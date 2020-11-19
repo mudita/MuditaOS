@@ -12,11 +12,15 @@
 namespace
 {
     int (*real_fprintf)(FILE *__restrict __stream, const char *__restrict __format, ...);
+    int (*real_vfscanf) (FILE *__restrict __s, const char *__restrict __format, __gnuc_va_list __arg) __wur;
+    int (*real_ungetc) (int __c, FILE *__stream);
 
     void __attribute__((constructor)) _syscalls_scan_family()
     {
         real_fprintf = reinterpret_cast<decltype(real_fprintf)>(dlsym(RTLD_NEXT, "fprintf"));
-        if(!real_fprintf ) {
+        real_ungetc = reinterpret_cast<decltype(real_ungetc)>(dlsym(RTLD_NEXT, "ungetc"));
+        real_vfscanf = reinterpret_cast<decltype(real_vfscanf)>(dlsym(RTLD_NEXT, "vfscanf"));
+        if(!real_fprintf || !real_ungetc || !real_vfscanf) {
             abort();
         }
     }
@@ -82,9 +86,8 @@ extern "C" {
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            real_fprintf(stderr,"WARNING: redirecting ungetc(%p) to the linux fs\n",__stream);
+            return real_ungetc(__c,__stream);
         }
         int ret = ff_fseek(reinterpret_cast<FF_FILE*>(__stream), -1, SEEK_CUR );
         if( ret ) {
@@ -109,9 +112,8 @@ extern "C" {
                     __gnuc_va_list ap)
     {
         if(!vfs::is_ff_handle(fp)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            real_fprintf(stderr,"WARNING: redirecting fscanf(%p) to the linux fs\n",fp);
+            return real_vfscanf(fp,fmt,ap);
         }
         TRACE_SYSCALL();
         int ret = 0;
@@ -166,11 +168,6 @@ extern "C" {
                    const char *__restrict fmt, ...) __wur
     {
         TRACE_SYSCALL();
-        if(!vfs::is_ff_handle(fp)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
-        }
         va_list ap;
         int ret;
         va_start(ap, fmt);
