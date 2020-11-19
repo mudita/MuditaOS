@@ -34,6 +34,7 @@
 #include <list>
 #include <tuple>
 #include <vector>
+#include <module-apps/messages/AppMessage.hpp>
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
@@ -254,6 +255,18 @@ sys::ReturnCodes EventManager::InitHandler()
             auto event   = std::make_unique<AppFocusChangeEvent>(targetApplication);
             auto message = std::make_shared<DeveloperModeRequest>(std::move(event));
             sys::Bus::SendUnicast(message, service::name::service_desktop, this);
+        }
+
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(app::AppInputEventMessage(gui::InputEvent(RawKey())), [&](sys::Message *msgl) {
+        auto msg = static_cast<app::AppInputEventMessage *>(msgl);
+        assert(msg);
+
+        auto message = std::make_shared<app::AppInputEventMessage>(msg->getEvent());
+        if (!targetApplication.empty()) {
+            sys::Bus::SendUnicast(std::move(message), targetApplication, this);
         }
 
         return std::make_shared<sys::ResponseMessage>();
