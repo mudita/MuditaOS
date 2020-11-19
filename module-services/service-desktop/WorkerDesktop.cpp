@@ -89,7 +89,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
     return true;
 }
 
-sys::ReturnCodes WorkerDesktop::startDownload(const std::filesystem::path &destinationPath, const uint32_t fileSize)
+sys::ReturnCodes WorkerDesktop::startDownload(const std::filesystem::path &destinationPath, uint32_t fileSize)
 {
     filePath = destinationPath;
     fileDes  = fopen(filePath.c_str(), "w");
