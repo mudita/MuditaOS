@@ -3,17 +3,25 @@
 
 #include "MessageHandler.hpp"
 #include "ParserFSM.hpp"
-#include "ParserUtils.hpp"
-
-#include <log/log.hpp>
-
-#include <memory>
-#include <string>
 
 namespace sys
 {
     class Service;
 } // namespace sys
+
+#include <service-desktop/ServiceDesktop.hpp>
+#include <log/log.hpp>
+#include <json/json11.hpp>
+#include <memory>
+#include <string>
+
+#include "MessageHandler.hpp" // for MessageHandler
+#include "ParserUtils.hpp" // for eraseFront, calcPayloadLength, extractPayload, getHeader, removeHeader, size_header, endpointChar, parserFSM
+
+namespace sys
+{
+    class Service;
+}
 
 using namespace parserFSM;
 
@@ -52,7 +60,7 @@ void StateMachine::parseHeader()
 
     auto messageStart = receivedMsgPtr->find(message::endpointChar);
     if (messageStart == std::string::npos) {
-        LOG_ERROR("This is not a valid endpoint message! Type=%c\n", receivedMsgPtr->at(0));
+        LOG_ERROR("This is not a valid endpoint message! Type=%c", receivedMsgPtr->at(0));
         return;
     }
 
@@ -72,7 +80,7 @@ void StateMachine::parseHeader()
         return;
     }
 
-    LOG_DEBUG("Payload length: %lu\n", payloadLength);
+    LOG_DEBUG("Payload length: %lu", payloadLength);
 
     message::removeHeader(*receivedMsgPtr);
     parseNewMessage();
@@ -144,9 +152,9 @@ void StateMachine::parsePartialMessage()
 
 void StateMachine::parsePayload()
 {
-    LOG_DEBUG("Payload: %s\n", payload.c_str());
+    LOG_DEBUG("Payload: %s", payload.c_str());
     if (payload.empty()) {
-        LOG_ERROR("Empty payload!\n");
+        LOG_ERROR("Empty payload!");
         state = State::NoMsg;
         return;
     }
