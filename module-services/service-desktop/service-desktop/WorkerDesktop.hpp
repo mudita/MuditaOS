@@ -40,7 +40,7 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     void timerHandler(void);
 
     void rawDataReceived(void *dataPtr, uint32_t dataLen) override;
-    bool getRawMode() override;
+    bool getRawMode() const noexcept override;
 
   private:
     void uploadFileFailedResponse();

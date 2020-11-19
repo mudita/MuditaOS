@@ -21,7 +21,7 @@ namespace bsp
 {
     class USBDeviceListener {
       public:
-        virtual bool getRawMode() {
+        virtual bool getRawMode() const noexcept{
             return false;
         }
         virtual void rawDataReceived(void *dataPtr, uint32_t dataLen) = 0;
