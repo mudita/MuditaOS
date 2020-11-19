@@ -46,6 +46,10 @@ namespace cellular
             [this]() { return "," + this->getNewPassword(); },
         };
 
+        if (!isValid()) {
+            return std::string();
+        }
+
         std::string cmd(at::factory(at::AT::CPWD));
         for (auto &cmdPart : commandParts) {
             cmd.append(cmdPart());

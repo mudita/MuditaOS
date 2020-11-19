@@ -34,13 +34,14 @@ namespace cellular
         static std::unique_ptr<SupplementaryServicesRequest> create(const std::string &data, GroupMatch matchGroups);
         SupplementaryServicesRequest(const std::string &data, GroupMatch matchGroups);
 
+        // according to 3GPP TS 22.030 V16.0.0
         enum class ProcedureType
         {
-            Deactivation,
-            Activation,
-            Interrogation,
-            Registration,
-            Erasure
+            Deactivation,  // #
+            Activation,    // *
+            Interrogation, // *#
+            Registration,  // **
+            Erasure        // ##
         };
 
       protected:
@@ -51,15 +52,42 @@ namespace cellular
         std::string supplementaryInfoC;
         ProcedureType procedureType;
 
-        static constexpr inline auto atInformationClassVoice     = "1";
-        static constexpr inline auto atInformationClassData      = "2";
-        static constexpr inline auto atInformationClassFax       = "4";
-        static constexpr inline auto atInformationClassAllButSms = "7";
+        // according to EC25&EC21_AT_Commands_Manual_V1.3
+        static constexpr inline auto atInformationClassVoice     = 1 << 0;
+        static constexpr inline auto atInformationClassData      = 1 << 1;
+        static constexpr inline auto atInformationClassFax       = 1 << 2;
+        static constexpr inline auto atInformationClassSms       = 1 << 3;
+        static constexpr inline auto atInformationClassDataSync  = 1 << 4;
+        static constexpr inline auto atInformationClassDataAsync = 1 << 5;
 
-        static constexpr inline auto basicServiceVoice     = "11";
-        static constexpr inline auto basicServiceVoiceData = "25";
-        static constexpr inline auto basicServiceVoiceFax  = "13";
+        static constexpr inline auto atInformationClassAllTele =
+            atInformationClassVoice + atInformationClassFax + atInformationClassSms;
+        static constexpr inline auto atInformationClassAllDataTele = atInformationClassFax + atInformationClassSms;
+        static constexpr inline auto atInformationClassAllBearer =
+            atInformationClassDataSync + atInformationClassDataAsync + atInformationClassData;
 
-        auto getCommandInformationClass(const std::string &basicServiceGroup) const -> std::string;
+        // according to 3GPP TS 22.030 V16.0.0
+        enum class TeleAndBearerService
+        {
+            AllTeleServices          = 10,
+            Telephony                = 11,
+            AllDataTeleServices      = 12,
+            FacsimileServices        = 13,
+            ShortMessageServices     = 16,
+            AllTeleServicesExceptSms = 19,
+
+            VoiceGroupCallService = 17,
+            VoiceBroadcastService = 18,
+
+            AllBearerServices           = 20,
+            AllAsyncServices            = 21,
+            AllSyncServices             = 22,
+            AllDataCircuitSync          = 24,
+            AllDataCircuitAsync         = 25,
+            AllGprsBearerServices       = 99,
+            TelephonyAndAllSyncServices = 26,
+        };
+
+        auto getCommandInformationClass(const std::string &basicServiceGroup) const -> std::optional<std::string>;
     };
 }; // namespace cellular
