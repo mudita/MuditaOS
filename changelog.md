@@ -18,6 +18,7 @@
 * `[audio]` Fixed handling of headset microphone LDO DCDC.
 * `[desktop]` Absent call button on desktop with notifications fix
 * `[desktop]` Fixed system freeze on pressing Back button while focused on desktop.
+* `[messages]` Fixed usage of special characters while writing new message.
 
 ## [0.46.1 2020-11-13]
 
