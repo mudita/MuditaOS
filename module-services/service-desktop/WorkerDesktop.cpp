@@ -6,6 +6,7 @@
 #include "parser/MessageHandler.hpp"
 #include "parser/ParserFSM.hpp"
 #include "endpoints/Context.hpp"
+
 #include <bsp/usb/usb.hpp>
 #include <log/log.hpp>
 #include <projdefs.h>
@@ -18,9 +19,12 @@ inline constexpr auto uploadFailedMessage = "file upload terminated before all d
 
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr)
     : sys::Worker(ownerServicePtr),
-      Timer("WorkerDesktop::Timeout", cpp_freertos::Ticks::MsToTicks(sdesktop::file_transfer_timeout), false),
       ownerService(ownerServicePtr), parser(ownerServicePtr), fileDes(nullptr)
-{}
+{
+    transferTimer = std::make_unique<sys::Timer>("WorkerDesktop file upload", ownerServicePtr, sdesktop::file_transfer_timeout);
+    transferTimer->connect([=](sys::Timer &) { timerHandler(); });
+    transferTimer->start();
+}
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 {
@@ -96,8 +100,7 @@ sys::ReturnCodes WorkerDesktop::startDownload(const std::filesystem::path &desti
     if (fileSize <= 0)
         return sys::ReturnCodes::Failure;
 
-    if (Start(cpp_freertos::Ticks::MsToTicks(1000)) == false)
-        return sys::ReturnCodes::Failure;
+    transferTimer->start();
 
     writeFileSizeExpected = fileSize;
     rawModeEnabled        = true;
@@ -126,7 +129,7 @@ void WorkerDesktop::stopTransfer(const TransferFailAction action)
     fclose(fileDes);
 
     // stop the timeout timer
-    Stop();
+    transferTimer->stop();
 
     // reset all counters
     writeFileSizeExpected = 0;
@@ -144,7 +147,7 @@ void WorkerDesktop::stopTransfer(const TransferFailAction action)
 void WorkerDesktop::rawDataReceived(void *dataPtr, uint32_t dataLen)
 {
     if (getRawMode()) {
-        Reset(cpp_freertos::Ticks::MsToTicks(sdesktop::file_transfer_timeout));
+        transferTimer->reload();
 
         if (dataPtr == nullptr || dataLen == 0) {
             LOG_ERROR("transferDataReceived invalid data");
@@ -172,7 +175,7 @@ void WorkerDesktop::rawDataReceived(void *dataPtr, uint32_t dataLen)
     }
 }
 
-void WorkerDesktop::Run()
+void WorkerDesktop::timerHandler()
 {
     LOG_DEBUG("timeout timer: run");
 

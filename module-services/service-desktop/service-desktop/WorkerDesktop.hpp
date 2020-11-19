@@ -6,15 +6,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <filesystem>
-#include <module-os/RTOSWrapper/include/ticks.hpp>
-#include <module-os/RTOSWrapper/include/timer.hpp>
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "Service/Worker.hpp"
+#include "Service/Timer.hpp"
 #include "parser/ParserFSM.hpp"
 #include "bsp/usb/usb.hpp"
 
-class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer, public bsp::USBDeviceListener
+class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
 {
   public:
     enum TransferFailAction
@@ -37,7 +36,8 @@ class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer, public bsp
     }
     sys::ReturnCodes startDownload(const std::filesystem::path &destinationPath, const uint32_t fileSize);
     void stopTransfer(const TransferFailAction action);
-    void Run();
+
+    void timerHandler(void);
 
     void rawDataReceived(void *dataPtr, uint32_t dataLen) override;
     bool getRawMode() override;
@@ -50,4 +50,5 @@ class WorkerDesktop : public sys::Worker, public cpp_freertos::Timer, public bsp
     uint32_t writeFileDataWritten  = 0;
     std::filesystem::path filePath;
     volatile bool rawModeEnabled = false;
+    std::unique_ptr<sys::Timer> transferTimer;
 };
