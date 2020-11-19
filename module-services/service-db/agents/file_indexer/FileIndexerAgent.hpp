@@ -16,13 +16,24 @@ class FileIndexerAgent : public DatabaseAgent
     void deinitDb() override;
     void registerMessages() override;
     auto getAgentName() -> const std::string override;
-    void dbTest();
 
-  private:
-    using MapOfRecipentsToBeNotified = std::map<std::string, std::set<std::string>>;
-    MapOfRecipentsToBeNotified fileChangeRecipents;
+  protected:
+    // msg handlers
     auto handleRegisterOnFileChange(sys::Message *req) -> sys::MessagePointer;
     auto handleUnregisterOnFileChange(sys::Message *req) -> sys::MessagePointer;
+    auto handleListDir(sys::Message *req) -> sys::MessagePointer;
+    auto handleGetProperty(sys::Message *req) -> sys::MessagePointer;
+    auto handleGetAllProperties(sys::Message *req) -> sys::MessagePointer;
+    auto handleSetProperty(sys::Message *req) -> sys::MessagePointer;
+    auto handleSetProperties(sys::Message *req) -> sys::MessagePointer;
+    auto handleGetRecord(sys::Message *req) -> sys::MessagePointer;
+    auto handleSetRecord(sys::Message *req) -> sys::MessagePointer;
+
+    using MapOfRecipentsToBeNotified = std::map<std::string, std::set<std::string>>;
+    MapOfRecipentsToBeNotified fileChangeRecipents;
+
+  private:
+    // db operations
     auto dbRegisterFileChange(std::string dir, std::string service) -> bool;
     auto dbUnregisterFileChange(std::string dir, std::string service) -> bool;
     auto dbListDir(std::unique_ptr<FileIndexer::ListDirData> listDir) -> std::unique_ptr<FileIndexer::ListDirData>;
@@ -37,11 +48,4 @@ class FileIndexerAgent : public DatabaseAgent
     auto getDbInitString() -> const std::string override;
     auto getDbFilePath() -> const std::string override;
     auto dbGetFilesCount() -> unsigned int;
-    auto handleListDir(sys::Message *req) -> sys::MessagePointer;
-    auto handleGetProperty(sys::Message *req) -> sys::MessagePointer;
-    auto handleGetAllProperties(sys::Message *req) -> sys::MessagePointer;
-    auto handleSetProperty(sys::Message *req) -> sys::MessagePointer;
-    auto handleSetProperties(sys::Message *req) -> sys::MessagePointer;
-    auto handleGetRecord(sys::Message *req) -> sys::MessagePointer;
-    auto handleSetRecord(sys::Message *req) -> sys::MessagePointer;
 };

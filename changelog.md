@@ -3,6 +3,7 @@
 ### Added
 
 * `[cellular]` Integration with basic flow for SIM card (cellular<>GUI)
+* `[file indexer db]` Added UT fot File Indexer DB
 
 ### Fixed
 
