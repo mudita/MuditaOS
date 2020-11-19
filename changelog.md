@@ -24,6 +24,7 @@
 ### Fixed
 
 * `[desktop]` Absent call button on desktop with notifications fix
+* `[desktop]` Fixed system freeze on pressing Back button while focused on desktop.
 * `[messages]` Fixed clearing text on options/recipient choice in new message window.
 * `[Text]` Fixed newline handling.
 * `[appmgr]` Fixed applications closing.
