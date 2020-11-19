@@ -8,7 +8,7 @@
 #include "UrcCpin.hpp" //for Cpin parseState
 #include "UrcFactory.hpp"
 
-SimCardResult SimCard::convertErrorFromATResult(at::Result atres)
+SimCardResult SimCard::convertErrorFromATResult(const at::Result atres) const
 {
     if (std::holds_alternative<at::EquipmentErrorCode>(atres.errorCode)) {
 
@@ -21,7 +21,7 @@ SimCardResult SimCard::convertErrorFromATResult(at::Result atres)
     return SimCardResult::Unknown;
 }
 
-std::optional<at::response::qpinc::AttemptsCounters> SimCard::getAttemptsCounters()
+std::optional<at::response::qpinc::AttemptsCounters> SimCard::getAttemptsCounters() const
 {
     auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
     if (channel) {
@@ -35,7 +35,7 @@ std::optional<at::response::qpinc::AttemptsCounters> SimCard::getAttemptsCounter
     return std::nullopt;
 }
 
-SimCardResult SimCard::supplyPin(const std::string pin)
+SimCardResult SimCard::supplyPin(const std::string pin) const
 {
     if (auto pc = getAttemptsCounters(); pc) {
         if (pc.value().PinCounter > 0) {
@@ -62,7 +62,7 @@ SimCardResult SimCard::supplyPin(const std::string pin)
     return SimCardResult::Unknown;
 }
 
-SimCardResult SimCard::supplyPuk(const std::string puk, const std::string pin)
+SimCardResult SimCard::supplyPuk(const std::string puk, const std::string pin) const
 {
     if (auto pc = getAttemptsCounters(); pc) {
         if (pc.value().PukCounter != 0) {
@@ -84,7 +84,7 @@ SimCardResult SimCard::supplyPuk(const std::string puk, const std::string pin)
     return SimCardResult::Unknown;
 }
 
-bool SimCard::isPinLocked()
+bool SimCard::isPinLocked() const
 {
     if (auto channel = cellularService.cmux->get(TS0710::Channel::Commands); channel) {
         auto resp = channel->cmd(at::factory(at::AT::CLCK) + "\"SC\",2\r");
@@ -96,7 +96,7 @@ bool SimCard::isPinLocked()
     return true;
 }
 
-SimCardResult SimCard::setPinLock(bool lock, std::string pin)
+SimCardResult SimCard::setPinLock(bool lock, const std::string pin) const
 {
     if (auto pc = getAttemptsCounters(); pc) {
         if (pc.value().PukCounter != 0) {
@@ -120,7 +120,7 @@ SimCardResult SimCard::setPinLock(bool lock, std::string pin)
     return SimCardResult::Unknown;
 }
 
-SimCardResult SimCard::changePin(std::string oldPin, std::string newPin)
+SimCardResult SimCard::changePin(const std::string oldPin, const std::string newPin) const
 {
     if (auto pc = getAttemptsCounters(); pc) {
         if (pc.value().PukCounter != 0) {
@@ -143,13 +143,13 @@ SimCardResult SimCard::changePin(std::string oldPin, std::string newPin)
     return SimCardResult::Unknown;
 }
 
-std::optional<at::SimState> SimCard::simState()
+std::optional<at::SimState> SimCard::simState() const
 {
     std::string buf;
     return simStateWithMessage(buf);
 }
 
-std::optional<at::SimState> SimCard::simStateWithMessage(std::string &message)
+std::optional<at::SimState> SimCard::simStateWithMessage(std::string &message) const
 {
     if (auto channel = cellularService.cmux->get(TS0710::Channel::Commands); channel) {
         auto resp = channel->cmd(at::factory(at::AT::GET_CPIN));

@@ -88,7 +88,6 @@ class CellularSimStateMessage : public CellularMessage
     std::string message;
 
   public:
-    CellularSimStateMessage() = delete;
     explicit CellularSimStateMessage(at::SimState state, std::string message)
         : CellularMessage(MessageType::CellularSimState), state(state), message(std::move(message))
     {}

@@ -24,32 +24,32 @@ class SimCard
      * return SIMFailure which could mean 0 attempts (happen if lock during session, on modem/sim reboot again return
      * 0,0);
      */
-    std::optional<at::response::qpinc::AttemptsCounters> getAttemptsCounters();
+    std::optional<at::response::qpinc::AttemptsCounters> getAttemptsCounters() const;
 
     /** Supply pin for modem
      * \param pin digits as a string from 4-8 digits
      * \return return OK on success in other case see details in SimCardResult
      */
-    SimCardResult supplyPin(const std::string pin);
+    SimCardResult supplyPin(const std::string pin) const;
 
     /** Supply pin for modem
      * \param puk puk as standard 8 digits
      * \param pin, new pin digits as a string from 4-8 digits
      * \return return OK on success in other case see details in SimCardResult
      */
-    SimCardResult supplyPuk(const std::string puk, const std::string pin);
+    SimCardResult supplyPuk(const std::string puk, const std::string pin) const;
 
     /** return whether the pin needs to be provided, only for standard pin.
      * \return true if need pin to unlock SIM card functionality
      */
-    bool isPinLocked();
+    bool isPinLocked() const;
 
     /** Set whether to provide pin. Always need to provide actual pin for sim card, only for standard PIN
      * \param lock true for lock SIM card
      * \param pin actual pin for SIM card
      * \return
      */
-    SimCardResult setPinLock(bool lock, std::string pin);
+    SimCardResult setPinLock(bool lock, const std::string pin) const;
 
     /** Change pin, only for standard pin. To get effect of change pin, SIM cart or modem should be restarted
      * simplest solution is to call AT+CFUN=0/1
@@ -57,12 +57,12 @@ class SimCard
      * \param newPin
      * \return return OK on success, else see SimCardResult
      */
-    SimCardResult changePin(std::string oldPin, std::string newPin);
+    SimCardResult changePin(const std::string oldPin, const std::string newPin) const;
 
     /** Return SIM state based on CPIN AT commands
      */
-    std::optional<at::SimState> simState();
-    std::optional<at::SimState> simStateWithMessage(std::string &message);
+    std::optional<at::SimState> simState() const;
+    std::optional<at::SimState> simStateWithMessage(std::string &message) const;
 
   private:
     ServiceCellular &cellularService;
@@ -70,7 +70,7 @@ class SimCard
     /** Helper function to convert from one enum to another (only with part of them). Base on continuous range of sim
      * errors in AT.
      */
-    SimCardResult convertErrorFromATResult(at::Result);
+    SimCardResult convertErrorFromATResult(const at::Result) const;
 
     std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head);
 };

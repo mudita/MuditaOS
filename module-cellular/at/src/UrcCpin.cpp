@@ -43,11 +43,7 @@ auto Cpin::getMessage() const noexcept -> std::optional<std::string>
     if (!isValid()) {
         return std::nullopt;
     }
-
-    auto message = tokens[Tokens::State];
-    utils::findAndReplaceAll(message, "\"", "");
-
-    return utils::trim(message);
+    return tokens[Tokens::State];
 }
 
 auto Cpin::getState() const noexcept -> std::optional<at::SimState>

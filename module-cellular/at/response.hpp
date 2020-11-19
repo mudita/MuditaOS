@@ -13,12 +13,26 @@ namespace at
 {
     namespace response
     {
+        namespace qpinc
+        {
+            /// Structure that holds parsed information from AT+QPINC command
+            struct AttemptsCounters
+            {
+                int PinCounter; /*!<  PIN attempts counter */
+                int PukCounter; /*!<  PUK attempts counter */
+            };
+        }
+
         std::vector<std::string> tokenize(std::string &response, std::string separator = ",");
+        std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head);
         bool parseCSQ(std::string response, std::string &result);
         bool parseCSQ(std::string cellularResponse, uint32_t &result);
         bool parseCREG(std::string &response, uint32_t &result);
         bool parseCREG(std::string &response, std::string &result);
         bool parseQNWINFO(std::string &response, std::string &result);
+        bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret);
+        bool parseCLCK(const at::Result &resp, int &ret);
+
 
         namespace creg
         {
