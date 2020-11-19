@@ -70,7 +70,7 @@ namespace bsp
         unlockpt(fd);
 
         char *pts_name = ptsname(fd);
-        if (pts_name == NULL) {
+        if (pts_name == nullptr) {
             LOG_ERROR("bsp::usbInit ptsname returned NULL, no pseudo terminal allocated");
             return -1;
         }
