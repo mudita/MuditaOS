@@ -22,8 +22,26 @@ namespace
     size_t (*real_fwrite)(const void *__restrict __ptr, size_t __size, size_t __n, FILE *__restrict __s);
     int (*real_fputs)(const char *__restrict __s, FILE *__restrict __stream);
     int (*real_fputc)(int __c, FILE *__stream);
+    int (*real_putc) (int __c, FILE *__stream);
     int (*real_fileno)(FILE *__stream) __THROW __wur;
     int (*real_vfprintf)(FILE *__restrict __s, const char *__restrict __format, __gnuc_va_list __arg);
+    FILE *(*real_fopen) (const char *__restrict __filename, const char *__restrict __modes) __wur;
+    int (*real_fclose) (FILE *__stream);
+    int (*real_getc) (FILE *__stream);
+    int (*real_feof) (FILE *__stream) __THROW __wur;
+    char *(*real_fgets) (char *__restrict __s, int __n, FILE *__restrict __stream) __wur;
+    int (*real_ferror) (FILE *__stream) __THROW __wur;
+    int (*real_fflush) (FILE *__stream);
+    int (*real_fgetc) (FILE *__stream);
+    int (*real_fgetpos) (FILE *__restrict __stream, fpos_t *__restrict __pos);
+    int (*real_fgetpos64) (FILE *__restrict __stream, fpos64_t *__restrict __pos);
+    size_t (*real_fread) (void *__restrict __ptr, size_t __size, size_t __n, FILE *__restrict __stream) __wur;
+    FILE *(*real_freopen) (const char *__restrict __filename, const char *__restrict __modes, FILE *__restrict __stream) __wur;
+    int (*real_fseek) (FILE *__stream, long int __off, int __whence);
+    int (*real_fsetpos) (FILE *__stream, const fpos_t *__pos);
+    int (*real_fsetpos64) (FILE *__stream, const fpos64_t *__pos);
+    long int (*real_ftell) (FILE *__stream) __wur;
+    void (*real_rewind) (FILE *__stream);
 
     std::unordered_map<FF_FILE*,size_t> g_fd_map;
     std::recursive_mutex g_mutex;
@@ -35,10 +53,33 @@ namespace
         real_fwrite = reinterpret_cast<decltype(real_fwrite)>(dlsym(RTLD_NEXT, "fwrite"));
         real_fputs = reinterpret_cast<decltype(real_fputs)>(dlsym(RTLD_NEXT, "fputs"));
         real_fputc = reinterpret_cast<decltype(real_fputc)>(dlsym(RTLD_NEXT, "fputc"));
+        real_putc = reinterpret_cast<decltype(real_putc)>(dlsym(RTLD_NEXT, "putc"));
         real_fileno = reinterpret_cast<decltype(real_fileno)>(dlsym(RTLD_NEXT, "fileno"));
         real_vfprintf = reinterpret_cast<decltype(real_vfprintf)>(dlsym(RTLD_NEXT, "vfprintf"));
+        real_fopen = reinterpret_cast<decltype(real_fopen)>(dlsym(RTLD_NEXT, "fopen"));
+        real_fclose = reinterpret_cast<decltype(real_fclose)>(dlsym(RTLD_NEXT, "fclose"));
+        real_getc = reinterpret_cast<decltype(real_getc)>(dlsym(RTLD_NEXT, "getc"));
+        real_feof = reinterpret_cast<decltype(real_feof)>(dlsym(RTLD_NEXT, "feof"));
+        real_fgets = reinterpret_cast<decltype(real_fgets)>(dlsym(RTLD_NEXT, "fgets"));
+        real_ferror = reinterpret_cast<decltype(real_ferror)>(dlsym(RTLD_NEXT, "ferror"));
+        real_fgetc = reinterpret_cast<decltype(real_fgetc)>(dlsym(RTLD_NEXT, "fgetc"));
+        real_fgetpos = reinterpret_cast<decltype(real_fgetpos)>(dlsym(RTLD_NEXT, "fgetpos"));
+        real_fgetpos64 = reinterpret_cast<decltype(real_fgetpos64)>(dlsym(RTLD_NEXT, "fgetpos64"));
+        real_fread = reinterpret_cast<decltype(real_fread)>(dlsym(RTLD_NEXT, "fread"));
+        real_freopen = reinterpret_cast<decltype(real_freopen)>(dlsym(RTLD_NEXT, "freopen"));
+        real_fseek = reinterpret_cast<decltype(real_fseek)>(dlsym(RTLD_NEXT, "fseek"));
+        real_fsetpos = reinterpret_cast<decltype(real_fsetpos)>(dlsym(RTLD_NEXT, "fsetpos"));
+        real_fsetpos64 = reinterpret_cast<decltype(real_fsetpos64)>(dlsym(RTLD_NEXT, "fsetpos64"));
+        real_ftell = reinterpret_cast<decltype(real_ftell)>(dlsym(RTLD_NEXT, "ftell"));
+        real_rewind = reinterpret_cast<decltype(real_rewind)>(dlsym(RTLD_NEXT, "rewind"));
+        real_fflush = reinterpret_cast<decltype(real_fflush)>(dlsym(RTLD_NEXT, "fflush"));
         if(!real_fprintf || !real_fwrite || !real_fputs || !real_fputc
-            || !real_fileno || !real_vfprintf) {
+            || !real_fileno || !real_vfprintf || !real_putc || !real_fopen
+            || !real_fclose || !real_getc || !real_feof || !real_fgets
+            || !real_ferror || !real_fflush || ! real_fgetc || !real_fgetpos
+            || !real_fgetpos64 || !real_fread || !real_freopen || !real_fseek
+            || !real_fsetpos || !real_fsetpos64 || !real_ftell || !real_rewind )
+        {
             abort();
         }
     }
@@ -88,6 +129,13 @@ extern "C"
             std::lock_guard<std::recursive_mutex> _lck(g_mutex);
             const auto fd = g_handles.insert(ret) + vfs::FIRST_FILEDESC;
             g_fd_map.insert(std::make_pair(ret,fd));
+        } else {
+            auto ret = real_fopen(pathname,mode);
+            real_fprintf(stderr,
+                "WARNING: redirecting fopen(%s) to the Linux fs. Native FILE*: %p\n",
+                pathname, ret
+            );
+            return ret;
         }
         errno    = stdioGET_ERRNO();
         return reinterpret_cast<FILE*>(ret);
@@ -105,9 +153,8 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            real_fprintf(stderr,"WARNING: redirecting fclose(%p) to the Linux fs.\n", __stream);
+            return real_fclose(__stream);
         }
         auto ret = ff_fclose(reinterpret_cast<FF_FILE *>(__stream));
         {
@@ -136,9 +183,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            return real_feof(__stream);
         }
         auto ret = ff_feof(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -146,10 +191,14 @@ extern "C"
     }
     __asm__(".symver feof,feof@GLIBC_2.2.5");
 
-    int ferror(FILE *) __THROW __wur
+    int ferror(FILE * stream) __THROW __wur
     {
         TRACE_SYSCALL();
-        return stdioGET_ERRNO();
+        if(vfs::is_ff_handle(stream)) {
+            return stdioGET_ERRNO();
+        } else {
+            return real_ferror(stream);
+        }
     }
     __asm__(".symver ferror,ferror@GLIBC_2.2.5");
 
@@ -157,9 +206,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            return real_fflush(__stream);
         }
         auto ret = ff_fflush(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -171,9 +218,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            return real_fgetc(__stream);
         }
         auto ret = ff_fgetc(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -185,9 +230,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            return real_fgetpos(__stream, __pos);
         }
         auto ret = ff_ftell(reinterpret_cast<FF_FILE *>(__stream));
         if (ret > 0 && __pos) {
@@ -203,9 +246,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            return real_fgetpos64(__stream,__pos);
         }
         auto ret = ff_ftell(reinterpret_cast<FF_FILE *>(__stream));
         if (ret > 0 && __pos) {
@@ -221,9 +262,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return nullptr;
+            return real_fgets(__s,__n,__stream);
         }
         auto ret = ff_fgets(__s, __n, reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -289,6 +328,7 @@ extern "C"
             return real_fputc( __c, __stream );
         }
         TRACE_SYSCALL();
+        real_fprintf(stderr,"PUTC FILE %p\n", __stream );
         auto ret = ff_fputc(__c, reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
         return ret;
@@ -316,9 +356,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return 0;
+            return real_fread(__ptr,__size,__n,__stream);
         }
         auto ret = ff_fread(__ptr, __size, __n, reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -333,9 +371,11 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return nullptr;
+            auto ret = real_freopen(__filename,__modes,__stream);
+            real_fprintf(stderr,
+                "WARNING: redirecting freopen(%s,%s,%p) to the Linux fs. Native FILE*: %p\n",
+                __filename, __modes,__stream, ret);
+            return  ret;
         }
         if( fclose(__stream) < 0) {
             return nullptr;
@@ -348,9 +388,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            return real_fseek(__stream,__off,__whence);
         }
         auto ret = ff_fseek(reinterpret_cast<FF_FILE*>(__stream), __off, __whence );
         errno = stdioGET_ERRNO();
@@ -362,9 +400,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            return real_fsetpos(__stream,__pos);
         }
         auto ret = ff_fseek( reinterpret_cast<FF_FILE*>(__stream), __pos->__pos, SEEK_SET );
         errno = stdioGET_ERRNO();
@@ -376,9 +412,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            return real_fsetpos64(__stream,__pos);
         }
         auto ret = ff_fseek( reinterpret_cast<FF_FILE*>(__stream), __pos->__pos, SEEK_SET );
         errno = stdioGET_ERRNO();
@@ -391,9 +425,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            return real_ftell(__stream);
         }
         auto ret = ff_ftell(reinterpret_cast<FF_FILE*>(__stream));
         errno = stdioGET_ERRNO();
@@ -418,9 +450,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            return real_getc(__stream);
         }
         auto ret = ff_fgetc(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -432,9 +462,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return -1;
+            return real_putc(__c,__stream);
         }
         auto ret = ff_fputc(__c, reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -458,9 +486,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"ERROR: It is not a ff file handle\n");
-            errno = EINVAL;
-            return;
+            real_rewind(__stream);
         }
         ff_fseek(reinterpret_cast<FF_FILE*>(__stream), 0L, SEEK_SET);
     }
