@@ -1,27 +1,34 @@
 # MuditaOS changelog
 
+## [Current release]
 
-## Added
-
+### Added
+* `[audio]` Added support for headset microphone.
+* `[service/db]` Added support for ListView in FileIndexer DB.
+* `[gui][desktop]` SIM PIN flow charts added
 * `[cellular]` Added SIM PIN/PUK handling
 * `[cellular]` Added change PIN functionality
 * `[cellular]` Added possibility of unlock SIM card (no PIN on start) functionality
 
+### Changed
+
+
+### Fixed
+* `[audio]` Fixed handling of headset microphone LDO DCDC.
+* `[desktop]` Absent call button on desktop with notifications fix
+* `[desktop]` Fixed system freeze on pressing Back button while focused on desktop.
 
 ## [0.46.1 2020-11-13]
 
 ## Added
 
-* `[gui][desktop]` SIM PIN flow charts added
 * `[cellular]` Added call request type recognition (URC).
 * `[calendar]` Added a new field for date of the event when the user adds/edits event.
 * `[file indexer db]` Added messages for File Indexer db.
 * `[settings]` Added Torch window (front-end only).
 * `[audio]` Added support for Bluetooth audio profiles
-* `[audio]` Added support for headset microphone.
 * `[filesystem]` Added support for standard file IO library.
 * [`[messages]`] Added fetching text messages at phone startup.
-* `[service/db]` Added support for ListView in FileIndexer DB.
 
 ## Changed
 
@@ -31,13 +38,10 @@
 
 ### Fixed
 
-* `[desktop]` Absent call button on desktop with notifications fix
-* `[desktop]` Fixed system freeze on pressing Back button while focused on desktop.
 * `[messages]` Fixed clearing text on options/recipient choice in new message window.
 * `[Text]` Fixed newline handling.
 * `[appmgr]` Fixed applications closing.
 * `[audio]` Fixed crash on attempt to open non-existent file
-* `[audio]` Fixed handling of headset microphone LDO DCDC.
 
 ## [0.45.1 2020-11-06]
 
