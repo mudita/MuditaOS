@@ -39,7 +39,7 @@ struct CalllogTableRow : public Record
     CallType type                 = CallType::CT_NONE;
     UTF8 name;
     uint32_t contactId = 0;
-    bool isRead = true;
+    bool isRead        = true;
 };
 
 enum class CalllogTableFields
@@ -75,17 +75,4 @@ class CalllogTable : public Table<CalllogTableRow, CalllogTableFields>
     uint32_t count(EntryState state);
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
     bool SetAllRead();
-
-  private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS calls("
-                                   "_id INTEGER PRIMARY KEY,"
-                                   "number TEXT DEFAULT '',"
-                                   "e164number TEXT DEFAULT '',"
-                                   "presentation INTEGER DEFAULT 0,"
-                                   "date INTEGER DEFAULT 0,"
-                                   "duration INTEGER DEFAULT 0,"
-                                   "type INTEGER DEFAULT 0,"
-                                   "name TEXT DEFAULT '',"
-                                   "contactId INTEGER DEFAULT 0,"
-                                   "isRead INTEGER DEFAULT 1)";
 };

@@ -55,26 +55,4 @@ class ThreadsTable : public Table<ThreadsTableRow, ThreadsTableFields>
 
     /// returns: { maximum_query_depth, vector {requested amount of data which match} }
     std::pair<uint32_t, std::vector<ThreadsTableRow>> getBySMSQuery(std::string text, uint32_t offset, uint32_t limit);
-
-  private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS threads("
-                                   "_id INTEGER PRIMARY KEY,"
-                                   "date INTEGER,"
-                                   "msg_count INTEGER,"
-                                   "read INTEGER,"
-                                   "contact_id INTEGER,"
-                                   "number_id INTEGER,"
-                                   "snippet TEXT NOT NULL,"
-                                   "last_dir INTEGER"
-                                   ");";
-
-    const char *createTableThreadsCounterQuery = "CREATE TABLE IF NOT EXISTS threads_count "
-                                                 "(_id INTEGER PRIMARY KEY,"
-                                                 "count INTEGER );";
-
-    const char *threadsCounterInsertionQuery = "INSERT OR IGNORE INTO threads_count ( _id, count ) VALUES (1,0);";
-    const char *threadInsertTriggerQuery     = "CREATE TRIGGER IF NOT EXISTS on_thread_insert AFTER INSERT ON threads "
-                                           "BEGIN UPDATE threads_count SET count=count+1 WHERE _id=1; END";
-    const char *threadRemoveTriggerQuery = "CREATE TRIGGER IF NOT EXISTS on_thread_remove AFTER DELETE ON threads "
-                                           "BEGIN UPDATE threads_count SET count=count-1 WHERE _id=1; END";
 };

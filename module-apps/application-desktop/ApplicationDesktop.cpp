@@ -22,14 +22,12 @@
 #include <application-calllog/ApplicationCallLog.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include <module-utils/magic_enum/include/magic_enum.hpp>
 
 #include <cassert>
 namespace app
 {
     ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground), lockHandler(this)
+        : Application(name, parent, startInBackground), lockHandler(this, settings)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }
@@ -147,6 +145,9 @@ namespace app
     auto ApplicationDesktop::handle(db::NotificationMessage *msg) -> bool
     {
         assert(msg);
+        if (msg->interface == db::Interface::Name::Settings) {
+            reloadSettings();
+        }
 
         if (msg->interface == db::Interface::Name::Notifications && msg->type == db::Query::Type::Update) {
             return requestNotSeenNotifications();
@@ -231,6 +232,7 @@ namespace app
             return ret;
         }
 
+        reloadSettings();
         requestNotReadNotifications();
         requestNotSeenNotifications();
         lockHandler.reloadScreenLock();
@@ -261,11 +263,6 @@ namespace app
         auto msgToSend =
             std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
         sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, this);
-
-        settings->registerValueChange(
-            ::Settings::SystemProperties::activeSim,
-            [this](const std::string &name, std::optional<std::string> value) { activeSimChanged(name, value); });
-        Store::GSM::get()->selected = Store::GSM::SIM::NONE;
 
         return sys::ReturnCodes::Success;
     }
@@ -305,20 +302,20 @@ namespace app
     void ApplicationDesktop::destroyUserInterface()
     {}
 
-    void ApplicationDesktop::activeSimChanged(const std::string &name, std::optional<std::string> value)
+    void ApplicationDesktop::reloadSettings()
     {
-        if (value.has_value() && !value.value().empty()) {
-            auto actSim = magic_enum::enum_cast<Store::GSM::SIM>(value.value());
-            if (actSim.has_value()) {
-                Store::GSM::get()->selected = actSim.value();
-            }
-            else {
-                Store::GSM::get()->selected = Store::GSM::SIM::NONE;
-            }
-        }
-        else {
-            need_sim_select             = true;
+        settings = DBServiceAPI::SettingsGet(this);
+        switch (settings.activeSIM) {
+        case SettingsRecord::ActiveSim::NONE:
             Store::GSM::get()->selected = Store::GSM::SIM::NONE;
+            need_sim_select             = true;
+            break;
+        case SettingsRecord::ActiveSim::SIM1:
+            Store::GSM::get()->selected = Store::GSM::SIM::SIM1;
+            break;
+        case SettingsRecord::ActiveSim::SIM2:
+            Store::GSM::get()->selected = Store::GSM::SIM::SIM2;
+            break;
         }
     }
 

@@ -1,21 +1,22 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <service-cellular/ServiceCellular.hpp>
+#include "FotaServiceAPI.hpp"
+
 #include <Modem/TS0710/DLC_channel.h>
 #include <Modem/TS0710/TS0710.h>
-#include <Service/Service.hpp> // for Service
-#include <Service/Message.hpp> // for MessagePointer
-#include <stdint.h>            // for uint32_t
-#include <memory>              // for unique_ptr
-#include <sstream>
-#include <string> // for string
+#include <Result.hpp>
+#include <Service/Common.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <service-cellular/ServiceCellular.hpp>
 
-#include "api/FotaServiceAPI.hpp" // for ContextMap
-#include "Result.hpp"             // for Result
-#include "Service/Common.hpp"     // for ReturnCodes, ReturnCodes::Success, ServicePowerMode
+#include <cstdint>
+#include <memory>
+#include <sstream>
+#include <string>
 
 class DLC_channel;
 class FotaUrcHandler;

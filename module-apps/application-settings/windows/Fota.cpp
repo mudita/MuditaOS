@@ -5,8 +5,8 @@
 #include "FotaWindow.hpp"
 
 #include <service-cellular/CellularServiceAPI.hpp>
-#include <service-fota/api/FotaServiceAPI.hpp>
-#include <service-fota/messages/FotaMessages.hpp>
+#include <service-fota/FotaServiceAPI.hpp>
+#include <service-fota/FotaMessages.hpp>
 
 #include <gui/widgets/Label.hpp>
 

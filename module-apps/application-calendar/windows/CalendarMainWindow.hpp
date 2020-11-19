@@ -13,7 +13,6 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <module-db/Common/Query.hpp>
 
 namespace gui
 {

@@ -47,11 +47,4 @@ class NotesTable : public Table<NotesTableRow, NotesTableFields>
 
     uint32_t count() override final;
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
-
-  private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS notes("
-                                   "_id INTEGER PRIMARY KEY,"
-                                   "date INTEGER,"
-                                   "snippet TEXT DEFAULT '',"
-                                   "path TEXT DEFAULT '')";
 };

@@ -1,18 +1,17 @@
 ﻿# service-db tests
 add_catch2_executable(
         NAME
-                service-db
+            service-db
         SRCS
-                main.cpp
-                test-service-db-api.cpp
-                test-service-db-settings-messages.cpp
-                test-service-db-settings-api.cpp
+            main.cpp
+            test-service-db-api.cpp
+            test-service-db-settings-messages.cpp
+            test-service-db-settings-api.cpp
         LIBS
-                module-bsp
-                module-services
-                module-utils
-                service-db
-                service-evtmgr
-                service-audio
+            service-audio
+            module-vfs
+            module-audio
+            service-cellular
+            module-cellular
 )
 

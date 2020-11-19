@@ -41,10 +41,4 @@ class SMSTemplateTable : public Table<SMSTemplateTableRow, SMSTemplateTableField
     uint32_t count() override final;
     uint32_t count(EntryState state);
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
-
-  private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS templates("
-                                   "_id INTEGER PRIMARY KEY,"
-                                   "text TEXT,"
-                                   "lastUsageTimestamp INTEGER)";
 };
