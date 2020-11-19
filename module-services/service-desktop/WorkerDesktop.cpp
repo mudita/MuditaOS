@@ -18,12 +18,11 @@
 inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
 
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr)
-    : sys::Worker(ownerServicePtr),
-      ownerService(ownerServicePtr), parser(ownerServicePtr), fileDes(nullptr)
+    : sys::Worker(ownerServicePtr), ownerService(ownerServicePtr), parser(ownerServicePtr), fileDes(nullptr)
 {
-    transferTimer = std::make_unique<sys::Timer>("WorkerDesktop file upload", ownerServicePtr, sdesktop::file_transfer_timeout);
+    transferTimer =
+        std::make_unique<sys::Timer>("WorkerDesktop file upload", ownerServicePtr, sdesktop::file_transfer_timeout);
     transferTimer->connect([=](sys::Timer &) { timerHandler(); });
-    transferTimer->start();
 }
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)

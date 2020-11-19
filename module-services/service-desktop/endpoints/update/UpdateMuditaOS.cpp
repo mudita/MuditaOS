@@ -588,7 +588,7 @@ const json11::Json UpdateMuditaOS::getVersionInfoFromFile(const fs::path &update
                      updateos::file::version,
                      updateFile.c_str());
 
-            //mtar_close(&tar);
+            // mtar_close(&tar);
             return json11::Json();
         }
 
