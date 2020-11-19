@@ -96,8 +96,12 @@ namespace bsp
         xTaskHandle taskHandleReceive;
         USBReceiveQueue = receiveQueue;
 
-        BaseType_t task_error = xTaskCreate(
-            &bsp::usbDeviceTask, "USBLinuxReceive", SERIAL_BUFFER_LEN * 8, nullptr, tskIDLE_PRIORITY, &taskHandleReceive);
+        BaseType_t task_error = xTaskCreate(&bsp::usbDeviceTask,
+                                            "USBLinuxReceive",
+                                            SERIAL_BUFFER_LEN * 8,
+                                            nullptr,
+                                            tskIDLE_PRIORITY,
+                                            &taskHandleReceive);
 
         if (task_error != pdPASS) {
             LOG_ERROR("bsp::usbInit Failed to start freertos USB_Linux_Receive");
