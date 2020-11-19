@@ -29,7 +29,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     receiveQueue                         = Worker::getQueueByName(sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
     parserFSM::MessageHandler::sendQueue = Worker::getQueueByName(sdesktop::SEND_QUEUE_BUFFER_NAME);
 
-    return static_cast<bool>(bsp::usbInit(receiveQueue, this));
+    return (bsp::usbInit(receiveQueue, this) < 0) ? false : true;
 }
 
 bool WorkerDesktop::deinit(void)
