@@ -33,9 +33,9 @@ BlueKitchen *BlueKitchen::getInstance()
     return k;
 }
 
-// request... from circ buffer
 ssize_t BlueKitchen::read(void *buf, size_t nbytes)
 {
+    LOG_DEBUG("BlueKitchen requested %d bytes to read", nbytes);
     set_rts(false);
     to_read     = nbytes;
     to_read_req = nbytes;
@@ -44,7 +44,11 @@ ssize_t BlueKitchen::read(void *buf, size_t nbytes)
     // bt->to_read
     BaseType_t taskwoken = 0;
     uint8_t val          = Bt::Message::EvtReceived;
+
     if ((to_read != 0) && (in.len >= to_read)) {
+
+        // order our worker to give nbytes RX bytes over to BlueKitchen
+
         to_read = 0;
         if (qHandle) {
             xQueueSendFromISR(qHandle, &val, &taskwoken);
@@ -88,37 +92,4 @@ ssize_t BlueKitchen::write_blocking(char *buf, ssize_t size)
     return i;
 }
 
-extern "C"
-{
-    void LPUART2_IRQHandler(void)
-    {
-        uint32_t isrReg               = LPUART_GetStatusFlags(BSP_BLUETOOTH_UART_BASE);
-        static char characterReceived = 0;
-        BaseType_t taskwoken          = 0;
-        uint8_t val                   = Bt::Message::EvtReceived;
-        bsp::BlueKitchen *bt          = bsp::BlueKitchen::getInstance();
-
-        if (isrReg & kLPUART_RxDataRegFullFlag) {
-            characterReceived = LPUART_ReadByte(BSP_BLUETOOTH_UART_BASE);
-            if (bt->in.push(characterReceived)) {
-                val = Bt::Message::EvtRecUnwanted;
-                xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
-            }
-            if (bt->to_read != 0 && (bt->in.len >= bt->to_read)) {
-                bt->to_read = 0;
-                assert(bt->qHandle);
-                val = Bt::Message::EvtReceived;
-                xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
-                portEND_SWITCHING_ISR(taskwoken);
-            }
-            if (bt->in.threshold_guard()) {
-                bt->set_rts(false);
-            }
-        }
-        if (isrReg & kLPUART_RxOverrunFlag) {
-            val = Bt::Message::EvtUartError;
-            xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
-        }
-        LPUART_ClearStatusFlags(BSP_BLUETOOTH_UART_BASE, isrReg);
-    }
-};
+;

@@ -51,6 +51,7 @@ namespace bsp {
                 _circ(unsigned int size, int threshold=0);
                 ~_circ();
                 inline int push(char val) {
+                    LOG_DEBUG("circ push: %d", val);
                     sem_take();
                     int ret=0;
                     if(len<size) {
@@ -135,15 +136,16 @@ namespace bsp {
             void configure_lpuart();
             void configure_cts_irq();
             void configure_lpuart_edma();
+      public:
             // edma
             std::shared_ptr<drivers::DriverDMAMux> dmamux;
             std::shared_ptr<drivers::DriverDMA> dma;
             std::unique_ptr<drivers::DriverDMAHandle> uartRxDmaHandle;
             std::unique_ptr<drivers::DriverDMAHandle> uartTxDmaHandle;
-            static lpuart_edma_handle_t uartDmaHandle;
+            static AT_NONCACHEABLE_SECTION_INIT(lpuart_edma_handle_t uartDmaHandle);
             static void uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
-            static volatile bool txFinished;
-            static volatile bool rxFinished;
+            static uint8_t dmaRXbuf[1000];
+            static uint32_t dmaRXreadCount;
             // /edma
     };
 
@@ -158,7 +160,7 @@ namespace bsp {
             virtual ssize_t read(void *buf, size_t nbytes) override;
             virtual ssize_t write_blocking(char *buf, ssize_t len) override;
             volatile uint32_t to_read_req = 0;
-            volatile uint32_t to_read =0;
+            volatile uint32_t to_read = 0;
             volatile char* read_buff;
 
             void set_flowcontrol(int on);

@@ -3,6 +3,8 @@
 
 #include <module-bsp/drivers/dmamux/DriverDMAMux.hpp>
 #include <module-bsp/bsp/BoardDefinitions.hpp>
+#include <sstream>
+#include "BluetoothWorker.hpp"
 #include "bsp/bluetooth/Bluetooth.hpp"
 #include "log/log.hpp"
 #include "FreeRTOS.h"
@@ -12,6 +14,8 @@
 using namespace bsp;
 
 lpuart_edma_handle_t BluetoothCommon::uartDmaHandle = {};
+uint8_t BluetoothCommon::dmaRXbuf[1000]             = {0};
+uint32_t BluetoothCommon::dmaRXreadCount            = 0;
 
 // TODO it's plain copy same as in cellular - this is kind of wrong
 uint32_t UartGetPeripheralClock();
@@ -104,9 +108,13 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 
 ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 {
-    lpuart_transfer_t sendXfer;
+    //    std::stringstream ss;
+    //    for (auto i = 0; i < nbytes; ++i) {
+    //        ss << " 0x" << std::hex << (int)buf[i];
+    //    }
+    //    LOG_DEBUG("write DMA -> [%d]>%s<", nbytes, ss.str().c_str());
 
-    //    LOG_INFO("write -> [%.*s]", nbytes, buf);
+    lpuart_transfer_t sendXfer = {0};
 
     sendXfer.data     = reinterpret_cast<uint8_t *>(buf);
     sendXfer.dataSize = nbytes;
@@ -118,19 +126,13 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 
     ssize_t ret = 0;
 
+    SCB_CleanInvalidateDCache();
     auto sent = LPUART_SendEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &sendXfer);
     switch (sent) {
     case kStatus_Success: {
-        //    CTS
-        auto ulNotificationValue = ulTaskNotifyTake(pdFALSE, 100);
-        if (ulNotificationValue != 0) {
-            LOG_DEBUG("DMA Tx gave");
-            ret = nbytes;
-        }
-        else {
-            LOG_ERROR("Cellular Uart error: TX Transmission timeout");
-            ret = -1;
-        }
+        // orchestrate a DMA tx
+        LOG_DEBUG("DMA Tx pending");
+        ret = nbytes;
     } break;
     case kStatus_LPUART_TxBusy:
         LOG_ERROR("Previous DMA xfer is still pending");
@@ -147,7 +149,19 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 
 ssize_t BluetoothCommon::write_blocking(char *buf, ssize_t len)
 {
-    return write(buf, len);
+    ssize_t ret = -1;
+
+    auto wrote = write(buf, len);
+
+    if (wrote == len) { // success orchestrating a transfer
+        constexpr auto write_blocking_timeout = pdMS_TO_TICKS(100);
+        auto ulNotificationValue              = ulTaskNotifyTake(pdFALSE, write_blocking_timeout);
+        if (ulNotificationValue != 0) { // success completing a transfer
+            LOG_DEBUG("DMA Tx pending");
+            ret = len;
+        }
+    }
+    return ret;
 }
 
 BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
@@ -165,6 +179,7 @@ BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
 // set flow on -> true, set flow off -> false
 BTdev::Error BluetoothCommon::set_rts(bool on)
 {
+    LOG_DEBUG("set RTS: %c", on ? 'O' : 'X');
     GPIO_PinWrite(BSP_BLUETOOTH_UART_RTS_PORT, BSP_BLUETOOTH_UART_RTS_PIN, on ? 0U : 1U);
     return Success;
 }
@@ -246,30 +261,17 @@ void BluetoothCommon::configure_lpuart()
                                      drivers::DriverDMAParams{});
 
     uartTxDmaHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_TX_DMA_CHANNEL));
-    //    uartRxDmaHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_RX_DMA_CHANNEL));
+    uartRxDmaHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_RX_DMA_CHANNEL));
 
     dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_TX_DMA_CHANNEL), kDmaRequestMuxLPUART2Tx);
-    //    dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_RX_DMA_CHANNEL), kDmaRequestMuxLPUART2Rx);
+    dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_RX_DMA_CHANNEL), kDmaRequestMuxLPUART2Rx);
 
     LPUART_TransferCreateHandleEDMA(BSP_BLUETOOTH_UART_BASE,
                                     &uartDmaHandle,
                                     uartDmaCallback,
                                     nullptr,
                                     reinterpret_cast<edma_handle_t *>(uartTxDmaHandle->GetHandle()),
-                                    nullptr); // reinterpret_cast<edma_handle_t *>(uartRxDmaHandle->GetHandle()));
-
-    //    // Prepares to receive
-    //    receiveXfer.data     = receiveData;
-    //    receiveXfer.dataSize = sizeof(receiveData) / sizeof(receiveData[0]);
-    //    rxFinished           = false;
-    //    // Receives.
-    //    LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, true);
-    //    LPUART_ReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &receiveXfer);
-    //    // Receive finished.
-    //    ret = LPUART_TransferGetReceiveCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
-    //    while (!rxFinished) {}
-    //    ret = LPUART_TransferGetReceiveCountEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &b);
-    //    LOG_DEBUG("finally");
+                                    reinterpret_cast<edma_handle_t *>(uartRxDmaHandle->GetHandle()));
 }
 
 void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData)
@@ -279,13 +281,15 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
     switch (status) {
     case kStatus_LPUART_TxIdle:
         LOG_DEBUG("DMA irq: TX done");
+        LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
         vTaskNotifyGiveFromISR((TaskHandle_t)userData, &higherPriorTaskWoken);
         portEND_SWITCHING_ISR(higherPriorTaskWoken);
         break;
-        //    case kStatus_LPUART_RxIdle:
-        //        break;
+    case kStatus_LPUART_RxIdle:
+        LOG_DEBUG("DMA irq: RX done");
+        break;
     default:
-        LOG_DEBUG("DMA irq: something else! (%ld)", status);
+        LOG_DEBUG("DMA irq: something else! (%ld). Quite impossible", status);
         break;
     }
 }
@@ -308,15 +312,94 @@ void BluetoothCommon::set_irq(bool enable)
     n += 0;
     if (enable) {
         LPUART_EnableInterrupts(BSP_BLUETOOTH_UART_BASE,
-                                kLPUART_RxDataRegFullInterruptEnable | kLPUART_IdleLineInterruptEnable);
+                                kLPUART_RxActiveEdgeInterruptEnable | kLPUART_RxOverrunInterruptEnable);
     }
     else {
         LPUART_DisableInterrupts(BSP_BLUETOOTH_UART_BASE,
-                                 kLPUART_RxDataRegFullInterruptEnable | kLPUART_IdleLineInterruptEnable);
+                                 kLPUART_RxDataRegFullInterruptEnable | kLPUART_IdleLineInterruptEnable |
+                                     kLPUART_RxOverrunInterruptEnable);
     }
     //     LPUART_EnableInterrupts(BSP_BLUETOOTH_UART_BASE,
     //     kLPUART_RxDataRegFullInterruptEnable|kLPUART_TxDataRegEmptyInterruptEnable|kLPUART_TransmissionCompleteInterruptEnable|kLPUART_RxOverrunInterruptEnable
     //     );
     LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, true);
     LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, true);
+}
+
+extern "C"
+{
+    void LPUART2_IRQHandler(void)
+    {
+        uint32_t isrReg      = LPUART_GetStatusFlags(BSP_BLUETOOTH_UART_BASE);
+        BaseType_t taskwoken = 0;
+        uint8_t val          = Bt::Message::EvtReceived;
+        bsp::BlueKitchen *bt = bsp::BlueKitchen::getInstance();
+
+        auto statusRxDma = LPUART_TransferGetReceiveCountEDMA(
+            BSP_BLUETOOTH_UART_BASE, &BluetoothCommon::uartDmaHandle, &BluetoothCommon::dmaRXreadCount);
+        LOG_DEBUG("DMA irq: %ld RXed so far (status: %ld)", BluetoothCommon::dmaRXreadCount, statusRxDma);
+
+        if (isrReg & kLPUART_RxActiveFlag) {
+            LOG_DEBUG("LPUART IRQ new byte incoming RX");
+
+            if (statusRxDma == kStatus_NoTransferInProgress) {
+                // start RXfer if there is byte incoming and no pending RXfer
+                lpuart_transfer_t receiveXfer;
+                receiveXfer.data     = reinterpret_cast<uint8_t *>(BluetoothCommon::dmaRXbuf);
+                receiveXfer.dataSize = sizeof(BluetoothCommon::dmaRXbuf) / sizeof(BluetoothCommon::dmaRXbuf[0]);
+
+                BluetoothCommon::dmaRXreadCount = 0;
+                LPUART_ReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &BluetoothCommon::uartDmaHandle, &receiveXfer);
+            }
+            else {
+                // transfer pending, no need to start again
+                // copy previous DMA byte to bt->in
+                if (BluetoothCommon::dmaRXreadCount > 0) {
+                    if (bt->in.push(BluetoothCommon::dmaRXbuf[BluetoothCommon::dmaRXreadCount - 1])) {
+                        val = Bt::Message::EvtRecUnwanted;
+                        xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
+                    }
+
+                    if (bt->to_read != 0 && (bt->in.len >= bt->to_read)) {
+                        bt->to_read = 0;
+                        assert(bt->qHandle);
+                        val = Bt::Message::EvtReceived;
+                        xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
+                        portEND_SWITCHING_ISR(taskwoken);
+                    }
+                }
+            }
+        }
+
+        if (isrReg & kLPUART_IdleLineFlag) {
+            LOG_DEBUG("LPUART IRQ line idle");
+
+            // DMA transaction is over. copy DMA buffer over to bt.in circ buffer
+
+            if (statusRxDma == kStatus_Success) {
+                LPUART_TransferAbortReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &BluetoothCommon::uartDmaHandle);
+                LOG_DEBUG("LPUART IRQ aborted RX");
+            }
+
+            // copy the last DMA byte to bt->in
+            if (bt->in.push(BluetoothCommon::dmaRXbuf[BluetoothCommon::dmaRXreadCount - 1])) {
+                val = Bt::Message::EvtRecUnwanted;
+                xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
+            }
+
+            if (bt->to_read != 0 && (bt->in.len >= bt->to_read)) {
+                bt->to_read = 0;
+                assert(bt->qHandle);
+                val = Bt::Message::EvtReceived;
+                xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
+                portEND_SWITCHING_ISR(taskwoken);
+            }
+        }
+        if (isrReg & kLPUART_RxDataRegFullFlag) {}
+        if (isrReg & kLPUART_RxOverrunFlag) {
+            val = Bt::Message::EvtUartError;
+            xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
+        }
+        LPUART_ClearStatusFlags(BSP_BLUETOOTH_UART_BASE, isrReg);
+    }
 }
