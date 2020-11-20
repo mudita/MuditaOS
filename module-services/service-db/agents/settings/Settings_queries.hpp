@@ -3,7 +3,9 @@
 
 #pragma once
 
-namespace Settings::Statements
+#include <log/log.hpp>
+
+namespace settings::Statements
 {
     constexpr auto getValue = R"sql(
                          SELECT value
@@ -92,4 +94,4 @@ namespace Settings::Statements
                         WHERE path = '%q' AND service = '%q';
                         )sql";
 
-} // namespace Settings::Statements
+} // namespace settings::Statements

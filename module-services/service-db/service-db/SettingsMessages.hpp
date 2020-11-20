@@ -12,7 +12,7 @@
 #include <utility>
 #include <variant>
 
-namespace Settings
+namespace settings
 {
     struct EntryPath
     {
@@ -334,4 +334,4 @@ namespace Settings
         };
 
     } // namespace Messages
-} // namespace Settings
+} // namespace settings

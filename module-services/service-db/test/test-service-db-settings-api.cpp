@@ -32,16 +32,16 @@ TEST_CASE("SettingsApi")
     SECTION("variable/profile/mode register/set/get/unregister")
     {
         std::shared_ptr<sys::SystemManager> manager = std::make_shared<sys::SystemManager>(5000);
-        std::shared_ptr<Settings::MyService> varWritter;
-        std::shared_ptr<Settings::MyService> varReader;
-        std::shared_ptr<Settings::AppTest> testVar;
-        std::shared_ptr<Settings::ServiceProfile> profWritter;
-        std::shared_ptr<Settings::ServiceProfile> profReader;
-        std::shared_ptr<Settings::AppTestProfileMode> testProf;
+        std::shared_ptr<settings::MyService> varWritter;
+        std::shared_ptr<settings::MyService> varReader;
+        std::shared_ptr<settings::AppTest> testVar;
+        std::shared_ptr<settings::ServiceProfile> profWritter;
+        std::shared_ptr<settings::ServiceProfile> profReader;
+        std::shared_ptr<settings::AppTestProfileMode> testProf;
         std::shared_ptr<std::mutex> testStart;
-        std::shared_ptr<Settings::ServiceMode> modeWritter;
-        std::shared_ptr<Settings::ServiceMode> modeReader;
-        std::shared_ptr<Settings::AppTestProfileMode> testMode;
+        std::shared_ptr<settings::ServiceMode> modeWritter;
+        std::shared_ptr<settings::ServiceMode> modeReader;
+        std::shared_ptr<settings::AppTestProfileMode> testMode;
 
         manager->StartSystem([manager,
                               &varWritter,
@@ -62,44 +62,44 @@ TEST_CASE("SettingsApi")
                                                          manager.get());
             ret &= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), manager.get());
 
-            varWritter = std::make_shared<Settings::MyService>("writterVar");
-            varReader  = std::make_shared<Settings::MyService>("readerVar");
+            varWritter = std::make_shared<settings::MyService>("writterVar");
+            varReader  = std::make_shared<settings::MyService>("readerVar");
 
             ret &= sys::SystemManager::CreateService(varWritter, manager.get());
             ret &= sys::SystemManager::CreateService(varReader, manager.get());
 
-            testVar = std::make_shared<Settings::AppTest>("appTest", varWritter, varReader, testStart);
+            testVar = std::make_shared<settings::AppTest>("appTest", varWritter, varReader, testStart);
             ret &= sys::SystemManager::CreateService(testVar, manager.get());
 
-            profWritter = std::make_shared<Settings::ServiceProfile>("writterProf");
-            profReader  = std::make_shared<Settings::ServiceProfile>("readerProf");
+            profWritter = std::make_shared<settings::ServiceProfile>("writterProf");
+            profReader  = std::make_shared<settings::ServiceProfile>("readerProf");
 
             ret &= sys::SystemManager::CreateService(profWritter, manager.get());
             ret &= sys::SystemManager::CreateService(profReader, manager.get());
 
             testProf =
-                std::make_shared<Settings::AppTestProfileMode>("appTestProfile", profWritter, profReader, testStart);
+                std::make_shared<settings::AppTestProfileMode>("appTestProfile", profWritter, profReader, testStart);
             ret &= sys::SystemManager::CreateService(testProf, manager.get());
 
-            modeWritter = std::make_shared<Settings::ServiceMode>("writterMode");
-            modeReader  = std::make_shared<Settings::ServiceMode>("readerMode");
+            modeWritter = std::make_shared<settings::ServiceMode>("writterMode");
+            modeReader  = std::make_shared<settings::ServiceMode>("readerMode");
 
             ret &= sys::SystemManager::CreateService(modeWritter, manager.get());
             ret &= sys::SystemManager::CreateService(modeReader, manager.get());
 
             testMode =
-                std::make_shared<Settings::AppTestProfileMode>("appTestMode", modeWritter, modeReader, testStart);
+                std::make_shared<settings::AppTestProfileMode>("appTestMode", modeWritter, modeReader, testStart);
             ret &= sys::SystemManager::CreateService(testMode, manager.get());
 
             std::cout << "koniec start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
             testStart->unlock();
-            auto msgStart = std::make_shared<Settings::UTMsg::UTMsgStart>();
+            auto msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
             sys::Bus::SendUnicast(std::move(msgStart), "appTest", manager.get());
 
-            msgStart = std::make_shared<Settings::UTMsg::UTMsgStart>();
+            msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
             sys::Bus::SendUnicast(std::move(msgStart), "appTestProfile", manager.get());
 
-            msgStart = std::make_shared<Settings::UTMsg::UTMsgStart>();
+            msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
             sys::Bus::SendUnicast(std::move(msgStart), "appTestMode", manager.get());
 
             return ret;
