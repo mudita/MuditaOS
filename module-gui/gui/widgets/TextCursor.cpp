@@ -164,30 +164,38 @@ namespace gui
         moveCursor(NavigationDirection::RIGHT);
     }
 
-    TextCursor &TextCursor::operator<<(const UTF8 &text)
+    TextCursor &TextCursor::operator<<(const UTF8 &textString)
     {
-        for (unsigned int i = 0; i < text.length(); ++i) {
-            addChar(text[i]);
+        for (unsigned int i = 0; i < textString.length(); ++i) {
+            if (text->checkAdditionBounds(textString[i]) == InputBound::CAN_ADD) {
+                addChar(textString[i]);
+            }
+            else {
+                break;
+            }
         }
         return *this;
     }
 
-    TextCursor &TextCursor::operator<<(TextBlock textblock)
+    TextCursor &TextCursor::operator<<(const TextBlock &textBlock)
     {
-        auto len = textblock.length();
-        auto end = textblock.getEnd();
+        auto [addBoundResult, processedTextBlock] = text->checkAdditionBounds(textBlock);
 
-        BlockCursor::addTextBlock(std::move(textblock));
+        if (addBoundResult == InputBound::CAN_ADD || addBoundResult == InputBound::CAN_ADD_PART) {
 
-        // +1 is for block barrier
-        for (unsigned int i = 0; i < len + 1; ++i) {
-            moveCursor(NavigationDirection::RIGHT);
-        }
+            auto len = processedTextBlock.length();
+            auto end = processedTextBlock.getEnd();
 
-        // If new added block ends with newline split it for additional empty block at end
-        if (end == TextBlock::End::Newline) {
-            document->addNewline(*this, TextBlock::End::Newline);
-            moveCursor(NavigationDirection::RIGHT);
+            BlockCursor::addTextBlock(std::move(processedTextBlock));
+
+            // +1 is for block barrier
+            moveCursor(NavigationDirection::RIGHT, len + 1);
+
+            // If new added block ends with newline split it for additional empty block at end
+            if (end == TextBlock::End::Newline) {
+                document->addNewline(*this, TextBlock::End::Newline);
+                moveCursor(NavigationDirection::RIGHT);
+            }
         }
 
         return *this;

@@ -10,6 +10,7 @@
 * `[cellular]` Added change PIN functionality
 * `[cellular]` Added possibility of unlock SIM card (no PIN on start) functionality
 * `[testing]` Added test harness with message sending case
+* `[text]` Text input boundaries support added (max signs or max widget area).
 
 ### Changed
 

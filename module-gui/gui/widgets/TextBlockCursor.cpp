@@ -210,9 +210,14 @@ namespace gui
 
     void BlockCursor::addTextBlock(TextBlock &&textblock)
     {
-        if (textblock.length() == 0) {
+
+        if (textblock.length() == 0 && document->blocks.empty() && textblock.getEnd() != TextBlock::End::Newline) {
             return;
         }
+        else if (textblock.length() == 0 && ((--blocksEnd())->getEnd() != TextBlock::End::Newline)) {
+            return;
+        }
+
         if (document->isEmpty()) {
             resetNpos();
         }
