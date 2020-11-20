@@ -19,6 +19,7 @@
 #include <application-settings/ApplicationSettings.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-cellular/ServiceCellular.hpp>
+#include <service-cellular/CellularMessage.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
@@ -30,6 +31,31 @@ namespace app
         : Application(name, parent, startInBackground), lockHandler(this, settings)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+
+        addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
+            lockHandler.handlePinRequest(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::RequestPuk, [this](auto &&data) {
+            lockHandler.handlePukRequest(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::RequestPinChange, [this](auto &&data) {
+            lockHandler.handlePinChangeRequest(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::BlockSim, [this](auto &&data) {
+            lockHandler.handleSimBlocked(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::DisplayCMEError, [this](auto &&data) {
+            lockHandler.handleCMEError(std::move(data));
+            return msgHandled();
+        });
     }
 
     ApplicationDesktop::~ApplicationDesktop()
@@ -62,9 +88,6 @@ namespace app
 
         else if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
             handled = handle(msg);
-        }
-        else if (auto msg = dynamic_cast<CellularSimResponseMessage *>(msgl)) {
-            handled = lockHandler.handle(msg);
         }
 
         // handle database response
@@ -100,7 +123,8 @@ namespace app
     auto ApplicationDesktop::handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool
     {
         if (event != nullptr) {
-            auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(lockHandler.lock.isLocked());
+            auto event =
+                std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(true); // lockHandler.lock.isLocked());
             auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
             sys::Bus::SendUnicast(std::move(msg), service::name::service_desktop, this);
         }
@@ -167,7 +191,7 @@ namespace app
     {
         assert(msg);
         if (msg->request == cellular::State::ST::URCReady) {
-            if (need_sim_select && !lockHandler.lock.isLocked()) {
+            if (need_sim_select && !lockHandler.isScreenLocked()) {
                 app::manager::Controller::switchApplication(this, app::name_settings, app::sim_select, nullptr);
                 return true;
             }
@@ -280,7 +304,7 @@ namespace app
             return std::make_unique<gui::DesktopMainWindow>(app);
         });
         windowsFactory.attach(desktop_pin_lock, [&](Application *app, const std::string newname) {
-            return std::make_unique<gui::PinLockWindow>(app, desktop_pin_lock, lockHandler.lock);
+            return std::make_unique<gui::PinLockWindow>(app, desktop_pin_lock);
         });
         windowsFactory.attach(desktop_menu, [](Application *app, const std::string newname) {
             return std::make_unique<gui::MenuWindow>(app);

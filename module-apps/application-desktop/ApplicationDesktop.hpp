@@ -15,6 +15,11 @@
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 
+namespace cellular
+{
+    class StateChange;
+}
+
 namespace app
 {
     inline constexpr auto name_desktop = "ApplicationDesktop";
@@ -83,7 +88,13 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch,
+                     manager::actions::RequestPin,
+                     manager::actions::RequestPuk,
+                     manager::actions::RequestPinChange,
+                     manager::actions::UnlockSim,
+                     manager::actions::BlockSim,
+                     manager::actions::DisplayCMEError}};
         }
     };
 
