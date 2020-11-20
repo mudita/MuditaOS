@@ -19,15 +19,18 @@ namespace gui
         const std::string this_window_name;
         std::string lockTimeoutApplication  = "";
         std::unique_ptr<PinLockBox> LockBox = nullptr;
-        PinLock::LockType currentLock       = PinLock::LockType::Unknown;
+        PinLockBox::EnterPasscodeType currentPasscodeType = PinLockBox::EnterPasscodeType::ProvidePasscode;
+
+        std::vector<unsigned int> buffer;
+        std::function<void(const std::vector<unsigned int> &)> callbackBuffer = nullptr;
 
         // method hides or show widgets and sets bars according to provided state
-        void setVisibleState(const PinLock::State state);
+        void setVisibleState(const PinLock::LockState state);
         void buildPinLockBox();
         void invalidate() noexcept;
 
       public:
-        PinLockWindow(app::Application *app, const std::string &window_name, PinLock &lock);
+        PinLockWindow(app::Application *app, const std::string &window_name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 
