@@ -4,6 +4,7 @@
 #pragma once
 
 #include <at/Result.hpp>
+#include <at/Commands.hpp>
 #include "service-cellular/RequestHandler.hpp"
 
 namespace cellular
@@ -34,6 +35,14 @@ namespace cellular
         bool isValid() const noexcept override;
 
       protected:
+        /**
+         * Helper command for building output command
+         * @param atCommand
+         * @param builderFunctions functions that build parts of the output command in order of execution
+         * @return formatted command or empty string if input is invalid
+         */
+        auto buildCommand(at::AT atCommand, const std::vector<std::function<std::string()>> &builderFunctions) const
+            -> std::string;
         bool isRequestHandled = false;
         std::string request;
     };

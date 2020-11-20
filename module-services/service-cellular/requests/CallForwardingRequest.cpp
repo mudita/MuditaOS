@@ -37,24 +37,13 @@ namespace cellular
 
     auto CallForwardingRequest::command() -> std::string
     {
-        std::array<std::function<std::string()>, 3> commandParts = {
+        std::vector<std::function<std::string()>> commandParts = {
             [this]() { return this->getCommandReason(); },
             [this]() { return this->getCommandMode(); },
             [this]() { return this->getCommandNumber(); },
         };
 
-        std::string cmd(at::factory(at::AT::CCFC));
-        bool formatFirst = true;
-        for (auto &cmdPart : commandParts) {
-            auto partStr = cmdPart();
-            if (partStr.empty()) {
-                continue;
-            }
-            cmd.append(formatFirst ? partStr : "," + partStr);
-            formatFirst = false;
-        }
-
-        return cmd;
+        return buildCommand(at::AT::CCFC, commandParts);
     }
 
     auto CallForwardingRequest::getCommandReason() const -> std::string

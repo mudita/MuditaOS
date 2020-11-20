@@ -7,6 +7,7 @@
 #include <service-cellular/RequestFactory.hpp>
 #include <service-cellular/requests/CallForwardingRequest.hpp>
 #include <service-cellular/requests/CallWaitingRequest.hpp>
+#include <service-cellular/requests/CallBarringRequest.hpp>
 #include <service-cellular/requests/PasswordRegistrationRequest.hpp>
 #include <service-cellular/requests/PinChangeRequest.hpp>
 #include <service-cellular/requests/ImeiRequest.hpp>
@@ -70,6 +71,117 @@ TEST_CASE("MMI requests")
         {R"(#76#)", R"(AT+COLP=0)", typeid(ColpRequest)},
         // bad procedure type
         {R"(**76#)", std::string(), typeid(ColpRequest), false},
+
+        /// CallBarringRequest
+        // BAOC (Bar All Outgoing Calls)
+        {R"(*33#)", R"(AT+CLCK="AO",1)", typeid(CallBarringRequest)},                    // lock
+        {R"(*33*1111#)", R"(AT+CLCK="AO",1,"1111")", typeid(CallBarringRequest)},        // lock with pass
+        {R"(*33*1111*10#)", R"(AT+CLCK="AO",1,"1111",13)", typeid(CallBarringRequest)},  // lock with pass and BS
+        {R"(#33#)", R"(AT+CLCK="AO",0)", typeid(CallBarringRequest)},                    // unlock
+        {R"(#33*1111#)", R"(AT+CLCK="AO",0,"1111")", typeid(CallBarringRequest)},        // unlock with pass
+        {R"(#33*1111*11#)", R"(AT+CLCK="AO",0,"1111",1)", typeid(CallBarringRequest)},   // unlock with pass and BS
+        {R"(*#33#)", R"(AT+CLCK="AO",2)", typeid(CallBarringRequest)},                   // query
+        {R"(*#33*1111#)", R"(AT+CLCK="AO",2,"1111")", typeid(CallBarringRequest)},       // query with pass
+        {R"(*#33*1111*12#)", R"(AT+CLCK="AO",2,"1111",12)", typeid(CallBarringRequest)}, // query with pass and BS
+        {R"(**33#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - register
+        {R"(##33#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - erasure
+        {R"(*#33*1111*17#)",
+         std::string(),
+         typeid(CallBarringRequest),
+         false}, // unsupported BS - Voice Group Call Service
+        {R"(*#33*1111*18#)",
+         std::string(),
+         typeid(CallBarringRequest),
+         false}, // unsupported BS - Voice Broadcast Service
+        {R"(*#33*1111*99#)",
+         std::string(),
+         typeid(CallBarringRequest),
+         false}, // unsupported BS - All GPRS bearer services
+        {R"(*#33*1111*45#)", std::string(), typeid(CallBarringRequest), false}, // unsupported BS - random
+        /// BOIC (Bar Outgoing International Calls)
+        {R"(*331#)", R"(AT+CLCK="OI",1)", typeid(CallBarringRequest)},                   // lock
+        {R"(*331*2222#)", R"(AT+CLCK="OI",1,"2222")", typeid(CallBarringRequest)},       // lock with pass
+        {R"(*331*2222*13#)", R"(AT+CLCK="OI",1,"2222",4)", typeid(CallBarringRequest)},  // lock with pass and BS
+        {R"(#331#)", R"(AT+CLCK="OI",0)", typeid(CallBarringRequest)},                   // unlock
+        {R"(#331*2222#)", R"(AT+CLCK="OI",0,"2222")", typeid(CallBarringRequest)},       // unlock with pass
+        {R"(#331*2222*16#)", R"(AT+CLCK="OI",0,"2222",8)", typeid(CallBarringRequest)},  // unlock with pass and BS
+        {R"(*#331#)", R"(AT+CLCK="OI",2)", typeid(CallBarringRequest)},                  // query
+        {R"(*#331*2222#)", R"(AT+CLCK="OI",2,"2222")", typeid(CallBarringRequest)},      // query with pass
+        {R"(*#331*2222*19#)", R"(AT+CLCK="OI",2,"2222",5)", typeid(CallBarringRequest)}, // query with pass and BS
+        {R"(**331#)", std::string(), typeid(CallBarringRequest), false},                 // bad procedure - register
+        {R"(##331#)", std::string(), typeid(CallBarringRequest), false},                 // bad procedure - erasure
+        /// BOIC-exHC (Bar Outgoing International Calls except to home country)
+        {R"(*332#)", R"(AT+CLCK="OX",1)", typeid(CallBarringRequest)},                    // lock
+        {R"(*332*3333#)", R"(AT+CLCK="OX",1,"3333")", typeid(CallBarringRequest)},        // lock
+        {R"(*332*2222*20#)", R"(AT+CLCK="OX",1,"2222",50)", typeid(CallBarringRequest)},  // lock with pass
+        {R"(#332#)", R"(AT+CLCK="OX",0)", typeid(CallBarringRequest)},                    // unlock with pass and BS
+        {R"(#332*3333#)", R"(AT+CLCK="OX",0,"3333")", typeid(CallBarringRequest)},        // unlock
+        {R"(#332*2222*21#)", R"(AT+CLCK="OX",0,"2222",32)", typeid(CallBarringRequest)},  // unlock with pass
+        {R"(*#332#)", R"(AT+CLCK="OX",2)", typeid(CallBarringRequest)},                   // query with pass and BS
+        {R"(*#332*3333#)", R"(AT+CLCK="OX",2,"3333")", typeid(CallBarringRequest)},       // query with pass
+        {R"(*#332*2222*22#)", R"(AT+CLCK="OX",2,"2222",16)", typeid(CallBarringRequest)}, // query with pass and BS
+        {R"(**332#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - register
+        {R"(##332#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - erasure
+        /// BAIC (Bar All Incoming Calls)
+        {R"(*35#)", R"(AT+CLCK="AI",1)", typeid(CallBarringRequest)},                    // lock
+        {R"(*35*1234#)", R"(AT+CLCK="AI",1,"1234")", typeid(CallBarringRequest)},        // lock with pass
+        {R"(*35*2222*24#)", R"(AT+CLCK="AI",1,"2222",16)", typeid(CallBarringRequest)},  // lock with pass and BS
+        {R"(#35#)", R"(AT+CLCK="AI",0)", typeid(CallBarringRequest)},                    // unlock
+        {R"(#35*1234#)", R"(AT+CLCK="AI",0,"1234")", typeid(CallBarringRequest)},        // unlock with pass
+        {R"(#35*2222*25#)", R"(AT+CLCK="AI",0,"2222",32)", typeid(CallBarringRequest)},  // unlock with pass and BS
+        {R"(*#35#)", R"(AT+CLCK="AI",2)", typeid(CallBarringRequest)},                   // query
+        {R"(*#35*1234#)", R"(AT+CLCK="AI",2,"1234")", typeid(CallBarringRequest)},       // query with pass
+        {R"(*#35*2222*26#)", R"(AT+CLCK="AI",2,"2222",17)", typeid(CallBarringRequest)}, // query with pass and BS
+        {R"(**35#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - register
+        {R"(##35#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - erasure
+        /// BIC-Roam (Bar Incoming Calls when Roaming outside the home country)
+        {R"(*351#)", R"(AT+CLCK="IR",1)", typeid(CallBarringRequest)},                    // lock
+        {R"(*351*1234#)", R"(AT+CLCK="IR",1,"1234")", typeid(CallBarringRequest)},        // lock with pass
+        {R"(*351*2222*10#)", R"(AT+CLCK="IR",1,"2222",13)", typeid(CallBarringRequest)},  // lock with pass and BS
+        {R"(#351#)", R"(AT+CLCK="IR",0)", typeid(CallBarringRequest)},                    // unlock
+        {R"(#351*1234#)", R"(AT+CLCK="IR",0,"1234")", typeid(CallBarringRequest)},        // unlock with pass
+        {R"(#351*2222*11#)", R"(AT+CLCK="IR",0,"2222",1)", typeid(CallBarringRequest)},   // unlock with pass and BS
+        {R"(*#351#)", R"(AT+CLCK="IR",2)", typeid(CallBarringRequest)},                   // query
+        {R"(*#351*1234#)", R"(AT+CLCK="IR",2,"1234")", typeid(CallBarringRequest)},       // query with pass
+        {R"(*#351*2222*12#)", R"(AT+CLCK="IR",2,"2222",12)", typeid(CallBarringRequest)}, // query with pass and BS
+        {R"(**351#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - register
+        {R"(##351#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - erasure
+        /// All barring services
+        {R"(*330#)", R"(AT+CLCK="AB",1)", typeid(CallBarringRequest)},                   // lock
+        {R"(*330*1234#)", R"(AT+CLCK="AB",1,"1234")", typeid(CallBarringRequest)},       // lock with pass
+        {R"(*330*2222*13#)", R"(AT+CLCK="AB",1,"2222",4)", typeid(CallBarringRequest)},  // lock with pass and BS
+        {R"(#330#)", R"(AT+CLCK="AB",0)", typeid(CallBarringRequest)},                   // unlock
+        {R"(#330*1234#)", R"(AT+CLCK="AB",0,"1234")", typeid(CallBarringRequest)},       // unlock with pass
+        {R"(#330*2222*16#)", R"(AT+CLCK="AB",0,"2222",8)", typeid(CallBarringRequest)},  // unlock with pass and BS
+        {R"(*#330#)", R"(AT+CLCK="AB",2)", typeid(CallBarringRequest)},                  // query
+        {R"(*#330*1234#)", R"(AT+CLCK="AB",2,"1234")", typeid(CallBarringRequest)},      // query with pass
+        {R"(*#330*2222*19#)", R"(AT+CLCK="AB",2,"2222",5)", typeid(CallBarringRequest)}, // query with pass and BS
+        {R"(**330#)", std::string(), typeid(CallBarringRequest), false},                 // bad procedure - register
+        {R"(##330#)", std::string(), typeid(CallBarringRequest), false},                 // bad procedure - erasure
+        /// All outgoing barring services
+        {R"(*333#)", R"(AT+CLCK="AG",1)", typeid(CallBarringRequest)},                    // lock
+        {R"(*333*1234#)", R"(AT+CLCK="AG",1,"1234")", typeid(CallBarringRequest)},        // lock with pass
+        {R"(*333*2222*20#)", R"(AT+CLCK="AG",1,"2222",50)", typeid(CallBarringRequest)},  // lock with pass and BS
+        {R"(#333#)", R"(AT+CLCK="AG",0)", typeid(CallBarringRequest)},                    // unlock
+        {R"(#333*1234#)", R"(AT+CLCK="AG",0,"1234")", typeid(CallBarringRequest)},        // unlock with pass
+        {R"(#333*2222*21#)", R"(AT+CLCK="AG",0,"2222",32)", typeid(CallBarringRequest)},  // unlock with pass and BS
+        {R"(*#333#)", R"(AT+CLCK="AG",2)", typeid(CallBarringRequest)},                   // query
+        {R"(*#333*1234#)", R"(AT+CLCK="AG",2,"1234")", typeid(CallBarringRequest)},       // query with pass
+        {R"(*#333*2222*22#)", R"(AT+CLCK="AG",2,"2222",16)", typeid(CallBarringRequest)}, // query with pass and BS
+        {R"(**333#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - register
+        {R"(##333#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - erasure
+        /// All incoming barring services
+        {R"(*353#)", R"(AT+CLCK="AC",1)", typeid(CallBarringRequest)},                    // lock
+        {R"(*353*1234#)", R"(AT+CLCK="AC",1,"1234")", typeid(CallBarringRequest)},        // lock with pass
+        {R"(*353*2222*24#)", R"(AT+CLCK="AC",1,"2222",16)", typeid(CallBarringRequest)},  // lock with pass and BS
+        {R"(#353#)", R"(AT+CLCK="AC",0)", typeid(CallBarringRequest)},                    // unlock
+        {R"(#353*1234#)", R"(AT+CLCK="AC",0,"1234")", typeid(CallBarringRequest)},        // unlock with pass
+        {R"(#353*2222*25#)", R"(AT+CLCK="AC",0,"2222",32)", typeid(CallBarringRequest)},  // unlock with pass and BS
+        {R"(*#353#)", R"(AT+CLCK="AC",2)", typeid(CallBarringRequest)},                   // query
+        {R"(*#353*1234#)", R"(AT+CLCK="AC",2,"1234")", typeid(CallBarringRequest)},       // query with pass
+        {R"(*#353*2222*10#)", R"(AT+CLCK="AC",2,"2222",13)", typeid(CallBarringRequest)}, // query with pass and BS
+        {R"(**353#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - register
+        {R"(##353#)", std::string(), typeid(CallBarringRequest), false},                  // bad procedure - erasure
 
         /// CallWaitingRequest
         // enable all

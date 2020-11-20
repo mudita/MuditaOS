@@ -22,7 +22,7 @@ set(SOURCES
     requests/ClirRequest.cpp
     requests/ColpRequest.cpp
     requests/CallWaitingRequest.cpp
-)
+    requests/CallBarringRequest.cpp)
 
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

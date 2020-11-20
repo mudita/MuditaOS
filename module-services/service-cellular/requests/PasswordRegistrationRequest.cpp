@@ -7,22 +7,7 @@
 #include <Utils.hpp>
 
 #include "service-cellular/requests/PasswordRegistrationRequest.hpp"
-
-namespace
-{
-    // according to EC25&EC21_AT_Commands_Manual_V1.3
-    const std::map<std::string, std::string> barringServiceToFacilityMap = {{
-        {"33", "AO"},  // BAOC (Bar All Outgoing Calls)
-        {"331", "OI"}, // BOIC (Bar Outgoing International Calls)
-        {"332", "OX"}, // BOIC-exHC (Bar Outgoing International Calls except to home country)
-        {"35", "AI"},  // BAIC (Bar All Incoming Calls)
-        {"351", "IR"}, // BIC-Roam (Bar Incoming Calls when Roaming outside the home country)
-        {"330", "AB"}, // All barring services
-        {"333", "AG"}, // All outgoing barring services
-        {"353", "AC"}, // All incoming barring services
-        {"", "AB"},    // All incoming barring services (According to 3GPP TS 22.030 V16.0.0 )
-    }};
-} // namespace
+#include "service-cellular/requests/CallBarringRequest.hpp" // for barringServiceToFacility map
 
 namespace
 {
@@ -40,28 +25,18 @@ namespace cellular
 
     auto PasswordRegistrationRequest::command() -> std::string
     {
-        std::array<std::function<std::string()>, 3> commandParts = {
+        std::vector<std::function<std::string()>> commandParts = {
             [this]() { return this->getCommandFacility(); },
-            [this]() { return "," + this->getOldPassword(); },
-            [this]() { return "," + this->getNewPassword(); },
+            [this]() { return this->getOldPassword(); },
+            [this]() { return this->getNewPassword(); },
         };
 
-        if (!isValid()) {
-            return std::string();
-        }
-
-        std::string cmd(at::factory(at::AT::CPWD));
-        for (auto &cmdPart : commandParts) {
-            cmd.append(cmdPart());
-        }
-
-        return cmd;
+        return buildCommand(at::AT::CPWD, commandParts);
     }
 
     auto PasswordRegistrationRequest::getCommandFacility() const noexcept -> std::string
     {
-        if (auto it = barringServiceToFacilityMap.find(requestBarringService);
-            it != barringServiceToFacilityMap.end()) {
+        if (auto it = barringServiceToFacility.find(requestBarringService); it != barringServiceToFacility.end()) {
             return "\"" + it->second + "\"";
         }
         return std::string();

@@ -5,7 +5,7 @@
 ### Added
 
 * `[gui][desktop]` Added SIM PIN basic flow implementation
-* `[cellular]` Added CLIR, CLIP, COLP, call waiting MMI support
+* `[cellular]` Added CLIR, CLIP, COLP, call waiting, call barring MMIs support
 
 ### Fixed
 

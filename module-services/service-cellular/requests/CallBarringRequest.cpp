@@ -6,46 +6,52 @@
 #include <at/Commands.hpp>
 #include <Utils.hpp>
 
-#include "service-cellular/requests/CallWaitingRequest.hpp"
+#include "service-cellular/requests/CallBarringRequest.hpp"
 
 namespace cellular
 {
 
-    std::unique_ptr<SupplementaryServicesRequest> CallWaitingRequest::create(const std::string &serviceCode,
+    std::unique_ptr<SupplementaryServicesRequest> CallBarringRequest::create(const std::string &serviceCode,
                                                                              const std::string &data,
                                                                              GroupMatch matchGroups)
     {
-        if (serviceCode == callWaitingServiceCode) {
-            return std::make_unique<CallWaitingRequest>(data, matchGroups);
+        for (auto &it : barringServiceToFacility) {
+            if (!it.first.empty() && it.first == serviceCode) {
+                return std::make_unique<CallBarringRequest>(it.second, data, matchGroups);
+            }
         }
-        else {
-            return nullptr;
-        }
+
+        return nullptr;
     }
 
-    auto CallWaitingRequest::command() -> std::string
+    auto CallBarringRequest::command() -> std::string
     {
         std::vector<std::function<std::string()>> commandParts = {
-            [this]() { return this->getCommandPresentation(); },
+            [this]() { return this->getCommandFacility(); },
             [this]() { return this->getCommandMode(); },
+            [this]() { return this->getCommandPassword(); },
             [this]() { return this->getCommandClass(); },
         };
 
-        return buildCommand(at::AT::CCWA, commandParts);
+        return buildCommand(at::AT::CLCK, commandParts);
     }
 
-    auto CallWaitingRequest::getCommandPresentation() const noexcept -> std::string
+    auto CallBarringRequest::getCommandFacility() const -> std::string
     {
-        // fixed, we always want full report
-        return unsolicitedResultCodeEnable;
+        return "\"" + facility + "\"";
     }
 
-    auto CallWaitingRequest::getCommandMode() const noexcept -> std::string
+    auto CallBarringRequest::getCommandMode() const -> std::string
     {
         return utils::to_string(magic_enum::enum_integer(procedureType));
     }
 
-    auto CallWaitingRequest::getCommandClass() const noexcept -> std::string
+    auto CallBarringRequest::getCommandPassword() const -> std::string
+    {
+        return password.empty() ? std::string() : "\"" + password + "\"";
+    }
+
+    auto CallBarringRequest::getCommandClass() const -> std::string
     {
         if (basicServiceGroup.empty()) {
             return std::string();
@@ -54,12 +60,12 @@ namespace cellular
         return getCommandInformationClass(basicServiceGroup).value_or(std::string());
     }
 
-    void CallWaitingRequest::handle(RequestHandler &h, at::Result &result)
+    void CallBarringRequest::handle(RequestHandler &h, at::Result &result)
     {
         h.handle(*this, result);
     }
 
-    auto CallWaitingRequest::isValid() const noexcept -> bool
+    auto CallBarringRequest::isValid() const noexcept -> bool
     {
         if (!getCommandInformationClass(basicServiceGroup).has_value()) {
             return false;

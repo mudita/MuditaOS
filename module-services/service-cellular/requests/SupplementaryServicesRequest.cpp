@@ -13,6 +13,7 @@
 #include "service-cellular/requests/ClirRequest.hpp"
 #include "service-cellular/requests/ColpRequest.hpp"
 #include "service-cellular/requests/CallWaitingRequest.hpp"
+#include "service-cellular/requests/CallBarringRequest.hpp"
 
 namespace
 {
@@ -55,6 +56,7 @@ namespace cellular
         auto factoryList = {
             CallForwardingRequest::create,
             CallWaitingRequest::create,
+            CallBarringRequest::create,
             ClipRequest::create,
             ClirRequest::create,
             ColpRequest::create,
