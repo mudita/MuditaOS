@@ -36,7 +36,7 @@ namespace drivers
     struct DriverPWMParams
     {
         PWMChannel channel;
-        uint32_t prescaler;
+        uint32_t frequency;
     };
 
     class DriverPWM

@@ -26,7 +26,7 @@ namespace drivers
         void Stop() override final;
 
       private:
-        void SetupPWMChannel(const PWMChannel &channel);
+        void SetupPWMChannel(const PWMChannel channel, const uint32_t frequency);
 
         PWM_Type *base;
 

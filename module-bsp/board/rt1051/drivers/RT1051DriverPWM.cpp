@@ -55,7 +55,7 @@ namespace drivers
         PWM_GetDefaultConfig(&pwmConfig);
         PWM_Init(base, pwmModule, &pwmConfig);
 
-        SetupPWMChannel(parameters.channel);
+        SetupPWMChannel(parameters.channel, parameters.frequency);
     }
 
     RT1051DriverPWM::~RT1051DriverPWM()
@@ -84,11 +84,8 @@ namespace drivers
         LOG_DEBUG("PWM stop");
     }
 
-    void RT1051DriverPWM::SetupPWMChannel(const PWMChannel &channel)
+    void RT1051DriverPWM::SetupPWMChannel(const PWMChannel channel, const uint32_t pwm_frequency)
     {
-        uint32_t pwmFrequency   = 10000;
-        uint32_t clockFrequency = 100000;
-
         switch (parameters.channel) {
         case PWMChannel::A:
             pwmSignalConfig.pwmChannel = kPWM_PwmA;
@@ -103,7 +100,7 @@ namespace drivers
             break;
         }
 
-        PWM_SetupPwm(base, pwmModule, &pwmSignalConfig, 1, pwmMode, pwmFrequency, clockFrequency);
+        PWM_SetupPwm(base, pwmModule, &pwmSignalConfig, 1, pwmMode, pwm_frequency, CLOCK_GetFreq(kCLOCK_IpgClk));
     }
 
 } // namespace drivers
