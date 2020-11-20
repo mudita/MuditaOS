@@ -109,10 +109,10 @@ namespace cellular
                 informationClass = atInformationClassAllTele - atInformationClassSms;
                 break;
             case TeleAndBearerService::VoiceGroupCallService:
-                // not supported
+                LOG_INFO("Unsupported information class: 17 - Voice Group Call Service");
                 break;
             case TeleAndBearerService::VoiceBroadcastService:
-                // not supported
+                LOG_INFO("Unsupported information class: 18 - Voice Broadcast Service");
                 break;
             case TeleAndBearerService::AllBearerServices:
                 informationClass = atInformationClassAllBearer;
@@ -130,7 +130,7 @@ namespace cellular
                 informationClass = atInformationClassDataAsync;
                 break;
             case TeleAndBearerService::AllGprsBearerServices:
-                // not supported
+                LOG_INFO("Unsupported information class: 99 - All Gprs Bearer Services");
                 break;
             case TeleAndBearerService::TelephonyAndAllSyncServices:
                 informationClass = atInformationClassVoice + atInformationClassDataSync;

@@ -28,19 +28,16 @@ namespace cellular
         switch (procedureType) {
         case ProcedureType::Deactivation:
             return std::string(at::factory(at::AT::COLP_DISABLE));
-            break;
         case ProcedureType::Activation:
             return std::string(at::factory(at::AT::COLP_ENABLE));
-            break;
         case ProcedureType::Interrogation:
             return std::string(at::factory(at::AT::COLP_GET));
-            break;
         case ProcedureType::Registration:
+            // not supported
             return std::string();
-            break;
         case ProcedureType::Erasure:
+            // not supported
             return std::string();
-            break;
         }
         return std::string();
     }

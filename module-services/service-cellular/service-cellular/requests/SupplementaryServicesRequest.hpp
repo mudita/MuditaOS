@@ -37,11 +37,11 @@ namespace cellular
         // according to 3GPP TS 22.030 V16.0.0
         enum class ProcedureType
         {
-            Deactivation,  // #
-            Activation,    // *
-            Interrogation, // *#
-            Registration,  // **
-            Erasure        // ##
+            Deactivation,  ///< MMI string starts with #
+            Activation,    ///< MMI string starts with *
+            Interrogation, ///< MMI string starts with *#
+            Registration,  ///< MMI string starts with **
+            Erasure        ///< MMI string starts with ##
         };
 
       protected:

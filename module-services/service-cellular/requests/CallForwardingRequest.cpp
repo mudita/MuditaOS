@@ -55,8 +55,6 @@ namespace cellular
         }
 
         return cmd;
-
-        return cmd;
     }
 
     auto CallForwardingRequest::getCommandReason() const -> std::string

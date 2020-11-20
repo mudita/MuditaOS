@@ -1,5 +1,11 @@
 # MuditaOS changelog
 
+## [current release]
+
+### Added
+
+* `[cellular]` Added CLIR, CLIP, COLP, call waiting MMI support
+
 ## [0.47.1 2020-11-20]
 
 ### Added
@@ -10,7 +16,6 @@
 * `[cellular]` Added a possibility to remove SIM PIN check on startup (SIM unlocking).
 * `[usb]` First implementation of USB's CDC and MTP protocols for communication with Mudita Center.
 * `[cellular]` Support for MMI Call Forwarding call.
-* `[cellular]` Added CLIR, CLIP, COLP, call waiting MMI support
 
 ### Changed
 
