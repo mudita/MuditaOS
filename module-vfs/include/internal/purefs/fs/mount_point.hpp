@@ -22,8 +22,8 @@ namespace purefs::fs::internal
     class mount_point
     {
         virtual ~mount_point() = default;
-        std::string device;     //! Owning device
-        std::string mount_path; //! Mounted path
+        int device{-1};                                 //! Owning device
+        std::string mount_path;                         //! Mounted path
         std::weak_ptr<filesystem_operation> filesystem; //! Filesystem operation
     };
 } // namespace purefs::fs::internal

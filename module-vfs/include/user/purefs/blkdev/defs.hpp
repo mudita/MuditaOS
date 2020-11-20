@@ -9,6 +9,11 @@ namespace purefs::blkdev
 {
     using sector_t = uint64_t;
     using scount_t = int64_t;
+    namespace internal
+    {
+        struct disk_handle;
+    }
+    using disk_fd_t = std::shared_ptr<internal::disk_handle>;
     //! Disk status result
     enum class media_status
     {
@@ -24,15 +29,7 @@ namespace purefs::blkdev
         sector_size,
         erase_block
     };
-    //! Error codes returned by the block dev_layer
-    struct error_codes
-    {
-        enum _errors_
-        {
-            success,
-            enotsup = -(1U << 9),
-        };
-    };
+
     //! Power control states
     enum class pm_state
     {

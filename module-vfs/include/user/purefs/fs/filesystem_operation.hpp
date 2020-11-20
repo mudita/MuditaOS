@@ -26,22 +26,22 @@ namespace purefs::fs
         using fsmount                                      = std::shared_ptr<internal::mount_point>;
         filesystem_operation(const filesystem_operation &) = delete;
         virtual ~filesystem_operation()                    = default;
-        auto operator=(const filesystem_operation &)                                                      = delete;
+        auto operator=(const filesystem_operation &) = delete;
         /** Allocate mount point class specify to the VFS
          * @return Allocated mount point structure
          */
-        virtual auto mount_prealloc() -> fsmount                                                          = 0;
+        virtual auto mount_prealloc() -> fsmount = 0;
         virtual auto mount(fsmount mnt) noexcept -> int;
-        virtual auto umount(fsmount mnt) noexcept -> int                                                  = 0;
-        virtual auto stat_vfs(std::string_view path, statvfs &stat) const noexcept -> int                 = 0;
+        virtual auto umount(fsmount mnt) noexcept -> int                                  = 0;
+        virtual auto stat_vfs(std::string_view path, statvfs &stat) const noexcept -> int = 0;
 
         /** Standard file access API */
         virtual auto open(fsmount mnt, std::string_view path, int flags, int mode) noexcept -> fsfile          = 0;
-        virtual auto close(fsfile zfile) noexcept -> int                                          = 0;
-        virtual auto write(fsfile zfile, const char *ptr, size_t len) noexcept -> ssize_t         = 0;
-        virtual auto read(fsfile zfile, char *ptr, size_t len) noexcept -> ssize_t                = 0;
-        virtual auto seek(fsfile zfile, off_t pos, int dir) noexcept -> off_t                     = 0;
-        virtual auto fstat(fsfile zfile, struct stat *st) noexcept -> int                         = 0;
+        virtual auto close(fsfile zfile) noexcept -> int                                                       = 0;
+        virtual auto write(fsfile zfile, const char *ptr, size_t len) noexcept -> ssize_t                      = 0;
+        virtual auto read(fsfile zfile, char *ptr, size_t len) noexcept -> ssize_t                             = 0;
+        virtual auto seek(fsfile zfile, off_t pos, int dir) noexcept -> off_t                                  = 0;
+        virtual auto fstat(fsfile zfile, struct stat *st) noexcept -> int                                      = 0;
         virtual auto stat(fsmount mnt, std::string_view file, struct stat *st) noexcept -> int                 = 0;
         virtual auto link(fsmount mnt, std::string_view existing, std::string_view newlink) noexcept -> int    = 0;
         virtual auto symlink(fsmount mnt, std::string_view existing, std::string_view newlink) noexcept -> int = 0;
@@ -56,14 +56,14 @@ namespace purefs::fs
         virtual auto dirclose(fsdir dirstate) noexcept -> int;
 
         /** Other fops API */
-        virtual auto ftruncate(fsfile zfile, off_t len) noexcept -> int                          = 0;
-        virtual auto fsync(fsfile zfile) noexcept -> int                                         = 0;
-        virtual auto ioctl(fsfile zfile, int cmd, void *arg) noexcept -> int                     = 0;
+        virtual auto ftruncate(fsfile zfile, off_t len) noexcept -> int                                       = 0;
+        virtual auto fsync(fsfile zfile) noexcept -> int                                                      = 0;
+        virtual auto ioctl(fsfile zfile, int cmd, void *arg) noexcept -> int                                  = 0;
         virtual auto utimens(fsmount mnt, std::string_view path, std::array<timespec, 2> &tv) noexcept -> int = 0;
-        virtual auto flock(fsfile zfile, int cmd) noexcept -> int                                = 0;
-        virtual auto isatty(fsfile zfile) noexcept -> int                                        = 0;
+        virtual auto flock(fsfile zfile, int cmd) noexcept -> int                                             = 0;
+        virtual auto isatty(fsfile zfile) noexcept -> int                                                     = 0;
 
         virtual auto chmod(fsmount mnt, std::string_view path, mode_t mode) noexcept -> int = 0;
-        virtual auto fchmod(fsfile zfile, mode_t mode) noexcept -> int         = 0;
+        virtual auto fchmod(fsfile zfile, mode_t mode) noexcept -> int                      = 0;
     };
 } // namespace purefs::fs

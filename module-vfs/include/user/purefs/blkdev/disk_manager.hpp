@@ -5,9 +5,13 @@
 
 #include <memory>
 #include <string>
+#include <list>
+#include <unordered_map>
+#include <mutex.hpp>
+#include <tuple>
+#include <purefs/utils/handle_mapper.hpp>
 #include "defs.hpp"
 #include "partition.hpp"
-#include <list>
 
 namespace purefs::blkdev
 {
@@ -25,69 +29,90 @@ namespace purefs::blkdev
          * @param[in] device_name Disk friendly name
          * @return zero on success othervise error
          */
-        auto register_device(std::shared_ptr<disk> disk, std::string_view device_name) -> int;
+        auto register_device(std::shared_ptr<disk> disk, std::string_view device_name, unsigned flags = 0) -> int;
         /** Unregister a disc from the manager
          *  param[in] Disc to unregister
          *  @return error code or 0 if success
          */
         auto unregister_device(std::string_view device_name) -> int;
         /** Write a data onto block device or partition
-         * @param[in] device_name Block device name or partition name for eg emmc0p1
+         * @param[in] dfd Disk manager fd
          * @param[in] buf Data buffer to write
          * @param[in] lba First sector
          * @param[in] Count sectors count
          * @return zero on success otherwise error
          */
-        auto write(std::string_view device_name, const void *buf, sector_t lba, std::size_t count) -> int;
+        auto write(disk_fd_t dfd, const void *buf, sector_t lba, std::size_t count) -> int;
         /** Read a data from block device or partition
-         * @param[in] device_name Block device name or partition name for eg emmc0p1
+         * @param[in] dfd Disk manager fd
          * @param[in] buf Data buffer for read
          * @param[in] lba First sector
          * @param[in] Count sectors count
          * @return zero on success otherwise error
          */
-        auto read(std::string_view device_name, void *buf, sector_t lba, std::size_t count) -> int;
+        auto read(disk_fd_t dfd, void *buf, sector_t lba, std::size_t count) -> int;
         /** Erase selected area on the block device or partition
-         * @param[in] device_name Block device or partition name
+         * @param[in] dfd Disk manager fd
          * @param[in] lba First sector to erase
          * @param[in] count Sectors count for erase
          * @return zero or success otherwise error
          */
-        auto erase(std::string_view device_name, sector_t lba, std::size_t count) -> int;
+
+        auto erase(disk_fd_t dfd, sector_t lba, std::size_t count) -> int;
         /** Flush buffers and write all data into the physical device
-         * param[in] device_name Partition or device name
+         * param[in] dfd Disc manager fd
          * @return zero or success otherwise error
          */
-        auto sync(std::string_view device_name) -> int;
+        auto sync(disk_fd_t dfd) -> int;
         /** Set block device power state
          * @param[in] device_name Device or partition name
          * @param[in] target_state Set the target power state
          * @return zero or success otherwise error
          * @note If the partition is changed whole device state will be suspended
          */
-        auto pm_control(std::string_view device_name, pm_state target_state) -> int;
+        auto pm_control(disk_fd_t dfd, pm_state target_state) -> int;
         /** Get block device power state
-         * @param[in] device_name Device or partition name
+         * @param[in] dfd Disk device handle
          * @param[out] currrent_state Device current state
          * @return zero or success otherwise error
          * @note If the partition is changed whole device state will be suspended
          */
-        auto pm_read(pm_state &current_state) -> int;
+        auto pm_read(disk_fd_t dfd, pm_state &current_state) -> int;
         /** Read the current media status
-         * @param[in] device_name Device name or partition
+         * @param[in] dfd Disk manager handle
          * @return Current media status @seee media_status
          */
-        [[nodiscard]] auto status(std::string_view device_name) const -> media_status;
+        [[nodiscard]] auto status(disk_fd_t dfd) const -> media_status;
         /** List the partitions on the underlaying device
-         * @param[in] device_name Block device name
+         * @param[in] dfd Disk manager fd
          * @return Partition list @see partition
          */
-        [[nodiscard]] auto partitions(std::string_view device_name) const -> std::list<partition>;
+        [[nodiscard]] auto partitions(disk_fd_t dfd) const -> std::list<partition>;
         /** Get media device info
-         * @param[in] device_name Device name or partition
+         * @param[in] dfd Disk manager handle
          * @param[in] what Information type @see info_type
          * @return Desired data or error if negative
          */
-        [[nodiscard]] auto get_info(std::string_view device_name, info_type what) const -> scount_t;
+        [[nodiscard]] auto get_info(disk_fd_t dfd, info_type what) const -> scount_t;
+
+        /** Force reread partition tables
+         * @param dfd Disk manager handle
+         * @return error code
+         */
+        auto reread_partitions(disk_fd_t dfd) -> int;
+        /**
+         * Return the device object based on friendly name
+         * @param device_name  Device name
+         * @return device object pointer
+         */
+        auto device_handle(std::string_view device_name) -> disk_fd_t;
+
+      private:
+        static auto parse_device_name(std::string_view device) -> std::tuple<std::string_view, short>;
+
+      private:
+        std::unordered_map<std::string, std::size_t> m_dev_map;
+        utils::internal::handle_mapper<std::shared_ptr<disk>> m_dev_fds;
+        cpp_freertos::MutexRecursive m_lock;
     };
 } // namespace purefs::blkdev
