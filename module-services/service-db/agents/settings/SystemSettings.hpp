@@ -12,4 +12,4 @@ namespace settings::SystemProperties
     constexpr inline auto lockTime        = "gs_lock_time";
     constexpr inline auto displayLanguage = "gs_display_language";
     constexpr inline auto inputLanguage   = "gs_input_language";
-}; // namespace Settings::SystemProperties
+}; // namespace settings::SystemProperties
