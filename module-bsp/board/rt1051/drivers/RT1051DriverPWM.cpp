@@ -68,7 +68,7 @@ namespace drivers
     {
         lastDutyCycle = duty_cycle;
         PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, lastDutyCycle);
-        LOG_DEBUG("Duty cycle set");
+        LOG_DEBUG("Duty cycle set to %u", lastDutyCycle);
     }
 
     void RT1051DriverPWM::Start()
