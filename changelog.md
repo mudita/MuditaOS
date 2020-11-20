@@ -1,37 +1,42 @@
 # MuditaOS changelog
 
-## [Current release]
+## [0.47.1 2020-11-20]
 
 ### Added
-* `[audio]` Added support for headset microphone.
-* `[service/db]` Added support for ListView in FileIndexer DB.
-* `[gui][desktop]` SIM PIN flow charts added
-* `[cellular]` Added SIM PIN/PUK handling
-* `[cellular]` Added change PIN functionality
-* `[cellular]` Added possibility of unlock SIM card (no PIN on start) functionality
-* `[testing]` Added test harness with message sending case
-* `[text]` Text input boundaries support added (max signs or max widget area).
-* `[usb]` Added first implementation for USB cdc and MTP protocols, activated service-desktop for communication with Mudita Center.
+
+* `[audio]` Added support for a headset microphone.
+* `[cellular]` Added SIM PIN/PUK handling.
+* `[cellular]` Added change PIN functionality.
+* `[cellular]` Added a possibility to remove SIM PIN check on startup (SIM unlocking).
+* `[usb]` First implementation of USB's CDC and MTP protocols for communication with Mudita Center.
+* `[cellular]` Support for MMI Call Forwarding call.
+
 ### Changed
 
+* `[text]` Text input boundaries support added (max signs or max widget area).
 
 ### Fixed
+
 * `[audio]` Fixed handling of headset microphone LDO DCDC.
-* `[desktop]` Absent call button on desktop with notifications fix
-* `[desktop]` Fixed system freeze on pressing Back button while focused on desktop.
+* `[desktop]` Absent call button on the desktop with notifications screen fix.
+* `[desktop]` Fixed system freeze when pressing the "Back" button while focused on the desktop screen.
+
+### Other
+
+* `[test]` Added message sending harness test.
+* `[gui][desktop]` SIM PIN flow charts added.
 
 ## [0.46.1 2020-11-13]
 
 ## Added
 
 * `[cellular]` Added call request type recognition (URC).
-* `[calendar]` Added a new field for date of the event when the user adds/edits event.
-* `[file indexer db]` Added messages for File Indexer db.
+* `[calendar]` Added a new field for event's date when the user adds/edits an event.
+* `[file indexer db]` Added messages for File Indexer database.
 * `[settings]` Added Torch window (front-end only).
 * `[audio]` Added support for Bluetooth audio profiles
 * `[filesystem]` Added support for standard file IO library.
-* [`[messages]`] Added fetching text messages at phone startup.
-* `[cellular]` Support for MMI Call Forwarding call
+* `[messages]` Added fetching text messages at phone startup.
 
 ## Changed
 
@@ -41,10 +46,10 @@
 
 ### Fixed
 
-* `[messages]` Fixed clearing text on options/recipient choice in new message window.
+* `[messages]` Fixed clearing text on options/recipient choice in the new message window.
 * `[Text]` Fixed newline handling.
 * `[appmgr]` Fixed applications closing.
-* `[audio]` Fixed crash on attempt to open non-existent file
+* `[audio]` Fixed crash on attempt to open a non-existent file
 
 ## [0.45.1 2020-11-06]
 
@@ -54,7 +59,6 @@
 * `[bluetooth]` Added HSP playback and recording.
 * `[cellular]` Added support for CMS and CME errors.
 * `[music player]` Added new samples of music files.
-* `[cellular]` Added handling SMS messages from modem storage at startup.
 
 ### Fixed
 
