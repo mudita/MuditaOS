@@ -5,10 +5,14 @@
 #include <memory>
 
 #include <at/Commands.hpp>
+#include <Utils.hpp>
 
 #include "service-cellular/requests/SupplementaryServicesRequest.hpp"
 #include "service-cellular/requests/CallForwardingRequest.hpp"
-#include "service-cellular/requests/PasswordRegistrationRequest.hpp"
+#include "service-cellular/requests/ClipRequest.hpp"
+#include "service-cellular/requests/ClirRequest.hpp"
+#include "service-cellular/requests/ColpRequest.hpp"
+#include "service-cellular/requests/CallWaitingRequest.hpp"
 
 namespace
 {
@@ -50,6 +54,10 @@ namespace cellular
 
         auto factoryList = {
             CallForwardingRequest::create,
+            CallWaitingRequest::create,
+            ClipRequest::create,
+            ClirRequest::create,
+            ColpRequest::create,
         };
 
         for (auto &createCb : factoryList) {
@@ -62,19 +70,79 @@ namespace cellular
     }
 
     auto SupplementaryServicesRequest::getCommandInformationClass(const std::string &basicServiceGroup) const
-        -> std::string
+        -> std::optional<std::string>
     {
         // according to EC25&EC21_AT_Commands_Manual_V1.3
-        if (basicServiceGroup == basicServiceVoice) {
-            return atInformationClassVoice;
+        int basicGroup       = 0;
+        int informationClass = 0;
+
+        if (basicServiceGroup.empty()) {
+            // according to 3GPP TS 22.030 V16.0.0 Annex C
+            informationClass = atInformationClassAllTele + atInformationClassAllBearer;
         }
-        else if (basicServiceGroup == basicServiceVoiceFax) {
-            return atInformationClassFax;
+        else {
+            utils::toNumeric(basicServiceGroup, basicGroup);
+            auto service = magic_enum::enum_cast<TeleAndBearerService>(basicGroup);
+
+            if (!service.has_value()) {
+                return std::nullopt;
+            }
+
+            switch (service.value()) {
+            // according to 3GPP TS 22.030 V16.0.0 Annex C
+            case TeleAndBearerService::AllTeleServices:
+                informationClass = atInformationClassAllTele;
+                break;
+            case TeleAndBearerService::Telephony:
+                informationClass = atInformationClassVoice;
+                break;
+            case TeleAndBearerService::AllDataTeleServices:
+                informationClass = atInformationClassAllDataTele;
+                break;
+            case TeleAndBearerService::FacsimileServices:
+                informationClass = atInformationClassFax;
+                break;
+            case TeleAndBearerService::ShortMessageServices:
+                informationClass = atInformationClassSms;
+                break;
+            case TeleAndBearerService::AllTeleServicesExceptSms:
+                informationClass = atInformationClassAllTele - atInformationClassSms;
+                break;
+            case TeleAndBearerService::VoiceGroupCallService:
+                LOG_INFO("Unsupported information class: 17 - Voice Group Call Service");
+                break;
+            case TeleAndBearerService::VoiceBroadcastService:
+                LOG_INFO("Unsupported information class: 18 - Voice Broadcast Service");
+                break;
+            case TeleAndBearerService::AllBearerServices:
+                informationClass = atInformationClassAllBearer;
+                break;
+            case TeleAndBearerService::AllAsyncServices:
+                informationClass = atInformationClassDataAsync;
+                break;
+            case TeleAndBearerService::AllSyncServices:
+                informationClass = atInformationClassDataSync;
+                break;
+            case TeleAndBearerService::AllDataCircuitSync:
+                informationClass = atInformationClassDataSync;
+                break;
+            case TeleAndBearerService::AllDataCircuitAsync:
+                informationClass = atInformationClassDataAsync;
+                break;
+            case TeleAndBearerService::AllGprsBearerServices:
+                LOG_INFO("Unsupported information class: 99 - All Gprs Bearer Services");
+                break;
+            case TeleAndBearerService::TelephonyAndAllSyncServices:
+                informationClass = atInformationClassVoice + atInformationClassDataSync;
+                break;
+            }
         }
-        else if (basicServiceGroup == basicServiceVoiceData) {
-            return atInformationClassData;
+
+        if (informationClass == 0) {
+            return std::nullopt;
         }
-        return atInformationClassAllButSms;
+
+        return utils::to_string(informationClass);
     }
 
 }; // namespace cellular

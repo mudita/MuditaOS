@@ -1,5 +1,11 @@
 # MuditaOS changelog
 
+## [current release]
+
+### Added
+
+* `[cellular]` Added CLIR, CLIP, COLP, call waiting MMI support
+
 ## [0.47.1 2020-11-20]
 
 ### Added

@@ -18,7 +18,12 @@ set(SOURCES
     requests/PinChangeRequest.cpp
     requests/ImeiRequest.cpp
     requests/UssdRequest.cpp
+    requests/ClipRequest.cpp
+    requests/ClirRequest.cpp
+    requests/ColpRequest.cpp
+    requests/CallWaitingRequest.cpp
 )
+
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 

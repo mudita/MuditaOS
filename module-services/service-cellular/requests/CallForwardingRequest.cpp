@@ -37,18 +37,21 @@ namespace cellular
 
     auto CallForwardingRequest::command() -> std::string
     {
-        std::array<std::function<std::string()>, 2> commandParts = {
+        std::array<std::function<std::string()>, 3> commandParts = {
+            [this]() { return this->getCommandReason(); },
             [this]() { return this->getCommandMode(); },
             [this]() { return this->getCommandNumber(); },
         };
 
-        std::string cmd(at::factory(at::AT::CCFC) + this->getCommandReason());
+        std::string cmd(at::factory(at::AT::CCFC));
+        bool formatFirst = true;
         for (auto &cmdPart : commandParts) {
             auto partStr = cmdPart();
             if (partStr.empty()) {
-                break;
+                continue;
             }
-            cmd.append("," + partStr);
+            cmd.append(formatFirst ? partStr : "," + partStr);
+            formatFirst = false;
         }
 
         return cmd;
@@ -82,7 +85,11 @@ namespace cellular
 
     auto CallForwardingRequest::getCommandClass() const -> std::string
     {
-        return getCommandInformationClass(basicServiceGroup);
+        if (basicServiceGroup.empty()) {
+            return std::string();
+        }
+
+        return getCommandInformationClass(basicServiceGroup).value_or(std::string());
     }
 
     auto CallForwardingRequest::getCommandSubAddr() const -> std::string

@@ -6,10 +6,14 @@
 #include <catch2/catch.hpp>
 #include <service-cellular/RequestFactory.hpp>
 #include <service-cellular/requests/CallForwardingRequest.hpp>
+#include <service-cellular/requests/CallWaitingRequest.hpp>
 #include <service-cellular/requests/PasswordRegistrationRequest.hpp>
 #include <service-cellular/requests/PinChangeRequest.hpp>
 #include <service-cellular/requests/ImeiRequest.hpp>
 #include <service-cellular/requests/UssdRequest.hpp>
+#include <service-cellular/requests/ClipRequest.hpp>
+#include <service-cellular/requests/ClirRequest.hpp>
+#include <service-cellular/requests/ColpRequest.hpp>
 
 using namespace cellular;
 
@@ -24,8 +28,84 @@ TEST_CASE("MMI requests")
     };
 
     std::vector<TestCase> testCases = {
-        /// IMEIRequest
+        /// ImeiRequest
         {R"(*#06#)", R"(AT+GSN)", typeid(ImeiRequest)},
+
+        /// ClipRequest
+        // bad procedure type
+        {R"(*30#)", std::string(), typeid(ClipRequest), false},
+        // query
+        {R"(*#30#)", R"(AT+CLIP?)", typeid(ClipRequest)},
+        // bad procedure type
+        {R"(##30#)", std::string(), typeid(ClipRequest), false},
+        // bad procedure type
+        {R"(#30#)", std::string(), typeid(ClipRequest), false},
+        // bad procedure type
+        {R"(**30#)", std::string(), typeid(ClipRequest), false},
+        // temporary mode enable
+        {R"(*30#600700800)", std::string(), typeid(CallRequest)},
+        // temporary mode disable
+        {R"(#30#600700800)", std::string(), typeid(CallRequest)},
+
+        /// ClirRequest
+        // bad procedure type
+        {R"(*31#)", R"(AT+CLIR=1)", typeid(ClirRequest)},
+        // query
+        {R"(*#31#)", R"(AT+CLIR?)", typeid(ClirRequest)},
+        // bad procedure type
+        {R"(##31#)", std::string(), typeid(ClirRequest), false},
+        // bad procedure type
+        {R"(#31#)", R"(AT+CLIR=2)", typeid(ClirRequest)},
+        // bad procedure type
+        {R"(**31#)", std::string(), typeid(ClirRequest), false},
+
+        /// ColpRequest
+        // bad procedure type
+        {R"(*76#)", R"(AT+COLP=1)", typeid(ColpRequest)},
+        // query
+        {R"(*#76#)", R"(AT+COLP?)", typeid(ColpRequest)},
+        // bad procedure type
+        {R"(##76#)", std::string(), typeid(ColpRequest), false},
+        // bad procedure type
+        {R"(#76#)", R"(AT+COLP=0)", typeid(ColpRequest)},
+        // bad procedure type
+        {R"(**76#)", std::string(), typeid(ColpRequest), false},
+
+        /// CallWaitingRequest
+        // enable all
+        {R"(*43#)", R"(AT+CCWA=1,1)", typeid(CallWaitingRequest)},
+        // enable all
+        {R"(*43*#)", R"(AT+CCWA=1,1)", typeid(CallWaitingRequest)},
+        // enable all tele services
+        {R"(*43*10#)", R"(AT+CCWA=1,1,13)", typeid(CallWaitingRequest)},
+        // enable voice
+        {R"(*43*11#)", R"(AT+CCWA=1,1,1)", typeid(CallWaitingRequest)},
+        // enable data
+        {R"(*43*12#)", R"(AT+CCWA=1,1,12)", typeid(CallWaitingRequest)},
+        // enable fax
+        {R"(*43*13#)", R"(AT+CCWA=1,1,4)", typeid(CallWaitingRequest)},
+        // enable sms
+        {R"(*43*16#)", R"(AT+CCWA=1,1,8)", typeid(CallWaitingRequest)},
+        // enable all tele except sms
+        {R"(*43*19#)", R"(AT+CCWA=1,1,5)", typeid(CallWaitingRequest)},
+        // enable all bearer
+        {R"(*43*20#)", R"(AT+CCWA=1,1,50)", typeid(CallWaitingRequest)},
+        // enable data circuit sync
+        {R"(*43*24#)", R"(AT+CCWA=1,1,16)", typeid(CallWaitingRequest)},
+        // enable data circuit async
+        {R"(*43*25#)", R"(AT+CCWA=1,1,32)", typeid(CallWaitingRequest)},
+        // disable all
+        {R"(#43#)", R"(AT+CCWA=1,0)", typeid(CallWaitingRequest)},
+        // query all
+        {R"(*#43#)", R"(AT+CCWA=1,2)", typeid(CallWaitingRequest)},
+        // bad procedure **
+        {R"(**43#)", std::string(), typeid(CallWaitingRequest), false},
+        // bad procedure ##
+        {R"(##43#)", std::string(), typeid(CallWaitingRequest), false},
+        // bad service group
+        {R"(*43*17#)", std::string(), typeid(CallWaitingRequest), false},
+        // bad service group
+        {R"(*43*17#)", std::string(), typeid(CallWaitingRequest), false},
 
         /// CallForwardingRequest
         // all diversions
@@ -134,8 +214,11 @@ TEST_CASE("MMI requests")
         INFO("Failed on testcase: " << testCase.requestString);
         REQUIRE(typeid(*request.get()).name() == testCase.expectedType.name());
         REQUIRE(request->isValid() == testCase.expectedValid);
-        if (typeid(*request.get()).name() != typeid(CallRequest).name() && request->isValid()) {
+        if (typeid(*request.get()).name() != typeid(CallRequest).name()) {
             REQUIRE(requestCommand == testCase.expectedCommandString);
+        }
+        else {
+            REQUIRE(requestCommand == "ATD" + testCase.requestString + ";");
         }
     }
 }
