@@ -385,7 +385,7 @@ namespace app
 
     bool ApplicationMessages::newMessageOptions(const std::string &requestingWindow, gui::Text *text)
     {
-        LOG_INFO("New message options");
+        LOG_INFO("New message options for %s", requestingWindow.c_str());
         auto opts = std::make_unique<gui::OptionsWindowOptions>(newMessageWindowOptions(this, requestingWindow, text));
         switchWindow(utils::localize.get("app_phonebook_options_title"), std::move(opts));
         return true;
