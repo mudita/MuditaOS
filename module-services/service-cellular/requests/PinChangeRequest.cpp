@@ -49,6 +49,10 @@ namespace cellular
             [this]() { return "," + this->getNewPin(); },
         };
 
+        if (!isValid()) {
+            return std::string();
+        }
+
         std::string cmd;
         switch (passChangeType) {
         case PassChangeType::ChangePin:
