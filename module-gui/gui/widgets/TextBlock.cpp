@@ -30,6 +30,16 @@ namespace gui
         end    = p.end;
     }
 
+    TextBlock &TextBlock::operator=(const TextBlock &p)
+    {
+        if (this != &p) {
+            text   = p.text;
+            format = std::make_unique<TextFormat>(*p.format);
+            end    = p.end;
+        }
+        return *this;
+    }
+
     const UTF8 &TextBlock::getText() const
     {
         return text;

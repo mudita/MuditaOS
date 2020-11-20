@@ -13,11 +13,24 @@ namespace gui
         const char newline      = '\n';
     }; // namespace text
 
+    enum class TextLimitType
+    {
+        MAX_SIZE,
+        MAX_LINES,
+        MAX_SIGNS_COUNT
+    };
+
+    struct TextLimit
+    {
+        TextLimitType limitType;
+        unsigned int limitValue;
+    };
+
     enum class ExpandMode
     {
         EXPAND_UP,
         EXPAND_DOWN,
-        EXPAND_NONE // defult
+        EXPAND_NONE // default
     };
 
     enum class EditMode
@@ -35,15 +48,9 @@ namespace gui
 
     enum class InputBound
     {
-        UNDEFINED = 0x000,
-
-        CANT_PROCESS = 0x100,
-        NO_DATA      = 0x101,
-        HIT_BOUND    = 0x110,
-
-        CAN_ADD    = 0x1000,
-        CAN_MOVE   = 0x10000,
-        CAN_REMOVE = 0x100000
+        CAN_ADD,
+        CAN_ADD_PART,
+        HIT_BOUND
     };
 
 } // namespace gui

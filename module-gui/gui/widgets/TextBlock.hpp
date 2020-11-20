@@ -50,5 +50,7 @@ namespace gui
 
         void addChar(uint32_t utf_val, unsigned int pos);
         bool isEmpty() const;
+
+        TextBlock &operator=(const TextBlock &);
     };
 } // namespace gui

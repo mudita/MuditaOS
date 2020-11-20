@@ -25,10 +25,11 @@ namespace gui
         std::stringstream ss(text.c_str());
         std::string line;
         while (std::getline(ss, line)) {
-            if (!blocks.empty()) {
-                blocks.back().setEnd(TextBlock::End::Newline);
+            auto block = TextBlock(line, std::make_unique<TextFormat>(format));
+            if (ss.good()) {
+                block.setEnd(TextBlock::End::Newline);
             }
-            blocks.emplace_back(TextBlock(line, std::make_unique<TextFormat>(format)));
+            blocks.emplace_back(block);
         }
 
         addEmptyBlockOnNewline(blocks, format);
