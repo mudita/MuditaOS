@@ -91,10 +91,10 @@ namespace app
             return {{manager::actions::Launch,
                      manager::actions::RequestPin,
                      manager::actions::RequestPuk,
-                     manager::actions::ChangePin,
-                     manager::actions::SimUnlocked,
-                     manager::actions::SimBlocked,
-                     manager::actions::UnhandledCMEError}};
+                     manager::actions::RequestPinChange,
+                     manager::actions::UnlockSim,
+                     manager::actions::BlockSim,
+                     manager::actions::DisplayCMEError}};
         }
     };
 

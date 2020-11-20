@@ -32,14 +32,14 @@ namespace gui
         {
             previousApplication = prevApp;
         };
-        const std::string &getPreviousApplication()
+        [[nodiscard]] const std::string &getPreviousApplication()
         {
             return previousApplication;
         };
 
-        std::unique_ptr<PinLock> getLock()
+        [[nodiscard]] std::unique_ptr<PinLock> getLock()
         {
-            return std::move(lock);
+            return std::make_unique<PinLock>(*lock.get());
         }
     };
 

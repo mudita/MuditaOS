@@ -4,6 +4,7 @@
 
 ### Added
 
+* `[gui][desktop]` Added SIM PIN basic flow implementation
 * `[cellular]` Added CLIR, CLIP, COLP, call waiting MMI support
 
 ## [0.47.1 2020-11-20]

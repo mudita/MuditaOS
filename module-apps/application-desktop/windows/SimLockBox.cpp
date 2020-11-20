@@ -35,7 +35,7 @@ namespace gui
     }
     void SimLockBox::buildPinLabels(unsigned int pinSize)
     {
-        auto itemBuilder = []() -> Rect * {
+        auto itemBuilder = []() {
             auto label = new gui::Image("dot_12px_hard_alpha_W_G");
             return label;
         };
@@ -62,22 +62,14 @@ namespace gui
         switch (type) {
         case PinLockBox::EnterPasscodeType::ProvidePasscode:
             LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_to_unlock"));
-            LockWindow->infoText->addText(" ");
-            //        LockWindow->infoText->addText(LockWindow->lock.getLockInfo(PinLock::InfoName::LockName));
-            LockWindow->infoText->addText(" ");
             LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_card"));
-            LockWindow->infoText->addText("\n");
-            LockWindow->infoText->addText("( ");
-            //        LockWindow->infoText->addText(LockWindow->lock.getLockInfo(PinLock::InfoName::PhoneNum));
-            LockWindow->infoText->addText(" )");
-            LockWindow->infoText->addText("\n");
             LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_type_pin"));
             break;
         case PinLockBox::EnterPasscodeType::ProvideNewPasscode:
-            LockWindow->infoText->addText("Enter new PIN");
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_enter_pin"));
             break;
         case PinLockBox::EnterPasscodeType::ConfirmNewPasscode:
-            LockWindow->infoText->addText("Confirm new PIN");
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_confirm_pin"));
             break;
         }
         LockWindow->infoText->setVisible(true);

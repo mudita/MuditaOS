@@ -23,23 +23,23 @@ namespace gui
         struct PinLabel : public HBox
         {
             gui::Image *image = nullptr;
-            PinLabel(Item *parent, const uint32_t &w, const uint32_t &h);
+            PinLabel(Item *parent, uint32_t w, uint32_t h);
             void setVisibleState(bool isImageVisible);
         };
 
         std::vector<PinLabel *> pinLabels;
 
         PinLockBaseWindow *LockWindow;
-        void popChar(unsigned int charNum) override final;
-        void putChar(unsigned int charNum) override final;
-        virtual void clear() override final;
+        void popChar(unsigned int charNum) final;
+        void putChar(unsigned int charNum) final;
+        virtual void clear() final;
 
-        void setVisibleStateEnterPin(EnterPasscodeType type) override final;
-        void setVisibleStateVerifiedPin() override final;
-        void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) override final;
-        void setVisibleStateBlocked() override final;
+        void setVisibleStateEnterPin(EnterPasscodeType type) final;
+        void setVisibleStateVerifiedPin() final;
+        void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) final;
+        void setVisibleStateBlocked() final;
 
-        void buildLockBox(unsigned int pinSize) override final;
+        void buildLockBox(unsigned int pinSize) final;
         void buildPinLabels(unsigned int pinSize);
     };
 } // namespace gui

@@ -9,17 +9,20 @@
 
 #include <module-utils/common_data/EventStore.hpp>
 
-#include <service-appmgr/service-appmgr/data/AppDesktopActionParams.hpp>
+#include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
 #include <service-cellular/CellularMessage.hpp>
 
 namespace gui
 {
-    constexpr unsigned int default_screen_pin_size   = 4;
-    constexpr unsigned int screen_nopin_size         = 0;
-    constexpr unsigned int default_attempts          = 4;
-    constexpr unsigned int blocked_sim_attempts      = 0;
-    constexpr unsigned int sim_max_passcode_size     = 8;
-    constexpr unsigned int sim_min_passcode_size     = 4;
+    namespace
+    {
+        constexpr unsigned int default_screen_pin_size = 4;
+        constexpr unsigned int screen_nopin_size       = 0;
+        constexpr unsigned int default_attempts        = 4;
+        constexpr unsigned int blocked_sim_attempts    = 0;
+        constexpr unsigned int sim_max_passcode_size   = 8;
+        constexpr unsigned int sim_min_passcode_size   = 4;
+    } // namespace
 
     PinLockHandler::PinLockHandler(app::ApplicationDesktop *app, SettingsRecord &settings)
         : app(app), appSettings(settings), screenLock(PinLock::SimCard::NoCard,
@@ -45,6 +48,7 @@ namespace gui
             screenLock.value--;
             if (hash == appSettings.lockPassHash) {
                 screenLock.lockState = gui::PinLock::LockState::Unlocked;
+                screenLock.value     = default_attempts;
             }
             else if (screenLock.value > 0) {
                 screenLock.lockState = gui::PinLock::LockState::PasscodeInvalidRetryRequired;
@@ -165,7 +169,7 @@ namespace gui
     {
         if (simLock.getLockType() == PinLock::LockType::SimPin) {
             sys::Bus::SendUnicast(
-                std::make_shared<CellularPinDataResponse>(Store::GSM::SIM::SIM1, passcode), "ServiceCellular", app);
+                std::make_shared<CellularSimPinDataMessage>(Store::GSM::SIM::SIM1, passcode), "ServiceCellular", app);
         }
         else if (simLock.getLockType() == PinLock::LockType::SimPuk) {
             handlePasscodeChange(passcode);
@@ -189,12 +193,12 @@ namespace gui
                                                     const std::vector<unsigned int> &pin) const
     {
         if (simLock.getLockType() == PinLock::LockType::SimPin) {
-            sys::Bus::SendUnicast(std::make_shared<CellularNewPinDataResponse>(Store::GSM::SIM::SIM1, passcode, pin),
+            sys::Bus::SendUnicast(std::make_shared<CellularSimNewPinDataMessage>(Store::GSM::SIM::SIM1, passcode, pin),
                                   "ServiceCellular",
                                   app);
         }
         else if (simLock.getLockType() == PinLock::LockType::SimPuk) {
-            sys::Bus::SendUnicast(std::make_shared<CellularPukDataResponse>(Store::GSM::SIM::SIM1, passcode, pin),
+            sys::Bus::SendUnicast(std::make_shared<CellularSimPukDataMessage>(Store::GSM::SIM::SIM1, passcode, pin),
                                   "ServiceCellular",
                                   app);
         }

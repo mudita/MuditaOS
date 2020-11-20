@@ -22,7 +22,6 @@ namespace app::manager::actions
 
       public:
         PasscodeParams(Store::GSM::SIM _sim, unsigned int _attempts, std::string _passcodeName);
-        PasscodeParams(const PasscodeParams &other) = default;
 
         [[nodiscard]] Store::GSM::SIM getSim() const noexcept;
         [[nodiscard]] unsigned int getAttempts() const noexcept;
@@ -39,7 +38,6 @@ namespace app::manager::actions
 
       public:
         explicit SimStateParams(Store::GSM::SIM _sim);
-        SimStateParams(const SimStateParams &other) = default;
 
         [[nodiscard]] Store::GSM::SIM getSim() const noexcept;
     };
@@ -54,7 +52,6 @@ namespace app::manager::actions
 
       public:
         UnhandledCMEParams(Store::GSM::SIM _sim, unsigned int _cmeCode);
-        UnhandledCMEParams(const UnhandledCMEParams &other) = default;
 
         [[nodiscard]] Store::GSM::SIM getSim() const noexcept;
         [[nodiscard]] unsigned int getCMECode() const noexcept;

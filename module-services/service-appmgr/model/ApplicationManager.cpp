@@ -260,12 +260,13 @@ namespace app::manager
             handleAction(actionMsg);
             return std::make_shared<sys::ResponseMessage>();
         });
-        connect(typeid(CellularSimGetPinRequest), makeConvertibleToActionHandler());
-        connect(typeid(CellularSimGetPukRequest), makeConvertibleToActionHandler());
-        connect(typeid(CellularSimChangePinRequest), makeConvertibleToActionHandler());
-        connect(typeid(CellularSimUnlockedMessage), makeConvertibleToActionHandler());
-        connect(typeid(CellularSimBlockedMessage), makeConvertibleToActionHandler());
-        connect(typeid(CellularUnhandledCMEMessage), makeConvertibleToActionHandler());
+
+        auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
+        connect(typeid(CellularSimRequestPinMessage), convertibleToActionHandler);
+        connect(typeid(CellularSimRequestPukMessage), convertibleToActionHandler);
+        connect(typeid(CellularUnlockSimMessage), convertibleToActionHandler);
+        connect(typeid(CellularBlockSimMessage), convertibleToActionHandler);
+        connect(typeid(CellularDisplayCMEMessage), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -649,17 +650,18 @@ namespace app::manager
         return true;
     }
 
-    auto ApplicationManager::makeConvertibleToActionHandler() -> sys::MessageHandler
+    auto ApplicationManager::handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>
     {
-        return [this](sys::Message *request) {
-            auto actionMsg = dynamic_cast<manager::actions::ConvertibleToAction *>(request);
-            auto action    = actionMsg->toAction();
-            if (actionMsg) {
-                handleAction(action.get());
-            }
-            return std::make_shared<sys::ResponseMessage>();
-        };
+        auto actionMsg = dynamic_cast<manager::actions::ConvertibleToAction *>(request);
+        if (!actionMsg) {
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
+        }
+        auto action = actionMsg->toAction();
+        handleAction(action.get());
+
+        return std::make_shared<sys::ResponseMessage>();
     }
+
     void ApplicationManager::onPhoneLocked()
     {
 #ifdef AUTO_PHONE_LOCK_ENABLED

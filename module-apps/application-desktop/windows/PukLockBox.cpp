@@ -31,7 +31,7 @@ namespace gui
     }
     void PukLockBox::buildPinLabels(unsigned int pinSize)
     {
-        auto itemBuilder = []() -> Rect * {
+        auto itemBuilder = []() {
             auto label = new gui::Image("dot_12px_hard_alpha_W_G");
             return label;
         };
@@ -62,10 +62,10 @@ namespace gui
             LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_type_puk"));
             break;
         case PinLockBox::EnterPasscodeType::ProvideNewPasscode:
-            LockWindow->infoText->addText("Enter new PIN code");
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_enter_pin"));
             break;
         case PinLockBox::EnterPasscodeType::ConfirmNewPasscode:
-            LockWindow->infoText->addText("Confirm new PIN code");
+            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_confirm_pin"));
         }
         LockWindow->infoText->setVisible(true);
 
@@ -106,7 +106,7 @@ namespace gui
             }
             break;
         case PinLockBox::PasscodeErrorType::NewPasscodeConfirmFailed:
-            LOG_ERROR("No use case for NewPasscodeConfirmFailed in PukLockBox");
+            LockWindow->infoText->setText(utils::localize.get("app_desktop_sim_wrong_pin"));
             break;
         case PinLockBox::PasscodeErrorType::UnhandledError:
             LOG_ERROR("No use case for UnhandledError in PukLockBox");

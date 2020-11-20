@@ -120,7 +120,7 @@ namespace app::manager
         auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
-        auto makeConvertibleToActionHandler() -> sys::MessageHandler;
+        auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
         void onApplicationSwitch(ApplicationHandle &app,

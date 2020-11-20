@@ -26,7 +26,7 @@ namespace gui
 
         virtual void popChar(unsigned int charNum) = 0;
         virtual void putChar(unsigned int charNum) = 0;
-        virtual void clear()                   = 0;
+        virtual void clear()                       = 0;
 
         virtual void setVisibleStateEnterPin(EnterPasscodeType type)                       = 0;
         virtual void setVisibleStateVerifiedPin() = 0;

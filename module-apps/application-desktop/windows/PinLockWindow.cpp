@@ -87,7 +87,7 @@ namespace gui
         if (auto lockData = dynamic_cast<LockPhoneData *>(data)) {
             assert(lockData);
             lockTimeoutApplication = lockData->getPreviousApplication();
-            lock = lockData->getLock();
+            lock                   = lockData->getLock();
             assert(lock);
 
             buildPinLockBox();

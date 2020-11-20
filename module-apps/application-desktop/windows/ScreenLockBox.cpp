@@ -15,7 +15,7 @@ namespace lock_style = style::window::pin_lock;
 namespace gui
 {
 
-    ScreenLockBox::PinLabel::PinLabel(Item *parent, const uint32_t &w, const uint32_t &h) : HBox(parent, 0, 0, w, h)
+    ScreenLockBox::PinLabel::PinLabel(Item *parent, uint32_t w, uint32_t h) : HBox(parent, 0, 0, w, h)
     {}
     void ScreenLockBox::PinLabel::setVisibleState(bool isImageVisible)
     {
@@ -51,18 +51,21 @@ namespace gui
     }
     void ScreenLockBox::buildPinLabels(unsigned int pinSize)
     {
-        unsigned int singleLabelWidth = lock_style::label_size;
         constexpr auto pinLabelWidth  = style::window::default_body_width;
         pinLabels.clear();
 
         if (pinSize == 0) {
             return;
         }
-        if (pinSize * singleLabelWidth > pinLabelWidth - pinSize * 2 * lock_style::label_margins) {
-            singleLabelWidth = pinLabelWidth / pinSize - 2 * lock_style::label_margins;
+
+        unsigned int singleLabelWidth        = lock_style::label_size;
+        unsigned int maxNoMarginsLabelsWidth = pinLabelWidth - pinSize * 2 * lock_style::label_margins;
+
+        if (pinSize * singleLabelWidth > maxNoMarginsLabelsWidth) {
+            singleLabelWidth = maxNoMarginsLabelsWidth / pinSize;
         }
 
-        auto itemBuilder = [this, singleLabelWidth]() -> Rect * {
+        auto itemBuilder = [this, singleLabelWidth]() {
             auto label = new PinLabel(nullptr, singleLabelWidth, lock_style::label_size);
             label->setEdges(RectangleEdge::Bottom);
             label->setMargins(Margins(lock_style::label_margins, 0, lock_style::label_margins, 0));

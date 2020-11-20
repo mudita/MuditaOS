@@ -32,31 +32,30 @@ namespace app
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
 
-        addActionReceiver(app::manager::actions::RequestPin, [this](app::manager::actions::ActionParamsPtr &&data) {
+        addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
             lockHandler.handlePinRequest(std::move(data));
-            return std::make_shared<sys::ResponseMessage>();
+            return msgHandled();
         });
 
-        addActionReceiver(app::manager::actions::RequestPuk, [this](app::manager::actions::ActionParamsPtr &&data) {
+        addActionReceiver(app::manager::actions::RequestPuk, [this](auto &&data) {
             lockHandler.handlePukRequest(std::move(data));
-            return std::make_shared<sys::ResponseMessage>();
+            return msgHandled();
         });
 
-        addActionReceiver(app::manager::actions::ChangePin, [this](app::manager::actions::ActionParamsPtr &&data) {
+        addActionReceiver(app::manager::actions::RequestPinChange, [this](auto &&data) {
             lockHandler.handlePinChangeRequest(std::move(data));
-            return std::make_shared<sys::ResponseMessage>();
+            return msgHandled();
         });
 
-        addActionReceiver(app::manager::actions::SimBlocked, [this](app::manager::actions::ActionParamsPtr &&data) {
+        addActionReceiver(app::manager::actions::BlockSim, [this](auto &&data) {
             lockHandler.handleSimBlocked(std::move(data));
-            return std::make_shared<sys::ResponseMessage>();
+            return msgHandled();
         });
 
-        addActionReceiver(app::manager::actions::UnhandledCMEError,
-                          [this](app::manager::actions::ActionParamsPtr &&data) {
-                              lockHandler.handleCMEError(std::move(data));
-                              return std::make_shared<sys::ResponseMessage>();
-                          });
+        addActionReceiver(app::manager::actions::DisplayCMEError, [this](auto &&data) {
+            lockHandler.handleCMEError(std::move(data));
+            return msgHandled();
+        });
     }
 
     ApplicationDesktop::~ApplicationDesktop()

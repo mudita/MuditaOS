@@ -26,10 +26,10 @@ namespace app::manager
             Call,
             RequestPin,
             RequestPuk,
-            ChangePin,
-            SimUnlocked,
-            SimBlocked,
-            UnhandledCMEError,
+            RequestPinChange,
+            UnlockSim,
+            BlockSim,
+            DisplayCMEError,
             UserAction // The last enumerator in the Action enum.
         };
 
