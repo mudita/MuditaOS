@@ -51,7 +51,7 @@ namespace gui
     }
     void ScreenLockBox::buildPinLabels(unsigned int pinSize)
     {
-        constexpr auto pinLabelWidth  = style::window::default_body_width;
+        constexpr auto pinLabelWidth = style::window::default_body_width;
         pinLabels.clear();
 
         if (pinSize == 0) {
