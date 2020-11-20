@@ -1104,12 +1104,13 @@ bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
 bool ServiceCellular::handleSimState(at::SimState state, const std::string message)
 {
 
-    std::optional<std::unique_ptr<CellularMessage>> response;
+    std::optional<std::shared_ptr<CellularMessage>> response;
     switch (state) {
     case at::SimState::Ready:
         Store::GSM::get()->sim = Store::GSM::get()->selected;
         // SIM causes SIM INIT, only on ready
         response = std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
+        sys::Bus::SendMulticast(response.value(), sys::BusChannels::ServiceCellularNotifications, this);
         sendSimUnlocked();
         break;
     case at::SimState::NotReady:
