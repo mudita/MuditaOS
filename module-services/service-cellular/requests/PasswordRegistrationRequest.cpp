@@ -25,10 +25,10 @@ namespace cellular
 
     auto PasswordRegistrationRequest::command() -> std::string
     {
-        std::vector<std::function<std::string()>> commandParts = {
-            [this]() { return this->getCommandFacility(); },
-            [this]() { return this->getOldPassword(); },
-            [this]() { return this->getNewPassword(); },
+        std::vector<commandBuilderFunc> commandParts = {
+            [this]() { return getCommandFacility(); },
+            [this]() { return getOldPassword(); },
+            [this]() { return getNewPassword(); },
         };
 
         return buildCommand(at::AT::CPWD, commandParts);
@@ -36,8 +36,14 @@ namespace cellular
 
     auto PasswordRegistrationRequest::getCommandFacility() const noexcept -> std::string
     {
-        if (auto it = barringServiceToFacility.find(requestBarringService); it != barringServiceToFacility.end()) {
-            return "\"" + it->second + "\"";
+        if (requestBarringService.empty()) {
+            return "\"" + std::string(CallBarringRequest::allBarringServicesFacilityString) +
+                   "\""; //(According to 3GPP TS 22.030 V16.0.0 )
+        }
+        for (auto &it : CallBarringRequest::barringServiceToFacility) {
+            if (it.first == requestBarringService) {
+                return "\"" + std::string(it.second) + "\"";
+            }
         }
         return std::string();
     }

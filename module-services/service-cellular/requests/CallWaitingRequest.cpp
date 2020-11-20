@@ -25,10 +25,10 @@ namespace cellular
 
     auto CallWaitingRequest::command() -> std::string
     {
-        std::vector<std::function<std::string()>> commandParts = {
-            [this]() { return this->getCommandPresentation(); },
-            [this]() { return this->getCommandMode(); },
-            [this]() { return this->getCommandClass(); },
+        std::vector<commandBuilderFunc> commandParts = {
+            [this]() { return getCommandPresentation(); },
+            [this]() { return getCommandMode(); },
+            [this]() { return getCommandClass(); },
         };
 
         return buildCommand(at::AT::CCWA, commandParts);

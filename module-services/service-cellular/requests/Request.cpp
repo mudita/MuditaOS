@@ -31,8 +31,7 @@ namespace cellular
         return true;
     }
 
-    std::string Request::buildCommand(at::AT atCommand,
-                                      const std::vector<std::function<std::string()>> &builderFunctions) const
+    std::string Request::buildCommand(at::AT atCommand, const std::vector<commandBuilderFunc> &builderFunctions) const
     {
         if (!isValid()) {
             return std::string();

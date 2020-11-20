@@ -16,8 +16,8 @@ namespace cellular
                                                                              GroupMatch matchGroups)
     {
         for (auto &it : barringServiceToFacility) {
-            if (!it.first.empty() && it.first == serviceCode) {
-                return std::make_unique<CallBarringRequest>(it.second, data, matchGroups);
+            if (it.first == serviceCode) {
+                return std::make_unique<CallBarringRequest>(std::string(it.second), data, matchGroups);
             }
         }
 
@@ -26,11 +26,11 @@ namespace cellular
 
     auto CallBarringRequest::command() -> std::string
     {
-        std::vector<std::function<std::string()>> commandParts = {
-            [this]() { return this->getCommandFacility(); },
-            [this]() { return this->getCommandMode(); },
-            [this]() { return this->getCommandPassword(); },
-            [this]() { return this->getCommandClass(); },
+        std::vector<commandBuilderFunc> commandParts = {
+            [this]() { return getCommandFacility(); },
+            [this]() { return getCommandMode(); },
+            [this]() { return getCommandPassword(); },
+            [this]() { return getCommandClass(); },
         };
 
         return buildCommand(at::AT::CLCK, commandParts);

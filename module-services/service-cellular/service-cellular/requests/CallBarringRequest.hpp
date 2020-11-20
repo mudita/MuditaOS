@@ -5,27 +5,24 @@
 
 #include "SupplementaryServicesRequest.hpp"
 
-namespace
-{
-    // according to EC25&EC21_AT_Commands_Manual_V1.3
-    const std::map<std::string, std::string> barringServiceToFacility = {{
-        {"33", "AO"},  // BAOC (Bar All Outgoing Calls)
-        {"331", "OI"}, // BOIC (Bar Outgoing International Calls)
-        {"332", "OX"}, // BOIC-exHC (Bar Outgoing International Calls except to home country)
-        {"35", "AI"},  // BAIC (Bar All Incoming Calls)
-        {"351", "IR"}, // BIC-Roam (Bar Incoming Calls when Roaming outside the home country)
-        {"330", "AB"}, // All barring services
-        {"333", "AG"}, // All outgoing barring services
-        {"353", "AC"}, // All incoming barring services
-        {"", "AB"},    // All incoming barring services (According to 3GPP TS 22.030 V16.0.0 )
-    }};
-} // namespace
-
 namespace cellular
 {
     class CallBarringRequest : public SupplementaryServicesRequest
     {
       public:
+        // according to EC25&EC21_AT_Commands_Manual_V1.3
+        static constexpr auto allBarringServicesFacilityString                                                 = "AB";
+        static constexpr std::array<std::pair<std::string_view, std::string_view>, 8> barringServiceToFacility = {{
+            {"33", "AO"},  // BAOC (Bar All Outgoing Calls)
+            {"331", "OI"}, // BOIC (Bar Outgoing International Calls)
+            {"332", "OX"}, // BOIC-exHC (Bar Outgoing International Calls except to home country)
+            {"35", "AI"},  // BAIC (Bar All Incoming Calls)
+            {"351", "IR"}, // BIC-Roam (Bar Incoming Calls when Roaming outside the home country)
+            {"330", allBarringServicesFacilityString}, // All barring services
+            {"333", "AG"},                             // All outgoing barring services
+            {"353", "AC"},                             // All incoming barring services
+        }};
+
         CallBarringRequest(const std::string &facility, const std::string &data, GroupMatch matchGroups)
             : SupplementaryServicesRequest(data, matchGroups), facility(facility)
         {}

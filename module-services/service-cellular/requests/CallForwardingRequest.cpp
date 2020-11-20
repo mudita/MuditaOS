@@ -37,10 +37,10 @@ namespace cellular
 
     auto CallForwardingRequest::command() -> std::string
     {
-        std::vector<std::function<std::string()>> commandParts = {
-            [this]() { return this->getCommandReason(); },
-            [this]() { return this->getCommandMode(); },
-            [this]() { return this->getCommandNumber(); },
+        std::vector<commandBuilderFunc> commandParts = {
+            [this]() { return getCommandReason(); },
+            [this]() { return getCommandMode(); },
+            [this]() { return getCommandNumber(); },
         };
 
         return buildCommand(at::AT::CCFC, commandParts);

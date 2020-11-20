@@ -35,13 +35,14 @@ namespace cellular
         bool isValid() const noexcept override;
 
       protected:
+        using commandBuilderFunc = std::function<std::string()>;
         /**
          * Helper command for building output command
          * @param atCommand
          * @param builderFunctions functions that build parts of the output command in order of execution
          * @return formatted command or empty string if input is invalid
          */
-        auto buildCommand(at::AT atCommand, const std::vector<std::function<std::string()>> &builderFunctions) const
+        auto buildCommand(at::AT atCommand, const std::vector<commandBuilderFunc> &builderFunctions) const
             -> std::string;
         bool isRequestHandled = false;
         std::string request;
