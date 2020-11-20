@@ -18,12 +18,12 @@ namespace purefs::fs
 namespace purefs::fs::internal
 {
     //! Mount point disk private structure
-    struct mount_point
+    //! TODO fill the blanks
+    class mount_point
     {
-        std::weak_ptr<blkdev::disk> device; //! Pointer to the device
-        int partition;
-
+        virtual ~mount_point() = default;
+        std::string device;     //! Owning device
         std::string mount_path; //! Mounted path
-        std::shared_ptr<filesystem_operation> filesystem;
+        std::weak_ptr<filesystem_operation> filesystem; //! Filesystem operation
     };
 } // namespace purefs::fs::internal

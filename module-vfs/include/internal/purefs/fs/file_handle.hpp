@@ -7,6 +7,7 @@
 
 namespace purefs::fs::internal
 {
+    class mount_point;
     // File handle used for internal operation
     class file_handle
     {
@@ -29,6 +30,7 @@ namespace purefs::fs::internal
         {
             return m_flags;
         }
+        std::weak_ptr<mount_point> m_mount_point;
 
       private:
         int m_error{};

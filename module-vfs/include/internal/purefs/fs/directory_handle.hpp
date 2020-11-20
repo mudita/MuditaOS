@@ -2,9 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+#include <memory>
 
 namespace purefs::fs::internal
 {
+    class mount_point;
     class directory_handle
     {
       public:
@@ -19,8 +21,8 @@ namespace purefs::fs::internal
         {
             return m_error;
         }
-
       private:
         int m_error{};
+        std::weak_ptr<mount_point> m_mount_point;
     };
 } // namespace purefs::fs::internal
