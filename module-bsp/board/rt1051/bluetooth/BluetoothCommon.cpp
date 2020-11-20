@@ -14,7 +14,7 @@
 using namespace bsp;
 
 lpuart_edma_handle_t BluetoothCommon::uartDmaHandle = {};
-uint8_t BluetoothCommon::dmaRXbuf[1000]             = {0};
+uint8_t BluetoothCommon::dmaRXbuf[384]             = {0};
 uint32_t BluetoothCommon::dmaRXreadCount            = 0;
 
 // TODO it's plain copy same as in cellular - this is kind of wrong
@@ -151,15 +151,25 @@ ssize_t BluetoothCommon::write_blocking(char *buf, ssize_t len)
 {
     ssize_t ret = -1;
 
+    // flush RX circ buffer
+    bsp::BlueKitchen *bt = bsp::BlueKitchen::getInstance();
+    bt->in.flush();
+
     auto wrote = write(buf, len);
 
     if (wrote == len) { // success orchestrating a transfer
         constexpr auto write_blocking_timeout = pdMS_TO_TICKS(100);
         auto ulNotificationValue              = ulTaskNotifyTake(pdFALSE, write_blocking_timeout);
         if (ulNotificationValue != 0) { // success completing a transfer
-            LOG_DEBUG("DMA Tx pending");
+            LOG_DEBUG("DMA Tx wrote");
             ret = len;
+        } else {
+            LOG_ERROR("DMA Tx timeout");
+            ret = -1;
         }
+    }
+    else{
+        LOG_WARN("DMA Tx not wrote (%d/%d)", wrote, len);
     }
     return ret;
 }
@@ -312,7 +322,8 @@ void BluetoothCommon::set_irq(bool enable)
     n += 0;
     if (enable) {
         LPUART_EnableInterrupts(BSP_BLUETOOTH_UART_BASE,
-                                kLPUART_RxActiveEdgeInterruptEnable | kLPUART_RxOverrunInterruptEnable);
+                                kLPUART_RxActiveEdgeInterruptEnable | kLPUART_IdleLineInterruptEnable |
+                                    kLPUART_RxOverrunInterruptEnable);
     }
     else {
         LPUART_DisableInterrupts(BSP_BLUETOOTH_UART_BASE,
@@ -353,21 +364,7 @@ extern "C"
             }
             else {
                 // transfer pending, no need to start again
-                // copy previous DMA byte to bt->in
-                if (BluetoothCommon::dmaRXreadCount > 0) {
-                    if (bt->in.push(BluetoothCommon::dmaRXbuf[BluetoothCommon::dmaRXreadCount - 1])) {
-                        val = Bt::Message::EvtRecUnwanted;
-                        xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
-                    }
-
-                    if (bt->to_read != 0 && (bt->in.len >= bt->to_read)) {
-                        bt->to_read = 0;
-                        assert(bt->qHandle);
-                        val = Bt::Message::EvtReceived;
-                        xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
-                        portEND_SWITCHING_ISR(taskwoken);
-                    }
-                }
+                LOG_DEBUG("LPUART IRQ new byte incoming RX - RX pending");
             }
         }
 
@@ -380,11 +377,13 @@ extern "C"
                 LPUART_TransferAbortReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &BluetoothCommon::uartDmaHandle);
                 LOG_DEBUG("LPUART IRQ aborted RX");
             }
-
-            // copy the last DMA byte to bt->in
-            if (bt->in.push(BluetoothCommon::dmaRXbuf[BluetoothCommon::dmaRXreadCount - 1])) {
-                val = Bt::Message::EvtRecUnwanted;
-                xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
+            LOG_DEBUG("compare count/to_read_req : %ld/%ld", BluetoothCommon::dmaRXreadCount, bt->to_read_req);
+            // copy DMA bytes to bt->in
+            for (auto dma = 0; dma < BluetoothCommon::dmaRXreadCount; dma++) {
+                if (bt->in.push(BluetoothCommon::dmaRXbuf[dma])) {
+                    val = Bt::Message::EvtRecUnwanted;
+                    xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
+                }
             }
 
             if (bt->to_read != 0 && (bt->in.len >= bt->to_read)) {
@@ -394,6 +393,8 @@ extern "C"
                 xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
                 portEND_SWITCHING_ISR(taskwoken);
             }
+
+            BluetoothCommon::dmaRXreadCount = 0;
         }
         if (isrReg & kLPUART_RxDataRegFullFlag) {}
         if (isrReg & kLPUART_RxOverrunFlag) {

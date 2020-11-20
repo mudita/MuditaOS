@@ -88,7 +88,6 @@ ssize_t BlueKitchen::write_blocking(char *buf, ssize_t size)
         val = Bt::Message::EvtSentError;
         xQueueSendFromISR(qHandle, &val, &taskwoken);
     }
-
     return i;
 }
 

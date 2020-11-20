@@ -184,7 +184,8 @@ namespace Bt
         btstack_memory_init();
 #ifdef TARGET_RT1051
         btstack_run_loop_init(btstack_run_loop_freertos_get_instance());
-        const btstack_uart_block_t *uart_driver = btstack_uart_block_rt1051_instance();
+//        const btstack_uart_block_t *uart_driver = btstack_uart_block_rt1051_instance();
+        const btstack_uart_block_t *uart_driver = btstack_uart_block_freertos_instance();
 #else
         btstack_run_loop_init(btstack_run_loop_posix_get_instance());
         config.device_name = "/dev/telit";

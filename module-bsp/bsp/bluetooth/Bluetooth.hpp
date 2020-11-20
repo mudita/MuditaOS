@@ -144,7 +144,7 @@ namespace bsp {
             std::unique_ptr<drivers::DriverDMAHandle> uartTxDmaHandle;
             static AT_NONCACHEABLE_SECTION_INIT(lpuart_edma_handle_t uartDmaHandle);
             static void uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
-            static uint8_t dmaRXbuf[1000];
+            static uint8_t dmaRXbuf[384];
             static uint32_t dmaRXreadCount;
             // /edma
     };
