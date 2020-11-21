@@ -14,7 +14,7 @@
 
 namespace bsp::cellular
 {
-    void readline_timeout()
+    void readline()
     {
         BaseType_t hp = pdFALSE;
         if (bsp::RT1051Cellular::blockedTaskHandle) {
@@ -45,9 +45,13 @@ extern "C"
                                              (void *)&characterReceived,
                                              1,
                                              &xHigherPriorityTaskWoken);
-                    bsp::pit::start(25 * 1000, bsp::cellular::readline_timeout);
                 }
             }
+
+            if (isrReg & kLPUART_IdleLineFlag) {
+                bsp::cellular::readline();
+            }
+
             LPUART_ClearStatusFlags(CELLULAR_UART_BASE, isrReg);
 
             portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
@@ -99,6 +103,7 @@ namespace bsp
             return;
         }
 
+        LPUART_EnableInterrupts(CELLULAR_UART_BASE, kLPUART_IdleLineInterruptEnable | kLPUART_RxDataRegFullFlag);
         LPUART_ClearStatusFlags(CELLULAR_UART_BASE, 0xFFFFFFFF);
         NVIC_ClearPendingIRQ(LPUART1_IRQn);
         NVIC_SetPriority(LPUART1_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
@@ -127,6 +132,7 @@ namespace bsp
         DisableTx();
 
         NVIC_DisableIRQ(LPUART1_IRQn);
+        LPUART_DisableInterrupts(CELLULAR_UART_BASE, kLPUART_IdleLineInterruptEnable | kLPUART_RxDataRegFullFlag);
         LPUART_ClearStatusFlags(CELLULAR_UART_BASE, 0xFFFFFFFF);
         NVIC_ClearPendingIRQ(LPUART1_IRQn);
 
