@@ -89,14 +89,4 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
     std::string GetSortedByNameQueryString(ContactQuerySection section);
 
   private:
-    const char *createTableQuery =
-        "CREATE TABLE IF NOT EXISTS contacts("
-        "_id              INTEGER PRIMARY KEY,"
-        "name_id          INTEGER,"
-        "numbers_id       TEXT NOT NULL,"
-        "ring_id          INTEGER,"
-        "address_id       INTEGER,"
-        "speeddial        TEXT NOT NULL,"
-        "FOREIGN KEY(name_id) REFERENCES contact_name(_id) FOREIGN KEY(ring_id) REFERENCES contact_ringtones(_id)"
-        ");";
 };
