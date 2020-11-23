@@ -100,7 +100,10 @@ namespace drivers
             break;
         }
 
-        PWM_SetupPwm(base, pwmModule, &pwmSignalConfig, 1, pwmMode, pwm_frequency, CLOCK_GetFreq(kCLOCK_IpgClk));
+        // Currently connected to IPbus clock
+        uint32_t clockSource = CLOCK_GetFreq(kCLOCK_IpgClk);
+
+        PWM_SetupPwm(base, pwmModule, &pwmSignalConfig, 1, pwmMode, pwm_frequency, clockSource);
     }
 
 } // namespace drivers

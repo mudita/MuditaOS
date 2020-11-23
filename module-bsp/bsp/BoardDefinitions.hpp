@@ -104,6 +104,9 @@ enum class BoardDefinitions
     TORCH_DRIVER_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
     TORCH_DRIVER_EN = 21, // GPIO_AD_B1_05 Active HIGH. Internal pulldown resistor of 300kΩ between HWEN and GND.
 
+    EINK_FRONTLIGHT_PWM_INSTANCE = 2, // GPIO_AD_B0_01 = FLEXPWM2_PWM3_B
+    EINK_FRONTLIGHT_PWM_MODULE = 3,
+    EINK_FRONTLIGHT_PWM_CHANNEL = 1, // B
 };
 
 #endif //PUREPHONE_BOARDDEFINITIONS_HPP
