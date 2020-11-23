@@ -146,11 +146,20 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
             return false;
         }
         if (event.keyCode == gui::KeyCode::KEY_LF) {
+            auto app = dynamic_cast<app::ApplicationPhonebook *>(application);
             if (item->contact && !item->contact->numbers.empty()) {
+                if (!Store::GSM::get()->simCardInserted()) {
+                    auto action = [=]() -> bool {
+                        app->returnToPreviousWindow();
+                        return true;
+                    };
+                    return app->showSIMNotification(action);
+                }
                 const auto phoneNumber = item->contact->numbers.front().number;
                 return app::manager::Controller::sendAction(
                     application, app::manager::actions::Dial, std::make_unique<app::ExecuteCallData>(phoneNumber));
             }
+            return false;
         }
         return false;
     };

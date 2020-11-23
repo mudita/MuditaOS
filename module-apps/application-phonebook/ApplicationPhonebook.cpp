@@ -199,13 +199,23 @@ namespace app
     bool ApplicationPhonebook::searchEmpty(const std::string &query)
     {
         gui::DialogMetadata meta;
-        meta.icon  = "search_big";
-        meta.text  = utils::localize.get("app_phonebook_search_no_results");
-        meta.title = utils::localize.get("common_results_prefix") + "\"" + query + "\"";
+        meta.icon                        = "search_big";
+        meta.text                        = utils::localize.get("app_phonebook_search_no_results");
+        meta.title                       = utils::localize.get("common_results_prefix") + "\"" + query + "\"";
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         data->ignoreCurrentWindowOnStack = true;
         LOG_DEBUG("Switching to app_phonebook_search_no_results window.");
         switchWindow(gui::window::name::dialog, std::move(data));
+        return true;
+    }
+
+    bool ApplicationPhonebook::showSIMNotification(std::function<bool()> action)
+    {
+        gui::DialogMetadata meta;
+        meta.icon   = "info_big_circle_W_G";
+        meta.text   = utils::localize.get("app_call_no_sim");
+        meta.action = action;
+        switchWindow(gui::window::name::dialog_confirm, std::make_unique<gui::DialogMetadataMessage>(meta));
         return true;
     }
 

@@ -49,6 +49,8 @@ namespace app
 
         void onSearchRequest(const std::string &searchFilter);
         bool searchEmpty(const std::string &query);
+
+        bool showSIMNotification(std::function<bool()> action);
     };
 
     template <> struct ManifestTraits<ApplicationPhonebook>
