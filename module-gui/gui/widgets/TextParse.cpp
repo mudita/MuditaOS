@@ -14,6 +14,8 @@ namespace gui
         while (std::getline(ss, line)) {
             blocks.emplace_back(TextBlock(line, font, end));
         }
+
+        addEmptyBlockOnNewline(blocks, font);
         return blocks;
     }
 
@@ -23,11 +25,29 @@ namespace gui
         std::stringstream ss(text.c_str());
         std::string line;
         while (std::getline(ss, line)) {
-            if (!blocks.empty()) {
-                blocks.back().setEnd(TextBlock::End::Newline);
+            auto block = TextBlock(line, std::make_unique<TextFormat>(format));
+            if (ss.good()) {
+                block.setEnd(TextBlock::End::Newline);
             }
-            blocks.emplace_back(TextBlock(line, std::make_unique<TextFormat>(format)));
+            blocks.emplace_back(block);
         }
+
+        addEmptyBlockOnNewline(blocks, format);
         return blocks;
+    }
+
+    auto addEmptyBlockOnNewline(std::list<TextBlock> &blocks, const RawFont *font) -> void
+    {
+        if (!blocks.empty() && blocks.back().getEnd() == TextBlock::End::Newline) {
+            blocks.emplace_back(TextBlock("", font, TextBlock::End::None));
+        }
+    }
+
+    auto addEmptyBlockOnNewline(std::list<TextBlock> &blocks, TextFormat format) -> void
+    {
+        if (!blocks.empty() && blocks.back().getEnd() == TextBlock::End::Newline) {
+            blocks.emplace_back(TextBlock("", std::make_unique<TextFormat>(format)));
+            blocks.back().setEnd(TextBlock::End::None);
+        }
     }
 } // namespace gui

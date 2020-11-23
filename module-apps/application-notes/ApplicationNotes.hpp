@@ -9,7 +9,7 @@
 
 namespace app
 {
-    inline const std::string name_notes = "ApplicationNotes";
+    inline constexpr auto name_notes = "ApplicationNotes";
 
     class ApplicationNotes : public Application
     {
@@ -18,7 +18,7 @@ namespace app
                          std::string parent                  = {},
                          StartInBackground startInBackground = {false});
         virtual ~ApplicationNotes();
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 

@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageType.hpp"
 #include "windows/NotesMainWindow.hpp"
 #include "windows/NotesEditWindow.hpp"
-#include "service-db/messages/DBMessage.hpp"
+#include <service-db/DBMessage.hpp>
 
 #include "ApplicationNotes.hpp"
 
@@ -20,7 +20,7 @@ namespace app
     }
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationNotes::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);

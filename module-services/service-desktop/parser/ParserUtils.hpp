@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,7 @@ namespace parserFSM
         invalid = 0,
         deviceInfo,
         update,
+        filesystemUpload,
         backup,
         restore,
         factory,
@@ -27,15 +28,15 @@ namespace parserFSM
         developerMode,
     };
 
-    constexpr int lastEndpoint = static_cast<int>(EndpointType::developerMode);
+    inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::developerMode);
     // Message defs and utils
     namespace message
     {
-        constexpr size_t size_length = 9;
-        constexpr size_t size_header = size_length + 1;
+        inline constexpr auto size_length = 9U;
+        inline constexpr auto size_header = size_length + 1;
 
-        constexpr char endpointChar = '#';
-        constexpr char rawDataChar  = '$';
+        inline constexpr auto endpointChar = '#';
+        inline constexpr auto rawDataChar  = '$';
 
         inline void removeHeader(std::string &msg)
         {
@@ -78,7 +79,9 @@ namespace parserFSM
         enum class Code
         {
             OK                  = 200,
+            Accepted            = 202,
             BadRequest          = 400,
+            NotAcceptable       = 406,
             InternalServerError = 500
         };
 
@@ -97,46 +100,67 @@ namespace parserFSM
 
     namespace json
     {
-        const inline std::string batteryLevel   = "batteryLevel";
-        const inline std::string batteryState   = "batteryState";
-        const inline std::string selectedSim    = "selectedSim";
-        const inline std::string trayState      = "trayState";
-        const inline std::string signalStrength = "signalStrength";
-        const inline std::string fsTotal        = "fsTotal";
-        const inline std::string fsFreePercent  = "fsFreePercent";
-        const inline std::string fsFree         = "fsFree";
-        const inline std::string gitRevision    = "gitRevision";
-        const inline std::string gitBranch      = "gitBranch";
-        const inline std::string gitTag         = "gitTag";
-        const inline std::string currentRTCTime = "currentRTCTime";
-        const inline std::string updateReady    = "updateReady";
-        const inline std::string updateFileList = "updateFileList";
-        const inline std::string backupRequest  = "backupRequest";
-        const inline std::string backupReady    = "backupReady";
-        const inline std::string backupUpload   = "backupUpload";
-        const inline std::string restoreRequest = "restoreRequest";
-        const inline std::string factoryRequest = "factoryRequest";
+        inline constexpr auto batteryLevel     = "batteryLevel";
+        inline constexpr auto batteryState     = "batteryState";
+        inline constexpr auto selectedSim      = "selectedSim";
+        inline constexpr auto trayState        = "trayState";
+        inline constexpr auto signalStrength   = "signalStrength";
+        inline constexpr auto fsTotal          = "fsTotal";
+        inline constexpr auto fsFreePercent    = "fsFreePercent";
+        inline constexpr auto fsFree           = "fsFree";
+        inline constexpr auto gitRevision      = "gitRevision";
+        inline constexpr auto gitBranch        = "gitBranch";
+        inline constexpr auto gitTag           = "gitTag";
+        inline constexpr auto currentRTCTime   = "currentRTCTime";
+        inline constexpr auto updateReady      = "updateReady";
+        inline constexpr auto updateFileList   = "updateFileList";
+        inline constexpr auto backupRequest    = "backupRequest";
+        inline constexpr auto backupReady      = "backupReady";
+        inline constexpr auto backupUpload     = "backupUpload";
+        inline constexpr auto restoreRequest   = "restoreRequest";
+        inline constexpr auto factoryRequest   = "factoryRequest";
+        inline constexpr auto networkStatus    = "networkStatus";
+        inline constexpr auto accessTechnology = "accessTechnology";
+        inline constexpr auto fileName         = "fileName";
+        inline constexpr auto fileSize         = "fileSize";
+
+        inline constexpr auto update      = "update";
+        inline constexpr auto updateInfo  = "updateInfo";
+        inline constexpr auto updateError = "updateError";
+        inline constexpr auto errorCode   = "errorCode";
+        inline constexpr auto statusCode  = "statusCode";
+
+        namespace filesystem
+        {
+            inline constexpr auto command = "command";
+            namespace commands
+            {
+                inline constexpr auto upload   = "upload";
+                inline constexpr auto rm       = "rm";
+                inline constexpr auto download = "download";
+            } // namespace commands
+        }     // namespace filesystem
 
         namespace messages
         {
-            const inline std::string id           = "id";
-            const inline std::string count        = "count";
-            const inline std::string offset       = "offset";
-            const inline std::string phoneNumber  = "phoneNumber";
-            const inline std::string messageBody  = "messageBody";
-            const inline std::string isUnread     = "unread";
-            const inline std::string contactID    = "contactID";
-            const inline std::string date         = "date";
-            const inline std::string dateSent     = "dateSent";
-            const inline std::string type         = "type";
-            const inline std::string threadID     = "threadID";
-            const inline std::string msgTemplate  = "template";
-            const inline std::string templateText = "text";
+            inline constexpr auto id           = "id";
+            inline constexpr auto count        = "count";
+            inline constexpr auto offset       = "offset";
+            inline constexpr auto phoneNumber  = "phoneNumber";
+            inline constexpr auto messageBody  = "messageBody";
+            inline constexpr auto isUnread     = "unread";
+            inline constexpr auto contactID    = "contactID";
+            inline constexpr auto date         = "date";
+            inline constexpr auto dateSent     = "dateSent";
+            inline constexpr auto type         = "type";
+            inline constexpr auto threadID     = "threadID";
+            inline constexpr auto msgTemplate  = "template";
+            inline constexpr auto templateText = "text";
             namespace thread
             {
-                const inline std::string msgCount       = "msgCount";
-                const inline std::string snippet        = "snippet";
-                const inline std::string unreadMsgCount = "unreadMsgCount";
+                inline constexpr auto msgCount       = "msgCount";
+                inline constexpr auto snippet        = "snippet";
+                inline constexpr auto unreadMsgCount = "unreadMsgCount";
 
             } // namespace thread
 

@@ -10,7 +10,7 @@
 namespace app
 {
 
-    const inline std::string CallLogAppStr = "ApplicationCallLog";
+    inline constexpr auto CallLogAppStr = "ApplicationCallLog";
 
     class ApplicationCallLog : public Application
     {
@@ -20,7 +20,7 @@ namespace app
                            StartInBackground startInBackground = {false});
         ~ApplicationCallLog() override;
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 
@@ -41,7 +41,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::ShowCallLog}};
         }
     };
 } /* namespace app */

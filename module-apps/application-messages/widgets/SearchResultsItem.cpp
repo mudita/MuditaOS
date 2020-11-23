@@ -19,8 +19,8 @@ namespace gui
     }
     void SearchResultsItem::setPreview(const UTF8 &text)
     {
-        if (preview != nullptr) {
-            preview->setText(text);
+        if (snippet != nullptr) {
+            snippet->setText(text);
         }
     }
 

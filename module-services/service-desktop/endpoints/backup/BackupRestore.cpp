@@ -1,21 +1,21 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BackupRestore.hpp"
 
-#include <assert.h>   // for assert
-#include <stdint.h>   // for uint32_t
-#include <filesystem> // for path
-#include <memory>     // for allocator, unique_ptr
-#include <string>     // for string, operator+, basic_string, char_traits
-#include <vector>     // for vector
+#include <SystemManager/SystemManager.hpp>
+#include <log/log.hpp>
+#include <microtar/src/microtar.hpp>
+#include <purefs/filesystem_paths.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/DBServiceName.hpp>
+#include <vfs.hpp>
 
-#include "vfs.hpp" // for vfs, vfs::DirectoryEntry, os_backup, tar_buf, PATH_BACKUP, vfs::FILE, user_disk
-#include "microtar/src/microtar.hpp" // for mtar_close, mtar_header_t, MTAR_ESUCCESS, mtar_strerror, mtar_open, mtar_finalize, mtar_next, mtar_read_data, mtar_read_header, mtar_write_data, mtar_write_file_header, mtar_t, MTAR_TREG
-#include "api/DBServiceAPI.hpp"      // for DBServiceAPI
-#include "service-db/includes/DBServiceName.hpp" // for db
-#include "SystemManager/SystemManager.hpp"       // for SystemManager
-#include "log/log.hpp"                           // for LOG_INFO, LOG_ERROR
+#include <cassert>
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace sys
 {
@@ -81,12 +81,12 @@ void BackupRestore::RestoreUserFiles(sys::Service *ownerService)
 bool BackupRestore::RemoveBackupDir()
 {
     /* prepare directories */
-    if (vfs.isDir(purefs::dir::os_backup.c_str())) {
-        LOG_INFO("RemoveBackupDir: removing backup directory %s...", purefs::dir::os_backup.c_str());
+    if (const auto backupOSPath = purefs::dir::getBackupOSPath(); vfs.isDir(backupOSPath.c_str())) {
+        LOG_INFO("RemoveBackupDir: removing backup directory %s...", backupOSPath.c_str());
 
-        if (vfs.deltree(purefs::dir::os_backup.c_str()) != 0) {
+        if (vfs.deltree(backupOSPath.c_str()) != 0) {
             LOG_ERROR("RemoveBackupDir: removing backup directory %s failed, error: %s.",
-                      purefs::dir::os_backup.c_str(),
+                      backupOSPath.c_str(),
                       vfs.lastErrnoToStr().c_str());
             return false;
         }
@@ -97,12 +97,13 @@ bool BackupRestore::RemoveBackupDir()
 
 bool BackupRestore::CreateBackupDir()
 {
-    LOG_INFO("CreateBackupDir: creating backup directory %s...", purefs::dir::os_backup.c_str());
+    const auto backupOSPath = purefs::dir::getBackupOSPath();
+    LOG_INFO("CreateBackupDir: creating backup directory %s...", backupOSPath.c_str());
 
-    if (vfs.isDir(purefs::dir::os_backup.c_str()) == false) {
-        if (vfs.mkdir(purefs::dir::os_backup.c_str()) != 0) {
+    if (vfs.isDir(backupOSPath.c_str()) == false) {
+        if (vfs.mkdir(backupOSPath.c_str()) != 0) {
             LOG_ERROR("CreateBackupDir: creating backup directory %s failed, error: %s.",
-                      purefs::dir::os_backup.c_str(),
+                      backupOSPath.c_str(),
                       vfs.lastErrnoToStr().c_str());
             return false;
         }
@@ -116,21 +117,21 @@ bool BackupRestore::PackUserFiles()
     std::string backupPathDB = PATH_BACKUP;
     backupPathDB += "/";
 
-    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(purefs::dir::os_backup.c_str(), "", true);
+    const auto backupOSPath                  = purefs::dir::getBackupOSPath();
+    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(backupOSPath.c_str(), "", true);
 
     if (dirlist.size() <= empty_dirlist_size) {
         /* vfs.listdir also lists two extra directories ".." and "..." by default, they shall be ignored */
-        LOG_ERROR("PackUserFiles: backup dir %s is empty, nothing to backup, quitting...",
-                  purefs::dir::os_backup.c_str());
+        LOG_ERROR("PackUserFiles: backup dir %s is empty, nothing to backup, quitting...", backupOSPath.c_str());
         BackupRestore::RemoveBackupDir();
         return false;
     }
 
     LOG_INFO("PackUserFiles: backup dir %s listed with %lu files.",
-             purefs::dir::os_backup.c_str(),
+             backupOSPath.c_str(),
              dirlist.size() - empty_dirlist_size);
 
-    std::string tarFilePath = purefs::dir::os_backup;
+    std::string tarFilePath = backupOSPath;
     tarFilePath += "/";
     tarFilePath += backup_file_name;
 
@@ -246,7 +247,7 @@ bool BackupRestore::PackUserFiles()
 
 bool BackupRestore::UnpackBackupFile()
 {
-    std::string tarFilePath = purefs::dir::os_backup;
+    std::string tarFilePath = purefs::dir::getBackupOSPath();
     tarFilePath += "/";
     tarFilePath += backup_file_name;
 
@@ -273,7 +274,7 @@ bool BackupRestore::UnpackBackupFile()
         if ((tarHeader.type == MTAR_TREG) && (ret == MTAR_ESUCCESS)) {
             LOG_INFO("UnpackBackupFile: extracting file %s...", tarHeader.name);
 
-            std::string restoreFilePath = purefs::dir::os_backup;
+            std::string restoreFilePath = purefs::dir::getBackupOSPath();
             restoreFilePath += "/";
             restoreFilePath += tarHeader.name;
             vfs::FILE *file = vfs.fopen(restoreFilePath.c_str(), "w");
@@ -334,7 +335,8 @@ bool BackupRestore::UnpackBackupFile()
 bool BackupRestore::ReplaceUserFiles()
 {
     /* replace existing files that have respective backup files existing */
-    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(purefs::dir::os_backup.c_str());
+    const auto backupOSPath                  = purefs::dir::getBackupOSPath();
+    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(backupOSPath.c_str());
 
     if (dirlist.size() <= empty_dirlist_size) {
         LOG_INFO("ReplaceUserFiles: dir emtpy, nothing to restore, quitting...");
@@ -343,10 +345,10 @@ bool BackupRestore::ReplaceUserFiles()
 
     LOG_INFO("ReplaceUserFiles: dir listed with %lu files", dirlist.size() - empty_dirlist_size);
 
-    std::string userFilePath = purefs::dir::user_disk;
+    std::string userFilePath = purefs::dir::getUserDiskPath();
     userFilePath += "/";
 
-    std::string backupFilePath = purefs::dir::os_backup;
+    std::string backupFilePath = purefs::dir::getBackupOSPath();
     backupFilePath += "/";
 
     for (auto &direntry : dirlist) {

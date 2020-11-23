@@ -1,10 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadItem.hpp"
 #include "time/time_conversion.hpp"
-
-#include "service-db/api/DBServiceAPI.hpp"
 
 #include <Style.hpp>
 #include "application-messages/data/MessagesStyle.hpp"
@@ -30,22 +28,21 @@ namespace gui
 
     void ThreadItem::setPreview()
     {
-        UTF8 prefix;
         switch (threadStruct->thread->type) {
         case SMSType::DRAFT:
-            prefix = utils::localize.get("app_messages_thread_draft");
+            snippetPrefix->setText(utils::localize.get("app_messages_thread_draft"));
             break;
         case SMSType::FAILED:
-            prefix = utils::localize.get("app_messages_thread_not_sent");
+            snippetPrefix->setText(utils::localize.get("app_messages_thread_not_sent"));
             break;
         case SMSType::OUTBOX:
         case SMSType::QUEUED:
-            prefix = utils::localize.get("app_messages_thread_you");
+            snippetPrefix->setText(utils::localize.get("app_messages_thread_you"));
             break;
         default:
             break;
         }
-        preview->setText(prefix + threadStruct->thread->snippet);
+        snippet->setText(threadStruct->thread->snippet);
     }
 
     void ThreadItem::setThreadItem(std::shared_ptr<ThreadListStruct> _threadStruct)
@@ -95,12 +92,9 @@ namespace gui
         namespace msgStyle = style::messages::threadItem;
 
         const auto indicatorWidth = indicator->getSize(gui::Axis::X) + 6;
-        preview->setPosition(msgStyle::leftMargin + indicatorWidth, newDim.h / 2);
-        preview->setSize(newDim.w - msgStyle::previewWidthOffset - indicatorWidth,
-                         newDim.h / 2 - msgStyle::bottomMargin);
-
+        resizeSnippet(newDim, indicatorWidth);
         indicator->setPosition(msgStyle::leftMargin,
-                               newDim.h / 2 + preview->getSize(gui::Axis::Y) / 2 -
+                               newDim.h / 2 + snippet->getSize(gui::Axis::Y) / 2 -
                                    indicator->getSize(gui::Axis::Y) / 2); // align with text
     }
 

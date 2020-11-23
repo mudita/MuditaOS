@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCalendar.hpp"
@@ -14,10 +14,11 @@
 #include "NoEvents.hpp"
 #include "Dialog.hpp"
 #include <time/time_conversion.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
-#include <module-services/service-db/messages/QueryMessage.hpp>
-#include <module-services/service-db/messages/DBNotificationMessage.hpp>
+
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/QueryMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 namespace app
 {
@@ -50,9 +51,13 @@ namespace app
         : Application(name, parent, startInBackground, stackDepth, priority)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        addActionReceiver(manager::actions::ShowReminder, [this](auto &&data) {
+            switchWindow(style::window::calendar::name::event_reminder_window, std::move(data));
+            return msgHandled();
+        });
     }
 
-    sys::Message_t ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
@@ -166,15 +171,16 @@ namespace app
         }
         gui::DialogMetadata meta;
         meta.text   = utils::localize.get("app_calendar_no_events_information");
-        meta.title = title;
-        meta.icon  = "phonebook_empty_grey_circle_W_G";
+        meta.title  = title;
+        meta.icon   = "phonebook_empty_grey_circle_W_G";
         meta.action = [=]() -> bool {
             LOG_DEBUG("Switch to new event window");
             std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
             eventData->setDescription(style::window::calendar::new_event);
             auto event       = std::make_shared<EventsRecord>();
             event->date_from = dateFilter;
-            event->date_till = dateFilter;
+            event->date_till = dateFilter + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
+                               std::chrono::minutes(style::window::calendar::time::max_minutes);
             eventData->setData(event);
 
             switchWindow(

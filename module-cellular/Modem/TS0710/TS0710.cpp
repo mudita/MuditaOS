@@ -1,14 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TS0710.h"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "projdefs.h"
-#include "service-cellular/ServiceCellular.hpp"
-#include "service-cellular/SignalStrength.hpp"
-#include "service-cellular/messages/CellularMessage.hpp"
+#include <service-cellular/ServiceCellular.hpp>
+#include <service-cellular/SignalStrength.hpp>
+#include <service-cellular/CellularMessage.hpp>
 #include <Service/Bus.hpp>
-#include <at/URC_QIND.hpp>
 #include <cassert>
 #include <memory>
 #include <module-os/RTOSWrapper/include/ticks.hpp>

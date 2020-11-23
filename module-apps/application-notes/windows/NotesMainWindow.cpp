@@ -1,15 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <memory>
 #include <functional>
 
 #include "InputEvent.hpp"
-#include "module-services/service-appmgr/model/ApplicationManager.hpp"
+#include <service-appmgr/model/ApplicationManager.hpp>
 
 #include "../ApplicationNotes.hpp"
 
-#include "service-db/messages/DBNotesMessage.hpp"
+#include <service-db/DBNotesMessage.hpp>
 #include "i18/i18.hpp"
 
 #include "Label.hpp"

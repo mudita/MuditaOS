@@ -1,26 +1,26 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "CalendarTimeEvents.hpp"
+#include <service-time/CalendarTimeEvents.hpp>
+#include <service-time/TimeEvents.hpp>
 
-#include <module-services/service-appmgr/Controller.hpp>                 // for Controller
-#include <module-services/service-db/api/DBServiceAPI.hpp>               // for DBServiceAPI
-#include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp> // for SelectFirstUpcoming, SelectFirstUpcomingResult
-#include <module-gui/gui/SwitchData.hpp>                                 // for SwitchData
-#include <module-apps/application-calendar/data/CalendarData.hpp>        // for EventRecordData
-#include <module-apps/application-calendar/ApplicationCalendar.hpp> // for name_calendar
-#include <module-apps/application-calendar/data/dateCommon.hpp>     // for TimePointNow, TimePoint, TIME_POINT_INVALID
-#include <algorithm>                                                // for min
-#include <chrono> // for duration, milliseconds, operator-, operator<, time_point, duration_cast, operator!=, minutes, operator""ms
-#include <type_traits> // for __success_type<>::type
-#include <utility>     // for move
-#include <vector>      // for vector
+#include <BaseInterface.hpp>
+#include <Common/Query.hpp>
+#include <application-calendar/widgets/CalendarStyle.hpp>
+#include <module-apps/application-calendar/ApplicationCalendar.hpp>
+#include <module-apps/application-calendar/data/CalendarData.hpp>
+#include <module-apps/application-calendar/data/dateCommon.hpp>
+#include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
+#include <module-gui/gui/SwitchData.hpp>
+#include <queries/calendar/QueryEventsEdit.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <service-db/DBServiceAPI.hpp>
 
-#include "BaseInterface.hpp"                              // for Interface, Interface::Name, Interface::Name::Events
-#include "Common/Query.hpp"                               // for Query, QueryResult
-#include "application-calendar/widgets/CalendarStyle.hpp" // for event_reminder_window
-#include "queries/calendar/QueryEventsEdit.hpp"           // for Edit
-#include "service-time/timeEvents/TimeEvents.hpp"         // for TimeEvents
+#include <algorithm>
+#include <chrono>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 namespace sys
 {
@@ -85,7 +85,6 @@ namespace stm
         auto event = std::make_shared<EventsRecord>(eventRecord);
         eventData->setData(event);
 
-        app::manager::Controller::switchApplication(
-            service(), app::name_calendar, style::window::calendar::name::event_reminder_window, std::move(eventData));
+        app::manager::Controller::sendAction(service(), app::manager::actions::ShowReminder, std::move(eventData));
     }
 } // namespace stm

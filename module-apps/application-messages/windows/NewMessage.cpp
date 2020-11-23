@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewMessage.hpp"
@@ -10,7 +10,7 @@
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <application-phonebook/windows/PhonebookSearchResults.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
 #include <i18/i18.hpp>
 #include <BoxLayout.hpp>
 #include <Text.hpp>
@@ -23,6 +23,32 @@
 
 namespace gui
 {
+    class NewMessageWindow::MessageMemento
+    {
+      public:
+        void setState(const gui::Text *_state)
+        {
+            assert(_state);
+            state = std::make_unique<TextBackup>(_state->backupText());
+        }
+
+        void getState(gui::Text *_state)
+        {
+            assert(_state);
+            if (!state) {
+                return;
+            }
+            _state->restoreFrom(*state);
+            state = nullptr;
+        }
+
+      private:
+        std::unique_ptr<gui::TextBackup> state;
+    };
+
+    std::unique_ptr<NewMessageWindow::MessageMemento> NewMessageWindow::memento =
+        std::make_unique<NewMessageWindow::MessageMemento>();
+
     NewMessageWindow::NewMessageWindow(app::Application *app) : AppWindow(app, name::window::new_sms)
     {
         buildInterface();
@@ -35,6 +61,7 @@ namespace gui
 
     void NewMessageWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        memento->getState(message);
         if (data == nullptr) {
             return;
         }
@@ -78,10 +105,11 @@ namespace gui
     {
         // select contact only if there is no entered number
         if (recipient->getText().empty()) {
-            auto data             = std::make_unique<PhonebookSearchReuqest>();
-            data->disableAppClose = true;
-            return app::manager::Controller::switchApplication(
-                application, app::name_phonebook, name::window::main_window, std::move(data));
+            memento->setState(message);
+            return app::manager::Controller::sendAction(application,
+                                                        app::manager::actions::ShowContacts,
+                                                        std::make_unique<PhonebookSearchReuqest>(),
+                                                        app::manager::OnSwitchBehaviour::RunInBackground);
         }
         return true;
     }
@@ -242,6 +270,7 @@ namespace gui
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
+                memento->setState(message);
                 return app->newMessageOptions(getName(), message);
             }
             return false;
@@ -262,7 +291,6 @@ namespace gui
             // Nothing to do if text is empty.
             return;
         }
-
         if (const auto handled = handleMessageText(); !handled) {
             message->clear();
         }
@@ -360,4 +388,5 @@ namespace gui
         app->updateDraft(sms, text);
         message->clear();
     }
+
 } // namespace gui

@@ -35,7 +35,7 @@ ContactsTable::~ContactsTable()
 
 bool ContactsTable::create()
 {
-    return db->execute(createTableQuery);
+    return true;
 }
 
 bool ContactsTable::add(ContactsTableRow entry)

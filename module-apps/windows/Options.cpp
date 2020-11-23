@@ -4,11 +4,14 @@
 #include "Options.hpp"
 #include "Text.hpp"
 #include "tools/Common.hpp"
-#include <UiCommonActions.hpp>
 #include <cassert>
 #include <i18/i18.hpp>
 #include <utility>
 #include <FontManager.hpp>
+
+#include <service-appmgr/Controller.hpp>
+#include <application-call/data/CallSwitchData.hpp>
+#include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
 
 namespace style::option
 {
@@ -46,52 +49,88 @@ namespace gui::option
             style::window::decorate(rect);
             auto l_app              = app;
             auto l_contact          = contact;
-            rect->activatedCallback = [l_app, l_contact](gui::Item &item) { return app::call(l_app, l_contact); };
+            rect->activatedCallback = [l_app, l_contact](gui::Item &item) {
+                if (!l_contact.numbers.empty()) {
+                    const auto &phoneNumber = l_contact.numbers.front().number;
+                    return app::manager::Controller::sendAction(
+                        l_app, app::manager::actions::Dial, std::make_unique<app::ExecuteCallData>(phoneNumber));
+                }
+                return false;
+            };
             rect->addWidget(text);
             center(rect, text, Axis::Y);
             return rect;
         }
     };
-
-}; // namespace gui::option
+} // namespace gui::option
 
 namespace gui::options
 {
-    using namespace app;
+    namespace
+    {
+        bool onContactOptionClick(app::Application *app,
+                                  ContactOperation contactOperation,
+                                  const ContactRecord &contactRecord)
+        {
+            auto data = std::make_unique<PhonebookItemData>(std::make_shared<ContactRecord>(contactRecord));
 
-    Option call(Application *app, CallOperation callOperation, const ContactRecord &contact)
+            switch (contactOperation) {
+            case ContactOperation::Add: {
+                data->ignoreCurrentWindowOnStack = true;
+                return app::manager::Controller::sendAction(app,
+                                                            app::manager::actions::AddContact,
+                                                            std::move(data),
+                                                            app::manager::OnSwitchBehaviour::RunInBackground);
+            }
+            case ContactOperation::Details: {
+                return app::manager::Controller::sendAction(app,
+                                                            app::manager::actions::ShowContactDetails,
+                                                            std::move(data),
+                                                            app::manager::OnSwitchBehaviour::RunInBackground);
+            }
+            case ContactOperation::Edit: {
+                return app::manager::Controller::sendAction(app,
+                                                            app::manager::actions::EditContact,
+                                                            std::move(data),
+                                                            app::manager::OnSwitchBehaviour::RunInBackground);
+            }
+            }
+            LOG_ERROR("ContactOperation not supported %" PRIu32, static_cast<uint32_t>(contactOperation));
+            return false;
+        }
+    } // namespace
+
+    Option call(app::Application *app, const ContactRecord &contact)
     {
         assert(app != nullptr);
         return Option{std::make_unique<gui::option::Call>(app, contact)};
     }
 
-    Option contact(Application *app,
+    Option contact(app::Application *app,
                    ContactOperation contactOperation,
                    const ContactRecord &contactRec,
                    gui::Arrow arrow)
     {
         assert(app != nullptr);
 
-        std::string str;
+        std::string optionName;
         switch (contactOperation) {
         case ContactOperation::Details:
-            str = utils::localize.get("app_options_contact_details");
+            optionName = utils::localize.get("app_options_contact_details");
             break;
-
         case ContactOperation::Add:
-            str = utils::localize.get("app_options_contact_add");
+            optionName = utils::localize.get("app_options_contact_add");
             break;
-
         case ContactOperation::Edit:
-            str = utils::localize.get("app_options_contact_edit");
+            optionName = utils::localize.get("app_options_contact_edit");
             break;
-
         default:
-            str = utils::localize.get("app_options_invalid_option");
+            optionName = utils::localize.get("app_options_invalid_option");
             LOG_WARN("ContactOperation %d not supported", static_cast<int>(contactOperation));
             break;
         }
 
-        return {str, [=](gui::Item &item) { return app::contact(app, contactOperation, contactRec); }, arrow};
+        return Option{
+            optionName, [=](gui::Item &) { return onContactOptionClick(app, contactOperation, contactRec); }, arrow};
     }
 } // namespace gui::options

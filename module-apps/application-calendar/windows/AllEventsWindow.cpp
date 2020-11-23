@@ -1,20 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AllEventsWindow.hpp"
 #include "InputEvent.hpp"
-#include "module-apps/application-calendar/ApplicationCalendar.hpp"
-#include "module-apps/application-calendar/data/CalendarData.hpp"
+#include "application-calendar/ApplicationCalendar.hpp"
+#include "application-calendar/data/CalendarData.hpp"
 #include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/TopBar.hpp>
 #include <gui/widgets/Window.hpp>
 #include <service-appmgr/Controller.hpp>
 
-#include <module-services/service-db/messages/QueryMessage.hpp>
 #include <module-db/queries/calendar/QueryEventsGetAllLimited.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
-#include <module-services/service-db/messages/DBNotificationMessage.hpp>
+#include <service-db/QueryMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 namespace gui
 {
@@ -61,6 +60,19 @@ namespace gui
         allEventsList->rebuildList();
     }
 
+    auto AllEventsWindow::handleSwitchData(SwitchData *data) -> bool
+    {
+        if (data == nullptr) {
+            return false;
+        }
+        auto *item = dynamic_cast<DayMonthData *>(data);
+        if (item == nullptr) {
+            return false;
+        }
+        dateFilter = item->getDateFilter();
+        return true;
+    }
+
     bool AllEventsWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (inputEvent.keyCode == gui::KeyCode::KEY_RF &&
@@ -82,8 +94,9 @@ namespace gui
             std::unique_ptr<EventRecordData> data = std::make_unique<EventRecordData>();
             data->setDescription(style::window::calendar::new_event);
             auto event       = std::make_shared<EventsRecord>();
-            event->date_from = TimePointNow();
-            event->date_till = TimePointNow();
+            event->date_from = dateFilter;
+            event->date_till = dateFilter + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
+                               std::chrono::minutes(style::window::calendar::time::max_minutes);
             data->setData(event);
             application->switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));

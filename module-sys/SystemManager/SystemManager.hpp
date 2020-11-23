@@ -91,8 +91,7 @@ namespace sys
         void kill(std::shared_ptr<Service> const &toKill);
 
       private:
-
-        Message_t DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;
+        MessagePointer DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;
 
         ReturnCodes InitHandler() override;
 

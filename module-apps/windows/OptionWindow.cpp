@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OptionWindow.hpp"
@@ -6,7 +6,7 @@
 #include "Margins.hpp"
 #include "i18/i18.hpp"
 #include "log/log.hpp"
-#include "module-services/service-appmgr/model/ApplicationManager.hpp"
+#include <service-appmgr/model/ApplicationManager.hpp>
 #include <Style.hpp>
 #include <cassert>
 #include <functional>
@@ -36,18 +36,24 @@ namespace gui
         body->addWidget(Option(text, activatedCallback, arrow).build());
     }
 
-    void OptionWindow::addOptions(std::list<Option> &options)
+    void OptionWindow::addOptions(std::list<Option> &optionList)
     {
-        for (auto &option : options) {
+        for (auto &option : optionList) {
             body->addWidget(option.build());
         }
         body->switchPage(0);
     }
 
-    void OptionWindow::addOptions(std::list<Option> &&options)
+    void OptionWindow::addOptions(std::list<Option> &&optionList)
     {
-        this->options = std::move(options);
-        addOptions(this->options);
+        options = std::move(optionList);
+        addOptions(options);
+    }
+
+    void OptionWindow::resetOptions(std::list<Option> &&optionList)
+    {
+        clearOptions();
+        addOptions(std::move(optionList));
     }
 
     void OptionWindow::clearOptions()
@@ -84,6 +90,7 @@ namespace gui
     void OptionWindow::destroyInterface()
     {
         erase();
+        body = nullptr;
     }
 
     OptionWindow::~OptionWindow()
@@ -95,8 +102,7 @@ namespace gui
     {
         if (auto message = dynamic_cast<gui::OptionsWindowOptions *>(data)) {
             LOG_DEBUG("Options load!");
-            options = message->takeOptions();
-            addOptions(options);
+            resetOptions(message->takeOptions());
         }
     }
 } /* namespace gui */

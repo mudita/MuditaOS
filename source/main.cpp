@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "config.h"
@@ -20,7 +20,7 @@
 #include <application-calculator/ApplicationCalculator.hpp>
 
 // services
-#include <module-services/service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include <service-db/ServiceDB.hpp>
@@ -83,8 +83,10 @@ int main()
 
         ret &=
             sys::SystemManager::CreateService(std::make_shared<EventManager>(service::name::evt_manager), sysmgr.get());
+#if ENABLE_FILEINDEXER_SERVICE
         ret &= sys::SystemManager::CreateService(
             std::make_shared<service::ServiceFileIndexer>(service::name::file_indexer), sysmgr.get());
+#endif
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
 
 #if ENABLE_GSM == 0
@@ -100,9 +102,9 @@ int main()
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(), sysmgr.get());
         ret &= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(), sysmgr.get());
+        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
 
         ret &= sys::SystemManager::CreateService(std::make_shared<stm::ServiceTime>(), sysmgr.get());
-        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
 
         // vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;

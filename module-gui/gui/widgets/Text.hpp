@@ -25,6 +25,12 @@
 
 namespace gui
 {
+    struct TextBackup
+    {
+        TextDocument document;
+        unsigned int cursorPos;
+    };
+
     class Lines;
 
     ///  @brief Widget that holds multiple lines of text.
@@ -70,20 +76,39 @@ namespace gui
 
       protected:
         TextType textType = TextType::MULTI_LINE;
+        std::list<TextLimit> limitsList;
+
         /// points to default text font to use
-        bool underline = false;
         TextFormat format;
 
-        auto moveCursor(const NavigationDirection &direction, std::unique_ptr<TextDocument> &document) -> bool;
+        auto handleRotateInputMode(const InputEvent &inputEvent) -> bool;
+        auto handleRestoreInputModeUI(const InputEvent &inputEvent) -> bool;
+        auto handleSelectSpecialChar(const InputEvent &inputEvent) -> bool;
+        auto handleActivation(const InputEvent &inputEvent) -> bool;
         auto handleNavigation(const InputEvent &inputEvent) -> bool;
-        auto handleEnter() -> bool;
+        auto handleRemovalChar(const InputEvent &inputEvent) -> bool;
+        auto handleDigitLongPress(const InputEvent &inputEvent) -> bool;
+        auto handleAddChar(const InputEvent &inputEvent) -> bool;
+
+        [[nodiscard]] auto getSizeMinusPadding(Axis axis, Area val) -> Length;
+        auto applyParentSizeRestrictions() -> void;
+        auto calculateAndRequestSize() -> void;
+        auto makePreDrawLines(const uint32_t utfVal) -> std::unique_ptr<Lines>;
+        auto makePreDrawLines(const TextBlock &textBlock) -> std::unique_ptr<Lines>;
+
+        auto checkMaxSignsLimit(unsigned int limitVal) -> InputBound;
+        auto checkMaxSignsLimit(const TextBlock &textBlock, unsigned int limitVal) -> std::tuple<InputBound, TextBlock>;
+        auto checkMaxSizeLimit(uint32_t utfVal) -> InputBound;
+        auto checkMaxSizeLimit(const TextBlock &textBlock) -> std::tuple<InputBound, TextBlock>;
+        auto checkMaxLinesLimit(uint32_t utfVal, unsigned int limitVal) -> InputBound;
+        auto checkMaxLinesLimit(const TextBlock &textBlock, unsigned int limitVal) -> std::tuple<InputBound, TextBlock>;
 
         void preBuildDrawListHookImplementation(std::list<Command> &commands);
         /// redrawing lines
         /// it redraws visible lines on screen and if needed requests resize in parent
-        virtual void drawLines();
+        virtual auto drawLines() -> void;
         /// redrawing cursor
-        void drawCursor();
+        auto drawCursor() -> void;
 
       public:
         /// Callback when text changed
@@ -104,9 +129,15 @@ namespace gui
 
         void setEditMode(EditMode mode);
         void setTextType(TextType type);
-        void setUnderline(const bool val);
+        void setTextLimitType(TextLimitType limitType, unsigned int val = 0);
+        void clearTextLimits();
+        void setUnderline(bool val);
         virtual void setText(const UTF8 &text);
         void setText(std::unique_ptr<TextDocument> &&document);
+
+        TextBackup backupText() const;
+        void restoreFrom(const TextBackup &backup);
+
         void setTextChangedCallback(TextChangedCallback &&callback);
 
         void addText(const UTF8 &text);
@@ -152,17 +183,10 @@ namespace gui
       public:
         TextChangedCallback textChangedCallback;
 
-        bool handleRotateInputMode(const InputEvent &inputEvent);
-        bool handleRestoreInputModeUI(const InputEvent &inputEvent);
-        bool handleSelectSpecialChar(const InputEvent &inputEvent);
-        bool handleActivation(const InputEvent &inputEvent);
-        bool handleBackspace(const InputEvent &inputEvent);
-        bool handleDigitLongPress(const InputEvent &inputEvent);
-        bool handleAddChar(const InputEvent &inputEvent);
-
+        auto checkAdditionBounds(uint32_t utfVal) -> InputBound;
+        auto checkAdditionBounds(const TextBlock &textBlock) -> std::tuple<InputBound, TextBlock>;
         bool addChar(uint32_t utf8);
         bool removeChar();
-        InputBound processBound(InputBound bound, const InputEvent &event);
         void onTextChanged();
     };
 

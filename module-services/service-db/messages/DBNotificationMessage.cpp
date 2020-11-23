@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "DBNotificationMessage.hpp"
+#include <service-db/DBNotificationMessage.hpp>
 
-#include "BaseInterface.hpp" // for Interface, Interface::Name
-#include "Common/Query.hpp"  // for Query, Query::Type, Query::Type::Create, Query::Type::Delete, Query::Type::Update
-#include "MessageType.hpp"   // for MessageType, MessageType::DBServiceNotification
+#include <BaseInterface.hpp>
+#include <Common/Query.hpp>
+#include <MessageType.hpp>
 
 namespace db
 {

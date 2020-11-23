@@ -17,15 +17,6 @@
 #include "Audio/Audio.hpp"
 #include "Audio/Operation/Operation.hpp"
 
-class vfs vfs;
-
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_init;
 
 TEST_CASE("Test audio tags")
 {
@@ -58,9 +49,9 @@ TEST_CASE("Audio settings string creation")
     SECTION("Create volume string for routing speakerphone")
     {
         const auto str =
-            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingSpeakerphone);
+            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingLoudspeaker);
         REQUIRE_FALSE(str.empty());
-        REQUIRE(str == "audio/RoutingSpeakerphone/Volume");
+        REQUIRE(str == "audio/RoutingLoudspeaker/Volume");
     }
 
     SECTION("Create gain string for recording built-in microphone")

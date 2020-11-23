@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
@@ -27,8 +27,8 @@
 #include "windows/SettingsChange.hpp"
 
 #include <i18/i18.hpp>
-#include <module-services/service-evtmgr/api/EventManagerServiceAPI.hpp>
-#include <service-bluetooth/messages/BluetoothMessage.hpp>
+#include <service-evtmgr/EventManagerServiceAPI.hpp>
+#include <service-bluetooth/BluetoothMessage.hpp>
 
 namespace app
 {
@@ -36,13 +36,18 @@ namespace app
         : Application(name, parent, startInBackground)
     {
         busChannels.push_back(sys::BusChannels::AntennaNotifications);
+        addActionReceiver(manager::actions::SelectSimCard, [this](auto &&data) {
+            switchWindow(app::sim_select);
+            return msgHandled();
+        });
     }
 
     ApplicationSettings::~ApplicationSettings()
     {}
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationSettings::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage * /*resp*/)
+    sys::MessagePointer ApplicationSettings::DataReceivedHandler(sys::DataMessage *msgl,
+                                                                 sys::ResponseMessage * /*resp*/)
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);

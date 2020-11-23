@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "DBSMSTemplateMessage.hpp"
+#include <service-db/DBSMSTemplateMessage.hpp>
+#include <service-db/DBMessage.hpp>
+
+#include <SMSTemplateRecord.hpp>
 
 #include <utility> // for move
-
-#include "SMSTemplateRecord.hpp"  // for SMSTemplateRecord
-#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
 
 DBSMSTemplateMessage::DBSMSTemplateMessage(MessageType messageType, const SMSTemplateRecord &rec)
     : DBMessage(messageType), record(rec)

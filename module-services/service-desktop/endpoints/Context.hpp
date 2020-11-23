@@ -1,20 +1,21 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "json/json11.hpp"
-#include "module-services/service-desktop/parser/ParserUtils.hpp"
+
+#include <json/json11.hpp>
+#include <module-services/service-desktop/parser/ParserUtils.hpp>
 
 namespace parserFSM
 {
 
     namespace json
     {
-        const inline std::string method   = "method";
-        const inline std::string endpoint = "endpoint";
-        const inline std::string uuid     = "uuid";
-        const inline std::string status   = "status";
-        const inline std::string body     = "body";
+        inline constexpr auto method   = "method";
+        inline constexpr auto endpoint = "endpoint";
+        inline constexpr auto uuid     = "uuid";
+        inline constexpr auto status   = "status";
+        inline constexpr auto body     = "body";
     } // namespace json
 
     struct endpointResponseContext
@@ -73,7 +74,7 @@ namespace parserFSM
                     uuid = invalidUuid;
                 }
             }
-            method   = static_cast<http::Method>(js[json::method].int_value());
+            method = static_cast<http::Method>(js[json::method].int_value());
             validate();
         }
         Context()
@@ -95,6 +96,10 @@ namespace parserFSM
         auto setResponseStatus(http::Code status)
         {
             responseContext.status = status;
+        }
+        auto setEndpoint(EndpointType endpointTypeToSet)
+        {
+            endpoint = endpointTypeToSet;
         }
         auto setResponseBody(json11::Json respBody)
         {

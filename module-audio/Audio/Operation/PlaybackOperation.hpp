@@ -38,11 +38,9 @@ namespace audio
         audio::RetCode SetInputGain(float gain) final;
 
         Position GetPosition() final;
-        void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data) final;
 
       private:
         std::unique_ptr<decoder> dec;
-        std::unique_ptr<bsp::AudioDevice> audioDevice;
         std::unique_ptr<Tags> tags;
     };
 

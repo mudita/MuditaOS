@@ -60,7 +60,7 @@ void InputMode::next()
 
 const std::string &InputMode::get()
 {
-    return utils::localize.get(input_mode.at(modeNow()));
+    return utils::localize.getInputLanguage(input_mode.at(modeNow()));
 }
 
 void InputMode::show_input_type()

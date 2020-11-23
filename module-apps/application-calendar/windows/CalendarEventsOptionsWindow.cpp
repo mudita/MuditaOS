@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalendarEventsOptionsWindow.hpp"
@@ -6,7 +6,7 @@
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "Dialog.hpp"
 #include <Utils.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
 #include <module-db/queries/calendar/QueryEventsRemove.hpp>
 #include <module-apps/application-calendar/data/CalendarData.hpp>
 

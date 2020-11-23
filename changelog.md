@@ -1,30 +1,100 @@
 # MuditaOS changelog
 
-
-
-## Current release
+## [current release]
 
 ### Added
 
-* `[messages][db]` File Indexer db Agent
-* `[testing]` Added key release simulation through service-desktop developerMode
-* `[cellular]` Set pin functionality with Action mockup
-* `[bluetooth]` Added HSP playback and recording
-
-### Changed
-
-* `[cellular]` Handled properly SIM READY and SIM PIN URC messages with Action mockup
-* `[calendar]` Rework to use database model instead of internal model in day events list.
-* `[appmgr]` Application manager actions introduced.
+* `[gui][desktop]` Added SIM PIN basic flow implementation
+* `[cellular]` Added CLIR, CLIP, COLP, call waiting MMI support
 
 ### Fixed
 
-* `[GUI][messages]` Fixed not showing number on deleting temporary contact
-* `[GUI]` Fixed filling Label with color
+* `[desktop]` Fixed ScreenlockCheckEvent handler 
+* `[messages]` Fix for changing the content of option windows when forwarding a message.
+
+### Changed
+
+* `[messages]` Changed fonts of message snippet and its prefix.
+
+## [0.47.1 2020-11-20]
+
+### Added
+
+* `[audio]` Added support for a headset microphone.
+* `[cellular]` Added SIM PIN/PUK handling.
+* `[cellular]` Added change PIN functionality.
+* `[cellular]` Added a possibility to remove SIM PIN check on startup (SIM unlocking).
+* `[usb]` First implementation of USB's CDC and MTP protocols for communication with Mudita Center.
+* `[cellular]` Support for MMI Call Forwarding call.
+
+### Changed
+
+* `[text]` Text input boundaries support added (max signs or max widget area).
+
+### Fixed
+
+* `[audio]` Fixed handling of headset microphone LDO DCDC.
+* `[desktop]` Absent call button on the desktop with notifications screen fix.
+* `[desktop]` Fixed system freeze when pressing the "Back" button while focused on the desktop screen.
+
+### Other
+
+* `[test]` Added message sending harness test.
+* `[gui][desktop]` SIM PIN flow charts added.
+
+## [0.46.1 2020-11-13]
+
+## Added
+
+* `[cellular]` Added call request type recognition (URC).
+* `[calendar]` Added a new field for event's date when the user adds/edits an event.
+* `[file indexer db]` Added messages for File Indexer database.
+* `[settings]` Added Torch window (front-end only).
+* `[audio]` Added support for Bluetooth audio profiles
+* `[filesystem]` Added support for standard file IO library.
+* `[messages]` Added fetching text messages at phone startup.
+
+## Changed
+
+* `[calendar]` Changed default option to 'all day' event.
+* `[bus]` Refactored message handling.
+* `[appmgr]` Translating messages to actions introduced. 
+* `[appmgr]` Switching between applications replaced with actions.
+
+### Fixed
+
+* `[messages]` Fixed clearing text on options/recipient choice in the new message window.
+* `[Text]` Fixed newline handling.
+* `[appmgr]` Fixed applications closing.
+* `[audio]` Fixed crash on attempt to open a non-existent file
+
+## [0.45.1 2020-11-06]
+
+### Added
+
+* `[cellular]` Added PIN setting.
+* `[bluetooth]` Added HSP playback and recording.
+* `[cellular]` Added support for CMS and CME errors.
+* `[music player]` Added new samples of music files.
+
+### Fixed
+
+* `[cellular]` Fixed SIM handling.
+* `[GUI][messages]` Fixed not showing a phone number of temporary contact being deleted.
+* `[GUI]` Fixed filling a label with color.
+* `[calculator]` Fix freezing on the '=' keypress.
+* `[messages][cellular]` Fixed handling messages when the recipient field does not contain a phone number.
+* `[meditation]` Fixed crash on gong sound.
+* `[vfs]` Improve data integrity by reducing filesystem operation on databases.
+
+### Other
+
+* `[testing]` Moved test harness into service-desktop.
+* `[system]` Application manager actions introduced.
 
 ## [0.44.1 2020-10-30]
 
-### Addedgit 
+### Added
 
 * `[settings][bluetooth]` Add "Phone name" window.
 * `[cellular]` Add support for modem reset.
@@ -572,4 +642,3 @@
 
 * `[test]` Improved modem testing with modem shutdown detection.
 * `[build]` Add support for auto-releases.
-

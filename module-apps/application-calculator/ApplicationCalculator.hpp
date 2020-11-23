@@ -7,8 +7,8 @@
 
 namespace app
 {
-    const inline std::string name_calculator = "ApplicationCalculator";
-    constexpr std::uint16_t stack_size       = 4096;
+    inline constexpr auto name_calculator     = "ApplicationCalculator";
+    inline constexpr std::uint16_t stack_size = 4096;
 
     class ApplicationCalculator : public Application
     {
@@ -18,7 +18,7 @@ namespace app
                               StartInBackground startInBackground = {false});
         ~ApplicationCalculator() override = default;
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 

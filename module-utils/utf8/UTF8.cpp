@@ -791,3 +791,58 @@ std::ostream &operator<<(std::ostream &os, const UTF8 &el)
     os << el.c_str();
     return os;
 }
+
+bool UTF8::isASCIICombination() const noexcept
+{
+    const auto len                          = strlen(data.get());
+    std::size_t i                           = 0;
+    constexpr char asciiZero                = '0';
+    constexpr uint8_t firstCharacterFactor  = 100;
+    constexpr uint8_t secondCharacterFactor = 10;
+    for (; i < len; i += 2) {
+        int firstCharacter = 0;
+        if (data[i] == '1') {
+            firstCharacter = static_cast<int>(data[i] - asciiZero) * firstCharacterFactor;
+            ++i;
+        }
+        if (i + 1 >= len) {
+            return false;
+        }
+        const auto combinedCharacters = static_cast<char>(
+            firstCharacter + ((data[i] - asciiZero) * secondCharacterFactor) + (data[i + 1] - asciiZero));
+        if (!std::isprint(combinedCharacters)) {
+            return false;
+        }
+    }
+    return i == len;
+}
+
+std::optional<std::string> UTF8::toASCII() const noexcept
+{
+    std::string ret{};
+    const auto len                          = strlen(data.get());
+    constexpr char asciiZero                = '0';
+    constexpr uint8_t firstCharacterFactor  = 100;
+    constexpr uint8_t secondCharacterFactor = 10;
+    std::size_t i                           = 0;
+    for (; i < len; i += 2) {
+        int firstCharacter = 0;
+        if (data[i] == '1') {
+            firstCharacter = static_cast<int>(data[i] - asciiZero) * firstCharacterFactor;
+            ++i;
+        }
+        if (i + 1 >= len) {
+            return std::nullopt;
+        }
+        const auto combinedCharacters = static_cast<char>(
+            firstCharacter + ((data[i] - asciiZero) * secondCharacterFactor) + (data[i + 1] - asciiZero));
+        if (!std::isprint(combinedCharacters)) {
+            return std::nullopt;
+        }
+        ret.push_back(combinedCharacters);
+    }
+
+    if (i != len)
+        return std::nullopt;
+    return ret;
+}

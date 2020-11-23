@@ -1,4 +1,4 @@
-
+﻿
 include_directories( ${CMAKE_PROJECT_NAME}
 
 	PUBLIC
@@ -21,11 +21,18 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EnterNumberWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/Icons.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCall.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EnterNumberWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/CallSwitchData.hpp"
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        service-audio
+        service-cellular
 )
 

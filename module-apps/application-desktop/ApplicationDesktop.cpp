@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationDesktop.hpp"
@@ -14,13 +14,14 @@
 #include "AppWindow.hpp"
 #include "data/LockPhoneData.hpp"
 
-#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-cellular/ServiceCellular.hpp>
+#include <service-cellular/CellularMessage.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
-#include <messages/QueryMessage.hpp>
+#include <service-db/QueryMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 
 #include <cassert>
@@ -30,6 +31,31 @@ namespace app
         : Application(name, parent, startInBackground), lockHandler(this, settings)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+
+        addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
+            lockHandler.handlePinRequest(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::RequestPuk, [this](auto &&data) {
+            lockHandler.handlePukRequest(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::RequestPinChange, [this](auto &&data) {
+            lockHandler.handlePinChangeRequest(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::BlockSim, [this](auto &&data) {
+            lockHandler.handleSimBlocked(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::DisplayCMEError, [this](auto &&data) {
+            lockHandler.handleCMEError(std::move(data));
+            return msgHandled();
+        });
     }
 
     ApplicationDesktop::~ApplicationDesktop()
@@ -38,7 +64,7 @@ namespace app
     }
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationDesktop::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);
@@ -54,12 +80,14 @@ namespace app
         else if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
             handled = handle(msg);
         }
+        else if (auto msg = dynamic_cast<sdesktop::developerMode::DeveloperModeRequest *>(msgl)) {
+            if (auto event = dynamic_cast<sdesktop::developerMode::ScreenlockCheckEvent *>(msg->event.get())) {
+                handled = handle(event);
+            }
+        }
 
         else if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
             handled = handle(msg);
-        }
-        else if (auto msg = dynamic_cast<CellularSimResponseMessage *>(msgl)) {
-            handled = lockHandler.handle(msg);
         }
 
         // handle database response
@@ -87,6 +115,17 @@ namespace app
             if (msg->updateStats.updateFile.has_filename()) {
                 LOG_DEBUG("handle pending update found: %s", msg->updateStats.updateFile.c_str());
             }
+        }
+
+        return true;
+    }
+
+    auto ApplicationDesktop::handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool
+    {
+        if (event != nullptr) {
+            auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(lockHandler.isScreenLocked());
+            auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+            sys::Bus::SendUnicast(std::move(msg), service::name::service_desktop, this);
         }
 
         return true;
@@ -151,8 +190,8 @@ namespace app
     {
         assert(msg);
         if (msg->request == cellular::State::ST::URCReady) {
-            if (need_sim_select && !lockHandler.lock.isLocked()) {
-                app::manager::Controller::switchApplication(this, app::name_settings, app::sim_select, nullptr);
+            if (need_sim_select && !lockHandler.isScreenLocked()) {
+                manager::Controller::sendAction(this, manager::actions::SelectSimCard);
                 return true;
             }
             else if (need_sim_select == false) {
@@ -170,8 +209,7 @@ namespace app
     bool ApplicationDesktop::showCalls()
     {
         LOG_DEBUG("show calls!");
-        return app::manager::Controller::switchApplication(
-            this, app::CallLogAppStr, gui::name::window::main_window, nullptr);
+        return manager::Controller::sendAction(this, manager::actions::ShowCallLog);
     }
 
     bool ApplicationDesktop::clearCallsNotification()
@@ -224,7 +262,7 @@ namespace app
         createUserInterface();
         setActiveWindow(gui::name::window::main_window);
 
-        connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+        connect(sdesktop::UpdateOsMessage(), [&](sys::Message *msg) {
             auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
             if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateFoundOnBoot) {
 
@@ -241,7 +279,7 @@ namespace app
                     getWindow(app::window::name::desktop_update)->handleSwitchData(data.get());
                 }
             }
-            return std::make_shared<sys::ResponseMessage>();
+            return msgHandled();
         });
 
         auto msgToSend =
@@ -264,7 +302,7 @@ namespace app
             return std::make_unique<gui::DesktopMainWindow>(app);
         });
         windowsFactory.attach(desktop_pin_lock, [&](Application *app, const std::string newname) {
-            return std::make_unique<gui::PinLockWindow>(app, desktop_pin_lock, lockHandler.lock);
+            return std::make_unique<gui::PinLockWindow>(app, desktop_pin_lock);
         });
         windowsFactory.attach(desktop_menu, [](Application *app, const std::string newname) {
             return std::make_unique<gui::MenuWindow>(app);

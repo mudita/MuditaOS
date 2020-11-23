@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EnterNumberWindow.hpp"
@@ -12,8 +12,7 @@
 #include <i18/i18.hpp>
 #include <InputMode.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-cellular/api/CellularServiceAPI.hpp>
-#include <UiCommonActions.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
 
 #include <phonenumbers/phonenumberutil.h>
 #include <phonenumbers/asyoutypeformatter.h>

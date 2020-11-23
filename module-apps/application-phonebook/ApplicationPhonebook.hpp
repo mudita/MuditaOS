@@ -9,23 +9,23 @@
 
 namespace gui::window::name
 {
-    inline const std::string contact          = "Contact";
-    inline const std::string contact_options  = "Options";
-    inline const std::string namecard_options = "Namecard Options";
-    inline const std::string new_contact      = "New";
-    inline const std::string search           = "Search";
-    inline const std::string search_results   = "SearchResults";
-    inline const std::string dialog_yes_no    = "DialogYesNo";
-    inline const std::string dialog_confirm   = "DialogConfirm";
-    inline const std::string dialog           = "Dialog";
-    inline const std::string dialog_yes_no_icon_txt = "DialogYesNoIconTxt";
-    inline const std::string ice_contacts           = "IceContacts";
+    inline constexpr auto contact                = "Contact";
+    inline constexpr auto contact_options        = "Options";
+    inline constexpr auto namecard_options       = "Namecard Options";
+    inline constexpr auto new_contact            = "New";
+    inline constexpr auto search                 = "Search";
+    inline constexpr auto search_results         = "SearchResults";
+    inline constexpr auto dialog_yes_no          = "DialogYesNo";
+    inline constexpr auto dialog_confirm         = "DialogConfirm";
+    inline constexpr auto dialog                 = "Dialog";
+    inline constexpr auto dialog_yes_no_icon_txt = "DialogYesNoIconTxt";
+    inline constexpr auto ice_contacts           = "IceContacts";
 
 } // namespace gui::window::name
 
 namespace app
 {
-    const inline std::string name_phonebook      = "ApplicationPhonebook";
+    inline constexpr auto name_phonebook         = "ApplicationPhonebook";
     constexpr std::uint16_t phonebook_stack_size = 8192;
 
     class ApplicationPhonebook : public app::Application
@@ -36,7 +36,7 @@ namespace app
                              StartInBackground startInBackground = {false});
         ~ApplicationPhonebook() override = default;
 
-        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t override;
+        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
         auto InitHandler() -> sys::ReturnCodes override;
 
         auto SwitchPowerModeHandler(const sys::ServicePowerMode mode) -> sys::ReturnCodes final
@@ -55,7 +55,12 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch,
+                     manager::actions::ShowContacts,
+                     manager::actions::AddContact,
+                     manager::actions::EditContact,
+                     manager::actions::ShowContactDetails,
+                     manager::actions::ShowEmergencyContacts}};
         }
     };
 } // namespace app

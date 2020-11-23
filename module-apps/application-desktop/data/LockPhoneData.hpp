@@ -1,13 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef MODULE_APPS_APPLICATION_DESKTOP_DATA_LOCKPHONEDATA_HPP_
 #define MODULE_APPS_APPLICATION_DESKTOP_DATA_LOCKPHONEDATA_HPP_
 
 #include "gui/SwitchData.hpp"
+#include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
-#include "DesktopMessages.hpp"
 #include <filesystem>
+
+#include "application-desktop/widgets/PinLock.hpp"
 
 namespace gui
 {
@@ -16,17 +18,10 @@ namespace gui
     class LockPhoneData : public gui::SwitchData
     {
         std::string previousApplication;
-        LockPhoneData() = default;
+        std::unique_ptr<PinLock> lock;
 
       public:
-        enum class Request
-        {
-            NoPin,
-            Pin,
-            ShowPrompt,
-        } request;
-
-        LockPhoneData(Request request) : SwitchData(), request(request)
+        LockPhoneData(std::unique_ptr<PinLock> &&lock) : SwitchData(), lock(std::move(lock))
         {
             description = "LockPhoneData";
         }
@@ -37,10 +32,15 @@ namespace gui
         {
             previousApplication = prevApp;
         };
-        const std::string &getPreviousApplication()
+        [[nodiscard]] const std::string &getPreviousApplication()
         {
             return previousApplication;
         };
+
+        [[nodiscard]] std::unique_ptr<PinLock> getLock()
+        {
+            return std::make_unique<PinLock>(*lock.get());
+        }
     };
 
     class UpdateSwitchData : public gui::SwitchData

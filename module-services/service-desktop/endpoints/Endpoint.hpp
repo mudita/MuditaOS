@@ -1,12 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "module-services/service-desktop/parser/ParserUtils.hpp"
-#include "json/json11.hpp"
-#include "Common/Query.hpp"
+
 #include "Context.hpp"
-#include "Service/Service.hpp"
+#include <parser/ParserUtils.hpp>
+
+#include <json/json11.hpp>
+#include <Common/Query.hpp>
+#include <Service/Service.hpp>
 #include <string>
 
 namespace parserFSM

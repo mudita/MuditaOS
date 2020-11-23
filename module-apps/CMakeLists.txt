@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+﻿cmake_minimum_required(VERSION 3.14)
 
 project(module-apps VERSION 1.0
         DESCRIPTION "Library with all applications.")
@@ -14,7 +14,6 @@ endif()
 set( SOURCES 
     "Application.cpp"
     "GuiTimer.cpp"
-    "UiCommonActions.cpp"
     "WindowsFactory.cpp"
     "windows/AppWindow.cpp" 
     "windows/OptionWindow.cpp"
@@ -25,6 +24,12 @@ set( SOURCES
     "windows/OptionSetting.cpp"
     "widgets/ButtonOnOff.cpp"
     "widgets/InputBox.cpp"
+    "windows/VolumeWindow.cpp"
+    "windows/BrightnessWindow.cpp"
+    "windows/HomeModesWindow.cpp"
+    "widgets/BrightnessBox.cpp"
+    "widgets/ModesBox.cpp"
+    "widgets/BarGraph.cpp"
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
@@ -87,7 +92,24 @@ include_directories( ../module-os )
 include_directories( ../module-bsp )
 include_directories( ../module-db )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-services module-db ${TARGET_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        service-appmgr
+        service-antenna
+        service-audio
+        service-cellular
+        service-db
+        service-evtmgr
+    PUBLIC
+        module-bsp
+        module-os
+        module-sys
+        module-utils
+        module-gui
+        module-services
+        module-db
+        ${TARGET_LIBRARIES}
+)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

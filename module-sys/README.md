@@ -36,12 +36,12 @@ enum class ServicePowerMode{
 
 Important: Currently there is no distinction between `SuspendToRAM` and `SuspendsToNVM`. These two cases should be handled the same.  Additionally only `SuspendToNVM` can be received by service.
 
-#### `Message_t DataReceivedHandler(DataMessage* msg,ResponseMessage* resp)`  
+#### `MessagePointer DataReceivedHandler(DataMessage* msg,ResponseMessage* resp)`  
 This is the main handler which should handle incoming messages.  
 If `DataMessage* msg` is not nullptr then it contains valid message which was sent by using blocking Bus API.  
 If `ResponseMessage* resp` is not nullptr then it contains valid message which was sent by using non-blocking Bus API.
 
-This handler MUST return valid `Message_t`. In practice each service will return custom ResponseMessage which is created
+This handler MUST return valid `MessagePointer`. In practice each service will return custom ResponseMessage which is created
 by inheriting from base `sys::ResponseMessage` class.  
 
 Please check existing services for more examples of use    
@@ -69,8 +69,8 @@ Bus subsystem was developed in order for services to be able to communicate with
 #### `bool SendUnicast(std::shared_ptr<Message> msg,const std::string& service,Service* s)`  
 Non-blocking variant of sending messages to specified service.  
 `Service* s` is pointer to API caller.
-#### `MessageRet_t SendUnicast(std::shared_ptr<Message> msg,const std::string& service,Service* s,uint32_t timeout)`  
-Blocking variant of sending messages to specified service. `timeout` is in ms. `MessageRet_t` is std::pair which consist return code and message hence
+#### `SendResult SendUnicast(std::shared_ptr<Message> msg,const std::string& service,Service* s,uint32_t timeout)`  
+Blocking variant of sending messages to specified service. `timeout` is in ms. `SendResult` is std::pair which consist return code and message hence
 it is required to first check for return code before using message field. In case of timeout return code will be set to `Timeout`    
 `Service* s` is pointer to API caller.
 #### `void SendMulticast(std::shared_ptr<Message> msg,BusChannels channel,Service* s)`  

@@ -11,9 +11,9 @@
 namespace app
 {
 
-    inline const std::string name_settings  = "ApplicationSettings";
-    inline const std::string sim_select     = "SimSelect";
-    inline const std::string change_setting = "ChangeSetting";
+    inline constexpr auto name_settings  = "ApplicationSettings";
+    inline constexpr auto sim_select     = "SimSelect";
+    inline constexpr auto change_setting = "ChangeSetting";
 
     class ApplicationSettings : public app::Application
     {
@@ -22,7 +22,7 @@ namespace app
                             std::string parent                  = {},
                             StartInBackground startInBackground = {false});
         virtual ~ApplicationSettings();
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 
@@ -40,7 +40,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::SelectSimCard}};
         }
     };
 } /* namespace app */

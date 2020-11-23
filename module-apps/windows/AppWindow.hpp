@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,6 @@
 #include <gui/widgets/Window.hpp>
 #include <Service/Service.hpp>
 #include <Service/Message.hpp>
-#include <service-audio/api/AudioServiceAPI.hpp>
 
 namespace app
 {
@@ -21,8 +20,8 @@ namespace gui
     {
         namespace window
         {
-            const inline std::string main_window = "MainWindow";
-            const inline std::string no_window   = "";
+            inline constexpr auto main_window = "MainWindow";
+            inline constexpr auto no_window   = "";
         } // namespace window
     }     // namespace name
 
@@ -50,7 +49,6 @@ namespace gui
       public:
         AppWindow() = delete;
         AppWindow(app::Application *app, std::string name);
-        ~AppWindow() override;
 
         app::Application *getApplication()
         {

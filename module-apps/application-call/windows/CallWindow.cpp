@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallWindow.hpp"
@@ -15,16 +15,15 @@
 
 #include "i18/i18.hpp"
 
-#include "service-audio/api/AudioServiceAPI.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
+#include <service-audio/AudioServiceAPI.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+#include "service-db/DBServiceAPI.hpp"
 
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "application-call/data/CallAppStyle.hpp"
 #include "time/time_conversion.hpp"
 
-#include <UiCommonActions.hpp>
 #include <application-messages/data/SMSdata.hpp>
 #include <InputMode.hpp>
 
@@ -97,10 +96,10 @@ namespace gui
 
             switch (speakerIcon->get()) {
             case SpeakerIconState::SPEAKER: {
-                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallSpeakerphoneOff);
+                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallLoudspeakerOff);
             } break;
             case SpeakerIconState::SPEAKERON: {
-                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallSpeakerphoneOn);
+                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallLoudspeakerOn);
             } break;
             // case SpeakerIconState::BLUETOOTH: {
             //     // TODO: need implementation
@@ -137,8 +136,9 @@ namespace gui
         };
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("Send messaage template and reject the call");
-            app::sms(application, app::SmsOperation::Template, phoneNumber);
-            return true;
+            return app::manager::Controller::sendAction(application,
+                                                        app::manager::actions::ShowSmsTemplates,
+                                                        std::make_unique<SMSSendTemplateRequest>(phoneNumber));
         };
 
         // define navigation between icons

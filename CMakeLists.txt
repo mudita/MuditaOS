@@ -21,7 +21,7 @@ message("TARGET_COMPILE_DEFINITIONS: ${TARGET_COMPILE_OPTIONS}")
 message("TARGET_LIBRARIES: ${TARGET_LIBRARIES}")
 message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
 
-add_executable(${PROJECT_NAME} "")
+add_executable(${PROJECT_NAME} "" )
 
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
 	set(ENABLE_TESTS ON)
@@ -96,13 +96,15 @@ add_compile_options( ${TARGET_COMPILE_OPTIONS}
                      -fno-builtin
                      -fno-diagnostics-color
                      # warning flags
-                     -Wall -Wextra -Werror -Wno-unused-parameter)
+                     -Wall -Wextra -Werror -Wno-unused-parameter -Wno-error=deprecated-declarations)
 
 target_compile_features(${PROJECT_NAME} PUBLIC
         ${TARGET_COMPILE_FEATURES})
 
 
 target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>)
+add_compile_options("-Wno-error=deprecated-declarations")
+target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-error=deprecated-declarations")
 
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${TARGET_SOURCES})
 target_sources(${CMAKE_PROJECT_NAME}
@@ -129,7 +131,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR})
 
-
+if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+     add_subdirectory(board/linux/libiosyscalls)
+endif()
 message("${PROJECT_NAME}: add_subdirectory module-sys")
 add_subdirectory(module-sys)
 
@@ -179,25 +183,20 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map
 # They have to be arranged in specific order because of circular dependencies that need to be correctly resolved
 # In case of doubt please contact me: mateusz.piesta@mudita.com
 target_link_libraries(${PROJECT_NAME}
-        module-bsp
-        module-os
-        module-bsp
-        module-utils
-        module-vfs
-        module-utils
-        module-sys
-        module-cellular
-        module-audio
-        module-db
-        module-gui
-        module-services
         module-apps
-        module-bluetooth
+        service-desktop
+        service-bluetooth
+        service-lwip
         ${LWIP_LIBRARIES}
-        module-lwip
-        ${TARGET_LIBRARIES}
         )
 
+if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    target_link_libraries(${PROJECT_NAME} iosyscalls)
+else()
+    target_link_libraries(${PROJECT_NAME}
+        service-antenna
+    )
+endif()
 
 set_source_files_properties(source/main.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
 

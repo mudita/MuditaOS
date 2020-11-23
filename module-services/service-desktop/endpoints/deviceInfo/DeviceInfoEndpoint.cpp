@@ -1,18 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DeviceInfoEndpoint.hpp"
+#include <endpoints/Context.hpp>
+#include <parser/MessageHandler.hpp>
 
-#include <source/version.hpp>         // for GIT_BRANCH, GIT_REV, GIT_TAG
-#include <vfs.hpp>                    // for vfs::FilesystemStats, vfs
-#include <common_data/EventStore.hpp> // for GSM, Battery, SignalStrength
-#include <time/time_conversion.hpp>   // for Time
-#include <stdint.h>                   // for uint32_t
-#include <string>                     // for to_string, allocator, string
+#include <common_data/EventStore.hpp>
+#include <json/json11.hpp>
+#include <source/version.hpp>
+#include <time/time_conversion.hpp>
+#include <vfs.hpp>
 
-#include "Context.hpp"        // for Context
-#include "MessageHandler.hpp" // for MessageHandler
-#include "json/json11.hpp"    // for Json, Json::object
+#include <cstdint>
+#include <string>
 
 auto DeviceInfoEndpoint::handle(Context &context) -> void
 {
@@ -36,6 +36,8 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
          {json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))},
          {json::signalStrength, std::to_string(static_cast<int>(Store::GSM::get()->getSignalStrength().rssiBar))},
+         {json::accessTechnology, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().accessTechnology))},
+         {json::networkStatus, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().status))},
          {json::fsTotal, std::to_string(fsStats.totalMbytes)},
          {json::fsFree, std::to_string(fsStats.freeMbytes)},
          {json::fsFreePercent, std::to_string(fsStats.freePercent)},

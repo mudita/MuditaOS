@@ -7,13 +7,14 @@
 #include <log/log.hpp>
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 
 #define MAGIC_ENUM_RANGE_MAX 256
 #include <magic_enum.hpp>
 
 namespace utils
 {
-    static const std::string WHITESPACE = " \n\r\t\f\v";
+    inline constexpr auto WHITESPACE = " \n\r\t\f\v";
     constexpr unsigned int secondsInMinute =
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::minutes(1)).count();
 
@@ -89,12 +90,60 @@ namespace utils
         return rtrim(ltrim(s));
     }
 
-    template <typename T> std::string to_string(T t, size_t minStringLength = 0)
+    static inline std::string addLeadingZeros(std::string base, size_t minStringLength = 0)
     {
+        if (base.length() >= minStringLength) {
+            return base;
+        }
         constexpr auto leadingDigit = '0';
+        base.insert(0, minStringLength - base.length(), leadingDigit);
+        return base;
+    }
+
+    template <typename T> std::string to_string(T t)
+    {
         std::ostringstream ss;
-        ss << std::setfill(leadingDigit) << std::setw(minStringLength) << t;
+        ss << t;
         return ss.str();
+    }
+
+    template <> inline std::string to_string<long double>(long double t)
+    {
+        uint32_t precision = 6;
+        int base           = static_cast<int>(t);
+        long double frac   = (t - base) * pow(10, precision);
+        auto baseAsStr     = std::to_string(base);
+        if (t < 0) {
+            frac *= -1;
+            if (base == 0) {
+                baseAsStr = "-0";
+            }
+        }
+        auto fractionalPart = static_cast<unsigned long int>(roundl(frac));
+        if (fractionalPart == 0) {
+            if (baseAsStr == "-0") {
+                return "0";
+            }
+            return baseAsStr;
+        }
+        auto fractionalAsStr = std::to_string(fractionalPart);
+        if (fractionalAsStr.size() < precision) {
+            fractionalAsStr.insert(0, precision - fractionalAsStr.size(), '0');
+        }
+        if (fractionalAsStr.find_last_not_of('0') != std::string::npos) {
+            fractionalAsStr.erase(fractionalAsStr.find_last_not_of('0') + 1);
+        }
+        return baseAsStr + "." + fractionalAsStr;
+    }
+
+    template <> inline std::string to_string<float>(float t)
+    {
+        return to_string((long double)(t));
+    }
+
+    template <> inline std::string to_string<double>(double t)
+    {
+        return to_string((long double)(t));
     }
 
     template <typename T>[[nodiscard]] const std::string enumToString(const T &t)

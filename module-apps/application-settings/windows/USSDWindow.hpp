@@ -19,7 +19,7 @@ namespace gui
     {
         namespace name
         {
-            inline const std::string ussd_window = "ussd_window";
+            inline constexpr auto ussd_window = "ussd_window";
         } // namespace name
     }     // namespace window
     class USSDWindow : public AppWindow

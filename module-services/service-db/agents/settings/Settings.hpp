@@ -1,28 +1,20 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <includes/DBServiceName.hpp> // for db
-#include <stdint.h>                   // for int16_t
-#include <list>                       // for list
-#include <functional>                 // for function
-#include <map>                        // for map
-#include <memory>                     // for shared_ptr, allocator
-#include <string>                     // for string
-#include <optional>                   // for optional
+#include <module-sys/Service/Message.hpp>
+#include <service-db/DBServiceName.hpp>
 
-namespace sys
-{
-    class Service;
-    class Message;
+#include <cstdint>
+#include <functional>
+#include <list>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
 
-    using Message_t = std::shared_ptr<Message>;
-    class DataMessage;
-    class ResponseMessage;
-}; // namespace sys
-
-namespace Settings
+namespace settings
 {
     namespace Messages
     {
@@ -73,12 +65,12 @@ namespace Settings
         OnAllModesRetrievedCallback cbAllModes;
         ProfileChangedCallback cbProfile;
         OnAllProfilesRetrievedCallback cbAllProfiles;
-        void sendMsg(std::shared_ptr<::Settings::Messages::SettingsMessage> &&msg);
+        void sendMsg(std::shared_ptr<settings::Messages::SettingsMessage> &&msg);
         void registerHandlers();
-        auto handleVariableChanged(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-        auto handleCurrentProfileChanged(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-        auto handleCurrentModeChanged(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-        auto handleProfileListResponse(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
-        auto handleModeListResponse(sys::DataMessage *req, sys::ResponseMessage *) -> sys::Message_t;
+        auto handleVariableChanged(sys::Message *req) -> sys::MessagePointer;
+        auto handleCurrentProfileChanged(sys::Message *req) -> sys::MessagePointer;
+        auto handleCurrentModeChanged(sys::Message *req) -> sys::MessagePointer;
+        auto handleProfileListResponse(sys::Message *req) -> sys::MessagePointer;
+        auto handleModeListResponse(sys::Message *req) -> sys::MessagePointer;
     };
-} // namespace Settings
+} // namespace settings

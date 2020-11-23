@@ -1,24 +1,25 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-db/queries/calllog/QueryCalllogGet.hpp>            // for CalllogGet, CalllogGetResult
-#include <module-db/queries/calllog/QueryCalllogGetCount.hpp>       // for CalllogGetCount, CalllogGetCountResult
-#include <module-db/queries/calllog/QueryCalllogRemove.hpp>         // for CalllogRemove, CalllogRemoveResult
-#include <module-db/queries/calllog/QueryCalllogGetByContactID.hpp> // for CalllogGetByContactID, CalllogGetByContactIDResult
-#include <memory>                                                   // for make_unique, unique_ptr
-#include <ostream>                                                  // for stringstream, basic_ostream, basic_ios::clear
-#include <utility>                                                  // for move
-#include <vector>                                                   // for vector
-
 #include "CalllogHelper.hpp"
-#include "BaseInterface.hpp"    // for Interface, Interface::Name, Interface::Name::Calllog
-#include "Common/Query.hpp"     // for EndpointListener, Query, QueryListener, QueryResult
-#include "Context.hpp"          // for Context
-#include "MessageHandler.hpp"   // for MessageHandler
-#include "ParserUtils.hpp"      // for Code, Code::InternalServerError, Code::OK, parserFSM
-#include "PhoneNumber.hpp"      // for PhoneNumber::View
-#include "api/DBServiceAPI.hpp" // for DBServiceAPI
-#include "utf8/UTF8.hpp"        // for UTF8
+#include <endpoints/Context.hpp>
+#include <parser/MessageHandler.hpp>
+#include <parser/ParserUtils.hpp>
+
+#include <BaseInterface.hpp>
+#include <Common/Query.hpp>
+#include <PhoneNumber.hpp>
+#include <module-db/queries/calllog/QueryCalllogGet.hpp>
+#include <module-db/queries/calllog/QueryCalllogGetByContactID.hpp>
+#include <module-db/queries/calllog/QueryCalllogGetCount.hpp>
+#include <module-db/queries/calllog/QueryCalllogRemove.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <utf8/UTF8.hpp>
+
+#include <memory>
+#include <ostream>
+#include <utility>
+#include <vector>
 
 using namespace parserFSM;
 

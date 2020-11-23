@@ -24,8 +24,14 @@ namespace at
         case commadsSet::simInit:
             ret.push_back(AT::CALLER_NUMBER_PRESENTATION);
             ret.push_back(AT::SMS_TEXT_FORMAT);
-            ret.push_back(AT::SMS_UCSC2);
+            ret.push_back(AT::SMS_GSM);
             ret.push_back(AT::CRC_ON);
+            break;
+        case commadsSet::smsInit:
+            ret.push_back(AT::SET_SMS_STORAGE);
+            ret.push_back(AT::SMS_TEXT_FORMAT);
+            ret.push_back(AT::SMS_UCSC2);
+            ret.push_back(AT::LIST_MESSAGES);
             break;
         }
         return ret;

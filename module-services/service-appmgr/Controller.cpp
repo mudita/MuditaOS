@@ -1,58 +1,42 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Controller.hpp"
+#include "service-appmgr/Controller.hpp"
+
+#include "service-appmgr/model/ApplicationManager.hpp"
+
+#include <module-sys/Service/Bus.hpp>
+#include <Service/Service.hpp>
 
 #include <utility> // for move
 
-#include "module-sys/Service/Bus.hpp" // for Bus
-#include "Service/Service.hpp"        // for Service
-#include "service-appmgr/model/ApplicationManager.hpp" // for ApplicationManager, ApplicationManager::ServiceName, ApplicationHandle, ApplicationHandle::Name
-
 namespace app::manager
 {
-    auto Controller::sendAction(sys::Service *sender, actions::ActionId actionId, actions::ActionParamsPtr &&data)
-        -> bool
+    namespace
     {
-        auto msg = std::make_shared<app::manager::ActionRequest>(sender->GetName(), actionId, std::move(data));
-        return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
-    }
+        void setOnSwitchBehaviour(actions::ActionParamsPtr &data, OnSwitchBehaviour onSwitchBehaviour) noexcept
+        {
+            if (data) {
+                data->disableAppClose = (onSwitchBehaviour == OnSwitchBehaviour::RunInBackground);
+            }
+        }
+    } // namespace
 
     auto Controller::applicationInitialised(sys::Service *sender,
                                             StartupStatus status,
                                             StartInBackground startInBackground) -> bool
     {
-        auto msg =
-            std::make_shared<app::manager::ApplicationInitialisation>(sender->GetName(), status, startInBackground);
+        auto msg = std::make_shared<app::manager::ApplicationInitialised>(sender->GetName(), status, startInBackground);
         return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
     }
 
-    auto Controller::switchApplication(sys::Service *sender,
-                                       const ApplicationName &applicationName,
-                                       const std::string &windowName,
-                                       std::unique_ptr<gui::SwitchData> data) -> bool
+    auto Controller::sendAction(sys::Service *sender,
+                                actions::ActionId actionId,
+                                actions::ActionParamsPtr &&data,
+                                OnSwitchBehaviour onSwitchBehaviour) -> bool
     {
-        auto msg = std::make_shared<app::manager::SwitchRequest>(
-            sender->GetName(), applicationName, windowName, std::move(data));
-        return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
-    }
-
-    auto Controller::confirmSwitch(sys::Service *sender) -> bool
-    {
-
-        auto msg = std::make_shared<app::manager::SwitchConfirmation>(sender->GetName());
-        return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
-    }
-
-    auto Controller::confirmClose(sys::Service *sender) -> bool
-    {
-        auto msg = std::make_shared<app::manager::CloseConfirmation>(sender->GetName());
-        return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
-    }
-
-    auto Controller::closeApplication(sys::Service *sender, const ApplicationName &name) -> bool
-    {
-        auto msg = std::make_shared<app::manager::ApplicationCloseRequest>(sender->GetName(), name);
+        setOnSwitchBehaviour(data, onSwitchBehaviour);
+        auto msg = std::make_shared<app::manager::ActionRequest>(sender->GetName(), actionId, std::move(data));
         return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
     }
 
@@ -64,15 +48,33 @@ namespace app::manager
         return sys::Bus::SendUnicast(switchMsg, ApplicationManager::ServiceName, sender);
     }
 
-    auto Controller::changeLanguage(sys::Service *sender, utils::Lang language) -> bool
+    auto Controller::confirmSwitch(sys::Service *sender) -> bool
     {
-        auto msg = std::make_shared<app::manager::LanguageChangeRequest>(sender->GetName(), language);
+        auto msg = std::make_shared<app::manager::SwitchConfirmation>(sender->GetName());
         return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
     }
 
-    auto Controller::stopApplicationManager(sys::Service *sender) -> bool
+    auto Controller::closeApplication(sys::Service *sender, const ApplicationName &name) -> bool
     {
-        auto msg = std::make_shared<app::manager::ShutdownRequest>(sender->GetName());
+        auto msg = std::make_shared<app::manager::ApplicationCloseRequest>(sender->GetName(), name);
+        return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
+    }
+
+    auto Controller::confirmClose(sys::Service *sender) -> bool
+    {
+        auto msg = std::make_shared<app::manager::CloseConfirmation>(sender->GetName());
+        return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
+    }
+
+    auto Controller::changeDisplayLanguage(sys::Service *sender, utils::Lang language) -> bool
+    {
+        auto msg = std::make_shared<app::manager::DisplayLanguageChangeRequest>(sender->GetName(), language);
+        return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
+    }
+
+    auto Controller::changeInputLanguage(sys::Service *sender, utils::Lang language) -> bool
+    {
+        auto msg = std::make_shared<app::manager::InputLanguageChangeRequest>(sender->GetName(), language);
         return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
     }
 

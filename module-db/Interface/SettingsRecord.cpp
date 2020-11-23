@@ -43,7 +43,8 @@ SettingsRecord SettingsRecordInterface::GetByID(uint32_t id)
                           .networkOperator = rec.networkOperator,
                           .lockPassHash    = rec.lockPassHash,
                           .lockTime        = rec.lockTime,
-                          .language        = rec.language};
+                          .displayLanguage = rec.displayLanguage,
+                          .inputLanguage   = rec.inputLanguage};
 }
 
 bool SettingsRecordInterface::Update(const SettingsRecord &rec)
@@ -65,5 +66,6 @@ bool SettingsRecordInterface::Update(const SettingsRecord &rec)
                                                         .networkOperator = rec.networkOperator,
                                                         .lockPassHash    = rec.lockPassHash,
                                                         .lockTime        = rec.lockTime,
-                                                        .language        = rec.language});
+                                                        .displayLanguage = rec.displayLanguage,
+                                                        .inputLanguage   = rec.inputLanguage});
 }

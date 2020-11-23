@@ -4,7 +4,9 @@
 #pragma once
 
 #include <map>
+#include <bitset>
 #include <bsp/audio/bsp_audio.hpp>
+#include <Utils.hpp>
 
 #include "Profiles/Profile.hpp"
 
@@ -15,20 +17,20 @@ namespace audio
 
 namespace audio
 {
-    constexpr Volume defaultVolumeStep = 1;
-    constexpr Gain defaultGainStep     = 10;
-    constexpr Volume defaultVolume     = 5;
-    constexpr Gain defaultGain         = 5;
+    inline constexpr Volume defaultVolumeStep = 1;
+    inline constexpr Gain defaultGainStep     = 10;
+    inline constexpr Volume defaultVolume     = 5;
+    inline constexpr Gain defaultGain         = 5;
 
-    constexpr Volume maxVolume = 10;
-    constexpr Volume minVolume = 0;
+    inline constexpr Volume maxVolume = 10;
+    inline constexpr Volume minVolume = 0;
 
-    constexpr Gain maxGain = 100;
-    constexpr Gain minGain = 0;
+    inline constexpr Gain maxGain = 100;
+    inline constexpr Gain minGain = 0;
 
-    constexpr uint32_t audioOperationTimeout = 1000;
+    inline constexpr auto audioOperationTimeout = 1000U;
 
-    static const std::string audioDbPrefix = "audio/";
+    inline constexpr auto audioDbPrefix = "audio/";
 
     enum class Setting
     {
@@ -49,15 +51,6 @@ namespace audio
         Last = TextMessageRingtone,
     };
 
-    const static std::map<PlaybackType, uint8_t> PlaybackTypePriority = {
-        {PlaybackType::CallRingtone, 2},
-        {PlaybackType::TextMessageRingtone, 3},
-        {PlaybackType::Notifications, 3},
-        {PlaybackType::Multimedia, 4},
-        {PlaybackType::KeypadSound, 5},
-        {PlaybackType::None, static_cast<uint8_t>(PlaybackType::Last)},
-    };
-
     [[nodiscard]] const std::string str(const PlaybackType &playbackType) noexcept;
 
     [[nodiscard]] const std::string str(const Setting &setting) noexcept;
@@ -68,32 +61,86 @@ namespace audio
 
     enum class EventType
     {
-        HeadphonesPlugin,
-        HeadphonesUnplug,
-        BTHeadsetOn,
-        BTHeadsetOff,
-        BTA2DPOn,
-        BTA2DPOff,
+        // HW state change notifications
+        JackState,               //!< jack input plugged / unplugged event
+        BlutoothHSPDeviceState,  //!< BT device connected / disconnected event (Headset Profile)
+        BlutoothA2DPDeviceState, //!< BT device connected / disconnected event (Advanced Audio Distribution Profile)
+
+        // call control
         CallMute,
         CallUnmute,
-        CallSpeakerphoneOn,
-        CallSpeakerphoneOff,
+        CallLoudspeakerOn,
+        CallLoudspeakerOff,
     };
+
+    constexpr auto hwStateUpdateMaxEvent = magic_enum::enum_index(EventType::BlutoothA2DPDeviceState);
 
     class Event
     {
       public:
-        explicit Event(EventType eType) : eventType(eType)
+        enum class DeviceState
+        {
+            Connected,
+            Disconnected
+        };
+
+        explicit Event(EventType eType, DeviceState deviceState = DeviceState::Connected)
+            : eventType(eType), deviceState(deviceState)
         {}
+
         virtual ~Event() = default;
 
-        EventType getType() const
+        EventType getType() const noexcept
         {
             return eventType;
         }
 
+        DeviceState getDeviceState() const noexcept
+        {
+            return deviceState;
+        }
+
       private:
         const EventType eventType;
+        const DeviceState deviceState;
+    };
+
+    class AudioSinkState
+    {
+      public:
+        void UpdateState(std::shared_ptr<Event> stateChangeEvent)
+        {
+            auto hwUpdateEventIdx = magic_enum::enum_integer(stateChangeEvent->getType());
+            if (hwUpdateEventIdx <= hwStateUpdateMaxEvent) {
+                audioSinkState.set(hwUpdateEventIdx,
+                                   stateChangeEvent->getDeviceState() == Event::DeviceState::Connected ? true : false);
+            }
+        }
+
+        std::vector<std::shared_ptr<Event>> getUpdateEvents() const
+        {
+            std::vector<std::shared_ptr<Event>> updateEvents;
+            for (size_t i = 0; i <= hwStateUpdateMaxEvent; i++) {
+                auto isConnected =
+                    audioSinkState.test(i) ? Event::DeviceState::Connected : Event::DeviceState::Disconnected;
+                auto updateEvt = magic_enum::enum_cast<EventType>(i);
+                updateEvents.emplace_back(std::make_unique<Event>(updateEvt.value(), isConnected));
+            }
+            return updateEvents;
+        }
+
+        bool isConnected(EventType deviceUpdateEvent) const
+        {
+            return audioSinkState.test(magic_enum::enum_integer(deviceUpdateEvent));
+        }
+
+        void setConnected(EventType deviceUpdateEvent, bool isConnected)
+        {
+            audioSinkState.set(magic_enum::enum_integer(deviceUpdateEvent), isConnected);
+        }
+
+      private:
+        std::bitset<magic_enum::enum_count<EventType>()> audioSinkState;
     };
 
     enum class RetCode
@@ -111,6 +158,21 @@ namespace audio
         DeviceFailure,
         TokenNotFound,
         Failed
+    };
+
+    struct AudioInitException : public std::runtime_error
+    {
+      protected:
+        audio::RetCode errorCode = audio::RetCode::Failed;
+
+      public:
+        AudioInitException(const char *message, audio::RetCode errorCode) : runtime_error(message)
+        {}
+
+        audio::RetCode getErrorCode() const noexcept
+        {
+            return errorCode;
+        }
     };
 
     class Token
@@ -219,10 +281,3 @@ namespace audio
     const std::string str(RetCode retcode);
     [[nodiscard]] auto GetVolumeText(const audio::Volume &volume) -> const std::string;
 } // namespace audio
-
-namespace audio::notifications
-{
-    const std::vector<audio::PlaybackType> typesToMute = {audio::PlaybackType::Notifications,
-                                                          audio::PlaybackType::CallRingtone,
-                                                          audio::PlaybackType::TextMessageRingtone};
-} // namespace audio::notifications

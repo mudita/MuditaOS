@@ -72,13 +72,13 @@ namespace audio
     size_t decoderFLAC::drflac_read(void *pUserData, void *pBufferOut, size_t bytesToRead)
     {
         decoderFLAC *userdata = (decoderFLAC *)pUserData;
-        return vfs.fread(pBufferOut, 1, bytesToRead, userdata->fd);
+        return std::fread(pBufferOut, 1, bytesToRead, userdata->fd);
     }
 
     drflac_bool32 decoderFLAC::drflac_seek(void *pUserData, int offset, drflac_seek_origin origin)
     {
         decoderFLAC *userdata = (decoderFLAC *)pUserData;
-        return !vfs.fseek(userdata->fd, offset, origin == drflac_seek_origin_start ? SEEK_SET : SEEK_CUR);
+        return !std::fseek(userdata->fd, offset, origin == drflac_seek_origin_start ? SEEK_SET : SEEK_CUR);
     }
 
     void decoderFLAC::drflac_meta(void *pUserData, drflac_metadata *pMetadata)

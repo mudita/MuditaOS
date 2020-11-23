@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCallLog.hpp"
@@ -9,8 +9,8 @@
 #include "windows/CallLogMainWindow.hpp"
 #include "windows/CallLogOptionsWindow.hpp"
 
-#include <service-db/api/DBServiceAPI.hpp>
-#include <service-db/messages/DBMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/DBMessage.hpp>
 #include <Dialog.hpp>
 #include <OptionWindow.hpp>
 #include <i18/i18.hpp>
@@ -25,7 +25,12 @@ namespace app
 {
     ApplicationCallLog::ApplicationCallLog(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground, 4096)
-    {}
+    {
+        addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {
+            switchWindow(gui::name::window::main_window, std::move(data));
+            return msgHandled();
+        });
+    }
 
     ApplicationCallLog::~ApplicationCallLog()
     {
@@ -33,7 +38,7 @@ namespace app
     }
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationCallLog::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationCallLog::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);

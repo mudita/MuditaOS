@@ -6,6 +6,18 @@
 
 namespace audio
 {
+    namespace
+    {
+        const std::map<PlaybackType, uint8_t> PlaybackTypePriority = {
+            {PlaybackType::CallRingtone, 2},
+            {PlaybackType::TextMessageRingtone, 3},
+            {PlaybackType::Notifications, 3},
+            {PlaybackType::Multimedia, 4},
+            {PlaybackType::KeypadSound, 5},
+            {PlaybackType::None, static_cast<uint8_t>(PlaybackType::Last)},
+        };
+    } // namespace
+
     AudioMux::AudioMux(audio::AsyncCallback asyncClbk, audio::DbCallback dbClbk, size_t audioInputsCount)
         : audioInputs(audioInputsInternal)
     {

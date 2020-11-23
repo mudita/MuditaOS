@@ -75,7 +75,7 @@ namespace sys
         static constexpr std::size_t controlMessagesCount = static_cast<std::size_t>(ControlMessage::MessageCount);
         static constexpr std::size_t defaultStackSize     = 2048;
         static constexpr TickType_t defaultJoinTimeout    = portMAX_DELAY;
-        static inline std::string controlQueueNamePrefix  = "wctrl";
+        static constexpr auto controlQueueNamePrefix      = "wctrl";
 
         xQueueHandle controlQueue      = nullptr;
         xSemaphoreHandle joinSemaphore = nullptr;

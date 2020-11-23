@@ -16,25 +16,27 @@ namespace gui
     class PinLockBaseWindow : public AppWindow
     {
       public:
-        PinLockBaseWindow(app::Application *app, std::string name, PinLock &lock) : AppWindow(app, name), lock(lock)
+        PinLockBaseWindow(app::Application *app, std::string name) : AppWindow(app, name)
         {}
         void build();
         void buildInfoText(unsigned int textHight);
-        void buildPinLabels(gui::Label *labelBox, unsigned int pinSize, unsigned int singleLabelWidth);
+        void buildPinLabels(std::function<Rect *()> itemBuilder,
+                            unsigned int pinSize,
+                            unsigned int offsetX,
+                            unsigned int offsetY,
+                            unsigned int boxWidth);
         void buildImages(const std::string &lockImg, const std::string &infoImg);
         void setBottomBarWidgetsActive(bool left, bool center, bool right);
         void setImagesVisible(bool lockImg, bool infoImg);
         void setBottomBarWidgetText(BottomBar::Side side, const UTF8 &txt);
-        void clearPinLabels();
 
         gui::Label *titleLabel = nullptr;
         gui::Text *infoText    = nullptr;
-        gui::Label *pinLabel   = nullptr;
-        std::vector<gui::Label *> pinLabels;
         gui::Image *lockImage = nullptr;
         gui::Image *infoImage = nullptr;
+        gui::HBox *pinLabelsBox = nullptr;
 
-        PinLock &lock;
+        std::unique_ptr<PinLock> lock = nullptr;
 
       private:
         void buildBottomBar();

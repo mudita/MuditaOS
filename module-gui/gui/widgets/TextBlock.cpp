@@ -30,6 +30,16 @@ namespace gui
         end    = p.end;
     }
 
+    TextBlock &TextBlock::operator=(const TextBlock &p)
+    {
+        if (this != &p) {
+            text   = p.text;
+            format = std::make_unique<TextFormat>(*p.format);
+            end    = p.end;
+        }
+        return *this;
+    }
+
     const UTF8 &TextBlock::getText() const
     {
         return text;
@@ -83,12 +93,15 @@ namespace gui
         return End::None;
     }
 
-    void TextBlock::setEnd(End end)
+    void TextBlock::setEnd(End _end)
     {
-        if (getEnd() != End::Newline) {
+        if (_end == End::Newline && getEnd() != End::Newline) {
             text.insertCode(text::newline);
         }
-        this->end = end;
+        else if (_end == End::None && getEnd() == End::Newline) {
+            text.removeChar(text.length() - 1);
+        }
+        this->end = _end;
     }
 
     void TextBlock::addChar(uint32_t utf_val, unsigned int pos)

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SystemManager.hpp"
@@ -8,8 +8,8 @@
 #include "ticks.hpp"
 #include "critical.hpp"
 #include <algorithm>
-#include <service-evtmgr/messages/KbdMessage.hpp>
-#include <service-evtmgr/messages/BatteryMessages.hpp>
+#include <service-evtmgr/KbdMessage.hpp>
+#include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 
 const inline size_t systemManagerStack = 4096 * 2;
@@ -270,7 +270,7 @@ namespace sys
     {
         isReady = true;
 
-        connect(SystemManagerCmd(), [&](DataMessage *msg, ResponseMessage * /*resp*/) {
+        connect(SystemManagerCmd(), [&](Message *msg) {
             if (msg->channel == BusChannels::SystemManagerRequests) {
                 auto *data = static_cast<SystemManagerCmd *>(msg);
 
@@ -285,28 +285,28 @@ namespace sys
                     break;
                 }
             }
-            return Message_t();
+            return MessageNone{};
         });
 
-        connect(sevm::KbdMessage(), [&](DataMessage * /*msg*/, ResponseMessage * /*resp*/) {
+        connect(sevm::KbdMessage(), [&](Message *) {
             // we are in shutdown mode - we received that there was red key pressed -> we need to reboot
             if (state == State::Shutdown) {
                 set(State::Reboot);
             }
-            return Message_t();
+            return MessageNone{};
         });
 
-        connect(sevm::BatteryPlugMessage(), [&](DataMessage * /*msg*/, ResponseMessage * /*resp*/) {
+        connect(sevm::BatteryPlugMessage(), [&](Message *) {
             if (state == State::Shutdown) {
                 set(State::ShutdownReady);
             }
-            return Message_t();
+            return MessageNone{};
         });
 
         return ReturnCodes::Success;
     }
 
-    Message_t SystemManager::DataReceivedHandler(DataMessage * /*msg*/, ResponseMessage * /*resp*/)
+    MessagePointer SystemManager::DataReceivedHandler(DataMessage * /*msg*/, ResponseMessage * /*resp*/)
     {
         return std::make_shared<ResponseMessage>();
     }
@@ -323,7 +323,7 @@ namespace sys
         for (bool retry{};; retry = false) {
             for (auto &service : servicesList) {
                 if (service->GetName() == service::name::evt_manager) {
-                    LOG_DEBUG("Delay closing %s", service::name::evt_manager.c_str());
+                    LOG_DEBUG("Delay closing %s", service::name::evt_manager);
                     continue;
                 }
                 if (service->parent == "") {

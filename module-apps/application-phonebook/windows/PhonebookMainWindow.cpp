@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookMainWindow.hpp"
@@ -6,11 +6,11 @@
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
 
-#include <messages/QueryMessage.hpp>
 #include <queries/phonebook/QueryContactGet.hpp>
 
 #include <service-appmgr/Controller.hpp>
-#include <module-services/service-db/messages/DBNotificationMessage.hpp>
+#include <service-db/QueryMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 namespace gui
 {

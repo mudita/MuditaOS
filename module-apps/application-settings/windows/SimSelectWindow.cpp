@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimSelectWindow.hpp"
@@ -8,7 +8,7 @@
 #include "log/log.hpp"
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <common_data/EventStore.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
 
 void changeSim(app::Application *app, SettingsRecord::ActiveSim simsettings, Store::GSM::SIM sim)
 {

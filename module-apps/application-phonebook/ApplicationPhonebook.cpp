@@ -1,11 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationPhonebook.hpp"
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
-#include "messages/QueryMessage.hpp"
-#include "messages/DBNotificationMessage.hpp"
 #include "models/PhonebookModel.hpp"
 #include "windows/PhonebookContactDetails.hpp"
 #include "windows/PhonebookContactOptions.hpp"
@@ -16,6 +14,8 @@
 #include "windows/PhonebookSearchResults.hpp"
 #include "windows/PhonebookIceContacts.hpp"
 #include <service-appmgr/Controller.hpp>
+#include <service-db/QueryMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 namespace app
 {
@@ -25,10 +25,31 @@ namespace app
         : Application(name, parent, startInBackground, phonebook_stack_size)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        addActionReceiver(manager::actions::ShowContacts, [this](auto &&data) {
+            switchWindow(gui::name::window::main_window, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::AddContact, [this](auto &&data) {
+            switchWindow(gui::window::name::new_contact, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::EditContact, [this](auto &&data) {
+            switchWindow(gui::window::name::new_contact, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::ShowContactDetails, [this](auto &&data) {
+            switchWindow(gui::window::name::contact, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::ShowEmergencyContacts, [this](auto &&data) {
+            switchWindow(gui::window::name::ice_contacts, std::move(data));
+            return msgHandled();
+        });
     }
 
     // Invoked upon receiving data message
-    auto ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t
+    auto ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+        -> sys::MessagePointer
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);

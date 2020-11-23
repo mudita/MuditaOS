@@ -1,30 +1,30 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <vfs.hpp>          // for vfs, eMMC_disk
-#include <catch2/catch.hpp> // for AssertionHandler, operator""_catch_sr, SourceLineInfo, StringRef, REQUIRE, Section, SECTION, SectionInfo, TEST_CASE
-#include <memory>           // for allocator, unique_ptr, make_unique, operator==, allocator_traits<>::value_type
-#include <filesystem>       // for path
-#include <string>           // for string, operator==, basic_string, operator+, char_traits
-#include <vector>           // for vector
+#include <endpoints/Endpoint.hpp>
+#include <endpoints/EndpointFactory.hpp>
+#include <endpoints/contacts/ContactHelper.hpp>
+#include <endpoints/contacts/ContactsEndpoint.hpp>
+#include <endpoints/factoryReset/FactoryReset.hpp>
+#include <endpoints/messages/MessageHelper.hpp>
+#include <endpoints/update/UpdateMuditaOS.hpp>
+#include <parser/ParserFSM.hpp>
+#include <parser/ParserUtils.hpp>
 
-#include "Common/Common.hpp" // for ContactNumberType, ContactNumberType::PAGER, SMSType, SMSType::DRAFT
-#include "ContactRecord.hpp" // for ContactRecord, ContactRecord::Number
-#include "ParserUtils.hpp" // for EndpointType, Method, Method::get, id, EndpointType::contacts, EndpointType::invalid, contactID, date, dateSent, messageBody, templateText, threadID, parserFSM
-#include "module-services/service-desktop/endpoints/update/UpdateMuditaOS.hpp" // for UpdateError, UpdateError::NoError, UpdateMuditaOS
-#include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp" // for CopyDirContent, DeleteDirContent
-#include "ParserFSM.hpp" // for State, StateMachine, State::NoMsg, State::ReceivedPayload, State::ReceivedPartialPayload, State::ReceivedPartialHeader
-#include "contacts/ContactHelper.hpp" // for ContactHelper, address, alternativeName, isBlocked, isFavourite, numbers, primaryName
-#include "messages/MessageHelper.hpp"    // for MessageHelper
-#include "EndpointFactory.hpp"           // for EndpointFactory
-#include "contacts/ContactsEndpoint.hpp" // for ContactsEndpoint
-#include "json/json11.hpp"               // for Json
-#include "Context.hpp"                   // for Context, invalidUuid
-#include "Endpoint.hpp"                  // for Endpoint
-#include "PhoneNumber.hpp"               // for PhoneNumber, PhoneNumber::View
-#include "SMSRecord.hpp"                 // for SMSRecord
-#include "SMSTemplateRecord.hpp"         // for SMSTemplateRecord
-#include "utf8/UTF8.hpp"                 // for UTF8, operator<<
+#include <Common/Common.hpp>
+#include <ContactRecord.hpp>
+#include <PhoneNumber.hpp>
+#include <SMSRecord.hpp>
+#include <SMSTemplateRecord.hpp>
+#include <catch2/catch.hpp>
+#include <json/json11.hpp>
+#include <purefs/filesystem_paths.hpp>
+#include <utf8/UTF8.hpp>
+
+#include <memory>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 class vfs vfs;
 
@@ -55,7 +55,7 @@ TEST_CASE("System Update Tests")
 TEST_CASE("Factory Reset Test")
 {
 
-    std::string sysdir = purefs::dir::eMMC_disk;
+    std::string sysdir = purefs::dir::getRootDiskPath();
     sysdir += "/factory-test/sys";
     std::string factorydir = sysdir + "/factory";
     REQUIRE(FactoryReset::DeleteDirContent(sysdir) == true);

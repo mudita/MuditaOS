@@ -4,6 +4,7 @@
 #pragma once
 
 #include "decoder.hpp"
+#include <vector>
 
 namespace audio
 {

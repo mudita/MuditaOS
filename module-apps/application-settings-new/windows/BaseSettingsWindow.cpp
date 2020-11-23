@@ -17,6 +17,8 @@ namespace gui
 
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        topBar->setActive(TopBar::Elements::BATTERY, false);
+        topBar->setActive(TopBar::Elements::SIM, false);
         topBar->setActive(TopBar::Elements::TIME, true);
     }
 

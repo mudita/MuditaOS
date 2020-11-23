@@ -328,3 +328,10 @@ const PhoneNumber::View &PhoneNumber::getView() const
 {
     return viewSelf;
 }
+
+const PhoneNumber::View PhoneNumber::getReceivedNumberView(const UTF8 &receivedNumber)
+{
+    return (receivedNumber.isASCIICombination())
+               ? utils::PhoneNumber(receivedNumber.toASCII().value(), utils::country::Id::UNKNOWN).getView()
+               : utils::PhoneNumber(receivedNumber, utils::country::Id::UNKNOWN).getView();
+}

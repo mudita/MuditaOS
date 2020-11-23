@@ -30,13 +30,13 @@ namespace gui
             End,   /// we hit end of document
             Up,    /// we moved up a line
             Down,  /// we moved down a line
-
-            InLine, /// no action - passed movement by `0` or we are just somewhere comfty in visible range
+            Left,  /// we moved left inline
+            Right, /// we moved right inline
 
             Error, /// error - now not implemented
         };
 
-        TextCursor(gui::Text *parent, unsigned int pos = 0, unsigned int block = 0);
+        TextCursor(gui::Text *parent, unsigned int pos = text::npos, unsigned int block = text::npos);
         TextCursor() = delete;
 
         /// Up Down - end of line movement like in vi
@@ -46,6 +46,7 @@ namespace gui
         /// - with_update - updates position in parent ( if false not - means we handled it already with i.e. addChar or
         /// removeChar)
         virtual Move moveCursor(NavigationDirection direction);
+        virtual Move moveCursor(NavigationDirection direction, unsigned int n);
         void reset();
 
         // TODO note to self - here should be too UTF8 char handling, not in document...
@@ -57,15 +58,13 @@ namespace gui
         // TODO this can move our text out of bonds ( and might need calling expand() in Text)
         void addChar(uint32_t utf_val);
         TextCursor &operator<<(const UTF8 &);
-        TextCursor &operator<<(TextBlock);
+        TextCursor &operator<<(const TextBlock &);
         void removeChar();
 
-        auto getPosOnScreen() const
+        [[nodiscard]] auto getPosOnScreen() const
         {
             return pos_on_screen;
         }
-
-        auto processBound(InputBound bound, const InputEvent &event) -> InputBound;
     };
 } // namespace gui
 

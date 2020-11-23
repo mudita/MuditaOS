@@ -9,6 +9,7 @@
 #include "application-calendar/widgets/EventTimeItem.hpp"
 #include "application-calendar/widgets/SeveralOptionsItem.hpp"
 #include "application-calendar/widgets/CheckBoxWithLabelItem.hpp"
+#include "application-calendar/widgets/EventDateItem.hpp"
 #include "InternalModel.hpp"
 #include <ListItemProvider.hpp>
 
@@ -19,6 +20,7 @@ class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, pu
 
     gui::TextWithLabelItem *eventNameInput          = nullptr;
     gui::CheckBoxWithLabelItem *allDayEventCheckBox = nullptr;
+    gui::EventDateItem *dateItem                    = nullptr;
     gui::EventTimeItem *startTime                   = nullptr;
     gui::EventTimeItem *endTime                     = nullptr;
     gui::SeveralOptionsItem *reminder               = nullptr;

@@ -10,7 +10,7 @@
 
 namespace style::window::font
 {
-    const inline std::string default_fallback_font = "dejavu_sans_bold_27";
+    inline constexpr auto default_fallback_font = "dejavu_sans_bold_27";
 }
 
 namespace gui

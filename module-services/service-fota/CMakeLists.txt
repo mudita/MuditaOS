@@ -1,20 +1,22 @@
-include_directories( ${CMAKE_PROJECT_NAME}
-    PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-include_directories( ${PROJECT_NAME}
-    PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
+﻿project(service-fota)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}" )
 
-target_sources( ${PROJECT_NAME}
-    PRIVATE
-        ServiceFota.cpp
-        api/FotaServiceAPI.cpp
+set(SOURCES
+    ServiceFota.cpp
+    FotaUrcHandler.cpp
+    FotaServiceAPI.cpp
+)
+
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
+
+target_include_directories(${PROJECT_NAME}
     PUBLIC
-        messages/FotaMessages.hpp
+        ${CMAKE_CURRENT_LIST_DIR}
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+       service-cellular
+       module-cellular
 )
 

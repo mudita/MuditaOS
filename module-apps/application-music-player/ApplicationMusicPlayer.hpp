@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Application.hpp>
+#include <module-audio/Audio/decoder/decoder.hpp>
 
 namespace gui
 {
@@ -12,16 +13,16 @@ namespace gui
     {
         namespace window
         {
-            inline const std::string all_songs_window = "All Songs";
-            inline const std::string player_window    = "Player";
-            inline const std::string empty_window     = "Empty";
+            inline constexpr auto all_songs_window = "All Songs";
+            inline constexpr auto player_window    = "Player";
+            inline constexpr auto empty_window     = "Empty";
         }; // namespace window
     };     // namespace name
 };         // namespace gui
 
 namespace app
 {
-    const inline std::string name_music_player = "ApplicationMusicPlayer";
+    inline constexpr auto name_music_player = "ApplicationMusicPlayer";
 
     class ApplicationMusicPlayer : public Application
     {
@@ -32,7 +33,7 @@ namespace app
                                StartInBackground startInBackground = {false});
         virtual ~ApplicationMusicPlayer();
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 

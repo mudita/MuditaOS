@@ -12,6 +12,11 @@ ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
                                                  StartInBackground startInBackground)
     : Application(name, parent, startInBackground)
 {
+    addActionReceiver(manager::actions::ShowSpecialInput, [this](auto &&data) {
+        switchWindow(app::char_select, std::move(data));
+        return msgHandled();
+    });
+
     windowsFactory.attach(app::char_select, [](Application *app, const std::string &name) {
         return std::make_unique<gui::SpecialInputMainWindow>(app);
     });
@@ -19,7 +24,7 @@ ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
     setActiveWindow(app::char_select);
 }
 
-sys::Message_t ApplicationSpecialInput::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+sys::MessagePointer ApplicationSpecialInput::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     auto retMsg = Application::DataReceivedHandler(msgl);
     if (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {

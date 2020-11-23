@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <mock/BlockFactory.hpp>
 #include <RawFont.hpp>
+#include "Font.hpp"
+#include "RichTextParser.hpp"
 
 TEST_CASE("Text ctor")
 {
@@ -67,6 +69,16 @@ namespace gui
         {
             return mode;
         }
+
+        auto moveCursor(NavigationDirection direction, unsigned int n)
+        {
+            cursor->TextCursor::moveCursor(direction, n);
+        }
+
+        [[nodiscard]] auto getCursorPos()
+        {
+            return cursor->getPosOnScreen();
+        }
     };
 } // namespace gui
 
@@ -88,7 +100,7 @@ TEST_CASE("Text drawLines")
         REQUIRE(text.linesSize() == 1);
     }
 
-    SECTION("all multiline visible")
+    SECTION("all multiline visible with newline end")
     {
         unsigned int lines_count = 4;
         auto testline            = mockup::multiLineString(lines_count);
@@ -98,7 +110,8 @@ TEST_CASE("Text drawLines")
             textToTextBlocks(testline, fontmanager.getFont(0), TextBlock::End::Newline)));
 
         text.drawLines();
-        REQUIRE(text.linesSize() == lines_count);
+        // Extra one line for empty newline at end
+        REQUIRE(text.linesSize() == lines_count + 1);
     }
 }
 
@@ -114,18 +127,24 @@ TEST_CASE("Text buildDrawList")
     text.setSize(3000, 3000);
     text.setText(std::make_unique<TextDocument>(textToTextBlocks(testline, font, TextBlock::End::Newline)));
 
-    SECTION("check every element in every line if it's in parent and has non zero sizes")
+    SECTION("check every element in every line if it's in parent and has non zero sizes apart from last empty line "
+            "from newline")
     {
         REQUIRE(text.linesGet().size() > 0);
         for (auto &line : text.linesGet()) {
-            REQUIRE(line.length() > 0);
+            if (&line == &text.linesGet().back()) {
+                REQUIRE(line.length() == 0);
+            }
+            else {
+                REQUIRE(line.length() > 0);
+            }
         }
     }
 }
 
 TEST_CASE("handle input mode ABC/abc/1234")
 {
-    utils::localize.Switch(utils::Lang::En); /// needed to load input mode
+    utils::localize.SetDisplayLanguage(utils::Lang::En); /// needed to load input mode
     auto &fontmanager = mockup::fontManager();
     auto font         = fontmanager.getFont(0);
     auto text         = gui::TestText();
@@ -233,4 +252,708 @@ TEST_CASE("handle text block - moved cursor to end")
     test_text = test_text + newline;
     text.addText(newline);
     REQUIRE(text.getText() == test_text);
+}
+
+TEST_CASE("Text backup and restore tests")
+{
+    std::string testStringOneLine   = "Test String ";
+    std::string testStringTwoLines  = "Test String 1 \n Test String 2";
+    std::string overwriteTestString = "Overwrite test String";
+
+    SECTION("Backup one line text with moved cursor, overwrite text and restore")
+    {
+        mockup::fontManager();
+        auto text = new gui::TestText();
+
+        text->addText(testStringOneLine);
+
+        unsigned int cursorMoveN = 2;
+        text->moveCursor(gui::NavigationDirection::LEFT, cursorMoveN);
+
+        auto backup = text->backupText();
+
+        REQUIRE(backup.document.getText() == text->getText());
+        REQUIRE(backup.document.getText().length() == text->getText().length());
+        REQUIRE(backup.cursorPos == text->getCursorPos());
+
+        text->setText(overwriteTestString);
+
+        REQUIRE(text->getText() != testStringOneLine);
+
+        text->restoreFrom(backup);
+
+        REQUIRE(text->getText() == testStringOneLine);
+        REQUIRE(text->getCursorPos() == testStringOneLine.length() - cursorMoveN);
+    }
+
+    SECTION("Backup two line text with moved cursor, overwrite text and restore")
+    {
+        mockup::fontManager();
+        auto text = new gui::TestText();
+
+        text->addText(testStringTwoLines);
+
+        unsigned int cursorMoveN = 10;
+        text->moveCursor(gui::NavigationDirection::LEFT, cursorMoveN);
+
+        auto backup = text->backupText();
+
+        REQUIRE(backup.document.getText() == text->getText());
+        REQUIRE(backup.document.getText().length() == text->getText().length());
+        REQUIRE(backup.cursorPos == text->getCursorPos());
+
+        text->setText(overwriteTestString);
+
+        REQUIRE(text->getText() != testStringOneLine);
+
+        text->restoreFrom(backup);
+
+        REQUIRE(text->getText() == testStringTwoLines);
+        REQUIRE(text->getCursorPos() == testStringTwoLines.length() - cursorMoveN);
+    }
+}
+
+TEST_CASE("Text addition bounds - text sings count restricted")
+{
+    std::string testStringOneLine  = "Test String 1";
+    std::string testStringTwoLines = "Test String 1\n Test String 2";
+
+    std::string richTextTwoLines =
+        "<text font='gt_pressura' color='12' size='30'>Test</text><text size='25'>String</text><text size='20' "
+        "weight='bold'>1</text><br></br><text>Test String 2</text>";
+
+    SECTION("Adding text to max signs count set to 0")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, 0);
+
+        text->addText(testStringOneLine);
+
+        REQUIRE(text->getText().empty());
+    }
+
+    SECTION("Adding text to max signs count set to 1")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, 1);
+
+        text->addText(testStringOneLine);
+
+        REQUIRE(text->getText().length() == 1);
+    }
+
+    SECTION("Adding two lines text to max signs count set to one line sings count")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, testStringOneLine.length());
+
+        text->addText(testStringTwoLines);
+
+        REQUIRE(text->getText().length() == testStringOneLine.length());
+    }
+
+    SECTION("Adding two lines text to max signs count set to two line sings count")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, testStringTwoLines.length());
+
+        text->addText(testStringTwoLines);
+
+        REQUIRE(text->getText().length() == testStringTwoLines.length());
+    }
+
+    SECTION("Adding TextBlock with max sign count lower than block size")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, testStringOneLine.length());
+
+        text->addText(TextBlock(testStringTwoLines, Font(27).raw(), TextBlock::End::None));
+
+        REQUIRE(text->getText().length() == testStringOneLine.length());
+        REQUIRE(text->getText().length() != testStringTwoLines.length());
+    }
+
+    SECTION("Adding TextBlock with max sign count greater than block and adding more text after")
+    {
+        auto additionalSpace = 5;
+        auto textLimit       = testStringOneLine.length() + additionalSpace;
+
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, textLimit);
+
+        text->addText(TextBlock(testStringOneLine, Font(27).raw(), TextBlock::End::None));
+
+        REQUIRE(text->getText().length() == testStringOneLine.length());
+
+        text->addText(testStringOneLine);
+
+        REQUIRE(text->getText().length() == testStringOneLine.length() + additionalSpace);
+    }
+
+    SECTION("Adding RichText with max sign count lower than block size")
+    {
+        unsigned int signCountRestricted = 5;
+
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, signCountRestricted);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->getText().length() == signCountRestricted);
+    }
+
+    SECTION("Adding RichText with max sign count greater than block and adding more text after")
+    {
+        auto additionalSpace = 5;
+
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+
+        auto format         = text->getTextFormat();
+        auto parsedRichText = gui::text::RichTextParser().parse(richTextTwoLines, &format);
+        auto textLimit      = parsedRichText->getText().length() + additionalSpace;
+
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, textLimit);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->getText().length() == parsedRichText->getText().length());
+
+        text->addText(testStringOneLine);
+
+        REQUIRE(text->getText().length() == parsedRichText->getText().length() + additionalSpace);
+    }
+}
+
+TEST_CASE("Text addition bounds - text widget size restricted")
+{
+    std::string testStringOneLine  = "Test String 1";
+    std::string testStringTwoLines = "Test String 1\nTest String 2";
+
+    std::string testStringFirstLine  = "Test String 1";
+    std::string testStringSecondLine = "Test String 2";
+
+    std::string richTextTwoLines =
+        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='25'>String </text><text size='20' "
+        "weight='bold'>1</text><br></br><text>Test String 2</text>";
+
+    SECTION("Adding text to 0 size text and no parent to grant size")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(0, 0);
+
+        text->addText(testStringOneLine);
+
+        REQUIRE(text->getText().empty());
+    }
+
+    SECTION("Adding text to text with parent max size set to not fit")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
+        layout.setMaximumSize(10, 10);
+        layout.addWidget(text);
+
+        text->addText(testStringOneLine);
+
+        REQUIRE(text->getText().empty());
+    }
+
+    SECTION("Adding two lines text to text with no parent and size set to fit one line")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(200, 30);
+
+        text->addText(testStringTwoLines);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText() == testStringOneLine);
+        REQUIRE(text->getText() != testStringTwoLines);
+    }
+
+    SECTION("Adding two lines text to text with no parent and size set to fit two line")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(200, 60);
+
+        text->addText(testStringTwoLines);
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE(text->getText() != testStringOneLine);
+        REQUIRE(text->getText() == testStringTwoLines);
+    }
+
+    SECTION("Adding two lines text to text with space for two lines and parent size set to fit one line")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(200, 60);
+        BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
+        layout.setMaximumSize(200, 30);
+        layout.addWidget(text);
+
+        text->addText(testStringTwoLines);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText() == testStringOneLine);
+        REQUIRE(text->getText() != testStringTwoLines);
+    }
+
+    SECTION("Adding text block to 0 size text and no parent to grant size")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(0, 0);
+
+        text->addText(TextBlock(testStringOneLine, Font(27).raw(), TextBlock::End::None));
+
+        REQUIRE(text->getText().empty());
+    }
+
+    SECTION("Adding text block to text with parent max size set to not fit")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
+        layout.setMaximumSize(10, 10);
+        layout.addWidget(text);
+
+        text->addText(TextBlock(testStringOneLine, Font(27).raw(), TextBlock::End::None));
+
+        REQUIRE(text->getText().empty());
+    }
+
+    SECTION("Adding two lines text block to text with no parent and size set to fit one line")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(150, 30);
+
+        text->addText(TextBlock(testStringFirstLine, Font(27).raw(), TextBlock::End::Newline));
+        text->addText(TextBlock(testStringSecondLine, Font(27).raw(), TextBlock::End::None));
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText() == testStringFirstLine);
+        REQUIRE(text->getText() != testStringTwoLines);
+    }
+
+    SECTION("Adding two lines text block to text with no parent and size set to fit two line")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(200, 60);
+
+        text->addText(TextBlock(testStringFirstLine, Font(27).raw(), TextBlock::End::Newline));
+        text->addText(TextBlock(testStringSecondLine, Font(27).raw(), TextBlock::End::None));
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE(text->getText() != testStringFirstLine);
+        REQUIRE(text->getText() == testStringTwoLines);
+    }
+
+    SECTION("Adding two lines text block to text with space for two lines and parent size set to fit one line")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(200, 60);
+        BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
+        layout.setMaximumSize(150, 30);
+        layout.addWidget(text);
+
+        text->addText(TextBlock(testStringFirstLine, Font(27).raw(), TextBlock::End::Newline));
+        text->addText(TextBlock(testStringSecondLine, Font(27).raw(), TextBlock::End::None));
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText() == testStringFirstLine);
+        REQUIRE(text->getText() != testStringTwoLines);
+    }
+
+    SECTION("Adding RichText to 0 size text and no parent to grant size")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(0, 0);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->getText().empty());
+    }
+
+    SECTION("Adding RichText to text with parent max size set to not fit")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
+        layout.setMaximumSize(10, 10);
+        layout.addWidget(text);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->getText().empty());
+    }
+
+    SECTION("Adding two lines RichText to text with no parent and size set to fit one line")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(160, 40);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText() == testStringFirstLine);
+        REQUIRE(text->getText() != testStringTwoLines);
+    }
+
+    SECTION("Adding two lines RichText to text with no parent and size set to fit two line")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(200, 80);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE(text->getText() != testStringFirstLine);
+        REQUIRE(text->getText() == testStringTwoLines);
+    }
+
+    SECTION("Adding two lines RichText to text with space for two lines and parent size set to fit one line")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(200, 80);
+        BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
+        layout.setMaximumSize(160, 40);
+        layout.addWidget(text);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText() == testStringFirstLine);
+        REQUIRE(text->getText() != testStringTwoLines);
+    }
+}
+
+TEST_CASE("Text addition bounds - text widget line size restricted")
+{
+    std::string testStringOneLine  = "Test String 1";
+    std::string testStringTwoLines = "Test String 1\nTest String 2";
+
+    std::string testStringFirstLine  = "Test String 1";
+    std::string testStringSecondLine = "Test String 2";
+
+    std::string richTextTwoLines =
+        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='25'>String </text><text size='20' "
+        "weight='bold'>1</text><br></br><text>Test String 2</text>";
+
+    SECTION("Adding text to 0 line size text")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 0);
+        text->setMaximumSize(150, 100);
+
+        text->addText(testStringOneLine);
+
+        REQUIRE(text->getText().empty());
+    }
+
+    SECTION("Adding two lines text to 1 line size text")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 1);
+        text->setMaximumSize(150, 100);
+
+        text->addText(testStringTwoLines);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText() == testStringOneLine);
+        REQUIRE(text->getText() != testStringTwoLines);
+    }
+
+    SECTION("Adding two lines text to 2 line size text")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 2);
+        text->setMaximumSize(150, 100);
+
+        text->addText(testStringTwoLines);
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE(text->getText() == testStringTwoLines);
+        REQUIRE(text->getText() != testStringOneLine);
+    }
+
+    SECTION("Adding text block to 0 line size text")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 0);
+        text->setMaximumSize(150, 100);
+
+        text->addText(TextBlock(testStringOneLine, Font(27).raw(), TextBlock::End::None));
+
+        REQUIRE(text->getText().empty());
+    }
+
+    SECTION("Adding two block lines text to 1 line size text")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 1);
+        text->setMaximumSize(150, 100);
+
+        text->addText(TextBlock(testStringFirstLine, Font(27).raw(), TextBlock::End::Newline));
+        text->addText(TextBlock(testStringSecondLine, Font(27).raw(), TextBlock::End::None));
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText() == testStringOneLine);
+        REQUIRE(text->getText() != testStringTwoLines);
+    }
+
+    SECTION("Adding two lines text to 2 line size text")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 2);
+        text->setMaximumSize(150, 100);
+
+        text->addText(TextBlock(testStringFirstLine, Font(27).raw(), TextBlock::End::Newline));
+        text->addText(TextBlock(testStringSecondLine, Font(27).raw(), TextBlock::End::None));
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE(text->getText() == testStringTwoLines);
+        REQUIRE(text->getText() != testStringOneLine);
+    }
+
+    SECTION("Adding RichText to 0 line size text")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 0);
+        text->setMaximumSize(150, 100);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->getText().empty());
+    }
+
+    SECTION("Adding two lines RichText to 1 line size text")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 1);
+        text->setMaximumSize(160, 100);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText() == testStringFirstLine);
+        REQUIRE(text->getText() != testStringTwoLines);
+    }
+
+    SECTION("Adding two lines RichText to 2 line size text")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 2);
+        text->setMaximumSize(160, 100);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE(text->getText() == testStringTwoLines);
+        REQUIRE(text->getText() != testStringFirstLine);
+    }
+}
+
+TEST_CASE("Text addition bounds - multiple limits tests")
+{
+    std::string testStringOneLine  = "Test String 1";
+    std::string testStringTwoLines = "Test String 1\nTest String 2";
+
+    std::string richTextTwoLines =
+        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='25'>String </text><text size='20' "
+        "weight='bold'>1</text><br></br><text>Test String 2</text>";
+
+    SECTION("Adding text to lower limit set to signs count and size and lines on higher limit")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 2);
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, testStringOneLine.length());
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(150, 100);
+
+        text->addText(testStringTwoLines);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText() == testStringOneLine);
+        REQUIRE(text->getText().length() == testStringOneLine.length());
+    }
+
+    SECTION("Adding text to lower limit set to lines count and size and signs count on higher limit")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+
+        unsigned int signsLimit = 100;
+
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 1);
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, signsLimit);
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(150, 100);
+
+        text->addText(testStringOneLine);
+        text->addText(testStringOneLine);
+        text->addText(testStringOneLine);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText().length() != signsLimit);
+    }
+
+    SECTION("Adding text to lower limit set to size and lines size and signs count on higher limit")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+
+        unsigned int signsLimit = 100;
+
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 3);
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, signsLimit);
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(140, 30);
+
+        text->addText(testStringOneLine);
+        text->addText(testStringOneLine);
+        text->addText(testStringOneLine);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText() == testStringOneLine);
+        REQUIRE(text->getText().length() != signsLimit);
+    }
+
+    SECTION("Adding RichText to lower limit set to signs count and size and lines on higher limit")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+
+        auto format         = text->getTextFormat();
+        auto parsedRichText = gui::text::RichTextParser().parse(richTextTwoLines, &format);
+
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 4);
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, parsedRichText->getText().length());
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(300, 100);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE(text->getText().length() == parsedRichText->getText().length());
+    }
+
+    SECTION("Adding RichText to lower limit set to lines count and size and signs count on higher limit")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+
+        unsigned int signsLimit = 100;
+
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 1);
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, signsLimit);
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(300, 100);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText().length() != signsLimit);
+    }
+
+    SECTION("Adding RichText to lower limit set to size and lines size and signs count on higher limit")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = new gui::TestText();
+
+        unsigned int signsLimit = 100;
+
+        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 3);
+        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, signsLimit);
+        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setMaximumSize(140, 30);
+
+        text->addRichText(richTextTwoLines);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE(text->getText().length() != signsLimit);
+    }
 }

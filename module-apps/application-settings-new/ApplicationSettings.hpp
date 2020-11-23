@@ -9,44 +9,43 @@
 
 namespace gui::window::name
 {
-    inline const std::string bluetooth   = "Bluetooth";
-    inline const std::string all_devices = "AllDevices";
-    inline const std::string phone_name  = "PhoneName";
-    inline const std::string add_device  = "AddDevice";
+    inline constexpr auto bluetooth   = "Bluetooth";
+    inline constexpr auto all_devices = "AllDevices";
+    inline constexpr auto phone_name  = "PhoneName";
+    inline constexpr auto add_device  = "AddDevice";
 
-    inline const std::string network        = "Network";
-    inline const std::string phone_modes    = "PhoneModes";
-    inline const std::string apps_and_tools = "AppsAndTools";
-    inline const std::string security       = "Security";
-    inline const std::string system         = "System";
+    inline constexpr auto network        = "Network";
+    inline constexpr auto phone_modes    = "PhoneModes";
+    inline constexpr auto apps_and_tools = "AppsAndTools";
+    inline constexpr auto security       = "Security";
+    inline constexpr auto system         = "System";
 
-    inline const std::string display_light  = "DisplayLight";
-    inline const std::string font_size      = "FontSize";
-    inline const std::string keypad_light   = "KeypadLight";
-    inline const std::string input_language = "InputLanguage";
-    inline const std::string locked_screen  = "LockedScreen";
+    inline constexpr auto display_light  = "DisplayLight";
+    inline constexpr auto font_size      = "FontSize";
+    inline constexpr auto keypad_light   = "KeypadLight";
+    inline constexpr auto input_language = "InputLanguage";
+    inline constexpr auto locked_screen  = "LockedScreen";
 
-    inline const std::string messages  = "Messages";
-    inline const std::string torch     = "Torch";
-    inline const std::string templates = "Templates";
+    inline constexpr auto messages  = "Messages";
+    inline constexpr auto torch     = "Torch";
+    inline constexpr auto templates = "Templates";
 
-    inline const std::string autolock  = "Autolock";
-    inline const std::string wallpaper = "Wallpaper";
-    inline const std::string quotes    = "Quotes";
-    inline const std::string new_quote = "NewQuote";
+    inline constexpr auto autolock  = "Autolock";
+    inline constexpr auto wallpaper = "Wallpaper";
+    inline constexpr auto quotes    = "Quotes";
+    inline constexpr auto new_quote = "NewQuote";
 
-    inline const std::string display_and_keypad = "DisplayAndKeypad";
-
-    inline const std::string change_settings = "ChangeSettings";
-    inline const std::string all_operators   = "AllOperators";
-    inline const std::string import_contacts = "ImportContacts";
-    inline const std::string dialog_settings = "DialogSettings";
+    inline constexpr auto display_and_keypad = "DisplayAndKeypad";
+    inline constexpr auto change_settings    = "ChangeSettings";
+    inline constexpr auto all_operators      = "AllOperators";
+    inline constexpr auto import_contacts    = "ImportContacts";
+    inline constexpr auto dialog_settings    = "DialogSettings";
 
 } // namespace gui::window::name
 
 namespace app
 {
-    inline const std::string name_settings_new = "ApplicationSettingsNew";
+    inline constexpr auto name_settings_new = "ApplicationSettingsNew";
 
     class ApplicationSettingsNew : public app::Application
     {
@@ -54,7 +53,7 @@ namespace app
         ApplicationSettingsNew(std::string name                    = name_settings_new,
                                std::string parent                  = {},
                                StartInBackground startInBackground = {false});
-        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::Message_t override;
+        auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
         auto InitHandler() -> sys::ReturnCodes override;
 
         auto SwitchPowerModeHandler(const sys::ServicePowerMode mode) -> sys::ReturnCodes final

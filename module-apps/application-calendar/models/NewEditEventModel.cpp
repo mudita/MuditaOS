@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditEventModel.hpp"
@@ -9,7 +9,7 @@
 #include <ListView.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 #include <module-apps/application-calendar/ApplicationCalendar.hpp>
 
@@ -72,6 +72,8 @@ void NewEditEventModel::createData(bool allDayEvent)
     allDayEventCheckBox = new gui::NewEventCheckBoxWithLabel(
         application, utils::localize.get("app_calendar_new_edit_event_allday"), true, this);
 
+    dateItem = new gui::EventDateItem();
+
     startTime = new gui::EventTimeItem(
         utils::localize.get("app_calendar_new_edit_event_start"),
         mode24H,
@@ -99,9 +101,13 @@ void NewEditEventModel::createData(bool allDayEvent)
     endTime->setConnectionToSecondItem(startTime);
     startTime->setConnectionToSecondItem(endTime);
 
+    startTime->setConnectionToDateItem(dateItem);
+    endTime->setConnectionToDateItem(dateItem);
+
     internalData.push_back(eventNameInput);
     internalData.push_back(allDayEventCheckBox);
     if (!allDayEvent) {
+        internalData.push_back(dateItem);
         internalData.push_back(startTime);
         internalData.push_back(endTime);
     }
@@ -133,6 +139,23 @@ void NewEditEventModel::loadData(std::shared_ptr<EventsRecord> record)
         }
     }
 
+    if (isAllDayEvent()) {
+        record->date_from = record->date_from - TimePointToHourMinSec(record->date_from).hours() -
+                            TimePointToHourMinSec(record->date_from).minutes() +
+                            TimePointToHourMinSec(TimePointNow()).hours() +
+                            TimePointToHourMinSec(TimePointNow()).minutes();
+        record->date_till = record->date_from + std::chrono::hours(1);
+        if (dateItem->onLoadCallback) {
+            dateItem->onLoadCallback(record);
+        }
+        if (startTime->onLoadCallback) {
+            startTime->onLoadCallback(record);
+        }
+        if (endTime->onLoadCallback) {
+            endTime->onLoadCallback(record);
+        }
+    }
+
     list->rebuildList();
 }
 
@@ -145,6 +168,7 @@ void NewEditEventModel::loadRepeat(const std::shared_ptr<EventsRecord> &record)
 
 void NewEditEventModel::loadDataWithoutTimeItem()
 {
+    internalData.erase(std::find(internalData.begin(), internalData.end(), dateItem));
     internalData.erase(std::find(internalData.begin(), internalData.end(), startTime));
     internalData.erase(std::find(internalData.begin(), internalData.end(), endTime));
     list->rebuildList();
@@ -156,6 +180,7 @@ void NewEditEventModel::reloadDataWithTimeItem()
 
     internalData.push_back(eventNameInput);
     internalData.push_back(allDayEventCheckBox);
+    internalData.push_back(dateItem);
     internalData.push_back(startTime);
     internalData.push_back(endTime);
     internalData.push_back(reminder);
@@ -192,13 +217,14 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
             DBServiceAPI::GetQuery(
                 application, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(*record));
 
-            if (application->getPrevWindow() == style::window::calendar::name::no_events_window) {
-                auto data      = std::make_unique<DayMonthData>();
-                auto startDate = TimePointToYearMonthDay(record->date_from);
-                std::string monthStr =
-                    utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
-                data->setData(std::to_string(unsigned(startDate.day())) + " " + monthStr, record->date_from);
+            auto data       = std::make_unique<DayMonthData>();
+            auto startDate  = TimePointToYearMonthDay(record->date_from);
+            auto filterDate = TimePointFromYearMonthDay(startDate);
+            std::string monthStr =
+                utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
+            data->setData(std::to_string(unsigned(startDate.day())) + " " + monthStr, filterDate);
 
+            if (application->getPrevWindow() == style::window::calendar::name::no_events_window) {
                 auto app = dynamic_cast<app::ApplicationCalendar *>(application);
                 assert(app != nullptr);
                 if (app->getEquivalentToEmptyWindow() == EquivalentWindow::DayEventsWindow) {
@@ -211,6 +237,9 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
                 }
             }
             else {
+                if (application->getPrevWindow() == style::window::calendar::name::day_events_window) {
+                    application->switchWindow(style::window::calendar::name::day_events_window, std::move(data));
+                }
                 application->returnToPreviousWindow();
             }
         }

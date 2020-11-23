@@ -1,15 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <memory> // for make_unique, unique_ptr
-#include <string> // for string
+#include "ContactHelper.hpp"
 
-#include "Endpoint.hpp" // for Endpoint
-#include "Service/Service.hpp"
-#include "ContactHelper.hpp" // for ContactHelper
-#include "ParserUtils.hpp"   // for parserFSM
+#include <endpoints/Endpoint.hpp>
+#include <parser/ParserUtils.hpp>
+
+#include <Service/Service.hpp>
+
+#include <memory>
+#include <string>
 
 namespace parserFSM
 {

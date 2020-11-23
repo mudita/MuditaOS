@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+﻿cmake_minimum_required(VERSION 3.12)
 
 project(module-cellular VERSION 1.0
         DESCRIPTION "Cellular module library")
@@ -23,11 +23,17 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_START.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_TEST.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_WAKEUP.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_Any.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_QIND.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CUSD.cpp       
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CTZE.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/URC_CREG.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Urc.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcQind.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcCusd.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcCtze.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcCreg.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcCmti.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcClip.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcCpin.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcPoweredDown.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcResponse.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcFactory.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Commands.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
         )
@@ -70,7 +76,17 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME} module-bsp module-utils module-vfs  module-sys module-db )
+target_link_libraries(${PROJECT_NAME}
+    service-cellular
+    service-eink
+    service-fota
+    module-utils
+    module-vfs
+    module-services
+    module-sys
+    module-db
+    module-bsp
+)
 
 if (${ENABLE_TESTS})
     add_subdirectory( test )

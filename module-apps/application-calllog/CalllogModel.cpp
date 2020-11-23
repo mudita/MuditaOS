@@ -1,14 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogModel.hpp"
 #include "InputEvent.hpp"
 #include "ListView.hpp"
-#include "UiCommonActions.hpp"
 #include "data/CallLogInternals.hpp"
 #include "data/CallLogSwitchData.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
 #include "widgets/CalllogItem.hpp"
+
+#include <service-db/DBServiceAPI.hpp>
+#include <service-appmgr/Controller.hpp>
+#include "application-call/data/CallSwitchData.hpp"
 
 using namespace calllog;
 
@@ -74,7 +76,10 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
         }
         if (event.keyCode == gui::KeyCode::KEY_LF) {
             LOG_DEBUG("calling");
-            return app::call(application, item->getCall().phoneNumber);
+            return app::manager::Controller::sendAction(
+                application,
+                app::manager::actions::Dial,
+                std::make_unique<app::ExecuteCallData>(item->getCall().phoneNumber));
         }
         return false;
     };

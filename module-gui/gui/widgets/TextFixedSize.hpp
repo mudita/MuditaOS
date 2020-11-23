@@ -12,7 +12,6 @@ namespace gui
     {
       protected:
         unsigned int linesCount   = style::text::maxTextLines;
-        Position underlinePadding = 0;
 
         void drawLines() override;
 

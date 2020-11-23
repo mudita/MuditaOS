@@ -2,6 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Database.hpp"
+#include "DatabaseInitializer.hpp"
+
 #include "log/log.hpp"
 #include "vfs.hpp"
 #include <assert.h>
@@ -61,9 +63,11 @@ extern "C"
     }
 }
 
-Database::Database(const char *name) : dbConnection(nullptr), dbName(name), isInitialized_(false)
+Database::Database(const char *name)
+    : dbConnection(nullptr), dbName(name), isInitialized_(false),
+      initializer(std::make_unique<DatabaseInitializer>(this))
 {
-    LOG_INFO("creating database: %s", dbName);
+    LOG_INFO("creating database: %s", dbName.c_str());
     auto rc = sqlite3_open(name, &dbConnection);
     if (rc != SQLITE_OK) {
         LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d dbName=%s", rc, name);
@@ -71,7 +75,9 @@ Database::Database(const char *name) : dbConnection(nullptr), dbName(name), isIn
     assert(rc == SQLITE_OK);
     pragmaQuery("PRAGMA integrity_check;");
     pragmaQuery("PRAGMA locking_mode=EXCLUSIVE");
-    pragmaQuery("PRAGMA journal_mode=WAL");
+
+    LOG_INFO("running scripts: %s", USER_PATH("db"));
+    isInitialized_ = initializer->run(USER_PATH("db"), INIT_SCRIPTS_EXT);
 }
 
 Database::~Database()
@@ -183,15 +189,15 @@ void Database::pragmaQuery(const std::string &pragmaStatemnt)
 
 bool Database::storeIntoFile(const std::string &backupPath)
 {
-    LOG_INFO("Backup database: %s, into file: %s - STARTED", dbName, backupPath.c_str());
+    LOG_INFO("Backup database: %s, into file: %s - STARTED", dbName.c_str(), backupPath.c_str());
 
     auto rc = execute("VACUUM INTO '%q';", backupPath.c_str());
 
     if (rc == true) {
-        LOG_INFO("Backup database: %s, into file: %s - SUCCEDED", dbName, backupPath.c_str());
+        LOG_INFO("Backup database: %s, into file: %s - SUCCEDED", dbName.c_str(), backupPath.c_str());
     }
     else {
-        LOG_ERROR("Backup database: %s, into file: %s - FAILED", dbName, backupPath.c_str());
+        LOG_ERROR("Backup database: %s, into file: %s - FAILED", dbName.c_str(), backupPath.c_str());
     }
 
     return rc;

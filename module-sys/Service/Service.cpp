@@ -7,7 +7,7 @@
 #include "MessageType.hpp"     // for MessageType, MessageType::MessageType...
 #include "Service/Common.hpp"  // for BusChannels, ReturnCodes, ReturnCodes...
 #include "Service/Mailbox.hpp" // for Mailbox
-#include "Service/Message.hpp" // for Message, Message_t, DataMessage, Resp...
+#include "Service/Message.hpp" // for Message, MessagePointer, DataMessage, Resp...
 #include "Timer.hpp"           // for Timer
 #include "TimerMessage.hpp"    // for TimerMessage
 #include "log/debug.hpp"       // for DEBUG_SERVICE_MESSAGES
@@ -26,7 +26,7 @@
 #endif
 
 // this could use Scoped() class from utils to print execution time too
-void debug_msg(sys::Service *srvc, sys::DataMessage *&ptr)
+void debug_msg(sys::Service *srvc, const sys::Message *ptr)
 {
 #if (DEBUG_SERVICE_MESSAGES > 0)
 
@@ -78,11 +78,8 @@ namespace sys
 
     void Service::Run()
     {
-
         while (enableRunLoop) {
-
-            auto msg = mailbox.pop();
-
+            auto msg           = mailbox.pop();
             uint32_t timestamp = cpp_freertos::Ticks::GetTicks();
 
             // Remove all staled messages
@@ -94,40 +91,56 @@ namespace sys
                                                 }),
                                  staleUniqueMsg.end());
 
-            /// this is the only place that uses Reponse messages (service manager doesnt...)
-            auto ret = msg->Execute(this);
-            if (ret == nullptr) {
-                ret = std::make_shared<DataMessage>(MessageType::MessageTypeUninitialized);
+            const bool respond = msg->type != Message::Type::Response && GetName() != msg->sender;
+            auto response      = msg->Execute(this);
+            if (response == nullptr || !respond) {
+                continue;
             }
 
-            // Unicast messages always need response with the same ID as received message
-            // Don't send responses to themselves,
-            // Don't send responses to responses
-            if ((msg->transType == Message::TransmissionType ::Unicast) && (msg->type != Message::Type::Response) &&
-                (GetName() != msg->sender)) {
-                Bus::SendResponse(ret, msg, this);
-            }
+            Bus::SendResponse(response, msg, this);
         }
-
         Bus::Remove(shared_from_this());
     };
 
-    auto Service::MessageEntry(DataMessage *message, ResponseMessage *response) -> Message_t
+    auto Service::MessageEntry(Message *message, ResponseMessage *response) -> MessagePointer
     {
-        Message_t ret = std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-        auto idx      = type_index(typeid(*message));
-        auto handler  = message_handlers.find(idx);
+        return response == nullptr ? HandleMessage(message) : HandleResponse(response);
+    }
+
+    auto Service::HandleMessage(Message *message) -> MessagePointer
+    {
         debug_msg(this, message);
-        if (handler != message_handlers.end()) {
-            ret = message_handlers[idx](message, response);
-            if (ret != nullptr) {
-                ret->type = sys::Message::Type::Response;
-            }
+
+        if (const auto &[handled, ret] = ExecuteMessageHandler(message); handled) {
+            return ret;
         }
-        else {
-            ret = DataReceivedHandler(message, response);
+        if (auto dataMsg = dynamic_cast<DataMessage *>(message); dataMsg != nullptr) {
+            return DataReceivedHandler(dataMsg, nullptr);
         }
-        return ret;
+
+        LOG_ERROR("Failed to handle message of type [%s]", typeid(*message).name());
+        return nullptr;
+    }
+
+    auto Service::HandleResponse(ResponseMessage *message) -> MessagePointer
+    {
+        debug_msg(this, message);
+
+        if (const auto &[handled, ret] = ExecuteMessageHandler(message); handled) {
+            return ret;
+        }
+        DataMessage dummy(MessageType::MessageTypeUninitialized);
+        return DataReceivedHandler(&dummy, message);
+    }
+
+    auto Service::ExecuteMessageHandler(Message *message) -> std::pair<bool, MessagePointer>
+    {
+        const auto idx = type_index(typeid(*message));
+        if (const auto handler = message_handlers.find(idx); handler != message_handlers.end()) {
+            const auto &handlerFunction = handler->second;
+            return {true, handlerFunction(message)};
+        }
+        return {false, nullptr};
     }
 
     bool Service::connect(const type_info &type, MessageHandler handler)
@@ -150,7 +163,7 @@ namespace sys
 
     bool Service::connect(Message &&msg, MessageHandler handler)
     {
-        return Service::connect(&msg, handler);
+        return connect(&msg, handler);
     }
 
     void Service::CloseHandler()
@@ -182,5 +195,40 @@ namespace sys
         for (auto timer : list) {
             timer->stop();
         }
+    }
+
+    auto Proxy::handleMessage(Service *service, Message *message, ResponseMessage *response) -> MessagePointer
+    {
+        if (service->isReady) {
+            return service->MessageEntry(message, response);
+        }
+        return std::make_shared<ResponseMessage>(ReturnCodes::ServiceDoesntExist);
+    }
+
+    auto Proxy::handleSystemMessage(Service *service, SystemMessage *message) -> MessagePointer
+    {
+        auto ret = ReturnCodes::Success;
+        switch (message->systemMessageType) {
+        case SystemMessageType::Ping:
+            service->pingTimestamp = cpp_freertos::Ticks::GetTicks();
+            break;
+        case SystemMessageType::SwitchPowerMode:
+            service->SwitchPowerModeHandler(message->powerMode);
+            break;
+        case SystemMessageType::Exit:
+            ret = service->DeinitHandler();
+            service->CloseHandler();
+            break;
+        case SystemMessageType::Timer:
+            ret = service->TimerHandle(*message);
+            break;
+        case SystemMessageType::Start:
+            ret = service->InitHandler();
+            if (ret == ReturnCodes::Success) {
+                service->isReady = true;
+            }
+            break;
+        }
+        return std::make_shared<ResponseMessage>(ret);
     }
 } // namespace sys

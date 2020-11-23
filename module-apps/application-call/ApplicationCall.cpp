@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCall.hpp"
@@ -15,63 +15,62 @@
 #include <Application.hpp>
 #include <MessageType.hpp>
 #include <PhoneNumber.hpp>
-#include <UiCommonActions.hpp>
 #include <Dialog.hpp>
 #include <log/log.hpp>
 #include <memory>
 #include <service-cellular/ServiceCellular.hpp>
-#include <service-cellular/api/CellularServiceAPI.hpp>
-#include <service-audio/api/AudioServiceAPI.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <time/time_conversion.hpp>
 #include <ticks.hpp>
 
 #include <cassert>
+#include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
+#include <module-services/service-db/service-db/DBServiceAPI.hpp>
 
 namespace app
 {
     ApplicationCall::ApplicationCall(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground, app::call_stack_size)
     {
-        addActionReceiver(manager::actions::Call,
-                          [this](auto data) { switchWindow(window::name_enterNumber, std::move(data)); });
+        addActionReceiver(manager::actions::Call, [this](auto &&data) {
+            switchWindow(window::name_call, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::Dial, [this](auto data) {
+            switchWindow(window::name_enterNumber, std::move(data));
+            return msgHandled();
+        });
     }
 
     //  number of seconds after end call to switch back to previous application
     const inline utils::time::Duration delayToSwitchToPreviousApp = 3;
 
-    void switchWindowOrApp(Application *app, std::unique_ptr<gui::SwitchData> &&data)
-    {
-        if (app->getState() == Application::State::ACTIVE_FORGROUND) {
-            app->switchWindow(window::name_call, std::move(data));
-        }
-        else {
-            app::manager::Controller::switchApplication(app, name_call, window::name_call, std::move(data));
-        }
-    }
-
     void ApplicationCall::CallAbortHandler()
     {
-        switchWindowOrApp(this, std::make_unique<app::CallAbortData>());
+        manager::Controller::sendAction(this, manager::actions::Call, std::make_unique<app::CallAbortData>());
     }
 
     void ApplicationCall::CallActiveHandler()
     {
-        switchWindowOrApp(this, std::make_unique<app::CallActiveData>());
+        manager::Controller::sendAction(this, manager::actions::Call, std::make_unique<app::CallActiveData>());
     }
 
     void ApplicationCall::IncomingCallHandler(const CellularCallMessage *const msg)
     {
-        switchWindowOrApp(this, std::make_unique<app::IncomingCallData>(msg->number));
+        manager::Controller::sendAction(
+            this, manager::actions::Call, std::make_unique<app::IncomingCallData>(msg->number));
     }
 
     void ApplicationCall::RingingHandler(const CellularCallMessage *const msg)
     {
-        switchWindowOrApp(this, std::make_unique<app::ExecuteCallData>(msg->number));
+        manager::Controller::sendAction(
+            this, manager::actions::Call, std::make_unique<app::ExecuteCallData>(msg->number));
     }
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationCall::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
 
         auto retMsg = Application::DataReceivedHandler(msgl);
@@ -203,7 +202,35 @@ namespace app
     void ApplicationCall::handleAddContactEvent(const std::string &number)
     {
         LOG_INFO("add contact information: %s", number.c_str());
-        app::contact(this, app::ContactOperation::Add, number);
+
+        auto searchResults = DBServiceAPI::ContactSearch(this, UTF8{}, UTF8{}, number);
+        if (const auto resultsSize = searchResults->size(); resultsSize > 1) {
+            LOG_FATAL("Found more than one contact for number %s", number.c_str());
+            for (auto i : *searchResults) {
+                LOG_FATAL("ContactID = %" PRIu32, i.ID);
+            }
+        }
+        else if (resultsSize == 1) {
+            const auto &contactRecord = searchResults->front();
+            LOG_INFO("Found contact matching search num %s : contact ID %" PRIu32 " - %s %s",
+                     number.c_str(),
+                     contactRecord.ID,
+                     contactRecord.primaryName.c_str(),
+                     contactRecord.alternativeName.c_str());
+            app::manager::Controller::sendAction(
+                this,
+                app::manager::actions::AddContact,
+                std::make_unique<PhonebookItemData>(std::make_shared<ContactRecord>(contactRecord)));
+        }
+        else {
+            ContactRecord contactRecord;
+            contactRecord.numbers.emplace_back(ContactRecord::Number(utils::PhoneNumber(number).getView()));
+
+            auto data = std::make_unique<PhonebookItemData>(std::make_shared<ContactRecord>(contactRecord));
+            data->ignoreCurrentWindowOnStack = true;
+            app::manager::Controller::sendAction(
+                this, manager::actions::AddContact, std::move(data), manager::OnSwitchBehaviour::RunInBackground);
+        }
     }
 
     void ApplicationCall::transmitDtmfTone(uint32_t digit)

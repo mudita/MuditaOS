@@ -21,8 +21,8 @@ namespace gui
 
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        void onClose() override;
         void buildInterface() override;
+        void onClose() override;
 
       private:
         bool selectContact();
@@ -37,12 +37,17 @@ namespace gui
             -> bool;
         void storeMessageDraft(const utils::PhoneNumber::View &number, const UTF8 &text);
         void storeMessageDraft(SMSRecord &sms, const UTF8 &text);
-
         static inline constexpr std::chrono::milliseconds getThreadTimeout{1000};
         gui::Text *recipient = nullptr;
         gui::Text *message   = nullptr;
         gui::VBox *body      = nullptr;
         std::shared_ptr<ContactRecord> contact;
         utils::PhoneNumber::View phoneNumber;
+
+        /// MessageMemento class provides buffer-like functionality for message field of NewMessageWindow.
+        /// MessageMemento shall be used whenever there is a need for temporary window switch in normal (uninterrupted)
+        /// flow of new message preparation, such as using options or recipient selection.
+        class MessageMemento;
+        static std::unique_ptr<MessageMemento> memento;
     };
 } /* namespace gui */

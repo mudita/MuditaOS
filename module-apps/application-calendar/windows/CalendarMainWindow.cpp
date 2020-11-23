@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalendarMainWindow.hpp"
@@ -7,11 +7,11 @@
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "application-calendar/data/CalendarData.hpp"
 #include "NoEvents.hpp"
-#include <module-services/service-db/messages/QueryMessage.hpp>
 #include <module-db/queries/calendar/QueryEventsGetAll.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
+#include <service-db/QueryMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
 
 namespace gui
 {
@@ -221,13 +221,16 @@ namespace gui
         }
         if (auto response = dynamic_cast<db::query::events::GetAllResult *>(queryResult)) {
             const auto records = response->getResult();
+            auto day           = monthBox->getFocusItemIndex() + 1;
+            auto filter = TimePointFromYearMonthDay(monthModel->getYear() / monthModel->getMonth() / date::day(day));
             if (!records->empty()) {
-                application->switchWindow(style::window::calendar::name::all_events_window);
+                auto data = std::make_unique<DayMonthData>();
+                data->setData("", filter);
+                application->switchWindow(style::window::calendar::name::all_events_window, std::move(data));
             }
             else {
                 auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
                 assert(appCalendar != nullptr);
-                auto filter = TimePointFromYearMonthDay(actualDate);
                 appCalendar->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"), filter);
             }
             return true;

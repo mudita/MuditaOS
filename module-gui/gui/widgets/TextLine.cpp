@@ -28,49 +28,50 @@ namespace gui
 
     /// Note - line breaking could be done here with different TextLines to return
     /// or via different block types (i.e. numeric block tyle could be not "breakable"
-    TextLine::TextLine(const BlockCursor &cursor, unsigned int max_width) : max_width(max_width)
+    TextLine::TextLine(BlockCursor &localCursor, unsigned int max_width) : max_width(max_width)
     {
-        BlockCursor localCursor = cursor;
-        localCursor.resetJumps();
-
         do {
             if (!localCursor) { // cursor is faulty
+                lineEnd = true;
                 return;
             }
 
-            if (localCursor.atEnd()) {
-                return;
-            }
-
-            if (localCursor.atEol()) {
-                width_used = max_width;
+            if (localCursor.atEnd() && !localCursor.checkLastNewLine()) {
+                lineEnd = true;
                 return;
             }
 
             // take text we want to show
             auto text = localCursor.getUTF8Text();
 
-            if (text.length() == 0) {
-                ++localCursor;
+            if (text.length() == 0 && localCursor.checkCurrentBlockNoNewLine() && !localCursor.atEnd()) {
+                localCursor.goToNextBlock();
                 continue;
             }
 
             auto text_format = localCursor->getFormat();
             if (text_format->getFont() == nullptr) {
-                break;
+                return;
+            }
+
+            // check if max provided width is enought to enter one char at least
+            if (max_width < text_format->getFont()->getCharPixelWidth(text[0])) {
+                lineEnd = true;
+                return;
             }
 
             auto can_show = text_format->getFont()->getCharCountInSpace(text, max_width - width_used);
 
             // we can show nothing - this is the end of this line
             if (can_show == 0) {
-                auto item = buildUITextPart("", text_format);
-                width_used += item->getTextNeedSpace();
-                height_used = std::max(height_used, item->getTextHeight());
 
+                auto item   = buildUITextPart("", text_format);
+                width_used  = item->getTextNeedSpace();
+                height_used = std::max(height_used, item->getTextHeight());
                 elements_to_show_in_line.emplace_back(item);
-                block_nr = cursor.getBlockNr();
-                break;
+                end = localCursor->getEnd();
+
+                return;
             }
 
             // create item for show and update Line data
@@ -79,15 +80,19 @@ namespace gui
             width_used += item->getTextNeedSpace();
             height_used = std::max(height_used, item->getTextHeight());
             elements_to_show_in_line.emplace_back(item);
+            end = localCursor->getEnd();
 
-            block_nr = cursor.getBlockNr();
+            localCursor += can_show;
+
+            if (localCursor.checkAndInvalidateBlockChanged() && localCursor.checkPreviousBlockNewLine()) {
+                return;
+            }
 
             // not whole text shown, try again for next line if you want
             if (can_show < text.length()) {
-                break;
+                return;
             }
 
-            localCursor += can_show;
         } while (true);
     }
 
@@ -101,8 +106,8 @@ namespace gui
         drawUnderline            = from.drawUnderline;
         drawUnderlineMode        = from.drawUnderlineMode;
         underlinePadding         = from.underlinePadding;
+        lineEnd                  = from.lineEnd;
         end                      = from.end;
-        block_nr                 = from.block_nr;
         max_width                = from.max_width;
     }
 
@@ -290,16 +295,4 @@ namespace gui
         }
     }
 
-    auto TextLine::checkBounds(TextLineCursor &cursor, uint32_t utf_value, const TextFormat *format) -> InputBound
-    {
-        auto font = format->getFont();
-        auto text = getText(0);
-        text.insertCode(utf_value);
-
-        if ((font->getPixelWidth(text)) <= max_width) {
-            return InputBound::CAN_ADD;
-        }
-
-        return InputBound::CANT_PROCESS;
-    }
 } // namespace gui

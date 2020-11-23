@@ -14,6 +14,11 @@ else
   BUILD_PATH=$1
 fi
 
+if [ ! -d $BUILD_PATH ]; then
+	echo "build directory: $BUILD_PATH does not exit"
+	exit 2
+fi
+
 check_target_rt1051 "$BUILD_PATH"
 
 MUDITAOS_DEV=/dev/disk/by-id/usb-NXP_SEMI_NXP_MASS_STORAGE_0123456789ABCDEF-0:0-part1
@@ -22,11 +27,30 @@ MUDITAOS_DISK=`readlink -f $MUDITAOS_DEV`
 MUDITAOS_DISK_RECOVER=`readlink -f $MUDITAOS_DEV_RECOVER`
 # check if already mouted
 
+if [ ! -f $BUILD_PATH/boot.bin ]; then
+	echo
+	echo "boot.bin does not exist in $BUILD_PATH, maybe you need to $ make in this dir"
+	echo
+	exit 2
+fi
+
 MOUNT_ENTRY_RECOVER=$(grep "$MUDITAOS_DISK_RECOVER" /etc/mtab)
 MOUNT_ENTRY=$(grep "$MUDITAOS_DISK" /etc/mtab)
 if [ $? -ne 0 ]; then
 	>&2 echo "PurePhone not mounted. Mount or retry with Ozone. https://github.com/muditacom/PurePhone/blob/master/doc/running_on_phone.md#eMMC_upload"
 	exit 2
+fi
+grep "[[:space:]]ro[[:space:],]" <<< $MOUNT_ENTRY
+if [ $? -eq 0 ]; then
+	>&2 echo "PurePhone mounted in readonly mode please unmount fs and check disc with command"
+	>&2 echo "sudo fsck.vfat -a $(awk '{ print $1 }' <<< $MOUNT_ENTRY)"
+	exit 3
+fi
+grep "[[:space:]]ro[[:space:],]" <<< $MOUNT_ENTRY_RECOVER
+if [ $? -eq 0 ]; then
+	>&2 echo "PurePhone mounted in readonly mode please unmount fs and check disc with command"
+	>&2 echo "sudo fsck.vfat -a $(awk '{ print $1 }' <<< $MOUNT_ENTRY_RECOVER)"
+	exit 4
 fi
 
 MUDITAOS_PATH=$(echo $MOUNT_ENTRY | awk -F " " '{print $2}')
@@ -36,8 +60,8 @@ MUDITAOS_PATH_ROOT=$(echo -e $MUDITAOS_PATH)
 
 echo "PurePhone remove all files"
 rm -rf "$MUDITAOS_PATH_ROOT"/* -r &>/dev/null || echo "PurePhone disk alread empty"
-rm -f "$MUDITAOS_PATH_ROOT"/.boot.ini
-rm -f "$MUDITAOS_PATH_ROOT"/.boot.ini.crc32
+rm -f "$MUDITAOS_PATH_ROOT"/.boot.json
+rm -f "$MUDITAOS_PATH_ROOT"/.boot.json.crc32
 
 echo "Create directories"
 mkdir -p $MUDITAOS_PATH_ROOT/$MUDITAOS_CURRENT
@@ -69,19 +93,21 @@ if [ -z $MUDITAOS_PARTITION ]; then
        MUDITAOS_PARTITION=$MUDITAOS_DISK # it is formatted like so apparently
 fi
 
+echo "Syncing data"
+sync && sync && sync
+
 if [ "$MOUNT_ENTRY" != "" ]; then
 	echo "Unmounting disk: $MUDITAOS_DISK ($MOUNT_ENTRY)"
-#	udisksctl unmount -b $MUDITAOS_DISK > /dev/null
+	udisksctl unmount -b $MUDITAOS_DISK > /dev/null
 fi
 
 if [ "$MOUNT_ENTRY_RECOVER" != "" ]; then
 	echo "Unmounting disk: $MUDITAOS_DISK_RECOVER ($MOUNT_ENTRY_RECOVER)"
-#	udisksctl unmount -b $MUDITAOS_DISK_RECOVER > /dev/null
+	udisksctl unmount -b $MUDITAOS_DISK_RECOVER > /dev/null
 fi
 
 sleep 1
 echo "PurePhone unmouted"
 echo "Ejecting USB"
-#timeout --signal=SIGINT 1 udisksctl power-off -b $MUDITAOS_DISK
-echo
+timeout --signal=SIGINT 1 udisksctl power-off -b $MUDITAOS_DISK
 echo "Reset your phone now"

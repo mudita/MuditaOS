@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "bsp/usb_cdc/usb_cdc.hpp"
+#include "bsp/usb/usb.hpp"
 #include <termios.h>
 #include <fcntl.h>
 
@@ -10,7 +10,12 @@ namespace bsp
     int fd;
     xQueueHandle USBReceiveQueue;
 
-    void usbCDCReceive(void *)
+    void usbDeviceTask(void *ptr)
+    {
+        usbCDCReceive(ptr);
+    }
+
+    int usbCDCReceive(void *)
     {
         LOG_INFO("[ServiceDesktop:BSP_Driver] Start reading on fd:%d", fd);
         uint8_t inputData[SERIAL_BUFFER_LEN];
@@ -51,21 +56,25 @@ namespace bsp
         }
     }
 
-    int usbCDCInit(xQueueHandle receiveQueue)
+    int usbInit(xQueueHandle receiveQueue, USBDeviceListener *)
     {
 
         fd = 0;
         fd = open("/dev/ptmx", O_RDWR | O_NOCTTY);
-
         if (fd == -1) {
-            return (-1);
+            LOG_ERROR("bsp::usbInit Failed to open /dev/ptmx, can't allocate new pseudo terminal");
+            return -1;
         }
 
         grantpt(fd);
         unlockpt(fd);
 
         char *pts_name = ptsname(fd);
-        LOG_INFO("[ServiceDesktop:BSP_Driver] VCOMAPPInit linux ptsname: %s", pts_name);
+        if (pts_name == nullptr) {
+            LOG_ERROR("bsp::usbInit ptsname returned NULL, no pseudo terminal allocated");
+            return -1;
+        }
+        LOG_INFO("bsp::usbInit linux ptsname: %s", pts_name);
         struct termios newtio;
         memset(&newtio, 0, sizeof(newtio));
         struct termios oldtio;
@@ -87,13 +96,18 @@ namespace bsp
         xTaskHandle taskHandleReceive;
         USBReceiveQueue = receiveQueue;
 
-        BaseType_t task_error = xTaskCreate(
-            usbCDCReceive, "USBLinuxReceive", SERIAL_BUFFER_LEN * 8, (void *)1, tskIDLE_PRIORITY, &taskHandleReceive);
+        BaseType_t task_error = xTaskCreate(&bsp::usbDeviceTask,
+                                            "USBLinuxReceive",
+                                            SERIAL_BUFFER_LEN * 8,
+                                            nullptr,
+                                            tskIDLE_PRIORITY,
+                                            &taskHandleReceive);
 
         if (task_error != pdPASS) {
-            LOG_ERROR("[ServiceDesktop:BSP_Driver] Failed to start freertos USB_Linux_Receive");
+            LOG_ERROR("bsp::usbInit Failed to start freertos USB_Linux_Receive");
+            return -1;
         }
 
-        return (fd);
+        return 0;
     }
 } // namespace bsp

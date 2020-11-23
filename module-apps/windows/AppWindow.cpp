@@ -1,15 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AppWindow.hpp"
 #include "Application.hpp"
 #include "InputEvent.hpp"
-#include "UiCommonActions.hpp"
 #include <Style.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <i18/i18.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-audio/api/AudioServiceAPI.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 
 using namespace style::header;
 
@@ -19,12 +18,6 @@ namespace gui
     AppWindow::AppWindow(app::Application *app, std::string name) : Window(name), application{app}
     {
         setSize(style::window_width, style::window_height);
-    }
-
-    AppWindow::~AppWindow()
-    {
-        LOG_INFO("deleting window: %s", name.c_str());
-        onClose();
     }
 
     void AppWindow::destroyInterface()
@@ -132,8 +125,7 @@ namespace gui
 
         if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_RF) {
             LOG_INFO("exit to main menu");
-            app::manager::Controller::switchApplication(
-                application, app::name_desktop, gui::name::window::main_window, nullptr);
+            app::manager::Controller::sendAction(application, app::manager::actions::Home);
         }
         // process only if key is released
         if ((inputEvent.state != InputEvent::State::keyReleasedShort))
@@ -218,9 +210,11 @@ namespace gui
 
     bool AppWindow::selectSpecialCharacter()
     {
-        return app::specialInput(
+        return app::manager::Controller::sendAction(
             application,
-            std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
+            app::manager::actions::ShowSpecialInput,
+            std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()),
+            app::manager::OnSwitchBehaviour::RunInBackground);
     }
 
     BoundingBox AppWindow::bodySize()

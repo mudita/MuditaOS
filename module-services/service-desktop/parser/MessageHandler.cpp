@@ -1,17 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHandler.hpp"
 
-#include <bits/exception.h> // for exception
-#include <inttypes.h>       // for PRIu32
-#include <memory>           // for operator!=, unique_ptr
+#include <endpoints/Context.hpp>
+#include <endpoints/Endpoint.hpp>
+#include <endpoints/EndpointFactory.hpp>
 
-#include "Context.hpp"         // for Context
-#include "EndpointFactory.hpp" // for EndpointFactory
-#include "log/log.hpp"         // for LOG_ERROR, LOG_DEBUG
-#include "Endpoint.hpp"        // for Endpoint
-#include "FreeRTOS.h"          // for xQueueHandle
+#include <FreeRTOS.h>
+#include <log/log.hpp>
+
+#include <bits/exception.h>
+#include <cinttypes>
+#include <memory>
 
 namespace sys
 {
@@ -54,10 +55,8 @@ void MessageHandler::processMessage()
 
 void MessageHandler::putToSendQueue(const std::string msg)
 {
-#if defined(TARGET_RT1051)
     if (uxQueueSpacesAvailable(sendQueue) != 0) {
         auto *responseString = new std::string(msg);
         xQueueSend(sendQueue, &responseString, portMAX_DELAY);
     }
-#endif
 }

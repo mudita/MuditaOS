@@ -1,19 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <application-phonebook/models/PhonebookModel.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
-#include <string> // for string, allocator
+#include <endpoints/Context.hpp>
+#include <endpoints/DBHelper.hpp>
 
-#include "Common/Query.hpp"
-#include "Context.hpp"
-#include "Service/Service.hpp"
-#include "Service/Common.hpp" // for ReturnCodes
-#include "DBHelper.hpp"       // for DBHelper
-#include "ContactRecord.hpp"  // for ContactRecord
-#include "json/json11.hpp"    // for Json
+#include <Common/Query.hpp>
+#include <ContactRecord.hpp>
+#include <Service/Common.hpp>
+#include <Service/Service.hpp>
+#include <application-phonebook/models/PhonebookModel.hpp>
+#include <json/json11.hpp>
+
+#include <string>
 
 namespace sys
 {
@@ -42,14 +42,14 @@ namespace parserFSM
 
     namespace json::contacts
     {
-        const inline std::string count           = "count";
-        const inline std::string primaryName     = "priName";
-        const inline std::string alternativeName = "altName";
-        const inline std::string address         = "address";
-        const inline std::string id              = "id";
-        const inline std::string numbers         = "numbers";
-        const inline std::string isBlocked       = "blocked";
-        const inline std::string isFavourite     = "favourite";
+        inline constexpr auto count           = "count";
+        inline constexpr auto primaryName     = "priName";
+        inline constexpr auto alternativeName = "altName";
+        inline constexpr auto address         = "address";
+        inline constexpr auto id              = "id";
+        inline constexpr auto numbers         = "numbers";
+        inline constexpr auto isBlocked       = "blocked";
+        inline constexpr auto isFavourite     = "favourite";
 
     } // namespace json::contacts
 } // namespace parserFSM

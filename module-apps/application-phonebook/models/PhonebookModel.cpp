@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
@@ -7,12 +7,13 @@
 #include "PhonebookModel.hpp"
 
 #include <Common/Query.hpp>
-#include <messages/QueryMessage.hpp>
 #include <queries/phonebook/QueryContactGet.hpp>
 #include <queries/RecordQuery.hpp>
 
-#include "service-db/api/DBServiceAPI.hpp"
-#include "UiCommonActions.hpp"
+#include <service-db/QueryMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <application-call/data/CallSwitchData.hpp>
 
 #include <string>
 #include <utility>
@@ -145,7 +146,11 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
             return false;
         }
         if (event.keyCode == gui::KeyCode::KEY_LF) {
-            return app::call(application, *item->contact);
+            if (item->contact && !item->contact->numbers.empty()) {
+                const auto phoneNumber = item->contact->numbers.front().number;
+                return app::manager::Controller::sendAction(
+                    application, app::manager::actions::Dial, std::make_unique<app::ExecuteCallData>(phoneNumber));
+            }
         }
         return false;
     };

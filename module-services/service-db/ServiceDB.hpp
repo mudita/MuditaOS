@@ -1,33 +1,34 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <memory> // for unique_ptr
-#include <set>    // for set
-#include <string> // for string
-
-#include "Interface/AlarmsRecord.hpp"
-#include "Interface/CalllogRecord.hpp"
-#include "Interface/ContactRecord.hpp"
-#include "Interface/CountryCodeRecord.hpp"
-#include "Interface/NotesRecord.hpp"
-#include "Interface/SMSRecord.hpp"
-#include "Interface/SettingsRecord.hpp"
-#include "Interface/ThreadRecord.hpp"
-#include "Interface/SMSTemplateRecord.hpp"
-#include "Interface/NotificationsRecord.hpp"
-#include "Interface/EventsRecord.hpp"
-#include "Interface/SettingsRecord_v2.hpp"
-#include "Service/Message.hpp" // for Message_t, DataMessage (ptr only), ResponseMessage (ptr only)
-#include "Service/Service.hpp" // for Service
-#include "messages/DBNotificationMessage.hpp"
-#include "agents/DatabaseAgent.hpp"
-#include "agents/settings/SettingsAgent.hpp"
 #include "agents/file_indexer/FileIndexerAgent.hpp"
-#include "BaseInterface.hpp"  // for Interface, Interface::Name
-#include "Common/Query.hpp"   // for Query, Query::Type
-#include "Service/Common.hpp" // for ReturnCodes, ServicePowerMode
+#include "agents/settings/SettingsAgent.hpp"
+#include "service-db/DatabaseAgent.hpp"
+#include "service-db/DBNotificationMessage.hpp"
+
+#include <Common/Query.hpp>
+#include <Interface/AlarmsRecord.hpp>
+#include <Interface/BaseInterface.hpp>
+#include <Interface/CalllogRecord.hpp>
+#include <Interface/ContactRecord.hpp>
+#include <Interface/CountryCodeRecord.hpp>
+#include <Interface/EventsRecord.hpp>
+#include <Interface/NotesRecord.hpp>
+#include <Interface/NotificationsRecord.hpp>
+#include <Interface/SMSRecord.hpp>
+#include <Interface/SMSTemplateRecord.hpp>
+#include <Interface/SettingsRecord.hpp>
+#include <Interface/SettingsRecord_v2.hpp>
+#include <Interface/ThreadRecord.hpp>
+#include <Service/Common.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+
+#include <memory>
+#include <set>
+#include <string>
 
 class AlarmsDB;
 class AlarmsRecordInterface;
@@ -86,7 +87,7 @@ class ServiceDB : public sys::Service
     ServiceDB();
     ~ServiceDB() override;
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
     sys::ReturnCodes InitHandler() override;
 

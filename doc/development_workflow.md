@@ -4,7 +4,7 @@ When submitting code or documentation changes please follow these steps to have 
 
 ## Create a new branch
 
-Create a branch, which name is connected to the feature, bug fix, or documentation change you want to contribute e.g. `feature/some-feature` or ``fix/some-fix`.
+Create a branch, which name is connected to the feature, bug fix, or documentation change you want to contribute e.g. `feature/some-feature` or `fix/some-fix`.
 
 **Note:** If you're part of the MuditaOS core development team, please precede the branch name with a relevant Jira ticket number e.g. `EGD-5555-some-feature`.
 
@@ -27,9 +27,9 @@ Here's [a helpful article about writing good Git commit messages](https://chris.
 Before submitting a Pull Request please go through some basic checks:
 
 - test your changes on both Linux and RT1051 platforms (please pay special attention to the things you might break unintentionally, e.g. when working on calling funcionality, check call log too)
-- [include changelog description](./doc/changelog_howto.md) (if applicable),
+- [include changelog description](changelog_howto.md) (if applicable),
 - run unit tests (`make check`),
-- check if your code formatting complies with [`.clang-format`](./.clang-format).
+- check if your code formatting complies with [`.clang-format`](../clang-format).
 
 ## Submit a Pull Request
 

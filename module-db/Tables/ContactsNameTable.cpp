@@ -11,7 +11,7 @@ ContactsNameTable::~ContactsNameTable()
 
 bool ContactsNameTable::create()
 {
-    return db->execute(createTableQuery);
+    return true;
 }
 
 bool ContactsNameTable::add(ContactsNameTableRow entry)

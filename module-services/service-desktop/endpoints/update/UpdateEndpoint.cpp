@@ -1,19 +1,21 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UpdateEndpoint.hpp"
+#include "UpdateMuditaOS.hpp"
 
-#include <Service/Bus.hpp> // for Bus
-#include <filesystem>      // for operator/, path
-#include <memory>          // for allocator, make_shared
+#include <service-desktop/DesktopMessages.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
+#include <endpoints/Context.hpp>
+#include <endpoints/messages/MessageHelper.hpp>
 
-#include "DesktopMessages.hpp" // for UpdateOsMessage
-#include "ServiceDesktop.hpp"  // for service_desktop
-#include "Context.hpp"         // for Context
-#include "MessageHandler.hpp"  // for MessageHandler
-#include "UpdateMuditaOS.hpp"  // for update
-#include "json/json11.hpp"     // for Json, Json::object
-#include "vfs.hpp"             // for vfs, os_updates
+#include <Service/Bus.hpp>
+#include <json/json11.hpp>
+#include <purefs/filesystem_paths.hpp>
+#include <vfs.hpp>
+
+#include <filesystem>
+#include <memory>
 
 auto UpdateEndpoint::handle(Context &context) -> void
 {
@@ -32,7 +34,7 @@ auto UpdateEndpoint::handle(Context &context) -> void
 auto UpdateEndpoint::run(Context &context) -> sys::ReturnCodes
 {
     std::string fileName = context.getBody()["fileName"].string_value();
-    auto path            = purefs::dir::os_updates / fileName;
+    auto path            = purefs::dir::getUpdatesOSPath() / fileName;
     auto fileExists      = vfs.fileExists(path.c_str());
     if (fileExists) {
         context.setResponseBody(json11::Json::object({{parserFSM::json::updateReady, true}}));
@@ -52,7 +54,8 @@ auto UpdateEndpoint::run(Context &context) -> sys::ReturnCodes
 
 auto UpdateEndpoint::getUpdates(Context &context) -> sys::ReturnCodes
 {
-    json11::Json fileList = vfs.listdir(purefs::dir::os_updates.c_str(), updateos::extension::update, true);
+    const auto updatesOSPath = purefs::dir::getUpdatesOSPath();
+    json11::Json fileList    = vfs.listdir(updatesOSPath.c_str(), updateos::extension::update, true);
 
     context.setResponseBody(json11::Json::object{{parserFSM::json::updateFileList, fileList}});
 

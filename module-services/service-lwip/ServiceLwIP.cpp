@@ -1,15 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "ServiceLwIP.hpp"
+#include "service-lwip/ServiceLwIP.hpp"
 
-#include <log/log.hpp>      // for LOG_ERROR, LOG_INFO
-#include <bits/exception.h> // for exception
-#include <stddef.h>         // for NULL
-
-#include "MessageType.hpp"     // for MessageType, MessageType::LwIP_request
-#include "Service/Message.hpp" // for ResponseMessage, DataMessage, Message_t
-#include "Service/Service.hpp" // for Service
+#include <MessageType.hpp>
+#include <Service/Bus.hpp>
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <log/log.hpp>
 
 extern "C"
 {
@@ -18,10 +16,11 @@ extern "C"
 #include "lwip/tcpip.h"           // for tcpip_init
 };
 
-#include <Service/Bus.hpp> // for Bus
-#include <memory>          // for make_shared, allocator, shared_ptr
-#include <string>          // for string
-#include <utility>         // for pair
+#include <bits/exception.h>
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <utility>
 
 #define NUM_DHCP_ENTRY 3
 
@@ -76,7 +75,7 @@ sys::ReturnCodes ServiceLwIP::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
-sys::Message_t ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
     LOG_ERROR("TRY START LWIP");
     try {

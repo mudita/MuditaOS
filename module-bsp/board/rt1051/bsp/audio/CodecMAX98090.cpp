@@ -79,32 +79,35 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
     i2c->Write(i2cAddr, (uint8_t *)&q_dai_setup, 1);
 
     // OUT configuration
-    if (params.outputPath != CodecParamsMAX98090::OutputPath::None) {
-        // Set output route
-        max98090_reg_playback_quick_setup_t q_playback_setup = {0};
+    if (params.outputPath != bsp::AudioDevice::OutputPath::None) {
 
         // Control HP performance
         max98090_reg_dachp_perfmode_t dacperf = {0};
+        dacperf.dachp                         = 1;
+        dacperf.perfmode                      = 0;
+        i2cAddr.subAddress                    = MAX98090_REG_DACHP_PERF_MODE;
+        i2c->Write(i2cAddr, (uint8_t *)&dacperf, 1);
 
         switch (params.outputPath) {
 
-        case CodecParamsMAX98090::OutputPath::HeadphonesMono: {
+        case bsp::AudioDevice::OutputPath::HeadphonesMono: {
+            max98090_reg_playback_quick_setup_t q_playback_setup = {0};
+            q_playback_setup.dig2hp                              = 1;
+            i2cAddr.subAddress                                   = MAX98090_REG_PLAYBACK_QUICK_SETUP;
+            i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
 
             // Mix left DAC channel to left&right HP output
             max98090_reg_lhp_mixer_t lmixconf = {0};
-            max98090_reg_rhp_mixer_t rmixconf = {0};
             lmixconf.mixhpl                   = 1;
-            rmixconf.mixhpr                   = 1;
-
             i2cAddr.subAddress = MAX98090_REG_LHP_MIXER_CONF;
             i2c->Write(i2cAddr, (uint8_t *)&lmixconf, 1);
+
+            max98090_reg_rhp_mixer_t rmixconf = {0};
+            rmixconf.mixhpr                   = 1;
             i2cAddr.subAddress = MAX98090_REG_RHP_MIXER_CONF;
             i2c->Write(i2cAddr, (uint8_t *)&rmixconf, 1);
 
-            q_playback_setup.dig2hp = 1;
-            i2cAddr.subAddress      = MAX98090_REG_PLAYBACK_QUICK_SETUP;
-            i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
-
+            // Use mixer outputs instead of direct DAC outputs
             max98090_reg_hpmix_conf_t mixconf = {0};
             mixconf.mixhplsel                 = 1;
             mixconf.mixhprsel                 = 1;
@@ -113,111 +116,59 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
 
         } break;
 
-        case CodecParamsMAX98090::OutputPath::Headphones: {
-            // Set DAC headphones output to high performance mode, increasing power consumption but providing the
-            // highest quality
-            dacperf.dachp           = 1;
-            dacperf.perfmode        = 1;
-            q_playback_setup.dig2hp = 1;
-
+        case bsp::AudioDevice::OutputPath::Headphones: {
+            max98090_reg_playback_quick_setup_t q_playback_setup = {0};
+            q_playback_setup.dig2hp                              = 1;
             i2cAddr.subAddress = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
-            i2cAddr.subAddress = MAX98090_REG_DACHP_PERF_MODE;
-            i2c->Write(i2cAddr, (uint8_t *)&dacperf, 1);
 
         } break;
 
-        case CodecParamsMAX98090::OutputPath::Earspeaker: {
+        case bsp::AudioDevice::OutputPath::Earspeaker: {
+            max98090_reg_playback_quick_setup_t q_playback_setup = {0};
             q_playback_setup.dig2ear = 1;
             i2cAddr.subAddress       = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
 
-            qfilter_coefficients_t band1_filter = {0};
-            qfilter_coefficients_t band2_filter = {0};
-            qfilter_coefficients_t band3_filter = {0};
-
-            // Highpass,lowpass & flat filters don't use Gain parameter
-            qfilter_CalculateCoeffs(FilterHighPass, 800, currentParams.GetSampleRateVal(), 0.707, 1, &band1_filter);
-            qfilter_CalculateCoeffs(FilterLowPass, 6000, currentParams.GetSampleRateVal(), 0.707, 1, &band2_filter);
-            qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band3_filter);
-
-            // BAND1
-            WriteFilterCoeff(band1_filter.b0, 0x46);
-            WriteFilterCoeff(band1_filter.b1, 0x49);
-            WriteFilterCoeff(band1_filter.b2, 0x4C);
-            WriteFilterCoeff(band1_filter.a1, 0x4F);
-            WriteFilterCoeff(band1_filter.a2, 0x52);
-
-            // BAND2
-            WriteFilterCoeff(band2_filter.b0, 0x55);
-            WriteFilterCoeff(band2_filter.b1, 0x58);
-            WriteFilterCoeff(band2_filter.b2, 0x5B);
-            WriteFilterCoeff(band2_filter.a1, 0x5E);
-            WriteFilterCoeff(band2_filter.a2, 0x61);
-
-            // BAND3
-            WriteFilterCoeff(band3_filter.b0, 0x64);
-            WriteFilterCoeff(band3_filter.b1, 0x67);
-            WriteFilterCoeff(band3_filter.b2, 0x6A);
-            WriteFilterCoeff(band3_filter.a1, 0x6D);
-            WriteFilterCoeff(band3_filter.a2, 0x70);
-
-            // Enable 3-band filter
-            max98090_reg_dsp_biquadfilter_enable_t filter = {0};
-            filter.eq3banden                              = 1;
-            i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
-            i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
+            SetupEarspeakerEqualizer();
 
         } break;
 
-        case CodecParamsMAX98090::OutputPath::Loudspeaker: {
+        case bsp::AudioDevice::OutputPath::Loudspeaker: {
+            max98090_reg_playback_quick_setup_t q_playback_setup = {0};
             q_playback_setup.dig2spk = 1;
+            i2cAddr.subAddress                                   = MAX98090_REG_PLAYBACK_QUICK_SETUP;
+            i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
 
             uint8_t mask       = 0x08; // Set 3th bit (dmono on)
             i2cAddr.subAddress = MAX98090_REG_INOUT_PATH_CONF;
             i2c->Modify(i2cAddr, mask, true, 1);
 
-            // TODO: Turn off/mute right speaker
+            // Turn off right speaker path
+            max98090_reg_outputenable_t outputenable = {0};
+            outputenable.dalen                       = 1;
+            outputenable.splen                       = 1;
+            i2cAddr.subAddress                       = MAX98090_REG_OUTPUT_ENABLE;
+            i2c->Write(i2cAddr, (uint8_t *)&outputenable, 1);
 
+            SetupLoudspeakerEqualizer();
+
+        } break;
+
+        case bsp::AudioDevice::OutputPath::LoudspeakerMono: {
+            max98090_reg_playback_quick_setup_t q_playback_setup = {0};
+            q_playback_setup.dig2spk                             = 1;
             i2cAddr.subAddress = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
 
-            qfilter_coefficients_t band1_filter = {0};
-            qfilter_coefficients_t band2_filter = {0};
-            qfilter_coefficients_t band3_filter = {0};
+            // Turn off right speaker path
+            max98090_reg_outputenable_t outputenable = {0};
+            outputenable.dalen                       = 1;
+            outputenable.splen                       = 1;
+            i2cAddr.subAddress                       = MAX98090_REG_OUTPUT_ENABLE;
+            i2c->Write(i2cAddr, (uint8_t *)&outputenable, 1);
 
-            // Highpass,lowpass & flat filters don't use Gain parameter
-            qfilter_CalculateCoeffs(FilterHighPass, 500, currentParams.GetSampleRateVal(), 0.707, 1, &band1_filter);
-            qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band2_filter);
-            qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band3_filter);
-
-            // BAND1
-            WriteFilterCoeff(band1_filter.b0, 0x46);
-            WriteFilterCoeff(band1_filter.b1, 0x49);
-            WriteFilterCoeff(band1_filter.b2, 0x4C);
-            WriteFilterCoeff(band1_filter.a1, 0x4F);
-            WriteFilterCoeff(band1_filter.a2, 0x52);
-
-            // BAND2
-            WriteFilterCoeff(band2_filter.b0, 0x55);
-            WriteFilterCoeff(band2_filter.b1, 0x58);
-            WriteFilterCoeff(band2_filter.b2, 0x5B);
-            WriteFilterCoeff(band2_filter.a1, 0x5E);
-            WriteFilterCoeff(band2_filter.a2, 0x61);
-
-            // BAND3
-            WriteFilterCoeff(band3_filter.b0, 0x64);
-            WriteFilterCoeff(band3_filter.b1, 0x67);
-            WriteFilterCoeff(band3_filter.b2, 0x6A);
-            WriteFilterCoeff(band3_filter.a1, 0x6D);
-            WriteFilterCoeff(band3_filter.a2, 0x70);
-
-            // Enable 3-band filter
-            max98090_reg_dsp_biquadfilter_enable_t filter = {0};
-            filter.eq3banden                              = 1;
-            i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
-            i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
-
+            SetupLoudspeakerEqualizer();
         } break;
 
         default:
@@ -226,37 +177,19 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
     }
 
     // IN configuration
-    if (params.inputPath != CodecParamsMAX98090::InputPath::None) {
+    if (params.inputPath != bsp::AudioDevice::InputPath::None) {
         // Set input path
         switch (params.inputPath) {
-        case CodecParamsMAX98090::InputPath::Headphones: {
-            /* 			max98090_reg_analog_to_record_quick_t q_analog_setup = {0};
 
-                        q_analog_setup.in34mic2 = 1;
-                        bsp_i2c_Send(i2CInst,DeviceAddr,
-               MAX98090_REG_ANALOG_MIC_TO_RECORD_QUICK,(uint8_t*)&q_analog_setup,1);
-
-                        max98090_reg_radc_mix_input_t radcmix = {0};
-                        bsp_i2c_Send(i2CInst,DeviceAddr, MAX98090_REG_RADC_MIXER_INPUT,(uint8_t*)&radcmix);
-
-                        max98090_reg_ladc_mix_input_t ladcmix = {0};
-                        ladcmix.mixadl = 0x40;
-                        bsp_i2c_Send(i2CInst,DeviceAddr, MAX98090_REG_LADC_MIXER_INPUT,(uint8_t*)&ladcmix); */
+        case bsp::AudioDevice::InputPath::Headphones: {
             max98090_reg_input_to_record_quick_t q_input_setup = {0};
             q_input_setup.in34dan                              = 1;
             i2cAddr.subAddress                                 = MAX98090_REG_LINE_INPUT_TO_RECORD_QUICK;
             i2c->Write(i2cAddr, (uint8_t *)&q_input_setup, 1);
-
-            uint8_t mask       = 0x10; // Set 4th bit (mic bias enable)
-            i2cAddr.subAddress = MAX98090_REG_INPUT_ENABLE;
-            i2c->Modify(i2cAddr, mask, true, 1);
-
         } break;
 
-        case CodecParamsMAX98090::InputPath::Microphone: {
-            max98090_reg_input_to_record_quick_t q_input_setup   = {0};
-            max98090_reg_analog_to_record_quick_t q_analog_setup = {0};
-            max98090_reg_digmic_enable_t digena                  = {0};
+        case bsp::AudioDevice::InputPath::Microphone: {
+            max98090_reg_digmic_enable_t digena = {0};
 
             // Enable left and right digital mic interface
             digena.digmicl = 1;
@@ -266,31 +199,17 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
 
             i2cAddr.subAddress = MAX98090_REG_DIG_MIC_ENABLE;
             i2c->Write(i2cAddr, (uint8_t *)&digena, 1);
-
-            // It seems that for digital mics it doesn't matter if digitial or analog input is chosen
-            q_input_setup.in12sab = 1;
-
-            i2cAddr.subAddress = MAX98090_REG_LINE_INPUT_TO_RECORD_QUICK;
-            i2c->Write(i2cAddr, (uint8_t *)&q_input_setup, 1);
-
-            // q_analog_setup.in12mic1 = 1;
-            // bsp_i2c_Send(i2CInst,DeviceAddr, MAX98090_REG_ANALOG_MIC_TO_RECORD_QUICK,(uint8_t*)&q_analog_setup,1);
-
-            uint8_t mask       = 0x10; // Clr 4th bit (mic bias disable)
-            i2cAddr.subAddress = MAX98090_REG_INPUT_ENABLE;
-            i2c->Modify(i2cAddr, mask, false, 1);
-
         } break;
 
         default:
             return CodecRetCode::InvalidInputPath;
         }
-
-        // Turn on DC blocking filters
-        uint8_t mask       = (1 << 6) | (1 << 5); // set 6th and 7th bit (AHPF and DHPF)
-        i2cAddr.subAddress = MAX98090_REG_PLAYBACK_DSP_FILTER_CONF;
-        i2c->Modify(i2cAddr, mask, true, 1);
     }
+
+    // Turn on DC blocking filters
+    uint8_t mask       = (1 << 6) | (1 << 5); // set 6th and 7th bit (AHPF and DHPF)
+    i2cAddr.subAddress = MAX98090_REG_PLAYBACK_DSP_FILTER_CONF;
+    i2c->Modify(i2cAddr, mask, true, 1);
 
     // Store param configuration
     currentParams = params;
@@ -384,8 +303,8 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
     }
 
     switch (currentParams.outputPath) {
-    case CodecParamsMAX98090::OutputPath::Headphones:
-    case CodecParamsMAX98090::OutputPath::HeadphonesMono: {
+    case bsp::AudioDevice::OutputPath::Headphones:
+    case bsp::AudioDevice::OutputPath::HeadphonesMono: {
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
         constexpr float scale_factor     = .31f * 10.f;
         uint8_t volume                   = static_cast<float>(vol * scale_factor);
@@ -404,7 +323,7 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
 
     } break;
 
-    case CodecParamsMAX98090::OutputPath::Earspeaker: {
+    case bsp::AudioDevice::OutputPath::Earspeaker: {
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
         constexpr float scale_factor     = .31f * 10.f;
         uint8_t volume                   = static_cast<float>(vol * scale_factor);
@@ -417,7 +336,8 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
         i2c->Write(i2cAddr, (uint8_t *)&vol, 1);
     } break;
 
-    case CodecParamsMAX98090::OutputPath::Loudspeaker: {
+    case bsp::AudioDevice::OutputPath::Loudspeaker:
+    case bsp::AudioDevice::OutputPath::LoudspeakerMono: {
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
         constexpr float scale_factor = .39f * 10.f;
         uint8_t volume               = static_cast<float>(vol * scale_factor) + 0x18;
@@ -515,6 +435,88 @@ CodecRetCode CodecMAX98090::MicBias(const bool enable)
     return CodecRetCode::Success;
 }
 
+CodecRetCode CodecMAX98090::SetupEarspeakerEqualizer()
+{
+    qfilter_coefficients_t band1_filter = {0};
+    qfilter_coefficients_t band2_filter = {0};
+    qfilter_coefficients_t band3_filter = {0};
+
+    // Highpass,lowpass & flat filters don't use Gain parameter
+    qfilter_CalculateCoeffs(FilterHighPass, 800, currentParams.GetSampleRateVal(), 0.707, 1, &band1_filter);
+    qfilter_CalculateCoeffs(FilterLowPass, 6000, currentParams.GetSampleRateVal(), 0.707, 1, &band2_filter);
+    qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band3_filter);
+
+    // BAND1
+    WriteFilterCoeff(band1_filter.b0, 0x46);
+    WriteFilterCoeff(band1_filter.b1, 0x49);
+    WriteFilterCoeff(band1_filter.b2, 0x4C);
+    WriteFilterCoeff(band1_filter.a1, 0x4F);
+    WriteFilterCoeff(band1_filter.a2, 0x52);
+
+    // BAND2
+    WriteFilterCoeff(band2_filter.b0, 0x55);
+    WriteFilterCoeff(band2_filter.b1, 0x58);
+    WriteFilterCoeff(band2_filter.b2, 0x5B);
+    WriteFilterCoeff(band2_filter.a1, 0x5E);
+    WriteFilterCoeff(band2_filter.a2, 0x61);
+
+    // BAND3
+    WriteFilterCoeff(band3_filter.b0, 0x64);
+    WriteFilterCoeff(band3_filter.b1, 0x67);
+    WriteFilterCoeff(band3_filter.b2, 0x6A);
+    WriteFilterCoeff(band3_filter.a1, 0x6D);
+    WriteFilterCoeff(band3_filter.a2, 0x70);
+
+    // Enable 3-band filter
+    max98090_reg_dsp_biquadfilter_enable_t filter = {0};
+    filter.eq3banden                              = 1;
+    i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
+    i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
+
+    return CodecRetCode::Success;
+}
+
+CodecRetCode CodecMAX98090::SetupLoudspeakerEqualizer()
+{
+    qfilter_coefficients_t band1_filter = {0};
+    qfilter_coefficients_t band2_filter = {0};
+    qfilter_coefficients_t band3_filter = {0};
+
+    // Highpass,lowpass & flat filters don't use Gain parameter
+    qfilter_CalculateCoeffs(FilterHighPass, 500, currentParams.GetSampleRateVal(), 0.707, 1, &band1_filter);
+    qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band2_filter);
+    qfilter_CalculateCoeffs(FilterFlat, 0, currentParams.GetSampleRateVal(), 0.707, 1, &band3_filter);
+
+    // BAND1
+    WriteFilterCoeff(band1_filter.b0, 0x46);
+    WriteFilterCoeff(band1_filter.b1, 0x49);
+    WriteFilterCoeff(band1_filter.b2, 0x4C);
+    WriteFilterCoeff(band1_filter.a1, 0x4F);
+    WriteFilterCoeff(band1_filter.a2, 0x52);
+
+    // BAND2
+    WriteFilterCoeff(band2_filter.b0, 0x55);
+    WriteFilterCoeff(band2_filter.b1, 0x58);
+    WriteFilterCoeff(band2_filter.b2, 0x5B);
+    WriteFilterCoeff(band2_filter.a1, 0x5E);
+    WriteFilterCoeff(band2_filter.a2, 0x61);
+
+    // BAND3
+    WriteFilterCoeff(band3_filter.b0, 0x64);
+    WriteFilterCoeff(band3_filter.b1, 0x67);
+    WriteFilterCoeff(band3_filter.b2, 0x6A);
+    WriteFilterCoeff(band3_filter.a1, 0x6D);
+    WriteFilterCoeff(band3_filter.a2, 0x70);
+
+    // Enable 3-band filter
+    max98090_reg_dsp_biquadfilter_enable_t filter = {0};
+    filter.eq3banden                              = 1;
+    i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
+    i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
+
+    return CodecRetCode::Success;
+}
+
 CodecRetCode CodecMAX98090::Reset()
 {
 
@@ -533,7 +535,7 @@ CodecRetCode CodecMAX98090::Reset()
     return CodecRetCode::Success;
 }
 
-CodecRetCode CodecMAX98090::SetOutputPath(const CodecParamsMAX98090::OutputPath path)
+CodecRetCode CodecMAX98090::SetOutputPath(const bsp::AudioDevice::OutputPath path)
 {
     Reset();
     currentParams.outputPath = path;
@@ -542,7 +544,7 @@ CodecRetCode CodecMAX98090::SetOutputPath(const CodecParamsMAX98090::OutputPath 
     return CodecRetCode::Success;
 }
 
-CodecRetCode CodecMAX98090::SetInputPath(const CodecParamsMAX98090::InputPath path)
+CodecRetCode CodecMAX98090::SetInputPath(const bsp::AudioDevice::InputPath path)
 {
     Reset();
     currentParams.inputPath = path;
@@ -558,17 +560,17 @@ CodecRetCode CodecMAX98090::SetMute(const bool enable)
     uint8_t regl, regr = 0;
 
     switch (currentParams.outputPath) {
-    case CodecParamsMAX98090::OutputPath::Headphones: {
+    case bsp::AudioDevice::OutputPath::Headphones: {
         regl = MAX98090_REG_LHP_VOL_CTRL;
         regr = MAX98090_REG_RHP_VOL_CTRL;
     } break;
 
-    case CodecParamsMAX98090::OutputPath::Earspeaker: {
+    case bsp::AudioDevice::OutputPath::Earspeaker: {
         regl = MAX98090_REG_RECV_VOL_CTRL;
         regr = 0;
     } break;
 
-    case CodecParamsMAX98090::OutputPath::Loudspeaker: {
+    case bsp::AudioDevice::OutputPath::Loudspeaker: {
         regl = MAX98090_REG_LSPK_VOL_CTRL;
         regr = MAX98090_REG_RSPK_VOL_CTRL;
     } break;

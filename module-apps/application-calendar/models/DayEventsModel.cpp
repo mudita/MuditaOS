@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DayEventsModel.hpp"
@@ -7,8 +7,8 @@
 #include "application-calendar/ApplicationCalendar.hpp"
 #include <ListView.hpp>
 #include <queries/calendar/QueryEventsGetFiltered.hpp>
-#include <module-services/service-db/api/DBServiceAPI.hpp>
-#include <module-services/service-db/messages/QueryMessage.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/QueryMessage.hpp>
 #include <module-db/queries/RecordQuery.hpp>
 
 DayEventsModel::DayEventsModel(app::Application *app) : DatabaseModel(app), application(app)

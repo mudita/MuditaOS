@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ATParser.hpp"
 #include "Service/Bus.hpp"
+#include <service-fota/FotaServiceAPI.hpp>
 #include "bsp/cellular/bsp_cellular.hpp"
-#include "service-cellular/messages/CellularMessage.hpp"
-#include "service-fota/api/FotaServiceAPI.hpp"
+#include <service-cellular/CellularMessage.hpp>
 #include "ticks.hpp"
 #include <Utils.hpp>
 #include <utility>

@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SCO.hpp"
 #include <cstdio>
 #include <Audio/AudioCommon.hpp>
 #include <service-evtmgr/Constants.hpp>
-#include <service-audio/messages/AudioMessage.hpp>
+#include <service-audio/AudioMessage.hpp>
 #include <cassert>
 extern "C"
 {
@@ -50,7 +50,7 @@ namespace Bt
         static void initCvsd();
         static void receiveCvsd(uint8_t *packet, uint16_t size);
         static void writeToHostEndian(int16_t *buffer, uint8_t *packet, int length);
-        static void sendEvent(audio::EventType event);
+        static void sendEvent(audio::EventType event, audio::Event::DeviceState state);
         static void flipEndianess(uint16_t *data, size_t length);
     };
 
@@ -102,9 +102,9 @@ QueueHandle_t SCO::SCOImpl::sourceQueue;
 const sys::Service *SCO::SCOImpl::ownerService = nullptr;
 DeviceMetadata_t SCO::SCOImpl::metadata;
 
-void SCO::SCOImpl::sendEvent(audio::EventType event)
+void SCO::SCOImpl::sendEvent(audio::EventType event, audio::Event::DeviceState state)
 {
-    auto evt = std::make_shared<audio::Event>(event);
+    auto evt = std::make_shared<audio::Event>(event, state);
     auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
     sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, const_cast<sys::Service *>(ownerService));
 }
@@ -121,7 +121,7 @@ auto SCO::SCOImpl::audioInitialize(int sampleRate) -> Error
     metadata.samplesPerFrame = audioSamplesPerPacket;
 
     if (sourceQueue != nullptr && sinkQueue != nullptr) {
-        sendEvent(audio::EventType::BTHeadsetOn);
+        sendEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Connected);
     }
     else {
         LOG_ERROR("failed to create queue!");

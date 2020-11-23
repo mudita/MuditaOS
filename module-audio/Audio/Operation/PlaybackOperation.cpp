@@ -5,16 +5,11 @@
 
 #include "Audio/decoder/decoder.hpp"
 #include "Audio/Profiles/Profile.hpp"
-#include "Audio/Profiles/ProfilePlaybackLoudspeaker.hpp"
-#include "Audio/Profiles/ProfilePlaybackHeadphones.hpp"
-#include "Audio/Profiles/ProfilePlaybackBluetoothA2DP.hpp"
 
 #include "Audio/AudioCommon.hpp"
 
 #include <bsp/audio/bsp_audio.hpp>
 #include <log/log.hpp>
-#include <FreeRTOS.h>
-#include <task.h>
 
 namespace audio
 {
@@ -25,7 +20,7 @@ namespace audio
         const char *file,
         const audio::PlaybackType &playbackType,
         std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
-        : Operation(false, playbackType), dec(nullptr)
+        : Operation(playbackType), dec(nullptr)
     {
         audioCallback = [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
 
@@ -56,24 +51,29 @@ namespace audio
             audio::dbPath(audio::Setting::Volume, playbackType, audio::Profile::Type::PlaybackHeadphones);
         const auto headphonesVolume = dbCallback(dbHeadphonesVolumePath, defaultHeadphonesVolume);
 
-        availableProfiles.push_back(Profile::Create(Profile::Type::PlaybackLoudspeaker, nullptr, loudspeakerVolume));
-        availableProfiles.push_back(Profile::Create(Profile::Type::PlaybackHeadphones, nullptr, headphonesVolume));
-        availableProfiles.push_back(Profile::Create(Profile::Type::PlaybackBTA2DP, nullptr, loudspeakerVolume));
+        // order in vector defines priority
+        supportedProfiles.emplace_back(
+            Profile::Create(Profile::Type::PlaybackBluetoothA2DP, nullptr, loudspeakerVolume), false);
+        supportedProfiles.emplace_back(Profile::Create(Profile::Type::PlaybackHeadphones, nullptr, headphonesVolume),
+                                       false);
+        supportedProfiles.emplace_back(Profile::Create(Profile::Type::PlaybackLoudspeaker, nullptr, loudspeakerVolume),
+                                       true);
 
-        currentProfile = availableProfiles[0];
+        auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
+        if (!defaultProfile) {
+            throw AudioInitException("Error during initializing profile", RetCode::ProfileNotSet);
+        }
+        currentProfile = defaultProfile;
 
         dec = decoder::Create(file);
         if (dec == nullptr) {
-            LOG_ERROR("Error during initializing decoder");
-            return;
-        }
-        audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
-        if (audioDevice == nullptr) {
-            LOG_ERROR("Error creating AudioDevice");
-            return;
+            throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
 
-        isInitialized = true;
+        auto retCode = SwitchToPriorityProfile();
+        if (retCode != RetCode::Success) {
+            throw AudioInitException("Failed to switch audio profile", retCode);
+        }
     }
 
     audio::RetCode PlaybackOperation::Start(audio::AsyncCallback callback, audio::Token token)
@@ -93,7 +93,6 @@ namespace audio
         currentProfile->SetInOutFlags(tags->num_channel == 2
                                           ? static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputStereo)
                                           : static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono));
-
         currentProfile->SetSampleRate(tags->sample_rate);
 
         auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
@@ -103,6 +102,9 @@ namespace audio
     audio::RetCode PlaybackOperation::Stop()
     {
         state = State::Idle;
+        if (!audioDevice) {
+            return audio::RetCode::DeviceFailure;
+        }
         return GetDeviceError(audioDevice->Stop());
     }
 
@@ -149,40 +151,41 @@ namespace audio
 
     audio::RetCode PlaybackOperation::SendEvent(std::shared_ptr<Event> evt)
     {
-
+        auto isAvailable = evt->getDeviceState() == Event::DeviceState::Connected ? true : false;
         switch (evt->getType()) {
-        case EventType::HeadphonesPlugin:
-            SwitchProfile(Profile::Type::PlaybackHeadphones);
+        case EventType::JackState:
+            SetProfileAvailability({Profile::Type::PlaybackHeadphones}, isAvailable);
+            SwitchToPriorityProfile();
             break;
-        case EventType::HeadphonesUnplug:
-            // TODO: Switch to playback headphones/bt profile if present
-            SwitchProfile(Profile::Type::PlaybackLoudspeaker);
-            break;
-        case EventType::BTA2DPOn:
-            // TODO: Switch to playback headphones/bt profile if present
-            SwitchProfile(Profile::Type::PlaybackBTA2DP);
+        case EventType::BlutoothA2DPDeviceState:
+            SetProfileAvailability({Profile::Type::PlaybackBluetoothA2DP}, isAvailable);
+            SwitchToPriorityProfile();
             break;
         default:
             return RetCode::UnsupportedEvent;
         }
+
         return RetCode::Success;
     }
 
     audio::RetCode PlaybackOperation::SwitchProfile(const Profile::Type type)
     {
-
         uint32_t currentSampleRate = currentProfile->GetSampleRate();
         uint32_t currentInOutFlags = currentProfile->GetInOutFlags();
 
         auto ret = GetProfile(type);
         if (ret) {
-            currentProfile = ret.value();
+            currentProfile = ret;
         }
         else {
             return RetCode::UnsupportedProfile;
         }
 
         audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        if (audioDevice == nullptr) {
+            LOG_ERROR("Error creating AudioDevice");
+            return RetCode::Failed;
+        }
 
         currentProfile->SetSampleRate(currentSampleRate);
         currentProfile->SetInOutFlags(currentInOutFlags);
@@ -204,15 +207,6 @@ namespace audio
     PlaybackOperation::~PlaybackOperation()
     {
         Stop();
-    }
-
-    void PlaybackOperation::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
-    {
-        if (auto device = dynamic_cast<bsp::RT1051BluetoothAudio *>(audioDevice.get()); device != nullptr) {
-            device->sourceQueue = data->out;
-            device->metadata    = data->metadata;
-            LOG_INFO("Queue and metadata set!");
-        }
     }
 
 } // namespace audio

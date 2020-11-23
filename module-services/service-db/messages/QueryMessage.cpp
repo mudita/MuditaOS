@@ -1,16 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "QueryMessage.hpp"
+#include <service-db/QueryMessage.hpp>
+#include <service-db/DBMessage.hpp>
 
-#include <memory>    // for unique_ptr, operator==
-#include <stdexcept> // for runtime_error
-#include <utility>   // for move
+#include <BaseInterface.hpp>
+#include <Common/Query.hpp>
+#include <MessageType.hpp>
 
-#include "BaseInterface.hpp"      // for Interface, Interface::Name
-#include "Common/Query.hpp"       // for Query, QueryResult
-#include "MessageType.hpp"        // for MessageType, MessageType::DBQuery
-#include "messages/DBMessage.hpp" // for DBMessage, DBResponseMessage
+#include <memory>
+#include <stdexcept>
+#include <utility>
 
 namespace db
 {

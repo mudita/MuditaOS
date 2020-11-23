@@ -1,36 +1,36 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <module-utils/microtar/src/microtar.hpp> // for mtar_header_t, mtar_t
-#include <vfs.hpp>                                // for PATH_SYS, PATH_TMP
-#include <json/json11.hpp>                        // for Json
-#include <stdint.h>                               // for uint32_t
-#include <filesystem>                             // for path, filesystem
-#include <iosfwd>                                 // for size_t
-#include <string>                                 // for string, allocator
-#include <vector>                                 // for vector
+#include <json/json11.hpp>
+#include <module-utils/microtar/src/microtar.hpp>
+#include <vfs.hpp>
+
+#include <cstdint>
+#include <filesystem>
+#include <iosfwd>
+#include <string>
+#include <vector>
 
 class ServiceDesktop;
-
 namespace fs = std::filesystem;
 namespace updateos
 {
     namespace file
     {
-        const inline std::string checksums = "checksums.txt";
-        const inline std::string sql_mig   = "sqlmig.json";
-        const inline std::string version   = "version.json";
+        inline constexpr auto checksums = "checksums.txt";
+        inline constexpr auto sql_mig   = "sqlmig.json";
+        inline constexpr auto version   = "version.json";
 
     } // namespace file
 
     namespace extension
     {
-        const inline std::string update = ".tar";
+        inline constexpr auto update = ".tar";
     }
 
-    const inline int prefix_len = 8;
+    inline constexpr auto prefix_len = 8;
 
     enum class UpdateError
     {
@@ -51,12 +51,9 @@ namespace updateos
         CantRenameTempToCurrent,
         CantUpdateJSON,
         CantSaveJSON,
-        CantUpdateCRC32JSON
-    };
-
-    enum class BootloaderUpdateError
-    {
-        NoError,
+        CantUpdateCRC32JSON,
+        CantDeltreePreviousOS,
+        CantWriteToFile,
         NoBootloaderFile,
         CantOpenBootloaderFile,
         CantAllocateBuffer,
@@ -127,11 +124,11 @@ class UpdateMuditaOS : public updateos::UpdateStats
     updateos::UpdateError cleanupAfterUpdate();
     updateos::UpdateError updateUserData();
 
-    void informError(const char *format, ...);
+    updateos::UpdateError informError(updateos::UpdateError errorCode, const char *format, ...);
     void informDebug(const char *format, ...);
-    void informUpdate(const char *format, ...);
+    void informUpdate(const updateos::UpdateState statusCode, const char *format, ...);
 
-    updateos::BootloaderUpdateError writeBootloader(fs::path bootloaderFile);
+    updateos::UpdateError writeBootloader(fs::path bootloaderFile);
 
     void getChecksumInfo(const std::string &infoLine, std::string &filePath, unsigned long *fileCRC32Long);
     unsigned long getExtractedFileCRC32(const std::string &filePath);

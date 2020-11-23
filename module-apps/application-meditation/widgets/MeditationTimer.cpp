@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
 
 #include <cassert>
 
+#include <service-audio/AudioServiceAPI.hpp>
 #include <application-meditation/data/Style.hpp>
 #include <time/time_conversion.hpp>
 
@@ -162,7 +163,7 @@ namespace gui
 
     namespace
     {
-        constexpr auto intervalSoundPath = "assets/audio/ringtone.wav";
+        constexpr auto intervalSoundPath = "assets/audio/SMS-drum2.mp3";
     }
 
     void MeditationTimer::onInterval() const

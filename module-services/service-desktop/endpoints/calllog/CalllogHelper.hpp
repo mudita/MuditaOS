@@ -1,19 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <application-phonebook/models/PhonebookModel.hpp>
-#include <service-db/api/DBServiceAPI.hpp>
-#include <string> // for string, allocator
+#include <endpoints/Context.hpp>
+#include <endpoints/DBHelper.hpp>
 
-#include "Common/Query.hpp"
-#include "Context.hpp"
-#include "Service/Service.hpp"
-#include "Service/Common.hpp" // for ReturnCodes
-#include "DBHelper.hpp"       // for DBHelper
-#include "CalllogRecord.hpp"  // for CalllogRecord
-#include "json/json11.hpp"    // for Json
+#include <CalllogRecord.hpp>
+#include <Common/Query.hpp>
+#include <Service/Common.hpp>
+#include <Service/Service.hpp>
+#include <application-phonebook/models/PhonebookModel.hpp>
+#include <json/json11.hpp>
+
+#include <string>
 
 namespace sys
 {
@@ -42,18 +42,18 @@ namespace parserFSM
 
     namespace json::calllog
     {
-        const inline std::string count        = "count";
-        const inline std::string limit        = "limit";
-        const inline std::string offset       = "offset";
-        const inline std::string presentation = "presentation";
-        const inline std::string date         = "date";
-        const inline std::string duration     = "duration";
-        const inline std::string id           = "id";
-        const inline std::string type         = "type";
-        const inline std::string name         = "name";
-        const inline std::string contactId    = "contactId";
-        const inline std::string phoneNumber  = "phoneNumber";
-        const inline std::string isRead       = "isRead";
+        inline constexpr auto count        = "count";
+        inline constexpr auto limit        = "limit";
+        inline constexpr auto offset       = "offset";
+        inline constexpr auto presentation = "presentation";
+        inline constexpr auto date         = "date";
+        inline constexpr auto duration     = "duration";
+        inline constexpr auto id           = "id";
+        inline constexpr auto type         = "type";
+        inline constexpr auto name         = "name";
+        inline constexpr auto contactId    = "contactId";
+        inline constexpr auto phoneNumber  = "phoneNumber";
+        inline constexpr auto isRead       = "isRead";
 
     } // namespace json::calllog
 } // namespace parserFSM

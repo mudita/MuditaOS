@@ -1,12 +1,30 @@
 ﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * WorkerEvent.cpp
- *
- *  Created on: May 31, 2019
- *      Author: kuba
- */
+#include "service-evtmgr/BatteryMessages.hpp"
+#include "service-evtmgr/Constants.hpp"
+#include "service-evtmgr/EVMessages.hpp"
+#include "service-evtmgr/KbdMessage.hpp"
+#include "service-evtmgr/WorkerEvent.hpp"
+
+#include <Audio/AudioCommon.hpp>
+#include <MessageType.hpp>
+#include <Service/Bus.hpp>
+#include <Service/Worker.hpp>
+#include <bsp/battery-charger/battery_charger.hpp>
+#include <bsp/cellular/bsp_cellular.hpp>
+#include <bsp/keyboard/keyboard.hpp>
+#include <bsp/magnetometer/magnetometer.hpp>
+#include <bsp/rtc/rtc.hpp>
+#include <bsp/torch/torch.hpp>
+#include <bsp/vibrator/vibrator.hpp>
+#include <common_data/EventStore.hpp>
+#include <common_data/RawKey.hpp>
+#include <headset.hpp>
+#include <log/log.hpp>
+#include <service-audio/AudioMessage.hpp>
+#include <service-desktop/Constants.hpp>
+#include <service-desktop/DesktopMessages.hpp>
 
 extern "C"
 {
@@ -15,38 +33,12 @@ extern "C"
 #include "queue.h"    // for xQueueReceive, QueueDefinition, QueueHandle_t
 #include "task.h"     // for xTaskGetTickCount
 }
-#include "Audio/AudioCommon.hpp"      // for EventType, EventType::HeadphonesPlugin, EventType::HeadphonesUnplug
-#include "common_data/EventStore.hpp" // for GSM, GSM::Tray
-#include "common_data/RawKey.hpp"     // for RawKey, RawKey::State, RawKey::State::Pressed, RawKey::State::Released
-//#include "harness/harness.hpp"                          // for ETX, STX
-#include "log/log.hpp"                                 // for LOG_DEBUG, LOG_ERROR
-#include "service-audio/messages/AudioMessage.hpp"     // for AudioEventRequest
-#include "service-evtmgr/messages/BatteryMessages.hpp" // for BatteryLevelMessage, BatteryPlugMessage
-#include "service-evtmgr/messages/KbdMessage.hpp"      // for KbdMessage
 
-#include <Service/Bus.hpp> // for Bus
-//#include <bits/types/struct_tm.h>                       // for tm
 #include <sys/types.h> // for time_t
 #include <memory>      // for make_shared, __shared_ptr_access, shared_ptr, allocator
 #include <optional>    // for optional
 #include <string>      // for string
 #include <vector>      // for vector
-
-#include "Service/Worker.hpp" // for WorkerQueueInfo, Worker, WorkerCommand
-#include "MessageType.hpp" // for MessageType, MessageType::EVMMinuteUpdated, MessageType::EVMModemStatus, MessageType::EVMRingIndicator
-#include "WorkerEvent.hpp"
-#include "service-evtmgr/messages/EVMessages.hpp"  // for StatusStateMessage, RtcMinuteAlarmMessage
-#include "bsp/battery-charger/battery_charger.hpp" // for battery_ClearAllIRQs, battery_Deinit, battery_Init, battery_getBatteryLevel, battery_getChargeStatus, batteryIRQSource, batteryIRQSource::INOKB, batteryIRQSource::INTB
-#include "bsp/cellular/bsp_cellular.hpp" // for getStatus, getTray, hotswap_trigger, init, ringIndicatorPin, statusPin, trayPin, value, value::ACTIVE
-#include "bsp/keyboard/keyboard.hpp" // for keyboard_Deinit, keyboard_Init, keyboard_get_data
-#include "headset.hpp"               // for Deinit, Handler, Init, IsInserted
-#include "bsp/rtc/rtc.hpp" // for rtc_GetCurrentTimestamp, rtc_SetMinuteAlarm, rtc_GetCurrentDateTime, rtc_Init
-#include "bsp/vibrator/vibrator.hpp"         // for init
-#include "bsp/magnetometer/magnetometer.hpp" // for WorkerEventHandler, init
-#include "bsp/torch/torch.hpp"               // for deinit, init
-#include "Constants.hpp"                     // for evt_manager
-#include "bsp/harness/bsp_harness.hpp"       // for Init, emit, flush, read
-#include "harness/Parser.hpp"                // for c_str, parse, Error, Error::Success
 
 bool WorkerEvent::handleMessage(uint32_t queueID)
 {
@@ -82,8 +74,9 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
 
         if (bsp::headset::Handler(notification) == true) {
             bool state = bsp::headset::IsInserted();
-            auto message = std::make_shared<AudioEventRequest>(state ? audio::EventType::HeadphonesPlugin
-                                                                     : audio::EventType::HeadphonesUnplug);
+            auto message = std::make_shared<AudioEventRequest>(audio::EventType::JackState,
+                                                               state ? audio::Event::DeviceState::Connected
+                                                                     : audio::Event::DeviceState::Disconnected);
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
         }
     }
@@ -131,28 +124,6 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
     }
 
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueHarness)) {
-        uint8_t notification;
-        if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
-            return false;
-        }
-        if (notification == STX) {
-            if (bsp::harness::flush() != true) {
-                LOG_ERROR("processing in progres...");
-            }
-        }
-        else if (notification == ETX) {
-            std::string text = bsp::harness::read();
-            auto ret         = harness::parse(text, this->service);
-            if (ret != harness::Error::Success) {
-                LOG_ERROR("Harness parser error: %s", c_str(ret));
-            }
-        }
-        else {
-            LOG_ERROR("Unknown event!");
-        }
-    }
-
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueCellular)) {
         uint8_t notification;
         if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
@@ -196,8 +167,6 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
     return true;
 }
 
-#include "harness/events/SysStart.hpp" // for SysStart
-
 bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
 {
     Worker::init(queues);
@@ -207,7 +176,6 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     bsp::headset::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHeadsetIRQ)]);
     bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
     bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
-    bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
     bsp::cellular::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueCellular)]);
     bsp::magnetometer::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]);
     bsp::torch::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueTorch)]);
@@ -215,7 +183,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     time_t timestamp;
     bsp::rtc_GetCurrentTimestamp(&timestamp);
     bsp::rtc_SetMinuteAlarm(timestamp);
-    bsp::harness::emit(harness::SysStart().encode());
+
     return true;
 }
 

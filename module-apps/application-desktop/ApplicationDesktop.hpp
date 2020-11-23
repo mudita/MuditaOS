@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,16 +8,21 @@
 
 #include <Application.hpp>
 #include <Service/Message.hpp>
-#include <service-cellular/messages/CellularMessage.hpp>
-#include <service-db/messages/DBNotificationMessage.hpp>
+#include <service-cellular/CellularMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
-#include <service-desktop/endpoints/update/UpdateMuditaOS.hpp>
-#include <module-services/service-desktop/ServiceDesktop.hpp>
-#include "DesktopMessages.hpp"
+#include <endpoints/update/UpdateMuditaOS.hpp>
+#include <service-desktop/ServiceDesktop.hpp>
+#include <service-desktop/DesktopMessages.hpp>
+
+namespace cellular
+{
+    class StateChange;
+}
 
 namespace app
 {
-    inline const std::string name_desktop = "ApplicationDesktop";
+    inline constexpr auto name_desktop = "ApplicationDesktop";
 
     class ApplicationDesktop : public Application
     {
@@ -50,7 +55,7 @@ namespace app
                            std::string parent                  = {},
                            StartInBackground startInBackground = {false});
         virtual ~ApplicationDesktop();
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 
@@ -66,7 +71,7 @@ namespace app
         bool handle(cellular::StateChange *msg);
         auto handle(db::query::notifications::GetAllResult *msg) -> bool;
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
-
+        auto handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool;
         /**
          * This static method will be used to lock the phone
          */
@@ -83,7 +88,13 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch,
+                     manager::actions::RequestPin,
+                     manager::actions::RequestPuk,
+                     manager::actions::RequestPinChange,
+                     manager::actions::UnlockSim,
+                     manager::actions::BlockSim,
+                     manager::actions::DisplayCMEError}};
         }
     };
 

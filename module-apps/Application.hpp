@@ -1,28 +1,25 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "Audio/AudioCommon.hpp"                        // for Volume, Play...
 #include "Audio/Profiles/Profile.hpp"                   // for Profile, Pro...
-#include "AudioServiceAPI.hpp"                          // for GetOutputVolume
 #include "Interface/SettingsRecord.hpp"                 // for SettingsRecord
 #include "Service/Bus.hpp"                              // for Bus
 #include "Service/Common.hpp"                           // for ReturnCodes
-#include "Service/Message.hpp"                          // for Message_t
+#include "Service/Message.hpp"                          // for MessagePointer
 #include "Service/Service.hpp"                          // for Service
 #include "SwitchData.hpp"                               // for SwitchData
 #include "SystemManager/SystemManager.hpp"              // for SystemManager
 #include "bsp/keyboard/key_codes.hpp"                   // for bsp
 #include "gui/Common.hpp"                               // for ShowMode
 #include "projdefs.h"                                   // for pdMS_TO_TICKS
-#include "service-evtmgr/messages/EVMessages.hpp"       // for TorchStateMe...
-#include "module-services/service-appmgr/ApplicationManifest.hpp"
+#include <service-appmgr/ApplicationManifest.hpp>
 #include <list>                                         // for list
 #include <map>                                          // for allocator, map
 #include <memory>                                       // for make_shared
 #include <module-bsp/bsp/torch/torch.hpp>               // for State, State...
-#include <module-services/service-evtmgr/Constants.hpp> // for evt_manager
 #include <stdint.h>                                     // for uint32_t
 #include <string>                                       // for string
 #include <utility>                                      // for move, pair
@@ -61,12 +58,12 @@ namespace app
     class Application;
     class GuiTimer;
 
-    inline auto msgHandled() -> sys::Message_t
+    inline auto msgHandled() -> sys::MessagePointer
     {
         return std::make_shared<sys::ResponseMessage>();
     }
 
-    inline auto msgNotHandled() -> sys::Message_t
+    inline auto msgNotHandled() -> sys::MessagePointer
     {
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
     }
@@ -154,27 +151,27 @@ namespace app
         /// c_str() function for Application::State
         static const char *stateStr(State st);
 
-        using OnActionReceived = std::function<void(manager::actions::ActionParamsPtr &&)>;
+        using OnActionReceived = std::function<sys::MessagePointer(manager::actions::ActionParamsPtr &&)>;
 
       private:
         std::string default_window;
         State state = State::DEACTIVATED;
 
-        sys::Message_t handleSignalStrengthUpdate(sys::DataMessage *msgl);
-        sys::Message_t handleNetworkAccessTechnologyUpdate(sys::DataMessage *msgl);
-        sys::Message_t handleInputEvent(sys::DataMessage *msgl);
-        sys::Message_t handleKBDKeyEvent(sys::DataMessage *msgl);
-        sys::Message_t handleBatteryLevel(sys::DataMessage *msgl);
-        sys::Message_t handleChargerPlugged(sys::DataMessage *msgl);
-        sys::Message_t handleMinuteUpdated(sys::DataMessage *msgl);
-        sys::Message_t handleAction(sys::DataMessage *msgl);
-        sys::Message_t handleApplicationSwitch(sys::DataMessage *msgl);
-        sys::Message_t handleSwitchWindow(sys::DataMessage *msgl);
-        sys::Message_t handleAppClose(sys::DataMessage *msgl);
-        sys::Message_t handleAppRebuild(sys::DataMessage *msgl);
-        sys::Message_t handleAppRefresh(sys::DataMessage *msgl);
-        sys::Message_t handleAppFocusLost(sys::DataMessage *msgl);
-        sys::Message_t handleSIMMessage(sys::DataMessage *msgl);
+        sys::MessagePointer handleSignalStrengthUpdate(sys::Message *msgl);
+        sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);
+        sys::MessagePointer handleInputEvent(sys::Message *msgl);
+        sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl);
+        sys::MessagePointer handleBatteryLevel(sys::Message *msgl);
+        sys::MessagePointer handleChargerPlugged(sys::Message *msgl);
+        sys::MessagePointer handleMinuteUpdated(sys::Message *msgl);
+        sys::MessagePointer handleAction(sys::Message *msgl);
+        sys::MessagePointer handleApplicationSwitch(sys::Message *msgl);
+        sys::MessagePointer handleSwitchWindow(sys::Message *msgl);
+        sys::MessagePointer handleAppClose(sys::Message *msgl);
+        sys::MessagePointer handleAppRebuild(sys::Message *msgl);
+        sys::MessagePointer handleAppRefresh(sys::Message *msgl);
+        sys::MessagePointer handleAppFocusLost(sys::Message *msgl);
+        sys::MessagePointer handleSIMMessage(sys::Message *msgl);
 
         std::list<std::unique_ptr<app::GuiTimer>> gui_timers;
         std::unordered_map<manager::actions::ActionId, OnActionReceived> receivers;
@@ -234,7 +231,7 @@ namespace app
 
         /// Mehtod to handle bus messages, all message types are defined in Message.hpp
         /// Message types are in MessageType
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl);
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl);
 
         /// initialization function
         /// 1. it has to be called for each and every application instance, it registeres application in
@@ -276,10 +273,7 @@ namespace app
 
         auto getVolume(audio::Volume &volume,
                        const audio::Profile::Type &profileType,
-                       const audio::PlaybackType &playbackType)
-        {
-            return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume, playbackType, profileType);
-        }
+                       const audio::PlaybackType &playbackType);
 
         bool adjustCurrentVolume(const int step);
         bool increaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
@@ -290,44 +284,9 @@ namespace app
         {
             return adjustCurrentVolume(-step);
         }
-        auto getCurrentVolume(audio::Volume &volume)
-        {
-            return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
-        }
+        audio::RetCode getCurrentVolume(audio::Volume &volume);
 
-        void toggleTorchAndColourTemps()
-        {
-            using namespace bsp;
-
-            auto retGetState = sys::Bus::SendUnicast(std::make_shared<sevm::TorchStateMessage>(torch::Action::getState),
-                                                     service::name::evt_manager,
-                                                     this,
-                                                     pdMS_TO_TICKS(1500));
-            if (retGetState.first == sys::ReturnCodes::Success) {
-                auto msgGetState = dynamic_cast<sevm::TorchStateResultMessage *>(retGetState.second.get());
-                if (msgGetState == nullptr) {
-                    return;
-                }
-                auto msgSetState = std::make_shared<sevm::TorchStateMessage>(torch::Action::setState);
-
-                switch (msgGetState->state) {
-                case torch::State::off:
-                    msgSetState->state      = torch::State::on;
-                    msgSetState->colourTemp = torch::warmest;
-                    break;
-                case torch::State::on:
-                    if (msgGetState->colourTemp == torch::warmest) { // toggle colour temp
-                        msgSetState->state      = torch::State::on;
-                        msgSetState->colourTemp = torch::coldest;
-                    }
-                    else {
-                        msgSetState->state = torch::State::off;
-                    }
-                    break;
-                }
-                sys::Bus::SendUnicast(msgSetState, service::name::evt_manager, this);
-            }
-        }
+        void toggleTorchAndColourTemps();
 
         /// @defgroup Application Application static functions
         /// All this functions are meant to be used in ApplicationManager only

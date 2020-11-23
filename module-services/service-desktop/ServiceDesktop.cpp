@@ -1,25 +1,26 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <messages/QueryMessage.hpp>                              // for QueryResponse
-#include <module-apps/application-desktop/ApplicationDesktop.hpp> // for name_desktop
-#include <module-services/service-desktop/ServiceDesktop.hpp>
-#include <inttypes.h> // for PRIu32
-#include <filesystem> // for path
+#include "service-desktop/DesktopMessages.hpp"
+#include "service-desktop/ServiceDesktop.hpp"
+#include "service-desktop/WorkerDesktop.hpp"
+#include "service-cellular/CellularMessage.hpp"
+#include "endpoints/factoryReset/FactoryReset.hpp"
+#include "endpoints/backup/BackupRestore.hpp"
+#include "endpoints/update/UpdateMuditaOS.hpp"
 
-#include "ServiceDesktop.hpp" // for ServiceDesktop, cdc_queue_len, cdc_queue_object_size, service_desktop, service_stack
-#include "BackupRestore.hpp"  // for BackupRestore
-#include "DesktopMessages.hpp" // for UpdateOsMessage, BackupMessage, FactoryMessage, RestoreMessage
-#include "module-services/service-desktop/endpoints/factoryReset/FactoryReset.hpp" // for Run
-#include "log/log.hpp"                                                             // for LOG_DEBUG, LOG_INFO, LOG_ERROR
-#include "Common/Query.hpp"                                                        // for QueryResult
-#include "MessageType.hpp"    // for MessageType, MessageType::DBQuery
-#include "Service/Bus.hpp"    // for Bus
-#include "Service/Worker.hpp" // for WorkerQueueInfo
-#include "UpdateMuditaOS.hpp" // for UpdateMuditaOS, UpdateStats, UpdateMessageType, UpdateError, UpdateError::NoError, UpdateMessageType::UpdateCheckForUpdateOnce, UpdateMessageType::UpdateFoundOnBoot, UpdateMessageType::UpdateNow
-#include "WorkerDesktop.hpp"  // for WorkerDesktop
-#include "json/json11.hpp"    // for Json
-#include "vfs.hpp"            // for vfs
+#include <Common/Query.hpp>
+#include <MessageType.hpp>
+#include <Service/Bus.hpp>
+#include <Service/Worker.hpp>
+#include <json/json11.hpp>
+#include <log/log.hpp>
+#include <module-apps/application-desktop/ApplicationDesktop.hpp>
+#include <service-db/QueryMessage.hpp>
+#include <vfs.hpp>
+
+#include <cinttypes>
+#include <filesystem>
 
 ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {
@@ -36,12 +37,27 @@ ServiceDesktop::~ServiceDesktop()
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
     desktopWorker = std::make_unique<WorkerDesktop>(this);
-    desktopWorker->init(
-        {{desktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), sdesktop::cdc_queue_len},
-         {desktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
-    desktopWorker->run();
+    const bool ret = desktopWorker->init(
+        {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), sdesktop::cdc_queue_len},
+         {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
 
-    connect(sdesktop::BackupMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+    if (ret == false) {
+        LOG_ERROR("!!! service-desktop InitHandler failed to initialize worker, service-desktop won't work");
+        return sys::ReturnCodes::Failure;
+    }
+    else {
+        desktopWorker->run();
+    }
+    connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
+        auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
+        if (request->event != nullptr) {
+            request->event->send();
+        }
+
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sdesktop::BackupMessage(), [&](sys::Message *msg) {
         sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
         if (backupMessage != nullptr) {
 
@@ -50,7 +66,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sdesktop::RestoreMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+    connect(sdesktop::RestoreMessage(), [&](sys::Message *msg) {
         sdesktop::RestoreMessage *restoreMessage = dynamic_cast<sdesktop::RestoreMessage *>(msg);
         if (restoreMessage != nullptr) {
 
@@ -59,7 +75,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sdesktop::FactoryMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+    connect(sdesktop::FactoryMessage(), [&](sys::Message *msg) {
         auto *factoryMessage = dynamic_cast<sdesktop::FactoryMessage *>(msg);
         if (factoryMessage != nullptr) {
             LOG_DEBUG("ServiceDesktop: FactoryMessage received");
@@ -68,7 +84,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sdesktop::UpdateOsMessage(), [&](sys::DataMessage *msg, sys::ResponseMessage *resp) {
+    connect(sdesktop::UpdateOsMessage(), [&](sys::Message *msg) {
         sdesktop::UpdateOsMessage *updateOsMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
 
         if (updateOsMsg != nullptr &&
@@ -95,8 +111,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    vfs.updateTimestamp();
-
     return (sys::ReturnCodes::Success);
 }
 
@@ -111,8 +125,12 @@ sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerM
     return sys::ReturnCodes::Success;
 }
 
-sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
+sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
+    if (auto msg = dynamic_cast<cellular::RawCommandResp *>(resp)) {
+        auto event = std::make_unique<sdesktop::developerMode::ATResponseEvent>(msg->response);
+        event->send();
+    }
     if (resp != nullptr) {
         if (resp->responseTo == MessageType::DBQuery) {
             if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {

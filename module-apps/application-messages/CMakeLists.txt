@@ -1,4 +1,4 @@
-include_directories( ${CMAKE_PROJECT_NAME}
+﻿include_directories( ${CMAKE_PROJECT_NAME}
 
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}"
@@ -48,3 +48,7 @@ target_sources( ${PROJECT_NAME}
         "widgets/SMSOutputWidget.hpp"
 )
 
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        service-db
+    )

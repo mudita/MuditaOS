@@ -6,83 +6,53 @@
 
 namespace gui
 {
-    PinLock::PinLock(gui::PinLockHandler *handler) : handler(handler)
-    {}
-
-    void PinLock::consumeInvalidPinState() noexcept
+    void PinLock::consumeState() noexcept
     {
-        if (state == State::InvalidPin) {
-            state = State::EnterPin;
+        if (lockState == LockState::PasscodeInvalidRetryRequired) {
+            lockState = LockState::PasscodeRequired;
+        }
+        else if (lockState == LockState::NewPasscodeInvalid) {
+            lockState = LockState::NewPasscodeRequired;
         }
     }
 
-    void PinLock::putNextChar(unsigned int c) noexcept
+    void PinLock::setNewPasscodeInvalidState() noexcept
     {
-        if (state == State::EnterPin && charCount < pinValue.size()) {
-            pinValue[charCount++] = c;
+        if (lockState == LockState::NewPasscodeRequired) {
+            lockState = LockState::NewPasscodeInvalid;
         }
     }
 
-    void PinLock::verifyPin() noexcept
+    void PinLock::putNextChar(unsigned int c)
     {
-        if (charCount == pinValue.size()) {
-            handler->handle(pinValue);
-            clearAttempt();
+        if (maxPinSize > pinValue.size()) {
+            pinValue.push_back(c);
+        }
+        if (canVerify() && autoActivate && onActivatedCallback != nullptr) {
+            onActivatedCallback(pinValue);
         }
     }
 
-    void PinLock::popChar() noexcept
+    void PinLock::popChar()
     {
-        if (state == State::EnterPin && charCount > 0) {
-            charCount--;
-            pinValue[charCount] = 0;
+        if (pinValue.size() > 0) {
+            pinValue.pop_back();
         }
     }
 
     void PinLock::clearAttempt() noexcept
     {
-        for (auto &c : pinValue) {
-            c = 0;
-        }
-        charCount = 0;
+        pinValue.clear();
     }
 
-    bool PinLock::unlock() noexcept
+    void PinLock::verify()
     {
-        if (state == State::VerifiedPin || pinValue.size() == 0) {
-            state = State::Unlocked;
-            return true;
+        auto pinCopy = std::move(pinValue);
+        clearAttempt();
+        if (!onActivatedCallback) {
+            LOG_ERROR("Passcode verification callback null");
+            return;
         }
-        return false;
-    }
-
-    void PinLock::lock() noexcept
-    {
-        if (state == State::Unlocked) {
-            state = State::EnterPin;
-        }
-    }
-
-    bool PinLock::isLocked() const noexcept
-    {
-        return state != State::Unlocked;
-    }
-
-    std::string PinLock::getLockInfo(const InfoName name) const
-    {
-        try {
-            return additionalLockInfo.at(name);
-        }
-        catch (std::out_of_range &) {
-            return std::string{};
-        }
-    }
-
-    void PinLock::reset(LockType newType, State newState, unsigned int attempts, unsigned int size) noexcept
-    {
-        type              = newType;
-        state             = newState;
-        remainingAttempts = attempts;
-        pinValue          = std::vector<unsigned int>(size, 0);
+        onActivatedCallback(pinCopy);
     }
 } // namespace gui

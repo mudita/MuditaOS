@@ -16,9 +16,10 @@ namespace gui
       public:
         virtual ~Progress() noexcept = default;
 
-        virtual void setMaximum(unsigned int value) noexcept         = 0;
-        virtual void setValue(unsigned int value) noexcept           = 0;
-        virtual void setPercentageValue(unsigned int value) noexcept = 0;
+        virtual void setMaximum(unsigned int value)         = 0;
+        virtual void setValue(unsigned int value)           = 0;
+        virtual void update(int value = 1)                  = 0;
+        virtual void setPercentageValue(unsigned int value) = 0;
     };
 
     class ProgressBar : public Rect, public Progress
@@ -28,6 +29,7 @@ namespace gui
 
         void setMaximum(unsigned int value) noexcept override;
         void setValue(unsigned int value) noexcept override;
+        void update(int value = 1) noexcept override;
         void setPercentageValue(unsigned int value) noexcept override;
 
         void buildDrawListImplementation(std::list<Command> &commands) override;
@@ -48,6 +50,7 @@ namespace gui
 
         void setMaximum(unsigned int value) noexcept override;
         void setValue(unsigned int value) noexcept override;
+        void update(int value = 1) noexcept override;
         void setPercentageValue(unsigned int value) noexcept override;
 
         void buildDrawListImplementation(std::list<Command> &commands) override;
@@ -56,8 +59,8 @@ namespace gui
       private:
         void createWidgets();
 
-        auto calculateProgressIndicatorCenter() const noexcept -> Point;
-        auto getPercentageValue() const noexcept -> float;
+        auto calculateProgressIndicatorCenter() const -> Point;
+        auto getPercentageValue() const -> float;
 
         unsigned int maxValue     = 0U;
         unsigned int currentValue = 0U;

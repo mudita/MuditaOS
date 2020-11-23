@@ -3,14 +3,13 @@
 
 #pragma once
 
-#include "Common/Query.hpp"
 #include "Context.hpp"
-#include "ParserFSM.hpp"
-#include "messages/QueryMessage.hpp"
-#include "queries/messages/threads/QueryThreadsSearchForList.hpp"
+#include "Endpoint.hpp"
+#include <parser/ParserFSM.hpp>
+
+#include <Common/Query.hpp>
 #include <Service/Common.hpp>
 #include <Service/Service.hpp>
-#include "Endpoint.hpp"
 
 namespace parserFSM
 {

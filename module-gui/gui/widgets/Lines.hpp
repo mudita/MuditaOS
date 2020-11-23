@@ -22,21 +22,24 @@ namespace gui
 
     class Lines
     {
-        Text *parent = nullptr;
+        Text *text = nullptr;
         std::list<TextLine> lines;
 
         uint32_t max_lines_count = 4;
         uint32_t scroll_position = 0;
 
+        bool underLine            = false;
+        Position underLinePadding = 0;
+
       public:
-        Lines(Text *parent) : parent(parent)
+        Lines(Text *text) : text(text)
         {}
 
         ~Lines() = default;
 
         void erase()
         {
-            if (parent != nullptr) {
+            if (text != nullptr) {
                 for (auto &line : lines) {
                     line.erase();
                 }
@@ -64,6 +67,11 @@ namespace gui
             return lines.size();
         }
 
+        [[nodiscard]] auto empty() const noexcept -> bool
+        {
+            return lines.empty();
+        }
+
         auto maxWidth()
         {
             unsigned int w = 0;
@@ -83,21 +91,39 @@ namespace gui
             return h;
         }
 
-        void draw(TextCursor &cursor);
+        auto setUnderLine(bool val) -> void
+        {
+            underLine = val;
+        }
 
-        void linesHAlign(Length parentSize);
-        void linesVAlign(Length parentSize);
-        auto checkBounds(TextLineCursor &cursor, InputEvent event) -> InputBound;
-        void updateScrollPosition(NavigationDirection scroll, uint32_t lines_to_scroll = 1);
+        auto getUnderLine() -> bool
+        {
+            return underLine;
+        }
+
+        auto setUnderLinePadding(Position val) -> void
+        {
+            underLinePadding = val;
+        }
+
+        auto getUnderLinePadding() -> Position
+        {
+            return underLinePadding;
+        }
+
+        auto draw(BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition) -> void;
+        auto draw(BlockCursor &drawCursor,
+                  Length w,
+                  Length h,
+                  Position lineYPosition,
+                  Position lineXPosition,
+                  unsigned int linesCount) -> void;
+
+        auto linesHAlign(Length parentSize) -> void;
+        auto linesVAlign(Length parentSize) -> void;
 
       protected:
-        auto processTextInput(TextLineCursor &cursor, const InputEvent &event) -> InputBound;
-        auto processNavigation(TextLineCursor &cursor, const InputEvent &event) -> InputBound;
-
-        auto canMove(TextLineCursor &cursor, NavigationDirection dir) -> InputBound;
-        InputBound processRemoval(TextLineCursor &cursor);
         TextLine *getTextLine(uint32_t line);
-        InputBound processAdding(TextLineCursor &cursor, const InputEvent &event);
     };
 
 } // namespace gui

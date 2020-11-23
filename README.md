@@ -19,6 +19,7 @@ MuditaOS is a mobile operating system optimized for E Ink displays. Built on Fre
 - contacts and calendar synchronization via Mudita Center desktop app 
 - flashlight
 - user interface optimized for E Ink displays with frontlight support
+- dark mode
 - Bluetooth headset connectivity with A2DP (Advanced Audio Distribution Profile) and HSP (Headset Profile) support
 - Passive Dual SIM support
 - USB-C Fast Charging
@@ -56,7 +57,7 @@ You can quickstart the project by going through one of the following guides:
 
 ## Contributing
 
-Pull requests are welcome. Please follow the guidelines in the ["Contributing to MuditaOS"](./CONTRIBUTING.md) article. Before contributing or starting a discussion, please make sure that you read our [Code of Conduct](./CODE_OF_CODUCT.md).
+Pull requests are welcome. Please follow the guidelines in the ["Contributing to MuditaOS"](./CONTRIBUTING.md) article. Before contributing or starting a discussion, please make sure that you read our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ### Discussions
 
@@ -103,4 +104,4 @@ firefox build-<target>-<build_type>/doc/html/index.html
 The [MuditaOS changelog](./changelog.md) is regularly updated by the core development team.
 
 ## License
-MuditaOS is licensed on [GPL3](https://choosealicense.com/licenses/gpl-3.0/).
+MuditaOS is licensed on [GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/).

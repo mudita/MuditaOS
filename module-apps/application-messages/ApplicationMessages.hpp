@@ -18,13 +18,13 @@ namespace gui
     {
         namespace window
         {
-            inline const std::string dialog_yes_no     = "DialogYesNo";
-            inline const std::string dialog_confirm    = "DialogConfirm";
-            inline const std::string dialog            = "Dialog";
-            inline const std::string new_sms           = "NewSMS";
-            inline const std::string thread_sms_search = "SMSSearch";
-            inline const std::string sms_templates     = "SMSTemplates";
-            inline const std::string thread_view       = "ThreadViewWindow";
+            inline constexpr auto dialog_yes_no     = "DialogYesNo";
+            inline constexpr auto dialog_confirm    = "DialogConfirm";
+            inline constexpr auto dialog            = "Dialog";
+            inline constexpr auto new_sms           = "NewSMS";
+            inline constexpr auto thread_sms_search = "SMSSearch";
+            inline constexpr auto sms_templates     = "SMSTemplates";
+            inline constexpr auto thread_view       = "ThreadViewWindow";
 
         }; // namespace window
     };     // namespace name
@@ -33,7 +33,7 @@ namespace gui
 namespace app
 {
 
-    inline const std::string name_messages = "ApplicationMessages";
+    inline constexpr auto name_messages = "ApplicationMessages";
 
     class ApplicationMessages : public app::Application
     {
@@ -43,7 +43,7 @@ namespace app
                             StartInBackground startInBackground = {false});
         virtual ~ApplicationMessages();
 
-        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
 
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
@@ -82,7 +82,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::CreateSms, manager::actions::ShowSmsTemplates}};
         }
     };
 } /* namespace app */

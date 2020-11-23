@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+﻿cmake_minimum_required(VERSION 3.12)
 
 project(module-audio VERSION 1.0
         DESCRIPTION "Audio module library")
@@ -69,7 +69,13 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME} module-bsp module-os module-utils module-vfs module-sys tag )
+target_link_libraries(${PROJECT_NAME}
+    module-bsp
+    module-os
+    module-utils
+    module-sys
+    tag
+)
 
 if (${ENABLE_TESTS})
     add_subdirectory(Audio/test)

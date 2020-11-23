@@ -10,7 +10,7 @@ class NotesDB : public Database
 {
   public:
     NotesDB();
-    virtual ~NotesDB();
+    ~NotesDB() = default;
 
     NotesTable notes;
 

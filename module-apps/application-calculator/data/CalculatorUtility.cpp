@@ -5,6 +5,7 @@
 #include "application-calculator/widgets/CalculatorStyle.hpp"
 #include <module-utils/tinyexpr/tinyexpr.h>
 #include <module-utils/i18/i18.hpp>
+#include <Utils.hpp>
 #include <cmath>
 
 Result Calculator::calculate(std::string source)
@@ -13,16 +14,10 @@ Result Calculator::calculate(std::string source)
     int error;
     double result = te_interp(source.c_str(), &error);
     if (error == 0 && !std::isinf(result) && !std::isnan(result)) {
-        auto output = std::to_string(result);
-        if (output.find_last_not_of('0') != std::string::npos) {
-            output.erase(output.find_last_not_of('0') + 1);
-        }
-        if (output.find_last_not_of(style::calculator::symbols::strings::full_stop) != std::string::npos) {
-            output.erase(output.find_last_not_of(style::calculator::symbols::strings::full_stop) + 1);
-        }
+        auto output = utils::to_string(result);
         if (utils::localize.get("app_calculator_decimal_separator") == style::calculator::symbols::strings::comma) {
             output.replace(output.find(style::calculator::symbols::strings::full_stop),
-                           style::calculator::symbols::strings::full_stop.length(),
+                           std::size(std::string_view(style::calculator::symbols::strings::full_stop)),
                            style::calculator::symbols::strings::comma);
         }
         return Result{source, output, false};

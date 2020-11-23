@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "ContactHelper.hpp"
 #include "ContactsEndpoint.hpp"
 
-#include <memory> // for unique_ptr
+#include <endpoints/Context.hpp>
 
-#include "Context.hpp"                // for Context
-#include "contacts/ContactHelper.hpp" // for ContactHelper
+#include <memory>
 
 using namespace parserFSM;
 

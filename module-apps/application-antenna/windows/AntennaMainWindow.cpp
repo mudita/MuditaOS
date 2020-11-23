@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -20,8 +20,8 @@
 #include "ScanModesWindow.hpp"
 #include "AlgoParamsWindow.hpp"
 #include "../ApplicationAntenna.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
-#include "service-antenna/api/AntennaServiceAPI.hpp"
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <service-antenna/AntennaServiceAPI.hpp>
 #include <at/response.hpp>
 namespace gui
 {

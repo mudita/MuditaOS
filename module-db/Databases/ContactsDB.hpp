@@ -15,7 +15,7 @@ class ContactsDB : public Database
 {
   public:
     ContactsDB();
-    ~ContactsDB();
+    ~ContactsDB() = default;
 
     static const char *GetDBName()
     {

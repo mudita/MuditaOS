@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-vfs/vfs.hpp>
+#include <vfs.hpp>
 #include "ContactsDB.hpp"
 
 const char *ContactsDB::dbName = USER_PATH("contacts.db");
@@ -15,25 +15,6 @@ ContactsDB::ContactsDB()
     : Database(dbName), contacts(this), name(this), number(this), ringtones(this), address(this), groups(this)
 {
 
-    if (contacts.create() == false) {
-        return;
-    }
-    if (name.create() == false) {
-        return;
-    }
-    if (number.create() == false) {
-        return;
-    }
-    if (ringtones.create() == false) {
-        return;
-    }
-    if (address.create() == false) {
-        return;
-    }
-    if (groups.create() == false) {
-        return;
-    }
-
     if (favouritesId == 0) {
         favouritesId = groups.favouritesId();
     }
@@ -46,9 +27,4 @@ ContactsDB::ContactsDB()
     if (temporaryId == 0) {
         temporaryId = groups.temporaryId();
     }
-
-    isInitialized_ = true;
 }
-
-ContactsDB::~ContactsDB()
-{}

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -7,7 +7,6 @@
 #include "DialogMetadataMessage.hpp"
 #include "OptionsWindow.hpp"
 #include "application-messages/data/SMSTextToSearch.hpp"
-#include "messages/DBNotificationMessage.hpp"
 #include "windows/MessagesMainWindow.hpp"
 #include "windows/NewMessage.hpp"
 #include "windows/OptionsMessages.hpp"
@@ -20,7 +19,9 @@
 #include <Dialog.hpp>
 #include <i18/i18.hpp>
 #include <memory>
-#include <service-db/api/DBServiceAPI.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include <service-db/DBNotificationMessage.hpp>
+#include <service-db/QueryMessage.hpp>
 #include <OptionWindow.hpp>
 
 #include <module-db/queries/messages/sms/QuerySMSAdd.hpp>
@@ -40,13 +41,21 @@ namespace app
         : Application(name, parent, startInBackground, 4096 * 2)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {
+            switchWindow(gui::name::window::new_sms, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::ShowSmsTemplates, [this](auto &&data) {
+            switchWindow(gui::name::window::sms_templates, std::move(data));
+            return msgHandled();
+        });
     }
 
     ApplicationMessages::~ApplicationMessages()
     {}
 
     // Invoked upon receiving data message
-    sys::Message_t ApplicationMessages::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationMessages::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
         auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
@@ -384,7 +393,7 @@ namespace app
 
     bool ApplicationMessages::newMessageOptions(const std::string &requestingWindow, gui::Text *text)
     {
-        LOG_INFO("New message options");
+        LOG_INFO("New message options for %s", requestingWindow.c_str());
         auto opts = std::make_unique<gui::OptionsWindowOptions>(newMessageWindowOptions(this, requestingWindow, text));
         switchWindow(utils::localize.get("app_phonebook_options_title"), std::move(opts));
         return true;
