@@ -535,8 +535,6 @@ auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
     return true;
 }
 
-
-
 sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
@@ -939,9 +937,9 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         channel->cmd(at::AT::DISABLE_TIME_ZONE_REPORTING);
         channel->cmd(at::AT::DISABLE_TIME_ZONE_UPDATE);
     } break;
-    case MessageType::CellularSimResponse:{
+    case MessageType::CellularSimResponse: {
         handleSimResponse(msgl);
-    }break;
+    } break;
     default:
         break;
 
@@ -1078,7 +1076,7 @@ bool ServiceCellular::changePin(const std::string oldPin, const std::string newP
 
 bool ServiceCellular::unlockSimPin(std::string pin)
 {
-    LOG_ERROR("Unlock pin %s",pin.c_str());
+    LOG_ERROR("Unlock pin %s", pin.c_str());
     SimCard simCard(*this);
     SimCardResult sime;
     LOG_DEBUG("PIN:  %s", pin.c_str());
@@ -1119,7 +1117,7 @@ bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
 
 bool ServiceCellular::handleSimResponse(sys::DataMessage *msgl)
 {
-    
+
     auto msgSimPin = dynamic_cast<CellularSimPinDataMessage *>(msgl);
     if (msgSimPin != nullptr) {
         LOG_DEBUG("Unclocking sim");
@@ -1129,7 +1127,7 @@ bool ServiceCellular::handleSimResponse(sys::DataMessage *msgl)
     auto msgSimPuk = dynamic_cast<CellularSimPukDataMessage *>(msgl);
     if (msgSimPuk != nullptr) {
         LOG_DEBUG("Unlocking puk");
-        return unlockSimPuk(utils::vectorToString(msgSimPuk->getPuk()),utils::vectorToString(msgSimPuk->getNewPin()));
+        return unlockSimPuk(utils::vectorToString(msgSimPuk->getPuk()), utils::vectorToString(msgSimPuk->getNewPin()));
     }
     return false;
 }
@@ -1306,8 +1304,8 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
 
     channel->cmd(at::AT::SMS_UCSC2);
 
-    auto cmd = at::factory(at::AT::QCMGR);
-    auto ret = channel->cmd(cmd + messageNumber, cmd.timeout);
+    auto cmd           = at::factory(at::AT::QCMGR);
+    auto ret           = channel->cmd(cmd + messageNumber, cmd.timeout);
     bool messageParsed = false;
 
     std::string messageRawBody;

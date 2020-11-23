@@ -28,7 +28,6 @@ namespace utils
         }
     }
 
-
     static inline std::vector<std::string> split(const std::string &s, char delim)
     {
         std::vector<std::string> elems;
@@ -148,28 +147,28 @@ namespace utils
         return to_string((long double)(t));
     }
 
-    template <typename T>[[nodiscard]] const std::string enumToString(const T &t)
+    template <typename T> [[nodiscard]] const std::string enumToString(const T &t)
     {
         static_assert(std::is_enum_v<T>);
         return std::string(magic_enum::enum_name(t));
     }
 
-    static inline std::string vectorToString(const std::vector<unsigned int> v){
+    static inline std::string vectorToString(const std::vector<unsigned int> v)
+    {
 
-        if (v.size()==0){
+        if (v.size() == 0) {
             return {};
         }
-        return std::accumulate(std::next(v.begin()), v.end(), std::to_string(v[0]),
-                               [](std::string a, unsigned int b){ return std::move(a) + std::to_string(b);});
-
+        return std::accumulate(std::next(v.begin()), v.end(), std::to_string(v[0]), [](std::string a, unsigned int b) {
+            return std::move(a) + std::to_string(b);
+        });
     }
-
 
     /// Gets value of type T from string
     ///
     /// @param value to be converted
     /// @return Value casted to type T
-    template <typename T>[[nodiscard]] T getValue(const std::string &value)
+    template <typename T> [[nodiscard]] T getValue(const std::string &value)
     {
         static_assert(std::is_arithmetic_v<T>);
         if (value.empty()) {
