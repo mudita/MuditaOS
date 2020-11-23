@@ -6,6 +6,7 @@
 #include "log/log.hpp"
 #include <Options.hpp>
 #include <OptionWindow.hpp>
+#include <module-services/service-db/service-db/DBServiceAPI.hpp>
 
 /// below just for apps names...
 
@@ -16,8 +17,9 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
         record ? DBServiceAPI::ContactGetByIDWithTemporary(app, record->contactID)->front() : ContactRecord();
     std::list<gui::Option> options;
 
-    options.emplace_back(gui::options::call(app, app::CallOperation::ExecuteCall, contact));
-    auto contactOperation = contact.isTemporary() ? app::ContactOperation::Add : app::ContactOperation::Details;
+    options.emplace_back(gui::options::call(app, contact));
+    auto contactOperation =
+        contact.isTemporary() ? gui::options::ContactOperation::Add : gui::options::ContactOperation::Details;
     options.emplace_back(gui::options::contact(app, contactOperation, contact));
 
     if (record->isUnread()) {

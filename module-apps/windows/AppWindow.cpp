@@ -4,7 +4,6 @@
 #include "AppWindow.hpp"
 #include "Application.hpp"
 #include "InputEvent.hpp"
-#include "UiCommonActions.hpp"
 #include <Style.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <i18/i18.hpp>
@@ -126,8 +125,7 @@ namespace gui
 
         if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_RF) {
             LOG_INFO("exit to main menu");
-            app::manager::Controller::switchApplication(
-                application, app::name_desktop, gui::name::window::main_window, nullptr);
+            app::manager::Controller::sendAction(application, app::manager::actions::Home);
         }
         // process only if key is released
         if ((inputEvent.state != InputEvent::State::keyReleasedShort))
@@ -212,9 +210,11 @@ namespace gui
 
     bool AppWindow::selectSpecialCharacter()
     {
-        return app::specialInput(
+        return app::manager::Controller::sendAction(
             application,
-            std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
+            app::manager::actions::ShowSpecialInput,
+            std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()),
+            app::manager::OnSwitchBehaviour::RunInBackground);
     }
 
     BoundingBox AppWindow::bodySize()

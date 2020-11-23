@@ -82,7 +82,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::CreateSms, manager::actions::ShowSmsTemplates}};
         }
     };
 } /* namespace app */

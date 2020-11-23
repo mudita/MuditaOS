@@ -12,7 +12,8 @@
 
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBServiceAPI.hpp>
-#include "UiCommonActions.hpp"
+#include <service-appmgr/Controller.hpp>
+#include <application-call/data/CallSwitchData.hpp>
 
 #include <string>
 #include <utility>
@@ -145,7 +146,11 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
             return false;
         }
         if (event.keyCode == gui::KeyCode::KEY_LF) {
-            return app::call(application, *item->contact);
+            if (item->contact && !item->contact->numbers.empty()) {
+                const auto phoneNumber = item->contact->numbers.front().number;
+                return app::manager::Controller::sendAction(
+                    application, app::manager::actions::Dial, std::make_unique<app::ExecuteCallData>(phoneNumber));
+            }
         }
         return false;
     };

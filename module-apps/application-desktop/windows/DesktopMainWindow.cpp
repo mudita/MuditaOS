@@ -17,7 +17,6 @@
 #include <service-appmgr/Controller.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
-#include <UiCommonActions.hpp>
 
 #include "i18/i18.hpp"
 #include "log/log.hpp"
@@ -26,6 +25,7 @@
 #include <application-settings/ApplicationSettings.hpp>
 #include <cassert>
 #include <time/time_conversion.hpp>
+#include <module-apps/application-call/data/CallSwitchData.hpp>
 
 namespace gui
 {
@@ -110,8 +110,7 @@ namespace gui
             setActiveState(app);
 
             if (app->need_sim_select && Store::GSM::get()->sim == Store::GSM::SIM::SIM_UNKNOWN) {
-                app::manager::Controller::switchApplication(
-                    this->application, app::name_settings, app::sim_select, nullptr);
+                app::manager::Controller::sendAction(application, app::manager::actions::SelectSimCard);
             }
 
             sys::Bus::SendUnicast(
@@ -160,7 +159,8 @@ namespace gui
             }
             // long press of '0' key is translated to '+'
             else if (inputEvent.is(KeyCode::KEY_0)) {
-                return app::prepareCall(application, "+");
+                return app::manager::Controller::sendAction(
+                    application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>("+"));
             }
         }
 
@@ -177,7 +177,9 @@ namespace gui
         auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
         // if numeric key was pressed record that key and send it to call application
         if (code != 0) {
-            return app::prepareCall(application, std::string(1, static_cast<char>(code)));
+            const auto &number = std::string(1, static_cast<char>(code));
+            return app::manager::Controller::sendAction(
+                application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>(number));
         }
         else if (inputEvent.is(KeyCode::KEY_UP) && focusItem == nullptr) {
             setFocusItem(notifications);
@@ -294,8 +296,10 @@ namespace gui
                 utils::localize.get("app_desktop_unread_messages"),
                 std::to_string(app->notifications.notSeen.SMS),
                 [this]() -> bool {
-                    return app::manager::Controller::switchApplication(
-                        application, app::name_messages, gui::name::window::main_window, nullptr);
+                    return app::manager::Controller::sendAction(
+                        application,
+                        app::manager::actions::Launch,
+                        std::make_unique<app::ApplicationLaunchData>(app::name_messages));
                 },
                 [app, this]() -> bool { return app->clearMessagesNotification(); },
                 onNotificationFocus);

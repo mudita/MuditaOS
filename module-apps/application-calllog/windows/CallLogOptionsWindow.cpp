@@ -5,6 +5,7 @@
 #include "i18/i18.hpp"
 #include "log/log.hpp"
 #include <Options.hpp>
+#include <module-services/service-db/service-db/DBServiceAPI.hpp>
 
 /// below just for apps names...
 
@@ -16,11 +17,11 @@ std::list<gui::Option> calllogWindowOptions(app::ApplicationCallLog *app, const 
 
     if (searchResults->empty() || !searchResults->front().isValid() || searchResults->front().isTemporary()) {
         // add option - add contact
-        options.push_back(gui::options::contact(app, app::ContactOperation::Add, searchResults->front()));
+        options.push_back(gui::options::contact(app, gui::options::ContactOperation::Add, searchResults->front()));
     }
     else {
         // add option - contact details
-        options.push_back(gui::options::contact(app, app::ContactOperation::Details, searchResults->front()));
+        options.push_back(gui::options::contact(app, gui::options::ContactOperation::Details, searchResults->front()));
     }
 
     // add option delete call option

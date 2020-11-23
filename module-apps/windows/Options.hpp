@@ -3,15 +3,22 @@
 
 #pragma once
 
+#include <module-db/Interface/ContactRecord.hpp>
 #include "Application.hpp"
 #include "OptionWindow.hpp"
-#include <UiCommonActions.hpp>
 
 namespace gui::options
 {
-    Option call(app::Application *app, app::CallOperation callOperation, const ContactRecord &contact);
+    enum class ContactOperation
+    {
+        Add,
+        Details,
+        Edit
+    };
+
+    Option call(app::Application *app, const ContactRecord &contact);
     Option contact(app::Application *app,
-                   app::ContactOperation contactOperation,
+                   ContactOperation contactOperation,
                    const ContactRecord &contactRec,
                    gui::Arrow arrow = gui::Arrow::Disabled);
 } // namespace gui::options
