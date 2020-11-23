@@ -11,7 +11,7 @@ namespace purefs::blkdev
     using scount_t = int64_t;
     namespace internal
     {
-        struct disk_handle;
+        class disk_handle;
     }
     using disk_fd_t = std::shared_ptr<internal::disk_handle>;
     //! Disk status result

@@ -14,7 +14,6 @@
  */
 namespace purefs::blkdev
 {
-
     auto disk_manager::register_device(std::shared_ptr<disk> disk, std::string_view device_name, unsigned flags) -> int
     {
         {
@@ -49,7 +48,11 @@ namespace purefs::blkdev
             return -ENOENT;
         }
         m_dev_map.erase(it);
-        return 0;
+        auto ret = it->second->cleanup();
+        if (ret < 0) {
+            LOG_ERROR("Disk cleanup failed code %i", ret);
+        }
+        return ret;
     }
 
     auto disk_manager::device_handle(std::string_view device_name) const -> disk_fd_t
