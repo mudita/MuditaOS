@@ -5,7 +5,7 @@
 
 namespace bsp
 {
-    namespace backlight
+    namespace keypad_backlight
     {
         constexpr auto LP55281_DEVICE_ADDR = 0x26;
 
@@ -60,5 +60,5 @@ namespace bsp
             return static_cast<uint8_t>(MAX_BRIGHTNESS_INT * normalized_brightness) & 0b00111111;
         }
 
-    } // namespace backlight
+    } // namespace keypad_backlight
 } // namespace bsp

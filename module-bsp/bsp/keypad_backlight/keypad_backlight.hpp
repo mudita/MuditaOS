@@ -14,7 +14,7 @@ extern "C"
 
 namespace bsp
 {
-    namespace backlight
+    namespace keypad_backlight
     {
         // channel intensity 0.0 - 1.0 : min - max
         using DiodeIntensity = float;
@@ -49,13 +49,13 @@ namespace bsp
         bool toggle(Diode diode);
 
         // Module sleep mode
-        void backlight_shutdown();
+        void shutdown();
 
         // Wakeup module, last on intensity preserved
-        void backlight_wakeup();
+        void wakeup();
 
         // Module reset
-        void backlight_reset();
+        void reset();
 
-    } // namespace backlight
+    } // namespace keypad_backlight
 } // namespace bsp
