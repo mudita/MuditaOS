@@ -25,6 +25,26 @@ namespace app
         : Application(name, parent, startInBackground, phonebook_stack_size)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        addActionReceiver(manager::actions::ShowContacts, [this](auto &&data) {
+            switchWindow(gui::name::window::main_window, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::AddContact, [this](auto &&data) {
+            switchWindow(gui::window::name::new_contact, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::EditContact, [this](auto &&data) {
+            switchWindow(gui::window::name::new_contact, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::ShowContactDetails, [this](auto &&data) {
+            switchWindow(gui::window::name::contact, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::ShowEmergencyContacts, [this](auto &&data) {
+            switchWindow(gui::window::name::ice_contacts, std::move(data));
+            return msgHandled();
+        });
     }
 
     // Invoked upon receiving data message

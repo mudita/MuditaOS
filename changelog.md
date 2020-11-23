@@ -59,6 +59,7 @@
 * `[calendar]` Changed default option to 'all day' event.
 * `[bus]` Refactored message handling.
 * `[appmgr]` Translating messages to actions introduced. 
+* `[appmgr]` Switching between applications replaced with actions.
 
 ### Fixed
 

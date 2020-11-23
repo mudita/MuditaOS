@@ -85,7 +85,6 @@ namespace stm
         auto event = std::make_shared<EventsRecord>(eventRecord);
         eventData->setData(event);
 
-        app::manager::Controller::switchApplication(
-            service(), app::name_calendar, style::window::calendar::name::event_reminder_window, std::move(eventData));
+        app::manager::Controller::sendAction(service(), app::manager::actions::ShowReminder, std::move(eventData));
     }
 } // namespace stm

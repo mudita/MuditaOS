@@ -47,36 +47,7 @@ namespace gui
         /// MessageMemento class provides buffer-like functionality for message field of NewMessageWindow.
         /// MessageMemento shall be used whenever there is a need for temporary window switch in normal (uninterrupted)
         /// flow of new message preparation, such as using options or recipient selection.
-        class MessageMemento : public Item
-        {
-            gui::Text *state = nullptr;
-
-          public:
-            /// sets memento and leaves the origin pointing to default-constructed object
-            void setState(gui::Text *&_state)
-            {
-                assert(_state);
-                LOG_DEBUG("setting memento for NewMessageWindow");
-                if (state == nullptr) {
-                    state         = new gui::Text();
-                    state->parent = this;
-                }
-                std::swap(state->parent, _state->parent);
-                std::swap(state, _state);
-            }
-            void getState(gui::Text *&_state)
-            {
-                if (state == nullptr) {
-                    return;
-                }
-                assert(_state);
-                LOG_DEBUG("getting memento for NewMessageWindow");
-                std::swap(state->parent, _state->parent);
-                std::swap(state, _state);
-                delete state;
-                state = nullptr;
-            }
-        };
+        class MessageMemento;
         static std::unique_ptr<MessageMemento> memento;
     };
 } /* namespace gui */

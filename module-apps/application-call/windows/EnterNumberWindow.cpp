@@ -13,7 +13,6 @@
 #include <InputMode.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
-#include <UiCommonActions.hpp>
 
 #include <phonenumbers/phonenumberutil.h>
 #include <phonenumbers/asyoutypeformatter.h>

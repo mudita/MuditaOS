@@ -14,7 +14,6 @@ endif()
 set( SOURCES 
     "Application.cpp"
     "GuiTimer.cpp"
-    "UiCommonActions.cpp"
     "WindowsFactory.cpp"
     "windows/AppWindow.cpp" 
     "windows/OptionWindow.cpp"

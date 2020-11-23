@@ -40,7 +40,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::SelectSimCard}};
         }
     };
 } /* namespace app */

@@ -147,7 +147,7 @@ namespace app::manager
         startSystemServices();
         startBackgroundApplications();
         if (auto app = getApplication(rootApplicationName); app != nullptr) {
-            Controller::switchApplication(this, rootApplicationName, std::string{}, nullptr);
+            Controller::sendAction(this, actions::Home);
         }
 
         return sys::ReturnCodes::Success;
@@ -349,7 +349,7 @@ namespace app::manager
         return true;
     }
 
-    auto ApplicationManager::handleSwitchApplication(SwitchRequest *msg) -> bool
+    auto ApplicationManager::handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp) -> bool
     {
         auto app = getApplication(msg->getName());
         if (app == nullptr) {
@@ -371,8 +371,8 @@ namespace app::manager
         }
 
         onApplicationSwitch(*app, std::move(msg->getData()), msg->getWindow());
-        const bool isFocusedAppCloseable = !(app->switchData && app->switchData->disableAppClose) &&
-                                           currentlyFocusedApp->closeable() && !currentlyFocusedApp->blockClosing;
+        const bool isFocusedAppCloseable =
+            closeCurrentlyFocusedApp && currentlyFocusedApp->closeable() && !currentlyFocusedApp->blockClosing;
         requestApplicationClose(*currentlyFocusedApp, isFocusedAppCloseable);
         return true;
     }
@@ -405,12 +405,40 @@ namespace app::manager
 
     auto ApplicationManager::handleAction(ActionRequest *actionMsg) -> bool
     {
-        auto action = actionMsg->getAction();
-        if (action == actions::Launch) {
+        switch (const auto action = actionMsg->getAction(); action) {
+        case actions::Home:
+            return handleHomeAction();
+        case actions::Launch: {
             auto params = static_cast<ApplicationLaunchData *>(actionMsg->getData().get());
             return handleLaunchAction(params);
         }
+        default: {
+            auto &actionParams = actionMsg->getData();
+            return handleCustomAction(action, std::move(actionParams));
+        }
+        }
+    }
 
+    auto ApplicationManager::handleHomeAction() -> bool
+    {
+        SwitchRequest switchRequest(ServiceName, rootApplicationName, gui::name::window::main_window, nullptr);
+        return handleSwitchApplication(&switchRequest);
+    }
+
+    auto ApplicationManager::handleLaunchAction(ApplicationLaunchData *launchParams) -> bool
+    {
+        auto targetApp = getApplication(launchParams->getTargetApplicationName());
+        if (targetApp == nullptr || !targetApp->handles(actions::Launch)) {
+            return false;
+        }
+
+        SwitchRequest switchRequest(ServiceName, targetApp->name(), gui::name::window::main_window, nullptr);
+        return handleSwitchApplication(&switchRequest);
+    }
+
+    auto ApplicationManager::handleCustomAction(actions::ActionId action, actions::ActionParamsPtr &&actionParams)
+        -> bool
+    {
         const auto actionHandlers = applications.findByAction(action);
         if (actionHandlers.empty()) {
             LOG_ERROR("No applications handling action #%d.", action);
@@ -421,32 +449,18 @@ namespace app::manager
             return false;
         }
 
-        auto &actionData     = actionMsg->getData();
         const auto targetApp = actionHandlers.front();
         if (targetApp->state() != ApplicationHandle::State::ACTIVE_FORGROUND) {
-            pendingAction = std::make_tuple(targetApp->name(), action, std::move(actionData));
+            const auto focusedAppClose = !(actionParams && actionParams->disableAppClose);
+            pendingAction              = std::make_tuple(targetApp->name(), action, std::move(actionParams));
 
-            SwitchRequest switchRequest(actionMsg->getSenderName(),
-                                        targetApp->name(),
-                                        targetApp->switchWindow,
-                                        std::move(targetApp->switchData));
-            return handleSwitchApplication(&switchRequest);
+            SwitchRequest switchRequest(
+                ServiceName, targetApp->name(), targetApp->switchWindow, std::move(targetApp->switchData));
+            return handleSwitchApplication(&switchRequest, focusedAppClose);
         }
 
-        app::Application::requestAction(this, targetApp->name(), action, std::move(actionData));
+        app::Application::requestAction(this, targetApp->name(), action, std::move(actionParams));
         return true;
-    }
-
-    auto ApplicationManager::handleLaunchAction(ApplicationLaunchData *launchParams) -> bool
-    {
-        auto targetApp = getApplication(launchParams->getTargetApplicationName());
-        if (targetApp == nullptr || !targetApp->handles(actions::Launch)) {
-            return false;
-        }
-
-        SwitchRequest switchRequest(
-            ServiceName, targetApp->name(), targetApp->switchWindow, std::move(targetApp->switchData));
-        return handleSwitchApplication(&switchRequest);
     }
 
     auto ApplicationManager::handleSwitchBack(SwitchBackRequest *msg) -> bool
@@ -470,10 +484,12 @@ namespace app::manager
             return false;
         }
 
-        LOG_DEBUG("Switch applications: [%s](%s) -> [%s](%s)",
+        LOG_DEBUG("Switch applications: [%s][%s](%s) -> [%s][%s](%s)",
                   currentlyFocusedApp->name().c_str(),
+                  currentlyFocusedApp->switchWindow.c_str(),
                   app::Application::stateStr(currentlyFocusedApp->state()),
                   previousApp->name().c_str(),
+                  previousApp->switchWindow.c_str(),
                   app::Application::stateStr(previousApp->state()));
 
         onApplicationSwitchToPrev(*previousApp, std::move(msg->getData()));
@@ -482,12 +498,10 @@ namespace app::manager
     }
 
     void ApplicationManager::onApplicationSwitchToPrev(ApplicationHandle &previousApp,
-                                                       std::unique_ptr<gui::SwitchData> &&data,
-                                                       std::string targetWindow)
+                                                       std::unique_ptr<gui::SwitchData> &&data)
     {
         popApplication();
-        previousApp.switchData   = std::move(data);
-        previousApp.switchWindow = std::move(targetWindow);
+        previousApp.switchData = std::move(data);
     }
 
     auto ApplicationManager::handleInitApplication(ApplicationInitialised *msg) -> bool

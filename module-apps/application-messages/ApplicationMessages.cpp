@@ -41,6 +41,14 @@ namespace app
         : Application(name, parent, startInBackground, 4096 * 2)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {
+            switchWindow(gui::name::window::new_sms, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::ShowSmsTemplates, [this](auto &&data) {
+            switchWindow(gui::name::window::sms_templates, std::move(data));
+            return msgHandled();
+        });
     }
 
     ApplicationMessages::~ApplicationMessages()
