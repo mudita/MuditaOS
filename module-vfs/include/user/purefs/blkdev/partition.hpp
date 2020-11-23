@@ -15,7 +15,7 @@ namespace purefs::blkdev
         int logical_number{};      //! Partition logical one in the mudita
         sector_t start_sector{};   //! First sector
         std::size_t num_sectors{}; //! Number of sectors
-        bool bootable{};           //! Partition is bootable
+        unsigned char bootable{};  //! Partition is bootable
         unsigned short type{};     //! Partition code
         std::string name;          //! Partition name in block manager
     };

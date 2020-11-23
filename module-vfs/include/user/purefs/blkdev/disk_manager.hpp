@@ -120,7 +120,6 @@ namespace purefs::blkdev
       private:
         static auto parse_device_name(std::string_view device) -> std::tuple<std::string_view, short>;
         static auto part_lba_to_disk_lba(disk_fd_t disk, sector_t part_lba, size_t count) -> scount_t;
-        static auto parse_mbr(std::shared_ptr<disk> disk) -> int;
 
       private:
         std::unordered_map<std::string, std::shared_ptr<disk>> m_dev_map;

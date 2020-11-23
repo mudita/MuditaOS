@@ -8,6 +8,7 @@
 #include <charconv>
 #include <tuple>
 #include <purefs/blkdev/disk_handle.hpp>
+#include <purefs/blkdev/partition_parser.hpp>
 
 /** NOTE: Device manager implementation without sector cache
  */
@@ -224,22 +225,8 @@ namespace purefs::blkdev
             LOG_ERROR("Disk doesn't exists");
             return {};
         }
-        return parse_mbr(disk);
-    }
-    auto disk_manager::parse_mbr(std::shared_ptr<disk> disk) -> int
-    {
-        // TODO: MBR parse
-        const auto sect_size = disk->get_info(info_type::sector_size);
-        if (sect_size < 0) {
-            LOG_ERROR("Unable to get sector size");
-            return sect_size;
-        }
-        std::vector<std::uint8_t> mbr_sect(sect_size);
-        auto ret = disk->read(mbr_sect.data(), 0, 1);
-        if (ret < 0) {
-            return ret;
-        }
-        return -1;
+        internal::partition_parser pparser(disk, disk->partitions());
+        return pparser.partition_search();
     }
 
     auto disk_manager::write(std::string_view device_name, const void *buf, sector_t lba, std::size_t count) -> int

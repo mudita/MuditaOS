@@ -84,19 +84,12 @@ namespace purefs::blkdev
          * @param[in] device_name Block device name
          * @return Partition list @see partition
          */
-        [[nodiscard]] auto partitions() const
+        [[nodiscard]] auto partitions() -> std::vector<partition> &
         {
             return m_partitions;
         }
 
       protected:
-        /** Add partition from the inherited class
-         * @param part New partition
-         */
-        auto add_partition(partition &&part) -> void
-        {
-            m_partitions.emplace_back(std::move(part));
-        }
         /** Clear all partitions */
         auto clear_partitions() -> void
         {

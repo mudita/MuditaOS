@@ -47,6 +47,7 @@ set(SOURCES ""
         src/purefs/filesystem_paths.cpp
         src/purefs/blkdev/disk_manager.cpp
         src/purefs/blkdev/disk.cpp
+        src/purefs/blkdev/partition_parser.cpp
         src/deprecated/vfs-utils.cpp
         src/deprecated/vfs.cpp
         src/deprecated/vfsNotifier.cpp
