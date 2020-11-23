@@ -17,6 +17,8 @@ namespace bsp
 
         void setBrightness(uint8_t brightness);
 
+        uint8_t GetBrightness();
+
         void turnOn();
         
         void turnOff();
