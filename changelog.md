@@ -1,18 +1,18 @@
 # MuditaOS changelog
 
-## [current release]
+## [0.48.1 2020-11-23]
 
 ### Added
 
-* `[gui][desktop]` Added SIM PIN basic flow implementation
-* `[cellular]` Added CLIR, CLIP, COLP, call waiting MMI support
+* `[gui][desktop]` Added SIM PIN basic flow implementation.
+* `[cellular]` Added CLIR, CLIP, COLP, and call-waiting MMI support.
 
 ### Fixed
 
-* `[desktop]` Fixed ScreenlockCheckEvent handler 
-* `[messages]` Fix for changing the content of option windows when forwarding a message.
+* `[call]` Fixed issues with incoming calls.
+* `[messages]` Fix changing the content of options windows when forwarding a message.
 * `[messages]` Fixed saving a draft message for a phone number.
-* `[messages]` Fixed usage of special characters while writing new message.
+* `[messages]` Fixed usage of special characters while writing a new message.
 
 ### Changed
 
@@ -61,7 +61,6 @@
 * `[calendar]` Changed default option to 'all day' event.
 * `[bus]` Refactored message handling.
 * `[appmgr]` Translating messages to actions introduced. 
-* `[appmgr]` Switching between applications replaced with actions.
 
 ### Fixed
 
