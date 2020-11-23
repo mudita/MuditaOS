@@ -7,6 +7,10 @@
 * `[gui][desktop]` Added SIM PIN basic flow implementation
 * `[cellular]` Added CLIR, CLIP, COLP, call waiting MMI support
 
+### Fixed
+
+* `[desktop]` Fixed ScreenlockCheckEvent handler 
+
 ## [0.47.1 2020-11-20]
 
 ### Added
