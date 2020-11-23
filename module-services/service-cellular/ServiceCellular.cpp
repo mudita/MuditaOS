@@ -938,7 +938,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         channel->cmd(at::AT::DISABLE_TIME_ZONE_UPDATE);
     } break;
     case MessageType::CellularSimResponse: {
-        handleSimResponse(msgl);
+        responseMsg = std::make_shared<CellularResponseMessage>(handleSimResponse(msgl));
     } break;
     default:
         break;
@@ -1079,7 +1079,6 @@ bool ServiceCellular::unlockSimPin(std::string pin)
     LOG_ERROR("Unlock pin %s", pin.c_str());
     SimCard simCard(*this);
     SimCardResult sime;
-    LOG_DEBUG("PIN:  %s", pin.c_str());
     sime = simCard.supplyPin(pin);
 
     if (sime == SimCardResult::IncorrectPassword) {

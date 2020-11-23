@@ -147,7 +147,7 @@ namespace utils
         return to_string((long double)(t));
     }
 
-    template <typename T> [[nodiscard]] const std::string enumToString(const T &t)
+    template <typename T>[[nodiscard]] const std::string enumToString(const T &t)
     {
         static_assert(std::is_enum_v<T>);
         return std::string(magic_enum::enum_name(t));
@@ -168,7 +168,7 @@ namespace utils
     ///
     /// @param value to be converted
     /// @return Value casted to type T
-    template <typename T> [[nodiscard]] T getValue(const std::string &value)
+    template <typename T>[[nodiscard]] T getValue(const std::string &value)
     {
         static_assert(std::is_arithmetic_v<T>);
         if (value.empty()) {
