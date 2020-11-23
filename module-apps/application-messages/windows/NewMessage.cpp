@@ -23,6 +23,29 @@
 
 namespace gui
 {
+    class NewMessageWindow::MessageMemento
+    {
+      public:
+        void setState(const gui::Text *_state)
+        {
+            assert(_state);
+            state = std::make_unique<TextBackup>(_state->backupText());
+        }
+
+        void getState(gui::Text *_state)
+        {
+            assert(_state);
+            if (!state) {
+                return;
+            }
+            _state->restoreFrom(*state);
+            state = nullptr;
+        }
+
+      private:
+        std::unique_ptr<gui::TextBackup> state;
+    };
+
     std::unique_ptr<NewMessageWindow::MessageMemento> NewMessageWindow::memento =
         std::make_unique<NewMessageWindow::MessageMemento>();
 
@@ -82,11 +105,11 @@ namespace gui
     {
         // select contact only if there is no entered number
         if (recipient->getText().empty()) {
-            auto data             = std::make_unique<PhonebookSearchReuqest>();
-            data->disableAppClose = true;
             memento->setState(message);
-            return app::manager::Controller::switchApplication(
-                application, app::name_phonebook, name::window::main_window, std::move(data));
+            return app::manager::Controller::sendAction(application,
+                                                        app::manager::actions::ShowContacts,
+                                                        std::make_unique<PhonebookSearchReuqest>(),
+                                                        app::manager::OnSwitchBehaviour::RunInBackground);
         }
         return true;
     }
@@ -278,7 +301,7 @@ namespace gui
         if (contact && !(contact->numbers.empty())) {
             return addDraft(*contact);
         }
-        if (const auto &number = getPhoneNumber(); number.isValid()) {
+        if (const auto &number = getPhoneNumber(); !number.get().empty()) {
             return addDraft(number);
         }
         return false;

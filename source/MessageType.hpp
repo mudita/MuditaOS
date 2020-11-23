@@ -126,13 +126,14 @@ enum class MessageType
     APMConfirmSwitch,   ///< Used when application confirms that it is loosing focus and also when application confirms
                         ///< that is has gained focus
     APMConfirmClose,    ///< Sent by application to confirm completion of the close procedure
-    APMRegister,        ///< when application finishes initHandler it is sending this messag to inform whether init was
-                        ///< successful or not.
-    APMInit,            ///< Send by application to confirm completion its initialisation process
-    APMDelayedClose,    ///< this message is sent internally from and to application manager to close specified
-                        ///< application.
-    APMChangeLanguage,  ///< this message is sent from any application to inform application manager that it should send
-                        ///< gui rebuild command to all applications in background and currently active application.
+    APMConfirmWindowSwitch, ///<
+    APMRegister,       ///< when application finishes initHandler it is sending this messag to inform whether init was
+                       ///< successful or not.
+    APMInit,           ///< Send by application to confirm completion its initialisation process
+    APMDelayedClose,   ///< this message is sent internally from and to application manager to close specified
+                       ///< application.
+    APMChangeLanguage, ///< this message is sent from any application to inform application manager that it should send
+                       ///< gui rebuild command to all applications in background and currently active application.
     APMClose, ///< this message will trigger application manager to close itself, all running applications gui and eink
               ///< services.
     APMPreventBlocking,   ///< Prevents application manager from initializing device blocking.

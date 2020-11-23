@@ -24,33 +24,39 @@ namespace gui
         setPenFocusWidth(window::default_border_focus_w);
         setPenWidth(window::default_border_no_focus_w);
 
-        contact = new gui::Label(this, 0, 0, 0, 0);
-        contact->setPenFocusWidth(window::default_border_no_focus_w);
-        contact->setPenWidth(window::default_border_no_focus_w);
+        contact = createEmptyLabel(this);
         contact->setFont(style::window::font::big);
         contact->setEllipsis(Ellipsis::Right);
         contact->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
-        numberImportance = new gui::Label(this, 0, 0, 0, 0);
-        numberImportance->setPenFocusWidth(window::default_border_no_focus_w);
-        numberImportance->setPenWidth(window::default_border_no_focus_w);
+        numberImportance = createEmptyLabel(this);
         numberImportance->setFont(style::window::font::small);
         numberImportance->setAlignment(
             gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
-        timestamp = new gui::Label(this, 0, 0, 0, 0);
-        timestamp->setPenFocusWidth(window::default_border_no_focus_w);
-        timestamp->setPenWidth(window::default_border_no_focus_w);
+        timestamp = createEmptyLabel(this);
         timestamp->setFont(style::window::font::small);
         timestamp->setEllipsis(Ellipsis::Right);
         timestamp->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center});
 
-        preview = new gui::Label(this, 0, 0, 0, 0);
-        preview->setPenFocusWidth(window::default_border_no_focus_w);
-        preview->setPenWidth(window::default_border_no_focus_w);
-        preview->setFont(style::window::font::small);
-        preview->setEllipsis(Ellipsis::Right);
-        preview->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+        snippetPrefix = createEmptyLabel(this);
+        snippetPrefix->setFont(style::window::font::mediumlight);
+        snippetPrefix->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+
+        snippet = createEmptyLabel(this);
+        snippet->setFont(style::window::font::medium);
+        snippet->setEllipsis(Ellipsis::Right);
+        snippet->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+    }
+
+    gui::Label *BaseThreadItem::createEmptyLabel(Item *parent)
+    {
+        using namespace style;
+
+        auto label = new gui::Label(parent, 0, 0, 0, 0);
+        label->setPenFocusWidth(window::default_border_no_focus_w);
+        label->setPenWidth(window::default_border_no_focus_w);
+        return label;
     }
 
     void BaseThreadItem::onDimensionChangedTop(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
@@ -75,17 +81,36 @@ namespace gui
 
     void BaseThreadItem::onDimensionChangedBottom(const BoundingBox & /*oldDim*/, const BoundingBox &newDim)
     {
+        resizeSnippet(newDim);
+    }
+
+    void BaseThreadItem::resizeSnippet(const BoundingBox &dimensions, unsigned int leftOffset)
+    {
         namespace msgStyle = style::messages::threadItem;
 
-        preview->setPosition(msgStyle::leftMargin, newDim.h / 2);
-        preview->setSize(newDim.w - msgStyle::previewWidthOffset, newDim.h / 2 - msgStyle::bottomMargin);
+        const auto leftMargin = msgStyle::leftMargin + leftOffset;
+        if (const auto isPrefixSet = !snippetPrefix->getText().empty(); isPrefixSet) {
+            snippetPrefix->setPosition(leftMargin, dimensions.h / 2);
+            snippetPrefix->setSize(snippetPrefix->getTextNeedSpace(), dimensions.h / 2 - msgStyle::bottomMargin);
+
+            const auto prefixSpace = snippetPrefix->getTextWidth() + msgStyle::snippetLeftMargin;
+            snippet->setPosition(leftMargin + prefixSpace, dimensions.h / 2);
+            snippet->setSize(dimensions.w - msgStyle::previewWidthOffset - prefixSpace - leftOffset,
+                             dimensions.h / 2 - msgStyle::bottomMargin);
+        }
+        else {
+            snippetPrefix->setPosition(0, 0);
+            snippetPrefix->setSize(0, 0);
+            snippet->setPosition(leftMargin, dimensions.h / 2);
+            snippet->setSize(dimensions.w - msgStyle::previewWidthOffset - leftOffset,
+                             dimensions.h / 2 - msgStyle::bottomMargin);
+        }
     }
 
     bool BaseThreadItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         onDimensionChangedTop(oldDim, newDim);
         onDimensionChangedBottom(oldDim, newDim);
-
         return true;
     }
 

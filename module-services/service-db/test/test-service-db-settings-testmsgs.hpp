@@ -1,15 +1,15 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-namespace Settings
+namespace settings
 {
     namespace UTMsg
     {
-        class SettingsUTMsg : public ::Settings::Messages::SettingsMessage
+        class SettingsUTMsg : public ::settings::Messages::SettingsMessage
         {
           public:
             explicit SettingsUTMsg(MessageType type = MessageType::Settings)
-                : ::Settings::Messages::SettingsMessage(type){};
+                : ::settings::Messages::SettingsMessage(type){};
             ~SettingsUTMsg() override = default;
         };
 
@@ -174,4 +174,4 @@ namespace Settings
             {}
         };
     }; // namespace UTMsg
-} // namespace Settings
+} // namespace settings

@@ -4,127 +4,93 @@
 #include "Lines.hpp"
 #include "TextLineCursor.hpp"
 #include "Text.hpp"
+#include "RawFont.hpp"
+
+#if DEBUG_GUI_TEXT_LINES == 1
+#define debug_text_lines(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define debug_text_lines(...)
+#endif
 
 namespace gui
 {
     // LEFT/RIGHT/UP/DOWN
-    auto Lines::checkNavigationBounds(TextLineCursor &cursor, InputEvent event) -> gui::InputBound
-    {
-        auto dir = inputToNavigation(event);
-        if (dir == NavigationDirection::NONE) {
-            return InputBound::UNDEFINED;
-        }
 
-        auto screen_bound = scroll_position + max_lines_count - 1;
-        auto lines_bound  = lines.size() - 1;
-
-        if (dir == NavigationDirection::UP || dir == NavigationDirection::LEFT) {
-            screen_bound = 0;
-            lines_bound  = 0;
-        }
-
-        if (dir == NavigationDirection::LEFT && cursor.getPosOnScreen() > 0) {
-            return InputBound::CAN_MOVE;
-        }
-
-        unsigned int pos = cursor.BlockCursor::getPosition();
-        auto textLine    = getTextLine(cursor.getScreenLine());
-
-        if (textLine == nullptr) {
-            return InputBound::NO_DATA;
-        }
-
-        size_t lineLength = textLine->length();
-
-        if (dir == NavigationDirection::RIGHT && pos < lineLength) {
-            return InputBound::CAN_MOVE;
-        }
-
-        if (cursor.getScreenLine() >= lines_bound) {
-            return InputBound::NO_DATA;
-        }
-
-        if (cursor.getScreenLine() >= screen_bound) {
-            return InputBound::HIT_BOUND;
-        }
-
-        return InputBound::CAN_MOVE;
-    }
-
-    auto Lines::checkAdditionBounds(TextLineCursor &cursor, InputEvent event) -> gui::InputBound
-    {
-        auto keymap = parent->mode != nullptr ? parent->mode->get() : "";
-        auto code   = gui::Profiles::get(keymap).get(event.key.key_code, 0);
-
-        auto format        = cursor->getFormat();
-        uint32_t line      = cursor.getScreenLine();
-        TextLine *textLine = getTextLine(line);
-
-        if (textLine == nullptr || !cursor) {
-            return InputBound::CAN_ADD;
-        }
-
-        auto bound = textLine->checkBounds(cursor, code, format);
-        if (bound == InputBound::CANT_PROCESS && line == scroll_position) {
-            // TODO -> to be corrected in next PR
-            return InputBound::CAN_ADD;
-        }
-
-        return InputBound::CAN_ADD;
-    }
-
-    auto Lines::checkRemovalBounds(TextLineCursor &cursor, InputEvent event) -> gui::InputBound
-    {
-        if (lines.empty()) {
-            return InputBound::CANT_PROCESS;
-        }
-
-        // TODO -> to be corrected in next PR
-        return InputBound::CAN_REMOVE;
-
-        uint32_t line = cursor.getScreenLine();
-        uint32_t pos  = cursor.getPosOnScreen();
-
-        if (pos == 0) {
-            if (line == scroll_position + max_lines_count) {
-                return InputBound::HIT_BOUND;
-            }
-            if (line == 0) {
-                return InputBound::CANT_PROCESS;
-            }
-        }
-
-        return InputBound::CAN_REMOVE;
-    }
-
-    void Lines::updateScrollPosition(NavigationDirection dir, unsigned int lines_to_scroll)
-    {
-        if (dir == NavigationDirection::UP) {
-            scroll_position -= lines_to_scroll;
-        }
-
-        if (dir == NavigationDirection::DOWN) {
-            scroll_position += lines_to_scroll;
-        }
-    }
-
-    void Lines::linesVAlign(Length parentSize)
+    auto Lines::linesVAlign(Length parentSize) -> void
     {
         for (auto &line : lines) {
-            line.alignV(parent->getAlignment(Axis::Y), parentSize, linesHeight());
+            line.alignV(text->getAlignment(Axis::Y), parentSize, linesHeight());
         }
     }
 
-    void Lines::linesHAlign(Length parentSize)
+    auto Lines::linesHAlign(Length parentSize) -> void
     {
         for (auto &line : lines) {
-            line.alignH(parent->getAlignment(Axis::X), parentSize);
+            line.alignH(text->getAlignment(Axis::X), parentSize);
         }
     }
 
-    void Lines::draw(TextCursor &cursor)
+    auto Lines::draw(BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition)
+        -> void
     {
-        parent->drawLines();
+        while (true) {
+            auto textLine = gui::TextLine(drawCursor, w);
+
+            if (textLine.length() == 0 && textLine.getLineEnd()) {
+                debug_text_lines("cant show more text from this document");
+                break;
+            }
+
+            if (lineYPosition + textLine.height() > h) { // no more space for next line
+                debug_text_lines("no more space for next text_line: %d + %" PRIu32 " > %" PRIu32,
+                                 lineYPosition,
+                                 textLine.height(),
+                                 h);
+                break;
+            }
+
+            emplace(std::move(textLine));
+            auto &line = last();
+
+            line.setPosition(lineXPosition, lineYPosition);
+            line.setParent(text);
+
+            lineYPosition += line.height();
+        }
+    }
+
+    auto Lines::draw(BlockCursor &drawCursor,
+                     Length w,
+                     Length h,
+                     Position lineYPosition,
+                     Position lineXPosition,
+                     unsigned int linesCount) -> void
+    {
+        Length initHeight = text->getTextFormat().getFont()->info.line_height;
+
+        while (true) {
+            auto textLine =
+                gui::TextLine(drawCursor, w, initHeight, underLine, UnderlineDrawMode::WholeLine, underLinePadding);
+
+            if (textLine.height() > 0 && initHeight != textLine.height()) {
+                initHeight = textLine.height();
+            }
+
+            if (lineYPosition + initHeight > h) {
+                break;
+            }
+
+            if (lines.size() >= linesCount) {
+                break;
+            }
+
+            emplace(std::move(textLine));
+            auto &line = last();
+            line.setPosition(lineXPosition, lineYPosition);
+            line.setParent(text);
+
+            lineYPosition += line.height();
+        }
     }
 
     TextLine *Lines::getTextLine(uint32_t line)
@@ -135,6 +101,6 @@ namespace gui
 
         auto it = std::next(lines.begin(), line);
         return &*it;
-    } // namespace gui
+    }
 
 } // namespace gui

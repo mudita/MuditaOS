@@ -11,7 +11,7 @@ using namespace db::query;
 ContactAdd::ContactAdd(const ContactRecord &rec) : Query(Query::Type::Read), rec(std::move(rec))
 {}
 
-ContactAddResult::ContactAddResult(bool result) : result(result)
+ContactAddResult::ContactAddResult(bool result, unsigned int id) : result(result), id(id)
 {}
 
 [[nodiscard]] auto ContactAdd::debugInfo() const -> std::string

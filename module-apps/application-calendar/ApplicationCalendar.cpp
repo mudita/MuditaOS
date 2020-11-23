@@ -51,6 +51,10 @@ namespace app
         : Application(name, parent, startInBackground, stackDepth, priority)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        addActionReceiver(manager::actions::ShowReminder, [this](auto &&data) {
+            switchWindow(style::window::calendar::name::event_reminder_window, std::move(data));
+            return msgHandled();
+        });
     }
 
     sys::MessagePointer ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

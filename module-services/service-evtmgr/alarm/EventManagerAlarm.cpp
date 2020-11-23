@@ -53,9 +53,9 @@ void EventManager::HandleAlarmTrigger(sys::DataMessage *msgl)
         // round time and compare to alaram timestamp
         if (alarmTimestamp == (currentTime % 86400)) {
             alarmIsValid = false;
-            // run bell application
-            std::unique_ptr<gui::SwitchData> switchMessage = std::make_unique<sevm::EVMAlarmSwitchData>(alarmID);
-            app::manager::Controller::switchApplication(this, "bell", "main", std::move(switchMessage));
+            // Run "alarm" application.
+            // std::unique_ptr<gui::SwitchData> switchMessage = std::make_unique<sevm::EVMAlarmSwitchData>(alarmID);
+            // app::manager::Controller::sendAction(this, app::manager::actions::ShowAlarm, std::move(switchMessage));
         }
         // check if alarm is not obsolete
         else if ((alarmTimestamp < (currentTime % 86400)) && ((currentTime + 60) % 86400) > (currentTime % 86400)) {

@@ -49,12 +49,4 @@ class ContactsAddressTable : public Table<ContactsAddressTableRow, ContactAddres
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
   private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS contact_address("
-                                   "_id              INTEGER PRIMARY KEY,"
-                                   "contact_id       INTEGER,"
-                                   "address          TEXT NOT NULL,"
-                                   "note             TEXT NOT NULL,"
-                                   "mail             TEXT NOT NULL,"
-                                   "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
-                                   ");";
 };

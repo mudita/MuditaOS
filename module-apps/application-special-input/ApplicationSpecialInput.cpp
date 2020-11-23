@@ -12,6 +12,11 @@ ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
                                                  StartInBackground startInBackground)
     : Application(name, parent, startInBackground)
 {
+    addActionReceiver(manager::actions::ShowSpecialInput, [this](auto &&data) {
+        switchWindow(app::char_select, std::move(data));
+        return msgHandled();
+    });
+
     windowsFactory.attach(app::char_select, [](Application *app, const std::string &name) {
         return std::make_unique<gui::SpecialInputMainWindow>(app);
     });
