@@ -21,6 +21,8 @@ namespace drivers
 
         void SetDutyCycle(uint8_t duty_cycle) override final;
 
+        uint8_t GetCurrentDutyCycle() override final;
+
         void Start() override final;
 
         void Stop() override final;

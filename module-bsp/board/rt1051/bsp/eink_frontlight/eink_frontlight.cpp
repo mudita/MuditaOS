@@ -34,7 +34,7 @@ namespace bsp
 
         void setBrightness(uint8_t brightness)
         {
-            // Add gamma correction - is it needed - check docu
+            // Add gamma correction - if needed
             pwm->SetDutyCycle(brightness);
         }
 

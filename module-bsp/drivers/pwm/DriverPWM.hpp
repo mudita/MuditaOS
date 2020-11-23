@@ -54,11 +54,13 @@ namespace drivers
         {}
 
         // Duty cycle in percent: 0 - 100
-        virtual void SetDutyCycle(uint8_t duty_cycle);
+        virtual void SetDutyCycle(uint8_t duty_cycle) = 0;
 
-        virtual void Start();
+        virtual uint8_t GetCurrentDutyCycle() = 0;
 
-        virtual void Stop();
+        virtual void Start() = 0;
+
+        virtual void Stop() = 0;
 
       protected:
         PWMInstances instance;
