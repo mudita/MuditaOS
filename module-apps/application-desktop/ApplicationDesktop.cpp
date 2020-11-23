@@ -123,8 +123,7 @@ namespace app
     auto ApplicationDesktop::handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool
     {
         if (event != nullptr) {
-            auto event =
-                std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(true); // lockHandler.lock.isLocked());
+            auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(lockHandler.isScreenLocked());
             auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
             sys::Bus::SendUnicast(std::move(msg), service::name::service_desktop, this);
         }
