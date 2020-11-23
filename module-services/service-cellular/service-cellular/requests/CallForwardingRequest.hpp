@@ -20,16 +20,17 @@ namespace cellular
 
         auto command() -> std::string final;
         void handle(RequestHandler &h, at::Result &result) final;
+        auto isValid() const noexcept -> bool final;
 
       private:
         static constexpr auto addressFormatTypeInternational = "145";
         static constexpr auto addressFormatTypeDefault       = "129";
-        static constexpr auto subaddrDefault                 = "128";
+        static constexpr auto subaddrDefault                 = "";
 
         std::string forwardReason;
         std::string &phoneNumber           = supplementaryInfoA;
         std::string &basicServiceGroup     = supplementaryInfoB;
-        std::string &noReplyConditionTimer = supplementaryInfoB;
+        std::string &noReplyConditionTimer = supplementaryInfoC;
 
         // command decomposition according to EC25&EC21_AT_Commands_Manual_V1.3
         auto getCommandReason() const -> std::string;

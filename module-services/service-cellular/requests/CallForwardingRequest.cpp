@@ -37,13 +37,31 @@ namespace cellular
 
     auto CallForwardingRequest::command() -> std::string
     {
-        std::vector<commandBuilderFunc> commandParts = {
-            [this]() { return getCommandReason(); },
-            [this]() { return getCommandMode(); },
-            [this]() { return getCommandNumber(); },
-        };
+        std::vector<commandBuilderFunc> commandParts = {[this]() { return getCommandReason(); },
+                                                        [this]() { return getCommandMode(); },
+                                                        [this]() { return getCommandNumber(); },
+                                                        [this]() { return getCommandType(); },
+                                                        [this]() { return getCommandClass(); },
+                                                        [this]() { return getCommandSubAddr(); },
+                                                        [this]() { return getCommandSatype(); },
+                                                        [this]() { return getCommandTime(); }};
 
-        return buildCommand(at::AT::CCFC, commandParts);
+        const auto itToCommandClass  = std::next(commandParts.begin(), 5);
+        const auto itToCommandNumber = std::next(commandParts.begin(), 3);
+
+        std::vector<commandBuilderFunc> trimmedCommandParts;
+
+        if (!getCommandTime().empty()) {
+            return buildCommand(at::AT::CCFC, commandParts, false);
+        }
+        else if (!getCommandClass().empty()) {
+            trimmedCommandParts.insert(trimmedCommandParts.begin(), commandParts.begin(), itToCommandClass);
+        }
+        else {
+            trimmedCommandParts.insert(trimmedCommandParts.begin(), commandParts.begin(), itToCommandNumber);
+        }
+
+        return buildCommand(at::AT::CCFC, trimmedCommandParts);
     }
 
     auto CallForwardingRequest::getCommandReason() const -> std::string
@@ -65,10 +83,10 @@ namespace cellular
     {
         // according to EC25&EC21_AT_Commands_Manual_V1.3
         if (auto pos = phoneNumber.find("+"); pos != std::string::npos) {
-            return addressFormatTypeDefault;
+            return addressFormatTypeInternational;
         }
         else {
-            return addressFormatTypeInternational;
+            return addressFormatTypeDefault;
         }
     }
 
@@ -94,6 +112,19 @@ namespace cellular
     auto CallForwardingRequest::getCommandTime() const -> std::string
     {
         return noReplyConditionTimer;
+    }
+
+    auto CallForwardingRequest::isValid() const noexcept -> bool
+    {
+        if (noReplyConditionTimer.empty()) {
+            return true;
+        }
+        int time;
+        if (utils::toNumeric(noReplyConditionTimer, time)) {
+            // EC25&EC21_AT_Commands_Manual
+            return std::clamp(time, 0, 30) == time;
+        }
+        return false;
     }
 
     void CallForwardingRequest::handle(RequestHandler &h, at::Result &result)
