@@ -9,7 +9,7 @@
 #include <tuple>
 #include <purefs/blkdev/disk_handle.hpp>
 
-/** NOTE: Device manager implementation without sector caching
+/** NOTE: Device manager implementation without sector cache
  */
 namespace purefs::blkdev
 {
@@ -24,14 +24,18 @@ namespace purefs::blkdev
                 return -EEXIST;
             }
             else {
-                const auto ret = disk->probe(flags);
+                auto ret = disk->probe(flags);
                 if (ret < 0) {
                     LOG_ERROR("Unable to probe the disc errno %i", ret);
                     return ret;
                 }
-                const auto fd = m_dev_fds.insert(disk);
-                m_dev_map.emplace(std::make_pair(device_name, fd));
-                return reread_partitions(std::make_shared<internal::disk_handle>(fd));
+                ret = disk->get_info(info_type::sector_count);
+                if (ret < 0) {
+                    LOG_ERROR("Unable to probe the disc errno %i", ret);
+                    return ret;
+                }
+                m_dev_map.emplace(std::make_pair(device_name, disk));
+                return reread_partitions(std::make_shared<internal::disk_handle>(disk, ret));
             }
         }
     }
@@ -43,16 +47,11 @@ namespace purefs::blkdev
             LOG_ERROR("Disc: %.*s doesn't exists in manager.", int(device_name.length()), device_name.data());
             return -ENOENT;
         }
-        const auto ret = m_dev_fds[it->second]->cleanup();
-        if (ret < 0) {
-            LOG_ERROR("Disk cleanup error %i", ret);
-        }
-        m_dev_fds.remove(it->second);
         m_dev_map.erase(it);
-        return ret;
+        return 0;
     }
 
-    auto disk_manager::device_handle(std::string_view device_name) -> disk_fd_t
+    auto disk_manager::device_handle(std::string_view device_name) const -> disk_fd_t
     {
         const auto [dev, part] = parse_device_name(device_name);
         disk_fd_t ret{};
@@ -72,7 +71,7 @@ namespace purefs::blkdev
         return ret;
     }
 
-    auto parse_device_name(std::string_view device) -> std::tuple<std::string_view, short>
+    auto disk_manager::parse_device_name(std::string_view device) -> std::tuple<std::string_view, short>
     {
         using namespace std::literals;
         static constexpr auto part_suffix = "part"sv;
@@ -95,5 +94,232 @@ namespace purefs::blkdev
         else {
             return std::make_tuple(""sv, -1);
         }
+    }
+    auto disk_manager::part_lba_to_disk_lba(disk_fd_t disk, sector_t part_lba, size_t count) -> scount_t
+    {
+        if (!disk->has_partition()) {
+            if (part_lba + count > disk->sectors()) {
+                LOG_ERROR("Disk sector req out of range");
+                return -ERANGE;
+            }
+            else {
+                return part_lba;
+            }
+        }
+        else {
+            auto pdisc      = disk->disk().lock();
+            const auto part = pdisc->partitions()[disk->partition()];
+            if (part_lba + count > part.num_sectors) {
+                LOG_ERROR("Partition sector req out of range");
+                return -ERANGE;
+            }
+            else {
+                return part_lba + part.start_sector;
+            }
+        }
+    }
+    auto disk_manager::write(disk_fd_t dfd, const void *buf, sector_t lba, std::size_t count) -> int
+    {
+        auto disk = dfd->disk().lock();
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return -ENOENT;
+        }
+        const auto calc_lba = part_lba_to_disk_lba(dfd, lba, count);
+        if (calc_lba < 0) {
+            return calc_lba;
+        }
+        else {
+            return disk->write(buf, lba, count);
+        }
+    }
+    auto disk_manager::read(disk_fd_t dfd, void *buf, sector_t lba, std::size_t count) -> int
+    {
+        auto disk = dfd->disk().lock();
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return -ENOENT;
+        }
+        const auto calc_lba = part_lba_to_disk_lba(dfd, lba, count);
+        if (calc_lba < 0) {
+            return calc_lba;
+        }
+        else {
+            return disk->read(buf, lba, count);
+        }
+    }
+    auto disk_manager::erase(disk_fd_t dfd, sector_t lba, std::size_t count) -> int
+    {
+        auto disk = dfd->disk().lock();
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return -ENOENT;
+        }
+        const auto calc_lba = part_lba_to_disk_lba(dfd, lba, count);
+        if (calc_lba < 0) {
+            return calc_lba;
+        }
+        else {
+            return disk->erase(lba, count);
+        }
+    }
+    auto disk_manager::sync(disk_fd_t dfd) -> int
+    {
+        auto disk = dfd->disk().lock();
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return -ENOENT;
+        }
+        return disk->sync();
+    }
+    auto disk_manager::pm_control(disk_fd_t dfd, pm_state target_state) -> int
+    {
+        auto disk = dfd->disk().lock();
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return -ENOENT;
+        }
+        return disk->pm_control(target_state);
+    }
+    auto disk_manager::pm_read(disk_fd_t dfd, pm_state &current_state) -> int
+    {
+        auto disk = dfd->disk().lock();
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return -ENOENT;
+        }
+        return disk->pm_read(current_state);
+    }
+    auto disk_manager::status(disk_fd_t dfd) const -> media_status
+    {
+        auto disk = dfd->disk().lock();
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return media_status::error;
+        }
+        return disk->status();
+    }
+    auto disk_manager::partitions(disk_fd_t dfd) const -> std::vector<partition>
+    {
+        auto disk = dfd->disk().lock();
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return {};
+        }
+        return disk->partitions();
+    }
+    auto disk_manager::get_info(disk_fd_t dfd, info_type what) const -> scount_t
+    {
+        auto disk = dfd->disk().lock();
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return {};
+        }
+        return disk->get_info(what);
+    }
+    auto disk_manager::reread_partitions(disk_fd_t dfd) -> int
+    {
+        auto disk = dfd->disk().lock();
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return {};
+        }
+        return parse_mbr(disk);
+    }
+    auto disk_manager::parse_mbr(std::shared_ptr<disk> disk) -> int
+    {
+        // TODO: MBR parse
+        const auto sect_size = disk->get_info(info_type::sector_size);
+        if (sect_size < 0) {
+            LOG_ERROR("Unable to get sector size");
+            return sect_size;
+        }
+        std::vector<std::uint8_t> mbr_sect(sect_size);
+        auto ret = disk->read(mbr_sect.data(), 0, 1);
+        if (ret < 0) {
+            return ret;
+        }
+        return -1;
+    }
+
+    auto disk_manager::write(std::string_view device_name, const void *buf, sector_t lba, std::size_t count) -> int
+    {
+        auto dfd = device_handle(device_name);
+        if (dfd)
+            return write(dfd, buf, lba, count);
+        else
+            return -ENOENT;
+    }
+    auto disk_manager::read(std::string_view device_name, void *buf, sector_t lba, std::size_t count) -> int
+    {
+        auto dfd = device_handle(device_name);
+        if (dfd)
+            return read(dfd, buf, lba, count);
+        else
+            return -ENOENT;
+    }
+    auto disk_manager::erase(std::string_view device_name, sector_t lba, std::size_t count) -> int
+    {
+        auto dfd = device_handle(device_name);
+        if (dfd)
+            return erase(dfd, lba, count);
+        else
+            return -ENOENT;
+    }
+    auto disk_manager::sync(std::string_view device_name) -> int
+    {
+        auto dfd = device_handle(device_name);
+        if (dfd)
+            return sync(dfd);
+        else
+            return -ENOENT;
+    }
+    auto disk_manager::pm_control(std::string_view device_name, pm_state target_state) -> int
+    {
+        auto dfd = device_handle(device_name);
+        if (dfd)
+            return pm_control(dfd, target_state);
+        else
+            return -ENOENT;
+    }
+    auto disk_manager::pm_read(std::string_view device_name, pm_state &current_state) -> int
+    {
+        auto dfd = device_handle(device_name);
+        if (dfd)
+            return pm_read(dfd, current_state);
+        else
+            return -ENOENT;
+    }
+    auto disk_manager::status(std::string_view device_name) const -> media_status
+    {
+        auto dfd = device_handle(device_name);
+        if (dfd)
+            return status(dfd);
+        else
+            return media_status::error;
+    }
+    auto disk_manager::partitions(std::string_view device_name) const -> std::vector<partition>
+    {
+        auto dfd = device_handle(device_name);
+        if (dfd)
+            return partitions(dfd);
+        else
+            return {};
+    }
+    auto disk_manager::get_info(std::string_view device_name, info_type what) const -> scount_t
+    {
+        auto dfd = device_handle(device_name);
+        if (dfd)
+            return get_info(dfd, what);
+        else
+            return -ENOENT;
+    }
+    auto disk_manager::reread_partitions(std::string_view device_name) -> int
+    {
+        auto dfd = device_handle(device_name);
+        if (dfd)
+            return reread_partitions(dfd);
+        else
+            return -ENOENT;
     }
 } // namespace purefs::blkdev

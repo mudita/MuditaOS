@@ -21,6 +21,7 @@ namespace purefs::blkdev
         uninit,   //! Disk unintialized
         nomedia,  //! No media
         wprotect, //! Write protected
+        error,    //! Internal error
     };
     // Information parameter
     enum class info_type
