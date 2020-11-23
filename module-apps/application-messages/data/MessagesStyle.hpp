@@ -31,6 +31,7 @@ namespace style
             inline constexpr uint32_t timestampWidth             = 100;
             inline constexpr uint32_t numberImportanceWidth      = 80;
             inline constexpr uint32_t numberImportanceLeftMargin = 10;
+            inline constexpr uint32_t snippetLeftMargin          = 5;
             inline constexpr uint32_t cotactWidthOffset          = timestampWidth + leftMargin + rightMargin;
             inline constexpr uint32_t notSentIconWidth           = 20;
 
