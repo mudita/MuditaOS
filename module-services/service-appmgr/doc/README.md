@@ -64,3 +64,55 @@ The idea is to create a base for such generic data. It should be able to seriali
 When sent, the data will be serialized into the data storage, and only that storage shall be sent along with the action request.
 
 When received, the data will be re-created from the storage and used by a receiver object.
+
+#### Interface proposal and code example
+
+```
+#include <string>
+#include <cassert>
+
+using DataPackage = std::string; // To be changed to chosen data format.
+
+class Packageable {
+public:
+  virtual ~Packageable() noexcept = default;
+
+  virtual DataPackage pack() const = 0;
+
+  template <typename T> class Creator {
+  public:
+    virtual ~Creator() noexcept = default;
+
+    virtual T unpack(const DataPackage &package) = 0;
+  };
+};
+
+class ExampleData : public Packageable {
+public:
+  class ExampleCreator : public Packageable::Creator<ExampleData> {
+  public:
+    ExampleData unpack(const DataPackage &package) override {
+      const auto x = std::stoi(package);
+      return ExampleData{x};
+    }
+  };
+  static inline ExampleCreator CREATOR;
+
+  explicit ExampleData(int _x) : x{_x} {}
+
+  DataPackage pack() const override { return std::to_string(x); }
+
+  int getX() const noexcept { return x; }
+
+private:
+  int x{0};
+};
+
+int main() {
+  ExampleData data{10};
+  const auto package = data.pack();
+  const auto received = ExampleData::CREATOR.unpack(package);
+  assert(data.getX() == received.getX());
+  return 0;
+}
+```
