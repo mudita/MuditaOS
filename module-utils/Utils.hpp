@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cmath>
+#include <numeric>
 
 #define MAGIC_ENUM_RANGE_MAX 256
 #include <magic_enum.hpp>
@@ -26,6 +27,7 @@ namespace utils
             *(result++) = item;
         }
     }
+
 
     static inline std::vector<std::string> split(const std::string &s, char delim)
     {
@@ -151,6 +153,17 @@ namespace utils
         static_assert(std::is_enum_v<T>);
         return std::string(magic_enum::enum_name(t));
     }
+
+    static inline std::string vectorToString(const std::vector<unsigned int> v){
+
+        if (v.size()==0){
+            return {};
+        }
+        return std::accumulate(std::next(v.begin()), v.end(), std::to_string(v[0]),
+                               [](std::string a, unsigned int b){ return std::move(a) + std::to_string(b);});
+
+    }
+
 
     /// Gets value of type T from string
     ///

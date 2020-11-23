@@ -163,6 +163,14 @@ TEST_CASE("Converts enum to string")
     REQUIRE(utils::enumToString(Test::False) == "False");
 }
 
+TEST_CASE("Converts vector with unsigned int to string")
+{
+    std::vector<unsigned int> v{1,2,3,4};
+    std::vector<unsigned int> empty;
+    REQUIRE(utils::vectorToString(v) == "1234");
+    REQUIRE(utils::vectorToString(empty) == "");
+}
+
 TEST_CASE("Get value from string")
 {
     SECTION("UInt32_t")

@@ -535,6 +535,8 @@ auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
     return true;
 }
 
+
+
 sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
@@ -937,6 +939,9 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         channel->cmd(at::AT::DISABLE_TIME_ZONE_REPORTING);
         channel->cmd(at::AT::DISABLE_TIME_ZONE_UPDATE);
     } break;
+    case MessageType::CellularSimResponse:{
+        handleSimResponse(msgl);
+    }break;
     default:
         break;
 
@@ -998,30 +1003,40 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
 
 bool ServiceCellular::requestPin(unsigned int attempts, const std::string msg)
 {
+    auto message = std::make_shared<CellularSimRequestPinMessage>(Store::GSM::get()->selected, attempts, msg);
+    sys::Bus::SendUnicast(message, "ApplicationManager", this);
     LOG_DEBUG("REQUEST PIN");
     return true;
 }
 
 bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
 {
+    auto message = std::make_shared<CellularSimRequestPukMessage>(Store::GSM::get()->selected, attempts, msg);
+    sys::Bus::SendUnicast(message, "ApplicationManager", this);
     LOG_ERROR("REQUEST PUK");
     return true;
 }
 
 bool ServiceCellular::sendSimUnlocked()
 {
+    auto message = std::make_shared<CellularUnlockSimMessage>(Store::GSM::get()->selected);
+    sys::Bus::SendUnicast(message, "ApplicationManager", this);
     LOG_DEBUG("SIM UNLOCKED");
     return true;
 }
 
 bool ServiceCellular::sendSimBlocked()
 {
+    auto message = std::make_shared<CellularBlockSimMessage>(Store::GSM::get()->selected);
+    sys::Bus::SendUnicast(message, "ApplicationManager", this);
     LOG_ERROR("SIM BLOCKED");
     return true;
 }
 
 bool ServiceCellular::sendUnhandledCME(unsigned int cme_error)
 {
+    auto message = std::make_shared<CellularDisplayCMEMessage>(Store::GSM::get()->selected, cme_error);
+    sys::Bus::SendUnicast(message, "ApplicationManager", this);
     LOG_ERROR("UNHANDLED CME %d", cme_error);
     return true;
 }
@@ -1063,6 +1078,7 @@ bool ServiceCellular::changePin(const std::string oldPin, const std::string newP
 
 bool ServiceCellular::unlockSimPin(std::string pin)
 {
+    LOG_ERROR("Unlock pin %s",pin.c_str());
     SimCard simCard(*this);
     SimCardResult sime;
     LOG_DEBUG("PIN:  %s", pin.c_str());
@@ -1098,6 +1114,23 @@ bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
         return true;
     }
     sendUnhandledCME(static_cast<unsigned int>(sime));
+    return false;
+}
+
+bool ServiceCellular::handleSimResponse(sys::DataMessage *msgl)
+{
+    
+    auto msgSimPin = dynamic_cast<CellularSimPinDataMessage *>(msgl);
+    if (msgSimPin != nullptr) {
+        LOG_DEBUG("Unclocking sim");
+        return unlockSimPin(utils::vectorToString(msgSimPin->getPin()));
+    }
+
+    auto msgSimPuk = dynamic_cast<CellularSimPukDataMessage *>(msgl);
+    if (msgSimPuk != nullptr) {
+        LOG_DEBUG("Unlocking puk");
+        return unlockSimPuk(utils::vectorToString(msgSimPuk->getPuk()),utils::vectorToString(msgSimPuk->getNewPin()));
+    }
     return false;
 }
 
