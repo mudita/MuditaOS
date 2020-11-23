@@ -31,10 +31,12 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/windows/Reboot.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/Update.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPullWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPushWindow.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockPhoneData.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/Style.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/data/Mmi.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinHash.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLock.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.hpp"
@@ -54,6 +56,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/Update.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Names.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPullWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPushWindow.hpp"
 )
 
 target_link_libraries(${PROJECT_NAME}
