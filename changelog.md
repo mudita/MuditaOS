@@ -11,6 +11,10 @@
 
 * `[desktop]` Fixed ScreenlockCheckEvent handler 
 
+### Changed
+
+* `[messages]` Changed fonts of message snippet and its prefix.
+
 ## [0.47.1 2020-11-20]
 
 ### Added
