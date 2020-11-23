@@ -63,6 +63,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/EVMessages.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
 #include <task.h>
 #include <time/time_conversion.hpp>
 #include <ucs2/UCS2.hpp>
@@ -1002,7 +1003,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
 bool ServiceCellular::requestPin(unsigned int attempts, const std::string msg)
 {
     auto message = std::make_shared<CellularSimRequestPinMessage>(Store::GSM::get()->selected, attempts, msg);
-    sys::Bus::SendUnicast(message, "ApplicationManager", this);
+    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
     LOG_DEBUG("REQUEST PIN");
     return true;
 }
@@ -1010,7 +1011,7 @@ bool ServiceCellular::requestPin(unsigned int attempts, const std::string msg)
 bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
 {
     auto message = std::make_shared<CellularSimRequestPukMessage>(Store::GSM::get()->selected, attempts, msg);
-    sys::Bus::SendUnicast(message, "ApplicationManager", this);
+    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
     LOG_ERROR("REQUEST PUK");
     return true;
 }
@@ -1018,7 +1019,7 @@ bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
 bool ServiceCellular::sendSimUnlocked()
 {
     auto message = std::make_shared<CellularUnlockSimMessage>(Store::GSM::get()->selected);
-    sys::Bus::SendUnicast(message, "ApplicationManager", this);
+    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
     LOG_DEBUG("SIM UNLOCKED");
     return true;
 }
@@ -1026,7 +1027,7 @@ bool ServiceCellular::sendSimUnlocked()
 bool ServiceCellular::sendSimBlocked()
 {
     auto message = std::make_shared<CellularBlockSimMessage>(Store::GSM::get()->selected);
-    sys::Bus::SendUnicast(message, "ApplicationManager", this);
+    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
     LOG_ERROR("SIM BLOCKED");
     return true;
 }
@@ -1034,7 +1035,7 @@ bool ServiceCellular::sendSimBlocked()
 bool ServiceCellular::sendUnhandledCME(unsigned int cme_error)
 {
     auto message = std::make_shared<CellularDisplayCMEMessage>(Store::GSM::get()->selected, cme_error);
-    sys::Bus::SendUnicast(message, "ApplicationManager", this);
+    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
     LOG_ERROR("UNHANDLED CME %d", cme_error);
     return true;
 }
