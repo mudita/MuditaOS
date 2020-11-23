@@ -301,7 +301,7 @@ namespace gui
         if (contact && !(contact->numbers.empty())) {
             return addDraft(*contact);
         }
-        if (const auto &number = getPhoneNumber(); number.isValid()) {
+        if (const auto &number = getPhoneNumber(); !number.get().empty()) {
             return addDraft(number);
         }
         return false;
