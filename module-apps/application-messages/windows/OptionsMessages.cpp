@@ -14,6 +14,7 @@
 #include <Text.hpp>
 #include <BoxLayout.hpp>
 #include <memory>
+#include <module-services/service-db/service-db/DBServiceAPI.hpp>
 
 using namespace style::window;
 
@@ -29,8 +30,9 @@ std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMS
             return true;
         });
     }
-    options.push_back(gui::options::call(app, app::CallOperation::ExecuteCall, contact));
-    auto contactOperation = contact.isTemporary() ? app::ContactOperation::Add : app::ContactOperation::Details;
+    options.push_back(gui::options::call(app, contact));
+    auto contactOperation =
+        contact.isTemporary() ? gui::options::ContactOperation::Add : gui::options::ContactOperation::Details;
     options.push_back(gui::options::contact(app, contactOperation, contact));
     options.emplace_back(UTF8(utils::localize.get("sms_forward_message")), [=](gui::Item &item) {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(record.body);

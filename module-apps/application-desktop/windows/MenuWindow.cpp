@@ -129,61 +129,62 @@ namespace gui
                 new gui::Tile("menu_calendar_W_G",
                               "app_desktop_menu_calendar",
                               [=](gui::Item &item) {
-                                  app::manager::Controller::switchApplication(
-                                      application, "ApplicationCalendar", gui::name::window::main_window, nullptr);
-                                  return true;
+                                  return app::manager::Controller::sendAction(
+                                      application,
+                                      app::manager::actions::Launch,
+                                      std::make_unique<app::ApplicationLaunchData>("ApplicationCalendar"));
                               }),
 
                 new gui::Tile{"menu_phone_W_G",
                               "app_desktop_menu_phone",
                               [=](gui::Item &item) {
-                                  LOG_INFO("Call Log");
-                                  app::manager::Controller::switchApplication(
-                                      application, "ApplicationCallLog", gui::name::window::main_window, nullptr);
-                                  return true;
+                                  return app::manager::Controller::sendAction(
+                                      application,
+                                      app::manager::actions::Launch,
+                                      std::make_unique<app::ApplicationLaunchData>("ApplicationCallLog"));
                               },
                               app->notifications.notRead.Calls},
                 new gui::Tile("menu_contacts_W_G",
                               "app_desktop_menu_contacts",
                               [=](gui::Item &item) {
-                                  LOG_INFO("Phonebook");
-                                  app::manager::Controller::switchApplication(
-                                      application, "ApplicationPhonebook", gui::name::window::main_window, nullptr);
-                                  return true;
+                                  return app::manager::Controller::sendAction(
+                                      application,
+                                      app::manager::actions::Launch,
+                                      std::make_unique<app::ApplicationLaunchData>("ApplicationPhonebook"));
                               }),
 
                 new gui::Tile{"menu_messages_W_G",
                               "app_desktop_menu_messages",
                               [=](gui::Item &item) {
-                                  LOG_INFO("Messages");
-                                  app::manager::Controller::switchApplication(
-                                      application, "ApplicationMessages", gui::name::window::main_window, nullptr);
-                                  return true;
+                                  return app::manager::Controller::sendAction(
+                                      application,
+                                      app::manager::actions::Launch,
+                                      std::make_unique<app::ApplicationLaunchData>("ApplicationMessages"));
                               },
                               app->notifications.notRead.SMS},
                 new gui::Tile{"menu_music_player_W_G",
                               "app_desktop_menu_music",
                               [=](gui::Item &item) {
-                                  LOG_INFO("Music Player");
-                                  app::manager::Controller::switchApplication(
-                                      application, "ApplicationMusicPlayer", gui::name::window::main_window, nullptr);
-                                  return true;
+                                  return app::manager::Controller::sendAction(
+                                      application,
+                                      app::manager::actions::Launch,
+                                      std::make_unique<app::ApplicationLaunchData>("ApplicationMusicPlayer"));
                               }},
                 new gui::Tile{"menu_meditation_W_G",
                               "app_desktop_menu_meditation",
                               [=](gui::Item &item) {
-                                  LOG_INFO("Meditation");
-                                  app::manager::Controller::switchApplication(
-                                      application, "ApplicationMeditation", gui::name::window::main_window, nullptr);
-                                  return true;
+                                  return app::manager::Controller::sendAction(
+                                      application,
+                                      app::manager::actions::Launch,
+                                      std::make_unique<app::ApplicationLaunchData>("ApplicationMeditation"));
                               }},
                 new gui::Tile{"menu_settings_W_G",
                               "app_desktop_menu_settings_new",
                               [=](gui::Item &item) {
-                                  LOG_INFO("page 1 settings");
-                                  app::manager::Controller::switchApplication(
-                                      application, APP_SETTINGS_NEW, gui::name::window::main_window, nullptr);
-                                  return true;
+                                  return app::manager::Controller::sendAction(
+                                      application,
+                                      app::manager::actions::Launch,
+                                      std::make_unique<app::ApplicationLaunchData>(APP_SETTINGS_NEW));
                               }},
             });
 
@@ -194,23 +195,26 @@ namespace gui
                 new gui::Tile{"menu_tools_notes_W_G",
                               "app_desktop_tools_notes",
                               [=](gui::Item &item) {
-                                  app::manager::Controller::switchApplication(
-                                      application, "ApplicationNotes", gui::name::window::main_window, nullptr);
-                                  return true;
+                                  return app::manager::Controller::sendAction(
+                                      application,
+                                      app::manager::actions::Launch,
+                                      std::make_unique<app::ApplicationLaunchData>("ApplicationNotes"));
                               }},
                 new gui::Tile{"menu_tools_calculator_W_G",
                               "app_desktop_tools_calculator",
                               [=](gui::Item &item) {
-                                  app::manager::Controller::switchApplication(
-                                      application, "ApplicationCalculator", gui::name::window::main_window, nullptr);
-                                  return true;
+                                  return app::manager::Controller::sendAction(
+                                      application,
+                                      app::manager::actions::Launch,
+                                      std::make_unique<app::ApplicationLaunchData>("ApplicationCalculator"));
                               }},
                 new gui::Tile{"menu_tools_recorder_W_G",
                               "app_desktop_tools_antenna",
                               [=](gui::Item &item) {
-                                  app::manager::Controller::switchApplication(
-                                      application, "ApplicationAntenna", gui::name::window::main_window, nullptr);
-                                  return true;
+                                  return app::manager::Controller::sendAction(
+                                      application,
+                                      app::manager::actions::Launch,
+                                      std::make_unique<app::ApplicationLaunchData>("ApplicationAntenna"));
                               }},
             });
 

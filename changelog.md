@@ -1,6 +1,6 @@
 # MuditaOS changelog
 
-## [current release]
+## [0.48.1 2020-11-23]
 
 ### Added
 
@@ -9,7 +9,14 @@
 
 ### Fixed
 
-* `[desktop]` Fixed ScreenlockCheckEvent handler 
+* `[call]` Fixed issues with incoming calls.
+* `[messages]` Fix changing the content of options windows when forwarding a message.
+* `[messages]` Fixed saving a draft message for a phone number.
+* `[messages]` Fixed usage of special characters while writing a new message.
+
+### Changed
+
+* `[messages]` Changed fonts of message snippet and its prefix.
 
 ## [0.47.1 2020-11-20]
 
