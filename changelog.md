@@ -10,6 +10,7 @@
 ### Fixed
 
 * `[desktop]` Fixed ScreenlockCheckEvent handler 
+* `[messages]` Fix for changing the content of option windows when forwarding a message.
 
 ### Changed
 

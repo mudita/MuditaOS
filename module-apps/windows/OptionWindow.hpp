@@ -17,8 +17,9 @@ namespace gui
       protected:
         PageLayout *body = nullptr;
         std::list<Option> options;
-        void addOptions(std::list<Option> &options);
-        void addOptions(std::list<Option> &&options);
+        void addOptions(std::list<Option> &optionList);
+        void addOptions(std::list<Option> &&optionList);
+        void resetOptions(std::list<Option> &&optionList);
 
       public:
         OptionWindow(app::Application *app, const std::string &name);
