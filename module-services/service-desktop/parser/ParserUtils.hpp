@@ -26,6 +26,7 @@ namespace parserFSM
         messages,
         calllog,
         developerMode,
+        deviceUpdate
     };
 
     inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::developerMode);

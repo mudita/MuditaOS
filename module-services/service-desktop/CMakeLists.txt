@@ -11,6 +11,7 @@ set(SOURCES
     endpoints/developerMode/DeveloperModeEndpoint.cpp
     endpoints/developerMode/DeveloperModeHelper.cpp
     endpoints/deviceInfo/DeviceInfoEndpoint.cpp
+    endpoints/deviceUpdate/DeviceUpdateEndpoint.cpp
     endpoints/factoryReset/FactoryReset.cpp
     endpoints/factoryReset/FactoryResetEndpoint.cpp
     endpoints/messages/MessageHelper.cpp

@@ -8,6 +8,7 @@
 #include "Service/Service.hpp"
 #include "backup/BackupEndpoint.hpp"
 #include "deviceInfo/DeviceInfoEndpoint.hpp"
+#include "deviceUpdate/DeviceUpdateEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
 #include "filesystem/FilesystemEndpoint.hpp"
 #include "factoryReset/FactoryResetEndpoint.hpp"
@@ -35,6 +36,8 @@ class EndpointFactory
             return std::make_unique<BackupEndpoint>(ownerServicePtr);
         case EndpointType::deviceInfo:
             return std::make_unique<DeviceInfoEndpoint>(ownerServicePtr);
+        case EndpointType::deviceUpdate:
+            return std::make_unique<DeviceUpdateEndpoint>(ownerServicePtr);
         case EndpointType::restore:
             return std::make_unique<RestoreEndpoint>(ownerServicePtr);
         case EndpointType::contacts:
