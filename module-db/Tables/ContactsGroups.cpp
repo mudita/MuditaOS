@@ -3,43 +3,6 @@
 
 #include "ContactsGroups.hpp"
 
-const char *createTablesQuery = "CREATE TABLE IF NOT EXISTS contact_groups("
-                                "  _id  INTEGER PRIMARY KEY,"
-                                "  name TEXT NOT NULL UNIQUE"
-                                ");"
-                                "CREATE TABLE IF NOT EXISTS contact_match_groups("
-                                "  _id        INTEGER PRIMARY KEY,"
-                                "  group_id   INTEGER,"
-                                "  contact_id INTEGER,"
-                                "  FOREIGN KEY(group_id) REFERENCES contact_groups(_id)"
-                                "      ON DELETE CASCADE,"
-                                "  FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
-                                "      ON DELETE CASCADE,"
-                                "  CONSTRAINT unique_group_contact"
-                                "      UNIQUE (group_id,contact_id)"
-                                ");";
-const char *createIndices = "CREATE INDEX IF NOT EXISTS contact_match_group_index_on_group"
-                            "  ON contact_match_groups(group_id);"
-                            "CREATE INDEX IF NOT EXISTS contact_match_group_index_on_contact"
-                            "  ON contact_match_groups(contact_id);";
-
-const char *addSpecialGroups = "INSERT OR REPLACE INTO contact_groups "
-                               " (_id, name)"
-                               "VALUES"
-                               " (1, 'Favourites'),"
-                               " (2, 'ICE'),"
-                               " (3, 'Blocked'),"
-                               " (4, 'Temporary');";
-
-const char *createTableGroupsProtected = "CREATE TABLE IF NOT EXISTS contact_group_protected"
-                                         "(  _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
-                                         "   group_id INTEGER)";
-
-const char *protectSpecialGroups = "INSERT INTO contact_group_protected "
-                                   " (group_id) "
-                                   " VALUES "
-                                   " (1),(2),(3),(4);";
-
 namespace statements
 {
     const char *countGroups = "SELECT COUNT(*) FROM contact_groups;";
@@ -49,8 +12,8 @@ namespace statements
     const char *blockedId    = "SELECT _id FROM contact_groups WHERE name = 'Blocked';";
     const char *temporaryId  = "SELECT _id FROM contact_groups WHERE name = 'Temporary';";
 
-    const char *getId      = "SELECT _id FROM contact_groups WHERE name = '%q';";
-    const char *getById    = "SELECT _id, name FROM contact_groups WHERE _id = %u;";
+    const char *getId   = "SELECT _id FROM contact_groups WHERE name = '%q';";
+    const char *getById = "SELECT _id, name FROM contact_groups WHERE _id = %u;";
 
     /**
      * delete a group only if it is not a "special group"
@@ -64,10 +27,10 @@ namespace statements
 
     const char *getAllLimtOfset = "SELECT _id, name FROM contact_groups ORDER BY _id LIMIT %lu OFFSET %lu;";
 
-    const char *addGrup         = "INSERT INTO contact_groups (name) VALUES ('%q');";
+    const char *addGrup           = "INSERT INTO contact_groups (name) VALUES ('%q');";
     const char *addProtectedGroup = "INSERT INTO conctact_group_protected (group_id) VALUES ('%u');";
-    const char *updateGroupName = "UPDATE contact_groups SET name = '%q' WHERE _id = '%u';";
-    const char *deleteGroup     = "DELETE FROM table_name WHERE _id = :id;";
+    const char *updateGroupName   = "UPDATE contact_groups SET name = '%q' WHERE _id = '%u';";
+    const char *deleteGroup       = "DELETE FROM table_name WHERE _id = :id;";
 
     const char *addContactToGroup = "INSERT INTO contact_match_groups (contact_id, group_id)"
                                     "  VALUES(%u, %u)";
@@ -96,18 +59,7 @@ ContactsGroupsTable::ContactsGroupsTable(Database *db) : Table(db)
 
 bool ContactsGroupsTable::create()
 {
-    if (db->execute(createTablesQuery)) {
-        if (db->execute(createIndices)) {
-            if (db->execute(addSpecialGroups)) {
-                if (db->execute(createTableGroupsProtected)) {
-                    if (db->execute(protectSpecialGroups)) {
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-    return false;
+    return true;
 }
 
 bool ContactsGroupsTable::add(ContactsGroupsTableRow entry)

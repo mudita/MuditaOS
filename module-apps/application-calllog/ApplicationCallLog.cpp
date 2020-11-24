@@ -25,7 +25,12 @@ namespace app
 {
     ApplicationCallLog::ApplicationCallLog(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground, 4096)
-    {}
+    {
+        addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {
+            switchWindow(gui::name::window::main_window, std::move(data));
+            return msgHandled();
+        });
+    }
 
     ApplicationCallLog::~ApplicationCallLog()
     {

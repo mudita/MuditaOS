@@ -36,7 +36,7 @@ class DatabaseInitializer
             vfs.fclose(file);
         }
 
-        [[nodiscard]] auto get() const -> vfs::FILE *
+        [[nodiscard]] vfs::FILE *get() const
         {
             return file;
         }

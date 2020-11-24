@@ -54,18 +54,22 @@ namespace gui
                 return;
             }
 
+            // check if max provided width is enought to enter one char at least
+            if (max_width < text_format->getFont()->getCharPixelWidth(text[0])) {
+                lineEnd = true;
+                return;
+            }
+
             auto can_show = text_format->getFont()->getCharCountInSpace(text, max_width - width_used);
 
             // we can show nothing - this is the end of this line
             if (can_show == 0) {
 
-                auto item = buildUITextPart(" ", text_format);
-                width_used += item->getTextNeedSpace();
+                auto item   = buildUITextPart("", text_format);
+                width_used  = item->getTextNeedSpace();
                 height_used = std::max(height_used, item->getTextHeight());
-
                 elements_to_show_in_line.emplace_back(item);
                 end = localCursor->getEnd();
-                ++localCursor;
 
                 return;
             }
@@ -291,16 +295,4 @@ namespace gui
         }
     }
 
-    auto TextLine::checkBounds(TextLineCursor &cursor, uint32_t utf_value, const TextFormat *format) -> InputBound
-    {
-        auto font = format->getFont();
-        auto text = getText(0);
-        text.insertCode(utf_value);
-
-        if ((font->getPixelWidth(text)) <= max_width) {
-            return InputBound::CAN_ADD;
-        }
-
-        return InputBound::CANT_PROCESS;
-    }
 } // namespace gui

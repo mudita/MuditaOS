@@ -9,9 +9,10 @@
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/State.hpp"
 #include "service-cellular/USSD.hpp"
+
 #include "SimCard.hpp"
-#include "service-cellular/CallRequestFactory.hpp"
-#include "service-cellular/CellularCallRequestHandler.hpp"
+#include "service-cellular/RequestFactory.hpp"
+#include "service-cellular/CellularRequestHandler.hpp"
 
 #include <Audio/AudioCommon.hpp>
 #include <BaseInterface.hpp>
@@ -728,8 +729,8 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             break;
         }
 
-        call_request::Factory factory(msg->number.getEntered());
-        CellularCallRequestHandler handler(*this);
+        cellular::RequestFactory factory(msg->number.getEntered());
+        CellularRequestHandler handler(*this);
 
         auto request = factory.create();
         auto result  = channel->cmd(request->command());
@@ -1103,12 +1104,13 @@ bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
 bool ServiceCellular::handleSimState(at::SimState state, const std::string message)
 {
 
-    std::optional<std::unique_ptr<CellularMessage>> response;
+    std::shared_ptr<CellularMessage> response;
     switch (state) {
     case at::SimState::Ready:
         Store::GSM::get()->sim = Store::GSM::get()->selected;
         // SIM causes SIM INIT, only on ready
-        response = std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
+        response = std::move(std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM));
+        sys::Bus::SendMulticast(response, sys::BusChannels::ServiceCellularNotifications, this);
         sendSimUnlocked();
         break;
     case at::SimState::NotReady:

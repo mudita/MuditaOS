@@ -97,6 +97,10 @@ namespace parserFSM
         {
             responseContext.status = status;
         }
+        auto setEndpoint(EndpointType endpointTypeToSet)
+        {
+            endpoint = endpointTypeToSet;
+        }
         auto setResponseBody(json11::Json respBody)
         {
             responseContext.body = respBody;
@@ -108,10 +112,6 @@ namespace parserFSM
         auto getEndpoint() -> EndpointType
         {
             return endpoint;
-        }
-        void setEndpoint(EndpointType newEndpoint)
-        {
-            endpoint = newEndpoint;
         }
         auto getUuid() -> uint32_t
         {

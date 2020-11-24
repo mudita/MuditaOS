@@ -1,4 +1,4 @@
-project(service-cellular)
+﻿project(service-cellular)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
@@ -7,11 +7,23 @@ set(SOURCES
     CellularUrcHandler.cpp
     ServiceCellular.cpp
     SignalStrength.cpp
-    CallRequest.cpp
     SimCard.cpp
-    CallRequestFactory.cpp
-    CellularCallRequestHandler.cpp
-)
+    RequestFactory.cpp
+    CellularRequestHandler.cpp
+    requests/Request.cpp
+    requests/CallRequest.cpp
+    requests/SupplementaryServicesRequest.cpp
+    requests/CallForwardingRequest.cpp
+    requests/PasswordRegistrationRequest.cpp
+    requests/PinChangeRequest.cpp
+    requests/ImeiRequest.cpp
+    requests/UssdRequest.cpp
+    requests/ClipRequest.cpp
+    requests/ClirRequest.cpp
+    requests/ColpRequest.cpp
+    requests/CallWaitingRequest.cpp
+    requests/CallBarringRequest.cpp)
+
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
@@ -28,4 +40,7 @@ target_link_libraries(${PROJECT_NAME}
         module-bsp
         module-cellular
     )
-    
+
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif ()

@@ -145,10 +145,7 @@ namespace app
         if (suspendInProgress)
             suspendInProgress = false;
     }
-    void Application::blockEvents(bool isBlocked)
-    {
-        acceptInput = isBlocked;
-    }
+
     void Application::switchWindow(const std::string &windowName,
                                    gui::ShowMode cmd,
                                    std::unique_ptr<gui::SwitchData> data)
@@ -406,10 +403,12 @@ namespace app
             if (switchData && switchData->ignoreCurrentWindowOnStack) {
                 popToWindow(getPrevWindow());
             }
-            if (not windowsStack.isEmpty()) {
-                getCurrentWindow()->onClose();
+            if (!isCurrentWindow(msg->getWindowName())) {
+                if (!windowsStack.isEmpty()) {
+                    getCurrentWindow()->onClose();
+                }
+                setActiveWindow(msg->getWindowName());
             }
-            setActiveWindow(msg->getWindowName());
             LOG_DEBUG("Current window: %s vs %s", getCurrentWindow()->getName().c_str(), msg->getWindowName().c_str());
             getCurrentWindow()->handleSwitchData(switchData.get());
 
@@ -517,7 +516,6 @@ namespace app
     void Application::setActiveWindow(const std::string &windowName)
     {
         pushWindow(windowName);
-        acceptInput = true;
     }
 
     bool Application::setVolume(const audio::Volume &value,
@@ -680,6 +678,14 @@ namespace app
         }
         /// TODO handle nullptr? if not found on stack -> return default
         return windowsStack.get(windowsStack.stack.back());
+    }
+
+    bool Application::isCurrentWindow(const std::string &windowName) const noexcept
+    {
+        if (windowsStack.isEmpty()) {
+            return false;
+        }
+        return windowsStack.stack.back() == windowName;
     }
 
     gui::AppWindow *Application::getWindow(const std::string &name)

@@ -28,7 +28,7 @@ namespace gui
             [[nodiscard]] virtual auto str() const -> std::string
             {
                 return "";
-            };
+            }
         };
 
         class Simple : public Base
@@ -44,6 +44,10 @@ namespace gui
             {}
 
             [[nodiscard]] auto build() const -> Item * override;
+            [[nodiscard]] auto str() const -> std::string override
+            {
+                return text;
+            }
         };
     }; // namespace option
 

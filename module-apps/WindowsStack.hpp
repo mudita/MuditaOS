@@ -46,7 +46,7 @@ namespace app
             stack.push_back(name);
         }
 
-        gui::AppWindow *get(const std::string &name)
+        gui::AppWindow *get(const std::string &name) const
         {
             auto ret = windows.find(name);
             return ret == std::end(windows) ? nullptr : ret->second.get();

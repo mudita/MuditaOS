@@ -16,6 +16,7 @@ namespace at
     inline const uint32_t default_timeout = 5000; /// if unsure - take this
     inline const uint32_t default_doc_timeout =
         300; /// if you've checked it's ok - or it was at least 300 in code somewhere, take this
+    inline const uint32_t default_long_doc_timeout = 15000;
 
     /// at::Cmd structure with command, it's timeout and some runtime data
     /// { command, timeout, last : {sent, response, status } }
@@ -135,6 +136,22 @@ namespace at
         CFUN_DISABLE_TRANSMITTING, /// Disable the ME from both transmitting and receiving RF signals
         LIST_MESSAGES,             /// List all messages from message storage
         GET_IMEI,
+        CCFC, /// Supplementary Services - Call Forwarding Number and Conditions Control
+        CCWA, /// Supplementary Services - Call Waiting Control
+        CCWA_GET,
+        CHLD, /// Supplementary Services - Call Related Supplementary Services
+        CLIP, /// Supplementary Services - Calling Line Identification Restriction
+        CLIP_GET,
+        CLIR, /// Supplementary Services - Calling Line Identification Restriction
+        CLIR_GET,
+        CLIR_ENABLE,
+        CLIR_DISABLE,
+        CLIR_RESET,
+        COLP, /// Supplementary Services - Connected Line Identification Presentation
+        COLP_GET,
+        COLP_ENABLE,
+        COLP_DISABLE,
+        CSSN, /// Supplementary Services - Supplementary Service Notifications
     };
 
     // below timeouts are defined in Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf
@@ -177,11 +194,11 @@ namespace at
             {AT::ATD, {"ATD"}},
             {AT::IPR, {"AT+IPR="}},
             {AT::CMUX, {"AT+CMUX="}},
-            {AT::CFUN, {"AT+CFUN=", 15000}},
-            {AT::CFUN_RESET, {"AT+CFUN=1,1", 15000}},
-            {AT::CFUN_MIN_FUNCTIONALITY, {"AT+CFUN=0", 15000}},
-            {AT::CFUN_FULL_FUNCTIONALITY, {"AT+CFUN=1", 15000}},
-            {AT::CFUN_DISABLE_TRANSMITTING, {"AT+CFUN=4", 15000}},
+            {AT::CFUN, {"AT+CFUN=", default_long_doc_timeout}},
+            {AT::CFUN_RESET, {"AT+CFUN=1,1", default_long_doc_timeout}},
+            {AT::CFUN_MIN_FUNCTIONALITY, {"AT+CFUN=0", default_long_doc_timeout}},
+            {AT::CFUN_FULL_FUNCTIONALITY, {"AT+CFUN=1", default_long_doc_timeout}},
+            {AT::CFUN_DISABLE_TRANSMITTING, {"AT+CFUN=4", default_long_doc_timeout}},
             {AT::CMGS, {"AT+CMGS=\""}},
             {AT::QCMGS, {"AT+QCMGS=\""}},
             {AT::CREG, {"AT+CREG?", default_doc_timeout}},
@@ -215,7 +232,23 @@ namespace at
             {AT::ENABLE_NETWORK_REGISTRATION_URC, {"AT+CREG=2"}},
             {AT::SET_SMS_TEXT_MODE_UCS2, {"AT+CSMP=17,167,0,8"}},
             {AT::LIST_MESSAGES, {"AT+CMGL=\"ALL\"", default_doc_timeout}},
-            {AT::GET_IMEI, {"AT+GSN", default_doc_timeout}}};
+            {AT::GET_IMEI, {"AT+GSN", default_doc_timeout}},
+            {AT::CCFC, {"AT+CCFC=", default_doc_timeout}},
+            {AT::CCWA, {"AT+CCWA=", default_doc_timeout}},
+            {AT::CCWA_GET, {"AT+CCWA?", default_doc_timeout}},
+            {AT::CHLD, {"AT+CHLD=\"", default_doc_timeout}},
+            {AT::CLIP, {"AT+CLIP=", default_long_doc_timeout}},
+            {AT::CLIP_GET, {"AT+CLIP?", default_long_doc_timeout}},
+            {AT::CLIR, {"AT+CLIR=", default_long_doc_timeout}},
+            {AT::CLIR_GET, {"AT+CLIR?", default_long_doc_timeout}},
+            {AT::CLIR_RESET, {"AT+CLIR=0", default_long_doc_timeout}},
+            {AT::CLIR_ENABLE, {"AT+CLIR=1", default_long_doc_timeout}},
+            {AT::CLIR_DISABLE, {"AT+CLIR=2", default_long_doc_timeout}},
+            {AT::COLP, {"AT+COLP", default_long_doc_timeout}},
+            {AT::COLP_GET, {"AT+COLP?", default_long_doc_timeout}},
+            {AT::COLP_ENABLE, {"AT+COLP=1", default_long_doc_timeout}},
+            {AT::COLP_DISABLE, {"AT+COLP=0", default_long_doc_timeout}},
+            {AT::CSSN, {"AT+CSSN=\"", default_doc_timeout}}};
 
         if (fact.count(at)) {
             return fact.at(at);

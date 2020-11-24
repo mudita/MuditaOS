@@ -139,6 +139,8 @@ auto ContactHelper::createDBEntry(Context &context) -> sys::ReturnCodes
     auto newRecord = from_json(context.getBody());
     if (newRecord.numbers.empty()) {
         LOG_ERROR("Empty number, not added!");
+        context.setResponseStatus(http::Code::NotAcceptable);
+        MessageHandler::putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Failure;
     }
 
@@ -148,6 +150,8 @@ auto ContactHelper::createDBEntry(Context &context) -> sys::ReturnCodes
         [](db::QueryResult *result, Context context) {
             if (auto contactResult = dynamic_cast<db::query::ContactAddResult *>(result)) {
 
+                context.setResponseBody(
+                    json11::Json::object({{json::contacts::id, static_cast<int>(contactResult->getID())}}));
                 context.setResponseStatus(contactResult->getResult() ? http::Code::OK
                                                                      : http::Code::InternalServerError);
                 MessageHandler::putToSendQueue(context.createSimpleResponse());

@@ -7,6 +7,7 @@
 
 #include "OptionsWindow.hpp"
 #include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
 
 #include "bsp/rtc/rtc.hpp"
 
@@ -20,11 +21,12 @@
 #include "../windows/CallLogOptionsWindow.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
-#include "UiCommonActions.hpp"
 #include "application-call/ApplicationCall.hpp"
+#include <application-call/data/CallSwitchData.hpp>
 #include "time/time_conversion.hpp"
 #include <Style.hpp>
 #include <cassert>
+#include <module-apps/application-messages/data/SMSdata.hpp>
 
 using namespace calllog;
 using namespace callLogStyle::detailsWindow;
@@ -141,12 +143,20 @@ namespace gui
         // activated callbacks
         rects[FocusRects::Call]->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("call %s", record.phoneNumber.getE164().c_str());
-            return app::call(application, record.phoneNumber);
+            return app::manager::Controller::sendAction(application,
+                                                        app::manager::actions::Dial,
+                                                        std::make_unique<app::ExecuteCallData>(record.phoneNumber),
+                                                        app::manager::OnSwitchBehaviour::RunInBackground);
         };
 
         rects[FocusRects::Sms]->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("sms %s", record.phoneNumber.getE164().c_str());
-            return app::sms(application, app::SmsOperation::New, record.phoneNumber);
+            auto data                        = std::make_unique<SMSSendRequest>(record.phoneNumber, std::string{});
+            data->ignoreCurrentWindowOnStack = true;
+            return app::manager::Controller::sendAction(application,
+                                                        app::manager::actions::CreateSms,
+                                                        std::move(data),
+                                                        app::manager::OnSwitchBehaviour::RunInBackground);
         };
 
         // Type

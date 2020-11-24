@@ -1,11 +1,12 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <module-services/service-appmgr/service-appmgr/Controller.hpp>
 #include "PhonebookNamecardOptions.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-phonebook/data/PhonebookUtils.hpp"
-#include "UiCommonActions.hpp"
+#include "application-messages/data/SMSdata.hpp"
 
 namespace gui
 {
@@ -44,9 +45,12 @@ namespace gui
 
     auto PhonebookNamecardOptions::sendViaSms() -> bool
     {
-        const UTF8 contactData = contact->getAsString();
-        const utils::PhoneNumber::View emptyNumber;
-        return app::sms(application, app::SmsOperation::New, emptyNumber, contactData);
+        auto data = std::make_unique<SMSSendRequest>(utils::PhoneNumber::View{}, contact->getAsString());
+        data->ignoreCurrentWindowOnStack = true;
+        return app::manager::Controller::sendAction(application,
+                                                    app::manager::actions::CreateSms,
+                                                    std::move(data),
+                                                    app::manager::OnSwitchBehaviour::RunInBackground);
     }
 
     void PhonebookNamecardOptions::sendViaBluetooth()
