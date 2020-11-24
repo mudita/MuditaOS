@@ -10,6 +10,15 @@ add_catch2_executable(
         module-vfs
 )
 
+add_catch2_executable(
+    NAME vfs-disk
+    SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/unittest_disk_manager.cpp
+    LIBS
+        module-vfs
+)
+
+
 # prepare test assets
 set(ASSETS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test_dir")
 set(ASSETS_TARGET_DIR "${CMAKE_BINARY_DIR}/module-vfs/test_dir")
