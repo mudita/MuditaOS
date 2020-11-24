@@ -32,16 +32,18 @@ namespace sgui
         friend WorkerGUI;
         service::renderer::FrameStack fs;
 
+        enum State
+        {
+            Initializing,
+            AwaitDisplay,
+            Processing, // { processing f1 || sending f1 || processing f2 || sending f2 }
+            Idle,
+        };
+
       protected:
         gui::Size screen = {480, 600};
-        // flag that defines whether eink is ready for new frame buffer
-        volatile bool einkReady   = false;
-        volatile bool requestSent = false;
-        volatile bool rendering   = false;
 
-        gui::RefreshModes mode = gui::RefreshModes::GUI_REFRESH_DEEP;
-
-        WorkerGUI *worker;
+        WorkerGUI *worker = nullptr;
 
         /**
          * Flag controls process of redrawing screen when suspend is in progress.
@@ -53,7 +55,6 @@ namespace sgui
         bool shutdownInProgress = false;
 
         void sendBuffer();
-        void sendToRender();
 
       public:
         ServiceGUI(const std::string &name, std::string parent, gui::Size screenSize);

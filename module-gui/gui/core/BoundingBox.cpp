@@ -103,15 +103,6 @@ namespace gui
             return y;
     }
 
-    std::string BoundingBox::str() const
-    {
-        std::stringstream ss;
-        ss << "{";
-        ss << "x: " << x << ", y: " << y << ", w: " << w << ", h: " << h;
-        ss << "}";
-        return ss.str();
-    }
-
     void BoundingBox::sum(const BoundingBox &box)
     {
         w = box.w > w ? box.w : w;

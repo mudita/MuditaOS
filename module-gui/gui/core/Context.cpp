@@ -55,7 +55,7 @@ namespace gui
         if (BoundingBox::intersect(currentBox, newBox, resultBox)) {
             uint32_t sourceOffset = resultBox.y * w + resultBox.x;
             uint32_t destOffset   = (resultBox.y - gy) * width + (resultBox.x - gx);
-            for (int32_t h = 0; h < resultBox.h; h++) {
+            for (Length h = 0; h < resultBox.h; h++) {
                 memcpy(retContext->data.get() + destOffset, data.get() + sourceOffset, resultBox.w);
                 sourceOffset += w;
                 destOffset += width;
@@ -77,7 +77,7 @@ namespace gui
         if (BoundingBox::intersect(currentBox, insertBox, resultBox)) {
             uint32_t sourceOffset = (resultBox.y - iy) * context->w + (resultBox.x - ix);
             uint32_t destOffset   = (resultBox.y) * w + (resultBox.x);
-            for (int32_t h = 0; h < resultBox.h; h++) {
+            for (Length h = 0; h < resultBox.h; h++) {
                 memcpy(data.get() + destOffset, context->data.get() + sourceOffset, resultBox.w);
                 sourceOffset += context->w;
                 destOffset += w;
@@ -103,7 +103,7 @@ namespace gui
                 yBoxOffset = iareaY;
             uint32_t sourceOffset = (resultBox.y - iy - yBoxOffset) * context->w + (resultBox.x - ix - xBoxOffset);
             uint32_t destOffset   = (resultBox.y) * w + (resultBox.x);
-            for (int32_t h = 0; h < resultBox.h; h++) {
+            for (Length h = 0; h < resultBox.h; h++) {
                 memcpy(data.get() + destOffset, context->data.get() + sourceOffset, resultBox.w);
                 sourceOffset += context->w;
                 destOffset += w;

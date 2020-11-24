@@ -38,7 +38,7 @@ namespace sgui
     using namespace service::renderer;
 
     ServiceGUI::ServiceGUI(const std::string &name, std::string parent, gui::Size screenSize)
-        : sys::Service(name, parent, 4096, sys::ServicePriority::Idle), fs(screenSize), worker{nullptr}
+        : sys::Service(name, parent, 4096, sys::ServicePriority::Idle), fs(screenSize)
     {
 
         LOG_INFO("[ServiceGUI] Initializing");
@@ -67,24 +67,11 @@ namespace sgui
         service::eink::ImageData data;
         if (not fs.takeLastProcessedFrame(data)) {
             LOG_ERROR("cant take context to send to eink");
+            return;
         }
 
-        auto msg =
-            std::make_shared<service::eink::ImageMessage>(std::move(data), suspendInProgress, shutdownInProgress);
-
-        einkReady = false;
-        sys::Bus::SendUnicast(msg, service::name::eink, this);
-        // TODO handle this ... this was blocking
-        // if (ret.first == sys::ReturnCodes::Success) {
-        //     transferedFrameCounter = renderFrameCounter;
-        // }
-        mode = gui::RefreshModes::GUI_REFRESH_FAST;
-    }
-
-    void ServiceGUI::sendToRender()
-    {
-        rendering = true;
-        worker->send(static_cast<uint32_t>(WorkerGUICommands::Render), NULL);
+        send(service::name::eink,
+             std::make_shared<service::eink::ImageMessage>(std::move(data), suspendInProgress, shutdownInProgress));
     }
 
     sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -99,10 +86,7 @@ namespace sgui
         worker->init(list);
         worker->run();
 
-        if (einkReady == false) {
-            requestSent = true;
-            sys::Bus::SendUnicast(std::make_shared<service::eink::StateRequest>(), service::name::eink, this);
-        }
+        sys::Bus::SendUnicast(std::make_shared<service::eink::StateRequest>(), service::name::eink, this);
         return sys::ReturnCodes::Success;
     }
 
@@ -148,15 +132,11 @@ namespace sgui
                     suspendInProgress = true;
                 }
 
-                mode = data.getMode();
-
                 if (fs.emplaceDrawData(std::move(data))) {
                     LOG_ERROR("gui fs : failed to push commands to process");
                 }
 
-                if (!rendering) {
-                    sendToRender();
-                }
+                worker->send(static_cast<uint32_t>(WorkerGUICommands::Render), nullptr);
             }
             else {
                 LOG_WARN("Suspended - ignoring draw commands");
@@ -167,24 +147,15 @@ namespace sgui
 
     sys::Message_t ServiceGUI::handleGUIRenderingFinished(sys::Message *message)
     {
-        if (einkReady) {
-            sendBuffer();
-        }
-        else if (!requestSent) {
-            requestSent = true;
-            sys::Bus::SendUnicast(std::make_shared<service::eink::StateRequest>(), service::name::eink, this);
-        }
+        sendBuffer();
         return nullptr;
     }
 
     sys::Message_t ServiceGUI::handleGUIDisplayReady(sys::Message *message)
     {
         auto msg    = static_cast<GUIDisplayReady *>(message);
-        einkReady   = true;
-        requestSent = false;
 
         if (msg->getShutdownInProgress()) {
-            einkReady         = false;
             suspendInProgress = false;
             LOG_DEBUG("last rendering before shutdown finished.");
 
@@ -192,17 +163,13 @@ namespace sgui
         }
 
         if (msg->getSuspendInProgress()) {
-            einkReady         = false;
             suspendInProgress = false;
             LOG_DEBUG("last rendering before suspend is finished.");
 
             app::manager::Controller::changePowerSaveMode(this);
         }
 
-        /// TODO do it based on fs data ready
         sendBuffer();
-
-        // sendToRender();
         return nullptr;
     }
 

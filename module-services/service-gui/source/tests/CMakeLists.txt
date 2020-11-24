@@ -7,6 +7,8 @@ add_catch2_executable(
         ${PROJECT_SOURCE_DIR}/../../module-gui/
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_FrameStack.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/unittest_TryLock.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/unittest_RendererMachine.cpp
     LIBS
         module-gui
 )

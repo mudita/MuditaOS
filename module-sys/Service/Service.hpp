@@ -83,6 +83,8 @@ namespace sys
         bool connect(Message *msg, MessageHandler handler);
         bool connect(Message &&msg, MessageHandler handler);
 
+        bool send(std::string whom, Message_t message);
+
       protected:
         bool enableRunLoop;
 

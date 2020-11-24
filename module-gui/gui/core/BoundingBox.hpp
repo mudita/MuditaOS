@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Axes.hpp"
+#include "Common.hpp"
 #include <cstdint>
 #include <string>
 
@@ -40,7 +41,6 @@ namespace gui
         uint16_t size(gui::Axis axis) const;
         /// get position in axis - in x get x, in y get y
         int16_t pos(gui::Axis axis) const;
-        std::string str() const;
         /// logical sum of bounding box by another bounding box values
         void sum(const BoundingBox &box);
         bool operator==(const BoundingBox &box) const;

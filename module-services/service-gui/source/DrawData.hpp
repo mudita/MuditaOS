@@ -13,6 +13,8 @@ namespace sgui
     {
         gui::Commands commands;
         gui::RefreshModes mode;
+        gui::Position position;
+        gui::Size size;
 
       public:
         DrawData(gui::Commands commands, gui::RefreshModes mode) : commands(std::move(commands)), mode(mode)

@@ -153,6 +153,11 @@ namespace sys
         return Service::connect(&msg, handler);
     }
 
+    bool Service::send(std::string whom, Message_t message)
+    {
+        return sys::Bus::SendUnicast(message, whom, this);
+    }
+
     void Service::CloseHandler()
     {
         timers.stop();

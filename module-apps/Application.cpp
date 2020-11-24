@@ -132,6 +132,7 @@ namespace app
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
 
+            /// TODO return both: 1. draw list and 2. max area to be used
             auto message = std::make_shared<sgui::DrawMessage>(sgui::DrawData(window->buildDrawList(), mode));
             if (shutdownInProgress) {
                 message->setCommandType(sgui::DrawMessage::Type::SHUTDOWN);

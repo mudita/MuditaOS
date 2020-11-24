@@ -46,6 +46,7 @@
 #include <SystemManager/SystemManager.hpp>
 #include <thread.hpp>
 #include <vfs.hpp>
+#include <utf8/UTF8.hpp>
 
 #include <memory>
 #include <vector>
