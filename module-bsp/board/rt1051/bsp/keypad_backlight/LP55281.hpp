@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 namespace bsp
 {
     namespace keypad_backlight
@@ -57,6 +59,7 @@ namespace bsp
         inline uint8_t encode_diode_brightness(float normalized_brightness)
         {
             // Normalized brightness to 6bit code
+            std::clamp(normalized_brightness, 0.0f, 1.0f);
             return static_cast<uint8_t>(MAX_BRIGHTNESS_INT * normalized_brightness) & 0b00111111;
         }
 

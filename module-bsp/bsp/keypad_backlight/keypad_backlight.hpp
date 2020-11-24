@@ -57,7 +57,7 @@ namespace bsp
         bool configureModule();
 
         // Module shutdown - registers erased
-        void shutdown();
+        bool shutdown();
 
         // Wakeup module - registers in default state
         void wakeup();

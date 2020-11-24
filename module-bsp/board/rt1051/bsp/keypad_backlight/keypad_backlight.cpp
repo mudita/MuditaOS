@@ -45,7 +45,6 @@ namespace bsp
             gpio = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_GPIO),
                                       DriverGPIOParams{});
 
-            // OUTPUT
             gpio->ConfPin(
                 DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
                                     .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
@@ -157,9 +156,10 @@ namespace bsp
             return true;
         }
 
-        void shutdown()
+        bool shutdown()
         {
             gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST), 0);
+            return true;
         }
 
         void wakeup()

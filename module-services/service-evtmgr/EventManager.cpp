@@ -228,8 +228,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
                 message->success = bsp::keypad_backlight::turnOnAll();
                 break;
             case bsp::keypad_backlight::Action::turnOff:
-                bsp::keypad_backlight::shutdown();
-                message->success = true;
+                message->success = bsp::keypad_backlight::shutdown();
                 break;
             }
             return message;
