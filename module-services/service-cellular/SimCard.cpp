@@ -8,6 +8,7 @@
 #include "UrcCpin.hpp" //for Cpin parseState
 #include "UrcFactory.hpp"
 
+
 SimCardResult SimCard::convertErrorFromATResult(const at::Result atres) const
 {
     if (std::holds_alternative<at::EquipmentErrorCode>(atres.errorCode)) {
@@ -166,4 +167,11 @@ std::optional<at::SimState> SimCard::simStateWithMessage(std::string &message) c
         }
     }
     return at::SimState::Unknown;
+}
+
+std::string SimCard::pinToString(std::vector<unsigned int> v)
+{
+    std::string buf;
+    std::transform(v.begin(), v.end(), std::back_inserter(buf), [](auto &&c) { return '0' + c; });
+    return buf;
 }

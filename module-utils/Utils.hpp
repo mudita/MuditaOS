@@ -153,16 +153,6 @@ namespace utils
         return std::string(magic_enum::enum_name(t));
     }
 
-    template <> inline std::string to_string<std::vector<unsigned int>>(std::vector<unsigned int> v)
-    {
-        if (v.size() == 0) {
-            return {};
-        }
-        return std::accumulate(std::next(v.begin()), v.end(), std::to_string(v[0]), [](std::string a, unsigned int b) {
-            return std::move(a) + std::to_string(b);
-        });
-    }
-
     /// Gets value of type T from string
     ///
     /// @param value to be converted

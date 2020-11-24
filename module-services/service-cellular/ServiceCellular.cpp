@@ -1121,13 +1121,13 @@ bool ServiceCellular::handleSimResponse(sys::DataMessage *msgl)
     auto msgSimPin = dynamic_cast<CellularSimPinDataMessage *>(msgl);
     if (msgSimPin != nullptr) {
         LOG_DEBUG("Unclocking sim");
-        return unlockSimPin(utils::to_string(msgSimPin->getPin()));
+        return unlockSimPin(SimCard::pinToString(msgSimPin->getPin()));
     }
 
     auto msgSimPuk = dynamic_cast<CellularSimPukDataMessage *>(msgl);
     if (msgSimPuk != nullptr) {
         LOG_DEBUG("Unlocking puk");
-        return unlockSimPuk(utils::to_string(msgSimPuk->getPuk()), utils::to_string(msgSimPuk->getNewPin()));
+        return unlockSimPuk(SimCard::pinToString(msgSimPuk->getPuk()), SimCard::pinToString(msgSimPuk->getNewPin()));
     }
     return false;
 }

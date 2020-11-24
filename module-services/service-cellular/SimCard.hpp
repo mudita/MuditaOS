@@ -32,12 +32,14 @@ class SimCard
      */
     SimCardResult supplyPin(const std::string pin) const;
 
+
     /** Supply pin for modem
      * \param puk puk as standard 8 digits
      * \param pin, new pin digits as a string from 4-8 digits
      * \return return OK on success in other case see details in SimCardResult
      */
     SimCardResult supplyPuk(const std::string puk, const std::string pin) const;
+
 
     /** return whether the pin needs to be provided, only for standard pin.
      * \return true if need pin to unlock SIM card functionality
@@ -64,6 +66,7 @@ class SimCard
     std::optional<at::SimState> simState() const;
     std::optional<at::SimState> simStateWithMessage(std::string &message) const;
 
+    static std::string pinToString(std::vector<unsigned int> v);
   private:
     ServiceCellular &cellularService;
 
@@ -73,4 +76,6 @@ class SimCard
     SimCardResult convertErrorFromATResult(const at::Result) const;
 
     std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head);
+
+
 };
