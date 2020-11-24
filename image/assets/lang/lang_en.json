@@ -163,6 +163,8 @@
     "app_desktop_sim_card": "card",
     "app_desktop_sim_type_pin": "please type a PIN code:",
     "app_desktop_sim_blocked": "The SIM card is blocked.",
+    "app_desktop_sim_enter_pin": "Enter new PIN code",
+    "app_desktop_sim_confirm_pin": "Enter new PIN code",
     "app_desktop_sim_type_puk": "To unblock it, type the PUK code:",
     "app_desktop_no_pin_lock": "<text>Press <b>Unlock</b> and then <b>#</b></text>",
     "app_desktop_sim_wrong_pin": "Wrong PIN code",
@@ -175,6 +177,7 @@
     "app_desktop_sim_warning3": "have to contact the operator",
     "app_desktop_sim_blocked_info1": "Sorry, SIM card permanently blocked.",
     "app_desktop_sim_blocked_info2": "Please contact your service provider",
+    "app_desktop_sim_cme_error": "<text>SIM card\nCME error:</text>",
 
     "app_desktop_unread_messages": "<text>Unread <b>messages</b></text>",
     "app_desktop_missed_calls": "<text>Missed <b>calls</b></text>",

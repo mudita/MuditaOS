@@ -25,28 +25,13 @@ namespace cellular
 
     auto CallWaitingRequest::command() -> std::string
     {
-        if (!isValid()) {
-            return std::string();
-        }
-
-        std::array<std::function<std::string()>, 3> commandParts = {
-            [this]() { return this->getCommandPresentation(); },
-            [this]() { return this->getCommandMode(); },
-            [this]() { return this->getCommandClass(); },
+        std::vector<commandBuilderFunc> commandParts = {
+            [this]() { return getCommandPresentation(); },
+            [this]() { return getCommandMode(); },
+            [this]() { return getCommandClass(); },
         };
 
-        std::string cmd(at::factory(at::AT::CCWA));
-        bool formatFirst = true;
-        for (auto &cmdPart : commandParts) {
-            auto partStr = cmdPart();
-            if (partStr.empty()) {
-                continue;
-            }
-            cmd.append(formatFirst ? partStr : "," + partStr);
-            formatFirst = false;
-        }
-
-        return cmd;
+        return buildCommand(at::AT::CCWA, commandParts);
     }
 
     auto CallWaitingRequest::getCommandPresentation() const noexcept -> std::string

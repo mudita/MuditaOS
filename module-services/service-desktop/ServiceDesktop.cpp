@@ -4,6 +4,7 @@
 #include "service-desktop/DesktopMessages.hpp"
 #include "service-desktop/ServiceDesktop.hpp"
 #include "service-desktop/WorkerDesktop.hpp"
+#include "service-cellular/CellularMessage.hpp"
 #include "endpoints/factoryReset/FactoryReset.hpp"
 #include "endpoints/backup/BackupRestore.hpp"
 #include "endpoints/update/UpdateMuditaOS.hpp"

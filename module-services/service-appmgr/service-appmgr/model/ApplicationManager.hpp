@@ -111,8 +111,10 @@ namespace app::manager
         // Message handlers
         void registerMessageHandlers();
         auto handleAction(ActionRequest *actionMsg) -> bool;
+        auto handleHomeAction() -> bool;
         auto handleLaunchAction(ApplicationLaunchData *launchParams) -> bool;
-        auto handleSwitchApplication(SwitchRequest *msg) -> bool;
+        auto handleCustomAction(actions::ActionId action, actions::ActionParamsPtr &&actionParams) -> bool;
+        auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
         auto handleSwitchBack(SwitchBackRequest *msg) -> bool;
@@ -120,14 +122,13 @@ namespace app::manager
         auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
+        auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
         void onApplicationSwitch(ApplicationHandle &app,
                                  std::unique_ptr<gui::SwitchData> &&data,
                                  std::string targetWindow);
-        void onApplicationSwitchToPrev(ApplicationHandle &previousApp,
-                                       std::unique_ptr<gui::SwitchData> &&data,
-                                       std::string targetWindow = {});
+        void onApplicationSwitchToPrev(ApplicationHandle &previousApp, std::unique_ptr<gui::SwitchData> &&data);
         void onApplicationInitialised(ApplicationHandle &app, StartInBackground startInBackground);
         void onApplicationInitFailure(ApplicationHandle &app);
         auto onSwitchConfirmed(ApplicationHandle &app) -> bool;
@@ -140,7 +141,6 @@ namespace app::manager
                                                    // defined in settings database application
                                                    // manager is sending signal to power manager and changing window to
                                                    // the desktop window in the blocked state.
-
         // Temporary solution - to be replaced with ActionsMiddleware.
         std::tuple<ApplicationName, actions::ActionId, actions::ActionParamsPtr> pendingAction;
     };

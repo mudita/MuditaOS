@@ -12,8 +12,6 @@
 #include "Style.hpp"
 #include "messages/AppMessage.hpp"
 
-#include "UiCommonActions.hpp"
-
 namespace gui
 {
 
@@ -81,10 +79,10 @@ namespace gui
         it->activatedCallback = [=](Item &it) {
             setFocusItem(nullptr);
             LOG_INFO("handled special char for %s", application->getCurrentWindow()->getName().c_str());
-            app::specialInput(
-                application,
-                std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Response, app->requester, str));
-            return true;
+            auto switchData =
+                std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Response, app->requester, str);
+            return app::manager::Controller::switchBack(
+                application, std::make_unique<app::manager::SwitchBackRequest>(app->requester, std::move(switchData)));
         };
     }
 

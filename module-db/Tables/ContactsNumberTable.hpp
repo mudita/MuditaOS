@@ -56,12 +56,4 @@ class ContactsNumberTable : public Table<ContactsNumberTableRow, ContactNumberTa
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
   private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS contact_number("
-                                   "_id              INTEGER PRIMARY KEY,"
-                                   "contact_id       INTEGER,"
-                                   "number_user      TEXT NOT NULL,"
-                                   "number_e164      TEXT NOT NULL,"
-                                   "type             INTEGER,"
-                                   "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
-                                   ");";
 };
