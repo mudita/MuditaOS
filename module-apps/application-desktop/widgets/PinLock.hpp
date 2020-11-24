@@ -66,15 +66,15 @@ namespace gui
         {
             return value;
         }
-        [[nodiscard]] bool is(Store::GSM::SIM _sim) const noexcept
+        [[nodiscard]] bool isSim(Store::GSM::SIM _sim) const noexcept
         {
             return sim == _sim;
         }
-        [[nodiscard]] bool is(LockState state) const noexcept
+        [[nodiscard]] bool isState(LockState state) const noexcept
         {
             return lockState == state;
         }
-        [[nodiscard]] bool is(LockType type) const noexcept
+        [[nodiscard]] bool isType(LockType type) const noexcept
         {
             return lockType == type;
         }

@@ -58,7 +58,7 @@ namespace gui
 
         [[nodiscard]] auto isScreenLocked() const noexcept -> bool
         {
-            return !screenLock.is(PinLock::LockState::Unlocked);
+            return !screenLock.isState(PinLock::LockState::Unlocked);
         }
         void lockScreen();
         void unlockScreen();
