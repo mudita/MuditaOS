@@ -46,5 +46,7 @@ INSTALL_PACKAGES="
         portaudio19-dev \
         tzdata \
         vim \
-        wget
+        wget \
+        python3-magic
 "
+
