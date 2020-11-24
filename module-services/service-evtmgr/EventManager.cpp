@@ -19,6 +19,7 @@
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/rtc/rtc.hpp>
 #include <bsp/torch/torch.hpp>
+#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <common_data/RawKey.hpp>
 #include <log/log.hpp>
 #include <module-utils/time/time_conversion.hpp>
@@ -212,6 +213,23 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
                 break;
             case bsp::torch::Action::toggle:
                 message->success = bsp::torch::toggle();
+                break;
+            }
+            return message;
+        }
+    }
+    else if (msgl->messageType == MessageType::EVMKeypadBacklightMessage) {
+        auto msg = dynamic_cast<sevm::KeypadBacklightMessage *>(msgl);
+        if (msg != nullptr) {
+            auto message = std::make_shared<sevm::KeypadBacklightResultMessage>(msg->action);
+
+            switch (msg->action) {
+            case bsp::keypad_backlight::Action::turnOn:
+                message->success = bsp::keypad_backlight::turnOnAll();
+                break;
+            case bsp::keypad_backlight::Action::turnOff:
+                bsp::keypad_backlight::shutdown();
+                message->success = true;
                 break;
             }
             return message;

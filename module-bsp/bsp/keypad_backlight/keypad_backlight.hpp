@@ -16,6 +16,12 @@ namespace bsp
 {
     namespace keypad_backlight
     {
+        enum class Action
+        {
+            turnOn,
+            turnOff,
+        };
+
         // channel intensity 0.0 - 1.0 : min - max
         using DiodeIntensity = float;
 

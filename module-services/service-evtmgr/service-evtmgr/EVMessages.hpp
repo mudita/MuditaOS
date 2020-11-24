@@ -14,6 +14,7 @@
 #include <bsp/common.hpp>
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/torch/torch.hpp>
+#include <bsp/keypad_backlight/keypad_backlight.hpp>
 
 #include <string>
 
@@ -120,6 +121,21 @@ namespace sevm
     {
       public:
         TorchStateResultMessage(bsp::torch::Action direction) : TorchStateMessage(direction)
+        {}
+        bool success = false;
+    };
+    class KeypadBacklightMessage : public Message
+    {
+      public:
+        KeypadBacklightMessage(bsp::keypad_backlight::Action action)
+            : Message(MessageType::EVMKeypadBacklightMessage), action(action)
+        {}
+        bsp::keypad_backlight::Action action;
+    };
+    class KeypadBacklightResultMessage : public KeypadBacklightMessage
+    {
+      public:
+        KeypadBacklightResultMessage(bsp::keypad_backlight::Action action) : KeypadBacklightMessage(action)
         {}
         bool success = false;
     };

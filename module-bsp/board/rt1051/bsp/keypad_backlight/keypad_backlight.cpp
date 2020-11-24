@@ -150,7 +150,7 @@ namespace bsp
             if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::BOOST_CTRL), &reg_val))
                 return false;
 
-            uint8_t reg_val = WAKEUP;
+            reg_val = WAKEUP;
             if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::ENABLES), &reg_val))
                 return false;
 
