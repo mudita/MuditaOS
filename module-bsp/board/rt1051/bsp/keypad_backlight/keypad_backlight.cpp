@@ -20,13 +20,13 @@ namespace bsp
     {
         static xQueueHandle qHandleIrq = NULL;
 
-        static I2CAddress addr = {.deviceAddress = LP55281_DEVICE_ADDR, .subAddressSize = 1};
+        static I2CAddress addr = {.deviceAddress = static_cast<uint32_t>(LP55281_DEVICE_ADDR), .subAddressSize = 1};
 
         std::shared_ptr<DriverGPIO> gpio;
 
         int32_t init(xQueueHandle qHandle)
         {
-            i2c = DriverI2C::Create(static_cast<I2CInstances>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_I2C_BAUDRATE),
+            i2c = DriverI2C::Create(static_cast<I2CInstances>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_I2C),
                                     DriverI2CParams{.baudrate = static_cast<uint32_t>(
                                                         BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_I2C_BAUDRATE)});
 
@@ -39,29 +39,82 @@ namespace bsp
             gpio->ConfPin(
                 DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
                                     .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
-                                    .defLogic = 0,
+                                    .defLogic = 1,
                                     .pin      = static_cast<uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST)});
 
-            set(Diode::KEYPAD_ALL, 0.5f);
+            wakeup();
+            addr.subAddress     = static_cast<uint32_t>(LP55281_Addresses::RESET);
+            uint8_t reset_value = 0xff;
+            auto write_success  = i2c->Write(addr, (uint8_t *)(&reset_value), 1);
+            shutdown();
+
+            if (write_success != 1) {
+                return kStatus_Fail;
+            }
 
             return kStatus_Success;
         }
 
         void deinit()
         {
+            shutdown();
             qHandleIrq = NULL;
         }
 
         bool set(Diode diode, DiodeIntensity intensity)
         {
-            static I2CAddress addr = {.deviceAddress = 0x09, .subAddressSize = 1};
+            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::RED4);
 
-            uint8_t diode_reg = encode_diode_brightness(intensity);
+            uint8_t diode_reg = 0xff; // encode_diode_brightness(intensity)|MAX_DIODE_CURRENT_LIMIT;
 
             auto wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
             if (wrote != 1) {
                 return false;
             }
+
+            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::GREEN4);
+
+            diode_reg = 0xff; // encode_diode_brightness(intensity)|MAX_DIODE_CURRENT_LIMIT;
+
+            wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
+            if (wrote != 1) {
+                return false;
+            }
+
+            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::GREEN2);
+
+            diode_reg = 0xff; // encode_diode_brightness(intensity)|MAX_DIODE_CURRENT_LIMIT;
+
+            wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
+            if (wrote != 1) {
+                return false;
+            }
+
+            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::RED3);
+
+            diode_reg = 0xff; // encode_diode_brightness(intensity)|MAX_DIODE_CURRENT_LIMIT;
+
+            wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
+            if (wrote != 1) {
+                return false;
+            }
+
+            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::BOOST_CTRL);
+            diode_reg       = BOOST_OUTPUT_4V;
+
+            wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
+            if (wrote != 1) {
+                return false;
+            }
+
+            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::ENABLES);
+            diode_reg       = WAKEUP;
+
+            wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
+            if (wrote != 1) {
+                return false;
+            }
+
             return true;
         }
 
@@ -72,16 +125,33 @@ namespace bsp
 
         bool toggle(Diode diode)
         {
-            return false;
+            if (!on) {
+                on = true;
+                wakeup();
+                return bsp::keypad_backlight::set(bsp::keypad_backlight::Diode::KEYPAD_ALL, 1.0f);
+            }
+            else {
+                shutdown();
+                on = false;
+                return true;
+            }
         }
 
         void shutdown()
-        {}
+        {
+            gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST), 0);
+        }
 
         void wakeup()
-        {}
+        {
+            gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST), 1);
+        }
 
         void reset()
-        {}
+        {
+            addr.subAddress     = static_cast<uint32_t>(LP55281_Addresses::RESET);
+            uint8_t reset_value = 0xff;
+            i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
+        }
     } // namespace keypad_backlight
 } // namespace bsp

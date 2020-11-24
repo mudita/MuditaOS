@@ -7,7 +7,7 @@ namespace bsp
 {
     namespace keypad_backlight
     {
-        constexpr auto LP55281_DEVICE_ADDR = 0x26;
+        constexpr auto LP55281_DEVICE_ADDR = 0x4C;
 
         // LP55281 registers addresses
         enum class LP55281_Addresses
