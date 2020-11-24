@@ -4,51 +4,52 @@
 #pragma once
 
 #include "Record.hpp"
-#include <stdint.h>
-#include "../Databases/NotesDB.hpp"
-#include "utf8/UTF8.hpp"
+
+#include <cstdint>
+#include <filesystem>
+
+#include <utf8/UTF8.hpp>
+
+#include "module-db/Databases/NotesDB.hpp"
 #include "../Common/Common.hpp"
 
-struct NotesRecord
+struct NotesRecord : public Record
 {
-    uint32_t ID;
-    uint32_t date;
+    std::uint32_t date;
     UTF8 snippet;
-    UTF8 path;
+    std::filesystem::path path;
 };
 
 enum class NotesRecordField
 {
-    Data,
+    Date,
     Snippet,
     Path
 };
 
-/*
- *
- */
 class NotesRecordInterface : public RecordInterface<NotesRecord, NotesRecordField>
 {
   public:
-    NotesRecordInterface(NotesDB *notesDb);
-    virtual ~NotesRecordInterface();
+    explicit NotesRecordInterface(NotesDB *notesDb);
 
-    bool Add(const NotesRecord &rec) override final;
-    bool RemoveByID(uint32_t id) override final;
-    bool RemoveByField(NotesRecordField field, const char *str) override final;
-    bool Update(const NotesRecord &rec) override final;
-    NotesRecord GetByID(uint32_t id) override final;
-
-    uint32_t GetCount() override final;
-
-    std::unique_ptr<std::vector<NotesRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
-
+    bool Add(const NotesRecord &rec) override;
+    bool RemoveByID(uint32_t id) override;
+    bool RemoveByField(NotesRecordField field, const char *str) override;
+    bool Update(const NotesRecord &rec) override;
+    NotesRecord GetByID(uint32_t id) override;
+    uint32_t GetCount() override;
+    std::unique_ptr<std::vector<NotesRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override;
     std::unique_ptr<std::vector<NotesRecord>> GetLimitOffsetByField(uint32_t offset,
                                                                     uint32_t limit,
                                                                     NotesRecordField field,
-                                                                    const char *str) override final;
+                                                                    const char *str) override;
+
+    std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
   private:
-    const uint32_t snippetLength = 60;
+    std::vector<NotesRecord> getNotes(uint32_t offset, uint32_t limit) const;
+
+    std::unique_ptr<db::QueryResult> getForListQuery(const std::shared_ptr<db::Query> &query);
+
     NotesDB *notesDB;
 };

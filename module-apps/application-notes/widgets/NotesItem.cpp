@@ -2,71 +2,73 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesItem.hpp"
+
 #include <Style.hpp>
+#include <module-apps/application-notes/style/NotesListStyle.hpp>
 
 namespace gui
 {
-
-    NotesItem::NotesItem(NotesModel *model, bool mode24H) : model{model}, mode24H{mode24H}
+    NotesItem::NotesItem(std::shared_ptr<NotesRecord> record, bool mode24H) : note{std::move(record)}, mode24H{mode24H}
     {
-        setMinimumSize(style::window::default_body_width, 146);
-        setMaximumSize(style::window::default_body_width, 146);
+        namespace notesItemStyle = app::notes::style::list::item;
+        setMinimumSize(style::window::default_body_width, notesItemStyle::Height);
+        setMaximumSize(style::window::default_body_width, notesItemStyle::Height);
+        setRadius(notesItemStyle::Radius);
+        setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
+        setPenFocusWidth(style::window::default_border_focus_w);
+        setPenWidth(style::window::default_border_no_focus_w);
 
-        setRadius(8);
-
-        setPenFocusWidth(3);
-        setPenWidth(1);
-
-        hour = new gui::Label(this, 0, 0, 0, 0);
-        hour->setPenFocusWidth(0);
-        hour->setPenWidth(0);
-        hour->setFont(style::window::font::medium);
-        hour->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Top});
-
-        title = new gui::Label(this, 0, 0, 0, 0);
-        title->setPenFocusWidth(0);
-        title->setPenWidth(0);
+        title = createEmptyLabel(this);
         title->setFont(style::window::font::bigbold);
         title->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top});
 
-        snippet = new gui::Label(this, 0, 0, 0, 0);
-        snippet->setPenFocusWidth(0);
-        snippet->setPenWidth(0);
+        date = createEmptyLabel(this);
+        date->setFont(style::window::font::medium);
+        date->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Top});
+
+        snippet = createEmptyLabel(this);
         snippet->setFont(style::window::font::small);
-        snippet->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+        snippet->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left});
+
+        setSnippet(note->snippet);
+        setDateText(note->date);
     }
 
-    NotesItem::~NotesItem()
+    gui::Label *NotesItem::createEmptyLabel(Item *parent)
     {
-        note = nullptr;
+        auto label = new gui::Label(parent, 0, 0, 0, 0);
+        label->setPenFocusWidth(0);
+        label->setPenWidth(0);
+        return label;
+    }
+
+    void NotesItem::setSnippet(const UTF8 &noteText)
+    {
+        title->setText(noteText);
+        snippet->setText(noteText);
+    }
+
+    void NotesItem::setDateText(std::uint32_t timestamp)
+    {
+        date->setText(utils::to_string(timestamp));
     }
 
     bool NotesItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
-        hour->setPosition(11, 0);
-        hour->setSize(newDim.w - 22, 40);
+        namespace notesItemStyle = app::notes::style::list::item;
+        title->setPosition(notesItemStyle::LeftPadding, notesItemStyle::VerticalPadding);
+        title->setSize(notesItemStyle::title::Width, notesItemStyle::title::Height);
 
-        title->setPosition(11, 0);
-        title->setSize(68, 40);
+        date->setPosition(notesItemStyle::LeftPadding, notesItemStyle::VerticalPadding);
+        date->setSize(newDim.w - (notesItemStyle::LeftPadding + notesItemStyle::RightPadding),
+                      notesItemStyle::date::Height);
 
-        snippet->setPosition(11, 40);
-        snippet->setSize(newDim.w - 22, newDim.h - 40);
+        snippet->setPosition(notesItemStyle::LeftPadding,
+                             notesItemStyle::VerticalPadding + notesItemStyle::title::Height +
+                                 notesItemStyle::snippet::TopMargin);
+        snippet->setSize(newDim.w - (notesItemStyle::LeftPadding + notesItemStyle::RightPadding),
+                         newDim.h - (2 * notesItemStyle::VerticalPadding) - notesItemStyle::title::Height -
+                             notesItemStyle::snippet::TopMargin);
         return true;
     }
-
-    // sets copy of alarm's
-    void NotesItem::setNote(std::shared_ptr<NotesRecord> &note)
-    {
-        this->note = note;
-        // set values of the labels
-        title->setText(std::to_string(note->ID));
-        snippet->setText(note->path);
-    }
-
-    bool NotesItem::onActivated(void *data)
-    {
-        LOG_INFO("ITEM WAS PRESSED");
-        return true;
-    }
-
 } /* namespace gui */

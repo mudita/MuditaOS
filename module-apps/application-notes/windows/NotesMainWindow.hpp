@@ -1,44 +1,36 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_APPS_APPLICATION_NOTES_WINDOWS_NOTESMAINWINDOW_HPP_
-#define MODULE_APPS_APPLICATION_NOTES_WINDOWS_NOTESMAINWINDOW_HPP_
+#pragma once
 
-#include <string>
-#include <functional>
+#include <memory>
 
-#include "AppWindow.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/Window.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/TopBar.hpp"
-#include "gui/widgets/ListView.hpp"
+#include <AppWindow.hpp>
+#include <gui/widgets/Label.hpp>
+#include <gui/widgets/ListView.hpp>
 
-#include "../NotesModel.hpp"
+#include <module-apps/application-notes/model/NotesListModel.hpp>
+#include <module-apps/application-notes/presenter/NotesMainWindowPresenter.hpp>
 
-namespace gui
+namespace app::notes
 {
-
-    class NotesMainWindow : public AppWindow
+    class NotesMainWindow : public gui::AppWindow, public NotesMainWindowContract::View
     {
-        std::shared_ptr<NotesModel> notesModel = nullptr;
-        gui::ListView *list    = nullptr;
-        Label *title           = nullptr;
-
       public:
-        NotesMainWindow(app::Application *app);
+        explicit NotesMainWindow(app::Application *app,
+                                 std::unique_ptr<NotesMainWindowContract::Presenter> &&windowPresenter);
 
         // virtual methods
-        bool onInput(const InputEvent &inputEvent) override;
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool onInput(const gui::InputEvent &inputEvent) override;
+        void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
 
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
         bool onDatabaseMessage(sys::Message *msg) override;
+
+      private:
+        std::unique_ptr<NotesMainWindowContract::Presenter> presenter;
+        gui::ListView *list = nullptr;
     };
-
-} /* namespace gui */
-
-#endif /* MODULE_APPS_APPLICATION_NOTES_WINDOWS_NOTESMAINWINDOW_HPP_ */
+} // namespace app::notes

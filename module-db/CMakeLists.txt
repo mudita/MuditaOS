@@ -87,6 +87,7 @@ set(SOURCES
         queries/messages/threads/QueryThreadGetByContactID.cpp
         queries/messages/threads/QueryThreadRemove.cpp
         queries/messages/threads/QueryThreadMarkAsRead.cpp
+        queries/notes/NotesGetForList.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/calllog/QueryCalllogGet.cpp
         queries/calllog/QueryCalllogGetCount.cpp

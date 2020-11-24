@@ -13,7 +13,7 @@ struct NotesTableRow
 {
     uint32_t ID = DB_ID_NONE;
     uint32_t date;
-    UTF8 snippet; // up to 60 characters
+    UTF8 snippet;
     UTF8 path;
 };
 
@@ -24,14 +24,10 @@ enum class NotesTableFields
     Path
 };
 
-/*
- *
- */
 class NotesTable : public Table<NotesTableRow, NotesTableFields>
 {
   public:
-    NotesTable(Database *db);
-    virtual ~NotesTable();
+    explicit NotesTable(Database *db);
 
     bool create() override final;
     bool add(NotesTableRow entry) override final;

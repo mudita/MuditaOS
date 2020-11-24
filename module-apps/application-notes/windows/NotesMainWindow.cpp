@@ -1,28 +1,27 @@
 ﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <memory>
-#include <functional>
-
-#include "InputEvent.hpp"
-#include <service-appmgr/model/ApplicationManager.hpp>
-
-#include "../ApplicationNotes.hpp"
-
-#include <service-db/DBNotesMessage.hpp>
-#include "module-utils/i18n/i18n.hpp"
-
-#include "Label.hpp"
-#include "Margins.hpp"
 #include "NotesMainWindow.hpp"
+
+#include <InputEvent.hpp>
+#include <service-db/DBNotesMessage.hpp>
+
+#include <i18/i18.hpp>
+
+#include <gui/widgets/Label.hpp>
+#include <gui/widgets/BottomBar.hpp>
+#include <gui/widgets/TopBar.hpp>
+
 #include <Style.hpp>
+#include <module-apps/application-notes/style/NotesListStyle.hpp>
 
-namespace gui
+namespace app::notes
 {
-
-    NotesMainWindow::NotesMainWindow(app::Application *app)
-        : AppWindow(app, gui::name::window::main_window), notesModel{std::make_shared<NotesModel>(app)}
+    NotesMainWindow::NotesMainWindow(app::Application *app,
+                                     std::unique_ptr<NotesMainWindowContract::Presenter> &&windowPresenter)
+        : AppWindow(app, gui::name::window::main_window), presenter{std::move(windowPresenter)}
     {
+        presenter->attach(this);
         buildInterface();
     }
 
@@ -36,51 +35,45 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        list = new gui::ListView(this, 16, 105, 480 - 32, 440, notesModel);
-        list->setPenFocusWidth(0);
-        list->setPenWidth(0);
-
-        setFocusItem(list);
-
         setTitle(utils::localize.get("app_notes_title_main"));
 
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        namespace listStyle = app::notes::style::list;
+        list                = new gui::ListView(
+            this, listStyle::X, listStyle::Y, listStyle::Width, listStyle::Height, presenter->getNotesItemProvider());
+        list->setPenWidth(listStyle::PenWidth);
+        list->setPenFocusWidth(listStyle::FocusedPenWidth);
 
-        topBar->setActive(TopBar::Elements::TIME, true);
+        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(::style::strings::common::open));
+
+        bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
+
+        topBar->setActive(gui::TopBar::Elements::TIME, true);
+
+        setFocusItem(list);
     }
 
     void NotesMainWindow::destroyInterface()
     {
         erase();
+        list = nullptr;
     }
 
-    void NotesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void NotesMainWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         list->rebuildList();
     }
 
-    bool NotesMainWindow::onInput(const InputEvent &inputEvent)
+    bool NotesMainWindow::onInput(const gui::InputEvent &inputEvent)
     {
-
-        // process only if key is released
-        if ((inputEvent.state != InputEvent::State::keyReleasedShort) ||
-            (inputEvent.state != InputEvent::State::keyReleasedLong)) {
-            if (inputEvent.keyCode == KeyCode::KEY_LEFT) {
-                application->switchWindow("EditWindow");
-                return true;
-            }
-        }
-
         return AppWindow::onInput(inputEvent);
     }
 
     bool NotesMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        DBNotesResponseMessage *msg = reinterpret_cast<DBNotesResponseMessage *>(msgl);
-        return notesModel->updateRecords(std::move(*msg->records));
+        auto *msg            = static_cast<DBNotesResponseMessage *>(msgl);
+        const auto &notesDao = presenter->getNotesDAO();
+        return notesDao->updateRecords(std::move(*msg->records));
     }
-
-} /* namespace gui */
+} // namespace app::notes

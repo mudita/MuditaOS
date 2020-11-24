@@ -6,9 +6,6 @@
 NotesTable::NotesTable(Database *db) : Table(db)
 {}
 
-NotesTable::~NotesTable()
-{}
-
 bool NotesTable::create()
 {
     return true;
@@ -30,16 +27,13 @@ bool NotesTable::removeById(uint32_t id)
 bool NotesTable::removeByField(NotesTableFields field, const char *str)
 {
     std::string fieldName;
-
     switch (field) {
     case NotesTableFields::Date:
         fieldName = "date";
         break;
-
     case NotesTableFields::Path:
         fieldName = "path";
         break;
-
     case NotesTableFields::Snippet:
         fieldName = "snippet";
         break;
@@ -78,7 +72,6 @@ NotesTableRow NotesTable::getById(uint32_t id)
 std::vector<NotesTableRow> NotesTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery = db->query("SELECT * from notes ORDER BY date LIMIT %lu OFFSET %lu;", limit, offset);
-
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<NotesTableRow>();
     }
@@ -86,6 +79,7 @@ std::vector<NotesTableRow> NotesTable::getLimitOffset(uint32_t offset, uint32_t 
     std::vector<NotesTableRow> ret;
 
     do {
+        LOG_ERROR("HERE");
         ret.push_back(NotesTableRow{
             (*retQuery)[0].getUInt32(), // ID
             (*retQuery)[1].getUInt32(), // date
@@ -93,7 +87,7 @@ std::vector<NotesTableRow> NotesTable::getLimitOffset(uint32_t offset, uint32_t 
             (*retQuery)[3].getString(), // path
         });
     } while (retQuery->nextRow());
-
+    LOG_ERROR("HERE");
     return ret;
 }
 
@@ -141,22 +135,20 @@ std::vector<NotesTableRow> NotesTable::getLimitOffsetByField(uint32_t offset,
 
 uint32_t NotesTable::count()
 {
-    auto queryRet = db->query("SELECT COUNT(*) FROM NOTES;");
-
+    auto queryRet = db->query("SELECT COUNT(*) FROM notes;");
     if (queryRet->getRowCount() == 0) {
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].getUInt32()};
+    return (*queryRet)[0].getUInt32();
 }
 
 uint32_t NotesTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM notes WHERE %q=%lu;", field, id);
-
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].getUInt32()};
+    return (*queryRet)[0].getUInt32();
 }
