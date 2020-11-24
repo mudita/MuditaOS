@@ -112,8 +112,7 @@ namespace gui
         }
         // accept only LF, enter, RF, #, and numeric values;
         if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
-            app::manager::Controller::switchApplication(
-                application, app::name_phonebook, gui::window::name::ice_contacts, nullptr);
+            app::manager::Controller::sendAction(application, app::manager::actions::ShowEmergencyContacts);
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {

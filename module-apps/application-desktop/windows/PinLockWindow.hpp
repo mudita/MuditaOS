@@ -27,7 +27,7 @@ namespace gui
         auto usesNumericKeys() const noexcept -> bool;
 
       public:
-        PinLockWindow(app::Application *app, const std::string &window_name, PinLock &lock);
+        PinLockWindow(app::Application *app, const std::string &window_name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 
