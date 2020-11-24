@@ -17,16 +17,10 @@
 
 namespace gui
 {
-    class Text;
-    class TextLineCursor;
-
     class Lines
     {
         Text *text = nullptr;
         std::list<TextLine> lines;
-
-        uint32_t max_lines_count = 4;
-        uint32_t scroll_position = 0;
 
         bool underLine            = false;
         Position underLinePadding = 0;
@@ -122,8 +116,7 @@ namespace gui
         auto linesHAlign(Length parentSize) -> void;
         auto linesVAlign(Length parentSize) -> void;
 
-      protected:
-        TextLine *getTextLine(uint32_t line);
+        TextLine *getLine(unsigned int lineNr);
     };
 
 } // namespace gui

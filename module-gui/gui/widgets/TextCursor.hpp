@@ -19,6 +19,7 @@ namespace gui
     /// and position in gui::Text::Lines shown on screen
     class TextCursor : public Rect, public BlockCursor
     {
+      protected:
         unsigned int pos_on_screen = 0;
         Text *text                 = nullptr;
 
@@ -36,7 +37,7 @@ namespace gui
             Error, /// error - now not implemented
         };
 
-        TextCursor(gui::Text *parent, unsigned int pos = text::npos, unsigned int block = text::npos);
+        explicit TextCursor(gui::Text *parent, unsigned int pos = text::npos, unsigned int block = text::npos);
         TextCursor() = delete;
 
         /// Up Down - end of line movement like in vi
@@ -47,12 +48,11 @@ namespace gui
         /// removeChar)
         virtual Move moveCursor(NavigationDirection direction);
         virtual Move moveCursor(NavigationDirection direction, unsigned int n);
-        void reset();
 
         // TODO note to self - here should be too UTF8 char handling, not in document...
         // cursor can pass processing char directly to TextBlock we are interested in...
         // so this should be in BlockCursor in reality
-        auto getLine() -> std::tuple<const TextLine *, unsigned int, unsigned int>;
+        auto getSelectedLine() -> std::tuple<const TextLine *, unsigned int, unsigned int>;
         void updateView();
 
         // TODO this can move our text out of bonds ( and might need calling expand() in Text)

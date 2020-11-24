@@ -49,7 +49,7 @@ namespace gui
     class TestText : public Text
     {
       public:
-        unsigned int linesSize()
+        [[nodiscard]] unsigned int linesSize()
         {
             return lines->get().size();
         }
@@ -60,7 +60,7 @@ namespace gui
             return;
         }
 
-        auto &linesGet()
+        [[nodiscard]] auto &linesGet()
         {
             return lines->get();
         }

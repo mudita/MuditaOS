@@ -28,7 +28,7 @@ namespace gui
 
     /// Note - line breaking could be done here with different TextLines to return
     /// or via different block types (i.e. numeric block tyle could be not "breakable"
-    TextLine::TextLine(BlockCursor &localCursor, unsigned int max_width) : max_width(max_width)
+    TextLine::TextLine(BlockCursor &localCursor, unsigned int maxWidth) : maxWidth(maxWidth)
     {
         do {
             if (!localCursor) { // cursor is faulty
@@ -49,71 +49,71 @@ namespace gui
                 continue;
             }
 
-            auto text_format = localCursor->getFormat();
-            if (text_format->getFont() == nullptr) {
+            auto textFormat = localCursor->getFormat();
+            if (textFormat->getFont() == nullptr) {
                 return;
             }
 
-            // check if max provided width is enought to enter one char at least
-            if (max_width < text_format->getFont()->getCharPixelWidth(text[0])) {
+            // check if max provided width is enough to enter one char at least
+            if (maxWidth < textFormat->getFont()->getCharPixelWidth(text[0])) {
                 lineEnd = true;
                 return;
             }
 
-            auto can_show = text_format->getFont()->getCharCountInSpace(text, max_width - width_used);
+            auto canShow = textFormat->getFont()->getCharCountInSpace(text, maxWidth - widthUsed);
 
             // we can show nothing - this is the end of this line
-            if (can_show == 0) {
+            if (canShow == 0) {
 
-                auto item   = buildUITextPart("", text_format);
-                width_used  = item->getTextNeedSpace();
-                height_used = std::max(height_used, item->getTextHeight());
-                elements_to_show_in_line.emplace_back(item);
+                auto item  = buildUITextPart("", textFormat);
+                widthUsed  = item->getTextNeedSpace();
+                heightUsed = std::max(heightUsed, item->getTextHeight());
+                lineContent.emplace_back(item);
                 end = localCursor->getEnd();
 
                 return;
             }
 
             // create item for show and update Line data
-            auto item = buildUITextPart(text.substr(0, can_show), text_format);
-            number_letters_shown += can_show;
-            width_used += item->getTextNeedSpace();
-            height_used = std::max(height_used, item->getTextHeight());
-            elements_to_show_in_line.emplace_back(item);
+            auto item = buildUITextPart(text.substr(0, canShow), textFormat);
+            shownLetterCount += canShow;
+            widthUsed += item->getTextNeedSpace();
+            heightUsed = std::max(heightUsed, item->getTextHeight());
+            lineContent.emplace_back(item);
             end = localCursor->getEnd();
 
-            localCursor += can_show;
+            localCursor += canShow;
 
             if (localCursor.checkAndInvalidateBlockChanged() && localCursor.checkPreviousBlockNewLine()) {
                 return;
             }
 
             // not whole text shown, try again for next line if you want
-            if (can_show < text.length()) {
+            if (canShow < text.length()) {
                 return;
             }
 
         } while (true);
     }
 
-    TextLine::TextLine(TextLine &&from)
+    TextLine::TextLine(TextLine &&from) noexcept
     {
-        elements_to_show_in_line = std::move(from.elements_to_show_in_line);
-        number_letters_shown     = from.number_letters_shown;
-        width_used               = from.width_used;
-        height_used              = from.height_used;
-        underline                = from.underline;
-        drawUnderline            = from.drawUnderline;
-        drawUnderlineMode        = from.drawUnderlineMode;
-        underlinePadding         = from.underlinePadding;
-        lineEnd                  = from.lineEnd;
-        end                      = from.end;
-        max_width                = from.max_width;
+        lineContent       = std::move(from.lineContent);
+        shownLetterCount  = from.shownLetterCount;
+        widthUsed         = from.widthUsed;
+        heightUsed        = from.heightUsed;
+        underline         = from.underline;
+        drawUnderline     = from.drawUnderline;
+        drawUnderlineMode = from.drawUnderlineMode;
+        underlinePadding  = from.underlinePadding;
+        lineEnd           = from.lineEnd;
+        end               = from.end;
+        maxWidth          = from.maxWidth;
     }
 
     TextLine::~TextLine()
     {
-        for (auto &el : elements_to_show_in_line) {
+        for (auto &el : lineContent) {
             if (el->parent == nullptr) {
                 delete el;
             }
@@ -148,14 +148,14 @@ namespace gui
 
     void TextLine::setPosition(const short &x, const short &y)
     {
-        auto line_x_position = x;
+        auto lineXPosition = x;
 
         updateUnderline(x, y);
 
-        for (auto &el : elements_to_show_in_line) {
-            auto scoped_disown = ScopedParentDisown(el);
-            el->setArea({line_x_position, y - underlinePadding, el->getWidth(), el->getHeight()});
-            line_x_position += el->getWidth();
+        for (auto &el : lineContent) {
+            auto scopedDisown = ScopedParentDisown(el);
+            el->setArea({lineXPosition, y - underlinePadding, el->getWidth(), el->getHeight()});
+            lineXPosition += el->getWidth();
         }
     }
 
@@ -167,7 +167,7 @@ namespace gui
 
         parent->addWidget(underline);
 
-        for (auto &el : elements_to_show_in_line) {
+        for (auto &el : lineContent) {
             parent->addWidget(el);
         }
     }
@@ -175,7 +175,7 @@ namespace gui
     Length TextLine::getWidth() const
     {
         Length width = 0;
-        for (auto &line : elements_to_show_in_line) {
+        for (auto &line : lineContent) {
             width += line->getWidth();
         }
         return width;
@@ -184,22 +184,22 @@ namespace gui
     uint32_t TextLine::getWidthTo(unsigned int pos) const
     {
         uint32_t width  = 0;
-        auto curent_pos = 0;
+        auto currentPos = 0;
         if (pos == text::npos) {
             return 0;
         }
-        for (auto &el : elements_to_show_in_line) {
+        for (auto &el : lineContent) {
             if (el->getFont() == nullptr) {
                 continue;
             }
-            if (curent_pos + el->getTextLength() > pos) {
-                width += el->getFont()->getPixelWidth(el->getText(), 0, pos - curent_pos);
+            if (currentPos + el->getTextLength() > pos) {
+                width += el->getFont()->getPixelWidth(el->getText(), 0, pos - currentPos);
                 return width;
             }
             else {
                 width += el->getWidth();
             }
-            curent_pos += el->getTextLength();
+            currentPos += el->getTextLength();
         }
         return width;
     }
@@ -207,7 +207,7 @@ namespace gui
     UTF8 TextLine::getText(unsigned int pos) const
     {
         UTF8 text;
-        for (auto &label : elements_to_show_in_line) {
+        for (auto &label : lineContent) {
             if (label->getFont() == nullptr) {
                 continue;
             }
@@ -219,7 +219,7 @@ namespace gui
 
     void TextLine::erase()
     {
-        for (auto &el : elements_to_show_in_line) {
+        for (auto &el : lineContent) {
             if (el->parent != nullptr) {
                 auto p = el->parent;
                 p->erase(el);
@@ -234,28 +234,28 @@ namespace gui
             p->removeWidget(underline);
         }
 
-        elements_to_show_in_line.clear();
+        lineContent.clear();
     }
 
-    void TextLine::alignH(Alignment line_align, Length parent_length) const
+    void TextLine::alignH(Alignment lineAlign, Length parentLength) const
     {
-        Position xOffset = line_align.calculateHAlignment(parent_length, getWidth());
+        Position xOffset = lineAlign.calculateHAlignment(parentLength, getWidth());
 
         if (xOffset >= 0) {
 
             if (underline != nullptr && drawUnderlineMode == UnderlineDrawMode::Concurrent)
                 underline->setPosition(underline->getPosition(Axis::X) + xOffset, Axis::X);
 
-            for (auto &el : elements_to_show_in_line) {
-                auto scoped_disown = ScopedParentDisown(el);
+            for (auto &el : lineContent) {
+                auto scopedDisown = ScopedParentDisown(el);
                 el->setPosition(el->getPosition(Axis::X) + xOffset, Axis::X);
             }
         }
     }
 
-    void TextLine::alignV(Alignment line_align, Length parent_length, Length lines_height)
+    void TextLine::alignV(Alignment lineAlign, Length parentLength, Length linesHeight)
     {
-        Position yOffset = line_align.calculateVAlignment(parent_length, lines_height);
+        Position yOffset = lineAlign.calculateVAlignment(parentLength, linesHeight);
 
         if (yOffset >= 0 && yOffset != storedYOffset) {
 
@@ -265,22 +265,22 @@ namespace gui
             if (underline != nullptr)
                 underline->setPosition(underline->getPosition(Axis::Y) + yOffset, Axis::Y);
 
-            for (auto &el : elements_to_show_in_line) {
-                auto scoped_disown = ScopedParentDisown(el);
+            for (auto &el : lineContent) {
+                auto scopedDisown = ScopedParentDisown(el);
                 el->setPosition(el->getPosition(Axis::Y) + yOffset, Axis::Y);
             }
         }
     }
 
-    void TextLine::createUnderline(unsigned int width, unsigned int init_height)
+    void TextLine::createUnderline(unsigned int width, unsigned int initHeight)
     {
         if (drawUnderline) {
 
-            underline = new Rect(nullptr, 0, 0, max_width, init_height);
+            underline = new Rect(nullptr, 0, 0, maxWidth, initHeight);
             underline->setEdges(RectangleEdge::Bottom);
 
             if (drawUnderlineMode == UnderlineDrawMode::WholeLine) {
-                height_used = std::max(height_used, (Length)init_height);
+                heightUsed = std::max(heightUsed, (Length)initHeight);
             }
         }
     }
