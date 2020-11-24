@@ -196,6 +196,7 @@ bool WorkerEvent::deinit(void)
     bsp::headset::Deinit();
     bsp::battery_Deinit();
     bsp::torch::deinit();
+    bsp::keypad_backlight::deinit();
 
     return true;
 }
