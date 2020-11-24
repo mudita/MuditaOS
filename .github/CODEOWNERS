@@ -13,7 +13,7 @@
 # all `os` devs are codeovners
 * @mudita/os
 
-#docments
+#documents
 *.md                                        @wojtekidd
 /doc                                        @wojtekidd
 
