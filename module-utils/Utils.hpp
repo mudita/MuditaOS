@@ -153,9 +153,8 @@ namespace utils
         return std::string(magic_enum::enum_name(t));
     }
 
-    static inline std::string vectorToString(const std::vector<unsigned int> v)
+    template <> inline std::string to_string<std::vector<unsigned int>>(std::vector<unsigned int> v)
     {
-
         if (v.size() == 0) {
             return {};
         }
