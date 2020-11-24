@@ -1,5 +1,5 @@
 # Please mind that:
-# 1. in CODEOVNERS file there is no `/**` syntax but we end catalog without `/` which means whole catalog and subdirs
+# 1. in CODEOWNERS file there is no `/**` syntax but we end catalog without `/` which means whole catalog and subdirs
 #    example `dir     @owner` means whole dir and it's subdirectory
 # 2. in CODEOWNERS file ending catalog with `/` means "cutoff
 #    example `dir     @owner` means whole only dir **without subdirs**
