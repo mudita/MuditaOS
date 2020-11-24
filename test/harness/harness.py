@@ -1,8 +1,9 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import time
+from enum import Enum
 
-from harness import utils
+from harness import utils, log
 from harness.interface import CDCSerial as serial
 from harness.interface.defs import key_codes, endpoint, method
 from harness.utils import send_keystoke, application_keypath, send_char
@@ -27,9 +28,9 @@ class Harness:
             self.connection.send_key(3)
             self.connection.send_key(3)
             self.connection.send_key(3)
-            print("Phone unlocked")
+            log.info("Phone unlocked")
         else:
-            print("Phone already unlocked")
+            log.info("Phone already unlocked")
 
     def with_phone_unlocked(self, func):
         if not self.is_phone_unlocked:
