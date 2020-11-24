@@ -83,7 +83,7 @@ extern "C"
 #ifdef DEBUG_UART
         LOG_INFO("--> write: %d", length);
 #endif
-        BlueKitchen::getInstance()->write_blocking((char *)buffer, length);
+        BlueKitchen::getInstance()->write((char *)buffer, length);
     }
 
     static const btstack_uart_block_t btstack_uart_posix = {

@@ -289,12 +289,20 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
     BaseType_t higherPriorTaskWoken = 0;
 
     switch (status) {
-    case kStatus_LPUART_TxIdle:
+    case kStatus_LPUART_TxIdle: {
+        BaseType_t taskwoken = 0;
+        uint8_t val          = Bt::Message::EvtSent;
+        bsp::BlueKitchen *bt = bsp::BlueKitchen::getInstance();
+
         LOG_DEBUG("DMA irq: TX done");
         LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
-        vTaskNotifyGiveFromISR((TaskHandle_t)userData, &higherPriorTaskWoken);
-        portEND_SWITCHING_ISR(higherPriorTaskWoken);
+
+        //        vTaskNotifyGiveFromISR((TaskHandle_t)userData, &higherPriorTaskWoken);
+        //        portEND_SWITCHING_ISR(higherPriorTaskWoken);
+
+        xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         break;
+    }
     case kStatus_LPUART_RxIdle:
         LOG_DEBUG("DMA irq: RX done");
         break;
