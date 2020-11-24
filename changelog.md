@@ -1,5 +1,9 @@
 # MuditaOS changelog
 
+### Added
+
+* `[cellular]` Integration with basic flow for SIM card (cellular<>GUI)
+
 ## [0.48.1 2020-11-23]
 
 ### Added
