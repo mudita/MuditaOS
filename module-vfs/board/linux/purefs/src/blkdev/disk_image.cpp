@@ -9,9 +9,12 @@
 namespace purefs::blkdev
 {
 
+    disk_image::disk_image(std::string_view image_filename) : m_image_name(image_filename)
+    {}
+
     auto disk_image::probe(unsigned int flags) -> int
     {
-        m_filedes = ::open(file_name, O_RDWR, O_SYNC);
+        m_filedes = ::open(m_image_name.c_str(), O_RDWR, O_SYNC);
         if (!m_filedes)
             return m_filedes;
         struct stat fst;
@@ -40,12 +43,12 @@ namespace purefs::blkdev
         if (ret < 0) {
             return ret;
         }
-        auto to_write = lba * sector_size;
+        auto to_write = count * sector_size;
         auto buf_b    = reinterpret_cast<const uint8_t *>(buf);
         do {
             ret = ::write(m_filedes, buf_b, to_write);
             if (ret < 0) {
-                return ret;
+                return -errno;
             }
             to_write -= ret;
             buf_b += ret;
@@ -58,12 +61,12 @@ namespace purefs::blkdev
         if (ret < 0) {
             return ret;
         }
-        auto to_read = lba * sector_size;
+        auto to_read = count * sector_size;
         auto buf_b   = reinterpret_cast<uint8_t *>(buf);
         do {
             ret = ::read(m_filedes, buf_b, to_read);
             if (ret < 0) {
-                return ret;
+                return -errno;
             }
             to_read -= ret;
             buf_b += ret;
@@ -83,7 +86,7 @@ namespace purefs::blkdev
     auto disk_image::status() const -> media_status
     {
         struct stat st;
-        auto ret = ::stat(file_name, &st);
+        auto ret = ::stat(m_image_name.c_str(), &st);
         if (!ret)
             return media_status::nomedia;
         else

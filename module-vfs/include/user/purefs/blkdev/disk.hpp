@@ -13,6 +13,7 @@ namespace purefs::blkdev
       public:
         disk(const disk &) = delete;
         auto operator=(const disk &) = delete;
+        disk()                       = default;
         virtual ~disk()              = default;
 
         /** Initialize the disk this method is called by the disc manager

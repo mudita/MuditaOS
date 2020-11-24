@@ -14,6 +14,11 @@
  */
 namespace purefs::blkdev
 {
+    namespace
+    {
+        using namespace std::literals;
+        static constexpr auto part_suffix = "part"sv;
+    } // namespace
     auto disk_manager::register_device(std::shared_ptr<disk> disk, std::string_view device_name, unsigned flags) -> int
     {
         {
@@ -29,13 +34,8 @@ namespace purefs::blkdev
                     LOG_ERROR("Unable to probe the disc errno %i", ret);
                     return ret;
                 }
-                ret = disk->get_info(info_type::sector_count);
-                if (ret < 0) {
-                    LOG_ERROR("Unable to probe the disc errno %i", ret);
-                    return ret;
-                }
-                m_dev_map.emplace(std::make_pair(device_name, disk));
-                return reread_partitions(std::make_shared<internal::disk_handle>(disk, ret));
+                const auto it = m_dev_map.emplace(std::make_pair(device_name, disk));
+                return reread_partitions(std::make_shared<internal::disk_handle>(disk, it.first->first));
             }
         }
     }
@@ -47,8 +47,8 @@ namespace purefs::blkdev
             LOG_ERROR("Disc: %.*s doesn't exists in manager.", int(device_name.length()), device_name.data());
             return -ENOENT;
         }
-        m_dev_map.erase(it);
         auto ret = it->second->cleanup();
+        m_dev_map.erase(it);
         if (ret < 0) {
             LOG_ERROR("Disk cleanup failed code %i", ret);
         }
@@ -69,7 +69,7 @@ namespace purefs::blkdev
                 ret = nullptr;
             }
             else {
-                ret = std::make_shared<internal::disk_handle>(it->second, part);
+                ret = std::make_shared<internal::disk_handle>(it->second, device_name, part);
             }
         }
         return ret;
@@ -77,16 +77,14 @@ namespace purefs::blkdev
 
     auto disk_manager::parse_device_name(std::string_view device) -> std::tuple<std::string_view, short>
     {
-        using namespace std::literals;
-        static constexpr auto part_suffix = "part"sv;
-        auto ret                          = device.rfind(part_suffix);
+        auto ret = device.rfind(part_suffix);
         if (ret != std::string::npos) {
             auto part_name = device.substr(0, ret);
             auto part_num  = device.substr(ret + part_suffix.length());
             short part_inum{-1};
             if (!part_num.empty()) {
                 auto ires = std::from_chars(std::begin(part_num), std::end(part_num), part_inum);
-                if (ires.ec != std::errc())
+                if (ires.ec == std::errc())
                     return std::make_tuple(part_name, part_inum);
                 else
                     return std::make_tuple(""sv, -1);
@@ -96,7 +94,7 @@ namespace purefs::blkdev
             }
         }
         else {
-            return std::make_tuple(""sv, -1);
+            return std::make_tuple(device, -1);
         }
     }
     auto disk_manager::part_lba_to_disk_lba(disk_fd_t disk, sector_t part_lba, size_t count) -> scount_t
@@ -134,7 +132,7 @@ namespace purefs::blkdev
             return calc_lba;
         }
         else {
-            return disk->write(buf, lba, count);
+            return disk->write(buf, calc_lba, count);
         }
     }
     auto disk_manager::read(disk_fd_t dfd, void *buf, sector_t lba, std::size_t count) -> int
@@ -149,7 +147,7 @@ namespace purefs::blkdev
             return calc_lba;
         }
         else {
-            return disk->read(buf, lba, count);
+            return disk->read(buf, calc_lba, count);
         }
     }
     auto disk_manager::erase(disk_fd_t dfd, sector_t lba, std::size_t count) -> int
@@ -164,7 +162,7 @@ namespace purefs::blkdev
             return calc_lba;
         }
         else {
-            return disk->erase(lba, count);
+            return disk->erase(calc_lba, count);
         }
     }
     auto disk_manager::sync(disk_fd_t dfd) -> int
@@ -229,7 +227,17 @@ namespace purefs::blkdev
             return {};
         }
         internal::partition_parser pparser(disk, disk->partitions());
-        return pparser.partition_search();
+        auto ret = pparser.partition_search();
+        // Fill the partition name
+        if (!ret) {
+            int no{};
+            for (auto &parts : disk->partitions()) {
+                parts.name = dfd->name();
+                parts.name += part_suffix;
+                parts.name += std::to_string(no++);
+            }
+        }
+        return ret;
     }
 
     auto disk_manager::write(std::string_view device_name, const void *buf, sector_t lba, std::size_t count) -> int

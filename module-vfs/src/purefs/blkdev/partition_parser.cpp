@@ -19,22 +19,27 @@ namespace purefs::blkdev::internal
             constexpr auto mbr_ptbl_type      = 0x004;
             constexpr auto mbr_ptbl_sect_cnt  = 0x00c;
             constexpr auto mbr_ptbl_lba       = 0x008;
+            constexpr auto ptbl_offs          = 0x1be;
+            constexpr auto ptbl_size          = 16;
             constexpr auto ext_part           = 0x05;
             constexpr auto ext_linux_part     = 0x85;
             constexpr auto ext_win98_part     = 0x0f;
             constexpr auto reserved_sect      = 0x00e;
             constexpr auto number_of_fats     = 0x010;
+            constexpr auto num_parts          = 4;
         } // namespace
     }     // namespace defs
     namespace
     {
-        inline auto to_word(const uint8_t buf[])
+        inline auto to_word(const std::vector<uint8_t> &vec, std::size_t offs)
         {
+            auto buf = &vec[offs];
             return (uint32_t(buf[0]) << 0U) | (uint32_t(buf[1]) << 8U) | (uint32_t(buf[2]) << 16U) |
                    (uint32_t(buf[3]) << 24U);
         }
-        inline auto to_short(const uint8_t buf[])
+        inline auto to_short(const std::vector<uint8_t> &vec, std::size_t offs)
         {
+            auto buf = &vec[offs];
             return (uint16_t(buf[0]) << 0U) | (uint16_t(buf[1]) << 8U);
         }
     } // namespace
@@ -53,20 +58,23 @@ namespace purefs::blkdev::internal
             return ret;
         }
         // Check initial signature
-        if ((mbr_sect[defs::mbr_signature_offs] != 0x55) && (mbr_sect[defs::mbr_signature_offs] != 0xAA)) {
+        if ((mbr_sect[defs::mbr_signature_offs] != 0x55) && (mbr_sect[defs::mbr_signature_offs + 1] != 0xAA)) {
             LOG_ERROR("Unable to find valid partition signature");
             return -ENXIO;
         }
         /* Copy the 4 partition records into partitions */
-        std::array<partition, 4> root_part;
+        std::array<partition, defs::num_parts> root_part;
         read_partitions(mbr_sect, root_part);
         // Add not extended partitions
-        for (const auto &part : root_part) {
+        int part_no{1};
+        for (auto &part : root_part) {
             if (is_extended(part.type))
                 continue;
             if (part.num_sectors) {
+                part.physical_number = part_no;
                 m_parts.emplace_back(part);
             }
+            ++part_no;
         }
         for (const auto &part : root_part) {
             if (is_extended(part.type)) {
@@ -78,13 +86,16 @@ namespace purefs::blkdev::internal
         return ret;
     }
 
-    auto partition_parser::read_partitions(const std::vector<uint8_t> &buffer, std::array<partition, 4> &parts) -> void
+    auto partition_parser::read_partitions(const std::vector<uint8_t> &buffer,
+                                           std::array<partition, defs::num_parts> &parts) -> void
     {
+        std::size_t offs = defs::ptbl_offs;
         for (auto &part : parts) {
-            part.bootable     = buffer[defs::mbr_ptbl_active];
-            part.type         = buffer[defs::mbr_ptbl_type];
-            part.num_sectors  = to_word(&buffer[defs::mbr_ptbl_sect_cnt]);
-            part.start_sector = to_word(&buffer[defs::mbr_ptbl_lba]);
+            part.bootable     = buffer[defs::mbr_ptbl_active + offs] & 0x80;
+            part.type         = buffer[defs::mbr_ptbl_type + offs];
+            part.num_sectors  = to_word(buffer, defs::mbr_ptbl_sect_cnt + offs);
+            part.start_sector = to_word(buffer, defs::mbr_ptbl_lba + offs);
+            offs += defs::ptbl_size;
         }
     }
     auto partition_parser::is_extended(uint8_t type) -> bool
@@ -94,9 +105,10 @@ namespace purefs::blkdev::internal
 
     auto partition_parser::parse_extended(uint32_t lba, uint32_t count) -> int
     {
+        static constexpr auto max_parts{100};
         auto sector_size = m_disk->get_info(info_type::sector_size);
         int extended_part_num;
-        std::array<partition, 4> parts;
+        std::array<partition, defs::num_parts> parts;
         auto current_sector = lba;
         auto this_size      = count;
         if (sector_size < 0) {
@@ -105,7 +117,7 @@ namespace purefs::blkdev::internal
         uint32_t sector_in_buf{std::numeric_limits<uint32_t>::max()};
         std::vector<uint8_t> sect_buf(sector_size);
 
-        auto try_count{100};
+        auto try_count{max_parts};
         int error{};
         while (try_count--) {
             if (sector_in_buf != current_sector) {
@@ -153,18 +165,17 @@ namespace purefs::blkdev::internal
                              unsigned(pnext));
                     continue;
                 }
-                {
-                    m_parts.emplace_back(parts[partition_num]);
-                    m_parts.back().start_sector += current_sector;
-                }
-                try_count = 100;
+                parts[partition_num].physical_number = partition_num + 1;
+                m_parts.emplace_back(parts[partition_num]);
+                m_parts.back().start_sector += current_sector;
+                try_count = max_parts;
             }
 
             if (extended_part_num < 0) {
                 LOG_DEBUG("No more extended partitions");
                 break; /* nothing left to do */
             }
-            /* Examine the ulNext extended partition */
+            /* Examine the next extended partition */
             current_sector = lba + parts[extended_part_num].start_sector * sector_size;
             this_size      = parts[extended_part_num].num_sectors * sector_size;
         }

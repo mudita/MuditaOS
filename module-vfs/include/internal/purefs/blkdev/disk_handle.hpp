@@ -4,6 +4,8 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <purefs/blkdev/defs.hpp>
 
 namespace purefs::blkdev
 {
@@ -17,8 +19,8 @@ namespace purefs::blkdev::internal
     {
       public:
         static constexpr auto no_parition = -1;
-        explicit disk_handle(std::weak_ptr<blkdev::disk> disk, sector_t sectors, short partition = no_parition)
-            : m_disk(disk), m_partition(partition), m_sectors(sectors)
+        explicit disk_handle(std::weak_ptr<blkdev::disk> disk, std::string_view name, short partition = no_parition)
+            : m_disk(disk), m_partition(partition), m_name(name)
         {}
         auto disk() const noexcept
         {
@@ -32,14 +34,16 @@ namespace purefs::blkdev::internal
         {
             return m_partition != no_parition;
         }
-        auto sectors() const noexcept
+        auto sectors() const noexcept -> sector_t;
+        auto name() const noexcept
         {
-            return m_sectors;
+            return m_name;
         }
 
       private:
-        std::weak_ptr<blkdev::disk> m_disk;
+        const std::weak_ptr<blkdev::disk> m_disk;
         const short m_partition{-1};
-        const sector_t m_sectors;
+        mutable sector_t m_sectors{0};
+        const std::string_view m_name;
     };
 } // namespace purefs::blkdev::internal

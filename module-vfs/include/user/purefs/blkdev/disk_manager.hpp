@@ -23,6 +23,7 @@ namespace purefs::blkdev
       public:
         disk_manager(const disk_manager &) = delete;
         auto operator=(const disk_manager &) -> disk_manager & = delete;
+        disk_manager()                                         = default;
         /** Register a new disc
          * @param[in] disk Block device register
          * @param[in] device_name Disk friendly name

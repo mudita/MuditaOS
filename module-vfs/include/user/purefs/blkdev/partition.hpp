@@ -11,11 +11,10 @@ namespace purefs::blkdev
     //! Disk partition table structure
     struct partition
     {
-        int phycical_number{};     //! Partition number
-        int logical_number{};      //! Partition logical one in the mudita
+        int physical_number{};     //! Partition physical number in part table
         sector_t start_sector{};   //! First sector
         std::size_t num_sectors{}; //! Number of sectors
-        unsigned char bootable{};  //! Partition is bootable
+        bool bootable{};           //! Partition is bootable
         unsigned short type{};     //! Partition code
         std::string name;          //! Partition name in block manager
     };

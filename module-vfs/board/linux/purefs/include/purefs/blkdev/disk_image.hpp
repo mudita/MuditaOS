@@ -9,10 +9,10 @@ namespace purefs::blkdev
 {
     class disk_image final : public disk
     {
-        static constexpr auto file_name   = "PurePhone.img";
         static constexpr auto sector_size = 512UL;
 
       public:
+        disk_image(std::string_view image_filename);
         virtual ~disk_image()
         {}
 
@@ -28,5 +28,6 @@ namespace purefs::blkdev
       private:
         int m_filedes{-1};
         unsigned long m_sectors{0};
+        std::string m_image_name;
     };
 } // namespace purefs::blkdev
