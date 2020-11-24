@@ -66,6 +66,12 @@ namespace purefs::fs
         virtual auto chmod(fsmount mnt, std::string_view path, mode_t mode) noexcept -> int;
         virtual auto fchmod(fsfile zfile, mode_t mode) noexcept -> int;
 
+        /** Internal use */
+        auto mount_count() const noexcept
+        {
+            return m_mount_count;
+        }
+
       private:
         std::size_t m_mount_count{};
     };

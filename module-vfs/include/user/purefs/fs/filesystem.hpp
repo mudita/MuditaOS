@@ -8,12 +8,17 @@
 #include <array>
 #include <mutex.hpp>
 #include <unordered_map>
+#include <map>
 
 namespace purefs::blkdev
 {
     class disk_manager;
 }
 
+namespace purefs::fs::internal
+{
+    class mount_point;
+}
 namespace purefs::fs
 {
     /** This is the filesystem class layer
@@ -110,6 +115,7 @@ namespace purefs::fs
       private:
         std::weak_ptr<blkdev::disk_manager> m_diskmm;
         std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;
+        std::map<std::string, std::shared_ptr<internal::mount_point>> m_mounts;
         mutable cpp_freertos::MutexRecursive m_lock;
     };
 } // namespace purefs::fs
