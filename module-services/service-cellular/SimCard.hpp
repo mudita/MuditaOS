@@ -64,6 +64,8 @@ class SimCard
     std::optional<at::SimState> simState() const;
     std::optional<at::SimState> simStateWithMessage(std::string &message) const;
 
+    static std::string pinToString(std::vector<unsigned int> v);
+
   private:
     ServiceCellular &cellularService;
 
