@@ -23,9 +23,12 @@ namespace cellular
         auto isValid() const noexcept -> bool final;
 
       private:
+        // source: EC25&EC21_AT_Commands_Manual
         static constexpr auto addressFormatTypeInternational = "145";
         static constexpr auto addressFormatTypeDefault       = "129";
         static constexpr auto subaddrDefault                 = "";
+        static constexpr auto maxNoReplyTime                 = 30;
+        static constexpr auto minNoReplyTime                 = 0;
 
         std::string forwardReason;
         std::string &phoneNumber           = supplementaryInfoA;

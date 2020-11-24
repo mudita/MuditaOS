@@ -74,7 +74,6 @@ namespace cellular
     auto SupplementaryServicesRequest::getCommandInformationClass(const std::string &basicServiceGroup) const
         -> std::optional<std::string>
     {
-        // according to EC25&EC21_AT_Commands_Manual_V1.3
         int basicGroup       = 0;
         int informationClass = 0;
 
@@ -83,7 +82,7 @@ namespace cellular
             informationClass = atInformationClassAllTele + atInformationClassAllBearer;
         }
         else {
-            utils::toNumeric(basicServiceGroup, basicGroup);
+            basicGroup   = utils::getNumericValue<int>(basicServiceGroup);
             auto service = magic_enum::enum_cast<TeleAndBearerService>(basicGroup);
 
             if (!service.has_value()) {

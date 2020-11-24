@@ -39,29 +39,24 @@ namespace cellular
     {
         std::vector<commandBuilderFunc> commandParts = {[this]() { return getCommandReason(); },
                                                         [this]() { return getCommandMode(); },
-                                                        [this]() { return getCommandNumber(); },
-                                                        [this]() { return getCommandType(); },
-                                                        [this]() { return getCommandClass(); },
-                                                        [this]() { return getCommandSubAddr(); },
-                                                        [this]() { return getCommandSatype(); },
-                                                        [this]() { return getCommandTime(); }};
+                                                        [this]() { return getCommandNumber(); }};
 
-        const auto itToCommandClass  = std::next(commandParts.begin(), 5);
-        const auto itToCommandNumber = std::next(commandParts.begin(), 3);
+        bool trimEmpty = true;
 
-        std::vector<commandBuilderFunc> trimmedCommandParts;
+        if (!getCommandClass().empty()) {
+            commandParts.emplace_back([this]() { return getCommandType(); });
+            commandParts.emplace_back([this]() { return getCommandClass(); });
+            trimEmpty = false;
+        }
 
         if (!getCommandTime().empty()) {
-            return buildCommand(at::AT::CCFC, commandParts, false);
-        }
-        else if (!getCommandClass().empty()) {
-            trimmedCommandParts.insert(trimmedCommandParts.begin(), commandParts.begin(), itToCommandClass);
-        }
-        else {
-            trimmedCommandParts.insert(trimmedCommandParts.begin(), commandParts.begin(), itToCommandNumber);
+            commandParts.emplace_back([this]() { return getCommandSubAddr(); });
+            commandParts.emplace_back([this]() { return getCommandSatype(); });
+            commandParts.emplace_back([this]() { return getCommandTime(); });
+            trimEmpty = false;
         }
 
-        return buildCommand(at::AT::CCFC, trimmedCommandParts);
+        return buildCommand(at::AT::CCFC, commandParts, trimEmpty);
     }
 
     auto CallForwardingRequest::getCommandReason() const -> std::string
@@ -119,12 +114,8 @@ namespace cellular
         if (noReplyConditionTimer.empty()) {
             return true;
         }
-        int time;
-        if (utils::toNumeric(noReplyConditionTimer, time)) {
-            // EC25&EC21_AT_Commands_Manual
-            return std::clamp(time, 0, 30) == time;
-        }
-        return false;
+        auto time = utils::getNumericValue<int>(noReplyConditionTimer);
+        return std::clamp(time, minNoReplyTime, maxNoReplyTime) == time;
     }
 
     void CallForwardingRequest::handle(RequestHandler &h, at::Result &result)

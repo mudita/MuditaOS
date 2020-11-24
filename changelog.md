@@ -21,6 +21,7 @@
 ### Changed
 
 * `[messages]` Changed fonts of message snippet and its prefix.
+* `[cellular]` Improve MMI call forwarding support
 
 ## [0.47.1 2020-11-20]
 
