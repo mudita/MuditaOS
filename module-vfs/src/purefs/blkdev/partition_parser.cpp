@@ -5,6 +5,7 @@
 #include <purefs/blkdev/disk.hpp>
 #include <log/log.hpp>
 #include <errno.h>
+#include <limits>
 
 namespace purefs::blkdev::internal
 {
