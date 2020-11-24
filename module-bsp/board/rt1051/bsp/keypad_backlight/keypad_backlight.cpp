@@ -24,6 +24,16 @@ namespace bsp
 
         std::shared_ptr<DriverGPIO> gpio;
 
+        static bool writeSingleRegister(uint32_t address, uint8_t *to_send)
+        {
+            addr.subAddress    = address;
+            auto write_success = i2c->Write(addr, to_send, 1);
+            if (write_success != 1) {
+                return false;
+            }
+            return true;
+        }
+
         int32_t init(xQueueHandle qHandle)
         {
             i2c = DriverI2C::Create(static_cast<I2CInstances>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_I2C),
@@ -43,12 +53,11 @@ namespace bsp
                                     .pin      = static_cast<uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST)});
 
             wakeup();
-            addr.subAddress     = static_cast<uint32_t>(LP55281_Addresses::RESET);
-            uint8_t reset_value = 0xff;
-            auto write_success  = i2c->Write(addr, (uint8_t *)(&reset_value), 1);
+            bool status = reset();
             shutdown();
 
-            if (write_success != 1) {
+            if (status != 1) {
+
                 return kStatus_Fail;
             }
 
@@ -61,80 +70,91 @@ namespace bsp
             qHandleIrq = NULL;
         }
 
-        bool set(Diode diode, DiodeIntensity intensity)
+        bool set(Diodes diode, DiodeIntensity intensity)
         {
-            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::RED4);
+            Diode_Reg diode_reg;
+            diode_reg.max_current = MAX_DIODE_CURRENT_LIMIT;
+            diode_reg.current     = encode_diode_brightness(intensity);
 
-            uint8_t diode_reg = 0xff; // encode_diode_brightness(intensity)|MAX_DIODE_CURRENT_LIMIT;
-
-            auto wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
-            if (wrote != 1) {
+            switch (diode) {
+            case Diodes::KEYPAD_LEFT:
+                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::GREEN4),
+                                         reinterpret_cast<uint8_t *>(&diode_reg)))
+                    return false;
+                break;
+            case Diodes::KEYPAD_RIGHT:
+                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::RED4),
+                                         reinterpret_cast<uint8_t *>(&diode_reg)))
+                    return false;
+                break;
+            default:
                 return false;
+                break;
             }
-
-            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::GREEN4);
-
-            diode_reg = 0xff; // encode_diode_brightness(intensity)|MAX_DIODE_CURRENT_LIMIT;
-
-            wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
-            if (wrote != 1) {
-                return false;
-            }
-
-            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::GREEN2);
-
-            diode_reg = 0xff; // encode_diode_brightness(intensity)|MAX_DIODE_CURRENT_LIMIT;
-
-            wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
-            if (wrote != 1) {
-                return false;
-            }
-
-            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::RED3);
-
-            diode_reg = 0xff; // encode_diode_brightness(intensity)|MAX_DIODE_CURRENT_LIMIT;
-
-            wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
-            if (wrote != 1) {
-                return false;
-            }
-
-            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::BOOST_CTRL);
-            diode_reg       = BOOST_OUTPUT_4V;
-
-            wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
-            if (wrote != 1) {
-                return false;
-            }
-
-            addr.subAddress = static_cast<uint32_t>(LP55281_Addresses::ENABLES);
-            diode_reg       = WAKEUP;
-
-            wrote = i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
-            if (wrote != 1) {
-                return false;
-            }
-
             return true;
         }
 
-        bool set(Diode diode, Rgb intensity)
+        bool set(Diodes diode, Rgb intensity)
         {
-            return false;
+            Diode_Reg diode_reg;
+            diode_reg.max_current = MAX_DIODE_CURRENT_LIMIT;
+
+            switch (diode) {
+            case Diodes::RGB_LEFT:
+                diode_reg.current = encode_diode_brightness(intensity.red);
+                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::RED3),
+                                         reinterpret_cast<uint8_t *>(&diode_reg)))
+                    return false;
+                diode_reg.current = encode_diode_brightness(intensity.green);
+                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::GREEN3),
+                                         reinterpret_cast<uint8_t *>(&diode_reg)))
+                    return false;
+                diode_reg.current = encode_diode_brightness(intensity.blue);
+                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::BLUE3),
+                                         reinterpret_cast<uint8_t *>(&diode_reg)))
+                    return false;
+                break;
+            case Diodes::RGB_RIGHT:
+                diode_reg.current = encode_diode_brightness(intensity.red);
+                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::RED2),
+                                         reinterpret_cast<uint8_t *>(&diode_reg)))
+                    return false;
+                diode_reg.current = encode_diode_brightness(intensity.green);
+                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::GREEN2),
+                                         reinterpret_cast<uint8_t *>(&diode_reg)))
+                    return false;
+                diode_reg.current = encode_diode_brightness(intensity.blue);
+                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::BLUE2),
+                                         reinterpret_cast<uint8_t *>(&diode_reg)))
+                    return false;
+                break;
+            default:
+                return false;
+                break;
+            }
+            return true;
         }
 
-        bool toggle(Diode diode)
+        bool turnOnAll()
         {
-            if (!on) {
-                on = true;
-                wakeup();
-                return bsp::keypad_backlight::set(bsp::keypad_backlight::Diode::KEYPAD_ALL, 1.0f);
-            }
-            else {
-                shutdown();
-                on = false;
-                return true;
-            }
+            wakeup();
+            configureModule();
+            return (set(Diodes::RGB_LEFT, {1.0f, 0.0f, 0.0f}) |  // Red
+                    set(Diodes::RGB_RIGHT, {0.0f, 1.0f, 0.0f}) | // Green
+                    set(Diodes::KEYPAD_LEFT, 1.0f) | set(Diodes::KEYPAD_RIGHT, 1.0f));
+        }
+
+        bool configureModule()
+        {
+            uint8_t reg_val = BOOST_OUTPUT_4V;
+            if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::BOOST_CTRL), &reg_val))
+                return false;
+
+            uint8_t reg_val = WAKEUP;
+            if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::ENABLES), &reg_val))
+                return false;
+
+            return true;
         }
 
         void shutdown()
@@ -147,11 +167,10 @@ namespace bsp
             gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST), 1);
         }
 
-        void reset()
+        bool reset()
         {
-            addr.subAddress     = static_cast<uint32_t>(LP55281_Addresses::RESET);
             uint8_t reset_value = 0xff;
-            i2c->Write(addr, (uint8_t *)(&diode_reg), 1);
+            return writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::RESET), &reset_value);
         }
     } // namespace keypad_backlight
 } // namespace bsp

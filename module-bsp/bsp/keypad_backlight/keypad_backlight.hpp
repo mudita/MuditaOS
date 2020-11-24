@@ -26,36 +26,38 @@ namespace bsp
             DiodeIntensity blue;
         };
 
-        enum class Diode
+        enum class Diodes
         {
             RGB_LEFT,
             RGB_RIGHT,
-            KEYPAD_BACKLIGHT_1,
-            KEYPAD_BACKLIGHT_2,
-            KEYPAD_ALL,
+            KEYPAD_LEFT,
+            KEYPAD_RIGHT,
         };
 
         int32_t init(xQueueHandle qHandle);
 
         void deinit();
 
+        // Turn on whole backlight
+        bool turnOnAll();
+
         // Single diode
-        bool set(Diode diode, DiodeIntensity intensity);
+        bool set(Diodes diode, DiodeIntensity intensity);
 
         // RGB diode
-        bool set(Diode diode, Rgb intensity);
-        
-        // Toggle diode, diode intensity preserved
-        bool toggle(Diode diode);
+        bool set(Diodes diode, Rgb intensity);
 
-        // Module sleep mode
+        // Configure mode of operation and enable output
+        bool configureModule();
+
+        // Module shutdown - registers erased
         void shutdown();
 
-        // Wakeup module, last on intensity preserved
+        // Wakeup module - registers in default state
         void wakeup();
 
-        // Module reset
-        void reset();
+        // Module reset thorugh I2C interface
+        bool reset();
 
     } // namespace keypad_backlight
 } // namespace bsp

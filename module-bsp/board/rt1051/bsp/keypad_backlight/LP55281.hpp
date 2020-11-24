@@ -10,7 +10,7 @@ namespace bsp
         constexpr auto LP55281_DEVICE_ADDR = 0x4C;
 
         // LP55281 registers addresses
-        enum class LP55281_Addresses
+        enum class LP55281_Registers
         {
             RED1       = 0x00,
             GREEN1     = 0x01,
@@ -35,14 +35,14 @@ namespace bsp
             RESET      = 0x60,
         };
 
-        struct Diode_Reg
+        typedef struct
         {
             uint8_t max_current : 2;
             uint8_t current : 6;
-        };
+        } Diode_Reg;
 
         // For specific leds registers
-        constexpr auto MAX_DIODE_CURRENT_LIMIT = 0b11000000;
+        constexpr auto MAX_DIODE_CURRENT_LIMIT = 0b11; // For 2-bit register
         constexpr auto MAX_BRIGHTNESS_INT      = 63;
 
         // For BOOST_CTRL register. Agreed to output minimum voltage
