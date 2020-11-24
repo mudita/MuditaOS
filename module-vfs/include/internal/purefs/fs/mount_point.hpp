@@ -19,9 +19,8 @@ namespace purefs::fs::internal
 {
     //! Mount point disk private structure
     //! TODO fill the blanks
-    class mount_point
+    struct mount_point
     {
-        virtual ~mount_point() = default;
         int device{-1};                                 //! Owning device
         std::string mount_path;                         //! Mounted path
         std::weak_ptr<filesystem_operation> filesystem; //! Filesystem operation

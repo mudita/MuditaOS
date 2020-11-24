@@ -31,7 +31,6 @@ namespace purefs::fs::internal
             return m_flags;
         }
         std::weak_ptr<mount_point> m_mount_point;
-
       private:
         int m_error{};
         int m_flags{};

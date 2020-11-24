@@ -6,16 +6,22 @@
 #include <memory>
 #include <list>
 #include <array>
+#include <mutex.hpp>
+#include <unordered_map>
+
+namespace purefs::blkdev
+{
+    class disk_manager;
+}
 
 namespace purefs::fs
 {
-
     /** This is the filesystem class layer
      * All methods can be called from the user thread
      * but generally those functions are for internal use for
      * example for newlib or glibc syscalls
      */
-    class filesystem_operation;
+    class filesystem_operations;
     struct statvfs;
     struct timespec;
     namespace internal
@@ -27,6 +33,7 @@ namespace purefs::fs
     {
       public:
         using fsdir                    = std::shared_ptr<internal::directory_handle>;
+        explicit filesystem(std::shared_ptr<blkdev::disk_manager> diskmm);
         filesystem(const filesystem &) = delete;
         auto operator=(const filesystem &) = delete;
         /** Utility API */
@@ -35,7 +42,7 @@ namespace purefs::fs
          * @param[in] fops Filesystem operation structure
          * @return zero on sucess otherwise error
          */
-        auto register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operation> fops) -> int;
+        auto register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operations> fops) -> int;
         /** Unregister filesystem driver
          * @param[in] fsname Unique filesystem name for example fat
          * @return zero on success otherwise error
@@ -99,5 +106,10 @@ namespace purefs::fs
 
         auto getcwd() noexcept -> std::string;
         auto chdir(std::string_view name) noexcept -> int;
+
+      private:
+        std::weak_ptr<blkdev::disk_manager> m_diskmm;
+        std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;
+        mutable cpp_freertos::MutexRecursive m_lock;
     };
 } // namespace purefs::fs
