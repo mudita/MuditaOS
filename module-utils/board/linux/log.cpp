@@ -50,7 +50,7 @@ static char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
 
 void dumpToFile(std::string_view log, const size_t length)
 {
-    static std::fstream logFile("log_file.log", std::fstream::in | std::fstream::out | std::fstream::app);
+    static std::fstream logFile(logFileName, std::fstream::in | std::fstream::out | std::fstream::app);
     logFile.write(log.data(), length);
 }
 
