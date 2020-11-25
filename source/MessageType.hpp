@@ -100,10 +100,10 @@ enum class MessageType
     CellularGetAntenna,
     CellularTransmitDtmfTones,
     CellularUSSDRequest,
-    CellularUSSDReceived,
-    CellularMMIResponse,
     CellularTimeUpdated,
     CellularSimState,
+    CellularMMIResult,
+    CellularMMIData,
 
     DBNotesAdd,            ///< Add new note's record
     DBNotesRemove,         ///< Remove selected note's record

@@ -516,7 +516,7 @@ class CellularMMIResult : public CellularMessage
     app::manager::actions::MMIResultParams params;
 
     CellularMMIResult(app::manager::actions::MMIResultParams::MMIResult result)
-        : CellularMessage(MessageType::CellularMMIResponse), params(result)
+        : CellularMessage(MessageType::CellularMMIResult), params(result)
     {}
 };
 
@@ -539,7 +539,7 @@ class CellularMMIDataMessage : public CellularMessage
   protected:
     app::manager::actions::MMIParams params;
 
-    CellularMMIDataMessage(std::string mmiData) : CellularMessage(MessageType::CellularMMIResponse), params(mmiData)
+    CellularMMIDataMessage(std::string mmiData) : CellularMessage(MessageType::CellularMMIData), params(mmiData)
     {}
 };
 class CellularMMIResponseMessage : public CellularMMIDataMessage, public app::manager::actions::ConvertibleToAction
