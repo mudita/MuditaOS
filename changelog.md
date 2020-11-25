@@ -7,6 +7,8 @@
 
 ### Changed
 
+* `[desktop]` Windows refactor
+
 ### Fixed
 
 ### Other

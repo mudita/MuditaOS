@@ -73,6 +73,7 @@ namespace gui
     void PinLockHandler::handlePasscodeRequest(PinLock::LockType type, app::manager::actions::ActionParamsPtr &&data)
     {
         LOG_DEBUG("Handling on of PasscodeRequest actions");
+        promptSimLockWindow = true;
         handlePasscodeParams(type, PinLock::LockState::PasscodeRequired, std::move(data));
         if (!getStrongestLock().isType(PinLock::LockType::Screen)) {
             unlock();
@@ -129,9 +130,9 @@ namespace gui
     {
         auto lock = std::make_unique<gui::PinLock>(getStrongestLock());
         if (lock->isState(PinLock::LockState::PasscodeInvalidRetryRequired)) {
+            getStrongestLock().consumeState();
             lock->onActivatedCallback = [this, onLockActivatedCallback](PinLock::LockType,
                                                                         const std::vector<unsigned int> &) {
-                getStrongestLock().consumeState();
                 switchToPinLockWindow(onLockActivatedCallback);
             };
         }

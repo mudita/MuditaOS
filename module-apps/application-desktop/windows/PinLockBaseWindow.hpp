@@ -6,6 +6,8 @@
 #include "AppWindow.hpp"
 #include "Text.hpp"
 
+#include "RichTextParser.hpp"
+
 namespace gui
 {
     class PinLock;
@@ -16,10 +18,25 @@ namespace gui
     class PinLockBaseWindow : public AppWindow
     {
       public:
+        enum class TextType
+        {
+            Title,
+            Primary,
+            Secondary
+        };
+
+        enum class Token
+        {
+            Sim,
+            Attempts,
+            Mins,
+            CmeCode
+        };
+
         PinLockBaseWindow(app::Application *app, std::string name) : AppWindow(app, name)
         {}
         void build();
-        void buildInfoText(unsigned int textHight);
+        void buildInfoTexts();
         void buildPinLabels(std::function<Rect *()> itemBuilder,
                             unsigned int pinSize,
                             unsigned int offsetX,
@@ -28,10 +45,18 @@ namespace gui
         void buildImages(const std::string &lockImg, const std::string &infoImg);
         void setBottomBarWidgetsActive(bool left, bool center, bool right);
         void setImagesVisible(bool lockImg, bool infoImg);
-        void setBottomBarWidgetText(BottomBar::Side side, const UTF8 &txt);
+        void setTitleBar(bool isVisible, bool isIceActive);
+        void setText(const std::string &value,
+                     TextType type,
+                     bool isReach                          = false,
+                     text::RichTextParser::TokenMap tokens = text::RichTextParser::TokenMap{});
+        void restore() noexcept;
+        [[nodiscard]] auto getToken(Token token) const -> std::string;
 
-        gui::Label *titleLabel = nullptr;
-        gui::Text *infoText    = nullptr;
+        gui::HBox *iceBox        = nullptr;
+        gui::Text *title         = nullptr;
+        gui::Text *primaryText   = nullptr;
+        gui::Text *secondaryText = nullptr;
         gui::Image *lockImage = nullptr;
         gui::Image *infoImage = nullptr;
         gui::HBox *pinLabelsBox = nullptr;
@@ -41,6 +66,7 @@ namespace gui
       private:
         void buildBottomBar();
         void buildTopBar();
-        void buildTitleLabel();
+        void buildTitleBar();
+        [[nodiscard]] auto getText(TextType type) noexcept -> gui::Text *;
     };
 } // namespace gui
