@@ -13,6 +13,8 @@ namespace bsp
     {
         static xQueueHandle qHandleIrq = NULL;
 
+        bool diodes_state = false;
+
         int32_t init(xQueueHandle qHandle)
         {
             qHandleIrq = qHandle;
@@ -25,18 +27,10 @@ namespace bsp
             qHandleIrq = NULL;
         }
 
-        bool set(Diodes diode, DiodeIntensity intensity)
-        {
-            return true;
-        }
-
-        bool set(Diodes diode, Rgb intensity)
-        {
-            return true;
-        }
 
         bool turnOnAll()
         {
+            diodes_state = true;
             return true;
         }
 
@@ -47,6 +41,7 @@ namespace bsp
 
         bool shutdown()
         {
+            diodes_state = false;
             return true;
         }
 
@@ -56,6 +51,11 @@ namespace bsp
         bool reset()
         {
             return true;
+        }
+
+        bool checkState()
+        {
+            return diodes_state;
         }
     } // namespace keypad_backlight
 } // namespace bsp
