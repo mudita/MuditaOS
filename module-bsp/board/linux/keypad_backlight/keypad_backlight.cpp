@@ -8,7 +8,6 @@ using namespace drivers;
 
 namespace bsp
 {
-
     namespace keypad_backlight
     {
         static xQueueHandle qHandleIrq = NULL;
@@ -56,5 +55,6 @@ namespace bsp
         {
             return diodes_state;
         }
+
     } // namespace keypad_backlight
 } // namespace bsp
