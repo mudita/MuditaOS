@@ -12,7 +12,6 @@ namespace bsp
     namespace keypad_backlight
     {
         static xQueueHandle qHandleIrq = NULL;
-
         bool diodes_state = false;
 
         int32_t init(xQueueHandle qHandle)
