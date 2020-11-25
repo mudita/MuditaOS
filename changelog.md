@@ -17,7 +17,7 @@
 
 ### Added
 
-* `gui` Added support for variable numbers in RichText
+* `[gui]` Added support for variable numbers in RichText
 * `[gui][desktop]` Added SIM PIN basic flow implementation
 * `[cellular]` Added CLIR, CLIP, COLP, call waiting, call barring MMIs support
 

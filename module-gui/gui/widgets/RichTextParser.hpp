@@ -7,6 +7,7 @@
 #include <map>
 #include <utf8/UTF8.hpp>
 #include <string>
+#include <variant>
 
 namespace gui
 {
@@ -16,22 +17,22 @@ namespace gui
 
 namespace gui::text
 {
-    inline const auto align     = "align";
-    inline const auto center    = "center";
-    inline const auto right     = "right";
-    inline const auto left      = "left";
-    inline const auto color     = "color";
-    inline const auto font      = "font";
-    inline const auto size      = "size";
-    inline const auto weight    = "weight";
-    inline const auto regular   = "regular";
-    inline const auto bold      = "bold";
-    inline const auto light     = "light";
-    inline const auto node_text = "text";
-    inline const auto node_br   = "br";
-    inline const auto node_p    = "p";
-    inline const auto short_bold = "b";
-    inline const auto node_value = "val";
+    constexpr inline auto align      = "align";
+    constexpr inline auto center     = "center";
+    constexpr inline auto right      = "right";
+    constexpr inline auto left       = "left";
+    constexpr inline auto color      = "color";
+    constexpr inline auto font       = "font";
+    constexpr inline auto size       = "size";
+    constexpr inline auto weight     = "weight";
+    constexpr inline auto regular    = "regular";
+    constexpr inline auto bold       = "bold";
+    constexpr inline auto light      = "light";
+    constexpr inline auto node_text  = "text";
+    constexpr inline auto node_br    = "br";
+    constexpr inline auto node_p     = "p";
+    constexpr inline auto short_bold = "b";
+    constexpr inline auto node_token = "token";
 
     /// Rich text parser utility
     /// supported specifiers
@@ -47,14 +48,14 @@ namespace gui::text
     /// * gui::text::node_p `<p> </p>`, gui::text::node_br `<br> </br>` working identical - marking start and end with
     /// newline
     /// * gui::text::short_bold `<b> </b>`  works identical as `<text weight=bold> </text weight=bold>`
-    /// * gui::text::node_value `<val>Pattern</val>' replaces /"Pattern/" with respective numeric value if such is
-    /// present it `values` argument of `parse` method
+    /// * gui::text::node_value `<token>Pattern</token>' replaces /"Pattern/" with respective token value if such is
+    /// present it `tokens` argument of `parse` method
     /// @return empty document on error
     class RichTextParser
     {
       public:
-        auto parse(const UTF8 &text, TextFormat *base_style) -> std::unique_ptr<TextDocument>;
-        auto parse(const UTF8 &text, TextFormat *base_style, std::map<std::string, int> &&values)
+        using TokenMap = std::map<std::string, std::variant<int, std::string>>;
+        [[nodiscard]] auto parse(const UTF8 &text, TextFormat *base_style, TokenMap &&tokens = TokenMap{})
             -> std::unique_ptr<TextDocument>;
     };
 } // namespace gui::text
