@@ -26,33 +26,12 @@ namespace bsp
         // channel intensity 0.0 - 1.0 : min - max
         using DiodeIntensity = float;
 
-        struct Rgb
-        {
-            DiodeIntensity red;
-            DiodeIntensity green;
-            DiodeIntensity blue;
-        };
-
-        enum class Diodes
-        {
-            RGB_LEFT,
-            RGB_RIGHT,
-            KEYPAD_LEFT,
-            KEYPAD_RIGHT,
-        };
-
         int32_t init(xQueueHandle qHandle);
 
         void deinit();
 
         // Turn on whole backlight
         bool turnOnAll();
-
-        // Single diode
-        bool set(Diodes diode, DiodeIntensity intensity);
-
-        // RGB diode
-        bool set(Diodes diode, Rgb intensity);
 
         // Configure mode of operation and enable output
         bool configureModule();

@@ -81,78 +81,22 @@ namespace bsp
             qHandleIrq = NULL;
         }
 
-        bool set(Diodes diode, DiodeIntensity intensity)
-        {
-            Diode_Reg diode_reg;
-            diode_reg.max_current = MAX_DIODE_CURRENT_LIMIT;
-            diode_reg.current     = encode_diode_brightness(intensity);
-
-            switch (diode) {
-            case Diodes::KEYPAD_LEFT:
-                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::GREEN4),
-                                         reinterpret_cast<uint8_t *>(&diode_reg)))
-                    return false;
-                break;
-            case Diodes::KEYPAD_RIGHT:
-                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::RED4),
-                                         reinterpret_cast<uint8_t *>(&diode_reg)))
-                    return false;
-                break;
-            default:
-                return false;
-                break;
-            }
-            return true;
-        }
-
-        bool set(Diodes diode, Rgb intensity)
-        {
-            Diode_Reg diode_reg;
-            diode_reg.max_current = MAX_DIODE_CURRENT_LIMIT;
-
-            switch (diode) {
-            case Diodes::RGB_LEFT:
-                diode_reg.current = encode_diode_brightness(intensity.red);
-                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::RED3),
-                                         reinterpret_cast<uint8_t *>(&diode_reg)))
-                    return false;
-                diode_reg.current = encode_diode_brightness(intensity.green);
-                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::GREEN3),
-                                         reinterpret_cast<uint8_t *>(&diode_reg)))
-                    return false;
-                diode_reg.current = encode_diode_brightness(intensity.blue);
-                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::BLUE3),
-                                         reinterpret_cast<uint8_t *>(&diode_reg)))
-                    return false;
-                break;
-            case Diodes::RGB_RIGHT:
-                diode_reg.current = encode_diode_brightness(intensity.red);
-                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::RED2),
-                                         reinterpret_cast<uint8_t *>(&diode_reg)))
-                    return false;
-                diode_reg.current = encode_diode_brightness(intensity.green);
-                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::GREEN2),
-                                         reinterpret_cast<uint8_t *>(&diode_reg)))
-                    return false;
-                diode_reg.current = encode_diode_brightness(intensity.blue);
-                if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::BLUE2),
-                                         reinterpret_cast<uint8_t *>(&diode_reg)))
-                    return false;
-                break;
-            default:
-                return false;
-                break;
-            }
-            return true;
-        }
-
         bool turnOnAll()
         {
+            uint32_t address;
+            DiodeIntensity intensity = 1.0f; // Maximum brightness
+            Diode_Reg diode_reg      = {.max_current = MAX_DIODE_CURRENT_LIMIT,
+                                   .current     = encode_diode_brightness(intensity)};
+
             wakeup();
             configureModule();
-            return (set(Diodes::RGB_LEFT, {1.0f, 0.0f, 0.0f}) |  // Red
-                    set(Diodes::RGB_RIGHT, {0.0f, 1.0f, 0.0f}) | // Green
-                    set(Diodes::KEYPAD_LEFT, 1.0f) | set(Diodes::KEYPAD_RIGHT, 1.0f));
+
+            for (auto &diode : usedOutputs) {
+                address = static_cast<uint32_t>(diode);
+                if (!writeSingleRegister(address, reinterpret_cast<uint8_t *>(&diode_reg)))
+                    return false;
+            }
+            return true;
         }
 
         bool configureModule()
