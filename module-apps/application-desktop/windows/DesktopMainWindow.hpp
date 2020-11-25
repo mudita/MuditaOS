@@ -17,7 +17,6 @@ namespace app
 namespace gui
 {
     class NotificationsBox;
-    class PinLock;
 
     class DesktopMainWindow : public AppWindow
     {
@@ -70,9 +69,6 @@ namespace gui
         bool processLongPressEvent(const InputEvent &inputEvent);
         bool processShortPressEventOnUnlocked(const InputEvent &inputEvent);
         bool processShortPressEventOnLocked(const InputEvent &inputEvent);
-
-        auto getScreenLock() -> std::unique_ptr<PinLock>;
-        void switchToPinLockWindow(std::unique_ptr<PinLock> &&data);
         app::ApplicationDesktop *getAppDesktop() const;
 
       public:

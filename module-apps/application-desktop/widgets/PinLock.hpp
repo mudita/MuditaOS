@@ -6,6 +6,8 @@
 #include <string>
 #include <functional>
 
+#include <module-utils/common_data/EventStore.hpp>
+
 namespace gui
 {
     class PinLockHandler;
@@ -26,14 +28,9 @@ namespace gui
             PasscodeInvalidRetryRequired,
             Blocked,
             NewPasscodeRequired,
+            NewPasscodeConfirmRequired,
             NewPasscodeInvalid,
             ErrorOccurred
-        };
-        enum class SimCard
-        {
-            SIM1,
-            SIM2,
-            NoCard
         };
 
         [[nodiscard]] LockState getState() const noexcept
@@ -69,6 +66,18 @@ namespace gui
         {
             return value;
         }
+        [[nodiscard]] bool isSim(Store::GSM::SIM _sim) const noexcept
+        {
+            return sim == _sim;
+        }
+        [[nodiscard]] bool isState(LockState state) const noexcept
+        {
+            return lockState == state;
+        }
+        [[nodiscard]] bool isType(LockType type) const noexcept
+        {
+            return lockType == type;
+        }
 
         void putNextChar(unsigned int c);
         /// removes a last character passed to Lock via putNextChar. The last character can not be popped
@@ -78,18 +87,18 @@ namespace gui
         /// consumes LockState::PasscodeInvalidRetryRequired state and LockState::NewPasscodeInvalid)
         void consumeState() noexcept;
         void setNewPasscodeInvalidState() noexcept;
+        /// calls
+        void activate();
 
-        void verify();
-
-        PinLock(SimCard sim, LockState state, LockType type, unsigned int value)
+        PinLock(Store::GSM::SIM sim, LockState state, LockType type, unsigned int value)
             : sim{sim}, lockState{state}, lockType{type}, value{value}
         {}
         PinLock(const PinLock &other) = default;
 
-        std::function<void(const std::vector<unsigned int> &)> onActivatedCallback = nullptr;
+        std::function<void(LockType type, const std::vector<unsigned int> &)> onActivatedCallback = nullptr;
 
       private:
-        SimCard sim         = SimCard::NoCard;
+        Store::GSM::SIM sim = Store::GSM::SIM::NONE;
         LockState lockState = LockState::Unlocked;
         LockType lockType   = LockType::Screen;
         unsigned int value  = 0;
