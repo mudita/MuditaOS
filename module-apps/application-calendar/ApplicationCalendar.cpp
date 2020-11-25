@@ -38,10 +38,9 @@ namespace app
         {Repeat::never, "app_calendar_repeat_never"},
         {Repeat::daily, "app_calendar_repeat_daily"},
         {Repeat::weekly, "app_calendar_repeat_weekly"},
-        {Repeat::two_weeks, "app_calendar_repeat_two_weeks"},
-        {Repeat::month, "app_calendar_repeat_month"},
-        {Repeat::year, "app_calendar_repeat_year"},
-        {Repeat::custom, "app_calendar_repeat_custom"}};
+        {Repeat::biweekly, "app_calendar_repeat_two_weeks"},
+        {Repeat::monthly, "app_calendar_repeat_month"},
+        {Repeat::yearly, "app_calendar_repeat_year"}};
 
     ApplicationCalendar::ApplicationCalendar(std::string name,
                                              std::string parent,
