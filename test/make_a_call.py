@@ -40,7 +40,7 @@ def main():
         if port_name.isascii():
             log.debug("found {} entry!".format(port_name))
         else:
-            print(f'Please pass port name as the parameter: python {sys.argv[0]} /dev/ttyACM0 number text ')
+            print(f'Please pass port name as the parameter: python {sys.argv[0]} /dev/ttyACM0 number duration')
             raise TestError(Error.PORT_NOT_FOUND)
     else:
         port_name = sys.argv[1]
