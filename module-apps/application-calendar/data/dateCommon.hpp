@@ -6,6 +6,7 @@
 
 #include <module-utils/date/include/date/date.h>
 #include <time/time_conversion.hpp>
+#include <random>
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
@@ -36,13 +37,14 @@ enum class Repeat
     never,
     daily,
     weekly,
-    two_weeks,
-    month,
-    year,
-    custom
+    biweekly,
+    monthly,
+    yearly
 };
 
 inline constexpr TimePoint TIME_POINT_INVALID = date::sys_days{date::January / 1 / 1970};
+inline constexpr uint32_t yearDigitsNumb = 4, monthDigitsNumb = 2, dayDigitsNumb = 2, HourDigitsNumb = 2,
+                          MinDigitsNumb = 2, SecDigitsNumb = 2;
 
 inline std::tm CreateTmStruct(int year, int month, int day, int hour, int minutes, int seconds)
 {
@@ -252,6 +254,22 @@ inline unsigned int WeekdayIndexFromTimePoint(const TimePoint &tp)
 {
     auto ymw = date::year_month_weekday{floor<date::days>(tp)};
     return ymw.weekday().iso_encoding() - 1;
+}
+
+inline std::string createUID()
+{
+    constexpr uint32_t bufferLimit = 16;
+    char Buffer[bufferLimit];
+    utils::time::Timestamp timestamp;
+    std::string UID{timestamp.str("%Y%m%dT%H%M%S")};
+    UID += '-';
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib(1, 100);
+    sprintf(Buffer, "%d", distrib(gen));
+    UID += Buffer;
+
+    return UID;
 }
 
 #endif

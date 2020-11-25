@@ -103,10 +103,12 @@ set(SOURCES
         queries/phonebook/QueryContactUpdate.cpp
         queries/phonebook/QueryContactRemove.cpp
         queries/phonebook/QueryNumberGetByID.cpp
+        queries/calendar/QueryEventsRemoveICS.cpp
         queries/calendar/QueryEventsRemove.cpp
         queries/calendar/QueryEventsGet.cpp
         queries/calendar/QueryEventsGetAll.cpp
         queries/calendar/QueryEventsAdd.cpp
+        queries/calendar/QueryEventsEditICS.cpp
         queries/calendar/QueryEventsEdit.cpp
         queries/calendar/QueryEventsGetFiltered.cpp
         queries/calendar/QueryEventsGetAllLimited.cpp

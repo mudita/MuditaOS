@@ -6,6 +6,7 @@
 #include "Endpoint.hpp"
 
 #include "Service/Service.hpp"
+#include "calendarEvents/CalendarEventsEndpoint.hpp"
 #include "backup/BackupEndpoint.hpp"
 #include "deviceInfo/DeviceInfoEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
@@ -47,6 +48,8 @@ class EndpointFactory
             return std::make_unique<CalllogEndpoint>(ownerServicePtr);
         case EndpointType::developerMode:
             return std::make_unique<DeveloperModeEndpoint>(ownerServicePtr);
+        case EndpointType::calendarEvents:
+            return std::make_unique<CalendarEventsEndpoint>(ownerServicePtr);
         default:
             return nullptr;
         }

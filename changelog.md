@@ -20,6 +20,7 @@
 
 ### Changed
 
+* `[gui][desktop]` ScreenLock logic unified with simLock's
 * `[messages]` Changed fonts of message snippet and its prefix.
 * `[cellular]` Improve MMI call forwarding support
 

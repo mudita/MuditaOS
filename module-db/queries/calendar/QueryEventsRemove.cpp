@@ -13,7 +13,7 @@ namespace db::query::events
         return "Remove";
     }
 
-    RemoveResult::RemoveResult(const bool &ret) : ret(ret)
+    RemoveResult::RemoveResult(bool ret) : ret(ret)
     {}
 
     auto RemoveResult::getResult() const -> bool

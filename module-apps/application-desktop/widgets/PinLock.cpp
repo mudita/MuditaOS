@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PinLock.hpp"
-#include "PinLockHandler.hpp"
+#include <module-utils/log/log.hpp>
 
 namespace gui
 {
@@ -29,7 +29,7 @@ namespace gui
             pinValue.push_back(c);
         }
         if (canVerify() && autoActivate && onActivatedCallback != nullptr) {
-            onActivatedCallback(pinValue);
+            onActivatedCallback(lockType, pinValue);
         }
     }
 
@@ -45,7 +45,7 @@ namespace gui
         pinValue.clear();
     }
 
-    void PinLock::verify()
+    void PinLock::activate()
     {
         auto pinCopy = std::move(pinValue);
         clearAttempt();
@@ -53,6 +53,6 @@ namespace gui
             LOG_ERROR("Passcode verification callback null");
             return;
         }
-        onActivatedCallback(pinCopy);
+        onActivatedCallback(lockType, pinCopy);
     }
 } // namespace gui

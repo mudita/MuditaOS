@@ -24,8 +24,12 @@ jobs:
         pushd build-linux-Debug && \
         export JOBS=${JOBS:-`nproc`} &&\
         echo "JOBS=${JOBS}" &&\
+        make -j ${JOBS} &&\
         make -j ${JOBS} check && \
         popd 
+    - name: "Check for statics"
+      run: |
+        ./tools/find_global_data.py build-linux-Debug/PurePhone.elf
     - name: "Build for RT1051"
       run: |
         ./configure.sh rt1051 Release && \

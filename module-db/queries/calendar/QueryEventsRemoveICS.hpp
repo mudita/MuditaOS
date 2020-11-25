@@ -9,26 +9,25 @@
 
 namespace db::query::events
 {
-    class Add : public Query
+
+    class RemoveICS : public Query
     {
-        EventsRecord record;
-
       public:
-        Add(EventsRecord record);
-        [[nodiscard]] auto getRecord() const -> EventsRecord;
-
+        RemoveICS(const std::string &UID);
         [[nodiscard]] auto debugInfo() const -> std::string override;
+
+        std::string UID;
     };
 
-    class AddResult : public QueryResult
+    class RemoveICSResult : public QueryResult
     {
+        bool ret;
+
       public:
-        explicit AddResult(bool ret);
+        explicit RemoveICSResult(bool ret);
         [[nodiscard]] auto getResult() const -> bool;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
-
-        const bool ret = true;
     };
 
 } // namespace db::query::events
