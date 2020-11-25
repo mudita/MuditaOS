@@ -4,7 +4,9 @@
 #include <purefs/fs/filesystem_operations.hpp>
 #include <purefs/fs/mount_point.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
+#include <purefs/fs/thread_local_cwd.hpp>
 #include <log/log.hpp>
+#include <split_sv.hpp>
 #include <errno.h>
 
 namespace purefs::fs
@@ -136,5 +138,51 @@ namespace purefs::fs
             }
         }
         return std::make_tuple(mount_pnt, longest_match);
+    }
+
+    auto filesystem::absolute_path(std::string_view path) noexcept -> std::string
+    {
+        std::string ret{};
+        if (path[0] == '/') {
+            ret.append(path);
+        }
+        else {
+            ret.append(internal::get_thread_local_cwd_path()).append("/").append(path);
+        }
+        return normalize_path(ret);
+    }
+
+    auto filesystem::normalize_path(std::string_view path) noexcept -> std::string
+    {
+        std::string ret;
+        auto paths = utils::split<std::list, std::string_view>(path, "/");
+        for (auto it = std::begin(paths); it != std::end(paths);) {
+            if (!it->compare(".")) {
+                it = paths.erase(it);
+            }
+            else if (!it->compare("..")) {
+                auto pit = it;
+                --pit;
+                if (pit != std::end(paths)) {
+                    it = paths.erase(pit);
+                    if (it != std::end(paths))
+                        it = paths.erase(it);
+                }
+                else {
+                    it = paths.erase(it);
+                }
+            }
+            else {
+                ++it;
+            }
+        }
+        for (auto ep : paths) {
+            if (!ep.empty()) {
+                ret.append("/").append(ep);
+            }
+        }
+        if (ret.empty())
+            ret.append("/");
+        return ret;
     }
 } // namespace purefs::fs

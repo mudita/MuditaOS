@@ -9,7 +9,7 @@ namespace purefs::fs::internal
 
     namespace
     {
-        thread_local std::string cwd_per_thread;
+        thread_local std::string cwd_per_thread{"/"};
     }
     auto get_thread_local_cwd_path() noexcept -> std::string_view
     {

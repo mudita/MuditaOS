@@ -24,7 +24,7 @@ namespace purefs::fs::internal
             if (pcwd == nullptr) {
                 pcwd = new (std::nothrow) char[PATH_MAX + 1];
                 if (pcwd) {
-                    pcwd[0] = '\0';
+                    std::strncpy(pcwd, "/", PATH_MAX);
                     vTaskSetThreadLocalStoragePointer(nullptr, CWD_THREAD_LOCAL_INDEX, pcwd);
                 }
             }

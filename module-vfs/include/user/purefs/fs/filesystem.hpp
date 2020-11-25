@@ -120,6 +120,9 @@ namespace purefs::fs
         auto find_mount_point(std::string_view path) const noexcept
             -> std::tuple<std::shared_ptr<internal::mount_point>, size_t>;
         /** Find the CWD local per thread directory */
+        static auto absolute_path(std::string_view path) noexcept -> std::string;
+        static auto normalize_path(std::string_view path) noexcept -> std::string;
+
       private:
         std::weak_ptr<blkdev::disk_manager> m_diskmm;
         std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;
