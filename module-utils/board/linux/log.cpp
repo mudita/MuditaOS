@@ -6,6 +6,8 @@
 #include <string>
 #include <mutex>
 #include <ticks.hpp>
+#include <fstream>
+#include <string_view>
 
 #define LOGGER_BUFFER_SIZE 4096
 
@@ -38,12 +40,19 @@ struct Logger
 {
     Logger(logger_level level = LOGTRACE) : level{level}
     {}
+
     std::mutex lock;
     logger_level level;
 };
 
 static Logger logger;
 static char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
+
+void dumpToFile(std::string_view log, const size_t length)
+{
+    static std::fstream logFile("log_file.log", std::fstream::in | std::fstream::out | std::fstream::app);
+    logFile.write(log.data(), length);
+}
 
 void log_Printf(const char *fmt, ...)
 {
@@ -54,10 +63,11 @@ void log_Printf(const char *fmt, ...)
     va_list args;
 
     va_start(args, fmt);
-    vsnprintf(ptr, LOGGER_BUFFER_SIZE - 1, fmt, args);
+    ptr += vsnprintf(ptr, LOGGER_BUFFER_SIZE - 1, fmt, args);
     va_end(args);
 
     std::cout << loggerBuffer;
+    dumpToFile(loggerBuffer, ptr - loggerBuffer);
 }
 
 static void _log_Log(
@@ -92,6 +102,7 @@ static void _log_Log(
     ptr += snprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, "\n");
 
     std::cout << loggerBuffer;
+    dumpToFile(loggerBuffer, ptr - loggerBuffer);
 }
 
 __attribute__((weak)) void log_Log(
