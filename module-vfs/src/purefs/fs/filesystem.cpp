@@ -22,7 +22,7 @@ namespace purefs::fs
         }
         else {
             m_fstypes.emplace(std::make_pair(fsname, fops));
-            return int();
+            return {};
         }
     }
 
@@ -39,7 +39,7 @@ namespace purefs::fs
             return -EBUSY;
         }
         m_fstypes.erase(it);
-        return int();
+        return {};
     }
 
     auto filesystem::mount(std::string_view dev_or_part,
@@ -84,7 +84,7 @@ namespace purefs::fs
                     return ret_mnt;
             }
         }
-        return int();
+        return {};
     }
 
     auto filesystem::umount(std::string_view mount_point) -> int
@@ -104,7 +104,7 @@ namespace purefs::fs
             return umnt_ret;
         }
         m_mounts.erase(mnti);
-        return int();
+        return {};
     }
 
     auto filesystem::read_mountpoints(std::list<std::string> &mountpoints) const -> int
@@ -113,7 +113,7 @@ namespace purefs::fs
         for (const auto &mntp : m_mounts) {
             mountpoints.push_back(mntp.first);
         }
-        return int();
+        return {};
     }
 
     auto filesystem::find_mount_point(std::string_view path) const noexcept
