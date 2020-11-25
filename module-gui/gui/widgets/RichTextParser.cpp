@@ -13,6 +13,7 @@
 #include "TextFormat.hpp"
 
 #include <module-utils/pugixml/src/pugixml.hpp>
+#include <module-utils/Utils.hpp>
 #include <utility>
 
 #ifdef DEBUG_RTP
@@ -274,17 +275,49 @@ namespace text
 
     const ShortTextNodes::SingleAttributedNode ShortTextNodes::nodes = {
         {gui::text::short_bold, {gui::text::weight, gui::text::bold}}};
-}; // namespace text
 
+    class CustomValues
+    {
+        std::map<std::string, int> values;
+
+      public:
+        explicit CustomValues(std::map<std::string, int> &&data) : values{std::move(data)}
+        {}
+
+        [[nodiscard]] static auto isCustomValueNode(const char *nodeName) -> bool
+        {
+            return static_cast<bool>(std::string(nodeName) == gui::text::node_value);
+        }
+        [[nodiscard]] auto get(const std::string &contentName) -> std::optional<std::string>
+        {
+            try {
+                auto value = values.at(contentName);
+                return std::optional<std::string>(utils::to_string(value));
+            }
+            catch (std::out_of_range &) {
+                LOG_ERROR("CustomValues: %s not found", contentName.c_str());
+                return std::nullopt;
+            }
+        }
+    };
+
+}; // namespace text
 struct walker : pugi::xml_tree_walker
 {
   protected:
     std::list<gui::TextBlock> blocks;
     std::list<gui::TextFormat> style_stack;
+    std::unique_ptr<text::CustomValues> custom_values = nullptr;
+
     bool add_newline = false;
+    bool adding_custom_values = false;
 
   public:
     walker(gui::TextFormat entry_style)
+    {
+        style_stack.push_back(entry_style);
+    }
+    walker(gui::TextFormat entry_style, std::unique_ptr<text::CustomValues> &&values) : custom_values{std::move(values)}
     {
         style_stack.push_back(entry_style);
     }
@@ -317,6 +350,11 @@ struct walker : pugi::xml_tree_walker
     auto is_short_text_node(pugi::xml_node &node) const
     {
         return text::ShortTextNodes::is(node.name());
+    }
+
+    auto is_custom_node(pugi::xml_node &node) const
+    {
+        return text::CustomValues::isCustomValueNode(node.name());
     }
 
     auto push_text_node(pugi::xml_node &node)
@@ -353,6 +391,21 @@ struct walker : pugi::xml_tree_walker
         }
     }
 
+    auto push_custom_node(pugi::xml_node &)
+    {
+        if (custom_values != nullptr) {
+            adding_custom_values = true;
+        }
+    }
+
+    auto push_custom_data_node(pugi::xml_node &node)
+    {
+        auto value = custom_values->get(node.value());
+        if (value.has_value()) {
+            blocks.emplace_back(value.value(), std::make_unique<gui::TextFormat>(style_stack.back()));
+        }
+    }
+
     auto push_data_node(pugi::xml_node &node)
     {
         blocks.emplace_back(node.value(), std::make_unique<gui::TextFormat>(style_stack.back()));
@@ -374,11 +427,20 @@ struct walker : pugi::xml_tree_walker
                 push_newline_node(node);
                 return true;
             }
+            if (is_custom_node(node)) {
+                push_custom_node(node);
+                return true;
+            }
         }
 
         std::string to_show = node.value();
         if (node.type() == pugi::xml_node_type::node_pcdata && !to_show.empty()) {
-            push_data_node(node);
+            if (adding_custom_values) {
+                push_custom_data_node(node);
+            }
+            else {
+                push_data_node(node);
+            }
         }
         return true;
     }
@@ -395,6 +457,11 @@ struct walker : pugi::xml_tree_walker
         }
     }
 
+    auto pop_custom_node(pugi::xml_node &node)
+    {
+        adding_custom_values = false;
+    }
+
     auto on_leave(pugi::xml_node &node) -> bool final
     {
         log_node(node, Action::Exit);
@@ -407,6 +474,9 @@ struct walker : pugi::xml_tree_walker
             if (is_newline_node(node)) {
                 pop_newline_node(node);
                 return true;
+            }
+            if (is_custom_node(node)) {
+                pop_custom_node(node);
             }
         }
         return true;
@@ -425,8 +495,8 @@ struct walker : pugi::xml_tree_walker
 
 namespace gui::text
 {
-
-    auto RichTextParser::parse(const UTF8 &text, TextFormat *base_style) -> std::unique_ptr<TextDocument>
+    auto parseText(const UTF8 &text, TextFormat *base_style, std::unique_ptr<::text::CustomValues> &&values = nullptr)
+        -> std::unique_ptr<TextDocument>
     {
         log_parser("parsing: %s", text.c_str());
         if (text.empty() || base_style == nullptr) {
@@ -435,12 +505,24 @@ namespace gui::text
         }
 
         pugi::xml_document doc;
-        walker walker(*base_style);
+        walker walker(*base_style, std::move(values));
 
         doc.load_string(text.c_str());
         doc.traverse(walker);
 
         return std::make_unique<TextDocument>(walker.souvenirs());
+    }
+
+    auto RichTextParser::parse(const UTF8 &text, TextFormat *base_style) -> std::unique_ptr<TextDocument>
+    {
+        return parseText(text, base_style);
+    }
+
+    auto RichTextParser::parse(const UTF8 &text, TextFormat *base_style, std::map<std::string, int> &&values)
+        -> std::unique_ptr<TextDocument>
+    {
+        auto custom_values = std::make_unique<::text::CustomValues>(std::move(values));
+        return parseText(text, base_style, std::move(custom_values));
     }
 
 }; // namespace gui::text

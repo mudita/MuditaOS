@@ -4,7 +4,9 @@
 #pragma once
 
 #include <memory>
+#include <map>
 #include <utf8/UTF8.hpp>
+#include <string>
 
 namespace gui
 {
@@ -29,6 +31,7 @@ namespace gui::text
     inline const auto node_br   = "br";
     inline const auto node_p    = "p";
     inline const auto short_bold = "b";
+    inline const auto node_value = "val";
 
     /// Rich text parser utility
     /// supported specifiers
@@ -41,12 +44,17 @@ namespace gui::text
     ///        * gui::text::weight - weight of font to use, one of: gui::text::bold, gui::text::regular,
     ///        gui::text::light
     /// please mind that selected font must exist on system, othervise closest relative will be selected
-    /// * gui::text::node_p `<p> </p>`, gui::text::node_br `<br> </br>` and gui::text::shortened_bold `<b> </b>` now
-    /// working identical - marking start and end with newline
+    /// * gui::text::node_p `<p> </p>`, gui::text::node_br `<br> </br>` working identical - marking start and end with
+    /// newline
+    /// * gui::text::short_bold `<b> </b>`  works identical as `<text weight=bold> </text weight=bold>`
+    /// * gui::text::node_value `<val>Pattern</val>' replaces /"Pattern/" with respective numeric value if such is
+    /// present it `values` argument of `parse` method
     /// @return empty document on error
     class RichTextParser
     {
       public:
         auto parse(const UTF8 &text, TextFormat *base_style) -> std::unique_ptr<TextDocument>;
+        auto parse(const UTF8 &text, TextFormat *base_style, std::map<std::string, int> &&values)
+            -> std::unique_ptr<TextDocument>;
     };
 } // namespace gui::text
