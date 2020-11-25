@@ -30,6 +30,7 @@ TEST_CASE("Events Table tests")
     {
         EventsTableRow testRow;
         REQUIRE(testRow.ID == DB_ID_NONE);
+        REQUIRE(testRow.UID == "");
         REQUIRE(testRow.title == "");
         REQUIRE(testRow.date_from == TIME_POINT_INVALID);
         REQUIRE(testRow.date_till == TIME_POINT_INVALID);
@@ -40,17 +41,22 @@ TEST_CASE("Events Table tests")
     }
 
     REQUIRE(eventsTbl.add({{.ID = 0},
-                           .title     = "Event3",
-                           .date_from = TimePointFromString("2019-10-20 14:24:00"),
-                           .date_till = TimePointFromString("2019-10-20 15:36:00"),
-                           .reminder  = 1,
-                           .repeat    = 2}));
+                           .UID            = "test",
+                           .title          = "Event3",
+                           .date_from      = TimePointFromString("2019-10-20 14:24:00"),
+                           .date_till      = TimePointFromString("2019-10-20 15:36:00"),
+                           .reminder       = 1,
+                           .repeat         = 2,
+                           .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
+
     REQUIRE(eventsTbl.add({{.ID = 0},
-                           .title     = "Event4",
-                           .date_from = TimePointFromString("2021-10-20 12:24:00"),
-                           .date_till = TimePointFromString("2021-10-20 15:36:00"),
-                           .reminder  = 0,
-                           .repeat    = 3}));
+                           .UID            = "test",
+                           .title          = "Event4",
+                           .date_from      = TimePointFromString("2021-10-20 12:24:00"),
+                           .date_till      = TimePointFromString("2021-10-20 15:36:00"),
+                           .reminder       = 0,
+                           .repeat         = 3,
+                           .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
 
     REQUIRE(eventsTbl.count() == 2);
 
@@ -85,11 +91,13 @@ TEST_CASE("Events Table tests")
     SECTION("Update entry by ID")
     {
         auto entry = EventsTableRow({{.ID = 2},
+                                     "test",
                                      "TestUpdateEvent",
                                      TimePointFromString("2019-10-20 15:00:00"),
                                      TimePointFromString("2019-10-20 18:54:00"),
                                      0,
-                                     2});
+                                     2,
+                                     TIME_POINT_INVALID});
         REQUIRE(eventsTbl.update(entry));
         auto record = eventsTbl.getById(2);
         REQUIRE(record.ID == 2);
@@ -104,41 +112,53 @@ TEST_CASE("Events Table tests")
     SECTION("Select entry by date")
     {
         REQUIRE(eventsTbl.add({{.ID = 0},
-                               .title     = "Event5",
-                               .date_from = TimePointFromString("2019-10-20 14:24:00"),
-                               .date_till = TimePointFromString("2019-10-20 15:36:00"),
-                               .reminder  = 1,
-                               .repeat    = 2}));
+                               .UID            = "test",
+                               .title          = "Event5",
+                               .date_from      = TimePointFromString("2019-10-20 14:24:00"),
+                               .date_till      = TimePointFromString("2019-10-20 15:36:00"),
+                               .reminder       = 1,
+                               .repeat         = 2,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
         REQUIRE(eventsTbl.add({{.ID = 1},
-                               .title     = "Event6",
-                               .date_from = TimePointFromString("2021-04-19 12:24:00"),
-                               .date_till = TimePointFromString("2021-04-20 15:36:00"),
-                               .reminder  = 0,
-                               .repeat    = 3}));
+                               .UID            = "test",
+                               .title          = "Event6",
+                               .date_from      = TimePointFromString("2021-04-19 12:24:00"),
+                               .date_till      = TimePointFromString("2021-04-20 15:36:00"),
+                               .reminder       = 0,
+                               .repeat         = 3,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
         REQUIRE(eventsTbl.add({{.ID = 2},
-                               .title     = "Event7",
-                               .date_from = TimePointFromString("2019-10-20 15:24:00"),
-                               .date_till = TimePointFromString("2019-10-20 15:36:00"),
-                               .reminder  = 1,
-                               .repeat    = 2}));
+                               .UID            = "test",
+                               .title          = "Event7",
+                               .date_from      = TimePointFromString("2019-10-20 15:24:00"),
+                               .date_till      = TimePointFromString("2019-10-20 15:36:00"),
+                               .reminder       = 1,
+                               .repeat         = 2,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
         REQUIRE(eventsTbl.add({{.ID = 3},
-                               .title     = "Event8",
-                               .date_from = TimePointFromString("2021-04-19 12:24:00"),
-                               .date_till = TimePointFromString("2019-10-20 15:36:00"),
-                               .reminder  = 0,
-                               .repeat    = 3}));
+                               .UID            = "test",
+                               .title          = "Event8",
+                               .date_from      = TimePointFromString("2021-04-19 12:24:00"),
+                               .date_till      = TimePointFromString("2019-10-20 15:36:00"),
+                               .reminder       = 0,
+                               .repeat         = 3,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
         REQUIRE(eventsTbl.add({{.ID = 4},
-                               .title     = "Event9",
-                               .date_from = TimePointFromString("2025-10-20 15:24:00"),
-                               .date_till = TimePointFromString("2025-10-20 15:36:00"),
-                               .reminder  = 1,
-                               .repeat    = 2}));
+                               .UID            = "test",
+                               .title          = "Event9",
+                               .date_from      = TimePointFromString("2025-10-20 15:24:00"),
+                               .date_till      = TimePointFromString("2025-10-20 15:36:00"),
+                               .reminder       = 1,
+                               .repeat         = 2,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
         REQUIRE(eventsTbl.add({{.ID = 5},
-                               .title     = "Event10",
-                               .date_from = TimePointFromString("2021-12-19 12:24:00"),
-                               .date_till = TimePointFromString("2021-12-20 15:36:00"),
-                               .reminder  = 0,
-                               .repeat    = 3}));
+                               .UID            = "test",
+                               .title          = "Event10",
+                               .date_from      = TimePointFromString("2021-12-19 12:24:00"),
+                               .date_till      = TimePointFromString("2021-12-20 15:36:00"),
+                               .reminder       = 0,
+                               .repeat         = 3,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
 
         auto entries = eventsTbl.selectByDatePeriod(
             TimePointFromString("2000-01-01 00:00:00"), TimePointFromString("2012-12-31 23:59:00"), 0, UINT32_MAX);
@@ -168,41 +188,53 @@ TEST_CASE("Events Table tests")
         const std::array<uint32_t, 6> paramID{3, 4, 5, 6, 7, 8};
         const std::array<std::string, 6> paramName{"Event1", "Event2", "Event3", "Event4", "Event5", "Event6"};
         REQUIRE(eventsTbl.add({{.ID = 1},
-                               .title     = "Event1",
-                               .date_from = paramDate[0],
-                               .date_till = TimePointFromString("2030-10-20 15:24"),
-                               .reminder  = 0,
-                               .repeat    = 0}));
+                               .UID            = "test",
+                               .title          = "Event1",
+                               .date_from      = paramDate[0],
+                               .date_till      = TimePointFromString("2030-10-20 15:24"),
+                               .reminder       = 0,
+                               .repeat         = 0,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
         REQUIRE(eventsTbl.add({{.ID = 2},
-                               .title     = "Event2",
-                               .date_from = paramDate[5],
-                               .date_till = TimePointFromString("2030-10-20 15:24"),
-                               .reminder  = 0,
-                               .repeat    = 0}));
+                               .UID            = "test",
+                               .title          = "Event2",
+                               .date_from      = paramDate[5],
+                               .date_till      = TimePointFromString("2030-10-20 15:24"),
+                               .reminder       = 0,
+                               .repeat         = 0,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
         REQUIRE(eventsTbl.add({{.ID = 3},
-                               .title     = "Event3",
-                               .date_from = paramDate[2],
-                               .date_till = TimePointFromString("2030-10-20 15:24"),
-                               .reminder  = 0,
-                               .repeat    = 0}));
+                               .UID            = "test",
+                               .title          = "Event3",
+                               .date_from      = paramDate[2],
+                               .date_till      = TimePointFromString("2030-10-20 15:24"),
+                               .reminder       = 0,
+                               .repeat         = 0,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
         REQUIRE(eventsTbl.add({{.ID = 4},
-                               .title     = "Event4",
-                               .date_from = paramDate[3],
-                               .date_till = TimePointFromString("2030-10-20 15:24"),
-                               .reminder  = 0,
-                               .repeat    = 0}));
+                               .UID            = "test",
+                               .title          = "Event4",
+                               .date_from      = paramDate[3],
+                               .date_till      = TimePointFromString("2030-10-20 15:24"),
+                               .reminder       = 0,
+                               .repeat         = 0,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
         REQUIRE(eventsTbl.add({{.ID = 5},
-                               .title     = "Event5",
-                               .date_from = paramDate[4],
-                               .date_till = TimePointFromString("2030-10-20 15:24"),
-                               .reminder  = 0,
-                               .repeat    = 0}));
+                               .UID            = "test",
+                               .title          = "Event5",
+                               .date_from      = paramDate[4],
+                               .date_till      = TimePointFromString("2030-10-20 15:24"),
+                               .reminder       = 0,
+                               .repeat         = 0,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
         REQUIRE(eventsTbl.add({{.ID = 6},
-                               .title     = "Event6",
-                               .date_from = paramDate[1],
-                               .date_till = TimePointFromString("2030-10-20 15:24"),
-                               .reminder  = 0,
-                               .repeat    = 0}));
+                               .UID            = "test",
+                               .title          = "Event6",
+                               .date_from      = paramDate[1],
+                               .date_till      = TimePointFromString("2030-10-20 15:24"),
+                               .reminder       = 0,
+                               .repeat         = 0,
+                               .reminder_fired = TimePointFromString("2019-10-20 15:36:00")}));
 
         auto entries = eventsTbl.getLimitOffsetByDate(0, 6);
         REQUIRE(entries.size() == 6);
@@ -240,6 +272,7 @@ TEST_CASE("Events Table tests")
         TimePoint firedDate = TimePointFromString("2018-10-20 14:24:00");
 
         REQUIRE(eventsTbl.add({{.ID = 1},
+                               .UID            = "test",
                                .title          = "Event1",
                                .date_from      = paramDate[0],
                                .date_till      = tillDate,
@@ -247,6 +280,7 @@ TEST_CASE("Events Table tests")
                                .repeat         = 0,
                                .reminder_fired = TIME_POINT_INVALID}));
         REQUIRE(eventsTbl.add({{.ID = 2},
+                               .UID            = "test",
                                .title          = "Event2",
                                .date_from      = paramDate[1],
                                .date_till      = tillDate,
@@ -254,6 +288,7 @@ TEST_CASE("Events Table tests")
                                .repeat         = 0,
                                .reminder_fired = TIME_POINT_INVALID}));
         REQUIRE(eventsTbl.add({{.ID = 3},
+                               .UID            = "test",
                                .title          = "Event3",
                                .date_from      = paramDate[2],
                                .date_till      = tillDate,
@@ -261,6 +296,7 @@ TEST_CASE("Events Table tests")
                                .repeat         = 0,
                                .reminder_fired = firedDate}));
         REQUIRE(eventsTbl.add({{.ID = 4},
+                               .UID            = "test",
                                .title          = "Event4",
                                .date_from      = paramDate[3],
                                .date_till      = tillDate,
@@ -268,6 +304,7 @@ TEST_CASE("Events Table tests")
                                .repeat         = 0,
                                .reminder_fired = firedDate}));
         REQUIRE(eventsTbl.add({{.ID = 5},
+                               .UID            = "test",
                                .title          = "Event5",
                                .date_from      = paramDate[4],
                                .date_till      = tillDate,
@@ -275,6 +312,7 @@ TEST_CASE("Events Table tests")
                                .repeat         = 0,
                                .reminder_fired = TIME_POINT_INVALID}));
         REQUIRE(eventsTbl.add({{.ID = 6},
+                               .UID            = "test",
                                .title          = "Event6",
                                .date_from      = paramDate[5],
                                .date_till      = tillDate,

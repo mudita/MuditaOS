@@ -9,26 +9,26 @@
 
 namespace db::query::events
 {
-    class Add : public Query
+    class EditICS : public Query
     {
         EventsRecord record;
 
       public:
-        Add(EventsRecord record);
-        [[nodiscard]] auto getRecord() const -> EventsRecord;
+        EditICS(EventsRecord record);
 
+        [[nodiscard]] auto getRecord() const -> EventsRecord;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
-    class AddResult : public QueryResult
+    class EditICSResult : public QueryResult
     {
       public:
-        explicit AddResult(bool ret);
+        explicit EditICSResult(bool ret);
         [[nodiscard]] auto getResult() const -> bool;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
-        const bool ret = true;
+        bool ret;
     };
 
 } // namespace db::query::events

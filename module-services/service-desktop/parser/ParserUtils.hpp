@@ -25,7 +25,8 @@ namespace parserFSM
         contacts,
         messages,
         calllog,
-        developerMode,
+        calendarEvents,
+        developerMode
     };
 
     inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::developerMode);
