@@ -59,6 +59,7 @@ static const auto service_db_stack = 1024 * 24;
 ServiceDB::ServiceDB() : sys::Service(service::name::db, "", service_db_stack, sys::ServicePriority::Idle)
 {
     LOG_INFO("[ServiceDB] Initializing");
+    LOG_INFO("%s", staticTest::abc.c_str());
 }
 
 ServiceDB::~ServiceDB()

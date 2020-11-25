@@ -53,6 +53,13 @@ class SettingsRecordInterface_v2;
 class SmsDB;
 class ThreadRecordInterface;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+namespace staticTest
+{
+    inline std::string abc = "abc";
+}
+#pragma GCC diagnostic pop
 class ServiceDB : public sys::Service
 {
   private:
