@@ -25,8 +25,8 @@ namespace bsp
 
         std::shared_ptr<DriverGPIO> gpio;
 
-        static const std::array<LP55281_Registers, 4> usedOutputs = {LP55281_Registers::GREEN2,  // Green right button
-                                                                     LP55281_Registers::RED3,    // Red left button
+        static const std::array<LP55281_Registers, 4> usedOutputs = {LP55281_Registers::RED2,    // Red right button
+                                                                     LP55281_Registers::GREEN3,  // Green left button
                                                                      LP55281_Registers::RED4,    // Keypad right side
                                                                      LP55281_Registers::GREEN4}; // Keypad left side
 
