@@ -16,10 +16,14 @@ namespace gui
         gui::Label *contact          = nullptr;
         gui::Label *numberImportance = nullptr;
         gui::Label *timestamp        = nullptr;
-        gui::Label *preview          = nullptr;
+        gui::Label *snippetPrefix    = nullptr;
+        gui::Label *snippet          = nullptr;
+
+        static gui::Label *createEmptyLabel(Item *parent);
 
         virtual void onDimensionChangedTop(const BoundingBox &oldDim, const BoundingBox &newDim);
         virtual void onDimensionChangedBottom(const BoundingBox &oldDim, const BoundingBox &newDim);
+        void resizeSnippet(const BoundingBox &dimensions, unsigned int leftOffset = 0U);
 
         void displayNumberImportance(long int importance);
 

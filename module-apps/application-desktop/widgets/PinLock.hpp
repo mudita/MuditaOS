@@ -2,8 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+#include <vector>
+#include <string>
+#include <functional>
 
-#include "PhoneNumber.hpp"
+#include <module-utils/common_data/EventStore.hpp>
 
 namespace gui
 {
@@ -14,82 +17,110 @@ namespace gui
       public:
         enum class LockType
         {
-            Screen,
-            SIM,
-            PUK,
-            Unknown
+            SimPin,
+            SimPuk,
+            Screen
         };
-        enum class InfoName
+        enum class LockState
         {
-            LockName,
-            PhoneNum
-        };
-        enum class State
-        {
-            EnterPin,
-            InvalidPin,
-            VerifiedPin,
+            Unlocked,
+            PasscodeRequired,
+            PasscodeInvalidRetryRequired,
             Blocked,
-            Unlocked
+            NewPasscodeRequired,
+            NewPasscodeConfirmRequired,
+            NewPasscodeInvalid,
+            ErrorOccurred
         };
 
-        [[nodiscard]] State getState() const noexcept
+        [[nodiscard]] LockState getState() const noexcept
         {
-            return state;
+            return lockState;
         }
-        [[nodiscard]] unsigned int getPinSize() const noexcept
+        [[nodiscard]] LockType getLockType() const noexcept
         {
-            return pinValue.size();
+            return lockType;
+        }
+        [[nodiscard]] unsigned int getMaxPinSize() const noexcept
+        {
+            return maxPinSize;
         }
         /// returns current position of a PIN character to be inserted
         [[nodiscard]] unsigned int getCharCount() const noexcept
         {
-            return charCount;
-        }
-        [[nodiscard]] unsigned int getRemainingAttempts() const noexcept
-        {
-            return remainingAttempts;
+            return pinValue.size();
         }
         [[nodiscard]] bool canPut() const noexcept
         {
-            return getCharCount() != getPinSize();
+            return getCharCount() < getMaxPinSize();
         }
-        void putNextChar(unsigned int c) noexcept;
-        void verifyPin() noexcept;
+        [[nodiscard]] bool canVerify() const noexcept
+        {
+            return getCharCount() >= minPinSize;
+        }
+        [[nodiscard]] std::vector<unsigned int> getPin() const
+        {
+            return pinValue;
+        }
+        [[nodiscard]] unsigned int getValue() const noexcept
+        {
+            return value;
+        }
+        [[nodiscard]] bool isSim(Store::GSM::SIM _sim) const noexcept
+        {
+            return sim == _sim;
+        }
+        [[nodiscard]] bool isState(LockState state) const noexcept
+        {
+            return lockState == state;
+        }
+        [[nodiscard]] bool isType(LockType type) const noexcept
+        {
+            return lockType == type;
+        }
+
+        void putNextChar(unsigned int c);
         /// removes a last character passed to Lock via putNextChar. The last character can not be popped
-        void popChar() noexcept;
+        void popChar();
         /// clear all characters passed to the Lock
         void clearAttempt() noexcept;
-        /// if Lock is in the State::InvalidPin state, changes it's state to the State::EnterPin
-        void consumeInvalidPinState() noexcept;
+        /// consumes LockState::PasscodeInvalidRetryRequired state and LockState::NewPasscodeInvalid)
+        void consumeState() noexcept;
+        void setNewPasscodeInvalidState() noexcept;
+        /// calls
+        void activate();
 
-        [[nodiscard]] bool isLocked() const noexcept;
-        bool unlock() noexcept;
-        void lock() noexcept;
+        PinLock(Store::GSM::SIM sim, LockState state, LockType type, unsigned int value)
+            : sim{sim}, lockState{state}, lockType{type}, value{value}
+        {}
+        PinLock(const PinLock &other) = default;
 
-        [[nodiscard]] std::string getLockInfo(const InfoName name) const;
-        [[nodiscard]] LockType getLockType() const noexcept
-        {
-            return type;
-        }
-        PinLock(gui::PinLockHandler *);
+        std::function<void(LockType type, const std::vector<unsigned int> &)> onActivatedCallback = nullptr;
 
       private:
-        /// for PIN verification purposes as PIN storage and management is out of scope of PinLock class
-        gui::PinLockHandler *handler;
+        Store::GSM::SIM sim = Store::GSM::SIM::NONE;
+        LockState lockState = LockState::Unlocked;
+        LockType lockType   = LockType::Screen;
+        unsigned int value  = 0;
 
-        LockType type                  = LockType::Unknown;
-        State state                    = State::EnterPin;
-        unsigned int remainingAttempts = 0;
-        /// code of the entered character on specified position
         std::vector<unsigned int> pinValue;
-        /// flag defines number of entered pin characters
-        unsigned int charCount = 0;
-        std::map<InfoName, std::string> additionalLockInfo;
+        unsigned int maxPinSize = defaultPasscodeSize;
+        unsigned int minPinSize = defaultPasscodeSize;
+        bool autoActivate       = false;
 
-        void reset(LockType, State, unsigned int remainingAttempts, unsigned int pinSize) noexcept;
+        static constexpr unsigned int defaultPasscodeSize = 4;
 
-        friend class gui::PinLockHandler;
+        void setAutoActivate(bool _autoActivate)
+        {
+            autoActivate = _autoActivate;
+        }
+        void setPinSizeBounds(unsigned int _minPinSize, unsigned int _maxPinSize)
+        {
+            minPinSize = _minPinSize;
+            maxPinSize = _maxPinSize;
+        }
+
+        friend class PinLockHandler;
     };
 
 } // namespace gui

@@ -122,6 +122,5 @@ namespace gui
         void alignH(Alignment align, Length parent_length) const;
         void alignV(Alignment align, Length parent_length, Length lines_height);
         auto getText(unsigned int pos) const -> UTF8;
-        auto checkBounds(TextLineCursor &cursor, uint32_t utf_value, const TextFormat *format) -> InputBound;
     };
 } // namespace gui

@@ -56,11 +56,4 @@ class ContactsNameTable : public Table<ContactsNameTableRow, ContactNameTableFie
     std::size_t GetCountByName(const std::string &name);
 
   private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS contact_name("
-                                   "_id              INTEGER PRIMARY KEY,"
-                                   "contact_id       INTEGER,"
-                                   "name_primary     TEXT NOT NULL,"
-                                   "name_alternative TEXT NOT NULL,"
-                                   "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
-                                   ");";
 };

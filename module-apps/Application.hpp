@@ -194,9 +194,6 @@ namespace app
         /// 2. loads rendering commands and send them to GUI renderer (sgui::ServiceGUI)
         void render(gui::RefreshModes mode);
 
-        /// Method responsible for setting application to the state where incoming user input is blocked
-        void blockEvents(bool isBlocked);
-
         /// Method sending switch command for another window. It will switch window within active application.
         /// To switch windows between applications use app::manager::Controller::switchApplication
         /// it will effectively trigger setActiveWindow and change on windows stack
@@ -337,6 +334,7 @@ namespace app
         /// if there is none - returns default window
         /// @ingrup AppWindowStack
         gui::AppWindow *getCurrentWindow();
+        bool isCurrentWindow(const std::string &windowName) const noexcept;
 
         gui::AppWindow *getWindow(const std::string &name);
         /// to avoid conflicts with connect below
@@ -345,9 +343,6 @@ namespace app
         void connect(std::unique_ptr<GuiTimer> &&timer, gui::Item *item);
 
       protected:
-        /// Flag defines whether keyboard input should be processed
-        bool acceptInput = false;
-
         /// key translator to handle
         /// 1. long press transformation (right now we support long press only via top application keyTralator handling)
         /// 2. simple translation of keys 1 to 1 with keyboard

@@ -18,6 +18,9 @@ set(SOURCES
     endpoints/restore/RestoreEndpoint.cpp
     endpoints/update/UpdateEndpoint.cpp
     endpoints/update/UpdateMuditaOS.cpp
+    endpoints/filesystem/FilesystemEndpoint.cpp
+    endpoints/calendarEvents/CalendarEventsHelper.cpp
+    endpoints/calendarEvents/CalendarEventsEndpoint.cpp
 
     parser/ParserUtils.cpp
     parser/ParserFSM.cpp

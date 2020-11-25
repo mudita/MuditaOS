@@ -2,13 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-
-#include <log/log.hpp>
-
-#include <bits/exception.h>
-#include <cstddef>
-#include <cstdint>
-#include <string>
+#include <stdint.h>         // for uint8_t
+#include <log/log.hpp>      // for LOG_ERROR
+#include <bits/exception.h> // for exception
+#include <stddef.h>         // for size_t
+#include <string>           // for string, allocator, basic_string, stol
 #include <vector>
 
 namespace parserFSM
@@ -20,13 +18,15 @@ namespace parserFSM
         invalid = 0,
         deviceInfo,
         update,
+        filesystemUpload,
         backup,
         restore,
         factory,
         contacts,
         messages,
         calllog,
-        developerMode,
+        calendarEvents,
+        developerMode
     };
 
     inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::developerMode);
@@ -80,7 +80,9 @@ namespace parserFSM
         enum class Code
         {
             OK                  = 200,
+            Accepted            = 202,
             BadRequest          = 400,
+            NotAcceptable       = 406,
             InternalServerError = 500
         };
 
@@ -99,27 +101,46 @@ namespace parserFSM
 
     namespace json
     {
-        inline constexpr auto batteryLevel   = "batteryLevel";
-        inline constexpr auto batteryState   = "batteryState";
-        inline constexpr auto selectedSim    = "selectedSim";
-        inline constexpr auto trayState      = "trayState";
-        inline constexpr auto signalStrength = "signalStrength";
-        inline constexpr auto fsTotal        = "fsTotal";
-        inline constexpr auto fsFreePercent  = "fsFreePercent";
-        inline constexpr auto fsFree         = "fsFree";
-        inline constexpr auto gitRevision    = "gitRevision";
-        inline constexpr auto gitBranch      = "gitBranch";
-        inline constexpr auto gitTag         = "gitTag";
-        inline constexpr auto currentRTCTime = "currentRTCTime";
-        inline constexpr auto updateReady    = "updateReady";
-        inline constexpr auto updateFileList = "updateFileList";
-        inline constexpr auto backupRequest  = "backupRequest";
-        inline constexpr auto backupReady    = "backupReady";
-        inline constexpr auto backupUpload   = "backupUpload";
-        inline constexpr auto restoreRequest = "restoreRequest";
-        inline constexpr auto factoryRequest = "factoryRequest";
+        inline constexpr auto batteryLevel     = "batteryLevel";
+        inline constexpr auto batteryState     = "batteryState";
+        inline constexpr auto selectedSim      = "selectedSim";
+        inline constexpr auto trayState        = "trayState";
+        inline constexpr auto signalStrength   = "signalStrength";
+        inline constexpr auto fsTotal          = "fsTotal";
+        inline constexpr auto fsFreePercent    = "fsFreePercent";
+        inline constexpr auto fsFree           = "fsFree";
+        inline constexpr auto gitRevision      = "gitRevision";
+        inline constexpr auto gitBranch        = "gitBranch";
+        inline constexpr auto gitTag           = "gitTag";
+        inline constexpr auto currentRTCTime   = "currentRTCTime";
+        inline constexpr auto updateReady      = "updateReady";
+        inline constexpr auto updateFileList   = "updateFileList";
+        inline constexpr auto backupRequest    = "backupRequest";
+        inline constexpr auto backupReady      = "backupReady";
+        inline constexpr auto backupUpload     = "backupUpload";
+        inline constexpr auto restoreRequest   = "restoreRequest";
+        inline constexpr auto factoryRequest   = "factoryRequest";
         inline constexpr auto networkStatus    = "networkStatus";
         inline constexpr auto accessTechnology = "accessTechnology";
+        inline constexpr auto fileName         = "fileName";
+        inline constexpr auto fileSize         = "fileSize";
+
+        inline constexpr auto update      = "update";
+        inline constexpr auto updateInfo  = "updateInfo";
+        inline constexpr auto updateError = "updateError";
+        inline constexpr auto errorCode   = "errorCode";
+        inline constexpr auto statusCode  = "statusCode";
+
+        namespace filesystem
+        {
+            inline constexpr auto command = "command";
+            namespace commands
+            {
+                inline constexpr auto upload   = "upload";
+                inline constexpr auto rm       = "rm";
+                inline constexpr auto download = "download";
+            } // namespace commands
+        }     // namespace filesystem
 
         namespace messages
         {

@@ -55,7 +55,12 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch,
+                     manager::actions::ShowContacts,
+                     manager::actions::AddContact,
+                     manager::actions::EditContact,
+                     manager::actions::ShowContactDetails,
+                     manager::actions::ShowEmergencyContacts}};
         }
     };
 } // namespace app

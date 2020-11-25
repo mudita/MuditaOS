@@ -22,21 +22,24 @@ namespace gui
 
     class Lines
     {
-        Text *parent = nullptr;
+        Text *text = nullptr;
         std::list<TextLine> lines;
 
         uint32_t max_lines_count = 4;
         uint32_t scroll_position = 0;
 
+        bool underLine            = false;
+        Position underLinePadding = 0;
+
       public:
-        Lines(Text *parent) : parent(parent)
+        Lines(Text *text) : text(text)
         {}
 
         ~Lines() = default;
 
         void erase()
         {
-            if (parent != nullptr) {
+            if (text != nullptr) {
                 for (auto &line : lines) {
                     line.erase();
                 }
@@ -64,6 +67,11 @@ namespace gui
             return lines.size();
         }
 
+        [[nodiscard]] auto empty() const noexcept -> bool
+        {
+            return lines.empty();
+        }
+
         auto maxWidth()
         {
             unsigned int w = 0;
@@ -83,14 +91,36 @@ namespace gui
             return h;
         }
 
-        void draw(TextCursor &cursor);
+        auto setUnderLine(bool val) -> void
+        {
+            underLine = val;
+        }
 
-        void linesHAlign(Length parentSize);
-        void linesVAlign(Length parentSize);
-        auto checkNavigationBounds(TextLineCursor &cursor, InputEvent event) -> InputBound;
-        auto checkAdditionBounds(TextLineCursor &cursor, InputEvent event) -> InputBound;
-        auto checkRemovalBounds(TextLineCursor &cursor, InputEvent event) -> InputBound;
-        void updateScrollPosition(NavigationDirection scroll, unsigned int lines_to_scroll = 1);
+        auto getUnderLine() -> bool
+        {
+            return underLine;
+        }
+
+        auto setUnderLinePadding(Position val) -> void
+        {
+            underLinePadding = val;
+        }
+
+        auto getUnderLinePadding() -> Position
+        {
+            return underLinePadding;
+        }
+
+        auto draw(BlockCursor &drawCursor, Length w, Length h, Position lineYPosition, Position lineXPosition) -> void;
+        auto draw(BlockCursor &drawCursor,
+                  Length w,
+                  Length h,
+                  Position lineYPosition,
+                  Position lineXPosition,
+                  unsigned int linesCount) -> void;
+
+        auto linesHAlign(Length parentSize) -> void;
+        auto linesVAlign(Length parentSize) -> void;
 
       protected:
         TextLine *getTextLine(uint32_t line);

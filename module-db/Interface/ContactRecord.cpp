@@ -297,7 +297,7 @@ auto ContactRecordInterface::addQuery(std::shared_ptr<db::Query> query) -> std::
 {
     auto addQuery = dynamic_cast<db::query::ContactAdd *>(query.get());
     auto ret      = ContactRecordInterface::Add(addQuery->rec);
-    auto response = std::make_unique<db::query::ContactAddResult>(ret);
+    auto response = std::make_unique<db::query::ContactAddResult>(ret, addQuery->rec.ID);
     response->setRequestQuery(query);
     return response;
 }

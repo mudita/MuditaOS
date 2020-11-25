@@ -6,8 +6,9 @@
 #include "module-db/queries/calendar/QueryEventsGetAll.hpp"
 #include "module-db/queries/calendar/QueryEventsAdd.hpp"
 #include "module-db/queries/calendar/QueryEventsRemove.hpp"
+#include "module-db/queries/calendar/QueryEventsRemoveICS.hpp"
 #include "module-db/queries/calendar/QueryEventsEdit.hpp"
-#include <module-db/queries/calendar/QueryEventsEdit.hpp>
+#include <module-db/queries/calendar/QueryEventsEditICS.hpp>
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
 #include <module-db/queries/calendar/QueryEventsGetAllLimited.hpp>
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
@@ -17,8 +18,9 @@
 #include <vector>
 
 EventsRecord::EventsRecord(const EventsTableRow &tableRow)
-    : Record{tableRow.ID}, title{tableRow.title}, date_from{tableRow.date_from}, date_till{tableRow.date_till},
-      reminder{tableRow.reminder}, repeat{tableRow.repeat}, reminder_fired{tableRow.reminder_fired}
+    : Record{tableRow.ID}, UID{tableRow.UID}, title{tableRow.title}, date_from{tableRow.date_from},
+      date_till{tableRow.date_till}, reminder{tableRow.reminder}, repeat{tableRow.repeat}, reminder_fired{
+                                                                                               tableRow.reminder_fired}
 {}
 
 EventsRecordInterface::EventsRecordInterface(EventsDB *eventsDb) : eventsDb(eventsDb)
@@ -27,6 +29,7 @@ EventsRecordInterface::EventsRecordInterface(EventsDB *eventsDb) : eventsDb(even
 bool EventsRecordInterface::Add(const EventsRecord &rec)
 {
     auto entry = EventsTableRow{{.ID = rec.ID},
+                                .UID            = rec.UID,
                                 .title          = rec.title,
                                 .date_from      = rec.date_from,
                                 .date_till      = rec.date_till,
@@ -34,29 +37,33 @@ bool EventsRecordInterface::Add(const EventsRecord &rec)
                                 .repeat         = rec.repeat,
                                 .reminder_fired = rec.reminder_fired};
 
-    switch (RepeatOption(rec.repeat)) {
-    case RepeatOption::Never: {
+    Repeat repeatOption = Repeat(rec.repeat);
+    if (repeatOption > Repeat::yearly) {
+        return (eventsDb->events.addCustom(entry));
+    }
+
+    switch (repeatOption) {
+    case Repeat::never: {
         return eventsDb->events.add(entry);
     }
-    case RepeatOption::Daily: {
+    case Repeat::daily: {
         return eventsDb->events.addDaily(entry);
     }
-    case RepeatOption::Weekly: {
+    case Repeat::weekly: {
         return eventsDb->events.addWeekly(entry);
     }
-    case RepeatOption::TwoWeeks: {
+    case Repeat::biweekly: {
         return eventsDb->events.addTwoWeeks(entry);
     }
-    case RepeatOption::Month: {
+    case Repeat::monthly: {
         return eventsDb->events.addMonth(entry);
     }
-    case RepeatOption::Year: {
+    case Repeat::yearly: {
         return eventsDb->events.addYear(entry);
     }
-    default: {
-        return eventsDb->events.addCustom(entry);
     }
-    }
+
+    return false;
 }
 
 std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::Select(TimePoint filter_from,
@@ -123,11 +130,12 @@ bool EventsRecordInterface::Update(const EventsRecord &rec)
 {
     auto record = eventsDb->events.getById(rec.ID);
     if (!record.isValid()) {
-        LOG_DEBUG("IS NOT VALID");
+        LOG_DEBUG("Event record is not valid");
         return false;
     }
 
     auto entry = EventsTableRow{{.ID = rec.ID},
+                                .UID            = rec.UID,
                                 .title          = rec.title,
                                 .date_from      = rec.date_from,
                                 .date_till      = rec.date_till,
@@ -137,34 +145,91 @@ bool EventsRecordInterface::Update(const EventsRecord &rec)
 
     bool result = eventsDb->events.update(entry);
 
-    switch (RepeatOption(rec.repeat)) {
-    case RepeatOption::Never: {
-        return (eventsDb->events.add(entry) && result);
+    Repeat repeatOption = Repeat(rec.repeat);
+    if (repeatOption > Repeat::yearly) {
+        return (eventsDb->events.addCustom(entry) && result);
     }
-    case RepeatOption::Daily: {
+
+    switch (repeatOption) {
+    case Repeat::never: {
+        return result;
+    }
+    case Repeat::daily: {
         return (eventsDb->events.addDaily(entry) && result);
     }
-    case RepeatOption::Weekly: {
+    case Repeat::weekly: {
         return (eventsDb->events.addWeekly(entry) && result);
     }
-    case RepeatOption::TwoWeeks: {
+    case Repeat::biweekly: {
         return (eventsDb->events.addTwoWeeks(entry) && result);
     }
-    case RepeatOption::Month: {
+    case Repeat::monthly: {
         return (eventsDb->events.addMonth(entry) && result);
     }
-    case RepeatOption::Year: {
+    case Repeat::yearly: {
         return (eventsDb->events.addYear(entry) && result);
     }
-    default: {
-        return eventsDb->events.addCustom(entry);
+    }
+
+    return false;
+}
+
+bool EventsRecordInterface::UpdateByUID(const EventsRecord &rec)
+{
+    auto record = eventsDb->events.getByUID(rec.UID);
+    if (!record.isValid()) {
+        LOG_DEBUG("Event record is not valid");
+        return false;
+    }
+
+    auto entry = EventsTableRow{{.ID = rec.ID},
+                                .UID            = rec.UID,
+                                .title          = rec.title,
+                                .date_from      = rec.date_from,
+                                .date_till      = rec.date_till,
+                                .reminder       = rec.reminder,
+                                .repeat         = rec.repeat,
+                                .reminder_fired = rec.reminder_fired};
+
+    bool result = eventsDb->events.updateByUID(entry);
+
+    Repeat repeatOption = Repeat(rec.repeat);
+    if (repeatOption > Repeat::yearly) {
+        return (eventsDb->events.addCustom(entry) && result);
+    }
+
+    switch (Repeat(rec.repeat)) {
+    case Repeat::never: {
+        return result;
+    }
+    case Repeat::daily: {
+        return (eventsDb->events.addDaily(entry) && result);
+    }
+    case Repeat::weekly: {
+        return (eventsDb->events.addWeekly(entry) && result);
+    }
+    case Repeat::biweekly: {
+        return (eventsDb->events.addTwoWeeks(entry) && result);
+    }
+    case Repeat::monthly: {
+        return (eventsDb->events.addMonth(entry) && result);
+    }
+    case Repeat::yearly: {
+        return (eventsDb->events.addYear(entry) && result);
     }
     }
+
+    return false;
 }
 
 bool EventsRecordInterface::RemoveByID(uint32_t id)
 {
     return eventsDb->events.removeById(id);
+}
+
+bool EventsRecordInterface::RemoveByUID(const std::string &UID)
+{
+    return eventsDb->events.removeByUID(UID);
 }
 
 bool EventsRecordInterface::RemoveByField(EventsRecordField field, const char *str)
@@ -223,8 +288,14 @@ std::unique_ptr<db::QueryResult> EventsRecordInterface::runQuery(std::shared_ptr
     if (typeid(*query) == typeid(db::query::events::Remove)) {
         return runQueryImplRemove(query);
     }
+    if (typeid(*query) == typeid(db::query::events::RemoveICS)) {
+        return runQueryImplRemoveICS(query);
+    }
     if (typeid(*query) == typeid(db::query::events::Edit)) {
         return runQueryImplEdit(query);
+    }
+    if (typeid(*query) == typeid(db::query::events::EditICS)) {
+        return runQueryImplEditICS(query);
     }
     if (typeid(*query) == typeid(db::query::events::SelectFirstUpcoming)) {
         return runQueryImplSelectFirstUpcoming(query);
@@ -235,8 +306,7 @@ std::unique_ptr<db::QueryResult> EventsRecordInterface::runQuery(std::shared_ptr
 std::unique_ptr<db::query::events::GetResult> EventsRecordInterface::runQueryImplGetResult(
     std::shared_ptr<db::Query> query)
 {
-    auto getQuery = dynamic_cast<db::query::events::Get *>(query.get());
-    assert(getQuery != nullptr);
+    auto getQuery = static_cast<db::query::events::Get *>(query.get());
     auto records  = GetByID(getQuery->id);
     auto response = std::make_unique<db::query::events::GetResult>(records);
     response->setRequestQuery(query);
@@ -257,10 +327,9 @@ std::unique_ptr<db::query::events::GetAllLimitedResult> EventsRecordInterface::r
     std::shared_ptr<db::Query> query)
 {
 
-    auto getAllLimitedQuery = dynamic_cast<db::query::events::GetAllLimited *>(query.get());
-    assert(getAllLimitedQuery != nullptr);
-    auto records = GetLimitOffsetByDate(getAllLimitedQuery->offset, getAllLimitedQuery->limit);
-    auto count   = GetCount();
+    auto getAllLimitedQuery = static_cast<db::query::events::GetAllLimited *>(query.get());
+    auto records            = GetLimitOffsetByDate(getAllLimitedQuery->offset, getAllLimitedQuery->limit);
+    auto count              = GetCount();
     auto response =
         std::make_unique<db::query::events::GetAllLimitedResult>(std::move(records), std::make_unique<uint32_t>(count));
     response->setRequestQuery(query);
@@ -270,22 +339,20 @@ std::unique_ptr<db::query::events::GetAllLimitedResult> EventsRecordInterface::r
 std::unique_ptr<db::query::events::GetFilteredResult> EventsRecordInterface::runQueryImplGetFilteredResult(
     std::shared_ptr<db::Query> query)
 {
-    auto getFilteredQuery = dynamic_cast<db::query::events::GetFiltered *>(query.get());
-    assert(getFilteredQuery != nullptr);
-    auto records        = Select(getFilteredQuery->filter_from,
+    auto getFilteredQuery = static_cast<db::query::events::GetFiltered *>(query.get());
+    auto records          = Select(getFilteredQuery->filter_from,
                           getFilteredQuery->filter_till,
                           getFilteredQuery->offset,
                           getFilteredQuery->limit);
-    auto numberOfEvents = GetCountFiltered(getFilteredQuery->filter_from, getFilteredQuery->filter_till);
-    auto response       = std::make_unique<db::query::events::GetFilteredResult>(std::move(records), numberOfEvents);
+    auto numberOfEvents   = GetCountFiltered(getFilteredQuery->filter_from, getFilteredQuery->filter_till);
+    auto response         = std::make_unique<db::query::events::GetFilteredResult>(std::move(records), numberOfEvents);
     response->setRequestQuery(query);
     return response;
 }
 
 std::unique_ptr<db::query::events::AddResult> EventsRecordInterface::runQueryImplAdd(std::shared_ptr<db::Query> query)
 {
-    auto addQuery = dynamic_cast<db::query::events::Add *>(query.get());
-    assert(addQuery != nullptr);
+    auto addQuery = static_cast<db::query::events::Add *>(query.get());
     bool ret      = Add(addQuery->getRecord());
     auto response = std::make_unique<db::query::events::AddResult>(ret);
     response->setRequestQuery(query);
@@ -295,20 +362,38 @@ std::unique_ptr<db::query::events::AddResult> EventsRecordInterface::runQueryImp
 std::unique_ptr<db::query::events::RemoveResult> EventsRecordInterface::runQueryImplRemove(
     std::shared_ptr<db::Query> query)
 {
-    auto removeQuery = dynamic_cast<db::query::events::Remove *>(query.get());
-    assert(removeQuery != nullptr);
-    bool ret      = RemoveByID(removeQuery->id);
-    auto response = std::make_unique<db::query::events::RemoveResult>(ret);
+    auto removeQuery = static_cast<db::query::events::Remove *>(query.get());
+    bool ret         = RemoveByID(removeQuery->id);
+    auto response    = std::make_unique<db::query::events::RemoveResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::query::events::RemoveICSResult> EventsRecordInterface::runQueryImplRemoveICS(
+    std::shared_ptr<db::Query> query)
+{
+    auto removeQuery = static_cast<db::query::events::RemoveICS *>(query.get());
+    bool ret         = RemoveByUID(removeQuery->UID);
+    auto response    = std::make_unique<db::query::events::RemoveICSResult>(ret);
     response->setRequestQuery(query);
     return response;
 }
 
 std::unique_ptr<db::query::events::EditResult> EventsRecordInterface::runQueryImplEdit(std::shared_ptr<db::Query> query)
 {
-    auto editQuery = dynamic_cast<db::query::events::Edit *>(query.get());
-    assert(editQuery != nullptr);
-    bool ret      = Update(editQuery->getRecord());
-    auto response = std::make_unique<db::query::events::EditResult>(ret);
+    auto editQuery = static_cast<db::query::events::Edit *>(query.get());
+    bool ret       = Update(editQuery->getRecord());
+    auto response  = std::make_unique<db::query::events::EditResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::query::events::EditICSResult> EventsRecordInterface::runQueryImplEditICS(
+    std::shared_ptr<db::Query> query)
+{
+    auto editQuery = static_cast<db::query::events::EditICS *>(query.get());
+    bool ret       = UpdateByUID(editQuery->getRecord());
+    auto response  = std::make_unique<db::query::events::EditICSResult>(ret);
     response->setRequestQuery(query);
     return response;
 }
@@ -316,8 +401,7 @@ std::unique_ptr<db::query::events::EditResult> EventsRecordInterface::runQueryIm
 std::unique_ptr<db::query::events::SelectFirstUpcomingResult> EventsRecordInterface::runQueryImplSelectFirstUpcoming(
     std::shared_ptr<db::Query> query)
 {
-    auto getFirstUpcomingQuery = dynamic_cast<db::query::events::SelectFirstUpcoming *>(query.get());
-    assert(getFirstUpcomingQuery != nullptr);
+    auto getFirstUpcomingQuery = static_cast<db::query::events::SelectFirstUpcoming *>(query.get());
 
     auto records  = SelectFirstUpcoming(getFirstUpcomingQuery->filter_from, getFirstUpcomingQuery->filter_till);
     auto response = std::make_unique<db::query::events::SelectFirstUpcomingResult>(std::move(records));

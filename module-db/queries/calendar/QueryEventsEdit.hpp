@@ -23,7 +23,7 @@ namespace db::query::events
     class EditResult : public QueryResult
     {
       public:
-        EditResult(bool ret);
+        explicit EditResult(bool ret);
         [[nodiscard]] auto getResult() const -> bool;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;

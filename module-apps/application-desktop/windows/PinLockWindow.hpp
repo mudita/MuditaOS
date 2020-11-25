@@ -13,21 +13,21 @@
 #include "PinLockBaseWindow.hpp"
 namespace gui
 {
-
     class PinLockWindow : public PinLockBaseWindow
     {
         const std::string this_window_name;
         std::string lockTimeoutApplication  = "";
         std::unique_ptr<PinLockBox> LockBox = nullptr;
-        PinLock::LockType currentLock       = PinLock::LockType::Unknown;
+        PinLockBox::EnterPasscodeType currentPasscodeType = PinLockBox::EnterPasscodeType::ProvidePasscode;
 
         // method hides or show widgets and sets bars according to provided state
-        void setVisibleState(const PinLock::State state);
+        void setVisibleState();
         void buildPinLockBox();
         void invalidate() noexcept;
+        auto usesNumericKeys() const noexcept -> bool;
 
       public:
-        PinLockWindow(app::Application *app, const std::string &window_name, PinLock &lock);
+        PinLockWindow(app::Application *app, const std::string &window_name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 

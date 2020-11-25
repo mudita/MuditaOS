@@ -70,7 +70,7 @@ struct ContactRecord : public Record
     inline auto getFormattedName(const NameFormatType type = NameFormatType::Default) const -> UTF8
     {
         if (isTemporary()) {
-            LOG_DEBUG("temporary contact, numer as name: '%s'", getNumberAsName().c_str());
+            LOG_DEBUG("temporary contact, number as name: '%s'", getNumberAsName().c_str());
             return getNumberAsName();
         }
         if (primaryName.length() > 0) {

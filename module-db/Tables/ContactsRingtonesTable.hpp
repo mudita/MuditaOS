@@ -57,10 +57,4 @@ class ContactsRingtonesTable : public Table<ContactsRingtonesTableRow, ContactRi
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
 
   private:
-    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS contact_ringtones("
-                                   "_id              INTEGER PRIMARY KEY,"
-                                   "contact_id       INTEGER,"
-                                   "asset_path       TEXT NOT NULL,"
-                                   "FOREIGN KEY(contact_id) REFERENCES contacts(_id) ON DELETE CASCADE"
-                                   ");";
 };

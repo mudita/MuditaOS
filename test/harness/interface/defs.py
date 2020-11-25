@@ -4,13 +4,14 @@
 endpoint = {
     "deviceInfo": 1,
     "update": 2,
-    "backup": 3,
-    "restore": 4,
-    "factory": 5,
-    "contacts": 6,
-    "messages": 7,
-    "calllog": 8,
-    "developerMode": 9
+    "filesystemUpload": 3,
+    "backup": 4,
+    "restore": 5,
+    "factory": 6,
+    "contacts": 7,
+    "messages": 8,
+    "calllog": 9,
+    "developerMode": 10
 }
 
 method = {

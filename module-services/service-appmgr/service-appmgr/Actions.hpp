@@ -22,10 +22,31 @@ namespace app::manager
 
         enum Action : ActionId
         {
+            Home,
             Launch,
             Call,
+            Dial,
+            ShowCallLog,
+            CreateSms,
+            ShowSmsTemplates,
+            ShowContacts,
+            ShowEmergencyContacts,
+            AddContact,
+            EditContact,
+            ShowContactDetails,
+            ShowSpecialInput,
+            SelectSimCard,
+            ShowAlarm,
+            ShowReminder,
+            RequestPin,
+            RequestPuk,
+            RequestPinChange,
+            UnlockSim,
+            BlockSim,
+            DisplayCMEError,
             UserAction // The last enumerator in the Action enum.
                        // All user-defined actions shall have values greater than UserAction.
+                       // All system-wide actions shall have values lesser than UserAction.
         };
 
         class ConvertibleToAction

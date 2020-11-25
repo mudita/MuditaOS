@@ -24,15 +24,20 @@ namespace db::query
     class ContactAddResult : public QueryResult
     {
       public:
-        ContactAddResult(bool result);
-        auto getResult() -> bool
+        ContactAddResult(bool result, unsigned int id);
+        [[nodiscard]] auto getResult() const noexcept -> bool
         {
             return result;
+        }
+        [[nodiscard]] auto getID() const noexcept -> unsigned int
+        {
+            return id;
         }
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
       private:
         bool result;
+        unsigned int id;
     };
 
 }; // namespace db::query

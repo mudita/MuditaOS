@@ -251,8 +251,9 @@ class ServiceCellular : public sys::Service
     void handleUSSDTimer();
 
     bool handleSimState(at::SimState state, const std::string message);
+    bool handleSimResponse(sys::DataMessage *msgl);
 
     friend class CellularUrcHandler;
-    friend class CellularCallRequestHandler;
     friend class SimCard;
+    friend class CellularRequestHandler;
 };

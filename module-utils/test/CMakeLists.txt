@@ -75,6 +75,16 @@ add_catch2_executable(
         module-utils
 )
 
+# ParserICS tests
+#add_catch2_executable(
+#    NAME
+#        utils-parserIcs
+#    SRCS
+#        test_ParserICS.cpp
+#    LIBS
+#        module-utils
+#)
+
 ###########################################
 # Log functional tests project
 project(test_module-utils_log VERSION 1.0

@@ -1,139 +1,272 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
-// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+//// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+//// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PinLockHandler.hpp"
 #include "PinHash.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
-#include <service-cellular/ServiceCellular.hpp>
+#include "application-desktop/data/LockPhoneData.hpp"
+#include "application-desktop/windows/Names.hpp"
+
+#include <module-utils/common_data/EventStore.hpp>
+#include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
+#include <service-cellular/CellularMessage.hpp>
 
 namespace gui
 {
-    constexpr unsigned int default_screen_pin_size = 4;
-    constexpr unsigned int default_screen_attempts = 4;
+    namespace
+    {
+        constexpr unsigned int default_screen_pin_size = 4;
+        constexpr unsigned int screen_nopin_size       = 0;
+        constexpr unsigned int default_attempts        = 4;
+        constexpr unsigned int blocked_sim_attempts    = 0;
+        constexpr unsigned int sim_max_passcode_size   = 8;
+        constexpr unsigned int sim_min_passcode_size   = 4;
+
+        constexpr inline auto serviceCellular = "ServiceCellular";
+    } // namespace
 
     PinLockHandler::PinLockHandler(app::ApplicationDesktop *app, SettingsRecord &settings)
-        : app(app), appSettings(settings), lock(this)
+        : app(app), appSettings(settings),
+          screenLock(
+              Store::GSM::SIM::NONE, PinLock::LockState::PasscodeRequired, PinLock::LockType::Screen, default_attempts),
+          simLock(Store::GSM::SIM::NONE, PinLock::LockState::Unlocked, PinLock::LockType::SimPin, default_attempts)
     {
-        reloadScreenLock();
-    }
-
-    auto PinLockHandler::handle(CellularSimResponseMessage *msg) -> bool
-    {
-        assert(msg);
-
-        parseSimCard(msg);
-        parseSimState(msg);
-        parseAttemptsAndPinSize(msg);
-
-        app->getWindow(app::window::name::desktop_pin_lock)->rebuild();
-        app->switchWindow(gui::name::window::main_window);
-        return true;
-    }
-
-    void PinLockHandler::handle(const std::vector<unsigned int> &pin)
-    {
-        if (lock.getLockType() == gui::PinLock::LockType::Screen) {
-            handleScreenPin(pin);
-        }
-        else {
-            handleSimPinOrPuk(pin);
-        }
-    }
-
-    void PinLockHandler::parseSimState(CellularSimResponseMessage *msg)
-    {
-        assert(msg);
-        switch (msg->getSimState()) {
-        case CellularSimResponseMessage::SimState::SIMUnlocked:
-            lock.type  = gui::PinLock::LockType::Screen;
-            lock.state = gui::PinLock::State::EnterPin;
-            break;
-        case CellularSimResponseMessage::SimState::PINRequired:
-            lock.type  = gui::PinLock::LockType::SIM;
-            lock.state = gui::PinLock::State::EnterPin;
-            break;
-        case CellularSimResponseMessage::SimState::PINInvalidRetryPossible:
-            lock.type  = gui::PinLock::LockType::SIM;
-            lock.state = gui::PinLock::State::InvalidPin;
-            break;
-        case CellularSimResponseMessage::SimState::PUKRequired:
-            lock.type  = gui::PinLock::LockType::PUK;
-            lock.state = gui::PinLock::State::EnterPin;
-            break;
-        case CellularSimResponseMessage::SimState::PUKInvalidRetryPossible:
-            lock.type  = gui::PinLock::LockType::PUK;
-            lock.state = gui::PinLock::State::InvalidPin;
-            break;
-        case CellularSimResponseMessage::SimState::SIMBlocked:
-            lock.type  = gui::PinLock::LockType::PUK;
-            lock.state = gui::PinLock::State::Blocked;
-            break;
-        }
-    }
-
-    void PinLockHandler::parseSimCard(CellularSimResponseMessage *msg)
-    {
-        assert(msg);
-        switch (msg->getSimCard()) {
-        case Store::GSM::SIM::SIM1:
-            lock.additionalLockInfo[gui::PinLock::InfoName::LockName] = "SIM1";
-            break;
-        case Store::GSM::SIM::SIM2:
-            lock.additionalLockInfo[gui::PinLock::InfoName::LockName] = "SIM2";
-            break;
-        default:
-            LOG_ERROR("Unknown SIM");
-            break;
-        }
-    }
-
-    void PinLockHandler::parseAttemptsAndPinSize(CellularSimResponseMessage *msg)
-    {
-        if (msg->getSimState() == CellularSimResponseMessage::SimState::SIMUnlocked) {
-            reloadScreenLock();
-        }
-        else {
-            lock.pinValue          = std::vector<unsigned int>(msg->getPinSize(), 0);
-            lock.remainingAttempts = msg->getAttemptsLeft();
-        }
+        simLock.setPinSizeBounds(sim_min_passcode_size, sim_max_passcode_size);
+        screenLock.setAutoActivate(true);
     }
 
     void PinLockHandler::handleScreenPin(const std::vector<unsigned int> &pin)
     {
-        if (lock.remainingAttempts > 0) {
-            std::hash<std::vector<unsigned int>> hashEngine;
-            uint32_t hash = hashEngine(pin);
-            lock.remainingAttempts--;
-            if (hash == appSettings.lockPassHash) {
-                lock.remainingAttempts = default_screen_attempts;
-                lock.state             = gui::PinLock::State::VerifiedPin;
-            }
-            else if (lock.remainingAttempts > 0) {
-                lock.state = gui::PinLock::State::InvalidPin;
-            }
-            else {
-                lock.state = gui::PinLock::State::Blocked;
-            }
+        std::hash<std::vector<unsigned int>> hashEngine;
+        uint32_t hash = hashEngine(pin);
+        screenLock.value--;
+        if (hash == appSettings.lockPassHash) {
+            screenLock.lockState = gui::PinLock::LockState::Unlocked;
+            screenLock.value     = default_attempts;
+        }
+        else if (screenLock.value > 0) {
+            screenLock.lockState = gui::PinLock::LockState::PasscodeInvalidRetryRequired;
+        }
+        else {
+            screenLock.lockState = gui::PinLock::LockState::Blocked;
+        }
+        unlock();
+    }
 
-            app->switchWindow(app::window::name::desktop_pin_lock);
+    void PinLockHandler::handlePasscodeParams(PinLock::LockType type,
+                                              PinLock::LockState state,
+                                              app::manager::actions::ActionParamsPtr &&data)
+    {
+        auto passcodeData = static_cast<app::manager::actions::PasscodeParams *>(data.get());
+        if (simLock.isSim(passcodeData->getSim()) && simLock.isType(type) && simLock.isState(state) &&
+            simLock.getValue() > passcodeData->getAttempts()) {
+            simLock.lockState = PinLock::LockState::PasscodeInvalidRetryRequired;
+        }
+        else {
+            simLock.lockState = state;
+            simLock.sim       = passcodeData->getSim();
+            simLock.lockType  = type;
+        }
+        simLock.value = passcodeData->getAttempts();
+    }
+
+    void PinLockHandler::handlePasscodeRequest(PinLock::LockType type, app::manager::actions::ActionParamsPtr &&data)
+    {
+        LOG_DEBUG("Handling on of PasscodeRequest actions");
+        handlePasscodeParams(type, PinLock::LockState::PasscodeRequired, std::move(data));
+        if (!getStrongestLock().isType(PinLock::LockType::Screen)) {
+            unlock();
         }
     }
 
-    void PinLockHandler::handleSimPinOrPuk(const std::vector<unsigned int> &pin)
+    void PinLockHandler::handlePinChangeRequest(app::manager::actions::ActionParamsPtr &&data)
     {
-        auto sim = Store::GSM::SIM::SIM1;
-        sys::Bus::SendUnicast(
-            std::make_shared<CellularSimVerifyPinRequestMessage>(sim, pin), ServiceCellular::serviceName, app);
+        LOG_DEBUG("Handling RequestPinChange action");
+        handlePasscodeParams(PinLock::LockType::SimPin, PinLock::LockState::PasscodeRequired, std::move(data));
+        promptSimLockWindow      = true;
+        auto onActivatedCallback = [this](PinLock::LockType type, const std::vector<unsigned int> &data) {
+            handlePasscodeChange(data);
+        };
+        switchToPinLockWindow(onActivatedCallback);
     }
 
-    void PinLockHandler::reloadScreenLock()
+    void PinLockHandler::handleSimBlocked(app::manager::actions::ActionParamsPtr &&data)
     {
-        lock.type  = gui::PinLock::LockType::Screen;
-        lock.state = gui::PinLock::State::EnterPin;
+        LOG_DEBUG("Handling BlockSim action");
+        auto params         = static_cast<app::manager::actions::SimStateParams *>(data.get());
+        promptSimLockWindow = true;
+        simLock.sim         = params->getSim();
+        simLock.lockState   = gui::PinLock::LockState::Blocked;
+        simLock.lockType    = gui::PinLock::LockType::SimPin;
+        simLock.value       = blocked_sim_attempts;
+        unlock();
+    }
 
-        unsigned int pinSize   = appSettings.lockPassHash == 0 ? 0 : default_screen_pin_size;
-        lock.pinValue          = std::vector<unsigned int>(pinSize, 0);
-        lock.remainingAttempts = default_screen_attempts;
+    void PinLockHandler::handleUnlockSim(app::manager::actions::ActionParamsPtr &&data)
+    {
+        LOG_DEBUG("Handling UnlockSim action");
+        simLock.lockState   = PinLock::LockState::Unlocked;
+        promptSimLockWindow = false;
+        unlock();
+    }
+
+    void PinLockHandler::handleCMEError(app::manager::actions::ActionParamsPtr &&data) const
+    {
+        LOG_DEBUG("Handling DisplayCMEError action");
+        auto params = static_cast<app::manager::actions::UnhandledCMEParams *>(data.get());
+        auto lock   = std::make_unique<gui::PinLock>(
+            params->getSim(), PinLock::LockState::ErrorOccurred, PinLock::LockType::SimPin, params->getCMECode());
+        lock->onActivatedCallback = [this](PinLock::LockType type, const std::vector<unsigned int> &data) {
+            app->switchWindow(app::window::name::desktop_main_window);
+        };
+        app->switchWindow(app::window::name::desktop_pin_lock,
+                          gui::ShowMode::GUI_SHOW_INIT,
+                          std::make_unique<gui::LockPhoneData>(std::move(lock)));
+    }
+
+    void PinLockHandler::switchToPinLockWindow(
+        std::function<void(PinLock::LockType, const std::vector<unsigned int> &)> onLockActivatedCallback)
+    {
+        auto lock = std::make_unique<gui::PinLock>(getStrongestLock());
+        if (lock->isState(PinLock::LockState::PasscodeInvalidRetryRequired)) {
+            lock->onActivatedCallback = [this, onLockActivatedCallback](PinLock::LockType,
+                                                                        const std::vector<unsigned int> &) {
+                getStrongestLock().consumeState();
+                switchToPinLockWindow(onLockActivatedCallback);
+            };
+        }
+        else if (lock->isState(gui::PinLock::LockState::Blocked)) {
+            lock->onActivatedCallback = [this](PinLock::LockType type, const std::vector<unsigned int> &data) {
+                setSimLockHandled();
+                app->switchWindow(app::window::name::desktop_main_window);
+            };
+        }
+        else if (lock->isState(gui::PinLock::LockState::Unlocked)) {
+            setSimLockHandled();
+            app->switchWindow(app::window::name::desktop_main_window);
+            return;
+        }
+        else {
+            lock->onActivatedCallback = onLockActivatedCallback;
+        }
+        app->switchWindow(app::window::name::desktop_pin_lock,
+                          gui::ShowMode::GUI_SHOW_INIT,
+                          std::make_unique<gui::LockPhoneData>(std::move(lock)));
+    }
+
+    void PinLockHandler::switchToPinLockWindow(
+        PinLock::LockState state,
+        std::function<void(PinLock::LockType, const std::vector<unsigned int> &)> onLockActivatedCallback)
+    {
+        auto lock                 = std::make_unique<gui::PinLock>(getStrongestLock());
+        lock->lockState           = state;
+        lock->onActivatedCallback = onLockActivatedCallback;
+        app->switchWindow(app::window::name::desktop_pin_lock,
+                          gui::ShowMode::GUI_SHOW_INIT,
+                          std::make_unique<gui::LockPhoneData>(std::move(lock)));
+    }
+
+    void PinLockHandler::handlePasscode(PinLock::LockType type, const std::vector<unsigned int> passcode)
+    {
+        if (type == PinLock::LockType::SimPin) {
+            setSimLockHandled();
+            sys::Bus::SendUnicast(
+                std::make_shared<CellularSimPinDataMessage>(simLock.sim, passcode), serviceCellular, app);
+        }
+        else if (type == PinLock::LockType::SimPuk) {
+            handlePasscodeChange(passcode);
+        }
+        else if (type == PinLock::LockType::Screen) {
+            handleScreenPin(passcode);
+        }
+    }
+
+    void PinLockHandler::handlePasscodeChange(const std::vector<unsigned int> passcode)
+    {
+        auto onActivatedCallback = [this, passcode](PinLock::LockType, const std::vector<unsigned int> &pin) {
+            handleNewPasscodeUnconfirmed(passcode, pin);
+        };
+        switchToPinLockWindow(PinLock::LockState::NewPasscodeRequired, onActivatedCallback);
+    }
+
+    void PinLockHandler::handleNewPasscodeUnconfirmed(const std::vector<unsigned int> &passcode,
+                                                      const std::vector<unsigned int> &pin)
+    {
+        auto onActivatedCallback = [this, passcode, pin](PinLock::LockType type,
+                                                         const std::vector<unsigned int> &pinConfirmed) {
+            if (pin == pinConfirmed) {
+                handleNewPasscodeConfirmed(type, passcode, pin);
+            }
+            else {
+                handleNewPasscodeInvalid(passcode);
+            }
+        };
+        switchToPinLockWindow(PinLock::LockState::NewPasscodeConfirmRequired, onActivatedCallback);
+    }
+
+    void PinLockHandler::handleNewPasscodeConfirmed(PinLock::LockType type,
+                                                    const std::vector<unsigned int> &passcode,
+                                                    const std::vector<unsigned int> &pin)
+    {
+        setSimLockHandled();
+        if (type == PinLock::LockType::SimPin) {
+            sys::Bus::SendUnicast(
+                std::make_shared<CellularSimNewPinDataMessage>(simLock.sim, passcode, pin), serviceCellular, app);
+        }
+        else if (type == PinLock::LockType::SimPuk) {
+            sys::Bus::SendUnicast(
+                std::make_shared<CellularSimPukDataMessage>(simLock.sim, passcode, pin), serviceCellular, app);
+        }
+    }
+
+    void PinLockHandler::handleNewPasscodeInvalid(const std::vector<unsigned int> &passcode)
+    {
+        auto onActivatedCallback = [this, passcode](PinLock::LockType type, const std::vector<unsigned int> &pin) {
+            handlePasscodeChange(passcode);
+        };
+        switchToPinLockWindow(PinLock::LockState::NewPasscodeInvalid, onActivatedCallback);
+    }
+    void PinLockHandler::unlock()
+    {
+        auto onActivatedCallback = [this](PinLock::LockType type, const std::vector<unsigned int> &data) {
+            handlePasscode(type, data);
+        };
+        switchToPinLockWindow(onActivatedCallback);
+    }
+
+    auto PinLockHandler::getStrongestLock() noexcept -> gui::PinLock &
+    {
+        if (!screenLock.isState(PinLock::LockState::Unlocked)) {
+            return screenLock;
+        }
+        else if (promptSimLockWindow && !simLock.isState(PinLock::LockState::Unlocked)) {
+            return simLock;
+        }
+        return screenLock;
+    }
+
+    void PinLockHandler::lockScreen()
+    {
+        screenLock.lockState = PinLock::LockState::PasscodeRequired;
+    }
+
+    void PinLockHandler::unlockScreen()
+    {
+        if (getStrongestLock().isType(PinLock::LockType::Screen)) {
+            unsigned int pinSize = appSettings.lockPassHash == 0 ? screen_nopin_size : default_screen_pin_size;
+            screenLock.setPinSizeBounds(pinSize, pinSize);
+            if (screenLock.getMaxPinSize() == screen_nopin_size) {
+                screenLock.lockState = gui::PinLock::LockState::Unlocked;
+            }
+        }
+        unlock();
+    }
+
+    void PinLockHandler::setSimLockHandled() noexcept
+    {
+        if (!getStrongestLock().isType(PinLock::LockType::Screen)) {
+            promptSimLockWindow = false;
+        }
     }
 
 } // namespace gui

@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-namespace Settings
+namespace settings
 {
     Settings::Settings(sys::Service *app, const std::string &dbAgentName) : dbAgentName(dbAgentName)
     {
@@ -28,7 +28,7 @@ namespace Settings
         sys::Bus::Remove(std::static_pointer_cast<sys::Service>(app));
     }
 
-    void Settings::sendMsg(std::shared_ptr<::Settings::Messages::SettingsMessage> &&msg)
+    void Settings::sendMsg(std::shared_ptr<settings::Messages::SettingsMessage> &&msg)
     {
         sys::Bus::SendUnicast(std::move(msg), dbAgentName, app.get());
     }
@@ -37,19 +37,20 @@ namespace Settings
     {
         using std::placeholders::_1;
         using std::placeholders::_2;
-        app->connect(::Settings::Messages::VariableChanged(), std::bind(&Settings::handleVariableChanged, this, _1));
-        app->connect(::Settings::Messages::CurrentProfileChanged(),
+        LOG_DEBUG("Settings::registerHandlers for %s", app->GetName().c_str());
+        app->connect(settings::Messages::VariableChanged(), std::bind(&Settings::handleVariableChanged, this, _1));
+        app->connect(settings::Messages::CurrentProfileChanged(),
                      std::bind(&Settings::handleCurrentProfileChanged, this, _1));
-        app->connect(::Settings::Messages::CurrentModeChanged(),
+        app->connect(settings::Messages::CurrentModeChanged(),
                      std::bind(&Settings::handleCurrentModeChanged, this, _1));
-        app->connect(::Settings::Messages::ProfileListResponse(),
+        app->connect(settings::Messages::ProfileListResponse(),
                      std::bind(&Settings::handleProfileListResponse, this, _1));
-        app->connect(::Settings::Messages::ModeListResponse(), std::bind(&Settings::handleModeListResponse, this, _1));
+        app->connect(settings::Messages::ModeListResponse(), std::bind(&Settings::handleModeListResponse, this, _1));
     }
     auto Settings::handleVariableChanged(sys::Message *req) -> sys::MessagePointer
     {
         LOG_DEBUG("handleVariableChanged");
-        if (auto msg = dynamic_cast<::Settings::Messages::VariableChanged *>(req)) {
+        if (auto msg = dynamic_cast<settings::Messages::VariableChanged *>(req)) {
             auto key = msg->getPath().variable;
             auto val = msg->getValue();
             LOG_DEBUG("handleVariableChanged: (k=v): (%s=%s)", key.c_str(), val.value_or("").c_str());
@@ -64,7 +65,7 @@ namespace Settings
     auto Settings::handleCurrentProfileChanged(sys::Message *req) -> sys::MessagePointer
     {
         LOG_DEBUG("handleCurrentProfileChanged");
-        if (auto msg = dynamic_cast<::Settings::Messages::CurrentProfileChanged *>(req)) {
+        if (auto msg = dynamic_cast<settings::Messages::CurrentProfileChanged *>(req)) {
             auto profile = msg->getProfileName();
             LOG_DEBUG("handleCurrentProfileChanged: %s", profile.c_str());
             cbProfile(profile);
@@ -74,7 +75,7 @@ namespace Settings
     auto Settings::handleCurrentModeChanged(sys::Message *req) -> sys::MessagePointer
     {
         LOG_DEBUG("handleCurrentModeChanged");
-        if (auto msg = dynamic_cast<::Settings::Messages::CurrentModeChanged *>(req)) {
+        if (auto msg = dynamic_cast<settings::Messages::CurrentModeChanged *>(req)) {
             auto mode = msg->getProfileName();
             LOG_DEBUG("handleCurrentModeChanged: %s", mode.c_str());
             cbMode(mode);
@@ -84,7 +85,7 @@ namespace Settings
     auto Settings::handleProfileListResponse(sys::Message *req) -> sys::MessagePointer
     {
         LOG_DEBUG("handleProfileListResponse");
-        if (auto msg = dynamic_cast<::Settings::Messages::ProfileListResponse *>(req)) {
+        if (auto msg = dynamic_cast<settings::Messages::ProfileListResponse *>(req)) {
             auto profiles = msg->getValue();
             LOG_DEBUG("handleProfileListResponse: %zu elements", profiles.size());
             cbAllProfiles(profiles);
@@ -94,7 +95,7 @@ namespace Settings
     auto Settings::handleModeListResponse(sys::Message *req) -> sys::MessagePointer
     {
         LOG_DEBUG("handleModeListResponse");
-        if (auto msg = dynamic_cast<::Settings::Messages::ModeListResponse *>(req)) {
+        if (auto msg = dynamic_cast<settings::Messages::ModeListResponse *>(req)) {
             auto modes = msg->getValue();
             LOG_DEBUG("handleModeListResponse: %zu elements", modes.size());
             cbAllModes(modes);
@@ -112,7 +113,7 @@ namespace Settings
         EntryPath path;
         path.variable = variableName;
         path.service  = app->GetName();
-        auto msg      = std::make_shared<::Settings::Messages::RegisterOnVariableChange>(path);
+        auto msg      = std::make_shared<settings::Messages::RegisterOnVariableChange>(path);
         sendMsg(std::move(msg));
     }
 
@@ -129,7 +130,7 @@ namespace Settings
         EntryPath path;
         path.variable = variableName;
         path.service  = app->GetName();
-        auto msg      = std::make_shared<::Settings::Messages::UnregisterOnVariableChange>(path);
+        auto msg      = std::make_shared<settings::Messages::UnregisterOnVariableChange>(path);
         sendMsg(std::move(msg));
     }
 
@@ -138,26 +139,26 @@ namespace Settings
         EntryPath path;
         path.variable = variableName;
         path.service  = app->GetName();
-        auto msg      = std::make_shared<::Settings::Messages::SetVariable>(path, variableValue);
+        auto msg      = std::make_shared<settings::Messages::SetVariable>(path, variableValue);
         sendMsg(std::move(msg));
     }
 
     void Settings::getAllProfiles(OnAllProfilesRetrievedCallback cb)
     {
         if (nullptr == cbAllProfiles) {
-            sendMsg(std::make_shared<::Settings::Messages::ListProfiles>());
+            sendMsg(std::make_shared<settings::Messages::ListProfiles>());
         }
         cbAllProfiles = cb;
     }
 
     void Settings::setCurrentProfile(const std::string &profile)
     {
-        sendMsg(std::make_shared<::Settings::Messages::SetCurrentProfile>(profile));
+        sendMsg(std::make_shared<settings::Messages::SetCurrentProfile>(profile));
     }
 
     void Settings::addProfile(const std::string &profile)
     {
-        sendMsg(std::make_shared<::Settings::Messages::AddProfile>(profile));
+        sendMsg(std::make_shared<settings::Messages::AddProfile>(profile));
     }
 
     void Settings::registerProfileChange(ProfileChangedCallback cb)
@@ -166,7 +167,7 @@ namespace Settings
             LOG_DEBUG("Profile change callback already exists, overwritting");
         }
         else {
-            sendMsg(std::make_shared<::Settings::Messages::RegisterOnProfileChange>());
+            sendMsg(std::make_shared<settings::Messages::RegisterOnProfileChange>());
         }
 
         cbProfile = cb;
@@ -175,25 +176,25 @@ namespace Settings
     void Settings::unregisterProfileChange()
     {
         cbProfile = nullptr;
-        sendMsg(std::make_shared<::Settings::Messages::UnregisterOnProfileChange>());
+        sendMsg(std::make_shared<settings::Messages::UnregisterOnProfileChange>());
     }
 
     void Settings::getAllModes(OnAllModesRetrievedCallback cb)
     {
         if (nullptr == cbAllModes) {
-            sendMsg(std::make_shared<::Settings::Messages::ListModes>());
+            sendMsg(std::make_shared<settings::Messages::ListModes>());
         }
         cbAllModes = cb;
     }
 
     void Settings::setCurrentMode(const std::string &mode)
     {
-        sendMsg(std::make_shared<::Settings::Messages::SetCurrentMode>(mode));
+        sendMsg(std::make_shared<settings::Messages::SetCurrentMode>(mode));
     }
 
     void Settings::addMode(const std::string &mode)
     {
-        sendMsg(std::make_shared<::Settings::Messages::AddMode>(mode));
+        sendMsg(std::make_shared<settings::Messages::AddMode>(mode));
     }
 
     void Settings::registerModeChange(ModeChangedCallback cb)
@@ -202,7 +203,7 @@ namespace Settings
             LOG_DEBUG("ModeChange callback allready set overwriting");
         }
         else {
-            sendMsg(std::make_shared<::Settings::Messages::RegisterOnModeChange>());
+            sendMsg(std::make_shared<settings::Messages::RegisterOnModeChange>());
         }
         cbMode = cb;
     }
@@ -210,6 +211,6 @@ namespace Settings
     void Settings::unregisterModeChange()
     {
         cbMode = nullptr;
-        sendMsg(std::make_shared<::Settings::Messages::UnregisterOnModeChange>());
+        sendMsg(std::make_shared<settings::Messages::UnregisterOnModeChange>());
     }
 } // namespace Settings

@@ -6,12 +6,15 @@
 #include "Endpoint.hpp"
 
 #include "Service/Service.hpp"
+#include "calendarEvents/CalendarEventsEndpoint.hpp"
 #include "backup/BackupEndpoint.hpp"
+#include "deviceInfo/DeviceInfoEndpoint.hpp"
+#include "update/UpdateEndpoint.hpp"
+#include "filesystem/FilesystemEndpoint.hpp"
+#include "factoryReset/FactoryResetEndpoint.hpp"
 #include "calllog/CalllogEndpoint.hpp"
 #include "contacts/ContactsEndpoint.hpp"
 #include "developerMode/DeveloperModeEndpoint.hpp"
-#include "deviceInfo/DeviceInfoEndpoint.hpp"
-#include "factoryReset/FactoryResetEndpoint.hpp"
 #include "messages/MessagesEndpoint.hpp"
 #include "restore/RestoreEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
@@ -27,6 +30,8 @@ class EndpointFactory
         switch (context.getEndpoint()) {
         case EndpointType::update:
             return std::make_unique<UpdateEndpoint>(ownerServicePtr);
+        case EndpointType::filesystemUpload:
+            return std::make_unique<FilesystemEndpoint>(ownerServicePtr);
         case EndpointType::backup:
             return std::make_unique<BackupEndpoint>(ownerServicePtr);
         case EndpointType::deviceInfo:
@@ -43,6 +48,8 @@ class EndpointFactory
             return std::make_unique<CalllogEndpoint>(ownerServicePtr);
         case EndpointType::developerMode:
             return std::make_unique<DeveloperModeEndpoint>(ownerServicePtr);
+        case EndpointType::calendarEvents:
+            return std::make_unique<CalendarEventsEndpoint>(ownerServicePtr);
         default:
             return nullptr;
         }

@@ -9,6 +9,7 @@ from tests.deviceinfo import *
 from tests.factoryReset import *
 from tests.backup import *
 from tests.calllog import *
+from tests.calendarEvents import *
 from termcolor import colored
 
 from harness.harness import Harness
@@ -23,7 +24,7 @@ def main():
     serial = test_harness.get_connection()
     final_result = True
     failed_tests = []
-    for test_instance in (DeviceInfoTest(serial), UpdateTest(serial), BackupTest(serial), MessageTest(serial),
+    for test_instance in (DeviceInfoTest(serial), calendarEventsTest(serial), UpdateTest(serial), BackupTest(serial), MessageTest(serial),
                           MessageTemplateTest(serial), ContactTest(serial), CalllogTest(serial),
                           FactoryResetTest(serial)):
         test_name = type(test_instance).__name__

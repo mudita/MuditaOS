@@ -4,6 +4,7 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 set(SOURCES
     ApplicationManifest.cpp
     Controller.cpp
+    data/SimActionsParams.cpp
     model/ApplicationManager.cpp
     model/ApplicationHandle.cpp
     model/ApplicationsRegistry.cpp

@@ -4,12 +4,13 @@
 #include "CalllogModel.hpp"
 #include "InputEvent.hpp"
 #include "ListView.hpp"
-#include "UiCommonActions.hpp"
 #include "data/CallLogInternals.hpp"
 #include "data/CallLogSwitchData.hpp"
 #include "widgets/CalllogItem.hpp"
 
 #include <service-db/DBServiceAPI.hpp>
+#include <service-appmgr/Controller.hpp>
+#include "application-call/data/CallSwitchData.hpp"
 
 using namespace calllog;
 
@@ -75,7 +76,10 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
         }
         if (event.keyCode == gui::KeyCode::KEY_LF) {
             LOG_DEBUG("calling");
-            return app::call(application, item->getCall().phoneNumber);
+            return app::manager::Controller::sendAction(
+                application,
+                app::manager::actions::Dial,
+                std::make_unique<app::ExecuteCallData>(item->getCall().phoneNumber));
         }
         return false;
     };

@@ -74,7 +74,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::Call}};
+            return {{manager::actions::Launch, manager::actions::Call, manager::actions::Dial}};
         }
     };
 } /* namespace app */

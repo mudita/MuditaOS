@@ -14,7 +14,6 @@
 #include <vector>
 
 class ServiceDesktop;
-
 namespace fs = std::filesystem;
 namespace updateos
 {
@@ -31,7 +30,7 @@ namespace updateos
         inline constexpr auto update = ".tar";
     }
 
-    const inline int prefix_len = 8;
+    inline constexpr auto prefix_len = 8;
 
     enum class UpdateError
     {
@@ -52,12 +51,9 @@ namespace updateos
         CantRenameTempToCurrent,
         CantUpdateJSON,
         CantSaveJSON,
-        CantUpdateCRC32JSON
-    };
-
-    enum class BootloaderUpdateError
-    {
-        NoError,
+        CantUpdateCRC32JSON,
+        CantDeltreePreviousOS,
+        CantWriteToFile,
         NoBootloaderFile,
         CantOpenBootloaderFile,
         CantAllocateBuffer,
@@ -128,11 +124,11 @@ class UpdateMuditaOS : public updateos::UpdateStats
     updateos::UpdateError cleanupAfterUpdate();
     updateos::UpdateError updateUserData();
 
-    void informError(const char *format, ...);
+    updateos::UpdateError informError(updateos::UpdateError errorCode, const char *format, ...);
     void informDebug(const char *format, ...);
-    void informUpdate(const char *format, ...);
+    void informUpdate(const updateos::UpdateState statusCode, const char *format, ...);
 
-    updateos::BootloaderUpdateError writeBootloader(fs::path bootloaderFile);
+    updateos::UpdateError writeBootloader(fs::path bootloaderFile);
 
     void getChecksumInfo(const std::string &infoLine, std::string &filePath, unsigned long *fileCRC32Long);
     unsigned long getExtractedFileCRC32(const std::string &filePath);

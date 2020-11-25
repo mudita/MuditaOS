@@ -4,9 +4,12 @@
 #pragma once
 
 #include "PinLock.hpp"
-#include <service-cellular/CellularMessage.hpp>
 
 #include "Interface/SettingsRecord.hpp"
+
+#include <module-services/service-appmgr/service-appmgr/messages/ActionRequest.hpp>
+#include <module-services/service-appmgr/service-appmgr/Actions.hpp>
+
 namespace app
 {
     class ApplicationDesktop;
@@ -18,20 +21,46 @@ namespace gui
     {
         app::ApplicationDesktop *app = nullptr;
         const SettingsRecord &appSettings;
-
-        void parseSimCard(CellularSimResponseMessage *msg);
-        void parseSimState(CellularSimResponseMessage *msg);
-        void parseAttemptsAndPinSize(CellularSimResponseMessage *msg);
+        gui::PinLock screenLock;
+        gui::PinLock simLock;
+        bool promptSimLockWindow = true;
 
         void handleScreenPin(const std::vector<unsigned int> &pin);
-        void handleSimPinOrPuk(const std::vector<unsigned int> &pin);
+        void handlePasscode(PinLock::LockType type, const std::vector<unsigned int> passcode);
+        void handlePasscodeChange(const std::vector<unsigned int> passcode);
+        void handleNewPasscodeUnconfirmed(const std::vector<unsigned int> &passcode,
+                                          const std::vector<unsigned int> &pin);
+        void handleNewPasscodeConfirmed(PinLock::LockType type,
+                                        const std::vector<unsigned int> &passcode,
+                                        const std::vector<unsigned int> &pin);
+        void handleNewPasscodeInvalid(const std::vector<unsigned int> &passcode);
+        void handlePasscodeParams(PinLock::LockType type,
+                                  PinLock::LockState state,
+                                  app::manager::actions::ActionParamsPtr &&data);
+        void switchToPinLockWindow(
+            std::function<void(PinLock::LockType, const std::vector<unsigned int> &)> onLockActivatedCallback);
+        void switchToPinLockWindow(
+            PinLock::LockState type,
+            std::function<void(PinLock::LockType, const std::vector<unsigned int> &)> onLockActivatedCallback);
+
+        auto getStrongestLock() noexcept -> gui::PinLock &;
+        void unlock();
+        void setSimLockHandled() noexcept;
 
       public:
         PinLockHandler(app::ApplicationDesktop *app, SettingsRecord &settings);
-        void reloadScreenLock();
-        auto handle(CellularSimResponseMessage *msg) -> bool;
-        void handle(const std::vector<unsigned int> &pin);
 
-        gui::PinLock lock;
+        void handlePasscodeRequest(PinLock::LockType type, app::manager::actions::ActionParamsPtr &&data);
+        void handlePinChangeRequest(app::manager::actions::ActionParamsPtr &&data);
+        void handleSimBlocked(app::manager::actions::ActionParamsPtr &&data);
+        void handleUnlockSim(app::manager::actions::ActionParamsPtr &&data);
+        void handleCMEError(app::manager::actions::ActionParamsPtr &&data) const;
+
+        [[nodiscard]] auto isScreenLocked() const noexcept -> bool
+        {
+            return !screenLock.isState(PinLock::LockState::Unlocked);
+        }
+        void lockScreen();
+        void unlockScreen();
     };
 } // namespace gui

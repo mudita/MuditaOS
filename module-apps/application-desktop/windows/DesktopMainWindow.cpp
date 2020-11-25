@@ -17,7 +17,6 @@
 #include <service-appmgr/Controller.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
-#include <UiCommonActions.hpp>
 
 #include "i18/i18.hpp"
 #include "log/log.hpp"
@@ -26,6 +25,7 @@
 #include <application-settings/ApplicationSettings.hpp>
 #include <cassert>
 #include <time/time_conversion.hpp>
+#include <module-apps/application-call/data/CallSwitchData.hpp>
 
 namespace gui
 {
@@ -89,9 +89,7 @@ namespace gui
     void DesktopMainWindow::setVisibleState()
     {
         auto app = getAppDesktop();
-
-        if (app->lockHandler.lock.isLocked() && app->lockHandler.lock.getLockType() == PinLock::LockType::Screen) {
-
+        if (app->lockHandler.isScreenLocked()) {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::RIGHT, false);
@@ -99,12 +97,6 @@ namespace gui
             inputCallback = nullptr;
             setFocusItem(nullptr);
             buildNotifications(app);
-
-            sys::Bus::SendUnicast(
-                std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
-        }
-        else if (app->lockHandler.lock.isLocked()) {
-            application->switchWindow(app::window::name::desktop_pin_lock);
 
             sys::Bus::SendUnicast(
                 std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
@@ -118,8 +110,7 @@ namespace gui
             setActiveState(app);
 
             if (app->need_sim_select && Store::GSM::get()->sim == Store::GSM::SIM::SIM_UNKNOWN) {
-                app::manager::Controller::switchApplication(
-                    this->application, app::name_settings, app::sim_select, nullptr);
+                app::manager::Controller::sendAction(application, app::manager::actions::SelectSimCard);
             }
 
             sys::Bus::SendUnicast(
@@ -135,13 +126,11 @@ namespace gui
         // check if there was a signal to lock the pone due to inactivity.
         if ((data != nullptr) && (data->getDescription() == "LockPhoneData")) {
             auto app = getAppDesktop();
-            if (app->lockHandler.lock.isLocked()) {
+            if (app->lockHandler.isScreenLocked()) {
                 return;
             }
-
             auto *lockData          = dynamic_cast<LockPhoneData *>(data);
             lockTimeoutApplilcation = lockData->getPreviousApplication();
-
             application->setSuspendFlag(true);
         }
         setVisibleState();
@@ -149,21 +138,25 @@ namespace gui
 
     bool DesktopMainWindow::processLongPressEvent(const InputEvent &inputEvent)
     {
-        auto *app = getAppDesktop();
+        auto app = getAppDesktop();
 
-        if (inputEvent.is(KeyCode::KEY_PND) && (!app->lockHandler.lock.isLocked())) {
-            app->lockHandler.lock.lock();
-            setVisibleState();
-            application->setSuspendFlag(true);
-            return true;
+        if (!app->lockHandler.isScreenLocked()) {
+            if (inputEvent.is(KeyCode::KEY_PND)) {
+                app->lockHandler.lockScreen();
+                setVisibleState();
+                application->setSuspendFlag(true);
+                return true;
+            }
+            // long press of '0' key is translated to '+'
+            else if (inputEvent.is(KeyCode::KEY_0)) {
+                return app::manager::Controller::sendAction(
+                    application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>("+"));
+            }
         }
-        else if (inputEvent.is(KeyCode::KEY_RF)) {
+
+        if (inputEvent.is(KeyCode::KEY_RF)) {
             application->switchWindow("PowerOffWindow");
             return true;
-        }
-        // long press of '0' key is translated to '+'
-        else if (inputEvent.is(KeyCode::KEY_0)) {
-            return app::prepareCall(application, "+");
         }
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
@@ -174,7 +167,9 @@ namespace gui
         auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
         // if numeric key was pressed record that key and send it to call application
         if (code != 0) {
-            return app::prepareCall(application, std::string(1, static_cast<char>(code)));
+            const auto &number = std::string(1, static_cast<char>(code));
+            return app::manager::Controller::sendAction(
+                application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>(number));
         }
         else if (inputEvent.is(KeyCode::KEY_UP) && focusItem == nullptr) {
             setFocusItem(notifications);
@@ -195,18 +190,9 @@ namespace gui
         if (enter_cache.cached() && inputEvent.is(KeyCode::KEY_PND)) {
             // if interval between enter and pnd keys is less than time defined for unlocking
             // display pin lock screen or simply refresh current window to update labels
-            std::unique_ptr<LockPhoneData> data = std::make_unique<LockPhoneData>(LockPhoneData::Request::Pin);
-            // if there was no application on to before closing proceed normally to pin protection
-            if (lockTimeoutApplilcation.empty()) {
-                application->switchWindow(app::window::name::desktop_pin_lock, std::move(data));
-                return true;
-            }
-            else {
-                data->setPrevApplication(lockTimeoutApplilcation);
-                lockTimeoutApplilcation = "";
-                application->switchWindow(app::window::name::desktop_pin_lock, std::move(data));
-                return true;
-            }
+
+            getAppDesktop()->lockHandler.unlockScreen();
+            return true;
         }
         else if (enter_cache.storeEnter(inputEvent)) {
             return true;
@@ -227,7 +213,7 @@ namespace gui
             return processLongPressEvent(inputEvent);
         }
         else if (inputEvent.isShortPress()) {
-            if (app->lockHandler.lock.isLocked()) {
+            if (app->lockHandler.isScreenLocked()) {
                 return processShortPressEventOnLocked(inputEvent);
             }
             else {
@@ -293,8 +279,10 @@ namespace gui
                 utils::localize.get("app_desktop_unread_messages"),
                 std::to_string(app->notifications.notSeen.SMS),
                 [this]() -> bool {
-                    return app::manager::Controller::switchApplication(
-                        application, app::name_messages, gui::name::window::main_window, nullptr);
+                    return app::manager::Controller::sendAction(
+                        application,
+                        app::manager::actions::Launch,
+                        std::make_unique<app::ApplicationLaunchData>(app::name_messages));
                 },
                 [app, this]() -> bool { return app->clearMessagesNotification(); },
                 onNotificationFocus);

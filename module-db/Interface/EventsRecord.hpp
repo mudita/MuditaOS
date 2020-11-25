@@ -3,12 +3,13 @@
 
 #pragma once
 
-#include "Common/Common.hpp"
-#include "Databases/EventsDB.hpp"
+#include "module-db/Common/Common.hpp"
+#include "module-db/Databases/EventsDB.hpp"
 #include "Record.hpp"
 #include <utf8/UTF8.hpp>
 #include <cstdint>
 #include <vector>
+#include <variant>
 #include <module-apps/application-calendar/data/dateCommon.hpp>
 
 // fw declarations
@@ -26,29 +27,24 @@ namespace db::query::events
     class AddResult;
     class Remove;
     class RemoveResult;
+    class RemoveICS;
+    class RemoveICSResult;
     class Edit;
     class EditResult;
+    class EditICS;
+    class EditICSResult;
     class SelectFirstUpcoming;
     class SelectFirstUpcomingResult;
 } // namespace db::query::events
 
-enum class RepeatOption
-{
-    Never    = 0,
-    Daily    = 1,
-    Weekly   = 2,
-    TwoWeeks = 3,
-    Month    = 4,
-    Year     = 5
-};
-
 struct EventsRecord : public Record
 {
+    std::string UID;
     std::string title;
     TimePoint date_from;
     TimePoint date_till;
     uint32_t reminder = 0;
-    uint32_t repeat    = 0;
+    uint32_t repeat   = 0;
     TimePoint reminder_fired;
 
     EventsRecord()  = default;
@@ -71,8 +67,10 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
 
     bool Add(const EventsRecord &rec) override final;
     bool RemoveByID(uint32_t id) override final;
+    bool RemoveByUID(const std::string &UID);
     bool RemoveByField(EventsRecordField field, const char *str) override final;
     bool Update(const EventsRecord &rec) override final;
+    bool UpdateByUID(const EventsRecord &rec);
     EventsRecord GetByID(uint32_t id) override final;
     uint32_t GetCount() override final;
     uint32_t GetCountFiltered(TimePoint from, TimePoint till);
@@ -101,7 +99,9 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
         std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::events::AddResult> runQueryImplAdd(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::events::RemoveResult> runQueryImplRemove(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::events::RemoveICSResult> runQueryImplRemoveICS(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::events::EditResult> runQueryImplEdit(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::events::EditICSResult> runQueryImplEditICS(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::events::SelectFirstUpcomingResult> runQueryImplSelectFirstUpcoming(
         std::shared_ptr<db::Query> query);
 };

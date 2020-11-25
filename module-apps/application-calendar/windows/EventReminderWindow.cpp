@@ -156,7 +156,7 @@ namespace gui
         LOG_DEBUG("Switch to previous window");
         destroyTimer();
 
-        app::manager::Controller::switchApplication(application, "ApplicationDesktop", gui::name::window::main_window);
+        app::manager::Controller::sendAction(application, app::manager::actions::Home);
     }
 
 } /* namespace gui */
