@@ -11,6 +11,7 @@ namespace purefs::fs
 {
     filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm) : m_diskmm(diskmm)
     {}
+
     auto filesystem::register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operations> fops) -> int
     {
         cpp_freertos::LockGuard _lck(m_lock);
@@ -21,9 +22,10 @@ namespace purefs::fs
         }
         else {
             m_fstypes.emplace(std::make_pair(fsname, fops));
-            return 0;
+            return int();
         }
     }
+
     auto filesystem::unregister_filesystem(std::string_view fsname) -> int
     {
         cpp_freertos::LockGuard _lck(m_lock);
@@ -37,8 +39,9 @@ namespace purefs::fs
             return -EBUSY;
         }
         m_fstypes.erase(it);
-        return 0;
+        return int();
     }
+
     auto filesystem::mount(std::string_view dev_or_part,
                            std::string_view target,
                            std::string_view fs_type,
@@ -81,14 +84,57 @@ namespace purefs::fs
                     return ret_mnt;
             }
         }
-        return 0;
+        return int();
     }
+
     auto filesystem::umount(std::string_view mount_point) -> int
     {
-        return -1;
+        cpp_freertos::LockGuard _lck(m_lock);
+        auto mnti = m_mounts.find(std::string(mount_point));
+        if (mnti == std::end(m_mounts)) {
+            return -ENOENT;
+        }
+        auto fsops = mnti->second->fs_ops().lock();
+        if (!fsops) {
+            LOG_ERROR("Unable to lock filesystem operation");
+            return -EIO;
+        }
+        const auto umnt_ret = fsops->umount(mnti->second);
+        if (umnt_ret) {
+            return umnt_ret;
+        }
+        m_mounts.erase(mnti);
+        return int();
     }
+
     auto filesystem::read_mountpoints(std::list<std::string> &mountpoints) const -> int
     {
-        return -1;
+        cpp_freertos::LockGuard _lck(m_lock);
+        for (const auto &mntp : m_mounts) {
+            mountpoints.push_back(mntp.first);
+        }
+        return int();
+    }
+
+    auto filesystem::find_mount_point(std::string_view path) const noexcept
+        -> std::tuple<std::shared_ptr<internal::mount_point>, size_t>
+    {
+        size_t longest_match{};
+        std::shared_ptr<internal::mount_point> mount_pnt;
+        cpp_freertos::LockGuard _lck(m_lock);
+        for (const auto &mntp : m_mounts) {
+            const auto slen = mntp.first.size();
+            if ((slen < longest_match) || (slen > path.size())) {
+                continue;
+            }
+            if ((slen > 1) && (path[slen] != '/') && (path[slen] != '\0')) {
+                continue;
+            }
+            if (path.compare(0, slen, mntp.first) == 0) {
+                mount_pnt     = mntp.second;
+                longest_match = slen;
+            }
+        }
+        return std::make_tuple(mount_pnt, longest_match);
     }
 } // namespace purefs::fs

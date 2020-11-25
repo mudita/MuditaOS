@@ -26,6 +26,18 @@ namespace purefs::fs::internal
                     std::shared_ptr<filesystem_operations> fs)
             : m_diskh(diskh), m_path(path), m_fs(fs)
         {}
+        auto disk() const noexcept
+        {
+            return m_diskh;
+        }
+        auto mount_path() const noexcept
+        {
+            return m_path;
+        }
+        auto fs_ops() const noexcept
+        {
+            return m_fs;
+        }
 
       private:
         const std::weak_ptr<blkdev::internal::disk_handle> m_diskh;
