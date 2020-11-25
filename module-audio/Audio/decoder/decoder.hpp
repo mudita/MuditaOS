@@ -12,6 +12,11 @@
 
 namespace audio
 {
+    namespace channel
+    {
+        constexpr inline auto monoSound   = 1;
+        constexpr inline auto stereoSound = 2;
+    } // namespace channel
 
     struct Tags
     {

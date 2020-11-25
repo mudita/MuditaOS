@@ -4,6 +4,10 @@
 
 * `[cellular]` Integration with basic flow for SIM card (cellular<>GUI)
 
+### Fixed
+
+* `[audio]` Fix playback of mono sound using headphones
+
 ## [0.48.1 2020-11-23]
 
 ### Added
