@@ -267,6 +267,9 @@ namespace app::manager
         connect(typeid(CellularUnlockSimMessage), convertibleToActionHandler);
         connect(typeid(CellularBlockSimMessage), convertibleToActionHandler);
         connect(typeid(CellularDisplayCMEMessage), convertibleToActionHandler);
+        connect(typeid(CellularMMIResultMessage), convertibleToActionHandler);
+        connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
+        connect(typeid(CellularMMIPushMessage), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

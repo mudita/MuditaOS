@@ -16,6 +16,8 @@
 #include "service-cellular/requests/ImeiRequest.hpp"
 #include "service-cellular/requests/UssdRequest.hpp"
 
+#include <service-appmgr/model/ApplicationManager.hpp>
+
 void CellularRequestHandler::handle(ImeiRequest &request, at::Result &result)
 {
     if (!request.checkModemResponse(result)) {
@@ -23,17 +25,20 @@ void CellularRequestHandler::handle(ImeiRequest &request, at::Result &result)
         return;
     }
     request.setHandled(true);
+    auto msg = std::make_shared<CellularMMIPushMessage>(result.response[0]);
+    sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
 }
 
 void CellularRequestHandler::handle(UssdRequest &request, at::Result &result)
 {
-    if (!request.checkModemResponse(result)) {
-        request.setHandled(false);
-        return;
+    auto requestHandled = request.checkModemResponse(result);
+
+    if (requestHandled) {
+        cellular.ussdState = ussd::State::pullRequestSent;
+        cellular.setUSSDTimer();
     }
-    cellular.ussdState = ussd::State::pullRequestSent;
-    cellular.setUSSDTimer();
-    request.setHandled(true);
+    request.setHandled(requestHandled);
+    sendActionMessage(requestHandled);
 }
 
 void CellularRequestHandler::handle(CallRequest &request, at::Result &result)
@@ -54,27 +59,30 @@ void CellularRequestHandler::handle(CallRequest &request, at::Result &result)
 
 void CellularRequestHandler::handle(SupplementaryServicesRequest &request, at::Result &result)
 {
-    if (!request.checkModemResponse(result)) {
-        request.setHandled(false);
-        return;
-    }
-    request.setHandled(true);
+    auto requestHandled = request.checkModemResponse(result);
+    request.setHandled(requestHandled);
+    sendActionMessage(requestHandled);
 }
 
 void CellularRequestHandler::handle(PasswordRegistrationRequest &request, at::Result &result)
 {
-    if (!request.checkModemResponse(result)) {
-        request.setHandled(false);
-        return;
-    }
-    request.setHandled(true);
+    auto requestHandled = request.checkModemResponse(result);
+    request.setHandled(requestHandled);
+    sendActionMessage(requestHandled);
 }
 
 void CellularRequestHandler::handle(PinChangeRequest &request, at::Result &result)
 {
-    if (!request.checkModemResponse(result)) {
-        request.setHandled(false);
-        return;
-    }
-    request.setHandled(true);
+    auto requestHandled = request.checkModemResponse(result);
+    request.setHandled(requestHandled);
+    sendActionMessage(requestHandled);
+}
+
+void CellularRequestHandler::sendActionMessage(bool result)
+{
+    using namespace app::manager::actions;
+
+    auto msg = std::make_shared<CellularMMIResultMessage>(result ? MMIResultParams::MMIResult::success
+                                                                 : MMIResultParams::MMIResult::failed);
+    sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
 }

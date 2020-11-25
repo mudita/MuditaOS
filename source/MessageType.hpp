@@ -100,6 +100,8 @@ enum class MessageType
     CellularGetAntenna,
     CellularTransmitDtmfTones,
     CellularUSSDRequest,
+    CellularUSSDReceived,
+    CellularMMIResponse,
     CellularTimeUpdated,
     CellularSimState,
 

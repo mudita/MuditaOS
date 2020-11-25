@@ -637,9 +637,13 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             auto resp   = handleAllMessagesFromMessageStorage();
             responseMsg = std::make_shared<CellularResponseMessage>(resp);
         } break;
-        case CellularNotificationMessage::Type::SignalStrengthUpdate:
-        case CellularNotificationMessage::Type::NetworkStatusUpdate:
         case CellularNotificationMessage::Type::NewIncomingUSSD: {
+
+            auto message = std::make_shared<CellularMMIResponseMessage>(msg->data);
+            sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
+        } break;
+        case CellularNotificationMessage::Type::SignalStrengthUpdate:
+        case CellularNotificationMessage::Type::NetworkStatusUpdate: {
             // skipped
             responseMsg = std::make_shared<CellularResponseMessage>(false);
         }
