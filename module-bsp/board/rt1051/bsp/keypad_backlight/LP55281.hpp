@@ -57,7 +57,7 @@ namespace bsp
         constexpr auto WAKEUP       = NSTDBY | BOOST_EN | LED_PORTS_EN;
 
         // Led test threshold
-        // 0.18mA = (15mA/255) * 17
+        // 0.18mA = (15mA/255) * 3
         constexpr auto LED_TEST_THRESHOLD = 3;
         constexpr auto EN_LED_TEST        = 0b00010000;
 
