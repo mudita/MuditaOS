@@ -56,6 +56,11 @@ namespace bsp
         constexpr auto LED_PORTS_EN = 0b00001110; // Only ports 2-4 active on board
         constexpr auto WAKEUP       = NSTDBY | BOOST_EN | LED_PORTS_EN;
 
+        // Led test threshold
+        // 0.18mA = (15mA/255) * 17
+        constexpr auto LED_TEST_THRESHOLD = 3;
+        constexpr auto EN_LED_TEST        = 0b00010000;
+
         inline uint8_t encode_diode_brightness(float normalized_brightness)
         {
             // Normalized brightness to 6bit code

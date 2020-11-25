@@ -20,6 +20,7 @@ namespace bsp
         {
             turnOn,
             turnOff,
+            checkState,
         };
 
         // channel intensity 0.0 - 1.0 : min - max
@@ -64,6 +65,9 @@ namespace bsp
 
         // Module reset thorugh I2C interface
         bool reset();
+
+        // Check if backlight is on
+        bool checkState();
 
     } // namespace keypad_backlight
 } // namespace bsp
