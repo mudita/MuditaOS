@@ -1,11 +1,15 @@
 # MuditaOS changelog
 
+### Added
+
+* `[cellular]` Integration with basic flow for SIM card (cellular<>GUI)
+
 ## [0.48.1 2020-11-23]
 
 ### Added
 
-* `[gui][desktop]` Added SIM PIN basic flow implementation.
-* `[cellular]` Added CLIR, CLIP, COLP, and call-waiting MMI support.
+* `[gui][desktop]` Added SIM PIN basic flow implementation
+* `[cellular]` Added CLIR, CLIP, COLP, call waiting, call barring MMIs support
 
 ### Fixed
 

@@ -1,6 +1,8 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+from __future__ import print_function
+
 from gdb.printing import PrettyPrinter, register_pretty_printer
 import gdb
 import uuid
