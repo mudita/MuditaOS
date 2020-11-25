@@ -4,6 +4,7 @@
 #include "RT1051DriverPWM.hpp"
 #include "log/log.hpp"
 #include "../board.h"
+#include <algorithm>
 
 namespace drivers
 {
@@ -64,9 +65,10 @@ namespace drivers
         LOG_DEBUG("Deinit: PWM");
     }
 
-    void RT1051DriverPWM::SetDutyCycle(uint8_t duty_cycle)
+    void RT1051DriverPWM::SetDutyCycle(uint8_t duty_cycle_percent)
     {
-        lastDutyCycle = duty_cycle;
+        cpp_freertos::LockGuard lock(mutex);
+        lastDutyCycle = std::clamp(duty_cycle_percent, static_cast<uint8_t>(0), static_cast<uint8_t>(100));
         PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, lastDutyCycle);
         LOG_DEBUG("Duty cycle set to %u", lastDutyCycle);
     }
@@ -78,12 +80,14 @@ namespace drivers
 
     void RT1051DriverPWM::Start()
     {
+        cpp_freertos::LockGuard lock(mutex);
         PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, lastDutyCycle);
         LOG_DEBUG("PWM start");
     }
 
     void RT1051DriverPWM::Stop()
     {
+        cpp_freertos::LockGuard lock(mutex);
         uint8_t stoppedDutyCycle = 0;
         PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, stoppedDutyCycle);
         LOG_DEBUG("PWM stop");

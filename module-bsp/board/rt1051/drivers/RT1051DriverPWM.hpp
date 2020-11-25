@@ -19,7 +19,7 @@ namespace drivers
 
         ~RT1051DriverPWM();
 
-        void SetDutyCycle(uint8_t duty_cycle) override final;
+        void SetDutyCycle(uint8_t duty_cycle_percent) override final;
 
         uint8_t GetCurrentDutyCycle() override final;
 
@@ -39,6 +39,8 @@ namespace drivers
         pwm_mode_t pwmMode = kPWM_SignedCenterAligned;
 
         uint8_t lastDutyCycle = 0;
+
+        cpp_freertos::MutexStandard mutex;
     };
 
 } // namespace drivers
