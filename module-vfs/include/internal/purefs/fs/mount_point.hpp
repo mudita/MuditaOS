@@ -26,6 +26,7 @@ namespace purefs::fs::internal
                     std::shared_ptr<filesystem_operations> fs)
             : m_diskh(diskh), m_path(path), m_fs(fs)
         {}
+
       private:
         const std::weak_ptr<blkdev::internal::disk_handle> m_diskh;
         const std::string_view m_path;                   //! Mounted path

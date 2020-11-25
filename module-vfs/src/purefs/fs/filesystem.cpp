@@ -73,10 +73,15 @@ namespace purefs::fs
                 }
             }
             if (diskh) {
-                auto mnt_point = std::make_shared<internal::mount_point>(diskh, target, vsi->second);
+                const auto mnt_point = std::make_shared<internal::mount_point>(diskh, target, vsi->second);
+                const auto ret_mnt   = vsi->second->mount(mnt_point);
+                if (!ret_mnt)
+                    m_mounts.emplace(std::make_pair(target, mnt_point));
+                else
+                    return ret_mnt;
             }
         }
-        return -1;
+        return 0;
     }
     auto filesystem::umount(std::string_view mount_point) -> int
     {
