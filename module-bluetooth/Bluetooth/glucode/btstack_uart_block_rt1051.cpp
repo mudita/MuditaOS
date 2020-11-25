@@ -75,7 +75,7 @@ extern "C"
 #ifdef DEBUG_UART
         LOG_INFO("<-- read: %d", len);
 #endif
-        BlueKitchen::getInstance()->read(buffer, len);
+        BlueKitchen::getInstance()->read(reinterpret_cast<char *>(buffer), len);
     }
 
     static void uart_rt1051_send_block(const uint8_t *buffer, uint16_t length)

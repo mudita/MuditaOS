@@ -33,30 +33,29 @@ BlueKitchen *BlueKitchen::getInstance()
     return k;
 }
 
-ssize_t BlueKitchen::read(void *buf, size_t nbytes)
+ssize_t BlueKitchen::read(char *buf, size_t nbytes)
 {
     LOG_DEBUG("BlueKitchen requested %d bytes to read", nbytes);
-    set_rts(false);
-    to_read     = nbytes;
-    to_read_req = nbytes;
-    read_buff   = reinterpret_cast<char *>(buf);
-    // set bt ptr to 0, len to 0, to read to nbytes
-    // bt->to_read
+
+    ssize_t i            = 0;
     BaseType_t taskwoken = 0;
-    uint8_t val          = Bt::Message::EvtReceived;
+    uint8_t val;
 
-    if ((to_read != 0) && (in.len >= to_read)) {
+    to_read = nbytes;
 
-        // order our worker to give nbytes RX bytes over to BlueKitchen
+    read_buff = reinterpret_cast<char *>(buf);
+    read_len  = nbytes;
 
-        to_read = 0;
-        if (qHandle) {
-            xQueueSendFromISR(qHandle, &val, &taskwoken);
-            portEND_SWITCHING_ISR(taskwoken);
-        }
+    if (BluetoothCommon::read(reinterpret_cast<char *>(buf), nbytes) == nbytes) {
+        val = Bt::Message::EvtReceiving;
+        xQueueSend(qHandle, &val, portMAX_DELAY);
     }
-    set_rts(true);
-    return 0;
+    else {
+        val = Bt::Message::EvtReceivingError;
+        xQueueSend(qHandle, &val, portMAX_DELAY);
+    }
+
+    return i;
 }
 
 void BlueKitchen::set_flowcontrol(int on)
@@ -66,11 +65,14 @@ void BlueKitchen::set_flowcontrol(int on)
 
 #include <sstream>
 
-ssize_t BlueKitchen::write_blocking(char *buf, ssize_t size)
+ssize_t BlueKitchen::write(char *buf, size_t size)
 {
+
+    LOG_DEBUG("BlueKitchen sends %d bytes", size);
+
     ssize_t i            = 0;
     BaseType_t taskwoken = 0;
-    uint8_t val          = Bt::Message::EvtSent;
+    uint8_t val;
 
 #define DO_DEBUG_HCI_COMS
 #ifdef DO_DEBUG_HCI_COMS
@@ -80,14 +82,24 @@ ssize_t BlueKitchen::write_blocking(char *buf, ssize_t size)
     }
     LOG_DEBUG("--> [%d]>%s<", size, ss.str().c_str());
 #endif
-    if (BluetoothCommon::write_blocking(buf, size) == size) {
-        xQueueSendFromISR(qHandle, &val, &taskwoken);
+    if (BluetoothCommon::read_cts() == 0) {
+        if (BluetoothCommon::write(buf, size) == size) {
+            val = Bt::Message::EvtSending;
+            xQueueSendFromISR(qHandle, &val, &taskwoken);
+        }
+        else {
+            val = Bt::Message::EvtSendingError;
+            xQueueSendFromISR(qHandle, &val, &taskwoken);
+        }
         portEND_SWITCHING_ISR(taskwoken);
     }
     else {
-        val = Bt::Message::EvtSentError;
+        LOG_WARN("Tx: not clear to send");
+        val = Bt::Message::EvtSendingError;
         xQueueSendFromISR(qHandle, &val, &taskwoken);
+        i = -1;
     }
+
     return i;
 }
 

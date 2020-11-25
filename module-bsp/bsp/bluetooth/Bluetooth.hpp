@@ -102,7 +102,7 @@ namespace bsp {
             // generall
             virtual void open() = 0;    // enable device -> irq enable
             virtual void close() = 0;   // disable device -> irq disable
-            virtual ssize_t read(void *buf, size_t nbytes) = 0; // read from internal in buffor
+            virtual ssize_t read(char *buf, size_t nbytes) = 0; // read from internal in buffer
             void log(LogLvl lvl,const char* val, ...);
             // uart specyfic
     };
@@ -120,6 +120,7 @@ namespace bsp {
             // uart specyfic Common part
             virtual void open() override;
             virtual void close() override;
+            virtual ssize_t read(char *buf, size_t nbytes) override;
             virtual ssize_t write(char *buf, size_t nbytes);
             virtual ssize_t write_blocking(char *buf, ssize_t len);
             Error set_baudrate(uint32_t bd);
@@ -128,8 +129,6 @@ namespace bsp {
             int read_cts();
             void sleep_ms(ssize_t ms);
             void set_irq(bool enable);
-            // Part to override
-            virtual ssize_t read(void *buf, size_t nbytes) override = 0;
 
           private:
             void configure_uart_io();
@@ -157,9 +156,9 @@ namespace bsp {
             virtual ~BlueKitchen();
             static BlueKitchen *getInstance();
 
-            virtual ssize_t read(void *buf, size_t nbytes) override;
-            virtual ssize_t write_blocking(char *buf, ssize_t len) override;
-            volatile uint32_t to_read_req = 0;
+            virtual ssize_t read(char *buf, size_t nbytes) override;
+            virtual ssize_t write(char *buf, size_t nbytes) override;
+            volatile uint32_t read_len = 0;
             volatile uint32_t to_read = 0;
             volatile char* read_buff;
 

@@ -127,11 +127,14 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
 
     Bt::Message notification = Bt::Message::EvtErrorRec;
     if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
-        LOG_ERROR("Receive failure!");
+        LOG_ERROR("Queue receive failure!");
         return false;
     }
     auto bt = BlueKitchen::getInstance();
     switch (notification) {
+    case Bt::Message::EvtSending:
+        LOG_DEBUG("[evt] sending");
+        break;
     case Bt::Message::EvtSent:
 #define DO_DEBUG_HCI_COMS
 #ifdef DO_DEBUG_HCI_COMS
@@ -141,38 +144,31 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
             bt->write_done_cb();
         }
         break;
+    case Bt::Message::EvtReceiving:
+        LOG_DEBUG("[evt] receiving");
+        bt->set_rts(true);
+        break;
     case Bt::Message::EvtReceived: {
-        if (bt->to_read_req > bt->in.len) {
-            // LOG_ERROR("%d vs %d", bt->to_read_req, bt->in.len);
-            break;
-        }
-        for (int i = 0; i < bt->to_read_req; ++i) {
-            // error in pop should never happen
-            if (int ret = bt->in.pop((char *)bt->read_buff + i)) {
-                LOG_ERROR("This shall never happen: %d", ret);
-            }
-        }
-        // LOG_DEBUG(">> %d",bt->in.len);
 #ifdef DO_DEBUG_HCI_COMS
         std::stringstream ss;
-        for (int i = 0; i < bt->to_read_req; ++i) {
+        for (int i = 0; i < bt->read_len; ++i) {
             ss << " 0x" << std::hex << (int)*(bt->read_buff + i);
         }
-        LOG_DEBUG("[evt] recieved <-- [%ld]>%s<", bt->to_read_req, ss.str().c_str());
+        LOG_DEBUG("[evt] recieved <-- [%ld]>%s<", bt->read_len, ss.str().c_str());
 #endif
-        bt->to_read_req = 0;
+        bt->read_len = 0;
 
         if (bt->read_ready_cb) {
             bt->read_ready_cb();
         }
     } break;
-    case Bt::Message::EvtSentError:
-    case Bt::Message::EvtRecError:
+    case Bt::Message::EvtSendingError:
+    case Bt::Message::EvtReceivingError:
+        bt->set_rts(false);
     case Bt::Message::EvtUartError:
-    case Bt::Message::EvtRecUnwanted: {
+    case Bt::Message::EvtRecUnwanted:
         LOG_ERROR("Uart error [%d]: %s", notification, Bt::MessageCstr(notification));
         break;
-    } break;
     default:
         LOG_ERROR("ERROR");
     }
