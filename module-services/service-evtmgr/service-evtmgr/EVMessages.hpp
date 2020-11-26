@@ -131,13 +131,7 @@ namespace sevm
             : Message(MessageType::EVMKeypadBacklightMessage), action(action)
         {}
         bsp::keypad_backlight::Action action;
-    };
-    class KeypadBacklightResultMessage : public KeypadBacklightMessage
-    {
-      public:
-        KeypadBacklightResultMessage(bsp::keypad_backlight::Action action) : KeypadBacklightMessage(action)
-        {}
-        bool success = false;
+        bool success;
     };
 
 } /* namespace sevm*/

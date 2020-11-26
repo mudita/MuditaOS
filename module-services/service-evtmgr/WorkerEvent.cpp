@@ -180,7 +180,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     bsp::cellular::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueCellular)]);
     bsp::magnetometer::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]);
     bsp::torch::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueTorch)]);
-    bsp::keypad_backlight::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueKeypadBacklight)]);
+    bsp::keypad_backlight::init();
 
     time_t timestamp;
     bsp::rtc_GetCurrentTimestamp(&timestamp);

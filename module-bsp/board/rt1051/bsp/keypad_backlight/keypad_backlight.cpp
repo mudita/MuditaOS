@@ -19,8 +19,6 @@ namespace bsp
 
     namespace keypad_backlight
     {
-        static xQueueHandle qHandleIrq = NULL;
-
         static I2CAddress addr = {.deviceAddress = static_cast<uint32_t>(LP55281_DEVICE_ADDR), .subAddressSize = 1};
 
         std::shared_ptr<DriverGPIO> gpio;
@@ -46,13 +44,11 @@ namespace bsp
             return i2c->Read(addr, readout, 1);
         }
 
-        int32_t init(xQueueHandle qHandle)
+        int32_t init()
         {
             i2c = DriverI2C::Create(static_cast<I2CInstances>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_I2C),
                                     DriverI2CParams{.baudrate = static_cast<uint32_t>(
                                                         BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_I2C_BAUDRATE)});
-
-            qHandleIrq = qHandle;
 
             gpio = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_GPIO),
                                       DriverGPIOParams{});
@@ -78,7 +74,6 @@ namespace bsp
         void deinit()
         {
             shutdown();
-            qHandleIrq = NULL;
         }
 
         bool turnOnAll()

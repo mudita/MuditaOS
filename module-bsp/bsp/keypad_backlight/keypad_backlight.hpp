@@ -26,7 +26,7 @@ namespace bsp
         // channel intensity 0.0 - 1.0 : min - max
         using DiodeIntensity = float;
 
-        int32_t init(xQueueHandle qHandle);
+        int32_t init();
 
         void deinit();
 

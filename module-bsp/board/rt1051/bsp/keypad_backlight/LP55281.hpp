@@ -61,7 +61,7 @@ namespace bsp
         constexpr auto LED_TEST_THRESHOLD = 3;
         constexpr auto EN_LED_TEST        = 0b00010000;
 
-        inline uint8_t encode_diode_brightness(float normalized_brightness)
+        constexpr inline uint8_t encode_diode_brightness(float normalized_brightness)
         {
             // Normalized brightness to 6bit code
             std::clamp(normalized_brightness, 0.0f, 1.0f);

@@ -221,7 +221,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
     else if (msgl->messageType == MessageType::EVMKeypadBacklightMessage) {
         auto msg = dynamic_cast<sevm::KeypadBacklightMessage *>(msgl);
         if (msg != nullptr) {
-            auto message = std::make_shared<sevm::KeypadBacklightResultMessage>(msg->action);
+            auto message = std::make_shared<sevm::KeypadBacklightMessage>(msg->action);
 
             switch (msg->action) {
             case bsp::keypad_backlight::Action::turnOn:
