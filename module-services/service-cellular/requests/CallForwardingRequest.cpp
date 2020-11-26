@@ -37,13 +37,26 @@ namespace cellular
 
     auto CallForwardingRequest::command() -> std::string
     {
-        std::vector<commandBuilderFunc> commandParts = {
-            [this]() { return getCommandReason(); },
-            [this]() { return getCommandMode(); },
-            [this]() { return getCommandNumber(); },
-        };
+        std::vector<commandBuilderFunc> commandParts = {[this]() { return getCommandReason(); },
+                                                        [this]() { return getCommandMode(); },
+                                                        [this]() { return getCommandNumber(); }};
 
-        return buildCommand(at::AT::CCFC, commandParts);
+        bool trimEmpty = true;
+
+        if (!getCommandClass().empty()) {
+            commandParts.emplace_back([this]() { return getCommandType(); });
+            commandParts.emplace_back([this]() { return getCommandClass(); });
+            trimEmpty = false;
+        }
+
+        if (!getCommandTime().empty()) {
+            commandParts.emplace_back([this]() { return getCommandSubAddr(); });
+            commandParts.emplace_back([this]() { return getCommandSatype(); });
+            commandParts.emplace_back([this]() { return getCommandTime(); });
+            trimEmpty = false;
+        }
+
+        return buildCommand(at::AT::CCFC, commandParts, trimEmpty);
     }
 
     auto CallForwardingRequest::getCommandReason() const -> std::string
@@ -65,10 +78,10 @@ namespace cellular
     {
         // according to EC25&EC21_AT_Commands_Manual_V1.3
         if (auto pos = phoneNumber.find("+"); pos != std::string::npos) {
-            return addressFormatTypeDefault;
+            return addressFormatTypeInternational;
         }
         else {
-            return addressFormatTypeInternational;
+            return addressFormatTypeDefault;
         }
     }
 
@@ -94,6 +107,15 @@ namespace cellular
     auto CallForwardingRequest::getCommandTime() const -> std::string
     {
         return noReplyConditionTimer;
+    }
+
+    auto CallForwardingRequest::isValid() const noexcept -> bool
+    {
+        if (noReplyConditionTimer.empty()) {
+            return true;
+        }
+        auto time = utils::getNumericValue<int>(noReplyConditionTimer);
+        return std::clamp(time, minNoReplyTime, maxNoReplyTime) == time;
     }
 
     void CallForwardingRequest::handle(RequestHandler &h, at::Result &result)

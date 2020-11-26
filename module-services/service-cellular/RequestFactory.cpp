@@ -74,7 +74,6 @@ namespace cellular
                 catch (const std::runtime_error &except) {
                     LOG_ERROR("Failed to create MMI request. Error message:\n%s", except.what());
                 }
-                break;
             }
         }
         return std::make_unique<CallRequest>(request);

@@ -24,10 +24,7 @@ std::optional<Clip::AddressType> Clip::getType() const
         return std::nullopt;
     }
 
-    int addressType;
-    if (!utils::toNumeric(tokens[magic_enum::enum_integer(Tokens::Type)], addressType)) {
-        return std::nullopt;
-    }
+    auto addressType = utils::getNumericValue<int>(tokens[magic_enum::enum_integer(Tokens::Type)]);
 
     constexpr auto addressTypes = magic_enum::enum_values<Clip::AddressType>();
     for (const auto &type : addressTypes) {
