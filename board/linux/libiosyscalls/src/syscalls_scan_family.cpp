@@ -89,6 +89,10 @@ extern "C" {
             real_fprintf(stderr,"WARNING: redirecting ungetc(%p) to the linux fs\n",__stream);
             return real_ungetc(__c,__stream);
         }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         int ret = ff_fseek(reinterpret_cast<FF_FILE*>(__stream), -1, SEEK_CUR );
         if( ret ) {
             errno = stdioGET_ERRNO();
@@ -105,9 +109,6 @@ extern "C" {
     }
     __asm__(".symver ungetc,vfscanf@GLIBC_2.2.5");
 
-
-
-
     int vfscanf (FILE *__restrict fp, const char *__restrict fmt,
                     __gnuc_va_list ap)
     {
@@ -116,6 +117,10 @@ extern "C" {
             return real_vfscanf(fp,fmt,ap);
         }
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         int ret = 0;
         int t, c;
         int wid = 1 << 20;

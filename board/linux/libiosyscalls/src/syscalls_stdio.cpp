@@ -124,7 +124,12 @@ extern "C"
     {
         TRACE_SYSCALL();
         char pathbuf[ffconfigMAX_FILENAME];
-        auto ret = ff_fopen(vfs::relative_to_root(pathbuf,sizeof pathbuf,pathname), mode);
+        FF_FILE* ret {};
+        if(!vfs::vfs_is_initialized()) {
+            ret = nullptr;
+        } else {
+            ret = ff_fopen(vfs::relative_to_root(pathbuf,sizeof pathbuf,pathname), mode);
+        }
         if(ret) {
             std::lock_guard<std::recursive_mutex> _lck(g_mutex);
             const auto fd = g_handles.insert(ret) + vfs::FIRST_FILEDESC;
@@ -156,6 +161,10 @@ extern "C"
             real_fprintf(stderr,"WARNING: redirecting fclose(%p) to the Linux fs.\n", __stream);
             return real_fclose(__stream);
         }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         auto ret = ff_fclose(reinterpret_cast<FF_FILE *>(__stream));
         {
             std::lock_guard<std::recursive_mutex> _lck(g_mutex);
@@ -185,6 +194,10 @@ extern "C"
         if(!vfs::is_ff_handle(__stream)) {
             return real_feof(__stream);
         }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         auto ret = ff_feof(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
         return ret;
@@ -195,7 +208,7 @@ extern "C"
     {
         TRACE_SYSCALL();
         if(vfs::is_ff_handle(stream)) {
-            return stdioGET_ERRNO();
+            return vfs::vfs_is_initialized()?stdioGET_ERRNO():EIO;
         } else {
             return real_ferror(stream);
         }
@@ -207,6 +220,10 @@ extern "C"
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
             return real_fflush(__stream);
+        }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
         }
         auto ret = ff_fflush(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -220,6 +237,10 @@ extern "C"
         if(!vfs::is_ff_handle(__stream)) {
             return real_fgetc(__stream);
         }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         auto ret = ff_fgetc(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
         return ret;
@@ -231,6 +252,10 @@ extern "C"
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
             return real_fgetpos(__stream, __pos);
+        }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
         }
         auto ret = ff_ftell(reinterpret_cast<FF_FILE *>(__stream));
         if (ret > 0 && __pos) {
@@ -248,6 +273,10 @@ extern "C"
         if(!vfs::is_ff_handle(__stream)) {
             return real_fgetpos64(__stream,__pos);
         }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         auto ret = ff_ftell(reinterpret_cast<FF_FILE *>(__stream));
         if (ret > 0 && __pos) {
             __pos->__pos = ret;
@@ -263,6 +292,10 @@ extern "C"
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
             return real_fgets(__s,__n,__stream);
+        }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return nullptr;
         }
         auto ret = ff_fgets(__s, __n, reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -297,6 +330,10 @@ extern "C"
             return ret;
         }
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         pcBuffer = (char *)ffconfigMALLOC(ffconfigFPRINTF_BUFFER_LENGTH);
         if (pcBuffer == NULL) {
             /* Store the errno to thread local storage. */
@@ -328,6 +365,10 @@ extern "C"
             return real_fputc( __c, __stream );
         }
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         real_fprintf(stderr,"PUTC FILE %p\n", __stream );
         auto ret = ff_fputc(__c, reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -341,6 +382,10 @@ extern "C"
             return real_fputs( __s, __stream );
         }
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         int ret;
         while (*__s) {
             ret = ff_fputc(*__s++, reinterpret_cast<FF_FILE *>(__stream));
@@ -357,6 +402,10 @@ extern "C"
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
             return real_fread(__ptr,__size,__n,__stream);
+        }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
         }
         auto ret = ff_fread(__ptr, __size, __n, reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -377,6 +426,10 @@ extern "C"
                 __filename, __modes,__stream, ret);
             return  ret;
         }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return nullptr;
+        }
         if( fclose(__stream) < 0) {
             return nullptr;
         }
@@ -390,6 +443,10 @@ extern "C"
         if(!vfs::is_ff_handle(__stream)) {
             return real_fseek(__stream,__off,__whence);
         }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         auto ret = ff_fseek(reinterpret_cast<FF_FILE*>(__stream), __off, __whence );
         errno = stdioGET_ERRNO();
         return ret;
@@ -402,6 +459,10 @@ extern "C"
         if(!vfs::is_ff_handle(__stream)) {
             return real_fsetpos(__stream,__pos);
         }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         auto ret = ff_fseek( reinterpret_cast<FF_FILE*>(__stream), __pos->__pos, SEEK_SET );
         errno = stdioGET_ERRNO();
         return ret;
@@ -413,6 +474,10 @@ extern "C"
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
             return real_fsetpos64(__stream,__pos);
+        }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
         }
         auto ret = ff_fseek( reinterpret_cast<FF_FILE*>(__stream), __pos->__pos, SEEK_SET );
         errno = stdioGET_ERRNO();
@@ -427,6 +492,10 @@ extern "C"
         if(!vfs::is_ff_handle(__stream)) {
             return real_ftell(__stream);
         }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         auto ret = ff_ftell(reinterpret_cast<FF_FILE*>(__stream));
         errno = stdioGET_ERRNO();
         return ret;
@@ -440,6 +509,10 @@ extern "C"
             return real_fwrite( __ptr, __size, __n, __s );
         }
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         auto ret = ff_fwrite(__ptr, __size, __n, reinterpret_cast<FF_FILE*>(__s));
         errno = stdioGET_ERRNO();
         return ret;
@@ -451,6 +524,10 @@ extern "C"
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
             return real_getc(__stream);
+        }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
         }
         auto ret = ff_fgetc(reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
@@ -464,6 +541,10 @@ extern "C"
         if(!vfs::is_ff_handle(__stream)) {
             return real_putc(__c,__stream);
         }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         auto ret = ff_fputc(__c, reinterpret_cast<FF_FILE *>(__stream));
         errno    = stdioGET_ERRNO();
         return ret;
@@ -473,6 +554,10 @@ extern "C"
     int remove (const char *__filename) __THROW
     {
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         char namebuf[ffconfigMAX_FILENAME];
         auto ret = ff_remove(vfs::relative_to_root(namebuf,sizeof namebuf, __filename));
         if (ret && stdioGET_ERRNO() == EISDIR)
@@ -487,6 +572,10 @@ extern "C"
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
             real_rewind(__stream);
+        }
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return;
         }
         ff_fseek(reinterpret_cast<FF_FILE*>(__stream), 0L, SEEK_SET);
     }

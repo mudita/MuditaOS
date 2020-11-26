@@ -22,6 +22,10 @@ namespace vfsn::linux::internal
     {
         return std::strncpy(out_path, vfs.relativeToRoot(inpath).c_str(), out_path_len);
     }
+    bool vfs_is_initialized()
+    {
+        return vfs.isInitialized();
+    }
 } // namespace vfsn::linux::internal
 
 vfs::vfs()
@@ -69,5 +73,6 @@ void vfs::Init()
         LOG_INFO("vfs::Init looks like %s exists", userDiskPath.c_str());
     }
     chnNotifier.onFileSystemInitialized();
+    initDone = true;
 }
 #pragma GCC diagnostic pop
