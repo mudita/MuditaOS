@@ -133,10 +133,11 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
     auto bt = BlueKitchen::getInstance();
     switch (notification) {
     case Bt::Message::EvtSending:
+#ifdef DO_DEBUG_HCI_COMS
         LOG_DEBUG("[evt] sending");
+#endif
         break;
     case Bt::Message::EvtSent:
-#define DO_DEBUG_HCI_COMS
 #ifdef DO_DEBUG_HCI_COMS
         LOG_INFO("[evt] sent");
 #endif
@@ -145,8 +146,9 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
         }
         break;
     case Bt::Message::EvtReceiving:
+#ifdef DO_DEBUG_HCI_COMS
         LOG_DEBUG("[evt] receiving");
-        bt->set_rts(true);
+#endif
         break;
     case Bt::Message::EvtReceived: {
 #ifdef DO_DEBUG_HCI_COMS
@@ -164,7 +166,6 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
     } break;
     case Bt::Message::EvtSendingError:
     case Bt::Message::EvtReceivingError:
-        bt->set_rts(false);
     case Bt::Message::EvtUartError:
     case Bt::Message::EvtRecUnwanted:
         LOG_ERROR("Uart error [%d]: %s", notification, Bt::MessageCstr(notification));
