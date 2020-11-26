@@ -9,10 +9,15 @@
 
 * `[audio]` Fix playback of mono sound using headphones
 
+## Changed
+
+* `[alarms]` Database refactor
+
 ## [0.48.1 2020-11-23]
 
 ### Added
 
+* `[gui]` Added support for variable numbers in RichText
 * `[gui][desktop]` Added SIM PIN basic flow implementation
 * `[cellular]` Added CLIR, CLIP, COLP, call waiting, call barring MMIs support
 

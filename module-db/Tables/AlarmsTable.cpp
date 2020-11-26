@@ -1,14 +1,23 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * AlarmsTable.cpp
- *
- *  Created on: 15 lip 2019
- *      Author: kuba
- */
-
 #include "AlarmsTable.hpp"
+#include "AlarmsRecord.hpp"
+
+AlarmsTableRow::AlarmsTableRow(const AlarmsRecord &rec)
+    : Record{rec.ID}, time{rec.time}, snooze{rec.snooze}, status{rec.status}, repeat{rec.repeat}, path{rec.path}
+{}
+
+AlarmsTableRow::AlarmsTableRow(
+    uint32_t id, TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, UTF8 path)
+    : Record{id}, time{time}, snooze{snooze}, status{status}, repeat{repeat}, path{std::move(path)}
+{}
+
+AlarmsTableRow::AlarmsTableRow(const QueryResult &result)
+    : Record{(result)[0].getUInt32()}, time{TimePointFromString((result)[1].getString().c_str())},
+      snooze{(result)[2].getUInt32()}, status{static_cast<AlarmStatus>((result)[3].getInt32())},
+      repeat{(result)[4].getUInt32()}, path{(result)[5].getString()}
+{}
 
 AlarmsTable::AlarmsTable(Database *db) : Table(db)
 {}
@@ -20,11 +29,13 @@ bool AlarmsTable::create()
 
 bool AlarmsTable::add(AlarmsTableRow entry)
 {
-    return db->execute("INSERT or ignore INTO alarms ( time, snooze, status, path ) VALUES (%lu,%lu,%lu,'%q');",
-                       entry.time,
-                       entry.snooze,
-                       entry.status,
-                       entry.path.c_str());
+    return db->execute(
+        "INSERT or ignore INTO alarms ( time, snooze, status, repeat, path ) VALUES ('%q', %lu, %i, %lu,'%q');",
+        TimePointToString(entry.time).c_str(),
+        entry.snooze,
+        entry.status,
+        entry.repeat,
+        entry.path.c_str());
 }
 
 bool AlarmsTable::removeById(uint32_t id)
@@ -57,12 +68,14 @@ bool AlarmsTable::removeByField(AlarmsTableFields field, const char *str)
 
 bool AlarmsTable::update(AlarmsTableRow entry)
 {
-    return db->execute("UPDATE alarms SET time = %lu, snooze = %lu ,status = %lu, path = '%q' WHERE _id=%lu;",
-                       entry.time,
-                       entry.snooze,
-                       entry.status,
-                       entry.path.c_str(),
-                       entry.ID);
+    return db->execute(
+        "UPDATE alarms SET time = '%q', snooze = %lu ,status = %i, repeat = %lu, path = '%q' WHERE _id=%lu;",
+        TimePointToString(entry.time).c_str(),
+        entry.snooze,
+        entry.status,
+        entry.repeat,
+        entry.path.c_str(),
+        entry.ID);
 }
 
 AlarmsTableRow AlarmsTable::getById(uint32_t id)
@@ -73,18 +86,12 @@ AlarmsTableRow AlarmsTable::getById(uint32_t id)
         return AlarmsTableRow();
     }
 
-    return AlarmsTableRow{
-        (*retQuery)[0].getUInt32(), // ID
-        (*retQuery)[1].getUInt32(), // time
-        (*retQuery)[2].getUInt32(), // snooze
-        (*retQuery)[3].getUInt32(), // status
-        (*retQuery)[4].getString(), // path
-    };
+    return AlarmsTableRow(*retQuery);
 }
 
 std::vector<AlarmsTableRow> AlarmsTable::getLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto retQuery = db->query("SELECT * from alarms ORDER BY time ASC LIMIT %lu OFFSET %lu;", limit, offset);
+    auto retQuery = db->query("SELECT * from alarms ORDER BY time(time) ASC LIMIT %lu OFFSET %lu;", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<AlarmsTableRow>();
@@ -93,13 +100,7 @@ std::vector<AlarmsTableRow> AlarmsTable::getLimitOffset(uint32_t offset, uint32_
     std::vector<AlarmsTableRow> ret;
 
     do {
-        ret.push_back(AlarmsTableRow{
-            (*retQuery)[0].getUInt32(), // ID
-            (*retQuery)[1].getUInt32(), // time
-            (*retQuery)[2].getUInt32(), // snooze
-            (*retQuery)[3].getUInt32(), // status
-            (*retQuery)[4].getString(), // path
-        });
+        ret.push_back(AlarmsTableRow(*retQuery));
     } while (retQuery->nextRow());
 
     return ret;
@@ -126,7 +127,7 @@ std::vector<AlarmsTableRow> AlarmsTable::getLimitOffsetByField(uint32_t offset,
         return std::vector<AlarmsTableRow>();
     }
 
-    auto retQuery = db->query("SELECT * from alarms WHERE %q='%q' ORDER BY time LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->query("SELECT * from alarms WHERE %q='%q' ORDER BY time(time) LIMIT %lu OFFSET %lu;",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -139,13 +140,7 @@ std::vector<AlarmsTableRow> AlarmsTable::getLimitOffsetByField(uint32_t offset,
     std::vector<AlarmsTableRow> ret;
 
     do {
-        ret.push_back(AlarmsTableRow{
-            (*retQuery)[0].getUInt32(), // ID
-            (*retQuery)[1].getUInt32(), // time
-            (*retQuery)[2].getUInt32(), // snooze
-            (*retQuery)[3].getUInt32(), // status
-            (*retQuery)[4].getString(), // path
-        });
+        ret.push_back(AlarmsTableRow(*retQuery));
     } while (retQuery->nextRow());
 
     return ret;
@@ -159,7 +154,7 @@ uint32_t AlarmsTable::count()
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].getUInt32()};
+    return (*queryRet)[0].getUInt32();
 }
 
 uint32_t AlarmsTable::countByFieldId(const char *field, uint32_t id)
@@ -170,22 +165,10 @@ uint32_t AlarmsTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].getUInt32()};
+    return (*queryRet)[0].getUInt32();
 }
 
-AlarmsTableRow AlarmsTable::next(time_t time)
+bool AlarmsTable::updateStatuses(AlarmStatus status)
 {
-    auto retQuery = db->query("SELECT * from alarms WHERE status=1 AND time>=%u ORDER BY time ASC LIMIT 1;", time);
-
-    if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
-        return AlarmsTableRow();
-    }
-
-    return AlarmsTableRow{
-        (*retQuery)[0].getUInt32(), // ID
-        (*retQuery)[1].getUInt32(), // time
-        (*retQuery)[2].getUInt32(), // snooze
-        (*retQuery)[3].getUInt32(), // status
-        (*retQuery)[4].getString(), // path
-    };
+    return db->execute("UPDATE alarms SET status = %i;", status);
 }

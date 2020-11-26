@@ -1,15 +1,18 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * AlarmsRecord.cpp
- *
- *  Created on: 15 lip 2019
- *      Author: kuba
- */
-
 #include "AlarmsRecord.hpp"
-#include "AlarmsTable.hpp"
+#include "queries/alarms/QueryAlarmsAdd.hpp"
+#include "queries/alarms/QueryAlarmsRemove.hpp"
+#include "queries/alarms/QueryAlarmsEdit.hpp"
+#include "queries/alarms/QueryAlarmsGet.hpp"
+#include "queries/alarms/QueryAlarmsGetLimited.hpp"
+#include "queries/alarms/QueryAlarmsTurnOffAll.hpp"
+
+AlarmsRecord::AlarmsRecord(const AlarmsTableRow &tableRow)
+    : Record{tableRow.ID}, time{tableRow.time}, snooze{tableRow.snooze}, status{tableRow.status},
+      repeat{tableRow.repeat}, path{tableRow.path}
+{}
 
 AlarmsRecordInterface::AlarmsRecordInterface(AlarmsDB *alarmsDb) : alarmsDB(alarmsDb)
 {}
@@ -20,10 +23,7 @@ AlarmsRecordInterface::~AlarmsRecordInterface()
 bool AlarmsRecordInterface::Add(const AlarmsRecord &rec)
 {
     // Create alarm
-    alarmsDB->alarms.add(
-        AlarmsTableRow{.time = rec.time, .snooze = rec.snooze, .status = rec.status, .path = rec.path});
-
-    // TODO: error check
+    alarmsDB->alarms.add(AlarmsTableRow(rec));
 
     return true;
 }
@@ -60,22 +60,12 @@ std::unique_ptr<std::vector<AlarmsRecord>> AlarmsRecordInterface::GetLimitOffset
 
 std::unique_ptr<std::vector<AlarmsRecord>> AlarmsRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
-    auto alarm = alarmsDB->alarms.getLimitOffset(offset, limit);
+    auto alarms = alarmsDB->alarms.getLimitOffset(offset, limit);
 
     auto records = std::make_unique<std::vector<AlarmsRecord>>();
 
-    AlarmsRecordInterface alarmsInterface(alarmsDB);
-    for (const auto &w : alarm) {
-
-        auto alarmsRec = alarmsInterface.GetByID(w.ID);
-
-        records->push_back({
-            .ID     = w.ID,
-            .time   = w.time,
-            .snooze = w.snooze,
-            .status = w.status,
-            .path   = w.path,
-        });
+    for (const auto &alarm : alarms) {
+        records->push_back(AlarmsRecord(alarm));
     }
 
     return records;
@@ -89,8 +79,7 @@ bool AlarmsRecordInterface::Update(const AlarmsRecord &rec)
         return false;
     }
 
-    alarmsDB->alarms.update(
-        AlarmsTableRow{.ID = rec.ID, .time = rec.time, .snooze = rec.snooze, .status = rec.status, .path = rec.path});
+    alarmsDB->alarms.update(AlarmsTableRow(rec));
 
     return true;
 }
@@ -115,7 +104,7 @@ bool AlarmsRecordInterface::RemoveByField(AlarmsRecordField field, const char *s
 {
 
     switch (field) {
-    case AlarmsRecordField ::Time:
+    case AlarmsRecordField::Time:
         return alarmsDB->alarms.removeByField(AlarmsTableFields::Time, str);
 
     default:
@@ -125,16 +114,95 @@ bool AlarmsRecordInterface::RemoveByField(AlarmsRecordField field, const char *s
 
 AlarmsRecord AlarmsRecordInterface::GetByID(uint32_t id)
 {
-    auto alarm = alarmsDB->alarms.getById(id);
-
-    return AlarmsRecord{
-        .ID = alarm.ID, .time = alarm.time, .snooze = alarm.snooze, .status = alarm.status, .path = alarm.path};
+    return AlarmsRecord(alarmsDB->alarms.getById(id));
 }
 
-AlarmsRecord AlarmsRecordInterface::GetNext(time_t time)
+bool AlarmsRecordInterface::TurnOffAll()
 {
-    auto alarm = alarmsDB->alarms.next(time);
+    return alarmsDB->alarms.updateStatuses(AlarmStatus::Off);
+}
 
-    return AlarmsRecord{
-        .ID = alarm.ID, .time = alarm.time, .snooze = alarm.snooze, .status = alarm.status, .path = alarm.path};
+std::unique_ptr<db::QueryResult> AlarmsRecordInterface::runQuery(std::shared_ptr<db::Query> query)
+{
+    if (typeid(*query) == typeid(db::query::alarms::Get)) {
+        return runQueryImplGetResult(query);
+    }
+    if (typeid(*query) == typeid(db::query::alarms::GetLimited)) {
+        return runQueryImplGetLimitedResult(query);
+    }
+    if (typeid(*query) == typeid(db::query::alarms::TurnOffAll)) {
+        return runQueryImplTurnOffAll(query);
+    }
+    if (typeid(*query) == typeid(db::query::alarms::Add)) {
+        return runQueryImplAdd(query);
+    }
+    if (typeid(*query) == typeid(db::query::alarms::Remove)) {
+        return runQueryImplRemove(query);
+    }
+    if (typeid(*query) == typeid(db::query::alarms::Edit)) {
+        return runQueryImplEdit(query);
+    }
+    return nullptr;
+}
+
+std::unique_ptr<db::query::alarms::GetResult> AlarmsRecordInterface::runQueryImplGetResult(
+    std::shared_ptr<db::Query> query)
+{
+    auto getQuery = static_cast<db::query::alarms::Get *>(query.get());
+    auto records  = GetByID(getQuery->id);
+    auto response = std::make_unique<db::query::alarms::GetResult>(records);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::query::alarms::GetLimitedResult> AlarmsRecordInterface::runQueryImplGetLimitedResult(
+    std::shared_ptr<db::Query> query)
+{
+    auto getLimitedQuery = static_cast<db::query::alarms::GetLimited *>(query.get());
+    auto records         = GetLimitOffset(getLimitedQuery->offset, getLimitedQuery->limit);
+    std::vector<AlarmsRecord> recordVector;
+
+    for (const auto &alarm : *records) {
+        recordVector.emplace_back(alarm);
+    }
+    auto response = std::make_unique<db::query::alarms::GetLimitedResult>(recordVector, GetCount());
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::query::alarms::AddResult> AlarmsRecordInterface::runQueryImplAdd(std::shared_ptr<db::Query> query)
+{
+    auto addQuery = static_cast<db::query::alarms::Add *>(query.get());
+    bool ret      = Add(addQuery->getRecord());
+    auto response = std::make_unique<db::query::alarms::AddResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::query::alarms::RemoveResult> AlarmsRecordInterface::runQueryImplRemove(
+    std::shared_ptr<db::Query> query)
+{
+    auto removeQuery = static_cast<db::query::alarms::Remove *>(query.get());
+    bool ret         = RemoveByID(removeQuery->id);
+    auto response    = std::make_unique<db::query::alarms::RemoveResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::query::alarms::EditResult> AlarmsRecordInterface::runQueryImplEdit(std::shared_ptr<db::Query> query)
+{
+    auto editQuery = static_cast<db::query::alarms::Edit *>(query.get());
+    bool ret       = Update(editQuery->getRecord());
+    auto response  = std::make_unique<db::query::alarms::EditResult>(ret);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::query::alarms::TurnOffAllResult> AlarmsRecordInterface::runQueryImplTurnOffAll(
+    std::shared_ptr<db::Query> query)
+{
+    auto result   = TurnOffAll();
+    auto response = std::make_unique<db::query::alarms::TurnOffAllResult>(result);
+    response->setRequestQuery(query);
+    return response;
 }
