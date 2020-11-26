@@ -7,31 +7,17 @@
 
 namespace gui
 {
+    class Text;
+    class TextDocument;
+
     class TextLineCursor : public TextCursor
     {
+      protected:
       public:
-        using TextCursor::TextCursor;
+        explicit TextLineCursor(gui::Text *parent, unsigned int pos = text::npos, unsigned int block = text::npos);
+        TextLineCursor() = delete;
 
-        uint32_t getScreenLine() const
-        {
-            return line;
-        }
-
-        auto moveCursor(NavigationDirection direction) -> Move
-        {
-            Move movement = TextCursor::moveCursor(direction);
-
-            if (movement == Move::Down) {
-                line++;
-            }
-            else if (movement == Move::Up) {
-                line--;
-            }
-
-            return movement;
-        }
-
-      private:
-        uint32_t line = 0;
+        auto moveCursor(NavigationDirection direction) -> Move override;
     };
+
 } // namespace gui

@@ -93,13 +93,13 @@ namespace gui
         }
     }
 
-    TextLine *Lines::getTextLine(uint32_t line)
+    TextLine *Lines::getLine(unsigned int lineNr)
     {
-        if (lines.empty() || line >= lines.size()) {
+        if (lines.empty() || lineNr >= lines.size()) {
             return nullptr;
         }
 
-        auto it = std::next(lines.begin(), line);
+        auto it = std::next(lines.begin(), lineNr);
         return &*it;
     }
 
