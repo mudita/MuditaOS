@@ -6,6 +6,7 @@
 
 #include <module-utils/date/include/date/date.h>
 #include <time/time_conversion.hpp>
+#include <Utils.hpp>
 #include <random>
 
 using namespace std::chrono;
@@ -227,16 +228,17 @@ inline uint32_t TimePointToHour12H(const TimePoint &tp)
 
 inline std::string TimePointToHourString12H(const TimePoint &tp)
 {
-    auto hour       = TimePointToHour12H(tp);
-    auto hourString = std::to_string(hour);
-    return hourString;
+    auto hour =
+        utils::time::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(utils::time::GetParameters::Hour);
+    auto hour12h = date::make12(std::chrono::hours(hour)).count();
+    return utils::to_string(hour12h);
 }
 
 inline std::string TimePointToHourString24H(const TimePoint &tp)
 {
-    auto hour       = TimePointToHour24H(tp);
-    auto hourString = std::to_string(hour);
-    return hourString;
+    auto hour =
+        utils::time::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(utils::time::GetParameters::Hour);
+    return utils::to_string(hour);
 }
 
 inline std::string TimePointToMinutesString(const TimePoint &tp)
