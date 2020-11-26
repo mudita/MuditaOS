@@ -8,12 +8,12 @@ using namespace app::manager::actions;
 MMIParams::MMIParams(std::string mmiData) : mmiData{std::move(mmiData)}
 {}
 
-std::string MMIParams::getData() const noexcept
+std::string MMIParams::getData() const
 {
     return mmiData;
 }
 
-MMIResultParams::MMIResultParams(MMIResult &result) : result(result)
+MMIResultParams::MMIResultParams(MMIResult result) : result(result)
 {}
 
 MMIResultParams::MMIResult MMIResultParams::getData() const noexcept

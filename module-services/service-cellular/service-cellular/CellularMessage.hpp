@@ -515,15 +515,16 @@ class CellularMMIResult : public CellularMessage
   protected:
     app::manager::actions::MMIResultParams params;
 
-    CellularMMIResult(app::manager::actions::MMIResultParams::MMIResult result)
-        : CellularMessage(MessageType::CellularMMIResult), params(result)
+    explicit CellularMMIResult(app::manager::actions::MMIResultParams::MMIResult result)
+        : CellularMessage(MessageType::CellularMMIData), params(result)
     {}
 };
 
 class CellularMMIResultMessage : public CellularMMIResult, public app::manager::actions::ConvertibleToAction
 {
   public:
-    CellularMMIResultMessage(app::manager::actions::MMIResultParams::MMIResult result) : CellularMMIResult(result)
+    explicit CellularMMIResultMessage(app::manager::actions::MMIResultParams::MMIResult result)
+        : CellularMMIResult(result)
     {}
 
     [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
@@ -539,13 +540,15 @@ class CellularMMIDataMessage : public CellularMessage
   protected:
     app::manager::actions::MMIParams params;
 
-    CellularMMIDataMessage(std::string mmiData) : CellularMessage(MessageType::CellularMMIData), params(mmiData)
+  public:
+    explicit CellularMMIDataMessage(std::string mmiData)
+        : CellularMessage(MessageType::CellularMMIData), params(mmiData)
     {}
 };
 class CellularMMIResponseMessage : public CellularMMIDataMessage, public app::manager::actions::ConvertibleToAction
 {
   public:
-    CellularMMIResponseMessage(std::string mmiData) : CellularMMIDataMessage(std::move(mmiData))
+    explicit CellularMMIResponseMessage(std::string mmiData) : CellularMMIDataMessage(std::move(mmiData))
     {}
 
     [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
@@ -557,7 +560,7 @@ class CellularMMIResponseMessage : public CellularMMIDataMessage, public app::ma
 class CellularMMIPushMessage : public CellularMMIDataMessage, public app::manager::actions::ConvertibleToAction
 {
   public:
-    CellularMMIPushMessage(std::string mmiData) : CellularMMIDataMessage(std::move(mmiData))
+    explicit CellularMMIPushMessage(std::string mmiData) : CellularMMIDataMessage(std::move(mmiData))
     {}
 
     [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>

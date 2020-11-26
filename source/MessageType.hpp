@@ -102,7 +102,6 @@ enum class MessageType
     CellularUSSDRequest,
     CellularTimeUpdated,
     CellularSimState,
-    CellularMMIResult,
     CellularMMIData,
 
     DBNotesAdd,            ///< Add new note's record

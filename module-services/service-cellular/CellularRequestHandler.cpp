@@ -22,6 +22,7 @@ void CellularRequestHandler::handle(ImeiRequest &request, at::Result &result)
 {
     if (!request.checkModemResponse(result)) {
         request.setHandled(false);
+        sendMmiResult(false);
         return;
     }
     request.setHandled(true);
@@ -38,7 +39,7 @@ void CellularRequestHandler::handle(UssdRequest &request, at::Result &result)
         cellular.setUSSDTimer();
     }
     request.setHandled(requestHandled);
-    sendActionMessage(requestHandled);
+    sendMmiResult(requestHandled);
 }
 
 void CellularRequestHandler::handle(CallRequest &request, at::Result &result)
@@ -61,28 +62,28 @@ void CellularRequestHandler::handle(SupplementaryServicesRequest &request, at::R
 {
     auto requestHandled = request.checkModemResponse(result);
     request.setHandled(requestHandled);
-    sendActionMessage(requestHandled);
+    sendMmiResult(requestHandled);
 }
 
 void CellularRequestHandler::handle(PasswordRegistrationRequest &request, at::Result &result)
 {
     auto requestHandled = request.checkModemResponse(result);
     request.setHandled(requestHandled);
-    sendActionMessage(requestHandled);
+    sendMmiResult(requestHandled);
 }
 
 void CellularRequestHandler::handle(PinChangeRequest &request, at::Result &result)
 {
     auto requestHandled = request.checkModemResponse(result);
     request.setHandled(requestHandled);
-    sendActionMessage(requestHandled);
+    sendMmiResult(requestHandled);
 }
 
-void CellularRequestHandler::sendActionMessage(bool result)
+void CellularRequestHandler::sendMmiResult(bool result)
 {
     using namespace app::manager::actions;
 
-    auto msg = std::make_shared<CellularMMIResultMessage>(result ? MMIResultParams::MMIResult::success
-                                                                 : MMIResultParams::MMIResult::failed);
+    auto msg = std::make_shared<CellularMMIResultMessage>(result ? MMIResultParams::MMIResult::Success
+                                                                 : MMIResultParams::MMIResult::Failed);
     sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
 }

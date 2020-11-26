@@ -11,9 +11,9 @@ namespace app::manager::actions
     class MMIParams : public ActionParams
     {
       public:
-        MMIParams(std::string mmiData);
+        explicit MMIParams(std::string mmiData);
 
-        [[nodiscard]] std::string getData() const noexcept;
+        [[nodiscard]] std::string getData() const;
 
       private:
         std::string mmiData;
@@ -24,10 +24,10 @@ namespace app::manager::actions
       public:
         enum class MMIResult
         {
-            success,
-            failed
+            Success,
+            Failed
         };
-        MMIResultParams(MMIResult &result);
+        explicit MMIResultParams(MMIResult result);
         [[nodiscard]] MMIResult getData() const noexcept;
 
       private:
