@@ -33,6 +33,7 @@ namespace vfsn::internal
     {
         auto open_to_fopen_flags(int flags)
         {
+            flags &= ~0x00010000; // Ignore binary
             if ((flags & O_RDONLY) || !flags) {
                 return "r";
             }
@@ -126,7 +127,7 @@ namespace vfsn::internal::syscalls
             _errno_ = EBADF;
             return -1;
         }
-        auto ret = ff_fread(buf, cnt, 1, fil);
+        auto ret = ff_fread(buf, 1, cnt, fil);
         _errno_  = stdioGET_ERRNO();
         return ret * cnt;
     }
