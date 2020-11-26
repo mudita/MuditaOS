@@ -3,10 +3,10 @@
 
 #include "DayEventsItem.hpp"
 #include "CalendarStyle.hpp"
-#include "application-calendar/data/TimeDisplayParser.hpp"
 #include <ListView.hpp>
 #include <gui/widgets/Label.hpp>
 #include <Style.hpp>
+#include <module-utils/time/TimeRangeParser.hpp>
 
 namespace gui
 {
@@ -49,7 +49,7 @@ namespace gui
 
         if (rec != nullptr) {
             description->setText(this->record->title.c_str());
-            title->setText(TimeDisplayParser().getTimeString(record));
+            title->setText(utils::time::TimeRangeParser().getCalendarTimeString(record->date_from, record->date_till));
             if (record->reminder == static_cast<uint32_t>(Reminder::never)) {
                 clock->setVisible(false);
             }

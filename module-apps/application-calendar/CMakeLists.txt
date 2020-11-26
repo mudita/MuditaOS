@@ -38,7 +38,6 @@
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarStyle.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/OptionParser.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/CalendarData.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/TimeDisplayParser.hpp"
 )
 
 target_link_libraries(${PROJECT_NAME}
