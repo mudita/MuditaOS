@@ -10,7 +10,7 @@ namespace bsp
 {
     namespace keypad_backlight
     {
-        bool diodes_state              = false;
+        bool diodes_state = false;
 
         int32_t init()
         {
