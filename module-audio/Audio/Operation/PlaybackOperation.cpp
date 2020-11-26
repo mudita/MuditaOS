@@ -90,9 +90,16 @@ namespace audio
         eventCallback = callback;
         state         = State::Active;
 
-        currentProfile->SetInOutFlags(tags->num_channel == 2
-                                          ? static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputStereo)
-                                          : static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono));
+        if (tags->num_channel == channel::stereoSound) {
+            currentProfile->SetInOutFlags(static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputStereo));
+        }
+        else {
+            currentProfile->SetInOutFlags(static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono));
+            if (currentProfile->GetOutputPath() == bsp::AudioDevice::OutputPath::Headphones) {
+                currentProfile->SetOutputPath(bsp::AudioDevice::OutputPath::HeadphonesMono);
+            }
+        }
+
         currentProfile->SetSampleRate(tags->sample_rate);
 
         auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
