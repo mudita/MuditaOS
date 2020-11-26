@@ -38,8 +38,10 @@ void CellularRequestHandler::handle(UssdRequest &request, at::Result &result)
         cellular.ussdState = ussd::State::pullRequestSent;
         cellular.setUSSDTimer();
     }
+    else {
+        sendMmiResult(requestHandled);
+    }
     request.setHandled(requestHandled);
-    sendMmiResult(requestHandled);
 }
 
 void CellularRequestHandler::handle(CallRequest &request, at::Result &result)

@@ -123,8 +123,8 @@ struct Logger
     std::map<std::string, logger_level> filtered = {
         // {"ServiceDB", logger_level::LOGFATAL},
         {"ApplicationManager", logger_level::LOGINFO},
-        //        {"TS0710Worker", logger_level::LOGINFO},
-        //        {"ServiceCellular", logger_level::LOGINFO},
+        {"TS0710Worker", logger_level::LOGINFO},
+        {"ServiceCellular", logger_level::LOGINFO},
         {"ServiceAntenna", logger_level::LOGINFO},
         {"ServiceFota", logger_level::LOGINFO},
         {"ServiceEink", logger_level::LOGINFO},
