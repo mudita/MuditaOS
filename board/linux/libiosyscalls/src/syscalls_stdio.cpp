@@ -179,7 +179,7 @@ extern "C"
     }
     __asm__(".symver fclose,fclose@GLIBC_2.2.5");
 
-    FILE *fdopen(int __fd, const char *__modes) __THROW __wur
+    FILE *fdopen(int __fd, const char *__modes) __THROW
     {
         TRACE_SYSCALL();
         real_fprintf(stderr, "unimplemented call %s\n", __PRETTY_FUNCTION__  );
@@ -188,7 +188,7 @@ extern "C"
     }
     __asm__(".symver fdopen,fdopen@GLIBC_2.2.5");
 
-    int feof(FILE *__stream) __THROW __wur
+    int feof(FILE *__stream) __THROW
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
@@ -204,7 +204,7 @@ extern "C"
     }
     __asm__(".symver feof,feof@GLIBC_2.2.5");
 
-    int ferror(FILE * stream) __THROW __wur
+    int ferror(FILE * stream) __THROW
     {
         TRACE_SYSCALL();
         if(vfs::is_ff_handle(stream)) {
@@ -287,7 +287,7 @@ extern "C"
     }
     __asm__(".symver fgetpos64,fgetpos64@GLIBC_2.2.5");
 
-    char *fgets(char *__restrict __s, int __n, FILE *__restrict __stream) __wur
+    char *fgets(char *__restrict __s, int __n, FILE *__restrict __stream)
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
@@ -303,7 +303,7 @@ extern "C"
     }
     __asm__(".symver fgets,fgets@GLIBC_2.2.5");
 
-    int fileno(FILE *__stream) __THROW __wur
+    int fileno(FILE *__stream) __THROW
     {
         auto ret = vfsn::linux::internal::ff_file_to_fd(reinterpret_cast<FF_FILE*>(__stream));
         if(ret<0) {
@@ -386,7 +386,7 @@ extern "C"
             errno = EIO;
             return -1;
         }
-        int ret;
+        int ret{-1};
         while (*__s) {
             ret = ff_fputc(*__s++, reinterpret_cast<FF_FILE *>(__stream));
             if (ret < 0)
@@ -397,7 +397,7 @@ extern "C"
     }
     __asm__(".symver fputs,fputs@GLIBC_2.2.5");
 
-    size_t fread(void *__restrict __ptr, size_t __size, size_t __n, FILE *__restrict __stream) __wur
+    size_t fread(void *__restrict __ptr, size_t __size, size_t __n, FILE *__restrict __stream)
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
@@ -416,7 +416,7 @@ extern "C"
 
     FILE *freopen (const char *__restrict __filename,
                       const char *__restrict __modes,
-                      FILE *__restrict __stream) __wur
+                      FILE *__restrict __stream)
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {
@@ -486,7 +486,7 @@ extern "C"
     __asm__(".symver fsetpos64,fsetpos64@GLIBC_2.2.5");
 
 
-    long int ftell (FILE *__stream) __wur
+    long int ftell (FILE *__stream)
     {
         TRACE_SYSCALL();
         if(!vfs::is_ff_handle(__stream)) {

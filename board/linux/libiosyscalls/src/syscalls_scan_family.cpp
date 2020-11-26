@@ -170,7 +170,7 @@ extern "C" {
     __asm__(".symver vfscanf,vfscanf@GLIBC_2.2.5");
 
     int fscanf (FILE *__restrict fp,
-                   const char *__restrict fmt, ...) __wur
+                   const char *__restrict fmt, ...)
     {
         TRACE_SYSCALL();
         va_list ap;
