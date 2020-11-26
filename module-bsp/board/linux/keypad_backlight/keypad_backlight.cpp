@@ -12,7 +12,7 @@ namespace bsp
     {
         bool diodes_state              = false;
 
-        int32_t init(xQueueHandle qHandle)
+        int32_t init()
         {
             return 0;
         }

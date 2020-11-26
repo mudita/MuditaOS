@@ -23,29 +23,22 @@ namespace bsp
             checkState,
         };
 
-        // channel intensity 0.0 - 1.0 : min - max
         using DiodeIntensity = float;
 
         int32_t init();
 
         void deinit();
 
-        // Turn on whole backlight
         bool turnOnAll();
 
-        // Configure mode of operation and enable output
         bool configureModule();
 
-        // Module shutdown - registers erased
         bool shutdown();
 
-        // Wakeup module - registers in default state
         void wakeup();
 
-        // Module reset thorugh I2C interface
         bool reset();
 
-        // Check if backlight is on
         bool checkState();
 
     } // namespace keypad_backlight
