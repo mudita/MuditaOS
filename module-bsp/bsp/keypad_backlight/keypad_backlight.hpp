@@ -12,34 +12,31 @@ extern "C"
 #include "queue.h"
 }
 
-namespace bsp
+namespace bsp::keypad_backlight
 {
-    namespace keypad_backlight
+    enum class Action
     {
-        enum class Action
-        {
-            turnOn,
-            turnOff,
-            checkState,
-        };
+        turnOn,
+        turnOff,
+        checkState,
+    };
 
-        using DiodeIntensity = float;
+    using DiodeIntensity = float;
 
-        std::int32_t init();
+    std::int32_t init();
 
-        void deinit();
+    void deinit();
 
-        bool turnOnAll();
+    bool turnOnAll();
 
-        bool configureModule();
+    bool configureModule();
 
-        bool shutdown();
+    bool shutdown();
 
-        void wakeup();
+    void wakeup();
 
-        bool reset();
+    bool reset();
 
-        bool checkState();
+    bool checkState();
 
-    } // namespace keypad_backlight
-} // namespace bsp
+} // namespace bsp::keypad_backlight

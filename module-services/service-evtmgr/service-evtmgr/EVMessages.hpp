@@ -130,22 +130,7 @@ namespace sevm
         explicit KeypadBacklightMessage() : Message(MessageType::EVMKeypadBacklightMessage)
         {}
 
-        bool processAction(bsp::keypad_backlight::Action act)
-        {
-            bool response = false;
-            switch (act) {
-            case bsp::keypad_backlight::Action::turnOn:
-                response = bsp::keypad_backlight::turnOnAll();
-                break;
-            case bsp::keypad_backlight::Action::turnOff:
-                response = bsp::keypad_backlight::shutdown();
-                break;
-            case bsp::keypad_backlight::Action::checkState:
-                response = bsp::keypad_backlight::checkState();
-                break;
-            }
-            return response;
-        }
+        bool processAction(bsp::keypad_backlight::Action act);
 
         bsp::keypad_backlight::Action action;
         bool success;

@@ -6,49 +6,50 @@
 
 using namespace drivers;
 
-namespace bsp
+namespace bsp::keypad_backlight
+
 {
-    namespace keypad_backlight
+    namespace
     {
         bool diodesState = false;
+    }
 
-        std::int32_t init()
-        {
-            return 0;
-        }
+    std::int32_t init()
+    {
+        return 0;
+    }
 
-        void deinit()
-        {}
+    void deinit()
+    {}
 
-        bool turnOnAll()
-        {
-            diodesState = true;
-            return true;
-        }
+    bool turnOnAll()
+    {
+        diodesState = true;
+        return true;
+    }
 
-        bool configureModule()
-        {
-            return true;
-        }
+    bool configureModule()
+    {
+        return true;
+    }
 
-        bool shutdown()
-        {
-            diodesState = false;
-            return true;
-        }
+    bool shutdown()
+    {
+        diodesState = false;
+        return true;
+    }
 
-        void wakeup()
-        {}
+    void wakeup()
+    {}
 
-        bool reset()
-        {
-            return true;
-        }
+    bool reset()
+    {
+        return true;
+    }
 
-        bool checkState()
-        {
-            return diodesState;
-        }
+    bool checkState()
+    {
+        return diodesState;
+    }
 
-    } // namespace keypad_backlight
-} // namespace bsp
+} // namespace bsp::keypad_backlight

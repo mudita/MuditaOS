@@ -14,21 +14,18 @@ using namespace drivers;
 
 static std::shared_ptr<drivers::DriverI2C> i2c;
 
-namespace bsp
+namespace bsp::keypad_backlight
 {
-
-    namespace keypad_backlight
+    namespace
     {
-        static I2CAddress addr = {.deviceAddress = static_cast<uint32_t>(LP55281_DEVICE_ADDR), .subAddressSize = 1};
+        I2CAddress addr = {.deviceAddress = static_cast<uint32_t>(LP55281_DEVICE_ADDR), .subAddressSize = 1};
 
-        std::shared_ptr<DriverGPIO> gpio;
+        const std::array<LP55281_Registers, 4> usedOutputs = {LP55281_Registers::RED2,    // Red right button
+                                                              LP55281_Registers::GREEN3,  // Green left button
+                                                              LP55281_Registers::RED4,    // Keypad right side
+                                                              LP55281_Registers::GREEN4}; // Keypad left side
 
-        static const std::array<LP55281_Registers, 4> usedOutputs = {LP55281_Registers::RED2,    // Red right button
-                                                                     LP55281_Registers::GREEN3,  // Green left button
-                                                                     LP55281_Registers::RED4,    // Keypad right side
-                                                                     LP55281_Registers::GREEN4}; // Keypad left side
-
-        static bool writeSingleRegister(std::uint32_t address, std::uint8_t *to_send)
+        bool writeSingleRegister(std::uint32_t address, std::uint8_t *to_send)
         {
             addr.subAddress    = address;
             auto write_success = i2c->Write(addr, to_send, 1);
@@ -38,122 +35,124 @@ namespace bsp
             return true;
         }
 
-        static ssize_t readSingleRegister(std::uint32_t address, std::uint8_t *readout)
+        ssize_t readSingleRegister(std::uint32_t address, std::uint8_t *readout)
         {
             addr.subAddress = address;
             return i2c->Read(addr, readout, 1);
         }
+    } // namespace
 
-        std::int32_t init()
-        {
-            i2c = DriverI2C::Create(static_cast<I2CInstances>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_I2C),
-                                    DriverI2CParams{.baudrate = static_cast<std::uint32_t>(
-                                                        BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_I2C_BAUDRATE)});
+    std::shared_ptr<DriverGPIO> gpio;
 
-            gpio = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_GPIO),
-                                      DriverGPIOParams{});
+    std::int32_t init()
+    {
+        i2c = DriverI2C::Create(static_cast<I2CInstances>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_I2C),
+                                DriverI2CParams{.baudrate = static_cast<std::uint32_t>(
+                                                    BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_I2C_BAUDRATE)});
 
-            gpio->ConfPin(
-                DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
-                                    .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
-                                    .defLogic = 1,
-                                    .pin = static_cast<std::uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST)});
+        gpio = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_GPIO),
+                                  DriverGPIOParams{});
 
-            wakeup();
-            bool status = reset();
-            shutdown();
+        gpio->ConfPin(
+            DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
+                                .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
+                                .defLogic = 1,
+                                .pin = static_cast<std::uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST)});
 
-            if (status != 1) {
+        wakeup();
+        bool status = reset();
+        shutdown();
 
-                return kStatus_Fail;
+        if (status != 1) {
+
+            return kStatus_Fail;
+        }
+
+        return kStatus_Success;
+    }
+
+    void deinit()
+    {
+        shutdown();
+    }
+
+    bool turnOnAll()
+    {
+        std::uint32_t address;
+        DiodeIntensity intensity = 1.0f; // Maximum brightness
+        Diode_Reg diode_reg      = {.max_current = MAX_DIODE_CURRENT_LIMIT,
+                               .current     = encode_diode_brightness_to_6bits(intensity)};
+
+        wakeup();
+        configureModule();
+
+        for (auto &diode : usedOutputs) {
+            address = static_cast<std::uint32_t>(diode);
+            if (!writeSingleRegister(address, reinterpret_cast<std::uint8_t *>(&diode_reg))) {
+                return false;
             }
+        }
+        return true;
+    }
 
-            return kStatus_Success;
+    bool configureModule()
+    {
+        std::uint8_t reg_val = BOOST_OUTPUT_4V;
+        if (!writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::BOOST_CTRL), &reg_val)) {
+            return false;
         }
 
-        void deinit()
-        {
-            shutdown();
+        reg_val = WAKEUP;
+        if (!writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::ENABLES), &reg_val)) {
+            return false;
         }
 
-        bool turnOnAll()
-        {
-            std::uint32_t address;
-            DiodeIntensity intensity = 1.0f; // Maximum brightness
-            Diode_Reg diode_reg      = {.max_current = MAX_DIODE_CURRENT_LIMIT,
-                                   .current     = encode_diode_brightness_to_6bits(intensity)};
+        return true;
+    }
 
-            wakeup();
-            configureModule();
+    bool shutdown()
+    {
+        gpio->WritePin(static_cast<std::uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST), 0);
+        return true;
+    }
 
-            for (auto &diode : usedOutputs) {
-                address = static_cast<std::uint32_t>(diode);
-                if (!writeSingleRegister(address, reinterpret_cast<std::uint8_t *>(&diode_reg))) {
-                    return false;
-                }
-            }
-            return true;
-        }
+    void wakeup()
+    {
+        gpio->WritePin(static_cast<std::uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST), 1);
+    }
 
-        bool configureModule()
-        {
-            std::uint8_t reg_val = BOOST_OUTPUT_4V;
-            if (!writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::BOOST_CTRL), &reg_val)) {
+    bool reset()
+    {
+        std::uint8_t reset_value = 0xff;
+        return writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::RESET), &reset_value);
+    }
+
+    // Must be run at least 20ms after leds startup
+    bool checkState()
+    {
+        std::uint8_t value = 0;
+        for (const auto diode : usedOutputs) {
+            value = static_cast<std::uint8_t>(diode) | EN_LED_TEST;
+
+            if (!writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::LED_TEST), &value)) {
                 return false;
             }
 
-            reg_val = WAKEUP;
-            if (!writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::ENABLES), &reg_val)) {
+            vTaskDelay(pdMS_TO_TICKS(2));
+
+            if (readSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::ADC_OUT), &value) != 1) {
                 return false;
             }
 
-            return true;
-        }
-
-        bool shutdown()
-        {
-            gpio->WritePin(static_cast<std::uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST), 0);
-            return true;
-        }
-
-        void wakeup()
-        {
-            gpio->WritePin(static_cast<std::uint32_t>(BoardDefinitions::KEYPAD_BACKLIGHT_DRIVER_NRST), 1);
-        }
-
-        bool reset()
-        {
-            std::uint8_t reset_value = 0xff;
-            return writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::RESET), &reset_value);
-        }
-
-        // Must be run at least 20ms after leds startup
-        bool checkState()
-        {
-            std::uint8_t value = 0;
-            for (const auto diode : usedOutputs) {
-                value = static_cast<std::uint8_t>(diode) | EN_LED_TEST;
-
-                if (!writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::LED_TEST), &value)) {
-                    return false;
-                }
-
-                vTaskDelay(pdMS_TO_TICKS(2));
-
-                if (readSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::ADC_OUT), &value) != 1) {
-                    return false;
-                }
-
-                if (value < LED_TEST_THRESHOLD) {
-                    return false;
-                }
+            if (value < LED_TEST_THRESHOLD) {
+                return false;
             }
-
-            value = 0;
-            writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::LED_TEST), &value);
-
-            return true;
         }
 
-    } // namespace keypad_backlight
-} // namespace bsp
+        value = 0;
+        writeSingleRegister(static_cast<std::uint32_t>(LP55281_Registers::LED_TEST), &value);
+
+        return true;
+    }
+
+} // namespace bsp::keypad_backlight
