@@ -9,6 +9,10 @@
 
 * `[audio]` Fix playback of mono sound using headphones
 
+## Changed
+
+* `[alarms]` Database refactor
+
 ## [0.48.1 2020-11-23]
 
 ### Added
