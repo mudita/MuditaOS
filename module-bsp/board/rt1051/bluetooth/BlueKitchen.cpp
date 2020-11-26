@@ -33,7 +33,7 @@ BlueKitchen *BlueKitchen::getInstance()
     return k;
 }
 
-ssize_t BlueKitchen::read(char *buf, size_t nbytes)
+ssize_t BlueKitchen::read(uint8_t *buf, size_t nbytes)
 {
 #ifdef DO_DEBUG_HCI_COMS
     LOG_DEBUG("BlueKitchen requested %d bytes to read", nbytes);
@@ -48,7 +48,7 @@ ssize_t BlueKitchen::read(char *buf, size_t nbytes)
     read_buff = reinterpret_cast<char *>(buf);
     read_len  = nbytes;
 
-    if (BluetoothCommon::read(reinterpret_cast<char *>(buf), nbytes) == nbytes) {
+    if (BluetoothCommon::read(buf, nbytes) == nbytes) {
         val = Bt::Message::EvtReceiving;
         xQueueSend(qHandle, &val, portMAX_DELAY);
     }
@@ -67,7 +67,7 @@ void BlueKitchen::set_flowcontrol(int on)
 
 #include <sstream>
 
-ssize_t BlueKitchen::write(char *buf, size_t size)
+ssize_t BlueKitchen::write(const uint8_t *buf, size_t size)
 {
 
     ssize_t i            = 0;

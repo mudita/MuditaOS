@@ -75,7 +75,7 @@ extern "C"
 #ifdef DEBUG_UART
         LOG_INFO("<-- read: %d", len);
 #endif
-        BlueKitchen::getInstance()->read(reinterpret_cast<char *>(buffer), len);
+        BlueKitchen::getInstance()->read(buffer, len);
     }
 
     static void uart_rt1051_send_block(const uint8_t *buffer, uint16_t length)
@@ -83,7 +83,7 @@ extern "C"
 #ifdef DEBUG_UART
         LOG_INFO("--> write: %d", length);
 #endif
-        BlueKitchen::getInstance()->write((char *)buffer, length);
+        BlueKitchen::getInstance()->write(buffer, length);
     }
 
     static const btstack_uart_block_t btstack_uart_posix = {

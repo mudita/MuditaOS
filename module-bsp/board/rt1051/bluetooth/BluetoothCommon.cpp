@@ -89,11 +89,11 @@ void BluetoothCommon::sleep_ms(ssize_t ms)
     ulTaskNotifyTake(pdTRUE, ms);
 }
 
-ssize_t BluetoothCommon::read(char *buf, size_t nbytes)
+ssize_t BluetoothCommon::read(uint8_t *buf, size_t nbytes)
 {
     // start RXfer if there is byte incoming and no pending RXfer
     lpuart_transfer_t receiveXfer;
-    receiveXfer.data     = reinterpret_cast<uint8_t *>(buf);
+    receiveXfer.data     = buf;
     receiveXfer.dataSize = nbytes;
 
     ssize_t ret = 0;
@@ -117,7 +117,7 @@ ssize_t BluetoothCommon::read(char *buf, size_t nbytes)
     return ret;
 }
 
-ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
+ssize_t BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
 {
 #ifdef DO_DEBUG_HCI_COMS
     std::stringstream ss;
@@ -128,7 +128,7 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 #endif
 
     lpuart_transfer_t sendXfer;
-    sendXfer.data     = reinterpret_cast<uint8_t *>(buf);
+    sendXfer.data     = const_cast<uint8_t *>(buf);
     sendXfer.dataSize = nbytes;
 
     uartDmaHandle.userData = xTaskGetCurrentTaskHandle();
@@ -163,7 +163,7 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
     return ret;
 }
 
-ssize_t BluetoothCommon::write_blocking(char *buf, ssize_t len)
+ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t len)
 {
     ssize_t ret = -1;
 
@@ -171,7 +171,7 @@ ssize_t BluetoothCommon::write_blocking(char *buf, ssize_t len)
     bsp::BlueKitchen *bt = bsp::BlueKitchen::getInstance();
     bt->in.flush();
 
-    auto wrote = write(buf, len);
+    auto wrote = write(const_cast<uint8_t *>(buf), len);
 
     if (wrote == len) { // success orchestrating a transfer
         constexpr auto write_blocking_timeout = pdMS_TO_TICKS(100);
