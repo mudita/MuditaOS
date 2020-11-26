@@ -158,7 +158,8 @@ static void ExtVibrationStop()
 
 bool ServiceAudio::IsVibrationEnabled(const audio::PlaybackType &type)
 {
-    auto isEnabled = utils::getValue<audio::Vibrate>(getSetting(Setting::EnableVibration, Profile::Type::Idle, type));
+    auto isEnabled =
+        utils::getNumericValue<audio::Vibrate>(getSetting(Setting::EnableVibration, Profile::Type::Idle, type));
     return isEnabled;
 }
 bool ServiceAudio::IsOperationEnabled(const audio::PlaybackType &plType, const Operation::Type &opType)
@@ -166,7 +167,8 @@ bool ServiceAudio::IsOperationEnabled(const audio::PlaybackType &plType, const O
     if (opType == Operation::Type::Router || opType == Operation::Type::Recorder) {
         return true;
     }
-    auto isEnabled = utils::getValue<audio::EnableSound>(getSetting(Setting::EnableSound, Profile::Type::Idle, plType));
+    auto isEnabled =
+        utils::getNumericValue<audio::EnableSound>(getSetting(Setting::EnableSound, Profile::Type::Idle, plType));
     return isEnabled;
 }
 
@@ -442,7 +444,8 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyP
             return std::make_unique<AudioKeyPressedResponse>(audio::RetCode::Success, 0, muted, context);
         }
     }
-    const auto volume    = utils::getValue<int>(getSetting(Setting::Volume, Profile::Type::Idle, PlaybackType::None));
+    const auto volume =
+        utils::getNumericValue<int>(getSetting(Setting::Volume, Profile::Type::Idle, PlaybackType::None));
     const auto newVolume = std::clamp(volume + step, static_cast<int>(minVolume), static_cast<int>(maxVolume));
     setSetting(Setting::Volume, std::to_string(newVolume), Profile::Type::Idle, PlaybackType::None);
     return std::make_unique<AudioKeyPressedResponse>(audio::RetCode::Success, newVolume, muted, context);
@@ -473,7 +476,7 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     else if (msgType == typeid(AudioGetSetting)) {
         auto *msg   = static_cast<AudioGetSetting *>(msgl);
         auto value  = getSetting(msg->setting, msg->profileType, msg->playbackType);
-        responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, utils::getValue<float>(value));
+        responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, utils::getNumericValue<float>(value));
     }
     else if (msgType == typeid(AudioSetSetting)) {
         auto *msg = static_cast<AudioSetSetting *>(msgl);
@@ -612,7 +615,7 @@ void ServiceAudio::setSetting(const Setting &setting,
         else if (auto input = audioMux.GetIdleInput(); input && (setting == audio::Setting::Volume)) {
             updatedProfile  = (*input)->audio->GetPriorityPlaybackProfile();
             updatedPlayback = PlaybackType::CallRingtone;
-            valueToSet      = std::clamp(utils::getValue<audio::Volume>(value), minVolume, maxVolume);
+            valueToSet      = std::clamp(utils::getNumericValue<audio::Volume>(value), minVolume, maxVolume);
         }
         else {
             return;
@@ -621,14 +624,14 @@ void ServiceAudio::setSetting(const Setting &setting,
 
     switch (setting) {
     case Setting::Volume: {
-        const auto clampedValue = std::clamp(utils::getValue<audio::Volume>(value), minVolume, maxVolume);
+        const auto clampedValue = std::clamp(utils::getNumericValue<audio::Volume>(value), minVolume, maxVolume);
         valueToSet              = std::to_string(clampedValue);
         if (activeInput) {
             retCode = activeInput.value()->audio->SetOutputVolume(clampedValue);
         }
     } break;
     case Setting::Gain: {
-        const auto clampedValue = std::clamp(utils::getValue<audio::Gain>(value), minGain, maxGain);
+        const auto clampedValue = std::clamp(utils::getNumericValue<audio::Gain>(value), minGain, maxGain);
         valueToSet              = std::to_string(clampedValue);
         if (activeInput) {
             retCode = activeInput.value()->audio->SetInputGain(clampedValue);

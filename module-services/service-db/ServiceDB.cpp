@@ -3,7 +3,6 @@
 
 #include "ServiceDB.hpp"
 
-#include "service-db/DBAlarmMessage.hpp"
 #include "service-db/DBCalllogMessage.hpp"
 #include "service-db/DBContactMessage.hpp"
 #include "service-db/DBCountryCodeMessage.hpp"
@@ -424,55 +423,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
                                                                  ret->size(),
                                                                  MessageType::DBContactGetLimitOffset);
 
-    } break;
-
-        /**
-         * Alarm records
-         */
-
-    case MessageType::DBAlarmAdd: {
-        auto time           = utils::time::Scoped("DBAlarmAdd");
-        DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
-        auto ret            = alarmsRecordInterface->Add(msg->record);
-        responseMsg         = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
-        if (ret == true) {
-            sendUpdateNotification(db::Interface::Name::Alarms, db::Query::Type::Create);
-        }
-    } break;
-
-    case MessageType::DBAlarmRemove: {
-        auto time           = utils::time::Scoped("DBAlarmRemove");
-        DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
-        auto ret            = alarmsRecordInterface->RemoveByID(msg->id);
-        responseMsg         = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
-    } break;
-
-    case MessageType::DBAlarmUpdate: {
-        auto time           = utils::time::Scoped("DBAlarmUpdate");
-        DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
-        auto ret            = alarmsRecordInterface->Update(msg->record);
-        responseMsg         = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
-    } break;
-
-    case MessageType::DBAlarmGetCount: {
-        auto time   = utils::time::Scoped("DBAlarmGetCount");
-        auto ret    = alarmsRecordInterface->GetCount();
-        responseMsg = std::make_shared<DBAlarmResponseMessage>(nullptr, true, ret);
-    } break;
-
-    case MessageType::DBAlarmGetLimitOffset: {
-        auto time           = utils::time::Scoped("DBAlarmGetLimitOffset");
-        DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
-        auto ret            = alarmsRecordInterface->GetLimitOffset(msg->offset, msg->limit);
-        responseMsg         = std::make_shared<DBAlarmResponseMessage>(std::move(ret), true);
-    } break;
-    case MessageType::DBAlarmGetNext: {
-        auto time           = utils::time::Scoped("DBAlarmGetNext");
-        DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
-        auto ret            = alarmsRecordInterface->GetNext(msg->time);
-        auto records        = std::make_unique<std::vector<AlarmsRecord>>();
-        records->push_back(ret);
-        responseMsg = std::make_shared<DBAlarmResponseMessage>(std::move(records), ret.ID == 0 ? false : true);
     } break;
 
         /**

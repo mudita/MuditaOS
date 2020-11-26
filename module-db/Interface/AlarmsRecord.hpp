@@ -1,27 +1,41 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * AlarmsRecord.hpp
- *
- *  Created on: 15 lip 2019
- *      Author: kuba
- */
 #pragma once
 
 #include "Record.hpp"
+#include "module-db/Databases/AlarmsDB.hpp"
+#include "module-db/Common/Common.hpp"
+#include <module-utils/utf8/UTF8.hpp>
+#include <module-apps/application-calendar/data/dateCommon.hpp>
 #include <stdint.h>
-#include "../Databases/AlarmsDB.hpp"
-#include "utf8/UTF8.hpp"
-#include "../Common/Common.hpp"
 
-struct AlarmsRecord
+namespace db::query::alarms
 {
-    uint32_t ID;
-    uint32_t time;
-    uint32_t snooze;
-    uint32_t status;
+    class Add;
+    class AddResult;
+    class Edit;
+    class EditResult;
+    class Get;
+    class GetResult;
+    class GetLimited;
+    class GetLimitedResult;
+    class Remove;
+    class RemoveResult;
+    class TurnOffAll;
+    class TurnOffAllResult;
+} // namespace db::query::alarms
+
+struct AlarmsRecord : public Record
+{
+    TimePoint time     = TIME_POINT_INVALID;
+    uint32_t snooze    = 0;
+    AlarmStatus status = AlarmStatus::On;
+    uint32_t repeat    = 0;
     UTF8 path;
+
+    AlarmsRecord() = default;
+    explicit AlarmsRecord(const AlarmsTableRow &tableRow);
 };
 
 enum class AlarmsRecordField
@@ -45,16 +59,23 @@ class AlarmsRecordInterface : public RecordInterface<AlarmsRecord, AlarmsRecordF
     AlarmsRecord GetByID(uint32_t id) override final;
 
     uint32_t GetCount() override final;
+    bool TurnOffAll();
 
     std::unique_ptr<std::vector<AlarmsRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
-
     std::unique_ptr<std::vector<AlarmsRecord>> GetLimitOffsetByField(uint32_t offset,
                                                                      uint32_t limit,
                                                                      AlarmsRecordField field,
                                                                      const char *str) override final;
 
-    AlarmsRecord GetNext(time_t time);
+    std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
   private:
     AlarmsDB *alarmsDB;
+
+    std::unique_ptr<db::query::alarms::AddResult> runQueryImplAdd(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::alarms::RemoveResult> runQueryImplRemove(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::alarms::EditResult> runQueryImplEdit(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::alarms::GetResult> runQueryImplGetResult(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::alarms::GetLimitedResult> runQueryImplGetLimitedResult(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::alarms::TurnOffAllResult> runQueryImplTurnOffAll(std::shared_ptr<db::Query> query);
 };

@@ -1,12 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * AlarmsTable_tests.cpp
- *
- *  Created on: 16 lip 2019
- *      Author: kuba
- */
 #include "vfs.hpp"
 
 #include <catch2/catch.hpp>
@@ -30,94 +24,141 @@ TEST_CASE("Alarms Table tests")
     AlarmsDB alarmsDb;
     REQUIRE(alarmsDb.isInitialized());
 
-    auto alarmsRow = alarmsDb.alarms.getById(1);
-    REQUIRE(alarmsRow.ID == 1);
+    auto &alarmsTbl = alarmsDb.alarms;
+    REQUIRE(alarmsTbl.count() == 0);
 
-    alarmsRow.time   = 1234;
-    alarmsRow.snooze = 2345;
-    alarmsRow.status = 1;
-    alarmsRow.path   = "awesome.jp2";
+    SECTION("Default Constructor")
+    {
+        AlarmsTableRow test;
+        REQUIRE(test.time == TIME_POINT_INVALID);
+        REQUIRE(test.snooze == 0);
+        REQUIRE(test.status == AlarmStatus::On);
+        REQUIRE(test.repeat == 0);
+        REQUIRE(test.path == "");
+    }
 
-    REQUIRE(alarmsDb.alarms.update(alarmsRow));
+    REQUIRE(alarmsTbl.add(
+        AlarmsTableRow(1, TimePointFromString("2020-11-11 15:10:00"), 0, AlarmStatus::Off, 0, "file.mp3")));
+    REQUIRE(alarmsTbl.add(
+        AlarmsTableRow(2, TimePointFromString("2020-11-11 15:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
 
-    auto alarmsRow2 = alarmsDb.alarms.getById(1);
+    REQUIRE(alarmsTbl.count() == 2);
+    REQUIRE(alarmsTbl.countByFieldId("status", 0) == 1);
 
-    REQUIRE(alarmsRow2.time == 1234);
-    REQUIRE(alarmsRow2.snooze == 2345);
-    REQUIRE(alarmsRow2.status == 1);
-    REQUIRE(alarmsRow2.path == "awesome.jp2");
+    SECTION("Get entry by ID")
+    {
+        auto entry = alarmsTbl.getById(1);
+        REQUIRE(entry.ID == 1);
+        REQUIRE(entry.time == TimePointFromString("2020-11-11 15:10:00"));
+        REQUIRE(entry.snooze == 0);
+        REQUIRE(entry.status == AlarmStatus::Off);
+        REQUIRE(entry.repeat == 0);
+        REQUIRE(entry.path == "file.mp3");
+        REQUIRE(entry.isValid());
+    }
 
-    // add 3 elements into table
-    REQUIRE(alarmsDb.alarms.add(alarmsRow));
-    REQUIRE(alarmsDb.alarms.add(alarmsRow));
-    REQUIRE(alarmsDb.alarms.add(alarmsRow));
+    SECTION("Get entry - invalid ID")
+    {
+        auto entry = alarmsTbl.getById(100);
+        REQUIRE(entry.ID == DB_ID_NONE);
+        REQUIRE(entry.time == TIME_POINT_INVALID);
+        REQUIRE(entry.snooze == 0);
+        REQUIRE(entry.status == AlarmStatus::On);
+        REQUIRE(entry.repeat == 0);
+        REQUIRE(entry.path == "");
+        REQUIRE_FALSE(entry.isValid());
+    }
 
-    // Table should have 4 elements
-    REQUIRE(alarmsDb.alarms.count() == 4);
+    SECTION("Entry update")
+    {
+        auto entryUpdate   = alarmsTbl.getById(1);
+        entryUpdate.time   = TimePointFromString("2020-12-31 23:59:00");
+        entryUpdate.snooze = 0;
+        entryUpdate.status = AlarmStatus::On;
+        entryUpdate.path   = "musicFileUpdate.mp3";
 
-    // update existing element in table
-    alarmsRow.ID   = 4;
-    alarmsRow.path = "updated";
-    REQUIRE(alarmsDb.alarms.update(alarmsRow));
+        REQUIRE(alarmsTbl.update(entryUpdate));
 
-    // Get table row using valid ID & check if it was updated
-    auto alarm = alarmsDb.alarms.getById(4);
-    REQUIRE(alarm.path == alarmsRow.path);
+        auto entry = alarmsTbl.getById(1);
+        REQUIRE(entry.ID == entryUpdate.ID);
+        REQUIRE(entry.time == entryUpdate.time);
+        REQUIRE(entry.snooze == entryUpdate.snooze);
+        REQUIRE(entry.status == entryUpdate.status);
+        REQUIRE(entry.repeat == entryUpdate.repeat);
+        REQUIRE(entry.path == entryUpdate.path);
+    }
 
-    // Get table row using invalid ID(should return empty alarmsDb.alarmsRow)
-    auto alarmFailed = alarmsDb.alarms.getById(100);
-    REQUIRE(alarmFailed.path == "");
+    SECTION("Remove entries")
+    {
+        REQUIRE(alarmsTbl.removeById(2));
+        REQUIRE(alarmsTbl.count() == 1);
 
-    // Get table rows using valid offset/limit parameters
-    auto retOffsetLimit = alarmsDb.alarms.getLimitOffset(0, 4);
-    REQUIRE(retOffsetLimit.size() == 4);
+        REQUIRE(alarmsTbl.removeById(100));
 
-    // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(alarmsDb.alarms.getLimitOffsetByField(0, 4, AlarmsTableFields::Status, "1").size() == 4);
+        REQUIRE(alarmsTbl.removeById(1));
+        REQUIRE(alarmsTbl.count() == 0);
+    }
 
-    // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
-    auto retOffsetLimitBigger = alarmsDb.alarms.getLimitOffset(0, 100);
-    REQUIRE(retOffsetLimitBigger.size() == 4);
+    SECTION("Turn off all alarms")
+    {
+        REQUIRE(alarmsTbl.updateStatuses(AlarmStatus::Off));
+        auto retOffsetLimit = alarmsTbl.getLimitOffset(0, alarmsTbl.count());
+        for (const auto &record : retOffsetLimit) {
+            REQUIRE(record.status == AlarmStatus::Off);
+        }
+    }
 
-    // Get table rows using invalid offset/limit parameters(should return empty object)
-    auto retOffsetLimitFailed = alarmsDb.alarms.getLimitOffset(5, 4);
-    REQUIRE(retOffsetLimitFailed.size() == 0);
+    SECTION("Get limit/offset")
+    {
+        auto retOffsetLimit = alarmsTbl.getLimitOffset(0, 2);
+        REQUIRE(retOffsetLimit.size() == 2);
 
-    // Get count of elements by field's ID
-    REQUIRE(alarmsDb.alarms.countByFieldId("status", 1) == 4);
+        retOffsetLimit = alarmsTbl.getLimitOffset(0, 100);
+        REQUIRE(retOffsetLimit.size() == 2);
 
-    // Get count of elements by invalid field's ID
-    REQUIRE(alarmsDb.alarms.countByFieldId("invalid_field", 0) == 0);
+        retOffsetLimit = alarmsTbl.getLimitOffset(5, 5);
+        REQUIRE(retOffsetLimit.empty());
 
-    // update existing element in table
-    alarmsRow.ID   = 4;
-    alarmsRow.path = "updated";
-    alarmsRow.time = 2222;
-    REQUIRE(alarmsDb.alarms.update(alarmsRow));
+        retOffsetLimit = alarmsTbl.getLimitOffsetByField(
+            0, 5, AlarmsTableFields::Status, std::to_string(static_cast<int>(AlarmStatus::Off)).c_str());
+        REQUIRE(retOffsetLimit.size() == 1);
 
-    // Get record by time
-    auto alarmByTime = alarmsDb.alarms.next(2000);
+        retOffsetLimit = alarmsTbl.getLimitOffsetByField(0, 5, AlarmsTableFields::Path, ".mp3");
+        REQUIRE(retOffsetLimit.empty());
+    }
 
-    REQUIRE(alarmByTime.ID == 4);
-    REQUIRE(alarmByTime.time == 2222);
+    SECTION("Check limit/offset sorting correctness")
+    {
+        REQUIRE(alarmsTbl.add(
+            AlarmsTableRow(3, TimePointFromString("2020-11-12 17:10:00"), 0, AlarmStatus::Off, 0, "file.mp3")));
+        REQUIRE(alarmsTbl.add(
+            AlarmsTableRow(4, TimePointFromString("2020-11-11 19:25:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
+        REQUIRE(alarmsTbl.add(
+            AlarmsTableRow(5, TimePointFromString("2020-12-11 07:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
 
-    // Table should have now 3 elements
-    REQUIRE(alarmsDb.alarms.removeById(3));
+        const std::array<TimePoint, 5> paramTime{TimePointFromString("2020-12-11 07:15:00"),
+                                                 TimePointFromString("2020-11-11 15:10:00"),
+                                                 TimePointFromString("2020-11-11 15:15:00"),
+                                                 TimePointFromString("2020-11-12 17:10:00"),
+                                                 TimePointFromString("2020-11-11 19:25:00")};
 
-    REQUIRE(alarmsDb.alarms.count() == 3);
+        REQUIRE(alarmsTbl.count() == 5);
+        auto entries   = alarmsTbl.getLimitOffset(0, 5);
+        uint32_t index = 0;
+        for (const auto &entry : entries) {
+            REQUIRE(entry.time == paramTime[index]);
+            REQUIRE(entry.isValid());
+            ++index;
+        }
+    }
 
-    // Remove non existing element
-    REQUIRE(alarmsDb.alarms.removeById(13));
-
-    REQUIRE(alarmsDb.alarms.count() == 3);
-
-    // Remove all elements from table
-    REQUIRE(alarmsDb.alarms.removeById(1));
-    REQUIRE(alarmsDb.alarms.removeById(2));
-    REQUIRE(alarmsDb.alarms.removeById(4));
-
-    // Table should be empty now
-    REQUIRE(alarmsDb.alarms.count() == 0);
+    SECTION("Remove by field")
+    {
+        REQUIRE(alarmsTbl.updateStatuses(AlarmStatus::Off));
+        REQUIRE(alarmsTbl.removeByField(AlarmsTableFields::Status,
+                                        std::to_string(static_cast<int>(AlarmStatus::Off)).c_str()));
+        REQUIRE(alarmsTbl.count() == 0);
+    }
 
     Database::deinitialize();
 }

@@ -18,15 +18,10 @@ int Ctze::getTimeZoneOffset() const
 {
     const std::string &tzOffsetToken = tokens[static_cast<uint32_t>(Tokens::GMTDifference)];
 
-    int offsetInQuartersOfHour = 0;
-    bool failed                = !utils::toNumeric(tzOffsetToken, offsetInQuartersOfHour);
+    auto offsetInQuartersOfHour = utils::getNumericValue<int>(tzOffsetToken);
 
     if (offsetInQuartersOfHour != std::clamp(offsetInQuartersOfHour, minTimezoneOffset, maxTimezoneOffset)) {
         offsetInQuartersOfHour = 0;
-        failed                 = true;
-    }
-
-    if (failed) {
         LOG_ERROR("Failed to parse Ctze time zone offset: %s", tzOffsetToken.c_str());
     }
 
@@ -69,7 +64,7 @@ auto Ctze::getTimeInfo() const noexcept -> tm
 
         auto gmtDifferenceStr = tokens[Tokens::GMTDifference];
 
-        int gmtDifference = utils::getValue<int>(gmtDifferenceStr);
+        int gmtDifference = utils::getNumericValue<int>(gmtDifferenceStr);
         auto time         = system_clock::to_time_t(tp) +
                     gmtDifference * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
         timeinfo = *gmtime(&time);

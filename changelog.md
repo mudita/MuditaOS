@@ -3,11 +3,21 @@
 ### Added
 
 * `[cellular]` Integration with basic flow for SIM card (cellular<>GUI)
+* `[file indexer db]` Added UT fot File Indexer DB
+
+### Fixed
+
+* `[audio]` Fix playback of mono sound using headphones
+
+## Changed
+
+* `[alarms]` Database refactor
 
 ## [0.48.1 2020-11-23]
 
 ### Added
 
+* `[gui]` Added support for variable numbers in RichText
 * `[gui][desktop]` Added SIM PIN basic flow implementation
 * `[cellular]` Added CLIR, CLIP, COLP, call waiting, call barring MMIs support
 
@@ -22,6 +32,7 @@
 
 * `[gui][desktop]` ScreenLock logic unified with simLock's
 * `[messages]` Changed fonts of message snippet and its prefix.
+* `[cellular]` Improve MMI call forwarding support
 
 ## [0.47.1 2020-11-20]
 
