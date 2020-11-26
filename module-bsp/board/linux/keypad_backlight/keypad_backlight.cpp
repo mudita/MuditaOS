@@ -10,9 +10,9 @@ namespace bsp
 {
     namespace keypad_backlight
     {
-        bool diodes_state = false;
+        bool diodesState = false;
 
-        int32_t init()
+        std::int32_t init()
         {
             return 0;
         }
@@ -22,7 +22,7 @@ namespace bsp
 
         bool turnOnAll()
         {
-            diodes_state = true;
+            diodesState = true;
             return true;
         }
 
@@ -33,7 +33,7 @@ namespace bsp
 
         bool shutdown()
         {
-            diodes_state = false;
+            diodesState = false;
             return true;
         }
 
@@ -47,7 +47,7 @@ namespace bsp
 
         bool checkState()
         {
-            return diodes_state;
+            return diodesState;
         }
 
     } // namespace keypad_backlight

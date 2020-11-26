@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 extern "C"
 {
@@ -25,7 +25,7 @@ namespace bsp
 
         using DiodeIntensity = float;
 
-        int32_t init();
+        std::int32_t init();
 
         void deinit();
 

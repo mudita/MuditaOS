@@ -9,7 +9,7 @@ namespace bsp
 {
     namespace keypad_backlight
     {
-        constexpr auto LP55281_DEVICE_ADDR = 0x4C;
+        constexpr inline auto LP55281_DEVICE_ADDR = 0x4C;
 
         enum class LP55281_Registers
         {
@@ -36,29 +36,29 @@ namespace bsp
             RESET      = 0x60,
         };
 
-        typedef struct
+        struct Diode_Reg
         {
-            uint8_t max_current : 2;
-            uint8_t current : 6;
-        } Diode_Reg;
+            std::uint8_t max_current : 2;
+            std::uint8_t current : 6;
+        };
 
-        constexpr auto MAX_DIODE_CURRENT_LIMIT = 0b11;
-        constexpr auto MAX_BRIGHTNESS_INT      = 63;
+        constexpr inline auto MAX_DIODE_CURRENT_LIMIT = 0b11;
+        constexpr inline auto MAX_BRIGHTNESS_INT      = 63;
 
-        constexpr auto BOOST_OUTPUT_4V = 0x00;
+        constexpr inline auto BOOST_OUTPUT_4V = 0x00;
 
-        constexpr auto NSTDBY       = 0b10000000;
-        constexpr auto BOOST_EN     = 0b01000000;
-        constexpr auto LED_PORTS_EN = 0b00001110; // Only ports 2-4 active on board
-        constexpr auto WAKEUP       = NSTDBY | BOOST_EN | LED_PORTS_EN;
+        constexpr inline auto NSTDBY       = 0b10000000;
+        constexpr inline auto BOOST_EN     = 0b01000000;
+        constexpr inline auto LED_PORTS_EN = 0b00001110; // Only ports 2-4 active on board
+        constexpr inline auto WAKEUP       = NSTDBY | BOOST_EN | LED_PORTS_EN;
 
-        constexpr auto LED_TEST_THRESHOLD = 3; // 0.18mA = (15mA/255) * 3
-        constexpr auto EN_LED_TEST        = 0b00010000;
+        constexpr inline auto LED_TEST_THRESHOLD = 3; // 0.18mA = (15mA/255) * 3
+        constexpr inline auto EN_LED_TEST        = 0b00010000;
 
-        constexpr inline uint8_t encode_diode_brightness_to_6bits(float normalized_brightness)
+        constexpr std::uint8_t encode_diode_brightness_to_6bits(float normalized_brightness)
         {
             std::clamp(normalized_brightness, 0.0f, 1.0f);
-            return static_cast<uint8_t>(MAX_BRIGHTNESS_INT * normalized_brightness) & 0b00111111;
+            return static_cast<std::uint8_t>(MAX_BRIGHTNESS_INT * normalized_brightness) & 0b00111111;
         }
 
     } // namespace keypad_backlight

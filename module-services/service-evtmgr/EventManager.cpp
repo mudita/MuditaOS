@@ -218,25 +218,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
             return message;
         }
     }
-    else if (msgl->messageType == MessageType::EVMKeypadBacklightMessage) {
-        auto msg = dynamic_cast<sevm::KeypadBacklightMessage *>(msgl);
-        if (msg != nullptr) {
-            auto message = std::make_shared<sevm::KeypadBacklightMessage>(msg->action);
-
-            switch (msg->action) {
-            case bsp::keypad_backlight::Action::turnOn:
-                message->success = bsp::keypad_backlight::turnOnAll();
-                break;
-            case bsp::keypad_backlight::Action::turnOff:
-                message->success = bsp::keypad_backlight::shutdown();
-                break;
-            case bsp::keypad_backlight::Action::checkState:
-                message->success = bsp::keypad_backlight::checkState();
-                break;
-            }
-            return message;
-        }
-    }
     else if (msgl->messageType == MessageType::CellularTimeUpdated) {
         auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl);
         if (msg != nullptr) {
@@ -290,6 +271,14 @@ sys::ReturnCodes EventManager::InitHandler()
         }
 
         return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sevm::KeypadBacklightMessage(), [&](sys::Message *msgl) {
+        auto msg = static_cast<sevm::KeypadBacklightMessage *>(msgl);
+        assert(msg);
+        auto message     = std::make_shared<sevm::KeypadBacklightMessage>();
+        message->success = msg->processAction(msg->action);
+        return message;
     });
 
     // initialize keyboard worker
