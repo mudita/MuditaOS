@@ -12,8 +12,6 @@
 
 namespace gui
 {
-    class TextCursor;
-
     enum class UnderlineDrawMode
     {
         WholeLine,
@@ -23,11 +21,11 @@ namespace gui
     /// interface element for TextDocument->getLine() <-- Text
     class TextLine
     {
-        unsigned int number_letters_shown = 0;
-        Length width_used                 = 0;
-        Length height_used                = 0;
-        Length max_width                  = 0;
-        std::list<Label *> elements_to_show_in_line;
+        unsigned int shownLetterCount = 0;
+        Length widthUsed              = 0;
+        Length heightUsed             = 0;
+        Length maxWidth               = 0;
+        std::list<Label *> lineContent;
         Rect *underline                     = nullptr;
         bool drawUnderline                  = false;
         UnderlineDrawMode drawUnderlineMode = UnderlineDrawMode::Concurrent;
@@ -43,7 +41,7 @@ namespace gui
         /// creates TextLine with data from text based on TextCursor position filling max_width
         TextLine(BlockCursor &, unsigned int max_width);
         TextLine(TextLine &) = delete;
-        TextLine(TextLine &&);
+        TextLine(TextLine &&) noexcept;
 
         TextLine(BlockCursor &cursor,
                  unsigned int max_width,
@@ -65,23 +63,23 @@ namespace gui
         /// number of letters in Whole TextLines
         [[nodiscard]] unsigned int length() const
         {
-            return number_letters_shown;
+            return shownLetterCount;
         }
 
         /// count of elements in whole TextLine
         [[nodiscard]] unsigned int count() const
         {
-            return elements_to_show_in_line.size();
+            return lineContent.size();
         }
 
         [[nodiscard]] Length width() const
         {
-            return width_used;
+            return widthUsed;
         }
 
         [[nodiscard]] Length height() const
         {
-            return height_used;
+            return heightUsed;
         }
 
         [[nodiscard]] TextBlock::End getEnd() const
@@ -94,10 +92,10 @@ namespace gui
             return lineEnd;
         }
 
-        const Item *getElement(unsigned int pos) const
+        [[nodiscard]] const Item *getElement(unsigned int pos) const
         {
             unsigned int local_pos = 0;
-            for (auto &el : elements_to_show_in_line) {
+            for (auto &el : lineContent) {
                 local_pos += el->getTextLength();
                 if (local_pos >= pos) {
                     return el;
@@ -106,9 +104,9 @@ namespace gui
             return nullptr;
         }
 
-        int32_t getX() const
+        [[nodiscard]] int32_t getX() const
         {
-            return elements_to_show_in_line.front()->area().pos(Axis::X);
+            return lineContent.front()->area().pos(Axis::X);
         }
 
         void setPosition(const short &x, const short &y);
@@ -121,6 +119,6 @@ namespace gui
         /// moves Text parts in Text. To not call n times callbacks on resize, call prior to setting parent
         void alignH(Alignment align, Length parent_length) const;
         void alignV(Alignment align, Length parent_length, Length lines_height);
-        auto getText(unsigned int pos) const -> UTF8;
+        [[nodiscard]] auto getText(unsigned int pos) const -> UTF8;
     };
 } // namespace gui

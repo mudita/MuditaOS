@@ -475,7 +475,10 @@ namespace gui
             return false;
         }
 
-        if (isMode(EditMode::SCROLL) && (inputEvent.is(KeyCode::KEY_LEFT) || inputEvent.is(KeyCode::KEY_RIGHT))) {
+        // Temporary disabled till text scrolling will ba added
+        // if (isMode(EditMode::SCROLL) && (inputEvent.is(KeyCode::KEY_LEFT) ||
+        // inputEvent.is(KeyCode::KEY_RIGHT))) {
+        if (isMode(EditMode::SCROLL)) {
             debug_text("Text in scroll mode ignores left/right navigation");
             return false;
         }
