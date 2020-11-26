@@ -13,12 +13,17 @@ import random
 class Harness:
     connection = None
     is_phone_unlocked = False
+    port_name = ''
 
-    def __init__(self, port='/dev/ttyACM2'):
+    def __init__(self, port):
+        self.port_name = port
         self.connection = serial.CDCSerial(port)
 
     def get_connection(self):
         return self.connection
+
+    def get_window_name(self):
+        return self.connection.get_window()
 
     def unlock_phone(self):
         if self.connection.is_phone_locked():
@@ -31,11 +36,11 @@ class Harness:
             log.info("Phone unlocked")
         else:
             log.info("Phone already unlocked")
+        self.is_phone_unlocked = True
 
     def with_phone_unlocked(self, func):
         if not self.is_phone_unlocked:
             self.unlock_phone()
-            self.is_phone_unlocked = True
 
         func(self.connection)
 
@@ -56,4 +61,4 @@ class Harness:
             "uuid": random.randint(1, 32000),
             "body": body
         })
-        return ret["body"]
+        return ret
