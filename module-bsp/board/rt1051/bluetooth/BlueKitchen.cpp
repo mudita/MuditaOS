@@ -82,25 +82,15 @@ ssize_t BlueKitchen::write(char *buf, size_t size)
     }
     LOG_DEBUG("--> [%d]>%s<", size, ss.str().c_str());
 #endif
-    if (BluetoothCommon::read_cts() == 0) {
-        if (BluetoothCommon::write(buf, size) == size) {
-            val = Bt::Message::EvtSending;
-            xQueueSendFromISR(qHandle, &val, &taskwoken);
-        }
-        else {
-            val = Bt::Message::EvtSendingError;
-            xQueueSendFromISR(qHandle, &val, &taskwoken);
-        }
-        portEND_SWITCHING_ISR(taskwoken);
+    if (BluetoothCommon::write(buf, size) == size) {
+        val = Bt::Message::EvtSending;
+        xQueueSendFromISR(qHandle, &val, &taskwoken);
     }
     else {
-        LOG_WARN("Tx: not clear to send");
         val = Bt::Message::EvtSendingError;
         xQueueSendFromISR(qHandle, &val, &taskwoken);
-        i = -1;
     }
+    portEND_SWITCHING_ISR(taskwoken);
 
     return i;
 }
-
-;

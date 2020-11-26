@@ -73,8 +73,8 @@ void BluetoothCommon::open()
     set_rts(false);
     set_reset(true);
     // wait for the module to power up (up to 100ms according to the docs )
-    do {
-    } while (read_cts() == 1);
+//    do {
+//    } while (read_cts() == 1);
     is_open = true;
 }
 
@@ -200,24 +200,11 @@ BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
     return ret;
 }
 
-// set flow on -> true, set flow off -> false
-BTdev::Error BluetoothCommon::set_rts(bool on)
-{
-    GPIO_PinWrite(BSP_BLUETOOTH_UART_RTS_PORT, BSP_BLUETOOTH_UART_RTS_PIN, on ? 0U : 1U);
-    LOG_DEBUG("set RTS: %c", on ? 'O' : 'X');
-    return Success;
-}
-
 BTdev::Error BluetoothCommon::set_reset(bool on)
 {
     LOG_INFO("reset %s", on ? "on" : "off");
     GPIO_PinWrite(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, on ? 1U : 0U);
     return Success;
-}
-
-int BluetoothCommon::read_cts()
-{
-    return GPIO_PinRead(BSP_BLUETOOTH_UART_CTS_PORT, BSP_BLUETOOTH_UART_CTS_PIN);
 }
 
 uint32_t UartGetPeripheralClock()
@@ -269,6 +256,8 @@ void BluetoothCommon::configure_lpuart()
     bt_c.rxIdleConfig  = kLPUART_IdleCharacter1;
     bt_c.enableTx      = false;
     bt_c.enableRx      = false;
+    bt_c.enableTxCTS   = true;
+    bt_c.enableRxRTS   = true;
 
     if (LPUART_Init(BSP_BLUETOOTH_UART_BASE, &bt_c, UartGetPeripheralClock()) != kStatus_Success) {
         LOG_ERROR("BT: UART config error Could not initialize the uart!");

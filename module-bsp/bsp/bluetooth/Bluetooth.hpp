@@ -124,9 +124,7 @@ namespace bsp {
             virtual ssize_t write(char *buf, size_t nbytes);
             virtual ssize_t write_blocking(char *buf, ssize_t len);
             Error set_baudrate(uint32_t bd);
-            Error set_rts(bool on);
             Error set_reset(bool on);
-            int read_cts();
             void sleep_ms(ssize_t ms);
             void set_irq(bool enable);
 

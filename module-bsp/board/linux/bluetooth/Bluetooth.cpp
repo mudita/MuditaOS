@@ -76,20 +76,9 @@ BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
     return Success;
 }
 
-// set flow on -> true, set flow off -> false
-BTdev::Error BluetoothCommon::set_rts(bool on)
-{
-    return Success;
-}
-
 BTdev::Error BluetoothCommon::set_reset(bool on)
 {
     return Success;
-}
-
-int BluetoothCommon::read_cts()
-{
-    return 0;
 }
 
 void BluetoothCommon::configure_uart_io()
