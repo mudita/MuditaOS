@@ -81,7 +81,7 @@ namespace bsp
             uint32_t address;
             DiodeIntensity intensity = 1.0f; // Maximum brightness
             Diode_Reg diode_reg      = {.max_current = MAX_DIODE_CURRENT_LIMIT,
-                                   .current     = encode_diode_brightness(intensity)};
+                                   .current     = encode_diode_brightness_to_6bits(intensity)};
 
             wakeup();
             configureModule();
@@ -124,21 +124,18 @@ namespace bsp
             return writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::RESET), &reset_value);
         }
 
-        // Run measurement on each of used outputs
         // Must be run at least 20ms after leds startup
         bool checkState()
         {
             uint8_t value = 0;
             for (auto &diode : usedOutputs) {
                 value = static_cast<uint8_t>(diode) | EN_LED_TEST;
-                // Trigger the measurement
+
                 if (!writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::LED_TEST), &value))
                     return false;
 
-                // Wait for measurement
                 vTaskDelay(pdMS_TO_TICKS(2));
 
-                // Read the measurement
                 if (readSingleRegister(static_cast<uint32_t>(LP55281_Registers::ADC_OUT), &value) != 1)
                     return false;
 
@@ -146,7 +143,6 @@ namespace bsp
                     return false;
             }
 
-            // Disable the LED test
             value = 0;
             writeSingleRegister(static_cast<uint32_t>(LP55281_Registers::LED_TEST), &value);
 

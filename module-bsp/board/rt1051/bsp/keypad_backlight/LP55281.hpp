@@ -11,7 +11,6 @@ namespace bsp
     {
         constexpr auto LP55281_DEVICE_ADDR = 0x4C;
 
-        // LP55281 registers addresses
         enum class LP55281_Registers
         {
             RED1       = 0x00,
@@ -43,27 +42,21 @@ namespace bsp
             uint8_t current : 6;
         } Diode_Reg;
 
-        // For specific leds registers
-        constexpr auto MAX_DIODE_CURRENT_LIMIT = 0b11; // For 2-bit register
+        constexpr auto MAX_DIODE_CURRENT_LIMIT = 0b11;
         constexpr auto MAX_BRIGHTNESS_INT      = 63;
 
-        // For BOOST_CTRL register. Agreed to output minimum voltage
         constexpr auto BOOST_OUTPUT_4V = 0x00;
 
-        // For ENABLES register
-        constexpr auto NSTDBY       = 0b10000000; // Wakeup from standby
-        constexpr auto BOOST_EN     = 0b01000000; // Turn on boost converter
+        constexpr auto NSTDBY       = 0b10000000;
+        constexpr auto BOOST_EN     = 0b01000000;
         constexpr auto LED_PORTS_EN = 0b00001110; // Only ports 2-4 active on board
         constexpr auto WAKEUP       = NSTDBY | BOOST_EN | LED_PORTS_EN;
 
-        // Led test threshold
-        // 0.18mA = (15mA/255) * 3
-        constexpr auto LED_TEST_THRESHOLD = 3;
+        constexpr auto LED_TEST_THRESHOLD = 3; // 0.18mA = (15mA/255) * 3
         constexpr auto EN_LED_TEST        = 0b00010000;
 
-        constexpr inline uint8_t encode_diode_brightness(float normalized_brightness)
+        constexpr inline uint8_t encode_diode_brightness_to_6bits(float normalized_brightness)
         {
-            // Normalized brightness to 6bit code
             std::clamp(normalized_brightness, 0.0f, 1.0f);
             return static_cast<uint8_t>(MAX_BRIGHTNESS_INT * normalized_brightness) & 0b00111111;
         }
