@@ -30,12 +30,17 @@ namespace gui
         bool drawUnderline                  = false;
         UnderlineDrawMode drawUnderlineMode = UnderlineDrawMode::Concurrent;
         Position underlinePadding           = 0;
+        Position underlineHeight            = 0;
         TextBlock::End end                  = TextBlock::End::None;
         Position storedYOffset              = 0;
         bool lineEnd                        = false;
+        bool lineVisible                    = true;
+        unsigned int lineStartBlockNumber   = text::npos;
+        unsigned int lineStartBlockPosition = text::npos;
 
         void createUnderline(unsigned int max_w, unsigned int max_height);
         void updateUnderline(const short &x, const short &y);
+        void setLineStartConditions(unsigned int startBlockNumber, unsigned int startBlockPosition);
 
       public:
         /// creates TextLine with data from text based on TextCursor position filling max_width
@@ -54,45 +59,64 @@ namespace gui
             this->drawUnderline     = drawUnderline;
             this->drawUnderlineMode = drawUnderlineMode;
             this->underlinePadding  = underlinePadding;
-
-            createUnderline(max_width, init_height);
+            this->underlineHeight   = init_height;
         }
 
         ~TextLine();
 
         /// number of letters in Whole TextLines
-        [[nodiscard]] unsigned int length() const
+        [[nodiscard]] unsigned int length() const noexcept
         {
             return shownLetterCount;
         }
 
         /// count of elements in whole TextLine
-        [[nodiscard]] unsigned int count() const
+        [[nodiscard]] unsigned int count() const noexcept
         {
             return lineContent.size();
         }
 
-        [[nodiscard]] Length width() const
+        [[nodiscard]] Length width() const noexcept
         {
             return widthUsed;
         }
 
-        [[nodiscard]] Length height() const
+        [[nodiscard]] Length height() const noexcept
         {
             return heightUsed;
         }
 
-        [[nodiscard]] TextBlock::End getEnd() const
+        [[nodiscard]] TextBlock::End getEnd() const noexcept
         {
             return end;
         }
 
-        [[nodiscard]] bool getLineEnd() const
+        [[nodiscard]] bool getLineEnd() const noexcept
         {
             return lineEnd;
         }
 
-        [[nodiscard]] const Item *getElement(unsigned int pos) const
+        [[nodiscard]] auto isVisible() const noexcept
+        {
+            return lineVisible;
+        }
+
+        void setVisible(bool val) noexcept
+        {
+            lineVisible = val;
+        }
+
+        [[nodiscard]] auto getLineStartBlockNumber() const noexcept
+        {
+            return lineStartBlockNumber;
+        }
+
+        [[nodiscard]] auto getLineStartBlockPosition() const noexcept
+        {
+            return lineStartBlockPosition;
+        }
+
+        [[nodiscard]] const Item *getElement(unsigned int pos) const noexcept
         {
             unsigned int local_pos = 0;
             for (auto &el : lineContent) {
@@ -104,7 +128,7 @@ namespace gui
             return nullptr;
         }
 
-        [[nodiscard]] int32_t getX() const
+        [[nodiscard]] int32_t getX() const noexcept
         {
             return lineContent.front()->area().pos(Axis::X);
         }

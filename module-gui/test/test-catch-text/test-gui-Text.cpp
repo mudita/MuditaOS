@@ -72,12 +72,12 @@ namespace gui
 
         auto moveCursor(NavigationDirection direction, unsigned int n)
         {
-            cursor->TextCursor::moveCursor(direction, n);
+            cursor->moveCursor(direction, n);
         }
 
-        [[nodiscard]] auto getCursorPos()
+        [[nodiscard]] auto getCursorPosition()
         {
-            return cursor->getPosOnScreen();
+            return cursor->getOnScreenPosition();
         }
     };
 } // namespace gui
@@ -274,7 +274,7 @@ TEST_CASE("Text backup and restore tests")
 
         REQUIRE(backup.document.getText() == text->getText());
         REQUIRE(backup.document.getText().length() == text->getText().length());
-        REQUIRE(backup.cursorPos == text->getCursorPos());
+        REQUIRE(backup.cursorPos == text->getCursorPosition());
 
         text->setText(overwriteTestString);
 
@@ -283,7 +283,7 @@ TEST_CASE("Text backup and restore tests")
         text->restoreFrom(backup);
 
         REQUIRE(text->getText() == testStringOneLine);
-        REQUIRE(text->getCursorPos() == testStringOneLine.length() - cursorMoveN);
+        REQUIRE(text->getCursorPosition() == testStringOneLine.length() - cursorMoveN);
     }
 
     SECTION("Backup two line text with moved cursor, overwrite text and restore")
@@ -300,7 +300,7 @@ TEST_CASE("Text backup and restore tests")
 
         REQUIRE(backup.document.getText() == text->getText());
         REQUIRE(backup.document.getText().length() == text->getText().length());
-        REQUIRE(backup.cursorPos == text->getCursorPos());
+        REQUIRE(backup.cursorPos == text->getCursorPosition());
 
         text->setText(overwriteTestString);
 
@@ -309,7 +309,7 @@ TEST_CASE("Text backup and restore tests")
         text->restoreFrom(backup);
 
         REQUIRE(text->getText() == testStringTwoLines);
-        REQUIRE(text->getCursorPos() == testStringTwoLines.length() - cursorMoveN);
+        REQUIRE(text->getCursorPosition() == testStringTwoLines.length() - cursorMoveN);
     }
 }
 

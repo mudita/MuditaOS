@@ -12,7 +12,8 @@
 * `[notes]` Notes application implemented.
 * `[notes]` Notes search engine implemented.
 * `[desktop]` info window for incoming MMI messages.
-
+* `[text]` Added vertical scrolling.
+* `[text]` Added cursor starting position handling.
 
 ### Changed
 
