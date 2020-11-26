@@ -168,14 +168,14 @@ TEST_CASE("Get value from string")
     SECTION("UInt32_t")
     {
         std::string testString = "10";
-        const auto testValue   = utils::getValue<uint32_t>(testString);
+        const auto testValue   = utils::getNumericValue<uint32_t>(testString);
         REQUIRE(testValue == 10);
     }
 
     SECTION("float")
     {
         std::string testString = "1.f";
-        const auto testValue   = utils::getValue<float>(testString);
+        const auto testValue   = utils::getNumericValue<float>(testString);
         Approx target          = Approx(1.f).margin(.01f);
         REQUIRE(testValue == target);
     }
