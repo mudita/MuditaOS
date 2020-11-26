@@ -3,29 +3,31 @@
 
 #pragma once
 
-#include "Label.hpp"
-#include "ListItem.hpp"
+#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/ListItem.hpp>
+#include <module-gui/gui/widgets/TextFixedSize.hpp>
 
-#include "module-apps/application-notes/model/NotesListModel.hpp"
+#include <module-db/Interface/NotesRecord.hpp>
 
 namespace gui
 {
     class NotesItem : public ListItem
     {
       public:
-        NotesItem(std::shared_ptr<NotesRecord> record, bool mode24H);
+        explicit NotesItem(std::shared_ptr<NotesRecord> record);
 
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
 
       private:
         static gui::Label *createEmptyLabel(Item *parent);
+
+        void buildInterface();
         void setSnippet(const UTF8 &noteText);
         void setDateText(std::uint32_t timestamp);
 
         std::shared_ptr<NotesRecord> note;
-        gui::Label *date    = nullptr;
-        gui::Label *title   = nullptr;
-        gui::Label *snippet = nullptr;
-        bool mode24H        = false;
+        gui::Label *date            = nullptr;
+        gui::Label *title           = nullptr;
+        gui::TextFixedSize *snippet = nullptr;
     };
 } // namespace gui

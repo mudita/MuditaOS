@@ -3,6 +3,7 @@
 [Current release]
 
 ### Added
+* `[notes]` Notes application implemented.
 
 ### Changed
 

@@ -122,10 +122,14 @@
   "app_options_contact_edit": "Edit Contact",
 
   "app_notes_title_main": "Notes",
-  "app_notes_new_note": "New Note",
-  "app_notes_save": "SAVE",
+  "app_notes_edit_new_note": "Edit/New Note",
+  "app_notes_copy_text": "Copy text",
+  "app_notes_copy_paste": "Paste text",
   "app_notes_edit": "EDIT",
-  "app_notes_back": "BACK",
+  "app_notes_edited": "Edited",
+  "app_notes_delete_note": "Delete",
+  "app_notes_note_delete_confirmation": "Do you really want to delete this note?",
+  "app_notes_no_notes": "There are no notes yet.\nPress Left arrow to add new.",
 
   "app_calllog_title_main": "Calls",
   "app_calllog_new_note": "New Note",

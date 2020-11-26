@@ -22,7 +22,8 @@ add_catch2_executable(
         "${CMAKE_CURRENT_SOURCE_DIR}/CalllogTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/NotificationsTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/EventsTable_tests.cpp"
-
+        "${CMAKE_CURRENT_SOURCE_DIR}/NotesRecord_tests.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/NotesTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/CalllogRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/ContactsRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/SMSRecord_tests.cpp"

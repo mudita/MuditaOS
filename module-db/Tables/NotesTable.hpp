@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "Table.hpp"
 #include "Record.hpp"
 #include "Database/Database.hpp"
@@ -11,17 +13,15 @@
 
 struct NotesTableRow
 {
-    uint32_t ID = DB_ID_NONE;
-    uint32_t date;
+    std::uint32_t ID = DB_ID_NONE;
+    std::uint32_t date;
     UTF8 snippet;
-    UTF8 path;
 };
 
 enum class NotesTableFields
 {
     Date,
     Snippet,
-    Path
 };
 
 class NotesTable : public Table<NotesTableRow, NotesTableFields>
@@ -29,18 +29,19 @@ class NotesTable : public Table<NotesTableRow, NotesTableFields>
   public:
     explicit NotesTable(Database *db);
 
-    bool create() override final;
-    bool add(NotesTableRow entry) override final;
-    bool removeById(uint32_t id) override final;
-    bool removeByField(NotesTableFields field, const char *str) override final;
-    bool update(NotesTableRow entry) override final;
-    NotesTableRow getById(uint32_t id) override final;
-    std::vector<NotesTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
-    std::vector<NotesTableRow> getLimitOffsetByField(uint32_t offset,
-                                                     uint32_t limit,
+    bool create() override;
+    bool add(NotesTableRow entry) override;
+    bool removeAll() override;
+    bool removeById(std::uint32_t id) override;
+    bool removeByField(NotesTableFields field, const char *str) override;
+    bool update(NotesTableRow entry) override;
+    NotesTableRow getById(std::uint32_t id) override;
+    std::vector<NotesTableRow> getLimitOffset(std::uint32_t offset, std::uint32_t limit) override;
+    std::vector<NotesTableRow> getLimitOffsetByField(std::uint32_t offset,
+                                                     std::uint32_t limit,
                                                      NotesTableFields field,
-                                                     const char *str) override final;
+                                                     const char *str) override;
 
-    uint32_t count() override final;
-    uint32_t countByFieldId(const char *field, uint32_t id) override final;
+    std::uint32_t count() override;
+    std::uint32_t countByFieldId(const char *field, std::uint32_t id) override;
 };

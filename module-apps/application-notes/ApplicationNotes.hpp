@@ -6,6 +6,13 @@
 #include "module-apps/application-notes/model/NotesListModel.hpp"
 #include "Application.hpp"
 
+namespace gui::name::window
+{
+    inline constexpr auto note_preview        = "NotePreview";
+    inline constexpr auto note_edit           = "NoteEdit";
+    inline constexpr auto note_confirm_dialog = "ConfirmDialog";
+} // namespace gui::name::window
+
 namespace app
 {
     inline constexpr auto name_notes = "ApplicationNotes";

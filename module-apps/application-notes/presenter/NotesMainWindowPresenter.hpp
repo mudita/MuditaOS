@@ -23,19 +23,21 @@ namespace app::notes
             virtual ~Presenter() noexcept = default;
 
             virtual std::shared_ptr<gui::ListItemProvider> getNotesItemProvider() const = 0;
-            virtual std::shared_ptr<DatabaseModel<NotesRecord>> getNotesDAO() const     = 0;
+            virtual bool isNoteListEmpty()                                              = 0;
+            virtual bool updateNotes(std::vector<NotesRecord> &&records)                = 0;
         };
     };
 
     class NotesMainWindowPresenter : public NotesMainWindowContract::Presenter
     {
       public:
-        explicit NotesMainWindowPresenter(std::shared_ptr<NotesProvider> notesProvider);
+        explicit NotesMainWindowPresenter(std::shared_ptr<NotesListItemProvider> notesListItemProvider);
 
         std::shared_ptr<gui::ListItemProvider> getNotesItemProvider() const override;
-        std::shared_ptr<DatabaseModel<NotesRecord>> getNotesDAO() const override;
+        bool isNoteListEmpty() override;
+        bool updateNotes(std::vector<NotesRecord> &&records) override;
 
       private:
-        std::shared_ptr<NotesProvider> notesProvider;
+        std::shared_ptr<NotesListItemProvider> notesProvider;
     };
 } // namespace app::notes

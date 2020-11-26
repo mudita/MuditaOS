@@ -4,13 +4,18 @@
 #include "ApplicationNotes.hpp"
 
 #include "MessageType.hpp"
-#include "windows/NotesMainWindow.hpp"
-#include "windows/NotesEditWindow.hpp"
+#include "windows/NoteMainWindow.hpp"
+#include "windows/NotePreviewWindow.hpp"
+#include "windows/NoteEditWindow.hpp"
 
 #include <service-db/DBMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 
 #include <module-apps/application-notes/presenter/NotesMainWindowPresenter.hpp>
+#include <module-apps/application-notes/presenter/NotePreviewWindowPresenter.hpp>
+#include <module-apps/application-notes/presenter/NoteEditWindowPresenter.hpp>
+#include <module-apps/windows/OptionWindow.hpp>
+#include <module-apps/windows/Dialog.hpp>
 
 namespace app
 {
@@ -36,7 +41,7 @@ namespace app
             switch (resp->responseTo) {
             case MessageType::DBQuery:
                 if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp); queryResponse != nullptr) {
-                    if (auto result = queryResponse->getResult(); result->hasListener()) {
+                    if (auto result = queryResponse->getResult(); result && result->hasListener()) {
                         if (result->handle()) {
                             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
                         }
@@ -76,10 +81,27 @@ namespace app
     void ApplicationNotes::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [this](Application *app, const std::string &name) {
-            auto notesRepository = std::make_shared<notes::NotesListModel>(this);
-            auto presenter       = std::make_unique<notes::NotesMainWindowPresenter>(notesRepository);
-            return std::make_unique<notes::NotesMainWindow>(app, std::move(presenter));
+            auto notesRepository = std::make_unique<notes::NotesDBRepository>(this);
+            auto notesProvider   = std::make_shared<notes::NotesListModel>(this, std::move(notesRepository));
+            auto presenter       = std::make_unique<notes::NotesMainWindowPresenter>(notesProvider);
+            return std::make_unique<notes::NoteMainWindow>(app, std::move(presenter));
         });
+        windowsFactory.attach(gui::name::window::note_preview, [this](Application *app, const std::string &name) {
+            auto notesRepository = std::make_unique<notes::NotesDBRepository>(this);
+            auto presenter       = std::make_unique<notes::NotePreviewWindowPresenter>(std::move(notesRepository));
+            return std::make_unique<notes::NotePreviewWindow>(app, std::move(presenter));
+        });
+        windowsFactory.attach(gui::name::window::note_edit, [this](Application *app, const std::string &name) {
+            auto notesRepository = std::make_unique<notes::NotesDBRepository>(this);
+            auto presenter       = std::make_unique<notes::NoteEditWindowPresenter>(std::move(notesRepository));
+            return std::make_unique<notes::NoteEditWindow>(app, std::move(presenter));
+        });
+        windowsFactory.attach(gui::name::window::note_confirm_dialog, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogYesNo>(app, name);
+        });
+        windowsFactory.attach(
+            utils::localize.get("app_phonebook_options_title"),
+            [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
     }
 
     void ApplicationNotes::destroyUserInterface()

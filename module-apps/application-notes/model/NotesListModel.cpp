@@ -5,18 +5,20 @@
 
 #include "module-apps/application-notes/widgets/NotesItem.hpp"
 #include "module-apps/application-notes/style/NotesListStyle.hpp"
+#include "module-apps/application-notes/windows/NotesOptions.hpp"
+#include "module-apps/application-notes/data/NoteSwitchData.hpp"
+#include <module-apps/messages/OptionsWindow.hpp>
 
-#include <service-db/DBServiceAPI.hpp>
-#include <module-db/queries/notes/NotesGetForList.hpp>
-
-#include "ListView.hpp"
+#include <module-gui/gui/widgets/ListView.hpp>
+#include <module-gui/gui/input/InputEvent.hpp>
 
 namespace app::notes
 {
-    NotesProvider::NotesProvider(Application *app) : DatabaseModel(app)
+    NotesListItemProvider::NotesListItemProvider(Application *app) : DatabaseModel(app)
     {}
 
-    NotesListModel::NotesListModel(app::Application *app) : NotesProvider(app)
+    NotesListModel::NotesListModel(app::Application *app, std::shared_ptr<AbstractNotesRepository> notesRepository)
+        : NotesListItemProvider(app), notesRepository{std::move(notesRepository)}
     {}
 
     unsigned int NotesListModel::requestRecordsCount()
@@ -43,29 +45,37 @@ namespace app::notes
             return nullptr;
         }
 
-        SettingsRecord &settings = application->getSettings();
-        return new gui::NotesItem(note, !settings.timeFormat12);
+        auto item               = new gui::NotesItem(note);
+        item->activatedCallback = [this, note = note.get()](gui::Item &) {
+            application->switchWindow(gui::name::window::note_preview, std::make_unique<NoteSwitchData>(*note));
+            return true;
+        };
+        item->inputCallback = [this, note = note.get()](gui::Item &, const gui::InputEvent &event) {
+            if (event.isShortPress() && event.is(gui::KeyCode::KEY_LF)) {
+                application->switchWindow(
+                    utils::localize.get("app_phonebook_options_title"),
+                    std::make_unique<gui::OptionsWindowOptions>(noteListOptions(application, *note, *notesRepository)));
+            }
+            return false;
+        };
+        return item;
     }
 
     void NotesListModel::requestRecords(uint32_t offset, uint32_t limit)
     {
-        auto query = std::make_unique<db::query::NotesGetForList>(offset, limit);
-        query->setQueryListener(
-            db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
-        DBServiceAPI::GetQuery(application, db::Interface::Name::Notes, std::move(query));
+        notesRepository->get(
+            offset, limit, [this](const std::vector<NotesRecord> &records, unsigned int notesRepoCount) {
+                return onNotesRetrieved(records, notesRepoCount);
+            });
     }
 
-    bool NotesListModel::handleQueryResponse(db::QueryResult *queryResult)
+    bool NotesListModel::onNotesRetrieved(const std::vector<NotesRecord> &records, unsigned int notesRepoCount)
     {
-        auto response = dynamic_cast<db::query::NotesGetForListResult *>(queryResult);
-        assert(response != nullptr);
-
-        const auto &notes = response->getRecords();
-        if (recordsCount != notes.size()) {
-            recordsCount = notes.size();
+        if (recordsCount != notesRepoCount) {
+            recordsCount = notesRepoCount;
             list->rebuildList(::style::listview::RebuildType::Full, 0, true);
             return false;
         }
-        return updateRecords(notes);
+        return updateRecords(records);
     }
 } // namespace app::notes

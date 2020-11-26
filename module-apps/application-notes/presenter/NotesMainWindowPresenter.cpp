@@ -5,7 +5,7 @@
 
 namespace app::notes
 {
-    NotesMainWindowPresenter::NotesMainWindowPresenter(std::shared_ptr<NotesProvider> notesProvider)
+    NotesMainWindowPresenter::NotesMainWindowPresenter(std::shared_ptr<NotesListItemProvider> notesProvider)
         : notesProvider{std::move(notesProvider)}
     {}
 
@@ -14,8 +14,13 @@ namespace app::notes
         return notesProvider;
     }
 
-    std::shared_ptr<DatabaseModel<NotesRecord>> NotesMainWindowPresenter::getNotesDAO() const
+    bool NotesMainWindowPresenter::isNoteListEmpty()
     {
-        return notesProvider;
+        return notesProvider->requestRecordsCount() == 0U;
+    }
+
+    bool NotesMainWindowPresenter::updateNotes(std::vector<NotesRecord> &&records)
+    {
+        return notesProvider->updateRecords(std::move(records));
     }
 } // namespace app::notes

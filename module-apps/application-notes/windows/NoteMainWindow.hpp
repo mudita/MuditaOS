@@ -6,19 +6,19 @@
 #include <memory>
 
 #include <AppWindow.hpp>
-#include <gui/widgets/Label.hpp>
-#include <gui/widgets/ListView.hpp>
+#include <module-gui/gui/widgets/Image.hpp>
+#include <module-gui/gui/widgets/Icon.hpp>
+#include <module-gui/gui/widgets/ListView.hpp>
 
-#include <module-apps/application-notes/model/NotesListModel.hpp>
 #include <module-apps/application-notes/presenter/NotesMainWindowPresenter.hpp>
 
 namespace app::notes
 {
-    class NotesMainWindow : public gui::AppWindow, public NotesMainWindowContract::View
+    class NoteMainWindow : public gui::AppWindow, public NotesMainWindowContract::View
     {
       public:
-        explicit NotesMainWindow(app::Application *app,
-                                 std::unique_ptr<NotesMainWindowContract::Presenter> &&windowPresenter);
+        NoteMainWindow(app::Application *app, std::unique_ptr<NotesMainWindowContract::Presenter> &&windowPresenter);
+        ~NoteMainWindow() noexcept override;
 
         // virtual methods
         bool onInput(const gui::InputEvent &inputEvent) override;
@@ -30,7 +30,17 @@ namespace app::notes
         bool onDatabaseMessage(sys::Message *msg) override;
 
       private:
+        void showEmptyIcon();
+        void showList();
+        void onEmptyList();
+        void onListFilled();
+
         std::unique_ptr<NotesMainWindowContract::Presenter> presenter;
-        gui::ListView *list = nullptr;
+        gui::ListView *list         = nullptr;
+        gui::Image *leftArrowImage  = nullptr;
+        gui::Image *rightArrowImage = nullptr;
+        gui::Image *newNoteImage    = nullptr;
+        gui::Image *searchImage     = nullptr;
+        gui::Icon *emptyListIcon    = nullptr;
     };
 } // namespace app::notes

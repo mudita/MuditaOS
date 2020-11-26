@@ -10,25 +10,27 @@
 
 namespace db::query
 {
-    class NotesGetForList : public Query
+    class QueryNoteStore : public Query
     {
       public:
-        const unsigned int offset;
-        const unsigned int limit;
+        explicit QueryNoteStore(NotesRecord record);
 
-        explicit NotesGetForList(unsigned int offset = 0U, unsigned int limit = 0U);
-        [[nodiscard]] std::string debugInfo() const override;
-    };
-
-    class NotesGetForListResult : public QueryResult
-    {
-      public:
-        explicit NotesGetForListResult(std::vector<NotesRecord> notes);
-
-        [[nodiscard]] const std::vector<NotesRecord> &getRecords() const;
+        [[nodiscard]] const NotesRecord &getRecord() const noexcept;
         [[nodiscard]] std::string debugInfo() const override;
 
       private:
-        std::vector<NotesRecord> records;
+        NotesRecord record;
+    };
+
+    class NoteStoreResult : public QueryResult
+    {
+      public:
+        explicit NoteStoreResult(bool isSuccess);
+
+        [[nodiscard]] bool succeed() const noexcept;
+        [[nodiscard]] std::string debugInfo() const override;
+
+      private:
+        bool isSuccess;
     };
 } // namespace db::query

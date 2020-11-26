@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <module-gui/gui/widgets/Style.hpp>
+
 namespace app::notes::style::list
 {
     constexpr inline auto X      = ::style::window::default_left_margin;
@@ -23,7 +25,7 @@ namespace app::notes::style::list
         constexpr inline auto RightPadding    = 4;
         namespace title
         {
-            constexpr inline auto Width  = 107;
+            constexpr inline auto Width  = 310;
             constexpr inline auto Height = 33;
         } // namespace title
 
@@ -35,7 +37,7 @@ namespace app::notes::style::list
 
         namespace snippet
         {
-            constexpr inline auto Width     = 90;
+            constexpr inline auto Width     = 417;
             constexpr inline auto Height    = 66;
             constexpr inline auto TopMargin = 5;
         } // namespace snippet
