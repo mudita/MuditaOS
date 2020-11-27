@@ -38,6 +38,10 @@ An example of a correctly formatted commit:
 
 Here's [a helpful article about writing good Git commit messages](https://chris.beams.io/posts/git-commit/).
 
+You can add template commit and hook that will help with proper defining both branch name and a message title:
+[commit message template](./doc/quickstart.md#commit-message-template)
+[commit message hook](./doc/quickstart.md#commit-message-hook)
+
 
 ## Basic checks before Pull Request
 
