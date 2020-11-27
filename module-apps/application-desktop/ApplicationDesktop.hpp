@@ -26,9 +26,6 @@ namespace app
 
     class ApplicationDesktop : public Application
     {
-      protected:
-        void reloadSettings();
-
       public:
         bool need_sim_select = false;
         struct Notifications
@@ -82,6 +79,15 @@ namespace app
         bool clearMessagesNotification();
         bool requestNotSeenNotifications();
         bool requestNotReadNotifications();
+        unsigned int getLockPassHash() const noexcept
+        {
+            return lockPassHash;
+        }
+
+      private:
+        void activeSimChanged(std::string value);
+        void lockPassHashChanged(std::string value);
+        unsigned int lockPassHash = 0;
     };
 
     template <> struct ManifestTraits<ApplicationDesktop>
