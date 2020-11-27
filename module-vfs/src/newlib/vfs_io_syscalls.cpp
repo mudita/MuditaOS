@@ -128,7 +128,7 @@ namespace vfsn::internal::syscalls
         }
         auto ret = ff_fwrite(buf, cnt, 1, fil);
         _errno_  = stdioGET_ERRNO();
-        return ret * cnt;
+        return ret > 0 ? (ret * cnt) : ret;
     }
 
     long read(int &_errno_, int fd, void *buf, size_t cnt)
@@ -143,9 +143,17 @@ namespace vfsn::internal::syscalls
             _errno_ = EBADF;
             return -1;
         }
-        auto ret = ff_fread(buf, 1, cnt, fil);
-        _errno_  = stdioGET_ERRNO();
-        return ret * cnt;
+        const auto remain_bytes = fil->ulFileSize - fil->ulFilePointer;
+        if (remain_bytes > 0) {
+            cnt            = std::min<size_t>(cnt, remain_bytes);
+            const auto ret = ff_fread(buf, cnt, 1, fil);
+            _errno_        = stdioGET_ERRNO();
+            return ret > 0 ? ret * cnt : ret;
+        }
+        else {
+            _errno_ = 0;
+            return 0;
+        }
     }
 
     off_t lseek(int &_errno_, int fd, off_t pos, int dir)
