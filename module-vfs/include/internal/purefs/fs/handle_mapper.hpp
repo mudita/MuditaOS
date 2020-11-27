@@ -4,7 +4,7 @@
 #pragma once
 
 #include <vector>
-namespace purefs::utils::internal
+namespace purefs::fs::internal
 {
 
     template <typename T> class handle_mapper
@@ -44,4 +44,4 @@ namespace purefs::utils::internal
         data[result] = value;
         return result;
     }
-} // namespace purefs::utils::internal
+} // namespace purefs::fs::internal

@@ -14,6 +14,8 @@ namespace purefs::fs::internal
       public:
         file_handle(const file_handle &) = delete;
         virtual ~file_handle()           = default;
+        explicit file_handle(std::shared_ptr<mount_point> mp) : m_mount_point(mp)
+        {}
         [[nodiscard]] auto error() const noexcept
         {
             return m_error;
@@ -30,8 +32,13 @@ namespace purefs::fs::internal
         {
             return m_flags;
         }
-        std::weak_ptr<mount_point> m_mount_point;
+        [[nodiscard]] auto mntpoint() const noexcept
+        {
+            return m_mount_point;
+        }
+
       private:
+        const std::weak_ptr<mount_point> m_mount_point;
         int m_error{};
         int m_flags{};
     };

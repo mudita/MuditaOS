@@ -9,16 +9,17 @@
 #include <mutex.hpp>
 #include <unordered_map>
 #include <map>
+#include <functional>
+#include <ctime>
+#include <purefs/fs/handle_mapper.hpp>
+#include <purefs/fs/file_handle.hpp>
+#include <purefs/fs/mount_point.hpp>
 
 namespace purefs::blkdev
 {
     class disk_manager;
 }
 
-namespace purefs::fs::internal
-{
-    class mount_point;
-}
 namespace purefs::fs
 {
     /** This is the filesystem class layer
@@ -26,9 +27,8 @@ namespace purefs::fs
      * but generally those functions are for internal use for
      * example for newlib or glibc syscalls
      */
-    class filesystem_operations;
     struct statvfs;
-    struct timespec;
+    class filesystem_operations;
     namespace internal
     {
         class directory_handle;
@@ -38,6 +38,7 @@ namespace purefs::fs
     {
       public:
         using fsdir                    = std::shared_ptr<internal::directory_handle>;
+        using fsfile                   = std::shared_ptr<internal::file_handle>;
         explicit filesystem(std::shared_ptr<blkdev::disk_manager> diskmm);
         filesystem(const filesystem &) = delete;
         auto operator=(const filesystem &) = delete;
@@ -103,8 +104,8 @@ namespace purefs::fs
         auto fsync(int fd) noexcept -> int;
         auto ioctl(std::string_view path, int cmd, void *arg) noexcept -> int;
         auto utimens(std::string_view path, std::array<timespec, 2> &tv) noexcept -> int;
-        auto flock(std::string_view path, int cmd) noexcept -> int;
-        auto isatty(std::string_view path) noexcept -> int;
+        auto flock(int fd, int cmd) noexcept -> int;
+        auto isatty(int fd) noexcept -> int;
 
         auto chmod(std::string_view path, mode_t mode) noexcept -> int;
         auto fchmod(int fd, mode_t mode) noexcept -> int;
@@ -119,14 +120,91 @@ namespace purefs::fs
          */
         auto find_mount_point(std::string_view path) const noexcept
             -> std::tuple<std::shared_ptr<internal::mount_point>, size_t>;
-        /** Find the CWD local per thread directory */
+        /** Return absolute path from the relative path
+         * @param[in] path Unormalized path
+         * @return Full Normalized path
+         */
         static auto absolute_path(std::string_view path) noexcept -> std::string;
+        /** Normalize full path
+         * @param[in] path Unnormalized full path
+         * @param[out] Normalized path
+         */
         static auto normalize_path(std::string_view path) noexcept -> std::string;
+        /** Add handle to file descriptor
+         */
+        auto add_filehandle(fsfile file) noexcept -> int;
+        auto remove_filehandle(int fds) noexcept -> fsfile;
+        auto find_filehandle(int fds) const noexcept -> fsfile;
+
+      private:
+        template <class Base, class T, typename... Args>
+        inline auto invoke_fops(T Base::*method, int fds, Args &&... args)
+            -> decltype((static_cast<Base *>(nullptr)->*method)(0, std::forward<Args>(args)...))
+        {
+            auto fil = find_filehandle(fds);
+            if (!fil) {
+                return -EBADF;
+            }
+            else {
+                auto mp = fil->mntpoint().lock();
+                if (!mp) {
+                    return -ENOENT;
+                }
+                auto fsops = mp->fs_ops().lock();
+                if (!fsops) {
+                    return -EIO;
+                }
+                else {
+                    return (fsops.get()->*method)(fil, std::forward<Args>(args)...);
+                }
+            }
+        }
+
+        template <class Base, class T, typename... Args>
+        inline auto invoke_fops(T Base::*method, std::string_view path, Args &&... args) const
+            -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, {}, std::forward<Args>(args)...))
+        {
+            const auto abspath     = absolute_path(path);
+            auto [mountp, pathpos] = find_mount_point(abspath);
+            if (!mountp) {
+                return -ENOENT;
+            }
+            auto fsops = mountp->fs_ops().lock();
+            if (fsops)
+                return (fsops.get()->*method)(mountp, abspath, std::forward<Args>(args)...);
+            else
+                return -EIO;
+        }
+
+        template <class Base, class T, typename... Args>
+        inline auto invoke_fops_same_mp(T Base::*method,
+                                        std::string_view path,
+                                        std::string_view path2,
+                                        Args &&... args) const
+            -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, {}, {}, std::forward<Args>(args)...))
+        {
+            const auto abspath     = absolute_path(path);
+            const auto abspath2    = absolute_path(path2);
+            auto [mountp, pathpos] = find_mount_point(abspath);
+            if (!mountp) {
+                return -ENOENT;
+            }
+            if (path.compare(0, pathpos, path2, 0, pathpos) != 0) {
+                // Mount points are not the same
+                return -EXDEV;
+            }
+            auto fsops = mountp->fs_ops().lock();
+            if (fsops)
+                return (fsops.get()->*method)(mountp, abspath, abspath2, std::forward<Args>(args)...);
+            else
+                return -EIO;
+        }
 
       private:
         std::weak_ptr<blkdev::disk_manager> m_diskmm;
         std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;
         std::map<std::string, std::shared_ptr<internal::mount_point>> m_mounts;
+        internal::handle_mapper<fsfile> m_fds;
         mutable cpp_freertos::MutexRecursive m_lock;
     };
 } // namespace purefs::fs

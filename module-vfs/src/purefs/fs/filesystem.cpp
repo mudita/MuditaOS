@@ -78,7 +78,7 @@ namespace purefs::fs
                 }
             }
             if (diskh) {
-                const auto mnt_point = std::make_shared<internal::mount_point>(diskh, target, vsi->second);
+                const auto mnt_point = vsi->second->mount_prealloc(diskh, target);
                 const auto ret_mnt   = vsi->second->mount(mnt_point);
                 if (!ret_mnt)
                     m_mounts.emplace(std::make_pair(target, mnt_point));
@@ -183,6 +183,32 @@ namespace purefs::fs
         }
         if (ret.empty())
             ret.append("/");
+        return ret;
+    }
+
+    auto filesystem::add_filehandle(fsfile file) noexcept -> int
+    {
+        cpp_freertos::LockGuard _lck(m_lock);
+        return m_fds.insert(file);
+    }
+
+    auto filesystem::remove_filehandle(int fds) noexcept -> fsfile
+    {
+        cpp_freertos::LockGuard _lck(m_lock);
+        fsfile ret{};
+        if (m_fds.exists(fds)) {
+            ret = m_fds[fds];
+            m_fds.remove(fds);
+        }
+        return ret;
+    }
+    auto filesystem::find_filehandle(int fds) const noexcept -> fsfile
+    {
+        fsfile ret{};
+        cpp_freertos::LockGuard _lck(m_lock);
+        if (m_fds.exists(fds)) {
+            ret = m_fds[fds];
+        }
         return ret;
     }
 } // namespace purefs::fs

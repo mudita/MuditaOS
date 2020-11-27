@@ -19,7 +19,7 @@ namespace purefs::fs
             --m_mount_count;
         return -ENOTSUP;
     }
-    auto filesystem_operations::stat_vfs(std::string_view path, statvfs &stat) const noexcept -> int
+    auto filesystem_operations::stat_vfs(fsmount mntp, std::string_view path, statvfs &stat) const noexcept -> int
     {
         return -ENOTSUP;
     }
@@ -80,7 +80,7 @@ namespace purefs::fs
     {
         return -ENOTSUP;
     }
-    auto filesystem_operations::ioctl(fsfile zfile, int cmd, void *arg) noexcept -> int
+    auto filesystem_operations::ioctl(fsmount mnt, std::string_view path, int cmd, void *arg) noexcept -> int
     {
         return -ENOTSUP;
     }

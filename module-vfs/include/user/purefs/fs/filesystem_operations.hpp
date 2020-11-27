@@ -7,6 +7,11 @@
 #include <tuple>
 #include <memory>
 
+namespace purefs::blkdev::internal
+{
+    class disk_handle;
+}
+
 namespace purefs::fs
 {
     struct statvfs;
@@ -30,10 +35,11 @@ namespace purefs::fs
         /** Allocate mount point class specify to the VFS
          * @return Allocated mount point structure
          */
-        virtual auto mount_prealloc() -> fsmount         = 0;
+        virtual auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh, std::string_view path)
+            -> fsmount                                   = 0;
         virtual auto mount(fsmount mnt) noexcept -> int  = 0;
         virtual auto umount(fsmount mnt) noexcept -> int = 0;
-        virtual auto stat_vfs(std::string_view path, statvfs &stat) const noexcept -> int;
+        virtual auto stat_vfs(fsmount mnt, std::string_view path, statvfs &stat) const noexcept -> int;
 
         /** Standard file access API */
         virtual auto open(fsmount mnt, std::string_view path, int flags, int mode) noexcept -> fsfile = 0;
@@ -58,7 +64,7 @@ namespace purefs::fs
         /** Other fops API */
         virtual auto ftruncate(fsfile zfile, off_t len) noexcept -> int;
         virtual auto fsync(fsfile zfile) noexcept -> int;
-        virtual auto ioctl(fsfile zfile, int cmd, void *arg) noexcept -> int;
+        virtual auto ioctl(fsmount mnt, std::string_view path, int cmd, void *arg) noexcept -> int;
         virtual auto utimens(fsmount mnt, std::string_view path, std::array<timespec, 2> &tv) noexcept -> int;
         virtual auto flock(fsfile zfile, int cmd) noexcept -> int;
         virtual auto isatty(fsfile zfile) noexcept -> int = 0;
