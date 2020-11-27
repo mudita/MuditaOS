@@ -9,7 +9,7 @@
 #include <application-call/ApplicationCall.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-db/DBCalllogMessage.hpp>
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <Label.hpp>
 #include <Margins.hpp>
 #include <Style.hpp>

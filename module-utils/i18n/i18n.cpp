@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "i18.hpp"
+#include "i18n.hpp"
 
 namespace utils
 {
@@ -16,7 +16,7 @@ namespace utils
         }
     } // namespace
 
-    i18 localize;
+    i18n localize;
     json11::Json LangLoader::createJson(const std::string &filename)
     {
         const fs::path path = LanguageDirPath / (filename + extension);
@@ -59,7 +59,7 @@ namespace utils
         return languageNames;
     }
 
-    void i18::setInputLanguage(const Language &lang)
+    void i18n::setInputLanguage(const Language &lang)
     {
         if (lang == currentInputLanguage) {
             return;
@@ -73,7 +73,7 @@ namespace utils
             inputLanguage     = pack;
         }
     }
-    const std::string &i18::getInputLanguage(const std::string &str)
+    const std::string &i18n::getInputLanguage(const std::string &str)
     {
         // if language pack returned nothing then try default language
         if (inputLanguage[str].string_value().empty()) {
@@ -82,7 +82,7 @@ namespace utils
         return returnNonEmptyString(inputLanguage[str].string_value(), str);
     }
 
-    const std::string &i18::get(const std::string &str)
+    const std::string &i18n::get(const std::string &str)
     {
         // if language pack returned nothing then try default language
         if (displayLanguage[str].string_value().empty()) {
@@ -91,7 +91,7 @@ namespace utils
         return returnNonEmptyString(displayLanguage[str].string_value(), str);
     }
 
-    void i18::setDisplayLanguage(const Language &lang)
+    void i18n::setDisplayLanguage(const Language &lang)
     {
         if (!backupLanguageInitializer) {
             fallbackLanguage          = loader.createJson(fallbackLanguageName);
@@ -114,7 +114,7 @@ namespace utils
         }
     }
 
-    void i18::setFallbackLanguage(const Language &lang)
+    void i18n::setFallbackLanguage(const Language &lang)
     {
         fallbackLanguageName = std::move(lang);
     }
