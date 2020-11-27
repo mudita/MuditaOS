@@ -8,6 +8,7 @@
 #include <functional>
 
 #include <Audio/AudioCommon.hpp>
+#include <Audio/Stream.hpp>
 #include <Audio/encoder/Encoder.hpp>
 #include <Audio/Profiles/Profile.hpp>
 
@@ -112,6 +113,12 @@ namespace audio
 
         audio::RetCode SwitchToPriorityProfile();
 
+        void SetDataStreams(Stream *dStreamOut, Stream *dStreamIn)
+        {
+            dataStreamOut = dStreamOut;
+            dataStreamIn  = dStreamIn;
+        }
+
       protected:
         struct SupportedProfile
         {
@@ -123,6 +130,9 @@ namespace audio
             bool isAvailable;
         };
 
+        Stream *dataStreamOut = nullptr;
+        Stream *dataStreamIn  = nullptr;
+
         std::shared_ptr<Profile> currentProfile;
         std::unique_ptr<bsp::AudioDevice> audioDevice;
 
@@ -131,8 +141,6 @@ namespace audio
 
         State state = State::Idle;
         audio::AsyncCallback eventCallback;
-
-        AudioSinkState audioSinkState;
 
         audio::Token operationToken;
         Type opType = Type::Idle;

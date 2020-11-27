@@ -6,6 +6,7 @@
 
 #include "bsp/audio/bsp_audio.hpp"
 #include "fsl_sai_edma.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "macros.h"
@@ -21,8 +22,6 @@ namespace bsp
 
     void txCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
     void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
-    void inCellularWorkerTask(void *pvp);
-    void outCellularWorkerTask(void *pvp);
 
     class RT1051CellularAudio : public AudioDevice
     {
@@ -30,8 +29,6 @@ namespace bsp
       public:
         friend void txCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
         friend void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
-        friend void inCellularWorkerTask(void *pvp);
-        friend void outCellularWorkerTask(void *pvp);
 
         RT1051CellularAudio(AudioDevice::audioCallback_t callback);
         virtual ~RT1051CellularAudio();
@@ -47,20 +44,10 @@ namespace bsp
         cpp_freertos::MutexStandard mutex;
 
       private:
-        static const uint32_t CODEC_CHANNEL_PCM_BUFFER_SIZE = 1024;
-
         enum class State
         {
             Running,
             Stopped
-        };
-
-        /*! @brief Internals state of Rx/Tx callback, needed for double buffering technique */
-        enum class TransferState
-        {
-            HalfTransfer = 1 << 0,
-            FullTransfer = 1 << 1,
-            Close        = 1 << 2,
         };
 
         struct SAIFormat
@@ -68,8 +55,6 @@ namespace bsp
             uint32_t sampleRate_Hz;   /*!< Sample rate of audio data */
             uint32_t bitWidth;        /*!< Data length of audio data, usually 8/16/24/32 bits */
             sai_mono_stereo_t stereo; /*!< Mono or stereo */
-            uint8_t *data;            /*!< Data start address to transfer. */
-            size_t dataSize;          /*!< Transfer size. */
         };
 
         State state = State::Stopped;
@@ -77,8 +62,6 @@ namespace bsp
         SAIFormat saiOutFormat;
         uint32_t mclkSourceClockHz = 0;
         sai_config_t config;
-        TaskHandle_t inWorkerThread  = nullptr;
-        TaskHandle_t outWorkerThread = nullptr;
 
         // M.P: It is important to destroy these drivers in specific order
         std::shared_ptr<drivers::DriverPLL> pll;
@@ -89,12 +72,6 @@ namespace bsp
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t rxHandle);
-
-        // CODEC_CHANNEL_PCM_BUFFER_SIZE * 2 for double buffering
-        static ALIGN_(4) int16_t inBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE * 2];
-
-        // CODEC_CHANNEL_PCM_BUFFER_SIZE * 2 for double buffering
-        static ALIGN_(4) int16_t outBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE * 2];
 
         void Init();
         void Deinit();

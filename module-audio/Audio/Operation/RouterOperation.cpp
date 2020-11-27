@@ -14,10 +14,6 @@
 #include <optional>
 #include <vector>
 
-// enforced optimization is needed for std::vector::insert and std::fill to be
-// as quick as memcpy and memset respectively
-#pragma GCC optimize("O3")
-
 namespace audio
 {
 
@@ -25,81 +21,6 @@ namespace audio
         [[maybe_unused]] const char *file,
         std::function<std::uint32_t(const std::string &path, const std::uint32_t &defaultValue)> dbCallback)
     {
-
-        audioDeviceCallback =
-            [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> std::int32_t {
-            if (inputBuffer != nullptr) {
-                cpp_freertos::LockGuard lock(audioMutex);
-                receivedFramesDiffAudio++;
-
-                if (framesPerBuffer > audioDeviceBuffer.size()) {
-                    audioDeviceBuffer.resize(framesPerBuffer, 0);
-                }
-
-                if (muteEnable) {
-                    std::fill(std::begin(audioDeviceBuffer), std::end(audioDeviceBuffer), 0);
-                }
-                else {
-                    auto rangeStart = static_cast<const std::uint16_t *>(inputBuffer);
-                    auto rangeEnd   = rangeStart + framesPerBuffer;
-                    std::copy(rangeStart, rangeEnd, std::begin(audioDeviceBuffer));
-                }
-            }
-
-            if (outputBuffer != nullptr) {
-                cpp_freertos::LockGuard lock(cellularMutex);
-                receivedFramesDiffCellular--;
-
-                if (receivedFramesDiffCellular != 0) {
-                    LOG_FATAL("Audio router synchronization fail, diff = %d", receivedFramesDiffCellular);
-                    receivedFramesDiffCellular = 0;
-                }
-
-                if (framesPerBuffer > audioDeviceCellularBuffer.size()) {
-                    audioDeviceCellularBuffer.resize(framesPerBuffer, 0);
-                }
-
-                memcpy(outputBuffer, &audioDeviceCellularBuffer[0], framesPerBuffer * sizeof(std::int16_t));
-            }
-            return framesPerBuffer;
-        };
-
-        audioDeviceCellularCallback =
-            [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> std::int32_t {
-            if (inputBuffer != nullptr) {
-                cpp_freertos::LockGuard lock(cellularMutex);
-                receivedFramesDiffCellular++;
-
-                if (framesPerBuffer > audioDeviceCellularBuffer.size()) {
-                    audioDeviceCellularBuffer.resize(framesPerBuffer, 0);
-                }
-
-                auto rangeStart = static_cast<const std::uint16_t *>(inputBuffer);
-                auto rangeEnd   = rangeStart + framesPerBuffer;
-                std::copy(rangeStart, rangeEnd, std::begin(audioDeviceCellularBuffer));
-            }
-
-            if (outputBuffer != nullptr) {
-                cpp_freertos::LockGuard lock(audioMutex);
-                receivedFramesDiffAudio--;
-
-                if (receivedFramesDiffAudio != 0) {
-                    LOG_FATAL("Audio router synchronization fail, diff = %d", receivedFramesDiffAudio);
-                    receivedFramesDiffAudio = 0;
-                }
-
-                if (framesPerBuffer > audioDeviceBuffer.size()) {
-                    audioDeviceBuffer.resize(framesPerBuffer, 0);
-                }
-
-                memcpy(outputBuffer, &audioDeviceBuffer[0], framesPerBuffer * sizeof(std::int16_t));
-            }
-            return framesPerBuffer;
-        };
-
-        audioDeviceBuffer.resize(INPUT_BUFFER_START_SIZE, 0);
-        audioDeviceCellularBuffer.resize(INPUT_BUFFER_START_SIZE, 0);
-
         constexpr audio::Gain defaultRoutingEarspeakerGain       = 20;
         constexpr audio::Volume defaultRoutingEarspeakerVolume   = 10;
         constexpr audio::Gain defaultRoutingSpeakerphoneGain     = 20;
@@ -276,19 +197,20 @@ namespace audio
             return RetCode::UnsupportedProfile;
         }
 
-        audioDevice =
-            bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioDeviceCallback).value_or(nullptr);
+        audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), nullptr).value_or(nullptr);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
         }
 
-        audioDeviceCellular =
-            bsp::AudioDevice::Create(bsp::AudioDevice::Type::Cellular, audioDeviceCellularCallback).value_or(nullptr);
+        audioDeviceCellular = bsp::AudioDevice::Create(bsp::AudioDevice::Type::Cellular, nullptr).value_or(nullptr);
         if (audioDeviceCellular == nullptr) {
             LOG_ERROR("Error creating AudioDeviceCellular");
             return RetCode::Failed;
         }
+
+        audioDevice->source.connect(audioDeviceCellular->sink, *dataStreamIn);
+        audioDeviceCellular->source.connect(audioDevice->sink, *dataStreamOut);
 
         switch (state) {
         case State::Idle:

@@ -17,6 +17,7 @@
 * `[PowerManagement]` Change hardware timers clock source
 * `[bluetooth]` Underlying communication with the Bluetooth module over DMA (direct access)
 * `[system]` Workers refactor and state transition fixes
+* Change audio data path synchronization.
 
 
 
