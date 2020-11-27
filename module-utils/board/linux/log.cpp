@@ -48,10 +48,11 @@ struct Logger
 static Logger logger;
 static char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
 
-void dumpToFile(std::string_view log, const size_t length)
+void dumpToFile(std::string_view log, size_t length)
 {
-    static std::fstream logFile(logFileName, std::fstream::in | std::fstream::out | std::fstream::app);
+    static std::fstream logFile(logFileName, std::fstream::out);
     logFile.write(log.data(), length);
+    logFile.flush();
 }
 
 void log_Printf(const char *fmt, ...)
