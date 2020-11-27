@@ -142,11 +142,20 @@ namespace gui
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
             }
+            if (event.is(gui::KeyCode::KEY_RF)) {
+                setFocusItem(nullptr);
+            }
 
             if (event.is(gui::KeyCode::KEY_LEFT)) {
                 actualVectorIndex--;
                 if (actualVectorIndex >= optionsNames.size()) {
                     actualVectorIndex = optionsNames.size() - 1;
+                    if (itemName == AlarmOptionItemName::Repeat) {
+                        bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_edit"));
+                    }
+                }
+                else if (itemName == AlarmOptionItemName::Repeat) {
+                    bottomBarRestoreFromTemporaryMode();
                 }
                 optionLabel->setText(optionsNames[actualVectorIndex]);
                 return true;
@@ -157,8 +166,22 @@ namespace gui
                 if (actualVectorIndex >= optionsNames.size()) {
                     actualVectorIndex = 0;
                 }
+                if (actualVectorIndex == optionsNames.size() - 1 && itemName == AlarmOptionItemName::Repeat) {
+                    bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_edit"));
+                }
+                else if (itemName == AlarmOptionItemName::Repeat) {
+                    bottomBarRestoreFromTemporaryMode();
+                }
                 optionLabel->setText(optionsNames[actualVectorIndex]);
                 return true;
+            }
+
+            if (event.is(gui::KeyCode::KEY_LF) && itemName == AlarmOptionItemName::Repeat &&
+                actualVectorIndex == optionsNames.size() - 1) {
+                OptionParser parser;
+                auto weekDayRepeatData = std::make_unique<WeekDaysRepeatData>();
+                auto weekDayData       = parser.setWeekDayOptions(repeatOptionValue, std::move(weekDayRepeatData));
+                application->switchWindow(style::alarmClock::window::name::customRepeat, std::move(weekDayData));
             }
 
             if (event.is(gui::KeyCode::KEY_LF) && itemName == AlarmOptionItemName::Sound) {
@@ -186,7 +209,14 @@ namespace gui
                 break;
             }
             case AlarmOptionItemName::Repeat: {
-                alarm->repeat = actualVectorIndex;
+                if (alarm->repeat < optionsNames.size() - 1 && actualVectorIndex != optionsNames.size() - 1) {
+                    alarm->repeat = actualVectorIndex;
+                }
+                else if (alarm->repeat == optionsNames.size() - 1 ||
+                         optionsNames[optionsNames.size() - 1] ==
+                             utils::localize.get("app_alarm_clock_repeat_custom")) {
+                    alarm->repeat = static_cast<uint32_t>(AlarmRepeat::never);
+                }
                 break;
             }
             }
@@ -221,10 +251,34 @@ namespace gui
             case AlarmOptionItemName::Repeat: {
                 if (alarm->repeat < optionsNames.size() - 1) {
                     actualVectorIndex = alarm->repeat;
+                    if (alarm->repeat == static_cast<uint32_t>(AlarmRepeat::never)) {
+                        optionsNames[optionsNames.size() - 1] = utils::localize.get("app_alarm_clock_repeat_custom");
+                    }
+                    bottomBarRestoreFromTemporaryMode();
                 }
                 else {
-                    actualVectorIndex = optionsNames.size() - 1;
+                    auto parser = CustomRepeatValueParser(alarm->repeat);
+                    if (parser.isCustomValueEveryday()) {
+                        actualVectorIndex = static_cast<uint32_t>(AlarmRepeat::everyday);
+                        alarm->repeat     = actualVectorIndex;
+                        bottomBarRestoreFromTemporaryMode();
+                        optionsNames[optionsNames.size() - 1] = utils::localize.get("app_alarm_clock_repeat_custom");
+                    }
+                    else if (parser.isCustomValueWeekDays()) {
+                        actualVectorIndex = static_cast<uint32_t>(AlarmRepeat::weekDays);
+                        alarm->repeat     = actualVectorIndex;
+                        bottomBarRestoreFromTemporaryMode();
+                        optionsNames[optionsNames.size() - 1] = utils::localize.get("app_alarm_clock_repeat_custom");
+                    }
+                    else {
+                        actualVectorIndex                     = optionsNames.size() - 1;
+                        optionsNames[optionsNames.size() - 1] = parser.getWeekDaysText();
+                        if (this->focus) {
+                            bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_edit"));
+                        }
+                    }
                 }
+                repeatOptionValue = alarm->repeat;
                 break;
             }
             }
@@ -260,5 +314,4 @@ namespace gui
         LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));
         return musicFiles;
     }
-
 } /* namespace gui */
