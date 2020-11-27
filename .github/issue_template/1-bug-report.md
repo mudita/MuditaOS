@@ -16,13 +16,20 @@ What you think should happen...
 
 Current 'buggy' behavior...
 
-## 🔬 Minimal Reproduction
+## 🔬 Minimal reproduction
 
 Simple steps to reproduce this bug.
 
 Issues that don't have enough info and can't be reproduced will be closed.
 
-## 🌍 Your operating system and Mudita Center version
+## 🔍 Provide logs
 
+Please paste relevant logs below or attach them to this issue.
+
+<pre><code>
+
+</code></pre>
+
+## 🌍 Your operating system and MuditaOS version
 
 ## 🤔 Anything else relevant?
