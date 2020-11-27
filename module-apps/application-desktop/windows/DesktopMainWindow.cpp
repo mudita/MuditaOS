@@ -18,7 +18,7 @@
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
 
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include "log/log.hpp"
 
 #include <application-settings-new/ApplicationSettings.hpp>

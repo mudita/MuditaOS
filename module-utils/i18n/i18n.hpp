@@ -26,7 +26,7 @@ namespace utils
         json11::Json createJson(const std::string &filename);
     };
 
-    class i18
+    class i18n
     {
       private:
         json11::Json displayLanguage;
@@ -41,12 +41,12 @@ namespace utils
       public:
         static constexpr auto DefaultLanguage = "English";
         // Default constructor, left empty on purpose
-        i18()
+        i18n()
         {}
 
         // Explicit initialization point, default constructor is omitted. This is because LangLoader uses file system
         // which is not available at program's startup.
-        virtual ~i18()
+        virtual ~i18n()
         {}
         void setInputLanguage(const Language &lang);
         const std::string &getInputLanguage(const std::string &str);
@@ -56,7 +56,7 @@ namespace utils
     };
 
     // Global instance of i18 class
-    extern i18 localize;
+    extern i18n localize;
     inline auto translateI18(const std::string &text)
     {
         return utils::localize.get(text);

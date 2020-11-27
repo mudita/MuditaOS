@@ -7,7 +7,7 @@
 #include <Common/Query.hpp>
 #include <Tables/ContactsGroups.hpp>
 
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include "Record.hpp"
 #include "utf8/UTF8.hpp"
 

@@ -10,7 +10,7 @@
 #include "RichTextParser.hpp"
 #include "FontManager.hpp"
 
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <Style.hpp>
 
 namespace lock_style = style::window::pin_lock;

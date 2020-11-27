@@ -4,7 +4,7 @@
 #include <catch2/catch.hpp>
 
 #include "Interface/ContactRecord.hpp"
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include "vfs.hpp"
 
 TEST_CASE("Contact Record db tests")
