@@ -20,6 +20,8 @@
 ### Other
 
 * `[utils]` Added unit tests for time display.
+* `[test]` Rewritten tests and updated test documentation.
+
 
 ### Changed
 
