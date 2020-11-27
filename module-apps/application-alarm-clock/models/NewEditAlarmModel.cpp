@@ -57,11 +57,12 @@ namespace app::alarmClock
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
             [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
 
-        internalData.push_back(new gui::AlarmOptionsItem(
+        repeatOption = new gui::AlarmOptionsItem(
             application,
             AlarmOptionItemName::Repeat,
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+        internalData.push_back(repeatOption);
 
         for (auto &item : internalData) {
             item->deleteByList = false;
@@ -82,6 +83,13 @@ namespace app::alarmClock
         }
 
         list->rebuildList();
+    }
+
+    void NewEditAlarmModel::loadRepeat(std::shared_ptr<AlarmsRecord> record)
+    {
+        if (repeatOption->onLoadCallback) {
+            repeatOption->onLoadCallback(std::move(record));
+        }
     }
 
     void NewEditAlarmModel::saveData(std::shared_ptr<AlarmsRecord> alarm, AlarmAction action)

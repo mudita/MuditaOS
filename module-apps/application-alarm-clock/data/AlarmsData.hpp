@@ -2,6 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include "application-calendar/data/OptionParser.hpp"
 #include <module-db/Interface/AlarmsRecord.hpp>
 #include <SwitchData.hpp>
 
@@ -33,6 +35,17 @@ enum class AlarmAction
     Edit
 };
 
+enum class WeekDayIso
+{
+    Monday = date::Monday.iso_encoding() - 1,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday,
+    Sunday
+};
+
 class AlarmRecordData : public gui::SwitchData
 {
   protected:
@@ -41,7 +54,7 @@ class AlarmRecordData : public gui::SwitchData
   public:
     explicit AlarmRecordData(std::shared_ptr<AlarmsRecord> record) : record{std::move(record)}
     {}
-    std::shared_ptr<AlarmsRecord> getData() const
+    std::shared_ptr<AlarmsRecord> getData()
     {
         return record;
     }
@@ -49,4 +62,16 @@ class AlarmRecordData : public gui::SwitchData
     {
         record = std::move(rec);
     }
+};
+
+class CustomRepeatValueParser
+{
+    std::unique_ptr<WeekDaysRepeatData> weekDayData;
+
+  public:
+    explicit CustomRepeatValueParser(uint32_t repeatValue);
+
+    [[nodiscard]] std::string getWeekDaysText() const;
+    [[nodiscard]] bool isCustomValueWeekDays() const;
+    [[nodiscard]] bool isCustomValueEveryday() const;
 };

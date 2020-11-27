@@ -21,12 +21,14 @@ namespace app::alarmClock
 
         virtual void loadData(std::shared_ptr<AlarmsRecord> record)                     = 0;
         virtual void saveData(std::shared_ptr<AlarmsRecord> record, AlarmAction action) = 0;
+        virtual void loadRepeat(std::shared_ptr<AlarmsRecord> record)                   = 0;
     };
 
     class NewEditAlarmModel : public AlarmsInternalListItemProvider
     {
         app::Application *application = nullptr;
         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository;
+        gui::AlarmInternalListItem *repeatOption = nullptr;
         bool mode24H = false;
 
       public:
@@ -36,6 +38,7 @@ namespace app::alarmClock
 
         void loadData(std::shared_ptr<AlarmsRecord> record) override;
         void saveData(std::shared_ptr<AlarmsRecord> alarm, AlarmAction action) override;
+        void loadRepeat(std::shared_ptr<AlarmsRecord> record) override;
         void createData();
 
         [[nodiscard]] unsigned int getMinimalItemHeight() const override;

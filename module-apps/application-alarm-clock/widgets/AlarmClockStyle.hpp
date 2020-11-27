@@ -54,6 +54,14 @@ namespace style::alarmClock
                 inline constexpr auto label_h   = 30;
                 inline constexpr auto arrow_w_h = 20;
             } // namespace options
+
+            namespace checkBox
+            {
+                inline constexpr auto height        = 44;
+                inline constexpr auto marginTop     = 18;
+                inline constexpr auto inputBox_w    = style::window::label::big_h;
+                inline constexpr auto description_w = 280;
+            } // namespace checkBox
         } // namespace item
 
     } // namespace window
