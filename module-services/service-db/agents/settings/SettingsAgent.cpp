@@ -24,8 +24,6 @@ SettingsAgent::SettingsAgent(sys::Service *parentService) : DatabaseAgent(parent
 
 void SettingsAgent::initDb()
 {
-    // LOG_DEBUG("sql:\n--\n%s\n--", getDbInitString().c_str());
-    database->execute(getDbInitString().c_str());
     auto notifications = database->query(settings::Statements::getAllNotifications);
     if (nullptr == notifications || 0 == notifications->getRowCount()) {
         return;
@@ -82,11 +80,7 @@ void SettingsAgent::registerMessages()
 
 auto SettingsAgent::getDbInitString() -> const std::string
 {
-    auto x          = 0;
-    const char *sql = (
-#include "settings.sql"
-    );
-    return sql;
+    return {};
 }
 
 auto SettingsAgent::getDbFilePath() -> const std::string

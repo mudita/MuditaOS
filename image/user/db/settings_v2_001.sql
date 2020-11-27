@@ -1,18 +1,10 @@
---x, R"dbInitStr( 
-/*
- * Create Settings tables
- */
-
-
-BEGIN TRANSACTION;
 --
 -- Main settings table, for string application persistent data
 --
 CREATE TABLE IF NOT EXISTS settings_tab (
-    path TEXT NOT NULL UNIQUE,
+    path TEXT NOT NULL UNIQUE PRIMARY KEY,
     value TEXT
 );
-
 
 --
 -- Dictionary table, for variables with fixed set of values
@@ -46,23 +38,6 @@ CREATE TABLE IF NOT EXISTS settings_changed_tab(
         UNIQUE(path ) ON CONFLICT REPLACE
 );
 
+CREATE TRIGGER IF NOT EXISTS on_update UPDATE OF value ON settings_tab 
+WHEN new.value <> old.value BEGIN INSERT OR REPLACE INTO  settings_changed_tab (path, value) VALUES (new.path,new.value); END;
 
-CREATE TRIGGER IF NOT EXISTS on_update UPDATE OF value ON settings_tab
-WHEN new.value <> old.value
-    BEGIN
-        INSERT OR REPLACE INTO  settings_changed_tab (path, value) VALUES  (new.path,new.value);
-    END;
-
-
-
--- ----------- insert default values ----------------------
-INSERT OR REPLACE INTO dictionary_tab (path, value) VALUES
-    ('system/phone_mode', 'online'),
-    ('system/phone_mode', 'offline'),
-    ('system/phone_mode', 'dnd');
-
-INSERT OR REPLACE INTO settings_tab (path, value) VALUES
-    ('system/phone_mode', 'online');
-
-COMMIT TRANSACTION;
--- )dbInitStr"
