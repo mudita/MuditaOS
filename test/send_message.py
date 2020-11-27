@@ -17,9 +17,9 @@ def send_message(harness, phone_number: str, message: str):
         # enter menu
         connection.send_key(key_codes["enter"])
         harness.open_application("messages")
-        if harness.connection.get_window() != "ApplicationMessages":
+        if harness.connection.get_window_name() != "ApplicationMessages":
             time.sleep(2)
-            if harness.connection.get_window() != "ApplicationMessages":
+            if harness.connection.get_window_name() != "ApplicationMessages":
                 print("Application didn't switch, exiting...")
                 exit(1)
 
@@ -37,7 +37,7 @@ def send_message(harness, phone_number: str, message: str):
 
 def get_message_by_text(harness, message: str):
     body = {"messageBody": message}
-    return harness.endpoint_request("messages", "get", body)
+    return harness.endpoint_request("messages", "get", body)["body"]
 
 
 def main():
