@@ -5,7 +5,8 @@ project(module-audio VERSION 1.0
 
 
 set(SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoder.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/Decoder.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/DecoderWorker.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderMP3.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderWAV.cpp"
@@ -17,13 +18,16 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Audio.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioMux.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioCommon.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Endpoint.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Stream.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/StreamQueuedEventsListener.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/Operation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/PlaybackOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/RecorderOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/RouterOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/IdleOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Profiles/Profile.cpp"
-        )
+)
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)

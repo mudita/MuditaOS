@@ -3,10 +3,12 @@
 
 #include "decoderWAV.hpp"
 
+#include "Audio/AudioCommon.hpp"
+
 namespace audio
 {
 
-    decoderWAV::decoderWAV(const char *fileName) : decoder(fileName)
+    decoderWAV::decoderWAV(const char *fileName) : Decoder(fileName)
     {
 
         if (fileSize == 0) {

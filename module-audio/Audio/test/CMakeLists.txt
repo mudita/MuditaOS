@@ -10,4 +10,13 @@ add_catch2_executable(
         module-audio
 )
 
+add_gtest_executable(
+    NAME
+        audio-stream
+    SRCS
+        unittest_stream.cpp
+    LIBS
+        module-audio
+)
+
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" DESTINATION "${CMAKE_BINARY_DIR}")

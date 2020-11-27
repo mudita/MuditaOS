@@ -4,7 +4,7 @@
 #pragma once
 
 #include <Application.hpp>
-#include <module-audio/Audio/decoder/decoder.hpp>
+#include <Audio/decoder/Decoder.hpp>
 
 namespace gui
 {

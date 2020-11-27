@@ -3,7 +3,7 @@
 
 #include <cstdio>
 #include <Utils.hpp>
-#include "decoder.hpp"
+#include "Decoder.hpp"
 #include "decoderMP3.hpp"
 #include "decoderFLAC.hpp"
 #include "decoderWAV.hpp"
@@ -15,7 +15,7 @@
 namespace audio
 {
 
-    decoder::decoder(const char *fileName)
+    Decoder::Decoder(const char *fileName)
         : filePath(fileName), workerBuffer(std::make_unique<int16_t[]>(workerBufferSize)), tag(std::make_unique<Tags>())
     {
 
@@ -29,14 +29,18 @@ namespace audio
         std::rewind(fd);
     }
 
-    decoder::~decoder()
+    Decoder::~Decoder()
     {
+        if (audioWorker) {
+            audioWorker->close();
+        }
+
         if (fd) {
             std::fclose(fd);
         }
     }
 
-    std::unique_ptr<Tags> decoder::fetchTags()
+    std::unique_ptr<Tags> Decoder::fetchTags()
     {
         if (fd) {
             auto inPos = std::ftell(fd);
@@ -79,9 +83,9 @@ namespace audio
         return std::make_unique<Tags>(*tag);
     }
 
-    std::unique_ptr<decoder> decoder::Create(const char *file)
+    std::unique_ptr<Decoder> Decoder::Create(const char *file)
     {
-        std::unique_ptr<decoder> dec;
+        std::unique_ptr<Decoder> dec;
         if ((strstr(file, ".wav") != NULL) || (strstr(file, ".WAV") != NULL)) {
             dec = std::make_unique<decoderWAV>(file);
         }
@@ -103,7 +107,7 @@ namespace audio
         }
     }
 
-    void decoder::convertmono2stereo(int16_t *pcm, uint32_t samplecount)
+    void Decoder::convertmono2stereo(int16_t *pcm, uint32_t samplecount)
     {
         uint32_t i = 0, j = 0;
 
@@ -115,6 +119,18 @@ namespace audio
         }
 
         memcpy(pcm, &workerBuffer[0], samplecount * 2 * sizeof(int16_t));
+    }
+
+    void Decoder::startDecodingWorker(Stream &audioStream, DecoderWorker::EndOfFileCallback endOfFileCallback)
+    {
+        if (!audioWorker) {
+            audioWorker = std::make_unique<DecoderWorker>(audioStream, this, endOfFileCallback);
+            audioWorker->init();
+            audioWorker->run();
+        }
+        else {
+            LOG_DEBUG("AudioWorker already running.");
+        }
     }
 
 } // namespace audio
