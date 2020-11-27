@@ -7,6 +7,7 @@
 * `[PowerManagement]` Critial battery level notification to SystemManager.
 * `[Bluetooth]`  Add settings storage to bluetooth related items
 * Add Bluetooth virtual audio device.
+* Add custom repeat window for the alarm application
 
 ## [0.51.1 2020-12-18]
 

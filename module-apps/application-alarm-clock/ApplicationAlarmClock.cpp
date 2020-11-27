@@ -4,8 +4,10 @@
 #include "ApplicationAlarmClock.hpp"
 #include "application-alarm-clock/windows/AlarmClockMainWindow.hpp"
 #include "application-alarm-clock/windows/NewEditAlarmWindow.hpp"
+#include "application-alarm-clock/windows/CustomRepeatWindow.hpp"
 #include "application-alarm-clock/widgets/AlarmClockStyle.hpp"
 #include "application-alarm-clock/presenter/AlarmClockMainWindowPresenter.hpp"
+#include "application-alarm-clock/presenter/CustomRepeatWindowPresenter.hpp"
 #include "windows/Dialog.hpp"
 #include "windows/AppWindow.hpp"
 #include "windows/OptionWindow.hpp"
@@ -99,6 +101,13 @@ namespace app
                 auto alarmsProvider = std::make_shared<alarmClock::NewEditAlarmModel>(app, std::move(alarmsRepository));
                 auto presenter      = std::make_unique<alarmClock::AlarmClockEditWindowPresenter>(alarmsProvider);
                 return std::make_unique<alarmClock::NewEditAlarmWindow>(app, std::move(presenter));
+            });
+        windowsFactory.attach(
+            style::alarmClock::window::name::customRepeat, [](Application *app, const std::string &name) {
+                auto alarmsRepository = std::make_unique<alarmClock::AlarmsDBRepository>(app);
+                auto alarmsProvider = std::make_shared<alarmClock::CustomRepeatModel>(app, std::move(alarmsRepository));
+                auto presenter      = std::make_unique<alarmClock::CustomRepeatWindowPresenter>(alarmsProvider);
+                return std::make_unique<alarmClock::CustomRepeatWindow>(app, std::move(presenter));
             });
         windowsFactory.attach(
             utils::localize.get("app_alarm_clock_options_title"),
