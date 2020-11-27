@@ -82,4 +82,9 @@ extern "C"
 }
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+static const char *logFileName = "MuditaOS.log";
+#pragma GCC diagnostic pop
+
 #endif /* LOG_LOG_H_ */

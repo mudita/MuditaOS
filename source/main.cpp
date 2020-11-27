@@ -66,9 +66,6 @@ int main()
 
     bsp::BoardInit();
 
-    LOG_PRINTF("Launching PurePhone \n");
-    LOG_PRINTF("commit: %s tag: %s branch: %s\n", GIT_REV, GIT_TAG, GIT_BRANCH);
-
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]() {
@@ -159,6 +156,8 @@ int main()
 
         return ret;
     });
+    LOG_PRINTF("Launching PurePhone \n");
+    LOG_PRINTF("commit: %s tag: %s branch: %s\n", GIT_REV, GIT_TAG, GIT_BRANCH);
 
     cpp_freertos::Thread::StartScheduler();
 
