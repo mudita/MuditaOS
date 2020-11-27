@@ -3,6 +3,7 @@
 
 #include "AlarmClockOptions.hpp"
 #include "application-alarm-clock/widgets/AlarmClockStyle.hpp"
+#include "application-alarm-clock/data/AlarmsData.hpp"
 #include "windows/Options.hpp"
 #include "windows/DialogMetadata.hpp"
 #include "messages/DialogMetadataMessage.hpp"
@@ -44,8 +45,11 @@ namespace app::alarmClock
         std::list<gui::Option> options;
         addOption(
             {"app_alarm_clock_options_edit"},
-            [](gui::Item &) {
-                LOG_DEBUG("Not implemented yet - switch to edit window");
+            [application, record](gui::Item &) {
+                auto rec  = std::make_unique<AlarmsRecord>(record);
+                auto data = std::make_unique<AlarmRecordData>(std::move(rec));
+                data->setDescription(style::alarmClock::editAlarm);
+                application->switchWindow(style::alarmClock::window::name::newEditAlarm, std::move(data));
                 return true;
             },
             options);
@@ -59,8 +63,7 @@ namespace app::alarmClock
         addOption(
             {"app_alarm_clock_options_turn_off_all_alarms"},
             [application, &alarmsRepository](gui::Item &) {
-                alarmsRepository.turnOffAll(
-                    [application](bool) { application->switchWindow(gui::name::window::main_window); });
+                alarmsRepository.turnOffAll([application](bool) { application->returnToPreviousWindow(); });
                 return true;
             },
             options);
