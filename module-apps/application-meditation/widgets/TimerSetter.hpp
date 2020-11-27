@@ -16,15 +16,17 @@ namespace gui
     {
         class State
         {
-            static constexpr int minimalValue          = 10;
-            static constexpr int maximalValue          = 90;
-            static constexpr int defaultIncrementValue = 15;
+            static constexpr int counterMaxDigits             = 2;
+            static constexpr int minimalValue                 = 1;
+            static constexpr int maximalValue                 = 99;
+            static constexpr int defaultMeditationTime        = 15;
+            static constexpr std::array<const int, 4> timeArr = {15, 30, 60, 90};
 
             bool resetValueOnNumeric = true;
-            int timeInMinutes        = defaultIncrementValue;
+            int timeInMinutes        = defaultMeditationTime;
 
           public:
-            std::chrono::minutes getTime() const noexcept
+            [[nodiscard]] std::chrono::minutes getTime() const noexcept
             {
                 return std::chrono::minutes{timeInMinutes};
             }
@@ -44,6 +46,7 @@ namespace gui
         Label *timeUnitLabel = nullptr;
 
         void build();
+        void setMeditationTime();
 
       public:
         TimerSetter(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h);
