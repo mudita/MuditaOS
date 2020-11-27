@@ -66,7 +66,7 @@ namespace gui
             periodLabel->setText(utils::localize.get("app_alarm_clock_repeat_week_days"));
         }
         else if (alarm->repeat != static_cast<uint32_t>(AlarmRepeat::never)) {
-            periodLabel->setText(utils::localize.get("app_alarm_clock_repeat_custom"));
+            periodLabel->setText(CustomRepeatValueParser(alarm->repeat).getWeekDaysText());
         }
 
         if (periodLabel->getText().empty()) {

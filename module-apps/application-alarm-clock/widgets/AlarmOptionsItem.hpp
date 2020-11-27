@@ -34,6 +34,7 @@ namespace gui
         std::vector<audio::Tags> songsList;
         MusicStatus musicStatus        = MusicStatus::Stop;
         unsigned int actualVectorIndex = 0;
+        uint32_t repeatOptionValue     = 0;
 
         std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;

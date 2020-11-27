@@ -24,4 +24,16 @@ namespace app::alarmClock
     {
         alarmFieldsProvider->saveData(std::move(record), action);
     }
+
+    void AlarmClockEditWindowPresenter::loadRepeat(std::shared_ptr<AlarmsRecord> record)
+    {
+        alarmFieldsProvider->loadRepeat(std::move(record));
+    }
+
+    void AlarmClockEditWindowPresenter::updateRepeat(std::shared_ptr<AlarmsRecord> record, WeekDaysRepeatData data)
+    {
+        auto parser     = std::make_unique<OptionParser>();
+        auto uniqueData = std::make_unique<WeekDaysRepeatData>(data);
+        record->repeat  = parser->getDatabaseFieldValue(std::move(uniqueData));
+    }
 } // namespace app::alarmClock
