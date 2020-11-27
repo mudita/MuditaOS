@@ -4,7 +4,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 #include "application-calculator/data/CalculatorUtility.hpp"
-#include <module-utils/i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <cstring>
 
 class vfs vfs;

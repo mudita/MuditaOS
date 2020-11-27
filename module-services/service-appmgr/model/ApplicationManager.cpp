@@ -13,7 +13,7 @@
 #include <SystemManager/SystemManager.hpp>
 #include <application-call/ApplicationCall.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <service-appmgr/messages/Message.hpp>
 #include <service-db/DBServiceAPI.hpp>

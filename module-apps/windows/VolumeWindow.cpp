@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-gui/gui/input/InputEvent.hpp>
-#include <module-utils/i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include "VolumeWindow.hpp"
 
 namespace gui

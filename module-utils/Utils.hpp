@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include <algorithm> // std::find_if_not
 #include <log/log.hpp>
 #include <sstream>

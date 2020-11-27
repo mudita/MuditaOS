@@ -4,10 +4,10 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 #include <vfs.hpp>
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 
-class vfs vfs;       // needed for compilation, our vfs is global
-utils::i18 localize; // needed to load any keymap - these are stored in i18
+class vfs vfs;        // needed for compilation, our vfs is global
+utils::i18n localize; // needed to load any keymap - these are stored in i18
 
 struct vfs_initializer
 {

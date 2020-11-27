@@ -5,7 +5,7 @@
 #include "../ApplicationCall.hpp"
 #include <service-appmgr/model/ApplicationManager.hpp>
 
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include "EmergencyCallWindow.hpp"
 
 namespace gui

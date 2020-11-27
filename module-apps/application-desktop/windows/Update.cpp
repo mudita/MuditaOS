@@ -8,7 +8,7 @@
 #include <source/version.hpp>
 
 // module-utils
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 
 #include "Update.hpp"
 #include "../ApplicationDesktop.hpp"
