@@ -10,17 +10,34 @@ Create a branch, which name is connected to the feature, bug fix, or documentati
 
 ## Commit changes
 
-Commit your work. Each commit should have a description explaining:
+Commit your work. Each commit that makes it from your branch or fork into the master branch must have a title and a clear description.
 
-- what are you changing,
-- why are you making the changes (motivation),
-- what is the result of your changes.
+If you're part of the MuditaOS core development team, your commit's title *must* start with a Jira ticket number in square brackets. It can also point to which component you are working on, e.g., `[EGD-5555] phonebook: fix contact details`. A list of components is not yet defined, so please follow the names that are already in use. Do not add commits that are out of the scope of the Jira issue you are working on.
 
-If it's impossible to provide the above information then your commit is likely excessive or redundant and should be squashed with other commit(s).
+Start your commit's description with a single sentence describing what you are changing using present simple tense and an infinitive form. It must start with one of the following verbs: "Add", "Change" or "Fix", depending on whether you are adding a new feature, changing its
+behavior, or fixing it. This sentence will be a part of the project changelog, so please ensure it will be clear to the non-technical
+readers. Do not use proper names such as names of classes or functions. 
+
+Then, in the next paragraph, you must include a short description of what commit is changing in the project. You should be clear about
+your motivation to do the change and how it influences the project.
+
+If it's impossible to provide any of the above information, then your commit is likely excessive or redundant and should be squashed with another commit.
+
+An example of a correctly formatted commit:
+```
+    [EGD-4544] doc: update requirements for commits
+    
+    Change the requirements for commits' description.
+    
+    In order to be able to remove the obligation to change the project
+    changelog with every PR, provide requirements for commits' title and
+    description. The first sentence of each commit will be included in
+    the changelog directly, while the rest of it should help understand
+    others motivation and result of a change.
+```
 
 Here's [a helpful article about writing good Git commit messages](https://chris.beams.io/posts/git-commit/).
 
-**Note:** If you're part of the MuditaOS core development team, your commit *must* start with Jira ticket number in square brackets. It can also point to which component you are working on, e.g. `[EGD-5555] phonebook: fix contact details`. A list of components is not yet defined, so please follow the names that are already in use. Do not add commits that are out of the scope of the Jira issue you are working on.
 
 ## Basic checks before Pull Request
 
