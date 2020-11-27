@@ -189,8 +189,8 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         } break;
 
         case bsp::AudioDevice::InputPath::Microphone: {
-            max98090_reg_input_to_record_quick_t q_input_setup   = {0};
-        	max98090_reg_digmic_enable_t digena = {0};
+            max98090_reg_input_to_record_quick_t q_input_setup = {0};
+            max98090_reg_digmic_enable_t digena                = {0};
 
             // Enable left and right digital mic interface
             digena.digmicl = 1;
@@ -202,7 +202,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             i2c->Write(i2cAddr, (uint8_t *)&digena, 1);
 
             q_input_setup.in12sab = 1;
-            i2cAddr.subAddress = MAX98090_REG_LINE_INPUT_TO_RECORD_QUICK;
+            i2cAddr.subAddress    = MAX98090_REG_LINE_INPUT_TO_RECORD_QUICK;
             i2c->Write(i2cAddr, (uint8_t *)&q_input_setup, 1);
         } break;
 
