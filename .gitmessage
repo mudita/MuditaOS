@@ -4,6 +4,8 @@
 # Remember blank line between title and domains.
 
 # Changed domains, one domain by line
+# `[domain]` <added|changed|fixed>: message
+
 
 # Remember blank line between domains and body.
 
