@@ -4,7 +4,7 @@
 #pragma once
 
 #include <Audio/AudioCommon.hpp>
-#include <Audio/decoder/decoder.hpp>
+#include <Audio/decoder/Decoder.hpp>
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
 
