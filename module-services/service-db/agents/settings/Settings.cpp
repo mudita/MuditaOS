@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "Settings.hpp"
+#include <service-db/Settings.hpp>
 #include <service-db/SettingsMessages.hpp>
 
 #include <Service/Bus.hpp>
@@ -25,6 +25,7 @@ namespace settings
 
     Settings::~Settings()
     {
+        LOG_DEBUG("Settings::~Settings on %s", app->GetName().c_str());
         sys::Bus::Remove(std::static_pointer_cast<sys::Service>(app));
     }
 
@@ -56,7 +57,7 @@ namespace settings
             LOG_DEBUG("handleVariableChanged: (k=v): (%s=%s)", key.c_str(), val.value_or("").c_str());
             ValueCb::iterator it_cb = cbValues.find(key);
             if (cbValues.end() != it_cb) {
-                it_cb->second(key, std::move(val));
+                it_cb->second(std::move(val.value()));
                 return std::make_shared<sys::ResponseMessage>();
             }
         }

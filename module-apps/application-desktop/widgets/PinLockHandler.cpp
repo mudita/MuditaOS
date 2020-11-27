@@ -25,8 +25,8 @@ namespace gui
         constexpr inline auto serviceCellular = "ServiceCellular";
     } // namespace
 
-    PinLockHandler::PinLockHandler(app::ApplicationDesktop *app, SettingsRecord &settings)
-        : app(app), appSettings(settings),
+    PinLockHandler::PinLockHandler(app::ApplicationDesktop *app)
+        : app(app),
           screenLock(
               Store::GSM::SIM::NONE, PinLock::LockState::PasscodeRequired, PinLock::LockType::Screen, default_attempts),
           simLock(Store::GSM::SIM::NONE, PinLock::LockState::Unlocked, PinLock::LockType::SimPin, default_attempts)
@@ -40,7 +40,7 @@ namespace gui
         std::hash<std::vector<unsigned int>> hashEngine;
         uint32_t hash = hashEngine(pin);
         screenLock.value--;
-        if (hash == appSettings.lockPassHash) {
+        if (hash == app->getLockPassHash()) {
             screenLock.lockState = gui::PinLock::LockState::Unlocked;
             screenLock.value     = default_attempts;
         }
@@ -253,7 +253,7 @@ namespace gui
     void PinLockHandler::unlockScreen()
     {
         if (getStrongestLock().isType(PinLock::LockType::Screen)) {
-            unsigned int pinSize = appSettings.lockPassHash == 0 ? screen_nopin_size : default_screen_pin_size;
+            unsigned int pinSize = app->getLockPassHash() == 0 ? screen_nopin_size : default_screen_pin_size;
             screenLock.setPinSizeBounds(pinSize, pinSize);
             if (screenLock.getMaxPinSize() == screen_nopin_size) {
                 screenLock.lockState = gui::PinLock::LockState::Unlocked;
