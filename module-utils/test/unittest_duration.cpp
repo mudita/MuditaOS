@@ -13,7 +13,7 @@
 #include <catch2/catch.hpp>
 
 class vfs vfs;
-utils::i18 localize;
+utils::i18n localize;
 
 struct vfs_initializer
 {

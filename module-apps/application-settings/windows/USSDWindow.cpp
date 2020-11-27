@@ -5,7 +5,7 @@
 #include "../ApplicationSettings.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include "messages/AppMessage.hpp"
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <GridLayout.hpp>

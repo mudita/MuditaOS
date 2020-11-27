@@ -13,7 +13,7 @@
 #include "application-call/ApplicationCall.hpp"
 #include "application-call/data/CallSwitchData.hpp"
 
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 
 #include <service-audio/AudioServiceAPI.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>

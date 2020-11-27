@@ -4,7 +4,7 @@
 #include "SimSelectWindow.hpp"
 #include "Info.hpp"
 #include "SettingsMainWindow.hpp"
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include "log/log.hpp"
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <common_data/EventStore.hpp>

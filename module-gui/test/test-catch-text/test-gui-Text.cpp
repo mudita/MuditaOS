@@ -6,7 +6,7 @@
 #include "Common.hpp"
 #include "InitializedFontManager.hpp"
 #include "TextParse.hpp"
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include "mock/InitializedFontManager.hpp"
 #include <catch2/catch.hpp>
 #include <limits>

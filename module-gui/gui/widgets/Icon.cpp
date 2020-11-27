@@ -3,7 +3,7 @@
 
 #include "Icon.hpp"
 #include "TextParse.hpp"
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <Style.hpp>
 #include <Font.hpp>
 
