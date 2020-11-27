@@ -274,7 +274,7 @@ sys::ReturnCodes EventManager::InitHandler()
     });
 
     connect(sevm::KeypadBacklightMessage(), [&](sys::Message *msgl) {
-        auto msg = static_cast<sevm::KeypadBacklightMessage *>(msgl);
+        auto msg         = static_cast<sevm::KeypadBacklightMessage *>(msgl);
         auto message     = std::make_shared<sevm::KeypadBacklightMessage>();
         message->success = msg->processAction(msg->action);
         return message;

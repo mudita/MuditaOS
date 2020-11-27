@@ -72,7 +72,7 @@ namespace bsp::keypad_backlight
     bool turnOnAll()
     {
         constexpr DiodeIntensity intensity = 1.0f; // Maximum brightness
-        Diode_Reg diode_reg      = {.max_current = MAX_DIODE_CURRENT_LIMIT,
+        Diode_Reg diode_reg                = {.max_current = MAX_DIODE_CURRENT_LIMIT,
                                .current     = encode_diode_brightness_to_6bits(intensity)};
 
         wakeup();
