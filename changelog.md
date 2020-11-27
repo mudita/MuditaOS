@@ -11,6 +11,7 @@
 
 * `[audio]` Fix playback of mono sound using headphones
 * `[vfs]` Fix emulator build error for target Linux Release
+* `[audio]` Fix builtin microphone handling
 
 ## Changed
 
