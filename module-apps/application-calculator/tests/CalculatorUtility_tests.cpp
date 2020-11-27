@@ -20,7 +20,7 @@ struct vfs_initializer
 TEST_CASE("Calculator utilities")
 {
     auto calculator = Calculator();
-    utils::localize.SetDisplayLanguage(utils::Lang::En);
+    utils::localize.setDisplayLanguage("English");
 
     SECTION("Addition")
     {
@@ -72,7 +72,7 @@ TEST_CASE("Calculator utilities")
 
     SECTION("Fraction with comma")
     {
-        utils::localize.SetDisplayLanguage(utils::Lang::Pl);
+        utils::localize.setDisplayLanguage("Polski");
         auto result = calculator.calculate("15,5+12,056");
         REQUIRE(result.value == "27,556");
         REQUIRE(result.equation == "15.5+12.056");

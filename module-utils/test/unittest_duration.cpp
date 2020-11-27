@@ -25,7 +25,7 @@ struct vfs_initializer
 
 TEST_CASE("Duration - creation")
 {
-    utils::localize.SetDisplayLanguage(utils::Lang::En);
+    utils::localize.setDisplayLanguage("English");
 
     SECTION("default constructor")
     {
@@ -68,7 +68,7 @@ TEST_CASE("Duration - creation")
 
 TEST_CASE("Duration - arithemtics")
 {
-    utils::localize.SetDisplayLanguage(utils::Lang::En);
+    utils::localize.setDisplayLanguage("English");
 
     SECTION("Addition")
     {
@@ -106,7 +106,7 @@ TEST_CASE("Duration - arithemtics")
 
 TEST_CASE("Duration - comparision")
 {
-    utils::localize.SetDisplayLanguage(utils::Lang::En);
+    utils::localize.setDisplayLanguage("English");
 
     SECTION("Duration")
     {
@@ -150,7 +150,7 @@ TEST_CASE("Duration - comparision")
 
 TEST_CASE("Duration - display")
 {
-    utils::localize.SetDisplayLanguage(utils::Lang::En);
+    utils::localize.setDisplayLanguage("English");
 
     {
         using namespace utils::time;

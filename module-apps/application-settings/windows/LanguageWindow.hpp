@@ -33,6 +33,7 @@ namespace gui
         void destroyInterface() override;
 
       private:
+        utils::LangLoader loader;
         void invalidate() noexcept;
     };
 } /* namespace gui */

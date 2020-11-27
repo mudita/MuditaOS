@@ -35,36 +35,6 @@ namespace app::manager
     namespace
     {
         constexpr auto default_application_locktime_ms = 30000;
-
-        utils::Lang toUtilsLanguage(SettingsLanguage language)
-        {
-            switch (language) {
-            case SettingsLanguage::ENGLISH:
-                return utils::Lang::En;
-            case SettingsLanguage::POLISH:
-                return utils::Lang::Pl;
-            case SettingsLanguage::GERMAN:
-                return utils::Lang::De;
-            case SettingsLanguage::SPANISH:
-                return utils::Lang::Sp;
-            }
-            return utils::Lang::En;
-        }
-
-        SettingsLanguage toSettingsLanguage(utils::Lang language)
-        {
-            switch (language) {
-            case utils::Lang::En:
-                return SettingsLanguage::ENGLISH;
-            case utils::Lang::Pl:
-                return SettingsLanguage::POLISH;
-            case utils::Lang::De:
-                return SettingsLanguage::GERMAN;
-            case utils::Lang::Sp:
-                return SettingsLanguage::SPANISH;
-            }
-            return SettingsLanguage::ENGLISH;
-        }
     } // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
@@ -141,8 +111,9 @@ namespace app::manager
     {
         settings = DBServiceAPI::SettingsGet(this);
         blockingTimer->setInterval(settings.lockTime != 0 ? settings.lockTime : default_application_locktime_ms);
-        utils::localize.SetDisplayLanguage(toUtilsLanguage(settings.displayLanguage));
-        utils::localize.setInputLanguage(toUtilsLanguage(settings.inputLanguage));
+        utils::localize.setFallbackLanguage(utils::localize.DefaultLanguage);
+        utils::localize.setDisplayLanguage(settings.displayLanguage);
+        utils::localize.setInputLanguage(settings.inputLanguage);
 
         startSystemServices();
         startBackgroundApplications();
@@ -557,7 +528,7 @@ namespace app::manager
 
     auto ApplicationManager::handleDisplayLanguageChange(app::manager::DisplayLanguageChangeRequest *msg) -> bool
     {
-        const auto requestedLanguage = toSettingsLanguage(msg->getLanguage());
+        const auto requestedLanguage = msg->getLanguage();
         settings                     = DBServiceAPI::SettingsGet(this);
 
         if (requestedLanguage == settings.displayLanguage) {
@@ -565,7 +536,7 @@ namespace app::manager
             return true;
         }
         settings.displayLanguage = requestedLanguage;
-        utils::localize.SetDisplayLanguage(msg->getLanguage());
+        utils::localize.setDisplayLanguage(requestedLanguage);
         rebuildActiveApplications();
         DBServiceAPI::SettingsUpdate(this, settings);
         return true;
@@ -573,7 +544,7 @@ namespace app::manager
 
     auto ApplicationManager::handleInputLanguageChange(app::manager::InputLanguageChangeRequest *msg) -> bool
     {
-        const auto requestedLanguage = toSettingsLanguage(msg->getLanguage());
+        const auto requestedLanguage = msg->getLanguage();
         settings                     = DBServiceAPI::SettingsGet(this);
 
         if (requestedLanguage == settings.inputLanguage) {
