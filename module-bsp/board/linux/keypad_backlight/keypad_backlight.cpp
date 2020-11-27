@@ -7,7 +7,6 @@
 using namespace drivers;
 
 namespace bsp::keypad_backlight
-
 {
     namespace
     {
