@@ -20,6 +20,10 @@
 
 * `[utils]` Added unit tests for time display.
 
+### Changed
+
+* `[language]` Changed language loader to load from files
+
 ## [0.48.1 2020-11-23]
 
 ### Added

@@ -12,26 +12,26 @@ namespace app::manager
     class LanguageChangeRequest : public BaseMessage
     {
       public:
-        [[nodiscard]] auto getLanguage() const noexcept -> utils::Lang;
+        [[nodiscard]] auto getLanguage() const -> Language;
 
       protected:
-        LanguageChangeRequest(const ApplicationName &senderName, utils::Lang language);
+        LanguageChangeRequest(const ApplicationName &senderName, Language &&language);
 
       private:
-        utils::Lang language;
+        Language language;
     };
 
     /// Requests to change the display language.
     class DisplayLanguageChangeRequest : public LanguageChangeRequest
     {
       public:
-        DisplayLanguageChangeRequest(const ApplicationName &senderName, utils::Lang language);
+        DisplayLanguageChangeRequest(const ApplicationName &senderName, Language language);
     };
 
     /// Requests to change the input language.
     class InputLanguageChangeRequest : public LanguageChangeRequest
     {
       public:
-        InputLanguageChangeRequest(const ApplicationName &senderName, utils::Lang language);
+        InputLanguageChangeRequest(const ApplicationName &senderName, Language language);
     };
 } // namespace app::manager

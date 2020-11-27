@@ -49,30 +49,13 @@ namespace gui
         topBar->setActive(TopBar::Elements::BATTERY, true);
 
         setTitle(utils::localize.get("app_settings_title_languages"));
-
-        options.push_back(addOptionLabel(utils::localize.get("app_settings_language_english"), [=](gui::Item &item) {
-            LOG_INFO("selected display language: english");
-            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::En);
-            return true;
-        }));
-
-        options.push_back(addOptionLabel(utils::localize.get("app_settings_language_polish"), [=](gui::Item &) {
-            LOG_INFO("selected display language: polish");
-            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::Pl);
-            return true;
-        }));
-
-        options.push_back(addOptionLabel(utils::localize.get("app_settings_language_german"), [=](gui::Item &) {
-            LOG_INFO("selected display language: german");
-            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::De);
-            return true;
-        }));
-
-        options.push_back(addOptionLabel(utils::localize.get("app_settings_language_spanish"), [=](gui::Item &) {
-            LOG_INFO("selected display language: spanish");
-            app::manager::Controller::changeDisplayLanguage(application, utils::Lang::Sp);
-            return true;
-        }));
+        const auto &langList = loader.getAvailableDisplayLanguages();
+        for (const auto &lang : langList) {
+            options.push_back(addOptionLabel(lang, [=](gui::Item &item) {
+                app::manager::Controller::changeDisplayLanguage(application, lang);
+                return true;
+            }));
+        }
 
         // set position and navigation for labels
         uint32_t size = options.size();
