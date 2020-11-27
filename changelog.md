@@ -1,31 +1,29 @@
 # MuditaOS changelog
 
+[0.48.1 2020-11-27]
+
 ### Added
 
-* `[cellular]` Integration with basic flow for SIM card (cellular<>GUI)
-* `[file indexer db]` Added UT fot File Indexer DB
-* `[cellular]` Added MMI convertible to action messages.
-* `[text]` Added Up/Down text navigation (without scrolling)
+* `[cellular]` Add basic GUI flow for SIM cards.
+* `[text]` Add vertical text navigation without scrolling.
 
 ### Fixed
 
-* `[audio]` Fix playback of mono sound using headphones
-* `[vfs]` Fix emulator build error for target Linux Release
-* `[audio]` Fix builtin microphone handling
-
-## Changed
-
-* `[alarms]` Database refactor
-
-### Other
-
-* `[utils]` Added unit tests for time display.
+* `[audio]` Fix playback of mono sound when using headphones.
+* `[audio]` Fix builtin microphone handling.
 
 ### Changed
 
-* `[language]` Changed language loader to load from files
+* `[settings]` Load language setting from the settings file.
+* `[cellular]` Improve MMI call forwarding support.
 
-## [0.48.1 2020-11-23]
+### Other
+
+* `[test]` Add unit tests for time display.
+* `[test]` Add unit tests for file indexer to database integration.
+* `[build]` Fix emulator build error for the release target
+
+## [0.47.2 2020-11-23]
 
 ### Added
 
@@ -42,9 +40,7 @@
 
 ### Changed
 
-* `[gui][desktop]` ScreenLock logic unified with simLock's
 * `[messages]` Changed fonts of message snippet and its prefix.
-* `[cellular]` Improve MMI call forwarding support
 
 ## [0.47.1 2020-11-20]
 
