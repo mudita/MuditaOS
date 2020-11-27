@@ -11,6 +11,8 @@
 
 ### Fixed
 
+* `[meditation]` Fixed default counter settings 
+
 ### Other
 
 * `[test]` Rewritten tests and updated test documentation.
