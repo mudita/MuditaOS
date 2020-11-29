@@ -437,6 +437,36 @@ class CellularSimNewPinDataMessage : public CellularSimDataMessage
     }
 };
 
+class CellularSimCardLockDataMessage : public CellularSimDataMessage
+{
+
+  public:
+    enum class SimCardLock
+    {
+        Locked,
+        Unlocked
+    };
+    CellularSimCardLockDataMessage(Store::GSM::SIM _sim,
+                                   SimCardLock _simCardLock,
+                                   std::vector<unsigned int> _pin)
+        : CellularSimDataMessage{_sim}, simCardLock{_simCardLock}, pin{std::move(_pin)}
+    {}
+
+    [[nodiscard]] SimCardLock getLock() const noexcept
+    {
+        return simCardLock;
+    }
+    [[nodiscard]] const std::vector<unsigned int> &getPin() const noexcept
+    {
+        return pin;
+    }
+  private:
+    SimCardLock simCardLock;
+    std::vector<unsigned int> pin;
+
+
+};
+
 class CellularSimPukDataMessage : public CellularSimDataMessage
 {
     std::vector<unsigned int> puk;

@@ -264,3 +264,36 @@ bool CellularServiceAPI::USSDRequest(sys::Service *serv, CellularUSSDMessage::Re
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
     return true;
 }
+
+
+bool CellularServiceAPI::ChangeSimPin(sys::Service *serv,Store::GSM::SIM sim,
+                                                const std::vector<unsigned int> &passcode,
+                                                const std::vector<unsigned int> &pin)
+{
+
+    auto ret =
+    sys::Bus::SendUnicast(
+        std::make_shared<CellularSimPukDataMessage>(sim, passcode, pin), ServiceCellular::serviceName, serv, at::default_timeout);
+    if (ret.first == sys::ReturnCodes::Success)  {
+        CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
+        return response->retCode;
+    }
+
+    return false;
+}
+
+bool CellularServiceAPI::SetSimCardLock(sys::Service *serv,Store::GSM::SIM sim,
+                                      CellularSimCardLockDataMessage::SimCardLock lock,
+                                      const std::vector<unsigned int> &pin)
+{
+
+    auto ret =
+        sys::Bus::SendUnicast(
+            std::make_shared<CellularSimCardLockDataMessage>(sim, lock, pin), ServiceCellular::serviceName, serv, at::default_timeout);
+    if (ret.first == sys::ReturnCodes::Success)  {
+        CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
+        return response->retCode;
+    }
+
+    return false;
+}

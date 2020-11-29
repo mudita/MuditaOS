@@ -255,9 +255,29 @@ sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePower
 
     return sys::ReturnCodes::Success;
 }
+void handleCellularSimNewPinDataMessage(CellularSimNewPinDataMessage *msg)
+{
 
+}
 void ServiceCellular::registerMessageHandlers()
 {
+
+    connect(typeid(CellularSimNewPinDataMessage),
+
+            [&](sys::Message *request) -> sys::MessagePointer {
+              auto msg          = static_cast<CellularSimNewPinDataMessage *>(request);
+              return std::make_shared<CellularResponseMessage>(changePin(SimCard::pinToString(msg->getOldPin()), SimCard::pinToString(msg->getNewPin())));
+            });
+
+    connect(typeid(CellularSimCardLockDataMessage),
+
+            [&](sys::Message *request) -> sys::MessagePointer {
+              auto msg          = static_cast<CellularSimCardLockDataMessage *>(request);
+
+              return std::make_shared<CellularResponseMessage>(setPinLock(msg->getLock() == CellularSimCardLockDataMessage::SimCardLock::Locked,
+                                                                           SimCard::pinToString(msg->getPin())));
+            });
+
     handle_CellularGetChannelMessage();
 }
 
@@ -1016,7 +1036,7 @@ bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
 {
     auto message = std::make_shared<CellularSimRequestPukMessage>(Store::GSM::get()->selected, attempts, msg);
     sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
-    LOG_ERROR("REQUEST PUK");
+    LOG_DEBUG("REQUEST PUK");
     return true;
 }
 
@@ -1075,9 +1095,18 @@ bool ServiceCellular::sendChangePinResult(SimCardResult res)
 bool ServiceCellular::changePin(const std::string oldPin, const std::string newPin)
 {
     SimCard simCard(*this);
-    sendChangePinResult(simCard.changePin(oldPin, newPin));
-    return true;
+    auto result = simCard.changePin(oldPin, newPin);
+    sendChangePinResult(result);
+    return result == SimCardResult::OK;
 }
+
+bool ServiceCellular::setPinLock(bool lock, const std::string pin)
+{
+    SimCard simCard(*this);
+    auto result = simCard.setPinLock(lock, pin);
+    return result == SimCardResult::OK;
+}
+
 
 bool ServiceCellular::unlockSimPin(std::string pin)
 {
