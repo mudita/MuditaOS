@@ -70,10 +70,12 @@ namespace CellularServiceAPI
 
     bool USSDRequest(sys::Service *serv, CellularUSSDMessage::RequestType type, std::string data = "");
 
-    bool ChangeSimPin(sys::Service *serv,Store::GSM::SIM sim,
-                                          const std::vector<unsigned int> &passcode,
-                                          const std::vector<unsigned int> &pin);
-    bool SetSimCardLock(sys::Service *serv,Store::GSM::SIM sim,
-                                            CellularSimCardLockDataMessage::SimCardLock lock,
-                                            const std::vector<unsigned int> &pin);
+    bool ChangeSimPin(sys::Service *serv,
+                      Store::GSM::SIM sim,
+                      const std::vector<unsigned int> &passcode,
+                      const std::vector<unsigned int> &pin);
+    bool SetSimCardLock(sys::Service *serv,
+                        Store::GSM::SIM sim,
+                        CellularSimCardLockDataMessage::SimCardLock lock,
+                        const std::vector<unsigned int> &pin);
 }; // namespace CellularServiceAPI

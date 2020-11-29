@@ -446,9 +446,7 @@ class CellularSimCardLockDataMessage : public CellularSimDataMessage
         Locked,
         Unlocked
     };
-    CellularSimCardLockDataMessage(Store::GSM::SIM _sim,
-                                   SimCardLock _simCardLock,
-                                   std::vector<unsigned int> _pin)
+    CellularSimCardLockDataMessage(Store::GSM::SIM _sim, SimCardLock _simCardLock, std::vector<unsigned int> _pin)
         : CellularSimDataMessage{_sim}, simCardLock{_simCardLock}, pin{std::move(_pin)}
     {}
 
@@ -460,11 +458,10 @@ class CellularSimCardLockDataMessage : public CellularSimDataMessage
     {
         return pin;
     }
+
   private:
     SimCardLock simCardLock;
     std::vector<unsigned int> pin;
-
-
 };
 
 class CellularSimPukDataMessage : public CellularSimDataMessage

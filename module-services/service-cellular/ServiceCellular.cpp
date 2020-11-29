@@ -256,26 +256,26 @@ sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePower
     return sys::ReturnCodes::Success;
 }
 void handleCellularSimNewPinDataMessage(CellularSimNewPinDataMessage *msg)
-{
-
-}
+{}
 void ServiceCellular::registerMessageHandlers()
 {
 
     connect(typeid(CellularSimNewPinDataMessage),
 
             [&](sys::Message *request) -> sys::MessagePointer {
-              auto msg          = static_cast<CellularSimNewPinDataMessage *>(request);
-              return std::make_shared<CellularResponseMessage>(changePin(SimCard::pinToString(msg->getOldPin()), SimCard::pinToString(msg->getNewPin())));
+                auto msg = static_cast<CellularSimNewPinDataMessage *>(request);
+                return std::make_shared<CellularResponseMessage>(
+                    changePin(SimCard::pinToString(msg->getOldPin()), SimCard::pinToString(msg->getNewPin())));
             });
 
     connect(typeid(CellularSimCardLockDataMessage),
 
             [&](sys::Message *request) -> sys::MessagePointer {
-              auto msg          = static_cast<CellularSimCardLockDataMessage *>(request);
+                auto msg = static_cast<CellularSimCardLockDataMessage *>(request);
 
-              return std::make_shared<CellularResponseMessage>(setPinLock(msg->getLock() == CellularSimCardLockDataMessage::SimCardLock::Locked,
-                                                                           SimCard::pinToString(msg->getPin())));
+                return std::make_shared<CellularResponseMessage>(
+                    setPinLock(msg->getLock() == CellularSimCardLockDataMessage::SimCardLock::Locked,
+                               SimCard::pinToString(msg->getPin())));
             });
 
     handle_CellularGetChannelMessage();
@@ -1106,7 +1106,6 @@ bool ServiceCellular::setPinLock(bool lock, const std::string pin)
     auto result = simCard.setPinLock(lock, pin);
     return result == SimCardResult::OK;
 }
-
 
 bool ServiceCellular::unlockSimPin(std::string pin)
 {
