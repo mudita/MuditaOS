@@ -272,10 +272,19 @@ void ServiceCellular::registerMessageHandlers()
 
             [&](sys::Message *request) -> sys::MessagePointer {
                 auto msg = static_cast<CellularSimCardLockDataMessage *>(request);
-
                 return std::make_shared<CellularResponseMessage>(
                     setPinLock(msg->getLock() == CellularSimCardLockDataMessage::SimCardLock::Locked,
                                SimCard::pinToString(msg->getPin())));
+            });
+
+    connect(typeid(CellularChangeSimDataMessage),
+
+            [&](sys::Message *request) -> sys::MessagePointer {
+                auto msg                    = static_cast<CellularChangeSimDataMessage *>(request);
+                Store::GSM::get()->selected = msg->getSim();
+                bsp::cellular::sim::sim_sel();
+                bsp::cellular::sim::hotswap_trigger();
+                return std::make_shared<CellularResponseMessage>(true);
             });
 
     handle_CellularGetChannelMessage();

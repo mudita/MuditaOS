@@ -297,6 +297,21 @@ bool CellularServiceAPI::SetSimCardLock(sys::Service *serv,
         CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
         return response->retCode;
     }
+    return false;
+}
 
+bool CellularServiceAPI::SetSimCard(sys::Service *serv,
+                                        Store::GSM::SIM sim
+                                   )
+{
+
+    auto ret = sys::Bus::SendUnicast(std::make_shared<CellularChangeSimDataMessage>(sim),
+                                     ServiceCellular::serviceName,
+                                     serv,
+                                     at::default_timeout);
+    if (ret.first == sys::ReturnCodes::Success) {
+        CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
+        return response->retCode;
+    }
     return false;
 }

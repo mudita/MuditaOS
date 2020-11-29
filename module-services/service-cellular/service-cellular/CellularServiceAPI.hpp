@@ -78,4 +78,7 @@ namespace CellularServiceAPI
                         Store::GSM::SIM sim,
                         CellularSimCardLockDataMessage::SimCardLock lock,
                         const std::vector<unsigned int> &pin);
+    bool SetSimCard(sys::Service *serv,
+                                        Store::GSM::SIM sim
+    );
 }; // namespace CellularServiceAPI

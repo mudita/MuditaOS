@@ -400,6 +400,14 @@ class CellularSimDataMessage : public CellularMessage
     }
 };
 
+class CellularChangeSimDataMessage : public CellularSimDataMessage
+{
+  public:
+    CellularChangeSimDataMessage(Store::GSM::SIM _sim)
+    : CellularSimDataMessage{_sim}
+    {}
+};
+
 class CellularSimPinDataMessage : public CellularSimDataMessage
 {
     std::vector<unsigned int> pinValue;
