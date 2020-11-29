@@ -6,7 +6,6 @@
 #include "service-time/TimeMessage.hpp"
 
 #include <BaseInterface.hpp>
-#include <Common/Query.hpp>
 #include <MessageType.hpp>
 #include <log/log.hpp>
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
@@ -98,8 +97,10 @@ namespace stm
                 auto result = msg->getResult();
 
                 if (dynamic_cast<db::query::events::SelectFirstUpcomingResult *>(result.get())) {
-
                     calendarEvents.receiveNextEventQuery(std::move(result));
+                    responseHandled = true;
+                }
+                if (dynamic_cast<db::query::alarms::SelectFirstUpcomingResult *>(result.get())) {
                     alarmsEvents.receiveNextEventQuery(std::move(result));
                     responseHandled = true;
                 }
