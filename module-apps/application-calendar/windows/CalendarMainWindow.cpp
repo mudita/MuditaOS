@@ -173,25 +173,6 @@ namespace gui
 
     bool CalendarMainWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        // mlucki
-        // if ((inputEvent.state == InputEvent::State::keyPressed) && (inputEvent.keyCode == KeyCode::KEY_0)) {
-        if (1) {
-
-            std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
-            eventData->setDescription(style::window::calendar::name::event_reminder_window);
-            auto event   = std::make_shared<EventsRecord>(); //(eventRecord);
-            event->title = "My little calendar event";
-            eventData->setData(event);
-
-            this->application->switchWindow("EventReminderWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(eventData));
-
-            // SwitchRequest switchRequest(ServiceName, rootApplicationName, gui::name::window::main_window, nullptr);
-
-            /*application->switchWindow(const std::string &windowName,
-                                           gui::ShowMode cmd,
-                                           std::unique_ptr<gui::SwitchData> data)*/
-        }
-
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }

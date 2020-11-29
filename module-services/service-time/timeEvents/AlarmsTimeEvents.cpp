@@ -6,17 +6,8 @@
 
 #include <BaseInterface.hpp>
 #include <Common/Query.hpp>
-
-//#include <application-calendar/widgets/CalendarStyle.hpp>
-/*#include <module-apps/application-calendar/ApplicationCalendar.hpp>
-#include <module-apps/application-calendar/data/CalendarData.hpp>
-#include <module-apps/application-calendar/data/dateCommon.hpp>*/
-
 #include <module-db/queries/alarms/QueryAlarmsSelectFirstUpcoming.hpp>
 #include <module-gui/gui/SwitchData.hpp>
-
-//#include <queries/calendar/QueryEventsEdit.hpp>
-
 #include <service-appmgr/Controller.hpp>
 #include <service-db/DBServiceAPI.hpp>
 
@@ -65,12 +56,12 @@ namespace stm
             return 0;
         }
 
+        // mlucki
+        // Todo: calc here the duration to first upcoming alarm
+        auto duration = seconds(0);
+        /*
         alarmsRecord = records->at(0);
-
-        // mlucki
-        auto duration = minutes(10);
-        // mlucki
-        /*startTP       = alarmsRecord.date_from - minutes{alarmsRecord.reminder};
+        startTP       = alarmsRecord.date_from - minutes{alarmsRecord.reminder};
         auto duration = alarmsRecord.date_from - std::chrono::minutes{alarmsRecord.reminder} - TimePointNow();
         if (duration.count() <= 0) {
             duration = std::chrono::milliseconds(eventTimerMinSkipInterval);
@@ -82,9 +73,12 @@ namespace stm
     bool AlarmsTimeEvents::sendEventFiredQuery()
     {
         // mlucki
+        // Todo: there is a place to set (in DB and optionally) the alarmsRecord as processed/invoked
+
         /*eventRecord.reminder_fired = TimePointNow();
         return DBServiceAPI::GetQuery(
             service(), db::Interface::Name::Alarms, std::make_unique<db::query::alarms::Edit>(alarmsRecord));*/
+
         return true;
     }
 
@@ -96,7 +90,7 @@ namespace stm
         auto event = std::make_shared<AlarmsRecord>(alarmsRecord);
         eventData->setData(event);*/
 
-        /// Todo: restore action after rework of application popups
+        /// Todo: restore invoke action after rework of application popups
         // app::manager::Controller::sendAction(service(), app::manager::actions::ShowReminder, std::move(eventData));
     }
 } // namespace stm
