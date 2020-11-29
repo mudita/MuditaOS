@@ -5,6 +5,7 @@ set(SOURCES
     ServiceTime.cpp
     timeEvents/TimeEvents.cpp
     timeEvents/CalendarTimeEvents.cpp
+    timeEvents/AlarmsTimeEvents.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

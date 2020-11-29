@@ -10,6 +10,7 @@
 #include <MessageType.hpp>
 #include <log/log.hpp>
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
+#include <module-db/queries/alarms/QueryAlarmsSelectFirstUpcoming.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 
@@ -19,7 +20,7 @@
 
 namespace stm
 {
-    ServiceTime::ServiceTime() : sys::Service(service::name::service_time), calendarEvents(this)
+    ServiceTime::ServiceTime() : sys::Service(service::name::service_time), calendarEvents(this), alarmsEvents(this)
     {
         LOG_INFO("[ServiceTime] Initializing");
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
@@ -60,20 +61,26 @@ namespace stm
             if (msg->interface == db::Interface::Name::Events && msg->dataModified()) {
 
                 calendarEvents.processNextEvent();
-
+                return responseMsg;
+            }
+            if (msg->interface == db::Interface::Name::Alarms && msg->dataModified()) {
+                alarmsEvents.processNextEvent();
                 return responseMsg;
             }
         } break;
         case MessageType::ReloadTimers: {
             calendarEvents.processNextEvent();
+            alarmsEvents.processNextEvent();
             return std::make_shared<sys::ResponseMessage>();
         } break;
         case MessageType::TimersProcessingStart: {
             calendarEvents.startProcessing();
+            alarmsEvents.startProcessing();
             return std::make_shared<sys::ResponseMessage>();
         } break;
         case MessageType::TimersProcessingStop: {
             calendarEvents.stopProcessing();
+            alarmsEvents.stopProcessing();
             return std::make_shared<sys::ResponseMessage>();
         } break;
         default:
@@ -93,6 +100,7 @@ namespace stm
                 if (dynamic_cast<db::query::events::SelectFirstUpcomingResult *>(result.get())) {
 
                     calendarEvents.receiveNextEventQuery(std::move(result));
+                    alarmsEvents.receiveNextEventQuery(std::move(result));
                     responseHandled = true;
                 }
             }

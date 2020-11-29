@@ -4,6 +4,7 @@
 #pragma once
 
 #include "service-time/CalendarTimeEvents.hpp"
+#include "service-time/AlarmsTimeEvents.hpp"
 #include "service-time/ServiceTime.hpp"
 
 #include <MessageType.hpp>
@@ -28,6 +29,7 @@ namespace stm
     {
       private:
         CalendarTimeEvents calendarEvents;
+        AlarmsTimeEvents alarmsEvents;
 
       public:
         ServiceTime();

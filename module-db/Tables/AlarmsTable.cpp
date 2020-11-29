@@ -170,3 +170,32 @@ bool AlarmsTable::updateStatuses(AlarmStatus status)
 {
     return db->execute("UPDATE alarms SET status = %i;", status);
 }
+
+std::vector<AlarmsTableRow> AlarmsTable::SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till)
+{
+    auto retQuery = db->query("SELECT * "
+                              "FROM alarms "
+                              "WHERE time >= '%q' "
+                              "AND time <= '%q' ",
+                              TimePointToString(filter_from).c_str(),
+                              TimePointToString(filter_till).c_str());
+
+    if (retQuery == nullptr || retQuery->getRowCount() == 0) {
+        return std::vector<AlarmsTableRow>();
+    }
+
+    std::vector<AlarmsTableRow> ret;
+
+    do {
+        ret.push_back(AlarmsTableRow{
+            (*retQuery)[0].getUInt32(),                              // ID
+            TimePointFromString((*retQuery)[1].getString().c_str()), // date_from
+            (*retQuery)[2].getUInt32(),                              // reminder
+            static_cast<AlarmStatus>((*retQuery)[3].getInt32()),     // reminder
+            (*retQuery)[4].getUInt32(),                              // reminder
+            (*retQuery)[5].getString()                               // title/
+        });
+    } while (retQuery->nextRow());
+
+    return ret;
+}

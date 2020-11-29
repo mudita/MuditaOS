@@ -24,6 +24,8 @@ namespace db::query::alarms
     class RemoveResult;
     class TurnOffAll;
     class TurnOffAllResult;
+    class SelectFirstUpcoming;
+    class SelectFirstUpcomingResult;
 } // namespace db::query::alarms
 
 struct AlarmsRecord : public Record
@@ -35,7 +37,8 @@ struct AlarmsRecord : public Record
     UTF8 path;
 
     AlarmsRecord() = default;
-    explicit AlarmsRecord(const AlarmsTableRow &tableRow);
+    ~AlarmsRecord() = default;
+    AlarmsRecord(const AlarmsTableRow &tableRow);
 };
 
 enum class AlarmsRecordField
@@ -50,7 +53,7 @@ class AlarmsRecordInterface : public RecordInterface<AlarmsRecord, AlarmsRecordF
 {
   public:
     AlarmsRecordInterface(AlarmsDB *alarmsDb);
-    ~AlarmsRecordInterface();
+    ~AlarmsRecordInterface() override = default;
 
     bool Add(const AlarmsRecord &rec) override final;
     bool RemoveByID(uint32_t id) override final;
@@ -66,6 +69,7 @@ class AlarmsRecordInterface : public RecordInterface<AlarmsRecord, AlarmsRecordF
                                                                      uint32_t limit,
                                                                      AlarmsRecordField field,
                                                                      const char *str) override final;
+    std::unique_ptr<std::vector<AlarmsRecord>> SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till);
 
     std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
@@ -78,4 +82,6 @@ class AlarmsRecordInterface : public RecordInterface<AlarmsRecord, AlarmsRecordF
     std::unique_ptr<db::query::alarms::GetResult> runQueryImplGetResult(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::alarms::GetLimitedResult> runQueryImplGetLimitedResult(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::alarms::TurnOffAllResult> runQueryImplTurnOffAll(std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::alarms::SelectFirstUpcomingResult> runQueryImplSelectFirstUpcoming(
+        std::shared_ptr<db::Query> query);
 };

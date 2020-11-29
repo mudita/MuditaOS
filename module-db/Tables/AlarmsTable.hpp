@@ -66,4 +66,5 @@ class AlarmsTable : public Table<AlarmsTableRow, AlarmsTableFields>
     uint32_t count() override final;
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
     bool updateStatuses(AlarmStatus status);
+    std::vector<AlarmsTableRow> SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till);
 };
