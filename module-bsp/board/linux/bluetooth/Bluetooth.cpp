@@ -9,21 +9,7 @@
 
 using namespace bsp;
 
-void BTdev::_circ::sem_take()
-{}
-void BTdev::_circ::sem_give()
-{}
-
-BTdev::_circ::_circ(unsigned int size, int threshold) : head(0), tail(0), threshold(threshold), size(size), len(0)
-{
-    buff = new char[size];
-}
-BTdev::_circ::~_circ()
-{
-    delete[] buff;
-}
-
-BlueKitchen::BlueKitchen(unsigned int in_size, unsigned int out_size) : BluetoothCommon(in_size, out_size)
+BlueKitchen::BlueKitchen() : BluetoothCommon()
 {}
 
 BlueKitchen *BlueKitchen::getInstance()
@@ -35,13 +21,12 @@ BlueKitchen *BlueKitchen::getInstance()
     return k;
 }
 
-ssize_t BlueKitchen::write_blocking(char *buf, ssize_t len)
+ssize_t BlueKitchen::write(const uint8_t *buf, size_t nbytes)
 {
     return 0;
 }
 
-BluetoothCommon::BluetoothCommon(unsigned int in_size, unsigned int out_size, int threshold)
-    : BTdev(in_size, out_size, threshold)
+BluetoothCommon::BluetoothCommon() : BTdev()
 {}
 
 BlueKitchen::~BlueKitchen()

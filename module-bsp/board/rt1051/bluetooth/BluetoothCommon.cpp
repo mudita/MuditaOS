@@ -18,42 +18,7 @@ lpuart_edma_handle_t BluetoothCommon::uartDmaHandle = {};
 // TODO it's plain copy same as in cellular - this is kind of wrong
 uint32_t UartGetPeripheralClock();
 
-void BTdev::_circ::sem_take()
-{
-    if (!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
-        xSemaphoreTake(sem, 0);
-    }
-    else {
-        BaseType_t px;
-        xSemaphoreTakeFromISR(sem, &px);
-    }
-}
-
-void BTdev::_circ::sem_give()
-{
-    if (!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
-        xSemaphoreGive(sem);
-    }
-    else {
-        BaseType_t px;
-        xSemaphoreGiveFromISR(sem, &px);
-    }
-}
-
-BTdev::_circ::_circ(unsigned int size, int threshold) : head(0), tail(0), threshold(threshold), size(size), len(0)
-{
-    buff = new char[size];
-    sem  = xSemaphoreCreateBinary();
-}
-
-BTdev::_circ::~_circ()
-{
-    vSemaphoreDelete(sem);
-    delete[] buff;
-}
-
-BluetoothCommon::BluetoothCommon(unsigned int in_size, unsigned int out_size, int threshold)
-    : BTdev(in_size, out_size, threshold)
+BluetoothCommon::BluetoothCommon() : BTdev()
 {
     configure_uart_io();
     configure_lpuart();
@@ -162,22 +127,18 @@ ssize_t BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
     return ret;
 }
 
-ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t len)
+ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t nbytes)
 {
     ssize_t ret = -1;
 
-    // flush RX circ buffer
-    bsp::BlueKitchen *bt = bsp::BlueKitchen::getInstance();
-    bt->in.flush();
+    auto wrote = write(const_cast<uint8_t *>(buf), nbytes);
 
-    auto wrote = write(const_cast<uint8_t *>(buf), len);
-
-    if (wrote == len) { // success orchestrating a transfer
+    if (wrote == nbytes) { // success orchestrating a transfer
         constexpr auto writeBlockingTimeout = pdMS_TO_TICKS(100);
         auto ulNotificationValue              = ulTaskNotifyTake(pdFALSE, writeBlockingTimeout);
         if (ulNotificationValue != 0) { // success completing a transfer
             LOG_DEBUG("DMA Tx wrote");
-            ret = len;
+            ret = nbytes;
         }
         else {
             LOG_ERROR("DMA Tx timeout");
@@ -185,7 +146,7 @@ ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t len)
         }
     }
     else {
-        LOG_WARN("DMA Tx not wrote (%d/%d)", wrote, len);
+        LOG_WARN("DMA Tx not wrote (%d/%d)", wrote, nbytes);
     }
     return ret;
 }

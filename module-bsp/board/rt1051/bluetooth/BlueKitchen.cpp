@@ -10,13 +10,12 @@
 
 using namespace bsp;
 
-BlueKitchen::BlueKitchen(unsigned int in_size, unsigned int out_size) : BluetoothCommon(in_size, out_size)
+BlueKitchen::BlueKitchen() : BluetoothCommon()
 {
     to_read       = 0;
     read_buff     = NULL;
     read_ready_cb = NULL;
     write_done_cb = NULL;
-    in.threshold  = 128;
 }
 
 BlueKitchen::~BlueKitchen()
@@ -28,7 +27,7 @@ BlueKitchen *BlueKitchen::getInstance()
     if (k == NULL) {
         /// outcomming & incomming heap allocated buffers sizes
         /// packet on IP network cna have MTU 1500, so big enough buffers were added to not throttle comms
-        k = new BlueKitchen(2048, 8000);
+        k = new BlueKitchen();
     }
     return k;
 }
