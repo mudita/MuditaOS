@@ -46,6 +46,7 @@ bool WorkerDesktop::deinit(void)
 
     Worker::deinit();
 
+    bsp::usbDeinit();
     LOG_DEBUG("deinit end");
     return true;
 }
