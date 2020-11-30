@@ -277,12 +277,12 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
              "contact_match_groups.group_id = " +
              std::to_string(groupId);
 
-    std::string exclude_temporary = " WHERE contacts._id not in ( "
-                                    "   SELECT cmg.contact_id "
-                                    "   FROM contact_match_groups cmg, contact_groups cg "
-                                    "   WHERE cmg.group_id = cg._id "
-                                    "       AND cg.name = 'Temporary' "
-                                    "   ) ";
+    constexpr auto exclude_temporary = " WHERE contacts._id not in ( "
+                                       "   SELECT cmg.contact_id "
+                                       "   FROM contact_match_groups cmg, contact_groups cg "
+                                       "   WHERE cmg.group_id = cg._id "
+                                       "       AND cg.name = 'Temporary' "
+                                       "   ) ";
 
     switch (matchType) {
     case MatchType::Name: {
