@@ -50,4 +50,12 @@ namespace purefs::fs::internal
             return {};
         }
     }
+    auto cleanup_thread_local_cwd_mem() -> void
+    {
+        auto pcwd = reinterpret_cast<char *>(pvTaskGetThreadLocalStoragePointer(nullptr, CWD_THREAD_LOCAL_INDEX));
+        if (pcwd) {
+            delete[] pcwd;
+            vTaskSetThreadLocalStoragePointer(nullptr, CWD_THREAD_LOCAL_INDEX, nullptr);
+        }
+    }
 } // namespace purefs::fs::internal

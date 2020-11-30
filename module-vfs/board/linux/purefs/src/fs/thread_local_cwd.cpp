@@ -20,4 +20,8 @@ namespace purefs::fs::internal
         cwd_per_thread = path;
         return {};
     }
+    auto cleanup_thread_local_cwd_mem() -> void
+    {
+        cwd_per_thread.erase();
+    }
 } // namespace purefs::fs::internal

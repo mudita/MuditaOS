@@ -143,7 +143,7 @@ namespace purefs::fs
     auto filesystem::absolute_path(std::string_view path) noexcept -> std::string
     {
         std::string ret{};
-        if (path[0] == '/') {
+        if (!path.empty() && path[0] == '/') {
             ret.append(path);
         }
         else {
