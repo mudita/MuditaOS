@@ -33,6 +33,14 @@ TEST_CASE("Notes Table tests")
         REQUIRE(records[0].snippet == testSnippet);
     }
 
+    SECTION("Get notes by text query")
+    {
+        constexpr auto testSearch = "TEST";
+        const auto &records       = table.getByText(testSearch);
+        REQUIRE(records.size() == 1);
+        REQUIRE(records[0].snippet == testSnippet);
+    }
+
     SECTION("Add a note")
     {
         NotesTableRow row;

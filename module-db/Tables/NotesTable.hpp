@@ -41,6 +41,7 @@ class NotesTable : public Table<NotesTableRow, NotesTableFields>
                                                      std::uint32_t limit,
                                                      NotesTableFields field,
                                                      const char *str) override;
+    std::vector<NotesTableRow> getByText(const std::string &text);
 
     std::uint32_t count() override;
     std::uint32_t countByFieldId(const char *field, std::uint32_t id) override;

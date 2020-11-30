@@ -5,6 +5,7 @@
 
 #include <Interface/NotesRecord.hpp>
 #include <queries/notes/QueryNotesGet.hpp>
+#include <queries/notes/QueryNotesGetByText.hpp>
 #include <queries/notes/QueryNoteRemove.hpp>
 #include <queries/notes/QueryNoteStore.hpp>
 
@@ -37,6 +38,17 @@ TEST_CASE("Notes Record tests")
 
         REQUIRE(getResult->getRecords().size() == notesRecordInterface.GetCount());
         REQUIRE(getResult->getCount() == notesRecordInterface.GetCount());
+        REQUIRE(getResult->getRecords()[0].snippet == testSnippet);
+    }
+
+    SECTION("Get notes by text query")
+    {
+        constexpr auto testSearch = "TEST";
+        auto query                = std::make_unique<db::query::QueryNotesGetByText>(testSearch);
+        auto response             = notesRecordInterface.runQuery(std::move(query));
+        auto getResult            = static_cast<db::query::NotesGetByTextResult *>(response.get());
+
+        REQUIRE(getResult->getRecords().size() == 1);
         REQUIRE(getResult->getRecords()[0].snippet == testSnippet);
     }
 

@@ -167,6 +167,9 @@ namespace app::notes
                 application->switchWindow(gui::name::window::note_edit,
                                           std::make_unique<NoteSwitchData>(NotesRecord{}));
             }
+            else if (inputEvent.is(gui::KeyCode::KEY_RIGHT)) {
+                application->switchWindow(gui::name::window::notes_search);
+            }
         }
         return AppWindow::onInput(inputEvent);
     }
