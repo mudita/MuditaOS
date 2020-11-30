@@ -11,7 +11,7 @@ target_sources(${PROJECT_NAME}
         widgets/MeditationModel.cpp
         widgets/MeditationListItems.cpp
         widgets/IntervalBox.cpp
-        widgets/TimerSetter.cpp
+        widgets/TimerProperty.cpp
     PUBLIC
         ApplicationMeditation.hpp
         data/Style.hpp
@@ -25,7 +25,7 @@ target_sources(${PROJECT_NAME}
         widgets/MeditationModel.hpp
         widgets/MeditationListItems.hpp
         widgets/IntervalBox.hpp
-        widgets/TimerSetter.hpp
+        widgets/TimerProperty.hpp
 )
 
 target_link_libraries(${PROJECT_NAME}
