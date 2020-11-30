@@ -12,7 +12,6 @@ set(SOURCES
     messages/DBCountryCodeMessage.cpp
     messages/DBNotesMessage.cpp
     messages/DBNotificationMessage.cpp
-    messages/DBSettingsMessage.cpp
     messages/DBServiceMessage.cpp
     messages/DBSMSMessage.cpp
     messages/DBSMSTemplateMessage.cpp

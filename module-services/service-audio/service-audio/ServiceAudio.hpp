@@ -11,9 +11,6 @@
 #include <Service/Service.hpp>
 #include <Utils.hpp>
 
-#include <queries/settings/QuerySettingsAddOrIgnore_v2.hpp>
-#include <queries/settings/QuerySettingsGet_v2.hpp>
-#include <queries/settings/QuerySettingsUpdate_v2.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/QueryMessage.hpp>
 

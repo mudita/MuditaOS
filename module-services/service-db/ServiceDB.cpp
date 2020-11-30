@@ -12,7 +12,6 @@
 #include "service-db/DBSMSTemplateMessage.hpp"
 #include "service-db/DBServiceMessage.hpp"
 #include "service-db/DBServiceName.hpp"
-#include "service-db/DBSettingsMessage.hpp"
 #include "service-db/DBThreadMessage.hpp"
 #include "service-db/QueryMessage.hpp"
 #include "service-db/DatabaseAgent.hpp"
@@ -30,7 +29,6 @@
 #include <Databases/EventsDB.hpp>
 #include <Databases/NotesDB.hpp>
 #include <Databases/NotificationsDB.hpp>
-#include <Databases/SettingsDB.hpp>
 #include <Databases/SmsDB.hpp>
 #include <EventsRecord.hpp>
 #include <MessageType.hpp>
@@ -39,7 +37,6 @@
 #include <SMSRecord.hpp>
 #include <SMSTemplateRecord.hpp>
 #include <Service/Bus.hpp>
-#include <SettingsRecord_v2.hpp>
 #include <Tables/Record.hpp>
 #include <ThreadRecord.hpp>
 #include <log/log.hpp>
@@ -61,7 +58,6 @@ ServiceDB::ServiceDB() : sys::Service(service::name::db, "", service_db_stack, s
 
 ServiceDB::~ServiceDB()
 {
-    settingsDB.reset();
     contactsDB.reset();
     smsDB.reset();
     alarmsDB.reset();
@@ -97,8 +93,6 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
         return notificationsRecordInterface.get();
     case db::Interface::Name::Events:
         return eventsRecordInterface.get();
-    case db::Interface::Name::Settings_v2:
-        return settingsRecordInterface_v2.get();
     }
     return nullptr;
 }
@@ -540,7 +534,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
     Database::initialize();
 
     // Create databases
-    settingsDB      = std::make_unique<SettingsDB>();
     contactsDB      = std::make_unique<ContactsDB>();
     smsDB           = std::make_unique<SmsDB>();
     alarmsDB        = std::make_unique<AlarmsDB>();
@@ -561,7 +554,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
     countryCodeRecordInterface   = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
     notificationsRecordInterface = std::make_unique<NotificationsRecordInterface>(notificationsDB.get());
     eventsRecordInterface        = std::make_unique<EventsRecordInterface>(eventsDB.get());
-    settingsRecordInterface_v2   = std::make_unique<SettingsRecordInterface_v2>(settingsDB.get());
 
     databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
     databaseAgents.emplace(std::make_unique<FileIndexerAgent>(this));
@@ -593,8 +585,7 @@ void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Query:
 
 bool ServiceDB::StoreIntoBackup(const std::string &backupPath)
 {
-    bool rc = settingsDB.get()->storeIntoFile(backupPath + "settings.db");
-    rc |= contactsDB.get()->storeIntoFile(backupPath + "contacts.db");
+    bool rc = contactsDB.get()->storeIntoFile(backupPath + "contacts.db");
     rc |= smsDB.get()->storeIntoFile(backupPath + "sms.db");
     rc |= alarmsDB.get()->storeIntoFile(backupPath + "alarms.db");
     rc |= notesDB.get()->storeIntoFile(backupPath + "notes.db");
