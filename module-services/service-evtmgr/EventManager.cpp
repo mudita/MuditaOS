@@ -280,6 +280,13 @@ sys::ReturnCodes EventManager::InitHandler()
         return message;
     });
 
+    connect(sevm::EinkFrontlightMessage(), [&](sys::Message *msgl) {
+        auto msg     = static_cast<sevm::EinkFrontlightMessage *>(msgl);
+        auto message = std::make_shared<sevm::EinkFrontlightMessage>();
+        msg->processAction(msg->action, msg->value);
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
     // initialize keyboard worker
     EventWorker = std::make_unique<WorkerEvent>(this);
 

@@ -9,6 +9,13 @@
 
 namespace bsp::eink_frontlight
 {
+    enum class Action
+    {
+        turnOn,
+        turnOff,
+        setBrightness,
+    };
+
     void init();
 
     void deinit();

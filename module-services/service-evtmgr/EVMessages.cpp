@@ -21,4 +21,19 @@ namespace sevm
         }
         return response;
     }
+
+    void EinkFrontlightMessage::processAction(bsp::eink_frontlight::Action act, std::uint8_t val = 0)
+    {
+        switch (act) {
+        case bsp::eink_frontlight::Action::turnOn:
+            bsp::eink_frontlight::turnOn();
+            break;
+        case bsp::eink_frontlight::Action::turnOff:
+            bsp::eink_frontlight::turnOff();
+            break;
+        case bsp::eink_frontlight::Action::setBrightness:
+            bsp::eink_frontlight::setBrightness(val);
+            break;
+        }
+    }
 } // namespace sevm
