@@ -7,20 +7,17 @@
 #include "bsp/common.hpp"
 #include <utility>
 
-namespace bsp
+namespace bsp::eink_frontlight
 {
-    namespace eink_frontlight
-    {
-        int32_t init();
+    void init();
 
-        void deinit();
+    void deinit();
 
-        void setBrightness(uint8_t brightness);
+    void setBrightness(uint8_t brightness);
 
-        uint8_t GetBrightness();
+    uint8_t GetBrightness();
 
-        void turnOn();
-        
-        void turnOff();
-    } // namespace eink_frontlight
-} // namespace bsp
+    void turnOn();
+    
+    void turnOff();
+} // namespace bsp::eink_frontlight

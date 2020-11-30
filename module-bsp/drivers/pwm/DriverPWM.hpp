@@ -11,7 +11,7 @@ namespace drivers
 
     enum class PWMInstances
     {
-        PWM_1,
+        PWM_1 = 1,
         PWM_2,
         PWM_3,
         PWM_4,
@@ -20,7 +20,7 @@ namespace drivers
 
     enum class PWMModules
     {
-        MODULE0,
+        MODULE0 = 0,
         MODULE1,
         MODULE2,
         MODULE3,
@@ -29,7 +29,7 @@ namespace drivers
 
     enum class PWMChannel
     {
-        A,
+        A = 0,
         B,
         X
     };

@@ -40,8 +40,6 @@ namespace drivers
                                               .deadtimeValue    = 0,
                                               .faultState       = kPWM_PwmFaultState0};
 
-        pwm_mode_t pwmMode = kPWM_SignedCenterAligned;
-
         uint8_t lastDutyCycle = 0;
 
         cpp_freertos::MutexStandard mutex;

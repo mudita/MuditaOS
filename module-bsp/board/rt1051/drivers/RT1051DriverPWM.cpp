@@ -32,7 +32,6 @@ namespace drivers
             LOG_DEBUG("Init: PWM4");
             break;
         default:
-            LOG_DEBUG("PWM INIT: Invalid instance");
             break;
         }
 
@@ -73,6 +72,8 @@ namespace drivers
     void RT1051DriverPWM::SetDutyCycle(uint8_t duty_cycle_percent)
     {
         cpp_freertos::LockGuard lock(mutex);
+        pwm_mode_t pwmMode = kPWM_SignedCenterAligned;
+
         lastDutyCycle = std::clamp(duty_cycle_percent, static_cast<uint8_t>(0), static_cast<uint8_t>(100));
         PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, lastDutyCycle);
         PWM_SetPwmLdok(base, 1 << pwmModule, true);
@@ -114,6 +115,8 @@ namespace drivers
 
         // Currently connected to IPbus clock
         uint32_t clockSource = CLOCK_GetFreq(kCLOCK_IpgClk);
+        pwm_mode_t pwmMode   = kPWM_SignedCenterAligned;
+
         PWM_SetupPwm(base, pwmModule, &pwmSignalConfig, 1, pwmMode, pwm_frequency, clockSource);
 
         PWM_SetupFaultDisableMap(base, pwmModule, pwmSignalConfig.pwmChannel, kPWM_faultchannel_0, 0);

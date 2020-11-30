@@ -6,53 +6,55 @@
 #include "drivers/pwm/DriverPWM.hpp"
 #include "fsl_common.h"
 
-using namespace drivers;
-
-static std::shared_ptr<drivers::DriverPWM> pwm;
-
-namespace bsp
+namespace bsp::eink_frontlight
 {
-    namespace eink_frontlight
+    namespace
     {
-        constexpr auto PWM_FREQUENCY = 10000; // 10 kHz
+        std::shared_ptr<drivers::DriverPWM> pwm;
+        constexpr inline auto PWM_FREQUENCY_HZ = 20000;
+        uint8_t bright                         = 0;
+    } // namespace
 
-        int32_t init()
-        {
-            pwm = DriverPWM::Create(
-                static_cast<PWMInstances>(BoardDefinitions::EINK_FRONTLIGHT_PWM_INSTANCE),
-                static_cast<PWMModules>(BoardDefinitions::EINK_FRONTLIGHT_PWM_MODULE),
-                DriverPWMParams{.channel   = static_cast<PWMChannel>(BoardDefinitions::EINK_FRONTLIGHT_PWM_CHANNEL),
-                                .frequency = PWM_FREQUENCY});
+    void init()
+    {
+        pwm = drivers::DriverPWM::Create(
+            static_cast<drivers::PWMInstances>(BoardDefinitions::EINK_FRONTLIGHT_PWM_INSTANCE),
+            static_cast<drivers::PWMModules>(BoardDefinitions::EINK_FRONTLIGHT_PWM_MODULE),
+            drivers::DriverPWMParams{
+                .channel   = static_cast<drivers::PWMChannel>(BoardDefinitions::EINK_FRONTLIGHT_PWM_CHANNEL),
+                .frequency = PWM_FREQUENCY_HZ});
+    }
 
-            return kStatus_Success; // Add some checks ?
+    void deinit()
+    {
+        turnOff();
+    }
+
+    void setBrightness(uint8_t brightness)
+    {
+        // Add gamma correction LUT if needed (from 0-5 scale to 0-100 duty cycle)
+        pwm->SetDutyCycle(bright);
+
+        bright += 20;
+        if (bright > 100) {
+            bright = 0;
         }
+    }
 
-        void deinit()
-        {
-            turnOff();
-        }
+    uint8_t GetBrightness()
+    {
+        // If gamma corection used add recalculation from 0-100 duty cycle to 0-5 scale
+        return pwm->GetCurrentDutyCycle();
+    }
 
-        void setBrightness(uint8_t brightness)
-        {
-            // Add gamma correction LUT if needed (from 0-5 scale to 0-100 duty cycle)
-            pwm->SetDutyCycle(brightness);
-        }
+    void turnOn()
+    {
+        pwm->Start();
+    }
 
-        uint8_t GetBrightness()
-        {
-            // If gamma corection used add recalculation from 0-100 duty cycle to 0-5 scale
-            return pwm->GetCurrentDutyCycle();
-        }
+    void turnOff()
+    {
+        pwm->Stop();
+    }
 
-        void turnOn()
-        {
-            pwm->Start();
-        }
-
-        void turnOff()
-        {
-            pwm->Stop();
-        }
-
-    } // namespace eink_frontlight
-} // namespace bsp
+} // namespace bsp::eink_frontlight
