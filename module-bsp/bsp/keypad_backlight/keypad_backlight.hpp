@@ -5,13 +5,6 @@
 
 #include <cstdint>
 
-extern "C"
-{
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-}
-
 namespace bsp::keypad_backlight
 {
     enum class Action

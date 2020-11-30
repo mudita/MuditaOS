@@ -55,8 +55,9 @@ namespace bsp::keypad_backlight
 
     constexpr std::uint8_t encode_diode_brightness_to_6bits(float normalized_brightness)
     {
-        std::clamp(normalized_brightness, 0.0f, 1.0f);
-        return static_cast<std::uint8_t>(MAX_BRIGHTNESS_INT * normalized_brightness) & 0b00111111;
+        return std::clamp(static_cast<std::uint8_t>(MAX_BRIGHTNESS_INT * normalized_brightness),
+                          static_cast<std::uint8_t>(0),
+                          static_cast<std::uint8_t>(MAX_BRIGHTNESS_INT));
     }
 
 } // namespace bsp::keypad_backlight

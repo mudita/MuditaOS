@@ -10,6 +10,12 @@
 #include "fsl_common.h"
 #include <array>
 
+extern "C"
+{
+#include "FreeRTOS.h"
+#include "task.h"
+}
+
 namespace bsp::keypad_backlight
 {
     namespace
