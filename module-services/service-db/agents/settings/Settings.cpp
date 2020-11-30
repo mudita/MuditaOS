@@ -57,8 +57,19 @@ namespace settings
             LOG_DEBUG("handleVariableChanged: (k=v): (%s=%s)", key.c_str(), val.value_or("").c_str());
             ValueCb::iterator it_cb = cbValues.find(key);
             if (cbValues.end() != it_cb) {
-                it_cb->second(std::move(val.value()));
-                return std::make_shared<sys::ResponseMessage>();
+                auto [cb, cbName] = it_cb->second;
+                if (nullptr != cb && nullptr != cbName) {
+                    // in case of two callbacks there is a need to duplicate the value
+                    auto valueCopy = val.value();
+                    cb(std::move(val.value()));
+                    cbName(key, std::move(valueCopy));
+                }
+                else if (nullptr != cb) {
+                    cb(std::move(val.value()));
+                }
+                else {
+                    cbName(key, std::move(val.value()));
+                }
             }
         }
         return std::make_shared<sys::ResponseMessage>();
@@ -110,7 +121,21 @@ namespace settings
         if (cbValues.end() != it_cb) {
             LOG_INFO("Callback function on value change (%s) already exists, rewriting", variableName.c_str());
         }
-        cbValues[variableName] = cb;
+        cbValues[variableName].first = cb;
+        EntryPath path;
+        path.variable = variableName;
+        path.service  = app->GetName();
+        auto msg      = std::make_shared<settings::Messages::RegisterOnVariableChange>(path);
+        sendMsg(std::move(msg));
+    }
+
+    void Settings::registerValueChange(const std::string &variableName, ValueChangedCallbackWithName cb)
+    {
+        ValueCb::iterator it_cb = cbValues.find(variableName);
+        if (cbValues.end() != it_cb) {
+            LOG_INFO("Callback function on value change (%s) already exists, rewriting", variableName.c_str());
+        }
+        cbValues[variableName].second = cb;
         EntryPath path;
         path.variable = variableName;
         path.service  = app->GetName();

@@ -19,6 +19,11 @@
 
 #include <functional>
 
+namespace settings
+{
+    class Settings;
+}
+
 class ServiceAudio : public sys::Service
 {
   public:
@@ -80,31 +85,6 @@ class ServiceAudio : public sys::Service
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
     auto IsBusy() -> bool;
 
-    // void addOrIgnoreEntry(const std::string &profilePath, const std::string &defaultValue);
-
-    /*template <typename T>[[nodiscard]] T fetchAudioSettingFromDb(const std::string &profilePath, const T
-    &defaultValue)
-    {
-        auto [code, msg] =
-            DBServiceAPI::GetQueryWithReply(this,
-                                            db::Interface::Name::Settings_v2,
-                                            std::make_unique<db::query::settings::SettingsQuery>(profilePath),
-                                            audio::audioOperationTimeout);
-
-        if (code == sys::ReturnCodes::Success && msg != nullptr) {
-            auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
-            assert(queryResponse != nullptr);
-
-            auto settingsResultResponse = queryResponse->getResult();
-            auto settingsResult = dynamic_cast<db::query::settings::SettingsResult *>(settingsResultResponse.get());
-            assert(settingsResult != nullptr);
-
-            return settingsResult->getResult().getValue<T>({});
-        }
-        return defaultValue;
-    }*/
-    // void updateDbValue(const std::string &path, const std::string &value);
-
     void setSetting(const audio::Setting &setting,
                     const std::string &value,
                     const audio::Profile::Type &profileType,
@@ -114,7 +94,7 @@ class ServiceAudio : public sys::Service
                                          const audio::PlaybackType &playbackType);
 
     const std::pair<audio::Profile::Type, audio::PlaybackType> getCurrentContext();
-    std::unique_ptr<::Settings::Settings> settingsProvider;
-    void settingsChanged(const std::string &name, std::optional<std::string> value);
+    std::unique_ptr<settings::Settings> settingsProvider;
+    void settingsChanged(const std::string &name, std::string value);
     std::map<std::string, std::string> settings;
 };

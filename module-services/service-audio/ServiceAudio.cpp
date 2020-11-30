@@ -9,6 +9,7 @@
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
+#include <service-db/Settings.hpp>
 
 #include <type_traits>
 
@@ -20,7 +21,7 @@ ServiceAudio::ServiceAudio()
     : sys::Service(serviceName, "", 4096 * 2, sys::ServicePriority::Idle),
       audioMux([this](auto... params) { return this->AsyncCallback(params...); },
                [this](auto... params) { return this->DbCallback(params...); }),
-      settingsProvider(std::make_unique<::Settings::Settings>(this))
+      settingsProvider(std::make_unique<settings::Settings>(this))
 {
     LOG_INFO("[ServiceAudio] Initializing");
     busChannels.push_back(sys::BusChannels::ServiceAudioNotifications);
@@ -93,8 +94,7 @@ sys::ReturnCodes ServiceAudio::InitHandler()
 
     for (auto setting : settings) {
         settingsProvider->registerValueChange(
-            setting.first,
-            [this](const std::string &name, std::optional<std::string> value) { settingsChanged(name, value); });
+            setting.first, [this](const std::string &name, std::string value) { settingsChanged(name, value); });
     }
 
     return sys::ReturnCodes::Success;
@@ -122,9 +122,19 @@ int32_t ServiceAudio::AsyncCallback(PlaybackEvent e)
 uint32_t ServiceAudio::DbCallback(const std::string &path, const uint32_t &defaultValue)
 {
     LOG_DEBUG("ServiceAudio::DBbCallback(%s, %d)", path.c_str(), static_cast<int>(defaultValue));
-    /*this->addOrIgnoreEntry(path, std::to_string(defaultValue));
-    return this->fetchAudioSettingFromDb(path, defaultValue);*/
-    return 0;
+    auto settings_it = settings.find(path);
+    if (settings.end() == settings_it) {
+        // not in local cache
+        // insert into cache
+        settings[path] = defaultValue;
+        // set value in db
+        settingsProvider->setValue(path, std::to_string(defaultValue));
+        // register on change - will receive value from db and put it in local cache
+        settingsProvider->registerValueChange(
+            path, [this](const std::string &variable, std::string value) { settingsChanged(variable, value); });
+        return defaultValue;
+    }
+    return utils::getNumericValue<uint32_t>(settings_it->second);
 };
 
 sys::ReturnCodes ServiceAudio::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -643,15 +653,12 @@ const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurr
     return {currentProfile->GetType(), currentOperation.GetPlaybackType()};
 }
 
-void ServiceAudio::settingsChanged(const std::string &name, std::optional<std::string> value)
+void ServiceAudio::settingsChanged(const std::string &name, std::string value)
 {
-    for (auto setting : settings) {
-        if (name == setting.first) {
-            if (value.has_value()) {
-                setting.second = value.value();
-                return;
-            }
-        }
+    auto s_it = settings.find(name);
+    if (settings.end() != s_it) {
+        s_it->second = value;
+        return;
     }
     LOG_ERROR("ServiceAudio::settingsChanged received notification about not registered setting: %s", name.c_str());
 }

@@ -25,6 +25,7 @@ namespace settings
     {
       public:
         using ValueChangedCallback           = std::function<void(const std::string &)>;
+        using ValueChangedCallbackWithName   = std::function<void(const std::string &, const std::string &value)>;
         using ProfileChangedCallback         = std::function<void(const std::string &)>;
         using ModeChangedCallback            = ProfileChangedCallback;
         using ListOfProfiles                 = std::list<std::string>;
@@ -37,6 +38,7 @@ namespace settings
 
         void setValue(const std::string &variableName, const std::string &variableValue);
         void registerValueChange(const std::string &variableName, ValueChangedCallback cb);
+        void registerValueChange(const std::string &variableName, ValueChangedCallbackWithName cb);
         void unregisterValueChange(const std::string &variableName);
 
         void getAllProfiles(OnAllProfilesRetrievedCallback cb);
@@ -59,7 +61,7 @@ namespace settings
         std::string phoneMode;
         std::string profile;
 
-        using ValueCb = std::map<std::string, ValueChangedCallback>;
+        using ValueCb = std::map<std::string, std::pair<ValueChangedCallback, ValueChangedCallbackWithName>>;
         ValueCb cbValues;
         ModeChangedCallback cbMode;
         OnAllModesRetrievedCallback cbAllModes;
