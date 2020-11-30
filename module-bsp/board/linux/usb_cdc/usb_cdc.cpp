@@ -10,6 +10,7 @@ namespace bsp
 {
     int fd;
     xQueueHandle USBReceiveQueue;
+    constexpr auto ptsFileName = "/tmp/purephone_pts_name";
 
     void usbDeviceTask(void *ptr)
     {
@@ -59,10 +60,15 @@ namespace bsp
 
     void writePtsToFile(const char *pts_name)
     {
-        constexpr auto fileName = "/tmp/purephone_pts_name";
         std::ofstream ptsNameFile;
-        ptsNameFile.open(fileName, std::ios::out | std::ios::trunc);
+        ptsNameFile.open(ptsFileName, std::ios::out | std::ios::trunc);
         ptsNameFile << pts_name;
+    }
+
+    void usbDeinit()
+    {
+        LOG_INFO("usbDeinit removing file %s", ptsFileName);
+        std::remove(ptsFileName);
     }
 
     int usbInit(xQueueHandle receiveQueue, USBDeviceListener *)
