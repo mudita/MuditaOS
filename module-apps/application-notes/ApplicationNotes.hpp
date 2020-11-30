@@ -1,11 +1,17 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_APPS_APPLICATION_NOTES_APPLICATIONNOTES_HPP_
-#define MODULE_APPS_APPLICATION_NOTES_APPLICATIONNOTES_HPP_
+#pragma once
 
-#include "NotesModel.hpp"
+#include "module-apps/application-notes/model/NotesListModel.hpp"
 #include "Application.hpp"
+
+namespace gui::name::window
+{
+    inline constexpr auto note_preview        = "NotePreview";
+    inline constexpr auto note_edit           = "NoteEdit";
+    inline constexpr auto note_confirm_dialog = "ConfirmDialog";
+} // namespace gui::name::window
 
 namespace app
 {
@@ -14,18 +20,14 @@ namespace app
     class ApplicationNotes : public Application
     {
       public:
-        ApplicationNotes(std::string name                    = name_notes,
-                         std::string parent                  = {},
-                         StartInBackground startInBackground = {false});
-        virtual ~ApplicationNotes();
+        explicit ApplicationNotes(std::string name                    = name_notes,
+                                  std::string parent                  = {},
+                                  StartInBackground startInBackground = {false});
+
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
-
-        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
-        {
-            return sys::ReturnCodes::Success;
-        }
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
         void createUserInterface() override;
         void destroyUserInterface() override;
@@ -38,6 +40,4 @@ namespace app
             return {{manager::actions::Launch}};
         }
     };
-} /* namespace app */
-
-#endif /* MODULE_APPS_APPLICATION_NOTES_APPLICATIONNOTES_HPP_ */
+} // namespace app
