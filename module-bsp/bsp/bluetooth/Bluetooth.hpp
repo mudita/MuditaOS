@@ -143,7 +143,6 @@ namespace bsp {
             static void uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
             static uint8_t dmaRXbuf[384];
             static uint32_t dmaRXreadCount;
-            // /edma
     };
 
     /// definitions needed by BT stack

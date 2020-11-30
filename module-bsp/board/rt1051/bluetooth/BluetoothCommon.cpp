@@ -91,6 +91,8 @@ void BluetoothCommon::sleep_ms(ssize_t ms)
 
 ssize_t BluetoothCommon::read(uint8_t *buf, size_t nbytes)
 {
+    LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, true);
+
     // start RXfer if there is byte incoming and no pending RXfer
     lpuart_transfer_t receiveXfer;
     receiveXfer.data     = buf;
@@ -310,6 +312,7 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
 #ifdef DO_DEBUG_HCI_COMS
         LOG_DEBUG("DMA irq: RX done");
 #endif
+        LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, false);
         val = Bt::Message::EvtReceived;
         xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         portEND_SWITCHING_ISR(taskwoken);
