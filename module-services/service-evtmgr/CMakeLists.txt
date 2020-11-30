@@ -3,6 +3,7 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
         EventManager.cpp
+        EVMessages.cpp
         WorkerEvent.cpp
         alarm/EventManagerAlarm.cpp
         api/EventManagerServiceAPI.cpp

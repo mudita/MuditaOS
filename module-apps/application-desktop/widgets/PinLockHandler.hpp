@@ -20,7 +20,6 @@ namespace gui
     class PinLockHandler
     {
         app::ApplicationDesktop *app = nullptr;
-        const SettingsRecord &appSettings;
         gui::PinLock screenLock;
         gui::PinLock simLock;
         bool promptSimLockWindow = true;
@@ -48,7 +47,7 @@ namespace gui
         void setSimLockHandled() noexcept;
 
       public:
-        PinLockHandler(app::ApplicationDesktop *app, SettingsRecord &settings);
+        PinLockHandler(app::ApplicationDesktop *app);
 
         void handlePasscodeRequest(PinLock::LockType type, app::manager::actions::ActionParamsPtr &&data);
         void handlePinChangeRequest(app::manager::actions::ActionParamsPtr &&data);

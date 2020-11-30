@@ -17,6 +17,7 @@ namespace gui
         auto buildOptionsList() -> std::list<gui::Option> override;
 
       private:
-        std::string selectedLang;
+        Language selectedLang;
+        utils::LangLoader loader;
     };
 } // namespace gui

@@ -12,7 +12,6 @@
 #include <Interface/NotesRecord.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <Interface/SMSTemplateRecord.hpp>
-#include <Interface/SettingsRecord.hpp>
 #include <Interface/SettingsRecord_v2.hpp>
 #include <Interface/ThreadRecord.hpp>
 #include <PhoneNumber.hpp>
@@ -51,8 +50,6 @@ class DBServiceAPI
         secondaryNumberError,
         noError
     };
-    static SettingsRecord SettingsGet(sys::Service *serv);
-    static bool SettingsUpdate(sys::Service *serv, const SettingsRecord &rec);
 
     /**
      * @brief Function is adding new SMS to SMSDB.
@@ -151,14 +148,6 @@ class DBServiceAPI
     static std::unique_ptr<utils::PhoneNumber::View> GetNumberById(sys::Service *serv,
                                                                    std::uint32_t numberId,
                                                                    std::uint32_t timeout = DefaultTimeoutInMs);
-    static bool AlarmAdd(sys::Service *serv, const AlarmsRecord &rec);
-    static bool AlarmRemove(sys::Service *serv, uint32_t id);
-    static bool AlarmUpdate(sys::Service *serv, const AlarmsRecord &rec);
-    static uint32_t AlarmGetCount(sys::Service *serv);
-    static std::unique_ptr<std::vector<AlarmsRecord>> AlarmGetLimitOffset(sys::Service *serv,
-                                                                          uint32_t offset,
-                                                                          uint32_t limit);
-    static AlarmsRecord AlarmGetNext(sys::Service *serv, time_t time);
 
     static bool NotesAdd(sys::Service *serv, const NotesRecord &rec);
     static bool NotesRemove(sys::Service *serv, uint32_t id);

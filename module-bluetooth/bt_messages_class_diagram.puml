@@ -1,0 +1,40 @@
+@startuml
+
+title BluetoothMessages - Class Diagram
+
+
+class BluetoothMessage
+
+class RequestBluetoothStatus
+class RequestBondedDevices
+class RequestDeviceName
+
+class ResponseBluetoothStatus
+class ResponseBondedDevices
+class ResponseDeviceName
+class ResponseVisibleDevices
+
+class SetBluetoothStatus
+class SetBondedDevices
+class SetDeviceName
+class SetScanState
+
+BluetoothMessage <|-left- RequestBluetoothStatus: Inheritance
+BluetoothMessage <|-up- RequestBondedDevices: Inheritance
+BluetoothMessage <|-up- RequestDeviceName: Inheritance
+
+
+BluetoothMessage <|-up- ResponseBluetoothStatus: Inheritance
+BluetoothMessage <|-up- ResponseBondedDevices: Inheritance
+BluetoothMessage <|-right- ResponseDeviceName: Inheritance
+BluetoothMessage <|-down- ResponseVisibleDevices: Inheritance
+
+
+BluetoothMessage <|-down- SetBluetoothStatus: Inheritance
+BluetoothMessage <|-down- SetBondedDevices: Inheritance
+BluetoothMessage <|-down- SetDeviceName: Inheritance
+BluetoothMessage <|-down- SetScanState: Inheritance
+
+
+
+@enduml

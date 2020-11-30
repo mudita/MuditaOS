@@ -26,7 +26,7 @@ third_party_source_optimization(${FREERTOS_FAT_SOURCES})
 # in the FREERTOS FAT implementation
 if(${PROJECT_TARGET}  STREQUAL "TARGET_Linux")
 set_property(SOURCE ${FREERTOS_FAT_SOURCES} APPEND_STRING PROPERTY COMPILE_FLAGS
-" -Wno-overflow -Wno-type-limits -Wno-format -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast")
+" -Wno-overflow -Wno-type-limits -Wno-format -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast -Wno-stringop-truncation")
 endif()
 
 set(PROJECT_INCLUDES

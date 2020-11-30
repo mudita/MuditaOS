@@ -2,23 +2,24 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/messages/LanguageChangeRequest.hpp>
+#include <utility>
 
 namespace app::manager
 {
-    LanguageChangeRequest::LanguageChangeRequest(const ApplicationName &senderName, utils::Lang language)
-        : BaseMessage(MessageType::APMChangeLanguage, senderName), language{language}
+    LanguageChangeRequest::LanguageChangeRequest(const ApplicationName &senderName, Language &&language)
+        : BaseMessage(MessageType::APMChangeLanguage, senderName), language{std::move(language)}
     {}
 
-    [[nodiscard]] auto LanguageChangeRequest::getLanguage() const noexcept -> utils::Lang
+    [[nodiscard]] auto LanguageChangeRequest::getLanguage() const -> Language
     {
         return language;
     }
 
-    DisplayLanguageChangeRequest::DisplayLanguageChangeRequest(const ApplicationName &senderName, utils::Lang language)
-        : LanguageChangeRequest(senderName, language)
+    DisplayLanguageChangeRequest::DisplayLanguageChangeRequest(const ApplicationName &senderName, Language language)
+        : LanguageChangeRequest(senderName, std::move(language))
     {}
 
-    InputLanguageChangeRequest::InputLanguageChangeRequest(const ApplicationName &senderName, utils::Lang language)
-        : LanguageChangeRequest(senderName, language)
+    InputLanguageChangeRequest::InputLanguageChangeRequest(const ApplicationName &senderName, Language language)
+        : LanguageChangeRequest(senderName, std::move(language))
     {}
 } // namespace app::manager

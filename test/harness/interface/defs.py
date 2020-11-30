@@ -11,7 +11,8 @@ endpoint = {
     "contacts": 7,
     "messages": 8,
     "calllog": 9,
-    "developerMode": 10
+    "events": 10,
+    "developerMode": 11
 }
 
 method = {
@@ -23,8 +24,10 @@ method = {
 
 status = {
     "OK": 200,
+    "Accepted": 202,
     "BadRequest": 400,
-    "InternalServerError": 500
+    "NotAcceptable": 406,
+    "InternalServerError": 500,
 }
 
 key_codes = {

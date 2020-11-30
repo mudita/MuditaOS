@@ -33,6 +33,7 @@ namespace vfsn::internal
     {
         auto open_to_fopen_flags(int flags)
         {
+            flags &= ~0x00010000; // Ignore binary
             if ((flags & O_RDONLY) || !flags) {
                 return "r";
             }
@@ -65,6 +66,10 @@ namespace vfsn::internal::syscalls
 {
     int open(int &_errno_, const char *file, int flags, int mode)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         auto fflags = open_to_fopen_flags(flags);
         if (*fflags == '\0') {
             _errno_ = EINVAL;
@@ -90,6 +95,10 @@ namespace vfsn::internal::syscalls
 
     long close(int &_errno_, int fd)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         auto fil = gFileHandles.clearHandle(fd);
         if (!fil) {
             LOG_ERROR("Unable to find handle %i", fd);
@@ -103,6 +112,10 @@ namespace vfsn::internal::syscalls
 
     long write(int &_errno_, int fd, const void *buf, size_t cnt)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         if (fd == STDERR_FILENO || fd == STDOUT_FILENO) {
             log_WriteToDevice((uint8_t *)buf, cnt);
             return cnt;
@@ -115,20 +128,32 @@ namespace vfsn::internal::syscalls
         }
         auto ret = ff_fwrite(buf, cnt, 1, fil);
         _errno_  = stdioGET_ERRNO();
-        return ret * cnt;
+        return ret > 0 ? (ret * cnt) : ret;
     }
 
     long read(int &_errno_, int fd, void *buf, size_t cnt)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         auto fil = gFileHandles[fd];
         if (!fil) {
             LOG_ERROR("Unable to find handle %i", fd);
             _errno_ = EBADF;
             return -1;
         }
-        auto ret = ff_fread(buf, cnt, 1, fil);
-        _errno_  = stdioGET_ERRNO();
-        return ret * cnt;
+        const auto remain_bytes = fil->ulFileSize - fil->ulFilePointer;
+        if (remain_bytes > 0) {
+            cnt            = std::min<size_t>(cnt, remain_bytes);
+            const auto ret = ff_fread(buf, cnt, 1, fil);
+            _errno_        = stdioGET_ERRNO();
+            return ret > 0 ? ret * cnt : ret;
+        }
+        else {
+            _errno_ = 0;
+            return 0;
+        }
     }
 
     off_t lseek(int &_errno_, int fd, off_t pos, int dir)
@@ -153,6 +178,10 @@ namespace vfsn::internal::syscalls
     }
     int fstat(int &_errno_, int fd, struct stat *pstat)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         auto fil = gFileHandles[fd];
         if (!fil) {
             LOG_ERROR("Unable to find handle %i", fd);
@@ -169,12 +198,20 @@ namespace vfsn::internal::syscalls
     }
     int link(int &_errno_, const char *existing, const char *newLink)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         _errno_ = ENOSYS;
         LOG_ERROR("Syscall %s not supported", __PRETTY_FUNCTION__);
         return -1;
     }
     int unlink(int &_errno_, const char *name)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         const auto rel_name = vfs.relativeToRoot(name);
         auto ret            = ff_remove(rel_name.c_str());
         if (ret && stdioGET_ERRNO() == EISDIR)
@@ -191,6 +228,10 @@ namespace vfsn::internal::syscalls
     }
     int stat(int &_errno_, const char *file, struct stat *pstat)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         FF_Stat_t stat_ff;
         auto ret = ff_stat(vfs.relativeToRoot(file).c_str(), &stat_ff);
         if (!ret) {
@@ -213,18 +254,30 @@ namespace vfsn::internal::syscalls
 
     int chdir(int &_errno_, const char *path)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         auto ret = ff_chdir(vfs.relativeToRoot(path).c_str());
         _errno_  = stdioGET_ERRNO();
         return ret;
     }
     char *getcwd(int &_errno_, char *buf, size_t size)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return nullptr;
+        }
         auto cwd = ff_getcwd(buf, size);
         _errno_  = stdioGET_ERRNO();
         return cwd;
     }
     int rename(int &_errno_, const char *oldName, const char *newName)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         auto ret = ff_rename(vfs.relativeToRoot(oldName).c_str(), vfs.relativeToRoot(newName).c_str(), true);
         _errno_  = stdioGET_ERRNO();
         return ret;
@@ -232,6 +285,10 @@ namespace vfsn::internal::syscalls
 
     int mkdir(int &_errno_, const char *path, uint32_t mode)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         auto ret = ff_mkdir(vfs.relativeToRoot(path).c_str());
         _errno_  = stdioGET_ERRNO();
         return ret;
@@ -239,6 +296,10 @@ namespace vfsn::internal::syscalls
 
     DIR *opendir(int &_errno_, const char *dirname)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return nullptr;
+        }
         auto dir      = new DIR;
         dir->dir_data = dirent::diropen(_errno_, vfs.relativeToRoot(dirname).c_str());
         if (!dir->dir_data) {
@@ -253,6 +314,10 @@ namespace vfsn::internal::syscalls
 
     int closedir(int &_errno_, DIR *dirp)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         if (!dirp) {
             _errno_ = EBADF;
             return -1;
@@ -266,6 +331,10 @@ namespace vfsn::internal::syscalls
     {
         if (!dirp) {
             _errno_ = EBADF;
+            return nullptr;
+        }
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
             return nullptr;
         }
         auto olderrno{_errno_};
@@ -292,6 +361,10 @@ namespace vfsn::internal::syscalls
     {
         if (!dirp) {
             return EBADF;
+        }
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
         }
         auto olderrno{_errno_};
         auto res = dirent::dirnext(_errno_, dirp->dir_data);
@@ -320,6 +393,10 @@ namespace vfsn::internal::syscalls
         if (!dirp) {
             return;
         }
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return;
+        }
         dirent::dirreset(_errno_, dirp->dir_data);
         dirp->position = 0;
     }
@@ -327,6 +404,10 @@ namespace vfsn::internal::syscalls
     void seekdir(int &_errno_, DIR *dirp, long int loc)
     {
         if (!dirp || loc < 0) {
+            return;
+        }
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
             return;
         }
         if (dirp->position > loc) {
@@ -340,6 +421,10 @@ namespace vfsn::internal::syscalls
     long int telldir(int &_errno_, DIR *dirp)
     {
         if (!dirp) {
+            return -1;
+        }
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
             return -1;
         }
         return dirp->position;
@@ -359,6 +444,10 @@ namespace vfsn::internal::syscalls
     }
     int fsync(int &_errno_, int fd)
     {
+        if (!vfs.isInitialized()) {
+            _errno_ = EIO;
+            return -1;
+        }
         auto fil = gFileHandles[fd];
         if (!fil) {
             LOG_ERROR("Unable to find handle %i", fd);

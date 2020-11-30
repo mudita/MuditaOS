@@ -7,6 +7,7 @@
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
 #include "../Databases/SettingsDB.hpp"
+#include "module-utils/i18n/i18n.hpp"
 
 struct SettingsRecord
 {
@@ -31,8 +32,8 @@ struct SettingsRecord
     std::string networkOperator;
     uint32_t lockPassHash;
     uint32_t lockTime;
-    SettingsLanguage displayLanguage;
-    SettingsLanguage inputLanguage;
+    Language displayLanguage;
+    Language inputLanguage;
 
     static ActiveSim to(const uint32_t sim);
     static uint32_t from(const ActiveSim sim);

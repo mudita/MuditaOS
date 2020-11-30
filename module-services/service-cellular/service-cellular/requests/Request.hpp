@@ -40,10 +40,12 @@ namespace cellular
          * Helper command for building output command
          * @param atCommand
          * @param builderFunctions functions that build parts of the output command in order of execution
+         * @param trim true to avoid appending commands that evaluate to empty string
          * @return formatted command or empty string if input is invalid
          */
-        auto buildCommand(at::AT atCommand, const std::vector<commandBuilderFunc> &builderFunctions) const
-            -> std::string;
+        auto buildCommand(at::AT atCommand,
+                          const std::vector<commandBuilderFunc> &builderFunctions,
+                          bool trim = true) const -> std::string;
         bool isRequestHandled = false;
         std::string request;
     };

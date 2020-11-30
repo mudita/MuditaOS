@@ -31,8 +31,6 @@ namespace gui
         unsigned int cursorPos;
     };
 
-    class Lines;
-
     ///  @brief Widget that holds multiple lines of text.
     ///
     ///  Can expand horizontally to it's max size if it needs to fit more text in line
@@ -48,7 +46,7 @@ namespace gui
     class Text : public Rect
     {
         friend TextCursor;
-        friend Lines;
+        friend TextLineCursor;
 
       protected:
         // holds list of labels for displaying currently visible text lines.
@@ -93,7 +91,7 @@ namespace gui
         [[nodiscard]] auto getSizeMinusPadding(Axis axis, Area val) -> Length;
         auto applyParentSizeRestrictions() -> void;
         auto calculateAndRequestSize() -> void;
-        auto makePreDrawLines(const uint32_t utfVal) -> std::unique_ptr<Lines>;
+        auto makePreDrawLines(uint32_t utfVal) -> std::unique_ptr<Lines>;
         auto makePreDrawLines(const TextBlock &textBlock) -> std::unique_ptr<Lines>;
 
         auto checkMaxSignsLimit(unsigned int limitVal) -> InputBound;

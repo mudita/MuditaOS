@@ -19,6 +19,19 @@ void FileIndexerAgent::initDb()
 {
     LOG_INFO("[ServiceDB][File Indexer] Initialized");
     database->execute(getDbInitString().c_str());
+
+    auto notifications = database->query(FileIndexer::Statements::getAllNotifications);
+    if (nullptr == notifications || FileIndexer::ONE_ROW_FOUND == notifications->getRowCount()) {
+        return;
+    }
+    if (notifications->getFieldCount() == FileIndexer::NOTIFICATION_RECORD_COLUMN_COUNT) {
+        fileChangeRecipents.clear();
+        do {
+            std::string directory = (*notifications)[1].getString();
+            std::string service   = (*notifications)[2].getString();
+            fileChangeRecipents[directory].insert(service);
+        } while (notifications->nextRow());
+    }
 }
 
 void FileIndexerAgent::deinitDb()
@@ -91,30 +104,40 @@ auto FileIndexerAgent::dbUnregisterFileChange(std::string dir, std::string servi
 
 auto FileIndexerAgent::handleRegisterOnFileChange(sys::Message *req) -> sys::MessagePointer
 {
+    std::string directory;
     if (auto msg = dynamic_cast<FileIndexer::Messages::RegisterOnFileChange *>(req)) {
-        if (dbRegisterFileChange(msg->directory, msg->sender)) {
-            auto it = fileChangeRecipents.find(msg->directory);
-            if (fileChangeRecipents.end() == it) {
-                fileChangeRecipents[msg->directory] = {msg->sender};
-            }
-            else {
-                it->second.insert(msg->sender);
+        if (msg->directory != nullptr) {
+            directory = *(msg->directory);
+            if (dbRegisterFileChange(directory, msg->sender)) {
+                auto it = fileChangeRecipents.find(directory);
+                if (fileChangeRecipents.end() == it) {
+                    fileChangeRecipents[directory] = {msg->sender};
+                }
+                else {
+                    it->second.insert(msg->sender);
+                }
             }
         }
     }
+    LOG_INFO("RegisterOnFileChange from %s", req->sender.c_str());
     return std::make_shared<sys::ResponseMessage>();
 }
 
 auto FileIndexerAgent::handleUnregisterOnFileChange(sys::Message *req) -> sys::MessagePointer
 {
+    std::string directory;
     if (auto msg = dynamic_cast<FileIndexer::Messages::UnregisterOnFileChange *>(req)) {
-        if (dbUnregisterFileChange(msg->directory, msg->sender)) {
-            auto it = fileChangeRecipents.find(msg->directory);
-            if (fileChangeRecipents.end() != it) {
-                it->second.erase(msg->sender);
+        if (msg->directory != nullptr) {
+            directory = *(msg->directory);
+            if (dbUnregisterFileChange(directory, msg->sender)) {
+                auto it = fileChangeRecipents.find(directory);
+                if (fileChangeRecipents.end() != it) {
+                    it->second.erase(msg->sender);
+                }
             }
         }
     }
+    LOG_INFO("UnRegisterOnFileChange from %s", req->sender.c_str());
     return std::make_shared<sys::ResponseMessage>();
 }
 
@@ -200,7 +223,6 @@ auto FileIndexerAgent::dbGetRecord(std::unique_ptr<FileIndexer::FileRecord> reco
 
 auto FileIndexerAgent::dbSetRecord(std::unique_ptr<FileIndexer::FileRecord> record) -> bool
 {
-
     auto retQuery = database->query(FileIndexer::Statements::getFileInfoByPath, record->path.c_str());
     FileIndexer::FileRecord retRecord(retQuery.get());
 
@@ -262,11 +284,12 @@ auto FileIndexerAgent::handleSetRecord(sys::Message *req) -> sys::MessagePointer
 
             sys::Bus::SendUnicast(std::move(updateMsg), msg->sender, parentService);
             dbSetRecord(std::make_unique<FileIndexer::FileRecord>(record));
-        }
 
-        for (auto recipient : fileChangeRecipents[record.directory]) {
-            auto notifeMsg = std::make_shared<FileIndexer::Messages::FileChanged>(record.directory);
-            sys::Bus::SendUnicast(std::move(notifeMsg), recipient, parentService);
+            for (auto recipient : fileChangeRecipents[record.directory]) {
+                auto notifeMsg = std::make_shared<FileIndexer::Messages::FileChanged>(
+                    std::make_unique<std::string>(record.directory));
+                sys::Bus::SendUnicast(std::move(notifeMsg), recipient, parentService);
+            }
         }
     }
     return std::make_shared<sys::ResponseMessage>();
@@ -402,7 +425,7 @@ auto FileIndexerAgent::handleGetProperty(sys::Message *req) -> sys::MessagePoint
 
 auto FileIndexerAgent::handleGetAllProperties(sys::Message *req) -> sys::MessagePointer
 {
-    if (auto msg = dynamic_cast<FileIndexer::Messages::GetPropertyMessage *>(req)) {
+    if (auto msg = dynamic_cast<FileIndexer::Messages::GetAllPropertiesMessage *>(req)) {
         auto metaDataPtr                   = std::move(msg->metaData);
         FileIndexer::FileMetadata metaData = *metaDataPtr;
         msg->dbMetaData                    = dbGetAllProperties(std::make_unique<FileIndexer::FileMetadata>(metaData));
@@ -437,7 +460,7 @@ auto FileIndexerAgent::handleSetProperty(sys::Message *req) -> sys::MessagePoint
 
 auto FileIndexerAgent::handleSetProperties(sys::Message *req) -> sys::MessagePointer
 {
-    if (auto msg = dynamic_cast<FileIndexer::Messages::SetPropertyMessage *>(req)) {
+    if (auto msg = dynamic_cast<FileIndexer::Messages::SetPropertiesMessage *>(req)) {
         auto metaDataPtr                   = std::move(msg->metaData);
         FileIndexer::FileMetadata metaData = *metaDataPtr;
         msg->dbMetaData                    = dbGetAllProperties(std::make_unique<FileIndexer::FileMetadata>(metaData));
@@ -447,7 +470,8 @@ auto FileIndexerAgent::handleSetProperties(sys::Message *req) -> sys::MessagePoi
         dbSetProperties(std::make_unique<FileIndexer::FileMetadata>(metaData));
 
         for (auto recipient : fileChangeRecipents[metaData.directory]) {
-            auto notifyMsg = std::make_shared<FileIndexer::Messages::FileChanged>(metaData.directory);
+            auto notifyMsg =
+                std::make_shared<FileIndexer::Messages::FileChanged>(std::make_unique<std::string>(metaData.directory));
             sys::Bus::SendUnicast(std::move(notifyMsg), recipient, parentService);
         }
     }

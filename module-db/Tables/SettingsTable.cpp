@@ -31,48 +31,25 @@ SettingsTableRow SettingsTable::getById(uint32_t id)
         return SettingsTableRow();
     }
 
-    if (!Language::ValidateLanguage(static_cast<SettingsLanguage>((*retQuery)[16].getUInt32())) ||
-        !Language::ValidateLanguage(static_cast<SettingsLanguage>((*retQuery)[17].getUInt32()))) {
-        return SettingsTableRow{
-            1,
-            false,
-            true,
-            true,
-            true,
-            0,
-            0,
-            SettingsPinMode::DAYS,
-            0,
-            0,
-            "",
-            "",
-            1,
-            "",
-            0,
-            30000, // time of inactivity of the user after which phone will be automatically blocked.
-            SettingsLanguage::ENGLISH,
-            SettingsLanguage::ENGLISH};
-    }
-
     return SettingsTableRow{
-        (*retQuery)[0].getUInt32(),                                 // ID
-        (*retQuery)[1].getBool(),                                   // timeFormat12
-        (*retQuery)[2].getBool(),                                   // timeAuto
-        (*retQuery)[3].getBool(),                                   // timeDateFormat
-        (*retQuery)[4].getBool(),                                   // brightnessAuto
-        (*retQuery)[5].getUInt32(),                                 // brightnessLevel
-        (*retQuery)[6].getUInt32(),                                 // fontSize
-        static_cast<SettingsPinMode>((*retQuery)[7].getUInt32()),   // pinMode
-        (*retQuery)[8].getUInt32(),                                 // pinDays
-        (*retQuery)[9].getUInt32(),                                 // pinDaysLeft
-        (*retQuery)[10].getString(),                                // pin1
-        (*retQuery)[11].getString(),                                // pin2
-        (*retQuery)[12].getUInt32(),                                // activeSIM
-        (*retQuery)[13].getString(),                                // networkOperator
-        (*retQuery)[14].getUInt32(),                                // lockPassHash
-        (*retQuery)[15].getUInt32(),                                // lockTime
-        static_cast<SettingsLanguage>((*retQuery)[16].getUInt32()), // displayLanguage
-        static_cast<SettingsLanguage>((*retQuery)[17].getUInt32()), // inputLanguage
+        (*retQuery)[0].getUInt32(),                               // ID
+        (*retQuery)[1].getBool(),                                 // timeFormat12
+        (*retQuery)[2].getBool(),                                 // timeAuto
+        (*retQuery)[3].getBool(),                                 // timeDateFormat
+        (*retQuery)[4].getBool(),                                 // brightnessAuto
+        (*retQuery)[5].getUInt32(),                               // brightnessLevel
+        (*retQuery)[6].getUInt32(),                               // fontSize
+        static_cast<SettingsPinMode>((*retQuery)[7].getUInt32()), // pinMode
+        (*retQuery)[8].getUInt32(),                               // pinDays
+        (*retQuery)[9].getUInt32(),                               // pinDaysLeft
+        (*retQuery)[10].getString(),                              // pin1
+        (*retQuery)[11].getString(),                              // pin2
+        (*retQuery)[12].getUInt32(),                              // activeSIM
+        (*retQuery)[13].getString(),                              // networkOperator
+        (*retQuery)[14].getUInt32(),                              // lockPassHash
+        (*retQuery)[15].getUInt32(),                              // lockTime
+        (*retQuery)[16].getString(),                              // displayLanguage
+        (*retQuery)[17].getString(),                              // inputLanguage
 
     };
 }
@@ -83,8 +60,8 @@ bool SettingsTable::update(SettingsTableRow entry)
                        ",brightness_auto = %lu, brightness_level = %lu, "
                        "bigger_font = %lu, pin_mode =%lu, pin_days = %lu ,pin_days_left = %lu, pin1_string = '%q', "
                        "pin2_string = '%q', active_sim = %lu, "
-                       "network_operator = '%q', lock_pass_hash = %lu, lock_time = %lu, display_language = %lu, "
-                       "input_language = %lu WHERE _id=1;",
+                       "network_operator = '%q', lock_pass_hash = %lu, lock_time = %lu, display_language = '%q', "
+                       "input_language = '%q' WHERE _id=1;",
                        entry.timeFormat12,
                        entry.timeAuto,
                        entry.timeDateFormat,
@@ -100,8 +77,8 @@ bool SettingsTable::update(SettingsTableRow entry)
                        entry.networkOperator.c_str(),
                        entry.lockPassHash,
                        entry.lockTime,
-                       entry.displayLanguage,
-                       entry.inputLanguage);
+                       entry.displayLanguage.c_str(),
+                       entry.inputLanguage.c_str());
 }
 
 bool SettingsTable::add(SettingsTableRow entry)

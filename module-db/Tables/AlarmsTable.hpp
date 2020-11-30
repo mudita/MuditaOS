@@ -1,27 +1,40 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * AlarmsTable.hpp
- *
- *  Created on: 15 lip 2019
- *      Author: kuba
- */
 #pragma once
 
 #include "Table.hpp"
 #include "Record.hpp"
 #include "Database/Database.hpp"
-#include "utf8/UTF8.hpp"
 #include "Common/Common.hpp"
+#include <module-utils/utf8/UTF8.hpp>
+#include <module-apps/application-calendar/data/dateCommon.hpp>
 
-struct AlarmsTableRow
+struct AlarmsRecord;
+
+enum class AlarmStatus
 {
-    uint32_t ID = DB_ID_NONE;
-    uint32_t time;
-    uint32_t snooze;
-    uint32_t status;
+    Off,
+    On,
+    FirstSnooze,
+    SecondSnooze,
+    ThirdSnooze,
+    FourthSnooze,
+    FifthSnooze
+};
+
+struct AlarmsTableRow : public Record
+{
+    TimePoint time     = TIME_POINT_INVALID;
+    uint32_t snooze    = 0;
+    AlarmStatus status = AlarmStatus::On;
+    uint32_t repeat    = 0;
     UTF8 path;
+
+    AlarmsTableRow() = default;
+    AlarmsTableRow(uint32_t id, TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, UTF8 path);
+    explicit AlarmsTableRow(const AlarmsRecord &rec);
+    explicit AlarmsTableRow(const QueryResult &result);
 };
 
 enum class AlarmsTableFields
@@ -52,6 +65,5 @@ class AlarmsTable : public Table<AlarmsTableRow, AlarmsTableFields>
 
     uint32_t count() override final;
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
-
-    AlarmsTableRow next(time_t time);
+    bool updateStatuses(AlarmStatus status);
 };

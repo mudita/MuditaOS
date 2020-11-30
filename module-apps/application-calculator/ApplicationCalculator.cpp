@@ -3,7 +3,7 @@
 
 #include "ApplicationCalculator.hpp"
 #include "windows/CalculatorMainWindow.hpp"
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 
 namespace app
 {

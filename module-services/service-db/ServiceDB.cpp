@@ -3,7 +3,6 @@
 
 #include "ServiceDB.hpp"
 
-#include "service-db/DBAlarmMessage.hpp"
 #include "service-db/DBCalllogMessage.hpp"
 #include "service-db/DBContactMessage.hpp"
 #include "service-db/DBCountryCodeMessage.hpp"
@@ -40,7 +39,6 @@
 #include <SMSRecord.hpp>
 #include <SMSTemplateRecord.hpp>
 #include <Service/Bus.hpp>
-#include <SettingsRecord.hpp>
 #include <SettingsRecord_v2.hpp>
 #include <Tables/Record.hpp>
 #include <ThreadRecord.hpp>
@@ -79,8 +77,6 @@ ServiceDB::~ServiceDB()
 db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
 {
     switch (interface) {
-    case db::Interface::Name::Settings:
-        return settingsRecordInterface.get();
     case db::Interface::Name::SMS:
         return smsRecordInterface.get();
     case db::Interface::Name::SMSThread:
@@ -115,21 +111,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
     auto type = static_cast<MessageType>(msgl->messageType);
     switch (type) {
 
-    /*
-     * Settings record
-     */
-    case MessageType::DBSettingsGet: {
-        auto time        = utils::time::Scoped("DBSettingsGet");
-        auto settingsRec = settingsRecordInterface->GetByID(1);
-        responseMsg = std::make_shared<DBSettingsResponseMessage>(settingsRec, settingsRec.dbID == 0 ? false : true);
-    } break;
-    case MessageType::DBSettingsUpdate: {
-        auto time              = utils::time::Scoped("DBSettingsUpdate");
-        DBSettingsMessage *msg = reinterpret_cast<DBSettingsMessage *>(msgl);
-        auto ret               = settingsRecordInterface->Update(msg->record);
-        responseMsg            = std::make_shared<DBSettingsResponseMessage>(SettingsRecord{}, ret);
-        sendUpdateNotification(db::Interface::Name::Settings, db::Query::Type::Update);
-    } break;
         /*
          * SMS records
          */
@@ -427,55 +408,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
     } break;
 
         /**
-         * Alarm records
-         */
-
-    case MessageType::DBAlarmAdd: {
-        auto time           = utils::time::Scoped("DBAlarmAdd");
-        DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
-        auto ret            = alarmsRecordInterface->Add(msg->record);
-        responseMsg         = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
-        if (ret == true) {
-            sendUpdateNotification(db::Interface::Name::Alarms, db::Query::Type::Create);
-        }
-    } break;
-
-    case MessageType::DBAlarmRemove: {
-        auto time           = utils::time::Scoped("DBAlarmRemove");
-        DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
-        auto ret            = alarmsRecordInterface->RemoveByID(msg->id);
-        responseMsg         = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
-    } break;
-
-    case MessageType::DBAlarmUpdate: {
-        auto time           = utils::time::Scoped("DBAlarmUpdate");
-        DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
-        auto ret            = alarmsRecordInterface->Update(msg->record);
-        responseMsg         = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
-    } break;
-
-    case MessageType::DBAlarmGetCount: {
-        auto time   = utils::time::Scoped("DBAlarmGetCount");
-        auto ret    = alarmsRecordInterface->GetCount();
-        responseMsg = std::make_shared<DBAlarmResponseMessage>(nullptr, true, ret);
-    } break;
-
-    case MessageType::DBAlarmGetLimitOffset: {
-        auto time           = utils::time::Scoped("DBAlarmGetLimitOffset");
-        DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
-        auto ret            = alarmsRecordInterface->GetLimitOffset(msg->offset, msg->limit);
-        responseMsg         = std::make_shared<DBAlarmResponseMessage>(std::move(ret), true);
-    } break;
-    case MessageType::DBAlarmGetNext: {
-        auto time           = utils::time::Scoped("DBAlarmGetNext");
-        DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
-        auto ret            = alarmsRecordInterface->GetNext(msg->time);
-        auto records        = std::make_unique<std::vector<AlarmsRecord>>();
-        records->push_back(ret);
-        responseMsg = std::make_shared<DBAlarmResponseMessage>(std::move(records), ret.ID == 0 ? false : true);
-    } break;
-
-        /**
          * Notes records
          */
 
@@ -619,7 +551,6 @@ sys::ReturnCodes ServiceDB::InitHandler()
     eventsDB        = std::make_unique<EventsDB>();
 
     // Create record interfaces
-    settingsRecordInterface      = std::make_unique<SettingsRecordInterface>(settingsDB.get());
     contactRecordInterface       = std::make_unique<ContactRecordInterface>(contactsDB.get());
     smsRecordInterface           = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
     threadRecordInterface        = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());

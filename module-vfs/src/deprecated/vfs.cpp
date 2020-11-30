@@ -14,15 +14,21 @@
 #define eMMCSECTORS_PER_MB      (eMMCBYTES_PER_MB / 512ull)
 
 /* Used as a magic number to indicate that an FF_Disk_t structure is a RAM
-disk. */
+   disk. */
 #define eMMCSIGNATURE             0x61606362
 #define mainIO_MANAGER_CACHE_SIZE (15UL * FSL_SDMMC_DEFAULT_BLOCK_SIZE)
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
+std::atomic<bool> vfs::initDone{false};
+
 vfs::FILE *vfs::fopen(const char *filename, const char *mode)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return nullptr;
+    }
     const auto filename_rel = relativeToRoot(filename);
     const auto handle       = ff_fopen(filename_rel.c_str(), mode);
     chnNotifier.onFileOpen(filename_rel, mode, handle);
@@ -31,6 +37,10 @@ vfs::FILE *vfs::fopen(const char *filename, const char *mode)
 
 int vfs::fclose(FILE *stream)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return -1;
+    }
     const auto ret = ff_fclose(stream);
     chnNotifier.onFileClose(stream);
     return ret;
@@ -38,6 +48,10 @@ int vfs::fclose(FILE *stream)
 
 int vfs::remove(const char *name)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return -1;
+    }
     const auto abs_name = relativeToRoot(name);
     const auto ret      = ff_remove(abs_name.c_str());
     if (!ret)
@@ -47,41 +61,72 @@ int vfs::remove(const char *name)
 
 size_t vfs::fread(void *ptr, size_t size, size_t count, FILE *stream)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return ssize_t(-1);
+    }
     return ff_fread(ptr, size, count, stream);
 }
 
 size_t vfs::fwrite(const void *ptr, size_t size, size_t count, FILE *stream)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return size_t(0);
+    }
     return ff_fwrite(ptr, size, count, stream);
 }
 
 int vfs::fseek(FILE *stream, long int offset, int origin)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return -1;
+    }
     return ff_fseek(stream, offset, origin);
 }
 
 long int vfs::ftell(FILE *stream)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return -1;
+    }
     return ff_ftell(stream);
 }
 
 void vfs::rewind(FILE *stream)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+    }
     ff_rewind(stream);
 }
 
 size_t vfs::filelength(FILE *stream)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return 0;
+    }
     return ff_filelength(stream);
 }
 
 char *vfs::fgets(char *buff, size_t count, FILE *stream)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return nullptr;
+    }
     return ff_fgets(buff, count, stream);
 }
 
 std::string vfs::getcurrdir()
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return {};
+    }
     char buff[64] = {};
     ff_getcwd(buff, sizeof buff);
     return std::string{buff};
@@ -99,6 +144,10 @@ static inline bool hasEnding(std::string const &fullString, std::string const &e
 
 std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::string &ext, const bool bypassRootCheck)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return {};
+    }
     std::vector<DirectoryEntry> dir_list;
 
     FileAttributes attribute;
@@ -147,12 +196,19 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
 
 bool vfs::eof(FILE *stream)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return true;
+    }
     return ff_feof(stream);
 }
 
 std::string vfs::getline(FILE *stream, uint32_t length)
 {
-
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return {};
+    }
     uint32_t currentPosition = ftell(stream);
 
     // allocate memory to read number of signs defined by length param. Size of buffer is increased by 1 to add string's
@@ -178,6 +234,11 @@ std::string vfs::getline(FILE *stream, uint32_t length)
 
 vfs::FilesystemStats vfs::getFilesystemStats()
 {
+
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return {};
+    }
     FF_Error_t xError;
     uint64_t ullFreeSectors;
     uint32_t ulTotalSizeMB, ulFreeSizeMB;
@@ -242,6 +303,10 @@ std::string vfs::relativeToRoot(const std::string path)
 
 bool vfs::isDir(const char *path)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return false;
+    }
     if (path == nullptr)
         return false;
 
@@ -258,6 +323,11 @@ bool vfs::isDir(const char *path)
 
 bool vfs::fileExists(const char *path)
 {
+
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return false;
+    }
     if (path == nullptr)
         return false;
 
@@ -271,6 +341,10 @@ bool vfs::fileExists(const char *path)
 
 int vfs::deltree(const char *path)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return -1;
+    }
     if (path != nullptr)
         return ff_deltree(
             relativeToRoot(path).c_str(),
@@ -285,6 +359,10 @@ int vfs::deltree(const char *path)
 
 int vfs::mkdir(const char *dir)
 {
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return -1;
+    }
     if (dir != nullptr)
         return ff_mkdir(relativeToRoot(dir).c_str());
     else
@@ -293,6 +371,11 @@ int vfs::mkdir(const char *dir)
 
 int vfs::rename(const char *oldname, const char *newname)
 {
+
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return -1;
+    }
     if (oldname != nullptr && newname != nullptr) {
         const auto old_rel = relativeToRoot(oldname);
         const auto new_rel = relativeToRoot(newname);
@@ -317,6 +400,10 @@ size_t vfs::fprintf(FILE *stream, const char *format, ...)
     char *buffer = nullptr;
     va_list args;
 
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return 0;
+    }
     buffer = static_cast<char *>(ffconfigMALLOC(ffconfigFPRINTF_BUFFER_LENGTH));
     if (buffer == nullptr) {
         stdioSET_ERRNO(pdFREERTOS_ERRNO_ENOMEM);
@@ -340,6 +427,10 @@ size_t vfs::fprintf(FILE *stream, const char *format, ...)
 auto vfs::getAbsolutePath(std::string_view path) const -> std::string
 {
     namespace fs = std::filesystem;
+    if (!initDone) {
+        stdioSET_ERRNO(pdFREERTOS_ERRNO_EIO);
+        return {};
+    }
     fs::path fs_path(path);
     if (fs_path.is_relative()) {
         char cwd_path[ffconfigMAX_FILENAME];

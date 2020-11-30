@@ -8,7 +8,8 @@ class Error(IntEnum):
     PORT_NOT_FOUND = 1,
     PORT_FILE_NOT_FOUND = 2,
     TEST_FAILED = 3,
-    OTHER_ERROR = 4
+    VERSION_MISMATCH = 4,
+    OTHER_ERROR = 5
 
 
 class TestError(Exception):

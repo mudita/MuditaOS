@@ -3,7 +3,7 @@
 
 #include "SearchStart.hpp"
 #include "../ApplicationMessages.hpp"
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <widgets/InputBox.hpp>
 #include <cassert>
 

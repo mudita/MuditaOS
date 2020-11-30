@@ -29,6 +29,8 @@ set(BOARD_SOURCES
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/torch/torch.cpp"
 
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/keypad_backlight/keypad_backlight.cpp"
+
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/watchdog/watchdog.cpp"
 
         CACHE INTERNAL "")

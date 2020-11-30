@@ -94,7 +94,6 @@ namespace sys
 
     void SystemManager::StartSystem(InitFunction init)
     {
-        LOG_FATAL("Initializing system...");
 
         powerManager = std::make_unique<PowerManager>();
         // Switch system to full functionality(clocks and power domains configured to max values)

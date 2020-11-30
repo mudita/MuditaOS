@@ -14,6 +14,11 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
 
+namespace app
+{
+    class LanguageSetter;
+}
+
 namespace gui
 {
 
@@ -23,9 +28,10 @@ namespace gui
         std::vector<gui::Item *> options;
 
         gui::Item *addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback);
+        app::LanguageSetter *setter;
 
       public:
-        LanguageWindow(app::Application *app);
+        LanguageWindow(app::Application *app, app::LanguageSetter *setter);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuild() override;
@@ -33,6 +39,7 @@ namespace gui
         void destroyInterface() override;
 
       private:
+        utils::LangLoader loader;
         void invalidate() noexcept;
     };
 } /* namespace gui */

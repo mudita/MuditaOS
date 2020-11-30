@@ -11,6 +11,7 @@
 #include <crc32/crc32.h>
 #include <log/log.hpp>
 #include <json/json11.hpp>
+#include <atomic>
 #include "vfsNotifier.hpp"
 #include "vfs_globals.hpp"
 
@@ -160,6 +161,10 @@ class vfs
     [[deprecated]] static bool verifyCRC(const std::string filePath, const unsigned long crc32);
     [[deprecated]] static bool verifyCRC(const fs::path filePath);
     [[deprecated]] static std::string generateRandomId(size_t length);
+    auto isInitialized() const noexcept
+    {
+        return initDone.load();
+    }
 
   private:
     bool updateFileCRC32(const fs::path &file);
@@ -168,6 +173,7 @@ class vfs
     bool updateBootConfig(const fs::path &bootJsonPath);
     struct purefs::BootConfig bootConfig;
     vfsn::utility::vfsNotifier chnNotifier;
+    static std::atomic<bool> initDone;
 };
 
 extern vfs vfs;
