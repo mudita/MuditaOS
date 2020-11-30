@@ -4,7 +4,7 @@
 #pragma once
 
 #include <memory>
-#include <sys/types.h>
+#include <cstdint>
 
 namespace drivers
 {
@@ -36,7 +36,7 @@ namespace drivers
     struct DriverPWMParams
     {
         PWMChannel channel;
-        uint32_t frequency;
+        std::uint32_t frequency;
     };
 
     class DriverPWM
@@ -54,9 +54,9 @@ namespace drivers
         {}
 
         // Duty cycle in percent: 0 - 100
-        virtual void SetDutyCycle(uint8_t duty_cycle) = 0;
+        virtual void SetDutyCycle(std::uint8_t duty_cycle) = 0;
 
-        virtual uint8_t GetCurrentDutyCycle() = 0;
+        virtual std::uint8_t GetCurrentDutyCycle() = 0;
 
         virtual void Start() = 0;
 
@@ -68,8 +68,8 @@ namespace drivers
         const DriverPWMParams parameters;
 
       private:
-        static std::weak_ptr<DriverPWM> singleton[static_cast<uint32_t>(PWMInstances::COUNT)]
-                                                 [static_cast<uint32_t>(PWMModules::COUNT)];
+        static std::weak_ptr<DriverPWM> singleton[static_cast<std::uint32_t>(PWMInstances::COUNT)]
+                                                 [static_cast<std::uint32_t>(PWMModules::COUNT)];
     };
 
 } // namespace drivers

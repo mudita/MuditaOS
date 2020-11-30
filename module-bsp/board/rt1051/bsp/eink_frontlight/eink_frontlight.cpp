@@ -12,7 +12,7 @@ namespace bsp::eink_frontlight
     {
         std::shared_ptr<drivers::DriverPWM> pwm;
         constexpr inline auto PWM_FREQUENCY_HZ = 20000;
-        uint8_t bright                         = 0;
+        std::uint8_t bright                    = 0;
     } // namespace
 
     void init()
@@ -41,7 +41,7 @@ namespace bsp::eink_frontlight
         }
     }
 
-    uint8_t GetBrightness()
+    std::uint8_t GetBrightness()
     {
         // If gamma corection used add recalculation from 0-100 duty cycle to 0-5 scale
         return pwm->GetCurrentDutyCycle();

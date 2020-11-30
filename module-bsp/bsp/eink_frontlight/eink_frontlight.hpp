@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include "bsp/common.hpp"
 #include <utility>
 
@@ -13,9 +13,9 @@ namespace bsp::eink_frontlight
 
     void deinit();
 
-    void setBrightness(uint8_t brightness);
+    void setBrightness(std::uint8_t brightness);
 
-    uint8_t GetBrightness();
+    std::uint8_t GetBrightness();
 
     void turnOn();
     

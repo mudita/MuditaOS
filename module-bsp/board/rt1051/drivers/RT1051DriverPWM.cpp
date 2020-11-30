@@ -69,17 +69,17 @@ namespace drivers
         LOG_DEBUG("Deinit: PWM");
     }
 
-    void RT1051DriverPWM::SetDutyCycle(uint8_t duty_cycle_percent)
+    void RT1051DriverPWM::SetDutyCycle(std::uint8_t duty_cycle_percent)
     {
         cpp_freertos::LockGuard lock(mutex);
         pwm_mode_t pwmMode = kPWM_SignedCenterAligned;
 
-        lastDutyCycle = std::clamp(duty_cycle_percent, static_cast<uint8_t>(0), static_cast<uint8_t>(100));
+        lastDutyCycle = std::clamp(duty_cycle_percent, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(100));
         PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, lastDutyCycle);
         PWM_SetPwmLdok(base, 1 << pwmModule, true);
     }
 
-    uint8_t RT1051DriverPWM::GetCurrentDutyCycle()
+    std::uint8_t RT1051DriverPWM::GetCurrentDutyCycle()
     {
         return lastDutyCycle;
     }
@@ -94,7 +94,7 @@ namespace drivers
         PWM_StopTimer(base, 1 << pwmModule);
     }
 
-    void RT1051DriverPWM::SetupPWMChannel(const PWMChannel channel, const uint32_t pwm_frequency)
+    void RT1051DriverPWM::SetupPWMChannel(const PWMChannel channel, const std::uint32_t pwm_frequency)
     {
         switch (parameters.channel) {
         case PWMChannel::A:
@@ -114,7 +114,7 @@ namespace drivers
         }
 
         // Currently connected to IPbus clock
-        uint32_t clockSource = CLOCK_GetFreq(kCLOCK_IpgClk);
+        std::uint32_t clockSource = CLOCK_GetFreq(kCLOCK_IpgClk);
         pwm_mode_t pwmMode   = kPWM_SignedCenterAligned;
 
         PWM_SetupPwm(base, pwmModule, &pwmSignalConfig, 1, pwmMode, pwm_frequency, clockSource);

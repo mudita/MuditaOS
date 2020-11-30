@@ -19,16 +19,16 @@ namespace drivers
 
         ~RT1051DriverPWM();
 
-        void SetDutyCycle(uint8_t duty_cycle_percent) override final;
+        void SetDutyCycle(std::uint8_t duty_cycle_percent) override final;
 
-        uint8_t GetCurrentDutyCycle() override final;
+        std::uint8_t GetCurrentDutyCycle() override final;
 
         void Start() override final;
 
         void Stop() override final;
 
       private:
-        void SetupPWMChannel(const PWMChannel channel, const uint32_t frequency);
+        void SetupPWMChannel(const PWMChannel channel, const std::uint32_t frequency);
 
         PWM_Type *base;
 
@@ -40,7 +40,7 @@ namespace drivers
                                               .deadtimeValue    = 0,
                                               .faultState       = kPWM_PwmFaultState0};
 
-        uint8_t lastDutyCycle = 0;
+        std::uint8_t lastDutyCycle = 0;
 
         cpp_freertos::MutexStandard mutex;
     };

@@ -17,8 +17,8 @@
 namespace drivers
 {
 
-    std::weak_ptr<DriverPWM> DriverPWM::singleton[static_cast<uint32_t>(PWMInstances ::COUNT)]
-                                                 [static_cast<uint32_t>(PWMModules::COUNT)];
+    std::weak_ptr<DriverPWM> DriverPWM::singleton[static_cast<std::uint32_t>(PWMInstances ::COUNT)]
+                                                 [static_cast<std::uint32_t>(PWMModules::COUNT)];
 
     std::shared_ptr<DriverPWM> DriverPWM::Create(const drivers::PWMInstances instance,
                                                  const drivers::PWMModules module,
@@ -28,7 +28,7 @@ namespace drivers
 
             cpp_freertos::CriticalSection::Enter();
             std::shared_ptr<DriverPWM> inst =
-                singleton[static_cast<uint32_t>(instance)][static_cast<uint32_t>(module)].lock();
+                singleton[static_cast<std::uint32_t>(instance)][static_cast<std::uint32_t>(module)].lock();
 
             if (!inst) {
 #if defined(TARGET_RT1051)
@@ -38,7 +38,7 @@ namespace drivers
 #error "Unsupported target"
 #endif
 
-                singleton[static_cast<uint32_t>(instance)][static_cast<uint32_t>(module)] = inst;
+                singleton[static_cast<std::uint32_t>(instance)][static_cast<std::uint32_t>(module)] = inst;
             }
 
             cpp_freertos::CriticalSection::Exit();
