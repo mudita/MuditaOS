@@ -1,5 +1,8 @@
 # MuditaOS changelog
 
+### Added
+* `[cellular]` SIM API for change pin, set/reset sim lock, switch sim card
+
 [Current release]
 
 ### Added
