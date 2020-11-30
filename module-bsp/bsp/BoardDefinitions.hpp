@@ -104,6 +104,11 @@ enum class BoardDefinitions
     TORCH_DRIVER_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
     TORCH_DRIVER_EN = 21, // GPIO_AD_B1_05 Active HIGH. Internal pulldown resistor of 300kΩ between HWEN and GND.
 
+    KEYPAD_BACKLIGHT_DRIVER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
+    KEYPAD_BACKLIGHT_DRIVER_I2C = AUDIOCODEC_I2C,
+    KEYPAD_BACKLIGHT_DRIVER_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
+    KEYPAD_BACKLIGHT_DRIVER_NRST = 3, // GPIO_AD_B0_03 Active LOW. External pulldown resistor of 10Ω between NRST and GND.
+
 };
 
 #endif //PUREPHONE_BOARDDEFINITIONS_HPP
