@@ -9,8 +9,6 @@
 #include <fstream>
 #include <string_view>
 
-#define LOGGER_BUFFER_SIZE 4096
-
 #define CONSOLE_ESCAPE_COLOR_BLACK   "\x1b[30m"
 #define CONSOLE_ESCAPE_COLOR_RED     "\x1b[31m"
 #define CONSOLE_ESCAPE_COLOR_GREEN   "\x1b[32m"
@@ -50,7 +48,7 @@ static char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
 
 void dumpToFile(std::string_view log, size_t length)
 {
-    static std::fstream logFile(logFileName, std::fstream::out);
+    static std::fstream logFile(LOG_FILE_NAME, std::fstream::out);
     logFile.write(log.data(), length);
     logFile.flush();
 }

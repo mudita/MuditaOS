@@ -20,8 +20,6 @@ extern "C"
  * directly.
  */
 
-#define LOGGER_BUFFER_SIZE 4096
-
 #if LOG_USE_COLOR == 1
 #define CONSOLE_ESCAPE_COLOR_BLACK              "\x1b[30m"
 #define CONSOLE_ESCAPE_COLOR_RED                "\x1b[31m"
@@ -70,6 +68,7 @@ static const char *level_colors[] = {"", "", "", "", "", ""};
 
 #include <map>
 #include <string>
+#include <fstream>
 
 namespace
 {
@@ -151,6 +150,17 @@ struct Logger
 
 static Logger logger;
 static char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
+static char *loggerBufferCurrentPos          = &loggerBuffer[0];
+
+void dumpToFile()
+{
+    const size_t currentBufferMemUsed = loggerBufferCurrentPos - loggerBuffer;
+    if (currentBufferMemUsed >= MAX_BUFFER_UTIL_MEM) {
+        std::fstream logFile(LOG_FILE_NAME, std::fstream::out | std::fstream::app);
+        logFile.write(loggerBuffer, currentBufferMemUsed);
+        loggerBufferCurrentPos = &loggerBuffer[0];
+    }
+}
 
 static inline size_t loggerBufferSizeLeft(char *ptr)
 {
@@ -164,14 +174,16 @@ void log_Printf(const char *fmt, ...)
         return;
     }
 
-    char *ptr = loggerBuffer;
+    char *startingPos = loggerBufferCurrentPos;
     va_list args;
 
     va_start(args, fmt);
-    ptr += vsnprintf(ptr, loggerBufferSizeLeft(ptr), fmt, args);
+    loggerBufferCurrentPos +=
+        vsnprintf(loggerBufferCurrentPos, loggerBufferSizeLeft(loggerBufferCurrentPos), fmt, args);
     va_end(args);
 
-    log_WriteToDevice((uint8_t *)loggerBuffer, ptr - loggerBuffer);
+    log_WriteToDevice((uint8_t *)startingPos, loggerBufferCurrentPos - startingPos);
+    dumpToFile();
 
     logger.logUnlock();
 }
@@ -194,7 +206,7 @@ static void _log_Log(
         return;
     }
 
-    char *ptr = loggerBuffer;
+    char *startingPos = loggerBufferCurrentPos;
 
     // filter out not interesing logs
     if (logger.filterThreadName(getTaskDesc()) >= level) {
@@ -202,33 +214,38 @@ static void _log_Log(
         return;
     }
 
-    ptr += snprintf(
-        ptr, loggerBufferSizeLeft(ptr), "%lu ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+    loggerBufferCurrentPos += snprintf(loggerBufferCurrentPos,
+                                       loggerBufferSizeLeft(loggerBufferCurrentPos),
+                                       "%lu ms ",
+                                       cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
 
 #if LOG_USE_COLOR == 1
 
-    ptr += snprintf(ptr,
-                    loggerBufferSizeLeft(ptr),
-                    "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[90m%s:%d:" CONSOLE_ESCAPE_COLOR_RESET,
-                    level_colors[level],
-                    level_names[level],
-                    getTaskDesc(),
-                    file,
-                    line);
+    loggerBufferCurrentPos +=
+        snprintf(loggerBufferCurrentPos,
+                 loggerBufferSizeLeft(loggerBufferCurrentPos),
+                 "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[90m%s:%d:" CONSOLE_ESCAPE_COLOR_RESET,
+                 level_colors[level],
+                 level_names[level],
+                 getTaskDesc(),
+                 file,
+                 line);
 #else
-    ptr += snprintf(ptr,
-                    loggerBufferSizeLeft(ptr),
-                    "%-5s [%s] %s:%s:%d: ",
-                    level_names[level],
-                    getTaskDesc(),
-                    file,
-                    function,
-                    line);
+    loggerBufferCurrentPos += snprintf(loggerBufferCurrentPos,
+                                       loggerBufferSizeLeft(loggerBufferCurrentPos),
+                                       "%-5s [%s] %s:%s:%d: ",
+                                       level_names[level],
+                                       getTaskDesc(),
+                                       file,
+                                       function,
+                                       line);
 #endif
-    ptr += vsnprintf(ptr, loggerBufferSizeLeft(ptr), fmt, args);
-    ptr += snprintf(ptr, loggerBufferSizeLeft(ptr), "\n");
+    loggerBufferCurrentPos +=
+        vsnprintf(loggerBufferCurrentPos, loggerBufferSizeLeft(loggerBufferCurrentPos), fmt, args);
+    loggerBufferCurrentPos += snprintf(loggerBufferCurrentPos, loggerBufferSizeLeft(loggerBufferCurrentPos), "\n");
 
-    log_WriteToDevice((uint8_t *)loggerBuffer, ptr - loggerBuffer);
+    log_WriteToDevice((uint8_t *)startingPos, loggerBufferCurrentPos - startingPos);
+    dumpToFile();
 
     /* Release lock */
     logger.logUnlock();
@@ -269,15 +286,17 @@ extern "C"
             return -1;
         }
 
-        char *ptr = loggerBuffer;
+        char *startingPos = loggerBufferCurrentPos;
         va_list args;
 
         va_start(args, __format);
-        ptr += vsnprintf(ptr, loggerBufferSizeLeft(ptr), __format, args);
+        loggerBufferCurrentPos +=
+            vsnprintf(loggerBufferCurrentPos, loggerBufferSizeLeft(loggerBufferCurrentPos), __format, args);
         va_end(args);
 
-        unsigned int numBytes = ptr - loggerBuffer;
-        SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, numBytes);
+        unsigned int numBytes = loggerBufferCurrentPos - startingPos;
+        SEGGER_RTT_Write(0, (uint8_t *)startingPos, numBytes);
+        dumpToFile();
 
         /* Release lock */
         logger.logUnlock();
@@ -291,11 +310,13 @@ extern "C"
         if (!logger.logLock()) {
             return -1;
         }
-        char *ptr = loggerBuffer;
-        ptr += vsnprintf(ptr, loggerBufferSizeLeft(ptr), __format, __arg);
+        char *startingPos = loggerBufferCurrentPos;
+        loggerBufferCurrentPos +=
+            vsnprintf(loggerBufferCurrentPos, loggerBufferSizeLeft(loggerBufferCurrentPos), __format, __arg);
 
-        unsigned int numBytes = ptr - loggerBuffer;
-        SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, numBytes);
+        unsigned int numBytes = loggerBufferCurrentPos - startingPos;
+        SEGGER_RTT_Write(0, (uint8_t *)startingPos, numBytes);
+        dumpToFile();
 
         /* Release lock */
         logger.logUnlock();
@@ -310,25 +331,29 @@ extern "C"
             return -1;
         }
 
-        char *ptr = loggerBuffer;
-        ptr += snprintf(
-            ptr, loggerBufferSizeLeft(ptr), "%lu ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+        char *startingPos = loggerBufferCurrentPos;
+        loggerBufferCurrentPos += snprintf(loggerBufferCurrentPos,
+                                           loggerBufferSizeLeft(loggerBufferCurrentPos),
+                                           "%lu ms ",
+                                           cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
         logger_level level = LOGFATAL;
-        ptr += snprintf(ptr,
-                        loggerBufferSizeLeft(ptr),
-                        "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[31mASSERTION " CONSOLE_ESCAPE_COLOR_RESET,
-                        level_colors[level],
-                        level_names[level],
-                        getTaskDesc());
+        loggerBufferCurrentPos +=
+            snprintf(loggerBufferCurrentPos,
+                     loggerBufferSizeLeft(loggerBufferCurrentPos),
+                     "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[31mASSERTION " CONSOLE_ESCAPE_COLOR_RESET,
+                     level_colors[level],
+                     level_names[level],
+                     getTaskDesc());
 
         va_list args;
         va_start(args, __format);
-        ptr += vsnprintf(ptr, loggerBufferSizeLeft(ptr), __format, args);
+        loggerBufferCurrentPos +=
+            vsnprintf(loggerBufferCurrentPos, loggerBufferSizeLeft(loggerBufferCurrentPos), __format, args);
         va_end(args);
 
-        unsigned int numBytes = ptr - loggerBuffer;
-
-        log_WriteToDevice((uint8_t *)loggerBuffer, ptr - loggerBuffer);
+        unsigned int numBytes = loggerBufferCurrentPos - startingPos;
+        log_WriteToDevice((uint8_t *)startingPos, numBytes);
+        dumpToFile();
 
         /* Release lock */
         logger.logUnlock();
