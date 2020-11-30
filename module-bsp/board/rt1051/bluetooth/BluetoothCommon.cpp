@@ -69,15 +69,12 @@ void BluetoothCommon::open()
     LOG_INFO("Bluetooth HW open!");
     set_irq(true);
     set_reset(true);
-    // wait for the module to power up (up to 100ms according to the docs )
-//    do {
-//    } while (read_cts() == 1);
     is_open = true;
 }
 
 void BluetoothCommon::close()
 {
-    LOG_INFO("close!");
+    LOG_INFO("Bluetooth HW close!");
     // TODO destroy semaphore
     set_irq(false);
     is_open = false;
@@ -176,17 +173,18 @@ ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t len)
     auto wrote = write(const_cast<uint8_t *>(buf), len);
 
     if (wrote == len) { // success orchestrating a transfer
-        constexpr auto write_blocking_timeout = pdMS_TO_TICKS(100);
-        auto ulNotificationValue              = ulTaskNotifyTake(pdFALSE, write_blocking_timeout);
+        constexpr auto writeBlockingTimeout = pdMS_TO_TICKS(100);
+        auto ulNotificationValue              = ulTaskNotifyTake(pdFALSE, writeBlockingTimeout);
         if (ulNotificationValue != 0) { // success completing a transfer
             LOG_DEBUG("DMA Tx wrote");
             ret = len;
-        } else {
+        }
+        else {
             LOG_ERROR("DMA Tx timeout");
             ret = -1;
         }
     }
-    else{
+    else {
         LOG_WARN("DMA Tx not wrote (%d/%d)", wrote, len);
     }
     return ret;
@@ -206,6 +204,10 @@ BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
 
 BTdev::Error BluetoothCommon::set_reset(bool on)
 {
+    if (on && (GPIO_PinRead(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN) == 0)) {
+        // docs: "nSHUTD must be low for a minimum of 5 ms."
+        sleep_ms(5);
+    }
     LOG_INFO("reset %s", on ? "on" : "off");
     GPIO_PinWrite(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, on ? 1U : 0U);
     return Success;
@@ -241,10 +243,7 @@ void BluetoothCommon::configure_uart_io()
     GPIO_PinInit(BSP_BLUETOOTH_UART_CTS_PORT, BSP_BLUETOOTH_UART_CTS_PIN, &gpio_init_structure);
     gpio_init_structure.direction     = kGPIO_DigitalOutput;
     gpio_init_structure.interruptMode = kGPIO_NoIntmode;
-    gpio_init_structure.outputLogic   = 1;
-    GPIO_PinInit(BSP_BLUETOOTH_OSC_EN_PORT, BSP_BLUETOOTH_OSC_EN_PIN, &gpio_init_structure);
-    gpio_init_structure.direction   = kGPIO_DigitalOutput;
-    gpio_init_structure.outputLogic = 0;
+    gpio_init_structure.outputLogic   = 0;
     GPIO_PinInit(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, &gpio_init_structure);
 }
 

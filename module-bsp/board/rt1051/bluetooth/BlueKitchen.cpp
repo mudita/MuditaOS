@@ -45,7 +45,7 @@ ssize_t BlueKitchen::read(uint8_t *buf, size_t nbytes)
 
     to_read = nbytes;
 
-    read_buff = reinterpret_cast<char *>(buf);
+    read_buff = reinterpret_cast<volatile char *>(buf);
     read_len  = nbytes;
 
     if (BluetoothCommon::read(buf, nbytes) == nbytes) {
