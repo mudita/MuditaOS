@@ -43,6 +43,9 @@ namespace app::manager
             RequestPinChange,
             UnlockSim,
             BlockSim,
+            ShowMMIResult,
+            ShowMMIResponse,
+            ShowMMIPush,
             DisplayCMEError,
             UserAction // The last enumerator in the Action enum.
                        // All user-defined actions shall have values greater than UserAction.

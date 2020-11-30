@@ -16,7 +16,7 @@
 #include "../ApplicationSettings.hpp"
 #include "DateTimeWindow.hpp"
 
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include "time/time_conversion.hpp"
 #include "time/time_date_validation.hpp"
 
@@ -26,10 +26,14 @@
 #include <Style.hpp>
 #include <widgets/BoxLayout.hpp>
 
+#include <module-utils/Utils.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
+
 namespace gui
 {
 
-    DateTimeWindow::DateTimeWindow(app::Application *app) : AppWindow(app, "DateTime")
+    DateTimeWindow::DateTimeWindow(app::Application *app, bool euroTime)
+        : AppWindow(app, "DateTime"), isEuroTime(euroTime)
     {
         buildInterface();
     }
@@ -58,10 +62,6 @@ namespace gui
 
         utils::time::Timestamp time;
 
-        SettingsRecord appSettings = application->getSettings();
-        timeFormat12h              = appSettings.timeFormat12;
-        timeDateFormat             = appSettings.timeDateFormat;
-
         // create date widgets
         dateBody = new gui::HBox(this,
                                  style::window::default_left_margin,
@@ -84,7 +84,7 @@ namespace gui
                                time.get_date_time_substr(utils::time::GetParameters::Year));
         dateItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Year, item));
 
-        if (timeDateFormat) {
+        if (isEuroTime) {
             auto toAdd = dateItems.find(DateTimeItems::Day);
             if (toAdd != dateItems.end()) {
                 dateBody->addWidget(toAdd->second);
@@ -119,7 +119,7 @@ namespace gui
 
         auto hourValue = time.get_date_time_sub_value(utils::time::GetParameters::Hour);
 
-        if (timeFormat12h) {
+        if (application->isTimeFormat12()) {
             if (hourValue > 12) {
                 hourValue -= 12;
                 dayPeriod = true;
@@ -142,7 +142,7 @@ namespace gui
         timeBody->addWidget(addSpacer(""));
 
         item = addDateTimeItem(nullptr, (""), (""));
-        if (timeFormat12h) {
+        if (application->isTimeFormat12()) {
             if (dayPeriod) {
                 item->setText("PM");
             }
@@ -341,7 +341,7 @@ namespace gui
 
             if (utils::time::validateTime(getDateTimeItemValue(DateTimeItems::Hour),
                                           getDateTimeItemValue(DateTimeItems::Minute),
-                                          timeFormat12h)) {
+                                          application->isTimeFormat12())) {
                 application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             }
             else {
@@ -364,7 +364,7 @@ namespace gui
             timeinfo.tm_mday = std::stoi(getDateTimeItemValue(DateTimeItems::Day));
 
             auto hourValue = std::stoi(getDateTimeItemValue(DateTimeItems::Hour));
-            if (timeFormat12h) {
+            if (application->isTimeFormat12()) {
                 if (dayPeriod) {
                     hourValue += 12;
                 }
@@ -379,4 +379,10 @@ namespace gui
         bsp::rtc_SetDateTime(&timeinfo);
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }
+
+    void DateTimeWindow::setEuroTime(bool euroTime)
+    {
+        isEuroTime = euroTime;
+    }
+
 } /* namespace gui */

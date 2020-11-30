@@ -5,6 +5,7 @@ set(SOURCES
     ApplicationManifest.cpp
     Controller.cpp
     data/SimActionsParams.cpp
+    data/MmiActionsParams.cpp
     model/ApplicationManager.cpp
     model/ApplicationHandle.cpp
     model/ApplicationsRegistry.cpp

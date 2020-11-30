@@ -7,6 +7,9 @@
 #include "NotesModel.hpp"
 #include "ListView.hpp"
 
+#include <module-utils/Utils.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
+
 NotesModel::NotesModel(app::Application *app) : DatabaseModel(app)
 {}
 
@@ -47,12 +50,7 @@ gui::ListItem *NotesModel::getItem(gui::Order order)
 {
     std::shared_ptr<NotesRecord> note = getRecord(order);
 
-    SettingsRecord &settings = application->getSettings();
-
-    if (note == nullptr)
-        return nullptr;
-
-    gui::NotesItem *item = new gui::NotesItem(this, !settings.timeFormat12);
+    auto *item = new gui::NotesItem(this, !(application->isTimeFormat12()));
 
     item->setNote(note);
     return item;

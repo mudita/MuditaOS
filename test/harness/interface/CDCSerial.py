@@ -1,13 +1,15 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import time
+from random import randrange
 
 import serial
 import json
-import typing
 import logging
 from enum import Enum
+
 from harness.interface.defs import endpoint, method, status
+from harness.interface.error import TestError, Error
 
 log = logging.getLogger(__name__)
 
@@ -18,24 +20,34 @@ class Keytype(Enum):
 
 
 class CDCSerial:
-    def __init__(self, port_name):
+    def __init__(self, port_name, timeout=10):
+        self.timeout = timeout
         self.body = ""
-        try:
-            self.serial = serial.Serial(port_name, baudrate=115200, timeout=10)
-            self.serial.flushInput()
-            log.info("port opened!")
-        except (FileNotFoundError, serial.serialutil.SerialException) as err:
-            log.error("uart {} not found".format(port_name))
-            exit(1)
+        while timeout != 0:
+            try:
+                self.serial = serial.Serial(port_name, baudrate=115200, timeout=10)
+                self.serial.flushInput()
+                log.info("port opened!")
+                break
+            except (FileNotFoundError, serial.serialutil.SerialException) as err:
+                log.error("can't open {}, retrying...".format(port_name))
+                time.sleep(1)
+                self.timeout = self.timeout - 1
+                if self.timeout == 0:
+                    log.error("uart {} not found - probably OS did not boot".format(port_name))
+                    raise TestError(Error.PORT_NOT_FOUND)
 
     def __del__(self):
-        self.serial.close()
+        try:
+            self.serial.close()
+        except (serial.serialutil.SerialException, AttributeError):
+            pass
 
     def __wrap_message(self, body):
         msg = {
             "endpoint": endpoint["developerMode"],
             "method": method["put"],
-            "uuid": 0,
+            "uuid": randrange(1,100),
             "body": body
         }
         return msg
@@ -71,9 +83,10 @@ class CDCSerial:
         }
 
         ret = self.write(self.__wrap_message(body), wait)
+        print(ret)
         return ret["body"]["ATResponse"]
 
-    def get_window(self):
+    def get_window_name(self):
         body = {
             "focus": True
         }

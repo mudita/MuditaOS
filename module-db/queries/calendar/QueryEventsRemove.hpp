@@ -21,10 +21,10 @@ namespace db::query::events
 
     class RemoveResult : public QueryResult
     {
-        const bool ret = true;
+        bool ret;
 
       public:
-        RemoveResult(const bool &ret);
+        explicit RemoveResult(bool ret);
         [[nodiscard]] auto getResult() const -> bool;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;

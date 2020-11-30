@@ -24,15 +24,18 @@ extern "C" {
 
     DIR *opendir(const char *dirname)
     {
-        namespace vfs = vfsn::linux::internal;
         TRACE_SYSCALL();
         if(!dirname) {
             errno = EINVAL;
             return nullptr;
         }
+        if(!vfs_is_initialized()) {
+            errno = EIO;
+            return nullptr;
+        }
         auto dir      = new DIR;
         char dirbuf[ffconfigMAX_FILENAME];
-        dir->dir_data = diren::diropen(errno, vfs::relative_to_root(dirbuf,sizeof dirbuf,dirname));
+        dir->dir_data = diren::diropen(errno, relative_to_root(dirbuf,sizeof dirbuf,dirname));
         if (!dir->dir_data) {
             delete dir;
             return nullptr;
@@ -51,6 +54,10 @@ extern "C" {
             errno = EBADF;
             return -1;
         }
+        if(!vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         auto res = diren::dirclose(errno, dirp->dir_data);
         delete dirp;
         return res;
@@ -62,6 +69,10 @@ extern "C" {
         TRACE_SYSCALL();
         if (!dirp) {
             errno = EBADF;
+            return nullptr;
+        }
+        if(!vfs_is_initialized()) {
+            errno = EIO;
             return nullptr;
         }
         auto olderrno{errno};
@@ -91,6 +102,10 @@ extern "C" {
         TRACE_SYSCALL();
         if (!dirp) {
             errno = EBADF;
+            return -1;
+        }
+        if(!vfs_is_initialized()) {
+            errno = EIO;
             return -1;
         }
         auto olderrno{errno};
@@ -123,6 +138,10 @@ extern "C" {
             errno = EBADF;
             return;
         }
+        if(!vfs_is_initialized()) {
+            errno = EIO;
+            return;
+        }
         diren::dirreset(errno, dirp->dir_data);
         dirp->position = 0;
     }
@@ -133,6 +152,10 @@ extern "C" {
         TRACE_SYSCALL();
         if (!dirp) {
             errno = EBADF;
+            return;
+        }
+        if(!vfs_is_initialized()) {
+            errno = EIO;
             return;
         }
         if (loc < 0) {
@@ -153,6 +176,10 @@ extern "C" {
         TRACE_SYSCALL();
         if (!dirp) {
             errno = EBADF;
+            return -1;
+        }
+        if(!vfs_is_initialized()) {
+            errno = EIO;
             return -1;
         }
         return dirp->position;

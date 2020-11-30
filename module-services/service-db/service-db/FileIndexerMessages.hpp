@@ -15,6 +15,7 @@ namespace FileIndexer
 {
     constexpr unsigned int FILE_ID_NOT_EXISTS       = 0;
     constexpr unsigned int FILE_RECORD_COLUMN_COUNT = 7;
+    constexpr unsigned int NOTIFICATION_RECORD_COLUMN_COUNT = 3;
     constexpr unsigned int ONE_ROW_FOUND            = 1;
     constexpr unsigned int ZERO_ROWS_FOUND          = 0;
 
@@ -94,28 +95,28 @@ namespace FileIndexer
         {
           public:
             RegisterOnFileChange() = default;
-            explicit RegisterOnFileChange(std::string dir) : directory(std::move(dir))
+            explicit RegisterOnFileChange(std::unique_ptr<std::string> dir) : directory(std::move(dir))
             {}
-            std::string directory;
+            std::unique_ptr<std::string> directory;
         };
 
         class UnregisterOnFileChange : public FileIndexerMessage
         {
           public:
             UnregisterOnFileChange() = default;
-            explicit UnregisterOnFileChange(std::string dir) : directory(std::move(dir))
+            explicit UnregisterOnFileChange(std::unique_ptr<std::string> dir) : directory(std::move(dir))
             {}
-            std::string directory;
+            std::unique_ptr<std::string> directory;
         };
 
         class FileChanged : public FileIndexerMessage
         {
           public:
             FileChanged() = default;
-            explicit FileChanged(std::string dir) : directory(dir)
+            explicit FileChanged(std::unique_ptr<std::string> dir) : directory(std::move(dir))
             {}
 
-            std::string directory;
+            std::unique_ptr<std::string> directory;
         };
 
         class GetListDirMessage : public FileIndexerMessage

@@ -5,7 +5,6 @@
 #define MODULE_APPS_APPLICATION_SETTINGS_APPLICATIONSETTINGS_HPP_
 
 #include "Application.hpp"
-
 #include "bsp/common.hpp"
 
 namespace app
@@ -15,7 +14,29 @@ namespace app
     inline constexpr auto sim_select     = "SimSelect";
     inline constexpr auto change_setting = "ChangeSetting";
 
-    class ApplicationSettings : public app::Application
+    class SimSetter
+    {
+      public:
+        virtual ~SimSetter()                     = default;
+        virtual void setSim(Store::GSM::SIM sim) = 0;
+    };
+
+    class PinLockSetter
+    {
+      public:
+        virtual ~PinLockSetter()              = default;
+        virtual void setPin(unsigned int pin) = 0;
+        virtual void clearPin()               = 0;
+    };
+
+    class LanguageSetter
+    {
+      public:
+        virtual ~LanguageSetter()                                    = default;
+        virtual void setDisplayLanguage(const std::string &language) = 0;
+    };
+
+    class ApplicationSettings : public app::Application, public SimSetter, public PinLockSetter, public LanguageSetter
     {
       public:
         ApplicationSettings(std::string name                    = name_settings,
@@ -34,6 +55,18 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
         bsp::Board board = bsp::Board::none;
+        void setSim(Store::GSM::SIM sim) override;
+        void setPin(unsigned int pin) override;
+        void clearPin() override;
+        void setDisplayLanguage(const std::string &language) override;
+        void lockPassChanged(std::string value);
+        void displayLanguageChanged(std::string value);
+        void timeDateChanged(std::string value);
+
+      private:
+        unsigned int lockPassHash;
+        bool europeanDateTimeFormat = false; // true europe format, false american format
+        std::string displayLanguage;
     };
 
     template <> struct ManifestTraits<ApplicationSettings>

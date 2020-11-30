@@ -18,7 +18,7 @@ else()
 endif()
 
 set (SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/i18/i18.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/i18n/i18n.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/json/json11.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/utf8/UTF8.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/time/time_conversion.cpp
@@ -33,6 +33,8 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/NumberHolderMatcher.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/country.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/state/ServiceState.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ical/ParserICS.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/time/TimeRangeParser.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})

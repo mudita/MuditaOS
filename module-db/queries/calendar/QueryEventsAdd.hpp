@@ -23,7 +23,7 @@ namespace db::query::events
     class AddResult : public QueryResult
     {
       public:
-        AddResult(bool ret);
+        explicit AddResult(bool ret);
         [[nodiscard]] auto getResult() const -> bool;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;

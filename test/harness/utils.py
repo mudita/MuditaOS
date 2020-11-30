@@ -2,9 +2,11 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import time
+from enum import Enum
 
 from harness.interface.CDCSerial import Keytype
 from harness.interface.defs import key_codes
+
 
 # assuming that the harness is actually in the menu
 application_keypath = {

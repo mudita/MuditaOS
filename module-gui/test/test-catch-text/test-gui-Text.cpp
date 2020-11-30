@@ -6,7 +6,7 @@
 #include "Common.hpp"
 #include "InitializedFontManager.hpp"
 #include "TextParse.hpp"
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include "mock/InitializedFontManager.hpp"
 #include <catch2/catch.hpp>
 #include <limits>
@@ -49,7 +49,7 @@ namespace gui
     class TestText : public Text
     {
       public:
-        unsigned int linesSize()
+        [[nodiscard]] unsigned int linesSize()
         {
             return lines->get().size();
         }
@@ -60,7 +60,7 @@ namespace gui
             return;
         }
 
-        auto &linesGet()
+        [[nodiscard]] auto &linesGet()
         {
             return lines->get();
         }
@@ -144,7 +144,7 @@ TEST_CASE("Text buildDrawList")
 
 TEST_CASE("handle input mode ABC/abc/1234")
 {
-    utils::localize.SetDisplayLanguage(utils::Lang::En); /// needed to load input mode
+    utils::localize.setInputLanguage("English"); /// needed to load input mode
     auto &fontmanager = mockup::fontManager();
     auto font         = fontmanager.getFont(0);
     auto text         = gui::TestText();

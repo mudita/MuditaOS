@@ -20,6 +20,7 @@
 #include <service-appmgr/service-appmgr/messages/ActionRequest.hpp>
 #include <service-appmgr/service-appmgr/Actions.hpp>
 #include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
+#include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
 
 class CellularMessage : public sys::DataMessage
 {
@@ -507,6 +508,66 @@ class CellularAntennaResponseMessage : public sys::ResponseMessage
 
     bool retCode;
     bsp::cellular::antenna antenna;
+};
+
+class CellularMMIResult : public CellularMessage
+{
+  protected:
+    app::manager::actions::MMIResultParams params;
+
+    explicit CellularMMIResult(app::manager::actions::MMIResultParams::MMIResult result)
+        : CellularMessage(MessageType::CellularMMIData), params(result)
+    {}
+};
+
+class CellularMMIResultMessage : public CellularMMIResult, public app::manager::actions::ConvertibleToAction
+{
+  public:
+    explicit CellularMMIResultMessage(app::manager::actions::MMIResultParams::MMIResult result)
+        : CellularMMIResult(result)
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender,
+            app::manager::actions::ShowMMIResult,
+            std::make_unique<app::manager::actions::MMIResultParams>(params));
+    }
+};
+class CellularMMIDataMessage : public CellularMessage
+{
+  protected:
+    app::manager::actions::MMIParams params;
+
+  public:
+    explicit CellularMMIDataMessage(std::string mmiData)
+        : CellularMessage(MessageType::CellularMMIData), params(mmiData)
+    {}
+};
+class CellularMMIResponseMessage : public CellularMMIDataMessage, public app::manager::actions::ConvertibleToAction
+{
+  public:
+    explicit CellularMMIResponseMessage(std::string mmiData) : CellularMMIDataMessage(std::move(mmiData))
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender, app::manager::actions::ShowMMIResponse, std::make_unique<app::manager::actions::MMIParams>(params));
+    }
+};
+class CellularMMIPushMessage : public CellularMMIDataMessage, public app::manager::actions::ConvertibleToAction
+{
+  public:
+    explicit CellularMMIPushMessage(std::string mmiData) : CellularMMIDataMessage(std::move(mmiData))
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender, app::manager::actions::ShowMMIPush, std::make_unique<app::manager::actions::MMIParams>(params));
+    }
 };
 namespace cellular
 {

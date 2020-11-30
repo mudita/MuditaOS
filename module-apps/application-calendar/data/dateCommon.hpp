@@ -6,6 +6,8 @@
 
 #include <module-utils/date/include/date/date.h>
 #include <time/time_conversion.hpp>
+#include <Utils.hpp>
+#include <random>
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
@@ -36,13 +38,14 @@ enum class Repeat
     never,
     daily,
     weekly,
-    two_weeks,
-    month,
-    year,
-    custom
+    biweekly,
+    monthly,
+    yearly
 };
 
 inline constexpr TimePoint TIME_POINT_INVALID = date::sys_days{date::January / 1 / 1970};
+inline constexpr uint32_t yearDigitsNumb = 4, monthDigitsNumb = 2, dayDigitsNumb = 2, HourDigitsNumb = 2,
+                          MinDigitsNumb = 2, SecDigitsNumb = 2;
 
 inline std::tm CreateTmStruct(int year, int month, int day, int hour, int minutes, int seconds)
 {
@@ -225,16 +228,17 @@ inline uint32_t TimePointToHour12H(const TimePoint &tp)
 
 inline std::string TimePointToHourString12H(const TimePoint &tp)
 {
-    auto hour       = TimePointToHour12H(tp);
-    auto hourString = std::to_string(hour);
-    return hourString;
+    auto hour =
+        utils::time::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(utils::time::GetParameters::Hour);
+    auto hour12h = date::make12(std::chrono::hours(hour)).count();
+    return utils::to_string(hour12h);
 }
 
 inline std::string TimePointToHourString24H(const TimePoint &tp)
 {
-    auto hour       = TimePointToHour24H(tp);
-    auto hourString = std::to_string(hour);
-    return hourString;
+    auto hour =
+        utils::time::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(utils::time::GetParameters::Hour);
+    return utils::to_string(hour);
 }
 
 inline std::string TimePointToMinutesString(const TimePoint &tp)
@@ -252,6 +256,22 @@ inline unsigned int WeekdayIndexFromTimePoint(const TimePoint &tp)
 {
     auto ymw = date::year_month_weekday{floor<date::days>(tp)};
     return ymw.weekday().iso_encoding() - 1;
+}
+
+inline std::string createUID()
+{
+    constexpr uint32_t bufferLimit = 16;
+    char Buffer[bufferLimit];
+    utils::time::Timestamp timestamp;
+    std::string UID{timestamp.str("%Y%m%dT%H%M%S")};
+    UID += '-';
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib(1, 100);
+    sprintf(Buffer, "%d", distrib(gen));
+    UID += Buffer;
+
+    return UID;
 }
 
 #endif

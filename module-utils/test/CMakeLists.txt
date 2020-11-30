@@ -75,6 +75,27 @@ add_catch2_executable(
         module-utils
 )
 
+# ParserICS tests
+#add_catch2_executable(
+#    NAME
+#        utils-parserIcs
+#    SRCS
+#        test_ParserICS.cpp
+#    LIBS
+#        module-utils
+#)
+
+#  time display tests
+#add_catch2_executable(
+#    NAME
+#        utils-time_display
+#    SRCS
+#        unittest_TimeRangeParser.cpp
+#    LIBS
+#        module-utils
+#        module-db
+#)
+
 ###########################################
 # Log functional tests project
 project(test_module-utils_log VERSION 1.0

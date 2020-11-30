@@ -18,7 +18,7 @@
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
 
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include "log/log.hpp"
 
 #include <application-settings-new/ApplicationSettings.hpp>
@@ -133,16 +133,6 @@ namespace gui
             lockTimeoutApplilcation = lockData->getPreviousApplication();
             application->setSuspendFlag(true);
         }
-
-        if (mode == ShowMode::GUI_SHOW_RETURN) {
-            auto lock = getScreenLock();
-            if (lock->getState() == PinLock::LockState::Unlocked) {
-                setVisibleState();
-                return;
-            }
-            switchToPinLockWindow(std::move(lock));
-        }
-
         setVisibleState();
     }
 
@@ -201,14 +191,7 @@ namespace gui
             // if interval between enter and pnd keys is less than time defined for unlocking
             // display pin lock screen or simply refresh current window to update labels
 
-            auto lock = getScreenLock();
-            // if there is no pin,
-            if (lock->getMaxPinSize() == 0) {
-                lock->verify();
-                return true;
-            }
-
-            switchToPinLockWindow(std::move(lock));
+            getAppDesktop()->lockHandler.unlockScreen();
             return true;
         }
         else if (enter_cache.storeEnter(inputEvent)) {
@@ -347,40 +330,5 @@ namespace gui
         auto *app = dynamic_cast<app::ApplicationDesktop *>(application);
         assert(app);
         return app;
-    }
-
-    auto DesktopMainWindow::getScreenLock() -> std::unique_ptr<PinLock>
-    {
-        auto lock = std::make_unique<PinLock>(getAppDesktop()->lockHandler.screenLock);
-        auto app  = getAppDesktop();
-        if (lock->getState() == PinLock::LockState::PasscodeRequired) {
-            lock->onActivatedCallback = [app](const std::vector<unsigned int> &data) {
-                app->lockHandler.handleScreenPin(data);
-                app->switchWindow(app::window::name::desktop_main_window, ShowMode::GUI_SHOW_RETURN);
-            };
-        }
-        else if (lock->getState() == PinLock::LockState::PasscodeInvalidRetryRequired) {
-            lock->onActivatedCallback = [app](const std::vector<unsigned int> &) {
-                app->lockHandler.screenLock.consumeState();
-                app->switchWindow(app::window::name::desktop_main_window, ShowMode::GUI_SHOW_RETURN);
-            };
-        }
-        else if (lock->getState() == PinLock::LockState::Blocked) {
-            lock->onActivatedCallback = [app](const std::vector<unsigned int> &) {
-                app->switchWindow(app::window::name::desktop_main_window, ShowMode::GUI_SHOW_INIT);
-            };
-        }
-        return lock;
-    }
-
-    void DesktopMainWindow::switchToPinLockWindow(std::unique_ptr<PinLock> &&lock)
-    {
-        auto data = std::make_unique<LockPhoneData>(std::move(lock));
-        if (!lockTimeoutApplilcation.empty()) {
-            // if there was no application on to before closing proceed normally to pin protection
-            data->setPrevApplication(lockTimeoutApplilcation);
-            lockTimeoutApplilcation.clear();
-        }
-        application->switchWindow(app::window::name::desktop_pin_lock, std::move(data));
     }
 } /* namespace gui */

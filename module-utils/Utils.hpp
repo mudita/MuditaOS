@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 #include <algorithm> // std::find_if_not
 #include <log/log.hpp>
 #include <sstream>
@@ -152,11 +152,11 @@ namespace utils
         return std::string(magic_enum::enum_name(t));
     }
 
-    /// Gets value of type T from string
+    /// Gets arithmetic value of type T from string
     ///
     /// @param value to be converted
     /// @return Value casted to type T
-    template <typename T>[[nodiscard]] T getValue(const std::string &value)
+    template <typename T>[[nodiscard]] T getNumericValue(const std::string &value)
     {
         static_assert(std::is_arithmetic_v<T>);
         if (value.empty()) {
@@ -165,6 +165,18 @@ namespace utils
         T ret;
         std::istringstream(value) >> ret;
         return ret;
+    }
+
+    static inline bool toNumeric(const std::string &text, int &value)
+    {
+        try {
+            value = std::stoi(text);
+        }
+        catch (const std::exception &e) {
+            LOG_ERROR("toNumeric exception %s", e.what());
+            return false;
+        }
+        return true;
     }
 
     static inline void findAndReplaceAll(std::string &data,
@@ -216,18 +228,6 @@ namespace utils
     static inline void findAndReplaceAll(std::string &data, const std::string &toSearch, const std::string &replaceStr)
     {
         findAndReplaceAll(data, {{toSearch, replaceStr}});
-    }
-
-    static inline bool toNumeric(const std::string &text, int &value)
-    {
-        try {
-            value = std::stoi(text);
-        }
-        catch (const std::exception &e) {
-            LOG_ERROR("toNumeric exception %s", e.what());
-            return false;
-        }
-        return true;
     }
 
     static inline uint32_t swapBytes(uint32_t toSwap)

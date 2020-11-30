@@ -8,8 +8,6 @@
 #include "Database/Database.hpp"
 #include "Databases/SmsDB.hpp"
 
-#include "Tables/SettingsTable.hpp"
-
 #include <algorithm>
 #include <cstring>
 

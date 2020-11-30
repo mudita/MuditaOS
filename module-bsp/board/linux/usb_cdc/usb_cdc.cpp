@@ -4,6 +4,7 @@
 #include "bsp/usb/usb.hpp"
 #include <termios.h>
 #include <fcntl.h>
+#include <fstream>
 
 namespace bsp
 {
@@ -56,6 +57,14 @@ namespace bsp
         }
     }
 
+    void writePtsToFile(const char *pts_name)
+    {
+        constexpr auto fileName = "/tmp/purephone_pts_name";
+        std::ofstream ptsNameFile;
+        ptsNameFile.open(fileName, std::ios::out | std::ios::trunc);
+        ptsNameFile << pts_name;
+    }
+
     int usbInit(xQueueHandle receiveQueue, USBDeviceListener *)
     {
 
@@ -74,6 +83,8 @@ namespace bsp
             LOG_ERROR("bsp::usbInit ptsname returned NULL, no pseudo terminal allocated");
             return -1;
         }
+
+        writePtsToFile(pts_name);
         LOG_INFO("bsp::usbInit linux ptsname: %s", pts_name);
         struct termios newtio;
         memset(&newtio, 0, sizeof(newtio));

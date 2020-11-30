@@ -78,6 +78,10 @@ extern "C" {
      int unlink(const char *name)
      {
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         char namebuf[ffconfigMAX_FILENAME];
         auto ret = ff_remove(vfs::relative_to_root(namebuf,sizeof namebuf, name));
         if (ret && stdioGET_ERRNO() == EISDIR)
@@ -89,7 +93,12 @@ extern "C" {
 
     int stat(const char *file, struct stat *pstat) {
         TRACE_SYSCALL();
-        auto ret = ff_cstat(file, pstat);
+        int ret {};
+        if(!vfs::vfs_is_initialized()) {
+            ret = -1;
+        } else {
+            ret = ff_cstat(file, pstat);
+        }
         if(ret) {
             real_fprintf(stderr,"WARNING: redirecting stat(%s) to the linux fs\n",file);
             ret = real_xstat(1,file,pstat);
@@ -101,7 +110,12 @@ extern "C" {
     int fstat(int fd, struct stat *pstat)
     {
         TRACE_SYSCALL();
-        FF_FILE* fil = vfsn::linux::internal::fd_to_ff_file(fd);
+        FF_FILE* fil;
+        if(!vfs::vfs_is_initialized()) {
+            fil = nullptr;
+        } else {
+            fil = vfsn::linux::internal::fd_to_ff_file(fd);
+        }
         if(!fil) {
             real_fprintf(stderr,"WARNING: redirecting fstat(%i) to the linux fs\n",fd);
             return real_fxstat(1,fd,pstat);
@@ -119,9 +133,14 @@ extern "C" {
     int lstat(const char *pathname, struct stat *statbuf)
     {
         TRACE_SYSCALL();
-        real_fprintf(stderr,"WARNING: redirecting lstat(%s) to the linux fs\n",pathname);
-        auto ret = ff_cstat(pathname, statbuf);
+        int ret;
+        if(!vfs::vfs_is_initialized()) {
+            ret = -1;
+        } else {
+            ret = ff_cstat(pathname, statbuf);
+        }
         if(ret) {
+            real_fprintf(stderr,"WARNING: redirecting lstat(%s) to the linux fs\n",pathname);
             ret = real_lxstat(1,pathname,statbuf);
         }
         return ret;
@@ -174,8 +193,16 @@ extern "C" {
     {
         TRACE_SYSCALL();
         char pathbuf[ffconfigMAX_FILENAME];
-        auto ret = ff_chdir(vfs::relative_to_root(pathbuf,sizeof pathbuf,path));
-        errno  = stdioGET_ERRNO();
+        int ret;
+        if(!vfs::vfs_is_initialized())
+        {
+            ret = -1;
+            errno = -EIO;
+        }
+        else {
+            ret = ff_chdir(vfs::relative_to_root(pathbuf,sizeof pathbuf,path));
+            errno  = stdioGET_ERRNO();
+        }
         return ret;
     }
     __asm__(".symver chdir,chdir@GLIBC_2.2.5");
@@ -191,6 +218,10 @@ extern "C" {
     char *getcwd(char *buf, size_t size)
     {
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return nullptr;
+        }
         auto cwd = ff_getcwd(buf, size);
         errno  = stdioGET_ERRNO();
         return cwd;
@@ -200,6 +231,10 @@ extern "C" {
     char *getwd(char *buf)
     {
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return nullptr;
+        }
         auto cwd = ff_getcwd(buf, ffconfigMAX_FILENAME );
         errno  = stdioGET_ERRNO();
         return cwd;
@@ -210,6 +245,10 @@ extern "C" {
     char *get_current_dir_name(void)
     {
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return nullptr;
+        }
         auto buf = new char[ffconfigMAX_FILENAME];
         auto cwd = ff_getcwd(buf, ffconfigMAX_FILENAME );
         errno  = stdioGET_ERRNO();
@@ -221,6 +260,10 @@ extern "C" {
     int rename(const char *oldpath, const char *newpath)
     {
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         char oldpbuf[ffconfigMAX_FILENAME];
         char newpbuf[ffconfigMAX_FILENAME];
         auto ret = ff_rename(vfs::relative_to_root(oldpbuf,sizeof oldpbuf, oldpath),
@@ -233,6 +276,10 @@ extern "C" {
     int mkdir(const char *pathname, mode_t )
     {
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         char pathbuf[ffconfigMAX_FILENAME];
         auto ret = ff_mkdir(vfs::relative_to_root(pathbuf,sizeof pathbuf,pathname));
         errno  = stdioGET_ERRNO();
@@ -261,6 +308,10 @@ extern "C" {
     int fsync(int fd)
     {
         TRACE_SYSCALL();
+        if(!vfs::vfs_is_initialized()) {
+            errno = EIO;
+            return -1;
+        }
         auto fil = vfsn::linux::internal::fd_to_ff_file(fd);
         if (!fil) {
             LOG_ERROR("Unable to find handle %i", fd);
@@ -329,6 +380,10 @@ extern "C" {
             return real_xstat( ver,path,stat_buf );
         }
         else {
+            if(!vfs::vfs_is_initialized()) {
+                errno = EIO;
+                return -1;
+            }
             int ret = ff_cstat(path, stat_buf);
             if(ret) {
                 real_fprintf(stderr,"WARNING: redirecting __lxstat(%s) to the linux fs\n",path);
