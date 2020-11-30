@@ -18,7 +18,7 @@ namespace purefs::fs::internal
     auto set_thread_cwd_path(std::string_view path) noexcept -> int
     {
         cwd_per_thread = path;
-        return {};
+        return 0;
     }
     auto cleanup_thread_local_cwd_mem() -> void
     {

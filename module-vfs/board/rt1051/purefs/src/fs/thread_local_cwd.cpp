@@ -11,13 +11,9 @@
 
 namespace purefs::fs::internal
 {
-
     namespace
     {
         constexpr auto CWD_THREAD_LOCAL_INDEX = 3;
-    }
-    namespace
-    {
         auto get_tls() noexcept -> char *
         {
             auto pcwd = reinterpret_cast<char *>(pvTaskGetThreadLocalStoragePointer(nullptr, CWD_THREAD_LOCAL_INDEX));
@@ -47,7 +43,7 @@ namespace purefs::fs::internal
         else {
             std::memcpy(tls, path.data(), path.size());
             tls[path.size()] = '\0';
-            return {};
+            return 0;
         }
     }
     auto cleanup_thread_local_cwd_mem() -> void

@@ -125,8 +125,9 @@ namespace purefs::fs
                 LOG_ERROR("VFS: Unable to get fops");
                 return -EBADF;
             }
-            if (fh->error()) {
-                return fh->error();
+            const auto err = fh->error();
+            if (err) {
+                return err;
             }
             return add_filehandle(fh);
         }
