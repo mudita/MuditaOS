@@ -34,8 +34,12 @@ namespace drivers
 
         pwm_submodule_t pwmModule = kPWM_Module_0;
 
-        pwm_signal_param_t pwmSignalConfig = {kPWM_PwmB, 0, kPWM_HighTrue, 0, kPWM_PwmFaultState0};
-        // Mode of signal allignement - set to default
+        pwm_signal_param_t pwmSignalConfig = {.pwmChannel       = kPWM_PwmB,
+                                              .dutyCyclePercent = 0,
+                                              .level            = kPWM_HighTrue,
+                                              .deadtimeValue    = 0,
+                                              .faultState       = kPWM_PwmFaultState0};
+
         pwm_mode_t pwmMode = kPWM_SignedCenterAligned;
 
         uint8_t lastDutyCycle = 0;

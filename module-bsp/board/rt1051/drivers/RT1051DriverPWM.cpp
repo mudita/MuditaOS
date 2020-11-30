@@ -39,15 +39,19 @@ namespace drivers
         switch (module) {
         case PWMModules::MODULE0:
             pwmModule = kPWM_Module_0;
+            LOG_DEBUG("Init: PWM module 0");
             break;
         case PWMModules::MODULE1:
             pwmModule = kPWM_Module_1;
+            LOG_DEBUG("Init: PWM module 1");
             break;
         case PWMModules::MODULE2:
             pwmModule = kPWM_Module_2;
+            LOG_DEBUG("Init: PWM module 2");
             break;
         case PWMModules::MODULE3:
             pwmModule = kPWM_Module_3;
+            LOG_DEBUG("Init: PWM module 3");
             break;
         default:
             break;
@@ -57,6 +61,7 @@ namespace drivers
         PWM_Init(base, pwmModule, &pwmConfig);
 
         SetupPWMChannel(parameters.channel, parameters.frequency);
+        Start();
     }
 
     RT1051DriverPWM::~RT1051DriverPWM()
@@ -70,7 +75,7 @@ namespace drivers
         cpp_freertos::LockGuard lock(mutex);
         lastDutyCycle = std::clamp(duty_cycle_percent, static_cast<uint8_t>(0), static_cast<uint8_t>(100));
         PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, lastDutyCycle);
-        LOG_DEBUG("Duty cycle set to %u", lastDutyCycle);
+        PWM_SetPwmLdok(base, 1 << pwmModule, true);
     }
 
     uint8_t RT1051DriverPWM::GetCurrentDutyCycle()
@@ -80,17 +85,12 @@ namespace drivers
 
     void RT1051DriverPWM::Start()
     {
-        cpp_freertos::LockGuard lock(mutex);
-        PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, lastDutyCycle);
-        LOG_DEBUG("PWM start");
+        PWM_StartTimer(base, 1 << pwmModule);
     }
 
     void RT1051DriverPWM::Stop()
     {
-        cpp_freertos::LockGuard lock(mutex);
-        uint8_t stoppedDutyCycle = 0;
-        PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, stoppedDutyCycle);
-        LOG_DEBUG("PWM stop");
+        PWM_StopTimer(base, 1 << pwmModule);
     }
 
     void RT1051DriverPWM::SetupPWMChannel(const PWMChannel channel, const uint32_t pwm_frequency)
@@ -98,12 +98,15 @@ namespace drivers
         switch (parameters.channel) {
         case PWMChannel::A:
             pwmSignalConfig.pwmChannel = kPWM_PwmA;
+            LOG_DEBUG("Init: PWM channel A");
             break;
         case PWMChannel::B:
             pwmSignalConfig.pwmChannel = kPWM_PwmB;
+            LOG_DEBUG("Init: PWM channel B");
             break;
         case PWMChannel::X:
             pwmSignalConfig.pwmChannel = kPWM_PwmX;
+            LOG_DEBUG("Init: PWM channel X");
             break;
         default:
             break;
@@ -111,8 +114,9 @@ namespace drivers
 
         // Currently connected to IPbus clock
         uint32_t clockSource = CLOCK_GetFreq(kCLOCK_IpgClk);
-
         PWM_SetupPwm(base, pwmModule, &pwmSignalConfig, 1, pwmMode, pwm_frequency, clockSource);
+
+        PWM_SetupFaultDisableMap(base, pwmModule, pwmSignalConfig.pwmChannel, kPWM_faultchannel_0, 0);
     }
 
 } // namespace drivers
