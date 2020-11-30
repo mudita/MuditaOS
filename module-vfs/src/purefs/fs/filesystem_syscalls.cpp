@@ -6,6 +6,7 @@
 #include <purefs/fs/mount_point.hpp>
 #include <purefs/fs/filesystem_operations.hpp>
 #include <purefs/fs/file_handle.hpp>
+#include <purefs/fs/thread_local_cwd.hpp>
 
 namespace purefs::fs
 {
@@ -14,7 +15,7 @@ namespace purefs::fs
         return invoke_fops(&filesystem_operations::stat_vfs, path, stat);
     }
 
-    auto filesystem::stat(std::string_view file, struct stat *st) noexcept -> int
+    auto filesystem::stat(std::string_view file, struct stat &st) noexcept -> int
     {
         return invoke_fops(&filesystem_operations::stat, file, st);
     }
@@ -74,7 +75,7 @@ namespace purefs::fs
         return invoke_fops(&filesystem_operations::seek, fd, pos, dir);
     }
 
-    auto filesystem::fstat(int fd, struct stat *st) noexcept -> int
+    auto filesystem::fstat(int fd, struct stat &st) noexcept -> int
     {
         return invoke_fops(&filesystem_operations::fstat, fd, st);
     }
@@ -134,5 +135,4 @@ namespace purefs::fs
             return -EIO;
         }
     }
-
 } // namespace purefs::fs

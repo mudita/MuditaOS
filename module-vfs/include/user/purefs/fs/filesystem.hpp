@@ -85,8 +85,8 @@ namespace purefs::fs
         auto write(int fd, const char *ptr, size_t len) noexcept -> ssize_t;
         auto read(int fd, char *ptr, size_t len) noexcept -> ssize_t;
         auto seek(int fd, off_t pos, int dir) noexcept -> off_t;
-        auto fstat(int fd, struct stat *st) noexcept -> int;
-        auto stat(std::string_view file, struct stat *st) noexcept -> int;
+        auto fstat(int fd, struct stat &st) noexcept -> int;
+        auto stat(std::string_view file, struct stat &st) noexcept -> int;
         auto link(std::string_view existing, std::string_view newlink) noexcept -> int;
         auto symlink(std::string_view existing, std::string_view newlink) noexcept -> int;
         auto unlink(std::string_view name) noexcept -> int;
@@ -110,7 +110,7 @@ namespace purefs::fs
         auto chmod(std::string_view path, mode_t mode) noexcept -> int;
         auto fchmod(int fd, mode_t mode) noexcept -> int;
 
-        auto getcwd() noexcept -> std::string;
+        auto getcwd() noexcept -> std::string_view;
         auto chdir(std::string_view name) noexcept -> int;
 
       private:

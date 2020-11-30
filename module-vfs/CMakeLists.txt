@@ -52,6 +52,7 @@ set(SOURCES ""
         src/purefs/fs/filesystem.cpp
         src/purefs/fs/filesystem_operations.cpp
         src/purefs/fs/filesystem_syscalls.cpp
+        src/purefs/fs/filesystem_cwd.cpp
         src/deprecated/vfs-utils.cpp
         src/deprecated/vfs.cpp
         src/deprecated/vfsNotifier.cpp

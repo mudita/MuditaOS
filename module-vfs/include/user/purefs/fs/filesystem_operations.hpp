@@ -47,8 +47,8 @@ namespace purefs::fs
         virtual auto write(fsfile zfile, const char *ptr, size_t len) noexcept -> ssize_t             = 0;
         virtual auto read(fsfile zfile, char *ptr, size_t len) noexcept -> ssize_t                    = 0;
         virtual auto seek(fsfile zfile, off_t pos, int dir) noexcept -> off_t;
-        virtual auto fstat(fsfile zfile, struct stat *st) noexcept -> int;
-        virtual auto stat(fsmount mnt, std::string_view file, struct stat *st) noexcept -> int;
+        virtual auto fstat(fsfile zfile, struct stat &st) noexcept -> int;
+        virtual auto stat(fsmount mnt, std::string_view file, struct stat &st) noexcept -> int;
         virtual auto link(fsmount mnt, std::string_view existing, std::string_view newlink) noexcept -> int;
         virtual auto symlink(fsmount mnt, std::string_view existing, std::string_view newlink) noexcept -> int;
         virtual auto unlink(fsmount mnt, std::string_view name) noexcept -> int;

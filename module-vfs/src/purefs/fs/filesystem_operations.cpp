@@ -27,11 +27,11 @@ namespace purefs::fs
     {
         return -ENOTSUP;
     }
-    auto filesystem_operations::fstat(fsfile zfile, struct stat *st) noexcept -> int
+    auto filesystem_operations::fstat(fsfile zfile, struct stat &st) noexcept -> int
     {
         return -ENOTSUP;
     }
-    auto filesystem_operations::stat(fsmount mnt, std::string_view file, struct stat *st) noexcept -> int
+    auto filesystem_operations::stat(fsmount mnt, std::string_view file, struct stat &st) noexcept -> int
     {
         return -ENOTSUP;
     }
