@@ -21,8 +21,6 @@ namespace drivers
 
         void SetDutyCycle(std::uint8_t duty_cycle_percent) override final;
 
-        std::uint8_t GetCurrentDutyCycle() override final;
-
         void Start() override final;
 
         void Stop() override final;

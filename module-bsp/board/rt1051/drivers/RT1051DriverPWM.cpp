@@ -74,14 +74,10 @@ namespace drivers
         cpp_freertos::LockGuard lock(mutex);
         pwm_mode_t pwmMode = kPWM_SignedCenterAligned;
 
-        lastDutyCycle = std::clamp(duty_cycle_percent, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(100));
-        PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, lastDutyCycle);
+        std::uint8_t dutyCycle =
+            std::clamp(duty_cycle_percent, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(100));
+        PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, dutyCycle);
         PWM_SetPwmLdok(base, 1 << pwmModule, true);
-    }
-
-    std::uint8_t RT1051DriverPWM::GetCurrentDutyCycle()
-    {
-        return lastDutyCycle;
     }
 
     void RT1051DriverPWM::Start()

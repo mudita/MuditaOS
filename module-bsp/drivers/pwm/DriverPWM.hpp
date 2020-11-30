@@ -56,8 +56,6 @@ namespace drivers
         // Duty cycle in percent: 0 - 100
         virtual void SetDutyCycle(std::uint8_t duty_cycle) = 0;
 
-        virtual std::uint8_t GetCurrentDutyCycle() = 0;
-
         virtual void Start() = 0;
 
         virtual void Stop() = 0;

@@ -5,6 +5,7 @@
 #include "bsp/BoardDefinitions.hpp"
 #include "drivers/pwm/DriverPWM.hpp"
 #include "fsl_common.h"
+#include <cmath>
 
 namespace bsp::eink_frontlight
 {
@@ -12,7 +13,22 @@ namespace bsp::eink_frontlight
     {
         std::shared_ptr<drivers::DriverPWM> pwm;
         constexpr inline auto PWM_FREQUENCY_HZ = 20000;
-        std::uint8_t bright                    = 0;
+
+        // 0 to N points mapping to 0-100 duty cycle with gamma correction
+        template <int N> struct GammaCorrectionLUT
+        {
+            constexpr GammaCorrectionLUT() : values()
+            {
+                constexpr float gamma = 2.5;
+                constexpr float scale = 100 / N;
+                for (auto i = 0; i <= N; ++i) {
+                    values[i] = static_cast<std::uint8_t>(100 * std::pow(((i * scale) / 100), gamma));
+                }
+            }
+            std::array<std::uint8_t, N + 1> values;
+        };
+        GammaCorrectionLUT<5> gammaCorrection;
+
     } // namespace
 
     void init()
@@ -30,21 +46,11 @@ namespace bsp::eink_frontlight
         turnOff();
     }
 
-    void setBrightness(uint8_t brightness)
+    void setBrightness(std::uint8_t brightness)
     {
-        // Add gamma correction LUT if needed (from 0-5 scale to 0-100 duty cycle)
-        pwm->SetDutyCycle(bright);
-
-        bright += 20;
-        if (bright > 100) {
-            bright = 0;
-        }
-    }
-
-    std::uint8_t GetBrightness()
-    {
-        // If gamma corection used add recalculation from 0-100 duty cycle to 0-5 scale
-        return pwm->GetCurrentDutyCycle();
+        std::clamp(
+            brightness, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(gammaCorrection.values.size() - 1));
+        pwm->SetDutyCycle(gammaCorrection.values[brightness]);
     }
 
     void turnOn()

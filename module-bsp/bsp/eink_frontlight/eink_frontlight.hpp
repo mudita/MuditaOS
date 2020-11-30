@@ -22,8 +22,6 @@ namespace bsp::eink_frontlight
 
     void setBrightness(std::uint8_t brightness);
 
-    std::uint8_t GetBrightness();
-
     void turnOn();
     
     void turnOff();
