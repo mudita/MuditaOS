@@ -48,6 +48,8 @@ Before submitting a Pull Request please go through some basic checks:
 - run unit tests (`make check`),
 - check if your code formatting complies with [`.clang-format`](../clang-format).
 
+As a part of our continuous integration proccess we also run integration tests using our own [testing framework](../test/README.md).
+
 ## Submit a Pull Request
 
 Submit a Pull Request. You can add labels that will help people who know the part of the code you are modifying in spotting the changes you are submitting and do a code review. 

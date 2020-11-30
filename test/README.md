@@ -1,4 +1,4 @@
-# Test framework
+# Testing framework
 
 Test harness makes use of USB-CDC serial (on RT1051 target) or pseudo-tty (on Linux) to communicate
 with `service-desktop` service in the operating system and get data from the internal database and device status.
