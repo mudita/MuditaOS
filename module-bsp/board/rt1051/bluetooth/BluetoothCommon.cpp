@@ -60,17 +60,18 @@ void BluetoothCommon::sleep_ms(ssize_t ms)
 
 ssize_t BluetoothCommon::read(uint8_t *buf, size_t nbytes)
 {
-    LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, true);
+    ssize_t ret = 0;
 
     // start RXfer if there is byte incoming and no pending RXfer
     lpuart_transfer_t receiveXfer;
     receiveXfer.data     = buf;
     receiveXfer.dataSize = nbytes;
 
-    ssize_t ret = 0;
-
+    // rx config
     SCB_CleanInvalidateDCache();
-    auto status = LPUART_ReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &BluetoothCommon::uartDmaHandle, &receiveXfer);
+    LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, true);
+
+    auto status = LPUART_ReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &receiveXfer);
     switch (status) {
     case kStatus_Success:
         ret = nbytes;
@@ -96,6 +97,7 @@ ssize_t BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
     }
     LOG_DEBUG("BT DMA to write --> [%d]>%s<", size, ss.str().c_str());
 #endif
+    ssize_t ret = 0;
 
     lpuart_transfer_t sendXfer;
     sendXfer.data     = const_cast<uint8_t *>(buf);
@@ -103,12 +105,10 @@ ssize_t BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
 
     uartDmaHandle.userData = xTaskGetCurrentTaskHandle();
 
-    // Sends out.
+    // tx config
+    SCB_CleanInvalidateDCache();
     LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, true);
 
-    ssize_t ret = 0;
-
-    SCB_CleanInvalidateDCache();
     auto sent = LPUART_SendEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &sendXfer);
     switch (sent) {
     case kStatus_Success:
@@ -224,12 +224,13 @@ void BluetoothCommon::configure_lpuart()
     bt_c.enableTx      = false;
     bt_c.enableRx      = false;
     bt_c.enableTxCTS   = true;
-    bt_c.enableRxRTS   = true;
+    bt_c.txCtsConfig   = kLPUART_CtsSampleAtStart; // to be able to stop TX mid-transfer
 
     if (LPUART_Init(BSP_BLUETOOTH_UART_BASE, &bt_c, UartGetPeripheralClock()) != kStatus_Success) {
         LOG_ERROR("BT: UART config error Could not initialize the uart!");
         return;
     }
+    BSP_BLUETOOTH_UART_BASE->MODIR |= LPUART_MODIR_TXRTSPOL_MASK; // apparently docs are not clear here. HIGH during TX
 
     LPUART_ClearStatusFlags(BSP_BLUETOOTH_UART_BASE, 0xFFFFFFFF);
     NVIC_ClearPendingIRQ(LPUART2_IRQn);
