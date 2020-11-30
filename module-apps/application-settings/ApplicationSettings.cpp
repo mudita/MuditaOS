@@ -33,7 +33,6 @@
 #include <service-db/Settings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
-
 namespace gui::window::name
 {
     inline constexpr auto date_time = "DateTime";
