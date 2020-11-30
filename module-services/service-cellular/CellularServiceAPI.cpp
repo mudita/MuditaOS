@@ -271,16 +271,8 @@ bool CellularServiceAPI::ChangeSimPin(sys::Service *serv,
                                       const std::vector<unsigned int> &pin)
 {
 
-    auto ret = sys::Bus::SendUnicast(std::make_shared<CellularSimPukDataMessage>(sim, passcode, pin),
-                                     ServiceCellular::serviceName,
-                                     serv,
-                                     at::default_timeout);
-    if (ret.first == sys::ReturnCodes::Success) {
-        CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
-        return response->retCode;
-    }
-
-    return false;
+    return sys::Bus::SendUnicast(
+        std::make_shared<CellularSimPukDataMessage>(sim, passcode, pin), ServiceCellular::serviceName, serv);
 }
 
 bool CellularServiceAPI::SetSimCardLock(sys::Service *serv,
@@ -289,25 +281,13 @@ bool CellularServiceAPI::SetSimCardLock(sys::Service *serv,
                                         const std::vector<unsigned int> &pin)
 {
 
-    auto ret = sys::Bus::SendUnicast(std::make_shared<CellularSimCardLockDataMessage>(sim, lock, pin),
-                                     ServiceCellular::serviceName,
-                                     serv,
-                                     at::default_timeout);
-    if (ret.first == sys::ReturnCodes::Success) {
-        CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
-        return response->retCode;
-    }
-    return false;
+    return sys::Bus::SendUnicast(
+        std::make_shared<CellularSimCardLockDataMessage>(sim, lock, pin), ServiceCellular::serviceName, serv);
 }
 
 bool CellularServiceAPI::SetSimCard(sys::Service *serv, Store::GSM::SIM sim)
 {
 
-    auto ret = sys::Bus::SendUnicast(
-        std::make_shared<CellularChangeSimDataMessage>(sim), ServiceCellular::serviceName, serv, at::default_timeout);
-    if (ret.first == sys::ReturnCodes::Success) {
-        CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
-        return response->retCode;
-    }
-    return false;
+    return sys::Bus::SendUnicast(
+        std::make_shared<CellularChangeSimDataMessage>(sim), ServiceCellular::serviceName, serv);
 }
