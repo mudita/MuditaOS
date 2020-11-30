@@ -342,8 +342,6 @@ void BluetoothCommon::set_irq(bool enable)
     else {
         LPUART_DisableInterrupts(BSP_BLUETOOTH_UART_BASE, kLPUART_RxOverrunInterruptEnable);
     }
-    LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, true);
-    LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, true);
 }
 
 extern "C"
