@@ -78,16 +78,21 @@ namespace drivers
             std::clamp(duty_cycle_percent, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(100));
         PWM_UpdatePwmDutycycle(base, pwmModule, pwmSignalConfig.pwmChannel, pwmMode, dutyCycle);
         PWM_SetPwmLdok(base, 1 << pwmModule, true);
+        LOG_DEBUG("Duty cycle: %d ", duty_cycle_percent);
     }
 
     void RT1051DriverPWM::Start()
     {
+        RestorePwmOutput();
         PWM_StartTimer(base, 1 << pwmModule);
+        LOG_DEBUG("PWM start");
     }
 
     void RT1051DriverPWM::Stop()
     {
         PWM_StopTimer(base, 1 << pwmModule);
+        ForceLowOutput();
+        LOG_DEBUG("PWM stop");
     }
 
     void RT1051DriverPWM::SetupPWMChannel(const PWMChannel channel, const std::uint32_t pwm_frequency)
@@ -116,6 +121,22 @@ namespace drivers
         PWM_SetupPwm(base, pwmModule, &pwmSignalConfig, 1, pwmMode, pwm_frequency, clockSource);
 
         PWM_SetupFaultDisableMap(base, pwmModule, pwmSignalConfig.pwmChannel, kPWM_faultchannel_0, 0);
+
+        // Force logic config
+        PWM_SetupSwCtrlOut(base, pwmModule, pwmSignalConfig.pwmChannel, false);
+        base->SM[pwmModule].CTRL2 |= PWM_CTRL2_FRCEN(1U);
+    }
+
+    void RT1051DriverPWM::ForceLowOutput()
+    {
+        PWM_SetupForceSignal(base, pwmModule, pwmSignalConfig.pwmChannel, kPWM_SoftwareControl);
+        base->SM[pwmModule].CTRL2 |= PWM_CTRL2_FORCE(1U);
+    }
+
+    void RT1051DriverPWM::RestorePwmOutput()
+    {
+        PWM_SetupForceSignal(base, pwmModule, pwmSignalConfig.pwmChannel, kPWM_UsePwm);
+        base->SM[pwmModule].CTRL2 |= PWM_CTRL2_FORCE(1U);
     }
 
 } // namespace drivers

@@ -20,7 +20,7 @@ namespace bsp::eink_frontlight
 
     void deinit();
 
-    void setBrightness(std::uint8_t brightness);
+    void setBrightness(std::uint8_t brightness); // In 1-5 scale
 
     void turnOn();
     

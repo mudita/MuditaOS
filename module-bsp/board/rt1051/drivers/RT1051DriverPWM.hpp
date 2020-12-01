@@ -28,6 +28,10 @@ namespace drivers
       private:
         void SetupPWMChannel(const PWMChannel channel, const std::uint32_t frequency);
 
+        void ForceLowOutput();
+
+        void RestorePwmOutput();
+
         PWM_Type *base;
 
         pwm_submodule_t pwmModule = kPWM_Module_0;
