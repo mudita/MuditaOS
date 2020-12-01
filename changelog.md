@@ -19,6 +19,7 @@
 * `[text]` Added cursor starting position handling.
 * `[alarms]` Added main window
 * `[PowerManagement]` PowerManagement: Enable FreeRTOS Run Time Statistics
+* `[cellular]` USSD session handling.
 
 ### Changed
 

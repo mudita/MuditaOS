@@ -18,7 +18,7 @@ namespace at::urc
          * @param urcHead - Urc message head
          * @param tokenDelimiter - sign that separates parameters in Urc message
          */
-        Urc(const std::string &urcBody, const std::string &urcHead = std::string(), char tokenDelimiter = ',');
+        Urc(const std::string &urcBody, const std::string &urcHead = std::string());
 
         virtual ~Urc() = default;
 
@@ -80,9 +80,8 @@ namespace at::urc
         /**
          * Splits Urc into head and tokenized data, cleans tokens from whitespaces and quotes
          * @param str - string to be split
-         * @param tokenDelimiter - sign that separates parameters in Urc message
          */
-        void split(const std::string &str, char tokenDelimiter = ',');
+        virtual void split(const std::string &str);
     };
 
 } // namespace at::urc
