@@ -18,11 +18,11 @@ namespace bsp::eink_frontlight
         // 0 to N points mapping to 0-100 duty cycle with gamma correction
         template <unsigned N> struct GammaCorrectionLUT
         {
-            static_assert(N > 0, "Number of elements should be more than 0");
+            static_assert(N > 0, "Number of elements should be greater than 0");
             constexpr GammaCorrectionLUT() : values()
             {
-                constexpr float gamma = 2.5;
-                constexpr float scale = 100 / N;
+                constexpr float gamma = 2.5f;
+                constexpr float scale = 100.0f / N;
                 for (auto i = 0; i <= N; ++i) {
                     values[i] = static_cast<std::uint8_t>(100 * std::pow(((i * scale) / 100), gamma));
                 }
@@ -35,12 +35,14 @@ namespace bsp::eink_frontlight
 
     void init()
     {
+        drivers::DriverPWMParams pwmParams;
+        pwmParams.channel   = static_cast<drivers::PWMChannel>(BoardDefinitions::EINK_FRONTLIGHT_PWM_CHANNEL);
+        pwmParams.frequency = PWM_FREQUENCY_HZ;
+
         pwm = drivers::DriverPWM::Create(
             static_cast<drivers::PWMInstances>(BoardDefinitions::EINK_FRONTLIGHT_PWM_INSTANCE),
             static_cast<drivers::PWMModules>(BoardDefinitions::EINK_FRONTLIGHT_PWM_MODULE),
-            drivers::DriverPWMParams{
-                .channel   = static_cast<drivers::PWMChannel>(BoardDefinitions::EINK_FRONTLIGHT_PWM_CHANNEL),
-                .frequency = PWM_FREQUENCY_HZ});
+            pwmParams);
     }
 
     void deinit()

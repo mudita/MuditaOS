@@ -50,8 +50,7 @@ namespace drivers
             : instance(inst), module(mod), parameters(params)
         {}
 
-        virtual ~DriverPWM()
-        {}
+        virtual ~DriverPWM() = default;
 
         // Duty cycle in percent: 0 - 100
         virtual void SetDutyCycle(std::uint8_t duty_cycle) = 0;

@@ -140,7 +140,7 @@ namespace sevm
     class EinkFrontlightMessage : public Message
     {
       public:
-        explicit EinkFrontlightMessage() : Message(MessageType::EVMEinkFrontlightMessage)
+        EinkFrontlightMessage() : Message(MessageType::EVMEinkFrontlightMessage)
         {}
 
         void processAction(bsp::eink_frontlight::Action act, std::uint8_t val);

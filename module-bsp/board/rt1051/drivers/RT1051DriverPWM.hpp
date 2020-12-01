@@ -19,11 +19,11 @@ namespace drivers
 
         ~RT1051DriverPWM();
 
-        void SetDutyCycle(std::uint8_t duty_cycle_percent) override final;
+        void SetDutyCycle(std::uint8_t duty_cycle_percent) final;
 
-        void Start() override final;
+        void Start() final;
 
-        void Stop() override final;
+        void Stop() final;
 
       private:
         void SetupPWMChannel(const PWMChannel channel, const std::uint32_t frequency);
