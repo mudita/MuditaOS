@@ -57,18 +57,18 @@ namespace settings
             LOG_DEBUG("handleVariableChanged: (k=v): (%s=%s)", key.c_str(), val.value_or("").c_str());
             ValueCb::iterator it_cb = cbValues.find(key);
             if (cbValues.end() != it_cb) {
-                auto [cb, cbName] = it_cb->second;
-                if (nullptr != cb && nullptr != cbName) {
+                auto [cb, cbWithName] = it_cb->second;
+                if (nullptr != cb && nullptr != cbWithName) {
                     // in case of two callbacks there is a need to duplicate the value
-                    auto valueCopy = val.value();
-                    cb(std::move(val.value()));
-                    cbName(key, std::move(valueCopy));
+                    auto valueCopy = val.value_or("");
+                    cb(std::move(val.value_or("")));
+                    cbWithName(key, std::move(valueCopy));
                 }
                 else if (nullptr != cb) {
-                    cb(std::move(val.value()));
+                    cb(std::move(val.value_or("")));
                 }
                 else {
-                    cbName(key, std::move(val.value()));
+                    cbWithName(key, std::move(val.value_or("")));
                 }
             }
         }
@@ -118,7 +118,7 @@ namespace settings
     void Settings::registerValueChange(const std::string &variableName, ValueChangedCallback cb)
     {
         ValueCb::iterator it_cb = cbValues.find(variableName);
-        if (cbValues.end() != it_cb) {
+        if (cbValues.end() != it_cb && nullptr != it_cb->second.first) {
             LOG_INFO("Callback function on value change (%s) already exists, rewriting", variableName.c_str());
         }
         cbValues[variableName].first = cb;
@@ -131,8 +131,8 @@ namespace settings
 
     void Settings::registerValueChange(const std::string &variableName, ValueChangedCallbackWithName cb)
     {
-        ValueCb::iterator it_cb = cbValues.find(variableName);
-        if (cbValues.end() != it_cb) {
+        auto it_cb = cbValues.find(variableName);
+        if (cbValues.end() != it_cb && nullptr != it_cb->second.second) {
             LOG_INFO("Callback function on value change (%s) already exists, rewriting", variableName.c_str());
         }
         cbValues[variableName].second = cb;

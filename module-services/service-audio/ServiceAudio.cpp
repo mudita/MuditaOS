@@ -92,7 +92,7 @@ sys::ReturnCodes ServiceAudio::InitHandler()
         {dbPath(Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle), defaultTrue},
     };
 
-    for (auto setting : settings) {
+    for (const auto &setting : settings) {
         settingsProvider->registerValueChange(
             setting.first, [this](const std::string &name, std::string value) { settingsChanged(name, value); });
     }
@@ -121,7 +121,7 @@ int32_t ServiceAudio::AsyncCallback(PlaybackEvent e)
 
 uint32_t ServiceAudio::DbCallback(const std::string &path, const uint32_t &defaultValue)
 {
-    LOG_DEBUG("ServiceAudio::DBbCallback(%s, %d)", path.c_str(), static_cast<int>(defaultValue));
+    LOG_DEBUG("ServiceAudio::DBbCallback(%s, %u)", path.c_str(), static_cast<int>(defaultValue));
     auto settings_it = settings.find(path);
     if (settings.end() == settings_it) {
         // not in local cache
@@ -573,10 +573,9 @@ std::string ServiceAudio::getSetting(const Setting &setting,
     }
 
     std::string path = dbPath(setting, targetPlayback, targetProfile);
-    for (auto _set : settings) {
-        if (_set.first == path) {
-            return _set.second;
-        }
+    auto set_it      = settings.find(path);
+    if (settings.end() != set_it) {
+        return set_it->second;
     }
 
     LOG_ERROR("ServiceAudio::getSetting setting name %s does not exist", path.c_str());

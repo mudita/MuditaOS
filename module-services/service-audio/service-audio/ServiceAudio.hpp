@@ -48,6 +48,8 @@ class ServiceAudio : public sys::Service
 
     audio::AudioMux audioMux;
     audio::AudioMux::VibrationStatus vibrationMotorStatus = audio::AudioMux::VibrationStatus::Off;
+    std::unique_ptr<settings::Settings> settingsProvider;
+    std::map<std::string, std::string> settings;
 
     auto IsVibrationMotorOn()
     {
@@ -91,7 +93,6 @@ class ServiceAudio : public sys::Service
                                          const audio::PlaybackType &playbackType);
 
     const std::pair<audio::Profile::Type, audio::PlaybackType> getCurrentContext();
-    std::unique_ptr<settings::Settings> settingsProvider;
+
     void settingsChanged(const std::string &name, std::string value);
-    std::map<std::string, std::string> settings;
 };
