@@ -15,9 +15,9 @@ namespace drivers
     class RT1051DriverPWM : public DriverPWM
     {
       public:
-        RT1051DriverPWM(const PWMInstances inst, const PWMModules mod, const DriverPWMParams &params);
+        RT1051DriverPWM(PWMInstances inst, PWMModules mod, const DriverPWMParams &params);
 
-        ~RT1051DriverPWM();
+        ~RT1051DriverPWM() final;
 
         void SetDutyCycle(std::uint8_t duty_cycle_percent) final;
 
@@ -26,7 +26,7 @@ namespace drivers
         void Stop() final;
 
       private:
-        void SetupPWMChannel(const PWMChannel channel, const std::uint32_t frequency);
+        void SetupPWMChannel(PWMChannel channel, std::uint32_t frequency);
 
         void ForceLowOutput();
 
@@ -44,7 +44,7 @@ namespace drivers
 
         std::uint8_t lastDutyCycle = 0;
 
-        cpp_freertos::MutexStandard mutex;
+        cpp_freertos::MutexStandard dutyCycleMutex;
     };
 
 } // namespace drivers

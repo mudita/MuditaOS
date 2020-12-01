@@ -8,7 +8,7 @@
 
 namespace drivers
 {
-    RT1051DriverPWM::RT1051DriverPWM(const PWMInstances inst, const PWMModules mod, const DriverPWMParams &params)
+    RT1051DriverPWM::RT1051DriverPWM(PWMInstances inst, PWMModules mod, const DriverPWMParams &params)
         : DriverPWM(inst, mod, params)
     {
 
@@ -71,7 +71,7 @@ namespace drivers
 
     void RT1051DriverPWM::SetDutyCycle(std::uint8_t duty_cycle_percent)
     {
-        cpp_freertos::LockGuard lock(mutex);
+        cpp_freertos::LockGuard lock(dutyCycleMutex);
         pwm_mode_t pwmMode = kPWM_SignedCenterAligned;
 
         std::uint8_t dutyCycle =
@@ -92,7 +92,7 @@ namespace drivers
         ForceLowOutput();
     }
 
-    void RT1051DriverPWM::SetupPWMChannel(const PWMChannel channel, const std::uint32_t pwm_frequency)
+    void RT1051DriverPWM::SetupPWMChannel(PWMChannel channel, std::uint32_t pwm_frequency)
     {
         switch (parameters.channel) {
         case PWMChannel::A:

@@ -15,7 +15,7 @@ namespace drivers
         PWM_2,
         PWM_3,
         PWM_4,
-        COUNT
+        COUNT = 4
     };
 
     enum class PWMModules
@@ -42,11 +42,9 @@ namespace drivers
     class DriverPWM
     {
       public:
-        static std::shared_ptr<DriverPWM> Create(const PWMInstances inst,
-                                                 const PWMModules mod,
-                                                 const DriverPWMParams &params);
+        static std::shared_ptr<DriverPWM> Create(PWMInstances inst, PWMModules mod, const DriverPWMParams &params);
 
-        DriverPWM(const PWMInstances inst, const PWMModules mod, const DriverPWMParams &params)
+        DriverPWM(PWMInstances inst, PWMModules mod, const DriverPWMParams &params)
             : instance(inst), module(mod), parameters(params)
         {}
 
@@ -65,8 +63,8 @@ namespace drivers
         const DriverPWMParams parameters;
 
       private:
-        static std::weak_ptr<DriverPWM> singleton[static_cast<std::uint32_t>(PWMInstances::COUNT)]
-                                                 [static_cast<std::uint32_t>(PWMModules::COUNT)];
+        static std::weak_ptr<DriverPWM> pwmDrivers[static_cast<std::uint32_t>(PWMInstances::COUNT)]
+                                                  [static_cast<std::uint32_t>(PWMModules::COUNT)];
     };
 
 } // namespace drivers
