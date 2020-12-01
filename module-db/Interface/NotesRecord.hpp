@@ -47,8 +47,10 @@ class NotesRecordInterface : public RecordInterface<NotesRecord, NotesRecordFiel
 
   private:
     std::vector<NotesRecord> getNotes(std::uint32_t offset, std::uint32_t limit) const;
+    std::vector<NotesRecord> getNotesByText(const std::string &text) const;
 
     std::unique_ptr<db::QueryResult> getQuery(const std::shared_ptr<db::Query> &query);
+    std::unique_ptr<db::QueryResult> getByTextQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> storeQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> removeQuery(const std::shared_ptr<db::Query> &query);
 

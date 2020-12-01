@@ -4,6 +4,7 @@
 #include "NotesRecord.hpp"
 
 #include "queries/notes/QueryNotesGet.hpp"
+#include "queries/notes/QueryNotesGetByText.hpp"
 #include "queries/notes/QueryNoteStore.hpp"
 #include "queries/notes/QueryNoteRemove.hpp"
 
@@ -96,9 +97,20 @@ NotesRecord NotesRecordInterface::GetByID(std::uint32_t id)
 std::vector<NotesRecord> NotesRecordInterface::getNotes(std::uint32_t offset, std::uint32_t limit) const
 {
     std::vector<NotesRecord> records;
-    const auto notes = notesDB->notes.getLimitOffset(offset, limit);
-    for (const auto &w : notes) {
-        NotesRecord record{w.ID, w.date, w.snippet};
+    const auto &notes = notesDB->notes.getLimitOffset(offset, limit);
+    for (const auto &note : notes) {
+        NotesRecord record{note.ID, note.date, note.snippet};
+        records.push_back(std::move(record));
+    }
+    return records;
+}
+
+std::vector<NotesRecord> NotesRecordInterface::getNotesByText(const std::string &text) const
+{
+    std::vector<NotesRecord> records;
+    const auto &notes = notesDB->notes.getByText(text);
+    for (const auto &note : notes) {
+        NotesRecord record{note.ID, note.date, note.snippet};
         records.push_back(std::move(record));
     }
     return records;
@@ -108,6 +120,9 @@ std::unique_ptr<db::QueryResult> NotesRecordInterface::runQuery(std::shared_ptr<
 {
     if (typeid(*query) == typeid(db::query::QueryNotesGet)) {
         return getQuery(query);
+    }
+    if (typeid(*query) == typeid(db::query::QueryNotesGetByText)) {
+        return getByTextQuery(query);
     }
     if (typeid(*query) == typeid(db::query::QueryNoteStore)) {
         return storeQuery(query);
@@ -123,6 +138,15 @@ std::unique_ptr<db::QueryResult> NotesRecordInterface::getQuery(const std::share
     const auto localQuery = static_cast<db::query::QueryNotesGet *>(query.get());
     const auto &records   = getNotes(localQuery->getOffset(), localQuery->getLimit());
     auto response         = std::make_unique<db::query::NotesGetResult>(records, GetCount());
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> NotesRecordInterface::getByTextQuery(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<db::query::QueryNotesGetByText *>(query.get());
+    const auto &records   = getNotesByText(localQuery->getText());
+    auto response         = std::make_unique<db::query::NotesGetByTextResult>(records);
     response->setRequestQuery(query);
     return response;
 }
