@@ -12,7 +12,7 @@ namespace bsp::eink_frontlight
     namespace
     {
         std::shared_ptr<drivers::DriverPWM> pwm;
-        constexpr inline auto PWM_FREQUENCY_HZ = 20000;
+        constexpr inline auto PWM_FREQUENCY_HZ       = 20000;
         constexpr inline auto EINK_BRIGHTNESS_LEVELS = 5;
 
         // 0 to N points mapping to 0-100 duty cycle with gamma correction
