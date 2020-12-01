@@ -9,7 +9,7 @@
 #include "../ApplicationSettings.hpp"
 #include "../windows/BtScanWindow.hpp"
 
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 
 #include "BtWindow.hpp"
 #include "Label.hpp"

@@ -58,8 +58,8 @@ std::vector<std::string> DatabaseInitializer::readCommands(fs::path filePath)
 std::array<std::string, 3> DatabaseInitializer::splitFilename(std::string filename)
 {
     auto name    = filename.substr(0, filename.find("."));
-    auto prefix  = name.substr(0, name.find("_"));
-    auto postfix = name.substr(name.find("_") + 1, std::string::npos);
+    auto prefix  = name.substr(0, name.find_last_of("_"));
+    auto postfix = name.substr(name.find_last_of("_") + 1, std::string::npos);
 
     return {name, prefix, postfix};
 }

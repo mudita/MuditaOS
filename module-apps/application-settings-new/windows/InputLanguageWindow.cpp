@@ -6,7 +6,7 @@
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "windows/OptionSetting.hpp"
 
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <module-services/service-appmgr/service-appmgr/Controller.hpp>
 
 namespace gui
@@ -20,19 +20,13 @@ namespace gui
     auto InputLanguageWindow::buildOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optionsList;
-        std::vector<std::string> languageListJson = {"app_settings_language_english",
-                                                     "app_settings_language_polish",
-                                                     "app_settings_language_german",
-                                                     "app_settings_language_spanish"};
-        std::vector<utils::Lang> languageListEnum = {
-            utils::Lang::En, utils::Lang::Pl, utils::Lang::De, utils::Lang::Sp};
-
-        for (size_t i = 0; i < languageListJson.size(); i++) {
+        const auto &langList = loader.getAvailableDisplayLanguages();
+        for (const auto &lang : langList) {
             optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
-                utils::localize.get(languageListJson[i]),
+                lang,
                 [=](gui::Item &item) {
-                    selectedLang = utils::localize.get(languageListJson[i]);
-                    app::manager::Controller::changeInputLanguage(application, languageListEnum[i]);
+                    selectedLang = lang;
+                    app::manager::Controller::changeInputLanguage(application, lang);
                     rebuildOptionList();
                     return true;
                 },
@@ -44,7 +38,7 @@ namespace gui
                     return true;
                 },
                 this,
-                selectedLang == utils::localize.get(languageListJson[i]) ? RightItem::Checked : RightItem::Disabled));
+                selectedLang == lang ? RightItem::Checked : RightItem::Disabled));
         }
 
         return optionsList;

@@ -15,7 +15,7 @@
 
 #include <cassert>
 
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 
 namespace gui
 {

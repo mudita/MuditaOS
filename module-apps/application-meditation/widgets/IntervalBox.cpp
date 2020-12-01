@@ -6,7 +6,7 @@
 #include "application-meditation/data/Style.hpp"
 #include "InputEvent.hpp"
 
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <cassert>
 
 using namespace gui;

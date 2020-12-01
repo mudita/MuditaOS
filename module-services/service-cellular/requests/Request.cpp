@@ -31,18 +31,21 @@ namespace cellular
         return true;
     }
 
-    std::string Request::buildCommand(at::AT atCommand, const std::vector<commandBuilderFunc> &builderFunctions) const
+    std::string Request::buildCommand(at::AT atCommand,
+                                      const std::vector<commandBuilderFunc> &builderFunctions,
+                                      bool trim) const
     {
         if (!isValid()) {
             return std::string();
         }
 
         std::string cmd(at::factory(atCommand));
-        bool formatFirst = true;
+
+        auto formatFirst = true;
         for (auto &cmdPart : builderFunctions) {
             auto partStr = cmdPart();
-            if (partStr.empty()) {
-                continue;
+            if (partStr.empty() && trim) {
+                break;
             }
             cmd.append(formatFirst ? partStr : "," + partStr);
             formatFirst = false;

@@ -6,7 +6,7 @@
 #include "windows/MusicPlayerEmptyWindow.hpp"
 
 #include <service-audio/AudioServiceAPI.hpp>
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <time/ScopedTime.hpp>
 

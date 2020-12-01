@@ -6,13 +6,11 @@
 #include "PinLockBaseWindow.hpp"
 #include "application-desktop/widgets/PinLock.hpp"
 #include "application-desktop/data/AppDesktopStyle.hpp"
-#include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <Style.hpp>
 
-namespace lock_style = style::window::pin_lock;
-
+namespace label_style = style::window::pin_lock::pin_label;
 namespace gui
 {
     void PukLockBox::popChar(unsigned int charNum)
@@ -26,7 +24,6 @@ namespace gui
     void PukLockBox::buildLockBox(unsigned int pinSize)
     {
         LockWindow->buildImages("pin_lock", "pin_lock_info");
-        LockWindow->buildInfoText(lock_style::info_text_h_puk);
         buildPinLabels(0);
     }
     void PukLockBox::buildPinLabels(unsigned int pinSize)
@@ -36,11 +33,7 @@ namespace gui
             return label;
         };
 
-        LockWindow->buildPinLabels(itemBuilder,
-                                   pinSize,
-                                   lock_style::pin_label_x,
-                                   lock_style::pin_label_y,
-                                   style::window_width - 2 * lock_style::pin_label_x);
+        LockWindow->buildPinLabels(itemBuilder, pinSize, label_style::x, label_style::y, label_style::w);
         LockWindow->pinLabelsBox->setEdges(RectangleEdge::Bottom);
     }
 
@@ -53,80 +46,55 @@ namespace gui
     void PukLockBox::setVisibleStateEnterPin(EnterPasscodeType type)
     {
         LockWindow->pinLabelsBox->setVisible(true);
-        LockWindow->infoText->clear();
-
         switch (type) {
-        case PinLockBox::EnterPasscodeType::ProvidePasscode:
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_blocked"));
-            LockWindow->infoText->addText("\n");
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_type_puk"));
+        case PinLockBox::EnterPasscodeType::ProvidePasscode: {
+            LockWindow->setText("app_desktop_sim_setup_enter_puk", PinLockBaseWindow::TextType::Primary, true);
             break;
-        case PinLockBox::EnterPasscodeType::ProvideNewPasscode:
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_enter_pin"));
-            break;
-        case PinLockBox::EnterPasscodeType::ConfirmNewPasscode:
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_confirm_pin"));
         }
-        LockWindow->infoText->setVisible(true);
+        case PinLockBox::EnterPasscodeType::ProvideNewPasscode: {
+            LockWindow->setText("app_desktop_sim_enter_new_pin", PinLockBaseWindow::TextType::Primary);
+            break;
+        }
+        case PinLockBox::EnterPasscodeType::ConfirmNewPasscode:
+            LockWindow->setText("app_desktop_sim_confirm_new_pin", PinLockBaseWindow::TextType::Primary);
+            break;
+        }
 
         LockWindow->setImagesVisible(true, false);
         LockWindow->setBottomBarWidgetsActive(false, false, true);
     }
-    void PukLockBox::setVisibleStateVerifiedPin()
-    {
-        LockWindow->pinLabelsBox->setVisible(false);
-        LockWindow->infoText->setVisible(false);
-    }
     void PukLockBox::setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value)
     {
-        LockWindow->pinLabelsBox->setVisible(false);
-        LockWindow->infoText->clear();
-
         switch (type) {
         case PinLockBox::PasscodeErrorType::InvalidPasscode:
-
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_wrong_puk"));
-            LockWindow->infoText->addText("\n");
-            LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_you_have"));
-            LockWindow->infoText->addText(" ");
-            LockWindow->infoText->addText(std::to_string(value));
-            LockWindow->infoText->addText(" ");
-
             if (value > 1) {
-                LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_attempt_left_plural"));
+                LockWindow->setText("app_desktop_sim_setup_wrong_puk",
+                                    PinLockBaseWindow::TextType::Primary,
+                                    true,
+                                    {{LockWindow->getToken(PinLockBaseWindow::Token::Attempts), value}});
             }
             else {
-                LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_attempt_left_singular"));
-                LockWindow->infoText->addText("\n\n");
-                LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_warning1"));
-                LockWindow->infoText->addText("\n");
-                LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_warning2"));
-                LockWindow->infoText->addText("\n");
-                LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_warning3"));
+                LockWindow->setText(
+                    "app_desktop_sim_setup_wrong_puk_last_attempt", PinLockBaseWindow::TextType::Primary, true);
+                LockWindow->setText("app_desktop_sim_setup_wrong_puk_last_attempt_warning",
+                                    PinLockBaseWindow::TextType::Secondary,
+                                    true);
             }
             break;
-        case PinLockBox::PasscodeErrorType::NewPasscodeConfirmFailed:
-            LockWindow->infoText->setText(utils::localize.get("app_desktop_sim_wrong_pin"));
+        case PinLockBox::PasscodeErrorType::NewPasscodeConfirmFailed: {
+            LockWindow->setText("app_desktop_sim_wrong_pin", PinLockBaseWindow::TextType::Primary);
             break;
+        }
         case PinLockBox::PasscodeErrorType::UnhandledError:
             LOG_ERROR("No use case for UnhandledError in PukLockBox");
             break;
         }
-
-        LockWindow->infoText->setVisible(true);
         LockWindow->setImagesVisible(false, true);
-        LockWindow->setBottomBarWidgetsActive(true, true, false);
+        LockWindow->setBottomBarWidgetsActive(false, true, false);
     }
     void PukLockBox::setVisibleStateBlocked()
     {
-        LockWindow->pinLabelsBox->setVisible(false);
-
-        LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_blocked_info1"));
-        LockWindow->infoText->addText("\n");
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_sim_blocked_info2"));
-        LockWindow->infoText->setVisible(true);
-
+        LockWindow->setText("app_desktop_sim_puk_blocked", PinLockBaseWindow::TextType::Primary, true);
         LockWindow->setImagesVisible(false, true);
         LockWindow->setBottomBarWidgetsActive(true, false, false);
     }

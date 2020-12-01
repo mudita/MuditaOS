@@ -42,8 +42,8 @@ TEST_CASE("Settings Record tests")
     REQUIRE(settingsRecord.activeSIM == SettingsRecord::ActiveSim::SIM1);
     REQUIRE(settingsRecord.networkOperator == "");
     REQUIRE(settingsRecord.lockPassHash == 0);
-    REQUIRE(settingsRecord.displayLanguage == SettingsLanguage ::ENGLISH);
-    REQUIRE(settingsRecord.inputLanguage == SettingsLanguage ::ENGLISH);
+    REQUIRE(settingsRecord.displayLanguage == "English");
+    REQUIRE(settingsRecord.inputLanguage == "English");
 
     settingsRecord.networkOperator = "MuditaConnectingPeople";
     settingsRecord.fontSize        = 10;

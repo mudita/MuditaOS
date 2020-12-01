@@ -1,6 +1,7 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import time
+from random import randrange
 
 import serial
 import json
@@ -19,7 +20,7 @@ class Keytype(Enum):
 
 
 class CDCSerial:
-    def __init__(self, port_name, timeout=30):
+    def __init__(self, port_name, timeout=10):
         self.timeout = timeout
         self.body = ""
         while timeout != 0:
@@ -46,7 +47,7 @@ class CDCSerial:
         msg = {
             "endpoint": endpoint["developerMode"],
             "method": method["put"],
-            "uuid": 0,
+            "uuid": randrange(1,100),
             "body": body
         }
         return msg
@@ -82,9 +83,10 @@ class CDCSerial:
         }
 
         ret = self.write(self.__wrap_message(body), wait)
+        print(ret)
         return ret["body"]["ATResponse"]
 
-    def get_window(self):
+    def get_window_name(self):
         body = {
             "focus": True
         }

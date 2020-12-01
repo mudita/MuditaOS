@@ -1,13 +1,50 @@
 # MuditaOS changelog
 
-### Added
-
-* `[cellular]` Integration with basic flow for SIM card (cellular<>GUI)
-
-## [0.48.1 2020-11-23]
+[Current release]
 
 ### Added
+* `[notes]` Notes application implemented.
 
+### Changed
+
+* `[desktop]` Windows refactor
+
+### Fixed
+
+* `[meditation]` Fixed default counter settings 
+
+### Other
+
+* `[test]` Rewritten tests and updated test documentation.
+
+[0.48.1 2020-11-27]
+
+### Added
+
+* `[cellular]` Add basic GUI flow for SIM cards.
+* `[text]` Add vertical text navigation without scrolling.
+
+### Fixed
+
+* `[audio]` Fix playback of mono sound when using headphones.
+* `[audio]` Fix builtin microphone handling.
+
+### Changed
+
+* `[settings]` Load language setting from the settings file.
+* `[cellular]` Improve MMI call forwarding support.
+
+### Other
+
+* `[test]` Add unit tests for time display.
+* `[test]` Add unit tests for file indexer to database integration.
+* `[build]` Fix emulator build error for the release target
+
+## [0.47.2 2020-11-23]
+
+### Added
+
+* `[gui]` Added support for variable numbers in RichText
 * `[gui][desktop]` Added SIM PIN basic flow implementation
 * `[cellular]` Added CLIR, CLIP, COLP, call waiting, call barring MMIs support
 
@@ -20,7 +57,6 @@
 
 ### Changed
 
-* `[gui][desktop]` ScreenLock logic unified with simLock's
 * `[messages]` Changed fonts of message snippet and its prefix.
 
 ## [0.47.1 2020-11-20]

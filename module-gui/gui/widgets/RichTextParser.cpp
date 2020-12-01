@@ -13,6 +13,7 @@
 #include "TextFormat.hpp"
 
 #include <module-utils/pugixml/src/pugixml.hpp>
+#include <module-utils/Utils.hpp>
 #include <utility>
 
 #ifdef DEBUG_RTP
@@ -265,7 +266,7 @@ namespace text
                 return std::optional<std::string>(content == AttributeContent::Name ? attribute.first
                                                                                     : attribute.second);
             }
-            catch (std::out_of_range &) {
+            catch (const std::out_of_range &) {
                 LOG_ERROR("ShortTextNode: %s not found", nodeName);
                 return {};
             }
@@ -274,17 +275,61 @@ namespace text
 
     const ShortTextNodes::SingleAttributedNode ShortTextNodes::nodes = {
         {gui::text::short_bold, {gui::text::weight, gui::text::bold}}};
-}; // namespace text
 
+    class CustomTokens
+    {
+      public:
+        using TokenMap = std::map<std::string, std::variant<int, std::string>>;
+        explicit CustomTokens(TokenMap &&_tokens) : tokens{std::move(_tokens)}
+        {}
+
+        [[nodiscard]] static auto isCustomTokenNode(const std::string &nodeName) -> bool
+        {
+            return nodeName == gui::text::node_token;
+        }
+
+        [[nodiscard]] auto get(const std::string &contentName) -> std::optional<std::string>
+        {
+            try {
+                auto token = tokens.at(contentName);
+                return std::visit(
+                    [](auto &&arg) {
+                        using T = std::decay_t<decltype(arg)>;
+                        if constexpr (std::is_same_v<T, int>) {
+                            return std::make_optional(utils::to_string(arg));
+                        }
+                        else if constexpr (std::is_same_v<T, std::string>) {
+                            return std::make_optional(arg);
+                        }
+                        else {
+                            return std::nullopt;
+                        }
+                    },
+                    std::move(token));
+            }
+            catch (const std::out_of_range &) {
+                LOG_ERROR("Tokens: %s not found", contentName.c_str());
+            }
+            return std::nullopt;
+        }
+
+      private:
+        TokenMap tokens;
+    };
+
+}; // namespace text
 struct walker : pugi::xml_tree_walker
 {
   protected:
     std::list<gui::TextBlock> blocks;
     std::list<gui::TextFormat> style_stack;
+    text::CustomTokens tokens;
+
     bool add_newline = false;
+    bool adding_tokens = false;
 
   public:
-    walker(gui::TextFormat entry_style)
+    walker(gui::TextFormat entry_style, ::text::CustomTokens::TokenMap &&tokens) : tokens{std::move(tokens)}
     {
         style_stack.push_back(entry_style);
     }
@@ -317,6 +362,11 @@ struct walker : pugi::xml_tree_walker
     auto is_short_text_node(pugi::xml_node &node) const
     {
         return text::ShortTextNodes::is(node.name());
+    }
+
+    auto is_custom_token_node(pugi::xml_node &node) const
+    {
+        return text::CustomTokens::isCustomTokenNode(node.name());
     }
 
     auto push_text_node(pugi::xml_node &node)
@@ -353,6 +403,19 @@ struct walker : pugi::xml_tree_walker
         }
     }
 
+    auto start_custom_token_node(pugi::xml_node &)
+    {
+        adding_tokens = true;
+    }
+
+    auto push_custom_token_data_node(pugi::xml_node &node)
+    {
+        auto value = tokens.get(node.value());
+        if (value.has_value()) {
+            blocks.emplace_back(value.value(), std::make_unique<gui::TextFormat>(style_stack.back()));
+        }
+    }
+
     auto push_data_node(pugi::xml_node &node)
     {
         blocks.emplace_back(node.value(), std::make_unique<gui::TextFormat>(style_stack.back()));
@@ -374,11 +437,20 @@ struct walker : pugi::xml_tree_walker
                 push_newline_node(node);
                 return true;
             }
+            if (is_custom_token_node(node)) {
+                start_custom_token_node(node);
+                return true;
+            }
         }
 
         std::string to_show = node.value();
         if (node.type() == pugi::xml_node_type::node_pcdata && !to_show.empty()) {
-            push_data_node(node);
+            if (adding_tokens) {
+                push_custom_token_data_node(node);
+            }
+            else {
+                push_data_node(node);
+            }
         }
         return true;
     }
@@ -395,6 +467,11 @@ struct walker : pugi::xml_tree_walker
         }
     }
 
+    auto end_custom_token_node(pugi::xml_node &node)
+    {
+        adding_tokens = false;
+    }
+
     auto on_leave(pugi::xml_node &node) -> bool final
     {
         log_node(node, Action::Exit);
@@ -407,6 +484,9 @@ struct walker : pugi::xml_tree_walker
             if (is_newline_node(node)) {
                 pop_newline_node(node);
                 return true;
+            }
+            if (is_custom_token_node(node)) {
+                end_custom_token_node(node);
             }
         }
         return true;
@@ -425,8 +505,8 @@ struct walker : pugi::xml_tree_walker
 
 namespace gui::text
 {
-
-    auto RichTextParser::parse(const UTF8 &text, TextFormat *base_style) -> std::unique_ptr<TextDocument>
+    auto RichTextParser::parse(const UTF8 &text, TextFormat *base_style, TokenMap &&tokenMap)
+        -> std::unique_ptr<TextDocument>
     {
         log_parser("parsing: %s", text.c_str());
         if (text.empty() || base_style == nullptr) {
@@ -435,12 +515,11 @@ namespace gui::text
         }
 
         pugi::xml_document doc;
-        walker walker(*base_style);
+        walker walker(*base_style, std::move(tokenMap));
 
         doc.load_string(text.c_str());
         doc.traverse(walker);
 
         return std::make_unique<TextDocument>(walker.souvenirs());
     }
-
 }; // namespace gui::text

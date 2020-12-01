@@ -3,10 +3,10 @@
 
 #include "EventDetailDescriptionItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
-#include "application-calendar/data/TimeDisplayParser.hpp"
 #include <Style.hpp>
 #include <time/time_conversion.hpp>
 #include <module-utils/date/include/date/date.h>
+#include <module-utils/time/TimeRangeParser.hpp>
 
 namespace gui
 {
@@ -79,7 +79,8 @@ namespace gui
         title->setText(utils::localize.get("app_calendar_event_detail"));
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
             description->setText(event->title);
-            eventTime->setText(TimeDisplayParser().getTimeString(event));
+            eventTime->setText(
+                utils::time::TimeRangeParser().getCalendarTimeString(event->date_from, event->date_till));
         };
     }
 

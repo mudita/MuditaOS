@@ -36,8 +36,8 @@ set(SOURCES
         Tables/ContactsRingtonesTable.cpp
         Tables/ContactsAddressTable.cpp
         Tables/ContactsGroups.cpp
-        Tables/SettingsTable.cpp
         Tables/AlarmsTable.cpp
+        Tables/AlarmsStatusTable.cpp
         Tables/NotesTable.cpp
         Tables/CalllogTable.cpp
         Tables/CountryCodesTable.cpp
@@ -50,7 +50,6 @@ set(SOURCES
         Interface/SMSRecord.cpp
         Interface/ContactRecord.cpp
         Interface/ThreadRecord.cpp
-        Interface/SettingsRecord.cpp
         Interface/AlarmsRecord.cpp
         Interface/NotesRecord.cpp
         Interface/CalllogRecord.cpp
@@ -88,6 +87,9 @@ set(SOURCES
         queries/messages/threads/QueryThreadGetByContactID.cpp
         queries/messages/threads/QueryThreadRemove.cpp
         queries/messages/threads/QueryThreadMarkAsRead.cpp
+        queries/notes/QueryNotesGet.cpp
+        queries/notes/QueryNoteStore.cpp
+        queries/notes/QueryNoteRemove.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/calllog/QueryCalllogGet.cpp
         queries/calllog/QueryCalllogGetCount.cpp
@@ -116,6 +118,12 @@ set(SOURCES
         queries/settings/QuerySettingsGet_v2.cpp
         queries/settings/QuerySettingsUpdate_v2.cpp
         queries/settings/QuerySettingsAddOrIgnore_v2.cpp
+        queries/alarms/QueryAlarmsAdd.cpp
+        queries/alarms/QueryAlarmsRemove.cpp
+        queries/alarms/QueryAlarmsEdit.cpp
+        queries/alarms/QueryAlarmsGet.cpp
+        queries/alarms/QueryAlarmsGetLimited.cpp
+        queries/alarms/QueryAlarmsTurnOffAll.cpp
 )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

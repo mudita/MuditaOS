@@ -49,4 +49,5 @@ void vfs::Init()
         LOG_INFO("vfs::Init looks like %s exists", userDiskPath.c_str());
     }
     chnNotifier.onFileSystemInitialized();
+    initDone = true;
 }

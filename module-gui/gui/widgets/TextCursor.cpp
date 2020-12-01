@@ -58,15 +58,13 @@ namespace gui
             return Move::Error;
         }
 
-        /// left & up - corner case
-        if ((checkNpos() || atBegin()) &&
-            (direction == NavigationDirection::LEFT || direction == NavigationDirection::UP)) {
+        /// left - corner case
+        if ((checkNpos() || atBegin()) && (direction == NavigationDirection::LEFT)) {
             return Move::Start;
         }
 
-        /// down & right - corner case
-        if ((checkNpos() || atEnd()) &&
-            (direction == NavigationDirection::RIGHT || direction == NavigationDirection::DOWN)) {
+        /// right - corner case
+        if ((checkNpos() || atEnd()) && (direction == NavigationDirection::RIGHT)) {
             return Move::End;
         }
 
@@ -108,7 +106,7 @@ namespace gui
         return Move::Error;
     }
 
-    std::tuple<const TextLine *, unsigned int, unsigned int> TextCursor::getLine()
+    std::tuple<const TextLine *, unsigned int, unsigned int> TextCursor::getSelectedLine()
     {
         unsigned int offset_pos = 0;
         unsigned int row        = 0;
@@ -144,7 +142,7 @@ namespace gui
             y = getAxisAlignmentValue(Axis::Y, h);
         }
         else if (text != nullptr || text->lines->size() > 0) {
-            auto [line, column, row] = getLine();
+            auto [line, column, row] = getSelectedLine();
             if (line == nullptr || column == text::npos || row == text::npos) {
                 setArea({x, y, w, h});
                 return;

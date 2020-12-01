@@ -8,12 +8,14 @@
 #include "application-desktop/data/AppDesktopStyle.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 
-namespace lock_style = style::window::pin_lock;
+namespace label_style = style::window::pin_lock::pin_label;
 
 namespace gui
 {
+
+    constexpr auto timeToUnlock = 10;
 
     ScreenLockBox::PinLabel::PinLabel(Item *parent, uint32_t w, uint32_t h) : HBox(parent, 0, 0, w, h)
     {}
@@ -46,7 +48,6 @@ namespace gui
     void ScreenLockBox::buildLockBox(unsigned int pinSize)
     {
         LockWindow->buildImages("pin_lock", "pin_lock_info");
-        LockWindow->buildInfoText(lock_style::info_text_h_screen);
         ScreenLockBox::buildPinLabels(pinSize);
     }
     void ScreenLockBox::buildPinLabels(unsigned int pinSize)
@@ -58,80 +59,67 @@ namespace gui
             return;
         }
 
-        unsigned int singleLabelWidth        = lock_style::label_size;
-        unsigned int maxNoMarginsLabelsWidth = pinLabelWidth - pinSize * 2 * lock_style::label_margins;
+        unsigned int singleLabelWidth        = label_style::size;
+        unsigned int maxNoMarginsLabelsWidth = pinLabelWidth - pinSize * 2 * label_style::margin;
 
         if (pinSize * singleLabelWidth > maxNoMarginsLabelsWidth) {
             singleLabelWidth = maxNoMarginsLabelsWidth / pinSize;
         }
 
         auto itemBuilder = [this, singleLabelWidth]() {
-            auto label = new PinLabel(nullptr, singleLabelWidth, lock_style::label_size);
+            auto label = new PinLabel(nullptr, singleLabelWidth, label_style::size);
             label->setEdges(RectangleEdge::Bottom);
-            label->setMargins(Margins(lock_style::label_margins, 0, lock_style::label_margins, 0));
+            label->setMargins(Margins(label_style::margin, 0, label_style::margin, 0));
             pinLabels.push_back(label);
             return label;
         };
 
         LockWindow->buildPinLabels(
-            itemBuilder, pinSize, style::window::default_left_margin, lock_style::pin_label_y_screen, pinLabelWidth);
+            itemBuilder, pinSize, style::window::default_left_margin, label_style::y, pinLabelWidth);
         LockWindow->pinLabelsBox->setEdges(RectangleEdge::None);
     }
     void ScreenLockBox::setVisibleStateEnterPin(EnterPasscodeType type)
     {
         LockWindow->pinLabelsBox->setVisible(true);
-
-        LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get("app_desktop_screen_enter_passcode"));
-        LockWindow->infoText->setVisible(true);
-
+        LockWindow->setText("app_desktop_screen_enter_passcode_to_unlock", PinLockBaseWindow::TextType::Primary, true);
         LockWindow->setImagesVisible(true, false);
         LockWindow->setBottomBarWidgetsActive(true, false, true);
     }
-    void ScreenLockBox::setVisibleStateVerifiedPin()
-    {
-        clear();
-        LockWindow->pinLabelsBox->setVisible(false);
-        LockWindow->titleLabel->setVisible(false);
-    }
+
     void ScreenLockBox::setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value)
     {
-        clear();
-        LockWindow->pinLabelsBox->setVisible(false);
-        LockWindow->infoText->clear();
-        LockWindow->titleLabel->setVisible(true);
         switch (type) {
         case PinLockBox::PasscodeErrorType::InvalidPasscode:
-            LockWindow->titleLabel->setText(utils::localize.get("app_desktop_screen_wrong_pin"));
-
-            LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_sim_you_have")));
-            LockWindow->infoText->addText(" ");
-            LockWindow->infoText->addText(std::to_string(value));
-            LockWindow->infoText->addText(" ");
-            LockWindow->infoText->addText(
-                utils::localize.get(utils::localize.get("app_desktop_sim_attempt_left_plural")));
+            LockWindow->setTitleBar(false, false);
+            if (value == 1) {
+                LockWindow->setText(
+                    "app_desktop_screen_wrong_passcode_last_attempt", PinLockBaseWindow::TextType::Primary, true);
+                LockWindow->setText("app_desktop_screen_wrong_passcode_last_attempt_warning",
+                                    PinLockBaseWindow::TextType::Secondary,
+                                    true,
+                                    {{LockWindow->getToken(PinLockBaseWindow::Token::Mins), timeToUnlock}});
+            }
+            else {
+                LockWindow->setText("app_desktop_screen_wrong_passcode",
+                                    PinLockBaseWindow::TextType::Primary,
+                                    true,
+                                    {{LockWindow->getToken(PinLockBaseWindow::Token::Attempts), value}});
+            }
             break;
+
         case PinLockBox::PasscodeErrorType::NewPasscodeConfirmFailed:
-            LockWindow->titleLabel->setText(utils::localize.get("app_desktop_screen_wrong_passcode"));
+            LockWindow->setText("app_desktop_screen_setup_wrong_passcode", PinLockBaseWindow::TextType::Primary, true);
             break;
         case PinLockBox::PasscodeErrorType::UnhandledError:
             LOG_ERROR("No use case for UnhandledError");
             break;
         }
-
-        LockWindow->infoText->setVisible(true);
         LockWindow->setImagesVisible(false, true);
         LockWindow->setBottomBarWidgetsActive(false, true, true);
     }
     void ScreenLockBox::setVisibleStateBlocked()
     {
-        LockWindow->pinLabelsBox->setVisible(false);
-        LockWindow->titleLabel->setVisible(false);
-
-        LockWindow->infoText->clear();
-        LockWindow->infoText->addText(utils::localize.get(utils::localize.get("app_desktop_screen_blocked_info")));
-        LockWindow->infoText->setVisible(true);
-
+        LockWindow->setText("app_desktop_screen_blocked", PinLockBaseWindow::TextType::Primary);
         LockWindow->setImagesVisible(false, true);
         LockWindow->setBottomBarWidgetsActive(false, true, false);
     }

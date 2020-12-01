@@ -19,6 +19,7 @@
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/rtc/rtc.hpp>
 #include <bsp/torch/torch.hpp>
+#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <common_data/RawKey.hpp>
 #include <log/log.hpp>
 #include <module-utils/time/time_conversion.hpp>
@@ -270,6 +271,13 @@ sys::ReturnCodes EventManager::InitHandler()
         }
 
         return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sevm::KeypadBacklightMessage(), [&](sys::Message *msgl) {
+        auto msg         = static_cast<sevm::KeypadBacklightMessage *>(msgl);
+        auto message     = std::make_shared<sevm::KeypadBacklightMessage>();
+        message->success = msg->processAction(msg->action);
+        return message;
     });
 
     // initialize keyboard worker

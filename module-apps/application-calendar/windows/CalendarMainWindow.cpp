@@ -12,6 +12,7 @@
 #include <time/time_conversion.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBServiceAPI.hpp>
+#include <module-db/Common/Query.hpp>
 
 namespace gui
 {

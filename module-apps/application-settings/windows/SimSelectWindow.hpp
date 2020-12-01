@@ -3,7 +3,11 @@
 
 #pragma once
 
-#include "Application.hpp"
 #include <OptionWindow.hpp>
+namespace app
+{
+    class Application;
+    class SimSetter;
+} // namespace app
 
-std::list<gui::Option> simSelectWindow(app::Application *app);
+std::list<gui::Option> simSelectWindow(app::Application *app, app::SimSetter *setter);

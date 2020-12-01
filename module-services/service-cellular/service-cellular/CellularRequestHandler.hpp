@@ -23,4 +23,5 @@ class CellularRequestHandler : public RequestHandler
 
   private:
     ServiceCellular &cellular;
+    void sendMmiResult(bool result);
 };

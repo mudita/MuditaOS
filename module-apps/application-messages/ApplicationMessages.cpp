@@ -17,7 +17,7 @@
 
 #include <MessageType.hpp>
 #include <Dialog.hpp>
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <memory>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBNotificationMessage.hpp>

@@ -26,9 +26,16 @@
 #include "windows/CellularPassthroughWindow.hpp"
 #include "windows/SettingsChange.hpp"
 
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
+#include <service-db/Settings.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
+
+namespace gui::window::name
+{
+    inline constexpr auto date_time = "DateTime";
+}
 
 namespace app
 {
@@ -40,6 +47,12 @@ namespace app
             switchWindow(app::sim_select);
             return msgHandled();
         });
+        settings->registerValueChange(settings::SystemProperties::lockPassHash,
+                                      [this](std::string value) { lockPassChanged(value); });
+        settings->registerValueChange(settings::SystemProperties::timeDateFormat,
+                                      [this](std::string value) { timeDateChanged(value); });
+        settings->registerValueChange(settings::SystemProperties::displayLanguage,
+                                      [this](std::string value) { displayLanguageChanged(value); });
     }
 
     ApplicationSettings::~ApplicationSettings()
@@ -125,14 +138,14 @@ namespace app
                 app, utils::localize.get("app_settings_title_main"), mainWindowOptions(app));
         });
 
-        windowsFactory.attach(app::sim_select, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::OptionWindow>(app, name, simSelectWindow(app));
+        windowsFactory.attach(app::sim_select, [this](Application *app, const std::string &name) {
+            return std::make_unique<gui::OptionWindow>(app, name, simSelectWindow(app, this));
         });
-        windowsFactory.attach(app::change_setting, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::OptionWindow>(app, name, settingsChangeWindow(app));
+        windowsFactory.attach(app::change_setting, [this](Application *app, const std::string &name) {
+            return std::make_unique<gui::OptionWindow>(app, name, settingsChangeWindow(app, this, lockPassHash));
         });
-        windowsFactory.attach("Languages", [](Application *app, const std::string &name) {
-            return std::make_unique<gui::LanguageWindow>(app);
+        windowsFactory.attach("Languages", [this](Application *app, const std::string &name) {
+            return std::make_unique<gui::LanguageWindow>(app, this);
         });
         windowsFactory.attach("Bluetooth", [](Application *app, const std::string &name) {
             return std::make_unique<gui::BtWindow>(app);
@@ -146,8 +159,8 @@ namespace app
         windowsFactory.attach(gui::window::hw_info, [](Application *app, const std::string &name) {
             return std::make_unique<gui::Info>(app);
         });
-        windowsFactory.attach("DateTime", [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DateTimeWindow>(app);
+        windowsFactory.attach(gui::window::name::date_time, [this](Application *app, const std::string &name) {
+            return std::make_unique<gui::DateTimeWindow>(app, europeanDateTimeFormat);
         });
         windowsFactory.attach(gui::window::name::fota_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::FotaWindow>(app);
@@ -171,5 +184,60 @@ namespace app
 
     void ApplicationSettings::destroyUserInterface()
     {}
+
+    void ApplicationSettings::setSim(Store::GSM::SIM sim)
+    {
+        settings->setValue(settings::SystemProperties::activeSim, utils::enumToString(sim));
+        Store::GSM::get()->selected = sim;
+        bsp::cellular::sim::sim_sel();
+        bsp::cellular::sim::hotswap_trigger();
+    }
+
+    void ApplicationSettings::setPin(unsigned int value)
+    {
+        settings->setValue(settings::SystemProperties::lockPassHash, std::to_string(value));
+    }
+
+    void ApplicationSettings::clearPin()
+    {
+        settings->setValue(settings::SystemProperties::lockPassHash, "");
+    }
+
+    void ApplicationSettings::lockPassChanged(std::string value)
+    {
+        auto newLockPassHash = 0U;
+        if (!value.empty()) {
+            newLockPassHash = utils::getNumericValue<unsigned int>(value);
+        }
+        if (lockPassHash != newLockPassHash) {
+            lockPassHash       = newLockPassHash;
+            auto currentWindow = getCurrentWindow();
+            if (app::change_setting == currentWindow->getName()) {
+                currentWindow->rebuild();
+            }
+        }
+    }
+
+    void ApplicationSettings::displayLanguageChanged(std::string value)
+    {
+        displayLanguage = value;
+    }
+
+    void ApplicationSettings::setDisplayLanguage(const std::string &value)
+    {
+        settings->setValue(settings::SystemProperties::displayLanguage, value);
+    }
+
+    void ApplicationSettings::timeDateChanged(std::string value)
+    {
+        auto newTimeDateFormat = utils::getNumericValue<bool>(value);
+        if (newTimeDateFormat != europeanDateTimeFormat) {
+            europeanDateTimeFormat = newTimeDateFormat;
+            auto currentWindow     = getCurrentWindow();
+            if (gui::window::name::date_time == currentWindow->getName()) {
+                currentWindow->rebuild();
+            }
+        }
+    }
 
 } /* namespace app */

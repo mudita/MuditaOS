@@ -1,0 +1,11 @@
+@startuml
+
+[Service DB] as srvcdb
+[Service Bluetooth] as srvcbt
+[Application Settings] as appstngs
+
+
+srvcdb <-r-> srvcbt : SettingsAgent
+srvcbt <-r-> appstngs : BluetoothMessages
+
+@enduml

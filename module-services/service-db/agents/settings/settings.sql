@@ -9,7 +9,7 @@ BEGIN TRANSACTION;
 -- Main settings table, for string application persistent data
 --
 CREATE TABLE IF NOT EXISTS settings_tab (
-    path TEXT NOT NULL UNIQUE,
+    path TEXT NOT NULL UNIQUE PRIMARY KEY,
     value TEXT
 );
 

@@ -5,7 +5,7 @@
 #include "../ApplicationSpecialInput.hpp"
 #include "Style.hpp"
 #include "messages/AppMessage.hpp"
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <cassert>
 
 using namespace gui;
