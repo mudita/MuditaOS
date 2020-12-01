@@ -47,7 +47,7 @@ PreparationTimeModel::PreparationTimeModel(app::Application *app) : MeditationMo
 void PreparationTimeModel::clearData()
 {
     itemCurrentlySelected = nullptr;
-    clearData();
+    MeditationModel::clearData();
 }
 
 namespace
@@ -68,7 +68,7 @@ void PreparationTimeModel::createData()
             itemCurrentlySelected = item;
         }
 
-        item->activatedCallback = [this, app, item, record](gui::Item &) {
+        item->activatedCallback = [this, app, item](gui::Item &) {
             LOG_DEBUG("Selecting meditation time period");
             if (itemCurrentlySelected != nullptr) {
                 itemCurrentlySelected->select(false);
