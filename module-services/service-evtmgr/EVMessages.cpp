@@ -22,9 +22,9 @@ namespace sevm
         return response;
     }
 
-    void EinkFrontlightMessage::processAction(bsp::eink_frontlight::Action act, std::uint8_t val = 0)
+    void EinkFrontlightMessage::processAction()
     {
-        switch (act) {
+        switch (action) {
         case bsp::eink_frontlight::Action::turnOn:
             bsp::eink_frontlight::turnOn();
             break;
@@ -32,7 +32,7 @@ namespace sevm
             bsp::eink_frontlight::turnOff();
             break;
         case bsp::eink_frontlight::Action::setBrightness:
-            bsp::eink_frontlight::setBrightness(val);
+            bsp::eink_frontlight::setBrightness(value);
             break;
         }
     }

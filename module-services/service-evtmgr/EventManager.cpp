@@ -282,7 +282,7 @@ sys::ReturnCodes EventManager::InitHandler()
 
     connect(sevm::EinkFrontlightMessage(), [&](sys::Message *msgl) {
         auto msg = static_cast<sevm::EinkFrontlightMessage *>(msgl);
-        msg->processAction(msg->action, msg->value);
+        msg->processAction();
         return std::make_shared<sys::ResponseMessage>();
     });
 
