@@ -112,8 +112,8 @@ namespace drivers
         }
 
         // Currently connected to IPbus clock
-        const auto clockSource    = CLOCK_GetFreq(kCLOCK_IpgClk);
-        pwm_mode_t pwmMode        = kPWM_SignedCenterAligned;
+        const auto clockSource = CLOCK_GetFreq(kCLOCK_IpgClk);
+        pwm_mode_t pwmMode     = kPWM_SignedCenterAligned;
 
         PWM_SetupPwm(base, pwmModule, &pwmSignalConfig, 1, pwmMode, pwm_frequency, clockSource);
 
