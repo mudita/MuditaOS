@@ -150,7 +150,7 @@
   "app_desktop_unlock": "UNLOCK",
   "app_desktop_lock": "LOCK",
   "app_desktop_menu": "MENU",
-  "app_desktop_emergency": "EMERG.",
+  "app_desktop_emergency": "SOS",
   "app_desktop_screen_enter_passcode": "Enter passcode",
   "app_desktop_screen_wrong_pin": "Wrong passcode",
   "app_desktop_screen_allowed_attempts": "Allowed unlock attempts",

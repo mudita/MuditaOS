@@ -59,6 +59,10 @@ namespace gui
         {
             return !screenLock.isState(PinLock::LockState::Unlocked);
         }
+        [[nodiscard]] auto isScreenBlocked() const noexcept -> bool
+        {
+            return screenLock.isState(PinLock::LockState::Blocked);
+        }
         void lockScreen();
         void unlockScreen();
     };
