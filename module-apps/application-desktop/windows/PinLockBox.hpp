@@ -29,7 +29,6 @@ namespace gui
         virtual void clear()                       = 0;
 
         virtual void setVisibleStateEnterPin(EnterPasscodeType type)                       = 0;
-        virtual void setVisibleStateVerifiedPin() = 0;
         virtual void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) = 0;
         virtual void setVisibleStateBlocked()     = 0;
 

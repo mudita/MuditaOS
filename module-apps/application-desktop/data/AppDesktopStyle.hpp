@@ -3,21 +3,62 @@
 
 #pragma once
 
-#include <inttypes.h>
-
 namespace style::window::pin_lock
 {
-    constexpr inline auto image_x            = 177;
-    constexpr inline auto image_y            = 132;
-    constexpr inline auto title_label_y      = 60;
-    constexpr inline auto title_label_h      = 40;
-    constexpr inline auto label_size         = 60;
-    constexpr inline auto label_margins      = 10;
-    constexpr inline auto pin_label_x        = 85;
-    constexpr inline auto pin_label_y        = 450;
-    constexpr inline auto pin_label_y_screen = 400;
-    constexpr inline auto info_text_y        = 294;
-    constexpr inline auto info_text_h_screen = 60;
-    constexpr inline auto info_text_h_sim    = 150;
-    constexpr inline auto info_text_h_puk    = 180;
+    namespace image
+    {
+        constexpr inline auto x = 177;
+        constexpr inline auto y = 132;
+    } // namespace image
+
+    namespace pin_label
+    {
+        constexpr inline auto x = 85;
+        constexpr inline auto y = 400;
+        constexpr inline auto w = style::window_width - 2 * x;
+
+        constexpr inline auto size   = 60;
+        constexpr inline auto margin = 10;
+    } // namespace pin_label
+
+    namespace title
+    {
+        constexpr inline auto x = 0;
+        constexpr inline auto y = 60;
+        constexpr inline auto w = style::window_width;
+        constexpr inline auto h = 50;
+    } // namespace title
+
+    namespace ice
+    {
+        constexpr inline auto x = style::window::default_left_margin;
+        constexpr inline auto y = title::y;
+        constexpr inline auto w = 60;
+        constexpr inline auto h = title::h;
+
+        constexpr inline auto margin = 3;
+
+        namespace text
+        {
+            constexpr inline auto w = 40;
+        }
+
+    } // namespace ice
+
+    namespace primary_text
+    {
+        constexpr inline auto x = style::window::default_left_margin;
+        constexpr inline auto y = 294;
+        constexpr inline auto w = style::window_width - 2 * x;
+        constexpr inline auto h = 60;
+    } // namespace primary_text
+
+    namespace secondary_text
+    {
+        constexpr inline auto x = style::window::default_left_margin;
+        constexpr inline auto y = primary_text::y + primary_text::h + 30;
+        constexpr inline auto w = style::window_width - 2 * x;
+        constexpr inline auto h = 90;
+    } // namespace secondary_text
+
 } // namespace style::window::pin_lock

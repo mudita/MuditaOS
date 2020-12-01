@@ -32,10 +32,9 @@ namespace gui
         PinLockBaseWindow *LockWindow;
         void popChar(unsigned int charNum) final;
         void putChar(unsigned int charNum) final;
-        virtual void clear() final;
+        void clear() final;
 
         void setVisibleStateEnterPin(EnterPasscodeType type) final;
-        void setVisibleStateVerifiedPin() final;
         void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) final;
         void setVisibleStateBlocked() final;
 
