@@ -4,6 +4,7 @@
 
 ### Added
 * `[notes]` Notes application implemented.
+* `[notes]` Notes search engine implemented.
 
 ### Changed
 

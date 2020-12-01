@@ -4,6 +4,7 @@
 #include "NotesRepository.hpp"
 
 #include <module-db/queries/notes/QueryNotesGet.hpp>
+#include <module-db/queries/notes/QueryNotesGetByText.hpp>
 #include <module-db/queries/notes/QueryNoteStore.hpp>
 #include <module-db/queries/notes/QueryNoteRemove.hpp>
 
@@ -24,6 +25,22 @@ namespace app::notes
             }
             if (callback) {
                 callback(result->getRecords(), result->getCount());
+            }
+            return true;
+        }));
+        DBServiceAPI::GetQuery(application, db::Interface::Name::Notes, std::move(query));
+    }
+
+    void NotesDBRepository::getByText(const std::string &text, const OnFilteredCallback &callback)
+    {
+        auto query = std::make_unique<db::query::QueryNotesGetByText>(text);
+        query->setQueryListener(db::QueryCallback::fromFunction([callback](auto response) {
+            auto result = dynamic_cast<db::query::NotesGetByTextResult *>(response);
+            if (result == nullptr) {
+                return false;
+            }
+            if (callback) {
+                callback(result->getRecords());
             }
             return true;
         }));

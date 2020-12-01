@@ -88,6 +88,7 @@ set(SOURCES
         queries/messages/threads/QueryThreadRemove.cpp
         queries/messages/threads/QueryThreadMarkAsRead.cpp
         queries/notes/QueryNotesGet.cpp
+        queries/notes/QueryNotesGetByText.cpp
         queries/notes/QueryNoteStore.cpp
         queries/notes/QueryNoteRemove.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp

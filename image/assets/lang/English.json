@@ -130,6 +130,7 @@
   "app_notes_delete_note": "Delete",
   "app_notes_note_delete_confirmation": "Do you really want to delete this note?",
   "app_notes_no_notes": "There are no notes yet.\nPress Left arrow to add new.",
+  "app_notes_search_no_results": "No notes found.",
 
   "app_calllog_title_main": "Calls",
   "app_calllog_new_note": "New Note",

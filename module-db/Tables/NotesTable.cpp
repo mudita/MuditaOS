@@ -117,6 +117,25 @@ std::vector<NotesTableRow> NotesTable::getLimitOffsetByField(std::uint32_t offse
     return ret;
 }
 
+std::vector<NotesTableRow> NotesTable::getByText(const std::string &text)
+{
+    auto retQuery = db->query("SELECT *, INSTR(snippet,'%s') pos FROM notes WHERE pos > 0;", text.c_str());
+    if (retQuery == nullptr || retQuery->getRowCount() == 0) {
+        return {};
+    }
+
+    std::vector<NotesTableRow> records;
+    do {
+        NotesTableRow row{
+            (*retQuery)[0].getUInt32(), // ID
+            (*retQuery)[1].getUInt32(), // date
+            (*retQuery)[2].getString()  // snippet
+        };
+        records.push_back(std::move(row));
+    } while (retQuery->nextRow());
+    return records;
+}
+
 std::uint32_t NotesTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM notes;");
