@@ -17,7 +17,8 @@
 
 ### Fixed
 
-* `[meditation]` Fixed default counter settings 
+* `[meditation]` Fixed default counter settings
+* `[notes]` Fixed displaying the special characters in a note title.
 
 ### Other
 
