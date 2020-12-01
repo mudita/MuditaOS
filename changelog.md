@@ -1,5 +1,8 @@
 # MuditaOS changelog
 
+### Added
+* `[utils]` Dump logs to a file on RT1051 after reaching 80% of log buffer utilization.
+
 [Current release]
 
 ### Added
