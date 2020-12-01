@@ -91,8 +91,10 @@ namespace gui
         auto app = getAppDesktop();
         if (app->lockHandler.isScreenLocked()) {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
-            bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::RIGHT, false);
+            bottomBar->setText(BottomBar::Side::LEFT,
+                               utils::localize.get("app_desktop_emergency"),
+                               app->lockHandler.isScreenBlocked());
             topBar->setActive(TopBar::Elements::LOCK, true);
             inputCallback = nullptr;
             setFocusItem(nullptr);
@@ -192,6 +194,10 @@ namespace gui
             // display pin lock screen or simply refresh current window to update labels
 
             getAppDesktop()->lockHandler.unlockScreen();
+            return true;
+        }
+        else if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
+            app::manager::Controller::sendAction(application, app::manager::actions::ShowEmergencyContacts);
             return true;
         }
         else if (enter_cache.storeEnter(inputEvent)) {

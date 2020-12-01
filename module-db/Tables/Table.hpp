@@ -17,8 +17,12 @@ template <typename T, typename F> class Table
     virtual ~Table()
     {}
 
-    virtual bool create()                = 0;
-    virtual bool add(T entry)            = 0;
+    virtual bool create()     = 0;
+    virtual bool add(T entry) = 0;
+    virtual bool removeAll()
+    {
+        return false;
+    }
     virtual bool removeById(uint32_t id) = 0;
     virtual bool removeByField(F field, const char *str)
     {

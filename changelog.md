@@ -3,10 +3,15 @@
 [Current release]
 
 ### Added
+* `[notes]` Notes application implemented.
 
 ### Changed
 
+* `[desktop]` Windows refactor
+
 ### Fixed
+
+* `[meditation]` Fixed default counter settings 
 
 ### Other
 
