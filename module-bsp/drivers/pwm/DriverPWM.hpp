@@ -15,7 +15,7 @@ namespace drivers
         PWM_2,
         PWM_3,
         PWM_4,
-        COUNT = 4
+        COUNT = PWM_4
     };
 
     enum class PWMModules
