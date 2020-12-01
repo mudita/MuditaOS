@@ -96,7 +96,7 @@ bool SimCard::isPinLocked() const
     return true;
 }
 
-SimCardResult SimCard::setPinLock(bool lock, const std::string pin) const
+SimCardResult SimCard::setPinLock(bool lock, const std::string &pin) const
 {
     if (auto pc = getAttemptsCounters(); pc) {
         if (pc.value().PukCounter != 0) {
