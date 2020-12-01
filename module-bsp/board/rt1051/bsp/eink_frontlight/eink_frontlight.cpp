@@ -13,10 +13,12 @@ namespace bsp::eink_frontlight
     {
         std::shared_ptr<drivers::DriverPWM> pwm;
         constexpr inline auto PWM_FREQUENCY_HZ = 20000;
+        constexpr inline auto EINK_BRIGHTNESS_LEVELS = 5;
 
         // 0 to N points mapping to 0-100 duty cycle with gamma correction
-        template <int N> struct GammaCorrectionLUT
+        template <unsigned N> struct GammaCorrectionLUT
         {
+            static_assert(N > 0, "Number of elements should be more than 0");
             constexpr GammaCorrectionLUT() : values()
             {
                 constexpr float gamma = 2.5;
@@ -27,7 +29,7 @@ namespace bsp::eink_frontlight
             }
             std::array<std::uint8_t, N + 1> values;
         };
-        GammaCorrectionLUT<5> gammaCorrection;
+        GammaCorrectionLUT<EINK_BRIGHTNESS_LEVELS> gammaCorrection;
 
     } // namespace
 
