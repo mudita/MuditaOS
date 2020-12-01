@@ -14,6 +14,7 @@
 ### Changed
 
 * `[desktop]` Windows refactor
+* `[notes]` A note characters limit set to 4'000.
 
 ### Fixed
 
