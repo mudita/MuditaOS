@@ -1,6 +1,8 @@
-# Testing framework
+# Test harness
 
-Test harness makes use of USB-CDC serial (on RT1051 target) or pseudo-tty (on Linux) to communicate
+The aim of this [test harness](https://en.wikipedia.org/wiki/Test_harness) is to enable tests automation and facilitate integration testing.
+
+Mudita Pure test harness makes use of USB-CDC serial (on RT1051 target) or pseudo-tty (on Linux) to communicate
 with `service-desktop` service in the operating system and get data from the internal database and device status.
 
 Both `service-desktop` and functional tests are using [`pyTest`](https://github.com/pytest-dev/pytest/) -
