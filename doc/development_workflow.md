@@ -2,9 +2,9 @@
 
 When submitting code or documentation changes please follow these steps to have bigger chances of getting your piece of work merged into the master branch.
 
-## Create a new branch
+## Create a new branch or fork
 
-Create a branch, which name is connected to the feature, bug fix, or documentation change you want to contribute e.g. `feature/some-feature` or `fix/some-fix`.
+Create a branch or fork, which name is connected to the feature, bug fix, or documentation change you want to contribute e.g. `feature/some-feature` or `fix/some-fix`.
 
 **Note:** If you're part of the MuditaOS core development team, please precede the branch name with a relevant Jira ticket number e.g. `EGD-5555-some-feature`.
 
@@ -12,22 +12,23 @@ Create a branch, which name is connected to the feature, bug fix, or documentati
 
 Commit your work. Each commit that makes it from your branch or fork into the master branch must have a title and a clear description.
 
-If you're part of the MuditaOS core development team, your commit's title *must* start with a Jira ticket number in square brackets. It can also point to which component you are working on, e.g., `[EGD-5555] phonebook: fix contact details`. A list of components is not yet defined, so please follow the names that are already in use. Do not add commits that are out of the scope of the Jira issue you are working on.
+If you're part of the MuditaOS core development team, your commit's title *must* start with a Jira ticket number in square brackets e.g. `[EGD-5555]`. Don't add commits that are out of the scope of the Jira issue you are working on.
 
-Start your commit's description with a single sentence describing what you are changing using present simple tense and an infinitive form. It must start with one of the following verbs: "Add", "Change" or "Fix", depending on whether you are adding a new feature, changing its
-behavior, or fixing it. This sentence will be a part of the project changelog, so please ensure it will be clear to the non-technical
-readers. Do not use proper names such as names of classes or functions. 
+Start your commit's description with a single sentence describing what you are changing using present simple tense and an imperative mood. Please follow these rules:
 
-Then, in the next paragraph, you must include a short description of what commit is changing in the project. You should be clear about
+- It must start with one of the following verbs: "Add", "Change" or "Fix", depending on whether you are adding a new feature, changing its behavior, or fixing it. This sentence will be a part of the project changelog, so please ensure it will be clear to the non-technical readers. 
+- Don't use proper names such as names of classes or functions. 
+- Try to be as concise as possible anf the limit of 72 characters (including the Jira ticket number if you're a part of the core MuditaOS development team). 
+- Don't end the subject line with a period. 
+
+Then, in the next paragraph, you must include a short description of what the commit is changing in the project. You should be clear about
 your motivation to do the change and how it influences the project.
 
 If it's impossible to provide any of the above information, then your commit is likely excessive or redundant and should be squashed with another commit.
 
 An example of a correctly formatted commit:
 ```
-    [EGD-4544] doc: update requirements for commits
-    
-    Change the requirements for commits' description.
+    [EGD-4544] Changed requirements for commits
     
     In order to be able to remove the obligation to change the project
     changelog with every PR, provide requirements for commits' title and
@@ -38,10 +39,10 @@ An example of a correctly formatted commit:
 
 Here's [a helpful article about writing good Git commit messages](https://chris.beams.io/posts/git-commit/).
 
-You can add template commit and hook that will help with proper defining both branch name and a message title:
-[commit message template](./doc/quickstart.md#commit-message-template)
-[commit message hook](./doc/quickstart.md#commit-message-hook)
+You can add a commit template and hook that will help with proper defining both branch name and a message title:
 
+- [commit message template](./doc/quickstart.md#commit-message-template)
+- [commit message hook](./doc/quickstart.md#commit-message-hook)
 
 ## Basic checks before Pull Request
 
