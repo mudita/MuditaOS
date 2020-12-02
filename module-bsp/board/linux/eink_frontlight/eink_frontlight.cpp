@@ -11,7 +11,7 @@ namespace bsp::eink_frontlight
     void deinit()
     {}
 
-    void setBrightness(std::uint8_t)
+    void setBrightness(BrightnessLevel)
     {}
 
     void turnOn()

@@ -50,7 +50,7 @@ namespace bsp::eink_frontlight
         turnOff();
     }
 
-    void setBrightness(std::uint8_t brightness)
+    void setBrightness(BrightnessLevel brightness)
     {
         std::clamp(
             brightness, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(gammaCorrection.values.size() - 1));

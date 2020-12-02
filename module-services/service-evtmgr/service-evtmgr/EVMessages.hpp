@@ -149,7 +149,7 @@ namespace sevm
 
       private:
         const bsp::eink_frontlight::Action action;
-        const std::uint8_t value;
+        const bsp::eink_frontlight::BrightnessLevel value;
     };
 
 } /* namespace sevm*/
