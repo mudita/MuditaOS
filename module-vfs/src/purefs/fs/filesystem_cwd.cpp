@@ -18,19 +18,15 @@ namespace purefs::fs
     {
         struct stat sts;
         int ret;
-        do {
-            ret = this->stat(name, sts);
-            if (ret)
-                break;
-            if ((sts.st_mode & S_IFMT) != S_IFDIR) {
-                ret = -ENOTDIR;
-                break;
-            }
-            const auto abspath = absolute_path(name);
-            ret                = internal::set_thread_cwd_path(abspath);
-            if (ret)
-                break;
-        } while (0);
+        ret = this->stat(name, sts);
+        if (ret) {
+            return ret;
+        }
+        if ((sts.st_mode & S_IFMT) != S_IFDIR) {
+            return -ENOTDIR;
+        }
+        const auto abspath = absolute_path(name);
+        ret                = internal::set_thread_cwd_path(abspath);
         return ret;
     }
 } // namespace purefs::fs

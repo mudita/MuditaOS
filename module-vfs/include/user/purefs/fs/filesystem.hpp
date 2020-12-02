@@ -37,8 +37,9 @@ namespace purefs::fs
     class filesystem
     {
       public:
+        static constexpr auto path_separator = '/';
         using fsdir                    = std::shared_ptr<internal::directory_handle>;
-        using fsfile                   = std::shared_ptr<internal::file_handle>;
+        using fsfile                         = std::shared_ptr<internal::file_handle>;
         explicit filesystem(std::shared_ptr<blkdev::disk_manager> diskmm);
         filesystem(const filesystem &) = delete;
         auto operator=(const filesystem &) = delete;

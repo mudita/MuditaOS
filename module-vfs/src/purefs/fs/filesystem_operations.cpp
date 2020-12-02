@@ -15,8 +15,9 @@ namespace purefs::fs
     }
     auto filesystem_operations::umount(fsmount mnt) noexcept -> int
     {
-        if (m_mount_count > 0)
+        if (m_mount_count > 0) {
             --m_mount_count;
+        }
         return -ENOTSUP;
     }
     auto filesystem_operations::stat_vfs(fsmount mntp, std::string_view path, statvfs &stat) const noexcept -> int
