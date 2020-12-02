@@ -151,7 +151,7 @@ namespace purefs::fs
                 if (!mp) {
                     return -ENOENT;
                 }
-                auto fsops = mp->fs_ops().lock();
+                auto fsops = mp->fs_ops();
                 if (!fsops) {
                     return -EIO;
                 }
@@ -170,7 +170,7 @@ namespace purefs::fs
             if (!mountp) {
                 return -ENOENT;
             }
-            auto fsops = mountp->fs_ops().lock();
+            auto fsops = mountp->fs_ops();
             if (fsops)
                 return (fsops.get()->*method)(mountp, abspath, std::forward<Args>(args)...);
             else
@@ -194,7 +194,7 @@ namespace purefs::fs
                 // Mount points are not the same
                 return -EXDEV;
             }
-            auto fsops = mountp->fs_ops().lock();
+            auto fsops = mountp->fs_ops();
             if (fsops)
                 return (fsops.get()->*method)(mountp, abspath, abspath2, std::forward<Args>(args)...);
             else

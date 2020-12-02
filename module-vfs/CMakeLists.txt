@@ -31,6 +31,7 @@ third_party_source_optimization(${FREERTOS_FAT_SOURCES_THIRDPARTY})
 set(FF_FAT_SOURCES
     ${FF_FAT_SOURCES_THIRDPARTY}
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ffsystem.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ff_glue.cpp
 )
 
 

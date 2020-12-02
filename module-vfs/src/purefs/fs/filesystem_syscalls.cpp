@@ -118,7 +118,7 @@ namespace purefs::fs
             LOG_ERROR("VFS: Unable to find mount point");
             return -ENOENT;
         }
-        auto fsops = mountp->fs_ops().lock();
+        auto fsops = mountp->fs_ops();
         if (fsops) {
             auto fh = fsops->open(mountp, abspath, flags, mode);
             if (!fh) {

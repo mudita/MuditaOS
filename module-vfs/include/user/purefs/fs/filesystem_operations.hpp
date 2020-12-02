@@ -33,7 +33,7 @@ namespace purefs::fs
         using fsfile                                         = std::shared_ptr<internal::file_handle>;
         using fsdir                                          = std::shared_ptr<internal::directory_handle>;
         using fsmount                                        = std::shared_ptr<internal::mount_point>;
-        filesystem_operations(std::weak_ptr<blkdev::disk_manager> diskmgr);
+        filesystem_operations()                              = default;
         filesystem_operations(const filesystem_operations &) = delete;
         virtual ~filesystem_operations()                     = default;
         auto operator=(const filesystem_operations &) = delete;
@@ -82,9 +82,24 @@ namespace purefs::fs
         {
             return m_mount_count;
         }
+        auto finalize_registration(std::weak_ptr<blkdev::disk_manager> diskmgr)
+        {
+            m_diskmm = diskmgr;
+            return filesystem_register_completed();
+        }
+
+      protected:
+        auto disk_mngr() const noexcept
+        {
+            return m_diskmm.lock();
+        }
+        auto virtual filesystem_register_completed() const noexcept -> int
+        {
+            return 0;
+        }
 
       private:
         std::size_t m_mount_count{};
-        const std::weak_ptr<blkdev::disk_manager> m_diskmm;
+        std::weak_ptr<blkdev::disk_manager> m_diskmm;
     };
 } // namespace purefs::fs

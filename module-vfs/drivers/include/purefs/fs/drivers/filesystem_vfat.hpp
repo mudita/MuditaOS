@@ -7,13 +7,15 @@
 namespace purefs::fs::drivers
 {
     /** Filesystem specific driver base class */
-    class filesystem_vfat final : public filesystem_operations
+    class filesystem_vfat final : private filesystem_operations
     {
       public:
+        filesystem_vfat();
         filesystem_vfat(const filesystem_vfat &) = delete;
         virtual ~filesystem_vfat()               = default;
         auto operator=(const filesystem_vfat &) = delete;
 
+      private:
         auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh, std::string_view path)
             -> fsmount override;
         auto mount(fsmount mnt) noexcept -> int override;
@@ -51,7 +53,6 @@ namespace purefs::fs::drivers
 
         auto chmod(fsmount mnt, std::string_view path, mode_t mode) noexcept -> int override;
         auto fchmod(fsfile zfile, mode_t mode) noexcept -> int override;
-
-      private:
+        auto filesystem_register_completed() const noexcept -> int override;
     };
 } // namespace purefs::fs::drivers

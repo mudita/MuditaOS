@@ -17,12 +17,17 @@ namespace purefs::fs
     auto filesystem::register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operations> fops) -> int
     {
         cpp_freertos::LockGuard _lck(m_lock);
-        const auto ret = m_fstypes.find(std::string(fsname));
-        if (ret != std::end(m_fstypes)) {
+        const auto it = m_fstypes.find(std::string(fsname));
+        if (it != std::end(m_fstypes)) {
             LOG_ERROR("Disc: %.*s already registered.", int(fsname.length()), fsname.data());
             return -EEXIST;
         }
         else {
+            const auto ret = fops->finalize_registration(m_diskmm);
+            if (ret) {
+                LOG_ERROR("Disc: Unable to register filesystem finalize error %i", ret);
+                return ret;
+            }
             m_fstypes.emplace(std::make_pair(fsname, fops));
             return {};
         }
@@ -67,7 +72,7 @@ namespace purefs::fs
                 return -ENODEV;
             }
             // Trying to open disk or part by manager
-            blkdev::disk_fd_t diskh;
+            blkdev::disk_fd diskh;
             {
                 auto disk_mgr = m_diskmm.lock();
                 if (disk_mgr) {
@@ -97,7 +102,7 @@ namespace purefs::fs
         if (mnti == std::end(m_mounts)) {
             return -ENOENT;
         }
-        auto fsops = mnti->second->fs_ops().lock();
+        auto fsops = mnti->second->fs_ops();
         if (!fsops) {
             LOG_ERROR("Unable to lock filesystem operation");
             return -EIO;

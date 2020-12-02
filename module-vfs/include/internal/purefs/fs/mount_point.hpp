@@ -29,7 +29,7 @@ namespace purefs::fs::internal
         virtual ~mount_point() = default;
         auto disk() const noexcept
         {
-            return m_diskh;
+            return m_diskh.lock();
         }
         auto mount_path() const noexcept
         {
@@ -37,7 +37,7 @@ namespace purefs::fs::internal
         }
         auto fs_ops() const noexcept
         {
-            return m_fs;
+            return m_fs.lock();
         }
       private:
         const std::weak_ptr<blkdev::internal::disk_handle> m_diskh;

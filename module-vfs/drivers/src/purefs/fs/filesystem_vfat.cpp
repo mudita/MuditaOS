@@ -3,10 +3,13 @@
 
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
 #include <purefs/fs/drivers/mount_point_vfat.hpp>
+#include <purefs/blkdev/disk_manager.hpp>
+#include <purefs/blkdev/disk_handle.hpp>
 #include <log/log.hpp>
+#include <volume_mapper.hpp>
+
 namespace purefs::fs::drivers
 {
-
     namespace
     {
         /*
@@ -50,6 +53,7 @@ namespace purefs::fs::drivers
         }
          */
     }
+
     auto filesystem_vfat::mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh, std::string_view path)
         -> fsmount
     {
@@ -58,8 +62,26 @@ namespace purefs::fs::drivers
 
     auto filesystem_vfat::mount(fsmount mnt) noexcept -> int
     {
-        auto disk = mnt->disk().lock();
-        if (!disk) {}
-        return -1;
+        auto disk = mnt->disk();
+        if (!disk) {
+            return -EIO;
+        }
+        auto ret = ffat::internal::append_volume(disk);
+        if (ret) {
+            return ret;
+        }
+        return ret;
+    }
+
+    auto filesystem_vfat::filesystem_register_completed() const noexcept -> int
+    {
+        const auto dmgr = disk_mngr();
+        if (dmgr) {
+            ffat::internal::reset_volumes(dmgr);
+            return 0;
+        }
+        else {
+            return -EIO;
+        }
     }
 } // namespace purefs::fs::drivers

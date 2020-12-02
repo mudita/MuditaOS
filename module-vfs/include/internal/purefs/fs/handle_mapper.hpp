@@ -27,6 +27,23 @@ namespace purefs::fs::internal
             return data.size() < index;
         }
         std::size_t insert(T const &value);
+        auto begin() const
+        {
+            return data.begin();
+        }
+        auto end() const
+        {
+            return data.end();
+        }
+        auto size() const
+        {
+            return data.size();
+        }
+        auto clear() -> void
+        {
+            data.clear();
+            unused.clear();
+        }
 
       private:
         std::vector<T> data;
