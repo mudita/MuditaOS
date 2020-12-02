@@ -9,8 +9,7 @@
 
 using namespace bsp;
 
-BlueKitchen::BlueKitchen() : BluetoothCommon()
-{}
+BlueKitchen::BlueKitchen() = default;
 
 BlueKitchen *BlueKitchen::getInstance()
 {

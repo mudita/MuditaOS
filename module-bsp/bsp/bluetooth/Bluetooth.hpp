@@ -89,7 +89,7 @@ namespace bsp {
 
     class BlueKitchen : public BluetoothCommon {
         public:
-          BlueKitchen();
+            BlueKitchen();
             virtual ~BlueKitchen();
             static BlueKitchen *getInstance();
 

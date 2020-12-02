@@ -16,7 +16,7 @@
 
 using namespace bsp;
 
-BlueKitchen::BlueKitchen() : BluetoothCommon()
+BlueKitchen::BlueKitchen()
 {
     to_read       = 0;
     read_buff     = NULL;
