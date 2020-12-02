@@ -28,7 +28,7 @@ If it's impossible to provide any of the above information, then your commit is 
 
 An example of a correctly formatted commit:
 ```
-    [EGD-4544] Changed requirements for commits
+    [EGD-4544] Change requirements for commits
     
     In order to be able to remove the obligation to change the project
     changelog with every PR, provide requirements for commits' title and
