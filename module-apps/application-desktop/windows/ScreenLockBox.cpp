@@ -100,10 +100,11 @@ namespace gui
                                     {{LockWindow->getToken(PinLockBaseWindow::Token::Mins), timeToUnlock}});
             }
             else {
-                LockWindow->setText("app_desktop_screen_wrong_passcode",
-                                    PinLockBaseWindow::TextType::Primary,
-                                    true,
-                                    {{LockWindow->getToken(PinLockBaseWindow::Token::Attempts), value}});
+                LockWindow->setText(
+                    "app_desktop_screen_wrong_passcode",
+                    PinLockBaseWindow::TextType::Primary,
+                    true,
+                    {{LockWindow->getToken(PinLockBaseWindow::Token::Attempts), static_cast<int>(value)}});
             }
             break;
 

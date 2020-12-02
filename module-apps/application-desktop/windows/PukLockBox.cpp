@@ -68,10 +68,11 @@ namespace gui
         switch (type) {
         case PinLockBox::PasscodeErrorType::InvalidPasscode:
             if (value > 1) {
-                LockWindow->setText("app_desktop_sim_setup_wrong_puk",
-                                    PinLockBaseWindow::TextType::Primary,
-                                    true,
-                                    {{LockWindow->getToken(PinLockBaseWindow::Token::Attempts), value}});
+                LockWindow->setText(
+                    "app_desktop_sim_setup_wrong_puk",
+                    PinLockBaseWindow::TextType::Primary,
+                    true,
+                    {{LockWindow->getToken(PinLockBaseWindow::Token::Attempts), static_cast<int>(value)}});
             }
             else {
                 LockWindow->setText(

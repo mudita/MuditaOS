@@ -72,10 +72,11 @@ namespace gui
                     "app_desktop_sim_setup_wrong_pin_last_attempt", PinLockBaseWindow::TextType::Primary, true);
             }
             else {
-                LockWindow->setText("app_desktop_sim_setup_wrong_pin",
-                                    PinLockBaseWindow::TextType::Primary,
-                                    true,
-                                    {{LockWindow->getToken(PinLockBaseWindow::Token::Attempts), value}});
+                LockWindow->setText(
+                    "app_desktop_sim_setup_wrong_pin",
+                    PinLockBaseWindow::TextType::Primary,
+                    true,
+                    {{LockWindow->getToken(PinLockBaseWindow::Token::Attempts), static_cast<int>(value)}});
             }
             break;
         case PinLockBox::PasscodeErrorType::NewPasscodeConfirmFailed:
@@ -85,7 +86,7 @@ namespace gui
             LockWindow->setText("app_desktop_sim_cme_error",
                                 PinLockBaseWindow::TextType::Primary,
                                 true,
-                                {{LockWindow->getToken(PinLockBaseWindow::Token::CmeCode), value}});
+                                {{LockWindow->getToken(PinLockBaseWindow::Token::CmeCode), static_cast<int>(value)}});
             break;
         }
         }
