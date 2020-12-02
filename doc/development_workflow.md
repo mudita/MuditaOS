@@ -12,7 +12,7 @@ Create a branch or fork, which name is connected to the feature, bug fix, or doc
 
 Commit your work. Each commit that makes it from your branch or fork into the master branch must have a title and a clear description.
 
-If you're part of the MuditaOS core development team, your commit's title *must* start with a Jira ticket number in square brackets e.g. `[EGD-5555]`. Don't add commits that are out of the scope of the Jira issue you are working on.
+If you're part of the MuditaOS core development team, your commit's title *must* start with a Jira ticket number in square brackets e.g. `[EGD-5555]`. Commits from the community will be accompanied by a relevant Jira ticket number during the merge. Don't add commits that are out of the scope of the Jira issue you are working on.
 
 Start your commit's description with a single sentence describing what you are changing using present simple tense and an imperative mood. Please follow these rules:
 
