@@ -30,7 +30,7 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
-
+#include <bsp/light_sensor/light_sensor.hpp>
 #include <cassert>
 #include <list>
 #include <tuple>
@@ -298,6 +298,8 @@ sys::ReturnCodes EventManager::InitHandler()
     sys::WorkerQueueInfo qMagnetometer = {"qMagnetometer", sizeof(uint8_t), 5};
     // torch driver queue
     sys::WorkerQueueInfo qTorch = {"qTorch", sizeof(uint8_t), 5};
+    // light sensor queue
+    sys::WorkerQueueInfo qLightSensor = {"qLightSensor", sizeof(uint8_t), 5};
 
     std::list<sys::WorkerQueueInfo> list;
 
@@ -308,6 +310,7 @@ sys::ReturnCodes EventManager::InitHandler()
     list.push_back(qSIM);
     list.push_back(qMagnetometer);
     list.push_back(qTorch);
+    list.push_back(qLightSensor);
 
     EventWorker->init(list);
     EventWorker->run();

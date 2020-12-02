@@ -41,6 +41,29 @@ namespace bsp::light_sensor
             return i2c->Read(addr, readout, 4);
         }
 
+        constexpr inline std::uint16_t irqLevelUp  = 400;
+        constexpr inline std::uint16_t irqLevelLow = 0;
+
+        void configureInterrupts()
+        {
+            std::uint8_t reg = ENABLE_IRQ;
+            writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::INTERRUPT), &reg);
+            reg = irqLevelUp & 0xff;
+            writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_UP_0), &reg);
+            reg = irqLevelUp >> 8;
+            writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_UP_1), &reg);
+            reg = irqLevelLow & 0xff;
+            writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_LOW_0), &reg);
+            reg = irqLevelLow >> 8;
+            writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_LOW_1), &reg);
+        }
+
+        void configureMeasurement()
+        {
+            std::uint8_t reg = MEASUREMENT_RATE | INTEGRATION_TIME;
+            writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_MEAS_RATE), &reg);
+        }
+
     } // namespace
 
     std::int32_t init(xQueueHandle qHandle)
@@ -63,7 +86,8 @@ namespace bsp::light_sensor
         gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ));
 
         reset();
-        vTaskDelay(pdMS_TO_TICKS(100));
+        configureMeasurement();
+        configureInterrupts();
         wakeup();
 
         return isPresent() ? kStatus_Success : kStatus_Fail;
@@ -72,28 +96,18 @@ namespace bsp::light_sensor
     void deinit()
     {
         qHandleIrq = NULL;
+        reset();
     }
 
     bool standby()
     {
-        return reset();
+        uint8_t reg = 0;
+        return writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_CONTR), &reg);
     }
 
     void wakeup()
     {
-
-        uint8_t reg = 0x0A;
-        writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::INTERRUPT), &reg);
-        reg = 200;
-        writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_UP_0), &reg);
-        reg = 0;
-        writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_UP_1), &reg);
-        reg = 0;
-        writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_LOW_0), &reg);
-        reg = 0;
-        writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_LOW_1), &reg);
-
-        reg = ACTIVE_MODE;
+        std::uint8_t reg = ACTIVE_MODE;
         writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_CONTR), &reg);
     }
 
@@ -103,7 +117,7 @@ namespace bsp::light_sensor
         readMeasurementRegisters(reg);
         float readout = decodeVisibleLightMeasurement(reg);
 
-        LOG_DEBUG("!!! Light measurement: %d", static_cast<int>(readout));
+        LOG_DEBUG("!!! Light measurement: %d, encoded: %d ", static_cast<int>(readout));
     }
 
     bool reset()
