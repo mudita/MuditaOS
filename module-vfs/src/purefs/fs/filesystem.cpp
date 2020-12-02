@@ -64,6 +64,7 @@ namespace purefs::fs
             const auto vsi = m_fstypes.find(std::string(fs_type));
             if (vsi == std::end(m_fstypes)) {
                 LOG_ERROR("VFS: requested filesystem %.*s not registered", int(fs_type.length()), fs_type.data());
+                return -ENODEV;
             }
             // Trying to open disk or part by manager
             blkdev::disk_fd_t diskh;

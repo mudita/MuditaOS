@@ -7,9 +7,13 @@
 #include <tuple>
 #include <memory>
 
-namespace purefs::blkdev::internal
+namespace purefs::blkdev
 {
-    class disk_handle;
+    namespace internal
+    {
+        class disk_handle;
+    }
+    class disk_manager;
 }
 
 namespace purefs::fs
@@ -23,12 +27,13 @@ namespace purefs::fs
     }; // namespace internal
 
     /** Filesystem specific driver base class */
-    class filesystem_operations
+    class filesystem_operations : public std::enable_shared_from_this<filesystem_operations>
     {
       public:
         using fsfile                                         = std::shared_ptr<internal::file_handle>;
         using fsdir                                          = std::shared_ptr<internal::directory_handle>;
         using fsmount                                        = std::shared_ptr<internal::mount_point>;
+        filesystem_operations(std::weak_ptr<blkdev::disk_manager> diskmgr);
         filesystem_operations(const filesystem_operations &) = delete;
         virtual ~filesystem_operations()                     = default;
         auto operator=(const filesystem_operations &) = delete;
@@ -80,5 +85,6 @@ namespace purefs::fs
 
       private:
         std::size_t m_mount_count{};
+        const std::weak_ptr<blkdev::disk_manager> m_diskmm;
     };
 } // namespace purefs::fs

@@ -62,7 +62,7 @@ namespace purefs::fs
          * @param[in] flags  Mount flags
          * @return zero on success otherwise error
          */
-        auto mount(std::string_view dev_or_part, std::string_view target, std::string_view fs_type, unsigned flags)
+        auto mount(std::string_view dev_or_part, std::string_view target, std::string_view fs_type, unsigned flags = 0)
             -> int;
         /** Unmont filesystem from selected mount point
          * @param[in] mount_point Mount point where the fs is mounted
@@ -200,7 +200,6 @@ namespace purefs::fs
             else
                 return -EIO;
         }
-
       private:
         std::weak_ptr<blkdev::disk_manager> m_diskmm;
         std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;

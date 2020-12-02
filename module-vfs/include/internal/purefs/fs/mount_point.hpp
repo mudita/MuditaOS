@@ -26,6 +26,7 @@ namespace purefs::fs::internal
                     std::shared_ptr<filesystem_operations> fs)
             : m_diskh(diskh), m_path(path), m_fs(fs)
         {}
+        virtual ~mount_point() = default;
         auto disk() const noexcept
         {
             return m_diskh;
@@ -38,7 +39,6 @@ namespace purefs::fs::internal
         {
             return m_fs;
         }
-
       private:
         const std::weak_ptr<blkdev::internal::disk_handle> m_diskh;
         const std::string_view m_path;                   //! Mounted path

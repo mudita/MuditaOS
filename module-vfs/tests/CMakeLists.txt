@@ -18,6 +18,13 @@ add_catch2_executable(
         module-vfs
 )
 
+add_catch2_executable(
+    NAME vfs-core-fs
+    SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_core.cpp
+    LIBS
+        module-vfs
+)
 
 # prepare test assets
 set(ASSETS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test_dir")
