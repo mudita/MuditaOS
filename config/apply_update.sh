@@ -2,8 +2,6 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-set -o v
-
 #
 # It works when the phone is in USB-MSC mode, it will apply the .tar
 # file provided as the -u parameter to the script, as the "current

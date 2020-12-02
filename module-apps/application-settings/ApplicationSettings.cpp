@@ -21,6 +21,7 @@
 #include "ApplicationSettings.hpp"
 
 #include "service-cellular/ServiceCellular.hpp"
+#include <service-cellular/CellularServiceAPI.hpp>
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/SimSelectWindow.hpp"
 #include "windows/CellularPassthroughWindow.hpp"
@@ -188,9 +189,7 @@ namespace app
     void ApplicationSettings::setSim(Store::GSM::SIM sim)
     {
         settings->setValue(settings::SystemProperties::activeSim, utils::enumToString(sim));
-        Store::GSM::get()->selected = sim;
-        bsp::cellular::sim::sim_sel();
-        bsp::cellular::sim::hotswap_trigger();
+        CellularServiceAPI::SetSimCard(this, sim);
     }
 
     void ApplicationSettings::setPin(unsigned int value)
