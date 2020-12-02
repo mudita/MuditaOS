@@ -12,8 +12,8 @@ namespace bsp::eink_frontlight
     namespace
     {
         std::shared_ptr<drivers::DriverPWM> pwm;
-        constexpr inline auto PWM_FREQUENCY_HZ       = 20000;
-        constexpr inline float gamma                 = 2.5f;
+        constexpr inline auto PWM_FREQUENCY_HZ = 20000;
+        constexpr inline float gamma           = 2.5f;
 
         constexpr inline std::uint8_t gammaCorrection(BrightnessPercentage brightness)
         {
