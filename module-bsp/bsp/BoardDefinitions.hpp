@@ -109,6 +109,10 @@ enum class BoardDefinitions
     KEYPAD_BACKLIGHT_DRIVER_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
     KEYPAD_BACKLIGHT_DRIVER_NRST = 3, // GPIO_AD_B0_03 Active LOW. External pulldown resistor of 10Ω between NRST and GND.
 
+    LIGHT_SENSOR_I2C = AUDIOCODEC_I2C,
+	LIGHT_SENSOR_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
+    LIGHT_SENSOR_IRQ_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_2),
+    LIGHT_SENSOR_IRQ = 15, // GPIO_AD_B1_04
 };
 
 #endif //PUREPHONE_BOARDDEFINITIONS_HPP
