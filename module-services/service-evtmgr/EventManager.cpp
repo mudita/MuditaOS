@@ -276,8 +276,14 @@ sys::ReturnCodes EventManager::InitHandler()
     connect(sevm::KeypadBacklightMessage(), [&](sys::Message *msgl) {
         auto msg         = static_cast<sevm::KeypadBacklightMessage *>(msgl);
         auto message     = std::make_shared<sevm::KeypadBacklightMessage>();
-        message->success = msg->processAction(msg->action);
+        message->success = processKeypadBacklightRequest(msg->action);
         return message;
+    });
+
+    connect(sevm::EinkFrontlightMessage(), [&](sys::Message *msgl) {
+        auto msg = static_cast<sevm::EinkFrontlightMessage *>(msgl);
+        processEinkFrontlightRequest(msg->action, msg->value);
+        return std::make_shared<sys::ResponseMessage>();
     });
 
     // initialize keyboard worker
@@ -347,4 +353,37 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
 
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
     return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
+}
+
+bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action act)
+{
+    bool response = false;
+    switch (act) {
+    case bsp::keypad_backlight::Action::turnOn:
+        response = bsp::keypad_backlight::turnOnAll();
+        break;
+    case bsp::keypad_backlight::Action::turnOff:
+        response = bsp::keypad_backlight::shutdown();
+        break;
+    case bsp::keypad_backlight::Action::checkState:
+        response = bsp::keypad_backlight::checkState();
+        break;
+    }
+    return response;
+}
+
+void EventManager::processEinkFrontlightRequest(bsp::eink_frontlight::Action act,
+                                                bsp::eink_frontlight::BrightnessPercentage val)
+{
+    switch (act) {
+    case bsp::eink_frontlight::Action::turnOn:
+        bsp::eink_frontlight::turnOn();
+        break;
+    case bsp::eink_frontlight::Action::turnOff:
+        bsp::eink_frontlight::turnOff();
+        break;
+    case bsp::eink_frontlight::Action::setBrightness:
+        bsp::eink_frontlight::setBrightness(val);
+        break;
+    }
 }
