@@ -29,6 +29,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_dmamux.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_edma.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_wdog.c"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_pwm.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/irq/irq_gpio.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/board.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/chip.cpp"
@@ -62,6 +63,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${USB_SRC}"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverPLL.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverI2C.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverPWM.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverDMAMux.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverDMA.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverGPIO.cpp"
@@ -69,8 +71,8 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/magnetometer/ALS31300.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/torch/torch.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/keypad_backlight/keypad_backlight.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eink_frontlight/eink_frontlight.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/light_sensor/light_sensor.cpp"
-	
 	CACHE INTERNAL ""
 )
 

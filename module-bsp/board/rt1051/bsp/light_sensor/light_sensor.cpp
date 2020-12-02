@@ -117,7 +117,7 @@ namespace bsp::light_sensor
         readMeasurementRegisters(reg);
         float readout = decodeVisibleLightMeasurement(reg);
 
-        LOG_DEBUG("!!! Light measurement: %d, encoded: %d ", static_cast<int>(readout));
+        LOG_DEBUG("!!! Light measurement: %d", static_cast<int>(readout));
     }
 
     bool reset()

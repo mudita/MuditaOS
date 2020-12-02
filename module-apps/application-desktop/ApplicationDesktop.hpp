@@ -100,6 +100,7 @@ namespace app
                      manager::actions::RequestPinChange,
                      manager::actions::UnlockSim,
                      manager::actions::BlockSim,
+                     manager::actions::ShowMMIResponse,
                      manager::actions::DisplayCMEError}};
         }
     };

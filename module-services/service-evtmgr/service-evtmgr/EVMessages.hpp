@@ -15,6 +15,7 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/torch/torch.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
+#include <bsp/eink_frontlight/eink_frontlight.hpp>
 
 #include <string>
 
@@ -130,10 +131,20 @@ namespace sevm
         explicit KeypadBacklightMessage() : Message(MessageType::EVMKeypadBacklightMessage)
         {}
 
-        bool processAction(bsp::keypad_backlight::Action act);
-
         bsp::keypad_backlight::Action action;
         bool success;
+    };
+
+    class EinkFrontlightMessage : public Message
+    {
+      public:
+        explicit EinkFrontlightMessage(bsp::eink_frontlight::Action act = bsp::eink_frontlight::Action::turnOff,
+                                       std::uint8_t val                 = 0)
+            : Message(MessageType::EVMEinkFrontlightMessage), action(act), value(val)
+        {}
+
+        bsp::eink_frontlight::Action action;
+        bsp::eink_frontlight::BrightnessPercentage value;
     };
 
 } /* namespace sevm*/

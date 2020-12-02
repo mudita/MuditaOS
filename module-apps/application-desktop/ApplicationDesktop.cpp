@@ -11,6 +11,7 @@
 #include "windows/LockedInfoWindow.hpp"
 #include "windows/Reboot.hpp"
 #include "windows/Update.hpp"
+#include "windows/MmiPullWindow.hpp"
 #include "AppWindow.hpp"
 #include "data/LockPhoneData.hpp"
 
@@ -61,6 +62,11 @@ namespace app
 
         addActionReceiver(app::manager::actions::DisplayCMEError, [this](auto &&data) {
             lockHandler.handleCMEError(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::ShowMMIResponse, [this](auto &&data) {
+            switchWindow(app::window::name::desktop_mmi_pull, std::move(data));
             return msgHandled();
         });
     }
@@ -326,6 +332,9 @@ namespace app
         });
         windowsFactory.attach(desktop_update, [](Application *app, const std::string newname) {
             return std::make_unique<gui::UpdateWindow>(app);
+        });
+        windowsFactory.attach(desktop_mmi_pull, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::MmiPullWindow>(app, desktop_mmi_pull);
         });
     }
 
