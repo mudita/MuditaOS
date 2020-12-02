@@ -8,6 +8,12 @@
 #include "fsl_lpuart.h"
 #include "board.h"
 
+#if DEBUG_BLUETOOTH_HCI_COMS >= 1
+#define log_hci_stack(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define log_hci_stack(...)
+#endif
+
 using namespace bsp;
 
 BlueKitchen::BlueKitchen() : BluetoothCommon()
@@ -34,12 +40,9 @@ BlueKitchen *BlueKitchen::getInstance()
 
 ssize_t BlueKitchen::read(uint8_t *buf, size_t nbytes)
 {
-#ifdef DO_DEBUG_HCI_COMS
-    LOG_DEBUG("BlueKitchen requested %d bytes to read", nbytes);
-#endif
+    log_hci_stack("BlueKitchen requested to read %d bytes", nbytes);
 
     ssize_t i            = 0;
-    BaseType_t taskwoken = 0;
     uint8_t val;
 
     to_read = nbytes;
@@ -73,15 +76,8 @@ ssize_t BlueKitchen::write(const uint8_t *buf, size_t size)
     BaseType_t taskwoken = 0;
     uint8_t val;
 
-#ifdef DO_DEBUG_HCI_COMS
-    LOG_DEBUG("BlueKitchen sends %d bytes", size);
+    log_hci_stack("BlueKitchen sends %d bytes", size);
 
-    std::stringstream ss;
-    for (int i = 0; i < size; ++i) {
-        ss << " 0x" << std::hex << (int)buf[i];
-    }
-    LOG_DEBUG("--> [%d]>%s<", size, ss.str().c_str());
-#endif
     if (BluetoothCommon::write(buf, size) == size) {
         val = Bt::Message::EvtSending;
         xQueueSendFromISR(qHandle, &val, &taskwoken);

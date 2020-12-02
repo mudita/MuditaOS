@@ -10,6 +10,13 @@
 #include "FreeRTOS.h"
 #include "fsl_lpuart.h"
 #include "board.h"
+#include "module-bsp/board/rt1051/common/fsl_drivers/fsl_lpuart_edma.c"
+
+#if DEBUG_BLUETOOTH_HCI_COMS >= 2
+#define log_hci_xfers(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define log_hci_xfers(...)
+#endif
 
 using namespace bsp;
 
@@ -70,11 +77,10 @@ ssize_t BluetoothCommon::read(uint8_t *buf, size_t nbytes)
         break;
     case kStatus_LPUART_RxBusy:
         ret = -1;
+        LOG_WARN("BT UART RX DMA already busy");
         break;
     case kStatus_InvalidArgument:
-#ifdef DO_DEBUG_HCI_COMS
-        LOG_ERROR("BT UART RX DMA invalid argument");
-#endif
+        LOG_WARN("BT UART RX DMA invalid argument");
         ret = -1;
         break;
     }
@@ -83,12 +89,12 @@ ssize_t BluetoothCommon::read(uint8_t *buf, size_t nbytes)
 
 ssize_t BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
 {
-#ifdef DO_DEBUG_HCI_COMS
+#if DEBUG_BLUETOOTH_HCI_COMS >= 3
     std::stringstream ss;
-    for (auto i = 0; i < nbytes; ++i) {
+    for (int i = 0; i < size; ++i) {
         ss << " 0x" << std::hex << (int)buf[i];
     }
-    LOG_DEBUG("write DMA -> [%d]>%s<", nbytes, ss.str().c_str());
+    LOG_DEBUG("BT DMA to write --> [%d]>%s<", size, ss.str().c_str());
 #endif
 
     lpuart_transfer_t sendXfer;
@@ -105,18 +111,14 @@ ssize_t BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
     SCB_CleanInvalidateDCache();
     auto sent = LPUART_SendEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &sendXfer);
     switch (sent) {
-    case kStatus_Success: {
-        // orchestrate a DMA tx
-#ifdef DO_DEBUG_HCI_COMS
-        LOG_DEBUG("DMA Tx pending");
-#endif
+    case kStatus_Success:
+        // orchestrate a DMA Tx
+        log_hci_xfers("DMA Tx started (%d)", nbytes);
         ret = nbytes;
-    } break;
+        break;
     case kStatus_LPUART_TxBusy:
         // could've checked beforehand
-#ifdef DO_DEBUG_HCI_COMS
-        LOG_ERROR("Previous DMA xfer is still pending");
-#endif
+        LOG_WARN("Previous DMA Tx is still pending");
         ret = -1;
         break;
     case kStatus_InvalidArgument:
@@ -137,7 +139,7 @@ ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t nbytes)
         constexpr auto writeBlockingTimeout = pdMS_TO_TICKS(100);
         auto ulNotificationValue              = ulTaskNotifyTake(pdFALSE, writeBlockingTimeout);
         if (ulNotificationValue != 0) { // success completing a transfer
-            LOG_DEBUG("DMA Tx wrote");
+            log_hci_xfers("DMA Tx wrote");
             ret = nbytes;
         }
         else {
@@ -165,9 +167,10 @@ BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
 
 BTdev::Error BluetoothCommon::set_reset(bool on)
 {
-    if (on && (GPIO_PinRead(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN) == 0)) {
+    if (on){
+        GPIO_PinWrite(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, 0);
         // docs: "nSHUTD must be low for a minimum of 5 ms."
-        sleep_ms(5);
+        sleep_ms(5+2);
     }
     LOG_INFO("reset %s", on ? "on" : "off");
     GPIO_PinWrite(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, on ? 1U : 0U);
@@ -260,27 +263,19 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
 
     switch (status) {
     case kStatus_LPUART_TxIdle: {
-#ifdef DO_DEBUG_HCI_COMS
-        LOG_DEBUG("DMA irq: TX done");
-#endif
+        log_hci_xfers("DMA irq: TX done");
         LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
         val = Bt::Message::EvtSent;
         xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
+        portEND_SWITCHING_ISR(taskwoken);
         break;
     }
     case kStatus_LPUART_RxIdle:
-#ifdef DO_DEBUG_HCI_COMS
-        LOG_DEBUG("DMA irq: RX done");
-#endif
+        log_hci_xfers("DMA irq: RX done");
         LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, false);
         val = Bt::Message::EvtReceived;
         xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         portEND_SWITCHING_ISR(taskwoken);
-        break;
-    default:
-#ifdef DO_DEBUG_HCI_COMS
-        LOG_DEBUG("DMA irq: something else! (%ld). Quite impossible", status);
-#endif
         break;
     }
 }

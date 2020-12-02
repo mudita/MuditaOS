@@ -6,6 +6,7 @@
 #define DEBUG_APPLICATION_MANAGEMENT 0 /// show verbose logs in ApplicationManager
 #define DEBUG_SCOPED_TIMINGS         0 /// show timings in measured functions
 #define _RT1051_UART_DEBUG           0 /// show full modem uart communication
+#define DEBUG_BLUETOOTH_HCI_COMS     0 /// show cooms with BT module. Verbosity: 1 (stack+events), 2 (xfers), 3 (bytes)
 #define DEBUG_MODEM_OUTPUT_RESPONSE  0 /// show full modem output
 #define DEBUG_SERVICE_MESSAGES       0 /// show messages prior to handling in service
 #define DEBUG_DB_MODEL_DATA          0 /// show messages prior to handling in service
