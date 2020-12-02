@@ -73,20 +73,18 @@ ssize_t BlueKitchen::write(const uint8_t *buf, size_t size)
 {
 
     ssize_t i            = 0;
-    BaseType_t taskwoken = 0;
     uint8_t val;
 
     log_hci_stack("BlueKitchen sends %d bytes", size);
 
     if (BluetoothCommon::write(buf, size) == size) {
         val = Bt::Message::EvtSending;
-        xQueueSendFromISR(qHandle, &val, &taskwoken);
+        xQueueSend(qHandle, &val, portMAX_DELAY);
     }
     else {
         val = Bt::Message::EvtSendingError;
-        xQueueSendFromISR(qHandle, &val, &taskwoken);
+        xQueueSend(qHandle, &val, portMAX_DELAY);
     }
-    portEND_SWITCHING_ISR(taskwoken);
 
     return i;
 }
