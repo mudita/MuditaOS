@@ -2,12 +2,14 @@
 
 ### Added
 * `[cellular]` SIM API for change pin, set/reset sim lock, switch sim card
+* `[notes]`    MMI/USSD communication window
 
 [Current release]
 
 ### Added
 * `[notes]` Notes application implemented.
 * `[notes]` Notes search engine implemented.
+
 
 ### Changed
 
