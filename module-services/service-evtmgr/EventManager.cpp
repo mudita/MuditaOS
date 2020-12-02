@@ -373,7 +373,7 @@ bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action a
 }
 
 void EventManager::processEinkFrontlightRequest(bsp::eink_frontlight::Action act,
-                                                bsp::eink_frontlight::BrightnessLevel val)
+                                                bsp::eink_frontlight::BrightnessPercentage val)
 {
     switch (act) {
     case bsp::eink_frontlight::Action::turnOn:

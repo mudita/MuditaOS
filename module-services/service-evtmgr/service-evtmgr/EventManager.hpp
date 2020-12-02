@@ -63,5 +63,5 @@ class EventManager : public sys::Service
 
     bool processKeypadBacklightRequest(bsp::keypad_backlight::Action act);
 
-    void processEinkFrontlightRequest(bsp::eink_frontlight::Action act, bsp::eink_frontlight::BrightnessLevel val);
+    void processEinkFrontlightRequest(bsp::eink_frontlight::Action act, bsp::eink_frontlight::BrightnessPercentage val);
 };

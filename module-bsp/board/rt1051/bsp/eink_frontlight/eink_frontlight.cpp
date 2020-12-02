@@ -13,23 +13,13 @@ namespace bsp::eink_frontlight
     {
         std::shared_ptr<drivers::DriverPWM> pwm;
         constexpr inline auto PWM_FREQUENCY_HZ       = 20000;
-        constexpr inline auto EINK_BRIGHTNESS_LEVELS = 5;
+        constexpr inline float gamma                 = 2.5f;
 
-        // 0 to N points mapping to 0-100 duty cycle with gamma correction
-        template <unsigned N> struct GammaCorrectionLUT
+        constexpr inline std::uint8_t gammaCorrection(BrightnessPercentage brightness)
         {
-            static_assert(N > 0, "Number of elements should be greater than 0");
-            constexpr GammaCorrectionLUT() : values()
-            {
-                constexpr float gamma = 2.5f;
-                constexpr float scale = 100.0f / N;
-                for (auto i = 0; i <= N; ++i) {
-                    values[i] = static_cast<std::uint8_t>(100 * std::pow(((i * scale) / 100), gamma));
-                }
-            }
-            std::array<std::uint8_t, N + 1> values;
-        };
-        GammaCorrectionLUT<EINK_BRIGHTNESS_LEVELS> gammaCorrection;
+            std::clamp(brightness, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(100));
+            return static_cast<std::uint8_t>(100 * std::pow((brightness / 100.0f), gamma));
+        }
 
     } // namespace
 
@@ -50,11 +40,9 @@ namespace bsp::eink_frontlight
         turnOff();
     }
 
-    void setBrightness(BrightnessLevel brightness)
+    void setBrightness(BrightnessPercentage brightness)
     {
-        std::clamp(
-            brightness, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(gammaCorrection.values.size() - 1));
-        pwm->SetDutyCycle(gammaCorrection.values[brightness]);
+        pwm->SetDutyCycle(gammaCorrection(brightness));
     }
 
     void turnOn()

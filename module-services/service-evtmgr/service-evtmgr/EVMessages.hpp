@@ -144,7 +144,7 @@ namespace sevm
         {}
 
         bsp::eink_frontlight::Action action;
-        bsp::eink_frontlight::BrightnessLevel value;
+        bsp::eink_frontlight::BrightnessPercentage value;
     };
 
 } /* namespace sevm*/

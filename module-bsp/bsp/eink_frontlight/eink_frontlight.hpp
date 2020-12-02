@@ -16,13 +16,13 @@ namespace bsp::eink_frontlight
         setBrightness,
     };
 
-    using BrightnessLevel = uint8_t;
+    using BrightnessPercentage = uint8_t;
 
     void init();
 
     void deinit();
 
-    void setBrightness(BrightnessLevel brightness); // In 1-5 scale
+    void setBrightness(BrightnessPercentage brightness);
 
     void turnOn();
     
