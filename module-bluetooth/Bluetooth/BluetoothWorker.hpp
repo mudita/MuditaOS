@@ -43,9 +43,9 @@ namespace Bt
         case EvtRecUnwanted:
             return "EvtRecUnwanted";
         case EvtReceivingError:
-            return "EvtRecError";
+            return "EvtReceivingError";
         case EvtSendingError:
-            return "EvtSentError";
+            return "EvtSendingError";
         case EvtUartError:
             return "EvtUartError";
         case EvtErrorRec:
