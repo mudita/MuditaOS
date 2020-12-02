@@ -32,7 +32,7 @@ namespace drivers
 
         void RestorePwmOutput();
 
-        PWM_Type *base;
+        PWM_Type *base = nullptr;
 
         pwm_submodule_t pwmModule = kPWM_Module_0;
 

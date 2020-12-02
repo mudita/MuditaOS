@@ -31,8 +31,6 @@ namespace drivers
             base = PWM4;
             LOG_DEBUG("Init: PWM4");
             break;
-        default:
-            break;
         }
 
         switch (module) {
@@ -51,8 +49,6 @@ namespace drivers
         case PWMModules::MODULE3:
             pwmModule = kPWM_Module_3;
             LOG_DEBUG("Init: PWM module 3");
-            break;
-        default:
             break;
         }
 
@@ -106,8 +102,6 @@ namespace drivers
         case PWMChannel::X:
             pwmSignalConfig.pwmChannel = kPWM_PwmX;
             LOG_DEBUG("Init: PWM channel X");
-            break;
-        default:
             break;
         }
 

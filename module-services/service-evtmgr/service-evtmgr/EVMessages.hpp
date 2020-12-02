@@ -131,8 +131,6 @@ namespace sevm
         explicit KeypadBacklightMessage() : Message(MessageType::EVMKeypadBacklightMessage)
         {}
 
-        bool processAction(bsp::keypad_backlight::Action act);
-
         bsp::keypad_backlight::Action action;
         bool success;
     };
@@ -145,11 +143,8 @@ namespace sevm
             : Message(MessageType::EVMEinkFrontlightMessage), action(act), value(val)
         {}
 
-        void processAction();
-
-      private:
-        const bsp::eink_frontlight::Action action;
-        const bsp::eink_frontlight::BrightnessLevel value;
+        bsp::eink_frontlight::Action action;
+        bsp::eink_frontlight::BrightnessLevel value;
     };
 
 } /* namespace sevm*/
