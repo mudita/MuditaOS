@@ -15,6 +15,7 @@
 #include <memory>               // for unique_ptr
 #include <utility>              // for move
 #include <core/DrawCommandForward.hpp>
+#include <module-gui/gui/dom/GuiVisitor.hpp>
 
 namespace gui
 {
@@ -349,6 +350,8 @@ namespace gui
 
         /// remove timer from item and as a result - destory it
         void detachTimer(Timer &timer);
+
+        virtual void accept(GuiVisitor &visitor);
 
       protected:
         /// On change of position or size this method will recalculate visible part of the widget

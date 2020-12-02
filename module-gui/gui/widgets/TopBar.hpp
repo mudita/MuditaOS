@@ -108,6 +108,7 @@ namespace gui
         {
             return time;
         };
+        void accept(GuiVisitor &visitor) override;
     };
 
 } /* namespace gui */

@@ -61,4 +61,8 @@ namespace gui
                inputEvent.keyCode == gui::KeyCode::KEY_ENTER && onActivated(nullptr);
     }
 
+    void Window::accept(GuiVisitor &visitor)
+    {
+        visitor.visit(*this);
+    }
 } /* namespace gui */

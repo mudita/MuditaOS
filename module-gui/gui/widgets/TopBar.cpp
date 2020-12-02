@@ -289,4 +289,8 @@ namespace gui
         sim->visible = false;
     }
 
+    void TopBar::accept(GuiVisitor &visitor)
+    {
+        visitor.visit(*this);
+    }
 } /* namespace gui */

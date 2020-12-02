@@ -17,6 +17,9 @@
 
 #include <module-utils/i18n/i18n.hpp>
 
+#include <iostream>
+#include <module-gui/gui/dom/GuiDOMVisitor.hpp>
+
 namespace gui
 {
     MeditationWindow::MeditationWindow(app::Application *app) : AppWindow{app, name::window::main_window}
@@ -87,6 +90,12 @@ namespace gui
                                                                              app->state->showCounter);
                 application->switchWindow(app::window::name::meditation_timer, std::move(timerSwitchData));
                 return true;
+            }
+            else if (inputEvent.is(KeyCode::KEY_VOLDN)) {
+                GuiDOMVisitor visitor;
+                std::cout << "starting walk" << std::endl;
+                this->accept(visitor);
+                visitor.dumpDOM();
             }
         }
         return AppWindow::onInput(inputEvent);
