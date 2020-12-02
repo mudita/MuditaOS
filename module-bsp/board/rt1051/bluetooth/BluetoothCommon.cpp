@@ -138,7 +138,7 @@ ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t nbytes)
 
     if (wrote == nbytes) { // success orchestrating a transfer
         constexpr auto writeBlockingTimeout = pdMS_TO_TICKS(100);
-        auto ulNotificationValue              = ulTaskNotifyTake(pdFALSE, writeBlockingTimeout);
+        auto ulNotificationValue            = ulTaskNotifyTake(pdFALSE, writeBlockingTimeout);
         if (ulNotificationValue != 0) { // success completing a transfer
             log_hci_xfers("DMA Tx wrote");
             ret = nbytes;
@@ -157,8 +157,8 @@ ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t nbytes)
 BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
 {
     LOG_INFO("Set baudrate: %" PRIu32, bd);
-    Error ret          = Success;
-    int err            = 0;
+    Error ret = Success;
+    int err   = 0;
     if ((err = LPUART_SetBaudRate(BSP_BLUETOOTH_UART_BASE, bd, UartGetPeripheralClock())) != 0) {
         LOG_ERROR("BT error: baudrate [%lu] set err: %d", bd, err);
         ret = ErrorBSP;
@@ -168,10 +168,10 @@ BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
 
 BTdev::Error BluetoothCommon::set_reset(bool on)
 {
-    if (on){
+    if (on) {
         GPIO_PinWrite(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, 0);
         // docs: "nSHUTD must be low for a minimum of 5 ms."
-        sleep_ms(5+2);
+        sleep_ms(5 + 2);
     }
     LOG_INFO("reset %s", on ? "on" : "off");
     GPIO_PinWrite(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, on ? 1U : 0U);
@@ -226,14 +226,13 @@ void BluetoothCommon::configure_lpuart()
     bt_c.enableRx      = false;
     bt_c.enableTxCTS   = true;
     bt_c.txCtsConfig   = kLPUART_CtsSampleAtStart; // to be able to stop TX mid-transfer
+    bt_c.enableRxRTS   = true;                     // == BSP_BLUETOOTH_UART_BASE->MODIR |= LPUART_MODIR_RXRTSE_MASK;
 
     if (LPUART_Init(BSP_BLUETOOTH_UART_BASE, &bt_c, UartGetPeripheralClock()) != kStatus_Success) {
         LOG_ERROR("BT: UART config error Could not initialize the uart!");
         return;
     }
     BSP_BLUETOOTH_UART_BASE->MODIR |= LPUART_MODIR_TXRTSPOL_MASK; // apparently docs are not clear here. HIGH during TX
-    BSP_BLUETOOTH_UART_BASE->MODIR |= LPUART_MODIR_RXRTSE_MASK;
-//    BSP_BLUETOOTH_UART_BASE->MODIR |= LPUART_MODIR_TXRTSE_MASK;
 
     LPUART_ClearStatusFlags(BSP_BLUETOOTH_UART_BASE, 0xFFFFFFFF);
     NVIC_ClearPendingIRQ(LPUART2_IRQn);
@@ -268,7 +267,7 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
     switch (status) {
     case kStatus_LPUART_TxIdle: {
         log_hci_xfers("DMA irq: TX done");
-//        LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
+        LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
         val = Bt::Message::EvtSent;
         xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         portEND_SWITCHING_ISR(taskwoken);
@@ -276,7 +275,7 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
     }
     case kStatus_LPUART_RxIdle:
         log_hci_xfers("DMA irq: RX done");
-//        LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, false);
+        LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, false);
         val = Bt::Message::EvtReceived;
         xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         portEND_SWITCHING_ISR(taskwoken);

@@ -42,7 +42,7 @@ ssize_t BlueKitchen::read(uint8_t *buf, size_t nbytes)
 {
     log_hci_stack("BlueKitchen requested to read %d bytes", nbytes);
 
-    ssize_t i            = 0;
+    ssize_t i = 0;
     uint8_t val;
 
     to_read = nbytes;
