@@ -5,9 +5,16 @@
 
 #include <cstdint>
 
+extern "C"
+{
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+}
+
 namespace bsp::light_sensor
 {
-    std::int32_t init();
+    std::int32_t init(xQueueHandle qHandle);
 
     void deinit();
 
@@ -20,4 +27,6 @@ namespace bsp::light_sensor
     bool isPresent();
 
     void readout();
+
+    BaseType_t IRQHandler();
 } // namespace bsp::light_sensor

@@ -18,6 +18,7 @@
 #include <bsp/rtc/rtc.hpp>
 #include <bsp/torch/torch.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
+#include <bsp/light_sensor/light_sensor.hpp>
 #include <bsp/vibrator/vibrator.hpp>
 #include <common_data/EventStore.hpp>
 #include <common_data/RawKey.hpp>
@@ -165,6 +166,16 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         }
     }
 
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueLightSensor)) {
+        uint8_t notification;
+        if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
+            return false;
+        }
+
+        LOG_DEBUG("Light sensor IRQ");
+        bsp::light_sensor::readout();
+    }
+
     return true;
 }
 
@@ -181,6 +192,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     bsp::magnetometer::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]);
     bsp::torch::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueTorch)]);
     bsp::keypad_backlight::init();
+    bsp::light_sensor::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueLightSensor)]);
 
     time_t timestamp;
     bsp::rtc_GetCurrentTimestamp(&timestamp);
@@ -197,6 +209,7 @@ bool WorkerEvent::deinit(void)
     bsp::battery_Deinit();
     bsp::torch::deinit();
     bsp::keypad_backlight::deinit();
+    bsp::light_sensor::deinit();
 
     return true;
 }

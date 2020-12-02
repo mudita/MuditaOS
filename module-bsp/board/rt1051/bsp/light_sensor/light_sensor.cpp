@@ -10,11 +10,6 @@
 #include "fsl_common.h"
 #include "log/log.hpp"
 
-extern "C"
-{
-#include "FreeRTOS.h"
-#include "task.h"
-}
 
 namespace bsp::light_sensor
 {
@@ -22,6 +17,7 @@ namespace bsp::light_sensor
     {
         std::shared_ptr<drivers::DriverGPIO> gpio;
         std::shared_ptr<drivers::DriverI2C> i2c;
+        static xQueueHandle qHandleIrq = NULL;
 
         drivers::I2CAddress addr = {.deviceAddress = static_cast<uint32_t>(LTR303ALS_DEVICE_ADDR), .subAddressSize = 1};
 
@@ -47,8 +43,10 @@ namespace bsp::light_sensor
 
     } // namespace
 
-    std::int32_t init()
+    std::int32_t init(xQueueHandle qHandle)
     {
+        qHandleIrq = qHandle;
+
         drivers::DriverI2CParams i2cParams;
         i2cParams.baudrate = static_cast<std::uint32_t>(BoardDefinitions::LIGHT_SENSOR_I2C_BAUDRATE);
         i2c = drivers::DriverI2C::Create(static_cast<drivers::I2CInstances>(BoardDefinitions::LIGHT_SENSOR_I2C),
@@ -64,13 +62,17 @@ namespace bsp::light_sensor
         gpio->ConfPin(gpioParams);
         gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ));
 
+        reset();
+        vTaskDelay(pdMS_TO_TICKS(100));
         wakeup();
 
         return isPresent() ? kStatus_Success : kStatus_Fail;
     }
 
     void deinit()
-    {}
+    {
+        qHandleIrq = NULL;
+    }
 
     bool standby()
     {
@@ -79,7 +81,19 @@ namespace bsp::light_sensor
 
     void wakeup()
     {
-        uint8_t reg = ACTIVE_MODE;
+
+        uint8_t reg = 0x0A;
+        writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::INTERRUPT), &reg);
+        reg = 200;
+        writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_UP_0), &reg);
+        reg = 0;
+        writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_UP_1), &reg);
+        reg = 0;
+        writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_LOW_0), &reg);
+        reg = 0;
+        writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_THRES_LOW_1), &reg);
+
+        reg = ACTIVE_MODE;
         writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_CONTR), &reg);
     }
 
@@ -106,6 +120,16 @@ namespace bsp::light_sensor
             return false;
         }
         return true;
+    }
+
+    BaseType_t IRQHandler()
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        if (qHandleIrq != NULL) {
+            uint8_t val = 0x01;
+            xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
+        }
+        return xHigherPriorityTaskWoken;
     }
 
 } // namespace bsp::light_sensor
