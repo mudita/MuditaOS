@@ -123,6 +123,7 @@ ssize_t BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
         break;
     case kStatus_InvalidArgument:
         LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
+        LOG_ERROR("DMA Tx invalid arg");
         ret = -1;
         break;
     }
@@ -156,8 +157,8 @@ ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t nbytes)
 BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
 {
     LOG_INFO("Set baudrate: %" PRIu32, bd);
-    Error ret = Success;
-    int err   = 0;
+    Error ret          = Success;
+    int err            = 0;
     if ((err = LPUART_SetBaudRate(BSP_BLUETOOTH_UART_BASE, bd, UartGetPeripheralClock())) != 0) {
         LOG_ERROR("BT error: baudrate [%lu] set err: %d", bd, err);
         ret = ErrorBSP;
@@ -231,6 +232,8 @@ void BluetoothCommon::configure_lpuart()
         return;
     }
     BSP_BLUETOOTH_UART_BASE->MODIR |= LPUART_MODIR_TXRTSPOL_MASK; // apparently docs are not clear here. HIGH during TX
+    BSP_BLUETOOTH_UART_BASE->MODIR |= LPUART_MODIR_RXRTSE_MASK;
+//    BSP_BLUETOOTH_UART_BASE->MODIR |= LPUART_MODIR_TXRTSE_MASK;
 
     LPUART_ClearStatusFlags(BSP_BLUETOOTH_UART_BASE, 0xFFFFFFFF);
     NVIC_ClearPendingIRQ(LPUART2_IRQn);
@@ -265,7 +268,7 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
     switch (status) {
     case kStatus_LPUART_TxIdle: {
         log_hci_xfers("DMA irq: TX done");
-        LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
+//        LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
         val = Bt::Message::EvtSent;
         xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         portEND_SWITCHING_ISR(taskwoken);
@@ -273,7 +276,7 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
     }
     case kStatus_LPUART_RxIdle:
         log_hci_xfers("DMA irq: RX done");
-        LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, false);
+//        LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, false);
         val = Bt::Message::EvtReceived;
         xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         portEND_SWITCHING_ISR(taskwoken);
