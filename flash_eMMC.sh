@@ -62,6 +62,15 @@ echo "PurePhone remove all files"
 rm -rf "$MUDITAOS_PATH_ROOT"/* -r &>/dev/null || echo "PurePhone disk alread empty"
 rm -f "$MUDITAOS_PATH_ROOT"/.boot.json
 rm -f "$MUDITAOS_PATH_ROOT"/.boot.json.crc32
+rm -rf "$MUDITAOS_PATH_ROOT"/.Trash-1000
+
+if [ "$(ls -A $MUDITAOS_PATH_ROOT)" ]; then
+	echo "Couldn't delete all files in $MUDITAOS_PATH_ROOT leftover files:"
+	find $MUDITAOS_PATH_ROOT -type f -printf "%f\n"
+	exit 5
+else
+	echo "$MUDITAOS_PATH_ROOT is Empty"
+fi
 
 echo "Create directories"
 mkdir -p $MUDITAOS_PATH_ROOT/$MUDITAOS_CURRENT
