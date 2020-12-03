@@ -82,11 +82,6 @@ namespace purefs::fs::drivers
         return ret;
     }
 
-    auto filesystem_vfat::stat_vfs(fsmount mnt, std::string_view path, statvfs &stat) const noexcept -> int
-    {
-        return -ENOTSUP;
-    }
-
     auto filesystem_vfat::filesystem_register_completed() const noexcept -> int
     {
         const auto dmgr = disk_mngr();
@@ -98,6 +93,7 @@ namespace purefs::fs::drivers
             return -EIO;
         }
     }
+
     auto filesystem_vfat::umount(fsmount mnt) noexcept -> int
     {
         auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
@@ -110,9 +106,21 @@ namespace purefs::fs::drivers
             LOG_ERROR("Wrong ff_lun");
             return -ENXIO;
         }
+        auto disk = mnt->disk();
+        if (!disk) {
+            return -EIO;
+        }
         int ret = f_mount(nullptr, vmnt->ff_drive(), 1);
         ret     = translate_error(ret);
+        if (!ret) {
+            ret = ffat::internal::remove_volume(disk);
+        }
         return ret;
+    }
+
+    auto filesystem_vfat::stat_vfs(fsmount mnt, std::string_view path, statvfs &stat) const noexcept -> int
+    {
+        return -ENOTSUP;
     }
 
     auto filesystem_vfat::open(fsmount mnt, std::string_view path, int flags, int mode) noexcept -> fsfile
