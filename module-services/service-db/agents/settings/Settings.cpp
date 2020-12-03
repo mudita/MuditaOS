@@ -60,9 +60,9 @@ namespace settings
                 auto [cb, cbWithName] = it_cb->second;
                 if (nullptr != cb && nullptr != cbWithName) {
                     // in case of two callbacks there is a need to duplicate the value
-                    auto valueCopy = val.value_or("");
-                    cb(std::move(val.value_or("")));
-                    cbWithName(key, std::move(valueCopy));
+                    auto value = std::move(val.value_or(""));
+                    cb(std::string{value});
+                    cbWithName(key, std::move(value));
                 }
                 else if (nullptr != cb) {
                     cb(std::move(val.value_or("")));

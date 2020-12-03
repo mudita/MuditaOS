@@ -39,7 +39,7 @@ sys::ReturnCodes ServiceAudio::InitHandler()
     static const std::string defaultTrue       = "1";
     static const std::string defaultFalse      = "0";
 
-    settings = {
+    settingsCache = {
 
         // PLAYBACK
         {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
@@ -92,7 +92,7 @@ sys::ReturnCodes ServiceAudio::InitHandler()
         {dbPath(Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle), defaultTrue},
     };
 
-    for (const auto &setting : settings) {
+    for (const auto &setting : settingsCache) {
         settingsProvider->registerValueChange(
             setting.first, [this](const std::string &name, std::string value) { settingsChanged(name, value); });
     }
@@ -122,14 +122,10 @@ int32_t ServiceAudio::AsyncCallback(PlaybackEvent e)
 uint32_t ServiceAudio::DbCallback(const std::string &path, const uint32_t &defaultValue)
 {
     LOG_DEBUG("ServiceAudio::DBbCallback(%s, %u)", path.c_str(), static_cast<int>(defaultValue));
-    auto settings_it = settings.find(path);
-    if (settings.end() == settings_it) {
-        // not in local cache
-        // insert into cache
-        settings[path] = defaultValue;
-        // set value in db
+    auto settings_it = settingsCache.find(path);
+    if (settingsCache.end() == settings_it) {
+        settingsCache[path] = defaultValue;
         settingsProvider->setValue(path, std::to_string(defaultValue));
-        // register on change - will receive value from db and put it in local cache
         settingsProvider->registerValueChange(
             path, [this](const std::string &variable, std::string value) { settingsChanged(variable, value); });
         return defaultValue;
@@ -573,8 +569,7 @@ std::string ServiceAudio::getSetting(const Setting &setting,
     }
 
     std::string path = dbPath(setting, targetPlayback, targetProfile);
-    auto set_it      = settings.find(path);
-    if (settings.end() != set_it) {
+    if (const auto set_it = settingsCache.find(path); settingsCache.end() != set_it) {
         return set_it->second;
     }
 
@@ -654,8 +649,7 @@ const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurr
 
 void ServiceAudio::settingsChanged(const std::string &name, std::string value)
 {
-    auto s_it = settings.find(name);
-    if (settings.end() != s_it) {
+    if (auto s_it = settingsCache.find(name); settingsCache.end() != s_it) {
         s_it->second = value;
         return;
     }
