@@ -17,6 +17,7 @@
 
 ### Fixed
 
+* `[meditation]` Fix interval chimes choice not scaling with meditation time
 * `[meditation]` Fix of too many time options
 * `[meditation]` Fixed default counter settings
 * `[notes]` Fixed displaying the special characters in a note title.
