@@ -16,6 +16,18 @@ extern "C"
 #include <module-bluetooth/lib/btstack/src/btstack_util.h>
 };
 
+struct BluetoothStatus
+{
+    enum class BluetoothState
+    {
+        On,
+        Off,
+        Error,
+        None
+    } state;
+    bool visibility;
+};
+
 class BluetoothMessage : public sys::DataMessage
 {
   public:
