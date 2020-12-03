@@ -7,57 +7,57 @@
 #include <purefs/blkdev/disk_handle.hpp>
 #include <log/log.hpp>
 #include <volume_mapper.hpp>
+#include <ff.h>
 
 namespace purefs::fs::drivers
 {
     namespace
     {
-        /*
         int translate_error(int error)
         {
             switch (error) {
-                case FR_OK:
-                    return 0;
-                case FR_NO_FILE:
-                case FR_NO_PATH:
-                case FR_INVALID_NAME:
-                    return -ENOENT;
-                case FR_DENIED:
-                    return -EACCES;
-                case FR_EXIST:
-                    return -EEXIST;
-                case FR_INVALID_OBJECT:
-                    return -EBADF;
-                case FR_WRITE_PROTECTED:
-                    return -EROFS;
-                case FR_INVALID_DRIVE:
-                case FR_NOT_ENABLED:
-                case FR_NO_FILESYSTEM:
-                    return -ENODEV;
-                case FR_NOT_ENOUGH_CORE:
-                    return -ENOMEM;
-                case FR_TOO_MANY_OPEN_FILES:
-                    return -EMFILE;
-                case FR_INVALID_PARAMETER:
-                    return -EINVAL;
-                case FR_LOCKED:
-                case FR_TIMEOUT:
-                case FR_MKFS_ABORTED:
-                case FR_DISK_ERR:
-                case FR_INT_ERR:
-                case FR_NOT_READY:
-                    return -EIO;
+            case FR_OK:
+                return 0;
+            case FR_NO_FILE:
+            case FR_NO_PATH:
+            case FR_INVALID_NAME:
+                return -ENOENT;
+            case FR_DENIED:
+                return -EACCES;
+            case FR_EXIST:
+                return -EEXIST;
+            case FR_INVALID_OBJECT:
+                return -EBADF;
+            case FR_WRITE_PROTECTED:
+                return -EROFS;
+            case FR_INVALID_DRIVE:
+            case FR_NOT_ENABLED:
+            case FR_NO_FILESYSTEM:
+                return -ENODEV;
+            case FR_NOT_ENOUGH_CORE:
+                return -ENOMEM;
+            case FR_TOO_MANY_OPEN_FILES:
+                return -EMFILE;
+            case FR_INVALID_PARAMETER:
+                return -EINVAL;
+            case FR_LOCKED:
+            case FR_TIMEOUT:
+            case FR_MKFS_ABORTED:
+            case FR_DISK_ERR:
+            case FR_INT_ERR:
+            case FR_NOT_READY:
+                return -EIO;
             }
 
             return -EIO;
         }
-         */
-    }
+    } // namespace
 
-    auto filesystem_vfat::mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh, std::string_view path)
-        -> fsmount
+    auto filesystem_vfat::mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh,
+                                         std::string_view path,
+                                         unsigned flags) -> fsmount
     {
-        return std::make_shared<mount_point_vfat>(diskh, path, shared_from_this());
+        return std::make_shared<mount_point_vfat>(diskh, path, flags, shared_from_this());
     }
 
     auto filesystem_vfat::mount(fsmount mnt) noexcept -> int
@@ -67,9 +67,18 @@ namespace purefs::fs::drivers
             return -EIO;
         }
         auto ret = ffat::internal::append_volume(disk);
-        if (ret) {
+        if (ret < 0) {
+            LOG_ERROR("Unable to attach volume to ff layer with errno %i", ret);
             return ret;
         }
+        auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non VFAT mount point");
+            return -EIO;
+        }
+        vmnt->ff_drive(ret);
+        ret = f_mount(vmnt->fatfs(), vmnt->ff_drive(), 1);
+        ret = translate_error(ret);
         return ret;
     }
 
@@ -83,5 +92,21 @@ namespace purefs::fs::drivers
         else {
             return -EIO;
         }
+    }
+    auto filesystem_vfat::umount(fsmount mnt) noexcept -> int
+    {
+        auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non VFAT mount point");
+            return -EIO;
+        }
+        const auto lun = vmnt->ff_lun();
+        if (lun < 0) {
+            LOG_ERROR("Wrong ff_lun");
+            return -ENXIO;
+        }
+        int ret = f_mount(nullptr, vmnt->ff_drive(), 1);
+        ret     = translate_error(ret);
+        return ret;
     }
 } // namespace purefs::fs::drivers

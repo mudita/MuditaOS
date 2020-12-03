@@ -84,7 +84,7 @@ namespace purefs::fs
                 }
             }
             if (diskh) {
-                const auto mnt_point = vsi->second->mount_prealloc(diskh, target);
+                const auto mnt_point = vsi->second->mount_prealloc(diskh, target, flags);
                 const auto ret_mnt   = vsi->second->mount(mnt_point);
                 if (!ret_mnt)
                     m_mounts.emplace(std::make_pair(target, mnt_point));

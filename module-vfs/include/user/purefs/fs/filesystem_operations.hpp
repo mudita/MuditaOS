@@ -40,8 +40,9 @@ namespace purefs::fs
         /** Allocate mount point class specify to the VFS
          * @return Allocated mount point structure
          */
-        virtual auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh, std::string_view path)
-            -> fsmount                                   = 0;
+        virtual auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh,
+                                    std::string_view path,
+                                    unsigned flags) -> fsmount = 0;
         virtual auto mount(fsmount mnt) noexcept -> int  = 0;
         virtual auto umount(fsmount mnt) noexcept -> int = 0;
         virtual auto stat_vfs(fsmount mnt, std::string_view path, statvfs &stat) const noexcept -> int;

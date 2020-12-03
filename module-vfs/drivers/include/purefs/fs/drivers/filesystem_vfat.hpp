@@ -16,7 +16,7 @@ namespace purefs::fs::drivers
         auto operator=(const filesystem_vfat &) = delete;
 
       private:
-        auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh, std::string_view path)
+        auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh, std::string_view path, unsigned flags)
             -> fsmount override;
         auto mount(fsmount mnt) noexcept -> int override;
         auto umount(fsmount mnt) noexcept -> int override;
