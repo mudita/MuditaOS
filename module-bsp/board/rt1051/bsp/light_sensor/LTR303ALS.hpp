@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace bsp::light_sensor
 {
     constexpr inline auto LTR303ALS_DEVICE_ADDR = 0x29;
@@ -49,22 +51,22 @@ namespace bsp::light_sensor
 
     constexpr inline float decodeLightMeasurement(std::uint8_t *data)
     {
-        std::uint16_t encodedCh1 = (static_cast<std::uint16_t>(data[1]) << 8) | data[0];
-        std::uint16_t encodedCh0 = (static_cast<std::uint16_t>(data[3]) << 8) | data[2];
+        auto ch1 = static_cast<float>((static_cast<std::uint16_t>(data[1]) << 8) | data[0]);
+        auto ch0 = static_cast<float>((static_cast<std::uint16_t>(data[3]) << 8) | data[2]);
 
-        if (encodedCh0 == 0 || encodedCh1 == 0) {
+        if (ch0 == 0.0f || ch1 == 0.0f) {
             return 0.0f;
         }
-        float ratio = encodedCh1 / (encodedCh1 + encodedCh0);
+        float ratio = ch1 / ((ch1) + ch0);
 
         if (ratio < 0.45f) {
-            return (1.7743 * encodedCh0 + 1.1059 * encodedCh1) / MEASUREMENT_COEFF;
+            return (1.7743f * ch0 + 1.1059f * ch1) / MEASUREMENT_COEFF;
         }
-        else if (ratio < 0.64 && ratio >= 0.45) {
-            return (4.2785 * encodedCh0 - 1.9548 * encodedCh1) / MEASUREMENT_COEFF;
+        else if (ratio < 0.64f && ratio >= 0.45f) {
+            return (4.2785f * ch0 - 1.9548f * ch1) / MEASUREMENT_COEFF;
         }
-        else if (ratio < 0.85 && ratio >= 0.64) {
-            return (0.5926 * encodedCh0 + 0.1185 * encodedCh1) / MEASUREMENT_COEFF;
+        else if (ratio < 0.85f && ratio >= 0.64f) {
+            return (0.5926f * ch0 + 0.1185f * ch1) / MEASUREMENT_COEFF;
         }
         else {
             return 0.0f;
