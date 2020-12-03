@@ -12,7 +12,7 @@
 
 namespace gui
 {
-    class TimerSetter : public Rect
+    class TimerProperty : public Rect
     {
         class State
         {
@@ -49,11 +49,11 @@ namespace gui
         void setMeditationTime();
 
       public:
-        TimerSetter(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h);
+        TimerProperty(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h);
 
         bool onFocus(bool isFocused) final;
         bool onInput(const InputEvent &inputEvent) final;
-        [[nodiscard]] std::chrono::seconds getTime() noexcept;
+        [[nodiscard]] std::chrono::minutes getTime() noexcept;
     };
 
 } // namespace gui

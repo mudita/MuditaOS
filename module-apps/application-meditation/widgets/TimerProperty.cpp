@@ -1,20 +1,20 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "TimerSetter.hpp"
+#include "TimerProperty.hpp"
 #include <application-meditation/data/Style.hpp>
 #include <module-utils/i18n/i18n.hpp>
 #include <module-utils/Utils.hpp>
 
 using namespace gui;
 
-TimerSetter::TimerSetter(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h)
+TimerProperty::TimerProperty(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h)
     : Rect(parent, x, y, w, h)
 {
     build();
 }
 
-void TimerSetter::build()
+void TimerProperty::build()
 {
     const Point boxCenter(getX() + (getWidth() / 2), getY() + (getHeight() / 2));
 
@@ -51,7 +51,7 @@ void TimerSetter::build()
     timeUnitLabel->setText(utils::localize.get("app_meditation_minutes"));
 }
 
-bool TimerSetter::onFocus(bool isFocused)
+bool TimerProperty::onFocus(bool isFocused)
 {
     circle->setFocus(isFocused);
     if (isFocused) {
@@ -64,7 +64,7 @@ bool TimerSetter::onFocus(bool isFocused)
     return true;
 }
 
-bool TimerSetter::onInput(const InputEvent &inputEvent)
+bool TimerProperty::onInput(const InputEvent &inputEvent)
 {
     bool handled = false;
     if (inputEvent.isShortPress()) {
@@ -88,7 +88,7 @@ bool TimerSetter::onInput(const InputEvent &inputEvent)
     return handled;
 }
 
-void TimerSetter::setMeditationTime()
+void TimerProperty::setMeditationTime()
 {
     const auto meditationTime = static_cast<int>(state.getTime().count());
     timeLabel->setText(utils::to_string(meditationTime));
@@ -100,19 +100,19 @@ void TimerSetter::setMeditationTime()
     }
 }
 
-std::chrono::seconds TimerSetter::getTime() noexcept
+std::chrono::minutes TimerProperty::getTime() noexcept
 {
     state.checkBounds();
     return state.getTime();
 }
 
-void TimerSetter::State::checkBounds() noexcept
+void TimerProperty::State::checkBounds() noexcept
 {
     timeInMinutes       = std::clamp(timeInMinutes, minimalValue, maximalValue);
     resetValueOnNumeric = true;
 }
 
-void TimerSetter::State::putNumericValue(int digit) noexcept
+void TimerProperty::State::putNumericValue(int digit) noexcept
 {
     if (resetValueOnNumeric) {
         timeInMinutes       = 0;
@@ -124,7 +124,7 @@ void TimerSetter::State::putNumericValue(int digit) noexcept
     }
 }
 
-void TimerSetter::State::increment() noexcept
+void TimerProperty::State::increment() noexcept
 {
     auto it = std::upper_bound(std::begin(timeArr), std::end(timeArr), timeInMinutes);
     if (it == std::end(timeArr)) {
@@ -134,7 +134,7 @@ void TimerSetter::State::increment() noexcept
     resetValueOnNumeric = true;
 }
 
-void TimerSetter::State::decrement() noexcept
+void TimerProperty::State::decrement() noexcept
 {
     auto it =
         std::upper_bound(std::rbegin(timeArr), std::rend(timeArr), timeInMinutes, [](int a, int b) { return a > b; });
