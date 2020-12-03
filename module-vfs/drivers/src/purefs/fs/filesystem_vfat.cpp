@@ -82,6 +82,11 @@ namespace purefs::fs::drivers
         return ret;
     }
 
+    auto filesystem_vfat::stat_vfs(fsmount mnt, std::string_view path, statvfs &stat) const noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
     auto filesystem_vfat::filesystem_register_completed() const noexcept -> int
     {
         const auto dmgr = disk_mngr();
@@ -109,4 +114,124 @@ namespace purefs::fs::drivers
         ret     = translate_error(ret);
         return ret;
     }
+
+    auto filesystem_vfat::open(fsmount mnt, std::string_view path, int flags, int mode) noexcept -> fsfile
+    {
+        return nullptr;
+    }
+
+    auto filesystem_vfat::close(fsfile zfile) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::write(fsfile zfile, const char *ptr, size_t len) noexcept -> ssize_t
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::read(fsfile zfile, char *ptr, size_t len) noexcept -> ssize_t
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::seek(fsfile zfile, off_t pos, int dir) noexcept -> off_t
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::fstat(fsfile zfile, struct stat &st) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::stat(fsmount mnt, std::string_view file, struct stat &st) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+    auto filesystem_vfat::link(fsmount mnt, std::string_view existing, std::string_view newlink) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::symlink(fsmount mnt, std::string_view existing, std::string_view newlink) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::unlink(fsmount mnt, std::string_view name) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::rename(fsmount mnt, std::string_view oldname, std::string_view newname) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::mkdir(fsmount mnt, std::string_view path, int mode) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::diropen(fsmount mnt, std::string_view path) noexcept -> fsdir
+    {
+        return nullptr;
+    }
+
+    auto filesystem_vfat::dirreset(fsdir dirstate) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::dirnext(fsdir dirstate, std::string &filename, struct stat &filestat) -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::dirclose(fsdir dirstate) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::ftruncate(fsfile zfile, off_t len) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::fsync(fsfile zfile) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::ioctl(fsmount mnt, std::string_view path, int cmd, void *arg) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::utimens(fsmount mnt, std::string_view path, std::array<timespec, 2> &tv) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::flock(fsfile zfile, int cmd) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::isatty(fsfile zfile) noexcept -> int
+    {
+        return 0;
+    }
+
+    auto filesystem_vfat::chmod(fsmount mnt, std::string_view path, mode_t mode) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
+    auto filesystem_vfat::fchmod(fsfile zfile, mode_t mode) noexcept -> int
+    {
+        return -ENOTSUP;
+    }
+
 } // namespace purefs::fs::drivers

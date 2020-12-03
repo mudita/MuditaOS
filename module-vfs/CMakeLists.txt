@@ -25,6 +25,7 @@ third_party_source_optimization(${FREERTOS_FAT_SOURCES})
 
 set(FF_FAT_SOURCES_THIRDPARTY
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source/ff.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source/ffunicode.c
 )
 third_party_source_optimization(${FREERTOS_FAT_SOURCES_THIRDPARTY})
 
@@ -109,13 +110,13 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/user/deprecated
         ${CMAKE_CURRENT_SOURCE_DIR}/include/user/
         ${CMAKE_CURRENT_SOURCE_DIR}/include/internal/
+        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
 )
 
 target_include_directories(${PROJECT_NAME}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source
-        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
 )
 
 target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-bsp module-utils)

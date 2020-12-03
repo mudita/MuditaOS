@@ -15,7 +15,7 @@ namespace purefs::fs::drivers
                          std::string_view path,
                          unsigned flags,
                          std::shared_ptr<filesystem_operations> fs)
-            : mount_point(diskh, path, flags, fs)
+            : mount_point(diskh, path, flags, fs), m_fatfs(std::make_unique<::FATFS>())
         {}
         virtual ~mount_point_vfat() = default;
         auto fatfs() const noexcept

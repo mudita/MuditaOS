@@ -33,6 +33,14 @@ namespace purefs::fs
     {
         class directory_handle;
     }
+    //! Mount flags struct
+    struct mount_flags
+    {
+        enum _mount_flags
+        {
+            read_only = 1U < 0U, // !Read only filesystem
+        };
+    };
 
     class filesystem
     {
@@ -49,6 +57,10 @@ namespace purefs::fs
          * @param[in] fops Filesystem operation structure
          * @return zero on sucess otherwise error
          */
+        template <typename T> auto register_filesystem(std::string_view fsname, std::shared_ptr<T> fops) -> int
+        {
+            return register_filesystem(fsname, std::shared_ptr<filesystem_operations>(fops));
+        }
         auto register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operations> fops) -> int;
         /** Unregister filesystem driver
          * @param[in] fsname Unique filesystem name for example fat
@@ -115,6 +127,10 @@ namespace purefs::fs
         auto chdir(std::string_view name) noexcept -> int;
 
       private:
+        /** Unregister filesystem driver
+         * @param[in] fsname Unique filesystem name for example fat
+         * @return zero on success otherwise error
+         **/
         /** Find the mount point object matching to the mount point path
          * @param[in] path Absolute input path
          * @return mount point object and the matching shortest path

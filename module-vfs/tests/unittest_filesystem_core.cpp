@@ -6,6 +6,7 @@
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_image.hpp>
+#include <purefs/fs/drivers/filesystem_vfat.hpp>
 
 namespace
 {
@@ -22,4 +23,11 @@ TEST_CASE("Registering and unregistering block device")
     purefs::fs::filesystem fscore(dm);
     /* Requested filesystem is not registered */
     REQUIRE(fscore.mount("emmc0", "/sys", "vfat") == -ENODEV);
+    /** Register filesystem */
+    {
+        auto ret = fscore.register_filesystem("vfat", std::make_shared<fs::drivers::filesystem_vfat>());
+        REQUIRE(ret == 0);
+        ret = fscore.mount("emmc0part1", "/sys", "vfat");
+        REQUIRE(ret == 0);
+    }
 }

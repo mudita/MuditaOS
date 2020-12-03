@@ -24,7 +24,7 @@ namespace purefs::fs::internal
         }
         bool exists(std::size_t index) const
         {
-            return data.size() < index;
+            return index < data.size();
         }
         std::size_t insert(T const &value);
         auto begin() const
@@ -44,6 +44,7 @@ namespace purefs::fs::internal
             data.clear();
             unused.clear();
         }
+        using value_type = T;
 
       private:
         std::vector<T> data;

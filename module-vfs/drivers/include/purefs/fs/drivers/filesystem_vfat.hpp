@@ -7,10 +7,10 @@
 namespace purefs::fs::drivers
 {
     /** Filesystem specific driver base class */
-    class filesystem_vfat final : private filesystem_operations
+    class filesystem_vfat final : public filesystem_operations
     {
       public:
-        filesystem_vfat();
+        filesystem_vfat()                        = default;
         filesystem_vfat(const filesystem_vfat &) = delete;
         virtual ~filesystem_vfat()               = default;
         auto operator=(const filesystem_vfat &) = delete;
