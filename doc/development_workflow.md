@@ -10,15 +10,17 @@ Create a branch or fork, which name is connected to the feature, bug fix, or doc
 
 ## Commit changes
 
-Commit your work. Each commit that makes it from your branch or fork into the master branch must have a title and a clear description.
+Each commit that makes it from your branch or fork into the master branch must have a title and a clear description.
 
-If you're part of the MuditaOS core development team, your commit's title *must* start with a Jira ticket number in square brackets e.g. `[EGD-5555]`. Commits from the community will be accompanied by a relevant Jira ticket number during the merge. Don't add commits that are out of the scope of the Jira issue you are working on.
+If you're part of the MuditaOS core development team, your commit's title *must* start with a Jira ticket number in square brackets e.g. `[EGD-5555]`. 
 
-Start your commit's description with a single sentence describing what you are changing using present simple tense and an imperative mood. Please follow these rules:
+Commits from the community will be accompanied by a relevant Jira ticket number during the merge. Don't add commits that are out of the scope of the Jira issue you are working on.
+
+Your commit's subject line should be a single sentence describing what you are changing using present simple tense and an imperative mood. Please follow these rules:
 
 - It must start with one of the following verbs: "Add", "Change" or "Fix", depending on whether you are adding a new feature, changing its behavior, or fixing it. This sentence will be a part of the project changelog, so please ensure it will be clear to the non-technical readers. 
 - Don't use proper names such as names of classes or functions. 
-- Try to be as concise as possible anf the limit of 72 characters (including the Jira ticket number if you're a part of the core MuditaOS development team). 
+- Try to be as concise as possible in the limit of 72 characters (including the Jira ticket number - 11 characters). 
 - Don't end the subject line with a period. 
 
 Then, in the next paragraph, you must include a short description of what the commit is changing in the project. You should be clear about
