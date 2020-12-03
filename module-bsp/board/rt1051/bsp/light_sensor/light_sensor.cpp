@@ -84,7 +84,7 @@ namespace bsp::light_sensor
         gpioParams.irqMode = drivers::DriverGPIOPinParams::InterruptMode::IntFallingEdge;
         gpioParams.pin     = static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ);
         gpio->ConfPin(gpioParams);
-        gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ));
+        // gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ));
 
         reset();
         configureMeasurement();
@@ -116,7 +116,7 @@ namespace bsp::light_sensor
     {
         uint8_t reg[4];
         readMeasurementRegisters(reg);
-        return decodeVisibleLightMeasurement(reg);
+        return decodeLightMeasurement(reg);
     }
 
     bool reset()

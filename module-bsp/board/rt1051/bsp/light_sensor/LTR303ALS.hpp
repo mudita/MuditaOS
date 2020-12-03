@@ -30,7 +30,15 @@ namespace bsp::light_sensor
     constexpr inline auto SW_RESET    = 0b00000010;
 
     constexpr inline auto INTEGRATION_TIME_200MS  = 0b00010000;
+    constexpr inline auto ALS_INT_200MS           = 2;
     constexpr inline auto INTEGRATION_TIME_400MS  = 0b00011000;
+    constexpr inline auto ALS_INT_400MS           = 4;
+
+    constexpr inline auto ALS_GAIN = 1.0f;
+    // Factor of light resistance of window above the sensor - roughly estimated value
+    constexpr inline auto PFACTOR           = 0.8f;
+    constexpr inline auto MEASUREMENT_COEFF = (ALS_INT_200MS * ALS_GAIN) / PFACTOR;
+
     constexpr inline auto MEASUREMENT_RATE_500MS  = 0b00000011;
     constexpr inline auto MEASUREMENT_RATE_2000MS = 0b00000111;
 
@@ -39,10 +47,28 @@ namespace bsp::light_sensor
     constexpr inline auto MANUFACTURER_ID = 0x05;
     constexpr inline auto LUX_RANGE       = 64000.f;
 
-    constexpr inline float decodeVisibleLightMeasurement(std::uint8_t *data)
+    constexpr inline float decodeLightMeasurement(std::uint8_t *data)
     {
-        std::uint16_t encodedMeasurement = (static_cast<std::uint16_t>(data[1]) << 8) | data[0];
-        return LUX_RANGE * (encodedMeasurement / 65535.0f);
+        std::uint16_t encodedCh1 = (static_cast<std::uint16_t>(data[1]) << 8) | data[0];
+        std::uint16_t encodedCh0 = (static_cast<std::uint16_t>(data[3]) << 8) | data[2];
+
+        if (encodedCh0 == 0 || encodedCh1 == 0) {
+            return 0.0f;
+        }
+        float ratio = encodedCh1 / (encodedCh1 + encodedCh0);
+
+        if (ratio < 0.45f) {
+            return (1.7743 * encodedCh0 + 1.1059 * encodedCh1) / MEASUREMENT_COEFF;
+        }
+        else if (ratio < 0.64 && ratio >= 0.45) {
+            return (4.2785 * encodedCh0 - 1.9548 * encodedCh1) / MEASUREMENT_COEFF;
+        }
+        else if (ratio < 0.85 && ratio >= 0.64) {
+            return (0.5926 * encodedCh0 + 0.1185 * encodedCh1) / MEASUREMENT_COEFF;
+        }
+        else {
+            return 0.0f;
+        }
     }
 
 } // namespace bsp::light_sensor
