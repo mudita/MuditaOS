@@ -20,7 +20,7 @@ namespace gui
         std::list<TextBlock> blocks;
 
       public:
-        TextDocument(const std::list<TextBlock> blocks);
+        TextDocument(const std::list<TextBlock> &blocks);
         ~TextDocument();
         void destroy();
 

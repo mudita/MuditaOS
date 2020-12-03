@@ -16,7 +16,7 @@ TEST_CASE("Text BlockCursor Ctor/Dtor ")
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() == text::npos);
-        REQUIRE(cursor.getBlockNr() == text::npos);
+        REQUIRE(cursor.getBlockNumber() == text::npos);
         REQUIRE(cursor.operator bool() == false);
     }
 
@@ -27,7 +27,7 @@ TEST_CASE("Text BlockCursor Ctor/Dtor ")
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() == text::npos);
-        REQUIRE(cursor.getBlockNr() == text::npos);
+        REQUIRE(cursor.getBlockNumber() == text::npos);
         REQUIRE(cursor.operator bool() == false);
     }
 
@@ -38,7 +38,7 @@ TEST_CASE("Text BlockCursor Ctor/Dtor ")
         REQUIRE(cursor.atBegin() == true);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
     }
 
@@ -50,7 +50,7 @@ TEST_CASE("Text BlockCursor Ctor/Dtor ")
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == true);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
     }
 
@@ -65,7 +65,7 @@ TEST_CASE("Text BlockCursor Ctor/Dtor ")
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
     }
 
@@ -80,7 +80,7 @@ TEST_CASE("Text BlockCursor Ctor/Dtor ")
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == true);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
     }
 }
@@ -156,13 +156,13 @@ TEST_CASE("TextDocument <-> BlockCursor operators: +, ++, -, -- tests")
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() == text::npos);
-        REQUIRE(cursor.getBlockNr() == text::npos);
+        REQUIRE(cursor.getBlockNumber() == text::npos);
         REQUIRE(cursor.operator bool() == false);
         --cursor;
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() == text::npos);
-        REQUIRE(cursor.getBlockNr() == text::npos);
+        REQUIRE(cursor.getBlockNumber() == text::npos);
         REQUIRE(cursor.operator bool() == false);
     }
 
@@ -174,13 +174,13 @@ TEST_CASE("TextDocument <-> BlockCursor operators: +, ++, -, -- tests")
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() == text::npos);
-        REQUIRE(cursor.getBlockNr() == text::npos);
+        REQUIRE(cursor.getBlockNumber() == text::npos);
         REQUIRE(cursor.operator bool() == false);
         --cursor;
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() == text::npos);
-        REQUIRE(cursor.getBlockNr() == text::npos);
+        REQUIRE(cursor.getBlockNumber() == text::npos);
         REQUIRE(cursor.operator bool() == false);
     }
 
@@ -194,19 +194,19 @@ TEST_CASE("TextDocument <-> BlockCursor operators: +, ++, -, -- tests")
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
         cursor += super_large_offset;
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == true);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
         cursor -= super_large_offset;
         REQUIRE(cursor.atBegin() == true);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
     }
 
@@ -219,19 +219,19 @@ TEST_CASE("TextDocument <-> BlockCursor operators: +, ++, -, -- tests")
         REQUIRE(cursor.atBegin() == true);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
         --cursor;
         REQUIRE(cursor.atBegin() == true);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
         cursor -= super_large_offset;
         REQUIRE(cursor.atBegin() == true);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
     }
 
@@ -245,19 +245,19 @@ TEST_CASE("TextDocument <-> BlockCursor operators: +, ++, -, -- tests")
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == true);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
         ++cursor;
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == true);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
         cursor += any_offset_really;
         REQUIRE(cursor.atBegin() == false);
         REQUIRE(cursor.atEnd() == true);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         REQUIRE(cursor.operator bool() == true);
     }
 
@@ -274,21 +274,21 @@ TEST_CASE("TextDocument <-> BlockCursor operators: +, ++, -, -- tests")
         REQUIRE(cursor.atBegin() == true);
         REQUIRE(cursor.atEnd() == false);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
-        REQUIRE(cursor.getBlockNr() == 0);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
+        REQUIRE(cursor.getBlockNumber() == 0);
         REQUIRE(cursor.operator bool() == true);
         cursor += first_block_size_offset + block_move_penalty;
-        REQUIRE(cursor.getBlockNr() == 1);
+        REQUIRE(cursor.getBlockNumber() == 1);
         REQUIRE(cursor.getPosition() == 0);
 
         cursor -= check_offset;
-        REQUIRE(cursor.getBlockNr() == 0);
+        REQUIRE(cursor.getBlockNumber() == 0);
         REQUIRE(cursor.getPosition() == first_block_size_offset - check_offset + block_move_penalty);
 
         for (unsigned int i = 0; i < check_offset; ++i) {
             ++cursor;
         }
-        REQUIRE(cursor.getBlockNr() == 1);
+        REQUIRE(cursor.getBlockNumber() == 1);
         REQUIRE(cursor.getPosition() == 0);
     }
 }
@@ -384,12 +384,12 @@ TEST_CASE("remove Char")
         }
         REQUIRE(block_count_start > 0);
         REQUIRE(doc.getBlocks().size() < block_count_start);
-        REQUIRE(cursor.getBlockNr() == 0);
+        REQUIRE(cursor.getBlockNumber() == 0);
     }
 
     SECTION("empty whole second block & remove second block")
     {
-        auto start_block_nr    = cursor.getBlockNr();
+        auto start_block_nr    = cursor.getBlockNumber();
         auto block_count_start = doc.getBlocks().size();
         auto how_many          = std::next(doc.getBlocks().begin())->length();
         // move to end of second block +1 is for newline
@@ -400,7 +400,7 @@ TEST_CASE("remove Char")
         }
         REQUIRE(block_count_start > 0);
         REQUIRE(doc.getBlocks().size() < block_count_start);
-        REQUIRE(start_block_nr == cursor.getBlockNr());
+        REQUIRE(start_block_nr == cursor.getBlockNumber());
     }
 
     SECTION("block with just newline - remove newline block")

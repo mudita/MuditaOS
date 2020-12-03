@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <vector>
+#include <numeric>
 
 #include "Alignment.hpp"
 #include "InputEvent.hpp"
@@ -17,6 +18,8 @@
 
 namespace gui
 {
+    using TextLineStartContition = std::tuple<unsigned int, unsigned int>;
+
     class Lines
     {
         Text *text = nullptr;
@@ -25,11 +28,26 @@ namespace gui
         bool underLine            = false;
         Position underLinePadding = 0;
 
+        void addToInvisibleLines(TextLine line);
+
       public:
-        Lines(Text *text) : text(text)
+        explicit Lines(Text *text) : text(text)
         {}
 
         ~Lines() = default;
+
+        LinesDrawStop stopCondition                = LinesDrawStop::NONE;
+        TextLineStartContition drawStartConditions = {0, 0};
+        std::list<TextLineStartContition> previousLinesStart;
+
+        void reset()
+        {
+            erase();
+
+            stopCondition = LinesDrawStop::NONE;
+            previousLinesStart.clear();
+            drawStartConditions = {0, 0};
+        }
 
         void erase()
         {
@@ -46,43 +64,60 @@ namespace gui
             lines.emplace_back(std::move(line));
         }
 
-        const auto &get()
+        [[nodiscard]] auto &get()
         {
             return lines;
         }
 
-        auto &last()
+        [[nodiscard]] auto &last()
         {
             return lines.back();
         }
 
-        auto size()
+        [[nodiscard]] auto &first()
+        {
+            return lines.front();
+        }
+
+        [[nodiscard]] auto size() const noexcept
         {
             return lines.size();
         }
 
-        [[nodiscard]] auto empty() const noexcept -> bool
+        [[nodiscard]] auto countVisible() const noexcept
+        {
+            return std::count_if(lines.begin(), lines.end(), [](const auto &line) { return line.isVisible(); });
+        }
+
+        [[nodiscard]] auto empty() const noexcept
         {
             return lines.empty();
         }
 
-        auto maxWidth()
+        [[nodiscard]] auto maxWidth() const noexcept
         {
-            unsigned int w = 0;
+            Length w = 0;
             // could be std::max_element
             for (auto &el : lines) {
-                w = el.width() > w ? el.width() : w;
+                if (el.isVisible()) {
+                    w = std::max(el.width(), w);
+                }
             }
             return w;
         }
 
-        auto linesHeight()
+        [[nodiscard]] auto linesHeight() const noexcept
         {
-            unsigned int h = 0;
-            for (auto &el : lines) {
-                h += el.height();
-            }
-            return h;
+            return std::accumulate(lines.begin(), lines.end(), 0U, [](const auto sum, const auto &line) {
+                return line.isVisible() ? sum + line.height() : sum;
+            });
+        }
+
+        [[nodiscard]] auto linesLength() const noexcept
+        {
+            return std::accumulate(lines.begin(), lines.end(), 0U, [](const auto sum, const auto &line) {
+                return line.isVisible() ? sum + line.length() : sum;
+            });
         }
 
         auto setUnderLine(bool val) -> void
@@ -90,7 +125,7 @@ namespace gui
             underLine = val;
         }
 
-        auto getUnderLine() -> bool
+        [[nodiscard]] auto getUnderLine() const noexcept
         {
             return underLine;
         }
@@ -100,7 +135,7 @@ namespace gui
             underLinePadding = val;
         }
 
-        auto getUnderLinePadding() -> Position
+        [[nodiscard]] auto getUnderLinePadding() const noexcept
         {
             return underLinePadding;
         }
@@ -115,6 +150,9 @@ namespace gui
 
         auto linesHAlign(Length parentSize) -> void;
         auto linesVAlign(Length parentSize) -> void;
+
+        auto addToPreviousLinesStartList(unsigned int lineStartBlockNumber, unsigned int lineStartBlockPosition)
+            -> void;
 
         TextLine *getLine(unsigned int lineNr);
     };

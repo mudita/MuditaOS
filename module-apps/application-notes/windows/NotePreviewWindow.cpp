@@ -57,19 +57,18 @@ namespace app::notes
         date->setEdges(gui::RectangleEdge::None);
         date->setFont(::style::window::font::small);
 
-        note =
-            new gui::TextFixedSize(this,
-                                   previewStyle::LeftMargin,
-                                   previewStyle::TopMargin + previewStyle::date::Height + previewStyle::text::TopMargin,
-                                   previewStyle::Width,
-                                   previewStyle::text::Height);
+        note = new gui::Text(this,
+                             previewStyle::LeftMargin,
+                             previewStyle::TopMargin + previewStyle::date::Height + previewStyle::text::TopMargin,
+                             previewStyle::Width,
+                             previewStyle::text::Height);
         note->setEdges(gui::RectangleEdge::None);
         note->setFont(::style::window::font::medium);
         note->setAlignment(gui::Alignment{gui::Alignment::Vertical::Top});
         note->setPenFocusWidth(::style::window::default_border_focus_w);
         note->setPenWidth(::style::window::default_border_rect_no_focus);
-        note->setEditMode(gui::EditMode::BROWSE);
-        note->setUnderline(false);
+        note->setEditMode(gui::EditMode::SCROLL);
+        note->setCursorStartPosition(gui::CursorStartPosition::DOCUMENT_BEGIN);
 
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(::style::strings::common::options));

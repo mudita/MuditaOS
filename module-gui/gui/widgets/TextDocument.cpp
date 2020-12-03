@@ -11,7 +11,7 @@ namespace gui
 
     const std::string TextDocument::newline = "\n";
 
-    TextDocument::TextDocument(const std::list<TextBlock> blocks) : blocks(std::move(blocks))
+    TextDocument::TextDocument(const std::list<TextBlock> &blocks) : blocks(std::move(blocks))
     {}
 
     TextDocument::~TextDocument()
@@ -38,12 +38,12 @@ namespace gui
 
     void TextDocument::addNewline(BlockCursor &cursor, TextBlock::End eol)
     {
-        assert(cursor.getBlockNr() < blocks.size());
+        assert(cursor.getBlockNumber() < blocks.size());
         auto [l_block, r_block] = split(cursor);
         l_block.setEnd(eol);
 
         // If we split last block in Document we set its end to None.
-        if (cursor.getBlockNr() == blocks.size() - 2) {
+        if (cursor.getBlockNumber() == blocks.size() - 2) {
             r_block.setEnd(TextBlock::End::None);
         }
     }
@@ -51,7 +51,7 @@ namespace gui
     auto TextDocument::getText() const -> UTF8
     {
         UTF8 output;
-        if (blocks.size() != 0) {
+        if (!blocks.empty()) {
             for (auto &el : blocks) {
                 output += el.getText();
             }
@@ -62,22 +62,22 @@ namespace gui
 
     auto TextDocument::getBlockCursor(unsigned int position) -> BlockCursor
     {
-        unsigned int block_no      = 0;
-        unsigned int loop_position = 0;
+        unsigned int blockNumber  = 0;
+        unsigned int loopPosition = 0;
 
         for (auto &el : blocks) {
 
             if (el.length() == 0) {
-                return BlockCursor(this, 0, block_no, el.getFormat()->getFont());
+                return BlockCursor(this, 0, blockNumber, el.getFormat()->getFont());
             }
 
-            if (loop_position + el.length() > position) { // data found
-                return BlockCursor(this, position - loop_position, block_no, el.getFormat()->getFont());
+            if (loopPosition + el.length() > position) { // data found
+                return BlockCursor(this, position - loopPosition, blockNumber, el.getFormat()->getFont());
             }
 
             // data not found in block_number, early exit,
-            loop_position += el.length();
-            ++block_no;
+            loopPosition += el.length();
+            ++blockNumber;
         }
         // TODO ok... here we might want to return BlockCursor(this) <- but returning text::npos / empty/none block if
         // we wanted to return anything
@@ -107,8 +107,8 @@ namespace gui
 
     auto TextDocument::operator()(const BlockCursor &cursor) const -> const TextBlock &
     {
-        assert(cursor.getBlockNr() < blocks.size());
-        return *std::next(blocks.begin(), cursor.getBlockNr());
+        assert(cursor.getBlockNumber() < blocks.size());
+        return *std::next(blocks.begin(), cursor.getBlockNumber());
     }
 
     void TextDocument::removeBlock(unsigned int block_nr)
@@ -126,18 +126,18 @@ namespace gui
 
     auto TextDocument::split(BlockCursor &cursor) -> std::pair<TextBlock &, TextBlock &>
     {
-        auto to_split = std::next(blocks.begin(), cursor.getBlockNr());
+        auto toSplit = std::next(blocks.begin(), cursor.getBlockNumber());
 
-        auto text = to_split->getText(cursor.getPosition());
-        auto font = to_split->getFormat()->getFont();
-        auto end  = to_split->getEnd();
+        auto text = toSplit->getText(cursor.getPosition());
+        auto font = toSplit->getFormat()->getFont();
+        auto end  = toSplit->getEnd();
 
-        auto newblock = TextBlock(text, font, end);
+        auto newBlock = TextBlock(text, font, end);
 
-        to_split->setText(to_split->getText().substr(0, cursor.getPosition()));
-        blocks.insert(std::next(to_split), std::move(newblock));
+        toSplit->setText(toSplit->getText().substr(0, cursor.getPosition()));
+        blocks.insert(std::next(toSplit), std::move(newBlock));
 
-        return {*to_split, *(std::next(to_split))};
+        return {*toSplit, *(std::next(toSplit))};
     }
 
 } // namespace gui

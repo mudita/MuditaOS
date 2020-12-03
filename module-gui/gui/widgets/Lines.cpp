@@ -14,7 +14,12 @@
 
 namespace gui
 {
-    // LEFT/RIGHT/UP/DOWN
+
+    void Lines::addToInvisibleLines(TextLine line)
+    {
+        line.setVisible(false);
+        emplace(std::move(line));
+    }
 
     auto Lines::linesVAlign(Length parentSize) -> void
     {
@@ -38,6 +43,7 @@ namespace gui
 
             if (textLine.length() == 0 && textLine.getLineEnd()) {
                 debug_text_lines("cant show more text from this document");
+                stopCondition = LinesDrawStop::OUT_OF_TEXT;
                 break;
             }
 
@@ -46,14 +52,16 @@ namespace gui
                                  lineYPosition,
                                  textLine.height(),
                                  h);
+                stopCondition = LinesDrawStop::OUT_OF_SPACE;
+                addToInvisibleLines(std::move(textLine));
                 break;
             }
 
             emplace(std::move(textLine));
             auto &line = last();
 
-            line.setPosition(lineXPosition, lineYPosition);
             line.setParent(text);
+            line.setPosition(lineXPosition, lineYPosition);
 
             lineYPosition += line.height();
         }
@@ -77,17 +85,22 @@ namespace gui
             }
 
             if (lineYPosition + initHeight > h) {
+                stopCondition = LinesDrawStop::OUT_OF_SPACE;
+                addToInvisibleLines(std::move(textLine));
                 break;
             }
 
             if (lines.size() >= linesCount) {
+                stopCondition = LinesDrawStop::OUT_OF_SPACE;
+                addToInvisibleLines(std::move(textLine));
                 break;
             }
 
             emplace(std::move(textLine));
             auto &line = last();
-            line.setPosition(lineXPosition, lineYPosition);
+
             line.setParent(text);
+            line.setPosition(lineXPosition, lineYPosition);
 
             lineYPosition += line.height();
         }
@@ -101,6 +114,22 @@ namespace gui
 
         auto it = std::next(lines.begin(), lineNr);
         return &*it;
+    }
+
+    auto Lines::addToPreviousLinesStartList(unsigned int lineStartBlockNumber, unsigned int lineStartBlockPosition)
+        -> void
+    {
+        auto it = std::find_if(
+            previousLinesStart.begin(),
+            previousLinesStart.end(),
+            [&lineStartBlockNumber, &lineStartBlockPosition](const std::tuple<unsigned int, unsigned int> &lineStart) {
+                return std::get<0>(lineStart) == lineStartBlockNumber &&
+                       std::get<1>(lineStart) == lineStartBlockPosition;
+            });
+
+        if (it == previousLinesStart.end()) {
+            previousLinesStart.emplace_back(lineStartBlockNumber, lineStartBlockPosition);
+        }
     }
 
 } // namespace gui
