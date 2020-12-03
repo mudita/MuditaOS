@@ -10,7 +10,7 @@
 #include <source/version.hpp>
 #include <time/time_conversion.hpp>
 #include <vfs.hpp>
-
+#include <service-desktop/service-desktop/ServiceDesktop.hpp>
 #include <cstdint>
 #include <string>
 
@@ -29,6 +29,7 @@ auto DeviceInfoEndpoint::handle(Context &context) -> void
 auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
 {
     vfs::FilesystemStats fsStats = vfs.getFilesystemStats();
+    json11::Json updateHistory   = static_cast<ServiceDesktop *>(ownerServicePtr)->updateOS->getUpdateHistory();
 
     context.setResponseBody(json11::Json::object(
         {{json::batteryLevel, std::to_string(Store::Battery::get().level)},
@@ -44,6 +45,7 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::gitRevision, (std::string)(GIT_REV)},
          {json::gitTag, (std::string)GIT_TAG},
          {json::gitBranch, (std::string)GIT_BRANCH},
+         {json::updateHistory, updateHistory},
          {json::currentRTCTime, std::to_string(static_cast<uint32_t>(utils::time::Time().getTime()))}}));
 
     MessageHandler::putToSendQueue(context.createSimpleResponse());

@@ -12,9 +12,10 @@
 #include <log/log.hpp>
 #include <microtar/src/microtar.hpp>
 #include <module-apps/application-desktop/ApplicationDesktop.hpp>
+#include <service-db/service-db/Settings.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <vfs.hpp>
-
+#include <time/time_conversion.hpp>
 #if defined(TARGET_RT1051)
 #include <board/cross/eMMC/eMMC.hpp>
 #include "bsp/watchdog/watchdog.hpp"
@@ -54,7 +55,7 @@ updateos::UpdateError UpdateMuditaOS::setUpdateFile(fs::path updateFileToUse)
 {
     updateFile = purefs::dir::getUpdatesOSPath() / updateFileToUse;
     if (vfs.fileExists(updateFile.c_str())) {
-        versioInformation = UpdateMuditaOS::getVersionInfoFromFile(updateFile);
+        versionInformation = UpdateMuditaOS::getVersionInfoFromFile(updateFile);
         if (mtar_open(&updateTar, updateFile.c_str(), "r") == MTAR_ESUCCESS) {
             totalBytes = vfs.filelength(updateTar.stream);
         }
@@ -77,6 +78,10 @@ updateos::UpdateError UpdateMuditaOS::setUpdateFile(fs::path updateFileToUse)
 updateos::UpdateError UpdateMuditaOS::runUpdate()
 {
     informDebug("Prepraring temp dir");
+
+    updateRunStatus.startTime   = utils::time::Time().getTime();
+    updateRunStatus.fromVersion = vfs.getBootConfig().to_json();
+    storeRunStatusInDB();
 
     updateos::UpdateError err = prepareTempDirForUpdate();
     if (err != updateos::UpdateError::NoError) {
@@ -122,6 +127,9 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
     if ((err = cleanupAfterUpdate()) != updateos::UpdateError::NoError) {
         informError(err, "runUpdate cleanupAfterUpdate failed, resetting anyway");
     }
+
+    updateRunStatus.endTime = utils::time::Time().getTime();
+    storeRunStatusInDB();
 
     // reboot always
     sys::SystemManager::Reboot(owner);
@@ -211,19 +219,29 @@ updateos::UpdateError UpdateMuditaOS::verifyVersion()
 
     std::string versionJsonString = vfs.loadFileAsString(getUpdateTmpChild(updateos::file::version));
     std::string parserError;
-    json11::Json updateVersionInformation = json11::Json::parse(versionJsonString, parserError);
-    if (parserError != "") {
+    targetVersionInfo = json11::Json::parse(versionJsonString, parserError);
+    if (!parserError.empty()) {
         return informError(
             updateos::UpdateError::VerifyVersionFailure, "verifyVersion parse json error: %s", parserError.c_str());
     }
     else {
+        /* version comparison goes here */
+        updateRunStatus.toVersion = targetVersionInfo;
+        const bool ret            = vfs.getBootConfig().version_compare(
+            targetVersionInfo[purefs::json::version_string].string_value(), vfs.getBootConfig().os_version);
+        LOG_DEBUG("verifyVersion comaprison result == %s", ret ? "true" : "false");
     }
     return updateos::UpdateError::NoError;
 }
 
 updateos::UpdateError UpdateMuditaOS::updateBootloader()
 {
-    informDebug("updateBootloader noError");
+    informDebug("updateBootloader");
+    if (targetVersionInfo[purefs::json::bootloader][parserFSM::json::fileName].is_string()) {
+        fs::path bootloaderFile =
+            getUpdateTmpChild(targetVersionInfo[purefs::json::bootloader][parserFSM::json::fileName].string_value());
+        return writeBootloader(bootloaderFile);
+    }
     return updateos::UpdateError::NoError;
 }
 
@@ -426,9 +444,11 @@ updateos::UpdateError UpdateMuditaOS::cleanupAfterUpdate()
             updateos::UpdateError::CantRemoveUniqueTmpDir, "ff_deltree failed on %s", updateTempDirectory.c_str());
     }
     mtar_close(&updateTar);
+
     if (vfs.remove(updateFile.c_str())) {
         return informError(updateos::UpdateError::CantRemoveUpdateFile, "Failed to delete %s", updateFile.c_str());
     }
+
     status = updateos::UpdateState::ReadyForReset;
     return updateos::UpdateError::NoError;
 }
@@ -668,6 +688,8 @@ updateos::UpdateError UpdateMuditaOS::informError(const updateos::UpdateError er
     responseContext.setResponseBody(responseJson);
     parserFSM::MessageHandler::putToSendQueue(responseContext.createSimpleResponse());
 
+    updateRunStatus.finishedState = status;
+    updateRunStatus.finishedError = errorCode;
     return errorCode;
 }
 
@@ -705,4 +727,51 @@ void UpdateMuditaOS::informUpdate(const updateos::UpdateState statusCode, const 
                                                      {parserFSM::json::statusCode, static_cast<uint8_t>(statusCode)}};
     responseContext.setResponseBody(responseJson);
     parserFSM::MessageHandler::putToSendQueue(responseContext.createSimpleResponse());
+
+    updateRunStatus.finishedState = status;
+}
+
+void UpdateMuditaOS::setInitialHistory(const std::string &initialHistory)
+{
+    LOG_DEBUG("setInitialHistory %s", initialHistory.c_str());
+    std::string parseErrors;
+    updateHistory = json11::Json::parse(initialHistory, parseErrors);
+
+    if (!parseErrors.empty() && !initialHistory.empty()) {
+        LOG_ERROR("Can't parse current update history, resetting");
+        updateHistory = json11::Json();
+    }
+}
+
+void UpdateMuditaOS::storeRunStatusInDB()
+{
+    std::vector<json11::Json> tempTable;
+    bool statusRunFound = false;
+    if (updateHistory.is_array()) {
+        for (const auto &value : updateHistory.array_items()) {
+            // need to use stoul as json does not seem to handle it well
+            if (std::stoul(value[updateos::settings::startTime].string_value()) == updateRunStatus.startTime) {
+                tempTable.emplace_back(updateRunStatus);
+
+                // this tells us we already found and element in history
+                statusRunFound = true;
+            }
+            else {
+                // if we found a value in history that's not ours, just copy it to temptable
+                tempTable.emplace_back(value);
+            }
+        }
+
+        if (statusRunFound == false) {
+            // if our element was not found, insert it
+            tempTable.emplace_back(updateRunStatus);
+        }
+    }
+    else {
+        // if the history is not a json array, initialize it
+        tempTable = json11::Json::array{updateRunStatus};
+    }
+
+    updateHistory = tempTable;
+    owner->storeHistory(updateHistory.dump());
 }
