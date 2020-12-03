@@ -91,20 +91,17 @@ auto MeditationTimerWindow::onInput(const InputEvent &inputEvent) -> bool
         }
         if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
             timer->stop();
-            finished = true;
             setVisibleMeditationEnd();
             return true;
         }
         if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
             if (timer->isStopped()) {
                 timer->start();
-                bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::pause));
-                setWidgetVisible(false, true, true);
+                setVisibleRunning();
             }
             else {
                 timer->stop();
-                bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::start));
-                setWidgetVisible(true, true, true);
+                setVisiblePaused();
             }
             return true;
         }
