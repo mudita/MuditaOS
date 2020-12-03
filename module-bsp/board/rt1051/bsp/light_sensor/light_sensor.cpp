@@ -17,7 +17,7 @@ namespace bsp::light_sensor
     {
         std::shared_ptr<drivers::DriverGPIO> gpio;
         std::shared_ptr<drivers::DriverI2C> i2c;
-        static xQueueHandle qHandleIrq = NULL;
+        xQueueHandle qHandleIrq = NULL;
 
         drivers::I2CAddress addr = {.deviceAddress = static_cast<uint32_t>(LTR303ALS_DEVICE_ADDR), .subAddressSize = 1};
 
@@ -46,6 +46,7 @@ namespace bsp::light_sensor
 
         void configureInterrupts()
         {
+            // Has to be done before sensor active mode
             std::uint8_t reg = ENABLE_IRQ;
             writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::INTERRUPT), &reg);
             reg = irqLevelUp & 0xff;
@@ -88,7 +89,7 @@ namespace bsp::light_sensor
         reset();
         configureMeasurement();
         // configureInterrupts();
-        // wakeup();
+        wakeup();
 
         return isPresent() ? kStatus_Success : kStatus_Fail;
     }
