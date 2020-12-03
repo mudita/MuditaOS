@@ -51,7 +51,7 @@ TEST_CASE("TextDocument getBlockCursor")
     {
         auto document = TextDocument({});
         auto cursor   = document.getBlockCursor(100);
-        REQUIRE(cursor.getBlockNr() == text::npos);
+        REQUIRE(cursor.getBlockNumber() == text::npos);
         auto text = document.getText(cursor);
         REQUIRE(text == "");
     }
@@ -65,7 +65,7 @@ TEST_CASE("TextDocument getBlockCursor")
         REQUIRE(document.getText().length() > pos);
         auto cursor = document.getBlockCursor(pos);
         REQUIRE(cursor.getPosition() != text::npos);
-        REQUIRE(cursor.getBlockNr() != text::npos);
+        REQUIRE(cursor.getBlockNumber() != text::npos);
         auto text = document.getText(cursor);
         REQUIRE(!(text == ""));
     }

@@ -26,6 +26,20 @@ namespace gui
         unsigned int limitValue;
     };
 
+    enum class CursorStartPosition
+    {
+        DOCUMENT_BEGIN,
+        OFFSET,
+        DOCUMENT_END
+    };
+
+    enum class LinesDrawStop
+    {
+        NONE,
+        OUT_OF_TEXT,
+        OUT_OF_SPACE
+    };
+
     enum class ExpandMode
     {
         EXPAND_UP,
