@@ -25,33 +25,29 @@ namespace gui
         setPenFocusWidth(style::window::default_border_focus_w);
         setPenWidth(style::window::default_border_no_focus_w);
 
-        title = createEmptyLabel(this);
-        title->setFont(style::window::font::bigbold);
-        title->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top});
-
-        date = createEmptyLabel(this);
+        date = new gui::Label(this, 0, 0, 0, 0);
+        date->setEdges(RectangleEdge::None);
         date->setFont(style::window::font::medium);
         date->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Top});
 
-        snippet = new gui::TextFixedSize(this, 0, 0, 0, 0);
-        snippet->setFont(style::window::font::small);
-        snippet->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left});
-        snippet->setEdges(gui::RectangleEdge::None);
-        snippet->setPenFocusWidth(::style::window::default_border_focus_w);
-        snippet->setPenWidth(::style::window::default_border_rect_no_focus);
-        snippet->setEditMode(gui::EditMode::BROWSE);
-        snippet->setUnderline(false);
+        title   = createTextField(this, style::window::font::bigbold);
+        snippet = createTextField(this, style::window::font::small);
 
         setSnippet(note->snippet);
         setDateText(note->date);
     }
 
-    gui::Label *NotesItem::createEmptyLabel(Item *parent)
+    gui::TextFixedSize *NotesItem::createTextField(Item *parent, const UTF8 &fontName)
     {
-        auto label = new gui::Label(parent, 0, 0, 0, 0);
-        label->setPenFocusWidth(0);
-        label->setPenWidth(0);
-        return label;
+        auto item = new gui::TextFixedSize(parent, 0, 0, 0, 0);
+        item->setFont(fontName);
+        item->setEdges(gui::RectangleEdge::None);
+        item->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top});
+        item->setPenFocusWidth(::style::window::default_border_focus_w);
+        item->setPenWidth(::style::window::default_border_rect_no_focus);
+        item->setEditMode(gui::EditMode::BROWSE);
+        item->setUnderline(false);
+        return item;
     }
 
     void NotesItem::setSnippet(const UTF8 &noteText)
