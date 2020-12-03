@@ -30,10 +30,8 @@ ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, 
     updateOS = std::make_unique<UpdateMuditaOS>(this);
     settings = std::make_unique<settings::Settings>(this);
 
-    settings->registerValueChange(updateos::settings::history, [this](const std::string value) {
-        LOG_ERROR("ctor registerValueChange value=%s", value.c_str());
-        updateOS->setInitialHistory(value);
-    });
+    settings->registerValueChange(updateos::settings::history,
+                                  [this](const std::string &value) { updateOS->setInitialHistory(value); });
 }
 
 ServiceDesktop::~ServiceDesktop()
@@ -124,7 +122,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 sys::ReturnCodes ServiceDesktop::DeinitHandler()
 {
     desktopWorker->deinit();
-    // desktopWorker->close();
     return sys::ReturnCodes::Success;
 }
 

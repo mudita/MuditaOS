@@ -46,7 +46,7 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::gitTag, (std::string)GIT_TAG},
          {json::gitBranch, (std::string)GIT_BRANCH},
          {json::updateHistory, updateHistory},
-         {json::currentRTCTime, std::to_string(static_cast<uint32_t>(utils::time::Time().getTime()))}}));
+         {json::currentRTCTime, std::to_string(static_cast<uint32_t>(utils::time::getCurrentTimestamp().getTime()))}}));
 
     MessageHandler::putToSendQueue(context.createSimpleResponse());
     return true;

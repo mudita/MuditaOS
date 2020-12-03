@@ -79,7 +79,7 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
 {
     informDebug("Prepraring temp dir");
 
-    updateRunStatus.startTime   = utils::time::Time().getTime();
+    updateRunStatus.startTime   = utils::time::getCurrentTimestamp().getTime();
     updateRunStatus.fromVersion = vfs.getBootConfig().to_json();
     storeRunStatusInDB();
 
@@ -749,16 +749,26 @@ void UpdateMuditaOS::storeRunStatusInDB()
     bool statusRunFound = false;
     if (updateHistory.is_array()) {
         for (const auto &value : updateHistory.array_items()) {
-            // need to use stoul as json does not seem to handle it well
-            if (std::stoul(value[updateos::settings::startTime].string_value()) == updateRunStatus.startTime) {
-                tempTable.emplace_back(updateRunStatus);
+            try {
+                // need to use stoul as json does not seem to handle it well
+                if (std::stoul(value[updateos::settings::startTime].string_value()) == updateRunStatus.startTime) {
+                    tempTable.emplace_back(updateRunStatus);
 
-                // this tells us we already found and element in history
-                statusRunFound = true;
+                    // this tells us we already found and element in history
+                    statusRunFound = true;
+                }
+                else {
+                    // if we found a value in history that's not ours, just copy it to temptable
+                    tempTable.emplace_back(value);
+                }
             }
-            else {
-                // if we found a value in history that's not ours, just copy it to temptable
-                tempTable.emplace_back(value);
+            catch (std::invalid_argument &arg) {
+                LOG_ERROR("storeRunStatusInDB conversion from %s to integer failed",
+                          value[updateos::settings::startTime].string_value().c_str());
+            }
+            catch (std::out_of_range &arg) {
+                LOG_ERROR("storeRunStatusInDB %s is out of range for conversion to integer",
+                          value[updateos::settings::startTime].string_value().c_str());
             }
         }
 
