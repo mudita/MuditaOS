@@ -12,6 +12,7 @@
 * `[cellular]` USSD session handling.
 * `[settings]` Nightshift window - GUI.
 * `[bluetooth][settings]` Add Bluetooth settings to database.
+* `[PowerManagement]` Added CPU load measurement.
 
 ### Changed
 
