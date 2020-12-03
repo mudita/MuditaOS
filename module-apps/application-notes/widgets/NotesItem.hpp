@@ -19,7 +19,7 @@ namespace gui
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
 
       private:
-        static gui::Label *createEmptyLabel(Item *parent);
+        static gui::TextFixedSize *createTextField(Item *parent, const UTF8 &fontName);
 
         void buildInterface();
         void setSnippet(const UTF8 &noteText);
@@ -27,7 +27,7 @@ namespace gui
 
         std::shared_ptr<NotesRecord> note;
         gui::Label *date            = nullptr;
-        gui::Label *title           = nullptr;
+        gui::TextFixedSize *title   = nullptr;
         gui::TextFixedSize *snippet = nullptr;
     };
 } // namespace gui
