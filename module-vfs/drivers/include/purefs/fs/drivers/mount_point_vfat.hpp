@@ -31,11 +31,11 @@ namespace purefs::fs::drivers
                 m_ff_drive[0] = ' ';
             }
         }
-        auto ff_drive() const noexcept
+        [[nodiscard]] auto ff_drive() const noexcept
         {
             return m_ff_drive;
         }
-        auto ff_lun() const noexcept -> int
+        [[nodiscard]] auto ff_lun() const noexcept -> int
         {
             return (m_ff_drive[0] == ' ') ? (-1) : (m_ff_drive[0] - '0');
         }
