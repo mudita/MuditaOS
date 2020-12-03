@@ -8,6 +8,7 @@
 * `[notes]` MMI/USSD communication window
 * `[notes]` Notes application implemented.
 * `[notes]` Notes search engine implemented.
+* `[desktop]` info window for incoming MMI messages.
 
 
 ### Changed
