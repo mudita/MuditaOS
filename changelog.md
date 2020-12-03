@@ -14,6 +14,7 @@
 
 * `[desktop]` Windows refactor
 * `[notes]` A note characters limit set to 4'000.
+* `[PowerManagement]` Separation of CPU clock into separate clock domain
 
 ### Fixed
 
