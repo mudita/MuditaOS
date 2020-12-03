@@ -23,7 +23,7 @@ Your commit's subject line should be a single sentence describing what you are c
 - Try to be as concise as possible in the limit of 72 characters (including the Jira ticket number - 11 characters). 
 - Don't end the subject line with a period. 
 
-Then, in the next paragraph, you must include a short description of what the commit is changing in the project. You should be clear about
+Then, in the commit message, you must include a short description of what the commit is changing in the project. You should be clear about
 your motivation to do the change and how it influences the project.
 
 If it's impossible to provide any of the above information, then your commit is likely excessive or redundant and should be squashed with another commit.
