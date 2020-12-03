@@ -61,6 +61,7 @@ namespace purefs::fs::drivers::ffat::internal
             return -EBADF;
         }
         g_disk_handles.remove(vol_it->second);
+        g_registered_vol.erase(vol_it);
         return 0;
     }
 
