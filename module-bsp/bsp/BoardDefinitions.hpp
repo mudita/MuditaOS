@@ -112,7 +112,7 @@ enum class BoardDefinitions
     KEYPAD_BACKLIGHT_DRIVER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
     KEYPAD_BACKLIGHT_DRIVER_I2C = AUDIOCODEC_I2C,
     KEYPAD_BACKLIGHT_DRIVER_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
-    KEYPAD_BACKLIGHT_DRIVER_NRST = 3, // GPIO_AD_B0_03 Active LOW. External pulldown resistor of 10Ω between NRST and GND.
+    KEYPAD_BACKLIGHT_DRIVER_NRST = 3, // GPIO_AD_B0_03 Active LOW. External pulldown resistor of 10kΩ between NRST and GND.
 
     EINK_FRONTLIGHT_PWM_INSTANCE = 2, // GPIO_AD_B0_01 = FLEXPWM2_PWM3_B
     EINK_FRONTLIGHT_PWM_MODULE = 3,

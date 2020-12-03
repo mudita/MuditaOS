@@ -18,7 +18,6 @@ using namespace bsp;
 
 BlueKitchen::BlueKitchen()
 {
-    to_read       = 0;
     read_buff     = NULL;
     read_ready_cb = NULL;
     write_done_cb = NULL;
@@ -38,19 +37,16 @@ BlueKitchen *BlueKitchen::getInstance()
     return k;
 }
 
-ssize_t BlueKitchen::read(uint8_t *buf, size_t nbytes)
+bool BlueKitchen::read(uint8_t *buf, size_t nbytes)
 {
     log_hci_stack("BlueKitchen requested to read %d bytes", nbytes);
 
-    ssize_t i = 0;
     uint8_t val;
 
-    to_read = nbytes;
-
-    read_buff = reinterpret_cast<volatile char *>(buf);
+    read_buff = buf; // point at the Bt stack read buffer
     read_len  = nbytes;
 
-    if (BluetoothCommon::read(buf, nbytes) == nbytes) {
+    if (BluetoothCommon::read(buf, nbytes) == true) {
         val = Bt::Message::EvtReceiving;
         xQueueSend(qHandle, &val, portMAX_DELAY);
     }
@@ -59,7 +55,7 @@ ssize_t BlueKitchen::read(uint8_t *buf, size_t nbytes)
         xQueueSend(qHandle, &val, portMAX_DELAY);
     }
 
-    return i;
+    return val == Bt::Message::EvtReceiving;
 }
 
 void BlueKitchen::set_flowcontrol(int on)
@@ -69,15 +65,13 @@ void BlueKitchen::set_flowcontrol(int on)
 
 #include <sstream>
 
-ssize_t BlueKitchen::write(const uint8_t *buf, size_t size)
+bool BlueKitchen::write(const uint8_t *buf, size_t size)
 {
-
-    ssize_t i            = 0;
     uint8_t val;
 
     log_hci_stack("BlueKitchen sends %d bytes", size);
 
-    if (BluetoothCommon::write(buf, size) == size) {
+    if (BluetoothCommon::write(buf, size) == true) {
         val = Bt::Message::EvtSending;
         xQueueSend(qHandle, &val, portMAX_DELAY);
     }
@@ -86,5 +80,5 @@ ssize_t BlueKitchen::write(const uint8_t *buf, size_t size)
         xQueueSend(qHandle, &val, portMAX_DELAY);
     }
 
-    return i;
+    return val == Bt::Message::EvtSending;
 }

@@ -20,13 +20,7 @@ BlueKitchen *BlueKitchen::getInstance()
     return k;
 }
 
-ssize_t BlueKitchen::write(const uint8_t *buf, size_t nbytes)
-{
-    return 0;
-}
-
-BluetoothCommon::BluetoothCommon() : BTdev()
-{}
+BluetoothCommon::BluetoothCommon() = default;
 
 BlueKitchen::~BlueKitchen()
 {}
@@ -45,12 +39,17 @@ void BluetoothCommon::sleep_ms(ssize_t ms)
     ulTaskNotifyTake(pdTRUE, ms);
 }
 
-ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
+bool BlueKitchen::read(uint8_t *buf, size_t nbytes)
 {
     return 0;
 }
 
-ssize_t BluetoothCommon::write_blocking(char *buf, ssize_t len)
+bool BlueKitchen::write(const uint8_t *buf, size_t nbytes)
+{
+    return 0;
+}
+
+ssize_t write_blocking(const uint8_t *buf, ssize_t nbytes)
 {
     return 0;
 }
@@ -76,9 +75,4 @@ void BluetoothCommon::configure_cts_irq()
 
 void BluetoothCommon::set_irq(bool enable)
 {}
-
-ssize_t BlueKitchen::read(void *buf, size_t nbytes)
-{
-    return 0;
-}
 

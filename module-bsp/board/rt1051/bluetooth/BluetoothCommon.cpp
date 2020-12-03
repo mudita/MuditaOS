@@ -25,7 +25,7 @@ lpuart_edma_handle_t BluetoothCommon::uartDmaHandle = {};
 // TODO it's plain copy same as in cellular - this is kind of wrong
 uint32_t UartGetPeripheralClock();
 
-BluetoothCommon::BluetoothCommon() : BTdev()
+BluetoothCommon::BluetoothCommon()
 {
     configure_uart_io();
     configure_lpuart();
@@ -58,9 +58,9 @@ void BluetoothCommon::sleep_ms(ssize_t ms)
     ulTaskNotifyTake(pdTRUE, ms);
 }
 
-ssize_t BluetoothCommon::read(uint8_t *buf, size_t nbytes)
+bool BluetoothCommon::read(uint8_t *buf, size_t nbytes)
 {
-    ssize_t ret = 0;
+    bool ret = false;
 
     // start RXfer if there is byte incoming and no pending RXfer
     lpuart_transfer_t receiveXfer;
@@ -74,21 +74,21 @@ ssize_t BluetoothCommon::read(uint8_t *buf, size_t nbytes)
     auto status = LPUART_ReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &receiveXfer);
     switch (status) {
     case kStatus_Success:
-        ret = nbytes;
+        ret = true;
         break;
     case kStatus_LPUART_RxBusy:
-        ret = -1;
+        ret = false;
         LOG_WARN("BT UART RX DMA already busy");
         break;
     case kStatus_InvalidArgument:
         LOG_WARN("BT UART RX DMA invalid argument");
-        ret = -1;
+        ret = false;
         break;
     }
     return ret;
 }
 
-ssize_t BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
+bool BluetoothCommon::write(const uint8_t *buf, size_t size)
 {
 #if DEBUG_BLUETOOTH_HCI_COMS >= 3
     std::stringstream ss;
@@ -97,11 +97,11 @@ ssize_t BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
     }
     LOG_DEBUG("BT DMA to write --> [%d]>%s<", size, ss.str().c_str());
 #endif
-    ssize_t ret = 0;
+    bool ret = false;
 
     lpuart_transfer_t sendXfer;
     sendXfer.data     = const_cast<uint8_t *>(buf);
-    sendXfer.dataSize = nbytes;
+    sendXfer.dataSize = size;
 
     uartDmaHandle.userData = xTaskGetCurrentTaskHandle();
 
@@ -113,18 +113,18 @@ ssize_t BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
     switch (sent) {
     case kStatus_Success:
         // orchestrate a DMA Tx
-        log_hci_xfers("DMA Tx started (%d)", nbytes);
-        ret = nbytes;
+        log_hci_xfers("DMA Tx started (%d)", size);
+        ret = true;
         break;
     case kStatus_LPUART_TxBusy:
         // could've checked beforehand
         LOG_WARN("Previous DMA Tx is still pending");
-        ret = -1;
+        ret = false;
         break;
     case kStatus_InvalidArgument:
         LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
         LOG_ERROR("DMA Tx invalid arg");
-        ret = -1;
+        ret = false;
         break;
     }
     return ret;
