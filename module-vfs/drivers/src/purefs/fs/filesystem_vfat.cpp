@@ -79,6 +79,7 @@ namespace purefs::fs::drivers
         vmnt->ff_drive(ret);
         ret = f_mount(vmnt->fatfs(), vmnt->ff_drive(), 1);
         ret = translate_error(ret);
+        filesystem_operations::mount(mnt);
         return ret;
     }
 
@@ -115,6 +116,7 @@ namespace purefs::fs::drivers
         if (!ret) {
             ret = ffat::internal::remove_volume(disk);
         }
+        filesystem_operations::umount(mnt);
         return ret;
     }
 
