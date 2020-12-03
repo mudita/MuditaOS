@@ -629,6 +629,7 @@ void ServiceAudio::setSetting(const Setting &setting,
 
     if (retCode == RetCode::Success) {
         settingsProvider->setValue(dbPath(setting, updatedPlayback, updatedProfile), valueToSet);
+        settingsCache[dbPath(setting, updatedPlayback, updatedProfile)] = valueToSet;
     }
 }
 
