@@ -163,6 +163,8 @@
   "app_desktop_menu": "MENU",
   "app_desktop_emergency": "SOS",
   "app_desktop_info": "Info",
+  "app_desktop_info_mmi_result_success": "Success",
+  "app_desktop_info_mmi_result_failed": "Failed",
   "app_desktop_screen_enter_passcode": "Enter passcode",
   "app_desktop_screen_wrong_pin": "Wrong passcode",
   "app_desktop_screen_allowed_attempts": "Allowed unlock attempts",
