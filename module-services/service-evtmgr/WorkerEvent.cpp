@@ -172,7 +172,6 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
             return false;
         }
-
         LOG_DEBUG("Light sensor IRQ");
         bsp::light_sensor::readout();
     }

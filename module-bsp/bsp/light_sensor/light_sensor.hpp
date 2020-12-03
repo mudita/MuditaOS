@@ -20,13 +20,13 @@ namespace bsp::light_sensor
 
     bool standby();
 
-    void wakeup();
+    bool wakeup();
 
     bool reset();
 
     bool isPresent();
 
-    void readout();
+    float readout();
 
     BaseType_t IRQHandler();
 } // namespace bsp::light_sensor

@@ -41,7 +41,7 @@ namespace bsp::light_sensor
             return i2c->Read(addr, readout, 4);
         }
 
-        constexpr inline std::uint16_t irqLevelUp  = 400;
+        constexpr inline std::uint16_t irqLevelUp  = 0xffff;
         constexpr inline std::uint16_t irqLevelLow = 0;
 
         void configureInterrupts()
@@ -87,8 +87,8 @@ namespace bsp::light_sensor
 
         reset();
         configureMeasurement();
-        configureInterrupts();
-        wakeup();
+        // configureInterrupts();
+        // wakeup();
 
         return isPresent() ? kStatus_Success : kStatus_Fail;
     }
@@ -105,19 +105,17 @@ namespace bsp::light_sensor
         return writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_CONTR), &reg);
     }
 
-    void wakeup()
+    bool wakeup()
     {
         std::uint8_t reg = ACTIVE_MODE;
-        writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_CONTR), &reg);
+        return writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_CONTR), &reg);
     }
 
-    void readout()
+    float readout()
     {
         uint8_t reg[4];
         readMeasurementRegisters(reg);
-        float readout = decodeVisibleLightMeasurement(reg);
-
-        LOG_DEBUG("!!! Light measurement: %d", static_cast<int>(readout));
+        return decodeVisibleLightMeasurement(reg);
     }
 
     bool reset()
