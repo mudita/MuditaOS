@@ -29,10 +29,10 @@ namespace bsp::light_sensor
     constexpr inline auto ACTIVE_MODE = 0b00000001;
     constexpr inline auto SW_RESET    = 0b00000010;
 
-    constexpr inline auto INTEGRATION_TIME_200MS  = 0b00010000;
-    constexpr inline auto ALS_INT_200MS           = 2;
-    constexpr inline auto INTEGRATION_TIME_400MS  = 0b00011000;
-    constexpr inline auto ALS_INT_400MS           = 4;
+    constexpr inline auto INTEGRATION_TIME_200MS = 0b00010000;
+    constexpr inline auto ALS_INT_200MS          = 2;
+    constexpr inline auto INTEGRATION_TIME_400MS = 0b00011000;
+    constexpr inline auto ALS_INT_400MS          = 4;
 
     constexpr inline auto ALS_GAIN = 1.0f;
     // Factor of light resistance of window above the sensor - roughly estimated value

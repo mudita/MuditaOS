@@ -10,7 +10,6 @@
 #include "fsl_common.h"
 #include "log/log.hpp"
 
-
 namespace bsp::light_sensor
 {
     namespace
