@@ -101,6 +101,7 @@ namespace app
                      manager::actions::UnlockSim,
                      manager::actions::BlockSim,
                      manager::actions::ShowMMIResponse,
+                     manager::actions::ShowMMIPush,
                      manager::actions::DisplayCMEError}};
         }
     };

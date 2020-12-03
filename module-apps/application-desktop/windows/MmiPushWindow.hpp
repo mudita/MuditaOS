@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "application-desktop/widgets/DesktopInputWidget.hpp"
-
 #include <AppWindow.hpp>
 #include <Text.hpp>
 #include <functional>
@@ -12,17 +10,15 @@
 
 namespace gui
 {
-    class DesktopInputWidget;
-
-    class MmiPullWindow : public AppWindow
+    class MmiPushWindow : public AppWindow
     {
       protected:
-        Text *text                   = nullptr;
-        DesktopInputWidget *InputBox = nullptr;
+        Text *text  = nullptr;
+        Image *icon = nullptr;
 
       public:
-        MmiPullWindow(app::Application *app, const std::string &name);
-        ~MmiPullWindow() override;
+        MmiPushWindow(app::Application *app, const std::string &name);
+        ~MmiPushWindow() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
         void destroyInterface() override;
