@@ -1,12 +1,11 @@
 # MuditaOS changelog
 
-### Added
-* `[cellular]` SIM API for change pin, set/reset sim lock, switch sim card
-* `[notes]`    MMI/USSD communication window
-
 [Current release]
 
 ### Added
+
+* `[cellular]` SIM API for change pin, set/reset sim lock, switch sim card
+* `[notes]` MMI/USSD communication window
 * `[notes]` Notes application implemented.
 * `[notes]` Notes search engine implemented.
 
@@ -18,6 +17,7 @@
 
 ### Fixed
 
+* `[meditation]` Fix of too many time options
 * `[meditation]` Fixed default counter settings
 * `[notes]` Fixed displaying the special characters in a note title.
 

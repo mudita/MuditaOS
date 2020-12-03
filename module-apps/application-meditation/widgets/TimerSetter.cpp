@@ -3,6 +3,8 @@
 
 #include "TimerSetter.hpp"
 #include <application-meditation/data/Style.hpp>
+#include <module-utils/i18n/i18n.hpp>
+#include <module-utils/Utils.hpp>
 
 using namespace gui;
 
@@ -45,8 +47,8 @@ void TimerSetter::build()
                               timerStyle::setterUnitLabel::Height);
     timeUnitLabel->setFont(style::window::font::verysmall);
     timeUnitLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-    timeUnitLabel->setText("MINUTES");
     timeUnitLabel->setEdges(RectangleEdge::None);
+    timeUnitLabel->setText(utils::localize.get("app_meditation_minutes"));
 }
 
 bool TimerSetter::onFocus(bool isFocused)
@@ -64,8 +66,8 @@ bool TimerSetter::onFocus(bool isFocused)
 
 bool TimerSetter::onInput(const InputEvent &inputEvent)
 {
+    bool handled = false;
     if (inputEvent.isShortPress()) {
-        bool handled = false;
         if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
             state.putNumericValue(gui::toNumeric(inputEvent.keyCode));
             handled = true;
@@ -81,12 +83,21 @@ bool TimerSetter::onInput(const InputEvent &inputEvent)
         else {
             state.onFocus();
         }
-        timeLabel->setText(std::to_string(static_cast<int>(state.getTime().count())));
-        if (handled) {
-            return true;
-        }
+        setMeditationTime();
     }
-    return false;
+    return handled;
+}
+
+void TimerSetter::setMeditationTime()
+{
+    const auto meditationTime = static_cast<int>(state.getTime().count());
+    timeLabel->setText(utils::to_string(meditationTime));
+    if (meditationTime == 1) {
+        timeUnitLabel->setText(utils::localize.get("app_meditation_minute"));
+    }
+    else {
+        timeUnitLabel->setText(utils::localize.get("app_meditation_minutes"));
+    }
 }
 
 std::chrono::seconds TimerSetter::getTime() noexcept
@@ -108,21 +119,28 @@ void TimerSetter::State::putNumericValue(int digit) noexcept
         resetValueOnNumeric = false;
     }
     timeInMinutes = 10 * timeInMinutes + digit;
-    if (timeInMinutes >= minimalValue) {
+    if (timeInMinutes >= 10 * (counterMaxDigits - 1)) {
         resetValueOnNumeric = true;
     }
 }
 
 void TimerSetter::State::increment() noexcept
 {
-    timeInMinutes       = (timeInMinutes / defaultIncrementValue + 1) * defaultIncrementValue;
+    auto it = std::upper_bound(std::begin(timeArr), std::end(timeArr), timeInMinutes);
+    if (it == std::end(timeArr)) {
+        it--;
+    }
+    timeInMinutes       = *it;
     resetValueOnNumeric = true;
-    checkBounds();
 }
 
 void TimerSetter::State::decrement() noexcept
 {
-    timeInMinutes       = ((timeInMinutes - 1) / defaultIncrementValue) * defaultIncrementValue;
+    auto it =
+        std::upper_bound(std::rbegin(timeArr), std::rend(timeArr), timeInMinutes, [](int a, int b) { return a > b; });
+    if (it == std::rend(timeArr)) {
+        it--;
+    }
+    timeInMinutes       = *it;
     resetValueOnNumeric = true;
-    checkBounds();
 }
