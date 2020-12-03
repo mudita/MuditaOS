@@ -43,3 +43,10 @@ docker/Dockerfile
 docker/assets/actions*
 docker/assets/cmake*
 docker/assets/gcc-arm*
+docker/assets/requirements*
+
+# vim temporary files
+*.swp
+*.swo
+tags
+.ycm_extra_conf.py

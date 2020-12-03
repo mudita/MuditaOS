@@ -14,6 +14,11 @@
 #include <vector>
 #include <string>
 
+namespace db
+{
+    class QueryResult;
+}
+
 namespace gui
 {
 

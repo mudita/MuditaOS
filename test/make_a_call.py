@@ -25,7 +25,7 @@ def call(harness, phone_number: str, duration: int):
 
 def get_calllog_count(harness):
     body = {"count": True}
-    return harness.endpoint_request("calllog", "get", body)["count"]
+    return harness.endpoint_request("calllog", "get", body)["body"]["count"]
 
 
 def main():

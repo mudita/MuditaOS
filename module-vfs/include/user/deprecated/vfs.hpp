@@ -46,7 +46,7 @@ namespace purefs
         inline constexpr auto os_image        = "imagename";
         inline constexpr auto os_version      = "version";
         inline constexpr auto version_major   = "major";
-        inline constexpr auto version_inor    = "minor";
+        inline constexpr auto version_minor   = "minor";
         inline constexpr auto version_patch   = "patch";
         inline constexpr auto version_string  = "string";
         inline constexpr auto timestamp       = "timestamp";
@@ -61,8 +61,8 @@ namespace purefs
 
     struct BootConfig
     {
-        std::string os_image;
-        std::string os_type;
+        std::string os_image = "boot.bin";
+        std::string os_type  = "current";
         std::string os_version;
         std::string bootloader_verion;
         std::string timestamp;

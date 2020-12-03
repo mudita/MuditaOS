@@ -36,7 +36,6 @@ set(SOURCES
         Tables/ContactsRingtonesTable.cpp
         Tables/ContactsAddressTable.cpp
         Tables/ContactsGroups.cpp
-        Tables/SettingsTable.cpp
         Tables/AlarmsTable.cpp
         Tables/AlarmsStatusTable.cpp
         Tables/NotesTable.cpp
@@ -51,7 +50,6 @@ set(SOURCES
         Interface/SMSRecord.cpp
         Interface/ContactRecord.cpp
         Interface/ThreadRecord.cpp
-        Interface/SettingsRecord.cpp
         Interface/AlarmsRecord.cpp
         Interface/NotesRecord.cpp
         Interface/CalllogRecord.cpp
@@ -89,6 +87,10 @@ set(SOURCES
         queries/messages/threads/QueryThreadGetByContactID.cpp
         queries/messages/threads/QueryThreadRemove.cpp
         queries/messages/threads/QueryThreadMarkAsRead.cpp
+        queries/notes/QueryNotesGet.cpp
+        queries/notes/QueryNotesGetByText.cpp
+        queries/notes/QueryNoteStore.cpp
+        queries/notes/QueryNoteRemove.cpp
         queries/calllog/QueryCalllogSetAllRead.cpp
         queries/calllog/QueryCalllogGet.cpp
         queries/calllog/QueryCalllogGetCount.cpp

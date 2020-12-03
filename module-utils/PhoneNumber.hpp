@@ -28,14 +28,14 @@ namespace utils
     class PhoneNumber
     {
       private:
-        using errCode    = i18n::phonenumbers::PhoneNumberUtil::ErrorType;
-        using formatType = i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat;
+        using errCode    = ::i18n::phonenumbers::PhoneNumberUtil::ErrorType;
+        using formatType = ::i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat;
 
       public:
         /**
          * @brief Number type enumeration, e.g. fixed line, mobile, etc.
          */
-        using numberType = i18n::phonenumbers::PhoneNumberUtil::PhoneNumberType;
+        using numberType = ::i18n::phonenumbers::PhoneNumberUtil::PhoneNumberType;
 
         /**
          * @brief Phone Number match type:
@@ -199,8 +199,8 @@ namespace utils
         };
 
       private:
-        using phn_util = i18n::phonenumbers::PhoneNumberUtil;
-        using gnumber  = i18n::phonenumbers::PhoneNumber;
+        using phn_util = ::i18n::phonenumbers::PhoneNumberUtil;
+        using gnumber  = ::i18n::phonenumbers::PhoneNumber;
 
       public:
         /**

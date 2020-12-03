@@ -11,11 +11,11 @@ namespace settings
             mySettings = std::make_shared<settings::Settings>(this);
         }
         std::shared_ptr<settings::Settings> mySettings;
-        std::vector<std::pair<std::string, std::string>> valChanged;
+        std::vector<std::string> valChanged;
         std::string whoRequestedNotifyOnChange;
-        void ValueChanged(const std::string &name, std::optional<std::string> value)
+        void ValueChanged(std::string value)
         {
-            valChanged.emplace_back(std::pair<std::string, std::string>{name, value.value_or("")});
+            valChanged.emplace_back(value);
         }
         void debug(const std::string &cmd, const std::string &k, const std::string &v)
         {
@@ -28,12 +28,12 @@ namespace settings
             if (auto msg = dynamic_cast<settings::UTMsg::ReqRegValChg *>(req)) {
                 debug("ReqRegValChg", msg->name, msg->value);
                 whoRequestedNotifyOnChange = msg->sender;
-                mySettings->registerValueChange(
-                    msg->name, ([this](const std::string &name, std::optional<std::string> value) {
-                        ValueChanged(name, value);
-                        auto cnf = std::make_shared<settings::UTMsg::CnfValChg>(name, value.value_or(""));
-                        sys::Bus::SendUnicast(std::move(cnf), whoRequestedNotifyOnChange, this);
-                    }));
+                mySettings->registerValueChange(msg->name, ([this](std::string value) {
+                                                    ValueChanged(value);
+                                                    auto cnf = std::make_shared<settings::UTMsg::CnfValChg>("", value);
+                                                    sys::Bus::SendUnicast(
+                                                        std::move(cnf), whoRequestedNotifyOnChange, this);
+                                                }));
                 auto cnf = std::make_shared<settings::UTMsg::CnfRegValChg>(msg->name, msg->value);
                 sys::Bus::SendUnicast(std::move(cnf), whoRequestedNotifyOnChange, this);
             }

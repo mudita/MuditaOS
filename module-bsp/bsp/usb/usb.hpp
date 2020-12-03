@@ -30,4 +30,5 @@ namespace bsp
     int usbInit(xQueueHandle, USBDeviceListener *deviceListener = nullptr);
     int usbCDCReceive(void *ptr);
     int usbCDCSend(std::string *sendMsg);
+    void usbDeinit();
 } // namespace bsp

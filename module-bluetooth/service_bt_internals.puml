@@ -1,0 +1,13 @@
+@startuml
+
+package ServiceBluetooth {
+  object BluetoothSettings {
+  bluetoothState
+  bondedDevices
+  deviceVisibilty
+  deviceName
+}
+  class BluetoothWorker{}
+}
+
+@enduml

@@ -49,7 +49,7 @@ class SimCard
      * \param pin actual pin for SIM card
      * \return
      */
-    SimCardResult setPinLock(bool lock, const std::string pin) const;
+    SimCardResult setPinLock(bool lock, const std::string &pin) const;
 
     /** Change pin, only for standard pin. To get effect of change pin, SIM cart or modem should be restarted
      * simplest solution is to call AT+CFUN=0/1

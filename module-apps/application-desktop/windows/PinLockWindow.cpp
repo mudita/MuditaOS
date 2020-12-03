@@ -47,15 +47,18 @@ namespace gui
 
     void PinLockWindow::invalidate() noexcept
     {
-        titleLabel = nullptr;
+        iceBox        = nullptr;
+        title         = nullptr;
         lockImage  = nullptr;
         infoImage  = nullptr;
-        infoText   = nullptr;
+        primaryText   = nullptr;
+        secondaryText = nullptr;
         pinLabelsBox = nullptr;
     }
 
     void PinLockWindow::setVisibleState()
     {
+        restore();
         if (lock->isState(PinLock::LockState::PasscodeRequired)) {
             LockBox->setVisibleStateEnterPin(PinLockBox::EnterPasscodeType::ProvidePasscode);
         }
@@ -83,11 +86,8 @@ namespace gui
 
     void PinLockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (mode == ShowMode::GUI_SHOW_INIT) {
-            rebuild();
-        }
         if (auto lockData = dynamic_cast<LockPhoneData *>(data)) {
-            assert(lockData);
+            rebuild();
             lockTimeoutApplication = lockData->getPreviousApplication();
             lock                   = lockData->getLock();
             assert(lock);
@@ -111,7 +111,11 @@ namespace gui
             return AppWindow::onInput(inputEvent);
         }
         // accept only LF, enter, RF, #, and numeric values;
-        if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
+        if (inputEvent.is(KeyCode::KEY_LEFT) && iceBox->visible) {
+            app::manager::Controller::sendAction(application, app::manager::actions::ShowEmergencyContacts);
+            return true;
+        }
+        else if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
             app::manager::Controller::sendAction(application, app::manager::actions::ShowEmergencyContacts);
             return true;
         }
@@ -143,6 +147,7 @@ namespace gui
         }
         else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
             lock->activate();
+            bottomBar->setActive(BottomBar::Side::CENTER, false);
             return true;
         }
         // check if any of the lower inheritance onInput methods catch the event
@@ -157,6 +162,8 @@ namespace gui
         }
         else if (lockType == PinLock::LockType::SimPuk) {
             LockBox = std::make_unique<PukLockBox>(this);
+            setTitleBar(true, true);
+            setText("app_desktop_header_sim_setup", TextType::Title, true, {{getToken(Token::Sim), "SIM1"}});
         }
         else if (lockType == PinLock::LockType::SimPin) {
             LockBox = std::make_unique<SimLockBox>(this);

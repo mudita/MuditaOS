@@ -146,6 +146,7 @@ class ServiceCellular : public sys::Service
     bool changePin(const std::string oldPin, const std::string newPin);
     bool unlockSimPin(std::string pin);
     bool unlockSimPuk(std::string puk, std::string pin);
+    bool setPinLock(bool lock, const std::string pin);
 
   private:
     std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);

@@ -1,45 +1,33 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_APPS_APPLICATION_NOTES_WIDGETS_NOTESITEM_HPP_
-#define MODULE_APPS_APPLICATION_NOTES_WIDGETS_NOTESITEM_HPP_
+#pragma once
 
-#include "Label.hpp"
-#include "ListItem.hpp"
-#include "../NotesModel.hpp"
+#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/ListItem.hpp>
+#include <module-gui/gui/widgets/TextFixedSize.hpp>
+
+#include <module-db/Interface/NotesRecord.hpp>
 
 namespace gui
 {
-
-    /*
-     * @brief Widget used to display information about note in the notes list view.
-     */
     class NotesItem : public ListItem
     {
-
-        NotesModel *model = nullptr;
-        // pointer to the notes record
-        std::shared_ptr<NotesRecord> note = nullptr;
-        // this is hour in the mode defined in settings
-        gui::Label *hour    = nullptr;
-        gui::Label *title   = nullptr;
-        gui::Label *snippet = nullptr;
-        // flag that defines if time should be displayed in 24h mode
-        bool mode24H = false;
-
       public:
-        NotesItem(NotesModel *model, bool mode24H);
-        virtual ~NotesItem();
-        // sets copy of alarm's
-        void setNote(std::shared_ptr<NotesRecord> &note);
+        explicit NotesItem(std::shared_ptr<NotesRecord> record);
 
-        // returns alarm structure
-        std::shared_ptr<NotesRecord> getAlarm();
-        // virtual methods from Item
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
-        bool onActivated(void *data) override;
+
+      private:
+        static gui::TextFixedSize *createTextField(Item *parent, const UTF8 &fontName);
+
+        void buildInterface();
+        void setSnippet(const UTF8 &noteText);
+        void setDateText(std::uint32_t timestamp);
+
+        std::shared_ptr<NotesRecord> note;
+        gui::Label *date            = nullptr;
+        gui::TextFixedSize *title   = nullptr;
+        gui::TextFixedSize *snippet = nullptr;
     };
-
-} /* namespace gui */
-
-#endif /* MODULE_APPS_APPLICATION_NOTES_WIDGETS_NOTESITEM_HPP_ */
+} // namespace gui

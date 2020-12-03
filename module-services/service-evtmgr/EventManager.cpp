@@ -19,6 +19,7 @@
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/rtc/rtc.hpp>
 #include <bsp/torch/torch.hpp>
+#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <common_data/RawKey.hpp>
 #include <log/log.hpp>
 #include <module-utils/time/time_conversion.hpp>
@@ -272,6 +273,19 @@ sys::ReturnCodes EventManager::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
+    connect(sevm::KeypadBacklightMessage(), [&](sys::Message *msgl) {
+        auto msg         = static_cast<sevm::KeypadBacklightMessage *>(msgl);
+        auto message     = std::make_shared<sevm::KeypadBacklightMessage>();
+        message->success = processKeypadBacklightRequest(msg->action);
+        return message;
+    });
+
+    connect(sevm::EinkFrontlightMessage(), [&](sys::Message *msgl) {
+        auto msg = static_cast<sevm::EinkFrontlightMessage *>(msgl);
+        processEinkFrontlightRequest(msg->action, msg->value);
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
     // initialize keyboard worker
     EventWorker = std::make_unique<WorkerEvent>(this);
 
@@ -339,4 +353,37 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
 
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
     return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
+}
+
+bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action act)
+{
+    bool response = false;
+    switch (act) {
+    case bsp::keypad_backlight::Action::turnOn:
+        response = bsp::keypad_backlight::turnOnAll();
+        break;
+    case bsp::keypad_backlight::Action::turnOff:
+        response = bsp::keypad_backlight::shutdown();
+        break;
+    case bsp::keypad_backlight::Action::checkState:
+        response = bsp::keypad_backlight::checkState();
+        break;
+    }
+    return response;
+}
+
+void EventManager::processEinkFrontlightRequest(bsp::eink_frontlight::Action act,
+                                                bsp::eink_frontlight::BrightnessPercentage val)
+{
+    switch (act) {
+    case bsp::eink_frontlight::Action::turnOn:
+        bsp::eink_frontlight::turnOn();
+        break;
+    case bsp::eink_frontlight::Action::turnOff:
+        bsp::eink_frontlight::turnOff();
+        break;
+    case bsp::eink_frontlight::Action::setBrightness:
+        bsp::eink_frontlight::setBrightness(val);
+        break;
+    }
 }

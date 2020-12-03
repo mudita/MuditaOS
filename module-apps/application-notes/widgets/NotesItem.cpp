@@ -2,71 +2,86 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesItem.hpp"
+
 #include <Style.hpp>
+#include <module-apps/application-notes/style/NotesListStyle.hpp>
+
+#include <module-utils/time/time_conversion.hpp>
 
 namespace gui
 {
-
-    NotesItem::NotesItem(NotesModel *model, bool mode24H) : model{model}, mode24H{mode24H}
+    NotesItem::NotesItem(std::shared_ptr<NotesRecord> record) : note{std::move(record)}
     {
-        setMinimumSize(style::window::default_body_width, 146);
-        setMaximumSize(style::window::default_body_width, 146);
-
-        setRadius(8);
-
-        setPenFocusWidth(3);
-        setPenWidth(1);
-
-        hour = new gui::Label(this, 0, 0, 0, 0);
-        hour->setPenFocusWidth(0);
-        hour->setPenWidth(0);
-        hour->setFont(style::window::font::medium);
-        hour->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Top});
-
-        title = new gui::Label(this, 0, 0, 0, 0);
-        title->setPenFocusWidth(0);
-        title->setPenWidth(0);
-        title->setFont(style::window::font::bigbold);
-        title->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top});
-
-        snippet = new gui::Label(this, 0, 0, 0, 0);
-        snippet->setPenFocusWidth(0);
-        snippet->setPenWidth(0);
-        snippet->setFont(style::window::font::small);
-        snippet->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+        buildInterface();
     }
 
-    NotesItem::~NotesItem()
+    void NotesItem::buildInterface()
     {
-        note = nullptr;
+        namespace notesItemStyle = app::notes::style::list::item;
+        setMinimumSize(style::window::default_body_width, notesItemStyle::Height);
+        setMaximumSize(style::window::default_body_width, notesItemStyle::Height);
+        setRadius(notesItemStyle::Radius);
+        setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
+        setPenFocusWidth(style::window::default_border_focus_w);
+        setPenWidth(style::window::default_border_no_focus_w);
+
+        date = new gui::Label(this, 0, 0, 0, 0);
+        date->setEdges(RectangleEdge::None);
+        date->setFont(style::window::font::medium);
+        date->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Top});
+
+        title   = createTextField(this, style::window::font::bigbold);
+        snippet = createTextField(this, style::window::font::small);
+
+        setSnippet(note->snippet);
+        setDateText(note->date);
+    }
+
+    gui::TextFixedSize *NotesItem::createTextField(Item *parent, const UTF8 &fontName)
+    {
+        auto item = new gui::TextFixedSize(parent, 0, 0, 0, 0);
+        item->setFont(fontName);
+        item->setEdges(gui::RectangleEdge::None);
+        item->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top});
+        item->setPenFocusWidth(::style::window::default_border_focus_w);
+        item->setPenWidth(::style::window::default_border_rect_no_focus);
+        item->setEditMode(gui::EditMode::BROWSE);
+        item->setUnderline(false);
+        return item;
+    }
+
+    void NotesItem::setSnippet(const UTF8 &noteText)
+    {
+        title->setText(noteText);
+        snippet->setText(noteText);
+    }
+
+    void NotesItem::setDateText(std::uint32_t timestamp)
+    {
+        if (auto dt = utils::time::DateTime(timestamp); dt.isYesterday()) {
+            date->setText(utils::localize.get("common_yesterday"));
+        }
+        else {
+            date->setText(dt);
+        }
     }
 
     bool NotesItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
-        hour->setPosition(11, 0);
-        hour->setSize(newDim.w - 22, 40);
+        namespace notesItemStyle = app::notes::style::list::item;
+        title->setPosition(notesItemStyle::LeftPadding, notesItemStyle::VerticalPadding);
+        title->setSize(notesItemStyle::title::Width, notesItemStyle::title::Height);
 
-        title->setPosition(11, 0);
-        title->setSize(68, 40);
+        date->setPosition(notesItemStyle::LeftPadding, notesItemStyle::VerticalPadding);
+        date->setSize(newDim.w - (notesItemStyle::LeftPadding + notesItemStyle::RightPadding),
+                      notesItemStyle::date::Height);
 
-        snippet->setPosition(11, 40);
-        snippet->setSize(newDim.w - 22, newDim.h - 40);
+        snippet->setPosition(notesItemStyle::LeftPadding,
+                             notesItemStyle::VerticalPadding + notesItemStyle::title::Height +
+                                 notesItemStyle::snippet::TopMargin);
+        snippet->setSize(newDim.w - (notesItemStyle::LeftPadding + notesItemStyle::RightPadding),
+                         newDim.h - (2 * notesItemStyle::VerticalPadding) - notesItemStyle::title::Height -
+                             notesItemStyle::snippet::TopMargin);
         return true;
     }
-
-    // sets copy of alarm's
-    void NotesItem::setNote(std::shared_ptr<NotesRecord> &note)
-    {
-        this->note = note;
-        // set values of the labels
-        title->setText(std::to_string(note->ID));
-        snippet->setText(note->path);
-    }
-
-    bool NotesItem::onActivated(void *data)
-    {
-        LOG_INFO("ITEM WAS PRESSED");
-        return true;
-    }
-
-} /* namespace gui */
+} // namespace gui
