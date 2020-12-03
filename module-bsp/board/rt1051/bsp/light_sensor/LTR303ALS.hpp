@@ -29,8 +29,10 @@ namespace bsp::light_sensor
     constexpr inline auto ACTIVE_MODE = 0b00000001;
     constexpr inline auto SW_RESET    = 0b00000010;
 
-    constexpr inline auto INTEGRATION_TIME = 0b00011000; // 400ms
-    constexpr inline auto MEASUREMENT_RATE = 0b00000111; // 2000ms
+    constexpr inline auto INTEGRATION_TIME_200MS  = 0b00010000;
+    constexpr inline auto INTEGRATION_TIME_400MS  = 0b00011000;
+    constexpr inline auto MEASUREMENT_RATE_500MS  = 0b00000011;
+    constexpr inline auto MEASUREMENT_RATE_2000MS = 0b00000111;
 
     constexpr inline auto ENABLE_IRQ = 0x0A;
 

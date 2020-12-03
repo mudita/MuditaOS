@@ -14,6 +14,8 @@ extern "C"
 
 namespace bsp::light_sensor
 {
+    using IlluminanceLux = float;
+
     std::int32_t init(xQueueHandle qHandle);
 
     void deinit();
@@ -26,7 +28,7 @@ namespace bsp::light_sensor
 
     bool isPresent();
 
-    float readout();
+    IlluminanceLux readout();
 
     BaseType_t IRQHandler();
 } // namespace bsp::light_sensor

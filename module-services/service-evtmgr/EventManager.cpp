@@ -274,16 +274,21 @@ sys::ReturnCodes EventManager::InitHandler()
     });
 
     connect(sevm::KeypadBacklightMessage(), [&](sys::Message *msgl) {
-        auto msg         = static_cast<sevm::KeypadBacklightMessage *>(msgl);
-        auto message     = std::make_shared<sevm::KeypadBacklightMessage>();
-        message->success = processKeypadBacklightRequest(msg->action);
-        return message;
+        auto request      = static_cast<sevm::KeypadBacklightMessage *>(msgl);
+        auto response     = std::make_shared<sevm::KeypadBacklightResponseMessage>();
+        response->success = processKeypadBacklightRequest(request->action);
+        return response;
     });
 
     connect(sevm::EinkFrontlightMessage(), [&](sys::Message *msgl) {
         auto msg = static_cast<sevm::EinkFrontlightMessage *>(msgl);
         processEinkFrontlightRequest(msg->action, msg->value);
         return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sevm::LightSensorMessage(), [&](sys::Message *msgl) {
+        auto message = std::make_shared<sevm::LightSensorReadoutMessage>(bsp::light_sensor::readout());
+        return message;
     });
 
     // initialize keyboard worker

@@ -41,7 +41,7 @@ namespace bsp::light_sensor
         return true;
     }
 
-    float readout()
+    IlluminanceLux readout()
     {
         return 0.0f;
     }

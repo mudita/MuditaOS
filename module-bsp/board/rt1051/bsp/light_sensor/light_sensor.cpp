@@ -61,7 +61,7 @@ namespace bsp::light_sensor
 
         void configureMeasurement()
         {
-            std::uint8_t reg = MEASUREMENT_RATE | INTEGRATION_TIME;
+            std::uint8_t reg = MEASUREMENT_RATE_500MS | INTEGRATION_TIME_200MS;
             writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_MEAS_RATE), &reg);
         }
 
@@ -112,7 +112,7 @@ namespace bsp::light_sensor
         return writeSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::ALS_CONTR), &reg);
     }
 
-    float readout()
+    IlluminanceLux readout()
     {
         uint8_t reg[4];
         readMeasurementRegisters(reg);
