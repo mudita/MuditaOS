@@ -9,9 +9,9 @@
 #include "board.h"
 
 #if DEBUG_BLUETOOTH_HCI_COMS >= 1
-#define log_hci_stack(...) LOG_DEBUG(__VA_ARGS__)
+#define logHciStack(...) LOG_DEBUG(__VA_ARGS__)
 #else
-#define log_hci_stack(...)
+#define logHciStack(...)
 #endif
 
 using namespace bsp;
@@ -39,7 +39,7 @@ BlueKitchen *BlueKitchen::getInstance()
 
 bool BlueKitchen::read(uint8_t *buf, size_t nbytes)
 {
-    log_hci_stack("BlueKitchen requested to read %d bytes", nbytes);
+    logHciStack("BlueKitchen requested to read %d bytes", nbytes);
 
     uint8_t val;
 
@@ -69,7 +69,7 @@ bool BlueKitchen::write(const uint8_t *buf, size_t size)
 {
     uint8_t val;
 
-    log_hci_stack("BlueKitchen sends %d bytes", size);
+    logHciStack("BlueKitchen sends %d bytes", size);
 
     if (BluetoothCommon::write(buf, size) == true) {
         val = Bt::Message::EvtSending;

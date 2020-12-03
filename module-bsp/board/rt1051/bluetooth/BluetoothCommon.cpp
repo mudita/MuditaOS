@@ -13,9 +13,9 @@
 #include "module-bsp/board/rt1051/common/fsl_drivers/fsl_lpuart_edma.c"
 
 #if DEBUG_BLUETOOTH_HCI_COMS >= 2
-#define log_hci_xfers(...) LOG_DEBUG(__VA_ARGS__)
+#define logHciXfers(...) LOG_DEBUG(__VA_ARGS__)
 #else
-#define log_hci_xfers(...)
+#define logHciXfers(...)
 #endif
 
 using namespace bsp;
@@ -113,7 +113,7 @@ bool BluetoothCommon::write(const uint8_t *buf, size_t size)
     switch (sent) {
     case kStatus_Success:
         // orchestrate a DMA Tx
-        log_hci_xfers("DMA Tx started (%d)", size);
+        logHciXfers("DMA Tx started (%d)", size);
         ret = true;
         break;
     case kStatus_LPUART_TxBusy:
@@ -140,7 +140,7 @@ ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t nbytes)
         constexpr auto writeBlockingTimeout = pdMS_TO_TICKS(100);
         auto ulNotificationValue            = ulTaskNotifyTake(pdFALSE, writeBlockingTimeout);
         if (ulNotificationValue != 0) { // success completing a transfer
-            log_hci_xfers("DMA Tx wrote");
+            logHciXfers("DMA Tx wrote");
             ret = nbytes;
         }
         else {
@@ -266,7 +266,7 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
 
     switch (status) {
     case kStatus_LPUART_TxIdle: {
-        log_hci_xfers("DMA irq: TX done");
+        logHciXfers("DMA irq: TX done");
         LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
         val = Bt::Message::EvtSent;
         xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
@@ -274,7 +274,7 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
         break;
     }
     case kStatus_LPUART_RxIdle:
-        log_hci_xfers("DMA irq: RX done");
+        logHciXfers("DMA irq: RX done");
         LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, false);
         val = Bt::Message::EvtReceived;
         xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
