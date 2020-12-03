@@ -1,18 +1,17 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-bsp/drivers/dmamux/DriverDMAMux.hpp>
-#include <module-bsp/bsp/BoardDefinitions.hpp>
-#include <sstream>
 #include "BluetoothWorker.hpp"
 #include "bsp/bluetooth/Bluetooth.hpp"
 #include "log/log.hpp"
 #include "FreeRTOS.h"
-#include "fsl_lpuart.h"
 #include "board.h"
-#include "module-bsp/board/rt1051/common/fsl_drivers/fsl_lpuart_edma.c"
+#include "fsl_lpuart_edma.h"
+#include <bsp/BoardDefinitions.hpp>
+//#include <drivers/dmamux/DriverDMAMux.hpp>
 
 #if DEBUG_BLUETOOTH_HCI_COMS >= 2
+#include <sstream>
 #define logHciXfers(...) LOG_DEBUG(__VA_ARGS__)
 #else
 #define logHciXfers(...)
@@ -239,9 +238,9 @@ void BluetoothCommon::configure_lpuart()
     NVIC_SetPriority(LPUART2_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY);
     NVIC_EnableIRQ(LPUART2_IRQn);
 
-    dmamux = drivers::DriverDMAMux::Create(static_cast<drivers::DMAMuxInstances>(BoardDefinitions ::BLUETOOTH_DMAMUX),
+    dmamux = drivers::DriverDMAMux::Create(static_cast<drivers::DMAMuxInstances>(BoardDefinitions::BLUETOOTH_DMAMUX),
                                            drivers::DriverDMAMuxParams{});
-    dma    = drivers::DriverDMA::Create(static_cast<drivers::DMAInstances>(BoardDefinitions ::BLUETOOTH_DMA),
+    dma    = drivers::DriverDMA::Create(static_cast<drivers::DMAInstances>(BoardDefinitions::BLUETOOTH_DMA),
                                      drivers::DriverDMAParams{});
 
     uartTxDmaHandle = dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::BLUETOOTH_TX_DMA_CHANNEL));

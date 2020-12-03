@@ -12,6 +12,7 @@ extern "C"
 };
 
 #if DEBUG_BLUETOOTH_HCI_COMS >= 1
+#include <sstream>
 #define logHciEvt(...) LOG_DEBUG(__VA_ARGS__)
 #else
 #define logHciEvt(...)
@@ -115,8 +116,6 @@ bool BluetoothWorker::start_pan()
     }
     return false;
 }
-
-#include <sstream>
 
 bool BluetoothWorker::handleMessage(uint32_t queueID)
 {

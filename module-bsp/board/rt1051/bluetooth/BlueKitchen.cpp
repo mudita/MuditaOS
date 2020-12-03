@@ -63,8 +63,6 @@ void BlueKitchen::set_flowcontrol(int on)
     // TODO
 }
 
-#include <sstream>
-
 bool BlueKitchen::write(const uint8_t *buf, size_t size)
 {
     uint8_t val;

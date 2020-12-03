@@ -7,11 +7,11 @@
 #include <thread.hpp>
 #include <board.h>
 
-// edma
-#include <module-bsp/board/rt1051/common/fsl_drivers/fsl_lpuart_edma.h>
+#if defined(TARGET_RT1051)
+#include "board/rt1051/common/fsl_drivers/fsl_lpuart_edma.h"
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
-// /edma
+#endif
 
 /// c++ low level driver overlay
 
@@ -76,13 +76,14 @@ namespace bsp {
             void configure_uart_io();
             void configure_lpuart();
             void configure_cts_irq();
-
+#if defined(TARGET_RT1051)
             std::shared_ptr<drivers::DriverDMAMux> dmamux;
             std::shared_ptr<drivers::DriverDMA> dma;
             std::unique_ptr<drivers::DriverDMAHandle> uartRxDmaHandle;
             std::unique_ptr<drivers::DriverDMAHandle> uartTxDmaHandle;
             static AT_NONCACHEABLE_SECTION_INIT(lpuart_edma_handle_t uartDmaHandle);
             static void uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
+#endif
     };
 
     /// definitions needed by BT stack
