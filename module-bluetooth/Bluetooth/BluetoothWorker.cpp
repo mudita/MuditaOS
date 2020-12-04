@@ -11,11 +11,17 @@ extern "C"
 #include "module-bluetooth/lib/btstack/src/btstack_util.h"
 };
 
-#if DEBUG_BLUETOOTH_HCI_COMS >= 1
-#include <sstream>
-#define logHciEvt(...) LOG_DEBUG(__VA_ARGS__)
+#if DEBUG_BLUETOOTH_HCI_COMS == 1
+#define logHciComs(...) LOG_DEBUG(__VA_ARGS__)
 #else
-#define logHciEvt(...)
+#define logHciComs(...)
+#endif
+
+#if DEBUG_BLUETOOTH_HCI_BYTES == 1
+#include <sstream>
+#define logHciBytes(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define logHciBytes(...)
 #endif
 
 using namespace bsp;
@@ -138,25 +144,29 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
     auto bt = BlueKitchen::getInstance();
     switch (notification) {
     case Bt::Message::EvtSending:
-        logHciEvt("[evt] sending");
+        logHciComs("[evt] sending");
         break;
     case Bt::Message::EvtSent:
-        logHciEvt("[evt] sent");
+        logHciComs("[evt] sent");
         if (bt->write_done_cb) {
             bt->write_done_cb();
         }
         break;
     case Bt::Message::EvtReceiving:
-        logHciEvt("[evt] receiving");
+        logHciComs("[evt] receiving");
         break;
     case Bt::Message::EvtReceived: {
-#if DEBUG_BLUETOOTH_HCI_COMS >= 3
-        std::stringstream ss;
-        for (int i = 0; i < bt->read_len; ++i) {
-            ss << " 0x" << std::hex << (int)*(bt->read_buff + i);
-        }
-        logHciEvt("[evt] BT DMA received <-- [%ld]>%s<", bt->read_len, ss.str().c_str());
-#endif
+        logHciBytes("[evt] BT DMA received <-- [%ld]>%s<",
+                    bt->read_len,
+                    [&]() -> std::string {
+                        std::stringstream ss;
+                        for (int i = 0; i < bt->read_len; ++i) {
+                            ss << " 0x" << std::hex << (int)*(bt->read_buff + i);
+                        }
+                        return ss.str();
+                    }()
+                                 .c_str());
+
         bt->read_len = 0;
 
         if (bt->read_ready_cb) {

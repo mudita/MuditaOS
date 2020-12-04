@@ -41,15 +41,25 @@ void BluetoothCommon::sleep_ms(ssize_t ms)
 
 bool BlueKitchen::read(uint8_t *buf, size_t nbytes)
 {
-    return 0;
+    return false;
+}
+
+bool BluetoothCommon::read(uint8_t *buf, size_t nbytes)
+{
+    return false;
 }
 
 bool BlueKitchen::write(const uint8_t *buf, size_t nbytes)
 {
-    return 0;
+    return false;
 }
 
-ssize_t write_blocking(const uint8_t *buf, ssize_t nbytes)
+bool BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
+{
+    return false;
+}
+
+ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t nbytes)
 {
     return 0;
 }
@@ -75,4 +85,3 @@ void BluetoothCommon::configure_cts_irq()
 
 void BluetoothCommon::set_irq(bool enable)
 {}
-

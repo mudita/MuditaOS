@@ -8,7 +8,7 @@
 #include "fsl_lpuart.h"
 #include "board.h"
 
-#if DEBUG_BLUETOOTH_HCI_COMS >= 1
+#if DEBUG_BLUETOOTH_HCI_COMS == 1
 #define logHciStack(...) LOG_DEBUG(__VA_ARGS__)
 #else
 #define logHciStack(...)
@@ -58,11 +58,6 @@ bool BlueKitchen::read(uint8_t *buf, size_t nbytes)
     return val == Bt::Message::EvtReceiving;
 }
 
-void BlueKitchen::set_flowcontrol(int on)
-{
-    // TODO
-}
-
 bool BlueKitchen::write(const uint8_t *buf, size_t size)
 {
     uint8_t val;
@@ -79,4 +74,9 @@ bool BlueKitchen::write(const uint8_t *buf, size_t size)
     }
 
     return val == Bt::Message::EvtSending;
+}
+
+void BlueKitchen::set_flowcontrol(int on)
+{
+    // TODO
 }
