@@ -37,7 +37,7 @@ namespace gui
         multilineText->setEdges(RectangleEdge::None);
         multilineText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
         multilineText->setFont(style::window::font::medium);
-        multilineText->setEditMode(EditMode::BROWSE);
+        multilineText->setEditMode(EditMode::Browse);
 
         applyItemNameSpecificSettings();
 

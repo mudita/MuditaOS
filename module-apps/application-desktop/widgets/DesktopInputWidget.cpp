@@ -49,7 +49,7 @@ namespace gui
         body = new HBox(this, 0, 0, 0, 0);
         body->setEdges(RectangleEdge::Bottom);
         body->setMaximumSize(style::window::default_body_width, style::desktop::body::body_height);
-        inputText = new gui::Text(body, 0, 0, 0, 0, "", ExpandMode::EXPAND_NONE);
+        inputText = new gui::Text(body, 0, 0, 0, 0, "", ExpandMode::None);
         inputText->setMaximumSize(style::desktop::inputText::default_input_w, style::desktop::inputText::max_input_h);
         inputText->setMinimumSize(style::desktop::inputText::default_input_w,
                                   style::desktop::inputText::default_input_h);
@@ -59,7 +59,7 @@ namespace gui
         inputText->setPenFocusWidth(style::window::default_border_focus_w);
         inputText->setPenWidth(style::window::default_border_focus_w);
         inputText->setEdges(gui::RectangleEdge::None);
-        inputText->setEditMode(EditMode::EDIT);
+        inputText->setEditMode(EditMode::Edit);
         setFocusItem(inputText);
 
         inputText->activatedCallback = [=](gui::Item &) {

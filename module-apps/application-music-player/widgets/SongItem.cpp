@@ -35,7 +35,7 @@ namespace gui
         durationText->setUnderline(false);
         durationText->setFont(style::window::font::verysmall);
         durationText->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
-        durationText->setEditMode(EditMode::BROWSE);
+        durationText->setEditMode(EditMode::Browse);
         durationText->setText(duration);
 
         songText = new TextFixedSize(firstHBox, 0, 0, 0, 0);
@@ -46,7 +46,7 @@ namespace gui
         songText->setUnderline(false);
         songText->setFont(style::window::font::verysmallbold);
         songText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        songText->setEditMode(EditMode::BROWSE);
+        songText->setEditMode(EditMode::Browse);
         songText->setText(songName);
 
         playedSong = new ImageBox(secondHBox, 0, 0, 0, 0, new Image("messages_error_W_M"));
@@ -61,7 +61,7 @@ namespace gui
         authorText->setUnderline(false);
         authorText->setFont(style::window::font::verysmall);
         authorText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        authorText->setEditMode(EditMode::BROWSE);
+        authorText->setEditMode(EditMode::Browse);
         authorText->setText(authorName);
     }
 

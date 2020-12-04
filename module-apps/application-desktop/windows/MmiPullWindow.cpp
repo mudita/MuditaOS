@@ -43,8 +43,8 @@ MmiPullWindow::MmiPullWindow(app::Application *app, const std::string &name) : g
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
     text = new Text(
         this, style::desktop::text::x, style::desktop::text::y, style::desktop::text::w, style::desktop::text::h);
-    text->setTextType(TextType::MULTI_LINE);
-    text->setEditMode(EditMode::BROWSE);
+    text->setTextType(TextType::MultiLine);
+    text->setEditMode(EditMode::Browse);
     text->setEdges(RectangleEdge::None);
     text->setFont(style::window::font::medium);
     text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));

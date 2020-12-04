@@ -53,7 +53,7 @@ namespace gui
             [=]() { selectSpecialCharacter(); }));
         inputText->setPenFocusWidth(style::window::default_border_focus_w);
         inputText->setPenWidth(style::window::default_border_no_focus_w);
-        inputText->setEditMode(EditMode::EDIT);
+        inputText->setEditMode(EditMode::Edit);
 
         applyItemNameSpecificSettings();
 
@@ -130,7 +130,7 @@ namespace gui
     void InputLinesWithLabelIWidget::firstNameHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
-        inputText->setTextType(TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SingleLine);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->primaryName = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->primaryName); };
@@ -139,7 +139,7 @@ namespace gui
     void InputLinesWithLabelIWidget::secondNameHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
-        inputText->setTextType(TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SingleLine);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
             contact->alternativeName = inputText->getText();
@@ -150,7 +150,7 @@ namespace gui
     void InputLinesWithLabelIWidget::numberHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number"));
-        inputText->setTextType(TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SingleLine);
         inputText->setInputMode(new InputMode({InputMode::phone}));
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
@@ -169,7 +169,7 @@ namespace gui
     void InputLinesWithLabelIWidget::secondNumberHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_number"));
-        inputText->setTextType(TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SingleLine);
         inputText->setInputMode(new InputMode({InputMode::phone}));
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
@@ -188,7 +188,7 @@ namespace gui
     void InputLinesWithLabelIWidget::emailHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_email"));
-        inputText->setTextType(TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SingleLine);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->mail); };
@@ -197,7 +197,7 @@ namespace gui
     void InputLinesWithLabelIWidget::addressHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
-        inputText->setTextType(TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SingleLine);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->address); };
@@ -205,7 +205,7 @@ namespace gui
     void InputLinesWithLabelIWidget::noteHandler()
     {
         titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
-        inputText->setTextType(TextType::SINGLE_LINE);
+        inputText->setTextType(TextType::SingleLine);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->note = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->note); };

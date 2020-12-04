@@ -63,7 +63,7 @@ namespace gui::option
             auto text = new TextFixedSize(nullptr, style::option::text_left_padding, 0, 0, 0);
             text->setMaximumSize(rect->getWidth(), rect->getHeight());
             text->setUnderline(false);
-            text->setEditMode(EditMode::BROWSE);
+            text->setEditMode(EditMode::Browse);
             text->setFont(font_bold);
             text->setText("Change PIN");
             text->setAlignment(Alignment(Alignment::Vertical::Center));
@@ -76,7 +76,7 @@ namespace gui::option
             pin_text->setMinimumSize(60, rect->getHeight());
             pin_text->setMaximumSize(200, rect->getHeight());
             pin_text->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-            pin_text->setEditMode(EditMode::EDIT);
+            pin_text->setEditMode(EditMode::Edit);
             pin_text->setFont(font);
             pin_text->setText(std::to_string(lockHash));
             pin_text->setPenWidth(0);
