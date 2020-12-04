@@ -20,6 +20,7 @@
 #include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/Window.hpp"
 #include <widgets/BoxLayout.hpp>
+
 namespace gui
 {
 
@@ -41,8 +42,6 @@ namespace gui
         gui::HBox *dateBody = nullptr;
         gui::HBox *timeBody = nullptr;
 
-        bool timeFormat12h  = false;
-        bool timeDateFormat = false; // true europe format, flase american format
         bool dayPeriod      = false; // day period indicator false am, true pm
 
         gui::Label *addDateTimeItem(Item *parent, const UTF8 &itemTitle, const UTF8 &value);
@@ -52,14 +51,16 @@ namespace gui
         bool setDate(int32_t value);
         bool setTime(int32_t value);
         void setRTC(void);
+        bool isEuroTime = false;
 
       public:
-        DateTimeWindow(app::Application *app);
+        DateTimeWindow(app::Application *app, bool isEuroTime);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+        void setEuroTime(bool euroTime);
 
       private:
         void invalidate() noexcept;

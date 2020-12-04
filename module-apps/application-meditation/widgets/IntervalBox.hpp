@@ -12,6 +12,8 @@
 
 namespace gui
 {
+    class TimerProperty;
+
     class IntervalBox : public BoxLayout
     {
         class ChimeIntervalList
@@ -28,34 +30,34 @@ namespace gui
 
             ChimeIntervalList();
 
-            std::chrono::minutes getCurrent() const noexcept
+            [[nodiscard]] std::chrono::minutes getCurrent() const noexcept
             {
                 return *current;
             }
 
-            bool moveToNext(Direction dir) noexcept;
-            [[nodiscard]] bool hasNext(Direction dir) const noexcept;
+            bool moveToNext(Direction dir, std::chrono::minutes meditationTime) noexcept;
+            [[nodiscard]] bool hasNext(Direction dir, std::chrono::minutes meditationTime) const noexcept;
 
             [[nodiscard]] static std::string toPrintableInterval(std::chrono::minutes time);
         } chimeIntervals;
 
+        TimerProperty *timerSetter = nullptr;
         Label *bottomLabel      = nullptr;
         Image *leftSwitchArrow  = nullptr;
         Image *rightSwitchArrow = nullptr;
 
-        bool showLeftArrowOnFocus  = true;
-        bool showRightArrowOnFocus = true;
         std::chrono::minutes intervalValue{0};
 
         void build();
         void updateIntervals(ChimeIntervalList::Direction dir);
+        void rescaleIntervals();
 
       public:
-        IntervalBox(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h);
+        IntervalBox(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, TimerProperty *timerSetter);
 
         bool onFocus(bool isFocused) final;
         bool onInput(const InputEvent &inputEvent) final;
-        std::chrono::seconds getIntervalValue() const noexcept
+        [[nodiscard]] std::chrono::seconds getIntervalValue() const noexcept
         {
             return std::chrono::seconds{intervalValue};
         }

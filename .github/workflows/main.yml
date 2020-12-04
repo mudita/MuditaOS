@@ -39,3 +39,41 @@ jobs:
         make -j ${JOBS} && \
         popd && \
         uptime
+
+  simulator_tests:
+    name: simulator tests
+    runs-on: self-hosted
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: build emulator
+        run: |
+          ./configure.sh linux Debug && \
+          pushd build-linux-Debug && \
+          export JOBS=${JOBS:-`nproc`} && \
+          echo "JOBS=${JOBS}" && \
+          make -j ${JOBS} && \
+          popd && \
+          uptime
+
+      - name: start emulator
+        run: |
+          ./run_emulator_on_filesystem_image.sh 2>&1 > emulator.log &
+          echo $! > emulator.pid
+
+      - name: run tests
+        run: pytest ./pytest -rP --port=simulator --timeout=20 -m 'not rt1051'
+        working-directory: test
+
+      - name: kill emulator
+        run: |
+          kill $(cat emulator.pid)
+          rm emulator.pid
+        if: always()
+
+      - name: print emulator logs
+        run: cat emulator.log
+        if: always()

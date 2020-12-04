@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <InputMode.hpp>
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <map>
 
 /// input mode strings - as these are stored in json (in files...)

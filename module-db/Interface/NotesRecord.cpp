@@ -2,100 +2,177 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesRecord.hpp"
-#include "../Tables/NotesTable.hpp"
+
+#include "queries/notes/QueryNotesGet.hpp"
+#include "queries/notes/QueryNotesGetByText.hpp"
+#include "queries/notes/QueryNoteStore.hpp"
+#include "queries/notes/QueryNoteRemove.hpp"
+
+#include <cassert>
+
+namespace
+{
+    NotesTableFields toNotesTableFields(NotesRecordField field)
+    {
+        switch (field) {
+        case NotesRecordField::Date:
+            return NotesTableFields::Date;
+        case NotesRecordField::Snippet:
+            return NotesTableFields::Snippet;
+        }
+        throw std::invalid_argument{"Invalid notes record field passed."};
+    }
+} // namespace
 
 NotesRecordInterface::NotesRecordInterface(NotesDB *notesDb) : notesDB(notesDb)
 {}
 
-NotesRecordInterface::~NotesRecordInterface()
-{}
-
 bool NotesRecordInterface::Add(const NotesRecord &rec)
 {
-    // Create SMS
-    notesDB->notes.add(NotesTableRow{.date = rec.date, .snippet = rec.snippet, .path = rec.path});
-
-    // TODO: error check
-
-    return true;
+    return notesDB->notes.add(NotesTableRow{.date = rec.date, .snippet = rec.snippet});
 }
 
-uint32_t NotesRecordInterface::GetCount()
+std::uint32_t NotesRecordInterface::GetCount()
 {
     return notesDB->notes.count();
 }
 
-std::unique_ptr<std::vector<NotesRecord>> NotesRecordInterface::GetLimitOffsetByField(uint32_t offset,
-                                                                                      uint32_t limit,
+std::unique_ptr<std::vector<NotesRecord>> NotesRecordInterface::GetLimitOffsetByField(std::uint32_t offset,
+                                                                                      std::uint32_t limit,
                                                                                       NotesRecordField field,
                                                                                       const char *str)
 {
-    return GetLimitOffset(offset, limit);
+    auto records     = std::make_unique<std::vector<NotesRecord>>();
+    const auto notes = notesDB->notes.getLimitOffsetByField(offset, limit, toNotesTableFields(field), str);
+    for (const auto &w : notes) {
+        NotesRecord record{w.ID, w.date, w.snippet};
+        records->push_back(std::move(record));
+    }
+    return records;
 }
 
-std::unique_ptr<std::vector<NotesRecord>> NotesRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)
+std::unique_ptr<std::vector<NotesRecord>> NotesRecordInterface::GetLimitOffset(std::uint32_t offset,
+                                                                               std::uint32_t limit)
 {
-    auto notes = notesDB->notes.getLimitOffset(offset, limit);
-
-    auto records = std::make_unique<std::vector<NotesRecord>>();
-    //
-    NotesRecordInterface notesInterface(notesDB);
-    for (const auto &w : notes) {
-
-        records->push_back({
-            .ID      = w.ID,
-            .date    = w.date,
-            .snippet = w.snippet,
-            .path    = w.path,
-        });
-    }
-
-    return records;
+    return std::make_unique<std::vector<NotesRecord>>(getNotes(offset, limit));
 }
 
 bool NotesRecordInterface::Update(const NotesRecord &rec)
 {
-
     auto note = notesDB->notes.getById(rec.ID);
-    if (note.ID == 0) {
+    if (note.ID == DB_ID_NONE) {
         return false;
     }
 
-    notesDB->notes.update(NotesTableRow{.ID = rec.ID, .date = rec.date, .snippet = rec.snippet, .path = rec.path});
-
+    notesDB->notes.update(NotesTableRow{.ID = rec.ID, .date = rec.date, .snippet = rec.snippet});
     return true;
 }
 
-bool NotesRecordInterface::RemoveByID(uint32_t id)
+bool NotesRecordInterface::RemoveAll()
 {
+    return notesDB->notes.removeAll();
+}
 
-    auto note = notesDB->notes.getById(id);
-    if (note.ID == 0) {
-        return false;
-    }
-
-    // Remove SMS
-    if (notesDB->notes.removeById(id) == false) {
-        return false;
-    }
-
-    return true;
+bool NotesRecordInterface::RemoveByID(std::uint32_t id)
+{
+    return notesDB->notes.removeById(id);
 }
 
 bool NotesRecordInterface::RemoveByField(NotesRecordField field, const char *str)
 {
-
     switch (field) {
-    case NotesRecordField::Data:
+    case NotesRecordField::Date:
         return notesDB->notes.removeByField(NotesTableFields::Date, str);
     default:
         return false;
     }
 }
 
-NotesRecord NotesRecordInterface::GetByID(uint32_t id)
+NotesRecord NotesRecordInterface::GetByID(std::uint32_t id)
 {
     auto note = notesDB->notes.getById(id);
+    return NotesRecord{note.ID, note.date, note.snippet};
+}
 
-    return NotesRecord{.ID = note.ID, .date = note.date, .snippet = note.snippet, .path = note.path};
+std::vector<NotesRecord> NotesRecordInterface::getNotes(std::uint32_t offset, std::uint32_t limit) const
+{
+    std::vector<NotesRecord> records;
+    const auto &notes = notesDB->notes.getLimitOffset(offset, limit);
+    for (const auto &note : notes) {
+        NotesRecord record{note.ID, note.date, note.snippet};
+        records.push_back(std::move(record));
+    }
+    return records;
+}
+
+std::vector<NotesRecord> NotesRecordInterface::getNotesByText(const std::string &text) const
+{
+    std::vector<NotesRecord> records;
+    const auto &notes = notesDB->notes.getByText(text);
+    for (const auto &note : notes) {
+        NotesRecord record{note.ID, note.date, note.snippet};
+        records.push_back(std::move(record));
+    }
+    return records;
+}
+
+std::unique_ptr<db::QueryResult> NotesRecordInterface::runQuery(std::shared_ptr<db::Query> query)
+{
+    if (typeid(*query) == typeid(db::query::QueryNotesGet)) {
+        return getQuery(query);
+    }
+    if (typeid(*query) == typeid(db::query::QueryNotesGetByText)) {
+        return getByTextQuery(query);
+    }
+    if (typeid(*query) == typeid(db::query::QueryNoteStore)) {
+        return storeQuery(query);
+    }
+    if (typeid(*query) == typeid(db::query::QueryNoteRemove)) {
+        return removeQuery(query);
+    }
+    return nullptr;
+}
+
+std::unique_ptr<db::QueryResult> NotesRecordInterface::getQuery(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<db::query::QueryNotesGet *>(query.get());
+    const auto &records   = getNotes(localQuery->getOffset(), localQuery->getLimit());
+    auto response         = std::make_unique<db::query::NotesGetResult>(records, GetCount());
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> NotesRecordInterface::getByTextQuery(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<db::query::QueryNotesGetByText *>(query.get());
+    const auto &records   = getNotesByText(localQuery->getText());
+    auto response         = std::make_unique<db::query::NotesGetByTextResult>(records);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> NotesRecordInterface::storeQuery(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<db::query::QueryNoteStore *>(query.get());
+    const auto &record    = localQuery->getRecord();
+    bool isSuccess        = false;
+    if (const auto exists = notesDB->notes.getById(record.ID).ID != DB_ID_NONE; exists) {
+        isSuccess = Update(record);
+    }
+    else {
+        isSuccess = Add(record);
+    }
+
+    auto response = std::make_unique<db::query::NoteStoreResult>(isSuccess);
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> NotesRecordInterface::removeQuery(const std::shared_ptr<db::Query> &query)
+{
+    const auto localQuery = static_cast<db::query::QueryNoteRemove *>(query.get());
+    const auto isSuccess  = RemoveByID(localQuery->getRecordId());
+    auto response         = std::make_unique<db::query::NoteRemoveResult>(isSuccess);
+    response->setRequestQuery(query);
+    return response;
 }

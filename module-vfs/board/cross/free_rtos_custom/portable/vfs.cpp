@@ -25,6 +25,9 @@ void vfs::Init()
 
     bootConfig.os_root_path = purefs::dir::getRootDiskPath();
 
+    chnNotifier.onFileSystemInitialized();
+    initDone = true;
+
     if (loadBootConfig(getCurrentBootJSON())) {
         LOG_INFO("vfs::Init osType %s root:%s", bootConfig.os_type.c_str(), bootConfig.os_root_path.c_str());
         if (ff_chdir(bootConfig.os_root_path.c_str()) != 0) {
@@ -48,6 +51,4 @@ void vfs::Init()
     else {
         LOG_INFO("vfs::Init looks like %s exists", userDiskPath.c_str());
     }
-    chnNotifier.onFileSystemInitialized();
-    initDone = true;
 }

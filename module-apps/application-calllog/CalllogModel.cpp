@@ -7,6 +7,7 @@
 #include "data/CallLogInternals.hpp"
 #include "data/CallLogSwitchData.hpp"
 #include "widgets/CalllogItem.hpp"
+#include <module-utils/Utils.hpp>
 
 #include <service-db/DBServiceAPI.hpp>
 #include <service-appmgr/Controller.hpp>
@@ -54,13 +55,11 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
 {
 
     std::shared_ptr<CalllogRecord> call = getRecord(order);
-
-    SettingsRecord &settings = application->getSettings();
     if (call.get() == nullptr) {
         return nullptr;
     }
 
-    auto item = new gui::CalllogItem(this, !settings.timeFormat12);
+    auto item = new gui::CalllogItem(this, !(application->isTimeFormat12()));
 
     item->setCall(call);
     item->activatedCallback = [=](gui::Item &item) {

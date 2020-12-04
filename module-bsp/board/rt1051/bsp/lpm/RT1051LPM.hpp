@@ -6,6 +6,7 @@
 
 #include "bsp/lpm/bsp_lpm.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
+#include "CpuFreqLPM.hpp"
 
 namespace bsp
 {
@@ -17,6 +18,7 @@ namespace bsp
         int32_t Switch(const Mode mode) override final;
         int32_t PowerOff() override final;
         int32_t Reboot() override final;
+        void SetCpuFrequency(CpuFrequency freq) final;
 
       private:
         int32_t EnterLowPowerRun();
@@ -25,6 +27,7 @@ namespace bsp
         int32_t EnterSuspend();
 
         std::shared_ptr<drivers::DriverGPIO> gpio;
+        std::unique_ptr<bsp::CpuFreqLPM> CpuFreq;
     };
 
 } // namespace bsp

@@ -11,7 +11,7 @@
 #include <application-phonebook/windows/PhonebookSearchResults.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-db/DBServiceAPI.hpp>
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <BoxLayout.hpp>
 #include <Text.hpp>
 

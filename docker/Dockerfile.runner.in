@@ -17,6 +17,10 @@ RUN locale-gen pl_PL.UTF-8 \
     dpkg-reconfigure --frontend noninteractive tzdata
 RUN mkdir -p /home/runner/app/settings
 
+#add python packages
+ADD assets/requirements.txt /home/docker/requirements.txt
+RUN pip3 install -r /home/docker/requirements.txt
+
 # ARM compiler
 ADD assets/@ARM_GCC_PKG@ /usr/local/
 

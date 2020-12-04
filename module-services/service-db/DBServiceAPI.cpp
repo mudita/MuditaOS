@@ -24,7 +24,6 @@
 #include <SMSTemplateRecord.hpp>
 #include <Service/Bus.hpp>
 #include <Service/Common.hpp>
-#include <SettingsRecord.hpp>
 #include <Tables/CountryCodesTable.hpp>
 #include <Tables/Record.hpp>
 #include <ThreadRecord.hpp>
@@ -42,41 +41,6 @@ namespace sys
     class Service;
 } // namespace sys
 struct NotesRecord;
-
-SettingsRecord DBServiceAPI::SettingsGet(sys::Service *serv)
-{
-
-    std::shared_ptr<DBSettingsMessage> msg = std::make_shared<DBSettingsMessage>(MessageType::DBSettingsGet);
-
-    auto ret = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
-    if (ret.first == sys::ReturnCodes::Success) {
-        auto respMsg                                = ret.second;
-        DBSettingsResponseMessage *settingsResponse = reinterpret_cast<DBSettingsResponseMessage *>(respMsg.get());
-
-        if (settingsResponse->retCode == true) {
-            return settingsResponse->record;
-        }
-        else {
-            return SettingsRecord{};
-        }
-    }
-    else {
-        return SettingsRecord{};
-    }
-}
-
-bool DBServiceAPI::SettingsUpdate(sys::Service *serv, const SettingsRecord &rec)
-{
-    std::shared_ptr<DBSettingsMessage> msg = std::make_shared<DBSettingsMessage>(MessageType::DBSettingsUpdate, rec);
-
-    auto ret = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
-    if (ret.first == sys::ReturnCodes::Success) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
 
 uint32_t DBServiceAPI::SMSAdd(sys::Service *serv, const SMSRecord &rec)
 {

@@ -11,6 +11,7 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dmamux/DriverDMAMux.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dma/DriverDMA.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c/DriverI2C.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pwm/DriverPWM.cpp"
         #"${CMAKE_CURRENT_SOURCE_DIR}/drivers/sai/DriverSAI.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio/DriverGPIO.cpp"
         board/linux/lpm/LinuxLPM.cpp board/linux/lpm/LinuxLPM.h

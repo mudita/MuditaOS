@@ -5,25 +5,43 @@
 #include <memory>
 #include <string>
 
-namespace purefs::blkdev
+namespace purefs::blkdev::internal
 {
-    class disk;
+    class disk_handle;
 }
 
 namespace purefs::fs
 {
-    class filesystem_operation;
+    class filesystem_operations;
 }
 
 namespace purefs::fs::internal
 {
     //! Mount point disk private structure
-    //! TODO fill the blanks
     class mount_point
     {
-        virtual ~mount_point() = default;
-        int device{-1};                                 //! Owning device
-        std::string mount_path;                         //! Mounted path
-        std::weak_ptr<filesystem_operation> filesystem; //! Filesystem operation
+      public:
+        mount_point(std::shared_ptr<blkdev::internal::disk_handle> diskh,
+                    std::string_view path,
+                    std::shared_ptr<filesystem_operations> fs)
+            : m_diskh(diskh), m_path(path), m_fs(fs)
+        {}
+        auto disk() const noexcept
+        {
+            return m_diskh;
+        }
+        auto mount_path() const noexcept
+        {
+            return m_path;
+        }
+        auto fs_ops() const noexcept
+        {
+            return m_fs;
+        }
+
+      private:
+        const std::weak_ptr<blkdev::internal::disk_handle> m_diskh;
+        const std::string_view m_path;                   //! Mounted path
+        const std::weak_ptr<filesystem_operations> m_fs; //! Filesystem operation
     };
 } // namespace purefs::fs::internal
