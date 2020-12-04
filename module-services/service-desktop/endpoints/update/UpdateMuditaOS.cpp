@@ -762,12 +762,9 @@ void UpdateMuditaOS::storeRunStatusInDB()
                     tempTable.emplace_back(value);
                 }
             }
-            catch (std::invalid_argument &arg) {
-                LOG_ERROR("storeRunStatusInDB conversion from %s to integer failed",
-                          value[updateos::settings::startTime].string_value().c_str());
-            }
-            catch (std::out_of_range &arg) {
-                LOG_ERROR("storeRunStatusInDB %s is out of range for conversion to integer",
+            catch (const std::exception &arg) {
+                LOG_ERROR("storeRunStatusInDB %s error - %s",
+                          arg.what(),
                           value[updateos::settings::startTime].string_value().c_str());
             }
         }
