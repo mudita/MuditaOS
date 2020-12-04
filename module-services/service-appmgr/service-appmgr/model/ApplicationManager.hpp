@@ -14,7 +14,6 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/Timer.hpp>
-#include <SettingsRecord.hpp>
 #include <SwitchData.hpp>
 
 #include <deque>
@@ -22,6 +21,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include <service-db/Settings.hpp>
 
 namespace app
 {
@@ -136,12 +137,18 @@ namespace app::manager
         void onPhoneLocked();
 
         ApplicationName rootApplicationName;
-        SettingsRecord settings;
         std::unique_ptr<sys::Timer> blockingTimer; //< timer to count time from last user's activity. If it reaches time
                                                    // defined in settings database application
                                                    // manager is sending signal to power manager and changing window to
                                                    // the desktop window in the blocked state.
         // Temporary solution - to be replaced with ActionsMiddleware.
         std::tuple<ApplicationName, actions::ActionId, actions::ActionParamsPtr> pendingAction;
+
+        std::unique_ptr<settings::Settings> settings;
+        void displayLanguageChanged(std::string value);
+        void lockTimeChanged(std::string value);
+        void inputLanguageChanged(std::string value);
+        std::string inputLanguage;
+        std::string displayLanguage;
     };
 } // namespace app::manager

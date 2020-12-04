@@ -7,7 +7,7 @@
 
 #include "../ApplicationSettings.hpp"
 
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 
 #include "Label.hpp"
 #include "LanguageWindow.hpp"
@@ -17,7 +17,8 @@
 namespace gui
 {
 
-    LanguageWindow::LanguageWindow(app::Application *app) : AppWindow(app, "Languages")
+    LanguageWindow::LanguageWindow(app::Application *app, app::LanguageSetter *setter)
+        : AppWindow(app, "Languages"), setter(setter)
     {
         buildInterface();
         setFocusItem(options[0]);
@@ -52,7 +53,7 @@ namespace gui
         const auto &langList = loader.getAvailableDisplayLanguages();
         for (const auto &lang : langList) {
             options.push_back(addOptionLabel(lang, [=](gui::Item &item) {
-                app::manager::Controller::changeDisplayLanguage(application, lang);
+                setter->setDisplayLanguage(lang);
                 return true;
             }));
         }

@@ -5,7 +5,6 @@
 
 #include "Audio/AudioCommon.hpp"                        // for Volume, Play...
 #include "Audio/Profiles/Profile.hpp"                   // for Profile, Pro...
-#include "Interface/SettingsRecord.hpp"                 // for SettingsRecord
 #include "Service/Bus.hpp"                              // for Bus
 #include "Service/Common.hpp"                           // for ReturnCodes
 #include "Service/Message.hpp"                          // for MessagePointer
@@ -51,6 +50,10 @@ namespace gui
 namespace sys
 {
     class Timer;
+}
+namespace settings
+{
+    class Settings;
 }
 
 namespace app
@@ -247,12 +250,6 @@ namespace app
         /// it modifies windows stack
         void setActiveWindow(const std::string &windowName);
 
-        /// getter for settings record
-        SettingsRecord &getSettings()
-        {
-            return settings;
-        }
-
         /// see suspendInProgress documentation
         virtual void setSuspendFlag(bool val)
         {
@@ -304,9 +301,6 @@ namespace app
         /// @}
 
       protected:
-        /// application's settings taken from database
-        SettingsRecord settings;
-
         void longPressTimerCallback();
         /// Method used to register all windows and widgets in application
         virtual void createUserInterface() = 0;
@@ -365,6 +359,14 @@ namespace app
                                                  const gui::InputEvent &event);
 
         void addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback);
+
+        /// application's settings
+        std::unique_ptr<settings::Settings> settings;
+        virtual void timeFormatChanged(std::string value);
+        bool timeFormat12 = false;
+
+      public:
+        bool isTimeFormat12() const noexcept;
     };
 
     /// Parameter pack used by application launch action.

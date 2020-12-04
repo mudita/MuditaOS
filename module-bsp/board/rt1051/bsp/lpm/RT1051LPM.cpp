@@ -24,6 +24,8 @@ namespace bsp
                                           .pin = static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON)});
 
         gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 1);
+
+        CpuFreq = std::make_unique<CpuFreqLPM>();
     }
 
     int32_t RT1051LPM::Switch(const bsp::LowPowerMode::Mode mode)
@@ -77,5 +79,30 @@ namespace bsp
     int32_t RT1051LPM::EnterSuspend()
     {
         return 0;
+    }
+
+    void RT1051LPM::SetCpuFrequency(bsp::LowPowerMode::CpuFrequency freq)
+    {
+        switch (freq) {
+        case bsp::LowPowerMode::CpuFrequency::Level_1:
+            CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_12_Mhz);
+            break;
+        case bsp::LowPowerMode::CpuFrequency::Level_2:
+            CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_24_Mhz);
+            break;
+        case bsp::LowPowerMode::CpuFrequency::Level_3:
+            CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_66_Mhz);
+            break;
+        case bsp::LowPowerMode::CpuFrequency::Level_4:
+            CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_132_Mhz);
+            break;
+        case bsp::LowPowerMode::CpuFrequency::Level_5:
+            CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_264_Mhz);
+            break;
+        case bsp::LowPowerMode::CpuFrequency::Level_6:
+            CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_528_Mhz);
+            break;
+        }
+        LOG_INFO("CPU frequency changed to %lu", CLOCK_GetFreq(kCLOCK_CpuClk));
     }
 } // namespace bsp

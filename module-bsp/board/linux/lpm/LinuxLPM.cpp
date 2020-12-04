@@ -25,4 +25,7 @@ namespace bsp
     {
         return 0;
     }
+
+    void LinuxLPM::SetCpuFrequency(bsp::LowPowerMode::CpuFrequency freq)
+    {}
 } // namespace bsp

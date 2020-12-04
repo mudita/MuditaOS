@@ -3,7 +3,12 @@
 
 #pragma once
 
-#include "Application.hpp"
+namespace app
+{
+    class Application;
+    class PinLockSetter;
+} // namespace app
+
 #include <OptionWindow.hpp>
 
-std::list<gui::Option> settingsChangeWindow(app::Application *app);
+std::list<gui::Option> settingsChangeWindow(app::Application *app, app::PinLockSetter *setter, unsigned int lockHash);

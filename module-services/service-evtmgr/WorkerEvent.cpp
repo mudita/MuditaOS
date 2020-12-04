@@ -17,7 +17,9 @@
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/rtc/rtc.hpp>
 #include <bsp/torch/torch.hpp>
+#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <bsp/vibrator/vibrator.hpp>
+#include <bsp/eink_frontlight/eink_frontlight.hpp>
 #include <common_data/EventStore.hpp>
 #include <common_data/RawKey.hpp>
 #include <headset.hpp>
@@ -179,6 +181,8 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     bsp::cellular::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueCellular)]);
     bsp::magnetometer::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]);
     bsp::torch::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueTorch)]);
+    bsp::keypad_backlight::init();
+    bsp::eink_frontlight::init();
 
     time_t timestamp;
     bsp::rtc_GetCurrentTimestamp(&timestamp);
@@ -194,6 +198,8 @@ bool WorkerEvent::deinit(void)
     bsp::headset::Deinit();
     bsp::battery_Deinit();
     bsp::torch::deinit();
+    bsp::keypad_backlight::deinit();
+    bsp::eink_frontlight::deinit();
 
     return true;
 }

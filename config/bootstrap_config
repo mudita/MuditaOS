@@ -47,6 +47,7 @@ INSTALL_PACKAGES="
         tzdata \
         vim \
         wget \
-        python3-magic
+        python3-magic \
+        python3-pip
 "
 

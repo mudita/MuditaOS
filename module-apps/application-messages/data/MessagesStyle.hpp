@@ -74,6 +74,7 @@ namespace style
             inline constexpr gui::Length sms_radius                  = 8;
             inline constexpr gui::Length default_h                   = 30;
             inline constexpr gui::Length sms_max_width               = 320;
+            inline constexpr gui::Length sms_max_height              = 270;
             inline constexpr gui::Length sms_h_padding               = 15;
             inline constexpr gui::Length sms_h_big_padding           = 25;
             inline constexpr gui::Length sms_v_padding               = 10;

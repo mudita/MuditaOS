@@ -15,7 +15,7 @@
 
 #include "../ApplicationSettings.hpp"
 
-#include "i18/i18.hpp"
+#include "module-utils/i18n/i18n.hpp"
 
 #include "Label.hpp"
 #include "Margins.hpp"

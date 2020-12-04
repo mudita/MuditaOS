@@ -51,10 +51,11 @@ namespace gui
       protected:
         // holds list of labels for displaying currently visible text lines.
 
-        TextLineCursor *cursor                 = nullptr;
-        std::unique_ptr<TextDocument> document = std::make_unique<TextDocument>(std::list<TextBlock>());
-        InputMode *mode                        = nullptr;
-        std::unique_ptr<Lines> lines           = nullptr;
+        TextLineCursor *cursor                  = nullptr;
+        CursorStartPosition cursorStartPosition = CursorStartPosition::DOCUMENT_END;
+        std::unique_ptr<TextDocument> document  = std::make_unique<TextDocument>(std::list<TextBlock>());
+        InputMode *mode                         = nullptr;
+        std::unique_ptr<Lines> lines            = nullptr;
 
         void buildDocument(const UTF8 &text);
         void buildDocument(std::unique_ptr<TextDocument> &&document);
@@ -183,6 +184,9 @@ namespace gui
 
         auto checkAdditionBounds(uint32_t utfVal) -> InputBound;
         auto checkAdditionBounds(const TextBlock &textBlock) -> std::tuple<InputBound, TextBlock>;
+
+        auto setCursorStartPosition(CursorStartPosition val) -> void;
+
         bool addChar(uint32_t utf8);
         bool removeChar();
         void onTextChanged();

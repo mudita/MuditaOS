@@ -4,9 +4,11 @@
 #include "IntervalBox.hpp"
 
 #include "application-meditation/data/Style.hpp"
+#include "Style.hpp"
+#include "TimerProperty.hpp"
 #include "InputEvent.hpp"
 
-#include <i18/i18.hpp>
+#include <module-utils/i18n/i18n.hpp>
 #include <cassert>
 
 using namespace gui;
@@ -18,9 +20,10 @@ namespace
         minutes{0}, minutes{2}, minutes{5}, minutes{10}, minutes{15}, minutes{30}};
 } // namespace
 
-IntervalBox::IntervalBox(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h)
-    : BoxLayout(parent, x, y, w, h)
+IntervalBox::IntervalBox(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, TimerProperty *timerSetter)
+    : BoxLayout(parent, x, y, w, h), timerSetter(timerSetter)
 {
+    assert(timerSetter);
     build();
 }
 
@@ -28,12 +31,12 @@ void IntervalBox::build()
 {
     namespace boxStyle = style::meditation::intervalBox;
 
-    Label *topLabel = new Label(this,
-                                boxStyle::topLabel::X,
-                                boxStyle::topLabel::Y,
-                                boxStyle::topLabel::Width,
-                                boxStyle::topLabel::Height,
-                                utils::localize.get("app_meditation_interval_chime"));
+    auto topLabel = new Label(this,
+                              boxStyle::topLabel::X,
+                              boxStyle::topLabel::Y,
+                              boxStyle::topLabel::Width,
+                              boxStyle::topLabel::Height,
+                              utils::localize.get("app_meditation_interval_chime"));
     topLabel->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
     topLabel->setFont(style::window::font::verysmall);
     topLabel->setEdges(RectangleEdge::None);
@@ -46,6 +49,7 @@ void IntervalBox::build()
     bottomLabel->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
     bottomLabel->setFont(style::window::font::small);
     bottomLabel->setEdges(RectangleEdge::Bottom);
+    bottomLabel->setPenWidth(style::window::default_border_rect_no_focus);
 
     leftSwitchArrow  = new gui::Image(bottomLabel,
                                      boxStyle::arrow::LeftX,
@@ -60,22 +64,28 @@ void IntervalBox::build()
                                       boxStyle::arrow::Height,
                                       "right_label_arrow");
 
-    leftSwitchArrow->setVisible(false);
-    rightSwitchArrow->setVisible(false);
 
     updateIntervals(ChimeIntervalList::Direction::Next);
+    leftSwitchArrow->setVisible(false);
+    rightSwitchArrow->setVisible(false);
 }
 
 bool IntervalBox::onFocus(bool state)
 {
     if (state) {
+        rescaleIntervals();
+        bottomLabel->setPenWidth(style::window::default_border_focus_w);
         bottomLabel->setFont(style::window::font::smallbold);
     }
     else {
+        bottomLabel->setPenWidth(style::window::default_border_rect_no_focus);
         bottomLabel->setFont(style::window::font::small);
     }
-    leftSwitchArrow->setVisible(state && showLeftArrowOnFocus);
-    rightSwitchArrow->setVisible(state && showRightArrowOnFocus);
+    auto currentMeditationTime = timerSetter->getTime();
+    leftSwitchArrow->setVisible(state &&
+                                chimeIntervals.hasNext(ChimeIntervalList::Direction::Previous, currentMeditationTime));
+    rightSwitchArrow->setVisible(state &&
+                                 chimeIntervals.hasNext(ChimeIntervalList::Direction::Next, currentMeditationTime));
     return true;
 }
 
@@ -96,25 +106,30 @@ bool IntervalBox::onInput(const InputEvent &inputEvent)
 
 void IntervalBox::updateIntervals(ChimeIntervalList::Direction direction)
 {
-    if (!chimeIntervals.moveToNext(direction)) {
+    auto currentMeditationTime = timerSetter->getTime();
+    if (!chimeIntervals.moveToNext(direction, currentMeditationTime)) {
         return;
     }
     intervalValue = chimeIntervals.getCurrent();
     bottomLabel->setText(ChimeIntervalList::toPrintableInterval(intervalValue));
 
-    showLeftArrowOnFocus  = chimeIntervals.hasNext(ChimeIntervalList::Direction::Previous);
-    showRightArrowOnFocus = chimeIntervals.hasNext(ChimeIntervalList::Direction::Next);
+    leftSwitchArrow->setVisible(chimeIntervals.hasNext(ChimeIntervalList::Direction::Previous, currentMeditationTime));
+    rightSwitchArrow->setVisible(chimeIntervals.hasNext(ChimeIntervalList::Direction::Next, currentMeditationTime));
+}
 
-    leftSwitchArrow->setVisible(showLeftArrowOnFocus);
-    rightSwitchArrow->setVisible(showRightArrowOnFocus);
+void IntervalBox::rescaleIntervals()
+{
+    while (intervalValue >= timerSetter->getTime() && intervalValue != minutes{0}) {
+        updateIntervals(ChimeIntervalList::Direction::Previous);
+    }
 }
 
 IntervalBox::ChimeIntervalList::ChimeIntervalList() : intervals(::chimeIntervals), current(intervals.begin())
 {}
 
-bool IntervalBox::ChimeIntervalList::moveToNext(Direction direction) noexcept
+bool IntervalBox::ChimeIntervalList::moveToNext(Direction direction, std::chrono::minutes meditationTime) noexcept
 {
-    if (!hasNext(direction)) {
+    if (!hasNext(direction, meditationTime)) {
         return false;
     }
     if (direction == Direction::Next) {
@@ -126,12 +141,16 @@ bool IntervalBox::ChimeIntervalList::moveToNext(Direction direction) noexcept
     return true;
 }
 
-bool IntervalBox::ChimeIntervalList::hasNext(Direction direction) const noexcept
+bool IntervalBox::ChimeIntervalList::hasNext(Direction direction, std::chrono::minutes meditationTime) const noexcept
 {
-    if (direction == Direction::Next) {
-        return std::next(current) != intervals.end();
+    if (direction == Direction::Previous) {
+        return current != intervals.begin();
     }
-    return current != intervals.begin();
+    auto result = std::next(current) != intervals.end();
+    if (result) {
+        result = *std::next(current) < meditationTime;
+    }
+    return result;
 }
 
 std::string IntervalBox::ChimeIntervalList::toPrintableInterval(std::chrono::minutes value)

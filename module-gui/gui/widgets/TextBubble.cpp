@@ -10,6 +10,7 @@ namespace gui
     {
         setEditMode(EditMode::SCROLL);
         setEdges(RectangleEdge::All);
+        setCursorStartPosition(CursorStartPosition::DOCUMENT_BEGIN);
     }
 
     void TextBubble::setYaps(RectangleYap yaps)

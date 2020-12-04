@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
-#include "agents/settings/Settings.hpp"
+#include <service-db/Settings.hpp>
 #include <service-db/SettingsMessages.hpp>
 #include <Service/Service.hpp>
 #include <functional>

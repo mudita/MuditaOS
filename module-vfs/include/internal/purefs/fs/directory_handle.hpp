@@ -10,8 +10,10 @@ namespace purefs::fs::internal
     class directory_handle
     {
       public:
+        directory_handle(int error, std::shared_ptr<mount_point> mount_point = nullptr)
+            : m_error(error), m_mount_point(mount_point)
+        {}
         directory_handle(const directory_handle &) = delete;
-        virtual ~directory_handle()                = delete;
         auto operator=(const directory_handle &) = delete;
         auto error(int error) noexcept -> void
         {
@@ -24,6 +26,6 @@ namespace purefs::fs::internal
 
       private:
         int m_error{};
-        std::weak_ptr<mount_point> m_mount_point;
+        const std::weak_ptr<mount_point> m_mount_point;
     };
 } // namespace purefs::fs::internal

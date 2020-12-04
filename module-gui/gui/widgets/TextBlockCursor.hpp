@@ -37,8 +37,8 @@ namespace gui
       private:
         bool emptyNewLineAdded      = false;
         bool blockChanged           = false;
-        unsigned int pos            = text::npos;
-        unsigned int currentBlockNr = text::npos;
+        unsigned int pos                = text::npos;
+        unsigned int currentBlockNumber = text::npos;
 
       protected:
         [[nodiscard]] auto checkNpos() const -> bool;
@@ -62,15 +62,15 @@ namespace gui
             return document;
         }
 
-        [[nodiscard]] auto getBlockNr() const -> unsigned int
+        [[nodiscard]] auto getBlockNumber() const -> unsigned int
         {
-            return currentBlockNr;
+            return currentBlockNumber;
         }
 
         [[nodiscard]] auto checkPreviousBlockNewLine() const -> bool
         {
-            if (currentBlockNr != text::npos) {
-                if (currentBlockNr > 0) {
+            if (currentBlockNumber != text::npos) {
+                if (currentBlockNumber > 0) {
                     return (--currentBlock())->getEnd() == TextBlock::End::Newline;
                 }
                 else {
@@ -104,8 +104,8 @@ namespace gui
 
         [[nodiscard]] auto checkPreviousBlockNoNewLine() const -> bool
         {
-            if (currentBlockNr != text::npos) {
-                if (currentBlockNr > 0) {
+            if (currentBlockNumber != text::npos) {
+                if (currentBlockNumber > 0) {
                     return (--currentBlock())->getEnd() == TextBlock::End::None;
                 }
                 else {
@@ -119,7 +119,7 @@ namespace gui
 
         [[nodiscard]] auto checkCurrentBlockNoNewLine() const -> bool
         {
-            if (currentBlockNr != text::npos && currentBlock() != blocksEnd()) {
+            if (currentBlockNumber != text::npos && currentBlock() != blocksEnd()) {
                 return (currentBlock())->getEnd() == TextBlock::End::None;
             }
             else {
@@ -132,7 +132,7 @@ namespace gui
             if (document == nullptr || checkNpos()) {
                 return false;
             }
-            return pos == 0 && currentBlockNr == 0;
+            return pos == 0 && currentBlockNumber == 0;
         }
 
         [[nodiscard]] auto atEnd() const -> bool;
@@ -151,11 +151,11 @@ namespace gui
         auto operator--() -> BlockCursor &;
 
         // return if handled ( this is not i.e. at begin/end)
-        auto removeChar() -> bool;
+        virtual auto removeChar() -> bool;
         auto operator*() -> const TextBlock &;
         auto operator->() -> const TextBlock *;
 
-        void addChar(uint32_t utf_val);
+        virtual void addChar(uint32_t utf_val);
         void addTextBlock(TextBlock &&);
 
         [[nodiscard]] auto getText() -> std::string;
