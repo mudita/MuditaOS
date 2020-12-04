@@ -5,6 +5,7 @@
 #include <purefs/fs/mount_point.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
+#include <purefs/blkdev/disk_handle.hpp>
 #include <log/log.hpp>
 #include <split_sv.hpp>
 #include <errno.h>
@@ -66,6 +67,11 @@ namespace purefs::fs
                 LOG_ERROR("VFS: mount point already exists %.*s", int(target.length()), target.data());
                 return -EBUSY;
             }
+            const auto mpp = m_partitions.find(std::string(dev_or_part));
+            if (mpp != std::end(m_partitions)) {
+                LOG_ERROR("VFS: partition already used %.*s", int(dev_or_part.length()), dev_or_part.data());
+                return -EBUSY;
+            }
             const auto vsi = m_fstypes.find(std::string(fs_type));
             if (vsi == std::end(m_fstypes)) {
                 LOG_ERROR("VFS: requested filesystem %.*s not registered", int(fs_type.length()), fs_type.data());
@@ -86,10 +92,13 @@ namespace purefs::fs
             if (diskh) {
                 const auto mnt_point = vsi->second->mount_prealloc(diskh, target, flags);
                 const auto ret_mnt   = vsi->second->mount(mnt_point);
-                if (!ret_mnt)
+                if (!ret_mnt) {
                     m_mounts.emplace(std::make_pair(target, mnt_point));
-                else
+                    m_partitions.emplace(dev_or_part);
+                }
+                else {
                     return ret_mnt;
+                }
             }
         }
         return {};
@@ -110,6 +119,10 @@ namespace purefs::fs
         const auto umnt_ret = fsops->umount(mnti->second);
         if (umnt_ret) {
             return umnt_ret;
+        }
+        const auto diskh = mnti->second->disk();
+        if (diskh) {
+            m_partitions.erase(std::string(diskh->name()));
         }
         m_mounts.erase(mnti);
         return {};

@@ -111,7 +111,7 @@ namespace purefs::fs::drivers
         if (!disk) {
             return -EIO;
         }
-        int ret = f_mount(nullptr, vmnt->ff_drive(), 1);
+        int ret = f_unmount(vmnt->ff_drive());
         ret     = translate_error(ret);
         if (!ret) {
             ret = ffat::internal::remove_volume(disk);

@@ -23,11 +23,24 @@ TEST_CASE("Registering and unregistering block device")
     purefs::fs::filesystem fscore(dm);
     /* Requested filesystem is not registered */
     REQUIRE(fscore.mount("emmc0", "/sys", "vfat") == -ENODEV);
-    /** Register filesystem */
-    {
-        auto ret = fscore.register_filesystem("vfat", std::make_shared<fs::drivers::filesystem_vfat>());
-        REQUIRE(ret == 0);
-        ret = fscore.mount("emmc0part1", "/sys", "vfat");
-        REQUIRE(ret == 0);
-    }
+    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
+    REQUIRE(vfs_vfat->mount_count() == 0);
+    auto ret = fscore.register_filesystem("vfat", vfs_vfat);
+    REQUIRE(ret == 0);
+    ret = fscore.mount("emmc0part1", "/sys", "vfat");
+    REQUIRE(ret == 0);
+    REQUIRE(vfs_vfat->mount_count() == 1);
+    REQUIRE(fscore.umount("/ala") == -ENOENT);
+    ret = fscore.mount("emmc0part1", "/sys", "vfat");
+    REQUIRE(ret == -EBUSY);
+    ret = fscore.mount("emmc0part1", "/path", "vfat");
+    REQUIRE(ret == -EBUSY);
+    ret = fscore.mount("emmc0part2", "/path", "nonexisting_fs");
+    REQUIRE(ret == -ENODEV);
+    ret = fscore.umount("/sys");
+    REQUIRE(ret == 0);
+    REQUIRE(vfs_vfat->mount_count() == 0);
+    ret = fscore.mount("emmc0part1", "/path", "vfat");
+    REQUIRE(ret == 0);
+    REQUIRE(vfs_vfat->mount_count() == 1);
 }

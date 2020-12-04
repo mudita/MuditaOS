@@ -11,6 +11,7 @@
 #include <map>
 #include <functional>
 #include <ctime>
+#include <unordered_set>
 #include <purefs/fs/handle_mapper.hpp>
 #include <purefs/fs/file_handle.hpp>
 #include <purefs/fs/mount_point.hpp>
@@ -220,6 +221,7 @@ namespace purefs::fs
         std::weak_ptr<blkdev::disk_manager> m_diskmm;
         std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;
         std::map<std::string, std::shared_ptr<internal::mount_point>> m_mounts;
+        std::unordered_set<std::string> m_partitions;
         internal::handle_mapper<fsfile> m_fds;
         mutable cpp_freertos::MutexRecursive m_lock;
     };
