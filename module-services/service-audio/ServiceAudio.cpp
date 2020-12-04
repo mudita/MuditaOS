@@ -650,6 +650,9 @@ const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurr
 
 void ServiceAudio::settingsChanged(const std::string &name, std::string value)
 {
+    if (value.empty()) {
+        return;
+    }
     if (auto s_it = settingsCache.find(name); settingsCache.end() != s_it) {
         s_it->second = value;
         return;
