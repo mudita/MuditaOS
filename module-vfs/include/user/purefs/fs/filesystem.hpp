@@ -16,6 +16,9 @@
 #include <purefs/fs/file_handle.hpp>
 #include <purefs/fs/mount_point.hpp>
 
+struct statvfs;
+struct stat;
+
 namespace purefs::blkdev
 {
     class disk_manager;
@@ -28,7 +31,6 @@ namespace purefs::fs
      * but generally those functions are for internal use for
      * example for newlib or glibc syscalls
      */
-    struct statvfs;
     class filesystem_operations;
     namespace internal
     {
@@ -92,7 +94,7 @@ namespace purefs::fs
          * @param[out] stat Pointer to a statvfs structure
          * @return zero on success otherwise error
          */
-        auto stat_vfs(std::string_view path, statvfs &stat) const noexcept -> int;
+        auto stat_vfs(std::string_view path, struct statvfs &stat) const noexcept -> int;
         /** Standard file access API */
         auto open(std::string_view path, int flags, int mode) noexcept -> int;
         auto close(int fd) noexcept -> int;

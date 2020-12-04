@@ -39,6 +39,10 @@ namespace purefs::fs::drivers
         {
             return (m_ff_drive[0] == ' ') ? (-1) : (m_ff_drive[0] - '0');
         }
+        auto native_root() const noexcept -> std::string_view override
+        {
+            return ff_drive();
+        }
 
       private:
         std::unique_ptr<::FATFS> m_fatfs;

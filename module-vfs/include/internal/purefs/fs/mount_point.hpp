@@ -44,6 +44,19 @@ namespace purefs::fs::internal
         {
             return m_flags;
         }
+        auto native_path(std::string_view full_path) const noexcept -> std::string
+        {
+            const auto n1 = full_path.find(m_path);
+            if (n1 == 0) {
+                return std::string(native_root()).append(full_path.substr(m_path.size()));
+            }
+            else {
+                return {};
+            }
+        }
+
+      private:
+        virtual auto native_root() const noexcept -> std::string_view = 0;
 
       private:
         const std::weak_ptr<blkdev::internal::disk_handle> m_diskh;

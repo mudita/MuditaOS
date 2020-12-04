@@ -7,6 +7,9 @@
 #include <tuple>
 #include <memory>
 
+struct statvfs;
+struct stat;
+
 namespace purefs::blkdev
 {
     namespace internal
@@ -18,7 +21,6 @@ namespace purefs::blkdev
 
 namespace purefs::fs
 {
-    struct statvfs;
     namespace internal
     {
         class file_handle;

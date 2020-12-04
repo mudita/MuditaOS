@@ -5,9 +5,15 @@
 #include <purefs/fs/drivers/mount_point_vfat.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_handle.hpp>
+#include <purefs/fs/drivers/file_handle_vfat.hpp>
 #include <log/log.hpp>
 #include <volume_mapper.hpp>
 #include <ff.h>
+#include <sys/statvfs.h>
+#include <limits.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 namespace purefs::fs::drivers
 {
@@ -50,6 +56,86 @@ namespace purefs::fs::drivers
             }
 
             return -EIO;
+        }
+
+        uint8_t translate_flags(unsigned flags)
+        {
+            uint8_t fat_mode = 0;
+            switch (flags & O_ACCMODE) {
+            case O_RDONLY:
+                fat_mode |= FA_READ;
+                break;
+            case O_WRONLY:
+                fat_mode |= FA_WRITE;
+                break;
+            case O_RDWR:
+                fat_mode |= (FA_READ | FA_WRITE);
+                break;
+            }
+            if (flags & O_APPEND)
+                fat_mode |= FA_OPEN_APPEND;
+            if (flags & O_CREAT)
+                fat_mode |= FA_CREATE_NEW;
+            if (flags & O_TRUNC)
+                fat_mode |= FA_CREATE_ALWAYS;
+            return fat_mode;
+        }
+
+        auto translate_fat_attrib_to_mode(BYTE fattrib)
+        {
+            decltype(static_cast<struct stat *>(nullptr)->st_mode) mode = S_IRUSR | S_IRGRP | S_IROTH;
+
+            if (fattrib & AM_DIR) {
+                mode |= (S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH);
+            }
+            else {
+                mode |= S_IFREG;
+            }
+            if ((fattrib & AM_RDO) == 0) {
+                mode |= (S_IWUSR | S_IWGRP | S_IWOTH);
+            }
+            if (fattrib & AM_HID) {}
+            if (fattrib & AM_SYS) {}
+            if (fattrib & AM_ARC) {}
+            return mode;
+        }
+
+        auto translate_mode_to_attrib(decltype(static_cast<struct stat *>(nullptr)->st_mode) mode)
+        {
+            BYTE attr{0};
+            if ((mode & (S_IWGRP | S_IWUSR | S_IWOTH)) == 0)
+                attr |= AM_RDO;
+            return attr;
+        }
+
+        void translate_filinfo_to_stat(const FILINFO &fs, const FIL *fil, struct stat &st)
+        {
+            if (fil) {
+                st.st_dev = fil->obj.id;
+                st.st_ino = fil->obj.sclust;
+            }
+            else {
+                st.st_dev = 0;
+                st.st_ino = 0;
+            }
+            st.st_mode  = translate_fat_attrib_to_mode(fs.fattrib);
+            st.st_nlink = 1;
+            st.st_uid   = 0;
+            st.st_gid   = 0;
+            st.st_rdev  = 0;
+            st.st_size  = fs.fsize;
+
+            // TODO: Block FF_MIN_SS != FF_MAX_SS
+#if FF_MAX_SS != FF_MIN_SS
+            st.st_blksize = fatfs->ssize;
+#else
+            st.st_blksize = FF_MIN_SS;
+#endif
+            // TODO: Time is currently not supported
+            st.st_blocks = fs.fsize / st.st_blksize;
+            st.st_atim   = {0, 0};
+            st.st_mtim   = {0, 0};
+            st.st_ctim   = {0, 0};
         }
     } // namespace
 
@@ -120,68 +206,190 @@ namespace purefs::fs::drivers
         return ret;
     }
 
-    auto filesystem_vfat::stat_vfs(fsmount mnt, std::string_view path, statvfs &stat) const noexcept -> int
+    auto filesystem_vfat::stat_vfs(fsmount mnt, std::string_view, struct statvfs &stat) const noexcept -> int
     {
-        return -ENOTSUP;
+        auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non VFAT mount point");
+            return -EIO;
+        }
+        DWORD xfree;
+        FATFS *fatfs;
+        const auto res = f_getfree(vmnt->ff_drive(), &xfree, &fatfs);
+        if (res != FR_OK) {
+            return -EIO;
+        }
+        /*
+         * _MIN_SS holds the sector size. It is one of the configuration
+         * constants used by the FS module
+         */
+        stat.f_bsize = FF_MIN_SS;
+#if FF_MAX_SS != FF_MIN_SS
+        stat.f_frsize = fatfs->csize * fatfs->ssize;
+#else
+        stat.f_frsize = fatfs->csize * FF_MIN_SS;
+#endif
+        stat.f_blocks  = (fatfs->n_fatent - 2);
+        stat.f_bfree   = xfree;
+        stat.f_bavail  = xfree;
+        stat.f_flag    = 0; // TODO: Flags later
+        stat.f_files   = 0;
+        stat.f_ffree   = 0;
+        stat.f_favail  = 0;
+        stat.f_fsid    = 0;
+        stat.f_namemax = PATH_MAX;
+        return translate_error(res);
     }
 
     auto filesystem_vfat::open(fsmount mnt, std::string_view path, int flags, int mode) noexcept -> fsfile
     {
-        return nullptr;
+        auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non VFAT mount point");
+            return nullptr;
+        }
+        const auto fspath  = vmnt->native_path(path);
+        const auto fsflags = translate_flags(flags);
+        auto fileo         = std::make_shared<file_handle_vfat>(mnt, path, flags);
+        auto ret           = f_open(fileo->ff_filp(), fspath.c_str(), fsflags);
+        fileo->error(translate_error(ret));
+        return fileo;
     }
 
     auto filesystem_vfat::close(fsfile zfile) noexcept -> int
     {
-        return -ENOTSUP;
+        auto vfile = std::dynamic_pointer_cast<file_handle_vfat>(zfile);
+        if (!vfile) {
+            LOG_ERROR("Non fat filesystem pointer");
+            return -EBADF;
+        }
+        const auto fres = f_close(vfile->ff_filp());
+        return translate_error(fres);
     }
 
     auto filesystem_vfat::write(fsfile zfile, const char *ptr, size_t len) noexcept -> ssize_t
     {
-        return -ENOTSUP;
+        auto vfile = std::dynamic_pointer_cast<file_handle_vfat>(zfile);
+        if (!vfile) {
+            LOG_ERROR("Non fat filesystem pointer");
+            return -EBADF;
+        }
+        UINT bytes_written;
+        const auto fres = f_write(vfile->ff_filp(), ptr, len, &bytes_written);
+        return (fres == FR_OK) ? (bytes_written) : translate_error(fres);
     }
 
     auto filesystem_vfat::read(fsfile zfile, char *ptr, size_t len) noexcept -> ssize_t
     {
-        return -ENOTSUP;
+        auto vfile = std::dynamic_pointer_cast<file_handle_vfat>(zfile);
+        if (!vfile) {
+            LOG_ERROR("Non fat filesystem pointer");
+            return -EBADF;
+        }
+        UINT bytes_read;
+        const auto fres = f_read(vfile->ff_filp(), ptr, len, &bytes_read);
+        return (fres == FR_OK) ? (bytes_read) : translate_error(fres);
     }
 
     auto filesystem_vfat::seek(fsfile zfile, off_t pos, int dir) noexcept -> off_t
     {
-        return -ENOTSUP;
+        auto vfile = std::dynamic_pointer_cast<file_handle_vfat>(zfile);
+        if (!vfile) {
+            LOG_ERROR("Non fat filesystem pointer");
+            return -EBADF;
+        }
+        off_t cpos{0};
+        auto fp = vfile->ff_filp();
+        if (f_error(fp) != FR_OK) {
+            return translate_error(f_error(fp));
+        }
+        const auto filesz = f_size(fp);
+        if (dir == SEEK_CUR) {
+            cpos = f_tell(fp);
+        }
+        else if (dir == SEEK_SET) {
+            cpos = 0;
+        }
+        else if (dir == SEEK_END) {
+            cpos = filesz;
+        }
+        else {
+            return -EINVAL;
+        }
+        const auto newpos = cpos + pos;
+        if (newpos < 0) {
+            return -ENXIO;
+        }
+        const auto fres = f_lseek(fp, newpos);
+        return translate_error(fres);
     }
 
     auto filesystem_vfat::fstat(fsfile zfile, struct stat &st) noexcept -> int
     {
-        return -ENOTSUP;
+        auto vfile = std::dynamic_pointer_cast<file_handle_vfat>(zfile);
+        if (!vfile) {
+            LOG_ERROR("Non fat filesystem pointer");
+            return -EBADF;
+        }
+        FILINFO finfo;
+        const int fres = f_stat(vfile->open_path().c_str(), &finfo);
+        if (fres == FR_OK) {
+            translate_filinfo_to_stat(finfo, vfile->ff_filp(), st);
+        }
+        return translate_error(fres);
     }
 
     auto filesystem_vfat::stat(fsmount mnt, std::string_view file, struct stat &st) noexcept -> int
     {
-        return -ENOTSUP;
-    }
-    auto filesystem_vfat::link(fsmount mnt, std::string_view existing, std::string_view newlink) noexcept -> int
-    {
-        return -ENOTSUP;
-    }
-
-    auto filesystem_vfat::symlink(fsmount mnt, std::string_view existing, std::string_view newlink) noexcept -> int
-    {
-        return -ENOTSUP;
+        auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non VFAT mount point");
+            return -EBADF;
+        }
+        FILINFO finfo;
+        const auto fspath = vmnt->native_path(file);
+        const int fres    = f_stat(fspath.c_str(), &finfo);
+        if (fres == FR_OK) {
+            translate_filinfo_to_stat(finfo, nullptr, st);
+        }
+        return translate_error(fres);
     }
 
     auto filesystem_vfat::unlink(fsmount mnt, std::string_view name) noexcept -> int
     {
-        return -ENOTSUP;
+        auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non VFAT mount point");
+            return -ENXIO;
+        }
+        const auto fspath = vmnt->native_path(name);
+        const auto fret   = f_unlink(fspath.c_str());
+        return translate_error(fret);
     }
 
     auto filesystem_vfat::rename(fsmount mnt, std::string_view oldname, std::string_view newname) noexcept -> int
     {
-        return -ENOTSUP;
+        auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non VFAT mount point");
+            return -ENXIO;
+        }
+        const auto fsold = vmnt->native_path(oldname);
+        const auto fsnew = vmnt->native_path(newname);
+        const auto fret  = f_rename(fsold.c_str(), fsnew.c_str());
+        return translate_error(fret);
     }
 
     auto filesystem_vfat::mkdir(fsmount mnt, std::string_view path, int mode) noexcept -> int
     {
-        return -ENOTSUP;
+        auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non VFAT mount point");
+            return -ENXIO;
+        }
+        const auto fspath = vmnt->native_path(path);
+        const auto fret   = f_mkdir(fspath.c_str());
+        return translate_error(fret);
     }
 
     auto filesystem_vfat::diropen(fsmount mnt, std::string_view path) noexcept -> fsdir
@@ -206,27 +414,24 @@ namespace purefs::fs::drivers
 
     auto filesystem_vfat::ftruncate(fsfile zfile, off_t len) noexcept -> int
     {
-        return -ENOTSUP;
+        auto vfile = std::dynamic_pointer_cast<file_handle_vfat>(zfile);
+        if (!vfile) {
+            LOG_ERROR("Non fat filesystem pointer");
+            return -EBADF;
+        }
+        const int fres = f_truncate(vfile->ff_filp());
+        return translate_error(fres);
     }
 
     auto filesystem_vfat::fsync(fsfile zfile) noexcept -> int
     {
-        return -ENOTSUP;
-    }
-
-    auto filesystem_vfat::ioctl(fsmount mnt, std::string_view path, int cmd, void *arg) noexcept -> int
-    {
-        return -ENOTSUP;
-    }
-
-    auto filesystem_vfat::utimens(fsmount mnt, std::string_view path, std::array<timespec, 2> &tv) noexcept -> int
-    {
-        return -ENOTSUP;
-    }
-
-    auto filesystem_vfat::flock(fsfile zfile, int cmd) noexcept -> int
-    {
-        return -ENOTSUP;
+        auto vfile = std::dynamic_pointer_cast<file_handle_vfat>(zfile);
+        if (!vfile) {
+            LOG_ERROR("Non fat filesystem pointer");
+            return -EBADF;
+        }
+        const int fres = f_sync(vfile->ff_filp());
+        return translate_error(fres);
     }
 
     auto filesystem_vfat::isatty(fsfile zfile) noexcept -> int
@@ -236,12 +441,26 @@ namespace purefs::fs::drivers
 
     auto filesystem_vfat::chmod(fsmount mnt, std::string_view path, mode_t mode) noexcept -> int
     {
-        return -ENOTSUP;
+        auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non VFAT mount point");
+            return -ENXIO;
+        }
+        const auto fspath = vmnt->native_path(path);
+        const auto fret   = f_chmod(fspath.c_str(), translate_mode_to_attrib(mode), translate_mode_to_attrib(mode));
+        return translate_error(fret);
     }
 
     auto filesystem_vfat::fchmod(fsfile zfile, mode_t mode) noexcept -> int
     {
-        return -ENOTSUP;
+        auto vfile = std::dynamic_pointer_cast<file_handle_vfat>(zfile);
+        if (!vfile) {
+            LOG_ERROR("Non fat filesystem pointer");
+            return -EBADF;
+        }
+        const auto fspath = vfile->open_path();
+        const auto fret   = f_chmod(fspath.c_str(), translate_mode_to_attrib(mode), translate_mode_to_attrib(mode));
+        return translate_error(fret);
     }
 
 } // namespace purefs::fs::drivers

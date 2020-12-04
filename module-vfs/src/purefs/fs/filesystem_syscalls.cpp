@@ -10,7 +10,7 @@
 
 namespace purefs::fs
 {
-    auto filesystem::stat_vfs(std::string_view path, statvfs &stat) const noexcept -> int
+    auto filesystem::stat_vfs(std::string_view path, struct ::statvfs &stat) const noexcept -> int
     {
         return invoke_fops(&filesystem_operations::stat_vfs, path, stat);
     }
