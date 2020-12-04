@@ -171,12 +171,8 @@ enum class MessageType
     EVMTimeUpdated,   ///< This message is send on every time update.
     // Torch messages
     EVMTorchStateMessage,
-    // Keypad backlight messages
-    EVMKeypadBacklightMessage,
-    // Eink frontlight messages
-    EVMEinkFrontlightMessage,
-    // Light sensor messages
-    EVMLightSensorMessage,
+    // Light control messages
+    EVMLightControlMessage,
 
     // cellular messages
     EVMGetBoard,

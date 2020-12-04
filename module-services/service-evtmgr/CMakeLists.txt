@@ -7,6 +7,7 @@ set(SOURCES
         alarm/EventManagerAlarm.cpp
         api/EventManagerServiceAPI.cpp
         messages/Message.cpp
+        LightControl.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

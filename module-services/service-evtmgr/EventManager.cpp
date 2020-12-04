@@ -19,7 +19,6 @@
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/rtc/rtc.hpp>
 #include <bsp/torch/torch.hpp>
-#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <common_data/RawKey.hpp>
 #include <log/log.hpp>
 #include <module-utils/time/time_conversion.hpp>
@@ -30,7 +29,6 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
-#include <bsp/light_sensor/light_sensor.hpp>
 #include <cassert>
 #include <list>
 #include <tuple>
@@ -273,22 +271,10 @@ sys::ReturnCodes EventManager::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sevm::KeypadBacklightMessage(), [&](sys::Message *msgl) {
-        auto request      = static_cast<sevm::KeypadBacklightMessage *>(msgl);
-        auto response     = std::make_shared<sevm::KeypadBacklightResponseMessage>();
-        response->success = processKeypadBacklightRequest(request->action);
-        return response;
-    });
-
-    connect(sevm::EinkFrontlightMessage(), [&](sys::Message *msgl) {
-        auto msg = static_cast<sevm::EinkFrontlightMessage *>(msgl);
-        processEinkFrontlightRequest(msg->action, msg->value);
-        return std::make_shared<sys::ResponseMessage>();
-    });
-
-    connect(sevm::LightSensorMessage(), [&](sys::Message *msgl) {
-        auto message = std::make_shared<sevm::LightSensorReadoutMessage>(bsp::light_sensor::readout());
-        return message;
+    connect(sevm::LightControlMessage(), [&](sys::Message *msgl) {
+        auto request = static_cast<sevm::LightControlMessage *>(msgl);
+        return std::make_shared<sevm::LightControlResponseMessage>(
+            sevm::light_control::processRequest(request->action, request->value));
     });
 
     // initialize keyboard worker
@@ -326,6 +312,10 @@ sys::ReturnCodes EventManager::InitHandler()
     EventWorker->init(list);
     EventWorker->run();
 
+    sevm::light_control::init(this);
+    sevm::light_control::processRequest(sevm::light_control::LightControlAction::turnOn, 0);
+    sevm::light_control::processRequest(sevm::light_control::LightControlAction::enableAutomaticMode, 0);
+
     return sys::ReturnCodes::Success;
 }
 
@@ -361,37 +351,4 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
 
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
     return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
-}
-
-bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action act)
-{
-    bool response = false;
-    switch (act) {
-    case bsp::keypad_backlight::Action::turnOn:
-        response = bsp::keypad_backlight::turnOnAll();
-        break;
-    case bsp::keypad_backlight::Action::turnOff:
-        response = bsp::keypad_backlight::shutdown();
-        break;
-    case bsp::keypad_backlight::Action::checkState:
-        response = bsp::keypad_backlight::checkState();
-        break;
-    }
-    return response;
-}
-
-void EventManager::processEinkFrontlightRequest(bsp::eink_frontlight::Action act,
-                                                bsp::eink_frontlight::BrightnessPercentage val)
-{
-    switch (act) {
-    case bsp::eink_frontlight::Action::turnOn:
-        bsp::eink_frontlight::turnOn();
-        break;
-    case bsp::eink_frontlight::Action::turnOff:
-        bsp::eink_frontlight::turnOff();
-        break;
-    case bsp::eink_frontlight::Action::setBrightness:
-        bsp::eink_frontlight::setBrightness(val);
-        break;
-    }
 }

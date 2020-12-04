@@ -5,6 +5,7 @@
 
 #include "KbdMessage.hpp"
 #include "BatteryMessages.hpp"
+#include "LightControl.hpp"
 
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
@@ -14,9 +15,6 @@
 #include <bsp/common.hpp>
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/torch/torch.hpp>
-#include <bsp/keypad_backlight/keypad_backlight.hpp>
-#include <bsp/eink_frontlight/eink_frontlight.hpp>
-#include <bsp/light_sensor/light_sensor.hpp>
 
 #include <string>
 
@@ -126,48 +124,22 @@ namespace sevm
         {}
         bool success = false;
     };
-    class KeypadBacklightMessage : public Message
+    class LightControlMessage : public Message
     {
       public:
-        KeypadBacklightMessage() : Message(MessageType::EVMKeypadBacklightMessage)
+        LightControlMessage() : Message(MessageType::EVMLightControlMessage)
         {}
 
-        bsp::keypad_backlight::Action action;
+        light_control::LightControlAction action;
+        unsigned int value;
     };
 
-    class KeypadBacklightResponseMessage : public KeypadBacklightMessage
+    class LightControlResponseMessage : public LightControlMessage
     {
       public:
-        KeypadBacklightResponseMessage() : KeypadBacklightMessage()
+        explicit LightControlResponseMessage(bool status) : LightControlMessage(), success(status)
         {}
         bool success;
-    };
-
-    class EinkFrontlightMessage : public Message
-    {
-      public:
-        explicit EinkFrontlightMessage(bsp::eink_frontlight::Action act = bsp::eink_frontlight::Action::turnOff,
-                                       std::uint8_t val                 = 0)
-            : Message(MessageType::EVMEinkFrontlightMessage), action(act), value(val)
-        {}
-
-        const bsp::eink_frontlight::Action action;
-        const bsp::eink_frontlight::BrightnessPercentage value;
-    };
-
-    class LightSensorMessage : public Message
-    {
-      public:
-        LightSensorMessage() : Message(MessageType::EVMLightSensorMessage)
-        {}
-    };
-
-    class LightSensorReadoutMessage : public LightSensorMessage
-    {
-      public:
-        explicit LightSensorReadoutMessage(bsp::light_sensor::IlluminanceLux val) : LightSensorMessage(), value(val)
-        {}
-        const bsp::light_sensor::IlluminanceLux value;
     };
 
 } /* namespace sevm*/

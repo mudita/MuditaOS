@@ -10,8 +10,7 @@
 #include <Service/Worker.hpp>
 #include <bsp/common.hpp>
 #include <bsp/keyboard/key_codes.hpp>
-#include <bsp/keypad_backlight/keypad_backlight.hpp>
-#include <bsp/eink_frontlight/eink_frontlight.hpp>
+#include "LightControl.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -60,8 +59,4 @@ class EventManager : public sys::Service
      * with specified name .
      */
     static bool messageSetApplication(sys::Service *sender, const std::string &applicationName);
-
-    bool processKeypadBacklightRequest(bsp::keypad_backlight::Action act);
-
-    void processEinkFrontlightRequest(bsp::eink_frontlight::Action act, bsp::eink_frontlight::BrightnessPercentage val);
 };

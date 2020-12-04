@@ -28,21 +28,31 @@ namespace bsp::light_sensor
         INTERRUPT_PERSIST = 0x9E
     };
 
-    constexpr inline auto ACTIVE_MODE = 0b00000001;
+    constexpr inline auto MEASUREMENT_GAIN_8 = 0b00001100;
+    constexpr inline auto ACTIVE_MODE        = 0b00000001 | MEASUREMENT_GAIN_8;
     constexpr inline auto SW_RESET    = 0b00000010;
 
+    constexpr inline auto INTEGRATION_TIME_50MS  = 0b00001000;
+    constexpr inline auto ALS_INT_50MS           = 0.5f;
+    constexpr inline auto INTEGRATION_TIME_100MS = 0b00000000;
+    constexpr inline auto ALS_INT_100MS          = 1;
     constexpr inline auto INTEGRATION_TIME_200MS = 0b00010000;
     constexpr inline auto ALS_INT_200MS          = 2;
     constexpr inline auto INTEGRATION_TIME_400MS = 0b00011000;
     constexpr inline auto ALS_INT_400MS          = 4;
 
-    constexpr inline auto ALS_GAIN = 1.0f;
+    constexpr inline auto MEASUREMENT_RATE_50MS   = 0b00000000;
+    constexpr inline auto MEASUREMENT_RATE_100MS  = 0b00000001;
+    constexpr inline auto MEASUREMENT_RATE_500MS  = 0b00000011;
+    constexpr inline auto MEASUREMENT_RATE_1000MS = 0b00000100;
+    constexpr inline auto MEASUREMENT_RATE_2000MS = 0b00000111;
+
+    constexpr inline auto MEAS_SETUP = INTEGRATION_TIME_400MS | MEASUREMENT_RATE_500MS;
+
+    constexpr inline auto ALS_GAIN = 8.0f;
     // Factor of light resistance of window above the sensor - roughly estimated value
     constexpr inline auto PFACTOR           = 0.8f;
-    constexpr inline auto MEASUREMENT_COEFF = (ALS_INT_200MS * ALS_GAIN) / PFACTOR;
-
-    constexpr inline auto MEASUREMENT_RATE_500MS  = 0b00000011;
-    constexpr inline auto MEASUREMENT_RATE_2000MS = 0b00000111;
+    constexpr inline auto MEASUREMENT_COEFF = (ALS_INT_400MS * ALS_GAIN) / PFACTOR;
 
     constexpr inline auto ENABLE_IRQ = 0x0A;
 
