@@ -57,8 +57,19 @@ namespace settings
             LOG_DEBUG("handleVariableChanged: (k=v): (%s=%s)", key.c_str(), val.value_or("").c_str());
             ValueCb::iterator it_cb = cbValues.find(key);
             if (cbValues.end() != it_cb) {
-                it_cb->second(std::move(val.value()));
-                return std::make_shared<sys::ResponseMessage>();
+                auto [cb, cbWithName] = it_cb->second;
+                if (nullptr != cb && nullptr != cbWithName) {
+                    // in case of two callbacks there is a need to duplicate the value
+                    auto value = std::move(val.value_or(""));
+                    cb(std::string{value});
+                    cbWithName(key, std::move(value));
+                }
+                else if (nullptr != cb) {
+                    cb(std::move(val.value_or("")));
+                }
+                else {
+                    cbWithName(key, std::move(val.value_or("")));
+                }
             }
         }
         return std::make_shared<sys::ResponseMessage>();
@@ -107,10 +118,24 @@ namespace settings
     void Settings::registerValueChange(const std::string &variableName, ValueChangedCallback cb)
     {
         ValueCb::iterator it_cb = cbValues.find(variableName);
-        if (cbValues.end() != it_cb) {
+        if (cbValues.end() != it_cb && nullptr != it_cb->second.first) {
             LOG_INFO("Callback function on value change (%s) already exists, rewriting", variableName.c_str());
         }
-        cbValues[variableName] = cb;
+        cbValues[variableName].first = cb;
+        EntryPath path;
+        path.variable = variableName;
+        path.service  = app->GetName();
+        auto msg      = std::make_shared<settings::Messages::RegisterOnVariableChange>(path);
+        sendMsg(std::move(msg));
+    }
+
+    void Settings::registerValueChange(const std::string &variableName, ValueChangedCallbackWithName cb)
+    {
+        auto it_cb = cbValues.find(variableName);
+        if (cbValues.end() != it_cb && nullptr != it_cb->second.second) {
+            LOG_INFO("Callback function on value change (%s) already exists, rewriting", variableName.c_str());
+        }
+        cbValues[variableName].second = cb;
         EntryPath path;
         path.variable = variableName;
         path.service  = app->GetName();

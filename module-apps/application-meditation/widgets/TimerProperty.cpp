@@ -1,18 +1,20 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "TimerSetter.hpp"
+#include "TimerProperty.hpp"
 #include <application-meditation/data/Style.hpp>
+#include <module-utils/i18n/i18n.hpp>
+#include <module-utils/Utils.hpp>
 
 using namespace gui;
 
-TimerSetter::TimerSetter(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h)
+TimerProperty::TimerProperty(Item *parent, const uint32_t x, const uint32_t y, const uint32_t w, const uint32_t h)
     : Rect(parent, x, y, w, h)
 {
     build();
 }
 
-void TimerSetter::build()
+void TimerProperty::build()
 {
     const Point boxCenter(getX() + (getWidth() / 2), getY() + (getHeight() / 2));
 
@@ -45,11 +47,11 @@ void TimerSetter::build()
                               timerStyle::setterUnitLabel::Height);
     timeUnitLabel->setFont(style::window::font::verysmall);
     timeUnitLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-    timeUnitLabel->setText("MINUTES");
     timeUnitLabel->setEdges(RectangleEdge::None);
+    timeUnitLabel->setText(utils::localize.get("app_meditation_minutes"));
 }
 
-bool TimerSetter::onFocus(bool isFocused)
+bool TimerProperty::onFocus(bool isFocused)
 {
     circle->setFocus(isFocused);
     if (isFocused) {
@@ -62,10 +64,10 @@ bool TimerSetter::onFocus(bool isFocused)
     return true;
 }
 
-bool TimerSetter::onInput(const InputEvent &inputEvent)
+bool TimerProperty::onInput(const InputEvent &inputEvent)
 {
+    bool handled = false;
     if (inputEvent.isShortPress()) {
-        bool handled = false;
         if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
             state.putNumericValue(gui::toNumeric(inputEvent.keyCode));
             handled = true;
@@ -81,48 +83,64 @@ bool TimerSetter::onInput(const InputEvent &inputEvent)
         else {
             state.onFocus();
         }
-        timeLabel->setText(std::to_string(static_cast<int>(state.getTime().count())));
-        if (handled) {
-            return true;
-        }
+        setMeditationTime();
     }
-    return false;
+    return handled;
 }
 
-std::chrono::seconds TimerSetter::getTime() noexcept
+void TimerProperty::setMeditationTime()
+{
+    const auto meditationTime = static_cast<int>(state.getTime().count());
+    timeLabel->setText(utils::to_string(meditationTime));
+    if (meditationTime == 1) {
+        timeUnitLabel->setText(utils::localize.get("app_meditation_minute"));
+    }
+    else {
+        timeUnitLabel->setText(utils::localize.get("app_meditation_minutes"));
+    }
+}
+
+std::chrono::minutes TimerProperty::getTime() noexcept
 {
     state.checkBounds();
     return state.getTime();
 }
 
-void TimerSetter::State::checkBounds() noexcept
+void TimerProperty::State::checkBounds() noexcept
 {
     timeInMinutes       = std::clamp(timeInMinutes, minimalValue, maximalValue);
     resetValueOnNumeric = true;
 }
 
-void TimerSetter::State::putNumericValue(int digit) noexcept
+void TimerProperty::State::putNumericValue(int digit) noexcept
 {
     if (resetValueOnNumeric) {
         timeInMinutes       = 0;
         resetValueOnNumeric = false;
     }
     timeInMinutes = 10 * timeInMinutes + digit;
-    if (timeInMinutes >= minimalValue) {
+    if (timeInMinutes >= 10 * (counterMaxDigits - 1)) {
         resetValueOnNumeric = true;
     }
 }
 
-void TimerSetter::State::increment() noexcept
+void TimerProperty::State::increment() noexcept
 {
-    timeInMinutes       = (timeInMinutes / defaultIncrementValue + 1) * defaultIncrementValue;
+    auto it = std::upper_bound(std::begin(timeArr), std::end(timeArr), timeInMinutes);
+    if (it == std::end(timeArr)) {
+        it--;
+    }
+    timeInMinutes       = *it;
     resetValueOnNumeric = true;
-    checkBounds();
 }
 
-void TimerSetter::State::decrement() noexcept
+void TimerProperty::State::decrement() noexcept
 {
-    timeInMinutes       = ((timeInMinutes - 1) / defaultIncrementValue) * defaultIncrementValue;
+    auto it =
+        std::upper_bound(std::rbegin(timeArr), std::rend(timeArr), timeInMinutes, [](int a, int b) { return a > b; });
+    if (it == std::rend(timeArr)) {
+        it--;
+    }
+    timeInMinutes       = *it;
     resetValueOnNumeric = true;
-    checkBounds();
 }

@@ -22,10 +22,11 @@ namespace gui
 
         body = new HBox(this, 0, 0, 0, 0);
         body->setEdges(RectangleEdge::None);
-        body->setMaximumSize(style::window::default_body_width, style::window::default_body_height);
+        body->setMaximumSize(style::window::default_body_width, style::messages::smsOutput::sms_max_height);
 
         smsBubble = new TextBubble(nullptr, 0, 0, 0, 0);
-        smsBubble->setMaximumSize(style::messages::smsOutput::sms_max_width, style::window::default_body_height);
+        smsBubble->setMaximumSize(style::messages::smsOutput::sms_max_width,
+                                  style::messages::smsOutput::sms_max_height);
         smsBubble->setAlignment(Alignment(Alignment::Vertical::Center));
         smsBubble->setTextType(TextType::MULTI_LINE);
         smsBubble->setRadius(style::messages::smsOutput::sms_radius);

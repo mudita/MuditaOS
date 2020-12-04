@@ -33,7 +33,7 @@ namespace app::notes
 
         std::unique_ptr<NotePreviewWindowContract::Presenter> presenter;
         std::unique_ptr<NotesRecord> notesRecord;
-        gui::TextFixedSize *note = nullptr;
-        gui::Label *date         = nullptr;
+        gui::Text *note  = nullptr;
+        gui::Label *date = nullptr;
     };
 } // namespace app::notes

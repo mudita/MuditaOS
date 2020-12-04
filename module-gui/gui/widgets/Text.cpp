@@ -214,6 +214,13 @@ namespace gui
         buildCursor();
     }
 
+    auto Text::setCursorStartPosition(CursorStartPosition val) -> void
+    {
+        // As we destroy cursors starting position information need to be stored in both places
+        cursorStartPosition = val;
+        cursor->setCursorStartPosition(cursorStartPosition);
+    }
+
     bool Text::onInput(const InputEvent &evt)
     {
         if (Rect::onInput(evt)) {
@@ -334,12 +341,14 @@ namespace gui
 
         applyParentSizeRestrictions();
 
-        BlockCursor drawCursor(cursor->getDocument(), 0, 0, getTextFormat().getFont());
+        const auto [startDrawBlockNumber, startDrawBlockPosition] = lines->drawStartConditions;
+        BlockCursor drawCursor(
+            cursor->getDocument(), startDrawBlockPosition, startDrawBlockNumber, getTextFormat().getFont());
 
         debug_text("--> START drawLines: {%" PRIu32 ", %" PRIu32 "}", w, h);
 
         lines->draw(drawCursor,
-                    getSizeMinusPadding(Axis::X, Area::Max),
+                    getSizeMinusPadding(Axis::X, Area::Max) - TextCursor::defaultWidth,
                     getSizeMinusPadding(Axis::Y, Area::Max),
                     padding.top,
                     padding.left);
@@ -366,7 +375,7 @@ namespace gui
                 if (format.getFont() != nullptr &&
                     padding.top + lines->linesHeight() < format.getFont()->info.line_height) {
                     hUsed = format.getFont()->info.line_height;
-                    wUsed = TextCursor::default_width;
+                    wUsed = TextCursor::defaultWidth;
                     debug_text("empty line height: %d", hUsed);
                 }
             }
@@ -413,6 +422,8 @@ namespace gui
             debug_text("Passed invalid document, returning without setting it");
             return;
         }
+
+        lines->reset();
         document->destroy();
         buildCursor();
 
@@ -427,6 +438,7 @@ namespace gui
     {
         erase(cursor);
         cursor = new TextLineCursor(this);
+        cursor->setCursorStartPosition(cursorStartPosition);
         cursor->setAlignment(this->getAlignment());
         cursor->setMargins(this->getPadding());
         showCursor(focus);
@@ -456,7 +468,6 @@ namespace gui
 
     auto Text::handleSelectSpecialChar(const InputEvent &inputEvent) -> bool
     {
-
         if (mode != nullptr && inputEvent.isLongPress() && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
             mode->select_special_char();
             return true;
@@ -475,21 +486,36 @@ namespace gui
             return false;
         }
 
-        // Temporary disabled till text scrolling will ba added
-        // if (isMode(EditMode::SCROLL) && (inputEvent.is(KeyCode::KEY_LEFT) ||
-        // inputEvent.is(KeyCode::KEY_RIGHT))) {
         if (isMode(EditMode::SCROLL)) {
+
             debug_text("Text in scroll mode ignores left/right navigation");
-            return false;
+            if (inputEvent.is(KeyCode::KEY_LEFT) || inputEvent.is(KeyCode::KEY_RIGHT)) {
+                return false;
+            }
+
+            if (inputEvent.is(KeyCode::KEY_DOWN)) {
+                return cursor->displayNextLine();
+            }
+
+            if (inputEvent.is(KeyCode::KEY_UP)) {
+                return cursor->displayPreviousLine();
+            }
         }
-        auto ret = cursor->moveCursor(inputToNavigation(inputEvent));
-        debug_text("moveCursor: %s", c_str(ret));
-        if (ret == TextCursor::Move::Start || ret == TextCursor::Move::End) {
-            debug_text("scrolling needs implementing");
-            return false;
-        }
-        if (ret != TextCursor::Move::Error) {
-            return true;
+
+        if (inputToNavigation(inputEvent) != NavigationDirection::NONE) {
+
+            setCursorStartPosition(CursorStartPosition::OFFSET);
+
+            auto ret = cursor->moveCursor(inputToNavigation(inputEvent));
+            debug_text("moveCursor: %s", c_str(ret));
+
+            if (ret == TextCursor::Move::Start || ret == TextCursor::Move::End) {
+                debug_text("scrolling needs implementing");
+                return false;
+            }
+            if (ret != TextCursor::Move::Error) {
+                return true;
+            }
         }
 
         return false;
@@ -501,9 +527,11 @@ namespace gui
             return false;
         }
         if (inputEvent.isShortPress() && inputEvent.is(key_signs_remove)) {
+
+            setCursorStartPosition(CursorStartPosition::OFFSET);
+
             if (!document->isEmpty() && removeChar()) {
                 onTextChanged();
-                drawLines();
             }
             return true;
         }
@@ -520,16 +548,16 @@ namespace gui
 
         if (code != KeyProfile::none_key && checkAdditionBounds(code) == InputBound::CAN_ADD) {
 
+            setCursorStartPosition(CursorStartPosition::OFFSET);
+
             debug_text("handleAddChar %d -> Begin", code);
             debug_text("%s times: %" PRIu32, inputEvent.str().c_str(), translator.getTimes());
-
             /// if we have multi press in non digit mode - we need to replace char and put next char from translator
             if (!(mode->is(InputMode::digit) || (mode->is(InputMode::phone))) && translator.getTimes() > 0) {
                 removeChar();
             }
             addChar(code);
             onTextChanged();
-            drawLines();
 
             debug_text("handleAddChar -> End(true)");
 
@@ -550,9 +578,9 @@ namespace gui
 
         if (val != InvalidNumericKeyCode && checkAdditionBounds(val) == InputBound::CAN_ADD) {
 
+            setCursorStartPosition(CursorStartPosition::OFFSET);
             addChar(intToAscii(val));
             onTextChanged();
-            drawLines();
             return true;
         }
 
@@ -582,19 +610,11 @@ namespace gui
         auto documentCopy     = *cursor->getDocument();
         auto formatCopy       = getTextFormat().getFont();
         auto preDrawTextBlock = TextBlock(textBlock);
-        auto preDrawTextEnd   = textBlock.getEnd();
 
         applyParentSizeRestrictions();
 
         BlockCursor preDrawCursor(&documentCopy, 0, 0, formatCopy);
-
-        applyParentSizeRestrictions();
-
         preDrawCursor.addTextBlock(std::move(preDrawTextBlock));
-
-        if (preDrawTextEnd == TextBlock::End::Newline) {
-            documentCopy.append(TextBlock("", formatCopy, TextBlock::End::None));
-        }
 
         preDrawLines->draw(
             preDrawCursor, getSizeMinusPadding(Axis::X, Area::Max), text::npos, padding.top, padding.left);
@@ -885,7 +905,7 @@ namespace gui
     TextBackup Text::backupText() const
     {
         return TextBackup{std::list<TextBlock>(document->getBlocks().begin(), document->getBlocks().end()),
-                          cursor->getPosOnScreen()};
+                          cursor->getOnScreenPosition()};
     }
 
     void Text::restoreFrom(const TextBackup &backup)
@@ -900,5 +920,4 @@ namespace gui
             cursor->TextCursor::moveCursor(NavigationDirection::LEFT, cursorPosDiff);
         }
     }
-
 } /* namespace gui */

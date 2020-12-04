@@ -8,7 +8,7 @@
 namespace gui
 {
     class IntervalBox;
-    class TimerSetter;
+    class TimerProperty;
 
     class MeditationWindow : public AppWindow
     {
@@ -23,7 +23,7 @@ namespace gui
 
       private:
         void invalidate() noexcept;
-        TimerSetter *timeSetter  = nullptr;
+        TimerProperty *timeSetter = nullptr;
         IntervalBox *intervalBox = nullptr;
     };
 } // namespace gui

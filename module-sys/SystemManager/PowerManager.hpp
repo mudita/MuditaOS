@@ -31,6 +31,8 @@ namespace sys
         int32_t PowerOff();
         int32_t Reboot();
 
+        void SetCpuFrequency(const bsp::LowPowerMode::CpuFrequency freq);
+
         Mode GetCurrentMode()
         {
             return currentPowerMode;
