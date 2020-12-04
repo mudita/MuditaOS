@@ -9,6 +9,7 @@
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
+#include <service-db/Settings.hpp>
 
 #include <type_traits>
 
@@ -19,7 +20,8 @@ using namespace audio;
 ServiceAudio::ServiceAudio()
     : sys::Service(serviceName, "", 4096 * 2, sys::ServicePriority::Idle),
       audioMux([this](auto... params) { return this->AsyncCallback(params...); },
-               [this](auto... params) { return this->DbCallback(params...); })
+               [this](auto... params) { return this->DbCallback(params...); }),
+      settingsProvider(std::make_unique<settings::Settings>(this))
 {
     LOG_INFO("[ServiceAudio] Initializing");
     busChannels.push_back(sys::BusChannels::ServiceAudioNotifications);
@@ -37,10 +39,7 @@ sys::ReturnCodes ServiceAudio::InitHandler()
     static const std::string defaultTrue       = "1";
     static const std::string defaultFalse      = "0";
 
-    static const int IdxPath  = 0;
-    static const int IdxValue = 1;
-
-    const static std::vector<std::vector<std::string>> defaultSettings = {
+    settingsCache = {
 
         // PLAYBACK
         {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
@@ -93,8 +92,9 @@ sys::ReturnCodes ServiceAudio::InitHandler()
         {dbPath(Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle), defaultTrue},
     };
 
-    for (const auto &defaultSet : defaultSettings) {
-        addOrIgnoreEntry(defaultSet[IdxPath], defaultSet[IdxValue]);
+    for (const auto &setting : settingsCache) {
+        settingsProvider->registerValueChange(
+            setting.first, [this](const std::string &name, std::string value) { settingsChanged(name, value); });
     }
 
     return sys::ReturnCodes::Success;
@@ -121,8 +121,16 @@ int32_t ServiceAudio::AsyncCallback(PlaybackEvent e)
 
 uint32_t ServiceAudio::DbCallback(const std::string &path, const uint32_t &defaultValue)
 {
-    this->addOrIgnoreEntry(path, std::to_string(defaultValue));
-    return this->fetchAudioSettingFromDb(path, defaultValue);
+    LOG_DEBUG("ServiceAudio::DBbCallback(%s, %u)", path.c_str(), static_cast<int>(defaultValue));
+    auto settings_it = settingsCache.find(path);
+    if (settingsCache.end() == settings_it) {
+        settingsCache[path] = defaultValue;
+        settingsProvider->setValue(path, std::to_string(defaultValue));
+        settingsProvider->registerValueChange(
+            path, [this](const std::string &variable, std::string value) { settingsChanged(variable, value); });
+        return defaultValue;
+    }
+    return utils::getNumericValue<uint32_t>(settings_it->second);
 };
 
 sys::ReturnCodes ServiceAudio::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -223,24 +231,6 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(const Token &tok
 {
     auto input = audioMux.GetInput(token);
     return HandlePause(input);
-}
-
-void ServiceAudio::addOrIgnoreEntry(const std::string &profilePath, const std::string &defaultValue)
-{
-    auto [code, msg] = DBServiceAPI::GetQueryWithReply(
-        this,
-        db::Interface::Name::Settings_v2,
-        std::make_unique<db::query::settings::AddOrIgnoreQuery>(
-            SettingsRecord_v2{SettingsTableRow_v2{{.ID = DB_ID_NONE}, .path = profilePath, .value = defaultValue}}),
-        audio::audioOperationTimeout);
-
-    if (code == sys::ReturnCodes::Success && msg != nullptr) {
-        auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
-        assert(queryResponse != nullptr);
-
-        auto settingsResultResponse = queryResponse->getResult();
-        assert(dynamic_cast<db::query::settings::AddOrIgnoreResult *>(settingsResultResponse.get()) != nullptr);
-    }
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<AudioMux::Input *> input)
@@ -547,18 +537,6 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     }
 }
 
-void ServiceAudio::updateDbValue(const std::string &path, const std::string &value)
-{
-    if (path.empty()) {
-        return;
-    }
-
-    auto query = std::make_unique<db::query::settings::UpdateQuery>(
-        SettingsRecord_v2({{.ID = DB_ID_NONE}, .path = path, .value = value}));
-
-    DBServiceAPI::GetQuery(this, db::Interface::Name::Settings_v2, std::move(query));
-}
-
 std::string ServiceAudio::getSetting(const Setting &setting,
                                      const Profile::Type &profileType,
                                      const PlaybackType &playbackType)
@@ -591,7 +569,12 @@ std::string ServiceAudio::getSetting(const Setting &setting,
     }
 
     std::string path = dbPath(setting, targetPlayback, targetProfile);
-    return fetchAudioSettingFromDb(path, defaultValue);
+    if (const auto set_it = settingsCache.find(path); settingsCache.end() != set_it) {
+        return set_it->second;
+    }
+
+    LOG_ERROR("ServiceAudio::getSetting setting name %s does not exist", path.c_str());
+    return std::string{};
 }
 
 void ServiceAudio::setSetting(const Setting &setting,
@@ -645,8 +628,8 @@ void ServiceAudio::setSetting(const Setting &setting,
     }
 
     if (retCode == RetCode::Success) {
-        path = dbPath(setting, updatedPlayback, updatedProfile);
-        updateDbValue(path, valueToSet);
+        settingsProvider->setValue(dbPath(setting, updatedPlayback, updatedProfile), valueToSet);
+        settingsCache[dbPath(setting, updatedPlayback, updatedProfile)] = valueToSet;
     }
 }
 
@@ -663,4 +646,16 @@ const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurr
     const auto &currentOperation = audio->GetCurrentOperation();
     const auto currentProfile    = currentOperation.GetProfile();
     return {currentProfile->GetType(), currentOperation.GetPlaybackType()};
+}
+
+void ServiceAudio::settingsChanged(const std::string &name, std::string value)
+{
+    if (value.empty()) {
+        return;
+    }
+    if (auto s_it = settingsCache.find(name); settingsCache.end() != s_it) {
+        s_it->second = value;
+        return;
+    }
+    LOG_ERROR("ServiceAudio::settingsChanged received notification about not registered setting: %s", name.c_str());
 }

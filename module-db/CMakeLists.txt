@@ -19,7 +19,6 @@ set(SOURCES
 
         Databases/ContactsDB.cpp
         Databases/SmsDB.cpp
-        Databases/SettingsDB.cpp
         Databases/AlarmsDB.cpp
         Databases/NotesDB.cpp
         Databases/CalllogDB.cpp
@@ -44,7 +43,6 @@ set(SOURCES
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
         Tables/EventsTable.cpp
-        Tables/SettingsTable_v2.cpp
 
         Interface/Record.cpp
         Interface/SMSRecord.cpp
@@ -56,7 +54,6 @@ set(SOURCES
         Interface/SMSTemplateRecord.cpp
         Interface/NotificationsRecord.cpp
         Interface/EventsRecord.cpp
-        Interface/SettingsRecord_v2.cpp
 
         queries/RecordQuery.cpp
         queries/messages/sms/QuerySMSSearchByType.cpp
@@ -116,9 +113,6 @@ set(SOURCES
         queries/calendar/QueryEventsGetFiltered.cpp
         queries/calendar/QueryEventsGetAllLimited.cpp
         queries/calendar/QueryEventsSelectFirstUpcoming.cpp
-        queries/settings/QuerySettingsGet_v2.cpp
-        queries/settings/QuerySettingsUpdate_v2.cpp
-        queries/settings/QuerySettingsAddOrIgnore_v2.cpp
         queries/alarms/QueryAlarmsAdd.cpp
         queries/alarms/QueryAlarmsRemove.cpp
         queries/alarms/QueryAlarmsEdit.cpp
