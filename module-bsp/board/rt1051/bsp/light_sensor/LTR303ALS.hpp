@@ -49,20 +49,20 @@ namespace bsp::light_sensor
     constexpr inline auto MANUFACTURER_ID = 0x05;
     constexpr inline auto LUX_RANGE       = 64000.f;
 
-    constexpr float decodeLightMeasurement(const std::uint8_t *const data)
+    constexpr float decodeLightMeasurement(const std::uint8_t *data)
     {
-        auto ch1 = static_cast<float>((static_cast<std::uint16_t>(data[1]) << 8) | data[0]);
-        auto ch0 = static_cast<float>((static_cast<std::uint16_t>(data[3]) << 8) | data[2]);
+        const auto ch1 = static_cast<float>((static_cast<std::uint16_t>(data[1]) << 8) | data[0]);
+        const auto ch0 = static_cast<float>((static_cast<std::uint16_t>(data[3]) << 8) | data[2]);
 
-        const auto ratio1Threshold = 0.45f;
-        const auto ratio2Threshold = 0.64f;
-        const auto ratio3Threshold = 0.85f;
-        const auto ch0CoeffRatio1  = 1.7743f;
-        const auto ch1CoeffRatio1  = 1.1059f;
-        const auto ch0CoeffRatio2  = 4.2785f;
-        const auto ch1CoeffRatio2  = 1.9548f;
-        const auto ch0CoeffRatio3  = 0.5926f;
-        const auto ch1CoeffRatio3  = 0.1185f;
+        constexpr auto ratio1Threshold = 0.45f;
+        constexpr auto ratio2Threshold = 0.64f;
+        constexpr auto ratio3Threshold = 0.85f;
+        constexpr auto ch0CoeffRatio1  = 1.7743f;
+        constexpr auto ch1CoeffRatio1  = 1.1059f;
+        constexpr auto ch0CoeffRatio2  = 4.2785f;
+        constexpr auto ch1CoeffRatio2  = 1.9548f;
+        constexpr auto ch0CoeffRatio3  = 0.5926f;
+        constexpr auto ch1CoeffRatio3  = 0.1185f;
 
         if (ch0 == 0.0f || ch1 == 0.0f) {
             return 0.0f;
