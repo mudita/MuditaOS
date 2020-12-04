@@ -16,14 +16,14 @@ namespace bsp::light_sensor
     {
         std::shared_ptr<drivers::DriverGPIO> gpio;
         std::shared_ptr<drivers::DriverI2C> i2c;
-        xQueueHandle qHandleIrq = NULL;
+        xQueueHandle qHandleIrq = nullptr;
 
         drivers::I2CAddress addr = {.deviceAddress = static_cast<uint32_t>(LTR303ALS_DEVICE_ADDR), .subAddressSize = 1};
 
         bool writeSingleRegister(std::uint32_t address, std::uint8_t *to_send)
         {
             addr.subAddress    = address;
-            auto write_success = i2c->Write(addr, to_send, 1);
+            const auto write_success = i2c->Write(addr, to_send, 1);
 
             return write_success == 1;
         }
@@ -83,10 +83,12 @@ namespace bsp::light_sensor
         gpioParams.irqMode = drivers::DriverGPIOPinParams::InterruptMode::IntFallingEdge;
         gpioParams.pin     = static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ);
         gpio->ConfPin(gpioParams);
+        // Uncomment to enable interrupts
         // gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ));
 
         reset();
         configureMeasurement();
+        // Uncomment to enable interrupts
         // configureInterrupts();
         wakeup();
 
@@ -95,7 +97,7 @@ namespace bsp::light_sensor
 
     void deinit()
     {
-        qHandleIrq = NULL;
+        qHandleIrq = nullptr;
         reset();
     }
 
@@ -128,17 +130,14 @@ namespace bsp::light_sensor
     {
         std::uint8_t readout;
         readSingleRegister(static_cast<std::uint32_t>(LTR303ALS_Registers::MANUFAC_ID), &readout);
-        if (readout != MANUFACTURER_ID) {
-            return false;
-        }
-        return true;
+        return readout == MANUFACTURER_ID;
     }
 
     BaseType_t IRQHandler()
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        if (qHandleIrq != NULL) {
-            uint8_t val = 0x01;
+        if (qHandleIrq != nullptr) {
+            std::uint8_t val = 0x01;
             xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
         }
         return xHigherPriorityTaskWoken;

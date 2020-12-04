@@ -49,28 +49,37 @@ namespace bsp::light_sensor
     constexpr inline auto MANUFACTURER_ID = 0x05;
     constexpr inline auto LUX_RANGE       = 64000.f;
 
-    constexpr inline float decodeLightMeasurement(std::uint8_t *data)
+    constexpr float decodeLightMeasurement(const std::uint8_t *const data)
     {
         auto ch1 = static_cast<float>((static_cast<std::uint16_t>(data[1]) << 8) | data[0]);
         auto ch0 = static_cast<float>((static_cast<std::uint16_t>(data[3]) << 8) | data[2]);
 
+        const auto ratio1Threshold = 0.45f;
+        const auto ratio2Threshold = 0.64f;
+        const auto ratio3Threshold = 0.85f;
+        const auto ch0CoeffRatio1  = 1.7743f;
+        const auto ch1CoeffRatio1  = 1.1059f;
+        const auto ch0CoeffRatio2  = 4.2785f;
+        const auto ch1CoeffRatio2  = 1.9548f;
+        const auto ch0CoeffRatio3  = 0.5926f;
+        const auto ch1CoeffRatio3  = 0.1185f;
+
         if (ch0 == 0.0f || ch1 == 0.0f) {
             return 0.0f;
         }
-        float ratio = ch1 / ((ch1) + ch0);
+        float ratio = ch1 / (ch1 + ch0);
 
-        if (ratio < 0.45f) {
-            return (1.7743f * ch0 + 1.1059f * ch1) / MEASUREMENT_COEFF;
+        if (ratio < ratio1Threshold) {
+            return (ch0CoeffRatio1 * ch0 + ch1CoeffRatio1 * ch1) / MEASUREMENT_COEFF;
         }
-        else if (ratio < 0.64f && ratio >= 0.45f) {
-            return (4.2785f * ch0 - 1.9548f * ch1) / MEASUREMENT_COEFF;
+        else if (ratio < ratio2Threshold) {
+            return (ch0CoeffRatio2 * ch0 - ch1CoeffRatio2 * ch1) / MEASUREMENT_COEFF;
         }
-        else if (ratio < 0.85f && ratio >= 0.64f) {
-            return (0.5926f * ch0 + 0.1185f * ch1) / MEASUREMENT_COEFF;
+        else if (ratio < ratio3Threshold) {
+            return (ch0CoeffRatio3 * ch0 + ch1CoeffRatio3 * ch1) / MEASUREMENT_COEFF;
         }
-        else {
-            return 0.0f;
-        }
+
+        return 0.0f;
     }
 
 } // namespace bsp::light_sensor

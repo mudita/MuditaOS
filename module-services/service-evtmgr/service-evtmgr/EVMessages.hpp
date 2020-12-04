@@ -151,8 +151,8 @@ namespace sevm
             : Message(MessageType::EVMEinkFrontlightMessage), action(act), value(val)
         {}
 
-        bsp::eink_frontlight::Action action;
-        bsp::eink_frontlight::BrightnessPercentage value;
+        const bsp::eink_frontlight::Action action;
+        const bsp::eink_frontlight::BrightnessPercentage value;
     };
 
     class LightSensorMessage : public Message
@@ -167,7 +167,7 @@ namespace sevm
       public:
         explicit LightSensorReadoutMessage(bsp::light_sensor::IlluminanceLux val) : LightSensorMessage(), value(val)
         {}
-        bsp::light_sensor::IlluminanceLux value;
+        const bsp::light_sensor::IlluminanceLux value;
     };
 
 } /* namespace sevm*/

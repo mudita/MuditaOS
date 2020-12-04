@@ -7,7 +7,7 @@ namespace bsp::light_sensor
 {
     namespace
     {
-        xQueueHandle qHandleIrq = NULL;
+        xQueueHandle qHandleIrq = nullptr;
     } // namespace
 
     std::int32_t init(xQueueHandle qHandle)
@@ -18,7 +18,7 @@ namespace bsp::light_sensor
 
     void deinit()
     {
-        qHandleIrq = NULL;
+        qHandleIrq = nullptr;
     }
 
     bool standby()
