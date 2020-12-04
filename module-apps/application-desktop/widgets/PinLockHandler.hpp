@@ -5,8 +5,6 @@
 
 #include "PinLock.hpp"
 
-#include "Interface/SettingsRecord.hpp"
-
 #include <module-services/service-appmgr/service-appmgr/messages/ActionRequest.hpp>
 #include <module-services/service-appmgr/service-appmgr/Actions.hpp>
 

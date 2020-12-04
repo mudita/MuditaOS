@@ -3,7 +3,6 @@
 
 #include "service-db/DBServiceAPI.hpp"
 #include "service-db/DBThreadMessage.hpp"
-#include "service-db/DBSettingsMessage.hpp"
 #include "service-db/DBSMSMessage.hpp"
 #include "service-db/DBSMSTemplateMessage.hpp"
 #include "service-db/DBContactMessage.hpp"
