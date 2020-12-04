@@ -62,7 +62,6 @@ extern "C"
      */
     void log_Log(logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
         __attribute__((format(printf, 5, 6)));
-    void log_SetLevel(logger_level level);
     void log_Printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
     void log_WriteToDevice(const uint8_t *pBuffer, unsigned NumBytes);
 
