@@ -133,9 +133,9 @@ namespace purefs::fs::drivers
 #endif
             // TODO: Time is currently not supported
             st.st_blocks = fs.fsize / st.st_blksize;
-            st.st_atim   = {0, 0};
-            st.st_mtim   = {0, 0};
-            st.st_ctim   = {0, 0};
+            st.st_atime  = 0;
+            st.st_mtime  = 0;
+            st.st_ctime  = 0;
         }
     } // namespace
 
