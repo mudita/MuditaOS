@@ -43,7 +43,7 @@ namespace gui
 
             if (textLine.length() == 0 && textLine.getLineEnd()) {
                 debug_text_lines("cant show more text from this document");
-                stopCondition = LinesDrawStop::OUT_OF_TEXT;
+                stopCondition = LinesDrawStop::OutOfText;
                 break;
             }
 
@@ -52,7 +52,7 @@ namespace gui
                                  lineYPosition,
                                  textLine.height(),
                                  h);
-                stopCondition = LinesDrawStop::OUT_OF_SPACE;
+                stopCondition = LinesDrawStop::OutOfSpace;
                 addToInvisibleLines(std::move(textLine));
                 break;
             }
@@ -85,13 +85,13 @@ namespace gui
             }
 
             if (lineYPosition + initHeight > h) {
-                stopCondition = LinesDrawStop::OUT_OF_SPACE;
+                stopCondition = LinesDrawStop::OutOfSpace;
                 addToInvisibleLines(std::move(textLine));
                 break;
             }
 
             if (lines.size() >= linesCount) {
-                stopCondition = LinesDrawStop::OUT_OF_SPACE;
+                stopCondition = LinesDrawStop::OutOfSpace;
                 addToInvisibleLines(std::move(textLine));
                 break;
             }

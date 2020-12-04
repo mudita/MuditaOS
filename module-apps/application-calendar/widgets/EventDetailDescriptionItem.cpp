@@ -57,7 +57,7 @@ namespace gui
                                     2 * style::window::calendar::item::eventDetail::label_h);
         description->setFont(style::window::font::big);
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
-        description->setEditMode(EditMode::BROWSE);
+        description->setEditMode(EditMode::Browse);
 
         focusChangedCallback = [&](Item &item) {
             setFocusItem(focus ? vBox : nullptr);

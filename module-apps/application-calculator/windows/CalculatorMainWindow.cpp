@@ -40,7 +40,7 @@ namespace gui
         mathOperationInput->setInputMode(new InputMode({InputMode::digit}));
         mathOperationInput->setPenFocusWidth(style::window::default_border_focus_w);
         mathOperationInput->setPenWidth(style::window::default_border_rect_no_focus);
-        mathOperationInput->setEditMode(gui::EditMode::EDIT);
+        mathOperationInput->setEditMode(gui::EditMode::Edit);
 
         mathBox = new gui::MathOperationsBox(this,
                                              style::calculator::window::math_box_offset_top,

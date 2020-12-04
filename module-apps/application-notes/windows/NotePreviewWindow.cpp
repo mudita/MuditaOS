@@ -67,8 +67,8 @@ namespace app::notes
         note->setAlignment(gui::Alignment{gui::Alignment::Vertical::Top});
         note->setPenFocusWidth(::style::window::default_border_focus_w);
         note->setPenWidth(::style::window::default_border_rect_no_focus);
-        note->setEditMode(gui::EditMode::SCROLL);
-        note->setCursorStartPosition(gui::CursorStartPosition::DOCUMENT_BEGIN);
+        note->setEditMode(gui::EditMode::Scroll);
+        note->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
 
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(::style::strings::common::options));
