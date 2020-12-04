@@ -21,6 +21,7 @@
 ### Fixed
 
 * `[settings]` Fix lack of sim at startup
+* `[audio]` Changed internal microphone gain from 0dB to -12dB to fix echo & noise problem
 
 ## [0.49.1 2020-12-04]
 
