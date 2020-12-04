@@ -71,6 +71,6 @@ TEST_CASE("Corefs: Basic API test")
     }
     {
         ret = fscore.open("/sys/ala/ma/kota/", 0, 0);
-        REQUIRE(ret > 2);
+        REQUIRE(ret == -ENOENT);
     }
 }
