@@ -1,6 +1,34 @@
 # MuditaOS changelog
 
-[0.48.1 2020-11-27]
+## [0.49.1 2020-12-04]
+
+### Added
+
+* Add MMI/USSD communication window.
+* Add Notes application.
+* Add notes search engine.
+* Add info window for incoming MMI messages.
+* Add vertical text scrolling.
+* Add text cursor starting position handling.
+
+### Changed
+
+*  Change note characters limit to 4'000.
+*  Dump logs to a file on RT1051 after reaching 80% of log buffer utilization.
+
+### Fixed
+
+* Fix interval chimes choice not scaling with meditation time.
+* Fix too many time options in the meditation application.
+* Fix default counter settings.
+* Fix displaying the special characters in a note title.
+
+### Other
+
+* Rewritten tests and updated test documentation.
+* Split clock domains on the RT1051 platform.
+
+## [0.48.1 2020-11-27]
 
 ### Added
 
