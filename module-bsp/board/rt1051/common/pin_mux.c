@@ -310,6 +310,7 @@ void PINMUX_InitBootPins(void)
     PINMUX_InitTorch();
     PINMUX_InitMagnetometer();
     PINMUX_InitEinkFrontlight();
+    PINMUX_InitLightSensor();
 }
 
 /*
@@ -1509,6 +1510,14 @@ void PINMUX_InitEinkFrontlight(void)
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_OPEN_DRAIN_DISABLED | PAD_CONFIG_SPEED_MEDIUM_1_100MHz |
                             PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_PULL_DOWN_100kOhm |
                             PAD_CONFIG_DRIVER_STRENGTH_LVL_6 | PAD_CONFIG_HYSTERESIS_DISABLED);
+}
+
+void PINMUX_InitLightSensor(void)
+{
+    IOMUXC_SetPinMux(PINMUX_LIGHT_SENSOR_IRQ_PIN, 0U);
+    IOMUXC_SetPinConfig(PINMUX_LIGHT_SENSOR_IRQ_PIN,
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_DISABLED | PAD_CONFIG_SPEED_SLOW_50MHz |
+                            PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_UP_22kOhm);
 }
 
 /***********************************************************************************************************************
