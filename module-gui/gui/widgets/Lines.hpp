@@ -36,7 +36,7 @@ namespace gui
 
         ~Lines() = default;
 
-        LinesDrawStop stopCondition                = LinesDrawStop::NONE;
+        LinesDrawStop stopCondition                = LinesDrawStop::None;
         TextLineStartContition drawStartConditions = {0, 0};
         std::list<TextLineStartContition> previousLinesStart;
 
@@ -44,7 +44,7 @@ namespace gui
         {
             erase();
 
-            stopCondition = LinesDrawStop::NONE;
+            stopCondition = LinesDrawStop::None;
             previousLinesStart.clear();
             drawStartConditions = {0, 0};
         }

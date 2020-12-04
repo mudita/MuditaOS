@@ -70,7 +70,7 @@ namespace gui
                                    phonebookStyle::numbersWithIconsWidget::number_text_h);
         numberText->setFont(font);
         numberText->setEdges(gui::RectangleEdge::None);
-        numberText->setEditMode(EditMode::BROWSE);
+        numberText->setEditMode(EditMode::Browse);
         numberText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         numberText->setText(number.getFormatted());
         numberText->activeItem = false;

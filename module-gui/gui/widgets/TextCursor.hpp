@@ -21,7 +21,7 @@ namespace gui
     {
       protected:
         Text *text                              = nullptr;
-        CursorStartPosition cursorStartPosition = CursorStartPosition::DOCUMENT_END;
+        CursorStartPosition cursorStartPosition = CursorStartPosition::DocumentEnd;
         unsigned int onScreenPosition           = 0;
 
       public:

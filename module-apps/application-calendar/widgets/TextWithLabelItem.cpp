@@ -46,7 +46,7 @@ namespace gui
             [=]() { selectSpecialCharacter(); }));
         textInput->setPenFocusWidth(style::window::default_border_focus_w);
         textInput->setPenWidth(style::window::default_border_rect_no_focus);
-        textInput->setEditMode(gui::EditMode::EDIT);
+        textInput->setEditMode(gui::EditMode::Edit);
 
         focusChangedCallback = [&](Item &item) {
             setFocusItem(focus ? vBox : nullptr);
