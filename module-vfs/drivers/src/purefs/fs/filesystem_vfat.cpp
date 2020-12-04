@@ -303,7 +303,6 @@ namespace purefs::fs::drivers
         if (f_error(fp) != FR_OK) {
             return translate_error(f_error(fp));
         }
-        const auto filesz = f_size(fp);
         if (dir == SEEK_CUR) {
             cpos = f_tell(fp);
         }
@@ -311,7 +310,7 @@ namespace purefs::fs::drivers
             cpos = 0;
         }
         else if (dir == SEEK_END) {
-            cpos = filesz;
+            cpos = f_size(fp);
         }
         else {
             return -EINVAL;
