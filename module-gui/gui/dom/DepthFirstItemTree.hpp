@@ -1,0 +1,33 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#pragma once
+
+#include "ItemTree.hpp"
+#include <stack>
+#include <iostream>
+namespace gui
+{
+    class DepthFirstItemTree : public ItemTree
+    {
+        static constexpr auto rootLevel = 0;
+
+      public:
+        enum class TraverseMode
+        {
+            PreOrder,
+            PostOrder
+        };
+        explicit DepthFirstItemTree(gui::Item &root, TraverseMode mode = TraverseMode::PreOrder);
+        [[nodiscard]] auto hasNode() const noexcept -> bool override;
+        [[nodiscard]] auto getNext() noexcept -> gui::ItemNode override;
+
+      private:
+        std::stack<gui::ItemNode> nodes;
+        TraverseMode mode;
+
+        void constructPostOrder(gui::Item *item, int level);
+        [[nodiscard]] auto getNextInOrder() -> gui::ItemNode;
+    };
+
+} // namespace gui

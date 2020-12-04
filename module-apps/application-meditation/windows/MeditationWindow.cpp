@@ -11,14 +11,11 @@
 #include "application-meditation/ApplicationMeditation.hpp"
 
 #include "InputEvent.hpp"
-//#include "Rect.hpp"
-
 #include <cassert>
 
 #include <module-utils/i18n/i18n.hpp>
 
-#include <iostream>
-#include <module-gui/gui/dom/GuiDOMVisitor.hpp>
+#include <module-gui/gui/dom/ItemDomCreator.hpp>
 
 namespace gui
 {
@@ -92,10 +89,8 @@ namespace gui
                 return true;
             }
             else if (inputEvent.is(KeyCode::KEY_VOLDN)) {
-                GuiDOMVisitor visitor;
-                std::cout << "starting walk" << std::endl;
-                this->accept(visitor);
-                visitor.dumpDOM();
+                ItemDomCreator domCreator(ItemDomCreator::DumpType::JsonAtTraverseEnd);
+                domCreator.traverse(*this);
             }
         }
         return AppWindow::onInput(inputEvent);

@@ -4,19 +4,21 @@
 #pragma once
 
 #include "GuiVisitor.hpp"
-#include "DomNode.hpp"
-#include <memory>
+#include "ItemWalker.hpp"
+#include <string>
+#include <list>
+#include <vector>
+
 namespace gui
 {
-    class DOMDataHandler;
-
-    class GuiDOMVisitor : public GuiVisitor
+    class Item2PrettyPrintSerializingVisitor : public GuiVisitor, public ItemWalker
     {
-        DOMDataHandler *handler;
+        std::list<std::string> sink;
+        void addLine(const std::string &name, const std::string &value);
+        void addLine(const std::string &name, const std::vector<int> &value);
+        void addLine(const std::string &name, int value);
+        void addLine(const std::string &name, bool value);
 
-      public:
-        GuiDOMVisitor();
-        ~GuiDOMVisitor();
         void visit(gui::Item &item) override;
         void visit(gui::Rect &item) override;
         void visit(gui::Text &item) override;
@@ -25,7 +27,7 @@ namespace gui
         void visit(gui::BottomBar &item) override;
         void visit(gui::TopBar &item) override;
 
-        void dumpDOM();
+      public:
+        void traverse(gui::Item &root) override;
     };
-
 } // namespace gui
