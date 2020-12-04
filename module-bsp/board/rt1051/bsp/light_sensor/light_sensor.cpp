@@ -22,7 +22,7 @@ namespace bsp::light_sensor
 
         bool writeSingleRegister(std::uint32_t address, std::uint8_t *to_send)
         {
-            addr.subAddress    = address;
+            addr.subAddress          = address;
             const auto write_success = i2c->Write(addr, to_send, 1);
 
             return write_success == 1;
