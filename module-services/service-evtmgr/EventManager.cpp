@@ -30,7 +30,7 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
-
+#include <bsp/light_sensor/light_sensor.hpp>
 #include <cassert>
 #include <list>
 #include <tuple>
@@ -274,16 +274,21 @@ sys::ReturnCodes EventManager::InitHandler()
     });
 
     connect(sevm::KeypadBacklightMessage(), [&](sys::Message *msgl) {
-        auto msg         = static_cast<sevm::KeypadBacklightMessage *>(msgl);
-        auto message     = std::make_shared<sevm::KeypadBacklightMessage>();
-        message->success = processKeypadBacklightRequest(msg->action);
-        return message;
+        auto request      = static_cast<sevm::KeypadBacklightMessage *>(msgl);
+        auto response     = std::make_shared<sevm::KeypadBacklightResponseMessage>();
+        response->success = processKeypadBacklightRequest(request->action);
+        return response;
     });
 
     connect(sevm::EinkFrontlightMessage(), [&](sys::Message *msgl) {
         auto msg = static_cast<sevm::EinkFrontlightMessage *>(msgl);
         processEinkFrontlightRequest(msg->action, msg->value);
         return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sevm::LightSensorMessage(), [&](sys::Message *msgl) {
+        auto message = std::make_shared<sevm::LightSensorReadoutMessage>(bsp::light_sensor::readout());
+        return message;
     });
 
     // initialize keyboard worker
@@ -304,6 +309,8 @@ sys::ReturnCodes EventManager::InitHandler()
     sys::WorkerQueueInfo qMagnetometer = {"qMagnetometer", sizeof(uint8_t), 5};
     // torch driver queue
     sys::WorkerQueueInfo qTorch = {"qTorch", sizeof(uint8_t), 5};
+    // light sensor queue
+    sys::WorkerQueueInfo qLightSensor = {"qLightSensor", sizeof(uint8_t), 5};
 
     std::list<sys::WorkerQueueInfo> list;
 
@@ -314,6 +321,7 @@ sys::ReturnCodes EventManager::InitHandler()
     list.push_back(qSIM);
     list.push_back(qMagnetometer);
     list.push_back(qTorch);
+    list.push_back(qLightSensor);
 
     EventWorker->init(list);
     EventWorker->run();
