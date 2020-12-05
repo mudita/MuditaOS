@@ -11,7 +11,6 @@ namespace at
 {
     namespace response
     {
-        constexpr auto StringDelimiter = "\"";
 
         std::optional<std::string> getResponseLineATCommand(const at::Result &resp, std::string_view head)
         {
@@ -35,6 +34,21 @@ namespace at
                 return utils::split(commandLine, ",");
             }
             return std::nullopt;
+        }
+        std::optional<ResponseTokens> getTokensForATResults(const at::Result &resp, std::string_view head)
+        {
+            if (resp.code != at::Result::Code::OK)
+                return std::nullopt;
+
+            std::vector<std::vector<std::string>> parts;
+            for (auto el : resp.response) {
+                if (el.compare(0, head.length(), head) == 0) {
+                    auto body = el.substr(head.length());
+                    parts.push_back(utils::split(body, ","));
+                }
+            }
+
+            return parts;
         }
 
         bool parseCOPS(const at::Result &resp, std::vector<cops::Operator> &ret)
@@ -104,9 +118,10 @@ namespace at
             const std::string_view AT_QPINC_SC = "+QPINC:";
             if (auto tokens = getTokensForATCommand(resp, AT_QPINC_SC); tokens) {
                 constexpr int QPINC_TokensCount = 3;
-                if ((*tokens).size() == QPINC_TokensCount) {
-                    utils::toNumeric((*tokens)[1], ret.PinCounter);
-                    utils::toNumeric((*tokens)[2], ret.PukCounter);
+                auto pinc_tokens                = (*tokens);
+                if (pinc_tokens.size() == QPINC_TokensCount) {
+                    utils::toNumeric(pinc_tokens[1], ret.PinCounter);
+                    utils::toNumeric(pinc_tokens[2], ret.PukCounter);
                     return true;
                 }
             }
