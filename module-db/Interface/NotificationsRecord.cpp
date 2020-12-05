@@ -79,7 +79,7 @@ std::unique_ptr<std::vector<NotificationsRecord>> NotificationsRecordInterface::
     auto records = std::make_unique<std::vector<NotificationsRecord>>();
 
     for (auto &r : rows) {
-        records->push_back(r);
+        records->push_back(NotificationsRecord{r});
     }
 
     return records;
@@ -112,7 +112,7 @@ bool NotificationsRecordInterface::RemoveByField(NotificationsRecordField field,
 
 NotificationsRecord NotificationsRecordInterface::GetByID(uint32_t id)
 {
-    return notificationsDb->notifications.getById(id);
+    return NotificationsRecord{notificationsDb->notifications.getById(id)};
 }
 
 uint32_t NotificationsRecordInterface::GetCount()
@@ -126,7 +126,8 @@ NotificationsRecord NotificationsRecordInterface::GetByKey(NotificationsRecord::
         return NotificationsRecord();
     }
 
-    return notificationsDb->notifications.GetByKey(static_cast<uint32_t>(key));
+    NotificationsTableRow notificationsTableRow = notificationsDb->notifications.GetByKey(static_cast<uint32_t>(key));
+    return NotificationsRecord{notificationsTableRow};
 }
 
 std::unique_ptr<db::QueryResult> NotificationsRecordInterface::runQuery(std::shared_ptr<db::Query> query)

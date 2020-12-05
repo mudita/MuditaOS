@@ -13,14 +13,16 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
+#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Events Table tests")
 {
     Database::initialize();
 
-    vfs.remove(EventsDB::GetDBName());
+    const auto eventsPath = (purefs::dir::getUserDiskPath() / "events.db").c_str();
+    std::filesystem::remove(eventsPath);
 
-    EventsDB eventsDb;
+    EventsDB eventsDb{eventsPath};
     REQUIRE(eventsDb.isInitialized());
 
     auto &eventsTbl = eventsDb.events;

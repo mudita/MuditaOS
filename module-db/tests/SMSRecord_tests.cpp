@@ -15,11 +15,12 @@
 #include <vfs.hpp>
 
 #include <algorithm>
-
+#include <filesystem>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <module-db/queries/messages/sms/QuerySMSGetForList.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 struct test
 {
@@ -31,11 +32,13 @@ TEST_CASE("SMS Record tests")
 {
     Database::initialize();
 
-    vfs.remove(ContactsDB::GetDBName());
-    vfs.remove(SmsDB::GetDBName());
+    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    const auto smsPath      = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
+    std::filesystem::remove(contactsPath);
+    std::filesystem::remove(smsPath);
 
-    auto smsDB      = std::make_unique<SmsDB>();
-    auto contactsDB = std::make_unique<ContactsDB>();
+    auto contactsDB = std::make_unique<ContactsDB>(contactsPath);
+    auto smsDB      = std::make_unique<SmsDB>(smsPath);
 
     const uint32_t dateTest      = 123456789;
     const uint32_t dateSentTest  = 987654321;

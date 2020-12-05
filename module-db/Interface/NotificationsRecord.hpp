@@ -42,7 +42,7 @@ struct NotificationsRecord : public Record
 
     NotificationsRecord()  = default;
     ~NotificationsRecord() = default;
-    NotificationsRecord(const NotificationsTableRow &tableRow);
+    explicit NotificationsRecord(const NotificationsTableRow &tableRow);
 
     bool isValidRecord() const;
     bool gotValidKey() const;
@@ -58,7 +58,7 @@ enum class NotificationsRecordField
 class NotificationsRecordInterface : public RecordInterface<NotificationsRecord, NotificationsRecordField>
 {
   public:
-    NotificationsRecordInterface(NotificationsDB *notificationsDb);
+    explicit NotificationsRecordInterface(NotificationsDB *notificationsDb);
     virtual ~NotificationsRecordInterface() = default;
 
     bool Add(const NotificationsRecord &rec) override final;
