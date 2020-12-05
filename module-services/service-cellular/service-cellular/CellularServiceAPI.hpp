@@ -4,6 +4,7 @@
 #pragma once
 
 #include "CellularMessage.hpp"
+#include "PacketDataCellularMessage.hpp"
 
 #include <Modem/TS0710/TS0710.h>
 #include <PhoneNumber.hpp>
@@ -80,4 +81,21 @@ namespace CellularServiceAPI
                         CellularSimCardLockDataMessage::SimCardLock lock,
                         const std::vector<unsigned int> &pin);
     bool SetSimCard(sys::Service *serv, Store::GSM::SIM sim);
+
+    /**
+     * @brief get all APNs from phone configuration
+     */
+    bool GetAPN(sys::Service *serv);
+    /**
+     * @brief get one APN from phone configuration, connected with ctxid
+     */
+    bool GetAPN(sys::Service *serv, std::uint8_t contextId);
+    /**
+     * @brief get first APN with type, from phone configuration
+     */
+    bool GetAPN(sys::Service *serv, packet_data::APN::APNType type);
+
+    bool SetAPN(sys::Service *serv, packet_data::APN::Config apnConfig);
+    bool SetDataTransfer(sys::Service *serv, packet_data::DataTransfer dt);
+    bool GetDataTransfer(sys::Service *serv);
 }; // namespace CellularServiceAPI

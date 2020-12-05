@@ -80,6 +80,8 @@ enum class MessageType
     CellularSimResponse,         // Send to PIN window (show, error state, hide)
     CellularSimVerifyPinRequest, // Send from PIN window with PIN, PUK, ... number
 
+    CellularPacketData, ///< for all PacketData messages
+
     CellularGetOwnNumber,
     CellularGetIMSI,
     CellularGetNetworkInfo,

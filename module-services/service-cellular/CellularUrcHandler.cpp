@@ -155,6 +155,24 @@ void CellularUrcHandler::Handle(Cpin &urc)
     }
 }
 
+void CellularUrcHandler::Handle(Qiurc &urc)
+{
+    auto urcType = urc.getType();
+    if (urc.isValid() && urcType) {
+        switch (*urcType) {
+        case Qiurc::QIUrcMessages::DeactivateContext:
+            if (auto urcFirstParam = urc.getFirstParam(); urcFirstParam) {
+                int ctxid = 0;
+                if (utils::toNumeric(*urcFirstParam, ctxid)) {
+                    response = std::make_unique<CellularDeactivateContextResponse>(at::Result::Code::OK, ctxid);
+                    urc.setHandled(true);
+                }
+            }
+            break;
+        }
+    }
+}
+
 void CellularUrcHandler::Handle(PoweredDown &urc)
 {
     if (urc.isValid()) {

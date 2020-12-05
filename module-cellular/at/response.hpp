@@ -15,6 +15,7 @@ namespace at
 {
     namespace response
     {
+        constexpr auto StringDelimiter = "\"";
         namespace qpinc
         {
             /// Structure that holds parsed information from AT+QPINC command
@@ -67,9 +68,33 @@ namespace at
         } // namespace cops
 
         bool parseCOPS(const at::Result &resp, std::vector<cops::Operator> &ret);
-
+        using ResponseTokens = std::vector<std::vector<std::string>>;
         std::vector<std::string> tokenize(std::string &response, std::string separator = ",");
+
+        /**
+         * For AT one line (+XYZ) response like:
+         * +CPIN READY
+         * OK
+         */
         std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head);
+
+        /**
+         * For AT multiline response like (last OK)
+         * +QIACT:1,<context_state>,<context_type>[,<IP_address>]
+         * [.....
+         * +QIACT:16,<context_state>,<context_type>[,<IP_address>]]
+         * OK
+         *
+         * response from function like QPING (not mention in DOC as URC), looks like (first OK)
+         * OK
+         * +QPING: 0,"61.135.169.125",32,192,255
+         * +QPING: 0,"61.135.169.125",32,240,255
+         * ...
+         * +QPING: 0,4,4,0,192,479,287
+         *
+         * Warning: should not be used for URC !
+         */
+        std::optional<ResponseTokens> getTokensForATResults(const at::Result &resp, std::string_view head);
         bool parseCSQ(std::string response, std::string &result);
         bool parseCSQ(std::string cellularResponse, uint32_t &result);
         bool parseCREG(std::string &response, uint32_t &result);
