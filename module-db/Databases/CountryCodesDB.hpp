@@ -8,16 +8,8 @@
 class CountryCodesDB : public Database
 {
   public:
-    CountryCodesDB();
+    CountryCodesDB(const char *name);
     ~CountryCodesDB();
 
-    static const char *GetDBName()
-    {
-        return dbName;
-    }
-
     CountryCodesTable countryCodes;
-
-  private:
-    static const char *dbName;
 };

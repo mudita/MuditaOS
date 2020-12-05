@@ -6,14 +6,16 @@
 #include "Interface/ContactRecord.hpp"
 #include "module-utils/i18n/i18n.hpp"
 #include "vfs.hpp"
+#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Contact Record db tests")
 {
     Database::initialize();
 
-    vfs.remove(ContactsDB::GetDBName());
+    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    std::filesystem::remove(contactsPath);
 
-    auto contactDB = std::make_unique<ContactsDB>();
+    auto contactDB = std::make_unique<ContactsDB>(contactsPath);
     REQUIRE(contactDB->isInitialized());
 
     const char *primaryNameTest                   = "PrimaryNameTest";
@@ -259,9 +261,10 @@ TEST_CASE("Test converting contact data to string")
 TEST_CASE("Contact record numbers update")
 {
     Database::initialize();
-    vfs.remove(ContactsDB::GetDBName());
+    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    std::filesystem::remove(contactsPath);
 
-    auto contactDB = std::make_unique<ContactsDB>();
+    auto contactDB = std::make_unique<ContactsDB>(contactsPath);
     REQUIRE(contactDB->isInitialized());
 
     auto records = ContactRecordInterface(contactDB.get());

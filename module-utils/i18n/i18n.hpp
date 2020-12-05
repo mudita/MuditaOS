@@ -1,12 +1,10 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef UNTITLED_I18_HPP
-#define UNTITLED_I18_HPP
-
+#pragma once
 #include "json/json11.hpp"
 #include <string>
-#include "vfs.hpp"
+#include <vfs.hpp>
 #include "log/log.hpp"
 
 #include "thread.hpp"
@@ -62,5 +60,3 @@ namespace utils
         return utils::localize.get(text);
     };
 } // namespace utils
-
-#endif // UNTITLED_I18_HPP

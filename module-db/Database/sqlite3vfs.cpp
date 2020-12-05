@@ -122,8 +122,10 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include "vfs.hpp"
 #include "config.h"
+
+#include <Utils.hpp>
+#include <dirent.h>
 
 //#include <log/log.hpp> //left for future debug
 
@@ -149,7 +151,7 @@ typedef struct EcophoneFile EcophoneFile;
 struct EcophoneFile
 {
     sqlite3_file base; /* Base class. Must be first. */
-    vfs::FILE *fd;     /* File descriptor */
+    std::FILE *fd;     /* File descriptor */
 
     char *aBuffer;             /* Pointer to malloc'd buffer */
     int nBuffer;               /* Valid bytes of data in zBuffer */
@@ -167,15 +169,15 @@ static int ecophoneDirectWrite(EcophoneFile *p,   /* File handle */
 )
 {
     size_t nWrite; /* Return value from write() */
-    const auto fileSize = vfs.filelength(p->fd);
+    const auto fileSize = utils::filesystem::filelength(p->fd);
     // vfs_fseek doesn't like offset to be > file size
     if (iOfst < fileSize) {
-        if (vfs.fseek(p->fd, iOfst, SEEK_SET) != 0) {
+        if (std::fseek(p->fd, iOfst, SEEK_SET) != 0) {
             return SQLITE_IOERR_WRITE;
         }
     }
     else {
-        if (vfs.fseek(p->fd, fileSize, SEEK_SET) != 0) {
+        if (std::fseek(p->fd, fileSize, SEEK_SET) != 0) {
             return SQLITE_IOERR_WRITE;
         }
         // Zero fill if outside the buffer
@@ -198,7 +200,7 @@ static int ecophoneDirectWrite(EcophoneFile *p,   /* File handle */
                     bytesToWrite = zerobuf_size;
                 }
             }
-            auto ret = vfs.fwrite(zero_buf.get(), sizeof(char), bytesToWrite, p->fd);
+            auto ret = std::fwrite(zero_buf.get(), sizeof(char), bytesToWrite, p->fd);
             if (ret != bytesToWrite) {
                 return SQLITE_IOERR_WRITE;
             }
@@ -206,11 +208,11 @@ static int ecophoneDirectWrite(EcophoneFile *p,   /* File handle */
         }
     }
 
-    nWrite = vfs.fwrite(zBuf, 1, iAmt, p->fd);
+    nWrite = std::fwrite(zBuf, 1, iAmt, p->fd);
     if ((int)nWrite != iAmt) {
         return SQLITE_IOERR_WRITE;
     }
-    if (ff_fflush(p->fd) != 0) {
+    if (std::fflush(p->fd) != 0) {
         return SQLITE_IOERR_WRITE;
     }
     return SQLITE_OK;
@@ -241,7 +243,7 @@ static int ecophoneClose(sqlite3_file *pFile)
     rc              = ecophoneFlushBuffer(p);
     sqlite3_free(p->aBuffer);
 
-    vfs.fclose(p->fd);
+    std::fclose(p->fd);
     return rc;
 }
 
@@ -265,7 +267,7 @@ static int ecophoneRead(sqlite3_file *pFile, void *zBuf, int iAmt, sqlite_int64 
         return rc;
     }
 
-    auto fileSize = vfs.filelength(p->fd);
+    auto fileSize = utils::filesystem::filelength(p->fd);
 
     if (p->fd != nullptr) {
         if (iOfst >= fileSize) {
@@ -273,11 +275,11 @@ static int ecophoneRead(sqlite3_file *pFile, void *zBuf, int iAmt, sqlite_int64 
         }
     }
 
-    if (vfs.fseek(p->fd, iOfst, SEEK_SET) != 0) {
+    if (std::fseek(p->fd, iOfst, SEEK_SET) != 0) {
         return SQLITE_IOERR_READ;
     }
 
-    nRead = vfs.fread(zBuf, 1, iAmt, p->fd);
+    nRead = std::fread(zBuf, 1, iAmt, p->fd);
 
     if (nRead == iAmt) {
         return SQLITE_OK;
@@ -390,7 +392,7 @@ static int ecophoneFileSize(sqlite3_file *pFile, sqlite_int64 *pSize)
         return rc;
     }
 
-    *pSize = vfs.filelength(p->fd);
+    *pSize = utils::filesystem::filelength(p->fd);
 
     return SQLITE_OK;
 }
@@ -456,7 +458,7 @@ static int ecophoneDeviceCharacteristics(sqlite3_file *pFile)
  */
 static int ecophoneAccess(sqlite3_vfs *pVfs, const char *zPath, int flags, int *pResOut)
 {
-    vfs::FILE *fd;
+    std::FILE *fd;
     UNUSED(pVfs);
 
     assert(flags == SQLITE_ACCESS_EXISTS       /* access(zPath, F_OK) */
@@ -464,11 +466,11 @@ static int ecophoneAccess(sqlite3_vfs *pVfs, const char *zPath, int flags, int *
            || flags == SQLITE_ACCESS_READWRITE /* access(zPath, R_OK|W_OK) */
     );
 
-    fd = vfs.fopen(zPath, (const char *)"r");
+    fd = std::fopen(zPath, "r");
     if (fd != NULL) {
         if (pResOut)
             *pResOut = flags;
-        vfs.fclose(fd);
+        std::fclose(fd);
     }
     else if (pResOut)
         *pResOut = 0;
@@ -528,14 +530,14 @@ static int ecophoneOpen(sqlite3_vfs *pVfs,   /* VFS */
     else if ((flags & SQLITE_OPEN_READWRITE) && (flags & SQLITE_OPEN_CREATE)) {
 
         // check if database specified exists
-        p->fd = vfs.fopen(zName, "r");
+        p->fd = std::fopen(zName, "r");
         if (p->fd == nullptr) {
             // database doesn't exist, create new one with read&write permissions
             oflags = "w+";
         }
         else {
             // database exists, open it with read&write permissions
-            vfs.fclose(p->fd);
+            std::fclose(p->fd);
             oflags = "r+";
         }
     }
@@ -543,7 +545,7 @@ static int ecophoneOpen(sqlite3_vfs *pVfs,   /* VFS */
         oflags = "r+";
     }
 
-    p->fd = vfs.fopen(zName, oflags.c_str());
+    p->fd = std::fopen(zName, oflags.c_str());
     if (p->fd == nullptr) {
         sqlite3_free(aBuf);
         return SQLITE_CANTOPEN;
@@ -565,14 +567,13 @@ static int ecophoneOpen(sqlite3_vfs *pVfs,   /* VFS */
 static int ecophoneDelete(sqlite3_vfs *pVfs, const char *zPath, int dirSync)
 {
     UNUSED(pVfs);
-    int rc; /* Return code */
+    int rc = std::filesystem::remove_all(zPath); /* Return code */
 
-    rc = vfs.remove(zPath);
-    if (rc != 0 /*&& errno==ENOENT*/)
+    if (rc != 0)
         return SQLITE_OK;
 
     if (rc == 0 && dirSync) {
-        vfs::FILE *dfd;             /* File descriptor open on directory */
+        DIR *dfd;                   /* File descriptor open on directory */
         int i;                      /* Iterator variable */
         char zDir[MAXPATHNAME + 1]; /* Name of directory containing file zPath */
 
@@ -584,13 +585,13 @@ static int ecophoneDelete(sqlite3_vfs *pVfs, const char *zPath, int dirSync)
         zDir[i] = '\0';
 
         /* Open a file-descriptor on the directory. Sync. Close. */
-        dfd = vfs.fopen(zDir, "D");
+        dfd = opendir(zDir);
         if (dfd == NULL) {
             rc = -1;
         }
         else {
             rc = SQLITE_OK;
-            vfs.fclose(dfd);
+            closedir(dfd);
         }
     }
     return (rc == 0 ? SQLITE_OK : SQLITE_IOERR_DELETE);

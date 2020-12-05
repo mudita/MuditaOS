@@ -4,6 +4,8 @@
 #pragma once
 
 #include "Database.hpp"
+#include <fstream>
+#include <filesystem>
 
 namespace
 {
@@ -28,32 +30,33 @@ class DatabaseInitializer
       public:
         ScopedFile(std::string path, std::string mode)
         {
-            file = vfs.fopen(path.c_str(), mode.c_str());
+            file = std::fopen(path.c_str(), mode.c_str());
         }
 
         ~ScopedFile()
         {
-            vfs.fclose(file);
+            std::fclose(file);
         }
 
-        [[nodiscard]] vfs::FILE *get() const
+        [[nodiscard]] std::FILE *get() const
         {
             return file;
         }
 
       private:
-        vfs::FILE *file = nullptr;
+        std::FILE *file = nullptr;
     };
 
   public:
     DatabaseInitializer(Database *db);
     ~DatabaseInitializer() = default;
 
-    auto run(fs::path path, std::string ext = "sql") -> bool;
+    auto run(std::filesystem::path path, std::string ext = "sql") -> bool;
 
-    auto readCommands(fs::path filePath) -> std::vector<std::string>;
+    auto readCommands(std::filesystem::path filePath) -> std::vector<std::string>;
 
-    auto listFiles(fs::path path, std::string prefix, std::string ext) -> std::vector<fs::path>;
+    auto listFiles(std::filesystem::path path, std::string prefix, std::string ext)
+        -> std::vector<std::filesystem::path>;
 
     auto executeOnDb(const std::vector<std::string> statements) -> bool;
 
@@ -65,6 +68,7 @@ class DatabaseInitializer
      *  [2] - num
      */
     auto splitFilename(std::string filename) -> std::array<std::string, 3>;
+    std::string readContent(const char *filename) const noexcept;
 
     Database *db = nullptr;
 };

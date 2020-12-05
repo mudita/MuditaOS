@@ -2,19 +2,22 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
+#include <filesystem>
 
 #include "Databases/ContactsDB.hpp"
 #include "Tables/ContactsTable.hpp"
 
-#include "vfs.hpp"
+#include <vfs.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Contacts Table tests")
 {
     Database::initialize();
 
-    vfs.remove(ContactsDB::GetDBName());
+    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    std::filesystem::remove(contactsPath);
 
-    ContactsDB contactsdb;
+    ContactsDB contactsdb{contactsPath};
     REQUIRE(contactsdb.isInitialized());
 
     ContactsTableRow testRow1 = {{.ID = DB_ID_NONE},
