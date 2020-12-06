@@ -277,16 +277,17 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
              "contact_match_groups.group_id = " +
              std::to_string(groupId);
 
+    constexpr auto exclude_temporary = " WHERE contacts._id not in ( "
+                                       "   SELECT cmg.contact_id "
+                                       "   FROM contact_match_groups cmg, contact_groups cg "
+                                       "   WHERE cmg.group_id = cg._id "
+                                       "       AND cg.name = 'Temporary' "
+                                       "   ) ";
+
     switch (matchType) {
     case MatchType::Name: {
+        query += exclude_temporary;
         if (!name.empty()) {
-            query += " WHERE contacts._id not in ( "
-                     "   SELECT cmg.contact_id "
-                     "   FROM contact_match_groups cmg, contact_groups cg "
-                     "   WHERE cmg.group_id = cg._id "
-                     "       AND cg.name = 'Temporary' "
-                     "   ) ";
-
             query += " AND ( contact_name.name_primary || ' ' || contact_name.name_alternative LIKE '" + name + "%%'";
             query += " OR contact_name.name_alternative || ' ' || contact_name.name_primary LIKE '" + name + "%%')";
         }
@@ -297,13 +298,8 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
             query += " INNER JOIN contact_number ON contact_number.contact_id == contacts._id AND "
                      "contact_number.number_user LIKE '%%" +
                      name + "%%'";
-            query += " WHERE contacts._id not in ( "
-                     "   SELECT cmg.contact_id "
-                     "   FROM contact_match_groups cmg, contact_groups cg "
-                     "   WHERE cmg.group_id = cg._id "
-                     "       AND cg.name = 'Temporary' "
-                     "   ) ";
         }
+        query += exclude_temporary;
     } break;
 
     case MatchType::Group:
@@ -311,12 +307,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
         break;
 
     case MatchType::None: {
-        query += " WHERE contacts._id not in ( "
-                 "   SELECT cmg.contact_id "
-                 "   FROM contact_match_groups cmg, contact_groups cg "
-                 "   WHERE cmg.group_id = cg._id "
-                 "       AND cg.name = 'Temporary' "
-                 "   ) ";
+        query += exclude_temporary;
     } break;
     }
 

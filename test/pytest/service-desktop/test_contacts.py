@@ -25,6 +25,17 @@ def test_contacts(harness):
     assert contacts_length
     assert contacts_length == count
 
+    # try to get more than available
+    body = {"count": 10 + count}
+    ret = harness.endpoint_request("contacts", "get", body)
+    assert ret["status"] == status["OK"]
+
+    contacts = ret["body"]
+    contacts_length = len(contacts)
+    assert contacts_length
+    assert contacts_length == count
+
+
     # adding new contact
     body = {"address": "6 Czeczota St.\n02600 Warsaw",
             "altName": "Testowy",
