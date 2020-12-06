@@ -1,4 +1,9 @@
-set(BOARD_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/port.c CACHE INTERNAL "")
+set(BOARD_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/port.c 
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/fsl_runtimestat_gpt.c
+        
+		CACHE INTERNAL ""
+		)
 
 set(BOARD_DIR_INCLUDES  ${CMAKE_CURRENT_SOURCE_DIR}/board/linux CACHE INTERNAL "")
 

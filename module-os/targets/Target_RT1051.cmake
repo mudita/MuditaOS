@@ -1,6 +1,7 @@
 set(BOARD_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/fsl_tickless_gpt.c
         ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/fsl_tickless_systick.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/fsl_runtimestat_gpt.c
 
         CACHE INTERNAL ""
         )
