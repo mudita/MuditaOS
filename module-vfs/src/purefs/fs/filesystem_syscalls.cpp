@@ -55,10 +55,6 @@ namespace purefs::fs
         return invoke_fops(&filesystem_operations::chmod, path, mode);
     }
 
-    auto filesystem::close(int fd) noexcept -> int
-    {
-        return invoke_fops(&filesystem_operations::close, fd);
-    }
 
     auto filesystem::write(int fd, const char *ptr, size_t len) noexcept -> ssize_t
     {
@@ -136,4 +132,14 @@ namespace purefs::fs
             return -EIO;
         }
     }
+
+    auto filesystem::close(int fd) noexcept -> int
+    {
+        auto ret = invoke_fops(&filesystem_operations::close, fd);
+        if (!ret) {
+            ret = (remove_filehandle(ret)) ? (0) : (-EBADF);
+        }
+        return ret;
+    }
+
 } // namespace purefs::fs

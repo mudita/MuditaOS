@@ -251,7 +251,7 @@ namespace purefs::fs::drivers
         }
         const auto fspath  = vmnt->native_path(path);
         const auto fsflags = translate_flags(flags);
-        auto fileo         = std::make_shared<file_handle_vfat>(mnt, path, flags);
+        auto fileo         = std::make_shared<file_handle_vfat>(mnt, fspath, flags);
         auto ret           = f_open(fileo->ff_filp(), fspath.c_str(), fsflags);
         fileo->error(translate_error(ret));
         return fileo;
@@ -332,7 +332,7 @@ namespace purefs::fs::drivers
             return -EBADF;
         }
         FILINFO finfo;
-        const int fres = f_stat(vfile->open_path().c_str(), &finfo);
+        const auto fres = f_stat(vfile->open_path().c_str(), &finfo);
         if (fres == FR_OK) {
             translate_filinfo_to_stat(finfo, vfile->ff_filp(), st);
         }
