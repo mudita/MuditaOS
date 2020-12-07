@@ -312,14 +312,7 @@ sys::ReturnCodes EventManager::InitHandler()
 
     EventWorker->init(list);
     EventWorker->run();
-
     sevm::light_control::init(this);
-    sevm::light_control::Parameters params;
-    params.functionPoints =
-        sevm::light_control::BrightnessFunction({{50.0f, 30.0f}, {150.0f, 80.0f}, {400.0f, 80.0f}, {700.0f, 0.0f}});
-    sevm::light_control::processRequest(sevm::light_control::LightControlAction::turnOn, params);
-    sevm::light_control::processRequest(sevm::light_control::LightControlAction::setAutomaticModeParameters, params);
-    sevm::light_control::processRequest(sevm::light_control::LightControlAction::enableAutomaticMode, params);
 
     return sys::ReturnCodes::Success;
 }
@@ -329,6 +322,7 @@ sys::ReturnCodes EventManager::DeinitHandler()
     EventWorker->close();
     EventWorker.reset();
     EventWorker = nullptr;
+    sevm::light_control::deinit();
 
     return sys::ReturnCodes::Success;
 }

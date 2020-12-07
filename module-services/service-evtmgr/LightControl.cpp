@@ -48,7 +48,6 @@ namespace sevm::light_control
         {
             if (rampTargetReached && std::abs(brightnessRampTarget - brightnessRampState) > brightnessHysteresis) {
                 rampTargetReached = false;
-                LOG_DEBUG("out of hysteresis");
             }
 
             if (!rampTargetReached) {
@@ -56,7 +55,6 @@ namespace sevm::light_control
                     brightnessRampState += rampStep;
                     if (brightnessRampState > brightnessRampTarget) {
                         rampTargetReached   = true;
-                        LOG_DEBUG("ramp taget reached");
                     }
                 }
                 else if (brightnessRampState > brightnessRampTarget) {
@@ -64,7 +62,6 @@ namespace sevm::light_control
                     if (brightnessRampState < brightnessRampTarget) {
                         brightnessRampState = brightnessRampTarget;
                         rampTargetReached   = true;
-                        LOG_DEBUG("ramp taget reached");
                     }
                 }
             }
@@ -72,22 +69,37 @@ namespace sevm::light_control
             return static_cast<bsp::eink_frontlight::BrightnessPercentage>(brightnessRampState);
         }
 
+        void enableTimers()
+        {
+            controlTimer->connect([&](sys::Timer &) { controlTimerCallback(); });
+            readoutTimer->connect([&](sys::Timer &) { readoutTimerCallback(); });
+            controlTimer->start();
+            readoutTimer->start();
+        }
+
+        void disableTimers()
+        {
+            controlTimer->stop();
+            readoutTimer->stop();
+        }
+
         void setAutomaticModeParameters(const Parameters &params)
         {
-            rampStep   = 100.0f * (static_cast<float>(CONTROL_TIMER_MS) / static_cast<float>(parameters.rampTimeMS));
-            brightnessHysteresis = parameters.brightnessHysteresis;
+            rampStep = 100.0f * (static_cast<float>(CONTROL_TIMER_MS) / static_cast<float>(params.rampTimeMS));
+            brightnessHysteresis = params.brightnessHysteresis;
 
             function.clear();
-            for (unsigned int i = 0; i < parameters.functionPoints.size(); ++i) {
+            for (unsigned int i = 0; i < params.functionPoints.size(); ++i) {
                 FunctionSection section;
-                section.xBound = parameters.functionPoints[i].first;
-                bsp::eink_frontlight::
+                section.xBound = params.functionPoints[i].first;
+                if (i == 0) {
+                    section.a = 0.0f;
+                    section.b = params.functionPoints[i].second;
                 }
                 else {
-                    section.a = (parameters.functionPoints[i - 1].second - parameters.functionPoints[i].second) /
-                                (parameters.functionPoints[i - 1].first - parameters.functionPoints[i].first);
-                    section.b =
-                        parameters.functionPoints[i - 1].second - section.a * parameters.functionPoints[i - 1].first;
+                    section.a = (params.functionPoints[i - 1].second - params.functionPoints[i].second) /
+                                (params.functionPoints[i - 1].first - params.functionPoints[i].first);
+                    section.b = params.functionPoints[i - 1].second - section.a * params.functionPoints[i - 1].first;
                 }
                 function.push_back(section);
             }
@@ -97,54 +109,47 @@ namespace sevm::light_control
     void init(sys::Service *parent)
     {
         controlTimer = std::make_unique<sys::Timer>("LightControlTimer", parent, CONTROL_TIMER_MS);
-        controlTimer->connect([&](sys::Timer &) { controlTimerCallback(); });
-
         readoutTimer = std::make_unique<sys::Timer>("LightSensorReadoutTimer", parent, READOUT_TIMER_MS);
-        readoutTimer->connect([&](sys::Timer &) { readoutTimerCallback(); });
     }
 
     void deinit()
     {
-        controlTimer->stop();
-        readoutTimer->stop();
+        disableTimers();
     }
 
     bool processRequest(LightControlAction action, const Parameters &params)
     {
         switch (action) {
-        case (LightControlAction::turnOff):
+        case LightControlAction::turnOff:
             bsp::keypad_backlight::shutdown();
             bsp::eink_frontlight::turnOff();
             bsp::light_sensor::standby();
             controlTimer->stop();
             readoutTimer->stop();
             break;
-        case (LightControlAction::turnOn):
+        case LightControlAction::turnOn:
             bsp::keypad_backlight::turnOnAll();
             bsp::eink_frontlight::turnOn();
             bsp::light_sensor::wakeup();
             if (automaticMode) {
-                controlTimer->start();
-                readoutTimer->start();
+                enableTimers();
             }
             break;
-        case (LightControlAction::enableAutomaticMode):
-            controlTimer->start();
-            readoutTimer->start();
+        case LightControlAction::enableAutomaticMode:
+            enableTimers();
             automaticMode = true;
             break;
-        case (LightControlAction::disableAutomaticMode):
-            controlTimer->stop();
-            readoutTimer->stop();
+        case LightControlAction::disableAutomaticMode:
+            disableTimers();
             automaticMode = false;
             break;
-        case (LightControlAction::setManualModeBrightness:
+        case LightControlAction::setManualModeBrightness:
             bsp::eink_frontlight::setBrightness(params.manualModeBrightness);
             break;
-        case (LightControlAction::setGammaCorrectionFactor:
+        case LightControlAction::setGammaCorrectionFactor:
             bsp::eink_frontlight::setGammaFactor(params.gammaFactor);
             break;
-        case (LightControlAction::setAutomaticModeParameters:
+        case LightControlAction::setAutomaticModeParameters:
             setAutomaticModeParameters(params);
             break;
         }
@@ -161,8 +166,6 @@ namespace sevm::light_control
     {
         float lightMeasurement = bsp::light_sensor::readout();
         brightnessRampTarget   = calculateBrightness(lightMeasurement);
-        LOG_DEBUG(
-            "measurement: %d , bright: %d", static_cast<int>(lightMeasurement), static_cast<int>(brightnessRampTarget));
     }
 
 } // namespace sevm::light_control
