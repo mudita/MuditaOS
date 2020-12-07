@@ -48,8 +48,15 @@ namespace purefs::fs
 
     class filesystem
     {
-      public:
         static constexpr auto path_separator = '/';
+        /** NOTE: Current implementation doesn't allow to open
+         * device and return fd. In the next release it will be fixed
+         * so default stdin,stdout,stderr will be registered so this
+         * first fd will not be longer needed.
+         */
+        static constexpr auto first_file_descriptor = 3;
+
+      public:
         using fsdir                    = std::shared_ptr<internal::directory_handle>;
         using fsfile                         = std::shared_ptr<internal::file_handle>;
         explicit filesystem(std::shared_ptr<blkdev::disk_manager> diskmm);

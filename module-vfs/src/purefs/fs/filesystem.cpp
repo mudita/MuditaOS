@@ -212,11 +212,15 @@ namespace purefs::fs
     auto filesystem::add_filehandle(fsfile file) noexcept -> int
     {
         cpp_freertos::LockGuard _lck(m_lock);
-        return m_fds.insert(file);
+        return m_fds.insert(file) + first_file_descriptor;
     }
 
     auto filesystem::remove_filehandle(int fds) noexcept -> fsfile
     {
+        if (fds < first_file_descriptor) {
+            return nullptr;
+        }
+        fds -= first_file_descriptor;
         cpp_freertos::LockGuard _lck(m_lock);
         fsfile ret{};
         if (m_fds.exists(fds)) {
@@ -225,9 +229,14 @@ namespace purefs::fs
         }
         return ret;
     }
+
     auto filesystem::find_filehandle(int fds) const noexcept -> fsfile
     {
         fsfile ret{};
+        if (fds < first_file_descriptor) {
+            return ret;
+        }
+        fds -= first_file_descriptor;
         cpp_freertos::LockGuard _lck(m_lock);
         if (m_fds.exists(fds)) {
             ret = m_fds[fds];

@@ -137,7 +137,7 @@ namespace purefs::fs
     {
         auto ret = invoke_fops(&filesystem_operations::close, fd);
         if (!ret) {
-            ret = (remove_filehandle(ret)) ? (0) : (-EBADF);
+            ret = (remove_filehandle(fd)) ? (0) : (-EBADF);
         }
         return ret;
     }

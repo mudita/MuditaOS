@@ -77,7 +77,7 @@ TEST_CASE("Corefs: Basic API test")
         REQUIRE(ret == -ENOENT);
         // Simple file test
         int hwnd = fscore.open("/sys/.boot.json", 0, 0);
-        REQUIRE(hwnd >= 0);
+        REQUIRE(hwnd >= 3);
         std::cout << "File open handle " << hwnd << std::endl;
         struct stat st;
         ret = fscore.fstat(hwnd, st);
@@ -86,7 +86,6 @@ TEST_CASE("Corefs: Basic API test")
         char buf[4096]{};
         ret = fscore.read(hwnd, buf, sizeof buf);
         REQUIRE(ret > 0);
-
         ret = fscore.close(hwnd);
         REQUIRE(ret == 0);
         {
