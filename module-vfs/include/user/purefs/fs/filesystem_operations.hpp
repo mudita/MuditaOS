@@ -7,14 +7,20 @@
 #include <tuple>
 #include <memory>
 
-namespace purefs::blkdev::internal
+struct statvfs;
+struct stat;
+
+namespace purefs::blkdev
 {
-    class disk_handle;
+    namespace internal
+    {
+        class disk_handle;
+    }
+    class disk_manager;
 }
 
 namespace purefs::fs
 {
-    struct statvfs;
     namespace internal
     {
         class file_handle;
@@ -23,20 +29,22 @@ namespace purefs::fs
     }; // namespace internal
 
     /** Filesystem specific driver base class */
-    class filesystem_operations
+    class filesystem_operations : public std::enable_shared_from_this<filesystem_operations>
     {
       public:
         using fsfile                                         = std::shared_ptr<internal::file_handle>;
         using fsdir                                          = std::shared_ptr<internal::directory_handle>;
         using fsmount                                        = std::shared_ptr<internal::mount_point>;
+        filesystem_operations()                              = default;
         filesystem_operations(const filesystem_operations &) = delete;
         virtual ~filesystem_operations()                     = default;
         auto operator=(const filesystem_operations &) = delete;
         /** Allocate mount point class specify to the VFS
          * @return Allocated mount point structure
          */
-        virtual auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh, std::string_view path)
-            -> fsmount                                   = 0;
+        virtual auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh,
+                                    std::string_view path,
+                                    unsigned flags) -> fsmount = 0;
         virtual auto mount(fsmount mnt) noexcept -> int  = 0;
         virtual auto umount(fsmount mnt) noexcept -> int = 0;
         virtual auto stat_vfs(fsmount mnt, std::string_view path, statvfs &stat) const noexcept -> int;
@@ -77,8 +85,24 @@ namespace purefs::fs
         {
             return m_mount_count;
         }
+        auto finalize_registration(std::weak_ptr<blkdev::disk_manager> diskmgr)
+        {
+            m_diskmm = diskmgr;
+            return filesystem_register_completed();
+        }
+
+      protected:
+        auto disk_mngr() const noexcept
+        {
+            return m_diskmm.lock();
+        }
+        auto virtual filesystem_register_completed() const noexcept -> int
+        {
+            return 0;
+        }
 
       private:
         std::size_t m_mount_count{};
+        std::weak_ptr<blkdev::disk_manager> m_diskmm;
     };
 } // namespace purefs::fs
