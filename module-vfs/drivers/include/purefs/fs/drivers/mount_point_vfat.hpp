@@ -15,12 +15,12 @@ namespace purefs::fs::drivers
                          std::string_view path,
                          unsigned flags,
                          std::shared_ptr<filesystem_operations> fs)
-            : mount_point(diskh, path, flags, fs), m_fatfs(std::make_unique<::FATFS>())
+            : mount_point(diskh, path, flags, fs)
         {}
         virtual ~mount_point_vfat() = default;
-        auto fatfs() const noexcept
+        auto fatfs() noexcept
         {
-            return m_fatfs.get();
+            return &m_fatfs;
         }
         auto ff_drive(int lun) noexcept -> void
         {
@@ -48,7 +48,7 @@ namespace purefs::fs::drivers
 
       private:
         static constexpr auto disk_name_size = 3;
-        std::unique_ptr<::FATFS> m_fatfs;
+        ::FATFS m_fatfs{};
         char m_ff_drive[disk_name_size]{" :"};
     };
 } // namespace purefs::fs::drivers
