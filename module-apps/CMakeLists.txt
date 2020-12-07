@@ -50,6 +50,7 @@ set(APPLICATIONS
     music-player
     meditation
     calculator
+    alarm-clock
 )
 
 list(SORT APPLICATIONS)
