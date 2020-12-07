@@ -7,13 +7,13 @@ using namespace gui;
 
 DepthFirstItemTree::DepthFirstItemTree(gui::Item &root, TraverseMode mode) : mode(mode)
 {
-    nodes.push(gui::ItemNode(root, rootLevel));
+    nodes.push(gui::ItemNode(root));
     if (mode == TraverseMode::PostOrder) {
-        constructPostOrder(&root, rootLevel + 1);
+        constructPostOrder(&root, ItemNode::rootLevel + 1);
     }
 }
 
-auto DepthFirstItemTree::hasNode() const noexcept -> bool
+auto DepthFirstItemTree::hasNext() const noexcept -> bool
 {
     return !nodes.empty();
 }
@@ -25,7 +25,7 @@ auto DepthFirstItemTree::getNext() noexcept -> gui::ItemNode
         nodes.pop();
         return current;
     }
-    return getNextInOrder();
+    return getNextInPreOrder();
 }
 
 void DepthFirstItemTree::constructPostOrder(gui::Item *item, int level)
@@ -39,7 +39,7 @@ void DepthFirstItemTree::constructPostOrder(gui::Item *item, int level)
     }
 }
 
-auto DepthFirstItemTree::getNextInOrder() -> gui::ItemNode
+auto DepthFirstItemTree::getNextInPreOrder() -> gui::ItemNode
 {
     auto current   = std::move(nodes.top());
     auto &item     = current.getItem();

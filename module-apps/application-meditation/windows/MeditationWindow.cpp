@@ -15,8 +15,6 @@
 
 #include <module-utils/i18n/i18n.hpp>
 
-#include <module-gui/gui/dom/ItemDomCreator.hpp>
-
 namespace gui
 {
     MeditationWindow::MeditationWindow(app::Application *app) : AppWindow{app, name::window::main_window}
@@ -87,10 +85,6 @@ namespace gui
                                                                              app->state->showCounter);
                 application->switchWindow(app::window::name::meditation_timer, std::move(timerSwitchData));
                 return true;
-            }
-            else if (inputEvent.is(KeyCode::KEY_VOLDN)) {
-                ItemDomCreator domCreator(ItemDomCreator::DumpType::JsonAtTraverseEnd);
-                domCreator.traverse(*this);
             }
         }
         return AppWindow::onInput(inputEvent);

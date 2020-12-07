@@ -57,4 +57,9 @@ namespace gui::visitor
         constexpr inline auto textWidth  = "TextWidth";
     } // namespace text
 
+    namespace window
+    {
+        constexpr inline auto name = "WindowName";
+    }
+
 } // namespace gui::visitor

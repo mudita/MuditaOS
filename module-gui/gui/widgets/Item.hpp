@@ -15,7 +15,7 @@
 #include <memory>               // for unique_ptr
 #include <utility>              // for move
 #include <core/DrawCommandForward.hpp>
-#include <module-gui/gui/dom/GuiVisitor.hpp>
+#include <module-gui/gui/widgets/visitor/GuiVisitor.hpp>
 
 namespace gui
 {

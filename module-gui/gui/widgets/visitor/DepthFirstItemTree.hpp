@@ -5,13 +5,11 @@
 
 #include "ItemTree.hpp"
 #include <stack>
-#include <iostream>
+
 namespace gui
 {
     class DepthFirstItemTree : public ItemTree
     {
-        static constexpr auto rootLevel = 0;
-
       public:
         enum class TraverseMode
         {
@@ -19,7 +17,7 @@ namespace gui
             PostOrder
         };
         explicit DepthFirstItemTree(gui::Item &root, TraverseMode mode = TraverseMode::PreOrder);
-        [[nodiscard]] auto hasNode() const noexcept -> bool override;
+        [[nodiscard]] auto hasNext() const noexcept -> bool override;
         [[nodiscard]] auto getNext() noexcept -> gui::ItemNode override;
 
       private:
@@ -27,7 +25,7 @@ namespace gui
         TraverseMode mode;
 
         void constructPostOrder(gui::Item *item, int level);
-        [[nodiscard]] auto getNextInOrder() -> gui::ItemNode;
+        [[nodiscard]] auto getNextInPreOrder() -> gui::ItemNode;
     };
 
 } // namespace gui

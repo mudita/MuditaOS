@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "GuiVisitor.hpp"
-#include "ItemWalker.hpp"
+#include "visitor/GuiVisitor.hpp"
+#include "visitor/ItemWalker.hpp"
 #include <module-utils/json/json11.hpp>
 #include <list>
 
@@ -12,10 +12,10 @@ namespace gui
 {
     class ItemNode;
 
-    class Item2JsonSerializingVisitor : public GuiVisitor, public ItemWalker
+    class Item2JsonSerializingVisitor : public GuiVisitor
     {
-        using document = std::map<int, std::list<json11::Json::object>>;
-        json11::Json::object sink;
+        json11::Json::array sink;
+        std::string itemName;
 
         void visit(gui::Item &item) override;
         void visit(gui::Rect &item) override;
@@ -25,11 +25,14 @@ namespace gui
         void visit(gui::BottomBar &item) override;
         void visit(gui::TopBar &item) override;
 
-        void handleSibling(gui::ItemNode &node, document &doc, int &level);
-        void handleParent(gui::ItemNode &node, document &doc, int &level);
-        void handleOther(gui::ItemNode &node, document &doc, int &level);
-
       public:
-        void traverse(gui::Item &root) override;
+        [[nodiscard]] auto getState() -> json11::Json::array
+        {
+            return std::move(sink);
+        }
+        [[nodiscard]] auto getName() -> std::string
+        {
+            return std::move(itemName);
+        }
     };
 } // namespace gui

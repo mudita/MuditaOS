@@ -10,8 +10,9 @@ namespace gui
     class ItemTree
     {
       public:
-        virtual auto hasNode() const noexcept -> bool    = 0;
-        virtual auto getNext() noexcept -> gui::ItemNode = 0;
-        virtual ~ItemTree()                              = default;
+        [[nodiscard]] virtual auto hasNext() const noexcept -> bool    = 0;
+        [[nodiscard]] virtual auto getNext() noexcept -> gui::ItemNode = 0;
+
+        virtual ~ItemTree() = default;
     };
 } // namespace gui

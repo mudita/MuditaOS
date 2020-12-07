@@ -40,6 +40,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/RichTextParser.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TextFormat.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/CheckBoxWithLabel.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/visitor/DepthFirstItemTree.cpp"
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/Alignment.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Arc.hpp"
@@ -67,5 +68,10 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/CheckBoxWithLabel.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Lines.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/TextLineCursor.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/visitor/GuiVisitor.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/visitor/ItemNode.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/visitor/ItemTree.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/visitor/DepthFirstItemTree.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/visitor/ItemWalker.hpp"
 )
 

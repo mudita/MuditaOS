@@ -11,20 +11,24 @@ namespace gui
 
     class ItemNode
     {
-        gui::Item &item;
-        int level = 0;
-
       public:
-        ItemNode(gui::Item &item, int level) : item{item}, level{level}
+        static constexpr auto rootLevel = 0;
+
+        explicit ItemNode(gui::Item &item, int level = rootLevel) : item{item}, level{level}
         {}
 
-        [[nodiscard]] auto getItem() const noexcept -> gui::Item &
+        [[nodiscard]] auto getItem() noexcept -> gui::Item &
         {
             return item;
         }
+
         [[nodiscard]] auto getLevel() const noexcept -> int
         {
             return level;
         }
+
+      private:
+        gui::Item &item;
+        int level = rootLevel;
     };
 } // namespace gui

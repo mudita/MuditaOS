@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "GuiVisitor.hpp"
-#include "ItemWalker.hpp"
+#include "visitor/GuiVisitor.hpp"
+#include "visitor/ItemWalker.hpp"
 
 #include <memory>
 
@@ -19,12 +19,11 @@ namespace gui
       public:
         enum class DumpType
         {
-            JsonAtTraverseEnd,
-            PrettyPrintAtNodeEnd
+            JsonAtTraverseEnd
         };
 
         explicit ItemDomCreator(DumpType type);
-        void traverse(gui::Item &root);
+        [[nodiscard]] auto getWalker() noexcept -> std::unique_ptr<ItemWalker> &;
     };
 
 } // namespace gui

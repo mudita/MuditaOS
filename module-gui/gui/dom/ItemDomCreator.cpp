@@ -3,8 +3,7 @@
 
 #include "ItemDomCreator.hpp"
 #include "Item.hpp"
-#include "Item2JsonSerializingVisitor.hpp"
-#include "Item2PrettyPrintSerializingVisitor.hpp"
+#include "Item2JsonSerializer.hpp"
 
 using namespace gui;
 
@@ -12,15 +11,12 @@ ItemDomCreator::ItemDomCreator(DumpType type)
 {
     switch (type) {
     case DumpType::JsonAtTraverseEnd:
-        walker = std::make_unique<Item2JsonSerializingVisitor>();
-        break;
-    case DumpType::PrettyPrintAtNodeEnd:
-        walker = std::make_unique<Item2PrettyPrintSerializingVisitor>();
+        walker = std::make_unique<Item2JsonSerializer>();
         break;
     }
 }
 
-void ItemDomCreator::traverse(gui::Item &root)
+[[nodiscard]] auto ItemDomCreator::getWalker() noexcept -> std::unique_ptr<ItemWalker> &
 {
-    walker->traverse(root);
+    return walker;
 }

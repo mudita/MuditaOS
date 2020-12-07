@@ -11,31 +11,27 @@
 #include "TopBar.hpp"
 
 #include "ItemDataNames.hpp"
-#include "DepthFirstItemTree.hpp"
 
 using namespace gui;
 using namespace gui::visitor;
 
-namespace
-{
-    constexpr inline auto childrenName = "XChildren";
-}
 
 void Item2JsonSerializingVisitor::visit(gui::Item &item)
 {
     auto boundingBoxSerializer = [](gui::BoundingBox &box) { return json11::Json::array{box.x, box.y, box.w, box.h}; };
 
-    sink.emplace(names::item,
-                 json11::Json::object{{item::itemType, static_cast<int>(item.type)},
-                                      {item::itemType, static_cast<int>(item.type)},
-                                      {item::focus, item.focus},
-                                      {item::visible, item.visible},
-                                      {item::active, item.activeItem},
-                                      {item::childrenCount, static_cast<int>(item.children.size())},
-                                      {item::widgetArea, boundingBoxSerializer(item.widgetArea)},
-                                      {item::widgetMinimumArea, boundingBoxSerializer(item.widgetMinimumArea)},
-                                      {item::widgetMaximumArea, boundingBoxSerializer(item.widgetMaximumArea)},
-                                      {item::drawArea, boundingBoxSerializer(item.drawArea)}});
+    if (itemName.empty()) {
+        itemName = names::item;
+    }
+    sink.emplace_back(json11::Json::object{{item::itemType, static_cast<int>(item.type)}});
+    sink.emplace_back(json11::Json::object{{item::focus, item.focus}});
+    sink.emplace_back(json11::Json::object{{item::visible, item.visible}});
+    sink.emplace_back(json11::Json::object{{item::active, item.activeItem}});
+    sink.emplace_back(json11::Json::object{{item::childrenCount, static_cast<int>(item.children.size())}});
+    sink.emplace_back(json11::Json::object{{item::widgetArea, boundingBoxSerializer(item.widgetArea)}});
+    sink.emplace_back(json11::Json::object{{item::widgetMinimumArea, boundingBoxSerializer(item.widgetMinimumArea)}});
+    sink.emplace_back(json11::Json::object{{item::widgetMaximumArea, boundingBoxSerializer(item.widgetMaximumArea)}});
+    sink.emplace_back(json11::Json::object{{item::drawArea, boundingBoxSerializer(item.drawArea)}});
 }
 
 void Item2JsonSerializingVisitor::visit(gui::Rect &item)
@@ -43,110 +39,63 @@ void Item2JsonSerializingVisitor::visit(gui::Rect &item)
     auto colorSerializer = [](gui::Color &color) {
         return json11::Json::array{static_cast<int>(color.intensity), static_cast<int>(color.alpha)};
     };
-    sink.emplace(names::rect,
-                 json11::Json::object{{rect::borderColor, colorSerializer(item.borderColor)},
-                                      {rect::fillColor, colorSerializer(item.fillColor)},
-                                      {rect::penWidth, item.penWidth},
-                                      {rect::penFocusWidth, item.penFocusWidth},
-                                      {rect::filled, item.filled},
-                                      {rect::edges, static_cast<int>(item.edges)},
-                                      {rect::flatEdges, static_cast<int>(item.flatEdges)},
-                                      {rect::corners, static_cast<int>(item.corners)},
-                                      {rect::yaps, static_cast<int>(item.yaps)},
-                                      {rect::yapSize, item.yapSize}});
+
+    if (itemName.empty()) {
+        itemName = names::rect;
+    }
+    sink.emplace_back(json11::Json::object{{rect::borderColor, colorSerializer(item.borderColor)}});
+    sink.emplace_back(json11::Json::object{{rect::fillColor, colorSerializer(item.fillColor)}});
+    sink.emplace_back(json11::Json::object{{rect::penWidth, item.penWidth}});
+    sink.emplace_back(json11::Json::object{{rect::penFocusWidth, item.penFocusWidth}});
+    sink.emplace_back(json11::Json::object{{rect::filled, item.filled}});
+    sink.emplace_back(json11::Json::object{{rect::edges, static_cast<int>(item.edges)}});
+    sink.emplace_back(json11::Json::object{{rect::flatEdges, static_cast<int>(item.flatEdges)}});
+    sink.emplace_back(json11::Json::object{{rect::corners, static_cast<int>(item.corners)}});
+    sink.emplace_back(json11::Json::object{{rect::yaps, static_cast<int>(item.yaps)}});
+    sink.emplace_back(json11::Json::object{{rect::yapSize, item.yapSize}});
+
     visit(static_cast<gui::Item &>(item));
 }
 
 void Item2JsonSerializingVisitor::visit(gui::Text &item)
 {
-    sink.emplace(names::text, json11::Json::object{});
+    if (itemName.empty()) {
+        itemName = names::text;
+    }
+    sink.emplace_back(json11::Json::object{{visitor::text::text, std::string{item.getText()}}});
     visit(static_cast<gui::Rect &>(item));
 }
 
 void Item2JsonSerializingVisitor::visit(gui::Label &item)
 {
-    sink.emplace(names::label, json11::Json::object{});
+    if (itemName.empty()) {
+        itemName = names::label;
+    }
+    sink.emplace_back(json11::Json::object{{visitor::text::text, std::string{item.getText()}}});
     visit(static_cast<gui::Rect &>(item));
 }
 
 void Item2JsonSerializingVisitor::visit(gui::Window &item)
 {
-
-    sink.emplace(names::window, json11::Json::object{});
+    if (itemName.empty()) {
+        itemName = names::window;
+    }
+    sink.emplace_back(json11::Json::object{{window::name, std::string{item.getName()}}});
     visit(static_cast<gui::Item &>(item));
 }
 
 void Item2JsonSerializingVisitor::visit(gui::BottomBar &item)
 {
+    if (itemName.empty()) {
+        itemName = names::bottomBar;
+    }
     visit(static_cast<gui::Item &>(item));
-    sink.emplace(names::bottomBar, json11::Json::object{});
 }
 
 void Item2JsonSerializingVisitor::visit(gui::TopBar &item)
 {
-    sink.emplace(names::topBar, json11::Json::object{});
+    if (itemName.empty()) {
+        itemName = names::topBar;
+    }
     visit(static_cast<gui::Item &>(item));
-}
-
-void Item2JsonSerializingVisitor::handleSibling(gui::ItemNode &node, document &doc, int &level)
-{
-    node.getItem().accept(*this);
-    doc[level].emplace_back(std::move(sink));
-}
-
-void Item2JsonSerializingVisitor::handleParent(gui::ItemNode &node, document &doc, int &level)
-{
-    auto parentLevel = node.getLevel();
-    node.getItem().accept(*this);
-    doc[parentLevel].emplace_back(std::move(sink));
-
-    if (!doc[level].empty()) {
-        auto children = json11::Json::array{};
-
-        while (!doc[level].empty()) {
-            auto &&obj = doc[level].front();
-            children.emplace_back(std::move(obj));
-            doc[level].pop_front();
-        }
-
-        auto &parent = doc[parentLevel].back();
-        parent.emplace(childrenName, std::move(children));
-    }
-
-    doc[level].clear();
-    level = parentLevel;
-}
-
-void Item2JsonSerializingVisitor::handleOther(gui::ItemNode &node, document &doc, int &level)
-{
-    level      = node.getLevel();
-    doc[level] = std::list<json11::Json::object>{};
-
-    node.getItem().accept(*this);
-    doc[level].emplace_back(std::move(sink));
-}
-
-void Item2JsonSerializingVisitor::traverse(gui::Item &root)
-{
-    int level = 0;
-    document documentPrototype;
-    DepthFirstItemTree nodes(root, DepthFirstItemTree::TraverseMode::PostOrder);
-
-    while (nodes.hasNode()) {
-        auto node = nodes.getNext();
-        if (node.getLevel() == level) {
-            handleSibling(node, documentPrototype, level);
-        }
-        else if (node.getLevel() < level) {
-            handleParent(node, documentPrototype, level);
-        }
-        else {
-            handleOther(node, documentPrototype, level);
-        }
-    }
-
-    json11::Json document(std::move(documentPrototype[0].front()));
-    documentPrototype[0].clear();
-    documentPrototype.clear();
-    std::cout << document.dump() << std::endl;
 }

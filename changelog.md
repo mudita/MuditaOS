@@ -4,6 +4,7 @@
 
 ### Added
 
+* `[gui]` Added DOM dump capability for gui::Item objects
 * `[call functions]` Window for MMI/USSD internal messages.
 * `[alarms]` Added main window
 * `[alarms]` Added window with options
