@@ -8,6 +8,7 @@
 #include <bsp/light_sensor/light_sensor.hpp>
 #include <Service/Timer.hpp>
 #include <memory>
+#include <vector>
 
 namespace sevm::light_control
 {
@@ -16,15 +17,25 @@ namespace sevm::light_control
         turnOff,
         turnOn,
         enableAutomaticMode,
-        disableAutomaticMode,
-        setScreenBrightness
+        disableAutomaticMode
     };
+
+    using BrightnessFunction = std::vector<std::pair<float, float>>;
+
+    typedef struct
+    {
+        bsp::eink_frontlight::BrightnessPercentage manualModeBrightness = 50;
+        BrightnessFunction functionPoints                               = BrightnessFunction({{0.0f, 50.0f}});
+        unsigned int rampTimeMS                                         = 1500;
+        float brightnessHysteresis                                      = 10.0f;
+        float gammaFactor                                               = 2.5f;
+    } Parameters;
 
     void init(sys::Service *parent);
 
     void deinit();
 
-    bool processRequest(LightControlAction request, unsigned int value);
+    bool processRequest(LightControlAction action, const Parameters &params);
 
     void controlTimerCallback();
 

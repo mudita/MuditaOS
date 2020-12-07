@@ -7,58 +7,60 @@ namespace sevm::light_control
 {
     namespace
     {
-        constexpr inline auto CONTROL_TIMER_MS = 20;
+        constexpr inline auto CONTROL_TIMER_MS = 25;
         constexpr inline auto READOUT_TIMER_MS = 500;
         std::unique_ptr<sys::Timer> controlTimer;
         std::unique_ptr<sys::Timer> readoutTimer;
 
-        constexpr inline auto MAX_BRIGHTNESS_PERCENT = 80.0f;
-        constexpr inline auto MIN_BRIGHTNESS_PERCENT = 20.0f;
-        constexpr inline auto DIMMING_THRESHOLD_LUX  = 50.0f;
-        constexpr inline auto MIN_BRIGHTNESS_LUX     = 500.0f;
-        constexpr inline auto RAMP_TIME_0_TO_100_MS  = 1500.0f; // 1.5s
-        constexpr inline auto RAMP_STEP              = 100.0f * (CONTROL_TIMER_MS / RAMP_TIME_0_TO_100_MS);
+        typedef struct
+        {
+            float xBound;
+            float a;
+            float b;
+        } FunctionSection;
 
-        constexpr inline auto BRIGHTNESS_CHANGE_SENSITIVITY = 10.0f;
+        Parameters parameters;
+        std::vector<FunctionSection> function;
+        float rampStep = 0.0f;
 
         float brightnessRampTarget;
         float brightnessRampState;
         bool rampTargetReached = false;
 
-        constexpr float calculateBrightness(bsp::light_sensor::IlluminanceLux measurement)
+        float calculateBrightness(bsp::light_sensor::IlluminanceLux measurement)
         {
-            if (measurement < DIMMING_THRESHOLD_LUX) {
-                return MAX_BRIGHTNESS_PERCENT;
-            }
-            else if (measurement < MIN_BRIGHTNESS_LUX) {
-                constexpr auto a =
-                    (MAX_BRIGHTNESS_PERCENT - MIN_BRIGHTNESS_PERCENT) / (DIMMING_THRESHOLD_LUX - MIN_BRIGHTNESS_LUX);
-                constexpr auto b = MAX_BRIGHTNESS_PERCENT - a * DIMMING_THRESHOLD_LUX;
-                return a * measurement + b;
+            for (const auto &section : function) {
+                if (measurement < section.xBound) {
+                    return section.a * measurement + section.b;
+                }
             }
 
-            return MIN_BRIGHTNESS_PERCENT;
+            if (function.empty()) {
+                return 0.0f;
+            }
+            else {
+                return function.back().xBound * function.back().a + function.back().b;
+            }
         }
 
         bsp::eink_frontlight::BrightnessPercentage brightnessRampOut()
         {
             if (rampTargetReached &&
-                std::abs(brightnessRampTarget - brightnessRampState) > BRIGHTNESS_CHANGE_SENSITIVITY) {
+                std::abs(brightnessRampTarget - brightnessRampState) > parameters.brightnessHysteresis) {
                 rampTargetReached = false;
                 LOG_DEBUG("out of hysteresis");
             }
 
             if (!rampTargetReached) {
                 if (brightnessRampState < brightnessRampTarget) {
-                    brightnessRampState += RAMP_STEP;
+                    brightnessRampState += rampStep;
                     if (brightnessRampState > brightnessRampTarget) {
-                        brightnessRampState = brightnessRampTarget;
                         rampTargetReached   = true;
                         LOG_DEBUG("ramp taget reached");
                     }
                 }
                 else if (brightnessRampState > brightnessRampTarget) {
-                    brightnessRampState -= RAMP_STEP;
+                    brightnessRampState -= rampStep;
                     if (brightnessRampState < brightnessRampTarget) {
                         brightnessRampState = brightnessRampTarget;
                         rampTargetReached   = true;
@@ -68,6 +70,30 @@ namespace sevm::light_control
             }
 
             return static_cast<bsp::eink_frontlight::BrightnessPercentage>(brightnessRampState);
+        }
+
+        void setParameters(const Parameters &params)
+        {
+            parameters = params;
+            rampStep   = 100.0f * (static_cast<float>(CONTROL_TIMER_MS) / static_cast<float>(parameters.rampTimeMS));
+            bsp::eink_frontlight::setGammaFactor(parameters.gammaFactor);
+
+            function.clear();
+            for (unsigned int i = 0; i < parameters.functionPoints.size(); ++i) {
+                FunctionSection section;
+                section.xBound = parameters.functionPoints[i].first;
+                if (i == 0) {
+                    section.a = 0.0f;
+                    section.b = parameters.functionPoints[i].second;
+                }
+                else {
+                    section.a = (parameters.functionPoints[i - 1].second - parameters.functionPoints[i].second) /
+                                (parameters.functionPoints[i - 1].first - parameters.functionPoints[i].first);
+                    section.b =
+                        parameters.functionPoints[i - 1].second - section.a * parameters.functionPoints[i - 1].first;
+                }
+                function.push_back(section);
+            }
         }
     } // namespace
 
@@ -86,9 +112,9 @@ namespace sevm::light_control
         readoutTimer->stop();
     }
 
-    bool processRequest(LightControlAction request, unsigned int value = 0)
+    bool processRequest(LightControlAction action, const Parameters &params)
     {
-        switch (request) {
+        switch (action) {
         case (LightControlAction::turnOff):
             bsp::keypad_backlight::shutdown();
             bsp::eink_frontlight::turnOff();
@@ -107,10 +133,9 @@ namespace sevm::light_control
             controlTimer->stop();
             readoutTimer->stop();
             break;
-        case (LightControlAction::setScreenBrightness):
-            bsp::eink_frontlight::setBrightness(value);
-            break;
         }
+
+        setParameters(params);
 
         return true;
     }

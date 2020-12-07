@@ -7,6 +7,7 @@
 #include "service-evtmgr/EventManager.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
 #include "service-evtmgr/WorkerEvent.hpp"
+#include "service-evtmgr/LightControl.hpp"
 
 #include <BaseInterface.hpp>
 #include <MessageType.hpp>
@@ -274,7 +275,7 @@ sys::ReturnCodes EventManager::InitHandler()
     connect(sevm::LightControlMessage(), [&](sys::Message *msgl) {
         auto request = static_cast<sevm::LightControlMessage *>(msgl);
         return std::make_shared<sevm::LightControlResponseMessage>(
-            sevm::light_control::processRequest(request->action, request->value));
+            sevm::light_control::processRequest(request->action, request->parameters));
     });
 
     // initialize keyboard worker
@@ -313,8 +314,11 @@ sys::ReturnCodes EventManager::InitHandler()
     EventWorker->run();
 
     sevm::light_control::init(this);
-    sevm::light_control::processRequest(sevm::light_control::LightControlAction::turnOn, 0);
-    sevm::light_control::processRequest(sevm::light_control::LightControlAction::enableAutomaticMode, 0);
+    sevm::light_control::Parameters params;
+    params.functionPoints =
+        sevm::light_control::BrightnessFunction({{50.0f, 30.0f}, {150.0f, 80.0f}, {400.0f, 80.0f}, {700.0f, 0.0f}});
+    sevm::light_control::processRequest(sevm::light_control::LightControlAction::turnOn, params);
+    sevm::light_control::processRequest(sevm::light_control::LightControlAction::enableAutomaticMode, params);
 
     return sys::ReturnCodes::Success;
 }

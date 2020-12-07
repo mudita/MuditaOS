@@ -131,7 +131,7 @@ namespace sevm
         {}
 
         light_control::LightControlAction action;
-        unsigned int value;
+        light_control::Parameters parameters;
     };
 
     class LightControlResponseMessage : public LightControlMessage

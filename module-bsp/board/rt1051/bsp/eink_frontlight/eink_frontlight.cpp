@@ -13,12 +13,12 @@ namespace bsp::eink_frontlight
     {
         std::shared_ptr<drivers::DriverPWM> pwm;
         constexpr inline auto PWM_FREQUENCY_HZ = 20000;
-        constexpr inline float gamma           = 2.5f;
+        float gammaFactor                      = 2.5f;
 
-        constexpr inline std::uint8_t gammaCorrection(BrightnessPercentage brightness)
+        std::uint8_t gammaCorrection(BrightnessPercentage brightness)
         {
             std::clamp(brightness, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(100));
-            return static_cast<std::uint8_t>(100 * std::pow((brightness / 100.0f), gamma));
+            return static_cast<std::uint8_t>(100 * std::pow((brightness / 100.0f), gammaFactor));
         }
 
     } // namespace
@@ -53,6 +53,11 @@ namespace bsp::eink_frontlight
     void turnOff()
     {
         pwm->Stop();
+    }
+
+    void setGammaFactor(float gamma)
+    {
+        gammaFactor = gamma;
     }
 
 } // namespace bsp::eink_frontlight

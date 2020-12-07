@@ -27,4 +27,6 @@ namespace bsp::eink_frontlight
     void turnOn();
     
     void turnOff();
+
+    void setGammaFactor(float gamma);
 } // namespace bsp::eink_frontlight

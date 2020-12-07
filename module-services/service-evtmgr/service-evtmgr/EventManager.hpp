@@ -10,7 +10,6 @@
 #include <Service/Worker.hpp>
 #include <bsp/common.hpp>
 #include <bsp/keyboard/key_codes.hpp>
-#include "LightControl.hpp"
 
 #include <cstdint>
 #include <memory>
