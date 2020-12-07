@@ -427,7 +427,13 @@ namespace purefs::fs::drivers
         FILINFO ffinfo;
         const auto ferr = f_readdir(dirp->ff_dirp(), &ffinfo);
         if (ferr == FR_OK) {
-            translate_filinfo_to_stat(ffinfo, nullptr, filestat);
+            if (ffinfo.fname[0] == '\0') {
+                return -ENODATA;
+            }
+            else {
+                translate_filinfo_to_stat(ffinfo, nullptr, filestat);
+                filename = ffinfo.fname;
+            }
         }
         return translate_error(ferr);
     }

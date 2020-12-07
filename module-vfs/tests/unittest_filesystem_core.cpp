@@ -8,6 +8,7 @@
 #include <purefs/blkdev/disk_image.hpp>
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
 #include <sys/statvfs.h>
+#include <sys/stat.h>
 
 namespace
 {
@@ -56,13 +57,15 @@ TEST_CASE("Corefs: Basic API test")
     REQUIRE(disk);
     REQUIRE(dm->register_device(disk, "emmc0") == 0);
     purefs::fs::filesystem fscore(dm);
-    /* Requested filesystem is not registered */
-    REQUIRE(fscore.mount("emmc0", "/sys", "vfat") == -ENODEV);
     const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
     REQUIRE(vfs_vfat->mount_count() == 0);
     auto ret = fscore.register_filesystem("vfat", vfs_vfat);
     REQUIRE(ret == 0);
-    ret = fscore.mount("emmc0part1", "/sys", "vfat");
+    // List partitions
+    for (const auto &part : dm->partitions("emmc0")) {
+        std::cout << part.name << " " << part.bootable << std::endl;
+    }
+    ret = fscore.mount("emmc0part0", "/sys", "vfat");
     REQUIRE(ret == 0);
     {
         struct statvfs ssv;
@@ -72,5 +75,35 @@ TEST_CASE("Corefs: Basic API test")
     {
         ret = fscore.open("/sys/ala/ma/kota/", 0, 0);
         REQUIRE(ret == -ENOENT);
+        // Simple file test
+        int hwnd = fscore.open("/sys/.boot.json", 0, 0);
+        REQUIRE(hwnd >= 0);
+        std::cout << "File open handle " << hwnd << std::endl;
+        struct stat st;
+        ret = fscore.fstat(hwnd, st);
+        REQUIRE(ret == 0);
+        std::cout << "File size " << st.st_size << std::endl;
+        char buf[4096]{};
+        ret = fscore.read(hwnd, buf, sizeof buf);
+        REQUIRE(ret > 0);
+
+        ret = fscore.close(hwnd);
+        REQUIRE(ret == 0);
+        {
+            // Simple directory test
+            auto dirhandle = fscore.diropen("/sys");
+            REQUIRE(dirhandle);
+            REQUIRE(dirhandle->error() == 0);
+            for (std::string fnm;;) {
+                if (fscore.dirnext(dirhandle, fnm, st) != 0) {
+                    break;
+                }
+                else {
+                    std::cout << "name " << fnm << " size " << st.st_size << std::endl;
+                }
+            }
+            fscore.dirclose(dirhandle);
+            dirhandle = nullptr;
+        }
     }
 }

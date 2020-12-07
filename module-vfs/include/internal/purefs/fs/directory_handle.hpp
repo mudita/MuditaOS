@@ -23,6 +23,10 @@ namespace purefs::fs::internal
         {
             return m_error;
         }
+        [[nodiscard]] auto mntpoint() noexcept
+        {
+            return m_mount_point.lock();
+        }
 
       private:
         int m_error{};

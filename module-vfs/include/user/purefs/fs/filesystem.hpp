@@ -14,6 +14,7 @@
 #include <unordered_set>
 #include <purefs/fs/handle_mapper.hpp>
 #include <purefs/fs/file_handle.hpp>
+#include <purefs/fs/directory_handle.hpp>
 #include <purefs/fs/mount_point.hpp>
 
 struct statvfs;
@@ -166,7 +167,7 @@ namespace purefs::fs
                 return -EBADF;
             }
             else {
-                auto mp = fil->mntpoint().lock();
+                auto mp = fil->mntpoint();
                 if (!mp) {
                     return -ENOENT;
                 }
@@ -219,6 +220,29 @@ namespace purefs::fs
             else
                 return -EIO;
         }
+        template <class Base, class T, typename... Args>
+        inline auto invoke_fops(T Base::*method, fsdir dirp, Args &&... args)
+            -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, std::forward<Args>(args)...))
+        {
+            const auto err = dirp->error();
+            if (err) {
+                return err;
+            }
+            else {
+                auto mp = dirp->mntpoint();
+                if (!mp) {
+                    return -ENOENT;
+                }
+                auto fsops = mp->fs_ops();
+                if (!fsops) {
+                    return -EIO;
+                }
+                else {
+                    return (fsops.get()->*method)(dirp, std::forward<Args>(args)...);
+                }
+            }
+        }
+
       private:
         std::weak_ptr<blkdev::disk_manager> m_diskmm;
         std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;

@@ -30,7 +30,7 @@ namespace purefs::fs::internal
         }
         [[nodiscard]] auto mntpoint() const noexcept
         {
-            return m_mount_point;
+            return m_mount_point.lock();
         }
 
       private:
