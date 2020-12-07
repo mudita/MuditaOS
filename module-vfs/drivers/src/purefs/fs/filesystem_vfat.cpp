@@ -6,6 +6,7 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/fs/drivers/file_handle_vfat.hpp>
+#include <purefs/fs/drivers/directory_handle_vfat.hpp>
 #include <log/log.hpp>
 #include <volume_mapper.hpp>
 #include <ff.h>
@@ -393,22 +394,53 @@ namespace purefs::fs::drivers
 
     auto filesystem_vfat::diropen(fsmount mnt, std::string_view path) noexcept -> fsdir
     {
-        return nullptr;
+        auto vmnt = std::dynamic_pointer_cast<mount_point_vfat>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non VFAT mount point");
+            return nullptr;
+        }
+        const auto fspath = vmnt->native_path(path);
+        const auto dirp   = std::make_shared<directory_handle_vfat>(mnt, 0);
+        const auto fret   = f_opendir(dirp->ff_dirp(), fspath.c_str());
+        dirp->error(translate_error(fret));
+        return dirp;
     }
 
     auto filesystem_vfat::dirreset(fsdir dirstate) noexcept -> int
     {
-        return -ENOTSUP;
+        auto dirp = std::dynamic_pointer_cast<directory_handle_vfat>(dirstate);
+        if (!dirp) {
+            LOG_ERROR("Non VFAT directory handle");
+            return -ENXIO;
+        }
+        const auto ferr = f_rewinddir(dirp->ff_dirp());
+        return translate_error(ferr);
     }
 
     auto filesystem_vfat::dirnext(fsdir dirstate, std::string &filename, struct stat &filestat) -> int
     {
-        return -ENOTSUP;
+        auto dirp = std::dynamic_pointer_cast<directory_handle_vfat>(dirstate);
+        if (!dirp) {
+            LOG_ERROR("Non VFAT directory handle");
+            return -ENXIO;
+        }
+        FILINFO ffinfo;
+        const auto ferr = f_readdir(dirp->ff_dirp(), &ffinfo);
+        if (ferr == FR_OK) {
+            translate_filinfo_to_stat(ffinfo, nullptr, filestat);
+        }
+        return translate_error(ferr);
     }
 
     auto filesystem_vfat::dirclose(fsdir dirstate) noexcept -> int
     {
-        return -ENOTSUP;
+        auto dirp = std::dynamic_pointer_cast<directory_handle_vfat>(dirstate);
+        if (!dirp) {
+            LOG_ERROR("Not a vfat directory handle");
+            return -ENXIO;
+        }
+        const auto ferr = f_closedir(dirp->ff_dirp());
+        return translate_error(ferr);
     }
 
     auto filesystem_vfat::ftruncate(fsfile zfile, off_t len) noexcept -> int
@@ -435,6 +467,7 @@ namespace purefs::fs::drivers
 
     auto filesystem_vfat::isatty(fsfile zfile) noexcept -> int
     {
+        // NOTE: Handle fvat is always not a tty
         return 0;
     }
 

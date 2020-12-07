@@ -26,7 +26,7 @@ namespace purefs::fs::drivers
         }
 
       private:
-        ::FIL m_fil;
+        ::FIL m_fil{};
         //! Store full path because some handle based fncs are not in ff_Fat
         const std::string m_path;
     };

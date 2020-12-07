@@ -14,6 +14,7 @@ namespace purefs::fs::internal
         {}
         directory_handle(const directory_handle &) = delete;
         auto operator=(const directory_handle &) = delete;
+        virtual ~directory_handle()              = default;
         auto error(int error) noexcept -> void
         {
             m_error = error;
