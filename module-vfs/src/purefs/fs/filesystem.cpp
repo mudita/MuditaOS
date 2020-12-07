@@ -100,6 +100,10 @@ namespace purefs::fs
                     return ret_mnt;
                 }
             }
+            else {
+                LOG_ERROR("Device or partition %.*s doesn't exists", int(dev_or_part.size()), dev_or_part.data());
+                return -ENXIO;
+            }
         }
         return {};
     }

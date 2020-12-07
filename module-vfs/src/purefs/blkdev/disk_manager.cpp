@@ -70,6 +70,12 @@ namespace purefs::blkdev
             }
             else {
                 ret = std::make_shared<internal::disk_handle>(it->second, device_name, part);
+                if (part != internal::disk_handle::no_parition) {
+                    if (part >= int(partitions(ret).size())) {
+                        LOG_ERROR("Partition %i doesn't exists", part);
+                        ret = nullptr;
+                    }
+                }
             }
         }
         return ret;
