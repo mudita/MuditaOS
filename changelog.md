@@ -1,5 +1,8 @@
 # MuditaOS changelog
 
+### Fixed
+* `[settings]` Fix lack of sim at startup
+
 ### Added
 * `[utils]` Dump logs to a file on RT1051 after reaching 80% of log buffer utilization.
 
