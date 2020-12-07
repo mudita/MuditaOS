@@ -13,7 +13,7 @@ namespace purefs::blkdev
     {
         class disk_handle;
     }
-    using disk_fd_t = std::shared_ptr<internal::disk_handle>;
+    using disk_fd = std::shared_ptr<internal::disk_handle>;
     //! Disk status result
     enum class media_status
     {

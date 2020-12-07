@@ -11,9 +11,14 @@
 #include <map>
 #include <functional>
 #include <ctime>
+#include <unordered_set>
 #include <purefs/fs/handle_mapper.hpp>
 #include <purefs/fs/file_handle.hpp>
+#include <purefs/fs/directory_handle.hpp>
 #include <purefs/fs/mount_point.hpp>
+
+struct statvfs;
+struct stat;
 
 namespace purefs::blkdev
 {
@@ -27,17 +32,31 @@ namespace purefs::fs
      * but generally those functions are for internal use for
      * example for newlib or glibc syscalls
      */
-    struct statvfs;
     class filesystem_operations;
     namespace internal
     {
         class directory_handle;
     }
+    //! Mount flags struct
+    struct mount_flags
+    {
+        enum _mount_flags
+        {
+            read_only = 1U < 0U, // !Read only filesystem
+        };
+    };
 
     class filesystem
     {
-      public:
         static constexpr auto path_separator = '/';
+        /** NOTE: Current implementation doesn't allow to open
+         * device and return fd. In the next release it will be fixed
+         * so default stdin,stdout,stderr will be registered so this
+         * first fd will not be longer needed.
+         */
+        static constexpr auto first_file_descriptor = 3;
+
+      public:
         using fsdir                    = std::shared_ptr<internal::directory_handle>;
         using fsfile                         = std::shared_ptr<internal::file_handle>;
         explicit filesystem(std::shared_ptr<blkdev::disk_manager> diskmm);
@@ -49,6 +68,10 @@ namespace purefs::fs
          * @param[in] fops Filesystem operation structure
          * @return zero on sucess otherwise error
          */
+        template <typename T> auto register_filesystem(std::string_view fsname, std::shared_ptr<T> fops) -> int
+        {
+            return register_filesystem(fsname, std::shared_ptr<filesystem_operations>(fops));
+        }
         auto register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operations> fops) -> int;
         /** Unregister filesystem driver
          * @param[in] fsname Unique filesystem name for example fat
@@ -62,7 +85,7 @@ namespace purefs::fs
          * @param[in] flags  Mount flags
          * @return zero on success otherwise error
          */
-        auto mount(std::string_view dev_or_part, std::string_view target, std::string_view fs_type, unsigned flags)
+        auto mount(std::string_view dev_or_part, std::string_view target, std::string_view fs_type, unsigned flags = 0)
             -> int;
         /** Unmont filesystem from selected mount point
          * @param[in] mount_point Mount point where the fs is mounted
@@ -79,7 +102,7 @@ namespace purefs::fs
          * @param[out] stat Pointer to a statvfs structure
          * @return zero on success otherwise error
          */
-        auto stat_vfs(std::string_view path, statvfs &stat) const noexcept -> int;
+        auto stat_vfs(std::string_view path, struct statvfs &stat) const noexcept -> int;
         /** Standard file access API */
         auto open(std::string_view path, int flags, int mode) noexcept -> int;
         auto close(int fd) noexcept -> int;
@@ -115,6 +138,10 @@ namespace purefs::fs
         auto chdir(std::string_view name) noexcept -> int;
 
       private:
+        /** Unregister filesystem driver
+         * @param[in] fsname Unique filesystem name for example fat
+         * @return zero on success otherwise error
+         **/
         /** Find the mount point object matching to the mount point path
          * @param[in] path Absolute input path
          * @return mount point object and the matching shortest path
@@ -147,11 +174,11 @@ namespace purefs::fs
                 return -EBADF;
             }
             else {
-                auto mp = fil->mntpoint().lock();
+                auto mp = fil->mntpoint();
                 if (!mp) {
                     return -ENOENT;
                 }
-                auto fsops = mp->fs_ops().lock();
+                auto fsops = mp->fs_ops();
                 if (!fsops) {
                     return -EIO;
                 }
@@ -170,7 +197,7 @@ namespace purefs::fs
             if (!mountp) {
                 return -ENOENT;
             }
-            auto fsops = mountp->fs_ops().lock();
+            auto fsops = mountp->fs_ops();
             if (fsops)
                 return (fsops.get()->*method)(mountp, abspath, std::forward<Args>(args)...);
             else
@@ -194,17 +221,40 @@ namespace purefs::fs
                 // Mount points are not the same
                 return -EXDEV;
             }
-            auto fsops = mountp->fs_ops().lock();
+            auto fsops = mountp->fs_ops();
             if (fsops)
                 return (fsops.get()->*method)(mountp, abspath, abspath2, std::forward<Args>(args)...);
             else
                 return -EIO;
+        }
+        template <class Base, class T, typename... Args>
+        inline auto invoke_fops(T Base::*method, fsdir dirp, Args &&... args)
+            -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, std::forward<Args>(args)...))
+        {
+            const auto err = dirp->error();
+            if (err) {
+                return err;
+            }
+            else {
+                auto mp = dirp->mntpoint();
+                if (!mp) {
+                    return -ENOENT;
+                }
+                auto fsops = mp->fs_ops();
+                if (!fsops) {
+                    return -EIO;
+                }
+                else {
+                    return (fsops.get()->*method)(dirp, std::forward<Args>(args)...);
+                }
+            }
         }
 
       private:
         std::weak_ptr<blkdev::disk_manager> m_diskmm;
         std::unordered_map<std::string, std::shared_ptr<filesystem_operations>> m_fstypes;
         std::map<std::string, std::shared_ptr<internal::mount_point>> m_mounts;
+        std::unordered_set<std::string> m_partitions;
         internal::handle_mapper<fsfile> m_fds;
         mutable cpp_freertos::MutexRecursive m_lock;
     };

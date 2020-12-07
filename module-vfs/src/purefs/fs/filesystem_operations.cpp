@@ -59,7 +59,7 @@ namespace purefs::fs
     }
     auto filesystem_operations::diropen(fsmount mnt, std::string_view path) noexcept -> fsdir
     {
-        return std::make_shared<internal::directory_handle>(-ENOTSUP);
+        return std::make_shared<internal::directory_handle>(nullptr, -ENOTSUP);
     }
     auto filesystem_operations::dirreset(fsdir dirstate) noexcept -> int
     {

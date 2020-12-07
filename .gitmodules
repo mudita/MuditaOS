@@ -62,3 +62,6 @@
 [submodule "module-bsp/board/rt1051/bsp/usb"]
 	path = module-bsp/board/rt1051/bsp/usb
 	url = ../usb_stack.git
+[submodule "module-vfs/thirdparty/fatfs"]
+	path = module-vfs/thirdparty/fatfs
+	url = ../fatfs.git

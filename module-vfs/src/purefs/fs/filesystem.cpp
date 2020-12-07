@@ -5,6 +5,7 @@
 #include <purefs/fs/mount_point.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
+#include <purefs/blkdev/disk_handle.hpp>
 #include <log/log.hpp>
 #include <split_sv.hpp>
 #include <errno.h>
@@ -17,12 +18,17 @@ namespace purefs::fs
     auto filesystem::register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operations> fops) -> int
     {
         cpp_freertos::LockGuard _lck(m_lock);
-        const auto ret = m_fstypes.find(std::string(fsname));
-        if (ret != std::end(m_fstypes)) {
+        const auto it = m_fstypes.find(std::string(fsname));
+        if (it != std::end(m_fstypes)) {
             LOG_ERROR("Disc: %.*s already registered.", int(fsname.length()), fsname.data());
             return -EEXIST;
         }
         else {
+            const auto ret = fops->finalize_registration(m_diskmm);
+            if (ret) {
+                LOG_ERROR("Disc: Unable to register filesystem finalize error %i", ret);
+                return ret;
+            }
             m_fstypes.emplace(std::make_pair(fsname, fops));
             return {};
         }
@@ -61,12 +67,18 @@ namespace purefs::fs
                 LOG_ERROR("VFS: mount point already exists %.*s", int(target.length()), target.data());
                 return -EBUSY;
             }
+            const auto mpp = m_partitions.find(std::string(dev_or_part));
+            if (mpp != std::end(m_partitions)) {
+                LOG_ERROR("VFS: partition already used %.*s", int(dev_or_part.length()), dev_or_part.data());
+                return -EBUSY;
+            }
             const auto vsi = m_fstypes.find(std::string(fs_type));
             if (vsi == std::end(m_fstypes)) {
                 LOG_ERROR("VFS: requested filesystem %.*s not registered", int(fs_type.length()), fs_type.data());
+                return -ENODEV;
             }
             // Trying to open disk or part by manager
-            blkdev::disk_fd_t diskh;
+            blkdev::disk_fd diskh;
             {
                 auto disk_mgr = m_diskmm.lock();
                 if (disk_mgr) {
@@ -78,12 +90,19 @@ namespace purefs::fs
                 }
             }
             if (diskh) {
-                const auto mnt_point = vsi->second->mount_prealloc(diskh, target);
+                const auto mnt_point = vsi->second->mount_prealloc(diskh, target, flags);
                 const auto ret_mnt   = vsi->second->mount(mnt_point);
-                if (!ret_mnt)
+                if (!ret_mnt) {
                     m_mounts.emplace(std::make_pair(target, mnt_point));
-                else
+                    m_partitions.emplace(dev_or_part);
+                }
+                else {
                     return ret_mnt;
+                }
+            }
+            else {
+                LOG_ERROR("Device or partition %.*s doesn't exists", int(dev_or_part.size()), dev_or_part.data());
+                return -ENXIO;
             }
         }
         return {};
@@ -96,7 +115,7 @@ namespace purefs::fs
         if (mnti == std::end(m_mounts)) {
             return -ENOENT;
         }
-        auto fsops = mnti->second->fs_ops().lock();
+        auto fsops = mnti->second->fs_ops();
         if (!fsops) {
             LOG_ERROR("Unable to lock filesystem operation");
             return -EIO;
@@ -104,6 +123,10 @@ namespace purefs::fs
         const auto umnt_ret = fsops->umount(mnti->second);
         if (umnt_ret) {
             return umnt_ret;
+        }
+        const auto diskh = mnti->second->disk();
+        if (diskh) {
+            m_partitions.erase(std::string(diskh->name()));
         }
         m_mounts.erase(mnti);
         return {};
@@ -189,11 +212,15 @@ namespace purefs::fs
     auto filesystem::add_filehandle(fsfile file) noexcept -> int
     {
         cpp_freertos::LockGuard _lck(m_lock);
-        return m_fds.insert(file);
+        return m_fds.insert(file) + first_file_descriptor;
     }
 
     auto filesystem::remove_filehandle(int fds) noexcept -> fsfile
     {
+        if (fds < first_file_descriptor) {
+            return nullptr;
+        }
+        fds -= first_file_descriptor;
         cpp_freertos::LockGuard _lck(m_lock);
         fsfile ret{};
         if (m_fds.exists(fds)) {
@@ -202,13 +229,19 @@ namespace purefs::fs
         }
         return ret;
     }
+
     auto filesystem::find_filehandle(int fds) const noexcept -> fsfile
     {
         fsfile ret{};
+        if (fds < first_file_descriptor) {
+            return ret;
+        }
+        fds -= first_file_descriptor;
         cpp_freertos::LockGuard _lck(m_lock);
         if (m_fds.exists(fds)) {
             ret = m_fds[fds];
         }
         return ret;
     }
+
 } // namespace purefs::fs
