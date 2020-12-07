@@ -93,7 +93,7 @@ namespace gui
         item->setInputMode(new InputMode({InputMode::digit}));
         item->setPenFocusWidth(style::window::default_border_focus_w);
         item->setPenWidth(style::window::default_border_rect_no_focus);
-        item->setEditMode(gui::EditMode::EDIT);
+        item->setEditMode(gui::EditMode::Edit);
     }
 
     void EventDateItem::applyCallbacks()

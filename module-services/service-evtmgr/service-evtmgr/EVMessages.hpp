@@ -15,6 +15,8 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/torch/torch.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
+#include <bsp/eink_frontlight/eink_frontlight.hpp>
+#include <bsp/light_sensor/light_sensor.hpp>
 
 #include <string>
 
@@ -127,13 +129,45 @@ namespace sevm
     class KeypadBacklightMessage : public Message
     {
       public:
-        explicit KeypadBacklightMessage() : Message(MessageType::EVMKeypadBacklightMessage)
+        KeypadBacklightMessage() : Message(MessageType::EVMKeypadBacklightMessage)
         {}
 
-        bool processAction(bsp::keypad_backlight::Action act);
-
         bsp::keypad_backlight::Action action;
+    };
+
+    class KeypadBacklightResponseMessage : public KeypadBacklightMessage
+    {
+      public:
+        KeypadBacklightResponseMessage() : KeypadBacklightMessage()
+        {}
         bool success;
+    };
+
+    class EinkFrontlightMessage : public Message
+    {
+      public:
+        explicit EinkFrontlightMessage(bsp::eink_frontlight::Action act = bsp::eink_frontlight::Action::turnOff,
+                                       std::uint8_t val                 = 0)
+            : Message(MessageType::EVMEinkFrontlightMessage), action(act), value(val)
+        {}
+
+        const bsp::eink_frontlight::Action action;
+        const bsp::eink_frontlight::BrightnessPercentage value;
+    };
+
+    class LightSensorMessage : public Message
+    {
+      public:
+        LightSensorMessage() : Message(MessageType::EVMLightSensorMessage)
+        {}
+    };
+
+    class LightSensorReadoutMessage : public LightSensorMessage
+    {
+      public:
+        explicit LightSensorReadoutMessage(bsp::light_sensor::IlluminanceLux val) : LightSensorMessage(), value(val)
+        {}
+        const bsp::light_sensor::IlluminanceLux value;
     };
 
 } /* namespace sevm*/

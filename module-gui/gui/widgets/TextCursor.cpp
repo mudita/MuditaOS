@@ -16,10 +16,10 @@
 
 namespace gui
 {
-    const unsigned int TextCursor::default_width = 2;
+    const unsigned int TextCursor::defaultWidth = 2;
 
     TextCursor::TextCursor(gui::Text *parent, unsigned int pos, unsigned int block)
-        : Rect(parent, 0, 0, default_width, 1),
+        : Rect(parent, 0, 0, defaultWidth, 1),
           BlockCursor(parent != nullptr ? parent->document.get() : nullptr,
                       pos,
                       block,
@@ -28,8 +28,6 @@ namespace gui
     {
         setFilled(true);
         setVisible(false);
-
-        pos_on_screen = document->getText().length();
     }
 
     TextCursor::Move TextCursor::moveCursor(NavigationDirection direction, unsigned int n)
@@ -49,8 +47,8 @@ namespace gui
     TextCursor::Move TextCursor::moveCursor(NavigationDirection direction)
     {
         debug_text_cursor("Before move cursor: screen pos: %d block: %d pos: %d %s",
-                          pos_on_screen,
-                          getBlockNr(),
+                          onScreenPosition,
+                          getBlockNumber(),
                           BlockCursor::getPosition(),
                           atBegin() ? "at begin" : "middle");
 
@@ -68,15 +66,15 @@ namespace gui
             return Move::End;
         }
 
-        auto nr = getBlockNr();
+        auto nr = getBlockNumber();
         if (direction == NavigationDirection::LEFT) {
             operator--();
 
-            if (pos_on_screen > 0) {
-                --pos_on_screen;
+            if (onScreenPosition > 0) {
+                --onScreenPosition;
             }
 
-            if (nr != getBlockNr() && checkCurrentBlockNoNewLine()) {
+            if (nr != getBlockNumber() && checkCurrentBlockNoNewLine()) {
                 operator--();
             }
 
@@ -86,11 +84,11 @@ namespace gui
         if (direction == NavigationDirection::RIGHT) {
             operator++();
 
-            if (pos_on_screen < document->getText().length()) {
-                ++pos_on_screen;
+            if (onScreenPosition < document->getText().length()) {
+                ++onScreenPosition;
             }
 
-            if (nr != getBlockNr() && checkPreviousBlockNoNewLine()) {
+            if (nr != getBlockNumber() && checkPreviousBlockNoNewLine()) {
                 operator++();
             }
 
@@ -98,8 +96,8 @@ namespace gui
         }
 
         debug_text_cursor("After move cursor: screen pos: %d block: %d pos: %d %s",
-                          pos_on_screen,
-                          getBlockNr(),
+                          onScreenPosition,
+                          getBlockNumber(),
                           BlockCursor::getPosition(),
                           atBegin() ? "at begin" : "middle");
 
@@ -108,8 +106,8 @@ namespace gui
 
     std::tuple<const TextLine *, unsigned int, unsigned int> TextCursor::getSelectedLine()
     {
-        unsigned int offset_pos = 0;
-        unsigned int row        = 0;
+        unsigned int offsetPosition = 0;
+        unsigned int row            = 0;
         if (text == nullptr) {
             return {nullptr, text::npos, text::npos};
         }
@@ -117,11 +115,11 @@ namespace gui
 
             auto lineSize = line.length() - (line.getEnd() == TextBlock::End::Newline ? 1 : 0);
 
-            if (offset_pos + lineSize >= pos_on_screen) {
-                auto column = pos_on_screen - offset_pos;
+            if (offsetPosition + lineSize >= onScreenPosition) {
+                auto column = onScreenPosition - offsetPosition;
                 return {&line, column, row};
             }
-            offset_pos += line.length();
+            offsetPosition += line.length();
             ++row;
         }
         return {nullptr, text::npos, text::npos};
@@ -130,7 +128,7 @@ namespace gui
     void TextCursor::updateView()
     {
         int32_t x = 0, y = 0;
-        uint32_t w = default_width, h = 0;
+        uint32_t w = defaultWidth, h = 0;
         if (text == nullptr) {
             setArea({x, y, w, h});
             return;
@@ -147,6 +145,7 @@ namespace gui
                 setArea({x, y, w, h});
                 return;
             }
+
             auto el = line->getElement(column);
             assert(el != nullptr);
             x = line->getX() + line->getWidthTo(column);
@@ -156,16 +155,27 @@ namespace gui
         setArea({x, y, w, h});
     }
 
+    auto TextCursor::setCursorStartPosition(CursorStartPosition val) -> void
+    {
+        cursorStartPosition = val;
+    }
+
     void TextCursor::addChar(uint32_t utf_val)
     {
         BlockCursor::addChar(utf_val);
-        moveCursor(NavigationDirection::RIGHT);
+
+        // lines need to be drawn before cursor move in case we have scrolling
+        text->drawLines();
+
+        if (cursorStartPosition != CursorStartPosition::DocumentBegin) {
+            moveCursor(NavigationDirection::RIGHT);
+        }
     }
 
     TextCursor &TextCursor::operator<<(const UTF8 &textString)
     {
         for (unsigned int i = 0; i < textString.length(); ++i) {
-            if (text->checkAdditionBounds(textString[i]) == InputBound::CAN_ADD) {
+            if (text->checkAdditionBounds(textString[i]) == AdditionBound::CanAddAll) {
                 addChar(textString[i]);
             }
             else {
@@ -179,30 +189,31 @@ namespace gui
     {
         auto [addBoundResult, processedTextBlock] = text->checkAdditionBounds(textBlock);
 
-        if (addBoundResult == InputBound::CAN_ADD || addBoundResult == InputBound::CAN_ADD_PART) {
+        if (addBoundResult == AdditionBound::CanAddAll || addBoundResult == AdditionBound::CanAddPart) {
 
             auto len = processedTextBlock.length();
-            auto end = processedTextBlock.getEnd();
-
             BlockCursor::addTextBlock(std::move(processedTextBlock));
 
-            // +1 is for block barrier
-            moveCursor(NavigationDirection::RIGHT, len + 1);
+            // lines need to be drawn before cursor move in case we have scrolling
+            text->drawLines();
 
-            // If new added block ends with newline split it for additional empty block at end
-            if (end == TextBlock::End::Newline) {
-                document->addNewline(*this, TextBlock::End::Newline);
-                moveCursor(NavigationDirection::RIGHT);
+            // +1 is for block barrier
+            if (cursorStartPosition != CursorStartPosition::DocumentBegin) {
+                moveCursor(NavigationDirection::RIGHT, len + 1);
             }
         }
 
         return *this;
     }
 
-    void TextCursor::removeChar()
+    bool TextCursor::removeChar()
     {
         moveCursor(NavigationDirection::LEFT);
-        BlockCursor::removeChar();
+        if (BlockCursor::removeChar()) {
+            text->drawLines();
+            return true;
+        }
+        return false;
     }
 
 } // namespace gui

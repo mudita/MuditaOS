@@ -5,7 +5,7 @@
 
 #include "application-meditation/windows/Names.hpp"
 #include "application-meditation/widgets/IntervalBox.hpp"
-#include "application-meditation/widgets/TimerSetter.hpp"
+#include "application-meditation/widgets/TimerProperty.hpp"
 #include "application-meditation/data/Style.hpp"
 #include "application-meditation/data/MeditationTimerData.hpp"
 #include "application-meditation/ApplicationMeditation.hpp"
@@ -42,11 +42,11 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::start));
 
-        timeSetter = new TimerSetter(this,
-                                     style::meditation::timer::X,
-                                     style::meditation::timer::Y,
-                                     style::meditation::timer::Width,
-                                     style::meditation::timer::Height);
+        timeSetter = new TimerProperty(this,
+                                       style::meditation::timer::X,
+                                       style::meditation::timer::Y,
+                                       style::meditation::timer::Width,
+                                       style::meditation::timer::Height);
         timeSetter->setEdges(RectangleEdge::None);
         setFocusItem(timeSetter);
 
@@ -54,7 +54,8 @@ namespace gui
                                       style::meditation::intervalBox::X,
                                       style::meditation::intervalBox::Y,
                                       style::meditation::intervalBox::Width,
-                                      style::meditation::intervalBox::Height);
+                                      style::meditation::intervalBox::Height,
+                                      timeSetter);
         intervalBox->setEdges(RectangleEdge::None);
 
         intervalBox->setNavigationItem(NavigationDirection::UP, timeSetter);

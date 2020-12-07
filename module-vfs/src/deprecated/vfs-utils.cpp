@@ -113,7 +113,7 @@ std::string vfs::loadFileAsString(const fs::path &fileToLoad)
 bool vfs::replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite)
 {
     auto lamb = [](vfs::FILE *stream) { ::vfs.fclose(stream); };
-    std::unique_ptr<vfs::FILE, decltype(lamb)> fp(fopen(fileToModify.c_str(), "w"), lamb);
+    std::unique_ptr<vfs::FILE, decltype(lamb)> fp(::vfs.fopen(fileToModify.c_str(), "w"), lamb);
 
     if (fp.get() != nullptr) {
         size_t dataWritten = fprintf(fp.get(), stringToWrite.c_str());
@@ -131,6 +131,9 @@ const fs::path vfs::getCurrentBootJSON()
     }
 
     LOG_INFO("vfs::getCurrentBootJSON crc check failed on %s", purefs::file::boot_json);
+    // replace broken .boot.json with a default one
+    replaceWithString(purefs::dir::getRootDiskPath() / purefs::file::boot_json, bootConfig.to_json().dump());
+
     return relativeToRoot(purefs::file::boot_json);
 }
 

@@ -1,18 +1,36 @@
 # MuditaOS changelog
 
+### Fixed
+* `[settings]` Fix lack of sim at startup
+
+### Added
+* `[utils]` Dump logs to a file on RT1051 after reaching 80% of log buffer utilization.
+
 [Current release]
 
 ### Added
+
+* `[cellular]` SIM API for change pin, set/reset sim lock, switch sim card
+* `[notes]` MMI/USSD communication window
 * `[notes]` Notes application implemented.
 * `[notes]` Notes search engine implemented.
+* `[desktop]` info window for incoming MMI messages.
+* `[text]` Added vertical scrolling.
+* `[text]` Added cursor starting position handling.
+* `[alarms]` Added main window
 
 ### Changed
 
 * `[desktop]` Windows refactor
+* `[notes]` A note characters limit set to 4'000.
+* `[PowerManagement]` Separation of CPU clock into separate clock domain
 
 ### Fixed
 
-* `[meditation]` Fixed default counter settings 
+* `[meditation]` Fix interval chimes choice not scaling with meditation time
+* `[meditation]` Fix of too many time options
+* `[meditation]` Fixed default counter settings
+* `[notes]` Fixed displaying the special characters in a note title.
 
 ### Other
 

@@ -3,11 +3,7 @@
 
 #include "EventsDB.hpp"
 
-#include <vfs.hpp>
-
-const char *EventsDB::dbName = USER_PATH("events.db");
-
-EventsDB::EventsDB() : Database(dbName), events(this)
+EventsDB::EventsDB(const char *name) : Database(name), events(this)
 {
     if (events.create() == false) {
         return;

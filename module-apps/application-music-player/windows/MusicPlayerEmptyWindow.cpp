@@ -39,8 +39,8 @@ namespace gui
 
         text = new Text(this, infoText::x, infoText::y, infoText::w, infoText::h);
         text->setText(utils::localize.get("app_music_player_music_empty_window_notification"));
-        text->setTextType(TextType::MULTI_LINE);
-        text->setEditMode(EditMode::BROWSE);
+        text->setTextType(TextType::MultiLine);
+        text->setEditMode(EditMode::Browse);
         text->setEdges(RectangleEdge::None);
         text->setFont(style::window::font::medium);
         text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));

@@ -21,6 +21,7 @@ namespace db::query::alarms
 
       public:
         explicit TurnOffAllResult(bool ret);
+        [[nodiscard]] auto succeed() const -> bool;
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 

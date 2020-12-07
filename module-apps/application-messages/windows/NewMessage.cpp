@@ -216,7 +216,7 @@ namespace gui
                                   body->getWidth() - msgStyle::recipientImg::w,
                                   msgStyle::text::h,
                                   "",
-                                  ExpandMode::EXPAND_NONE);
+                                  ExpandMode::None);
         recipient->setEdges(gui::RectangleEdge::None);
         recipient->setInputMode(new InputMode({InputMode::phone}));
         recipient->setFont(style::window::font::mediumbold);
@@ -243,7 +243,7 @@ namespace gui
         labelMessage->setFont(style::window::font::small);
         labelMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
-        message = new gui::Text(nullptr, 0, 0, body->getWidth(), msgStyle::text::h, "", ExpandMode::EXPAND_UP);
+        message = new gui::Text(nullptr, 0, 0, body->getWidth(), msgStyle::text::h, "", ExpandMode::Up);
         message->setMaximumSize(body->getWidth(), body->getHeight());
         message->setEdges(gui::RectangleEdge::Bottom);
         message->setInputMode(new InputMode(

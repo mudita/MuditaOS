@@ -221,6 +221,12 @@ extern "C"
 #define PINMUX_MAGNETOMETER_IRQ_PIN IOMUXC_GPIO_AD_B1_04_GPIO1_IO20
     void PINMUX_InitMagnetometer(void);
 
+#define PINMUX_EINK_FORNTLIGHT_PWM IOMUXC_GPIO_AD_B0_01_FLEXPWM2_PWMB03
+    void PINMUX_InitEinkFrontlight(void);
+
+#define PINMUX_LIGHT_SENSOR_IRQ_PIN IOMUXC_GPIO_B0_15_GPIO2_IO15
+    void PINMUX_InitLightSensor(void);
+
 #if defined(__cplusplus)
 }
 #endif

@@ -30,7 +30,7 @@ set( SOURCES
     "widgets/BrightnessBox.cpp"
     "widgets/ModesBox.cpp"
     "widgets/BarGraph.cpp"
-    )
+     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
@@ -50,6 +50,7 @@ set(APPLICATIONS
     music-player
     meditation
     calculator
+    alarm-clock
 )
 
 list(SORT APPLICATIONS)

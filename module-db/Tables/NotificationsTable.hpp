@@ -23,7 +23,7 @@ enum class NotificationsTableFields
 class NotificationsTable : public Table<NotificationsTableRow, NotificationsTableFields>
 {
   public:
-    NotificationsTable(Database *db);
+    explicit NotificationsTable(Database *db);
     virtual ~NotificationsTable() = default;
 
     bool create() override final;

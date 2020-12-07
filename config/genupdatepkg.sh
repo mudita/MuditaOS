@@ -95,6 +95,7 @@ sed -i -e 's/__GIT_REVISION__/'$MUDITAOS_GIT_REV'/g' $vjson
 sed -i -e 's/__VERSION_MAJOR__/'$MUDITAOS_VERSION_MAJOR'/g' $vjson
 sed -i -e 's/__VERSION_MINOR__/'$MUDITAOS_VERSION_MINOR'/g' $vjson
 sed -i -e 's/__VERSION_PATCH__/'$MUDITAOS_VERSION_PATCH'/g' $vjson
+sed -i -e 's/__VERSION_STRING__/'$MUDITAOS_GIT_TAG'/g' $vjson
 
 BUILD_HOST=`uname -r`
 BUILD_USER=`whoami`

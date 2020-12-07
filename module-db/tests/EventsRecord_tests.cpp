@@ -16,6 +16,7 @@
 #include "module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp"
 
 #include <vfs.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 #include <stdint.h>
 #include <stdio.h>
@@ -27,9 +28,10 @@ TEST_CASE("Events Record tests")
 {
     Database::initialize();
 
-    vfs.remove(EventsDB::GetDBName());
+    const auto eventsPath = (purefs::dir::getUserDiskPath() / "events.db").c_str();
+    std::filesystem::remove(eventsPath);
 
-    EventsDB eventsDb;
+    EventsDB eventsDb{eventsPath};
 
     REQUIRE(eventsDb.isInitialized());
 

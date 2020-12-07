@@ -72,12 +72,12 @@ namespace gui
 
         auto moveCursor(NavigationDirection direction, unsigned int n)
         {
-            cursor->TextCursor::moveCursor(direction, n);
+            cursor->moveCursor(direction, n);
         }
 
-        [[nodiscard]] auto getCursorPos()
+        [[nodiscard]] auto getCursorPosition()
         {
-            return cursor->getPosOnScreen();
+            return cursor->getOnScreenPosition();
         }
     };
 } // namespace gui
@@ -274,7 +274,7 @@ TEST_CASE("Text backup and restore tests")
 
         REQUIRE(backup.document.getText() == text->getText());
         REQUIRE(backup.document.getText().length() == text->getText().length());
-        REQUIRE(backup.cursorPos == text->getCursorPos());
+        REQUIRE(backup.cursorPos == text->getCursorPosition());
 
         text->setText(overwriteTestString);
 
@@ -283,7 +283,7 @@ TEST_CASE("Text backup and restore tests")
         text->restoreFrom(backup);
 
         REQUIRE(text->getText() == testStringOneLine);
-        REQUIRE(text->getCursorPos() == testStringOneLine.length() - cursorMoveN);
+        REQUIRE(text->getCursorPosition() == testStringOneLine.length() - cursorMoveN);
     }
 
     SECTION("Backup two line text with moved cursor, overwrite text and restore")
@@ -300,7 +300,7 @@ TEST_CASE("Text backup and restore tests")
 
         REQUIRE(backup.document.getText() == text->getText());
         REQUIRE(backup.document.getText().length() == text->getText().length());
-        REQUIRE(backup.cursorPos == text->getCursorPos());
+        REQUIRE(backup.cursorPos == text->getCursorPosition());
 
         text->setText(overwriteTestString);
 
@@ -309,7 +309,7 @@ TEST_CASE("Text backup and restore tests")
         text->restoreFrom(backup);
 
         REQUIRE(text->getText() == testStringTwoLines);
-        REQUIRE(text->getCursorPos() == testStringTwoLines.length() - cursorMoveN);
+        REQUIRE(text->getCursorPosition() == testStringTwoLines.length() - cursorMoveN);
     }
 }
 
@@ -327,7 +327,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, 0);
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, 0);
 
         text->addText(testStringOneLine);
 
@@ -339,7 +339,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, 1);
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, 1);
 
         text->addText(testStringOneLine);
 
@@ -351,7 +351,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, testStringOneLine.length());
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, testStringOneLine.length());
 
         text->addText(testStringTwoLines);
 
@@ -363,7 +363,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, testStringTwoLines.length());
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, testStringTwoLines.length());
 
         text->addText(testStringTwoLines);
 
@@ -375,7 +375,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, testStringOneLine.length());
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, testStringOneLine.length());
 
         text->addText(TextBlock(testStringTwoLines, Font(27).raw(), TextBlock::End::None));
 
@@ -391,7 +391,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, textLimit);
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, textLimit);
 
         text->addText(TextBlock(testStringOneLine, Font(27).raw(), TextBlock::End::None));
 
@@ -410,7 +410,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
         using namespace gui;
         auto text = new gui::TestText();
 
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, signCountRestricted);
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, signCountRestricted);
 
         text->addRichText(richTextTwoLines);
 
@@ -429,7 +429,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
         auto parsedRichText = gui::text::RichTextParser().parse(richTextTwoLines, &format);
         auto textLimit      = parsedRichText->getText().length() + additionalSpace;
 
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, textLimit);
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, textLimit);
 
         text->addRichText(richTextTwoLines);
 
@@ -458,7 +458,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(0, 0);
 
         text->addText(testStringOneLine);
@@ -471,7 +471,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
         layout.setMaximumSize(10, 10);
         layout.addWidget(text);
@@ -486,7 +486,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 30);
 
         text->addText(testStringTwoLines);
@@ -501,7 +501,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 60);
 
         text->addText(testStringTwoLines);
@@ -516,7 +516,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 60);
         BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
         layout.setMaximumSize(200, 30);
@@ -534,7 +534,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(0, 0);
 
         text->addText(TextBlock(testStringOneLine, Font(27).raw(), TextBlock::End::None));
@@ -547,7 +547,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
         layout.setMaximumSize(10, 10);
         layout.addWidget(text);
@@ -562,7 +562,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(150, 30);
 
         text->addText(TextBlock(testStringFirstLine, Font(27).raw(), TextBlock::End::Newline));
@@ -578,7 +578,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 60);
 
         text->addText(TextBlock(testStringFirstLine, Font(27).raw(), TextBlock::End::Newline));
@@ -594,7 +594,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 60);
         BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
         layout.setMaximumSize(150, 30);
@@ -613,7 +613,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(0, 0);
 
         text->addRichText(richTextTwoLines);
@@ -626,7 +626,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
         layout.setMaximumSize(10, 10);
         layout.addWidget(text);
@@ -641,7 +641,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(160, 40);
 
         text->addRichText(richTextTwoLines);
@@ -656,7 +656,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 80);
 
         text->addRichText(richTextTwoLines);
@@ -671,7 +671,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 80);
         BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
         layout.setMaximumSize(160, 40);
@@ -702,7 +702,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 0);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 0);
         text->setMaximumSize(150, 100);
 
         text->addText(testStringOneLine);
@@ -715,7 +715,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 1);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 1);
         text->setMaximumSize(150, 100);
 
         text->addText(testStringTwoLines);
@@ -730,7 +730,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 2);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 2);
         text->setMaximumSize(150, 100);
 
         text->addText(testStringTwoLines);
@@ -745,7 +745,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 0);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 0);
         text->setMaximumSize(150, 100);
 
         text->addText(TextBlock(testStringOneLine, Font(27).raw(), TextBlock::End::None));
@@ -758,7 +758,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 1);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 1);
         text->setMaximumSize(150, 100);
 
         text->addText(TextBlock(testStringFirstLine, Font(27).raw(), TextBlock::End::Newline));
@@ -774,7 +774,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 2);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 2);
         text->setMaximumSize(150, 100);
 
         text->addText(TextBlock(testStringFirstLine, Font(27).raw(), TextBlock::End::Newline));
@@ -790,7 +790,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 0);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 0);
         text->setMaximumSize(150, 100);
 
         text->addRichText(richTextTwoLines);
@@ -803,7 +803,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 1);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 1);
         text->setMaximumSize(160, 100);
 
         text->addRichText(richTextTwoLines);
@@ -818,7 +818,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
         mockup::fontManager();
         using namespace gui;
         auto text = new gui::TestText();
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 2);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 2);
         text->setMaximumSize(160, 100);
 
         text->addRichText(richTextTwoLines);
@@ -844,9 +844,9 @@ TEST_CASE("Text addition bounds - multiple limits tests")
         using namespace gui;
         auto text = new gui::TestText();
 
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 2);
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, testStringOneLine.length());
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 2);
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, testStringOneLine.length());
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(150, 100);
 
         text->addText(testStringTwoLines);
@@ -864,9 +864,9 @@ TEST_CASE("Text addition bounds - multiple limits tests")
 
         unsigned int signsLimit = 100;
 
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 1);
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, signsLimit);
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 1);
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, signsLimit);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(150, 100);
 
         text->addText(testStringOneLine);
@@ -885,9 +885,9 @@ TEST_CASE("Text addition bounds - multiple limits tests")
 
         unsigned int signsLimit = 100;
 
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 3);
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, signsLimit);
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 3);
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, signsLimit);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(140, 30);
 
         text->addText(testStringOneLine);
@@ -908,9 +908,9 @@ TEST_CASE("Text addition bounds - multiple limits tests")
         auto format         = text->getTextFormat();
         auto parsedRichText = gui::text::RichTextParser().parse(richTextTwoLines, &format);
 
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 4);
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, parsedRichText->getText().length());
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 4);
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, parsedRichText->getText().length());
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(300, 100);
 
         text->addRichText(richTextTwoLines);
@@ -927,9 +927,9 @@ TEST_CASE("Text addition bounds - multiple limits tests")
 
         unsigned int signsLimit = 100;
 
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 1);
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, signsLimit);
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 1);
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, signsLimit);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(300, 100);
 
         text->addRichText(richTextTwoLines);
@@ -946,9 +946,9 @@ TEST_CASE("Text addition bounds - multiple limits tests")
 
         unsigned int signsLimit = 100;
 
-        text->setTextLimitType(gui::TextLimitType::MAX_LINES, 3);
-        text->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, signsLimit);
-        text->setTextLimitType(gui::TextLimitType::MAX_SIZE);
+        text->setTextLimitType(gui::TextLimitType::MaxLines, 3);
+        text->setTextLimitType(gui::TextLimitType::MaxSignsCount, signsLimit);
+        text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(140, 30);
 
         text->addRichText(richTextTwoLines);

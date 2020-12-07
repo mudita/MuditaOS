@@ -74,6 +74,7 @@ namespace app::notes
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         edit->setTextChangedCallback([this](Item &, const UTF8 &text) { setCharactersCount(text.length()); });
+        edit->setTextLimitType(gui::TextLimitType::MaxSignsCount, MaxCharactersCount);
 
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(::style::strings::common::options));
@@ -139,14 +140,8 @@ namespace app::notes
 
     void NoteEditWindow::saveNote()
     {
-        const auto &newSnippetText = edit->getText();
-        if (newSnippetText.length() > MaxCharactersCount) {
-            LOG_ERROR("Unable to save the note: text is too long.");
-            return;
-        }
-
         notesRecord->date    = utils::time::getCurrentTimestamp().getTime();
-        notesRecord->snippet = newSnippetText;
+        notesRecord->snippet = edit->getText();
         presenter->save(*notesRecord);
     }
 } // namespace app::notes

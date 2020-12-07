@@ -20,14 +20,16 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Alarms Record tests")
 {
     Database::initialize();
 
-    vfs.remove(AlarmsDB::GetDBName());
+    const auto alarmsPath = (purefs::dir::getUserDiskPath() / "alarms.db").c_str();
+    std::filesystem::remove(alarmsPath);
 
-    auto alarmsDB = AlarmsDB();
+    auto alarmsDB = AlarmsDB(alarmsPath);
     REQUIRE(alarmsDB.isInitialized());
 
     SECTION("Default Constructor")

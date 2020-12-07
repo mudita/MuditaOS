@@ -73,6 +73,7 @@ namespace purefs::blkdev::internal
                 continue;
             if (part.num_sectors) {
                 part.physical_number = part_no;
+                part.mbr_number      = part_no;
                 m_parts.emplace_back(part);
             }
             ++part_no;

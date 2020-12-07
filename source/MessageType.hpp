@@ -173,6 +173,10 @@ enum class MessageType
     EVMTorchStateMessage,
     // Keypad backlight messages
     EVMKeypadBacklightMessage,
+    // Eink frontlight messages
+    EVMEinkFrontlightMessage,
+    // Light sensor messages
+    EVMLightSensorMessage,
 
     // cellular messages
     EVMGetBoard,

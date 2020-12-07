@@ -62,7 +62,7 @@ namespace gui
                 this->application, CellularUSSDMessage::RequestType::pullSesionRequest, data);
             return true;
         };
-        pullToSend->setEditMode(EditMode::EDIT);
+        pullToSend->setEditMode(EditMode::Edit);
         pullToSend->setInputMode(new InputMode(
             {InputMode::digit},
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
