@@ -223,7 +223,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
     // Set volume to 0 before enabling codec to avoid pops/clicks
     auto currVol = currentParams.outVolume;
     SetOutputVolume(0);
-    currentParams.inGain = 0; // let's try different gains
+
     SetInputGain(currentParams.inGain);
 
     // Turn on device
