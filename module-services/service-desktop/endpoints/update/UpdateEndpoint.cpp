@@ -35,7 +35,7 @@ auto UpdateEndpoint::run(Context &context) -> sys::ReturnCodes
 {
     std::string fileName = context.getBody()["fileName"].string_value();
     auto path            = purefs::dir::getUpdatesOSPath() / fileName;
-    auto fileExists      = vfs.fileExists(path.c_str());
+    auto fileExists      = std::filesystem::exists(path.c_str());
     if (fileExists) {
         context.setResponseBody(json11::Json::object({{parserFSM::json::updateReady, true}}));
 

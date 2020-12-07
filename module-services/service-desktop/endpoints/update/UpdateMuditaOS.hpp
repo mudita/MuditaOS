@@ -5,7 +5,6 @@
 
 #include <json/json11.hpp>
 #include <module-utils/microtar/src/microtar.hpp>
-#include <vfs.hpp>
 
 #include <cstdint>
 #include <filesystem>
@@ -182,4 +181,5 @@ class UpdateMuditaOS : public updateos::UpdateStats
     updateos::UpdateRunStatus updateRunStatus;
     json11::Json updateHistory;
     json11::Json targetVersionInfo;
+    [[nodiscard]] static std::string readContent(const char *filename) noexcept;
 };
