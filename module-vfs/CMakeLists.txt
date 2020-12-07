@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 include(thirdparty)
+include(thirdparty/littlefs.cmake)
 
 project(module-vfs VERSION 1.0
         DESCRIPTION "VFS module library")
@@ -119,7 +120,7 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source
 )
 
-target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-bsp module-utils)
+target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-bsp module-utils littlefs)
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     target_link_libraries(${PROJECT_NAME} -lstdc++fs)

@@ -65,3 +65,6 @@
 [submodule "module-vfs/thirdparty/fatfs"]
 	path = module-vfs/thirdparty/fatfs
 	url = ../fatfs.git
+[submodule "module-vfs/thirdparty/littlefs"]
+	path = module-vfs/thirdparty/littlefs
+	url = https://github.com/littlefs-project/littlefs.git
