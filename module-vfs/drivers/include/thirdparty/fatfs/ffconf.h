@@ -243,7 +243,6 @@
 /      can be opened simultaneously under file lock control. Note that the file
 /      lock control is independent of re-entrancy. */
 
-/* #include <somertos.h>	// O/S definitions */
 #include "FreeRTOS.h"
 #include "semphr.h"
 #define FF_FS_REENTRANT 1

@@ -24,7 +24,9 @@ namespace purefs::fs::drivers
         }
         auto ff_drive(int lun) noexcept -> void
         {
-            if (lun >= 0 && lun <= 9) {
+            static constexpr auto drive_letter_min = 0;
+            static constexpr auto drive_letter_max = 9;
+            if (lun >= drive_letter_min && lun <= drive_letter_max) {
                 m_ff_drive[0] = lun + '0';
             }
             else {
@@ -45,7 +47,8 @@ namespace purefs::fs::drivers
         }
 
       private:
+        static constexpr auto disk_name_size = 3;
         std::unique_ptr<::FATFS> m_fatfs;
-        char m_ff_drive[3]{" :"};
+        char m_ff_drive[disk_name_size]{" :"};
     };
 } // namespace purefs::fs::drivers

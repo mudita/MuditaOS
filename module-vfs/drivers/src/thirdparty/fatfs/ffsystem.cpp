@@ -36,7 +36,7 @@ extern "C" void ff_memfree(void *mblock /* Pointer to the memory block to free (
 
 #endif
 
-#if FF_FS_REENTRANT /* Mutal exclusion */
+#if FF_FS_REENTRANT /* Mutual exclusion */
 
 /*------------------------------------------------------------------------*/
 /* Create a Synchronization Object                                        */
