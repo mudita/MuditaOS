@@ -318,6 +318,7 @@ sys::ReturnCodes EventManager::InitHandler()
     params.functionPoints =
         sevm::light_control::BrightnessFunction({{50.0f, 30.0f}, {150.0f, 80.0f}, {400.0f, 80.0f}, {700.0f, 0.0f}});
     sevm::light_control::processRequest(sevm::light_control::LightControlAction::turnOn, params);
+    sevm::light_control::processRequest(sevm::light_control::LightControlAction::setAutomaticModeParameters, params);
     sevm::light_control::processRequest(sevm::light_control::LightControlAction::enableAutomaticMode, params);
 
     return sys::ReturnCodes::Success;

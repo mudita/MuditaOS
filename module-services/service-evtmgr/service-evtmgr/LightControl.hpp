@@ -17,7 +17,10 @@ namespace sevm::light_control
         turnOff,
         turnOn,
         enableAutomaticMode,
-        disableAutomaticMode
+        disableAutomaticMode,
+        setManualModeBrightness,
+        setGammaCorrectionFactor,
+        setAutomaticModeParameters
     };
 
     using BrightnessFunction = std::vector<std::pair<float, float>>;

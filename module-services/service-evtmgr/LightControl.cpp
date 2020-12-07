@@ -12,6 +12,7 @@ namespace sevm::light_control
         std::unique_ptr<sys::Timer> controlTimer;
         std::unique_ptr<sys::Timer> readoutTimer;
 
+        bool automaticMode = false;
         typedef struct
         {
             float xBound;
@@ -19,9 +20,9 @@ namespace sevm::light_control
             float b;
         } FunctionSection;
 
-        Parameters parameters;
         std::vector<FunctionSection> function;
-        float rampStep = 0.0f;
+        float rampStep;
+        float brightnessHysteresis;
 
         float brightnessRampTarget;
         float brightnessRampState;
@@ -45,8 +46,7 @@ namespace sevm::light_control
 
         bsp::eink_frontlight::BrightnessPercentage brightnessRampOut()
         {
-            if (rampTargetReached &&
-                std::abs(brightnessRampTarget - brightnessRampState) > parameters.brightnessHysteresis) {
+            if (rampTargetReached && std::abs(brightnessRampTarget - brightnessRampState) > brightnessHysteresis) {
                 rampTargetReached = false;
                 LOG_DEBUG("out of hysteresis");
             }
@@ -72,19 +72,16 @@ namespace sevm::light_control
             return static_cast<bsp::eink_frontlight::BrightnessPercentage>(brightnessRampState);
         }
 
-        void setParameters(const Parameters &params)
+        void setAutomaticModeParameters(const Parameters &params)
         {
-            parameters = params;
             rampStep   = 100.0f * (static_cast<float>(CONTROL_TIMER_MS) / static_cast<float>(parameters.rampTimeMS));
-            bsp::eink_frontlight::setGammaFactor(parameters.gammaFactor);
+            brightnessHysteresis = parameters.brightnessHysteresis;
 
             function.clear();
             for (unsigned int i = 0; i < parameters.functionPoints.size(); ++i) {
                 FunctionSection section;
                 section.xBound = parameters.functionPoints[i].first;
-                if (i == 0) {
-                    section.a = 0.0f;
-                    section.b = parameters.functionPoints[i].second;
+                bsp::eink_frontlight::
                 }
                 else {
                     section.a = (parameters.functionPoints[i - 1].second - parameters.functionPoints[i].second) /
@@ -119,31 +116,44 @@ namespace sevm::light_control
             bsp::keypad_backlight::shutdown();
             bsp::eink_frontlight::turnOff();
             bsp::light_sensor::standby();
+            controlTimer->stop();
+            readoutTimer->stop();
             break;
         case (LightControlAction::turnOn):
             bsp::keypad_backlight::turnOnAll();
             bsp::eink_frontlight::turnOn();
             bsp::light_sensor::wakeup();
+            if (automaticMode) {
+                controlTimer->start();
+                readoutTimer->start();
+            }
             break;
         case (LightControlAction::enableAutomaticMode):
             controlTimer->start();
             readoutTimer->start();
+            automaticMode = true;
             break;
         case (LightControlAction::disableAutomaticMode):
             controlTimer->stop();
             readoutTimer->stop();
+            automaticMode = false;
+            break;
+        case (LightControlAction::setManualModeBrightness:
+            bsp::eink_frontlight::setBrightness(params.manualModeBrightness);
+            break;
+        case (LightControlAction::setGammaCorrectionFactor:
+            bsp::eink_frontlight::setGammaFactor(params.gammaFactor);
+            break;
+        case (LightControlAction::setAutomaticModeParameters:
+            setAutomaticModeParameters(params);
             break;
         }
-
-        setParameters(params);
-
         return true;
     }
 
     void controlTimerCallback()
     {
         auto out = brightnessRampOut();
-        // LOG_DEBUG("ramp out: %d", out);
         bsp::eink_frontlight::setBrightness(out);
     }
 
