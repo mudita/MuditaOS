@@ -8,7 +8,6 @@
 #include "board.h"
 #include "fsl_lpuart_edma.h"
 #include <bsp/BoardDefinitions.hpp>
-//#include <drivers/dmamux/DriverDMAMux.hpp>
 
 #if DEBUG_BLUETOOTH_HCI_COMS == 1
 #define logHciComs(...) LOG_DEBUG(__VA_ARGS__)
@@ -27,7 +26,6 @@ using namespace bsp;
 
 lpuart_edma_handle_t BluetoothCommon::uartDmaHandle = {};
 
-// TODO it's plain copy same as in cellular - this is kind of wrong
 uint32_t UartGetPeripheralClock();
 
 BluetoothCommon::BluetoothCommon()
@@ -52,7 +50,6 @@ void BluetoothCommon::open()
 void BluetoothCommon::close()
 {
     LOG_INFO("Bluetooth HW close!");
-    // TODO destroy semaphore
     set_irq(false);
     is_open = false;
     set_reset(false);
@@ -63,11 +60,11 @@ void BluetoothCommon::sleep_ms(ssize_t ms)
     ulTaskNotifyTake(pdTRUE, ms);
 }
 
-bool BluetoothCommon::read(uint8_t *buf, size_t nbytes)
+BTdev::Error BluetoothCommon::read(uint8_t *buf, size_t nbytes)
 {
-    bool ret = false;
+    auto ret = ErrorUndefined;
 
-    // start RXfer if there is byte incoming and no pending RXfer
+    // start RXfer if there is a byte incoming and no pending RXfer
     lpuart_transfer_t receiveXfer;
     receiveXfer.data     = buf;
     receiveXfer.dataSize = nbytes;
@@ -79,21 +76,21 @@ bool BluetoothCommon::read(uint8_t *buf, size_t nbytes)
     auto status = LPUART_ReceiveEDMA(BSP_BLUETOOTH_UART_BASE, &uartDmaHandle, &receiveXfer);
     switch (status) {
     case kStatus_Success:
-        ret = true;
+        ret = Success;
         break;
     case kStatus_LPUART_RxBusy:
-        ret = false;
+        ret = ErrorBSP;
         LOG_WARN("BT UART RX DMA already busy");
         break;
     case kStatus_InvalidArgument:
         LOG_WARN("BT UART RX DMA invalid argument");
-        ret = false;
+        ret = ErrorBSP;
         break;
     }
     return ret;
 }
 
-bool BluetoothCommon::write(const uint8_t *buf, size_t size)
+BTdev::Error BluetoothCommon::write(const uint8_t *buf, size_t size)
 {
     logHciBytes("BT DMA to write --> [%d]>%s<",
                 size,
@@ -105,7 +102,7 @@ bool BluetoothCommon::write(const uint8_t *buf, size_t size)
                     return ss.str();
                 }()
                              .c_str());
-    bool ret = false;
+    auto ret = ErrorUndefined;
 
     lpuart_transfer_t sendXfer;
     sendXfer.data     = const_cast<uint8_t *>(buf);
@@ -122,17 +119,17 @@ bool BluetoothCommon::write(const uint8_t *buf, size_t size)
     case kStatus_Success:
         // orchestrate a DMA Tx
         logHciComs("DMA Tx started (%d)", size);
-        ret = true;
+        ret = Success;
         break;
     case kStatus_LPUART_TxBusy:
         // could've checked beforehand
         LOG_WARN("Previous DMA Tx is still pending");
-        ret = false;
+        ret = ErrorBSP;
         break;
     case kStatus_InvalidArgument:
         LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
         LOG_ERROR("DMA Tx invalid arg");
-        ret = false;
+        ret = ErrorBSP;
         break;
     }
     return ret;

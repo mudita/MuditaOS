@@ -39,24 +39,24 @@ void BluetoothCommon::sleep_ms(ssize_t ms)
     ulTaskNotifyTake(pdTRUE, ms);
 }
 
-bool BlueKitchen::read(uint8_t *buf, size_t nbytes)
+BTdev::Error BlueKitchen::read(uint8_t *buf, size_t nbytes)
 {
-    return false;
+    return Success;
 }
 
-bool BluetoothCommon::read(uint8_t *buf, size_t nbytes)
+BTdev::Error BluetoothCommon::read(uint8_t *buf, size_t nbytes)
 {
-    return false;
+    return Success;
 }
 
-bool BlueKitchen::write(const uint8_t *buf, size_t nbytes)
+BTdev::Error BlueKitchen::write(const uint8_t *buf, size_t nbytes)
 {
-    return false;
+    return Success;
 }
 
-bool BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
+BTdev::Error BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
 {
-    return false;
+    return Success;
 }
 
 ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t nbytes)

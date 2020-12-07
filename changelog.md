@@ -6,6 +6,9 @@
 ### Added
 * `[utils]` Dump logs to a file on RT1051 after reaching 80% of log buffer utilization.
 
+### Changed
+* `[bluetooth]` Underlying communication with the Bluetooth module over DMA (direct access)
+
 [Current release]
 
 ### Added
