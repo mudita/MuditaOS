@@ -107,9 +107,18 @@ namespace app::alarmClock
     bool AlarmClockMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
         auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
-        if (msgNotification != nullptr && msgNotification->interface == db::Interface::Name::Alarms &&
-            msgNotification->dataModified()) {
-            alarmsList->rebuildList(style::listview::RebuildType::InPlace);
+        if (msgNotification != nullptr && msgNotification->interface == db::Interface::Name::Alarms) {
+            if (msgNotification->dataModified()) {
+                alarmsList->rebuildList(style::listview::RebuildType::InPlace);
+            }
+            if (presenter->isAlarmsListEmpty()) {
+                showEmptyIcon();
+            }
+            else {
+                alarmsList->setVisible(true);
+                emptyListIcon->setVisible(false);
+                setFocusItem(alarmsList);
+            }
             return true;
         }
         return false;

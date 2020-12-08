@@ -18,6 +18,7 @@
 * `[text]` Added vertical scrolling.
 * `[text]` Added cursor starting position handling.
 * `[alarms]` Added main window
+* `[alarms]` Added window with options
 * `[PowerManagement]` PowerManagement: Enable FreeRTOS Run Time Statistics
 * `[cellular]` USSD session handling.
 
