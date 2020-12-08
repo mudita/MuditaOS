@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "service-evtmgr/LightControl.hpp"
+#include "service-evtmgr/ScreenLightControl.hpp"
 
-namespace sevm::light_control
+namespace sevm::screen_light_control
 {
     namespace
     {
@@ -55,7 +55,7 @@ namespace sevm::light_control
                 if (brightnessRampState < brightnessRampTarget) {
                     brightnessRampState += rampStep;
                     if (brightnessRampState > brightnessRampTarget) {
-                        rampTargetReached   = true;
+                        rampTargetReached = true;
                     }
                 }
                 else if (brightnessRampState > brightnessRampTarget) {
@@ -136,19 +136,17 @@ namespace sevm::light_control
         disableTimers();
     }
 
-    bool processRequest(LightControlAction action, const Parameters &params)
+    void processRequest(Action action, const Parameters &params)
     {
         switch (action) {
-        case LightControlAction::turnOff:
-            bsp::keypad_backlight::shutdown();
+        case Action::turnOff:
             bsp::eink_frontlight::turnOff();
             bsp::light_sensor::standby();
             controlTimer->stop();
             readoutTimer->stop();
             lightOn = false;
             break;
-        case LightControlAction::turnOn:
-            bsp::keypad_backlight::turnOnAll();
+        case Action::turnOn:
             bsp::eink_frontlight::turnOn();
             bsp::light_sensor::wakeup();
             if (automaticMode) {
@@ -156,23 +154,23 @@ namespace sevm::light_control
             }
             lightOn = true;
             break;
-        case LightControlAction::enableAutomaticMode:
+        case Action::enableAutomaticMode:
             if (lightOn) {
                 enableTimers();
             }
             automaticMode = true;
             break;
-        case LightControlAction::disableAutomaticMode:
+        case Action::disableAutomaticMode:
             disableTimers();
             automaticMode = false;
             break;
-        case LightControlAction::setManualModeBrightness:
+        case Action::setManualModeBrightness:
             bsp::eink_frontlight::setBrightness(params.manualModeBrightness);
             break;
-        case LightControlAction::setGammaCorrectionFactor:
+        case Action::setGammaCorrectionFactor:
             bsp::eink_frontlight::setGammaFactor(params.gammaFactor);
             break;
-        case LightControlAction::setAutomaticModeParameters:
+        case Action::setAutomaticModeParameters:
             if (lightOn && automaticMode) {
                 disableTimers();
             }
@@ -182,7 +180,6 @@ namespace sevm::light_control
             }
             break;
         }
-        return true;
     }
 
-} // namespace sevm::light_control
+} // namespace sevm::screen_light_control

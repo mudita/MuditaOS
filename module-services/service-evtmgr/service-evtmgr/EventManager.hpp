@@ -10,6 +10,7 @@
 #include <Service/Worker.hpp>
 #include <bsp/common.hpp>
 #include <bsp/keyboard/key_codes.hpp>
+#include <bsp/keypad_backlight/keypad_backlight.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -23,6 +24,7 @@ class EventManager : public sys::Service
   private:
     void HandleAlarmTrigger(sys::DataMessage *msgl);
     void GetNextAlarmTimestamp(time_t timestamp);
+    bool processKeypadBacklightRequest(bsp::keypad_backlight::Action act);
 
   protected:
     std::unique_ptr<WorkerEvent> EventWorker;

@@ -7,7 +7,7 @@
 #include "service-evtmgr/EventManager.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
 #include "service-evtmgr/WorkerEvent.hpp"
-#include "service-evtmgr/LightControl.hpp"
+#include "service-evtmgr/ScreenLightControl.hpp"
 
 #include <BaseInterface.hpp>
 #include <MessageType.hpp>
@@ -272,10 +272,17 @@ sys::ReturnCodes EventManager::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sevm::LightControlMessage(), [&](sys::Message *msgl) {
-        auto request = static_cast<sevm::LightControlMessage *>(msgl);
-        return std::make_shared<sevm::LightControlResponseMessage>(
-            sevm::light_control::processRequest(request->action, request->parameters));
+    connect(sevm::KeypadBacklightMessage(), [&](sys::Message *msgl) {
+        auto request      = static_cast<sevm::KeypadBacklightMessage *>(msgl);
+        auto response     = std::make_shared<sevm::KeypadBacklightResponseMessage>();
+        response->success = processKeypadBacklightRequest(request->action);
+        return response;
+    });
+
+    connect(sevm::ScreenLightControlMessage(), [&](sys::Message *msgl) {
+        auto request = static_cast<sevm::ScreenLightControlMessage *>(msgl);
+        sevm::screen_light_control::processRequest(request->action, request->parameters);
+        return std::make_shared<sys::ResponseMessage>();
     });
 
     // initialize keyboard worker
@@ -312,14 +319,14 @@ sys::ReturnCodes EventManager::InitHandler()
 
     EventWorker->init(list);
     EventWorker->run();
-    sevm::light_control::init(this);
+    sevm::screen_light_control::init(this);
 
     return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes EventManager::DeinitHandler()
 {
-    sevm::light_control::deinit();
+    sevm::screen_light_control::deinit();
     EventWorker->close();
     EventWorker.reset();
     EventWorker = nullptr;
@@ -350,4 +357,21 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
 
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
     return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
+}
+
+bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action act)
+{
+    bool response = false;
+    switch (act) {
+    case bsp::keypad_backlight::Action::turnOn:
+        response = bsp::keypad_backlight::turnOnAll();
+        break;
+    case bsp::keypad_backlight::Action::turnOff:
+        response = bsp::keypad_backlight::shutdown();
+        break;
+    case bsp::keypad_backlight::Action::checkState:
+        response = bsp::keypad_backlight::checkState();
+        break;
+    }
+    return response;
 }

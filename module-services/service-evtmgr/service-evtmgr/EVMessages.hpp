@@ -5,7 +5,7 @@
 
 #include "KbdMessage.hpp"
 #include "BatteryMessages.hpp"
-#include "LightControl.hpp"
+#include "ScreenLightControl.hpp"
 
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
@@ -15,6 +15,7 @@
 #include <bsp/common.hpp>
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/torch/torch.hpp>
+#include <bsp/keypad_backlight/keypad_backlight.hpp>
 
 #include <string>
 
@@ -124,22 +125,32 @@ namespace sevm
         {}
         bool success = false;
     };
-    class LightControlMessage : public Message
+
+    class KeypadBacklightMessage : public Message
     {
       public:
-        LightControlMessage() : Message(MessageType::EVMLightControlMessage)
+        KeypadBacklightMessage() : Message(MessageType::EVMKeypadBacklightMessage)
         {}
 
-        light_control::LightControlAction action;
-        light_control::Parameters parameters;
+        bsp::keypad_backlight::Action action;
     };
 
-    class LightControlResponseMessage : public LightControlMessage
+    class KeypadBacklightResponseMessage : public KeypadBacklightMessage
     {
       public:
-        explicit LightControlResponseMessage(bool status) : LightControlMessage(), success(status)
+        KeypadBacklightResponseMessage() : KeypadBacklightMessage()
         {}
         bool success;
+    };
+
+    class ScreenLightControlMessage : public Message
+    {
+      public:
+        ScreenLightControlMessage() : Message(MessageType::EVMScreenLightControlMessage)
+        {}
+
+        screen_light_control::Action action;
+        screen_light_control::Parameters parameters;
     };
 
 } /* namespace sevm*/
