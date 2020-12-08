@@ -9,7 +9,8 @@
 extern "C"
 {
 #include "module-bluetooth/lib/btstack/src/btstack_util.h"
-};
+}
+#include <btstack_run_loop_freertos.h>
 
 #if DEBUG_BLUETOOTH_HCI_COMS == 1
 #define logHciComs(...) LOG_DEBUG(__VA_ARGS__)
@@ -149,7 +150,8 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
     case Bt::Message::EvtSent:
         logHciComs("[evt] sent");
         if (bt->write_done_cb) {
-            bt->write_done_cb();
+            btstack_run_loop_freertos_execute_code_on_main_thread(reinterpret_cast<void (*)(void *)>(bt->write_done_cb),
+                                                                  nullptr);
         }
         break;
     case Bt::Message::EvtReceiving:
@@ -170,7 +172,8 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
         bt->read_len = 0;
 
         if (bt->read_ready_cb) {
-            bt->read_ready_cb();
+            btstack_run_loop_freertos_execute_code_on_main_thread(reinterpret_cast<void (*)(void *)>(bt->read_ready_cb),
+                                                                  nullptr);
         }
     } break;
     case Bt::Message::EvtSendingError:
