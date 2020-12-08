@@ -68,3 +68,6 @@
 [submodule "host-tools/littlefs-fuse/lfsfuse"]
 	path = host-tools/littlefs-fuse/lfsfuse
 	url = https://github.com/littlefs-project/littlefs-fuse.git
+[submodule "module-vfs/thirdparty/littlefs/littlefs"]
+	path = module-vfs/thirdparty/littlefs/littlefs
+	url = https://github.com/littlefs-project/littlefs.git
