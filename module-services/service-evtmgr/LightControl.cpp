@@ -13,6 +13,7 @@ namespace sevm::light_control
         std::unique_ptr<sys::Timer> readoutTimer;
 
         bool automaticMode = false;
+        bool lightOn       = false;
         typedef struct
         {
             float xBound;
@@ -20,27 +21,27 @@ namespace sevm::light_control
             float b;
         } FunctionSection;
 
-        std::vector<FunctionSection> function;
+        std::vector<FunctionSection> brightnessFunction;
         float rampStep;
         float brightnessHysteresis;
 
-        float brightnessRampTarget;
-        float brightnessRampState;
+        bsp::eink_frontlight::BrightnessPercentage brightnessRampTarget;
+        bsp::eink_frontlight::BrightnessPercentage brightnessRampState;
         bool rampTargetReached = false;
 
         float calculateBrightness(bsp::light_sensor::IlluminanceLux measurement)
         {
-            for (const auto &section : function) {
+            for (const auto &section : brightnessFunction) {
                 if (measurement < section.xBound) {
                     return section.a * measurement + section.b;
                 }
             }
 
-            if (function.empty()) {
+            if (brightnessFunction.empty()) {
                 return 0.0f;
             }
             else {
-                return function.back().xBound * function.back().a + function.back().b;
+                return brightnessFunction.back().xBound * brightnessFunction.back().a + brightnessFunction.back().b;
             }
         }
 
@@ -66,7 +67,19 @@ namespace sevm::light_control
                 }
             }
 
-            return static_cast<bsp::eink_frontlight::BrightnessPercentage>(brightnessRampState);
+            return brightnessRampState;
+        }
+
+        void controlTimerCallback()
+        {
+            auto out = brightnessRampOut();
+            bsp::eink_frontlight::setBrightness(out);
+        }
+
+        void readoutTimerCallback()
+        {
+            float lightMeasurement = bsp::light_sensor::readout();
+            brightnessRampTarget   = calculateBrightness(lightMeasurement);
         }
 
         void enableTimers()
@@ -88,20 +101,23 @@ namespace sevm::light_control
             rampStep = 100.0f * (static_cast<float>(CONTROL_TIMER_MS) / static_cast<float>(params.rampTimeMS));
             brightnessHysteresis = params.brightnessHysteresis;
 
-            function.clear();
-            for (unsigned int i = 0; i < params.functionPoints.size(); ++i) {
-                FunctionSection section;
-                section.xBound = params.functionPoints[i].first;
-                if (i == 0) {
-                    section.a = 0.0f;
-                    section.b = params.functionPoints[i].second;
+            if (!params.functionPoints.empty()) {
+                brightnessFunction.clear();
+                for (unsigned int i = 0; i < params.functionPoints.size(); ++i) {
+                    FunctionSection section;
+                    section.xBound = params.functionPoints[i].first;
+                    if (i == 0) {
+                        section.a = 0.0f;
+                        section.b = params.functionPoints[i].second;
+                    }
+                    else {
+                        section.a = (params.functionPoints[i - 1].second - params.functionPoints[i].second) /
+                                    (params.functionPoints[i - 1].first - params.functionPoints[i].first);
+                        section.b =
+                            params.functionPoints[i - 1].second - section.a * params.functionPoints[i - 1].first;
+                    }
+                    brightnessFunction.push_back(section);
                 }
-                else {
-                    section.a = (params.functionPoints[i - 1].second - params.functionPoints[i].second) /
-                                (params.functionPoints[i - 1].first - params.functionPoints[i].first);
-                    section.b = params.functionPoints[i - 1].second - section.a * params.functionPoints[i - 1].first;
-                }
-                function.push_back(section);
             }
         }
     } // namespace
@@ -110,6 +126,9 @@ namespace sevm::light_control
     {
         controlTimer = std::make_unique<sys::Timer>("LightControlTimer", parent, CONTROL_TIMER_MS);
         readoutTimer = std::make_unique<sys::Timer>("LightSensorReadoutTimer", parent, READOUT_TIMER_MS);
+
+        Parameters params;
+        setAutomaticModeParameters(params);
     }
 
     void deinit()
@@ -126,6 +145,7 @@ namespace sevm::light_control
             bsp::light_sensor::standby();
             controlTimer->stop();
             readoutTimer->stop();
+            lightOn = false;
             break;
         case LightControlAction::turnOn:
             bsp::keypad_backlight::turnOnAll();
@@ -134,9 +154,12 @@ namespace sevm::light_control
             if (automaticMode) {
                 enableTimers();
             }
+            lightOn = true;
             break;
         case LightControlAction::enableAutomaticMode:
-            enableTimers();
+            if (lightOn) {
+                enableTimers();
+            }
             automaticMode = true;
             break;
         case LightControlAction::disableAutomaticMode:
@@ -150,22 +173,16 @@ namespace sevm::light_control
             bsp::eink_frontlight::setGammaFactor(params.gammaFactor);
             break;
         case LightControlAction::setAutomaticModeParameters:
+            if (lightOn && automaticMode) {
+                disableTimers();
+            }
             setAutomaticModeParameters(params);
+            if (lightOn && automaticMode) {
+                enableTimers();
+            }
             break;
         }
         return true;
-    }
-
-    void controlTimerCallback()
-    {
-        auto out = brightnessRampOut();
-        bsp::eink_frontlight::setBrightness(out);
-    }
-
-    void readoutTimerCallback()
-    {
-        float lightMeasurement = bsp::light_sensor::readout();
-        brightnessRampTarget   = calculateBrightness(lightMeasurement);
     }
 
 } // namespace sevm::light_control

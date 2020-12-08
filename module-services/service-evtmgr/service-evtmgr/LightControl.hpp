@@ -23,11 +23,12 @@ namespace sevm::light_control
         setAutomaticModeParameters
     };
 
-    using BrightnessFunction = std::vector<std::pair<float, float>>;
+    using BrightnessFunction =
+        std::vector<std::pair<bsp::light_sensor::IlluminanceLux, bsp::eink_frontlight::BrightnessPercentage>>;
 
     typedef struct
     {
-        bsp::eink_frontlight::BrightnessPercentage manualModeBrightness = 50;
+        bsp::eink_frontlight::BrightnessPercentage manualModeBrightness = 50.0f;
         BrightnessFunction functionPoints                               = BrightnessFunction({{0.0f, 50.0f}});
         unsigned int rampTimeMS                                         = 1500;
         float brightnessHysteresis                                      = 10.0f;
@@ -39,9 +40,5 @@ namespace sevm::light_control
     void deinit();
 
     bool processRequest(LightControlAction action, const Parameters &params);
-
-    void controlTimerCallback();
-
-    void readoutTimerCallback();
 
 } // namespace sevm::light_control

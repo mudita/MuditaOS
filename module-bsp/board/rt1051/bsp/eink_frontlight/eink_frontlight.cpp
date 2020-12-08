@@ -17,7 +17,7 @@ namespace bsp::eink_frontlight
 
         std::uint8_t gammaCorrection(BrightnessPercentage brightness)
         {
-            std::clamp(brightness, static_cast<std::uint8_t>(0), static_cast<std::uint8_t>(100));
+            std::clamp(brightness, 0.0f, 100.0f);
             return static_cast<std::uint8_t>(100 * std::pow((brightness / 100.0f), gammaFactor));
         }
 

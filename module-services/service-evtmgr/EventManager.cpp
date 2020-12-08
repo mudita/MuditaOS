@@ -319,10 +319,10 @@ sys::ReturnCodes EventManager::InitHandler()
 
 sys::ReturnCodes EventManager::DeinitHandler()
 {
+    sevm::light_control::deinit();
     EventWorker->close();
     EventWorker.reset();
     EventWorker = nullptr;
-    sevm::light_control::deinit();
 
     return sys::ReturnCodes::Success;
 }

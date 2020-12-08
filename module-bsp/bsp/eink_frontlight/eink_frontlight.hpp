@@ -16,7 +16,7 @@ namespace bsp::eink_frontlight
         setBrightness,
     };
 
-    using BrightnessPercentage = uint8_t;
+    using BrightnessPercentage = float;
 
     void init();
 
