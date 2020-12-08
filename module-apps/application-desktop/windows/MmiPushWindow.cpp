@@ -20,7 +20,7 @@ namespace style::desktop
     namespace text
     {
         constexpr uint32_t x = 40;
-        constexpr uint32_t y = 260;
+        constexpr uint32_t y = 300;
         constexpr uint32_t w = 400;
         constexpr uint32_t h = 135;
     } // namespace text
@@ -30,7 +30,6 @@ namespace style::desktop
 MmiPushWindow::MmiPushWindow(app::Application *app, const std::string &name) : gui::AppWindow(app, name)
 {
     AppWindow::buildInterface();
-
     topBar->setActive(TopBar::Elements::TIME, true);
     topBar->setActive(TopBar::Elements::SIM, false);
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
@@ -42,7 +41,7 @@ MmiPushWindow::MmiPushWindow(app::Application *app, const std::string &name) : g
     text->setEditMode(EditMode::Browse);
     text->setEdges(RectangleEdge::None);
     text->setFont(style::window::font::medium);
-    text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+    text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
     setTitle(utils::localize.get("app_desktop_info"));
 }
 
