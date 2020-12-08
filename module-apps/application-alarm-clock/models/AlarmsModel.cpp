@@ -4,8 +4,10 @@
 #include "AlarmsModel.hpp"
 #include "application-alarm-clock/widgets/AlarmItem.hpp"
 #include "application-alarm-clock/widgets/AlarmClockStyle.hpp"
-#include "application-alarm-clock/ApplicationAlarmClock.hpp"
+#include "application-alarm-clock/windows/AlarmClockOptions.hpp"
+#include "messages/OptionsWindow.hpp"
 #include <ListView.hpp>
+#include <InputEvent.hpp>
 
 namespace app::alarmClock
 {
@@ -52,6 +54,14 @@ namespace app::alarmClock
             }
             alarmsRepository->update(*record, nullptr);
             return true;
+        };
+        item->inputCallback = [this, record = record.get()](gui::Item &, const gui::InputEvent &event) {
+            if (event.isShortPress() && event.is(gui::KeyCode::KEY_LF)) {
+                application->switchWindow(utils::localize.get("app_alarm_clock_options_title"),
+                                          std::make_unique<gui::OptionsWindowOptions>(
+                                              alarmsListOptions(application, *record, *alarmsRepository)));
+            }
+            return false;
         };
         return item;
     }
