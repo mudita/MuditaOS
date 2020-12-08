@@ -19,7 +19,7 @@ then processed with brightness function mapping to obtain particular level of sc
 ## Brightness level function
 Brightness level [%] in relation to ambient light luminance level [Lux] is passed as 
 a vector of points wchich are automatically interpolated with linear function. `sevm::screen_light_control::Parameters::functionPoints` field is used for parametrization. These
-points have to be in ascending order. Example:
+points have to be in ascending order of luminance values. Example:
 
 ```
 sevm::screen_light_control::BrightnessFunction({{50.0f, 30.0f}, {150.0f, 80.0f}, {400.0f, 80.0f}, {700.0f, 40.0f}});
@@ -40,14 +40,15 @@ Hysteresis value is adjustable via API using `sevm::screen_light_control::Parame
 ![](light_control_hysteresis.svg "Hysteresis in ramp")
 
 ## Gamma correction
-Gamma correction is algorith to adjust change of the light intesivity in the way that it is perveied as linear by human eye.
-
-y(x) = scale*(x/scale) <sup>&gamma;</sup>
-
-Where &gamma; is parametrizable correction factor in `sevm::screen_light_control::Parameters::gammaFactor`.
+Gamma correction is an algorithm to adjust change of the light intesivity in the way that it is perceived as linear by human eye.
 
 ![](gamma_correction.svg "Human eye sensitivity")
 
+y(x) = scale*(x/scale) <sup>&gamma;</sup>
+
+Where &gamma; is parametrizable correction factor in `sevm::screen_light_control::Parameters::gammaFactor`. 
+
+
 ## Message API
 
-`sevm::ScreenLightControlMessage` is used to control the module. It takes action and data structure as parameters. Set of action is described in `sevm::screen_light_control::Action`.
+`sevm::ScreenLightControlMessage` is used to control the module. It takes action and data structure as parameters. Set of actions is described in `sevm::screen_light_control::Action`.
