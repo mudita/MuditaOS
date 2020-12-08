@@ -6,60 +6,56 @@
 namespace gui::visitor
 {
 
-    namespace names
+    enum Names
     {
-        constexpr inline auto item      = "Item";
-        constexpr inline auto rect      = "Rect";
-        constexpr inline auto label     = "Label";
-        constexpr inline auto text      = "Text";
-        constexpr inline auto topBar    = "TopBar";
-        constexpr inline auto bottomBar = "BottomBar";
-        constexpr inline auto window    = "Window";
-    } // namespace names
+        Item,
+        Rect,
+        Label,
+        Text,
+        TopBar,
+        BottomBar,
+        Window,
+        Children
+    };
 
-    namespace item
+    enum Item
     {
-        constexpr inline auto itemType      = "ItemType";
-        constexpr inline auto focus         = "Focus";
-        constexpr inline auto visible       = "Visible";
-        constexpr inline auto active        = "Active";
-        constexpr inline auto childrenCount = "ChildrenCount";
+        ItemType,
+        Focus,
+        Visible,
+        Active,
+        ChildrenCount,
+        WidgetArea,
+        WidgetMinimumArea,
+        WidgetMaximumArea,
+        DrawArea,
+        Padding,
+        Margins,
+        Alignment
+    };
 
-        constexpr inline auto widgetArea        = "WidgetArea";
-        constexpr inline auto widgetMinimumArea = "WidgetMinimumArea";
-        constexpr inline auto widgetMaximumArea = "WidgetMaximumArea";
-        constexpr inline auto drawArea          = "DrawArea";
-        constexpr inline auto padding           = "Padding";
-        constexpr inline auto margins           = "Margins";
-        constexpr inline auto alignment         = "Alignment";
-
-    } // namespace item
-
-    namespace rect
+    enum Rect
     {
-        constexpr inline auto borderColor   = "BorderColor";
-        constexpr inline auto fillColor     = "FillColor";
-        constexpr inline auto penWidth      = "PenWidth";
-        constexpr inline auto penFocusWidth = "PenFocusWidth";
-        constexpr inline auto filled        = "Filled";
-        constexpr inline auto edges         = "Edges";
-        constexpr inline auto flatEdges     = "FlatEdges";
-        constexpr inline auto corners       = "Corners";
-        constexpr inline auto yaps          = "Yaps";
-        constexpr inline auto yapSize       = "YapSize";
-    } // namespace rect
+        BorderColor,
+        FillColor,
+        PenWidth,
+        PenFocusWidth,
+        Filled,
+        Edges,
+        FlatEdges,
+        Corners,
+        Yaps,
+        YapSize,
+    };
 
-    namespace text
+    enum Text
     {
-        constexpr inline auto text       = "Text";
-        constexpr inline auto textLength = "TextLength";
-        constexpr inline auto textHight  = "TextHight";
-        constexpr inline auto textWidth  = "TextWidth";
-    } // namespace text
+        TextValue,
+    };
 
-    namespace window
+    enum Window
     {
-        constexpr inline auto name = "WindowName";
-    }
+        WindowName
+    };
 
 } // namespace gui::visitor

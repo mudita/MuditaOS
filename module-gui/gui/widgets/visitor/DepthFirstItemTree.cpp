@@ -21,9 +21,7 @@ auto DepthFirstItemTree::hasNext() const noexcept -> bool
 auto DepthFirstItemTree::getNext() noexcept -> gui::ItemNode
 {
     if (mode == TraverseMode::PostOrder) {
-        auto current = std::move(nodes.top());
-        nodes.pop();
-        return current;
+        return getNextInPostOrder();
     }
     return getNextInPreOrder();
 }
@@ -37,6 +35,13 @@ void DepthFirstItemTree::constructPostOrder(gui::Item *item, int level)
         nodes.push(gui::ItemNode(**child, level));
         constructPostOrder(*child, level + 1);
     }
+}
+
+auto DepthFirstItemTree::getNextInPostOrder() -> gui::ItemNode
+{
+    auto current = std::move(nodes.top());
+    nodes.pop();
+    return current;
 }
 
 auto DepthFirstItemTree::getNextInPreOrder() -> gui::ItemNode

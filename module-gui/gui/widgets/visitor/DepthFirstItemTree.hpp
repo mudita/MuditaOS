@@ -26,6 +26,7 @@ namespace gui
 
         void constructPostOrder(gui::Item *item, int level);
         [[nodiscard]] auto getNextInPreOrder() -> gui::ItemNode;
+        [[nodiscard]] auto getNextInPostOrder() -> gui::ItemNode;
     };
 
 } // namespace gui

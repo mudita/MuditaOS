@@ -4,18 +4,22 @@
 #pragma once
 
 #include "visitor/GuiVisitor.hpp"
-#include "visitor/ItemWalker.hpp"
 #include <module-utils/json/json11.hpp>
 #include <list>
 
 namespace gui
 {
     class ItemNode;
+    class BoundingBox;
+    class Color;
 
     class Item2JsonSerializingVisitor : public GuiVisitor
     {
-        json11::Json::array sink;
+        json11::Json::object sink;
         std::string itemName;
+
+        auto serialize(gui::BoundingBox &box) -> json11::Json::array;
+        auto serialize(gui::Color &color) -> json11::Json::array;
 
         void visit(gui::Item &item) override;
         void visit(gui::Rect &item) override;
@@ -26,11 +30,11 @@ namespace gui
         void visit(gui::TopBar &item) override;
 
       public:
-        [[nodiscard]] auto getState() -> json11::Json::array
+        [[nodiscard]] auto moveState() noexcept -> json11::Json::object
         {
             return std::move(sink);
         }
-        [[nodiscard]] auto getName() -> std::string
+        [[nodiscard]] auto moveName() noexcept -> std::string
         {
             return std::move(itemName);
         }
