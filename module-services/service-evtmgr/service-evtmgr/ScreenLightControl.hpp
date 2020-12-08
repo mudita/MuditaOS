@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 
+/// Screen light control
 namespace sevm::screen_light_control
 {
     /// Set of actions to control the screen light
