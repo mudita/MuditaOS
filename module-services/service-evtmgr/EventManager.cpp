@@ -279,7 +279,7 @@ sys::ReturnCodes EventManager::InitHandler()
         return response;
     });
 
-    connect(sevm::ScreenLightControlMessage(), [&](sys::Message *msgl) {
+    connect(sevm::ScreenLightControlMessage(sevm::screen_light_control::Action::turnOff), [&](sys::Message *msgl) {
         auto request = static_cast<sevm::ScreenLightControlMessage *>(msgl);
         sevm::screen_light_control::processRequest(request->action, request->parameters);
         return std::make_shared<sys::ResponseMessage>();

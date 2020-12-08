@@ -146,7 +146,9 @@ namespace sevm
     class ScreenLightControlMessage : public Message
     {
       public:
-        ScreenLightControlMessage() : Message(MessageType::EVMScreenLightControlMessage)
+        ScreenLightControlMessage(screen_light_control::Action act,
+                                  screen_light_control::Parameters params = screen_light_control::Parameters())
+            : Message(MessageType::EVMScreenLightControlMessage), action(act), parameters(params)
         {}
 
         screen_light_control::Action action;
