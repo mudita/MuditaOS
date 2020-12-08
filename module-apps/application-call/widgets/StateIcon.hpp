@@ -37,12 +37,14 @@ namespace gui
     /// @note Desired visible area is icon::w x icon::h. However, the whole widget area might be set to bigger one w x
     /// icon::h where w = icon::w + 2 * w_margin. It is necessary as it is possible that text will exceed Icon visible
     /// area
-    template <class T> class Icon : public Rect
+
+    template <class T> class [[deprecated("Class to be merged with Icon.hpp")]] StateIcon : public Rect
     {
       public:
         using IconMap = std::map<T, std::pair<const std::string, const std::string>>;
-        Icon()        = delete;
-        Icon(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w_margin, T state, const IconMap &data)
+        StateIcon()   = delete;
+        StateIcon(
+            Item * parent, const uint32_t &x, const uint32_t &y, const uint32_t &w_margin, T state, const IconMap &data)
             : Rect(parent, x, y, icon::w + 2 * w_margin, icon::h), data(data)
         {
             setEdges(RectangleEdge::None);
@@ -62,10 +64,8 @@ namespace gui
             set(state);
         }
 
-        virtual ~Icon()
-        {
-  
-        }
+        virtual ~StateIcon()
+        {}
 
         /// @brief sets Icon state and display appropriate image and string
         /// @param state to set. @note state is also used as a key to the internal map. If the state points to the

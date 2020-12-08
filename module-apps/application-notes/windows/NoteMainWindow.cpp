@@ -19,6 +19,8 @@
 #include <module-apps/application-notes/style/NotesListStyle.hpp>
 #include <module-apps/application-notes/style/NotesMainWindowStyle.hpp>
 
+#include <module-services/service-db/service-db/DBNotificationMessage.hpp>
+
 namespace app::notes
 {
     NoteMainWindow::NoteMainWindow(app::Application *app,
@@ -103,7 +105,9 @@ namespace app::notes
             onEmptyList();
             return true;
         };
-        emptyListIcon->setVisible(false);
+
+        list->emptyListCallback    = [this]() { onEmptyList(); };
+        list->notEmptyListCallback = [this]() { onListFilled(); };
 
         setFocusItem(list);
     }
@@ -119,35 +123,11 @@ namespace app::notes
         emptyListIcon   = nullptr;
     }
 
-    void NoteMainWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
-    {
-        if (presenter->isNoteListEmpty()) {
-            showEmptyIcon();
-        }
-        else {
-            showList();
-        }
-    }
-
-    void NoteMainWindow::showEmptyIcon()
-    {
-        list->setVisible(false);
-        emptyListIcon->setVisible(true);
-        setFocusItem(emptyListIcon);
-    }
-
-    void NoteMainWindow::showList()
-    {
-        list->rebuildList();
-        list->setVisible(true);
-        emptyListIcon->setVisible(false);
-        setFocusItem(list);
-    }
-
     void NoteMainWindow::onEmptyList()
     {
         bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
+        emptyListIcon->setVisible(true);
         rightArrowImage->setVisible(false);
         searchImage->setVisible(false);
     }
@@ -156,6 +136,7 @@ namespace app::notes
     {
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+        emptyListIcon->setVisible(false);
         rightArrowImage->setVisible(true);
         searchImage->setVisible(true);
     }
@@ -174,9 +155,19 @@ namespace app::notes
         return AppWindow::onInput(inputEvent);
     }
 
-    bool NoteMainWindow::onDatabaseMessage(sys::Message *msgl)
+    bool NoteMainWindow::onDatabaseMessage(sys::Message *msg)
     {
-        auto *msg = static_cast<DBNotesResponseMessage *>(msgl);
-        return presenter->updateNotes(std::move(*msg->records));
+        auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msg);
+        if (msgNotification != nullptr) {
+            if (msgNotification->interface == db::Interface::Name::Notes) {
+                if (msgNotification->dataModified()) {
+
+                    list->rebuildList(::style::listview::RebuildType::InPlace);
+
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 } // namespace app::notes

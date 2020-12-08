@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "../ApplicationCall.hpp"
-#include "../widgets/Icons.hpp"
+#include "application-call/ApplicationCall.hpp"
+#include "application-call/widgets/StateIcons.hpp"
 
 #include <Application.hpp>
 #include <AppWindow.hpp>

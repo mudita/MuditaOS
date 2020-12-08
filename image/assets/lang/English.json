@@ -58,6 +58,7 @@
   "common_today": "Today",
   "common_results_prefix": "Results: ",
   "common_search": "SEARCH",
+  "common_empty_list": "Default Info: No elements on list.",
   "locale_12hour_min": "%I:%M %p",
   "locale_24hour_min": "%H:%M",
   "locale_date_full": "%m/%d/%y",

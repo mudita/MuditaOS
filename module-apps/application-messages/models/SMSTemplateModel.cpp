@@ -69,7 +69,7 @@ auto SMSTemplateModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     // If list record count has changed we need to rebuild list.
     if (recordsCount != (msgResponse->getCount())) {
         recordsCount = msgResponse->getCount();
-        list->rebuildList(style::listview::RebuildType::Full, 0, true);
+        list->reSendLastRebuildRequest();
         return false;
     }
 
