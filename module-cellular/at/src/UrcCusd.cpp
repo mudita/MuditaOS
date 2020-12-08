@@ -7,6 +7,10 @@
 
 using namespace at::urc;
 
+Cusd::Cusd(const std::string &urcBody, const std::string &urcHead) : Urc(urcBody, urcHead)
+{
+    split(urcBody);
+}
 auto Cusd::isValid() const noexcept -> bool
 {
     return tokens.size() == magic_enum::enum_count<Tokens>();
@@ -69,4 +73,29 @@ auto Cusd::getDCS() const noexcept -> std::optional<int>
     }
 
     return dcs;
+}
+void Cusd::split(const std::string &str)
+{
+    constexpr auto commaString    = ",";
+    constexpr char tokenDelimiter = '\"';
+
+    tokens = utils::split(str, tokenDelimiter);
+    for (auto &t : tokens) {
+        utils::findAndReplaceAll(t, "\"", "");
+        t = utils::trim(t);
+    }
+
+    auto dcs       = tokens[Tokens::DCS];
+    auto dcsTokens = utils::split(dcs, commaString);
+
+    if (dcsTokens.size() > 1) {
+        tokens.pop_back();
+        for (auto el : dcsTokens) {
+            tokens.push_back(el);
+        }
+    }
+    for (auto &t : tokens) {
+        utils::findAndReplaceAll(t, commaString, "");
+        t = utils::trim(t);
+    }
 }

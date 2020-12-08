@@ -69,7 +69,6 @@ class CellularNotificationMessage : public CellularMessage
         RawCommand,               // send raw command to modem -> returns raw, tokenised result
         PowerDownDeregistering,   // modem informed it has started to disconnect from network
         PowerDownDeregistered,    // modem informed it has disconnected from network
-        NewIncomingUSSD,          // modem received new ussd code from network
         SMSDone,                  // SMS initialization finished
     };
 
