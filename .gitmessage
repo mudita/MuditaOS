@@ -22,7 +22,7 @@
 # https://chris.beams.io/posts/git-commit/
 #
 # 1. Separate subject from body with a blank line
-# 2. Limit the subject line to 80 characters
+# 2. Limit the subject line to 72 characters
 # 3. Capitalize the subject line
 # 4. Do not end the subject line with a period
 # 5. Use the imperative mood in the subject line
