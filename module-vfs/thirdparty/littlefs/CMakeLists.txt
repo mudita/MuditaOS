@@ -1,9 +1,11 @@
-include(thirdparty)
+cmake_minimum_required(VERSION 3.14)
 
-set(LIBLITTLEFS_TARGET littlefs)
+project(littlefs LANGUAGES C)
 
+include(thirdparty OPTIONAL)
 
-set(LIBLITTLEFS_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/littlefs)
+set(LIBLITTLEFS_SRCDIR littlefs)
+set(LIBLITTLEFS_TARGET ${PROJECT_NAME})
 
 set(LIBLITTLEFS_SOURCES
         ${LIBLITTLEFS_SRCDIR}/lfs.c
@@ -18,7 +20,10 @@ set( LIBLITTLEFS_PRIVATE_INCLUDES ${LIBLITTLEFS_SRCDIR}/bd)
 
 
 add_library( ${LIBLITTLEFS_TARGET} STATIC ${LIBLITTLEFS_SOURCES} )
-third_party_target_setup( ${LIBLITTLEFS_TARGET} )
+
+if( COMMAND third_party_target_setup )
+    third_party_target_setup( ${LIBLITTLEFS_TARGET} )
+endif()
 
 target_include_directories( ${LIBLITTLEFS_TARGET}
         PUBLIC
@@ -26,5 +31,6 @@ target_include_directories( ${LIBLITTLEFS_TARGET}
         PRIVATE
         ${LIBLITTLEFS_PRIVATE_INCLUDES}
 )
-
-third_party_source_optimization( ${LIBLITTLEFS_SOURCES} )
+if( COMMAND third_party_source_optimization )
+    third_party_source_optimization( ${LIBLITTLEFS_SOURCES} )
+endif()

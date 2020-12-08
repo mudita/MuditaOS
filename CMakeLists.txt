@@ -33,6 +33,7 @@ if (${ENABLE_TESTS})
 	add_subdirectory(test)
 endif ()
 
+add_subdirectory(host-tools)
 add_custom_target(assets)
 
 # setting build flags
@@ -219,6 +220,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 	add_dependencies(check ${FAT_IMAGE}-target)
     install(TARGETS ${CMAKE_PROJECT_NAME} DESTINATION "./")
 endif()
+
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     set(HEX_FILE ${CMAKE_PROJECT_NAME}.hex)
