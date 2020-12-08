@@ -44,9 +44,12 @@ Gamma correction is an algorithm to adjust change of the light intesivity in the
 
 ![](gamma_correction.svg "Human eye sensitivity")
 
+Gamma correction is described by formula:
+
 y(x) = scale*(x/scale) <sup>&gamma;</sup>
 
-Where &gamma; is parametrizable correction factor in `sevm::screen_light_control::Parameters::gammaFactor`. 
+Where &gamma; is parametrizable correction factor in `sevm::screen_light_control::Parameters::gammaFactor`. Scale is used to normalize x value to 0-1 range.
+Default value of &gamma; is 2.5 . For leds this factor could be in range 2.2-2.8.
 
 
 ## Message API
