@@ -28,6 +28,8 @@ class FileIndexerAgent : public DatabaseAgent
     auto handleSetProperties(sys::Message *req) -> sys::MessagePointer;
     auto handleGetRecord(sys::Message *req) -> sys::MessagePointer;
     auto handleSetRecord(sys::Message *req) -> sys::MessagePointer;
+    auto handleDeleteFile(sys::Message *req) -> sys::MessagePointer;
+    auto handleDeleteAllFilesInDir(sys::Message *req) -> sys::MessagePointer;
 
     using MapOfRecipentsToBeNotified = std::map<std::string, std::set<std::string>>;
     MapOfRecipentsToBeNotified fileChangeRecipents;
@@ -44,8 +46,11 @@ class FileIndexerAgent : public DatabaseAgent
     auto dbGetAllProperties(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> FileIndexer::FileMetadata;
     auto dbGetRecord(std::unique_ptr<FileIndexer::FileRecord> record) -> FileIndexer::FileRecord;
     auto dbSetRecord(std::unique_ptr<FileIndexer::FileRecord> record) -> bool;
+    auto dbDeleteFile(std::unique_ptr<FileIndexer::FileRecord> record) -> bool;
+    auto dbDeleteAllFilesInDir(std::unique_ptr<FileIndexer::FileRecord> record) -> bool;
     auto dbUpdateRecord(std::unique_ptr<FileIndexer::FileRecord> record) -> bool;
     auto getDbInitString() -> const std::string override;
     auto getDbFilePath() -> const std::string override;
     auto dbGetFilesCount() -> unsigned int;
+    auto dbGeMetadataCount() -> unsigned int;
 };
