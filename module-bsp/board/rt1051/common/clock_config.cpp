@@ -155,9 +155,9 @@ void BOARD_BootClockRUN(void)
 
     /* Set PERCLK_PODF. */
     /* IPG_CLK_ROOT/2 */
-    CLOCK_SetDiv(kCLOCK_PerclkDiv, 1); // CSCMR1
+    CLOCK_SetDiv(kCLOCK_PerclkDiv, 0); // CSCMR1
     /* Set per clock source. */
-    CLOCK_SetMux(kCLOCK_PerclkMux, 0); // CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
+    CLOCK_SetMux(kCLOCK_PerclkMux, 1); // CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
 
     /* Set USDHC1_PODF. */
     CLOCK_SetDiv(kCLOCK_Usdhc1Div, 1); // CSCDR1
@@ -1453,9 +1453,9 @@ void LPM_EnterFullSpeed(void)
 
     /* Set PERCLK_PODF. */
     /* IPG_CLK_ROOT/2 */
-    CLOCK_SetDiv(kCLOCK_PerclkDiv, 1); // CSCMR1
+    CLOCK_SetDiv(kCLOCK_PerclkDiv, 0); // CSCMR1
     /* Set per clock source. */
-    CLOCK_SetMux(kCLOCK_PerclkMux, 0); // CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
+    CLOCK_SetMux(kCLOCK_PerclkMux, 1); // CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
 
     clkPLL2setup(CLK_ENABLE);
     CLOCK_SetMux(kCLOCK_SemcMux, 1);
