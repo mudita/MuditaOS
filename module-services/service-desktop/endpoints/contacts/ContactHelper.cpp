@@ -77,7 +77,8 @@ auto ContactHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
     }
 
     auto limit = context.getBody()[json::contacts::count].int_value();
-    auto query = std::make_unique<db::query::ContactGet>(0, limit, "");
+    auto offset = context.getBody()[json::contacts::offset].int_value();
+    auto query  = std::make_unique<db::query::ContactGet>(offset, limit, "");
 
     auto listener = std::make_unique<db::EndpointListener>(
         [](db::QueryResult *result, Context context) {
