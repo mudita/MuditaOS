@@ -43,6 +43,7 @@ namespace parserFSM
     namespace json::contacts
     {
         inline constexpr auto count           = "count";
+        inline constexpr auto offset          = "offset";
         inline constexpr auto primaryName     = "priName";
         inline constexpr auto alternativeName = "altName";
         inline constexpr auto address         = "address";
