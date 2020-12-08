@@ -1,5 +1,5 @@
 # Title: [JIRA-TICKET] Summary, imperative, start upper case, don't end with a period
-# No more than 80 chars. ################################## 80 chars is here: #
+# No more than 72 chars. ########################### 72 chars is here: #
 <Title>
 # Remember blank line between title and domains.
 
@@ -28,4 +28,3 @@
 # 5. Use the imperative mood in the subject line
 # 6. Wrap the body at 80 characters
 # 7. Use the body to explain what and why vs. how
-
