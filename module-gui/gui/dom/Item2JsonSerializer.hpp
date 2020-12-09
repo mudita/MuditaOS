@@ -22,6 +22,8 @@ namespace gui
         void handleOther(gui::ItemNode &node, prototype &doc, int &level);
 
       public:
+        /// On traverse all `gui::Item`-based classes in the parent-children tree of given root will be serialized into
+        /// JSON format and kept in `document`.
         void traverse(gui::Item &root);
         void dump(std::ostream &stream);
     };

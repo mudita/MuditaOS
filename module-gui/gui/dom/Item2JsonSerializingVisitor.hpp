@@ -13,6 +13,8 @@ namespace gui
     class BoundingBox;
     class Color;
 
+    /// Visitor serializing a single object of a class in a `gui::Item`'s inheritance hierarchy into the JSON format. On
+    /// each visit, acceptor is serialized with a result appended into the `sink`.
     class Item2JsonSerializingVisitor : public GuiVisitor
     {
         json11::Json::object sink;
@@ -30,10 +32,12 @@ namespace gui
         void visit(gui::TopBar &item) override;
 
       public:
+        /// retrieves current state of the `sink`. The state of the `sink` after call is default-initialized
         [[nodiscard]] auto moveState() noexcept -> json11::Json::object
         {
             return std::move(sink);
         }
+        /// retrieves name of a object's type that was serialized.
         [[nodiscard]] auto moveName() noexcept -> std::string
         {
             return std::move(itemName);

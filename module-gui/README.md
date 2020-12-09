@@ -95,3 +95,90 @@ There are 2 set of parameters for key press:
 
 Now you can use `InputMode::Mode::phone` translation in `gui::Text` widget.
 This means `gui::Text` will automatically change text on key press for you, same as in modes `InputMode::Mode::phone` etc.
+
+# Adding new functionalities - Visitor pattern in `gui::Item`
+
+The `gui::Item` class is compatible with visitor pattern providing double dispatch behaviour.
+The double dispatch mechanism enables, for all classes in `gui::Item`'s inheritance hierarchy, to easily equip them with new polymorphic behavior without changing classes themselves.
+
+## Structure
+
+Every new functionality to be added to `gui::Item` hierarchy requires creation of new concrete visitor that publicly inherits from `gui::GuiVisitor` interface and specify respective behavior.
+In order to ensure that a class in `gui::Item` hierarchy is recognized by it's concrete type in `ConcreteVisitor::visit(...)` method, class must override `gui::Item::accept(gui::GuiVisitor &)`,
+otherwise it will be resolved as a closest ancestor. On the diagram below both `gui::CustomItem1` and `gui::CustomItem2` will be resolved as `gui::Rect`
+despite existing `gui::GuiVisitor::visit(gui::CustomItem2 &)` overload and `gui::CustomItem1::accept(...)` override.
+
+![Simplified UI](./doc/visitor_item_structure.svg "Visitor-Item structure")
+
+## Tree of `gui::Item`
+
+Each a `gui::Item` object is used as a node to build UI general tree.
+That relation is simplest thought of as a tree of dependencies with a node being a parent of zero, one or more other nodes.
+Concerning need of a `ConcreteVisitors` to visit not only parent but also all it's children,
+`gui::ItemTree` is an interface class providing abstract interface for implementation of `gui::Item` tree traversal.
+The concrete realization of `gui::ItemTree` is `gui::DepthFirstItemTree`.
+
+![Simplified UI](./doc/item_tree.svg "ItemTree structure")
+
+### Depth-First tree of `gui::Item`
+
+`gui::DepthFirstItemTree` builds tree of parent-children relation for any `gui::Item` pointed as the root.
+The class offers two traverse modes:
+* `PreOrder` - in this mode a parent is precedes all it's children
+* `PostOrder` - in this mode all children precede it's parent
+
+## Example
+
+![Simplified UI](./doc/visitor_item_example.svg "Visitor-Item  example")
+
+# Domain Object Model of `gui::Item`
+
+Each `gui::Item` object can be serialized into json-formatted stream using `gui::Item2JsonSerializer`.
+The serializing class employs dedicated `gui::Item2JsonSerializingVisitor`, `gui::DepthFirstItemTree` in `PostOrder` mode 
+in a sequence flow analogous to the one presented above. Below exemplary fragment of DOM serialization output is presented.
+```asm
+{"Rect": {
+    "Active": true, 
+    "BorderColor": [0, 0], 
+    "Children": [
+        {"Label": {
+            "Active": true, 
+            "BorderColor": [0, 0], 
+            "ChildrenCount": 0, 
+            "Corners": 240, 
+            "DrawArea": [20, 445, 440, 30], 
+            "Edges": 0, 
+            "FillColor": [15, 15], 
+            "Filled": false, 
+            "FlatEdges": 0, 
+            "Focus": false, 
+            "ItemType": 0, 
+            "PenFocusWidth": 2, 
+            "PenWidth": 1, 
+            "TextValue": "Interval Chime", 
+            "Visible": true, 
+            "WidgetArea": [0, 0, 440, 30], 
+            "WidgetMaximumArea": [0, 0, 440, 30], 
+            "WidgetMinimumArea": [0, 0, 440, 30], 
+            "YapSize": 10, "Yaps": 0}
+        },
+        {"Label": {...}}
+    ], 
+    "ChildrenCount": 2, 
+    "Corners": 240, 
+    "DrawArea": [20, 445, 440, 60], 
+    "Edges": 0, 
+    "FillColor": [15, 15], 
+    "Filled": false, 
+    "FlatEdges": 0, 
+    "Focus": true, 
+    "ItemType": 0, 
+    "PenFocusWidth": 2, 
+    "PenWidth": 1, 
+    "Visible": true, 
+    "WidgetArea": [20, 445, 440, 60], 
+    "WidgetMaximumArea": [0, 0, 440, 60], 
+    "WidgetMinimumArea": [0, 0, 440, 60], 
+    "YapSize": 10, "Yaps": 0}
+}
+```
