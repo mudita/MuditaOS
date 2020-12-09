@@ -1,3 +1,6 @@
+-- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+-- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 -- ----------- insert default values ----------------------
 INSERT OR REPLACE INTO dictionary_tab (path, value) VALUES
     ('system/phone_mode', 'online'),
