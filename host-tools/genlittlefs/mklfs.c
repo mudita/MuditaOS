@@ -1,49 +1,5 @@
-/*
- * Copyright (C) 2015 - 2020, IBEROXARXA SERVICIOS INTEGRALES, S.L.
- * Copyright (C) 2015 - 2020, Jaume Olivé Petrus (jolive@whitecatboard.org)
- *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the <organization> nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *     * The WHITECAT logotype cannot be changed, you can remove it, but you
- *       cannot change it in any way. The WHITECAT logotype is:
- *
- *          /\       /\
- *         /  \_____/  \
- *        /_____________\
- *        W H I T E C A T
- *
- *     * Redistributions in binary form must retain all copyright notices printed
- *       to any local or remote output device. This include any reference to
- *       Lua RTOS, whitecatboard.org, Lua, and other copyright notices that may
- *       appear in the future.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * Lua RTOS, a tool for make a LFS file system image
- *
- */
-
 #include "lfs.h"
+#include "parse_partitions.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -57,30 +13,7 @@
 
 static struct lfs_config cfg;
 static lfs_t lfs;
-static uint8_t *data;
 
-static int lfs_read(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
-{
-    memcpy(buffer, data + (block * c->block_size) + off, size);
-    return 0;
-}
-
-static int lfs_prog(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, const void *buffer, lfs_size_t size)
-{
-    memcpy(data + (block * c->block_size) + off, buffer, size);
-    return 0;
-}
-
-static int lfs_erase(const struct lfs_config *c, lfs_block_t block)
-{
-    memset(data + (block * c->block_size), 0, c->block_size);
-    return 0;
-}
-
-static int lfs_sync(const struct lfs_config *c)
-{
-    return 0;
-}
 
 static void create_dir(char *src)
 {
@@ -230,6 +163,7 @@ static int to_int(const char *s)
 
 int main(int argc, char **argv)
 {
+
     char *src = NULL;   // Source directory
     char *dst = NULL;   // Destination image
     int c;              // Current option
@@ -238,6 +172,13 @@ int main(int argc, char **argv)
     int prog_size  = 0; // Prog size
     int fs_size    = 0; // File system size
     int err;
+
+    size_t elems;
+    struct partition *parts = find_partitions("PurePhone.img", scan_all_partitions, &elems);
+    for (size_t i = 0; i < elems; ++i) {
+        printf("Start %li end %li type %i\n", parts[i].start, parts[i].end, parts[i].type);
+    }
+    free(parts);
 
     while ((c = getopt(argc, argv, "c:i:b:p:r:s:")) != -1) {
         switch (c) {
@@ -272,12 +213,6 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    // Mount the file system
-    cfg.read  = lfs_read;
-    cfg.prog  = lfs_prog;
-    cfg.erase = lfs_erase;
-    cfg.sync  = lfs_sync;
-
     cfg.block_size     = block_size;
     cfg.read_size      = read_size;
     cfg.prog_size      = prog_size;
@@ -287,12 +222,24 @@ int main(int argc, char **argv)
     cfg.cache_size     = block_size;
     cfg.block_cycles   = 512;
 
+    /*
+    FILE *img = fopen(dst, "wb+");
+
+    if (!img) {
+        fprintf(stderr, "can't create image file: errno=%d (%s)\r\n", errno, strerror(errno));
+        return -1;
+    }
+
+    fwrite(data, 1, fs_size, img);
+
+    fclose(img);
+
     data = calloc(1, fs_size);
     if (!data) {
         fprintf(stderr, "no memory for mount\r\n");
         return -1;
     }
-
+*/
     err = lfs_format(&lfs, &cfg);
     if (err < 0) {
         fprintf(stderr, "format error: error=%d\r\n", err);
@@ -307,16 +254,6 @@ int main(int argc, char **argv)
 
     compact(src);
 
-    FILE *img = fopen(dst, "wb+");
-
-    if (!img) {
-        fprintf(stderr, "can't create image file: errno=%d (%s)\r\n", errno, strerror(errno));
-        return -1;
-    }
-
-    fwrite(data, 1, fs_size, img);
-
-    fclose(img);
 
     return 0;
 }
