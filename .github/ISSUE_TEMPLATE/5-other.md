@@ -1,6 +1,6 @@
 ---
 name: "⚠️ Create other issue"
-about: Create a new issue that doesn't fit any of the above categories (e.g. test-related issues, infrastructure issues, etc.)
+about: Create a new issue that doesn't fit any of the above categories (e.g. test-related issues, infrastructure issues, design issues etc.)
 
 ---
 
