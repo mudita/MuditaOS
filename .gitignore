@@ -52,3 +52,7 @@ tags
 .ycm_extra_conf.py
 
 update/
+
+# build in docker files
+.ccache/
+.bash_history

@@ -1,3 +1,6 @@
+-- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+-- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 BEGIN TRANSACTION;
 INSERT OR REPLACE INTO "sms" ("_id","thread_id","contact_id","date","date_send","error_code","body","type") VALUES (1,1,1,1547465101,1,1,'najstarsze odb fsjdklafjskldjf',4);
 INSERT OR REPLACE  INTO "sms" ("_id","thread_id","contact_id","date","date_send","error_code","body","type") VALUES (2,1,1,1547468701,2,2,'wys',8);

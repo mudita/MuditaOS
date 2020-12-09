@@ -1,6 +1,5 @@
-//
-// Created by mati on 09.09.2019.
-//
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_LINUXLPM_H
 #define PUREPHONE_LINUXLPM_H
