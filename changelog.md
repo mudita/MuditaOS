@@ -4,6 +4,7 @@
 
 ### Added
 
+* Add GUI visitor and DOM documentation.
 * `[PowerManagement]` Critial battery level notification to SystemManager.
 * `[Bluetooth]`  Add settings storage to bluetooth related items
 * Add Bluetooth virtual audio device.
