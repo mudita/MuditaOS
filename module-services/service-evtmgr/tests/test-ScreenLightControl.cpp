@@ -55,21 +55,21 @@ TEST_CASE("ScreenLightControl")
     SECTION("Turn on and off")
     {
         INFO("Check if system off");
-        REQUIRE(!bsp::eink_frontlight::isOn);
-        REQUIRE(!bsp::light_sensor::isOn);
+        CHECK(!bsp::eink_frontlight::isOn);
+        CHECK(!bsp::light_sensor::isOn);
 
         INFO("Command TurnOn and check");
         Action act = Action::turnOn;
         Parameters defaultParams;
         processRequest(act, defaultParams);
-        REQUIRE(bsp::eink_frontlight::isOn);
-        REQUIRE(bsp::light_sensor::isOn);
+        CHECK(bsp::eink_frontlight::isOn);
+        CHECK(bsp::light_sensor::isOn);
 
         INFO("Command TurnOff and check");
         act = Action::turnOff;
         processRequest(act, defaultParams);
-        REQUIRE(!bsp::eink_frontlight::isOn);
-        REQUIRE(!bsp::light_sensor::isOn);
+        CHECK(!bsp::eink_frontlight::isOn);
+        CHECK(!bsp::light_sensor::isOn);
     }
 
     SECTION("Set manual brigthness")
@@ -80,7 +80,7 @@ TEST_CASE("ScreenLightControl")
         const bsp::eink_frontlight::BrightnessPercentage testVal = 21.37f;
         params.manualModeBrightness                              = testVal;
         processRequest(act, params);
-        REQUIRE(bsp::eink_frontlight::actualBrightness == testVal);
+        CHECK(bsp::eink_frontlight::actualBrightness == testVal);
     }
 
     SECTION("Automatic mode ramp an hsyteresis test")
@@ -105,7 +105,7 @@ TEST_CASE("ScreenLightControl")
         for (int i = 0; i < cyclesPerRamp; ++i) {
             controlTimerCallback();
         }
-        REQUIRE(bsp::eink_frontlight::actualBrightness == testVal);
+        CHECK(bsp::eink_frontlight::actualBrightness == testVal);
 
         INFO("Hysteresis preventing the change");
         bsp::light_sensor::measurement = 9.5f;
@@ -114,7 +114,7 @@ TEST_CASE("ScreenLightControl")
             controlTimerCallback();
         }
         // No change due to hysteresis
-        REQUIRE(bsp::eink_frontlight::actualBrightness == testVal);
+        CHECK(bsp::eink_frontlight::actualBrightness == testVal);
 
         INFO("Out of hysteresis");
         bsp::light_sensor::measurement = 110.0f;
@@ -122,10 +122,10 @@ TEST_CASE("ScreenLightControl")
         for (int i = 0; i < cyclesPerRamp; ++i) {
             controlTimerCallback();
         }
-        REQUIRE(bsp::eink_frontlight::actualBrightness == 0);
+        CHECK(bsp::eink_frontlight::actualBrightness == 0);
     }
 
-    SECTION("Brigthness funtcion check")
+    SECTION("Brigthness function check")
     {
         INFO("Setup automatic mode and iterate through points");
         Action act = Action::setAutomaticModeParameters;
@@ -161,7 +161,7 @@ TEST_CASE("ScreenLightControl")
             }
             INFO("Measurement:" << point.first << " Expected:" << point.second
                                 << " Actual:" << bsp::eink_frontlight::actualBrightness);
-            REQUIRE(bsp::eink_frontlight::actualBrightness == point.second);
+            CHECK(bsp::eink_frontlight::actualBrightness == point.second);
         }
     }
 
