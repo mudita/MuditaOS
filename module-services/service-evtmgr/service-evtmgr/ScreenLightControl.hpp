@@ -9,7 +9,8 @@
 #include <memory>
 #include <vector>
 
-/// Screen light control
+/// Screen light control algorithm. Automatic/Manual mode of operation.
+/// Processing of ambient light sensor input to screen brightness output.
 namespace sevm::screen_light_control
 {
     /// Set of actions to control the screen light
