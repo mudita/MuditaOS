@@ -94,8 +94,15 @@ void Cusd::split(const std::string &str)
             tokens.push_back(el);
         }
     }
+    uint32_t token = 0;
     for (auto &t : tokens) {
-        utils::findAndReplaceAll(t, commaString, "");
-        t = utils::trim(t);
+        LOG_INFO("                                                           Token :%lu", token);
+        if (token != static_cast<uint32_t>(Tokens::Response)) {
+            LOG_INFO("                                                           Token przyciety");
+            utils::findAndReplaceAll(t, commaString, "");
+            t = utils::trim(t);
+        }
+        LOG_INFO("                                                           Token %s", t.c_str());
+        token += 1;
     }
 }

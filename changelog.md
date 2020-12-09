@@ -41,6 +41,7 @@
 * Fix too many time options in the meditation application.
 * Fix default counter settings.
 * Fix displaying the special characters in a note title.
+* Fixed CUSD URC parser.
 
 ### Other
 
