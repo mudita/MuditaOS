@@ -1,0 +1,57 @@
+@startuml
+
+abstract class gui::GuiVisitor
+{
+    void visit(gui::Item &item)
+    void visit(gui::Rect &item)
+    void visit(gui::Text &item)
+    ... visit overloads ...
+    void visit(gui::CustomItem2 &item)
+}
+
+class gui::ConcreteVisitor1
+{
+    void visit(gui::Item &item)
+    void visit(gui::Rect &item)
+    void visit(gui::Text &item)
+    ... visit overloads ...
+    void visit(gui::CustomItem2 &item)
+}
+
+class gui::ConcreteVisitor2
+{
+    void visit(gui::Item &item)
+    void visit(gui::Rect &item)
+    void visit(gui::Text &item)
+    ... visit overloads ...
+    void visit(gui::CustomItem2 &item)
+}
+
+gui::GuiVisitor <|-- gui::ConcreteVisitor1
+gui::GuiVisitor <|-- gui::ConcreteVisitor2
+
+class gui::Item
+{
+    void accept(gui::GuiVisitor &visitor)
+}
+class gui::Rect
+{
+    void accept(gui::GuiVisitor &visitor)
+}
+class gui::Text
+{
+    void accept(gui::GuiVisitor &visitor)
+}
+class gui::CustomItem1
+{
+    void accept(gui::GuiVisitor &visitor)
+}
+class gui::CustomItem2
+{
+}
+
+gui::Item <|-- gui::Rect
+gui::Rect <|-- gui::Text
+gui::Rect <|-- gui::CustomItem1
+gui::Rect <|-- gui::CustomItem2
+@enduml

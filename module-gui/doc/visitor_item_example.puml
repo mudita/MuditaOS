@@ -1,0 +1,47 @@
+@startuml
+
+participant "ConcreteTree" as ct
+participant "ConcreteWalker" as cw
+participant "ConcreteVisitor" as cv
+participant "gui::Item" as item
+
+
+[o->cw : traverse(root)
+    create ct
+        activate cw #DarkGreen
+    ct <- cw : <<create>>(root)
+    activate ct #DarkGreen
+
+        create cv
+        cw -> cv : <<create>>
+            activate cv #DarkGreen
+loop tree::hasNext()
+    ct <- cw : getNext
+    activate ct #LimeGreen
+    ct --> cw : node
+    deactivate ct
+        cw -> item : accept(visitor)
+                activate item #DarkGreen
+            cv <- item : visit(*this)
+            activate cv #LimeGreen
+
+            cv -> item : interaction
+                activate item #LimeGreen
+            cv <-- item
+                deactivate item
+
+            cv --> item
+            deactivate cv
+        cw <-- item
+                deactivate item
+        cw -> cv : <<concrete interaction>>
+            activate cv #LimeGreen
+        cw <-- cv
+            deactivate cv
+end
+        cw -x cv : <<delete>>
+            deactivate cv
+    ct x- cw : <<delete>>
+    deactivate ct
+
+@enduml

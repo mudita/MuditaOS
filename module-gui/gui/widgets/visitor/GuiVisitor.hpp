@@ -13,6 +13,8 @@ namespace gui
     class BottomBar;
     class TopBar;
 
+    /// The general purpose abstract interface for enabling Double-Dispatch behavior throughout `gui::Item`'s
+    /// inheritance hierarchy.
     class GuiVisitor
     {
       public:

@@ -1,0 +1,31 @@
+@startuml
+
+class gui::ItemNode
+{
+    gui::Item*
+    int level
+}
+
+abstract class gui::ItemTree
+{
+    bool hasNext()
+    gui::ItemNode getNext()
+}
+
+enum TraverseMode
+{
+    PreOrder
+    PostOrder
+}
+
+class gui::DepthFirstItemTree
+{
+    DepthFirstItemTree(gui::Item *root, TraverseMode mode)
+    bool hasNext()
+    gui::ItemNode getNext()
+}
+
+gui::ItemTree <|-- gui::DepthFirstItemTree
+gui::DepthFirstItemTree o-- TraverseMode
+
+@enduml
