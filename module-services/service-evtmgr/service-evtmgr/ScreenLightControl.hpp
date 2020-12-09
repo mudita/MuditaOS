@@ -51,4 +51,8 @@ namespace sevm::screen_light_control
 
     void processRequest(Action action, const Parameters &params);
 
+    void controlTimerCallback();
+
+    void readoutTimerCallback();
+
 } // namespace sevm::screen_light_control

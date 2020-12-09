@@ -5,20 +5,29 @@
 
 namespace bsp::eink_frontlight
 {
+    bool isOn                             = false;
+    BrightnessPercentage actualBrightness = 0.0f;
+
     void init()
     {}
 
     void deinit()
     {}
 
-    void setBrightness(BrightnessPercentage)
-    {}
+    void setBrightness(BrightnessPercentage brightness)
+    {
+        actualBrightness = brightness;
+    }
 
     void turnOn()
-    {}
+    {
+        isOn = true;
+    }
 
     void turnOff()
-    {}
+    {
+        isOn = false;
+    }
 
     void setGammaFactor(float)
     {}

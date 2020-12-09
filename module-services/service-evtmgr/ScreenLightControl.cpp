@@ -52,13 +52,13 @@ namespace sevm::screen_light_control
             if (!rampTargetReached) {
                 if (brightnessRampState < brightnessRampTarget) {
                     brightnessRampState += rampStep;
-                    if (brightnessRampState > brightnessRampTarget) {
+                    if (brightnessRampState >= brightnessRampTarget) {
                         rampTargetReached = true;
                     }
                 }
                 else if (brightnessRampState > brightnessRampTarget) {
                     brightnessRampState -= rampStep;
-                    if (brightnessRampState < brightnessRampTarget) {
+                    if (brightnessRampState <= brightnessRampTarget) {
                         brightnessRampState = brightnessRampTarget;
                         rampTargetReached   = true;
                     }
@@ -66,18 +66,6 @@ namespace sevm::screen_light_control
             }
 
             return brightnessRampState;
-        }
-
-        void controlTimerCallback()
-        {
-            auto out = brightnessRampOut();
-            bsp::eink_frontlight::setBrightness(out);
-        }
-
-        void readoutTimerCallback()
-        {
-            float lightMeasurement = bsp::light_sensor::readout();
-            brightnessRampTarget   = calculateBrightness(lightMeasurement);
         }
 
         void enableTimers()
@@ -174,6 +162,8 @@ namespace sevm::screen_light_control
     void deinit()
     {
         disableTimers();
+        controlTimer = nullptr;
+        readoutTimer = nullptr;
     }
 
     void processRequest(Action action, const Parameters &params)
@@ -201,6 +191,18 @@ namespace sevm::screen_light_control
             setAutomaticModeParameters(params);
             break;
         }
+    }
+
+    void controlTimerCallback()
+    {
+        auto out = brightnessRampOut();
+        bsp::eink_frontlight::setBrightness(out);
+    }
+
+    void readoutTimerCallback()
+    {
+        float lightMeasurement = bsp::light_sensor::readout();
+        brightnessRampTarget   = calculateBrightness(lightMeasurement);
     }
 
 } // namespace sevm::screen_light_control
