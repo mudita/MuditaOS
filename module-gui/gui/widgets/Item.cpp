@@ -11,7 +11,6 @@
 #include <list>      // for list<>::iterator, list, operator!=, _List...
 #include <memory>
 #include <DrawCommand.hpp>
-
 namespace gui
 {
 
@@ -528,6 +527,11 @@ namespace gui
     {
         auto el = std::find_if(timers.begin(), timers.end(), [&](auto &el) -> bool { return el.get() == &timer; });
         timers.erase(el);
+    }
+
+    void Item::accept(GuiVisitor &visitor)
+    {
+        visitor.visit(*this);
     }
 
 } /* namespace gui */
