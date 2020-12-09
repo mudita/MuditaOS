@@ -22,9 +22,18 @@ namespace updateos
         inline constexpr auto checksums = "checksums.txt";
         inline constexpr auto sql_mig   = "sqlmig.json";
         inline constexpr auto version   = "version.json";
-
     } // namespace file
 
+    namespace settings
+    {
+        inline constexpr auto history       = "history";
+        inline constexpr auto startTime     = "startTime";
+        inline constexpr auto endTime       = "endTime";
+        inline constexpr auto finishedState = "finishedState";
+        inline constexpr auto finishedError = "finishedError";
+        inline constexpr auto fromVersion   = "fromVersion";
+        inline constexpr auto toVersion     = "toVersion";
+    } // namespace settings
     namespace extension
     {
         inline constexpr auto update = ".tar";
@@ -92,7 +101,25 @@ namespace updateos
         uint32_t uuid                  = 0;
         std::string messageText        = "";
         updateos::UpdateState status;
-        json11::Json versioInformation;
+        json11::Json versionInformation;
+    };
+
+    struct UpdateRunStatus
+    {
+        uint32_t startTime = 0, endTime = 0;
+        UpdateState finishedState = UpdateState::Initial;
+        UpdateError finishedError = UpdateError::NoError;
+        json11::Json fromVersion, toVersion;
+
+        json11::Json to_json() const
+        {
+            return json11::Json::object{{updateos::settings::startTime, std::to_string(startTime)},
+                                        {updateos::settings::endTime, std::to_string(endTime)},
+                                        {updateos::settings::finishedState, (int)finishedState},
+                                        {updateos::settings::finishedError, (int)finishedError},
+                                        {updateos::settings::fromVersion, fromVersion},
+                                        {updateos::settings::toVersion, toVersion}};
+        }
     };
 
 }; // namespace updateos
@@ -138,9 +165,21 @@ class UpdateMuditaOS : public updateos::UpdateStats
     static const json11::Json getVersionInfoFromFile(const fs::path &updateFile);
     static bool isUpgradeToCurrent(const std::string &versionToCompare);
     static const fs::path checkForUpdate();
+    void historyValueChanged(const std::string &value);
+    void setInitialHistory(const std::string &initialHistory);
+    json11::Json getUpdateHistory() const
+    {
+        return updateHistory;
+    }
 
   private:
     std::vector<FileInfo> filesInUpdatePackage;
     mtar_t updateTar      = {};
     ServiceDesktop *owner = nullptr;
+
+    void storeRunStatusInDB();
+
+    updateos::UpdateRunStatus updateRunStatus;
+    json11::Json updateHistory;
+    json11::Json targetVersionInfo;
 };
