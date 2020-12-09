@@ -185,7 +185,7 @@ namespace gui
         return document->isEmpty();
     }
 
-    UTF8 Text::getText()
+    UTF8 Text::getText() const
     {
         return document->getText();
     }
@@ -919,5 +919,10 @@ namespace gui
             // Move cursor to backup position from end of document.
             cursor->TextCursor::moveCursor(NavigationDirection::LEFT, cursorPosDiff);
         }
+    }
+
+    void Text::accept(GuiVisitor &visitor)
+    {
+        visitor.visit(*this);
     }
 } /* namespace gui */
