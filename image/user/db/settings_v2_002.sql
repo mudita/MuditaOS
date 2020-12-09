@@ -13,4 +13,8 @@ INSERT OR REPLACE INTO settings_tab (path, value) VALUES
     ('gs_lock_pass_hash', '3333'),
     ('gs_lock_time', '30000'),
     ('gs_display_language', 'En'),
-    ('gs_input_language', 'En');
+    ('gs_input_language', 'En'),
+    ('bt_state', '0'),
+    ('bt_device_visibility', '0'),
+    ('bt_device_name', 'PurePhone'),
+    ('bt_bonded_devices', '');

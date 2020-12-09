@@ -11,6 +11,7 @@
 * `[PowerManagement]` PowerManagement: Enable FreeRTOS Run Time Statistics
 * `[cellular]` USSD session handling.
 * `[settings]` Nightshift window - GUI.
+* `[bluetooth][settings]` Add Bluetooth settings to database.
 
 ### Changed
 
