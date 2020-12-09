@@ -1,26 +1,10 @@
 # MuditaOS changelog
 
-### Fixed
-* `[settings]` Fix lack of sim at startup
+## Current release
 
 ### Added
-* `[utils]` Dump logs to a file on RT1051 after reaching 80% of log buffer utilization.
+
 * `[call functions]` Window for MMI/USSD internal messages.
-
-### Changed
-* `[bluetooth]` Underlying communication with the Bluetooth module over DMA (direct access)
-
-[Current release]
-
-### Added
-
-* `[cellular]` SIM API for change pin, set/reset sim lock, switch sim card
-* `[notes]` MMI/USSD communication window
-* `[notes]` Notes application implemented.
-* `[notes]` Notes search engine implemented.
-* `[desktop]` info window for incoming MMI messages.
-* `[text]` Added vertical scrolling.
-* `[text]` Added cursor starting position handling.
 * `[alarms]` Added main window
 * `[alarms]` Added window with options
 * `[PowerManagement]` PowerManagement: Enable FreeRTOS Run Time Statistics
@@ -28,23 +12,42 @@
 
 ### Changed
 
-* `[desktop]` Windows refactor
-* `[notes]` A note characters limit set to 4'000.
-* `[PowerManagement]` Separation of CPU clock into separate clock domain
 * `[PowerManagement]` Change hardware timers clock source
+* `[bluetooth]` Underlying communication with the Bluetooth module over DMA (direct access)
 
 ### Fixed
 
-* `[meditation]` Fix interval chimes choice not scaling with meditation time
-* `[meditation]` Fix of too many time options
-* `[meditation]` Fixed default counter settings
-* `[notes]` Fixed displaying the special characters in a note title.
+* `[settings]` Fix lack of sim at startup
+
+## [0.49.1 2020-12-04]
+
+### Added
+
+* Add MMI/USSD communication window.
+* Add Notes application.
+* Add notes search engine.
+* Add info window for incoming MMI messages.
+* Add vertical text scrolling.
+* Add text cursor starting position handling.
+* Add logs dumping to a file on the RT1051 platform.
+
+### Changed
+
+* Change note characters limit to 4'000.
+
+### Fixed
+
+* Fix interval chimes choice not scaling with meditation time.
+* Fix too many time options in the meditation application.
+* Fix default counter settings.
+* Fix displaying the special characters in a note title.
 
 ### Other
 
-* `[test]` Rewritten tests and updated test documentation.
+* Rewritten tests and updated test documentation.
+* Split clock domains on the RT1051 platform.
 
-[0.48.1 2020-11-27]
+## [0.48.1 2020-11-27]
 
 ### Added
 
