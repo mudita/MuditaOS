@@ -15,7 +15,7 @@
 
 static uint8_t *data = NULL;
 static int data_fd   = -1;
-static mmap_size     = 0;
+static size_t mmap_size = 0;
 
 static int lfs_read(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
 {

@@ -1,5 +1,6 @@
 #include "lfs.h"
 #include "parse_partitions.h"
+#include "parse_args.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -11,10 +12,10 @@
 #include <dirent.h>
 #include <sys/types.h>
 
-static struct lfs_config cfg;
-static lfs_t lfs;
+// static struct lfs_config cfg;
+// static lfs_t lfs;
 
-
+/*
 static void create_dir(char *src)
 {
     char *path;
@@ -75,7 +76,6 @@ static void create_file(char *src)
         fclose(srcf);
     }
 }
-
 static void compact(char *src)
 {
     DIR *dir;
@@ -105,73 +105,17 @@ static void compact(char *src)
         closedir(dir);
     }
 }
-
-void usage()
-{
-    fprintf(stdout,
-            "usage: mklfs -c <pack-dir> -b <block-size> -r <read-size> -p <prog-size> -s <filesystem-size> -i "
-            "<image-file-path>\r\n");
-}
-
-static int is_number(const char *s)
-{
-    const char *c = s;
-
-    while (*c) {
-        if ((*c < '0') || (*c > '9')) {
-            return 0;
-        }
-        c++;
-    }
-
-    return 1;
-}
-
-static int is_hex(const char *s)
-{
-    const char *c = s;
-
-    if (*c++ != '0') {
-        return 0;
-    }
-
-    if (*c++ != 'x') {
-        return 0;
-    }
-
-    while (*c) {
-        if (((*c < '0') || (*c > '9')) && ((*c < 'A') || (*c > 'F')) && ((*c < 'a') || (*c > 'f'))) {
-            return 0;
-        }
-        c++;
-    }
-
-    return 1;
-}
-
-static int to_int(const char *s)
-{
-    if (is_number(s)) {
-        return atoi(s);
-    }
-    else if (is_hex(s)) {
-        return (int)strtol(s, NULL, 16);
-    }
-
-    return -1;
-}
+*/
 
 int main(int argc, char **argv)
 {
 
-    char *src = NULL;   // Source directory
-    char *dst = NULL;   // Destination image
-    int c;              // Current option
-    int block_size = 0; // Block size
-    int read_size  = 0; // Read size
-    int prog_size  = 0; // Prog size
-    int fs_size    = 0; // File system size
     int err;
+    struct littlefs_opts lopts;
+    err = parse_program_args(argc, argv, &lopts);
+    if (err < 0) {
+        return err;
+    }
 
     size_t elems;
     struct partition *parts = find_partitions("PurePhone.img", scan_all_partitions, &elems);
@@ -180,47 +124,16 @@ int main(int argc, char **argv)
     }
     free(parts);
 
-    while ((c = getopt(argc, argv, "c:i:b:p:r:s:")) != -1) {
-        switch (c) {
-        case 'c':
-            src = optarg;
-            break;
-
-        case 'i':
-            dst = optarg;
-            break;
-
-        case 'b':
-            block_size = to_int(optarg);
-            break;
-
-        case 'p':
-            prog_size = to_int(optarg);
-            break;
-
-        case 'r':
-            read_size = to_int(optarg);
-            break;
-
-        case 's':
-            fs_size = to_int(optarg);
-            break;
-        }
-    }
-
-    if ((src == NULL) || (dst == NULL) || (block_size <= 0) || (prog_size <= 0) || (read_size <= 0) || (fs_size <= 0)) {
-        usage();
-        exit(1);
-    }
-
-    cfg.block_size     = block_size;
-    cfg.read_size      = read_size;
-    cfg.prog_size      = prog_size;
-    cfg.block_count    = fs_size / cfg.block_size;
-    cfg.lookahead_size = cfg.block_count;
-    cfg.context        = NULL;
-    cfg.cache_size     = block_size;
-    cfg.block_cycles   = 512;
+    /*
+        cfg.block_size     = block_size;
+        cfg.read_size      = read_size;
+        cfg.prog_size      = prog_size;
+        cfg.block_count    = fs_size / cfg.block_size;
+        cfg.lookahead_size = cfg.block_count;
+        cfg.context        = NULL;
+        cfg.cache_size     = block_size;
+        cfg.block_cycles   = 512;
+        */
 
     /*
     FILE *img = fopen(dst, "wb+");
@@ -239,7 +152,6 @@ int main(int argc, char **argv)
         fprintf(stderr, "no memory for mount\r\n");
         return -1;
     }
-*/
     err = lfs_format(&lfs, &cfg);
     if (err < 0) {
         fprintf(stderr, "format error: error=%d\r\n", err);
@@ -254,6 +166,7 @@ int main(int argc, char **argv)
 
     compact(src);
 
+*/
 
     return 0;
 }
