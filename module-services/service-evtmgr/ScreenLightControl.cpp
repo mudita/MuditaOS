@@ -14,12 +14,12 @@ namespace sevm::screen_light_control
 
         bool automaticMode = false;
         bool lightOn       = false;
-        typedef struct
+        struct FunctionSection
         {
             float xBound;
             float a;
             float b;
-        } FunctionSection;
+        };
 
         std::vector<FunctionSection> brightnessFunction;
         float rampStep;
@@ -40,9 +40,7 @@ namespace sevm::screen_light_control
             if (brightnessFunction.empty()) {
                 return 0.0f;
             }
-            else {
-                return brightnessFunction.back().xBound * brightnessFunction.back().a + brightnessFunction.back().b;
-            }
+            return brightnessFunction.back().xBound * brightnessFunction.back().a + brightnessFunction.back().b;
         }
 
         bsp::eink_frontlight::BrightnessPercentage brightnessRampOut()
@@ -98,6 +96,10 @@ namespace sevm::screen_light_control
 
         void setAutomaticModeParameters(const Parameters &params)
         {
+            if (lightOn && automaticMode) {
+                disableTimers();
+            }
+
             rampStep = 100.0f * (static_cast<float>(CONTROL_TIMER_MS) / static_cast<float>(params.rampTimeMS));
             brightnessHysteresis = params.brightnessHysteresis;
 
@@ -119,7 +121,45 @@ namespace sevm::screen_light_control
                     brightnessFunction.push_back(section);
                 }
             }
+
+            if (lightOn && automaticMode) {
+                enableTimers();
+            }
         }
+
+        void turnOff()
+        {
+            bsp::eink_frontlight::turnOff();
+            bsp::light_sensor::standby();
+            controlTimer->stop();
+            readoutTimer->stop();
+            lightOn = false;
+        }
+
+        void turnOn()
+        {
+            bsp::eink_frontlight::turnOn();
+            bsp::light_sensor::wakeup();
+            if (automaticMode) {
+                enableTimers();
+            }
+            lightOn = true;
+        }
+
+        void enableAutomaticMode()
+        {
+            if (lightOn) {
+                enableTimers();
+            }
+            automaticMode = true;
+        }
+
+        void disableAutomaticMode()
+        {
+            disableTimers();
+            automaticMode = false;
+        }
+
     } // namespace
 
     void init(sys::Service *parent)
@@ -127,8 +167,8 @@ namespace sevm::screen_light_control
         controlTimer = std::make_unique<sys::Timer>("LightControlTimer", parent, CONTROL_TIMER_MS);
         readoutTimer = std::make_unique<sys::Timer>("LightSensorReadoutTimer", parent, READOUT_TIMER_MS);
 
-        Parameters params;
-        setAutomaticModeParameters(params);
+        Parameters defaultParams;
+        setAutomaticModeParameters(defaultParams);
     }
 
     void deinit()
@@ -140,29 +180,16 @@ namespace sevm::screen_light_control
     {
         switch (action) {
         case Action::turnOff:
-            bsp::eink_frontlight::turnOff();
-            bsp::light_sensor::standby();
-            controlTimer->stop();
-            readoutTimer->stop();
-            lightOn = false;
+            turnOff();
             break;
         case Action::turnOn:
-            bsp::eink_frontlight::turnOn();
-            bsp::light_sensor::wakeup();
-            if (automaticMode) {
-                enableTimers();
-            }
-            lightOn = true;
+            turnOn();
             break;
         case Action::enableAutomaticMode:
-            if (lightOn) {
-                enableTimers();
-            }
-            automaticMode = true;
+            enableAutomaticMode();
             break;
         case Action::disableAutomaticMode:
-            disableTimers();
-            automaticMode = false;
+            disableAutomaticMode();
             break;
         case Action::setManualModeBrightness:
             bsp::eink_frontlight::setBrightness(params.manualModeBrightness);
@@ -171,13 +198,7 @@ namespace sevm::screen_light_control
             bsp::eink_frontlight::setGammaFactor(params.gammaFactor);
             break;
         case Action::setAutomaticModeParameters:
-            if (lightOn && automaticMode) {
-                disableTimers();
-            }
             setAutomaticModeParameters(params);
-            if (lightOn && automaticMode) {
-                enableTimers();
-            }
             break;
         }
     }

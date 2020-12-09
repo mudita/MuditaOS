@@ -27,7 +27,7 @@ namespace sevm::screen_light_control
     using BrightnessFunction =
         std::vector<std::pair<bsp::light_sensor::IlluminanceLux, bsp::eink_frontlight::BrightnessPercentage>>;
 
-    typedef struct
+    struct Parameters
     {
         /// Screen brightness 0-100% in manual mode
         bsp::eink_frontlight::BrightnessPercentage manualModeBrightness = 50.0f;
@@ -40,7 +40,7 @@ namespace sevm::screen_light_control
         float brightnessHysteresis = 10.0f;
         /// Gamma factor for screen brightness correction
         float gammaFactor = 2.5f;
-    } Parameters;
+    };
 
     /// Initialization of screen light control
     /// @param 'parent' - pointer to parent sys::Service class
