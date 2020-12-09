@@ -9,6 +9,8 @@ namespace gui
 {
     class Item;
 
+    /// General wrapper for a `gui::Item`'s parent-children hierarchy. Encapsulates a object's reference together with
+    /// it's level in a hierarchy
     class ItemNode
     {
       public:

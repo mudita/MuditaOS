@@ -11,6 +11,8 @@ namespace gui
     class DepthFirstItemTree : public ItemTree
     {
       public:
+        /// Tree traverse modes. In `PreOrder` mode a parent precedes it's children. In `PostOrder` mode, children
+        /// precedes it's parent.
         enum class TraverseMode
         {
             PreOrder,
