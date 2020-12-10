@@ -9,7 +9,8 @@
 namespace app::settingsInterface
 {
     class SimParams;
-}
+    class OperatorsSettings;
+}; // namespace app::settingsInterface
 
 namespace gui
 {
@@ -22,13 +23,15 @@ namespace gui
     class NetworkWindow : public OptionWindow
     {
       private:
-        bool operatorsOn;
-        app::settingsInterface::SimParams *simParams;
         auto netOptList() -> std::list<gui::Option>;
-        void rebuild() override;
+        app::settingsInterface::SimParams *simParams;
+        void rebuild();
+        app::settingsInterface::OperatorsSettings *operatorsSettings;
 
       public:
-        NetworkWindow(app::Application *app, app::settingsInterface::SimParams *simParams);
+        NetworkWindow(app::Application *app,
+                      app::settingsInterface::SimParams *simParams,
+                      app::settingsInterface::OperatorsSettings *operatorsSettings);
         void onBeforeShow(ShowMode m, SwitchData *d) override;
     };
 } // namespace gui

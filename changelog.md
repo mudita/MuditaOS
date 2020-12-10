@@ -1,6 +1,10 @@
 # MuditaOS changelog
 
 ## Current release
+### Fixed
+* `[settings]` Fix lack of sim at startup
+* `[settings]` Fix Network All Operators display condition
+* `[settings]` Fix Network window items indentation
 
 ### Added
 

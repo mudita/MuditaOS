@@ -14,7 +14,8 @@ namespace gui
         optionBodyHBox->focusChangedCallback = focusCb;
         style::window::decorate(optionBodyHBox);
 
-        auto optionNameLabel = new Label(optionBodyHBox, 0, 0, 0, 0, text);
+        auto optionNameLabel =
+            new Label(optionBodyHBox, indent ? style::window::default_left_margin : 0, 0, 0, 0, text);
         optionNameLabel->setEdges(RectangleEdge::None);
         optionNameLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         optionNameLabel->setFont(style::window::font::big);
@@ -50,6 +51,9 @@ namespace gui
         if (!imageName.empty()) {
             auto image           = new gui::Image(optionBodyHBox, 0, 0, 0, 0, imageName);
             optionRightItemWidth = image->getWidth();
+        }
+        if (indent) {
+            optionRightItemWidth += style::window::default_left_margin;
         }
 
         optionNameLabel->setMinimumSize(style::window::default_body_width - optionRightItemWidth,
