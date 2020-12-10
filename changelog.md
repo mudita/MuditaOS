@@ -10,6 +10,7 @@
 * `[file indexer]` Support for deleting entries in File Indexer DB.
 * `[listview]` Added onEmpty list callbacks and implemented them for notes and messages. 
 * `[notes]` Added list rebuild on notifications.
+* `[cellular]` Custom MMI response message.
 
 ### Changed
 
