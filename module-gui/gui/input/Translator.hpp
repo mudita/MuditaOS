@@ -50,35 +50,32 @@ namespace gui
         InputEvent translate(uint32_t timeout);
     };
 
-    /// translator using & switching KeyMaps for use per widget basis ,called for selected widget, per widget basis
-    class KeyInputMappedTranslation : public KeyBaseTranslation
-    {
-        uint32_t times = 0;
-
-      public:
-        bool setProfile(std::string profileName);
-        uint32_t handle(RawKey key, const std::string &keymap);
-        uint32_t getTimes()
-        {
-            return times;
-        }
-    };
-
     /// profiles cache - load once for all
     class Profiles
     {
       private:
-        const char *profilesFolder                   = "assets/profiles";
-        std::map<std::string, gui::Profile> profiles = {};
-        Profile empty;
+        std::map<std::string, gui::Profile> profilesList = {};
 
         void loadProfile(const std::string &filepath);
-        std::vector<std::string> getProfilesList(std::string ext);
+        std::vector<std::string> getProfilesPaths();
         void init();
+        Profile empty;
+
+        static Profiles &get();
 
       public:
-        static Profiles &get();
-        static Profile &get(const std::string &name);
+        Profile &get(const std::string &name);
+    };
+
+    /// translator using & switching KeyMaps for use per widget basis ,called for selected widget, per widget basis
+    class KeyInputMappedTranslation : public KeyBaseTranslation
+    {
+        uint32_t times = 0;
+        Profiles profiles;
+
+      public:
+        uint32_t handle(RawKey key, const std::string &keymap);
+        uint32_t getTimes() const noexcept;
     };
 
 } /* namespace gui */
