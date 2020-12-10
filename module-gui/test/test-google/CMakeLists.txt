@@ -5,6 +5,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 add_executable(${PROJECT_NAME} EXCLUDE_FROM_ALL
         test-gui-listview.cpp
         test-gui-boxlayout.cpp
+        test-gui-visitor-call.cpp
         ../mock/TestListViewProvider.cpp
         )
 
@@ -27,4 +28,3 @@ add_test(NAME ${PROJECT_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
 
-add_dependencies(check ${PROJECT_NAME})
