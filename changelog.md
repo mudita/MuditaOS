@@ -10,6 +10,7 @@
 * `[alarms]` Added window with options
 * `[PowerManagement]` PowerManagement: Enable FreeRTOS Run Time Statistics
 * `[cellular]` USSD session handling.
+* `[settings]` Nightshift window - GUI.
 
 ### Changed
 
