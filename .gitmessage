@@ -1,30 +1,18 @@
-# Title: [JIRA-TICKET] Summary, imperative, start upper case, don't end with a period
+# Commit subject: [JIRA-TICKET] <Add/Change/Fix> changes summary, don't end with a period
 # No more than 72 chars. ########################### 72 chars is here: #
 <Title>
-# Remember blank line between title and domains.
+# Remember blank line between title and commit message.
 
-# Changed domains, one domain by line
-# `[domain]` <added|changed|fixed>: message
-
-
-# Remember blank line between domains and body.
-
-# Body: Explain *what* and *why* (not *how*).
+# Commit message: Explain *what* and *why* (not *how*).
 # Wrap at 72 chars. ################################### which is here: #
 
-
-
-# At the end: Include Co-authored-by for all contributors. 
-# Include at least one empty line before it. Format: 
-# Co-authored-by: name <user@users.noreply.github.com>
-#
 # How to Write a Git Commit Message:
 # https://chris.beams.io/posts/git-commit/
 #
-# 1. Separate subject from body with a blank line
+# 1. Separate subject from message with a blank line
 # 2. Limit the subject line to 72 characters
 # 3. Capitalize the subject line
 # 4. Do not end the subject line with a period
 # 5. Use the imperative mood in the subject line
-# 6. Wrap the body at 72 characters
-# 7. Use the body to explain what and why vs. how
+# 6. Wrap the commit message body at 72 characters
+# 7. Use the commit message to explain what and why vs. how
