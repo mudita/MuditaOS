@@ -10,10 +10,12 @@ set(GENLITTLEFS_SRCS
     parse_partitions.c
     parse_args.c
     lfs_ioaccess.c
+    utility.c
 )
 
 add_executable(${PROJECT_NAME} ${GENLITTLEFS_SRCS})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -pedantic -Werror -Wextra )
+target_compile_definitions(${PROJECT_NAME} PRIVATE _GNU_SOURCE )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE littlefs ${BLKID_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${BLKID_INCLUDE_DIR})

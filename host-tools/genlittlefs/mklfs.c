@@ -1,7 +1,11 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "lfs.h"
 #include "lfs_ioaccess.h"
 #include "parse_partitions.h"
 #include "parse_args.h"
+#include "utility.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,93 +15,119 @@
 #include <limits.h>
 #include <dirent.h>
 
-static void create_dir_in_lfs(lfs_t lfs, const char *src)
+static void create_dir_in_lfs(lfs_t lfs, const char *lfs_path)
 {
-    char *path;
     int ret;
-
-    path = strchr(src, '/');
-    if (path) {
-        fprintf(stdout, "%s\r\n", path);
-
-        if ((ret = lfs_mkdir(&lfs, path)) < 0) {
-            fprintf(stderr, "can't create directory %s: error=%d\r\n", path, ret);
-            exit(1);
-        }
+    fprintf(stdout, "[%s]\n", lfs_path);
+    if ((ret = lfs_mkdir(&lfs, lfs_path)) < 0) {
+        fprintf(stderr, "can't create directory %s: error=%d\n", lfs_path, ret);
+        exit(1);
     }
 }
 
-static void create_file_in_lfs(lfs_t lfs, const char *src)
+static void create_file_in_lfs(lfs_t lfs, const char *host_file, const char *lfs_file)
 {
-    char *path;
     int ret;
 
-    path = strchr(src, '/');
-    if (path) {
-        fprintf(stdout, "%s\r\n", path);
+    fprintf(stdout, "%s\n", lfs_file);
 
-        // Open source file
-        FILE *srcf = fopen(src, "rb");
-        if (!srcf) {
-            fprintf(stderr, "can't open source file %s: errno=%d (%s)\r\n", src, errno, strerror(errno));
-            exit(1);
-        }
+    // Open source file
+    FILE *srcf = fopen(host_file, "rb");
+    if (!srcf) {
+        fprintf(stderr, "can't open source file %s: errno=%d (%s)\n", host_file, errno, strerror(errno));
+        exit(1);
+    }
 
-        // Open destination file
-        lfs_file_t dstf;
-        if ((ret = lfs_file_open(&lfs, &dstf, path, LFS_O_WRONLY | LFS_O_CREAT)) < 0) {
-            fprintf(stderr, "can't open destination file %s: error=%d\r\n", path, ret);
-            exit(1);
-        }
+    // Open destination file
+    lfs_file_t dstf;
+    if ((ret = lfs_file_open(&lfs, &dstf, lfs_file, LFS_O_WRONLY | LFS_O_CREAT)) < 0) {
+        fprintf(stderr, "can't open destination file %s: error=%d\n", lfs_file, ret);
+        exit(1);
+    }
 
-        char c = fgetc(srcf);
-        while (!feof(srcf)) {
-            ret = lfs_file_write(&lfs, &dstf, &c, 1);
-            if (ret < 0) {
-                fprintf(stderr, "can't write to destination file %s: error=%d\r\n", path, ret);
-                exit(1);
-            }
-            c = fgetc(srcf);
-        }
-
-        // Close destination file
-        ret = lfs_file_close(&lfs, &dstf);
+    char c = fgetc(srcf);
+    while (!feof(srcf)) {
+        ret = lfs_file_write(&lfs, &dstf, &c, 1);
         if (ret < 0) {
-            fprintf(stderr, "can't close destination file %s: error=%d\r\n", path, ret);
+            fprintf(stderr, "can't write to destination file %s: error=%d\n", lfs_file, ret);
             exit(1);
         }
-
-        // Close source file
-        fclose(srcf);
+        c = fgetc(srcf);
     }
+
+    // Close destination file
+    ret = lfs_file_close(&lfs, &dstf);
+    if (ret < 0) {
+        fprintf(stderr, "can't close destination file %s: error=%d\n", lfs_file, ret);
+        exit(1);
+    }
+
+    // Close source file
+    fclose(srcf);
 }
-static void add_directory_to_lfs(lfs_t lfs, char *src)
+
+static void add_directory_to_lfs(lfs_t lfs, const char *host_path, const char *lfs_path)
 {
     DIR *dir;
     struct dirent *ent;
-    char curr_path[PATH_MAX];
-
-    dir = opendir(src);
+    char lfs_curr_path[PATH_MAX];
+    char host_curr_path[PATH_MAX];
+    dir = opendir(host_path);
     if (dir) {
         while ((ent = readdir(dir))) {
             // Skip . and .. directories
             if ((strcmp(ent->d_name, ".") != 0) && (strcmp(ent->d_name, "..") != 0)) {
                 // Update the current path
-                strcpy(curr_path, src);
-                strcat(curr_path, "/");
-                strcat(curr_path, ent->d_name);
+                strcpy(lfs_curr_path, lfs_path);
+                strcat(lfs_curr_path, "/");
+                strcat(lfs_curr_path, ent->d_name);
+                // Update native current path
+                strcpy(host_curr_path, host_path);
+                strcat(host_curr_path, "/");
+                strcat(host_curr_path, ent->d_name);
 
                 if (ent->d_type == DT_DIR) {
-                    create_dir_in_lfs(lfs, curr_path);
-                    add_directory_to_lfs(lfs, curr_path);
+                    create_dir_in_lfs(lfs, lfs_curr_path);
+                    add_directory_to_lfs(lfs, host_curr_path, lfs_curr_path);
                 }
                 else if (ent->d_type == DT_REG) {
-                    create_file_in_lfs(lfs, curr_path);
+                    create_file_in_lfs(lfs, host_curr_path, lfs_curr_path);
                 }
             }
         }
         closedir(dir);
     }
+}
+
+static int add_to_lfs(lfs_t lfs, const char *dir)
+{
+    char *host_dir = canonicalize_file_name(dir);
+    int is_dir     = path_is_a_directory(host_dir);
+    if (is_dir < 0) {
+        free(host_dir);
+        return is_dir;
+    }
+    else if (!is_dir) {
+        free(host_dir);
+        errno = ENOTDIR;
+        return -1;
+    }
+    char *sep_ptr = strrchr(host_dir, '/');
+    char *tgt_dir = malloc(strlen(sep_ptr + 1) + sizeof('\0') + sizeof('/'));
+    if (!tgt_dir) {
+        free(host_dir);
+        errno = ENOMEM;
+        return -1;
+    }
+    else {
+        tgt_dir[0] = '/';
+        strcpy(tgt_dir + 1, sep_ptr + 1);
+    }
+    create_dir_in_lfs(lfs, tgt_dir);
+    add_directory_to_lfs(lfs, host_dir, tgt_dir);
+    free(host_dir);
+    free(tgt_dir);
+    return 0;
 }
 
 static void configure_lfs_params(struct lfs_config *lfsc, const struct littlefs_opts *opts)
@@ -132,9 +162,7 @@ int main(int argc, char **argv)
         free(lopts.src_dirs);
         return EXIT_SUCCESS;
     }
-    if (lopts.verbose) {
-        print_config_options(&lopts);
-    }
+
     configure_lfs_params(&cfg, &lopts);
     if (lopts.mode == littlefs_opts_parts) {
         size_t elems;
@@ -150,7 +178,9 @@ int main(int argc, char **argv)
             free(lopts.src_dirs);
             return EXIT_FAILURE;
         }
-        ioctx = lfs_ioaccess_open(&cfg, lopts.dst_image, &parts[lopts.partition_num - 1]);
+        const struct partition *curr_part = &parts[lopts.partition_num - 1];
+        cfg.block_count                   = (curr_part->end - curr_part->start) / lopts.block_size;
+        ioctx                             = lfs_ioaccess_open(&cfg, lopts.dst_image, curr_part);
         if (!ioctx) {
             perror("Unable to open file:");
             free(parts);
@@ -166,6 +196,7 @@ int main(int argc, char **argv)
             free(lopts.src_dirs);
             return EXIT_FAILURE;
         }
+        cfg.block_count = lopts.filesystem_size / lopts.block_size;
         ioctx = lfs_ioaccess_open(&cfg, lopts.dst_image, NULL);
         if (!ioctx) {
             perror("Unable to open file:");
@@ -178,10 +209,12 @@ int main(int argc, char **argv)
         free(lopts.src_dirs);
         return EXIT_FAILURE;
     }
-
+    if (lopts.verbose) {
+        print_config_options(&lopts);
+    }
     err = lfs_format(&lfs, &cfg);
     if (err < 0) {
-        fprintf(stderr, "lfs format error: error=%d\r\n", err);
+        fprintf(stderr, "lfs format error: error=%d\n", err);
         lfs_ioaccess_close(ioctx);
         free(lopts.src_dirs);
         return EXIT_FAILURE;
@@ -189,17 +222,24 @@ int main(int argc, char **argv)
 
     err = lfs_mount(&lfs, &cfg);
     if (err < 0) {
-        fprintf(stderr, "lfs mount error: error=%d\r\n", err);
+        fprintf(stderr, "lfs mount error: error=%d\n", err);
         lfs_ioaccess_close(ioctx);
         free(lopts.src_dirs);
         return EXIT_FAILURE;
     }
     for (size_t ndir = 0; ndir < lopts.src_dirs_siz; ++ndir) {
-        add_directory_to_lfs(lfs, lopts.src_dirs[ndir]);
+        err = add_to_lfs(lfs, lopts.src_dirs[ndir]);
+        if (err) {
+            perror("Unable add to lfs dir");
+            lfs_ioaccess_close(ioctx);
+            free(lopts.src_dirs);
+            lfs_unmount(&lfs);
+            return EXIT_FAILURE;
+        }
     }
     err = lfs_unmount(&lfs);
     if (err < 0) {
-        fprintf(stderr, "lfs umount error: error=%d\r\n", err);
+        fprintf(stderr, "lfs umount error: error=%d\n", err);
         lfs_ioaccess_close(ioctx);
         free(lopts.src_dirs);
         return EXIT_FAILURE;

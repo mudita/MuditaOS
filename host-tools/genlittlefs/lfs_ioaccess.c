@@ -77,21 +77,17 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
         }
         else {
             start_pos = partition->start;
-            ret->mmap_size = partition->end - partition->start;
+            ret->mmap_size = partition->end - partition->start + 1;
         }
     }
-    err = lseek(ret->data_fd, start_pos, SEEK_SET);
-    if (err < 0) {
-        close(ret->data_fd);
-        free(ret);
-        return NULL;
-    }
-    ret->data = mmap(NULL, ret->mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, ret->data_fd, 0);
+
+    ret->data = mmap(NULL, ret->mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, ret->data_fd, start_pos);
     if (ret->data == MAP_FAILED) {
         close(ret->data_fd);
         free(ret);
         return NULL;
     }
+
     // Mount the file system
     cfg->read  = lfs_read;
     cfg->prog  = lfs_prog;

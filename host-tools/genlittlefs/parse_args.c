@@ -283,7 +283,11 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
             opts->src_dirs_siz = argc - optind;
             opts->src_dirs     = calloc(opts->src_dirs_siz, sizeof(char *));
             for (int i = 0; optind < argc; ++i) {
-                opts->src_dirs[i] = argv[optind++];
+                char *arg           = argv[optind++];
+                const size_t arg_sz = strlen(arg);
+                if (arg[arg_sz - 1] == '/')
+                    arg[arg_sz - 1] = '\0';
+                opts->src_dirs[i] = arg;
             }
         }
         else {
@@ -300,8 +304,7 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
 
 void print_config_options(const struct littlefs_opts *opts)
 {
-    static const char struct_info[] = "genlittlefs partition configuration:\n"
-                                      "\n"
+    static const char struct_info[] = "genlittlefs configuration:\n"
                                       "   LFS read size %i\n"
                                       "   LFS block size: %i\n"
                                       "   LFS prog size: %i\n"
