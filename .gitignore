@@ -50,3 +50,5 @@ docker/assets/requirements*
 *.swo
 tags
 .ycm_extra_conf.py
+
+update/
