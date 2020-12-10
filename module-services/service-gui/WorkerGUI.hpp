@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "ServiceGUI.hpp"
-
 #include <core/Context.hpp>
 #include <core/DrawCommand.hpp>
 #include <gui/core/Renderer.hpp>

@@ -12,7 +12,6 @@
 #include <string>
 #include <vector>
 #include <common_data/RawKey.hpp>
-#include <vfs.hpp>
 
 namespace gui
 {
@@ -72,68 +71,15 @@ namespace gui
         const char *profilesFolder                   = "assets/profiles";
         std::map<std::string, gui::Profile> profiles = {};
 
-        void loadProfile(const std::string &filepath)
-        {
-            LOG_INFO("Load profile: %s", filepath.c_str());
-            auto p = Profile(filepath);
-            if (p.getName() != std::string()) {
-                profiles.insert({p.getName(), std::move(p)});
-            }
-        }
+        void loadProfile(const std::string &filepath);
+        std::vector<std::string> getProfilesList(std::string ext);
+        void init();
 
-        std::vector<std::string> getProfilesList(std::string ext)
-        {
-            std::vector<std::string> profileFiles;
-            LOG_INFO("Scanning %s profiles folder: %s", ext.c_str(), profilesFolder);
-            auto dirList = vfs.listdir(profilesFolder, ext);
-
-            for (vfs::DirectoryEntry ent : dirList) {
-                if (ent.attributes != vfs::FileAttributes::Directory) {
-                    profileFiles.push_back(std::string(profilesFolder) + "/" + ent.fileName);
-                }
-            }
-
-            LOG_INFO("Total number of profiles: %u", static_cast<unsigned int>(profileFiles.size()));
-            return profileFiles;
-        }
-
-        void init()
-        {
-            std::vector<std::string> profileFiles = getProfilesList(".kprof");
-            for (std::string mapName : profileFiles) {
-                if (std::size(mapName)) {
-                    loadProfile(mapName);
-                }
-            }
-            if (std::size(profiles) == 0) {
-                LOG_ERROR("No keyboard profiles loaded");
-            }
-        }
         Profile empty;
 
       public:
-        static Profiles &get()
-        {
-            static Profiles *p;
-            if (p == nullptr) {
-                p = new Profiles();
-                p->init();
-            }
-            return *p;
-        }
-
-        static Profile &get(const std::string &name)
-        {
-            // if profile not in profile map -> load
-            if (std::size(name) == 0) {
-                LOG_ERROR("Request for non existend profile: %s", name.c_str());
-                return get().empty;
-            }
-            if (get().profiles.find(name) == get().profiles.end()) {
-                get().loadProfile(name);
-            }
-            return get().profiles[name];
-        }
+        static Profiles &get();
+        static Profile &get(const std::string &name);
     };
 
 } /* namespace gui */

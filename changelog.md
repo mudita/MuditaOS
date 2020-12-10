@@ -23,6 +23,7 @@
 
 ### Fixed
 
+* `[gui]` Fix of includes order causing conflicts with gtest
 * `[settings]` Fix lack of sim at startup
 * `[audio]` Changed internal microphone gain from 0dB to -12dB to fix echo & noise problem
 

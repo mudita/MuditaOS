@@ -7,9 +7,7 @@
 #include <log/log.hpp>
 #include <MessageType.hpp>
 #include <projdefs.h>
-#include <queue.h>
 #include <Renderer.hpp>
-#include <semphr.h>
 #include <Service/Bus.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
@@ -20,6 +18,9 @@
 #include <utility>
 #include <vector>
 #include "messages/RenderingFinished.hpp"
+
+#include <semphr.h>
+#include <queue.h>
 
 namespace sgui
 {
