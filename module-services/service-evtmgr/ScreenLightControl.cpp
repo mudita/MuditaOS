@@ -162,8 +162,8 @@ namespace sevm::screen_light_control
     void deinit()
     {
         disableTimers();
-        controlTimer = nullptr;
-        readoutTimer = nullptr;
+        controlTimer.reset();
+        readoutTimer.reset();
     }
 
     void processRequest(Action action, const Parameters &params)
