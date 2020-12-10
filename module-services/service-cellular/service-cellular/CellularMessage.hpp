@@ -549,7 +549,10 @@ class CellularMMIResult : public CellularMessage
   protected:
     app::manager::actions::MMIResultParams params;
 
-    explicit CellularMMIResult(app::manager::actions::MMIResultParams::MMIResult result)
+    CellularMMIResult(app::manager::actions::MMIResultParams::MMIResult result)
+        : CellularMessage(MessageType::CellularMMIData), params(result)
+    {}
+    CellularMMIResult(std::shared_ptr<app::manager::actions::IMMICustomResultParams> &result)
         : CellularMessage(MessageType::CellularMMIData), params(result)
     {}
 };
@@ -557,7 +560,10 @@ class CellularMMIResult : public CellularMessage
 class CellularMMIResultMessage : public CellularMMIResult, public app::manager::actions::ConvertibleToAction
 {
   public:
-    explicit CellularMMIResultMessage(app::manager::actions::MMIResultParams::MMIResult result)
+    CellularMMIResultMessage(app::manager::actions::MMIResultParams::MMIResult result) : CellularMMIResult(result)
+    {}
+
+    CellularMMIResultMessage(std::shared_ptr<app::manager::actions::IMMICustomResultParams> &result)
         : CellularMMIResult(result)
     {}
 

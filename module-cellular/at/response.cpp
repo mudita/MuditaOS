@@ -3,6 +3,7 @@
 
 #include "response.hpp"
 #include <Utils.hpp>
+#include <magic_enum.hpp>
 
 #include <algorithm>
 
@@ -218,5 +219,79 @@ namespace at
                 return 0;
             }
         } // namespace qnwinfo
+
+        namespace clir
+        {
+            std::optional<ClirResponse> parseClir(const std::string &response)
+            {
+                auto constexpr toRemove    = "+CLIR: ";
+                auto constexpr emptyString = "";
+
+                auto resp = response;
+                utils::findAndReplaceAll(resp, toRemove, emptyString);
+
+                auto tokens = utils::split(resp, ",");
+                for (auto &t : tokens) {
+                    t = utils::trim(t);
+                }
+                if (tokens.size() == clirTokens) {
+                    int state;
+                    int status;
+
+                    if (!utils::toNumeric(tokens[0], state) || !utils::toNumeric(tokens[1], status)) {
+                        return std::nullopt;
+                    }
+                    if (static_cast<unsigned int>(state) < magic_enum::enum_count<ServiceState>() &&
+                        static_cast<unsigned int>(status) < magic_enum::enum_count<ServiceStatus>()) {
+                        return ClirResponse(static_cast<ServiceState>(state), static_cast<ServiceStatus>(status));
+                    }
+                }
+                return std::nullopt;
+            }
+
+            app::manager::actions::IMMICustomResultParams::MMIResultMessage getState(const ServiceState &state)
+            {
+                using namespace app::manager::actions;
+
+                auto message = IMMICustomResultParams::MMIResultMessage::CommonNoMessage;
+                switch (state) {
+                case ServiceState::AccordingToSubscription:
+                    message = IMMICustomResultParams::MMIResultMessage::ClirAccordingToSubscription;
+                    break;
+                case ServiceState::ServiceEnabled:
+                    message = IMMICustomResultParams::MMIResultMessage::ClirEnabled;
+                    break;
+                case ServiceState::ServiceDisabled:
+                    message = IMMICustomResultParams::MMIResultMessage::ClirDisabled;
+                    break;
+                }
+                return message;
+            }
+
+            app::manager::actions::IMMICustomResultParams::MMIResultMessage getStatus(const ServiceStatus &status)
+            {
+                using namespace app::manager::actions;
+
+                auto message = IMMICustomResultParams::MMIResultMessage::CommonNoMessage;
+                switch (status) {
+                case ServiceStatus::NotProvisioned:
+                    message = IMMICustomResultParams::MMIResultMessage::ClirNotProvisioned;
+                    break;
+                case ServiceStatus::PermanentProvisioned:
+                    message = IMMICustomResultParams::MMIResultMessage::ClirPermanentProvisioned;
+                    break;
+                case ServiceStatus::Unknown:
+                    message = IMMICustomResultParams::MMIResultMessage::ClirUnknown;
+                    break;
+                case ServiceStatus::TemporaryRestricted:
+                    message = IMMICustomResultParams::MMIResultMessage::ClirTemporaryRestricted;
+                    break;
+                case ServiceStatus::TemporaryAllowed:
+                    message = IMMICustomResultParams::MMIResultMessage::ClirTemporaryAllowed;
+                    break;
+                }
+                return message;
+            }
+        } // namespace clir
     }     // namespace response
 } // namespace at
