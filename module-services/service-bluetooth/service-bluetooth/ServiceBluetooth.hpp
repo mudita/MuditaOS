@@ -7,6 +7,7 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
+#include "service-bluetooth/SettingsHolder.hpp"
 
 #include <memory> // for unique_ptr
 
@@ -30,10 +31,5 @@ class ServiceBluetooth : public sys::Service
 
   private:
     std::unique_ptr<BluetoothWorker> worker;
-    std::unique_ptr<settings::Settings> settingsProvider;
-
-    void stateSettingChanged(std::string value);
-    void deviceVisibilitySettingChanged(std::string value);
-    void deviceNameSettingChanged(std::string value);
-    void bondedDevicesSettingChanged(std::string value);
+    std::unique_ptr<Bluetooth::SettingsHolder> settingsHolder;
 };
