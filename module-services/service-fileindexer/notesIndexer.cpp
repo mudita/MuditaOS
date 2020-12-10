@@ -3,8 +3,8 @@
 
 #include <log/log.hpp>
 #include "notesIndexer.hpp"
-#include <vfs.hpp>
 #include <cwctype>
+#include <cstdio>
 #include <utf8/UTF8.hpp>
 
 namespace service::detail
@@ -12,19 +12,18 @@ namespace service::detail
 
     notesIndexer::notesIndexer(std::string_view path)
     {
-        auto file = vfs.fopen(std::string(path).c_str(), "r");
+        auto file = std::fopen(std::string(path).c_str(), "r");
         if (!file) {
-            LOG_INFO("Unable to open file [%s] errr: [%s] . Ignore...",
-                     std::string(path).c_str(),
-                     vfs.lastErrnoToStr().c_str());
+            LOG_INFO("Unable to open file [%s]. Ignore...", std::string(path).c_str());
             return;
         }
-        if (!vfs.eof(file)) {
-            auto line = vfs.getline(file, 4096);
+        if (!std::feof(file)) {
+            char line[4096];
+            std::fgets(line, sizeof(line), file);
             mLinesCount++;
             updateLineStats(line);
         }
-        vfs.fclose(file);
+        std::fclose(file);
     }
     auto notesIndexer::updateLineStats(std::string_view _line) noexcept -> void
     {

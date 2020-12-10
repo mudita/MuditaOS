@@ -4,7 +4,7 @@
 #include "FilesystemEndpoint.hpp"
 #include "service-desktop/DesktopMessages.hpp"
 #include "service-desktop/ServiceDesktop.hpp"
-#include <module-vfs/include/user/purefs/filesystem_paths.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 auto FilesystemEndpoint::handle(Context &context) -> void
 {
@@ -19,9 +19,9 @@ auto FilesystemEndpoint::handle(Context &context) -> void
 }
 static bool isWritable(const fs::path file)
 {
-    auto lamb = [](vfs::FILE *stream) { vfs.fclose(stream); };
+    auto lamb = [](std::FILE *stream) { std::fclose(stream); };
 
-    std::unique_ptr<vfs::FILE, decltype(lamb)> sf(vfs.fopen(file.c_str(), "w"), lamb);
+    std::unique_ptr<std::FILE, decltype(lamb)> sf(std::fopen(file.c_str(), "w"), lamb);
 
     if (sf.get() != nullptr) {
         return true;
