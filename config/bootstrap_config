@@ -49,6 +49,9 @@ INSTALL_PACKAGES="
         wget \
         python3-magic \
         python3-pip \
-        libfdisk-dev
+        libfdisk-dev \
+        python3-requests \
+        libfuse-dev \
+        libblkid-dev 
 "
 
