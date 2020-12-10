@@ -58,14 +58,24 @@ namespace app
             virtual Store::GSM::SIM getSim()         = 0;
             virtual std::string getNumber()          = 0;
         };
-    } // namespace settingsInterface
+        class OperatorsSettings
+        {
+          public:
+            virtual ~OperatorsSettings()                               = default;
+            virtual void setOperatorsOn(bool value)                    = 0;
+            [[nodiscard]] virtual bool getOperatorsOn() const noexcept = 0;
+        };
+    }; // namespace settingsInterface
 
-    class ApplicationSettingsNew : public app::Application, public settingsInterface::SimParams
+    class ApplicationSettingsNew : public app::Application,
+                                   public settingsInterface::SimParams,
+                                   public settingsInterface::OperatorsSettings
     {
       public:
         ApplicationSettingsNew(std::string name                    = name_settings_new,
                                std::string parent                  = {},
                                StartInBackground startInBackground = {false});
+        ~ApplicationSettingsNew() override;
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
         auto InitHandler() -> sys::ReturnCodes override;
 
@@ -79,11 +89,16 @@ namespace app
         void setSim(Store::GSM::SIM sim) override;
         Store::GSM::SIM getSim() override;
         std::string getNumber() override;
-        bsp::Board board = bsp::Board::none;
+
+        void operatorOnChanged(const std::string &value);
+        void setOperatorsOn(bool value) override;
+        bool getOperatorsOn() const noexcept override;
 
       private:
         Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
         std::string selectedSimNumber = {};
+        bsp::Board board              = bsp::Board::none;
+        bool operatorsOn              = false;
     };
 
     template <> struct ManifestTraits<ApplicationSettingsNew>

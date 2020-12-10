@@ -10,10 +10,11 @@
 
 namespace gui
 {
-    NetworkWindow::NetworkWindow(app::Application *app, app::settingsInterface::SimParams *simParams)
-        : OptionWindow(app, gui::window::name::network), simParams(simParams)
+    NetworkWindow::NetworkWindow(app::Application *app,
+                                 app::settingsInterface::SimParams *simParams,
+                                 app::settingsInterface::OperatorsSettings *operatorsSettings)
+        : OptionWindow(app, gui::window::name::network), simParams(simParams), operatorsSettings(operatorsSettings)
     {
-        operatorsOn = false;
     }
     void NetworkWindow::onBeforeShow(ShowMode m, SwitchData *d)
     {
@@ -39,6 +40,7 @@ namespace gui
             phoneNumber = {};
             break;
         }
+        auto operatorsOn = operatorsSettings->getOperatorsOn();
         optList.emplace_back(std::make_unique<gui::OptionSettings>(
             utils::translateI18("app_settings_network_active_card") + ":" + simStr + " / " + phoneNumber,
             [=](gui::Item &item) {
@@ -63,17 +65,18 @@ namespace gui
                 return true;
             },
             this));
+
         optList.emplace_back(std::make_unique<gui::OptionSettings>(
             utils::translateI18("app_settings_network_operator_auto_select"),
             [=](gui::Item &item) {
-                operatorsOn = !operatorsOn;
+                operatorsSettings->setOperatorsOn(!operatorsOn);
                 rebuild();
                 return true;
             },
             nullptr,
             nullptr,
             operatorsOn ? RightItem::On : RightItem::Off));
-        if (operatorsOn) {
+        if (!operatorsOn) {
             optList.emplace_back(std::make_unique<gui::OptionSettings>(
                 utils::translateI18("app_settings_network_all_operators"),
                 [=](gui::Item &item) {
@@ -82,13 +85,17 @@ namespace gui
                 },
                 nullptr,
                 nullptr,
-                RightItem::ArrowWhite));
+                RightItem::ArrowWhite,
+                true));
         }
-        optList.emplace_back(gui::Option{
-            utils::translateI18("app_settings_network_import_contacts_from_sim_card"), [=](gui::Item &item) {
+        optList.emplace_back(std::make_unique<gui::OptionSettings>(
+            utils::translateI18("app_settings_network_import_contacts_from_sim_card"),
+            [=](gui::Item &item) {
                 this->application->switchWindow(gui::window::name::import_contacts, nullptr);
                 return true;
-            }});
+            },
+            nullptr,
+            nullptr));
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
 
