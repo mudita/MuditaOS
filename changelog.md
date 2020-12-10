@@ -4,6 +4,10 @@
 ### Added
 
 * Battery Brownout detection
+
+### Changed
+
+* Input keyboard language files parser from KBD to JSON.
 ## [0.52.1 2020-12-23]
 
 ### Added

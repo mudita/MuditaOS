@@ -9,6 +9,11 @@
 
 namespace gui
 {
+    namespace
+    {
+        constexpr auto profilesFolder = "assets/profiles";
+        constexpr auto extension      = ".json";
+    } // namespace
 
     void recon_long_press(InputEvent &evt, const RawKey &key, const RawKey &prev_key_press, uint32_t time)
     {
@@ -180,26 +185,30 @@ namespace gui
         if (key.state == RawKey::State::Released) {
             prev_key_press = key;
         }
-        return Profiles::get(keymap).get(key.key_code, times);
+        return profiles.get(keymap).getCharKey(key.key_code, times);
+    }
+
+    uint32_t KeyInputMappedTranslation::getTimes() const noexcept
+    {
+        return times;
     }
 
     void Profiles::loadProfile(const std::string &filepath)
     {
         LOG_INFO("Load profile: %s", filepath.c_str());
         auto p = Profile(filepath);
-        if (p.getName() != std::string()) {
-            profiles.insert({p.getName(), std::move(p)});
+        if (auto name = p.getName(); !name.empty()) {
+            profilesList.insert({p.getName(), std::move(p)});
         }
     }
-    std::vector<std::string> Profiles::getProfilesList(std::string ext)
+
+    std::vector<std::string> Profiles::getProfilesPaths()
     {
         std::vector<std::string> profileFiles;
-        LOG_INFO("Scanning %s profiles folder: %s", ext.c_str(), profilesFolder);
+        LOG_INFO("Scanning %s profiles folder: %s", extension, profilesFolder);
 
         for (const auto &entry : std::filesystem::directory_iterator(profilesFolder)) {
-            if (!std::filesystem::is_directory(entry) && entry.path().extension().string() == ext) {
-                profileFiles.push_back(entry.path().string());
-            }
+            profileFiles.push_back(std::filesystem::path(entry.path()));
         }
 
         LOG_INFO("Total number of profiles: %u", static_cast<unsigned int>(profileFiles.size()));
@@ -208,16 +217,17 @@ namespace gui
 
     void Profiles::init()
     {
-        std::vector<std::string> profileFiles = getProfilesList(".kprof");
-        for (std::string mapName : profileFiles) {
-            if (std::size(mapName)) {
-                loadProfile(mapName);
+        std::vector<std::string> profileFilesPaths = getProfilesPaths();
+        for (std::string filePath : profileFilesPaths) {
+            if (std::size(filePath)) {
+                loadProfile(filePath);
             }
         }
-        if (std::size(profiles) == 0) {
+        if (std::size(profilesList) == 0) {
             LOG_ERROR("No keyboard profiles loaded");
         }
     }
+
     Profiles &Profiles::get()
     {
         static Profiles *p;
@@ -227,16 +237,19 @@ namespace gui
         }
         return *p;
     }
+
     Profile &Profiles::get(const std::string &name)
     {
+        auto filepath = std::string(profilesFolder) + "/" + name + extension;
         // if profile not in profile map -> load
-        if (std::size(name) == 0) {
-            LOG_ERROR("Request for non existend profile: %s", name.c_str());
+        if (std::size(filepath) == 0) {
+            LOG_ERROR("Request for nonexistent profile: %s", filepath.c_str());
             return get().empty;
         }
-        if (get().profiles.find(name) == get().profiles.end()) {
-            get().loadProfile(name);
+        if (get().profilesList.find(filepath) == get().profilesList.end()) {
+            get().loadProfile(filepath);
         }
-        return get().profiles[name];
+        return get().profilesList[filepath];
     }
+
 } /* namespace gui */

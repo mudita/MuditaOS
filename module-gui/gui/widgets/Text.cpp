@@ -545,7 +545,7 @@ namespace gui
 
         auto code = translator.handle(inputEvent.key, mode ? mode->get() : "");
 
-        if (code != KeyProfile::none_key && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
+        if (code != Profile::none_key && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
 
             setCursorStartPosition(CursorStartPosition::Offset);
 

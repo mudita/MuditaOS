@@ -1,249 +1,60 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <string>
-#include <iomanip>
-#include <algorithm>
-#include <sstream>
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
 #include "Profile.hpp"
 #include <Utils.hpp>
+#include <gsl>
 
 namespace gui
 {
 
-    const uint32_t KeyProfile::none_key = 0;
+    Profile::Profile(const std::string &filepath) : name(filepath), inputChars(createJson(filepath))
+    {}
 
-    Profile::Profile(const std::string &name)
-    {
-        LOG_INFO("Create!");
-        load(name);
-    }
-
-    Profile::Profile(Profile &&p)
-    {
-        this->name = p.name;
-        this->keys = p.keys;
-        // this is important, we need to assure that moved Profile doesn't clean up our memory again
-        p.clear();
-    }
-
-    Profile::~Profile()
-    {
-        for (auto it = keys.begin(); it != keys.end(); it++) {
-            delete it->second;
-        }
-        keys.clear();
-    }
-
-    static inline std::string trim(const std::string &s)
-    {
-        auto wsfront = std::find_if_not(s.begin(), s.end(), [](int c) { return std::isspace(c); });
-        return std::string(wsfront,
-                           std::find_if_not(s.rbegin(), std::string::const_reverse_iterator(wsfront), [](int c) {
-                               return std::isspace(c);
-                           }).base());
-    }
-
-    template <typename Out> void split(const std::string &s, char delim, Out result)
-    {
-        std::stringstream ss(s);
-        std::string item;
-        while (std::getline(ss, item, delim)) {
-            *(result++) = item;
-        }
-    }
-
-    static std::vector<std::string> split(const std::string &s, char delim)
-    {
-        std::vector<std::string> elems;
-        split(s, delim, std::back_inserter(elems));
-        return elems;
-    }
-
-    void Profile::clear()
-    {
-        keys.clear();
-    }
-
-    std::string Profile::getName() const noexcept
+    const std::string &Profile::getName() noexcept
     {
         return name;
     }
 
-    bool Profile::load(const std::string &filename)
+    const json11::Json Profile::createJson(const std::string &filepath)
     {
-        auto file = std::fopen(filename.c_str(), "rb");
+        auto fd = std::fopen(filepath.c_str(), "r");
 
-        if (file == nullptr) {
-            LOG_FATAL("no KeyProfile file: %s", filename.c_str());
-            return false;
+        if (fd == nullptr) {
+            LOG_FATAL("Error during opening file %s", filepath.c_str());
+            return json11::Json();
         }
 
-        enum class LineType
-        {
-            KEY_CODE = 0,
-            CYCLIC,
-            CHARACTERS,
-            TIMEOUTS
-        };
+        uint32_t fsize = utils::filesystem::filelength(fd);
 
-        LineType lineType = LineType::KEY_CODE;
-        bool name         = false;
+        auto stream = std::make_unique<char[]>(fsize + 1);
 
-        KeyProfile *pk = nullptr;
-        KeyProfile tmp;
-        while (std::feof(file) != true) {
-            const auto line = trim(utils::filesystem::getline(file));
-            if ((line[0] == '#') || (line.empty())) {
-                continue;
-            }
-            else {
+        memset(stream.get(), 0, fsize + 1);
 
-                // first not commented line is a name of profile
-                if (name == false) {
-                    LOG_INFO("profile name: %s", line.c_str());
-                    setName(line);
-                    name = true;
-                }
-                else {
-                    // new structure, create profile key and read the keyboard's key code
-                    if (lineType == LineType::KEY_CODE) {
-                        uint32_t keyCode;
-                        std::stringstream(line) >> keyCode;
-                        pk          = new KeyProfile();
-                        pk->keyCode = keyCode;
-                        lineType    = LineType::CYCLIC;
-                    }
-                    else if (lineType == LineType::CYCLIC) {
-                        pk->cyclic = (line.compare("true") == 0);
-                        lineType   = LineType::CHARACTERS;
-                    }
-                    else if (lineType == LineType::CHARACTERS) {
-                        addCharacters(pk, line);
-                        lineType = LineType::TIMEOUTS;
-                    }
-                    else if (lineType == LineType::TIMEOUTS) {
-                        addTimeouts(pk, line);
-                        if ((pk->chars.size() == pk->timeouts.size()) && (keys.find(pk->keyCode) == keys.end())) {
-                            addKeyProfile(pk);
-                        }
-                        else {
-                            LOG_FATAL("Incorrect number of chars or key code duplicate key code: [%" PRIu32 "]",
-                                      pk->keyCode);
-                            delete pk;
-                            pk = nullptr;
-                        }
+        std::fread(stream.get(), 1, fsize, fd);
 
-                        lineType = LineType::KEY_CODE;
-                    }
-                    else {
-                        LOG_FATAL("invalid line: [%s]", line.c_str());
-                    }
-                }
-            }
+        std::string err;
+        json11::Json parsedJson = json11::Json::parse(stream.get(), err);
+
+        auto _ = gsl::finally([fd] { std::fclose(fd); });
+
+        if (err.length() != 0) {
+            LOG_FATAL("%s", err.c_str());
+            return json11::Json();
         }
-
-        std::fclose(file);
-
-        return true;
+        return parsedJson;
     }
 
-    int is_utf8_character(unsigned char c)
+    uint32_t Profile::getCharKey(bsp::KeyCodes code, uint32_t times)
     {
-        if ((c >> 7) == 0b1) {
-            if ((c >> 6) == 0b10) {
-                return 2; // 2nd, 3rd or 4th byte of a utf-8 character
-            }
-            else {
-                return 1; // 1st byte of a utf-8 character
-            }
+        std::string ts = inputChars[utils::to_string(static_cast<int>(code))].string_value();
+        UTF8 utf       = UTF8(ts);
+        if (ts.size() > 0) {
+            return utf[times % utf.length()];
         }
-        else {
-            return 0; // a single byte character
-        }
-    }
-
-    static std::vector<std::string> split_str(const std::string &s, int chars_number, int start_pos)
-    {
-        int pos = start_pos, char_pos, bytes_to_write;
-        std::vector<std::string> elems;
-        while (pos < (int)s.length()) {
-            bytes_to_write = chars_number;
-            char_pos       = pos + 1;
-            if (is_utf8_character(s[char_pos]) > 0) {
-                bytes_to_write = bytes_to_write + 1;
-            }
-            elems.push_back(s.substr(pos, bytes_to_write));
-            pos = pos + bytes_to_write + 1;
-        }
-        return elems;
-    }
-
-    void Profile::addCharacters(KeyProfile *pk, const std::string &s) const
-    {
-
-        uint32_t charKey;
-        std::vector<std::string> vec = split_str(s, 3, 0);
-        for (std::string s : vec) {
-            std::string ts = trim(s);
-            if (ts[0] == '\'') {
-                // empty character - no character
-                if (s.size() == 2) {
-                    pk->chars.push_back(0);
-                    break;
-                }
-                ts       = s.substr(1, s.size() - 1);
-                UTF8 utf = UTF8(ts);
-                charKey  = utf[0];
-                pk->chars.push_back(charKey);
-            }
-            else if (ts.substr(0, 2) == "0x") {
-                std::stringstream ss;
-                ss << std::hex << ts;
-                ss >> charKey;
-                pk->chars.push_back(charKey);
-            }
-        }
-    }
-    void Profile::addTimeouts(KeyProfile *pk, const std::string &s) const
-    {
-        uint32_t timeout;
-        std::vector<std::string> vec = split(s, ',');
-        for (std::string s : vec) {
-            std::stringstream(trim(s)) >> timeout;
-            pk->timeouts.push_back(timeout);
-        }
-    }
-
-    void Profile::addKeyProfile(KeyProfile *pk)
-    {
-        if (pk != nullptr)
-            keys.insert(std::pair<uint32_t, KeyProfile *>(pk->keyCode, pk));
-    }
-
-    void Profile::setName(const std::string &name)
-    {
-        this->name = name;
-    }
-
-    const KeyProfile *Profile::getKeyProfile(uint32_t keyCode) const
-    {
-        auto key = keys.find(keyCode);
-        if (key != keys.end())
-            return key->second;
-        return nullptr;
-    }
-
-    uint32_t Profile::get(bsp::KeyCodes code, uint32_t times)
-    {
-        const KeyProfile *p = getKeyProfile(static_cast<uint32_t>(code));
-        if (p == nullptr) {
-            LOG_DEBUG("KeyProfile for key: %" PRIu32 " not found", static_cast<uint32_t>(code));
-            return 0;
-        }
-        return p->chars[times % p->chars.size()];
+        return utf[0];
     }
 
 } /* namespace gui */
