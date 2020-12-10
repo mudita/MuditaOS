@@ -164,7 +164,6 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
             break;
         case 's':
             opts->filesystem_size = to_longlong(optarg);
-            printf("S set %s\n", optarg);
             break;
         case 'p':
             opts->partition_num = to_int(optarg);
@@ -271,8 +270,8 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
             return -1;
         }
         else if (opts->filesystem_size > 0) {
-            if (opts->filesystem_size % 512) {
-                fprintf(stderr, "--filesystem_size <size> should be multiply of 512");
+            if (opts->filesystem_size % opts->block_size) {
+                fprintf(stderr, "--filesystem_size <size> should be multiply of block size\n");
                 return -1;
             }
             opts->mode = littlefs_opts_file;

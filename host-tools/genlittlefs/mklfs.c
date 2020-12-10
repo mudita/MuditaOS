@@ -15,6 +15,14 @@
 #include <limits.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+
+struct lfs_info_summary
+{
+    size_t files_added;
+    size_t directories_added;
+    size_t bytes_transferred;
+};
 
 static int create_dir_in_lfs(lfs_t *lfs, const char *lfs_path, bool verbose)
 {
@@ -89,7 +97,8 @@ static int create_file_in_lfs(lfs_t *lfs, const char *host_file, const char *lfs
     return ret;
 }
 
-static int add_directory_to_lfs(lfs_t *lfs, const char *host_path, const char *lfs_path, bool verbose)
+static int add_directory_to_lfs(
+    lfs_t *lfs, const char *host_path, const char *lfs_path, struct lfs_info_summary *summary, bool verbose)
 {
     DIR *dir;
     struct dirent *ent;
@@ -116,7 +125,10 @@ static int add_directory_to_lfs(lfs_t *lfs, const char *host_path, const char *l
                         closedir(dir);
                         return err;
                     }
-                    err = add_directory_to_lfs(lfs, host_curr_path, lfs_curr_path, verbose);
+                    else {
+                        summary->directories_added++;
+                    }
+                    err = add_directory_to_lfs(lfs, host_curr_path, lfs_curr_path, summary, verbose);
                     if (err) {
                         closedir(dir);
                         return err;
@@ -128,6 +140,13 @@ static int add_directory_to_lfs(lfs_t *lfs, const char *host_path, const char *l
                         closedir(dir);
                         return err;
                     }
+                    else {
+                        summary->files_added++;
+                        struct stat statbuf;
+                        if (stat(host_curr_path, &statbuf) == 0) {
+                            summary->bytes_transferred += statbuf.st_size;
+                        }
+                    }
                 }
             }
         }
@@ -136,7 +155,7 @@ static int add_directory_to_lfs(lfs_t *lfs, const char *host_path, const char *l
     return err;
 }
 
-static int add_to_lfs(lfs_t *lfs, const char *dir, bool verbose)
+static int add_to_lfs(lfs_t *lfs, const char *dir, struct lfs_info_summary *summary, bool verbose)
 {
     char *host_dir = canonicalize_file_name(dir);
     int is_dir     = path_is_a_directory(host_dir);
@@ -166,7 +185,8 @@ static int add_to_lfs(lfs_t *lfs, const char *dir, bool verbose)
         free(tgt_dir);
         return err;
     }
-    err = add_directory_to_lfs(lfs, host_dir, tgt_dir, verbose);
+    summary->directories_added++;
+    err = add_directory_to_lfs(lfs, host_dir, tgt_dir, summary, verbose);
     free(host_dir);
     free(tgt_dir);
     return err;
@@ -200,9 +220,9 @@ int main(int argc, char **argv)
     int err;
     struct littlefs_opts lopts;
     struct lfs_config cfg;
+    struct lfs_info_summary prog_summary;
     struct lfs_ioaccess_context *ioctx = NULL;
     lfs_t lfs;
-
     err = parse_program_args(argc, argv, &lopts);
     if (err < 0) {
         return err;
@@ -217,6 +237,7 @@ int main(int argc, char **argv)
     }
 
     configure_lfs_params(&cfg, &lopts);
+    memset(&prog_summary, 0, sizeof(prog_summary));
     if (lopts.mode == littlefs_opts_parts) {
         size_t elems;
         struct partition *parts = find_partitions(lopts.dst_image, scan_all_partitions, &elems);
@@ -243,12 +264,20 @@ int main(int argc, char **argv)
         free(parts);
     }
     else if (lopts.mode == littlefs_opts_file) {
-        err = truncate(lopts.dst_image, lopts.filesystem_size);
-        if (err) {
-            perror("Unable to create file:");
+        int fds = open(lopts.dst_image, O_CREAT | O_WRONLY, 0644);
+        if (fds < 0) {
+            perror("Unable to create file");
             free(lopts.src_dirs);
             return EXIT_FAILURE;
         }
+        err = ftruncate(fds, lopts.filesystem_size);
+        if (err) {
+            perror("Unable to truncate file");
+            free(lopts.src_dirs);
+            return EXIT_FAILURE;
+        }
+        close(fds);
+        fds             = -1;
         cfg.block_count = lopts.filesystem_size / lopts.block_size;
         ioctx = lfs_ioaccess_open(&cfg, lopts.dst_image, NULL);
         if (!ioctx) {
@@ -260,11 +289,25 @@ int main(int argc, char **argv)
     else {
         fprintf(stderr, "Unknown option\n");
         free(lopts.src_dirs);
+        lfs_ioaccess_close(ioctx);
         return EXIT_FAILURE;
     }
     if (lopts.verbose) {
         print_config_options(&lopts);
     }
+
+    if (!lopts.overwrite_existing) {
+        lfs_t tmp_lfs;
+        int code = lfs_mount(&tmp_lfs, &cfg);
+        if (!code) {
+            fprintf(stderr, "LFS filesystem already exists. If you want to overwrite add --overwrite flag\n");
+            lfs_unmount(&tmp_lfs);
+            free(lopts.src_dirs);
+            lfs_ioaccess_close(ioctx);
+            return EXIT_FAILURE;
+        }
+    }
+
     err = lfs_format(&lfs, &cfg);
     if (err < 0) {
         fprintf(stderr, "lfs format error: error=%d\n", err);
@@ -281,7 +324,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
     for (size_t ndir = 0; ndir < lopts.src_dirs_siz; ++ndir) {
-        err = add_to_lfs(&lfs, lopts.src_dirs[ndir], lopts.verbose);
+        err = add_to_lfs(&lfs, lopts.src_dirs[ndir], &prog_summary, lopts.verbose);
         if (err) {
             print_error("Unable to open file:", err);
             lfs_ioaccess_close(ioctx);
@@ -299,5 +342,9 @@ int main(int argc, char **argv)
     }
     free(lopts.src_dirs);
     lfs_ioaccess_close(ioctx);
+    printf("Summary: Directories added: %lu, Files added: %lu, Transferred %lu kbytes\n",
+           prog_summary.directories_added,
+           prog_summary.files_added,
+           prog_summary.bytes_transferred / 1024UL);
     return EXIT_SUCCESS;
 }
