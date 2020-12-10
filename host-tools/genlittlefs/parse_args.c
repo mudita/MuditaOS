@@ -182,6 +182,7 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
     }
     if (argc == 1) {
         usage(argv[0]);
+        return -1;
     }
     else if (is_help) {
         help(argv[0]);
