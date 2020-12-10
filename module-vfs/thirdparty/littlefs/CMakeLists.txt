@@ -21,6 +21,8 @@ set( LIBLITTLEFS_PRIVATE_INCLUDES ${LIBLITTLEFS_SRCDIR}/bd)
 
 add_library( ${LIBLITTLEFS_TARGET} STATIC ${LIBLITTLEFS_SOURCES} )
 
+#target_compile_definitions(${LIBLITTLEFS_TARGET} PRIVATE LFS_YES_TRACE )
+
 if( COMMAND third_party_target_setup )
     third_party_target_setup( ${LIBLITTLEFS_TARGET} )
 endif()

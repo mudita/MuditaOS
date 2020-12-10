@@ -8,6 +8,7 @@
 #include <sys/mman.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
@@ -17,6 +18,7 @@ struct lfs_ioaccess_context
     uint8_t *data;
     int data_fd;
     size_t mmap_size;
+    struct timeval last_msync;
 };
 
 static int lfs_read(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
@@ -45,8 +47,19 @@ static int lfs_erase(const struct lfs_config *c, lfs_block_t block)
 
 static int lfs_sync(const struct lfs_config *c)
 {
-    (void)c;
-    return 0;
+    // NOTES: Flush the dirty pages on disk ~1s
+    struct lfs_ioaccess_context *ctx = c->context;
+    struct timeval curr_msync, result_msync;
+    if (gettimeofday(&curr_msync, NULL) == -1) {
+        return -1;
+    }
+    timersub(&curr_msync, &ctx->last_msync, &result_msync);
+    int err = 0;
+    if (result_msync.tv_sec >= 1) {
+        err             = msync(ctx->data, ctx->mmap_size, MS_ASYNC);
+        ctx->last_msync = curr_msync;
+    }
+    return err;
 }
 
 struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
