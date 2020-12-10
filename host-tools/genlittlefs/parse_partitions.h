@@ -19,3 +19,4 @@ struct partition
 };
 
 struct partition *find_partitions(const char *filename, part_type_t ptype, size_t *nelems);
+void print_partitions(const struct partition *part, size_t nparts);

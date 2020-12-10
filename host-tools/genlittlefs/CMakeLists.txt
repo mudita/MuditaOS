@@ -9,6 +9,7 @@ set(GENLITTLEFS_SRCS
     mklfs.c
     parse_partitions.c
     parse_args.c
+    lfs_ioaccess.c
 )
 
 add_executable(${PROJECT_NAME} ${GENLITTLEFS_SRCS})

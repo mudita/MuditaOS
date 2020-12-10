@@ -20,6 +20,10 @@ struct partition *find_partitions(const char *filename, part_type_t ptype, size_
     blkid_do_fullprobe(pr);
 
     blkid_partlist ls = blkid_probe_get_partitions(pr);
+    if (!ls) {
+        *nelems = 0;
+        return pret;
+    }
     const int nparts  = blkid_partlist_numof_partitions(ls);
     if (nparts < 1) {
         if (nelems)
@@ -34,7 +38,7 @@ struct partition *find_partitions(const char *filename, part_type_t ptype, size_
         blkid_partition par = blkid_partlist_get_partition(ls, i);
         if (ptype == scan_all_partitions || blkid_partition_get_type(par) == ptype) {
             pret[ipart].start = (blkid_partition_get_start(par)) * sector_size;
-            pret[ipart].end   = pret[i].start + blkid_partition_get_size(par) * sector_size;
+            pret[ipart].end   = (blkid_partition_get_start(par) + blkid_partition_get_size(par)) * sector_size;
             pret[ipart].type  = blkid_partition_get_type(par);
             ++ipart;
         }
@@ -44,4 +48,16 @@ struct partition *find_partitions(const char *filename, part_type_t ptype, size_
     }
     blkid_free_probe(pr);
     return pret;
+}
+
+void print_partitions(const struct partition *part, size_t nparts)
+{
+    printf("List of partitions [%lu]:\n", nparts);
+    for (size_t s = 0; s < nparts; ++s) {
+        printf("    Number: [%lu] Type: [%02x] Start: [%luk] End: [%luk]\n",
+               s + 1,
+               (int)part->type,
+               part[s].start / 1024,
+               part[s].end / 1024);
+    }
 }

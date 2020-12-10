@@ -5,7 +5,6 @@
 #include "lfs_ioaccess.h"
 #include "parse_partitions.h"
 
-#include <stdio.h>
 #include <sys/mman.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -13,98 +12,111 @@
 #include <unistd.h>
 #include <errno.h>
 
-static uint8_t *data = NULL;
-static int data_fd   = -1;
-static size_t mmap_size = 0;
+struct lfs_ioaccess_context
+{
+    uint8_t *data;
+    int data_fd;
+    size_t mmap_size;
+};
 
 static int lfs_read(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
 {
+    struct lfs_ioaccess_context *ctx = c->context;
+    uint8_t *data                    = ctx->data;
     memcpy(buffer, data + (block * c->block_size) + off, size);
     return 0;
 }
 
 static int lfs_prog(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, const void *buffer, lfs_size_t size)
 {
+    struct lfs_ioaccess_context *ctx = c->context;
+    uint8_t *data                    = ctx->data;
     memcpy(data + (block * c->block_size) + off, buffer, size);
     return 0;
 }
 
 static int lfs_erase(const struct lfs_config *c, lfs_block_t block)
 {
+    struct lfs_ioaccess_context *ctx = c->context;
+    uint8_t *data                    = ctx->data;
     memset(data + (block * c->block_size), 0, c->block_size);
     return 0;
 }
 
 static int lfs_sync(const struct lfs_config *c)
 {
+    (void)c;
     return 0;
 }
 
-int lfs_ioaccess_open(struct lfs_config *cfg, const char *filename, const struct partition *partition)
+struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
+                                               const char *filename,
+                                               const struct partition *partition)
 {
-    if (data_fd > 0) {
-        errno = EINVAL;
-        return -1;
-    }
-    data_fd = open(filename, O_RDWR);
-    if (data_fd < 0) {
-        return data_fd;
+    struct lfs_ioaccess_context *ret = calloc(1, sizeof(struct lfs_ioaccess_context));
+    ret->data_fd                     = open(filename, O_RDWR);
+    if (ret->data_fd < 0) {
+        free(ret);
+        return NULL;
     }
     struct stat statbuf;
-    int err = fstat(data_fd, &statbuf);
+    int err = fstat(ret->data_fd, &statbuf);
     if (err < 0) {
-        close(data_fd);
-        data_fd = -1;
-        return err;
+        close(ret->data_fd);
+        free(ret);
+        return NULL;
     }
     off_t start_pos = 0;
-    mmap_size       = statbuf.st_size;
+    ret->mmap_size  = statbuf.st_size;
     if (partition) {
         if (partition->end > statbuf.st_size) {
-            close(data_fd);
-            data_fd = -1;
+            close(ret->data_fd);
+            free(ret);
             errno   = E2BIG;
-            return -1;
+            return NULL;
         }
         else {
             start_pos = partition->start;
-            mmap_size = partition->end - partition->start;
+            ret->mmap_size = partition->end - partition->start;
         }
     }
-    err = lseek(data_fd, start_pos, SEEK_SET);
+    err = lseek(ret->data_fd, start_pos, SEEK_SET);
     if (err < 0) {
-        close(data_fd);
-        data_fd = -1;
-        return err;
+        close(ret->data_fd);
+        free(ret);
+        return NULL;
     }
-    data = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, data_fd, 0);
-    if (data == MAP_FAILED) {
-        close(data_fd);
-        data_fd = -1;
-        return -1;
+    ret->data = mmap(NULL, ret->mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, ret->data_fd, 0);
+    if (ret->data == MAP_FAILED) {
+        close(ret->data_fd);
+        free(ret);
+        return NULL;
     }
     // Mount the file system
     cfg->read  = lfs_read;
     cfg->prog  = lfs_prog;
     cfg->erase = lfs_erase;
     cfg->sync  = lfs_sync;
-    return 0;
+    cfg->context = ret;
+    return ret;
 }
 
-int lfs_ioaccess_close()
+int lfs_ioaccess_close(struct lfs_ioaccess_context *ctx)
 {
-    if (data_fd < 0) {
+    if (!ctx) {
         errno = EINVAL;
         return -1;
     }
-    int err = munmap(data, mmap_size);
+    if (ctx->data_fd < 0) {
+        errno = EINVAL;
+        return -1;
+    }
+    int err = munmap(ctx->data, ctx->mmap_size);
     if (err < 0) {
-        close(data_fd);
-        data_fd = -1;
+        close(ctx->data_fd);
         return err;
     }
-    close(data_fd);
-    data      = NULL;
-    mmap_size = 0;
-    return 0;
+    err = close(ctx->data_fd);
+    free(ctx);
+    return err;
 }

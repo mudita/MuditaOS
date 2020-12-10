@@ -6,6 +6,10 @@
 struct lfs_config;
 struct partition;
 
-int lfs_ioaccess_open(struct lfs_config *cfg, const char *filename, const struct partition *partition);
+struct lfs_ioaccess_context;
 
-int lfs_ioaccess_close();
+struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
+                                               const char *filename,
+                                               const struct partition *partition);
+
+int lfs_ioaccess_close(struct lfs_ioaccess_context *ctx);

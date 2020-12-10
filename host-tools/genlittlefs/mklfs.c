@@ -1,8 +1,8 @@
 #include "lfs.h"
+#include "lfs_ioaccess.h"
 #include "parse_partitions.h"
 #include "parse_args.h"
 
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,13 +10,8 @@
 #include <errno.h>
 #include <limits.h>
 #include <dirent.h>
-#include <sys/types.h>
 
-// static struct lfs_config cfg;
-// static lfs_t lfs;
-
-/*
-static void create_dir(char *src)
+static void create_dir_in_lfs(lfs_t lfs, const char *src)
 {
     char *path;
     int ret;
@@ -32,7 +27,7 @@ static void create_dir(char *src)
     }
 }
 
-static void create_file(char *src)
+static void create_file_in_lfs(lfs_t lfs, const char *src)
 {
     char *path;
     int ret;
@@ -76,7 +71,7 @@ static void create_file(char *src)
         fclose(srcf);
     }
 }
-static void compact(char *src)
+static void add_directory_to_lfs(lfs_t lfs, char *src)
 {
     DIR *dir;
     struct dirent *ent;
@@ -93,80 +88,123 @@ static void compact(char *src)
                 strcat(curr_path, ent->d_name);
 
                 if (ent->d_type == DT_DIR) {
-                    create_dir(curr_path);
-                    compact(curr_path);
+                    create_dir_in_lfs(lfs, curr_path);
+                    add_directory_to_lfs(lfs, curr_path);
                 }
                 else if (ent->d_type == DT_REG) {
-                    create_file(curr_path);
+                    create_file_in_lfs(lfs, curr_path);
                 }
             }
         }
-
         closedir(dir);
     }
 }
-*/
+
+static void configure_lfs_params(struct lfs_config *lfsc, const struct littlefs_opts *opts)
+{
+    memset(lfsc, 0, sizeof *lfsc);
+    lfsc->block_size     = opts->block_size;
+    lfsc->read_size      = opts->read_size;
+    lfsc->prog_size      = opts->prog_size;
+    lfsc->lookahead_size = opts->lockahead_size;
+    lfsc->cache_size     = opts->cache_size;
+    lfsc->block_cycles   = opts->block_cycles;
+}
 
 int main(int argc, char **argv)
 {
 
     int err;
     struct littlefs_opts lopts;
+    struct lfs_config cfg;
+    struct lfs_ioaccess_context *ioctx = NULL;
+    lfs_t lfs;
+
     err = parse_program_args(argc, argv, &lopts);
     if (err < 0) {
         return err;
     }
-
-    size_t elems;
-    struct partition *parts = find_partitions("PurePhone.img", scan_all_partitions, &elems);
-    for (size_t i = 0; i < elems; ++i) {
-        printf("Start %li end %li type %i\n", parts[i].start, parts[i].end, parts[i].type);
+    if (lopts.mode == littlefs_opts_listparts) {
+        size_t elems;
+        struct partition *parts = find_partitions(lopts.dst_image, scan_all_partitions, &elems);
+        print_partitions(parts, elems);
+        free(parts);
+        free(lopts.src_dirs);
+        return EXIT_SUCCESS;
     }
-    free(parts);
-
-    /*
-        cfg.block_size     = block_size;
-        cfg.read_size      = read_size;
-        cfg.prog_size      = prog_size;
-        cfg.block_count    = fs_size / cfg.block_size;
-        cfg.lookahead_size = cfg.block_count;
-        cfg.context        = NULL;
-        cfg.cache_size     = block_size;
-        cfg.block_cycles   = 512;
-        */
-
-    /*
-    FILE *img = fopen(dst, "wb+");
-
-    if (!img) {
-        fprintf(stderr, "can't create image file: errno=%d (%s)\r\n", errno, strerror(errno));
-        return -1;
+    if (lopts.verbose) {
+        print_config_options(&lopts);
+    }
+    configure_lfs_params(&cfg, &lopts);
+    if (lopts.mode == littlefs_opts_parts) {
+        size_t elems;
+        struct partition *parts = find_partitions(lopts.dst_image, scan_all_partitions, &elems);
+        if (!parts) {
+            perror("Unable to list partitions:");
+            free(lopts.src_dirs);
+            return EXIT_FAILURE;
+        }
+        if (lopts.partition_num - 1 > (int)elems) {
+            fprintf(stderr, "Invalid partition selected. Max partition_num is: %lu\n", elems);
+            free(parts);
+            free(lopts.src_dirs);
+            return EXIT_FAILURE;
+        }
+        ioctx = lfs_ioaccess_open(&cfg, lopts.dst_image, &parts[lopts.partition_num - 1]);
+        if (!ioctx) {
+            perror("Unable to open file:");
+            free(parts);
+            free(lopts.src_dirs);
+            return EXIT_FAILURE;
+        }
+        free(parts);
+    }
+    else if (lopts.mode == littlefs_opts_file) {
+        err = truncate(lopts.dst_image, lopts.filesystem_size);
+        if (err) {
+            perror("Unable to create file:");
+            free(lopts.src_dirs);
+            return EXIT_FAILURE;
+        }
+        ioctx = lfs_ioaccess_open(&cfg, lopts.dst_image, NULL);
+        if (!ioctx) {
+            perror("Unable to open file:");
+            free(lopts.src_dirs);
+            return EXIT_FAILURE;
+        }
+    }
+    else {
+        fprintf(stderr, "Unknown option\n");
+        free(lopts.src_dirs);
+        return EXIT_FAILURE;
     }
 
-    fwrite(data, 1, fs_size, img);
-
-    fclose(img);
-
-    data = calloc(1, fs_size);
-    if (!data) {
-        fprintf(stderr, "no memory for mount\r\n");
-        return -1;
-    }
     err = lfs_format(&lfs, &cfg);
     if (err < 0) {
-        fprintf(stderr, "format error: error=%d\r\n", err);
-        return -1;
+        fprintf(stderr, "lfs format error: error=%d\r\n", err);
+        lfs_ioaccess_close(ioctx);
+        free(lopts.src_dirs);
+        return EXIT_FAILURE;
     }
 
     err = lfs_mount(&lfs, &cfg);
     if (err < 0) {
-        fprintf(stderr, "mount error: error=%d\r\n", err);
-        return -1;
+        fprintf(stderr, "lfs mount error: error=%d\r\n", err);
+        lfs_ioaccess_close(ioctx);
+        free(lopts.src_dirs);
+        return EXIT_FAILURE;
     }
-
-    compact(src);
-
-*/
-
-    return 0;
+    for (size_t ndir = 0; ndir < lopts.src_dirs_siz; ++ndir) {
+        add_directory_to_lfs(lfs, lopts.src_dirs[ndir]);
+    }
+    err = lfs_unmount(&lfs);
+    if (err < 0) {
+        fprintf(stderr, "lfs umount error: error=%d\r\n", err);
+        lfs_ioaccess_close(ioctx);
+        free(lopts.src_dirs);
+        return EXIT_FAILURE;
+    }
+    free(lopts.src_dirs);
+    lfs_ioaccess_close(ioctx);
+    return EXIT_SUCCESS;
 }

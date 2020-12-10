@@ -4,7 +4,6 @@
 #include "parse_args.h"
 
 #include <getopt.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -79,7 +78,7 @@ static void help(const char *name)
     static const char help_text[] = "usage: %s [options] -- src_dir1 ... [src_dirN]\n"
                                     "\n"
                                     "general options:\n"
-                                    "    -h   --help            print help\n"
+                                    "    -h   --help              print help\n"
                                     "\n"
                                     "genlilttlefs options:\n"
                                     "    -i   --image             partition file image\n"
@@ -93,8 +92,11 @@ static void help(const char *name)
                                     "    --lookahead_size         size of lookahead buffer (8192)\n"
                                     "    --block_cycles           number of erase cycles before eviction (512)\n"
                                     "    --overwrite              reformat existing partition\n"
-                                    "    src_dir                  initial file content\n"
-                                    "\n";
+                                    "    --verbose                verbose mode\n"
+                                    "\n"
+                                    "positional arguments:\n"
+                                    "    src_dir1                 first source directory\n"
+                                    "    src_dirN                 N-th source directory\n";
     fprintf(stderr, help_text, name);
 }
 
@@ -103,7 +105,8 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
     int c; // Current option
     int option_index = 0;
     bool is_help     = false;
-
+    bool is_listpart                    = false;
+    bool is_unknown                     = false;
     static struct option long_options[] = {
         {.name = "image", .has_arg = required_argument, .flag = 0, .val = 'i'},
         {.name = "block_size", .has_arg = required_argument, .flag = 0, .val = 'b'},
@@ -117,6 +120,7 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
         {.name = "lockahead_size", .has_arg = required_argument, .flag = 0, .val = 0},
         {.name = "block_cycles", .has_arg = required_argument, .flag = 0, .val = 0},
         {.name = "overwrite", .has_arg = no_argument, .flag = 0, .val = 0},
+        {.name = "verbose", .has_arg = no_argument, .flag = 0, .val = 0},
         {.name = 0, .has_arg = 0, .flag = 0, .val = 0}};
     if (!opts) {
         errno = EINVAL;
@@ -132,6 +136,9 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
             const char *optname = long_options[option_index].name;
             if (!strcmp(optname, "overwrite")) {
                 opts->overwrite_existing = true;
+            }
+            else if (!strcmp(optname, "verbose")) {
+                opts->verbose = true;
             }
             else if (!strcmp(optname, "block_cycles")) {
                 opts->block_cycles = to_int(optarg);
@@ -163,12 +170,13 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
             opts->partition_num = to_int(optarg);
             break;
         case 'l':
-            opts->list_partitions = true;
+            is_listpart = true;
             break;
         case 'h':
             is_help = true;
             break;
         default:
+            is_unknown = true;
             break;
         }
     }
@@ -179,8 +187,19 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
         help(argv[0]);
         return -1;
     }
-    else if (opts->list_partitions) {
-        return 0;
+    else if (is_unknown) {
+        fprintf(stderr, "Unknown option\n");
+        return -1;
+    }
+    else if (is_listpart) {
+        opts->mode = littlefs_opts_listparts;
+        if (!opts->dst_image) {
+            fprintf(stderr, "--image <file> is not specified\n");
+            return -1;
+        }
+        else {
+            return 0;
+        }
     }
     else {
         if (opts->block_cycles < 0) {
@@ -246,6 +265,20 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
             fprintf(stderr, "Missing --filesystem_size <size> or --partition_num <num>\n");
             return -1;
         }
+        else if (opts->filesystem_size > 0 && opts->partition_num > 0) {
+            fprintf(stderr, "Only --filesystem_size or --partition_num is allowed in same time");
+            return -1;
+        }
+        else if (opts->filesystem_size > 0) {
+            if (opts->filesystem_size % 512) {
+                fprintf(stderr, "--filesystem_size <size> should be multiply of 512");
+                return -1;
+            }
+            opts->mode = littlefs_opts_file;
+        }
+        else if (opts->partition_num > 0) {
+            opts->mode = littlefs_opts_parts;
+        }
         if (optind < argc) {
             opts->src_dirs_siz = argc - optind;
             opts->src_dirs     = calloc(opts->src_dirs_siz, sizeof(char *));
@@ -257,6 +290,35 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
             fprintf(stderr, "source directories not specified\n");
             return -1;
         }
+        if (!opts->dst_image) {
+            fprintf(stderr, "--image <file> is not specified\n");
+            return -1;
+        }
     }
-    return -1;
+    return 0;
+}
+
+void print_config_options(const struct littlefs_opts *opts)
+{
+    static const char struct_info[] = "genlittlefs partition configuration:\n"
+                                      "\n"
+                                      "   LFS read size %i\n"
+                                      "   LFS block size: %i\n"
+                                      "   LFS prog size: %i\n"
+                                      "   LFS cache size: %i\n"
+                                      "   LFS lookahead size: %i\n"
+                                      "   LFS block cycles: %i\n"
+                                      "   Filesystem size: %lli\n"
+                                      "   Partition number: %i\n"
+                                      "   Overwrite existing fs: %i\n";
+    printf(struct_info,
+           opts->read_size,
+           opts->block_size,
+           opts->prog_size,
+           opts->cache_size,
+           opts->lockahead_size,
+           opts->block_cycles,
+           opts->filesystem_size,
+           opts->partition_num,
+           opts->overwrite_existing);
 }
