@@ -8,6 +8,8 @@
 #include <sstream>
 #include <iomanip>
 #include <cmath>
+#include <random>
+#include "module-utils/time/time_conversion.hpp"
 
 #define MAGIC_ENUM_RANGE_MAX 256
 #include <magic_enum.hpp>
@@ -242,13 +244,10 @@ namespace utils
 
     namespace filesystem
     {
-        static inline long int filelength(std::FILE *file) noexcept
-        {
-            if (file == nullptr) {
-                return 0;
-            }
-            std::fseek(file, 0, SEEK_END);
-            return std::ftell(file);
-        }
+        [[nodiscard]] long int filelength(std::FILE *file) noexcept;
+
+        void computeCRC32(std::FILE *file, unsigned long *outCrc32) noexcept;
+
+        [[nodiscard]] std::string generateRandomId(std::size_t length = 0) noexcept;
     } // namespace filesystem
 } // namespace utils

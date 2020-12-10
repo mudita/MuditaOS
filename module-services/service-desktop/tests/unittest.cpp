@@ -20,6 +20,7 @@
 #include <json/json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <utf8/UTF8.hpp>
+#include <vfs.hpp>
 
 #include <memory>
 #include <filesystem>

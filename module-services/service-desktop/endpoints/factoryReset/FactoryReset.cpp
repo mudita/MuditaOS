@@ -7,7 +7,7 @@
 #include <log/log.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <service-db/DBServiceName.hpp>
-#include <vfs.hpp>
+#include <Utils.hpp>
 
 #include <cstdint>
 #include <filesystem>
@@ -24,7 +24,6 @@ namespace FactoryReset
     static bool CopyFile(std::string sourcefile, std::string targetfile);
 
     static int recurseDepth             = 0;
-    static const int empty_dirlist_size = 2;   /* vfs.listdir lists "." and ".." by default also for empty dir */
     static const int max_recurse_depth  = 120; /* 120 is just an arbitrary value of max number of recursive calls.
                                                 * If more then error is assumed, not the real depth of directories."
                                                 */
@@ -39,11 +38,9 @@ namespace FactoryReset
         LOG_INFO("FactoryReset: restoring factory state started...");
 
         recurseDepth = 0;
-
         const auto factoryOSPath                 = purefs::dir::getFactoryOSPath();
-        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(factoryOSPath.c_str(), "");
 
-        if (dirlist.size() <= empty_dirlist_size) {
+        if (std::filesystem::is_directory(factoryOSPath.c_str()) && std::filesystem::is_empty(factoryOSPath.c_str())) {
             LOG_ERROR("FactoryReset: restoring factory state aborted");
             LOG_ERROR("FactoryReset: directory %s seems empty.", factoryOSPath.c_str());
             return false;
@@ -52,7 +49,7 @@ namespace FactoryReset
         if (ownerService != nullptr) {
             LOG_INFO("FactoryReset: closing ServiceDB...");
             std::string dbServiceName = service::name::db;
-            (void)sys::SystemManager::DestroyService(dbServiceName, ownerService);
+            sys::SystemManager::DestroyService(dbServiceName, ownerService);
         }
 
         if (DeleteDirContent(purefs::dir::getRootDiskPath()) != true) {
@@ -72,20 +69,21 @@ namespace FactoryReset
 
     bool DeleteDirContent(std::string dir)
     {
-        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(dir.c_str(), "");
-
-        for (auto &direntry : dirlist) {
-            if ((direntry.fileName.compare(".") != 0) && (direntry.fileName.compare("..") != 0) &&
-                (direntry.fileName.compare("...") != 0)) {
+        for (auto &direntry : std::filesystem::directory_iterator(dir.c_str())) {
+            if ((direntry.path().string().compare(".") != 0) && (direntry.path().string().compare("..") != 0) &&
+                (direntry.path().string().compare("...") != 0)) {
 
                 std::string delpath = dir;
                 delpath += "/";
-                delpath += direntry.fileName.c_str();
+                delpath += direntry.path().string().c_str();
 
-                if (direntry.attributes == vfs::FileAttributes::Directory) {
-                    if (direntry.fileName.compare(PATH_FACTORY) != 0) {
+                if (std::filesystem::is_directory(direntry)) {
+                    if (direntry.path().string().compare(PATH_FACTORY) != 0) {
                         LOG_INFO("FactoryReset: recursively deleting dir %s...", delpath.c_str());
-                        if (vfs.deltree(delpath.c_str()) != 0) {
+                        try {
+                            std::filesystem::remove_all(delpath.c_str());
+                        }
+                        catch (const std::filesystem::filesystem_error &e) {
                             LOG_ERROR("FactoryReset: error deleting dir %s, aborting...", delpath.c_str());
                             return false;
                         }
@@ -93,7 +91,7 @@ namespace FactoryReset
                 }
                 else {
                     LOG_INFO("FactoryReset: deleting file %s...", delpath.c_str());
-                    if (vfs.remove(delpath.c_str()) != 0) {
+                    if (std::filesystem::remove(delpath.c_str())) {
                         LOG_ERROR("FactoryReset: error deleting file %s, aborting...", delpath.c_str());
                         return false;
                     }
@@ -114,21 +112,20 @@ namespace FactoryReset
         }
 
         const auto factoryOSPath                 = purefs::dir::getFactoryOSPath();
-        std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(sourcedir.c_str(), "");
 
-        for (auto &direntry : dirlist) {
-            if ((direntry.fileName.compare(".") == 0) || (direntry.fileName.compare("..") == 0) ||
-                (direntry.fileName.compare("...") == 0)) {
+        for (auto &direntry : std::filesystem::directory_iterator(sourcedir.c_str())) {
+            if ((direntry.path().string().compare(".") == 0) || (direntry.path().string().compare("..") == 0) ||
+                (direntry.path().string().compare("...") == 0)) {
                 continue;
             }
 
             std::string sourcepath = sourcedir;
             sourcepath += "/";
-            sourcepath += direntry.fileName.c_str();
+            sourcepath += direntry.path().string().c_str();
 
             std::string targetpath = targetdir;
             targetpath += "/";
-            targetpath += direntry.fileName.c_str();
+            targetpath += direntry.path().string().c_str();
 
             if ((sourcepath.size() >= max_filepath_length) || (targetpath.size() >= max_filepath_length)) {
                 LOG_ERROR("FactoryReset: path length (source or target) exceeds system limit of %d",
@@ -137,14 +134,14 @@ namespace FactoryReset
                 return false;
             }
 
-            if (direntry.attributes == vfs::FileAttributes::Directory) {
+            if (std::filesystem::is_directory(direntry)) {
                 if (targetpath.compare(factoryOSPath.c_str()) == 0) {
                     continue;
                 }
 
                 LOG_INFO("FactoryReset: restoring dir  %s into %s...", sourcepath.c_str(), targetpath.c_str());
 
-                if (vfs.mkdir(targetpath.c_str()) != 0) {
+                if (std::filesystem::create_directory(targetpath.c_str())) {
                     LOG_ERROR("FactoryReset: create dir %s failed", targetpath.c_str());
                     return false;
                 }
@@ -173,30 +170,30 @@ namespace FactoryReset
     static bool CopyFile(std::string sourcefile, std::string targetfile)
     {
         bool ret  = true;
-        auto lamb = [](vfs::FILE *stream) { vfs.fclose(stream); };
+        auto lamb = [](std::FILE *stream) { std::fclose(stream); };
 
-        std::unique_ptr<vfs::FILE, decltype(lamb)> sf(vfs.fopen(sourcefile.c_str(), "r"), lamb);
-        std::unique_ptr<vfs::FILE, decltype(lamb)> tf(vfs.fopen(targetfile.c_str(), "w"), lamb);
+        std::unique_ptr<std::FILE, decltype(lamb)> sf(std::fopen(sourcefile.c_str(), "r"), lamb);
+        std::unique_ptr<std::FILE, decltype(lamb)> tf(std::fopen(targetfile.c_str(), "w"), lamb);
 
         if ((sf.get() != nullptr) && (tf.get() != nullptr)) {
             std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::copy_buf]);
 
             if (buffer.get() != nullptr) {
-                uint32_t loopcount = (vfs.filelength(sf.get()) / purefs::buffer::copy_buf) + 1u;
+                uint32_t loopcount = (utils::filesystem::filelength(sf.get()) / purefs::buffer::copy_buf) + 1u;
                 uint32_t readsize  = purefs::buffer::copy_buf;
 
                 for (uint32_t i = 0u; i < loopcount; i++) {
                     if (i + 1u == loopcount) {
-                        readsize = vfs.filelength(sf.get()) % purefs::buffer::copy_buf;
+                        readsize = utils::filesystem::filelength(sf.get()) % purefs::buffer::copy_buf;
                     }
 
-                    if (vfs.fread(buffer.get(), 1, readsize, sf.get()) != readsize) {
+                    if (std::fread(buffer.get(), 1, readsize, sf.get()) != readsize) {
                         LOG_ERROR("FactoryReset: read from sourcefile %s failed", sourcefile.c_str());
                         ret = false;
                         break;
                     }
 
-                    if (vfs.fwrite(buffer.get(), 1, readsize, tf.get()) != readsize) {
+                    if (std::fwrite(buffer.get(), 1, readsize, tf.get()) != readsize) {
                         LOG_ERROR("FactoryReset: write to targetfile %s failed", targetfile.c_str());
                         ret = false;
                         break;

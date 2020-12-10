@@ -18,7 +18,6 @@
 #include <module-apps/application-desktop/ApplicationDesktop.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <service-db/QueryMessage.hpp>
-#include <vfs.hpp>
 
 #include <cinttypes>
 #include <filesystem>
