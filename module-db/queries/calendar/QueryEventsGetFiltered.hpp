@@ -24,13 +24,13 @@ namespace db::query::events
 
     class GetFilteredResult : public QueryResult
     {
-        std::unique_ptr<std::vector<EventsRecord>> records;
+        std::vector<EventsRecord> records;
         uint32_t recordsCount;
 
       public:
-        GetFilteredResult(std::unique_ptr<std::vector<EventsRecord>> records, uint32_t count);
+        GetFilteredResult(std::vector<EventsRecord> records, uint32_t count);
         auto getCountResult() -> uint32_t;
-        [[nodiscard]] auto getResult() -> std::unique_ptr<std::vector<EventsRecord>>;
+        [[nodiscard]] auto getResult() -> std::vector<EventsRecord>;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };

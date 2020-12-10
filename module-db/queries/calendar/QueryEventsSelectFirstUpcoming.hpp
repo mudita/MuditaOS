@@ -24,11 +24,11 @@ namespace db::query::events
     /// Result of SelectFirstUpcoming query
     class SelectFirstUpcomingResult : public QueryResult
     {
-        std::unique_ptr<std::vector<EventsRecord>> records;
+        std::vector<EventsRecord> records;
 
       public:
-        SelectFirstUpcomingResult(std::unique_ptr<std::vector<EventsRecord>> records);
-        [[nodiscard]] auto getResult() -> std::unique_ptr<std::vector<EventsRecord>>;
+        SelectFirstUpcomingResult(std::vector<EventsRecord> records);
+        [[nodiscard]] auto getResult() -> std::vector<EventsRecord>;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
