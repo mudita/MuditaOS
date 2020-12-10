@@ -175,14 +175,9 @@ bool AlarmsTable::updateStatuses(AlarmStatus status)
 // Todo: create query that returns first upcoming alarm to invoke
 //(or set of alarms that will be further processed in AlarmsTimeEvents::calcToNextEventInterval
 // to programmatically choose the first upcoming one)
-std::vector<AlarmsTableRow> AlarmsTable::SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till)
+std::vector<AlarmsTableRow> AlarmsTable::SelectTurnedOn()
 {
-    auto retQuery = db->query("SELECT * "
-                              "FROM alarms "
-                              "WHERE time >= '%q' "
-                              "AND time <= '%q' ",
-                              TimePointToString(filter_from).c_str(),
-                              TimePointToString(filter_till).c_str());
+    auto retQuery = db->query("SELECT * from alarms WHERE status > %i;", AlarmStatus::Off);
 
     if (retQuery == nullptr || retQuery->getRowCount() == 0) {
         return std::vector<AlarmsTableRow>();
@@ -191,14 +186,7 @@ std::vector<AlarmsTableRow> AlarmsTable::SelectFirstUpcoming(TimePoint filter_fr
     std::vector<AlarmsTableRow> ret;
 
     do {
-        ret.push_back(AlarmsTableRow{
-            (*retQuery)[0].getUInt32(),                              // ID
-            TimePointFromString((*retQuery)[1].getString().c_str()), // date_from
-            (*retQuery)[2].getUInt32(),                              // reminder
-            static_cast<AlarmStatus>((*retQuery)[3].getInt32()),     // reminder
-            (*retQuery)[4].getUInt32(),                              // reminder
-            (*retQuery)[5].getString()                               // title/
-        });
+        ret.push_back(AlarmsTableRow(*retQuery));
     } while (retQuery->nextRow());
 
     return ret;

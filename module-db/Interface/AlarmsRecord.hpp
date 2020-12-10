@@ -24,8 +24,8 @@ namespace db::query::alarms
     class RemoveResult;
     class TurnOffAll;
     class TurnOffAllResult;
-    class SelectFirstUpcoming;
-    class SelectFirstUpcomingResult;
+    class SelectTurnedOn;
+    class SelectTurnedOnResult;
 } // namespace db::query::alarms
 
 struct AlarmsRecord : public Record
@@ -69,7 +69,7 @@ class AlarmsRecordInterface : public RecordInterface<AlarmsRecord, AlarmsRecordF
                                                                      uint32_t limit,
                                                                      AlarmsRecordField field,
                                                                      const char *str) override final;
-    std::unique_ptr<std::vector<AlarmsRecord>> SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till);
+    std::unique_ptr<std::vector<AlarmsRecord>> SelectTurnedOn();
 
     std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
@@ -82,6 +82,6 @@ class AlarmsRecordInterface : public RecordInterface<AlarmsRecord, AlarmsRecordF
     std::unique_ptr<db::query::alarms::GetResult> runQueryImplGetResult(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::alarms::GetLimitedResult> runQueryImplGetLimitedResult(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::alarms::TurnOffAllResult> runQueryImplTurnOffAll(std::shared_ptr<db::Query> query);
-    std::unique_ptr<db::query::alarms::SelectFirstUpcomingResult> runQueryImplSelectFirstUpcoming(
+    std::unique_ptr<db::query::alarms::SelectTurnedOnResult> runQueryImplSelectTurnedOn(
         std::shared_ptr<db::Query> query);
 };

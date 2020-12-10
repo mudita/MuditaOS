@@ -8,7 +8,7 @@
 #include "queries/alarms/QueryAlarmsGet.hpp"
 #include "queries/alarms/QueryAlarmsGetLimited.hpp"
 #include "queries/alarms/QueryAlarmsTurnOffAll.hpp"
-#include <module-db/queries/alarms/QueryAlarmsSelectFirstUpcoming.hpp>
+#include "queries/alarms/QueryAlarmsSelectTurnedOn.hpp"
 
 AlarmsRecord::AlarmsRecord(const AlarmsTableRow &tableRow)
     : Record{tableRow.ID}, time{tableRow.time}, snooze{tableRow.snooze}, status{tableRow.status},
@@ -120,14 +120,13 @@ bool AlarmsRecordInterface::TurnOffAll()
     return alarmsDB->alarms.updateStatuses(AlarmStatus::Off);
 }
 
-std::unique_ptr<std::vector<AlarmsRecord>> AlarmsRecordInterface::SelectFirstUpcoming(TimePoint filter_from,
-                                                                                      TimePoint filter_till)
+std::unique_ptr<std::vector<AlarmsRecord>> AlarmsRecordInterface::SelectTurnedOn()
 {
-    auto rows = alarmsDB->alarms.SelectFirstUpcoming(filter_from, filter_till);
+    auto rows = alarmsDB->alarms.SelectTurnedOn();
 
     auto records = std::make_unique<std::vector<AlarmsRecord>>();
 
-    for (auto &r : rows) {
+    for (const auto &r : rows) {
         records->push_back(r);
     }
 
@@ -154,8 +153,8 @@ std::unique_ptr<db::QueryResult> AlarmsRecordInterface::runQuery(std::shared_ptr
     if (typeid(*query) == typeid(db::query::alarms::Edit)) {
         return runQueryImplEdit(query);
     }
-    if (typeid(*query) == typeid(db::query::alarms::SelectFirstUpcoming)) {
-        return runQueryImplSelectFirstUpcoming(query);
+    if (typeid(*query) == typeid(db::query::alarms::SelectTurnedOn)) {
+        return runQueryImplSelectTurnedOn(query);
     }
     return nullptr;
 }
@@ -222,13 +221,15 @@ std::unique_ptr<db::query::alarms::TurnOffAllResult> AlarmsRecordInterface::runQ
     return response;
 }
 
-std::unique_ptr<db::query::alarms::SelectFirstUpcomingResult> AlarmsRecordInterface::runQueryImplSelectFirstUpcoming(
+std::unique_ptr<db::query::alarms::SelectTurnedOnResult> AlarmsRecordInterface::runQueryImplSelectTurnedOn(
     std::shared_ptr<db::Query> query)
 {
-    auto getFirstUpcomingQuery = static_cast<db::query::alarms::SelectFirstUpcoming *>(query.get());
-
-    auto records  = SelectFirstUpcoming(getFirstUpcomingQuery->filter_from, getFirstUpcomingQuery->filter_till);
-    auto response = std::make_unique<db::query::alarms::SelectFirstUpcomingResult>(std::move(records));
+    auto records = SelectTurnedOn();
+    std::vector<AlarmsRecord> recordVector;
+    for (const auto &alarm : *records) {
+        recordVector.emplace_back(alarm);
+    }
+    auto response = std::make_unique<db::query::alarms::SelectTurnedOnResult>(recordVector);
     response->setRequestQuery(query);
     return response;
 }

@@ -9,7 +9,7 @@
 #include <MessageType.hpp>
 #include <log/log.hpp>
 #include <module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp>
-#include <module-db/queries/alarms/QueryAlarmsSelectFirstUpcoming.hpp>
+#include <module-db/queries/alarms/QueryAlarmsSelectTurnedOn.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 
@@ -100,7 +100,7 @@ namespace stm
                     calendarEvents.receiveNextEventQuery(std::move(result));
                     responseHandled = true;
                 }
-                if (dynamic_cast<db::query::alarms::SelectFirstUpcomingResult *>(result.get())) {
+                if (dynamic_cast<db::query::alarms::SelectTurnedOn *>(result.get())) {
                     alarmsEvents.receiveNextEventQuery(std::move(result));
                     responseHandled = true;
                 }

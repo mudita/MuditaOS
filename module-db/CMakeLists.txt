@@ -120,7 +120,7 @@ set(SOURCES
         queries/alarms/QueryAlarmsGet.cpp
         queries/alarms/QueryAlarmsGetLimited.cpp
         queries/alarms/QueryAlarmsTurnOffAll.cpp
-        queries/alarms/QueryAlarmsSelectFirstUpcoming.cpp
+        queries/alarms/QueryAlarmsSelectTurnedOn.cpp
 )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
