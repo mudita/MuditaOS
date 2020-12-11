@@ -16,6 +16,7 @@
 struct lfs_ioaccess_context
 {
     uint8_t *data;
+    void *mmap_addr;
     int data_fd;
     size_t mmap_size;
     struct timeval last_msync;
@@ -41,7 +42,7 @@ static int lfs_erase(const struct lfs_config *c, lfs_block_t block)
 {
     struct lfs_ioaccess_context *ctx = c->context;
     uint8_t *data                    = ctx->data;
-    memset(data + (block * c->block_size), 0, c->block_size);
+    memset(data + (block * c->block_size), 0xff, c->block_size);
     return 0;
 }
 
@@ -56,7 +57,7 @@ static int lfs_sync(const struct lfs_config *c)
     timersub(&curr_msync, &ctx->last_msync, &result_msync);
     int err = 0;
     if (result_msync.tv_sec >= 1) {
-        err             = msync(ctx->data, ctx->mmap_size, MS_ASYNC);
+        err             = msync(ctx->mmap_addr, ctx->mmap_size, MS_ASYNC);
         ctx->last_msync = curr_msync;
     }
     return err;
@@ -93,13 +94,17 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
             ret->mmap_size = partition->end - partition->start + 1;
         }
     }
+    long page_mask    = ~(sysconf(_SC_PAGESIZE) - 1);
+    off_t mmap_offset = start_pos & page_mask;
 
-    ret->data = mmap(NULL, ret->mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, ret->data_fd, start_pos);
-    if (ret->data == MAP_FAILED) {
+    ret->mmap_addr = mmap(NULL, ret->mmap_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, ret->data_fd, mmap_offset);
+    if (ret->mmap_addr == MAP_FAILED) {
         close(ret->data_fd);
         free(ret);
         return NULL;
     }
+    ret->data = ret->mmap_addr;
+    ret->data += (start_pos - mmap_offset);
 
     // Mount the file system
     cfg->read  = lfs_read;
@@ -120,8 +125,8 @@ int lfs_ioaccess_close(struct lfs_ioaccess_context *ctx)
         errno = EINVAL;
         return -1;
     }
-    msync(ctx->data, ctx->mmap_size, MS_SYNC);
-    int err = munmap(ctx->data, ctx->mmap_size);
+    msync(ctx->mmap_addr, ctx->mmap_size, MS_SYNC);
+    int err = munmap(ctx->mmap_addr, ctx->mmap_size);
     if (err < 0) {
         close(ctx->data_fd);
         return err;
