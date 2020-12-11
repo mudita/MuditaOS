@@ -9,7 +9,21 @@
 extern "C"
 {
 #include "module-bluetooth/lib/btstack/src/btstack_util.h"
-};
+}
+#include <btstack_run_loop_freertos.h>
+
+#if DEBUG_BLUETOOTH_HCI_COMS == 1
+#define logHciComs(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define logHciComs(...)
+#endif
+
+#if DEBUG_BLUETOOTH_HCI_BYTES == 1
+#include <sstream>
+#define logHciBytes(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define logHciBytes(...)
+#endif
 
 using namespace bsp;
 
@@ -110,8 +124,6 @@ bool BluetoothWorker::start_pan()
     return false;
 }
 
-#include <sstream>
-
 bool BluetoothWorker::handleMessage(uint32_t queueID)
 {
 
@@ -127,51 +139,49 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
 
     Bt::Message notification = Bt::Message::EvtErrorRec;
     if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
-        LOG_ERROR("Receive failure!");
+        LOG_ERROR("Queue receive failure!");
         return false;
     }
     auto bt = BlueKitchen::getInstance();
     switch (notification) {
+    case Bt::Message::EvtSending:
+        logHciComs("[evt] sending");
+        break;
     case Bt::Message::EvtSent:
-#ifdef DO_DEBUG_HCI_COMS
-        LOG_INFO("[evt] sent");
-#endif
+        logHciComs("[evt] sent");
         if (bt->write_done_cb) {
-            bt->write_done_cb();
+            btstack_run_loop_freertos_execute_code_on_main_thread(reinterpret_cast<void (*)(void *)>(bt->write_done_cb),
+                                                                  nullptr);
         }
+        break;
+    case Bt::Message::EvtReceiving:
+        logHciComs("[evt] receiving");
         break;
     case Bt::Message::EvtReceived: {
-        if (bt->to_read_req > bt->in.len) {
-            // LOG_ERROR("%d vs %d", bt->to_read_req, bt->in.len);
-            break;
-        }
-        for (int i = 0; i < bt->to_read_req; ++i) {
-            // error in pop should never happen
-            if (int ret = bt->in.pop((char *)bt->read_buff + i)) {
-                LOG_ERROR("This shall never happen: %d", ret);
-            }
-        }
-        // LOG_DEBUG(">> %d",bt->in.len);
-#ifdef DO_DEBUG_HCI_COMS
-        std::stringstream ss;
-        for (int i = 0; i < bt->to_read_req; ++i) {
-            ss << " 0x" << std::hex << (int)*(bt->read_buff + i);
-        }
-        LOG_DEBUG("[evt] recieved <-- [%d]>%s<", bt->to_read_req, ss.str().c_str());
-#endif
-        bt->to_read_req = 0;
+        logHciBytes("[evt] BT DMA received <-- [%ld]>%s<",
+                    bt->read_len,
+                    [&]() -> std::string {
+                        std::stringstream ss;
+                        for (int i = 0; i < bt->read_len; ++i) {
+                            ss << " 0x" << std::hex << (int)*(bt->read_buff + i);
+                        }
+                        return ss.str();
+                    }()
+                                 .c_str());
+
+        bt->read_len = 0;
 
         if (bt->read_ready_cb) {
-            bt->read_ready_cb();
+            btstack_run_loop_freertos_execute_code_on_main_thread(reinterpret_cast<void (*)(void *)>(bt->read_ready_cb),
+                                                                  nullptr);
         }
     } break;
-    case Bt::Message::EvtSentError:
-    case Bt::Message::EvtRecError:
+    case Bt::Message::EvtSendingError:
+    case Bt::Message::EvtReceivingError:
     case Bt::Message::EvtUartError:
-    case Bt::Message::EvtRecUnwanted: {
+    case Bt::Message::EvtRecUnwanted:
         LOG_ERROR("Uart error [%d]: %s", notification, Bt::MessageCstr(notification));
         break;
-    } break;
     default:
         LOG_ERROR("ERROR");
     }

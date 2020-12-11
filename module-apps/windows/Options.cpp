@@ -43,7 +43,7 @@ namespace gui::option
             auto font_bold = FontManager::getInstance().getFont(style::window::font::mediumbold);
             auto text      = new Text(nullptr, style::option::text_left_padding, 0, 0, 0);
             text->setMaximumSize(rect->getWidth(), rect->getHeight());
-            text->setEditMode(EditMode::BROWSE);
+            text->setEditMode(EditMode::Browse);
             text->setText(std::make_unique<TextDocument>(std::list<TextBlock>(
                 {{utils::localize.get("sms_call_text"), font}, {contact.getFormattedName(), font_bold}})));
             style::window::decorate(rect);

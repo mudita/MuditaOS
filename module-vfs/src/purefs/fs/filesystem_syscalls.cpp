@@ -3,14 +3,14 @@
 #include <purefs/fs/filesystem.hpp>
 #include <errno.h>
 #include <log/log.hpp>
-#include <purefs/fs/mount_point.hpp>
 #include <purefs/fs/filesystem_operations.hpp>
 #include <purefs/fs/file_handle.hpp>
+#include <purefs/fs/directory_handle.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
 
 namespace purefs::fs
 {
-    auto filesystem::stat_vfs(std::string_view path, statvfs &stat) const noexcept -> int
+    auto filesystem::stat_vfs(std::string_view path, struct ::statvfs &stat) const noexcept -> int
     {
         return invoke_fops(&filesystem_operations::stat_vfs, path, stat);
     }
@@ -55,10 +55,6 @@ namespace purefs::fs
         return invoke_fops(&filesystem_operations::chmod, path, mode);
     }
 
-    auto filesystem::close(int fd) noexcept -> int
-    {
-        return invoke_fops(&filesystem_operations::close, fd);
-    }
 
     auto filesystem::write(int fd, const char *ptr, size_t len) noexcept -> ssize_t
     {
@@ -118,7 +114,7 @@ namespace purefs::fs
             LOG_ERROR("VFS: Unable to find mount point");
             return -ENOENT;
         }
-        auto fsops = mountp->fs_ops().lock();
+        auto fsops = mountp->fs_ops();
         if (fsops) {
             auto fh = fsops->open(mountp, abspath, flags, mode);
             if (!fh) {
@@ -136,4 +132,52 @@ namespace purefs::fs
             return -EIO;
         }
     }
+
+    auto filesystem::close(int fd) noexcept -> int
+    {
+        auto ret = invoke_fops(&filesystem_operations::close, fd);
+        if (!ret) {
+            ret = (remove_filehandle(fd)) ? (0) : (-EBADF);
+        }
+        return ret;
+    }
+
+    auto filesystem::diropen(std::string_view path) noexcept -> fsdir
+    {
+        const auto abspath     = absolute_path(path);
+        auto [mountp, pathpos] = find_mount_point(abspath);
+        if (!mountp) {
+            LOG_ERROR("VFS: Unable to find mount point");
+            return std::make_shared<internal::directory_handle>(nullptr, -ENOENT);
+        }
+        auto fsops = mountp->fs_ops();
+        if (fsops) {
+            auto dh = fsops->diropen(mountp, abspath);
+            if (!dh) {
+                LOG_ERROR("VFS: Unable to get diropen");
+                return std::make_shared<internal::directory_handle>(nullptr, -ENXIO);
+            }
+            return dh;
+        }
+        else {
+            LOG_ERROR("VFS: Unable to lock fops");
+            return std::make_shared<internal::directory_handle>(nullptr, -EIO);
+        }
+    }
+
+    auto filesystem::dirreset(fsdir dirstate) noexcept -> int
+    {
+        return invoke_fops(&filesystem_operations::dirreset, dirstate);
+    }
+
+    auto filesystem::dirnext(fsdir dirstate, std::string &filename, struct stat &filestat) noexcept -> int
+    {
+        return invoke_fops(&filesystem_operations::dirnext, dirstate, filename, filestat);
+    }
+
+    auto filesystem::dirclose(fsdir dirstate) noexcept -> int
+    {
+        return invoke_fops(&filesystem_operations::dirclose, dirstate);
+    }
+
 } // namespace purefs::fs

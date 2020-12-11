@@ -24,7 +24,7 @@ namespace purefs::blkdev::internal
         {}
         auto disk() const noexcept
         {
-            return m_disk;
+            return m_disk.lock();
         }
         auto partition() const noexcept
         {

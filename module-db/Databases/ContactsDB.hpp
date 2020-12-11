@@ -14,13 +14,8 @@
 class ContactsDB : public Database
 {
   public:
-    ContactsDB();
+    ContactsDB(const char *name);
     ~ContactsDB() = default;
-
-    static const char *GetDBName()
-    {
-        return dbName;
-    }
 
     ContactsTable contacts;
     ContactsNameTable name;
@@ -47,7 +42,6 @@ class ContactsDB : public Database
     }
 
   private:
-    static const char *dbName;
     static uint32_t favouritesId;
     static uint32_t iceId;
     static uint32_t blockedId;

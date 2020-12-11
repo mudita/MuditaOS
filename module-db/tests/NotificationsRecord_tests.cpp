@@ -12,20 +12,23 @@
 #include "module-db/queries/notifications/QueryNotificationsGetAll.hpp"
 
 #include <vfs.hpp>
+#include <filesystem>
 
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <algorithm>
 #include <iostream>
+#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Notifications Record tests")
 {
     Database::initialize();
 
-    vfs.remove(NotificationsDB::GetDBName());
+    const auto notificationsPath = (purefs::dir::getUserDiskPath() / "notifications.db").c_str();
+    std::filesystem::remove(notificationsPath);
 
-    NotificationsDB notificationsDb;
+    NotificationsDB notificationsDb{notificationsPath};
 
     REQUIRE(notificationsDb.isInitialized());
 

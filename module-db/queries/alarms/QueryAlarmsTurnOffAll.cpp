@@ -16,6 +16,11 @@ namespace db::query::alarms
     TurnOffAllResult::TurnOffAllResult(bool ret) : ret(ret)
     {}
 
+    auto TurnOffAllResult::succeed() const -> bool
+    {
+        return ret;
+    }
+
     [[nodiscard]] auto TurnOffAllResult::debugInfo() const -> std::string
     {
         return std::string{"TurnOffAllResult"};

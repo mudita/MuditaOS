@@ -28,7 +28,7 @@ namespace gui
         smsBubble->setMaximumSize(style::messages::smsOutput::sms_max_width,
                                   style::messages::smsOutput::sms_max_height);
         smsBubble->setAlignment(Alignment(Alignment::Vertical::Center));
-        smsBubble->setTextType(TextType::MULTI_LINE);
+        smsBubble->setTextType(TextType::MultiLine);
         smsBubble->setRadius(style::messages::smsOutput::sms_radius);
         smsBubble->setFont(style::window::font::medium);
         smsBubble->setPenFocusWidth(style::window::default_border_focus_w);

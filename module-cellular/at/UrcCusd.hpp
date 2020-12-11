@@ -30,7 +30,7 @@ namespace at::urc
             OperationNotSupported,
             NetworkTimeOut
         };
-
+        Cusd(const std::string &urcBody, const std::string &urcHead = std::string());
         static constexpr std::string_view head = "+CUSD";
         static auto isURC(const std::string uHead) -> bool
         {
@@ -45,6 +45,7 @@ namespace at::urc
         [[nodiscard]] auto getMessage() const noexcept -> std::optional<std::string>;
         [[nodiscard]] auto getStatus() const noexcept -> std::optional<StatusType>;
         [[nodiscard]] auto getDCS() const noexcept -> std::optional<int>;
+        void split(const std::string &str) override;
 
         void Handle(UrcHandler &h) final
         {

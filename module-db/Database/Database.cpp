@@ -5,9 +5,9 @@
 #include "DatabaseInitializer.hpp"
 
 #include "log/log.hpp"
-#include "vfs.hpp"
 #include <assert.h>
 #include <memory>
+#include <purefs/filesystem_paths.hpp>
 
 /* Declarations *********************/
 extern sqlite3_vfs *sqlite3_ecophonevfs(void);
@@ -76,8 +76,9 @@ Database::Database(const char *name)
     pragmaQuery("PRAGMA integrity_check;");
     pragmaQuery("PRAGMA locking_mode=EXCLUSIVE");
 
-    LOG_INFO("running scripts: %s", USER_PATH("db"));
-    isInitialized_ = initializer->run(USER_PATH("db"), INIT_SCRIPTS_EXT);
+    const auto filePath = (purefs::dir::getUserDiskPath() / "db");
+    LOG_INFO("running scripts: %s", filePath.c_str());
+    isInitialized_ = initializer->run(filePath.c_str(), INIT_SCRIPTS_EXT);
 }
 
 Database::~Database()

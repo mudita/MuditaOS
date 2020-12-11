@@ -17,7 +17,8 @@
 #include "queries/messages/threads/QueryThreadRemove.hpp"
 #include "queries/messages/threads/QueryThreadsGet.hpp"
 #include "queries/messages/sms/QuerySMSGetLastByThreadID.hpp"
-#include "vfs.hpp"
+#include <vfs.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 #include <algorithm>
 
@@ -29,12 +30,14 @@ TEST_CASE("Thread Record tests")
 {
     Database::initialize();
 
-    vfs.remove(ContactsDB::GetDBName());
-    vfs.remove(SmsDB::GetDBName());
+    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    const auto smsPath      = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
+    std::filesystem::remove(contactsPath);
+    std::filesystem::remove(smsPath);
 
-    auto smsDB = std::make_unique<SmsDB>();
+    auto smsDB = std::make_unique<SmsDB>(smsPath);
     REQUIRE(smsDB->isInitialized());
-    auto contactsDB = std::make_unique<ContactsDB>();
+    auto contactsDB = std::make_unique<ContactsDB>(contactsPath);
     REQUIRE(contactsDB->isInitialized());
 
     const uint32_t dateTest      = 123456789;

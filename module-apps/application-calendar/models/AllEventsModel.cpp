@@ -67,8 +67,8 @@ auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     auto response = dynamic_cast<db::query::events::GetAllLimitedResult *>(queryResult);
     assert(response != nullptr);
 
-    auto records = *response->getResult();
-    list->setElementsCount(*response->getCountResult());
+    auto records = response->getResult();
+    list->setElementsCount(response->getCountResult());
 
     auto app = dynamic_cast<app::ApplicationCalendar *>(application);
     assert(application != nullptr);

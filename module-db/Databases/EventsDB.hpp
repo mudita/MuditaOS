@@ -9,16 +9,8 @@
 class EventsDB : public Database
 {
   public:
-    EventsDB();
+    EventsDB(const char *name);
     ~EventsDB() override = default;
 
     EventsTable events;
-
-    static const char *GetDBName()
-    {
-        return dbName;
-    }
-
-  private:
-    static const char *dbName;
 };

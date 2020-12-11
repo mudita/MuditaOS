@@ -65,3 +65,151 @@ TEST_CASE("RW boundary checking")
     REQUIRE(dm.read(part1.name, buf2.data(), 0, 1) == 0);
     REQUIRE(buf1 == buf2);
 }
+
+TEST_CASE("Null pointer passed to disk manager functions")
+{
+    using namespace purefs;
+    blkdev::disk_manager dm;
+
+    SECTION("Register device function")
+    {
+        std::shared_ptr<blkdev::disk> disk = nullptr;
+        REQUIRE(dm.register_device(disk, "emmc0") == -EINVAL);
+    }
+
+    SECTION("Write function")
+    {
+        REQUIRE(dm.write(static_cast<blkdev::disk_fd>(nullptr),
+                         nullptr,
+                         static_cast<uint64_t>(0),
+                         static_cast<std::size_t>(0)) == -EINVAL);
+    }
+
+    SECTION("Read function")
+    {
+        REQUIRE(dm.read(static_cast<blkdev::disk_fd>(nullptr),
+                        nullptr,
+                        static_cast<uint64_t>(0),
+                        static_cast<std::size_t>(0)) == -EINVAL);
+    }
+
+    SECTION("Erase function")
+    {
+        REQUIRE(dm.erase(static_cast<blkdev::disk_fd>(nullptr), 0, 0) == -EINVAL);
+    }
+
+    SECTION("Sync function")
+    {
+        REQUIRE(dm.sync(static_cast<blkdev::disk_fd>(nullptr)) == -EINVAL);
+    }
+
+    SECTION("PM control function")
+    {
+        REQUIRE(dm.pm_control(static_cast<blkdev::disk_fd>(nullptr), blkdev::pm_state::power_off) == -EINVAL);
+    }
+
+    SECTION("Status function")
+    {
+        REQUIRE(dm.status(static_cast<blkdev::disk_fd>(nullptr)) == blkdev::media_status::error);
+    }
+
+    SECTION("Partitions function")
+    {
+        REQUIRE(dm.partitions(static_cast<blkdev::disk_fd>(nullptr)).empty());
+    }
+
+    SECTION("Get info function")
+    {
+        REQUIRE(dm.get_info(static_cast<blkdev::disk_fd>(nullptr), blkdev::info_type::sector_size) == 0);
+    }
+
+    SECTION("Reread partitions function")
+    {
+        REQUIRE(dm.reread_partitions(static_cast<blkdev::disk_fd>(nullptr)) == -EINVAL);
+    }
+}
+
+TEST_CASE("Boundary checks for partitions")
+{
+    using namespace purefs;
+    blkdev::disk_manager dm;
+
+    SECTION("Register device function")
+    {
+        REQUIRE(dm.unregister_device("") == -ENOENT);
+    }
+
+    SECTION("Write function")
+    {
+        REQUIRE(dm.write("", nullptr, static_cast<uint64_t>(0), static_cast<std::size_t>(0)) == -ENOENT);
+    }
+
+    SECTION("Read function")
+    {
+        REQUIRE(dm.read("", nullptr, static_cast<uint64_t>(0), static_cast<std::size_t>(0)) == -ENOENT);
+    }
+
+    SECTION("Erase function")
+    {
+        REQUIRE(dm.erase("", 0, 0) == -ENOENT);
+    }
+
+    SECTION("Sync function")
+    {
+        REQUIRE(dm.sync("") == -ENOENT);
+    }
+
+    SECTION("PM control function")
+    {
+        REQUIRE(dm.pm_control("", blkdev::pm_state::power_off) == -ENOENT);
+    }
+
+    SECTION("Status function")
+    {
+        REQUIRE(dm.status("") == blkdev::media_status::error);
+    }
+
+    SECTION("Partitions function")
+    {
+        REQUIRE(dm.partitions("").empty());
+    }
+
+    SECTION("Get info function")
+    {
+        REQUIRE(dm.get_info("", blkdev::info_type::sector_size) == -ENOENT);
+    }
+
+    SECTION("Reread partitions function")
+    {
+        REQUIRE(dm.reread_partitions("") == -ENOENT);
+    }
+}
+
+TEST_CASE("Disk sectors out of range for partition")
+{
+    using namespace purefs;
+    blkdev::disk_manager dm;
+    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    REQUIRE(disk);
+    REQUIRE(dm.register_device(disk, "emmc1") == 0);
+    const auto parts = dm.partitions("emmc1");
+    REQUIRE(parts.size() > 1);
+    const auto sect_size = dm.get_info("emmc1", blkdev::info_type::sector_size);
+
+    SECTION("Read out of range")
+    {
+        std::vector<uint8_t> buf(sect_size);
+        REQUIRE(dm.read("emmc1", buf.data(), parts[0].num_sectors - 1, parts[0].num_sectors) == -ERANGE);
+    }
+
+    SECTION("Write out of range")
+    {
+        std::vector<uint8_t> buf(sect_size);
+        REQUIRE(dm.write("emmc1", buf.data(), parts[0].num_sectors - 1, parts[0].num_sectors) == -ERANGE);
+    }
+
+    SECTION("Erase out of range")
+    {
+        REQUIRE(dm.erase("emmc1", parts[0].num_sectors - 1, parts[0].num_sectors) == -ERANGE);
+    }
+}

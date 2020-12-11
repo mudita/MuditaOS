@@ -9,6 +9,8 @@
 #include "Tables/SMSTemplateTable.hpp"
 
 #include <vfs.hpp>
+#include <filesystem>
+#include <purefs/filesystem_paths.hpp>
 
 #include <algorithm>
 #include <string>
@@ -19,9 +21,10 @@ TEST_CASE("SMS Templates Table tests")
 {
     Database::initialize();
 
-    vfs.remove(SmsDB::GetDBName());
+    const auto smsPath = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
+    std::filesystem::remove(smsPath);
 
-    SmsDB smsDb;
+    SmsDB smsDb{smsPath};
     REQUIRE(smsDb.isInitialized());
 
     auto &templatesTbl = smsDb.templates;

@@ -41,8 +41,8 @@ Icon::Icon(Item *parent,
 
     new Image(this, style::img::x, style::img::y, imageName);
     text = new Text(this, style::text::x, style::text::y, style::text::w, style::text::h);
-    text->setTextType(TextType::MULTI_LINE);
-    text->setEditMode(EditMode::BROWSE);
+    text->setTextType(TextType::MultiLine);
+    text->setEditMode(EditMode::Browse);
     text->setEdges(RectangleEdge::None);
     text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 

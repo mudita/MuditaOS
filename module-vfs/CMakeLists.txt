@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 include(thirdparty)
+include(thirdparty/littlefs.cmake)
 
 project(module-vfs VERSION 1.0
         DESCRIPTION "VFS module library")
@@ -21,6 +22,20 @@ set(FREERTOS_FAT_SOURCES
         )
 
 third_party_source_optimization(${FREERTOS_FAT_SOURCES})
+
+
+set(FF_FAT_SOURCES_THIRDPARTY
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source/ff.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source/ffunicode.c
+)
+third_party_source_optimization(${FREERTOS_FAT_SOURCES_THIRDPARTY})
+
+set(FF_FAT_SOURCES
+    ${FF_FAT_SOURCES_THIRDPARTY}
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ffsystem.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ff_glue.cpp
+)
+
 
 # Disable some warnings due to ugly embedded hacks
 # in the FREERTOS FAT implementation
@@ -44,6 +59,7 @@ set(FREERTOS_FAT_EXTSOURCES
 set(SOURCES ""
         ${FREERTOS_FAT_SOURCES}
         ${FREERTOS_FAT_EXTSOURCES}
+        ${FF_FAT_SOURCES}
         src/purefs/filesystem_paths.cpp
         src/purefs/blkdev/disk_manager.cpp
         src/purefs/blkdev/disk.cpp
@@ -53,6 +69,8 @@ set(SOURCES ""
         src/purefs/fs/filesystem_operations.cpp
         src/purefs/fs/filesystem_syscalls.cpp
         src/purefs/fs/filesystem_cwd.cpp
+        src/purefs/vfs_subsystem.cpp
+        drivers/src/purefs/fs/filesystem_vfat.cpp
         src/deprecated/vfs-utils.cpp
         src/deprecated/vfs.cpp
         src/deprecated/vfsNotifier.cpp
@@ -85,7 +103,6 @@ target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 target_compile_definitions(${PROJECT_NAME}
-
         PUBLIC
 )
 
@@ -94,9 +111,16 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/user/deprecated
         ${CMAKE_CURRENT_SOURCE_DIR}/include/user/
         ${CMAKE_CURRENT_SOURCE_DIR}/include/internal/
+        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
 )
 
-target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-bsp module-utils)
+target_include_directories(${PROJECT_NAME}
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source
+)
+
+target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-bsp module-utils littlefs)
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     target_link_libraries(${PROJECT_NAME} -lstdc++fs)

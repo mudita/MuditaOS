@@ -19,8 +19,9 @@
 
 EventsRecord::EventsRecord(const EventsTableRow &tableRow)
     : Record{tableRow.ID}, UID{tableRow.UID}, title{tableRow.title}, date_from{tableRow.date_from},
-      date_till{tableRow.date_till}, reminder{tableRow.reminder}, repeat{tableRow.repeat}, reminder_fired{
-                                                                                               tableRow.reminder_fired}
+      date_till{tableRow.date_till}, reminder{tableRow.reminder}, repeat{tableRow.repeat},
+      reminder_fired{tableRow.reminder_fired}, provider_type{tableRow.provider_type}, provider_id{tableRow.provider_id},
+      provider_iCalUid{tableRow.provider_iCalUid}
 {}
 
 EventsRecordInterface::EventsRecordInterface(EventsDB *eventsDb) : eventsDb(eventsDb)
@@ -28,14 +29,17 @@ EventsRecordInterface::EventsRecordInterface(EventsDB *eventsDb) : eventsDb(even
 
 bool EventsRecordInterface::Add(const EventsRecord &rec)
 {
-    auto entry = EventsTableRow{{.ID = rec.ID},
-                                .UID            = rec.UID,
-                                .title          = rec.title,
-                                .date_from      = rec.date_from,
-                                .date_till      = rec.date_till,
-                                .reminder       = rec.reminder,
-                                .repeat         = rec.repeat,
-                                .reminder_fired = rec.reminder_fired};
+    auto entry = EventsTableRow{{rec.ID},
+                                .UID              = rec.UID,
+                                .title            = rec.title,
+                                .date_from        = rec.date_from,
+                                .date_till        = rec.date_till,
+                                .reminder         = rec.reminder,
+                                .repeat           = rec.repeat,
+                                .reminder_fired   = rec.reminder_fired,
+                                .provider_type    = rec.provider_type,
+                                .provider_id      = rec.provider_id,
+                                .provider_iCalUid = rec.provider_iCalUid};
 
     Repeat repeatOption = Repeat(rec.repeat);
     if (repeatOption > Repeat::yearly) {
@@ -66,17 +70,17 @@ bool EventsRecordInterface::Add(const EventsRecord &rec)
     return false;
 }
 
-std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::Select(TimePoint filter_from,
-                                                                         TimePoint filter_till,
-                                                                         uint32_t offset,
-                                                                         uint32_t limit)
+std::vector<EventsRecord> EventsRecordInterface::Select(TimePoint filter_from,
+                                                        TimePoint filter_till,
+                                                        uint32_t offset,
+                                                        uint32_t limit)
 {
     auto rows = eventsDb->events.selectByDatePeriod(filter_from, filter_till, offset, limit);
 
-    auto records = std::make_unique<std::vector<EventsRecord>>();
+    auto records = std::vector<EventsRecord>();
 
     for (auto &r : rows) {
-        records->push_back(r);
+        records.push_back(r);
     }
 
     return records;
@@ -105,11 +109,10 @@ std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::GetLimitOffset
     for (auto &r : rows) {
         records->push_back(r);
     }
-
     return records;
 }
 
-std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::GetLimitOffsetByDate(uint32_t offset, uint32_t limit)
+std::vector<EventsRecord> EventsRecordInterface::GetLimitOffsetByDate(uint32_t offset, uint32_t limit)
 {
     if (limit == 0) {
         limit = GetCount();
@@ -117,10 +120,10 @@ std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::GetLimitOffset
 
     auto rows = eventsDb->events.getLimitOffsetByDate(offset, limit);
 
-    auto records = std::make_unique<std::vector<EventsRecord>>();
+    auto records = std::vector<EventsRecord>();
 
     for (auto &r : rows) {
-        records->push_back(r);
+        records.push_back(r);
     }
 
     return records;
@@ -134,14 +137,17 @@ bool EventsRecordInterface::Update(const EventsRecord &rec)
         return false;
     }
 
-    auto entry = EventsTableRow{{.ID = rec.ID},
-                                .UID            = rec.UID,
-                                .title          = rec.title,
-                                .date_from      = rec.date_from,
-                                .date_till      = rec.date_till,
-                                .reminder       = rec.reminder,
-                                .repeat         = rec.repeat,
-                                .reminder_fired = rec.reminder_fired};
+    auto entry = EventsTableRow{{rec.ID},
+                                .UID              = rec.UID,
+                                .title            = rec.title,
+                                .date_from        = rec.date_from,
+                                .date_till        = rec.date_till,
+                                .reminder         = rec.reminder,
+                                .repeat           = rec.repeat,
+                                .reminder_fired   = rec.reminder_fired,
+                                .provider_type    = rec.provider_type,
+                                .provider_id      = rec.provider_id,
+                                .provider_iCalUid = rec.provider_iCalUid};
 
     bool result = eventsDb->events.update(entry);
 
@@ -182,14 +188,17 @@ bool EventsRecordInterface::UpdateByUID(const EventsRecord &rec)
         return false;
     }
 
-    auto entry = EventsTableRow{{.ID = rec.ID},
-                                .UID            = rec.UID,
-                                .title          = rec.title,
-                                .date_from      = rec.date_from,
-                                .date_till      = rec.date_till,
-                                .reminder       = rec.reminder,
-                                .repeat         = rec.repeat,
-                                .reminder_fired = rec.reminder_fired};
+    auto entry = EventsTableRow{{rec.ID},
+                                .UID              = rec.UID,
+                                .title            = rec.title,
+                                .date_from        = rec.date_from,
+                                .date_till        = rec.date_till,
+                                .reminder         = rec.reminder,
+                                .repeat           = rec.repeat,
+                                .reminder_fired   = rec.reminder_fired,
+                                .provider_type    = rec.provider_type,
+                                .provider_id      = rec.provider_id,
+                                .provider_iCalUid = rec.provider_iCalUid};
 
     bool result = eventsDb->events.updateByUID(entry);
 
@@ -241,7 +250,13 @@ bool EventsRecordInterface::RemoveByField(EventsRecordField field, const char *s
 
 EventsRecord EventsRecordInterface::GetByID(uint32_t id)
 {
-    EventsRecord event = static_cast<EventsRecord>(eventsDb->events.getById(id));
+    EventsRecord event{eventsDb->events.getById(id)};
+    return event;
+}
+
+EventsRecord EventsRecordInterface::GetByUID(const std::string &uid)
+{
+    EventsRecord event{eventsDb->events.getByUID(uid)};
     return event;
 }
 
@@ -255,14 +270,13 @@ uint32_t EventsRecordInterface::GetCountFiltered(TimePoint from, TimePoint till)
     return eventsDb->events.countFromFilter(from, till);
 }
 
-std::unique_ptr<std::vector<EventsRecord>> EventsRecordInterface::SelectFirstUpcoming(TimePoint filter_from,
-                                                                                      TimePoint filter_till)
+std::vector<EventsRecord> EventsRecordInterface::SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till)
 {
     auto rows = eventsDb->events.SelectFirstUpcoming(filter_from, filter_till);
 
-    auto records = std::make_unique<std::vector<EventsRecord>>();
+    auto records = std::vector<EventsRecord>();
     for (auto &r : rows) {
-        records->push_back(r);
+        records.push_back(r);
     }
 
     return records;
@@ -318,7 +332,7 @@ std::unique_ptr<db::query::events::GetAllResult> EventsRecordInterface::runQuery
 {
     auto numberOfEvents = GetCount();
     auto records        = GetLimitOffset(0, numberOfEvents);
-    auto response       = std::make_unique<db::query::events::GetAllResult>(std::move(records));
+    auto response       = std::make_unique<db::query::events::GetAllResult>(*records);
     response->setRequestQuery(query);
     return response;
 }
@@ -330,8 +344,7 @@ std::unique_ptr<db::query::events::GetAllLimitedResult> EventsRecordInterface::r
     auto getAllLimitedQuery = static_cast<db::query::events::GetAllLimited *>(query.get());
     auto records            = GetLimitOffsetByDate(getAllLimitedQuery->offset, getAllLimitedQuery->limit);
     auto count              = GetCount();
-    auto response =
-        std::make_unique<db::query::events::GetAllLimitedResult>(std::move(records), std::make_unique<uint32_t>(count));
+    auto response           = std::make_unique<db::query::events::GetAllLimitedResult>(std::move(records), count);
     response->setRequestQuery(query);
     return response;
 }
@@ -404,7 +417,7 @@ std::unique_ptr<db::query::events::SelectFirstUpcomingResult> EventsRecordInterf
     auto getFirstUpcomingQuery = static_cast<db::query::events::SelectFirstUpcoming *>(query.get());
 
     auto records  = SelectFirstUpcoming(getFirstUpcomingQuery->filter_from, getFirstUpcomingQuery->filter_till);
-    auto response = std::make_unique<db::query::events::SelectFirstUpcomingResult>(std::move(records));
+    auto response = std::make_unique<db::query::events::SelectFirstUpcomingResult>(records);
     response->setRequestQuery(query);
     return response;
 }

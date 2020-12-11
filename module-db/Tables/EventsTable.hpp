@@ -19,6 +19,9 @@ struct EventsTableRow : public Record
     uint32_t reminder        = 0;
     uint32_t repeat          = 0;
     TimePoint reminder_fired = TIME_POINT_INVALID;
+    std::string provider_type;
+    std::string provider_id;
+    std::string provider_iCalUid;
 };
 
 enum class EventsTableFields
@@ -40,12 +43,14 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
     bool addTwoWeeks(EventsTableRow entry);
     bool addMonth(EventsTableRow entry);
     bool addYear(EventsTableRow entry);
+    std::vector<bool> parseOptions(uint32_t repeatOptionValue);
     bool addCustom(EventsTableRow entry);
     bool removeById(uint32_t id) override final;
     bool removeByUID(const std::string &UID);
     bool removeByField(EventsTableFields field, const char *str) override final;
     bool update(EventsTableRow entry) override final;
     bool updateByUID(EventsTableRow entry);
+    bool drop();
     EventsTableRow getByUID(const std::string &UID);
     EventsTableRow getById(uint32_t id) override final;
     std::vector<EventsTableRow> selectByDatePeriod(TimePoint filter_from,
@@ -74,5 +79,8 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
                                    "reminder INTEGER,"
                                    "repeat INTEGER,"
                                    "reminder_fired DATETIME,"
+                                   "provider_type TEXT,"
+                                   "provider_id TEXT,"
+                                   "provider_iCalUid TEXT,"
                                    "UNIQUE (title, date_from, date_till));";
 };

@@ -83,7 +83,7 @@ namespace gui
 
     auto TextLineCursor::displayNextLine() -> bool
     {
-        if (text->lines->stopCondition != LinesDrawStop::OUT_OF_TEXT) {
+        if (text->lines->stopCondition != LinesDrawStop::OutOfText) {
 
             text->lines->addToPreviousLinesStartList(text->lines->first().getLineStartBlockNumber(),
                                                      text->lines->first().getLineStartBlockPosition());
@@ -146,7 +146,7 @@ namespace gui
         /// down - corner case
         if ((checkNpos() || (direction == NavigationDirection::DOWN && selectedLineNumber == lastVisibleLineNumber))) {
 
-            if (text->lines->stopCondition != LinesDrawStop::OUT_OF_TEXT) {
+            if (text->lines->stopCondition != LinesDrawStop::OutOfText) {
 
                 if (checkNextLineDocumentEnd(selectedLineNumber)) {
                     return TextCursor::Move::End;
@@ -180,7 +180,7 @@ namespace gui
         /// right - corner case
         if ((checkNpos() || (direction == NavigationDirection::RIGHT && selectedLineNumber == lastVisibleLineNumber))) {
 
-            if (text->lines->stopCondition != LinesDrawStop::OUT_OF_TEXT &&
+            if (text->lines->stopCondition != LinesDrawStop::OutOfText &&
                 (selectedLineCursorPosition ==
                  (text->lines->getLine(lastVisibleLineNumber)->length() -
                   (text->lines->getLine(lastVisibleLineNumber)->getEnd() == TextBlock::End::Newline ? 1 : 0)))) {
