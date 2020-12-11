@@ -42,7 +42,8 @@ const char *c_str(Bt::Error::Code code)
     return "";
 }
 
-BluetoothWorker::BluetoothWorker(sys::Service *service) : Worker(service), currentProfile(std::make_shared<Bt::HSP>())
+BluetoothWorker::BluetoothWorker(sys::Service *service)
+    : Worker(service), service(service), currentProfile(std::make_shared<Bt::HSP>())
 {
     init({
         {"qBtIO", sizeof(Bt::Message), 10},
@@ -67,7 +68,7 @@ bool BluetoothWorker::run()
     if (Worker::run()) {
         is_running                          = true;
         auto el                             = queues[queueIO_handle];
-        BlueKitchen::getInstance()->qHandle = el;
+        BlueKitchen::getInstance()->qHandle = el->GetQueueHandle();
         Bt::initialize_stack();
         Bt::register_hw_error_callback();
         Bt::GAP::register_scan();
@@ -127,7 +128,7 @@ bool BluetoothWorker::start_pan()
 bool BluetoothWorker::handleMessage(uint32_t queueID)
 {
 
-    QueueHandle_t queue = queues[queueID];
+    QueueHandle_t queue = queues[queueID]->GetQueueHandle();
     if (queueID == queueService) {
         LOG_DEBUG("not interested");
         return true;
