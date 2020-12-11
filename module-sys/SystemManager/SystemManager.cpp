@@ -11,6 +11,7 @@
 #include <service-evtmgr/KbdMessage.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <Service/Timer.hpp>
 
 const inline size_t systemManagerStack = 4096 * 2;
 
@@ -94,8 +95,9 @@ namespace sys
 
     void SystemManager::StartSystem(InitFunction init)
     {
-
         powerManager = std::make_unique<PowerManager>();
+        cpuStatistics = std::make_unique<CpuStatistics>();
+
         // Switch system to full functionality(clocks and power domains configured to max values)
         powerManager->Switch(PowerManager::Mode::FullSpeed);
         userInit = init;
@@ -106,6 +108,10 @@ namespace sys
         // M.P: Ping/pong mechanism is turned off. It doesn't bring any value to the system.
         // pingPongTimerID = CreateTimer(Ticks::MsToTicks(pingInterval), true);
         // ReloadTimer(pingPongTimerID);
+
+        cpuStatisticsTimer = std::make_unique<sys::Timer>("cpuStatistics", this, 1000);
+        cpuStatisticsTimer->connect([&](sys::Timer &) { CpuStatisticsTimerHandler(); });
+        cpuStatisticsTimer->start();
     }
 
     bool SystemManager::CloseSystem(Service *s)
@@ -348,8 +354,14 @@ namespace sys
         set(State::Reboot);
     }
 
+    void SystemManager::CpuStatisticsTimerHandler()
+    {
+        cpuStatistics->Update();
+    }
+
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
     cpp_freertos::MutexStandard SystemManager::destroyMutex;
     std::unique_ptr<PowerManager> SystemManager::powerManager;
+    std::unique_ptr<CpuStatistics> SystemManager::cpuStatistics;
 
 } // namespace sys

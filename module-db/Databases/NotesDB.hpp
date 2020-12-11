@@ -9,16 +9,8 @@
 class NotesDB : public Database
 {
   public:
-    NotesDB();
+    NotesDB(const char *name);
     ~NotesDB() = default;
 
     NotesTable notes;
-
-    static const char *GetDBName()
-    {
-        return dbName;
-    }
-
-  private:
-    static const char *dbName;
 };

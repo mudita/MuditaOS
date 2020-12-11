@@ -167,7 +167,7 @@ namespace gui
         // lines need to be drawn before cursor move in case we have scrolling
         text->drawLines();
 
-        if (cursorStartPosition != CursorStartPosition::DOCUMENT_BEGIN) {
+        if (cursorStartPosition != CursorStartPosition::DocumentBegin) {
             moveCursor(NavigationDirection::RIGHT);
         }
     }
@@ -175,7 +175,7 @@ namespace gui
     TextCursor &TextCursor::operator<<(const UTF8 &textString)
     {
         for (unsigned int i = 0; i < textString.length(); ++i) {
-            if (text->checkAdditionBounds(textString[i]) == InputBound::CAN_ADD) {
+            if (text->checkAdditionBounds(textString[i]) == AdditionBound::CanAddAll) {
                 addChar(textString[i]);
             }
             else {
@@ -189,7 +189,7 @@ namespace gui
     {
         auto [addBoundResult, processedTextBlock] = text->checkAdditionBounds(textBlock);
 
-        if (addBoundResult == InputBound::CAN_ADD || addBoundResult == InputBound::CAN_ADD_PART) {
+        if (addBoundResult == AdditionBound::CanAddAll || addBoundResult == AdditionBound::CanAddPart) {
 
             auto len = processedTextBlock.length();
             BlockCursor::addTextBlock(std::move(processedTextBlock));
@@ -198,7 +198,7 @@ namespace gui
             text->drawLines();
 
             // +1 is for block barrier
-            if (cursorStartPosition != CursorStartPosition::DOCUMENT_BEGIN) {
+            if (cursorStartPosition != CursorStartPosition::DocumentBegin) {
                 moveCursor(NavigationDirection::RIGHT, len + 1);
             }
         }

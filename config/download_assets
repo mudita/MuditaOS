@@ -6,6 +6,8 @@ SCRIPT_DIR="$(dirname ${SCRIPT})"
 SRC_ROOT=$(readlink -f ${SCRIPT_DIR}/..)
 
 DEST_DIR="${SRC_ROOT}/docker/assets"
+DEST_PYREQ_TMP="${DEST_DIR}/requirements.txt.tmp"
+DEST_PYREQ="${DEST_DIR}/requirements.txt"
 
 . ${SRC_ROOT}/config/common_scripsts_lib
 . ${SRC_ROOT}/config/bootstrap_config
@@ -39,7 +41,9 @@ function get_gh_runner() {
 
 function getPythonReq() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
-    cp ${SRC_ROOT}/test/requirements.txt $DEST_DIR
+    cat ${SRC_ROOT}/test/requirements.txt > ${DEST_PYREQ_TMP}
+    cat ${SRC_ROOT}/config/requirements.txt >> ${DEST_PYREQ_TMP}
+    cat ${DEST_PYREQ_TMP} | sort | uniq > ${DEST_PYREQ}
 }
 
 get_arm_toolchain

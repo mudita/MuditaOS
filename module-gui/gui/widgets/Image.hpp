@@ -34,6 +34,7 @@ namespace gui
         void set(const UTF8 &name);
 
         void buildDrawListImplementation(std::list<Command> &commands) override;
+        void accept(GuiVisitor &visitor) override;
     };
 
 } /* namespace gui */

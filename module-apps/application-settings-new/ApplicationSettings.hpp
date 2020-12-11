@@ -26,9 +26,10 @@ namespace gui::window::name
     inline constexpr auto input_language = "InputLanguage";
     inline constexpr auto locked_screen  = "LockedScreen";
 
-    inline constexpr auto messages  = "Messages";
-    inline constexpr auto torch     = "Torch";
-    inline constexpr auto templates = "Templates";
+    inline constexpr auto messages   = "Messages";
+    inline constexpr auto torch      = "Torch";
+    inline constexpr auto nightshift = "Nightshift";
+    inline constexpr auto templates  = "Templates";
 
     inline constexpr auto autolock  = "Autolock";
     inline constexpr auto wallpaper = "Wallpaper";

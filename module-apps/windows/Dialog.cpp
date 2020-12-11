@@ -59,8 +59,8 @@ Dialog::Dialog(app::Application *app, const std::string &name) : gui::AppWindow(
 
     text = new Text(this, style::text::x, style::text::y, style::text::w, style::text::h);
     text->setRichText("lol");
-    text->setTextType(TextType::MULTI_LINE);
-    text->setEditMode(EditMode::BROWSE);
+    text->setTextType(TextType::MultiLine);
+    text->setEditMode(EditMode::Browse);
     text->setEdges(RectangleEdge::None);
     text->setFont(style::window::font::medium);
     text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
@@ -156,8 +156,8 @@ DialogYesNoIconTxt::DialogYesNoIconTxt(app::Application *app, const std::string 
 {
     iconText = new Text(this, style::icontext::x, style::icontext::y, style::icontext::w, style::icontext::h);
     iconText->setText("");
-    iconText->setTextType(TextType::SINGLE_LINE);
-    iconText->setEditMode(EditMode::BROWSE);
+    iconText->setTextType(TextType::SingleLine);
+    iconText->setEditMode(EditMode::Browse);
     iconText->setEdges(RectangleEdge::None);
     iconText->setFont(style::window::font::largelight);
     iconText->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::None));

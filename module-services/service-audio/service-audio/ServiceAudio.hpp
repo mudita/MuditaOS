@@ -11,13 +11,15 @@
 #include <Service/Service.hpp>
 #include <Utils.hpp>
 
-#include <queries/settings/QuerySettingsAddOrIgnore_v2.hpp>
-#include <queries/settings/QuerySettingsGet_v2.hpp>
-#include <queries/settings/QuerySettingsUpdate_v2.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/QueryMessage.hpp>
 
 #include <functional>
+
+namespace settings
+{
+    class Settings;
+}
 
 class ServiceAudio : public sys::Service
 {
@@ -46,6 +48,8 @@ class ServiceAudio : public sys::Service
 
     audio::AudioMux audioMux;
     audio::AudioMux::VibrationStatus vibrationMotorStatus = audio::AudioMux::VibrationStatus::Off;
+    std::unique_ptr<settings::Settings> settingsProvider;
+    std::map<std::string, std::string> settingsCache;
 
     auto IsVibrationMotorOn()
     {
@@ -80,30 +84,6 @@ class ServiceAudio : public sys::Service
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
     auto IsBusy() -> bool;
 
-    void addOrIgnoreEntry(const std::string &profilePath, const std::string &defaultValue);
-
-    template <typename T>[[nodiscard]] T fetchAudioSettingFromDb(const std::string &profilePath, const T &defaultValue)
-    {
-        auto [code, msg] =
-            DBServiceAPI::GetQueryWithReply(this,
-                                            db::Interface::Name::Settings_v2,
-                                            std::make_unique<db::query::settings::SettingsQuery>(profilePath),
-                                            audio::audioOperationTimeout);
-
-        if (code == sys::ReturnCodes::Success && msg != nullptr) {
-            auto queryResponse = dynamic_cast<db::QueryResponse *>(msg.get());
-            assert(queryResponse != nullptr);
-
-            auto settingsResultResponse = queryResponse->getResult();
-            auto settingsResult = dynamic_cast<db::query::settings::SettingsResult *>(settingsResultResponse.get());
-            assert(settingsResult != nullptr);
-
-            return settingsResult->getResult().getValue<T>({});
-        }
-        return defaultValue;
-    }
-    void updateDbValue(const std::string &path, const std::string &value);
-
     void setSetting(const audio::Setting &setting,
                     const std::string &value,
                     const audio::Profile::Type &profileType,
@@ -113,4 +93,6 @@ class ServiceAudio : public sys::Service
                                          const audio::PlaybackType &playbackType);
 
     const std::pair<audio::Profile::Type, audio::PlaybackType> getCurrentContext();
+
+    void settingsChanged(const std::string &name, std::string value);
 };

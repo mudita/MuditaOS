@@ -11,8 +11,6 @@
 #include "application-meditation/ApplicationMeditation.hpp"
 
 #include "InputEvent.hpp"
-//#include "Rect.hpp"
-
 #include <cassert>
 
 #include <module-utils/i18n/i18n.hpp>

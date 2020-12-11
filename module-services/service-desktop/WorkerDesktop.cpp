@@ -154,10 +154,10 @@ void WorkerDesktop::rawDataReceived(void *dataPtr, uint32_t dataLen)
             return;
         }
 
-        const uint32_t bytesWritten = fwrite(dataPtr, 1, dataLen, fileDes);
+        const uint32_t bytesWritten = std::fwrite(dataPtr, 1, dataLen, fileDes);
 
         if (bytesWritten != dataLen) {
-            LOG_ERROR("transferDataReceived vfs write failed bytesWritten=%" PRIu32 " != dataLen=%" PRIu32,
+            LOG_ERROR("transferDataReceived write failed bytesWritten=%" PRIu32 " != dataLen=%" PRIu32,
                       bytesWritten,
                       dataLen);
             return;

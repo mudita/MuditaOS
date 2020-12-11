@@ -6,14 +6,15 @@
 
 namespace at::urc
 {
-    Urc::Urc(const std::string &urcBody, const std::string &urcHead, char tokenDelimiter)
-        : urcBody(urcBody), urcHead(urcHead)
+    Urc::Urc(const std::string &urcBody, const std::string &urcHead) : urcBody(urcBody), urcHead(urcHead)
     {
-        split(urcBody, tokenDelimiter);
+        split(urcBody);
     }
 
-    void Urc::split(const std::string &str, char tokenDelimiter)
+    void Urc::split(const std::string &str)
     {
+        constexpr char tokenDelimiter = ',';
+
         tokens                            = utils::split(str, tokenDelimiter);
         constexpr auto urcStringDelimiter = "\"";
         for (auto &t : tokens) {

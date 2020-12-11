@@ -42,8 +42,8 @@ namespace gui
         item->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top});
         item->setPenFocusWidth(::style::window::default_border_focus_w);
         item->setPenWidth(::style::window::default_border_rect_no_focus);
-        item->setEditMode(gui::EditMode::BROWSE);
-        item->setCursorStartPosition(CursorStartPosition::DOCUMENT_BEGIN);
+        item->setEditMode(gui::EditMode::Browse);
+        item->setCursorStartPosition(CursorStartPosition::DocumentBegin);
         item->setUnderline(false);
         return item;
     }

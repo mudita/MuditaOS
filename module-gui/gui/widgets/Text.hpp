@@ -52,7 +52,7 @@ namespace gui
         // holds list of labels for displaying currently visible text lines.
 
         TextLineCursor *cursor                  = nullptr;
-        CursorStartPosition cursorStartPosition = CursorStartPosition::DOCUMENT_END;
+        CursorStartPosition cursorStartPosition = CursorStartPosition::DocumentEnd;
         std::unique_ptr<TextDocument> document  = std::make_unique<TextDocument>(std::list<TextBlock>());
         InputMode *mode                         = nullptr;
         std::unique_ptr<Lines> lines            = nullptr;
@@ -64,8 +64,8 @@ namespace gui
         void showCursor(bool focus);
 
       public:
-        ExpandMode expandMode    = ExpandMode::EXPAND_NONE;
-        EditMode editMode        = EditMode::EDIT;
+        ExpandMode expandMode    = ExpandMode::None;
+        EditMode editMode        = EditMode::Edit;
         KeyCode key_signs_remove = KeyCode::KEY_PND;
 
         [[nodiscard]] bool isMode(EditMode edit) const
@@ -74,7 +74,7 @@ namespace gui
         }
 
       protected:
-        TextType textType = TextType::MULTI_LINE;
+        TextType textType = TextType::MultiLine;
         std::list<TextLimit> limitsList;
 
         /// points to default text font to use
@@ -95,12 +95,14 @@ namespace gui
         auto makePreDrawLines(uint32_t utfVal) -> std::unique_ptr<Lines>;
         auto makePreDrawLines(const TextBlock &textBlock) -> std::unique_ptr<Lines>;
 
-        auto checkMaxSignsLimit(unsigned int limitVal) -> InputBound;
-        auto checkMaxSignsLimit(const TextBlock &textBlock, unsigned int limitVal) -> std::tuple<InputBound, TextBlock>;
-        auto checkMaxSizeLimit(uint32_t utfVal) -> InputBound;
-        auto checkMaxSizeLimit(const TextBlock &textBlock) -> std::tuple<InputBound, TextBlock>;
-        auto checkMaxLinesLimit(uint32_t utfVal, unsigned int limitVal) -> InputBound;
-        auto checkMaxLinesLimit(const TextBlock &textBlock, unsigned int limitVal) -> std::tuple<InputBound, TextBlock>;
+        auto checkMaxSignsLimit(unsigned int limitVal) -> AdditionBound;
+        auto checkMaxSignsLimit(const TextBlock &textBlock, unsigned int limitVal)
+            -> std::tuple<AdditionBound, TextBlock>;
+        auto checkMaxSizeLimit(uint32_t utfVal) -> AdditionBound;
+        auto checkMaxSizeLimit(const TextBlock &textBlock) -> std::tuple<AdditionBound, TextBlock>;
+        auto checkMaxLinesLimit(uint32_t utfVal, unsigned int limitVal) -> AdditionBound;
+        auto checkMaxLinesLimit(const TextBlock &textBlock, unsigned int limitVal)
+            -> std::tuple<AdditionBound, TextBlock>;
 
         void preBuildDrawListHookImplementation(std::list<Command> &commands);
         /// redrawing lines
@@ -122,8 +124,8 @@ namespace gui
              const uint32_t &w,
              const uint32_t &h,
              const UTF8 &text      = "",
-             ExpandMode expandMode = ExpandMode::EXPAND_NONE,
-             TextType textType     = TextType::MULTI_LINE);
+             ExpandMode expandMode = ExpandMode::None,
+             TextType textType     = TextType::MultiLine);
         ~Text() override;
 
         void setEditMode(EditMode mode);
@@ -150,7 +152,7 @@ namespace gui
         /// @}
         virtual void clear();
         bool isEmpty();
-        virtual UTF8 getText();
+        virtual UTF8 getText() const;
         /// saves text from widget to file at specified path
         virtual bool saveText(UTF8 path);
         void setFont(const UTF8 &fontName);
@@ -176,14 +178,16 @@ namespace gui
             return format;
         }
 
+        void accept(GuiVisitor &visitor) override;
+
       private:
         gui::KeyInputMappedTranslation translator;
 
       public:
         TextChangedCallback textChangedCallback;
 
-        auto checkAdditionBounds(uint32_t utfVal) -> InputBound;
-        auto checkAdditionBounds(const TextBlock &textBlock) -> std::tuple<InputBound, TextBlock>;
+        auto checkAdditionBounds(uint32_t utfVal) -> AdditionBound;
+        auto checkAdditionBounds(const TextBlock &textBlock) -> std::tuple<AdditionBound, TextBlock>;
 
         auto setCursorStartPosition(CursorStartPosition val) -> void;
 

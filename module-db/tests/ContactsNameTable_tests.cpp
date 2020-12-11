@@ -1,7 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "vfs.hpp"
 
 #include <catch2/catch.hpp>
 
@@ -13,14 +12,16 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Contacts Name Table tests")
 {
     Database::initialize();
 
-    vfs.remove(ContactsDB::GetDBName());
+    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    std::remove(contactsPath);
 
-    ContactsDB contactsdb;
+    ContactsDB contactsdb(contactsPath);
     REQUIRE(contactsdb.isInitialized());
 
     ContactsNameTableRow testRow1 = {

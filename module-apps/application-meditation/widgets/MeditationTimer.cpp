@@ -48,7 +48,7 @@ namespace gui
         timer->setEdges(RectangleEdge::None);
         timer->setFont(style::window::font::supersizemelight);
         timer->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        timer->setEditMode(EditMode::BROWSE);
+        timer->setEditMode(EditMode::Browse);
 
         onReset();
     }

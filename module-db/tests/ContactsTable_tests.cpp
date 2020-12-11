@@ -2,27 +2,30 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
+#include <filesystem>
 
 #include "Databases/ContactsDB.hpp"
 #include "Tables/ContactsTable.hpp"
 
-#include "vfs.hpp"
+#include <vfs.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Contacts Table tests")
 {
     Database::initialize();
 
-    vfs.remove(ContactsDB::GetDBName());
+    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    std::filesystem::remove(contactsPath);
 
-    ContactsDB contactsdb;
+    ContactsDB contactsdb{contactsPath};
     REQUIRE(contactsdb.isInitialized());
 
     ContactsTableRow testRow1 = {{.ID = DB_ID_NONE},
-                                 .nameID         = DB_ID_NONE,
-                                 .numbersID      = "0 1 2 3 4",
-                                 .ringID         = DB_ID_NONE,
-                                 .addressID      = DB_ID_NONE,
-                                 .speedDial      = "666"
+                                 .nameID    = DB_ID_NONE,
+                                 .numbersID = "0 1 2 3 4",
+                                 .ringID    = DB_ID_NONE,
+                                 .addressID = DB_ID_NONE,
+                                 .speedDial = "666"
 
     };
 
@@ -58,6 +61,13 @@ TEST_CASE("Contacts Table tests")
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
     auto retOffsetLimitBigger = contactsdb.contacts.getLimitOffset(0, 100);
     REQUIRE(retOffsetLimitBigger.size() == 4);
+
+    auto sortedRetOffsetLimitBigger =
+        contactsdb.contacts.GetIDsSortedByField(ContactsTable::MatchType::Name, "", 1, 100, 0);
+    REQUIRE(sortedRetOffsetLimitBigger.size() == 4);
+
+    sortedRetOffsetLimitBigger = contactsdb.contacts.GetIDsSortedByName(1, 100);
+    REQUIRE(sortedRetOffsetLimitBigger.size() == 4);
 
     // Get table rows using invalid offset/limit parameters(should return empty object)
     auto retOffsetLimitFailed = contactsdb.contacts.getLimitOffset(5, 4);

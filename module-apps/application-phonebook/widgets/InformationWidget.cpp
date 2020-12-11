@@ -64,7 +64,7 @@ namespace gui
                                           phonebookStyle::informationWidget::email_text_h);
                 emailText->setMargins(Margins(0, style::margins::very_big, 0, 0));
                 emailText->setFont(style::window::font::medium);
-                emailText->setEditMode(EditMode::BROWSE);
+                emailText->setEditMode(EditMode::Browse);
                 emailText->setEdges(RectangleEdge::None);
                 emailText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
                 emailText->setText(contact->mail);

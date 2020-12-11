@@ -9,16 +9,8 @@
 class CalllogDB : public Database
 {
   public:
-    CalllogDB();
+    CalllogDB(const char *name);
     ~CalllogDB() = default;
 
     CalllogTable calls;
-
-    static const char *GetDBName()
-    {
-        return dbName;
-    }
-
-  private:
-    static const char *dbName;
 };

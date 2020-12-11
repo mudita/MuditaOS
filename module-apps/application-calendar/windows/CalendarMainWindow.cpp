@@ -212,7 +212,7 @@ namespace gui
         std::fill(std::begin(isDayEmpty), std::end(isDayEmpty), true);
         if (auto response = dynamic_cast<db::query::events::GetFilteredResult *>(queryResult)) {
             const auto records = response->getResult();
-            for (auto &rec : *records) {
+            for (auto &rec : records) {
                 date::year_month_day recordDate = TimePointToYearMonthDay(rec.date_from);
                 uint32_t dayNumb                = static_cast<unsigned>(recordDate.day());
                 isDayEmpty[dayNumb - 1]         = false;
@@ -224,7 +224,7 @@ namespace gui
             const auto records = response->getResult();
             auto day           = monthBox->getFocusItemIndex() + 1;
             auto filter = TimePointFromYearMonthDay(monthModel->getYear() / monthModel->getMonth() / date::day(day));
-            if (!records->empty()) {
+            if (!records.empty()) {
                 auto data = std::make_unique<DayMonthData>();
                 data->setData("", filter);
                 application->switchWindow(style::window::calendar::name::all_events_window, std::move(data));

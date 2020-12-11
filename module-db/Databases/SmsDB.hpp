@@ -11,18 +11,10 @@
 class SmsDB : public Database
 {
   public:
-    SmsDB();
+    SmsDB(const char *name);
     ~SmsDB() = default;
 
     SMSTable sms;
     ThreadsTable threads;
     SMSTemplateTable templates;
-
-    static const char *GetDBName()
-    {
-        return dbName;
-    }
-
-  private:
-    static const char *dbName;
 };

@@ -15,7 +15,7 @@ target_link_libraries(${PROJECT_NAME}
     module-bluetooth
     module-audio
     module-utils
-    module-db
+    module-services
 )
 
 

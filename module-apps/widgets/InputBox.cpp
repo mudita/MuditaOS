@@ -53,8 +53,8 @@ namespace gui
                                    horizontalBox::inputField::y,
                                    horizontalBox::inputField::w,
                                    horizontalBox::inputField::h);
-        inputField->setTextType(TextType::SINGLE_LINE);
-        inputField->setEditMode(EditMode::EDIT);
+        inputField->setTextType(TextType::SingleLine);
+        inputField->setEditMode(EditMode::Edit);
         inputField->setEdges(RectangleEdge::None);
         inputField->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
         inputField->setFont(style::window::font::mediumbold);

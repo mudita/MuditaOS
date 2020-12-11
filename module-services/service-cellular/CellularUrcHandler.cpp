@@ -9,6 +9,7 @@
 #include <module-sys/Service/Bus.hpp>
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <service-appmgr/Controller.hpp>
 
 // this static function will be replaced by Settings API
 static bool isSettingsAutomaticTimeSyncEnabled()
@@ -65,26 +66,28 @@ void CellularUrcHandler::Handle(Cmti &urc)
 
 void CellularUrcHandler::Handle(Cusd &urc)
 {
+    response     = std::nullopt;
+    auto message = urc.getMessage();
+    if (!message) {
+        return;
+    }
+
     if (urc.isActionNeeded()) {
         if (cellularService.ussdState == ussd::State::pullRequestSent) {
             cellularService.ussdState = ussd::State::pullResponseReceived;
             cellularService.setUSSDTimer();
+            auto msg = std::make_shared<CellularMMIResponseMessage>(*message);
+            sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellularService);
         }
     }
     else {
         CellularServiceAPI::USSDRequest(&cellularService, CellularUSSDMessage::RequestType::abortSesion);
         cellularService.ussdState = ussd::State::sesionAborted;
         cellularService.setUSSDTimer();
+        auto msg = std::make_shared<CellularMMIPushMessage>(*message);
+        sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellularService);
     }
 
-    auto message = urc.getMessage();
-    if (!message) {
-        response = std::nullopt;
-        return;
-    }
-
-    response =
-        std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingUSSD, *message);
     urc.setHandled(true);
 }
 

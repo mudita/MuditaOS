@@ -74,7 +74,7 @@ namespace app::notes
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));
         edit->setTextChangedCallback([this](Item &, const UTF8 &text) { setCharactersCount(text.length()); });
-        edit->setTextLimitType(gui::TextLimitType::MAX_SIGNS_COUNT, MaxCharactersCount);
+        edit->setTextLimitType(gui::TextLimitType::MaxSignsCount, MaxCharactersCount);
 
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(::style::strings::common::options));

@@ -9,7 +9,7 @@ namespace gui
 {
     TextFixedSize::TextFixedSize(Item *parent, Position x, Position y, Length w, Length h) : Text(parent, x, y, w, h)
     {
-        setEditMode(EditMode::EDIT);
+        setEditMode(EditMode::Edit);
         lines->setUnderLine(true);
     }
 

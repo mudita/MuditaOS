@@ -9,16 +9,8 @@
 class NotificationsDB : public Database
 {
   public:
-    NotificationsDB();
+    NotificationsDB(const char *name);
     virtual ~NotificationsDB() = default;
 
     NotificationsTable notifications;
-
-    static const char *GetDBName()
-    {
-        return dbName;
-    }
-
-  private:
-    static const char *dbName;
 };
