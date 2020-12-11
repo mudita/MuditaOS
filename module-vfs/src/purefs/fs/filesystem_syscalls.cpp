@@ -55,7 +55,6 @@ namespace purefs::fs
         return invoke_fops(&filesystem_operations::chmod, path, mode);
     }
 
-
     auto filesystem::write(int fd, const char *ptr, size_t len) noexcept -> ssize_t
     {
         return invoke_fops(&filesystem_operations::write, fd, ptr, len);
@@ -172,11 +171,19 @@ namespace purefs::fs
 
     auto filesystem::dirnext(fsdir dirstate, std::string &filename, struct stat &filestat) noexcept -> int
     {
+        if (!dirstate) {
+            LOG_ERROR("No directory handle");
+            return -ENXIO;
+        }
         return invoke_fops(&filesystem_operations::dirnext, dirstate, filename, filestat);
     }
 
     auto filesystem::dirclose(fsdir dirstate) noexcept -> int
     {
+        if (!dirstate) {
+            LOG_ERROR("No directory handle");
+            return -ENXIO;
+        }
         return invoke_fops(&filesystem_operations::dirclose, dirstate);
     }
 
