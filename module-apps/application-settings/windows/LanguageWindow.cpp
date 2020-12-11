@@ -17,8 +17,7 @@
 namespace gui
 {
 
-    LanguageWindow::LanguageWindow(app::Application *app, app::LanguageSetter *setter)
-        : AppWindow(app, "Languages"), setter(setter)
+    LanguageWindow::LanguageWindow(app::Application *app) : AppWindow(app, "Languages")
     {
         buildInterface();
         setFocusItem(options[0]);
@@ -53,7 +52,7 @@ namespace gui
         const auto &langList = loader.getAvailableDisplayLanguages();
         for (const auto &lang : langList) {
             options.push_back(addOptionLabel(lang, [=](gui::Item &item) {
-                setter->setDisplayLanguage(lang);
+                app::manager::Controller::changeDisplayLanguage(application, lang);
                 return true;
             }));
         }
