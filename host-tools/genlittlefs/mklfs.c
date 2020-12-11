@@ -104,7 +104,7 @@ static int add_directory_to_lfs(
     char lfs_curr_path[PATH_MAX];
     char host_curr_path[PATH_MAX];
     int err = -1;
-    dir = opendir(host_path);
+    dir     = opendir(host_path);
     if (dir) {
         while ((ent = readdir(dir))) {
             // Skip . and .. directories
@@ -298,7 +298,7 @@ int main(int argc, char **argv)
         close(fds);
         fds             = -1;
         cfg.block_count = lopts.filesystem_size / lopts.block_size;
-        ioctx = lfs_ioaccess_open(&cfg, lopts.dst_image, NULL);
+        ioctx           = lfs_ioaccess_open(&cfg, lopts.dst_image, NULL);
         if (!ioctx) {
             perror("Unable to open file:");
             free(lopts.src_dirs);

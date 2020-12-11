@@ -22,13 +22,13 @@ struct littlefs_opts
     int block_cycles;   //! Progam counter cycles
     //! Other ars
     enum littlefs_opts_mode mode; //! Software mode
-    long long filesystem_size; //! Filesystem size
-    int partition_num;         //! Parition number
-    size_t src_dirs_siz;       //! SOurce dirs size
-    char **src_dirs;           //! Source directories
-    char *dst_image;           //! Destination image
-    bool overwrite_existing;   //! Overwrite existing format
-    bool verbose;              //! Verbose mode
+    long long filesystem_size;    //! Filesystem size
+    int partition_num;            //! Parition number
+    size_t src_dirs_siz;          //! SOurce dirs size
+    char **src_dirs;              //! Source directories
+    char *dst_image;              //! Destination image
+    bool overwrite_existing;      //! Overwrite existing format
+    bool verbose;                 //! Verbose mode
 };
 
 int parse_program_args(int argc, char **argv, struct littlefs_opts *opts);

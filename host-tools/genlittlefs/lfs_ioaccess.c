@@ -176,20 +176,20 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
         if (partition->end > statbuf.st_size) {
             close(ret->file_des);
             free(ret);
-            errno   = E2BIG;
+            errno = E2BIG;
             return NULL;
         }
         else {
-            start_pos = partition->start;
+            start_pos      = partition->start;
             ret->last_offs = partition->end;
         }
     }
     ret->part_offs = start_pos;
     // Mount the file system
-    cfg->read  = lfs_read;
-    cfg->prog  = lfs_prog;
-    cfg->erase = lfs_erase;
-    cfg->sync  = lfs_sync;
+    cfg->read    = lfs_read;
+    cfg->prog    = lfs_prog;
+    cfg->erase   = lfs_erase;
+    cfg->sync    = lfs_sync;
     cfg->context = ret;
     return ret;
 }
@@ -208,7 +208,7 @@ int lfs_ioaccess_close(struct lfs_ioaccess_context *ctx)
 
 int lfs_ioaccess_is_lfs_filesystem(struct lfs_ioaccess_context *ctx)
 {
-    static const char lfs_id[] = "littlefs";
+    static const char lfs_id[]   = "littlefs";
     static const size_t lfs_offs = 8U;
     char buf[32];
     if (!ctx) {

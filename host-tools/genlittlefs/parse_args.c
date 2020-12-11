@@ -103,8 +103,8 @@ static void help(const char *name)
 int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
 {
     int c; // Current option
-    int option_index = 0;
-    bool is_help     = false;
+    int option_index                    = 0;
+    bool is_help                        = false;
     bool is_listpart                    = false;
     bool is_unknown                     = false;
     static struct option long_options[] = {

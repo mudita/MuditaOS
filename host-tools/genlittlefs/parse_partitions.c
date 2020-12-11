@@ -24,7 +24,7 @@ struct partition *find_partitions(const char *filename, part_type_t ptype, size_
         *nelems = 0;
         return pret;
     }
-    const int nparts  = blkid_partlist_numof_partitions(ls);
+    const int nparts = blkid_partlist_numof_partitions(ls);
     if (nparts < 1) {
         if (nelems)
             *nelems = 0;
