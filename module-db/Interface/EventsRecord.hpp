@@ -46,6 +46,9 @@ struct EventsRecord : public Record
     uint32_t reminder = 0;
     uint32_t repeat   = 0;
     TimePoint reminder_fired;
+    std::string provider_type;
+    std::string provider_id;
+    std::string provider_iCalUid;
 
     EventsRecord()  = default;
     ~EventsRecord() = default;
@@ -72,19 +75,17 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
     bool Update(const EventsRecord &rec) override final;
     bool UpdateByUID(const EventsRecord &rec);
     EventsRecord GetByID(uint32_t id) override final;
+    EventsRecord GetByUID(const std::string &uid);
     uint32_t GetCount() override final;
     uint32_t GetCountFiltered(TimePoint from, TimePoint till);
-    std::unique_ptr<std::vector<EventsRecord>> Select(TimePoint filter_from,
-                                                      TimePoint filter_till,
-                                                      uint32_t offset,
-                                                      uint32_t limit);
+    std::vector<EventsRecord> Select(TimePoint filter_from, TimePoint filter_till, uint32_t offset, uint32_t limit);
     std::unique_ptr<std::vector<EventsRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
     std::unique_ptr<std::vector<EventsRecord>> GetLimitOffsetByField(uint32_t offset,
                                                                      uint32_t limit,
                                                                      EventsRecordField field,
                                                                      const char *str) override final;
-    std::unique_ptr<std::vector<EventsRecord>> GetLimitOffsetByDate(uint32_t offset, uint32_t limit);
-    std::unique_ptr<std::vector<EventsRecord>> SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till);
+    std::vector<EventsRecord> GetLimitOffsetByDate(uint32_t offset, uint32_t limit);
+    std::vector<EventsRecord> SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till);
 
     std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 

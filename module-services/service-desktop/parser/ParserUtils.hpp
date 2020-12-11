@@ -124,13 +124,12 @@ namespace parserFSM
         inline constexpr auto accessTechnology = "accessTechnology";
         inline constexpr auto fileName         = "fileName";
         inline constexpr auto fileSize         = "fileSize";
-
-        inline constexpr auto update      = "update";
-        inline constexpr auto updateInfo  = "updateInfo";
-        inline constexpr auto updateError = "updateError";
-        inline constexpr auto errorCode   = "errorCode";
-        inline constexpr auto statusCode  = "statusCode";
-
+        inline constexpr auto update           = "update";
+        inline constexpr auto updateInfo       = "updateInfo";
+        inline constexpr auto updateError      = "updateError";
+        inline constexpr auto errorCode        = "errorCode";
+        inline constexpr auto statusCode       = "statusCode";
+        inline constexpr auto updateHistory    = "updateHistory";
         namespace filesystem
         {
             inline constexpr auto command = "command";

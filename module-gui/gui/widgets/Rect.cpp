@@ -126,4 +126,9 @@ namespace gui
         commands.emplace_back(std::move(rect));
     }
 
+    void Rect::accept(GuiVisitor &visitor)
+    {
+        visitor.visit(*this);
+    }
+
 } /* namespace gui */

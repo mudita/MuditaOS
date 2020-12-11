@@ -9,17 +9,9 @@
 class AlarmsDB : public Database
 {
   public:
-    AlarmsDB();
+    AlarmsDB(const char *name);
     ~AlarmsDB() = default;
 
     AlarmsTable alarms;
     AlarmsStatusTable alarmStatuses;
-
-    static const char *GetDBName()
-    {
-        return dbName;
-    }
-
-  private:
-    static const char *dbName;
 };

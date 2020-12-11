@@ -57,6 +57,7 @@ namespace gui
 
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;
+        void accept(GuiVisitor &visitor) override;
 
         void buildDrawListImplementation(std::list<Command> &commands) override;
 

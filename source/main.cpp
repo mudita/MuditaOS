@@ -18,6 +18,7 @@
 #include <application-music-player/ApplicationMusicPlayer.hpp>
 #include <application-meditation/ApplicationMeditation.hpp>
 #include <application-calculator/ApplicationCalculator.hpp>
+#include <application-alarm-clock/ApplicationAlarmClock.hpp>
 
 // services
 #include <service-appmgr/model/ApplicationManager.hpp>
@@ -146,6 +147,9 @@ int main()
 #endif
 #ifdef ENABLE_APP_CALCULATOR
         applications.push_back(app::CreateLauncher<app::ApplicationCalculator>(app::name_calculator));
+#endif
+#ifdef ENABLE_APP_ALARM_CLOCK
+        applications.push_back(app::CreateLauncher<app::ApplicationAlarmClock>(app::name_alarm_clock));
 #endif
 
         // start application manager

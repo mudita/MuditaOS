@@ -13,14 +13,17 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
+#include <filesystem>
+#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Notifications Table tests")
 {
     Database::initialize();
 
-    vfs.remove(NotificationsDB::GetDBName());
+    const auto notificationsPath = (purefs::dir::getUserDiskPath() / "notifications.db").c_str();
+    std::filesystem::remove(notificationsPath);
 
-    NotificationsDB notificationsDb;
+    NotificationsDB notificationsDb{notificationsPath};
     REQUIRE(notificationsDb.isInitialized());
 
     auto &notificationsTbl = notificationsDb.notifications;

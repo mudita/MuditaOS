@@ -75,6 +75,7 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
+        void accept(GuiVisitor &visitor) override;
         /// Setting bottom bar temporary text
         /// @param text - bottomBar text
         /// @param overwriteOthers - set or not other bottomBar texts to "" (default true)

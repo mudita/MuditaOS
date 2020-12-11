@@ -17,6 +17,7 @@
 #include <memory>
 #include <module-db/queries/messages/sms/QuerySMSGetCount.hpp>
 #include <module-utils/json/json11.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 namespace db
 {
@@ -37,8 +38,9 @@ namespace db
 TEST_CASE("Query interface")
 {
     Database::initialize();
-    auto contactsDB      = std::make_unique<ContactsDB>();
-    auto smsDB           = std::make_unique<SmsDB>();
+
+    auto contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getUserDiskPath() / "contacts.db").c_str());
+    auto smsDB           = std::make_unique<SmsDB>((purefs::dir::getUserDiskPath() / "sms.db").c_str());
     auto smsInterface    = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
     auto threadInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
 

@@ -34,6 +34,7 @@
 #include <MessageType.hpp>
 #include <NotesRecord.hpp>
 #include <NotificationsRecord.hpp>
+#include <purefs/filesystem_paths.hpp>
 #include <SMSRecord.hpp>
 #include <SMSTemplateRecord.hpp>
 #include <Service/Bus.hpp>
@@ -534,14 +535,14 @@ sys::ReturnCodes ServiceDB::InitHandler()
     Database::initialize();
 
     // Create databases
-    contactsDB      = std::make_unique<ContactsDB>();
-    smsDB           = std::make_unique<SmsDB>();
-    alarmsDB        = std::make_unique<AlarmsDB>();
-    notesDB         = std::make_unique<NotesDB>();
-    calllogDB       = std::make_unique<CalllogDB>();
-    countryCodesDB  = std::make_unique<CountryCodesDB>();
-    notificationsDB = std::make_unique<NotificationsDB>();
-    eventsDB        = std::make_unique<EventsDB>();
+    contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getUserDiskPath() / "contacts.db").c_str());
+    smsDB           = std::make_unique<SmsDB>((purefs::dir::getUserDiskPath() / "sms.db").c_str());
+    alarmsDB        = std::make_unique<AlarmsDB>((purefs::dir::getUserDiskPath() / "alarms.db").c_str());
+    notesDB         = std::make_unique<NotesDB>((purefs::dir::getUserDiskPath() / "notes.db").c_str());
+    calllogDB       = std::make_unique<CalllogDB>((purefs::dir::getUserDiskPath() / "callog.db").c_str());
+    countryCodesDB  = std::make_unique<CountryCodesDB>("country-codes.db");
+    notificationsDB = std::make_unique<NotificationsDB>((purefs::dir::getUserDiskPath() / "notifications.db").c_str());
+    eventsDB        = std::make_unique<EventsDB>((purefs::dir::getUserDiskPath() / "events.db").c_str());
 
     // Create record interfaces
     contactRecordInterface       = std::make_unique<ContactRecordInterface>(contactsDB.get());

@@ -204,6 +204,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             q_input_setup.in12sab = 1;
             i2cAddr.subAddress    = MAX98090_REG_LINE_INPUT_TO_RECORD_QUICK;
             i2c->Write(i2cAddr, (uint8_t *)&q_input_setup, 1);
+
         } break;
 
         default:
@@ -222,6 +223,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
     // Set volume to 0 before enabling codec to avoid pops/clicks
     auto currVol = currentParams.outVolume;
     SetOutputVolume(0);
+
     SetInputGain(currentParams.inGain);
 
     // Turn on device
@@ -380,7 +382,7 @@ CodecRetCode CodecMAX98090::SetInputGain(const float gain)
     }
 
     max98090_reg_lrec_dig_gain_t lgain = {0};
-    lgain.avl                          = 3;               // fine gain - 0dB
+    lgain.avl                          = 0xF;             // fine gain - 0xF: -12dB
     lgain.avlg                         = gainToSet * 0.7; // coarse gain (0.7 used as scaling factor)
 
     i2cAddr.subAddress = MAX98090_REG_LREC_DIG_GAIN;
@@ -388,7 +390,7 @@ CodecRetCode CodecMAX98090::SetInputGain(const float gain)
 
     // coarse gain - 18dB, fine gain - 0dB
     max98090_reg_rrec_dig_gain_t rgain = {0};
-    rgain.avr                          = 3;               // fine gain - 0dB
+    rgain.avr                          = 0xF;             // fine gain - 0xF: -12dB
     rgain.avrg                         = gainToSet * 0.7; // coarse gain (0.7 used as scaling factor)
 
     i2cAddr.subAddress = MAX98090_REG_RREC_DIG_GAIN;

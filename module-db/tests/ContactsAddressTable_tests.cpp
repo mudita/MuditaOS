@@ -4,15 +4,18 @@
 #include <catch2/catch.hpp>
 
 #include "Databases/ContactsDB.hpp"
-#include "vfs.hpp"
+#include <vfs.hpp>
+#include <filesystem>
+#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Contacts address Table tests")
 {
     Database::initialize();
 
-    vfs.remove(ContactsDB::GetDBName());
+    const auto callogPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    std::filesystem::remove(callogPath);
 
-    ContactsDB contactsdb;
+    ContactsDB contactsdb{callogPath};
     REQUIRE(contactsdb.isInitialized());
 
     ContactsAddressTableRow testRow1 = {{.ID = DB_ID_NONE},

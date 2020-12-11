@@ -14,6 +14,7 @@
 #include "windows/DisplayLightWindow.hpp"
 #include "windows/KeypadLightWindow.hpp"
 #include "windows/AppsAndToolsWindow.hpp"
+#include "windows/NightshiftWindow.hpp"
 #include "windows/NetworkWindow.hpp"
 #include "windows/MessagesWindow.hpp"
 #include "windows/PhoneNameWindow.hpp"
@@ -116,6 +117,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::apps_and_tools, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AppsAndToolsWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::nightshift, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::NightshiftWindow>(app);
         });
         windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NetworkWindow>(app);

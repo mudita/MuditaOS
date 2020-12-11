@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "vfs.hpp"
+#include <vfs.hpp>
 
 #include <catch2/catch.hpp>
 
@@ -11,6 +11,7 @@
 #include "Tables/SMSTable.hpp"
 
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 
 #include <cstdint>
@@ -94,10 +95,11 @@ TEST_CASE("Create and destroy simple database")
     SECTION("Store database into backup file")
     {
         std::string backupPathDB = USER_PATH("testbackup.db");
-        vfs.remove(backupPathDB.c_str());
+        std::remove(backupPathDB.c_str());
         Database testDB("test.db");
         REQUIRE(testDB.storeIntoFile(backupPathDB) == true);
-        REQUIRE(vfs.fileExists(backupPathDB.c_str()) == true);
+        std::ifstream f(backupPathDB);
+        REQUIRE(f.good() == true);
     }
 
     Database::deinitialize();
@@ -108,21 +110,21 @@ class ScopedDir
   public:
     ScopedDir(std::string p) : path(p)
     {
-        vfs.mkdir(path.c_str());
+        REQUIRE(std::filesystem::create_directory(path.c_str()));
     }
 
     ~ScopedDir()
     {
-        vfs.deltree(path.c_str());
+        REQUIRE(std::filesystem::remove(path.c_str()));
     }
 
-    auto operator()(std::string file = "") -> fs::path
+    auto operator()(std::string file = "") -> std::filesystem::path
     {
         return path / file;
     }
 
   private:
-    fs::path path;
+    std::filesystem::path path;
 };
 
 TEST_CASE("Database initialization scripts")
@@ -154,20 +156,20 @@ TEST_CASE("Database initialization scripts")
     {
         ScopedDir dir(USER_PATH("scripts"));
 
-        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
-        vfs.fclose(file);
+        auto file = std::fopen(dir("test_1.sql").c_str(), "w");
+        std::fclose(file);
 
-        file = vfs.fopen(dir("test_021.sql").c_str(), "w");
-        vfs.fclose(file);
+        file = std::fopen(dir("test_021.sql").c_str(), "w");
+        std::fclose(file);
 
-        file = vfs.fopen(dir("test_011.sql").c_str(), "w");
-        vfs.fclose(file);
+        file = std::fopen(dir("test_011.sql").c_str(), "w");
+        std::fclose(file);
 
-        file = vfs.fopen(dir("test_003.sql").c_str(), "w");
-        vfs.fclose(file);
+        file = std::fopen(dir("test_003.sql").c_str(), "w");
+        std::fclose(file);
 
-        file = vfs.fopen(dir("noprefix_003.sql").c_str(), "w");
-        vfs.fclose(file);
+        file = std::fopen(dir("noprefix_003.sql").c_str(), "w");
+        std::fclose(file);
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
@@ -184,12 +186,12 @@ TEST_CASE("Database initialization scripts")
     {
         ScopedDir dir(USER_PATH("scripts"));
 
-        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
+        auto file = std::fopen(dir("test_1.sql").c_str(), "w");
 
-        vfs.fprintf(file, "%s\n", script_create);
-        vfs.fprintf(file, "%s\n", script_insert);
+        std::fprintf(file, "%s\n", script_create);
+        std::fprintf(file, "%s\n", script_insert);
 
-        vfs.fclose(file);
+        std::fclose(file);
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
@@ -202,8 +204,8 @@ TEST_CASE("Database initialization scripts")
     {
         ScopedDir dir(USER_PATH("scripts"));
 
-        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
-        vfs.fclose(file);
+        auto file = std::fopen(dir("test_1.sql").c_str(), "w");
+        std::fclose(file);
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
@@ -216,9 +218,9 @@ TEST_CASE("Database initialization scripts")
     {
         ScopedDir dir(USER_PATH("scripts"));
 
-        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
-        vfs.fprintf(file, "%s\n", script_comment);
-        vfs.fclose(file);
+        auto file = std::fopen(dir("test_1.sql").c_str(), "w");
+        std::fprintf(file, "%s\n", script_comment);
+        std::fclose(file);
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
@@ -231,9 +233,9 @@ TEST_CASE("Database initialization scripts")
     {
         ScopedDir dir(USER_PATH("scripts"));
 
-        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
-        vfs.fprintf(file, "%s\n", script_create);
-        vfs.fclose(file);
+        auto file = std::fopen(dir("test_1.sql").c_str(), "w");
+        std::fprintf(file, "%s\n", script_create);
+        std::fclose(file);
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
@@ -246,9 +248,9 @@ TEST_CASE("Database initialization scripts")
     {
         ScopedDir dir(USER_PATH("scripts"));
 
-        auto file = vfs.fopen(dir("test_1.sql").c_str(), "w");
-        vfs.fprintf(file, "%s\n", script_invalid);
-        vfs.fclose(file);
+        auto file = std::fopen(dir("test_1.sql").c_str(), "w");
+        std::fprintf(file, "%s\n", script_invalid);
+        std::fclose(file);
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);

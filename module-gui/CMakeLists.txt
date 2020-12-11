@@ -17,6 +17,7 @@ include(gui/CMakeLists.txt)
 include(gui/core/CMakeLists.txt)
 include(gui/widgets/CMakeLists.txt)
 include(gui/input/CMakeLists.txt)
+include(gui/dom/CMakeLists.txt)
 
 include_directories( ../module-vfs )
 include_directories( ../module-utils )

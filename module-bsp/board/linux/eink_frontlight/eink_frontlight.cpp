@@ -32,4 +32,7 @@ namespace bsp::eink_frontlight
     void setGammaFactor(float)
     {}
 
+    void setGammaFactor(float)
+    {}
+
 } // namespace bsp::eink_frontlight

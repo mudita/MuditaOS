@@ -21,6 +21,7 @@
 #include "Service/Message.hpp"
 #include "PowerManager.hpp"
 #include "Constants.hpp"
+#include "CpuStatistics.hpp"
 
 namespace sys
 {
@@ -124,14 +125,20 @@ namespace sys
         /// red key won't work to power it on. For more information follow up with schematics
         bool PreShutdownLoop();
 
+        /// periodic update of cpu statistics
+        void CpuStatisticsTimerHandler();
+
         TickType_t pingInterval;
         uint32_t pingPongTimerID;
 
         InitFunction userInit;
 
+        std::unique_ptr<sys::Timer> cpuStatisticsTimer;
+
         static std::vector<std::shared_ptr<Service>> servicesList;
         static cpp_freertos::MutexStandard destroyMutex;
         static std::unique_ptr<PowerManager> powerManager;
+        static std::unique_ptr<CpuStatistics> cpuStatistics;
     };
 
 } // namespace sys

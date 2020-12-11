@@ -14,13 +14,13 @@ namespace db::query::events
         return "SelectFirstUpcoming";
     }
 
-    SelectFirstUpcomingResult::SelectFirstUpcomingResult(std::unique_ptr<std::vector<EventsRecord>> records)
-        : records(std::move(records))
+    SelectFirstUpcomingResult::SelectFirstUpcomingResult(std::vector<EventsRecord> records)
+        : records{std::move(records)}
     {}
 
-    auto SelectFirstUpcomingResult::getResult() -> std::unique_ptr<std::vector<EventsRecord>>
+    auto SelectFirstUpcomingResult::getResult() -> std::vector<EventsRecord>
     {
-        return std::move(records);
+        return records;
     }
 
     auto SelectFirstUpcomingResult::debugInfo() const -> std::string
