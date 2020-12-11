@@ -16,6 +16,7 @@
 #include <purefs/fs/file_handle.hpp>
 #include <purefs/fs/directory_handle.hpp>
 #include <purefs/fs/mount_point.hpp>
+#include <type_traits>
 
 struct statvfs;
 struct stat;
@@ -70,6 +71,10 @@ namespace purefs::fs
          */
         template <typename T> auto register_filesystem(std::string_view fsname, std::shared_ptr<T> fops) -> int
         {
+            if (!fops || !std::is_convertible_v<T *, filesystem_operations *>) {
+                LOG_ERROR("Filesystem not valid");
+                return -EINVAL;
+            }
             return register_filesystem(fsname, std::shared_ptr<filesystem_operations>(fops));
         }
         auto register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operations> fops) -> int;
