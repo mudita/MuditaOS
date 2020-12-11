@@ -20,7 +20,7 @@ namespace style::alarmClock
 
         namespace name
         {
-            inline constexpr auto noAlarms = "NoAlarms";
+            inline constexpr auto dialogYesNo = "DialogYesNo";
         }
 
         namespace item

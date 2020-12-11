@@ -16,8 +16,12 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-
 #include <memory>
+
+namespace settings
+{
+    class Settings;
+}
 
 namespace sdesktop
 {
@@ -41,4 +45,8 @@ class ServiceDesktop : public sys::Service
 
     std::unique_ptr<UpdateMuditaOS> updateOS;
     std::unique_ptr<WorkerDesktop> desktopWorker;
+    void storeHistory(const std::string &historyValue);
+
+  private:
+    std::unique_ptr<settings::Settings> settings;
 };

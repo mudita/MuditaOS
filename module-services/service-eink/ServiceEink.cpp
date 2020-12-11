@@ -16,7 +16,6 @@
 #include <MessageType.hpp>
 #include <Service/Bus.hpp>
 #include <service-gui/messages/GUIMessage.hpp>
-#include <vfs.hpp>
 
 #include <cstdio>
 #include <cstring>
@@ -184,7 +183,7 @@ bool ServiceEink::changeWaveform(EinkWaveforms_e mode, const int32_t temperature
         break;
     }
 
-    auto file = vfs.fopen("Luts.bin", "rb");
+    auto file = std::fopen("Luts.bin", "rb");
     if (file == nullptr) {
         LOG_FATAL("Could not find the LUTS.bin file. Returning");
         return false;
@@ -198,7 +197,7 @@ bool ServiceEink::changeWaveform(EinkWaveforms_e mode, const int32_t temperature
 
     if (waveformSettings.LUTDData == nullptr) {
         LOG_ERROR("Could not allocate memory for the LUTD array");
-        vfs.fclose(file);
+        std::fclose(file);
         return false;
     }
 
@@ -209,15 +208,15 @@ bool ServiceEink::changeWaveform(EinkWaveforms_e mode, const int32_t temperature
     waveformSettings.LUTCData = new uint8_t[LUTC_SIZE + 1];
     if (waveformSettings.LUTCData == nullptr) {
         LOG_ERROR("Could not allocate memory for the LUTC array");
-        vfs.fclose(file);
+        std::fclose(file);
         return false;
     }
 
     waveformSettings.LUTDData[0] = EinkLUTD;
     waveformSettings.LUTCData[0] = EinkLUTC;
 
-    vfs.fseek(file, offset, SEEK_SET);
-    vfs.fread(&waveformSettings.LUTDData[1], 1, LUTD_SIZE, file);
+    std::fseek(file, offset, SEEK_SET);
+    std::fread(&waveformSettings.LUTDData[1], 1, LUTD_SIZE, file);
 
     uint8_t frameCount = waveformSettings.LUTDData[1] + 1; // 0x00 - 1 frame, ... , 0x0F - 16 frames
     waveformSettings.LUTDSize =
@@ -225,10 +224,10 @@ bool ServiceEink::changeWaveform(EinkWaveforms_e mode, const int32_t temperature
         1; // (frameCount * 64) - size of actual LUT; (+1) - the byte containing frameCount; (+1) - EinkLUTD command
 
     offset += LUTD_SIZE;
-    vfs.fseek(file, offset, SEEK_SET);
-    vfs.fread(&waveformSettings.LUTCData[1], 1, LUTC_SIZE, file);
+    std::fseek(file, offset, SEEK_SET);
+    std::fread(&waveformSettings.LUTCData[1], 1, LUTC_SIZE, file);
 
-    vfs.fclose(file);
+    std::fclose(file);
 
     EinkUpdateWaveform(&waveformSettings);
 

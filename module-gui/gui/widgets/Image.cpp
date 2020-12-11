@@ -69,4 +69,8 @@ namespace gui
         commands.emplace_back(std::move(img));
     }
 
+    void Image::accept(GuiVisitor &visitor)
+    {
+        visitor.visit(*this);
+    }
 } /* namespace gui */

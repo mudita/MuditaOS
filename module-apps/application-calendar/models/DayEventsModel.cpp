@@ -69,7 +69,7 @@ auto DayEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
             return false;
         }
 
-        auto records = *response->getResult();
+        auto records = response->getResult();
         if (auto app = dynamic_cast<app::ApplicationCalendar *>(application); app != nullptr) {
             if (response->getCountResult() == 0) {
                 LOG_DEBUG("Empty records");

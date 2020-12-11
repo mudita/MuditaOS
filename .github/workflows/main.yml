@@ -15,6 +15,7 @@ jobs:
       - name: clone repository
         uses: actions/checkout@v2
         with:
+          token: ${{ secrets.GitHub_PAT }}
           fetch-depth: 0
           submodules: recursive
       - name: Copyright notice check
@@ -31,6 +32,7 @@ jobs:
       - name: clone repository
         uses: actions/checkout@v2
         with:
+          token: ${{ secrets.GitHub_PAT }}
           submodules: recursive
       - name: Build for RT1051
         run: |
@@ -51,6 +53,7 @@ jobs:
       - name: clone repository
         uses: actions/checkout@v2
         with:
+          token: ${{ secrets.GitHub_PAT }}
           submodules: recursive
       - name: build linux binary
         run: |

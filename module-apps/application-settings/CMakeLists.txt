@@ -28,7 +28,6 @@ target_sources( ${PROJECT_NAME}
         windows/FotaWindow.cpp
         windows/Fota.cpp
         windows/SettingsChange.cpp
-        windows/USSDWindow.cpp
         windows/EinkModeWindow.cpp
 
     PUBLIC
@@ -36,7 +35,6 @@ target_sources( ${PROJECT_NAME}
         windows/SettingsMainWindow.hpp
         windows/LanguageWindow.hpp
         windows/DateTimeWindow.hpp
-        windows/USSDWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

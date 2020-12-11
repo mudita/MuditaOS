@@ -56,12 +56,12 @@ namespace stm
             return 0;
         }
 
-        std::unique_ptr<std::vector<EventsRecord>> records = firstUpcomingQuery->getResult();
-        if (records->size() == 0) {
+        std::vector<EventsRecord> records = firstUpcomingQuery->getResult();
+        if (records.size() == 0) {
             return 0;
         }
 
-        eventRecord   = records->at(0);
+        eventRecord   = records.at(0);
         startTP       = eventRecord.date_from - minutes{eventRecord.reminder};
         auto duration = eventRecord.date_from - std::chrono::minutes{eventRecord.reminder} - TimePointNow();
         if (duration.count() <= 0) {
