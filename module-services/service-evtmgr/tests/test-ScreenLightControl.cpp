@@ -72,7 +72,7 @@ TEST_CASE("ScreenLightControl")
         CHECK(!bsp::light_sensor::isOn);
     }
 
-    SECTION("Set manual brigthness")
+    SECTION("Set manual brightness")
     {
         INFO("Try change brightness in manual mode");
         Action act = Action::setManualModeBrightness;
@@ -83,7 +83,7 @@ TEST_CASE("ScreenLightControl")
         CHECK(bsp::eink_frontlight::actualBrightness == testVal);
     }
 
-    SECTION("Automatic mode ramp an hsyteresis test")
+    SECTION("Automatic mode ramp an hysteresis test")
     {
         INFO("Setup automatic mode");
         Action act = Action::setAutomaticModeParameters;
@@ -125,7 +125,7 @@ TEST_CASE("ScreenLightControl")
         CHECK(bsp::eink_frontlight::actualBrightness == 0);
     }
 
-    SECTION("Brigthness function check")
+    SECTION("Brightness function check")
     {
         INFO("Setup automatic mode and iterate through points");
         Action act = Action::setAutomaticModeParameters;
