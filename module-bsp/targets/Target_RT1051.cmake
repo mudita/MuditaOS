@@ -51,6 +51,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/vibrator/vibrator.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/watchdog/watchdog.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/lpm/RT1051LPM.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/lpm/CpuFreqLPM.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bluetooth/BluetoothCommon.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bluetooth/BlueKitchen.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/rtc/rtc.cpp"
@@ -72,6 +73,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/torch/torch.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/keypad_backlight/keypad_backlight.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eink_frontlight/eink_frontlight.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/light_sensor/light_sensor.cpp"
 	CACHE INTERNAL ""
 )
 

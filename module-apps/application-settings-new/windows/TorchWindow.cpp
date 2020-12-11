@@ -61,7 +61,10 @@ namespace gui
         if (switchState) {
             optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
                 utils::translateI18("app_settings_torch_nightshift_time_option"),
-                [=](gui::Item &item) { return true; },
+                [=](gui::Item &item) {
+                    application->switchWindow(gui::window::name::nightshift, gui::ShowMode::GUI_SHOW_INIT);
+                    return true;
+                },
                 [=](gui::Item &item) {
                     if (item.focus) {
                         this->setBottomBarText(utils::translateI18(style::strings::common::select),

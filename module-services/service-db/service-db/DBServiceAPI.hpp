@@ -12,7 +12,6 @@
 #include <Interface/NotesRecord.hpp>
 #include <Interface/SMSRecord.hpp>
 #include <Interface/SMSTemplateRecord.hpp>
-#include <Interface/SettingsRecord_v2.hpp>
 #include <Interface/ThreadRecord.hpp>
 #include <PhoneNumber.hpp>
 #include <Service/Bus.hpp>

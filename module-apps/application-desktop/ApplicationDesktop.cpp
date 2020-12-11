@@ -12,6 +12,9 @@
 #include "windows/Reboot.hpp"
 #include "windows/Update.hpp"
 #include "windows/MmiPullWindow.hpp"
+#include "windows/MmiPushWindow.hpp"
+#include "windows/MmiInternalMsgWindow.hpp"
+
 #include "AppWindow.hpp"
 #include "data/LockPhoneData.hpp"
 
@@ -67,6 +70,16 @@ namespace app
 
         addActionReceiver(app::manager::actions::ShowMMIResponse, [this](auto &&data) {
             switchWindow(app::window::name::desktop_mmi_pull, std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::ShowMMIPush, [this](auto &&data) {
+            switchWindow(app::window::name::desktop_mmi_push, std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::ShowMMIResult, [this](auto &&data) {
+            switchWindow(app::window::name::desktop_mmi_internal, std::move(data));
             return msgHandled();
         });
     }
@@ -335,6 +348,12 @@ namespace app
         });
         windowsFactory.attach(desktop_mmi_pull, [](Application *app, const std::string newname) {
             return std::make_unique<gui::MmiPullWindow>(app, desktop_mmi_pull);
+        });
+        windowsFactory.attach(desktop_mmi_push, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::MmiPushWindow>(app, desktop_mmi_push);
+        });
+        windowsFactory.attach(desktop_mmi_internal, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::MmiInternalMsgWindow>(app, desktop_mmi_internal);
         });
     }
 

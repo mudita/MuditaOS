@@ -69,7 +69,9 @@ namespace gui
                 widthUsed  = item->getTextNeedSpace();
                 heightUsed = std::max(heightUsed, item->getTextHeight());
                 lineContent.emplace_back(item);
-                end = localCursor->getEnd();
+                end = TextBlock::End::None;
+
+                setLineStartConditions(localCursor.getBlockNumber(), localCursor.getPosition());
 
                 return;
             }
@@ -80,16 +82,19 @@ namespace gui
             widthUsed += item->getTextNeedSpace();
             heightUsed = std::max(heightUsed, item->getTextHeight());
             lineContent.emplace_back(item);
-            end = localCursor->getEnd();
+
+            setLineStartConditions(localCursor.getBlockNumber(), localCursor.getPosition());
 
             localCursor += canShow;
 
             if (localCursor.checkAndInvalidateBlockChanged() && localCursor.checkPreviousBlockNewLine()) {
+                end = TextBlock::End::Newline;
                 return;
             }
 
             // not whole text shown, try again for next line if you want
             if (canShow < text.length()) {
+                end = TextBlock::End::None;
                 return;
             }
 
@@ -98,17 +103,21 @@ namespace gui
 
     TextLine::TextLine(TextLine &&from) noexcept
     {
-        lineContent       = std::move(from.lineContent);
-        shownLetterCount  = from.shownLetterCount;
-        widthUsed         = from.widthUsed;
-        heightUsed        = from.heightUsed;
-        underline         = from.underline;
-        drawUnderline     = from.drawUnderline;
-        drawUnderlineMode = from.drawUnderlineMode;
-        underlinePadding  = from.underlinePadding;
-        lineEnd           = from.lineEnd;
-        end               = from.end;
-        maxWidth          = from.maxWidth;
+        lineContent            = std::move(from.lineContent);
+        shownLetterCount       = from.shownLetterCount;
+        widthUsed              = from.widthUsed;
+        heightUsed             = from.heightUsed;
+        underline              = from.underline;
+        drawUnderline          = from.drawUnderline;
+        drawUnderlineMode      = from.drawUnderlineMode;
+        underlinePadding       = from.underlinePadding;
+        underlineHeight        = from.underlineHeight;
+        lineEnd                = from.lineEnd;
+        end                    = from.end;
+        maxWidth               = from.maxWidth;
+        lineStartBlockNumber   = from.lineStartBlockNumber;
+        lineStartBlockPosition = from.lineStartBlockPosition;
+        lineVisible            = from.lineVisible;
     }
 
     TextLine::~TextLine()
@@ -159,12 +168,21 @@ namespace gui
         }
     }
 
+    void TextLine::setLineStartConditions(unsigned int startBlockNumber, unsigned int startBlockPosition)
+    {
+        if (lineStartBlockNumber == text::npos && lineStartBlockPosition == text::npos) {
+            lineStartBlockNumber   = startBlockNumber;
+            lineStartBlockPosition = startBlockPosition;
+        }
+    }
+
     void TextLine::setParent(Item *parent)
     {
         if (parent == nullptr) {
             return;
         }
 
+        createUnderline(maxWidth, underlineHeight);
         parent->addWidget(underline);
 
         for (auto &el : lineContent) {

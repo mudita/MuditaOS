@@ -14,13 +14,13 @@ namespace db::query::events
         return "GetFiltered";
     }
 
-    GetFilteredResult::GetFilteredResult(std::unique_ptr<std::vector<EventsRecord>> records, uint32_t count)
-        : records(std::move(records)), recordsCount(count)
+    GetFilteredResult::GetFilteredResult(std::vector<EventsRecord> records, uint32_t count)
+        : records{std::move(records)}, recordsCount{count}
     {}
 
-    auto GetFilteredResult::getResult() -> std::unique_ptr<std::vector<EventsRecord>>
+    auto GetFilteredResult::getResult() -> std::vector<EventsRecord>
     {
-        return std::move(records);
+        return records;
     }
 
     auto GetFilteredResult::getCountResult() -> uint32_t

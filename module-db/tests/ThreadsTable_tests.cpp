@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "vfs.hpp"
+#include <vfs.hpp>
 
 #include <catch2/catch.hpp>
 
@@ -10,18 +10,21 @@
 #include "Tables/ThreadsTable.hpp"
 
 #include <algorithm>
+#include <filesystem>
 
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Threads Table tests")
 {
     Database::initialize();
 
-    vfs.remove(SmsDB::GetDBName());
+    const auto smsPath = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
+    std::filesystem::remove(smsPath);
 
-    SmsDB smsdb;
+    SmsDB smsdb{smsPath};
     REQUIRE(smsdb.isInitialized());
 
     ThreadsTableRow testRow1 = {{.ID = 0},

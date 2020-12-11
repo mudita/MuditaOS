@@ -9,7 +9,7 @@ namespace gui
 {
     TextFixedSize::TextFixedSize(Item *parent, Position x, Position y, Length w, Length h) : Text(parent, x, y, w, h)
     {
-        setEditMode(EditMode::EDIT);
+        setEditMode(EditMode::Edit);
         lines->setUnderLine(true);
     }
 
@@ -33,10 +33,12 @@ namespace gui
     {
         lines->erase();
 
-        BlockCursor drawCursor(cursor->getDocument(), 0, 0, getTextFormat().getFont());
+        const auto [startDrawBlockNumber, startDrawBlockPosition] = lines->drawStartConditions;
+        BlockCursor drawCursor(
+            cursor->getDocument(), startDrawBlockPosition, startDrawBlockNumber, getTextFormat().getFont());
 
         lines->draw(drawCursor,
-                    getSizeMinusPadding(Axis::X, Area::Normal),
+                    getSizeMinusPadding(Axis::X, Area::Normal) - TextCursor::defaultWidth,
                     getSizeMinusPadding(Axis::Y, Area::Normal),
                     padding.top,
                     padding.left,

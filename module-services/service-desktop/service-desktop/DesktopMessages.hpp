@@ -9,7 +9,6 @@
 #include <Service/Message.hpp>
 #include <MessageType.hpp>
 
-#include <vfs.hpp>
 
 namespace sdesktop
 {

@@ -51,6 +51,8 @@ namespace gui
         virtual void setYapSize(unsigned short value);
         void setFilled(bool val);
         void buildDrawListImplementation(std::list<Command> &commands) override;
+
+        void accept(GuiVisitor &visitor) override;
     };
 
 } /* namespace gui */

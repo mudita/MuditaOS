@@ -2,7 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MmiPullWindow.hpp"
-#include "application-desktop/widgets/DesktopInputWidget.hpp"
+#include <application-desktop/widgets/DesktopInputWidget.hpp>
+#include <application-desktop/data/Mmi.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <service-appmgr/data/MmiActionsParams.hpp>
 
@@ -42,8 +43,8 @@ MmiPullWindow::MmiPullWindow(app::Application *app, const std::string &name) : g
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
     text = new Text(
         this, style::desktop::text::x, style::desktop::text::y, style::desktop::text::w, style::desktop::text::h);
-    text->setTextType(TextType::MULTI_LINE);
-    text->setEditMode(EditMode::BROWSE);
+    text->setTextType(TextType::MultiLine);
+    text->setEditMode(EditMode::Browse);
     text->setEdges(RectangleEdge::None);
     text->setFont(style::window::font::medium);
     text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
@@ -65,21 +66,11 @@ MmiPullWindow::MmiPullWindow(app::Application *app, const std::string &name) : g
     addWidget(InputBox);
 }
 
-std::string MmiPullWindow::removePhrase(std::string str, std::string phrase)
-{
-    auto find_pos = str.find(phrase);
-    while (find_pos != std::string::npos) {
-        str.replace(find_pos, phrase.size(), "");
-        find_pos = str.find(phrase, find_pos);
-    }
-    return str;
-}
-
 void MmiPullWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     auto metadata = dynamic_cast<app::manager::actions::MMIParams *>(data);
     if (metadata != nullptr) {
-        text->setText(removePhrase(metadata->getData(), "\r"));
+        text->setText(mmi::removePhrase(metadata->getData(), "\r"));
     }
     InputBox->setVisible(true);
     setFocusItem(InputBox->inputText);

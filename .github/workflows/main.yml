@@ -6,36 +6,84 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    - name: Check Out
-      uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.GitHub_PAT }}
-        submodules: recursive
-        fetch-depth: 0
-    - name: "Copyright notice check"
-      run: |
-        config/license_header_check.sh --ci --check-only
-    - name: "Style checking"
-      run: |
-        ./config/style_check_hook.sh --last
-    - name: "Unit Tests"
-      run: |
-        ./configure.sh linux Debug && \
-        pushd build-linux-Debug && \
-        export JOBS=${JOBS:-`nproc`} &&\
-        echo "JOBS=${JOBS}" &&\
-        make -j ${JOBS} &&\
-        make -j ${JOBS} check && \
-        popd 
-    - name: "Check for statics"
-      run: |
-        ./tools/find_global_data.py build-linux-Debug/PurePhone.elf
-    - name: "Build for RT1051"
-      run: |
-        ./configure.sh rt1051 Release && \
-        pushd build-rt1051-Release && \
-        export JOBS=${JOBS:-`nproc`} && \
-        echo "JOBS=${JOBS}" && \
-        make -j ${JOBS} && \
-        popd && \
-        uptime
+      - name: build
+        run: echo "Placeholder for old CI scripts"
+  check_copyright_and_style:
+    name: check copyright and style
+    runs-on: self-hosted
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GitHub_PAT }}
+          fetch-depth: 0
+          submodules: recursive
+      - name: Copyright notice check
+        run: config/license_header_check.sh --ci --check-only
+      - name: Style checking
+        run: ./config/style_check_hook.sh --last
+
+  build_rt1051_binary:
+    name: build rt1051 binary
+    needs:
+      - check_copyright_and_style
+    runs-on: self-hosted
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GitHub_PAT }}
+          submodules: recursive
+      - name: Build for RT1051
+        run: |
+          ./configure.sh rt1051 Release && \
+          pushd build-rt1051-Release && \
+          export JOBS=${JOBS:-`nproc`} && \
+          echo "JOBS=${JOBS}" && \
+          make -j ${JOBS} && \
+          popd && \
+          uptime
+
+  build_linux_binary_and_run_tests:
+    name: build linux binary and run tests
+    needs:
+      - check_copyright_and_style
+    runs-on: self-hosted
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GitHub_PAT }}
+          submodules: recursive
+      - name: build linux binary
+        run: |
+          ./configure.sh linux Debug && \
+          pushd build-linux-Debug && \
+          export JOBS=${JOBS:-`nproc`} && \
+          echo "JOBS=${JOBS}" && \
+          make -j ${JOBS} && \
+          popd
+      - name: Check for statics
+        run: ./tools/find_global_data.py build-linux-Debug/PurePhone.elf
+      - name: run unit tests
+        run: |
+          pushd build-linux-Debug && \
+          export JOBS=${JOBS:-`nproc`} && \
+          echo "JOBS=${JOBS}" && \
+          make -j ${JOBS} check && \
+          popd
+      - name: start emulator
+        run: |
+          ./run_emulator_on_filesystem_image.sh 2>&1 > emulator.log &
+          echo $! > emulator.pid
+      - name: run tests
+        run: pytest ./pytest -rP --port=simulator --timeout=20 -m 'not rt1051'
+        working-directory: test
+      - name: kill emulator
+        run: |
+          kill $(cat emulator.pid)
+          rm emulator.pid
+        if: always()
+      - name: print emulator logs
+        run: cat emulator.log
+        if: always()

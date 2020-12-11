@@ -19,11 +19,11 @@ namespace db::query::events
 
     class GetAllResult : public QueryResult
     {
-        std::unique_ptr<std::vector<EventsRecord>> records;
+        std::vector<EventsRecord> records;
 
       public:
-        GetAllResult(std::unique_ptr<std::vector<EventsRecord>> records);
-        [[nodiscard]] auto getResult() -> std::unique_ptr<std::vector<EventsRecord>>;
+        GetAllResult(std::vector<EventsRecord> records);
+        [[nodiscard]] auto getResult() -> std::vector<EventsRecord>;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };

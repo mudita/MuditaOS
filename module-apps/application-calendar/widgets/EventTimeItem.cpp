@@ -49,7 +49,7 @@ namespace gui
         hourInput->setInputMode(new InputMode({InputMode::digit}));
         hourInput->setPenFocusWidth(style::window::default_border_focus_w);
         hourInput->setPenWidth(style::window::default_border_rect_no_focus);
-        hourInput->setEditMode(gui::EditMode::EDIT);
+        hourInput->setEditMode(gui::EditMode::Edit);
 
         colonLabel = new gui::Label(hBox, 0, 0, 0, 0);
         colonLabel->setMinimumSize(style::window::calendar::item::eventTime::separator,
@@ -68,7 +68,7 @@ namespace gui
         minuteInput->setInputMode(new InputMode({InputMode::digit}));
         minuteInput->setPenFocusWidth(style::window::default_border_focus_w);
         minuteInput->setPenWidth(style::window::default_border_rect_no_focus);
-        minuteInput->setEditMode(gui::EditMode::EDIT);
+        minuteInput->setEditMode(gui::EditMode::Edit);
 
         descriptionLabel->setText(description);
 

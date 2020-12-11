@@ -8,8 +8,9 @@ namespace gui
 
     TextBubble::TextBubble(Item *parent, Position x, Position y, Length w, Length h) : Text(parent, x, y, w, h)
     {
-        setEditMode(EditMode::SCROLL);
+        setEditMode(EditMode::Scroll);
         setEdges(RectangleEdge::All);
+        setCursorStartPosition(CursorStartPosition::DocumentBegin);
     }
 
     void TextBubble::setYaps(RectangleYap yaps)

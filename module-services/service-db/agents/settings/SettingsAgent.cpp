@@ -9,7 +9,7 @@
 #include <Database/Database.hpp>
 #include <Service/Service.hpp>
 #include <module-sys/Service/Bus.hpp>
-#include <vfs.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 namespace settings::DbPaths
 {
@@ -85,8 +85,7 @@ auto SettingsAgent::getDbInitString() -> const std::string
 
 auto SettingsAgent::getDbFilePath() -> const std::string
 {
-
-    return USER_PATH("settings_v2.db");
+    return (purefs::dir::getUserDiskPath() / "settings_v2.db").string();
 }
 auto SettingsAgent::getAgentName() -> const std::string
 {

@@ -39,12 +39,21 @@ namespace parserFSM
 
     namespace json::calendar::events
     {
-        constexpr inline auto UID    = "UID";
-        constexpr inline auto data   = "data";
-        constexpr inline auto offset = "offset";
-        constexpr inline auto limit  = "limit";
-        constexpr inline auto count  = "count";
-    } // namespace json::calendar::events
+        constexpr inline auto UID         = "UID";
+        constexpr inline auto data        = "data";
+        constexpr inline auto offset      = "offset";
+        constexpr inline auto limit       = "limit";
+        constexpr inline auto count       = "count";
+        constexpr inline auto total_count = "total_count";
+
+        constexpr inline auto providers = "providers";
+        namespace provider
+        {
+            constexpr inline auto type    = "provider_type";
+            constexpr inline auto id      = "provider_id";
+            constexpr inline auto iCalUid = "provider_iCalUid";
+        } // namespace provider
+    }     // namespace json::calendar::events
 } // namespace parserFSM
 using namespace parserFSM;
 
@@ -153,16 +162,18 @@ auto CalendarEventsHelper::requestDataFromDB(Context &context) -> sys::ReturnCod
     auto listener = std::make_unique<db::EndpointListener>(
         [&](db::QueryResult *result, Context context) {
             if (auto EventsResult = dynamic_cast<db::query::events::GetAllLimitedResult *>(result)) {
-                auto records = EventsResult->getResult();
-                assert(records != nullptr);
-                auto parser = std::make_unique<ParserICS>();
+                auto records        = EventsResult->getResult();
+                uint32_t totalCount = EventsResult->getCountResult();
+                auto parser         = std::make_unique<ParserICS>();
                 std::vector<ICalEvent> icalEvents;
-                for (auto rec : *records) {
+                for (auto rec : records) {
                     icalEvents.push_back(icalEventFrom(rec));
                 }
                 parser->importEvents(icalEvents);
-                auto jsonObj = json11::Json::object({{json::calendar::events::data, parser->getIcsData()},
-                                                     {json::calendar::events::count, std::to_string(records->size())}});
+                auto jsonObj =
+                    json11::Json::object({{json::calendar::events::data, parser->getIcsData()},
+                                          {json::calendar::events::count, std::to_string(records.size())},
+                                          {json::calendar::events::total_count, std::to_string(totalCount)}});
 
                 context.setResponseBody(jsonObj);
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
@@ -240,20 +251,27 @@ auto CalendarEventsHelper::eventsRecordFrom(ICalEvent &icalEvent) const -> Event
 
 auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 {
-    auto parser = std::make_unique<ParserICS>();
+    auto parser = std::make_shared<ParserICS>();
     parser->loadData(context.getBody()[json::calendar::events::data].string_value());
     auto icalEvents = parser->exportEvents();
 
     bool ret = true;
     for (auto event : icalEvents) {
+        auto UID    = event.event.getUID();
         auto record = eventsRecordFrom(event);
         auto query  = std::make_unique<db::query::events::Add>(record);
 
         auto listener = std::make_unique<db::EndpointListener>(
             [=](db::QueryResult *result, Context context) {
                 if (auto EventResult = dynamic_cast<db::query::events::AddResult *>(result)) {
+
+                    auto jsonObj = json11::Json::object(
+                        {{json::calendar::events::data, parser->getIcsData()}, {json::calendar::events::UID, UID}});
+
+                    context.setResponseBody(jsonObj);
                     context.setResponseStatus(EventResult->getResult() ? http::Code::OK
                                                                        : http::Code::InternalServerError);
+
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
                 }

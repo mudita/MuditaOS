@@ -13,11 +13,21 @@ namespace gui
     class TextLineCursor : public TextCursor
     {
       protected:
+        auto checkNextLineDocumentEnd(unsigned int selectedLineNumber) -> bool;
+        void handleDownNavigation(unsigned int selectedLineNumber, unsigned int selectedLineCursorPosition);
+        void handleUpNavigation(unsigned int selectedLineNumber, unsigned int selectedLineCursorPosition);
+
       public:
         explicit TextLineCursor(gui::Text *parent, unsigned int pos = text::npos, unsigned int block = text::npos);
         TextLineCursor() = delete;
 
+        auto displayPreviousLine() -> bool;
+        auto displayNextLine() -> bool;
+
         auto moveCursor(NavigationDirection direction) -> Move override;
+        auto moveCursor(NavigationDirection direction, unsigned int n) -> Move override;
+
+        bool removeChar() final;
     };
 
 } // namespace gui

@@ -14,4 +14,6 @@ namespace app::window::name
     inline constexpr auto desktop_locked      = "LockedInfoWindow";
     inline constexpr auto desktop_update      = "Update";
     inline constexpr auto desktop_mmi_pull    = "MmiPullWindow";
+    inline constexpr auto desktop_mmi_push    = "MmiPushWindow";
+    inline constexpr auto desktop_mmi_internal = "MmiInternalMsgWindow";
 }; // namespace app::window::name

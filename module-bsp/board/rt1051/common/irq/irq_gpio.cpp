@@ -14,6 +14,7 @@
 #include "bsp/keyboard/keyboard.hpp"
 #include "bsp/BoardDefinitions.hpp"
 #include "bsp/magnetometer/magnetometer.hpp"
+#include "bsp/light_sensor/light_sensor.hpp"
 
 #if 0 // TODO:M.P implement the rest of BSP drivers
 
@@ -124,6 +125,10 @@ namespace bsp
 
             if (irq_mask & (1 << BSP_CELLULAR_SIM_TRAY_INSERTED_PIN)) {
                 xHigherPriorityTaskWoken |= bsp::cellular::sim::trayIRQ_handler();
+            }
+
+            if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ))) {
+                xHigherPriorityTaskWoken |= bsp::light_sensor::IRQHandler();
             }
 
             // Clear all IRQs

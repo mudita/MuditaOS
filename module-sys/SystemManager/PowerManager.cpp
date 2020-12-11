@@ -49,4 +49,9 @@ namespace sys
         return lowPowerControl->Reboot();
     }
 
+    void PowerManager::SetCpuFrequency(const bsp::LowPowerMode::CpuFrequency freq)
+    {
+        lowPowerControl->SetCpuFrequency(freq);
+    }
+
 } // namespace sys

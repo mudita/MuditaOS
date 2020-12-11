@@ -30,7 +30,7 @@ namespace gui
         setTitle("UI TEST");
         text = new gui::Text(
             this, style::window::default_left_margin, title->offset_h(), style::window::default_body_width, 300);
-        text->setEditMode(EditMode::EDIT);
+        text->setEditMode(EditMode::Edit);
         text->setFont(style::window::font::medium);
         LOG_DEBUG(
             "----------------------------------------------------------------------------------------------------");

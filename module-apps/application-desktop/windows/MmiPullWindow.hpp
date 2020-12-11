@@ -26,7 +26,6 @@ namespace gui
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
         void destroyInterface() override;
-        std::string removePhrase(std::string str, std::string phrase);
     };
 
 }; // namespace gui

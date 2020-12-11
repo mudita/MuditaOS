@@ -12,13 +12,16 @@
 #include <MessageType.hpp>
 #include <Service/Service.hpp>
 #include <Service/Message.hpp>
+#include <agents/settings/SystemSettings.hpp>
+#include <service-db/Settings.hpp>
 
 #include <log/log.hpp>
 
 #include <bits/exception.h>
 #include <utility>
 
-ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth)
+ServiceBluetooth::ServiceBluetooth()
+    : sys::Service(service::name::bluetooth), settingsProvider(std::make_unique<settings::Settings>(this))
 {
     LOG_INFO("[ServiceBluetooth] Initializing");
 }
@@ -34,6 +37,14 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
 {
     LOG_ERROR("Bluetooth experimental!");
     worker = std::make_unique<BluetoothWorker>(this);
+    settingsProvider->registerValueChange(settings::Bluetooth::state,
+                                          [this](std::string value) { stateSettingChanged(value); });
+    settingsProvider->registerValueChange(settings::Bluetooth::deviceVisibility,
+                                          [this](std::string value) { deviceVisibilitySettingChanged(value); });
+    settingsProvider->registerValueChange(settings::Bluetooth::deviceName,
+                                          [this](std::string value) { deviceNameSettingChanged(value); });
+    settingsProvider->registerValueChange(settings::Bluetooth::bondedDevices,
+                                          [this](std::string value) { bondedDevicesSettingChanged(value); });
 
     return sys::ReturnCodes::Success;
 }
@@ -122,4 +133,28 @@ sys::ReturnCodes ServiceBluetooth::SwitchPowerModeHandler(const sys::ServicePowe
 {
     LOG_ERROR("TODO");
     return sys::ReturnCodes::Success;
+}
+
+void ServiceBluetooth::stateSettingChanged(std::string value)
+{
+    LOG_DEBUG("Received new bt_state: %s", value.c_str());
+    settingsProvider->unregisterValueChange(settings::Bluetooth::state);
+}
+
+void ServiceBluetooth::deviceVisibilitySettingChanged(std::string value)
+{
+    LOG_DEBUG("Received new bt_device_visibility: %s", value.c_str());
+    settingsProvider->unregisterValueChange(settings::Bluetooth::deviceVisibility);
+}
+
+void ServiceBluetooth::deviceNameSettingChanged(std::string value)
+{
+    LOG_DEBUG("Received new bt_device_name: %s", value.c_str());
+    settingsProvider->unregisterValueChange(settings::Bluetooth::deviceName);
+}
+
+void ServiceBluetooth::bondedDevicesSettingChanged(std::string value)
+{
+    LOG_DEBUG("Received new bt_bonded_devices: %s", value.c_str());
+    settingsProvider->unregisterValueChange(settings::Bluetooth::bondedDevices);
 }

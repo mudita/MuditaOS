@@ -10,11 +10,11 @@ namespace purefs::fs::internal
     class directory_handle
     {
       public:
-        directory_handle(int error, std::shared_ptr<mount_point> mount_point = nullptr)
-            : m_error(error), m_mount_point(mount_point)
+        directory_handle(std::shared_ptr<mount_point> mp, int error) : m_error(error), m_mount_point(mp)
         {}
         directory_handle(const directory_handle &) = delete;
         auto operator=(const directory_handle &) = delete;
+        virtual ~directory_handle()              = default;
         auto error(int error) noexcept -> void
         {
             m_error = error;
@@ -22,6 +22,10 @@ namespace purefs::fs::internal
         [[nodiscard]] auto error() noexcept
         {
             return m_error;
+        }
+        [[nodiscard]] auto mntpoint() noexcept
+        {
+            return m_mount_point.lock();
         }
 
       private:

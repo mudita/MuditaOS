@@ -21,22 +21,24 @@ namespace purefs::blkdev
     } // namespace
     auto disk_manager::register_device(std::shared_ptr<disk> disk, std::string_view device_name, unsigned flags) -> int
     {
-        {
-            cpp_freertos::LockGuard _lck(m_lock);
-            const auto ret = m_dev_map.find(std::string(device_name));
-            if (ret != std::end(m_dev_map)) {
-                LOG_ERROR("Disc: %.*s already registered.", int(device_name.length()), device_name.data());
-                return -EEXIST;
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return -EINVAL;
+        }
+        cpp_freertos::LockGuard _lck(m_lock);
+        const auto ret = m_dev_map.find(std::string(device_name));
+        if (ret != std::end(m_dev_map)) {
+            LOG_ERROR("Disc: %.*s already registered.", int(device_name.length()), device_name.data());
+            return -EEXIST;
+        }
+        else {
+            auto ret = disk->probe(flags);
+            if (ret < 0) {
+                LOG_ERROR("Unable to probe the disc errno %i", ret);
+                return ret;
             }
-            else {
-                auto ret = disk->probe(flags);
-                if (ret < 0) {
-                    LOG_ERROR("Unable to probe the disc errno %i", ret);
-                    return ret;
-                }
-                const auto it = m_dev_map.emplace(std::make_pair(device_name, disk));
-                return reread_partitions(std::make_shared<internal::disk_handle>(disk, it.first->first));
-            }
+            const auto it = m_dev_map.emplace(std::make_pair(device_name, disk));
+            return reread_partitions(std::make_shared<internal::disk_handle>(disk, it.first->first));
         }
     }
     auto disk_manager::unregister_device(std::string_view device_name) -> int
@@ -55,10 +57,10 @@ namespace purefs::blkdev
         return ret;
     }
 
-    auto disk_manager::device_handle(std::string_view device_name) const -> disk_fd_t
+    auto disk_manager::device_handle(std::string_view device_name) const -> disk_fd
     {
         const auto [dev, part] = parse_device_name(device_name);
-        disk_fd_t ret{};
+        disk_fd ret{};
         if (dev.empty()) {
             ret = nullptr;
         }
@@ -70,6 +72,12 @@ namespace purefs::blkdev
             }
             else {
                 ret = std::make_shared<internal::disk_handle>(it->second, device_name, part);
+                if (part != internal::disk_handle::no_parition) {
+                    if (part >= int(partitions(ret).size())) {
+                        LOG_ERROR("Partition %i doesn't exists", part);
+                        ret = nullptr;
+                    }
+                }
             }
         }
         return ret;
@@ -97,7 +105,7 @@ namespace purefs::blkdev
             return std::make_tuple(device, -1);
         }
     }
-    auto disk_manager::part_lba_to_disk_lba(disk_fd_t disk, sector_t part_lba, size_t count) -> scount_t
+    auto disk_manager::part_lba_to_disk_lba(disk_fd disk, sector_t part_lba, size_t count) -> scount_t
     {
         if (!disk->has_partition()) {
             if (part_lba + count > disk->sectors()) {
@@ -109,7 +117,10 @@ namespace purefs::blkdev
             }
         }
         else {
-            auto pdisc      = disk->disk().lock();
+            auto pdisc = disk->disk();
+            if (!pdisc) {
+                return -EIO;
+            }
             const auto part = pdisc->partitions()[disk->partition()];
             if (part_lba + count > part.num_sectors) {
                 LOG_ERROR("Partition sector req out of range");
@@ -120,9 +131,13 @@ namespace purefs::blkdev
             }
         }
     }
-    auto disk_manager::write(disk_fd_t dfd, const void *buf, sector_t lba, std::size_t count) -> int
+    auto disk_manager::write(disk_fd dfd, const void *buf, sector_t lba, std::size_t count) -> int
     {
-        auto disk = dfd->disk().lock();
+        if (!dfd) {
+            LOG_ERROR("Disk handle doesn't exists");
+            return -EINVAL;
+        }
+        auto disk = dfd->disk();
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return -ENOENT;
@@ -135,9 +150,13 @@ namespace purefs::blkdev
             return disk->write(buf, calc_lba, count);
         }
     }
-    auto disk_manager::read(disk_fd_t dfd, void *buf, sector_t lba, std::size_t count) -> int
+    auto disk_manager::read(disk_fd dfd, void *buf, sector_t lba, std::size_t count) -> int
     {
-        auto disk = dfd->disk().lock();
+        if (!dfd) {
+            LOG_ERROR("Disk handle doesn't exists");
+            return -EINVAL;
+        }
+        auto disk = dfd->disk();
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return -ENOENT;
@@ -150,9 +169,13 @@ namespace purefs::blkdev
             return disk->read(buf, calc_lba, count);
         }
     }
-    auto disk_manager::erase(disk_fd_t dfd, sector_t lba, std::size_t count) -> int
+    auto disk_manager::erase(disk_fd dfd, sector_t lba, std::size_t count) -> int
     {
-        auto disk = dfd->disk().lock();
+        if (!dfd) {
+            LOG_ERROR("Disk handle doesn't exists");
+            return -EINVAL;
+        }
+        auto disk = dfd->disk();
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return -ENOENT;
@@ -165,63 +188,91 @@ namespace purefs::blkdev
             return disk->erase(calc_lba, count);
         }
     }
-    auto disk_manager::sync(disk_fd_t dfd) -> int
+    auto disk_manager::sync(disk_fd dfd) -> int
     {
-        auto disk = dfd->disk().lock();
+        if (!dfd) {
+            LOG_ERROR("Disk handle doesn't exists");
+            return -EINVAL;
+        }
+        auto disk = dfd->disk();
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return -ENOENT;
         }
         return disk->sync();
     }
-    auto disk_manager::pm_control(disk_fd_t dfd, pm_state target_state) -> int
+    auto disk_manager::pm_control(disk_fd dfd, pm_state target_state) -> int
     {
-        auto disk = dfd->disk().lock();
+        if (!dfd) {
+            LOG_ERROR("Disk handle doesn't exists");
+            return -EINVAL;
+        }
+        auto disk = dfd->disk();
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return -ENOENT;
         }
         return disk->pm_control(target_state);
     }
-    auto disk_manager::pm_read(disk_fd_t dfd, pm_state &current_state) -> int
+    auto disk_manager::pm_read(disk_fd dfd, pm_state &current_state) -> int
     {
-        auto disk = dfd->disk().lock();
+        if (!dfd) {
+            LOG_ERROR("Disk handle doesn't exists");
+            return -EINVAL;
+        }
+        auto disk = dfd->disk();
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return -ENOENT;
         }
         return disk->pm_read(current_state);
     }
-    auto disk_manager::status(disk_fd_t dfd) const -> media_status
+    auto disk_manager::status(disk_fd dfd) const -> media_status
     {
-        auto disk = dfd->disk().lock();
+        if (!dfd) {
+            LOG_ERROR("Disk handle doesn't exists");
+            return media_status::error;
+        }
+        auto disk = dfd->disk();
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return media_status::error;
         }
         return disk->status();
     }
-    auto disk_manager::partitions(disk_fd_t dfd) const -> std::vector<partition>
+    auto disk_manager::partitions(disk_fd dfd) const -> std::vector<partition>
     {
-        auto disk = dfd->disk().lock();
+        if (!dfd) {
+            LOG_ERROR("Disk handle doesn't exists");
+            return {};
+        }
+        auto disk = dfd->disk();
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return {};
         }
         return disk->partitions();
     }
-    auto disk_manager::get_info(disk_fd_t dfd, info_type what) const -> scount_t
+    auto disk_manager::get_info(disk_fd dfd, info_type what) const -> scount_t
     {
-        auto disk = dfd->disk().lock();
+        if (!dfd) {
+            LOG_ERROR("Disk handle doesn't exists");
+            return {};
+        }
+        auto disk = dfd->disk();
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return {};
         }
         return disk->get_info(what);
     }
-    auto disk_manager::reread_partitions(disk_fd_t dfd) -> int
+    auto disk_manager::reread_partitions(disk_fd dfd) -> int
     {
-        auto disk = dfd->disk().lock();
+        if (!dfd) {
+            LOG_ERROR("Disk handle doesn't exists");
+            return -EINVAL;
+        }
+        auto disk = dfd->disk();
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return {};
@@ -319,5 +370,10 @@ namespace purefs::blkdev
             return reread_partitions(dfd);
         else
             return -ENOENT;
+    }
+    auto disk_manager::disk_handle_from_partition_handle(disk_fd disk) -> disk_fd
+    {
+        const auto new_name = std::get<0>(parse_device_name(disk->name()));
+        return std::make_shared<internal::disk_handle>(disk->disk(), new_name);
     }
 } // namespace purefs::blkdev

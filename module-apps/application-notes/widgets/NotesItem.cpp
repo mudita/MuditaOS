@@ -32,9 +32,6 @@ namespace gui
 
         title   = createTextField(this, style::window::font::bigbold);
         snippet = createTextField(this, style::window::font::small);
-
-        setSnippet(note->snippet);
-        setDateText(note->date);
     }
 
     gui::TextFixedSize *NotesItem::createTextField(Item *parent, const UTF8 &fontName)
@@ -45,7 +42,8 @@ namespace gui
         item->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top});
         item->setPenFocusWidth(::style::window::default_border_focus_w);
         item->setPenWidth(::style::window::default_border_rect_no_focus);
-        item->setEditMode(gui::EditMode::BROWSE);
+        item->setEditMode(gui::EditMode::Browse);
+        item->setCursorStartPosition(CursorStartPosition::DocumentBegin);
         item->setUnderline(false);
         return item;
     }
@@ -82,6 +80,11 @@ namespace gui
         snippet->setSize(newDim.w - (notesItemStyle::LeftPadding + notesItemStyle::RightPadding),
                          newDim.h - (2 * notesItemStyle::VerticalPadding) - notesItemStyle::title::Height -
                              notesItemStyle::snippet::TopMargin);
+
+        // Temporary fix - text is loading really long if no size for it provided.
+        setSnippet(note->snippet);
+        setDateText(note->date);
+
         return true;
     }
 } // namespace gui

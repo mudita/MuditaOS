@@ -185,7 +185,7 @@ namespace gui
         return document->isEmpty();
     }
 
-    UTF8 Text::getText()
+    UTF8 Text::getText() const
     {
         return document->getText();
     }
@@ -212,6 +212,13 @@ namespace gui
     {
         format.setFont(font);
         buildCursor();
+    }
+
+    auto Text::setCursorStartPosition(CursorStartPosition val) -> void
+    {
+        // As we destroy cursors starting position information need to be stored in both places
+        cursorStartPosition = val;
+        cursor->setCursorStartPosition(cursorStartPosition);
     }
 
     bool Text::onInput(const InputEvent &evt)
@@ -334,12 +341,14 @@ namespace gui
 
         applyParentSizeRestrictions();
 
-        BlockCursor drawCursor(cursor->getDocument(), 0, 0, getTextFormat().getFont());
+        const auto [startDrawBlockNumber, startDrawBlockPosition] = lines->drawStartConditions;
+        BlockCursor drawCursor(
+            cursor->getDocument(), startDrawBlockPosition, startDrawBlockNumber, getTextFormat().getFont());
 
         debug_text("--> START drawLines: {%" PRIu32 ", %" PRIu32 "}", w, h);
 
         lines->draw(drawCursor,
-                    getSizeMinusPadding(Axis::X, Area::Max),
+                    getSizeMinusPadding(Axis::X, Area::Max) - TextCursor::defaultWidth,
                     getSizeMinusPadding(Axis::Y, Area::Max),
                     padding.top,
                     padding.left);
@@ -366,7 +375,7 @@ namespace gui
                 if (format.getFont() != nullptr &&
                     padding.top + lines->linesHeight() < format.getFont()->info.line_height) {
                     hUsed = format.getFont()->info.line_height;
-                    wUsed = TextCursor::default_width;
+                    wUsed = TextCursor::defaultWidth;
                     debug_text("empty line height: %d", hUsed);
                 }
             }
@@ -413,6 +422,8 @@ namespace gui
             debug_text("Passed invalid document, returning without setting it");
             return;
         }
+
+        lines->reset();
         document->destroy();
         buildCursor();
 
@@ -427,6 +438,7 @@ namespace gui
     {
         erase(cursor);
         cursor = new TextLineCursor(this);
+        cursor->setCursorStartPosition(cursorStartPosition);
         cursor->setAlignment(this->getAlignment());
         cursor->setMargins(this->getPadding());
         showCursor(focus);
@@ -434,7 +446,7 @@ namespace gui
 
     void Text::showCursor(bool focus)
     {
-        cursor->setVisible(focus && isMode(EditMode::EDIT));
+        cursor->setVisible(focus && isMode(EditMode::Edit));
     }
 
     auto Text::handleRotateInputMode(const InputEvent &inputEvent) -> bool
@@ -456,7 +468,6 @@ namespace gui
 
     auto Text::handleSelectSpecialChar(const InputEvent &inputEvent) -> bool
     {
-
         if (mode != nullptr && inputEvent.isLongPress() && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
             mode->select_special_char();
             return true;
@@ -475,21 +486,36 @@ namespace gui
             return false;
         }
 
-        // Temporary disabled till text scrolling will ba added
-        // if (isMode(EditMode::SCROLL) && (inputEvent.is(KeyCode::KEY_LEFT) ||
-        // inputEvent.is(KeyCode::KEY_RIGHT))) {
-        if (isMode(EditMode::SCROLL)) {
+        if (isMode(EditMode::Scroll)) {
+
             debug_text("Text in scroll mode ignores left/right navigation");
-            return false;
+            if (inputEvent.is(KeyCode::KEY_LEFT) || inputEvent.is(KeyCode::KEY_RIGHT)) {
+                return false;
+            }
+
+            if (inputEvent.is(KeyCode::KEY_DOWN)) {
+                return cursor->displayNextLine();
+            }
+
+            if (inputEvent.is(KeyCode::KEY_UP)) {
+                return cursor->displayPreviousLine();
+            }
         }
-        auto ret = cursor->moveCursor(inputToNavigation(inputEvent));
-        debug_text("moveCursor: %s", c_str(ret));
-        if (ret == TextCursor::Move::Start || ret == TextCursor::Move::End) {
-            debug_text("scrolling needs implementing");
-            return false;
-        }
-        if (ret != TextCursor::Move::Error) {
-            return true;
+
+        if (inputToNavigation(inputEvent) != NavigationDirection::NONE) {
+
+            setCursorStartPosition(CursorStartPosition::Offset);
+
+            auto ret = cursor->moveCursor(inputToNavigation(inputEvent));
+            debug_text("moveCursor: %s", c_str(ret));
+
+            if (ret == TextCursor::Move::Start || ret == TextCursor::Move::End) {
+                debug_text("scrolling needs implementing");
+                return false;
+            }
+            if (ret != TextCursor::Move::Error) {
+                return true;
+            }
         }
 
         return false;
@@ -497,13 +523,15 @@ namespace gui
 
     bool Text::handleRemovalChar(const InputEvent &inputEvent)
     {
-        if (!isMode(EditMode::EDIT)) {
+        if (!isMode(EditMode::Edit)) {
             return false;
         }
         if (inputEvent.isShortPress() && inputEvent.is(key_signs_remove)) {
+
+            setCursorStartPosition(CursorStartPosition::Offset);
+
             if (!document->isEmpty() && removeChar()) {
                 onTextChanged();
-                drawLines();
             }
             return true;
         }
@@ -512,24 +540,24 @@ namespace gui
 
     bool Text::handleAddChar(const InputEvent &inputEvent)
     {
-        if (!inputEvent.isShortPress() || !isMode(EditMode::EDIT)) {
+        if (!inputEvent.isShortPress() || !isMode(EditMode::Edit)) {
             return false;
         }
 
         auto code = translator.handle(inputEvent.key, mode ? mode->get() : "");
 
-        if (code != KeyProfile::none_key && checkAdditionBounds(code) == InputBound::CAN_ADD) {
+        if (code != KeyProfile::none_key && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
+
+            setCursorStartPosition(CursorStartPosition::Offset);
 
             debug_text("handleAddChar %d -> Begin", code);
             debug_text("%s times: %" PRIu32, inputEvent.str().c_str(), translator.getTimes());
-
             /// if we have multi press in non digit mode - we need to replace char and put next char from translator
             if (!(mode->is(InputMode::digit) || (mode->is(InputMode::phone))) && translator.getTimes() > 0) {
                 removeChar();
             }
             addChar(code);
             onTextChanged();
-            drawLines();
 
             debug_text("handleAddChar -> End(true)");
 
@@ -548,11 +576,11 @@ namespace gui
 
         auto val = toNumeric(inputEvent.keyCode);
 
-        if (val != InvalidNumericKeyCode && checkAdditionBounds(val) == InputBound::CAN_ADD) {
+        if (val != InvalidNumericKeyCode && checkAdditionBounds(val) == AdditionBound::CanAddAll) {
 
+            setCursorStartPosition(CursorStartPosition::Offset);
             addChar(intToAscii(val));
             onTextChanged();
-            drawLines();
             return true;
         }
 
@@ -582,19 +610,11 @@ namespace gui
         auto documentCopy     = *cursor->getDocument();
         auto formatCopy       = getTextFormat().getFont();
         auto preDrawTextBlock = TextBlock(textBlock);
-        auto preDrawTextEnd   = textBlock.getEnd();
 
         applyParentSizeRestrictions();
 
         BlockCursor preDrawCursor(&documentCopy, 0, 0, formatCopy);
-
-        applyParentSizeRestrictions();
-
         preDrawCursor.addTextBlock(std::move(preDrawTextBlock));
-
-        if (preDrawTextEnd == TextBlock::End::Newline) {
-            documentCopy.append(TextBlock("", formatCopy, TextBlock::End::None));
-        }
 
         preDrawLines->draw(
             preDrawCursor, getSizeMinusPadding(Axis::X, Area::Max), text::npos, padding.top, padding.left);
@@ -602,23 +622,23 @@ namespace gui
         return preDrawLines;
     }
 
-    auto Text::checkMaxSignsLimit(unsigned int limitVal) -> InputBound
+    auto Text::checkMaxSignsLimit(unsigned int limitVal) -> AdditionBound
     {
         if (getText().length() >= limitVal) {
             debug_text("Text at max signs count can't add more");
-            return InputBound::HIT_BOUND;
+            return AdditionBound::CantAdd;
         }
         else {
-            return InputBound::CAN_ADD;
+            return AdditionBound::CanAddAll;
         }
     }
 
     auto Text::checkMaxSignsLimit(const TextBlock &textBlock, unsigned int limitVal)
-        -> std::tuple<InputBound, TextBlock>
+        -> std::tuple<AdditionBound, TextBlock>
     {
         if (getText().length() >= limitVal) {
             debug_text("Text at max signs count can't add more.");
-            return {InputBound::HIT_BOUND, textBlock};
+            return {AdditionBound::CantAdd, textBlock};
         }
         else if (getText().length() + textBlock.length() >= limitVal) {
 
@@ -631,16 +651,16 @@ namespace gui
                        textBlock.getText().c_str(),
                        partBlockText.c_str());
 
-            return {InputBound::CAN_ADD_PART, TextBlock(partBlockText, std::make_unique<TextFormat>(*blockFormat))};
+            return {AdditionBound::CanAddPart, TextBlock(partBlockText, std::make_unique<TextFormat>(*blockFormat))};
         }
         else {
-            return {InputBound::CAN_ADD, textBlock};
+            return {AdditionBound::CanAddAll, textBlock};
         }
     }
 
-    auto Text::checkMaxSizeLimit(uint32_t utfVal) -> InputBound
+    auto Text::checkMaxSizeLimit(uint32_t utfVal) -> AdditionBound
     {
-        auto returnValue = InputBound::CAN_ADD;
+        auto returnValue = AdditionBound::CanAddAll;
 
         auto preDrawLines = makePreDrawLines(utfVal);
 
@@ -654,14 +674,14 @@ namespace gui
 
             debug_text("Text at max size can't add more");
             preDrawLines->erase();
-            returnValue = InputBound::HIT_BOUND;
+            returnValue = AdditionBound::CantAdd;
         }
 
         preDrawLines->erase();
         return returnValue;
     }
 
-    auto Text::checkMaxSizeLimit(const TextBlock &textBlock) -> std::tuple<InputBound, TextBlock>
+    auto Text::checkMaxSizeLimit(const TextBlock &textBlock) -> std::tuple<AdditionBound, TextBlock>
     {
         auto preDrawLines = makePreDrawLines(textBlock);
 
@@ -672,7 +692,7 @@ namespace gui
 
         if (preDrawLines->maxWidth() == 0) {
             preDrawLines->erase();
-            return {InputBound::HIT_BOUND, textBlock};
+            return {AdditionBound::CantAdd, textBlock};
         }
 
         if (preDrawLines->linesHeight() + getPadding().getSumInAxis(Axis::Y) > area(Area::Max).h) {
@@ -701,23 +721,23 @@ namespace gui
                                textBlock.getText().c_str(),
                                partBlockText.c_str());
 
-                    return {InputBound::CAN_ADD_PART,
+                    return {AdditionBound::CanAddPart,
                             TextBlock(partBlockText, std::make_unique<TextFormat>(*blockFormat))};
                 }
             }
 
             preDrawLines->erase();
             // If not a part of block can fit return hit bound.
-            return {InputBound::HIT_BOUND, textBlock};
+            return {AdditionBound::CantAdd, textBlock};
         }
 
         preDrawLines->erase();
-        return {InputBound::CAN_ADD, textBlock};
+        return {AdditionBound::CanAddAll, textBlock};
     }
 
-    auto Text::checkMaxLinesLimit(uint32_t utfVal, unsigned int limitVal) -> InputBound
+    auto Text::checkMaxLinesLimit(uint32_t utfVal, unsigned int limitVal) -> AdditionBound
     {
-        auto returnValue = InputBound::CAN_ADD;
+        auto returnValue = AdditionBound::CanAddAll;
 
         auto preDrawLines = makePreDrawLines(utfVal);
 
@@ -730,7 +750,7 @@ namespace gui
 
             debug_text("Text at max size can't add more");
             preDrawLines->erase();
-            returnValue = InputBound::HIT_BOUND;
+            returnValue = AdditionBound::CantAdd;
         }
 
         preDrawLines->erase();
@@ -738,7 +758,7 @@ namespace gui
     }
 
     auto Text::checkMaxLinesLimit(const TextBlock &textBlock, unsigned int limitVal)
-        -> std::tuple<InputBound, TextBlock>
+        -> std::tuple<AdditionBound, TextBlock>
     {
         auto preDrawLines = makePreDrawLines(textBlock);
 
@@ -749,7 +769,7 @@ namespace gui
 
         if (preDrawLines->maxWidth() == 0) {
             preDrawLines->erase();
-            return {InputBound::HIT_BOUND, textBlock};
+            return {AdditionBound::CantAdd, textBlock};
         }
 
         if (preDrawLines->size() > limitVal) {
@@ -778,75 +798,75 @@ namespace gui
                                textBlock.getText().c_str(),
                                partBlockText.c_str());
 
-                    return {InputBound::CAN_ADD_PART,
+                    return {AdditionBound::CanAddPart,
                             TextBlock(partBlockText, std::make_unique<TextFormat>(*blockFormat))};
                 }
             }
 
             preDrawLines->erase();
             // If not a part of block can fit return hit bound.
-            return {InputBound::HIT_BOUND, textBlock};
+            return {AdditionBound::CantAdd, textBlock};
         }
 
         preDrawLines->erase();
-        return {InputBound::CAN_ADD, textBlock};
+        return {AdditionBound::CanAddAll, textBlock};
     }
 
-    auto Text::checkAdditionBounds(const uint32_t utfVal) -> InputBound
+    auto Text::checkAdditionBounds(const uint32_t utfVal) -> AdditionBound
     {
-        auto returnValue = InputBound::CAN_ADD;
+        auto returnValue = AdditionBound::CanAddAll;
 
         for (auto limit : limitsList) {
 
             switch (limit.limitType) {
-            case TextLimitType::MAX_SIGNS_COUNT:
+            case TextLimitType::MaxSignsCount:
                 returnValue = checkMaxSignsLimit(limit.limitValue);
                 break;
-            case TextLimitType::MAX_LINES:
+            case TextLimitType::MaxLines:
                 returnValue = checkMaxLinesLimit(utfVal, limit.limitValue);
                 break;
-            case TextLimitType::MAX_SIZE:
+            case TextLimitType::MaxSize:
                 returnValue = checkMaxSizeLimit(utfVal);
                 break;
             default:
                 break;
             }
 
-            if (returnValue == InputBound::HIT_BOUND) {
+            if (returnValue == AdditionBound::CantAdd) {
                 return returnValue;
             }
         }
         return returnValue;
     }
 
-    auto Text::checkAdditionBounds(const TextBlock &textBlock) -> std::tuple<InputBound, TextBlock>
+    auto Text::checkAdditionBounds(const TextBlock &textBlock) -> std::tuple<AdditionBound, TextBlock>
     {
-        std::tuple<InputBound, TextBlock> returnValue = {InputBound::CAN_ADD, textBlock};
-        auto shortestProcessedBlock                   = textBlock;
+        std::tuple<AdditionBound, TextBlock> returnValue = {AdditionBound::CanAddAll, textBlock};
+        auto shortestProcessedBlock                      = textBlock;
 
         for (auto limit : limitsList) {
 
             switch (limit.limitType) {
-            case TextLimitType::MAX_SIGNS_COUNT:
+            case TextLimitType::MaxSignsCount:
                 returnValue = checkMaxSignsLimit(textBlock, limit.limitValue);
                 break;
-            case TextLimitType::MAX_LINES:
+            case TextLimitType::MaxLines:
                 returnValue = checkMaxLinesLimit(textBlock, limit.limitValue);
                 break;
-            case TextLimitType::MAX_SIZE:
+            case TextLimitType::MaxSize:
                 returnValue = checkMaxSizeLimit(textBlock);
                 break;
             default:
                 break;
             }
 
-            if (std::get<0>(returnValue) == InputBound::CAN_ADD_PART) {
+            if (std::get<0>(returnValue) == AdditionBound::CanAddPart) {
                 if (std::get<1>(returnValue).length() < shortestProcessedBlock.length()) {
                     shortestProcessedBlock = std::get<1>(returnValue);
                 }
             }
 
-            if (std::get<0>(returnValue) == InputBound::HIT_BOUND) {
+            if (std::get<0>(returnValue) == AdditionBound::CantAdd) {
                 return returnValue;
             }
         }
@@ -885,7 +905,7 @@ namespace gui
     TextBackup Text::backupText() const
     {
         return TextBackup{std::list<TextBlock>(document->getBlocks().begin(), document->getBlocks().end()),
-                          cursor->getPosOnScreen()};
+                          cursor->getOnScreenPosition()};
     }
 
     void Text::restoreFrom(const TextBackup &backup)
@@ -901,4 +921,8 @@ namespace gui
         }
     }
 
+    void Text::accept(GuiVisitor &visitor)
+    {
+        visitor.visit(*this);
+    }
 } /* namespace gui */

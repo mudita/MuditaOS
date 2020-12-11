@@ -3,7 +3,7 @@
 
 
 namespace bsp {
-    BTdev::BTdev(unsigned int in_size, unsigned int out_size, int threshold) : flog(nullptr), in(in_size, threshold), out(out_size, threshold)
+    BTdev::BTdev() : flog(nullptr)
     {
         is_open = false;
     }

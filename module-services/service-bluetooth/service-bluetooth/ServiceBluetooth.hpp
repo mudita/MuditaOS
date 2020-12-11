@@ -11,6 +11,10 @@
 #include <memory> // for unique_ptr
 
 class BluetoothWorker;
+namespace settings
+{
+    class Settings;
+}
 
 class ServiceBluetooth : public sys::Service
 {
@@ -26,4 +30,10 @@ class ServiceBluetooth : public sys::Service
 
   private:
     std::unique_ptr<BluetoothWorker> worker;
+    std::unique_ptr<settings::Settings> settingsProvider;
+
+    void stateSettingChanged(std::string value);
+    void deviceVisibilitySettingChanged(std::string value);
+    void deviceNameSettingChanged(std::string value);
+    void bondedDevicesSettingChanged(std::string value);
 };

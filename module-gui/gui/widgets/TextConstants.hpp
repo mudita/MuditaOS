@@ -15,9 +15,9 @@ namespace gui
 
     enum class TextLimitType
     {
-        MAX_SIZE,
-        MAX_LINES,
-        MAX_SIGNS_COUNT
+        MaxSize,
+        MaxLines,
+        MaxSignsCount
     };
 
     struct TextLimit
@@ -26,31 +26,45 @@ namespace gui
         unsigned int limitValue;
     };
 
+    enum class CursorStartPosition
+    {
+        DocumentBegin,
+        Offset,
+        DocumentEnd
+    };
+
+    enum class LinesDrawStop
+    {
+        None,
+        OutOfText,
+        OutOfSpace
+    };
+
     enum class ExpandMode
     {
-        EXPAND_UP,
-        EXPAND_DOWN,
-        EXPAND_NONE // default
+        Up,
+        Down,
+        None // default
     };
 
     enum class EditMode
     {
-        BROWSE,
-        EDIT,
-        SCROLL,
+        Browse,
+        Edit,
+        Scroll,
     };
 
     enum class TextType
     {
-        SINGLE_LINE = 1,
-        MULTI_LINE
+        SingleLine = 1,
+        MultiLine
     };
 
-    enum class InputBound
+    enum class AdditionBound
     {
-        CAN_ADD,
-        CAN_ADD_PART,
-        HIT_BOUND
+        CanAddAll,
+        CanAddPart,
+        CantAdd
     };
 
 } // namespace gui

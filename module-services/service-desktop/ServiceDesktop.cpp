@@ -16,8 +16,8 @@
 #include <json/json11.hpp>
 #include <log/log.hpp>
 #include <module-apps/application-desktop/ApplicationDesktop.hpp>
+#include <service-db/service-db/Settings.hpp>
 #include <service-db/QueryMessage.hpp>
-#include <vfs.hpp>
 
 #include <cinttypes>
 #include <filesystem>
@@ -27,6 +27,10 @@ ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, 
     LOG_INFO("[ServiceDesktop] Initializing");
 
     updateOS = std::make_unique<UpdateMuditaOS>(this);
+    settings = std::make_unique<settings::Settings>(this);
+
+    settings->registerValueChange(updateos::settings::history,
+                                  [this](const std::string &value) { updateOS->setInitialHistory(value); });
 }
 
 ServiceDesktop::~ServiceDesktop()
@@ -95,7 +99,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                 /* send info to applicationDesktop that there is an update waiting */
                 auto msgToSend =
                     std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateFoundOnBoot, file);
-                msgToSend->updateStats.versioInformation = UpdateMuditaOS::getVersionInfoFromFile(file);
+                msgToSend->updateStats.versionInformation = UpdateMuditaOS::getVersionInfoFromFile(file);
                 sys::Bus::SendUnicast(msgToSend, app::name_desktop, this);
             }
         }
@@ -116,7 +120,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
 sys::ReturnCodes ServiceDesktop::DeinitHandler()
 {
-    desktopWorker->close();
+    desktopWorker->deinit();
     return sys::ReturnCodes::Success;
 }
 
@@ -150,4 +154,9 @@ sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, s
     }
 
     return std::make_shared<sys::ResponseMessage>();
+}
+
+void ServiceDesktop::storeHistory(const std::string &historyValue)
+{
+    settings->setValue(updateos::settings::history, historyValue);
 }

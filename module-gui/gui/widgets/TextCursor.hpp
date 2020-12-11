@@ -20,11 +20,12 @@ namespace gui
     class TextCursor : public Rect, public BlockCursor
     {
       protected:
-        unsigned int pos_on_screen = 0;
-        Text *text                 = nullptr;
+        Text *text                              = nullptr;
+        CursorStartPosition cursorStartPosition = CursorStartPosition::DocumentEnd;
+        unsigned int onScreenPosition           = 0;
 
       public:
-        static const unsigned int default_width;
+        static const unsigned int defaultWidth;
         enum class Move
         {
             Start, /// we are text `0`
@@ -55,15 +56,16 @@ namespace gui
         auto getSelectedLine() -> std::tuple<const TextLine *, unsigned int, unsigned int>;
         void updateView();
 
-        // TODO this can move our text out of bonds ( and might need calling expand() in Text)
-        void addChar(uint32_t utf_val);
+        void addChar(uint32_t utf_val) override;
         TextCursor &operator<<(const UTF8 &);
         TextCursor &operator<<(const TextBlock &);
-        void removeChar();
+        bool removeChar() override;
 
-        [[nodiscard]] auto getPosOnScreen() const
+        auto setCursorStartPosition(CursorStartPosition val) -> void;
+
+        [[nodiscard]] auto getOnScreenPosition() const
         {
-            return pos_on_screen;
+            return onScreenPosition;
         }
     };
 } // namespace gui
