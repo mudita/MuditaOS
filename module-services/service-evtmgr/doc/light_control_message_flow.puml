@@ -1,0 +1,6 @@
+@startuml
+Application -> "Event Manager" as evm : ScreenLightControlMessage
+evm -> "ScreenLightControl" as slc: processRequest()
+slc -> "Eink Frontlight" : request
+slc -> "Light Sensor" : request
+@enduml
