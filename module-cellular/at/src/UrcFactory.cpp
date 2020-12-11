@@ -19,7 +19,6 @@ std::unique_ptr<Urc> UrcFactory::Create(const std::string &urcMessage)
     if (urcMessage.empty()) {
         return std::make_unique<Urc>(std::string());
     }
-
     const char headDelimiter = ':';
     auto it                  = std::find(urcMessage.begin(), urcMessage.end(), headDelimiter);
     std::string head         = std::string(urcMessage.begin(), it);

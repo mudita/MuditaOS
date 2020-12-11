@@ -12,7 +12,6 @@
 #include <Service/Bus.hpp>
 #include <json/json11.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <vfs.hpp>
 
 #include <filesystem>
 #include <memory>
@@ -61,7 +60,7 @@ auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
 auto BackupEndpoint::upload(Context &context) -> sys::ReturnCodes
 {
     if (context.getBody()[json::backupUpload] == true) {
-        if (const auto backupOSPath = purefs::dir::getBackupOSPath(); vfs.fileExists(backupOSPath.c_str())) {
+        if (const auto backupOSPath = purefs::dir::getBackupOSPath(); std::filesystem::exists(backupOSPath.c_str())) {
             context.setResponseBody(json11::Json::object({{json::backupUpload, true}}));
         }
         else {

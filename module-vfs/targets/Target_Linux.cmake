@@ -4,6 +4,7 @@ set(BOARD_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/free_rtos_custom/portable/vfs.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/purefs/src/blkdev/disk_image.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/purefs/src/fs/thread_local_cwd.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/purefs/src/vfs_subsystem_internal.cpp
         CACHE INTERNAL ""
 )
 

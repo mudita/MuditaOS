@@ -181,4 +181,9 @@ namespace gui
         }
     }
 
+    void BottomBar::accept(GuiVisitor &visitor)
+    {
+        visitor.visit(*this);
+    }
+
 } /* namespace gui */

@@ -12,15 +12,18 @@
 #include <stdint.h>
 #include <string>
 #include <algorithm>
+#include <filesystem>
 #include <iostream>
+#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Calllog Table tests")
 {
     Database::initialize();
 
-    vfs.remove(CalllogDB::GetDBName());
+    const auto callogPath = (purefs::dir::getUserDiskPath() / "callog.db").c_str();
+    std::filesystem::remove(callogPath);
 
-    CalllogDB calllogDb;
+    CalllogDB calllogDb{callogPath};
     REQUIRE(calllogDb.isInitialized());
 
     auto &callsTbl = calllogDb.calls;

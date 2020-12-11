@@ -64,6 +64,12 @@ function setup_gcc_alternatives() {
 		MSGEND
 }
 
+function install_pip_packages() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
+    pip3 install -r ${SCRIPT_DIR}/requirements.txt
+    pip3 install -r ${SCRIPT_DIR}/../tests/requirements.txt
+}
+
 function install_ubuntu_packages() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     cat <<-MSGEND
@@ -75,6 +81,7 @@ function install_ubuntu_packages() {
     sudo apt-get update
     sudo apt-get install ${INSTALL_PACKAGES}
     setup_gcc_alternatives
+    install_pip_packages
 }
 
 function setup_arm_toolchain() {

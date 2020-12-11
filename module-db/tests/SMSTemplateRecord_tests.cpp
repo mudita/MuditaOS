@@ -7,9 +7,11 @@
 #include "Database/Database.hpp"
 #include "Databases/SmsDB.hpp"
 
-#include "vfs.hpp"
+#include <vfs.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 #include <algorithm>
+#include <filesystem>
 
 #include <cstdint>
 #include <cstdio>
@@ -19,9 +21,10 @@ TEST_CASE("SMS templates Record tests")
 {
     Database::initialize();
 
-    vfs.remove(SmsDB::GetDBName());
+    const auto smsPath = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
+    std::filesystem::remove(smsPath);
 
-    auto smsDB = std::make_unique<SmsDB>();
+    auto smsDB = std::make_unique<SmsDB>(smsPath);
     REQUIRE(smsDB->isInitialized());
 
     SMSTemplateRecordInterface SMSTemplateRecordInterface(smsDB.get());

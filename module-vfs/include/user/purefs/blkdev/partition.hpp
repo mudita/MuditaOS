@@ -12,6 +12,7 @@ namespace purefs::blkdev
     struct partition
     {
         int physical_number{};     //! Partition physical number in part table
+        int mbr_number{-1};        //! If mbr partition
         sector_t start_sector{};   //! First sector
         std::size_t num_sectors{}; //! Number of sectors
         bool bootable{};           //! Partition is bootable

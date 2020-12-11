@@ -6,8 +6,7 @@
 
 #include <log/log.hpp>
 #include <module-sys/Service/Bus.hpp>
-#include <vfs.hpp>
-
+#include <purefs/filesystem_paths.hpp>
 #include <memory>
 
 FileIndexerAgent::FileIndexerAgent(sys::Service *parentService) : DatabaseAgent(parentService)
@@ -79,7 +78,7 @@ auto FileIndexerAgent::getDbInitString() -> const std::string
 
 auto FileIndexerAgent::getDbFilePath() -> const std::string
 {
-    return USER_PATH("file_indexer.db");
+    return (purefs::dir::getUserDiskPath() / "file_indexer.db").string();
 }
 auto FileIndexerAgent::getAgentName() -> const std::string
 {
