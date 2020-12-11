@@ -13,6 +13,7 @@
 * `[settings]` Nightshift window - GUI.
 * `[bluetooth][settings]` Add Bluetooth settings to database.
 * `[PowerManagement]` Added CPU load measurement.
+* `[alarms]` Added new/edit alarm window
 
 ### Changed
 

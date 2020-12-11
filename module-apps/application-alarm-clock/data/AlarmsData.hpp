@@ -12,6 +12,27 @@ enum class AlarmRepeat
     weekDays
 };
 
+enum class AlarmSnooze
+{
+    FiveMinutes    = 5,
+    TenMinutes     = 10,
+    FifteenMinutes = 15,
+    ThirtyMinutes  = 30
+};
+
+enum class AlarmOptionItemName
+{
+    Sound,
+    Snooze,
+    Repeat
+};
+
+enum class AlarmAction
+{
+    Add,
+    Edit
+};
+
 class AlarmRecordData : public gui::SwitchData
 {
   protected:
