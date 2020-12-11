@@ -5,7 +5,6 @@
 #include "lfs_ioaccess.h"
 #include "parse_partitions.h"
 #include "parse_args.h"
-#include "utility.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -158,12 +157,20 @@ static int add_directory_to_lfs(
 static int add_to_lfs(lfs_t *lfs, const char *dir, struct lfs_info_summary *summary, bool verbose)
 {
     char *host_dir = canonicalize_file_name(dir);
-    int is_dir     = path_is_a_directory(host_dir);
-    if (is_dir < 0) {
-        free(host_dir);
-        return is_dir;
+    bool is_dir, is_file;
+    off_t fsize;
+    {
+        struct stat stbuf;
+        int err = stat(host_dir, &stbuf);
+        if (err < 0) {
+            free(host_dir);
+            return -1;
+        }
+        fsize   = stbuf.st_size;
+        is_dir  = stbuf.st_mode & S_IFDIR;
+        is_file = stbuf.st_mode & S_IFREG;
     }
-    else if (!is_dir) {
+    if (!is_dir && !is_file) {
         free(host_dir);
         errno = ENOTDIR;
         return -1;
@@ -179,14 +186,26 @@ static int add_to_lfs(lfs_t *lfs, const char *dir, struct lfs_info_summary *summ
         tgt_dir[0] = '/';
         strcpy(tgt_dir + 1, sep_ptr + 1);
     }
-    int err = create_dir_in_lfs(lfs, tgt_dir, verbose);
-    if (err) {
-        free(host_dir);
-        free(tgt_dir);
-        return err;
+    int err;
+    if (is_dir) {
+        err = create_dir_in_lfs(lfs, tgt_dir, verbose);
+        if (err) {
+            free(host_dir);
+            free(tgt_dir);
+            return err;
+        }
+        err = add_directory_to_lfs(lfs, host_dir, tgt_dir, summary, verbose);
+        if (!err) {
+            summary->directories_added++;
+        }
     }
-    summary->directories_added++;
-    err = add_directory_to_lfs(lfs, host_dir, tgt_dir, summary, verbose);
+    else if (is_file) {
+        err = create_file_in_lfs(lfs, host_dir, tgt_dir, verbose);
+        if (!err) {
+            summary->files_added++;
+            summary->bytes_transferred += fsize;
+        }
+    }
     free(host_dir);
     free(tgt_dir);
     return err;

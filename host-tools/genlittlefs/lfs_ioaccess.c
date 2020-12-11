@@ -5,7 +5,6 @@
 #include "lfs_ioaccess.h"
 #include "parse_partitions.h"
 
-#include <sys/mman.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -15,50 +14,129 @@
 
 struct lfs_ioaccess_context
 {
-    uint8_t *data;
-    void *mmap_addr;
-    int data_fd;
-    size_t mmap_size;
-    struct timeval last_msync;
+    int file_des;
+    loff_t part_offs;
+    size_t last_offs;
+    const void *empty_flash_mem;
+    struct timeval last_sync;
 };
 
 static int lfs_read(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
 {
     struct lfs_ioaccess_context *ctx = c->context;
-    uint8_t *data                    = ctx->data;
-    memcpy(buffer, data + (block * c->block_size) + off, size);
-    return 0;
+    if (!ctx) {
+        return LFS_ERR_IO;
+    }
+    const off_t offrq = (off_t)block * c->block_size + (off_t)off + ctx->part_offs;
+    if (offrq > (off_t)ctx->last_offs + size) {
+        return LFS_ERR_IO;
+    }
+    off_t err = lseek(ctx->file_des, offrq, SEEK_SET);
+    if (err < 0) {
+        return -errno;
+    }
+    else if (err != offrq) {
+        return LFS_ERR_IO;
+    }
+    char *rd_buf = buffer;
+    do {
+        ssize_t ret = read(ctx->file_des, rd_buf, (size_t)size);
+        if (ret > 0) {
+            size -= ret;
+            rd_buf += ret;
+        }
+        else if (ret == 0) {
+            break;
+        }
+        else {
+            return ret;
+        }
+    } while (size > 0);
+    return size > 0 ? LFS_ERR_IO : 0;
 }
 
 static int lfs_prog(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, const void *buffer, lfs_size_t size)
 {
     struct lfs_ioaccess_context *ctx = c->context;
-    uint8_t *data                    = ctx->data;
-    memcpy(data + (block * c->block_size) + off, buffer, size);
-    return 0;
+    if (!ctx) {
+        return LFS_ERR_IO;
+    }
+    const off_t offrq = (off_t)block * c->block_size + (off_t)off + ctx->part_offs;
+    if (offrq > (off_t)ctx->last_offs + size) {
+        return LFS_ERR_IO;
+    }
+    off_t err = lseek(ctx->file_des, offrq, SEEK_SET);
+    if (err < 0) {
+        return -errno;
+    }
+    else if (err != offrq) {
+        return LFS_ERR_IO;
+    }
+    const char *wr_buf = buffer;
+    do {
+        ssize_t ret = write(ctx->file_des, wr_buf, (size_t)size);
+        if (ret > 0) {
+            size -= ret;
+            wr_buf += ret;
+        }
+        else if (ret == 0) {
+            break;
+        }
+        else {
+            return ret;
+        }
+    } while (size > 0);
+    return size > 0 ? LFS_ERR_IO : 0;
 }
 
 static int lfs_erase(const struct lfs_config *c, lfs_block_t block)
 {
     struct lfs_ioaccess_context *ctx = c->context;
-    uint8_t *data                    = ctx->data;
-    memset(data + (block * c->block_size), 0xff, c->block_size);
-    return 0;
+    if (!ctx) {
+        return LFS_ERR_IO;
+    }
+    const off_t offrq = (off_t)block * c->block_size + ctx->part_offs;
+    if (offrq > (off_t)ctx->last_offs + c->block_size) {
+        return LFS_ERR_IO;
+    }
+    off_t err = lseek(ctx->file_des, offrq, SEEK_SET);
+    if (err < 0) {
+        return -errno;
+    }
+    else if (err != offrq) {
+        return LFS_ERR_IO;
+    }
+    const char *wr_buf = ctx->empty_flash_mem;
+    size_t size;
+    do {
+        size        = c->block_size;
+        ssize_t ret = write(ctx->file_des, wr_buf, (size_t)size);
+        if (ret > 0) {
+            size -= ret;
+            wr_buf += ret;
+        }
+        else if (ret == 0) {
+            break;
+        }
+        else {
+            return ret;
+        }
+    } while (size > 0);
+    return size > 0 ? LFS_ERR_IO : 0;
 }
 
 static int lfs_sync(const struct lfs_config *c)
 {
-    // NOTES: Flush the dirty pages on disk ~1s
     struct lfs_ioaccess_context *ctx = c->context;
     struct timeval curr_msync, result_msync;
     if (gettimeofday(&curr_msync, NULL) == -1) {
         return -1;
     }
-    timersub(&curr_msync, &ctx->last_msync, &result_msync);
+    timersub(&curr_msync, &ctx->last_sync, &result_msync);
     int err = 0;
     if (result_msync.tv_sec >= 1) {
-        err             = msync(ctx->mmap_addr, ctx->mmap_size, MS_ASYNC);
-        ctx->last_msync = curr_msync;
+        err            = fsync(ctx->file_des);
+        ctx->last_sync = curr_msync;
     }
     return err;
 }
@@ -68,44 +146,45 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
                                                const struct partition *partition)
 {
     struct lfs_ioaccess_context *ret = calloc(1, sizeof(struct lfs_ioaccess_context));
-    ret->data_fd                     = open(filename, O_RDWR);
-    if (ret->data_fd < 0) {
+    if (!ret) {
+        return NULL;
+    }
+    {
+        char *memm = malloc(cfg->block_size);
+        if (!memm) {
+            free(ret);
+            return NULL;
+        }
+        memset(memm, 0xff, cfg->block_size);
+        ret->empty_flash_mem = memm;
+    }
+    ret->file_des = open(filename, O_RDWR);
+    if (ret->file_des < 0) {
         free(ret);
         return NULL;
     }
     struct stat statbuf;
-    int err = fstat(ret->data_fd, &statbuf);
+    int err = fstat(ret->file_des, &statbuf);
     if (err < 0) {
-        close(ret->data_fd);
+        close(ret->file_des);
         free(ret);
         return NULL;
     }
     off_t start_pos = 0;
-    ret->mmap_size  = statbuf.st_size;
+    ret->last_offs  = statbuf.st_size;
     if (partition) {
         if (partition->end > statbuf.st_size) {
-            close(ret->data_fd);
+            close(ret->file_des);
             free(ret);
             errno   = E2BIG;
             return NULL;
         }
         else {
             start_pos = partition->start;
-            ret->mmap_size = partition->end - partition->start + 1;
+            ret->last_offs = partition->end;
         }
     }
-    long page_mask    = ~(sysconf(_SC_PAGESIZE) - 1);
-    off_t mmap_offset = start_pos & page_mask;
-
-    ret->mmap_addr = mmap(NULL, ret->mmap_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, ret->data_fd, mmap_offset);
-    if (ret->mmap_addr == MAP_FAILED) {
-        close(ret->data_fd);
-        free(ret);
-        return NULL;
-    }
-    ret->data = ret->mmap_addr;
-    ret->data += (start_pos - mmap_offset);
-
+    ret->part_offs = start_pos;
     // Mount the file system
     cfg->read  = lfs_read;
     cfg->prog  = lfs_prog;
@@ -121,31 +200,47 @@ int lfs_ioaccess_close(struct lfs_ioaccess_context *ctx)
         errno = EINVAL;
         return -1;
     }
-    if (ctx->data_fd < 0) {
-        errno = EINVAL;
-        return -1;
-    }
-    msync(ctx->mmap_addr, ctx->mmap_size, MS_SYNC);
-    int err = munmap(ctx->mmap_addr, ctx->mmap_size);
-    if (err < 0) {
-        close(ctx->data_fd);
-        return err;
-    }
-    err = close(ctx->data_fd);
+    free((void *)ctx->empty_flash_mem);
+    int ret = close(ctx->file_des);
     free(ctx);
-    return err;
+    return ret;
 }
 
 int lfs_ioaccess_is_lfs_filesystem(struct lfs_ioaccess_context *ctx)
 {
     static const char lfs_id[] = "littlefs";
+    static const size_t lfs_offs = 8U;
+    char buf[32];
     if (!ctx) {
         errno = EINVAL;
         return -1;
     }
-    if (!ctx->data) {
-        errno = ENOMEM;
+    off_t offs = lseek(ctx->file_des, ctx->part_offs + lfs_offs, SEEK_SET);
+    if (offs < 0) {
         return -1;
     }
-    return memcmp(ctx->data + 8, lfs_id, sizeof(lfs_id) - sizeof('\0')) == 0;
+    else if (offs != ctx->part_offs + (off_t)lfs_offs) {
+        errno = ERANGE;
+        return -1;
+    }
+    size_t rd_req = sizeof buf;
+    char *rd_buf  = buf;
+    do {
+        ssize_t ret = read(ctx->file_des, rd_buf, rd_req);
+        if (ret > 0) {
+            rd_req -= ret;
+            rd_buf += ret;
+        }
+        else if (ret == 0) {
+            break;
+        }
+        else {
+            return ret;
+        }
+    } while (rd_req > 0);
+    if (rd_req) {
+        errno = ERANGE;
+        return -1;
+    }
+    return memcmp(buf, lfs_id, sizeof(lfs_id) - sizeof('\0')) == 0;
 }
