@@ -13,12 +13,12 @@ namespace db::query::events
         return "GetAll";
     }
 
-    GetAllResult::GetAllResult(std::unique_ptr<std::vector<EventsRecord>> records) : records(std::move(records))
+    GetAllResult::GetAllResult(std::vector<EventsRecord> records) : records{std::move(records)}
     {}
 
-    auto GetAllResult::getResult() -> std::unique_ptr<std::vector<EventsRecord>>
+    auto GetAllResult::getResult() -> std::vector<EventsRecord>
     {
-        return std::move(records);
+        return records;
     }
 
     auto GetAllResult::debugInfo() const -> std::string

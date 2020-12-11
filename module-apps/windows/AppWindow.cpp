@@ -230,4 +230,9 @@ namespace gui
         bottomBar->setActive(side, value);
     }
 
+    void AppWindow::accept(GuiVisitor &visitor)
+    {
+        visitor.visit(*this);
+    }
+
 } /* namespace gui */

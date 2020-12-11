@@ -9,7 +9,6 @@
 #include <json/json11.hpp>
 #include <source/version.hpp>
 #include <time/time_conversion.hpp>
-#include <vfs.hpp>
 #include <service-desktop/service-desktop/ServiceDesktop.hpp>
 #include <cstdint>
 #include <string>

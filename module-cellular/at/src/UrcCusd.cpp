@@ -94,8 +94,12 @@ void Cusd::split(const std::string &str)
             tokens.push_back(el);
         }
     }
+    uint32_t token = 0;
     for (auto &t : tokens) {
-        utils::findAndReplaceAll(t, commaString, "");
-        t = utils::trim(t);
+        if (token != static_cast<uint32_t>(Tokens::Response)) {
+            utils::findAndReplaceAll(t, commaString, "");
+            t = utils::trim(t);
+        }
+        token += 1;
     }
 }
