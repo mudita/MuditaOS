@@ -13,3 +13,5 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
                                                const struct partition *partition);
 
 int lfs_ioaccess_close(struct lfs_ioaccess_context *ctx);
+
+int lfs_ioaccess_is_lfs_filesystem(struct lfs_ioaccess_context *ctx);

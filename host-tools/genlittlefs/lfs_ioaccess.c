@@ -120,6 +120,7 @@ int lfs_ioaccess_close(struct lfs_ioaccess_context *ctx)
         errno = EINVAL;
         return -1;
     }
+    msync(ctx->data, ctx->mmap_size, MS_SYNC);
     int err = munmap(ctx->data, ctx->mmap_size);
     if (err < 0) {
         close(ctx->data_fd);
@@ -128,4 +129,18 @@ int lfs_ioaccess_close(struct lfs_ioaccess_context *ctx)
     err = close(ctx->data_fd);
     free(ctx);
     return err;
+}
+
+int lfs_ioaccess_is_lfs_filesystem(struct lfs_ioaccess_context *ctx)
+{
+    static const char lfs_id[] = "littlefs";
+    if (!ctx) {
+        errno = EINVAL;
+        return -1;
+    }
+    if (!ctx->data) {
+        errno = ENOMEM;
+        return -1;
+    }
+    return memcmp(ctx->data + 8, lfs_id, sizeof(lfs_id) - sizeof('\0')) == 0;
 }
