@@ -16,7 +16,7 @@ namespace bsp::eink_frontlight
         setBrightness,
     };
 
-    using BrightnessPercentage = uint8_t;
+    using BrightnessPercentage = float;
 
     void init();
 
@@ -27,4 +27,6 @@ namespace bsp::eink_frontlight
     void turnOn();
     
     void turnOff();
+
+    void setGammaFactor(float gamma);
 } // namespace bsp::eink_frontlight
