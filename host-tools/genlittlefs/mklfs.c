@@ -296,16 +296,11 @@ int main(int argc, char **argv)
         print_config_options(&lopts);
     }
 
-    if (!lopts.overwrite_existing) {
-        lfs_t tmp_lfs;
-        int code = lfs_mount(&tmp_lfs, &cfg);
-        if (!code) {
-            fprintf(stderr, "LFS filesystem already exists. If you want to overwrite add --overwrite flag\n");
-            lfs_unmount(&tmp_lfs);
-            free(lopts.src_dirs);
-            lfs_ioaccess_close(ioctx);
-            return EXIT_FAILURE;
-        }
+    if (!lopts.overwrite_existing && lfs_ioaccess_is_lfs_filesystem(ioctx) > 0) {
+        fprintf(stderr, "LFS filesystem already exists. If you want to overwrite add --overwrite flag\n");
+        free(lopts.src_dirs);
+        lfs_ioaccess_close(ioctx);
+        return EXIT_FAILURE;
     }
 
     err = lfs_format(&lfs, &cfg);
@@ -323,6 +318,7 @@ int main(int argc, char **argv)
         free(lopts.src_dirs);
         return EXIT_FAILURE;
     }
+
     for (size_t ndir = 0; ndir < lopts.src_dirs_siz; ++ndir) {
         err = add_to_lfs(&lfs, lopts.src_dirs[ndir], &prog_summary, lopts.verbose);
         if (err) {
@@ -342,9 +338,13 @@ int main(int argc, char **argv)
     }
     free(lopts.src_dirs);
     lfs_ioaccess_close(ioctx);
-    printf("Summary: Directories added: %lu, Files added: %lu, Transferred %lu kbytes\n",
+    printf("Littlefs summary:\n"
+           "     Directories created: %lu, Files added: %lu, Transferred %lu kbytes.\n"
+           "     Littlefs block size: %i blocks count: %i.\n",
            prog_summary.directories_added,
            prog_summary.files_added,
-           prog_summary.bytes_transferred / 1024UL);
+           prog_summary.bytes_transferred / 1024UL,
+           cfg.block_size,
+           cfg.block_count);
     return EXIT_SUCCESS;
 }
