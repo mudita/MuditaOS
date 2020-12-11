@@ -114,6 +114,44 @@ git commit
 To fix the style for Pull Request CI:
 `./config/pre-commit.hook --branch-fix`
 
+## Commit message template
+
+To add commit message template use this command:
+
+```bash
+git config commit.template .gitmessage
+```
+
+This way each time you add new commit you will see template that will help
+you with proper message format. More about that in (Development Workflow)[./doc/development_workflow.md#commit-changes]
+
+## Commit message hook
+This hooks automatically converts your branch name to commit title
+
+rules:
+if branch starts with EGD-xxxx it is treated as jira ticket
+all `-` and `_` are converted to spaces
+
+### adding a hook:
+```bash
+cd .git/hooks
+ln -s ../../config/prepare-commit-msg
+```
+### using hook:
+
+Create a branch
+
+```bash
+git checkout origin/master -b EGD-1234-Add_change_description
+```
+
+Do your changes, and prepare commit
+
+```bash
+git commit
+```
+
+
 ## Longstart
 
 Run the provisioning script `./config/bootstrap.sh` to install all dependencies. The script is written for Ubuntu and tested on 20.04.
