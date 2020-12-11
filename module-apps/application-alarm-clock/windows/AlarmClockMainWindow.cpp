@@ -3,6 +3,7 @@
 
 #include "AlarmClockMainWindow.hpp"
 #include "application-alarm-clock/widgets/AlarmClockStyle.hpp"
+#include "application-alarm-clock/data/AlarmsData.hpp"
 #include "windows/DialogMetadata.hpp"
 #include "messages/DialogMetadataMessage.hpp"
 #include <InputEvent.hpp>
@@ -97,7 +98,12 @@ namespace app::alarmClock
         }
 
         if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_LEFT)) {
-            LOG_DEBUG("Not implemented yet");
+            auto rec                              = new AlarmsRecord();
+            rec->time                             = TimePointNow();
+            auto event                            = std::make_shared<AlarmsRecord>(*rec);
+            std::unique_ptr<AlarmRecordData> data = std::make_unique<AlarmRecordData>(event);
+            data->setDescription(style::alarmClock::newAlarm);
+            application->switchWindow(style::alarmClock::window::name::newEditAlarm, std::move(data));
             return true;
         }
 
