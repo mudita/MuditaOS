@@ -17,6 +17,10 @@ namespace purefs::fs
 
     auto filesystem::register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operations> fops) -> int
     {
+        if (fops == nullptr) {
+            LOG_ERROR("Filesystem operations doesn't exists");
+            return -EINVAL;
+        }
         cpp_freertos::LockGuard _lck(m_lock);
         const auto it = m_fstypes.find(std::string(fsname));
         if (it != std::end(m_fstypes)) {
