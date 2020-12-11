@@ -3,6 +3,11 @@
 
 #include <fstream>
 #include "Logger.hpp"
+#ifdef TARGET_Linux
+#include "board/linux/LogRotator.hpp"
+#else
+#include "board/cross/LogRotator.hpp"
+#endif
 
 namespace Log
 {
@@ -12,8 +17,8 @@ namespace Log
     void Logger::dumpToFile()
     {
         if (_loggerBufferCurrentPos >= MAX_BUFFER_UTIL_MEM) {
-            std::ofstream logFile(LOG_FILE_NAME, std::fstream::out | std::fstream::app);
-            logFile.write(_loggerBuffer, _loggerBufferCurrentPos);
+            static LogRotator logRotator(LOF_FILE_NAME, MAX_LOG_FILE_SIZE, MAX_LOG_FILES_COUNT);
+            logRotator.Log(_loggerBuffer, _loggerBufferCurrentPos);
             _loggerBufferCurrentPos = 0;
         }
     }
