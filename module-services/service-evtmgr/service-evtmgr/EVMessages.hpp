@@ -5,6 +5,7 @@
 
 #include "KbdMessage.hpp"
 #include "BatteryMessages.hpp"
+#include "ScreenLightControl.hpp"
 
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
@@ -15,8 +16,6 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/torch/torch.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
-#include <bsp/eink_frontlight/eink_frontlight.hpp>
-#include <bsp/light_sensor/light_sensor.hpp>
 
 #include <string>
 
@@ -126,6 +125,7 @@ namespace sevm
         {}
         bool success = false;
     };
+
     class KeypadBacklightMessage : public Message
     {
       public:
@@ -143,31 +143,16 @@ namespace sevm
         bool success;
     };
 
-    class EinkFrontlightMessage : public Message
+    class ScreenLightControlMessage : public Message
     {
       public:
-        explicit EinkFrontlightMessage(bsp::eink_frontlight::Action act = bsp::eink_frontlight::Action::turnOff,
-                                       std::uint8_t val                 = 0)
-            : Message(MessageType::EVMEinkFrontlightMessage), action(act), value(val)
+        ScreenLightControlMessage(screen_light_control::Action act,
+                                  screen_light_control::Parameters params = screen_light_control::Parameters())
+            : Message(MessageType::EVMScreenLightControlMessage), action(act), parameters(params)
         {}
 
-        const bsp::eink_frontlight::Action action;
-        const bsp::eink_frontlight::BrightnessPercentage value;
-    };
-
-    class LightSensorMessage : public Message
-    {
-      public:
-        LightSensorMessage() : Message(MessageType::EVMLightSensorMessage)
-        {}
-    };
-
-    class LightSensorReadoutMessage : public LightSensorMessage
-    {
-      public:
-        explicit LightSensorReadoutMessage(bsp::light_sensor::IlluminanceLux val) : LightSensorMessage(), value(val)
-        {}
-        const bsp::light_sensor::IlluminanceLux value;
+        screen_light_control::Action action;
+        screen_light_control::Parameters parameters;
     };
 
 } /* namespace sevm*/
