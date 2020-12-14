@@ -13,11 +13,13 @@
 * `[settings]` Nightshift window - GUI.
 * `[bluetooth][settings]` Add Bluetooth settings to database.
 * `[PowerManagement]` Added CPU load measurement.
+* `[alarms]` Added new/edit alarm window
 
 ### Changed
 
 * `[PowerManagement]` Change hardware timers clock source
 * `[bluetooth]` Underlying communication with the Bluetooth module over DMA (direct access)
+* `[system]` Workers refactor and state transition fixes
 
 ### Fixed
 
