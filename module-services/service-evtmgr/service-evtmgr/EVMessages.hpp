@@ -5,7 +5,7 @@
 
 #include "KbdMessage.hpp"
 #include "BatteryMessages.hpp"
-#include "ScreenLightControl.hpp"
+#include <screen-light-control/ScreenLightControl.hpp>
 
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
