@@ -7,7 +7,7 @@
 #include "service-evtmgr/EventManager.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
 #include "service-evtmgr/WorkerEvent.hpp"
-#include "service-evtmgr/ScreenLightControl.hpp"
+#include "screen-light-control/ScreenLightControl.hpp"
 
 #include <BaseInterface.hpp>
 #include <MessageType.hpp>
