@@ -39,6 +39,9 @@ namespace gui
                                  msgThreadStyle::listHeight,
                                  model);
         list->setScrollTopMargin(style::margins::small);
+        setFocusItem(list);
+
+        list->emptyListCallback = [this]() { showEmptyResults(); };
     }
 
     void SearchResults::onBeforeShow(ShowMode mode, SwitchData *data)

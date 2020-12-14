@@ -75,7 +75,7 @@ auto SMSThreadModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     if (recordsCount != (msgResponse->getCount() + 1)) {
         // Additional one element for SMSInputWidget.
         recordsCount = msgResponse->getCount() + 1;
-        list->rebuildList(style::listview::RebuildType::Full, 0, true);
+        list->reSendLastRebuildRequest();
         return false;
     }
 

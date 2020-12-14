@@ -73,7 +73,7 @@ namespace app::notes
     {
         if (recordsCount != notesRepoCount) {
             recordsCount = notesRepoCount;
-            list->rebuildList(::style::listview::RebuildType::Full, 0, true);
+            list->reSendLastRebuildRequest();
             return false;
         }
         return updateRecords(records);

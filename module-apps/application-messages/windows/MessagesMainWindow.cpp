@@ -89,13 +89,16 @@ namespace gui
             return true;
         };
 
-        emptyListIcon->setVisible(false);
-        emptyListIcon->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {
+        list->emptyListCallback = [this]() {
+            emptyListIcon->setVisible(true);
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
-            rightArrowImage->setVisible(false);
-            searchImage->setVisible(false);
-            return true;
+        };
+
+        list->notEmptyListCallback = [this]() {
+            emptyListIcon->setVisible(false);
+            bottomBar->setActive(BottomBar::Side::LEFT, true);
+            bottomBar->setActive(BottomBar::Side::CENTER, true);
         };
 
         setFocusItem(list);
@@ -123,14 +126,6 @@ namespace gui
                 }));
                 DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
             }
-        }
-
-        if (threadsModel->requestRecordsCount() == 0) {
-            emptyListIcon->setVisible(true);
-            setFocusItem(emptyListIcon);
-        }
-        else {
-            emptyListIcon->setVisible(false);
         }
 
         DBServiceAPI::GetQuery(application,

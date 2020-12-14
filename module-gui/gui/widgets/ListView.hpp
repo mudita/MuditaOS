@@ -14,6 +14,8 @@ namespace gui
 {
     class ListItemProvider;
 
+    using rebuildRequest = std::pair<style::listview::RebuildType, unsigned int>;
+
     class ListViewScroll : public Rect
     {
       public:
@@ -28,11 +30,12 @@ namespace gui
       protected:
         unsigned int startIndex                    = 0;
         unsigned int storedFocusIndex              = 0;
-        unsigned int elementsCount                 = 1;
+        unsigned int elementsCount                 = 0;
         std::shared_ptr<ListItemProvider> provider = nullptr;
         VBox *body                                 = nullptr;
         ListViewScroll *scroll                     = nullptr;
-        std::list<std::pair<style::listview::RebuildType, unsigned int>> rebuildRequests;
+        std::list<rebuildRequest> rebuildRequests;
+        rebuildRequest lastRebuildRequest = {style::listview::RebuildType::Full, 0};
 
         unsigned int currentPageSize = 0;
         bool pageLoaded              = true;
@@ -52,6 +55,8 @@ namespace gui
         void fillFirstPage();
         void setStartIndex();
         void recalculateOnBoxRequestedResize();
+        /// Default empty list to inform that there is no elements - callback should be override in applications
+        void onElementsCountChanged();
         unsigned int calculateMaxItemsOnPage();
         unsigned int calculateLimit(style::listview::Direction value = style::listview::Direction::Bottom);
         Order getOrderFromDirection();
@@ -69,6 +74,9 @@ namespace gui
         void rebuildList(style::listview::RebuildType rebuildType = style::listview::RebuildType::Full,
                          unsigned int dataOffset                  = 0,
                          bool forceRebuild                        = false);
+        /// In case of elements count change there can be a need to resend request in case of having one async query for
+        /// count and records.
+        void reSendLastRebuildRequest();
         void clear();
         std::shared_ptr<ListItemProvider> getProvider();
         void setOrientation(style::listview::Orientation value);
@@ -76,6 +84,10 @@ namespace gui
         void setScrollTopMargin(int value);
         void setAlignment(const Alignment &value) override;
         void onProviderDataUpdate();
+
+        [[nodiscard]] bool isEmpty() const noexcept;
+        std::function<void()> emptyListCallback;
+        std::function<void()> notEmptyListCallback;
 
         // virtual methods from Item
         bool onInput(const InputEvent &inputEvent) override;

@@ -18,6 +18,7 @@
 #include <module-apps/application-notes/presenter/NoteEditWindowPresenter.hpp>
 #include <module-apps/windows/OptionWindow.hpp>
 #include <module-apps/windows/Dialog.hpp>
+#include <module-services/service-db/service-db/DBNotificationMessage.hpp>
 
 namespace app
 {
@@ -28,7 +29,9 @@ namespace app
 
     ApplicationNotes::ApplicationNotes(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground, NotesStackSize)
-    {}
+    {
+        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+    }
 
     // Invoked upon receiving data message
     sys::MessagePointer ApplicationNotes::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -37,6 +40,19 @@ namespace app
         // if message was handled by application's template there is no need to process further.
         if (static_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
+        }
+
+        if (msgl->messageType == MessageType::DBServiceNotification) {
+            auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
+            if (msg != nullptr) {
+                // window-specific actions
+                if (msg->interface == db::Interface::Name::Notes) {
+                    for (auto &[name, window] : windowsStack) {
+                        window->onDatabaseMessage(msg);
+                    }
+                }
+                return std::make_shared<sys::ResponseMessage>();
+            }
         }
 
         if (resp != nullptr) {
