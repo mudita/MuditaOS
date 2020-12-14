@@ -76,6 +76,7 @@ class BluetoothWorker : private sys::Worker
 
     TaskHandle_t bt_worker_task = nullptr;
     int is_running              = false;
+    sys::Service *service       = nullptr;
 
   public:
     enum Error

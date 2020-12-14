@@ -48,6 +48,16 @@ class FileIndexerTest : public FileIndexerAgent
         return FileIndexerAgent::handleUnregisterOnFileChange(req);
     }
 
+    auto handleDeleteFileTest(FileIndexer::Messages::DeleteFileMessage *req) -> sys::MessagePointer
+    {
+        return FileIndexerAgent::handleDeleteFile(req);
+    }
+
+    auto handleDeleteAllFilesInDirTest(FileIndexer::Messages::DeleteAllFilesInDirMessage *req) -> sys::MessagePointer
+    {
+        return FileIndexerAgent::handleDeleteAllFilesInDir(req);
+    }
+
     unsigned int getNumberOfRecipients(std::string directory)
     {
         unsigned int recipientCount = 0;

@@ -174,6 +174,7 @@ standard names. */
 /* system heap integrity check */
 #ifdef DEBUG_FREERTOS
 #define configSYSTEM_HEAP_STATS           (1)
+#define configUSER_HEAP_STATS             (1)
 #define configSYSTEM_HEAP_INTEGRITY_CHECK (1)
 #endif
 
