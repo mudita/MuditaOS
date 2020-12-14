@@ -56,7 +56,11 @@ namespace app
     }
 
     ApplicationSettings::~ApplicationSettings()
-    {}
+    {
+        settings->unregisterValueChange(settings::SystemProperties::lockPassHash);
+        settings->unregisterValueChange(settings::SystemProperties::timeDateFormat);
+        settings->unregisterValueChange(settings::SystemProperties::displayLanguage);
+    }
 
     // Invoked upon receiving data message
     sys::MessagePointer ApplicationSettings::DataReceivedHandler(sys::DataMessage *msgl,
@@ -167,18 +171,19 @@ namespace app
 
     void ApplicationSettings::setSim(Store::GSM::SIM sim)
     {
-        settings->setValue(settings::SystemProperties::activeSim, utils::enumToString(sim));
         CellularServiceAPI::SetSimCard(this, sim);
     }
 
     void ApplicationSettings::setPin(unsigned int value)
     {
         settings->setValue(settings::SystemProperties::lockPassHash, std::to_string(value));
+        lockPassHash = value;
     }
 
     void ApplicationSettings::clearPin()
     {
         settings->setValue(settings::SystemProperties::lockPassHash, "");
+        lockPassHash = 0U;
     }
 
     void ApplicationSettings::lockPassChanged(std::string value)
