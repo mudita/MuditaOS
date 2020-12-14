@@ -31,6 +31,7 @@ namespace sgui
     {
         // object responsible for rendering images to context
         gui::Renderer renderer;
+        sys::Service *service;
 
       public:
         WorkerGUI(ServiceGUI *service);

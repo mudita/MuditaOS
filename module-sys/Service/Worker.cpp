@@ -22,14 +22,14 @@ namespace sys
     void Worker::taskAdapter(void *taskParam)
     {
         Worker *worker = static_cast<Worker *>(taskParam);
+        worker->setState(State::Running);
         worker->task();
     }
 
     bool Worker::handleControlMessage()
     {
-        std::uint8_t receivedMessage;
-
-        xQueueReceive(controlQueue, &receivedMessage, 0);
+        auto receivedMessage = static_cast<std::uint8_t>(Worker::ControlMessage::Stop);
+        getControlQueue().Dequeue(&receivedMessage, 0);
         LOG_INFO("Handle control message: %u", receivedMessage);
         assert(receivedMessage < controlMessagesCount);
 
@@ -51,19 +51,20 @@ namespace sys
     void Worker::task()
     {
         QueueSetMemberHandle_t activeMember;
+        assert(getState() == State::Running);
 
         while (getState() == State::Running) {
             activeMember = xQueueSelectFromSet(queueSet, portMAX_DELAY);
 
             // handle control messages from parent service
-            if (activeMember == controlQueue) {
+            if (activeMember == getControlQueue().GetQueueHandle()) {
                 handleControlMessage();
                 continue;
             }
 
             // find id of the queue that was activated
             for (uint32_t i = 0; i < queues.size(); i++) {
-                if (queues[i] == activeMember) {
+                if (queues[i]->GetQueueHandle() == activeMember) {
                     handleMessage(i);
                 }
             }
@@ -75,8 +76,16 @@ namespace sys
         vTaskDelete(nullptr);
     }
 
-    Worker::Worker(sys::Service *service) : service{service}
-    {}
+    Worker::Worker(sys::Service *service) : name(service->GetName()), priority(service->GetPriority())
+    {
+        constructName();
+    }
+
+    Worker::Worker(std::string workerNamePrefix, UBaseType_t priority)
+        : name(std::move(workerNamePrefix)), priority(priority)
+    {
+        constructName();
+    }
 
     Worker::~Worker()
     {
@@ -85,11 +94,34 @@ namespace sys
         }
     }
 
-    void Worker::addQueueInfo(xQueueHandle q, std::string qName)
+    void Worker::constructName()
     {
-        queueNameMap.emplace(std::make_pair(q, qName));
-        vQueueAddToRegistry(q, qName.c_str());
-        queues.push_back(q);
+        // assign worker id
+        taskENTER_CRITICAL();
+        id = count++;
+        taskEXIT_CRITICAL();
+
+        name.append("_w" + std::to_string(id));
+    }
+
+    size_t Worker::addQueue(const std::string &qName, UBaseType_t maxItems, UBaseType_t itemSize)
+    {
+        auto idx = queues.size();
+        queues.push_back(std::make_shared<WorkerQueue>(qName, maxItems, itemSize));
+        vQueueAddToRegistry(queues.back()->GetQueueHandle(), qName.c_str());
+        return idx;
+    }
+
+    WorkerQueue &Worker::getControlQueue() const
+    {
+        assert(controlQueueIndex);
+        return *queues.at(controlQueueIndex.value());
+    }
+
+    WorkerQueue &Worker::getServiceQueue() const
+    {
+        assert(serviceQueueIndex);
+        return *queues.at(serviceQueueIndex.value());
     }
 
     inline std::string Worker::getControlQueueName() const
@@ -100,13 +132,6 @@ namespace sys
     bool Worker::init(std::list<WorkerQueueInfo> queuesList)
     {
         assert(state == State::New);
-
-        // assign worker id
-        taskENTER_CRITICAL();
-        id = count++;
-        taskEXIT_CRITICAL();
-
-        name = service->GetName() + "_w" + std::to_string(id);
 
         // initial value is because there is always a service and control queue
         // to communicate with the parent service
@@ -125,41 +150,19 @@ namespace sys
         }
 
         // create and add all queues to the set. First service queue is created.
-        serviceQueue = xQueueCreate(SERVICE_QUEUE_LENGTH, SERVICE_QUEUE_SIZE);
-        if (serviceQueue == nullptr) {
-            state = State::Invalid;
-            deinit();
-            return false;
-        }
-
-        addQueueInfo(serviceQueue, SERVICE_QUEUE_NAME);
+        serviceQueueIndex = addQueue(SERVICE_QUEUE_NAME, SERVICE_QUEUE_LENGTH, SERVICE_QUEUE_SIZE);
 
         // create control queue
-        controlQueue = xQueueCreate(CONTROL_QUEUE_LENGTH, sizeof(std::uint8_t));
-        if (controlQueue == nullptr) {
-            state = State::Invalid;
-            deinit();
-            return false;
-        }
-
-        addQueueInfo(controlQueue, getControlQueueName());
+        controlQueueIndex = addQueue(getControlQueueName(), CONTROL_QUEUE_LENGTH, sizeof(std::uint8_t));
 
         // create and add all queues provided from service
         for (auto wqi : queuesList) {
-            auto q = xQueueCreate(wqi.length, wqi.elementSize);
-            if (q == nullptr) {
-                LOG_FATAL("xQueueCreate %s failed", wqi.name.c_str());
-                state = State::Invalid;
-                deinit();
-                return false;
-            }
-            addQueueInfo(q, wqi.name);
+            addQueue(wqi.name, wqi.length, wqi.elementSize);
         };
 
-        // iterate over all queues and add them to set
+        // iterate over all user queues and add them to set
         for (uint32_t i = 0; i < queues.size(); ++i) {
-
-            if (xQueueAddToSet(queues[i], queueSet) != pdPASS) {
+            if (xQueueAddToSet(queues[i]->GetQueueHandle(), queueSet) != pdPASS) {
                 state = State::Invalid;
                 deinit();
                 return false;
@@ -181,11 +184,9 @@ namespace sys
     bool Worker::deinit()
     {
         // for all queues - remove from set and delete queue
-        for (auto q : queues) {
+        for (auto &q : queues) {
             // remove queues from set
-            xQueueRemoveFromSet(q, queueSet);
-            // delete queue
-            vQueueDelete(q);
+            xQueueRemoveFromSet(q->GetQueueHandle(), queueSet);
         }
         queues.clear();
 
@@ -209,29 +210,31 @@ namespace sys
 
         runnerTask = xTaskGetCurrentTaskHandle();
 
-        BaseType_t task_error =
-            xTaskCreate(Worker::taskAdapter, name.c_str(), defaultStackSize, this, service->GetPriority(), &taskHandle);
+        BaseType_t task_error = 0;
+        task_error = xTaskCreate(Worker::taskAdapter, name.c_str(), defaultStackSize, this, priority, &taskHandle);
+
         if (task_error != pdPASS) {
             LOG_ERROR("Failed to start the task");
             return false;
         }
 
-        setState(State::Running);
         return true;
     }
 
     bool Worker::stop()
     {
-        assert(xTaskGetCurrentTaskHandle() == runnerTask);
-        assert(getState() == State::Running);
-
-        return sendControlMessage(ControlMessage::Stop);
+        if (runnerTask) {
+            assert(xTaskGetCurrentTaskHandle() == runnerTask);
+            assert(getState() == State::Running);
+            return sendControlMessage(ControlMessage::Stop);
+        }
+        return true;
     }
 
     bool Worker::sendControlMessage(ControlMessage message)
     {
         auto messageToSend = static_cast<std::uint8_t>(message);
-        return xQueueSend(controlQueue, &messageToSend, portMAX_DELAY) == pdTRUE;
+        return getControlQueue().Enqueue(&messageToSend, portMAX_DELAY);
     }
 
     bool Worker::send(uint32_t cmd, uint32_t *data)
@@ -239,34 +242,44 @@ namespace sys
         assert(xTaskGetCurrentTaskHandle() == runnerTask);
         assert(getState() == State::Running);
 
-        if (serviceQueue != nullptr) {
-            WorkerCommand workerCommand{cmd, data};
-            if (xQueueSend(serviceQueue, &workerCommand, portMAX_DELAY) == pdTRUE) {
-                return true;
-            }
+        WorkerCommand workerCommand{cmd, data};
+        if (getServiceQueue().Enqueue(&workerCommand, portMAX_DELAY)) {
+            return true;
         }
         return false;
     }
 
-    xQueueHandle Worker::getQueueByName(std::string qname)
+    xQueueHandle Worker::getQueueHandleByName(const std::string &qname) const
     {
-        for (auto q_handle : this->queues) {
-            if (this->queueNameMap[q_handle] == qname)
-                return q_handle;
+        for (auto &q : queues) {
+            if (q->GetQueueName() == qname) {
+                return q->GetQueueHandle();
+            }
+        }
+        return nullptr;
+    }
+
+    std::shared_ptr<WorkerQueue> Worker::getQueueByName(const std::string &qname) const
+    {
+        for (auto &q : queues) {
+            if (q->GetQueueName() == qname) {
+                return q;
+            }
         }
         return nullptr;
     }
 
     bool Worker::join(TickType_t timeout)
     {
-        assert(xTaskGetCurrentTaskHandle() == runnerTask);
-        assert(getState() == State::Running);
+        if (runnerTask) {
+            assert(xTaskGetCurrentTaskHandle() == runnerTask);
+            assert(getState() == State::Running || getState() == State::Stopped);
 
-        if (xSemaphoreTake(joinSemaphore, timeout) != pdTRUE) {
-            return false;
+            if (xSemaphoreTake(joinSemaphore, timeout) != pdTRUE) {
+                return false;
+            }
+            while (eTaskGetState(taskHandle) != eDeleted) {}
         }
-        while (eTaskGetState(taskHandle) != eDeleted) {}
-
         return true;
     }
 
@@ -302,5 +315,4 @@ namespace sys
         // a worker in case of unexpected failure without knowing its state.
         vTaskDelete(taskHandle);
     }
-
 } /* namespace sys */

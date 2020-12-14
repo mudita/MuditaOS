@@ -7,6 +7,7 @@
 #include "service-evtmgr/EventManager.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
 #include "service-evtmgr/WorkerEvent.hpp"
+#include "service-evtmgr/ScreenLightControl.hpp"
 
 #include <BaseInterface.hpp>
 #include <MessageType.hpp>
@@ -19,7 +20,6 @@
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/rtc/rtc.hpp>
 #include <bsp/torch/torch.hpp>
-#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <common_data/RawKey.hpp>
 #include <log/log.hpp>
 #include <module-utils/time/time_conversion.hpp>
@@ -30,7 +30,6 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
-#include <bsp/light_sensor/light_sensor.hpp>
 #include <cassert>
 #include <list>
 #include <tuple>
@@ -280,15 +279,10 @@ sys::ReturnCodes EventManager::InitHandler()
         return response;
     });
 
-    connect(sevm::EinkFrontlightMessage(), [&](sys::Message *msgl) {
-        auto msg = static_cast<sevm::EinkFrontlightMessage *>(msgl);
-        processEinkFrontlightRequest(msg->action, msg->value);
+    connect(sevm::ScreenLightControlMessage(sevm::screen_light_control::Action::turnOff), [&](sys::Message *msgl) {
+        auto request = static_cast<sevm::ScreenLightControlMessage *>(msgl);
+        sevm::screen_light_control::processRequest(request->action, request->parameters);
         return std::make_shared<sys::ResponseMessage>();
-    });
-
-    connect(sevm::LightSensorMessage(), [&](sys::Message *msgl) {
-        auto message = std::make_shared<sevm::LightSensorReadoutMessage>(bsp::light_sensor::readout());
-        return message;
     });
 
     // initialize keyboard worker
@@ -325,12 +319,14 @@ sys::ReturnCodes EventManager::InitHandler()
 
     EventWorker->init(list);
     EventWorker->run();
+    sevm::screen_light_control::init(this);
 
     return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes EventManager::DeinitHandler()
 {
+    sevm::screen_light_control::deinit();
     EventWorker->close();
     EventWorker.reset();
     EventWorker = nullptr;
@@ -378,20 +374,4 @@ bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action a
         break;
     }
     return response;
-}
-
-void EventManager::processEinkFrontlightRequest(bsp::eink_frontlight::Action act,
-                                                bsp::eink_frontlight::BrightnessPercentage val)
-{
-    switch (act) {
-    case bsp::eink_frontlight::Action::turnOn:
-        bsp::eink_frontlight::turnOn();
-        break;
-    case bsp::eink_frontlight::Action::turnOff:
-        bsp::eink_frontlight::turnOff();
-        break;
-    case bsp::eink_frontlight::Action::setBrightness:
-        bsp::eink_frontlight::setBrightness(val);
-        break;
-    }
 }
