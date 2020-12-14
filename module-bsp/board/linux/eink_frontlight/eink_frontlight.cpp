@@ -11,7 +11,7 @@ namespace bsp::eink_frontlight
     void deinit()
     {}
 
-    void setBrightness(BrightnessPercentage brightness)
+    void setBrightness(BrightnessPercentage)
     {}
 
     void turnOn()

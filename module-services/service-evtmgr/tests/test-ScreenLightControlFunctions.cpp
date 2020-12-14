@@ -9,7 +9,7 @@ TEST_CASE("ScreenLightControlFunctions")
     using namespace sevm::screen_light_control::functions;
     constexpr auto controlTimerMS = 25;
 
-    SECTION("Automatic mode ramp an hysteresis test")
+    SECTION("Ramp an hysteresis test")
     {
         INFO("Setup");
         const unsigned int testRampTime                          = 500;
