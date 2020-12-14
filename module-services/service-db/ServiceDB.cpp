@@ -532,7 +532,9 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
 
 sys::ReturnCodes ServiceDB::InitHandler()
 {
-    Database::initialize();
+    if (const auto isSuccess = Database::initialize(); !isSuccess) {
+        return sys::ReturnCodes::Failure;
+    }
 
     // Create databases
     contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getUserDiskPath() / "contacts.db").c_str());

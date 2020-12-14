@@ -125,7 +125,7 @@ uint32_t ContactsNameTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM contact_name;");
 
-    if (queryRet->getRowCount() == 0) {
+    if (!queryRet || queryRet->getRowCount() == 0) {
         return 0;
     }
 

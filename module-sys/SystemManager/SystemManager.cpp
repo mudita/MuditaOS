@@ -51,8 +51,9 @@ namespace sys
 
         // in shutdown we need to wait till event manager tells us that it's ok to stfu
         while (state == State::Running) {
-            auto msg = mailbox.pop();
-            msg->Execute(this);
+            if (auto msg = mailbox.pop(); msg) {
+                msg->Execute(this);
+            }
         }
 
         while (state == State::Shutdown) {
@@ -63,6 +64,9 @@ namespace sys
             else {
                 // await from EvtManager for info that red key was pressed / timeout
                 auto msg = mailbox.pop();
+                if (!msg) {
+                    continue;
+                }
                 if (msg->sender != service::name::evt_manager) {
                     LOG_ERROR("Ignored msg from: %s on shutdown", msg->sender.c_str());
                     continue;

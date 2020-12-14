@@ -109,9 +109,9 @@ void ContactsGroupsTable::updateGroups(uint32_t contactId, std::set<ContactsGrou
 ContactsGroupsTableRow ContactsGroupsTable::getById(uint32_t id)
 {
     if (id != DB_ID_NONE) {
-        auto qureryResult = db->query(statements::getById, id);
-        if (qureryResult->getRowCount() == 1) {
-            return {(*qureryResult)[0].getUInt32(), (*qureryResult)[1].getString()};
+        auto queryResult = db->query(statements::getById, id);
+        if (queryResult && queryResult->getRowCount() == 1) {
+            return {(*queryResult)[0].getUInt32(), (*queryResult)[1].getString()};
         }
     }
     return ContactsGroupsTableRow();
@@ -187,7 +187,7 @@ uint32_t ContactsGroupsTable::getId(const std::string &name)
 {
     if (!name.empty()) {
         auto queryRet = db->query(statements::getId, name.c_str());
-        if (queryRet->getRowCount() != 0) {
+        if (queryRet && queryRet->getRowCount() != 0) {
             return (*queryRet)[0].getUInt32();
         }
     }
@@ -197,7 +197,7 @@ uint32_t ContactsGroupsTable::getId(const std::string &name)
 std::set<ContactsGroupsTableRow> ContactsGroupsTable::getGroupsForContact(uint32_t contactId)
 {
     auto queryResult = db->query(statements::getGroupsForContact, contactId);
-    if (queryResult->getRowCount() != 0) {
+    if (queryResult && queryResult->getRowCount() != 0) {
         std::set<ContactsGroupsTableRow> results;
         do {
             results.insert(ContactsGroupsTableRow((*queryResult)[0].getUInt32(), (*queryResult)[1].getString()));
@@ -221,7 +221,7 @@ std::set<uint32_t> ContactsGroupsTable::getContactsForGroup(uint32_t groupId)
 {
     (void)(&groupId);
     auto queryResults = db->query(statements::getContactsForGroup, groupId);
-    if (queryResults->getRowCount() != 0) {
+    if (queryResults && queryResults->getRowCount() != 0) {
         std::set<uint32_t> contacts;
         do {
             contacts.insert((*queryResults)[0].getUInt32());
@@ -234,7 +234,7 @@ std::set<uint32_t> ContactsGroupsTable::getContactsForGroup(uint32_t groupId)
 uint32_t ContactsGroupsTable::getIdOrCount(const char *queryString) const
 {
     auto queryRet = db->query(queryString);
-    if (queryRet->getRowCount() == 0) {
+    if (!queryRet || queryRet->getRowCount() == 0) {
         return 0;
     }
     return (*queryRet)[0].getUInt32();

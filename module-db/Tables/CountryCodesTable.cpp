@@ -37,7 +37,7 @@ uint32_t CountryCodesTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM codes;");
 
-    if (queryRet->getRowCount() == 0) {
+    if (!queryRet || queryRet->getRowCount() == 0) {
         return 0;
     }
 

@@ -112,7 +112,7 @@ uint32_t ContactsRingtonesTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM contact_ringtones;");
 
-    if (queryRet->getRowCount() == 0) {
+    if (!queryRet || queryRet->getRowCount() == 0) {
         return 0;
     }
 
