@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadWindowOptions.hpp"
-#include "module-utils/i18n/i18n.hpp"
+#include <i18n/i18n.hpp>
 #include "log/log.hpp"
 #include <Options.hpp>
 #include <OptionWindow.hpp>

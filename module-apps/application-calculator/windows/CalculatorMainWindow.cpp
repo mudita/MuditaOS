@@ -4,7 +4,7 @@
 #include "CalculatorMainWindow.hpp"
 #include "application-calculator/widgets/CalculatorStyle.hpp"
 #include "application-calculator/data/CalculatorUtility.hpp"
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 namespace gui
 {

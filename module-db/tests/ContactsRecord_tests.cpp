@@ -4,7 +4,7 @@
 #include <catch2/catch.hpp>
 
 #include "Interface/ContactRecord.hpp"
-#include "module-utils/i18n/i18n.hpp"
+#include <i18n/i18n.hpp>
 #include "vfs.hpp"
 #include <purefs/filesystem_paths.hpp>
 

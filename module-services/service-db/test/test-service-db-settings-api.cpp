@@ -18,6 +18,7 @@
 #include "test-service-db-settings-testmsgs.hpp"
 #include "test-service-db-settings-testservices.hpp"
 #include "test-service-db-settings-testapps.hpp"
+#include <vfs.hpp>
 
 struct vfs_initializer
 {

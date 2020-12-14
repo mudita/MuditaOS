@@ -2,14 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "module-utils/i18n/i18n.hpp"
+#include "i18n/i18n.hpp"
 #include <algorithm> // std::find_if_not
 #include <log/log.hpp>
 #include <sstream>
 #include <iomanip>
 #include <cmath>
+#include <chrono>
 #include <random>
-#include "module-utils/time/time_conversion.hpp"
+#include "time/time_conversion.hpp"
 
 #define MAGIC_ENUM_RANGE_MAX 256
 #include <magic_enum.hpp>
@@ -245,9 +246,8 @@ namespace utils
     namespace filesystem
     {
         [[nodiscard]] long int filelength(std::FILE *file) noexcept;
-
         void computeCRC32(std::FILE *file, unsigned long *outCrc32) noexcept;
-
         [[nodiscard]] std::string generateRandomId(std::size_t length = 0) noexcept;
+        [[nodiscard]] std::string getline(std::FILE *stream, uint32_t length = 1024) noexcept;
     } // namespace filesystem
 } // namespace utils

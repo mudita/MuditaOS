@@ -4,7 +4,7 @@
 #include "AppsAndToolsWindow.hpp"
 
 #include <application-settings-new/ApplicationSettings.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <OptionWindow.hpp>
 
 namespace gui

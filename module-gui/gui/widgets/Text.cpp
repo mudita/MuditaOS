@@ -17,7 +17,6 @@
 #include "TextParse.hpp"
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
-#include "vfs.hpp"
 #include <Style.hpp>
 #include <cassert>
 #include <FontManager.hpp>
@@ -192,10 +191,10 @@ namespace gui
 
     bool Text::saveText(UTF8 path)
     {
-        if (auto file = vfs.fopen(path.c_str(), "wb")) {
+        if (auto file = std::fopen(path.c_str(), "wb")) {
             auto text = getText();
-            vfs.fwrite(text.c_str(), text.length(), text.length(), file);
-            vfs.fclose(file);
+            std::fwrite(text.c_str(), text.length(), text.length(), file);
+            std::fclose(file);
             return true;
         }
         return false;

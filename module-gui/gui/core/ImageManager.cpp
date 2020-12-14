@@ -11,7 +11,9 @@
 #include <set>
 #include <string>
 
+#include <cstdio>
 #include <cstring>
+#include <filesystem>
 
 #include "ImageManager.hpp"
 #include "utf8/UTF8.hpp"
@@ -20,7 +22,7 @@
 #include "ImageMap.hpp"
 #include "VecMap.hpp"
 #include "PixMap.hpp"
-#include "vfs.hpp"
+#include <Utils.hpp>
 
 namespace gui
 {
@@ -82,22 +84,22 @@ namespace gui
     ImageMap *ImageManager::loadPixMap(std::string filename)
     {
 
-        auto file = vfs.fopen(filename.c_str(), "rb");
+        auto file = std::fopen(filename.c_str(), "rb");
 
-        auto fileSize = vfs.filelength(file);
+        auto fileSize = utils::filesystem::filelength(file);
 
         char *data = new char[fileSize];
         if (data == nullptr) {
-            vfs.fclose(file);
+            std::fclose(file);
             LOG_ERROR(" Failed to allocate temporary font buffer");
             return nullptr;
         }
 
         // read data to buffer
-        vfs.fread(data, 1, fileSize, file);
+        std::fread(data, 1, fileSize, file);
 
         // close file
-        vfs.fclose(file);
+        std::fclose(file);
 
         // allocate memory for new font
         PixMap *pixMap = new PixMap();
@@ -126,22 +128,22 @@ namespace gui
     ImageMap *ImageManager::loadVecMap(std::string filename)
     {
 
-        auto file = vfs.fopen(filename.c_str(), "rb");
+        auto file = std::fopen(filename.c_str(), "rb");
 
-        auto fileSize = vfs.filelength(file);
+        auto fileSize = utils::filesystem::filelength(file);
 
         char *data = new char[fileSize];
         if (data == nullptr) {
-            vfs.fclose(file);
+            std::fclose(file);
             LOG_ERROR(" Failed to allocate temporary font buffer");
             return nullptr;
         }
 
         // read data to buffer
-        vfs.fread(data, 1, fileSize, file);
+        std::fread(data, 1, fileSize, file);
 
         // close file
-        vfs.fclose(file);
+        std::fclose(file);
 
         VecMap *vecMap = new VecMap();
         if (vecMap->load(reinterpret_cast<uint8_t *>(data), fileSize) != gui::Status::GUI_SUCCESS) {
@@ -171,11 +173,11 @@ namespace gui
         std::vector<std::string> mapFiles;
 
         LOG_INFO("Scanning %s images folder: %s", ext.c_str(), mapFolder.c_str());
-        auto dirList = vfs.listdir(mapFolder.c_str(), ext);
 
-        for (vfs::DirectoryEntry ent : dirList) {
-            if (ent.attributes != vfs::FileAttributes::Directory)
-                mapFiles.push_back(mapFolder + "/" + ent.fileName);
+        for (const auto &entry : std::filesystem::directory_iterator(mapFolder)) {
+            if (!entry.is_directory() && entry.path().extension() == ext) {
+                mapFiles.push_back(entry.path().string());
+            }
         }
 
         LOG_INFO("Total number of images: %u", static_cast<unsigned int>(mapFiles.size()));

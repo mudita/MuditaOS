@@ -6,7 +6,7 @@
 
 #include "OptionSetting.hpp"
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 
 namespace gui

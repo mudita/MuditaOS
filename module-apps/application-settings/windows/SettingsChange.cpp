@@ -3,7 +3,7 @@
 
 #include "SettingsChange.hpp"
 #include "../ApplicationSettings.hpp"
-#include "module-utils/i18n/i18n.hpp"
+#include <i18n/i18n.hpp>
 #include "tools/Common.hpp"
 #include <widgets/Text.hpp>
 #include <widgets/TextFixedSize.hpp>

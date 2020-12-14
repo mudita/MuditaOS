@@ -12,13 +12,12 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}"
         "${CMAKE_SOURCE_DIR}/module-utils"
-        "${CMAKE_SOURCE_DIR}/module-vfs"
         "${CMAKE_SOURCE_DIR}/module-gui/test/"
         )
 
 target_link_directories(${PROJECT_NAME} PUBLIC "${PROJECT_LIB_DIRECTORY}")
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-vfs module-utils module-gui)
+target_link_libraries(${PROJECT_NAME} PUBLIC module-utils module-gui)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC gtest gtest_main)
 

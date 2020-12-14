@@ -19,10 +19,9 @@ include(gui/widgets/CMakeLists.txt)
 include(gui/input/CMakeLists.txt)
 include(gui/dom/CMakeLists.txt)
 
-include_directories( ../module-vfs )
 include_directories( ../module-utils )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-utils module-vfs ${TARGET_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME} PUBLIC module-utils ${TARGET_LIBRARIES} )
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

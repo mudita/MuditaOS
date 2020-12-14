@@ -4,7 +4,7 @@
 #include "SettingsMainWindow.hpp"
 #include "../ApplicationSettings.hpp"
 #include "Info.hpp"
-#include "module-utils/i18n/i18n.hpp"
+#include <i18n/i18n.hpp>
 #include "log/log.hpp"
 #include "CellularPassthroughWindow.hpp"
 #include "FotaWindow.hpp"

@@ -5,7 +5,7 @@
 #include "Text.hpp"
 #include "tools/Common.hpp"
 #include <cassert>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <utility>
 #include <FontManager.hpp>
 

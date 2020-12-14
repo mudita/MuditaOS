@@ -14,7 +14,7 @@
 #include "../ApplicationCallLog.hpp"
 
 #include <service-db/DBMessage.hpp>
-#include "module-utils/i18n/i18n.hpp"
+#include <i18n/i18n.hpp>
 
 #include "../data/CallLogInternals.hpp" // TODO: alek: add easier paths
 #include "../data/CallLogSwitchData.hpp"

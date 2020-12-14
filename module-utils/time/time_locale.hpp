@@ -5,7 +5,7 @@
 
 #include <array>
 #include <utf8/UTF8.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include "i18n/i18n.hpp"
 #include <log/log.hpp>
 
 namespace utils
