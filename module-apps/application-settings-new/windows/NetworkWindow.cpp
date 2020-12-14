@@ -10,26 +10,45 @@
 
 namespace gui
 {
-    NetworkWindow::NetworkWindow(app::Application *app) : OptionWindow(app, gui::window::name::network)
+    NetworkWindow::NetworkWindow(app::Application *app, app::settingsInterface::SimParams *simParams)
+        : OptionWindow(app, gui::window::name::network), simParams(simParams)
     {
         operatorsOn = false;
     }
     void NetworkWindow::onBeforeShow(ShowMode m, SwitchData *d)
     {
-        rebuildOptList();
+        rebuild();
     }
     auto NetworkWindow::netOptList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optList;
-        auto sim    = Store::GSM::get()->selected;
-        auto simStr = utils::translateI18("app_settings_network_sim1");
-        if (sim == Store::GSM::SIM::SIM2) {
+        std::string simStr;
+        auto phoneNumber = simParams->getNumber();
+        auto sim         = simParams->getSim();
+        switch (sim) {
+        case Store::GSM::SIM::SIM1:
+            simStr = utils::translateI18("app_settings_network_sim1");
+            break;
+        case Store::GSM::SIM::SIM2:
             simStr = utils::translateI18("app_settings_network_sim2");
+            break;
+        case Store::GSM::SIM::NONE:
+        case Store::GSM::SIM::SIM_FAIL:
+        case Store::GSM::SIM::SIM_UNKNOWN:
+            simStr      = utils::translateI18("app_settings_network_sim_none");
+            phoneNumber = {};
+            break;
         }
         optList.emplace_back(std::make_unique<gui::OptionSettings>(
-            utils::translateI18("app_settings_network_active_card") + ":" + simStr,
+            utils::translateI18("app_settings_network_active_card") + ":" + simStr + " / " + phoneNumber,
             [=](gui::Item &item) {
-                this->application->switchWindow(gui::window::name::change_settings, nullptr);
+                if (Store::GSM::SIM::SIM1 == sim) {
+                    simParams->setSim(Store::GSM::SIM::SIM2);
+                }
+                else {
+                    simParams->setSim(Store::GSM::SIM::SIM1);
+                }
+
                 return true;
             },
             [=](gui::Item &item) {
@@ -48,7 +67,7 @@ namespace gui
             utils::translateI18("app_settings_network_operator_auto_select"),
             [=](gui::Item &item) {
                 operatorsOn = !operatorsOn;
-                rebuildOptList();
+                rebuild();
                 return true;
             },
             nullptr,
@@ -78,9 +97,10 @@ namespace gui
         topBar->setActive(TopBar::Elements::SIM, false);
         return optList;
     }
-    void NetworkWindow::rebuildOptList()
+    void NetworkWindow::rebuild()
     {
         clearOptions();
         addOptions(netOptList());
     }
+
 } // namespace gui

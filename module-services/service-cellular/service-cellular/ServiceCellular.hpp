@@ -23,6 +23,8 @@
 #include <memory>   // for unique_ptr, allocator, make_unique, shared_ptr
 #include <string>   // for string
 #include <vector>   // for vector
+#include <service-db/Settings.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -219,6 +221,7 @@ class ServiceCellular : public sys::Service
     /// \note some run state should be added to ignore non system messages now...
     bool handle_fatal_failure();
     bool handle_ready();
+    std::unique_ptr<settings::Settings> settings = std::make_unique<settings::Settings>(this);
 
     bool handleAllMessagesFromMessageStorage();
     [[nodiscard]] SMSRecord createSMSRecord(const UTF8 &decodedMessage,
