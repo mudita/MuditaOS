@@ -18,7 +18,7 @@ namespace purefs::fs::drivers
             : mount_point(diskh, path, flags, fs)
         {}
         virtual ~mount_point_vfat() = default;
-        auto fatfs() noexcept
+        [[nodiscard]] auto fatfs() noexcept
         {
             return &m_fatfs;
         }
@@ -41,6 +41,8 @@ namespace purefs::fs::drivers
         {
             return (m_ff_drive[0] == ' ') ? (-1) : (m_ff_drive[0] - '0');
         }
+
+      private:
         auto native_root() const noexcept -> std::string_view override
         {
             return ff_drive();

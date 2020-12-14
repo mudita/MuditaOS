@@ -36,6 +36,7 @@ set(FF_FAT_SOURCES
     ${FF_FAT_SOURCES_THIRDPARTY}
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ffsystem.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/fatfs/ff_glue.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/src/thirdparty/littlefs/lfs_glue.cpp
 )
 
 
@@ -73,6 +74,7 @@ set(SOURCES ""
         src/purefs/fs/filesystem_cwd.cpp
         src/purefs/vfs_subsystem.cpp
         drivers/src/purefs/fs/filesystem_vfat.cpp
+        drivers/src/purefs/fs/filesystem_littlefs.cpp
         src/deprecated/vfs-utils.cpp
         src/deprecated/vfs.cpp
         src/deprecated/vfsNotifier.cpp
@@ -119,6 +121,7 @@ target_include_directories(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty/fatfs
+        ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include/thirdparty
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source
 )
 
