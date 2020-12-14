@@ -536,11 +536,11 @@ namespace app::manager
 
     auto ApplicationManager::handleDisplayLanguageChange(app::manager::DisplayLanguageChangeRequest *msg) -> bool
     {
-        const auto requestedLanguage = msg->getLanguage();
+        const auto &requestedLanguage = msg->getLanguage();
 
         if (requestedLanguage == displayLanguage) {
             LOG_WARN("The selected language is already set. Ignore.");
-            return true;
+            return false;
         }
         displayLanguage = requestedLanguage;
         settings->setValue(settings::SystemProperties::displayLanguage, displayLanguage);
@@ -551,15 +551,15 @@ namespace app::manager
 
     auto ApplicationManager::handleInputLanguageChange(app::manager::InputLanguageChangeRequest *msg) -> bool
     {
-        const auto requestedLanguage = msg->getLanguage();
+        const auto &requestedLanguage = msg->getLanguage();
 
         if (requestedLanguage == inputLanguage) {
             LOG_WARN("The selected language is already set. Ignore.");
-            return true;
+            return false;
         }
         inputLanguage = requestedLanguage;
         settings->setValue(settings::SystemProperties::inputLanguage, inputLanguage);
-        utils::localize.setInputLanguage(msg->getLanguage());
+        utils::localize.setInputLanguage(inputLanguage);
         return true;
     }
 
