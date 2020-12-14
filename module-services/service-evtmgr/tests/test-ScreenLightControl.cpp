@@ -2,22 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
-#include <service-evtmgr/ScreenLightControl.hpp>
+#include <screen-light-control/ScreenLightControl.hpp>
+#include <screen-light-control/ControlFunctions.hpp>
 #include <Service/Service.hpp>
 #include <Service/Message.hpp>
 #include <iostream>
-
-namespace bsp::eink_frontlight
-{
-    extern bool isOn;
-    extern BrightnessPercentage actualBrightness;
-} // namespace bsp::eink_frontlight
-
-namespace bsp::light_sensor
-{
-    extern bool isOn;
-    extern IlluminanceLux measurement;
-} // namespace bsp::light_sensor
 
 class TestService : public sys::Service
 {
@@ -52,37 +41,6 @@ TEST_CASE("ScreenLightControl")
     TestService testService;
     init(&testService);
 
-    SECTION("Turn on and off")
-    {
-        INFO("Check if system off");
-        CHECK(!bsp::eink_frontlight::isOn);
-        CHECK(!bsp::light_sensor::isOn);
-
-        INFO("Command TurnOn and check");
-        Action act = Action::turnOn;
-        Parameters defaultParams;
-        processRequest(act, defaultParams);
-        CHECK(bsp::eink_frontlight::isOn);
-        CHECK(bsp::light_sensor::isOn);
-
-        INFO("Command TurnOff and check");
-        act = Action::turnOff;
-        processRequest(act, defaultParams);
-        CHECK(!bsp::eink_frontlight::isOn);
-        CHECK(!bsp::light_sensor::isOn);
-    }
-
-    SECTION("Set manual brightness")
-    {
-        INFO("Try change brightness in manual mode");
-        Action act = Action::setManualModeBrightness;
-        Parameters params;
-        const bsp::eink_frontlight::BrightnessPercentage testVal = 21.37f;
-        params.manualModeBrightness                              = testVal;
-        processRequest(act, params);
-        CHECK(bsp::eink_frontlight::actualBrightness == testVal);
-    }
-
     SECTION("Automatic mode ramp an hysteresis test")
     {
         INFO("Setup automatic mode");
@@ -91,7 +49,7 @@ TEST_CASE("ScreenLightControl")
         const unsigned int testRampTime                          = 500;
         params.rampTimeMS                                        = testRampTime;
         const bsp::eink_frontlight::BrightnessPercentage testVal = 100.0f;
-        params.functionPoints       = BrightnessFunction({{0.0f, testVal}, {100.0f, 0.0f}});
+        params.functionPoints       = functions::BrightnessFunction({{0.0f, testVal}, {100.0f, 0.0f}});
         const float hysteresis      = 10.0f;
         params.brightnessHysteresis = hysteresis;
         processRequest(act, params);
@@ -100,29 +58,27 @@ TEST_CASE("ScreenLightControl")
         // Timer callback cycles
         int cyclesPerRamp = testRampTime / 25;
         // Mock the measurement
-        bsp::light_sensor::measurement = 0.0f;
-        readoutTimerCallback();
+        functions::calculateBrightness(0.0f);
+        auto rampOut = 0.0f;
         for (int i = 0; i < cyclesPerRamp; ++i) {
-            controlTimerCallback();
+            rampOut = functions::brightnessRampOut();
         }
-        CHECK(bsp::eink_frontlight::actualBrightness == testVal);
+        CHECK(rampOut == testVal);
 
         INFO("Hysteresis preventing the change");
-        bsp::light_sensor::measurement = 9.5f;
-        readoutTimerCallback();
+        functions::calculateBrightness(9.5f);
         for (int i = 0; i < cyclesPerRamp; ++i) {
-            controlTimerCallback();
+            rampOut = functions::brightnessRampOut();
         }
-        // No change due to hysteresis
-        CHECK(bsp::eink_frontlight::actualBrightness == testVal);
+        // No chnage due to hysteresis
+        CHECK(rampOut == testVal);
 
         INFO("Out of hysteresis");
-        bsp::light_sensor::measurement = 110.0f;
-        readoutTimerCallback();
+        functions::calculateBrightness(110.0f);
         for (int i = 0; i < cyclesPerRamp; ++i) {
-            controlTimerCallback();
+            rampOut = functions::brightnessRampOut();
         }
-        CHECK(bsp::eink_frontlight::actualBrightness == 0);
+        CHECK(rampOut == 0.0f);
     }
 
     SECTION("Brightness function check")
@@ -132,36 +88,35 @@ TEST_CASE("ScreenLightControl")
         Parameters params;
         const unsigned int testRampTime = 100;
         params.rampTimeMS               = testRampTime;
-        params.functionPoints           = BrightnessFunction({{50.0f, 50.0f},
-                                                    {100.0f, 100.0f},
-                                                    {150.0f, 100.0f},
-                                                    {200.0f, 0.0f},
-                                                    {250.0f, 0.0f},
-                                                    {300.0f, 100.0f},
-                                                    {350.0f, 50.0f}});
+        params.functionPoints           = functions::BrightnessFunction({{50.0f, 50.0f},
+                                                               {100.0f, 100.0f},
+                                                               {150.0f, 100.0f},
+                                                               {200.0f, 0.0f},
+                                                               {250.0f, 0.0f},
+                                                               {300.0f, 100.0f},
+                                                               {350.0f, 50.0f}});
         const float hysteresis          = 10.0f;
         params.brightnessHysteresis     = hysteresis;
         processRequest(act, params);
 
         int cyclesPerRamp = testRampTime / 25;
         // Checking values between the points
-        BrightnessFunction testPoints = BrightnessFunction({{0.0f, 50.0f},
-                                                            {75.0f, 75.0f},
-                                                            {125.0f, 100.0f},
-                                                            {175.0f, 50.0f},
-                                                            {225.0f, 0.0f},
-                                                            {275.0f, 50.0f},
-                                                            {325.0f, 75.0f},
-                                                            {400.0f, 50.0f}});
+        functions::BrightnessFunction testPoints = functions::BrightnessFunction({{0.0f, 50.0f},
+                                                                                  {75.0f, 75.0f},
+                                                                                  {125.0f, 100.0f},
+                                                                                  {175.0f, 50.0f},
+                                                                                  {225.0f, 0.0f},
+                                                                                  {275.0f, 50.0f},
+                                                                                  {325.0f, 75.0f},
+                                                                                  {400.0f, 50.0f}});
         for (const auto &point : testPoints) {
-            bsp::light_sensor::measurement = point.first;
-            readoutTimerCallback();
+            functions::calculateBrightness(point.first);
+            auto rampOut = 0.0f;
             for (int i = 0; i < cyclesPerRamp; ++i) {
-                controlTimerCallback();
+                rampOut = functions::brightnessRampOut();
             }
-            INFO("Measurement:" << point.first << " Expected:" << point.second
-                                << " Actual:" << bsp::eink_frontlight::actualBrightness);
-            CHECK(bsp::eink_frontlight::actualBrightness == point.second);
+            INFO("Measurement:" << point.first << " Expected:" << point.second << " Actual:" << rampOut);
+            CHECK(rampOut == point.second);
         }
     }
 

@@ -5,9 +5,6 @@
 
 namespace bsp::light_sensor
 {
-    bool isOn                  = false;
-    IlluminanceLux measurement = 0.0f;
-
     namespace
     {
         xQueueHandle qHandleIrq = nullptr;
@@ -26,13 +23,11 @@ namespace bsp::light_sensor
 
     bool standby()
     {
-        isOn = false;
         return true;
     }
 
     bool wakeup()
     {
-        isOn = true;
         return true;
     }
 
@@ -48,7 +43,7 @@ namespace bsp::light_sensor
 
     IlluminanceLux readout()
     {
-        return measurement;
+        return 0.0f;
     }
 
     BaseType_t IRQHandler()

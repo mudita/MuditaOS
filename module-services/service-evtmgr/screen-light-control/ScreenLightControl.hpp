@@ -3,11 +3,8 @@
 
 #pragma once
 
-#include <bsp/eink_frontlight/eink_frontlight.hpp>
-#include <bsp/light_sensor/light_sensor.hpp>
+#include "ControlFunctions.hpp"
 #include <Service/Timer.hpp>
-#include <memory>
-#include <vector>
 
 /// Screen light control algorithm. Automatic/Manual mode of operation.
 /// Processing of ambient light sensor input to screen brightness output.
@@ -25,16 +22,13 @@ namespace sevm::screen_light_control
         setAutomaticModeParameters, ///< Set parameters for automatic mode of screen frontlight
     };
 
-    using BrightnessFunction =
-        std::vector<std::pair<bsp::light_sensor::IlluminanceLux, bsp::eink_frontlight::BrightnessPercentage>>;
-
     struct Parameters
     {
         /// Screen brightness 0-100% in manual mode
         bsp::eink_frontlight::BrightnessPercentage manualModeBrightness = 50.0f;
         /// Vector of points for screen brightness [%] in relation to ambient light [Lux] function. Points have to be in
         /// ascending order of ambient light values.
-        BrightnessFunction functionPoints = BrightnessFunction({{0.0f, 50.0f}});
+        functions::BrightnessFunction functionPoints = functions::BrightnessFunction({{0.0f, 50.0f}});
         /// Ramp time of screen brightness in miliseconds per 0-100% change
         unsigned int rampTimeMS = 1500;
         /// Hysteresis value of screen brightness control
