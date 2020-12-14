@@ -14,6 +14,7 @@
 * `[bluetooth][settings]` Add Bluetooth settings to database.
 * `[PowerManagement]` Added CPU load measurement.
 * `[alarms]` Added new/edit alarm window
+* `[file indexer]` Support for deleting entries in File Indexer DB.
 
 ### Changed
 
