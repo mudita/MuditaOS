@@ -68,6 +68,10 @@ typedef struct A_BLOCK_LINK
 #endif
 	struct A_BLOCK_LINK *pxNextFreeBlock;	/*<< The next free block in the list. */
 	size_t xBlockSize;						/*<< The size of the free block. */
+#if (configUSER_HEAP_STATS == 1)
+    TaskHandle_t xAllocatingTask; /*<< The task allocating the memory block. */
+    TickType_t xTimeAllocated;    /*<< The timestamp of memory block allocation. */
+#endif
 } BlockLink_t;
 
 /*-----------------------------------------------------------*/
@@ -226,8 +230,12 @@ void *usermalloc(size_t xWantedSize)
 						/* The block is being returned - it is allocated and owned
 						by the application and has no "next" block. */
 						pxBlock->xBlockSize |= xBlockAllocatedBit;
+#if (configUSER_HEAP_STATS == 1)
+                        pxBlock->xAllocatingTask = xTaskGetCurrentTaskHandle();
+                        pxBlock->xTimeAllocated  = xTaskGetTickCount();
+#endif
 
-						#if( PROJECT_CONFIG_HEAP_INTEGRITY_CHECKS != 0 )
+#if (PROJECT_CONFIG_HEAP_INTEGRITY_CHECKS != 0)
                     	{
 							/* First check if the block was still marked as 'free' */
 							configASSERT( pxBlock->ulStamp == INTEGRITY_STAMP_FREE );
@@ -414,8 +422,12 @@ size_t xTotalHeapSize = USERMEM_TOTAL_HEAP_SIZE;
 	blocks.  The void cast is used to prevent compiler warnings. */
 	userxStart.pxNextFreeBlock = ( void * ) pucAlignedHeap;
 	userxStart.xBlockSize = ( size_t ) 0;
+#if (configUSER_HEAP_STATS == 1)
+    userxStart.xTimeAllocated  = 0;
+    userxStart.xAllocatingTask = 0;
+#endif
 
-	/* userpxEnd is used to mark the end of the list of free blocks and is inserted
+    /* userpxEnd is used to mark the end of the list of free blocks and is inserted
 	at the end of the heap space. */
 	uxAddress = ( ( size_t ) pucAlignedHeap ) + xTotalHeapSize;
 	uxAddress -= xHeapStructSize;
@@ -423,8 +435,12 @@ size_t xTotalHeapSize = USERMEM_TOTAL_HEAP_SIZE;
 	userpxEnd = ( void * ) uxAddress;
 	userpxEnd->xBlockSize = 0;
 	userpxEnd->pxNextFreeBlock = NULL;
+#if (configUSER_HEAP_STATS == 1)
+    userpxEnd->xTimeAllocated  = 0;
+    userpxEnd->xAllocatingTask = 0;
+#endif
 
-	/* To start with there is a single free block that is sized to take up the
+    /* To start with there is a single free block that is sized to take up the
 	entire heap space, minus the space taken by userpxEnd. */
 	pxFirstFreeBlock = ( void * ) pucAlignedHeap;
 	pxFirstFreeBlock->xBlockSize = uxAddress - ( size_t ) pxFirstFreeBlock;
