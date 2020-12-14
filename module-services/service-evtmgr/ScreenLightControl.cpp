@@ -195,14 +195,12 @@ namespace sevm::screen_light_control
 
     void controlTimerCallback()
     {
-        auto out = brightnessRampOut();
-        bsp::eink_frontlight::setBrightness(out);
+        bsp::eink_frontlight::setBrightness(brightnessRampOut());
     }
 
     void readoutTimerCallback()
     {
-        float lightMeasurement = bsp::light_sensor::readout();
-        brightnessRampTarget   = calculateBrightness(lightMeasurement);
+        brightnessRampTarget = calculateBrightness(bsp::light_sensor::readout());
     }
 
 } // namespace sevm::screen_light_control
