@@ -3,7 +3,7 @@
         service-evtmgr
     SRCS
         tests-main.cpp
-        test-ScreenLightControl.cpp
+        test-ScreenLightControlFunctions.cpp
     LIBS
         service-evtmgr
         module-bsp
