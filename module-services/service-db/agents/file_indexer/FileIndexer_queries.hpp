@@ -10,6 +10,10 @@ namespace FileIndexer::Statements
                         SELECT COUNT(FT.file_id) AS FILE_PATH_EXISTS FROM  file_tab AS FT;
                         )sql";
 
+    constexpr auto getMetadataCount = R"sql(
+                        SELECT COUNT(MT.file_id) AS FILE_PATH_EXISTS FROM  metadata_tab AS MT;
+                        )sql";
+
     constexpr auto checkFileExists = R"sql(
                         SELECT COUNT(size) AS FILE_PATH_EXISTS FROM  file_tab AS FT
                         WHERE FT.path = '%q'
@@ -17,7 +21,7 @@ namespace FileIndexer::Statements
                         )sql";
 
     constexpr auto getFileIdByPath = R"sql(
-                        SELECT FT.file_id file_tab AS FT
+                        SELECT FT.file_id FROM file_tab AS FT
                         WHERE FT.path = '%q'
                         COLLATE NOCASE;
                         )sql";
@@ -59,6 +63,24 @@ namespace FileIndexer::Statements
                         directory ='%q',
                         file_type= '%lu'
                         WHERE file_id = '%lu' ;
+                        )sql";
+
+    constexpr auto deleteFileById = R"sql(
+                        DELETE FROM file_tab AS FT
+                        WHERE FT.file_id = '%lu';
+                        DELETE FROM metadata_tab AS MT
+                        WHERE MT.file_id = '%lu';
+                        )sql";
+
+    constexpr auto deleteAllFileInfoInDir = R"sql(
+                        DELETE FROM file_tab AS FT
+                        WHERE FT.directory = '%q';
+                        )sql";
+
+    constexpr auto getFilesIdByDir = R"sql(
+                        SELECT file_id FROM  file_tab AS FT
+                        WHERE FT.directory = '%q'
+                        COLLATE NOCASE;
                         )sql";
 
     constexpr auto getPropertyValue = R"sql(

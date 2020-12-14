@@ -223,4 +223,93 @@ TEST_CASE("FileIndexer")
         }
         REQUIRE(newPropertyValueFound == newPropertyValue);
     }
+
+    SECTION("DeleteFile /DeleteAllFilesInDir")
+    {
+        FileIndexer::ListDirData inputData{};
+        FileIndexer::FileRecord record{};
+        std::cout << "DeleteFile /DeleteAllFilesInDir" << std::endl << std::flush;
+
+        // SetRecord - add files
+        auto recordPtr = std::make_unique<FileIndexer::FileRecord>(record);
+        std::unique_ptr<FileIndexerTest> fiAgentTest{new FileIndexerTest(&file_indexer_client_service)};
+        record.directory = "wav";
+        record.path      = "wav/file1.wav";
+
+        recordPtr                  = std::make_unique<FileIndexer::FileRecord>(record);
+        auto setMsg                = std::make_shared<FileIndexer::Messages::SetRecordMessage>(std::move(recordPtr));
+        setMsg->sender             = serviceName;
+        sys::MessagePointer recMsg = fiAgentTest->handleSetRecordTest(setMsg.get());
+
+        record.path    = "wav/file2.wav";
+        recordPtr      = std::make_unique<FileIndexer::FileRecord>(record);
+        setMsg         = std::make_shared<FileIndexer::Messages::SetRecordMessage>(std::move(recordPtr));
+        setMsg->sender = serviceName;
+        recMsg         = fiAgentTest->handleSetRecordTest(setMsg.get());
+
+        record.path    = "wav/file3.wav";
+        recordPtr      = std::make_unique<FileIndexer::FileRecord>(record);
+        setMsg         = std::make_shared<FileIndexer::Messages::SetRecordMessage>(std::move(recordPtr));
+        setMsg->sender = serviceName;
+        recMsg         = fiAgentTest->handleSetRecordTest(setMsg.get());
+
+        std::cout << "Get listDir" << std::endl << std::flush;
+        inputData.directory   = "wav";
+        inputData.list_offset = 0;
+        inputData.list_limit  = 10;
+        auto inputDataPtr     = std::make_unique<FileIndexer::ListDirData>(inputData);
+        auto getListDirMsg    = std::make_shared<FileIndexer::Messages::GetListDirMessage>(std::move(inputDataPtr));
+        recMsg                = fiAgentTest->handleListDirTest(getListDirMsg.get());
+        auto msg              = dynamic_cast<FileIndexer::Messages::GetListDirResponseMessage *>(recMsg.get());
+        auto fileCount        = msg->getCount();
+        auto fileList         = msg->getResults();
+        LOG_INFO("Total number of files in %s = %d", inputData.directory.c_str(), fileCount);
+        LOG_INFO("Limit= %d Offset= %d", inputData.list_limit, inputData.list_offset);
+        for (auto fileRec : fileList) {
+            LOG_INFO("file id= %d file path= %s  size = %d  mime= %d  mtime = %d directory= %s ftype= %d",
+                     fileRec.file_id,
+                     fileRec.path.c_str(),
+                     fileRec.size,
+                     fileRec.mime_type,
+                     fileRec.mtime,
+                     fileRec.directory.c_str(),
+                     fileRec.file_type);
+        }
+
+        std::cout << "DeleteFile" << std::endl << std::flush;
+        record.path      = "wav/file1.wav";
+        record.directory = "wav";
+        recordPtr        = std::make_unique<FileIndexer::FileRecord>(record);
+        auto delMsg      = std::make_shared<FileIndexer::Messages::DeleteFileMessage>(std::move(recordPtr));
+        delMsg->sender   = serviceName;
+        auto delRecMsg   = fiAgentTest->handleDeleteFileTest(delMsg.get());
+
+        inputData.directory    = "wav";
+        inputData.list_offset  = 0;
+        inputData.list_limit   = 10;
+        inputDataPtr           = std::make_unique<FileIndexer::ListDirData>(inputData);
+        getListDirMsg          = std::make_shared<FileIndexer::Messages::GetListDirMessage>(std::move(inputDataPtr));
+        recMsg                 = fiAgentTest->handleListDirTest(getListDirMsg.get());
+        msg                    = dynamic_cast<FileIndexer::Messages::GetListDirResponseMessage *>(recMsg.get());
+        auto fileCountAfterDel = msg->getCount();
+        REQUIRE(fileCountAfterDel == fileCount - 1);
+
+        std::cout << "DeleteAllFilesInDir" << std::endl << std::flush;
+        record.directory  = "wav";
+        recordPtr         = std::make_unique<FileIndexer::FileRecord>(record);
+        auto delAllMsg    = std::make_shared<FileIndexer::Messages::DeleteAllFilesInDirMessage>(std::move(recordPtr));
+        delAllMsg->sender = serviceName;
+        delRecMsg         = fiAgentTest->handleDeleteAllFilesInDirTest(delAllMsg.get());
+
+        inputData.directory   = "wav";
+        inputData.list_offset = 0;
+        inputData.list_limit  = 10;
+        inputDataPtr          = std::make_unique<FileIndexer::ListDirData>(inputData);
+        getListDirMsg         = std::make_shared<FileIndexer::Messages::GetListDirMessage>(std::move(inputDataPtr));
+        recMsg                = fiAgentTest->handleListDirTest(getListDirMsg.get());
+        msg                   = dynamic_cast<FileIndexer::Messages::GetListDirResponseMessage *>(recMsg.get());
+        fileCountAfterDel     = msg->getCount();
+        REQUIRE(fileCountAfterDel == 0);
+        std::cout << "DeleteFile /DeleteAllFilesInDir  finished" << std::endl << std::flush;
+    }
 }
