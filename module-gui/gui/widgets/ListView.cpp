@@ -4,7 +4,6 @@
 #include "ListView.hpp"
 #include "InputEvent.hpp"
 #include "cassert"
-#include <algorithm>
 #include <log/log.hpp>
 
 namespace gui
@@ -99,7 +98,7 @@ namespace gui
                                     style::listview::scroll::w,
                                     style::listview::scroll::h);
 
-        setProvider(prov);
+        setProvider(std::move(prov));
 
         type = gui::ItemType::LIST;
     }
@@ -144,13 +143,18 @@ namespace gui
         }
     }
 
+    bool ListView::isEmpty() const noexcept
+    {
+        return elementsCount == 0;
+    }
+
     void ListView::rebuildList(style::listview::RebuildType rebuildType, unsigned int dataOffset, bool forceRebuild)
     {
         if (pageLoaded || forceRebuild) {
+
             setElementsCount(provider->requestRecordsCount());
 
             setup(rebuildType, dataOffset);
-            clearItems();
 
             // If deletion operation caused last page to be removed request previous one.
             if ((startIndex != 0 && startIndex == elementsCount)) {
@@ -163,7 +167,12 @@ namespace gui
         else {
             rebuildRequests.push_front({rebuildType, dataOffset});
         }
-    };
+    }
+
+    void ListView::reSendLastRebuildRequest()
+    {
+        rebuildList(lastRebuildRequest.first, lastRebuildRequest.second, true);
+    }
 
     void ListView::setup(style::listview::RebuildType rebuildType, unsigned int dataOffset)
     {
@@ -185,9 +194,12 @@ namespace gui
             storedFocusIndex = body->getFocusItemIndex();
 
             if (direction == style::listview::Direction::Top) {
-                storedFocusIndex = abs((currentPageSize - 1) - storedFocusIndex);
+                int position     = currentPageSize - 1 - storedFocusIndex;
+                storedFocusIndex = std::abs(position);
             }
         }
+
+        lastRebuildRequest = {rebuildType, dataOffset};
 
         body->setReverseOrder(false);
         direction = style::listview::Direction::Bottom;
@@ -239,6 +251,8 @@ namespace gui
             LOG_ERROR("ListView Data provider not exist");
             return;
         }
+
+        onElementsCountChanged();
 
         clearItems();
 
@@ -348,7 +362,6 @@ namespace gui
             if (!body->setFocusOnElement(storedFocusIndex)) {
                 body->setFocusOnLastElement();
             }
-            storedFocusIndex = 0;
         }
 
         if (focusOnLastItem) {
@@ -356,6 +369,18 @@ namespace gui
             focusOnLastItem = false;
         }
     };
+
+    void ListView::onElementsCountChanged()
+    {
+        if (isEmpty()) {
+            if (emptyListCallback) {
+                emptyListCallback();
+            }
+        }
+        else if (notEmptyListCallback) {
+            notEmptyListCallback();
+        }
+    }
 
     bool ListView::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
@@ -435,7 +460,8 @@ namespace gui
 
         direction = style::listview::Direction::Bottom;
         body->setReverseOrder(false);
-        pageLoaded = false;
+        pageLoaded       = false;
+        storedFocusIndex = 0;
         provider->requestRecords(startIndex, calculateLimit());
 
         return true;
@@ -466,7 +492,8 @@ namespace gui
 
         direction = style::listview::Direction::Top;
         body->setReverseOrder(true);
-        pageLoaded = false;
+        pageLoaded       = false;
+        storedFocusIndex = 0;
         provider->requestRecords(topFetchIndex, limit);
 
         return true;

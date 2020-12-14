@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Icon.hpp"
+#include "StateIcon.hpp"
 
 #include <cstdint>
 
@@ -14,7 +14,7 @@ namespace gui
         ADD_CONTACT
     };
 
-    class AddContactIcon : public Icon<AddContactIconState>
+    class AddContactIcon : public StateIcon<AddContactIconState>
     {
       public:
         AddContactIcon() = delete;
@@ -25,7 +25,7 @@ namespace gui
     {
         SEND_SMS
     };
-    class SendSmsIcon : public Icon<SendSmsIconState>
+    class SendSmsIcon : public StateIcon<SendSmsIconState>
     {
       public:
         SendSmsIcon() = delete;
@@ -38,7 +38,7 @@ namespace gui
         MUTED
     };
 
-    class MicrophoneIcon : public Icon<MicrophoneIconState>
+    class MicrophoneIcon : public StateIcon<MicrophoneIconState>
     {
       public:
         MicrophoneIcon() = delete;
@@ -51,7 +51,7 @@ namespace gui
         SPEAKERON
     };
 
-    class SpeakerIcon : public Icon<SpeakerIconState>
+    class SpeakerIcon : public StateIcon<SpeakerIconState>
     {
       public:
         SpeakerIcon() = delete;

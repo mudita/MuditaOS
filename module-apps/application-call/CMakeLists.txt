@@ -21,7 +21,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EnterNumberWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/Icons.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/StateIcons.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCall.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EnterNumberWindow.hpp"

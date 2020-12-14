@@ -5,7 +5,7 @@
 
 #include "application-call/ApplicationCall.hpp"
 #include "AppWindow.hpp"
-#include "application-call/widgets/Icons.hpp"
+#include "application-call/widgets/StateIcons.hpp"
 
 #include <gui/input/Translator.hpp>
 #include <Rect.hpp>
