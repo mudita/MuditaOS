@@ -22,12 +22,12 @@ namespace purefs::fs::drivers::littlefs::internal
      * @param diskh  Disk handle in manager
      * @return Error code or success
      */
-    int append_volume(lfs_config &lfsc, std::shared_ptr<blkdev::disk_manager> diskmm, blkdev::disk_fd diskh);
+    int append_volume(lfs_config *lfsc, std::shared_ptr<blkdev::disk_manager> diskmm, blkdev::disk_fd diskh);
 
     /**  Deconfigure volume
      *
      * @param lfsc LFs configuration structure
      */
-    void remove_volume(lfs_config &lfsc);
+    void remove_volume(lfs_config *lfsc);
 
 } // namespace purefs::fs::drivers::littlefs::internal
