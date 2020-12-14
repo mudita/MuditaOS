@@ -4,6 +4,7 @@
 #pragma once
 
 #include <purefs/fs/filesystem_operations.hpp>
+#include <mutex.hpp>
 
 namespace purefs::fs::drivers
 {
@@ -59,6 +60,7 @@ namespace purefs::fs::drivers
         auto chmod(fsmount mnt, std::string_view path, mode_t mode) noexcept -> int override;
         auto fchmod(fsfile zfile, mode_t mode) noexcept -> int override;
 
-        auto filesystem_register_completed() const noexcept -> int override;
+      private:
+        mutable cpp_freertos::MutexRecursive m_lock;
     };
 } // namespace purefs::fs::drivers

@@ -6,6 +6,8 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <log/log.hpp>
 
+#include <errno.h>
+
 namespace purefs::fs::drivers::littlefs::internal
 {
 
@@ -26,6 +28,40 @@ namespace purefs::fs::drivers::littlefs::internal
                 const size_t sector_size;
             };
 
+            int errno_to_lfs(int error)
+            {
+                if (error >= 0) {
+                    return LFS_ERR_OK;
+                }
+
+                switch (error) {
+                default:
+                case -EIO: /* Error during device operation */
+                    return LFS_ERR_IO;
+                case -EFAULT: /* Corrupted */
+                    return LFS_ERR_CORRUPT;
+                case -ENOENT: /* No directory entry */
+                    return LFS_ERR_NOENT;
+                case -EEXIST: /* Entry already exists */
+                    return LFS_ERR_EXIST;
+                case -ENOTDIR: /* Entry is not a dir */
+                    return LFS_ERR_NOTDIR;
+                case -EISDIR: /* Entry is a dir */
+                    return LFS_ERR_ISDIR;
+                case -ENOTEMPTY: /* Dir is not empty */
+                    return LFS_ERR_NOTEMPTY;
+                case -EBADF: /* Bad file number */
+                    return LFS_ERR_BADF;
+                case -EFBIG: /* File too large */
+                    return LFS_ERR_FBIG;
+                case -EINVAL: /* Invalid parameter */
+                    return LFS_ERR_INVAL;
+                case -ENOSPC: /* No space left on device */
+                    return LFS_ERR_NOSPC;
+                case -ENOMEM: /* No more memory available */
+                    return LFS_ERR_NOMEM;
+                }
+            }
             int read(const struct lfs_config *lfsc, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
             {
                 auto ctx = reinterpret_cast<io_context *>(lfsc->context);
@@ -46,7 +82,7 @@ namespace purefs::fs::drivers::littlefs::internal
                 if (err) {
                     LOG_ERROR("Sector read error %i", err);
                 }
-                return err;
+                return errno_to_lfs(err);
             }
 
             int prog(
@@ -70,7 +106,7 @@ namespace purefs::fs::drivers::littlefs::internal
                 if (err) {
                     LOG_ERROR("Sector read error %i", err);
                 }
-                return err;
+                return errno_to_lfs(err);
             }
 
             int erase(const struct lfs_config *lfsc, lfs_block_t block)
@@ -89,7 +125,7 @@ namespace purefs::fs::drivers::littlefs::internal
                 if (err) {
                     LOG_ERROR("Unable to erase area ret: %i", err);
                 }
-                return err;
+                return errno_to_lfs(err);
             }
 
             int sync(const struct lfs_config *lfsc)
@@ -106,36 +142,42 @@ namespace purefs::fs::drivers::littlefs::internal
                 if (err) {
                     LOG_ERROR("Unable to sync %i", err);
                 }
-                return err;
+                return errno_to_lfs(err);
             }
         } // namespace lfs_io
     }     // namespace
 
-    int append_volume(lfs_config &lfsc, std::shared_ptr<blkdev::disk_manager> diskmm, blkdev::disk_fd diskh)
+    int append_volume(lfs_config *lfsc, std::shared_ptr<blkdev::disk_manager> diskmm, blkdev::disk_fd diskh)
     {
+        if (!lfsc) {
+            return -EINVAL;
+        }
         const auto sect_size = diskmm->get_info(diskh, blkdev::info_type::sector_size);
         if (sect_size < 0) {
             LOG_ERROR("Unable to get sector size %li", sect_size);
             return sect_size;
         }
-        if (sect_size % lfsc.block_size || lfsc.block_size < sect_size) {
+        if (sect_size % lfsc->block_size || lfsc->block_size < sect_size) {
             LOG_ERROR("Sector size doesn't match block size");
             return -ERANGE;
         }
-        auto ctx     = new lfs_io::io_context(diskmm, diskh, sect_size);
-        lfsc.context = ctx;
-        lfsc.read    = lfs_io::read;
-        lfsc.prog    = lfs_io::prog;
-        lfsc.erase   = lfs_io::erase;
-        lfsc.sync    = lfs_io::sync;
-        lfsc.context = ctx;
+        auto ctx      = new lfs_io::io_context(diskmm, diskh, sect_size);
+        lfsc->context = ctx;
+        lfsc->read    = lfs_io::read;
+        lfsc->prog    = lfs_io::prog;
+        lfsc->erase   = lfs_io::erase;
+        lfsc->sync    = lfs_io::sync;
+        lfsc->context = ctx;
         return 0;
     }
 
-    void remove_volume(lfs_config &lfsc)
+    void remove_volume(lfs_config *lfsc)
     {
-        if (lfsc.context) {
-            delete reinterpret_cast<lfs_io::io_context *>(lfsc.context);
+        if (!lfsc) {
+            return;
+        }
+        if (lfsc->context) {
+            delete reinterpret_cast<lfs_io::io_context *>(lfsc->context);
         }
     }
 
