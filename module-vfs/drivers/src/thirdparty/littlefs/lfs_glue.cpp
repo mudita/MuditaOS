@@ -154,7 +154,7 @@ namespace purefs::fs::drivers::littlefs::internal
         }
         const auto sect_size = diskmm->get_info(diskh, blkdev::info_type::sector_size);
         if (sect_size < 0) {
-            LOG_ERROR("Unable to get sector size %li", sect_size);
+            LOG_ERROR("Unable to get sector size %li", long(sect_size));
             return sect_size;
         }
         if (sect_size % lfsc->block_size || lfsc->block_size < sect_size) {
