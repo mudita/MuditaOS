@@ -8,6 +8,8 @@
 #include <lfs.h>
 #include <log/log.hpp>
 
+#include <limits.h>
+#include <syslimits.h>
 #include <sys/statvfs.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -79,7 +81,6 @@ namespace
 
     auto translate_attrib_to_st_mode(uint8_t type)
     {
-
         decltype(static_cast<struct stat *>(nullptr)->st_mode) mode =
             S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH;
         if (type == LFS_TYPE_REG) {
@@ -221,6 +222,7 @@ namespace purefs::fs::drivers
             lerr = lfs_unmount(vmnt->lfs_mount());
         }
         if (!lerr) {
+            littlefs::internal::remove_volume(vmnt->lfs_config());
             filesystem_operations::umount(mnt);
         }
         else {
@@ -236,18 +238,20 @@ namespace purefs::fs::drivers
             LOG_ERROR("Non LITTLEFS mount point");
             return -EIO;
         }
-        const auto cfg = vmnt->lfs_config();
-        stat.f_bsize   = cfg->prog_size;
-        stat.f_frsize  = cfg->block_size;
-        stat.f_blocks  = cfg->block_count;
         int lerr;
         {
             cpp_freertos::LockGuard _lck(m_lock);
             lerr = lfs_fs_size(vmnt->lfs_mount());
         }
         if (lerr >= 0) {
-            stat.f_bfree = stat.f_blocks - lerr;
-            lerr         = 0;
+            std::memset(&stat, 0, sizeof stat);
+            stat.f_bfree   = stat.f_blocks - lerr;
+            lerr           = 0;
+            const auto cfg = vmnt->lfs_config();
+            stat.f_bsize   = cfg->prog_size;
+            stat.f_frsize  = cfg->block_size;
+            stat.f_blocks  = cfg->block_count;
+            stat.f_namemax = PATH_MAX;
         }
         return lfs_to_errno(lerr);
     }
