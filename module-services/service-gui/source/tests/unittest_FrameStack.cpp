@@ -12,8 +12,8 @@
 
 using namespace service::renderer;
 
-auto procesor_success = [](sgui::DrawData &data, ::gui::Context &context) -> bool { return true; };
-auto procesor_failure = [](sgui::DrawData &data, ::gui::Context &context) -> bool { return false; };
+auto procesor_success = [](sgui::DrawData &data, gui::FrameBuffer &context) -> bool { return true; };
+auto procesor_failure = [](sgui::DrawData &data, gui::FrameBuffer &context) -> bool { return false; };
 
 class EmptyDrawData
 {
@@ -34,18 +34,20 @@ TEST_CASE("DrawFrame")
 {
 
     cpp_freertos::MutexStandard mutex;
-    auto frame = DrawFrame(mutex, EmptyDrawData(), {10, 10});
+    auto frame = DrawFrame(mutex, EmptyDrawData());
+    auto fb    = gui::FrameBuffer({10, 10});
+
     REQUIRE(frame.getState() == DrawFrame::State::Fresh);
 
     SECTION("case 1: we process successfully ")
     {
-        REQUIRE(frame.processFrame(procesor_success) == true);
+        REQUIRE(frame.processFrame(procesor_success, fb) == true);
         REQUIRE(frame.getState() == DrawFrame::State::Processed);
     }
 
     SECTION("case 2: we process with fail but process ")
     {
-        REQUIRE(frame.processFrame(procesor_failure) == false);
+        REQUIRE(frame.processFrame(procesor_failure, fb) == false);
         INFO("we processed frame either way - so it should be processed")
         REQUIRE(frame.getState() == DrawFrame::State::Processed);
     }
@@ -65,11 +67,12 @@ TEST_CASE("FrameStack - positive flow")
 {
     auto fs = FrameStack(gui::Size{480, 600});
 
-    REQUIRE(fs.processLastFrame(procesor_success) == false);
+    auto fb = gui::FrameBuffer({10, 10});
+    REQUIRE(fs.processLastFrame(procesor_success, fb) == false);
 
     REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
 
-    REQUIRE(fs.processLastFrame(procesor_success) == true);
+    REQUIRE(fs.processLastFrame(procesor_success, fb) == true);
 
     service::eink::ImageData data;
 
@@ -83,6 +86,7 @@ TEST_CASE("FrameStack - positive flow")
 TEST_CASE("FrameStack - negative flow, frame dropping")
 {
     auto fs = FrameStack(gui::Size{480, 600});
+    auto fb = gui::FrameBuffer({10, 10});
 
     SECTION("case 1: simple frame drop")
     {
@@ -90,7 +94,7 @@ TEST_CASE("FrameStack - negative flow, frame dropping")
         REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
         REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
         REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
-        REQUIRE(fs.processLastFrame(procesor_success));
+        REQUIRE(fs.processLastFrame(procesor_success, fb));
     }
 
     SECTION("case 2: frame drop with refresh promotion")
@@ -100,7 +104,7 @@ TEST_CASE("FrameStack - negative flow, frame dropping")
         REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
         REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
         INFO("Deep refresh should be promoted up to last rendered frame");
-        REQUIRE(fs.processLastFrame(procesor_success));
+        REQUIRE(fs.processLastFrame(procesor_success, fb));
         service::eink::ImageData data;
         REQUIRE(fs.takeLastProcessedFrame(data) == true);
         REQUIRE(data.mode == gui::RefreshModes::GUI_REFRESH_DEEP);
@@ -110,7 +114,7 @@ TEST_CASE("FrameStack - negative flow, frame dropping")
     {
         // TODO some ID to EmpyDrawData? some ID to frames in general?
         REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
-        REQUIRE(fs.processLastFrame(procesor_success) == true);
+        REQUIRE(fs.processLastFrame(procesor_success, fb) == true);
         REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
         REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);
         REQUIRE(fs.emplaceDrawData(EmptyDrawData()) == true);

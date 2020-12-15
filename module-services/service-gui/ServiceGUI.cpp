@@ -57,7 +57,7 @@ namespace sgui
             return handleGUIRenderingFinished(request);
         });
 
-        connect(typeid(GUIDisplayReady), [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
+        connect(typeid(DisplayReady), [&](sys::DataMessage *request, sys::ResponseMessage *) -> sys::Message_t {
             return handleGUIDisplayReady(request);
         });
     }
@@ -153,7 +153,7 @@ namespace sgui
 
     sys::Message_t ServiceGUI::handleGUIDisplayReady(sys::Message *message)
     {
-        auto msg    = static_cast<GUIDisplayReady *>(message);
+        auto msg = static_cast<DisplayReady *>(message);
 
         if (msg->getShutdownInProgress()) {
             suspendInProgress = false;

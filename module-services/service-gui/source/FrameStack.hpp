@@ -3,88 +3,23 @@
 
 #pragma once
 
-#include <gui/core/Context.hpp>
 #include <memory>
 #include <queue>
 #include <gui/core/DrawCommandForward.hpp>
-#include <service-eink/ImageData.hpp>
 #include <utility>
-#include "DrawData.hpp"
 #include <functional>
-#include "TryLock.hpp"
+#include "FrameBufferPool.hpp"
+#include "DrawFrame.hpp"
 
 namespace gui
 {
     class DrawCommand;
 
-    class FrameBuffer
-    {
-      public:
-        Size size;
-        Context canvas;
-
-        FrameBuffer()                    = delete;
-        FrameBuffer(const FrameBuffer &) = delete;
-        FrameBuffer(FrameBuffer &&)      = delete;
-        FrameBuffer &operator=(const FrameBuffer &) = delete;
-        FrameBuffer &operator=(FrameBuffer &&) = delete;
-        virtual ~FrameBuffer()                 = default;
-
-        FrameBuffer(Size size) : size(size), canvas(size)
-        {}
-    };
 } // namespace gui
 
 namespace service::renderer
 {
 
-    using FrameProcessor = std::function<bool(sgui::DrawData &data, gui::FrameBuffer &fb)>;
-
-    class DrawFrame
-    {
-      public:
-        enum class State
-        {
-            Fresh,
-            Processed
-        };
-
-      private:
-        cpp_freertos::MutexStandard &processingLock;
-        sgui::DrawData data;
-
-        State state = State::Fresh;
-
-      public:
-        DrawFrame(cpp_freertos::MutexStandard &processingLock, sgui::DrawData &&data, gui::Size canvasSize)
-            : processingLock(processingLock), data(std::move(data))
-        {}
-
-        bool processFrame(FrameProcessor processor, gui::FrameBuffer &fb)
-        {
-            if (processor == nullptr) {
-                return false;
-            }
-
-            auto lock = Trylock(processingLock, 10);
-            if (not lock.isLocked()) {
-                return false;
-            }
-
-            state = State::Processed;
-            return processor(data, fb);
-        }
-
-        [[nodiscard]] auto getState() const noexcept
-        {
-            return state;
-        }
-
-        auto &getData()
-        {
-            return data;
-        }
-    };
 
     class FrameStack
     {
@@ -103,16 +38,16 @@ namespace service::renderer
             if (not lock.isLocked()) {
                 return false;
             }
-            this->drawFrames.emplace_back(DrawFrame{lockProcessing, std::move(data), size});
+            this->drawFrames.emplace_back(DrawFrame{lockProcessing, std::move(data)});
             return true;
         }
 
-        /// TODO WIP
-        bool processLastFrame(FrameProcessor processor, gui::FrameBuffer &fb)
+        /// TODO WIP - need to process it separatelly - need to process it separatelly
+        std::optional<DrawFrame> getLastFrame(gui::FrameBuffer &fb)
         {
             auto lock = Trylock(lockQueue, 10);
             if (not lock.isLocked()) {
-                return false;
+                return {};
             }
 
             // for ( auto & f : drawFrames )
@@ -128,37 +63,12 @@ namespace service::renderer
             // 1 .. end() -1
 
             if (drawFrames.empty()) {
-                return false;
+                return {};
             }
 
             // TODO lock selection of frame selected to be processed
-            // then mark it as "being processed" ?
-
-            return drawFrames.back().processFrame(processor, fb);
-        }
-
-        /// take last processed frame to send to eink
-        /// lock as we will give frame results to somebody and then remove it from this context
-        bool takeLastProcessedFrame(service::eink::ImageData &data)
-        {
-            auto lock = Trylock(lockQueue, 10);
-            if (not lock.isLocked()) {
-                return false;
-            }
-
-            if (drawFrames.empty()) {
-                return false;
-            }
-
-            // TODO frameskip if there are more than 1 frame ready
-            data.mode    = drawFrames.front().getData().getMode();
-            // ok now what... we should use FrameBuffer here?
-            // or somehow pass it another way?
-            // how should we pass it then?
-            data.context = drawFrames.front().takeContext();
-            drawFrames.pop_back();
-
-            return true;
+            // TODO do I need to remove last element after moving it?
+            return std::move(drawFrames.back());
         }
     };
 } // namespace service::renderer

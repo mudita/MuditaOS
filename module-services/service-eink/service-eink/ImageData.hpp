@@ -3,14 +3,18 @@
 
 #pragma once
 
-#include <gui/core/Context.hpp>
 #include <gui/Common.hpp>
+#include "service-gui/source/FrameBufferFlyweight.hpp"
 
 namespace service::eink
 {
     struct ImageData
     {
-        gui::Context context;
+        gui::FrameBufferFlyweight context;
         gui::RefreshModes mode = gui::RefreshModes::GUI_REFRESH_FAST;
+        gui::Size size;
+        gui::Point point;
     };
 } // namespace service::eink
+
+static_assert(std::is_trivially_copyable<service::eink::ImageData>(), "ImageData is POD by default!");

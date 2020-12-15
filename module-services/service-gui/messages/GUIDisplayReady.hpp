@@ -7,14 +7,14 @@
 
 namespace service::renderer
 {
-    class GUIDisplayReady : public sgui::GUIMessage
+    class DisplayReady : public sgui::GUIMessage
     {
 
         bool suspendInProgress  = false;
         bool shutdownInProgress = false;
 
       public:
-        GUIDisplayReady(bool suspendInProgress, bool shutdownInProgress)
+        DisplayReady(bool suspendInProgress, bool shutdownInProgress)
             : suspendInProgress(suspendInProgress), shutdownInProgress(shutdownInProgress)
         {}
 

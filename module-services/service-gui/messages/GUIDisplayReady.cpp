@@ -8,7 +8,7 @@
 namespace service::renderer
 {
 
-    GUIDisplayReady::operator std::string() const
+    DisplayReady::operator std::string() const
     {
         json11::Json::object vals;
         vals["in_suspend"]  = suspendInProgress ? "yes" : "no";
