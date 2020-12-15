@@ -16,8 +16,12 @@
 
 namespace gui
 {
+    namespace window::name
+    {
+        constexpr inline auto languages = "Languages";
+    }
 
-    LanguageWindow::LanguageWindow(app::Application *app) : AppWindow(app, "Languages")
+    LanguageWindow::LanguageWindow(app::Application *app) : AppWindow(app, gui::window::name::languages)
     {
         buildInterface();
         setFocusItem(options[0]);

@@ -222,12 +222,12 @@ namespace app::manager
         connect(typeid(DisplayLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<DisplayLanguageChangeRequest *>(request);
             handleDisplayLanguageChange(msg);
-            return std::make_shared<sys::ResponseMessage>();
+            return msgHandled();
         });
         connect(typeid(InputLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<InputLanguageChangeRequest *>(request);
             handleInputLanguageChange(msg);
-            return std::make_shared<sys::ResponseMessage>();
+            return msgHandled();
         });
         connect(typeid(ShutdownRequest), [this](sys::Message *) {
             closeApplications();
