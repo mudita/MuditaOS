@@ -19,8 +19,7 @@ bool AlarmsStatusTable::add(AlarmsStatusRow entry)
 uint32_t AlarmsStatusTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM alarmStatuses;");
-
-    if (queryRet->getRowCount() == 0) {
+    if (!queryRet || queryRet->getRowCount() == 0) {
         return 0;
     }
 

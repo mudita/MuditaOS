@@ -57,30 +57,27 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
     const auto &qname = queue->GetQueueName();
 
     LOG_INFO("handleMessage received data from queue: %s", qname.c_str());
+
     static std::string *sendMsg = nullptr;
     static std::string receivedMsg;
-
     if (qname == sdesktop::RECEIVE_QUEUE_BUFFER_NAME) {
         if (!queue->Dequeue(&receivedMsg, 0)) {
             LOG_ERROR("handleMessage failed to receive from \"%s\"", sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
             return false;
         }
-        else {
-            parser.processMessage(receivedMsg);
-        }
+        parser.processMessage(receivedMsg);
     }
     else if (qname == sdesktop::SEND_QUEUE_BUFFER_NAME) {
         if (!queue->Dequeue(&sendMsg, 0)) {
-            LOG_ERROR("handleMessage xQueueReceive failed for %s size %d bytes",
-                      sdesktop::SEND_QUEUE_BUFFER_NAME,
-                      static_cast<unsigned int>(sendMsg->length()));
+            LOG_ERROR("handleMessage xQueueReceive failed for %s.", sdesktop::SEND_QUEUE_BUFFER_NAME);
             return false;
         }
-        else {
-            LOG_DEBUG("handeMessage sending %d bytes using usbCDCSend", static_cast<unsigned int>(sendMsg->length()));
-        }
 
+        LOG_DEBUG("handeMessage sending %d bytes using usbCDCSend", static_cast<unsigned int>(sendMsg->length()));
         bsp::usbCDCSend(sendMsg);
+
+        delete sendMsg;
+        sendMsg = nullptr;
     }
     else {
         LOG_INFO("handeMessage got message on an unhandled queue");
