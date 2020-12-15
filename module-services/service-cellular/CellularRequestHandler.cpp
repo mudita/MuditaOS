@@ -92,7 +92,7 @@ void CellularRequestHandler::handle(ClirRequest &request, at::Result &result)
     using namespace at::response;
     auto requestHandled = request.checkModemResponse(result);
 
-    std::shared_ptr<IMMICustomResultParams> response = std::make_shared<MMIClirResult>();
+    std::shared_ptr<MMICustomResultParams> response = std::make_shared<MMIClirResult>();
     if (requestHandled) {
         auto procedureType = request.getProcedureType();
         if (procedureType == SupplementaryServicesRequest::ProcedureType::Activation) {
@@ -112,7 +112,7 @@ void CellularRequestHandler::handle(ClirRequest &request, at::Result &result)
             response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
         }
     }
-    auto msg = std::make_shared<CellularMMIResultMessage>(response);
+    auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
     sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
     request.setHandled(requestHandled);
 }

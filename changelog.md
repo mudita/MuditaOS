@@ -7,6 +7,7 @@
 * Add GUI visitor and DOM documentation.
 * `[PowerManagement]` Critial battery level notification to SystemManager.
 * `[Bluetooth]`  Add settings storage to bluetooth related items
+* `[cellular]`  Add GUI for Custom MMI messages- call forwarding.
 * Add Bluetooth virtual audio device.
 * Add custom repeat window for the alarm application
 
