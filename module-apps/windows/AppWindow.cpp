@@ -55,9 +55,9 @@ namespace gui
         topBar->setActive(TopBar::Elements::SIGNAL, false);
     }
 
-    bool AppWindow::batteryCharging(bool charging)
+    bool AppWindow::batteryChargingChange(bool charging)
     {
-        topBar->setBatteryCharging(charging);
+        topBar->setBatteryChargingChange(charging);
         return true;
     }
 
@@ -73,7 +73,7 @@ namespace gui
         // get old value of battery level, calcualte new level and comapre both
         // if they are different make a change and return true, otherwise return false;
         if (topBar != nullptr) {
-            return topBar->setBatteryLevel(percentage);
+            return topBar->setBatteryBars(percentage);
         }
         return false;
     }

@@ -43,16 +43,16 @@ namespace gui
 
     void TopBar::batteryShowBars(uint32_t val)
     {
-        if (val > battery.size()) {
+        if (val > batteryBars.size()) {
             LOG_ERROR("Trying to set battery level out of scope");
-            val = battery.size();
+            val = batteryBars.size();
         }
-        for (unsigned int i = 0; i < battery.size(); ++i) {
+        for (unsigned int i = 0; i < batteryBars.size(); ++i) {
             if (elements.battery) {
-                battery[i]->setVisible(val >= i);
+                batteryBars[i]->setVisible(i == val);
             }
             else {
-                battery[i]->setVisible(false);
+                batteryBars[i]->setVisible(false);
             }
         }
     }
@@ -69,7 +69,7 @@ namespace gui
         updateSignalStrength();
 
         // icons for battery
-        battery = {
+        batteryBars = {
             new gui::Image(this, batteryOffset, 15, 0, 0, "battery_low_W_M"),
             new gui::Image(this, batteryOffset, 15, 0, 0, "battery1_W_M"),
             new gui::Image(this, batteryOffset, 15, 0, 0, "battery2_W_M"),
@@ -79,12 +79,13 @@ namespace gui
         };
         batteryShowBars(0);
 
-        charging = new Label(this, batteryOffset, 15, 30, this->drawArea.h);
-        charging->setFilled(false);
-        charging->setBorderColor(gui::ColorNoColor);
-        charging->setFont(style::header::font::title);
-        charging->setText("Z");
-        charging->setVisible(false);
+        batteryChargings[Store::Battery::State::Charging] =
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery_charging_W_M");
+        batteryChargings[Store::Battery::State::PluggedNotCharging] =
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery_charging_ready_W_M");
+        for (auto &el : batteryChargings) {
+            el.second->setVisible(false);
+        }
 
         const auto design_sim_offset = 376; // this offset is not final, but it is pixel Purefect
         sim                          = new SIM(this, design_sim_offset, 12);
@@ -123,15 +124,17 @@ namespace gui
         case Elements::BATTERY: {
             elements.battery = active;
             if (Store::Battery::get().state == Store::Battery::State::Discharging) {
-                setBatteryLevel(active ? Store::Battery::get().level : 0);
+                setBatteryBars(active ? Store::Battery::get().level : 0);
             }
             else {
+                // plugged
                 if (active) {
-                    setBatteryCharging(true);
+                    setBatteryChargingChange(true);
                 }
                 else {
-                    charging->setVisible(false);
-                    setBatteryLevel(0);
+                    for (auto &el : batteryChargings) {
+                        el.second->setVisible(false);
+                    }
                 }
             }
         } break;
@@ -162,10 +165,10 @@ namespace gui
         };
     }
 
-    uint32_t calculateBatteryLavel(uint32_t percentage)
+    uint32_t calculateBatteryBars(uint32_t percentage)
     {
         uint32_t level = 0;
-        if (percentage <= 5)
+        if (percentage <= 5) // level critical
             level = 0;
         else if (percentage <= 27)
             level = 1;
@@ -178,38 +181,49 @@ namespace gui
         else
             level = 5;
 
-        if (level >= batteryLevelCount) {
+        if (level >= batteryBarsCount) {
             LOG_ERROR("Battery level calculations are done wrong!");
-            return batteryLevelCount - 1;
+            return batteryBarsCount - 1;
         }
         return level;
     }
 
-    bool TopBar::setBatteryLevel(uint32_t percent)
+    bool TopBar::setBatteryBars(uint32_t percent)
     {
         if (Store::Battery::get().state != Store::Battery::State::Discharging) {
+
             return false;
         }
-        charging->setVisible(false);
-        batteryShowBars(calculateBatteryLavel(percent));
+        for (auto &el : batteryChargings) {
+            el.second->setVisible(false);
+        }
+        batteryShowBars(calculateBatteryBars(percent));
         return true;
     }
 
-    void TopBar::setBatteryCharging(bool plugged)
+    void TopBar::setBatteryChargingChange(bool plugged)
     {
-        if (plugged) {
-            batteryShowBars(0);
+        switch (Store::Battery::get().state) {
+
+        case Store::Battery::State::Discharging:
+            setBatteryBars(Store::Battery::get().level);
+            break;
+        case Store::Battery::State::Charging:
+            break;
+        case Store::Battery::State::PluggedNotCharging:
+            break;
         }
-        if (charging == nullptr)
-            return;
-        if (plugged) {
-            charging->setVisible(true);
-            batteryShowBars(0);
-        }
-        else {
-            charging->setVisible(false);
-            setBatteryLevel(Store::Battery::get().level);
-        }
+        if (plugged) {}
+        //        if (battery == nullptr)
+        //            return;
+        //        if (plugged) {
+        //            chargingPending->setVisible(true);
+        //                        batteryShowBars(0);
+        //        }
+        //        else {
+        //            chargingPending->setVisible(false);
+        //
+        //        }
     }
 
     bool TopBar::updateSignalStrength()
