@@ -26,7 +26,23 @@ namespace style::alarmClock
             inline constexpr auto newEditAlarm = "NewEditWindow";
             inline constexpr auto customRepeat = "CustomRepeat";
             inline constexpr auto dialogYesNo = "DialogYesNo";
+            inline constexpr auto alarmReminder = "AlarmReminder";
         }
+
+        namespace alarmReminder
+        {
+            inline constexpr auto marginTop            = 79;
+            inline constexpr auto hBoxHeight           = 250;
+            inline constexpr auto vBoxWidth            = 140;
+            inline constexpr auto timeLabelHeight      = 51;
+            inline constexpr auto timeLabelMarginBot   = 13;
+            inline constexpr auto alarmLabelHeight     = 25;
+            inline constexpr auto snoozeVBox           = 100;
+            inline constexpr auto snoozeVBoxMarginTop  = 83;
+            inline constexpr auto snoozeLabelHeight    = 40;
+            inline constexpr auto snoozeImageMarginTop = 7;
+            inline constexpr auto snoozeImageMarginBot = 4;
+        } // namespace alarmReminder
 
         namespace item
         {

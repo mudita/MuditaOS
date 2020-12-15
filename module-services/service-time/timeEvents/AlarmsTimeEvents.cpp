@@ -9,7 +9,6 @@
 #include <module-apps/application-alarm-clock/data/AlarmsData.hpp>
 #include <module-apps/application-calendar/data/OptionParser.hpp>
 #include <module-db/queries/alarms/QueryAlarmsSelectTurnedOn.hpp>
-#include <module-gui/gui/SwitchData.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-db/DBServiceAPI.hpp>
 
@@ -33,13 +32,6 @@ namespace stm
 
     bool AlarmsTimeEvents::sendNextEventQuery()
     {
-        TimePoint filterFrom = TimePointNow();
-        TimePoint filterTill = filterFrom;
-        if (startTP != TIME_POINT_INVALID) {
-            filterFrom = std::min(startTP, filterFrom);
-            filterTill = filterFrom;
-        }
-
         return DBServiceAPI::GetQuery(
             service(), db::Interface::Name::Alarms, std::make_unique<db::query::alarms::SelectTurnedOn>());
     }
@@ -50,33 +42,52 @@ namespace stm
         if (firstUpcomingQuery == nullptr) {
             return 0;
         }
-
         std::vector<AlarmsRecord> records = firstUpcomingQuery->getResult();
         if (records.empty()) {
             return 0;
         }
 
-        // mlucki
-        // Todo: calc here the duration to first upcoming alarm
-        auto duration = seconds(0);
         auto actualTimePoint = TimePointNow();
         auto weekDay         = WeekdayIndexFromTimePoint(actualTimePoint);
         std::vector<AlarmsRecord> nearestAlarms;
         for (uint32_t i = 0; i < 7; i++) {
-            for (const auto &record : records) {
+            for (auto &record : records) {
+                auto hoursAndMinutes = TimePointToHourMinSec(record.time);
+                record.time = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + date::days{i} +
+                              hoursAndMinutes.hours() + hoursAndMinutes.minutes();
                 if (record.repeat == static_cast<uint32_t>(AlarmRepeat::never) ||
                     record.repeat == static_cast<uint32_t>(AlarmRepeat::everyday)) {
                     nearestAlarms.push_back(record);
                 }
-                else if (weekDay > 0 && weekDay < 6 && record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays)) {
+                else if (weekDay < 6 && record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays)) {
                     nearestAlarms.push_back(record);
+                }
+                else if (weekDay == 6 && record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays) &&
+                         record.status > AlarmStatus::On) {
+                    auto buffer = TimePointToYearMonthDay(record.time);
+                    record.time =
+                        record.time + (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze);
+                    if (buffer.day() != TimePointToYearMonthDay(record.time).day()) {
+                        nearestAlarms.push_back(record);
+                    }
                 }
                 else {
                     OptionParser parser;
-                    auto weekDayRepeatData = std::make_unique<WeekDaysRepeatData>();
-                    auto weekDayData       = parser.setWeekDayOptions(record.repeat, std::move(weekDayRepeatData));
+                    auto weekDayData = parser.setWeekDayOptions(record.repeat, std::make_unique<WeekDaysRepeatData>());
                     if (weekDayData->getData(weekDay)) {
                         nearestAlarms.push_back(record);
+                    }
+                    uint32_t dayBefore = weekDay - 1;
+                    if (dayBefore > 7) {
+                        dayBefore = 7;
+                    }
+                    if (weekDayData->getData(dayBefore)) {
+                        auto buffer = TimePointToYearMonthDay(record.time);
+                        record.time = record.time +
+                                      (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze);
+                        if (buffer.day() != TimePointToYearMonthDay(record.time).day()) {
+                            nearestAlarms.push_back(record);
+                        }
                     }
                 }
             }
@@ -90,23 +101,50 @@ namespace stm
                 break;
             }
         }
+        if (nearestAlarms.empty()) {
+            return 0;
+        }
 
+        // TODO: alarms with snoozes between days
         // Apply snooze
         for (auto &alarm : nearestAlarms) {
             if (alarm.status > AlarmStatus::On) {
+                // auto buffer = TimePointToYearMonthDay(alarm.time);
                 alarm.time =
                     alarm.time + (static_cast<uint32_t>(alarm.status) - 1) * std::chrono::minutes(alarm.snooze);
+                // if alarm time after applying snoozes is going to jump to the next day
+                // it means that this is alarm from yesterday and to properly handle it
+                // you have to subtract one day so it will rang today not tomorrow
+                // if (buffer.day() != TimePointToYearMonthDay(alarm.time).day()) {
+                //    alarm.time -= date::days{1};
+                //}
+                if (alarm.time < TimePointNow()) {
+                    alarm.time += date::days{1};
+                }
+            }
+            // if alarm status is not Off and alarm time is smaller than actual time
+            // it means that this alarm should ring the next day
+            else if (alarm.time < TimePointNow()) {
+                alarm.time += date::days{1};
             }
         }
 
-        /*
-        alarmsRecord = records->at(0);
-        startTP       = alarmsRecord.date_from - minutes{alarmsRecord.reminder};
-        auto duration = alarmsRecord.date_from - std::chrono::minutes{alarmsRecord.reminder} - TimePointNow();
+        std::sort(nearestAlarms.begin(),
+                  nearestAlarms.end(),
+                  [](const AlarmsRecord &first, const AlarmsRecord &second) { return first.time < second.time; });
+
+        alarmsRecord = nearestAlarms.at(0);
+        auto duration = alarmsRecord.time - TimePointNow();
         if (duration.count() <= 0) {
             duration = std::chrono::milliseconds(eventTimerMinSkipInterval);
-        }*/
-
+        }
+        // restore original alarm time if snooze was applied
+        if (alarmsRecord.status > AlarmStatus::On) {
+            alarmsRecord.time = alarmsRecord.time - (static_cast<uint32_t>(alarmsRecord.status) - 1) *
+                                                        std::chrono::minutes(alarmsRecord.snooze);
+        }
+        LOG_DEBUG("How many miliseconds to alarm: %i",
+                  static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()));
         return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     }
 
@@ -118,19 +156,15 @@ namespace stm
         /*eventRecord.reminder_fired = TimePointNow();
         return DBServiceAPI::GetQuery(
             service(), db::Interface::Name::Alarms, std::make_unique<db::query::alarms::Edit>(alarmsRecord));*/
-
+        // sendNextEventQuery();
         return true;
     }
 
     void AlarmsTimeEvents::invokeEvent()
     {
-        // mlucki
-        /*std::unique_ptr<AlarmsRecordData> eventData = std::make_unique<AlarmsRecordData>();
-        eventData->setDescription(style::window::calendar::name::event_reminder_window);
-        auto event = std::make_shared<AlarmsRecord>(alarmsRecord);
-        eventData->setData(event);*/
+        auto alarm = std::make_shared<AlarmsRecord>(alarmsRecord);
+        auto data  = std::make_unique<AlarmRecordData>(alarm);
 
-        /// Todo: restore invoke action after rework of application popups
-        // app::manager::Controller::sendAction(service(), app::manager::actions::ShowReminder, std::move(eventData));
+        app::manager::Controller::sendAction(service(), app::manager::actions::ShowAlarm, std::move(data));
     }
 } // namespace stm

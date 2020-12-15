@@ -5,6 +5,7 @@
 #include "application-alarm-clock/windows/AlarmClockMainWindow.hpp"
 #include "application-alarm-clock/windows/NewEditAlarmWindow.hpp"
 #include "application-alarm-clock/windows/CustomRepeatWindow.hpp"
+#include "application-alarm-clock/windows/AlarmReminderWindow.hpp"
 #include "application-alarm-clock/widgets/AlarmClockStyle.hpp"
 #include "application-alarm-clock/presenter/AlarmClockMainWindowPresenter.hpp"
 #include "application-alarm-clock/presenter/CustomRepeatWindowPresenter.hpp"
@@ -24,6 +25,10 @@ namespace app
         : Application(name, parent, false, stackDepth, priority)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
+            switchWindow(style::alarmClock::window::name::alarmReminder, std::move(data));
+            return msgHandled();
+        });
     }
 
     sys::MessagePointer ApplicationAlarmClock::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -107,6 +112,14 @@ namespace app
         windowsFactory.attach(
             style::alarmClock::window::name::dialogYesNo,
             [](Application *app, const std::string &name) { return std::make_unique<gui::DialogYesNo>(app, name); });
+
+        windowsFactory.attach(
+            style::alarmClock::window::name::alarmReminder, [](Application *app, const std::string &name) {
+                auto alarmsRepository = std::make_unique<alarmClock::AlarmsDBRepository>(app);
+                auto presenter =
+                    std::make_unique<alarmClock::AlarmReminderWindowPresenter>(std::move(alarmsRepository));
+                return std::make_unique<alarmClock::AlarmReminderWindow>(app, std::move(presenter));
+            });
     }
 
     void ApplicationAlarmClock::destroyUserInterface()

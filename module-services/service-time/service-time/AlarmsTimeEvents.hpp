@@ -6,7 +6,6 @@
 
 #include <application-calendar/data/dateCommon.hpp>
 #include <module-db/Interface/AlarmsRecord.hpp>
-//#include <module-db/queries/calendar/QueryEventsEdit.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -27,7 +26,6 @@ namespace stm
     {
       private:
         AlarmsRecord alarmsRecord;
-        TimePoint startTP = TIME_POINT_INVALID;
 
       protected:
         const std::string timerName() override

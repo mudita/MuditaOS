@@ -6,6 +6,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/windows/AlarmClockOptions.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/NewEditAlarmWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/CustomRepeatWindow.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/windows/AlarmReminderWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/models/AlarmsModel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/models/AlarmsRepository.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/models/NewEditAlarmModel.cpp"
@@ -18,6 +19,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/presenter/AlarmClockEditWindowPresenter.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/presenter/CustomRepeatWindowPresenter.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/data/AlarmsData.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/presenter/AlarmReminderWindowPresenter.cpp"
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/ApplicationAlarmClock.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/AlarmClockStyle.hpp"

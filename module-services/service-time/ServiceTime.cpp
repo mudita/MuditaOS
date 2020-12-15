@@ -100,7 +100,7 @@ namespace stm
                     calendarEvents.receiveNextEventQuery(std::move(result));
                     responseHandled = true;
                 }
-                if (dynamic_cast<db::query::alarms::SelectTurnedOn *>(result.get())) {
+                if (dynamic_cast<db::query::alarms::SelectTurnedOnResult *>(result.get())) {
                     alarmsEvents.receiveNextEventQuery(std::move(result));
                     responseHandled = true;
                 }
