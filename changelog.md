@@ -29,6 +29,9 @@
 * `[settings]` Fix lack of sim at startup
 * `[audio]` Changed internal microphone gain from 0dB to -12dB to fix echo & noise problem
 
+### Removed
+* `[utils]` Dump logs to a file on RT1051 after reaching 80% of log buffer utilization.
+
 ## [0.49.1 2020-12-04]
 
 ### Added
