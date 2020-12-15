@@ -84,10 +84,7 @@ extern "C"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-static const char *LOG_FILE_NAME              = "MuditaOS.log";
-static const size_t LOGGER_BUFFER_SIZE        = 8192;
-static const double LOGGER_BUFFER_UTILIZATION = 0.8;
-static const size_t MAX_BUFFER_UTIL_MEM       = LOGGER_BUFFER_UTILIZATION * LOGGER_BUFFER_SIZE;
+static const char *logFileName = "MuditaOS.log";
 #pragma GCC diagnostic pop
 
 #endif /* LOG_LOG_H_ */
