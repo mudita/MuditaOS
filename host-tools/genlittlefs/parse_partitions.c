@@ -26,8 +26,7 @@ struct partition *find_partitions(const char *filename, part_type_t ptype, size_
     }
     const int nparts = blkid_partlist_numof_partitions(ls);
     if (nparts < 1) {
-        if (nelems)
-            *nelems = 0;
+        *nelems = 0;
         return pret;
     }
     else {
@@ -42,9 +41,7 @@ struct partition *find_partitions(const char *filename, part_type_t ptype, size_
             pret[ipart].type  = blkid_partition_get_type(par);
             ++ipart;
         }
-        if (nelems) {
-            *nelems = ipart;
-        }
+        *nelems = ipart;
     }
     blkid_free_probe(pr);
     return pret;
@@ -53,6 +50,9 @@ struct partition *find_partitions(const char *filename, part_type_t ptype, size_
 void print_partitions(const struct partition *part, size_t nparts)
 {
     printf("List of partitions [%lu]:\n", nparts);
+    if (!part) {
+        return;
+    }
     for (size_t s = 0; s < nparts; ++s) {
         printf("    Number: [%lu] Type: [%02x] Start: [%luk] End: [%luk]\n",
                s + 1,

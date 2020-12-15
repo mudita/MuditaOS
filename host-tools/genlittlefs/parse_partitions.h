@@ -18,5 +18,7 @@ struct partition
     part_type_t type;
 };
 
-struct partition *find_partitions(const char *filename, part_type_t ptype, size_t *nelems);
+struct partition *find_partitions(const char *filename, part_type_t ptype, size_t *nelems)
+    __attribute__((nonnull(1, 3)));
+
 void print_partitions(const struct partition *part, size_t nparts);

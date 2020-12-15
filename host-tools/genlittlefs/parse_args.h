@@ -31,5 +31,6 @@ struct littlefs_opts
     bool verbose;                 //! Verbose mode
 };
 
-int parse_program_args(int argc, char **argv, struct littlefs_opts *opts);
-void print_config_options(const struct littlefs_opts *opts);
+int parse_program_args(int argc, char **argv, struct littlefs_opts *opts) __attribute__((nonnull(3)));
+
+void print_config_options(const struct littlefs_opts *opts) __attribute__((nonnull(1)));

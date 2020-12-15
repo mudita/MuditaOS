@@ -211,6 +211,7 @@ static int add_to_lfs(lfs_t *lfs, const char *dir, struct lfs_info_summary *summ
     return err;
 }
 
+static void print_error(const char *str, int error) __attribute__((nonnull(1)));
 static void print_error(const char *str, int error)
 {
     if (error == -1) {
@@ -221,6 +222,9 @@ static void print_error(const char *str, int error)
         fprintf(stderr, "lfs_error %s %i\n", str, error);
     }
 }
+
+static void configure_lfs_params(struct lfs_config *lfsc, const struct littlefs_opts *opts)
+    __attribute__((nonnull(1, 2)));
 
 static void configure_lfs_params(struct lfs_config *lfsc, const struct littlefs_opts *opts)
 {

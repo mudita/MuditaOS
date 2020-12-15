@@ -47,6 +47,9 @@ static int is_hex(const char *s)
 
 static int to_int(const char *s)
 {
+    if (!s) {
+        return -1;
+    }
     if (is_number(s)) {
         return atoi(s);
     }
@@ -59,6 +62,9 @@ static int to_int(const char *s)
 
 static long long to_longlong(const char *s)
 {
+    if (!s) {
+        return -1;
+    }
     if (is_number(s)) {
         return atoll(s);
     }
@@ -68,11 +74,13 @@ static long long to_longlong(const char *s)
     return -1;
 }
 
+static void usage(const char *name) __attribute__((nonnull(1)));
 static void usage(const char *name)
 {
     fprintf(stderr, "usage: %s [options] -- src_dir1 ... [src_dirN]\n", name);
 }
 
+static void help(const char *name) __attribute__((nonnull(1)));
 static void help(const char *name)
 {
     static const char help_text[] = "usage: %s [options] -- src_dir1 ... [src_dirN]\n"
@@ -122,10 +130,6 @@ int parse_program_args(int argc, char **argv, struct littlefs_opts *opts)
         {.name = "overwrite", .has_arg = no_argument, .flag = 0, .val = 0},
         {.name = "verbose", .has_arg = no_argument, .flag = 0, .val = 0},
         {.name = 0, .has_arg = 0, .flag = 0, .val = 0}};
-    if (!opts) {
-        errno = EINVAL;
-        return -1;
-    }
     memset(opts, 0, sizeof(*opts));
     while ((c = getopt_long(argc, argv, "i:b:s:p:lh", long_options, &option_index)) != -1) {
         switch (c) {
