@@ -96,7 +96,7 @@ namespace purefs::fs
         {
             return m_diskmm.lock();
         }
-        auto virtual filesystem_register_completed() const noexcept -> int
+        virtual auto filesystem_register_completed() const noexcept -> int
         {
             return 0;
         }
