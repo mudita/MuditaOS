@@ -132,6 +132,7 @@ namespace gui
         uint32_t getTextWidth() const noexcept;
 
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+        void accept(GuiVisitor &visitor) override;
     };
 
 } /* namespace gui */

@@ -22,7 +22,6 @@ namespace app::notes
 
         // virtual methods
         bool onInput(const gui::InputEvent &inputEvent) override;
-        void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
 
         void rebuild() override;
         void buildInterface() override;
@@ -30,8 +29,6 @@ namespace app::notes
         bool onDatabaseMessage(sys::Message *msg) override;
 
       private:
-        void showEmptyIcon();
-        void showList();
         void onEmptyList();
         void onListFilled();
 

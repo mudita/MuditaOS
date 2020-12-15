@@ -95,7 +95,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 
 /* Run time and task stats gathering related definitions. */
-#define configGENERATE_RUN_TIME_STATS           0
+#define configGENERATE_RUN_TIME_STATS           1
 #define configUSE_TRACE_FACILITY                1
 #define configUSE_STATS_FORMATTING_FUNCTIONS    1
 #define configRECORD_STACK_HIGH_ADDRESS		    1
@@ -125,7 +125,7 @@ extern uint32_t SystemCoreClock;
 #define INCLUDE_xTaskGetCurrentTaskHandle       1
 #define INCLUDE_uxTaskGetStackHighWaterMark     1
 #define INCLUDE_uxTaskGetStackHighWaterMark2    1
-#define INCLUDE_xTaskGetIdleTaskHandle          0
+#define INCLUDE_xTaskGetIdleTaskHandle          1
 #define INCLUDE_eTaskGetState                   0
 #define INCLUDE_xTimerPendFunctionCall          1
 #define INCLUDE_xTaskAbortDelay                 0
@@ -174,7 +174,13 @@ standard names. */
 /* system heap integrity check */
 #ifdef DEBUG_FREERTOS
 #define configSYSTEM_HEAP_STATS           (1)
+#define configUSER_HEAP_STATS             (1)
 #define configSYSTEM_HEAP_INTEGRITY_CHECK (1)
 #endif
+
+extern void vConfigureTimerForRunTimeStats(void);
+extern uint32_t ulHighFrequencyTimerTicks(void);
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vConfigureTimerForRunTimeStats()
+#define portGET_RUN_TIME_COUNTER_VALUE() ulHighFrequencyTimerTicks()
 
 #endif /* FREERTOS_CONFIG_H */

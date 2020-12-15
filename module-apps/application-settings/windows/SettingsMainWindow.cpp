@@ -8,7 +8,6 @@
 #include "log/log.hpp"
 #include "CellularPassthroughWindow.hpp"
 #include "FotaWindow.hpp"
-#include "USSDWindow.hpp"
 #include "EinkModeWindow.hpp"
 
 std::list<gui::Option> mainWindowOptions(app::Application *app)
@@ -40,7 +39,6 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
         addMenu(i18("app_settings_cellular_passthrough"), gui::window::cellular_passthrough::window_name);
     }
     addMenu(i18("Fota update"), gui::window::name::fota_window);
-    addMenu(i18("USSD test"), gui::window::name::ussd_window);
     addMenu("Eink Mode", gui::window::name::eink);
     addMenu(i18("app_settings_display"));
     addMenu(i18("app_settings_phone_modes"));

@@ -8,7 +8,7 @@
 #include <source/version.hpp>
 
 // module-utils
-#include "module-utils/i18n/i18n.hpp"
+#include "i18n/i18n.hpp"
 
 #include "Update.hpp"
 #include "../ApplicationDesktop.hpp"
@@ -176,11 +176,11 @@ namespace gui
                 updateVersion << utils::localize.get("app_desktop_update_to");
                 updateVersion << ": ";
                 updateVersion << msg.updateStats
-                                     .versioInformation[purefs::json::os_version][purefs::json::version_string]
+                                     .versionInformation[purefs::json::os_version][purefs::json::version_string]
                                      .string_value();
                 updateVersion << " (";
                 updateVersion << msg.updateStats
-                                     .versioInformation[purefs::json::git_info][purefs::json::os_git_revision]
+                                     .versionInformation[purefs::json::git_info][purefs::json::os_git_revision]
                                      .string_value();
                 updateVersion << ")";
 
@@ -189,7 +189,7 @@ namespace gui
                 updateFileDetails << std::to_string(msg.updateStats.totalBytes / 1024);
                 updateFileDetails << "Kb (";
                 updateFileDetails
-                    << msg.updateStats.versioInformation[purefs::json::misc][purefs::json::builddate].string_value();
+                    << msg.updateStats.versionInformation[purefs::json::misc][purefs::json::builddate].string_value();
                 updateFileDetails << ")";
 
                 currentVersionInfo->setText(currentVersion.str());

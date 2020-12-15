@@ -7,6 +7,9 @@
 
 namespace style::alarmClock
 {
+    inline constexpr auto editAlarm = "Edit";
+    inline constexpr auto newAlarm  = "New";
+
     namespace window
     {
         inline constexpr auto cross_x    = 48;
@@ -20,7 +23,9 @@ namespace style::alarmClock
 
         namespace name
         {
-            inline constexpr auto noAlarms = "NoAlarms";
+            inline constexpr auto newEditAlarm = "NewEditWindow";
+            inline constexpr auto customRepeat = "CustomRepeat";
+            inline constexpr auto dialogYesNo = "DialogYesNo";
         }
 
         namespace item
@@ -32,6 +37,23 @@ namespace style::alarmClock
             inline constexpr auto imageMargin    = 150;
             inline constexpr auto timeHeight     = 60 - style::margins::small;
             inline constexpr auto periodHeight   = 40;
+
+            namespace time
+            {
+                inline constexpr auto height       = 106;
+                inline constexpr auto margin       = 21;
+                inline constexpr auto marginBot    = 15;
+                inline constexpr auto separator    = 30;
+                inline constexpr auto timeInput12h = 120;
+                inline constexpr auto timeInput24h = 195;
+            } // namespace time
+
+            namespace options
+            {
+                inline constexpr auto height    = 63;
+                inline constexpr auto label_h   = 30;
+                inline constexpr auto arrow_w_h = 20;
+            } // namespace options
         } // namespace item
 
     } // namespace window

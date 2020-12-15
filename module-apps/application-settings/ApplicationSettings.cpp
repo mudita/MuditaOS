@@ -12,7 +12,6 @@
 #include "windows/Info.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
-#include "windows/USSDWindow.hpp"
 
 #include "windows/UITestWindow.hpp"
 
@@ -57,7 +56,11 @@ namespace app
     }
 
     ApplicationSettings::~ApplicationSettings()
-    {}
+    {
+        settings->unregisterValueChange(settings::SystemProperties::lockPassHash);
+        settings->unregisterValueChange(settings::SystemProperties::timeDateFormat);
+        settings->unregisterValueChange(settings::SystemProperties::displayLanguage);
+    }
 
     // Invoked upon receiving data message
     sys::MessagePointer ApplicationSettings::DataReceivedHandler(sys::DataMessage *msgl,
@@ -88,22 +91,6 @@ namespace app
         }
         // this variable defines whether message was processed.
         bool handled = true;
-
-        if (msgl->messageType == MessageType::CellularNotification) {
-            auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
-            if (msg != nullptr) {
-                if (msg->type == CellularNotificationMessage::Type::NewIncomingUSSD) {
-
-                    auto window = this->getCurrentWindow();
-                    if (window->getName() == gui::window::name::ussd_window) {
-                        auto ussdWindow = dynamic_cast<gui::USSDWindow *>(window);
-                        if (ussdWindow != nullptr) {
-                            ussdWindow->handleIncomingUSSD(msg->data);
-                        }
-                    }
-                }
-            }
-        }
 
         if (handled)
             return std::make_shared<sys::ResponseMessage>();
@@ -177,10 +164,6 @@ namespace app
                                       return std::make_unique<gui::CellularPassthroughWindow>(app);
                                   });
         }
-
-        windowsFactory.attach(gui::window::name::ussd_window, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::USSDWindow>(app);
-        });
     }
 
     void ApplicationSettings::destroyUserInterface()
@@ -188,18 +171,19 @@ namespace app
 
     void ApplicationSettings::setSim(Store::GSM::SIM sim)
     {
-        settings->setValue(settings::SystemProperties::activeSim, utils::enumToString(sim));
         CellularServiceAPI::SetSimCard(this, sim);
     }
 
     void ApplicationSettings::setPin(unsigned int value)
     {
         settings->setValue(settings::SystemProperties::lockPassHash, std::to_string(value));
+        lockPassHash = value;
     }
 
     void ApplicationSettings::clearPin()
     {
         settings->setValue(settings::SystemProperties::lockPassHash, "");
+        lockPassHash = 0U;
     }
 
     void ApplicationSettings::lockPassChanged(std::string value)

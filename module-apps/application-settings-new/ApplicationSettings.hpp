@@ -26,9 +26,10 @@ namespace gui::window::name
     inline constexpr auto input_language = "InputLanguage";
     inline constexpr auto locked_screen  = "LockedScreen";
 
-    inline constexpr auto messages  = "Messages";
-    inline constexpr auto torch     = "Torch";
-    inline constexpr auto templates = "Templates";
+    inline constexpr auto messages   = "Messages";
+    inline constexpr auto torch      = "Torch";
+    inline constexpr auto nightshift = "Nightshift";
+    inline constexpr auto templates  = "Templates";
 
     inline constexpr auto autolock  = "Autolock";
     inline constexpr auto wallpaper = "Wallpaper";
@@ -47,7 +48,19 @@ namespace app
 {
     inline constexpr auto name_settings_new = "ApplicationSettingsNew";
 
-    class ApplicationSettingsNew : public app::Application
+    namespace settingsInterface
+    {
+        class SimParams
+        {
+          public:
+            virtual ~SimParams()                     = default;
+            virtual void setSim(Store::GSM::SIM sim) = 0;
+            virtual Store::GSM::SIM getSim()         = 0;
+            virtual std::string getNumber()          = 0;
+        };
+    } // namespace settingsInterface
+
+    class ApplicationSettingsNew : public app::Application, public settingsInterface::SimParams
     {
       public:
         ApplicationSettingsNew(std::string name                    = name_settings_new,
@@ -63,7 +76,14 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
+        void setSim(Store::GSM::SIM sim) override;
+        Store::GSM::SIM getSim() override;
+        std::string getNumber() override;
         bsp::Board board = bsp::Board::none;
+
+      private:
+        Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
+        std::string selectedSimNumber = {};
     };
 
     template <> struct ManifestTraits<ApplicationSettingsNew>

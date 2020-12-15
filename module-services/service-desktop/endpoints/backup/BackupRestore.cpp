@@ -9,7 +9,6 @@
 #include <purefs/filesystem_paths.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBServiceName.hpp>
-#include <vfs.hpp>
 
 #include <cassert>
 #include <filesystem>
@@ -81,13 +80,15 @@ void BackupRestore::RestoreUserFiles(sys::Service *ownerService)
 bool BackupRestore::RemoveBackupDir()
 {
     /* prepare directories */
-    if (const auto backupOSPath = purefs::dir::getBackupOSPath(); vfs.isDir(backupOSPath.c_str())) {
+    if (const auto backupOSPath = purefs::dir::getBackupOSPath(); std::filesystem::is_directory(backupOSPath.c_str())) {
         LOG_INFO("RemoveBackupDir: removing backup directory %s...", backupOSPath.c_str());
 
-        if (vfs.deltree(backupOSPath.c_str()) != 0) {
-            LOG_ERROR("RemoveBackupDir: removing backup directory %s failed, error: %s.",
-                      backupOSPath.c_str(),
-                      vfs.lastErrnoToStr().c_str());
+        try {
+            std::filesystem::remove_all(backupOSPath.c_str());
+        }
+        catch (const std::filesystem::filesystem_error &e) {
+            LOG_ERROR(
+                "RemoveBackupDir: removing backup directory %s failed, error: %s.", backupOSPath.c_str(), e.what());
             return false;
         }
     }
@@ -100,11 +101,9 @@ bool BackupRestore::CreateBackupDir()
     const auto backupOSPath = purefs::dir::getBackupOSPath();
     LOG_INFO("CreateBackupDir: creating backup directory %s...", backupOSPath.c_str());
 
-    if (vfs.isDir(backupOSPath.c_str()) == false) {
-        if (vfs.mkdir(backupOSPath.c_str()) != 0) {
-            LOG_ERROR("CreateBackupDir: creating backup directory %s failed, error: %s.",
-                      backupOSPath.c_str(),
-                      vfs.lastErrnoToStr().c_str());
+    if (!std::filesystem::is_directory(backupOSPath.c_str())) {
+        if (!std::filesystem::create_directory(backupOSPath.c_str())) {
+            LOG_ERROR("CreateBackupDir: creating backup directory %s failed.", backupOSPath.c_str());
             return false;
         }
     }
@@ -118,18 +117,12 @@ bool BackupRestore::PackUserFiles()
     backupPathDB += "/";
 
     const auto backupOSPath                  = purefs::dir::getBackupOSPath();
-    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(backupOSPath.c_str(), "", true);
 
-    if (dirlist.size() <= empty_dirlist_size) {
-        /* vfs.listdir also lists two extra directories ".." and "..." by default, they shall be ignored */
+    if (std::filesystem::is_empty(backupOSPath.c_str())) {
         LOG_ERROR("PackUserFiles: backup dir %s is empty, nothing to backup, quitting...", backupOSPath.c_str());
         BackupRestore::RemoveBackupDir();
         return false;
     }
-
-    LOG_INFO("PackUserFiles: backup dir %s listed with %lu files.",
-             backupOSPath.c_str(),
-             dirlist.size() - empty_dirlist_size);
 
     std::string tarFilePath = backupOSPath;
     tarFilePath += "/";
@@ -150,76 +143,78 @@ bool BackupRestore::PackUserFiles()
 
     std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::tar_buf]);
 
-    for (auto &direntry : dirlist) {
-        if ((direntry.fileName.compare(".") != 0) && (direntry.fileName.compare("..") != 0) &&
-            (direntry.fileName.compare("...") != 0)) {
+    for (auto &direntry : std::filesystem::directory_iterator(backupOSPath.c_str())) {
+        if ((direntry.path().string().compare(".") != 0) && (direntry.path().string().compare("..") != 0) &&
+            (direntry.path().string().compare("...") != 0)) {
 
-            LOG_INFO("PackUserFiles: archiving file %s...", (backupPathDB + direntry.fileName).c_str());
-            vfs::FILE *file = vfs.fopen((backupPathDB + direntry.fileName).c_str(), "r");
+            LOG_INFO("PackUserFiles: archiving file %s...", (backupPathDB + direntry.path().string()).c_str());
+            auto *file = std::fopen((backupPathDB + direntry.path().string()).c_str(), "r");
 
             if (file == nullptr) {
                 LOG_ERROR("PackUserFiles: archiving file %s failed, cannot open file, quitting...",
-                          direntry.fileName.c_str());
+                          direntry.path().string().c_str());
                 mtar_close(&tarFile);
                 BackupRestore::RemoveBackupDir();
                 return false;
             }
 
-            LOG_INFO("PackUserFiles: writting tar header for %s...", direntry.fileName.c_str());
+            LOG_INFO("PackUserFiles: writting tar header for %s...", direntry.path().string().c_str());
 
-            if (mtar_write_file_header(&tarFile, direntry.fileName.c_str(), static_cast<unsigned>(direntry.fileSize)) !=
-                MTAR_ESUCCESS) {
-                LOG_ERROR("PackUserFiles: writing tar header for %s failed", direntry.fileName.c_str());
-                vfs.fclose(file);
+            if (mtar_write_file_header(&tarFile,
+                                       direntry.path().string().c_str(),
+                                       static_cast<unsigned>(std::filesystem::file_size(direntry))) != MTAR_ESUCCESS) {
+                LOG_ERROR("PackUserFiles: writing tar header for %s failed", direntry.path().string().c_str());
+                std::fclose(file);
                 mtar_close(&tarFile);
                 BackupRestore::RemoveBackupDir();
                 return false;
             }
 
-            uint32_t loopcount = (vfs.filelength(file) / purefs::buffer::tar_buf) + 1u;
+            uint32_t loopcount = (utils::filesystem::filelength(file) / purefs::buffer::tar_buf) + 1u;
             uint32_t readsize  = 0u;
 
             for (uint32_t i = 0u; i < loopcount; i++) {
                 if (i + 1u == loopcount) {
-                    readsize = vfs.filelength(file) % purefs::buffer::tar_buf;
+                    readsize = utils::filesystem::filelength(file) % purefs::buffer::tar_buf;
                 }
                 else {
                     readsize = purefs::buffer::tar_buf;
                 }
 
-                LOG_INFO("PackUserFiles: reading file %s...", direntry.fileName.c_str());
+                LOG_INFO("PackUserFiles: reading file %s...", direntry.path().string().c_str());
 
-                if (vfs.fread(buffer.get(), 1, readsize, file) != readsize) {
-                    LOG_ERROR("PackUserFiles: reading file %s failed, quitting...", direntry.fileName.c_str());
-                    vfs.fclose(file);
+                if (std::fread(buffer.get(), 1, readsize, file) != readsize) {
+                    LOG_ERROR("PackUserFiles: reading file %s failed, quitting...", direntry.path().string().c_str());
+                    std::fclose(file);
                     mtar_close(&tarFile);
                     BackupRestore::RemoveBackupDir();
                     return false;
                 }
 
-                LOG_INFO("PackUserFiles: writting %s into backup...", direntry.fileName.c_str());
+                LOG_INFO("PackUserFiles: writting %s into backup...", direntry.path().string().c_str());
                 if (mtar_write_data(&tarFile, buffer.get(), readsize) != MTAR_ESUCCESS) {
-                    LOG_ERROR("PackUserFiles: writting %s into backup failed, quitting...", direntry.fileName.c_str());
-                    vfs.fclose(file);
+                    LOG_ERROR("PackUserFiles: writting %s into backup failed, quitting...",
+                              direntry.path().string().c_str());
+                    std::fclose(file);
                     mtar_close(&tarFile);
                     BackupRestore::RemoveBackupDir();
                     return false;
                 }
             }
 
-            LOG_INFO("PackUserFiles: closing file %s...", (backupPathDB + direntry.fileName).c_str());
-            if (vfs.fclose(file) != 0) {
+            LOG_INFO("PackUserFiles: closing file %s...", (backupPathDB + direntry.path().string()).c_str());
+            if (std::fclose(file) != 0) {
                 LOG_ERROR("PackUserFiles: closing file %s failed, quitting...",
-                          (backupPathDB + direntry.fileName).c_str());
+                          (backupPathDB + direntry.path().string()).c_str());
                 mtar_close(&tarFile);
                 BackupRestore::RemoveBackupDir();
                 return false;
             }
 
-            LOG_INFO("PackUserFiles: deleting file %s...", (backupPathDB + direntry.fileName).c_str());
-            if (vfs.remove((backupPathDB + direntry.fileName).c_str()) != 0) {
+            LOG_INFO("PackUserFiles: deleting file %s...", (backupPathDB + direntry.path().string()).c_str());
+            if (std::remove((backupPathDB + direntry.path().string()).c_str()) != 0) {
                 LOG_ERROR("PackUserFiles: deleting file %s failed, quitting...",
-                          (backupPathDB + direntry.fileName).c_str());
+                          (backupPathDB + direntry.path().string()).c_str());
                 mtar_close(&tarFile);
                 BackupRestore::RemoveBackupDir();
                 return false;
@@ -277,7 +272,7 @@ bool BackupRestore::UnpackBackupFile()
             std::string restoreFilePath = purefs::dir::getBackupOSPath();
             restoreFilePath += "/";
             restoreFilePath += tarHeader.name;
-            vfs::FILE *file = vfs.fopen(restoreFilePath.c_str(), "w");
+            auto *file = std::fopen(restoreFilePath.c_str(), "w");
 
             if (file == nullptr) {
                 LOG_ERROR("UnpackBackupFile: extracting file %s failed, quitting...", tarHeader.name);
@@ -300,22 +295,22 @@ bool BackupRestore::UnpackBackupFile()
                 if (mtar_read_data(&tarFile, buffer.get(), readsize) != MTAR_ESUCCESS) {
                     LOG_ERROR("UnpackBackupFile: extracting file %s failed, quitting...", tarHeader.name);
                     mtar_close(&tarFile);
-                    vfs.fclose(file);
-                    vfs.remove(restoreFilePath.c_str());
+                    std::fclose(file);
+                    std::remove(restoreFilePath.c_str());
                     return false;
                 }
 
-                if (vfs.fwrite(buffer.get(), 1, readsize, file) != readsize) {
+                if (std::fwrite(buffer.get(), 1, readsize, file) != readsize) {
                     LOG_ERROR("UnpackBackupFile: writting file %s failed, quitting...", restoreFilePath.c_str());
                     mtar_close(&tarFile);
-                    vfs.fclose(file);
-                    vfs.remove(restoreFilePath.c_str());
+                    std::fclose(file);
+                    std::remove(restoreFilePath.c_str());
                     return false;
                 }
             }
 
             LOG_INFO("UnpackBackupFile: extracting file %s succeeded", tarHeader.name);
-            vfs.fclose(file);
+            std::fclose(file);
         }
         else {
             LOG_INFO("UnpackBackupFile: found header %d, skipping", tarHeader.type);
@@ -327,7 +322,7 @@ bool BackupRestore::UnpackBackupFile()
 
     LOG_INFO("UnpackBackupFile: cleaning directory from tar file...");
     mtar_close(&tarFile);
-    vfs.remove(tarFilePath.c_str());
+    std::remove(tarFilePath.c_str());
 
     return true;
 }
@@ -336,53 +331,48 @@ bool BackupRestore::ReplaceUserFiles()
 {
     /* replace existing files that have respective backup files existing */
     const auto backupOSPath                  = purefs::dir::getBackupOSPath();
-    std::vector<vfs::DirectoryEntry> dirlist = vfs.listdir(backupOSPath.c_str());
-
-    if (dirlist.size() <= empty_dirlist_size) {
+    if (std::filesystem::is_directory(backupOSPath) && std::filesystem::is_empty(backupOSPath)) {
         LOG_INFO("ReplaceUserFiles: dir emtpy, nothing to restore, quitting...");
         return false;
     }
-
-    LOG_INFO("ReplaceUserFiles: dir listed with %lu files", dirlist.size() - empty_dirlist_size);
-
     std::string userFilePath = purefs::dir::getUserDiskPath();
     userFilePath += "/";
 
     std::string backupFilePath = purefs::dir::getBackupOSPath();
     backupFilePath += "/";
 
-    for (auto &direntry : dirlist) {
-        if ((direntry.fileName.compare(".") != 0) && (direntry.fileName.compare("..") != 0) &&
-            (direntry.fileName.compare("...") != 0)) {
-            LOG_INFO("ReplaceUserFiles: restoring backup file %s...", direntry.fileName.c_str());
+    for (auto &direntry : std::filesystem::directory_iterator(backupOSPath.c_str())) {
+        if ((direntry.path().compare(".") != 0) && (direntry.path().compare("..") != 0) &&
+            (direntry.path().compare("...") != 0)) {
+            LOG_INFO("ReplaceUserFiles: restoring backup file %s...", direntry.path().c_str());
 
-            if (vfs.fileExists((userFilePath + direntry.fileName).c_str())) {
-                if (vfs.remove((userFilePath + direntry.fileName).c_str()) == 0) {
-                    if (vfs.rename((backupFilePath + direntry.fileName).c_str(),
-                                   (userFilePath + direntry.fileName).c_str()) == 0) {
-                        LOG_INFO("ReplaceUserFiles: restoring backup file %s succeeded", direntry.fileName.c_str());
+            if (std::filesystem::exists((userFilePath + direntry.path().string()))) {
+                if (std::filesystem::remove((userFilePath + direntry.path().string()))) {
+                    try {
+                        std::filesystem::rename(backupFilePath + direntry.path().string(),
+                                                userFilePath + direntry.path().string());
+                        LOG_INFO("ReplaceUserFiles: restoring backup file %s succeeded", direntry.path().c_str());
                     }
-                    else {
+                    catch (const std::exception &e) {
                         LOG_ERROR("ReplaceUserFiles: restoring backup file %s failed on error %s",
-                                  direntry.fileName.c_str(),
-                                  vfs.lastErrnoToStr().c_str());
+                                  direntry.path().c_str(),
+                                  e.what());
                     }
                 }
                 else {
-                    LOG_ERROR("ReplaceUserFiles: restoring backup file %s failed on error %s",
-                              direntry.fileName.c_str(),
-                              vfs.lastErrnoToStr().c_str());
+                    LOG_ERROR("ReplaceUserFiles: restoring backup file %s", direntry.path().c_str());
                 }
             }
             else {
-                if (vfs.rename((backupFilePath + direntry.fileName).c_str(),
-                               (userFilePath + direntry.fileName).c_str()) == 0) {
-                    LOG_INFO("ReplaceUserFiles: restoring backup file %s succeeded", direntry.fileName.c_str());
+                try {
+                    std::filesystem::rename(backupFilePath + direntry.path().string(),
+                                            userFilePath + direntry.path().string());
+                    LOG_INFO("ReplaceUserFiles: restoring backup file %s succeeded", direntry.path().c_str());
                 }
-                else {
+                catch (const std::filesystem::filesystem_error &e) {
                     LOG_ERROR("ReplaceUserFiles: restoring backup file %s failed on error %s",
-                              direntry.fileName.c_str(),
-                              vfs.lastErrnoToStr().c_str());
+                              direntry.path().c_str(),
+                              e.what());
                 }
             }
         }

@@ -109,11 +109,11 @@ namespace FileIndexer
             std::unique_ptr<std::string> directory;
         };
 
-        class FileChanged : public FileIndexerMessage
+        class DirectoryContentChangedMessage : public FileIndexerMessage
         {
           public:
-            FileChanged() = default;
-            explicit FileChanged(std::unique_ptr<std::string> dir) : directory(std::move(dir))
+            DirectoryContentChangedMessage() = default;
+            explicit DirectoryContentChangedMessage(std::unique_ptr<std::string> dir) : directory(std::move(dir))
             {}
 
             std::unique_ptr<std::string> directory;
@@ -192,6 +192,47 @@ namespace FileIndexer
                 : sys::ResponseMessage(code), record(std::move(record))
             {}
             std::unique_ptr<FileRecord> record;
+        };
+
+        class DeleteRecordMessage : public RecordMessage
+        {
+          public:
+            DeleteRecordMessage() = default;
+            DeleteRecordMessage(std::unique_ptr<FileRecord> record) : RecordMessage(std::move(record))
+            {}
+        };
+
+        class DeleteFileMessage : public RecordMessage
+        {
+          public:
+            DeleteFileMessage() = default;
+            DeleteFileMessage(std::unique_ptr<FileRecord> record) : RecordMessage(std::move(record))
+            {}
+        };
+
+        class DeleteAllFilesInDirMessage : public RecordMessage
+        {
+          public:
+            DeleteAllFilesInDirMessage() = default;
+            DeleteAllFilesInDirMessage(std::unique_ptr<FileRecord> record) : RecordMessage(std::move(record))
+            {}
+        };
+
+        class FileDeletedMessage : public RecordMessage
+        {
+          public:
+            FileDeletedMessage() = default;
+            explicit FileDeletedMessage(std::unique_ptr<FileRecord> record) : RecordMessage(std::move(record))
+            {}
+        };
+
+        class AllFilesInDirDeletedDeletedMessage : public RecordMessage
+        {
+          public:
+            AllFilesInDirDeletedDeletedMessage() = default;
+            explicit AllFilesInDirDeletedDeletedMessage(std::unique_ptr<FileRecord> record)
+                : RecordMessage(std::move(record))
+            {}
         };
 
         /// Property manipulation

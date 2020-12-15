@@ -65,11 +65,11 @@ class CellularNotificationMessage : public CellularMessage
         NetworkStatusUpdate,      // update of the status of the network
         PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and
                                   // cold start)
-        SIM,                      // change on SIM from URC
+        SIM_READY,                // change on SIM from URC
+        SIM_NOT_READY,            // change to not existing/not valid SIM
         RawCommand,               // send raw command to modem -> returns raw, tokenised result
         PowerDownDeregistering,   // modem informed it has started to disconnect from network
         PowerDownDeregistered,    // modem informed it has disconnected from network
-        NewIncomingUSSD,          // modem received new ussd code from network
         SMSDone,                  // SMS initialization finished
     };
 

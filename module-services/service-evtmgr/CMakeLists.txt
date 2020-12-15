@@ -7,6 +7,8 @@ set(SOURCES
         alarm/EventManagerAlarm.cpp
         api/EventManagerServiceAPI.cpp
         messages/Message.cpp
+        screen-light-control/ScreenLightControl.cpp
+        screen-light-control/ControlFunctions.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
@@ -28,3 +30,6 @@ target_link_libraries(${PROJECT_NAME}
 
 )
 
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif ()

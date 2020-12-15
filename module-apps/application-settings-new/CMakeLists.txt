@@ -15,6 +15,7 @@ target_sources( ${PROJECT_NAME}
 
     PRIVATE
         ApplicationSettings.cpp
+        widgets/timeWidget.cpp
         windows/SettingsMainWindow.cpp
         windows/AddDeviceWindow.cpp
         windows/AllDevicesWindow.cpp
@@ -28,6 +29,7 @@ target_sources( ${PROJECT_NAME}
         windows/DisplayAndKeypadWindow.cpp
         windows/AppsAndToolsWindow.cpp
         windows/NetworkWindow.cpp
+        windows/NightshiftWindow.cpp
         windows/MessagesWindow.cpp
         windows/PhoneNameWindow.cpp
         windows/AutolockWindow.cpp

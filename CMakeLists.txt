@@ -280,6 +280,11 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
         )
 endif()
 
+add_custom_target(ecoboot.bin 
+    COMMAND ${CMAKE_SOURCE_DIR}/tools/download_asset.py -w ${CMAKE_BINARY_DIR}/update ecoboot download
+    BYPRODUCTS update/ecoboot.bin
+    )
+
 message_serial_status()
 
 option (BUILD_DOC_WITH_ALL "Build documentation" OFF)

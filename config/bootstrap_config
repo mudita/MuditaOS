@@ -48,6 +48,10 @@ INSTALL_PACKAGES="
         vim \
         wget \
         python3-magic \
-        python3-pip
+        python3-pip \
+        libfdisk-dev \
+        python3-requests \
+        libfuse-dev \
+        libblkid-dev 
 "
 

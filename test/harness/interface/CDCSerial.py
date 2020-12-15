@@ -23,6 +23,7 @@ class CDCSerial:
     def __init__(self, port_name, timeout=10):
         self.timeout = timeout
         self.body = ""
+        self.header_length = 10
         while timeout != 0:
             try:
                 self.serial = serial.Serial(port_name, baudrate=115200, timeout=10)
@@ -59,13 +60,15 @@ class CDCSerial:
         json_dump = json.dumps(json_data)
         return "#%09d%s" % (len(json_dump), json_dump)
 
-    def write(self, msg, timeout=10):
+    def write(self, msg, timeout=30):
         message = self.__build_message(msg)
+        log.info(message)
         self.serial.write(message.encode())
-
-        header = self.serial.read(timeout).decode()
+        self.serial.timeout = timeout
+        header = self.serial.read(self.header_length).decode()
         payload_length = int(header[1:])
         result = self.serial.read(payload_length).decode()
+        log.info(f"received length: {len(result)}, payload length:{payload_length}")
         return json.loads(result)
 
     def send_key(self, key_code, key_type=Keytype.short_press, wait=10):

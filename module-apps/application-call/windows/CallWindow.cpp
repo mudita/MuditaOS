@@ -6,7 +6,7 @@
 
 #include "GuiTimer.hpp"
 #include "InputEvent.hpp"
-#include "application-call/widgets/Icons.hpp"
+#include "application-call/widgets/StateIcons.hpp"
 #include "log/log.hpp"
 #include "service-appmgr/Controller.hpp"
 
