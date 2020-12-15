@@ -7,8 +7,11 @@
 
 #include <AppWindow.hpp>
 #include <Text.hpp>
-#include <functional>
 #include <DialogMetadata.hpp>
+#include <service-appmgr/data/MmiActionsParams.hpp>
+
+#include <functional>
+#include <map>
 
 namespace gui
 {
@@ -17,6 +20,7 @@ namespace gui
       public:
         MmiInternalMsgWindow(app::Application *app, const std::string &name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void handleInternalMessages(mmiactions::MMIResultParams *metadata);
     };
 
 }; // namespace gui
