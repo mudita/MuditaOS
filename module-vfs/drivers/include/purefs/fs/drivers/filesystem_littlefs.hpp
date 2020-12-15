@@ -13,13 +13,11 @@ namespace purefs::fs::drivers
     class filesystem_littlefs final : public filesystem_operations
     {
       public:
-        using fsfile                                       = std::shared_ptr<internal::file_handle>;
-        using fsdir                                        = std::shared_ptr<internal::directory_handle>;
-        using fsmount                                      = std::shared_ptr<internal::mount_point>;
-        filesystem_littlefs()                              = default;
-        filesystem_littlefs(const filesystem_operations &) = delete;
-        virtual ~filesystem_littlefs()                     = default;
-        auto operator=(const filesystem_operations &) = delete;
+        using fsfile                   = std::shared_ptr<internal::file_handle>;
+        using fsdir                    = std::shared_ptr<internal::directory_handle>;
+        using fsmount                  = std::shared_ptr<internal::mount_point>;
+        filesystem_littlefs()          = default;
+        virtual ~filesystem_littlefs() = default;
         /** Allocate mount point class specify to the VFS
          * @return Allocated mount point structure
          */
