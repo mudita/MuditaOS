@@ -549,23 +549,21 @@ class CellularMMIResult : public CellularMessage
   protected:
     app::manager::actions::MMIResultParams params;
 
-    CellularMMIResult(app::manager::actions::MMIResultParams::MMIResult result)
-        : CellularMessage(MessageType::CellularMMIData), params(result)
-    {}
-    CellularMMIResult(std::shared_ptr<app::manager::actions::IMMICustomResultParams> &result)
-        : CellularMessage(MessageType::CellularMMIData), params(result)
+    explicit CellularMMIResult(app::manager::actions::MMIResultParams::MMIResult result,
+                               std::shared_ptr<app::manager::actions::MMICustomResultParams> customResult = nullptr)
+        : CellularMessage(MessageType::CellularMMIData), params(result, std::move(customResult))
     {}
 };
 
 class CellularMMIResultMessage : public CellularMMIResult, public app::manager::actions::ConvertibleToAction
 {
   public:
-    CellularMMIResultMessage(app::manager::actions::MMIResultParams::MMIResult result) : CellularMMIResult(result)
+    explicit CellularMMIResultMessage(
+        app::manager::actions::MMIResultParams::MMIResult result,
+        std::shared_ptr<app::manager::actions::MMICustomResultParams> customResult = nullptr)
+        : CellularMMIResult(result, std::move(customResult))
     {}
 
-    CellularMMIResultMessage(std::shared_ptr<app::manager::actions::IMMICustomResultParams> &result)
-        : CellularMMIResult(result)
-    {}
 
     [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
     {
