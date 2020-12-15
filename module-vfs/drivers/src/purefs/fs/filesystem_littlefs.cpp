@@ -103,9 +103,13 @@ namespace
         st.st_mode    = translate_attrib_to_st_mode(fs.type);
     }
 
-    void setup_lfs_config(lfs_config *cfg)
+    [[gnu::nonnull(1)]] void setup_lfs_config(lfs_config *cfg)
     {
-        // TODO: LFS config default parameters
+        cfg->block_cycles   = 512;
+        cfg->block_size     = 0; // Read later from superblock
+        cfg->block_count    = 0; // Read later from super block
+        cfg->cache_size     = 32768;
+        cfg->lookahead_size = 8192;
     }
 } // namespace
 
