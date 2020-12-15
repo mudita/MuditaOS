@@ -37,8 +37,6 @@ namespace purefs::fs::drivers
         auto seek(fsfile zfile, off_t pos, int dir) noexcept -> off_t override;
         auto fstat(fsfile zfile, struct stat &st) noexcept -> int override;
         auto stat(fsmount mnt, std::string_view file, struct stat &st) noexcept -> int override;
-        auto link(fsmount mnt, std::string_view existing, std::string_view newlink) noexcept -> int override;
-        auto symlink(fsmount mnt, std::string_view existing, std::string_view newlink) noexcept -> int override;
         auto unlink(fsmount mnt, std::string_view name) noexcept -> int override;
         auto rename(fsmount mnt, std::string_view oldname, std::string_view newname) noexcept -> int override;
         auto mkdir(fsmount mnt, std::string_view path, int mode) noexcept -> int override;
@@ -52,13 +50,7 @@ namespace purefs::fs::drivers
         /** Other fops API */
         auto ftruncate(fsfile zfile, off_t len) noexcept -> int override;
         auto fsync(fsfile zfile) noexcept -> int override;
-        auto ioctl(fsmount mnt, std::string_view path, int cmd, void *arg) noexcept -> int override;
-        auto utimens(fsmount mnt, std::string_view path, std::array<timespec, 2> &tv) noexcept -> int override;
-        auto flock(fsfile zfile, int cmd) noexcept -> int;
         auto isatty(fsfile zfile) noexcept -> int override;
-
-        auto chmod(fsmount mnt, std::string_view path, mode_t mode) noexcept -> int override;
-        auto fchmod(fsfile zfile, mode_t mode) noexcept -> int override;
 
       private:
         mutable cpp_freertos::MutexRecursive m_lock;
