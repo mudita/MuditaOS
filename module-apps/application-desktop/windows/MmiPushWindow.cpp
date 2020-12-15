@@ -22,7 +22,7 @@ namespace style::desktop
         constexpr uint32_t x = 40;
         constexpr uint32_t y = 300;
         constexpr uint32_t w = 400;
-        constexpr uint32_t h = 135;
+        constexpr uint32_t h = 300;
     } // namespace text
 
 } // namespace style::desktop
