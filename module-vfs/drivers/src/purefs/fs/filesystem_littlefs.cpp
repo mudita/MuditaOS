@@ -11,14 +11,15 @@
 #include <sys/statvfs.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <cstring>
+#include <sys/stat.h>
 
 /** NOTE: LITTLEFS is not thread safe like ELM FAT, so it will require global fs mutex lock :(
  */
 
 namespace
 {
-
-    static int lfs_to_errno(int error)
+    template <typename T> auto lfs_to_errno(T error) -> T
     {
         if (error >= 0) {
             return error;
@@ -75,6 +76,31 @@ namespace
             lfs_mode |= LFS_O_EXCL;
         return lfs_mode;
     }
+
+    auto translate_attrib_to_st_mode(uint8_t type)
+    {
+
+        decltype(static_cast<struct stat *>(nullptr)->st_mode) mode =
+            S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH;
+        if (type == LFS_TYPE_REG) {
+            mode |= (S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH);
+        }
+        else if (type == LFS_TYPE_DIR) {
+            mode |= S_IFREG;
+        }
+        return mode;
+    }
+
+    void translate_lfsinfo_to_stat(const ::lfs_info &fs, const lfs_config &cfg, struct stat &st)
+    {
+        std::memset(&st, 0, sizeof st);
+        st.st_nlink   = 1;
+        st.st_size    = fs.size;
+        st.st_blksize = cfg.block_size;
+        st.st_blocks  = fs.size / cfg.block_count;
+        st.st_mode    = translate_attrib_to_st_mode(fs.type);
+    }
+
     void setup_lfs_config(lfs_config *cfg)
     {
         // TODO: LFS config default parameters
@@ -83,6 +109,70 @@ namespace
 
 namespace purefs::fs::drivers
 {
+    namespace
+    {
+        template <typename T, typename... Args>
+        auto invoke_lfs(cpp_freertos::MutexRecursive &mtx, filesystem_littlefs::fsfile zfil, T lfs_fun, Args &&... args)
+            -> decltype(lfs_fun(nullptr, nullptr, std::forward<Args>(args)...))
+        {
+            auto vfile = std::dynamic_pointer_cast<file_handle_littlefs>(zfil);
+            if (!vfile) {
+                LOG_ERROR("Non LITTLEFS filesystem file pointer");
+                return -EBADF;
+            }
+            auto mntp = std::static_pointer_cast<mount_point_littlefs>(vfile->mntpoint());
+            if (!mntp) {
+                LOG_ERROR("Non LITTLEFS mount point");
+                return -EBADF;
+            }
+            decltype(lfs_fun(nullptr, nullptr, std::forward<Args>(args)...)) lerr;
+            {
+                cpp_freertos::LockGuard _lck(mtx);
+                lerr = lfs_fun(mntp->lfs_mount(), vfile->lfs_filp(), std::forward<Args>(args)...);
+            }
+            return lfs_to_errno(lerr);
+        }
+
+        template <typename T, typename... Args>
+        auto invoke_lfs(cpp_freertos::MutexRecursive &mtx,
+                        filesystem_littlefs::fsmount fmnt,
+                        T lfs_fun,
+                        Args &&... args) -> decltype(lfs_fun(nullptr, std::forward<Args>(args)...))
+        {
+            auto mntp = std::static_pointer_cast<mount_point_littlefs>(fmnt);
+            if (!mntp) {
+                LOG_ERROR("Non LITTLEFS mount point");
+                return -EBADF;
+            }
+            decltype(lfs_fun(nullptr, std::forward<Args>(args)...)) lerr;
+            {
+                cpp_freertos::LockGuard _lck(mtx);
+                lerr = lfs_fun(mntp->lfs_mount(), std::forward<Args>(args)...);
+            }
+            return lfs_to_errno(lerr);
+        }
+
+        template <typename T, typename... Args>
+        auto invoke_lfs(cpp_freertos::MutexRecursive &mtx,
+                        filesystem_littlefs::fsmount fmnt,
+                        std::string_view path,
+                        T lfs_fun,
+                        Args &&... args) -> decltype(lfs_fun(nullptr, "", std::forward<Args>(args)...))
+        {
+            auto mntp = std::static_pointer_cast<mount_point_littlefs>(fmnt);
+            if (!mntp) {
+                LOG_ERROR("Non LITTLEFS mount point");
+                return -EBADF;
+            }
+            decltype(lfs_fun(nullptr, "", std::forward<Args>(args)...)) lerr;
+            const auto native_path = mntp->native_path(path);
+            {
+                cpp_freertos::LockGuard _lck(mtx);
+                lerr = lfs_fun(mntp->lfs_mount(), native_path.c_str(), std::forward<Args>(args)...);
+            }
+            return lfs_to_errno(lerr);
+        }
+    } // namespace
 
     auto filesystem_littlefs::mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh,
                                              std::string_view path,
@@ -171,7 +261,7 @@ namespace purefs::fs::drivers
         }
         const auto fspath = vmnt->native_path(path);
         const auto fsflag = translate_flags(mode);
-        auto filep        = std::make_shared<file_handle_littlefs>(mnt, flags);
+        auto filep        = std::make_shared<file_handle_littlefs>(mnt, fspath, flags);
         int lerr;
         {
             cpp_freertos::LockGuard _lck(m_lock);
@@ -183,82 +273,93 @@ namespace purefs::fs::drivers
 
     auto filesystem_littlefs::close(fsfile zfile) noexcept -> int
     {
-        auto vfile = std::dynamic_pointer_cast<file_handle_littlefs>(zfile);
-        if (!vfile) {
-            LOG_ERROR("Non LITTLEFS filesystem file pointer");
-            return -EBADF;
-        }
-        auto mntp = std::static_pointer_cast<mount_point_littlefs>(vfile->mntpoint());
-        if (!mntp) {
-            LOG_ERROR("Non LITTLEFS mount point");
-            return -EBADF;
-        }
-        int lerr;
-        {
-            cpp_freertos::LockGuard _lck(m_lock);
-            lerr = lfs_file_close(mntp->lfs_mount(), vfile->lfs_filp());
-        }
-        return lfs_to_errno(lerr);
+        return invoke_lfs(m_lock, zfile, ::lfs_file_close);
     }
 
     auto filesystem_littlefs::write(fsfile zfile, const char *ptr, size_t len) noexcept -> ssize_t
     {
-        auto vfile = std::dynamic_pointer_cast<file_handle_littlefs>(zfile);
-        if (!vfile) {
-            LOG_ERROR("Non LITTLEFS filesystem file pointer");
-            return -EBADF;
-        }
-        auto mntp = std::static_pointer_cast<mount_point_littlefs>(vfile->mntpoint());
-        if (!mntp) {
-            LOG_ERROR("Non LITTLEFS mount point");
-            return -EBADF;
-        }
-        int lerr;
-        {
-            cpp_freertos::LockGuard _lck(m_lock);
-            lerr = lfs_file_write(mntp->lfs_mount(), vfile->lfs_filp(), ptr, len);
-        }
-        return lfs_to_errno(lerr);
+        return invoke_lfs(m_lock, zfile, ::lfs_file_write, ptr, len);
     }
 
     auto filesystem_littlefs::read(fsfile zfile, char *ptr, size_t len) noexcept -> ssize_t
     {
-        auto vfile = std::dynamic_pointer_cast<file_handle_littlefs>(zfile);
-        if (!vfile) {
-            LOG_ERROR("Non LITTLEFS filesystem file pointer");
-            return -EBADF;
-        }
-        auto mntp = std::static_pointer_cast<mount_point_littlefs>(vfile->mntpoint());
-        if (!mntp) {
-            LOG_ERROR("Non LITTLEFS mount point");
-            return -EBADF;
-        }
-        int lerr;
-        {
-            cpp_freertos::LockGuard _lck(m_lock);
-            lerr = lfs_file_read(mntp->lfs_mount(), vfile->lfs_filp(), ptr, len);
-        }
-        return lfs_to_errno(lerr);
+        return invoke_lfs(m_lock, zfile, ::lfs_file_read, ptr, len);
     }
 
     auto filesystem_littlefs::seek(fsfile zfile, off_t pos, int dir) noexcept -> off_t
+    {
+        return invoke_lfs(m_lock, zfile, ::lfs_file_seek, pos, dir);
+    }
+
+    auto filesystem_littlefs::fstat(fsfile zfile, struct stat &st) noexcept -> int
     {
         auto vfile = std::dynamic_pointer_cast<file_handle_littlefs>(zfile);
         if (!vfile) {
             LOG_ERROR("Non LITTLEFS filesystem file pointer");
             return -EBADF;
         }
-        auto mntp = std::static_pointer_cast<mount_point_littlefs>(vfile->mntpoint());
+        ::lfs_info linfo;
+        const auto path = vfile->open_path();
+        const auto err  = invoke_lfs(m_lock, zfile->mntpoint(), ::lfs_stat, path.c_str(), &linfo);
+        if (!err) {
+            auto vmnt = std::static_pointer_cast<mount_point_littlefs>(vfile->mntpoint());
+            translate_lfsinfo_to_stat(linfo, *vmnt->lfs_config(), st);
+        }
+        return err;
+    }
+
+    auto filesystem_littlefs::stat(fsmount mnt, std::string_view file, struct stat &st) noexcept -> int
+    {
+        ::lfs_info linfo;
+        const auto err = invoke_lfs(m_lock, mnt, file, ::lfs_stat, &linfo);
+        if (!err) {
+            auto mntp = std::static_pointer_cast<mount_point_littlefs>(mnt);
+            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), st);
+        }
+        return err;
+    }
+
+    auto filesystem_littlefs::unlink(fsmount mnt, std::string_view name) noexcept -> int
+    {
+        return invoke_lfs(m_lock, mnt, name, ::lfs_remove);
+    }
+
+    auto filesystem_littlefs::rename(fsmount mnt, std::string_view oldname, std::string_view newname) noexcept -> int
+    {
+        auto mntp = std::static_pointer_cast<mount_point_littlefs>(mnt);
         if (!mntp) {
             LOG_ERROR("Non LITTLEFS mount point");
             return -EBADF;
         }
+        const auto native_old = mntp->native_path(oldname);
+        const auto native_new = mntp->native_path(newname);
         int lerr;
         {
             cpp_freertos::LockGuard _lck(m_lock);
-            lerr = lfs_file_seek(mntp->lfs_mount(), vfile->lfs_filp(), pos, dir);
+            lerr = lfs_rename(mntp->lfs_mount(), native_old.c_str(), native_new.c_str());
         }
         return lfs_to_errno(lerr);
+    }
+
+    auto filesystem_littlefs::ftruncate(fsfile zfile, off_t len) noexcept -> int
+    {
+        return invoke_lfs(m_lock, zfile, ::lfs_file_truncate, len);
+    }
+
+    auto filesystem_littlefs::fsync(fsfile zfile) noexcept -> int
+    {
+        return invoke_lfs(m_lock, zfile, ::lfs_file_sync);
+    }
+
+    auto filesystem_littlefs::isatty(fsfile zfile) noexcept -> int
+    {
+        // NOTE: Handle littlefs is always not a tty
+        return 0;
+    }
+
+    auto filesystem_littlefs::mkdir(fsmount mnt, std::string_view path, int mode) noexcept -> int
+    {
+        return invoke_lfs(m_lock, mnt, path, ::lfs_mkdir);
     }
 
 } // namespace purefs::fs::drivers
