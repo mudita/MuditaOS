@@ -63,7 +63,7 @@ namespace sgui
         // semaphore used to protect commands vector while commands are taken from service to worker.
         SemaphoreHandle_t semCommands;
 
-        WorkerGUI *worker;
+        std::unique_ptr<WorkerGUI> worker;
 
         /**
          * Flag controls process of redrawing screen when suspend is in progress.

@@ -6,6 +6,8 @@
 #include <service-db/DatabaseAgent.hpp>
 #include <service-db/FileIndexerMessages.hpp>
 
+#include <set>
+
 class FileIndexerAgent : public DatabaseAgent
 {
   public:

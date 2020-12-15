@@ -69,6 +69,9 @@
 #include <ucs2/UCS2.hpp>
 #include <utf8/UTF8.hpp>
 
+#include <module-db/queries/messages/sms/QuerySMSUpdate.hpp>
+#include <module-db/queries/messages/sms/QuerySMSAdd.hpp>
+
 #include <algorithm>
 #include <bits/exception.h>
 #include <cassert>
@@ -1323,7 +1326,7 @@ bool ServiceCellular::sendSMS(SMSRecord record)
         LOG_INFO("SMS sending failed.");
         record.type = SMSType::FAILED;
     }
-    DBServiceAPI::SMSUpdate(this, record);
+    DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(record));
 
     channel->cmd(at::AT::SMS_GSM);
     return result;
@@ -1780,15 +1783,26 @@ SMSRecord ServiceCellular::createSMSRecord(const UTF8 &decodedMessage,
 
 bool ServiceCellular::dbAddSMSRecord(const SMSRecord &record)
 {
-    if (DBServiceAPI::SMSAdd(this, record) == DB_ID_NONE) {
-        return false;
-    }
+    auto query = std::make_unique<db::query::SMSAdd>(record);
+    query->setQueryListener(db::QueryCallback::fromFunction([this](auto response) {
+        auto result = dynamic_cast<db::query::SMSAddResult *>(response);
+        if (result == nullptr || !result->result) {
+            return false;
+        }
+
+        onSMSReceived();
+        return true;
+    }));
+    return DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::move(query));
+}
+
+void ServiceCellular::onSMSReceived()
+{
     DBServiceAPI::GetQuery(this,
                            db::Interface::Name::Notifications,
                            std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
     const std::string ringtone_path = "assets/audio/SMS-drum2.mp3";
     AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::TextMessageRingtone, ringtone_path);
-    return true;
 }
 
 bool ServiceCellular::handleListMessages(const at::AT &command, DLC_channel *channel)

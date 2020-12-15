@@ -79,10 +79,13 @@ namespace sys
     void Service::Run()
     {
         while (enableRunLoop) {
-            auto msg           = mailbox.pop();
-            uint32_t timestamp = cpp_freertos::Ticks::GetTicks();
+            auto msg = mailbox.pop();
+            if (!msg) {
+                continue;
+            }
 
             // Remove all staled messages
+            uint32_t timestamp = cpp_freertos::Ticks::GetTicks();
             staleUniqueMsg.erase(std::remove_if(staleUniqueMsg.begin(),
                                                 staleUniqueMsg.end(),
                                                 [&](const auto &id) {

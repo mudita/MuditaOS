@@ -139,7 +139,7 @@ std::vector<NotesTableRow> NotesTable::getByText(const std::string &text)
 std::uint32_t NotesTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM notes;");
-    if (queryRet->getRowCount() == 0) {
+    if (!queryRet || queryRet->getRowCount() == 0) {
         return 0;
     }
     return (*queryRet)[0].getUInt32();
