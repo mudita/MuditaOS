@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.12)
 include(thirdparty)
-include(thirdparty/littlefs.cmake)
+
 
 project(module-vfs VERSION 1.0
         DESCRIPTION "VFS module library")
+
+add_subdirectory(thirdparty/lfsfs)
 
 set(FREERTOS_FAT_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/board/freeRTOS_FAT/ff_crc.c
