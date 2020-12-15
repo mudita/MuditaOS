@@ -5,6 +5,7 @@
 #include <purefs/fs/drivers/mount_point_littlefs.hpp>
 #include <littlefs/volume_mapper.hpp>
 #include <purefs/fs/drivers/file_handle_littlefs.hpp>
+#include <purefs/fs/drivers/directory_handle_littlefs.hpp>
 #include <lfs.h>
 #include <log/log.hpp>
 
@@ -130,6 +131,27 @@ namespace purefs::fs::drivers
             {
                 cpp_freertos::LockGuard _lck(mtx);
                 lerr = lfs_fun(mntp->lfs_mount(), vfile->lfs_filp(), std::forward<Args>(args)...);
+            }
+            return lfs_to_errno(lerr);
+        }
+        template <typename T, typename... Args>
+        auto invoke_lfs(cpp_freertos::MutexRecursive &mtx, filesystem_littlefs::fsdir zdir, T lfs_fun, Args &&... args)
+            -> decltype(lfs_fun(nullptr, nullptr, std::forward<Args>(args)...))
+        {
+            auto vdir = std::dynamic_pointer_cast<directory_handle_littlefs>(zdir);
+            if (!vdir) {
+                LOG_ERROR("Non LITTLEFS filesystem directory pointer");
+                return -EBADF;
+            }
+            auto mntp = std::static_pointer_cast<mount_point_littlefs>(vdir->mntpoint());
+            if (!mntp) {
+                LOG_ERROR("Non LITTLEFS mount point");
+                return -EBADF;
+            }
+            decltype(lfs_fun(nullptr, nullptr, std::forward<Args>(args)...)) lerr;
+            {
+                cpp_freertos::LockGuard _lck(mtx);
+                lerr = lfs_fun(mntp->lfs_mount(), vdir->lfs_dirp(), std::forward<Args>(args)...);
             }
             return lfs_to_errno(lerr);
         }
@@ -364,6 +386,68 @@ namespace purefs::fs::drivers
     auto filesystem_littlefs::mkdir(fsmount mnt, std::string_view path, int mode) noexcept -> int
     {
         return invoke_lfs(m_lock, mnt, path, ::lfs_mkdir);
+    }
+
+    auto filesystem_littlefs::diropen(fsmount mnt, std::string_view path) noexcept -> fsdir
+    {
+        auto vmnt = std::dynamic_pointer_cast<mount_point_littlefs>(mnt);
+        if (!vmnt) {
+            LOG_ERROR("Non LFS mount point");
+            return nullptr;
+        }
+        const auto fspath = vmnt->native_path(path);
+        const auto dirp   = std::make_shared<directory_handle_littlefs>(mnt, 0);
+        const auto lret   = lfs_dir_open(vmnt->lfs_mount(), dirp->lfs_dirp(), fspath.c_str());
+        dirp->error(lfs_to_errno(lret));
+        return dirp;
+    }
+
+    auto filesystem_littlefs::dirreset(fsdir dirstate) noexcept -> int
+    {
+        return invoke_lfs(m_lock, dirstate, ::lfs_dir_rewind);
+    }
+
+    auto filesystem_littlefs::dirnext(fsdir dirstate, std::string &filename, struct stat &filestat) -> int
+    {
+        auto vdir = std::dynamic_pointer_cast<directory_handle_littlefs>(dirstate);
+        if (!vdir) {
+            LOG_ERROR("Non LITTLEFS filesystem directory pointer");
+            return -EBADF;
+        }
+        auto mntp = std::static_pointer_cast<mount_point_littlefs>(vdir->mntpoint());
+        if (!mntp) {
+            LOG_ERROR("Non LITTLEFS mount point");
+            return -EBADF;
+        }
+        int lerr;
+        ::lfs_info linfo;
+        {
+            cpp_freertos::LockGuard _lck(m_lock);
+            lerr = ::lfs_dir_read(mntp->lfs_mount(), vdir->lfs_dirp(), &linfo);
+            if (!lerr) {
+                const auto loffs = ::lfs_dir_tell(mntp->lfs_mount(), vdir->lfs_dirp());
+                if (loffs >= 0) {
+                    lerr = ::lfs_dir_seek(mntp->lfs_mount(), vdir->lfs_dirp(), loffs + 1);
+                }
+                else {
+                    lerr = loffs;
+                    LOG_ERROR("LFS unable to seek dir %i", lerr);
+                }
+            }
+            else {
+                LOG_ERROR("LFS unable to read dir %i", lerr);
+            }
+        }
+        if (!lerr) {
+            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), filestat);
+            filename = linfo.name;
+        }
+        return lfs_to_errno(lerr);
+    }
+
+    auto filesystem_littlefs::dirclose(fsdir dirstate) noexcept -> int
+    {
+        return invoke_lfs(m_lock, dirstate, ::lfs_dir_close);
     }
 
 } // namespace purefs::fs::drivers
