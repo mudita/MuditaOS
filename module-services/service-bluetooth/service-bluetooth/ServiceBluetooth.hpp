@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "BluetoothMessage.hpp"
 #include <Bluetooth/BluetoothWorker.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
@@ -31,6 +32,7 @@ class ServiceBluetooth : public sys::Service
   private:
     std::unique_ptr<BluetoothWorker> worker;
     std::unique_ptr<settings::Settings> settingsProvider;
+    BluetoothStatus btStatus; // will be replaced with settings storage introduced in [EGD-4579]
 
     void stateSettingChanged(std::string value);
     void deviceVisibilitySettingChanged(std::string value);
