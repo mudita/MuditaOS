@@ -37,6 +37,7 @@
 #include <tuple>
 #include <vector>
 #include <module-apps/messages/AppMessage.hpp>
+#include <SystemManager/messages/CpuFrequencyMessage.hpp>
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
@@ -98,10 +99,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         auto message = std::make_shared<sevm::KbdMessage>();
         message->key = msg->key;
 
-        if (suspended && (message->key.state == RawKey::State::Pressed)) {
-            suspended = false;
-            sys::SystemManager::ResumeSystem(this);
-        }
         if (message->key.state == RawKey::State::Pressed && message->key.key_code == bsp::KeyCodes::FnRight) {
             // and state == ShutDown
             sys::Bus::SendUnicast(message, service::name::system_manager, this);
@@ -126,11 +123,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
     else if (msgl->messageType == MessageType::EVMBatteryLevel && msgl->sender == this->GetName()) {
         auto *msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
 
-        if (suspended) {
-            suspended = false;
-            sys::SystemManager::ResumeSystem(this);
-        }
-
         auto message           = std::make_shared<sevm::BatteryLevelMessage>();
         message->levelPercents = msg->levelPercents;
         message->fullyCharged  = msg->fullyCharged;
@@ -143,11 +135,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
     }
     else if (msgl->messageType == MessageType::EVMChargerPlugged && msgl->sender == this->GetName()) {
         auto *msg = static_cast<sevm::BatteryPlugMessage *>(msgl);
-
-        if (suspended) {
-            suspended = false;
-            sys::SystemManager::ResumeSystem(this);
-        }
 
         auto message     = std::make_shared<sevm::BatteryPlugMessage>();
         message->plugged = msg->plugged;
@@ -162,12 +149,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         handled = true;
     }
     else if (msgl->messageType == MessageType::EVMMinuteUpdated && msgl->sender == this->GetName()) {
-
-        // resume system first
-        if (suspended) {
-            // suspended = false;
-            // sys::SystemManager::ResumeSystem(this);
-        }
 
         // HandleAlarmTrigger(msgl);
 
@@ -235,7 +216,8 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         }
     }
     else if (msgl->messageType == MessageType::EVMRingIndicator) {
-        sys::SystemManager::ResumeSystem(this);
+        auto msg = std::make_shared<sys::CpuFrequencyMessage>(sys::CpuFrequencyMessage::Action::Increase);
+        sys::Bus::SendUnicast(msg, service::name::system_manager, this);
     }
 
     if (handled) {
@@ -346,11 +328,8 @@ sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMod
 {
     LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %s", c_str(mode));
 
-    suspended = true;
-
     switch (mode) {
     case sys::ServicePowerMode ::Active:
-        suspended = false;
         break;
     case sys::ServicePowerMode ::SuspendToRAM:
     case sys::ServicePowerMode ::SuspendToNVM:

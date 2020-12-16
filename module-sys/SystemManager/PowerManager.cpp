@@ -7,7 +7,6 @@
 
 namespace sys
 {
-
     PowerManager::PowerManager()
     {
         lowPowerControl = bsp::LowPowerMode::Create().value_or(nullptr);
@@ -15,29 +14,6 @@ namespace sys
 
     PowerManager::~PowerManager()
     {}
-
-    int32_t PowerManager::Switch(const sys::PowerManager::Mode mode)
-    {
-
-        int32_t ret = 0;
-        switch (mode) {
-        case Mode::FullSpeed:
-            ret = lowPowerControl->Switch(bsp::LowPowerMode::Mode::FullSpeed);
-            break;
-        case Mode::LowPowerIdle:
-        case Mode::LowPowerRun:
-        case Mode::Suspend:
-            LOG_FATAL("LowPowerIdle temporary disabled!");
-            // Low power is temporary disabled it was breaking i.e. GSM
-            // ret = lowPowerControl->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
-            break;
-        }
-
-        if (ret == 0) {
-            currentPowerMode = mode;
-        }
-        return ret;
-    }
 
     int32_t PowerManager::PowerOff()
     {
@@ -49,9 +25,73 @@ namespace sys
         return lowPowerControl->Reboot();
     }
 
-    void PowerManager::SetCpuFrequency(const bsp::LowPowerMode::CpuFrequency freq)
+    void PowerManager::UpdateCpuFrequency(uint32_t cpuLoad)
     {
-        lowPowerControl->SetCpuFrequency(freq);
+        const auto freq = lowPowerControl->GetCurrentFrequency();
+
+        if (cpuLoad > frequencyShiftUpperThreshold && freq < bsp::LowPowerMode::CpuFrequency::Level_6) {
+            aboveThresholdCounter++;
+            belowThresholdCounter = 0;
+        }
+        else if (cpuLoad < frequencyShiftLowerThreshold && freq > bsp::LowPowerMode::CpuFrequency::Level_1) {
+            belowThresholdCounter++;
+            aboveThresholdCounter = 0;
+        }
+        else {
+            ResetFrequencyShiftCounter();
+        }
+
+        if (aboveThresholdCounter >= maxAboveThresholdCount) {
+            ResetFrequencyShiftCounter();
+            IncreaseCpuFrequency();
+        }
+        if (belowThresholdCounter >= maxBelowThresholdCount) {
+            ResetFrequencyShiftCounter();
+            DecreaseCpuFrequency();
+        }
     }
 
+    void PowerManager::IncreaseCpuFrequency() const
+    {
+        bsp::LowPowerMode::CpuFrequency freq = lowPowerControl->GetCurrentFrequency();
+        if (freq < bsp::LowPowerMode::CpuFrequency::Level_6) {
+            lowPowerControl->SetCpuFrequency(bsp::LowPowerMode::CpuFrequency::Level_6);
+        }
+    }
+
+    void PowerManager::DecreaseCpuFrequency() const
+    {
+        const auto freq = lowPowerControl->GetCurrentFrequency();
+        auto level      = bsp::LowPowerMode::CpuFrequency::Level_1;
+
+        switch (freq) {
+        case bsp::LowPowerMode::CpuFrequency::Level_6:
+            level = bsp::LowPowerMode::CpuFrequency::Level_5;
+            break;
+        case bsp::LowPowerMode::CpuFrequency::Level_5:
+            level = bsp::LowPowerMode::CpuFrequency::Level_4;
+            break;
+        case bsp::LowPowerMode::CpuFrequency::Level_4:
+            level = bsp::LowPowerMode::CpuFrequency::Level_3;
+            break;
+        case bsp::LowPowerMode::CpuFrequency::Level_3:
+            level = bsp::LowPowerMode::CpuFrequency::Level_2;
+            break;
+        case bsp::LowPowerMode::CpuFrequency::Level_2:
+            level = bsp::LowPowerMode::CpuFrequency::Level_1;
+            break;
+        case bsp::LowPowerMode::CpuFrequency::Level_1:
+            break;
+        }
+
+        if (level != freq) {
+            lowPowerControl->SetCpuFrequency(level);
+        }
+    }
+
+    void PowerManager::ResetFrequencyShiftCounter()
+    {
+        aboveThresholdCounter = 0;
+        belowThresholdCounter = 0;
+    }
 } // namespace sys

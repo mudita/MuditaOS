@@ -8,16 +8,7 @@ namespace bsp {
 
     class LowPowerMode
     {
-      private:
       public:
-        enum class Mode
-        {
-            FullSpeed,
-            LowPowerRun,
-            LowPowerIdle,
-            Suspend
-
-        };
         enum class CpuFrequency
         {
             Level_1, // 12 MHz
@@ -33,15 +24,13 @@ namespace bsp {
 
         static std::optional<std::unique_ptr<LowPowerMode>> Create();
 
-        virtual int32_t Switch(const Mode mode) = 0;
-        Mode GetCurrentMode(){return currentMode;}
-
         virtual int32_t PowerOff() = 0;
         virtual int32_t Reboot() = 0;
         virtual void SetCpuFrequency(CpuFrequency freq) = 0;
+        [[nodiscard]] CpuFrequency GetCurrentFrequency() const noexcept;
 
     protected:
-      Mode currentMode = Mode::FullSpeed;
+        CpuFrequency currentFrequency = CpuFrequency::Level_6;
     };
 } // namespace bsp
 
