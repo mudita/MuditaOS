@@ -61,6 +61,12 @@ namespace bsp
     void battery_getChargeStatus(bool &status)
     {
         status = plugged;
+        if (status) {
+            Store::Battery::modify().state = Store::Battery::State::Charging;
+        }
+        else {
+            Store::Battery::modify().state = Store::Battery::State::Discharging;
+        }
     }
 
     // TODO function unused in linux driver, left for compatibility with target driver
