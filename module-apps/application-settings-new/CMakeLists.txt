@@ -37,6 +37,7 @@ target_sources( ${PROJECT_NAME}
         windows/WallpaperWindow.cpp
         windows/QuotesMainWindow.cpp
         windows/QuotesAddWindow.cpp
+        windows/SecurityMainWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
