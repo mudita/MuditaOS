@@ -28,6 +28,7 @@
 #include <service-audio/AudioMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <SystemManager/SystemManager.hpp>
 
 extern "C"
 {
@@ -97,6 +98,10 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             message->levelPercents = battLevel;
             message->fullyCharged  = false;
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
+            if (bsp::battery_isLevelCritical(battLevel)) {
+                auto levelCriticalMessage = std::make_shared<sevm::BatteryLevelCriticalMessage>();
+                sys::Bus::SendUnicast(levelCriticalMessage, service::name::system_manager, this->service);
+            }
         }
         if (notification & static_cast<uint8_t>(bsp::batteryIRQSource::INOKB)) {
             bool status;

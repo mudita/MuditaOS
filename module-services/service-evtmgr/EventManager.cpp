@@ -20,6 +20,7 @@
 #include <bsp/magnetometer/magnetometer.hpp>
 #include <bsp/rtc/rtc.hpp>
 #include <bsp/torch/torch.hpp>
+#include <bsp/battery-charger/battery_charger.hpp>
 #include <common_data/RawKey.hpp>
 #include <log/log.hpp>
 #include <module-utils/time/time_conversion.hpp>
@@ -282,6 +283,12 @@ sys::ReturnCodes EventManager::InitHandler()
     connect(sevm::ScreenLightControlMessage(sevm::screen_light_control::Action::turnOff), [&](sys::Message *msgl) {
         auto request = static_cast<sevm::ScreenLightControlMessage *>(msgl);
         sevm::screen_light_control::processRequest(request->action, request->parameters);
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sevm::BatterySetCriticalLevel(0), [&](sys::Message *msgl) {
+        auto request = static_cast<sevm::BatterySetCriticalLevel *>(msgl);
+        bsp::battery_setCriticalLevel(request->criticalLevel);
         return std::make_shared<sys::ResponseMessage>();
     });
 
