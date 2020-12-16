@@ -39,8 +39,6 @@ class EventManager : public sys::Service
     bool alarmDBEmpty = false;
     // flag set when there is alarm to handle
     bool alarmIsValid = false;
-    // flag informs about suspend/resume status
-    bool suspended = false;
 
   public:
     EventManager(const std::string &name);

@@ -326,8 +326,6 @@ namespace app::manager
     auto ApplicationManager::handlePowerSavingModeInit() -> bool
     {
         LOG_INFO("Going to suspend mode");
-        suspendSystemServices();
-        sys::SystemManager::SuspendSystem(this);
         return true;
     }
 
