@@ -10,6 +10,7 @@
 * `[cellular]`  Add GUI for Custom MMI messages- call forwarding.
 * Add Bluetooth virtual audio device.
 * Add custom repeat window for the alarm application
+* `[PowerManagement]` Add CPU frequency shift mechanism.
 
 ### Fixed
 

@@ -10,12 +10,6 @@
 namespace bsp
 {
 
-    int32_t LinuxLPM::Switch(const bsp::LowPowerMode::Mode mode)
-    {
-        currentMode = mode;
-        return 0;
-    }
-
     int32_t LinuxLPM::PowerOff()
     {
         return 0;
@@ -27,5 +21,7 @@ namespace bsp
     }
 
     void LinuxLPM::SetCpuFrequency(bsp::LowPowerMode::CpuFrequency freq)
-    {}
+    {
+        currentFrequency = freq;
+    }
 } // namespace bsp

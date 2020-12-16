@@ -13,7 +13,6 @@ namespace bsp
     class LinuxLPM : public LowPowerMode
     {
       public:
-        int32_t Switch(const Mode mode) override final;
         int32_t PowerOff() override final;
         int32_t Reboot() override final;
         void SetCpuFrequency(CpuFrequency freq) final;

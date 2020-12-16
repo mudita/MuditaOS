@@ -28,23 +28,6 @@ namespace bsp
         CpuFreq = std::make_unique<CpuFreqLPM>();
     }
 
-    int32_t RT1051LPM::Switch(const bsp::LowPowerMode::Mode mode)
-    {
-        currentMode = mode;
-        switch (mode) {
-        case Mode ::FullSpeed:
-            return EnterFullSpeed();
-        case Mode ::LowPowerRun:
-            return EnterLowPowerRun();
-        case Mode ::LowPowerIdle:
-            return EnterLowPowerIdle();
-        case Mode ::Suspend:
-            return EnterSuspend();
-        default:
-            return 0;
-        }
-    }
-
     int32_t RT1051LPM::PowerOff()
     {
         gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 0);
@@ -58,31 +41,9 @@ namespace bsp
         return 0;
     }
 
-    int32_t RT1051LPM::EnterFullSpeed()
-    {
-        LPM_EnterFullSpeed();
-        return 0;
-    }
-
-    int32_t RT1051LPM::EnterLowPowerRun()
-    {
-        LPM_EnterLowPowerRun();
-        return 0;
-    }
-
-    int32_t RT1051LPM::EnterLowPowerIdle()
-    {
-        LPM_EnterLowPowerIdle();
-        return 0;
-    }
-
-    int32_t RT1051LPM::EnterSuspend()
-    {
-        return 0;
-    }
-
     void RT1051LPM::SetCpuFrequency(bsp::LowPowerMode::CpuFrequency freq)
     {
+        currentFrequency = freq;
         switch (freq) {
         case bsp::LowPowerMode::CpuFrequency::Level_1:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_12_Mhz);

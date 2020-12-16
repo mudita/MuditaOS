@@ -148,13 +148,10 @@ namespace gui
         eventMgrLabel->activatedCallback = [=](gui::Item &item) {
             static bool state = false;
             if (state == false) {
-                // sys::SystemManager::DestroyService(ServiceCellular::serviceName,application);
-                sys::SystemManager::SuspendSystem(application);
                 LOG_INFO("SUSPEND SYSTEM");
                 state = true;
             }
             else {
-                sys::SystemManager::ResumeSystem(application);
                 LOG_INFO("RESUME SYSTEM");
                 state = false;
             }
