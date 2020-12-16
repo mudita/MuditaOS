@@ -3,23 +3,26 @@
 ## Current release
 
 ### Added
+
 * `[gui]` Added DOM dump capability for gui::Item objects
-* `[call functions]` Window for MMI/USSD internal messages.
-* `[alarms]` Added main window
-* `[alarms]` Added window with options
 * `[PowerManagement]` PowerManagement: Enable FreeRTOS Run Time Statistics
-* `[cellular]` USSD session handling.
-* `[settings]` Nightshift window - GUI.
-* `[bluetooth][settings]` Add Bluetooth settings to database.
 * `[PowerManagement]` Added CPU load measurement.
-* `[alarms]` Added new/edit alarm window
 * `[file indexer]` Support for deleting entries in File Indexer DB.
 * `[listview]` Added onEmpty list callbacks and implemented them for notes and messages. 
 * `[notes]` Added list rebuild on notifications.
 
+### Changed
+
+* `[PowerManagement]` Change hardware timers clock source
+* `[bluetooth]` Underlying communication with the Bluetooth module over DMA (direct access)
+* `[system]` Workers refactor and state transition fixes
+
+
+
 ## [0.50.1 2020-12-14]
 
 ### Added
+
 * Add window for MMI/USSD internal messages.
 * Add windows for the alarm application.
 * Add "nightshift" settings window.
@@ -37,9 +40,6 @@
 * Clock configuration changes.
 * Add power measurement features to the system.
 
-### Removed
-* `[utils]` Dump logs to a file on RT1051 after reaching 80% of log buffer utilization.
-
 ## [0.49.1 2020-12-04]
 
 ### Added
@@ -51,6 +51,8 @@
 * Add vertical text scrolling.
 * Add text cursor starting position handling.
 * Add logs dumping to a file on the RT1051 platform.
+* `[calendar]` Added calendar events endpoints handling.
+* `[calendar]` Added parser ics.
 
 ### Changed
 
@@ -62,6 +64,7 @@
 * Fix too many time options in the meditation application.
 * Fix default counter settings.
 * Fix displaying the special characters in a note title.
+* Fixed CUSD URC parser.
 
 ### Other
 
