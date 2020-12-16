@@ -99,7 +99,8 @@ namespace bsp{
 
 	enum class batteryIRQSource{
 		INTB = 0x01,
-		INOKB = 0x02
+		INOKB = 0x02,
+		checkCriticalLevel
 	};
 
 	int battery_Init(xQueueHandle qHandle);
