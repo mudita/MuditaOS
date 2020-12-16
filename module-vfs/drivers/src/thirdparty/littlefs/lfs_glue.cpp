@@ -77,8 +77,12 @@ namespace purefs::fs::drivers::littlefs::internal
                     LOG_ERROR("Partial offset not supported");
                     return LFS_ERR_IO;
                 }
-                const std::size_t lba_sz = (size * lfsc->block_size) / ctx->sector_size;
-                const auto err           = diskmm->read(ctx->disk_h, buffer, lba, lba_sz);
+                const std::size_t lba_sz = size / ctx->sector_size;
+                if (size % ctx->sector_size) {
+                    LOG_ERROR("Bounary read sz error");
+                    return LFS_ERR_IO;
+                }
+                const auto err = diskmm->read(ctx->disk_h, buffer, lba, lba_sz);
                 if (err) {
                     LOG_ERROR("Sector read error %i", err);
                 }
@@ -156,10 +160,6 @@ namespace purefs::fs::drivers::littlefs::internal
         if (sect_size < 0) {
             LOG_ERROR("Unable to get sector size %li", long(sect_size));
             return sect_size;
-        }
-        if (sect_size % lfsc->block_size || lfsc->block_size < sect_size) {
-            LOG_ERROR("Sector size doesn't match block size");
-            return -ERANGE;
         }
         auto ctx      = new lfs_io::io_context(diskmm, diskh, sect_size);
         lfsc->context = ctx;
