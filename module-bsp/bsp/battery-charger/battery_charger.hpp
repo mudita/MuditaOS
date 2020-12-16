@@ -8,6 +8,8 @@
 #ifndef MODULE_BSP_BSP_BATTERY_CHARGER_BATTERY_CHARGER_HPP_
 #define MODULE_BSP_BSP_BATTERY_CHARGER_BATTERY_CHARGER_HPP_
 
+#include <cstdint>
+
 namespace bsp{
 
 	enum class batteryChargerRegisters{
@@ -111,6 +113,10 @@ namespace bsp{
 	void battery_ClearAllIRQs(void);
 
 	void battery_clearFuelGuageIRQ(void);
+
+	void battery_setCriticalLevel(std::uint8_t level);
+
+	bool battery_isLevelCritical(std::uint8_t level);
 }
 
 BaseType_t BSP_BatteryChargerINOKB_IRQHandler();

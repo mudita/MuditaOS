@@ -29,4 +29,19 @@ namespace sevm
         }
         bool plugged = false;
     };
+    class BatterySetCriticalLevel : public Message
+    {
+      public:
+        BatterySetCriticalLevel(std::uint8_t level)
+            : Message(MessageType::EVMBatterySetCriticalLevel), criticalLevel(level)
+        {}
+        std::uint8_t criticalLevel = 0;
+    };
+
+    class BatteryLevelCriticalMessage : public Message
+    {
+      public:
+        BatteryLevelCriticalMessage() : Message(MessageType::EVMBatteryLevelCritical)
+        {}
+    };
 } // namespace sevm

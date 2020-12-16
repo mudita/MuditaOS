@@ -34,6 +34,10 @@ static uint8_t battLevel = 100;
 static bool plugged      = false;
 namespace bsp
 {
+    namespace
+    {
+        std::uint8_t batteryCriticalLevel = 10;
+    } // namespace
 
     static void battery_worker(void *pvp);
 
@@ -111,4 +115,15 @@ namespace bsp
             vTaskDelay(50);
         }
     }
+
+    void battery_setCriticalLevel(std::uint8_t level)
+    {
+        batteryCriticalLevel = level;
+    }
+
+    bool battery_isLevelCritical(std::uint8_t level)
+    {
+        return level <= batteryCriticalLevel;
+    }
+
 } // namespace bsp
