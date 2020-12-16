@@ -29,14 +29,7 @@ namespace app
         virtual void clearPin()               = 0;
     };
 
-    class LanguageSetter
-    {
-      public:
-        virtual ~LanguageSetter()                                    = default;
-        virtual void setDisplayLanguage(const std::string &language) = 0;
-    };
-
-    class ApplicationSettings : public app::Application, public SimSetter, public PinLockSetter, public LanguageSetter
+    class ApplicationSettings : public app::Application, public SimSetter, public PinLockSetter
     {
       public:
         ApplicationSettings(std::string name                    = name_settings,
@@ -58,15 +51,12 @@ namespace app
         void setSim(Store::GSM::SIM sim) override;
         void setPin(unsigned int pin) override;
         void clearPin() override;
-        void setDisplayLanguage(const std::string &language) override;
         void lockPassChanged(std::string value);
-        void displayLanguageChanged(std::string value);
         void timeDateChanged(std::string value);
 
       private:
         unsigned int lockPassHash;
         bool europeanDateTimeFormat = false; // true europe format, false american format
-        std::string displayLanguage;
     };
 
     template <> struct ManifestTraits<ApplicationSettings>
