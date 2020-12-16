@@ -48,6 +48,9 @@ namespace bsp
             return 1;
         }
         Store::Battery::modify().level = battLevel;
+
+        uint8_t notification = static_cast<uint8_t>(bsp::batteryIRQSource::checkCriticalLevel);
+        xQueueSend(qHandleIrq, &notification, 100);
         return 0;
     }
 
@@ -109,7 +112,6 @@ namespace bsp
                     if (battLevel >= 1)
                         battLevel--;
                     break;
-                }
                 xQueueSend(qHandleIrq, &notification, 100);
             }
             vTaskDelay(50);
@@ -119,6 +121,8 @@ namespace bsp
     void battery_setCriticalLevel(std::uint8_t level)
     {
         batteryCriticalLevel = level;
+        uint8_t notification = static_cast<uint8_t>(bsp::batteryIRQSource::checkCriticalLevel);
+        xQueueSend(qHandleIrq, &notification, 100);
     }
 
     bool battery_isLevelCritical(std::uint8_t level)
