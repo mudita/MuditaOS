@@ -36,7 +36,7 @@ namespace bsp
 {
     namespace
     {
-        std::uint8_t batteryCriticalLevel = 10;
+        std::uint8_t batteryCriticalLevel = 5;
     } // namespace
 
     static void battery_worker(void *pvp);
