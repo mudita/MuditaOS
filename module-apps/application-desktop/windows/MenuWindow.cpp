@@ -11,7 +11,7 @@
 #include <tools/Common.hpp>
 #include <Style.hpp>
 #include <cassert>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 namespace style::design
 {

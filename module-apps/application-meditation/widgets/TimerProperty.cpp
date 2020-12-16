@@ -3,7 +3,7 @@
 
 #include "TimerProperty.hpp"
 #include <application-meditation/data/Style.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <module-utils/Utils.hpp>
 
 using namespace gui;

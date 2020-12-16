@@ -9,8 +9,6 @@
 #include <gui/core/Context.hpp>
 #include <gui/core/Renderer.hpp>
 #include <gui/input/Translator.hpp>
-#include <queue.h>
-#include <semphr.h>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>

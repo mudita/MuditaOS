@@ -7,7 +7,7 @@
 #include <module-apps/application-notes/data/NotesFoundData.hpp>
 #include <module-apps/widgets/InputBox.hpp>
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 namespace app::notes
 {

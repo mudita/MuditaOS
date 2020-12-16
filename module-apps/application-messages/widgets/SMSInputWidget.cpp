@@ -7,7 +7,7 @@
 #include <module-apps/application-messages/ApplicationMessages.hpp>
 
 #include <Style.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <Font.hpp>
 #include <utility>
 #include <algorithm>

@@ -15,12 +15,10 @@ namespace gui
         static const uint32_t none_key; /// defaults to 0
         uint32_t keyCode = none_key;
         bool cyclic      = false;
-        ;
         std::vector<uint32_t> chars;
         std::vector<uint32_t> timeouts;
 
-        KeyProfile();
-        virtual ~KeyProfile();
+        virtual ~KeyProfile() = default;
 
         void addCharacters(const std::string &s);
         void addTimeouts(const std::string &s);
@@ -31,30 +29,21 @@ namespace gui
         std::string name;
         std::map<uint32_t, KeyProfile *> keys = {};
 
-        void addCharacters(KeyProfile *pk, const std::string &s);
-        void addTimeouts(KeyProfile *pk, const std::string &s);
+        void addCharacters(KeyProfile *pk, const std::string &s) const;
+        void addTimeouts(KeyProfile *pk, const std::string &s) const;
         void addKeyProfile(KeyProfile *pk);
-        void setName(std::string name)
-        {
-            this->name = name;
-        };
-        const KeyProfile *getKeyProfile(uint32_t keyCode);
+        void setName(const std::string &name);
+        const KeyProfile *getKeyProfile(uint32_t keyCode) const;
 
       public:
-        void clear()
-        {
-            this->keys.clear();
-        };
+        void clear();
         Profile() = default;
         Profile(const std::string &name);
         Profile(Profile &&p);
         virtual ~Profile();
 
-        std::string getName()
-        {
-            return name;
-        };
-        bool load(std::string filename);
+        [[nodiscard]] std::string getName() const noexcept;
+        bool load(const std::string &filename);
 
         uint32_t get(bsp::KeyCodes code, uint32_t times);
     };

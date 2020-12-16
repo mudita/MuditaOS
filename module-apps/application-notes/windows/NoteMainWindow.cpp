@@ -9,7 +9,7 @@
 #include <InputEvent.hpp>
 #include <service-db/DBNotesMessage.hpp>
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/BottomBar.hpp>

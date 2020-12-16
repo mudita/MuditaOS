@@ -13,7 +13,7 @@
 #include "Names.hpp"
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 using namespace gui;
 

@@ -7,7 +7,7 @@
 #include "log/log.hpp"
 
 // module-utils
-#include "module-utils/i18n/i18n.hpp"
+#include <i18n/i18n.hpp>
 
 #include "PowerOffWindow.hpp"
 #include "../ApplicationDesktop.hpp"

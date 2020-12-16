@@ -8,7 +8,7 @@
 #include <common_data/Clipboard.hpp>
 #include <Options.hpp>
 #include <OptionWindow.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <log/log.hpp>
 
 #include <Text.hpp>
