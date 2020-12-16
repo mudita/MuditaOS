@@ -23,6 +23,7 @@
 #include "windows/WallpaperWindow.hpp"
 #include "windows/QuotesMainWindow.hpp"
 #include "windows/QuotesAddWindow.hpp"
+#include "windows/SecurityMainWindow.hpp"
 
 #include "Dialog.hpp"
 
@@ -184,6 +185,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::new_quote, [](Application *app, const std::string &name) {
             return std::make_unique<gui::QuotesAddWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::SecurityMainWindow>(app);
         });
     }
 
