@@ -110,6 +110,10 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
         return informError(err, "Can't verify version");
     }
 
+    // at this point we should set the system to update mode we are
+    // writing directly to eMMC when updating the bootloader
+    // then placing the new files in destination folders/files
+
     if ((err = updateBootloader()) == updateos::UpdateError::NoError) {
         informUpdate(status, "Update bootloader");
     }
@@ -142,13 +146,16 @@ updateos::UpdateError UpdateMuditaOS::unpackUpdate()
     mtar_header_t tarHeader;
     filesInUpdatePackage.clear();
     status = updateos::UpdateState::ExtractingFiles;
-
+    std::rewind(updateTar.stream);
     while ((mtar_read_header(&updateTar, &tarHeader)) != MTAR_ENULLRECORD) {
+        if (std::string(tarHeader.name) == "./") {
+            mtar_next(&updateTar);
+            continue;
+        }
         unsigned long fileCRC32 = 0;
-
         if (tarHeader.type == MTAR_TDIR) {
             fs::path tmpPath = getUpdateTmpChild(tarHeader.name);
-            if (std::filesystem::create_directory(tmpPath.c_str())) {
+            if (!std::filesystem::create_directory(tmpPath.c_str())) {
                 return informError(updateos::UpdateError::CantCreateExtractedFile,
                                    "unpackUpdate failed to create %s when extracting update tar",
                                    tmpPath.c_str());
@@ -475,7 +482,10 @@ updateos::UpdateError UpdateMuditaOS::cleanupAfterUpdate()
 
 const fs::path UpdateMuditaOS::getUpdateTmpChild(const fs::path &childPath)
 {
-    return updateTempDirectory / childPath;
+    if (childPath.string().rfind("./", 0) == 0)
+        return updateTempDirectory / childPath.string().substr(2);
+    else
+        return updateTempDirectory / childPath;
 }
 
 updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate()
