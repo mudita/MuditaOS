@@ -3,7 +3,6 @@
 ## Current release
 
 ### Added
-
 * `[gui]` Added DOM dump capability for gui::Item objects
 * `[call functions]` Window for MMI/USSD internal messages.
 * `[alarms]` Added main window
@@ -18,16 +17,25 @@
 * `[listview]` Added onEmpty list callbacks and implemented them for notes and messages. 
 * `[notes]` Added list rebuild on notifications.
 
-### Changed
+## [0.50.1 2020-12-14]
 
-* `[PowerManagement]` Change hardware timers clock source
-* `[bluetooth]` Underlying communication with the Bluetooth module over DMA (direct access)
-* `[system]` Workers refactor and state transition fixes
+### Added
+* Add window for MMI/USSD internal messages.
+* Add windows for the alarm application.
+* Add "nightshift" settings window.
+* Add Bluetooth settings.
 
 ### Fixed
 
-* `[settings]` Fix lack of sim at startup
-* `[audio]` Changed internal microphone gain from 0dB to -12dB to fix echo & noise problem
+* Fix default SIM setting.
+* Fix internal microphone echo and noise problem.
+* Fix several problems with USSD.
+
+### Other
+
+* Add ICS parser for the calendar application.
+* Clock configuration changes.
+* Add power measurement features to the system.
 
 ### Removed
 * `[utils]` Dump logs to a file on RT1051 after reaching 80% of log buffer utilization.
@@ -43,8 +51,6 @@
 * Add vertical text scrolling.
 * Add text cursor starting position handling.
 * Add logs dumping to a file on the RT1051 platform.
-* `[calendar]` Added calendar events endpoints handling.
-* `[calendar]` Added parser ics.
 
 ### Changed
 
@@ -56,7 +62,6 @@
 * Fix too many time options in the meditation application.
 * Fix default counter settings.
 * Fix displaying the special characters in a note title.
-* Fixed CUSD URC parser.
 
 ### Other
 
