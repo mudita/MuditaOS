@@ -102,7 +102,16 @@ namespace bsp
 {
     namespace
     {
-        std::uint8_t batteryLevelCritical = 10;
+        std::uint8_t batteryLevelCritical = 5;
+
+        void triggerCriticalLevelCheck()
+        {
+            if (qHandleIrq != NULL) {
+                BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+                uint8_t val                         = static_cast<uint8_t>(bsp::batteryIRQSource::checkCriticalLevel);
+                xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
+            }
+        }
     } // namespace
 
     // STATUS register bits
@@ -179,10 +188,7 @@ namespace bsp
 
         s_BSP_BatteryChargerIrqPinsInit();
 
-        if (qHandleIrq != NULL) {
-            uint8_t val = static_cast<uint8_t>(bsp::batteryIRQSource::checkCriticalLevel);
-            xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
-        }
+        triggerCriticalLevelCheck();
 
         return 0;
     }
@@ -204,10 +210,7 @@ namespace bsp
     void battery_setCriticalLevel(std::uint8_t level)
     {
         batteryLevelCritical = level;
-        if (qHandleIrq != NULL) {
-            uint8_t val = static_cast<uint8_t>(bsp::batteryIRQSource::checkCriticalLevel);
-            xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
-        }
+        triggerCriticalLevelCheck();
     }
 
     bool battery_isLevelCritical(std::uint8_t level)
