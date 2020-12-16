@@ -313,7 +313,7 @@ namespace sys
         });
 
         connect(sevm::BatteryLevelCriticalMessage(), [&](Message *) {
-            LOG_INFO("Battery Critical Level");
+            LOG_INFO("Battery Critical Level reached!");
             return MessageNone{};
         });
 
