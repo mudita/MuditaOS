@@ -308,6 +308,11 @@ namespace sys
             return MessageNone{};
         });
 
+        connect(sevm::BatteryLevelCriticalMessage(), [&](Message *) {
+            LOG_INFO("Battery Critical Level");
+            return MessageNone{};
+        });
+
         return ReturnCodes::Success;
     }
 

@@ -166,6 +166,8 @@ enum class MessageType
     // battery charger messages
     EVMBatteryLevel,
     EVMChargerPlugged,
+    EVMBatterySetCriticalLevel,
+    EVMBatteryLevelCritical,
     // rtc messages
     EVMMinuteUpdated, ///< This message is send to current focused application on every minute time change.
     EVMTimeUpdated,   ///< This message is send on every time update.

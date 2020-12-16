@@ -100,6 +100,10 @@ static xQueueHandle qHandleIrq = NULL;
 
 namespace bsp
 {
+    namespace
+    {
+        std::uint8_t batteryLevelCritical = 10;
+    } // namespace
 
     // STATUS register bits
     enum B_STATUS
@@ -190,6 +194,16 @@ namespace bsp
 
         i2c.reset();
         gpio.reset();
+    }
+
+    void battery_setCriticalLevel(std::uint8_t level)
+    {
+        batteryLevelCritical = level;
+    }
+
+    bool battery_isLevelCritical(std::uint8_t level)
+    {
+        return level <= batteryLevelCritical;
     }
 
     void battery_getBatteryLevel(uint8_t &levelPercent)
