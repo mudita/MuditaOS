@@ -120,11 +120,11 @@ namespace purefs::fs
             LOG_ERROR("Unable to lock filesystem operation");
             return -EIO;
         }
+        const auto diskh    = mnti->second->disk();
         const auto umnt_ret = fsops->umount(mnti->second);
         if (umnt_ret) {
             return umnt_ret;
         }
-        const auto diskh = mnti->second->disk();
         if (diskh) {
             m_partitions.erase(std::string(diskh->name()));
         }

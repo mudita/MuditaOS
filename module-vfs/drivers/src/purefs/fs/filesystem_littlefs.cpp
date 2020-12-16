@@ -108,8 +108,13 @@ namespace
         cfg->block_cycles   = 512;
         cfg->block_size     = 0; // Read later from superblock
         cfg->block_count    = 0; // Read later from super block
-        cfg->cache_size     = 32768;
         cfg->lookahead_size = 8192;
+        // TODO: Read lfs configuration from the superblock
+        cfg->block_size  = 4096;
+        cfg->read_size   = cfg->block_size;
+        cfg->prog_size   = cfg->block_size;
+        cfg->cache_size  = cfg->block_size;
+        cfg->block_count = 261887;
     }
 } // namespace
 
