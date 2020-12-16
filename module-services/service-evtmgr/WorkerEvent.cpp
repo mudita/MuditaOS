@@ -90,7 +90,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        if (notification & static_cast<uint8_t>(bsp::batteryIRQSource::INTB)) {
+        if (notification == static_cast<uint8_t>(bsp::batteryIRQSource::INTB)) {
             uint8_t battLevel = 0;
             bsp::battery_getBatteryLevel(battLevel);
             bsp::battery_ClearAllIRQs();
@@ -103,13 +103,21 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
                 sys::Bus::SendUnicast(levelCriticalMessage, service::name::system_manager, this->service);
             }
         }
-        if (notification & static_cast<uint8_t>(bsp::batteryIRQSource::INOKB)) {
+        if (notification == static_cast<uint8_t>(bsp::batteryIRQSource::INOKB)) {
             bool status;
             bsp::battery_getChargeStatus(status);
             bsp::battery_ClearAllIRQs();
             auto message     = std::make_shared<sevm::BatteryPlugMessage>();
             message->plugged = status;
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
+        }
+        if (notification == static_cast<uint8_t>(bsp::batteryIRQSource::checkCriticalLevel)) {
+            if (Store::Battery::get().state == Store::Battery::State::Discharging) {
+                if (bsp::battery_isLevelCritical(Store::Battery::get().level)) {
+                    auto levelCriticalMessage = std::make_shared<sevm::BatteryLevelCriticalMessage>();
+                    sys::Bus::SendUnicast(levelCriticalMessage, service::name::system_manager, this->service);
+                }
+            }
         }
     }
 
