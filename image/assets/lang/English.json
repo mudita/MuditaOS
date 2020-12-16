@@ -328,6 +328,8 @@
   "app_settings_network_sim_none": "No Sim",
   "app_settings_toggle_on": "ON",
   "app_settings_toggle_off": "OFF",
+  "app_settings_security_lock_screen_passcode": "Lock screen passcode",
+  "app_settings_security_change_passcode": "Change passcode",
   "app_phonebook_title_main": "Contacts",
   "app_phonebook_search_win_contacts": "Contacts",
   "common_search_uc": "Search",
