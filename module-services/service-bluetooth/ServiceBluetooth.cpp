@@ -4,6 +4,8 @@
 #include "Constants.hpp"
 #include "service-bluetooth/ServiceBluetooth.hpp"
 #include "service-bluetooth/BluetoothMessage.hpp"
+#include <service-bluetooth/messages/DeviceName.hpp>
+#include <service-bluetooth/messages/SetDeviceName.hpp>
 #include "service-bluetooth/messages/Status.hpp"
 #include "service-bluetooth/messages/SetStatus.hpp"
 
@@ -71,6 +73,18 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
     if (auto setStatusMsg = dynamic_cast<message::bluetooth::SetStatus *>(msg); nullptr != setStatusMsg) {
         btStatus = setStatusMsg->getStatus();
         sys::Bus::SendBroadcast(std::make_shared<message::bluetooth::ResponseStatus>(btStatus), this);
+    }
+
+    // mock response on message::bluetooth::RequestDeviceName
+    if (auto requestDeviceNameMsg = dynamic_cast<message::bluetooth::RequestDeviceName *>(msg);
+        nullptr != requestDeviceNameMsg) {
+        sys::Bus::SendUnicast(std::make_shared<message::bluetooth::ResponseDeviceName>(phoneName), msg->sender, this);
+    }
+
+    // temporary solution for handling message::bluetooth::SetDeviceName
+    if (auto setDeviceNameMsg = dynamic_cast<message::bluetooth::SetDeviceName *>(msg); nullptr != setDeviceNameMsg) {
+        phoneName = setDeviceNameMsg->getName();
+        sys::Bus::SendBroadcast(std::make_shared<message::bluetooth::ResponseDeviceName>(phoneName), this);
     }
 
     try {

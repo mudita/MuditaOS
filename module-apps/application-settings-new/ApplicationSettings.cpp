@@ -28,9 +28,11 @@
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
+#include <module-utils/i18n/i18n.hpp>
+#include <service-bluetooth/messages/Status.hpp>
+#include <service-bluetooth/messages/DeviceName.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-db/Settings.hpp>
-#include <module-services/service-bluetooth/service-bluetooth/messages/Status.hpp>
 
 namespace app
 {
@@ -95,6 +97,13 @@ namespace app
             if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
                 auto btStatusData = std::make_unique<gui::BluetoothStatusData>(responseStatusMsg->getStatus());
                 switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
+            }
+        }
+        else if (auto responseDeviceNameMsg = dynamic_cast<message::bluetooth::ResponseDeviceName *>(msgl);
+                 nullptr != responseDeviceNameMsg) {
+            if (gui::window::name::phone_name == getCurrentWindow()->getName()) {
+                auto btPhoneNameData = std::make_unique<gui::PhoneNameData>(responseDeviceNameMsg->getName());
+                switchWindow(gui::window::name::phone_name, std::move(btPhoneNameData));
             }
         }
 

@@ -12,12 +12,27 @@ namespace gui
     class PhoneNameWindow : public AppWindow
     {
       public:
-        PhoneNameWindow(app::Application *app);
-        void buildInterface() override;
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        explicit PhoneNameWindow(app::Application *app);
 
       private:
+        void buildInterface() override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
+
         Text *inputField = nullptr;
     };
 
+    class PhoneNameData : public SwitchData
+    {
+      public:
+        explicit PhoneNameData(std::string name) : SwitchData(), name(std::move(name))
+        {}
+        [[nodiscard]] auto getName() const -> const std::string &
+        {
+            return name;
+        }
+
+      private:
+        std::string name;
+    };
 } /* namespace gui */

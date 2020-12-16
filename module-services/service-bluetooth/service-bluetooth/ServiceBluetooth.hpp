@@ -32,7 +32,10 @@ class ServiceBluetooth : public sys::Service
   private:
     std::unique_ptr<BluetoothWorker> worker;
     std::unique_ptr<settings::Settings> settingsProvider;
-    BluetoothStatus btStatus; // will be replaced with settings storage introduced in [EGD-4579]
+
+    // will be replaced with settings storage introduced in [EGD-4579]
+    BluetoothStatus btStatus;
+    std::string phoneName = "PurePhone";
 
     void stateSettingChanged(std::string value);
     void deviceVisibilitySettingChanged(std::string value);

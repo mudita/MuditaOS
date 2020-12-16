@@ -11,15 +11,16 @@ namespace gui
     class BluetoothWindow : public OptionWindow
     {
       public:
-        BluetoothWindow(app::Application *app);
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        explicit BluetoothWindow(app::Application *app);
 
       private:
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        auto bluetoothOptionsList() -> std::list<gui::Option>;
+        void rebuildOptionList();
+        void switchHandler(bool &switchState);
+
         bool isBluetoothSwitchOn       = false;
         bool isPhoneVisibilitySwitchOn = false;
-        auto bluetoothOptionsList() -> std::list<gui::Option>;
-        void switchHandler(bool &switchState);
-        void rebuildOptionList();
     };
 
     class BluetoothStatusData : public SwitchData
