@@ -167,7 +167,7 @@ namespace at
             {AT::URC_NOTIF_CHANNEL, {"AT+QCFG=\"cmux/urcport\",1"}},
             {AT::RI_PIN_AUTO_CALL, {"AT+QCFG=\"urc/ri/ring\",\"auto\""}},
             {AT::RI_PIN_OFF_CALL, {"AT+QCFG=\"urc/ri/ring\",\"off\""}},
-            {AT::RI_PIN_PULSE_SMS, {"AT+QCFG=\"urc/ri/smsincoming\",\"pulse\",200"}},
+            {AT::RI_PIN_PULSE_SMS, {"AT+QCFG=\"urc/ri/smsincoming\",\"pulse\",450"}},
             {AT::RI_PIN_OFF_SMS, {"AT+QCFG=\"urc/ri/smsincoming\",\"off\""}},
             {AT::RI_PIN_OFF_OTHER, {"AT+QCFG=\"urc/ri/other\",\"off\""}},
             {AT::URC_DELAY_ON, {"AT+QCFG=\"urc/delay\",1"}},

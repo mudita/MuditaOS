@@ -26,4 +26,8 @@ namespace bsp{
         return inst;
     }
 
+    LowPowerMode::CpuFrequency LowPowerMode::GetCurrentFrequency() const noexcept
+    {
+    	return currentFrequency;
+    }
 }

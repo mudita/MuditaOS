@@ -22,9 +22,14 @@
 #include "PowerManager.hpp"
 #include "Constants.hpp"
 #include "CpuStatistics.hpp"
+#include <chrono>
 
 namespace sys
 {
+    using namespace std::chrono_literals;
+    inline constexpr std::chrono::milliseconds timerInitInterval{30s};
+    inline constexpr std::chrono::milliseconds timerPeriodInterval{100ms};
+
     enum class Code
     {
         CloseSystem,
@@ -65,10 +70,6 @@ namespace sys
         static bool CloseSystem(Service *s);
 
         static bool Reboot(Service *s);
-
-        static bool SuspendSystem(Service *caller);
-
-        static bool ResumeSystem(Service *caller);
 
         static bool SuspendService(const std::string &name, Service *caller);
 
@@ -130,6 +131,7 @@ namespace sys
 
         TickType_t pingInterval;
         uint32_t pingPongTimerID;
+        bool cpuStatisticsTimerInit{false};
 
         InitFunction userInit;
 

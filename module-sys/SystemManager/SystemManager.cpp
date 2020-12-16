@@ -12,6 +12,7 @@
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <Service/Timer.hpp>
+#include "messages/CpuFrequencyMessage.hpp"
 
 const inline size_t systemManagerStack = 4096 * 2;
 
@@ -102,8 +103,6 @@ namespace sys
         powerManager = std::make_unique<PowerManager>();
         cpuStatistics = std::make_unique<CpuStatistics>();
 
-        // Switch system to full functionality(clocks and power domains configured to max values)
-        powerManager->Switch(PowerManager::Mode::FullSpeed);
         userInit = init;
 
         // Start System manager
@@ -113,7 +112,7 @@ namespace sys
         // pingPongTimerID = CreateTimer(Ticks::MsToTicks(pingInterval), true);
         // ReloadTimer(pingPongTimerID);
 
-        cpuStatisticsTimer = std::make_unique<sys::Timer>("cpuStatistics", this, 1000);
+        cpuStatisticsTimer = std::make_unique<sys::Timer>("cpuStatistics", this, timerInitInterval.count());
         cpuStatisticsTimer->connect([&](sys::Timer &) { CpuStatisticsTimerHandler(); });
         cpuStatisticsTimer->start();
     }
@@ -127,62 +126,6 @@ namespace sys
     bool SystemManager::Reboot(Service *s)
     {
         Bus::SendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot), service::name::system_manager, s);
-        return true;
-    }
-
-    bool SystemManager::SuspendSystem(Service *caller)
-    {
-
-        if (powerManager->GetCurrentMode() != PowerManager::Mode::FullSpeed) {
-            LOG_WARN("System is already suspended.");
-            return false;
-        }
-
-        for (auto w = servicesList.rbegin(); w != servicesList.rend(); ++w) {
-            if ((*w)->parent == "" && (*w)->GetName() != caller->GetName()) {
-                auto ret = Bus::SendUnicast(
-                    std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::SuspendToRAM),
-                    (*w)->GetName(),
-                    caller,
-                    1000);
-
-                auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
-                if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)) {
-                    LOG_FATAL("Service %s failed to enter low-power mode", (*w)->GetName().c_str());
-                }
-            }
-        }
-
-        powerManager->Switch(PowerManager::Mode::LowPowerIdle);
-
-        return true;
-    }
-
-    bool SystemManager::ResumeSystem(Service *caller)
-    {
-
-        if (powerManager->GetCurrentMode() == PowerManager::Mode::FullSpeed) {
-            LOG_WARN("System is already resumed.");
-            return false;
-        }
-
-        powerManager->Switch(PowerManager::Mode::FullSpeed);
-
-        for (const auto &w : servicesList) {
-
-            if (w->parent == "" && w->GetName() != caller->GetName()) {
-                auto ret = Bus::SendUnicast(
-                    std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::Active),
-                    w->GetName(),
-                    caller,
-                    1000);
-                auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
-
-                if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)) {
-                    LOG_FATAL("Service %s failed to exit low-power mode", w->GetName().c_str());
-                }
-            }
-        }
         return true;
     }
 
@@ -317,6 +260,21 @@ namespace sys
             return MessageNone{};
         });
 
+        connect(typeid(sys::CpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
+            auto msg = static_cast<sys::CpuFrequencyMessage *>(message);
+
+            if (msg->getAction() == sys::CpuFrequencyMessage::Action::Increase) {
+                powerManager->IncreaseCpuFrequency();
+                cpuStatisticsTimer->reload();
+            }
+            else if (msg->getAction() == sys::CpuFrequencyMessage::Action::Decrease) {
+                powerManager->DecreaseCpuFrequency();
+                cpuStatisticsTimer->reload();
+            }
+
+            return sys::MessageNone{};
+        });
+
         return ReturnCodes::Success;
     }
 
@@ -365,7 +323,13 @@ namespace sys
 
     void SystemManager::CpuStatisticsTimerHandler()
     {
+        if (!cpuStatisticsTimerInit) {
+            cpuStatisticsTimerInit = true;
+            cpuStatisticsTimer->setInterval(timerPeriodInterval.count());
+        }
+
         cpuStatistics->Update();
+        powerManager->UpdateCpuFrequency(cpuStatistics->GetPercentageCpuLoad());
     }
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
