@@ -43,8 +43,8 @@ Here's [a helpful article about writing good Git commit messages](https://chris.
 
 You can add a commit template and hook that will help with proper defining both branch name and a message title:
 
-- [commit message template](./doc/quickstart.md#commit-message-template)
-- [commit message hook](./doc/quickstart.md#commit-message-hook)
+- [commit message template](quickstart.md#commit-message-template)
+- [commit message hook](quickstart.md#commit-message-hook)
 
 ## Basic checks before Pull Request
 
