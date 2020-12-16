@@ -9,7 +9,7 @@
 
 #include <ContactRecord.hpp>
 #include <country.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <InputMode.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>

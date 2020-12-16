@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <InputMode.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <map>
+#include <log/log.hpp>
 
 /// input mode strings - as these are stored in json (in files...)
 const std::map<InputMode::Mode, std::string> input_mode = {

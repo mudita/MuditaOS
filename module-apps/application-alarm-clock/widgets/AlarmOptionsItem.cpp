@@ -7,6 +7,7 @@
 #include <Style.hpp>
 #include <Utils.hpp>
 #include <module-services/service-audio/service-audio/AudioServiceAPI.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 namespace gui
 {
@@ -240,9 +241,9 @@ namespace gui
 
     std::vector<audio::Tags> AlarmOptionsItem::getMusicFilesList()
     {
-        const char *musicFolder = USER_PATH("music");
+        const auto musicFolder = (purefs::dir::getUserDiskPath() / "music").string();
         std::vector<audio::Tags> musicFiles;
-        LOG_INFO("Scanning music folder: %s", musicFolder);
+        LOG_INFO("Scanning music folder: %s", musicFolder.c_str());
         for (const auto &ent : std::filesystem::directory_iterator(musicFolder)) {
             if (!ent.is_directory()) {
                 const auto filePath = std::string(musicFolder) + "/" + ent.path().filename().c_str();

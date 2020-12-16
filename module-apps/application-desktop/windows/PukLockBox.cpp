@@ -7,7 +7,7 @@
 #include "application-desktop/widgets/PinLock.hpp"
 #include "application-desktop/data/AppDesktopStyle.hpp"
 #include "gui/widgets/Image.hpp"
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <Style.hpp>
 
 namespace label_style = style::window::pin_lock::pin_label;

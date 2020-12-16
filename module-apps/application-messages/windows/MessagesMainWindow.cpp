@@ -13,7 +13,7 @@
 #include <service-db/DBNotificationMessage.hpp>
 
 #include <service-appmgr/model/ApplicationManager.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <application-phonebook/data/PhonebookItemData.hpp>
 #include <Style.hpp>
 #include <log/log.hpp>

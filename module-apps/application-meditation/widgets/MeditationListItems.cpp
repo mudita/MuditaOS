@@ -4,7 +4,7 @@
 #include "MeditationListItems.hpp"
 #include "application-meditation/data/Style.hpp"
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 using namespace gui;
 namespace listStyle = style::meditation::itemList;

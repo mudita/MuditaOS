@@ -8,7 +8,7 @@
 
 #include <Alignment.hpp>
 #include <BoxLayout.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <tools/Common.hpp>
 #include <Style.hpp>
 

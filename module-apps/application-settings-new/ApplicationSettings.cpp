@@ -28,10 +28,10 @@
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
-#include <module-utils/i18n/i18n.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-db/Settings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <i18n/i18n.hpp>
 
 namespace app
 {
