@@ -64,6 +64,7 @@ namespace purefs::fs::drivers::littlefs::internal
             }
             int read(const struct lfs_config *lfsc, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
             {
+                // LOG_DEBUG("lfs_read_req(block=%u off=%u size=%u", unsigned(block), unsigned(off), unsigned(size));
                 auto ctx = reinterpret_cast<io_context *>(lfsc->context);
                 if (!ctx) {
                     return LFS_ERR_IO;
@@ -72,7 +73,7 @@ namespace purefs::fs::drivers::littlefs::internal
                 if (!diskmm) {
                     return LFS_ERR_IO;
                 }
-                const auto lba = (uint64_t(lfsc->block_size) * block + off) / ctx->sector_size;
+                const auto lba = (uint64_t(lfsc->block_size) * block) / ctx->sector_size;
                 if (off % ctx->sector_size) {
                     LOG_ERROR("Partial offset not supported");
                     return LFS_ERR_IO;
@@ -100,12 +101,12 @@ namespace purefs::fs::drivers::littlefs::internal
                 if (!diskmm) {
                     return LFS_ERR_IO;
                 }
-                const auto lba = (uint64_t(lfsc->block_size) * block + off) / ctx->sector_size;
+                const auto lba = (uint64_t(lfsc->block_size) * block) / ctx->sector_size;
                 if (off % ctx->sector_size) {
                     LOG_ERROR("Partial offset not supported");
                     return LFS_ERR_IO;
                 }
-                const std::size_t lba_sz = (size * lfsc->block_size) / ctx->sector_size;
+                const std::size_t lba_sz = size / ctx->sector_size;
                 const auto err           = diskmm->write(ctx->disk_h, buffer, lba, lba_sz);
                 if (err) {
                     LOG_ERROR("Sector read error %i", err);
