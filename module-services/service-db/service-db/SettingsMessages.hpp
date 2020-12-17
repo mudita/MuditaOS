@@ -5,6 +5,7 @@
 
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
+#include <service-db/SettingsScope.hpp>
 
 #include <list>
 #include <memory>
@@ -20,10 +21,39 @@ namespace settings
         std::string service;
         std::string profile;
         std::string variable;
+        SettingsScope scope;
 
         [[nodiscard]] auto to_string(std::string sep = "\\") const -> std::string
         {
+            if (SettingsScope::Global == scope) {
+                return variable;
+            }
             return mode + sep + service + sep + profile + sep + variable;
+        }
+
+        bool operator<(const EntryPath &other) const
+        {
+            if (mode < other.mode)
+                return true;
+            if (mode > other.mode)
+                return false;
+            if (service < other.service)
+                return true;
+            if (service > other.service)
+                return false;
+            if (profile < other.profile)
+                return true;
+            if (profile > other.profile)
+                return false;
+            if (variable < other.variable)
+                return true;
+            if (variable > other.variable)
+                return false;
+            if (scope < other.scope)
+                return true;
+            if (scope > other.scope)
+                return false;
+            return false;
         }
     };
 

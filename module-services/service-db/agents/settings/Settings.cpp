@@ -52,9 +52,9 @@ namespace settings
     {
         LOG_DEBUG("handleVariableChanged");
         if (auto msg = dynamic_cast<settings::Messages::VariableChanged *>(req)) {
-            auto key = msg->getPath().variable;
+            auto key = msg->getPath();
             auto val = msg->getValue();
-            LOG_DEBUG("handleVariableChanged: (k=v): (%s=%s)", key.c_str(), val.value_or("").c_str());
+            LOG_DEBUG("handleVariableChanged: (k=v): (%s=%s)", key.to_string().c_str(), val.value_or("").c_str());
             ValueCb::iterator it_cb = cbValues.find(key);
             if (cbValues.end() != it_cb) {
                 auto [cb, cbWithName] = it_cb->second;
@@ -62,13 +62,13 @@ namespace settings
                     // in case of two callbacks there is a need to duplicate the value
                     auto value = std::move(val.value_or(""));
                     cb(std::string{value});
-                    cbWithName(key, std::move(value));
+                    cbWithName(key.variable, std::move(value));
                 }
                 else if (nullptr != cb) {
                     cb(std::move(val.value_or("")));
                 }
                 else {
-                    cbWithName(key, std::move(val.value_or("")));
+                    cbWithName(key.variable, std::move(val.value_or("")));
                 }
             }
         }
@@ -115,56 +115,77 @@ namespace settings
         return std::make_shared<sys::ResponseMessage>();
     }
 
-    void Settings::registerValueChange(const std::string &variableName, ValueChangedCallback cb)
+    void Settings::registerValueChange(const std::string &variableName, ValueChangedCallback cb, SettingsScope scope)
     {
-        ValueCb::iterator it_cb = cbValues.find(variableName);
+        EntryPath path;
+        path.variable = variableName;
+        path.service  = app->GetName();
+        path.scope    = scope;
+
+        auto it_cb = cbValues.find(path);
         if (cbValues.end() != it_cb && nullptr != it_cb->second.first) {
-            LOG_INFO("Callback function on value change (%s) already exists, rewriting", variableName.c_str());
+            LOG_INFO("Callback function on value change (%s) already exists, rewriting", path.to_string().c_str());
         }
-        cbValues[variableName].first = cb;
-        EntryPath path;
-        path.variable = variableName;
-        path.service  = app->GetName();
+        cbValues[path].first = cb;
+
         auto msg      = std::make_shared<settings::Messages::RegisterOnVariableChange>(path);
         sendMsg(std::move(msg));
     }
 
-    void Settings::registerValueChange(const std::string &variableName, ValueChangedCallbackWithName cb)
+    void Settings::registerValueChange(const std::string &variableName,
+                                       ValueChangedCallbackWithName cb,
+                                       SettingsScope scope)
     {
-        auto it_cb = cbValues.find(variableName);
+        EntryPath path;
+        path.variable = variableName;
+        path.service  = app->GetName();
+        path.scope    = scope;
+
+        auto it_cb = cbValues.find(path);
         if (cbValues.end() != it_cb && nullptr != it_cb->second.second) {
-            LOG_INFO("Callback function on value change (%s) already exists, rewriting", variableName.c_str());
+            LOG_INFO("Callback function on value change (%s) already exists, rewriting", path.to_string().c_str());
         }
-        cbValues[variableName].second = cb;
-        EntryPath path;
-        path.variable = variableName;
-        path.service  = app->GetName();
+        cbValues[path].second = cb;
+
         auto msg      = std::make_shared<settings::Messages::RegisterOnVariableChange>(path);
         sendMsg(std::move(msg));
     }
 
-    void Settings::unregisterValueChange(const std::string &variableName)
+    void Settings::unregisterValueChange(const std::string &variableName, SettingsScope scope)
     {
-        ValueCb::iterator it_cb = cbValues.find(variableName);
+        EntryPath path;
+        path.variable = variableName;
+        path.service  = app->GetName();
+        path.scope    = scope;
+
+        auto it_cb = cbValues.find(path);
         if (cbValues.end() == it_cb) {
-            LOG_INFO("Callback function on value change (%s) does not exist", variableName.c_str());
+            LOG_INFO("Callback function on value change (%s) does not exist", path.to_string().c_str());
         }
         else {
             cbValues.erase(it_cb);
         }
 
-        EntryPath path;
-        path.variable = variableName;
-        path.service  = app->GetName();
         auto msg      = std::make_shared<settings::Messages::UnregisterOnVariableChange>(path);
         sendMsg(std::move(msg));
     }
 
-    void Settings::setValue(const std::string &variableName, const std::string &variableValue)
+    void Settings::unregisterValueChange()
+    {
+        for (auto it_cb : cbValues) {
+            auto msg = std::make_shared<settings::Messages::UnregisterOnVariableChange>(it_cb.first);
+            sendMsg(std::move(msg));
+        }
+        cbValues.clear();
+        LOG_INFO("Unregistered all settings variable change on application (%s)", app->GetName().c_str());
+    }
+
+    void Settings::setValue(const std::string &variableName, const std::string &variableValue, SettingsScope scope)
     {
         EntryPath path;
         path.variable = variableName;
         path.service  = app->GetName();
+        path.scope    = scope;
         auto msg      = std::make_shared<settings::Messages::SetVariable>(path, variableValue);
         sendMsg(std::move(msg));
     }

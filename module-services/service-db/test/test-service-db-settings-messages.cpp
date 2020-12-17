@@ -118,13 +118,13 @@ TEST_CASE("Settings Messages")
         settings::Service settings("settings");
         settings.InitHandler();
 
-        sys::Bus::SendUnicast(std::make_shared<settings::Messages::RegisterOnVariableChange>(
-                                  settings::EntryPath({"mode", "service", "profile", "variable"})),
+        sys::Bus::SendUnicast(std::make_shared<settings::Messages::RegisterOnVariableChange>(settings::EntryPath(
+                                  {"mode", "service", "profile", "variable", settings::SettingsScope::AppLocal})),
                               "db-worker",
                               &settings);
 
-        sys::Bus::SendUnicast(std::make_shared<settings::Messages::UnregisterOnVariableChange>(
-                                  settings::EntryPath({"mode", "service", "profile", "variable"})),
+        sys::Bus::SendUnicast(std::make_shared<settings::Messages::UnregisterOnVariableChange>(settings::EntryPath(
+                                  {"mode", "service", "profile", "variable", settings::SettingsScope::AppLocal})),
                               "db-worker",
                               &settings);
     }

@@ -32,7 +32,8 @@ class SettingsAgent : public DatabaseAgent
     auto getAgentName() -> const std::string override;
 
   private:
-    using MapOfRecipentsToBeNotified = std::map<std::string, std::set<std::string>>;
+    // using MapOfRecipentsToBeNotified = std::map<std::string, std::set<std::string>>;
+    using MapOfRecipentsToBeNotified = std::map<std::string, std::set<settings::EntryPath>>;
     MapOfRecipentsToBeNotified variableChangeRecipents;
     using SetOfRecipents = std::set<std::string>;
     SetOfRecipents profileChangedRecipents;
