@@ -71,7 +71,7 @@ TEST_CASE("littlefs: Basic API test")
         ret = fscore.open("/sys/ala/ma/kota/", 0, 0);
         REQUIRE(ret == -ENOENT);
         // Simple file test
-        int hwnd = fscore.open("/sys/.boot.json", 0, 0);
+        int hwnd = fscore.open("/sys/fonts/gt_pressura_bold_27.mpf", 0, 0);
         REQUIRE(hwnd >= 3);
         std::cout << "File open handle " << hwnd << std::endl;
         struct stat st;
@@ -83,22 +83,26 @@ TEST_CASE("littlefs: Basic API test")
         REQUIRE(ret > 0);
         ret = fscore.close(hwnd);
         REQUIRE(ret == 0);
-        {
-            // Simple directory test
-            auto dirhandle = fscore.diropen("/sys");
-            REQUIRE(dirhandle);
-            REQUIRE(dirhandle->error() == 0);
-            for (std::string fnm;;) {
-                if (fscore.dirnext(dirhandle, fnm, st) != 0) {
-                    break;
-                }
-                else {
-                    std::cout << "name " << fnm << " size " << st.st_size << std::endl;
-                }
-            }
-            fscore.dirclose(dirhandle);
-        }
-        ret = fscore.umount("/sys");
-        REQUIRE(ret == 0);
     }
+    {
+        struct stat st;
+        int ndirs{};
+        // Simple directory test
+        auto dirhandle = fscore.diropen("/sys/fonts/");
+        REQUIRE(dirhandle);
+        REQUIRE(dirhandle->error() == 0);
+        for (std::string fnm;;) {
+            if (fscore.dirnext(dirhandle, fnm, st) != 0) {
+                break;
+            }
+            else {
+                std::cout << "name " << fnm << " size " << st.st_size << std::endl;
+                ndirs++;
+            }
+        }
+        fscore.dirclose(dirhandle);
+        REQUIRE(ndirs > 0);
+    }
+    ret = fscore.umount("/sys");
+    REQUIRE(ret == 0);
 }

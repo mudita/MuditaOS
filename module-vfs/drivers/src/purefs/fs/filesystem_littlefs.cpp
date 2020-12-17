@@ -418,40 +418,18 @@ namespace purefs::fs::drivers
 
     auto filesystem_littlefs::dirnext(fsdir dirstate, std::string &filename, struct stat &filestat) -> int
     {
-        auto vdir = std::dynamic_pointer_cast<directory_handle_littlefs>(dirstate);
-        if (!vdir) {
-            LOG_ERROR("Non LITTLEFS filesystem directory pointer");
-            return -EBADF;
-        }
-        auto mntp = std::static_pointer_cast<mount_point_littlefs>(vdir->mntpoint());
-        if (!mntp) {
-            LOG_ERROR("Non LITTLEFS mount point");
-            return -EBADF;
-        }
-        int lerr;
-        ::lfs_info linfo;
-        {
-            cpp_freertos::LockGuard _lck(m_lock);
-            lerr = ::lfs_dir_read(mntp->lfs_mount(), vdir->lfs_dirp(), &linfo);
-            if (!lerr) {
-                const auto loffs = ::lfs_dir_tell(mntp->lfs_mount(), vdir->lfs_dirp());
-                if (loffs >= 0) {
-                    lerr = ::lfs_dir_seek(mntp->lfs_mount(), vdir->lfs_dirp(), loffs + 1);
-                }
-                else {
-                    lerr = loffs;
-                    LOG_ERROR("LFS unable to seek dir %i", lerr);
-                }
-            }
-            else {
-                LOG_ERROR("LFS unable to read dir %i", lerr);
-            }
-        }
-        if (!lerr) {
+        lfs_info linfo;
+        int err = invoke_lfs(m_lock, dirstate, ::lfs_dir_read, &linfo);
+        if (err == 1) {
+            auto mntp = std::static_pointer_cast<mount_point_littlefs>(dirstate->mntpoint());
             translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), filestat);
             filename = linfo.name;
+            err      = 0;
         }
-        return lfs_to_errno(lerr);
+        else if (err == 0) {
+            err = -ENODATA;
+        }
+        return err;
     }
 
     auto filesystem_littlefs::dirclose(fsdir dirstate) noexcept -> int
