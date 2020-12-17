@@ -4,7 +4,6 @@
 #pragma once
 
 #include <purefs/fs/filesystem_operations.hpp>
-#include <mutex.hpp>
 
 namespace purefs::fs::drivers
 {
@@ -49,8 +48,5 @@ namespace purefs::fs::drivers
         auto ftruncate(fsfile zfile, off_t len) noexcept -> int override;
         auto fsync(fsfile zfile) noexcept -> int override;
         auto isatty(fsfile zfile) noexcept -> int override;
-
-      private:
-        mutable cpp_freertos::MutexRecursive m_lock;
     };
 } // namespace purefs::fs::drivers
