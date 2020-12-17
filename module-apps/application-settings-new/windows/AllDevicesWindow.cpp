@@ -9,9 +9,10 @@
 #include "DialogMetadata.hpp"
 #include "DialogMetadataMessage.hpp"
 
+#include <Constants.hpp>
 #include <InputEvent.hpp>
 #include <i18n/i18n.hpp>
-#include <service-bluetooth/BluetoothMessage.hpp>
+#include <service-bluetooth/messages/BondedDevices.hpp>
 
 namespace gui
 {
@@ -19,7 +20,17 @@ namespace gui
     AllDevicesWindow::AllDevicesWindow(app::Application *app) : OptionWindow(app, gui::window::name::all_devices)
     {
         setTitle(utils::localize.get("app_settings_bluetooth_all_devices"));
-        addOptions(allDevicesOptionsList());
+        sys::Bus::SendUnicast(
+            std::make_shared<message::bluetooth::RequestBondedDevices>(), service::name::bluetooth, application);
+    }
+
+    void AllDevicesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        clearOptions();
+        if (data != nullptr) {
+            const auto newData = static_cast<BondedDevicesData *>(data);
+            addOptions(allDevicesOptionsList(newData->getDevices()));
+        }
     }
 
     auto AllDevicesWindow::onInput(const InputEvent &inputEvent) -> bool
@@ -44,17 +55,11 @@ namespace gui
         return AppWindow::onInput(inputEvent);
     }
 
-    auto AllDevicesWindow::allDevicesOptionsList() -> std::list<Option>
+    auto AllDevicesWindow::allDevicesOptionsList(const std::vector<Devicei> &devicesList) -> std::list<Option>
     {
         std::list<gui::Option> optionsList;
 
-        std::vector<Devicei> devices{Devicei("Paired_device1"),
-                                     Devicei("Paired_device2"),
-                                     Devicei("Paired_device3"),
-                                     Devicei("Paired_device4"),
-                                     Devicei("Paired_device5")};
-
-        for (const auto &device : devices) {
+        for (const auto &device : devicesList) {
             optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
                 device.name,
                 [=](gui::Item &item) {

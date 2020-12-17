@@ -33,6 +33,6 @@ namespace gui
         }
 
       private:
-        std::string name;
+        const std::string name;
     };
 } /* namespace gui */

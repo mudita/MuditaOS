@@ -4,6 +4,7 @@
 #include "Constants.hpp"
 #include "service-bluetooth/ServiceBluetooth.hpp"
 #include "service-bluetooth/BluetoothMessage.hpp"
+#include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
 #include <service-bluetooth/messages/SetDeviceName.hpp>
 #include "service-bluetooth/messages/Status.hpp"
@@ -85,6 +86,12 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
     if (auto setDeviceNameMsg = dynamic_cast<message::bluetooth::SetDeviceName *>(msg); nullptr != setDeviceNameMsg) {
         phoneName = setDeviceNameMsg->getName();
         sys::Bus::SendBroadcast(std::make_shared<message::bluetooth::ResponseDeviceName>(phoneName), this);
+    }
+
+    // mock response on message::bluetooth::RequestBondedDevices
+    if (auto requestBondedDevicesMsg = dynamic_cast<message::bluetooth::RequestBondedDevices *>(msg);
+        nullptr != requestBondedDevicesMsg) {
+        sys::Bus::SendUnicast(std::make_shared<message::bluetooth::ResponseBondedDevices>(devices), msg->sender, this);
     }
 
     try {
