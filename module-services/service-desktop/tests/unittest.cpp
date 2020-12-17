@@ -29,16 +29,10 @@
 
 class vfs vfs;
 
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_initializer;
-
 TEST_CASE("System Update Tests")
 {
+    vfs.Init();
+
     UpdateMuditaOS updateOS(nullptr);
 
     updateos::UpdateError err = updateOS.prepareTempDirForUpdate();
@@ -55,6 +49,7 @@ TEST_CASE("System Update Tests")
 
 TEST_CASE("Factory Reset Test")
 {
+    vfs.Init();
 
     std::string sysdir = purefs::dir::getRootDiskPath();
     sysdir += "/factory-test/sys";
@@ -67,6 +62,8 @@ using namespace parserFSM;
 
 TEST_CASE("Parser Test")
 {
+    vfs.Init();
+
     StateMachine parser(nullptr);
 
     SECTION("Parse message with divided header and payload")
@@ -148,6 +145,8 @@ TEST_CASE("Parser Test")
 
 TEST_CASE("DB Helpers test - json decoding")
 {
+    vfs.Init();
+
     std::string err;
 
     SECTION("correct json")
@@ -187,6 +186,8 @@ TEST_CASE("DB Helpers test - json decoding")
 
 TEST_CASE("DB Helpers test - json encoding (contacts)")
 {
+    vfs.Init();
+
     auto helper = std::make_unique<ContactHelper>(nullptr);
 
     auto contact             = std::make_unique<ContactRecord>();
@@ -213,6 +214,8 @@ TEST_CASE("DB Helpers test - json encoding (contacts)")
 
 TEST_CASE("DB Helpers test - json encoding (messages)")
 {
+    vfs.Init();
+
     auto helper  = std::make_unique<MessageHelper>(nullptr);
     auto message = std::make_unique<SMSRecord>();
 
@@ -251,6 +254,8 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
 
 TEST_CASE("Context class test")
 {
+    vfs.Init();
+
     SECTION("Correct message")
     {
         auto testMessage = R"({"endpoint":6, "method":1, "uuid":12345, "body":{"test":"test"}})";
@@ -287,6 +292,8 @@ TEST_CASE("Context class test")
 
 TEST_CASE("Endpoint Factory test")
 {
+    vfs.Init();
+
     SECTION("Proper endpoint")
     {
         auto testMessage = R"({"endpoint":6, "method":1, "uuid":12345, "body":{"test":"test"}})";

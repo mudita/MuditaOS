@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstring>
@@ -15,16 +15,9 @@
 
 class vfs vfs;
 
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_initializer;
-
 TEST_CASE("Split tests")
 {
+    vfs.Init();
     std::string delimiter = "\r\n";
 
     std::string inputStr1 = "\r\nOK\r\n\r\nNO CARRIER\r\n\r\nFINISHED\r\n";
@@ -81,6 +74,8 @@ TEST_CASE("Split tests")
 
 TEST_CASE("toNumeric tests")
 {
+    vfs.Init();
+
     std::string inputStr1 = "2";
     int value;
 
@@ -91,6 +86,8 @@ TEST_CASE("toNumeric tests")
 
 TEST_CASE("findAndReplaceAll tests")
 {
+    vfs.Init();
+
     // helper lambda
     auto compare = [](std::string &data, std::string &expected, bool &retVal) {
         if (data.compare(expected)) {
@@ -164,6 +161,8 @@ TEST_CASE("findAndReplaceAll tests")
 
 TEST_CASE("Converts enum to string")
 {
+    vfs.Init();
+
     enum class Test : bool
     {
         True  = true,
@@ -176,6 +175,8 @@ TEST_CASE("Converts enum to string")
 
 TEST_CASE("Get value from string")
 {
+    vfs.Init();
+
     SECTION("UInt32_t")
     {
         std::string testString = "10";
@@ -194,6 +195,8 @@ TEST_CASE("Get value from string")
 
 TEST_CASE("Swap endianness")
 {
+    vfs.Init();
+
     uint32_t as_long = 0x11223344;
 
     SECTION("endiannes check")
@@ -222,6 +225,8 @@ TEST_CASE("Swap endianness")
 
 TEST_CASE("Floating point to string")
 {
+    vfs.Init();
+
     SECTION("Double")
     {
         double test = 15.0965432456321;
@@ -273,6 +278,8 @@ TEST_CASE("Floating point to string")
 
 TEST_CASE("Fill leading digit in string")
 {
+    vfs.Init();
+
     std::string test = "45";
     REQUIRE(utils::addLeadingZeros(test) == "45");
     REQUIRE(utils::addLeadingZeros(test, 1) == "45");
@@ -305,6 +312,8 @@ class ScopedDir
 
 TEST_CASE("Read file length")
 {
+    vfs.Init();
+
     ScopedDir dir(USER_PATH("test"));
     auto *file = std::fopen(dir("test.txt").c_str(), "w");
     REQUIRE(file != nullptr);

@@ -21,17 +21,9 @@
 
 class vfs vfs;
 
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_initializer;
-
 TEST_CASE("Test vfs case 1")
 {
-
+    vfs.Init();
 
     const size_t testBufferSize = 1024 * 1024;
 
@@ -86,6 +78,8 @@ TEST_CASE("Test vfs case 1")
 
 TEST_CASE("VFS lseek check")
 {
+    vfs.Init();
+
     static constexpr auto seek_filename = "lseek_test.fil";
     static constexpr auto buf_elems_size = 1024U;
     static constexpr auto buf_elems      = buf_elems_size / sizeof(int);
@@ -123,6 +117,8 @@ TEST_CASE("VFS lseek check")
 
 TEST_CASE("Simple file notifier init")
 {
+    vfs.Init();
+
     vfs.registerNotificationHandler(
         [](std::string_view file, vfsn::utility::vfsNotifier::FsEvent ev, std::string_view old_file) {
             using namespace std::string_literals;
@@ -135,6 +131,8 @@ TEST_CASE("Simple file notifier init")
 
 TEST_CASE("Simple file notifier write")
 {
+    vfs.Init();
+
     vfs.registerNotificationHandler(
         [](std::string_view file, vfsn::utility::vfsNotifier::FsEvent ev, std::string_view old_file) {
             using namespace std::string_literals;
