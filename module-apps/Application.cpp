@@ -126,7 +126,7 @@ namespace app
         if (state == State::ACTIVE_FORGROUND) {
             auto window = getCurrentWindow();
             if (Store::Battery::get().state == Store::Battery::State::Charging) {
-                window->batteryChargingChange(true);
+                window->updateBatteryCharger(true);
             }
             else {
                 window->updateBatteryLevel(Store::Battery::get().level);
@@ -315,7 +315,7 @@ namespace app
         else {
             LOG_INFO("Charger disconnected");
         }
-        getCurrentWindow()->batteryChargingChange(msg->plugged);
+        getCurrentWindow()->updateBatteryCharger(msg->plugged);
         refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         return msgHandled();
     }
