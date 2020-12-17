@@ -34,11 +34,6 @@ static uint8_t battLevel = 100;
 static bool plugged      = false;
 namespace bsp
 {
-    namespace
-    {
-        std::uint8_t batteryCriticalLevel = 5;
-    } // namespace
-
     static void battery_worker(void *pvp);
 
     int battery_Init(xQueueHandle qHandle)
@@ -49,8 +44,6 @@ namespace bsp
         }
         Store::Battery::modify().level = battLevel;
 
-        uint8_t notification = static_cast<uint8_t>(bsp::batteryIRQSource::checkCriticalLevel);
-        xQueueSend(qHandleIrq, &notification, 100);
         return 0;
     }
 
@@ -112,22 +105,11 @@ namespace bsp
                     if (battLevel >= 1)
                         battLevel--;
                     break;
+                }
                 xQueueSend(qHandleIrq, &notification, 100);
             }
             vTaskDelay(50);
         }
-    }
-
-    void battery_setCriticalLevel(std::uint8_t level)
-    {
-        batteryCriticalLevel = level;
-        uint8_t notification = static_cast<uint8_t>(bsp::batteryIRQSource::checkCriticalLevel);
-        xQueueSend(qHandleIrq, &notification, 100);
-    }
-
-    bool battery_isLevelCritical(std::uint8_t level)
-    {
-        return level <= batteryCriticalLevel;
     }
 
 } // namespace bsp

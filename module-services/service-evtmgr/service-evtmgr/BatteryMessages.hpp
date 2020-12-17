@@ -35,7 +35,7 @@ namespace sevm
         BatterySetCriticalLevel(std::uint8_t level)
             : Message(MessageType::EVMBatterySetCriticalLevel), criticalLevel(level)
         {}
-        std::uint8_t criticalLevel = 0;
+        unsigned int criticalLevel = 0;
     };
 
     class BatteryLevelCriticalMessage : public Message
