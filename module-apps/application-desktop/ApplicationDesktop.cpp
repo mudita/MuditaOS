@@ -141,6 +141,9 @@ namespace app
                 if (auto response = dynamic_cast<db::query::notifications::GetAllResult *>(result.get())) {
                     handled = handle(response);
                 }
+                else if (auto response = dynamic_cast<db::query::alarms::SelectTurnedOnResult *>(result.get())) {
+                    handled = handle(response);
+                }
             }
         }
 
@@ -217,6 +220,10 @@ namespace app
             return requestNotSeenNotifications();
         }
 
+        if (msg->interface == db::Interface::Name::Alarms && msg->type != db::Query::Type::Read) {
+            return requestSnoozedAlarms();
+        }
+
         if ((msg->interface == db::Interface::Name::Calllog || msg->interface == db::Interface::Name::SMSThread ||
              msg->interface == db::Interface::Name::SMS) &&
             msg->type != db::Query::Type::Read) {
@@ -229,6 +236,29 @@ namespace app
         }
 
         return false;
+    }
+
+    auto ApplicationDesktop::handle(db::query::alarms::SelectTurnedOnResult *msg) -> bool
+    {
+        assert(msg);
+        auto records = msg->getResult();
+
+        bool rebuildMainWindow = false;
+        uint32_t counter       = 0;
+        for (const auto &record : records) {
+            if (record.status > AlarmStatus::On) {
+                counter++;
+            }
+        }
+        rebuildMainWindow |= counter != notifications.notSeen.SnoozedAlarms;
+        notifications.notSeen.SnoozedAlarms = counter;
+
+        auto ptr = getCurrentWindow();
+        if (rebuildMainWindow && ptr->getName() == app::window::name::desktop_main_window) {
+            ptr->rebuild();
+        }
+
+        return true;
     }
 
     auto ApplicationDesktop::handle(cellular::StateChange *msg) -> bool
@@ -282,6 +312,12 @@ namespace app
         const auto [succeed, _] = DBServiceAPI::GetQuery(
             this, db::Interface::Name::Notifications, std::make_unique<db::query::notifications::GetAll>());
         return succeed;
+    }
+
+    bool ApplicationDesktop::requestSnoozedAlarms()
+    {
+        return DBServiceAPI::GetQuery(
+            this, db::Interface::Name::Alarms, std::make_unique<db::query::alarms::SelectTurnedOn>());
     }
 
     bool ApplicationDesktop::requestNotReadNotifications()

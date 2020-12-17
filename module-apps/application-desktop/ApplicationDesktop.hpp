@@ -11,6 +11,7 @@
 #include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
+#include <module-db/queries/alarms/QueryAlarmsSelectTurnedOn.hpp>
 #include <endpoints/update/UpdateMuditaOS.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DesktopMessages.hpp>
@@ -34,6 +35,7 @@ namespace app
             {
                 unsigned int SMS   = 0;
                 unsigned int Calls = 0;
+                unsigned int SnoozedAlarms = 0;
 
                 auto areEmpty()
                 {
@@ -69,6 +71,7 @@ namespace app
         bool handle(db::NotificationMessage *msg);
         bool handle(cellular::StateChange *msg);
         auto handle(db::query::notifications::GetAllResult *msg) -> bool;
+        auto handle(db::query::alarms::SelectTurnedOnResult *msg) -> bool;
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
         auto handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool;
         /**
@@ -81,6 +84,7 @@ namespace app
         bool clearMessagesNotification();
         bool requestNotSeenNotifications();
         bool requestNotReadNotifications();
+        bool requestSnoozedAlarms();
         unsigned int getLockPassHash() const noexcept
         {
             return lockPassHash;

@@ -310,6 +310,15 @@ namespace gui
                 [app, this]() -> bool { return app->clearMessagesNotification(); },
                 onNotificationFocus);
         }
+        if (app->notifications.notSeen.SnoozedAlarms > 0) {
+            notifications->addNotification(
+                "snooze_icon",
+                utils::localize.get("app_desktop_snoozed_alarms"),
+                std::to_string(app->notifications.notSeen.SnoozedAlarms),
+                []() -> bool { return false; },
+                []() -> bool { return false; },
+                [](bool) -> void {});
+        }
 
         notifications->focusChangedCallback = [this, app](Item &) -> bool {
             if (notifications->focus == false) {

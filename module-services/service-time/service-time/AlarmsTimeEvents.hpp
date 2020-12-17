@@ -37,6 +37,7 @@ namespace stm
         bool sendNextEventQuery() override;
         bool sendEventFiredQuery() override;
         void invokeEvent() override;
+        bool isAlarmGoingToJumpToNextDay(AlarmsRecord record);
 
       public:
         AlarmsTimeEvents() = delete;

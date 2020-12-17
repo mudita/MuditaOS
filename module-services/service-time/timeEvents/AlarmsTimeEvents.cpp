@@ -14,7 +14,6 @@
 
 #include <algorithm>
 #include <chrono>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -38,11 +37,11 @@ namespace stm
 
     uint32_t AlarmsTimeEvents::calcToNextEventInterval(std::unique_ptr<db::QueryResult> nextEventQueryResult)
     {
-        auto firstUpcomingQuery = dynamic_cast<db::query::alarms::SelectTurnedOnResult *>(nextEventQueryResult.get());
-        if (firstUpcomingQuery == nullptr) {
+        auto selectTurnedOn = dynamic_cast<db::query::alarms::SelectTurnedOnResult *>(nextEventQueryResult.get());
+        if (selectTurnedOn == nullptr) {
             return 0;
         }
-        std::vector<AlarmsRecord> records = firstUpcomingQuery->getResult();
+        std::vector<AlarmsRecord> records = selectTurnedOn->getResult();
         if (records.empty()) {
             return 0;
         }
@@ -50,24 +49,21 @@ namespace stm
         auto actualTimePoint = TimePointNow();
         auto weekDay         = WeekdayIndexFromTimePoint(actualTimePoint);
         std::vector<AlarmsRecord> nearestAlarms;
-        for (uint32_t i = 0; i < 7; i++) {
+        for (uint32_t i = 0; i < date::Sunday.iso_encoding(); i++) {
             for (auto &record : records) {
                 auto hoursAndMinutes = TimePointToHourMinSec(record.time);
                 record.time = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + date::days{i} +
                               hoursAndMinutes.hours() + hoursAndMinutes.minutes();
                 if (record.repeat == static_cast<uint32_t>(AlarmRepeat::never) ||
-                    record.repeat == static_cast<uint32_t>(AlarmRepeat::everyday)) {
+                    record.repeat == static_cast<uint32_t>(AlarmRepeat::everyday) ||
+                    (weekDay < date::Saturday.iso_encoding() - 1 &&
+                     record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays))) {
                     nearestAlarms.push_back(record);
                 }
-                else if (weekDay < 6 && record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays)) {
-                    nearestAlarms.push_back(record);
-                }
-                else if (weekDay == 6 && record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays) &&
+                else if (weekDay == date::Saturday.iso_encoding() - 1 &&
+                         record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays) &&
                          record.status > AlarmStatus::On) {
-                    auto buffer = TimePointToYearMonthDay(record.time);
-                    record.time =
-                        record.time + (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze);
-                    if (buffer.day() != TimePointToYearMonthDay(record.time).day()) {
+                    if (isAlarmGoingToJumpToNextDay(record)) {
                         nearestAlarms.push_back(record);
                     }
                 }
@@ -78,22 +74,20 @@ namespace stm
                         nearestAlarms.push_back(record);
                     }
                     uint32_t dayBefore = weekDay - 1;
-                    if (dayBefore > 7) {
-                        dayBefore = 7;
+                    if (dayBefore > date::Sunday.iso_encoding() - 1) {
+                        dayBefore = date::Sunday.iso_encoding() - 1;
                     }
                     if (weekDayData->getData(dayBefore)) {
-                        auto buffer = TimePointToYearMonthDay(record.time);
-                        record.time = record.time +
-                                      (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze);
-                        if (buffer.day() != TimePointToYearMonthDay(record.time).day()) {
+                        if (isAlarmGoingToJumpToNextDay(record)) {
                             nearestAlarms.push_back(record);
                         }
                     }
                 }
             }
+            // search in another day if there is not alarm for today
             if (nearestAlarms.empty()) {
                 weekDay++;
-                if (weekDay > 6) {
+                if (weekDay > date::Sunday.iso_encoding() - 1) {
                     weekDay = 0;
                 }
             }
@@ -105,19 +99,17 @@ namespace stm
             return 0;
         }
 
-        // TODO: alarms with snoozes between days
         // Apply snooze
         for (auto &alarm : nearestAlarms) {
             if (alarm.status > AlarmStatus::On) {
-                // auto buffer = TimePointToYearMonthDay(alarm.time);
-                alarm.time =
-                    alarm.time + (static_cast<uint32_t>(alarm.status) - 1) * std::chrono::minutes(alarm.snooze);
                 // if alarm time after applying snoozes is going to jump to the next day
                 // it means that this is alarm from yesterday and to properly handle it
                 // you have to subtract one day so it will rang today not tomorrow
-                // if (buffer.day() != TimePointToYearMonthDay(alarm.time).day()) {
-                //    alarm.time -= date::days{1};
-                //}
+                if (isAlarmGoingToJumpToNextDay(alarm)) {
+                    alarm.time -= date::days{1};
+                }
+                alarm.time =
+                    alarm.time + (static_cast<uint32_t>(alarm.status) - 1) * std::chrono::minutes(alarm.snooze);
                 if (alarm.time < TimePointNow()) {
                     alarm.time += date::days{1};
                 }
@@ -150,13 +142,7 @@ namespace stm
 
     bool AlarmsTimeEvents::sendEventFiredQuery()
     {
-        // mlucki
-        // Todo: there is a place to set (in DB and optionally) the alarmsRecord as processed/invoked
-
-        /*eventRecord.reminder_fired = TimePointNow();
-        return DBServiceAPI::GetQuery(
-            service(), db::Interface::Name::Alarms, std::make_unique<db::query::alarms::Edit>(alarmsRecord));*/
-        // sendNextEventQuery();
+        sendNextEventQuery();
         return true;
     }
 
@@ -166,5 +152,12 @@ namespace stm
         auto data  = std::make_unique<AlarmRecordData>(alarm);
 
         app::manager::Controller::sendAction(service(), app::manager::actions::ShowAlarm, std::move(data));
+    }
+
+    bool AlarmsTimeEvents::isAlarmGoingToJumpToNextDay(AlarmsRecord record)
+    {
+        auto buffer = TimePointToYearMonthDay(record.time);
+        record.time = record.time + (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze);
+        return buffer.day() != TimePointToYearMonthDay(record.time).day();
     }
 } // namespace stm
