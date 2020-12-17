@@ -19,7 +19,8 @@ namespace audio
     class Operation
     {
       public:
-        Operation(const audio::PlaybackType &playbackType = audio::PlaybackType::None) : playbackType{playbackType}
+        Operation(AudioServiceMessage::Callback callback, const PlaybackType &playbackType = PlaybackType::None)
+            : playbackType(playbackType), serviceCallback(callback)
         {}
 
         enum class State
@@ -54,13 +55,12 @@ namespace audio
 
         virtual ~Operation() = default;
 
-        static std::unique_ptr<Operation> Create(
-            Type t,
-            const char *fileName                  = "",
-            const audio::PlaybackType &operations = audio::PlaybackType::None,
-            std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr);
+        static std::unique_ptr<Operation> Create(Type t,
+                                                 const char *fileName                   = "",
+                                                 const audio::PlaybackType &operations  = audio::PlaybackType::None,
+                                                 AudioServiceMessage::Callback callback = nullptr);
 
-        virtual audio::RetCode Start(audio::AsyncCallback callback, audio::Token token) = 0;
+        virtual audio::RetCode Start(audio::Token token)                                = 0;
         virtual audio::RetCode Stop()                                                   = 0;
         virtual audio::RetCode Pause()                                                  = 0;
         virtual audio::RetCode Resume()                                                 = 0;
@@ -138,9 +138,9 @@ namespace audio
 
         std::vector<SupportedProfile> supportedProfiles;
         void SetProfileAvailability(std::vector<Profile::Type> profiles, bool available);
+        void AddProfile(const Profile::Type &profile, const PlaybackType &playback, bool isAvailable);
 
         State state = State::Idle;
-        audio::AsyncCallback eventCallback;
 
         audio::Token operationToken;
         Type opType = Type::Idle;
@@ -152,6 +152,7 @@ namespace audio
 
         std::shared_ptr<Profile> GetProfile(const Profile::Type type);
 
+        AudioServiceMessage::Callback serviceCallback;
         std::function<int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
             audioCallback = nullptr;
     };

@@ -7,6 +7,7 @@
 #include <bitset>
 #include <bsp/audio/bsp_audio.hpp>
 #include <Utils.hpp>
+#include <utility>
 
 #include "Profiles/Profile.hpp"
 
@@ -241,43 +242,61 @@ namespace audio
         friend class ::audio::AudioMux;
     };
 
-    class Handle
+    RetCode GetDeviceError(bsp::AudioDevice::RetCode retCode);
+    const std::string str(RetCode retcode);
+    [[nodiscard]] auto GetVolumeText(const audio::Volume &volume) -> std::string;
+} // namespace audio
+
+namespace AudioServiceMessage
+{
+
+    class Message
     {
       public:
-        Handle(const RetCode &retCode = RetCode::Failed, const Token &token = Token())
-            : lastRetCode(retCode), token(token)
+        virtual ~Message() = default;
+    };
+
+    class EndOfFile : public Message
+    {
+      public:
+        explicit EndOfFile(audio::Token &token) : token(token)
         {}
-        auto GetLastRetCode() -> RetCode
-        {
-            return lastRetCode;
-        }
-        auto GetToken() const -> const Token &
+        const audio::Token &GetToken() const
         {
             return token;
         }
 
       private:
-        RetCode lastRetCode;
-        Token token;
+        audio::Token token = audio::Token::MakeBadToken();
     };
 
-    enum class PlaybackEventType
+    class FileSystemNoSpace : public Message
     {
-        Empty,
-        EndOfFile,
-        FileSystemNoSpace
+      public:
+        explicit FileSystemNoSpace(audio::Token &token) : token(token)
+        {}
+        const audio::Token &GetToken() const
+        {
+            return token;
+        }
+
+      private:
+        audio::Token token = audio::Token::MakeBadToken();
     };
 
-    struct PlaybackEvent
+    class DbRequest : public Message
     {
-        PlaybackEventType event = PlaybackEventType::Empty;
-        audio::Token token      = audio::Token::MakeBadToken();
+      public:
+        explicit DbRequest(std::string path) : path(std::move(path))
+        {}
+        const std::string &GetPath() const
+        {
+            return path;
+        }
+
+      private:
+        const std::string path;
     };
 
-    typedef std::function<int32_t(PlaybackEvent e)> AsyncCallback;
-    typedef std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> DbCallback;
-
-    RetCode GetDeviceError(bsp::AudioDevice::RetCode retCode);
-    const std::string str(RetCode retcode);
-    [[nodiscard]] auto GetVolumeText(const audio::Volume &volume) -> const std::string;
-} // namespace audio
+    using Callback = std::function<std::optional<std::string>(const Message *e)>;
+} // namespace AudioServiceMessage
