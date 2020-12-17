@@ -29,7 +29,7 @@ namespace audio
             Routing,
         };
 
-        Audio(AsyncCallback asyncCallback, DbCallback dbCallback);
+        Audio(AudioServiceMessage::Callback callback);
 
         virtual ~Audio() = default;
 
@@ -116,8 +116,7 @@ namespace audio
         State currentState = State::Idle;
         std::unique_ptr<Operation> currentOperation;
 
-        AsyncCallback asyncCallback;
-        DbCallback dbCallback;
+        AudioServiceMessage::Callback serviceCallback;
 
         // for efficiency multiple of 24 and 32 (max audio samples size)
         static constexpr auto defaultAudioStreamBlockSize = 2048;

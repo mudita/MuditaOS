@@ -23,14 +23,13 @@ namespace audio
     class PlaybackOperation : public Operation
     {
       public:
-        PlaybackOperation(
-            const char *file,
-            const audio::PlaybackType &playbackType,
-            std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback = nullptr);
+        PlaybackOperation(const char *file,
+                          const audio::PlaybackType &playbackType,
+                          AudioServiceMessage::Callback callback = nullptr);
 
         virtual ~PlaybackOperation();
 
-        audio::RetCode Start(audio::AsyncCallback callback, audio::Token token) final;
+        audio::RetCode Start(audio::Token token) final;
         audio::RetCode Stop() final;
         audio::RetCode Pause() final;
         audio::RetCode Resume() final;

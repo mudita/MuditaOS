@@ -74,8 +74,7 @@ class MockAudio : public audio::Audio
 
   public:
     MockAudio(audio::Audio::State state, audio::PlaybackType plbckType, audio::Operation::State opState)
-        : audio::Audio([](audio::PlaybackEvent e) { return 0; },
-                       [](const std::string &path, const uint32_t &defaultValue) { return 0; }),
+        : audio::Audio([](const AudioServiceMessage::Message *e) { return std::optional<std::string>(); }),
           state(state), plbckType(plbckType), opState(opState)
     {}
 

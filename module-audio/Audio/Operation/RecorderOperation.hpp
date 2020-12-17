@@ -13,10 +13,9 @@ namespace audio
     class RecorderOperation : public Operation
     {
       public:
-        RecorderOperation(const char *file,
-                          std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback);
+        RecorderOperation(const char *file, AudioServiceMessage::Callback callback);
 
-        audio::RetCode Start(audio::AsyncCallback callback, audio::Token token) final;
+        audio::RetCode Start(audio::Token token) final;
         audio::RetCode Stop() final;
         audio::RetCode Pause() final;
         audio::RetCode Resume() final;

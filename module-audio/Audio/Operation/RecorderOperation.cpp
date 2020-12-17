@@ -15,13 +15,14 @@
 
 namespace audio
 {
+    using namespace AudioServiceMessage;
+    using namespace utils;
 
 #define PERF_STATS_ON 0
 
     using namespace bsp;
 
-    RecorderOperation::RecorderOperation(
-        const char *file, std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
+    RecorderOperation::RecorderOperation(const char *file, AudioServiceMessage::Callback callback) : Operation(callback)
     {
 
         audioCallback = [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
@@ -37,29 +38,16 @@ namespace audio
 #endif
             if (ret == 0) {
                 state = State::Idle;
-                eventCallback({PlaybackEventType::FileSystemNoSpace, audio::Token::MakeBadToken()});
+                const auto req = AudioServiceMessage::FileSystemNoSpace(operationToken);
+                serviceCallback(&req);
             }
             return ret;
         };
 
-        constexpr audio::Gain defaultRecordingOnBoardMicGain = 200;
-        constexpr audio::Gain defaultRecordingHeadsetGain    = 100;
-
-        const auto dbRecordingOnBoardMicGainPath =
-            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingBuiltInMic);
-        const auto recordingOnBoardMicGain = dbCallback(dbRecordingOnBoardMicGainPath, defaultRecordingOnBoardMicGain);
-
-        const auto dbRecordingHeadsetGainPath =
-            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingHeadphones);
-        const auto recordingHeadsetGain = dbCallback(dbRecordingHeadsetGainPath, defaultRecordingHeadsetGain);
-
-        // order in vector defines priority
-        supportedProfiles.emplace_back(
-            Profile::Create(Profile::Type::RecordingBluetoothHSP, nullptr, 0, recordingHeadsetGain), false);
-        supportedProfiles.emplace_back(
-            Profile::Create(Profile::Type::RecordingHeadphones, nullptr, 0, recordingHeadsetGain), false);
-        supportedProfiles.emplace_back(
-            Profile::Create(Profile::Type::RecordingBuiltInMic, nullptr, 0, recordingOnBoardMicGain), true);
+        // order defines priority
+        AddProfile(Profile::Type::RecordingBluetoothHSP, PlaybackType::None, false);
+        AddProfile(Profile::Type::RecordingHeadphones, PlaybackType::None, false);
+        AddProfile(Profile::Type::RecordingBuiltInMic, PlaybackType::None, true);
 
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
@@ -87,14 +75,13 @@ namespace audio
         }
     }
 
-    audio::RetCode RecorderOperation::Start(audio::AsyncCallback callback, audio::Token token)
+    audio::RetCode RecorderOperation::Start(audio::Token token)
     {
 
         if (state == State::Paused || state == State::Active) {
             return RetCode::InvokedInIncorrectState;
         }
         operationToken = token;
-        eventCallback = callback;
         state         = State::Active;
 
         if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
@@ -183,7 +170,7 @@ namespace audio
 
         case State::Active:
             state = State::Idle;
-            Start(eventCallback, operationToken);
+            Start(operationToken);
             break;
         }
 
