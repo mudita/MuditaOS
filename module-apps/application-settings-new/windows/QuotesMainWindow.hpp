@@ -5,7 +5,6 @@
 
 #include "BaseSettingsWindow.hpp"
 
-#include <vfs.hpp>
 
 namespace gui
 {
@@ -24,6 +23,7 @@ namespace gui
       private:
         void readQuotes(fs::path fn);
         void switchHandler(bool &optionSwitch);
+        [[nodiscard]] static std::string readFileToString(const fs::path &fn);
 
         std::list<std::pair<std::string, bool>> quotes;
     };

@@ -5,11 +5,12 @@
 #include "windows/MusicPlayerAllSongsWindow.hpp"
 #include "windows/MusicPlayerEmptyWindow.hpp"
 
-#include <service-audio/AudioServiceAPI.hpp>
-#include <i18n/i18n.hpp>
+#include <filesystem>
 #include <log/log.hpp>
+#include <i18n/i18n.hpp>
+#include <purefs/filesystem_paths.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <time/ScopedTime.hpp>
-#include <vfs.hpp>
 
 namespace app
 {
@@ -65,26 +66,21 @@ namespace app
 
     std::vector<audio::Tags> ApplicationMusicPlayer::getMusicFilesList()
     {
-        const char *musicFolder = USER_PATH("music");
+        const auto musicFolder = purefs::dir::getUserDiskPath() / "music";
         std::vector<audio::Tags> musicFiles;
-        LOG_INFO("Scanning music folder: %s", musicFolder);
-        std::vector<vfs::DirectoryEntry> dirList;
-        {
-            auto time = utils::time::Scoped("listdir time");
-            dirList   = vfs.listdir(musicFolder, "");
-        }
+        LOG_INFO("Scanning music folder: %s", musicFolder.c_str());
         {
             auto time = utils::time::Scoped("fetch tags time");
-            for (vfs::DirectoryEntry ent : dirList) {
-                if (ent.attributes != vfs::FileAttributes::Directory) {
-                    const auto filePath = std::string(musicFolder) + "/" + ent.fileName;
+            for (const auto &entry : std::filesystem::directory_iterator(musicFolder)) {
+                if (!std::filesystem::is_directory(entry)) {
+                    const auto filePath = entry.path();
                     auto fileTags       = getFileTags(filePath);
                     if (fileTags) {
                         musicFiles.push_back(*fileTags);
-                        LOG_DEBUG(" - file %s found", ent.fileName.c_str());
+                        LOG_DEBUG(" - file %s found", entry.path().c_str());
                     }
                     else {
-                        LOG_ERROR("Not an audio file %s", ent.fileName.c_str());
+                        LOG_ERROR("Not an audio file %s", entry.path().c_str());
                     }
                 }
             }

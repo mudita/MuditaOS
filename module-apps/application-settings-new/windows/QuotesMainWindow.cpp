@@ -10,19 +10,17 @@
 #include <InputEvent.hpp>
 #include <i18n/i18n.hpp>
 #include <json/json11.hpp>
-#include <vfs.hpp>
+#include <purefs/filesystem_paths.hpp>
+#include <Utils.hpp>
+#include <string>
 
 namespace gui
 {
-    namespace quotes
-    {
-        inline static std::string path = "sys/data/applications/settings/quotes.json";
-    } // namespace quotes
-
     QuotesMainWindow::QuotesMainWindow(app::Application *app) : BaseSettingsWindow(app, gui::window::name::quotes)
     {
+        const auto quotesPath = purefs::dir::getCurrentOSPath() / "data/applications/settings/quotes.json";
         setTitle(utils::localize.get("app_settings_display_locked_screen_quotes"));
-        readQuotes(quotes::path);
+        readQuotes(quotesPath);
     }
 
     auto QuotesMainWindow::onInput(const InputEvent &inputEvent) -> bool
@@ -47,9 +45,8 @@ namespace gui
     {
         std::string err;
 
-        std::string fileContents = vfs.loadFileAsString(fn);
-
-        auto obj = json11::Json::parse(fileContents, err).array_items();
+        const auto fileContents = readFileToString(fn);
+        auto obj                = json11::Json::parse(fileContents.c_str(), err).array_items();
 
         if (!err.empty()) {
             LOG_ERROR("Error while parsing quotes: %s", err.c_str());
@@ -90,4 +87,24 @@ namespace gui
         optionSwitch = !optionSwitch;
         rebuildOptionList();
     }
+
+    std::string QuotesMainWindow::readFileToString(const fs::path &fn)
+    {
+        constexpr auto tar_buf = 8192 * 4;
+        auto file              = std::fopen(fn.c_str(), "r");
+        if (!file) {
+            return {};
+        }
+        const auto length = utils::filesystem::filelength(file);
+        if (length >= tar_buf) {
+            LOG_ERROR("File %s length is too high!", fn.c_str());
+            std::fclose(file);
+            return {};
+        }
+        auto buffer = std::make_unique<char[]>(length + 1);
+        std::fread(buffer.get(), 1, length, file);
+        std::fclose(file);
+        return std::string(buffer.get());
+    }
+
 } // namespace gui
