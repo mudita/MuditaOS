@@ -44,11 +44,10 @@ namespace audio
         };
         /**
          * Constructs class with fixed number of managed inputs
-         * @param asyncClbk Callback for async control events from of managed audio::Audio() instances
-         * @param dbClbk Callback for async DB change events from of managed audio::Audio() instances
+         * @param callback Callback for async requests to audio service from audio module
          * @param audioInputsCount Number of inputs managed and internal audio::Audio() classes created
          */
-        AudioMux(audio::AsyncCallback asyncClbk, audio::DbCallback dbClbk, size_t audioInputsCount = 1);
+        AudioMux(AudioServiceMessage::Callback callback, size_t audioInputsCount = 1);
         /**
          * Constructs mux managing externally allocated instances of Input
          * @param extAudioInputs Instances of Input to be managed

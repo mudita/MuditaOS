@@ -27,12 +27,10 @@ namespace audio
         static const std::size_t INPUT_BUFFER_START_SIZE = 1024;
 
       public:
-        RouterOperation(
-            const char *file,
-            std::function<std::uint32_t(const std::string &path, const std::uint32_t &defaultValue)> dbCallback);
+        RouterOperation(const char *file, AudioServiceMessage::Callback callback);
         ~RouterOperation() = default;
 
-        audio::RetCode Start([[maybe_unused]] audio::AsyncCallback callback, audio::Token token) final;
+        audio::RetCode Start(audio::Token token) final;
         audio::RetCode Stop() final;
         audio::RetCode Pause() final;
         audio::RetCode Resume() final;

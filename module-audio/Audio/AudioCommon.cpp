@@ -54,7 +54,7 @@ namespace audio
         return path;
     }
 
-    auto GetVolumeText(const audio::Volume &volume) -> const std::string
+    auto GetVolumeText(const audio::Volume &volume) -> std::string
     {
         return (static_cast<std::ostringstream &&>(std::ostringstream() << "Vol: " << std::to_string(volume))).str();
     }

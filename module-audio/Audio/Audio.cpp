@@ -10,11 +10,10 @@
 namespace audio
 {
 
-    Audio::Audio(AsyncCallback asyncCallback, DbCallback dbCallback)
-        : currentOperation(), asyncCallback(asyncCallback), dbCallback(dbCallback)
+    Audio::Audio(AudioServiceMessage::Callback callback) : currentOperation(), serviceCallback(callback)
     {
 
-        auto ret = Operation::Create(Operation::Type::Idle, "", audio::PlaybackType::None, dbCallback);
+        auto ret = Operation::Create(Operation::Type::Idle, "", audio::PlaybackType::None, callback);
         if (ret) {
             currentOperation = std::move(ret);
         }
@@ -76,7 +75,7 @@ namespace audio
     {
 
         try {
-            auto ret = Operation::Create(op, fileName, playbackType, dbCallback);
+            auto ret = Operation::Create(op, fileName, playbackType, serviceCallback);
             switch (op) {
             case Operation::Type::Playback:
                 currentState = State::Playback;
@@ -108,7 +107,7 @@ namespace audio
             return audioException.getErrorCode();
         }
 
-        return currentOperation->Start(asyncCallback, token);
+        return currentOperation->Start(token);
     }
 
     audio::RetCode Audio::Start()

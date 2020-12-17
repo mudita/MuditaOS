@@ -18,14 +18,13 @@ namespace audio
         };
     } // namespace
 
-    AudioMux::AudioMux(audio::AsyncCallback asyncClbk, audio::DbCallback dbClbk, size_t audioInputsCount)
+    AudioMux::AudioMux(AudioServiceMessage::Callback callback, size_t audioInputsCount)
         : audioInputs(audioInputsInternal)
     {
         audioInputsCount = audioInputsCount > 0 ? audioInputsCount : 1;
         audioInputsInternal.reserve(audioInputsCount);
         for (size_t i = 0; i < audioInputsCount; i++) {
-            audioInputsInternal.emplace_back(
-                Input(std::make_unique<Audio>(asyncClbk, dbClbk), refToken.IncrementToken()));
+            audioInputsInternal.emplace_back(Input(std::make_unique<Audio>(callback), refToken.IncrementToken()));
         }
     }
 
