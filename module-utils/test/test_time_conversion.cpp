@@ -5,6 +5,8 @@
 #include <time/time_conversion.hpp>
 #include <algorithm>
 #include <thread.hpp>
+#include <vfs.hpp>
+#include "i18n/i18n.hpp"
 
 namespace
 {

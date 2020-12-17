@@ -2,7 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FactoryReset.hpp"
-
+#ifndef TARGET_Linux
+#include <FreeRTOSFATConfig.h>
+#endif
 #include <SystemManager/SystemManager.hpp>
 #include <log/log.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -13,6 +15,8 @@
 #include <filesystem>
 #include <memory>
 #include <vector>
+#include <purefs/filesystem_paths.hpp>
+#include <purefs/fs/filesystem.hpp>
 
 namespace sys
 {
@@ -21,6 +25,11 @@ namespace sys
 
 namespace FactoryReset
 {
+    namespace
+    {
+        inline constexpr auto copy_buf = 8192 * 4;
+    } // namespace
+
     static bool CopyFile(std::string sourcefile, std::string targetfile);
 
     static int recurseDepth             = 0;
@@ -78,7 +87,7 @@ namespace FactoryReset
                 delpath += direntry.path().string().c_str();
 
                 if (std::filesystem::is_directory(direntry)) {
-                    if (direntry.path().string().compare(PATH_FACTORY) != 0) {
+                    if (direntry.path().string().compare(purefs::dir::getFactoryOSPath()) != 0) {
                         LOG_INFO("FactoryReset: recursively deleting dir %s...", delpath.c_str());
                         try {
                             std::filesystem::remove_all(delpath.c_str());
@@ -176,15 +185,15 @@ namespace FactoryReset
         std::unique_ptr<std::FILE, decltype(lamb)> tf(std::fopen(targetfile.c_str(), "w"), lamb);
 
         if ((sf.get() != nullptr) && (tf.get() != nullptr)) {
-            std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::copy_buf]);
+            std::unique_ptr<unsigned char[]> buffer(new unsigned char[copy_buf]);
 
             if (buffer.get() != nullptr) {
-                uint32_t loopcount = (utils::filesystem::filelength(sf.get()) / purefs::buffer::copy_buf) + 1u;
-                uint32_t readsize  = purefs::buffer::copy_buf;
+                uint32_t loopcount = (utils::filesystem::filelength(sf.get()) / copy_buf) + 1u;
+                uint32_t readsize  = copy_buf;
 
                 for (uint32_t i = 0u; i < loopcount; i++) {
                     if (i + 1u == loopcount) {
-                        readsize = utils::filesystem::filelength(sf.get()) % purefs::buffer::copy_buf;
+                        readsize = utils::filesystem::filelength(sf.get()) % copy_buf;
                     }
 
                     if (std::fread(buffer.get(), 1, readsize, sf.get()) != readsize) {

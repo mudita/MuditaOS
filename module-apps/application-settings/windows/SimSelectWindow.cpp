@@ -4,7 +4,7 @@
 #include "SimSelectWindow.hpp"
 #include "Info.hpp"
 #include "SettingsMainWindow.hpp"
-#include "module-utils/i18n/i18n.hpp"
+#include <i18n/i18n.hpp>
 #include "log/log.hpp"
 #include <common_data/EventStore.hpp>
 #include <service-db/DBServiceAPI.hpp>

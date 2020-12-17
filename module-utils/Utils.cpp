@@ -2,16 +2,26 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Utils.hpp"
+#include <purefs/fs/filesystem.hpp>
+#include <crc32/crc32.h>
 
 namespace utils::filesystem
 {
+    namespace
+    {
+        inline constexpr auto crc_buf = 1024;
+    } // namespace
+
     long int filelength(std::FILE *file) noexcept
     {
         if (file == nullptr) {
             return 0;
         }
+        const auto startPosition = std::ftell(file);
         std::fseek(file, 0, SEEK_END);
-        return std::ftell(file);
+        const auto endPosition = std::ftell(file);
+        std::fseek(file, startPosition, SEEK_SET);
+        return endPosition;
     }
 
     void computeCRC32(std::FILE *file, unsigned long *outCrc32) noexcept
@@ -19,13 +29,13 @@ namespace utils::filesystem
         if (outCrc32 == nullptr)
             return;
 
-        auto buf = std::make_unique<unsigned char[]>(purefs::buffer::crc_buf);
+        auto buf = std::make_unique<unsigned char[]>(crc_buf);
         size_t bufLen;
 
         *outCrc32 = 0;
 
         while (!std::feof(file)) {
-            bufLen = std::fread(buf.get(), 1, purefs::buffer::crc_buf, file);
+            bufLen = std::fread(buf.get(), 1, crc_buf, file);
             if (bufLen <= 0)
                 break;
 
@@ -49,5 +59,30 @@ namespace utils::filesystem
         }
 
         return random_string;
+    }
+
+    std::string getline(std::FILE *stream, uint32_t length) noexcept
+    {
+        std::uint32_t currentPosition = std::ftell(stream);
+
+        // allocate memory to read number of signs defined by length param. Size of buffer is increased by 1 to add
+        // string's null terminator.
+        auto buffer = std::make_unique<char[]>(length + 1);
+
+        std::uint32_t bytesRead = std::fread(buffer.get(), 1, length, stream);
+
+        // search buffer for /n sign
+        constexpr auto newLineSign = 0x0A;
+        for (std::uint32_t i = 0; i < bytesRead; ++i) {
+            if (buffer[i] == newLineSign) {
+                buffer[i] = 0;
+                std::fseek(stream, currentPosition + i + 1, SEEK_SET);
+                break;
+            }
+        }
+
+        std::string ret = std::string(buffer.get());
+
+        return ret;
     }
 } // namespace utils::filesystem

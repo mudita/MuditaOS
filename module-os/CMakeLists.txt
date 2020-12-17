@@ -28,6 +28,8 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/timers.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/usermem.c
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/CriticalSectionGuard.cpp
         )
 
 #Substitute FreeRTOS SystemvView sources if enabled

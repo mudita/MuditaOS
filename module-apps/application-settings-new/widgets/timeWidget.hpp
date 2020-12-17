@@ -5,6 +5,7 @@
 
 #include <Label.hpp>
 #include <Text.hpp>
+#include <chrono>
 
 namespace gui
 {

@@ -11,6 +11,7 @@
 #include <catch2/catch.hpp>
 
 #include "Utils.hpp"
+#include <vfs.hpp>
 
 class vfs vfs;
 

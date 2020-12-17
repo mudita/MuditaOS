@@ -146,4 +146,9 @@ namespace cellular
         return utils::to_string(informationClass);
     }
 
+    auto SupplementaryServicesRequest::getProcedureType() -> ProcedureType
+    {
+        return procedureType;
+    }
+
 }; // namespace cellular

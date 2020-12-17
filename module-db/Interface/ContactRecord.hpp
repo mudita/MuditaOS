@@ -7,7 +7,7 @@
 #include <Common/Query.hpp>
 #include <Tables/ContactsGroups.hpp>
 
-#include "module-utils/i18n/i18n.hpp"
+#include <i18n/i18n.hpp>
 #include "Record.hpp"
 #include "utf8/UTF8.hpp"
 
@@ -19,6 +19,7 @@
 #include <memory>
 #include <optional>
 #include <set>
+#include <sstream>
 
 struct ContactRecord : public Record
 {

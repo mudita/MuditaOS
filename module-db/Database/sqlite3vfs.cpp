@@ -119,6 +119,7 @@
 #include <errno.h>
 #include <memory>
 #include <cstring>
+#include <filesystem>
 
 #include "FreeRTOS.h"
 #include "task.h"

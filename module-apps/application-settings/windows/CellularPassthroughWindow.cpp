@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularPassthroughWindow.hpp"
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <module-bsp/bsp/cellular/bsp_cellular.hpp>
 #include "Label.hpp"
 #include <cassert>

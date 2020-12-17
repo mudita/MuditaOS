@@ -26,7 +26,7 @@
 #include "windows/CellularPassthroughWindow.hpp"
 #include "windows/SettingsChange.hpp"
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-db/Settings.hpp>

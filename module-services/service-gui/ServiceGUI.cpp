@@ -37,6 +37,7 @@ extern "C"
 #include <list>
 #include <memory>
 #include <utility>
+#include <purefs/filesystem_paths.hpp>
 
 namespace sgui
 {
@@ -52,10 +53,10 @@ namespace sgui
         transferContext = new gui::Context(screenWidth, screenHeight);
 
         gui::FontManager &fontManager = gui::FontManager::getInstance();
-        fontManager.init("assets");
+        fontManager.init(purefs::dir::getCurrentOSPath() / "assets");
 
         gui::ImageManager &imageManager = gui::ImageManager::getInstance();
-        imageManager.init("assets");
+        imageManager.init(purefs::dir::getCurrentOSPath() / "assets");
 
         connect(typeid(sgui::DrawMessage),
                 [&](sys::Message *request) -> sys::MessagePointer { return handleDrawMessage(request); });

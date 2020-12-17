@@ -10,12 +10,14 @@
 * `[file indexer]` Support for deleting entries in File Indexer DB.
 * `[listview]` Added onEmpty list callbacks and implemented them for notes and messages. 
 * `[notes]` Added list rebuild on notifications.
+* `[cellular]` Custom MMI response message.
 
 ### Changed
 
 * `[PowerManagement]` Change hardware timers clock source
 * `[bluetooth]` Underlying communication with the Bluetooth module over DMA (direct access)
 * `[system]` Workers refactor and state transition fixes
+* Change audio data path synchronization.
 
 
 

@@ -11,8 +11,9 @@
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
 #include "AudioCommon.hpp"
+#include "Stream.hpp"
 #include "Operation/Operation.hpp"
-#include "decoder/decoder.hpp"
+#include "decoder/Decoder.hpp"
 
 namespace audio
 {
@@ -117,6 +118,14 @@ namespace audio
 
         AsyncCallback asyncCallback;
         DbCallback dbCallback;
+
+        // for efficiency multiple of 24 and 32 (max audio samples size)
+        static constexpr auto defaultAudioStreamBlockSize = 2048;
+        StandardStreamAllocator allocatorOut;
+        Stream dataStreamOut{allocatorOut, defaultAudioStreamBlockSize};
+
+        StandardStreamAllocator allocatorIn;
+        Stream dataStreamIn{allocatorIn, defaultAudioStreamBlockSize};
     };
 
 } // namespace audio

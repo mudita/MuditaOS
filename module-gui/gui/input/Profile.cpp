@@ -7,18 +7,13 @@
 #include <sstream>
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
-#include "vfs.hpp"
 #include "Profile.hpp"
+#include <Utils.hpp>
 
 namespace gui
 {
 
     const uint32_t KeyProfile::none_key = 0;
-
-    KeyProfile::KeyProfile()
-    {}
-    KeyProfile::~KeyProfile()
-    {}
 
     Profile::Profile(const std::string &name)
     {
@@ -67,9 +62,19 @@ namespace gui
         return elems;
     }
 
-    bool Profile::load(std::string filename)
+    void Profile::clear()
     {
-        auto file = vfs.fopen(filename.c_str(), "rb");
+        keys.clear();
+    }
+
+    std::string Profile::getName() const noexcept
+    {
+        return name;
+    }
+
+    bool Profile::load(const std::string &filename)
+    {
+        auto file = std::fopen(filename.c_str(), "rb");
 
         if (file == nullptr) {
             LOG_FATAL("no KeyProfile file: %s", filename.c_str());
@@ -89,9 +94,8 @@ namespace gui
 
         KeyProfile *pk = nullptr;
         KeyProfile tmp;
-        while (vfs.eof(file) != true) {
-
-            std::string line = trim(vfs.getline(file));
+        while (std::feof(file) != true) {
+            const auto line = trim(utils::filesystem::getline(file));
             if ((line[0] == '#') || (line.empty())) {
                 continue;
             }
@@ -141,7 +145,7 @@ namespace gui
             }
         }
 
-        vfs.fclose(file);
+        std::fclose(file);
 
         return true;
     }
@@ -177,7 +181,7 @@ namespace gui
         return elems;
     }
 
-    void Profile::addCharacters(KeyProfile *pk, const std::string &s)
+    void Profile::addCharacters(KeyProfile *pk, const std::string &s) const
     {
 
         uint32_t charKey;
@@ -203,7 +207,7 @@ namespace gui
             }
         }
     }
-    void Profile::addTimeouts(KeyProfile *pk, const std::string &s)
+    void Profile::addTimeouts(KeyProfile *pk, const std::string &s) const
     {
         uint32_t timeout;
         std::vector<std::string> vec = split(s, ',');
@@ -219,7 +223,12 @@ namespace gui
             keys.insert(std::pair<uint32_t, KeyProfile *>(pk->keyCode, pk));
     }
 
-    const KeyProfile *Profile::getKeyProfile(uint32_t keyCode)
+    void Profile::setName(const std::string &name)
+    {
+        this->name = name;
+    }
+
+    const KeyProfile *Profile::getKeyProfile(uint32_t keyCode) const
     {
         auto key = keys.find(keyCode);
         if (key != keys.end())

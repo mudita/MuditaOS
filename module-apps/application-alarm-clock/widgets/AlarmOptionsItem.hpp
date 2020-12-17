@@ -8,7 +8,7 @@
 #include <Label.hpp>
 #include <Image.hpp>
 #include <BoxLayout.hpp>
-#include <module-audio/Audio/decoder/decoder.hpp>
+#include <Audio/decoder/Decoder.hpp>
 
 namespace gui
 {

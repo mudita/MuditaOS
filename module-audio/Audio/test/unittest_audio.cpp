@@ -5,7 +5,7 @@
 
 #include <catch2/catch.hpp>
 
-#include "Audio/decoder/decoder.hpp"
+#include "Audio/decoder/Decoder.hpp"
 
 #include "Audio/decoder/decoderMP3.hpp"
 #include "Audio/decoder/decoderFLAC.hpp"
@@ -24,7 +24,7 @@ TEST_CASE("Test audio tags")
     {
         std::vector<std::string> testExtensions = {"flac", "wav", "mp3"};
         for (auto ext : testExtensions) {
-            auto dec = audio::decoder::Create(("testfiles/audio." + ext).c_str());
+            auto dec = audio::Decoder::Create(("testfiles/audio." + ext).c_str());
             REQUIRE(dec);
             auto tags = dec->fetchTags();
             REQUIRE(tags);

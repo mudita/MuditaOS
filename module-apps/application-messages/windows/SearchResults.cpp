@@ -12,7 +12,7 @@
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBMessage.hpp>
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 namespace gui
 {

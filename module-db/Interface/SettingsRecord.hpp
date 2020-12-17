@@ -7,7 +7,7 @@
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
 #include "../Databases/SettingsDB.hpp"
-#include "module-utils/i18n/i18n.hpp"
+#include <i18n/i18n.hpp>
 
 struct SettingsRecord
 {

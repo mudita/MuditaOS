@@ -3,6 +3,16 @@ name: CI
 on: [pull_request]
 
 jobs:
+  check_commit_messages:
+    name: check commit messages
+    runs-on: self-hosted
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: check commit messages
+        run: ./tools/check_commit_messages.py
   build:
     runs-on: self-hosted
     steps:

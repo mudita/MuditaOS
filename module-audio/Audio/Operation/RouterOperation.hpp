@@ -47,22 +47,8 @@ namespace audio
         bool Mute(bool enable);
 
         bool muteEnable = false;
-
         std::unique_ptr<Encoder> enc;
-
         std::unique_ptr<bsp::AudioDevice> audioDeviceCellular;
-
-        AudioCallback audioDeviceCallback         = nullptr;
-        AudioCallback audioDeviceCellularCallback = nullptr;
-
-        std::vector<std::int16_t> audioDeviceBuffer;
-        std::vector<std::int16_t> audioDeviceCellularBuffer;
-
-        cpp_freertos::MutexStandard audioMutex;
-        cpp_freertos::MutexStandard cellularMutex;
-
-        int receivedFramesDiffAudio    = 0;
-        int receivedFramesDiffCellular = 0;
     };
 
 } // namespace audio
