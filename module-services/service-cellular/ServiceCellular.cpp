@@ -1284,7 +1284,9 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
     switch (state) {
     case at::SimState::Ready:
         Store::GSM::get()->sim = Store::GSM::get()->selected;
-        settings->setValue(settings::SystemProperties::activeSim, utils::enumToString(Store::GSM::get()->selected));
+        settings->setValue(settings::SystemProperties::activeSim,
+                           utils::enumToString(Store::GSM::get()->selected),
+                           settings::SettingsScope::Global);
         // SIM causes SIM INIT, only on ready
         response =
             std::move(std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM_READY));
