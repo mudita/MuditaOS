@@ -100,20 +100,6 @@ static xQueueHandle qHandleIrq = NULL;
 
 namespace bsp
 {
-    namespace
-    {
-        std::uint8_t batteryLevelCritical = 5;
-
-        void triggerCriticalLevelCheck()
-        {
-            if (qHandleIrq != NULL) {
-                BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-                uint8_t val                         = static_cast<uint8_t>(bsp::batteryIRQSource::checkCriticalLevel);
-                xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
-            }
-        }
-    } // namespace
-
     // STATUS register bits
     enum B_STATUS
     {
@@ -188,8 +174,6 @@ namespace bsp
 
         s_BSP_BatteryChargerIrqPinsInit();
 
-        triggerCriticalLevelCheck();
-
         return 0;
     }
 
@@ -205,17 +189,6 @@ namespace bsp
 
         i2c.reset();
         gpio.reset();
-    }
-
-    void battery_setCriticalLevel(std::uint8_t level)
-    {
-        batteryLevelCritical = level;
-        triggerCriticalLevelCheck();
-    }
-
-    bool battery_isLevelCritical(std::uint8_t level)
-    {
-        return level <= batteryLevelCritical;
     }
 
     void battery_getBatteryLevel(uint8_t &levelPercent)
