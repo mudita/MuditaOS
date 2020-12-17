@@ -38,6 +38,7 @@ target_sources( ${PROJECT_NAME}
         windows/QuotesMainWindow.cpp
         windows/QuotesAddWindow.cpp
         windows/SecurityMainWindow.cpp
+        windows/ChangePasscodeWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
