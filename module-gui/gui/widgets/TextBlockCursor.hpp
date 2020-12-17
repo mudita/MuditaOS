@@ -51,6 +51,7 @@ namespace gui
         /// and check if this one is needed
         BlockCursor(TextDocument *document, unsigned int pos, unsigned int block_nr, RawFont *default_font);
         BlockCursor() = default; /// bad cursor
+        virtual ~BlockCursor() = default;
 
         [[nodiscard]] auto getPosition() const -> unsigned int
         {
