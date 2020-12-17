@@ -84,13 +84,16 @@ namespace app
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
 
-        settings->registerValueChange(settings::SystemProperties::timeFormat12,
-                                      [this](std::string value) { timeFormatChanged(value); });
+        settings->registerValueChange(
+            settings::SystemProperties::timeFormat12,
+            [this](std::string value) { timeFormatChanged(value); },
+            settings::SettingsScope::Global);
     }
 
     Application::~Application() noexcept
     {
         windowsStack.windows.clear();
+        settings->unregisterValueChange();
     }
 
     Application::State Application::getState()
