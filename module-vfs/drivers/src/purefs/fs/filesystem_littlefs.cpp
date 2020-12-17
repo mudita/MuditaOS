@@ -6,10 +6,13 @@
 #include <littlefs/volume_mapper.hpp>
 #include <purefs/fs/drivers/file_handle_littlefs.hpp>
 #include <purefs/fs/drivers/directory_handle_littlefs.hpp>
+#include <purefs/blkdev/disk_manager.hpp>
+#include <purefs/blkdev/disk_handle.hpp>
 #include <lfs.h>
+#include <lfs_extension.h>
 #include <log/log.hpp>
 
-#include <limits.h>
+#include <climits>
 #include <syslimits.h>
 #include <sys/statvfs.h>
 #include <fcntl.h>
@@ -103,19 +106,33 @@ namespace
         st.st_mode    = translate_attrib_to_st_mode(fs.type);
     }
 
-    [[gnu::nonnull(1)]] void setup_lfs_config(lfs_config *cfg)
+    [[gnu::nonnull(1)]] int setup_lfs_config(lfs_config *cfg, size_t sector_size, size_t part_sectors_count)
     {
         cfg->block_cycles   = 512;
         cfg->block_size     = 0; // Read later from superblock
         cfg->block_count    = 0; // Read later from super block
         cfg->lookahead_size = 8192;
-        // TODO: Read lfs configuration from the superblock
-        cfg->block_size  = 4096;
-        cfg->read_size   = cfg->block_size;
-        cfg->prog_size   = cfg->block_size;
-        cfg->cache_size  = cfg->block_size;
-        cfg->block_count = 261887;
+
+        int err = lfs_extension_read_config_from_superblock(cfg, sector_size);
+        if (err) {
+            LOG_ERROR("Unable to read the superblock info %i", err);
+            return lfs_to_errno(err);
+        }
+        if (cfg->block_size > 1024U * 1024U) {
+            LOG_ERROR("Block size too big");
+            return -E2BIG;
+        }
+
+        if ((uint64_t(cfg->block_count) * uint64_t(cfg->block_size)) / sector_size > part_sectors_count) {
+            LOG_ERROR("Block count out of range sectors count");
+            return -ERANGE;
+        }
+        cfg->read_size  = cfg->block_size;
+        cfg->prog_size  = cfg->block_size;
+        cfg->cache_size = cfg->block_size;
+        return 0;
     }
+
 } // namespace
 
 namespace purefs::fs::drivers
@@ -227,9 +244,20 @@ namespace purefs::fs::drivers
         cpp_freertos::LockGuard _lck(m_lock);
         auto err = littlefs::internal::append_volume(vmnt->lfs_config(), disk_mngr(), disk);
         if (err) {
+            return lfs_to_errno(err);
+        }
+        {
+            auto diskmm = disk_mngr();
+            auto ssize  = diskmm->get_info(disk, blkdev::info_type::sector_size);
+            if (ssize < 0) {
+                LOG_ERROR("Unable to read sector size %i", int(ssize));
+                return ssize;
+            }
+            err = setup_lfs_config(vmnt->lfs_config(), ssize, disk->sectors());
+        }
+        if (err) {
             return err;
         }
-        setup_lfs_config(vmnt->lfs_config());
         err = lfs_mount(vmnt->lfs_mount(), vmnt->lfs_config());
         if (err) {
             LOG_ERROR("LFS mount error %i", err);
