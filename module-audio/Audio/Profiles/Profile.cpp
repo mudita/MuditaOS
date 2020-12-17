@@ -24,40 +24,53 @@
 namespace audio
 {
 
-    std::unique_ptr<Profile> Profile::Create(const Type t, std::function<int32_t()> callback, Volume vol, Gain gain)
+    std::unique_ptr<Profile> Profile::Create(const Type t,
+                                             std::function<int32_t()> callback,
+                                             std::optional<Volume> vol,
+                                             std::optional<Gain> gain)
     {
         std::unique_ptr<Profile> inst;
 
         switch (t) {
         case Type::PlaybackHeadphones:
-            inst = std::make_unique<ProfilePlaybackHeadphones>(callback, vol);
+            assert(vol);
+            inst = std::make_unique<ProfilePlaybackHeadphones>(callback, vol.value());
             break;
         case Type::PlaybackLoudspeaker:
-            inst = std::make_unique<ProfilePlaybackLoudspeaker>(callback, vol);
+            assert(vol);
+            inst = std::make_unique<ProfilePlaybackLoudspeaker>(callback, vol.value());
             break;
         case Type::PlaybackBluetoothA2DP:
-            inst = std::make_unique<ProfilePlaybackBluetoothA2DP>(callback, vol);
+            assert(vol);
+            inst = std::make_unique<ProfilePlaybackBluetoothA2DP>(callback, vol.value());
             break;
         case Type::RecordingBuiltInMic:
-            inst = std::make_unique<ProfileRecordingOnBoardMic>(callback, gain);
+            assert(gain);
+            inst = std::make_unique<ProfileRecordingOnBoardMic>(callback, gain.value());
             break;
         case Type::RecordingHeadphones:
-            inst = std::make_unique<ProfileRecordingHeadphones>(callback, gain);
+            assert(gain);
+            inst = std::make_unique<ProfileRecordingHeadphones>(callback, gain.value());
             break;
         case Type::RecordingBluetoothHSP:
-            inst = std::make_unique<ProfileRecordingBluetoothHSP>(callback, gain);
+            assert(gain);
+            inst = std::make_unique<ProfileRecordingBluetoothHSP>(callback, gain.value());
             break;
         case Type::RoutingHeadphones:
-            inst = std::make_unique<ProfileRoutingHeadphones>(callback, vol, gain);
+            assert(gain && vol);
+            inst = std::make_unique<ProfileRoutingHeadphones>(callback, vol.value(), gain.value());
             break;
         case Type::RoutingLoudspeaker:
-            inst = std::make_unique<ProfileRoutingLoudspeaker>(callback, vol, gain);
+            assert(gain && vol);
+            inst = std::make_unique<ProfileRoutingLoudspeaker>(callback, vol.value(), gain.value());
             break;
         case Type::RoutingEarspeaker:
-            inst = std::make_unique<ProfileRoutingEarspeaker>(callback, vol, gain);
+            assert(gain && vol);
+            inst = std::make_unique<ProfileRoutingEarspeaker>(callback, vol.value(), gain.value());
             break;
         case Type::RoutingBluetoothHSP:
-            inst = std::make_unique<ProfileRoutingBluetoothHSP>(callback, vol, gain);
+            assert(gain && vol);
+            inst = std::make_unique<ProfileRoutingBluetoothHSP>(callback, vol.value(), gain.value());
             break;
         case Type::Idle:
             inst = std::make_unique<ProfileIdle>();
