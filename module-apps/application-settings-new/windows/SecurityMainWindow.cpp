@@ -4,6 +4,7 @@
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "OptionSetting.hpp"
 #include "SecurityMainWindow.hpp"
+#include "module-apps/application-desktop/windows/Names.hpp"
 
 namespace gui
 {
@@ -39,7 +40,8 @@ namespace gui
             optionList.emplace_back(std::make_unique<OptionSettings>(
                 utils::translateI18("app_settings_security_change_passcode"),
                 [=](Item &item) {
-                    LOG_INFO("Not implemented");
+                    LOG_INFO("switching to %s page", gui::window::name::change_passcode);
+                    application->switchWindow(gui::window::name::change_passcode, nullptr);
                     return true;
                 },
                 nullptr,

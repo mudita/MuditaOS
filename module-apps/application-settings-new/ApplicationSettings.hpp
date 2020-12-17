@@ -41,6 +41,7 @@ namespace gui::window::name
     inline constexpr auto all_operators      = "AllOperators";
     inline constexpr auto import_contacts    = "ImportContacts";
     inline constexpr auto dialog_settings    = "DialogSettings";
+    inline constexpr auto change_passcode    = "ChangePasscode";
 
 } // namespace gui::window::name
 
