@@ -100,6 +100,7 @@ static xQueueHandle qHandleIrq = NULL;
 
 namespace bsp
 {
+
     // STATUS register bits
     enum B_STATUS
     {
