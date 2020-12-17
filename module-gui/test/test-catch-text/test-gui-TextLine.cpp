@@ -34,7 +34,7 @@ TEST_CASE("TextLine - ctor")
         auto texts            = mockup::lineStrings(3);
         auto [document, font] = mockup::buildMultilineTestDocument(texts);
 
-        auto cursor = new BlockCursor(&document, 0, 0, font);
+        auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, font);
         auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() > 0);
@@ -46,7 +46,7 @@ TEST_CASE("TextLine - ctor")
         auto test_text        = mockup::multiWordString(5);
         auto [document, font] = mockup::buildOnelineTestDocument(test_text);
 
-        auto cursor = new BlockCursor(&document, 0, 0, font);
+        auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, font);
         auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() > 0);
@@ -63,7 +63,7 @@ TEST_CASE("TextLine - non fitting text")
         auto test_text        = mockup::multiWordString(5);
         auto [document, font] = mockup::buildOnelineTestDocument(test_text);
 
-        auto cursor = new BlockCursor(&document, 0, 0, font);
+        auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, font);
         auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() != 0);
@@ -89,7 +89,7 @@ TEST_CASE("TextLine - multiple styles text")
         auto testblock = mockup::getBlock(mockup::BlockFactory::Type::Block0);
         auto document  = TextDocument(testblock);
 
-        auto cursor = new BlockCursor(&document, 0, 0, nullptr);
+        auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, nullptr);
         auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.width() > 0);
@@ -105,7 +105,7 @@ TEST_CASE("TextLine - multiple styles text")
         testblock.insert(testblock.end(), block1.begin(), block1.end());
         auto document = TextDocument(testblock);
 
-        auto cursor = new BlockCursor(&document, 0, 0, nullptr);
+        auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, nullptr);
         auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == getTextLen(block0));
@@ -121,7 +121,7 @@ TEST_CASE("TextLine - multiple styles text")
         testblock.insert(testblock.end(), block1.begin(), block1.end());
         auto document = TextDocument(testblock);
 
-        auto cursor = new BlockCursor(&document, 0, block0.size(), nullptr);
+        auto cursor = std::make_unique<BlockCursor>(&document, 0, block0.size(), nullptr);
         auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == getTextLen(block1));
@@ -132,7 +132,7 @@ TEST_CASE("TextLine - multiple styles text")
         auto testblock = mockup::getBlock(mockup::BlockFactory::Type::NoneBlock0);
         auto document  = TextDocument(testblock);
 
-        auto cursor = new BlockCursor(&document, 0, 0, nullptr);
+        auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, nullptr);
         auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == 0);
@@ -144,7 +144,7 @@ TEST_CASE("TextLine - multiple styles text")
         auto testblock = mockup::getBlock(mockup::BlockFactory::Type::NoneBlock1);
         auto document  = TextDocument(testblock);
 
-        auto cursor = new BlockCursor(&document, 0, 0, nullptr);
+        auto cursor = std::make_unique<BlockCursor>(&document, 0, 0, nullptr);
         auto line   = gui::TextLine(*cursor, maxWidth);
 
         REQUIRE(line.length() == 0);
@@ -159,7 +159,7 @@ TEST_CASE("TextLine - elements sizes checkup")
     auto testblock = mockup::getBlock(mockup::BlockFactory::Type::Block0);
     auto document  = TextDocument(testblock);
 
-    auto cursor    = new BlockCursor(&document, 0, 0, nullptr);
+    auto cursor    = std::make_unique<BlockCursor>(&document, 0, 0, nullptr);
     auto text_line = TextLine(*cursor, maxWidth);
 
     REQUIRE(text_line.length() > 0);
