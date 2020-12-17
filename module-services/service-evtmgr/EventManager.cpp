@@ -8,6 +8,7 @@
 #include "service-evtmgr/KbdMessage.hpp"
 #include "service-evtmgr/WorkerEvent.hpp"
 #include "screen-light-control/ScreenLightControl.hpp"
+#include "battery-level-check/BatteryLevelCheck.hpp"
 
 #include <BaseInterface.hpp>
 #include <MessageType.hpp>
@@ -288,7 +289,7 @@ sys::ReturnCodes EventManager::InitHandler()
 
     connect(sevm::BatterySetCriticalLevel(0), [&](sys::Message *msgl) {
         auto request = static_cast<sevm::BatterySetCriticalLevel *>(msgl);
-        bsp::battery_setCriticalLevel(request->criticalLevel);
+        battery_level_check::setBatteryCriticalLevel(request->criticalLevel);
         return std::make_shared<sys::ResponseMessage>();
     });
 

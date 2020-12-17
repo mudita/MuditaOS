@@ -6,6 +6,7 @@
 #include "service-evtmgr/EVMessages.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
 #include "service-evtmgr/WorkerEvent.hpp"
+#include "battery-level-check/BatteryLevelCheck.hpp"
 
 #include <Audio/AudioCommon.hpp>
 #include <MessageType.hpp>
@@ -43,6 +44,11 @@ extern "C"
 #include <optional>    // for optional
 #include <string>      // for string
 #include <vector>      // for vector
+
+WorkerEvent::WorkerEvent(sys::Service *service) : sys::Worker(service), service(service)
+{
+    battery_level_check::init(service);
+}
 
 bool WorkerEvent::handleMessage(uint32_t queueID)
 {
@@ -98,10 +104,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             message->levelPercents = battLevel;
             message->fullyCharged  = false;
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
-            if (bsp::battery_isLevelCritical(battLevel)) {
-                auto levelCriticalMessage = std::make_shared<sevm::BatteryLevelCriticalMessage>();
-                sys::Bus::SendUnicast(levelCriticalMessage, service::name::system_manager, this->service);
-            }
+            battery_level_check::checkBatteryLevelCritical();
         }
         if (notification == static_cast<uint8_t>(bsp::batteryIRQSource::INOKB)) {
             bool status;
@@ -110,14 +113,6 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             auto message     = std::make_shared<sevm::BatteryPlugMessage>();
             message->plugged = status;
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
-        }
-        if (notification == static_cast<uint8_t>(bsp::batteryIRQSource::checkCriticalLevel)) {
-            if (Store::Battery::get().state == Store::Battery::State::Discharging) {
-                if (bsp::battery_isLevelCritical(Store::Battery::get().level)) {
-                    auto levelCriticalMessage = std::make_shared<sevm::BatteryLevelCriticalMessage>();
-                    sys::Bus::SendUnicast(levelCriticalMessage, service::name::system_manager, this->service);
-                }
-            }
         }
     }
 
