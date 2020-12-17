@@ -11,4 +11,7 @@ add_catch2_executable(
         service-desktop
         module-utils
         module-apps
+        iosyscalls
+    DEPS
+        PurePhone.img-target
 )

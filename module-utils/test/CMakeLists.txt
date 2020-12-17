@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+﻿cmake_minimum_required(VERSION 3.12)
 
 # Phone number tests
 add_catch2_executable(
@@ -53,6 +53,9 @@ add_catch2_executable(
         unittest_duration.cpp
     LIBS
         module-utils
+        iosyscalls
+    DEPS
+        PurePhone.img-target
 )
 
 # utils tests
@@ -63,6 +66,9 @@ add_catch2_executable(
         unittest_utils.cpp
     LIBS
         module-utils
+        iosyscalls
+    DEPS
+        PurePhone.img-target
 )
 
 # Math tests

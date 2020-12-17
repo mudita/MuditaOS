@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /// These are random tests what could be salvaged from old tests
@@ -33,16 +33,10 @@ using namespace std;
 
 class vfs vfs;
 
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_init;
-
 TEST_CASE("Test BoundingBox intersect")
 {
+    vfs.Init();
+
     gui::BoundingBox result;
     REQUIRE(gui::BoundingBox::intersect(gui::BoundingBox(0, 0, 15, 15), gui::BoundingBox(15, 0, 15, 15), result) ==
             false);
@@ -61,6 +55,8 @@ TEST_CASE("Test BoundingBox intersect")
 /// tbh - there should allways be fallback to some memory stored font in our FontManager
 TEST_CASE("Are fonts loaded")
 {
+    vfs.Init();
+
     auto &fontmanager = gui::FontManager::getInstance();
     // check getInstance - getting even default font will result in nullptr
     // this is because no fonts are loaded
@@ -73,6 +69,8 @@ TEST_CASE("Are fonts loaded")
 
 TEST_CASE("Draw window with labels")
 {
+    vfs.Init();
+
     mockup::fontManager(); // To load fonts
     auto win = new gui::TestWindow("MAIN");
     win->setSize(480, 600);
@@ -104,6 +102,8 @@ TEST_CASE("Draw window with labels")
 
 TEST_CASE("Draw window with box layouts")
 {
+    vfs.Init();
+
     auto win_unique = make_unique<gui::TestWindow>("MAIN"); // make root gui element used unique to auto clean it
     auto win        = win_unique.get();                     // get pointer to root element for ctros sake
     win->setSize(480, 600);

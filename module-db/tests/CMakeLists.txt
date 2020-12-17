@@ -1,4 +1,4 @@
-if (NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/sys/user")
+﻿if (NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/sys/user")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/sys/user")
 endif()
 
@@ -36,4 +36,7 @@ add_catch2_executable(
     LIBS
         module-db
         module-vfs
+        iosyscalls
+    DEPS
+        PurePhone.img-target
 )

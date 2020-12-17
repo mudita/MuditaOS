@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstring>
@@ -16,16 +16,10 @@
 class vfs vfs;
 utils::i18n localize;
 
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_intializer;
-
 TEST_CASE("Duration - creation")
 {
+    vfs.Init();
+
     utils::localize.setDisplayLanguage("English");
 
     SECTION("default constructor")
@@ -69,6 +63,7 @@ TEST_CASE("Duration - creation")
 
 TEST_CASE("Duration - arithemtics")
 {
+    vfs.Init();
     utils::localize.setDisplayLanguage("English");
 
     SECTION("Addition")
@@ -107,6 +102,8 @@ TEST_CASE("Duration - arithemtics")
 
 TEST_CASE("Duration - comparision")
 {
+    vfs.Init();
+
     utils::localize.setDisplayLanguage("English");
 
     SECTION("Duration")
@@ -151,6 +148,8 @@ TEST_CASE("Duration - comparision")
 
 TEST_CASE("Duration - display")
 {
+    vfs.Init();
+
     utils::localize.setDisplayLanguage("English");
 
     {
