@@ -6,6 +6,7 @@ from enum import Enum
 from harness import utils, log
 from harness.interface import CDCSerial as serial
 from harness.interface.defs import key_codes, endpoint, method
+from harness.interface.CDCSerial import Keytype
 from harness.utils import send_keystoke, application_keypath, send_char
 from harness.interface.error import TestError, Error
 import random
@@ -86,3 +87,11 @@ class Harness:
         })
         return ret
 
+    def turn_phone_off(self):
+        appDesktop = "ApplicationDesktop"
+        while not self.get_window_name() == appDesktop:
+            self.connection.send_key(key_codes["fnRight"], Keytype.long_press)
+
+        self.connection.send_key(key_codes["fnRight"], Keytype.long_press)
+        self.connection.send_key(key_codes["right"], Keytype.short_press)
+        self.connection.send_key(key_codes["enter"], Keytype.short_press)
