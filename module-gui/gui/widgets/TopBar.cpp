@@ -123,20 +123,7 @@ namespace gui
         switch (element) {
         case Elements::BATTERY: {
             elements.battery = active;
-            if (Store::Battery::get().state == Store::Battery::State::Discharging) {
-                setBatteryBars(active ? Store::Battery::get().level : 0);
-            }
-            else {
-                // plugged
-                if (active) {
-                    setBatteryChargingChange(true);
-                }
-                else {
-                    for (auto &el : batteryChargings) {
-                        el.second->setVisible(false);
-                    }
-                }
-            }
+            showBattery(elements.battery);
         } break;
         case Elements::LOCK: {
             elements.lock = active;
@@ -188,42 +175,40 @@ namespace gui
         return level;
     }
 
-    bool TopBar::setBatteryBars(uint32_t percent)
+    bool TopBar::updateBattery(uint32_t percent)
     {
-        if (Store::Battery::get().state != Store::Battery::State::Discharging) {
-
-            return false;
-        }
-        for (auto &el : batteryChargings) {
-            el.second->setVisible(false);
-        }
-        batteryShowBars(calculateBatteryBars(percent));
+        showBattery(elements.battery);
         return true;
     }
 
-    void TopBar::setBatteryChargingChange(bool plugged)
+    bool TopBar::updateBattery(bool plugged)
     {
-        switch (Store::Battery::get().state) {
+        showBattery(elements.battery);
+        return true;
+    }
 
-        case Store::Battery::State::Discharging:
-            setBatteryBars(Store::Battery::get().level);
-            break;
-        case Store::Battery::State::Charging:
-            break;
-        case Store::Battery::State::PluggedNotCharging:
-            break;
+    void TopBar::showBattery(bool shown)
+    {
+        // hide battery bars icons
+        for (const auto &bars : batteryBars) {
+            bars->setVisible(false);
         }
-        if (plugged) {}
-        //        if (battery == nullptr)
-        //            return;
-        //        if (plugged) {
-        //            chargingPending->setVisible(true);
-        //                        batteryShowBars(0);
-        //        }
-        //        else {
-        //            chargingPending->setVisible(false);
-        //
-        //        }
+        // hide battery charging icons
+        for (const auto &charging : batteryChargings) {
+            charging.second->setVisible(false);
+        }
+
+        if (shown) {
+            switch (Store::Battery::get().state) {
+            case Store::Battery::State::Discharging:
+                batteryShowBars(calculateBatteryBars(Store::Battery::get().level));
+                break;
+            case Store::Battery::State::Charging:
+            case Store::Battery::State::PluggedNotCharging:
+                batteryChargings[Store::Battery::get().state]->setVisible(true);
+                break;
+            }
+        }
     }
 
     bool TopBar::updateSignalStrength()
