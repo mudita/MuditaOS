@@ -26,6 +26,7 @@ set( LIBLITTLEFS_PRIVATE_INCLUDES ${LIBLITTLEFS_SRCDIR} )
 add_library( ${LIBLITTLEFS_TARGET} STATIC ${LIBLITTLEFS_SOURCES} )
 
 #target_compile_definitions(${LIBLITTLEFS_TARGET} PRIVATE LFS_YES_TRACE )
+target_compile_definitions(${LIBLITTLEFS_TARGET} PUBLIC LFS_THREADSAFE )
 
 if( COMMAND third_party_target_setup )
     third_party_target_setup( ${LIBLITTLEFS_TARGET} )

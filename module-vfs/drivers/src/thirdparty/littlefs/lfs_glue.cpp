@@ -5,7 +5,7 @@
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <log/log.hpp>
-
+#include <mutex.hpp>
 #include <errno.h>
 
 namespace purefs::fs::drivers::littlefs::internal
@@ -26,6 +26,7 @@ namespace purefs::fs::drivers::littlefs::internal
                 const std::weak_ptr<blkdev::disk_manager> disk;
                 const blkdev::disk_fd disk_h;
                 const size_t sector_size;
+                mutable cpp_freertos::MutexRecursive mutex;
             };
 
             int errno_to_lfs(int error)
@@ -149,6 +150,16 @@ namespace purefs::fs::drivers::littlefs::internal
                 }
                 return errno_to_lfs(err);
             }
+            int lock(const struct lfs_config *lfsc)
+            {
+                auto ctx = reinterpret_cast<io_context *>(lfsc->context);
+                return ctx->mutex.Lock() ? LFS_ERR_OK : LFS_ERR_IO;
+            }
+            int unlock(const struct lfs_config *lfsc)
+            {
+                auto ctx = reinterpret_cast<io_context *>(lfsc->context);
+                return ctx->mutex.Unlock() ? LFS_ERR_OK : LFS_ERR_IO;
+            }
         } // namespace lfs_io
     }     // namespace
 
@@ -168,6 +179,8 @@ namespace purefs::fs::drivers::littlefs::internal
         lfsc->prog    = lfs_io::prog;
         lfsc->erase   = lfs_io::erase;
         lfsc->sync    = lfs_io::sync;
+        lfsc->lock    = lfs_io::lock;
+        lfsc->unlock  = lfs_io::unlock;
         lfsc->context = ctx;
         return 0;
     }

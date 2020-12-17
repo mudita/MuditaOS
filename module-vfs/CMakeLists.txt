@@ -125,11 +125,8 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source
 )
 
-target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-bsp module-utils littlefs)
-
-if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    target_link_libraries(${PROJECT_NAME} -lstdc++fs)
-endif()
+target_link_libraries(${PROJECT_NAME} PUBLIC ${TARGET_LIBRARIES} module-bsp module-utils)
+target_link_libraries(${PROJECT_NAME} PRIVATE littlefs)
 
 if (${ENABLE_TESTS})
     add_subdirectory(tests)
