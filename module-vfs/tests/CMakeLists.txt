@@ -7,7 +7,11 @@ add_catch2_executable(
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_vfs.cpp
     LIBS
-        module-vfs module-utils
+        module-vfs 
+        module-utils
+        iosyscalls
+    DEPS
+        PurePhone.img-target
 )
 
 add_catch2_executable(

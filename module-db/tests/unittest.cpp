@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <vfs.hpp>
@@ -20,16 +20,9 @@
 
 class vfs vfs;
 
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_initializer;
-
 TEST_CASE("Create and destroy simple database")
 {
+    vfs.Init();
 
     Database::initialize();
 
@@ -129,6 +122,7 @@ class ScopedDir
 
 TEST_CASE("Database initialization scripts")
 {
+    vfs.Init();
     Database::initialize();
 
     const char *script_create = "CREATE TABLE IF NOT EXISTS tracks("

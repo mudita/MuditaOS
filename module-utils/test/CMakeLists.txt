@@ -53,18 +53,23 @@ add_catch2_executable(
         unittest_duration.cpp
     LIBS
         module-utils
+        iosyscalls
+    DEPS
+        PurePhone.img-target
 )
 
-message(WARNING "Unit tests for module-utils are disabled until they're fixed (EGD-5583).")
 # utils tests
-# add_catch2_executable(
-#    NAME
-#        utils
-#    SRCS
-#        unittest_utils.cpp
-#    LIBS
-#        module-utils
-#)
+add_catch2_executable(
+    NAME
+        utils
+    SRCS
+        unittest_utils.cpp
+    LIBS
+        module-utils
+        iosyscalls
+    DEPS
+        PurePhone.img-target
+)
 
 # Math tests
 add_catch2_executable(
