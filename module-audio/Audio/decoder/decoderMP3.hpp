@@ -6,7 +6,7 @@
 #include "minimp3/minimp3.h"
 
 #include <cstring>
-#include "decoder.hpp"
+#include "Decoder.hpp"
 
 extern "C"
 {
@@ -16,13 +16,11 @@ extern "C"
 namespace audio
 {
 
-    class decoderMP3 : public decoder
+    class decoderMP3 : public Decoder
     {
 
       public:
         decoderMP3(const char *fileName);
-
-        ~decoderMP3() = default;
 
         uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) override;
 

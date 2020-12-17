@@ -9,7 +9,12 @@
 #include <optional>
 #include <cstring>
 
+#include <log/log.hpp>
 
+#include "Audio/Stream.hpp"
+#include "Audio/Endpoint.hpp"
+#include "Audio/AudioCommon.hpp"
+#include "DecoderWorker.hpp"
 namespace audio
 {
     namespace channel
@@ -65,15 +70,17 @@ namespace audio
         }
     };
 
-    class decoder
+    class Decoder : public Source
     {
 
       public:
-        decoder(const char *fileName);
+        Decoder(const char *fileName);
 
-        virtual ~decoder();
+        virtual ~Decoder();
 
         virtual uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) = 0;
+
+        void startDecodingWorker(Stream &audioStream, DecoderWorker::EndOfFileCallback endOfFileCallback);
 
         std::unique_ptr<Tags> fetchTags();
 
@@ -96,7 +103,7 @@ namespace audio
         }
 
         // Factory method
-        static std::unique_ptr<decoder> Create(const char *file);
+        static std::unique_ptr<Decoder> Create(const char *file);
 
       protected:
         virtual void fetchTagsSpecific(){};
@@ -116,7 +123,9 @@ namespace audio
         std::unique_ptr<int16_t[]> workerBuffer;
         std::unique_ptr<Tags> tag;
         bool isInitialized = false;
+
+        // decoding worker
+        std::unique_ptr<DecoderWorker> audioWorker;
     };
 
 } // namespace audio
-

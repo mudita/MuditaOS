@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include "decoder.hpp"
+#include "Decoder.hpp"
 #include "dr_flac.h"
 
 namespace audio
 {
 
-    class decoderFLAC : public decoder
+    class decoderFLAC : public Decoder
     {
 
       public:

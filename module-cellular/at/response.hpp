@@ -9,6 +9,8 @@
 #include <memory>
 #include <string>
 
+#include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
+
 namespace at
 {
     namespace response
@@ -86,5 +88,42 @@ namespace at
             uint32_t parseNumericBandString(std::string &string);
             uint32_t parseLteBandString(std::string &string);
         } // namespace qnwinfo
+
+        namespace clir
+        {
+            constexpr uint32_t clirTokens = 2;
+
+            enum class ServiceState
+            {
+                AccordingToSubscription,
+                ServiceEnabled,
+                ServiceDisabled,
+            };
+
+            enum class ServiceStatus
+            {
+                NotProvisioned,
+                PermanentProvisioned,
+                Unknown,
+                TemporaryRestricted,
+                TemporaryAllowed
+            };
+
+            class ClirResponse
+            {
+              public:
+                ServiceState serviceState;
+                ServiceStatus serviceStatus;
+
+                explicit ClirResponse(const ServiceState &state, const ServiceStatus &status)
+                    : serviceState(state), serviceStatus(status)
+                {}
+            };
+
+            auto parseClir(const std::string &response) -> std::optional<ClirResponse>;
+            auto getState(const ServiceState &state) -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
+            auto getStatus(const ServiceStatus &status)
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
+        } // namespace clir
     }     // namespace response
 } // namespace at

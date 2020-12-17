@@ -44,6 +44,8 @@ namespace cellular
             Erasure        ///< MMI string starts with ##
         };
 
+        auto getProcedureType() -> ProcedureType;
+
       protected:
         std::string request;
         std::string serviceCode;

@@ -7,7 +7,7 @@
 
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
-#include <Audio/decoder/decoder.hpp>
+#include <Audio/decoder/Decoder.hpp>
 
 #include <memory>
 #include <optional>

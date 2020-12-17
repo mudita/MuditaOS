@@ -185,7 +185,7 @@ Here's the bare minimum that will enable you to bootstrap the environment on Lin
 ```bash
 git submodule update --init --recursive                        # initialize submodules
 cd ./config/ && ./bootstrap.sh && cd ../                       # bootstrap requirements
-./cofnigure.sh rt1051|linux Debug|Release|RelWithDebInfo       # configure build
+./configure.sh rt1051|linux Debug|Release|RelWithDebInfo       # configure build
 cd <build-dir>                                                 # build dir depends on configuration
 make -j                                                        # build
 ./PurePhone                                                    # run PurePhone - emulator screen will pop up (on the Linux filesystem)

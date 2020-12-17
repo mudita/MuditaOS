@@ -5,7 +5,7 @@
 #include "service-audio/ServiceAudio.hpp"
 #include "service-audio/AudioMessage.hpp"
 
-#include <Audio/decoder/decoder.hpp>
+#include <Audio/decoder/Decoder.hpp>
 #include <Service/Bus.hpp>
 #include <Service/Common.hpp>
 #include <log/log.hpp>

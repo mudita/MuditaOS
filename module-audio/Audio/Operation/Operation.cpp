@@ -10,7 +10,7 @@
 #include "RecorderOperation.hpp"
 #include "RouterOperation.hpp"
 
-#include "Audio/decoder/decoder.hpp"
+#include "Audio/decoder/Decoder.hpp"
 
 #include <bsp/audio/bsp_audio.hpp>
 #include <module-bsp/board/rt1051/bsp/audio/RT1051BluetoothAudio.hpp>

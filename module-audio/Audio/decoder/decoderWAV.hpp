@@ -3,20 +3,17 @@
 
 #pragma once
 
-#include "decoder.hpp"
+#include "Decoder.hpp"
 #include <vector>
 
 namespace audio
 {
 
-    class decoderWAV : public decoder
+    class decoderWAV : public Decoder
     {
 
       public:
         decoderWAV(const char *fileName);
-
-        ~decoderWAV()
-        {}
 
         uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) override;
 

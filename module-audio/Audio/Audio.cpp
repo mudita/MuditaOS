@@ -28,7 +28,7 @@ namespace audio
 
     std::optional<Tags> Audio::GetFileTags(const char *filename)
     {
-        auto ret = decoder::Create(filename);
+        auto ret = Decoder::Create(filename);
         if (ret == nullptr) {
             return {};
         }
@@ -91,6 +91,8 @@ namespace audio
                 break;
             }
             currentOperation = std::move(ret);
+            currentOperation->SetDataStreams(&dataStreamOut, &dataStreamIn);
+
             UpdateProfiles();
 
             if (btData) {
