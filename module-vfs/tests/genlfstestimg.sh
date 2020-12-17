@@ -37,7 +37,7 @@ sfdisk $IMAGE_FILE << ==sfdisk
 label: dos
 unit: sectors
 
-/dev/sdz1 : start=      2048, size=$SECTOR_END, type=9e, bootable
+/dev/sdz1 : start=$SECTOR_START, size=$SECTOR_END, type=9e
 ==sfdisk
-./genlittlefs --image $IMAGE_FILE --block_size=4096  --overwrite  --partition_num 1 -- assets/*
+./genlittlefs --image $IMAGE_FILE --block_size=4096  --overwrite  --partition_num 1 -- assets/* .boot.json
 
