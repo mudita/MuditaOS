@@ -5,17 +5,35 @@
 
 #include "OptionWindow.hpp"
 
+#include <Device.hpp>
+
 namespace gui
 {
     class AllDevicesWindow : public OptionWindow
     {
       public:
-        AllDevicesWindow(app::Application *app);
-        auto onInput(const InputEvent &inputEvent) -> bool override;
+        explicit AllDevicesWindow(app::Application *app);
 
       private:
+        auto allDevicesOptionsList(const std::vector<Devicei> &vector) -> std::list<Option>;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
+
         Image *leftArrowImage = nullptr;
         Image *crossImage     = nullptr;
-        auto allDevicesOptionsList() -> std::list<Option>;
     };
-}; // namespace gui
+
+    class BondedDevicesData : public SwitchData
+    {
+      public:
+        explicit BondedDevicesData(std::vector<Devicei> devices) : SwitchData(), devices(std::move(devices))
+        {}
+        [[nodiscard]] auto getDevices() const -> const std::vector<Devicei> &
+        {
+            return devices;
+        }
+
+      private:
+        const std::vector<Devicei> devices;
+    };
+} // namespace gui

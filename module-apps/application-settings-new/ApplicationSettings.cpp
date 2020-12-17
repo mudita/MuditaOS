@@ -29,8 +29,9 @@
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <module-utils/i18n/i18n.hpp>
-#include <service-bluetooth/messages/Status.hpp>
+#include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
+#include <service-bluetooth/messages/Status.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-db/Settings.hpp>
 
@@ -102,8 +103,16 @@ namespace app
         else if (auto responseDeviceNameMsg = dynamic_cast<message::bluetooth::ResponseDeviceName *>(msgl);
                  nullptr != responseDeviceNameMsg) {
             if (gui::window::name::phone_name == getCurrentWindow()->getName()) {
-                auto btPhoneNameData = std::make_unique<gui::PhoneNameData>(responseDeviceNameMsg->getName());
-                switchWindow(gui::window::name::phone_name, std::move(btPhoneNameData));
+                auto phoneNameData = std::make_unique<gui::PhoneNameData>(responseDeviceNameMsg->getName());
+                switchWindow(gui::window::name::phone_name, std::move(phoneNameData));
+            }
+        }
+        else if (auto responseBondedDevicesMsg = dynamic_cast<message::bluetooth::ResponseBondedDevices *>(msgl);
+                 nullptr != responseBondedDevicesMsg) {
+            if (gui::window::name::all_devices == getCurrentWindow()->getName()) {
+                auto bondedDevicesData =
+                    std::make_unique<gui::BondedDevicesData>(responseBondedDevicesMsg->getDevices());
+                switchWindow(gui::window::name::all_devices, std::move(bondedDevicesData));
             }
         }
 

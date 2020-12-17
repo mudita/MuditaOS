@@ -14,8 +14,8 @@ namespace gui
         explicit BluetoothWindow(app::Application *app);
 
       private:
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto bluetoothOptionsList() -> std::list<gui::Option>;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuildOptionList();
         void switchHandler(bool &switchState);
 

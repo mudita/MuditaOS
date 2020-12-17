@@ -35,6 +35,11 @@ class ServiceBluetooth : public sys::Service
 
     // will be replaced with settings storage introduced in [EGD-4579]
     BluetoothStatus btStatus;
+    std::vector<Devicei> devices{Devicei("Paired_device1"),
+                                 Devicei("Paired_device2"),
+                                 Devicei("Paired_device3"),
+                                 Devicei("Paired_device4"),
+                                 Devicei("Paired_device5")};
     std::string phoneName = "PurePhone";
 
     void stateSettingChanged(std::string value);
