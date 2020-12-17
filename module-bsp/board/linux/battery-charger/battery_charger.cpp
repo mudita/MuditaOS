@@ -34,6 +34,7 @@ static uint8_t battLevel = 100;
 static bool plugged      = false;
 namespace bsp
 {
+
     static void battery_worker(void *pvp);
 
     int battery_Init(xQueueHandle qHandle)
@@ -111,5 +112,4 @@ namespace bsp
             vTaskDelay(50);
         }
     }
-
 } // namespace bsp

@@ -8,8 +8,6 @@
 #ifndef MODULE_BSP_BSP_BATTERY_CHARGER_BATTERY_CHARGER_HPP_
 #define MODULE_BSP_BSP_BATTERY_CHARGER_BATTERY_CHARGER_HPP_
 
-#include <cstdint>
-
 namespace bsp{
 
 	enum class batteryChargerRegisters{
