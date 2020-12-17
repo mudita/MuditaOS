@@ -1,8 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "lfs_extension.h"
-#include "lfs_util.h"
+#include <littlefs/lfs_extension.h>
 
 static inline void lfs_superblock_fromle32(lfs_superblock_t *superblock)
 {
