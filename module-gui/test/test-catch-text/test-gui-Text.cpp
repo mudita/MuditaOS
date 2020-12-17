@@ -263,7 +263,7 @@ TEST_CASE("Text backup and restore tests")
     SECTION("Backup one line text with moved cursor, overwrite text and restore")
     {
         mockup::fontManager();
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
 
         text->addText(testStringOneLine);
 
@@ -289,7 +289,7 @@ TEST_CASE("Text backup and restore tests")
     SECTION("Backup two line text with moved cursor, overwrite text and restore")
     {
         mockup::fontManager();
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
 
         text->addText(testStringTwoLines);
 
@@ -326,7 +326,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSignsCount, 0);
 
         text->addText(testStringOneLine);
@@ -338,7 +338,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSignsCount, 1);
 
         text->addText(testStringOneLine);
@@ -350,7 +350,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSignsCount, testStringOneLine.length());
 
         text->addText(testStringTwoLines);
@@ -362,7 +362,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSignsCount, testStringTwoLines.length());
 
         text->addText(testStringTwoLines);
@@ -374,7 +374,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSignsCount, testStringOneLine.length());
 
         text->addText(TextBlock(testStringTwoLines, Font(27).raw(), TextBlock::End::None));
@@ -390,7 +390,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
 
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSignsCount, textLimit);
 
         text->addText(TextBlock(testStringOneLine, Font(27).raw(), TextBlock::End::None));
@@ -408,7 +408,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
 
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
 
         text->setTextLimitType(gui::TextLimitType::MaxSignsCount, signCountRestricted);
 
@@ -423,7 +423,7 @@ TEST_CASE("Text addition bounds - text sings count restricted")
 
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
 
         auto format         = text->getTextFormat();
         auto parsedRichText = gui::text::RichTextParser().parse(richTextTwoLines, &format);
@@ -450,14 +450,14 @@ TEST_CASE("Text addition bounds - text widget size restricted")
     std::string testStringSecondLine = "Test String 2";
 
     std::string richTextTwoLines =
-        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='25'>String </text><text size='20' "
+        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
         "weight='bold'>1</text><br></br><text>Test String 2</text>";
 
     SECTION("Adding text to 0 size text and no parent to grant size")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(0, 0);
 
@@ -485,7 +485,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 30);
 
@@ -500,7 +500,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 60);
 
@@ -533,7 +533,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(0, 0);
 
@@ -561,7 +561,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(150, 30);
 
@@ -577,7 +577,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 60);
 
@@ -612,7 +612,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(0, 0);
 
@@ -640,9 +640,9 @@ TEST_CASE("Text addition bounds - text widget size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSize);
-        text->setMaximumSize(160, 40);
+        text->setMaximumSize(140, 40);
 
         text->addRichText(richTextTwoLines);
 
@@ -655,7 +655,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 80);
 
@@ -674,7 +674,7 @@ TEST_CASE("Text addition bounds - text widget size restricted")
         text->setTextLimitType(gui::TextLimitType::MaxSize);
         text->setMaximumSize(200, 80);
         BoxLayout layout = BoxLayout(nullptr, 0, 0, 0, 0);
-        layout.setMaximumSize(160, 40);
+        layout.setMaximumSize(140, 40);
         layout.addWidget(text);
 
         text->addRichText(richTextTwoLines);
@@ -694,14 +694,14 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
     std::string testStringSecondLine = "Test String 2";
 
     std::string richTextTwoLines =
-        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='25'>String </text><text size='20' "
+        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
         "weight='bold'>1</text><br></br><text>Test String 2</text>";
 
     SECTION("Adding text to 0 line size text")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxLines, 0);
         text->setMaximumSize(150, 100);
 
@@ -714,7 +714,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxLines, 1);
         text->setMaximumSize(150, 100);
 
@@ -729,7 +729,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxLines, 2);
         text->setMaximumSize(150, 100);
 
@@ -744,7 +744,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxLines, 0);
         text->setMaximumSize(150, 100);
 
@@ -757,7 +757,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxLines, 1);
         text->setMaximumSize(150, 100);
 
@@ -773,7 +773,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxLines, 2);
         text->setMaximumSize(150, 100);
 
@@ -789,7 +789,7 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxLines, 0);
         text->setMaximumSize(150, 100);
 
@@ -802,9 +802,9 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxLines, 1);
-        text->setMaximumSize(160, 100);
+        text->setMaximumSize(140, 100);
 
         text->addRichText(richTextTwoLines);
 
@@ -817,9 +817,9 @@ TEST_CASE("Text addition bounds - text widget line size restricted")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setTextLimitType(gui::TextLimitType::MaxLines, 2);
-        text->setMaximumSize(160, 100);
+        text->setMaximumSize(140, 100);
 
         text->addRichText(richTextTwoLines);
 
@@ -842,7 +842,7 @@ TEST_CASE("Text addition bounds - multiple limits tests")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
 
         text->setTextLimitType(gui::TextLimitType::MaxLines, 2);
         text->setTextLimitType(gui::TextLimitType::MaxSignsCount, testStringOneLine.length());
@@ -860,7 +860,7 @@ TEST_CASE("Text addition bounds - multiple limits tests")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
 
         unsigned int signsLimit = 100;
 
@@ -881,7 +881,7 @@ TEST_CASE("Text addition bounds - multiple limits tests")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
 
         unsigned int signsLimit = 100;
 
@@ -903,7 +903,7 @@ TEST_CASE("Text addition bounds - multiple limits tests")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
 
         auto format         = text->getTextFormat();
         auto parsedRichText = gui::text::RichTextParser().parse(richTextTwoLines, &format);
@@ -923,7 +923,7 @@ TEST_CASE("Text addition bounds - multiple limits tests")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
 
         unsigned int signsLimit = 100;
 
@@ -942,7 +942,7 @@ TEST_CASE("Text addition bounds - multiple limits tests")
     {
         mockup::fontManager();
         using namespace gui;
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
 
         unsigned int signsLimit = 100;
 

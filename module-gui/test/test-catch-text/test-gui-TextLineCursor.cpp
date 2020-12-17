@@ -55,7 +55,7 @@ TEST_CASE("TextLineCursor - navigation without scroll")
     SECTION("Default position three lines text")
     {
         mockup::fontManager();
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setMaximumSize(400, 200);
 
         text->addText(TextBlock(testStringShortLine, Font(27).raw(), TextBlock::End::Newline));
@@ -72,7 +72,7 @@ TEST_CASE("TextLineCursor - navigation without scroll")
     SECTION("Movement three lines text test -> short|normal|long")
     {
         mockup::fontManager();
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setMaximumSize(400, 200);
 
         std::tuple<const TextLine *, unsigned int, unsigned int> selectedLine;
@@ -162,7 +162,7 @@ TEST_CASE("TextLineCursor - navigation without scroll")
     SECTION("Movement three lines text test -> long|short|normal")
     {
         mockup::fontManager();
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setMaximumSize(400, 200);
 
         std::tuple<const TextLine *, unsigned int, unsigned int> selectedLine;
@@ -222,7 +222,7 @@ TEST_CASE("TextLineCursor - navigation with scroll")
     {
 
         mockup::fontManager();
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setMaximumSize(400, 40);
         text->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
 
@@ -326,7 +326,7 @@ TEST_CASE("TextLineCursor - navigation with scroll")
     {
 
         mockup::fontManager();
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setMaximumSize(400, 40);
         text->setCursorStartPosition(gui::CursorStartPosition::DocumentEnd);
 
@@ -379,7 +379,7 @@ TEST_CASE("TextLineCursor - navigation with scroll")
     SECTION("One 10 lines text space text containing three lines - scroll init position at document begin")
     {
         mockup::fontManager();
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setMaximumSize(400, 90);
         text->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
 
@@ -455,7 +455,7 @@ TEST_CASE("TextLineCursor - navigation with scroll")
     SECTION("One 10 lines text space text containing three lines - scroll init position at document end")
     {
         mockup::fontManager();
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setMaximumSize(400, 90);
         text->setCursorStartPosition(gui::CursorStartPosition::DocumentEnd);
 
@@ -535,7 +535,7 @@ TEST_CASE("TextLineCursor - addition and deletion with scroll")
     {
 
         mockup::fontManager();
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setMaximumSize(600, 40);
         text->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
 
@@ -597,7 +597,7 @@ TEST_CASE("TextLineCursor - addition and deletion with scroll")
     SECTION("One 10 lines text space text containing three lines - scroll init position at document end")
     {
         mockup::fontManager();
-        auto text = new gui::TestText();
+        auto text = std::make_unique<gui::TestText>();
         text->setMaximumSize(400, 90);
         text->setCursorStartPosition(gui::CursorStartPosition::DocumentEnd);
 

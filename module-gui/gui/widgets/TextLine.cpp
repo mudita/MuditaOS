@@ -51,6 +51,7 @@ namespace gui
 
             auto textFormat = localCursor->getFormat();
             if (textFormat->getFont() == nullptr) {
+                lineEnd = true;
                 return;
             }
 
