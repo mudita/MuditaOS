@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 #include <purefs/fs/mount_point.hpp>
-#include <lfs.h>
+#include <littlefs/lfs.h>
 
 namespace purefs::fs::drivers
 {

@@ -4,7 +4,7 @@
 #pragma once
 
 #include <purefs/fs/directory_handle.hpp>
-#include <lfs.h>
+#include <littlefs/lfs.h>
 
 namespace purefs::fs::drivers
 {

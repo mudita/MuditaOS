@@ -8,8 +8,8 @@
 #include <purefs/fs/drivers/directory_handle_littlefs.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_handle.hpp>
-#include <lfs.h>
-#include <lfs_extension.h>
+#include <littlefs/lfs.h>
+#include <littlefs/lfs_extension.h>
 #include <log/log.hpp>
 
 #include <climits>
