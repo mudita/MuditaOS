@@ -67,7 +67,7 @@ function setup_gcc_alternatives() {
 function install_pip_packages() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     pip3 install -r ${SCRIPT_DIR}/requirements.txt
-    pip3 install -r ${SCRIPT_DIR}/../tests/requirements.txt
+    pip3 install -r ${SCRIPT_DIR}/../test/requirements.txt
 }
 
 function install_ubuntu_packages() {
@@ -179,4 +179,3 @@ do
     echo "${I}" > LAST_STEP
     I=$(( ${I} + 1 ))
 done
-
