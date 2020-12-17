@@ -48,7 +48,10 @@ namespace purefs::fs::internal
         {
             const auto n1 = full_path.find(m_path);
             if (n1 == 0) {
-                return std::string(native_root()).append(full_path.substr(m_path.size()));
+                auto ret = std::string(native_root()).append(full_path.substr(m_path.size()));
+                if (ret.empty())
+                    ret.append("/");
+                return ret;
             }
             else {
                 return {};

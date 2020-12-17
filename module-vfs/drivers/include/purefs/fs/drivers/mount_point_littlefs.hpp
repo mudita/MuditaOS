@@ -30,7 +30,7 @@ namespace purefs::fs::drivers
       private:
         auto native_root() const noexcept -> std::string_view override
         {
-            return "/";
+            return "";
         }
         struct lfs_config m_lfs_conf
         {};
