@@ -13,6 +13,7 @@ import random
 class Harness:
     connection = None
     is_phone_unlocked = False
+    is_echo_mode = False
     port_name = ''
 
     def __init__(self, port):
@@ -43,6 +44,14 @@ class Harness:
             self.unlock_phone()
 
         func(self.connection)
+
+    def connection_echo_mode_on(self):
+        if self.connection.enable_echo_mode():
+            self.is_echo_mode = True
+
+    def connection_echo_mode_off(self):
+        if self.connection.disable_echo_mode():
+            self.is_echo_mode = False
 
     def open_application(self, app):
         send_keystoke(application_keypath[app], self.connection)
