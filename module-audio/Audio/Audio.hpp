@@ -105,8 +105,6 @@ namespace audio
 
         virtual audio::RetCode Mute();
 
-        virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data);
-
       private:
         void UpdateProfiles();
         AudioSinkState audioSinkState;

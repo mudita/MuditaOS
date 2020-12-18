@@ -10,10 +10,9 @@
 #include "RecorderOperation.hpp"
 #include "RouterOperation.hpp"
 
-#include "Audio/decoder/Decoder.hpp"
+#include "Audio/BluetoothProxyAudio.hpp"
 
 #include <bsp/audio/bsp_audio.hpp>
-#include <module-bsp/board/rt1051/bsp/audio/RT1051BluetoothAudio.hpp>
 
 namespace audio
 {
@@ -57,16 +56,6 @@ namespace audio
         }
     }
 
-    void Operation::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
-    {
-        if (auto device = dynamic_cast<bsp::RT1051BluetoothAudio *>(audioDevice.get()); device != nullptr) {
-            GetProfile()->SetSampleRate(data->metadata.sampleRate);
-            device->sourceQueue = data->out;
-            device->metadata    = data->metadata;
-            LOG_INFO("Queue and metadata set!");
-        }
-    }
-
     audio::RetCode Operation::SwitchToPriorityProfile()
     {
         for (auto &p : supportedProfiles) {
@@ -103,5 +92,15 @@ namespace audio
         }
 
         supportedProfiles.emplace_back(Profile::Create(profile, nullptr, volume, gain), isAvailable);
+    }
+    std::optional<std::unique_ptr<bsp::AudioDevice>> Operation::CreateDevice(bsp::AudioDevice::Type type,
+                                                                             bsp::AudioDevice::audioCallback_t callback)
+    {
+        if (type == bsp::AudioDevice::Type::Bluetooth) {
+            auto audioFormat = currentProfile->GetAudioFormat();
+            return std::make_unique<bsp::BluetoothProxyAudio>(
+                serviceCallback, *dataStreamOut, *dataStreamIn, audioFormat);
+        }
+        return bsp::AudioDevice::Create(type, callback).value_or(nullptr);
     }
 } // namespace audio

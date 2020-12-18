@@ -158,13 +158,12 @@ namespace audio
             return RetCode::UnsupportedProfile;
         }
 
-        audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), nullptr).value_or(nullptr);
+        audioDevice = CreateDevice(currentProfile->GetAudioDeviceType(), nullptr).value_or(nullptr);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
         }
-
-        audioDeviceCellular = bsp::AudioDevice::Create(bsp::AudioDevice::Type::Cellular, nullptr).value_or(nullptr);
+        audioDeviceCellular = CreateDevice(bsp::AudioDevice::Type::Cellular, nullptr).value_or(nullptr);
         if (audioDeviceCellular == nullptr) {
             LOG_ERROR("Error creating AudioDeviceCellular");
             return RetCode::Failed;
