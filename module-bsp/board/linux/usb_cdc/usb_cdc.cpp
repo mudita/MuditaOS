@@ -5,12 +5,23 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <fstream>
+#include <string>
 
 namespace bsp
 {
     int fd;
     xQueueHandle USBReceiveQueue;
     constexpr auto ptsFileName = "/tmp/purephone_pts_name";
+
+#if USBCDC_ECHO_ENABLED
+    bool usbCdcEchoEnabled = false;
+
+    constexpr std::string_view usbCDCEchoOnCmd("UsbCdcEcho=ON");
+    constexpr std::string_view usbCDCEchoOffCmd("UsbCdcEcho=OFF");
+
+    constexpr auto usbCDCEchoOnCmdLength  = usbCDCEchoOnCmd.length();
+    constexpr auto usbCDCEchoOffCmdLength = usbCDCEchoOffCmd.length();
+#endif
 
     void usbDeviceTask(void *ptr)
     {
@@ -20,15 +31,37 @@ namespace bsp
     int usbCDCReceive(void *)
     {
         LOG_INFO("[ServiceDesktop:BSP_Driver] Start reading on fd:%d", fd);
-        uint8_t inputData[SERIAL_BUFFER_LEN];
+        char inputData[SERIAL_BUFFER_LEN];
         static std::string receiveMsg;
 
         while (1) {
             if (uxQueueSpacesAvailable(USBReceiveQueue) != 0) {
+                memset(inputData, 0, SERIAL_BUFFER_LEN);
+
                 ssize_t length = read(fd, &inputData[0], SERIAL_BUFFER_LEN);
                 if (length > 0) {
+                    LOG_DEBUG(
+                        "[ServiceDesktop:BSP_Driver] Received: %d signs: [%s]", static_cast<int>(length), inputData);
+#if USBCDC_ECHO_ENABLED
+                    bool usbCdcEchoEnabledPrev = usbCdcEchoEnabled;
+
+                    auto usbEchoCmd = std::string_view{inputData, static_cast<size_t>(length)};
+
+                    if ((length == usbCDCEchoOnCmdLength) && (usbCDCEchoOnCmd == usbEchoCmd)) {
+                        usbCdcEchoEnabled = true;
+                    }
+                    else if ((length == usbCDCEchoOffCmdLength) && (usbCDCEchoOffCmd == usbEchoCmd)) {
+                        usbCdcEchoEnabled = false;
+                    }
+
+                    if (usbCdcEchoEnabled || usbCdcEchoEnabledPrev) {
+                        usbCDCSendRaw(inputData, length);
+                        LOG_DEBUG(
+                            "[ServiceDesktop:BSP_Driver] Echoed: %d signs: [%s]", static_cast<int>(length), inputData);
+                        continue;
+                    }
+#endif
                     receiveMsg = std::string(inputData, inputData + length);
-                    LOG_DEBUG("[ServiceDesktop:BSP_Driver] Received: %d signs", static_cast<int>(length));
                     xQueueSend(USBReceiveQueue, &receiveMsg, portMAX_DELAY);
                 }
                 else {
@@ -45,9 +78,14 @@ namespace bsp
 
     int usbCDCSend(std::string *sendMsg)
     {
-        ssize_t t = write(fd, sendMsg->c_str(), sendMsg->length());
+        return usbCDCSendRaw(sendMsg->c_str(), sendMsg->length());
+    }
+
+    int usbCDCSendRaw(const char *dataPtr, size_t dataLen)
+    {
+        ssize_t t = write(fd, dataPtr, dataLen);
         if (t >= 0) {
-            LOG_DEBUG("[ServiceDesktop:BSP_Driver] Send: %d signs", static_cast<int>(t));
+            LOG_DEBUG("[ServiceDesktop:BSP_Driver] Sent: %d", static_cast<int>(t));
             return 0;
         }
         else {
