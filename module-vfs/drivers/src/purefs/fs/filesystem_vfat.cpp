@@ -76,7 +76,7 @@ namespace purefs::fs::drivers
             if (flags & O_APPEND)
                 fat_mode |= FA_OPEN_APPEND;
             if (flags & O_CREAT)
-                fat_mode |= FA_CREATE_NEW;
+                fat_mode |= FA_OPEN_ALWAYS;
             if (flags & O_TRUNC)
                 fat_mode |= FA_CREATE_ALWAYS;
             return fat_mode;
