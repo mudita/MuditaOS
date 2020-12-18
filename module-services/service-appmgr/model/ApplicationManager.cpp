@@ -139,8 +139,8 @@ namespace app::manager
             !ret) {
             LOG_ERROR("Failed to initialize GUI service");
         }
-        if (bool ret =
-                sys::SystemManager::CreateService(std::make_shared<ServiceEink>(service::name::eink, GetName()), this);
+        if (bool ret = sys::SystemManager::CreateService(
+                std::make_shared<eink::ServiceEink>(service::name::eink, GetName()), this);
             !ret) {
             LOG_ERROR("Failed to initialize EInk service");
         }
