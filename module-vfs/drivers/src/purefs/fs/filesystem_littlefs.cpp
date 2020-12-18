@@ -229,19 +229,23 @@ namespace purefs::fs::drivers
             auto ssize  = diskmm->get_info(disk, blkdev::info_type::sector_size);
             if (ssize < 0) {
                 LOG_ERROR("Unable to read sector size %i", int(ssize));
-                return ssize;
+                err = ssize;
             }
-            err = setup_lfs_config(vmnt->lfs_config(), ssize, disk->sectors());
+            else {
+                err = setup_lfs_config(vmnt->lfs_config(), ssize, disk->sectors());
+            }
         }
-        if (err) {
-            return err;
+        if (!err) {
+            err = lfs_mount(vmnt->lfs_mount(), vmnt->lfs_config());
         }
-        err = lfs_mount(vmnt->lfs_mount(), vmnt->lfs_config());
-        if (err) {
+        else {
             LOG_ERROR("LFS mount error %i", err);
         }
         if (!err) {
             filesystem_operations::mount(mnt);
+        }
+        else {
+            littlefs::internal::remove_volume(vmnt->lfs_config());
         }
         return lfs_to_errno(err);
     }
