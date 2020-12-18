@@ -8,6 +8,7 @@
 #include <bsp/audio/bsp_audio.hpp>
 #include <Utils.hpp>
 #include <utility>
+#include <Service/Message.hpp>
 
 #include "Profiles/Profile.hpp"
 
@@ -249,14 +250,7 @@ namespace audio
 
 namespace AudioServiceMessage
 {
-
-    class Message
-    {
-      public:
-        virtual ~Message() = default;
-    };
-
-    class EndOfFile : public Message
+    class EndOfFile : public sys::Message
     {
       public:
         explicit EndOfFile(audio::Token &token) : token(token)
@@ -270,7 +264,7 @@ namespace AudioServiceMessage
         audio::Token token = audio::Token::MakeBadToken();
     };
 
-    class FileSystemNoSpace : public Message
+    class FileSystemNoSpace : public sys::Message
     {
       public:
         explicit FileSystemNoSpace(audio::Token &token) : token(token)
@@ -284,7 +278,7 @@ namespace AudioServiceMessage
         audio::Token token = audio::Token::MakeBadToken();
     };
 
-    class DbRequest : public Message
+    class DbRequest : public sys::Message
     {
       public:
         explicit DbRequest(std::string path) : path(std::move(path))
@@ -298,5 +292,5 @@ namespace AudioServiceMessage
         const std::string path;
     };
 
-    using Callback = std::function<std::optional<std::string>(const Message *e)>;
+    using Callback = std::function<std::optional<std::string>(const sys::Message *msg)>;
 } // namespace AudioServiceMessage

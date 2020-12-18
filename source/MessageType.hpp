@@ -192,6 +192,14 @@ enum class MessageType
     BluetoothDeviceMetadata,
     BluetoothRequestStream,
 
+    // bluetooth proxy
+    BluetoothProxyStart,
+    BluetoothProxyStop,
+    BluetoothProxyOutputVolumeCtrl,
+    BluetoothProxyInputGainCtrl,
+    BluetoothProxyOutputPathCtrl,
+    BluetoothProxyInputPathCtrl,
+
     LwIP_request,
     EVM_GPIO,
     SIMTrayEvent,

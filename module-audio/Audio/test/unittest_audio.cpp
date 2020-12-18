@@ -74,8 +74,8 @@ class MockAudio : public audio::Audio
 
   public:
     MockAudio(audio::Audio::State state, audio::PlaybackType plbckType, audio::Operation::State opState)
-        : audio::Audio([](const AudioServiceMessage::Message *e) { return std::optional<std::string>(); }),
-          state(state), plbckType(plbckType), opState(opState)
+        : audio::Audio([](const sys::Message *e) { return std::optional<std::string>(); }), state(state),
+          plbckType(plbckType), opState(opState)
     {}
 
     audio::PlaybackType GetCurrentOperationPlaybackType() const override
