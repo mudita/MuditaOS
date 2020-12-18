@@ -70,12 +70,12 @@ namespace gui
 
         // icons for battery
         battery = {
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery0"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery1"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery2"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery3"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery4"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery5"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery_low_W_M"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery1_W_M"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery2_W_M"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery3_W_M"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery4_W_M"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery5_W_M"),
         };
         batteryShowBars(0);
 
