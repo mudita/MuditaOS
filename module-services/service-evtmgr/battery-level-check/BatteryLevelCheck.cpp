@@ -15,7 +15,8 @@ namespace battery_level_check
 {
     namespace
     {
-        unsigned int batteryLevelCritical = 0;
+        constexpr inline auto DEFAULT_LEVEL = 10;
+        unsigned int batteryLevelCritical   = DEFAULT_LEVEL;
 
         sys::Service *parentService = nullptr;
 
@@ -31,8 +32,10 @@ namespace battery_level_check
             if (!setting.empty()) {
                 batteryLevelCritical = utils::getNumericValue<unsigned int>(setting);
             }
+            else {
+                setBatteryCriticalLevel(DEFAULT_LEVEL);
+            }
         }
-
     } // namespace
 
     void init(sys::Service *service)
