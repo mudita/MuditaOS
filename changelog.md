@@ -1,29 +1,32 @@
 # MuditaOS changelog
 
-## Current release
-### Fixed
-* `[settings]` Fix lack of sim at startup
-* `[settings]` Fix Network All Operators display condition
-* `[settings]` Fix Network window items indentation
+## [0.51.1 2020-12-18]
 
 ### Added
 
-* `[gui]` Added DOM dump capability for gui::Item objects
-* `[PowerManagement]` PowerManagement: Enable FreeRTOS Run Time Statistics
-* `[PowerManagement]` Added CPU load measurement.
-* `[file indexer]` Support for deleting entries in File Indexer DB.
-* `[listview]` Added onEmpty list callbacks and implemented them for notes and messages. 
-* `[notes]` Added list rebuild on notifications.
-* `[cellular]` Custom MMI response message.
+* Add screen light control.
+* Add SIM switch setting.
 
 ### Changed
 
-* `[PowerManagement]` Change hardware timers clock source
-* `[bluetooth]` Underlying communication with the Bluetooth module over DMA (direct access)
-* `[system]` Workers refactor and state transition fixes
-* Change audio data path synchronization.
+* Several database stability improvements.
+* Change audio data path to solve synchronization issues.
 
+### Fixed
 
+* Fix empty list behavior.
+* Fix input and display language settings.
+
+### Removed
+
+* Remove flawed log dumping mechanism.
+
+### Other
+
+* Add Ecoboot download target.
+* Add several minor documentation fixes.
+* Add commit format checker to the CI workflow.
+* Add several VFS related fixes.
 
 ## [0.50.1 2020-12-14]
 
@@ -70,7 +73,7 @@
 * Fix too many time options in the meditation application.
 * Fix default counter settings.
 * Fix displaying the special characters in a note title.
-* Fixed CUSD URC parser.
+
 
 ### Other
 
