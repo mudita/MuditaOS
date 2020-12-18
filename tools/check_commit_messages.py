@@ -56,6 +56,7 @@ def main():
     print(error)
 
   if errors:
+    print('See https://github.com/mudita/MuditaOS/blob/master/doc/development_workflow.md#commit-changes for the commit message format specification')
     exit(1)
 
 
