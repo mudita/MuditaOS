@@ -93,10 +93,6 @@ namespace audio
             currentOperation->SetDataStreams(&dataStreamOut, &dataStreamIn);
 
             UpdateProfiles();
-
-            if (btData) {
-                currentOperation->SetBluetoothStreamData(btData);
-            }
         }
         catch (const AudioInitException &audioException) {
             // If creating operation failed fallback to IdleOperation which is guaranteed to work
@@ -161,11 +157,6 @@ namespace audio
     audio::RetCode Audio::Mute()
     {
         return SetOutputVolume(0);
-    }
-
-    void Audio::SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data)
-    {
-        btData = data;
     }
 
     void Audio::UpdateProfiles()

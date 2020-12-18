@@ -57,9 +57,6 @@ namespace audio
         {
             return 0.0;
         }
-
-        void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data) final
-        {}
     };
 
 } // namespace audio

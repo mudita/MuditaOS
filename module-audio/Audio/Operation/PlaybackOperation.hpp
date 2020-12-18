@@ -10,8 +10,6 @@
 #include "Audio/StreamQueuedEventsListener.hpp"
 #include "Audio/decoder/Decoder.hpp"
 
-#include <bsp/audio/bsp_audio.hpp>
-
 namespace audio::playbackDefaults
 {
     constexpr audio::Volume defaultLoudspeakerVolume = 10;

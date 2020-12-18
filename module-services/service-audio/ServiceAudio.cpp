@@ -107,7 +107,7 @@ sys::ReturnCodes ServiceAudio::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
-std::optional<std::string> ServiceAudio::AudioServicesCallback(const AudioServiceMessage::Message *msg)
+std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Message *msg)
 {
     if (const auto *eof = dynamic_cast<const AudioServiceMessage::EndOfFile *>(msg); eof) {
         auto newMsg =
@@ -122,6 +122,29 @@ std::optional<std::string> ServiceAudio::AudioServicesCallback(const AudioServic
             return std::nullopt;
         }
         return settings_it->second;
+    }
+    else if (const auto *btReq = dynamic_cast<const BluetoothProxyMessage *>(msg); btReq) {
+        std::shared_ptr<BluetoothProxyMessage> request;
+        if (const auto *btStart = dynamic_cast<const BluetoothProxyStartMessage *>(msg); btStart) {
+            request = std::make_shared<BluetoothProxyStartMessage>(*btStart);
+        }
+        else if (const auto *btVolume = dynamic_cast<const BluetoothProxySetVolumeMessage *>(msg); btVolume) {
+            request = std::make_shared<BluetoothProxySetVolumeMessage>(*btVolume);
+        }
+        else if (const auto *btGain = dynamic_cast<const BluetoothProxySetGainMessage *>(msg); btGain) {
+            request = std::make_shared<BluetoothProxySetGainMessage>(*btGain);
+        }
+        else if (const auto *btOutPath = dynamic_cast<const BluetoothProxySetOutputPathMessage *>(msg); btOutPath) {
+            request = std::make_shared<BluetoothProxySetOutputPathMessage>(*btOutPath);
+        }
+        else if (const auto *btInPath = dynamic_cast<const BluetoothProxySetInputPathMessage *>(msg); btInPath) {
+            request = std::make_shared<BluetoothProxySetInputPathMessage>(*btInPath);
+        }
+        else {
+            LOG_DEBUG("BluetoothProxyMessage not supported.");
+            return std::nullopt;
+        }
+        sys::Bus::SendUnicast(request, service::name::bluetooth, this);
     }
     else {
         LOG_DEBUG("Message received but not handled - no effect.");
@@ -328,9 +351,6 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
 
     for (auto &input : audioMux.GetAllInputs()) {
         input.audio->SendEvent(evt);
-        if (isBT && evt->getDeviceState() == audio::Event::DeviceState::Connected) {
-            input.audio->SetBluetoothStreamData(nullptr);
-        }
     }
     return std::make_unique<AudioEventResponse>(RetCode::Success);
 }
@@ -505,15 +525,6 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     else if (msgType == typeid(AudioKeyPressedRequest)) {
         auto *msg   = static_cast<AudioKeyPressedRequest *>(msgl);
         responseMsg = HandleKeyPressed(msg->step);
-    }
-    else if (msgType == typeid(BluetoothRequestStreamResultMessage)) {
-        auto *msg = static_cast<BluetoothRequestStreamResultMessage *>(msgl);
-        for (auto &input : audioMux.GetAllInputs()) {
-            input.audio->SetBluetoothStreamData(msg->getData());
-            input.audio->SendEvent(
-                std::make_unique<Event>(EventType::BlutoothA2DPDeviceState, audio::Event::DeviceState::Connected));
-            LOG_INFO("Queues received!");
-        }
     }
     else {
         LOG_DEBUG("Unhandled message");
