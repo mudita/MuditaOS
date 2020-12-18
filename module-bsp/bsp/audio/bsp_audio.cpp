@@ -15,7 +15,7 @@
 
 namespace bsp{
 
-    std::optional<std::unique_ptr<AudioDevice>> AudioDevice::Create(bsp::AudioDevice::Type type,audioCallback_t callback) {
+    std::optional<std::unique_ptr<AudioDevice>> AudioDevice::Create(bsp::AudioDevice::Type type, audioCallback_t callback) {
 
         std::unique_ptr<AudioDevice> inst;
 

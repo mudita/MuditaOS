@@ -168,7 +168,7 @@ namespace audio
             dec->disconnectStream();
         }
 
-        audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        audioDevice = CreateDevice(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;

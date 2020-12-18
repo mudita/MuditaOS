@@ -69,7 +69,6 @@ namespace audio
         virtual audio::RetCode SetInputGain(float gain)                                 = 0;
 
         virtual Position GetPosition() = 0;
-        virtual void SetBluetoothStreamData(std::shared_ptr<BluetoothStreamData> data);
 
         Volume GetOutputVolume() const
         {
@@ -135,26 +134,26 @@ namespace audio
 
         std::shared_ptr<Profile> currentProfile;
         std::unique_ptr<bsp::AudioDevice> audioDevice;
-
         std::vector<SupportedProfile> supportedProfiles;
-        void SetProfileAvailability(std::vector<Profile::Type> profiles, bool available);
-        void AddProfile(const Profile::Type &profile, const PlaybackType &playback, bool isAvailable);
 
         State state = State::Idle;
-
         audio::Token operationToken;
         Type opType = Type::Idle;
         std::string filePath;
-
         audio::PlaybackType playbackType = audio::PlaybackType::None;
-
-        virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
-
-        std::shared_ptr<Profile> GetProfile(const Profile::Type type);
 
         AudioServiceMessage::Callback serviceCallback;
         std::function<int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
             audioCallback = nullptr;
+
+        void SetProfileAvailability(std::vector<Profile::Type> profiles, bool available);
+        void AddProfile(const Profile::Type &profile, const PlaybackType &playback, bool isAvailable);
+
+        virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
+        std::shared_ptr<Profile> GetProfile(const Profile::Type type);
+
+        std::optional<std::unique_ptr<bsp::AudioDevice>> CreateDevice(bsp::AudioDevice::Type type,
+                                                                      bsp::AudioDevice::audioCallback_t callback);
     };
 
 } // namespace audio

@@ -6,6 +6,7 @@
 
 * `[PowerManagement]` Critial battery level notification to SystemManager.
 * `[Bluetooth]`  Add settings storage to bluetooth related items
+* Add Bluetooth virtual audio device.
 
 ## [0.51.1 2020-12-18]
 

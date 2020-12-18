@@ -16,8 +16,6 @@ set(BOARD_SOURCES
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/audio/linux_audiocodec.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/audio/LinuxCellularAudio.cpp"
-        #needed because of PlaybackOperation::SetBluetoothStreamData
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051BluetoothAudio.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/bluetooth/Bluetooth.cpp"
 
