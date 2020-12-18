@@ -45,9 +45,7 @@ namespace bsp
 
     int usbCDCSend(std::string *sendMsg)
     {
-        ssize_t t = write(fd, (*sendMsg).c_str(), (*sendMsg).length());
-        delete sendMsg;
-
+        ssize_t t = write(fd, sendMsg->c_str(), sendMsg->length());
         if (t >= 0) {
             LOG_DEBUG("[ServiceDesktop:BSP_Driver] Send: %d signs", static_cast<int>(t));
             return 0;

@@ -149,8 +149,7 @@ std::vector<AlarmsTableRow> AlarmsTable::getLimitOffsetByField(uint32_t offset,
 uint32_t AlarmsTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM alarms;");
-
-    if (queryRet->getRowCount() == 0) {
+    if (!queryRet || queryRet->getRowCount() == 0) {
         return 0;
     }
 
@@ -160,7 +159,6 @@ uint32_t AlarmsTable::count()
 uint32_t AlarmsTable::countByFieldId(const char *field, uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM alarms WHERE %q=%lu;", field, id);
-
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return 0;
     }

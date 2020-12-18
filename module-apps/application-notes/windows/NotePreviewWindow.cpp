@@ -9,7 +9,7 @@
 #include <module-apps/application-notes/windows/NotesOptions.hpp>
 #include <module-apps/messages/OptionsWindow.hpp>
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <module-utils/time/time_conversion.hpp>
 
 #include <Style.hpp>

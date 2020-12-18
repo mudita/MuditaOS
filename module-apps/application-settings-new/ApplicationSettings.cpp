@@ -28,13 +28,18 @@
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
-#include <module-utils/i18n/i18n.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-db/Settings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <i18n/i18n.hpp>
 
 namespace app
 {
+    namespace settings
+    {
+        constexpr inline auto operators_on = "operators_on";
+    }
+
     ApplicationSettingsNew::ApplicationSettingsNew(std::string name,
                                                    std::string parent,
                                                    StartInBackground startInBackground)
@@ -44,6 +49,13 @@ namespace app
             Store::GSM::get()->sim == selectedSim) {
             selectedSimNumber = CellularServiceAPI::GetOwnNumber(this);
         }
+        settings->registerValueChange(settings::operators_on,
+                                      [this](const std::string &value) { operatorOnChanged(value); });
+    }
+
+    ApplicationSettingsNew::~ApplicationSettingsNew()
+    {
+        settings->unregisterValueChange(settings::operators_on);
     }
 
     // Invoked upon receiving data message
@@ -143,7 +155,8 @@ namespace app
             return std::make_unique<gui::NightshiftWindow>(app);
         });
         windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::NetworkWindow>(app, dynamic_cast<SimParams *>(app));
+            return std::make_unique<gui::NetworkWindow>(
+                app, static_cast<ApplicationSettingsNew *>(app), static_cast<ApplicationSettingsNew *>(app));
         });
         windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MessagesWindow>(app);
@@ -186,4 +199,19 @@ namespace app
         return selectedSim;
     }
 
+    void ApplicationSettingsNew::operatorOnChanged(const std::string &value)
+    {
+        if (!value.empty()) {
+            operatorsOn = utils::getNumericValue<bool>(value);
+        }
+    }
+    bool ApplicationSettingsNew::getOperatorsOn() const noexcept
+    {
+        return operatorsOn;
+    }
+    void ApplicationSettingsNew::setOperatorsOn(bool value)
+    {
+        operatorsOn = value;
+        settings->setValue(settings::operators_on, std::to_string(value));
+    }
 } /* namespace app */

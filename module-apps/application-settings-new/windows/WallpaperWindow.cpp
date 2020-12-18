@@ -6,7 +6,7 @@
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "windows/OptionSetting.hpp"
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 namespace gui
 {

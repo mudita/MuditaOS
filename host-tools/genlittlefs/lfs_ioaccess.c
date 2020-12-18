@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "lfs.h"
+#include <littlefs/lfs.h>
 #include "lfs_ioaccess.h"
 #include "parse_partitions.h"
 
@@ -141,6 +141,15 @@ static int lfs_sync(const struct lfs_config *c)
     return err;
 }
 
+#ifdef LFS_THREADSAFE
+//! Note single threaded application don't need locks
+static int lfs_lock_unlock(const struct lfs_config *cfg)
+{
+    (void)cfg;
+    return LFS_ERR_OK;
+}
+#endif
+
 struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
                                                const char *filename,
                                                const struct partition *partition)
@@ -190,7 +199,12 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
     cfg->prog    = lfs_prog;
     cfg->erase   = lfs_erase;
     cfg->sync    = lfs_sync;
+#ifdef LFS_THREADSAFE
+    cfg->lock   = lfs_lock_unlock;
+    cfg->unlock = lfs_lock_unlock;
+#endif
     cfg->context = ret;
+
     return ret;
 }
 

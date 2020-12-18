@@ -13,7 +13,7 @@
 namespace audio
 {
 
-    decoderMP3::decoderMP3(const char *fileName) : decoder(fileName)
+    decoderMP3::decoderMP3(const char *fileName) : Decoder(fileName)
     {
 
         if (fileSize == 0) {

@@ -8,7 +8,7 @@
 #include <purefs/fs/drivers/file_handle_vfat.hpp>
 #include <purefs/fs/drivers/directory_handle_vfat.hpp>
 #include <log/log.hpp>
-#include <volume_mapper.hpp>
+#include <fatfs/volume_mapper.hpp>
 #include <ff.h>
 #include <sys/statvfs.h>
 #include <limits.h>
@@ -166,7 +166,9 @@ namespace purefs::fs::drivers
         vmnt->ff_drive(ret);
         ret = f_mount(vmnt->fatfs(), vmnt->ff_drive(), 1);
         ret = translate_error(ret);
-        filesystem_operations::mount(mnt);
+        if (!ret) {
+            filesystem_operations::mount(mnt);
+        }
         return ret;
     }
 
@@ -202,8 +204,8 @@ namespace purefs::fs::drivers
         ret     = translate_error(ret);
         if (!ret) {
             ret = ffat::internal::remove_volume(disk);
+            filesystem_operations::umount(mnt);
         }
-        filesystem_operations::umount(mnt);
         return ret;
     }
 

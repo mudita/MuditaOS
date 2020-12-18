@@ -8,7 +8,7 @@
 #include "windows/OptionSetting.hpp"
 
 #include <InputEvent.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <json/json11.hpp>
 #include <vfs.hpp>
 

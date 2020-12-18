@@ -6,7 +6,9 @@
 #include "FontInfo.hpp" // for FontInfo
 #include "RawFont.hpp"  // for RawFont
 #include "log/log.hpp"  // for LOG_ERROR, LOG_INFO, LOG_WARN
-#include "vfs.hpp"      // for vfs, vfs::DirectoryEntry, vfs::FileAttributes
+#include <Utils.hpp>
+#include <filesystem>
+#include <cstdio>
 
 namespace style::window::font
 {
@@ -42,23 +44,24 @@ namespace gui
     RawFont *FontManager::loadFont(std::string filename)
     {
 
-        auto file = vfs.fopen(filename.c_str(), "rb");
+        auto file = std::fopen(filename.c_str(), "rb");
 
-        auto fileSize = vfs.filelength(file);
+        auto fileSize = utils::filesystem::filelength(file);
+        std::rewind(file);
 
         char *fontData = new char[fileSize];
         if (fontData == nullptr) {
-            vfs.fclose(file);
+            std::fclose(file);
             LOG_ERROR(" Failed to allocate temporary font buffer");
             return nullptr;
         }
 
         // read data to buffer
-        auto bytesRead = vfs.fread(fontData, 1, fileSize, file);
+        auto bytesRead = std::fread(fontData, 1, fileSize, file);
 
         // close file
-        vfs.fclose(file);
-        if (bytesRead != fileSize) {
+        std::fclose(file);
+        if (static_cast<long>(bytesRead) != fileSize) {
             LOG_ERROR("Failed to read all file");
             delete[] fontData;
             return nullptr;
@@ -96,11 +99,10 @@ namespace gui
         std::vector<std::string> fontFiles;
 
         LOG_INFO("Scanning fonts folder: %s", fontFolder.c_str());
-        auto dirList = vfs.listdir(fontFolder.c_str());
 
-        for (vfs::DirectoryEntry ent : dirList) {
-            if ((ent.attributes != vfs::FileAttributes::Directory) && hasEnding(ent.fileName, ".mpf")) {
-                fontFiles.push_back(fontFolder + "/" + ent.fileName);
+        for (const auto &entry : std::filesystem::directory_iterator(fontFolder)) {
+            if (!std::filesystem::is_directory(entry) && entry.path().extension() == ".mpf") {
+                fontFiles.push_back(entry.path().string());
             }
         }
 

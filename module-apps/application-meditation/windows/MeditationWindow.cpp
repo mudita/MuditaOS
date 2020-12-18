@@ -13,7 +13,7 @@
 #include "InputEvent.hpp"
 #include <cassert>
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 namespace gui
 {

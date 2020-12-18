@@ -13,7 +13,7 @@
 #include <SystemManager/SystemManager.hpp>
 #include <application-call/ApplicationCall.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <service-appmgr/messages/Message.hpp>
 #include <service-db/DBServiceAPI.hpp>
@@ -218,6 +218,16 @@ namespace app::manager
             auto msg = static_cast<ApplicationInitialised *>(request);
             handleInitApplication(msg);
             return std::make_shared<sys::ResponseMessage>();
+        });
+        connect(typeid(DisplayLanguageChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<DisplayLanguageChangeRequest *>(request);
+            handleDisplayLanguageChange(msg);
+            return msgHandled();
+        });
+        connect(typeid(InputLanguageChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<InputLanguageChangeRequest *>(request);
+            handleInputLanguageChange(msg);
+            return msgHandled();
         });
         connect(typeid(ShutdownRequest), [this](sys::Message *) {
             closeApplications();
@@ -524,6 +534,35 @@ namespace app::manager
         Controller::switchBack(this);
     }
 
+    auto ApplicationManager::handleDisplayLanguageChange(app::manager::DisplayLanguageChangeRequest *msg) -> bool
+    {
+        const auto &requestedLanguage = msg->getLanguage();
+
+        if (requestedLanguage == displayLanguage) {
+            LOG_WARN("The selected language is already set. Ignore.");
+            return false;
+        }
+        displayLanguage = requestedLanguage;
+        settings->setValue(settings::SystemProperties::displayLanguage, displayLanguage);
+        utils::localize.setDisplayLanguage(displayLanguage);
+        rebuildActiveApplications();
+        return true;
+    }
+
+    auto ApplicationManager::handleInputLanguageChange(app::manager::InputLanguageChangeRequest *msg) -> bool
+    {
+        const auto &requestedLanguage = msg->getLanguage();
+
+        if (requestedLanguage == inputLanguage) {
+            LOG_WARN("The selected language is already set. Ignore.");
+            return false;
+        }
+        inputLanguage = requestedLanguage;
+        settings->setValue(settings::SystemProperties::inputLanguage, inputLanguage);
+        utils::localize.setInputLanguage(inputLanguage);
+        return true;
+    }
+
     void ApplicationManager::rebuildActiveApplications()
     {
         for (const auto &app : getApplications()) {
@@ -664,6 +703,10 @@ namespace app::manager
     }
     void ApplicationManager::inputLanguageChanged(std::string value)
     {
+        if (value.empty()) {
+            return;
+        }
         inputLanguage = value;
+        utils::localize.setInputLanguage(value);
     }
 } // namespace app::manager

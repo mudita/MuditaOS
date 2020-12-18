@@ -5,9 +5,6 @@
 #include "json/json11.hpp"
 #include <string>
 #include <vfs.hpp>
-#include "log/log.hpp"
-
-#include "thread.hpp"
 
 using Language = std::string;
 
@@ -16,10 +13,7 @@ namespace utils
     class LangLoader
     {
       public:
-        LangLoader()
-        {}
-        virtual ~LangLoader()
-        {}
+        virtual ~LangLoader() = default;
         std::vector<Language> getAvailableDisplayLanguages() const;
         json11::Json createJson(const std::string &filename);
     };
@@ -38,14 +32,8 @@ namespace utils
 
       public:
         static constexpr auto DefaultLanguage = "English";
-        // Default constructor, left empty on purpose
-        i18n()
-        {}
 
-        // Explicit initialization point, default constructor is omitted. This is because LangLoader uses file system
-        // which is not available at program's startup.
-        virtual ~i18n()
-        {}
+        virtual ~i18n() = default;
         void setInputLanguage(const Language &lang);
         const std::string &getInputLanguage(const std::string &str);
         const std::string &get(const std::string &str);

@@ -9,7 +9,7 @@
 
 #include "ListView.hpp"
 #include "Label.hpp"
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 using namespace gui;
 namespace listViewWindow = style::meditation::listView::window;

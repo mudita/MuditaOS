@@ -17,6 +17,10 @@
 #include "service-cellular/requests/UssdRequest.hpp"
 
 #include <service-appmgr/model/ApplicationManager.hpp>
+#include "service-cellular/service-cellular/requests/ClirRequest.hpp"
+#include "service-cellular/service-cellular/requests/SupplementaryServicesRequest.hpp"
+
+#include <module-cellular/at/response.hpp>
 
 void CellularRequestHandler::handle(ImeiRequest &request, at::Result &result)
 {
@@ -81,6 +85,37 @@ void CellularRequestHandler::handle(PinChangeRequest &request, at::Result &resul
     sendMmiResult(requestHandled);
 }
 
+void CellularRequestHandler::handle(ClirRequest &request, at::Result &result)
+{
+    using namespace app::manager::actions;
+    using namespace cellular;
+    using namespace at::response;
+    auto requestHandled = request.checkModemResponse(result);
+
+    std::shared_ptr<IMMICustomResultParams> response = std::make_shared<MMIClirResult>();
+    if (requestHandled) {
+        auto procedureType = request.getProcedureType();
+        if (procedureType == SupplementaryServicesRequest::ProcedureType::Activation) {
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::ClirEnabled);
+        }
+        else if (procedureType == SupplementaryServicesRequest::ProcedureType::Deactivation) {
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::ClirDisabled);
+        }
+        else if (procedureType == SupplementaryServicesRequest::ProcedureType::Interrogation) {
+            auto clirParsed = clir::parseClir(result.response[0]);
+            if (clirParsed != std::nullopt) {
+                response->addMessage(clir::getStatus(clirParsed->serviceStatus));
+                response->addMessage(clir::getState(clirParsed->serviceState));
+            }
+        }
+        else {
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
+        }
+    }
+    auto msg = std::make_shared<CellularMMIResultMessage>(response);
+    sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
+    request.setHandled(requestHandled);
+}
 void CellularRequestHandler::sendMmiResult(bool result)
 {
     using namespace app::manager::actions;

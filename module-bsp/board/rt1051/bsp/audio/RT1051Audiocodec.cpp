@@ -20,12 +20,10 @@ namespace bsp
     std::shared_ptr<drivers::DriverDMA> RT1051Audiocodec::dma;
     std::unique_ptr<drivers::DriverDMAHandle> RT1051Audiocodec::rxDMAHandle;
     std::unique_ptr<drivers::DriverDMAHandle> RT1051Audiocodec::txDMAHandle;
-    sai_config_t RT1051Audiocodec::config                                  = {};
-    std::uint32_t RT1051Audiocodec::mclkSourceClockHz                      = 0;
-    sai_edma_handle_t RT1051Audiocodec::txHandle                           = {};
-    sai_edma_handle_t RT1051Audiocodec::rxHandle                           = {};
-    int16_t RT1051Audiocodec::inBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE * 2]  = {};
-    int16_t RT1051Audiocodec::outBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE * 2] = {};
+    sai_config_t RT1051Audiocodec::config             = {};
+    std::uint32_t RT1051Audiocodec::mclkSourceClockHz = 0;
+    sai_edma_handle_t RT1051Audiocodec::txHandle      = {};
+    sai_edma_handle_t RT1051Audiocodec::rxHandle      = {};
 
     RT1051Audiocodec::RT1051Audiocodec(bsp::AudioDevice::audioCallback_t callback)
         : AudioDevice(callback), saiInFormat{}, saiOutFormat{}, codecParams{}, codec{}
@@ -105,16 +103,6 @@ namespace bsp
 
         InStop();
         OutStop();
-
-        if (outWorkerThread) {
-            xTaskNotify(outWorkerThread, static_cast<std::uint32_t>(TransferState::Close), eSetBits);
-            outWorkerThread = nullptr;
-        }
-
-        if (inWorkerThread) {
-            xTaskNotify(inWorkerThread, static_cast<std::uint32_t>(TransferState::Close), eSetBits);
-            inWorkerThread = nullptr;
-        }
 
         state = State::Stopped;
         vTaskDelay(codecSettleTime);
@@ -224,10 +212,6 @@ namespace bsp
     void RT1051Audiocodec::InStart()
     {
         sai_transfer_format_t sai_format = {0};
-        sai_transfer_t xfer              = {0};
-
-        saiInFormat.data     = (uint8_t *)inBuffer;
-        saiInFormat.dataSize = CODEC_CHANNEL_PCM_BUFFER_SIZE * saiInFormat.bitWidth / 8;
 
         /* Configure the audio format */
         sai_format.bitWidth           = saiInFormat.bitWidth;
@@ -255,22 +239,21 @@ namespace bsp
         /* Reset SAI Rx internal logic */
         SAI_RxSoftwareReset(BOARD_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
 
-        xfer.data     = saiInFormat.data;
-        xfer.dataSize = saiInFormat.dataSize;
-        SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, &xfer);
-
-        if (xTaskCreate(inAudioCodecWorkerTask, "inaudiocodec", 1024, this, 0, &inWorkerThread) != pdPASS) {
-            LOG_ERROR("Error during creating input audiocodec task");
+        if (!source.isConnected()) {
+            LOG_FATAL("No output stream connected!");
+            return;
         }
+
+        /// initiate first read
+        audio::Stream::Span dataSpan;
+        source.getStream()->reserve(dataSpan);
+        auto xfer = sai_transfer_t{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
+        SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, &xfer);
     }
 
     void RT1051Audiocodec::OutStart()
     {
         sai_transfer_format_t sai_format = {0};
-        sai_transfer_t xfer              = {0};
-
-        saiOutFormat.data     = (uint8_t *)outBuffer;
-        saiOutFormat.dataSize = CODEC_CHANNEL_PCM_BUFFER_SIZE * saiInFormat.bitWidth / 8;
 
         /* Configure the audio format */
         sai_format.bitWidth           = saiOutFormat.bitWidth;
@@ -297,16 +280,14 @@ namespace bsp
         /* Reset SAI Tx internal logic */
         SAI_TxSoftwareReset(BOARD_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
 
-        xfer.data     = saiOutFormat.data;
-        xfer.dataSize = saiOutFormat.dataSize;
-        SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, &xfer);
-
-        if (xTaskCreate(outAudioCodecWorkerTask, "outaudiocodec", 1024, this, 0, &outWorkerThread) != pdPASS) {
-            LOG_ERROR("Error during creating  output audiocodec task");
+        if (!sink.isConnected()) {
+            LOG_FATAL("No input stream connected!");
+            return;
         }
 
-        // Fill out buffer with data
-        GetAudioCallback()(nullptr, outBuffer, RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE * 2);
+        auto nullSpan = sink.getStream()->getNullSpan();
+        auto xfer     = sai_transfer_t{.data = nullSpan.data, .dataSize = nullSpan.dataSize};
+        SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, &xfer);
     }
 
     void RT1051Audiocodec::OutStop()
@@ -327,168 +308,42 @@ namespace bsp
         memset(&rxHandle, 0, sizeof(rxHandle));
     }
 
-    void inAudioCodecWorkerTask(void *pvp)
-    {
-        std::uint32_t ulNotificationValue = 0;
-        RT1051Audiocodec *inst            = reinterpret_cast<RT1051Audiocodec *>(pvp);
-
-        while (true) {
-            xTaskNotifyWait(0x00,                 /* Don't clear any bits on entry. */
-                            UINT32_MAX,           /* Clear all bits on exit. */
-                            &ulNotificationValue, /* Receives the notification value. */
-                            portMAX_DELAY);       /* Block indefinitely. */
-            {
-                if (ulNotificationValue & static_cast<std::uint32_t>(RT1051Audiocodec::TransferState::Close)) {
-                    break;
-                }
-
-                if (ulNotificationValue & static_cast<std::uint32_t>(RT1051Audiocodec::TransferState::HalfTransfer)) {
-                    auto framesFetched = inst->GetAudioCallback()(
-                        inst->inBuffer, nullptr, RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE);
-
-                    if (framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
-                        memset(&inst->inBuffer[framesFetched],
-                               0,
-                               RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
-                    }
-                }
-
-                if (ulNotificationValue & static_cast<std::uint32_t>(RT1051Audiocodec::TransferState::FullTransfer)) {
-                    auto framesFetched =
-                        inst->GetAudioCallback()(&inst->inBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE],
-                                                 nullptr,
-                                                 RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE);
-
-                    if (framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
-                        memset(&inst->inBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE + framesFetched],
-                               0,
-                               RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
-                    }
-                }
-            }
-        }
-
-        vTaskDelete(nullptr);
-    }
-
-    void outAudioCodecWorkerTask(void *pvp)
-    {
-        std::uint32_t ulNotificationValue = 0;
-        RT1051Audiocodec *inst            = reinterpret_cast<RT1051Audiocodec *>(pvp);
-
-        while (true) {
-            xTaskNotifyWait(0x00,                 /* Don't clear any bits on entry. */
-                            UINT32_MAX,           /* Clear all bits on exit. */
-                            &ulNotificationValue, /* Receives the notification value. */
-                            portMAX_DELAY);       /* Block indefinitely. */
-            {
-                if (ulNotificationValue & static_cast<std::uint32_t>(RT1051Audiocodec::TransferState::Close)) {
-                    break;
-                }
-
-                if (ulNotificationValue & static_cast<std::uint32_t>(RT1051Audiocodec::TransferState::HalfTransfer)) {
-                    auto framesFetched = inst->GetAudioCallback()(
-                        nullptr, inst->outBuffer, RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE);
-
-                    if (framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
-                        memset(&inst->outBuffer[framesFetched],
-                               0,
-                               RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
-                    }
-                }
-
-                if (ulNotificationValue & static_cast<std::uint32_t>(RT1051Audiocodec::TransferState::FullTransfer)) {
-                    auto framesFetched =
-                        inst->GetAudioCallback()(nullptr,
-                                                 &inst->outBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE],
-                                                 RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE);
-
-                    if (framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
-                        memset(&inst->outBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE + framesFetched],
-                               0,
-                               RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
-                    }
-                }
-            }
-        }
-
-        vTaskDelete(nullptr);
-    }
-
     void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        static RT1051Audiocodec::TransferState state = RT1051Audiocodec::TransferState::HalfTransfer;
-        RT1051Audiocodec *inst                       = (RT1051Audiocodec *)userData;
-        sai_transfer_t xfer                          = {0};
-        BaseType_t xHigherPriorityTaskWoken          = pdFALSE;
+        audio::Stream::Span dataSpan;
+        auto self    = static_cast<RT1051Audiocodec *>(userData);
+        auto &source = self->source;
 
-        if (inst->state == RT1051Audiocodec::State::Stopped) {
+        /// exit if not connected to the stream
+        if (!source.isConnected()) {
             return;
         }
 
-        if (state == RT1051Audiocodec::TransferState::HalfTransfer) {
+        /// reserve space for the next read commiting previously reserved block before
+        source.getStream()->commit();
+        source.getStream()->reserve(dataSpan);
 
-            xfer.dataSize = inst->saiInFormat.dataSize;
-            xfer.data     = inst->saiInFormat.data + (inst->saiInFormat.dataSize);
-            SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &inst->rxHandle, &xfer);
-
-            /* Notify the task that the transmission is complete. */
-            if (inst->inWorkerThread) {
-                xTaskNotifyFromISR(
-                    inst->inWorkerThread, static_cast<uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
-            }
-            state = RT1051Audiocodec::TransferState::FullTransfer;
-        }
-        else {
-
-            xfer.dataSize = inst->saiInFormat.dataSize;
-            xfer.data     = inst->saiInFormat.data;
-            SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &inst->rxHandle, &xfer);
-
-            /* Notify the task that the transmission is complete. */
-            xTaskNotifyFromISR(inst->inWorkerThread, static_cast<uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
-
-            state = RT1051Audiocodec::TransferState::HalfTransfer;
-        }
-
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        sai_transfer_t xfer{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
+        SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &self->rxHandle, &xfer);
     }
 
     void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        static RT1051Audiocodec::TransferState state = RT1051Audiocodec::TransferState::HalfTransfer;
-        RT1051Audiocodec *inst                       = (RT1051Audiocodec *)userData;
-        sai_transfer_t xfer                          = {0};
-        BaseType_t xHigherPriorityTaskWoken          = pdFALSE;
+        audio::Stream::Span dataSpan;
+        auto self  = static_cast<RT1051Audiocodec *>(userData);
+        auto &sink = self->sink;
 
-        if (inst->state == RT1051Audiocodec::State::Stopped) {
+        /// exit if not connected to the stream
+        if (!sink.isConnected()) {
             return;
         }
 
-        if (state == RT1051Audiocodec::TransferState::HalfTransfer) {
+        /// pop previous read and peek next
+        sink.getStream()->consume();
+        sink.getStream()->peek(dataSpan);
 
-            xfer.dataSize = inst->saiOutFormat.dataSize;
-            xfer.data     = inst->saiOutFormat.data + (inst->saiOutFormat.dataSize);
-            SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &inst->txHandle, &xfer);
-
-            /* Notify the task that the transmission is complete. */
-            xTaskNotifyFromISR(
-                inst->outWorkerThread, static_cast<uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
-
-            state = RT1051Audiocodec::TransferState::FullTransfer;
-        }
-        else {
-            xfer.dataSize = inst->saiOutFormat.dataSize;
-            xfer.data     = inst->saiOutFormat.data;
-            SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &inst->txHandle, &xfer);
-
-            /* Notify the task that the transmission is complete. */
-            xTaskNotifyFromISR(
-                inst->outWorkerThread, static_cast<uint32_t>(state), eSetBits, &xHigherPriorityTaskWoken);
-            state = RT1051Audiocodec::TransferState::HalfTransfer;
-        }
-
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        sai_transfer_t xfer{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
+        SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &self->txHandle, &xfer);
     }
 
 } // namespace bsp

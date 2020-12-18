@@ -16,7 +16,7 @@
 #include "../ApplicationSettings.hpp"
 #include "DateTimeWindow.hpp"
 
-#include "module-utils/i18n/i18n.hpp"
+#include <i18n/i18n.hpp>
 #include "time/time_conversion.hpp"
 #include "time/time_date_validation.hpp"
 

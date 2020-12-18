@@ -26,7 +26,7 @@
 #include "windows/CellularPassthroughWindow.hpp"
 #include "windows/SettingsChange.hpp"
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-db/Settings.hpp>
@@ -51,15 +51,12 @@ namespace app
                                       [this](std::string value) { lockPassChanged(value); });
         settings->registerValueChange(settings::SystemProperties::timeDateFormat,
                                       [this](std::string value) { timeDateChanged(value); });
-        settings->registerValueChange(settings::SystemProperties::displayLanguage,
-                                      [this](std::string value) { displayLanguageChanged(value); });
     }
 
     ApplicationSettings::~ApplicationSettings()
     {
         settings->unregisterValueChange(settings::SystemProperties::lockPassHash);
         settings->unregisterValueChange(settings::SystemProperties::timeDateFormat);
-        settings->unregisterValueChange(settings::SystemProperties::displayLanguage);
     }
 
     // Invoked upon receiving data message
@@ -132,8 +129,8 @@ namespace app
         windowsFactory.attach(app::change_setting, [this](Application *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(app, name, settingsChangeWindow(app, this, lockPassHash));
         });
-        windowsFactory.attach("Languages", [this](Application *app, const std::string &name) {
-            return std::make_unique<gui::LanguageWindow>(app, this);
+        windowsFactory.attach("Languages", [](Application *app, const std::string &name) {
+            return std::make_unique<gui::LanguageWindow>(app);
         });
         windowsFactory.attach("Bluetooth", [](Application *app, const std::string &name) {
             return std::make_unique<gui::BtWindow>(app);
@@ -199,16 +196,6 @@ namespace app
                 currentWindow->rebuild();
             }
         }
-    }
-
-    void ApplicationSettings::displayLanguageChanged(std::string value)
-    {
-        displayLanguage = value;
-    }
-
-    void ApplicationSettings::setDisplayLanguage(const std::string &value)
-    {
-        settings->setValue(settings::SystemProperties::displayLanguage, value);
     }
 
     void ApplicationSettings::timeDateChanged(std::string value)

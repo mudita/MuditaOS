@@ -5,16 +5,19 @@
 #include "DatabaseInitializer.hpp"
 
 #include "log/log.hpp"
-#include <assert.h>
-#include <memory>
+
 #include <purefs/filesystem_paths.hpp>
+#include <gsl/gsl_util>
+
+#include <cassert>
+#include <cstring>
+#include <memory>
 
 /* Declarations *********************/
 extern sqlite3_vfs *sqlite3_ecophonevfs(void);
 
 extern "C"
 {
-
     int sqlite3_os_init(void)
     {
         /*
@@ -39,7 +42,6 @@ extern "C"
          */
 
         sqlite3_vfs_register(sqlite3_ecophonevfs(), 1);
-
         return SQLITE_OK;
     }
 
@@ -52,7 +54,6 @@ extern "C"
      */
     int sqlite3_os_end(void)
     {
-
         return SQLITE_OK;
     }
 
@@ -64,86 +65,99 @@ extern "C"
 }
 
 Database::Database(const char *name)
-    : dbConnection(nullptr), dbName(name), isInitialized_(false),
+    : dbConnection(nullptr), dbName(name), queryStatementBuffer{nullptr}, isInitialized_(false),
       initializer(std::make_unique<DatabaseInitializer>(this))
 {
-    LOG_INFO("creating database: %s", dbName.c_str());
-    auto rc = sqlite3_open(name, &dbConnection);
-    if (rc != SQLITE_OK) {
+    LOG_INFO("Creating database: %s", dbName.c_str());
+    if (const auto rc = sqlite3_open(name, &dbConnection); rc != SQLITE_OK) {
         LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d dbName=%s", rc, name);
+        throw DatabaseInitialisationError{"Failed to initialize the sqlite db"};
     }
-    assert(rc == SQLITE_OK);
+
+    initQueryStatementBuffer();
     pragmaQuery("PRAGMA integrity_check;");
     pragmaQuery("PRAGMA locking_mode=EXCLUSIVE");
 
     const auto filePath = (purefs::dir::getUserDiskPath() / "db");
-    LOG_INFO("running scripts: %s", filePath.c_str());
-    isInitialized_ = initializer->run(filePath.c_str(), INIT_SCRIPTS_EXT);
+    LOG_INFO("Running scripts: %s", filePath.c_str());
+    isInitialized_ = initializer->run(filePath.c_str(), InitScriptExtension);
+}
+
+void Database::initQueryStatementBuffer()
+{
+    queryStatementBuffer = static_cast<char *>(sqlite3_malloc(maxQueryLen));
+    if (queryStatementBuffer == nullptr) {
+        LOG_ERROR("Unable to allocate memory for query statement buffer.");
+        throw DatabaseInitialisationError{"Failed to initialize the query statement buffer"};
+    }
+    clearQueryStatementBuffer();
+}
+
+void Database::clearQueryStatementBuffer()
+{
+    std::memset(queryStatementBuffer, 0, maxQueryLen);
 }
 
 Database::~Database()
 {
+    sqlite3_free(queryStatementBuffer);
     sqlite3_close(dbConnection);
 }
 
-void Database::initialize()
+bool Database::initialize()
 {
-    sqlite3_config(
-        SQLITE_CONFIG_LOG,
-        errorLogCallback,
-        (void *)1); //(void*)1 is taken from official SQLITE examples and it appears that it ends variable args list
-    sqlite3_initialize();
+    if (const auto code = sqlite3_config(SQLITE_CONFIG_LOG, errorLogCallback, (void *)1); code != SQLITE_OK) {
+        //(void*)1 is taken from official SQLITE examples and it appears that it ends variable args list
+        return false;
+    }
+    return sqlite3_initialize() == SQLITE_OK;
 }
-void Database::deinitialize()
+
+bool Database::deinitialize()
 {
-    sqlite3_shutdown();
+    return sqlite3_shutdown() == SQLITE_OK;
 }
 
 bool Database::execute(const char *format, ...)
 {
-    if (!format) {
+    if (format == nullptr) {
         return false;
     }
 
+    auto cleanup = gsl::finally([this] { clearQueryStatementBuffer(); });
+
     va_list ap;
-    char *szQuery = static_cast<char *>(sqlite3_malloc(maxQueryLen));
     va_start(ap, format);
-    sqlite3_vsnprintf(maxQueryLen, (char *)szQuery, format, ap);
+    sqlite3_vsnprintf(maxQueryLen, queryStatementBuffer, format, ap);
     va_end(ap);
 
-    int result = sqlite3_exec(dbConnection, szQuery, NULL, NULL, NULL);
-    if (result != SQLITE_OK)
-        LOG_ERROR("Execution of \'%s\' failed with %d", szQuery, result);
-
-    sqlite3_free(szQuery);
-
-    return result != SQLITE_OK ? false : true;
+    if (const int result = sqlite3_exec(dbConnection, queryStatementBuffer, nullptr, nullptr, nullptr);
+        result != SQLITE_OK) {
+        LOG_ERROR("Execution of \'%s\' failed with %d", queryStatementBuffer, result);
+        return false;
+    }
+    return true;
 }
 
 std::unique_ptr<QueryResult> Database::query(const char *format, ...)
 {
-
-    if (!format) {
+    if (format == nullptr) {
         return nullptr;
     }
 
+    auto cleanup = gsl::finally([this] { clearQueryStatementBuffer(); });
+
     va_list ap;
-    char *szQuery = static_cast<char *>(sqlite3_malloc(maxQueryLen));
     va_start(ap, format);
-    szQuery[0] = 0;
-    sqlite3_vsnprintf(maxQueryLen, szQuery, format, ap);
+    sqlite3_vsnprintf(maxQueryLen, queryStatementBuffer, format, ap);
     va_end(ap);
 
     auto queryResult = std::make_unique<QueryResult>();
-
-    int result = sqlite3_exec(dbConnection, szQuery, queryCallback, queryResult.get(), NULL);
-    if (result != SQLITE_OK) {
-        LOG_ERROR("SQL query \'%s\' failed selecting : %d", szQuery, result);
+    if (const int result = sqlite3_exec(dbConnection, queryStatementBuffer, queryCallback, queryResult.get(), nullptr);
+        result != SQLITE_OK) {
+        LOG_ERROR("SQL query \'%s\' failed selecting : %d", queryStatementBuffer, result);
         return nullptr;
     }
-
-    sqlite3_free(szQuery);
-
     return queryResult;
 }
 
@@ -173,9 +187,8 @@ uint32_t Database::getLastInsertRowId()
 
 void Database::pragmaQuery(const std::string &pragmaStatemnt)
 {
-    auto results = query(pragmaStatemnt.c_str());
-    if (results) {
-        uint32_t fieldsCount = results->getFieldCount();
+    if (auto results = query(pragmaStatemnt.c_str()); results) {
+        const auto fieldsCount = results->getFieldCount();
         do {
             for (uint32_t i = 0; i < fieldsCount; i++) {
                 Field field = (*results)[i];
@@ -191,15 +204,10 @@ void Database::pragmaQuery(const std::string &pragmaStatemnt)
 bool Database::storeIntoFile(const std::string &backupPath)
 {
     LOG_INFO("Backup database: %s, into file: %s - STARTED", dbName.c_str(), backupPath.c_str());
-
-    auto rc = execute("VACUUM INTO '%q';", backupPath.c_str());
-
-    if (rc == true) {
-        LOG_INFO("Backup database: %s, into file: %s - SUCCEDED", dbName.c_str(), backupPath.c_str());
-    }
-    else {
+    if (const auto rc = execute("VACUUM INTO '%q';", backupPath.c_str()); !rc) {
         LOG_ERROR("Backup database: %s, into file: %s - FAILED", dbName.c_str(), backupPath.c_str());
+        return false;
     }
-
-    return rc;
+    LOG_INFO("Backup database: %s, into file: %s - SUCCEDED", dbName.c_str(), backupPath.c_str());
+    return true;
 }

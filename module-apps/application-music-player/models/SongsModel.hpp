@@ -8,7 +8,7 @@
 #include "Application.hpp"
 
 #include <ListItemProvider.hpp>
-#include <module-audio/Audio/decoder/decoder.hpp>
+#include <Audio/decoder/Decoder.hpp>
 
 class SongsModel : public app::InternalModel<gui::ListItem *>, public gui::ListItemProvider
 {

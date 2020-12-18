@@ -3,12 +3,11 @@
 
 #include "PlaybackOperation.hpp"
 
-#include "Audio/decoder/decoder.hpp"
+#include "Audio/decoder/Decoder.hpp"
 #include "Audio/Profiles/Profile.hpp"
 
 #include "Audio/AudioCommon.hpp"
 
-#include <bsp/audio/bsp_audio.hpp>
 #include <log/log.hpp>
 
 namespace audio
@@ -22,23 +21,6 @@ namespace audio
         std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
         : Operation(playbackType), dec(nullptr)
     {
-        audioCallback = [this](const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer) -> int32_t {
-
-#if PERF_STATS_ON == 1
-            auto tstamp = xTaskGetTickCount();
-#endif
-            auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
-#if PERF_STATS_ON == 1
-            LOG_DEBUG("Dec:%dms", xTaskGetTickCount() - tstamp);
-            // LOG_DEBUG("Watermark:%lu",uxTaskGetStackHighWaterMark2(NULL));  M.P: left here on purpose, it's handy
-            // during sf tests on hardware
-#endif
-            if (ret == 0) {
-                state = State::Idle;
-                eventCallback({PlaybackEventType::EndOfFile, operationToken});
-            }
-            return ret;
-        };
 
         constexpr audio::Volume defaultLoudspeakerVolume = 10;
         constexpr audio::Volume defaultHeadphonesVolume  = 2;
@@ -65,7 +47,7 @@ namespace audio
         }
         currentProfile = defaultProfile;
 
-        dec = decoder::Create(file);
+        dec = Decoder::Create(file);
         if (dec == nullptr) {
             throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
@@ -74,6 +56,11 @@ namespace audio
         if (retCode != RetCode::Success) {
             throw AudioInitException("Failed to switch audio profile", retCode);
         }
+
+        endOfFileCallback = [this]() {
+            state = State::Idle;
+            eventCallback({PlaybackEventType::EndOfFile, operationToken});
+        };
     }
 
     audio::RetCode PlaybackOperation::Start(audio::AsyncCallback callback, audio::Token token)
@@ -82,6 +69,9 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
         operationToken = token;
+
+        assert(dataStreamOut);
+        dec->startDecodingWorker(*dataStreamOut, endOfFileCallback);
 
         if (!tags) {
             tags = dec->fetchTags();
@@ -188,11 +178,17 @@ namespace audio
             return RetCode::UnsupportedProfile;
         }
 
+        if (dec->isConnected()) {
+            dec->disconnectStream();
+        }
+
         audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
         }
+
+        dec->connect(audioDevice->sink, *dataStreamOut);
 
         currentProfile->SetSampleRate(currentSampleRate);
         currentProfile->SetInOutFlags(currentInOutFlags);

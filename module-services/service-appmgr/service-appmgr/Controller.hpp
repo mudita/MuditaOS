@@ -10,7 +10,7 @@
 #include <module-sys/Service/Service.hpp>
 #include <SwitchData.hpp>
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 #include <memory>
 #include <string>

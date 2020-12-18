@@ -9,7 +9,7 @@
 #include <module-apps/windows/DialogMetadata.hpp>
 #include <module-apps/messages/DialogMetadataMessage.hpp>
 
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 #include <module-gui/gui/widgets/Text.hpp>
 

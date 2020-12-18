@@ -4,7 +4,7 @@
 #include "CalculatorUtility.hpp"
 #include "application-calculator/widgets/CalculatorStyle.hpp"
 #include <module-utils/tinyexpr/tinyexpr.h>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <Utils.hpp>
 #include <cmath>
 

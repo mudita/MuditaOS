@@ -20,7 +20,6 @@ add_catch2_executable(
                 ../mock/
         LIBS
                 module-gui
-                module-vfs
         DEPS
                 assets
 )

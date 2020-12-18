@@ -11,9 +11,7 @@ namespace purefs::fs::drivers
     {
       public:
         filesystem_vfat()                        = default;
-        filesystem_vfat(const filesystem_vfat &) = delete;
         virtual ~filesystem_vfat()               = default;
-        auto operator=(const filesystem_vfat &) = delete;
 
       private:
         auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh, std::string_view path, unsigned flags)

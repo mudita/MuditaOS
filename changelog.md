@@ -1,33 +1,50 @@
 # MuditaOS changelog
 
 ## Current release
+### Fixed
+* `[settings]` Fix lack of sim at startup
+* `[settings]` Fix Network All Operators display condition
+* `[settings]` Fix Network window items indentation
 
 ### Added
 
 * `[gui]` Added DOM dump capability for gui::Item objects
-* `[call functions]` Window for MMI/USSD internal messages.
-* `[alarms]` Added main window
-* `[alarms]` Added window with options
 * `[PowerManagement]` PowerManagement: Enable FreeRTOS Run Time Statistics
-* `[cellular]` USSD session handling.
-* `[settings]` Nightshift window - GUI.
-* `[bluetooth][settings]` Add Bluetooth settings to database.
 * `[PowerManagement]` Added CPU load measurement.
-* `[alarms]` Added new/edit alarm window
 * `[file indexer]` Support for deleting entries in File Indexer DB.
 * `[listview]` Added onEmpty list callbacks and implemented them for notes and messages. 
 * `[notes]` Added list rebuild on notifications.
+* `[cellular]` Custom MMI response message.
 
 ### Changed
 
 * `[PowerManagement]` Change hardware timers clock source
 * `[bluetooth]` Underlying communication with the Bluetooth module over DMA (direct access)
 * `[system]` Workers refactor and state transition fixes
+* Change audio data path synchronization.
+
+
+
+## [0.50.1 2020-12-14]
+
+### Added
+
+* Add window for MMI/USSD internal messages.
+* Add windows for the alarm application.
+* Add "nightshift" settings window.
+* Add Bluetooth settings.
 
 ### Fixed
 
-* `[settings]` Fix lack of sim at startup
-* `[audio]` Changed internal microphone gain from 0dB to -12dB to fix echo & noise problem
+* Fix default SIM setting.
+* Fix internal microphone echo and noise problem.
+* Fix several problems with USSD.
+
+### Other
+
+* Add ICS parser for the calendar application.
+* Clock configuration changes.
+* Add power measurement features to the system.
 
 ## [0.49.1 2020-12-04]
 

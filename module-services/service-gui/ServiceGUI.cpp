@@ -37,13 +37,14 @@ extern "C"
 #include <list>
 #include <memory>
 #include <utility>
+#include <purefs/filesystem_paths.hpp>
 
 namespace sgui
 {
     ServiceGUI::ServiceGUI(const std::string &name, std::string parent, uint32_t screenWidth, uint32_t screenHeight)
         : sys::Service(name, parent, 4096, sys::ServicePriority::Idle), renderContext{nullptr},
           transferContext{nullptr}, renderFrameCounter{1}, transferedFrameCounter{0}, screenWidth{screenWidth},
-          screenHeight{screenHeight}, semCommands{NULL}, worker{nullptr}
+          screenHeight{screenHeight}, semCommands{NULL}
     {
 
         LOG_INFO("[ServiceGUI] Initializing");
@@ -52,10 +53,10 @@ namespace sgui
         transferContext = new gui::Context(screenWidth, screenHeight);
 
         gui::FontManager &fontManager = gui::FontManager::getInstance();
-        fontManager.init("assets");
+        fontManager.init(purefs::dir::getCurrentOSPath() / "assets");
 
         gui::ImageManager &imageManager = gui::ImageManager::getInstance();
-        imageManager.init("assets");
+        imageManager.init(purefs::dir::getCurrentOSPath() / "assets");
 
         connect(typeid(sgui::DrawMessage),
                 [&](sys::Message *request) -> sys::MessagePointer { return handleDrawMessage(request); });
@@ -117,7 +118,7 @@ namespace sgui
         }
         xSemaphoreGive(semCommands);
 
-        worker = new WorkerGUI(this);
+        worker = std::make_unique<WorkerGUI>(this);
         std::list<sys::WorkerQueueInfo> list;
         worker->init(list);
         worker->run();

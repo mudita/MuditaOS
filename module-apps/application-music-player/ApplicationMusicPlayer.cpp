@@ -6,9 +6,10 @@
 #include "windows/MusicPlayerEmptyWindow.hpp"
 
 #include <service-audio/AudioServiceAPI.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <time/ScopedTime.hpp>
+#include <vfs.hpp>
 
 namespace app
 {

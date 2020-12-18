@@ -7,7 +7,7 @@
 #include "Label.hpp"
 #include <Style.hpp>
 #include <log/log.hpp>
-#include <module-utils/i18n/i18n.hpp>
+#include <i18n/i18n.hpp>
 
 namespace gui
 {

@@ -27,14 +27,17 @@ namespace gui
         std::function<bool(Item &)> focusCb           = nullptr;
         AppWindow *app                                = nullptr;
         RightItem rightItem                           = RightItem::Disabled;
+        bool indent                                   = false;
 
       public:
         OptionSettings(const UTF8 text,
                        std::function<bool(Item &)> cb,
                        std::function<bool(Item &)> cbFocus,
                        AppWindow *app,
-                       RightItem rightItem = RightItem::Disabled)
-            : text(text), activatedCallback(std::move(cb)), focusCb(std::move(cbFocus)), app(app), rightItem(rightItem)
+                       RightItem rightItem = RightItem::Disabled,
+                       bool indent         = false)
+            : text(text), activatedCallback(std::move(cb)), focusCb(std::move(cbFocus)), app(app), rightItem(rightItem),
+              indent(indent)
         {}
         [[nodiscard]] auto build() const -> Item * override;
     };

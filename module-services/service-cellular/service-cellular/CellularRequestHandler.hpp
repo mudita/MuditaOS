@@ -20,6 +20,7 @@ class CellularRequestHandler : public RequestHandler
     void handle(PasswordRegistrationRequest &request, at::Result &result) final;
     void handle(SupplementaryServicesRequest &request, at::Result &result) final;
     void handle(PinChangeRequest &request, at::Result &result) final;
+    void handle(ClirRequest &request, at::Result &result) final;
 
   private:
     ServiceCellular &cellular;

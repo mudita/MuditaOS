@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ControlFunctions.hpp"
+#include <cmath>
 
 namespace sevm::screen_light_control::functions
 {
