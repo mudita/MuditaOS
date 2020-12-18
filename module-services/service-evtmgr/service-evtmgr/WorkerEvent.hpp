@@ -61,7 +61,7 @@ class WorkerEvent : public sys::Worker
     sys::Service *service     = nullptr;
 
   public:
-    WorkerEvent(sys::Service *service);
+    WorkerEvent(sys::Service *service) : sys::Worker(service), service(service);
     /**
      * This function is responsible for creating all queues provided in the constructor.
      * When all queues are created this method creates set of queues.

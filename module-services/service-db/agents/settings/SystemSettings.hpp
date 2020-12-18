@@ -22,5 +22,9 @@ namespace settings
         constexpr inline auto deviceName       = "bt_device_name";
         constexpr inline auto bondedDevices    = "bt_bonded_devices";
     } // namespace Bluetooth
+    namespace Battery
+    {
+        constexpr inline auto criticalLevel = "batt_critical_level";
+    } // namespace Battery
 
 }; // namespace settings

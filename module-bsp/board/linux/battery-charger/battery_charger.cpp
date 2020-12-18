@@ -44,7 +44,6 @@ namespace bsp
             return 1;
         }
         Store::Battery::modify().level = battLevel;
-
         return 0;
     }
 
