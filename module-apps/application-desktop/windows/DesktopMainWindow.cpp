@@ -312,7 +312,7 @@ namespace gui
         }
         if (app->notifications.notSeen.SnoozedAlarms > 0) {
             notifications->addNotification(
-                "snooze_icon",
+                "alarm_icon",
                 utils::localize.get("app_desktop_snoozed_alarms"),
                 std::to_string(app->notifications.notSeen.SnoozedAlarms),
                 []() -> bool { return false; },

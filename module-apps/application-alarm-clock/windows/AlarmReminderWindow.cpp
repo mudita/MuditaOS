@@ -11,7 +11,7 @@
 
 namespace app::alarmClock
 {
-    constexpr static const int reminderLifeDuration = 100000;
+    constexpr static const int reminderLifeDuration = 900000; // 15min
 
     AlarmReminderWindow::AlarmReminderWindow(app::Application *app,
                                              std::unique_ptr<AlarmReminderWindowContract::Presenter> &&windowPresenter)
@@ -32,7 +32,7 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::onClose()
     {
-        destroyTimer();
+        destroyTimers();
     }
 
     void AlarmReminderWindow::rebuild()
@@ -107,7 +107,7 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::destroyInterface()
     {
-        destroyTimer();
+        destroyTimers();
         erase();
     }
 
@@ -117,9 +117,16 @@ namespace app::alarmClock
         reminderTimer->reload();
     }
 
-    void AlarmReminderWindow::destroyTimer()
+    void AlarmReminderWindow::startMusicTimer()
+    {
+        musicTimer->connect([=](sys::Timer &) { loopMusic(); });
+        musicTimer->reload();
+    }
+
+    void AlarmReminderWindow::destroyTimers()
     {
         reminderTimer->stop();
+        // musicTimer->stop();
     }
 
     auto AlarmReminderWindow::handleSwitchData(gui::SwitchData *data) -> bool
@@ -137,8 +144,15 @@ namespace app::alarmClock
 
         alarmRecord = item->getData();
         timeLabel->setText(TimePointToLocalizedTimeString(alarmRecord->time, "%I:%0M"));
-        // AudioServiceAPI::PlaybackStart(
-        //            application, audio::PlaybackType::Multimedia, alarmRecord->path);
+        auto fileTags = AudioServiceAPI::GetFileTags(application, alarmRecord->path);
+
+        if (fileTags != std::nullopt) {
+            /*musicTimer = std::make_unique<sys::Timer>(
+                    "AlarmClockMusicTimer", application, fileTags->duration_sec * 1000, sys::Timer::Type::Periodic);
+            startMusicTimer();
+            AudioServiceAPI::PlaybackStart(
+                        application, audio::PlaybackType::Multimedia, alarmRecord->path);*/
+        }
         return true;
     }
 
@@ -149,7 +163,6 @@ namespace app::alarmClock
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-            // AudioServiceAPI::StopAll(application);
             switch (alarmRecord->status) {
             case AlarmStatus::Off:
                 break;
@@ -183,7 +196,6 @@ namespace app::alarmClock
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_RF)) {
-            // AudioServiceAPI::StopAll(application);
             if (alarmRecord->repeat == static_cast<uint32_t>(AlarmRepeat::never)) {
                 alarmRecord->status = AlarmStatus::Off;
             }
@@ -201,9 +213,15 @@ namespace app::alarmClock
     void AlarmReminderWindow::closeReminder()
     {
         LOG_DEBUG("Switch to previous window");
-        destroyTimer();
-
+        destroyTimers();
+        // AudioServiceAPI::StopAll(application);
         app::manager::Controller::sendAction(application, app::manager::actions::Home);
+    }
+
+    void AlarmReminderWindow::loopMusic()
+    {
+        // AudioServiceAPI::PlaybackStart(
+        //        application, audio::PlaybackType::Multimedia, alarmRecord->path);
     }
 
 } // namespace app::alarmClock

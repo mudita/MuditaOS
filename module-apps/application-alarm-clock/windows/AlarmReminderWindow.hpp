@@ -18,6 +18,7 @@ namespace app::alarmClock
     {
       private:
         std::unique_ptr<sys::Timer> reminderTimer;
+        std::unique_ptr<sys::Timer> musicTimer;
         std::unique_ptr<AlarmReminderWindowContract::Presenter> presenter;
         std::shared_ptr<AlarmsRecord> alarmRecord;
 
@@ -33,8 +34,10 @@ namespace app::alarmClock
         gui::Image *snoozeImage = nullptr;
 
         void startTimer();
-        void destroyTimer();
+        void startMusicTimer();
+        void destroyTimers();
         void closeReminder();
+        void loopMusic();
 
       public:
         AlarmReminderWindow(app::Application *app,
