@@ -60,16 +60,26 @@ class CDCSerial:
         json_dump = json.dumps(json_data)
         return "#%09d%s" % (len(json_dump), json_dump)
 
+    def read(self, length):
+        header = self.readRaw(length)
+        payload_length = int(header[1:])
+        result = self.readRaw(payload_length)
+        log.info(f"received length: {len(result)}, payload length:{payload_length}")
+        return result
+
+    def readRaw(self, length):
+        return self.serial.read(length).decode()
+
     def write(self, msg, timeout=30):
         message = self.__build_message(msg)
+        self.writeRaw(message)
+        result = self.read(self.header_length)
+        return json.loads(result)
+
+    def writeRaw(self, message, timeout=30):
         log.info(message)
         self.serial.write(message.encode())
         self.serial.timeout = timeout
-        header = self.serial.read(self.header_length).decode()
-        payload_length = int(header[1:])
-        result = self.serial.read(payload_length).decode()
-        log.info(f"received length: {len(result)}, payload length:{payload_length}")
-        return json.loads(result)
 
     def send_key(self, key_code, key_type=Keytype.short_press, wait=10):
         if key_type is Keytype.long_press:
@@ -78,6 +88,22 @@ class CDCSerial:
             body = {"keyPressed": key_code, "state": 2}
         ret = self.write(self.__wrap_message(body), wait)
         time.sleep(0.3)
+        return ret
+
+    def enable_echo_mode(self):
+        echoOnCmd = "UsbCdcEcho=ON"
+        self.writeRaw(echoOnCmd)
+        result = self.readRaw(len(echoOnCmd))
+        log.info(f"received length: {len(result)}, result:{result}")
+        ret = (result == echoOnCmd)
+        return ret
+
+    def disable_echo_mode(self):
+        echoOffCmd = "UsbCdcEcho=OFF"
+        self.writeRaw(echoOffCmd)
+        result = self.readRaw(len(echoOffCmd))
+        log.info(f"received length: {len(result)}, result:{result}")
+        ret = (result == echoOffCmd)
         return ret
 
     def send_at(self, at_command, wait=10):

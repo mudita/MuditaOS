@@ -76,15 +76,15 @@ def harness(request):
     harness = Harness(port_name)
     return harness
 
-
 @pytest.fixture(scope='session')
 def phone_unlocked(harness):
     harness.unlock_phone()
     assert harness.is_phone_unlocked
-
 
 def pytest_configure(config):
     config.addinivalue_line("markers",
                             "service_desktop_test: mark test if it's related to service-desktop API")
     config.addinivalue_line("markers",
                             "rt1051: mark test if it's target only (eg. calls, messages)")
+    config.addinivalue_line("markers",
+                            "usb_cdc_echo: mark test if it's intended for usb-cdc echo mode")
