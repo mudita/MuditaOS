@@ -45,11 +45,6 @@ extern "C"
 #include <string>      // for string
 #include <vector>      // for vector
 
-WorkerEvent::WorkerEvent(sys::Service *service) : sys::Worker(service), service(service)
-{
-    battery_level_check::init(service);
-}
-
 bool WorkerEvent::handleMessage(uint32_t queueID)
 {
 
@@ -205,6 +200,8 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
     bsp::rtc_GetCurrentTimestamp(&timestamp);
     bsp::rtc_SetMinuteAlarm(timestamp);
 
+    battery_level_check::init(service);
+
     return true;
 }
 
@@ -218,6 +215,8 @@ bool WorkerEvent::deinit(void)
     bsp::keypad_backlight::deinit();
     bsp::eink_frontlight::deinit();
     bsp::light_sensor::deinit();
+
+    battery_level_check::deinit();
 
     return true;
 }
