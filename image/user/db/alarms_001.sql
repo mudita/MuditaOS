@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS alarms(
                   snooze INTEGER,
                   status INTEGER,
                   repeat INTEGER,
+                  delay INTEGER,
                   path TEXT DEFAULT '',
                   FOREIGN KEY(status) REFERENCES alarmStatuses(_id)
 );

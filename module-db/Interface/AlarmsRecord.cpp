@@ -12,7 +12,7 @@
 
 AlarmsRecord::AlarmsRecord(const AlarmsTableRow &tableRow)
     : Record{tableRow.ID}, time{tableRow.time}, snooze{tableRow.snooze}, status{tableRow.status},
-      repeat{tableRow.repeat}, path{tableRow.path}
+      repeat{tableRow.repeat}, delay{tableRow.delay}, path{tableRow.path}
 {}
 
 AlarmsRecordInterface::AlarmsRecordInterface(AlarmsDB *alarmsDb) : alarmsDB(alarmsDb)

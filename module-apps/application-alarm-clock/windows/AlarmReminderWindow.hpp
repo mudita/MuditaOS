@@ -19,8 +19,10 @@ namespace app::alarmClock
       private:
         std::unique_ptr<sys::Timer> reminderTimer;
         std::unique_ptr<sys::Timer> musicTimer;
+        std::unique_ptr<sys::Timer> delayTimer;
         std::unique_ptr<AlarmReminderWindowContract::Presenter> presenter;
         std::shared_ptr<AlarmsRecord> alarmRecord;
+        std::shared_ptr<AlarmsRecord> previousAlarmRecord;
 
         gui::VBox *body         = nullptr;
         gui::HBox *hBox         = nullptr;
@@ -33,18 +35,22 @@ namespace app::alarmClock
         gui::Image *rightImage  = nullptr;
         gui::Image *snoozeImage = nullptr;
 
-        void startTimer();
+        uint32_t elapsedMinutes = 0;
+        uint32_t previousElapsedMinutes = 0;
+
+        void startTimers();
         void startMusicTimer();
         void destroyTimers();
         void closeReminder();
+        void closeReminderCallback();
         void loopMusic();
+        void countElapsedMinutes();
 
       public:
         AlarmReminderWindow(app::Application *app,
                             std::unique_ptr<AlarmReminderWindowContract::Presenter> &&windowPresenter);
         ~AlarmReminderWindow() override;
 
-        void onClose() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
         void rebuild() override;
         void buildInterface() override;

@@ -8,6 +8,12 @@
 
 namespace app::alarmClock
 {
+    enum class UserAction
+    {
+        TurnOff,
+        Snooze
+    };
+
     class AlarmReminderWindowContract
     {
       public:
@@ -21,7 +27,7 @@ namespace app::alarmClock
           public:
             virtual ~Presenter() noexcept = default;
 
-            virtual void update(const AlarmsRecord &alarm) = 0;
+            virtual void update(AlarmsRecord &alarm, UserAction action, uint32_t delay) = 0;
         };
     };
 
@@ -30,7 +36,7 @@ namespace app::alarmClock
       public:
         explicit AlarmReminderWindowPresenter(std::unique_ptr<AbstractAlarmsRepository> &&alarmsRepository);
 
-        void update(const AlarmsRecord &alarm) override;
+        void update(AlarmsRecord &alarm, UserAction action, uint32_t delay) override;
 
       private:
         std::unique_ptr<AbstractAlarmsRepository> alarmsRepository;

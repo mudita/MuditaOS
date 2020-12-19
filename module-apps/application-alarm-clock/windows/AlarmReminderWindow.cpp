@@ -12,6 +12,7 @@
 namespace app::alarmClock
 {
     constexpr static const int reminderLifeDuration = 900000; // 15min
+    constexpr static const int defaultDuration      = 60000;  // 1min
 
     AlarmReminderWindow::AlarmReminderWindow(app::Application *app,
                                              std::unique_ptr<AlarmReminderWindowContract::Presenter> &&windowPresenter)
@@ -22,17 +23,14 @@ namespace app::alarmClock
 
         reminderTimer = std::make_unique<sys::Timer>(
             "AlarmClockReminderTimer", app, reminderLifeDuration, sys::Timer::Type::SingleShot);
-        reminderTimer->connect([=](sys::Timer &) { closeReminder(); });
+        musicTimer =
+            std::make_unique<sys::Timer>("AlarmClockMusicTimer", app, defaultDuration, sys::Timer::Type::Periodic);
+        delayTimer = std::make_unique<sys::Timer>("AlarmDelayTimer", app, defaultDuration, sys::Timer::Type::Periodic);
     }
 
     AlarmReminderWindow::~AlarmReminderWindow()
     {
         destroyInterface();
-    }
-
-    void AlarmReminderWindow::onClose()
-    {
-        destroyTimers();
     }
 
     void AlarmReminderWindow::rebuild()
@@ -111,10 +109,13 @@ namespace app::alarmClock
         erase();
     }
 
-    void AlarmReminderWindow::startTimer()
+    void AlarmReminderWindow::startTimers()
     {
-        reminderTimer->connect([=](sys::Timer &) { closeReminder(); });
+        elapsedMinutes = 0;
+        reminderTimer->connect([=](sys::Timer &) { closeReminderCallback(); });
         reminderTimer->reload();
+        delayTimer->connect([=](sys::Timer &) { countElapsedMinutes(); });
+        delayTimer->reload();
     }
 
     void AlarmReminderWindow::startMusicTimer()
@@ -126,12 +127,13 @@ namespace app::alarmClock
     void AlarmReminderWindow::destroyTimers()
     {
         reminderTimer->stop();
-        // musicTimer->stop();
+        delayTimer->stop();
+        musicTimer->stop();
     }
 
     auto AlarmReminderWindow::handleSwitchData(gui::SwitchData *data) -> bool
     {
-        startTimer();
+        startTimers();
 
         if (data == nullptr) {
             return false;
@@ -143,12 +145,18 @@ namespace app::alarmClock
         }
 
         alarmRecord = item->getData();
+        if (previousAlarmRecord != nullptr) {
+            LOG_DEBUG("New alarm covered the old one, automatic snooze applying");
+            presenter->update(*previousAlarmRecord, UserAction::Snooze, previousElapsedMinutes);
+            previousElapsedMinutes = 0;
+        }
+        previousAlarmRecord = alarmRecord;
         timeLabel->setText(TimePointToLocalizedTimeString(alarmRecord->time, "%I:%0M"));
         auto fileTags = AudioServiceAPI::GetFileTags(application, alarmRecord->path);
 
         if (fileTags != std::nullopt) {
-            /*musicTimer = std::make_unique<sys::Timer>(
-                    "AlarmClockMusicTimer", application, fileTags->duration_sec * 1000, sys::Timer::Type::Periodic);
+            /*
+            musicTimer->setInterval(fileTags->duration_sec * 1000);
             startMusicTimer();
             AudioServiceAPI::PlaybackStart(
                         application, audio::PlaybackType::Multimedia, alarmRecord->path);*/
@@ -163,46 +171,13 @@ namespace app::alarmClock
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-            switch (alarmRecord->status) {
-            case AlarmStatus::Off:
-                break;
-            case AlarmStatus::On:
-                alarmRecord->status = AlarmStatus::FirstSnooze;
-                break;
-            case AlarmStatus::FirstSnooze:
-                alarmRecord->status = AlarmStatus::SecondSnooze;
-                break;
-            case AlarmStatus::SecondSnooze:
-                alarmRecord->status = AlarmStatus::ThirdSnooze;
-                break;
-            case AlarmStatus::ThirdSnooze:
-                alarmRecord->status = AlarmStatus::FourthSnooze;
-                break;
-            case AlarmStatus::FourthSnooze:
-                alarmRecord->status = AlarmStatus::FifthSnooze;
-                break;
-            case AlarmStatus::FifthSnooze:
-                if (alarmRecord->repeat == static_cast<uint32_t>(AlarmRepeat::never)) {
-                    alarmRecord->status = AlarmStatus::Off;
-                }
-                else {
-                    alarmRecord->status = AlarmStatus::On;
-                }
-                break;
-            }
-            presenter->update(*alarmRecord);
+            presenter->update(*alarmRecord, UserAction::Snooze, elapsedMinutes);
             closeReminder();
             return true;
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_RF)) {
-            if (alarmRecord->repeat == static_cast<uint32_t>(AlarmRepeat::never)) {
-                alarmRecord->status = AlarmStatus::Off;
-            }
-            else {
-                alarmRecord->status = AlarmStatus::On;
-            }
-            presenter->update(*alarmRecord);
+            presenter->update(*alarmRecord, UserAction::TurnOff, 0);
             closeReminder();
             return true;
         }
@@ -212,7 +187,8 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::closeReminder()
     {
-        LOG_DEBUG("Switch to previous window");
+        LOG_DEBUG("Switch to home window");
+
         destroyTimers();
         // AudioServiceAPI::StopAll(application);
         app::manager::Controller::sendAction(application, app::manager::actions::Home);
@@ -220,8 +196,19 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::loopMusic()
     {
-        // AudioServiceAPI::PlaybackStart(
-        //        application, audio::PlaybackType::Multimedia, alarmRecord->path);
+        AudioServiceAPI::PlaybackStart(application, audio::PlaybackType::Multimedia, alarmRecord->path);
+    }
+
+    void AlarmReminderWindow::countElapsedMinutes()
+    {
+        ++elapsedMinutes;
+        previousElapsedMinutes = elapsedMinutes;
+    }
+
+    void AlarmReminderWindow::closeReminderCallback()
+    {
+        presenter->update(*alarmRecord, UserAction::Snooze, elapsedMinutes);
+        closeReminder();
     }
 
 } // namespace app::alarmClock

@@ -37,13 +37,14 @@ TEST_CASE("Alarms Table tests")
         REQUIRE(test.snooze == 0);
         REQUIRE(test.status == AlarmStatus::On);
         REQUIRE(test.repeat == 0);
+        REQUIRE(test.delay == 0);
         REQUIRE(test.path == "");
     }
 
     REQUIRE(alarmsTbl.add(
-        AlarmsTableRow(1, TimePointFromString("2020-11-11 15:10:00"), 0, AlarmStatus::Off, 0, "file.mp3")));
+        AlarmsTableRow(1, TimePointFromString("2020-11-11 15:10:00"), 0, AlarmStatus::Off, 0, 0, "file.mp3")));
     REQUIRE(alarmsTbl.add(
-        AlarmsTableRow(2, TimePointFromString("2020-11-11 15:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
+        AlarmsTableRow(2, TimePointFromString("2020-11-11 15:15:00"), 1, AlarmStatus::On, 1, 0, "file2.mp3")));
 
     REQUIRE(alarmsTbl.count() == 2);
     REQUIRE(alarmsTbl.countByFieldId("status", 0) == 1);
@@ -56,6 +57,7 @@ TEST_CASE("Alarms Table tests")
         REQUIRE(entry.snooze == 0);
         REQUIRE(entry.status == AlarmStatus::Off);
         REQUIRE(entry.repeat == 0);
+        REQUIRE(entry.delay == 0);
         REQUIRE(entry.path == "file.mp3");
         REQUIRE(entry.isValid());
     }
@@ -68,6 +70,7 @@ TEST_CASE("Alarms Table tests")
         REQUIRE(entry.snooze == 0);
         REQUIRE(entry.status == AlarmStatus::On);
         REQUIRE(entry.repeat == 0);
+        REQUIRE(entry.delay == 0);
         REQUIRE(entry.path == "");
         REQUIRE_FALSE(entry.isValid());
     }
@@ -88,6 +91,7 @@ TEST_CASE("Alarms Table tests")
         REQUIRE(entry.snooze == entryUpdate.snooze);
         REQUIRE(entry.status == entryUpdate.status);
         REQUIRE(entry.repeat == entryUpdate.repeat);
+        REQUIRE(entry.delay == entryUpdate.delay);
         REQUIRE(entry.path == entryUpdate.path);
     }
 
@@ -133,11 +137,11 @@ TEST_CASE("Alarms Table tests")
     SECTION("Check limit/offset sorting correctness")
     {
         REQUIRE(alarmsTbl.add(
-            AlarmsTableRow(3, TimePointFromString("2020-11-12 17:10:00"), 0, AlarmStatus::Off, 0, "file.mp3")));
+            AlarmsTableRow(3, TimePointFromString("2020-11-12 17:10:00"), 0, AlarmStatus::Off, 0, 0, "file.mp3")));
         REQUIRE(alarmsTbl.add(
-            AlarmsTableRow(4, TimePointFromString("2020-11-11 19:25:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
+            AlarmsTableRow(4, TimePointFromString("2020-11-11 19:25:00"), 1, AlarmStatus::On, 1, 0, "file2.mp3")));
         REQUIRE(alarmsTbl.add(
-            AlarmsTableRow(5, TimePointFromString("2020-12-11 07:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
+            AlarmsTableRow(5, TimePointFromString("2020-12-11 07:15:00"), 1, AlarmStatus::On, 1, 0, "file2.mp3")));
 
         const std::array<TimePoint, 5> paramTime{TimePointFromString("2020-12-11 07:15:00"),
                                                  TimePointFromString("2020-11-11 15:10:00"),

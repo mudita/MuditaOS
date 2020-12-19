@@ -38,18 +38,20 @@ TEST_CASE("Alarms Record tests")
         REQUIRE(test.snooze == 0);
         REQUIRE(test.status == AlarmStatus::On);
         REQUIRE(test.repeat == 0);
+        REQUIRE(test.delay == 0);
         REQUIRE(test.path == "");
     }
 
     auto time = TimePointFromString("2020-11-11 15:15:00");
     SECTION("Constructor from AlarmsTableRow")
     {
-        AlarmsTableRow tableRow(1, time, 0, AlarmStatus::On, 0, "musicFile.mp3");
+        AlarmsTableRow tableRow(1, time, 0, AlarmStatus::On, 0, 0, "musicFile.mp3");
         AlarmsRecord test(tableRow);
         REQUIRE(test.time == time);
         REQUIRE(test.snooze == 0);
         REQUIRE(test.status == AlarmStatus::On);
         REQUIRE(test.repeat == 0);
+        REQUIRE(test.delay == 0);
         REQUIRE(test.path == "musicFile.mp3");
         REQUIRE(test.isValid());
     }
@@ -59,12 +61,13 @@ TEST_CASE("Alarms Record tests")
     auto recordsNumber = alarmsRecordInterface.GetCount();
     REQUIRE(recordsNumber == 0);
 
-    AlarmsTableRow tableRow(1, time, 2, AlarmStatus::Off, 3, "musicFile.mp3");
+    AlarmsTableRow tableRow(1, time, 2, AlarmStatus::Off, 3, 0, "musicFile.mp3");
     auto rec = AlarmsRecord(tableRow);
     REQUIRE(rec.time == time);
     REQUIRE(rec.snooze == 2);
     REQUIRE(rec.status == AlarmStatus::Off);
     REQUIRE(rec.repeat == 3);
+    REQUIRE(rec.delay == 0);
     REQUIRE(rec.path == "musicFile.mp3");
     REQUIRE(rec.isValid());
 
@@ -81,6 +84,7 @@ TEST_CASE("Alarms Record tests")
         REQUIRE(entry.snooze == 2);
         REQUIRE(entry.status == AlarmStatus::Off);
         REQUIRE(entry.repeat == 3);
+        REQUIRE(entry.delay == 0);
         REQUIRE(entry.path == "musicFile.mp3");
         REQUIRE(entry.isValid());
     }
@@ -93,16 +97,19 @@ TEST_CASE("Alarms Record tests")
         REQUIRE(entry.snooze == 0);
         REQUIRE(entry.status == AlarmStatus::On);
         REQUIRE(entry.repeat == 0);
+        REQUIRE(entry.delay == 0);
         REQUIRE(entry.path == "");
         REQUIRE_FALSE(entry.isValid());
     }
 
-    AlarmsTableRow tableRow2(2, TimePointFromString("2020-11-12 18:00:00"), 3, AlarmStatus::On, 0, "musicFile123.mp3");
+    AlarmsTableRow tableRow2(
+        2, TimePointFromString("2020-11-12 18:00:00"), 3, AlarmStatus::On, 0, 0, "musicFile123.mp3");
     auto rec2 = AlarmsRecord(tableRow2);
     REQUIRE(rec2.time == TimePointFromString("2020-11-12 18:00:00"));
     REQUIRE(rec2.snooze == 3);
     REQUIRE(rec2.status == AlarmStatus::On);
     REQUIRE(rec2.repeat == 0);
+    REQUIRE(rec2.delay == 0);
     REQUIRE(rec2.path == "musicFile123.mp3");
     REQUIRE(rec2.isValid());
 
@@ -127,6 +134,7 @@ TEST_CASE("Alarms Record tests")
         REQUIRE(entry.snooze == entryUpdate.snooze);
         REQUIRE(entry.status == entryUpdate.status);
         REQUIRE(entry.repeat == entryUpdate.repeat);
+        REQUIRE(entry.delay == entryUpdate.delay);
         REQUIRE(entry.path == entryUpdate.path);
         REQUIRE(recordsNumber == 2);
     }
@@ -188,6 +196,7 @@ TEST_CASE("Alarms Record tests")
                         uint32_t snooze,
                         AlarmStatus status,
                         uint32_t repeat,
+                        uint32_t delay,
                         const std::string &path) {
         auto query  = std::make_shared<db::query::alarms::Get>(id);
         auto ret    = alarmsRecordInterface.runQuery(query);
@@ -199,6 +208,7 @@ TEST_CASE("Alarms Record tests")
         REQUIRE(alarmRec.snooze == snooze);
         REQUIRE(alarmRec.status == status);
         REQUIRE(alarmRec.repeat == repeat);
+        REQUIRE(alarmRec.delay == delay);
         REQUIRE(alarmRec.path == path);
 
         return alarmRec;
@@ -229,7 +239,7 @@ TEST_CASE("Alarms Record tests")
 
     SECTION("Get record by id with query")
     {
-        getQuery(1, time, 2, AlarmStatus::Off, 3, "musicFile.mp3");
+        getQuery(1, time, 2, AlarmStatus::Off, 3, 0, "musicFile.mp3");
     }
 
     SECTION("Remove records with query")
@@ -268,12 +278,12 @@ TEST_CASE("Alarms Record tests")
         auto result = dynamic_cast<db::query::alarms::EditResult *>(ret.get());
         REQUIRE(result != nullptr);
 
-        getQuery(1, TimePointFromString("2021-01-01 09:00:00"), 1, AlarmStatus::On, 0, "newFile.wav");
+        getQuery(1, TimePointFromString("2021-01-01 09:00:00"), 1, AlarmStatus::On, 0, 0, "newFile.wav");
     }
 
     SECTION("Add with query")
     {
-        AlarmsTableRow tableRow3(4, TimePointFromString("2020-11-11 09:00:00"), 0, AlarmStatus::Off, 9, "music.wav");
+        AlarmsTableRow tableRow3(4, TimePointFromString("2020-11-11 09:00:00"), 0, AlarmStatus::Off, 9, 0, "music.wav");
         auto record = AlarmsRecord(tableRow3);
         auto query  = std::make_shared<db::query::alarms::Add>(record);
         auto ret    = alarmsRecordInterface.runQuery(query);
@@ -282,7 +292,7 @@ TEST_CASE("Alarms Record tests")
         REQUIRE(result->succeed());
         auto maxID = alarmsRecordInterface.GetCount();
 
-        getQuery(maxID, TimePointFromString("2020-11-11 09:00:00"), 0, AlarmStatus::Off, 9, "music.wav");
+        getQuery(maxID, TimePointFromString("2020-11-11 09:00:00"), 0, AlarmStatus::Off, 9, 0, "music.wav");
     }
 
     Database::deinitialize();

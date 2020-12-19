@@ -34,6 +34,7 @@ struct AlarmsRecord : public Record
     uint32_t snooze    = 0;
     AlarmStatus status = AlarmStatus::On;
     uint32_t repeat    = 0;
+    uint32_t delay     = 0;
     UTF8 path;
 
     AlarmsRecord() = default;

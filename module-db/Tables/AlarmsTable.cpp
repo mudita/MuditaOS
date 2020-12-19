@@ -5,18 +5,19 @@
 #include "AlarmsRecord.hpp"
 
 AlarmsTableRow::AlarmsTableRow(const AlarmsRecord &rec)
-    : Record{rec.ID}, time{rec.time}, snooze{rec.snooze}, status{rec.status}, repeat{rec.repeat}, path{rec.path}
+    : Record{rec.ID}, time{rec.time}, snooze{rec.snooze}, status{rec.status}, repeat{rec.repeat}, delay{rec.delay},
+      path{rec.path}
 {}
 
 AlarmsTableRow::AlarmsTableRow(
-    uint32_t id, TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, UTF8 path)
-    : Record{id}, time{time}, snooze{snooze}, status{status}, repeat{repeat}, path{std::move(path)}
+    uint32_t id, TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, uint32_t delay, UTF8 path)
+    : Record{id}, time{time}, snooze{snooze}, status{status}, repeat{repeat}, delay{delay}, path{std::move(path)}
 {}
 
 AlarmsTableRow::AlarmsTableRow(const QueryResult &result)
     : Record{(result)[0].getUInt32()}, time{TimePointFromString((result)[1].getString().c_str())},
       snooze{(result)[2].getUInt32()}, status{static_cast<AlarmStatus>((result)[3].getInt32())},
-      repeat{(result)[4].getUInt32()}, path{(result)[5].getString()}
+      repeat{(result)[4].getUInt32()}, delay{(result)[5].getUInt32()}, path{(result)[6].getString()}
 {}
 
 AlarmsTable::AlarmsTable(Database *db) : Table(db)
@@ -29,13 +30,14 @@ bool AlarmsTable::create()
 
 bool AlarmsTable::add(AlarmsTableRow entry)
 {
-    return db->execute(
-        "INSERT or ignore INTO alarms ( time, snooze, status, repeat, path ) VALUES ('%q', %lu, %i, %lu,'%q');",
-        TimePointToString(entry.time).c_str(),
-        entry.snooze,
-        entry.status,
-        entry.repeat,
-        entry.path.c_str());
+    return db->execute("INSERT or ignore INTO alarms ( time, snooze, status, repeat, delay, path ) VALUES ('%q', %lu, "
+                       "%i, %lu, %lu, '%q');",
+                       TimePointToString(entry.time).c_str(),
+                       entry.snooze,
+                       entry.status,
+                       entry.repeat,
+                       entry.delay,
+                       entry.path.c_str());
 }
 
 bool AlarmsTable::removeById(uint32_t id)
@@ -68,14 +70,15 @@ bool AlarmsTable::removeByField(AlarmsTableFields field, const char *str)
 
 bool AlarmsTable::update(AlarmsTableRow entry)
 {
-    return db->execute(
-        "UPDATE alarms SET time = '%q', snooze = %lu ,status = %i, repeat = %lu, path = '%q' WHERE _id=%lu;",
-        TimePointToString(entry.time).c_str(),
-        entry.snooze,
-        entry.status,
-        entry.repeat,
-        entry.path.c_str(),
-        entry.ID);
+    return db->execute("UPDATE alarms SET time = '%q', snooze = %lu ,status = %i, repeat = %lu, delay = %lu, path = "
+                       "'%q' WHERE _id=%lu;",
+                       TimePointToString(entry.time).c_str(),
+                       entry.snooze,
+                       entry.status,
+                       entry.repeat,
+                       entry.delay,
+                       entry.path.c_str(),
+                       entry.ID);
 }
 
 AlarmsTableRow AlarmsTable::getById(uint32_t id)

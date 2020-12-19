@@ -54,6 +54,12 @@ namespace stm
                 auto hoursAndMinutes = TimePointToHourMinSec(record.time);
                 record.time = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + date::days{i} +
                               hoursAndMinutes.hours() + hoursAndMinutes.minutes();
+                auto buffer = record.time +
+                              (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze) +
+                              std::chrono::minutes(record.delay);
+                if (buffer < TimePointNow()) {
+                    continue;
+                }
                 if (record.repeat == static_cast<uint32_t>(AlarmRepeat::never) ||
                     record.repeat == static_cast<uint32_t>(AlarmRepeat::everyday) ||
                     (weekDay < date::Saturday.iso_encoding() - 1 &&
@@ -67,7 +73,7 @@ namespace stm
                         nearestAlarms.push_back(record);
                     }
                 }
-                else {
+                else if (record.repeat > static_cast<uint32_t>(AlarmRepeat::weekDays)) {
                     OptionParser parser;
                     auto weekDayData = parser.setWeekDayOptions(record.repeat, std::make_unique<WeekDaysRepeatData>());
                     if (weekDayData->getData(weekDay)) {
@@ -99,7 +105,7 @@ namespace stm
             return 0;
         }
 
-        // Apply snooze
+        // Apply snooze and delay
         for (auto &alarm : nearestAlarms) {
             if (alarm.status > AlarmStatus::On) {
                 // if alarm time after applying snoozes is going to jump to the next day
@@ -108,8 +114,9 @@ namespace stm
                 if (isAlarmGoingToJumpToNextDay(alarm)) {
                     alarm.time -= date::days{1};
                 }
-                alarm.time =
-                    alarm.time + (static_cast<uint32_t>(alarm.status) - 1) * std::chrono::minutes(alarm.snooze);
+                alarm.time = alarm.time +
+                             (static_cast<uint32_t>(alarm.status) - 1) * std::chrono::minutes(alarm.snooze) +
+                             std::chrono::minutes(alarm.delay);
                 if (alarm.time < TimePointNow()) {
                     alarm.time += date::days{1};
                 }
@@ -132,8 +139,10 @@ namespace stm
         }
         // restore original alarm time if snooze was applied
         if (alarmsRecord.status > AlarmStatus::On) {
-            alarmsRecord.time = alarmsRecord.time - (static_cast<uint32_t>(alarmsRecord.status) - 1) *
-                                                        std::chrono::minutes(alarmsRecord.snooze);
+            alarmsRecord.time =
+                alarmsRecord.time -
+                (static_cast<uint32_t>(alarmsRecord.status) - 1) * std::chrono::minutes(alarmsRecord.snooze) -
+                std::chrono::minutes(alarmsRecord.delay);
         }
         LOG_DEBUG("How many miliseconds to alarm: %i",
                   static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()));
@@ -157,7 +166,8 @@ namespace stm
     bool AlarmsTimeEvents::isAlarmGoingToJumpToNextDay(AlarmsRecord record)
     {
         auto buffer = TimePointToYearMonthDay(record.time);
-        record.time = record.time + (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze);
+        record.time = record.time + (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze) +
+                      std::chrono::minutes(record.delay);
         return buffer.day() != TimePointToYearMonthDay(record.time).day();
     }
 } // namespace stm

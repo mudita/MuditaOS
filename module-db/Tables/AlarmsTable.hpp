@@ -29,10 +29,12 @@ struct AlarmsTableRow : public Record
     uint32_t snooze    = 0;
     AlarmStatus status = AlarmStatus::On;
     uint32_t repeat    = 0;
+    uint32_t delay     = 0;
     UTF8 path;
 
     AlarmsTableRow() = default;
-    AlarmsTableRow(uint32_t id, TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, UTF8 path);
+    AlarmsTableRow(
+        uint32_t id, TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, uint32_t delay, UTF8 path);
     explicit AlarmsTableRow(const AlarmsRecord &rec);
     explicit AlarmsTableRow(const QueryResult &result);
 };
