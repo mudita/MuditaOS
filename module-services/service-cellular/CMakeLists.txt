@@ -8,6 +8,7 @@ set(SOURCES
     ServiceCellular.cpp
     SignalStrength.cpp
     SimCard.cpp
+    NetworkSettings.cpp
     RequestFactory.cpp
     CellularRequestHandler.cpp
     requests/Request.cpp

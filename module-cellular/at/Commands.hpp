@@ -203,7 +203,7 @@ namespace at
             {AT::QCMGS, {"AT+QCMGS=\""}},
             {AT::CREG, {"AT+CREG?", default_doc_timeout}},
             {AT::QNWINFO, {"AT+QNWINFO"}},
-            {AT::COPS, {"AT+COPS=?", 180000}},
+            {AT::COPS, {"AT+COPS", 180000}},
             {AT::QSIMSTAT, {"AT+QSIMSTAT?"}},
             {AT::SIM_DET, {"AT+QSIMDET?"}},
             {AT::SIM_DET_ON, {"AT+QSIMDET=1,0"}},

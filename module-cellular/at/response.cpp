@@ -11,14 +11,16 @@ namespace at
 {
     namespace response
     {
-        std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head)
+        constexpr auto StringDelimiter = "\"";
+
+        std::optional<std::string> getResponseLineATCommand(const at::Result &resp, std::string_view head)
         {
             if (resp.code == at::Result::Code::OK) {
                 if (resp.response.size()) {
                     for (auto el : resp.response) {
                         if (el.compare(0, head.length(), head) == 0) {
-                            auto body = el.substr(head.length());
-                            return utils::split(body, ",");
+                            auto body = utils::trim(el.substr(head.length()));
+                            return body;
                         }
                     }
                 }
@@ -26,6 +28,76 @@ namespace at
             return std::nullopt;
         }
 
+        std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head)
+        {
+            if (auto line = getResponseLineATCommand(resp, head); line) {
+                const auto &commandLine = *line;
+                return utils::split(commandLine, ",");
+            }
+            return std::nullopt;
+        }
+
+        bool parseCOPS(const at::Result &resp, std::vector<cops::Operator> &ret)
+        {
+            /// +COPS: (list of supported <stat>,long alphanumeric <oper>,
+            /// short alphanumeric <oper>,numeric <oper>s)[,<Act>])s]
+            ///[,,(list of supported <mode>s),(list of supported <format>s)]
+            ///
+            /// +COPS: (2,"PLAY","PLAY","26006",2),,(0-4),(0-2)
+            /// +COPS: (2,"PLAY","PLAY","26006",2)
+            /// +COPS: (2,"PLAY","PLAY","26006")
+            ///
+            /// In case no network, error (not empty list)
+
+            constexpr auto minCOPSLength     = 12; ///(0,"","","")
+            constexpr auto minOperatorParams = 4;
+            constexpr auto maxOperatorParams = 5;
+
+            constexpr std::string_view AT_COPS = "+COPS:";
+            if (auto line = getResponseLineATCommand(resp, AT_COPS); line) {
+                const auto &commandLine = *line;
+
+                if (commandLine.length() < minCOPSLength) {
+                    return false;
+                }
+                /// separator ",," between operator list and parameters info
+                auto data      = utils::split(commandLine, ",,");
+                auto operators = data[0];
+                if ((operators.front() == '(') && (operators.back()) == ')') {
+                    operators.erase(0, 1);
+                    operators.pop_back();
+
+                    auto opArray = utils::split(operators, "),(");
+
+                    for (auto opp : opArray) {
+                        auto opParams = utils::split(opp, ",");
+                        if ((opParams.size() < minOperatorParams) || (opParams.size() > maxOperatorParams))
+                            return false;
+                        cops::Operator op;
+
+                        op.status = static_cast<cops::OperatorStatus>(utils::getNumericValue<int>(opParams[0]));
+
+                        op.longName = opParams[1];
+                        utils::findAndReplaceAll(op.longName, at::response::StringDelimiter, "");
+
+                        op.shortName = opParams[2];
+                        utils::findAndReplaceAll(op.shortName, at::response::StringDelimiter, "");
+
+                        op.numericName = opParams[3];
+                        utils::findAndReplaceAll(op.numericName, at::response::StringDelimiter, "");
+                        if (opParams.size() == maxOperatorParams) {
+                            op.technology =
+                                static_cast<cops::AccessTechnology>(utils::getNumericValue<int>(opParams[4]));
+                        }
+                        ret.push_back(op);
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
         bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret)
         {
             /// parse only first result from QPINC
@@ -55,7 +127,7 @@ namespace at
         bool parseCSQ(std::string response, std::string &result)
         {
             std::string toErase = "+CSQ: ";
-            auto pos = response.find(toErase);
+            auto pos            = response.find(toErase);
             if (pos != std::string::npos) {
                 response.erase(pos, toErase.length());
 
