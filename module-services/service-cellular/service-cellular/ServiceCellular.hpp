@@ -84,7 +84,6 @@ class ServiceCellular : public sys::Service
      */
     bool getIMSI(std::string &destination, bool fullNumber = false);
     std::vector<std::string> getNetworkInfo();
-    std::vector<std::string> scanOperators();
 
     /** group of action/messages send "outside" eg. GUI
      * requestPin is call anytime modem need pin, here should be called any action
@@ -258,7 +257,11 @@ class ServiceCellular : public sys::Service
     bool handleSimState(at::SimState state, const std::string message);
     bool handleSimResponse(sys::DataMessage *msgl);
 
+    std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
+        CellularStartOperatorsScanMessage *msg);
+
     friend class CellularUrcHandler;
     friend class SimCard;
     friend class CellularRequestHandler;
+    friend class NetworkSettings;
 };

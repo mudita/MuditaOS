@@ -17,3 +17,4 @@ add_catch2_executable(
         LIBS
         module-cellular
 )
+

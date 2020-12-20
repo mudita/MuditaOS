@@ -11,6 +11,7 @@
 #include "service-cellular/USSD.hpp"
 
 #include "SimCard.hpp"
+#include "NetworkSettings.hpp"
 #include "service-cellular/RequestFactory.hpp"
 #include "service-cellular/CellularRequestHandler.hpp"
 
@@ -282,7 +283,10 @@ void ServiceCellular::registerMessageHandlers()
         bsp::cellular::sim::hotswap_trigger();
         return std::make_shared<CellularResponseMessage>(true);
     });
-
+    connect(typeid(CellularStartOperatorsScanMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularStartOperatorsScanMessage *>(request);
+        return handleCellularStartOperatorsScan(msg);
+    });
     handle_CellularGetChannelMessage();
 }
 
@@ -811,14 +815,6 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
 
         auto msg  = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularNetworkInfoResult);
         msg->data = getNetworkInfo();
-        sys::Bus::SendUnicast(msg, msgl->sender, this);
-    } break;
-    case MessageType::CellularStartOperatorsScan: {
-        LOG_INFO("CellularStartOperatorsScan handled");
-        cellular::RawCommandResp response = (true);
-
-        auto msg  = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularOperatorsScanResult);
-        msg->data = scanOperators();
         sys::Bus::SendUnicast(msg, msgl->sender, this);
     } break;
     case MessageType::CellularSelectAntenna: {
@@ -1520,36 +1516,6 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
     }
     return data;
 }
-std::vector<std::string> ServiceCellular::scanOperators(void)
-{
-    auto channel = cmux->get(TS0710::Channel::Commands);
-    std::vector<std::string> result;
-    if (channel) {
-        auto resp = channel->cmd("AT+COPS=?", 180000, 2);
-        if (resp.code == at::Result::Code::OK) {
-            std::string rawResponse = resp.response[0];
-            std::string toErase("+COPS: ");
-            auto pos = rawResponse.find(toErase);
-            if (pos != std::string::npos) {
-                rawResponse.erase(pos, toErase.length());
-            }
-            std::string delimiter("),(");
-
-            auto end   = rawResponse.find(delimiter);
-            auto begin = 0;
-            while (end != std::string::npos) {
-                auto operatorInfo = rawResponse.substr(begin, end - begin);
-                operatorInfo.erase(std::remove(operatorInfo.begin(), operatorInfo.end(), '('), operatorInfo.end());
-                operatorInfo.erase(std::remove(operatorInfo.begin(), operatorInfo.end(), ')'), operatorInfo.end());
-                operatorInfo.erase(std::remove(operatorInfo.begin(), operatorInfo.end(), ','), operatorInfo.end());
-                result.push_back(operatorInfo);
-                begin = end;
-                end   = rawResponse.find(delimiter, end + 1);
-            }
-        }
-    }
-    return result;
-}
 
 std::vector<std::string> get_last_AT_error(DLC_channel *channel)
 {
@@ -2013,4 +1979,15 @@ void ServiceCellular::setUSSDTimer(void)
         return;
     }
     ussdTimer->reload();
+}
+
+std::shared_ptr<cellular::RawCommandRespAsync> ServiceCellular::handleCellularStartOperatorsScan(
+    CellularStartOperatorsScanMessage *msg)
+{
+    LOG_INFO("CellularStartOperatorsScan handled");
+    auto ret = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularOperatorsScanResult);
+    NetworkSettings networkSettings(*this);
+    ret->data = networkSettings.scanOperators(msg->getFullInfo());
+    sys::Bus::SendUnicast(ret, msg->sender, this);
+    return ret;
 }
