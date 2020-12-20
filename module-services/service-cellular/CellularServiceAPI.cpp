@@ -112,11 +112,11 @@ void CellularServiceAPI::GetNetworkInfo(sys::Service *serv)
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
 }
 
-void CellularServiceAPI::StartOperatorsScan(sys::Service *serv)
+void CellularServiceAPI::StartOperatorsScan(sys::Service *serv, bool fullInfo)
 {
-    std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularStartOperatorsScan);
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 185000);
+    std::shared_ptr<CellularStartOperatorsScanMessage> msg =
+        std::make_shared<CellularStartOperatorsScanMessage>(fullInfo);
+    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
 }
 
 bool CellularServiceAPI::SelectAntenna(sys::Service *serv, bsp::cellular::antenna antenna)

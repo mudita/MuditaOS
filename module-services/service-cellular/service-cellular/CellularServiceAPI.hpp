@@ -45,9 +45,10 @@ namespace CellularServiceAPI
     /*
      * @brief It calls service-cellulat to perform operators scan
      * @param serv pointer to caller service.
+     * @param fullInfo for retrieve full info true in other case only list of operators (long name), without duplicates
      *
      */
-    void StartOperatorsScan(sys::Service *serv);
+    void StartOperatorsScan(sys::Service *serv, bool fullInfo = false);
     /*
      * @brief It calls service-cellulat to switch antenna
      * @param serv pointer to caller service.

@@ -83,7 +83,7 @@ namespace gui
             if (app != nullptr) {
                 app->setScanInProgress(true);
             }
-            CellularServiceAPI::StartOperatorsScan(this->application);
+            CellularServiceAPI::StartOperatorsScan(this->application, true);
             return true;
         }));
 
