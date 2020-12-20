@@ -9,3 +9,13 @@ add_catch2_executable(
     LIBS
         module-cellular 
 )
+
+add_catch2_executable(
+        NAME
+        cellular-response
+        SRCS
+        unittest_response.cpp
+        LIBS
+        module-cellular
+)
+

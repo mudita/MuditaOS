@@ -86,6 +86,21 @@ class CellularNotificationMessage : public CellularMessage
     std::string data;
 };
 
+class CellularStartOperatorsScanMessage : public CellularMessage
+{
+    bool fullInfo = false;
+
+  public:
+    explicit CellularStartOperatorsScanMessage(bool fullInfoList = false)
+        : CellularMessage(MessageType::CellularStartOperatorsScan), fullInfo(fullInfoList)
+    {}
+
+    bool getFullInfo() const noexcept
+    {
+        return fullInfo;
+    }
+};
+
 class CellularSimStateMessage : public CellularMessage
 {
   private:

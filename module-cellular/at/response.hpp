@@ -25,6 +25,49 @@ namespace at
             };
         } // namespace qpinc
 
+        namespace cops
+        {
+            enum class OperatorStatus
+            {
+                Unknown   = 0,
+                Available = 1,
+                Current   = 2,
+                Forbidden = 3
+            };
+            enum class CopsMode
+            {
+                Automatic    = 0,
+                Manual       = 1,
+                Deregister   = 2,
+                OnlyFormat   = 3,
+                ManualOrAuto = 4
+            };
+            enum class AccessTechnology
+            {
+
+                GSM                     = 0,
+                UTRAN                   = 2,
+                GSM_W_EGPRS             = 3,
+                UTRAN_W_HSDPA           = 4,
+                UTRAN_W_HSUPA           = 5,
+                UTRAN_W_HSDPA_and_HSUPA = 6,
+                E_UTRAN                 = 7,
+                CDMA                    = 100
+            };
+
+            class Operator
+            {
+              public:
+                OperatorStatus status;
+                std::string shortName;
+                std::string longName;
+                std::string numericName;
+                std::optional<cops::AccessTechnology> technology = std::nullopt;
+            };
+        } // namespace cops
+
+        bool parseCOPS(const at::Result &resp, std::vector<cops::Operator> &ret);
+
         std::vector<std::string> tokenize(std::string &response, std::string separator = ",");
         std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head);
         bool parseCSQ(std::string response, std::string &result);
