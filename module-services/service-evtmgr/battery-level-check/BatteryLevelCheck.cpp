@@ -14,7 +14,7 @@ namespace battery_level_check
     {
         constexpr inline auto DEFAULT_LEVEL = 10;
 
-        unsigned int batteryLevelCritical   = DEFAULT_LEVEL;
+        unsigned int batteryLevelCritical = DEFAULT_LEVEL;
 
         sys::Service *parentService = nullptr;
 
