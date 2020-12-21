@@ -695,6 +695,26 @@ class CellularSetOperatorResponse : public CellularResponseMessage
     {}
 };
 
+class CellularVoLTEDataMessage : public CellularMessage
+{
+    bool VoLTEon = false;
+
+  public:
+    explicit CellularVoLTEDataMessage(bool VoLTEon) : CellularMessage{MessageType::CellularSetVoLTE}, VoLTEon{VoLTEon}
+    {}
+    [[nodiscard]] bool getVoLTEon() const noexcept
+    {
+        return VoLTEon;
+    }
+};
+
+class CellularChangeVoLTEDataMessage : public CellularVoLTEDataMessage
+{
+  public:
+    explicit CellularChangeVoLTEDataMessage(bool VoLTEon) : CellularVoLTEDataMessage{VoLTEon}
+    {}
+};
+
 namespace cellular
 {
 

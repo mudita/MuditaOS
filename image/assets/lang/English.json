@@ -346,6 +346,7 @@
   "app_settings_network_sim1": "Sim1",
   "app_settings_network_sim2": "Sim2",
   "app_settings_network_sim_none": "No Sim",
+  "app_settings_network_voice_over_lte" :"VoLTE (experimental)",
   "app_settings_toggle_on": "ON",
   "app_settings_toggle_off": "OFF",
   "app_settings_security_lock_screen_passcode": "Lock screen passcode",

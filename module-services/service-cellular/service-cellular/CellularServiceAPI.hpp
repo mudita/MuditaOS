@@ -111,4 +111,6 @@ namespace CellularServiceAPI
     bool SetAPN(sys::Service *serv, packet_data::APN::Config apnConfig);
     bool SetDataTransfer(sys::Service *serv, packet_data::DataTransfer dt);
     bool GetDataTransfer(sys::Service *serv);
+    bool SetVoLTE(sys::Service *serv, bool value);
+
 }; // namespace CellularServiceAPI

@@ -4,6 +4,7 @@
 ### Added
 
 * Battery Brownout detection
+* VoLTE ON/OFF switch in Settings Network window
 
 ### Changed
 

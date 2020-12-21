@@ -23,4 +23,9 @@ namespace settings
         constexpr inline auto bondedDevices    = "bt_bonded_devices";
     } // namespace Bluetooth
 
+    namespace Cellular
+    {
+        constexpr inline auto volte_on = "cl_volte_on";
+    } // namespace Cellular
+
 }; // namespace settings
