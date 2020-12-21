@@ -32,6 +32,7 @@
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-db/Settings.hpp>
 #include <module-services/service-bluetooth/service-bluetooth/messages/Status.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 namespace app
 {
@@ -51,11 +52,15 @@ namespace app
         }
         settings->registerValueChange(settings::operators_on,
                                       [this](const std::string &value) { operatorOnChanged(value); });
+
+        settings->registerValueChange(::settings::Cellular::volte_on,
+                                      [this](const std::string &value) { volteChanged(value); });
     }
 
     ApplicationSettingsNew::~ApplicationSettingsNew()
     {
         settings->unregisterValueChange(settings::operators_on);
+        settings->unregisterValueChange(::settings::Cellular::volte_on);
     }
 
     // Invoked upon receiving data message
@@ -224,4 +229,23 @@ namespace app
         operatorsOn = value;
         settings->setValue(settings::operators_on, std::to_string(value));
     }
+
+    void ApplicationSettingsNew::setVoLTEOn(bool value)
+    {
+        voLteStateOn = value;
+        CellularServiceAPI::SetVoLTE(this, voLteStateOn);
+    };
+
+    bool ApplicationSettingsNew::getVoLTEOn() const noexcept
+    {
+        return voLteStateOn;
+    }
+
+    void ApplicationSettingsNew::volteChanged(const std::string &value)
+    {
+        if (!value.empty()) {
+            voLteStateOn = utils::getNumericValue<bool>(value);
+        }
+    }
+
 } /* namespace app */

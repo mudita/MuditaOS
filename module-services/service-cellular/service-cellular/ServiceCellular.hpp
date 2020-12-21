@@ -293,4 +293,7 @@ class ServiceCellular : public sys::Service
     friend class NetworkSettings;
     friend class packet_data::PDPContext;
     friend class packet_data::PacketData;
+
+    void volteChanged(const std::string &value);
+    bool volteOn = false;
 };

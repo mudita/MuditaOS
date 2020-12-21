@@ -41,6 +41,8 @@ namespace gui
             break;
         }
         auto operatorsOn = operatorsSettings->getOperatorsOn();
+        auto voLteOn     = operatorsSettings->getVoLTEOn();
+
         optList.emplace_back(std::make_unique<gui::OptionSettings>(
             utils::translateI18("app_settings_network_active_card") + ":" + simStr + " / " + phoneNumber,
             [=](gui::Item &item) {
@@ -96,6 +98,17 @@ namespace gui
             },
             nullptr,
             nullptr));
+
+        optList.emplace_back(std::make_unique<gui::OptionSettings>(
+            utils::translateI18("app_settings_network_voice_over_lte"),
+            [=](gui::Item &item) {
+                operatorsSettings->setVoLTEOn(!voLteOn);
+                rebuild();
+                return true;
+            },
+            nullptr,
+            nullptr,
+            voLteOn ? RightItem::On : RightItem::Off));
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
 
