@@ -219,6 +219,8 @@ namespace purefs::fs::drivers::ffat::internal
             }
             // Finally translate error
             switch (ret) {
+            case 0:
+                return RES_OK;
             case -EINVAL:
                 return RES_PARERR;
             default:
