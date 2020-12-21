@@ -10,6 +10,7 @@
 ### Changed
 
 * Input keyboard language files parser from KBD to JSON.
+* Input language files are now loaded based on files in "profiles" folder.
 
 ### Fixed
 
