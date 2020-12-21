@@ -13,6 +13,8 @@
 #include <Service/Service.hpp>
 #include <Service/Message.hpp>
 #include <service-db/Settings.hpp>
+#include "service-bluetooth/messages/Status.hpp"
+#include "service-bluetooth/messages/SetStatus.hpp"
 
 #include <log/log.hpp>
 
@@ -37,7 +39,8 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
 {
     LOG_ERROR("Bluetooth experimental!");
     worker = std::make_unique<BluetoothWorker>(this);
-
+    btStatus.state      = BluetoothStatus::BluetoothState::On;
+    btStatus.visibility = true;
     return sys::ReturnCodes::Success;
 }
 
@@ -49,6 +52,17 @@ sys::ReturnCodes ServiceBluetooth::DeinitHandler()
 
 sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
+    // mock response on message::bluetooth::RequestStatus
+    if (auto requestStatusMsg = dynamic_cast<message::bluetooth::RequestStatus *>(msg); nullptr != requestStatusMsg) {
+        sys::Bus::SendUnicast(std::make_shared<message::bluetooth::ResponseStatus>(btStatus), msg->sender, this);
+    }
+
+    // temporary solution for handling message::bluetooth::SetStatus
+    if (auto setStatusMsg = dynamic_cast<message::bluetooth::SetStatus *>(msg); nullptr != setStatusMsg) {
+        btStatus = setStatusMsg->getStatus();
+        sys::Bus::SendBroadcast(std::make_shared<message::bluetooth::ResponseStatus>(btStatus), this);
+    }
+
     try {
         switch (static_cast<MessageType>(msg->messageType)) {
         case MessageType::BluetoothRequest: {
