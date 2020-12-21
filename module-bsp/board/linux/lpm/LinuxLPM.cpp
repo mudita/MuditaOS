@@ -24,4 +24,9 @@ namespace bsp
     {
         currentFrequency = freq;
     }
+
+    void LinuxLPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
+    {
+        currentOscSource = source;
+    }
 } // namespace bsp
