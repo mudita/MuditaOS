@@ -67,6 +67,7 @@ mformat -i "$PART2" -F -T 2097152 -v RECOVER
 mmd -i "$PART1" ::/current
 cd "$SRC_DATA"
 for i in $ASSETS_DIR; do
+    echo "copy: $i"
 	mcopy -s -i "$PART1" $i ::/current/
 done
 mcopy -s -i "$PART1" user ::
