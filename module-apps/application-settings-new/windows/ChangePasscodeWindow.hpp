@@ -20,8 +20,10 @@ namespace gui
 
       private:
         void buildInterface() override;
+        void destroyInterface() override;
 
         std::unique_ptr<PinLockBox> lockBox = nullptr;
+        uint32_t newPasscodeHash;
     };
 
 } /* namespace gui */
