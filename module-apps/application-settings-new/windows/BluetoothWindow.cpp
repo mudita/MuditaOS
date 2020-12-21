@@ -6,8 +6,9 @@
 
 #include "OptionSetting.hpp"
 
-#include <i18n/i18n.hpp>
-#include <service-bluetooth/BluetoothMessage.hpp>
+#include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/messages/Status.hpp>
+#include <service-bluetooth/messages/SetStatus.hpp>
 
 namespace gui
 {
@@ -16,10 +17,17 @@ namespace gui
     {
         topBar->setActive(TopBar::Elements::BATTERY, false);
         topBar->setActive(TopBar::Elements::SIM, false);
+        sys::Bus::SendUnicast(
+            std::make_shared<message::bluetooth::RequestStatus>(), service::name::bluetooth, application);
     }
 
     void BluetoothWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        if (data != nullptr) {
+            const auto newData        = static_cast<BluetoothStatusData *>(data);
+            isBluetoothSwitchOn       = newData->getState();
+            isPhoneVisibilitySwitchOn = newData->getVisibility();
+        }
         rebuildOptionList();
     }
 
@@ -30,7 +38,7 @@ namespace gui
         optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
             utils::translateI18("app_settings_bluetooth_main"),
             [=](gui::Item &item) {
-                bluetoothSwitchHandler(isBluetoothSwitchOn);
+                switchHandler(isBluetoothSwitchOn);
                 return true;
             },
             [=](gui::Item &item) {
@@ -62,7 +70,7 @@ namespace gui
             optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
                 utils::translateI18("app_settings_bluetooth_phone_visibility"),
                 [=](gui::Item &item) {
-                    phoneVisibilitySwitchHandler(isPhoneVisibilitySwitchOn);
+                    switchHandler(isPhoneVisibilitySwitchOn);
                     return true;
                 },
                 [=](gui::Item &item) {
@@ -96,27 +104,22 @@ namespace gui
         return optionsList;
     }
 
-    void BluetoothWindow::bluetoothSwitchHandler(bool &switchState)
+    void BluetoothWindow::switchHandler(bool &switchState)
     {
-        if (switchState) {
-            sys::Bus::SendUnicast(
-                std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Stop), "ServiceBluetooth", application);
+        switchState = !switchState;
+        BluetoothStatus btStatus;
+
+        if (isBluetoothSwitchOn) {
+            btStatus.state = BluetoothStatus::BluetoothState::On;
         }
         else {
-            sys::Bus::SendUnicast(
-                std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Start), "ServiceBluetooth", application);
+            btStatus.state = BluetoothStatus::BluetoothState::Off;
         }
-        switchState = !switchState;
-        rebuildOptionList();
-    }
+        btStatus.visibility = isPhoneVisibilitySwitchOn;
+        message::bluetooth::SetStatus setStatus(btStatus);
 
-    void BluetoothWindow::phoneVisibilitySwitchHandler(bool &switchState)
-    {
         sys::Bus::SendUnicast(
-            std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Visible), "ServiceBluetooth", application);
-
-        switchState = !switchState;
-        rebuildOptionList();
+            std::make_shared<message::bluetooth::SetStatus>(setStatus), service::name::bluetooth, application);
     }
 
     void BluetoothWindow::rebuildOptionList()

@@ -8,6 +8,7 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include "service-bluetooth/SettingsHolder.hpp"
+#include "BluetoothMessage.hpp"
 
 #include <memory> // for unique_ptr
 
@@ -32,4 +33,5 @@ class ServiceBluetooth : public sys::Service
   private:
     std::unique_ptr<BluetoothWorker> worker;
     std::unique_ptr<Bluetooth::SettingsHolder> settingsHolder;
+    BluetoothStatus btStatus; // will be replaced with settings storage introduced in [EGD-4579]
 };
