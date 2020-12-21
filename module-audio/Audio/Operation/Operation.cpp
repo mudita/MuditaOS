@@ -17,11 +17,10 @@
 
 namespace audio
 {
-    std::unique_ptr<Operation> Operation::Create(
-        Operation::Type t,
-        const char *fileName,
-        const audio::PlaybackType &playbackType,
-        std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
+    std::unique_ptr<Operation> Operation::Create(Operation::Type t,
+                                                 const char *fileName,
+                                                 const audio::PlaybackType &playbackType,
+                                                 AudioServiceMessage::Callback callback)
     {
         std::unique_ptr<Operation> inst;
 
@@ -30,13 +29,13 @@ namespace audio
             inst = std::make_unique<IdleOperation>(fileName);
             break;
         case Type::Playback:
-            inst = std::make_unique<PlaybackOperation>(fileName, playbackType, dbCallback);
+            inst = std::make_unique<PlaybackOperation>(fileName, playbackType, callback);
             break;
         case Type::Router:
-            inst = std::make_unique<RouterOperation>(fileName, dbCallback);
+            inst = std::make_unique<RouterOperation>(fileName, callback);
             break;
         case Type::Recorder:
-            inst = std::make_unique<RecorderOperation>(fileName, dbCallback);
+            inst = std::make_unique<RecorderOperation>(fileName, callback);
             break;
         }
 
@@ -86,5 +85,23 @@ namespace audio
                 p.isAvailable = available;
             }
         }
+    }
+    void Operation::AddProfile(const Profile::Type &profile, const PlaybackType &playback, bool isAvailable)
+    {
+        const auto reqVol  = AudioServiceMessage::DbRequest(audio::dbPath(Setting::Volume, playback, profile));
+        const auto reqGain = AudioServiceMessage::DbRequest(audio::dbPath(Setting::Gain, playback, profile));
+
+        std::optional<audio::Volume> volume;
+        std::optional<audio::Gain> gain;
+
+        if (auto val = serviceCallback(&reqVol); val) {
+            volume = utils::getNumericValue<audio::Volume>(val.value());
+        }
+
+        if (auto val = serviceCallback(&reqGain); val) {
+            gain = utils::getNumericValue<audio::Gain>(val.value());
+        }
+
+        supportedProfiles.emplace_back(Profile::Create(profile, nullptr, volume, gain), isAvailable);
     }
 } // namespace audio

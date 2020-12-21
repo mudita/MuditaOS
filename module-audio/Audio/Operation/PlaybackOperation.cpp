@@ -13,33 +13,18 @@
 namespace audio
 {
 
+    using namespace AudioServiceMessage;
+    using namespace utils;
+
 #define PERF_STATS_ON 0
 
-    PlaybackOperation::PlaybackOperation(
-        const char *file,
-        const audio::PlaybackType &playbackType,
-        std::function<uint32_t(const std::string &path, const uint32_t &defaultValue)> dbCallback)
-        : Operation(playbackType), dec(nullptr)
+    PlaybackOperation::PlaybackOperation(const char *file, const audio::PlaybackType &playbackType, Callback callback)
+        : Operation(callback, playbackType), dec(nullptr)
     {
-
-        constexpr audio::Volume defaultLoudspeakerVolume = 10;
-        constexpr audio::Volume defaultHeadphonesVolume  = 2;
-
-        const auto dbLoudspeakerVolumePath =
-            audio::dbPath(audio::Setting::Volume, playbackType, audio::Profile::Type::PlaybackLoudspeaker);
-        const auto loudspeakerVolume = dbCallback(dbLoudspeakerVolumePath, defaultLoudspeakerVolume);
-
-        const auto dbHeadphonesVolumePath =
-            audio::dbPath(audio::Setting::Volume, playbackType, audio::Profile::Type::PlaybackHeadphones);
-        const auto headphonesVolume = dbCallback(dbHeadphonesVolumePath, defaultHeadphonesVolume);
-
-        // order in vector defines priority
-        supportedProfiles.emplace_back(
-            Profile::Create(Profile::Type::PlaybackBluetoothA2DP, nullptr, loudspeakerVolume), false);
-        supportedProfiles.emplace_back(Profile::Create(Profile::Type::PlaybackHeadphones, nullptr, headphonesVolume),
-                                       false);
-        supportedProfiles.emplace_back(Profile::Create(Profile::Type::PlaybackLoudspeaker, nullptr, loudspeakerVolume),
-                                       true);
+        // order defines priority
+        AddProfile(Profile::Type::PlaybackBluetoothA2DP, playbackType, false);
+        AddProfile(Profile::Type::PlaybackHeadphones, playbackType, false);
+        AddProfile(Profile::Type::PlaybackLoudspeaker, playbackType, true);
 
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
@@ -58,12 +43,14 @@ namespace audio
         }
 
         endOfFileCallback = [this]() {
-            state = State::Idle;
-            eventCallback({PlaybackEventType::EndOfFile, operationToken});
+            state          = State::Idle;
+            const auto req = AudioServiceMessage::EndOfFile(operationToken);
+            serviceCallback(&req);
+            return std::string();
         };
     }
 
-    audio::RetCode PlaybackOperation::Start(audio::AsyncCallback callback, audio::Token token)
+    audio::RetCode PlaybackOperation::Start(audio::Token token)
     {
         if (state == State::Active || state == State::Paused) {
             return RetCode::InvokedInIncorrectState;
@@ -77,7 +64,6 @@ namespace audio
             tags = dec->fetchTags();
         }
 
-        eventCallback = callback;
         state         = State::Active;
 
         if (tags->num_channel == channel::stereoSound) {
@@ -200,7 +186,7 @@ namespace audio
 
         case State::Active:
             state = State::Idle;
-            Start(eventCallback, operationToken);
+            Start(operationToken);
             break;
         }
 

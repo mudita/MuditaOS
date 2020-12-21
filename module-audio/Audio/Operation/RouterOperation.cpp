@@ -17,52 +17,14 @@
 namespace audio
 {
 
-    RouterOperation::RouterOperation(
-        [[maybe_unused]] const char *file,
-        std::function<std::uint32_t(const std::string &path, const std::uint32_t &defaultValue)> dbCallback)
+    RouterOperation::RouterOperation([[maybe_unused]] const char *file, AudioServiceMessage::Callback callback)
+        : Operation(callback)
     {
-        constexpr audio::Gain defaultRoutingEarspeakerGain       = 20;
-        constexpr audio::Volume defaultRoutingEarspeakerVolume   = 10;
-        constexpr audio::Gain defaultRoutingSpeakerphoneGain     = 20;
-        constexpr audio::Volume defaultRoutingSpeakerphoneVolume = 10;
-        constexpr audio::Gain defaultRoutingHeadphonesGain       = 0;
-        constexpr audio::Volume defaultRoutingHeadphonesVolume   = 10;
-
-        const auto dbRoutingEarspeakerGainPath =
-            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingEarspeaker);
-        const auto routingEarspeakerGain = dbCallback(dbRoutingEarspeakerGainPath, defaultRoutingEarspeakerGain);
-        const auto dbRoutingEarspeakerVolumePath =
-            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingEarspeaker);
-        const auto routingEarspeakerVolume = dbCallback(dbRoutingEarspeakerVolumePath, defaultRoutingEarspeakerVolume);
-        const auto dbRoutingLoudspeakerGainPath =
-            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingLoudspeaker);
-        const auto routingLoudspeakerGain = dbCallback(dbRoutingLoudspeakerGainPath, defaultRoutingSpeakerphoneGain);
-        const auto dbRoutingLoudspeakerVolumePath =
-            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingLoudspeaker);
-        const auto routingLoudspeakerVolume =
-            dbCallback(dbRoutingLoudspeakerVolumePath, defaultRoutingSpeakerphoneVolume);
-        const auto dbRoutingHeadsetGainPath =
-            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadphones);
-        const auto routingHeadphonesGain = dbCallback(dbRoutingHeadsetGainPath, defaultRoutingHeadphonesGain);
-        const auto dbRoutingHeadphonesVolumePath =
-            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingHeadphones);
-        const auto routingHeadphonesVolume = dbCallback(dbRoutingHeadphonesVolumePath, defaultRoutingHeadphonesVolume);
-
-        // order in vector defines priority
-        supportedProfiles.emplace_back(
-            Profile::Create(
-                Profile::Type::RoutingBluetoothHSP, nullptr, routingHeadphonesVolume, routingHeadphonesGain),
-            false);
-        supportedProfiles.emplace_back(
-            Profile::Create(Profile::Type::RoutingHeadphones, nullptr, routingHeadphonesVolume, routingHeadphonesGain),
-            false);
-        supportedProfiles.emplace_back(
-            Profile::Create(Profile::Type::RoutingEarspeaker, nullptr, routingEarspeakerVolume, routingEarspeakerGain),
-            true);
-        supportedProfiles.emplace_back(
-            Profile::Create(
-                Profile::Type::RoutingLoudspeaker, nullptr, routingLoudspeakerVolume, routingLoudspeakerGain),
-            true);
+        // order defines priority
+        AddProfile(Profile::Type::RoutingBluetoothHSP, PlaybackType::None, false);
+        AddProfile(Profile::Type::RoutingHeadphones, PlaybackType::None, false);
+        AddProfile(Profile::Type::RoutingEarspeaker, PlaybackType::None, true);
+        AddProfile(Profile::Type::RoutingLoudspeaker, PlaybackType::None, true);
 
         auto defaultProfile = GetProfile(Profile::Type::RoutingEarspeaker);
         if (!defaultProfile) {
@@ -90,13 +52,12 @@ namespace audio
         return GetDeviceError(ret);
     }
 
-    audio::RetCode RouterOperation::Start(audio::AsyncCallback callback, audio::Token token)
+    audio::RetCode RouterOperation::Start(audio::Token token)
     {
         if (state == State::Paused || state == State::Active) {
             return RetCode::InvokedInIncorrectState;
         }
         operationToken = token;
-        eventCallback  = callback;
         state          = State::Active;
 
         if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
@@ -219,7 +180,7 @@ namespace audio
 
         case State::Active:
             state = State::Idle;
-            Start(eventCallback, operationToken);
+            Start(operationToken);
             break;
         }
 

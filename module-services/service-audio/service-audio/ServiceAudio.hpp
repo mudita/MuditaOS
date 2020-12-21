@@ -56,8 +56,7 @@ class ServiceAudio : public sys::Service
         return vibrationMotorStatus == audio::AudioMux::VibrationStatus::On;
     }
 
-    auto AsyncCallback(audio::PlaybackEvent e) -> int32_t;
-    auto DbCallback(const std::string &path, const uint32_t &defaultValue) -> uint32_t;
+    auto AudioServicesCallback(const AudioServiceMessage::Message *msg) -> std::optional<std::string>;
 
     auto HandleStart(const audio::Operation::Type opType,
                      const std::string                       = "",

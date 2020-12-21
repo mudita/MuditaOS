@@ -19,8 +19,7 @@ using namespace audio;
 
 ServiceAudio::ServiceAudio()
     : sys::Service(serviceName, "", 4096 * 2, sys::ServicePriority::Idle),
-      audioMux([this](auto... params) { return this->AsyncCallback(params...); },
-               [this](auto... params) { return this->DbCallback(params...); }),
+      audioMux([this](auto... params) { return this->AudioServicesCallback(params...); }),
       settingsProvider(std::make_unique<settings::Settings>(this))
 {
     LOG_INFO("[ServiceAudio] Initializing");
@@ -68,7 +67,6 @@ sys::ReturnCodes ServiceAudio::InitHandler()
         // ROUTING
         {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP), "20"},
         {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker), "20"},
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones), "0"},
         {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingLoudspeaker), "20"},
         {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones), "50"},
 
@@ -76,7 +74,11 @@ sys::ReturnCodes ServiceAudio::InitHandler()
         {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker), defaultVolumeHigh},
         {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones), defaultVolumeHigh},
         {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingLoudspeaker), defaultVolumeHigh},
-        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones), defaultVolumeHigh},
+
+        // RECORDING
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RecordingBuiltInMic), "200"},
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RecordingHeadphones), "100"},
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RecordingBluetoothHSP), "100"},
 
         // MISC
         {dbPath(Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle), defaultFalse},
@@ -105,32 +107,27 @@ sys::ReturnCodes ServiceAudio::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
-int32_t ServiceAudio::AsyncCallback(PlaybackEvent e)
+std::optional<std::string> ServiceAudio::AudioServicesCallback(const AudioServiceMessage::Message *msg)
 {
-    switch (e.event) {
-    case audio::PlaybackEventType::EndOfFile: {
-        auto msg = std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::EndOfFile, e.token);
-        sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceAudioNotifications, this);
-    } break;
-    case audio::PlaybackEventType::FileSystemNoSpace:
-    case audio::PlaybackEventType::Empty:
-        break;
+    if (const auto *eof = dynamic_cast<const AudioServiceMessage::EndOfFile *>(msg); eof) {
+        auto newMsg =
+            std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::EndOfFile, eof->GetToken());
+        sys::Bus::SendMulticast(newMsg, sys::BusChannels::ServiceAudioNotifications, this);
     }
-    return 0;
-};
+    else if (const auto *dbReq = dynamic_cast<const AudioServiceMessage::DbRequest *>(msg); dbReq) {
+        LOG_DEBUG("ServiceAudio::DBbCallback(%s)", dbReq->GetPath().c_str());
+        auto settings_it = settingsCache.find(dbReq->GetPath());
+        if (settingsCache.end() == settings_it) {
+            LOG_DEBUG("%s does not exist in cache", dbReq->GetPath().c_str());
+            return std::nullopt;
+        }
+        return settings_it->second;
+    }
+    else {
+        LOG_DEBUG("Message received but not handled - no effect.");
+    }
 
-uint32_t ServiceAudio::DbCallback(const std::string &path, const uint32_t &defaultValue)
-{
-    LOG_DEBUG("ServiceAudio::DBbCallback(%s, %u)", path.c_str(), static_cast<int>(defaultValue));
-    auto settings_it = settingsCache.find(path);
-    if (settingsCache.end() == settings_it) {
-        settingsCache[path] = defaultValue;
-        settingsProvider->setValue(path, std::to_string(defaultValue));
-        settingsProvider->registerValueChange(
-            path, [this](const std::string &variable, std::string value) { settingsChanged(variable, value); });
-        return defaultValue;
-    }
-    return utils::getNumericValue<uint32_t>(settings_it->second);
+    return std::nullopt;
 };
 
 sys::ReturnCodes ServiceAudio::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

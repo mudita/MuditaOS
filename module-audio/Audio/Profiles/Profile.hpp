@@ -44,8 +44,8 @@ namespace audio
 
         static std::unique_ptr<Profile> Create(const Type t,
                                                std::function<int32_t()> callback = nullptr,
-                                               Volume vol                        = 0,
-                                               Gain gain                         = 0);
+                                               std::optional<Volume> vol         = 0,
+                                               std::optional<Gain> gain          = 0);
 
         void SetOutputVolume(Volume vol);
 

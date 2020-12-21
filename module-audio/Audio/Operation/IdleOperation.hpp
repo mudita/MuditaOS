@@ -15,11 +15,11 @@ namespace audio
     class IdleOperation : public Operation
     {
       public:
-        IdleOperation(const char *file);
+        explicit IdleOperation([[maybe_unused]] const char *file);
 
         ~IdleOperation() = default;
 
-        audio::RetCode Start([[maybe_unused]] audio::AsyncCallback callback, audio::Token token) final
+        audio::RetCode Start(audio::Token token) final
         {
             return audio::RetCode::Success;
         }
