@@ -216,8 +216,6 @@ bool WorkerEvent::deinit(void)
     bsp::eink_frontlight::deinit();
     bsp::light_sensor::deinit();
 
-    battery_level_check::deinit();
-
     return true;
 }
 
