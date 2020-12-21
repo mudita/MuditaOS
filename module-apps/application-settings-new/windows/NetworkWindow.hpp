@@ -25,7 +25,7 @@ namespace gui
       private:
         auto netOptList() -> std::list<gui::Option>;
         app::settingsInterface::SimParams *simParams;
-        void rebuild();
+        void rebuild() override;
         app::settingsInterface::OperatorsSettings *operatorsSettings;
 
       public:

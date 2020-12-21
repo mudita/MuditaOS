@@ -79,6 +79,7 @@ enum class MessageType
     CellularSimProcedure,        // Broadcast on sim state changed
     CellularSimResponse,         // Send to PIN window (show, error state, hide)
     CellularSimVerifyPinRequest, // Send from PIN window with PIN, PUK, ... number
+    CellularSetVoLTE,
 
     CellularPacketData, ///< for all PacketData messages
 
