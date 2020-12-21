@@ -7,49 +7,28 @@
 
 #include <Service/Bus.hpp>
 #include <common_data/EventStore.hpp>
-#include <service-db/service-db/Settings.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
-#include <module-utils/Utils.hpp>
 
 namespace battery_level_check
 {
     namespace
     {
         constexpr inline auto DEFAULT_LEVEL = 10;
+
         unsigned int batteryLevelCritical   = DEFAULT_LEVEL;
 
         sys::Service *parentService = nullptr;
-
-        std::unique_ptr<settings::Settings> settings;
 
         bool isBatteryLevelCritical(unsigned int level)
         {
             return level < batteryLevelCritical;
         }
 
-        void batteryLevelSettingsCallback(std::string setting)
-        {
-            if (!setting.empty()) {
-                batteryLevelCritical = utils::getNumericValue<unsigned int>(setting);
-            }
-            else {
-                setBatteryCriticalLevel(DEFAULT_LEVEL);
-            }
-        }
     } // namespace
 
     void init(sys::Service *service)
     {
         parentService = service;
-        settings      = std::make_unique<settings::Settings>(service);
-        settings->registerValueChange(settings::Battery::criticalLevel,
-                                      [&](std::string value) { batteryLevelSettingsCallback(value); });
-    }
-
-    void deinit()
-    {
-        settings->unregisterValueChange(settings::Battery::criticalLevel);
-        settings.reset();
+        checkBatteryLevelCritical();
     }
 
     void checkBatteryLevelCritical()
@@ -65,7 +44,6 @@ namespace battery_level_check
     void setBatteryCriticalLevel(unsigned int level)
     {
         batteryLevelCritical = level;
-        settings->setValue(settings::Battery::criticalLevel, std::to_string(batteryLevelCritical));
         checkBatteryLevelCritical();
     }
 
