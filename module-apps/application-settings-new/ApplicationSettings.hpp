@@ -94,6 +94,8 @@ namespace app
         void operatorOnChanged(const std::string &value);
         void setOperatorsOn(bool value) override;
         bool getOperatorsOn() const noexcept override;
+        void updateLockPassHash(unsigned int value);
+        unsigned int lockPassHash = 0;
 
       private:
         Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;

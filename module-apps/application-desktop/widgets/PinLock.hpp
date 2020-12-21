@@ -97,9 +97,10 @@ namespace gui
 
         std::function<void(LockType type, const std::vector<unsigned int> &)> onActivatedCallback = nullptr;
 
-      private:
         Store::GSM::SIM sim = Store::GSM::SIM::NONE;
         LockState lockState = LockState::Unlocked;
+
+      private:
         LockType lockType   = LockType::Screen;
         unsigned int value  = 0;
 

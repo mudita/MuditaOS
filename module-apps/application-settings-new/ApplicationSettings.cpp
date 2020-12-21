@@ -33,6 +33,7 @@
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-db/Settings.hpp>
 #include <module-services/service-bluetooth/service-bluetooth/messages/Status.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
 namespace app
 {
@@ -116,6 +117,10 @@ namespace app
         createUserInterface();
 
         setActiveWindow(gui::name::window::main_window);
+
+        settings->registerValueChange(::settings::SystemProperties::lockPassHash, [this](std::string value) {
+            lockPassHash = utils::getNumericValue<unsigned int>(value);
+        });
 
         return ret;
     }
@@ -227,5 +232,11 @@ namespace app
     {
         operatorsOn = value;
         settings->setValue(settings::operators_on, std::to_string(value));
+    }
+
+    void ApplicationSettingsNew::updateLockPassHash(unsigned int value)
+    {
+        lockPassHash = value;
+        settings->setValue(::settings::SystemProperties::lockPassHash, std::to_string(value));
     }
 } /* namespace app */
