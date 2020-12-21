@@ -15,6 +15,7 @@
 * Input language files are now loaded based on files in "profiles" folder.
 * Minimum CPU frequency is now 132 MHz
 * Icon widget now accepts rich text.
+* Change default gain values for audio input.
 
 ### Fixed
 
