@@ -4,6 +4,7 @@
 #pragma once
 
 #include <OptionWindow.hpp>
+#include <service-bluetooth/BluetoothMessage.hpp>
 
 namespace gui
 {
@@ -17,8 +18,28 @@ namespace gui
         bool isBluetoothSwitchOn       = false;
         bool isPhoneVisibilitySwitchOn = false;
         auto bluetoothOptionsList() -> std::list<gui::Option>;
-        void bluetoothSwitchHandler(bool &switchState);
-        void phoneVisibilitySwitchHandler(bool &switchState);
+        void switchHandler(bool &switchState);
         void rebuildOptionList();
     };
-}; // namespace gui
+
+    class BluetoothStatusData : public SwitchData
+    {
+      public:
+        explicit BluetoothStatusData(BluetoothStatus status) : SwitchData(), status(std::move(status))
+        {}
+        [[nodiscard]] auto getState() const noexcept -> bool
+        {
+            if (status.state == BluetoothStatus::BluetoothState::On) {
+                return true;
+            }
+            return false;
+        }
+        [[nodiscard]] auto getVisibility() const noexcept -> bool
+        {
+            return status.visibility;
+        }
+
+      private:
+        BluetoothStatus status;
+    };
+} // namespace gui
