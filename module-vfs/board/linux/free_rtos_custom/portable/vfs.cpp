@@ -47,19 +47,22 @@ void vfs::Init()
     /* Print out information on the disk. */
     freertos_fat::internals::diskShowPartition(emmcFFDisk);
 
-    bootConfig.os_root_path = purefs::dir::getRootDiskPath();
-
-    if (loadBootConfig(getCurrentBootJSON())) {
-        LOG_INFO("vfs::Init osType %s root:%s", bootConfig.os_type.c_str(), bootConfig.os_root_path.c_str());
-        if (ff_chdir(bootConfig.os_root_path.c_str()) != 0) {
-            LOG_ERROR("vfs::Init can't chdir to %s", bootConfig.os_root_path.c_str());
+    initDone = true;
+    int err  = bootConfig.load();
+    if (!err) {
+        if (ff_chdir(bootConfig.os_root_path().c_str()) != 0) {
+            LOG_ERROR("vfs::Init can't chdir to %s", bootConfig.os_root_path().c_str());
+        }
+        LOG_INFO("vfs::Init osType %s root:%s", bootConfig.os_type().c_str(), bootConfig.os_root_path().c_str());
+        if (ff_chdir(bootConfig.os_root_path().c_str()) != 0) {
+            LOG_ERROR("vfs::Init can't chdir to %s", bootConfig.os_root_path().c_str());
         }
     }
     else {
-        LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", bootConfig.os_root_path.c_str());
+        LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", bootConfig.os_root_path().c_str());
     }
 
-    LOG_INFO("vfs::Init running on ARM osRootPath: %s", bootConfig.os_root_path.c_str());
+    LOG_INFO("vfs::Init running on ARM osRootPath: %s", bootConfig.os_root_path().c_str());
 
     // this should already exist and have user data in it
     // if it does not create an exmpty directory so that sqlite3 does not fault
@@ -73,6 +76,5 @@ void vfs::Init()
         LOG_INFO("vfs::Init looks like %s exists", userDiskPath.c_str());
     }
     chnNotifier.onFileSystemInitialized();
-    initDone = true;
 }
 #pragma GCC diagnostic pop

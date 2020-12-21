@@ -7,7 +7,7 @@ add_catch2_executable(
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_vfs.cpp
     LIBS
-        module-vfs
+        module-vfs module-utils
 )
 
 add_catch2_executable(
