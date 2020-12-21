@@ -15,7 +15,7 @@
 #include <gui/widgets/Style.hpp>
 
 #include <i18n/i18n.hpp>
-#include <vfs.hpp>
+#include <boot/bootconfig.hpp>
 
 namespace gui
 {
@@ -48,12 +48,14 @@ namespace gui
         addAlignedLabelWithValue(box, "GIT tag:", std::string(GIT_TAG));
         addAlignedLabelWithValue(box, "GIT branch:", std::string(GIT_BRANCH));
         addAlignedLabelWithValue(box, "Version:", std::string(VERSION));
-        addAlignedLabelWithValue(box,
-                                 "Bootloader:",
-                                 (vfs.getBootConfig().bootloader_verion.empty()
-                                      ? utils::localize.get("not available")
-                                      : vfs.getBootConfig().bootloader_verion));
-
+        {
+            boot::BootConfig bootCfg;
+            bootCfg.load();
+            addAlignedLabelWithValue(box,
+                                     "Bootloader:",
+                                     (bootCfg.bootloader_version().empty() ? utils::localize.get("not available")
+                                                                           : bootCfg.bootloader_version()));
+        }
         std::string firmwareVersion;
         CellularServiceAPI::GetFirmwareVersion(getApplication(), firmwareVersion);
         addAlignedLabelWithValue(
