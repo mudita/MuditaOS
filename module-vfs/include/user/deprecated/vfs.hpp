@@ -8,10 +8,9 @@
 #include <vector>
 #include <sstream>
 #include <filesystem>
-#include <crc32/crc32.h>
 #include <log/log.hpp>
-#include <json/json11.hpp>
 #include <atomic>
+#include <boot/bootconfig.hpp>
 #include "vfsNotifier.hpp"
 #include "vfs_globals.hpp"
 
@@ -59,21 +58,6 @@ namespace purefs
         inline constexpr auto bootloader      = "bootloader";
     } // namespace json
 
-    struct BootConfig
-    {
-        std::string os_image = "boot.bin";
-        std::string os_type  = "current";
-        std::string os_version;
-        std::string bootloader_verion;
-        std::string timestamp;
-        json11::Json boot_json_parsed;
-
-        fs::path os_root_path;
-        fs::path boot_json;
-
-        static int version_compare(const std::string &v1, const std::string &v2);
-        [[nodiscard]] json11::Json to_json() const;
-    };
 }; // namespace purefs
 
 /* NOTE: VFS global object class is now deprecated more information
@@ -141,10 +125,6 @@ class vfs
     [[deprecated]] std::string loadFileAsString(const fs::path &fileToLoad);
     [[deprecated]] bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite);
     [[deprecated]] void updateTimestamp();
-    [[deprecated]] struct purefs::BootConfig &getBootConfig()
-    {
-        return bootConfig;
-    }
     [[deprecated]] void registerNotificationHandler(vfsn::utility::vfsNotifier::NotifyHandler handler)
     {
         chnNotifier.registerNotificationHandler(handler);
@@ -157,23 +137,15 @@ class vfs
 
     FF_Disk_t *emmcFFDisk{};
 
-    [[deprecated]] static void computeCRC32(FILE *file, unsigned long *outCrc32);
-    [[deprecated]] static bool verifyCRC(const std::string filePath, const unsigned long crc32);
-    [[deprecated]] static bool verifyCRC(const fs::path filePath);
-    [[deprecated]] static std::string generateRandomId(size_t length);
     auto isInitialized() const noexcept
     {
         return initDone.load();
     }
 
   private:
-    bool updateFileCRC32(const fs::path &file);
-    const fs::path getCurrentBootJSON();
-    bool loadBootConfig(const fs::path &bootJsonPath);
-    bool updateBootConfig(const fs::path &bootJsonPath);
-    struct purefs::BootConfig bootConfig;
     vfsn::utility::vfsNotifier chnNotifier;
     static std::atomic<bool> initDone;
+    boot::BootConfig bootConfig;
 };
 
 extern vfs vfs;

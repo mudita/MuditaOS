@@ -289,16 +289,16 @@ std::string vfs::relativeToRoot(const std::string path)
     fs::path fsPath(path);
 
     if (fsPath.is_absolute()) {
-        if (bootConfig.os_root_path.root_directory() == fsPath.root_directory())
+        if (bootConfig.os_root_path().root_directory() == fsPath.root_directory())
             return fsPath;
         else
             return purefs::createPath(purefs::dir::getRootDiskPath(), fsPath.relative_path()).c_str();
     }
 
     if (path.empty())
-        return bootConfig.os_root_path;
+        return bootConfig.os_root_path();
     else
-        return bootConfig.os_root_path / fsPath;
+        return bootConfig.os_root_path() / fsPath;
 }
 
 bool vfs::isDir(const char *path)
