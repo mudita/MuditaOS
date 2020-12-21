@@ -19,9 +19,9 @@ add_catch2_executable(
                 ..
                 ../mock/
         LIBS
+                module-vfs
                 module-gui
                 iosyscalls
-                module-vfs
         DEPS
                 assets
                 PurePhone.img-target
