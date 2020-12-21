@@ -17,6 +17,7 @@
 * Add custom repeat window for the alarm application.
 * Add GUI for custom MMI messages.
 * Add CPU frequency shift mechanism to save power.
+* Add oscillator clock switching mechanisms.
 
 ### Fixed
 

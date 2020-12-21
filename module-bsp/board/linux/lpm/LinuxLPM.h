@@ -16,6 +16,7 @@ namespace bsp
         int32_t PowerOff() override final;
         int32_t Reboot() override final;
         void SetCpuFrequency(CpuFrequency freq) final;
+        void SwitchOscillatorSource(OscillatorSource source) final;
     };
 
 } // namespace bsp
