@@ -1,5 +1,11 @@
 # MuditaOS changelog
 
+## Current release
+
+### Added
+
+* `[PowerManagement]` Critial battery level notification to SystemManager.
+
 ## [0.51.1 2020-12-18]
 
 ### Added
