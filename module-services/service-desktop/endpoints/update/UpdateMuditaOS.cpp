@@ -49,6 +49,7 @@ json11::Json FileInfo::to_json() const
 UpdateMuditaOS::UpdateMuditaOS(ServiceDesktop *ownerService) : owner(ownerService)
 {
     status = updateos::UpdateState::Initial;
+    bootConfig.load();
 }
 
 updateos::UpdateError UpdateMuditaOS::setUpdateFile(fs::path updateFileToUse)
@@ -80,7 +81,7 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
     informDebug("Prepraring temp dir");
 
     updateRunStatus.startTime   = utils::time::getCurrentTimestamp().getTime();
-    updateRunStatus.fromVersion = vfs.getBootConfig().to_json();
+    updateRunStatus.fromVersion = bootConfig.to_json();
     storeRunStatusInDB();
 
     updateos::UpdateError err = prepareTempDirForUpdate();
@@ -256,9 +257,9 @@ updateos::UpdateError UpdateMuditaOS::verifyVersion()
     else {
         /* version comparison goes here */
         updateRunStatus.toVersion = targetVersionInfo;
-        const bool ret            = vfs.getBootConfig().version_compare(
-            targetVersionInfo[purefs::json::version_string].string_value(), vfs.getBootConfig().os_version);
-        LOG_DEBUG("verifyVersion comaprison result == %s", ret ? "true" : "false");
+        const bool ret = bootConfig.version_compare(targetVersionInfo[purefs::json::version_string].string_value(),
+                                                    bootConfig.os_version());
+        LOG_DEBUG("verifyVersion comparison result == %s", ret ? "true" : "false");
     }
     return updateos::UpdateError::NoError;
 }

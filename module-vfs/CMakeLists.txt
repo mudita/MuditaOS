@@ -75,8 +75,8 @@ set(SOURCES ""
         src/purefs/vfs_subsystem.cpp
         drivers/src/purefs/fs/filesystem_vfat.cpp
         drivers/src/purefs/fs/filesystem_littlefs.cpp
-        src/deprecated/vfs-utils.cpp
         src/deprecated/vfs.cpp
+        src/deprecated/vfs-utils.cpp
         src/deprecated/vfsNotifier.cpp
 )
 
@@ -126,7 +126,9 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${TARGET_LIBRARIES} module-bsp module-utils)
-target_link_libraries(${PROJECT_NAME} PRIVATE littlefs)
+target_link_libraries(${PROJECT_NAME} PRIVATE littlefs )
+# TODO: Temporary only remove when removing old vfs
+target_link_libraries(${PROJECT_NAME} PUBLIC utils-bootconfig )
 
 if (${ENABLE_TESTS})
     add_subdirectory(tests)
