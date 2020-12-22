@@ -21,8 +21,6 @@ namespace app::alarmClock
         std::unique_ptr<sys::Timer> musicTimer;
         std::unique_ptr<sys::Timer> delayTimer;
         std::unique_ptr<AlarmReminderWindowContract::Presenter> presenter;
-        std::shared_ptr<AlarmsRecord> alarmRecord;
-        std::shared_ptr<AlarmsRecord> previousAlarmRecord;
         std::vector<AlarmsRecord> alarmRecords;
         std::vector<AlarmsRecord> previousAlarmRecords;
 
@@ -46,7 +44,7 @@ namespace app::alarmClock
         void closeReminder();
         void closeReminderCallback();
         void loopMusic();
-        void loopAlarmDisplaying();
+        void displayAlarm();
         void countElapsedMinutes();
 
       public:

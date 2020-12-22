@@ -25,7 +25,6 @@ namespace stm
     class AlarmsTimeEvents : public TimeEvents
     {
       private:
-        AlarmsRecord alarmsRecord;
         std::vector<AlarmsRecord> alarmRecords;
 
       protected:

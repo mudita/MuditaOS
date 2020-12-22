@@ -140,20 +140,21 @@ namespace stm
         if (nearestAlarms.size() > 1) {
             LOG_DEBUG("Multiple alarms at the same time");
         }
-        alarmRecords  = nearestAlarms;
-        alarmsRecord = nearestAlarms.at(0);
-        auto duration = alarmsRecord.time - TimePointNow();
+
+        auto duration = nearestAlarms.at(0).time - TimePointNow();
         if (duration.count() <= 0) {
             duration = std::chrono::milliseconds(eventTimerMinSkipInterval);
         }
         // restore original alarm time if snooze was applied
-        if (alarmsRecord.status > AlarmStatus::On) {
-            alarmsRecord.time =
-                alarmsRecord.time -
-                (static_cast<uint32_t>(alarmsRecord.status) - 1) * std::chrono::minutes(alarmsRecord.snooze) -
-                std::chrono::minutes(alarmsRecord.delay);
+        for (auto &alarm : nearestAlarms) {
+            if (alarm.status > AlarmStatus::On) {
+                alarm.time = alarm.time -
+                             (static_cast<uint32_t>(alarm.status) - 1) * std::chrono::minutes(alarm.snooze) -
+                             std::chrono::minutes(alarm.delay);
+            }
         }
-        LOG_DEBUG("How many miliseconds to alarm: %i",
+        alarmRecords = nearestAlarms;
+        LOG_DEBUG("How many milliseconds to alarm: %i",
                   static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()));
         return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     }
@@ -166,10 +167,7 @@ namespace stm
 
     void AlarmsTimeEvents::invokeEvent()
     {
-        // auto alarm = std::make_shared<AlarmsRecord>(alarmsRecord);
-        // auto data  = std::make_unique<AlarmRecordData>(alarm);
-        auto data = std::make_unique<AlarmRecordData>(alarmRecords);
-
+        auto data = std::make_unique<AlarmRecordsData>(alarmRecords);
         app::manager::Controller::sendAction(service(), app::manager::actions::ShowAlarm, std::move(data));
     }
 
