@@ -540,7 +540,7 @@ namespace app
         return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
     }
 
-    void Application::toggleTorchAndColourTemps()
+    void Application::toggleTorch(bsp::torch::ColourTemperature temperature)
     {
         using namespace bsp;
 
@@ -558,16 +558,10 @@ namespace app
             switch (msgGetState->state) {
             case torch::State::off:
                 msgSetState->state      = torch::State::on;
-                msgSetState->colourTemp = torch::warmest;
+                msgSetState->colourTemp = temperature;
                 break;
             case torch::State::on:
-                if (msgGetState->colourTemp == torch::warmest) { // toggle colour temp
-                    msgSetState->state      = torch::State::on;
-                    msgSetState->colourTemp = torch::coldest;
-                }
-                else {
-                    msgSetState->state = torch::State::off;
-                }
+                msgSetState->state = torch::State::off;
                 break;
             }
             sys::Bus::SendUnicast(msgSetState, service::name::evt_manager, this);
