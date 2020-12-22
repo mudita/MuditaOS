@@ -50,13 +50,20 @@ class AlarmRecordData : public gui::SwitchData
 {
   protected:
     std::shared_ptr<AlarmsRecord> record;
+    std::vector<AlarmsRecord> records;
 
   public:
     explicit AlarmRecordData(std::shared_ptr<AlarmsRecord> record) : record{std::move(record)}
     {}
+    explicit AlarmRecordData(std::vector<AlarmsRecord> records) : records{std::move(records)}
+    {}
     std::shared_ptr<AlarmsRecord> getData()
     {
         return record;
+    }
+    std::vector<AlarmsRecord> getRecords()
+    {
+        return records;
     }
     void setData(std::shared_ptr<AlarmsRecord> rec)
     {

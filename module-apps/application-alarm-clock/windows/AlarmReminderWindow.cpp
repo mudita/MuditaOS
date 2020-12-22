@@ -144,15 +144,50 @@ namespace app::alarmClock
             return false;
         }
 
-        alarmRecord = item->getData();
-        if (previousAlarmRecord != nullptr) {
+        //        alarmRecord = item->getData();
+        //        if (previousAlarmRecord != nullptr) {
+        //            LOG_DEBUG("New alarm covered the old one, automatic snooze applying");
+        //            presenter->update(*previousAlarmRecord, UserAction::Snooze, previousElapsedMinutes);
+        //            previousElapsedMinutes = 0;
+        //        }
+        //        previousAlarmRecord = alarmRecord;
+        //        auto timeToDisplay = alarmRecord->time + std::chrono::minutes(alarmRecord->delay);
+        //        if (alarmRecord->status > AlarmStatus::On){
+        //            timeToDisplay += (static_cast<uint32_t>(alarmRecord->status) - 1) *
+        //            std::chrono::minutes(alarmRecord->snooze);
+        //        }
+        //        timeLabel->setText(TimePointToLocalizedTimeString(timeToDisplay, "%I:%0M"));
+        //        auto fileTags = AudioServiceAPI::GetFileTags(application, alarmRecord->path);
+        //
+        //        if (fileTags != std::nullopt) {
+        //            /*
+        //            musicTimer->setInterval(fileTags->duration_sec * 1000);
+        //            startMusicTimer();
+        //            AudioServiceAPI::PlaybackStart(
+        //                        application, audio::PlaybackType::Multimedia, alarmRecord->path);*/
+        //        }
+        alarmRecords = item->getRecords();
+        if (!previousAlarmRecords.empty()) {
             LOG_DEBUG("New alarm covered the old one, automatic snooze applying");
-            presenter->update(*previousAlarmRecord, UserAction::Snooze, previousElapsedMinutes);
+            for (auto &alarm : previousAlarmRecords) {
+                presenter->update(alarm, UserAction::Snooze, previousElapsedMinutes);
+            }
             previousElapsedMinutes = 0;
         }
-        previousAlarmRecord = alarmRecord;
-        timeLabel->setText(TimePointToLocalizedTimeString(alarmRecord->time, "%I:%0M"));
-        auto fileTags = AudioServiceAPI::GetFileTags(application, alarmRecord->path);
+        previousAlarmRecords = alarmRecords;
+        loopAlarmDisplaying();
+        return true;
+    }
+
+    void AlarmReminderWindow::loopAlarmDisplaying()
+    {
+        auto rec           = alarmRecords.at(0);
+        auto timeToDisplay = rec.time + std::chrono::minutes(rec.delay);
+        if (rec.status > AlarmStatus::On) {
+            timeToDisplay += (static_cast<uint32_t>(rec.status) - 1) * std::chrono::minutes(rec.snooze);
+        }
+        timeLabel->setText(TimePointToLocalizedTimeString(timeToDisplay, "%I:%0M"));
+        auto fileTags = AudioServiceAPI::GetFileTags(application, rec.path);
 
         if (fileTags != std::nullopt) {
             /*
@@ -161,7 +196,6 @@ namespace app::alarmClock
             AudioServiceAPI::PlaybackStart(
                         application, audio::PlaybackType::Multimedia, alarmRecord->path);*/
         }
-        return true;
     }
 
     bool AlarmReminderWindow::onInput(const gui::InputEvent &inputEvent)
@@ -171,13 +205,13 @@ namespace app::alarmClock
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-            presenter->update(*alarmRecord, UserAction::Snooze, elapsedMinutes);
+            presenter->update(alarmRecords.at(0), UserAction::Snooze, elapsedMinutes);
             closeReminder();
             return true;
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_RF)) {
-            presenter->update(*alarmRecord, UserAction::TurnOff, 0);
+            presenter->update(alarmRecords.at(0), UserAction::TurnOff, 0);
             closeReminder();
             return true;
         }
@@ -187,11 +221,18 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::closeReminder()
     {
-        LOG_DEBUG("Switch to home window");
-
-        destroyTimers();
-        // AudioServiceAPI::StopAll(application);
-        app::manager::Controller::sendAction(application, app::manager::actions::Home);
+        if (alarmRecords.size() == 1) {
+            LOG_DEBUG("Switch to home window");
+            destroyTimers();
+            // AudioServiceAPI::StopAll(application);
+            app::manager::Controller::sendAction(application, app::manager::actions::Home);
+        }
+        else {
+            alarmRecords.erase(alarmRecords.begin());
+            destroyTimers();
+            startTimers();
+            loopAlarmDisplaying();
+        }
     }
 
     void AlarmReminderWindow::loopMusic()

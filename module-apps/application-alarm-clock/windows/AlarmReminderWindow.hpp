@@ -23,6 +23,8 @@ namespace app::alarmClock
         std::unique_ptr<AlarmReminderWindowContract::Presenter> presenter;
         std::shared_ptr<AlarmsRecord> alarmRecord;
         std::shared_ptr<AlarmsRecord> previousAlarmRecord;
+        std::vector<AlarmsRecord> alarmRecords;
+        std::vector<AlarmsRecord> previousAlarmRecords;
 
         gui::VBox *body         = nullptr;
         gui::HBox *hBox         = nullptr;
@@ -44,6 +46,7 @@ namespace app::alarmClock
         void closeReminder();
         void closeReminderCallback();
         void loopMusic();
+        void loopAlarmDisplaying();
         void countElapsedMinutes();
 
       public:

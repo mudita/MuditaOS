@@ -49,7 +49,7 @@ namespace stm
         auto actualTimePoint = TimePointNow();
         auto weekDay         = WeekdayIndexFromTimePoint(actualTimePoint);
         std::vector<AlarmsRecord> nearestAlarms;
-        for (uint32_t i = 0; i < date::Sunday.iso_encoding(); i++) {
+        for (uint32_t i = 0; i < date::Sunday.iso_encoding() + 1; i++) {
             for (auto &record : records) {
                 auto hoursAndMinutes = TimePointToHourMinSec(record.time);
                 record.time = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + date::days{i} +
@@ -132,6 +132,15 @@ namespace stm
                   nearestAlarms.end(),
                   [](const AlarmsRecord &first, const AlarmsRecord &second) { return first.time < second.time; });
 
+        auto alarmTime = nearestAlarms.at(0).time;
+        nearestAlarms.erase(std::remove_if(nearestAlarms.begin(),
+                                           nearestAlarms.end(),
+                                           [alarmTime](const AlarmsRecord &rec) { return alarmTime != rec.time; }),
+                            nearestAlarms.end());
+        if (nearestAlarms.size() > 1) {
+            LOG_DEBUG("Multiple alarms at the same time");
+        }
+        alarmRecords  = nearestAlarms;
         alarmsRecord = nearestAlarms.at(0);
         auto duration = alarmsRecord.time - TimePointNow();
         if (duration.count() <= 0) {
@@ -157,8 +166,9 @@ namespace stm
 
     void AlarmsTimeEvents::invokeEvent()
     {
-        auto alarm = std::make_shared<AlarmsRecord>(alarmsRecord);
-        auto data  = std::make_unique<AlarmRecordData>(alarm);
+        // auto alarm = std::make_shared<AlarmsRecord>(alarmsRecord);
+        // auto data  = std::make_unique<AlarmRecordData>(alarm);
+        auto data = std::make_unique<AlarmRecordData>(alarmRecords);
 
         app::manager::Controller::sendAction(service(), app::manager::actions::ShowAlarm, std::move(data));
     }

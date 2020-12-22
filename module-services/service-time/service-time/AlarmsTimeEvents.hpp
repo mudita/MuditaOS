@@ -26,6 +26,7 @@ namespace stm
     {
       private:
         AlarmsRecord alarmsRecord;
+        std::vector<AlarmsRecord> alarmRecords;
 
       protected:
         const std::string timerName() override
