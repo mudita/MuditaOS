@@ -106,9 +106,11 @@ namespace gui
     void PinLockHandler::handleUnlockSim(app::manager::actions::ActionParamsPtr &&data)
     {
         LOG_DEBUG("Handling UnlockSim action");
-        simLock.lockState   = PinLock::LockState::Unlocked;
         promptSimLockWindow = false;
-        unlock();
+        if (!simLock.isState(PinLock::LockState::Unlocked)) {
+            simLock.lockState = PinLock::LockState::Unlocked;
+            unlock();
+        }
     }
 
     void PinLockHandler::handleCMEError(app::manager::actions::ActionParamsPtr &&data) const
