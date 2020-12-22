@@ -14,6 +14,9 @@
 
 * Fix missing texts for ApplicationDesktop windows
 
+### Changed
+
+* `[UserInterface]` Torch light control button press time recognition.
 ## [0.51.1 2020-12-18]
 
 ### Added
