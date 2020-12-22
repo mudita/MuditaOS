@@ -23,27 +23,35 @@ namespace gui
         buildInterface();
     }
 
-    void ChangePasscodeWindow::buildInterface()
+    void ChangePasscodeWindow::buildBottomBar()
     {
-        AppWindow::buildInterface();
-        PinLockBaseWindow::build();
-        setTitle(utils::localize.get("app_settings_security_change_passcode"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        setBottomBarWidgetsActive(false, true, true);
+    }
 
+    void ChangePasscodeWindow::buildTopBar()
+    {
         topBar->setActive(TopBar::Elements::SIM, false);
         topBar->setActive(TopBar::Elements::LOCK, false);
         topBar->setActive(TopBar::Elements::BATTERY, false);
         topBar->setActive(TopBar::Elements::TIME, true);
+    }
+
+    void ChangePasscodeWindow::buildTitleBar()
+    {
+        setTitle(utils::localize.get("app_settings_security_change_passcode"));
+    }
+
+    void ChangePasscodeWindow::buildInterface()
+    {
+        AppWindow::buildInterface();
+        PinLockBaseWindow::build();
 
         lockBox = std::make_unique<ScreenLockBoxSettings>(this);
         lockBox->buildLockBox(4U);
 
-        lockImage->setVisible(false);
-        infoImage->setVisible(false);
         pinLabelsBox->setPosition(248U, gui::Axis::Y);
-
-        bottomBar->setActive(BottomBar::Side::LEFT, false);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         setVisibleState();
     }
@@ -104,7 +112,7 @@ namespace gui
             break;
         }
         case PinLock::LockState::Unlocked: {
-            infoImage->setVisible(true);
+            // infoImage->setVisible(true);
             primaryText->setVisible(false);
             secondaryText->setText("Passcode changed successfully");
             secondaryText->setVisible(true);
@@ -122,7 +130,7 @@ namespace gui
     {
         auto &lock = screenLockHandler.getLock();
         if (lock.isState(PinLock::LockState::Unlocked) && inputEvent.isShortPress()) {
-            application->returnToPreviousWindow(1);
+            application->returnToPreviousWindow();
         }
         if (!inputEvent.isShortPress()) {
             return AppWindow::onInput(inputEvent);

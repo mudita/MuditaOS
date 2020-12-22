@@ -3,7 +3,7 @@
 
 #include "PukLockBox.hpp"
 
-#include "widgets/PinLockBaseWindow.hpp"
+#include "PinLockWindow.hpp"
 #include "widgets/PinLock.hpp"
 #include "application-desktop/data/AppDesktopStyle.hpp"
 #include "gui/widgets/Image.hpp"

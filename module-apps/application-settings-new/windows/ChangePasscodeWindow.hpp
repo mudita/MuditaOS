@@ -17,6 +17,9 @@ namespace gui
         void rebuild() override;
 
       private:
+        void buildBottomBar() override;
+        void buildTopBar() override;
+        void buildTitleBar() override;
         void buildInterface() override;
         void destroyInterface() override;
         void invalidate() noexcept;

@@ -5,6 +5,10 @@
 
 namespace gui
 {
+    void ScreenLockBoxSettings::buildLockBox(unsigned int pinSize)
+    {
+        ScreenLockBox::buildPinLabels(pinSize);
+    }
 
     void ScreenLockBoxSettings::setVisibleStateEnterPin(EnterPasscodeType type)
     {}

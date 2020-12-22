@@ -19,8 +19,15 @@ namespace gui
         std::unique_ptr<PinLockBox> LockBox = nullptr;
         std::unique_ptr<PinLock> lock                     = nullptr;
         PinLockBox::EnterPasscodeType currentPasscodeType = PinLockBox::EnterPasscodeType::ProvidePasscode;
+        gui::Image *lockImage                             = nullptr;
+        gui::Image *infoImage                             = nullptr;
+        gui::HBox *iceBox                                 = nullptr;
 
         // method hides or show widgets and sets bars according to provided state
+        void buildBottomBar() override;
+        void buildTopBar() override;
+        void buildTitleBar() override;
+        void restore() noexcept override;
         void setVisibleState();
         void buildPinLockBox();
         void invalidate() noexcept override;
@@ -34,6 +41,11 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+        void buildImages(const std::string &lockImg, const std::string &infoImg);
+        [[nodiscard]] auto getToken(Token token) const -> std::string;
+        void setImagesVisible(bool lockImg, bool infoImg);
+        void setTitleBar(bool isVisible, bool isIceActive);
     };
 
 } /* namespace gui */

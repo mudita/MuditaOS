@@ -42,11 +42,6 @@ namespace gui
             pinLabels[charNum]->setVisibleState(true);
         }
     }
-    void ScreenLockBox::buildLockBox(unsigned int pinSize)
-    {
-        LockWindow->buildImages("pin_lock", "pin_lock_info");
-        ScreenLockBox::buildPinLabels(pinSize);
-    }
     void ScreenLockBox::buildPinLabels(unsigned int pinSize)
     {
         constexpr auto pinLabelWidth = style::window::default_body_width;
@@ -71,9 +66,9 @@ namespace gui
             return label;
         };
 
-        LockWindow->buildPinLabels(
+        lockBaseWindow->buildPinLabels(
             itemBuilder, pinSize, style::window::default_left_margin, label_style::y, pinLabelWidth);
-        LockWindow->pinLabelsBox->setEdges(RectangleEdge::None);
+        lockBaseWindow->pinLabelsBox->setEdges(RectangleEdge::None);
     }
 
     void ScreenLockBox::clear()

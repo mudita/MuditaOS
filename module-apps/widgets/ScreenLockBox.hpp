@@ -17,12 +17,13 @@ namespace gui
     class ScreenLockBox : public PinLockBox
     {
       public:
-        ScreenLockBox(PinLockBaseWindow *LockBaseWindow) : LockWindow(LockBaseWindow)
+        ScreenLockBox(PinLockBaseWindow *LockBaseWindow) : lockBaseWindow(LockBaseWindow)
         {}
-        void buildLockBox(unsigned int pinSize) final;
         void popChar(unsigned int charNum) final;
         void putChar(unsigned int charNum) final;
         void clear() final;
+        void setVisibleStateBlocked() override
+        {}
 
       protected:
         struct PinLabel : public HBox
@@ -34,7 +35,7 @@ namespace gui
 
         std::vector<PinLabel *> pinLabels;
 
-        PinLockBaseWindow *LockWindow;
+        PinLockBaseWindow *lockBaseWindow;
 
         void buildPinLabels(unsigned int pinSize);
     };

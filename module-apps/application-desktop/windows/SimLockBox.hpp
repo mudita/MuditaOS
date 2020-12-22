@@ -7,7 +7,7 @@
 
 namespace gui
 {
-    class PinLockBaseWindow;
+    class PinLockWindow;
 }
 
 namespace gui
@@ -15,11 +15,11 @@ namespace gui
     class SimLockBox : public PinLockBox
     {
       public:
-        SimLockBox(PinLockBaseWindow *LockBaseWindow) : LockWindow(LockBaseWindow)
+        SimLockBox(PinLockWindow *LockBaseWindow) : LockWindow(LockBaseWindow)
         {}
 
       private:
-        PinLockBaseWindow *LockWindow;
+        PinLockWindow *LockWindow;
         void popChar(unsigned int charNum) final;
         void putChar(unsigned int charNum) final;
         void clear() final;

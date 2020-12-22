@@ -15,7 +15,9 @@
 #include "SimLockBox.hpp"
 #include "PukLockBox.hpp"
 #include <application-phonebook/ApplicationPhonebook.hpp>
+#include "application-desktop/data/AppDesktopStyle.hpp"
 
+namespace lock_style = style::window::pin_lock;
 namespace gui
 {
 
@@ -50,6 +52,101 @@ namespace gui
         PinLockBaseWindow::invalidate();
         LockBox      = nullptr;
         pinLabelsBox = nullptr;
+    }
+
+    void PinLockWindow::buildImages(const std::string &lockImg, const std::string &infoImg)
+    {
+        lockImage = new gui::Image(this, lock_style::image::x, lock_style::image::y, 0, 0, lockImg);
+        infoImage = new gui::Image(this, lock_style::image::x, lock_style::image::y, 0, 0, infoImg);
+    }
+
+    void PinLockWindow::setImagesVisible(bool lockImg, bool infoImg)
+    {
+        lockImage->setVisible(lockImg);
+        infoImage->setVisible(infoImg);
+    }
+
+    void PinLockWindow::setTitleBar(bool isVisible, bool isIceActive)
+    {
+        iceBox->setVisible(isIceActive);
+        title->setVisible(isVisible);
+        if (isVisible) {
+            title->setEdges(RectangleEdge::Bottom);
+        }
+        else {
+            title->clear();
+            title->setEdges(RectangleEdge::None);
+        }
+    }
+
+    auto PinLockWindow::getToken(Token token) const -> std::string
+    {
+        if (token == Token::Sim) {
+            return "$SIM";
+        }
+        else if (token == Token::Attempts) {
+            return "$ATTEMPTS";
+        }
+        else if (token == Token::Mins) {
+            return "$MINUTES";
+        }
+        else if (token == Token::CmeCode) {
+            return "$CMECODE";
+        }
+        return std::string{};
+    }
+
+    void PinLockWindow::restore() noexcept
+    {
+        PinLockBaseWindow::restore();
+        lockImage->setVisible(false);
+        infoImage->setVisible(false);
+    }
+
+    void PinLockWindow::buildBottomBar()
+    {
+        setBottomBarWidgetsActive(false, false, false);
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_emergency"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+    }
+
+    void PinLockWindow::buildTopBar()
+    {
+        topBar->setActive(TopBar::Elements::SIGNAL, true);
+        topBar->setActive(TopBar::Elements::BATTERY, true);
+        topBar->setActive(TopBar::Elements::LOCK, true);
+    }
+
+    void PinLockWindow::buildTitleBar()
+    {
+        using namespace style::window::pin_lock;
+
+        iceBox = new gui::HBox(this, ice::x, ice::y, ice::w, ice::h);
+        iceBox->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
+        iceBox->setEdges(RectangleEdge::None);
+        iceBox->setVisible(false);
+
+        auto arrow        = new gui::Image("left_label_arrow");
+        arrow->activeItem = false;
+        arrow->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
+        arrow->setMargins(Margins(0, 0, ice::margin, 0));
+        iceBox->addWidget(arrow);
+
+        auto iceText        = new gui::Text(nullptr, 0, 0, ice::text::w, ice::h);
+        iceText->activeItem = false;
+        iceText->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
+        iceText->setFont(style::window::font::verysmall);
+        iceText->setText(utils::localize.get("app_desktop_emergency"));
+        iceBox->addWidget(iceText);
+
+        title = new gui::Text(this, title::x, title::y, title::w, title::h);
+        title->setFilled(false);
+        title->setBorderColor(gui::ColorFullBlack);
+        title->setFont(style::header::font::title);
+        title->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        title->setVisible(false);
+        title->setPenWidth(2);
     }
 
     void PinLockWindow::setVisibleState()

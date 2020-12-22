@@ -14,7 +14,6 @@ namespace gui
     {
         return activateLock([this, currentLockPassHash](PinLock::LockType, const std::vector<unsigned int> &pin) {
             const auto hash = GetPinHash(pin);
-            LOG_ERROR("hash=%d, currentLockPassHash=%d", hash, currentLockPassHash);
             if (hash == currentLockPassHash) {
                 lock.lockState = PinLock::LockState::NewPasscodeRequired;
             }

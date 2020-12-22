@@ -3,38 +3,42 @@
 
 #include "ScreenLockBoxDesktop.hpp"
 #include "widgets/PinLock.hpp"
-#include "widgets/PinLockBaseWindow.hpp"
 
 namespace gui
 {
+    void ScreenLockBoxDesktop::buildLockBox(unsigned int pinSize)
+    {
+        lockWindow->buildImages("pin_lock", "pin_lock_info");
+        ScreenLockBox::buildPinLabels(pinSize);
+    }
     void ScreenLockBoxDesktop::setVisibleStateEnterPin(EnterPasscodeType type)
     {
-        LockWindow->pinLabelsBox->setVisible(true);
-        LockWindow->setText("app_desktop_screen_enter_passcode_to_unlock", PinLockBaseWindow::TextType::Primary, true);
-        LockWindow->setImagesVisible(true, false);
-        LockWindow->setBottomBarWidgetsActive(true, false, true);
+        lockWindow->pinLabelsBox->setVisible(true);
+        lockWindow->setText("app_desktop_screen_enter_passcode_to_unlock", PinLockBaseWindow::TextType::Primary, true);
+        lockWindow->setImagesVisible(true, false);
+        lockWindow->setBottomBarWidgetsActive(true, false, true);
     }
 
     void ScreenLockBoxDesktop::setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value)
     {
         switch (type) {
         case PinLockBox::PasscodeErrorType::InvalidPasscode:
-            LockWindow->setTitleBar(false, false);
+            lockWindow->setTitleBar(false, false);
             if (value == 1) {
                 constexpr auto timeToUnlock = 10;
-                LockWindow->setText(
+                lockWindow->setText(
                     "app_desktop_screen_wrong_passcode_last_attempt", PinLockBaseWindow::TextType::Primary, true);
-                LockWindow->setText("app_desktop_screen_wrong_passcode_last_attempt_warning",
+                lockWindow->setText("app_desktop_screen_wrong_passcode_last_attempt_warning",
                                     PinLockBaseWindow::TextType::Secondary,
                                     true,
-                                    {{LockWindow->getToken(PinLockBaseWindow::Token::Mins), timeToUnlock}});
+                                    {{lockWindow->getToken(PinLockBaseWindow::Token::Mins), timeToUnlock}});
             }
             else {
-                LockWindow->setText(
+                lockWindow->setText(
                     "app_desktop_screen_wrong_passcode",
                     PinLockBaseWindow::TextType::Primary,
                     true,
-                    {{LockWindow->getToken(PinLockBaseWindow::Token::Attempts), static_cast<int>(value)}});
+                    {{lockWindow->getToken(PinLockBaseWindow::Token::Attempts), static_cast<int>(value)}});
             }
             break;
 
@@ -45,13 +49,13 @@ namespace gui
             LOG_ERROR("No use case for UnhandledError");
             break;
         }
-        LockWindow->setImagesVisible(false, true);
-        LockWindow->setBottomBarWidgetsActive(false, true, true);
+        lockWindow->setImagesVisible(false, true);
+        lockWindow->setBottomBarWidgetsActive(false, true, true);
     }
     void ScreenLockBoxDesktop::setVisibleStateBlocked()
     {
-        LockWindow->setText("app_desktop_screen_blocked_info", PinLockBaseWindow::TextType::Primary);
-        LockWindow->setImagesVisible(false, true);
-        LockWindow->setBottomBarWidgetsActive(false, true, false);
+        lockWindow->setText("app_desktop_screen_blocked_info", PinLockBaseWindow::TextType::Primary);
+        lockWindow->setImagesVisible(false, true);
+        lockWindow->setBottomBarWidgetsActive(false, true, false);
     }
 } // namespace gui
