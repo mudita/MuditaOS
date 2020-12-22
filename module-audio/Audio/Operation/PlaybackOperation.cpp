@@ -58,6 +58,7 @@ namespace audio
         operationToken = token;
 
         assert(dataStreamOut);
+
         dec->startDecodingWorker(*dataStreamOut, endOfFileCallback);
 
         if (!tags) {
@@ -196,6 +197,8 @@ namespace audio
     PlaybackOperation::~PlaybackOperation()
     {
         Stop();
+        dataStreamOut->reset();
+        dataStreamIn->reset();
     }
 
 } // namespace audio

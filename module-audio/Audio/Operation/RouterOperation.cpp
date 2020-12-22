@@ -88,6 +88,8 @@ namespace audio
         state = State::Idle;
         audioDevice->Stop();
         audioDeviceCellular->Stop();
+        dataStreamOut->reset();
+        dataStreamIn->reset();
 
         return RetCode::Success;
     }
