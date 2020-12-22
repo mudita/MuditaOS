@@ -127,29 +127,35 @@ namespace gui
             LOG_INFO("exit to main menu");
             app::manager::Controller::sendAction(application, app::manager::actions::Home);
         }
-        // process only if key is released
-        if ((inputEvent.state != InputEvent::State::keyReleasedShort))
-            return false;
 
-        switch (inputEvent.keyCode) {
-        case KeyCode::KEY_VOLUP: {
-            application->increaseCurrentVolume();
-            return true;
+        if ((inputEvent.isShortPress())) {
+            switch (inputEvent.keyCode) {
+            case KeyCode::KEY_VOLUP: {
+                application->increaseCurrentVolume();
+                return true;
+            }
+            case KeyCode::KEY_VOLDN: {
+                application->decreaseCurrentVolume();
+                return true;
+            }
+            case KeyCode::KEY_RF: {
+                application->returnToPreviousWindow();
+                return true;
+            }
+            default:
+                break;
+            }
         }
-        case KeyCode::KEY_VOLDN: {
-            application->decreaseCurrentVolume();
-            return true;
-        }
-        case KeyCode::KEY_RF: {
-            application->returnToPreviousWindow();
-            return true;
-        }
-        case KeyCode::KEY_TORCH: {
-            application->toggleTorchAndColourTemps();
-            return true;
-        }
-        default:
-            break;
+
+        if (inputEvent.keyCode == KeyCode::KEY_TORCH) {
+            if (inputEvent.isLongPress()) {
+                application->toggleTorch(bsp::torch::ColourTemperature::warmest);
+                return true;
+            }
+            else if (inputEvent.isShortPress()) {
+                application->toggleTorch(bsp::torch::ColourTemperature::coldest);
+                return true;
+            }
         }
 
         return false;

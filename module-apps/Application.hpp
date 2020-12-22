@@ -280,7 +280,7 @@ namespace app
         }
         audio::RetCode getCurrentVolume(audio::Volume &volume);
 
-        void toggleTorchAndColourTemps();
+        void toggleTorch(bsp::torch::ColourTemperature temperature);
 
         /// @defgroup Application Application static functions
         /// All this functions are meant to be used in ApplicationManager only
