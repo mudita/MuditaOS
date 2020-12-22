@@ -11,6 +11,7 @@
 #include <memory>
 #include <task.h>
 #include <vector>
+#include "service-bluetooth/SettingsHolder.hpp"
 
 struct HCI;
 
@@ -19,7 +20,7 @@ struct HCI;
 
 namespace Bt
 {
-    enum Message : uint8_t
+    enum Message : std::uint8_t
     {
         /// asynchronous messages to use on event from irq
         EvtSending,        /// Bt stack ordered a write transaction and it is pending
@@ -31,6 +32,18 @@ namespace Bt
         EvtReceivingError, /// bsp error on receive
         EvtUartError,      /// generic uart error
         EvtErrorRec,       /// there was error o queue receive
+    };
+
+    enum Command : std::uint8_t
+    {
+        StartScan,
+        StopScan,
+        VisibilityOn,
+        VisibilityOff,
+        ConnectAudio,
+        DisconnectAudio,
+        PowerOn,
+        PowerOff,
     };
 
     inline const char *MessageCstr(Message what)
@@ -70,8 +83,9 @@ class BluetoothWorker : private sys::Worker
         queueService = 0,
         queueControl = 1,
         queueIO_handle, /// bsp support queue
-        queue_profiles, /// queue for communication between profile workers,
-                        /// main bt_worker_task should dispatch these in events
+                        //        queue_profiles, /// queue for communication between profile workers,
+                        //                        /// main bt_worker_task should dispatch these in events
+        queueCommands,
     };
 
     TaskHandle_t bt_worker_task = nullptr;
@@ -91,11 +105,13 @@ class BluetoothWorker : private sys::Worker
 
     virtual bool handleMessage(uint32_t queueID);
 
+    bool handleCommand(QueueHandle_t queue);
+
     bool run();
 
     bool scan();
 
-    bool toggleVisibility();
+    void setVisibility(bool visibility);
 
     bool start_pan();
 
@@ -111,4 +127,6 @@ class BluetoothWorker : private sys::Worker
     void initAudioBT();
 
     std::shared_ptr<Bt::Profile> currentProfile;
+    std::shared_ptr<Bluetooth::SettingsHolder> settings;
+    std::vector<Devicei> pairedDevices;
 };

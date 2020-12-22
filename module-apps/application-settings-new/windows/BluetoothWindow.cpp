@@ -110,10 +110,10 @@ namespace gui
         BluetoothStatus btStatus;
 
         if (isBluetoothSwitchOn) {
-            btStatus.state = BluetoothStatus::BluetoothState::On;
+            btStatus.state = BluetoothStatus::State::On;
         }
         else {
-            btStatus.state = BluetoothStatus::BluetoothState::Off;
+            btStatus.state = BluetoothStatus::State::Off;
         }
         btStatus.visibility = isPhoneVisibilitySwitchOn;
         ::message::bluetooth::SetStatus setStatus(btStatus);
