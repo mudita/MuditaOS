@@ -9,6 +9,10 @@
 * Add Bluetooth virtual audio device.
 * Add custom repeat window for the alarm application
 
+### Fixed
+
+* Fix missing texts for ApplicationDesktop windows
+
 ## [0.51.1 2020-12-18]
 
 ### Added
