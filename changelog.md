@@ -14,6 +14,7 @@
 
 ### Fixed
 
+* Fix auto unlock screen on idle
 * Fix missing texts for ApplicationDesktop windows
 
 ### Changed
