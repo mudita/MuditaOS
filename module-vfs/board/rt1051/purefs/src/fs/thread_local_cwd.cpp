@@ -14,13 +14,14 @@ namespace purefs::fs::internal
     namespace
     {
         constexpr auto CWD_THREAD_LOCAL_INDEX = 3;
+        std::string g_default_cwd{"/"};
         auto get_tls() noexcept -> char *
         {
             auto pcwd = reinterpret_cast<char *>(pvTaskGetThreadLocalStoragePointer(nullptr, CWD_THREAD_LOCAL_INDEX));
             if (pcwd == nullptr) {
                 pcwd = new (std::nothrow) char[PATH_MAX + 1];
                 if (pcwd) {
-                    std::strncpy(pcwd, "/", PATH_MAX);
+                    std::strncpy(pcwd, g_default_cwd.c_str(), PATH_MAX);
                     vTaskSetThreadLocalStoragePointer(nullptr, CWD_THREAD_LOCAL_INDEX, pcwd);
                 }
             }
@@ -53,5 +54,9 @@ namespace purefs::fs::internal
             delete[] pcwd;
             vTaskSetThreadLocalStoragePointer(nullptr, CWD_THREAD_LOCAL_INDEX, nullptr);
         }
+    }
+    auto set_default_thread_cwd(std::string_view str) noexcept -> void
+    {
+        g_default_cwd = str;
     }
 } // namespace purefs::fs::internal
