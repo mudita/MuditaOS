@@ -22,6 +22,7 @@ namespace gui
         void buildLockBox(unsigned int pinSize) final;
         void popChar(unsigned int charNum) final;
         void putChar(unsigned int charNum) final;
+        void clear() final;
 
       protected:
         struct PinLabel : public HBox
@@ -34,7 +35,6 @@ namespace gui
         std::vector<PinLabel *> pinLabels;
 
         PinLockBaseWindow *LockWindow;
-        void clear() final;
 
         void buildPinLabels(unsigned int pinSize);
     };

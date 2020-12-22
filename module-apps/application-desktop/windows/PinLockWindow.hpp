@@ -17,12 +17,13 @@ namespace gui
         const std::string this_window_name;
         std::string lockTimeoutApplication  = "";
         std::unique_ptr<PinLockBox> LockBox = nullptr;
+        std::unique_ptr<PinLock> lock                     = nullptr;
         PinLockBox::EnterPasscodeType currentPasscodeType = PinLockBox::EnterPasscodeType::ProvidePasscode;
 
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState();
         void buildPinLockBox();
-        void invalidate() noexcept;
+        void invalidate() noexcept override;
         auto usesNumericKeys() const noexcept -> bool;
 
       public:

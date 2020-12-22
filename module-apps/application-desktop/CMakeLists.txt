@@ -36,7 +36,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockPhoneData.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/Style.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/Mmi.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinHash.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLockHandler.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/NotificationsBox.hpp"

@@ -17,6 +17,7 @@ target_sources( ${PROJECT_NAME}
         ApplicationSettings.cpp
         widgets/timeWidget.cpp
         widgets/ScreenLockBoxSettings.cpp
+        widgets/ScreenLockHandler.cpp
         windows/SettingsMainWindow.cpp
         windows/AddDeviceWindow.cpp
         windows/AllDevicesWindow.cpp

@@ -11,7 +11,14 @@
 namespace lock_style = style::window::pin_lock;
 namespace gui
 {
-
+    void PinLockBaseWindow::invalidate() noexcept
+    {
+        title         = nullptr;
+        lockImage     = nullptr;
+        infoImage     = nullptr;
+        primaryText   = nullptr;
+        secondaryText = nullptr;
+    }
     void PinLockBaseWindow::build()
     {
         buildBottomBar();

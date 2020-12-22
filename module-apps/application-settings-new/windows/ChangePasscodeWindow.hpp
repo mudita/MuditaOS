@@ -5,6 +5,7 @@
 
 #include "widgets/PinLockBaseWindow.hpp"
 #include "application-settings-new/widgets/ScreenLockBoxSettings.hpp"
+#include "application-settings-new/widgets/ScreenLockHandler.hpp"
 
 namespace gui
 {
@@ -20,9 +21,11 @@ namespace gui
         void destroyInterface() override;
         void invalidate() noexcept;
         void setVisibleState();
+        void processPasscode();
 
+        ScreenLockHandler screenLockHandler;
+        PinLock::LockState lockState{PinLock::LockState::PasscodeRequired};
         std::unique_ptr<ScreenLockBoxSettings> lockBox = nullptr;
-        uint32_t newPasscodeHash;
     };
 
 } /* namespace gui */

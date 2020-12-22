@@ -31,6 +31,7 @@ namespace gui
 
         PinLockBaseWindow(app::Application *app, std::string name) : AppWindow(app, name)
         {}
+        virtual void invalidate() noexcept;
         void build();
         void buildInfoTexts();
         void buildPinLabels(std::function<Rect *()> itemBuilder,
@@ -56,8 +57,6 @@ namespace gui
         gui::Image *lockImage    = nullptr;
         gui::Image *infoImage    = nullptr;
         gui::HBox *pinLabelsBox  = nullptr;
-
-        std::unique_ptr<PinLock> lock = nullptr;
 
       private:
         void buildBottomBar();

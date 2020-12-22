@@ -234,7 +234,7 @@ namespace app
         settings->setValue(settings::operators_on, std::to_string(value));
     }
 
-    void ApplicationSettingsNew::updateLockPassHash(unsigned int value)
+    void ApplicationSettingsNew::setLockPassHash(unsigned int value)
     {
         lockPassHash = value;
         settings->setValue(::settings::SystemProperties::lockPassHash, std::to_string(value));

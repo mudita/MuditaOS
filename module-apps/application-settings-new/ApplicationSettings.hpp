@@ -94,14 +94,18 @@ namespace app
         void operatorOnChanged(const std::string &value);
         void setOperatorsOn(bool value) override;
         bool getOperatorsOn() const noexcept override;
-        void updateLockPassHash(unsigned int value);
-        unsigned int lockPassHash = 0;
+        [[nodiscard]] auto getLockPassHash() const noexcept -> unsigned int
+        {
+            return lockPassHash;
+        }
+        void setLockPassHash(unsigned int value);
 
       private:
         Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
         std::string selectedSimNumber = {};
         bsp::Board board              = bsp::Board::none;
         bool operatorsOn              = false;
+        unsigned int lockPassHash     = 0;
     };
 
     template <> struct ManifestTraits<ApplicationSettingsNew>

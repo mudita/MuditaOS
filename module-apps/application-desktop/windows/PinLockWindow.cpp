@@ -47,12 +47,8 @@ namespace gui
 
     void PinLockWindow::invalidate() noexcept
     {
-        iceBox        = nullptr;
-        title         = nullptr;
-        lockImage  = nullptr;
-        infoImage  = nullptr;
-        primaryText   = nullptr;
-        secondaryText = nullptr;
+        PinLockBaseWindow::invalidate();
+        LockBox      = nullptr;
         pinLabelsBox = nullptr;
     }
 

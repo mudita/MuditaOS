@@ -2,7 +2,7 @@
 //// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PinLockHandler.hpp"
-#include "PinHash.hpp"
+#include "widgets/PinHash.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 #include "application-desktop/data/LockPhoneData.hpp"
 #include "application-desktop/windows/Names.hpp"

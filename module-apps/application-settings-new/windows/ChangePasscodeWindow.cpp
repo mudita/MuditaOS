@@ -4,7 +4,6 @@
 #include "application-settings-new/widgets/ScreenLockBoxSettings.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "ChangePasscodeWindow.hpp"
-#include "application-desktop/widgets/PinHash.hpp"
 #include "application-desktop/data/Style.hpp"
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include "AppWindow.hpp"
@@ -15,8 +14,6 @@ namespace gui
     ChangePasscodeWindow::ChangePasscodeWindow(app::Application *app)
         : PinLockBaseWindow(app, gui::window::name::change_passcode)
     {
-        lock = std::make_unique<gui::PinLock>(
-            Store::GSM::SIM::NONE, PinLock::LockState::PasscodeRequired, PinLock::LockType::Screen, 4);
         buildInterface();
     }
 
@@ -59,45 +56,72 @@ namespace gui
 
     void ChangePasscodeWindow::invalidate() noexcept
     {
+        PinLockBaseWindow::invalidate();
         lockBox       = nullptr;
-        title         = nullptr;
-        lockImage     = nullptr;
-        infoImage     = nullptr;
-        primaryText   = nullptr;
-        secondaryText = nullptr;
     }
 
     void ChangePasscodeWindow::setVisibleState()
     {
-        if (lock->isState(PinLock::LockState::PasscodeRequired) ||
-            lock->isState(PinLock::LockState::PasscodeInvalidRetryRequired)) {
+        lockBox->clear();
+        switch (lockState) {
+        case PinLock::LockState::PasscodeRequired: {
             primaryText->setText("Type current passcode");
             primaryText->setPosition(160U, gui::Axis::Y);
+            secondaryText->setVisible(false);
+            break;
         }
-        else if (lock->isState(PinLock::LockState::NewPasscodeRequired)) {
+        case PinLock::LockState::PasscodeInvalidRetryRequired: {
+            primaryText->setText("Type current passcode");
+            primaryText->setPosition(160U, gui::Axis::Y);
+            secondaryText->setText("Wrong passcode!");
+            secondaryText->setVisible(true);
+            break;
+        }
+        case PinLock::LockState::NewPasscodeRequired: {
             primaryText->setText("Enter new passcode");
             primaryText->setPosition(160U, gui::Axis::Y);
+            secondaryText->setVisible(false);
+            break;
         }
-        else if (lock->isState(PinLock::LockState::NewPasscodeConfirmRequired)) {
+        case PinLock::LockState::NewPasscodeInvalidRetryRequired: {
+            primaryText->setText("Enter new passcode");
+            primaryText->setPosition(160U, gui::Axis::Y);
+            secondaryText->setText("Wrong passcode!");
+            secondaryText->setVisible(true);
+            break;
+        }
+        case PinLock::LockState::NewPasscodeConfirmRequired: {
             primaryText->setText("Confirm new passcode");
             primaryText->setPosition(160U, gui::Axis::Y);
+            secondaryText->setVisible(false);
+            break;
         }
-        else if (lock->isState(PinLock::LockState::Unlocked)) {
+        case PinLock::LockState::NewPasscodeInvalid: {
+            primaryText->setText("Confirm new passcode");
+            primaryText->setPosition(160U, gui::Axis::Y);
+            secondaryText->setText("Wrong passcode!");
+            secondaryText->setVisible(true);
+            break;
+        }
+        case PinLock::LockState::Unlocked: {
             infoImage->setVisible(true);
+            primaryText->setVisible(false);
             secondaryText->setText("Passcode changed successfully");
+            secondaryText->setVisible(true);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
             pinLabelsBox->setVisible(false);
+            break;
         }
-
-        if (lock->isState(PinLock::LockState::PasscodeInvalidRetryRequired) ||
-            lock->isState(PinLock::LockState::NewPasscodeInvalid)) {
-            secondaryText->setText("Wrong passcode!");
+        default: {
+            break;
+        }
         }
     }
 
     auto ChangePasscodeWindow::onInput(const InputEvent &inputEvent) -> bool
     {
-        if (lock->isState(PinLock::LockState::Unlocked) && inputEvent.isShortPress()) {
+        auto &lock = screenLockHandler.getLock();
+        if (lock.isState(PinLock::LockState::Unlocked) && inputEvent.isShortPress()) {
             application->returnToPreviousWindow(1);
         }
         if (!inputEvent.isShortPress()) {
@@ -105,65 +129,49 @@ namespace gui
         }
 
         auto keyCodeNum = gui::toNumeric(inputEvent.keyCode);
-        if (0 <= keyCodeNum && keyCodeNum <= 9 && lock->canPut()) {
-            lockBox->putChar(lock->getCharCount());
-            lock->putNextChar(keyCodeNum);
+        if (0 <= keyCodeNum && keyCodeNum <= 9 && lock.canPut()) {
+            lockBox->putChar(lock.getCharCount());
+            lock.putNextChar(keyCodeNum);
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_PND)) {
-            lock->popChar();
-            lockBox->popChar(lock->getCharCount());
+            lock.popChar();
+            lockBox->popChar(lock.getCharCount());
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_ENTER)) {
-            if (lock->isState(PinLock::LockState::PasscodeRequired)) {
-                const auto callback = [this](PinLock::LockType, const std::vector<unsigned int> &pin) {
-                    std::hash<std::vector<unsigned int>> hashEngine;
-                    uint32_t hash = hashEngine(pin);
-                    auto app      = static_cast<app::ApplicationSettingsNew *>(application);
-                    if (hash == app->lockPassHash) {
-                        lock->lockState = PinLock::LockState::NewPasscodeRequired;
-                    }
-                    else {
-                        lock->lockState = PinLock::LockState::PasscodeInvalidRetryRequired;
-                    }
-                    rebuild();
-                };
-                lock->onActivatedCallback = callback;
-            }
-            else if (lock->isState(PinLock::LockState::NewPasscodeRequired)) {
-                const auto callback = [this](PinLock::LockType, const std::vector<unsigned int> &pin) {
-                    if (pin.size() < lock->getMaxPinSize()) {
-                        lock->lockState = PinLock::LockState::PasscodeInvalidRetryRequired;
-                        rebuild();
-                        return;
-                    }
-                    std::hash<std::vector<unsigned int>> hashEngine;
-                    newPasscodeHash = hashEngine(pin);
-                    lock->lockState = PinLock::LockState::NewPasscodeConfirmRequired;
-                    rebuild();
-                };
-                lock->onActivatedCallback = callback;
-            }
-            else if (lock->isState(PinLock::LockState::NewPasscodeConfirmRequired)) {
-                const auto callback = [this](PinLock::LockType, const std::vector<unsigned int> &pin) {
-                    std::hash<std::vector<unsigned int>> hashEngine;
-                    const auto newPasscodeConfirmedHash = hashEngine(pin);
-                    if (newPasscodeHash == newPasscodeConfirmedHash) {
-                        lock->lockState = PinLock::LockState::Unlocked;
-                        auto app        = static_cast<app::ApplicationSettingsNew *>(application);
-                        app->updateLockPassHash(newPasscodeConfirmedHash);
-                    }
-                    else {
-                        lock->lockState = PinLock::LockState::NewPasscodeInvalid;
-                    }
-                    rebuild();
-                };
-                lock->onActivatedCallback = callback;
-            }
-            lock->activate();
+            processPasscode();
+            setVisibleState();
             return true;
         }
         return AppWindow::onInput(inputEvent);
+    }
+
+    void ChangePasscodeWindow::processPasscode()
+    {
+        switch (lockState) {
+        case PinLock::LockState::PasscodeRequired:
+        case PinLock::LockState::PasscodeInvalidRetryRequired: {
+            auto app  = static_cast<app::ApplicationSettingsNew *>(application);
+            lockState = screenLockHandler.checkPasscode(app->getLockPassHash());
+            break;
+        }
+        case PinLock::LockState::NewPasscodeRequired:
+        case PinLock::LockState::NewPasscodeInvalidRetryRequired: {
+            lockState = screenLockHandler.newPasscodeProvided();
+            break;
+        }
+        case PinLock::LockState::NewPasscodeConfirmRequired:
+        case PinLock::LockState::NewPasscodeInvalid: {
+            lockState = screenLockHandler.newPasscodeConfirmed();
+            if (lockState == PinLock::LockState::Unlocked) {
+                auto app = static_cast<app::ApplicationSettingsNew *>(application);
+                app->setLockPassHash(screenLockHandler.getNewPasscodeHash());
+            }
+            break;
+        }
+        default:
+            break;
+        }
     }
 } // namespace gui
