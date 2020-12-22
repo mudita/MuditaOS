@@ -39,14 +39,14 @@ namespace purefs::blkdev
     }
     auto disk_image::write(const void *buf, sector_t lba, std::size_t count) -> int
     {
-        int ret = ::lseek(m_filedes, lba * sector_size, SEEK_SET);
-        if (ret < 0) {
-            return ret;
+        auto offs = ::lseek(m_filedes, off_t(lba) * sector_size, SEEK_SET);
+        if (offs < 0) {
+            return offs;
         }
         auto to_write = count * sector_size;
         auto buf_b    = reinterpret_cast<const uint8_t *>(buf);
         do {
-            ret = ::write(m_filedes, buf_b, to_write);
+            auto ret = ::write(m_filedes, buf_b, to_write);
             if (ret < 0) {
                 return -errno;
             }
@@ -57,14 +57,14 @@ namespace purefs::blkdev
     }
     auto disk_image::read(void *buf, sector_t lba, std::size_t count) -> int
     {
-        int ret = ::lseek(m_filedes, lba * sector_size, SEEK_SET);
-        if (ret < 0) {
-            return ret;
+        auto offs = ::lseek(m_filedes, off_t(lba) * sector_size, SEEK_SET);
+        if (offs < 0) {
+            return offs;
         }
         auto to_read = count * sector_size;
         auto buf_b   = reinterpret_cast<uint8_t *>(buf);
         do {
-            ret = ::read(m_filedes, buf_b, to_read);
+            auto ret = ::read(m_filedes, buf_b, to_read);
             if (ret < 0) {
                 return -errno;
             }

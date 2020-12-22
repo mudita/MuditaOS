@@ -9,10 +9,14 @@ namespace purefs::fs::internal
 
     namespace
     {
-        thread_local std::string cwd_per_thread{"/"};
+        thread_local std::string cwd_per_thread;
+        std::string default_cwd{"/"};
     }
     auto get_thread_local_cwd_path() noexcept -> std::string_view
     {
+        if (cwd_per_thread.empty()) {
+            cwd_per_thread = default_cwd;
+        }
         return cwd_per_thread;
     }
     auto set_thread_cwd_path(std::string_view path) noexcept -> int
@@ -23,5 +27,9 @@ namespace purefs::fs::internal
     auto cleanup_thread_local_cwd_mem() -> void
     {
         cwd_per_thread.erase();
+    }
+    auto set_default_thread_cwd(std::string_view str) noexcept -> void
+    {
+        default_cwd = str;
     }
 } // namespace purefs::fs::internal
