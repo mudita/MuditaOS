@@ -62,3 +62,16 @@ namespace style::window::pin_lock
     } // namespace secondary_text
 
 } // namespace style::window::pin_lock
+
+namespace style::window::screen_pin_lock
+{
+    namespace pin_label
+    {
+        constexpr inline auto y = 248;
+    } // namespace pin_label
+
+    namespace primary_text
+    {
+        constexpr inline auto y = 160;
+    } // namespace primary_text
+} // namespace style::window::screen_pin_lock

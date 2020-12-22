@@ -22,6 +22,10 @@ namespace gui
         void popChar(unsigned int charNum) final;
         void putChar(unsigned int charNum) final;
         void clear() final;
+        void setVisibleStateEnterPin(EnterPasscodeType type) override
+        {}
+        virtual void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) override
+        {}
         void setVisibleStateBlocked() override
         {}
 

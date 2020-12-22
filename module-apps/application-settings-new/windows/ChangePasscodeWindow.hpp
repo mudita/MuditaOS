@@ -17,6 +17,8 @@ namespace gui
         void rebuild() override;
 
       private:
+        gui::Image *tickImage = nullptr;
+
         void buildBottomBar() override;
         void buildTopBar() override;
         void buildTitleBar() override;

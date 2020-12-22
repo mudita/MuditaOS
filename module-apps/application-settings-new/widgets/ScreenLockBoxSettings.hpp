@@ -12,10 +12,6 @@ namespace gui
       public:
         ScreenLockBoxSettings(PinLockBaseWindow *LockBaseWindow) : ScreenLockBox(LockBaseWindow)
         {}
-        void buildLockBox(unsigned int pinSize) override;
-
-      private:
-        void setVisibleStateEnterPin(EnterPasscodeType type) final;
-        void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) final;
+        void buildLockBox(unsigned int pinSize) final;
     };
 } // namespace gui

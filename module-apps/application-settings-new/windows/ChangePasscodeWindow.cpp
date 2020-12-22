@@ -1,14 +1,12 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-settings-new/widgets/ScreenLockBoxSettings.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "ChangePasscodeWindow.hpp"
-#include "application-desktop/data/Style.hpp"
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include "AppWindow.hpp"
-#include "widgets/PinLock.hpp"
+#include "application-desktop/data/AppDesktopStyle.hpp"
 
+namespace lock_style        = style::window::pin_lock;
+namespace screen_lock_style = style::window::screen_pin_lock;
 namespace gui
 {
     ChangePasscodeWindow::ChangePasscodeWindow(app::Application *app)
@@ -49,9 +47,11 @@ namespace gui
         PinLockBaseWindow::build();
 
         lockBox = std::make_unique<ScreenLockBoxSettings>(this);
-        lockBox->buildLockBox(4U);
-
-        pinLabelsBox->setPosition(248U, gui::Axis::Y);
+        lockBox->buildLockBox(screenLockHandler.getLock().getMaxPinSize());
+        primaryText->setPosition(screen_lock_style::primary_text::y, gui::Axis::Y);
+        pinLabelsBox->setPosition(screen_lock_style::pin_label::y, gui::Axis::Y);
+        tickImage = new gui::Image(this, lock_style::image::x, lock_style::image::y, 0, 0, "small_tick_W_M");
+        tickImage->setVisible(false);
 
         setVisibleState();
     }
@@ -73,48 +73,31 @@ namespace gui
         lockBox->clear();
         switch (lockState) {
         case PinLock::LockState::PasscodeRequired: {
-            primaryText->setText("Type current passcode");
-            primaryText->setPosition(160U, gui::Axis::Y);
+            setText("app_settings_security_type_current_passcode", PinLockBaseWindow::TextType::Primary);
             secondaryText->setVisible(false);
-            break;
-        }
-        case PinLock::LockState::PasscodeInvalidRetryRequired: {
-            primaryText->setText("Type current passcode");
-            primaryText->setPosition(160U, gui::Axis::Y);
-            secondaryText->setText("Wrong passcode!");
-            secondaryText->setVisible(true);
             break;
         }
         case PinLock::LockState::NewPasscodeRequired: {
-            primaryText->setText("Enter new passcode");
-            primaryText->setPosition(160U, gui::Axis::Y);
+            setText("app_settings_security_enter_new_passcode", PinLockBaseWindow::TextType::Primary);
             secondaryText->setVisible(false);
-            break;
-        }
-        case PinLock::LockState::NewPasscodeInvalidRetryRequired: {
-            primaryText->setText("Enter new passcode");
-            primaryText->setPosition(160U, gui::Axis::Y);
-            secondaryText->setText("Wrong passcode!");
-            secondaryText->setVisible(true);
             break;
         }
         case PinLock::LockState::NewPasscodeConfirmRequired: {
-            primaryText->setText("Confirm new passcode");
-            primaryText->setPosition(160U, gui::Axis::Y);
+            setText("app_settings_security_confirm_new_passcode", PinLockBaseWindow::TextType::Primary);
             secondaryText->setVisible(false);
             break;
         }
+        case PinLock::LockState::PasscodeInvalidRetryRequired:
+        case PinLock::LockState::NewPasscodeInvalidRetryRequired:
         case PinLock::LockState::NewPasscodeInvalid: {
-            primaryText->setText("Confirm new passcode");
-            primaryText->setPosition(160U, gui::Axis::Y);
-            secondaryText->setText("Wrong passcode!");
+            setText("app_settings_security_wrong_passcode", PinLockBaseWindow::TextType::Secondary);
             secondaryText->setVisible(true);
             break;
         }
         case PinLock::LockState::Unlocked: {
-            // infoImage->setVisible(true);
+            tickImage->setVisible(true);
             primaryText->setVisible(false);
-            secondaryText->setText("Passcode changed successfully");
+            setText("app_settings_security_passcode_changed_successfully", PinLockBaseWindow::TextType::Secondary);
             secondaryText->setVisible(true);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
             pinLabelsBox->setVisible(false);
