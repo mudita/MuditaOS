@@ -80,7 +80,7 @@ namespace gui
             }
             break;
         case PinLockBox::PasscodeErrorType::NewPasscodeConfirmFailed:
-            LockWindow->setText("app_desktop_sim_wrong_pin", PinLockBaseWindow::TextType::Primary);
+            LockWindow->setText("app_desktop_sim_wrong_pin_confirmation", PinLockBaseWindow::TextType::Primary);
             break;
         case PinLockBox::PasscodeErrorType::UnhandledError: {
             LockWindow->setText("app_desktop_sim_cme_error",

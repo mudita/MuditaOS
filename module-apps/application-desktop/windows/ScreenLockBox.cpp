@@ -109,7 +109,7 @@ namespace gui
             break;
 
         case PinLockBox::PasscodeErrorType::NewPasscodeConfirmFailed:
-            LockWindow->setText("app_desktop_screen_setup_wrong_passcode", PinLockBaseWindow::TextType::Primary, true);
+            LOG_ERROR("No use case for NewPasscodeConfirmFailed");
             break;
         case PinLockBox::PasscodeErrorType::UnhandledError:
             LOG_ERROR("No use case for UnhandledError");
@@ -120,7 +120,7 @@ namespace gui
     }
     void ScreenLockBox::setVisibleStateBlocked()
     {
-        LockWindow->setText("app_desktop_screen_blocked", PinLockBaseWindow::TextType::Primary);
+        LockWindow->setText("app_desktop_screen_blocked_info", PinLockBaseWindow::TextType::Primary);
         LockWindow->setImagesVisible(false, true);
         LockWindow->setBottomBarWidgetsActive(false, true, false);
     }
