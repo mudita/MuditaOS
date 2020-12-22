@@ -8,6 +8,7 @@
 #ifndef MODULE_BSP_BSP_BATTERY_CHARGER_BATTERY_CHARGER_HPP_
 #define MODULE_BSP_BSP_BATTERY_CHARGER_BATTERY_CHARGER_HPP_
 
+#include <cstdint>
 namespace bsp{
 
 	enum class batteryChargerRegisters{
@@ -100,6 +101,12 @@ namespace bsp{
 		INOKB = 0x02
 	};
 
+	enum class batteryINTBSource{
+		minSOCAlert = 1 << 10,
+		minVAlert = 1 << 8,
+		SOCOnePercentChange = 1 << 7
+	};
+
 	int battery_Init(xQueueHandle qHandle);
 
 	void battery_Deinit(void);
@@ -111,6 +118,8 @@ namespace bsp{
 	void battery_ClearAllIRQs(void);
 
 	void battery_clearFuelGuageIRQ(void);
+
+	std::uint16_t battery_getStatusRegister();
 }
 
 BaseType_t BSP_BatteryChargerINOKB_IRQHandler();
