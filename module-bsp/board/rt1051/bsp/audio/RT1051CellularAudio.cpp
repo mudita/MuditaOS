@@ -259,6 +259,9 @@ namespace bsp
             SAI_TransferTerminateSendEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle);
         }
         memset(&txHandle, 0, sizeof(txHandle));
+        if (sink.isConnected()) {
+            sink.getStream()->unpeek();
+        }
     }
 
     void RT1051CellularAudio::InStop()
@@ -268,6 +271,9 @@ namespace bsp
             SAI_TransferAbortReceiveEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle);
         }
         memset(&rxHandle, 0, sizeof(rxHandle));
+        if (source.isConnected()) {
+            source.getStream()->release();
+        }
     }
 
     void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)

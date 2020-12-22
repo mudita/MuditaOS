@@ -101,6 +101,8 @@ namespace audio
         /// get empty data span
         Span getNullSpan() const noexcept;
 
+        void reset();
+
         [[nodiscard]] std::size_t getBlockSize() const noexcept;
         [[nodiscard]] std::size_t getBlockCount() const noexcept;
         [[nodiscard]] std::size_t getUsedBlockCount() const noexcept;
