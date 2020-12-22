@@ -1,13 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
 #include <FontManager.hpp>
 #include <Font.hpp>
 #include <Style.hpp>
+#include <vfs.hpp>
 
 TEST_CASE("Testo Font")
 {
+    vfs.Init();
     using namespace gui;
     auto &fm = FontManager::getInstance();
     fm.init("assets");

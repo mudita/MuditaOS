@@ -125,32 +125,35 @@ TEST_CASE("Database initialization scripts")
     vfs.Init();
     Database::initialize();
 
-    const char *script_create = "CREATE TABLE IF NOT EXISTS tracks("
-                                "_id	                INTEGER PRIMARY KEY,"
-                                "filename	            TEXT UNIQUE,"
-                                "name	            	TEXT,"
-                                "duration	            INTEGER,"
-                                "artist_id	            INTEGER,"
-                                "album_id	            INTEGER,"
-                                "cover  	            INTEGER,"
-                                "FOREIGN KEY(artist_id) REFERENCES artists(_id),"
-                                "FOREIGN KEY(album_id) 	REFERENCES albums(_id)"
-                                ");";
+    const std::string script_create = "CREATE TABLE IF NOT EXISTS tracks("
+                                      "_id	                INTEGER PRIMARY KEY,"
+                                      "filename	            TEXT UNIQUE,"
+                                      "name	            	TEXT,"
+                                      "duration	            INTEGER,"
+                                      "artist_id	            INTEGER,"
+                                      "album_id	            INTEGER,"
+                                      "cover  	            INTEGER,"
+                                      "FOREIGN KEY(artist_id) REFERENCES artists(_id),"
+                                      "FOREIGN KEY(album_id) 	REFERENCES albums(_id)"
+                                      ");\n";
 
-    const char *script_insert = "insert or ignore into artists(name) VALUES('%q');";
+    const std::string script_insert = "insert or ignore into artists(name) VALUES('%q');\n";
 
-    const char *script_comment = "--insert or ignore into artists(name) VALUES('%q');\n"
-                                 "insert or ignore into artists(name) VALUES('%q');\n"
-                                 "--insert or ignore into artists(name) VALUES('%q');\n"
-                                 "insert or ignore into artists(name) VALUES('%q');\n";
+    const std::string script_comment = "--insert or ignore into artists(name) VALUES('%q');\n"
+                                       "insert or ignore into artists(name) VALUES('%q');\n"
+                                       "--insert or ignore into artists(name) VALUES('%q');\n"
+                                       "insert or ignore into artists(name) VALUES('%q');\n";
 
-    const char *script_invalid = "insert artists(name) VALUES('%q');";
+    const std::string script_invalid = "insert artists(name) VALUES('%q');\n";
 
     SECTION("list files")
     {
-        ScopedDir dir(USER_PATH("scripts"));
+        ScopedDir dir(USER_PATH("test"));
+        LOG_INFO("PATH_SYS: %s", PATH_SYS);
+        LOG_INFO("PATH_USER: %s", PATH_USER);
 
         auto file = std::fopen(dir("test_1.sql").c_str(), "w");
+        LOG_INFO("test file: %s", dir("test_1.sql").c_str());
         std::fclose(file);
 
         file = std::fopen(dir("test_021.sql").c_str(), "w");
@@ -167,29 +170,28 @@ TEST_CASE("Database initialization scripts")
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
-        auto files = initializer.listFiles(PATH_SYS "/" PATH_USER "/", "test", "sql");
+        auto files = initializer.listFiles(dir(), "test", "sql");
 
         REQUIRE(files.size() == 4);
-        REQUIRE(files[0] == USER_PATH("test_1.sql"));
-        REQUIRE(files[1] == USER_PATH("test_003.sql"));
-        REQUIRE(files[2] == USER_PATH("test_011.sql"));
-        REQUIRE(files[3] == USER_PATH("test_021.sql"));
+        REQUIRE(files[0] == dir("test_1.sql"));
+        REQUIRE(files[1] == dir("test_003.sql"));
+        REQUIRE(files[2] == dir("test_011.sql"));
+        REQUIRE(files[3] == dir("test_021.sql"));
     }
 
     SECTION("read script files")
     {
         ScopedDir dir(USER_PATH("scripts"));
+        std::string test_file("read_script_test_1.sql");
 
-        auto file = std::fopen(dir("test_1.sql").c_str(), "w");
-
-        std::fprintf(file, "%s\n", script_create);
-        std::fprintf(file, "%s\n", script_insert);
-
+        auto file = std::fopen(dir(test_file).c_str(), "w");
+        std::fwrite(script_create.data(), sizeof(char), script_create.size(), file);
+        std::fwrite(script_insert.data(), sizeof(char), script_insert.size(), file);
         std::fclose(file);
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
-        auto commands = initializer.readCommands(dir("test_1.sql"));
+        auto commands = initializer.readCommands(dir(test_file));
 
         REQUIRE(commands.size() == 2);
     }
@@ -197,38 +199,41 @@ TEST_CASE("Database initialization scripts")
     SECTION("read empty script files")
     {
         ScopedDir dir(USER_PATH("scripts"));
+        std::string test_file("read_empyty_1.sql");
 
-        auto file = std::fopen(dir("test_1.sql").c_str(), "w");
+        auto file = std::fopen(dir(test_file).c_str(), "w");
         std::fclose(file);
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
-        auto commands = initializer.readCommands(dir("test_1.sql"));
+        auto commands = initializer.readCommands(dir(test_file));
 
         REQUIRE(commands.size() == 0);
     }
 
     SECTION("read script file with comment")
     {
-        ScopedDir dir(USER_PATH("scripts"));
+        ScopedDir dir(USER_PATH("read_script_file_with_comment"));
+        std::string test_file("test_01.sql");
 
-        auto file = std::fopen(dir("test_1.sql").c_str(), "w");
-        std::fprintf(file, "%s\n", script_comment);
+        auto file = std::fopen(dir(test_file).c_str(), "w");
+        std::fwrite(script_comment.data(), sizeof(char), script_comment.size(), file);
         std::fclose(file);
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
-        auto commands = initializer.readCommands(dir("test_1.sql"));
+        auto commands = initializer.readCommands(dir(test_file));
 
         REQUIRE(commands.size() == 2);
     }
 
     SECTION("execute valid script")
     {
-        ScopedDir dir(USER_PATH("scripts"));
+        ScopedDir dir(USER_PATH("execute_valid_script"));
+        std::string test_file("test_01.sql");
 
-        auto file = std::fopen(dir("test_1.sql").c_str(), "w");
-        std::fprintf(file, "%s\n", script_create);
+        auto file = std::fopen(dir(test_file).c_str(), "w");
+        std::fwrite(script_create.data(), sizeof(char), script_create.size(), file);
         std::fclose(file);
 
         Database db(dir("test.db").c_str());
@@ -240,10 +245,11 @@ TEST_CASE("Database initialization scripts")
 
     SECTION("execute invalid script")
     {
-        ScopedDir dir(USER_PATH("scripts"));
+        ScopedDir dir(USER_PATH("execute_invalid_script"));
+        std::string test_file("test_1.sql");
 
-        auto file = std::fopen(dir("test_1.sql").c_str(), "w");
-        std::fprintf(file, "%s\n", script_invalid);
+        auto file = std::fopen(dir(test_file).c_str(), "w");
+        std::fwrite(script_invalid.data(), sizeof(char), script_invalid.size(), file);
         std::fclose(file);
 
         Database db(dir("test.db").c_str());
