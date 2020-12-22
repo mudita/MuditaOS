@@ -245,6 +245,19 @@ bool Stream::blocksAvailable() const noexcept
     return !isEmpty();
 }
 
+void Stream::reset()
+{
+    _dataStart                = {_buffer.get(), _blockSize * _blockCount, _buffer.get(), _blockSize};
+    _dataEnd                  = _dataStart;
+    _peekPosition             = _dataStart;
+    _writeReservationPosition = _dataStart;
+    std::fill(_emptyBuffer.get(), _emptyBuffer.get() + _blockSize, 0);
+
+    _blocksUsed   = 0;
+    _peekCount    = 0;
+    _reserveCount = 0;
+}
+
 Stream::UniqueStreamBuffer StandardStreamAllocator::allocate(std::size_t size)
 {
     return std::make_unique<uint8_t[]>(size);
