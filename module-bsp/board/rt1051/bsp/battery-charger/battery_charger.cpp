@@ -22,6 +22,8 @@ extern "C"
 #include "common_data/EventStore.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
+#include <cstdio>
+#include <purefs/filesystem_paths.hpp>
 
 #define BSP_BATTERY_CHARGER_I2C_ADDR (0xD2 >> 1)
 #define BSP_FUEL_GAUGE_I2C_ADDR      (0x6C >> 1)
@@ -29,8 +31,11 @@ extern "C"
 
 static const uint32_t i2cSubaddresSize = 1;
 
-const char *battery_cfgFile     = "sys/batteryAdjustementConfig.cfg";
-const char *battery_cfgFilePrev = "sys/batteryAdjustementConfig_old.cfg";
+namespace configs
+{
+    const auto battery_cfgFile     = purefs::dir::getCurrentOSPath() / "batteryAdjustementConfig.cfg";
+    const auto battery_cfgFilePrev = purefs::dir::getCurrentOSPath() / "batteryAdjustementConfig_old.cfg";
+} // namespace configs
 
 static const uint16_t BATT_SERVICE_AVG_CURRENT_PERIOD =
     0x00; //< 0.1758 ms * 2^(2 + BATT_SERVICE_AVG_CURRENT_PERIOD)         == 700ms
@@ -351,30 +356,29 @@ static int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registe
 
 static bsp::batteryRetval battery_loadConfiguration(void)
 {
-    vfs::FILE *fd = NULL;
-
-    fd = vfs.fopen(battery_cfgFile, "r");
+    auto fd = std::fopen(configs::battery_cfgFile.c_str(), "r");
     if (fd == NULL) {
-        LOG_WARN("Configuration file [%s] not found. Searching for file [%s]", battery_cfgFile, battery_cfgFilePrev);
-        fd = vfs.fopen(battery_cfgFilePrev, "r");
+        LOG_WARN("Configuration file [%s] not found. Searching for file [%s]",
+                 configs::battery_cfgFile.c_str(),
+                 configs::battery_cfgFilePrev.c_str());
+        fd = std::fopen(configs::battery_cfgFilePrev.c_str(), "r");
         if (fd == NULL) {
-            LOG_WARN("Configuration file [%s] not found.", battery_cfgFilePrev);
+            LOG_WARN("Configuration file [%s] not found.", configs::battery_cfgFilePrev.c_str());
             return bsp::batteryRetval::battery_ChargerError;
         }
     }
 
     uint16_t regValue = 0;
-    ;
     for (uint8_t i = 0; i < 0xff; ++i) {
-        if (vfs.fread(&regValue, sizeof(regValue), 1, fd) != sizeof(regValue)) {
+        if (std::fread(&regValue, sizeof(regValue), 1, fd) != sizeof(regValue)) {
             LOG_ERROR("Reading register 0x%x failed.", i);
-            vfs.fclose(fd);
+            std::fclose(fd);
             return bsp::batteryRetval::battery_ChargerError;
         }
 
         if (battery_fuelGaugeWrite(static_cast<bsp::batteryChargerRegisters>(i), regValue) != kStatus_Success) {
             LOG_ERROR("Writing register 0x%x failed.", i);
-            vfs.fclose(fd);
+            std::fclose(fd);
             return bsp::batteryRetval::battery_ChargerError;
         }
     }
@@ -385,14 +389,12 @@ static bsp::batteryRetval battery_loadConfiguration(void)
 static bsp::batteryRetval battery_storeConfiguration(void)
 {
     // TODO:M.P procedure below seems to crash system, it should be fixed.
-    if (ff_rename(battery_cfgFile, battery_cfgFilePrev, false) != 0) {
+    if (ff_rename(configs::battery_cfgFile.c_str(), configs::battery_cfgFilePrev.c_str(), false) != 0) {
         LOG_ERROR("Could not move configuration file");
         return bsp::batteryRetval::battery_ChargerError;
     }
 
-    vfs::FILE *fd = NULL;
-
-    fd = vfs.fopen(battery_cfgFile, "w");
+    auto fd = std::fopen(configs::battery_cfgFile.c_str(), "w");
     if (fd == NULL) {
         LOG_ERROR("Could not open configuration file");
         return bsp::batteryRetval::battery_ChargerError;
@@ -402,14 +404,14 @@ static bsp::batteryRetval battery_storeConfiguration(void)
     for (unsigned int i = 0; i < 0xff; ++i) {
         if (battery_fuelGaugeRead(static_cast<bsp::batteryChargerRegisters>(i), &regVal) != kStatus_Success) {
             LOG_ERROR("Reading register 0x%x failed.", i);
-            vfs.fclose(fd);
+            std::fclose(fd);
             return bsp::batteryRetval::battery_ChargerError;
         }
 
-        if (vfs.fwrite(&regVal, sizeof(regVal), 1, fd) != sizeof(regVal)) {
+        if (std::fwrite(&regVal, sizeof(regVal), 1, fd) != sizeof(regVal)) {
             LOG_ERROR("Storing register 0x%x failed.", i);
-            vfs.fclose(fd);
-            vfs.remove(battery_cfgFile);
+            std::fclose(fd);
+            std::remove(configs::battery_cfgFile.c_str());
             return bsp::batteryRetval::battery_ChargerError;
         }
     }
