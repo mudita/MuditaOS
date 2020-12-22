@@ -15,7 +15,6 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLock.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLockHandler.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/NotificationsBox.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.cpp"
@@ -38,7 +37,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/data/Style.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/Mmi.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinHash.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLock.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLockHandler.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/NotificationsBox.hpp"

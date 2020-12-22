@@ -8,7 +8,6 @@
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
-#include "application-desktop/widgets/PinLock.hpp"
 #include "widgets/PinLockBox.hpp"
 #include "widgets/PinLockBaseWindow.hpp"
 namespace gui

@@ -101,8 +101,8 @@ namespace gui
         LockState lockState = LockState::Unlocked;
 
       private:
-        LockType lockType   = LockType::Screen;
-        unsigned int value  = 0;
+        LockType lockType  = LockType::Screen;
+        unsigned int value = 0;
 
         std::vector<unsigned int> pinValue;
         unsigned int maxPinSize = defaultPasscodeSize;

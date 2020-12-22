@@ -4,4 +4,12 @@
 #include "ScreenLockBoxSettings.hpp"
 
 namespace gui
-{} // namespace gui
+{
+
+    void ScreenLockBoxSettings::setVisibleStateEnterPin(EnterPasscodeType type)
+    {}
+
+    void ScreenLockBoxSettings::setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value)
+    {}
+
+} // namespace gui

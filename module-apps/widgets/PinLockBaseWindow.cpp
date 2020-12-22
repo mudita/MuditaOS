@@ -3,7 +3,7 @@
 
 #include "PinLockBaseWindow.hpp"
 #include "application-desktop/data/AppDesktopStyle.hpp"
-#include "application-desktop/widgets/PinLock.hpp"
+#include "PinLock.hpp"
 #include <i18n/i18n.hpp>
 
 #include "FontManager.hpp"

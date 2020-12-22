@@ -7,6 +7,8 @@
 #include "application-desktop/widgets/PinHash.hpp"
 #include "application-desktop/data/Style.hpp"
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include "AppWindow.hpp"
+#include "widgets/PinLock.hpp"
 
 namespace gui
 {

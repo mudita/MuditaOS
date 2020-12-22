@@ -7,11 +7,7 @@
 #include "Text.hpp"
 
 #include "RichTextParser.hpp"
-
-namespace gui
-{
-    class PinLock;
-}
+#include "PinLock.hpp"
 
 namespace gui
 {

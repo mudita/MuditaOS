@@ -6,6 +6,7 @@
 #include "PinLockBox.hpp"
 #include "BoxLayout.hpp"
 #include "Image.hpp"
+
 namespace gui
 {
     class PinLockBaseWindow;
@@ -18,8 +19,11 @@ namespace gui
       public:
         ScreenLockBox(PinLockBaseWindow *LockBaseWindow) : LockWindow(LockBaseWindow)
         {}
+        void buildLockBox(unsigned int pinSize) final;
+        void popChar(unsigned int charNum) final;
+        void putChar(unsigned int charNum) final;
 
-      private:
+      protected:
         struct PinLabel : public HBox
         {
             gui::Image *image = nullptr;
@@ -30,15 +34,8 @@ namespace gui
         std::vector<PinLabel *> pinLabels;
 
         PinLockBaseWindow *LockWindow;
-        void popChar(unsigned int charNum) final;
-        void putChar(unsigned int charNum) final;
         void clear() final;
 
-        void setVisibleStateEnterPin(EnterPasscodeType type) final;
-        void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) final;
-        void setVisibleStateBlocked() final;
-
-        void buildLockBox(unsigned int pinSize) final;
         void buildPinLabels(unsigned int pinSize);
     };
 } // namespace gui

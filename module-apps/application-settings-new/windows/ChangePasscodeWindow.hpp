@@ -3,11 +3,8 @@
 
 #pragma once
 
-#include "AppWindow.hpp"
-#include "application-desktop/widgets/PinLock.hpp"
 #include "widgets/PinLockBaseWindow.hpp"
-#include "widgets/PinLockBox.hpp"
-#include "application-desktop/widgets/PinLockHandler.hpp"
+#include "application-settings-new/widgets/ScreenLockBoxSettings.hpp"
 
 namespace gui
 {
@@ -24,7 +21,7 @@ namespace gui
         void invalidate() noexcept;
         void setVisibleState();
 
-        std::unique_ptr<PinLockBox> lockBox = nullptr;
+        std::unique_ptr<ScreenLockBoxSettings> lockBox = nullptr;
         uint32_t newPasscodeHash;
     };
 

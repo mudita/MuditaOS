@@ -14,5 +14,9 @@ namespace gui
         {}
 
       private:
+        void setVisibleStateEnterPin(EnterPasscodeType type) final;
+        void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) final;
+        void setVisibleStateBlocked() final
+        {}
     };
 } // namespace gui

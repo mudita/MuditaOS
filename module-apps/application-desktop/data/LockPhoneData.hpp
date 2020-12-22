@@ -9,7 +9,7 @@
 #include <service-desktop/ServiceDesktop.hpp>
 #include <filesystem>
 
-#include "application-desktop/widgets/PinLock.hpp"
+#include "widgets/PinLock.hpp"
 
 namespace gui
 {
