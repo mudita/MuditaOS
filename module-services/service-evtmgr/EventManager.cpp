@@ -123,9 +123,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
     else if (msgl->messageType == MessageType::EVMBatteryLevel && msgl->sender == this->GetName()) {
         auto *msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
 
-        auto message           = std::make_shared<sevm::BatteryLevelMessage>();
-        message->levelPercents = msg->levelPercents;
-        message->fullyCharged  = msg->fullyCharged;
+        auto message = std::make_shared<sevm::BatteryLevelMessage>(msg->levelPercents, msg->fullyCharged);
 
         if (!targetApplication.empty()) {
             sys::Bus::SendUnicast(message, targetApplication, this);

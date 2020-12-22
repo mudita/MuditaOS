@@ -1,5 +1,9 @@
 # MuditaOS changelog
 
+## Latest Changes
+### Added
+
+* Battery Brownout detection
 ## [0.52.1 2020-12-23]
 
 ### Added

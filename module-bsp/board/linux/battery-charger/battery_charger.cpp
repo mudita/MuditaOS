@@ -127,4 +127,10 @@ namespace bsp
             vTaskDelay(50);
         }
     }
+
+    std::uint16_t battery_getStatusRegister()
+    {
+        return static_cast<std::uint16_t>(batteryINTBSource::SOCOnePercentChange);
+    }
+
 } // namespace bsp
