@@ -8,6 +8,7 @@
 * Add PLL2 clock switching
 * Support for asynchronous callbacks on application side.
 * APN settings window - empty.
+* Bluetooth settings middleware layer
 
 ### Changed
 

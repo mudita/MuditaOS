@@ -17,6 +17,7 @@ namespace Bt
     auto run_stack(TaskHandle_t *handle) -> Error;
     namespace GAP
     {
+        extern std::vector<Devicei> devices;
         /// THIS have to be called prior to Bt system start!
         auto register_scan() -> Error;
         auto scan() -> Error;
