@@ -21,7 +21,7 @@ extern "C"
 
 struct BluetoothStatus
 {
-    enum class BluetoothState
+    enum class State
     {
         On,
         Off,
