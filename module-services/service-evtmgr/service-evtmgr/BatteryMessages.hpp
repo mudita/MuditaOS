@@ -12,7 +12,8 @@ namespace sevm
     class BatteryLevelMessage : public Message
     {
       public:
-        BatteryLevelMessage() : Message(MessageType::EVMBatteryLevel)
+        BatteryLevelMessage(uint8_t levelPercents, bool fullyCharged)
+            : Message(MessageType::EVMBatteryLevel), levelPercents(levelPercents), fullyCharged(fullyCharged)
         {
             type = Type::Data;
         }
@@ -44,4 +45,12 @@ namespace sevm
         BatteryLevelCriticalMessage() : Message(MessageType::EVMBatteryLevelCritical)
         {}
     };
+
+    class BatteryBrownoutMessage : public Message
+    {
+      public:
+        BatteryBrownoutMessage() : Message(MessageType::EVMBatteryBrownout)
+        {}
+    };
+
 } // namespace sevm

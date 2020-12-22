@@ -256,7 +256,12 @@ namespace sys
         });
 
         connect(sevm::BatteryLevelCriticalMessage(), [&](Message *) {
-            LOG_INFO("Battery Critical Level reached!");
+            LOG_INFO("Battery Critical SOC Level reached!");
+            return MessageNone{};
+        });
+
+        connect(sevm::BatteryBrownoutMessage(), [&](Message *) {
+            LOG_INFO("Battery Brownout voltage level reached!");
             return MessageNone{};
         });
 
