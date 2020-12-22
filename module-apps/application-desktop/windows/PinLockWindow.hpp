@@ -9,8 +9,8 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
 #include "application-desktop/widgets/PinLock.hpp"
-#include "PinLockBox.hpp"
-#include "PinLockBaseWindow.hpp"
+#include "widgets/PinLockBox.hpp"
+#include "widgets/PinLockBaseWindow.hpp"
 namespace gui
 {
     class PinLockWindow : public PinLockBaseWindow

@@ -3,7 +3,7 @@
 
 #include "SimLockBox.hpp"
 
-#include "PinLockBaseWindow.hpp"
+#include "widgets/PinLockBaseWindow.hpp"
 #include "application-desktop/widgets/PinLock.hpp"
 #include "application-desktop/data/AppDesktopStyle.hpp"
 #include <Style.hpp>

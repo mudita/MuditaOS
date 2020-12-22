@@ -11,7 +11,7 @@
 
 #include "application-desktop/ApplicationDesktop.hpp"
 #include "application-desktop/data/LockPhoneData.hpp"
-#include "ScreenLockBox.hpp"
+#include "application-desktop/widgets/ScreenLockBoxDesktop.hpp"
 #include "SimLockBox.hpp"
 #include "PukLockBox.hpp"
 #include <application-phonebook/ApplicationPhonebook.hpp>
@@ -158,7 +158,7 @@ namespace gui
     {
         auto lockType = lock->getLockType();
         if (lockType == PinLock::LockType::Screen) {
-            LockBox = std::make_unique<ScreenLockBox>(this);
+            LockBox = std::make_unique<ScreenLockBoxDesktop>(this);
         }
         else if (lockType == PinLock::LockType::SimPuk) {
             LockBox = std::make_unique<PukLockBox>(this);

@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-desktop/windows/ScreenLockBox.hpp"
+#include "application-settings-new/widgets/ScreenLockBoxSettings.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "ChangePasscodeWindow.hpp"
 #include "application-desktop/widgets/PinHash.hpp"
@@ -35,7 +35,7 @@ namespace gui
         topBar->setActive(TopBar::Elements::BATTERY, false);
         topBar->setActive(TopBar::Elements::TIME, true);
 
-        lockBox = std::make_unique<ScreenLockBox>(this);
+        lockBox = std::make_unique<ScreenLockBoxSettings>(this);
         lockBox->buildLockBox(4U);
 
         lockImage->setVisible(false);

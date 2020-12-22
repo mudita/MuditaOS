@@ -57,9 +57,9 @@ namespace gui
         gui::Text *title         = nullptr;
         gui::Text *primaryText   = nullptr;
         gui::Text *secondaryText = nullptr;
-        gui::Image *lockImage = nullptr;
-        gui::Image *infoImage = nullptr;
-        gui::HBox *pinLabelsBox = nullptr;
+        gui::Image *lockImage    = nullptr;
+        gui::Image *infoImage    = nullptr;
+        gui::HBox *pinLabelsBox  = nullptr;
 
         std::unique_ptr<PinLock> lock = nullptr;
 

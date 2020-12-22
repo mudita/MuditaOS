@@ -30,7 +30,7 @@ namespace gui
 
         virtual void setVisibleStateEnterPin(EnterPasscodeType type)                       = 0;
         virtual void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) = 0;
-        virtual void setVisibleStateBlocked()     = 0;
+        virtual void setVisibleStateBlocked()                                              = 0;
 
         virtual void buildLockBox(unsigned int pinSize) = 0;
         virtual ~PinLockBox()                           = default;

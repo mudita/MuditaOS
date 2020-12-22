@@ -5,8 +5,8 @@
 
 #include "AppWindow.hpp"
 #include "application-desktop/widgets/PinLock.hpp"
-#include "application-desktop/windows/PinLockBaseWindow.hpp"
-#include "application-desktop/windows/PinLockBox.hpp"
+#include "widgets/PinLockBaseWindow.hpp"
+#include "widgets/PinLockBox.hpp"
 #include "application-desktop/widgets/PinLockHandler.hpp"
 
 namespace gui

@@ -30,6 +30,8 @@ set( SOURCES
     "widgets/BrightnessBox.cpp"
     "widgets/ModesBox.cpp"
     "widgets/BarGraph.cpp"
+    "widgets/ScreenLockBox.cpp"
+    "widgets/PinLockBaseWindow.cpp"
      )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
