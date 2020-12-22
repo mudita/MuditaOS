@@ -44,6 +44,6 @@ namespace purefs::blkdev::internal
         const std::weak_ptr<blkdev::disk> m_disk;
         const short m_partition{-1};
         mutable sector_t m_sectors{0};
-        const std::string_view m_name;
+        const std::string m_name;
     };
 } // namespace purefs::blkdev::internal

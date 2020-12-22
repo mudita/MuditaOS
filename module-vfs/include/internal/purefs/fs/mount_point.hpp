@@ -4,6 +4,7 @@
 #pragma once
 #include <memory>
 #include <string>
+#include <iostream>
 
 namespace purefs::blkdev::internal
 {
@@ -63,7 +64,7 @@ namespace purefs::fs::internal
 
       private:
         const std::weak_ptr<blkdev::internal::disk_handle> m_diskh;
-        const std::string_view m_path;                   //! Mounted path
+        const std::string m_path;                        //! Mounted path
         const std::weak_ptr<filesystem_operations> m_fs; //! Filesystem operation
         const unsigned m_flags;
     };

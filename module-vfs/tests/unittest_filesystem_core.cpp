@@ -7,6 +7,8 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_image.hpp>
 #include <purefs/fs/drivers/filesystem_vfat.hpp>
+#include <purefs/vfs_subsystem.hpp>
+#include <purefs/fs/thread_local_cwd.hpp>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -268,4 +270,14 @@ TEST_CASE("Corefs: Directory operations")
         REQUIRE(fscore.dirclose(dirhandle) == 0);
         REQUIRE(fscore.umount("/sys") == 0);
     }
+}
+
+TEST_CASE("Unititest integrated subsystem")
+{
+    auto [disk, vfs] = purefs::subsystem::initialize();
+    REQUIRE(purefs::subsystem::mount_defaults() == 0);
+    REQUIRE(purefs::fs::internal::get_thread_local_cwd_path() == "/sys/current");
+    const auto err = vfs->umount("/sys/user");
+    REQUIRE((err == 0 || err == -2));
+    REQUIRE(vfs->umount("/sys") == 0);
 }
