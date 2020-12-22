@@ -5,6 +5,8 @@ monitor halt
 monitor memU32 0x401BC000 = 128;
 load
 eval "monitor exec SetRTTAddr %p", &_SEGGER_RTT
+info threads
+thread 2
 b main
 b HardFault_Handler
 b MemManage_Handler
