@@ -87,8 +87,6 @@
 * Add vertical text scrolling.
 * Add text cursor starting position handling.
 * Add logs dumping to a file on the RT1051 platform.
-* `[calendar]` Added calendar events endpoints handling.
-* `[calendar]` Added parser ics.
 
 ### Changed
 
