@@ -6,4 +6,4 @@
 namespace service::name
 {
     constexpr inline auto gui = "ServiceGUI";
-}
+} // namespace service::name

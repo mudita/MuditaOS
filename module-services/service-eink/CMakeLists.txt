@@ -14,8 +14,9 @@ message( "EINK BOARD PATH: ${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}" )
 
 set(SOURCES
     ServiceEink.cpp
-    EinkScreen.cpp
+    EinkDisplay.cpp
     messages/ImageMessage.cpp
+    messages/PrepareDisplayRequest.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
