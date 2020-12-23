@@ -541,7 +541,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     smsDB           = std::make_unique<SmsDB>((purefs::dir::getUserDiskPath() / "sms.db").c_str());
     alarmsDB        = std::make_unique<AlarmsDB>((purefs::dir::getUserDiskPath() / "alarms.db").c_str());
     notesDB         = std::make_unique<NotesDB>((purefs::dir::getUserDiskPath() / "notes.db").c_str());
-    calllogDB       = std::make_unique<CalllogDB>((purefs::dir::getUserDiskPath() / "callog.db").c_str());
+    calllogDB       = std::make_unique<CalllogDB>((purefs::dir::getUserDiskPath() / "calllog.db").c_str());
     countryCodesDB  = std::make_unique<CountryCodesDB>("country-codes.db");
     notificationsDB = std::make_unique<NotificationsDB>((purefs::dir::getUserDiskPath() / "notifications.db").c_str());
     eventsDB        = std::make_unique<EventsDB>((purefs::dir::getUserDiskPath() / "events.db").c_str());

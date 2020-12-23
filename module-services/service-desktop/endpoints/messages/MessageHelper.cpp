@@ -198,6 +198,11 @@ auto MessageHelper::requestSMS(Context &context) -> sys::ReturnCodes
     else if (context.getBody()[json::messages::messageBody].string_value().empty() == false) {
         auto query =
             std::make_unique<db::query::SMSGetByText>(context.getBody()[json::messages::messageBody].string_value());
+        if (const auto filterByNumber = !context.getBody()[json::messages::phoneNumber].string_value().empty();
+            filterByNumber) {
+            utils::PhoneNumber number{context.getBody()[json::messages::phoneNumber].string_value()};
+            query->filterByPhoneNumber(number.getView());
+        }
 
         auto listener = std::make_unique<db::EndpointListener>(
             [=](db::QueryResult *result, Context context) {
