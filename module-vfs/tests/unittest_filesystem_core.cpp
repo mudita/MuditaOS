@@ -277,7 +277,6 @@ TEST_CASE("Unititest integrated subsystem")
     auto [disk, vfs] = purefs::subsystem::initialize();
     REQUIRE(purefs::subsystem::mount_defaults() == 0);
     REQUIRE(purefs::fs::internal::get_thread_local_cwd_path() == "/sys/current");
-    const auto err = vfs->umount("/sys/user");
-    REQUIRE((err == 0 || err == -2));
-    REQUIRE(vfs->umount("/sys") == 0);
+    REQUIRE(vfs->getcwd() == "/sys/current");
+    REQUIRE(purefs::subsystem::unmount_all() == 0);
 }
