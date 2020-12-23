@@ -14,6 +14,7 @@ message( "EINK BOARD PATH: ${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}" )
 
 set(SOURCES
     ServiceEink.cpp
+    EinkScreen.cpp
     messages/ImageMessage.cpp
 )
 
