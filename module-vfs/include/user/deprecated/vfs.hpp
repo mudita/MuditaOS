@@ -122,9 +122,6 @@ class vfs
     [[deprecated]] int deltree(const char *path);
     [[deprecated]] int mkdir(const char *dir);
     [[deprecated]] int rename(const char *oldname, const char *newname);
-    [[deprecated]] std::string loadFileAsString(const fs::path &fileToLoad);
-    [[deprecated]] bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite);
-    [[deprecated]] void updateTimestamp();
     [[deprecated]] void registerNotificationHandler(vfsn::utility::vfsNotifier::NotifyHandler handler)
     {
         chnNotifier.registerNotificationHandler(handler);

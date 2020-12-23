@@ -2,6 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <algorithm>
+#include <cstdio>
+#include <filesystem>
+#include <purefs/filesystem_paths.hpp>
+#include <gsl/gsl_util>
+
 #include "BtKeysStorage.hpp"
 
 json11::Json Bt::KeyStorage::fileJson = json11::Json();
@@ -11,9 +16,41 @@ std::string Bt::KeyStorage::fileContent;
 
 namespace Bt
 {
+    namespace
+    {
+        std::string loadFilesAsString(const std::filesystem::path &fileToLoad)
+        {
+            using namespace std::string_literals;
+            static constexpr auto file_size_limit = 512LU * 1024LU;
+            std::error_code ec;
+            auto filesize = std::filesystem::file_size(fileToLoad, ec);
+            if (ec || filesize > file_size_limit) {
+                return ""s;
+            }
+            std::string contents(filesize, '\0');
+            auto fp = fopen(fileToLoad.c_str(), "r");
+            if (!fp) {
+                return ""s;
+            }
+            auto cleanup      = gsl::finally([fp] { fclose(fp); });
+            const auto nitems = std::fread(contents.data(), contents.size(), 1, fp);
+            return (nitems == 1) ? contents : ""s;
+        }
+
+        bool replaceWithString(const std::filesystem::path &fileToModify, const std::string &stringToWrite)
+        {
+            auto fp = std::fopen(fileToModify.c_str(), "w");
+            if (!fp)
+                return false;
+            auto cleanup       = gsl::finally([fp] { fclose(fp); });
+            size_t dataWritten = std::fwrite(stringToWrite.data(), stringToWrite.size(), 1, fp);
+            return dataWritten == 1;
+        }
+    } // namespace
+
     namespace strings
     {
-        inline std::string keysFilename = USER_PATH("btkeys.json");
+        inline std::string keysFilename = purefs::dir::getUserDiskPath() / "btkeys.json";
         inline std::string keys         = "keys";
         inline std::string link_key     = "link_key";
         inline std::string bd_addr      = "bd_addr";
@@ -39,7 +76,7 @@ namespace Bt
     {
         LOG_INFO("opening storage from API");
         fileContent.clear();
-        fileContent = vfs.loadFileAsString(strings::keysFilename);
+        fileContent = loadFilesAsString(strings::keysFilename);
         if (fileContent.empty()) {
             LOG_WARN("opening empty key file!");
             return;
@@ -131,7 +168,7 @@ namespace Bt
     {
         json11::Json finalJson = json11::Json::object{{strings::keys, keys}};
         fileContent            = finalJson.dump();
-        vfs.replaceWithString(strings::keysFilename, fileContent);
+        replaceWithString(strings::keysFilename, fileContent);
     }
 
 } // namespace Bt
