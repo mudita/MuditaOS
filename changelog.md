@@ -11,6 +11,7 @@
 * Add Bluetooth virtual audio device.
 * Add custom repeat window for the alarm application
 * `[PowerManagement]` Add CPU frequency shift mechanism.
+* `[tests]` Extended the automated tests with new test cases: making a call, answering a call.
 
 ### Fixed
 

@@ -77,6 +77,11 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
     SmsDB *smsDB                        = nullptr;
     ContactsDB *contactsDB              = nullptr;
 
+    std::vector<SMSRecord> getByText(const std::string &text,
+                                     const std::optional<utils::PhoneNumber::View> &phoneNumberFilter);
+    std::vector<SMSRecord> getByTextAndPhoneNumber(const std::string &text,
+                                                   const utils::PhoneNumber::View &phoneNumber);
+
     static void UpdateThreadSummary(ThreadRecord &threadToUpdate, const SMSRecord &rec);
     std::unique_ptr<db::query::SMSSearchByTypeResult> runQueryImpl(const db::query::SMSSearchByType *query);
     std::unique_ptr<db::QueryResult> getByIDQuery(const std::shared_ptr<db::Query> &query);
