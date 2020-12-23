@@ -16,7 +16,7 @@ namespace db::query::alarms
     SelectTurnedOnResult::SelectTurnedOnResult(std::vector<AlarmsRecord> records) : records(std::move(records))
     {}
 
-    auto SelectTurnedOnResult::getResult() -> std::vector<AlarmsRecord>
+    auto SelectTurnedOnResult::getResult() -> const std::vector<AlarmsRecord>
     {
         return records;
     }

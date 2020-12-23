@@ -39,7 +39,7 @@ struct AlarmsRecord : public Record
 
     AlarmsRecord() = default;
     ~AlarmsRecord() = default;
-    AlarmsRecord(const AlarmsTableRow &tableRow);
+    explicit AlarmsRecord(const AlarmsTableRow &tableRow);
 };
 
 enum class AlarmsRecordField
@@ -70,7 +70,7 @@ class AlarmsRecordInterface : public RecordInterface<AlarmsRecord, AlarmsRecordF
                                                                      uint32_t limit,
                                                                      AlarmsRecordField field,
                                                                      const char *str) override final;
-    std::unique_ptr<std::vector<AlarmsRecord>> SelectTurnedOn();
+    std::vector<AlarmsRecord> SelectTurnedOn();
 
     std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 

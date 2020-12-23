@@ -244,18 +244,14 @@ namespace app
         auto records = msg->getResult();
 
         bool rebuildMainWindow = false;
-        uint32_t counter       = 0;
-        for (const auto &record : records) {
-            if (record.status > AlarmStatus::On) {
-                counter++;
-            }
-        }
+        uint32_t counter       = std::count_if(
+            records.begin(), records.end(), [](const AlarmsRecord &rec) { return rec.status > AlarmStatus::On; });
         rebuildMainWindow |= counter != notifications.notSeen.SnoozedAlarms;
         notifications.notSeen.SnoozedAlarms = counter;
 
-        auto ptr = getCurrentWindow();
-        if (rebuildMainWindow && ptr->getName() == app::window::name::desktop_main_window) {
-            ptr->rebuild();
+        auto currentWindow = getCurrentWindow();
+        if (rebuildMainWindow && currentWindow->getName() == app::window::name::desktop_main_window) {
+            currentWindow->rebuild();
         }
 
         return true;

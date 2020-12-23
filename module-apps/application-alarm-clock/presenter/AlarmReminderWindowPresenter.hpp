@@ -39,6 +39,8 @@ namespace app::alarmClock
         void update(AlarmsRecord &alarm, UserAction action, uint32_t delay) override;
 
       private:
+        void snoozeHandle(AlarmsRecord &alarm, uint32_t delay);
+        void endAlarm(AlarmsRecord &alarm);
         std::unique_ptr<AbstractAlarmsRepository> alarmsRepository;
     };
 } // namespace app::alarmClock

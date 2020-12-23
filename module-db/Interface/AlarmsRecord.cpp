@@ -120,14 +120,14 @@ bool AlarmsRecordInterface::TurnOffAll()
     return alarmsDB->alarms.updateStatuses(AlarmStatus::Off);
 }
 
-std::unique_ptr<std::vector<AlarmsRecord>> AlarmsRecordInterface::SelectTurnedOn()
+std::vector<AlarmsRecord> AlarmsRecordInterface::SelectTurnedOn()
 {
     auto rows = alarmsDB->alarms.SelectTurnedOn();
 
-    auto records = std::make_unique<std::vector<AlarmsRecord>>();
+    auto records = std::vector<AlarmsRecord>();
 
     for (const auto &r : rows) {
-        records->push_back(r);
+        records.push_back(AlarmsRecord(r));
     }
 
     return records;
@@ -224,12 +224,7 @@ std::unique_ptr<db::query::alarms::TurnOffAllResult> AlarmsRecordInterface::runQ
 std::unique_ptr<db::query::alarms::SelectTurnedOnResult> AlarmsRecordInterface::runQueryImplSelectTurnedOn(
     std::shared_ptr<db::Query> query)
 {
-    auto records = SelectTurnedOn();
-    std::vector<AlarmsRecord> recordVector;
-    for (const auto &alarm : *records) {
-        recordVector.emplace_back(alarm);
-    }
-    auto response = std::make_unique<db::query::alarms::SelectTurnedOnResult>(recordVector);
+    auto response = std::make_unique<db::query::alarms::SelectTurnedOnResult>(SelectTurnedOn());
     response->setRequestQuery(query);
     return response;
 }

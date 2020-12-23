@@ -46,100 +46,13 @@ namespace stm
             return 0;
         }
 
-        auto actualTimePoint = TimePointNow();
-        auto weekDay         = WeekdayIndexFromTimePoint(actualTimePoint);
-        std::vector<AlarmsRecord> nearestAlarms;
-        for (uint32_t i = 0; i < date::Sunday.iso_encoding() + 1; i++) {
-            for (auto &record : records) {
-                auto hoursAndMinutes = TimePointToHourMinSec(record.time);
-                record.time = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + date::days{i} +
-                              hoursAndMinutes.hours() + hoursAndMinutes.minutes();
-                auto buffer = record.time +
-                              (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze) +
-                              std::chrono::minutes(record.delay);
-                if (buffer < TimePointNow()) {
-                    continue;
-                }
-                if (record.repeat == static_cast<uint32_t>(AlarmRepeat::never) ||
-                    record.repeat == static_cast<uint32_t>(AlarmRepeat::everyday) ||
-                    (weekDay < date::Saturday.iso_encoding() - 1 &&
-                     record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays))) {
-                    nearestAlarms.push_back(record);
-                }
-                else if (weekDay == date::Saturday.iso_encoding() - 1 &&
-                         record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays) &&
-                         record.status > AlarmStatus::On) {
-                    if (isAlarmGoingToJumpToNextDay(record)) {
-                        nearestAlarms.push_back(record);
-                    }
-                }
-                else if (record.repeat > static_cast<uint32_t>(AlarmRepeat::weekDays)) {
-                    OptionParser parser;
-                    auto weekDayData = parser.setWeekDayOptions(record.repeat, std::make_unique<WeekDaysRepeatData>());
-                    if (weekDayData->getData(weekDay)) {
-                        nearestAlarms.push_back(record);
-                    }
-                    uint32_t dayBefore = weekDay - 1;
-                    if (dayBefore > date::Sunday.iso_encoding() - 1) {
-                        dayBefore = date::Sunday.iso_encoding() - 1;
-                    }
-                    if (weekDayData->getData(dayBefore)) {
-                        if (isAlarmGoingToJumpToNextDay(record)) {
-                            nearestAlarms.push_back(record);
-                        }
-                    }
-                }
-            }
-            // search in another day if there is not alarm for today
-            if (nearestAlarms.empty()) {
-                weekDay++;
-                if (weekDay > date::Sunday.iso_encoding() - 1) {
-                    weekDay = 0;
-                }
-            }
-            else {
-                break;
-            }
-        }
+        auto nearestAlarms = getPossibleNearestAlarms(records);
         if (nearestAlarms.empty()) {
             return 0;
         }
 
-        // Apply snooze and delay
-        for (auto &alarm : nearestAlarms) {
-            if (alarm.status > AlarmStatus::On) {
-                // if alarm time after applying snoozes is going to jump to the next day
-                // it means that this is alarm from yesterday and to properly handle it
-                // you have to subtract one day so it will rang today not tomorrow
-                if (isAlarmGoingToJumpToNextDay(alarm)) {
-                    alarm.time -= date::days{1};
-                }
-                alarm.time = alarm.time +
-                             (static_cast<uint32_t>(alarm.status) - 1) * std::chrono::minutes(alarm.snooze) +
-                             std::chrono::minutes(alarm.delay);
-                if (alarm.time < TimePointNow()) {
-                    alarm.time += date::days{1};
-                }
-            }
-            // if alarm status is not Off and alarm time is smaller than actual time
-            // it means that this alarm should ring the next day
-            else if (alarm.time < TimePointNow()) {
-                alarm.time += date::days{1};
-            }
-        }
-
-        std::sort(nearestAlarms.begin(),
-                  nearestAlarms.end(),
-                  [](const AlarmsRecord &first, const AlarmsRecord &second) { return first.time < second.time; });
-
-        auto alarmTime = nearestAlarms.at(0).time;
-        nearestAlarms.erase(std::remove_if(nearestAlarms.begin(),
-                                           nearestAlarms.end(),
-                                           [alarmTime](const AlarmsRecord &rec) { return alarmTime != rec.time; }),
-                            nearestAlarms.end());
-        if (nearestAlarms.size() > 1) {
-            LOG_DEBUG("Multiple alarms at the same time");
-        }
+        applySnoozeAndDelay(nearestAlarms);
+        sortNearestAlarms(nearestAlarms);
 
         auto duration = nearestAlarms.at(0).time - TimePointNow();
         if (duration.count() <= 0) {
@@ -149,14 +62,9 @@ namespace stm
         else {
             isInvalid = false;
         }
-        // restore original alarm time if snooze was applied
-        for (auto &alarm : nearestAlarms) {
-            if (alarm.status > AlarmStatus::On) {
-                alarm.time = alarm.time -
-                             (static_cast<uint32_t>(alarm.status) - 1) * std::chrono::minutes(alarm.snooze) -
-                             std::chrono::minutes(alarm.delay);
-            }
-        }
+
+        restoreOriginalAlarmTime(nearestAlarms);
+
         alarmRecords = nearestAlarms;
         return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     }
@@ -181,5 +89,126 @@ namespace stm
         record.time = record.time + (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze) +
                       std::chrono::minutes(record.delay);
         return buffer.day() != TimePointToYearMonthDay(record.time).day();
+    }
+
+    std::vector<AlarmsRecord> AlarmsTimeEvents::getPossibleNearestAlarms(std::vector<AlarmsRecord> &allRecords)
+    {
+        auto weekDay = WeekdayIndexFromTimePoint(TimePointNow());
+        std::vector<AlarmsRecord> nearestAlarms;
+        for (uint32_t i = 0; i < date::Sunday.iso_encoding() + 1; i++) {
+            for (auto &record : allRecords) {
+                auto hoursAndMinutes = TimePointToHourMinSec(record.time);
+                record.time = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + date::days{i} +
+                              hoursAndMinutes.hours() + hoursAndMinutes.minutes();
+                auto buffer = record.time +
+                              (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze) +
+                              std::chrono::minutes(record.delay);
+                if (buffer < TimePointNow()) {
+                    continue;
+                }
+                if (record.repeat == static_cast<uint32_t>(AlarmRepeat::never) ||
+                    record.repeat == static_cast<uint32_t>(AlarmRepeat::everyday) ||
+                    (weekDay < date::Saturday.iso_encoding() - 1 &&
+                     record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays))) {
+                    nearestAlarms.push_back(record);
+                }
+                else if (weekDay == date::Saturday.iso_encoding() - 1 &&
+                         record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays) &&
+                         record.status > AlarmStatus::On) {
+                    if (isAlarmGoingToJumpToNextDay(record)) {
+                        nearestAlarms.push_back(record);
+                    }
+                }
+                else if (record.repeat > static_cast<uint32_t>(AlarmRepeat::weekDays)) {
+                    if (const auto &alarms = customRepeatHandle(record, weekDay); !alarms.empty()) {
+                        nearestAlarms.insert(nearestAlarms.end(), alarms.begin(), alarms.end());
+                    }
+                }
+            }
+            // search in another day if there is not alarm for today
+            if (nearestAlarms.empty()) {
+                weekDay++;
+                if (weekDay > date::Sunday.iso_encoding() - 1) {
+                    weekDay = 0;
+                }
+            }
+            else {
+                break;
+            }
+        }
+        return nearestAlarms;
+    }
+
+    std::vector<AlarmsRecord> AlarmsTimeEvents::customRepeatHandle(const AlarmsRecord &record, uint32_t weekDay)
+    {
+        OptionParser parser;
+        std::vector<AlarmsRecord> records;
+        auto weekDayData = parser.setWeekDayOptions(record.repeat, std::make_unique<WeekDaysRepeatData>());
+        if (weekDayData->getData(weekDay)) {
+            records.push_back(record);
+        }
+        uint32_t dayBefore = weekDay - 1;
+        if (dayBefore > date::Sunday.iso_encoding() - 1) {
+            dayBefore = date::Sunday.iso_encoding() - 1;
+        }
+        if (weekDayData->getData(dayBefore)) {
+            if (isAlarmGoingToJumpToNextDay(record)) {
+                records.push_back(record);
+            }
+        }
+        return records;
+    }
+
+    void AlarmsTimeEvents::applySnoozeAndDelay(std::vector<AlarmsRecord> &records)
+    {
+        for (auto &alarm : records) {
+            if (alarm.status > AlarmStatus::On) {
+                // if alarm time after applying snoozes is going to jump to the next day
+                // it means that this is alarm from yesterday and to properly handle it
+                // you have to subtract one day so it will rang today not tomorrow
+                if (isAlarmGoingToJumpToNextDay(alarm)) {
+                    alarm.time -= date::days{1};
+                }
+                alarm.time = alarm.time +
+                             (static_cast<uint32_t>(alarm.status) - 1) * std::chrono::minutes(alarm.snooze) +
+                             std::chrono::minutes(alarm.delay);
+                if (alarm.time < TimePointNow()) {
+                    alarm.time += date::days{1};
+                }
+            }
+            // if alarm status is not Off and alarm time is smaller than actual time
+            // it means that this alarm should ring the next day
+            else if (alarm.time < TimePointNow()) {
+                alarm.time += date::days{1};
+            }
+        }
+    }
+
+    void AlarmsTimeEvents::sortNearestAlarms(std::vector<AlarmsRecord> &nearestAlarms)
+    {
+        std::sort(nearestAlarms.begin(),
+                  nearestAlarms.end(),
+                  [](const AlarmsRecord &first, const AlarmsRecord &second) { return first.time < second.time; });
+
+        auto alarmTime = nearestAlarms.at(0).time;
+        nearestAlarms.erase(std::remove_if(nearestAlarms.begin(),
+                                           nearestAlarms.end(),
+                                           [alarmTime](const AlarmsRecord &rec) { return alarmTime != rec.time; }),
+                            nearestAlarms.end());
+        if (nearestAlarms.size() > 1) {
+            LOG_DEBUG("Multiple alarms at the same time");
+        }
+    }
+
+    void AlarmsTimeEvents::restoreOriginalAlarmTime(std::vector<AlarmsRecord> &nearestAlarms)
+    {
+        // restore original alarm time if snooze was applied
+        for (auto &alarm : nearestAlarms) {
+            if (alarm.status > AlarmStatus::On) {
+                alarm.time = alarm.time -
+                             (static_cast<uint32_t>(alarm.status) - 1) * std::chrono::minutes(alarm.snooze) -
+                             std::chrono::minutes(alarm.delay);
+            }
+        }
     }
 } // namespace stm

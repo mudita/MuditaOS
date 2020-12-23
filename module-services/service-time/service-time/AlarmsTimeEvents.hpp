@@ -39,9 +39,13 @@ namespace stm
         bool sendEventFiredQuery() override;
         void invokeEvent() override;
         bool isAlarmGoingToJumpToNextDay(AlarmsRecord record);
+        std::vector<AlarmsRecord> customRepeatHandle(const AlarmsRecord &record, uint32_t weekDay);
+        void applySnoozeAndDelay(std::vector<AlarmsRecord> &records);
+        void sortNearestAlarms(std::vector<AlarmsRecord> &nearestAlarms);
+        void restoreOriginalAlarmTime(std::vector<AlarmsRecord> &nearestAlarms);
+        std::vector<AlarmsRecord> getPossibleNearestAlarms(std::vector<AlarmsRecord> &allRecords);
 
       public:
-        AlarmsTimeEvents() = delete;
         explicit AlarmsTimeEvents(sys::Service *service);
         ~AlarmsTimeEvents() = default;
     };

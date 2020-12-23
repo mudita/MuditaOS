@@ -40,7 +40,7 @@ namespace app::alarmClock
 
         void startTimers();
         void startMusicTimer();
-        void destroyTimers();
+        void stopTimers();
         void closeReminder();
         void closeReminderCallback();
         void loopMusic();

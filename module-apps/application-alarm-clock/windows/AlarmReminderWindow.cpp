@@ -16,20 +16,21 @@ namespace app::alarmClock
 
     AlarmReminderWindow::AlarmReminderWindow(app::Application *app,
                                              std::unique_ptr<AlarmReminderWindowContract::Presenter> &&windowPresenter)
-        : AppWindow(app, style::alarmClock::window::name::alarmReminder), presenter{std::move(windowPresenter)}
+        : AppWindow(app, style::alarmClock::window::name::alarmReminder),
+          reminderTimer{std::make_unique<sys::Timer>(
+              "AlarmClockReminderTimer", app, reminderLifeDuration, sys::Timer::Type::SingleShot)},
+          musicTimer{
+              std::make_unique<sys::Timer>("AlarmClockMusicTimer", app, defaultDuration, sys::Timer::Type::Periodic)},
+          delayTimer{std::make_unique<sys::Timer>("AlarmDelayTimer", app, defaultDuration, sys::Timer::Type::Periodic)},
+          presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();
-
-        reminderTimer = std::make_unique<sys::Timer>(
-            "AlarmClockReminderTimer", app, reminderLifeDuration, sys::Timer::Type::SingleShot);
-        musicTimer =
-            std::make_unique<sys::Timer>("AlarmClockMusicTimer", app, defaultDuration, sys::Timer::Type::Periodic);
-        delayTimer = std::make_unique<sys::Timer>("AlarmDelayTimer", app, defaultDuration, sys::Timer::Type::Periodic);
     }
 
     AlarmReminderWindow::~AlarmReminderWindow()
     {
+        stopTimers();
         destroyInterface();
     }
 
@@ -105,7 +106,6 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::destroyInterface()
     {
-        destroyTimers();
         erase();
     }
 
@@ -124,7 +124,7 @@ namespace app::alarmClock
         musicTimer->reload();
     }
 
-    void AlarmReminderWindow::destroyTimers()
+    void AlarmReminderWindow::stopTimers()
     {
         reminderTimer->stop();
         delayTimer->stop();
@@ -137,19 +137,20 @@ namespace app::alarmClock
             return false;
         }
 
-        auto *item = dynamic_cast<AlarmRecordsData *>(data);
+        auto item = dynamic_cast<AlarmRecordsData *>(data);
         if (item == nullptr) {
             return false;
         }
         alarmRecords = item->getRecords();
         if (!previousAlarmRecords.empty()) {
-            if (previousAlarmRecords.at(0).ID == alarmRecords.at(0).ID) {
+            if (previousAlarmRecords.front().ID == alarmRecords.front().ID) {
                 LOG_DEBUG("Duplicated data received, return");
                 return false;
             }
             LOG_DEBUG("New alarm covered the old one, automatic snooze applying");
             for (auto &alarm : previousAlarmRecords) {
-                uint32_t minutes = std::round(previousElapsedSeconds / utils::time::secondsInMinute);
+                uint32_t minutes =
+                    std::lround(static_cast<float>(previousElapsedSeconds) / utils::time::secondsInMinute);
                 presenter->update(alarm, UserAction::Snooze, minutes);
             }
             previousElapsedSeconds = 0;
@@ -162,7 +163,7 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::displayAlarm()
     {
-        auto rec           = alarmRecords.at(0);
+        auto rec           = alarmRecords.front();
         auto timeToDisplay = rec.time + std::chrono::minutes(rec.delay);
         if (rec.status > AlarmStatus::On) {
             timeToDisplay += (static_cast<uint32_t>(rec.status) - 1) * std::chrono::minutes(rec.snooze);
@@ -187,15 +188,15 @@ namespace app::alarmClock
             return false;
         }
 
-        if (inputEvent.is(gui::KeyCode::KEY_ENTER) && alarmRecords.at(0).status != AlarmStatus::FifthSnooze) {
-            uint32_t minutes = std::round(elapsedSeconds / utils::time::secondsInMinute);
-            presenter->update(alarmRecords.at(0), UserAction::Snooze, minutes);
+        if (inputEvent.is(gui::KeyCode::KEY_ENTER) && alarmRecords.front().status != AlarmStatus::FifthSnooze) {
+            uint32_t minutes = std::lround(static_cast<float>(elapsedSeconds) / utils::time::secondsInMinute);
+            presenter->update(alarmRecords.front(), UserAction::Snooze, minutes);
             closeReminder();
             return true;
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_RF)) {
-            presenter->update(alarmRecords.at(0), UserAction::TurnOff, 0);
+            presenter->update(alarmRecords.front(), UserAction::TurnOff, 0);
             closeReminder();
             return true;
         }
@@ -210,14 +211,14 @@ namespace app::alarmClock
         }
         if (alarmRecords.empty()) {
             LOG_DEBUG("Switch to alarm main window");
-            destroyTimers();
+            stopTimers();
             AudioServiceAPI::StopAll(application);
             // app::manager::Controller::sendAction(application, app::manager::actions::Home);
             application->switchWindow(gui::name::window::main_window);
         }
         else {
             LOG_DEBUG("Next alarm at the same time handle");
-            destroyTimers();
+            stopTimers();
             startTimers();
             displayAlarm();
         }

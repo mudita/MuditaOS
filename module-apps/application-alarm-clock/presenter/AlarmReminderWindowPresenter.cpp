@@ -14,45 +14,49 @@ namespace app::alarmClock
     void AlarmReminderWindowPresenter::update(AlarmsRecord &alarm, UserAction action, uint32_t delay)
     {
         if (action == UserAction::Snooze) {
-            alarm.delay += delay;
-            switch (alarm.status) {
-            case AlarmStatus::Off:
-                break;
-            case AlarmStatus::On:
-                alarm.status = AlarmStatus::FirstSnooze;
-                break;
-            case AlarmStatus::FirstSnooze:
-                alarm.status = AlarmStatus::SecondSnooze;
-                break;
-            case AlarmStatus::SecondSnooze:
-                alarm.status = AlarmStatus::ThirdSnooze;
-                break;
-            case AlarmStatus::ThirdSnooze:
-                alarm.status = AlarmStatus::FourthSnooze;
-                break;
-            case AlarmStatus::FourthSnooze:
-                alarm.status = AlarmStatus::FifthSnooze;
-                break;
-            case AlarmStatus::FifthSnooze:
-                alarm.delay = 0;
-                if (alarm.repeat == static_cast<uint32_t>(AlarmRepeat::never)) {
-                    alarm.status = AlarmStatus::Off;
-                }
-                else {
-                    alarm.status = AlarmStatus::On;
-                }
-                break;
-            }
+            snoozeHandle(alarm, delay);
         }
         else {
-            if (alarm.repeat == static_cast<uint32_t>(AlarmRepeat::never)) {
-                alarm.status = AlarmStatus::Off;
-            }
-            else {
-                alarm.status = AlarmStatus::On;
-            }
-            alarm.delay = 0;
+            endAlarm(alarm);
         }
         alarmsRepository->update(alarm, nullptr);
+    }
+
+    void AlarmReminderWindowPresenter::snoozeHandle(AlarmsRecord &alarm, uint32_t delay)
+    {
+        alarm.delay += delay;
+        switch (alarm.status) {
+        case AlarmStatus::Off:
+            break;
+        case AlarmStatus::On:
+            alarm.status = AlarmStatus::FirstSnooze;
+            break;
+        case AlarmStatus::FirstSnooze:
+            alarm.status = AlarmStatus::SecondSnooze;
+            break;
+        case AlarmStatus::SecondSnooze:
+            alarm.status = AlarmStatus::ThirdSnooze;
+            break;
+        case AlarmStatus::ThirdSnooze:
+            alarm.status = AlarmStatus::FourthSnooze;
+            break;
+        case AlarmStatus::FourthSnooze:
+            alarm.status = AlarmStatus::FifthSnooze;
+            break;
+        case AlarmStatus::FifthSnooze:
+            endAlarm(alarm);
+            break;
+        }
+    }
+
+    void AlarmReminderWindowPresenter::endAlarm(AlarmsRecord &alarm)
+    {
+        if (alarm.repeat == static_cast<uint32_t>(AlarmRepeat::never)) {
+            alarm.status = AlarmStatus::Off;
+        }
+        else {
+            alarm.status = AlarmStatus::On;
+        }
+        alarm.delay = 0;
     }
 } // namespace app::alarmClock

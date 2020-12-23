@@ -25,7 +25,7 @@ namespace db::query::alarms
 
       public:
         explicit SelectTurnedOnResult(std::vector<AlarmsRecord> records);
-        [[nodiscard]] auto getResult() -> std::vector<AlarmsRecord>;
+        [[nodiscard]] auto getResult() -> const std::vector<AlarmsRecord>;
 
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
