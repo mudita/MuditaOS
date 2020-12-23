@@ -65,7 +65,7 @@ namespace gui
     void ChangePasscodeWindow::invalidate() noexcept
     {
         PinLockBaseWindow::invalidate();
-        lockBox       = nullptr;
+        lockBox = nullptr;
     }
 
     void ChangePasscodeWindow::setVisibleState()
