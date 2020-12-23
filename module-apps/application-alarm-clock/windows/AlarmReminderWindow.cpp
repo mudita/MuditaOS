@@ -164,7 +164,6 @@ namespace app::alarmClock
     {
         auto rec           = alarmRecords.at(0);
         auto timeToDisplay = rec.time + std::chrono::minutes(rec.delay);
-        LOG_DEBUG("Displaying alarm, delay = %u", rec.delay);
         if (rec.status > AlarmStatus::On) {
             timeToDisplay += (static_cast<uint32_t>(rec.status) - 1) * std::chrono::minutes(rec.snooze);
         }

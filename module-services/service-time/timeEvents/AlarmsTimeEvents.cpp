@@ -158,8 +158,6 @@ namespace stm
             }
         }
         alarmRecords = nearestAlarms;
-        LOG_DEBUG("How many milliseconds to alarm: %u",
-                  static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()));
         return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     }
 
