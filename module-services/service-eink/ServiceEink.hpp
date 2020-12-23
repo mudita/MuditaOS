@@ -13,58 +13,54 @@
 #include <cstdint>
 #include <string>
 
-class ServiceEink : public sys::Service
+#include "EinkScreen.hpp"
+
+namespace eink
 {
-    gui::Size screen        = {480, 600};
-    gui::Point pointTopLeft = {0, 0};
-    std::unique_ptr<uint8_t[]> einkRenderBuffer;
+    class ServiceEink : public sys::Service
+    {
+      protected:
+        EinkScreen screen;
 
-  protected:
-    // counts timer triggers from last self refresh
-    uint32_t selfRefereshTriggerCount;
-    // counts timer events from last temperature measurement
-    uint32_t temperatureMeasurementTriggerCount;
-    // counts trigger counts from last action that required eink to be powered on
-    uint32_t powerOffTriggerCount;
+        // counts timer triggers from last self refresh
+        uint32_t selfRefereshTriggerCount;
+        // counts timer events from last temperature measurement
+        uint32_t temperatureMeasurementTriggerCount;
+        // counts trigger counts from last action that required eink to be powered on
+        uint32_t powerOffTriggerCount;
 
-    // number of timer triggers required to execute self refresh handler
-    const uint32_t selfRefereshTriggerValue = 60;
-    // number of timer triggers required to execute temperature measurement handler
-    const uint32_t temperatureMeasurementTriggerValue = 5 * 60;
-    // number of timer triggers from last action requiring power on eink to power down eink.
-    const uint32_t powerOffTriggerValue = 3;
+        // number of timer triggers required to execute self refresh handler
+        const uint32_t selfRefereshTriggerValue = 60;
+        // number of timer triggers required to execute temperature measurement handler
+        const uint32_t temperatureMeasurementTriggerValue = 5 * 60;
+        // number of timer triggers from last action requiring power on eink to power down eink.
+        const uint32_t powerOffTriggerValue = 3;
 
-    // structure with recently loaded waveformdata
-    EinkWaveFormSettings_t waveformSettings;
+        bool suspended = false;
 
-    EinkDisplayColorMode_e displayMode = EinkDisplayColorMode_e::EinkDisplayColorModeStandard;
+        bool suspendInProgress  = false;
+        bool shutdownInProgress = false;
+        bool deepRefresh        = false;
 
-    bool suspended = false;
+        sys::ms powerOffTime = 3000;
+        sys::Timer powerOffTimer;
 
-    bool suspendInProgress  = false;
-    bool shutdownInProgress = false;
+      public:
+        explicit ServiceEink(const std::string &name, std::string parent = {});
 
-    bool changeWaveform(EinkWaveforms_e Mode, const int32_t temperature);
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::ReturnCodes InitHandler() override;
+        sys::ReturnCodes DeinitHandler() override;
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
-    bool deepClearScreen(int8_t temperature);
+      private:
+        void enterActiveMode();
+        void suspend();
 
-    bool deepRefresh         = false;
-
-    sys::ms powerOffTime = 3000;
-    sys::Timer powerOffTimer;
-
-  public:
-    ServiceEink(const std::string &name, std::string parent = "");
-    ~ServiceEink() override;
-
-    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
-    sys::ReturnCodes InitHandler() override;
-    sys::ReturnCodes DeinitHandler() override;
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
-
-  private:
-    sys::MessagePointer handleEinkDMATransfer(sys::Message *message);
-    sys::MessagePointer handleImageMessage(sys::Message *message);
-    sys::MessagePointer handleStateRequest(sys::Message *messge);
-    sys::MessagePointer handleTemperatureUpdate(sys::Message *);
-};
+        sys::MessagePointer handleEinkModeChangedMessage(sys::Message *message);
+        sys::MessagePointer handleEinkDMATransfer(sys::Message *message);
+        sys::MessagePointer handleImageMessage(sys::Message *message);
+        sys::MessagePointer handleStateRequest(sys::Message *messge);
+        sys::MessagePointer handleTemperatureUpdate(sys::Message *);
+    };
+} // namespace eink
