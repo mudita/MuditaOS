@@ -1,27 +1,32 @@
 # MuditaOS changelog
 
-## Current release
+## [0.52.1 2020-12-23]
 
 ### Added
 
-* Add GUI visitor and DOM documentation.
-* `[PowerManagement]` Critial battery level notification to SystemManager.
-* `[Bluetooth]`  Add settings storage to bluetooth related items
-* `[cellular]`  Add GUI for Custom MMI messages- call forwarding.
-* Add Bluetooth virtual audio device.
-* Add custom repeat window for the alarm application
-* `[PowerManagement]` Add CPU frequency shift mechanism.
-* `[tests]` Extended the automated tests with new test cases: making a call, answering a call.
+* Add battery critical level check.
+* Add Bluetooth settings storing.
+* Add custom repeat window for the alarm application.
+* Add GUI for custom MMI messages.
+* Add CPU frequency shift mechanism to save power.
 
 ### Fixed
 
-* Fix auto unlock screen on idle
-* Fix missing texts for ApplicationDesktop windows
-* Fix no audio during call
+* Fix auto-unlocking screen on idle.
+* Fix missing texts in the desktop application.
+* Fix occasional cases of no audio during an incoming call.
 
 ### Changed
 
-* `[UserInterface]` Torch light control button press time recognition.
+* Torch light control button press time recognition.
+
+### Other
+
+* Several changes improving audio code stability.
+* Several fixes to unit and harness tests.
+* Changes related to VFS cleanup.
+* Updated GUI documentation regarding DOM.
+
 ## [0.51.1 2020-12-18]
 
 ### Added
