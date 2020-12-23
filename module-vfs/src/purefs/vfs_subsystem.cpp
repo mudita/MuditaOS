@@ -136,7 +136,8 @@ namespace purefs::subsystem
         }
         auto parts = disk->partitions(default_blkdev_name);
         if (parts.size() != old_layout_part_count && parts.size() != new_layout_part_count) {
-            LOG_FATAL("Unknown partition layout part size is %u", unsigned(parts.size()));
+            LOG_FATAL("Unknown partitions layout part size is %u", unsigned(parts.size()));
+            return -EIO;
         }
         auto boot_it = std::end(parts);
         auto lfs_it  = std::end(parts);
@@ -174,4 +175,25 @@ namespace purefs::subsystem
         fs::internal::set_default_thread_cwd(user_dir);
         return err;
     }
+
+    auto unmount_all() -> int
+    {
+        auto vfs = g_fs_core.lock();
+        if (!vfs) {
+            LOG_ERROR("Unable to lock vfs");
+            return -EIO;
+        }
+        std::list<std::string> mount_points;
+        int err = vfs->read_mountpoints(mount_points);
+        if (err) {
+            return err;
+        }
+        for (const auto &mpoint : mount_points) {
+            err = vfs->umount(mpoint);
+            if (err)
+                break;
+        }
+        return err;
+    }
+
 } // namespace purefs::subsystem
