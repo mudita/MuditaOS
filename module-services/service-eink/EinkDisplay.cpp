@@ -1,7 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "EinkScreen.hpp"
+#include "EinkDisplay.hpp"
 
 #include <gui/core/Color.hpp>
 #include <gsl/gsl_util>
@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <cstring>
 
-namespace eink
+namespace service::eink
 {
     namespace
     {
@@ -19,6 +19,9 @@ namespace eink
         constexpr auto LUTCSize                      = 64;
         constexpr auto LUTRSize                      = 256; ///< Needed due to \ref EINK_LUTS_FILE_PATH structure
         constexpr auto LUTSTotalSize                 = LUTDSize + LUTCSize + LUTRSize;
+        constexpr auto LUTVersionInterval            = 3;
+        constexpr auto LUTSubcritical                = 12;
+        constexpr auto LUTCritical                   = 13;
 
         EinkWaveFormSettings_t createDefaultWaveFormSettings(EinkWaveforms_e waveformMode)
         {
@@ -31,102 +34,69 @@ namespace eink
             settings.LUTDSize    = 0;
             return settings;
         }
-
-        std::unique_ptr<std::uint8_t[]> allocateScreenBuffer(gui::Size screenSize)
-        {
-            return std::make_unique<std::uint8_t[]>(screenSize.width * screenSize.height);
-        }
     } // namespace
 
-    EinkScreen::EinkScreen(gui::Size screenSize)
-        : size{screenSize}, screenBuffer{allocateScreenBuffer(screenSize)},
-          waveformSettings{createDefaultWaveFormSettings(EinkWaveformGC16)},
+    EinkDisplay::EinkDisplay(::gui::Size screenSize)
+        : size{screenSize}, waveformSettings{createDefaultWaveFormSettings(EinkWaveformGC16)},
           displayMode{EinkDisplayColorMode_e::EinkDisplayColorModeStandard}
     {}
 
-    EinkScreen::~EinkScreen() noexcept
+    EinkDisplay::~EinkDisplay() noexcept
     {
         delete[] waveformSettings.LUTCData;
         delete[] waveformSettings.LUTDData;
     }
 
-    EinkStatus_e EinkScreen::resetAndInit()
+    EinkStatus_e EinkDisplay::resetAndInit()
     {
         return EinkResetAndInitialize();
     }
 
-    void EinkScreen::dither()
+    void EinkDisplay::dither()
     {
         EinkDitherDisplay();
     }
 
-    void EinkScreen::powerOn()
+    void EinkDisplay::powerOn()
     {
         EinkPowerOn();
     }
 
-    void EinkScreen::powerOff()
+    void EinkDisplay::powerOff()
     {
         EinkPowerOff();
     }
 
-    void EinkScreen::shutdown()
+    void EinkDisplay::shutdown()
     {
         EinkPowerDown();
     }
 
-    void EinkScreen::setScreenBuffer(const std::uint8_t *buffer, std::uint32_t bufferSize)
+    EinkStatus_e EinkDisplay::update(std::uint8_t *displayBuffer)
     {
-        std::memcpy(screenBuffer.get(), buffer, bufferSize);
+        return EinkUpdateFrame(pointTopLeft.x,
+                               pointTopLeft.y,
+                               size.width,
+                               size.height,
+                               displayBuffer,
+                               getCurrentBitsPerPixelFormat(),
+                               displayMode);
     }
 
-    void EinkScreen::setScreenBuffer(std::uint8_t value, std::uint32_t bufferSize)
+    EinkBpp_e EinkDisplay::getCurrentBitsPerPixelFormat() const noexcept
     {
-        std::memset(screenBuffer.get(), value, bufferSize);
+        if (waveformSettings.mode == EinkWaveformDU2) {
+            return Eink1Bpp;
+        }
+        return Eink4Bpp;
     }
 
-    EinkStatus_e EinkScreen::update()
-    {
-        return EinkUpdateFrame(
-            pointTopLeft.x, pointTopLeft.y, size.width, size.height, screenBuffer.get(), Eink4Bpp, displayMode);
-    }
-
-    EinkStatus_e EinkScreen::refresh(EinkDisplayTimingsMode_e refreshMode)
+    EinkStatus_e EinkDisplay::refresh(EinkDisplayTimingsMode_e refreshMode)
     {
         return EinkRefreshImage(pointTopLeft.x, pointTopLeft.y, size.width, size.height, refreshMode);
     }
 
-    bool EinkScreen::deepClear(std::int32_t temperature)
-    {
-        const auto waveformMode = waveformSettings.mode;
-
-        powerOn();
-        changeWaveform(EinkWaveforms_e::EinkWaveformA2, temperature);
-
-        fillScreen(gui::Color::White);
-        for (auto i = 0; i < 2; ++i) {
-            fillScreen(gui::Color::Black);
-            fillScreen(gui::Color::White);
-        }
-
-        changeWaveform(waveformMode, temperature);
-        powerOff();
-        return true;
-    }
-
-    void EinkScreen::fillScreen(std::uint8_t colorIntensity)
-    {
-        const auto screenBufferSize = size.width * size.height;
-        setScreenBuffer(colorIntensity, screenBufferSize);
-        if (const auto status = update(); status != EinkOK) {
-            LOG_FATAL("Failed to update frame");
-        }
-        if (const auto status = refresh(EinkDisplayTimingsFastRefreshMode); status != EinkOK) {
-            LOG_FATAL("Failed to refresh frame");
-        }
-    }
-
-    bool EinkScreen::changeWaveform(EinkWaveforms_e mode, std::int32_t temperature)
+    bool EinkDisplay::changeWaveform(EinkWaveforms_e mode, std::int32_t temperature)
     {
         if (temperature == waveformSettings.temperature && mode == waveformSettings.mode) {
             return EinkOK;
@@ -161,18 +131,18 @@ namespace eink
         return true;
     }
 
-    unsigned int EinkScreen::calculateWaveFormSegment(std::int32_t temperature) const
+    unsigned int EinkDisplay::calculateWaveFormSegment(std::int32_t temperature) const
     {
         if (temperature < 38) {
-            return temperature / 3;
+            return temperature / LUTVersionInterval;
         }
         if (temperature < 43) {
-            return 12;
+            return LUTSubcritical;
         }
-        return 13;
+        return LUTCritical;
     }
 
-    unsigned int EinkScreen::calculateWaveFormOffset(EinkWaveforms_e mode, unsigned int segment) const
+    unsigned int EinkDisplay::calculateWaveFormOffset(EinkWaveforms_e mode, unsigned int segment) const
     {
         switch (mode) {
         case EinkWaveformINIT:
@@ -184,27 +154,31 @@ namespace eink
         case EinkWaveformGLD16:
             return LUTSTotalSize * (42 + segment);
         case EinkWaveformGC16:
-            [[fallthrough]];
-        default:
             return LUTSTotalSize * (56 + segment);
         }
+        throw std::invalid_argument{"Invalid waveform mode."};
     }
 
-    void EinkScreen::resetWaveFormSettings()
+    void EinkDisplay::resetWaveFormSettings()
     {
         delete[] waveformSettings.LUTDData;
         waveformSettings.LUTDSize    = 0;
-        waveformSettings.LUTDData    = new uint8_t[LUTDSize + 1];
+        waveformSettings.LUTDData    = new std::uint8_t[LUTDSize + 1];
         waveformSettings.LUTDData[0] = EinkLUTD;
 
         delete[] waveformSettings.LUTCData;
         waveformSettings.LUTCSize    = LUTCSize;
-        waveformSettings.LUTCData    = new uint8_t[LUTCSize + 1];
+        waveformSettings.LUTCData    = new std::uint8_t[LUTCSize + 1];
         waveformSettings.LUTCData[0] = EinkLUTC;
     }
 
-    void EinkScreen::setDisplayMode(EinkDisplayColorMode_e mode) noexcept
+    void EinkDisplay::setMode(EinkDisplayColorMode_e mode) noexcept
     {
         displayMode = mode;
     }
-} // namespace eink
+
+    ::gui::Size EinkDisplay::getSize() const noexcept
+    {
+        return size;
+    }
+} // namespace service::eink

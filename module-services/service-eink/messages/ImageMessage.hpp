@@ -6,49 +6,34 @@
 #include "EinkMessage.hpp"
 
 #include <cstdint>
+#include <module-gui/gui/core/Context.hpp>
+#include <module-gui/gui/Common.hpp>
 
 namespace service::eink
 {
-
     class ImageMessage : public EinkMessage
     {
-      protected:
-        uint32_t x, y, w, h;
-        bool deepRefresh;
-        uint8_t *data;
-        bool suspend  = false;
-        bool shutdown = false;
-
       public:
-        ImageMessage(uint32_t x,
-                     uint32_t y,
-                     uint32_t w,
-                     uint32_t h,
-                     bool deepRefresh,
-                     uint8_t *data,
-                     bool suspend,
-                     bool shutdown);
+        ImageMessage(int contextId, ::gui::Context *context, ::gui::RefreshModes refreshMode);
 
-        uint8_t *getData()
-        {
-            return data;
-        };
-        uint32_t getSize()
-        {
-            return w * h;
-        };
-        bool getDeepRefresh()
-        {
-            return deepRefresh;
-        };
-        bool getSuspend()
-        {
-            return suspend;
-        };
-        bool getShutdown()
-        {
-            return shutdown;
-        };
+        [[nodiscard]] auto getContextId() const noexcept -> int;
+        [[nodiscard]] auto getData() noexcept -> std::uint8_t *;
+        [[nodiscard]] auto getRefreshMode() const noexcept -> ::gui::RefreshModes;
+
+      private:
+        int contextId;
+        ::gui::Context *context;
+        ::gui::RefreshModes refreshMode;
     };
 
+    class ImageDisplayedNotification : public EinkMessage
+    {
+      public:
+        explicit ImageDisplayedNotification(int contextId);
+
+        [[nodiscard]] auto getContextId() const noexcept -> int;
+
+      private:
+        int contextId;
+    };
 } /* namespace seink */
