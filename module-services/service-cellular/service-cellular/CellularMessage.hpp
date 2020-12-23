@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -88,6 +88,13 @@ class CellularNotificationMessage : public CellularMessage
     std::string data;
 };
 
+class CellularGetCurrentOperatorMessage : public CellularMessage
+{
+  public:
+    explicit CellularGetCurrentOperatorMessage() : CellularMessage(MessageType::CellularNotification)
+    {}
+};
+
 class CellularSetOperatorAutoSelectMessage : public sys::Message
 {
   public:
@@ -95,6 +102,20 @@ class CellularSetOperatorAutoSelectMessage : public sys::Message
     {}
 };
 
+class CellularGetCurrentOperatorResponse : public CellularMessage
+{
+    std::string currentOperatorName;
+
+  public:
+    explicit CellularGetCurrentOperatorResponse(std::string currentOperatorName)
+        : CellularMessage(MessageType::CellularNotification), currentOperatorName(currentOperatorName)
+    {}
+
+    std::string getCurrentOperatorName() const
+    {
+        return currentOperatorName;
+    }
+};
 class CellularSetOperatorMessage : public sys::Message
 {
     at::response::cops::CopsMode mode;
