@@ -25,6 +25,7 @@ namespace stm
     class AlarmsTimeEvents : public TimeEvents
     {
       private:
+        bool isInvalid = false;
         std::vector<AlarmsRecord> alarmRecords;
 
       protected:

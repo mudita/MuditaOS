@@ -35,8 +35,8 @@ namespace app::alarmClock
         gui::Image *rightImage  = nullptr;
         gui::Image *snoozeImage = nullptr;
 
-        uint32_t elapsedMinutes = 0;
-        uint32_t previousElapsedMinutes = 0;
+        uint32_t elapsedSeconds         = 0;
+        uint32_t previousElapsedSeconds = 0;
 
         void startTimers();
         void startMusicTimer();

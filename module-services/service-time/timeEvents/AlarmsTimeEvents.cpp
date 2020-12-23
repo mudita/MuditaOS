@@ -144,6 +144,10 @@ namespace stm
         auto duration = nearestAlarms.at(0).time - TimePointNow();
         if (duration.count() <= 0) {
             duration = std::chrono::milliseconds(eventTimerMinSkipInterval);
+            isInvalid = true;
+        }
+        else {
+            isInvalid = false;
         }
         // restore original alarm time if snooze was applied
         for (auto &alarm : nearestAlarms) {
@@ -154,7 +158,7 @@ namespace stm
             }
         }
         alarmRecords = nearestAlarms;
-        LOG_DEBUG("How many milliseconds to alarm: %i",
+        LOG_DEBUG("How many milliseconds to alarm: %u",
                   static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()));
         return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
     }
@@ -167,8 +171,10 @@ namespace stm
 
     void AlarmsTimeEvents::invokeEvent()
     {
-        auto data = std::make_unique<AlarmRecordsData>(alarmRecords);
-        app::manager::Controller::sendAction(service(), app::manager::actions::ShowAlarm, std::move(data));
+        if (!isInvalid) {
+            auto data = std::make_unique<AlarmRecordsData>(alarmRecords);
+            app::manager::Controller::sendAction(service(), app::manager::actions::ShowAlarm, std::move(data));
+        }
     }
 
     bool AlarmsTimeEvents::isAlarmGoingToJumpToNextDay(AlarmsRecord record)

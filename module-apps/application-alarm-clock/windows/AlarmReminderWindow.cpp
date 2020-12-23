@@ -12,7 +12,7 @@
 namespace app::alarmClock
 {
     constexpr static const int reminderLifeDuration = 900000; // 15min
-    constexpr static const int defaultDuration      = 60000;  // 1min
+    constexpr static const int defaultDuration      = 10000;  // 10s
 
     AlarmReminderWindow::AlarmReminderWindow(app::Application *app,
                                              std::unique_ptr<AlarmReminderWindowContract::Presenter> &&windowPresenter)
@@ -111,7 +111,7 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::startTimers()
     {
-        elapsedMinutes = 0;
+        elapsedSeconds = 0;
         reminderTimer->connect([=](sys::Timer &) { closeReminderCallback(); });
         reminderTimer->reload();
         delayTimer->connect([=](sys::Timer &) { countElapsedMinutes(); });
@@ -133,8 +133,6 @@ namespace app::alarmClock
 
     auto AlarmReminderWindow::handleSwitchData(gui::SwitchData *data) -> bool
     {
-        startTimers();
-
         if (data == nullptr) {
             return false;
         }
@@ -145,12 +143,18 @@ namespace app::alarmClock
         }
         alarmRecords = item->getRecords();
         if (!previousAlarmRecords.empty()) {
+            if (previousAlarmRecords.at(0).ID == alarmRecords.at(0).ID) {
+                LOG_DEBUG("Duplicated data received, return");
+                return false;
+            }
             LOG_DEBUG("New alarm covered the old one, automatic snooze applying");
             for (auto &alarm : previousAlarmRecords) {
-                presenter->update(alarm, UserAction::Snooze, previousElapsedMinutes);
+                uint32_t minutes = std::round(previousElapsedSeconds / utils::time::secondsInMinute);
+                presenter->update(alarm, UserAction::Snooze, minutes);
             }
-            previousElapsedMinutes = 0;
+            previousElapsedSeconds = 0;
         }
+        startTimers();
         previousAlarmRecords = alarmRecords;
         displayAlarm();
         return true;
@@ -160,6 +164,7 @@ namespace app::alarmClock
     {
         auto rec           = alarmRecords.at(0);
         auto timeToDisplay = rec.time + std::chrono::minutes(rec.delay);
+        LOG_DEBUG("Displaying alarm, delay = %u", rec.delay);
         if (rec.status > AlarmStatus::On) {
             timeToDisplay += (static_cast<uint32_t>(rec.status) - 1) * std::chrono::minutes(rec.snooze);
         }
@@ -184,7 +189,8 @@ namespace app::alarmClock
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_ENTER) && alarmRecords.at(0).status != AlarmStatus::FifthSnooze) {
-            presenter->update(alarmRecords.at(0), UserAction::Snooze, elapsedMinutes);
+            uint32_t minutes = std::round(elapsedSeconds / utils::time::secondsInMinute);
+            presenter->update(alarmRecords.at(0), UserAction::Snooze, minutes);
             closeReminder();
             return true;
         }
@@ -200,7 +206,9 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::closeReminder()
     {
-        alarmRecords.erase(alarmRecords.begin());
+        if (!alarmRecords.empty()) {
+            alarmRecords.erase(alarmRecords.begin());
+        }
         if (alarmRecords.empty()) {
             LOG_DEBUG("Switch to home window");
             destroyTimers();
@@ -208,6 +216,7 @@ namespace app::alarmClock
             app::manager::Controller::sendAction(application, app::manager::actions::Home);
         }
         else {
+            LOG_DEBUG("Next alarm at the same time handle");
             destroyTimers();
             startTimers();
             displayAlarm();
@@ -221,14 +230,16 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::countElapsedMinutes()
     {
-        ++elapsedMinutes;
-        previousElapsedMinutes = elapsedMinutes;
+        elapsedSeconds += defaultDuration / utils::time::milisecondsInSecond;
+        previousElapsedSeconds = elapsedSeconds;
     }
 
     void AlarmReminderWindow::closeReminderCallback()
     {
         for (auto &alarm : alarmRecords) {
-            presenter->update(alarm, UserAction::Snooze, elapsedMinutes);
+            presenter->update(alarm,
+                              UserAction::Snooze,
+                              reminderLifeDuration / (utils::time::milisecondsInSecond * utils::time::secondsInMinute));
         }
         alarmRecords.clear();
         closeReminder();
