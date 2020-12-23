@@ -6,15 +6,15 @@ import pytest
 from harness.interface.defs import key_codes
 
 
-def get_message_by_text(harness, message: str):
-    body = {"messageBody": message}
+def get_message_by_text(harness, message: str, phone_number: str):
+    body = {"messageBody": message, "phoneNumber": phone_number}
     return harness.endpoint_request("messages", "get", body)["body"]
 
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
 def test_send_message(harness, phone_number, sms_text):
-    messages = get_message_by_text(harness, sms_text.upper())
+    messages = get_message_by_text(harness, sms_text.upper(), str(phone_number))
 
     # enter menu
     harness.connection.send_key(key_codes["enter"])
@@ -35,11 +35,11 @@ def test_send_message(harness, phone_number, sms_text):
     harness.connection.send_key(key_codes["enter"])
 
     # go back to main screen
-    for i in range(3):
+    for _ in range(3):
         harness.connection.send_key(key_codes["fnRight"])
 
     time.sleep(2)
-    new_messages = get_message_by_text(harness, sms_text.upper())
+    new_messages = get_message_by_text(harness, sms_text.upper(), str(phone_number))
 
     diff = [i for i in messages + new_messages if i not in messages or i not in new_messages]
     assert len(diff) == 1

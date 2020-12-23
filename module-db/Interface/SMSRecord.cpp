@@ -380,13 +380,37 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::getByContactIDQuery(const s
 std::unique_ptr<db::QueryResult> SMSRecordInterface::getByTextQuery(const std::shared_ptr<db::Query> &query)
 {
     const auto localQuery = static_cast<const db::query::SMSGetByText *>(query.get());
-    auto smsVector        = smsDB->sms.getByText(localQuery->text);
+    auto smsVector        = getByText(localQuery->getText(), localQuery->getPhoneNumber());
     auto recordVector     = std::vector<SMSRecord>(smsVector.begin(), smsVector.end());
 
     auto response = std::make_unique<db::query::SMSGetByTextResult>(recordVector);
     response->setRequestQuery(query);
     return response;
 }
+
+std::vector<SMSRecord> SMSRecordInterface::getByText(const std::string &text,
+                                                     const std::optional<utils::PhoneNumber::View> &phoneNumberFilter)
+{
+    if (phoneNumberFilter.has_value()) {
+        return getByTextAndPhoneNumber(text, phoneNumberFilter.value());
+    }
+    const auto &records = smsDB->sms.getByText(text);
+    return std::vector<SMSRecord>(records.begin(), records.end());
+}
+
+std::vector<SMSRecord> SMSRecordInterface::getByTextAndPhoneNumber(const std::string &text,
+                                                                   const utils::PhoneNumber::View &phoneNumber)
+{
+    ThreadRecordInterface threadsInterface{smsDB, contactsDB};
+    const auto &thread = threadsInterface.GetByNumber(phoneNumber);
+    if (!thread.isValid()) {
+        return {};
+    }
+
+    const auto &smsRecords = smsDB->sms.getByText(text, thread.ID);
+    return std::vector<SMSRecord>(smsRecords.begin(), smsRecords.end());
+}
+
 std::unique_ptr<db::QueryResult> SMSRecordInterface::getCountQuery(const std::shared_ptr<db::Query> &query)
 {
     auto response = std::make_unique<db::query::SMSGetCountResult>(smsDB->sms.count());

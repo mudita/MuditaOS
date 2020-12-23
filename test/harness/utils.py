@@ -10,7 +10,7 @@ from harness.interface.defs import key_codes
 
 # assuming that the harness is actually in the menu
 application_keypath = {
-    "phone": [
+    "calllog": [
         "enter"
     ],
     "contacts": [
