@@ -1,0 +1,9 @@
+add_catch2_executable(
+    NAME
+        context-pool-tests
+    SRCS
+        tests-main.cpp
+        test-ContextPool.cpp
+    LIBS
+        service-gui
+)

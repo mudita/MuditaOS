@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <cstring>
 
-namespace eink
+namespace service::eink
 {
     namespace
     {
@@ -32,17 +32,19 @@ namespace eink
             return settings;
         }
 
-        std::unique_ptr<std::uint8_t[]> allocateScreenBuffer(gui::Size screenSize)
+        std::unique_ptr<std::uint8_t[]> allocateScreenBuffer(::gui::Size screenSize)
         {
             return std::make_unique<std::uint8_t[]>(screenSize.width * screenSize.height);
         }
     } // namespace
 
-    EinkScreen::EinkScreen(gui::Size screenSize)
+    EinkScreen::EinkScreen(::gui::Size screenSize)
         : size{screenSize}, screenBuffer{allocateScreenBuffer(screenSize)},
           waveformSettings{createDefaultWaveFormSettings(EinkWaveformGC16)},
           displayMode{EinkDisplayColorMode_e::EinkDisplayColorModeStandard}
-    {}
+    {
+        setScreenBuffer(gui::Color::White, screenSize.width * screenSize.height);
+    }
 
     EinkScreen::~EinkScreen() noexcept
     {
@@ -94,36 +96,6 @@ namespace eink
     EinkStatus_e EinkScreen::refresh(EinkDisplayTimingsMode_e refreshMode)
     {
         return EinkRefreshImage(pointTopLeft.x, pointTopLeft.y, size.width, size.height, refreshMode);
-    }
-
-    bool EinkScreen::deepClear(std::int32_t temperature)
-    {
-        const auto waveformMode = waveformSettings.mode;
-
-        powerOn();
-        changeWaveform(EinkWaveforms_e::EinkWaveformA2, temperature);
-
-        fillScreen(gui::Color::White);
-        for (auto i = 0; i < 2; ++i) {
-            fillScreen(gui::Color::Black);
-            fillScreen(gui::Color::White);
-        }
-
-        changeWaveform(waveformMode, temperature);
-        powerOff();
-        return true;
-    }
-
-    void EinkScreen::fillScreen(std::uint8_t colorIntensity)
-    {
-        const auto screenBufferSize = size.width * size.height;
-        setScreenBuffer(colorIntensity, screenBufferSize);
-        if (const auto status = update(); status != EinkOK) {
-            LOG_FATAL("Failed to update frame");
-        }
-        if (const auto status = refresh(EinkDisplayTimingsFastRefreshMode); status != EinkOK) {
-            LOG_FATAL("Failed to refresh frame");
-        }
     }
 
     bool EinkScreen::changeWaveform(EinkWaveforms_e mode, std::int32_t temperature)
@@ -184,10 +156,9 @@ namespace eink
         case EinkWaveformGLD16:
             return LUTSTotalSize * (42 + segment);
         case EinkWaveformGC16:
-            [[fallthrough]];
-        default:
             return LUTSTotalSize * (56 + segment);
         }
+        throw std::invalid_argument{"Invalid waveform mode."};
     }
 
     void EinkScreen::resetWaveFormSettings()
@@ -207,4 +178,9 @@ namespace eink
     {
         displayMode = mode;
     }
-} // namespace eink
+
+    ::gui::Size EinkScreen::getDisplaySize() const noexcept
+    {
+        return size;
+    }
+} // namespace service::eink

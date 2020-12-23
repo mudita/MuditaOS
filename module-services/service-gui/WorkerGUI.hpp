@@ -12,34 +12,36 @@
 
 #include <cstdint>
 
-namespace sgui
+namespace service::gui
 {
-
     class ServiceGUI;
 
-    enum class WorkerGUICommands
+    struct RenderCommand
     {
-        Finish,
-        Render,
-        //	RenderSuspend
+        ::gui::DrawCommand **drawCommands = nullptr;
+        std::size_t commandsCount         = 0U;
+        ::gui::RefreshModes refreshMode   = ::gui::RefreshModes::GUI_REFRESH_FAST;
+
+        static RenderCommand fromCommandList(std::list<std::unique_ptr<::gui::DrawCommand>> &&commands);
+
+        void clear() noexcept;
+        [[nodiscard]] auto toStdList() const -> std::list<::gui::DrawCommand *>;
     };
 
-    /*
-     *
-     */
     class WorkerGUI : public sys::Worker
     {
-        // object responsible for rendering images to context
-        gui::Renderer renderer;
-        sys::Service *service;
-
       public:
-        WorkerGUI(ServiceGUI *service);
+        static constexpr auto RenderingQueueName = "RendererQueue";
 
-        /**
-         * virtual method responsible for finishing the worker and handling rendering commands
-         */
-        bool handleMessage(uint32_t queueID) override;
+        explicit WorkerGUI(ServiceGUI *service);
+
+        auto handleMessage(std::uint32_t queueID) -> bool override;
+        void render(RenderCommand &&command);
+
+      private:
+        void render(std::list<::gui::DrawCommand *> &commands, ::gui::RefreshModes refreshMode);
+
+        ServiceGUI *guiService;
+        ::gui::Renderer renderer;
     };
-
-} /* namespace sgui */
+} // namespace service::gui

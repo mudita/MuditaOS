@@ -306,8 +306,8 @@ namespace gui
         commandRect->penWidth = unsupported->xoffset;
 
         auto renderCtx                           = std::make_unique<Context>(unsupported->width, unsupported->height);
-        std::list<Command> commands;
-        commands.emplace_back(std::move(commandRect));
+        std::list<gui::DrawCommand *> commands;
+        commands.emplace_back(commandRect.get());
         Renderer().render(renderCtx.get(), commands);
 
         auto size         = unsupported->width * unsupported->height;

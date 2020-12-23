@@ -7,6 +7,6 @@
 
 namespace service::eink
 {
-    class EinkDMATransfer : public service::eink::EinkMessage
-    {};
+    class EinkDMATransfer : public EinkMessage
+    {}
 }; // namespace service::eink

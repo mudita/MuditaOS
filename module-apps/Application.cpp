@@ -135,12 +135,12 @@ namespace app
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
 
-            auto message = std::make_shared<sgui::DrawMessage>(window->buildDrawList(), mode);
+            auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
             if (shutdownInProgress) {
-                message->setCommandType(sgui::DrawMessage::Type::SHUTDOWN);
+                message->setCommandType(service::gui::DrawMessage::Type::SHUTDOWN);
             }
             else if (suspendInProgress) {
-                message->setCommandType(sgui::DrawMessage::Type::SUSPEND);
+                message->setCommandType(service::gui::DrawMessage::Type::SUSPEND);
             }
             sys::Bus::SendUnicast(message, service::name::gui, this);
         }
@@ -312,12 +312,10 @@ namespace app
         if (msg->plugged == true) {
             LOG_INFO("Application charger connected");
             getCurrentWindow()->batteryCharging(true);
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         else {
             LOG_INFO("Application charger disconnected");
             getCurrentWindow()->batteryCharging(false);
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
 
         refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);

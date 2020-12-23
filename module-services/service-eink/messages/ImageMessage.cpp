@@ -4,14 +4,38 @@
 #include "EinkMessage.hpp"
 #include "ImageMessage.hpp"
 
-#include <MessageType.hpp>
-
 namespace service::eink
 {
-
     ImageMessage::ImageMessage(
-        uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool deepRefresh, uint8_t *data, bool suspend, bool shutdown)
-        : EinkMessage(), x{x}, y{y}, w{w}, h{h}, deepRefresh{deepRefresh}, data{data}, suspend{suspend}, shutdown{
-                                                                                                             shutdown}
+        const std::uint8_t *data, std::uint32_t width, std::uint32_t height, bool deepRefresh, int contextId)
+        : data{data}, width{width}, height{height}, deepRefresh{deepRefresh}, contextId{contextId}
     {}
+
+    auto ImageMessage::getData() const noexcept -> const uint8_t *
+    {
+        return data;
+    }
+
+    auto ImageMessage::getSize() const noexcept -> uint32_t
+    {
+        return width * height;
+    }
+
+    auto ImageMessage::isDeepRefresh() const noexcept -> bool
+    {
+        return deepRefresh;
+    }
+
+    auto ImageMessage::getContextId() const noexcept -> int
+    {
+        return contextId;
+    }
+
+    ImageDisplayedNotification::ImageDisplayedNotification(int contextId) : contextId{contextId}
+    {}
+
+    auto ImageDisplayedNotification::getContextId() const noexcept -> int
+    {
+        return contextId;
+    }
 } /* namespace seink */

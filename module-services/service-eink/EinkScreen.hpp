@@ -6,16 +6,17 @@
 #include <gui/Common.hpp>
 
 #include <EinkIncludes.hpp>
+#include "Common.hpp"
 
 #include <cstdint>
 #include <memory>
 
-namespace eink
+namespace service::eink
 {
     class EinkScreen
     {
       public:
-        explicit EinkScreen(gui::Size screenSize = {480, 600});
+        explicit EinkScreen(::gui::Size screenSize = {DefaultScreenWidth, DefaultScreenHeight});
         ~EinkScreen() noexcept;
 
         EinkStatus_e resetAndInit();
@@ -26,24 +27,22 @@ namespace eink
         void powerOff();
         void shutdown();
 
-        bool deepClear(std::int32_t temperature);
         bool changeWaveform(EinkWaveforms_e mode, std::int32_t temperature);
-
         void setScreenBuffer(const std::uint8_t *buffer, std::uint32_t bufferSize);
         void setDisplayMode(EinkDisplayColorMode_e mode) noexcept;
 
+        ::gui::Size getDisplaySize() const noexcept;
+
       private:
-        void fillScreen(std::uint8_t colorIntensity);
         void setScreenBuffer(std::uint8_t value, std::uint32_t bufferSize);
         unsigned int calculateWaveFormSegment(std::int32_t temperature) const;
         unsigned int calculateWaveFormOffset(EinkWaveforms_e mode, unsigned int segment) const;
         void resetWaveFormSettings();
 
-        static constexpr gui::Point pointTopLeft{0, 0};
-
-        const gui::Size size;
+        static constexpr ::gui::Point pointTopLeft{0, 0};
+        const ::gui::Size size;
         std::unique_ptr<std::uint8_t[]> screenBuffer;
         EinkWaveFormSettings_t waveformSettings;
         EinkDisplayColorMode_e displayMode;
     };
-} // namespace eink
+} // namespace service::eink

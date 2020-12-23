@@ -16,7 +16,7 @@ namespace service::eink
             Invert
         };
 
-        EinkModeMessage(Mode mode) : EinkMessage(), mode(mode)
+        EinkModeMessage(Mode mode) : mode(mode)
         {}
 
         [[nodiscard]] auto getMode() const noexcept

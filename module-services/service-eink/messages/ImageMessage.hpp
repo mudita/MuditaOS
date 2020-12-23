@@ -9,46 +9,33 @@
 
 namespace service::eink
 {
-
     class ImageMessage : public EinkMessage
     {
-      protected:
-        uint32_t x, y, w, h;
-        bool deepRefresh;
-        uint8_t *data;
-        bool suspend  = false;
-        bool shutdown = false;
-
       public:
-        ImageMessage(uint32_t x,
-                     uint32_t y,
-                     uint32_t w,
-                     uint32_t h,
-                     bool deepRefresh,
-                     uint8_t *data,
-                     bool suspend,
-                     bool shutdown);
+        ImageMessage(
+            const std::uint8_t *data, std::uint32_t width, std::uint32_t height, bool deepRefresh, int contextId);
 
-        uint8_t *getData()
-        {
-            return data;
-        };
-        uint32_t getSize()
-        {
-            return w * h;
-        };
-        bool getDeepRefresh()
-        {
-            return deepRefresh;
-        };
-        bool getSuspend()
-        {
-            return suspend;
-        };
-        bool getShutdown()
-        {
-            return shutdown;
-        };
+        [[nodiscard]] auto getData() const noexcept -> const uint8_t *;
+        [[nodiscard]] auto getSize() const noexcept -> uint32_t;
+        [[nodiscard]] auto isDeepRefresh() const noexcept -> bool;
+        [[nodiscard]] auto getContextId() const noexcept -> int;
+
+      private:
+        const std::uint8_t *data;
+        std::uint32_t width;
+        std::uint32_t height;
+        bool deepRefresh;
+        int contextId;
     };
 
+    class ImageDisplayedNotification : public EinkMessage
+    {
+      public:
+        explicit ImageDisplayedNotification(int contextId);
+
+        [[nodiscard]] auto getContextId() const noexcept -> int;
+
+      private:
+        int contextId;
+    };
 } /* namespace seink */

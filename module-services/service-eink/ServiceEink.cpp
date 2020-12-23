@@ -3,11 +3,8 @@
 
 #include "ServiceEink.hpp"
 #include "messages/EinkModeMessage.hpp"
-#include "messages/EinkDMATransfer.hpp"
-#include "messages/StateRequest.hpp"
-#include "messages/TemperatureUpdate.hpp"
 #include <service-gui/Common.hpp>
-#include <service-gui/messages/GUIDisplayReady.hpp>
+#include <service-gui/messages/EinkReady.hpp>
 #include <time/ScopedTime.hpp>
 
 #include <log/log.hpp>
@@ -18,50 +15,44 @@
 #include <cstring>
 #include <memory>
 
-namespace eink
+namespace service::eink
 {
     namespace
     {
         constexpr auto ServceEinkStackDepth = 4096 + 1024;
+        constexpr std::chrono::milliseconds powerOffTime{3000};
+        constexpr auto PowerOffTimerName = "PwrOffTimer";
     } // namespace
 
     ServiceEink::ServiceEink(const std::string &name, std::string parent)
-        : sys::Service(name, parent, ServceEinkStackDepth), selfRefereshTriggerCount{0},
-          temperatureMeasurementTriggerCount{0}, powerOffTriggerCount{0},
-          powerOffTimer("PwrOffTimer", this, 3000, sys::Timer::Type::SingleShot)
+        : sys::Service(name, parent, ServceEinkStackDepth), currentState{State::Running},
+          powerOffTimer(PowerOffTimerName, this, powerOffTime.count(), sys::Timer::Type::SingleShot)
     {
-        connect(typeid(service::eink::EinkModeMessage),
+        connect(typeid(EinkModeMessage),
                 [this](sys::Message *message) -> sys::MessagePointer { return handleEinkModeChangedMessage(message); });
 
-        connect(typeid(service::eink::EinkDMATransfer),
-                [this](sys::Message *request) -> sys::MessagePointer { return handleEinkDMATransfer(request); });
-
-        connect(typeid(service::eink::ImageMessage),
+        connect(typeid(ImageMessage),
                 [this](sys::Message *request) -> sys::MessagePointer { return handleImageMessage(request); });
-
-        connect(typeid(service::eink::StateRequest),
-                [this](sys::Message *request) -> sys::MessagePointer { return handleStateRequest(request); });
-
-        connect(typeid(service::eink::TemperatureUpdate),
-                [this](sys::Message *request) -> sys::MessagePointer { return handleTemperatureUpdate(request); });
     }
 
-    sys::MessagePointer ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *response)
     {
         return std::make_shared<sys::ResponseMessage>();
     }
 
     sys::ReturnCodes ServiceEink::InitHandler()
     {
-        LOG_INFO("[ServiceEink] Initializing");
+        LOG_INFO("Initializing");
         if (const auto status = screen.resetAndInit(); status != EinkOK) {
-            LOG_FATAL("Error: Could not initialize Eink display!\n");
+            LOG_FATAL("Error: Could not initialize Eink display!");
             return sys::ReturnCodes::Failure;
         }
+
         screen.powerOn();
 
-        auto msg = std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
+        auto msg = std::make_shared<service::gui::EinkReady>(screen.getDisplaySize());
         sys::Bus::SendUnicast(msg, service::name::gui, this);
+
         return sys::ReturnCodes::Success;
     }
 
@@ -73,8 +64,7 @@ namespace eink
 
     sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
-        LOG_FATAL("[ServiceEink] PowerModeHandler: %s", c_str(mode));
-
+        LOG_INFO("PowerModeHandler: %s", c_str(mode));
         switch (mode) {
         case sys::ServicePowerMode::Active:
             enterActiveMode();
@@ -90,10 +80,10 @@ namespace eink
 
     void ServiceEink::enterActiveMode()
     {
-        suspended = false;
+        setState(State::Running);
 
         if (const auto status = screen.resetAndInit(); status != EinkOK) {
-            LOG_FATAL("Error: Could not initialize Eink display!\n");
+            LOG_FATAL("Error: Could not initialize Eink display!");
         }
         screen.powerOn();
         screen.powerOff();
@@ -101,7 +91,7 @@ namespace eink
 
     void ServiceEink::suspend()
     {
-        suspended = true;
+        setState(State::Suspended);
 
         powerOffTimer.stop();
         screen.shutdown();
@@ -117,21 +107,27 @@ namespace eink
         return sys::MessageNone{};
     }
 
-    sys::MessagePointer ServiceEink::handleEinkDMATransfer(sys::Message *message)
+    sys::MessagePointer ServiceEink::handleImageMessage(sys::Message *request)
     {
-        utils::time::Scoped measurement("EinkDMATransfer");
-
-        if (suspended) {
-            if (suspendInProgress) {
-                LOG_ERROR("drawing before suspend failed");
-                suspendInProgress = false;
-            }
-            LOG_INFO("[ServiceEink] Received image while suspended, ignoring");
+        const auto message = static_cast<service::eink::ImageMessage *>(request);
+        if (isInState(State::Suspended)) {
+            LOG_WARN("Received image while suspended, ignoring");
             return sys::MessageNone{};
         }
+        utils::time::Scoped measurement("ImageMessage");
 
+        powerOffTimer.stop();
+        updateDisplay(message->getData(), message->getSize(), message->isDeepRefresh());
+        powerOffTimer.reload();
+        return std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
+    }
+
+    void ServiceEink::updateDisplay(const std::uint8_t *frameBuffer, std::uint32_t bufferSize, bool isDeepRefresh)
+    {
+        screen.setScreenBuffer(frameBuffer, bufferSize);
         screen.powerOn();
-        if (const auto temperature = EinkGetTemperatureInternal(); deepRefresh) {
+
+        if (const auto temperature = EinkGetTemperatureInternal(); isDeepRefresh) {
             screen.changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
             screen.dither();
         }
@@ -143,49 +139,19 @@ namespace eink
             LOG_FATAL("Failed to update frame");
         }
         if (const auto status =
-                screen.refresh(deepRefresh ? EinkDisplayTimingsDeepCleanMode : EinkDisplayTimingsFastRefreshMode);
+                screen.refresh(isDeepRefresh ? EinkDisplayTimingsDeepCleanMode : EinkDisplayTimingsFastRefreshMode);
             status != EinkOK) {
             LOG_FATAL("Failed to refresh frame");
         }
-
-        powerOffTimer.reload();
-
-        auto msg           = std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
-        suspendInProgress  = false;
-        shutdownInProgress = false;
-        sys::Bus::SendUnicast(msg, service::name::gui, this);
-
-        return sys::MessageNone{};
     }
 
-    sys::MessagePointer ServiceEink::handleImageMessage(sys::Message *request)
+    void ServiceEink::setState(State state) noexcept
     {
-        auto message = static_cast<service::eink::ImageMessage *>(request);
-
-        powerOffTimer.stop();
-        screen.setScreenBuffer(message->getData(), message->getSize());
-        deepRefresh = message->getDeepRefresh();
-
-        shutdownInProgress = message->getShutdown();
-        if (shutdownInProgress) {
-            LOG_DEBUG("Shutdown In Progress");
-        }
-        suspendInProgress = message->getSuspend();
-        if (suspendInProgress) {
-            LOG_DEBUG("Suspend In Progress");
-        }
-
-        sys::Bus::SendUnicast(std::make_shared<service::eink::EinkDMATransfer>(), GetName(), this);
-        return std::make_shared<sys::ResponseMessage>();
+        currentState = state;
     }
 
-    sys::MessagePointer ServiceEink::handleStateRequest(sys::Message *)
+    bool ServiceEink::isInState(State state) const noexcept
     {
-        return std::make_shared<service::gui::GUIDisplayReady>(suspendInProgress, shutdownInProgress);
+        return currentState == state;
     }
-
-    sys::MessagePointer ServiceEink::handleTemperatureUpdate(sys::Message *)
-    {
-        return nullptr;
-    }
-} // namespace eink
+} // namespace service::eink
