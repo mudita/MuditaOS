@@ -210,10 +210,11 @@ namespace app::alarmClock
             alarmRecords.erase(alarmRecords.begin());
         }
         if (alarmRecords.empty()) {
-            LOG_DEBUG("Switch to home window");
+            LOG_DEBUG("Switch to alarm main window");
             destroyTimers();
             AudioServiceAPI::StopAll(application);
-            app::manager::Controller::sendAction(application, app::manager::actions::Home);
+            // app::manager::Controller::sendAction(application, app::manager::actions::Home);
+            application->switchWindow(gui::name::window::main_window);
         }
         else {
             LOG_DEBUG("Next alarm at the same time handle");

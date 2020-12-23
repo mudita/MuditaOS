@@ -174,10 +174,6 @@ bool AlarmsTable::updateStatuses(AlarmStatus status)
     return db->execute("UPDATE alarms SET status = %i;", status);
 }
 
-// mlucki
-// Todo: create query that returns first upcoming alarm to invoke
-//(or set of alarms that will be further processed in AlarmsTimeEvents::calcToNextEventInterval
-// to programmatically choose the first upcoming one)
 std::vector<AlarmsTableRow> AlarmsTable::SelectTurnedOn()
 {
     auto retQuery = db->query("SELECT * from alarms WHERE status > %i;", AlarmStatus::Off);

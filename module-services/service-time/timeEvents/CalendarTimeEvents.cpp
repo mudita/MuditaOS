@@ -89,7 +89,6 @@ namespace stm
         auto event = std::make_shared<EventsRecord>(eventRecord);
         eventData->setData(event);
 
-        /// Todo: restore action after rework of application popups
         // app::manager::Controller::sendAction(service(), app::manager::actions::ShowReminder, std::move(eventData));
     }
 } // namespace stm

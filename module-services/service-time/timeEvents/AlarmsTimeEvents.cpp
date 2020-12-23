@@ -143,7 +143,7 @@ namespace stm
 
         auto duration = nearestAlarms.at(0).time - TimePointNow();
         if (duration.count() <= 0) {
-            duration = std::chrono::milliseconds(eventTimerMinSkipInterval);
+            duration  = std::chrono::milliseconds(eventTimerMinSkipInterval);
             isInvalid = true;
         }
         else {
