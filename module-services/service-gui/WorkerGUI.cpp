@@ -5,52 +5,55 @@
 
 #include <DrawCommand.hpp>
 #include <log/log.hpp>
-#include <MessageType.hpp>
-#include <projdefs.h>
-#include <queue.h>
 #include <Renderer.hpp>
-#include <semphr.h>
 #include <Service/Bus.hpp>
-#include <Service/Message.hpp>
-#include <Service/Service.hpp>
 #include <Service/Worker.hpp>
 #include <service-gui/ServiceGUI.hpp>
 
 #include <memory>
-#include <utility>
-#include <vector>
+#include <module-utils/time/ScopedTime.hpp>
 #include "messages/RenderingFinished.hpp"
 
-namespace sgui
+namespace service::gui
 {
-
-    WorkerGUI::WorkerGUI(ServiceGUI *service) : Worker(service), service(service)
+    WorkerGUI::WorkerGUI(ServiceGUI *service) : Worker(service), guiService{service}
     {}
+
+    void WorkerGUI::notify(Signal command)
+    {
+        if (auto queue = getQueueByName(SignallingQueueName); !queue->Overwrite(&command)) {
+            LOG_ERROR("Unable to overwrite the command in the commands queue.");
+        }
+    }
 
     bool WorkerGUI::handleMessage(uint32_t queueID)
     {
-        auto &queue = queues[queueID];
-
-        auto serviceGUI = static_cast<sgui::ServiceGUI *>(service);
-
-        if (queueID == 0) {
-            sys::WorkerCommand received;
-            queue->Dequeue(&received, 0);
-
-            std::list<std::unique_ptr<gui::DrawCommand>> uniqueCommands;
-            if (xSemaphoreTake(serviceGUI->semCommands, pdMS_TO_TICKS(1000)) == pdTRUE) {
-                uniqueCommands = std::move(serviceGUI->commands);
-                xSemaphoreGive(serviceGUI->semCommands);
+        if (const auto queue = queues[queueID]; queue->GetQueueName() == SignallingQueueName) {
+            if (sys::WorkerCommand command; queue->Dequeue(&command, 0)) {
+                handleCommand(static_cast<Signal>(command.command));
             }
-            else {
-                LOG_ERROR("Failed to acquire semaphore");
-            }
-
-            serviceGUI->renderer.render(serviceGUI->renderContext, uniqueCommands);
-
-            sys::Bus::SendUnicast(std::make_shared<service::gui::RenderingFinished>(), service->GetName(), service);
         }
         return true;
     }
 
-} /* namespace sgui */
+    void WorkerGUI::handleCommand(Signal command)
+    {
+        if (command == Signal::Render) {
+            auto item = guiService->commandsQueue->dequeue();
+            render(item.commands, item.refreshMode);
+        }
+    }
+
+    void WorkerGUI::render(std::list<std::unique_ptr<::gui::DrawCommand>> &commands, ::gui::RefreshModes refreshMode)
+    {
+        const auto [contextId, context] = guiService->contextPool->borrowContext(); // Waits for the context.
+        renderer.render(context, commands);
+        onRenderingFinished(contextId, refreshMode);
+    }
+
+    void WorkerGUI::onRenderingFinished(int contextId, ::gui::RefreshModes refreshMode)
+    {
+        auto msg = std::make_shared<service::gui::RenderingFinished>(contextId, refreshMode);
+        sys::Bus::SendUnicast(std::move(msg), guiService->GetName(), guiService);
+    }
+} // namespace service::gui

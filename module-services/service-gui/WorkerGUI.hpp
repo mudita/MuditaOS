@@ -12,34 +12,32 @@
 
 #include <cstdint>
 
-namespace sgui
+namespace service::gui
 {
-
     class ServiceGUI;
 
-    enum class WorkerGUICommands
-    {
-        Finish,
-        Render,
-        //	RenderSuspend
-    };
-
-    /*
-     *
-     */
     class WorkerGUI : public sys::Worker
     {
-        // object responsible for rendering images to context
-        gui::Renderer renderer;
-        sys::Service *service;
-
       public:
-        WorkerGUI(ServiceGUI *service);
+        enum class Signal
+        {
+            Render
+        };
+        static constexpr auto SignallingQueueName     = "SignallingQueue";
+        static constexpr auto SignallingQueueCapacity = 1;
+        static constexpr auto SignalSize              = sizeof(Signal);
 
-        /**
-         * virtual method responsible for finishing the worker and handling rendering commands
-         */
-        bool handleMessage(uint32_t queueID) override;
+        explicit WorkerGUI(ServiceGUI *service);
+
+        void notify(Signal command);
+        auto handleMessage(std::uint32_t queueID) -> bool override;
+
+      private:
+        void handleCommand(Signal command);
+        void render(std::list<std::unique_ptr<::gui::DrawCommand>> &commands, ::gui::RefreshModes refreshMode);
+        void onRenderingFinished(int contextId, ::gui::RefreshModes refreshMode);
+
+        ServiceGUI *guiService;
+        ::gui::Renderer renderer;
     };
-
-} /* namespace sgui */
+} // namespace service::gui

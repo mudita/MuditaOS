@@ -136,6 +136,14 @@ class Queue {
         virtual ~Queue();
 
         /**
+         * Add an item to the queue, or overwrites the existing one.
+         * Works only for queues 1-element long.
+         * @param item  The item to be added.
+         * @return true if the item was added, false otherwise.
+         */
+        bool Overwrite(void *item);
+
+        /**
          *  Add an item to the back of the queue.
          *
          *  @param item The item you are adding.

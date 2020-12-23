@@ -13,7 +13,6 @@ namespace gui
 {
     class PowerOffWindow : public AppWindow
     {
-
         enum class State
         {
             PowerDown,
@@ -28,6 +27,8 @@ namespace gui
         gui::Image *powerImage     = nullptr;
         gui::Image *powerDownImage = nullptr;
         State state                = State::Return;
+
+        void scheduleSystemShutdown();
 
       public:
         PowerOffWindow(app::Application *app);
