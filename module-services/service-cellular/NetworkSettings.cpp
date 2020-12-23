@@ -5,6 +5,22 @@
 
 #include <unordered_map>
 
+std::string NetworkSettings::getCurrentOperator() const
+{
+    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    if (channel) {
+        at::Cmd buildCmd = at::factory(at::AT::COPS) + "?";
+        auto resp        = channel->cmd(buildCmd);
+        at::response::cops::CurrentOperatorInfo ret;
+        if ((resp.code == at::Result::Code::OK) && (at::response::parseCOPS(resp, ret))) {
+            if (auto _operator = ret.getOperator(); _operator) {
+                return _operator->getNameByFormat(ret.getFormat());
+            }
+        }
+    }
+
+    return {};
+}
 std::vector<std::string> NetworkSettings::scanOperators(bool fullInfoList)
 {
     std::vector<std::string> operatorNames;

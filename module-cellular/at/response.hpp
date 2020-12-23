@@ -55,7 +55,6 @@ namespace at
                 E_UTRAN                 = 7,
                 CDMA                    = 100
             };
-
             enum class NameFormat
             {
                 Long    = 0,
@@ -100,10 +99,61 @@ namespace at
                     }
                 }
             };
+
+            class CurrentOperatorInfo
+            {
+                Operator op;
+                CopsMode mode     = CopsMode::Automatic;
+                NameFormat format = NameFormat::Long;
+                bool operatorSet  = false;
+
+              public:
+                void setFormat(NameFormat format)
+                {
+                    this->format = format;
+                }
+                NameFormat getFormat() const noexcept
+                {
+                    return this->format;
+                }
+                void setMode(CopsMode mode)
+                {
+                    this->mode = mode;
+                }
+                CopsMode getMode() const noexcept
+                {
+                    return this->mode;
+                }
+
+                void setOperator(Operator op)
+                {
+                    this->operatorSet = true;
+                    this->op          = op;
+                }
+                std::optional<cops::Operator> getOperator() const
+                {
+                    if (operatorSet) {
+                        return op;
+                    }
+                    else {
+                        return std::nullopt;
+                    }
+                }
+            };
         } // namespace cops
 
+        /**
+         * @brief parse for AT+COPS=? from quectel
+         *
+         */
         bool parseCOPS(const at::Result &resp, std::vector<cops::Operator> &ret);
         using ResponseTokens = std::vector<std::vector<std::string>>;
+        /**
+         * @brief parse for AT+COPS? from quectel
+         *
+         */
+        bool parseCOPS(const at::Result &resp, cops::CurrentOperatorInfo &ret);
+
         std::vector<std::string> tokenize(std::string &response, std::string separator = ",");
 
         /**

@@ -51,6 +51,7 @@ namespace at
             return parts;
         }
 
+        constexpr std::string_view AT_COPS = "+COPS:";
         bool parseCOPS(const at::Result &resp, std::vector<cops::Operator> &ret)
         {
             /// +COPS: (list of supported <stat>,long alphanumeric <oper>,
@@ -67,7 +68,6 @@ namespace at
             constexpr auto minOperatorParams = 4;
             constexpr auto maxOperatorParams = 5;
 
-            constexpr std::string_view AT_COPS = "+COPS:";
             if (auto line = getResponseLineATCommand(resp, AT_COPS); line) {
                 const auto &commandLine = *line;
 
@@ -112,6 +112,50 @@ namespace at
 
             return false;
         }
+
+        bool parseCOPS(const at::Result &resp, cops::CurrentOperatorInfo &ret)
+        {
+            /// ret as +COPS: <mode>[,<format>[,<oper>][,<Act>]]
+            /// parameters could be 1,2,3,4 all optional in documentation !
+
+            constexpr auto minCOPSLength = 1;
+
+            if (auto line = getResponseLineATCommand(resp, AT_COPS); line) {
+                const auto &commandLine = *line;
+
+                if (commandLine.length() < minCOPSLength) {
+                    return false;
+                }
+
+                auto opParams = utils::split(commandLine, ",");
+                cops::Operator op;
+
+                switch (opParams.size()) {
+                case 4:
+                    op.technology = static_cast<cops::AccessTechnology>(utils::getNumericValue<int>(opParams[3]));
+                    [[fallthrough]];
+                case 3: {
+                    ret.setFormat(static_cast<cops::NameFormat>(utils::getNumericValue<int>(opParams[1])));
+                    utils::findAndReplaceAll(opParams[2], at::response::StringDelimiter, "");
+                    op.setNameByFormat(ret.getFormat(), opParams[2]);
+                }
+                    ret.setOperator(op);
+                    [[fallthrough]];
+                case 2:
+                    ret.setFormat(static_cast<cops::NameFormat>(utils::getNumericValue<int>(opParams[1])));
+                    [[fallthrough]];
+                case 1:
+                    ret.setMode(static_cast<cops::CopsMode>(utils::getNumericValue<int>(opParams[0])));
+                    break;
+                default:
+                    return false;
+                }
+
+                return true;
+            }
+            return false;
+        }
+
         bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret)
         {
             /// parse only first result from QPINC

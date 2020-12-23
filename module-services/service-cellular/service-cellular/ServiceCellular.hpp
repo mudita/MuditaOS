@@ -269,8 +269,11 @@ class ServiceCellular : public sys::Service
 
     std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
         CellularStartOperatorsScanMessage *msg);
+
     std::shared_ptr<CellularSetOperatorAutoSelectResponse> handleCellularSetOperatorAutoSelect(
         CellularSetOperatorAutoSelectMessage *msg);
+    std::shared_ptr<CellularGetCurrentOperatorResponse> handleCellularGetCurrentOperator(
+        CellularGetCurrentOperatorMessage *msg);
     std::shared_ptr<CellularGetAPNResponse> handleCellularGetAPNMessage(CellularGetAPNMessage *msg);
     std::shared_ptr<CellularSetAPNResponse> handleCellularSetAPNMessage(CellularSetAPNMessage *msg);
     std::shared_ptr<CellularSetOperatorResponse> handleCellularSetOperator(CellularSetOperatorMessage *msg);
