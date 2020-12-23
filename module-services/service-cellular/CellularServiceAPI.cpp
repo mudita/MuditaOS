@@ -112,6 +112,12 @@ void CellularServiceAPI::GetNetworkInfo(sys::Service *serv)
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
 }
 
+void CellularServiceAPI::GetCurrentOperator(sys::Service *serv)
+{
+    std::shared_ptr<CellularGetCurrentOperatorMessage> msg = std::make_shared<CellularGetCurrentOperatorMessage>();
+    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+}
+
 void CellularServiceAPI::StartOperatorsScan(sys::Service *serv, bool fullInfo)
 {
     std::shared_ptr<CellularStartOperatorsScanMessage> msg =

@@ -43,6 +43,12 @@ namespace CellularServiceAPI
      * @param serv pointer to caller service.
      */
     void GetNetworkInfo(sys::Service *serv);
+
+    /*
+     * @brief Get current operator, result async in
+     * CellularGetCurrentOperatorResponse message
+     */
+    void GetCurrentOperator(sys::Service *serv);
     /*
      * @brief It calls service-cellulat to perform operators scan
      * @param serv pointer to caller service.

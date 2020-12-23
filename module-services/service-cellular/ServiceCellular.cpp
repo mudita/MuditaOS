@@ -300,6 +300,11 @@ void ServiceCellular::registerMessageHandlers()
     });
 
     connect(typeid(CellularGetAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        connect(typeid(CellularGetCurrentOperatorMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg = static_cast<CellularGetCurrentOperatorMessage *>(request);
+            return handleCellularGetCurrentOperator(msg);
+        });
+
         auto msg = static_cast<CellularGetAPNMessage *>(request);
         return handleCellularGetAPNMessage(msg);
     });
@@ -2041,6 +2046,14 @@ bool ServiceCellular::handle_apn_conf_procedure()
     packetData->setupAPNSettings();
     state.set(this, State::ST::SanityCheck);
     return true;
+}
+
+std::shared_ptr<CellularGetCurrentOperatorResponse> ServiceCellular::handleCellularGetCurrentOperator(
+    CellularGetCurrentOperatorMessage *msg)
+{
+    LOG_INFO("CellularGetCurrentOperator handled");
+    NetworkSettings networkSettings(*this);
+    return std::make_shared<CellularGetCurrentOperatorResponse>(networkSettings.getCurrentOperator());
 }
 
 std::shared_ptr<CellularGetAPNResponse> ServiceCellular::handleCellularGetAPNMessage(CellularGetAPNMessage *msg)
