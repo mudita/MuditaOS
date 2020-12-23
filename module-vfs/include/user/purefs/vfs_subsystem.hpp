@@ -12,4 +12,5 @@ namespace purefs::subsystem
     auto disk_mgr() -> std::shared_ptr<blkdev::disk_manager>;
     auto vfs_core() -> std::shared_ptr<fs::filesystem>;
     auto mount_defaults() -> int;
+    auto unmount_all() -> int;
 } // namespace purefs::subsystem
