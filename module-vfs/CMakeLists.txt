@@ -76,7 +76,6 @@ set(SOURCES ""
         drivers/src/purefs/fs/filesystem_vfat.cpp
         drivers/src/purefs/fs/filesystem_littlefs.cpp
         src/deprecated/vfs.cpp
-        src/deprecated/vfs-utils.cpp
         src/deprecated/vfsNotifier.cpp
 )
 
