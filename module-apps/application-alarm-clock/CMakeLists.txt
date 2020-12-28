@@ -11,6 +11,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/models/AlarmsRepository.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/models/NewEditAlarmModel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/models/CustomRepeatModel.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/models/AlarmsReminderModel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/AlarmItem.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/AlarmTimeItem.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/AlarmOptionsItem.cpp"

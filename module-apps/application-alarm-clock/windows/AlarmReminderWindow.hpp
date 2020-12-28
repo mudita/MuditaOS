@@ -17,9 +17,6 @@ namespace app::alarmClock
     class AlarmReminderWindow : public gui::AppWindow, public AlarmReminderWindowContract::View
     {
       private:
-        std::unique_ptr<sys::Timer> reminderTimer;
-        std::unique_ptr<sys::Timer> musicTimer;
-        std::unique_ptr<sys::Timer> delayTimer;
         std::unique_ptr<AlarmReminderWindowContract::Presenter> presenter;
         std::vector<AlarmsRecord> alarmRecords;
         std::vector<AlarmsRecord> previousAlarmRecords;
@@ -35,17 +32,9 @@ namespace app::alarmClock
         gui::Image *rightImage  = nullptr;
         gui::Image *snoozeImage = nullptr;
 
-        uint32_t elapsedSeconds         = 0;
-        uint32_t previousElapsedSeconds = 0;
-
-        void startTimers();
-        void startMusicTimer();
-        void stopTimers();
         void closeReminder();
-        void closeReminderCallback();
-        void loopMusic();
         void displayAlarm();
-        void countElapsedMinutes();
+        AlarmsReminderModel::OnTimerCallback getCallback();
 
       public:
         AlarmReminderWindow(app::Application *app,

@@ -113,13 +113,14 @@ namespace app
             style::alarmClock::window::name::dialogYesNo,
             [](Application *app, const std::string &name) { return std::make_unique<gui::DialogYesNo>(app, name); });
 
-        windowsFactory.attach(
-            style::alarmClock::window::name::alarmReminder, [](Application *app, const std::string &name) {
-                auto alarmsRepository = std::make_unique<alarmClock::AlarmsDBRepository>(app);
-                auto presenter =
-                    std::make_unique<alarmClock::AlarmReminderWindowPresenter>(std::move(alarmsRepository));
-                return std::make_unique<alarmClock::AlarmReminderWindow>(app, std::move(presenter));
-            });
+        windowsFactory.attach(style::alarmClock::window::name::alarmReminder,
+                              [](Application *app, const std::string &name) {
+                                  auto alarmsRepository    = std::make_unique<alarmClock::AlarmsDBRepository>(app);
+                                  auto alarmsReminderModel = std::make_unique<alarmClock::AlarmsReminderModel>(app);
+                                  auto presenter           = std::make_unique<alarmClock::AlarmReminderWindowPresenter>(
+                                      std::move(alarmsRepository), std::move(alarmsReminderModel));
+                                  return std::make_unique<alarmClock::AlarmReminderWindow>(app, std::move(presenter));
+                              });
     }
 
     void ApplicationAlarmClock::destroyUserInterface()

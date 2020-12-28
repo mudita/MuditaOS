@@ -7,22 +7,12 @@
 #include <gui/widgets/Window.hpp>
 #include <time/time_conversion.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <module-services/service-audio/service-audio/AudioServiceAPI.hpp>
 
 namespace app::alarmClock
 {
-    constexpr static const int reminderLifeDuration = 900000; // 15min
-    constexpr static const int defaultDuration      = 10000;  // 10s
-
     AlarmReminderWindow::AlarmReminderWindow(app::Application *app,
                                              std::unique_ptr<AlarmReminderWindowContract::Presenter> &&windowPresenter)
-        : AppWindow(app, style::alarmClock::window::name::alarmReminder),
-          reminderTimer{std::make_unique<sys::Timer>(
-              "AlarmClockReminderTimer", app, reminderLifeDuration, sys::Timer::Type::SingleShot)},
-          musicTimer{
-              std::make_unique<sys::Timer>("AlarmClockMusicTimer", app, defaultDuration, sys::Timer::Type::Periodic)},
-          delayTimer{std::make_unique<sys::Timer>("AlarmDelayTimer", app, defaultDuration, sys::Timer::Type::Periodic)},
-          presenter{std::move(windowPresenter)}
+        : AppWindow(app, style::alarmClock::window::name::alarmReminder), presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();
@@ -30,7 +20,7 @@ namespace app::alarmClock
 
     AlarmReminderWindow::~AlarmReminderWindow()
     {
-        stopTimers();
+        presenter->stopTimers();
         destroyInterface();
     }
 
@@ -109,28 +99,6 @@ namespace app::alarmClock
         erase();
     }
 
-    void AlarmReminderWindow::startTimers()
-    {
-        elapsedSeconds = 0;
-        reminderTimer->connect([=](sys::Timer &) { closeReminderCallback(); });
-        reminderTimer->reload();
-        delayTimer->connect([=](sys::Timer &) { countElapsedMinutes(); });
-        delayTimer->reload();
-    }
-
-    void AlarmReminderWindow::startMusicTimer()
-    {
-        musicTimer->connect([=](sys::Timer &) { loopMusic(); });
-        musicTimer->reload();
-    }
-
-    void AlarmReminderWindow::stopTimers()
-    {
-        reminderTimer->stop();
-        delayTimer->stop();
-        musicTimer->stop();
-    }
-
     auto AlarmReminderWindow::handleSwitchData(gui::SwitchData *data) -> bool
     {
         if (data == nullptr) {
@@ -148,14 +116,9 @@ namespace app::alarmClock
                 return false;
             }
             LOG_DEBUG("New alarm covered the old one, automatic snooze applying");
-            for (auto &alarm : previousAlarmRecords) {
-                uint32_t minutes =
-                    std::lround(static_cast<float>(previousElapsedSeconds) / utils::time::secondsInMinute);
-                presenter->update(alarm, UserAction::Snooze, minutes);
-            }
-            previousElapsedSeconds = 0;
+            presenter->updatePreviousRecords(previousAlarmRecords);
         }
-        startTimers();
+        presenter->startTimers(getCallback());
         previousAlarmRecords = alarmRecords;
         displayAlarm();
         return true;
@@ -163,23 +126,13 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::displayAlarm()
     {
-        auto rec           = alarmRecords.front();
-        auto timeToDisplay = rec.time + std::chrono::minutes(rec.delay);
-        if (rec.status > AlarmStatus::On) {
-            timeToDisplay += (static_cast<uint32_t>(rec.status) - 1) * std::chrono::minutes(rec.snooze);
-        }
+        auto rec = alarmRecords.front();
         if (rec.status == AlarmStatus::FifthSnooze) {
             snoozeVBox->setVisible(false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
         }
-        timeLabel->setText(TimePointToLocalizedTimeString(timeToDisplay, "%I:%0M"));
-        auto fileTags = AudioServiceAPI::GetFileTags(application, rec.path);
-
-        if (fileTags != std::nullopt) {
-            musicTimer->setInterval(fileTags->duration_sec * 1000);
-            startMusicTimer();
-            loopMusic();
-        }
+        timeLabel->setText(TimePointToLocalizedTimeString(presenter->getTimeToDisplay(rec), "%I:%0M"));
+        presenter->handleMusicPlay(rec.path);
     }
 
     bool AlarmReminderWindow::onInput(const gui::InputEvent &inputEvent)
@@ -189,8 +142,7 @@ namespace app::alarmClock
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_ENTER) && alarmRecords.front().status != AlarmStatus::FifthSnooze) {
-            uint32_t minutes = std::lround(static_cast<float>(elapsedSeconds) / utils::time::secondsInMinute);
-            presenter->update(alarmRecords.front(), UserAction::Snooze, minutes);
+            presenter->update(alarmRecords.front(), UserAction::Snooze, presenter->getElapsedMinutes());
             closeReminder();
             return true;
         }
@@ -211,39 +163,28 @@ namespace app::alarmClock
         }
         if (alarmRecords.empty()) {
             LOG_DEBUG("Switch to alarm main window");
-            stopTimers();
-            AudioServiceAPI::StopAll(application);
+            presenter->stopTimers();
+            presenter->stopMusic();
             // app::manager::Controller::sendAction(application, app::manager::actions::Home);
             application->switchWindow(gui::name::window::main_window);
         }
         else {
             LOG_DEBUG("Next alarm at the same time handle");
-            stopTimers();
-            startTimers();
+            presenter->stopTimers();
+            presenter->startTimers(getCallback());
             displayAlarm();
         }
     }
 
-    void AlarmReminderWindow::loopMusic()
+    AlarmsReminderModel::OnTimerCallback AlarmReminderWindow::getCallback()
     {
-        AudioServiceAPI::PlaybackStart(application, audio::PlaybackType::Multimedia, alarmRecords.at(0).path);
+        auto callback = [&]() {
+            for (auto &alarm : alarmRecords) {
+                presenter->update(alarm, UserAction::Snooze, presenter->getElapsedMinutes());
+            }
+            alarmRecords.clear();
+            closeReminder();
+        };
+        return callback;
     }
-
-    void AlarmReminderWindow::countElapsedMinutes()
-    {
-        elapsedSeconds += defaultDuration / utils::time::milisecondsInSecond;
-        previousElapsedSeconds = elapsedSeconds;
-    }
-
-    void AlarmReminderWindow::closeReminderCallback()
-    {
-        for (auto &alarm : alarmRecords) {
-            presenter->update(alarm,
-                              UserAction::Snooze,
-                              reminderLifeDuration / (utils::time::milisecondsInSecond * utils::time::secondsInMinute));
-        }
-        alarmRecords.clear();
-        closeReminder();
-    }
-
 } // namespace app::alarmClock

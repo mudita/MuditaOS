@@ -5,6 +5,7 @@
 
 #include "BasePresenter.hpp"
 #include "application-alarm-clock/models/AlarmsRepository.hpp"
+#include "application-alarm-clock/models/AlarmsReminderModel.hpp"
 
 namespace app::alarmClock
 {
@@ -28,19 +29,35 @@ namespace app::alarmClock
             virtual ~Presenter() noexcept = default;
 
             virtual void update(AlarmsRecord &alarm, UserAction action, uint32_t delay) = 0;
+            virtual void updatePreviousRecords(std::vector<AlarmsRecord> &records)      = 0;
+            virtual void startTimers(AlarmsReminderModel::OnTimerCallback callback)     = 0;
+            virtual void stopTimers()                                                   = 0;
+            virtual void handleMusicPlay(const std::string &filePath)                   = 0;
+            virtual void stopMusic()                                                    = 0;
+            virtual uint32_t getElapsedMinutes()                                        = 0;
+            virtual TimePoint getTimeToDisplay(const AlarmsRecord &alarm)               = 0;
         };
     };
 
     class AlarmReminderWindowPresenter : public AlarmReminderWindowContract::Presenter
     {
       public:
-        explicit AlarmReminderWindowPresenter(std::unique_ptr<AbstractAlarmsRepository> &&alarmsRepository);
+        AlarmReminderWindowPresenter(std::unique_ptr<AbstractAlarmsRepository> &&alarmsRepository,
+                                     std::unique_ptr<AbstractAlarmsReminderModel> &&alarmsReminderModel);
 
         void update(AlarmsRecord &alarm, UserAction action, uint32_t delay) override;
+        void updatePreviousRecords(std::vector<AlarmsRecord> &records) override;
+        void startTimers(AlarmsReminderModel::OnTimerCallback callback) override;
+        void stopTimers() override;
+        void handleMusicPlay(const std::string &filePath) override;
+        void stopMusic() override;
+        uint32_t getElapsedMinutes() override;
+        TimePoint getTimeToDisplay(const AlarmsRecord &alarm) override;
 
       private:
         void snoozeHandle(AlarmsRecord &alarm, uint32_t delay);
         void endAlarm(AlarmsRecord &alarm);
         std::unique_ptr<AbstractAlarmsRepository> alarmsRepository;
+        std::unique_ptr<AbstractAlarmsReminderModel> alarmsReminderModel;
     };
 } // namespace app::alarmClock

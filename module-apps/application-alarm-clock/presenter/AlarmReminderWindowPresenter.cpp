@@ -7,8 +7,9 @@
 namespace app::alarmClock
 {
     AlarmReminderWindowPresenter::AlarmReminderWindowPresenter(
-        std::unique_ptr<AbstractAlarmsRepository> &&alarmsRepository)
-        : alarmsRepository{std::move(alarmsRepository)}
+        std::unique_ptr<AbstractAlarmsRepository> &&alarmsRepository,
+        std::unique_ptr<AbstractAlarmsReminderModel> &&alarmsReminderModel)
+        : alarmsRepository{std::move(alarmsRepository)}, alarmsReminderModel{std::move(alarmsReminderModel)}
     {}
 
     void AlarmReminderWindowPresenter::update(AlarmsRecord &alarm, UserAction action, uint32_t delay)
@@ -58,5 +59,47 @@ namespace app::alarmClock
             alarm.status = AlarmStatus::On;
         }
         alarm.delay = 0;
+    }
+
+    void AlarmReminderWindowPresenter::updatePreviousRecords(std::vector<AlarmsRecord> &records)
+    {
+        for (auto &alarm : records) {
+            this->update(alarm, UserAction::Snooze, alarmsReminderModel->getPreviousElapsedMinutes());
+        }
+        alarmsReminderModel->resetPreviousElapsedSeconds();
+    }
+
+    void AlarmReminderWindowPresenter::startTimers(AlarmsReminderModel::OnTimerCallback callback)
+    {
+        alarmsReminderModel->startTimers(callback);
+    }
+
+    void AlarmReminderWindowPresenter::stopTimers()
+    {
+        alarmsReminderModel->stopTimers();
+    }
+
+    void AlarmReminderWindowPresenter::handleMusicPlay(const std::string &filePath)
+    {
+        alarmsReminderModel->handleMusicPlay(filePath);
+    }
+
+    void AlarmReminderWindowPresenter::stopMusic()
+    {
+        alarmsReminderModel->stopMusic();
+    }
+
+    uint32_t AlarmReminderWindowPresenter::getElapsedMinutes()
+    {
+        return alarmsReminderModel->getElapsedMinutes();
+    }
+
+    TimePoint AlarmReminderWindowPresenter::getTimeToDisplay(const AlarmsRecord &alarm)
+    {
+        auto timeToDisplay = alarm.time + std::chrono::minutes(alarm.delay);
+        if (alarm.status > AlarmStatus::On) {
+            timeToDisplay += (static_cast<uint32_t>(alarm.status) - 1) * std::chrono::minutes(alarm.snooze);
+        }
+        return timeToDisplay;
     }
 } // namespace app::alarmClock
