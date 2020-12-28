@@ -47,6 +47,7 @@
 #include <SystemManager/SystemManager.hpp>
 #include <thread.hpp>
 #include <vfs.hpp>
+#include <purefs/vfs_subsystem.hpp>
 
 #include <memory>
 #include <vector>
@@ -68,17 +69,20 @@ int main()
     bsp::BoardInit();
 
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
+    purefs::subsystem::vfs_handle_t vfs;
 
-    sysmgr->StartSystem([sysmgr]() {
+    sysmgr->StartSystem([sysmgr, &vfs]() {
         /// force initialization of PhonenumberUtil because of its stack usage
         /// otherwise we would end up with an init race and PhonenumberUtil could
         /// be initiated in a task with stack not big enough to handle it
         i18n::phonenumbers::PhoneNumberUtil::GetInstance();
-
-        vfs.Init();
-
+        vfs     = purefs::subsystem::initialize();
+        int err = purefs::subsystem::mount_defaults();
+        if (err) {
+            LOG_FATAL("VFS subystem fatal error %i", err);
+            std::abort();
+        }
         auto ret = true;
-
         ret &=
             sys::SystemManager::CreateService(std::make_shared<EventManager>(service::name::evt_manager), sysmgr.get());
 #if ENABLE_FILEINDEXER_SERVICE

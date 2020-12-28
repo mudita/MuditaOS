@@ -305,7 +305,7 @@ class ScopedDir
 
 TEST_CASE("Read file length")
 {
-    ScopedDir dir(USER_PATH("test"));
+    ScopedDir dir("mytest");
     auto *file = std::fopen(dir("test.txt").c_str(), "w");
     REQUIRE(file != nullptr);
     std::array<int, 3> v = {42, -1, 7};

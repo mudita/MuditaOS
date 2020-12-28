@@ -11,14 +11,12 @@
 #include <log/log.hpp>
 #include <atomic>
 #include <boot/bootconfig.hpp>
-#include "vfsNotifier.hpp"
 #include "vfs_globals.hpp"
 
 #ifndef TARGET_Linux
 #include "board/cross/eMMC/eMMC.hpp"
 #endif
 
-#include "ff_stdio.h"
 
 namespace fs = std::filesystem;
 
@@ -67,8 +65,7 @@ namespace purefs
 class vfs
 {
   public:
-    using FILE    = FF_FILE;
-    using FsEvent = vfsn::utility::vfsNotifier::FsEvent;
+    // using FsEvent = vfsn::utility::vfsNotifier::FsEvent;
     enum class FileAttributes
     {
         ReadOnly,
@@ -122,17 +119,19 @@ class vfs
     [[deprecated]] int deltree(const char *path);
     [[deprecated]] int mkdir(const char *dir);
     [[deprecated]] int rename(const char *oldname, const char *newname);
+    /*
     [[deprecated]] void registerNotificationHandler(vfsn::utility::vfsNotifier::NotifyHandler handler)
     {
         chnNotifier.registerNotificationHandler(handler);
     }
+    */
     [[deprecated]] auto getAbsolutePath(std::string_view path) const -> std::string;
 
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
 #endif
 
-    FF_Disk_t *emmcFFDisk{};
+    /// FF_Disk_t *emmcFFDisk{};
 
     auto isInitialized() const noexcept
     {
@@ -140,7 +139,7 @@ class vfs
     }
 
   private:
-    vfsn::utility::vfsNotifier chnNotifier;
+    // vfsn::utility::vfsNotifier chnNotifier;
     static std::atomic<bool> initDone;
     boot::BootConfig bootConfig;
 };

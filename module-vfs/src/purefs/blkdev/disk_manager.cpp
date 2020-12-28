@@ -4,6 +4,7 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk.hpp>
 #include <log/log.hpp>
+#include <mutex.hpp>
 #include <errno.h>
 #include <charconv>
 #include <tuple>
@@ -19,13 +20,20 @@ namespace purefs::blkdev
         using namespace std::literals;
         static constexpr auto part_suffix = "part"sv;
     } // namespace
+
+    disk_manager::disk_manager() : m_lock(std::make_unique<cpp_freertos::MutexRecursive>())
+    {}
+
+    disk_manager::~disk_manager()
+    {}
+
     auto disk_manager::register_device(std::shared_ptr<disk> disk, std::string_view device_name, unsigned flags) -> int
     {
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return -EINVAL;
         }
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         const auto ret = m_dev_map.find(std::string(device_name));
         if (ret != std::end(m_dev_map)) {
             LOG_ERROR("Disc: %.*s already registered.", int(device_name.length()), device_name.data());
@@ -43,7 +51,7 @@ namespace purefs::blkdev
     }
     auto disk_manager::unregister_device(std::string_view device_name) -> int
     {
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         auto it = m_dev_map.find(std::string(device_name));
         if (it == std::end(m_dev_map)) {
             LOG_ERROR("Disc: %.*s doesn't exists in manager.", int(device_name.length()), device_name.data());
@@ -65,7 +73,7 @@ namespace purefs::blkdev
             ret = nullptr;
         }
         else {
-            cpp_freertos::LockGuard _lck(m_lock);
+            cpp_freertos::LockGuard _lck(*m_lock);
             const auto it = m_dev_map.find(std::string(dev));
             if (it == std::end(m_dev_map)) {
                 ret = nullptr;

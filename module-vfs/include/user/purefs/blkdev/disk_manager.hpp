@@ -7,10 +7,14 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <mutex.hpp>
 #include <tuple>
 #include "defs.hpp"
 #include "partition.hpp"
+
+namespace cpp_freertos
+{
+    class MutexRecursive;
+}
 
 namespace purefs::blkdev
 {
@@ -23,7 +27,8 @@ namespace purefs::blkdev
       public:
         disk_manager(const disk_manager &) = delete;
         auto operator=(const disk_manager &) -> disk_manager & = delete;
-        disk_manager()                                         = default;
+        disk_manager();
+        ~disk_manager();
         /** Register a new disc
          * @param[in] disk Block device register
          * @param[in] device_name Disk friendly name
@@ -130,6 +135,6 @@ namespace purefs::blkdev
 
       private:
         std::unordered_map<std::string, std::shared_ptr<disk>> m_dev_map;
-        mutable cpp_freertos::MutexRecursive m_lock;
+        std::unique_ptr<cpp_freertos::MutexRecursive> m_lock;
     };
 } // namespace purefs::blkdev

@@ -9,10 +9,15 @@
 #include <log/log.hpp>
 #include <split_sv.hpp>
 #include <errno.h>
+#include <mutex.hpp>
 
 namespace purefs::fs
 {
-    filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm) : m_diskmm(diskmm)
+    filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm)
+        : m_diskmm(diskmm), m_lock(new cpp_freertos::MutexRecursive)
+    {}
+
+    filesystem::~filesystem()
     {}
 
     auto filesystem::register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operations> fops) -> int
@@ -21,7 +26,7 @@ namespace purefs::fs
             LOG_ERROR("Filesystem operations doesn't exists");
             return -EINVAL;
         }
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         const auto it = m_fstypes.find(std::string(fsname));
         if (it != std::end(m_fstypes)) {
             LOG_ERROR("Disc: %.*s already registered.", int(fsname.length()), fsname.data());
@@ -40,7 +45,7 @@ namespace purefs::fs
 
     auto filesystem::unregister_filesystem(std::string_view fsname) -> int
     {
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         const auto it = m_fstypes.find(std::string(fsname));
         if (it == std::end(m_fstypes)) {
             LOG_ERROR("VFS: filesystem %.*s doesn't exists in manager.", int(fsname.length()), fsname.data());
@@ -65,7 +70,7 @@ namespace purefs::fs
             return -EINVAL;
         }
         {
-            cpp_freertos::LockGuard _lock(m_lock);
+            cpp_freertos::LockGuard _lock(*m_lock);
             const auto mpi = m_mounts.find(std::string(target));
             if (mpi != std::end(m_mounts)) {
                 LOG_ERROR("VFS: mount point already exists %.*s", int(target.length()), target.data());
@@ -114,7 +119,7 @@ namespace purefs::fs
 
     auto filesystem::umount(std::string_view mount_point) -> int
     {
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         auto mnti = m_mounts.find(std::string(mount_point));
         if (mnti == std::end(m_mounts)) {
             return -ENOENT;
@@ -138,7 +143,7 @@ namespace purefs::fs
 
     auto filesystem::read_mountpoints(std::list<std::string> &mountpoints) const -> int
     {
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         for (const auto &mntp : m_mounts) {
             mountpoints.push_back(mntp.first);
         }
@@ -150,7 +155,7 @@ namespace purefs::fs
     {
         size_t longest_match{};
         std::shared_ptr<internal::mount_point> mount_pnt;
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         for (const auto &mntp : m_mounts) {
             const auto slen = mntp.first.size();
             if ((slen < longest_match) || (slen > path.size())) {
@@ -215,7 +220,7 @@ namespace purefs::fs
 
     auto filesystem::add_filehandle(fsfile file) noexcept -> int
     {
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         return m_fds.insert(file) + first_file_descriptor;
     }
 
@@ -225,7 +230,7 @@ namespace purefs::fs
             return nullptr;
         }
         fds -= first_file_descriptor;
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         fsfile ret{};
         if (m_fds.exists(fds)) {
             ret = m_fds[fds];
@@ -241,7 +246,7 @@ namespace purefs::fs
             return ret;
         }
         fds -= first_file_descriptor;
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         if (m_fds.exists(fds)) {
             ret = m_fds[fds];
         }
