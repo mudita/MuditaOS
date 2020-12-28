@@ -1,15 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
 
-# vfs tests
-add_catch2_executable(
-    NAME
-        vfs
-    SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/unittest_vfs.cpp
-    LIBS
-        module-vfs module-utils
-)
-
 add_catch2_executable(
     NAME vfs-disk
     SRCS

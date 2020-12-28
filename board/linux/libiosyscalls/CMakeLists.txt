@@ -5,26 +5,29 @@ project(iosyscalls VERSION 1.0
 
 
 set(SOURCES
-		${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_stdio.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_scan_family.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_posix.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/dirent_support.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/dirent.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_stdio.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_scan_family.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/syscalls_posix.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/iosyscalls.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/dirent.cpp
 
 )
 
+
 set(INCLUDES
 	"${CMAKE_CURRENT_SOURCE_DIR}/include"
-	"${CMAKE_SOURCE_DIR}/module-vfs/board/freeRTOS_FAT/include"
-	"${CMAKE_SOURCE_DIR}/module-os/FreeRTOS/include"
 	"${CMAKE_SOURCE_DIR}/module-os/board/linux"
-	"${CMAKE_SOURCE_DIR}/module-vfs/board/free_rtos_custom/include"
+        "${CMAKE_SOURCE_DIR}/module-os/RTOSWrapper/include"
+	"${CMAKE_SOURCE_DIR}/module-utils/parallel-hashmap"
 	"${CMAKE_SOURCE_DIR}/module-utils"
+	"${CMAKE_SOURCE_DIR}/module-vfs/include/user"
+	"${CMAKE_SOURCE_DIR}/module-vfs/include/internal"
 )
 
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
+target_compile_options( ${PROJECT_NAME} PRIVATE "-Wno-nonnull-compare" )
 get_target_property( target_options ${PROJECT_NAME} COMPILE_OPTIONS)
 list(REMOVE_ITEM target_options "-fsanitize=address")
 set_property(TARGET ${PROJECT_NAME} PROPERTY COMPILE_OPTIONS ${target_options} )

@@ -3,19 +3,13 @@
 
 #pragma once
 
-#include <stdio.h>
-#include <dlfcn.h>
-
-namespace vfsn::debug::internal {
-    static inline void trace_syscall( const char* fn)
-    {
-        int (*real_fprintf)(FILE *__restrict __stream, const char *__restrict __format, ...);
-        real_fprintf = reinterpret_cast<decltype(real_fprintf)>(dlsym(RTLD_NEXT, "fprintf"));
-        real_fprintf(stderr,">>>>>>> CALL FUNC [%s] <<<<<<<\n", fn );
-    }
-}
 #ifdef DEBUG_SHARED_LIBRARY_FS_LIB
-#define TRACE_SYSCALL() vfsn::debug::internal::trace_syscall(__PRETTY_FUNCTION__)
+namespace vfsn::linux::internal {
+    void debug_trace_syscall(const char* fn, const char* format, ...);
+}
+#define TRACE_SYSCALL() vfsn::linux::internal::debug_trace_syscall(__PRETTY_FUNCTION__,"")
+#define TRACE_SYSCALLN(format,...) vfsn::linux::internal::debug_trace_syscall(__PRETTY_FUNCTION__,format,__VA_ARGS__)
 #else
 #define TRACE_SYSCALL() do {} while(0)
+#define TRACE_SYSCALLN(format,...) do {} while(0)
 #endif

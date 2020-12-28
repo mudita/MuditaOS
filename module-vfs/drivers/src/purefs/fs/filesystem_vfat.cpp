@@ -322,8 +322,11 @@ namespace purefs::fs::drivers
         if (newpos < 0) {
             return -ENXIO;
         }
-        const auto fres = f_lseek(fp, newpos);
-        return translate_error(fres);
+        FRESULT fres{FR_OK};
+        if (f_tell(fp) != newpos) {
+            fres = f_lseek(fp, newpos);
+        }
+        return (fres == FR_OK) ? (f_tell(fp)) : translate_error(fres);
     }
 
     auto filesystem_vfat::fstat(fsfile zfile, struct stat &st) noexcept -> int

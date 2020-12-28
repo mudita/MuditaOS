@@ -1,12 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-//#include <stdio.h>
-#include <ff_stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include "debug.hpp"
-#include "internal.hpp"
+#include <iosyscalls.hpp>
 #include <dlfcn.h>
 
 namespace
@@ -26,13 +25,28 @@ namespace
     }
 }
 
-namespace {
-    int ic(FF_FILE *fp)
+namespace
+{
+
+    using namespace vfsn::linux::internal;
+    int ic(FILEX *fp)
     {
         char ch;
-        return ff_fread( &ch, 1, 1, fp);
+        if(fp->ungetchar>0)
+        {
+            ch = fp->ungetchar;
+            fp->ungetchar = -1;
+            return 0;
+        }
+        else
+        {
+            auto ret = invoke_fs(&purefs::fs::filesystem::read,fp->fd,&ch,1);
+            fp->error = errno;
+            return ret==1?0:ret;
+        }
     }
-    int istr(FF_FILE *fp, char *dst, int wid)
+
+    int istr(FILEX *fp, char *dst, int wid)
     {
         char *d = dst;
         int c;
@@ -40,11 +54,11 @@ namespace {
             *d++ = c;
         }
         *d = '\0';
-        ungetc(c, reinterpret_cast<FILE*>(fp));
+        //ungetc(c, fp);
         return d == dst;
     }
     /* t is 1 for char, 2 for short, 4 for int, and 8 for long */
-    int iint(FF_FILE *fp, void *dst, int t, int wid)
+    int iint(FILEX *fp, void *dst, int t, int wid)
     {
         long n = 0;
         int c;
@@ -79,60 +93,47 @@ namespace {
         return 0;
     }
 }
-extern "C" {
+extern "C"
+{
 
-    namespace vfs = vfsn::linux::internal;
+    using namespace vfsn::linux::internal;
     int ungetc (int __c, FILE *__stream)
     {
         TRACE_SYSCALL();
-        if(!vfs::is_ff_handle(__stream)) {
-            real_fprintf(stderr,"WARNING: redirecting ungetc(%p) to the linux fs\n",__stream);
+        if(!is_filex(__stream))
+        {
             return real_ungetc(__c,__stream);
         }
-        if(!vfs::vfs_is_initialized()) {
-            errno = EIO;
-            return -1;
+        else
+        {
+            auto fx = reinterpret_cast<FILEX*>(__stream);
+            fx->ungetchar = __c;
+            return 0;
         }
-        int ret = ff_fseek(reinterpret_cast<FF_FILE*>(__stream), -1, SEEK_CUR );
-        if( ret ) {
-            errno = stdioGET_ERRNO();
-            return ret;
-        }
-        char ch = __c;
-        ret = ff_fwrite(&ch, 1, 1, reinterpret_cast<FF_FILE*>(__stream) );
-        if(ret!=1) {
-            errno = stdioGET_ERRNO();
-            return -1;
-        }
-        errno = stdioGET_ERRNO();
-        return 0;
     }
     __asm__(".symver ungetc,vfscanf@GLIBC_2.2.5");
 
     int vfscanf (FILE *__restrict fp, const char *__restrict fmt,
                     __gnuc_va_list ap)
     {
-        if(!vfs::is_ff_handle(fp)) {
-            real_fprintf(stderr,"WARNING: redirecting fscanf(%p) to the linux fs\n",fp);
+        if(!is_filex(fp))
+        {
             return real_vfscanf(fp,fmt,ap);
         }
         TRACE_SYSCALL();
-        if(!vfs::vfs_is_initialized()) {
-            errno = EIO;
-            return -1;
-        }
         int ret = 0;
         int t, c;
         int wid = 1 << 20;
+        auto fx = reinterpret_cast<FILEX*>(fp);
         while (*fmt) {
             while (isspace(static_cast<unsigned char>(*fmt))) {
                 fmt++;
             }
-            while (isspace(c = ic(reinterpret_cast<FF_FILE*>(fp))))
+            while (isspace(c = ic(fx)))
                 ;
             ungetc(c, fp);
             while (*fmt && *fmt != '%' && !isspace((unsigned char) *fmt))
-                if (*fmt++ != ic(reinterpret_cast<FF_FILE*>(fp)))
+                if (*fmt++ != ic(fx))
                     return ret;
             if (*fmt != '%')
                 continue;
@@ -154,12 +155,12 @@ extern "C" {
             switch (*fmt++) {
             case 'u':
             case 'd':
-                if (iint(reinterpret_cast<FF_FILE*>(fp), va_arg(ap, long *), t, wid))
+                if (iint((fx), va_arg(ap, long *), t, wid))
                     return ret;
                 ret++;
                 break;
             case 's':
-                if (istr(reinterpret_cast<FF_FILE*>(fp), va_arg(ap, char *), wid))
+                if (istr((fx), va_arg(ap, char *), wid))
                     return ret;
                 ret++;
                 break;

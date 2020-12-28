@@ -149,7 +149,7 @@ TEST_CASE("Corefs: Create new file, write, read from it")
         REQUIRE(hwnd >= 3);
         char buf[4096]{};
         REQUIRE(fscore.read(hwnd, buf, sizeof(buf)) == 4);
-        REQUIRE(fscore.seek(hwnd, 0, SEEK_END) == 0);
+        REQUIRE(fscore.seek(hwnd, 0, SEEK_END) == 4);
         REQUIRE(fscore.read(hwnd, buf, sizeof(buf)) == 0);
         REQUIRE(fscore.seek(hwnd, 0, SEEK_SET) == 0);
         fscore.close(hwnd);
