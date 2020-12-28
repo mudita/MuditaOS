@@ -55,6 +55,7 @@ namespace service
     // Initialize data notification handler
     sys::ReturnCodes ServiceFileIndexer::InitHandler()
     {
+        /*
         vfs.registerNotificationHandler(
             [_this = shared_from_this()](std::string_view new_path, vfs::FsEvent event, std::string_view old_path) {
                 namespace fs       = std::filesystem;
@@ -63,12 +64,15 @@ namespace service
                 sys::Bus::SendUnicast(msg, std::string(service::name::file_indexer), _this.get());
             });
         mStartupIndexer.start(shared_from_this(), service::name::file_indexer);
+        */
         return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes ServiceFileIndexer::DeinitHandler()
     {
+        /*
         vfs.registerNotificationHandler(nullptr);
+        */
         return sys::ReturnCodes::Success;
     }
 

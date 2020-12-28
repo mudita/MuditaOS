@@ -6,8 +6,6 @@
 #include <memory>
 #include <list>
 #include <array>
-#include <mutex.hpp>
-#include <unordered_map>
 #include <map>
 #include <functional>
 #include <ctime>
@@ -24,6 +22,11 @@ struct stat;
 namespace purefs::blkdev
 {
     class disk_manager;
+}
+
+namespace cpp_freertos
+{
+    class MutexRecursive;
 }
 
 namespace purefs::fs
@@ -61,6 +64,7 @@ namespace purefs::fs
         using fsdir                    = std::shared_ptr<internal::directory_handle>;
         using fsfile                         = std::shared_ptr<internal::file_handle>;
         explicit filesystem(std::shared_ptr<blkdev::disk_manager> diskmm);
+        ~filesystem();
         filesystem(const filesystem &) = delete;
         auto operator=(const filesystem &) = delete;
         /** Utility API */
@@ -72,7 +76,6 @@ namespace purefs::fs
         template <typename T> auto register_filesystem(std::string_view fsname, std::shared_ptr<T> fops) -> int
         {
             if (!fops || !std::is_convertible_v<T *, filesystem_operations *>) {
-                LOG_ERROR("Filesystem not valid");
                 return -EINVAL;
             }
             return register_filesystem(fsname, std::shared_ptr<filesystem_operations>(fops));
@@ -261,6 +264,6 @@ namespace purefs::fs
         std::map<std::string, std::shared_ptr<internal::mount_point>> m_mounts;
         std::unordered_set<std::string> m_partitions;
         internal::handle_mapper<fsfile> m_fds;
-        mutable cpp_freertos::MutexRecursive m_lock;
+        std::unique_ptr<cpp_freertos::MutexRecursive> m_lock;
     };
 } // namespace purefs::fs
