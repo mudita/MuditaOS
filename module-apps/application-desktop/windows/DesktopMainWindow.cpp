@@ -310,11 +310,11 @@ namespace gui
                 [app, this]() -> bool { return app->clearMessagesNotification(); },
                 onNotificationFocus);
         }
-        if (app->notifications.notSeen.SnoozedAlarms > 0) {
+        if (app->notifications.notSeen.Alarms > 0) {
             notifications->addNotification(
                 "alarm_icon",
                 utils::localize.get("app_desktop_snoozed_alarms"),
-                std::to_string(app->notifications.notSeen.SnoozedAlarms),
+                std::to_string(app->notifications.notSeen.Alarms),
                 []() -> bool { return false; },
                 []() -> bool { return false; },
                 [](bool) -> void {});

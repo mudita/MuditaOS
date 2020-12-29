@@ -33,9 +33,9 @@ namespace app
         {
             struct Counters
             {
-                unsigned int SMS   = 0;
-                unsigned int Calls = 0;
-                unsigned int SnoozedAlarms = 0;
+                unsigned int SMS    = 0;
+                unsigned int Calls  = 0;
+                unsigned int Alarms = 0;
 
                 auto areEmpty()
                 {
@@ -84,7 +84,8 @@ namespace app
         bool clearMessagesNotification();
         bool requestNotSeenNotifications();
         bool requestNotReadNotifications();
-        bool requestSnoozedAlarms();
+        bool requestTurnedOnAlarms();
+        uint32_t countAlarmsForToday(std::vector<AlarmsRecord> allRecords);
         unsigned int getLockPassHash() const noexcept
         {
             return lockPassHash;

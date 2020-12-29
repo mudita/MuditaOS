@@ -22,6 +22,7 @@
 #include <service-db/DBServiceAPI.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <application-settings/ApplicationSettings.hpp>
+#include <application-alarm-clock/data/AlarmsData.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/CellularMessage.hpp>
@@ -29,6 +30,7 @@
 #include <service-db/QueryMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <module-services/service-time/service-time/AlarmsTimeEvents.hpp>
 #include <module-utils/magic_enum/include/magic_enum.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 
@@ -221,7 +223,7 @@ namespace app
         }
 
         if (msg->interface == db::Interface::Name::Alarms && msg->type != db::Query::Type::Read) {
-            return requestSnoozedAlarms();
+            return requestTurnedOnAlarms();
         }
 
         if ((msg->interface == db::Interface::Name::Calllog || msg->interface == db::Interface::Name::SMSThread ||
@@ -246,8 +248,16 @@ namespace app
         bool rebuildMainWindow = false;
         uint32_t counter       = std::count_if(
             records.begin(), records.end(), [](const AlarmsRecord &rec) { return rec.status > AlarmStatus::On; });
-        rebuildMainWindow |= counter != notifications.notSeen.SnoozedAlarms;
-        notifications.notSeen.SnoozedAlarms = counter;
+        rebuildMainWindow |= counter != notifications.notSeen.Alarms;
+        notifications.notSeen.Alarms = counter;
+
+        uint32_t counterForToday     = countAlarmsForToday(records);
+        bool rebuildDesktopMenu      = counterForToday != notifications.notRead.Alarms;
+        notifications.notRead.Alarms = counterForToday;
+
+        if (rebuildDesktopMenu) {
+            windowsFactory.build(this, app::window::name::desktop_menu);
+        }
 
         auto currentWindow = getCurrentWindow();
         if (rebuildMainWindow && currentWindow->getName() == app::window::name::desktop_main_window) {
@@ -310,7 +320,7 @@ namespace app
         return succeed;
     }
 
-    bool ApplicationDesktop::requestSnoozedAlarms()
+    bool ApplicationDesktop::requestTurnedOnAlarms()
     {
         return DBServiceAPI::GetQuery(
             this, db::Interface::Name::Alarms, std::make_unique<db::query::alarms::SelectTurnedOn>());
@@ -333,6 +343,7 @@ namespace app
 
         requestNotReadNotifications();
         requestNotSeenNotifications();
+        requestTurnedOnAlarms();
 
         createUserInterface();
         setActiveWindow(gui::name::window::main_window);
@@ -455,6 +466,41 @@ namespace app
         if (currentWindow->getName() == window::name::desktop_main_window) {
             currentWindow->rebuild();
         }
+    }
+
+    uint32_t ApplicationDesktop::countAlarmsForToday(std::vector<AlarmsRecord> allRecords)
+    {
+        auto counter = 0u;
+        auto weekDay = WeekdayIndexFromTimePoint(TimePointNow());
+        for (auto &record : allRecords) {
+            auto hoursAndMinutes = TimePointToHourMinSec(record.time);
+            record.time = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + hoursAndMinutes.hours() +
+                          hoursAndMinutes.minutes();
+            auto buffer = record.time +
+                          (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze) +
+                          std::chrono::minutes(record.delay);
+            if (buffer < TimePointNow()) {
+                continue;
+            }
+            if (record.repeat == static_cast<uint32_t>(AlarmRepeat::never) ||
+                record.repeat == static_cast<uint32_t>(AlarmRepeat::everyday) ||
+                (weekDay < date::Saturday.iso_encoding() - 1 &&
+                 record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays))) {
+                counter++;
+            }
+            else if (weekDay == date::Saturday.iso_encoding() - 1 &&
+                     record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays) && record.status > AlarmStatus::On) {
+                if (stm::AlarmsTimeEvents::isAlarmGoingToJumpToNextDay(record)) {
+                    counter++;
+                }
+            }
+            else if (record.repeat > static_cast<uint32_t>(AlarmRepeat::weekDays)) {
+                if (const auto &alarms = stm::AlarmsTimeEvents::customRepeatHandle(record, weekDay); !alarms.empty()) {
+                    counter += alarms.size();
+                }
+            }
+        }
+        return counter;
     }
 
 } // namespace app

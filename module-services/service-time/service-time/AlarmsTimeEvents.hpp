@@ -38,8 +38,6 @@ namespace stm
         bool sendNextEventQuery() override;
         bool sendEventFiredQuery() override;
         void invokeEvent() override;
-        bool isAlarmGoingToJumpToNextDay(AlarmsRecord record);
-        std::vector<AlarmsRecord> customRepeatHandle(const AlarmsRecord &record, uint32_t weekDay);
         void applySnoozeAndDelay(std::vector<AlarmsRecord> &records);
         void sortNearestAlarms(std::vector<AlarmsRecord> &nearestAlarms);
         void restoreOriginalAlarmTime(std::vector<AlarmsRecord> &nearestAlarms);
@@ -48,6 +46,9 @@ namespace stm
       public:
         explicit AlarmsTimeEvents(sys::Service *service);
         ~AlarmsTimeEvents() = default;
+
+        static bool isAlarmGoingToJumpToNextDay(AlarmsRecord record);
+        static std::vector<AlarmsRecord> customRepeatHandle(const AlarmsRecord &record, uint32_t weekDay);
     };
 
 } // namespace stm

@@ -167,14 +167,16 @@ namespace gui
                         }
                     },
                 },
-                new gui::Tile("menu_alarm_W_G",
-                              "app_desktop_menu_alarm",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationAlarmClock"));
-                              }),
+                new gui::Tile(
+                    "menu_alarm_W_G",
+                    "app_desktop_menu_alarm",
+                    [=](gui::Item &item) {
+                        return app::manager::Controller::sendAction(
+                            application,
+                            app::manager::actions::Launch,
+                            std::make_unique<app::ApplicationLaunchData>("ApplicationAlarmClock"));
+                    },
+                    app->notifications.notRead.Alarms),
 
                 new gui::Tile("menu_calendar_W_G",
                               "app_desktop_menu_calendar",
