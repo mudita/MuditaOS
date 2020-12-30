@@ -73,6 +73,4 @@ class SimCard
      * errors in AT.
      */
     SimCardResult convertErrorFromATResult(const at::Result) const;
-
-    std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head);
 };

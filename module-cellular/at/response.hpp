@@ -180,6 +180,7 @@ namespace at
          * Warning: should not be used for URC !
          */
         std::optional<ResponseTokens> getTokensForATResults(const at::Result &resp, std::string_view head);
+
         bool parseCSQ(std::string response, std::string &result);
         bool parseCSQ(std::string cellularResponse, uint32_t &result);
         bool parseCREG(std::string &response, uint32_t &result);
@@ -187,7 +188,25 @@ namespace at
         bool parseQNWINFO(std::string &response, std::string &result);
         bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret);
         bool parseCLCK(const at::Result &resp, int &ret);
+        namespace qcfg_ims
+        {
+            /**
+             * VoLTE state based on QCFG="ims" command
+             */
+            enum class VoLTEIMSState
+            {
+                NotReady = 0,
+                Ready    = 1
+            };
 
+            enum class IMSState
+            {
+                ViaMBN  = 0, /// configuration could be setup via MBN file in NVRAM
+                Enable  = 1,
+                Disable = 2
+            };
+        } // namespace qcfg_ims
+        bool parseQCFG_IMS(const at::Result &resp, std::pair<qcfg_ims::IMSState, qcfg_ims::VoLTEIMSState> &ret);
         namespace creg
         {
             bool isRegistered(uint32_t commandData);
