@@ -11,6 +11,7 @@ set(SOURCES
     SimCard.cpp
     NetworkSettings.cpp
     PacketData.cpp
+    QMBNManager.cpp
     RequestFactory.cpp
     CellularRequestHandler.cpp
     requests/Request.cpp

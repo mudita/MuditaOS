@@ -124,15 +124,19 @@ namespace at
         COLP_GET,
         COLP_ENABLE,
         COLP_DISABLE,
-        CSSN,    /// Supplementary Services - Supplementary Service Notifications
-        QICSGP,  /// Configure Parameters of a TCP/IP Context
-        QIACT,   /// Activate a PDP Context
-        QIDEACT, /// Deactivate a PDP Context
-        CSCA,    /// check SMS Center
-        QRXGAIN, /// Set Downlink Gains of RX
-        CLVL,    /// Loudspeaker Volume Level Selection
-        QMIC,    /// Set Uplink Gains of MIC
-        QEEC,    /// Echo cancellation parameters
+        CSSN,     /// Supplementary Services - Supplementary Service Notifications
+        QICSGP,   /// Configure Parameters of a TCP/IP Context
+        QIACT,    /// Activate a PDP Context
+        QIDEACT,  /// Deactivate a PDP Context
+        CSCA,     /// check SMS Center
+        QRXGAIN,  /// Set Downlink Gains of RX
+        CLVL,     /// Loudspeaker Volume Level Selection
+        QMIC,     /// Set Uplink Gains of MIC
+        QNVFR,    /// Quectel command to read NV settings
+        QNVFW,    /// Quectel command to write NV settings
+        QMBNCFG,  /// Quectel command for MBN files management
+        QCFG_IMS, /// Set/Get IP Multimedia Services, get state of VoLTE
+        QEEC,     /// Echo cancellation parameters
     };
 
     // below timeouts are defined in Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf
@@ -236,7 +240,11 @@ namespace at
             {AT::QRXGAIN, {"AT+QRXGAIN=40000", default_timeout}},
             {AT::CLVL, {"AT+CLVL=3", default_timeout}},
             {AT::QMIC, {"AT+QMIC=15000,15000", default_timeout}},
-            {AT::QEEC, {"AT+QEEC=", default_timeout}}};
+            {AT::QEEC, {"AT+QEEC=", default_timeout}},
+            {AT::QNVFR, {"AT+QNVFR=", default_long_doc_timeout}},
+            {AT::QNVFW, {"AT+QNVFW=", default_long_doc_timeout}},
+            {AT::QMBNCFG, {"AT+QMBNCFG=", default_long_doc_timeout}},
+            {AT::QCFG_IMS, {"AT+QCFG=\"ims\"", default_timeout}}};
 
         if (fact.count(at) != 0u) {
             return fact.at(at);

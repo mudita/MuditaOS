@@ -1,0 +1,37 @@
+@startuml
+
+state "Disable autoselect MBN" as DautoMBN
+DautoMBN:AT+QMBNCFG="autoselect",0
+
+state "List MBN" as ListMBN
+ListMBN:AT+QMBNCFG="list"
+
+state "Select ROW MBN" as SelectROWMBN
+SelectROWMBN:AT+QMBNCFG="deactivate"
+SelectROWMBN:AT+QMBNCFG="select","ROW_Generic_3GPP"
+
+state "Reboot modem" as Reboot
+Reboot: AT+CFUN=1,1 via SoftReset
+Reboot: Init modem, MBN auto-setup IMS APN
+
+state "IMS"  as IMS
+IMS: AT+QCFG="ims",1
+IMS: AT+QNVFR="/nv/item_files/ims/IMS_enable"
+
+state "Set PS as preferred" as SetPS
+SetPS:Set Packets Switching as preferred method for voice and SMS
+SetPS:AT+QNVFR="/nv/item_files/modem/mmode/voice_domain_pref"
+SetPS:AT+QNVFR="/nv/item_files/modem/mmode/sms_domain_pref"
+
+SetPS --> DautoMBN
+DautoMBN -->  ListMBN 
+ListMBN --> SelectROWMBN: Generic MBN not selected
+ListMBN --> IMS: If correct MBN is selected
+
+
+SelectROWMBN --> IMS
+IMS --> Reboot: Only if select new MBN
+
+
+
+@enduml
