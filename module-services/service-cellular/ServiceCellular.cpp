@@ -71,7 +71,6 @@
 
 #include <module-db/queries/messages/sms/QuerySMSUpdate.hpp>
 #include <module-db/queries/messages/sms/QuerySMSAdd.hpp>
-#include <module-db/queries/phonebook/QueryContactGet.hpp>
 
 #include <algorithm>
 #include <bits/exception.h>
@@ -356,6 +355,16 @@ void ServiceCellular::registerMessageHandlers()
         auto msg = static_cast<CellularChangeVoLTEDataMessage *>(request);
         volteOn  = msg->getVoLTEon();
         settings->setValue(settings::Cellular::volte_on, std::to_string(volteOn), settings::SettingsScope::Global);
+        NetworkSettings networkSettings(*this);
+        auto vstate = networkSettings.getVoLTEState();
+        if ((vstate != VoLTEState::On) && volteOn) {
+            LOG_DEBUG("VoLTE On");
+            networkSettings.setVoLTEState(VoLTEState::On);
+        }
+        else if (!volteOn) {
+            LOG_DEBUG("VoLTE Off");
+            networkSettings.setVoLTEState(VoLTEState::Off);
+        }
         return std::make_shared<CellularResponseMessage>(true);
     });
 
@@ -520,19 +529,19 @@ bool ServiceCellular::handle_power_up_procedure()
         break;
     }
     case bsp::Board::T3: {
-        // check baud once to determine if it's already turned on
+        // check baud once to determine if it�s already turned on
         auto ret = cmux->BaudDetectOnce();
         if (ret == TS0710::ConfState::Success) {
-            // it's on aka hot start.
+            // it�s on aka hot start.
             LOG_DEBUG("T3 - hot start");
             state.set(this, State::ST::CellularConfProcedure);
             break;
         }
         else {
-            // it's off aka cold start
+            // it�s off aka cold start
             LOG_DEBUG("T3 - cold start");
             cmux->TurnOnModem();
-            // if it's T3, then wait for status pin to become active, to align its starting position with T4
+            // if it�s T3, then wait for status pin to become active, to align its starting position with T4
             vTaskDelay(pdMS_TO_TICKS(8000));
             state.set(this, State::ST::PowerUpInProgress);
             break;
@@ -540,20 +549,20 @@ bool ServiceCellular::handle_power_up_procedure()
     }
     case bsp::Board::Linux: {
         // it is basically the same as T3
-        // check baud once to determine if it's already turned on
+        // check baud once to determine if it�s already turned on
         auto ret = cmux->BaudDetectOnce();
         if (ret == TS0710::ConfState::Success) {
-            // it's on aka hot start.
+            // it�s on aka hot start.
             LOG_DEBUG("Linux - hot start");
             state.set(this, State::ST::CellularConfProcedure);
             break;
         }
         else {
-            // it's off aka cold start
+            // it�s off aka cold start
             LOG_DEBUG("Linux - cold start");
             LOG_WARN("Press PWR_KEY for 2 sec on modem eval board!");
             vTaskDelay(pdMS_TO_TICKS(2000)); // give some 2 secs more for user input
-            // if it's Linux (T3), then wait for status pin to become active, to align its starting position with T4
+            // if it�s Linux (T3), then wait for status pin to become active, to align its starting position with T4
             vTaskDelay(pdMS_TO_TICKS(8000));
             state.set(this, State::ST::PowerUpInProgress);
             break;
@@ -607,12 +616,12 @@ bool ServiceCellular::handle_power_down_waiting()
         break;
     case bsp::Board::Linux:
     case bsp::Board::T3:
-        // if it's T3, then wait for status pin to become inactive, to align with T4
-        vTaskDelay(pdMS_TO_TICKS(17000)); // according to docs this shouldn't be needed, but better be safe than Quectel
+        // if it�s T3, then wait for status pin to become inactive, to align with T4
+        vTaskDelay(pdMS_TO_TICKS(17000)); // according to docs this shouldn�t be needed, but better be safe than Quectel
         state.set(this, cellular::State::ST::PowerDown);
         break;
     default:
-        LOG_ERROR("Powering `down an unknown device not handled");
+        LOG_ERROR("Powering �down an unknown device not handled");
         return false;
     }
     return true;
@@ -630,7 +639,7 @@ bool ServiceCellular::handle_power_down()
 
 bool ServiceCellular::handle_start_conf_procedure()
 {
-    // Start configuration procedure, if it's first run modem will be restarted
+    // Start configuration procedure, if it�s first run modem will be restarted
     auto confRet = cmux->ConfProcedure();
     if (confRet == TS0710::ConfState::Success) {
         state.set(this, State::ST::AudioConfigurationProcedure);
@@ -867,7 +876,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         auto channel = cmux->get(TS0710::Channel::Commands);
         auto ret     = false;
         if (channel) {
-            // TODO alek: check if your request isn't for 5 sec when you wait in command for 90000, it's exclusivelly
+            // TODO alek: check if your request isn�t for 5 sec when you wait in command for 90000, it�s exclusivelly
             // set to 5000ms in command requesting...
             auto response = channel->cmd(at::AT::ATA);
             if (response) {
@@ -919,7 +928,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         }
         if (msg->interface == db::Interface::Name::SMS &&
             (msg->type == db::Query::Type::Create || msg->type == db::Query::Type::Update)) {
-            // note: this gets triggered on every type update, e.g. on QUEUED → FAILED so way too often
+            // note: this gets triggered on every type update, e.g. on QUEUED ? FAILED so way too often
 
             // are there new messges queued for sending ?
             auto limitTo = 15; // how many to send in this Query
@@ -2223,6 +2232,7 @@ std::shared_ptr<CellularGetAPNResponse> ServiceCellular::handleCellularGetAPNMes
 
     return std::make_shared<CellularGetAPNResponse>(packetData->getAPNs());
 }
+
 std::shared_ptr<CellularSetAPNResponse> ServiceCellular::handleCellularSetAPNMessage(CellularSetAPNMessage *msg)
 {
     auto apn = msg->getAPNConfig();
@@ -2230,7 +2240,6 @@ std::shared_ptr<CellularSetAPNResponse> ServiceCellular::handleCellularSetAPNMes
     settings->setValue(settings::Cellular::apn_list, packetData->saveAPNSettings(), settings::SettingsScope::Global);
     return std::make_shared<CellularSetAPNResponse>(ret);
 }
-
 std::shared_ptr<CellularNewAPNResponse> ServiceCellular::handleCellularNewAPNMessage(CellularNewAPNMessage *msg)
 {
     auto apn           = msg->getAPNConfig();

@@ -43,6 +43,10 @@ TESTS_LIST["catch2-cellular-request-factory"]="
     Emergency handling;
     MMI requests;
 "
+#---------    
+TESTS_LIST["catch2-cellular-qmbn"]="
+    Quectel MBN test;
+"
 #---------
 TESTS_LIST["catch2-cellular-response"]="
     Response COPS;
@@ -50,6 +54,8 @@ TESTS_LIST["catch2-cellular-response"]="
     Response CLIP;
     Response CLCK;
     Response CCWA?;
+    Response CCFC;
+    Response QCFG IMS;    
 "
 #---------
 TESTS_LIST["catch2-cellular-simcard"]="
@@ -226,6 +232,8 @@ TESTS_LIST["catch2-utils"]="
     Floating point to string;
     Fill leading digit in string;
     Read file length;
+    Hex to bytes;
+    Bytes to hex;
 "
 #---------
 TESTS_LIST["catch2-utils-clipboard"]="

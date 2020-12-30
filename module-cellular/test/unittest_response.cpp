@@ -686,3 +686,40 @@ TEST_CASE("Response CCFC")
         REQUIRE(ret.size() == 0);
     }
 }
+TEST_CASE("Response QCFG IMS")
+{
+    SECTION("QCFG IMS OK")
+    {
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState> ret;
+        resp.response.push_back("+QCFG: \"ims\",0,0");
+        REQUIRE(at::response::parseQCFG_IMS(resp, ret) == true);
+        REQUIRE(ret.first == at::response::qcfg_ims::IMSState::ViaMBN);
+        REQUIRE(ret.second == at::response::qcfg_ims::VoLTEIMSState::NotReady);
+    }
+    SECTION("QCFG IMS no space")
+    {
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState> ret;
+        resp.response.push_back("+QCFG:\"ims\",0,0");
+        REQUIRE(at::response::parseQCFG_IMS(resp, ret) == false);
+    }
+    SECTION("QCFG IMS to many value")
+    {
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState> ret;
+        resp.response.push_back("+QCFG: \"ims\",0,0,3");
+        REQUIRE(at::response::parseQCFG_IMS(resp, ret) == false);
+    }
+    SECTION("QCFG IMS to small value")
+    {
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims::VoLTEIMSState> ret;
+        resp.response.push_back("+QCFG: \"ims\",0");
+        REQUIRE(at::response::parseQCFG_IMS(resp, ret) == false);
+    }
+}

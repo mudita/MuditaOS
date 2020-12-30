@@ -156,6 +156,20 @@ namespace at
             return false;
         }
 
+        bool parseQCFG_IMS(const at::Result &resp, std::pair<qcfg_ims::IMSState, qcfg_ims::VoLTEIMSState> &ret)
+        {
+            const std::string_view AT_QCFG_IMS = "+QCFG: \"ims\"";
+            if (auto tokens = getTokensForATCommand(resp, AT_QCFG_IMS); tokens) {
+                constexpr int QCFG_IMS_TokensCount = 2;
+                if ((*tokens).size() == QCFG_IMS_TokensCount) {
+                    ret.first  = static_cast<qcfg_ims::IMSState>(utils::getNumericValue<int>((*tokens)[0]));
+                    ret.second = static_cast<qcfg_ims::VoLTEIMSState>(utils::getNumericValue<int>((*tokens)[1]));
+                    return true;
+                }
+            }
+            return false;
+        }
+
         bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret)
         {
             /// parse only first result from QPINC
