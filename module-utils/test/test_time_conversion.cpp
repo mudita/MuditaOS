@@ -44,8 +44,6 @@ class NullStream : public std::ostream
     {}
 };
 
-class vfs vfs;
-
 using namespace utils::time;
 
 using namespace std;
@@ -234,7 +232,6 @@ int main(int argc, char *argv[])
 {
     time_t time_today = 0;
 
-    vfs.Init();
     // get reference Today time
     if (bsp::rtc_GetCurrentTimestamp(&time_today)) {
         std::cerr << "Error on gettime" << std::endl;
