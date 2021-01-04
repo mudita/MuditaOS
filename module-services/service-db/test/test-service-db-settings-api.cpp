@@ -20,14 +20,6 @@
 #include "test-service-db-settings-testapps.hpp"
 #include <vfs.hpp>
 
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_init;
-
 TEST_CASE("SettingsApi")
 {
     SECTION("variable/profile/mode register/set/get/unregister")

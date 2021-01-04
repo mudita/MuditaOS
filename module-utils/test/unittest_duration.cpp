@@ -13,16 +13,7 @@
 
 #include <catch2/catch.hpp>
 
-class vfs vfs;
 utils::i18n localize;
-
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_intializer;
 
 TEST_CASE("Duration - creation")
 {
