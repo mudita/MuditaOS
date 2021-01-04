@@ -31,16 +31,6 @@
 
 using namespace std;
 
-class vfs vfs;
-
-struct vfs_initializer
-{
-    vfs_initializer()
-    {
-        vfs.Init();
-    }
-} vfs_init;
-
 TEST_CASE("Test BoundingBox intersect")
 {
     gui::BoundingBox result;
