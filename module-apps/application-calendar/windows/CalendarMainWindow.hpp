@@ -24,7 +24,7 @@ namespace gui
 
     class CalendarMainWindow : public gui::AppWindow, public app::AsyncCallbackReceiver
     {
-        bool isDayEmpty[31];
+        std::array<bool, 31> isDayEmpty;
         uint32_t offsetFromTop = 0;
         uint32_t monthWidth    = 0;
         uint32_t monthHeight   = 0;
@@ -41,7 +41,7 @@ namespace gui
         CalendarMainWindow(app::Application *app, const std::string &name);
 
         void rebuild() override;
-        void refresh();
+        void refresh(const std::vector<EventsRecord> &records);
         void filterRequest();
         void buildMonth(std::unique_ptr<MonthModel> &model);
         void buildDateLabel(std::string actualDateTime);

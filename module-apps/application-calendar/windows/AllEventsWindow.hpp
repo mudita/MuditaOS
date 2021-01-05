@@ -16,7 +16,7 @@ namespace gui
         gui::Image *leftArrowImage   = nullptr;
         gui::Image *newDayEventImage = nullptr;
 
-        calendar::TimePoint dateFilter                 = TimePointNow();
+        TimePoint dateFilter                           = TimePointNow();
         gui::ListView *allEventsList                   = nullptr;
         std::shared_ptr<AllEventsModel> allEventsModel = nullptr;
 
