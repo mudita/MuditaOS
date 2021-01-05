@@ -9,15 +9,16 @@
 #include <Utils.hpp>
 #include <random>
 
+using Clock     = std::chrono::system_clock;
+using TimePoint = std::chrono::time_point<Clock>;
+
 namespace calendar
 {
-    using Clock            = std::chrono::system_clock;
-    using TimePoint        = std::chrono::time_point<Clock>;
     using YearMonthDay     = date::year_month_day;
     using YearMonthDayLast = date::year_month_day_last;
 } // namespace calendar
 
-inline constexpr auto max_month_day = 48;
+inline constexpr auto max_month_day = 31;
 
 enum class Reminder
 {
@@ -43,7 +44,7 @@ enum class Repeat
     yearly
 };
 
-inline constexpr calendar::TimePoint TIME_POINT_INVALID = date::sys_days{date::January / 1 / 1970};
+inline constexpr TimePoint TIME_POINT_INVALID = date::sys_days{date::January / 1 / 1970};
 inline constexpr uint32_t yearDigitsNumb = 4, monthDigitsNumb = 2, dayDigitsNumb = 2, HourDigitsNumb = 2,
                           MinDigitsNumb = 2, SecDigitsNumb = 2;
 
@@ -88,34 +89,34 @@ inline time_t GetAsUTCTime(int year, int month, int day, int hour = 0, int minut
     return basetime + GetDiffLocalWithUTCTime();
 }
 
-inline calendar::TimePoint TimePointFromTimeT(const time_t &time)
+inline TimePoint TimePointFromTimeT(const time_t &time)
 {
     return std::chrono::system_clock::from_time_t(time);
 }
 
-inline time_t TimePointToTimeT(const calendar::TimePoint &tp)
+inline time_t TimePointToTimeT(const TimePoint &tp)
 {
     return std::chrono::system_clock::to_time_t(tp);
 }
 
-inline calendar::TimePoint TimePointNow()
+inline TimePoint TimePointNow()
 {
     utils::time::Timestamp timestamp;
     return TimePointFromTimeT(timestamp.getTime());
 }
 
-inline std::string TimePointToString(const calendar::TimePoint &tp)
+inline std::string TimePointToString(const TimePoint &tp)
 {
     return date::format("%F %T", std::chrono::time_point_cast<std::chrono::seconds>(tp));
 }
 
-inline auto TimePointToHourMinSec(const calendar::TimePoint &tp)
+inline auto TimePointToHourMinSec(const TimePoint &tp)
 {
     auto dp = date::floor<date::days>(tp);
     return date::make_time(tp - dp);
 }
 
-inline uint32_t TimePointToHour24H(const calendar::TimePoint &tp)
+inline uint32_t TimePointToHour24H(const TimePoint &tp)
 {
     auto time = TimePointToTimeT(tp);
     utils::time::Timestamp timestamp(time);
@@ -123,7 +124,7 @@ inline uint32_t TimePointToHour24H(const calendar::TimePoint &tp)
     return hour;
 }
 
-inline uint32_t TimePointToMinutes(const calendar::TimePoint &tp)
+inline uint32_t TimePointToMinutes(const TimePoint &tp)
 {
     auto time = TimePointToTimeT(tp);
     utils::time::Timestamp timestamp(time);
@@ -131,7 +132,7 @@ inline uint32_t TimePointToMinutes(const calendar::TimePoint &tp)
     return minute;
 }
 
-inline calendar::TimePoint getFirstWeekDay(const calendar::TimePoint &tp)
+inline TimePoint getFirstWeekDay(const TimePoint &tp)
 {
     date::year_month_day yearMonthDay = date::year_month_day{date::floor<date::days>(tp)};
     auto hourV                        = TimePointToHour24H(tp);
@@ -146,12 +147,12 @@ inline calendar::TimePoint getFirstWeekDay(const calendar::TimePoint &tp)
     return finalDateTime;
 }
 
-inline std::string TimePointToString(const calendar::TimePoint &tp, date::months months)
+inline std::string TimePointToString(const TimePoint &tp, date::months months)
 {
     date::year_month_day yearMonthDay     = date::year_month_day{date::floor<date::days>(tp)};
     date::year_month_day yearMonthDayLast = yearMonthDay.year() / yearMonthDay.month() / date::last;
 
-    calendar::TimePoint timePoint;
+    TimePoint timePoint;
 
     if ((static_cast<unsigned>(yearMonthDay.month()) + months.count()) <= 12) {
         if (yearMonthDayLast.day() == yearMonthDay.day()) {
@@ -176,38 +177,38 @@ inline std::string TimePointToString(const calendar::TimePoint &tp, date::months
     return date::format("%F %T", std::chrono::time_point_cast<std::chrono::seconds>(timePoint));
 }
 
-inline std::string TimePointToLocalizedDateString(const calendar::TimePoint &tp, const std::string format = "")
+inline std::string TimePointToLocalizedDateString(const TimePoint &tp, const std::string format = "")
 {
     auto time = TimePointToTimeT(tp);
     utils::time::Date timestamp(time);
     return timestamp.str(format);
 }
 
-inline std::string TimePointToLocalizedTimeString(const calendar::TimePoint &tp, const std::string format = "")
+inline std::string TimePointToLocalizedTimeString(const TimePoint &tp, const std::string format = "")
 {
     auto time = TimePointToTimeT(tp);
     utils::time::Time timestamp(time);
     return timestamp.str(format);
 }
 
-inline calendar::TimePoint TimePointFromString(const char *s1)
+inline TimePoint TimePointFromString(const char *s1)
 {
-    calendar::TimePoint tp;
+    TimePoint tp;
     std::istringstream(s1) >> date::parse("%F %T", tp);
     return tp;
 }
 
-inline calendar::YearMonthDay TimePointToYearMonthDay(const calendar::TimePoint &tp)
+inline calendar::YearMonthDay TimePointToYearMonthDay(const TimePoint &tp)
 {
     return date::year_month_day{date::floor<date::days>(tp)};
 }
 
-inline calendar::TimePoint TimePointFromYearMonthDay(const calendar::YearMonthDay &ymd)
+inline TimePoint TimePointFromYearMonthDay(const calendar::YearMonthDay &ymd)
 {
     return date::sys_days{ymd.year() / ymd.month() / ymd.day()};
 }
 
-inline time_t TimePointToMin(const calendar::TimePoint &tp)
+inline time_t TimePointToMin(const TimePoint &tp)
 {
     auto time     = TimePointToTimeT(tp);
     auto duration = new utils::time::Duration(time);
@@ -215,7 +216,7 @@ inline time_t TimePointToMin(const calendar::TimePoint &tp)
     return minutes;
 }
 
-inline uint32_t TimePointToHour12H(const calendar::TimePoint &tp)
+inline uint32_t TimePointToHour12H(const TimePoint &tp)
 {
     auto time = TimePointToTimeT(tp);
     utils::time::Timestamp timestamp(time);
@@ -226,7 +227,7 @@ inline uint32_t TimePointToHour12H(const calendar::TimePoint &tp)
     return hour;
 }
 
-inline std::string TimePointToHourString12H(const calendar::TimePoint &tp)
+inline std::string TimePointToHourString12H(const TimePoint &tp)
 {
     auto hour =
         utils::time::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(utils::time::GetParameters::Hour);
@@ -234,14 +235,14 @@ inline std::string TimePointToHourString12H(const calendar::TimePoint &tp)
     return utils::to_string(hour12h);
 }
 
-inline std::string TimePointToHourString24H(const calendar::TimePoint &tp)
+inline std::string TimePointToHourString24H(const TimePoint &tp)
 {
     auto hour =
         utils::time::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(utils::time::GetParameters::Hour);
     return utils::to_string(hour);
 }
 
-inline std::string TimePointToMinutesString(const calendar::TimePoint &tp)
+inline std::string TimePointToMinutesString(const TimePoint &tp)
 {
     auto minute       = TimePointToMinutes(tp);
     auto minuteString = std::to_string(minute);
@@ -252,7 +253,7 @@ inline std::string TimePointToMinutesString(const calendar::TimePoint &tp)
 }
 
 // 0: Monday, 1: Tuesday ... 6: Sunday
-inline unsigned int WeekdayIndexFromTimePoint(const calendar::TimePoint &tp)
+inline unsigned int WeekdayIndexFromTimePoint(const TimePoint &tp)
 {
     auto ymw = date::year_month_weekday{std::chrono::floor<date::days>(tp)};
     return ymw.weekday().iso_encoding() - 1;

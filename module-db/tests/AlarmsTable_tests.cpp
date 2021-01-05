@@ -139,11 +139,11 @@ TEST_CASE("Alarms Table tests")
         REQUIRE(alarmsTbl.add(
             AlarmsTableRow(5, TimePointFromString("2020-12-11 07:15:00"), 1, AlarmStatus::On, 1, "file2.mp3")));
 
-        const std::array<calendar::TimePoint, 5> paramTime{TimePointFromString("2020-12-11 07:15:00"),
-                                                           TimePointFromString("2020-11-11 15:10:00"),
-                                                           TimePointFromString("2020-11-11 15:15:00"),
-                                                           TimePointFromString("2020-11-12 17:10:00"),
-                                                           TimePointFromString("2020-11-11 19:25:00")};
+        const std::array<TimePoint, 5> paramTime{TimePointFromString("2020-12-11 07:15:00"),
+                                                 TimePointFromString("2020-11-11 15:10:00"),
+                                                 TimePointFromString("2020-11-11 15:15:00"),
+                                                 TimePointFromString("2020-11-12 17:10:00"),
+                                                 TimePointFromString("2020-11-11 19:25:00")};
 
         REQUIRE(alarmsTbl.count() == 5);
         auto entries   = alarmsTbl.getLimitOffset(0, 5);

@@ -34,7 +34,7 @@ TEST_CASE("Events Table tests")
     Database::initialize();
 
     const auto eventsPath = (purefs::dir::getUserDiskPath() / "events.db").c_str();
-    std::filesystem::remove(eventsPath);
+    // std::filesystem::remove(eventsPath);
 
     EventsDB eventsDb{eventsPath};
     REQUIRE(eventsDb.isInitialized());
@@ -166,8 +166,8 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 7;
-        calendar::TimePoint startDate = TimePointFromString("2019-10-20 14:30:00");
-        calendar::TimePoint endDate   = TimePointFromString("2019-10-20 15:30:00");
+        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
         testRow1.date_from      = startDate;
         testRow1.date_till      = endDate;
         CHECK(eventsTbl.addDaily(testRow1));
@@ -201,8 +201,8 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 4;
-        calendar::TimePoint startDate = TimePointFromString("2019-10-20 14:30:00");
-        calendar::TimePoint endDate   = TimePointFromString("2019-10-20 15:30:00");
+        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
         testRow1.date_from      = startDate;
         testRow1.date_till      = endDate;
         CHECK(eventsTbl.addWeekly(testRow1));
@@ -236,8 +236,8 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 4;
-        calendar::TimePoint startDate = TimePointFromString("2019-10-20 14:30:00");
-        calendar::TimePoint endDate   = TimePointFromString("2019-10-20 15:30:00");
+        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
         testRow1.date_from      = startDate;
         testRow1.date_till      = endDate;
         CHECK(eventsTbl.addTwoWeeks(testRow1));
@@ -271,7 +271,7 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 12;
-        const std::array<calendar::TimePoint, 24> dates{
+        const std::array<TimePoint, 24> dates{
             TimePointFromString("2019-01-20 14:30:00"), TimePointFromString("2019-01-20 15:30:00"),
             TimePointFromString("2019-02-20 14:30:00"), TimePointFromString("2019-02-20 15:30:00"),
             TimePointFromString("2019-03-20 14:30:00"), TimePointFromString("2019-03-20 15:30:00"),
@@ -318,14 +318,14 @@ TEST_CASE("Events Table tests")
         REQUIRE(eventsTbl.count() == 0);
 
         uint32_t numberOfEvents = 4;
-        std::array<calendar::TimePoint, 8> dates{TimePointFromString("2019-02-20 14:30:00"),
-                                                 TimePointFromString("2019-02-20 15:30:00"),
-                                                 TimePointFromString("2020-02-20 14:30:00"),
-                                                 TimePointFromString("2020-02-20 15:30:00"),
-                                                 TimePointFromString("2021-02-20 14:30:00"),
-                                                 TimePointFromString("2021-02-20 15:30:00"),
-                                                 TimePointFromString("2022-02-20 14:30:00"),
-                                                 TimePointFromString("2022-02-20 15:30:00")};
+        std::array<TimePoint, 8> dates{TimePointFromString("2019-02-20 14:30:00"),
+                                       TimePointFromString("2019-02-20 15:30:00"),
+                                       TimePointFromString("2020-02-20 14:30:00"),
+                                       TimePointFromString("2020-02-20 15:30:00"),
+                                       TimePointFromString("2021-02-20 14:30:00"),
+                                       TimePointFromString("2021-02-20 15:30:00"),
+                                       TimePointFromString("2022-02-20 14:30:00"),
+                                       TimePointFromString("2022-02-20 15:30:00")};
 
         testRow1.date_from = dates[0];
         testRow1.date_till = dates[1];
@@ -367,8 +367,8 @@ TEST_CASE("Events Table tests")
     {
         auto check_custom_repeat = [&](uint32_t customRepeatOption,
                                        uint32_t numberOfEvents,
-                                       calendar::TimePoint originalStartDate,
-                                       calendar::TimePoint originalEndDate) {
+                                       TimePoint originalStartDate,
+                                       TimePoint originalEndDate) {
             if (eventsTbl.count() > 0) {
                 REQUIRE(remove_events(eventsDb));
             }
@@ -396,8 +396,8 @@ TEST_CASE("Events Table tests")
                 }
             }
 
-            calendar::TimePoint expectedStartDate = TimePointFromString("2020-12-07 14:30:00"); // monday
-            calendar::TimePoint expectedEndDate   = TimePointFromString("2020-12-07 15:30:00"); // monday
+            TimePoint expectedStartDate = TimePointFromString("2020-12-07 14:30:00"); // monday
+            TimePoint expectedEndDate   = TimePointFromString("2020-12-07 15:30:00"); // monday
 
             uint32_t i = 0;
             for (uint32_t l = 0; l < numberOfWeeks; l++) {
@@ -439,8 +439,8 @@ TEST_CASE("Events Table tests")
             uint32_t customRepeatOption =
                 static_cast<uint32_t>(weekDayOption::monday) + static_cast<uint32_t>(weekDayOption::wednesday);
             uint32_t numberOfEvents     = 9;
-            calendar::TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            calendar::TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
@@ -451,8 +451,8 @@ TEST_CASE("Events Table tests")
                 static_cast<uint32_t>(weekDayOption::monday) + static_cast<uint32_t>(weekDayOption::wednesday) +
                 static_cast<uint32_t>(weekDayOption::tuesday) + static_cast<uint32_t>(weekDayOption::sunday);
             uint32_t numberOfEvents     = 17;
-            calendar::TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            calendar::TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
@@ -461,8 +461,8 @@ TEST_CASE("Events Table tests")
         {
             uint32_t customRepeatOption = static_cast<uint32_t>(weekDayOption::saturday);
             uint32_t numberOfEvents     = 5;
-            calendar::TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            calendar::TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
@@ -470,8 +470,8 @@ TEST_CASE("Events Table tests")
 
     SECTION("Check count from filter")
     {
-        calendar::TimePoint from = TimePointFromString("2019-10-20 14:30:00");
-        calendar::TimePoint till = TimePointFromString("2019-10-24 14:20:00");
+        TimePoint from = TimePointFromString("2019-10-20 14:30:00");
+        TimePoint till = TimePointFromString("2019-10-24 14:20:00");
 
         CHECK(eventsTbl.countFromFilter(from, till) == 4);
     }
@@ -516,8 +516,8 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 6);
 
         std::string newTitle = "Updated Title", newProviderID = "PurePhoneUpdated";
-        calendar::TimePoint newDateFrom = TimePointFromString("2020-10-20 15:00:00"),
-                            newDateTill = TimePointFromString("2020-10-20 16:00:00");
+        TimePoint newDateFrom    = TimePointFromString("2020-10-20 15:00:00"),
+                  newDateTill    = TimePointFromString("2020-10-20 16:00:00");
         uint32_t newReminder     = static_cast<uint32_t>(Reminder::one_week_before);
         uint32_t newRepeatOption = static_cast<uint32_t>(Repeat::biweekly);
 
@@ -572,8 +572,8 @@ TEST_CASE("Events Table tests")
 
         std::string newTitle = "Updated Title", newProviderType = "PurePhoneUpdate", newProviderID = "newID",
                     newProvideriCalUid = "new iCalUid";
-        calendar::TimePoint newDateFrom = TimePointFromString("2020-10-20 15:00:00"),
-                            newDateTill = TimePointFromString("2020-10-20 16:00:00");
+        TimePoint newDateFrom          = TimePointFromString("2020-10-20 15:00:00"),
+                  newDateTill          = TimePointFromString("2020-10-20 16:00:00");
         uint32_t newReminder           = static_cast<uint32_t>(Reminder::one_week_before);
         uint32_t newRepeatOption       = static_cast<uint32_t>(Repeat::biweekly);
 
@@ -630,8 +630,8 @@ TEST_CASE("Events Table tests")
 
         std::string newTitle = "Updated Title", newProviderType = "PurePhoneUpdate", newProviderID = "newID",
                     newProvideriCalUid = "new iCalUid";
-        calendar::TimePoint newDateFrom = TimePointFromString("2020-10-20 15:00:00"),
-                            newDateTill = TimePointFromString("2020-10-20 16:00:00");
+        TimePoint newDateFrom          = TimePointFromString("2020-10-20 15:00:00"),
+                  newDateTill          = TimePointFromString("2020-10-20 16:00:00");
         uint32_t newReminder           = static_cast<uint32_t>(Reminder::one_week_before);
         uint32_t newRepeatOption       = static_cast<uint32_t>(Repeat::biweekly);
 
@@ -696,7 +696,7 @@ TEST_CASE("Events Table tests")
         check_tableRow(entries[2], testRow3);
     }
 
-    SECTION("Select entry by date max")
+    SECTION("Select entry by date period max")
     {
         auto entries = eventsTbl.selectByDatePeriod(
             TimePointFromString("2019-10-21 10:00:00"), TimePointFromString("2019-10-24 10:00:00"), 0, UINT32_MAX);
@@ -722,6 +722,291 @@ TEST_CASE("Events Table tests")
         CHECK(entries.size() == 6);
     }
 
+    SECTION("Check multiday events")
+    {
+        /// 8.12 <-> 11.12
+        EventsTableRow multidayEvent1 = {{1},
+                                         .UID              = "test1",
+                                         .title            = "Event1",
+                                         .date_from        = TimePointFromString("2020-12-8 14:25:00"),
+                                         .date_till        = TimePointFromString("2020-12-11 15:36:00"),
+                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
+                                         .repeat           = static_cast<uint32_t>(Repeat::never),
+                                         .reminder_fired   = TimePointFromString("2020-10-20 14:20:00"),
+                                         .provider_type    = "PurePhone",
+                                         .provider_id      = "testID",
+                                         .provider_iCalUid = "test6"};
+
+        /// 14.12 <-> 21.12
+        EventsTableRow multidayEvent2 = {{2},
+                                         .UID              = "test2",
+                                         .title            = "Event2",
+                                         .date_from        = TimePointFromString("2020-12-14 14:24:00"),
+                                         .date_till        = TimePointFromString("2020-12-21 15:36:00"),
+                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
+                                         .repeat           = static_cast<uint32_t>(Repeat::never),
+                                         .reminder_fired   = TimePointFromString("2020-10-21 14:20:00"),
+                                         .provider_type    = "PurePhone",
+                                         .provider_id      = "testID",
+                                         .provider_iCalUid = "test6"};
+
+        EventsTableRow singleDayEvent = {{3},
+                                         .UID              = "test3",
+                                         .title            = "Event3",
+                                         .date_from        = TimePointFromString("2020-12-18 14:24:00"),
+                                         .date_till        = TimePointFromString("2020-12-18 15:36:00"),
+                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
+                                         .repeat           = static_cast<uint32_t>(Repeat::never),
+                                         .reminder_fired   = TimePointFromString("2020-10-21 14:20:00"),
+                                         .provider_type    = "PurePhone",
+                                         .provider_id      = "testID",
+                                         .provider_iCalUid = "test6"};
+
+        /// 23.12 <-> 24.12
+        EventsTableRow multidayEvent3 = {{4},
+                                         .UID              = "test4",
+                                         .title            = "Event4",
+                                         .date_from        = TimePointFromString("2020-12-23 14:25:00"),
+                                         .date_till        = TimePointFromString("2020-12-24 15:36:00"),
+                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
+                                         .repeat           = static_cast<uint32_t>(Repeat::never),
+                                         .reminder_fired   = TimePointFromString("2020-10-22 14:20:00"),
+                                         .provider_type    = "PurePhone",
+                                         .provider_id      = "testID",
+                                         .provider_iCalUid = "test6"};
+
+        /// 24.12 <-> 26.12
+        EventsTableRow multidayEvent4 = {{5},
+                                         .UID              = "test5",
+                                         .title            = "Event5",
+                                         .date_from        = TimePointFromString("2020-12-24 16:25:00"),
+                                         .date_till        = TimePointFromString("2020-12-26 15:36:00"),
+                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
+                                         .repeat           = static_cast<uint32_t>(Repeat::never),
+                                         .reminder_fired   = TimePointFromString("2020-10-22 14:20:00"),
+                                         .provider_type    = "PurePhone",
+                                         .provider_id      = "testID",
+                                         .provider_iCalUid = "test6"};
+
+        /// 25.12 <-> 28.12
+        EventsTableRow multidayEvent5 = {{6},
+                                         .UID              = "test6",
+                                         .title            = "Event6",
+                                         .date_from        = TimePointFromString("2020-12-25 16:25:00"),
+                                         .date_till        = TimePointFromString("2020-12-28 15:36:00"),
+                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
+                                         .repeat           = static_cast<uint32_t>(Repeat::never),
+                                         .reminder_fired   = TimePointFromString("2020-10-22 14:20:00"),
+                                         .provider_type    = "PurePhone",
+                                         .provider_id      = "testID",
+                                         .provider_iCalUid = "test6"};
+
+        /// 31.12 <-> 03.01
+        EventsTableRow multidayEvent6 = {{7},
+                                         .UID              = "test7",
+                                         .title            = "Event7",
+                                         .date_from        = TimePointFromString("2020-12-31 16:25:00"),
+                                         .date_till        = TimePointFromString("2021-01-23 15:36:00"),
+                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
+                                         .repeat           = static_cast<uint32_t>(Repeat::never),
+                                         .reminder_fired   = TimePointFromString("2020-10-22 14:20:00"),
+                                         .provider_type    = "PurePhone",
+                                         .provider_id      = "testID",
+                                         .provider_iCalUid = "test6"};
+
+        SECTION("Select entry by date (multi day events)")
+        {
+            auto entries = eventsTbl.selectByDate(TimePointFromString("2020-12-07 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.empty());
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-08 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent1);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-09 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent1);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-10 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent1);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-11 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent1);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-12 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.empty());
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-13 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.empty());
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-14 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent2);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-15 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent2);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-16 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent2);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-17 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent2);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-18 10:00:00"), 0, UINT32_MAX);
+            REQUIRE(entries.size() == 2);
+
+            check_tableRow(entries[0], multidayEvent2);
+            check_tableRow(entries[1], singleDayEvent);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-19 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent2);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-20 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent2);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-21 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent2);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-22 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.empty());
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-23 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent3);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-24 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 2);
+
+            check_tableRow(entries[0], multidayEvent3);
+            check_tableRow(entries[1], multidayEvent4);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-25 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 2);
+
+            check_tableRow(entries[0], multidayEvent4);
+            check_tableRow(entries[1], multidayEvent5);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-26 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 2);
+
+            check_tableRow(entries[0], multidayEvent4);
+            check_tableRow(entries[1], multidayEvent5);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-27 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent5);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-28 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent5);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-29 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.empty());
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-30 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.empty());
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-31 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent6);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2021-01-01 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent6);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2021-01-02 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent6);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2021-01-03 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], multidayEvent6);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2021-01-04 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.empty());
+        }
+
+        SECTION("Select entry by date (single day events)")
+        {
+            EventsTableRow singleDayEvent1 = {{1},
+                                              .UID              = "test1",
+                                              .title            = "Event1",
+                                              .date_from        = TimePointFromString("2020-10-20 14:25:00"),
+                                              .date_till        = TimePointFromString("2020-10-20 15:36:00"),
+                                              .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
+                                              .repeat           = static_cast<uint32_t>(Repeat::never),
+                                              .reminder_fired   = TimePointFromString("2020-10-20 14:20:00"),
+                                              .provider_type    = "PurePhone",
+                                              .provider_id      = "testID",
+                                              .provider_iCalUid = "test6"};
+
+            EventsTableRow singleDayEvent2 = {{2},
+                                              .UID              = "test2",
+                                              .title            = "Event2",
+                                              .date_from        = TimePointFromString("2020-10-21 14:24:00"),
+                                              .date_till        = TimePointFromString("2020-10-21 15:36:00"),
+                                              .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
+                                              .repeat           = static_cast<uint32_t>(Repeat::never),
+                                              .reminder_fired   = TimePointFromString("2020-10-21 14:20:00"),
+                                              .provider_type    = "PurePhone",
+                                              .provider_id      = "testID",
+                                              .provider_iCalUid = "test6"};
+
+            EventsTableRow singleDayEvent3 = {{3},
+                                              .UID              = "test3",
+                                              .title            = "Event3",
+                                              .date_from        = TimePointFromString("2020-10-22 14:25:00"),
+                                              .date_till        = TimePointFromString("2020-10-22 15:36:00"),
+                                              .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
+                                              .repeat           = static_cast<uint32_t>(Repeat::never),
+                                              .reminder_fired   = TimePointFromString("2020-10-22 14:20:00"),
+                                              .provider_type    = "PurePhone",
+                                              .provider_id      = "testID",
+                                              .provider_iCalUid = "test6"};
+
+            auto entries = eventsTbl.selectByDate(TimePointFromString("2020-10-20 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], singleDayEvent1);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-10-21 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], singleDayEvent2);
+
+            entries = eventsTbl.selectByDate(TimePointFromString("2020-10-22 10:00:00"), 0, UINT32_MAX);
+            CHECK(entries.size() == 1);
+
+            check_tableRow(entries[0], singleDayEvent3);
+        }
+    }
+
     SECTION("Select first upcoming event")
     {
         if (eventsTbl.count() > 0) {
@@ -729,11 +1014,11 @@ TEST_CASE("Events Table tests")
         }
         CHECK(eventsTbl.count() == 0);
 
-        calendar::TimePoint startDate1 = TimePointFromString("2018-10-20 14:24:00");
-        calendar::TimePoint startDate2 = TimePointFromString("2020-10-20 14:24:00");
+        TimePoint startDate1 = TimePointFromString("2018-10-20 14:24:00");
+        TimePoint startDate2 = TimePointFromString("2020-10-20 14:24:00");
 
-        calendar::TimePoint tillDate  = TimePointFromString("2030-10-20 15:24:00");
-        calendar::TimePoint firedDate = TimePointFromString("2018-10-20 14:24:00");
+        TimePoint tillDate  = TimePointFromString("2030-10-20 15:24:00");
+        TimePoint firedDate = TimePointFromString("2018-10-20 14:24:00");
 
         EventsTableRow testEvent1 = {{1},
                                      .UID              = "test1",
