@@ -54,13 +54,19 @@ namespace bsp
     }
     void battery_getBatteryLevel(uint8_t &levelPercent)
     {
-        levelPercent = battLevel;
+        levelPercent                   = battLevel;
         Store::Battery::modify().level = battLevel;
     }
 
     void battery_getChargeStatus(bool &status)
     {
         status = plugged;
+        if (status) {
+            Store::Battery::modify().state = Store::Battery::State::Charging;
+        }
+        else {
+            Store::Battery::modify().state = Store::Battery::State::Discharging;
+        }
     }
 
     // TODO function unused in linux driver, left for compatibility with target driver
@@ -92,18 +98,28 @@ namespace bsp
                 uint8_t notification = 0;
                 switch (buff[0]) {
                 case 'p':
-                    notification = 0x02;
+                    notification = static_cast<uint8_t>(bsp::batteryIRQSource::INOKB);
                     plugged      = 1 - plugged;
                     break;
                 case ']':
-                    notification = 0x01;
+                    notification = static_cast<uint8_t>(bsp::batteryIRQSource::INTB);
                     if (battLevel < 100)
                         battLevel++;
+                    else {
+                        // second 100% in a row
+                        if (plugged && Store::Battery::get().level == 100) {
+                            Store::Battery::modify().state = Store::Battery::State::PluggedNotCharging;
+                        }
+                    }
                     break;
                 case '[':
-                    notification = 0x01;
+                    notification = static_cast<uint8_t>(bsp::batteryIRQSource::INTB);
                     if (battLevel >= 1)
                         battLevel--;
+                    if (plugged && Store::Battery::get().level == 100) {
+                        // charging but not 100% anymore
+                        Store::Battery::modify().state = Store::Battery::State::Charging;
+                    }
                     break;
                 }
                 xQueueSend(qHandleIrq, &notification, 100);

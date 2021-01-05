@@ -9,11 +9,12 @@
 #include "Rect.hpp"
 #include "TopBar/SIM.hpp"
 #include <common_data/EventStore.hpp>
+#include <map>
 
 namespace gui
 {
 
-    static const uint32_t batteryLevelCount = 6;
+    static const uint32_t batteryBarsCount  = 6;
     static const uint32_t signalImgCount    = 6;
 
     /// Header of most of design Windows
@@ -55,9 +56,10 @@ namespace gui
         Label *networkAccessTechnologyLabel = nullptr;
         Image *signal[static_cast<size_t>(Store::RssiBar::noOfSupprtedBars)];
         Image *lock;
-        std::array<Image *, batteryLevelCount> battery = {nullptr};
-        Label *charging                                = nullptr;
-        gui::SIM *sim                                  = nullptr;
+        std::array<Image *, batteryBarsCount> batteryBars               = {nullptr};
+        std::map<const Store::Battery::State, Image *> batteryChargings = {
+            {Store::Battery::State::Charging, nullptr}, {Store::Battery::State::PluggedNotCharging, nullptr}};
+        gui::SIM *sim = nullptr;
         void prepareWidget();
         static TimeMode timeMode;
 
@@ -89,9 +91,9 @@ namespace gui
          * displayed.
          * @return if display should be refreshed or not
          */
-        bool setBatteryLevel(uint32_t percent);
-
-        void setBatteryCharging(bool plugged);
+        bool updateBattery(uint32_t percent);
+        bool updateBattery(bool plugged);
+        void showBattery(bool shown);
 
         /**
          * @brief updates signal strength. This will cause appropriate image to be displayed.
