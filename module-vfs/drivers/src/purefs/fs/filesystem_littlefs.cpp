@@ -72,14 +72,18 @@ namespace
             lfs_mode |= LFS_O_RDWR;
             break;
         }
-        if (flags & O_APPEND)
+        if (flags & O_APPEND) {
             lfs_mode |= LFS_O_APPEND;
-        if (flags & O_CREAT)
+        }
+        if (flags & O_CREAT) {
             lfs_mode |= LFS_O_CREAT;
-        if (flags & O_TRUNC)
+        }
+        if (flags & O_TRUNC) {
             lfs_mode |= LFS_O_TRUNC;
-        if (flags & O_EXCL)
+        }
+        if (flags & O_EXCL) {
             lfs_mode |= LFS_O_EXCL;
+        }
         return lfs_mode;
     }
 
@@ -297,7 +301,7 @@ namespace purefs::fs::drivers
             return nullptr;
         }
         const auto fspath = vmnt->native_path(path);
-        const auto fsflag = translate_flags(mode);
+        const auto fsflag = translate_flags(flags);
         auto filep        = std::make_shared<file_handle_littlefs>(mnt, fspath, flags);
         auto lerr         = lfs_file_open(vmnt->lfs_mount(), filep->lfs_filp(), fspath.c_str(), fsflag);
         filep->error(lfs_to_errno(lerr));
