@@ -25,6 +25,7 @@
 * Fix missing texts in the desktop application.
 * Fix occasional cases of no audio during an incoming call.
 * Charging state icons in simulator
+* Fix Debug UART conditional enabling
 
 ### Changed
 
