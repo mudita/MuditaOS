@@ -1,7 +1,7 @@
 # Software License Agreement
 
 MuditaOS – https://github.com/mudita/MuditaOS
-Copyright (c) 2017-2020, Mudita Sp. z o.o. All rights reserved.
+Copyright (c) 2017-2021, Mudita Sp. z o.o. All rights reserved.
 
 ## Sources of Intellectual Property Included in MuditaOS
 
