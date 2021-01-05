@@ -730,7 +730,7 @@ TEST_CASE("Events Record tests")
 
     SECTION("Select first upcoming event")
     {
-        calendar::TimePoint start_date = TimePointFromString("2019-10-19 14:24:00");
+        TimePoint start_date = TimePointFromString("2019-10-19 14:24:00");
         auto nextUpcoming    = eventsRecordInterface.SelectFirstUpcoming(start_date, start_date);
         REQUIRE(nextUpcoming.size() == 1);
         EventsRecord nextEventsRecord = nextUpcoming.at(0);
@@ -799,9 +799,7 @@ TEST_CASE("Events Record tests")
         getAll(expectedRecords, numberOfEvents);
     }
 
-    auto getFiltered = [&](calendar::TimePoint filter_from,
-                           calendar::TimePoint filter_till,
-                           std::vector<EventsRecord> expected_records) {
+    auto getFiltered = [&](TimePoint filter_from, TimePoint filter_till, std::vector<EventsRecord> expected_records) {
         auto query  = std::make_shared<db::query::events::GetFiltered>(filter_from, filter_till);
         auto ret    = eventsRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::events::GetFilteredResult *>(ret.get());
@@ -1013,8 +1011,7 @@ TEST_CASE("Events Record tests")
         EditQueryICS(testRecord6.UID, testRecord6);
     }
 
-    [[maybe_unused]] auto selectFirstUpcomingEvent = [&](calendar::TimePoint filter_from,
-                                                         calendar::TimePoint filter_till) {
+    [[maybe_unused]] auto selectFirstUpcomingEvent = [&](TimePoint filter_from, TimePoint filter_till) {
         auto query  = std::make_shared<db::query::events::SelectFirstUpcoming>(filter_from, filter_till);
         auto ret    = eventsRecordInterface.runQuery(query);
         auto result = dynamic_cast<db::query::events::SelectFirstUpcomingResult *>(ret.get());

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,25 +10,24 @@
 
 namespace db::query::events
 {
-    class GetFiltered : public Query
+    class GetFilteredByDay : public Query
     {
       public:
-        GetFiltered(TimePoint filter_from, TimePoint filter_till, uint32_t offset = 0, uint32_t limit = UINT32_MAX);
+        GetFilteredByDay(TimePoint filterDate, uint32_t offset = 0, uint32_t limit = UINT32_MAX);
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
-        TimePoint filter_from;
-        TimePoint filter_till;
+        TimePoint filterDate;
         uint32_t offset;
         uint32_t limit;
     };
 
-    class GetFilteredResult : public QueryResult
+    class GetFilteredByDayResult : public QueryResult
     {
         std::vector<EventsRecord> records;
         uint32_t recordsCount;
 
       public:
-        GetFilteredResult(std::vector<EventsRecord> records, uint32_t count);
+        GetFilteredByDayResult(const std::vector<EventsRecord> &records, uint32_t count);
         auto getCountResult() -> uint32_t;
         [[nodiscard]] auto getResult() -> std::vector<EventsRecord>;
 

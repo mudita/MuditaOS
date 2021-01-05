@@ -226,6 +226,11 @@ namespace utils
                 return minutes;
             }
 
+            time_t getHours() const
+            {
+                return hours;
+            }
+
             UTF8 str(DisplayedFormat displayedFormat = DisplayedFormat::Auto0M) const;
 
             // uses default format

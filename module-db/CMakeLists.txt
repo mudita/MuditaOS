@@ -111,6 +111,7 @@ set(SOURCES
         queries/calendar/QueryEventsEditICS.cpp
         queries/calendar/QueryEventsEdit.cpp
         queries/calendar/QueryEventsGetFiltered.cpp
+        queries/calendar/QueryEventsGetFilteredByDay.cpp
         queries/calendar/QueryEventsGetAllLimited.cpp
         queries/calendar/QueryEventsSelectFirstUpcoming.cpp
         queries/alarms/QueryAlarmsAdd.cpp
