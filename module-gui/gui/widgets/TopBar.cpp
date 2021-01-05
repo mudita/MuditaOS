@@ -43,16 +43,16 @@ namespace gui
 
     void TopBar::batteryShowBars(uint32_t val)
     {
-        if (val > battery.size()) {
+        if (val > batteryBars.size()) {
             LOG_ERROR("Trying to set battery level out of scope");
-            val = battery.size();
+            val = batteryBars.size();
         }
-        for (unsigned int i = 0; i < battery.size(); ++i) {
+        for (unsigned int i = 0; i < batteryBars.size(); ++i) {
             if (elements.battery) {
-                battery[i]->setVisible(val >= i);
+                batteryBars[i]->setVisible(i == val);
             }
             else {
-                battery[i]->setVisible(false);
+                batteryBars[i]->setVisible(false);
             }
         }
     }
@@ -69,22 +69,23 @@ namespace gui
         updateSignalStrength();
 
         // icons for battery
-        battery = {
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery0"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery1"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery2"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery3"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery4"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery5"),
+        batteryBars = {
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery_low_W_M"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery1_W_M"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery2_W_M"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery3_W_M"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery4_W_M"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery5_W_M"),
         };
         batteryShowBars(0);
 
-        charging = new Label(this, batteryOffset, 15, 30, this->drawArea.h);
-        charging->setFilled(false);
-        charging->setBorderColor(gui::ColorNoColor);
-        charging->setFont(style::header::font::title);
-        charging->setText("Z");
-        charging->setVisible(false);
+        batteryChargings[Store::Battery::State::Charging] =
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery_charging_W_M");
+        batteryChargings[Store::Battery::State::PluggedNotCharging] =
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery_charging_ready_W_M");
+        for (auto &el : batteryChargings) {
+            el.second->setVisible(false);
+        }
 
         const auto design_sim_offset = 376; // this offset is not final, but it is pixel Purefect
         sim                          = new SIM(this, design_sim_offset, 12);
@@ -122,18 +123,7 @@ namespace gui
         switch (element) {
         case Elements::BATTERY: {
             elements.battery = active;
-            if (Store::Battery::get().state == Store::Battery::State::Discharging) {
-                setBatteryLevel(active ? Store::Battery::get().level : 0);
-            }
-            else {
-                if (active) {
-                    setBatteryCharging(true);
-                }
-                else {
-                    charging->setVisible(false);
-                    setBatteryLevel(0);
-                }
-            }
+            showBattery(elements.battery);
         } break;
         case Elements::LOCK: {
             elements.lock = active;
@@ -162,10 +152,10 @@ namespace gui
         };
     }
 
-    uint32_t calculateBatteryLavel(uint32_t percentage)
+    uint32_t calculateBatteryBars(uint32_t percentage)
     {
         uint32_t level = 0;
-        if (percentage <= 5)
+        if (percentage <= 5) // level critical
             level = 0;
         else if (percentage <= 27)
             level = 1;
@@ -178,37 +168,46 @@ namespace gui
         else
             level = 5;
 
-        if (level >= batteryLevelCount) {
+        if (level >= batteryBarsCount) {
             LOG_ERROR("Battery level calculations are done wrong!");
-            return batteryLevelCount - 1;
+            return batteryBarsCount - 1;
         }
         return level;
     }
 
-    bool TopBar::setBatteryLevel(uint32_t percent)
+    bool TopBar::updateBattery(uint32_t percent)
     {
-        if (Store::Battery::get().state != Store::Battery::State::Discharging) {
-            return false;
-        }
-        charging->setVisible(false);
-        batteryShowBars(calculateBatteryLavel(percent));
+        showBattery(elements.battery);
         return true;
     }
 
-    void TopBar::setBatteryCharging(bool plugged)
+    bool TopBar::updateBattery(bool plugged)
     {
-        if (plugged) {
-            batteryShowBars(0);
+        showBattery(elements.battery);
+        return true;
+    }
+
+    void TopBar::showBattery(bool shown)
+    {
+        // hide battery bars icons
+        for (const auto &bars : batteryBars) {
+            bars->setVisible(false);
         }
-        if (charging == nullptr)
-            return;
-        if (plugged) {
-            charging->setVisible(true);
-            batteryShowBars(0);
+        // hide battery charging icons
+        for (const auto &charging : batteryChargings) {
+            charging.second->setVisible(false);
         }
-        else {
-            charging->setVisible(false);
-            setBatteryLevel(Store::Battery::get().level);
+
+        if (shown) {
+            switch (Store::Battery::get().state) {
+            case Store::Battery::State::Discharging:
+                batteryShowBars(calculateBatteryBars(Store::Battery::get().level));
+                break;
+            case Store::Battery::State::Charging:
+            case Store::Battery::State::PluggedNotCharging:
+                batteryChargings[Store::Battery::get().state]->setVisible(true);
+                break;
+            }
         }
     }
 

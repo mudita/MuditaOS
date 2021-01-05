@@ -15,10 +15,12 @@
 * Fix auto-unlocking screen on idle.
 * Fix missing texts in the desktop application.
 * Fix occasional cases of no audio during an incoming call.
+* Charging state icons in simulator
 
 ### Changed
 
 * Torch light control button press time recognition.
+* New battery icons
 
 ### Other
 

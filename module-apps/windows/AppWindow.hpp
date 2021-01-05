@@ -60,7 +60,7 @@ namespace gui
         };
         virtual bool onDatabaseMessage(sys::Message *msg);
 
-        bool batteryCharging(bool charging);
+        bool updateBatteryCharger(bool charging);
         bool setSIM();
         // updates battery level in the window
         bool updateBatteryLevel(uint32_t percentage);
