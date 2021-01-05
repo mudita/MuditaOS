@@ -12,6 +12,7 @@
 
 #include <cassert>
 #include <filesystem>
+#include <purefs/filesystem_paths.hpp>
 #include <memory>
 #include <string>
 #include <vector>
@@ -23,6 +24,7 @@ namespace sys
 
 static const long unsigned int empty_dirlist_size = 2;
 static const auto backup_file_name                = "backup.tar";
+static constexpr auto tar_buf                     = 8192 * 4;
 
 void BackupRestore::BackupUserFiles(sys::Service *ownerService)
 {
@@ -38,7 +40,7 @@ void BackupRestore::BackupUserFiles(sys::Service *ownerService)
         return;
     }
 
-    std::string backupPathDB = PATH_BACKUP;
+    std::string backupPathDB = purefs::dir::getBackupOSPath();
     backupPathDB += "/";
 
     LOG_INFO("BackupUserFiles: database backup started...");
@@ -113,7 +115,7 @@ bool BackupRestore::CreateBackupDir()
 
 bool BackupRestore::PackUserFiles()
 {
-    std::string backupPathDB = PATH_BACKUP;
+    std::string backupPathDB = purefs::dir::getBackupOSPath();
     backupPathDB += "/";
 
     const auto backupOSPath                  = purefs::dir::getBackupOSPath();
@@ -140,8 +142,7 @@ bool BackupRestore::PackUserFiles()
         BackupRestore::RemoveBackupDir();
         return false;
     }
-
-    std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::tar_buf]);
+    std::unique_ptr<unsigned char[]> buffer(new unsigned char[tar_buf]);
 
     for (auto &direntry : std::filesystem::directory_iterator(backupOSPath.c_str())) {
         if ((direntry.path().string().compare(".") != 0) && (direntry.path().string().compare("..") != 0) &&
@@ -170,15 +171,15 @@ bool BackupRestore::PackUserFiles()
                 return false;
             }
 
-            uint32_t loopcount = (utils::filesystem::filelength(file) / purefs::buffer::tar_buf) + 1u;
+            uint32_t loopcount = (utils::filesystem::filelength(file) / tar_buf) + 1u;
             uint32_t readsize  = 0u;
 
             for (uint32_t i = 0u; i < loopcount; i++) {
                 if (i + 1u == loopcount) {
-                    readsize = utils::filesystem::filelength(file) % purefs::buffer::tar_buf;
+                    readsize = utils::filesystem::filelength(file) % tar_buf;
                 }
                 else {
-                    readsize = purefs::buffer::tar_buf;
+                    readsize = tar_buf;
                 }
 
                 LOG_INFO("PackUserFiles: reading file %s...", direntry.path().string().c_str());
@@ -260,7 +261,7 @@ bool BackupRestore::UnpackBackupFile()
         return false;
     }
 
-    std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::tar_buf]);
+    std::unique_ptr<unsigned char[]> buffer(new unsigned char[tar_buf]);
 
     do {
         ret = mtar_read_header(&tarFile, &tarHeader);
@@ -280,16 +281,16 @@ bool BackupRestore::UnpackBackupFile()
                 return false;
             }
 
-            uint32_t loopcount = (tarHeader.size / purefs::buffer::tar_buf) + 1u;
+            uint32_t loopcount = (tarHeader.size / tar_buf) + 1u;
             uint32_t readsize  = 0u;
 
             for (uint32_t i = 0u; i < loopcount; i++) {
 
                 if (i + 1u == loopcount) {
-                    readsize = tarHeader.size % purefs::buffer::tar_buf;
+                    readsize = tarHeader.size % tar_buf;
                 }
                 else {
-                    readsize = purefs::buffer::tar_buf;
+                    readsize = tar_buf;
                 }
 
                 if (mtar_read_data(&tarFile, buffer.get(), readsize) != MTAR_ESUCCESS) {

@@ -6,6 +6,7 @@
 #include <json/json11.hpp>
 #include <module-utils/microtar/src/microtar.hpp>
 #include <boot/bootconfig.hpp>
+#include <purefs/filesystem_paths.hpp>
 
 #include <cstdint>
 #include <filesystem>
@@ -94,7 +95,7 @@ namespace updateos
     {
         fs::path updateFile            = "";
         fs::path fileExtracted         = "";
-        fs::path updateTempDirectory   = PATH_SYS "/" PATH_TMP;
+        fs::path updateTempDirectory   = purefs::dir::getTemporaryPath();
         uint32_t totalBytes            = 0;
         uint32_t currentExtractedBytes = 0;
         uint32_t fileExtractedSize     = 0;
