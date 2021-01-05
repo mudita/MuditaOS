@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <cstring>
 #include <sys/stat.h>
 
 namespace purefs::blkdev
@@ -55,6 +56,12 @@ namespace purefs::blkdev
         } while (to_write > 0);
         return 0;
     }
+    auto disk_image::erase(sector_t lba, std::size_t count) -> int
+    {
+        char buf[count * sector_size];
+        std::memset(buf, 0xff, count * sector_size);
+        return write(buf, lba, count);
+    }
     auto disk_image::read(void *buf, sector_t lba, std::size_t count) -> int
     {
         auto offs = ::lseek(m_filedes, off_t(lba) * sector_size, SEEK_SET);
@@ -100,7 +107,7 @@ namespace purefs::blkdev
         case info_type::sector_count:
             return m_sectors;
         case info_type::erase_block:
-            return 0;
+            return 1;
         }
         return -1;
     }
