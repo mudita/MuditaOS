@@ -2,16 +2,35 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "Linux Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build-linux-Debug/PurePhone.elf",
             "args": [],
-            "stopAtEntry": false,
+            "stopAtEntry": true,
             "cwd": "${workspaceFolder}/build-linux-Debug/",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "disable SIGUSR1 logs",
+                    "text": "handle SIGUSR1 nostop noprint"
+                },
+            ]
+        },
+        {
+            "name": "Linux Attach",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "${workspaceFolder}/build-linux-Debug/PurePhone.elf",
+            "MIMode": "gdb",
+            "processId": "${command:pickProcess}",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -40,6 +59,34 @@
                 "monitor halt",
                 "monitor memU32 0x401BC000 = 128;",
                 "load",
+                "info threads",
+                "thread 2",
+                "b ResetISR",
+                "b main",
+                "b HardFault_Handler",
+                "b MemManage_Handler",
+                "b BusFault_Handler",
+                "b UsageFault_Handler",
+            ]
+        },
+        {
+            "name": "RelWithDebug (rt1051)",
+            "type": "gdb",
+            "gdbpath": "arm-none-eabi-gdb",
+            "request": "attach",
+            "target": ":2331",
+            "remote": true,
+            "cwd": "${workspaceRoot}",
+            "valuesFormatting": "parseText",
+            "executable": "${workspaceFolder}/build-rt1051-RelWithDebInfo/PurePhone.elf",
+            "autorun": [
+                "eval \"monitor exec SetRTTAddr %p\", &_SEGGER_RTT",
+                "monitor reset 0",
+                "monitor halt",
+                "monitor memU32 0x401BC000 = 128;",
+                "load",
+                "info threads",
+                "thread 2",
                 "b ResetISR",
                 "b main",
                 "b HardFault_Handler",
