@@ -126,7 +126,7 @@ namespace app
         if (state == State::ACTIVE_FORGROUND) {
             auto window = getCurrentWindow();
             if (Store::Battery::get().state == Store::Battery::State::Charging) {
-                window->batteryCharging(true);
+                window->updateBatteryCharger(true);
             }
             else {
                 window->updateBatteryLevel(Store::Battery::get().level);
@@ -298,7 +298,7 @@ namespace app
     sys::MessagePointer Application::handleBatteryLevel(sys::Message *msgl)
     {
         auto msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
-        LOG_INFO("Application battery level: %d", msg->levelPercents);
+        LOG_INFO("Battery level: %d", msg->levelPercents);
 
         if (getCurrentWindow()->updateBatteryLevel(msg->levelPercents)) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -310,16 +310,12 @@ namespace app
     {
         auto *msg = static_cast<sevm::BatteryPlugMessage *>(msgl);
         if (msg->plugged == true) {
-            LOG_INFO("Application charger connected");
-            getCurrentWindow()->batteryCharging(true);
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            LOG_INFO("Charger connected");
         }
         else {
-            LOG_INFO("Application charger disconnected");
-            getCurrentWindow()->batteryCharging(false);
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            LOG_INFO("Charger disconnected");
         }
-
+        getCurrentWindow()->updateBatteryCharger(msg->plugged);
         refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         return msgHandled();
     }
