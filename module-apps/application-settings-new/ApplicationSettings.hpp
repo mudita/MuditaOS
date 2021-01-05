@@ -42,6 +42,7 @@ namespace gui::window::name
     inline constexpr auto all_operators      = "AllOperators";
     inline constexpr auto import_contacts    = "ImportContacts";
     inline constexpr auto dialog_settings    = "DialogSettings";
+    inline constexpr auto change_passcode    = "ChangePasscode";
 
 } // namespace gui::window::name
 
@@ -99,6 +100,11 @@ namespace app
         void setVoLTEOn(bool value) override;
         bool getVoLTEOn() const noexcept override;
         void volteChanged(const std::string &value);
+        [[nodiscard]] auto getLockPassHash() const noexcept -> unsigned int
+        {
+            return lockPassHash;
+        }
+        void setLockPassHash(unsigned int value);
 
       private:
         Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
@@ -106,6 +112,7 @@ namespace app
         bsp::Board board              = bsp::Board::none;
         bool operatorsOn              = false;
         bool voLteStateOn             = false;
+        unsigned int lockPassHash     = 0;
     };
 
     template <> struct ManifestTraits<ApplicationSettingsNew>

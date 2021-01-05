@@ -494,6 +494,10 @@ namespace app
         if (startInBackground) {
             setState(State::ACTIVE_BACKGROUND);
         }
+
+        settings->registerValueChange(
+            settings::SystemProperties::lockScreenPasscodeIsOn,
+            [this](const std::string &value) { setLockScreenPasscodeOn(utils::getNumericValue<bool>(value)); });
         return sys::ReturnCodes::Success;
     }
 
@@ -708,5 +712,16 @@ namespace app
     void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
     {
         callbackStorage->removeAll(receiver);
+    }
+
+    void Application::setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept
+    {
+        lockScreenPasscodeIsOn = screenPasscodeOn;
+        settings->setValue(settings::SystemProperties::lockScreenPasscodeIsOn, std::to_string(lockScreenPasscodeIsOn));
+    }
+
+    bool Application::isLockScreenPasscodeOn() const noexcept
+    {
+        return lockScreenPasscodeIsOn;
     }
 } /* namespace app */

@@ -32,13 +32,13 @@ namespace gui
           simLock(Store::GSM::SIM::NONE, PinLock::LockState::Unlocked, PinLock::LockType::SimPin, default_attempts)
     {
         simLock.setPinSizeBounds(sim_min_passcode_size, sim_max_passcode_size);
+        screenLock.setPinSizeBounds(default_screen_pin_size, default_screen_pin_size);
         screenLock.setAutoActivate(true);
     }
 
     void PinLockHandler::handleScreenPin(const std::vector<unsigned int> &pin)
     {
-        std::hash<std::vector<unsigned int>> hashEngine;
-        uint32_t hash = hashEngine(pin);
+        const uint32_t hash = GetPinHash(pin);
         screenLock.value--;
         if (hash == app->getLockPassHash()) {
             screenLock.lockState = gui::PinLock::LockState::Unlocked;
@@ -255,12 +255,8 @@ namespace gui
 
     void PinLockHandler::unlockScreen()
     {
-        if (getStrongestLock().isType(PinLock::LockType::Screen)) {
-            unsigned int pinSize = app->getLockPassHash() == 0 ? screen_nopin_size : default_screen_pin_size;
-            screenLock.setPinSizeBounds(pinSize, pinSize);
-            if (screenLock.getMaxPinSize() == screen_nopin_size) {
-                screenLock.lockState = gui::PinLock::LockState::Unlocked;
-            }
+        if (getStrongestLock().isType(PinLock::LockType::Screen) && !app->isLockScreenPasscodeOn()) {
+            screenLock.lockState = gui::PinLock::LockState::Unlocked;
         }
         unlock();
     }
