@@ -8,6 +8,7 @@
 #include <gsl/gsl_util>
 
 #include "BtKeysStorage.hpp"
+#include <log/log.hpp>
 
 json11::Json Bt::KeyStorage::fileJson = json11::Json();
 btstack_link_key_db_t Bt::KeyStorage::keyStorage;

@@ -46,13 +46,11 @@
 #include <source/version.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <thread.hpp>
-#include <vfs.hpp>
 #include <purefs/vfs_subsystem.hpp>
 
 #include <memory>
 #include <vector>
 
-class vfs vfs;
 
 int main()
 {

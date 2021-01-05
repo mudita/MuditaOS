@@ -4,7 +4,7 @@
 #pragma once
 
 #include "BaseSettingsWindow.hpp"
-
+#include <filesystem>
 
 namespace gui
 {
@@ -21,9 +21,9 @@ namespace gui
         auto buildOptionsList() -> std::list<Option> override;
 
       private:
-        void readQuotes(fs::path fn);
+        void readQuotes(std::filesystem::path fn);
         void switchHandler(bool &optionSwitch);
-        [[nodiscard]] static std::string readFileToString(const fs::path &fn);
+        [[nodiscard]] static std::string readFileToString(const std::filesystem::path &fn);
 
         std::list<std::pair<std::string, bool>> quotes;
     };
