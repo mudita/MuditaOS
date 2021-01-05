@@ -1,12 +1,13 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <boot/bootconfig.hpp>
+#include <boot/bootconstants.hpp>
 
 #include <purefs/filesystem_paths.hpp>
 #include <source/version.hpp>
 #include <time/time_conversion.hpp>
 #include <ticks.hpp>
-#include <stdio.h>
+#include <cstdio>
 #include <log/log.hpp>
 #include <crc32/crc32.h>
 
@@ -14,7 +15,8 @@ namespace boot
 {
     namespace
     {
-        bool replaceWithString(const fs::path &fileToModify, const std::string &stringToWrite)
+
+        bool replaceWithString(const std::filesystem::path &fileToModify, const std::string &stringToWrite)
         {
             auto lamb = [](::FILE *stream) { fclose(stream); };
             std::unique_ptr<::FILE, decltype(lamb)> fp(fopen(fileToModify.c_str(), "w"), lamb);
@@ -27,18 +29,17 @@ namespace boot
                 return false;
             }
         }
-        void computeCRC32(::FILE *file, unsigned long *outCrc32)
+        void computeCRC32(std::FILE *file, unsigned long *outCrc32)
         {
             if (outCrc32 == nullptr)
                 return;
-
-            std::unique_ptr<unsigned char[]> buf(new unsigned char[purefs::buffer::crc_buf]);
+            std::unique_ptr<unsigned char[]> buf(new unsigned char[boot::consts::crc_buf]);
             size_t bufLen;
 
             *outCrc32 = 0;
 
-            while (!::feof(file)) {
-                bufLen = ::fread(buf.get(), 1, purefs::buffer::crc_buf, file);
+            while (!std::feof(file)) {
+                bufLen = std::fread(buf.get(), 1, boot::consts::crc_buf, file);
                 if (bufLen <= 0)
                     break;
 
@@ -46,7 +47,7 @@ namespace boot
             }
         }
 
-        bool updateFileCRC32(const fs::path &file)
+        bool updateFileCRC32(const std::filesystem::path &file)
         {
             unsigned long fileCRC32 = 0;
             auto lamb               = [](::FILE *stream) { ::fclose(stream); };
@@ -54,7 +55,7 @@ namespace boot
             std::unique_ptr<::FILE, decltype(lamb)> fp(fopen(file.c_str(), "r"), lamb);
 
             if (fp.get() != nullptr) {
-                std::unique_ptr<char[]> crc32Buf(new char[purefs::buffer::crc_char_size]);
+                std::unique_ptr<char[]> crc32Buf(new char[boot::consts::crc_char_size]);
                 int written = 0;
                 computeCRC32(fp.get(), &fileCRC32);
                 LOG_INFO("updateFileCRC32 writing new crc32 %08" PRIX32 " for %s",
@@ -62,20 +63,20 @@ namespace boot
                          file.c_str());
                 if (fileCRC32 != 0) {
                     if ((written = sprintf(crc32Buf.get(), "%08" PRIX32, fileCRC32)) !=
-                        (purefs::buffer::crc_char_size - 1)) {
+                        (boot::consts::crc_char_size - 1)) {
                         LOG_INFO("updateFileCRC32 can't prepare string for crc32, sprintf returned %d instead of %d",
                                  written,
-                                 purefs::buffer::crc_char_size - 1);
+                                 boot::consts::crc_char_size - 1);
                         return false;
                     }
-                    fs::path fileCRC32Path = file;
-                    fileCRC32Path += purefs::extension::crc32;
+                    std::filesystem::path fileCRC32Path = file;
+                    fileCRC32Path += boot::consts::ext_crc32;
 
                     std::unique_ptr<::FILE, decltype(lamb)> fpCRC32(fopen(fileCRC32Path.c_str(), "w"), lamb);
 
                     if (fpCRC32.get() != nullptr) {
-                        if (fwrite(crc32Buf.get(), 1, purefs::buffer::crc_char_size, fpCRC32.get()) ==
-                            purefs::buffer::crc_char_size) {
+                        if (fwrite(crc32Buf.get(), 1, boot::consts::crc_char_size, fpCRC32.get()) ==
+                            boot::consts::crc_char_size) {
                             LOG_INFO("updateFileCRC32 wrote \"%s\" in %s", crc32Buf.get(), fileCRC32Path.c_str());
                             return true;
                         }
@@ -97,17 +98,17 @@ namespace boot
 
             return false;
         }
-        std::string loadFileAsString(const fs::path &fileToLoad)
+        std::string loadFileAsString(const std::filesystem::path &fileToLoad)
         {
             auto lamb = [](::FILE *stream) { ::fclose(stream); };
-            std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
+            std::unique_ptr<char[]> readBuf(new char[boot::consts::tar_buf]);
             std::unique_ptr<::FILE, decltype(lamb)> fp(fopen(fileToLoad.c_str(), "r"), lamb);
             std::string contents;
             size_t readSize;
 
             if (fp.get() != nullptr) {
                 while (!feof(fp.get())) {
-                    readSize = fread(readBuf.get(), 1, purefs::buffer::tar_buf, fp.get());
+                    readSize = fread(readBuf.get(), 1, boot::consts::tar_buf, fp.get());
                     contents.append(static_cast<const char *>(readBuf.get()), readSize);
                 }
             }
@@ -122,17 +123,17 @@ namespace boot
     json11::Json BootConfig::to_json() const
     {
         return json11::Json::object{
-            {purefs::json::main,
-             json11::Json::object{{purefs::json::os_image, m_os_image},
-                                  {purefs::json::os_type, m_os_type},
-                                  {purefs::json::os_version, m_os_version},
-                                  {purefs::json::timestamp, m_timestamp}}},
+            {boot::json::main,
+             json11::Json::object{{boot::json::os_image, m_os_image},
+                                  {boot::json::os_type, m_os_type},
+                                  {boot::json::os_version, m_os_version},
+                                  {boot::json::timestamp, m_timestamp}}},
 
-            {purefs::json::git_info,
-             json11::Json::object{{purefs::json::os_git_tag, std::string(GIT_TAG)},
-                                  {purefs::json::os_git_revision, std::string(GIT_REV)},
-                                  {purefs::json::os_git_branch, std::string(GIT_BRANCH)}}},
-            {purefs::json::bootloader, json11::Json::object{{purefs::json::os_version, m_bootloader_version}}}};
+            {boot::json::git_info,
+             json11::Json::object{{boot::json::os_git_tag, std::string(GIT_TAG)},
+                                  {boot::json::os_git_revision, std::string(GIT_REV)},
+                                  {boot::json::os_git_branch, std::string(GIT_BRANCH)}}},
+            {boot::json::bootloader, json11::Json::object{{boot::json::os_version, m_bootloader_version}}}};
     }
     int BootConfig::load()
     {
@@ -188,12 +189,11 @@ namespace boot
         m_boot_json_parsed = json11::Json::parse(jsonContents, parseErrors);
 
         if (parseErrors == "") {
-            m_os_type      = m_boot_json_parsed[purefs::json::main][purefs::json::os_type].string_value();
-            m_os_image     = m_boot_json_parsed[purefs::json::main][purefs::json::os_image].string_value();
+            m_os_type            = m_boot_json_parsed[boot::json::main][boot::json::os_type].string_value();
+            m_os_image           = m_boot_json_parsed[boot::json::main][boot::json::os_image].string_value();
             m_os_root_path = purefs::createPath(purefs::dir::getRootDiskPath(), m_os_type);
             m_boot_json    = bootJsonPath;
-            m_bootloader_version =
-                m_boot_json_parsed[purefs::json::bootloader][purefs::json::os_version].string_value();
+            m_bootloader_version = m_boot_json_parsed[boot::json::bootloader][boot::json::os_version].string_value();
             m_timestamp  = utils::time::Timestamp().str("%c");
             m_os_version = std::string(VERSION);
 
@@ -201,7 +201,7 @@ namespace boot
             return true;
         }
         else {
-            m_os_type      = PATH_CURRENT;
+            m_os_type      = purefs::dir::getCurrentOSPath();
             m_os_image     = purefs::file::boot_bin;
             m_os_root_path = purefs::createPath(purefs::dir::getRootDiskPath(), m_os_type);
             m_boot_json    = bootJsonPath;
@@ -243,24 +243,24 @@ namespace boot
     bool BootConfig::verifyCRC(const std::filesystem::path filePath)
     {
         auto lamb = [](::FILE *stream) { ::fclose(stream); };
-        std::unique_ptr<char[]> crcBuf(new char[purefs::buffer::crc_char_size]);
+        std::unique_ptr<char[]> crcBuf(new char[boot::consts::crc_char_size]);
         size_t readSize;
-        fs::path crcFilePath(filePath);
-        crcFilePath += purefs::extension::crc32;
+        std::filesystem::path crcFilePath(filePath);
+        crcFilePath += boot::consts::ext_crc32;
 
         std::unique_ptr<::FILE, decltype(lamb)> fp(::fopen(crcFilePath.c_str(), "r"), lamb);
 
         if (fp.get() != nullptr) {
-            if ((readSize = ::fread(crcBuf.get(), 1, purefs::buffer::crc_char_size, fp.get())) !=
-                (purefs::buffer::crc_char_size)) {
+            if ((readSize = ::fread(crcBuf.get(), 1, boot::consts::crc_char_size, fp.get())) !=
+                (boot::consts::crc_char_size)) {
                 LOG_ERROR("verifyCRC fread on %s returned different size then %d [%zu]",
                           crcFilePath.c_str(),
-                          purefs::buffer::crc_char_size,
+                          boot::consts::crc_char_size,
                           readSize);
                 return false;
             }
 
-            const unsigned long crc32Read = strtoull(crcBuf.get(), nullptr, purefs::buffer::crc_radix);
+            const unsigned long crc32Read = strtoull(crcBuf.get(), nullptr, boot::consts::crc_radix);
 
             LOG_INFO("verifyCRC read %s string:\"%s\" hex:%08lX", crcFilePath.c_str(), crcBuf.get(), crc32Read);
             return verifyCRC(filePath, crc32Read);

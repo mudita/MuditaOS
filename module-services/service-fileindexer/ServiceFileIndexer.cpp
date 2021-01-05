@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log/log.hpp>
-#include <vfs.hpp>
 #include "ServiceFileIndexer.hpp"
 #include "notesIndexer.hpp"
 #include "messages/FileChangeMessage.hpp"

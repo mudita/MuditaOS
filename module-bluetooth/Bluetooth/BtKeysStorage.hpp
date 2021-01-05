@@ -7,7 +7,6 @@
 #include <btstack_util.h>
 
 #include <json/json11.hpp>
-#include <vfs.hpp>
 
 namespace Bt
 {

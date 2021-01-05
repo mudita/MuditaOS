@@ -17,6 +17,8 @@
 #include <time/time_conversion.hpp>
 #include <filesystem>
 #include <Utils.hpp>
+#include <boot/bootconfig.hpp>
+#include <boot/bootconstants.hpp>
 
 #if defined(TARGET_RT1051)
 #include <board/cross/eMMC/eMMC.hpp>
@@ -201,9 +203,8 @@ std::string UpdateMuditaOS::readContent(const char *filename) noexcept
 updateos::UpdateError UpdateMuditaOS::verifyChecksums()
 {
     status = updateos::UpdateState::ChecksumVerification;
-
     auto lineBuff = std::make_unique<char[]>(
-        purefs::buffer::tar_buf); // max line should be freertos max path + checksum, so this is enough
+        boot::consts::tar_buf); // max line should be freertos max path + checksum, so this is enough
     fs::path checksumsFile = getUpdateTmpChild(updateos::file::checksums);
     auto fpChecksums       = std::fopen(checksumsFile.c_str(), "r");
 
@@ -214,7 +215,7 @@ updateos::UpdateError UpdateMuditaOS::verifyChecksums()
     }
 
     while (!std::feof(fpChecksums)) {
-        char *line = std::fgets(lineBuff.get(), purefs::buffer::tar_buf, fpChecksums);
+        char *line = std::fgets(lineBuff.get(), boot::consts::tar_buf, fpChecksums);
         std::string filePath;
         unsigned long fileCRC32;
 
@@ -257,7 +258,7 @@ updateos::UpdateError UpdateMuditaOS::verifyVersion()
     else {
         /* version comparison goes here */
         updateRunStatus.toVersion = targetVersionInfo;
-        const bool ret = bootConfig.version_compare(targetVersionInfo[purefs::json::version_string].string_value(),
+        const bool ret = bootConfig.version_compare(targetVersionInfo[boot::json::version_string].string_value(),
                                                     bootConfig.os_version());
         LOG_DEBUG("verifyVersion comparison result == %s", ret ? "true" : "false");
     }
@@ -267,9 +268,9 @@ updateos::UpdateError UpdateMuditaOS::verifyVersion()
 updateos::UpdateError UpdateMuditaOS::updateBootloader()
 {
     informDebug("updateBootloader");
-    if (targetVersionInfo[purefs::json::bootloader][parserFSM::json::fileName].is_string()) {
+    if (targetVersionInfo[boot::json::bootloader][parserFSM::json::fileName].is_string()) {
         fs::path bootloaderFile =
-            getUpdateTmpChild(targetVersionInfo[purefs::json::bootloader][parserFSM::json::fileName].string_value());
+            getUpdateTmpChild(targetVersionInfo[boot::json::bootloader][parserFSM::json::fileName].string_value());
         return writeBootloader(bootloaderFile);
     }
     return updateos::UpdateError::NoError;
@@ -290,9 +291,9 @@ void UpdateMuditaOS::getChecksumInfo(const std::string &infoLine, std::string &f
     std::size_t lastSpacePos = infoLine.find_last_of(' ');
     if (lastSpacePos > 0) {
         filePath                       = infoLine.substr(0, lastSpacePos);
-        const std::string fileCRC32Str = infoLine.substr(lastSpacePos + 1, purefs::buffer::crc_char_size - 1);
+        const std::string fileCRC32Str = infoLine.substr(lastSpacePos + 1, boot::consts::crc_char_size - 1);
         if (fileCRC32Long != nullptr) {
-            *fileCRC32Long = strtoull(fileCRC32Str.c_str(), nullptr, purefs::buffer::crc_radix);
+            *fileCRC32Long = strtoull(fileCRC32Str.c_str(), nullptr, boot::consts::crc_radix);
             informDebug("getChecksumInfo filePath: %s fileCRC32Str: %s fileCRC32Long: %lu fileCRC32Hex: %lX",
                         filePath.c_str(),
                         fileCRC32Str.c_str(),
@@ -382,13 +383,13 @@ updateos::UpdateError UpdateMuditaOS::updateBootJSON()
 
     if (fp != nullptr) {
         utils::filesystem::computeCRC32(fp, &bootJSONAbsoulteCRC);
-        bootJSONAbsoulte += purefs::extension::crc32;
+        bootJSONAbsoulte += boot::consts::ext_crc32;
 
         auto *fpCRC = std::fopen(bootJSONAbsoulte.c_str(), "w");
         if (fpCRC != nullptr) {
-            std::array<char, purefs::buffer::crc_char_size> crcBuf;
+            std::array<char, boot::consts::crc_char_size> crcBuf;
             snprintf(crcBuf.data(), crcBuf.size(), "%lX", bootJSONAbsoulteCRC);
-            std::fwrite(crcBuf.data(), 1, purefs::buffer::crc_char_size, fpCRC);
+            std::fwrite(crcBuf.data(), 1, boot::consts::crc_char_size, fpCRC);
             std::fclose(fpCRC);
         }
         else {
@@ -407,11 +408,11 @@ updateos::UpdateError UpdateMuditaOS::updateBootJSON()
 
 bool UpdateMuditaOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
 {
-    auto readBuf            = std::make_unique<unsigned char[]>(purefs::buffer::tar_buf);
+    auto readBuf            = std::make_unique<unsigned char[]>(boot::consts::tar_buf);
     const fs::path fullPath = getUpdateTmpChild(h.name);
 
-    uint32_t blocksToRead = (h.size / purefs::buffer::tar_buf) + 1;
-    uint32_t sizeToRead   = purefs::buffer::tar_buf;
+    uint32_t blocksToRead = (h.size / boot::consts::tar_buf) + 1;
+    uint32_t sizeToRead   = boot::consts::tar_buf;
     fileExtracted         = h.name;
     fileExtractedSize     = h.size;
 
@@ -434,10 +435,10 @@ bool UpdateMuditaOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
 
     for (uint32_t i = 0; i < blocksToRead; i++) {
         if (i + 1 == blocksToRead) {
-            sizeToRead = h.size % purefs::buffer::tar_buf;
+            sizeToRead = h.size % boot::consts::tar_buf;
         }
         else {
-            sizeToRead = purefs::buffer::tar_buf;
+            sizeToRead = boot::consts::tar_buf;
         }
 
         if (sizeToRead == 0)
@@ -620,7 +621,7 @@ const json11::Json UpdateMuditaOS::getVersionInfoFromFile(const fs::path &update
             return json11::Json();
         }
 
-        std::unique_ptr<char[]> versionFilename(new char[purefs::buffer::crc_buf]);
+        std::unique_ptr<char[]> versionFilename(new char[boot::consts::crc_buf]);
         sprintf(versionFilename.get(), "./%s", updateos::file::version);
         if (mtar_find(&tar, versionFilename.get(), &h) == MTAR_ENOTFOUND) {
             LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile can't find %s in %s",
@@ -631,8 +632,8 @@ const json11::Json UpdateMuditaOS::getVersionInfoFromFile(const fs::path &update
             return json11::Json();
         }
 
-        /* this file should never be larger then purefs::buffer::tar_buf */
-        std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
+        /* this file should never be larger then boot::consts::tar_buf */
+        std::unique_ptr<char[]> readBuf(new char[boot::consts::tar_buf]);
         if (mtar_read_data(&tar, readBuf.get(), h.size) != MTAR_ESUCCESS) {
             LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile can't read %s in %s",
                      updateos::file::version,
@@ -676,9 +677,9 @@ const fs::path UpdateMuditaOS::checkForUpdate()
         if (versionInfo.is_null())
             continue;
 
-        if (versionInfo[purefs::json::os_version][purefs::json::version_string].is_string()) {
+        if (versionInfo[boot::json::os_version][boot::json::version_string].is_string()) {
             if (UpdateMuditaOS::isUpgradeToCurrent(
-                    versionInfo[purefs::json::os_version][purefs::json::version_string].string_value())) {
+                    versionInfo[boot::json::os_version][boot::json::version_string].string_value())) {
                 return updatesOSPath / file.path();
             }
         }
@@ -695,9 +696,9 @@ updateos::UpdateError UpdateMuditaOS::updateUserData()
 updateos::UpdateError UpdateMuditaOS::informError(const updateos::UpdateError errorCode, const char *format, ...)
 {
     va_list argptr;
-    std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
+    std::unique_ptr<char[]> readBuf(new char[boot::consts::tar_buf]);
     va_start(argptr, format);
-    vsnprintf(readBuf.get(), purefs::buffer::tar_buf, format, argptr);
+    vsnprintf(readBuf.get(), boot::consts::tar_buf, format, argptr);
     va_end(argptr);
 
     LOG_ERROR("UPDATE_ERRROR [%d] %s", static_cast<uint8_t>(errorCode), readBuf.get());
@@ -724,9 +725,9 @@ updateos::UpdateError UpdateMuditaOS::informError(const updateos::UpdateError er
 void UpdateMuditaOS::informDebug(const char *format, ...)
 {
     va_list argptr;
-    std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
+    std::unique_ptr<char[]> readBuf(new char[boot::consts::tar_buf]);
     va_start(argptr, format);
-    vsnprintf(readBuf.get(), purefs::buffer::tar_buf, format, argptr);
+    vsnprintf(readBuf.get(), boot::consts::tar_buf, format, argptr);
     va_end(argptr);
 
     LOG_DEBUG("UPDATE_DEBUG %s", readBuf.get());
@@ -735,9 +736,9 @@ void UpdateMuditaOS::informDebug(const char *format, ...)
 void UpdateMuditaOS::informUpdate(const updateos::UpdateState statusCode, const char *format, ...)
 {
     va_list argptr;
-    std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
+    std::unique_ptr<char[]> readBuf(new char[boot::consts::tar_buf]);
     va_start(argptr, format);
-    vsnprintf(readBuf.get(), purefs::buffer::tar_buf, format, argptr);
+    vsnprintf(readBuf.get(), boot::consts::tar_buf, format, argptr);
     va_end(argptr);
 
     LOG_INFO("UPDATE_INFO [%d] %s", static_cast<uint8_t>(statusCode), readBuf.get());
