@@ -41,7 +41,7 @@ namespace gui
         return false;
     }
 
-    void QuotesMainWindow::readQuotes(fs::path fn)
+    void QuotesMainWindow::readQuotes(std::filesystem::path fn)
     {
         std::string err;
 
@@ -88,7 +88,7 @@ namespace gui
         rebuildOptionList();
     }
 
-    std::string QuotesMainWindow::readFileToString(const fs::path &fn)
+    std::string QuotesMainWindow::readFileToString(const std::filesystem::path &fn)
     {
         constexpr auto tar_buf = 8192 * 4;
         auto file              = std::fopen(fn.c_str(), "r");

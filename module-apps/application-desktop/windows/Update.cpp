@@ -17,6 +17,7 @@
 
 #include "service-cellular/ServiceCellular.hpp"
 #include <Style.hpp>
+#include <boot/bootconfig.hpp>
 
 namespace gui
 {
@@ -175,12 +176,10 @@ namespace gui
 
                 updateVersion << utils::localize.get("app_desktop_update_to");
                 updateVersion << ": ";
-                updateVersion << msg.updateStats
-                                     .versionInformation[purefs::json::os_version][purefs::json::version_string]
+                updateVersion << msg.updateStats.versionInformation[boot::json::os_version][boot::json::version_string]
                                      .string_value();
                 updateVersion << " (";
-                updateVersion << msg.updateStats
-                                     .versionInformation[purefs::json::git_info][purefs::json::os_git_revision]
+                updateVersion << msg.updateStats.versionInformation[boot::json::git_info][boot::json::os_git_revision]
                                      .string_value();
                 updateVersion << ")";
 
@@ -189,7 +188,7 @@ namespace gui
                 updateFileDetails << std::to_string(msg.updateStats.totalBytes / 1024);
                 updateFileDetails << "Kb (";
                 updateFileDetails
-                    << msg.updateStats.versionInformation[purefs::json::misc][purefs::json::builddate].string_value();
+                    << msg.updateStats.versionInformation[boot::json::misc][boot::json::builddate].string_value();
                 updateFileDetails << ")";
 
                 currentVersionInfo->setText(currentVersion.str());
