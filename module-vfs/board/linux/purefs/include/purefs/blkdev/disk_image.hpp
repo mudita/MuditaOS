@@ -24,6 +24,7 @@ namespace purefs::blkdev
         auto sync() -> int override;
         auto status() const -> media_status override;
         auto get_info(info_type what) const -> scount_t override;
+        auto erase(sector_t lba, std::size_t count) -> int override;
 
       private:
         int m_filedes{-1};
