@@ -32,7 +32,6 @@ set(SOURCES
         src/purefs/vfs_subsystem.cpp
         drivers/src/purefs/fs/filesystem_vfat.cpp
         drivers/src/purefs/fs/filesystem_littlefs.cpp
-        src/deprecated/vfs.cpp
 )
 
 
