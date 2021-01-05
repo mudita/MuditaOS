@@ -8,6 +8,11 @@
 ### Changed
 
 * Input keyboard language files parser from KBD to JSON.
+
+### Fixed
+
+* Fix absent notifications
+
 ## [0.52.1 2020-12-23]
 
 ### Added
