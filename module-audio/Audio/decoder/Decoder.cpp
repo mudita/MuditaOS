@@ -133,4 +133,13 @@ namespace audio
         }
     }
 
+    void Decoder::onDataRead()
+    {}
+
+    void Decoder::enableInput()
+    {}
+
+    void Decoder::disableInput()
+    {}
+
 } // namespace audio

@@ -171,8 +171,11 @@ namespace audio
             return RetCode::Failed;
         }
 
-        audioDevice->source.connect(audioDeviceCellular->sink, *dataStreamIn);
-        audioDeviceCellular->source.connect(audioDevice->sink, *dataStreamOut);
+        audioDevice->connectOutputStream(*dataStreamOut);
+        audioDevice->connectInputStream(*dataStreamIn);
+
+        audioDeviceCellular->connectInputStream(*dataStreamOut);
+        audioDeviceCellular->connectOutputStream(*dataStreamIn);
 
         switch (state) {
         case State::Idle:

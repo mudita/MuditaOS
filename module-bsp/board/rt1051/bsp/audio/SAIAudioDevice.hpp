@@ -1,0 +1,33 @@
+#pragma once
+
+#include "bsp/audio/bsp_audio.hpp"
+
+#include "fsl_sai_edma.h"
+
+namespace bsp
+{
+
+    class SAIAudioDevice : public bsp::AudioDevice
+    {
+      public:
+        SAIAudioDevice(AudioDevice::audioCallback_t callback,
+                       I2S_Type *base,
+                       sai_edma_handle_t *rxHandle,
+                       sai_edma_handle_t *txHandle);
+
+        void onDataRead() override;
+        void onDataWrite() override;
+        void enableInput() override;
+        void enableOutput() override;
+        void disableInput() override;
+        void disableOutput() override;
+
+      protected:
+        void initiateRxTransfer();
+        void initiateTxTransfer();
+
+        sai_edma_handle_t *rx;
+        sai_edma_handle_t *tx;
+    };
+
+} // namespace bsp

@@ -102,6 +102,10 @@ namespace audio
             return position;
         }
 
+        void onDataRead() override;
+        void enableInput() override;
+        void disableInput() override;
+
         // Factory method
         static std::unique_ptr<Decoder> Create(const char *file);
 

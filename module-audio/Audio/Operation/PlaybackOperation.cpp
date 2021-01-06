@@ -65,7 +65,7 @@ namespace audio
             tags = dec->fetchTags();
         }
 
-        state         = State::Active;
+        state = State::Active;
 
         if (tags->num_channel == channel::stereoSound) {
             currentProfile->SetInOutFlags(static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputStereo));
@@ -175,7 +175,8 @@ namespace audio
             return RetCode::Failed;
         }
 
-        dec->connect(audioDevice->sink, *dataStreamOut);
+        dec->connectStream(*dataStreamOut);
+        audioDevice->connectOutputStream(*dataStreamOut);
 
         currentProfile->SetSampleRate(currentSampleRate);
         currentProfile->SetInOutFlags(currentInOutFlags);
