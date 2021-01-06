@@ -31,6 +31,13 @@ namespace bsp
 
         bool IsFormatSupported(const Format &format) override final;
 
+        void onDataReceive() final;
+        void onDataSend() final;
+        void enableInput() final;
+        void enableOutput() final;
+        void disableInput() final;
+        void disableOutput() final;
+
       private:
         PaStream *stream;
 
