@@ -121,10 +121,11 @@ namespace audio
         memcpy(pcm, &workerBuffer[0], samplecount * 2 * sizeof(int16_t));
     }
 
-    void Decoder::startDecodingWorker(Stream &audioStream, DecoderWorker::EndOfFileCallback endOfFileCallback)
+    void Decoder::startDecodingWorker(DecoderWorker::EndOfFileCallback endOfFileCallback)
     {
+        assert(_stream != nullptr);
         if (!audioWorker) {
-            audioWorker = std::make_unique<DecoderWorker>(audioStream, this, endOfFileCallback);
+            audioWorker = std::make_unique<DecoderWorker>(_stream, this, endOfFileCallback);
             audioWorker->init();
             audioWorker->run();
         }
@@ -139,6 +140,21 @@ namespace audio
             audioWorker->close();
         }
         audioWorker = nullptr;
+    }
+
+    void Decoder::onDataReceive()
+    {
+        audioWorker->enablePlayback();
+    }
+
+    void Decoder::enableInput()
+    {
+        audioWorker->enablePlayback();
+    }
+
+    void Decoder::disableInput()
+    {
+        audioWorker->disablePlayback();
     }
 
 } // namespace audio

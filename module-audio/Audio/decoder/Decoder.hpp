@@ -80,9 +80,6 @@ namespace audio
 
         virtual uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) = 0;
 
-        void startDecodingWorker(Stream &audioStream, DecoderWorker::EndOfFileCallback endOfFileCallback);
-        void stopDecodingWorker();
-
         std::unique_ptr<Tags> fetchTags();
 
         // Range 0 - 1
@@ -102,6 +99,13 @@ namespace audio
         {
             return position;
         }
+
+        void onDataReceive() override;
+        void enableInput() override;
+        void disableInput() override;
+
+        void startDecodingWorker(DecoderWorker::EndOfFileCallback endOfFileCallback);
+        void stopDecodingWorker();
 
         // Factory method
         static std::unique_ptr<Decoder> Create(const char *file);
@@ -127,6 +131,7 @@ namespace audio
 
         // decoding worker
         std::unique_ptr<DecoderWorker> audioWorker;
+        DecoderWorker::EndOfFileCallback _endOfFileCallback;
     };
 
 } // namespace audio

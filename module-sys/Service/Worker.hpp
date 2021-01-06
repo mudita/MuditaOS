@@ -98,7 +98,6 @@ namespace sys
         std::optional<size_t> controlQueueIndex;
         std::optional<size_t> serviceQueueIndex;
         WorkerQueue &getControlQueue() const;
-        WorkerQueue &getServiceQueue() const;
 
         static constexpr std::size_t controlMessagesCount = static_cast<std::size_t>(ControlMessage::MessageCount);
         static constexpr std::size_t defaultStackSize     = 2048;
@@ -117,10 +116,13 @@ namespace sys
       protected:
         virtual bool handleMessage(uint32_t queueID) = 0;
 
+        WorkerQueue &getServiceQueue() const;
+
         xQueueHandle getQueueHandleByName(const std::string &qname) const;
         std::shared_ptr<WorkerQueue> getQueueByName(const std::string &qname) const;
 
         bool sendControlMessage(ControlMessage message);
+        bool sendCommand(WorkerCommand command);
         State getState() const;
 
         const static uint32_t SERVICE_QUEUE_LENGTH = 10;
