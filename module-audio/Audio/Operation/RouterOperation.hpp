@@ -8,6 +8,7 @@
 #include <Audio/encoder/Encoder.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
+#include <Audio/Endpoint.hpp>
 #include <bsp/audio/bsp_audio.hpp>
 #include <mutex.hpp>
 
@@ -28,7 +29,7 @@ namespace audio
 
       public:
         RouterOperation(const char *file, AudioServiceMessage::Callback callback);
-        ~RouterOperation() = default;
+        ~RouterOperation();
 
         audio::RetCode Start(audio::Token token) final;
         audio::RetCode Stop() final;
@@ -47,6 +48,8 @@ namespace audio
         bool muteEnable = false;
         std::unique_ptr<Encoder> enc;
         std::unique_ptr<bsp::AudioDevice> audioDeviceCellular;
+        std::unique_ptr<StreamConnection> outputConnection;
+        std::unique_ptr<StreamConnection> inputConnection;
     };
 
 } // namespace audio
