@@ -1044,6 +1044,9 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             if (auto response = dynamic_cast<db::query::SMSSearchByTypeResult *>(result.get())) {
                 responseHandled = handle(response);
             }
+            else if (result->hasListener()) {
+                responseHandled = result->handle();
+            }
         }
         if (responseHandled) {
             return std::make_shared<sys::ResponseMessage>();

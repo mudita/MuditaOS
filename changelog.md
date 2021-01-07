@@ -22,6 +22,7 @@
 
 ### Fixed
 
+* Fix menu notification dot
 * Fix absent notifications
 * Fix newly added contact recognized as a duplicate of temporary contact.
 * Fix default borderCallback navigation in GridLayout.

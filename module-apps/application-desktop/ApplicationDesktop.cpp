@@ -203,7 +203,11 @@ namespace app
              msg->interface == db::Interface::Name::SMS) &&
             msg->type != db::Query::Type::Read) {
             requestNotReadNotifications();
-            windowsFactory.build(this, app::window::name::desktop_menu);
+            if (auto menuWindow = dynamic_cast<gui::MenuWindow *>(getWindow(app::window::name::desktop_menu));
+                menuWindow != nullptr) {
+                menuWindow->refresh();
+                return true;
+            }
         }
 
         return false;
@@ -266,7 +270,6 @@ namespace app
     {
         notifications.notRead.Calls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
         notifications.notRead.SMS   = DBServiceAPI::ThreadGetCount(this, EntryState::UNREAD);
-
         return true;
     }
 
