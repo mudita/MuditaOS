@@ -50,6 +50,13 @@ namespace CellularServiceAPI
      *
      */
     void StartOperatorsScan(sys::Service *serv, bool fullInfo = false);
+
+    void SetOperatorAutoSelect(sys::Service *serv);
+    void SetOperator(sys::Service *serv,
+                     at::response::cops::CopsMode mode,
+                     at::response::cops::NameFormat format,
+                     const std::string &name);
+
     /*
      * @brief It calls service-cellulat to switch antenna
      * @param serv pointer to caller service.

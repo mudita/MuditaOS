@@ -119,6 +119,21 @@ void CellularServiceAPI::StartOperatorsScan(sys::Service *serv, bool fullInfo)
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
 }
 
+void CellularServiceAPI::SetOperatorAutoSelect(sys::Service *serv)
+{
+    auto msg = std::make_shared<CellularSetOperatorAutoSelectMessage>();
+    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+}
+
+void CellularServiceAPI::SetOperator(sys::Service *serv,
+                                     at::response::cops::CopsMode mode,
+                                     at::response::cops::NameFormat format,
+                                     const std::string &name)
+{
+    auto msg = std::make_shared<CellularSetOperatorMessage>(mode, format, name);
+    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+}
+
 bool CellularServiceAPI::SelectAntenna(sys::Service *serv, bsp::cellular::antenna antenna)
 {
     auto msg     = std::make_shared<CellularAntennaRequestMessage>(MessageType::CellularSelectAntenna);
