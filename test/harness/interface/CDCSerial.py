@@ -41,6 +41,7 @@ class CDCSerial:
     def __del__(self):
         try:
             self.serial.close()
+            log.info(f"closed port {self.serial.name}")
         except (serial.serialutil.SerialException, AttributeError):
             pass
 
