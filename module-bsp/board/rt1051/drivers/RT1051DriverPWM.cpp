@@ -12,7 +12,7 @@ namespace drivers
         : DriverPWM(inst, mod, params)
     {
 
-        pwm_config_t pwmConfig = {0};
+        pwm_config_t pwmConfig = {};
 
         switch (instance) {
         case PWMInstances::PWM_1:
@@ -30,6 +30,8 @@ namespace drivers
         case PWMInstances::PWM_4:
             base = PWM4;
             LOG_DEBUG("Init: PWM4");
+            break;
+        default:
             break;
         }
 
@@ -49,6 +51,8 @@ namespace drivers
         case PWMModules::MODULE3:
             pwmModule = kPWM_Module_3;
             LOG_DEBUG("Init: PWM module 3");
+            break;
+        default:
             break;
         }
 

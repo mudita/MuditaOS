@@ -1061,7 +1061,7 @@ extern "C"
     WEAK_AV void HardFault_Handler_C(syslog_exception_stack_frame_t *frame __attribute__((unused)),
                                      uint32_t lr_value __attribute__((unused)))
     {
-        static syslog_t syslog     = {0};
+        static syslog_t syslog     = {};
         syslog.stackFrame          = *frame;
         syslog.registers.hfsr.all  = SCB->HFSR;
         syslog.registers.cfsr.all  = SCB->CFSR;

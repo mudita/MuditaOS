@@ -18,7 +18,8 @@ namespace bsp::light_sensor
         std::shared_ptr<drivers::DriverI2C> i2c;
         xQueueHandle qHandleIrq = nullptr;
 
-        drivers::I2CAddress addr = {.deviceAddress = static_cast<uint32_t>(LTR303ALS_DEVICE_ADDR), .subAddressSize = 1};
+        drivers::I2CAddress addr = {
+            .deviceAddress = static_cast<uint32_t>(LTR303ALS_DEVICE_ADDR), .subAddress = 0, .subAddressSize = 1};
 
         bool writeSingleRegister(std::uint32_t address, std::uint8_t *to_send)
         {
@@ -43,6 +44,7 @@ namespace bsp::light_sensor
         constexpr inline std::uint16_t irqLevelUp  = 0xffff;
         constexpr inline std::uint16_t irqLevelLow = 0;
 
+        void configureInterrupts() __attribute__((used));
         void configureInterrupts()
         {
             // Has to be done before sensor active mode
