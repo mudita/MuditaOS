@@ -165,7 +165,7 @@ namespace gui
     {
         auto tmp_document = text::RichTextParser().parse(text, &format);
         if (tmp_document->isEmpty()) {
-            LOG_ERROR("Nothing to parse/parser error in rich text: %s", text.c_str());
+            debug_text("Nothing to parse/parser error in rich text: %s", text.c_str());
             addText(text); // fallback
         }
         for (auto block : tmp_document->getBlockCursor(0)) {
