@@ -14,6 +14,8 @@
 #include <utf8/UTF8.hpp>
 #include <SimState.hpp>
 
+#include <response.hpp>
+
 #include <memory>
 #include <string>
 
@@ -84,6 +86,41 @@ class CellularNotificationMessage : public CellularMessage
 
     Type type;
     std::string data;
+};
+
+class CellularSetOperatorAutoSelectMessage : public sys::Message
+{
+  public:
+    CellularSetOperatorAutoSelectMessage()
+    {}
+};
+
+class CellularSetOperatorMessage : public sys::Message
+{
+    at::response::cops::CopsMode mode;
+    at::response::cops::NameFormat format;
+    const std::string name;
+
+  public:
+    explicit CellularSetOperatorMessage(at::response::cops::CopsMode mode,
+                                        at::response::cops::NameFormat format,
+                                        std::string name)
+        : mode(mode), format(format), name(std::move(name))
+    {}
+
+    at::response::cops::CopsMode getMode() const noexcept
+    {
+        return mode;
+    }
+    at::response::cops::NameFormat getFormat() const noexcept
+    {
+        return format;
+    }
+
+    std::string getName() const
+    {
+        return name;
+    }
 };
 
 class CellularStartOperatorsScanMessage : public CellularMessage
@@ -622,6 +659,21 @@ class CellularMMIPushMessage : public CellularMMIDataMessage, public app::manage
             sender, app::manager::actions::ShowMMIPush, std::make_unique<app::manager::actions::MMIParams>(params));
     }
 };
+
+class CellularSetOperatorAutoSelectResponse : public CellularResponseMessage
+{
+  public:
+    explicit CellularSetOperatorAutoSelectResponse(bool ret) : CellularResponseMessage(ret)
+    {}
+};
+
+class CellularSetOperatorResponse : public CellularResponseMessage
+{
+  public:
+    explicit CellularSetOperatorResponse(bool ret) : CellularResponseMessage(ret)
+    {}
+};
+
 namespace cellular
 {
 
