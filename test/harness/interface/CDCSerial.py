@@ -28,14 +28,14 @@ class CDCSerial:
             try:
                 self.serial = serial.Serial(port_name, baudrate=115200, timeout=10)
                 self.serial.flushInput()
-                log.info("port opened!")
+                log.info(f"opened port {port_name}!")
                 break
             except (FileNotFoundError, serial.serialutil.SerialException) as err:
-                log.error("can't open {}, retrying...".format(port_name))
+                log.error(f"can't open {port_name}, retrying...")
                 time.sleep(1)
                 self.timeout = self.timeout - 1
                 if self.timeout == 0:
-                    log.error("uart {} not found - probably OS did not boot".format(port_name))
+                    log.error(f"uart {port_name} not found - probably OS did not boot")
                     raise TestError(Error.PORT_NOT_FOUND)
 
     def __del__(self):
@@ -130,3 +130,11 @@ class CDCSerial:
 
         ret = self.write(self.__wrap_message(body))
         return ret["body"]["isLocked"]
+
+    @staticmethod
+    def find_Pures() -> str:
+        '''
+        Return a list of paths (str) to any Mudita Pure phone found connected to the system
+        '''
+        import serial.tools.list_ports as list_ports
+        return [_.device for _ in list_ports.comports() if _.manufacturer == 'Mudita' and _.product == 'Mudita Pure']

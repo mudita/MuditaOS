@@ -20,6 +20,19 @@ class Harness:
         self.port_name = port
         self.connection = serial.CDCSerial(port)
 
+    @classmethod
+    def from_detect(cls):
+        '''
+        Try to instantiate from first detected device.
+        Do not use this method if you need >1 unique devices.
+        '''
+        found = serial.CDCSerial.find_Pures()
+        if found:
+            port = found[0]
+            return cls(found[0])
+        else:
+            raise TestError(Error.PORT_NOT_FOUND)
+
     def get_connection(self):
         return self.connection
 
@@ -71,3 +84,4 @@ class Harness:
             "body": body
         })
         return ret
+
