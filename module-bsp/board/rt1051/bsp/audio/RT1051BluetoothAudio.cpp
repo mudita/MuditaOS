@@ -62,7 +62,7 @@ namespace bsp
             if (framesFetched == 0) {
                 break;
             }
-            else if (framesFetched < inst->audioData.data.size()) {
+            else if (size_t(framesFetched) < inst->audioData.data.size()) {
                 std::fill(inst->audioData.data.begin() + framesFetched, inst->audioData.data.end(), 0);
             }
 

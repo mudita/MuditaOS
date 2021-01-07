@@ -18,7 +18,7 @@ using namespace utils;
 
 static std::shared_ptr<drivers::DriverI2C> i2c;
 
-static I2CAddress addr = {.deviceAddress = als31300::I2C_ADDRESS, .subAddressSize = 1};
+static I2CAddress addr = {.deviceAddress = als31300::I2C_ADDRESS, .subAddress = 0, .subAddressSize = 1};
 
 union i2c_buf_t
 {
@@ -161,9 +161,10 @@ namespace bsp
 
             // INTERRUPT PIN
             gpio->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_IRQ));
-            gpio->ConfPin(DriverGPIOPinParams{.dir     = DriverGPIOPinParams::Direction::Input,
-                                              .irqMode = DriverGPIOPinParams::InterruptMode::IntFallingEdge,
-                                              .pin     = static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_IRQ)});
+            gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
+                                              .irqMode  = DriverGPIOPinParams::InterruptMode::IntFallingEdge,
+                                              .defLogic = 0,
+                                              .pin      = static_cast<uint32_t>(BoardDefinitions::MAGNETOMETER_IRQ)});
             // NOTE: irq not yet enabled
             // this version uses timer to poll the sensor
             // the timer requests to read the magnetometer periodically

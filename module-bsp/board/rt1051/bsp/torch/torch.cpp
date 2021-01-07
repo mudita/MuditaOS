@@ -20,7 +20,7 @@ namespace bsp
     {
         static xQueueHandle qHandleIrq = NULL;
 
-        static I2CAddress addr = {.deviceAddress = 0x63, .subAddressSize = 1};
+        static I2CAddress addr = {.deviceAddress = 0x63, .subAddress = 0, .subAddressSize = 1};
 
         std::shared_ptr<DriverGPIO> gpio;
         const unsigned short max_current_mA = 150;
