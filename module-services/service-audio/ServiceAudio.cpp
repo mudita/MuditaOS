@@ -474,7 +474,6 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     bool isBusy = IsBusy();
 
     auto &msgType = typeid(*msgl);
-    LOG_DEBUG("msgType %d %s", static_cast<int>(msgl->messageType), msgType.name());
 
     if (msgType == typeid(AudioNotificationMessage)) {
         auto *msg = static_cast<AudioNotificationMessage *>(msgl);
@@ -525,9 +524,6 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     else if (msgType == typeid(AudioKeyPressedRequest)) {
         auto *msg   = static_cast<AudioKeyPressedRequest *>(msgl);
         responseMsg = HandleKeyPressed(msg->step);
-    }
-    else {
-        LOG_DEBUG("Unhandled message");
     }
 
     auto curIsBusy = IsBusy();

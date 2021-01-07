@@ -124,7 +124,6 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
             LOG_INFO("Queues sent after a request!");
         } break;
         default:
-            LOG_INFO("BT not handled!");
             break;
         }
     }

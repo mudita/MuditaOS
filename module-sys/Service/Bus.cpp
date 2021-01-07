@@ -26,7 +26,7 @@ namespace sys
     {
         CriticalSection::Enter();
         for (auto &w : service->busChannels) {
-            channels[w].m_services.push_back(service);
+            channels[w].m_services.insert(service);
         }
         servicesRegistered[service->GetName()] = service;
         CriticalSection::Exit();
@@ -195,6 +195,7 @@ namespace sys
 
         msg->transType = Message::TransmissionType ::Multicast;
         msg->sender    = source->GetName();
+
         for (auto const &w : channels[channel].m_services) {
             w->mailbox.push(msg);
         }

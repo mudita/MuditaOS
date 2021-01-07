@@ -239,4 +239,4 @@ namespace settings
         cbMode = nullptr;
         sendMsg(std::make_shared<settings::Messages::UnregisterOnModeChange>());
     }
-} // namespace Settings
+} // namespace settings
