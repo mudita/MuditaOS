@@ -515,11 +515,6 @@ namespace gui
         return false;
     }
 
-    bool Item::onContent()
-    {
-        return false;
-    }
-
     auto Item::onTimer(Timer &timer) -> bool
     {
         if (timerCallback != nullptr) {
