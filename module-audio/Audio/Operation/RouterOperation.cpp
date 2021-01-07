@@ -25,17 +25,6 @@ namespace audio
         AddProfile(Profile::Type::RoutingHeadphones, PlaybackType::None, false);
         AddProfile(Profile::Type::RoutingEarspeaker, PlaybackType::None, true);
         AddProfile(Profile::Type::RoutingLoudspeaker, PlaybackType::None, true);
-
-        auto defaultProfile = GetProfile(Profile::Type::RoutingEarspeaker);
-        if (!defaultProfile) {
-            throw AudioInitException("Error during initializing profile", RetCode::ProfileNotSet);
-        }
-        currentProfile = defaultProfile;
-
-        auto retCode = SwitchToPriorityProfile();
-        if (retCode != RetCode::Success) {
-            throw AudioInitException("Failed to switch audio profile", retCode);
-        }
     }
 
     audio::RetCode RouterOperation::SetOutputVolume(float vol)
@@ -153,7 +142,11 @@ namespace audio
     audio::RetCode RouterOperation::SwitchProfile(const audio::Profile::Type type)
     {
         auto ret = GetProfile(type);
+
         if (ret) {
+            if (currentProfile && currentProfile->GetType() == ret->GetType()) {
+                return RetCode::Success;
+            }
             currentProfile = ret;
         }
         else {
