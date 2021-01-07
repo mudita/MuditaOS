@@ -745,6 +745,9 @@ void UpdateMuditaOS::informUpdate(const updateos::UpdateState statusCode, const 
     auto msgToSend         = std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateInform);
     messageText            = std::string(readBuf.get());
     msgToSend->updateStats = (updateos::UpdateStats)(*this);
+    if (owner == nullptr) {
+        return;
+    }
     sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
 
     parserFSM::Context responseContext;
