@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Common/Common.hpp"
+#include "Common/Logging.hpp"
 #include "Record.hpp"
 #include "Table.hpp"
 #include "utf8/UTF8.hpp"
