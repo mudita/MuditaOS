@@ -32,7 +32,7 @@ namespace vfsn::linux::internal
         auto vfs = purefs::subsystem::vfs_core();
         if(!vfs) {
             errno = EIO;
-            return 0;
+            return -1;
         }
         auto ret = (vfs.get()->*lfs_fun)(std::forward<Args>(args)...);
         if(ret < 0) {
