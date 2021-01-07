@@ -2100,3 +2100,21 @@ std::shared_ptr<CellularGetActiveContextsResponse> ServiceCellular::handleCellul
 {
     return std::make_shared<CellularGetActiveContextsResponse>(packetData->getActiveContexts());
 }
+
+std::shared_ptr<CellularSetOperatorAutoSelectResponse> ServiceCellular::handleCellularSetOperatorAutoSelect(
+    CellularSetOperatorAutoSelectMessage *msg)
+{
+    LOG_INFO("CellularSetOperatorAutoSelect handled");
+
+    NetworkSettings networkSettings(*this);
+    return std::make_shared<CellularSetOperatorAutoSelectResponse>(networkSettings.setOperatorAutoSelect());
+}
+
+std::shared_ptr<CellularSetOperatorResponse> ServiceCellular::handleCellularSetOperator(CellularSetOperatorMessage *msg)
+{
+    LOG_INFO("CellularSetOperatorAutoSelect handled");
+
+    NetworkSettings networkSettings(*this);
+    return std::make_shared<CellularSetOperatorResponse>(
+        networkSettings.setOperator(msg->getMode(), msg->getFormat(), msg->getName()));
+}

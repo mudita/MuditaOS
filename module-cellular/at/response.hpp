@@ -56,6 +56,13 @@ namespace at
                 CDMA                    = 100
             };
 
+            enum class NameFormat
+            {
+                Long    = 0,
+                Short   = 1,
+                Numeric = 2
+            };
+
             class Operator
             {
               public:
@@ -64,6 +71,34 @@ namespace at
                 std::string longName;
                 std::string numericName;
                 std::optional<cops::AccessTechnology> technology = std::nullopt;
+
+                std::string getNameByFormat(NameFormat format)
+                {
+                    switch (format) {
+                    case NameFormat::Long:
+                        return longName;
+                    case NameFormat::Short:
+                        return shortName;
+                    case NameFormat::Numeric:
+                        return numericName;
+                    }
+                    return {};
+                }
+
+                void setNameByFormat(NameFormat format, const std::string &name)
+                {
+                    switch (format) {
+                    case NameFormat::Long:
+                        longName = name;
+                        break;
+                    case NameFormat::Short:
+                        shortName = name;
+                        break;
+                    case NameFormat::Numeric:
+                        numericName = name;
+                        break;
+                    }
+                }
             };
         } // namespace cops
 
