@@ -112,7 +112,7 @@ extern "C"
     }
     int statvfs(const char *path, struct statvfs *buf)
     {
-        return syscalls::statvfs(path,buf);
+        return syscalls::statvfs( _REENT->_errno, path,buf);
     }
 }
 

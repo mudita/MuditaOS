@@ -35,6 +35,6 @@ namespace vfsn::internal::syscalls
     int chmod(int &_errno_, const char *path, mode_t mode);
     int fchmod(int &_errno_, int fd, mode_t mode);
     int fsync(int &_errno_, int fd);
-    int statvfs(const char *path, struct statvfs *buf);
+    int statvfs(int &_errno_, const char *path, struct statvfs *buf);
 
 } // namespace vfsn::internal::syscalls
