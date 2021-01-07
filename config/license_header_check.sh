@@ -17,7 +17,7 @@ REPO_ROOT="${SCRIPT_DIR%/*}"
 
 pushd ${REPO_ROOT} >> /dev/null
 
-LICENSE1="Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved."
+LICENSE1="Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved."
 LICENSE2="For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md"
 
 CHECK_ONLY="false"
