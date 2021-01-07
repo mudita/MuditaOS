@@ -26,8 +26,8 @@ namespace bsp
     using namespace drivers;
 
     static std::shared_ptr<drivers::DriverI2C> i2c;
-    static drivers::I2CAddress i2cAddr = {.deviceAddress  = TCA8418_I2C_ADDRESS,
-                                          .subAddressSize = TCA8418_I2C_ADDRESS_SIZE};
+    static drivers::I2CAddress i2cAddr = {
+        .deviceAddress = TCA8418_I2C_ADDRESS, .subAddress = 0, .subAddressSize = TCA8418_I2C_ADDRESS_SIZE};
     static std::shared_ptr<DriverGPIO> gpio;
 
 #define KEYBOARD_CONTACT_OSCILLATION_TIMEOUT_MS 20
