@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <newlib/vfs_io_syscalls.hpp>
+#include <sys/statvfs.h>
 extern "C"
 {
     using namespace vfsn::internal;
@@ -108,6 +109,10 @@ extern "C"
     }
     int fsync( int fd ) {
         return syscalls::fsync(_REENT->_errno, fd);
+    }
+    int statvfs(const char *path, struct statvfs *buf)
+    {
+        return syscalls::statvfs(path,buf);
     }
 }
 

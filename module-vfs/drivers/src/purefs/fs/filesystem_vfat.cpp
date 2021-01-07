@@ -323,7 +323,7 @@ namespace purefs::fs::drivers
             return -ENXIO;
         }
         FRESULT fres{FR_OK};
-        if (f_tell(fp) != newpos) {
+        if (f_tell(fp) != static_cast<unsigned long>(newpos)) {
             fres = f_lseek(fp, newpos);
         }
         return (fres == FR_OK) ? (f_tell(fp)) : translate_error(fres);
