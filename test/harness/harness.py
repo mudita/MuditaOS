@@ -7,6 +7,7 @@ from harness import utils, log
 from harness.interface import CDCSerial as serial
 from harness.interface.defs import key_codes, endpoint, method
 from harness.utils import send_keystoke, application_keypath, send_char
+from harness.interface.error import TestError, Error
 import random
 
 
@@ -37,7 +38,7 @@ class Harness:
         return self.connection
 
     def get_window_name(self):
-        return self.connection.get_window()
+        return self.connection.get_window_name()
 
     def unlock_phone(self):
         if self.connection.is_phone_locked():

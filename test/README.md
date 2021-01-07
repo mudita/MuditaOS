@@ -77,10 +77,8 @@ methods:
 from harness.harness import Harness
 from harness.interface.defs import key_codes
 
-port_name = "/dev/ttyACM0"
-
-# init Harness object and open serial port
-harness = Harness(port_name)
+# try to init Harness object with automatic port detection
+harness = Harness.from_magic()
 
 #get current application name
 current_window = harness.get_window_name()

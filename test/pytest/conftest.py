@@ -18,7 +18,7 @@ simulator_port = 'simulator'
 
 
 def pytest_addoption(parser):
-    parser.addoption("--port", type=str, action="store", required=True)
+    parser.addoption("--port", type=str, action="store", required=False)
     parser.addoption("--timeout", type=int, action="store", default=15)
     parser.addoption("--phone_number", type=int, action="store")
     parser.addoption("--call_duration", type=int, action="store", default=30)
@@ -49,31 +49,41 @@ def sms_text(request):
 @pytest.fixture(scope='session')
 def harness(request):
     port_name = request.config.option.port
-    timeout = request.config.option.timeout
+
+    RETRY_EVERY = 0.7 # second
+    retries = request.config.option.timeout / RETRY_EVERY
 
     if port_name is None:
-        pytest.exit("no port provided!")
-    assert '/dev' in port_name or simulator_port in port_name
+        log.warning("no port provided! trying automatic detection")
+        try:
+            harness = Harness.from_detect()
+        except TestError as e:
+            if e.get_error_code() == Error.PORT_NOT_FOUND:
+                pytest.exit("couldn't find any viable port. exiting")
+            else:
+                raise(e)
+    else:
+        assert '/dev' in port_name or simulator_port in port_name
 
-    if simulator_port in port_name:
-        while timeout != 0:
-            try:
-                file = open("/tmp/purephone_pts_name", "r")
-                break
-            except FileNotFoundError as err:
-                time.sleep(1)
-                timeout = timeout - 1
-                print("waiting...")
-                if timeout == 0:
-                    raise TestError(Error.PORT_FILE_NOT_FOUND)
+        if simulator_port in port_name:
+            while retries > 0:
+                try:
+                    file = open("/tmp/purephone_pts_name", "r")
+                    break
+                except FileNotFoundError as err:
+                    time.sleep(RETRY_EVERY)
+                    retries -= 1
+                    log.info("waiting for simulator port...")
+            else:
+                raise TestError(Error.PORT_FILE_NOT_FOUND)
 
-        port_name = file.readline()
-        if port_name.isascii():
-            log.debug("found {} entry!".format(port_name))
-        else:
-            pytest.exit("not a valid sim pts entry!")
+            port_name = file.readline()
+            if port_name.isascii():
+                log.debug("found {} entry!".format(port_name))
+            else:
+                pytest.exit("not a valid sim pts entry!")
 
-    harness = Harness(port_name)
+        harness = Harness(port_name)
     return harness
 
 @pytest.fixture(scope='session')
