@@ -27,6 +27,9 @@ auto DeviceInfoEndpoint::handle(Context &context) -> void
 }
 auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
 {
+    if (ownerServicePtr == nullptr) {
+        return false;
+    }
     vfs::FilesystemStats fsStats = vfs.getFilesystemStats();
     json11::Json updateHistory   = static_cast<ServiceDesktop *>(ownerServicePtr)->updateOS->getUpdateHistory();
 
