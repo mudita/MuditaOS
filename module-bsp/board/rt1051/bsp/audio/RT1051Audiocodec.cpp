@@ -211,7 +211,7 @@ namespace bsp
 
     void RT1051Audiocodec::InStart()
     {
-        sai_transfer_format_t sai_format = {0};
+        sai_transfer_format_t sai_format = {};
 
         /* Configure the audio format */
         sai_format.bitWidth           = saiInFormat.bitWidth;
@@ -253,7 +253,7 @@ namespace bsp
 
     void RT1051Audiocodec::OutStart()
     {
-        sai_transfer_format_t sai_format = {0};
+        sai_transfer_format_t sai_format = {};
 
         /* Configure the audio format */
         sai_format.bitWidth           = saiOutFormat.bitWidth;

@@ -74,7 +74,7 @@
 //#endif
 
 /// This is DMA handle for internal frame buffer memory-to-memory copying operation
-static edma_handle_t s_einkMemcpyDma_handle;
+static edma_handle_t s_einkMemcpyDma_handle __attribute__((used));
 
 using namespace drivers;
 using namespace magic_enum;

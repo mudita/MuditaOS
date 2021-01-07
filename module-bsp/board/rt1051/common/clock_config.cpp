@@ -971,6 +971,7 @@ void clkPLL4setup(uint8_t enabled)
         .postDivider = 1,   /* Divider after the PLL, should only be 1, 2, 4, 8, 16. */
         .numerator   = 77,  /* 30 bit numerator of fractional loop divider. */
         .denominator = 100, /* 30 bit denominator of fractional loop divider */
+        .src         = 0,
     };
     if (enabled) {
         CLOCK_InitAudioPll(&audioPllConfig_BOARD_BootClockRUN);

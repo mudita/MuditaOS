@@ -112,6 +112,11 @@ static bsp_eink_driver_t BSP_EINK_LPSPI_EdmaDriverState = {
     &BSP_EINK_LPSPI_EdmaHandle,
     nullptr, // will be filled in init function
     nullptr, // will be filled in init function
+    0,
+    0,
+    0,
+    SPI_AUTOMATIC_CS,
+    EventWaitRegistered,
 };
 
 static SemaphoreHandle_t bsp_eink_TransferComplete;
@@ -142,7 +147,7 @@ static void s_LPSPI_MasterEdmaCallback(LPSPI_Type *base,
 status_t BSP_EinkInit(bsp_eink_BusyEvent event)
 {
     bsp_eink_driver_t *lpspi           = &BSP_EINK_LPSPI_EdmaDriverState;
-    lpspi_edma_resource_t *dmaResource = lpspi->dmaResource;
+    // lpspi_edma_resource_t *dmaResource = lpspi->dmaResource;
 
     // If was already created - free it
     if (bsp_eink_busySemaphore != NULL) {
@@ -297,7 +302,7 @@ status_t BSP_EinkWriteData(void *txBuffer, uint32_t len, eink_spi_cs_config_e cs
     const uint32_t TX_TIMEOUT_MS = 1000;
     status_t tx_status           = 0;
     status_t status;
-    lpspi_transfer_t xfer = {0};
+    lpspi_transfer_t xfer = {};
 
     if (cs == SPI_AUTOMATIC_CS) {
         BSP_EinkWriteCS(BSP_Eink_CS_Clr);
@@ -384,7 +389,7 @@ status_t BSP_EinkReadData(void *rxBuffer, uint32_t len, eink_spi_cs_config_e cs)
     const int RX_TIMEOUT_MS = 1000;
     status_t tx_status      = 0;
     status_t status;
-    lpspi_transfer_t xfer = {0};
+    lpspi_transfer_t xfer = {};
 
     xfer.txData      = NULL;
     xfer.rxData      = (uint8_t *)rxBuffer;
