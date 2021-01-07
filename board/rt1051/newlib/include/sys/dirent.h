@@ -29,28 +29,14 @@ extern "C" {
 	struct dirent {
 		ino_t	d_ino;
 		unsigned char  d_type;
+		size_t  d_reclen;
 		char	d_name[NAME_MAX+1];
 	};
 
-    struct DIR_ITER {
-        void *dir_state;
-        char name_state[NAME_MAX+1];
-    };
+	struct __dirstream;
+	typedef struct __dirstream DIR;
+	
 
-	typedef struct {
-		long int        position;
-		DIR_ITER*       dir_data;
-		struct dirent   file_data;
-	} DIR;
-	
-	int closedir(DIR *dirp);
-	DIR *opendir(const char *dirname);
-	struct dirent *readdir(DIR *dirp);
-	int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result);
-	void rewinddir(DIR *dirp);
-	void seekdir(DIR *dirp, long int loc);
-	long int telldir(DIR *dirp);
-	
 #ifdef __cplusplus
 }
 #endif
