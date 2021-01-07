@@ -2,9 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FactoryReset.hpp"
-#ifndef TARGET_Linux
-#include <FreeRTOSFATConfig.h>
-#endif
 #include <SystemManager/SystemManager.hpp>
 #include <log/log.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -17,6 +14,7 @@
 #include <vector>
 #include <purefs/filesystem_paths.hpp>
 #include <purefs/fs/filesystem.hpp>
+#include <limits.h>
 
 namespace sys
 {
@@ -36,11 +34,7 @@ namespace FactoryReset
     static const int max_recurse_depth  = 120; /* 120 is just an arbitrary value of max number of recursive calls.
                                                 * If more then error is assumed, not the real depth of directories."
                                                 */
-#ifdef TARGET_Linux
-    static const int max_filepath_length = 4096;
-#else
-    static const int max_filepath_length = ffconfigMAX_FILENAME;
-#endif
+    static const int max_filepath_length = PATH_MAX;
 
     bool Run(sys::Service *ownerService)
     {

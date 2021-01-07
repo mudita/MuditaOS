@@ -3,6 +3,7 @@
 #include <boot/bootconfig.hpp>
 #include <boot/bootconstants.hpp>
 
+#include <limits.h>
 #include <purefs/filesystem_paths.hpp>
 #include <source/version.hpp>
 #include <time/time_conversion.hpp>

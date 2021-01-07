@@ -16,7 +16,6 @@ extern "C"
 }
 
 #include "bsp/battery-charger/battery_charger.hpp"
-#include "vfs.hpp"
 
 #include "bsp/BoardDefinitions.hpp"
 #include "common_data/EventStore.hpp"
@@ -24,7 +23,7 @@ extern "C"
 #include "drivers/i2c/DriverI2C.hpp"
 #include <cstdio>
 #include <purefs/filesystem_paths.hpp>
-
+#include "fsl_common.h"
 #define BSP_BATTERY_CHARGER_I2C_ADDR (0xD2 >> 1)
 #define BSP_FUEL_GAUGE_I2C_ADDR      (0x6C >> 1)
 #define BSP_TOP_CONTROLLER_I2C_ADDR  (0xCC >> 1)
@@ -337,6 +336,8 @@ static int battery_chargerTopControllerWrite(bsp::batteryChargerRegisters regist
 }
 
 static int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registerAddress, uint8_t *value)
+    __attribute__((used));
+static int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registerAddress, uint8_t *value)
 {
     if (value == NULL) {
         return -1;
@@ -389,7 +390,7 @@ static bsp::batteryRetval battery_loadConfiguration(void)
 static bsp::batteryRetval battery_storeConfiguration(void)
 {
     // TODO:M.P procedure below seems to crash system, it should be fixed.
-    if (ff_rename(configs::battery_cfgFile.c_str(), configs::battery_cfgFilePrev.c_str(), false) != 0) {
+    if (rename(configs::battery_cfgFile.c_str(), configs::battery_cfgFilePrev.c_str()) != 0) {
         LOG_ERROR("Could not move configuration file");
         return bsp::batteryRetval::battery_ChargerError;
     }
