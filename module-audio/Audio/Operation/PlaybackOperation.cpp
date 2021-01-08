@@ -58,7 +58,7 @@ namespace audio
         }
         operationToken = token;
 
-        assert(dataStreamOut);
+        assert(outputConnection);
 
         if (!tags) {
             tags = dec->fetchTags();

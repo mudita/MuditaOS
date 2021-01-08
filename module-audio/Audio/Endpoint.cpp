@@ -62,8 +62,8 @@ void StreamConnection::enable()
     }
 
     _stream->reset();
-    _source->enableInput();
     _sink->enableOutput();
+    _source->enableInput();
 
     enabled = true;
 }
