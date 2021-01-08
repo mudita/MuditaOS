@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-namespace gui::call
+namespace app::call
 {
     enum class State
     {
@@ -15,18 +15,18 @@ namespace gui::call
     };
 }
 
-inline const char *c_str(gui::call::State state)
+inline auto c_str(app::call::State state) -> const char *
 {
     switch (state) {
-    case gui::call::State::IDLE:
+    case app::call::State::IDLE:
         return "IDLE";
-    case gui::call::State::INCOMING_CALL:
+    case app::call::State::INCOMING_CALL:
         return "INCOMING_CALL";
-    case gui::call::State::OUTGOING_CALL:
+    case app::call::State::OUTGOING_CALL:
         return "OUTGOING_CALL";
-    case gui::call::State::CALL_IN_PROGRESS:
+    case app::call::State::CALL_IN_PROGRESS:
         return "CALL_IN_PROGRESS";
-    case gui::call::State::CALL_ENDED:
+    case app::call::State::CALL_ENDED:
         return "CALL_ENDED";
     }
     return "";
