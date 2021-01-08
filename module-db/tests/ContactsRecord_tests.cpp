@@ -5,7 +5,6 @@
 
 #include "Interface/ContactRecord.hpp"
 #include <i18n/i18n.hpp>
-#include "vfs.hpp"
 #include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Contact Record db tests")

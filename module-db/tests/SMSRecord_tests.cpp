@@ -12,7 +12,6 @@
 
 #include <country.hpp>
 #include <PhoneNumber.hpp>
-#include <vfs.hpp>
 
 #include <algorithm>
 #include <filesystem>

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #define CATCH_CONFIG_MAIN
@@ -6,7 +6,6 @@
 #include "application-calculator/data/CalculatorUtility.hpp"
 #include <i18n/i18n.hpp>
 #include <cstring>
-#include <vfs.hpp>
 
 
 TEST_CASE("Calculator utilities")

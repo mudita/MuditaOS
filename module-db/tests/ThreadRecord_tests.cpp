@@ -17,7 +17,6 @@
 #include "queries/messages/threads/QueryThreadRemove.hpp"
 #include "queries/messages/threads/QueryThreadsGet.hpp"
 #include "queries/messages/sms/QuerySMSGetLastByThreadID.hpp"
-#include <vfs.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 #include <algorithm>

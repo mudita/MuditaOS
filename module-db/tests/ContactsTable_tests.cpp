@@ -7,7 +7,6 @@
 #include "Databases/ContactsDB.hpp"
 #include "Tables/ContactsTable.hpp"
 
-#include <vfs.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Contacts Table tests")
