@@ -3,16 +3,6 @@
 
 #include <purefs/filesystem_paths.hpp>
 
-// FIXME: Remove it when deprecated API will be removed
-#undef PATH_SYS
-#undef PATH_USER
-#undef PATH_CURRENT
-#undef PATH_PREVIOUS
-#undef PATH_UPDATES
-#undef PATH_TMP
-#undef PATH_BACKUP
-#undef PATH_FACTORY
-
 namespace
 {
     constexpr inline auto PATH_SYS      = "/sys";
@@ -61,7 +51,7 @@ namespace purefs
 
         std::filesystem::path getTemporaryPath() noexcept
         {
-            return std::filesystem::path{eMMC_disk} / PATH_TMP;
+            return std::filesystem::path{eMMC_disk} / PATH_USER / PATH_TMP;
         }
 
         std::filesystem::path getBackupOSPath() noexcept
