@@ -136,3 +136,33 @@ def send_number(number: str, connection):
             connection.send_key_code(int(digit))
             time.sleep(0.3)
 
+
+### timeout from https://stackoverflow.com/a/601168/5752094
+
+from contextlib import contextmanager
+
+import signal
+
+
+class Timeout(Exception):
+    '''
+    usage:
+        try:
+            with Timeout.limit(10):
+                long_function_call()
+        except Timeout as e:
+            print("Timed out!")
+    '''
+
+    @classmethod
+    @contextmanager
+    def limit(cls, seconds):
+        def signal_handler(signum, frame):
+            raise Timeout("Timed out!")
+
+        signal.signal(signal.SIGALRM, signal_handler)
+        signal.alarm(seconds)
+        try:
+            yield
+        finally:
+            signal.alarm(0)
