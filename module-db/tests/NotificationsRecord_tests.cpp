@@ -11,7 +11,6 @@
 #include "module-db/queries/notifications/QueryNotificationsClear.hpp"
 #include "module-db/queries/notifications/QueryNotificationsGetAll.hpp"
 
-#include <vfs.hpp>
 #include <filesystem>
 
 #include <stdint.h>
