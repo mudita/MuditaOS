@@ -30,6 +30,11 @@ namespace gui
         }
     }
 
+    bool isInputNavigation(const InputEvent &evt)
+    {
+        return inputToNavigation(evt) != NavigationDirection::NONE;
+    }
+
     Item::Item()
         : focus{false}, type{ItemType::ITEM}, parent{nullptr}, radius{0}, visible{true},
           verticalPolicy{LayoutVerticalPolicy::LAYOUT_POLICY_VERTICAL_EXPAND},
