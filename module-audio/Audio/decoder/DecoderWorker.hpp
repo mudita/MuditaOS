@@ -25,12 +25,12 @@ namespace audio
         ~DecoderWorker() override;
 
         virtual auto init(std::list<sys::WorkerQueueInfo> queues = std::list<sys::WorkerQueueInfo>()) -> bool override;
-        virtual auto handleMessage(uint32_t queueID) -> bool override;
 
-        bool enablePlayback();
-        bool disablePlayback();
+        auto enablePlayback() -> bool;
+        auto disablePlayback() -> bool;
 
       private:
+        virtual auto handleMessage(uint32_t queueID) -> bool override;
         void pushAudioData();
         bool stateChangeWait();
 
