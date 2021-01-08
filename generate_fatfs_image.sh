@@ -50,14 +50,22 @@ if [ ! $MTOOLS_OK ]; then
 	exit -1
 fi
 
+SDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+GENLFS=$(find $SDIR -type f -iname genlittlefs -executable -print -quit)
+if [ -z ${GENLFS} ]; then
+    echo "Unable to find genlilttlefs..."
+    exit -1
+fi
+
 truncate -s 16G $IMAGE_NAME
 sfdisk $IMAGE_NAME << ==sfdisk
 label: dos
 label-id: 0x09650eb4
 unit: sectors
 
-/dev/sda1 : start=        2048, size=    28522496, type=b, bootable
-/dev/sda2 : start=    28524544, size=     2097152, type=b
+/dev/sdx1 : start=       2048,  size=    2097152, type=b, bootable
+/dev/sdx2 : start=    2099200,  size=    2097152, type=b
+/dev/sdx3 : start=    4196352,  size=   29358080, type=9e
 ==sfdisk
 
 PART1="$IMAGE_NAME@@1048576"
@@ -69,7 +77,6 @@ cd "$SRC_DATA"
 for i in $ASSETS_DIR; do
 	mcopy -s -i "$PART1" $i ::/current/
 done
-mcopy -s -i "$PART1" user ::
 mcopy -s -i "$PART1" .boot.json ::
 mcopy -s -i "$PART1" .boot.json.crc32 ::
 mmd -i "$PART1" ::/current/sys
@@ -80,4 +87,8 @@ for i in $TEST_ITEMS; do
 	mcopy -s -i "$PART1" $i ::/current
 done
 mcopy -s -i "$PART1" sys/updates ::
+
+#Littlefs generate image
+$GENLFS --image=$IMAGE_NAME --block_size=4096  --overwrite  --partition_num=3 -- user/*
+# back to previous dir
 cd -

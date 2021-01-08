@@ -9,7 +9,6 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_handle.hpp>
 #include <littlefs/lfs.h>
-#include <littlefs/lfs_extension.h>
 #include <log/log.hpp>
 
 #include <climits>
@@ -20,11 +19,11 @@
 #include <cstring>
 #include <sys/stat.h>
 
-/** NOTE: LITTLEFS is not thread safe like ELM FAT, so it will require global fs mutex lock :(
- */
-
 namespace
 {
+    // NOTE: lfs block size is configured during format
+    static constexpr auto c_lfs_block_size = 4096;
+
     template <typename T> auto lfs_to_errno(T error) -> T
     {
         if (error >= 0) {
@@ -92,10 +91,10 @@ namespace
         decltype(static_cast<struct stat *>(nullptr)->st_mode) mode =
             S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH;
         if (type == LFS_TYPE_REG) {
-            mode |= (S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH);
+            mode |= (S_IFREG | S_IXUSR | S_IXGRP | S_IXOTH);
         }
         else if (type == LFS_TYPE_DIR) {
-            mode |= S_IFREG;
+            mode |= S_IFDIR;
         }
         return mode;
     }
@@ -113,24 +112,15 @@ namespace
     [[gnu::nonnull(1)]] int setup_lfs_config(lfs_config *cfg, size_t sector_size, size_t part_sectors_count)
     {
         cfg->block_cycles   = 512;
-        cfg->block_size     = 0; // Read later from superblock
+        cfg->block_size      = c_lfs_block_size;
         cfg->block_count    = 0; // Read later from super block
         cfg->lookahead_size = 8192;
-
-        int err = lfs_extension_read_config_from_superblock(cfg, sector_size);
-        if (err) {
-            LOG_ERROR("Unable to read the superblock info %i", err);
-            return lfs_to_errno(err);
-        }
-        if (cfg->block_size > 1024U * 1024U) {
-            LOG_ERROR("Block size too big");
-            return -E2BIG;
-        }
-
-        if ((uint64_t(cfg->block_count) * uint64_t(cfg->block_size)) / sector_size > part_sectors_count) {
-            LOG_ERROR("Block count out of range sectors count");
+        const auto total_siz = uint64_t(sector_size) * uint64_t(part_sectors_count);
+        if (total_siz % cfg->block_size) {
+            LOG_ERROR("Block size doesn't match partition size");
             return -ERANGE;
         }
+        cfg->block_count = total_siz / cfg->block_size;
         cfg->read_size  = cfg->block_size;
         cfg->prog_size  = cfg->block_size;
         cfg->cache_size = cfg->block_size;
