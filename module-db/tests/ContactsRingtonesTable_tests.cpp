@@ -20,10 +20,10 @@ TEST_CASE("Contacts Ringtones Table tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
     std::filesystem::remove(contactsPath);
 
-    ContactsDB contactsdb{contactsPath};
+    ContactsDB contactsdb{contactsPath.c_str()};
     REQUIRE(contactsdb.isInitialized());
 
     ContactsRingtonesTableRow testRow1(DB_ID_NONE, DB_ID_NONE, "/test/assets/path/ringtone.wr");

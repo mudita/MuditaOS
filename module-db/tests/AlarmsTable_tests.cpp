@@ -21,10 +21,10 @@ TEST_CASE("Alarms Table tests")
 {
     Database::initialize();
 
-    const auto alarmsPath = (purefs::dir::getUserDiskPath() / "alarms.db").c_str();
+    const auto alarmsPath = purefs::dir::getUserDiskPath() / "alarms.db";
     std::filesystem::remove(alarmsPath);
 
-    AlarmsDB alarmsDb(alarmsPath);
+    AlarmsDB alarmsDb(alarmsPath.c_str());
     REQUIRE(alarmsDb.isInitialized());
 
     auto &alarmsTbl = alarmsDb.alarms;

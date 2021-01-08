@@ -12,11 +12,11 @@ TEST_CASE("Contact Record db tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
     std::filesystem::remove(contactsPath);
 
-    auto contactDB = std::make_unique<ContactsDB>(contactsPath);
-    REQUIRE(contactDB->isInitialized());
+    ContactsDB contactDB(contactsPath.c_str());
+    REQUIRE(contactDB.isInitialized());
 
     const char *primaryNameTest                   = "PrimaryNameTest";
     const char *alternativeNameTest               = "AlternativeNameTest";
@@ -29,7 +29,7 @@ TEST_CASE("Contact Record db tests")
     const char *speeddialTest                     = "100";
     const ContactNumberType contactNumberTypeTest = ContactNumberType ::PAGER;
 
-    ContactRecordInterface contRecInterface(contactDB.get());
+    ContactRecordInterface contRecInterface(&contactDB);
 
     ContactRecord recordIN;
 
@@ -261,13 +261,13 @@ TEST_CASE("Test converting contact data to string")
 TEST_CASE("Contact record numbers update")
 {
     Database::initialize();
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
     std::filesystem::remove(contactsPath);
 
-    auto contactDB = std::make_unique<ContactsDB>(contactsPath);
-    REQUIRE(contactDB->isInitialized());
+    ContactsDB contactDB(contactsPath.c_str());
+    REQUIRE(contactDB.isInitialized());
 
-    auto records = ContactRecordInterface(contactDB.get());
+    auto records = ContactRecordInterface(&contactDB);
 
     ContactRecord testRecord, otherRecord;
     std::array<std::string, 4> numbers = {{{"600100100"}, {"600100200"}, {"600100300"}, {"600100400"}}};
@@ -289,7 +289,7 @@ TEST_CASE("Contact record numbers update")
         auto newRecord = records.GetByID(1);
         REQUIRE(newRecord.numbers.size() == 2);
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB->number.count() == 4);
+        REQUIRE(contactDB.number.count() == 4);
 
         auto validatationRecord = records.GetByID(1);
         REQUIRE(validatationRecord.numbers.size() == 2);
@@ -310,7 +310,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
 
-        REQUIRE(contactDB->number.count() == 3);
+        REQUIRE(contactDB.number.count() == 3);
 
         auto validatationRecord = records.GetByID(1);
         REQUIRE(validatationRecord.numbers.size() == 1);
@@ -324,7 +324,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>(
             {ContactRecord::Number(numbers[0], std::string("")), ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB->number.count() == 4);
+        REQUIRE(contactDB.number.count() == 4);
 
         validatationRecord = records.GetByID(1);
         REQUIRE(validatationRecord.numbers.size() == 2);
@@ -349,7 +349,7 @@ TEST_CASE("Contact record numbers update")
         REQUIRE(records.Update(newRecord));
 
         auto validatationRecord = records.GetByID(1);
-        REQUIRE(contactDB->number.count() == 4);
+        REQUIRE(contactDB.number.count() == 4);
         REQUIRE(validatationRecord.numbers.size() == 2);
         REQUIRE(validatationRecord.numbers[0].number.getEntered() == numbers[1]);
         REQUIRE(validatationRecord.numbers[1].number.getEntered() == numbers[0]);
@@ -363,7 +363,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>(
             {ContactRecord::Number(numbers[2], std::string("")), ContactRecord::Number(numbers[1], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB->number.count() == 3);
+        REQUIRE(contactDB.number.count() == 3);
 
         auto validatationRecord = records.GetByID(1);
         REQUIRE(validatationRecord.numbers.size() == 2);
@@ -383,7 +383,7 @@ TEST_CASE("Contact record numbers update")
         newRecord.numbers = std::vector<ContactRecord::Number>(
             {ContactRecord::Number(numbers[2], std::string("")), ContactRecord::Number(numbers[3], std::string(""))});
         REQUIRE(records.Update(newRecord));
-        REQUIRE(contactDB->number.count() == 2);
+        REQUIRE(contactDB.number.count() == 2);
 
         auto validatationRecord = records.GetByID(1);
         REQUIRE(validatationRecord.numbers.size() == 2);

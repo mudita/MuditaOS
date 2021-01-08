@@ -21,13 +21,13 @@ TEST_CASE("SMS templates Record tests")
 {
     Database::initialize();
 
-    const auto smsPath = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
+    const auto smsPath = purefs::dir::getUserDiskPath() / "sms.db";
     std::filesystem::remove(smsPath);
 
-    auto smsDB = std::make_unique<SmsDB>(smsPath);
-    REQUIRE(smsDB->isInitialized());
+    SmsDB smsDB(smsPath.c_str());
+    REQUIRE(smsDB.isInitialized());
 
-    SMSTemplateRecordInterface SMSTemplateRecordInterface(smsDB.get());
+    SMSTemplateRecordInterface SMSTemplateRecordInterface(&smsDB);
     SMSTemplateRecord testRec;
     testRec.text               = "Test text";
     testRec.lastUsageTimestamp = 100;

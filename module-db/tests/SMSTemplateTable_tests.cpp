@@ -21,10 +21,10 @@ TEST_CASE("SMS Templates Table tests")
 {
     Database::initialize();
 
-    const auto smsPath = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
+    const auto smsPath = purefs::dir::getUserDiskPath() / "sms.db";
     std::filesystem::remove(smsPath);
 
-    SmsDB smsDb{smsPath};
+    SmsDB smsDb{smsPath.c_str()};
     REQUIRE(smsDb.isInitialized());
 
     auto &templatesTbl = smsDb.templates;

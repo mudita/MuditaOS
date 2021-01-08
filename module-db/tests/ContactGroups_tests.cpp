@@ -28,9 +28,9 @@ TEST_CASE("Contact Groups tests", "[Groups]")
 {
     INFO("sqlite Init");
     Database::initialize();
-    const auto callogPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    const auto callogPath = purefs::dir::getUserDiskPath() / "contacts.db";
     std::filesystem::remove(callogPath);
-    ContactsDB contactDb{callogPath};
+    ContactsDB contactDb{callogPath.c_str()};
     INFO("contactDB init");
     REQUIRE(contactDb.isInitialized());
     ContactsGroupsTable contactGroupsTable = ContactsGroupsTable(&contactDb);

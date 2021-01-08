@@ -30,15 +30,15 @@ TEST_CASE("Thread Record tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
-    const auto smsPath      = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
+    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
+    const auto smsPath      = purefs::dir::getUserDiskPath() / "sms.db";
     std::filesystem::remove(contactsPath);
     std::filesystem::remove(smsPath);
 
-    auto smsDB = std::make_unique<SmsDB>(smsPath);
-    REQUIRE(smsDB->isInitialized());
-    auto contactsDB = std::make_unique<ContactsDB>(contactsPath);
-    REQUIRE(contactsDB->isInitialized());
+    SmsDB smsDB(smsPath.c_str());
+    REQUIRE(smsDB.isInitialized());
+    ContactsDB contactsDB(contactsPath.c_str());
+    REQUIRE(contactsDB.isInitialized());
 
     const uint32_t dateTest      = 123456789;
     const char *snippetTest      = "Test snippet";
@@ -46,7 +46,7 @@ TEST_CASE("Thread Record tests")
     const SMSType typeTest       = SMSType ::UNKNOWN;
     const uint32_t contactIDTest = 100;
 
-    ThreadRecordInterface threadRecordInterface1(smsDB.get(), contactsDB.get());
+    ThreadRecordInterface threadRecordInterface1(&smsDB, &contactsDB);
 
     ThreadRecord recordIN;
     recordIN.date      = dateTest;
@@ -208,7 +208,7 @@ TEST_CASE("Thread Record tests")
         const utils::PhoneNumber phoneNumber("+48600123456", utils::country::Id::UNKNOWN);
         const std::string lastSmsBody = "Ola";
 
-        SMSRecordInterface smsRecInterface(smsDB.get(), contactsDB.get());
+        SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
         SMSRecord recordIN;
         recordIN.date      = 123456789;
         recordIN.dateSent  = 987654321;

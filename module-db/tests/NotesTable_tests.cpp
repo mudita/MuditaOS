@@ -12,10 +12,11 @@ TEST_CASE("Notes Table tests")
 {
     Database::initialize();
 
-    auto notesDb = std::make_unique<NotesDB>((purefs::dir::getUserDiskPath() / "notes.db").c_str());
-    REQUIRE(notesDb->isInitialized());
+    const auto notesDbPath = purefs::dir::getUserDiskPath() / "notes.db";
+    NotesDB notesDb{notesDbPath.c_str()};
+    REQUIRE(notesDb.isInitialized());
 
-    NotesTable table{notesDb.get()};
+    NotesTable table{&notesDb};
     table.removeAll();
     REQUIRE(table.count() == 0);
 
