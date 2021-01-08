@@ -165,13 +165,8 @@ namespace audio
             return RetCode::UnsupportedProfile;
         }
 
-        if (outputConnection) {
-            outputConnection.release();
-        }
-
-        if (audioDevice) {
-            audioDevice.release();
-        }
+        outputConnection.release();
+        audioDevice.release();
 
         audioDevice = CreateDevice(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
         if (audioDevice == nullptr) {
