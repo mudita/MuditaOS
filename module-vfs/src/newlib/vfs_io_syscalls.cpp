@@ -120,7 +120,7 @@ namespace vfsn::internal::syscalls
         }
         const auto ret  = vfs->getcwd();
         const auto slen = ret.copy(buf, size);
-        if (size < slen) {
+        if (size >= slen) {
             buf[slen] = '\0';
         }
         return buf;
