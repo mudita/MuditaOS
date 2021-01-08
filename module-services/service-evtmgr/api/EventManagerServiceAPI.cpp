@@ -35,3 +35,9 @@ bsp::Board EventManagerServiceAPI::GetBoard(sys::Service *serv)
     }
     return bsp::Board::none;
 }
+
+void EventManagerServiceAPI::checkBatteryLevelCriticalState(sys::Service *serv)
+{
+    auto msg = std::make_shared<sevm::BatteryLevelCriticalCheckMessage>();
+    sys::Bus::SendUnicast(msg, service::name::evt_manager, serv);
+}
