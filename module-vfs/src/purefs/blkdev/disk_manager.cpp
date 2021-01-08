@@ -36,7 +36,7 @@ namespace purefs::blkdev
         cpp_freertos::LockGuard _lck(*m_lock);
         const auto ret = m_dev_map.find(std::string(device_name));
         if (ret != std::end(m_dev_map)) {
-            LOG_ERROR("Disc: %.*s already registered.", int(device_name.length()), device_name.data());
+            LOG_ERROR("Disc: %s already registered.", std::string(device_name).c_str());
             return -EEXIST;
         }
         else {
@@ -54,7 +54,7 @@ namespace purefs::blkdev
         cpp_freertos::LockGuard _lck(*m_lock);
         auto it = m_dev_map.find(std::string(device_name));
         if (it == std::end(m_dev_map)) {
-            LOG_ERROR("Disc: %.*s doesn't exists in manager.", int(device_name.length()), device_name.data());
+            LOG_ERROR("Disc: %s doesn't exists in manager.", std::string(device_name).c_str());
             return -ENOENT;
         }
         auto ret = it->second->cleanup();
