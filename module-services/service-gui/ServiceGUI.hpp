@@ -63,6 +63,7 @@ namespace service::gui
 
         void prepareDisplayEarly(::gui::RefreshModes refreshMode);
         void notifyRenderer(std::list<std::unique_ptr<::gui::DrawCommand>> &&commands, ::gui::RefreshModes refreshMode);
+        void notifyRenderColorSchemeChange(::gui::ColorScheme &&scheme);
         void enqueueDrawCommands(DrawCommandsQueue::QueueItem &&item);
         void sendOnDisplay(::gui::Context *context, int contextId, ::gui::RefreshModes refreshMode);
         void scheduleContextRelease(int contextId);
@@ -76,10 +77,12 @@ namespace service::gui
         sys::MessagePointer handleGUIRenderingFinished(sys::Message *message);
         sys::MessagePointer handleEinkInitialized(sys::Message *message);
         sys::MessagePointer handleImageDisplayedNotification(sys::Message *message);
+        sys::MessagePointer handleChangeColorScheme(sys::Message *message);
 
         std::unique_ptr<ContextPool> contextPool;
         std::unique_ptr<WorkerGUI> worker;
         std::unique_ptr<DrawCommandsQueue> commandsQueue;
+        std::unique_ptr<::gui::ColorScheme> colorSchemeUpdate;
         std::optional<CachedRender> cachedRender;
         std::unique_ptr<sys::Timer> contextReleaseTimer;
         State currentState;

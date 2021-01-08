@@ -9,6 +9,7 @@
 #include "CellularPassthroughWindow.hpp"
 #include "FotaWindow.hpp"
 #include "EinkModeWindow.hpp"
+#include "ColorTestWindow.hpp"
 
 std::list<gui::Option> mainWindowOptions(app::Application *app)
 {
@@ -40,6 +41,7 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
     }
     addMenu(i18("Fota update"), gui::window::name::fota_window);
     addMenu("Eink Mode", gui::window::name::eink);
+    addMenu(i18("Color test"), gui::window::name::color_test_window);
     addMenu(i18("app_settings_display"));
     addMenu(i18("app_settings_phone_modes"));
     addMenu(i18("app_settings_security"));

@@ -5,7 +5,9 @@
 #include "WorkerGUI.hpp"
 
 #include "messages/DrawMessage.hpp"
+
 #include "messages/EinkInitialized.hpp"
+#include "messages/ChangeColorScheme.hpp"
 
 #include <DrawCommand.hpp>
 #include <FontManager.hpp>
@@ -62,6 +64,9 @@ namespace service::gui
 
         connect(typeid(RenderingFinished),
                 [this](sys::Message *request) -> sys::MessagePointer { return handleGUIRenderingFinished(request); });
+
+        connect(typeid(ChangeColorScheme),
+                [this](sys::Message *request) -> sys::MessagePointer { return handleChangeColorScheme(request); });
 
         connect(typeid(eink::ImageDisplayedNotification), [this](sys::Message *request) -> sys::MessagePointer {
             return handleImageDisplayedNotification(request);
@@ -129,6 +134,13 @@ namespace service::gui
         return sys::MessageNone{};
     }
 
+    sys::MessagePointer ServiceGUI::handleChangeColorScheme(sys::Message *message)
+    {
+        const auto msg = static_cast<ChangeColorScheme *>(message);
+        notifyRenderColorSchemeChange(msg->getColorScheme());
+        return sys::MessageNone{};
+    }
+
     void ServiceGUI::prepareDisplayEarly(::gui::RefreshModes refreshMode)
     {
         auto msg = std::make_shared<service::eink::PrepareDisplayEarlyRequest>(refreshMode);
@@ -140,6 +152,12 @@ namespace service::gui
     {
         enqueueDrawCommands(DrawCommandsQueue::QueueItem{std::move(commands), refreshMode});
         worker->notify(WorkerGUI::Signal::Render);
+    }
+
+    void ServiceGUI::notifyRenderColorSchemeChange(::gui::ColorScheme &&scheme)
+    {
+        colorSchemeUpdate = std::make_unique<::gui::ColorScheme>(scheme);
+        worker->notify(WorkerGUI::Signal::ChangeColorScheme);
     }
 
     void ServiceGUI::enqueueDrawCommands(DrawCommandsQueue::QueueItem &&item)
