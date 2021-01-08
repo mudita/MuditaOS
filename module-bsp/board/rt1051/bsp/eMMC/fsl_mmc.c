@@ -57,15 +57,6 @@
 inline static status_t MMC_SelectCard(mmc_card_t *card, bool isSelected);
 
 /*!
- * @brief Wait write process complete.
- *
- * @param card Card descriptor.
- * @retval kStatus_Timeout Operation timeout.
- * @retval kStatus_Success Operate successfully.
- */
-static status_t MMC_WaitWriteComplete(mmc_card_t *card);
-
-/*!
  * @brief Send SET_BLOCK_COUNT command.
  *
  * @param card Card descriptor.
@@ -147,15 +138,6 @@ static void MMC_DecodeCsd(mmc_card_t *card, uint32_t *rawCsd);
  * @param card Card descriptor.
  */
 static void MMC_SetMaxFrequency(mmc_card_t *card);
-
-/*!
- * @brief Set erase unit size of the card
- *
- * @param card Card descriptor.
- * @retval kStatus_SDMMC_ConfigureExtendedCsdFailed Configure Extended CSD failed.
- * @retval kStatus_Success Operate successfully.
- */
-static status_t MMC_SetMaxEraseUnitSize(mmc_card_t *card);
 
 /*!
  * @brief Send SWITCH command to set the specific byte in Extended CSD.
@@ -524,7 +506,7 @@ static status_t MMC_Transfer(mmc_card_t *card, SDMMCHOST_TRANSFER *content, uint
     return error;
 }
 
-static status_t MMC_WaitWriteComplete(mmc_card_t *card)
+status_t MMC_WaitWriteComplete(mmc_card_t *card)
 {
     assert(card);
 
@@ -825,8 +807,8 @@ static void MMC_SetMaxFrequency(mmc_card_t *card)
     card->busClock_Hz = SDMMCHOST_SET_CARD_CLOCK(card->host.base, card->host.sourceClock_Hz, maxBusClock_Hz);
 }
 
-static status_t MMC_SetMaxEraseUnitSize(mmc_card_t *card) __attribute__((used));
-static status_t MMC_SetMaxEraseUnitSize(mmc_card_t *card)
+status_t MMC_SetMaxEraseUnitSize(mmc_card_t *card) __attribute__((used));
+status_t MMC_SetMaxEraseUnitSize(mmc_card_t *card)
 {
     assert(card);
 

@@ -3,12 +3,12 @@
 
 #include <purefs/vfs_subsystem_internal.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
+#include <purefs/blkdev/disk_emmc.hpp>
 
 namespace purefs::subsystem::internal
 {
     auto create_default_block_device() -> std::shared_ptr<blkdev::disk>
     {
-        // TODO: implement for rt1051
-        return nullptr;
+        return std::make_shared<purefs::blkdev::disk_emmc>();
     }
 } // namespace purefs::subsystem::internal
