@@ -47,6 +47,7 @@ namespace app::manager
             ShowMMIResponse,
             ShowMMIPush,
             DisplayCMEError,
+            DisplayLowBatteryNotification,
             UserAction // The last enumerator in the Action enum.
                        // All user-defined actions shall have values greater than UserAction.
                        // All system-wide actions shall have values lesser than UserAction.

@@ -273,6 +273,11 @@ sys::ReturnCodes EventManager::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
+    connect(sevm::BatteryLevelCriticalCheckMessage(), [&](sys::Message *msgl) {
+        EventWorker->checkBatteryLevelCritical();
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
     // initialize keyboard worker
     EventWorker = std::make_unique<WorkerEvent>(this);
 
