@@ -64,11 +64,13 @@ bool audio::DecoderWorker::handleMessage(uint32_t queueID)
             switch (static_cast<Command>(cmd.command)) {
             case Command::EnablePlayback: {
                 playbackEnabled = true;
+                stateSemaphore.Give();
                 pushAudioData();
                 break;
             }
             case Command::DisablePlayback: {
                 playbackEnabled = false;
+                stateSemaphore.Give();
             }
             }
         }
@@ -98,10 +100,17 @@ void audio::DecoderWorker::pushAudioData()
 
 bool audio::DecoderWorker::enablePlayback()
 {
-    return sendCommand({.command = static_cast<uint32_t>(Command::EnablePlayback), .data = nullptr});
+    return sendCommand({.command = static_cast<uint32_t>(Command::EnablePlayback), .data = nullptr}) &&
+           stateChangeWait();
 }
 
 bool audio::DecoderWorker::disablePlayback()
 {
-    return sendCommand({.command = static_cast<uint32_t>(Command::DisablePlayback), .data = nullptr});
+    return sendCommand({.command = static_cast<uint32_t>(Command::DisablePlayback), .data = nullptr}) &&
+           stateChangeWait();
+}
+
+bool audio::DecoderWorker::stateChangeWait()
+{
+    return stateSemaphore.Take();
 }

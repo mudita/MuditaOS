@@ -3,8 +3,10 @@
 
 #pragma once
 
-#include <Service/Worker.hpp>
 #include "Audio/StreamQueuedEventsListener.hpp"
+
+#include <Service/Worker.hpp>
+#include <semaphore.hpp>
 
 namespace audio
 {
@@ -30,6 +32,7 @@ namespace audio
 
       private:
         void pushAudioData();
+        bool stateChangeWait();
 
         using BufferInternalType = int16_t;
 
@@ -43,6 +46,7 @@ namespace audio
         EndOfFileCallback endOfFileCallback;
         std::unique_ptr<StreamQueuedEventsListener> queueListener;
         bool playbackEnabled = false;
+        cpp_freertos::BinarySemaphore stateSemaphore;
 
         const int bufferSize;
         std::unique_ptr<BufferInternalType[]> decoderBuffer;
