@@ -17,10 +17,11 @@ TEST_CASE("Notes Record tests")
 {
     Database::initialize();
 
-    auto notesDb = std::make_unique<NotesDB>((purefs::dir::getUserDiskPath() / "notes.db").c_str());
-    REQUIRE(notesDb->isInitialized());
+    const auto notesDbPath = purefs::dir::getUserDiskPath() / "notes.db";
+    NotesDB notesDb{notesDbPath.c_str()};
+    REQUIRE(notesDb.isInitialized());
 
-    NotesRecordInterface notesRecordInterface{notesDb.get()};
+    NotesRecordInterface notesRecordInterface{&notesDb};
     notesRecordInterface.RemoveAll(); // Empty the notes database.
 
     constexpr auto testSnippet = "TEST SNIPPET";

@@ -39,10 +39,10 @@ TEST_CASE("Events Record tests")
 {
     Database::initialize();
 
-    const auto eventsPath = (purefs::dir::getUserDiskPath() / "events.db").c_str();
+    const auto eventsPath = purefs::dir::getUserDiskPath() / "events.db";
     std::filesystem::remove(eventsPath);
 
-    EventsDB eventsDb{eventsPath};
+    EventsDB eventsDb{eventsPath.c_str()};
 
     REQUIRE(eventsDb.isInitialized());
 

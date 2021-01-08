@@ -21,10 +21,10 @@ TEST_CASE("Threads Table tests")
 {
     Database::initialize();
 
-    const auto smsPath = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
+    const auto smsPath = purefs::dir::getUserDiskPath() / "sms.db";
     std::filesystem::remove(smsPath);
 
-    SmsDB smsdb{smsPath};
+    SmsDB smsdb{smsPath.c_str()};
     REQUIRE(smsdb.isInitialized());
 
     ThreadsTableRow testRow1 = {{.ID = 0},
