@@ -51,17 +51,13 @@ StreamConnection::~StreamConnection()
 void StreamConnection::destroy()
 {
     disable();
-    if (_sink != nullptr) {
-        _sink->disconnectStream();
-    }
-    if (_source != nullptr) {
-        _source->disconnectStream();
-    }
+    _sink->disconnectStream();
+    _source->disconnectStream();
 }
 
 void StreamConnection::enable()
 {
-    if (!isValid() || enabled) {
+    if (enabled) {
         return;
     }
 
@@ -74,7 +70,7 @@ void StreamConnection::enable()
 
 void StreamConnection::disable()
 {
-    if (!isValid() || !enabled) {
+    if (!enabled) {
         return;
     }
 
@@ -103,9 +99,4 @@ Sink *StreamConnection::getSink() const noexcept
 Stream *StreamConnection::getStream() const noexcept
 {
     return _stream;
-}
-
-[[nodiscard]] bool StreamConnection::isValid() const noexcept
-{
-    return _sink != nullptr && _source != nullptr && _stream != nullptr;
 }

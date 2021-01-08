@@ -59,6 +59,7 @@ namespace audio
 
         assert(dataStreamOut);
 
+        // TODO: move to enable
         dec->startDecodingWorker(*dataStreamOut, endOfFileCallback);
 
         if (!tags) {
@@ -175,8 +176,7 @@ namespace audio
             return RetCode::Failed;
         }
 
-        dec->connectStream(*dataStreamOut);
-        audioDevice->connectOutputStream(*dataStreamOut);
+        outputConnection = std::make_unique<StreamConnection>(dec.get(), audioDevice.get(), dataStreamOut);
 
         currentProfile->SetSampleRate(currentSampleRate);
         currentProfile->SetInOutFlags(currentInOutFlags);

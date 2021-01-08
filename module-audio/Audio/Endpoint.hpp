@@ -85,7 +85,6 @@ namespace audio
         [[nodiscard]] Sink *getSink() const noexcept;
         [[nodiscard]] Stream *getStream() const noexcept;
 
-        [[nodiscard]] bool isValid() const noexcept;
         [[nodiscard]] bool isEnabled() const noexcept;
 
       private:
