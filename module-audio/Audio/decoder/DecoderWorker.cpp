@@ -4,15 +4,15 @@
 #include "DecoderWorker.hpp"
 #include "Audio/decoder/Decoder.hpp"
 
-audio::DecoderWorker::DecoderWorker(Stream &audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback)
+audio::DecoderWorker::DecoderWorker(Stream *audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback)
     : sys::Worker(DecoderWorker::workerName, DecoderWorker::workerPriority), audioStreamOut(audioStreamOut),
       decoder(decoder), endOfFileCallback(endOfFileCallback),
-      bufferSize(audioStreamOut.getBlockSize() / sizeof(BufferInternalType))
+      bufferSize(audioStreamOut->getBlockSize() / sizeof(BufferInternalType))
 {}
 
 audio::DecoderWorker::~DecoderWorker()
 {
-    audioStreamOut.unregisterListeners(queueListener.get());
+    audioStreamOut->unregisterListeners(queueListener.get());
 }
 
 auto audio::DecoderWorker::init(std::list<sys::WorkerQueueInfo> queues) -> bool
@@ -27,7 +27,7 @@ auto audio::DecoderWorker::init(std::list<sys::WorkerQueueInfo> queues) -> bool
         return false;
     }
 
-    audioStreamOut.registerListener(queueListener.get());
+    audioStreamOut->registerListener(queueListener.get());
 
     decoderBuffer = std::make_unique<BufferInternalType[]>(bufferSize);
     if (!decoderBuffer) {
@@ -81,7 +81,7 @@ void audio::DecoderWorker::pushAudioData()
 {
     auto samplesRead = 0;
 
-    while (!audioStreamOut.isFull() && playbackEnabled) {
+    while (!audioStreamOut->isFull() && playbackEnabled) {
         samplesRead = decoder->decode(bufferSize, decoderBuffer.get());
 
         if (samplesRead == 0) {
@@ -89,7 +89,7 @@ void audio::DecoderWorker::pushAudioData()
             break;
         }
 
-        if (!audioStreamOut.push(decoderBuffer.get(), samplesRead * sizeof(BufferInternalType))) {
+        if (!audioStreamOut->push(decoderBuffer.get(), samplesRead * sizeof(BufferInternalType))) {
             LOG_FATAL("Decoder failed to push to stream.");
             break;
         }

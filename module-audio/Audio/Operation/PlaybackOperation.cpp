@@ -26,6 +26,13 @@ namespace audio
         AddProfile(Profile::Type::PlaybackHeadphones, playbackType, false);
         AddProfile(Profile::Type::PlaybackLoudspeaker, playbackType, true);
 
+        endOfFileCallback = [this]() {
+            state          = State::Idle;
+            const auto req = AudioServiceMessage::EndOfFile(operationToken);
+            serviceCallback(&req);
+            return std::string();
+        };
+
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
             throw AudioInitException("Error during initializing profile", RetCode::ProfileNotSet);
@@ -36,18 +43,12 @@ namespace audio
         if (dec == nullptr) {
             throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
+        dec->startDecodingWorker(endOfFileCallback);
 
         auto retCode = SwitchToPriorityProfile();
         if (retCode != RetCode::Success) {
             throw AudioInitException("Failed to switch audio profile", retCode);
         }
-
-        endOfFileCallback = [this]() {
-            state          = State::Idle;
-            const auto req = AudioServiceMessage::EndOfFile(operationToken);
-            serviceCallback(&req);
-            return std::string();
-        };
     }
 
     audio::RetCode PlaybackOperation::Start(audio::Token token)

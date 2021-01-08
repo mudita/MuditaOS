@@ -19,7 +19,7 @@ namespace audio
             DisablePlayback,
         };
 
-        DecoderWorker(Stream &audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback);
+        DecoderWorker(Stream *audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback);
         ~DecoderWorker() override;
 
         virtual auto init(std::list<sys::WorkerQueueInfo> queues = std::list<sys::WorkerQueueInfo>()) -> bool override;
@@ -38,7 +38,7 @@ namespace audio
         static constexpr auto listenerQueueName     = "DecoderWorkerQueue";
         static constexpr auto listenerQueueCapacity = 1024;
 
-        Stream &audioStreamOut;
+        Stream *audioStreamOut;
         Decoder *decoder = nullptr;
         EndOfFileCallback endOfFileCallback;
         std::unique_ptr<StreamQueuedEventsListener> queueListener;

@@ -104,7 +104,7 @@ namespace audio
         void enableInput() override;
         void disableInput() override;
 
-        void startDecodingWorker(Stream &audioStream, DecoderWorker::EndOfFileCallback endOfFileCallback);
+        void startDecodingWorker(DecoderWorker::EndOfFileCallback endOfFileCallback);
 
         // Factory method
         static std::unique_ptr<Decoder> Create(const char *file);
