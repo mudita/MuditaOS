@@ -15,8 +15,8 @@ namespace bsp
                        sai_edma_handle_t *rxHandle,
                        sai_edma_handle_t *txHandle);
 
-        void onDataRead() override;
-        void onDataWrite() override;
+        void onDataSend() override;
+        void onDataReceive() override;
         void enableInput() override;
         void enableOutput() override;
         void disableInput() override;
@@ -25,7 +25,7 @@ namespace bsp
       protected:
         void initiateRxTransfer();
         void initiateTxTransfer();
-
+        I2S_Type *_base;
         sai_edma_handle_t *rx;
         sai_edma_handle_t *tx;
     };
