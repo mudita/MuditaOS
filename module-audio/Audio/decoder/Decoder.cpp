@@ -133,7 +133,7 @@ namespace audio
         }
     }
 
-    void Decoder::onDataRead()
+    void Decoder::onDataReceive()
     {
         audioWorker->enablePlayback();
     }

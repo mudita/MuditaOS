@@ -100,7 +100,7 @@ namespace audio
             return position;
         }
 
-        void onDataRead() override;
+        void onDataReceive() override;
         void enableInput() override;
         void disableInput() override;
 

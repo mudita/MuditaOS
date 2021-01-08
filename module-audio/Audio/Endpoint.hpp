@@ -33,7 +33,7 @@ namespace audio
     class Sink : public Endpoint
     {
       public:
-        virtual void onDataWrite()   = 0;
+        virtual void onDataSend()    = 0;
         virtual void enableOutput()  = 0;
         virtual void disableOutput() = 0;
     };
@@ -41,9 +41,9 @@ namespace audio
     class Source : public Endpoint
     {
       public:
-        virtual void onDataRead()   = 0;
-        virtual void enableInput()  = 0;
-        virtual void disableInput() = 0;
+        virtual void onDataReceive() = 0;
+        virtual void enableInput()   = 0;
+        virtual void disableInput()  = 0;
     };
 
     class IOProxy : public Sink, public Source

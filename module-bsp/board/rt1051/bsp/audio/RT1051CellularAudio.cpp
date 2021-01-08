@@ -277,7 +277,7 @@ namespace bsp
             return;
         }
 
-        self->onDataWrite();
+        self->onDataReceive();
     }
 
     void txCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
@@ -290,7 +290,7 @@ namespace bsp
             return;
         }
 
-        self->onDataRead();
+        self->onDataSend();
     }
 
 } // namespace bsp
