@@ -7,7 +7,6 @@
 #include <Tables/ContactsTable.hpp>
 #include <Tables/ContactsGroups.hpp>
 
-#include <vfs.hpp>
 #include <filesystem>
 
 #include <iomanip>

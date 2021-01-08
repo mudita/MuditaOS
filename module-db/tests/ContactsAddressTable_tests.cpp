@@ -4,7 +4,6 @@
 #include <catch2/catch.hpp>
 
 #include "Databases/ContactsDB.hpp"
-#include <vfs.hpp>
 #include <filesystem>
 #include <purefs/filesystem_paths.hpp>
 

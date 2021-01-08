@@ -7,7 +7,6 @@
 #include "Databases/EventsDB.hpp"
 #include "Tables/EventsTable.hpp"
 
-#include <vfs.hpp>
 #include <stdint.h>
 #include <string>
 #include <algorithm>
