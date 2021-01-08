@@ -166,7 +166,11 @@ namespace audio
         }
 
         if (outputConnection) {
-            outputConnection->destroy();
+            outputConnection.release();
+        }
+
+        if (audioDevice) {
+            audioDevice.release();
         }
 
         audioDevice = CreateDevice(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
@@ -196,7 +200,6 @@ namespace audio
 
     PlaybackOperation::~PlaybackOperation()
     {
-        outputConnection.release();
         Stop();
     }
 
