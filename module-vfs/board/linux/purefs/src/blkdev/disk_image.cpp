@@ -40,6 +40,9 @@ namespace purefs::blkdev
     }
     auto disk_image::write(const void *buf, sector_t lba, std::size_t count) -> int
     {
+        if (!range_valid(lba, count)) {
+            return -ERANGE;
+        }
         auto offs = ::lseek(m_filedes, off_t(lba) * sector_size, SEEK_SET);
         if (offs < 0) {
             return offs;
@@ -58,12 +61,15 @@ namespace purefs::blkdev
     }
     auto disk_image::erase(sector_t lba, std::size_t count) -> int
     {
-        char buf[count * sector_size];
-        std::memset(buf, 0xff, count * sector_size);
-        return write(buf, lba, count);
+        std::unique_ptr<char[]> buf(new char[count * sector_size]);
+        std::memset(buf.get(), 0xff, count * sector_size);
+        return write(buf.get(), lba, count);
     }
     auto disk_image::read(void *buf, sector_t lba, std::size_t count) -> int
     {
+        if (!range_valid(lba, count)) {
+            return -ERANGE;
+        }
         auto offs = ::lseek(m_filedes, off_t(lba) * sector_size, SEEK_SET);
         if (offs < 0) {
             return offs;
@@ -110,5 +116,9 @@ namespace purefs::blkdev
             return 1;
         }
         return -1;
+    }
+    auto disk_image::range_valid(sector_t lba, std::size_t count) const -> bool
+    {
+        return (lba < m_sectors) && ((lba + count) < m_sectors);
     }
 } // namespace purefs::blkdev
