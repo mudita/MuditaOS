@@ -74,13 +74,11 @@ namespace audio
     {
 
       public:
-        Decoder(const char *fileName);
+        Decoder(const char *fileName, DecoderWorker::EndOfFileCallback endOfFileCallback);
 
         virtual ~Decoder();
 
         virtual uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) = 0;
-
-        void startDecodingWorker(Stream &audioStream, DecoderWorker::EndOfFileCallback endOfFileCallback);
 
         std::unique_ptr<Tags> fetchTags();
 
@@ -107,7 +105,7 @@ namespace audio
         void disableInput() override;
 
         // Factory method
-        static std::unique_ptr<Decoder> Create(const char *file);
+        static std::unique_ptr<Decoder> Create(const char *file, DecoderWorker::EndOfFileCallback cb);
 
       protected:
         virtual void fetchTagsSpecific(){};
@@ -130,6 +128,7 @@ namespace audio
 
         // decoding worker
         std::unique_ptr<DecoderWorker> audioWorker;
+        DecoderWorker::EndOfFileCallback _endOfFileCallback;
     };
 
 } // namespace audio

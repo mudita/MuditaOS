@@ -15,8 +15,9 @@
 namespace audio
 {
 
-    Decoder::Decoder(const char *fileName)
-        : filePath(fileName), workerBuffer(std::make_unique<int16_t[]>(workerBufferSize)), tag(std::make_unique<Tags>())
+    Decoder::Decoder(const char *fileName, DecoderWorker::EndOfFileCallback endOfFileCallback)
+        : filePath(fileName), workerBuffer(std::make_unique<int16_t[]>(workerBufferSize)),
+          tag(std::make_unique<Tags>()), _endOfFileCallback(endOfFileCallback)
     {
 
         fd = std::fopen(fileName, "r");
@@ -83,17 +84,17 @@ namespace audio
         return std::make_unique<Tags>(*tag);
     }
 
-    std::unique_ptr<Decoder> Decoder::Create(const char *file)
+    std::unique_ptr<Decoder> Decoder::Create(const char *file, DecoderWorker::EndOfFileCallback cb)
     {
         std::unique_ptr<Decoder> dec;
         if ((strstr(file, ".wav") != NULL) || (strstr(file, ".WAV") != NULL)) {
-            dec = std::make_unique<decoderWAV>(file);
+            dec = std::make_unique<decoderWAV>(file, cb);
         }
         else if ((strstr(file, ".mp3") != NULL) || (strstr(file, ".MP3") != NULL)) {
-            dec = std::make_unique<decoderMP3>(file);
+            dec = std::make_unique<decoderMP3>(file, cb);
         }
         else if ((strstr(file, ".flac") != NULL) || (strstr(file, ".FLAC") != NULL)) {
-            dec = std::make_unique<decoderFLAC>(file);
+            dec = std::make_unique<decoderFLAC>(file, cb);
         }
         else {
             return nullptr;
@@ -121,10 +122,13 @@ namespace audio
         memcpy(pcm, &workerBuffer[0], samplecount * 2 * sizeof(int16_t));
     }
 
-    void Decoder::startDecodingWorker(Stream &audioStream, DecoderWorker::EndOfFileCallback endOfFileCallback)
+    void Decoder::onDataRead()
+    {}
+
+    void Decoder::enableInput()
     {
         if (!audioWorker) {
-            audioWorker = std::make_unique<DecoderWorker>(audioStream, this, endOfFileCallback);
+            audioWorker = std::make_unique<DecoderWorker>(*_stream, this, _endOfFileCallback);
             audioWorker->init();
             audioWorker->run();
         }
@@ -132,12 +136,6 @@ namespace audio
             LOG_DEBUG("AudioWorker already running.");
         }
     }
-
-    void Decoder::onDataRead()
-    {}
-
-    void Decoder::enableInput()
-    {}
 
     void Decoder::disableInput()
     {}

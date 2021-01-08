@@ -13,7 +13,7 @@ namespace audio
     {
 
       public:
-        decoderFLAC(const char *fileName);
+        decoderFLAC(const char *fileName, DecoderWorker::EndOfFileCallback cb);
 
         ~decoderFLAC();
 

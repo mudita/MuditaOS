@@ -46,7 +46,7 @@ namespace audio
         virtual void disableInput() = 0;
     };
 
-    class IOProxy : protected Sink, protected Source
+    class IOProxy : public Sink, public Source
     {
       public:
         inline bool isSinkConnected() const noexcept

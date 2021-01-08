@@ -32,7 +32,14 @@ namespace audio
         }
         currentProfile = defaultProfile;
 
-        dec = Decoder::Create(file);
+        endOfFileCallback = [this]() {
+            state          = State::Idle;
+            const auto req = AudioServiceMessage::EndOfFile(operationToken);
+            serviceCallback(&req);
+            return std::string();
+        };
+
+        dec = Decoder::Create(file, endOfFileCallback);
         if (dec == nullptr) {
             throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
@@ -41,13 +48,6 @@ namespace audio
         if (retCode != RetCode::Success) {
             throw AudioInitException("Failed to switch audio profile", retCode);
         }
-
-        endOfFileCallback = [this]() {
-            state          = State::Idle;
-            const auto req = AudioServiceMessage::EndOfFile(operationToken);
-            serviceCallback(&req);
-            return std::string();
-        };
     }
 
     audio::RetCode PlaybackOperation::Start(audio::Token token)
@@ -58,9 +58,6 @@ namespace audio
         operationToken = token;
 
         assert(dataStreamOut);
-
-        // TODO: move to enable
-        dec->startDecodingWorker(*dataStreamOut, endOfFileCallback);
 
         if (!tags) {
             tags = dec->fetchTags();
@@ -81,6 +78,7 @@ namespace audio
         currentProfile->SetSampleRate(tags->sample_rate);
 
         auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        outputConnection->enable();
         return GetDeviceError(ret);
     }
 
@@ -90,6 +88,7 @@ namespace audio
         if (!audioDevice) {
             return audio::RetCode::DeviceFailure;
         }
+        outputConnection->disable();
         return GetDeviceError(audioDevice->Stop());
     }
 
@@ -101,7 +100,8 @@ namespace audio
         }
 
         state = State::Paused;
-        return GetDeviceError(audioDevice->Stop());
+        outputConnection->disable();
+        return audio::RetCode::Success;
     }
 
     audio::RetCode PlaybackOperation::Resume()
@@ -110,9 +110,9 @@ namespace audio
         if (state == State::Active || state == State::Idle) {
             return RetCode::InvokedInIncorrectState;
         }
-        state    = State::Active;
-        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
-        return GetDeviceError(ret);
+        state = State::Active;
+        outputConnection->enable();
+        return audio::RetCode::Success;
     }
 
     audio::RetCode PlaybackOperation::SetOutputVolume(float vol)
@@ -166,8 +166,8 @@ namespace audio
             return RetCode::UnsupportedProfile;
         }
 
-        if (dec->isConnected()) {
-            dec->disconnectStream();
+        if (outputConnection) {
+            outputConnection->destroy();
         }
 
         audioDevice = CreateDevice(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
@@ -197,9 +197,8 @@ namespace audio
 
     PlaybackOperation::~PlaybackOperation()
     {
+        outputConnection.release();
         Stop();
-        dataStreamOut->reset();
-        dataStreamIn->reset();
     }
 
 } // namespace audio
