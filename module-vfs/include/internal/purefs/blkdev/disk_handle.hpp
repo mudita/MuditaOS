@@ -30,7 +30,7 @@ namespace purefs::blkdev::internal
         {
             return m_partition;
         }
-        auto has_partition() const noexcept
+        auto has_partition() const noexcept -> bool
         {
             return m_partition != no_parition;
         }
