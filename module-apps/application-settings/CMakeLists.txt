@@ -27,6 +27,10 @@ target_sources( ${PROJECT_NAME}
         windows/FotaWindow.cpp
         windows/Fota.cpp
         windows/EinkModeWindow.cpp
+        windows/ColorTestWindow.cpp
+        widgets/ColorTestListItem.cpp
+        widgets/ColorTestListView.cpp
+        models/ColorTestModel.cpp
 
     PUBLIC
         ApplicationSettings.hpp

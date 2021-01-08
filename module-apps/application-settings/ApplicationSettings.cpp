@@ -12,6 +12,7 @@
 #include "windows/Info.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
+#include "windows/ColorTestWindow.hpp"
 
 #include "windows/UITestWindow.hpp"
 
@@ -149,9 +150,11 @@ namespace app
         windowsFactory.attach(gui::window::name::fota_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::FotaWindow>(app);
         });
-
         windowsFactory.attach(gui::window::name::eink, [](Application *app, const std::string &name) {
             return std::make_unique<gui::EinkModeWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::color_test_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ColorTestWindow>(app);
         });
 
         if (board == bsp::Board::T4) {

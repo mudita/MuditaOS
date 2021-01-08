@@ -414,6 +414,8 @@
   "app_settings_apn_authtype": "Authentication type",
   "app_settings_apn_apntype": "APN Type",
   "app_settings_apn_apnprotocol" : "APN Protocol",
+  "app_settings_title_color_test": "Display available colors",
+  "app_settings_toolbar_reset": "RESET",
   "app_phonebook_title_main": "Contacts",
   "app_phonebook_search_win_contacts": "Contacts",
   "common_search_uc": "Search",
