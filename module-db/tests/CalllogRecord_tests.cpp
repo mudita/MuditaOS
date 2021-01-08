@@ -7,7 +7,6 @@
 #include "Database/Database.hpp"
 #include "Databases/CalllogDB.hpp"
 
-#include <vfs.hpp>
 
 #include <stdint.h>
 #include <stdio.h>

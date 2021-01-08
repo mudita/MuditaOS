@@ -17,7 +17,6 @@
 #include "module-db/queries/calendar/QueryEventsEditICS.hpp"
 #include "module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp"
 
-#include <vfs.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 #include <stdint.h>
