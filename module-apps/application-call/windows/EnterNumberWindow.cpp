@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EnterNumberWindow.hpp"
@@ -17,6 +17,8 @@
 #include <phonenumbers/phonenumberutil.h>
 #include <phonenumbers/asyoutypeformatter.h>
 
+#include <cassert>
+
 using namespace utils;
 
 namespace gui
@@ -24,15 +26,17 @@ namespace gui
     using namespace callAppStyle;
     using namespace callAppStyle::enterNumberWindow;
 
-    EnterNumberWindow::EnterNumberWindow(app::Application *app, std::string windowName)
-        : AppWindow(app, windowName), currentCountry(defaultCountry), numberUtil(*PhoneNumberUtil::GetInstance())
+    EnterNumberWindow::EnterNumberWindow(app::Application *app,
+                                         app::EnterNumberWindowInterface *interface,
+                                         std::string windowName)
+        : AppWindow(app, windowName), interface(interface), currentCountry(defaultCountry),
+          numberUtil(*PhoneNumberUtil::GetInstance())
     {
+        assert(interface != nullptr);
+        assert(app != nullptr);
         switchFormatter(country::getAlpha2Code(currentCountry));
         buildInterface();
     }
-
-    void EnterNumberWindow::rebuild()
-    {}
 
     void EnterNumberWindow::setNumberLabel(const std::string num)
     {
@@ -72,11 +76,8 @@ namespace gui
 
     bool EnterNumberWindow::addNewContact()
     {
-        auto app = dynamic_cast<app::ApplicationCall *>(application);
-        if (app != nullptr) {
-            app->handleAddContactEvent(enteredNumber);
-        }
-        return false;
+        interface->handleAddContactEvent(enteredNumber);
+        return true;
     }
 
     void EnterNumberWindow::destroyInterface()
@@ -84,22 +85,13 @@ namespace gui
         erase();
     }
 
-    EnterNumberWindow::~EnterNumberWindow()
-    {
-    }
-
     bool EnterNumberWindow::onInput(const InputEvent &inputEvent)
     {
-        auto app = dynamic_cast<app::ApplicationCall *>(application);
-        if (app == nullptr) {
-            LOG_ERROR("app != ApplicationCall");
-            return AppWindow::onInput(inputEvent);
-        }
         auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
         if (inputEvent.state == InputEvent::State::keyReleasedShort) {
             // Call function
             if (inputEvent.keyCode == KeyCode::KEY_LF) {
-                app->handleCallEvent(enteredNumber);
+                interface->handleCallEvent(enteredNumber);
                 return true;
             }
             // Clear/back function
@@ -136,7 +128,6 @@ namespace gui
                     app::manager::Controller::switchBack(application);
                     return true;
                 }
-
                 clearInput();
 
                 return true;
@@ -154,8 +145,6 @@ namespace gui
 
     bool EnterNumberWindow::handleSwitchData(SwitchData *data)
     {
-        auto app = dynamic_cast<app::ApplicationCall *>(application);
-
         if (data == nullptr) {
             LOG_ERROR("Received null pointer");
             return false;
@@ -180,7 +169,7 @@ namespace gui
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
 
             if (callData->getType() == app::CallSwitchData::Type::EXECUTE_CALL) {
-                app->handleCallEvent(phoneNumber.getEntered());
+                interface->handleCallEvent(phoneNumber.getEntered());
             }
         }
         else {

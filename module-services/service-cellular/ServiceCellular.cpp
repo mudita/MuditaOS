@@ -224,6 +224,7 @@ static bool isSettingsAutomaticTimeSyncEnabled()
 
 void ServiceCellular::CallStateTimerHandler()
 {
+    LOG_DEBUG("CallStateTimerHandler");
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, this);
