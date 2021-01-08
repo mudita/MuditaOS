@@ -7,7 +7,6 @@
 #include "Database/Database.hpp"
 #include "Databases/SmsDB.hpp"
 
-#include <vfs.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 #include <algorithm>

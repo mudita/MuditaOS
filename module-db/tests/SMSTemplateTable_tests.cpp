@@ -8,7 +8,6 @@
 
 #include "Tables/SMSTemplateTable.hpp"
 
-#include <vfs.hpp>
 #include <filesystem>
 #include <purefs/filesystem_paths.hpp>
 
