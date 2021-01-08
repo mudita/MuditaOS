@@ -74,6 +74,7 @@ enum class MessageType
     CellularHangupCall,         ///< Hang up call
     CellularCall,               ///< Call related events
     CellularCallRequest,        ///< Call request
+    CellularPowerStateChange,   ///< Change power state of the module
 
     CellularListCurrentCalls,
     CellularSimProcedure,        // Broadcast on sim state changed
@@ -169,9 +170,6 @@ enum class MessageType
     // battery charger messages
     EVMBatteryLevel,
     EVMChargerPlugged,
-    EVMBatterySetCriticalLevel,
-    EVMBatteryLevelCritical,
-    EVMBatteryBrownout,
     // rtc messages
     EVMMinuteUpdated, ///< This message is send to current focused application on every minute time change.
     EVMTimeUpdated,   ///< This message is send on every time update.

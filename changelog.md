@@ -3,6 +3,7 @@
 ## Latest Changes
 ### Added
 
+* GSM module turnoff with low battery.
 * Battery Brownout detection
 * VoLTE ON/OFF switch in Settings Network window
 * Add PLL2 clock switching

@@ -262,3 +262,8 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
     }
     sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
 }
+
+void WorkerEvent::checkBatteryLevelCritical()
+{
+    battery_level_check::checkBatteryLevelCritical();
+}
