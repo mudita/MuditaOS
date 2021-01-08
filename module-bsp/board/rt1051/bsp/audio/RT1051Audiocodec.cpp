@@ -239,14 +239,6 @@ namespace bsp
 
         /* Reset SAI Rx internal logic */
         SAI_RxSoftwareReset(BOARD_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
-
-        if (!isSourceConnected()) {
-            LOG_FATAL("No output stream connected!");
-            return;
-        }
-
-        /// initiate first read
-        initiateRxTransfer();
     }
 
     void RT1051Audiocodec::OutStart()
@@ -277,14 +269,6 @@ namespace bsp
 
         /* Reset SAI Tx internal logic */
         SAI_TxSoftwareReset(BOARD_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
-
-        if (!isSinkConnected()) {
-            LOG_FATAL("No input stream connected!");
-            return;
-        }
-
-        /// initiate first write
-        initiateTxTransfer();
     }
 
     void RT1051Audiocodec::OutStop()
@@ -307,27 +291,13 @@ namespace bsp
 
     void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        audio::Stream::Span dataSpan;
         auto self = static_cast<RT1051Audiocodec *>(userData);
-
-        /// exit if not connected to the stream
-        if (!self->isSourceConnected()) {
-            return;
-        }
-
         self->onDataReceive();
     }
 
     void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        audio::Stream::Span dataSpan;
         auto self = static_cast<RT1051Audiocodec *>(userData);
-
-        /// exit if not connected to the stream
-        if (!self->isSinkConnected()) {
-            return;
-        }
-
         self->onDataSend();
     }
 

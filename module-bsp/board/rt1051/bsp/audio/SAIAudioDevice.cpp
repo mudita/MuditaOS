@@ -29,6 +29,10 @@ void SAIAudioDevice::onDataSend()
 {
     audio::Stream::Span dataSpan;
 
+    if (!txEnabled || !isSinkConnected()) {
+        return;
+    }
+
     /// pop previous read and peek next
     Sink::_stream->consume();
     Sink::_stream->peek(dataSpan);
@@ -41,6 +45,10 @@ void SAIAudioDevice::onDataReceive()
 {
     audio::Stream::Span dataSpan;
 
+    if (!rxEnabled || !isSourceConnected()) {
+        return;
+    }
+
     /// reserve space for the next read commiting previously reserved block before
     Source::_stream->commit();
     Source::_stream->reserve(dataSpan);
@@ -50,13 +58,37 @@ void SAIAudioDevice::onDataReceive()
 }
 
 void SAIAudioDevice::enableInput()
-{}
+{
+    if (!isSourceConnected()) {
+        LOG_FATAL("No output stream connected!");
+        return;
+    }
+
+    rxEnabled = true;
+
+    /// initiate first read
+    initiateRxTransfer();
+}
 
 void SAIAudioDevice::enableOutput()
-{}
+{
+    if (!isSinkConnected()) {
+        LOG_FATAL("No input stream connected!");
+        return;
+    }
+
+    txEnabled = true;
+
+    /// initiate first write
+    initiateTxTransfer();
+}
 
 void SAIAudioDevice::disableInput()
-{}
+{
+    rxEnabled = false;
+}
 
 void SAIAudioDevice::disableOutput()
-{}
+{
+    txEnabled = false;
+}

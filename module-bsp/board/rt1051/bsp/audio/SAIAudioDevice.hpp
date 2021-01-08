@@ -28,6 +28,8 @@ namespace bsp
         I2S_Type *_base;
         sai_edma_handle_t *rx;
         sai_edma_handle_t *tx;
+        bool txEnabled = false;
+        bool rxEnabled = false;
     };
 
 } // namespace bsp
