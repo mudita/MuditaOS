@@ -17,10 +17,10 @@ TEST_CASE("SMS Table tests")
 {
     Database::initialize();
 
-    const auto smsPath = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
+    const auto smsPath = purefs::dir::getUserDiskPath() / "sms.db";
     std::filesystem::remove(smsPath);
 
-    SmsDB smsdb(smsPath);
+    SmsDB smsdb(smsPath.c_str());
     REQUIRE(smsdb.isInitialized());
 
     SMSTableRow testRow1 = {{.ID = 0},

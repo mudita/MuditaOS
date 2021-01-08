@@ -20,13 +20,13 @@ TEST_CASE("Calllog Record tests")
 {
     Database::initialize();
 
-    const auto callogPath   = (purefs::dir::getUserDiskPath() / "callog.db").c_str();
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    const auto callogPath   = purefs::dir::getUserDiskPath() / "callog.db";
+    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
     std::filesystem::remove(callogPath);
     std::filesystem::remove(contactsPath);
 
-    CalllogDB calllogDb(callogPath);
-    ContactsDB contactsDb(contactsPath);
+    CalllogDB calllogDb(callogPath.c_str());
+    ContactsDB contactsDb(contactsPath.c_str());
 
     REQUIRE(calllogDb.isInitialized());
     REQUIRE(contactsDb.isInitialized());

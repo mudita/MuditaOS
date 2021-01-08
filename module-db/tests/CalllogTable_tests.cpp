@@ -20,10 +20,10 @@ TEST_CASE("Calllog Table tests")
 {
     Database::initialize();
 
-    const auto callogPath = (purefs::dir::getUserDiskPath() / "callog.db").c_str();
+    const auto callogPath = purefs::dir::getUserDiskPath() / "callog.db";
     std::filesystem::remove(callogPath);
 
-    CalllogDB calllogDb{callogPath};
+    CalllogDB calllogDb{callogPath.c_str()};
     REQUIRE(calllogDb.isInitialized());
 
     auto &callsTbl = calllogDb.calls;
