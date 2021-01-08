@@ -18,10 +18,10 @@ TEST_CASE("Contacts Name Table tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
-    std::remove(contactsPath);
+    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
+    std::filesystem::remove(contactsPath);
 
-    ContactsDB contactsdb(contactsPath);
+    ContactsDB contactsdb(contactsPath.c_str());
     REQUIRE(contactsdb.isInitialized());
 
     ContactsNameTableRow testRow1 = {

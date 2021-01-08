@@ -12,10 +12,10 @@ TEST_CASE("Contacts address Table tests")
 {
     Database::initialize();
 
-    const auto callogPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
+    const auto callogPath = purefs::dir::getUserDiskPath() / "contacts.db";
     std::filesystem::remove(callogPath);
 
-    ContactsDB contactsdb{callogPath};
+    ContactsDB contactsdb{callogPath.c_str()};
     REQUIRE(contactsdb.isInitialized());
 
     ContactsAddressTableRow testRow1 = {{.ID = DB_ID_NONE},

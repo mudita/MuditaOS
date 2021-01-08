@@ -32,13 +32,13 @@ TEST_CASE("SMS Record tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
-    const auto smsPath      = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
+    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
+    const auto smsPath      = purefs::dir::getUserDiskPath() / "sms.db";
     std::filesystem::remove(contactsPath);
     std::filesystem::remove(smsPath);
 
-    auto contactsDB = std::make_unique<ContactsDB>(contactsPath);
-    auto smsDB      = std::make_unique<SmsDB>(smsPath);
+    ContactsDB contactsDB(contactsPath.c_str());
+    SmsDB smsDB(smsPath.c_str());
 
     const uint32_t dateTest      = 123456789;
     const uint32_t dateSentTest  = 987654321;
@@ -49,7 +49,7 @@ TEST_CASE("SMS Record tests")
     const char *bodyTest2        = "Test SMS Body2";
     const SMSType typeTest       = SMSType ::DRAFT;
 
-    SMSRecordInterface smsRecInterface(smsDB.get(), contactsDB.get());
+    SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
 
     SMSRecord recordIN;
     recordIN.date      = dateTest;
@@ -160,7 +160,7 @@ TEST_CASE("SMS Record tests")
         }
 
         // Remove sms records in order to check automatic management of threads and contact databases
-        ThreadRecordInterface threadRecordInterface(smsDB.get(), contactsDB.get());
+        ThreadRecordInterface threadRecordInterface(&smsDB, &contactsDB);
         REQUIRE(smsRecInterface.RemoveByID(1));
         records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "1");
         REQUIRE((*records).size() == 1);
@@ -178,7 +178,7 @@ TEST_CASE("SMS Record tests")
 
         // Test removing a message which belongs to non-existent thread
         REQUIRE(smsRecInterface.Add(recordIN));
-        REQUIRE(smsDB->threads.removeById(1)); // stealthy thread remove
+        REQUIRE(smsDB.threads.removeById(1)); // stealthy thread remove
         REQUIRE(smsRecInterface.RemoveByID(1));
 
         // Test handling of missmatch in sms vs. thread tables
@@ -199,7 +199,7 @@ TEST_CASE("SMS Record tests")
                                   .snippet        = threadRec.snippet,
                                   .type           = threadRec.type};
         threadRaw.msgCount = trueCount + 1; // break the DB
-        REQUIRE(smsDB->threads.update(threadRaw));
+        REQUIRE(smsDB.threads.update(threadRaw));
 
         REQUIRE(static_cast<int>(
                     smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ThreadID, "1")->size()) == trueCount);
