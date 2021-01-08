@@ -120,10 +120,11 @@ namespace
             LOG_ERROR("Block size doesn't match partition size");
             return -ERANGE;
         }
-        cfg->block_count = total_siz / cfg->block_size;
+        cfg->block_count = total_siz / cfg->block_size - 1;
         cfg->read_size  = cfg->block_size;
         cfg->prog_size  = cfg->block_size;
         cfg->cache_size = cfg->block_size;
+        LOG_INFO("LFS: block_count %u sector_size %u", unsigned(cfg->block_count), unsigned(cfg->block_size));
         return 0;
     }
 
@@ -220,13 +221,20 @@ namespace purefs::fs::drivers
         }
         {
             auto diskmm = disk_mngr();
-            auto ssize  = diskmm->get_info(disk, blkdev::info_type::sector_size);
+            const auto ssize = diskmm->get_info(disk, blkdev::info_type::sector_size);
             if (ssize < 0) {
                 LOG_ERROR("Unable to read sector size %i", int(ssize));
                 err = ssize;
             }
             else {
-                err = setup_lfs_config(vmnt->lfs_config(), ssize, disk->sectors());
+                auto sect_count = diskmm->get_info(disk, blkdev::info_type::sector_count);
+                if (sect_count > 0) {
+                    err = setup_lfs_config(vmnt->lfs_config(), ssize, sect_count);
+                }
+                else {
+                    LOG_ERROR("Unable to read sector count %i", int(sect_count));
+                    err = sect_count;
+                }
             }
         }
         if (!err) {
