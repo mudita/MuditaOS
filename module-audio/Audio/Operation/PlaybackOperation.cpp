@@ -95,7 +95,6 @@ namespace audio
 
     audio::RetCode PlaybackOperation::Pause()
     {
-
         if (state == State::Paused || state == State::Idle) {
             return RetCode::InvokedInIncorrectState;
         }
@@ -107,7 +106,6 @@ namespace audio
 
     audio::RetCode PlaybackOperation::Resume()
     {
-
         if (state == State::Active || state == State::Idle) {
             return RetCode::InvokedInIncorrectState;
         }
