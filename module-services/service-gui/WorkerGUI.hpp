@@ -21,7 +21,8 @@ namespace service::gui
       public:
         enum class Signal
         {
-            Render
+            Render,
+            ChangeColorScheme,
         };
         static constexpr auto SignallingQueueName     = "SignallingQueue";
         static constexpr auto SignallingQueueCapacity = 1;
@@ -34,7 +35,8 @@ namespace service::gui
 
       private:
         void handleCommand(Signal command);
-        void render(std::list<std::unique_ptr<::gui::DrawCommand>> &commands, ::gui::RefreshModes refreshMode);
+        void render(DrawCommandsQueue::CommandList &commands, ::gui::RefreshModes refreshMode);
+        void changeColorScheme(const std::unique_ptr<::gui::ColorScheme> &scheme);
         void onRenderingFinished(int contextId, ::gui::RefreshModes refreshMode);
 
         ServiceGUI *guiService;

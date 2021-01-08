@@ -38,17 +38,31 @@ namespace service::gui
 
     void WorkerGUI::handleCommand(Signal command)
     {
-        if (command == Signal::Render) {
+        switch (command) {
+        case Signal::Render: {
             auto item = guiService->commandsQueue->dequeue();
             render(item.commands, item.refreshMode);
+            break;
+        }
+        case Signal::ChangeColorScheme: {
+            changeColorScheme(guiService->colorSchemeUpdate);
+            break;
+        }
+        default:
+            LOG_ERROR("Command not valid.");
         }
     }
 
-    void WorkerGUI::render(std::list<std::unique_ptr<::gui::DrawCommand>> &commands, ::gui::RefreshModes refreshMode)
+    void WorkerGUI::render(DrawCommandsQueue::CommandList &commands, ::gui::RefreshModes refreshMode)
     {
         const auto [contextId, context] = guiService->contextPool->borrowContext(); // Waits for the context.
         renderer.render(context, commands);
         onRenderingFinished(contextId, refreshMode);
+    }
+
+    void WorkerGUI::changeColorScheme(const std::unique_ptr<::gui::ColorScheme> &scheme)
+    {
+        renderer.changeColorScheme(scheme);
     }
 
     void WorkerGUI::onRenderingFinished(int contextId, ::gui::RefreshModes refreshMode)

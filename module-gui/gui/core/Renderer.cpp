@@ -5,8 +5,16 @@
 #include "Renderer.hpp"
 #include "Context.hpp"
 
+// renderer
+#include "renderers/PixelRenderer.hpp"
+
 namespace gui
 {
+    void Renderer::changeColorScheme(const std::unique_ptr<ColorScheme> &scheme)
+    {
+        renderer::PixelRenderer::updateColorScheme(scheme);
+    }
+
     void Renderer::render(Context *ctx, std::list<std::unique_ptr<DrawCommand>> &commands)
     {
         if (ctx == nullptr) {

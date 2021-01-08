@@ -37,6 +37,7 @@ namespace gui
         virtual ~Renderer() = default;
 
         void render(Context *ctx, std::list<std::unique_ptr<DrawCommand>> &commands);
+        void changeColorScheme(const std::unique_ptr<ColorScheme> &scheme);
     };
 
 } /* namespace gui */
