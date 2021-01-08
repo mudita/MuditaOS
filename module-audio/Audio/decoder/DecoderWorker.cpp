@@ -39,38 +39,69 @@ auto audio::DecoderWorker::init(std::list<sys::WorkerQueueInfo> queues) -> bool
 
 bool audio::DecoderWorker::handleMessage(uint32_t queueID)
 {
-    auto queue = queues[queueID];
-    if (queue->GetQueueName() == listenerQueueName && queueListener) {
+    auto queue      = queues[queueID];
+    auto &queueName = queue->GetQueueName();
+    if (queueName == listenerQueueName && queueListener) {
         auto event = queueListener->getEvent();
 
         switch (event.second) {
         case Stream::Event::StreamOverflow:
-            break;
         case Stream::Event::StreamUnderFlow:
-            break;
         case Stream::Event::NoEvent:
-            break;
         case Stream::Event::StreamFull:
             break;
         case Stream::Event::StreamHalfUsed:
             [[fallthrough]];
         case Stream::Event::StreamEmpty:
-            auto samplesRead = 0;
+            pushAudioData();
+        }
+    }
+    else if (queueName == SERVICE_QUEUE_NAME) {
+        auto serviceQueue = getServiceQueue();
+        sys::WorkerCommand cmd;
 
-            while (!audioStreamOut.isFull()) {
-                samplesRead = decoder->decode(bufferSize, decoderBuffer.get());
-
-                if (samplesRead == 0) {
-                    endOfFileCallback();
-                    break;
-                }
-
-                if (!audioStreamOut.push(decoderBuffer.get(), samplesRead * sizeof(BufferInternalType))) {
-                    LOG_FATAL("Decoder failed to push to stream.");
-                    break;
-                }
+        if (serviceQueue.Dequeue(&cmd)) {
+            switch (static_cast<Command>(cmd.command)) {
+            case Command::EnablePlayback: {
+                playbackEnabled = true;
+                pushAudioData();
+                break;
+            }
+            case Command::DisablePlayback: {
+                playbackEnabled = false;
+            }
             }
         }
     }
+
     return true;
+}
+
+void audio::DecoderWorker::pushAudioData()
+{
+    auto samplesRead = 0;
+
+    while (!audioStreamOut.isFull() && playbackEnabled) {
+        samplesRead = decoder->decode(bufferSize, decoderBuffer.get());
+
+        if (samplesRead == 0) {
+            endOfFileCallback();
+            break;
+        }
+
+        if (!audioStreamOut.push(decoderBuffer.get(), samplesRead * sizeof(BufferInternalType))) {
+            LOG_FATAL("Decoder failed to push to stream.");
+            break;
+        }
+    }
+}
+
+bool audio::DecoderWorker::enablePlayback()
+{
+    return sendCommand({.command = static_cast<uint32_t>(Command::EnablePlayback), .data = nullptr});
+}
+
+bool audio::DecoderWorker::disablePlayback()
+{
+    return sendCommand({.command = static_cast<uint32_t>(Command::DisablePlayback), .data = nullptr});
 }

@@ -13,6 +13,11 @@ namespace audio
     {
       public:
         using EndOfFileCallback = std::function<void()>;
+        enum class Command
+        {
+            EnablePlayback,
+            DisablePlayback,
+        };
 
         DecoderWorker(Stream &audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback);
         ~DecoderWorker() override;
@@ -20,7 +25,12 @@ namespace audio
         virtual auto init(std::list<sys::WorkerQueueInfo> queues = std::list<sys::WorkerQueueInfo>()) -> bool override;
         virtual auto handleMessage(uint32_t queueID) -> bool override;
 
+        bool enablePlayback();
+        bool disablePlayback();
+
       private:
+        void pushAudioData();
+
         using BufferInternalType = int16_t;
 
         static constexpr auto workerName            = "DecoderWorker";
@@ -32,6 +42,7 @@ namespace audio
         Decoder *decoder = nullptr;
         EndOfFileCallback endOfFileCallback;
         std::unique_ptr<StreamQueuedEventsListener> queueListener;
+        bool playbackEnabled = false;
 
         const int bufferSize;
         std::unique_ptr<BufferInternalType[]> decoderBuffer;

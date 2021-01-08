@@ -134,12 +134,18 @@ namespace audio
     }
 
     void Decoder::onDataRead()
-    {}
+    {
+        audioWorker->enablePlayback();
+    }
 
     void Decoder::enableInput()
-    {}
+    {
+        audioWorker->enablePlayback();
+    }
 
     void Decoder::disableInput()
-    {}
+    {
+        audioWorker->disablePlayback();
+    }
 
 } // namespace audio
