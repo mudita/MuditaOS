@@ -13,7 +13,7 @@ namespace audio
     {
 
       public:
-        decoderWAV(const char *fileName, DecoderWorker::EndOfFileCallback cb);
+        decoderWAV(const char *fileName);
 
         uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) override;
 

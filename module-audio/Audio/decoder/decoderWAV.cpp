@@ -8,7 +8,7 @@
 namespace audio
 {
 
-    decoderWAV::decoderWAV(const char *fileName, DecoderWorker::EndOfFileCallback cb) : Decoder(fileName, cb)
+    decoderWAV::decoderWAV(const char *fileName) : Decoder(fileName)
     {
 
         if (fileSize == 0) {

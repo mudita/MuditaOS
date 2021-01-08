@@ -20,7 +20,7 @@ namespace audio
     {
 
       public:
-        decoderMP3(const char *fileName, DecoderWorker::EndOfFileCallback cb);
+        decoderMP3(const char *fileName);
 
         uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) override;
 

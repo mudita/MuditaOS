@@ -74,7 +74,7 @@ namespace audio
     {
 
       public:
-        Decoder(const char *fileName, DecoderWorker::EndOfFileCallback endOfFileCallback);
+        Decoder(const char *fileName);
 
         virtual ~Decoder();
 
@@ -104,8 +104,10 @@ namespace audio
         void enableInput() override;
         void disableInput() override;
 
+        void startDecodingWorker(Stream &audioStream, DecoderWorker::EndOfFileCallback endOfFileCallback);
+
         // Factory method
-        static std::unique_ptr<Decoder> Create(const char *file, DecoderWorker::EndOfFileCallback cb);
+        static std::unique_ptr<Decoder> Create(const char *file);
 
       protected:
         virtual void fetchTagsSpecific(){};

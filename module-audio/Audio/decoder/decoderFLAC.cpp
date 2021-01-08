@@ -15,7 +15,7 @@
 namespace audio
 {
 
-    decoderFLAC::decoderFLAC(const char *fileName, DecoderWorker::EndOfFileCallback cb) : Decoder(fileName, cb)
+    decoderFLAC::decoderFLAC(const char *fileName) : Decoder(fileName)
     {
 
         if (fileSize == 0) {

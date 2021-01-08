@@ -32,14 +32,7 @@ namespace audio
         }
         currentProfile = defaultProfile;
 
-        endOfFileCallback = [this]() {
-            state          = State::Idle;
-            const auto req = AudioServiceMessage::EndOfFile(operationToken);
-            serviceCallback(&req);
-            return std::string();
-        };
-
-        dec = Decoder::Create(file, endOfFileCallback);
+        dec = Decoder::Create(file);
         if (dec == nullptr) {
             throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
@@ -48,6 +41,13 @@ namespace audio
         if (retCode != RetCode::Success) {
             throw AudioInitException("Failed to switch audio profile", retCode);
         }
+
+        endOfFileCallback = [this]() {
+            state          = State::Idle;
+            const auto req = AudioServiceMessage::EndOfFile(operationToken);
+            serviceCallback(&req);
+            return std::string();
+        };
     }
 
     audio::RetCode PlaybackOperation::Start(audio::Token token)
