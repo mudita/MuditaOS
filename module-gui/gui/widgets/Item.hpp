@@ -363,5 +363,5 @@ namespace gui
     };
 
     NavigationDirection inputToNavigation(const InputEvent &evt);
-
+    bool isInputNavigation(const InputEvent &evt);
 } /* namespace gui */
