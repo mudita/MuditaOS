@@ -173,6 +173,7 @@ namespace gui
             sys::SystemManager::CloseSystem(application);
             return true;
         };
+        powerOffTimer->start();
         application->connect(std::move(powerOffTimer), this);
     }
 

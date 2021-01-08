@@ -13,7 +13,7 @@ def two_phones_available(harnesses):
     assert len(harnesses) == 2
 
 @pytest.mark.rt1051
-@pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("phones_unlocked")
 @pytest.mark.usefixtures("two_phones_available")
 def test_call_number(harnesses, phone_number, call_duration):
     role_calling = harnesses[1]
@@ -28,7 +28,7 @@ def test_call_number(harnesses, phone_number, call_duration):
 
 
 @pytest.mark.rt1051
-@pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("phones_unlocked")
 @pytest.mark.usefixtures("two_phones_available")
 def test_call_back(harnesses, phone_number, call_duration):
     role_calling = harnesses[0]
