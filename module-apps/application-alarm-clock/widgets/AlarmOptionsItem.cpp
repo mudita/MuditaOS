@@ -3,6 +3,7 @@
 
 #include "AlarmOptionsItem.hpp"
 #include "AlarmClockStyle.hpp"
+#include "application-alarm-clock/ApplicationAlarmClock.hpp"
 #include <InputEvent.hpp>
 #include <Style.hpp>
 #include <Utils.hpp>
@@ -192,7 +193,8 @@ namespace gui
                 }
                 else if (musicStatus == MusicStatus::Play) {
                     musicStatus = MusicStatus::Stop;
-                    AudioServiceAPI::StopAll(application);
+                    auto alarmApp = static_cast<app::ApplicationAlarmClock *>(application);
+                    AudioServiceAPI::Stop(application, alarmApp->getAudioToken());
                 }
             }
             return false;

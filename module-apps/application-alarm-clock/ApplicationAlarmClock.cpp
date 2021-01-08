@@ -14,6 +14,7 @@
 #include "windows/OptionWindow.hpp"
 #include <module-services/service-db/service-db/DBNotificationMessage.hpp>
 #include <module-services/service-db/service-db/QueryMessage.hpp>
+#include <module-services/service-audio/service-audio/AudioMessage.hpp>
 
 namespace app
 {
@@ -58,6 +59,10 @@ namespace app
             handled = true;
             if (auto command = callbackStorage->getCallback(resp); command->execute()) {
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            }
+            if (auto audioResp = dynamic_cast<AudioStartPlaybackResponse *>(resp)) {
+                LOG_DEBUG("AudioStartPlaybackResponseMessage");
+                audioToken = audioResp->token;
             }
         }
         if (handled) {
@@ -125,5 +130,10 @@ namespace app
 
     void ApplicationAlarmClock::destroyUserInterface()
     {}
+
+    audio::Token ApplicationAlarmClock::getAudioToken()
+    {
+        return audioToken;
+    }
 
 } /* namespace app */

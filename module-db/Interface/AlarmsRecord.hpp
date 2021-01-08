@@ -38,7 +38,6 @@ struct AlarmsRecord : public Record
     UTF8 path;
 
     AlarmsRecord() = default;
-    ~AlarmsRecord() = default;
     explicit AlarmsRecord(const AlarmsTableRow &tableRow);
 };
 
@@ -54,7 +53,6 @@ class AlarmsRecordInterface : public RecordInterface<AlarmsRecord, AlarmsRecordF
 {
   public:
     AlarmsRecordInterface(AlarmsDB *alarmsDb);
-    ~AlarmsRecordInterface() override = default;
 
     bool Add(const AlarmsRecord &rec) override final;
     bool RemoveByID(uint32_t id) override final;

@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmsReminderModel.hpp"
+#include "application-alarm-clock/ApplicationAlarmClock.hpp"
 #include <module-services/service-audio/service-audio/AudioServiceAPI.hpp>
 
 namespace app::alarmClock
@@ -56,7 +57,8 @@ namespace app::alarmClock
 
     void AlarmsReminderModel::stopMusic()
     {
-        AudioServiceAPI::StopAll(app);
+        auto alarmApp = static_cast<ApplicationAlarmClock *>(app);
+        AudioServiceAPI::Stop(app, alarmApp->getAudioToken());
     }
 
     void AlarmsReminderModel::countElapsedSeconds()
