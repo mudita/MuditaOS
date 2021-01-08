@@ -103,7 +103,7 @@ static int add_directory_to_lfs(
     struct dirent *ent;
     char lfs_curr_path[PATH_MAX];
     char host_curr_path[PATH_MAX];
-    int err = -1;
+    int err = 0;
     dir     = opendir(host_path);
     if (dir) {
         while ((ent = readdir(dir))) {
