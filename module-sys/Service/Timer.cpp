@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Timer.hpp"
@@ -67,6 +67,7 @@ namespace sys
     void Timer::start()
     {
         log_timers("Timer %s start!", name.c_str());
+        isActive = true;
         Start(0);
     }
 
@@ -78,13 +79,15 @@ namespace sys
             SetPeriod(pdMS_TO_TICKS(interval));
         }
         log_timers("Timer %s reload!", name.c_str());
+        isActive = true;
         Start(0); // start with no waittime
     }
 
     void Timer::stop()
     {
         log_timers("Timer %s stop!", name.c_str());
-        callback = nullptr;
+        // make sure callback is not called even if it is already in the queue
+        isActive = false;
         Stop(0);
     }
 
@@ -98,7 +101,7 @@ namespace sys
     void Timer::onTimeout()
     {
         log_timers("Timer %s tick", name.c_str());
-        if (callback != nullptr) {
+        if (callback != nullptr && isActive) {
             log_timers("Timer %s callback run!", name.c_str());
             callback(*this);
         }
