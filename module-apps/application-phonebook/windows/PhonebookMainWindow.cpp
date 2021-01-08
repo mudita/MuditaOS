@@ -86,6 +86,7 @@ namespace gui
 
     void PhonebookMainWindow::destroyInterface()
     {
+        phonebookModel->list = nullptr;
         erase();
     }
 

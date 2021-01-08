@@ -60,8 +60,8 @@ void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     auto query =
         std::make_unique<db::query::ContactGet>(offset, limit, queryFilter, queryGroupFilter, queryDisplayMode);
-    query->setQueryListener(
-        db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
+    query->setQueryListener(db::QueryCallback::fromFunction(
+        [_this = shared_from_this()](auto response) { return _this->handleQueryResponse(response); }));
     DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
 }
 
@@ -104,7 +104,9 @@ auto PhonebookModel::updateRecords(std::vector<ContactRecord> records) -> bool
 #endif
 
     DatabaseModel::updateRecords(std::move(records));
-    list->onProviderDataUpdate();
+    if (list != nullptr) {
+        list->onProviderDataUpdate();
+    }
 
     return true;
 }

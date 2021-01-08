@@ -17,7 +17,9 @@
 
 #include <string>
 
-class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::ListItemProvider
+class PhonebookModel : public app::DatabaseModel<ContactRecord>,
+                       public gui::ListItemProvider,
+                       public std::enable_shared_from_this<PhonebookModel>
 {
   private:
     std::string queryFilter;
