@@ -272,7 +272,18 @@ namespace purefs::blkdev
             LOG_ERROR("Disk doesn't exists");
             return {};
         }
-        return disk->get_info(what);
+        //! When it is partition as for partition sectors count
+        if (what == info_type::sector_count && dfd->has_partition()) {
+            if (unsigned(dfd->partition()) >= disk->partitions().size()) {
+                LOG_ERROR("Partition number out of range");
+                return -ERANGE;
+            }
+            const auto part = disk->partitions()[dfd->partition()];
+            return part.num_sectors;
+        }
+        else {
+            return disk->get_info(what);
+        }
     }
     auto disk_manager::reread_partitions(disk_fd dfd) -> int
     {
