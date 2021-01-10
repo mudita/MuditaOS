@@ -22,6 +22,8 @@ namespace gui
         void applyInputCallback();
         bool isPreviousNumberDecimal();
         bool isSymbol(uint32_t character);
+        bool isDecimalSeparator(uint32_t character);
+        uint32_t getPenultimate();
 
       public:
         CalculatorMainWindow(app::Application *app, std::string name);
