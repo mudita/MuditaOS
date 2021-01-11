@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <purefs/vfs_subsystem.hpp>
 
+struct __dirstream;
+
 namespace vfsn::linux::internal
 {
     bool redirect_to_image();
@@ -24,6 +26,11 @@ namespace vfsn::linux::internal
     FILEX* allocate_filex(int fd);
     bool is_filex(const void* fd);
     void remove_filex(FILEX *fil);
+
+
+    void add_DIR_to_image_list(__dirstream* indir);
+    void remove_DIR_from_image_list(__dirstream* indir);
+    bool is_image_DIR(__dirstream* indir);
 
     template <class Base, typename T, typename... Args>
         auto invoke_fs( T Base::*lfs_fun, Args&& ... args)
