@@ -16,9 +16,8 @@
 #include "GUIMessage.hpp"
 #include "gui/Common.hpp"
 
-namespace sgui
+namespace service::gui
 {
-
     class DrawMessage : public GUIMessage
     {
       public:
@@ -30,20 +29,19 @@ namespace sgui
         } type = Type::NORMAL;
 
       public:
-        gui::RefreshModes mode;
-        std::list<gui::Command> commands;
+        ::gui::RefreshModes mode;
+        std::list<::gui::Command> commands;
 
-        DrawMessage(std::list<gui::Command> commandsList, gui::RefreshModes mode);
+        DrawMessage(std::list<::gui::Command> commandsList, ::gui::RefreshModes mode);
 
-        void setCommandType(Type type) noexcept
+        void setCommandType(Type value) noexcept
         {
-            this->type = type;
+            type = value;
         }
 
-        bool isType(Type type) const noexcept
+        bool isType(Type value) const noexcept
         {
-            return this->type == type;
+            return type == value;
         }
     };
-
-} // namespace sgui
+} // namespace service::gui

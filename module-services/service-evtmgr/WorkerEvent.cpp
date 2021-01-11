@@ -92,14 +92,20 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             return false;
         }
         if (notification == static_cast<uint8_t>(bsp::batteryIRQSource::INTB)) {
-            uint8_t battLevel = 0;
-            bsp::battery_getBatteryLevel(battLevel);
+            LOG_DEBUG("Battery INTB");
+            const auto status = bsp::battery_getStatusRegister();
+            if (status & static_cast<std::uint16_t>(bsp::batteryINTBSource::minVAlert)) {
+                auto messageBrownout = std::make_shared<sevm::BatteryBrownoutMessage>();
+                sys::Bus::SendUnicast(messageBrownout, service::name::system_manager, this->service);
+            }
+            if (status & static_cast<std::uint16_t>(bsp::batteryINTBSource::SOCOnePercentChange)) {
+                std::uint8_t battLevel = 0;
+                bsp::battery_getBatteryLevel(battLevel);
+                auto message = std::make_shared<sevm::BatteryLevelMessage>(battLevel, false);
+                sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
+                battery_level_check::checkBatteryLevelCritical();
+            }
             bsp::battery_ClearAllIRQs();
-            auto message           = std::make_shared<sevm::BatteryLevelMessage>();
-            message->levelPercents = battLevel;
-            message->fullyCharged  = false;
-            sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
-            battery_level_check::checkBatteryLevelCritical();
         }
         if (notification == static_cast<uint8_t>(bsp::batteryIRQSource::INOKB)) {
             bool status;

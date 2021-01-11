@@ -54,8 +54,8 @@ static const uint8_t battery_DischargedPercent   = 15;
 static const uint8_t battery_maxTemperatureDegrees = 50;
 static const uint8_t battery_minTemperatureDegrees = 5;
 
-static const uint16_t battery_maxVoltagemV = 4200;
-static const uint16_t battery_minVoltagemV = 3700;
+static constexpr inline uint16_t battery_maxVoltagemV = 4200;
+static constexpr inline uint16_t battery_minVoltagemV = 3600;
 
 using namespace drivers;
 
@@ -96,7 +96,7 @@ static bsp::batteryRetval battery_enableFuelGuageIRQs(void);
 
 static bsp::batteryRetval battery_enableTopIRQs(void);
 
-static bsp::batteryRetval battery_disableAlerts(void);
+static bsp::batteryRetval battery_configureAlerts();
 
 static void s_BSP_BatteryChargerIrqPinsInit();
 
@@ -139,7 +139,27 @@ namespace bsp
         AICL_I  = (1 << 7),
     };
 
-    uint16_t battery_get_STATUS();
+    // CONFIG register bits
+    enum class B_CONFIG
+    {
+        Ber    = 1 << 0,
+        Bei    = 1 << 1,
+        Aen    = 1 << 2,
+        FTHRM  = 1 << 3,
+        ETHRM  = 1 << 4,
+        SPR_5  = 1 << 5,
+        I2CSH  = 1 << 6,
+        SHDN   = 1 << 7,
+        Tex    = 1 << 8,
+        Ten    = 1 << 9,
+        AINSH  = 1 << 10,
+        SPR_11 = 1 << 11,
+        Vs     = 1 << 12,
+        Ts     = 1 << 13,
+        Ss     = 1 << 14,
+        SPR_15 = 1 << 15
+    };
+
     uint16_t battery_get_CHG_INT_OK();
 
     int battery_Init(xQueueHandle qHandle)
@@ -165,7 +185,7 @@ namespace bsp
             battery_setServiceVoltageThresholds(battery_maxVoltagemV, battery_minVoltagemV);
         }
 
-        battery_disableAlerts();
+        battery_configureAlerts();
         battery_enableFuelGuageIRQs();
 
         uint8_t level = 0;
@@ -222,7 +242,7 @@ namespace bsp
         }
     }
 
-    uint16_t battery_get_STATUS()
+    std::uint16_t battery_getStatusRegister()
     {
         uint16_t status = 0;
         battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &status);
@@ -238,7 +258,7 @@ namespace bsp
             battery_chargerWrite(bsp::batteryChargerRegisters::CHG_INT_REG, 0);
         }
 
-        uint16_t status = battery_get_STATUS();
+        uint16_t status = battery_getStatusRegister();
         if (status != 0) {
             // write zero to clear irq source
             battery_fuelGaugeWrite(bsp::batteryChargerRegisters::STATUS_REG, 0);
@@ -250,6 +270,7 @@ namespace bsp
         // write zero to clear interrupt source
         battery_fuelGaugeWrite(bsp::batteryChargerRegisters::STATUS_REG, 0x0000);
     }
+
 } // namespace bsp
 
 static int battery_fuelGaugeWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value)
@@ -494,12 +515,12 @@ static bsp::batteryRetval battery_enableFuelGuageIRQs(void)
     return bsp::batteryRetval::battery_OK;
 }
 
-static bsp::batteryRetval battery_disableAlerts(void)
+static bsp::batteryRetval battery_configureAlerts()
 {
-    uint16_t regVal = 0;
+    auto regVal = static_cast<std::uint16_t>(bsp::B_CONFIG::Aen); // Enable alerts
 
     if (battery_fuelGaugeWrite(bsp::batteryChargerRegisters::CONFIG_REG, regVal) != kStatus_Success) {
-        LOG_ERROR("battery_disableAlerts failed.");
+        LOG_ERROR("battery_configureAlerts failed.");
         return bsp::batteryRetval::battery_ChargerError;
     }
 

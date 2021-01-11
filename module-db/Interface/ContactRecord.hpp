@@ -5,6 +5,7 @@
 
 #include <Databases/ContactsDB.hpp>
 #include <Common/Query.hpp>
+#include <Common/Logging.hpp>
 #include <Tables/ContactsGroups.hpp>
 
 #include <i18n/i18n.hpp>
@@ -23,8 +24,8 @@
 
 struct ContactRecord : public Record
 {
-    UTF8 primaryName     = "";
-    UTF8 alternativeName = "";
+    UTF8 primaryName          = "";
+    UTF8 alternativeName      = "";
     uint32_t contactPosOnList = 0;
 
     struct Number
@@ -71,7 +72,7 @@ struct ContactRecord : public Record
     inline auto getFormattedName(const NameFormatType type = NameFormatType::Default) const -> UTF8
     {
         if (isTemporary()) {
-            LOG_DEBUG("temporary contact, number as name: '%s'", getNumberAsName().c_str());
+            debug_db_data("temporary contact, number as name: '%s'", getNumberAsName().c_str());
             return getNumberAsName();
         }
         if (primaryName.length() > 0) {

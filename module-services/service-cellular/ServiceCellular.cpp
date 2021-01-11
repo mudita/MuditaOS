@@ -102,6 +102,8 @@ const char *State::c_str(State::ST state)
         return "PowerUpProcedure";
     case ST::AudioConfigurationProcedure:
         return "AudioConfigurationProcedure";
+    case ST::APNConfProcedure:
+        return "APNConfProcedure";
     case ST::ModemOn:
         return "ModemOn";
     case ST::URCReady:
@@ -196,6 +198,9 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         sys::Bus::SendMulticast(msg.value(), sys::BusChannels::ServiceCellularNotifications, this);
     };
     registerMessageHandlers();
+
+    packetData = std::make_unique<packet_data::PacketData>(*this);
+    packetData->loadAPNSettings();
 }
 
 ServiceCellular::~ServiceCellular()
@@ -259,8 +264,10 @@ sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePower
 
     return sys::ReturnCodes::Success;
 }
+
 void handleCellularSimNewPinDataMessage(CellularSimNewPinDataMessage *msg)
 {}
+
 void ServiceCellular::registerMessageHandlers()
 {
     connect(typeid(CellularSimNewPinDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
@@ -286,6 +293,45 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularStartOperatorsScanMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularStartOperatorsScanMessage *>(request);
         return handleCellularStartOperatorsScan(msg);
+    });
+    connect(typeid(CellularGetActiveContextsMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularGetActiveContextsMessage *>(request);
+        return handleCellularGetActiveContextsMessage(msg);
+    });
+
+    connect(typeid(CellularGetAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        connect(typeid(CellularGetCurrentOperatorMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg = static_cast<CellularGetCurrentOperatorMessage *>(request);
+            return handleCellularGetCurrentOperator(msg);
+        });
+
+        auto msg = static_cast<CellularGetAPNMessage *>(request);
+        return handleCellularGetAPNMessage(msg);
+    });
+
+    connect(typeid(CellularSetDataTransferMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularSetDataTransferMessage *>(request);
+        return handleCellularSetDataTransferMessage(msg);
+    });
+
+    connect(typeid(CellularGetDataTransferMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularGetDataTransferMessage *>(request);
+        return handleCellularGetDataTransferMessage(msg);
+    });
+
+    connect(typeid(CellularActivateContextMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularActivateContextMessage *>(request);
+        return handleCellularActivateContextMessage(msg);
+    });
+
+    connect(typeid(CellularDeactivateContextMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularDeactivateContextMessage *>(request);
+        return handleCellularDeactivateContextMessage(msg);
+    });
+
+    connect(typeid(CellularGetActiveContextsMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularGetActiveContextsMessage *>(request);
+        return handleCellularGetActiveContextsMessage(msg);
     });
     handle_CellularGetChannelMessage();
 }
@@ -341,6 +387,9 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
         break;
     case State::ST::CellularConfProcedure:
         handle_start_conf_procedure();
+        break;
+    case State::ST::APNConfProcedure:
+        handle_apn_conf_procedure();
         break;
     case State::ST::SanityCheck:
         handle_sim_sanity_check();
@@ -531,7 +580,7 @@ bool ServiceCellular::handle_audio_conf_procedure()
                 LOG_DEBUG("Setting up notifications callback");
                 notificationsChannel->setCallback(notificationCallback);
             }
-            state.set(this, State::ST::SanityCheck);
+            state.set(this, State::ST::APNConfProcedure);
             return true;
         }
         else {
@@ -1990,4 +2039,95 @@ std::shared_ptr<cellular::RawCommandRespAsync> ServiceCellular::handleCellularSt
     ret->data = networkSettings.scanOperators(msg->getFullInfo());
     sys::Bus::SendUnicast(ret, msg->sender, this);
     return ret;
+}
+bool ServiceCellular::handle_apn_conf_procedure()
+{
+    LOG_DEBUG("APN on modem configuration");
+    packetData->setupAPNSettings();
+    state.set(this, State::ST::SanityCheck);
+    return true;
+}
+
+std::shared_ptr<CellularGetCurrentOperatorResponse> ServiceCellular::handleCellularGetCurrentOperator(
+    CellularGetCurrentOperatorMessage *msg)
+{
+    LOG_INFO("CellularGetCurrentOperator handled");
+    NetworkSettings networkSettings(*this);
+    return std::make_shared<CellularGetCurrentOperatorResponse>(networkSettings.getCurrentOperator());
+}
+
+std::shared_ptr<CellularGetAPNResponse> ServiceCellular::handleCellularGetAPNMessage(CellularGetAPNMessage *msg)
+{
+    std::vector<std::shared_ptr<packet_data::APN::Config>> apns;
+
+    if (auto type = msg->getAPNType(); type) {
+        if (auto apn = packetData->getAPNFirst(*type); apn) {
+            apns.push_back(*apn);
+        }
+        return std::make_shared<CellularGetAPNResponse>(apns);
+    }
+
+    if (auto ctxid = msg->getContextId(); ctxid) {
+        if (auto apn = packetData->getAPN(*ctxid); apn) {
+            apns.push_back(*apn);
+        }
+        return std::make_shared<CellularGetAPNResponse>(apns);
+    }
+
+    return std::make_shared<CellularGetAPNResponse>(packetData->getAPNs());
+}
+std::shared_ptr<CellularSetAPNResponse> ServiceCellular::handleCellularSetAPNMessage(CellularSetAPNMessage *msg)
+{
+
+    auto apn = msg->getAPNConfig();
+
+    return std::make_shared<CellularSetAPNResponse>(packetData->setAPN(apn));
+}
+std::shared_ptr<CellularSetDataTransferResponse> ServiceCellular::handleCellularSetDataTransferMessage(
+    CellularSetDataTransferMessage *msg)
+{
+    packetData->setDataTransfer(msg->getDataTransfer());
+    return std::make_shared<CellularSetDataTransferResponse>(at::Result::Code::OK);
+}
+std::shared_ptr<CellularGetDataTransferResponse> ServiceCellular::handleCellularGetDataTransferMessage(
+    CellularGetDataTransferMessage *msg)
+{
+    return std::make_shared<CellularGetDataTransferResponse>(packetData->getDataTransfer());
+}
+
+std::shared_ptr<CellularActivateContextResponse> ServiceCellular::handleCellularActivateContextMessage(
+    CellularActivateContextMessage *msg)
+{
+    return std::make_shared<CellularActivateContextResponse>(packetData->activateContext(msg->getContextId()),
+                                                             msg->getContextId());
+}
+std::shared_ptr<CellularDeactivateContextResponse> ServiceCellular::handleCellularDeactivateContextMessage(
+    CellularDeactivateContextMessage *msg)
+{
+    return std::make_shared<CellularDeactivateContextResponse>(packetData->deactivateContext(msg->getContextId()),
+                                                               msg->getContextId());
+}
+
+std::shared_ptr<CellularGetActiveContextsResponse> ServiceCellular::handleCellularGetActiveContextsMessage(
+    CellularGetActiveContextsMessage *msg)
+{
+    return std::make_shared<CellularGetActiveContextsResponse>(packetData->getActiveContexts());
+}
+
+std::shared_ptr<CellularSetOperatorAutoSelectResponse> ServiceCellular::handleCellularSetOperatorAutoSelect(
+    CellularSetOperatorAutoSelectMessage *msg)
+{
+    LOG_INFO("CellularSetOperatorAutoSelect handled");
+
+    NetworkSettings networkSettings(*this);
+    return std::make_shared<CellularSetOperatorAutoSelectResponse>(networkSettings.setOperatorAutoSelect());
+}
+
+std::shared_ptr<CellularSetOperatorResponse> ServiceCellular::handleCellularSetOperator(CellularSetOperatorMessage *msg)
+{
+    LOG_INFO("CellularSetOperatorAutoSelect handled");
+
+    NetworkSettings networkSettings(*this);
+    return std::make_shared<CellularSetOperatorResponse>(
+        networkSettings.setOperator(msg->getMode(), msg->getFormat(), msg->getName()));
 }

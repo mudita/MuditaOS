@@ -16,6 +16,7 @@
 #include <module-cellular/at/UrcPoweredDown.hpp>
 #include <module-cellular/at/UrcQind.hpp>
 #include <module-cellular/at/UrcResponse.hpp>
+#include <module-cellular/at/UrcQiurc.hpp>
 
 using namespace at::urc;
 
@@ -35,6 +36,7 @@ class CellularUrcHandler : public UrcHandler
     void Handle(Ctze &urc) final;
     void Handle(Qind &urc) final;
     void Handle(Cpin &urc) final;
+    void Handle(Qiurc &urc) final;
     void Handle(PoweredDown &urc) final;
     void Handle(UrcResponse &urc) final;
 

@@ -30,13 +30,16 @@ namespace gui
     struct Point
     {
         Position x = 0, y = 0;
-        Point(Position x = 0, Position y = 0) : x(x), y(y)
+
+        constexpr Point(Position x = 0, Position y = 0) : x(x), y(y)
         {}
-        [[nodiscard]] auto get(Axis axis) const -> Length
+
+        [[nodiscard]] constexpr auto get(Axis axis) -> Length
         {
             return Axis::X == axis ? x : y;
         }
-        [[nodiscard]] auto isZero() const -> bool
+
+        [[nodiscard]] constexpr auto isZero() -> bool
         {
             return 0 == x && 0 == y;
         }

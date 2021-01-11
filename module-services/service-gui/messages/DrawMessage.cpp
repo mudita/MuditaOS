@@ -6,11 +6,9 @@
 #include <Common.hpp>
 #include <DrawCommand.hpp>
 
-namespace sgui
+namespace service::gui
 {
-
-    DrawMessage::DrawMessage(std::list<gui::Command> commands, gui::RefreshModes mode)
+    DrawMessage::DrawMessage(std::list<::gui::Command> commands, ::gui::RefreshModes mode)
         : GUIMessage(), mode(mode), commands(std::move(commands))
-    {
-    }
-} /* namespace sgui */
+    {}
+} // namespace service::gui

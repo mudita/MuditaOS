@@ -151,7 +151,10 @@ namespace at
         COLP_GET,
         COLP_ENABLE,
         COLP_DISABLE,
-        CSSN, /// Supplementary Services - Supplementary Service Notifications
+        CSSN,   /// Supplementary Services - Supplementary Service Notifications
+        QICSGP, /// Configure Parameters of a TCP/IP Context
+        QIACT,  /// Activate a PDP Context
+        QIDEACT /// Deactivate a PDP Context
     };
 
     // below timeouts are defined in Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf
@@ -248,7 +251,10 @@ namespace at
             {AT::COLP_GET, {"AT+COLP?", default_long_doc_timeout}},
             {AT::COLP_ENABLE, {"AT+COLP=1", default_long_doc_timeout}},
             {AT::COLP_DISABLE, {"AT+COLP=0", default_long_doc_timeout}},
-            {AT::CSSN, {"AT+CSSN=\"", default_doc_timeout}}};
+            {AT::CSSN, {"AT+CSSN=\"", default_doc_timeout}},
+            {AT::QICSGP, {"AT+QICSGP", default_timeout}},
+            {AT::QIACT, {"AT+QIACT", 150000}},
+            {AT::QIDEACT, {"AT+QIDEACT", 40000}}};
 
         if (fact.count(at)) {
             return fact.at(at);

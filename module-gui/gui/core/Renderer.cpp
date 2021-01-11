@@ -288,7 +288,7 @@ namespace gui
         delete drawCtx;
     }
 
-    void Renderer::render(Context *ctx, std::list<Command> &commands)
+    void Renderer::render(Context *ctx, std::list<std::unique_ptr<DrawCommand>> &commands)
     {
         if (ctx == nullptr) {
             return;

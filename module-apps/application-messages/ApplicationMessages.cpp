@@ -65,7 +65,6 @@ namespace app
 
         if (msgl->messageType == MessageType::DBServiceNotification) {
             auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
-            LOG_DEBUG("Received notification");
             if (msg != nullptr) {
                 // window-specific actions
                 if (msg->interface == db::Interface::Name::SMSThread || msg->interface == db::Interface::Name::SMS) {

@@ -48,7 +48,7 @@ namespace at::urc
         };
 
         static constexpr std::string_view head = "+QIND";
-        static auto isURC(const std::string uHead) -> bool
+        static auto isURC(const std::string &uHead) -> bool
         {
             return uHead.find(Qind::head) != std::string::npos;
         }

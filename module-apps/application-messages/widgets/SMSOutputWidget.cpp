@@ -35,7 +35,6 @@ namespace gui
         smsBubble->setPenWidth(style::window::default_border_rect_no_focus);
         smsBubble->setPadding(style::messages::smsOutput::sms_right_bubble_padding);
 
-        LOG_DEBUG("ADD SMS TYPE: %d", static_cast<int>(record->type));
         switch (record->type) {
         case SMSType::QUEUED:
             // Handle in the same way as case below. (pending sending display as already sent)

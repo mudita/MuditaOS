@@ -44,9 +44,9 @@ All of these are asynchronous and there is little state machine maintenance.
 3. Applications react on key **releases** actions, in most scenarios key press event is useless
 4. all applications, if it hasn't been overriden in `gui::AppWindow` will try to return to previous window or application on `back`
 
-# `gui::Item` Key Press handling
+## `gui::Item` Key Press handling
 
-## What happens when you press a key?
+### What happens when you press a key?
 
 ![Key Handling Diagram](./doc/how_keypress_work.svg "High level perspective of the key handling")
 
@@ -60,7 +60,7 @@ All of these are asynchronous and there is little state machine maintenance.
     * use widgets which override default key handling (see `gui::Item::onInput`)
     * have own `gui::KeyInputMappedTranslation` +  `gui::InputMode` and process key press however they want
 
-## How to handle key press
+### How to handle key press
 
 There are at least 3 ways to handle key press, listed in order of execution:
 * `gui::Item::onInput` - if not redefined calls `inputCallback`; if handled here, other calls wont be called
@@ -75,67 +75,71 @@ There are 2 set of parameters for key press:
 * `gui::KeyCode`   - initially parsed key code
 * `gui::RawKey`  - raw key code, to be processed in widget based on event i.e. translate pressing key `1` 3 times into C in `gui::Text` mode `ABC`
 
-## How to add key mapping when basic key maps are not enough?
+### How to add key mapping when basic key maps are not enough?
 
-* Key maps are specific key translation mappings. i.e. press `1` 3 times to get C, press `1` 4 times to get A, etc.
+* Key maps are specific key translation mappings i.e. press `1` 3 times to get C, press `1` 4 times to get A, etc.
 * basic key maps are stored in: `InputMode`, right now there are following `InputMode::Mode`s: [`ABC`, `abc`, `digit`, `phone`]
 * key maps in `gui::InputMode` are changed in regards of language settings
 
-### How to add a new key map, i.e. `phone`
+#### How to add a new key map
+
+How to add a new key map, i.e. `phone`:
 
 1. Add new file for your key map: `cp image/assets/profiles/template.kprof image/assets/profiles/phone.kprof`
 2. Change your template accordingly
-3. Pin new key map = add it to language support, add: `"common_kbd_phone": "phone"` to at least `image/assets/lang/lang_en.json` if it will differ per language, prepare one `kprof` file per language
+3. Pin new key map (add it to language support) by adding: `"common_kbd_phone": "phone"` to at least `image/assets/lang/lang_en.json` if it will differ per language, prepare one `kprof` file per language
 4. Add new key map to `gui::InputMode`
     - Add `InputMode::Mode` enum i.e. `InputMode::Mode::phone`
-    - Add new Mode to input mode mapping in `InputMode.cpp` (same as with other enums)
-    - Test new added mode in: `UITestWindow.cpp`
+    - Add new mode to input mode mapping in `InputMode.cpp` (same as with other enums)
+    - Test newly added mode in: `UITestWindow.cpp`
     - Test new key map on phone
 5. Load key map to phone
 
 Now you can use `InputMode::Mode::phone` translation in `gui::Text` widget.
 This means `gui::Text` will automatically change text on key press for you, same as in modes `InputMode::Mode::phone` etc.
 
-# Adding new functionalities - Visitor pattern in `gui::Item`
+## Adding new functionalities - visitor pattern in `gui::Item`
 
 The `gui::Item` class is compatible with visitor pattern providing double dispatch behaviour.
-The double dispatch mechanism enables, for all classes in `gui::Item`'s inheritance hierarchy, to easily equip them with new polymorphic behavior without changing classes themselves.
+The double dispatch mechanism for all classes in `gui::Item`'s inheritance hierarchy enables easily equipping them with new polymorphic behavior without changing classes themselves.
 
-## Structure
+### Structure
 
-Every new functionality to be added to `gui::Item` hierarchy requires creation of new concrete visitor that publicly inherits from `gui::GuiVisitor` interface and specify respective behavior.
-In order to ensure that a class in `gui::Item` hierarchy is recognized by it's concrete type in `ConcreteVisitor::visit(...)` method, class must override `gui::Item::accept(gui::GuiVisitor &)`,
+Every new functionality to be added to `gui::Item` hierarchy requires creation of new concrete visitor that publicly inherits from `gui::GuiVisitor` interface and specifies respective behavior.
+In order to ensure that a class in `gui::Item` hierarchy is recognized by its concrete type in `ConcreteVisitor::visit(...)` method, class must override `gui::Item::accept(gui::GuiVisitor &)`,
 otherwise it will be resolved as a closest ancestor. On the diagram below both `gui::CustomItem1` and `gui::CustomItem2` will be resolved as `gui::Rect`
 despite existing `gui::GuiVisitor::visit(gui::CustomItem2 &)` overload and `gui::CustomItem1::accept(...)` override.
 
 ![Simplified UI](./doc/visitor_item_structure.svg "Visitor-Item structure")
 
-## Tree of `gui::Item`
+### Tree of `gui::Item`
 
-Each a `gui::Item` object is used as a node to build UI general tree.
-That relation is simplest thought of as a tree of dependencies with a node being a parent of zero, one or more other nodes.
-Concerning need of a `ConcreteVisitors` to visit not only parent but also all it's children,
+Each `gui::Item` object is used as a node to build a UI general tree.
+That relation can simply be thought of as a tree of dependencies with a node being a parent of zero, one or more other nodes.
+Concerning the need of a `ConcreteVisitors` to visit not only the parent but also all its children,
 `gui::ItemTree` is an interface class providing abstract interface for implementation of `gui::Item` tree traversal.
 The concrete realization of `gui::ItemTree` is `gui::DepthFirstItemTree`.
 
 ![Simplified UI](./doc/item_tree.svg "ItemTree structure")
 
-### Depth-First tree of `gui::Item`
+#### Depth-First tree of `gui::Item`
 
 `gui::DepthFirstItemTree` builds tree of parent-children relation for any `gui::Item` pointed as the root.
-The class offers two traverse modes:
-* `PreOrder` - in this mode a parent is precedes all it's children
-* `PostOrder` - in this mode all children precede it's parent
 
-## Example
+The class offers two traverse modes:
+* `PreOrder` - in this mode a parent precedes all its children
+* `PostOrder` - in this mode all children precede their parent
+
+### Example
 
 ![Simplified UI](./doc/visitor_item_example.svg "Visitor-Item  example")
 
-# Domain Object Model of `gui::Item`
+## Domain Object Model of `gui::Item`
 
-Each `gui::Item` object can be serialized into json-formatted stream using `gui::Item2JsonSerializer`.
+Each `gui::Item` object can be serialized into JSON-formatted stream using `gui::Item2JsonSerializer`.
 The serializing class employs dedicated `gui::Item2JsonSerializingVisitor`, `gui::DepthFirstItemTree` in `PostOrder` mode 
-in a sequence flow analogous to the one presented above. Below exemplary fragment of DOM serialization output is presented.
+in a sequence flow analogous to the one presented above. Please find an exemplary fragment of DOM serialization output below.
+
 ```asm
 {"Rect": {
     "Active": true, 

@@ -53,7 +53,16 @@ namespace sys
 
     void PowerManager::IncreaseCpuFrequency() const
     {
-        bsp::LowPowerMode::CpuFrequency freq = lowPowerControl->GetCurrentFrequency();
+        const auto freq      = lowPowerControl->GetCurrentFrequency();
+        const auto oscSource = lowPowerControl->GetCurrentOscillatorSource();
+
+        /// switch osc source first
+        if (freq == bsp::LowPowerMode::CpuFrequency::Level_1 &&
+            oscSource == bsp::LowPowerMode::OscillatorSource::Internal) {
+            lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::External);
+        }
+
+        /// then increase frequency
         if (freq < bsp::LowPowerMode::CpuFrequency::Level_6) {
             lowPowerControl->SetCpuFrequency(bsp::LowPowerMode::CpuFrequency::Level_6);
         }
@@ -62,6 +71,7 @@ namespace sys
     void PowerManager::DecreaseCpuFrequency() const
     {
         const auto freq = lowPowerControl->GetCurrentFrequency();
+        const auto oscSource = lowPowerControl->GetCurrentOscillatorSource();
         auto level      = bsp::LowPowerMode::CpuFrequency::Level_1;
 
         switch (freq) {
@@ -84,8 +94,15 @@ namespace sys
             break;
         }
 
+        /// decrease frequency first
         if (level != freq) {
             lowPowerControl->SetCpuFrequency(level);
+        }
+
+        /// then switch osc source
+        if (level == bsp::LowPowerMode::CpuFrequency::Level_1 &&
+            oscSource == bsp::LowPowerMode::OscillatorSource::External) {
+            lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
         }
     }
 

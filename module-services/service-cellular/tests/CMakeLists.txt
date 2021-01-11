@@ -18,3 +18,12 @@ add_catch2_executable(
         module-cellular
 )
 
+
+add_catch2_executable(
+        NAME
+        cellular-datatransfer
+        SRCS
+        unittest_datatransfer.cpp
+        LIBS
+        module-cellular
+)

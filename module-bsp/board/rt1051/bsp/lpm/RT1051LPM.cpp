@@ -7,6 +7,8 @@
 #include "log/log.hpp"
 #include "bsp/BoardDefinitions.hpp"
 #include "bsp/watchdog/watchdog.hpp"
+#include <fsl_clock.h>
+#include <fsl_dcdc.h>
 
 namespace bsp
 {
@@ -66,4 +68,45 @@ namespace bsp
         }
         LOG_INFO("CPU frequency changed to %lu", CLOCK_GetFreq(kCLOCK_CpuClk));
     }
+
+    void RT1051LPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
+    {
+        if (source == bsp::LowPowerMode::OscillatorSource::Internal) {
+            if (IsClockEnabled(kCLOCK_Lpuart1) || IsClockEnabled(kCLOCK_Lpuart2) || IsClockEnabled(kCLOCK_Lpuart3) ||
+                IsClockEnabled(kCLOCK_Lpuart4) || IsClockEnabled(kCLOCK_Lpuart5) || IsClockEnabled(kCLOCK_Lpuart6) ||
+                IsClockEnabled(kCLOCK_Lpuart7) || IsClockEnabled(kCLOCK_Lpuart8)) {
+                return;
+            }
+
+            /// Switch DCDC to use DCDC internal OSC
+            DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
+            /// Switch clock source to internal RC
+            CLOCK_SwitchOsc(kCLOCK_RcOsc);
+            CLOCK_DeinitExternalClk();
+            /// Wait CCM operation finishes
+            while (CCM->CDHIPR != 0) {}
+        }
+        else if (source == bsp::LowPowerMode::OscillatorSource::External) {
+            CLOCK_InitExternalClk(0);
+            /// Switch DCDC to use DCDC external OSC
+            DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
+            /// Switch clock source to external OSC.
+            CLOCK_SwitchOsc(kCLOCK_XtalOsc);
+            /// Wait CCM operation finishes
+            while (CCM->CDHIPR != 0) {}
+            /// Set Oscillator ready counter value.
+            CCM->CCR = (CCM->CCR & (~CCM_CCR_OSCNT_MASK)) | CCM_CCR_OSCNT(bsp::OscillatorReadyCounterValue);
+        }
+
+        currentOscSource = source;
+    }
+
+    bool RT1051LPM::IsClockEnabled(clock_ip_name_t name) const noexcept
+    {
+        const auto index = static_cast<uint32_t>(name) >> CCM_TupleShift;
+        const auto shift = static_cast<uint32_t>(name) & CCM_TupleMask;
+
+        return ((*reinterpret_cast<volatile uint32_t *>(&CCM->CCGR0 + index)) & (ClockNeededRunWaitMode << shift));
+    }
+
 } // namespace bsp

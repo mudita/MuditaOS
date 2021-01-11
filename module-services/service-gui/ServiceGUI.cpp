@@ -4,245 +4,246 @@
 #include "ServiceGUI.hpp"
 #include "WorkerGUI.hpp"
 
-#include "messages/GUIMessage.hpp"
 #include "messages/DrawMessage.hpp"
-#include "messages/RenderingFinished.hpp"
-#include "messages/GUIDisplayReady.hpp"
+#include "messages/EinkReady.hpp"
 
 #include <DrawCommand.hpp>
 #include <FontManager.hpp>
-#include <MessageType.hpp>
-#include <gui/core/Context.hpp>
 #include <gui/core/ImageManager.hpp>
 #include <log/log.hpp>
-#include <projdefs.h>
-#include <service-appmgr/Controller.hpp>
+#include <service-eink/Common.hpp>
 #include <service-eink/messages/ImageMessage.hpp>
 #include <service-eink/messages/EinkMessage.hpp>
-#include <service-eink/messages/StateRequest.hpp>
-#include <Service/Bus.hpp>
-#include <Service/Worker.hpp>
+#include <service-eink/messages/PrepareDisplayRequest.hpp>
 #include <SystemManager/SystemManager.hpp>
-#include <service-eink/Common.hpp>
 
-#include <task.h>
-
-extern "C"
-{
-#include <FreeRTOS.h>
-#include <semphr.h>
-}
-
-#include <cstddef>
-#include <list>
-#include <memory>
-#include <utility>
+#include <gsl/gsl_util>
 #include <purefs/filesystem_paths.hpp>
 
-namespace sgui
+namespace service::gui
 {
-    ServiceGUI::ServiceGUI(const std::string &name, std::string parent, uint32_t screenWidth, uint32_t screenHeight)
-        : sys::Service(name, parent, 4096, sys::ServicePriority::Idle), renderContext{nullptr},
-          transferContext{nullptr}, renderFrameCounter{1}, transferedFrameCounter{0}, screenWidth{screenWidth},
-          screenHeight{screenHeight}, semCommands{NULL}
+    namespace
     {
+        constexpr auto ServiceGuiStackDepth  = 4096U;
+        constexpr auto ContextsCount         = 2;
+        constexpr auto CommandsQueueCapacity = 3;
+        constexpr std::chrono::milliseconds ContextReleaseTimeout{1000};
+    } // namespace
 
-        LOG_INFO("[ServiceGUI] Initializing");
-
-        renderContext   = new gui::Context(screenWidth, screenHeight);
-        transferContext = new gui::Context(screenWidth, screenHeight);
-
-        gui::FontManager &fontManager = gui::FontManager::getInstance();
-        fontManager.init(purefs::dir::getCurrentOSPath() / "assets");
-
-        gui::ImageManager &imageManager = gui::ImageManager::getInstance();
-        imageManager.init(purefs::dir::getCurrentOSPath() / "assets");
-
-        connect(typeid(sgui::DrawMessage),
-                [&](sys::Message *request) -> sys::MessagePointer { return handleDrawMessage(request); });
-
-        connect(typeid(service::gui::RenderingFinished),
-                [&](sys::Message *request) -> sys::MessagePointer { return handleGUIRenderingFinished(request); });
-
-        connect(typeid(service::gui::GUIDisplayReady),
-                [&](sys::Message *request) -> sys::MessagePointer { return handleGUIDisplayReady(request); });
+    ServiceGUI::ServiceGUI(const std::string &name, std::string parent)
+        : sys::Service(name, parent, ServiceGuiStackDepth), commandsQueue{std::make_unique<DrawCommandsQueue>(
+                                                                CommandsQueueCapacity)},
+          contextReleaseTimer{
+              std::make_unique<sys::Timer>(this, ContextReleaseTimeout.count(), sys::Timer::Type::SingleShot)},
+          currentState{State::NotInitialised}
+    {
+        initAssetManagers();
+        registerMessageHandlers();
     }
 
-    ServiceGUI::~ServiceGUI()
+    ServiceGUI::~ServiceGUI() noexcept = default;
+
+    void ServiceGUI::initAssetManagers()
     {
-        LOG_INFO("[ServiceGUI] Cleaning resources");
-        if (renderContext)
-            delete renderContext;
-        if (transferContext)
-            delete transferContext;
+        const auto assetsPath = purefs::dir::getCurrentOSPath() / "assets";
+        ::gui::FontManager::getInstance().init(assetsPath);
+        ::gui::ImageManager::getInstance().init(assetsPath);
     }
 
-    void ServiceGUI::sendBuffer()
+    void ServiceGUI::registerMessageHandlers()
     {
-        transferContext->insert(0, 0, renderContext);
+        connect(typeid(EinkReady),
+                [this](sys::Message *request) -> sys::MessagePointer { return handleEinkReady(request); });
 
-        auto msg =
-            std::make_shared<service::eink::ImageMessage>(0,
-                                                          0,
-                                                          transferContext->getW(),
-                                                          transferContext->getH(),
-                                                          (mode == gui::RefreshModes::GUI_REFRESH_DEEP ? true : false),
-                                                          transferContext->getData(),
-                                                          suspendInProgress,
-                                                          shutdownInProgress);
-        einkReady = false;
-        auto ret  = sys::Bus::SendUnicast(msg, service::name::eink, this, 2000);
-        if (ret.first == sys::ReturnCodes::Success) {
-            transferedFrameCounter = renderFrameCounter;
-        }
-        mode = gui::RefreshModes::GUI_REFRESH_FAST;
-    }
+        connect(typeid(DrawMessage),
+                [this](sys::Message *request) -> sys::MessagePointer { return handleDrawMessage(request); });
 
-    void ServiceGUI::sendToRender()
-    {
-        rendering = true;
-        worker->send(static_cast<uint32_t>(WorkerGUICommands::Render), NULL);
+        connect(typeid(RenderingFinished),
+                [this](sys::Message *request) -> sys::MessagePointer { return handleGUIRenderingFinished(request); });
+
+        connect(typeid(eink::ImageDisplayedNotification), [this](sys::Message *request) -> sys::MessagePointer {
+            return handleImageDisplayedNotification(request);
+        });
     }
 
     sys::MessagePointer ServiceGUI::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-        return std::make_shared<sys::ResponseMessage>();
+        return sys::MessageNone{};
     }
 
     sys::ReturnCodes ServiceGUI::InitHandler()
     {
-        semCommands = xSemaphoreCreateBinary();
-        if (semCommands == NULL) {
-            LOG_FATAL("Failed to create commands semaphore.");
-            return sys::ReturnCodes::Failure;
-        }
-        xSemaphoreGive(semCommands);
-
+        std::list<sys::WorkerQueueInfo> queueInfo{
+            {WorkerGUI::SignallingQueueName, WorkerGUI::SignalSize, WorkerGUI::SignallingQueueCapacity}};
         worker = std::make_unique<WorkerGUI>(this);
-        std::list<sys::WorkerQueueInfo> list;
-        worker->init(list);
+        worker->init(queueInfo);
         worker->run();
-
-        if (einkReady == false) {
-            requestSent = true;
-            sys::Bus::SendUnicast(std::make_shared<service::eink::StateRequest>(), service::name::eink, this);
-        }
         return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes ServiceGUI::DeinitHandler()
     {
-
-        if (semCommands != NULL)
-            vSemaphoreDelete(semCommands);
-        semCommands = NULL;
-
-        worker->stop();
-        worker->join();
-        worker->deinit();
-
+        worker->close();
         return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes ServiceGUI::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
-        LOG_FATAL("[ServiceGUI] PowerModeHandler: %s", c_str(mode));
-
+        LOG_INFO("PowerModeHandler: %s", c_str(mode));
         switch (mode) {
-        case sys::ServicePowerMode ::Active:
+        case sys::ServicePowerMode::Active:
+            setState(contextPool != nullptr ? State::Idle : State::NotInitialised);
             break;
-        case sys::ServicePowerMode ::SuspendToRAM:
-        case sys::ServicePowerMode ::SuspendToNVM:
+        case sys::ServicePowerMode::SuspendToRAM:
+            [[fallthrough]];
+        case sys::ServicePowerMode::SuspendToNVM:
+            setState(State::Suspended);
             break;
         }
-
         return sys::ReturnCodes::Success;
     }
 
     sys::MessagePointer ServiceGUI::handleDrawMessage(sys::Message *message)
     {
-        auto dmsg = static_cast<sgui::DrawMessage *>(message);
-        if (!dmsg->commands.empty()) {
-
-            if (!suspendInProgress) {
-
-                if (dmsg->isType(sgui::DrawMessage::Type::SHUTDOWN)) {
-                    LOG_WARN("Shutdown - received shutdown draw commands");
-                    shutdownInProgress = true;
-                }
-
-                if (dmsg->isType(sgui::DrawMessage::Type::SUSPEND)) {
-                    LOG_WARN("Suspended - received suspend draw commands");
-                    suspendInProgress = true;
-                }
-
-                if (dmsg->mode == gui::RefreshModes::GUI_REFRESH_DEEP) {
-                    mode = dmsg->mode;
-                }
-
-                if (xSemaphoreTake(semCommands, pdMS_TO_TICKS(1000)) == pdTRUE) {
-                    commands = std::move(dmsg->commands);
-                    xSemaphoreGive(semCommands);
-                }
-                else {
-                    LOG_ERROR("Failed to acquire semaphore");
-                }
-
-                if (!rendering) {
-                    sendToRender();
-                }
-            }
-            else {
-                LOG_WARN("Suspended - ignoring draw commands");
-            }
+        if (isInState(State::NotInitialised)) {
+            LOG_WARN("Service not yet initialised - ignoring draw commands");
+            return sys::MessageNone{};
         }
-        return nullptr;
+        if (isInState(State::Suspended)) {
+            LOG_WARN("Suspended - ignoring draw commands");
+            return sys::MessageNone{};
+        }
+
+        if (const auto drawMsg = static_cast<DrawMessage *>(message); !drawMsg->commands.empty()) {
+            if (drawMsg->isType(DrawMessage::Type::SHUTDOWN) || drawMsg->isType(DrawMessage::Type::SUSPEND)) {
+                setState(State::Suspended);
+            }
+
+            prepareDisplay(drawMsg->mode);
+            notifyRenderer(std::move(drawMsg->commands), drawMsg->mode);
+        }
+        return sys::MessageNone{};
+    }
+
+    void ServiceGUI::prepareDisplay(::gui::RefreshModes refreshMode)
+    {
+        auto msg = std::make_shared<service::eink::PrepareDisplayRequest>(refreshMode);
+        sys::Bus::SendUnicast(msg, service::name::eink, this);
+    }
+
+    void ServiceGUI::notifyRenderer(std::list<std::unique_ptr<::gui::DrawCommand>> &&commands,
+                                    ::gui::RefreshModes refreshMode)
+    {
+        enqueueDrawCommands(DrawCommandsQueue::QueueItem{std::move(commands), refreshMode});
+        worker->notify(WorkerGUI::Signal::Render);
+    }
+
+    void ServiceGUI::enqueueDrawCommands(DrawCommandsQueue::QueueItem &&item)
+    {
+        // Clear all queue elements for now to keep only the latest command in the queue.
+        // In the future, we'll need to implement more sophisticated algorithm for partially refresh the display.
+        if (item.refreshMode == ::gui::RefreshModes::GUI_REFRESH_DEEP) {
+            commandsQueue->clear();
+        }
+        else if (const auto maxRefreshMode = commandsQueue->getMaxRefreshModeAndClear();
+                 maxRefreshMode == ::gui::RefreshModes::GUI_REFRESH_DEEP) {
+            item.refreshMode = maxRefreshMode;
+        }
+        commandsQueue->enqueue(std::move(item)); // 3 consecutive deep refreshes after leaving messages? :/
     }
 
     sys::MessagePointer ServiceGUI::handleGUIRenderingFinished(sys::Message *message)
     {
-        rendering = false;
-        renderFrameCounter++;
-
-        if (einkReady) {
-            sendBuffer();
+        auto finishedMsg       = static_cast<service::gui::RenderingFinished *>(message);
+        const auto contextId   = finishedMsg->getContextId();
+        const auto refreshMode = finishedMsg->getRefreshMode();
+        if (isInState(State::Idle)) {
+            const auto context = contextPool->peekContext(contextId);
+            sendOnDisplay(context, contextId, refreshMode);
+            invalidateCache();
         }
-        else if (!requestSent) {
-            requestSent = true;
-            sys::Bus::SendUnicast(std::make_shared<service::eink::StateRequest>(), service::name::eink, this);
+        else {
+            cacheRender(contextId, refreshMode);
+            contextPool->returnContext(contextId);
         }
-        return nullptr;
+        return sys::MessageNone{};
     }
 
-    sys::MessagePointer ServiceGUI::handleGUIDisplayReady(sys::Message *message)
+    void ServiceGUI::sendOnDisplay(::gui::Context *context, int contextId, ::gui::RefreshModes refreshMode)
     {
-        auto msg    = static_cast<service::gui::GUIDisplayReady *>(message);
-        einkReady   = true;
-        requestSent = false;
-
-        if (msg->getShutdownInProgress()) {
-            einkReady         = false;
-            suspendInProgress = false;
-            LOG_DEBUG("last rendering before shutdown finished.");
-
-            sys::SystemManager::CloseSystem(this);
-        }
-
-        if (msg->getSuspendInProgress()) {
-            einkReady         = false;
-            suspendInProgress = false;
-            LOG_DEBUG("last rendering before suspend is finished.");
-
-            app::manager::Controller::changePowerSaveMode(this);
-        }
-        if ((renderFrameCounter != transferedFrameCounter) && (!rendering)) {
-            sendBuffer();
-        }
-
-        if (commands.empty() == false) {
-            sendToRender();
-        }
-        return nullptr;
+        setState(State::Busy);
+        auto imageMsg = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
+        sys::Bus::SendUnicast(imageMsg, service::name::eink, this);
+        scheduleContextRelease(contextId);
     }
 
+    void ServiceGUI::scheduleContextRelease(int contextId)
+    {
+        // Whenever the response from ServiceEink doesn't come, the context has to be released automatically after a
+        // timeout.
+        contextReleaseTimer->connect([this, contextId](sys::Timer &it) {
+            eink::ImageDisplayedNotification notification{contextId};
+            handleImageDisplayedNotification(&notification);
+            LOG_WARN("Context # %d released after timeout. Does ServiceEink respond properly?", contextId);
+        });
+        contextReleaseTimer->start();
+    }
+
+    void ServiceGUI::cacheRender(int contextId, ::gui::RefreshModes refreshMode)
+    {
+        cachedRender = CachedRender{contextId, refreshMode};
+    }
+
+    void ServiceGUI::invalidateCache()
+    {
+        cachedRender = std::nullopt;
+    }
+
+    sys::MessagePointer ServiceGUI::handleEinkReady(sys::Message *message)
+    {
+        const auto msg = static_cast<service::gui::EinkReady *>(message);
+        contextPool    = std::make_unique<ContextPool>(msg->getDisplaySize(), ContextsCount);
+        setState(State::Idle);
+        return sys::MessageNone{};
+    }
+
+    sys::MessagePointer ServiceGUI::handleImageDisplayedNotification(sys::Message *message)
+    {
+        const auto msg       = static_cast<eink::ImageDisplayedNotification *>(message);
+        const auto contextId = msg->getContextId();
+        contextPool->returnContext(contextId);
+        contextReleaseTimer->stop();
+        setState(State::Idle);
+
+        if (isNextFrameReady()) {
+            trySendNextFrame();
+        }
+        return sys::MessageNone{};
+    }
+
+    bool ServiceGUI::isNextFrameReady() const noexcept
+    {
+        // Even if the next render is already cached, if any context in the pool is currently being processed, then we
+        // better wait for it.
+        return cachedRender.has_value() && !contextPool->isAnyContextLocked();
+    }
+
+    void ServiceGUI::trySendNextFrame()
+    {
+        const auto contextId = cachedRender->contextId;
+        if (const auto context = contextPool->borrowContext(contextId); context != nullptr) {
+            sendOnDisplay(context, contextId, cachedRender->refreshMode);
+        }
+        invalidateCache();
+    }
+
+    void ServiceGUI::setState(State state) noexcept
+    {
+        currentState = state;
+    }
+
+    bool ServiceGUI::isInState(State state) const noexcept
+    {
+        return currentState == state;
+    }
 } /* namespace sgui */

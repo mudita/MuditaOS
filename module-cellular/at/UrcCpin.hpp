@@ -43,7 +43,7 @@ namespace at::urc
 
         static constexpr auto head = "+CPIN";
 
-        static bool isURC(const std::string uHead)
+        static bool isURC(const std::string &uHead)
         {
             return uHead.find(Cpin::head) != std::string::npos;
         }

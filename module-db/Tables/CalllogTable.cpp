@@ -197,7 +197,6 @@ uint32_t CalllogTable::count(EntryState state)
         break;
     }
     query += ";";
-    LOG_DEBUG("> %s", query.c_str());
     auto queryRet = db->query(query.c_str());
 
     if (queryRet == nullptr || queryRet->getRowCount() == 0) {

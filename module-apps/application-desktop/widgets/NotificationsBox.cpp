@@ -105,13 +105,12 @@ namespace
         auto number = new gui::Text();
         if (indicator.length() > 2) {
             number->setText(maxNotificationValue);
-            number->setMinimumWidth(strlen(maxNotificationValue) * notifications::DigitSize);
         }
         else {
             number->setText(indicator);
-            number->setMinimumWidth(indicator.length() * notifications::DigitSize);
         }
-        number->setMinimumWidth(indicator.length() * notifications::DigitSize);
+
+        number->setMinimumWidth(number->getText().length() * notifications::DigitSize);
         number->setFont(style::window::font::mediumbold);
         number->setPenWidth(style::window::default_border_no_focus_w);
         number->setMargins(gui::Margins(0, 0, style::window::default_right_margin, 0));

@@ -57,7 +57,7 @@ namespace audio
         }
         operationToken = token;
 
-        assert(dataStreamOut);
+        assert(dataStreamOut != nullptr);
 
         dec->startDecodingWorker(*dataStreamOut, endOfFileCallback);
 
@@ -89,17 +89,19 @@ namespace audio
         if (!audioDevice) {
             return audio::RetCode::DeviceFailure;
         }
+
+        dec->stopDecodingWorker();
         return GetDeviceError(audioDevice->Stop());
     }
 
     audio::RetCode PlaybackOperation::Pause()
     {
-
         if (state == State::Paused || state == State::Idle) {
             return RetCode::InvokedInIncorrectState;
         }
-
         state = State::Paused;
+
+        dec->stopDecodingWorker();
         return GetDeviceError(audioDevice->Stop());
     }
 
@@ -110,6 +112,9 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
         state    = State::Active;
+
+        assert(dataStreamOut != nullptr);
+        dec->startDecodingWorker(*dataStreamOut, endOfFileCallback);
         auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
         return GetDeviceError(ret);
     }
@@ -196,6 +201,7 @@ namespace audio
 
     PlaybackOperation::~PlaybackOperation()
     {
+        dec->stopDecodingWorker();
         Stop();
         dataStreamOut->reset();
         dataStreamIn->reset();
