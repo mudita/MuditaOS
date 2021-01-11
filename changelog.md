@@ -1,17 +1,26 @@
 # MuditaOS changelog
 
-## Latest Changes
+## [0.53.1 2020-01-11]
+
 ### Added
 
-* Battery Brownout detection
+* Add battery brownout detection.
+* Add several improvements to power saving.
+* Add APN settings.
 
 ### Changed
 
-* Input keyboard language files parser from KBD to JSON.
+* Change battery icons.
 
 ### Fixed
 
-* Fix absent notifications
+* Fix duplicated actions due to an error in events generation.
+
+### Other
+
+* Several changes related to the change of the filesystem.
+* Switch to JSON format for localization files.
+* Documentation fixes.
 
 ## [0.52.1 2020-12-23]
 
