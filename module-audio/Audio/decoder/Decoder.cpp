@@ -123,6 +123,7 @@ namespace audio
 
     void Decoder::startDecodingWorker(DecoderWorker::EndOfFileCallback endOfFileCallback)
     {
+        assert(_stream != nullptr);
         if (!audioWorker) {
             audioWorker = std::make_unique<DecoderWorker>(_stream, this, endOfFileCallback);
             audioWorker->init();

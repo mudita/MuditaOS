@@ -60,9 +60,9 @@ namespace audio
         if (!tags) {
             tags = dec->fetchTags();
         }
-        dec->startDecodingWorker(endOfFileCallback);
 
         outputConnection = std::make_unique<StreamConnection>(dec.get(), audioDevice.get(), dataStreamOut);
+        dec->startDecodingWorker(endOfFileCallback);
 
         state = State::Active;
 
