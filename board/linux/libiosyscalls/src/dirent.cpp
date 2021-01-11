@@ -31,7 +31,7 @@ extern "C" {
         }
         else
         {
-            if( redirect_to_image() )
+            if( redirect_to_image(dirname) )
             {
                 auto vfs = purefs::subsystem::vfs_core();
                 if(!vfs)
@@ -63,6 +63,9 @@ extern "C" {
                         }
                     }
                 }
+                if(ret) {
+                    add_DIR_to_image_list(ret);
+                }
             }
             else
             {
@@ -87,7 +90,7 @@ extern "C" {
                 ret = -1;
                 break;
             }
-            if(redirect_to_image()) {
+            if(is_image_DIR(dirp)) {
                 auto vfs = purefs::subsystem::vfs_core();
                 if(!vfs) {
                     errno = EIO;
@@ -99,6 +102,7 @@ extern "C" {
                     errno = -ret;
                     ret = -1;
                 }
+                remove_DIR_from_image_list(dirp);
                 delete dirp;
             } else {
                 auto r_closedir = reinterpret_cast<int (*)(DIR*)>(dlsym(RTLD_NEXT,"closedir"));
@@ -118,7 +122,7 @@ extern "C" {
                 errno = EBADF;
                 break;
             }
-            if(redirect_to_image()) {
+            if(is_image_DIR(dirp)) {
                 auto vfs = purefs::subsystem::vfs_core();
                 if(!vfs) {
                     errno = EIO;
@@ -161,7 +165,7 @@ extern "C" {
             errno = EBADF;
             return -1;
         }
-        if(redirect_to_image()) {
+        if(is_image_DIR(dirp)) {
             auto vfs = purefs::subsystem::vfs_core();
             if(!vfs) {
                 errno = EIO;
@@ -201,7 +205,7 @@ extern "C" {
             errno = EBADF;
             return;
         }
-        if(redirect_to_image())
+        if(is_image_DIR(dirp))
         {
             auto vfs = purefs::subsystem::vfs_core();
             if(!vfs) {
@@ -228,7 +232,7 @@ extern "C" {
             errno = EBADF;
             return;
         }
-        if( redirect_to_image() )
+        if( is_image_DIR(dirp) )
         {
             if (loc < 0) {
                 return;
@@ -262,7 +266,7 @@ extern "C" {
             errno = EBADF;
             return -1;
         }
-        if( redirect_to_image() )
+        if( is_image_DIR(dirp) )
         {
             return dirp->position;
         }

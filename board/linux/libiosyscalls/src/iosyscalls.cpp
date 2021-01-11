@@ -10,6 +10,7 @@
 #include <dlfcn.h>
 #include <stdarg.h>
 #include <debug.hpp>
+#include <dirent.h>
 
 namespace {
     constexpr auto ENV_NAME = "IOSYSCALLS_REDIRECT_TO_IMAGE";
@@ -20,6 +21,11 @@ namespace {
         "/dev/",
         "/etc/",
         "/sys/",
+        "/usr/share",
+        "/run/user",
+        "/home",
+        "/proc",
+        "/dev/shm",
         "PurePhone.img",
         nullptr,
     };
@@ -42,6 +48,7 @@ namespace {
 
     pthread_mutex_t g_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
     phmap::flat_hash_set<vfsn::linux::internal::FILEX*> g_fdlist;
+    phmap::flat_hash_set<DIR*> g_dirlist;
 }
 
 namespace vfsn::linux::internal
@@ -124,6 +131,36 @@ namespace vfsn::linux::internal
         g_fdlist.emplace( ret );
         pthread_mutex_unlock(&g_lock);
         return ret;
+    }
+
+    void add_DIR_to_image_list(DIR* indir)
+    {
+        pthread_mutex_lock(&g_lock);
+        g_dirlist.emplace( indir );
+        pthread_mutex_unlock(&g_lock);
+    }
+
+    void remove_DIR_from_image_list(DIR* indir)
+    {
+        pthread_mutex_lock(&g_lock);
+        auto fres = g_dirlist.find(indir);
+        if(fres != g_dirlist.end())
+        {
+            g_dirlist.erase(fres);
+        }
+        pthread_mutex_unlock(&g_lock);
+    }
+
+    bool is_image_DIR(DIR* indir)
+    {
+        if(indir==nullptr) {
+            return false;
+        }
+        pthread_mutex_lock(&g_lock);
+        auto fres = g_dirlist.find(indir);
+        auto isntdir = ( fres != g_dirlist.end() );
+        pthread_mutex_unlock(&g_lock);
+        return isntdir;
     }
 
     bool is_filex(const void* fd)

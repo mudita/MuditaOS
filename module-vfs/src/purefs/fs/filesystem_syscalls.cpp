@@ -110,7 +110,7 @@ namespace purefs::fs
         const auto abspath     = absolute_path(path);
         auto [mountp, pathpos] = find_mount_point(abspath);
         if (!mountp) {
-            LOG_ERROR("VFS: Unable to find mount point");
+            LOG_ERROR("VFS: Unable to find mount point: %.*s", int(path.size()), path.data());
             return -ENOENT;
         }
         auto fsops = mountp->fs_ops();
@@ -146,7 +146,7 @@ namespace purefs::fs
         const auto abspath     = absolute_path(path);
         auto [mountp, pathpos] = find_mount_point(abspath);
         if (!mountp) {
-            LOG_ERROR("VFS: Unable to find mount point");
+            LOG_ERROR("VFS: Unable to find mount point: %.*s", int(path.size()), path.data());
             return std::make_shared<internal::directory_handle>(nullptr, -ENOENT);
         }
         auto fsops = mountp->fs_ops();
