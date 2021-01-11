@@ -34,24 +34,6 @@ GLIBC_2.2.5 {
                 fscanf;
                 vfscanf;
                 ungetc;
-                link;
-                unlink;
-                stat;
-                fstat;
-                lstat;
-                fcntl;
-                fcntl64;
-                chdir;
-                fchdir;
-                getcwd;
-                getwd;
-                get_current_dir_name;
-                rename;
-                mkdir;
-                chmod;
-                fchmod;
-                fsync;
-                fdatasync;
                 opendir;
                 closedir;
                 readdir;
@@ -59,12 +41,38 @@ GLIBC_2.2.5 {
                 rewinddir;
                 seekdir;
                 telldir;
+                rename;
+
+# posix
+                link;
+                unlink;
+                stat;
+                lstat;
+                fstat;
+                fcntl;
+                fcntl64;
+                chdir;
+                fchdir;
+                getcwd;
+                getwd;
+                get_current_dir_name;
+                mkdir;
+                chmod;
+                fchmod;
+                fsync;
+                fdatasync;
                 symlink;
-                fstatat;
                 __xstat;
                 __lxstat;
                 __fxstat;
-                __symlink;
+                __xstat64;
+                __lxstat64;
+                __fxstat64;
         local:
                 *;
+};
+GLIBC_2.4 {
+        global:
+                __fxstatat;
+                __fxstatat64;
 };
