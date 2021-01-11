@@ -43,7 +43,6 @@ namespace audio
         if (dec == nullptr) {
             throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
-        dec->startDecodingWorker(endOfFileCallback);
 
         auto retCode = SwitchToPriorityProfile();
         if (retCode != RetCode::Success) {
@@ -58,11 +57,12 @@ namespace audio
         }
         operationToken = token;
 
-        assert(outputConnection);
-
         if (!tags) {
             tags = dec->fetchTags();
         }
+        dec->startDecodingWorker(endOfFileCallback);
+
+        outputConnection = std::make_unique<StreamConnection>(dec.get(), audioDevice.get(), dataStreamOut);
 
         state = State::Active;
 
@@ -173,8 +173,6 @@ namespace audio
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
         }
-
-        outputConnection = std::make_unique<StreamConnection>(dec.get(), audioDevice.get(), dataStreamOut);
 
         currentProfile->SetSampleRate(currentSampleRate);
         currentProfile->SetInOutFlags(currentInOutFlags);
