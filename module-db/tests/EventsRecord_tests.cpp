@@ -17,10 +17,9 @@
 #include "module-db/queries/calendar/QueryEventsEditICS.hpp"
 #include "module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp"
 
-#include <purefs/filesystem_paths.hpp>
-
-#include <stdint.h>
 #include <algorithm>
+#include <cstdint>
+#include <filesystem>
 #include <iostream>
 
 static auto remove_events(EventsDB &db) -> bool
@@ -38,10 +37,12 @@ TEST_CASE("Events Record tests")
 {
     Database::initialize();
 
-    const auto eventsPath = (purefs::dir::getUserDiskPath() / "events.db").c_str();
-    std::filesystem::remove(eventsPath);
+    const auto eventsPath = (std::filesystem::path{"user"} / "events.db");
+    if (std::filesystem::exists(eventsPath)) {
+        REQUIRE(std::filesystem::remove(eventsPath));
+    }
 
-    EventsDB eventsDb{eventsPath};
+    EventsDB eventsDb{eventsPath.c_str()};
 
     REQUIRE(eventsDb.isInitialized());
 

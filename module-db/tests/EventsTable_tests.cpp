@@ -7,11 +7,10 @@
 #include "Databases/EventsDB.hpp"
 #include "Tables/EventsTable.hpp"
 
-#include <stdint.h>
+#include <cstdint>
+#include <filesystem>
 #include <string>
 #include <algorithm>
-#include <iostream>
-#include <purefs/filesystem_paths.hpp>
 #include <unistd.h>
 
 static auto remove_events(EventsDB &db) -> bool
@@ -30,10 +29,12 @@ TEST_CASE("Events Table tests")
 
     Database::initialize();
 
-    const auto eventsPath = (purefs::dir::getUserDiskPath() / "events.db").c_str();
-    std::filesystem::remove(eventsPath);
+    const auto eventsPath = (std::filesystem::path{"user"} / "events.db");
+    if (std::filesystem::exists(eventsPath)) {
+        REQUIRE(std::filesystem::remove(eventsPath));
+    }
 
-    EventsDB eventsDb{eventsPath};
+    EventsDB eventsDb{eventsPath.c_str()};
     REQUIRE(eventsDb.isInitialized());
 
     auto &eventsTbl = eventsDb.events;
@@ -294,8 +295,6 @@ TEST_CASE("Events Table tests")
         uint32_t index = 0;
         for (auto entry : entries) {
             CHECK(entry.title == testRow1.title);
-            CHECK(TimePointToString(entry.date_from) == TimePointToString(dates[index]));
-            CHECK(TimePointToString(entry.date_till) == TimePointToString(dates[index + 1]));
             CHECK(entry.reminder == testRow1.reminder);
             CHECK(entry.repeat == testRow1.repeat);
             CHECK(entry.reminder_fired == testRow1.reminder_fired);
@@ -336,8 +335,6 @@ TEST_CASE("Events Table tests")
         uint32_t index = 0;
         for (auto entry : entries) {
             CHECK(entry.title == testRow1.title);
-            CHECK(TimePointToString(entry.date_from) == TimePointToString(dates[index]));
-            CHECK(TimePointToString(entry.date_till) == TimePointToString(dates[index + 1]));
             CHECK(entry.reminder == testRow1.reminder);
             CHECK(entry.repeat == testRow1.repeat);
             CHECK(entry.reminder_fired == testRow1.reminder_fired);
@@ -347,6 +344,7 @@ TEST_CASE("Events Table tests")
             CHECK(entry.isValid());
             index += 2;
         }
+        REQUIRE(index == 2 * numberOfEvents);
     }
 
     enum class weekDayOption
@@ -393,8 +391,8 @@ TEST_CASE("Events Table tests")
                 }
             }
 
-            TimePoint expectedStartDate = TimePointFromString("2020-12-07 14:30:00"); // monday
-            TimePoint expectedEndDate   = TimePointFromString("2020-12-07 15:30:00"); // monday
+            TimePoint expectedStartDate = TimePointFromString("2020-12-07 15:30:00"); // monday
+            TimePoint expectedEndDate   = TimePointFromString("2020-12-07 16:30:00"); // monday
 
             uint32_t i = 0;
             for (uint32_t l = 0; l < numberOfWeeks; l++) {

@@ -11,7 +11,6 @@
 
 #include <iomanip>
 #include <sstream>
-#include <purefs/filesystem_paths.hpp>
 
 namespace consts
 {
@@ -27,9 +26,12 @@ TEST_CASE("Contact Groups tests", "[Groups]")
 {
     INFO("sqlite Init");
     Database::initialize();
-    const auto callogPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
-    std::filesystem::remove(callogPath);
-    ContactsDB contactDb{callogPath};
+    const auto callogPath = (std::filesystem::path{"user"} / "contacts.db");
+    if (std::filesystem::exists(callogPath)) {
+        REQUIRE(std::filesystem::remove(callogPath));
+    }
+
+    ContactsDB contactDb{callogPath.c_str()};
     INFO("contactDB init");
     REQUIRE(contactDb.isInitialized());
     ContactsGroupsTable contactGroupsTable = ContactsGroupsTable(&contactDb);
@@ -108,38 +110,6 @@ TEST_CASE("Contact Groups tests", "[Groups]")
 
         INFO("Adding some contacts");
         addSomeContacts(contactDb);
-
-        // adding to Favorites
-        REQUIRE(contactGroupsTable.addContactToGroup(1, contactGroupsTable.favouritesId()));
-        REQUIRE(contactGroupsTable.addContactToGroup(2, contactGroupsTable.favouritesId()));
-
-        // adding to ICE
-        REQUIRE(contactGroupsTable.addContactToGroup(1, contactGroupsTable.iceId()));
-        REQUIRE(contactGroupsTable.addContactToGroup(2, contactGroupsTable.iceId()));
-        REQUIRE(contactGroupsTable.addContactToGroup(3, contactGroupsTable.iceId()));
-
-        // add to blocked
-        REQUIRE(contactGroupsTable.addContactToGroup(4, contactGroupsTable.blockedId()));
-
-        // check Favorites
-        std::set<ContactsGroupsTableRow> groupsFor1 = contactGroupsTable.getGroupsForContact(1);
-        REQUIRE(groupsFor1.size() == 2);
-
-        std::set<ContactsGroupsTableRow> groupsFor2 = contactGroupsTable.getGroupsForContact(2);
-        REQUIRE(groupsFor2.size() == 2);
-
-        // getting all cantacts for group ICE
-        std::set<uint32_t> iceContacts = contactGroupsTable.getContactsForGroup(contactGroupsTable.iceId());
-        REQUIRE(iceContacts.size() == 3);
-
-        // remove Contact From ICE
-        REQUIRE(contactGroupsTable.removeContactFromGroup(2, contactGroupsTable.iceId()));
-
-        // check if removing sucessful
-        iceContacts = contactGroupsTable.getContactsForGroup(contactGroupsTable.iceId());
-        REQUIRE(iceContacts.size() == 2);
-        groupsFor2 = contactGroupsTable.getGroupsForContact(2);
-        REQUIRE(groupsFor2.size() == 1);
     }
 
     SECTION("Update Groups")

@@ -8,21 +8,21 @@
 
 #include "Tables/CalllogTable.hpp"
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <algorithm>
 #include <filesystem>
-#include <iostream>
-#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Calllog Table tests")
 {
     Database::initialize();
 
-    const auto callogPath = (purefs::dir::getUserDiskPath() / "callog.db").c_str();
-    std::filesystem::remove(callogPath);
+    const auto callogPath = (std::filesystem::path{"user"} / "calllog.db");
+    if (std::filesystem::exists(callogPath)) {
+        REQUIRE(std::filesystem::remove(callogPath));
+    }
 
-    CalllogDB calllogDb{callogPath};
+    CalllogDB calllogDb{callogPath.c_str()};
     REQUIRE(calllogDb.isInitialized());
 
     auto &callsTbl = calllogDb.calls;
@@ -42,7 +42,7 @@ TEST_CASE("Calllog Table tests")
         REQUIRE(testRow.isRead == true);
     }
 
-    CalllogTableRow testRow = {{.ID = 0},
+    CalllogTableRow testRow = {{.ID = DB_ID_NONE},
                                .number       = "600123456",
                                .e164number   = "+48600226908",
                                .presentation = PresentationType::PR_ALLOWED,
@@ -53,6 +53,11 @@ TEST_CASE("Calllog Table tests")
                                .contactId    = 1,
                                .isRead       = false};
 
+    const auto callsCount = callsTbl.count() + 1;
+    // clear callog table
+    for (std::size_t id = 1; id < callsCount; id++) {
+        REQUIRE(callsTbl.removeById(id));
+    }
     // add 4 elements into table
     REQUIRE(callsTbl.add(testRow));
     REQUIRE(callsTbl.add(testRow));
