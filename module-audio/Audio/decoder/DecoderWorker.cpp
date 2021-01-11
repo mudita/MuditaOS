@@ -57,7 +57,7 @@ bool audio::DecoderWorker::handleMessage(uint32_t queueID)
         }
     }
     else if (queueName == SERVICE_QUEUE_NAME) {
-        auto serviceQueue = getServiceQueue();
+        auto &serviceQueue = getServiceQueue();
         sys::WorkerCommand cmd;
 
         if (serviceQueue.Dequeue(&cmd)) {
