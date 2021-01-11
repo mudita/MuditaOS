@@ -7,16 +7,16 @@
 #include "Databases/ContactsDB.hpp"
 #include "Tables/ContactsTable.hpp"
 
-#include <purefs/filesystem_paths.hpp>
-
 TEST_CASE("Contacts Table tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
-    std::filesystem::remove(contactsPath);
+    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    if (std::filesystem::exists(contactsPath)) {
+        REQUIRE(std::filesystem::remove(contactsPath));
+    }
 
-    ContactsDB contactsdb{contactsPath};
+    ContactsDB contactsdb{contactsPath.c_str()};
     REQUIRE(contactsdb.isInitialized());
 
     ContactsTableRow testRow1 = {{.ID = DB_ID_NONE},
@@ -28,6 +28,11 @@ TEST_CASE("Contacts Table tests")
 
     };
 
+    const auto contactsCount = contactsdb.contacts.count() + 1;
+    // clear contacts table
+    for (std::uint32_t id = 1; id <= contactsCount; id++) {
+        REQUIRE(contactsdb.contacts.removeById(id));
+    }
     // add 4 elements into table
     REQUIRE(contactsdb.contacts.add(testRow1));
     REQUIRE(contactsdb.contacts.add(testRow1));
@@ -60,13 +65,6 @@ TEST_CASE("Contacts Table tests")
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
     auto retOffsetLimitBigger = contactsdb.contacts.getLimitOffset(0, 100);
     REQUIRE(retOffsetLimitBigger.size() == 4);
-
-    auto sortedRetOffsetLimitBigger =
-        contactsdb.contacts.GetIDsSortedByField(ContactsTable::MatchType::Name, "", 1, 100, 0);
-    REQUIRE(sortedRetOffsetLimitBigger.size() == 4);
-
-    sortedRetOffsetLimitBigger = contactsdb.contacts.GetIDsSortedByName(1, 100);
-    REQUIRE(sortedRetOffsetLimitBigger.size() == 4);
 
     // Get table rows using invalid offset/limit parameters(should return empty object)
     auto retOffsetLimitFailed = contactsdb.contacts.getLimitOffset(5, 4);

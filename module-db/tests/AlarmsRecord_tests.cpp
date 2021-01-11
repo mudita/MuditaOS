@@ -14,20 +14,21 @@
 #include "queries/alarms/QueryAlarmsTurnOffAll.hpp"
 
 #include <algorithm>
-
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <purefs/filesystem_paths.hpp>
+#include <filesystem>
 
 TEST_CASE("Alarms Record tests")
 {
     Database::initialize();
 
-    const auto alarmsPath = (purefs::dir::getUserDiskPath() / "alarms.db").c_str();
-    std::filesystem::remove(alarmsPath);
+    const auto alarmsPath = (std::filesystem::path{"user"} / "alarms.db");
+    if (std::filesystem::exists(alarmsPath)) {
+        REQUIRE(std::filesystem::remove(alarmsPath));
+    }
 
-    auto alarmsDB = AlarmsDB(alarmsPath);
+    auto alarmsDB = AlarmsDB(alarmsPath.c_str());
     REQUIRE(alarmsDB.isInitialized());
 
     SECTION("Default Constructor")

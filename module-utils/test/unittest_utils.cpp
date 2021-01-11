@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstring>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <unistd.h>
