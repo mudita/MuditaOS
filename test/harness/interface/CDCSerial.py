@@ -82,7 +82,7 @@ class CDCSerial:
         self.serial.write(message.encode())
         self.serial.timeout = timeout
 
-    def send_key(self, key_code, key_type=Keytype.short_press, wait=10):
+    def send_key_code(self, key_code, key_type=Keytype.short_press, wait=10):
         if key_type is Keytype.long_press:
             body = {"keyPressed": key_code, "state": 4}
         else:
