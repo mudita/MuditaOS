@@ -7,12 +7,12 @@
 #include <string.h>
 #include <mutex>
 #include <unordered_map>
-#include <handle_mapper.hpp>
 #include <iosyscalls.hpp>
-#include "debug.hpp"
 #include <fcntl.h>
 #include <stdarg.h>
 #include <limits.h>
+
+#include "debug.hpp"
 
 namespace
 {
@@ -112,11 +112,12 @@ extern "C"
 {
     using namespace vfsn::linux::internal;
 
-    FILE *fopen(const char *pathname, const char *mode)
+    FILE *_iosys_fopen(const char *pathname, const char *mode)
     {
         FILE* ret {};
         if(redirect_to_image(pathname))
         {
+            TRACE_SYSCALLN("(%s,%s) -> VFS", pathname, mode);
             const auto fd = invoke_fs(&purefs::fs::filesystem::open, pathname, fopen_to_open_flags(mode),0644);
             if(fd >= 0) {
                 ret = reinterpret_cast<FILE*>(allocate_filex(fd));
@@ -124,6 +125,7 @@ extern "C"
         }
         else
         {
+            TRACE_SYSCALLN("(%s,%s) -> linux fs", pathname, mode);
             char tmp[PATH_MAX];
             const auto path = npath_translate(pathname,tmp);
             ret = real_fopen(path,mode);
@@ -131,19 +133,20 @@ extern "C"
         TRACE_SYSCALLN("(%s,%s)=%p", pathname, mode, ret);
         return ret;
     }
-    __asm__(".symver fopen,fopen@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fopen,fopen@GLIBC_2.2.5");
 
-    FILE *fopen64(const char *pathname, const char *mode)
+    FILE *_iosys_fopen64(const char *pathname, const char *mode)
     {
+        TRACE_SYSCALLN("(%s,%s)", pathname, mode);
         return fopen(pathname,mode);
     }
-    __asm__(".symver fopen64,fopen64@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fopen64,fopen64@GLIBC_2.2.5");
 
-    int fclose(FILE *__stream)
+    int _iosys_fclose(FILE *__stream)
     {
-        TRACE_SYSCALL();
         if(is_filex(__stream))
         {
+            TRACE_SYSCALLN("(%p) -> VFS", __stream);
             auto fx = reinterpret_cast<FILEX*>(__stream);
             auto ret = invoke_fs(&purefs::fs::filesystem::close, fx->fd);
             if(!ret)
@@ -158,21 +161,22 @@ extern "C"
         }
         else
         {
+            TRACE_SYSCALLN("(%p) -> linux fs", __stream);
             return real_fclose(__stream);
         }
     }
-    __asm__(".symver fclose,fclose@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fclose,fclose@GLIBC_2.2.5");
 
-    FILE *fdopen(int __fd, const char *__modes) __THROW
+    FILE *_iosys_fdopen(int __fd, const char *__modes) __THROW
     {
         TRACE_SYSCALL();
-        real_fprintf(stderr, "unimplemented call %s\n", __PRETTY_FUNCTION__);
+        std::cerr << "Unimplemented syscall " <<  __PRETTY_FUNCTION__ << std::endl;
         errno = ENOTSUP;
         return nullptr;
     }
-    __asm__(".symver fdopen,fdopen@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fdopen,fdopen@GLIBC_2.2.5");
 
-    int feof(FILE *__stream) __THROW
+    int _iosys_feof(FILE *__stream) __THROW
     {
         int ret {};
         if(is_filex(__stream))
@@ -204,9 +208,9 @@ extern "C"
         TRACE_SYSCALLN("(%p)=%i",__stream,ret);
         return ret;
     }
-    __asm__(".symver feof,feof@GLIBC_2.2.5");
+    __asm__(".symver _iosys_feof,feof@GLIBC_2.2.5");
 
-    int ferror(FILE * stream) __THROW
+    int _iosys_ferror(FILE * stream) __THROW
     {
         TRACE_SYSCALL();
         if(is_filex(stream))
@@ -219,9 +223,9 @@ extern "C"
             return real_ferror(stream);
         }
     }
-    __asm__(".symver ferror,ferror@GLIBC_2.2.5");
+    __asm__(".symver _iosys_ferror,ferror@GLIBC_2.2.5");
 
-    int fflush(FILE *__stream)
+    int _iosys_fflush(FILE *__stream)
     {
         int ret {};
         if(is_filex(__stream))
@@ -237,9 +241,9 @@ extern "C"
         TRACE_SYSCALLN("(%p)=%i",__stream,ret);
         return ret;
     }
-    __asm__(".symver fflush,fflush@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fflush,fflush@GLIBC_2.2.5");
 
-    int fgetc(FILE *__stream)
+    int _iosys_fgetc(FILE *__stream)
     {
         TRACE_SYSCALL();
         if(is_filex(__stream))
@@ -255,9 +259,9 @@ extern "C"
             return real_fgetc(__stream);
         }
     }
-    __asm__(".symver fgetc,fgetc@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fgetc,fgetc@GLIBC_2.2.5");
 
-    int fgetpos(FILE *__restrict __stream, fpos_t *__restrict __pos)
+    int _iosys_fgetpos(FILE *__restrict __stream, fpos_t *__restrict __pos)
     {
         TRACE_SYSCALL();
         if(is_filex(__stream))
@@ -275,9 +279,9 @@ extern "C"
             return real_fgetpos(__stream, __pos);
         }
     }
-    __asm__(".symver fgetpos,fgetpos@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fgetpos,fgetpos@GLIBC_2.2.5");
 
-    int fgetpos64(FILE *__restrict __stream, fpos64_t *__restrict __pos)
+    int _iosys_fgetpos64(FILE *__restrict __stream, fpos64_t *__restrict __pos)
     {
         TRACE_SYSCALL();
         if(is_filex(__stream))
@@ -295,9 +299,9 @@ extern "C"
             return real_fgetpos64(__stream, __pos);
         }
     }
-    __asm__(".symver fgetpos64,fgetpos64@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fgetpos64,fgetpos64@GLIBC_2.2.5");
 
-    char *fgets(char *__restrict __s, int __n, FILE *__restrict __stream)
+    char *_iosys_fgets(char *__restrict __s, int __n, FILE *__restrict __stream)
     {
         TRACE_SYSCALL();
         if(is_filex(__s))
@@ -327,9 +331,9 @@ extern "C"
             return real_fgets(__s,__n,__stream);
         }
     }
-    __asm__(".symver fgets,fgets@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fgets,fgets@GLIBC_2.2.5");
 
-    int fileno(FILE *__stream) __THROW
+    int _iosys_fileno(FILE *__stream) __THROW
     {
         int ret {};
         if(is_filex(__stream))
@@ -344,9 +348,9 @@ extern "C"
         TRACE_SYSCALLN("(%p)=%i",__stream,ret);
         return ret;
     }
-    __asm__(".symver fileno,fileno@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fileno,fileno@GLIBC_2.2.5");
 
-    int fprintf(FILE *__restrict __stream, const char *__restrict __format, ...)
+    int _iosys_fprintf(FILE *__restrict __stream, const char *__restrict __format, ...)
     {
         constexpr auto buf_len = 4096;
         int iCount;
@@ -387,9 +391,9 @@ extern "C"
         fx->error = errno;
         return iCount;
     }
-    __asm__(".symver fprintf,fprintf@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fprintf,fprintf@GLIBC_2.2.5");
 
-    int fputc(int __c, FILE *__stream)
+    int _iosys_fputc(int __c, FILE *__stream)
     {
         if(!is_filex(__stream))
         {
@@ -405,9 +409,9 @@ extern "C"
             return ret==1?0:ret;
         }
     }
-    __asm__(".symver fputc,fputc@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fputc,fputc@GLIBC_2.2.5");
 
-    int fputs(const char *__restrict __s, FILE *__restrict __stream)
+    int _iosys_fputs(const char *__restrict __s, FILE *__restrict __stream)
     {
         int ret {};
         if(is_filex(__stream))
@@ -425,9 +429,9 @@ extern "C"
         TRACE_SYSCALLN("(%s, %p)=%i",__s, __stream, ret);
         return ret;
     }
-    __asm__(".symver fputs,fputs@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fputs,fputs@GLIBC_2.2.5");
 
-    size_t fread(void *__restrict __ptr, size_t __size, size_t __n, FILE *__restrict __stream)
+    size_t _iosys_fread(void *__restrict __ptr, size_t __size, size_t __n, FILE *__restrict __stream)
     {
         size_t ret {};
         if(__size!=0 && __n!=0)
@@ -454,10 +458,10 @@ extern "C"
         TRACE_SYSCALLN("(%p, %lu, %lu, %p)=%i",__ptr,__size,__n,__stream, ret);
         return ret;
     }
-    __asm__(".symver fread,fread@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fread,fread@GLIBC_2.2.5");
 
 
-    FILE *freopen (const char *__restrict __filename,
+    FILE *_iosys_freopen (const char *__restrict __filename,
                       const char *__restrict __modes,
                       FILE *__restrict __stream)
     {
@@ -473,9 +477,9 @@ extern "C"
             return fopen(__filename, __modes );
         }
     }
-    __asm__(".symver freopen,freopen@GLIBC_2.2.5");
+    __asm__(".symver _iosys_freopen,freopen@GLIBC_2.2.5");
 
-    int fseek (FILE *__stream, long int __off, int __whence)
+    int _iosys_fseek (FILE *__stream, long int __off, int __whence)
     {
         int ret {};
         if(is_filex(__stream))
@@ -491,9 +495,9 @@ extern "C"
         TRACE_SYSCALLN("(%p, %li, %i)=%i",__stream,__off,__whence,ret);
         return ret;
     }
-    __asm__(".symver fseek,fseek@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fseek,fseek@GLIBC_2.2.5");
 
-    int fsetpos (FILE *__stream, const fpos_t *__pos)
+    int _iosys_fsetpos (FILE *__stream, const fpos_t *__pos)
     {
         TRACE_SYSCALL();
         if(!is_filex(__stream))
@@ -507,9 +511,9 @@ extern "C"
             return ret>0?0:ret;
         }
     }
-    __asm__(".symver fsetpos,fsetpos@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fsetpos,fsetpos@GLIBC_2.2.5");
 
-    int fsetpos64 (FILE *__stream, const fpos64_t *__pos)
+    int _iosys_fsetpos64 (FILE *__stream, const fpos64_t *__pos)
     {
         TRACE_SYSCALL();
         if(!is_filex(__stream)) {
@@ -522,10 +526,10 @@ extern "C"
             return ret>0?0:ret;
         }
     }
-    __asm__(".symver fsetpos64,fsetpos64@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fsetpos64,fsetpos64@GLIBC_2.2.5");
 
 
-    long int ftell (FILE *__stream)
+    long int _iosys_ftell (FILE *__stream)
     {
         long int ret {};
         if(is_filex(__stream))
@@ -540,9 +544,9 @@ extern "C"
         TRACE_SYSCALLN("(%p)=%i",__stream, ret);
         return ret;
     }
-    __asm__(".symver ftell,ftell@GLIBC_2.2.5");
+    __asm__(".symver _iosys_ftell,ftell@GLIBC_2.2.5");
 
-    size_t fwrite (const void *__restrict __ptr, size_t __size,
+    size_t _iosys_fwrite (const void *__restrict __ptr, size_t __size,
                           size_t __n, FILE *__restrict __s)
     {
         int ret {};
@@ -569,12 +573,13 @@ extern "C"
                 ret = real_fwrite( __ptr, __size, __n, __s );
             }
         }
-        TRACE_SYSCALLN("(ptr: %p,size: %lu, n: %lu, fil: %p)=%i",__ptr,__size,__n,__s,ret);
+        if (__s != stdout && __s != stderr)
+            TRACE_SYSCALLN("(ptr: %p,size: %lu, n: %lu, fil: %p)=%i",__ptr,__size,__n,__s,ret);
         return ret;
     }
-    __asm__(".symver fwrite,fwrite@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fwrite,fwrite@GLIBC_2.2.5");
 
-    int getc(FILE *__stream)
+    int _iosys_getc(FILE *__stream)
     {
         int ret {};
         if(is_filex(__stream))
@@ -592,9 +597,9 @@ extern "C"
         TRACE_SYSCALLN("(%p)=%i",__stream, ret);
         return ret;
     }
-    __asm__(".symver getc,getc@GLIBC_2.2.5");
+    __asm__(".symver _iosys_getc,getc@GLIBC_2.2.5");
 
-    int putc(int __c, FILE *__stream)
+    int _iosys_putc(int __c, FILE *__stream)
     {
         int ret {};
         if(is_filex(__stream))
@@ -612,9 +617,9 @@ extern "C"
         TRACE_SYSCALLN("(%i %p)=%i",__c,__stream, ret);
         return ret;
     }
-    __asm__(".symver putc,putc@GLIBC_2.2.5");
+    __asm__(".symver _iosys_putc,putc@GLIBC_2.2.5");
 
-    int remove (const char *__filename) __THROW
+    int _iosys_remove (const char *__filename) __THROW
     {
         int ret {};
         if(redirect_to_image(__filename))
@@ -631,9 +636,9 @@ extern "C"
         TRACE_SYSCALLN("(%s)=%i",__filename, ret);
         return ret;
     }
-    __asm__(".symver remove,remove@GLIBC_2.2.5");
+    __asm__(".symver _iosys_remove,remove@GLIBC_2.2.5");
 
-    void rewind (FILE *__stream)
+    void _iosys_rewind (FILE *__stream)
     {
         TRACE_SYSCALLN("(%p)",__stream);
         if(is_filex(__stream))
@@ -647,44 +652,44 @@ extern "C"
             real_rewind(__stream);
         }
     }
-    __asm__(".symver rewind,rewind@GLIBC_2.2.5");
+    __asm__(".symver _iosys_rewind,rewind@GLIBC_2.2.5");
 
 
-    void setbuf (FILE *__restrict , char *__restrict ) __THROW
+    void _iosys_setbuf (FILE *__restrict , char *__restrict ) __THROW
     {
         TRACE_SYSCALL();
-        real_fprintf(stderr, "unimplemented call %s\n", __PRETTY_FUNCTION__ );
+        std::cerr << "Unimplemented syscall " <<  __PRETTY_FUNCTION__ << std::endl;
         errno = ENOTSUP;
     }
-    __asm__(".symver setbuf,setbuf@GLIBC_2.2.5");
+    __asm__(".symver _iosys_setbuf,setbuf@GLIBC_2.2.5");
 
-    int setvbuf (FILE *__restrict __stream, char *__restrict __buf,
+    int _iosys_setvbuf (FILE *__restrict __stream, char *__restrict __buf,
                         int __modes, size_t __n) __THROW
     {
         TRACE_SYSCALL();
-        real_fprintf(stderr, "unimplemented call %s\n", __PRETTY_FUNCTION__ );
+        std::cerr << "Unimplemented syscall " <<  __PRETTY_FUNCTION__ << std::endl;
         errno = ENOTSUP;
         return 0;
     }
-    __asm__(".symver setvbuf,setbuf@GLIBC_2.2.5");
+    __asm__(".symver _iosys_setvbuf,setbuf@GLIBC_2.2.5");
 
 
-    void setbuffer (FILE *__restrict __stream, char *__restrict __buf,
+    void _iosys_setbuffer (FILE *__restrict __stream, char *__restrict __buf,
                            size_t __size) __THROW
     {
         TRACE_SYSCALL();
-        real_fprintf(stderr, "unimplemented call %s\n", __PRETTY_FUNCTION__ );
+        std::cerr << "Unimplemented syscall " <<  __PRETTY_FUNCTION__ << std::endl;
         errno = ENOTSUP;
     }
-    __asm__(".symver setbuffer,setbuffer@GLIBC_2.2.5");
+    __asm__(".symver _iosys_setbuffer,setbuffer@GLIBC_2.2.5");
 
     /* Make STREAM line-buffered.  */
-    void setlinebuf (FILE *__stream) __THROW
+    void _iosys_setlinebuf (FILE *__stream) __THROW
     {
         TRACE_SYSCALL();
         errno = ENOTSUP;
-        real_fprintf(stderr, "unimplemented call %s\n", __PRETTY_FUNCTION__ );
+        std::cerr << "Unimplemented syscall " <<  __PRETTY_FUNCTION__ << std::endl;
     }
-    __asm__(".symver setlinebuf,setlinebuf@GLIBC_2.2.5");
+    __asm__(".symver _iosys_setlinebuf,setlinebuf@GLIBC_2.2.5");
 
 }
