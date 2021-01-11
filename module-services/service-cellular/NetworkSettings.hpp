@@ -25,6 +25,10 @@ class NetworkSettings
      */
     std::vector<std::string> scanOperators(bool fullInfoList = false);
 
+    bool setOperatorAutoSelect();
+    std::string getCurrentOperator() const;
+    bool setOperator(at::response::cops::CopsMode mode, at::response::cops::NameFormat format, const std::string &name);
+
   private:
     ServiceCellular &cellularService;
 };

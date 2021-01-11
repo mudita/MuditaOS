@@ -1,5 +1,18 @@
 # MuditaOS changelog
 
+## Latest Changes
+### Added
+
+* Battery Brownout detection
+
+### Changed
+
+* Input keyboard language files parser from KBD to JSON.
+
+### Fixed
+
+* Fix absent notifications
+
 ## [0.52.1 2020-12-23]
 
 ### Added
@@ -9,6 +22,7 @@
 * Add custom repeat window for the alarm application.
 * Add GUI for custom MMI messages.
 * Add CPU frequency shift mechanism to save power.
+* Add oscillator clock switching mechanisms.
 
 ### Fixed
 
@@ -16,6 +30,7 @@
 * Fix missing texts in the desktop application.
 * Fix occasional cases of no audio during an incoming call.
 * Charging state icons in simulator
+* Fix Debug UART conditional enabling
 
 ### Changed
 

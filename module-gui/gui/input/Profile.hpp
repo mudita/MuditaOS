@@ -6,46 +6,26 @@
 #include <cstdint>
 #include <vector>
 #include <map>
+#include "json/json11.hpp"
+
 namespace gui
 {
 
-    class KeyProfile
-    {
-      public:
-        static const uint32_t none_key; /// defaults to 0
-        uint32_t keyCode = none_key;
-        bool cyclic      = false;
-        std::vector<uint32_t> chars;
-        std::vector<uint32_t> timeouts;
-
-        virtual ~KeyProfile() = default;
-
-        void addCharacters(const std::string &s);
-        void addTimeouts(const std::string &s);
-    };
-
     class Profile
     {
+      private:
         std::string name;
-        std::map<uint32_t, KeyProfile *> keys = {};
+        json11::Json inputChars;
 
-        void addCharacters(KeyProfile *pk, const std::string &s) const;
-        void addTimeouts(KeyProfile *pk, const std::string &s) const;
-        void addKeyProfile(KeyProfile *pk);
-        void setName(const std::string &name);
-        const KeyProfile *getKeyProfile(uint32_t keyCode) const;
+        const json11::Json createJson(const std::string &filepath);
 
       public:
-        void clear();
-        Profile() = default;
-        Profile(const std::string &name);
-        Profile(Profile &&p);
-        virtual ~Profile();
+        static constexpr uint32_t none_key = 0;
+        Profile()                          = default;
+        explicit Profile(const std::string &filepath);
 
-        [[nodiscard]] std::string getName() const noexcept;
-        bool load(const std::string &filename);
-
-        uint32_t get(bsp::KeyCodes code, uint32_t times);
+        [[nodiscard]] const std::string &getName() noexcept;
+        [[nodiscard]] uint32_t getCharKey(bsp::KeyCodes code, uint32_t times);
     };
 
 } /* namespace gui */

@@ -11,7 +11,6 @@ namespace at
 {
     namespace response
     {
-        constexpr auto StringDelimiter = "\"";
 
         std::optional<std::string> getResponseLineATCommand(const at::Result &resp, std::string_view head)
         {
@@ -36,7 +35,23 @@ namespace at
             }
             return std::nullopt;
         }
+        std::optional<ResponseTokens> getTokensForATResults(const at::Result &resp, std::string_view head)
+        {
+            if (resp.code != at::Result::Code::OK)
+                return std::nullopt;
 
+            std::vector<std::vector<std::string>> parts;
+            for (auto el : resp.response) {
+                if (el.compare(0, head.length(), head) == 0) {
+                    auto body = el.substr(head.length());
+                    parts.push_back(utils::split(body, ","));
+                }
+            }
+
+            return parts;
+        }
+
+        constexpr std::string_view AT_COPS = "+COPS:";
         bool parseCOPS(const at::Result &resp, std::vector<cops::Operator> &ret)
         {
             /// +COPS: (list of supported <stat>,long alphanumeric <oper>,
@@ -53,7 +68,6 @@ namespace at
             constexpr auto minOperatorParams = 4;
             constexpr auto maxOperatorParams = 5;
 
-            constexpr std::string_view AT_COPS = "+COPS:";
             if (auto line = getResponseLineATCommand(resp, AT_COPS); line) {
                 const auto &commandLine = *line;
 
@@ -98,15 +112,60 @@ namespace at
 
             return false;
         }
+
+        bool parseCOPS(const at::Result &resp, cops::CurrentOperatorInfo &ret)
+        {
+            /// ret as +COPS: <mode>[,<format>[,<oper>][,<Act>]]
+            /// parameters could be 1,2,3,4 all optional in documentation !
+
+            constexpr auto minCOPSLength = 1;
+
+            if (auto line = getResponseLineATCommand(resp, AT_COPS); line) {
+                const auto &commandLine = *line;
+
+                if (commandLine.length() < minCOPSLength) {
+                    return false;
+                }
+
+                auto opParams = utils::split(commandLine, ",");
+                cops::Operator op;
+
+                switch (opParams.size()) {
+                case 4:
+                    op.technology = static_cast<cops::AccessTechnology>(utils::getNumericValue<int>(opParams[3]));
+                    [[fallthrough]];
+                case 3: {
+                    ret.setFormat(static_cast<cops::NameFormat>(utils::getNumericValue<int>(opParams[1])));
+                    utils::findAndReplaceAll(opParams[2], at::response::StringDelimiter, "");
+                    op.setNameByFormat(ret.getFormat(), opParams[2]);
+                }
+                    ret.setOperator(op);
+                    [[fallthrough]];
+                case 2:
+                    ret.setFormat(static_cast<cops::NameFormat>(utils::getNumericValue<int>(opParams[1])));
+                    [[fallthrough]];
+                case 1:
+                    ret.setMode(static_cast<cops::CopsMode>(utils::getNumericValue<int>(opParams[0])));
+                    break;
+                default:
+                    return false;
+                }
+
+                return true;
+            }
+            return false;
+        }
+
         bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret)
         {
             /// parse only first result from QPINC
             const std::string_view AT_QPINC_SC = "+QPINC:";
             if (auto tokens = getTokensForATCommand(resp, AT_QPINC_SC); tokens) {
                 constexpr int QPINC_TokensCount = 3;
-                if ((*tokens).size() == QPINC_TokensCount) {
-                    utils::toNumeric((*tokens)[1], ret.PinCounter);
-                    utils::toNumeric((*tokens)[2], ret.PukCounter);
+                auto pinc_tokens                = (*tokens);
+                if (pinc_tokens.size() == QPINC_TokensCount) {
+                    utils::toNumeric(pinc_tokens[1], ret.PinCounter);
+                    utils::toNumeric(pinc_tokens[2], ret.PukCounter);
                     return true;
                 }
             }

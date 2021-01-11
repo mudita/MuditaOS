@@ -17,7 +17,7 @@ namespace at::urc
 
       public:
         static constexpr std::string_view head = "+CMTI";
-        static auto isURC(const std::string uHead) -> bool
+        static auto isURC(const std::string &uHead) -> bool
         {
             return uHead.find(Cmti::head) != std::string::npos;
         }

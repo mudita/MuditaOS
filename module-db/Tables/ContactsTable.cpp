@@ -79,20 +79,20 @@ ContactsTableRow ContactsTable::getById(uint32_t id)
 
 ContactsTableRow ContactsTable::getByIdWithTemporary(uint32_t id)
 {
-    LOG_DEBUG("%s", __FUNCTION__);
+    debug_db_data("%s", __FUNCTION__);
     auto retQuery = db->query(statements::selectWithTemp, id);
     return getByIdCommon(std::move(retQuery));
 }
 
 ContactsTableRow ContactsTable::getByIdCommon(std::unique_ptr<QueryResult> retQuery)
 {
-    LOG_DEBUG("%s", __FUNCTION__);
+    debug_db_data("%s", __FUNCTION__);
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         LOG_DEBUG("no results");
         return ContactsTableRow();
     }
 
-    LOG_DEBUG(
+    debug_db_data(
         "got results: %" PRIu32 "; ID: %" PRIu32, retQuery->getRowCount(), (*retQuery)[ColumnName::id].getInt32());
     return ContactsTableRow{
         {.ID = (*retQuery)[ColumnName::id].getUInt32()},
@@ -133,7 +133,7 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string &primaryNa
     if (!number.empty())
         q += "t3.number_e164 like '%%" + number + "%%'";
 
-    LOG_DEBUG("query: \"%s\"", q.c_str());
+    debug_db_data("query: \"%s\"", q.c_str());
     auto retQuery = db->query(q.c_str());
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
@@ -190,7 +190,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByName(std::uint32_t limit
     std::vector<std::uint32_t> ids_limit;
 
     std::string query = GetSortedByNameQueryString(ContactQuerySection::Favourites);
-    LOG_DEBUG("query: %s", query.c_str());
+    debug_db_data("query: %s", query.c_str());
     auto queryRet = db->query(query.c_str());
     if (queryRet == nullptr) {
 
@@ -202,7 +202,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByName(std::uint32_t limit
         } while (queryRet->nextRow());
 
     query = GetSortedByNameQueryString(ContactQuerySection::Mixed);
-    LOG_DEBUG("query: %s", query.c_str());
+    debug_db_data("query: %s", query.c_str());
     queryRet = db->query(query.c_str());
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return ids;
@@ -323,7 +323,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
 
     query += " ;";
 
-    LOG_DEBUG("query: %s", query.c_str());
+    debug_db_data("query: %s", query.c_str());
     auto queryRet = db->query(query.c_str());
     if ((queryRet == nullptr) || (queryRet->getRowCount() == 0)) {
         return ids;

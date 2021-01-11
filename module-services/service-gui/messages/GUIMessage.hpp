@@ -7,13 +7,12 @@
 #include <Service/Message.hpp>
 #include <core/DrawCommand.hpp>
 
-namespace sgui
+namespace service::gui
 {
-
     class GUIMessage : public sys::DataMessage
     {
       public:
-        GUIMessage() : sys::DataMessage(MessageType::GUIMessage){};
+        GUIMessage() : sys::DataMessage(MessageType::GUIMessage)
+        {}
     };
-
-} /* namespace sgui */
+} // namespace service::gui

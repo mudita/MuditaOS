@@ -62,6 +62,14 @@ Queue::~Queue()
     vQueueDelete(handle);
 }
 
+bool Queue::Overwrite(void *item)
+{
+    BaseType_t success;
+
+    success = xQueueOverwrite(handle, item);
+
+    return success == pdTRUE ? true : false;
+}
 
 bool Queue::Enqueue(void *item)
 {
