@@ -15,6 +15,7 @@ namespace purefs::blkdev
 
     auto disk_image::probe(unsigned int flags) -> int
     {
+        std::lock_guard<std::recursive_mutex> m_lock(m_mtx);
         m_filedes = ::open(m_image_name.c_str(), O_RDWR, O_SYNC);
         if (!m_filedes)
             return m_filedes;
@@ -24,10 +25,11 @@ namespace purefs::blkdev
             return -errno;
         }
         m_sectors = fst.st_size / sector_size;
-        return 0;
+        return fst.st_size % sector_size;
     }
     auto disk_image::cleanup() -> int
     {
+        std::lock_guard<std::recursive_mutex> m_lock(m_mtx);
         int ret{-EBADFD};
         if (m_filedes) {
             if (m_filedes) {
@@ -40,10 +42,11 @@ namespace purefs::blkdev
     }
     auto disk_image::write(const void *buf, sector_t lba, std::size_t count) -> int
     {
+        std::lock_guard<std::recursive_mutex> m_lock(m_mtx);
         if (!range_valid(lba, count)) {
             return -ERANGE;
         }
-        auto offs = ::lseek(m_filedes, off_t(lba) * sector_size, SEEK_SET);
+        auto offs = ::lseek64(m_filedes, off64_t(lba) * off64_t(sector_size), SEEK_SET);
         if (offs < 0) {
             return offs;
         }
@@ -67,10 +70,11 @@ namespace purefs::blkdev
     }
     auto disk_image::read(void *buf, sector_t lba, std::size_t count) -> int
     {
+        std::lock_guard<std::recursive_mutex> m_lock(m_mtx);
         if (!range_valid(lba, count)) {
             return -ERANGE;
         }
-        auto offs = ::lseek(m_filedes, off_t(lba) * sector_size, SEEK_SET);
+        auto offs = ::lseek64(m_filedes, off64_t(lba) * off64_t(sector_size), SEEK_SET);
         if (offs < 0) {
             return offs;
         }
@@ -88,6 +92,7 @@ namespace purefs::blkdev
     }
     auto disk_image::sync() -> int
     {
+        std::lock_guard<std::recursive_mutex> m_lock(m_mtx);
         int ret{-EBADFD};
         if (m_filedes) {
             ret = fsync(m_filedes);
@@ -98,6 +103,7 @@ namespace purefs::blkdev
     }
     auto disk_image::status() const -> media_status
     {
+        std::lock_guard<std::recursive_mutex> m_lock(m_mtx);
         struct stat st;
         auto ret = ::stat(m_image_name.c_str(), &st);
         if (!ret)
@@ -107,6 +113,7 @@ namespace purefs::blkdev
     }
     auto disk_image::get_info(info_type what) const -> scount_t
     {
+        std::lock_guard<std::recursive_mutex> m_lock(m_mtx);
         switch (what) {
         case info_type::sector_size:
             return sector_size;
