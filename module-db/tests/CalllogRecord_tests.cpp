@@ -7,25 +7,27 @@
 #include "Database/Database.hpp"
 #include "Databases/CalllogDB.hpp"
 
-
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdint>
+#include <cstring>
+#include <filesystem>
 #include <algorithm>
 #include <iostream>
-#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Calllog Record tests")
 {
     Database::initialize();
 
-    const auto callogPath   = (purefs::dir::getUserDiskPath() / "callog.db").c_str();
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
-    std::filesystem::remove(callogPath);
-    std::filesystem::remove(contactsPath);
+    const auto calllogPath  = (std::filesystem::path{"user"} / "calllog.db");
+    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    if (std::filesystem::exists(calllogPath)) {
+        REQUIRE(std::filesystem::remove(calllogPath));
+    }
+    if (std::filesystem::exists(contactsPath)) {
+        REQUIRE(std::filesystem::remove(contactsPath));
+    }
 
-    CalllogDB calllogDb(callogPath);
-    ContactsDB contactsDb(contactsPath);
+    CalllogDB calllogDb(calllogPath.c_str());
+    ContactsDB contactsDb(contactsPath.c_str());
 
     REQUIRE(calllogDb.isInitialized());
     REQUIRE(contactsDb.isInitialized());
@@ -55,6 +57,11 @@ TEST_CASE("Calllog Record tests")
     testRec.phoneNumber  = utils::PhoneNumber("600123456").getView();
     testRec.isRead       = false;
 
+    const auto callsCount = calllogRecordInterface.GetCount() + 1;
+    // clear calllog table
+    for (std::size_t id = 1; id < callsCount; id++) {
+        REQUIRE(calllogRecordInterface.RemoveByID(id));
+    }
     // Add 4 records
     REQUIRE(calllogRecordInterface.Add(testRec));
     REQUIRE(calllogRecordInterface.Add(testRec));
@@ -75,7 +82,6 @@ TEST_CASE("Calllog Record tests")
         REQUIRE(call.isRead == testRec.isRead);
         // below fields will be filled in with contact data
         REQUIRE_FALSE(call.contactId == testRec.contactId);
-        REQUIRE(call.contactId == 1);
         REQUIRE_FALSE(call.name == testRec.name);
         REQUIRE(call.name == "600123456");
     }

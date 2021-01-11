@@ -3,16 +3,16 @@
 
 #include <catch2/catch.hpp>
 
+#include <filesystem>
 #include <Tables/NotesTable.hpp>
 #include "Database/Database.hpp"
 #include "Databases/NotesDB.hpp"
-#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Notes Table tests")
 {
     Database::initialize();
 
-    auto notesDb = std::make_unique<NotesDB>((purefs::dir::getUserDiskPath() / "notes.db").c_str());
+    auto notesDb = std::make_unique<NotesDB>((std::filesystem::path{"user"} / "notes.db").c_str());
     REQUIRE(notesDb->isInitialized());
 
     NotesTable table{notesDb.get()};

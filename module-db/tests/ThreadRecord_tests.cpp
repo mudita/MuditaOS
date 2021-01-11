@@ -17,26 +17,29 @@
 #include "queries/messages/threads/QueryThreadRemove.hpp"
 #include "queries/messages/threads/QueryThreadsGet.hpp"
 #include "queries/messages/sms/QuerySMSGetLastByThreadID.hpp"
-#include <purefs/filesystem_paths.hpp>
 
 #include <algorithm>
-
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <filesystem>
 
 TEST_CASE("Thread Record tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (purefs::dir::getUserDiskPath() / "contacts.db").c_str();
-    const auto smsPath      = (purefs::dir::getUserDiskPath() / "sms.db").c_str();
-    std::filesystem::remove(contactsPath);
-    std::filesystem::remove(smsPath);
+    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    const auto smsPath      = (std::filesystem::path{"user"} / "sms.db");
+    if (std::filesystem::exists(contactsPath)) {
+        REQUIRE(std::filesystem::remove(contactsPath));
+    }
+    if (std::filesystem::exists(smsPath)) {
+        REQUIRE(std::filesystem::remove(smsPath));
+    }
 
-    auto smsDB = std::make_unique<SmsDB>(smsPath);
+    auto smsDB = std::make_unique<SmsDB>(smsPath.c_str());
     REQUIRE(smsDB->isInitialized());
-    auto contactsDB = std::make_unique<ContactsDB>(contactsPath);
+    auto contactsDB = std::make_unique<ContactsDB>(contactsPath.c_str());
     REQUIRE(contactsDB->isInitialized());
 
     const uint32_t dateTest      = 123456789;
@@ -52,6 +55,12 @@ TEST_CASE("Thread Record tests")
     recordIN.snippet   = snippetTest;
     recordIN.type      = typeTest;
     recordIN.contactID = contactIDTest;
+
+    const auto threadRecords = threadRecordInterface1.GetCount() + 1;
+    // clear all records
+    for (std::size_t id = 1; id < threadRecords; id++) {
+        REQUIRE(threadRecordInterface1.RemoveByID(id));
+    }
 
     // Add 2 records
     REQUIRE(threadRecordInterface1.Add(recordIN));
