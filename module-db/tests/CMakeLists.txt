@@ -1,4 +1,4 @@
-if (NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/sys/user")
+﻿if (NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/sys/user")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/sys/user")
 endif()
 
@@ -24,16 +24,15 @@ add_catch2_executable(
         "${CMAKE_CURRENT_SOURCE_DIR}/NotesRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/NotesTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/CalllogRecord_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/ContactsRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/SMSRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/ThreadRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/AlarmsRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/SMSTemplateRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/NotificationsRecord_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/EventsRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/QueryInterface.cpp"
         
     LIBS
         module-db
         module-vfs
+        iosyscalls
 )

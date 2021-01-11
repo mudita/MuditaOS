@@ -3,12 +3,12 @@
 
 #include <catch2/catch.hpp>
 
+#include <filesystem>
 #include <Interface/NotesRecord.hpp>
 #include <queries/notes/QueryNotesGet.hpp>
 #include <queries/notes/QueryNotesGetByText.hpp>
 #include <queries/notes/QueryNoteRemove.hpp>
 #include <queries/notes/QueryNoteStore.hpp>
-#include <purefs/filesystem_paths.hpp>
 
 #include "Database/Database.hpp"
 #include "Databases/NotesDB.hpp"
@@ -17,7 +17,7 @@ TEST_CASE("Notes Record tests")
 {
     Database::initialize();
 
-    auto notesDb = std::make_unique<NotesDB>((purefs::dir::getUserDiskPath() / "notes.db").c_str());
+    auto notesDb = std::make_unique<NotesDB>((std::filesystem::path{"user"} / "notes.db").c_str());
     REQUIRE(notesDb->isInitialized());
 
     NotesRecordInterface notesRecordInterface{notesDb.get()};
