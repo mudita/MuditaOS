@@ -4,6 +4,7 @@
 #pragma once
 
 #include <purefs/blkdev/disk.hpp>
+#include <mutex>
 
 namespace purefs::blkdev
 {
@@ -31,5 +32,6 @@ namespace purefs::blkdev
         int m_filedes{-1};
         unsigned long m_sectors{0};
         std::string m_image_name;
+        mutable std::recursive_mutex m_mtx;
     };
 } // namespace purefs::blkdev
