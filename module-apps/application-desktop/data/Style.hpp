@@ -9,7 +9,7 @@ namespace style::desktop
     namespace notifications
     {
         constexpr auto SpanSize     = 8;
-        constexpr auto DigitSize    = 14;
+        constexpr auto DigitSize    = 16;
         constexpr auto IconWidth    = 35;
         constexpr auto TextMaxWidth = 250;
 

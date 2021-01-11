@@ -30,4 +30,9 @@ namespace bsp{
     {
     	return currentFrequency;
     }
+
+    LowPowerMode::OscillatorSource LowPowerMode::GetCurrentOscillatorSource() const noexcept
+    {
+    	return currentOscSource;
+    }
 }

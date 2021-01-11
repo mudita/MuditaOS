@@ -23,7 +23,7 @@ namespace at::urc
             NoAnswer
         };
 
-        static auto isURC(const std::string uHead) -> std::optional<URCResponseType>
+        static auto isURC(const std::string &uHead) -> std::optional<URCResponseType>
         {
             for (auto &resp : urcResponses) {
                 if (uHead.find(resp.second) != std::string::npos) {

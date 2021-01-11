@@ -12,6 +12,7 @@ namespace at::urc
     class Ctze;
     class Qind;
     class Cpin;
+    class Qiurc;
     class PoweredDown;
     class UrcResponse;
 
@@ -25,6 +26,7 @@ namespace at::urc
         virtual void Handle(Ctze &urc)        = 0;
         virtual void Handle(Qind &urc)        = 0;
         virtual void Handle(Cpin &urc)        = 0;
+        virtual void Handle(Qiurc &urc)       = 0;
         virtual void Handle(PoweredDown &urc) = 0;
         virtual void Handle(UrcResponse &urc) = 0;
     };

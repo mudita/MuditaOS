@@ -165,7 +165,7 @@ namespace gui
     {
         auto tmp_document = text::RichTextParser().parse(text, &format);
         if (tmp_document->isEmpty()) {
-            LOG_ERROR("Nothing to parse/parser error in rich text: %s", text.c_str());
+            debug_text("Nothing to parse/parser error in rich text: %s", text.c_str());
             addText(text); // fallback
         }
         for (auto block : tmp_document->getBlockCursor(0)) {
@@ -545,7 +545,7 @@ namespace gui
 
         auto code = translator.handle(inputEvent.key, mode ? mode->get() : "");
 
-        if (code != KeyProfile::none_key && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
+        if (code != Profile::none_key && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
 
             setCursorStartPosition(CursorStartPosition::Offset);
 

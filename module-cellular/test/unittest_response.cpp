@@ -96,4 +96,59 @@ TEST_CASE("Response COPS")
         resp.response.push_back("+COPS: (2,\"PLAY\",\"PLAY\", 4)(");
         REQUIRE(at::response::parseCOPS(resp, ret) == false);
     }
+
+    SECTION("OK COPS? - return operator")
+    {
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        at::response::cops::CurrentOperatorInfo ret;
+        resp.response.push_back("+COPS: 0,0,\"PLAY\",2");
+        resp.response.push_back("OK");
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::parseCOPS(resp, ret) == true);
+        REQUIRE(ret.getOperator());
+        REQUIRE(ret.getMode() == at::response::cops::CopsMode::Automatic);
+        REQUIRE(ret.getFormat() == at::response::cops::NameFormat::Long);
+        auto op = *ret.getOperator();
+        REQUIRE(op.longName == "PLAY");
+        REQUIRE(op.technology == at::response::cops::AccessTechnology::UTRAN);
+    }
+
+    SECTION("OK COPS? - return operator no act")
+    {
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        at::response::cops::CurrentOperatorInfo ret;
+        resp.response.push_back("+COPS: 0,0,\"PLAY\"");
+        resp.response.push_back("OK");
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::parseCOPS(resp, ret) == true);
+        REQUIRE(ret.getOperator());
+        REQUIRE(ret.getMode() == at::response::cops::CopsMode::Automatic);
+        REQUIRE(ret.getFormat() == at::response::cops::NameFormat::Long);
+        auto op = *ret.getOperator();
+        REQUIRE(op.longName == "PLAY");
+    }
+
+    SECTION("OK COPS? - no operator")
+    {
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        at::response::cops::CurrentOperatorInfo ret;
+        resp.response.push_back("+COPS: 0");
+        resp.response.push_back("OK");
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::parseCOPS(resp, ret) == true);
+        REQUIRE(ret.getMode() == at::response::cops::CopsMode::Automatic);
+    }
+    SECTION("WRONG COPS? - to many")
+    {
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        at::response::cops::CurrentOperatorInfo ret;
+        resp.response.push_back("+COPS: 0,0,\"PLAY\",2, 3");
+        resp.response.push_back("OK");
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::parseCOPS(resp, ret) == false);
+    }
 }

@@ -12,7 +12,7 @@ namespace at::urc
       public:
         static constexpr std::string_view head_immediate = "POWERED DOWN";
         static constexpr std::string_view head_normal    = "NORMAL POWER DOWN";
-        static auto isURC(const std::string uHead) -> bool
+        static auto isURC(const std::string &uHead) -> bool
         {
             auto isImmediatePowerDown = uHead.find(PoweredDown::head_immediate) != std::string::npos;
             auto isNormalPowerDown    = uHead.find(PoweredDown::head_normal) != std::string::npos;

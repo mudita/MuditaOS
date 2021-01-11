@@ -12,6 +12,7 @@
 #include <UrcPoweredDown.hpp>
 #include <UrcResponse.hpp>
 #include <UrcCpin.hpp>
+#include <UrcQiurc.hpp>
 using namespace at::urc;
 
 std::unique_ptr<Urc> UrcFactory::Create(const std::string &urcMessage)
@@ -50,6 +51,9 @@ std::unique_ptr<Urc> UrcFactory::Create(const std::string &urcMessage)
     }
     else if (auto type = UrcResponse::isURC(head)) {
         return std::make_unique<UrcResponse>(type.value());
+    }
+    else if (Qiurc::isURC(head)) {
+        return std::make_unique<Qiurc>(body);
     }
 
     return std::make_unique<Urc>(body, head);

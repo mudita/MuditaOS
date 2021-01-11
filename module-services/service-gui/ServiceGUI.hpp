@@ -3,20 +3,20 @@
 
 #pragma once
 
-// module-gui
-
 #include <Common.hpp>
-#include <gui/core/Context.hpp>
-#include <gui/core/Renderer.hpp>
-#include <gui/input/Translator.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
+#include <Service/Timer.hpp>
+
+#include "messages/RenderingFinished.hpp"
+
+#include "ContextPool.hpp"
+#include "DrawCommandsQueue.hpp"
 
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace gui
 {
@@ -24,76 +24,64 @@ namespace gui
     class DrawCommand;
 } // namespace gui
 
-namespace sgui
+namespace service::gui
 {
-
     class WorkerGUI;
 
     class ServiceGUI : public sys::Service
     {
         friend WorkerGUI;
 
-      protected:
-        // this is where every incomming frame is painted.
-        gui::Context *renderContext;
-        // this buffer is provided to eink
-        gui::Context *transferContext;
-        // ID of the last rendered frame
-        uint32_t renderFrameCounter;
-        // ID of the last frame sent to eink for rendering
-        uint32_t transferedFrameCounter;
-        // Horizontal size of the screen in pixels
-        uint32_t screenWidth;
-        // vertical size of the screen in pixels
-        uint32_t screenHeight;
-        // object responsible for rendering images to context
-        gui::Renderer renderer;
-        // flag that defines whether eink is ready for new frame buffer
-        volatile bool einkReady   = false;
-        volatile bool requestSent = false;
-        volatile bool rendering   = false;
-        // set of commands recently received. If this vector is not empty and new set of commands is received
-        // previous commands are removed.
-        std::list<std::unique_ptr<gui::DrawCommand>> commands;
-        //	uint32_t timer_id= 0;
-        gui::RefreshModes mode = gui::RefreshModes::GUI_REFRESH_DEEP;
-
-        // semaphore used to protect commands vector while commands are taken from service to worker.
-        SemaphoreHandle_t semCommands;
-
-        std::unique_ptr<WorkerGUI> worker;
-
-        /**
-         * Flag controls process of redrawing screen when suspend is in progress.
-         */
-        bool suspendInProgress = false;
-        /**
-         * Flag controls process of redrawing screen when phone is shutting down.
-         */
-        bool shutdownInProgress = false;
-
-        void sendBuffer();
-        void sendToRender();
-
       public:
-        ServiceGUI(const std::string &name,
-                   std::string parent    = "",
-                   uint32_t screenWidth  = 480,
-                   uint32_t screenHeight = 600);
-        ~ServiceGUI();
-
-        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        explicit ServiceGUI(const std::string &name, std::string parent = {});
+        ~ServiceGUI() noexcept override;
 
         sys::ReturnCodes InitHandler() override;
-
         sys::ReturnCodes DeinitHandler() override;
-
-        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
       private:
+        struct CachedRender
+        {
+            int contextId;
+            ::gui::RefreshModes refreshMode;
+        };
+        enum class State
+        {
+            NotInitialised,
+            Idle,
+            Busy,
+            Suspended
+        };
+
+        static void initAssetManagers();
+        void registerMessageHandlers();
+
+        void cacheRender(int contextId, ::gui::RefreshModes refreshMode);
+        void invalidateCache();
+
+        void prepareDisplay(::gui::RefreshModes refreshMode);
+        void notifyRenderer(std::list<std::unique_ptr<::gui::DrawCommand>> &&commands, ::gui::RefreshModes refreshMode);
+        void enqueueDrawCommands(DrawCommandsQueue::QueueItem &&item);
+        void sendOnDisplay(::gui::Context *context, int contextId, ::gui::RefreshModes refreshMode);
+        void scheduleContextRelease(int contextId);
+        bool isNextFrameReady() const noexcept;
+        void trySendNextFrame();
+
+        void setState(State state) noexcept;
+        bool isInState(State state) const noexcept;
+
         sys::MessagePointer handleDrawMessage(sys::Message *message);
         sys::MessagePointer handleGUIRenderingFinished(sys::Message *message);
-        sys::MessagePointer handleGUIDisplayReady(sys::Message *message);
-    };
+        sys::MessagePointer handleEinkReady(sys::Message *message);
+        sys::MessagePointer handleImageDisplayedNotification(sys::Message *message);
 
-} /* namespace sgui */
+        std::unique_ptr<ContextPool> contextPool;
+        std::unique_ptr<WorkerGUI> worker;
+        std::unique_ptr<DrawCommandsQueue> commandsQueue;
+        std::optional<CachedRender> cachedRender;
+        std::unique_ptr<sys::Timer> contextReleaseTimer;
+        State currentState;
+    };
+} // namespace service::gui

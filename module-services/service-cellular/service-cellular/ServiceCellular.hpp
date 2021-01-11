@@ -9,6 +9,8 @@
 #include "CellularMessage.hpp"
 #include "State.hpp"
 #include "USSD.hpp"
+#include "PacketData.hpp"
+#include "PacketDataCellularMessage.hpp"
 
 #include <Modem/TS0710/DLC_channel.h>
 #include <Modem/TS0710/TS0710.h>
@@ -46,6 +48,11 @@ namespace sys
     class Timer;
 } // namespace sys
 
+namespace packet_data
+{
+    class PacketData;
+    class PDPContext;
+} // namespace packet_data
 class ServiceCellular : public sys::Service
 {
 
@@ -159,6 +166,8 @@ class ServiceCellular : public sys::Service
     void CallStateTimerHandler();
     DLC_channel::Callback_t notificationCallback = nullptr;
 
+    std::unique_ptr<packet_data::PacketData> packetData;
+
     cellular::State state;
     bsp::Board board = bsp::Board::none;
 
@@ -221,6 +230,7 @@ class ServiceCellular : public sys::Service
     bool handle_fatal_failure();
     bool handle_ready();
     std::unique_ptr<settings::Settings> settings = std::make_unique<settings::Settings>(this);
+    bool handle_apn_conf_procedure();
 
     bool handleAllMessagesFromMessageStorage();
     [[nodiscard]] SMSRecord createSMSRecord(const UTF8 &decodedMessage,
@@ -260,8 +270,27 @@ class ServiceCellular : public sys::Service
     std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
         CellularStartOperatorsScanMessage *msg);
 
+    std::shared_ptr<CellularSetOperatorAutoSelectResponse> handleCellularSetOperatorAutoSelect(
+        CellularSetOperatorAutoSelectMessage *msg);
+    std::shared_ptr<CellularGetCurrentOperatorResponse> handleCellularGetCurrentOperator(
+        CellularGetCurrentOperatorMessage *msg);
+    std::shared_ptr<CellularGetAPNResponse> handleCellularGetAPNMessage(CellularGetAPNMessage *msg);
+    std::shared_ptr<CellularSetAPNResponse> handleCellularSetAPNMessage(CellularSetAPNMessage *msg);
+    std::shared_ptr<CellularSetOperatorResponse> handleCellularSetOperator(CellularSetOperatorMessage *msg);
+    std::shared_ptr<CellularSetDataTransferResponse> handleCellularSetDataTransferMessage(
+        CellularSetDataTransferMessage *msg);
+    std::shared_ptr<CellularGetDataTransferResponse> handleCellularGetDataTransferMessage(
+        CellularGetDataTransferMessage *msg);
+    std::shared_ptr<CellularActivateContextResponse> handleCellularActivateContextMessage(
+        CellularActivateContextMessage *msg);
+    std::shared_ptr<CellularDeactivateContextResponse> handleCellularDeactivateContextMessage(
+        CellularDeactivateContextMessage *msg);
+    std::shared_ptr<CellularGetActiveContextsResponse> handleCellularGetActiveContextsMessage(
+        CellularGetActiveContextsMessage *msg);
     friend class CellularUrcHandler;
     friend class SimCard;
     friend class CellularRequestHandler;
     friend class NetworkSettings;
+    friend class packet_data::PDPContext;
+    friend class packet_data::PacketData;
 };

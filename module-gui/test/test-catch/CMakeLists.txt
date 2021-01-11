@@ -9,6 +9,7 @@ add_catch2_executable(
                 test-gui-resizes.cpp
                 ../mock/TestWindow.cpp
                 ../mock/InitializedFontManager.cpp
+        test-language-input-parser.cpp
         INCLUDE
                 ..
         LIBS
