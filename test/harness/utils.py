@@ -55,32 +55,32 @@ application_keypath = {
 }
 
 keymap = {
-    "a": "2",
-    "b": "22",
-    "c": "222",
-    "d": "3",
-    "e": "33",
-    "f": "333",
-    "g": "4",
-    "h": "44",
-    "i": "444",
-    "j": "5",
-    "k": "55",
-    "l": "555",
-    "m": "6",
-    "n": "66",
-    "o": "666",
-    "p": "7",
-    "q": "77",
-    "r": "777",
-    "s": "7777",
-    "t": "8",
-    "u": "88",
-    "v": "888",
-    "w": "9",
-    "x": "99",
-    "y": "999",
-    "z": "9999",
+    "A": "2",
+    "B": "22",
+    "C": "222",
+    "D": "3",
+    "E": "33",
+    "F": "333",
+    "G": "4",
+    "H": "44",
+    "I": "444",
+    "J": "5",
+    "K": "55",
+    "L": "555",
+    "M": "6",
+    "N": "66",
+    "O": "666",
+    "P": "7",
+    "Q": "77",
+    "R": "777",
+    "S": "7777",
+    "T": "8",
+    "U": "88",
+    "V": "888",
+    "W": "9",
+    "X": "99",
+    "Y": "999",
+    "Z": "9999",
     " ": "0",
     ".": "1",
     ",": "11",
@@ -101,8 +101,8 @@ keymap = {
 
 
 def send_keystoke(keypath, connection):
-    for i in keypath:
-        connection.send_key(key_codes[i])
+    for key in keypath:
+        connection.send_key_code(key_codes[key])
         time.sleep(0.3)
 
 
@@ -116,23 +116,23 @@ def send_char(char: str, connection):
         key_type = Keytype.long_press
         if last_char is char:
             print("repeated key!")
-            connection.send_key(key_codes["right"])
-        connection.send_key(int(char), key_type)
-        connection.send_key(key_codes["right"])
+            connection.send_key_code(key_codes["right"])
+        connection.send_key_code(int(char), key_type)
+        connection.send_key_code(key_codes["right"])
         last_char = char
 
     else:
         if last_char is keymap[char][0]:
             print("repeated key!")
-            connection.send_key(key_codes["right"], key_type)
+            connection.send_key_code(key_codes["right"], key_type)
         for key in keymap[char]:
-            connection.send_key(int(key), key_type)
+            connection.send_key_code(int(key), key_type)
         last_char = keymap[char][0]
 
 
 def send_number(number: str, connection):
     if number.isnumeric():
         for digit in number:
-            connection.send_key(int(digit))
+            connection.send_key_code(int(digit))
             time.sleep(0.3)
 

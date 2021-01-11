@@ -30,7 +30,7 @@ class Harness:
         found = serial.CDCSerial.find_Pures()
         if found:
             port = found[0]
-            return cls(found[0])
+            return cls(port)
         else:
             raise TestError(Error.PORT_NOT_FOUND)
 
@@ -42,12 +42,12 @@ class Harness:
 
     def unlock_phone(self):
         if self.connection.is_phone_locked():
-            self.connection.send_key(key_codes["enter"])
-            self.connection.send_key(key_codes["#"])
-            self.connection.send_key(3)
-            self.connection.send_key(3)
-            self.connection.send_key(3)
-            self.connection.send_key(3)
+            self.connection.send_key_code(key_codes["enter"])
+            self.connection.send_key_code(key_codes["#"])
+            self.connection.send_key_code(3)
+            self.connection.send_key_code(3)
+            self.connection.send_key_code(3)
+            self.connection.send_key_code(3)
             log.info("Phone unlocked")
         else:
             log.info("Phone already unlocked")
