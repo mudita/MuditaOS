@@ -13,7 +13,6 @@
 #include "application-call/ApplicationCall.hpp"
 #include "application-call/data/CallSwitchData.hpp"
 
-#include <bits/stdint-uintn.h>
 #include <i18n/i18n.hpp>
 
 #include <service-audio/AudioServiceAPI.hpp>
