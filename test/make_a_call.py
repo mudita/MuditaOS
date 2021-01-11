@@ -17,10 +17,10 @@ def call(harness, phone_number: str, duration: int):
         # enter number
         harness.send_number(phone_number)
         # call
-        connection.send_key(key_codes["fnLeft"])
+        connection.send_key_code(key_codes["fnLeft"])
 
         time.sleep(duration)
-        connection.send_key(key_codes["fnRight"])
+        connection.send_key_code(key_codes["fnRight"])
 
 
 def get_calllog_count(harness):

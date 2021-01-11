@@ -3,6 +3,8 @@
 
 #include "SynchronizationMechanism.hpp"
 
+#include <stdexcept>
+
 namespace service::gui
 {
     class FreeRtosSynchronization : public SynchronizationMechanism
