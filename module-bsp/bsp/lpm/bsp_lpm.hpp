@@ -18,6 +18,11 @@ namespace bsp {
             Level_5, // 264 MHz
             Level_6  // 528 MHz
         };
+        enum class OscillatorSource
+        {
+            External,
+            Internal
+        };
 
         LowPowerMode()          = default;
         virtual ~LowPowerMode() = default;
@@ -26,11 +31,16 @@ namespace bsp {
 
         virtual int32_t PowerOff() = 0;
         virtual int32_t Reboot() = 0;
+
         virtual void SetCpuFrequency(CpuFrequency freq) = 0;
         [[nodiscard]] CpuFrequency GetCurrentFrequency() const noexcept;
 
+        virtual void SwitchOscillatorSource(OscillatorSource source) = 0;
+        [[nodiscard]] OscillatorSource GetCurrentOscillatorSource() const noexcept;
+
     protected:
         CpuFrequency currentFrequency = CpuFrequency::Level_6;
+        OscillatorSource currentOscSource = OscillatorSource::External;
     };
 } // namespace bsp
 

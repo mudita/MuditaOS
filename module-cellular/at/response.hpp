@@ -15,6 +15,7 @@ namespace at
 {
     namespace response
     {
+        constexpr auto StringDelimiter = "\"";
         namespace qpinc
         {
             /// Structure that holds parsed information from AT+QPINC command
@@ -54,6 +55,12 @@ namespace at
                 E_UTRAN                 = 7,
                 CDMA                    = 100
             };
+            enum class NameFormat
+            {
+                Long    = 0,
+                Short   = 1,
+                Numeric = 2
+            };
 
             class Operator
             {
@@ -63,13 +70,116 @@ namespace at
                 std::string longName;
                 std::string numericName;
                 std::optional<cops::AccessTechnology> technology = std::nullopt;
+
+                std::string getNameByFormat(NameFormat format)
+                {
+                    switch (format) {
+                    case NameFormat::Long:
+                        return longName;
+                    case NameFormat::Short:
+                        return shortName;
+                    case NameFormat::Numeric:
+                        return numericName;
+                    }
+                    return {};
+                }
+
+                void setNameByFormat(NameFormat format, const std::string &name)
+                {
+                    switch (format) {
+                    case NameFormat::Long:
+                        longName = name;
+                        break;
+                    case NameFormat::Short:
+                        shortName = name;
+                        break;
+                    case NameFormat::Numeric:
+                        numericName = name;
+                        break;
+                    }
+                }
+            };
+
+            class CurrentOperatorInfo
+            {
+                Operator op;
+                CopsMode mode     = CopsMode::Automatic;
+                NameFormat format = NameFormat::Long;
+                bool operatorSet  = false;
+
+              public:
+                void setFormat(NameFormat format)
+                {
+                    this->format = format;
+                }
+                NameFormat getFormat() const noexcept
+                {
+                    return this->format;
+                }
+                void setMode(CopsMode mode)
+                {
+                    this->mode = mode;
+                }
+                CopsMode getMode() const noexcept
+                {
+                    return this->mode;
+                }
+
+                void setOperator(Operator op)
+                {
+                    this->operatorSet = true;
+                    this->op          = op;
+                }
+                std::optional<cops::Operator> getOperator() const
+                {
+                    if (operatorSet) {
+                        return op;
+                    }
+                    else {
+                        return std::nullopt;
+                    }
+                }
             };
         } // namespace cops
 
+        /**
+         * @brief parse for AT+COPS=? from quectel
+         *
+         */
         bool parseCOPS(const at::Result &resp, std::vector<cops::Operator> &ret);
+        using ResponseTokens = std::vector<std::vector<std::string>>;
+        /**
+         * @brief parse for AT+COPS? from quectel
+         *
+         */
+        bool parseCOPS(const at::Result &resp, cops::CurrentOperatorInfo &ret);
 
         std::vector<std::string> tokenize(std::string &response, std::string separator = ",");
+
+        /**
+         * For AT one line (+XYZ) response like:
+         * +CPIN READY
+         * OK
+         */
         std::optional<std::vector<std::string>> getTokensForATCommand(const at::Result &resp, std::string_view head);
+
+        /**
+         * For AT multiline response like (last OK)
+         * +QIACT:1,<context_state>,<context_type>[,<IP_address>]
+         * [.....
+         * +QIACT:16,<context_state>,<context_type>[,<IP_address>]]
+         * OK
+         *
+         * response from function like QPING (not mention in DOC as URC), looks like (first OK)
+         * OK
+         * +QPING: 0,"61.135.169.125",32,192,255
+         * +QPING: 0,"61.135.169.125",32,240,255
+         * ...
+         * +QPING: 0,4,4,0,192,479,287
+         *
+         * Warning: should not be used for URC !
+         */
+        std::optional<ResponseTokens> getTokensForATResults(const at::Result &resp, std::string_view head);
         bool parseCSQ(std::string response, std::string &result);
         bool parseCSQ(std::string cellularResponse, uint32_t &result);
         bool parseCREG(std::string &response, uint32_t &result);

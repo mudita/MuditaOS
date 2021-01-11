@@ -1,4 +1,4 @@
-﻿project(service-cellular)
+project(service-cellular)
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 set(SOURCES
@@ -9,6 +9,7 @@ set(SOURCES
     SignalStrength.cpp
     SimCard.cpp
     NetworkSettings.cpp
+    PacketData.cpp
     RequestFactory.cpp
     CellularRequestHandler.cpp
     requests/Request.cpp

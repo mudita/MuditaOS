@@ -99,10 +99,10 @@ namespace bsp
             return AudioDevice::RetCode::Failure;
         }
 
-        codec.Stop();
-
         InStop();
         OutStop();
+
+        codec.Stop();
 
         state = State::Stopped;
         vTaskDelay(codecSettleTime);

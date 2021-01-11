@@ -17,6 +17,7 @@
 #include "UrcCmti.hpp"
 #include "UrcClip.hpp"
 #include "UrcCpin.hpp"
+#include "UrcQiurc.hpp"
 #include "UrcPoweredDown.hpp"
 #include "UrcResponse.hpp"
 #include "UrcFactory.hpp"
@@ -806,5 +807,37 @@ TEST_CASE("+Qind: SMS DONE")
         qind = getURC<at::urc::Qind>(urc);
         REQUIRE(qind);
         REQUIRE(qind->isSmsDone());
+    }
+}
+
+TEST_CASE("+Qiurc: TCP Context and connection message")
+{
+    SECTION("PDP Context deactivate - normal message")
+    {
+        /// +QIURC:"pdpdeact",<contextID>
+
+        auto urc   = at::urc::UrcFactory::Create("+QIURC: \"pdpdeact\",1");
+        auto qiurc = getURC<at::urc::Qiurc>(urc);
+
+        REQUIRE(qiurc);
+        REQUIRE(qiurc->getType());
+        REQUIRE(qiurc->isValid());
+        REQUIRE(*qiurc->getType() == at::urc::Qiurc::QIUrcMessages::DeactivateContext);
+        REQUIRE(*qiurc->getFirstParam() == "1");
+    }
+
+    SECTION("PDP Context deactivate - corrupted, but OK format")
+    {
+        auto urc   = at::urc::UrcFactory::Create("+QIURC:\"pdpdeactwww\",1");
+        auto qiurc = getURC<at::urc::Qiurc>(urc);
+        REQUIRE(qiurc);
+        REQUIRE(qiurc->getType() == std::nullopt);
+    }
+
+    SECTION("PDP Context deactivate - wrong param count (in case simple implementation)")
+    {
+        auto urc   = at::urc::UrcFactory::Create("+QIURC:\"pdpdeactwww\",1,3");
+        auto qiurc = getURC<at::urc::Qiurc>(urc);
+        REQUIRE(qiurc->getType() == std::nullopt);
     }
 }

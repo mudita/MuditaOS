@@ -3,7 +3,16 @@
 
 #pragma once
 
-namespace service::name
+namespace service
 {
-    constexpr char eink[] = "ServiceEink";
-};
+    namespace name
+    {
+        constexpr inline auto eink = "ServiceEink";
+    } // namespace name
+
+    namespace eink
+    {
+        constexpr inline auto DefaultScreenWidth  = 480;
+        constexpr inline auto DefaultScreenHeight = 600;
+    } // namespace eink
+} // namespace service

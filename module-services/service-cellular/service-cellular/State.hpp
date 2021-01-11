@@ -18,6 +18,7 @@ namespace cellular
             PowerUpInProgress,           /// waiting for modem powered up by polling various bauds
             CellularConfProcedure,       /// configuration procedure
             AudioConfigurationProcedure, /// audio configuration for modem (could be in ModemConfiguration)
+            APNConfProcedure,            /// Configure APN set by user, check if modem have similar
             SanityCheck,                 /// prior to ModemOn last sanity checks for one time configurations etc
             ModemOn,   /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
             URCReady,  /// State indicates that URC handling is enabled

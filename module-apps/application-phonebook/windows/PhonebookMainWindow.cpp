@@ -119,7 +119,7 @@ namespace gui
     void PhonebookMainWindow::HandleFilteringByLetter(const InputEvent &inputEvent)
     {
         auto code = translator.handle(inputEvent.key, inputMode ? inputMode->get() : "");
-        if (code != KeyProfile::none_key) {
+        if (code != Profile::none_key) {
             LOG_INFO("char=' %c'", static_cast<char>(code));
             char letter = static_cast<char>(code);
             std::string filterLetter;

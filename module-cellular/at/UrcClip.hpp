@@ -31,7 +31,7 @@ namespace at::urc
         };
 
         static constexpr std::string_view head = "+CLIP";
-        static bool isURC(const std::string uHead)
+        static bool isURC(const std::string &uHead)
         {
             return uHead.find(Clip::head) != std::string::npos;
         }

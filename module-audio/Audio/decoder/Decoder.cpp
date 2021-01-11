@@ -133,4 +133,12 @@ namespace audio
         }
     }
 
+    void Decoder::stopDecodingWorker()
+    {
+        if (audioWorker) {
+            audioWorker->close();
+        }
+        audioWorker = nullptr;
+    }
+
 } // namespace audio

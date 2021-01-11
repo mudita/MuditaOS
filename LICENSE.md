@@ -1,13 +1,48 @@
 # Software License Agreement
 
 MuditaOS – https://github.com/mudita/MuditaOS
-Copyright (c) 2017-2020, Mudita Sp. z o.o. All rights reserved.
+Copyright (c) 2017-2021, Mudita Sp. z o.o. All rights reserved.
 
 ## Sources of Intellectual Property Included in MuditaOS
 
 Where not otherwise indicated, all MuditaOS content is authored by Mudita engineers and consists of Mudita-owned intellectual property. In some specific instances, MuditaOS will incorporate work done by developers outside of Mudita with their expressed permission.
 
-## Proprietary code
+### Third party code
+
+The following libraries are included in MuditaOS under specified licenses:
+
+- [Protobuf](https://github.com/protocolbuffers/protobuf/blob/master/LICENSE)
+- [TagLib](https://github.com/mudita/taglib/blob/master/COPYING.MPL)
+- [pugixml](https://github.com/mudita/pugixml/blob/master/LICENSE.md)
+- [lwip](https://github.com/mudita/lwip/blob/master/README)
+- [Libphonenumber](https://github.com/google/libphonenumber/blob/master/LICENSE)
+- [FatFS](https://github.com/abbrev/fatfs)
+- [Littlefs](https://github.com/littlefs-project/littlefs/blob/master/LICENSE.md)
+- [CRC-32](http://csbruce.com/software/)
+- [HowardHinnant - date](https://github.com/HowardHinnant/date/blob/master/LICENSE.txt)
+- [GSL](https://github.com/microsoft/GSL/blob/master/LICENSE)
+- [json11](https://github.com/dropbox/json11/blob/master/LICENSE.txt)
+- [MagicEnumC++](https://github.com/Neargye/magic_enum/blob/master/LICENSE)
+- [microtar](https://github.com/rxi/microtar/blob/master/LICENSE)
+- [RE2](https://github.com/google/re2/blob/master/LICENSE)
+- [SEGGER](https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/)
+- [tinyexpr](https://github.com/codeplea/tinyexpr/blob/master/LICENSE)
+- [FreeRTOS](https://github.com/aws/amazon-freertos/blob/master/LICENSE)
+- [FreeRTOS Add-ons](https://michaelbecker.github.io/freertos-addons/)
+- [SQLite](https://www.sqlite.org/copyright.html)
+- RT1051 drivers
+- [dr_flac](https://github.com/mackron/dr_libs/)
+- [minimp3](https://github.com/lieff/minimp3/blob/master/LICENSE)
+- [newlib](http://sourceware.org/newlib/)
+- [FreeRTOS + FAT](https://github.com/FreeRTOS/Lab-Project-FreeRTOS-FAT/blob/master/LICENSE.md)
+- [dhcp server](https://github.com/majbthrd/D21ecm/tree/master/dhcp-server)
+
+The following libraries are included only in the development version of MuditaOS under specified licenses:
+
+- [Catch2](https://github.com/catchorg/Catch2/blob/devel/LICENSE.txt)
+- [googletest](https://github.com/google/googletest/blob/master/LICENSE)
+
+### Proprietary code
 
 The following proprietary code is included in MuditaOS:
 

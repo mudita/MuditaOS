@@ -20,7 +20,7 @@ namespace at::urc
 
       public:
         static constexpr std::string_view head = "+CTZE";
-        static auto isURC(const std::string uHead) -> bool
+        static auto isURC(const std::string &uHead) -> bool
         {
             return uHead.find(Ctze::head) != std::string::npos;
         }

@@ -6,7 +6,6 @@
 
 #include <module-apps/messages/AppMessage.hpp>
 #include <Common.hpp>
-#include <Common/Common.hpp>
 #include <Service/Bus.hpp>
 #include <Service/Message.hpp>
 #include <Service/Timer.hpp>
@@ -16,10 +15,8 @@
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <service-appmgr/messages/Message.hpp>
-#include <service-db/DBServiceAPI.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-gui/ServiceGUI.hpp>
-#include <service-eink/Common.hpp>
 #include <service-eink/ServiceEink.hpp>
 #include <service-gui/Common.hpp>
 
@@ -135,12 +132,12 @@ namespace app::manager
     void ApplicationManager::startSystemServices()
     {
         if (bool ret = sys::SystemManager::CreateService(
-                std::make_shared<sgui::ServiceGUI>(service::name::gui, GetName(), 480, 600), this);
+                std::make_shared<service::gui::ServiceGUI>(service::name::gui, GetName()), this);
             !ret) {
             LOG_ERROR("Failed to initialize GUI service");
         }
-        if (bool ret =
-                sys::SystemManager::CreateService(std::make_shared<ServiceEink>(service::name::eink, GetName()), this);
+        if (bool ret = sys::SystemManager::CreateService(
+                std::make_shared<service::eink::ServiceEink>(service::name::eink, GetName()), this);
             !ret) {
             LOG_ERROR("Failed to initialize EInk service");
         }

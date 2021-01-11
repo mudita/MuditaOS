@@ -6,7 +6,7 @@ extern "C"
 #include "fsl_clock.h"
 #include "fsl_dcdc.h"
 #include "pin_mux.h"
-#if LOG_REDIRECT == RTT_LUART
+#if LOG_LUART_ENABLED
 #include "fsl_lpuart.h"
 #endif
 }
@@ -21,7 +21,7 @@ extern std::uint8_t __sdram_cached_start[];
 namespace bsp
 {
 
-#if LOG_REDIRECT == RTT_LUART
+#if LOG_LUART_ENABLED
     static lpuart_handle_t g_lpuartHandle;
 #endif
 
@@ -46,7 +46,7 @@ namespace bsp
     /* Initialize debug console. */
     static void BOARD_InitDebugConsole(void)
     {
-#if LOG_REDIRECT == RTT_LUART
+#if LOG_LUART_ENABLED
         /* The user initialization should be placed here */
         lpuart_config_t lpuartConfig;
 

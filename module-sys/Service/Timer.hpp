@@ -1,13 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "FreeRTOS.h"
-#include "portmacro.h" // for TickType_t
+#include "portmacro.h"                             // for TickType_t
 #include <module-os/RTOSWrapper/include/timer.hpp> // for Timer
-#include <functional>  // for function
-#include <string>      // for string
+#include <functional>                              // for function
+#include <string>                                  // for string
+#include <atomic>
 namespace sys
 {
     class Service;
@@ -69,6 +70,7 @@ namespace sys
         Type type;
         ms interval;
         std::function<void(Timer &)> callback = nullptr;
+        std::atomic_bool isActive             = false;
         const std::string name;
 
       public:

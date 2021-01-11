@@ -1,0 +1,21 @@
+add_catch2_executable(
+    NAME
+        context-pool-tests
+    SRCS
+        tests-main.cpp
+        test-ContextPool.cpp
+        MockedSynchronizationMechanism.hpp
+    LIBS
+        service-gui
+)
+
+add_catch2_executable(
+    NAME
+        commands-queue-tests
+    SRCS
+        tests-main.cpp
+        test-DrawCommandsQueue.cpp
+        MockedSynchronizationMechanism.hpp
+    LIBS
+        service-gui
+)

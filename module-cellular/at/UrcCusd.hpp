@@ -32,7 +32,7 @@ namespace at::urc
         };
         Cusd(const std::string &urcBody, const std::string &urcHead = std::string());
         static constexpr std::string_view head = "+CUSD";
-        static auto isURC(const std::string uHead) -> bool
+        static auto isURC(const std::string &uHead) -> bool
         {
             return uHead.find(Cusd::head) != std::string::npos;
         }

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <memory>
+#include <set>
 
 namespace sys
 {
@@ -17,7 +18,7 @@ namespace sys
         Channel()
         {}
 
-        std::vector<std::shared_ptr<Service>> m_services;
+        std::set<std::shared_ptr<Service>> m_services;
     };
 
 } // namespace sys

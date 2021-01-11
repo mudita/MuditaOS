@@ -8,11 +8,10 @@
 
 namespace service::eink
 {
-
     class EinkMessage : public sys::DataMessage
     {
       public:
-        EinkMessage() : sys::DataMessage(MessageType::EinkMessage){};
+        EinkMessage() : sys::DataMessage(MessageType::EinkMessage)
+        {}
     };
-
 } /* namespace seink */

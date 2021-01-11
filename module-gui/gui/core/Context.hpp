@@ -51,26 +51,30 @@ namespace gui
         /**
          * @brief returns pointer to context's data;
          */
+        inline const uint8_t *getData() const
+        {
+            return data;
+        }
         inline uint8_t *getData()
         {
             return data;
-        };
-        inline int16_t getX()
+        }
+        inline int16_t getX() const
         {
             return x;
-        };
-        inline int16_t getY()
+        }
+        inline int16_t getY() const
         {
             return y;
-        };
-        inline uint16_t getW()
+        }
+        inline uint16_t getW() const
         {
             return w;
-        };
-        inline uint16_t getH()
+        }
+        inline uint16_t getH() const
         {
             return h;
-        };
+        }
 
         inline bool addressInData(const uint8_t *ptr) const
         {
