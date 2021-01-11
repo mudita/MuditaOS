@@ -82,7 +82,7 @@ TEST_CASE("Create and destroy simple database")
 
     SECTION("Store database into backup file")
     {
-        std::string backupPathDB = USER_PATH("testbackup.db");
+        std::string backupPathDB = "testbackup.db";
         std::remove(backupPathDB.c_str());
         Database testDB("test.db");
         REQUIRE(testDB.storeIntoFile(backupPathDB) == true);
@@ -98,12 +98,16 @@ class ScopedDir
   public:
     ScopedDir(std::string p) : path(p)
     {
-        REQUIRE(std::filesystem::create_directory(path.c_str()));
+        if (!(std::filesystem::exists(path.c_str()))) {
+            REQUIRE(std::filesystem::create_directory(path.c_str()));
+        }
     }
 
     ~ScopedDir()
     {
-        REQUIRE(std::filesystem::remove(path.c_str()));
+        if (std::filesystem::exists(path.c_str())) {
+            REQUIRE(std::filesystem::remove_all(path.c_str()) > 0);
+        }
     }
 
     auto operator()(std::string file = "") -> std::filesystem::path
@@ -142,7 +146,7 @@ TEST_CASE("Database initialization scripts")
 
     SECTION("list files")
     {
-        ScopedDir dir(USER_PATH("scripts"));
+        ScopedDir dir("scripts");
 
         auto file = std::fopen(dir("test_1.sql").c_str(), "w");
         std::fclose(file);
@@ -161,18 +165,18 @@ TEST_CASE("Database initialization scripts")
 
         Database db(dir("test.db").c_str());
         DatabaseInitializer initializer(&db);
-        auto files = initializer.listFiles(PATH_SYS "/" PATH_USER "/", "test", "sql");
+        auto files = initializer.listFiles("scripts", "test", "sql");
 
         REQUIRE(files.size() == 4);
-        REQUIRE(files[0] == USER_PATH("test_1.sql"));
-        REQUIRE(files[1] == USER_PATH("test_003.sql"));
-        REQUIRE(files[2] == USER_PATH("test_011.sql"));
-        REQUIRE(files[3] == USER_PATH("test_021.sql"));
+        REQUIRE(files[0] == (std::filesystem::path{"scripts"} / "test_1.sql"));
+        REQUIRE(files[1] == (std::filesystem::path{"scripts"} / "test_003.sql"));
+        REQUIRE(files[2] == (std::filesystem::path{"scripts"} / "test_011.sql"));
+        REQUIRE(files[3] == (std::filesystem::path{"scripts"} / "test_021.sql"));
     }
 
     SECTION("read script files")
     {
-        ScopedDir dir(USER_PATH("scripts"));
+        ScopedDir dir("scripts");
 
         auto file = std::fopen(dir("test_1.sql").c_str(), "w");
 
@@ -190,7 +194,7 @@ TEST_CASE("Database initialization scripts")
 
     SECTION("read empty script files")
     {
-        ScopedDir dir(USER_PATH("scripts"));
+        ScopedDir dir("scripts");
 
         auto file = std::fopen(dir("test_1.sql").c_str(), "w");
         std::fclose(file);
@@ -204,7 +208,7 @@ TEST_CASE("Database initialization scripts")
 
     SECTION("read script file with comment")
     {
-        ScopedDir dir(USER_PATH("scripts"));
+        ScopedDir dir("scripts");
 
         auto file = std::fopen(dir("test_1.sql").c_str(), "w");
         std::fprintf(file, "%s\n", script_comment);
@@ -219,7 +223,7 @@ TEST_CASE("Database initialization scripts")
 
     SECTION("execute valid script")
     {
-        ScopedDir dir(USER_PATH("scripts"));
+        ScopedDir dir("scripts");
 
         auto file = std::fopen(dir("test_1.sql").c_str(), "w");
         std::fprintf(file, "%s\n", script_create);
@@ -234,7 +238,7 @@ TEST_CASE("Database initialization scripts")
 
     SECTION("execute invalid script")
     {
-        ScopedDir dir(USER_PATH("scripts"));
+        ScopedDir dir("scripts");
 
         auto file = std::fopen(dir("test_1.sql").c_str(), "w");
         std::fprintf(file, "%s\n", script_invalid);
@@ -247,5 +251,5 @@ TEST_CASE("Database initialization scripts")
         REQUIRE(result == false);
     }
 
-    Database::deinitialize();
+    REQUIRE(Database::deinitialize() == true);
 }
