@@ -220,7 +220,7 @@ TEST_CASE("Corefs: Directory operations")
     REQUIRE(ret == 0);
     REQUIRE(fscore.mount("emmc0part0", "/sys", "vfat") == 0);
 
-    const auto dirhandle = fscore.diropen("/sys/user");
+    const auto dirhandle = fscore.diropen("/sys/current");
     REQUIRE(dirhandle);
     REQUIRE(dirhandle->error() == 0);
 
