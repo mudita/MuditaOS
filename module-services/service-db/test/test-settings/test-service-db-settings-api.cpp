@@ -17,8 +17,8 @@
 #include "test-service-db-settings-testmsgs.hpp"
 #include "test-service-db-settings-testservices.hpp"
 #include "test-service-db-settings-testapps.hpp"
+#include "Database.cpp"
 #include <vfs.hpp>
-
 
 TEST_CASE("SettingsApi")
 {
@@ -33,10 +33,10 @@ TEST_CASE("SettingsApi")
         std::shared_ptr<settings::ServiceProfile> profWritter;
         std::shared_ptr<settings::ServiceProfile> profReader;
         std::shared_ptr<settings::AppTestProfileMode> testProf;
-        std::shared_ptr<std::mutex> testStart;
         std::shared_ptr<settings::ServiceMode> modeWritter;
         std::shared_ptr<settings::ServiceMode> modeReader;
         std::shared_ptr<settings::AppTestProfileMode> testMode;
+        std::shared_ptr<std::mutex> testStart;
 
         manager->StartSystem([manager,
                               &varWritter,
@@ -120,7 +120,6 @@ TEST_CASE("SettingsApi")
         REQUIRE(testProf->v[1] == testProf->v[0] + "1");
         REQUIRE(testProf->v[2] == testProf->v[0] + "12");
         REQUIRE(testProf->v[3] == "other");
-        REQUIRE(testProf->v[4] == "other");
 
         std::cout << "testMode values:" << std::endl << std::flush;
         for (auto s : testMode->v) {
@@ -129,6 +128,5 @@ TEST_CASE("SettingsApi")
         REQUIRE(testMode->v[1] == testMode->v[0] + "1");
         REQUIRE(testMode->v[2] == testMode->v[0] + "12");
         REQUIRE(testMode->v[3] == "other");
-        REQUIRE(testMode->v[4] == "other");
     }
 }
