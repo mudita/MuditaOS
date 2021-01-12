@@ -141,14 +141,15 @@ class UpdateMuditaOS : public updateos::UpdateStats
     UpdateMuditaOS(ServiceDesktop *ownerService);
 
     updateos::UpdateError runUpdate();
-    updateos::UpdateError prepareTempDirForUpdate();
+    updateos::UpdateError prepareTempDirForUpdate(const std::filesystem::path &temporaryPath,
+                                                  const std::filesystem::path &updatesOSPath);
     updateos::UpdateError unpackUpdate();
     updateos::UpdateError verifyChecksums();
     updateos::UpdateError verifyVersion();
     updateos::UpdateError updateBootloader();
     updateos::UpdateError prepareRoot();
     updateos::UpdateError updateBootJSON();
-    updateos::UpdateError setUpdateFile(fs::path updateFileToUse);
+    updateos::UpdateError setUpdateFile(const std::filesystem::path &updatesOSPath, fs::path updateFileToUse);
     updateos::UpdateError cleanupAfterUpdate();
     updateos::UpdateError updateUserData();
 
