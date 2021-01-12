@@ -1,48 +1,42 @@
 GLIBC_2.2.5 {
         global:
-                fclose;
-                fdopen;
-                feof;
-                ferror;
-                fflush;
-                fgetc;
-                fgetpos;
-                fgetpos64;
-                fgets;
-                fileno;
+# stdio
+                fprintf;
+                fwrite;
+                fread;
                 fopen;
                 fopen64;
-                fprintf;
+                fclose;
                 fputc;
                 fputs;
-                fread;
+                putc;
+                fgetc;
+                fgets;
+                getc;
                 freopen;
+                fdopen;
                 fseek;
-                fscanf;
+                ftell;
                 fsetpos;
                 fsetpos64;
-                ftell;
-                fwrite;
-                getc;
-                putc;
-                remove;
+                fgetpos;
+                fgetpos64;
+                feof;
                 rewind;
+                fileno;
+                ferror;
+                fflush;
+                remove;
+                rename;
+# stdio - scan family
+                fscanf;
+                vfscanf;
+#                ungetc;
+# stdio - disabled
                 setbuf;
                 setvbuf;
                 setbuffer;
                 setlinebuf;
-                fscanf;
-                vfscanf;
-                ungetc;
-                opendir;
-                closedir;
-                readdir;
-                readdir_r;
-                rewinddir;
-                seekdir;
-                telldir;
-                rename;
-
 # posix
                 link;
                 unlink;
@@ -70,6 +64,21 @@ GLIBC_2.2.5 {
                 __fxstat64;
                 mount;
                 umount;
+# posix - dirent
+                opendir;
+                closedir;
+                readdir;
+                readdir_r;
+                rewinddir;
+                seekdir;
+                telldir;
+# posix - not implemented
+#                read;
+#                write;
+#                lseek;
+#                lseek64;
+#                ioctl;
+#                poll;
 
         local:
                 *;

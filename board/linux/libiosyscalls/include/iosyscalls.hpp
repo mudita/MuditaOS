@@ -12,8 +12,6 @@ namespace vfsn::linux::internal
 {
     bool redirect_to_image();
     bool is_image_handle(const FILE* fil);
-    int native_fd_to_image_fd(int fd);
-    int image_fd_to_native_fd(int fd);
     bool is_image_fd(int fd);
     bool redirect_to_image(const char* inpath);
     const char* npath_translate(const char* inpath, char *buffer);
@@ -23,6 +21,9 @@ namespace vfsn::linux::internal
         int error {0};
         int ungetchar {-1};
     };
+
+    int get_native_fd(FILEX*);
+
     FILEX* allocate_filex(int fd);
     bool is_filex(const void* fd);
     void remove_filex(FILEX *fil);
