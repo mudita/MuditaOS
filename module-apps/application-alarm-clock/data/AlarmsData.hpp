@@ -71,7 +71,7 @@ class AlarmRecordsData : public gui::SwitchData
   public:
     explicit AlarmRecordsData(std::vector<AlarmsRecord> records) : records{std::move(records)}
     {}
-    std::vector<AlarmsRecord> getRecords() const
+    [[nodiscard]] auto getRecords() const -> std::vector<AlarmsRecord>
     {
         return records;
     }

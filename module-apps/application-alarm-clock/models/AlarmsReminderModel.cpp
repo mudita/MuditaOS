@@ -45,7 +45,7 @@ namespace app::alarmClock
     {
         auto fileTags = AudioServiceAPI::GetFileTags(app, filePath);
         if (fileTags != std::nullopt) {
-            this->startMusicTimer(fileTags->duration_sec * 1000, fileTags->filePath);
+            this->startMusicTimer(fileTags->duration_sec * utils::time::milisecondsInSecond, fileTags->filePath);
             this->playMusic(fileTags->filePath);
         }
     }

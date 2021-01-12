@@ -26,7 +26,7 @@ namespace app::alarmClock
         class Presenter : public BasePresenter<AlarmReminderWindowContract::View>
         {
           public:
-            virtual ~Presenter() noexcept = default;
+            ~Presenter() noexcept override = default;
 
             virtual void update(AlarmsRecord &alarm, UserAction action, uint32_t delay) = 0;
             virtual void updatePreviousRecords(std::vector<AlarmsRecord> &records)      = 0;

@@ -127,7 +127,7 @@ std::vector<AlarmsRecord> AlarmsRecordInterface::SelectTurnedOn()
     auto records = std::vector<AlarmsRecord>();
 
     for (const auto &r : rows) {
-        records.push_back(AlarmsRecord(r));
+        records.emplace_back(r);
     }
 
     return records;

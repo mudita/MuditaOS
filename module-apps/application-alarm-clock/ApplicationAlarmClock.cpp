@@ -27,7 +27,7 @@ namespace app
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
-            switchWindow(style::alarmClock::window::name::alarmReminder, std::move(data));
+            switchWindow(style::alarmClock::window::name::alarmReminder, std::forward<decltype(data)>(data));
             return msgHandled();
         });
     }

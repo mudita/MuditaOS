@@ -185,7 +185,7 @@ std::vector<AlarmsTableRow> AlarmsTable::SelectTurnedOn()
     std::vector<AlarmsTableRow> ret;
 
     do {
-        ret.push_back(AlarmsTableRow(*retQuery));
+        ret.emplace_back(*retQuery);
     } while (retQuery->nextRow());
 
     return ret;
