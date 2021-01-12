@@ -2,31 +2,31 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
-#include "Common.hpp"                                    // for RefreshModes
-#include "GuiTimer.hpp"                                  // for GuiTimer
-#include "Item.hpp"                                      // for Item
-#include "MessageType.hpp"                               // for MessageType
-#include "Service/Timer.hpp"                             // for Timer
-#include "Timer.hpp"                                     // for Timer
-#include "Translator.hpp"                                // for KeyInputSim...
-#include "common_data/EventStore.hpp"                    // for Battery
-#include "common_data/RawKey.hpp"                        // for RawKey, key...
-#include "gui/input/InputEvent.hpp"                      // for InputEvent
-#include "log/debug.hpp"                                 // for DEBUG_APPLI...
-#include "log/log.hpp"                                   // for LOG_INFO
-#include "messages/AppMessage.hpp"                       // for AppSwitchMe...
-#include "service-appmgr/Controller.hpp"                 // for Controller
+#include "Common.hpp"                    // for RefreshModes
+#include "GuiTimer.hpp"                  // for GuiTimer
+#include "Item.hpp"                      // for Item
+#include "MessageType.hpp"               // for MessageType
+#include "Service/Timer.hpp"             // for Timer
+#include "Timer.hpp"                     // for Timer
+#include "Translator.hpp"                // for KeyInputSim...
+#include "common_data/EventStore.hpp"    // for Battery
+#include "common_data/RawKey.hpp"        // for RawKey, key...
+#include "gui/input/InputEvent.hpp"      // for InputEvent
+#include "log/debug.hpp"                 // for DEBUG_APPLI...
+#include "log/log.hpp"                   // for LOG_INFO
+#include "messages/AppMessage.hpp"       // for AppSwitchMe...
+#include "service-appmgr/Controller.hpp" // for Controller
 #include <service-cellular/CellularMessage.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include "service-gui/messages/DrawMessage.hpp"          // for DrawMessage
-#include "task.h"                                        // for xTaskGetTic...
-#include "windows/AppWindow.hpp"                         // for AppWindow
-#include <Text.hpp>                                      // for Text
-#include <algorithm>                                     // for find
-#include <iterator>                                      // for distance, next
-#include <type_traits>                                   // for add_const<>...
+#include "service-gui/messages/DrawMessage.hpp" // for DrawMessage
+#include "task.h"                               // for xTaskGetTic...
+#include "windows/AppWindow.hpp"                // for AppWindow
+#include <Text.hpp>                             // for Text
+#include <algorithm>                            // for find
+#include <iterator>                             // for distance, next
+#include <type_traits>                          // for add_const<>...
 #include <WindowsFactory.hpp>
 #include <service-gui/Common.hpp>
 #include <module-utils/Utils.hpp>
@@ -103,7 +103,6 @@ namespace app
 #endif
         state = st;
     }
-
 
     void Application::longPressTimerCallback()
     {

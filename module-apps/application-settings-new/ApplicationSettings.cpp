@@ -30,16 +30,21 @@
 #include "Dialog.hpp"
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
-#include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
-#include <service-db/Settings.hpp>
-#include <module-services/service-bluetooth/service-bluetooth/messages/Status.hpp>
+#include <service-bluetooth/BluetoothMessage.hpp>
+#include <service-bluetooth/service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
 #include <application-settings-new/data/BondedDevicesData.hpp>
+#include <application-settings-new/data/PhoneNameData.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <application-settings-new/data/PhoneNameData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <service-db/Settings.hpp>
+
+#include <i18n/i18n.hpp>
+#include <module-services/service-evtmgr/service-evtmgr/ScreenLightControlMessage.hpp>
+#include <module-services/service-evtmgr/service-evtmgr/Constants.hpp>
 
 namespace app
 {
@@ -188,7 +193,7 @@ namespace app
             return std::make_unique<gui::FontSizeWindow>(app);
         });
         windowsFactory.attach(gui::window::name::display_light, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DisplayLightWindow>(app);
+            return std::make_unique<gui::DisplayLightWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
         windowsFactory.attach(gui::window::name::apps_and_tools, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AppsAndToolsWindow>(app);
@@ -292,4 +297,51 @@ namespace app
         lockPassHash = value;
         settings->setValue(::settings::SystemProperties::lockPassHash, std::to_string(value));
     }
+
+    auto ApplicationSettingsNew::getCurrentValues() -> settingsInterface::ScreenLightSettings::Values
+    {
+        constexpr int timeout = pdMS_TO_TICKS(1500);
+
+        auto response = sys::Bus::SendUnicast(
+            std::make_shared<sevm::ScreenLightControlRequestParameters>(), service::name::evt_manager, this, timeout);
+
+        if (response.first == sys::ReturnCodes::Success) {
+            auto msgState = dynamic_cast<sevm::ScreenLightControlParametersResponse *>(response.second.get());
+            if (msgState == nullptr) {
+                return {};
+            }
+
+            return {msgState->lightOn, msgState->mode, msgState->parameters};
+        }
+
+        return {};
+    }
+
+    void ApplicationSettingsNew::setBrightness(bsp::eink_frontlight::BrightnessPercentage value)
+    {
+        screen_light_control::Parameters parameters{value};
+        sys::Bus::SendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                                  screen_light_control::Action::setManualModeBrightness, parameters),
+                              service::name::evt_manager,
+                              this);
+    }
+
+    void ApplicationSettingsNew::setMode(bool isAutoLightSwitchOn)
+    {
+        sys::Bus::SendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                                  isAutoLightSwitchOn ? screen_light_control::Action::enableAutomaticMode
+                                                      : screen_light_control::Action::disableAutomaticMode),
+                              service::name::evt_manager,
+                              this);
+    }
+
+    void ApplicationSettingsNew::setStatus(bool isDisplayLightSwitchOn)
+    {
+        sys::Bus::SendUnicast(
+            std::make_shared<sevm::ScreenLightControlMessage>(
+                isDisplayLightSwitchOn ? screen_light_control::Action::turnOn : screen_light_control::Action::turnOff),
+            service::name::evt_manager,
+            this);
+    }
+
 } /* namespace app */

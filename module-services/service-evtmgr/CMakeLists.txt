@@ -7,9 +7,9 @@ set(SOURCES
         alarm/EventManagerAlarm.cpp
         api/EventManagerServiceAPI.cpp
         messages/Message.cpp
-        screen-light-control/ScreenLightControl.cpp
-        screen-light-control/ControlFunctions.cpp
         battery-level-check/BatteryLevelCheck.cpp
+        screen-light-control/ControlFunctions.cpp
+        screen-light-control/ScreenLightControl.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
