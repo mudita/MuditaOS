@@ -35,13 +35,12 @@ namespace app
 
     inline constexpr auto name_messages = "ApplicationMessages";
 
-    class ApplicationMessages : public app::Application
+    class ApplicationMessages : public app::Application, public app::AsyncCallbackReceiver
     {
       public:
         ApplicationMessages(std::string name                    = name_messages,
                             std::string parent                  = {},
                             StartInBackground startInBackground = {false});
-        virtual ~ApplicationMessages();
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;

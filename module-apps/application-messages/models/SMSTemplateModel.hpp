@@ -9,12 +9,13 @@
 #include <Application.hpp>
 #include <ListItemProvider.hpp>
 
-class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>, public gui::ListItemProvider
+class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>,
+                         public gui::ListItemProvider,
+                         public app::AsyncCallbackReceiver
 {
   public:
     SMSTemplateModel() = delete;
     SMSTemplateModel(app::Application *app);
-    virtual ~SMSTemplateModel() = default;
 
     unsigned int requestRecordsCount() override;
     bool updateRecords(std::vector<SMSTemplateRecord> records) override;

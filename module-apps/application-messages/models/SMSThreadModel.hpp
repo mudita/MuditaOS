@@ -9,7 +9,9 @@
 #include "Interface/SMSRecord.hpp"
 #include <application-messages/widgets/SMSInputWidget.hpp>
 
-class SMSThreadModel : public app::DatabaseModel<SMSRecord>, public gui::ListItemProvider
+class SMSThreadModel : public app::DatabaseModel<SMSRecord>,
+                       public gui::ListItemProvider,
+                       public app::AsyncCallbackReceiver
 {
   public:
     unsigned int smsThreadID      = 0;

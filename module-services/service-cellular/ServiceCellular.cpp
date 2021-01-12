@@ -1820,7 +1820,8 @@ bool ServiceCellular::dbAddSMSRecord(const SMSRecord &record)
         onSMSReceived();
         return true;
     }));
-    return DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::move(query));
+    const auto [succeed, _] = DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::move(query));
+    return succeed;
 }
 
 void ServiceCellular::onSMSReceived()

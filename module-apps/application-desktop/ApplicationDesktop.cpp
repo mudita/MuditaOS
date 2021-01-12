@@ -257,8 +257,9 @@ namespace app
 
     bool ApplicationDesktop::requestNotSeenNotifications()
     {
-        return DBServiceAPI::GetQuery(
+        const auto [succeed, _] = DBServiceAPI::GetQuery(
             this, db::Interface::Name::Notifications, std::make_unique<db::query::notifications::GetAll>());
+        return succeed;
     }
 
     bool ApplicationDesktop::requestNotReadNotifications()

@@ -69,8 +69,9 @@ namespace app
                              StartInBackground startInBackground,
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
-        : Service(name, parent, stackDepth, priority), default_window(gui::name::window::main_window),
-          windowsStack(this), startInBackground{startInBackground}, settings(std::make_unique<settings::Settings>(this))
+        : Service(std::move(name), std::move(parent), stackDepth, priority),
+          default_window(gui::name::window::main_window), windowsStack(this), startInBackground{startInBackground},
+          callbackStorage{std::make_unique<CallbackStorage>()}, settings(std::make_unique<settings::Settings>(this))
     {
         keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
         busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
@@ -85,7 +86,10 @@ namespace app
                                       [this](std::string value) { timeFormatChanged(value); });
     }
 
-    Application::~Application() = default;
+    Application::~Application() noexcept
+    {
+        windowsStack.windows.clear();
+    }
 
     Application::State Application::getState()
     {
@@ -701,4 +705,8 @@ namespace app
         return timeFormat12;
     }
 
+    void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
+    {
+        callbackStorage->removeAll(receiver);
+    }
 } /* namespace app */

@@ -10,7 +10,7 @@
 #include <service-db/DBServiceAPI.hpp>
 #include <queries/calendar/QueryEventsGetAllLimited.hpp>
 
-AllEventsModel::AllEventsModel(app::Application *app) : DatabaseModel(app)
+AllEventsModel::AllEventsModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
 {
     application = app;
     assert(app != nullptr);
@@ -24,9 +24,9 @@ unsigned int AllEventsModel::requestRecordsCount()
 void AllEventsModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     auto query = std::make_unique<db::query::events::GetAllLimited>(offset, limit);
-    query->setQueryListener(
-        db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
-    DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::move(query));
+    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Events);
+    task->setCallback([this](auto response) { return handleQueryResponse(response); });
+    task->execute(application, this);
 }
 
 unsigned int AllEventsModel::getMinimalItemHeight() const
