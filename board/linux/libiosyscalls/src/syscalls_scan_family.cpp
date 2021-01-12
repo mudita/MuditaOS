@@ -1,25 +1,29 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <stdlib.h>
 #include <errno.h>
 #include <ctype.h>
 #include <stdarg.h>
-#include "debug.hpp"
 #include <iosyscalls.hpp>
-#include <dlfcn.h>
+
+#include "syscalls_real.hpp"
+
+#include "debug.hpp"
 
 namespace
 {
-    int (*real_fprintf)(FILE *__restrict __stream, const char *__restrict __format, ...);
-    int (*real_vfscanf) (FILE *__restrict __s, const char *__restrict __format, __gnuc_va_list __arg) __wur;
-    int (*real_ungetc) (int __c, FILE *__stream);
+    namespace real {
+        __REAL_DECL(ungetc);
+        __REAL_DECL(vfscanf);
+    }
 
     void __attribute__((constructor)) _syscalls_scan_family()
     {
-        real_fprintf = reinterpret_cast<decltype(real_fprintf)>(dlsym(RTLD_NEXT, "fprintf"));
-        real_ungetc = reinterpret_cast<decltype(real_ungetc)>(dlsym(RTLD_NEXT, "ungetc"));
-        real_vfscanf = reinterpret_cast<decltype(real_vfscanf)>(dlsym(RTLD_NEXT, "vfscanf"));
-        if(!real_fprintf || !real_ungetc || !real_vfscanf) {
+        __REAL_DLSYM(ungetc);
+        __REAL_DLSYM(vfscanf);
+
+        if(!(real::ungetc && real::vfscanf)) {
             abort();
         }
     }
@@ -27,8 +31,10 @@ namespace
 
 namespace
 {
+    namespace vfs = vfsn::linux::internal;
+    using FILEX = vfs::FILEX;
+    using fs = purefs::fs::filesystem;
 
-    using namespace vfsn::linux::internal;
     int ic(FILEX *fp)
     {
         char ch;
@@ -40,7 +46,7 @@ namespace
         }
         else
         {
-            auto ret = invoke_fs(&purefs::fs::filesystem::read,fp->fd,&ch,1);
+            auto ret = vfs::invoke_fs(&fs::read,fp->fd,&ch,1);
             fp->error = errno;
             return ret==1?0:ret;
         }
@@ -95,32 +101,39 @@ namespace
 }
 extern "C"
 {
+    namespace vfs = vfsn::linux::internal;
+    using FILEX = vfs::FILEX;
 
-    using namespace vfsn::linux::internal;
     int ungetc (int __c, FILE *__stream)
     {
-        TRACE_SYSCALL();
-        if(!is_filex(__stream))
+        if(vfs::is_filex(__stream))
         {
-            return real_ungetc(__c,__stream);
-        }
-        else
-        {
+            TRACE_SYSCALLN("(%p) -> VFS", __stream);
             auto fx = reinterpret_cast<FILEX*>(__stream);
             fx->ungetchar = __c;
             return 0;
         }
+        else
+        {
+            TRACE_SYSCALLN("(%p) -> linux fs", __stream);
+            return real::ungetc(__c,__stream);
+        }
     }
-    __asm__(".symver ungetc,vfscanf@GLIBC_2.2.5");
+    /* WARNING:
+     *   this implementation of ungetc() is work-in-progress
+     *   and should remain local until FILEX buffering is implemented!
+     */
+//    __asm__(".symver _iosys_ungetc,ungetc@GLIBC_2.2.5");
 
-    int vfscanf (FILE *__restrict fp, const char *__restrict fmt,
+    int _iosys_vfscanf (FILE *__restrict fp, const char *__restrict fmt,
                     __gnuc_va_list ap)
     {
-        if(!is_filex(fp))
+        if(!vfs::is_filex(fp))
         {
-            return real_vfscanf(fp,fmt,ap);
+            TRACE_SYSCALLN("(%p) -> linux fs", fp);
+            return real::vfscanf(fp,fmt,ap);
         }
-        TRACE_SYSCALL();
+        TRACE_SYSCALLN("(%p) -> VFS", fp);
         int ret = 0;
         int t, c;
         int wid = 1 << 20;
@@ -168,12 +181,12 @@ extern "C"
         }
         return ret;
     }
-    __asm__(".symver vfscanf,vfscanf@GLIBC_2.2.5");
+    __asm__(".symver _iosys_vfscanf,vfscanf@GLIBC_2.2.5");
 
-    int fscanf (FILE *__restrict fp,
+    int _iosys_fscanf (FILE *__restrict fp,
                    const char *__restrict fmt, ...)
     {
-        TRACE_SYSCALL();
+        TRACE_SYSCALLN("(%p) -> vfscanf()", fp);
         va_list ap;
         int ret;
         va_start(ap, fmt);
@@ -181,5 +194,5 @@ extern "C"
         va_end(ap);
         return ret;
     }
-    __asm__(".symver fscanf,fscanf@GLIBC_2.2.5");
+    __asm__(".symver _iosys_fscanf,fscanf@GLIBC_2.2.5");
 }
