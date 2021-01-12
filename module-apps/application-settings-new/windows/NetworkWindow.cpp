@@ -42,7 +42,7 @@ namespace gui
         auto operatorsOn = operatorsSettings->getOperatorsOn();
         auto voLteOn     = operatorsSettings->getVoLTEOn();
 
-        optList.emplace_back(std::make_unique<gui::OptionSettings>(
+        optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translateI18("app_settings_network_active_card") + ":" + simStr + " / " + phoneNumber,
             [=](gui::Item &item) {
                 if (Store::GSM::SIM::SIM1 == sim) {
@@ -67,7 +67,7 @@ namespace gui
             },
             this));
 
-        optList.emplace_back(std::make_unique<gui::OptionSettings>(
+        optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translateI18("app_settings_network_operator_auto_select"),
             [=](gui::Item &item) {
                 operatorsSettings->setOperatorsOn(!operatorsOn);
@@ -76,10 +76,9 @@ namespace gui
             },
             nullptr,
             nullptr,
-            operatorsOn ? RightItem::On : RightItem::Off));
-
+            operatorsOn ? gui::option::SettingRightItem::On : gui::option::SettingRightItem::Off));
         if (!operatorsOn) {
-            optList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 utils::translateI18("app_settings_network_all_operators"),
                 [=](gui::Item &item) {
                     this->application->switchWindow(gui::window::name::all_operators, nullptr);
@@ -87,10 +86,10 @@ namespace gui
                 },
                 nullptr,
                 nullptr,
-                RightItem::ArrowWhite,
+                gui::option::SettingRightItem::ArrowWhite,
                 true));
         }
-        optList.emplace_back(std::make_unique<gui::OptionSettings>(
+        optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translateI18("app_settings_network_import_contacts_from_sim_card"),
             [=](gui::Item &item) {
                 this->application->switchWindow(gui::window::name::import_contacts, nullptr);
@@ -99,7 +98,7 @@ namespace gui
             nullptr,
             nullptr));
 
-        optList.emplace_back(std::make_unique<gui::OptionSettings>(
+        optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translateI18("app_settings_network_voice_over_lte"),
             [=](gui::Item &item) {
                 operatorsSettings->setVoLTEOn(!voLteOn);
@@ -108,9 +107,9 @@ namespace gui
             },
             nullptr,
             nullptr,
-            voLteOn ? RightItem::On : RightItem::Off));
+            voLteOn ? gui::option::SettingRightItem::On : gui::option::SettingRightItem::Off));
 
-        optList.emplace_back(std::make_unique<gui::OptionSettings>(
+        optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translateI18("app_settings_network_apn_settings"),
             [=](gui::Item &item) {
                 this->application->switchWindow(gui::window::name::apn_settings, nullptr);
@@ -118,7 +117,7 @@ namespace gui
             },
             nullptr,
             nullptr,
-            RightItem::ArrowWhite,
+            gui::option::SettingRightItem::ArrowWhite,
             true));
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));

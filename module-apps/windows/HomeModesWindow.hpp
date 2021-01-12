@@ -5,7 +5,6 @@
 
 #include "module-apps/Application.hpp"
 #include "AppWindow.hpp"
-#include "PageLayout.hpp"
 #include "module-apps/widgets/BarGraph.hpp"
 #include "module-apps/widgets/ModesBox.hpp"
 #include <functional>

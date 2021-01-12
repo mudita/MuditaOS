@@ -14,7 +14,7 @@ namespace gui
     {
         std::list<Option> optionList;
 
-        optionList.emplace_back(std::make_unique<OptionSettings>(
+        optionList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translateI18("app_settings_security_lock_screen_passcode"),
             [=](Item &item) {
                 lockScreenPasscodeOn = !lockScreenPasscodeOn;
@@ -33,10 +33,10 @@ namespace gui
                 return true;
             },
             nullptr,
-            lockScreenPasscodeOn ? RightItem::On : RightItem::Off));
+            lockScreenPasscodeOn ? gui::option::SettingRightItem::On : gui::option::SettingRightItem::Off));
 
         if (lockScreenPasscodeOn) {
-            optionList.emplace_back(std::make_unique<OptionSettings>(
+            optionList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 utils::translateI18("app_settings_security_change_passcode"),
                 [=](Item &item) {
                     LOG_INFO("Not implemented");
@@ -44,7 +44,7 @@ namespace gui
                 },
                 nullptr,
                 nullptr,
-                RightItem::ArrowWhite));
+                gui::option::SettingRightItem::ArrowWhite));
         }
 
         return optionList;

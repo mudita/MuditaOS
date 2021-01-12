@@ -30,7 +30,7 @@ namespace gui
                                                     application->switchWindow(window, nullptr);
                                                     return true;
                                                 },
-                                                gui::Arrow::Enabled});
+                                                gui::option::Arrow::Enabled});
         };
 
         topBar->setActive(TopBar::Elements::SIGNAL, false);

@@ -50,7 +50,6 @@ namespace gui
 
     ListView::ListView()
     {
-
         body = new VBox{this, 0, 0, 0, 0};
 
         scroll = new ListViewScroll(this,
@@ -61,8 +60,13 @@ namespace gui
         type   = gui::ItemType::LIST;
     }
 
-    ListView::ListView(
-        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::shared_ptr<ListItemProvider> prov)
+    ListView::ListView(Item *parent,
+                       uint32_t x,
+                       uint32_t y,
+                       uint32_t w,
+                       uint32_t h,
+                       std::shared_ptr<ListItemProvider> prov,
+                       style::listview::ScrollBarType scrollBarType)
         : Rect{parent, x, y, w, h}
     {
 
@@ -92,11 +96,13 @@ namespace gui
                 recalculateOnBoxRequestedResize();
         };
 
-        scroll = new ListViewScroll(this,
-                                    style::listview::scroll::x,
-                                    style::listview::scroll::y,
-                                    style::listview::scroll::w,
-                                    style::listview::scroll::h);
+        if (scrollBarType != style::listview::ScrollBarType::None) {
+            scroll = new ListViewScroll(this,
+                                        style::listview::scroll::x,
+                                        style::listview::scroll::y,
+                                        style::listview::scroll::w,
+                                        style::listview::scroll::h);
+        }
 
         setProvider(std::move(prov));
 
@@ -259,7 +265,9 @@ namespace gui
         addItemsOnPage();
 
         setFocus();
-        scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
+        if (scroll) {
+            scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
+        }
         resizeWithScroll();
         pageLoaded = true;
 
@@ -326,7 +334,7 @@ namespace gui
 
     void ListView::resizeWithScroll()
     {
-        if (scroll->shouldShowScroll(currentPageSize, elementsCount)) {
+        if (scroll && scroll->shouldShowScroll(currentPageSize, elementsCount)) {
             body->setSize(style::listview::item_width_with_scroll, body->getHeight());
         }
         else {
@@ -386,7 +394,9 @@ namespace gui
     {
         Rect::onDimensionChanged(oldDim, newDim);
         body->setSize(body->getWidth(), newDim.h);
-        scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
+        if (scroll) {
+            scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
+        }
 
         return true;
     }

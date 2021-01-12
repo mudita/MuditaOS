@@ -4,7 +4,7 @@
 #pragma once
 
 #include <SwitchData.hpp>
-#include <OptionsWindowOption.hpp>
+#include <Option.hpp>
 #include <list>
 
 namespace gui
