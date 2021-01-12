@@ -28,7 +28,7 @@ TEST_CASE("gui::Item on input flow test")
     SECTION("gui item resize called")
     {
         success                       = false;
-        item.dimensionChangedCallback = [&success](gui::Item &, void *data) -> bool {
+        item.dimensionChangedCallback = [&success](gui::Item &, gui::BoundingBox data) -> bool {
             success = true;
             return true;
         };

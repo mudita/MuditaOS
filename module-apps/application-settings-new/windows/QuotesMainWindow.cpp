@@ -5,7 +5,7 @@
 
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/widgets/SettingsStyle.hpp"
-#include "windows/OptionSetting.hpp"
+#include "OptionSetting.hpp"
 
 #include <InputEvent.hpp>
 #include <i18n/i18n.hpp>
@@ -62,7 +62,7 @@ namespace gui
         std::list<gui::Option> optionsList;
 
         for (auto &quote : quotes) {
-            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 utils::translateI18(quote.first),
                 [&quote, this](gui::Item &item) {
                     switchHandler(quote.second);
@@ -76,7 +76,7 @@ namespace gui
                     return true;
                 },
                 this,
-                quote.second ? RightItem::Checked : RightItem::Disabled));
+                quote.second ? gui::option::SettingRightItem::Checked : gui::option::SettingRightItem::Disabled));
         }
 
         return optionsList;
