@@ -3,6 +3,8 @@
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <application-phonebook/windows/PhonebookContactDetails.hpp>
+#include <AsyncTask.hpp>
+
 #include "ListView.hpp"
 #include "PhonebookModel.hpp"
 
@@ -24,8 +26,8 @@ PhonebookModel::PhonebookModel(app::Application *app,
                                std::string filter,
                                std::uint32_t groupFilter,
                                std::uint32_t displayMode)
-    : DatabaseModel(app), queryFilter(std::move(filter)), queryGroupFilter(std::move(groupFilter)),
-      queryDisplayMode(std::move(displayMode))
+    : DatabaseModel(app), app::AsyncCallbackReceiver{app}, queryFilter(std::move(filter)),
+      queryGroupFilter(std::move(groupFilter)), queryDisplayMode(std::move(displayMode))
 {}
 
 auto PhonebookModel::requestRecordsCount() -> unsigned int
@@ -60,9 +62,9 @@ void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     auto query =
         std::make_unique<db::query::ContactGet>(offset, limit, queryFilter, queryGroupFilter, queryDisplayMode);
-    query->setQueryListener(
-        db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
-    DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
+    auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
+    task->setCallback([this](auto response) { return handleQueryResponse(response); });
+    task->execute(application, this);
 }
 
 auto PhonebookModel::requestLetterMap() -> ContactsMapData

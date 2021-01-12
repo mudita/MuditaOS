@@ -184,7 +184,7 @@ auto CalendarEventsHelper::requestDataFromDB(Context &context) -> sys::ReturnCod
         context);
 
     query->setQueryListener(std::move(listener));
-    auto ret = DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+    auto [ret, _] = DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
 
     if (ret) {
         return sys::ReturnCodes::Success;
@@ -280,7 +280,9 @@ auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
             context);
 
         query->setQueryListener(std::move(listener));
-        ret = ret && DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+        const auto [succeed, _] =
+            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+        ret = ret && succeed;
     }
 
     if (ret) {
@@ -315,7 +317,9 @@ auto CalendarEventsHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
             context);
 
         query->setQueryListener(std::move(listener));
-        ret = ret && DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+        const auto [succeed, _] =
+            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+        ret = ret && succeed;
     }
     if (ret) {
         return sys::ReturnCodes::Success;
@@ -341,7 +345,7 @@ auto CalendarEventsHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
         context);
 
     query->setQueryListener(std::move(listener));
-    auto ret = DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+    auto [ret, _] = DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
 
     if (ret) {
         return sys::ReturnCodes::Success;

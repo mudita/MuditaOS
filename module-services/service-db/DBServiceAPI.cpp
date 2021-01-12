@@ -54,17 +54,6 @@ auto DBServiceAPI::ThreadGetByNumber(sys::Service *serv,
     return nullptr;
 }
 
-auto DBServiceAPI::ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit) -> bool
-{
-    std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadGetLimitOffset);
-    msg->offset                          = offset;
-    msg->limit                           = limit;
-
-    sys::Bus::SendUnicast(msg, service::name::db, serv);
-
-    return true;
-}
-
 auto DBServiceAPI::ThreadGetCount(sys::Service *serv, EntryState state) -> uint32_t
 {
     auto msg = std::make_shared<DBThreadGetCountMessage>(state);
