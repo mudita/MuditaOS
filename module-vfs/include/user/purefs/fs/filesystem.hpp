@@ -14,6 +14,7 @@
 #include <purefs/fs/file_handle.hpp>
 #include <purefs/fs/directory_handle.hpp>
 #include <purefs/fs/mount_point.hpp>
+#include <purefs/fs/mount_flags.hpp>
 #include <type_traits>
 
 struct statvfs;
@@ -41,15 +42,6 @@ namespace purefs::fs
     {
         class directory_handle;
     }
-    //! Mount flags struct
-    struct mount_flags
-    {
-        enum _mount_flags
-        {
-            read_only = 1U < 0U, // !Read only filesystem
-        };
-    };
-
     class filesystem
     {
         static constexpr auto path_separator = '/';
@@ -173,6 +165,11 @@ namespace purefs::fs
         auto find_filehandle(int fds) const noexcept -> fsfile;
 
       private:
+        enum class iaccess : bool
+        {
+            ro, //! Syscall is RO
+            rw  //! Syscall is RW
+        };
         template <class Base, class T, typename... Args>
         inline auto invoke_fops(T Base::*method, int fds, Args &&... args)
             -> decltype((static_cast<Base *>(nullptr)->*method)(0, std::forward<Args>(args)...))
@@ -197,13 +194,16 @@ namespace purefs::fs
         }
 
         template <class Base, class T, typename... Args>
-        inline auto invoke_fops(T Base::*method, std::string_view path, Args &&... args) const
+        inline auto invoke_fops(iaccess acc, T Base::*method, std::string_view path, Args &&... args) const
             -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, {}, std::forward<Args>(args)...))
         {
             const auto abspath     = absolute_path(path);
             auto [mountp, pathpos] = find_mount_point(abspath);
             if (!mountp) {
                 return -ENOENT;
+            }
+            if (acc == iaccess::rw && (mountp->flags() & mount_flags::read_only)) {
+                return -EACCES;
             }
             auto fsops = mountp->fs_ops();
             if (fsops)
@@ -224,6 +224,9 @@ namespace purefs::fs
             auto [mountp, pathpos] = find_mount_point(abspath);
             if (!mountp) {
                 return -ENOENT;
+            }
+            if (mountp->flags() & mount_flags::read_only) {
+                return -EACCES;
             }
             if (path.compare(0, pathpos, path2, 0, pathpos) != 0) {
                 // Mount points are not the same

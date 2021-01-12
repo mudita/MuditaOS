@@ -8,6 +8,7 @@
 #include <purefs/fs/drivers/directory_handle_littlefs.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_handle.hpp>
+#include <purefs/fs/mount_flags.hpp>
 #include <littlefs/lfs.h>
 #include <log/log.hpp>
 
@@ -86,27 +87,29 @@ namespace
         return lfs_mode;
     }
 
-    auto translate_attrib_to_st_mode(uint8_t type)
+    auto translate_attrib_to_st_mode(uint8_t type, bool ro)
     {
-        decltype(static_cast<struct stat *>(nullptr)->st_mode) mode =
-            S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH;
+        decltype(static_cast<struct stat *>(nullptr)->st_mode) mode = S_IRUSR | S_IRGRP | S_IROTH;
+        if (!ro) {
+            mode |= S_IWUSR | S_IWGRP | S_IWOTH;
+        }
         if (type == LFS_TYPE_REG) {
-            mode |= (S_IFREG | S_IXUSR | S_IXGRP | S_IXOTH);
+            mode |= S_IFREG;
         }
         else if (type == LFS_TYPE_DIR) {
-            mode |= S_IFDIR;
+            mode |= (S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH);
         }
         return mode;
     }
 
-    void translate_lfsinfo_to_stat(const ::lfs_info &fs, const lfs_config &cfg, struct stat &st)
+    void translate_lfsinfo_to_stat(const ::lfs_info &fs, const lfs_config &cfg, bool ro, struct stat &st)
     {
         std::memset(&st, 0, sizeof st);
         st.st_nlink   = 1;
         st.st_size    = fs.size;
         st.st_blksize = cfg.block_size;
         st.st_blocks  = fs.size / cfg.block_count;
-        st.st_mode    = translate_attrib_to_st_mode(fs.type);
+        st.st_mode    = translate_attrib_to_st_mode(fs.type, ro);
     }
 
     [[gnu::nonnull(1)]] int setup_lfs_config(lfs_config *cfg, size_t sector_size, size_t part_sectors_count)
@@ -338,7 +341,7 @@ namespace purefs::fs::drivers
         const auto err  = invoke_lfs(zfile->mntpoint(), ::lfs_stat, path.c_str(), &linfo);
         if (!err) {
             auto vmnt = std::static_pointer_cast<mount_point_littlefs>(vfile->mntpoint());
-            translate_lfsinfo_to_stat(linfo, *vmnt->lfs_config(), st);
+            translate_lfsinfo_to_stat(linfo, *vmnt->lfs_config(), vmnt->flags() & mount_flags::read_only, st);
         }
         return err;
     }
@@ -349,7 +352,7 @@ namespace purefs::fs::drivers
         const auto err = invoke_lfs(mnt, file, ::lfs_stat, &linfo);
         if (!err) {
             auto mntp = std::static_pointer_cast<mount_point_littlefs>(mnt);
-            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), st);
+            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), mntp->flags() & mount_flags::read_only, st);
         }
         return err;
     }
@@ -418,7 +421,7 @@ namespace purefs::fs::drivers
         int err = invoke_lfs(dirstate, ::lfs_dir_read, &linfo);
         if (err == 1) {
             auto mntp = std::static_pointer_cast<mount_point_littlefs>(dirstate->mntpoint());
-            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), filestat);
+            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), mntp->flags() & mount_flags::read_only, filestat);
             filename = linfo.name;
             err      = 0;
         }
