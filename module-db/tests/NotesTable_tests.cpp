@@ -1,6 +1,7 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "vfs.hpp"
 #include <catch2/catch.hpp>
 
 #include <Tables/NotesTable.hpp>
@@ -10,6 +11,7 @@
 
 TEST_CASE("Notes Table tests")
 {
+    vfs.Init();
     Database::initialize();
 
     const auto notesDbPath = purefs::dir::getUserDiskPath() / "notes.db";

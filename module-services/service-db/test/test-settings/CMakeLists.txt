@@ -1,12 +1,10 @@
 ﻿# service-db tests
 add_catch2_executable(
         NAME
-            service-db
+            service-db-settings
         SRCS
             main.cpp
-            test-service-db-api.cpp
-            test-service-db-settings-messages.cpp
-            test-service-db-file_indexer.cpp
+            test-service-db-settings-api.cpp
         LIBS
             service-audio
             module-vfs
@@ -17,4 +15,3 @@ add_catch2_executable(
         DEPS
             PurePhone.img-target
 )
-add_subdirectory(test-settings)

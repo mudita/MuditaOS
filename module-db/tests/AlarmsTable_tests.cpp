@@ -19,6 +19,7 @@
 
 TEST_CASE("Alarms Table tests")
 {
+    vfs.Init();
     Database::initialize();
 
     const auto alarmsPath = purefs::dir::getUserDiskPath() / "alarms.db";
