@@ -8,6 +8,7 @@
 #include <dirent.h>
 #include <newlib/vfs_io_syscalls.hpp>
 #include <sys/statvfs.h>
+#include <sys/mount.h>
 extern "C"
 {
     using namespace vfsn::internal;
@@ -113,6 +114,19 @@ extern "C"
     int statvfs(const char *path, struct statvfs *buf)
     {
         return syscalls::statvfs( _REENT->_errno, path,buf);
+    }
+    /* Mount a filesystem.  */
+    int mount (const char *special_file, const char *dir,
+           const char *fstype, unsigned long int rwflag,
+           const void *data)
+    {
+        return syscalls::mount(_REENT->_errno, special_file, dir,
+                               fstype, rwflag, data );
+    }
+    /* Unmount a filesystem.  */
+    int umount (const char *special_file)
+    {
+        return syscalls::umount(_REENT->_errno, special_file);
     }
 }
 

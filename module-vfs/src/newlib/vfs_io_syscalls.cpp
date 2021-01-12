@@ -343,5 +343,20 @@ namespace vfsn::internal::syscalls
         }
     }
 
+    int umount(int &_errno_, const char *special_file)
+    {
+        return invoke_fs(_errno_, &purefs::fs::filesystem::umount, special_file);
+    }
+
+    int mount(int &_errno_,
+              const char *special_file,
+              const char *dir,
+              const char *fstype,
+              unsigned long int rwflag,
+              const void * /*data*/)
+    {
+        return invoke_fs(_errno_, &purefs::fs::filesystem::mount, special_file, dir, fstype, rwflag);
+    }
+
 } // namespace vfsn::internal::syscalls
 
