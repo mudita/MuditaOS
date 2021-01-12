@@ -3,7 +3,7 @@
 
 #include "AutolockWindow.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
-#include "windows/OptionSetting.hpp"
+#include "OptionSetting.hpp"
 
 #include <i18n/i18n.hpp>
 
@@ -21,7 +21,7 @@ namespace gui
         std::vector<std::string> autoLockTimes = {"15s", "30s", "1m", "2m", "5m", "10m", "20m"};
 
         for (auto time : autoLockTimes) {
-            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 time,
                 [=](gui::Item &item) {
                     selectedTime = time;
@@ -36,7 +36,8 @@ namespace gui
                     return true;
                 },
                 this,
-                selectedTime == time ? RightItem::Checked : RightItem::Disabled));
+                selectedTime == time ? gui::option::SettingRightItem::Checked
+                                     : gui::option::SettingRightItem::Disabled));
         }
 
         return optionsList;

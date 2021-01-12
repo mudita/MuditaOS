@@ -4,7 +4,7 @@
 #include "DisplayLightWindow.hpp"
 
 #include "application-settings-new/ApplicationSettings.hpp"
-#include "windows/OptionSetting.hpp"
+#include "OptionSetting.hpp"
 
 #include <i18n/i18n.hpp>
 
@@ -26,7 +26,7 @@ namespace gui
         std::list<gui::Option> optionsList;
 
         auto addOnOffOoption = [&](UTF8 text, bool &toggle) {
-            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 text,
                 [&](gui::Item &item) mutable {
                     switchHandler(toggle);
@@ -40,7 +40,7 @@ namespace gui
                     return true;
                 },
                 this,
-                toggle ? RightItem::On : RightItem::Off));
+                toggle ? gui::option::SettingRightItem::On : gui::option::SettingRightItem::Off));
         };
 
         addOnOffOoption(utils::translateI18("app_settings_display_light_main"), isDisplayLightSwitchOn);
@@ -49,7 +49,7 @@ namespace gui
         }
 
         if (isDisplayLightSwitchOn && !isAutoLightSwitchOn) {
-            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 utils::translateI18("app_settings_display_light_brightness"),
                 [=](gui::Item &item) { return true; },
                 [=](gui::Item &item) {
@@ -60,7 +60,7 @@ namespace gui
                     return true;
                 },
                 this,
-                RightItem::ArrowWhite));
+                gui::option::SettingRightItem::ArrowWhite));
         }
 
         return optionsList;
