@@ -73,8 +73,15 @@ namespace purefs::fs
             cpp_freertos::LockGuard _lock(*m_lock);
             const auto mpi = m_mounts.find(std::string(target));
             if (mpi != std::end(m_mounts)) {
-                LOG_ERROR("VFS: mount point already exists %.*s", int(target.length()), target.data());
-                return -EBUSY;
+                if (flags & mount_flags::remount) {
+                    // NOTE: Currently only RO is supported
+                    mpi->second->modify_flags(flags);
+                    return {};
+                }
+                else {
+                    LOG_ERROR("VFS: mount point already exists %.*s", int(target.length()), target.data());
+                    return -EBUSY;
+                }
             }
             const auto mpp = m_partitions.find(std::string(dev_or_part));
             if (mpp != std::end(m_partitions)) {
