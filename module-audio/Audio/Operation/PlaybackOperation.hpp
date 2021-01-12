@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -39,9 +39,15 @@ namespace audio
         Position GetPosition() final;
 
       private:
+        static constexpr auto minimumBlockSize = 256U;
+        static constexpr auto maximumBlockSize = 2048U;
+        static constexpr Endpoint::Capabilities playbackCapabilities{.minBlockSize = minimumBlockSize,
+                                                                     .maxBlockSize = maximumBlockSize};
+
+        std::unique_ptr<Stream> dataStreamOut;
         std::unique_ptr<Decoder> dec;
         std::unique_ptr<Tags> tags;
-        std::unique_ptr<StreamConnection> outputConnection = nullptr;
+        std::unique_ptr<StreamConnection> outputConnection;
 
         DecoderWorker::EndOfFileCallback endOfFileCallback;
     };
