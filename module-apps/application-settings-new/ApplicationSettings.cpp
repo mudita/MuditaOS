@@ -25,6 +25,7 @@
 #include "windows/QuotesMainWindow.hpp"
 #include "windows/QuotesAddWindow.hpp"
 #include "windows/SecurityMainWindow.hpp"
+#include "windows/QuotesOptionsWindow.hpp"
 #include "windows/ChangePasscodeWindow.hpp"
 
 #include "Dialog.hpp"
@@ -51,7 +52,9 @@ namespace app
     namespace settings
     {
         constexpr inline auto operators_on = "operators_on";
-    }
+        const std::string quotesPath =
+            purefs::createPath(purefs::dir::getUserDiskPath(), "data/applications/settings/quotes.json");
+    } // namespace settings
 
     ApplicationSettingsNew::ApplicationSettingsNew(std::string name,
                                                    std::string parent,
@@ -223,20 +226,11 @@ namespace app
         windowsFactory.attach(gui::window::name::wallpaper, [](Application *app, const std::string &name) {
             return std::make_unique<gui::WallpaperWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::quotes, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuotesMainWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::new_quote, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuotesAddWindow>(app);
+        windowsFactory.attach(gui::window::name::quotes_dialog_yes_no, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogYesNo>(app, name);
         });
         windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SecurityMainWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::change_passcode, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::ChangePasscodeWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
         });
     }
 

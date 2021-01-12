@@ -17,6 +17,7 @@ target_sources( ${PROJECT_NAME}
         ApplicationSettings.cpp
         widgets/timeWidget.cpp
         widgets/ChangePasscodeLockHandler.cpp
+        widgets/QuoteWidget.cpp
         windows/SettingsMainWindow.cpp
         windows/AddDeviceWindow.cpp
         windows/AllDevicesWindow.cpp
@@ -46,7 +47,6 @@ target_sources( ${PROJECT_NAME}
 
     PUBLIC
         ApplicationSettings.hpp
-        widgets/ChangePasscodeLockHandler.hpp
         windows/SettingsMainWindow.hpp
         windows/BaseSettingsWindow.hpp
         windows/FontSizeWindow.hpp
@@ -60,7 +60,6 @@ target_sources( ${PROJECT_NAME}
         widgets/SettingsStyle.hpp
         windows/AutolockWindow.hpp
         windows/WallpaperWindow.hpp
-        windows/ChangePasscodeWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)
