@@ -37,6 +37,7 @@ namespace db
 
 TEST_CASE("Query interface")
 {
+    vfs.Init();
     Database::initialize();
 
     auto contactsDB      = std::make_unique<ContactsDB>((purefs::dir::getUserDiskPath() / "contacts.db").c_str());
