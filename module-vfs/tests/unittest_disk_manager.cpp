@@ -194,22 +194,44 @@ TEST_CASE("Disk sectors out of range for partition")
     REQUIRE(dm.register_device(disk, "emmc1") == 0);
     const auto parts = dm.partitions("emmc1");
     REQUIRE(parts.size() > 1);
+    const auto sectors   = dm.get_info("emmc1", blkdev::info_type::sector_count);
     const auto sect_size = dm.get_info("emmc1", blkdev::info_type::sector_size);
 
-    SECTION("Read out of range")
+    SECTION("Read out of range ")
     {
         std::vector<uint8_t> buf(sect_size);
-        REQUIRE(dm.read("emmc1", buf.data(), parts[0].num_sectors - 1, parts[0].num_sectors) == -ERANGE);
+        SECTION("Pass lba bigger than sectors")
+        {
+            REQUIRE(dm.read("emmc1", buf.data(), sectors + 1, 1) == -ERANGE);
+        }
+        SECTION("Pass sum of lba and count bigger than sectors")
+        {
+            REQUIRE(dm.read("emmc1", buf.data(), sectors - 1, 2) == -ERANGE);
+        }
     }
 
     SECTION("Write out of range")
     {
         std::vector<uint8_t> buf(sect_size);
-        REQUIRE(dm.write("emmc1", buf.data(), parts[0].num_sectors - 1, parts[0].num_sectors) == -ERANGE);
+        SECTION("Pass lba bigger than sectors")
+        {
+            REQUIRE(dm.write("emmc1", buf.data(), sectors + 1, 1) == -ERANGE);
+        }
+        SECTION("Pass sum of lba and count bigger than sectors")
+        {
+            REQUIRE(dm.write("emmc1", buf.data(), sectors - 1, 2) == -ERANGE);
+        }
     }
 
     SECTION("Erase out of range")
     {
-        REQUIRE(dm.erase("emmc1", parts[0].num_sectors - 1, parts[0].num_sectors) == -ERANGE);
+        SECTION("Pass lba bigger than sectors")
+        {
+            REQUIRE(dm.erase("emmc1", sectors + 1, 1) == -ERANGE);
+        }
+        SECTION("Pass sum of lba and count bigger than sectors")
+        {
+            REQUIRE(dm.erase("emmc1", sectors - 1, 2) == -ERANGE);
+        }
     }
 }
