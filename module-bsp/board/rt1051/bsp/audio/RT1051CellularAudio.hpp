@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_RT1051CELLULARAUDIO_HPP
@@ -30,7 +30,7 @@ namespace bsp
         friend void txCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
         friend void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
 
-        RT1051CellularAudio(AudioDevice::audioCallback_t callback);
+        RT1051CellularAudio();
         virtual ~RT1051CellularAudio();
 
         AudioDevice::RetCode Start(const Format &format) override final;

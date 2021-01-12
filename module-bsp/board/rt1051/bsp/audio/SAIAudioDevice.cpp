@@ -5,11 +5,8 @@
 
 using namespace bsp;
 
-SAIAudioDevice::SAIAudioDevice(AudioDevice::audioCallback_t callback,
-                               I2S_Type *base,
-                               sai_edma_handle_t *rxHandle,
-                               sai_edma_handle_t *txHandle)
-    : AudioDevice(callback), _base(base), rx(rxHandle), tx(txHandle)
+SAIAudioDevice::SAIAudioDevice(I2S_Type *base, sai_edma_handle_t *rxHandle, sai_edma_handle_t *txHandle)
+    : AudioDevice(saiCapabilities, saiCapabilities), _base(base), rx(rxHandle), tx(txHandle)
 {}
 
 void SAIAudioDevice::initiateRxTransfer()

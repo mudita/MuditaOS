@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051CellularAudio.hpp"
@@ -18,9 +18,8 @@ namespace bsp
     sai_edma_handle_t RT1051CellularAudio::txHandle = {};
     sai_edma_handle_t RT1051CellularAudio::rxHandle = {};
 
-    RT1051CellularAudio::RT1051CellularAudio(bsp::AudioDevice::audioCallback_t callback)
-        : SAIAudioDevice(callback, BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &txHandle), saiInFormat{},
-          saiOutFormat{}, config{}
+    RT1051CellularAudio::RT1051CellularAudio()
+        : SAIAudioDevice(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &txHandle), saiInFormat{}, saiOutFormat{}, config{}
     {
         isInitialized = true;
     }
