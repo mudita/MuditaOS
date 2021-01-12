@@ -7,14 +7,14 @@
 * VoLTE ON/OFF switch in Settings Network window
 * Add PLL2 clock switching
 * Support for asynchronous callbacks on application side.
-* APN settings window - empty
+* APN settings window - empty.
 
 ### Changed
 
 * Input keyboard language files parser from KBD to JSON.
 * Input language files are now loaded based on files in "profiles" folder.
 * Minimum CPU frequency is now 132 MHz
-* Icon widget now accepts rich text
+* Icon widget now accepts rich text.
 
 ### Fixed
 
@@ -22,6 +22,7 @@
 * Fix newly added contact recognized as a duplicate of temporary contact.
 * Fix default borderCallback navigation in GridLayout.
 * Fix crash on enter Settings -> Information.
+* Fix keyboard mode in the search windows.
 
 ## [0.52.1 2020-12-23]
 

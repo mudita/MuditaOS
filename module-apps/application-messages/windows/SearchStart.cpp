@@ -22,6 +22,11 @@ namespace gui
         body->setBoundingBox(bodySize());
         addWidget(body);
         auto text = inputBox(this, utils::localize.get("common_search_uc"), "search");
+        text->setInputMode(new InputMode(
+            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            [=](const UTF8 &Text) { application->getCurrentWindow()->bottomBarTemporaryMode(Text); },
+            [=]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+            [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
 
         inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
