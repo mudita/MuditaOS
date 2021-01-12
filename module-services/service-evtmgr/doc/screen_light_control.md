@@ -54,6 +54,7 @@ Default value of &gamma; is 2.5 . For leds this factor could be in range 2.2-2.8
 
 ## Message API
 
-`sevm::ScreenLightControlMessage` is used to control the module. It takes action and data structure as parameters. Set of actions is described in `sevm::screen_light_control::Action`.
+`screen_light_control::ScreenLightControlMessage` is used to control the module. It takes action and data structure as parameters. Set of actions is described in `sevm::screen_light_control::Action`.
+`screen_light_control::ScreenLightControlRequestParameters` us ised to request currently setup parameters for display light and sensor.
 
 ![](light_control_message_flow.svg "Message to light control")

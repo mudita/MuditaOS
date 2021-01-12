@@ -41,6 +41,8 @@ target_sources( ${PROJECT_NAME}
         windows/QuotesAddWindow.cpp
         windows/SecurityMainWindow.cpp
         windows/ChangePasscodeWindow.cpp
+        widgets/SpinBox.cpp
+        widgets/SpinBoxOptionSetting.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -66,5 +68,4 @@ add_dependencies(${PROJECT_NAME} version)
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
         service-bluetooth
-        service-evtmgr
 )

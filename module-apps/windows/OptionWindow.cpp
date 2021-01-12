@@ -97,4 +97,5 @@ namespace gui
             resetOptions(message->takeOptions());
         }
     }
+
 } /* namespace gui */

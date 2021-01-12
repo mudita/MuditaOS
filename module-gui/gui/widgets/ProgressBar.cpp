@@ -35,14 +35,15 @@ namespace gui
         }
     }
 
-    void ProgressBar::setValue(unsigned int value) noexcept
+    bool ProgressBar::setValue(unsigned int value) noexcept
     {
         currentValue = std::clamp(value, 0U, maxValue);
+        return currentValue == value;
     }
 
-    void ProgressBar::update(int value) noexcept
+    bool ProgressBar::update(int value) noexcept
     {
-        setValue(currentValue + value);
+        return setValue(currentValue + value);
     }
 
     void ProgressBar::setPercentageValue(unsigned int value) noexcept
@@ -110,14 +111,15 @@ namespace gui
         }
     }
 
-    void CircularProgressBar::setValue(unsigned int value) noexcept
+    bool CircularProgressBar::setValue(unsigned int value) noexcept
     {
         currentValue = std::clamp(value, 0U, maxValue);
+        return value == currentValue;
     }
 
-    void CircularProgressBar::update(int value) noexcept
+    bool CircularProgressBar::update(int value) noexcept
     {
-        setValue(currentValue + value);
+        return setValue(currentValue + value);
     }
 
     void CircularProgressBar::setPercentageValue(unsigned int value) noexcept
