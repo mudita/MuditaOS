@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051Audiocodec.hpp"
@@ -25,8 +25,8 @@ namespace bsp
     sai_edma_handle_t RT1051Audiocodec::txHandle      = {};
     sai_edma_handle_t RT1051Audiocodec::rxHandle      = {};
 
-    RT1051Audiocodec::RT1051Audiocodec(bsp::AudioDevice::audioCallback_t callback)
-        : SAIAudioDevice(callback, BOARD_AUDIOCODEC_SAIx, &rxHandle, &txHandle), saiInFormat{}, saiOutFormat{},
+    RT1051Audiocodec::RT1051Audiocodec()
+        : SAIAudioDevice(BOARD_AUDIOCODEC_SAIx, &rxHandle, &txHandle), saiInFormat{}, saiOutFormat{},
           codecParams{}, codec{}
     {
         isInitialized = true;

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,6 @@
 #include <functional>
 
 #include <Audio/AudioCommon.hpp>
-#include <Audio/Stream.hpp>
 #include <Audio/encoder/Encoder.hpp>
 #include <Audio/Profiles/Profile.hpp>
 
@@ -60,13 +59,13 @@ namespace audio
                                                  const audio::PlaybackType &operations  = audio::PlaybackType::None,
                                                  AudioServiceMessage::Callback callback = nullptr);
 
-        virtual audio::RetCode Start(audio::Token token)                                = 0;
-        virtual audio::RetCode Stop()                                                   = 0;
-        virtual audio::RetCode Pause()                                                  = 0;
-        virtual audio::RetCode Resume()                                                 = 0;
-        virtual audio::RetCode SendEvent(std::shared_ptr<Event> evt)                    = 0;
-        virtual audio::RetCode SetOutputVolume(float vol)                               = 0;
-        virtual audio::RetCode SetInputGain(float gain)                                 = 0;
+        virtual audio::RetCode Start(audio::Token token)             = 0;
+        virtual audio::RetCode Stop()                                = 0;
+        virtual audio::RetCode Pause()                               = 0;
+        virtual audio::RetCode Resume()                              = 0;
+        virtual audio::RetCode SendEvent(std::shared_ptr<Event> evt) = 0;
+        virtual audio::RetCode SetOutputVolume(float vol)            = 0;
+        virtual audio::RetCode SetInputGain(float gain)              = 0;
 
         virtual Position GetPosition() = 0;
 
@@ -112,12 +111,6 @@ namespace audio
 
         audio::RetCode SwitchToPriorityProfile();
 
-        void SetDataStreams(Stream *dStreamOut, Stream *dStreamIn)
-        {
-            dataStreamOut = dStreamOut;
-            dataStreamIn  = dStreamIn;
-        }
-
       protected:
         struct SupportedProfile
         {
@@ -128,9 +121,6 @@ namespace audio
             std::shared_ptr<Profile> profile;
             bool isAvailable;
         };
-
-        Stream *dataStreamOut = nullptr;
-        Stream *dataStreamIn  = nullptr;
 
         std::shared_ptr<Profile> currentProfile;
         std::unique_ptr<bsp::AudioDevice> audioDevice;
@@ -152,8 +142,7 @@ namespace audio
         virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
         std::shared_ptr<Profile> GetProfile(const Profile::Type type);
 
-        std::optional<std::unique_ptr<bsp::AudioDevice>> CreateDevice(bsp::AudioDevice::Type type,
-                                                                      bsp::AudioDevice::audioCallback_t callback);
+        std::optional<std::unique_ptr<bsp::AudioDevice>> CreateDevice(bsp::AudioDevice::Type type);
     };
 
 } // namespace audio

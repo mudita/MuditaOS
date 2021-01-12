@@ -20,6 +20,7 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioCommon.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Endpoint.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Stream.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/StreamFactory.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/StreamQueuedEventsListener.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/BluetoothProxyAudio.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/Operation.cpp"

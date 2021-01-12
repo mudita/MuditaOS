@@ -1,19 +1,18 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <memory>
-#include <optional>
-#include <functional>
-#include <bitset>
-
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 
 #include "AudioCommon.hpp"
-#include "Stream.hpp"
-#include "Operation/Operation.hpp"
 #include "decoder/Decoder.hpp"
+#include "Operation/Operation.hpp"
+
+#include <bitset>
+#include <functional>
+#include <memory>
+#include <optional>
 
 namespace audio
 {
@@ -96,17 +95,14 @@ namespace audio
                                      const audio::PlaybackType &playbackType = audio::PlaybackType::None);
 
         virtual audio::RetCode Start();
-
         virtual audio::RetCode Stop();
-
         virtual audio::RetCode Pause();
-
         virtual audio::RetCode Resume();
-
         virtual audio::RetCode Mute();
 
       private:
         void UpdateProfiles();
+
         AudioSinkState audioSinkState;
 
         std::shared_ptr<BluetoothStreamData> btData;
@@ -115,14 +111,6 @@ namespace audio
         std::unique_ptr<Operation> currentOperation;
 
         AudioServiceMessage::Callback serviceCallback;
-
-        // for efficiency multiple of 24 and 32 (max audio samples size)
-        static constexpr auto defaultAudioStreamBlockSize = 2048;
-        StandardStreamAllocator allocatorOut;
-        Stream dataStreamOut{allocatorOut, defaultAudioStreamBlockSize};
-
-        StandardStreamAllocator allocatorIn;
-        Stream dataStreamIn{allocatorIn, defaultAudioStreamBlockSize};
     };
 
 } // namespace audio
