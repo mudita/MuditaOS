@@ -4,7 +4,7 @@
 #include "ControlFunctions.hpp"
 #include <cmath>
 
-namespace sevm::screen_light_control::functions
+namespace screen_light_control::functions
 {
     namespace
     {
@@ -95,4 +95,4 @@ namespace sevm::screen_light_control::functions
         }
     }
 
-} // namespace sevm::screen_light_control::functions
+} // namespace screen_light_control::functions

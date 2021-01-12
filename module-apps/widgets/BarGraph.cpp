@@ -18,22 +18,77 @@ namespace gui
         setValue(absoluteValue);
     }
 
-    Rect *BarGraph::createRectangle(uint32_t width, uint32_t height)
+    auto BarGraph::createRectangle(uint32_t width, uint32_t height) const -> Rect *
     {
         auto rectangle = new Rect(nullptr, 0, 0, width, height);
         rectangle->setFillColor(ColorFullBlack);
         rectangle->setBorderColor(ColorFullBlack);
-        rectangle->setFilled(true);
+        rectangle->setFilled(false);
         rectangle->setRadius(style::bargraph::radius);
         rectangle->setPenWidth(style::window::default_border_focus_w);
         return rectangle;
     }
 
-    Rect *BarGraph::createSpace(uint32_t width, uint32_t height)
+    auto BarGraph::createSpace(uint32_t width, uint32_t height) const -> Rect *
     {
         auto space = new Rect(nullptr, 0, 0, width, height);
         space->setEdges(RectangleEdge::None);
         return space;
+    }
+
+    auto BarGraph::incrementWith(uint32_t levels) -> bool
+    {
+        if ((currentLevel + levels) <= numberOfRectangles) {
+            for (uint32_t i = 0; i < levels; ++i) {
+                rectangles[currentLevel]->setFillColor(ColorFullBlack);
+                rectangles[currentLevel]->setBorderColor(ColorFullBlack);
+                ++currentLevel;
+            }
+            return true;
+        }
+        else {
+            LOG_ERROR("bargraph incremented out of size");
+            return false;
+        }
+    }
+
+    auto BarGraph::decrementWith(uint32_t levels) -> bool
+    {
+        if (currentLevel >= levels) {
+            for (uint32_t i = levels; i > 0; --i) {
+                --currentLevel;
+                rectangles[currentLevel]->setFillColor(ColorFullWhite);
+                rectangles[currentLevel]->setBorderColor(ColorFullBlack);
+            }
+            return true;
+        }
+        else {
+            LOG_ERROR("bargraph incremented out of size");
+            return false;
+        }
+    }
+
+    auto BarGraph::update(int value) -> bool
+    {
+        if (value > 0) {
+            return incrementWith(value);
+        }
+        else if (value < 0) {
+            return decrementWith((-value));
+        }
+
+        return false;
+    }
+
+    bool BarGraph::setValue(unsigned int value)
+    {
+        if (const auto levels = static_cast<int>(value) - static_cast<int>(currentLevel); levels > 0) {
+            return incrementWith(levels);
+        }
+        else if (levels < 0) {
+            return decrementWith(-levels);
+        }
+        return false;
     }
 
     VBarGraph::VBarGraph(Item *parent, Position x, Position y, uint32_t numberOfRectangles)
@@ -65,57 +120,9 @@ namespace gui
         }
     }
 
-    void VBarGraph::update(int value)
+    HBarGraph::HBarGraph(Item *parent, Position x, Position y, uint32_t numberOfRectangles) : HBox(parent)
     {
-        if (value > 0) {
-            incrementWith(value);
-        }
-        else if (value < 0) {
-            decrementWith((-value));
-        }
-    }
-
-    void VBarGraph::setValue(unsigned int value)
-    {
-        if (const auto levels = static_cast<int>(value) - static_cast<int>(currentLevel); levels > 0) {
-            incrementWith(levels);
-        }
-        else if (levels < 0) {
-            decrementWith(-levels);
-        }
-    }
-
-    void VBarGraph::incrementWith(uint32_t levels)
-    {
-        if ((currentLevel + levels) <= numberOfRectangles) {
-            for (uint32_t i = 0; i < levels; ++i) {
-                rectangles[currentLevel]->setFillColor(ColorFullBlack);
-                rectangles[currentLevel]->setBorderColor(ColorFullBlack);
-                ++currentLevel;
-            }
-        }
-        else {
-            LOG_ERROR("bargraph incremented out of size");
-        }
-    }
-
-    void VBarGraph::decrementWith(uint32_t levels)
-    {
-        if (currentLevel >= levels) {
-            for (uint32_t i = levels; i > 0; --i) {
-                --currentLevel;
-                rectangles[currentLevel]->setFillColor(ColorTray);
-                rectangles[currentLevel]->setBorderColor(ColorTray);
-            }
-        }
-        else {
-            LOG_ERROR("bargraph incremented out of size");
-        }
-    }
-
-    HBarGraph::HBarGraph(Item *parent, Position x, Position y, uint32_t numberOfRectangles)
-        : HBox(parent, x, y, rectAxisLenghtFrom(numberOfRectangles), style::bargraph::rect_axis_length_lrg)
-    {
+        setMinimumSize(rectAxisLenghtFrom(numberOfRectangles), style::bargraph::rect_axis_length_lrg);
         setRadius(style::bargraph::radius);
         setEdges(RectangleEdge::None);
         setMaximum(numberOfRectangles);
@@ -138,54 +145,6 @@ namespace gui
             addWidget(rectangle);
             rectangles.push_back(rectangle);
             addWidget(createSpace(style::bargraph::spacing, style::bargraph::rect_axis_length_lrg));
-        }
-    }
-
-    void HBarGraph::update(int value)
-    {
-        if (value > 0) {
-            incrementWith(value);
-        }
-        else if (value < 0) {
-            decrementWith(-value);
-        }
-    }
-
-    void HBarGraph::setValue(unsigned int value)
-    {
-        if (const auto levels = static_cast<int>(value) - static_cast<int>(currentLevel); levels > 0) {
-            incrementWith(levels);
-        }
-        else if (levels < 0) {
-            decrementWith(levels * -1);
-        }
-    }
-
-    void HBarGraph::incrementWith(uint32_t levels)
-    {
-        if ((currentLevel + levels) <= numberOfRectangles) {
-            for (uint32_t i = 0; i < levels; ++i) {
-                rectangles[currentLevel]->setFillColor(ColorFullBlack);
-                rectangles[currentLevel]->setBorderColor(ColorFullBlack);
-                ++currentLevel;
-            }
-        }
-        else {
-            LOG_ERROR("bargraph incremented out of size");
-        }
-    }
-
-    void HBarGraph::decrementWith(uint32_t levels)
-    {
-        if (currentLevel >= levels) {
-            for (uint32_t i = levels; i > 0; --i) {
-                --currentLevel;
-                rectangles[currentLevel]->setFillColor(ColorFullWhite);
-                rectangles[currentLevel]->setBorderColor(ColorFullBlack);
-            }
-        }
-        else {
-            LOG_ERROR("bargraph incremented out of size");
         }
     }
 

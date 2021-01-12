@@ -177,8 +177,6 @@ enum class MessageType
     EVMTorchStateMessage,
     // Keypad backlight control messages
     EVMKeypadBacklightMessage,
-    // Screen frontlight control messages
-    EVMScreenLightControlMessage,
 
     // cellular messages
     EVMGetBoard,
@@ -238,7 +236,12 @@ enum class MessageType
     AntennaLockNotification,
     Settings,
     FileContentModified,
-    FileIndexer
+    FileIndexer,
+
+    // Screen frontlight control messages
+    ScreenLightControlAction,
+    ScreenLightControlParameters,
+    ScreenLightControlParametersResponse,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */
