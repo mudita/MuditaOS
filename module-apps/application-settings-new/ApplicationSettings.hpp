@@ -33,10 +33,14 @@ namespace gui::window::name
     inline constexpr auto nightshift = "Nightshift";
     inline constexpr auto templates  = "Templates";
 
-    inline constexpr auto autolock  = "Autolock";
-    inline constexpr auto wallpaper = "Wallpaper";
-    inline constexpr auto quotes    = "Quotes";
-    inline constexpr auto new_quote = "NewQuote";
+    inline constexpr auto autolock             = "Autolock";
+    inline constexpr auto wallpaper            = "Wallpaper";
+    inline constexpr auto quotes               = "Quotes";
+    inline constexpr auto new_quote            = "NewQuote";
+    inline constexpr auto edit_quote           = "EditQuote";
+    inline constexpr auto options_quote        = "OptionsQuote";
+    inline constexpr auto delete_quote         = "DeleteQuote";
+    inline constexpr auto quotes_dialog_yes_no = "DialogYesNo";
 
     inline constexpr auto display_and_keypad = "DisplayAndKeypad";
     inline constexpr auto change_settings    = "ChangeSettings";
@@ -130,6 +134,8 @@ namespace app
         void setStatus(bool isDisplayLightSwitchOn) override;
 
       private:
+        void attachQuotesWindows();
+
         Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
         std::string selectedSimNumber = {};
         bsp::Board board              = bsp::Board::none;
