@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsAgent.hpp"
@@ -83,7 +83,7 @@ auto SettingsAgent::getAgentName() -> const std::string
 // dbSingleVar
 auto SettingsAgent::dbGetValue(settings::EntryPath path) -> std::optional<std::string>
 {
-    auto retQuery = database->query(settings::Statements::getValue, path.to_string().c_str());
+    auto retQuery = database->query(settings::Statements::getValue, path.variable.c_str());
     if (nullptr == retQuery || 1 != retQuery->getRowCount()) {
         return std::string{};
     }
@@ -174,7 +174,7 @@ auto SettingsAgent::dbGetCurrentMode() -> std::string
 
 auto SettingsAgent::dbGetAllModes() -> std::list<std::string>
 {
-    auto qModes = database->query(settings::Statements::getDictValue, settings::DbPaths::phone_profile);
+    auto qModes = database->query(settings::Statements::getDictValue, settings::DbPaths::phone_mode);
     if (nullptr == qModes || 0 == qModes->getRowCount()) {
         return std::list<std::string>{};
     }
@@ -211,7 +211,6 @@ auto SettingsAgent::handleSetVariable(sys::Message *req) -> sys::MessagePointer
         auto oldValue = dbGetValue(path);
         if (oldValue.has_value() && oldValue.value() != value) {
             dbSetValue(path, value);
-            LOG_DEBUG("[SettingsAgent::handleSetVariable] %s=%s", path.to_string().c_str(), value.c_str());
             for (auto regPath : variableChangeRecipents[path.to_string()]) {
                 if (regPath.service != path.service) {
                     auto updateMsg =
@@ -230,9 +229,9 @@ auto SettingsAgent::handleRegisterOnVariableChange(sys::Message *req) -> sys::Me
     if (auto msg = dynamic_cast<settings::Messages::RegisterOnVariableChange *>(req)) {
         auto path = msg->getPath();
         if (dbRegisterValueChange(path)) {
-            auto it = variableChangeRecipents.find(path.to_string());
+            auto it = variableChangeRecipents.find(path.variable);
             if (variableChangeRecipents.end() == it || it->second.end() == it->second.find(path)) {
-                variableChangeRecipents[path.to_string()] = {path};
+                variableChangeRecipents[path.variable]    = {path.service};
                 auto currentValue                         = dbGetValue(path).value_or("");
                 auto msgValue = std::make_shared<::settings::Messages::VariableChanged>(path, currentValue, "");
                 sys::Bus::SendUnicast(std::move(msgValue), msg->sender, parentService);
@@ -254,7 +253,7 @@ auto SettingsAgent::handleUnregisterOnVariableChange(sys::Message *req) -> sys::
     if (auto msg = dynamic_cast<settings::Messages::UnregisterOnVariableChange *>(req)) {
         auto path = msg->getPath();
         if (dbUnregisterValueChange(path)) {
-            auto it = variableChangeRecipents.find(path.to_string());
+            auto it = variableChangeRecipents.find(path.variable);
             if (variableChangeRecipents.end() != it) {
                 it->second.erase(path);
                 LOG_DEBUG("[SettingsAgent::handleUnregisterOnVariableChange] %s", path.to_string().c_str());
