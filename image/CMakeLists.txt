@@ -1,4 +1,6 @@
-﻿set(ASSETS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+﻿include(Utils)
+
+set(ASSETS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(ASSETS_DEST_DIR "${CMAKE_BINARY_DIR}")
 
 file (GLOB_RECURSE ASSETS_LIST
@@ -16,10 +18,17 @@ foreach(ASSET ${ASSETS_LIST})
 
     if(dir)
         set(destdir "${ASSETS_DEST_DIR}/${dir}")
-        install(FILES ${ASSET} DESTINATION ${dir})
+        multicomp_install(
+            FILES ${ASSET}
+            DESTINATION ${dir}
+            COMPONENTS Standalone Update
+            )
     else()
         set(destdir "${ASSETS_DEST_DIR}")
-        install(FILES ${ASSET} DESTINATION "./" )
+        multicomp_install(
+            FILES ${ASSET}
+            DESTINATION "./"
+            COMPONENTS Standalone Update)
     endif()
 
     set(outfile "${destdir}/${filename}")
