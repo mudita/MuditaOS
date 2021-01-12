@@ -54,10 +54,11 @@ UpdateMuditaOS::UpdateMuditaOS(ServiceDesktop *ownerService) : owner(ownerServic
     bootConfig.load();
 }
 
-updateos::UpdateError UpdateMuditaOS::setUpdateFile(fs::path updateFileToUse)
+updateos::UpdateError UpdateMuditaOS::setUpdateFile(const std::filesystem::path &updatesOSPath,
+                                                    fs::path updateFileToUse)
 {
-    updateFile = purefs::dir::getUpdatesOSPath() / updateFileToUse;
-    if (std::filesystem::exists(updateFile.c_str())) {
+    updateFile = updatesOSPath / updateFileToUse;
+    if (std::filesystem::exists(updateFile)) {
         versionInformation = UpdateMuditaOS::getVersionInfoFromFile(updateFile);
         if (mtar_open(&updateTar, updateFile.c_str(), "r") == MTAR_ESUCCESS) {
             totalBytes = utils::filesystem::filelength(updateTar.stream);
@@ -86,7 +87,8 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
     updateRunStatus.fromVersion = bootConfig.to_json();
     storeRunStatusInDB();
 
-    updateos::UpdateError err = prepareTempDirForUpdate();
+    updateos::UpdateError err =
+        prepareTempDirForUpdate(purefs::dir::getTemporaryPath(), purefs::dir::getUpdatesOSPath());
     if (err != updateos::UpdateError::NoError) {
         return informError(err, "runUpdate can't prepare temp directory for update");
     }
@@ -490,49 +492,47 @@ const fs::path UpdateMuditaOS::getUpdateTmpChild(const fs::path &childPath)
         return updateTempDirectory / childPath;
 }
 
-updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate()
+updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate(const std::filesystem::path &temporaryPath,
+                                                              const std::filesystem::path &updatesOSPath)
 {
     status = updateos::UpdateState::CreatingDirectories;
 
-    updateTempDirectory = purefs::dir::getTemporaryPath() / utils::filesystem::generateRandomId(updateos::prefix_len);
+    updateTempDirectory = temporaryPath / utils::filesystem::generateRandomId(updateos::prefix_len);
 
     informDebug("Temp dir for update %s", updateTempDirectory.c_str());
 
-    const auto updatesOSPath = purefs::dir::getUpdatesOSPath();
-    if (!std::filesystem::is_directory(updatesOSPath.c_str())) {
-        if (!std::filesystem::create_directory(updatesOSPath.c_str())) {
+    if (!std::filesystem::is_directory(updatesOSPath)) {
+        if (!std::filesystem::create_directory(updatesOSPath)) {
             return informError(
                 updateos::UpdateError::CantCreateUpdatesDir, "%s can't create it", updatesOSPath.c_str());
         }
     }
 
-    if (!std::filesystem::is_directory(purefs::dir::getUpdatesOSPath().c_str())) {
-        if (!std::filesystem::create_directory(purefs::dir::getUpdatesOSPath().c_str())) {
-            return informError(updateos::UpdateError::CantCreateUpdatesDir,
-                               "%s can't create it %s",
-                               purefs::dir::getUpdatesOSPath().c_str());
+    if (!std::filesystem::is_directory(updatesOSPath)) {
+        if (!std::filesystem::create_directory(updatesOSPath)) {
+            return informError(
+                updateos::UpdateError::CantCreateUpdatesDir, "%s can't create it %s", updatesOSPath.c_str());
         }
         else {
-            informDebug("prepareTempDirForUpdate %s created", purefs::dir::getUpdatesOSPath().c_str());
+            informDebug("prepareTempDirForUpdate %s created", updatesOSPath.c_str());
         }
     }
     else {
-        informDebug("prepareTempDirForUpdate %s exists", purefs::dir::getUpdatesOSPath().c_str());
+        informDebug("prepareTempDirForUpdate %s exists", updatesOSPath.c_str());
     }
 
-    if (!std::filesystem::is_directory(purefs::dir::getTemporaryPath().c_str())) {
-        informDebug("prepareTempDirForUpdate %s is not a directory", purefs::dir::getTemporaryPath().c_str());
-        if (!std::filesystem::create_directory(purefs::dir::getTemporaryPath().c_str())) {
-            return informError(updateos::UpdateError::CantCreateTempDir,
-                               "%s can't create it %s",
-                               purefs::dir::getTemporaryPath().c_str());
+    if (!std::filesystem::is_directory(temporaryPath)) {
+        informDebug("prepareTempDirForUpdate %s is not a directory", temporaryPath.c_str());
+        if (!std::filesystem::create_directory(temporaryPath.c_str())) {
+            return informError(
+                updateos::UpdateError::CantCreateTempDir, "%s can't create it %s", temporaryPath.c_str());
         }
         else {
-            informDebug("prepareTempDirForUpdate %s created", purefs::dir::getTemporaryPath().c_str());
+            informDebug("prepareTempDirForUpdate %s created", temporaryPath.c_str());
         }
     }
     else {
-        informDebug("prepareTempDirForUpdate %s exists", purefs::dir::getTemporaryPath().c_str());
+        informDebug("prepareTempDirForUpdate %s exists", temporaryPath.c_str());
     }
 
     if (std::filesystem::is_directory(updateTempDirectory.c_str())) {
@@ -746,6 +746,9 @@ void UpdateMuditaOS::informUpdate(const updateos::UpdateState statusCode, const 
     auto msgToSend         = std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateInform);
     messageText            = std::string(readBuf.get());
     msgToSend->updateStats = (updateos::UpdateStats)(*this);
+    if (owner == nullptr) {
+        return;
+    }
     sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
 
     parserFSM::Context responseContext;

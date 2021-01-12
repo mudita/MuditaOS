@@ -29,6 +29,9 @@ auto DeviceInfoEndpoint::handle(Context &context) -> void
 }
 auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
 {
+    if (ownerServicePtr == nullptr) {
+        return false;
+    }
     json11::Json updateHistory   = static_cast<ServiceDesktop *>(ownerServicePtr)->updateOS->getUpdateHistory();
     struct statvfs vfstat;
     if (statvfs(purefs::dir::getRootDiskPath().c_str(), &vfstat) < 0) {
