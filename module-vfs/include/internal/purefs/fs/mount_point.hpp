@@ -45,6 +45,10 @@ namespace purefs::fs::internal
         {
             return m_flags;
         }
+        void modify_flags(unsigned flags) noexcept
+        {
+            m_flags = flags;
+        }
         auto native_path(std::string_view full_path) const noexcept -> std::string
         {
             const auto n1 = full_path.find(m_path);
@@ -66,6 +70,6 @@ namespace purefs::fs::internal
         const std::weak_ptr<blkdev::internal::disk_handle> m_diskh;
         const std::string m_path;                        //! Mounted path
         const std::weak_ptr<filesystem_operations> m_fs; //! Filesystem operation
-        const unsigned m_flags;
+        unsigned m_flags;
     };
 } // namespace purefs::fs::internal
