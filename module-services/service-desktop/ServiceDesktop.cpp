@@ -109,7 +109,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                       updateOsMsg->updateStats.updateFile.c_str(),
                       updateOsMsg->updateStats.uuid);
 
-            if (updateOS->setUpdateFile(updateOsMsg->updateStats.updateFile) == updateos::UpdateError::NoError)
+            if (updateOS->setUpdateFile(purefs::dir::getUpdatesOSPath(), updateOsMsg->updateStats.updateFile) ==
+                updateos::UpdateError::NoError)
                 updateOS->runUpdate();
         }
         return std::make_shared<sys::ResponseMessage>();
