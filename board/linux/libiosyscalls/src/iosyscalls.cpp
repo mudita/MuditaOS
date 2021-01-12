@@ -104,18 +104,9 @@ namespace vfsn::linux::internal
         return false;
     }
 
-    int native_fd_to_image_fd(int fd)
+    int get_native_fd(FILEX* file)
     {
-        return FIRST_FILEDESC + fd;
-    }
-
-    int image_fd_from_native_fd(int fd)
-    {
-        if(fd < FIRST_FILEDESC ) {
-            return -1;
-        } else {
-            return fd - FIRST_FILEDESC;
-        }
+        return file ? (FIRST_FILEDESC + file->fd) : -1;
     }
 
     bool is_image_fd(int fd)
