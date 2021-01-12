@@ -75,6 +75,16 @@ add_catch2_executable(
         module-utils
 )
 
+# Logger buffer tests
+add_catch2_executable(
+    NAME
+        utils-loggerbuffer
+    SRCS
+        test_LoggerBuffer.cpp
+    LIBS
+        module-utils
+)
+
 # ParserICS tests
 #add_catch2_executable(
 #    NAME
