@@ -11,7 +11,8 @@
 #include <service-db/QueryMessage.hpp>
 #include <module-db/queries/RecordQuery.hpp>
 
-DayEventsModel::DayEventsModel(app::Application *app) : DatabaseModel(app), application(app)
+DayEventsModel::DayEventsModel(app::Application *app)
+    : DatabaseModel(app), app::AsyncCallbackReceiver{app}, application(app)
 {}
 
 unsigned int DayEventsModel::requestRecordsCount()
@@ -27,9 +28,9 @@ unsigned int DayEventsModel::getMinimalItemHeight() const
 void DayEventsModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     auto query = std::make_unique<db::query::events::GetFiltered>(filterFrom, filterTill, offset, limit);
-    query->setQueryListener(
-        db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
-    DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::move(query));
+    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Events);
+    task->setCallback([this](auto response) { return handleQueryResponse(response); });
+    task->execute(application, this);
 }
 
 gui::ListItem *DayEventsModel::getItem(gui::Order order)

@@ -52,10 +52,18 @@ class DBServiceAPI
     static auto ThreadGetByNumber(sys::Service *serv,
                                   const utils::PhoneNumber::View &phoneNumber,
                                   std::uint32_t timeout = DefaultTimeoutInMs) -> std::unique_ptr<ThreadRecord>;
-    static auto ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit) -> bool;
     static auto ThreadGetCount(sys::Service *serv, EntryState state = EntryState::ALL) -> uint32_t;
 
-    static auto GetQuery(sys::Service *serv, db::Interface::Name database, std::unique_ptr<db::Query> query) -> bool;
+    /**
+     * Queries the database.
+     * @param serv      Sender service.
+     * @param database  Target database name.
+     * @param query     Query.
+     * @return A pair of: a flag that indicates whether query send was successful, and a message identifier that common
+     * for the query and its response.
+     */
+    static auto GetQuery(sys::Service *serv, db::Interface::Name database, std::unique_ptr<db::Query> query)
+        -> std::pair<bool, std::uint64_t>;
     static auto GetQueryWithReply(sys::Service *serv,
                                   db::Interface::Name database,
                                   std::unique_ptr<db::Query> query,

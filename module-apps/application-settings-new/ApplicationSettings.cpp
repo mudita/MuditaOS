@@ -96,7 +96,7 @@ namespace app
                 currentWindow->rebuild();
             }
         }
-        else if (auto responseStatusMsg = dynamic_cast<message::bluetooth::ResponseStatus *>(msgl);
+        else if (auto responseStatusMsg = dynamic_cast<::message::bluetooth::ResponseStatus *>(msgl);
                  nullptr != responseStatusMsg) {
             if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
                 auto btStatusData = std::make_unique<gui::BluetoothStatusData>(responseStatusMsg->getStatus());
