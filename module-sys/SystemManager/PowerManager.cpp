@@ -79,23 +79,14 @@ namespace sys
         const auto freq = lowPowerControl->GetCurrentFrequency();
         auto level      = bsp::LowPowerMode::CpuFrequency::Level_1;
 
+        // We temporarily limit the minimum CPU frequency
+        // due to problems with the UART of the GSM modem
         switch (freq) {
         case bsp::LowPowerMode::CpuFrequency::Level_6:
             level = bsp::LowPowerMode::CpuFrequency::Level_5;
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_5:
+        default:
             level = bsp::LowPowerMode::CpuFrequency::Level_4;
-            break;
-        case bsp::LowPowerMode::CpuFrequency::Level_4:
-            level = bsp::LowPowerMode::CpuFrequency::Level_3;
-            break;
-        case bsp::LowPowerMode::CpuFrequency::Level_3:
-            level = bsp::LowPowerMode::CpuFrequency::Level_2;
-            break;
-        case bsp::LowPowerMode::CpuFrequency::Level_2:
-            level = bsp::LowPowerMode::CpuFrequency::Level_1;
-            break;
-        case bsp::LowPowerMode::CpuFrequency::Level_1:
             break;
         }
 
