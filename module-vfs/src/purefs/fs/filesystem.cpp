@@ -69,12 +69,15 @@ namespace purefs::fs
             LOG_ERROR("VFS: Invalid target mountpoint path %.*s", int(target.length()), target.data());
             return -EINVAL;
         }
+        if (flags & ~(mount_flags::remount | mount_flags::read_only)) {
+            LOG_ERROR("VFS: passed mount flags is not supported");
+            return -ENOTSUP;
+        }
         {
             cpp_freertos::LockGuard _lock(*m_lock);
             const auto mpi = m_mounts.find(std::string(target));
             if (mpi != std::end(m_mounts)) {
                 if (flags & mount_flags::remount) {
-                    // NOTE: Currently only RO is supported
                     mpi->second->modify_flags(flags & ~mount_flags::remount);
                     return {};
                 }
