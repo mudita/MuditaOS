@@ -135,7 +135,7 @@ class CDCSerial:
     @staticmethod
     def find_Pures() -> str:
         '''
-        Return a list of paths (str) to any Mudita Pure phone found connected to the system
+        Return a list of unique paths to all the Mudita Pure phones found connected to the system
         '''
         import serial.tools.list_ports as list_ports
         return [_.device for _ in list_ports.comports() if _.manufacturer == 'Mudita' and _.product == 'Mudita Pure']
