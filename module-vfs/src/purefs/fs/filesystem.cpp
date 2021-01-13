@@ -13,6 +13,13 @@
 
 namespace purefs::fs
 {
+    namespace
+    {
+        constexpr std::pair<short, std::string_view> part_types_to_vfs[] = {
+            {0x0b, "vfat"},
+            {0x9e, "littlefs"},
+        };
+    }
     filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm)
         : m_diskmm(diskmm), m_lock(new cpp_freertos::MutexRecursive)
     {}
@@ -91,9 +98,20 @@ namespace purefs::fs
                 LOG_ERROR("VFS: partition already used %.*s", int(dev_or_part.length()), dev_or_part.data());
                 return -EBUSY;
             }
-            const auto vsi = m_fstypes.find(std::string(fs_type));
+            std::string filesystem_type;
+            if (fs_type.compare("auto") == 0) {
+                filesystem_type = autodetect_filesystem_type(std::string(dev_or_part));
+                if (filesystem_type.empty()) {
+                    LOG_ERROR("Unable to auto detect filesystem");
+                    return -ENODEV;
+                }
+            }
+            else {
+                filesystem_type = fs_type;
+            }
+            const auto vsi = m_fstypes.find(filesystem_type);
             if (vsi == std::end(m_fstypes)) {
-                LOG_ERROR("VFS: requested filesystem %.*s not registered", int(fs_type.length()), fs_type.data());
+                LOG_ERROR("VFS: requested filesystem %s not registered", filesystem_type.c_str());
                 return -ENODEV;
             }
             // Trying to open disk or part by manager
@@ -263,4 +281,30 @@ namespace purefs::fs
         return ret;
     }
 
+    auto filesystem::autodetect_filesystem_type(std::string_view dev_or_part) const noexcept -> std::string
+    {
+        auto disk_mgr = m_diskmm.lock();
+        if (disk_mgr) {
+            auto part = disk_mgr->partition_info(dev_or_part);
+            if (part) {
+                for (auto &ptype : part_types_to_vfs) {
+                    if (ptype.first == part.value().type) {
+                        const auto ret = std::string(ptype.second);
+                        LOG_INFO("Autodetected filesystem type %s", ret.c_str());
+                        return ret;
+                    }
+                }
+                LOG_ERROR("Unable to detect filesystem type");
+                return {};
+            }
+            else {
+                LOG_ERROR("No partition on device");
+                return {};
+            }
+        }
+        else {
+            LOG_ERROR("VFS: Unable to lock device manager");
+            return {};
+        }
+    }
 } // namespace purefs::fs
