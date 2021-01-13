@@ -345,6 +345,22 @@ TEST_CASE("Remount filesystem from RO to RW and to RO")
     REQUIRE(fscore->umount("/sys") == 0);
 }
 
+TEST_CASE("Autodetect filesystems")
+{
+    using namespace purefs;
+    auto dm   = std::make_shared<blkdev::disk_manager>();
+    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    REQUIRE(disk);
+    REQUIRE(dm->register_device(disk, "emmc0") == 0);
+    auto fscore         = std::make_shared<purefs::fs::filesystem>(dm);
+    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
+    REQUIRE(vfs_vfat->mount_count() == 0);
+    auto ret = fscore->register_filesystem("vfat", vfs_vfat);
+    REQUIRE(ret == 0);
+    REQUIRE(fscore->mount("emmc0part0", "/sys", "auto") == 0);
+    REQUIRE(fscore->umount("/sys") == 0);
+}
+
 TEST_CASE("Unititest integrated subsystem")
 {
     auto [disk, vfs] = purefs::subsystem::initialize();
