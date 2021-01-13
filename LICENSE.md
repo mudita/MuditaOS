@@ -52,7 +52,7 @@ The following proprietary code is included in MuditaOS:
 ## The GNU General Public License v3.0
 
 ``` 
-Licensed under the terms of GNU General Public License Version 3 or later.
+Licensed under the terms of GNU General Public License Version 3.
 
    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
