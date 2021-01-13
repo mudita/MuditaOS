@@ -6,6 +6,7 @@ include_directories(${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR})
 add_executable(${PROJECT_NAME} EXCLUDE_FROM_ALL
         test-gui-listview.cpp
         test-gui-boxlayout.cpp
+        test-gui-gridlayout.cpp
         test-gui-depthfirst-itemtree.cpp
         test-gui-visitor-call.cpp
         test-gui-dom-dump.cpp

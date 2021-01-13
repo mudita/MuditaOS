@@ -69,6 +69,16 @@ uint32_t GridLayout::calculateRowSizeForBorderTransition(const uint32_t currentP
     return realRowSize;
 }
 
+void GridLayout::handleItemsOutOfGridLayoutArea(uint32_t maxItemsInArea)
+{
+    for (auto i = maxItemsInArea; i < children.size(); i++) {
+        auto it = std::next(children.begin(), i);
+        if ((*it)->visible) {
+            addToOutOfDrawAreaList(*it);
+        }
+    }
+}
+
 void GridLayout::resizeItems()
 {
     if (grid.x == 0 || grid.y == 0) {
@@ -78,6 +88,7 @@ void GridLayout::resizeItems()
     uint32_t el_in_x = area().w / grid.x;
     uint32_t el_in_y = area().h / grid.y;
 
+    elementsInIncompletedLastRow = 0;
     colSize = children.size() < area().w / grid.x ? children.size() : area().w / grid.x;
     rowSize = colSize != 0 ? (children.size() / colSize) : 1;
     if (colSize > 1 && (static_cast<double>(children.size()) / colSize) > 1.0) {
@@ -99,6 +110,7 @@ void GridLayout::resizeItems()
         LOG_ERROR("More children than possible to show: %u > %" PRIu32 "",
                   static_cast<unsigned int>(children.size()),
                   max_elements);
+        handleItemsOutOfGridLayoutArea(max_elements);
         return;
     }
     if (el_in_x > 2)
