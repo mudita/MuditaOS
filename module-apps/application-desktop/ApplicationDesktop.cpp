@@ -8,6 +8,7 @@
 #include "windows/MenuWindow.hpp"
 #include "windows/PinLockWindow.hpp"
 #include "windows/PowerOffWindow.hpp"
+#include "windows/DeadBatteryWindow.hpp"
 #include "windows/LockedInfoWindow.hpp"
 #include "windows/Reboot.hpp"
 #include "windows/Update.hpp"
@@ -92,6 +93,11 @@ namespace app
 
         addActionReceiver(app::manager::actions::DisplayLowBatteryNotification, [this](auto &&data) {
             handleLowBatteryNotification(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
+            switchWindow(app::window::name::dead_battery, std::move(data));
             return msgHandled();
         });
     }
@@ -357,6 +363,9 @@ namespace app
         });
         windowsFactory.attach(desktop_poweroff, [](Application *app, const std::string newname) {
             return std::make_unique<gui::PowerOffWindow>(app);
+        });
+        windowsFactory.attach(dead_battery, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::DeadBatteryWindow>(app);
         });
         windowsFactory.attach(desktop_locked, [](Application *app, const std::string newname) {
             return std::make_unique<gui::LockedInfoWindow>(app);
