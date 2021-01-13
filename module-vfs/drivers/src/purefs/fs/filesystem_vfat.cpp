@@ -342,7 +342,7 @@ namespace purefs::fs::drivers
         if (fres == FR_OK) {
             const auto vmnt = vfile->mntpoint();
             if (vmnt) {
-                translate_filinfo_to_stat(finfo, vfile->ff_filp(), vmnt->flags() & mount_flags::read_only, st);
+                translate_filinfo_to_stat(finfo, vfile->ff_filp(), vmnt->is_ro(), st);
             }
             else {
                 return -EIO;
@@ -362,7 +362,7 @@ namespace purefs::fs::drivers
         const auto fspath = vmnt->native_path(file);
         const int fres    = f_stat(fspath.c_str(), &finfo);
         if (fres == FR_OK) {
-            translate_filinfo_to_stat(finfo, nullptr, vmnt->flags() & mount_flags::read_only, st);
+            translate_filinfo_to_stat(finfo, nullptr, vmnt->is_ro(), st);
         }
         return translate_error(fres);
     }
@@ -445,7 +445,7 @@ namespace purefs::fs::drivers
             else {
                 const auto vmnt = dirp->mntpoint();
                 if (vmnt) {
-                    translate_filinfo_to_stat(ffinfo, nullptr, vmnt->flags() & mount_flags::read_only, filestat);
+                    translate_filinfo_to_stat(ffinfo, nullptr, vmnt->is_ro(), filestat);
                     filename = ffinfo.fname;
                 }
                 else {
