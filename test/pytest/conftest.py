@@ -13,6 +13,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 from harness import log
 from harness.harness import Harness
 from harness.interface.error import TestError, Error
+from harness.interface.CDCSerial import CDCSerial as serial
 
 simulator_port = 'simulator'
 
@@ -48,10 +49,13 @@ def sms_text(request):
 
 @pytest.fixture(scope='session')
 def harness(request):
+    '''
+    Try to init one Pure phone with serial port path or automatically
+    '''
     port_name = request.config.option.port
 
-    RETRY_EVERY = 0.7 # second
-    retries = request.config.option.timeout / RETRY_EVERY
+    RETRY_EVERY_SECONDS = 0.7
+    retries = request.config.option.timeout / RETRY_EVERY_SECONDS
 
     if port_name is None:
         log.warning("no port provided! trying automatic detection")
@@ -71,7 +75,7 @@ def harness(request):
                     file = open("/tmp/purephone_pts_name", "r")
                     break
                 except FileNotFoundError as err:
-                    time.sleep(RETRY_EVERY)
+                    time.sleep(RETRY_EVERY_SECONDS)
                     retries -= 1
                     log.info("waiting for simulator port...")
             else:
@@ -86,10 +90,29 @@ def harness(request):
         harness = Harness(port_name)
     return harness
 
+
+@pytest.fixture(scope='session')
+def harnesses():
+    '''
+    Automatically init at least two Pure phones
+    '''
+    found_pures = serial.find_Pures()
+    harnesses = [Harness(pure) for pure in found_pures]
+    if not len(harnesses) >= 2:
+        pytest.skip("At least two phones are needed for this test")
+    assert len(harnesses) >= 2
+    return harnesses
+
 @pytest.fixture(scope='session')
 def phone_unlocked(harness):
     harness.unlock_phone()
     assert harness.is_phone_unlocked
+
+@pytest.fixture(scope='session')
+def phone_unlocked(harnesses):
+    for harness in harnesses:
+        harness.unlock_phone()
+        assert harness.is_phone_unlocked
 
 def pytest_configure(config):
     config.addinivalue_line("markers",
