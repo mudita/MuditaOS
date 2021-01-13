@@ -87,10 +87,10 @@ namespace
         return lfs_mode;
     }
 
-    auto translate_attrib_to_st_mode(uint8_t type, bool ro)
+    auto translate_attrib_to_st_mode(uint8_t type, bool readOnly)
     {
-        decltype(static_cast<struct stat *>(nullptr)->st_mode) mode = S_IRUSR | S_IRGRP | S_IROTH;
-        if (!ro) {
+        decltype(std::declval<struct stat *>()->st_mode) mode = S_IRUSR | S_IRGRP | S_IROTH;
+        if (!readOnly) {
             mode |= S_IWUSR | S_IWGRP | S_IWOTH;
         }
         if (type == LFS_TYPE_REG) {
@@ -102,14 +102,14 @@ namespace
         return mode;
     }
 
-    void translate_lfsinfo_to_stat(const ::lfs_info &fs, const lfs_config &cfg, bool ro, struct stat &st)
+    void translate_lfsinfo_to_stat(const ::lfs_info &fs, const lfs_config &cfg, bool readOnly, struct stat &st)
     {
         std::memset(&st, 0, sizeof st);
         st.st_nlink   = 1;
         st.st_size    = fs.size;
         st.st_blksize = cfg.block_size;
         st.st_blocks  = fs.size / cfg.block_count;
-        st.st_mode    = translate_attrib_to_st_mode(fs.type, ro);
+        st.st_mode    = translate_attrib_to_st_mode(fs.type, readOnly);
     }
 
     [[gnu::nonnull(1)]] int setup_lfs_config(lfs_config *cfg, size_t sector_size, size_t part_sectors_count)
