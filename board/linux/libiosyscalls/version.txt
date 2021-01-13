@@ -68,6 +68,9 @@ GLIBC_2.2.5 {
                 __xstat64;
                 __lxstat64;
                 __fxstat64;
+                mount;
+                umount;
+
         local:
                 *;
 };

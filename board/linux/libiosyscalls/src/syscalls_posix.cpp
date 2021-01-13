@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/mount.h>
 #include <fcntl.h>
 
 #include <errno.h>
@@ -550,4 +551,37 @@ extern "C" {
         return -1;
     }
     __asm__(".symver _iosys_fxstatat64,__fxstatat64@GLIBC_2.4");
+
+    int _iosys_mount (const char *special_file, const char *dir,
+		  const char *fstype, unsigned long int rwflag,
+		  const void *data)
+    {
+        if(vfs::redirect_to_image(dir))
+        {
+            return vfs::invoke_fs(__VFS(mount), special_file, dir, fstype, rwflag );
+        }
+        else
+        {
+            //NOTE: Always return zero because we will use fileystem which is always RW
+            TRACE_SYSCALLN("(%s, %s, %s, %08lx,%p) -> linux fs", special_file, dir,fstype, rwflag, data);
+            return 0;
+        }
+    }
+    __asm__(".symver _iosys_mount,mount@GLIBC_2.2.5");
+
+    int _iosys_umount (const char *mount_point)
+    {
+        if(vfs::redirect_to_image(mount_point))
+        {
+            return vfs::invoke_fs(__VFS(umount), mount_point );
+        }
+        else
+        {
+            //NOTE: Always return zero because we will use fileystem which is always RW
+            TRACE_SYSCALLN("(%s) -> linux fs", mount_point);
+            return 0;
+        }
+    }
+    __asm__(".symver _iosys_umount,umount@GLIBC_2.2.5");
+
 }
