@@ -202,7 +202,7 @@ namespace purefs::fs
             if (!mountp) {
                 return -ENOENT;
             }
-            if (acc == iaccess::rw && (mountp->flags() & mount_flags::read_only)) {
+            if (acc == iaccess::rw && mountp->is_ro()) {
                 return -EACCES;
             }
             auto fsops = mountp->fs_ops();
@@ -225,7 +225,7 @@ namespace purefs::fs
             if (!mountp) {
                 return -ENOENT;
             }
-            if (mountp->flags() & mount_flags::read_only) {
+            if (mountp->is_ro()) {
                 return -EACCES;
             }
             if (path.compare(0, pathpos, path2, 0, pathpos) != 0) {

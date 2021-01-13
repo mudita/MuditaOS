@@ -13,6 +13,7 @@ namespace purefs::fs::internal
     {
       public:
         file_handle(const file_handle &) = delete;
+        auto operator=(const file_handle &) = delete;
         virtual ~file_handle()           = default;
         file_handle(std::shared_ptr<mount_point> mp, unsigned flags) : m_mount_point(mp), m_flags(flags)
         {}

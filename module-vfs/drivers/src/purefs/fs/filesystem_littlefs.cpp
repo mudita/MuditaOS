@@ -341,7 +341,7 @@ namespace purefs::fs::drivers
         const auto err  = invoke_lfs(zfile->mntpoint(), ::lfs_stat, path.c_str(), &linfo);
         if (!err) {
             auto vmnt = std::static_pointer_cast<mount_point_littlefs>(vfile->mntpoint());
-            translate_lfsinfo_to_stat(linfo, *vmnt->lfs_config(), vmnt->flags() & mount_flags::read_only, st);
+            translate_lfsinfo_to_stat(linfo, *vmnt->lfs_config(), vmnt->is_ro(), st);
         }
         return err;
     }
@@ -352,7 +352,7 @@ namespace purefs::fs::drivers
         const auto err = invoke_lfs(mnt, file, ::lfs_stat, &linfo);
         if (!err) {
             auto mntp = std::static_pointer_cast<mount_point_littlefs>(mnt);
-            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), mntp->flags() & mount_flags::read_only, st);
+            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), mntp->is_ro(), st);
         }
         return err;
     }
@@ -421,7 +421,7 @@ namespace purefs::fs::drivers
         int err = invoke_lfs(dirstate, ::lfs_dir_read, &linfo);
         if (err == 1) {
             auto mntp = std::static_pointer_cast<mount_point_littlefs>(dirstate->mntpoint());
-            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), mntp->flags() & mount_flags::read_only, filestat);
+            translate_lfsinfo_to_stat(linfo, *mntp->lfs_config(), mntp->is_ro(), filestat);
             filename = linfo.name;
             err      = 0;
         }
