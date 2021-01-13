@@ -114,6 +114,7 @@ namespace app::manager
         auto handleAction(ActionRequest *actionMsg) -> bool;
         auto handleHomeAction() -> bool;
         auto handleLaunchAction(ApplicationLaunchData *launchParams) -> bool;
+        auto handleCloseSystem() -> bool;
         auto handleCustomAction(actions::ActionId action, actions::ActionParamsPtr &&actionParams) -> bool;
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
@@ -141,6 +142,7 @@ namespace app::manager
                                                    // defined in settings database application
                                                    // manager is sending signal to power manager and changing window to
                                                    // the desktop window in the blocked state.
+        std::unique_ptr<sys::Timer> shutdownDelay;
         // Temporary solution - to be replaced with ActionsMiddleware.
         std::tuple<ApplicationName, actions::ActionId, actions::ActionParamsPtr> pendingAction;
 

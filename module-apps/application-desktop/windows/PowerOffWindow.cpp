@@ -4,7 +4,6 @@
 #include "InputEvent.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
-#include "GuiTimer.hpp"
 #include "log/log.hpp"
 
 // module-utils
@@ -15,6 +14,7 @@
 
 // services
 #include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
 
 #include "service-cellular/ServiceCellular.hpp"
 #include <Style.hpp>
@@ -142,7 +142,7 @@ namespace gui
             infoLabel->setVisible(false);
 
             application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
-            scheduleSystemShutdown();
+            app::manager::Controller::sendAction(application, app::manager::actions::CloseSystem);
             return true;
         };
 
@@ -158,23 +158,6 @@ namespace gui
             }
             return true;
         };
-    }
-
-    // Temporary solution for shutting down the system.
-    // The former solution removed from service-gui during its refactor.
-    // To be reimplemented in SystemManager in upcoming commits.
-    void PowerOffWindow::scheduleSystemShutdown()
-    {
-        constexpr auto SystemShutdownDelayInMs = 500;
-        auto powerOffTimer                     = std::make_unique<app::GuiTimer>("PowerOffTimer", application);
-        powerOffTimer->setInterval(SystemShutdownDelayInMs);
-        timerCallback = [this](Item &, Timer &timer) {
-            detachTimer(timer);
-            sys::SystemManager::CloseSystem(application);
-            return true;
-        };
-        powerOffTimer->start();
-        application->connect(std::move(powerOffTimer), this);
     }
 
     void PowerOffWindow::destroyInterface()

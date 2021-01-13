@@ -37,4 +37,14 @@ namespace sys
         bool isActive;
     };
 
+    class SystemBrownoutMesssage : public sys::Message, public app::manager::actions::ConvertibleToAction
+    {
+      public:
+        [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+        {
+            return std::make_unique<app::manager::ActionRequest>(
+                service::name::system_manager, app::manager::actions::SystemBrownout, nullptr);
+        }
+    };
+
 } // namespace sys
