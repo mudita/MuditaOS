@@ -18,8 +18,6 @@ namespace app::alarmClock
     {
       private:
         std::unique_ptr<AlarmReminderWindowContract::Presenter> presenter;
-        std::vector<AlarmsRecord> alarmRecords;
-        std::vector<AlarmsRecord> previousAlarmRecords;
 
         gui::VBox *body         = nullptr;
         gui::HBox *hBox         = nullptr;

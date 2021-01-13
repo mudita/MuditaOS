@@ -45,8 +45,8 @@ namespace app::alarmClock
     {
         auto fileTags = AudioServiceAPI::GetFileTags(app, filePath);
         if (fileTags != std::nullopt) {
-            this->startMusicTimer(fileTags->duration_sec * utils::time::milisecondsInSecond, fileTags->filePath);
-            this->playMusic(fileTags->filePath);
+            startMusicTimer(fileTags->duration_sec * utils::time::milisecondsInSecond, fileTags->filePath);
+            playMusic(fileTags->filePath);
         }
     }
 
@@ -80,5 +80,43 @@ namespace app::alarmClock
     void AlarmsReminderModel::resetPreviousElapsedSeconds()
     {
         previousElapsedSeconds = 0;
+    }
+
+    std::pair<bool, std::vector<AlarmsRecord>> AlarmsReminderModel::setAlarmRecords(std::vector<AlarmsRecord> records)
+    {
+        std::vector<AlarmsRecord> forUpdate;
+        alarmRecords = records;
+        if (!previousAlarmRecords.empty()) {
+            if (previousAlarmRecords.front().ID == alarmRecords.front().ID) {
+                LOG_DEBUG("Duplicated data received, return");
+                return std::make_pair(false, forUpdate);
+            }
+            LOG_DEBUG("New alarm covered the old one, automatic snooze applying");
+            forUpdate = previousAlarmRecords;
+        }
+        previousAlarmRecords = alarmRecords;
+        return std::make_pair(true, forUpdate);
+    }
+
+    AlarmsRecord &AlarmsReminderModel::getAlarmRecord()
+    {
+        return alarmRecords.front();
+    }
+
+    std::vector<AlarmsRecord> AlarmsReminderModel::getAllAlarmRecords()
+    {
+        return alarmRecords;
+    }
+
+    void AlarmsReminderModel::eraseFrontAlarmRecord()
+    {
+        if (!alarmRecords.empty()) {
+            alarmRecords.erase(alarmRecords.begin());
+        }
+    }
+
+    void AlarmsReminderModel::clearAlarmRecords()
+    {
+        alarmRecords.clear();
     }
 } // namespace app::alarmClock

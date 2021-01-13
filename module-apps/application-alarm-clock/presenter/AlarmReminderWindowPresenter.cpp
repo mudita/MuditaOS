@@ -102,4 +102,36 @@ namespace app::alarmClock
         }
         return timeToDisplay;
     }
+
+    bool AlarmReminderWindowPresenter::setAlarmRecords(std::vector<AlarmsRecord> records)
+    {
+        auto [ret, recordsForUpdate] = alarmsReminderModel->setAlarmRecords(records);
+        if (!recordsForUpdate.empty()) {
+            updatePreviousRecords(recordsForUpdate);
+        }
+        return ret;
+    }
+
+    AlarmsRecord &AlarmReminderWindowPresenter::getAlarmRecord()
+    {
+        return alarmsReminderModel->getAlarmRecord();
+    }
+
+    std::vector<AlarmsRecord> AlarmReminderWindowPresenter::getAllAlarmRecords()
+    {
+        return alarmsReminderModel->getAllAlarmRecords();
+    }
+
+    void AlarmReminderWindowPresenter::eraseFrontAlarmRecord()
+    {
+        alarmsReminderModel->eraseFrontAlarmRecord();
+    }
+
+    void AlarmReminderWindowPresenter::updateAllAlarmRecords()
+    {
+        for (auto &alarm : alarmsReminderModel->getAllAlarmRecords()) {
+            update(alarm, UserAction::Snooze, getElapsedMinutes());
+        }
+        alarmsReminderModel->clearAlarmRecords();
+    }
 } // namespace app::alarmClock

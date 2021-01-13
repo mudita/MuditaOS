@@ -23,6 +23,11 @@ namespace app::alarmClock
         virtual uint32_t getElapsedMinutes()                      = 0;
         virtual uint32_t getPreviousElapsedMinutes()              = 0;
         virtual void resetPreviousElapsedSeconds()                = 0;
+        virtual AlarmsRecord &getAlarmRecord()                                                                = 0;
+        virtual std::vector<AlarmsRecord> getAllAlarmRecords()                                                = 0;
+        virtual void eraseFrontAlarmRecord()                                                                  = 0;
+        virtual void clearAlarmRecords()                                                                      = 0;
+        virtual std::pair<bool, std::vector<AlarmsRecord>> setAlarmRecords(std::vector<AlarmsRecord> records) = 0;
     };
 
     class AlarmsReminderModel : public AbstractAlarmsReminderModel
@@ -37,6 +42,11 @@ namespace app::alarmClock
         uint32_t getElapsedMinutes() override;
         uint32_t getPreviousElapsedMinutes() override;
         void resetPreviousElapsedSeconds() override;
+        AlarmsRecord &getAlarmRecord() override;
+        std::vector<AlarmsRecord> getAllAlarmRecords() override;
+        void eraseFrontAlarmRecord() override;
+        void clearAlarmRecords() override;
+        std::pair<bool, std::vector<AlarmsRecord>> setAlarmRecords(std::vector<AlarmsRecord> records) override;
 
       private:
         void countElapsedSeconds();
@@ -46,6 +56,8 @@ namespace app::alarmClock
         std::unique_ptr<sys::Timer> reminderTimer;
         std::unique_ptr<sys::Timer> musicTimer;
         std::unique_ptr<sys::Timer> delayTimer;
+        std::vector<AlarmsRecord> alarmRecords;
+        std::vector<AlarmsRecord> previousAlarmRecords;
 
         uint32_t elapsedSeconds         = 0;
         uint32_t previousElapsedSeconds = 0;

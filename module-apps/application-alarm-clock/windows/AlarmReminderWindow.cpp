@@ -109,24 +109,17 @@ namespace app::alarmClock
         if (item == nullptr) {
             return false;
         }
-        alarmRecords = item->getRecords();
-        if (!previousAlarmRecords.empty()) {
-            if (previousAlarmRecords.front().ID == alarmRecords.front().ID) {
-                LOG_DEBUG("Duplicated data received, return");
-                return false;
-            }
-            LOG_DEBUG("New alarm covered the old one, automatic snooze applying");
-            presenter->updatePreviousRecords(previousAlarmRecords);
+        if (presenter->setAlarmRecords(item->getRecords())) {
+            presenter->startTimers(getCallback());
+            displayAlarm();
+            return true;
         }
-        presenter->startTimers(getCallback());
-        previousAlarmRecords = alarmRecords;
-        displayAlarm();
-        return true;
+        return false;
     }
 
     void AlarmReminderWindow::displayAlarm()
     {
-        auto rec = alarmRecords.front();
+        auto rec = presenter->getAlarmRecord();
         if (rec.status == AlarmStatus::FifthSnooze) {
             snoozeVBox->setVisible(false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
@@ -141,14 +134,14 @@ namespace app::alarmClock
             return false;
         }
 
-        if (inputEvent.is(gui::KeyCode::KEY_ENTER) && alarmRecords.front().status != AlarmStatus::FifthSnooze) {
-            presenter->update(alarmRecords.front(), UserAction::Snooze, presenter->getElapsedMinutes());
+        if (inputEvent.is(gui::KeyCode::KEY_ENTER) && presenter->getAlarmRecord().status != AlarmStatus::FifthSnooze) {
+            presenter->update(presenter->getAlarmRecord(), UserAction::Snooze, presenter->getElapsedMinutes());
             closeReminder();
             return true;
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_RF)) {
-            presenter->update(alarmRecords.front(), UserAction::TurnOff, 0);
+            presenter->update(presenter->getAlarmRecord(), UserAction::TurnOff, 0);
             closeReminder();
             return true;
         }
@@ -158,10 +151,8 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::closeReminder()
     {
-        if (!alarmRecords.empty()) {
-            alarmRecords.erase(alarmRecords.begin());
-        }
-        if (alarmRecords.empty()) {
+        presenter->eraseFrontAlarmRecord();
+        if (presenter->getAllAlarmRecords().empty()) {
             LOG_DEBUG("Switch to alarm main window");
             presenter->stopTimers();
             presenter->stopMusic();
@@ -179,10 +170,7 @@ namespace app::alarmClock
     AlarmsReminderModel::OnTimerCallback AlarmReminderWindow::getCallback()
     {
         auto callback = [&]() {
-            for (auto &alarm : alarmRecords) {
-                presenter->update(alarm, UserAction::Snooze, presenter->getElapsedMinutes());
-            }
-            alarmRecords.clear();
+            presenter->updateAllAlarmRecords();
             closeReminder();
         };
         return callback;

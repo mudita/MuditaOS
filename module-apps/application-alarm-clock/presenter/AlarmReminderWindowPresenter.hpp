@@ -36,6 +36,11 @@ namespace app::alarmClock
             virtual void stopMusic()                                                    = 0;
             virtual uint32_t getElapsedMinutes()                                        = 0;
             virtual TimePoint getTimeToDisplay(const AlarmsRecord &alarm)               = 0;
+            virtual bool setAlarmRecords(std::vector<AlarmsRecord> records)             = 0;
+            virtual AlarmsRecord &getAlarmRecord()                                      = 0;
+            virtual std::vector<AlarmsRecord> getAllAlarmRecords()                      = 0;
+            virtual void eraseFrontAlarmRecord()                                        = 0;
+            virtual void updateAllAlarmRecords()                                        = 0;
         };
     };
 
@@ -53,6 +58,11 @@ namespace app::alarmClock
         void stopMusic() override;
         uint32_t getElapsedMinutes() override;
         TimePoint getTimeToDisplay(const AlarmsRecord &alarm) override;
+        bool setAlarmRecords(std::vector<AlarmsRecord> records) override;
+        AlarmsRecord &getAlarmRecord() override;
+        std::vector<AlarmsRecord> getAllAlarmRecords() override;
+        void eraseFrontAlarmRecord() override;
+        void updateAllAlarmRecords() override;
 
       private:
         void snoozeHandle(AlarmsRecord &alarm, uint32_t delay);

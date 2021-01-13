@@ -11,7 +11,7 @@ namespace app
     class ApplicationAlarmClock : public Application
     {
 
-        audio::Token audioToken = audio::Token();
+        audio::Token audioToken;
 
       public:
         ApplicationAlarmClock(std::string name,
