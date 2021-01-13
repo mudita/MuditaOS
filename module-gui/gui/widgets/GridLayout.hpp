@@ -41,6 +41,8 @@ namespace gui
       private:
         uint32_t calculateColumnSizeForBorderTransition(const uint32_t currentPosition);
         uint32_t calculateRowSizeForBorderTransition(const uint32_t currentPosition);
+
+        void handleItemsOutOfGridLayoutArea(uint32_t maxItemsInArea);
     };
 
 }; // namespace gui
