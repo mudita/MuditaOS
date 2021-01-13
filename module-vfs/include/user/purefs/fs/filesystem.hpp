@@ -163,8 +163,8 @@ namespace purefs::fs
         auto add_filehandle(fsfile file) noexcept -> int;
         auto remove_filehandle(int fds) noexcept -> fsfile;
         auto find_filehandle(int fds) const noexcept -> fsfile;
+        auto autodetect_filesystem_type(std::string_view dev_or_part) const noexcept -> std::string;
 
-      private:
         enum class iaccess : bool
         {
             ro, //! Syscall is RO

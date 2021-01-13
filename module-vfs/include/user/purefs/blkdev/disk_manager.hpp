@@ -8,6 +8,7 @@
 #include <vector>
 #include <unordered_map>
 #include <tuple>
+#include <optional>
 #include "defs.hpp"
 #include "partition.hpp"
 
@@ -102,6 +103,14 @@ namespace purefs::blkdev
          */
         [[nodiscard]] auto partitions(disk_fd dfd) const -> std::vector<partition>;
         [[nodiscard]] auto partitions(std::string_view device_name) const -> std::vector<partition>;
+
+        /** Get the selected partition info
+         * @Param[in] Disk manager fd
+         * @return Partition info data
+         */
+        [[nodiscard]] auto partition_info(disk_fd dfd) const -> std::optional<partition>;
+        [[nodiscard]] auto partition_info(std::string_view device_name) const -> std::optional<partition>;
+
         /** Get media device info
          * @param[in] dfd Disk manager handle
          * @param[in] what Information type @see info_type
