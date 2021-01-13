@@ -297,12 +297,12 @@ void ServiceCellular::registerMessageHandlers()
         return handleCellularGetActiveContextsMessage(msg);
     });
 
-    connect(typeid(CellularGetAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        connect(typeid(CellularGetCurrentOperatorMessage), [&](sys::Message *request) -> sys::MessagePointer {
-            auto msg = static_cast<CellularGetCurrentOperatorMessage *>(request);
-            return handleCellularGetCurrentOperator(msg);
-        });
+    connect(typeid(CellularGetCurrentOperatorMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularGetCurrentOperatorMessage *>(request);
+        return handleCellularGetCurrentOperator(msg);
+    });
 
+    connect(typeid(CellularGetAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularGetAPNMessage *>(request);
         return handleCellularGetAPNMessage(msg);
     });

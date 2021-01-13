@@ -55,6 +55,8 @@ namespace gui::window::name
     inline constexpr auto about_your_pure = "AboutYourPure";
     inline constexpr auto certification   = "Certification";
 
+    inline constexpr auto new_apn = "NewApn";
+
 } // namespace gui::window::name
 
 namespace app

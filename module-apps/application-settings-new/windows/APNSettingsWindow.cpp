@@ -4,6 +4,7 @@
 #include "APNSettingsWindow.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/widgets/SettingsStyle.hpp"
+#include "application-settings-new/data/SettingsItemData.hpp"
 #include "OptionSetting.hpp"
 
 #include <InputEvent.hpp>
@@ -18,15 +19,17 @@ namespace gui
 
     auto APNSettingsWindow::onInput(const InputEvent &inputEvent) -> bool
     {
-
         if (inputEvent.isShortPress()) {
             if (inputEvent.is(KeyCode::KEY_LEFT)) {
-                // switch to new/edit APN window
+                auto apnRecord                        = std::make_shared<packet_data::APN::Config>();
+                std::unique_ptr<gui::SwitchData> data = std::make_unique<ApnItemData>(apnRecord);
+                application->switchWindow(gui::window::name::new_apn, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+                return true;
             }
         }
-
         return AppWindow::onInput(inputEvent);
     }
+
     void APNSettingsWindow::buildInterface()
     {
         setTitle(utils::localize.get("app_settings_network_apn_settings"));
