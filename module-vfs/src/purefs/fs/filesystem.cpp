@@ -75,7 +75,7 @@ namespace purefs::fs
             if (mpi != std::end(m_mounts)) {
                 if (flags & mount_flags::remount) {
                     // NOTE: Currently only RO is supported
-                    mpi->second->modify_flags(flags);
+                    mpi->second->modify_flags(flags & ~mount_flags::remount);
                     return {};
                 }
                 else {
