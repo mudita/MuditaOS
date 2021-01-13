@@ -5,6 +5,10 @@
 
 #include <string>
 #include <memory>
+#include <unordered_map>
+#include <map>
+
+#include <Utils.hpp>
 
 namespace packet_data
 {
@@ -22,10 +26,11 @@ namespace packet_data
          */
         enum class APNType
         {
-            Default, ///< for data traffic
+            Default, ///< only one APN is set as default
             IMS,     ///< IP Multimedia Subsystem for eg VoLTE
             MMS,     ///< for MMS service
-            Fota     ///< for Firmware Update
+            Fota,    ///< for Firmware Update
+            Internet //< for data traffic
         };
 
         /**
@@ -80,6 +85,63 @@ namespace packet_data
             std::string username;
             std::string password;
             std::string ip; /// set after connection
+
+            std::string getAuthMethod()
+            {
+                return utils::enumToString(authMethod);
+            }
+
+            void setAuthMethod(const std::string &str)
+            {
+                if (str == "NONE")
+                    authMethod = AuthMethod::NONE;
+                else if (str == "AUTO")
+                    authMethod = AuthMethod::AUTO;
+                else if (str == "CHAP")
+                    authMethod = AuthMethod::CHAP;
+                else if (str == "PAP")
+                    authMethod = AuthMethod::PAP;
+                else
+                    authMethod = AuthMethod::NONE;
+            }
+
+            std::string getApnType()
+            {
+                return utils::enumToString(apnType);
+            }
+
+            void setApnType(const std::string &str)
+            {
+                if (str == "Default")
+                    apnType = APNType::Default;
+                else if (str == "Fota")
+                    apnType = APNType::Fota;
+                else if (str == "IMS")
+                    apnType = APNType::IMS;
+                else if (str == "Internet")
+                    apnType = APNType::Internet;
+                else if (str == "MMS")
+                    apnType = APNType::MMS;
+                else
+                    apnType = APNType::Internet;
+            }
+
+            std::string getApnProtocol()
+            {
+                return utils::enumToString(contextType);
+            }
+
+            void setApnProtocol(const std::string &str)
+            {
+                if (str == "ipv4")
+                    contextType = ContextType::ipv4;
+                else if (str == "ipv6")
+                    contextType = ContextType::ipv6;
+                else if (str == "ipv4v6")
+                    contextType = ContextType::ipv4v6;
+                else
+                    contextType = ContextType::ipv4;
+            }
 
             bool isEmpty() const noexcept
             {

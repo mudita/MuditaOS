@@ -28,7 +28,18 @@ namespace style
                 inline constexpr auto before_noon             = "AM";
                 inline constexpr auto after_noon              = "PM";
             } // namespace time
+
+            namespace apnInputWidget
+            {
+                inline constexpr uint32_t w                = style::window::default_body_width;
+                inline constexpr uint32_t h                = 63;
+                inline constexpr uint32_t title_label_h    = 20;
+                inline constexpr uint32_t input_text_h     = 37;
+                inline constexpr uint32_t span_size        = 6;
+                inline constexpr int32_t underline_padding = 4;
+            } // namespace apnInputWidget
         }     // namespace widget
+
         namespace window
         {
             namespace leftArrowImage
@@ -70,6 +81,15 @@ namespace style
 
                 inline constexpr auto separator_h = 55;
             } // namespace nightshift
+
+            namespace newApn
+            {
+                inline constexpr uint32_t x = style::window::default_left_margin;
+                inline constexpr uint32_t y = style::header::height;
+                inline constexpr uint32_t w = style::listview::body_width_with_scroll;
+                inline constexpr uint32_t h = style::window_height - y - style::footer::height;
+            } // namespace newApn
+
         }     // namespace window
     };        // namespace settings
 } // namespace style
