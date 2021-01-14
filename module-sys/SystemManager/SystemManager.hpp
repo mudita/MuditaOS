@@ -16,7 +16,6 @@
 #include "condition_variable.hpp"
 #include "mutex.hpp"
 #include "Service/Mailbox.hpp"
-#include "Service/Bus.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "PowerManager.hpp"
@@ -43,7 +42,7 @@ namespace sys
     class SystemManagerCmd : public DataMessage
     {
       public:
-        SystemManagerCmd(Code type = Code::None) : DataMessage(BusChannels::SystemManagerRequests), type(type)
+        SystemManagerCmd(Code type = Code::None) : DataMessage(BusChannel::SystemManagerRequests), type(type)
         {}
 
         Code type;

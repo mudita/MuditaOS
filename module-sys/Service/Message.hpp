@@ -36,7 +36,7 @@ namespace sys
         };
 
         Message() = default;
-        explicit Message(BusChannels channel);
+        explicit Message(BusChannel channel);
         virtual ~Message() noexcept = default;
 
         virtual MessagePointer Execute(Service *service);
@@ -50,7 +50,7 @@ namespace sys
         std::uint64_t uniID;
         Type type;
         TransmissionType transType;
-        BusChannels channel;
+        BusChannel channel;
         std::string sender;
     };
 
@@ -79,7 +79,7 @@ namespace sys
     {
       public:
         explicit DataMessage(MessageType messageType);
-        explicit DataMessage(BusChannels channel);
+        explicit DataMessage(BusChannel channel);
 
         // This field must by provided by the class that inherits DataMessage
         MessageType messageType = MessageType::MessageTypeUninitialized;

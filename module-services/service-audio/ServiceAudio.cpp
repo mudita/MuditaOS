@@ -23,7 +23,7 @@ ServiceAudio::ServiceAudio()
       settingsProvider(std::make_unique<settings::Settings>(this))
 {
     LOG_INFO("[ServiceAudio] Initializing");
-    busChannels.push_back(sys::BusChannels::ServiceAudioNotifications);
+    bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
 }
 
 ServiceAudio::~ServiceAudio()
@@ -112,7 +112,7 @@ std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Messag
     if (const auto *eof = dynamic_cast<const AudioServiceMessage::EndOfFile *>(msg); eof) {
         auto newMsg =
             std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::EndOfFile, eof->GetToken());
-        sys::Bus::SendMulticast(newMsg, sys::BusChannels::ServiceAudioNotifications, this);
+        bus.sendMulticast(std::move(newMsg), sys::BusChannel::ServiceAudioNotifications);
     }
     else if (const auto *dbReq = dynamic_cast<const AudioServiceMessage::DbRequest *>(msg); dbReq) {
         LOG_DEBUG("ServiceAudio::DBbCallback(%s)", dbReq->GetPath().c_str());
@@ -144,7 +144,7 @@ std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Messag
             LOG_DEBUG("BluetoothProxyMessage not supported.");
             return std::nullopt;
         }
-        sys::Bus::SendUnicast(request, service::name::bluetooth, this);
+        bus.sendUnicast(request, service::name::bluetooth);
     }
     else {
         LOG_DEBUG("Message received but not handled - no effect.");
@@ -274,7 +274,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandlePause(std::optional<Au
         retCode = audioInput->audio->Stop();
         auto broadMsg =
             std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::Stop, audioInput->token);
-        sys::Bus::SendMulticast(broadMsg, sys::BusChannels::ServiceAudioNotifications, this);
+        bus.sendMulticast(std::move(broadMsg), sys::BusChannel::ServiceAudioNotifications);
         audioMux.ResetInput(audioInput);
     }
 
@@ -345,7 +345,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
         evt->getType() == EventType::BlutoothHSPDeviceState || evt->getType() == EventType::BlutoothA2DPDeviceState;
     if (isBT && evt->getDeviceState() == audio::Event::DeviceState::Connected) {
         auto req = std::make_shared<BluetoothRequestStreamMessage>();
-        sys::Bus::SendUnicast(req, service::name::bluetooth, this);
+        bus.sendUnicast(req, service::name::bluetooth);
         return std::make_unique<AudioEventResponse>(RetCode::Success);
     }
 
@@ -368,7 +368,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
         auto rCode = inp->audio->Stop();
         // Send notification that audio file was stopped
         auto msgStop = std::make_shared<AudioNotificationMessage>(AudioNotificationMessage::Type::Stop, inp->token);
-        sys::Bus::SendMulticast(msgStop, sys::BusChannels::ServiceAudioNotifications, this);
+        bus.sendMulticast(msgStop, sys::BusChannel::ServiceAudioNotifications);
         audioMux.ResetInput(inp);
         return rCode;
     };
@@ -426,7 +426,7 @@ void ServiceAudio::HandleNotification(const AudioNotificationMessage::Type &type
         }
         else {
             auto newMsg = std::make_shared<AudioStopRequest>(token);
-            sys::Bus::SendUnicast(newMsg, ServiceAudio::serviceName, this);
+            bus.sendUnicast(newMsg, ServiceAudio::serviceName);
         }
         return;
     }
@@ -530,7 +530,7 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     if (isBusy != curIsBusy) {
         auto broadMsg = std::make_shared<AudioNotificationMessage>(
             curIsBusy ? AudioNotificationMessage::Type::ServiceWakeUp : AudioNotificationMessage::Type::ServiceSleep);
-        sys::Bus::SendMulticast(broadMsg, sys::BusChannels::ServiceAudioNotifications, this);
+        bus.sendMulticast(broadMsg, sys::BusChannel::ServiceAudioNotifications);
     }
 
     if (responseMsg) {

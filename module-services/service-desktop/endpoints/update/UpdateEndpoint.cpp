@@ -9,7 +9,6 @@
 #include <endpoints/Context.hpp>
 #include <endpoints/messages/MessageHelper.hpp>
 
-#include <Service/Bus.hpp>
 #include <json/json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <vfs.hpp>
@@ -61,7 +60,7 @@ auto UpdateEndpoint::run(Context &context) -> sys::ReturnCodes
         context.setResponseBody(json11::Json::object({{parserFSM::json::updateReady, true}}));
 
         auto msg = std::make_shared<sdesktop::UpdateOsMessage>(fileName, context.getUuid());
-        sys::Bus::SendUnicast(msg, service::name::service_desktop, ownerServicePtr);
+        ownerServicePtr->bus.sendUnicast(msg, service::name::service_desktop);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Success;
     }

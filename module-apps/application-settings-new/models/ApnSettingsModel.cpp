@@ -10,7 +10,7 @@ ApnSettingsModel::ApnSettingsModel(app::Application *application) : application{
 
 void ApnSettingsModel::requestAPNList()
 {
-    sys::Bus::SendUnicast(std::make_shared<CellularGetAPNMessage>(), ServiceCellular::serviceName, application);
+    application->bus.sendUnicast(std::make_shared<CellularGetAPNMessage>(), ServiceCellular::serviceName);
 }
 
 void ApnSettingsModel::saveAPN(std::shared_ptr<packet_data::APN::Config> apn)
@@ -31,5 +31,5 @@ void ApnSettingsModel::removeAPN(std::shared_ptr<packet_data::APN::Config> apn)
 void ApnSettingsModel::setAsDefaultAPN(std::shared_ptr<packet_data::APN::Config> apn)
 {
     apn->apnType = packet_data::APN::APNType::Default;
-    sys::Bus::SendUnicast(std::make_shared<CellularSetAPNMessage>(apn), ServiceCellular::serviceName, application);
+    application->bus.sendUnicast(std::make_shared<CellularSetAPNMessage>(apn), ServiceCellular::serviceName);
 }

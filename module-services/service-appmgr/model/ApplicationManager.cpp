@@ -6,7 +6,6 @@
 
 #include <module-apps/messages/AppMessage.hpp>
 #include <Common.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Message.hpp>
 #include <Service/Timer.hpp>
 #include <SystemManager/SystemManager.hpp>
@@ -571,7 +570,7 @@ namespace app::manager
         }
 
         auto notification = std::make_shared<ApplicationStatusRequest>(GetName(), app->name());
-        sys::Bus::SendMulticast(notification, sys::BusChannels::AppManagerNotifications, this);
+        bus.sendMulticast(notification, sys::BusChannel::AppManagerNotifications);
         return true;
     }
 

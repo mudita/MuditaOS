@@ -7,7 +7,6 @@
 
 void LanguagesModel::requestCurrentDisplayLanguage()
 {
-    sys::Bus::SendUnicast(std::make_shared<app::manager::GetCurrentDisplayLanguageRequest>(),
-                          app::manager::ApplicationManager::ServiceName,
-                          application);
+    application->bus.sendUnicast(std::make_shared<app::manager::GetCurrentDisplayLanguageRequest>(),
+                                 app::manager::ApplicationManager::ServiceName);
 }

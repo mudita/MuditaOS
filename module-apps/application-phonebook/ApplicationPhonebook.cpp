@@ -24,7 +24,7 @@ namespace app
                                                StartInBackground startInBackground)
         : Application(name, parent, startInBackground, phonebook_stack_size)
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowContacts, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
             return msgHandled();

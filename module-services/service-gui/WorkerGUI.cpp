@@ -6,7 +6,6 @@
 #include <DrawCommand.hpp>
 #include <log/log.hpp>
 #include <Renderer.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Worker.hpp>
 #include <service-gui/ServiceGUI.hpp>
 
@@ -68,6 +67,6 @@ namespace service::gui
     void WorkerGUI::onRenderingFinished(int contextId, ::gui::RefreshModes refreshMode)
     {
         auto msg = std::make_shared<service::gui::RenderingFinished>(contextId, refreshMode);
-        sys::Bus::SendUnicast(std::move(msg), guiService->GetName(), guiService);
+        guiService->bus.sendUnicast(std::move(msg), guiService->GetName());
     }
 } // namespace service::gui

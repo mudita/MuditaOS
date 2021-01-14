@@ -11,7 +11,6 @@
 #include <log/log.hpp>
 #include <messages/EinkMessage.hpp>
 #include <messages/ImageMessage.hpp>
-#include <Service/Bus.hpp>
 
 #include <cstring>
 #include <memory>
@@ -52,8 +51,7 @@ namespace service::eink
         display.powerOn();
 
         auto msg = std::make_shared<service::gui::EinkInitialized>(display.getSize());
-        sys::Bus::SendUnicast(msg, service::name::gui, this);
-
+        bus.sendUnicast(msg, service::name::gui);
         return sys::ReturnCodes::Success;
     }
 

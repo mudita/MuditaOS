@@ -30,7 +30,6 @@
 #include <NotificationsRecord.hpp>
 #include <PhoneNumber.hpp>
 #include <Result.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/Timer.hpp>
@@ -151,7 +150,7 @@ void State::set(ServiceCellular *owner, ST state)
     LOG_DEBUG("GSM state: (%s) -> (%s)", c_str(this->state), c_str(state));
     this->state = state;
     auto msg    = std::make_shared<StateChange>(state);
-    sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, owner);
+    owner->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
 }
 
 State::ST State::get() const
@@ -164,9 +163,9 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
     LOG_INFO("[ServiceCellular] Initializing");
 
-    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-    busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
-    busChannels.push_back(sys::BusChannels::ServiceEvtmgrNotifications);
+    bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
+    bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+    bus.channels.push_back(sys::BusChannel::ServiceEvtmgrNotifications);
 
     callStateTimer = std::make_unique<sys::Timer>("call_state", this, 1000);
     callStateTimer->connect([&](sys::Timer &) { CallStateTimerHandler(); });
@@ -203,7 +202,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
             return;
         }
 
-        sys::Bus::SendMulticast(msg.value(), sys::BusChannels::ServiceCellularNotifications, this);
+        bus.sendMulticast(msg.value(), sys::BusChannel::ServiceCellularNotifications);
     };
 
     packetData = std::make_unique<packet_data::PacketData>(*this); /// call in apnListChanged handler
@@ -229,7 +228,7 @@ void ServiceCellular::CallStateTimerHandler()
     LOG_DEBUG("CallStateTimerHandler");
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, this);
+    bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
 sys::ReturnCodes ServiceCellular::InitHandler()
@@ -486,7 +485,7 @@ bool ServiceCellular::handle_idle()
 bool ServiceCellular::handle_wait_for_start_permission()
 {
     auto msg = std::make_shared<CellularCheckIfStartAllowedMessage>();
-    sys::Bus::SendUnicast(msg, service::name::system_manager, this);
+    bus.sendUnicast(msg, service::name::system_manager);
 
     return true;
 }
@@ -828,7 +827,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
                 if (call.state == ModemCall::CallState::Active) {
                     auto msg =
                         std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
-                    sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
+                    bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
                     callStateTimer->stop();
                 }
             }
@@ -873,10 +872,9 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             auto response = channel->cmd(at::AT::ATA);
             if (response) {
                 // Propagate "CallActive" notification into system
-                sys::Bus::SendMulticast(
+                bus.sendMulticast(
                     std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive),
-                    sys::BusChannels::ServiceCellularNotifications,
-                    this);
+                    sys::BusChannel::ServiceCellularNotifications);
                 ret = true;
             }
         }
@@ -960,7 +958,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
 
         auto msg  = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularNetworkInfoResult);
         msg->data = getNetworkInfo();
-        sys::Bus::SendUnicast(msg, msgl->sender, this);
+        bus.sendUnicast(msg, msgl->sender);
     } break;
     case MessageType::CellularSelectAntenna: {
         auto msg = dynamic_cast<CellularAntennaRequestMessage *>(msgl);
@@ -973,7 +971,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             responseMsg         = std::make_shared<CellularResponseMessage>(changedAntenna);
 
             auto notification = std::make_shared<AntennaChangedMessage>();
-            sys::Bus::SendMulticast(notification, sys::BusChannels::AntennaNotifications, this);
+            bus.sendMulticast(notification, sys::BusChannel::AntennaNotifications);
         }
         else {
             responseMsg = std::make_shared<CellularResponseMessage>(false);
@@ -997,7 +995,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             responseMsg = std::make_shared<CellularResponseMessage>(true);
             auto msg    = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularGetScanModeResult);
             msg->data.push_back(response);
-            sys::Bus::SendUnicast(msg, msgl->sender, this);
+            bus.sendUnicast(msg, msgl->sender);
             break;
         }
         responseMsg = std::make_shared<CellularResponseMessage>(false);
@@ -1167,7 +1165,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
 bool ServiceCellular::requestPin(unsigned int attempts, const std::string msg)
 {
     auto message = std::make_shared<CellularSimRequestPinMessage>(Store::GSM::get()->selected, attempts, msg);
-    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
+    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
     LOG_DEBUG("REQUEST PIN");
     return true;
 }
@@ -1175,7 +1173,7 @@ bool ServiceCellular::requestPin(unsigned int attempts, const std::string msg)
 bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
 {
     auto message = std::make_shared<CellularSimRequestPukMessage>(Store::GSM::get()->selected, attempts, msg);
-    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
+    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
     LOG_DEBUG("REQUEST PUK");
     return true;
 }
@@ -1183,7 +1181,7 @@ bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
 bool ServiceCellular::sendSimUnlocked()
 {
     auto message = std::make_shared<CellularUnlockSimMessage>(Store::GSM::get()->selected);
-    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
+    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
     LOG_DEBUG("SIM UNLOCKED");
     return true;
 }
@@ -1191,7 +1189,7 @@ bool ServiceCellular::sendSimUnlocked()
 bool ServiceCellular::sendSimBlocked()
 {
     auto message = std::make_shared<CellularBlockSimMessage>(Store::GSM::get()->selected);
-    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
+    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
     LOG_ERROR("SIM BLOCKED");
     return true;
 }
@@ -1199,7 +1197,7 @@ bool ServiceCellular::sendSimBlocked()
 bool ServiceCellular::sendUnhandledCME(unsigned int cme_error)
 {
     auto message = std::make_shared<CellularDisplayCMEMessage>(Store::GSM::get()->selected, cme_error);
-    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
+    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
     LOG_ERROR("UNHANDLED CME %d", cme_error);
     return true;
 }
@@ -1317,7 +1315,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         // SIM causes SIM INIT, only on ready
         response =
             std::move(std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM_READY));
-        sys::Bus::SendMulticast(response, sys::BusChannels::ServiceCellularNotifications, this);
+        bus.sendMulticast(response, sys::BusChannel::ServiceCellularNotifications);
         sendSimUnlocked();
         break;
     case at::SimState::NotReady:
@@ -1325,7 +1323,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         response =
             std::move(std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM_NOT_READY));
-        sys::Bus::SendMulticast(response, sys::BusChannels::ServiceCellularNotifications, this);
+        bus.sendMulticast(response, sys::BusChannel::ServiceCellularNotifications);
         break;
     case at::SimState::SimPin: {
         SimCard simCard(*this);
@@ -1381,7 +1379,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         break;
     }
     auto simMessage = std::make_shared<sevm::SIMMessage>();
-    sys::Bus::SendUnicast(simMessage, service::name::evt_manager, this);
+    bus.sendUnicast(simMessage, service::name::evt_manager);
 
     return true;
 }
@@ -1802,7 +1800,7 @@ bool ServiceCellular::handle_select_sim()
             // NO SIM IN
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
-        sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), service::name::evt_manager, this);
+        bus.sendUnicast(std::make_shared<sevm::SIMMessage>(), service::name::evt_manager);
         bool ready = false;
         while (!ready) {
             auto response = channel->cmd("AT+CPIN?");
@@ -2025,7 +2023,7 @@ void ServiceCellular::handle_CellularGetChannelMessage()
         std::shared_ptr<CellularGetChannelResponseMessage> channelResponsMessage =
             std::make_shared<CellularGetChannelResponseMessage>(cmux->get(getChannelMsg->dataChannel));
         LOG_DEBUG("channel ptr: %p", channelResponsMessage->dataChannelPtr);
-        sys::Bus::SendUnicast(std::move(channelResponsMessage), req->sender, this);
+        bus.sendUnicast(std::move(channelResponsMessage), req->sender);
         return sys::MessageNone{};
     });
 }
@@ -2189,7 +2187,7 @@ std::shared_ptr<cellular::RawCommandRespAsync> ServiceCellular::handleCellularSt
     auto ret = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularOperatorsScanResult);
     NetworkSettings networkSettings(*this);
     ret->data = networkSettings.scanOperators(msg->getFullInfo());
-    sys::Bus::SendUnicast(ret, msg->sender, this);
+    bus.sendUnicast(ret, msg->sender);
     return ret;
 }
 

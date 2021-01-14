@@ -5,7 +5,6 @@
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 
-#include <Service/Bus.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <crc32/crc32.h>
 #include <json/json11.hpp>
@@ -737,7 +736,7 @@ updateos::UpdateError UpdateMuditaOS::informError(const updateos::UpdateError er
     auto msgToSend         = std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateError);
     messageText            = std::string(readBuf.get());
     msgToSend->updateStats = (updateos::UpdateStats)(*this);
-    sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
+    owner->bus.sendUnicast(msgToSend, app::name_desktop);
 
     parserFSM::Context responseContext;
     responseContext.setResponseStatus(parserFSM::http::Code::InternalServerError);
@@ -780,7 +779,7 @@ void UpdateMuditaOS::informUpdate(const updateos::UpdateState statusCode, const 
     if (owner == nullptr) {
         return;
     }
-    sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
+    owner->bus.sendUnicast(msgToSend, app::name_desktop);
 
     parserFSM::Context responseContext;
     responseContext.setResponseStatus(parserFSM::http::Code::Accepted);

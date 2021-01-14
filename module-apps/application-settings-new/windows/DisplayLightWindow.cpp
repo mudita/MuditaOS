@@ -10,7 +10,6 @@
 
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <i18n/i18n.hpp>
-#include <Service/Bus.hpp>
 
 namespace gui
 {
