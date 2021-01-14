@@ -54,6 +54,7 @@ namespace at
         ServiceProvPersPUKRequired    = 45,
         CorporatePersPINRequired      = 46,
         CorporatePersPUKRequired      = 47,
+        PhoneBusy                     = 258,
         AudioUnknownError             = 901,
         AudioInvalidParameters        = 902,
         AudioOperationNotSupported    = 903,
@@ -69,7 +70,6 @@ namespace at
      */
     enum class NetworkErrorCode : uint32_t
     {
-
         MEFailure                   = 300,
         SMS_MEReserved              = 301,
         OperationNotAllowed         = 302,

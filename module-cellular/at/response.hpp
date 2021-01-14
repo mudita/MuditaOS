@@ -278,5 +278,61 @@ namespace at
             auto getStatus(const ServiceStatus &status)
                 -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
         } // namespace clir
+
+        namespace ccfc
+        {
+
+            enum class ConnectionClass
+            {
+                None                  = 0,
+                Voice                 = 1,
+                Data                  = 2,
+                Fax                   = 4,
+                AllTelephonyExceptSMS = 7,
+                ShortMessgeService    = 8,
+                DataAsync             = 16,
+                DataSync              = 32
+            };
+
+            enum class ForwardingStatus
+            {
+                NotActive,
+                Active
+            };
+
+            struct ParsedCcfc
+            {
+                ConnectionClass connectionClass;
+                ForwardingStatus status;
+                std::string number;
+
+                explicit ParsedCcfc(ConnectionClass connectionClass, ForwardingStatus status, const std::string &number)
+                    : connectionClass(connectionClass), status(status), number(number)
+                {}
+            };
+
+            enum Tokens
+            {
+                Status,
+                Class,
+                Number,
+                Type
+            };
+
+            struct CcfcNumbers
+            {
+                std::string voice;
+                std::string fax;
+                std::string sync;
+                std::string async;
+            };
+
+            auto constexpr serviceDisabledTokenCount = 2;
+            auto constexpr serviceEnabledTokenCount  = 4;
+
+            auto parse(std::vector<std::string> response, std::vector<ParsedCcfc> &parsed) -> bool;
+            auto getNumbers(std::vector<ParsedCcfc> &parsed) -> CcfcNumbers;
+            auto isAnyActive(std::vector<ParsedCcfc> &parsed) -> bool;
+        } // namespace ccfc
     }     // namespace response
 } // namespace at
