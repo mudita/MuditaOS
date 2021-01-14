@@ -9,7 +9,6 @@
 #include <Commands.hpp>
 #include <MessageType.hpp>
 #include <Modem/TS0710/DLC_channel.h>
-#include <Service/Bus.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/Timer.hpp>
@@ -47,14 +46,14 @@ namespace FotaService
     {
         LOG_INFO("[ServiceFota] Initializing");
 
-        busChannels.push_back(sys::BusChannels::ServiceFotaNotifications);
-        busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceFotaNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 
         connectionTimer = std::make_unique<sys::Timer>("Fota", this, defaultTimer);
         connectionTimer->connect([&](sys::Timer &) {
             std::shared_ptr<InternetRequestMessage> msg =
                 std::make_shared<InternetRequestMessage>(MessageType::CellularListCurrentCalls);
-            sys::Bus::SendUnicast(msg, Service::serviceName, this);
+            bus.sendUnicast(msg, Service::serviceName);
         });
         registerMessageHandlers();
     }
@@ -149,10 +148,8 @@ namespace FotaService
                 }
 
                 if (atResult) {
-                    sys::Bus::SendMulticast(
-                        std::make_shared<NotificationMessage>(NotificationMessage::Type::Configured),
-                        sys::BusChannels::ServiceFotaNotifications,
-                        this);
+                    bus.sendMulticast(std::make_shared<NotificationMessage>(NotificationMessage::Type::Configured),
+                                      sys::BusChannel::ServiceFotaNotifications);
                     LOG_DEBUG("Internet Cofiguration OK");
                 }
                 return std::make_shared<FotaResponseMessage>(true);
@@ -172,10 +169,9 @@ namespace FotaService
                 }
             }
             LOG_DEBUG("InternetConnect OK");
-            sys::Bus::SendMulticast(std::make_shared<NotificationMessage>(
-                                        static_cast<NotificationMessage::Type>(NotificationMessage::Type::Connected)),
-                                    sys::BusChannels::ServiceFotaNotifications,
-                                    this);
+            bus.sendMulticast(std::make_shared<NotificationMessage>(
+                                  static_cast<NotificationMessage::Type>(NotificationMessage::Type::Connected)),
+                              sys::BusChannel::ServiceFotaNotifications);
             return std::make_shared<FotaResponseMessage>(true);
         }
         return std::make_shared<FotaResponseMessage>(false);
@@ -574,7 +570,7 @@ namespace FotaService
         msg->httpServerResponseError             = httpErrorCodeValue200;
         msg->responseHeaders                     = std::move(headers);
         msg->body                                = std::move(body);
-        sys::Bus::SendUnicast(msg, receiverServiceName, this);
+        bus.sendUnicast(msg, receiverServiceName);
     }
 
     void Service::parseQIND(const std::string &message)
@@ -588,13 +584,13 @@ namespace FotaService
     {
         auto progressMsg      = std::make_shared<FOTAProgres>();
         progressMsg->progress = progress;
-        sys::Bus::SendUnicast(progressMsg, receiver, this);
+        bus.sendUnicast(progressMsg, receiver);
     }
 
     void Service::sendFotaFinshed(const std::string &receiver)
     {
         auto msg = std::make_shared<FOTAFinished>();
-        sys::Bus::SendUnicast(std::move(msg), receiver, this);
+        bus.sendUnicast(std::move(msg), receiver);
     }
 
     sys::MessagePointer Service::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage * /*resp*/)

@@ -43,7 +43,7 @@ namespace app
     ApplicationSettings::ApplicationSettings(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground)
     {
-        busChannels.push_back(sys::BusChannels::AntennaNotifications);
+        bus.channels.push_back(sys::BusChannel::AntennaNotifications);
         addActionReceiver(manager::actions::SelectSimCard, [this](auto &&data) {
             switchWindow(app::sim_select);
             return msgHandled();

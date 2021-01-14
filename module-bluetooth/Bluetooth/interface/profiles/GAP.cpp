@@ -3,7 +3,6 @@
 
 #include "BluetoothWorker.hpp"
 #include "Device.hpp"
-#include "Service/Bus.hpp"
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/Error.hpp>
 #include <log/log.hpp>
@@ -217,9 +216,8 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
             }
             bluetooth::GAP::devices.push_back(dev);
             auto msg = std::make_shared<BluetoothScanResultMessage>(bluetooth::GAP::devices);
-            sys::Bus::SendUnicast(msg, "ApplicationSettings", bluetooth::GAP::ownerService);
-            sys::Bus::SendUnicast(msg, "ApplicationSettingsNew", bluetooth::GAP::ownerService);
-
+            bluetooth::GAP::ownerService->bus.sendUnicast(msg, "ApplicationSettings");
+            bluetooth::GAP::ownerService->bus.sendUnicast(msg, "ApplicationSettingsNew");
         } break;
 
         case GAP_EVENT_INQUIRY_COMPLETE:
@@ -255,8 +253,8 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
         case GAP_EVENT_DEDICATED_BONDING_COMPLETED: {
             auto result = packet[2];
             auto msg    = std::make_shared<BluetoothPairResultMessage>(result == 0u);
-            sys::Bus::SendUnicast(msg, "ApplicationSettings", bluetooth::GAP::ownerService);
-            sys::Bus::SendUnicast(msg, "ApplicationSettingsNew", bluetooth::GAP::ownerService);
+            bluetooth::GAP::ownerService->bus.sendUnicast(msg, "ApplicationSettings");
+            bluetooth::GAP::ownerService->bus.sendUnicast(msg, "ApplicationSettingsNew");
         } break;
         default:
             break;

@@ -74,8 +74,8 @@ ServiceAntenna::ServiceAntenna() : sys::Service(serviceName)
 
     state = new utils::state::State<antenna::State>(this);
 
-    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-    busChannels.push_back(sys::BusChannels::AntennaNotifications);
+    bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
+    bus.channels.push_back(sys::BusChannel::AntennaNotifications);
 }
 
 ServiceAntenna::~ServiceAntenna()

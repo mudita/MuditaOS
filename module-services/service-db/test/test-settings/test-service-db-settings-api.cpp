@@ -89,13 +89,13 @@ TEST_CASE("SettingsApi")
             std::cout << "koniec start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
             testStart->unlock();
             auto msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
-            sys::Bus::SendUnicast(std::move(msgStart), "appTest", manager.get());
+            manager->bus.sendUnicast(std::move(msgStart), "appTest");
 
             msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
-            sys::Bus::SendUnicast(std::move(msgStart), "appTestProfile", manager.get());
+            manager->bus.sendUnicast(std::move(msgStart), "appTestProfile");
 
             msgStart = std::make_shared<settings::UTMsg::UTMsgStart>();
-            sys::Bus::SendUnicast(std::move(msgStart), "appTestMode", manager.get());
+            manager->bus.sendUnicast(std::move(msgStart), "appTestMode");
 
             return ret;
         });

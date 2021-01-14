@@ -49,7 +49,7 @@ namespace app
                                              sys::ServicePriority priority)
         : Application(name, parent, startInBackground, stackDepth, priority)
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowReminder, [this](auto &&data) {
             switchWindow(style::window::calendar::name::event_reminder_window, std::move(data));
             return msgHandled();
