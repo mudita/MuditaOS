@@ -344,6 +344,11 @@ namespace gui
         /// remove timer from item and as a result - destory it
         void detachTimer(Timer &timer);
 
+        /// simple check function to determine if item is active && visible
+        inline bool isActive()
+        {
+            return (activeItem && visible);
+        }
         virtual void accept(GuiVisitor &visitor);
 
       protected:
