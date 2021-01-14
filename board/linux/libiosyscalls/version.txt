@@ -62,6 +62,7 @@ GLIBC_2.2.5 {
                 __xstat64;
                 __lxstat64;
                 __fxstat64;
+                read;
                 mount;
                 umount;
 # posix - dirent
@@ -73,7 +74,6 @@ GLIBC_2.2.5 {
                 seekdir;
                 telldir;
 # posix - not implemented
-#                read;
 #                write;
 #                lseek;
 #                lseek64;

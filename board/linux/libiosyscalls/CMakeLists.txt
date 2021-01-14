@@ -43,3 +43,7 @@ target_link_options(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES} )
 target_link_libraries( ${PROJECT_NAME} dl )
 target_compile_definitions( ${PROJECT_NAME} PUBLIC TARGET_Linux )
+
+if (${ENABLE_TESTS})
+    add_subdirectory(test)
+endif ()

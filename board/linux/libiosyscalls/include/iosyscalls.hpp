@@ -22,7 +22,8 @@ namespace vfsn::linux::internal
         int ungetchar {-1};
     };
 
-    int get_native_fd(FILEX*);
+    int to_native_fd(int fd);
+    int to_image_fd(int fd);
 
     FILEX* allocate_filex(int fd);
     bool is_filex(const void* fd);
