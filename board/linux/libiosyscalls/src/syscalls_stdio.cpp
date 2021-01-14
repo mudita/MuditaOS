@@ -378,7 +378,7 @@ extern "C"
         if(vfs::is_filex(__stream))
         {
             TRACE_SYSCALLN("(%p) -> VFS", __stream);
-            ret =  vfs::get_native_fd(reinterpret_cast<FILEX*>(__stream));
+            ret = vfs::to_native_fd(reinterpret_cast<FILEX*>(__stream)->fd);
         }
         else
         {

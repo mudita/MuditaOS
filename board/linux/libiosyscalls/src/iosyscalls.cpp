@@ -27,6 +27,7 @@ namespace {
         "/proc",
         "/dev/shm",
         "PurePhone.img",
+        "MuditaOS.log",
         nullptr,
     };
     constexpr const char * EXCLUDED_PATHS[] = {
@@ -104,9 +105,14 @@ namespace vfsn::linux::internal
         return false;
     }
 
-    int get_native_fd(FILEX* file)
+    int to_native_fd(int fd)
     {
-        return file ? (FIRST_FILEDESC + file->fd) : -1;
+        return FIRST_FILEDESC + fd;
+    }
+
+    int to_image_fd(int fd)
+    {
+        return fd - FIRST_FILEDESC;
     }
 
     bool is_image_fd(int fd)
