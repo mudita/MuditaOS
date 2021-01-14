@@ -374,8 +374,8 @@ namespace app
     {
         constexpr int timeout = pdMS_TO_TICKS(1500);
 
-        auto response = sys::Bus::SendUnicast(
-            std::make_shared<sevm::ScreenLightControlRequestParameters>(), service::name::evt_manager, this, timeout);
+        auto response = bus.sendUnicast(
+            std::make_shared<sevm::ScreenLightControlRequestParameters>(), service::name::evt_manager, timeout);
 
         if (response.first == sys::ReturnCodes::Success) {
             auto msgState = dynamic_cast<sevm::ScreenLightControlParametersResponse *>(response.second.get());
@@ -392,39 +392,35 @@ namespace app
     void ApplicationSettingsNew::setBrightness(bsp::eink_frontlight::BrightnessPercentage value)
     {
         screen_light_control::Parameters parameters{value};
-        sys::Bus::SendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
-                                  screen_light_control::Action::setManualModeBrightness, parameters),
-                              service::name::evt_manager,
-                              this);
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                            screen_light_control::Action::setManualModeBrightness, parameters),
+                        service::name::evt_manager);
     }
 
     void ApplicationSettingsNew::setMode(bool isAutoLightSwitchOn)
     {
-        sys::Bus::SendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
-                                  isAutoLightSwitchOn ? screen_light_control::Action::enableAutomaticMode
-                                                      : screen_light_control::Action::disableAutomaticMode),
-                              service::name::evt_manager,
-                              this);
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                            isAutoLightSwitchOn ? screen_light_control::Action::enableAutomaticMode
+                                                : screen_light_control::Action::disableAutomaticMode),
+                        service::name::evt_manager);
     }
 
     void ApplicationSettingsNew::setStatus(bool isDisplayLightSwitchOn)
     {
-        sys::Bus::SendUnicast(
-            std::make_shared<sevm::ScreenLightControlMessage>(
-                isDisplayLightSwitchOn ? screen_light_control::Action::turnOn : screen_light_control::Action::turnOff),
-            service::name::evt_manager,
-            this);
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(isDisplayLightSwitchOn
+                                                                              ? screen_light_control::Action::turnOn
+                                                                              : screen_light_control::Action::turnOff),
+                        service::name::evt_manager);
     }
 
     auto ApplicationSettingsNew::isKeypadBacklightOn() -> bool
     {
         constexpr int timeout = pdMS_TO_TICKS(1500);
 
-        auto response = sys::Bus::SendUnicast(
-            std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::checkState),
-            service::name::evt_manager,
-            this,
-            timeout);
+        auto response =
+            bus.sendUnicast(std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::checkState),
+                            service::name::evt_manager,
+                            timeout);
 
         if (response.first == sys::ReturnCodes::Success) {
             auto msgState = dynamic_cast<sevm::KeypadBacklightResponseMessage *>(response.second.get());
@@ -439,11 +435,9 @@ namespace app
 
     void ApplicationSettingsNew::setKeypadBacklightState(bool newState)
     {
-        sys::Bus::SendUnicast(
-            std::make_shared<sevm::KeypadBacklightMessage>(newState ? bsp::keypad_backlight::Action::turnOn
-                                                                    : bsp::keypad_backlight::Action::turnOff),
-            service::name::evt_manager,
-            this);
+        bus.sendUnicast(std::make_shared<sevm::KeypadBacklightMessage>(
+                            newState ? bsp::keypad_backlight::Action::turnOn : bsp::keypad_backlight::Action::turnOff),
+                        service::name::evt_manager);
     }
 
 } /* namespace app */

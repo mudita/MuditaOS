@@ -4,7 +4,6 @@
 #include "Timer.hpp"
 #include "Service.hpp"
 #include "TimerMessage.hpp"
-#include "Service/Bus.hpp"
 #include <log/log.hpp>
 #include <projdefs.h>
 #include <limits>
@@ -61,8 +60,8 @@ namespace sys
             log_error("Timer %s error: no parent service", name.c_str());
             return;
         }
-        if (!Bus::SendUnicast(msg, parent->GetName(), parent)) {
-            log_error("Timer %s error: bus error", name.c_str());
+        if (!parent->bus.sendUnicast(msg, parent->GetName())) {
+            LOG_ERROR("Timer %s error: bus error", name.c_str());
             return;
         }
     }

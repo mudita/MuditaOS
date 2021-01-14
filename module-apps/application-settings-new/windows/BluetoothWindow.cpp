@@ -15,8 +15,7 @@ namespace gui
 
     BluetoothWindow::BluetoothWindow(app::Application *app) : OptionWindow(app, gui::window::name::bluetooth)
     {
-        sys::Bus::SendUnicast(
-            std::make_shared<::message::bluetooth::RequestStatus>(), service::name::bluetooth, application);
+        application->bus.sendUnicast(std::make_shared<::message::bluetooth::RequestStatus>(), service::name::bluetooth);
     }
 
     void BluetoothWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -111,17 +110,15 @@ namespace gui
     void BluetoothWindow::changeBluetoothState(bool currentState)
     {
         ::message::bluetooth::SetStatus setStatus(makeDesiredStatus(!currentState, isPhoneVisibilitySwitchOn));
-        sys::Bus::SendUnicast(std::make_shared<::message::bluetooth::SetStatus>(std::move(setStatus)),
-                              service::name::bluetooth,
-                              application);
+        application->bus.sendUnicast(std::make_shared<::message::bluetooth::SetStatus>(std::move(setStatus)),
+                                     service::name::bluetooth);
     }
 
     void BluetoothWindow::changeVisibility(bool currentVisibility)
     {
         ::message::bluetooth::SetStatus setStatus(makeDesiredStatus(isBluetoothSwitchOn, !currentVisibility));
-        sys::Bus::SendUnicast(std::make_shared<::message::bluetooth::SetStatus>(std::move(setStatus)),
-                              service::name::bluetooth,
-                              application);
+        application->bus.sendUnicast(std::make_shared<::message::bluetooth::SetStatus>(std::move(setStatus)),
+                                     service::name::bluetooth);
     }
 
     BluetoothStatus BluetoothWindow::makeDesiredStatus(bool desiredBluetoothState, bool desiredVisibility) noexcept

@@ -11,7 +11,6 @@
 
 #include <Common/Query.hpp>
 #include <MessageType.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Worker.hpp>
 #include <json/json11.hpp>
 #include <log/log.hpp>
@@ -98,7 +97,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                 auto msgToSend =
                     std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateFoundOnBoot, file);
                 msgToSend->updateStats.versionInformation = UpdateMuditaOS::getVersionInfoFromFile(file);
-                sys::Bus::SendUnicast(msgToSend, app::name_desktop, this);
+                bus.sendUnicast(msgToSend, app::name_desktop);
             }
         }
 

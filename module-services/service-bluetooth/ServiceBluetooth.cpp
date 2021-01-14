@@ -5,7 +5,6 @@
 #include "service-bluetooth/ServiceBluetooth.hpp"
 #include "service-bluetooth/BluetoothMessage.hpp"
 
-#include <module-sys/Service/Bus.hpp>
 
 #include <Bluetooth/BluetoothWorker.hpp>
 #include <interface/profiles/Profile.hpp>
@@ -89,7 +88,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
             auto state   = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
             auto event   = std::make_unique<BluetoothStatusRequestEvent>(state);
             auto message = std::make_shared<DeveloperModeRequest>(std::move(event));
-            sys::Bus::SendUnicast(std::move(message), service::name::service_desktop, this);
+            bus.sendUnicast(std::move(message), service::name::service_desktop);
         }
 
         return sys::MessageNone{};
@@ -167,7 +166,7 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
         case MessageType::BluetoothRequestStream: {
             auto result =
                 std::make_shared<BluetoothRequestStreamResultMessage>(worker->currentProfile->getStreamData());
-            sys::Bus::SendUnicast(std::move(result), "ServiceAudio", this);
+            bus.sendUnicast(std::move(result), "ServiceAudio");
             LOG_INFO("Queues sent after a request!");
         } break;
         default:

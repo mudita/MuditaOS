@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "BusProxy.hpp"
 #include "Common.hpp"  // for ReturnCodes, ServicePriority, BusChannels
 #include "Mailbox.hpp" // for Mailbox
 #include "Message.hpp" // for MessagePointer
@@ -43,6 +44,7 @@ namespace sys
         ~Service() override;
 
         void StartService();
+        void CloseService();
 
         // Invoked for not processed already messages
         // override should in in either callback, function or whatever...
@@ -69,7 +71,7 @@ namespace sys
 
         std::string parent;
 
-        std::vector<BusChannels> busChannels;
+        BusProxy bus;
 
         Mailbox<std::shared_ptr<Message>> mailbox;
 

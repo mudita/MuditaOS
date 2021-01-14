@@ -8,7 +8,7 @@
 namespace sys
 {
 
-    enum class BusChannels
+    enum class BusChannel
     {
         System,
         SystemManagerRequests,
@@ -84,32 +84,32 @@ inline const char *c_str(sys::ServicePowerMode code)
     return "";
 }
 
-inline const char *c_str(sys::BusChannels channel)
+inline const char *c_str(sys::BusChannel channel)
 {
     switch (channel) {
-    case sys::BusChannels::System:
+    case sys::BusChannel::System:
         return "System";
-    case sys::BusChannels::SystemManagerRequests:
+    case sys::BusChannel::SystemManagerRequests:
         return "SystemManagerRequests";
-    case sys::BusChannels::PowerManagerRequests:
+    case sys::BusChannel::PowerManagerRequests:
         return "PowerManagerRequests";
-    case sys::BusChannels::ServiceCellularNotifications:
+    case sys::BusChannel::ServiceCellularNotifications:
         return "ServiceCellularNotifications,";
-    case sys::BusChannels::Test2CustomBusChannel:
+    case sys::BusChannel::Test2CustomBusChannel:
         return "Test2CustomBusChannel,";
-    case sys::BusChannels::ServiceDBNotifications:
+    case sys::BusChannel::ServiceDBNotifications:
         return "ServiceDBNotifications,";
-    case sys::BusChannels::ServiceAudioNotifications:
+    case sys::BusChannel::ServiceAudioNotifications:
         return "ServiceAudioNotifications";
-    case sys::BusChannels::AppManagerNotifications:
+    case sys::BusChannel::AppManagerNotifications:
         return "AppManagerNotifications,";
-    case sys::BusChannels::ServiceFotaNotifications:
+    case sys::BusChannel::ServiceFotaNotifications:
         return "ServiceFotaNotifications";
-    case sys::BusChannels::AntennaNotifications:
+    case sys::BusChannel::AntennaNotifications:
         return "AntennaNotifications";
-    case sys::BusChannels::ServiceEvtmgrNotifications:
+    case sys::BusChannel::ServiceEvtmgrNotifications:
         return "ServiceEvtmgrNotifications";
-    case sys::BusChannels::CalendarNotifications:
+    case sys::BusChannel::CalendarNotifications:
         return "CalendarNotifications";
     }
     return "";

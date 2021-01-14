@@ -5,7 +5,6 @@
 #include "service-fota/FotaServiceAPI.hpp"
 #include "service-fota/ServiceFota.hpp"
 
-#include <Service/Bus.hpp>
 #include <MessageType.hpp>
 #include <log/log.hpp>
 
@@ -20,21 +19,21 @@ namespace FotaService
     {
         LOG_DEBUG("FOTA - Internet Config called");
         std::shared_ptr<ConfigureAPNMessage> msg = std::make_shared<ConfigureAPNMessage>(config);
-        return sys::Bus::SendUnicast(std::move(msg), FotaService::Service::serviceName, serv);
+        return serv->bus.sendUnicast(std::move(msg), FotaService::Service::serviceName);
     }
 
     bool API::Connect(sys::Service *serv)
     {
         LOG_DEBUG("FOTA - Internet connection called");
         auto msg = std::make_shared<ConnectMessage>();
-        return sys::Bus::SendUnicast(std::move(msg), FotaService::Service::serviceName, serv);
+        return serv->bus.sendUnicast(std::move(msg), FotaService::Service::serviceName);
     }
 
     bool API::Disconnect(sys::Service *serv)
     {
         std::shared_ptr<InternetRequestMessage> msg =
             std::make_shared<InternetRequestMessage>(MessageType::FotaInternetDisconnect);
-        return sys::Bus::SendUnicast(std::move(msg), FotaService::Service::serviceName, serv);
+        return serv->bus.sendUnicast(std::move(msg), FotaService::Service::serviceName);
     }
 
     void API::HTTPGET(sys::Service *serv, const std::string &url)
@@ -43,7 +42,7 @@ namespace FotaService
         std::shared_ptr<HTTPRequestMessage> msg = std::make_shared<HTTPRequestMessage>();
         msg->url                                = url;
         msg->method                             = FotaService::HTTPMethod::GET;
-        sys::Bus::SendUnicast(std::move(msg), FotaService::Service::serviceName, serv);
+        serv->bus.sendUnicast(std::move(msg), FotaService::Service::serviceName);
     }
 
     void API::FotaStart(sys::Service *serv, const std::string &url)
@@ -53,7 +52,7 @@ namespace FotaService
 
         msg->url = url;
 
-        sys::Bus::SendUnicast(std::move(msg), FotaService::Service::serviceName, serv);
+        serv->bus.sendUnicast(std::move(msg), FotaService::Service::serviceName);
     }
 
     void API::sendRawProgress(sys::Service *serv, const std::string &rawQind)
@@ -61,7 +60,7 @@ namespace FotaService
         LOG_DEBUG("Fota sending Raw progress");
         std::shared_ptr<FotaService::FOTARawProgress> msg = std::make_shared<FotaService::FOTARawProgress>();
         msg->qindRaw                                      = rawQind;
-        sys::Bus::SendUnicast(std::move(msg), FotaService::Service::serviceName, serv);
+        serv->bus.sendUnicast(std::move(msg), FotaService::Service::serviceName);
     }
 
     std::string APN::toString(APN::AuthMethod authMethod)

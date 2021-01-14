@@ -79,7 +79,8 @@ namespace bluetooth
     {
         auto evt = std::make_shared<audio::Event>(event, state);
         auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
-        sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, const_cast<sys::Service *>(ownerService));
+        auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+        busProxy.sendUnicast(std::move(msg), service::name::evt_manager);
     }
 
     void HSP::HSPImpl::packetHandler(uint8_t packetType, uint16_t channel, uint8_t *event, uint16_t eventSize)

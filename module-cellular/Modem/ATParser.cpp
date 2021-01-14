@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ATParser.hpp"
-#include "Service/Bus.hpp"
 #include <service-fota/FotaServiceAPI.hpp>
 #include "bsp/cellular/bsp_cellular.hpp"
 #include <service-cellular/CellularMessage.hpp>
@@ -94,7 +93,7 @@ int ATParser::ProcessNewData(sys::Service *service)
             cpp_freertos::LockGuard lock(mutex);
             auto msg = std::make_shared<CellularNotificationMessage>(
                 CellularNotificationMessage::Type::PowerUpProcedureComplete);
-            sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, service);
+            service->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
             LOG_DEBUG("[!!!] Fucking away data");
             responseBuffer.erase();
             urcs.clear();

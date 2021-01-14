@@ -7,7 +7,6 @@
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/SignalStrength.hpp>
 #include <service-cellular/CellularMessage.hpp>
-#include <Service/Bus.hpp>
 #include <cassert>
 #include <memory>
 #include <module-os/RTOSWrapper/include/ticks.hpp>
@@ -411,7 +410,7 @@ TS0710::ConfState TS0710::StartMultiplexer()
                 Store::GSM::get()->setSignalStrength(signalStrength.data);
                 auto msg = std::make_shared<CellularNotificationMessage>(
                     CellularNotificationMessage::Type::SignalStrengthUpdate);
-                sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
+                pv_parent->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
             }
         }
         else {

@@ -9,7 +9,6 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 
-#include <Service/Bus.hpp>
 #include <json/json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 
@@ -45,7 +44,7 @@ auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
     }
     else if (context.getBody()[json::backupRequest] == true) {
         auto msg = std::make_shared<sdesktop::BackupMessage>();
-        sys::Bus::SendUnicast(msg, service::name::service_desktop, ownerServicePtr);
+        ownerServicePtr->bus.sendUnicast(msg, service::name::service_desktop);
         backupReady = true;
 
         context.setResponseBody(json11::Json::object({{json::backupRequest, true}}));

@@ -36,7 +36,7 @@ namespace sys
     SystemManager::SystemManager() : Service(service::name::system_manager, "", systemManagerStack)
     {
         // Specify list of channels which System Manager is registered to
-        busChannels = {BusChannels::SystemManagerRequests};
+        bus.channels = {BusChannel::SystemManagerRequests};
     }
 
     SystemManager::~SystemManager()
@@ -81,7 +81,8 @@ namespace sys
 
         DestroyService(service::name::evt_manager, this);
 
-        Bus::Remove(shared_from_this());
+        CloseService();
+
         EndScheduler();
 
         // Power off system
@@ -118,22 +119,21 @@ namespace sys
 
     bool SystemManager::CloseSystem(Service *s)
     {
-        Bus::SendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), service::name::system_manager, s);
+        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), service::name::system_manager);
         return true;
     }
 
     bool SystemManager::Reboot(Service *s)
     {
-        Bus::SendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot), service::name::system_manager, s);
+        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot), service::name::system_manager);
         return true;
     }
 
     bool SystemManager::SuspendService(const std::string &name, sys::Service *caller)
     {
-        auto ret = Bus::SendUnicast(
+        auto ret = caller->bus.sendUnicast(
             std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::SuspendToRAM),
             name,
-            caller,
             1000);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
@@ -145,11 +145,8 @@ namespace sys
 
     bool SystemManager::ResumeService(const std::string &name, sys::Service *caller)
     {
-        auto ret = Bus::SendUnicast(
-            std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::Active),
-            name,
-            caller,
-            1000);
+        auto ret = caller->bus.sendUnicast(
+            std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::Active), name, 1000);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)) {
@@ -168,7 +165,7 @@ namespace sys
         service->StartService();
 
         auto msg  = std::make_shared<SystemMessage>(SystemMessageType::Start);
-        auto ret  = Bus::SendUnicast(msg, service->GetName(), caller, timeout);
+        auto ret  = caller->bus.sendUnicast(msg, service->GetName(), timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if (ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)) {
@@ -183,7 +180,7 @@ namespace sys
     {
 
         auto msg  = std::make_shared<SystemMessage>(SystemMessageType::Exit);
-        auto ret  = Bus::SendUnicast(msg, name, caller, timeout);
+        auto ret  = caller->bus.sendUnicast(msg, name, timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if (ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)) {
@@ -222,7 +219,7 @@ namespace sys
         isReady = true;
 
         connect(SystemManagerCmd(), [&](Message *msg) {
-            if (msg->channel == BusChannels::SystemManagerRequests) {
+            if (msg->channel == BusChannel::SystemManagerRequests) {
                 auto *data = static_cast<SystemManagerCmd *>(msg);
 
                 switch (data->type) {
@@ -258,7 +255,7 @@ namespace sys
             LOG_INFO("Battery Brownout voltage level reached!");
 
             auto msg = std::make_shared<SystemBrownoutMesssage>();
-            Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, this);
+            bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
 
             return MessageNone{};
         });
@@ -273,7 +270,7 @@ namespace sys
             CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::Off);
 
             auto msg = std::make_shared<CriticalBatteryLevelNotification>(true);
-            Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, this);
+            bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
 
             return MessageNone{};
         });
@@ -283,8 +280,7 @@ namespace sys
             CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::On);
 
             auto msg = std::make_shared<CriticalBatteryLevelNotification>(false);
-            Bus::SendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName, this);
-
+            bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
             return MessageNone{};
         });
 

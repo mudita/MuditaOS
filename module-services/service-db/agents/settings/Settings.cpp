@@ -4,7 +4,6 @@
 #include <service-db/Settings.hpp>
 #include <service-db/SettingsMessages.hpp>
 
-#include <Service/Bus.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
@@ -18,20 +17,18 @@ namespace settings
     Settings::Settings(sys::Service *app, const std::string &dbAgentName) : dbAgentName(dbAgentName)
     {
         this->app = std::shared_ptr<sys::Service>(app, [](sys::Service *) {}); /// with deleter that doesn't delete.
-        this->app->busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
-        sys::Bus::Add(std::static_pointer_cast<sys::Service>(this->app));
+        this->app->bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         registerHandlers();
     }
 
     Settings::~Settings()
     {
         LOG_DEBUG("Settings::~Settings on %s", app->GetName().c_str());
-        sys::Bus::Remove(std::static_pointer_cast<sys::Service>(app));
     }
 
     void Settings::sendMsg(std::shared_ptr<settings::Messages::SettingsMessage> &&msg)
     {
-        sys::Bus::SendUnicast(std::move(msg), dbAgentName, app.get());
+        app->bus.sendUnicast(std::move(msg), dbAgentName);
     }
 
     void Settings::registerHandlers()
