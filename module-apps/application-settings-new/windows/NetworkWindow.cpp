@@ -14,8 +14,7 @@ namespace gui
                                  app::settingsInterface::SimParams *simParams,
                                  app::settingsInterface::OperatorsSettings *operatorsSettings)
         : OptionWindow(app, gui::window::name::network), simParams(simParams), operatorsSettings(operatorsSettings)
-    {
-    }
+    {}
     void NetworkWindow::onBeforeShow(ShowMode m, SwitchData *d)
     {
         rebuild();
@@ -78,6 +77,7 @@ namespace gui
             nullptr,
             nullptr,
             operatorsOn ? RightItem::On : RightItem::Off));
+
         if (!operatorsOn) {
             optList.emplace_back(std::make_unique<gui::OptionSettings>(
                 utils::translateI18("app_settings_network_all_operators"),
@@ -109,6 +109,17 @@ namespace gui
             nullptr,
             nullptr,
             voLteOn ? RightItem::On : RightItem::Off));
+
+        optList.emplace_back(std::make_unique<gui::OptionSettings>(
+            utils::translateI18("app_settings_network_apn_settings"),
+            [=](gui::Item &item) {
+                this->application->switchWindow(gui::window::name::apn_settings, nullptr);
+                return true;
+            },
+            nullptr,
+            nullptr,
+            RightItem::ArrowWhite,
+            true));
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
 
