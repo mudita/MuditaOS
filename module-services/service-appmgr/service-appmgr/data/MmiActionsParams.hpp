@@ -38,6 +38,7 @@ namespace app::manager::actions
             NoneSpecifiedSuccess,
             NoneSpecifiedFailed,
             CommonFailure,
+            CommonMMINotSupported,
             CommonNoMessage,
 
             ClirAccordingToSubscription,
@@ -49,6 +50,7 @@ namespace app::manager::actions
             ClirTemporaryRestricted,
             ClirTemporaryAllowed,
 
+            // Call forwarding
             RegistrationSuccessful,
             RegistrationFailed,
             ErasureSuccessful,
@@ -56,7 +58,9 @@ namespace app::manager::actions
             DisablingSuccessful,
             DisablingFailed,
             EnablingSuccessful,
-            EnablingFailed
+            EnablingFailed,
+            CallForwardingDisabled
+
         };
 
         virtual auto getMessage() const -> std::vector<MMIResultMessage> = 0;

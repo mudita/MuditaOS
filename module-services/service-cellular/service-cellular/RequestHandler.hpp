@@ -15,6 +15,7 @@ namespace cellular
     class PinChangeRequest;
     class ClipRequest;
     class ClirRequest;
+    class CallForwardingRequest;
 
     class RequestHandler
     {
@@ -26,5 +27,6 @@ namespace cellular
         virtual void handle(PinChangeRequest &request, at::Result &result)             = 0;
         virtual void handle(SupplementaryServicesRequest &request, at::Result &result) = 0;
         virtual void handle(ClirRequest &request, at::Result &result)                  = 0;
+        virtual void handle(CallForwardingRequest &request, at::Result &result)        = 0;
     };
 } // namespace cellular

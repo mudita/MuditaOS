@@ -38,7 +38,7 @@ auto MMICallForwardingResult::getData() const -> std::tuple<std::string, std::st
 void MMICallForwardingResult::accept(Visitor &v, std::string &displayMessage)
 {
     v.visit(*this, displayMessage);
-};
+}
 
 MMIParams::MMIParams(std::string mmiData) : mmiData{std::move(mmiData)}
 {}

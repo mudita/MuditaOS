@@ -19,6 +19,7 @@ class CellularRequestHandler : public cellular::RequestHandler
     void handle(cellular::SupplementaryServicesRequest &request, at::Result &result) final;
     void handle(cellular::PinChangeRequest &request, at::Result &result) final;
     void handle(cellular::ClirRequest &request, at::Result &result) final;
+    void handle(cellular::CallForwardingRequest &request, at::Result &result) final;
 
   private:
     ServiceCellular &cellular;
