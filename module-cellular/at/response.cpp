@@ -424,5 +424,101 @@ namespace at
                 return message;
             }
         } // namespace clir
+
+        namespace ccfc
+        {
+
+            auto parse(std::vector<std::string> response, std::vector<ParsedCcfc> &parsed) -> bool
+            {
+
+                auto constexpr toRemove    = "+CCFC: ";
+                auto constexpr emptyString = "";
+                auto constexpr quote       = "\"";
+
+                parsed.clear();
+
+                for (auto el : response) {
+
+                    if (el.find("OK") != std::string::npos) {
+                        return true;
+                    }
+
+                    utils::findAndReplaceAll(el, toRemove, emptyString);
+                    auto tokens = utils::split(el, ",");
+
+                    if (tokens.size() == serviceDisabledTokenCount) {
+                        parsed.push_back(ParsedCcfc(ConnectionClass::None, ForwardingStatus::NotActive, ""));
+                    }
+                    else if (tokens.size() > serviceDisabledTokenCount) {
+                        int statusToken          = 0;
+                        int connectionClassToken = 0;
+
+                        if (!utils::toNumeric(tokens[Tokens::Status], statusToken) ||
+                            !utils::toNumeric(tokens[Tokens::Class], connectionClassToken)) {
+                            return false;
+                        }
+                        auto status          = static_cast<ForwardingStatus>(statusToken);
+                        auto connectionClass = static_cast<ConnectionClass>(connectionClassToken);
+
+                        if (magic_enum::enum_contains<ForwardingStatus>(status) &&
+                            magic_enum::enum_contains<ConnectionClass>(connectionClass)) {
+                            auto number = tokens[Tokens::Number];
+                            utils::findAndReplaceAll(number, quote, emptyString);
+                            utils::trim(number);
+                            parsed.push_back(ParsedCcfc(connectionClass, status, number));
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            auto getNumbers(std::vector<ParsedCcfc> &parsed) -> CcfcNumbers
+            {
+                CcfcNumbers numbers;
+
+                for (auto el : parsed) {
+                    std::string number = "";
+                    if (el.status == ForwardingStatus::Active) {
+                        number = el.number;
+                    }
+                    switch (el.connectionClass) {
+                    case ConnectionClass::None:
+                        break;
+                    case ConnectionClass::Voice:
+                        numbers.voice = number;
+                        break;
+                    case ConnectionClass::Data:
+                        break;
+                    case ConnectionClass::Fax:
+                        numbers.fax = number;
+                        break;
+                    case ConnectionClass::AllTelephonyExceptSMS:
+                        break;
+                    case ConnectionClass::ShortMessgeService:
+                        break;
+                    case ConnectionClass::DataAsync:
+                        numbers.async = number;
+                        break;
+                    case ConnectionClass::DataSync:
+                        numbers.sync = number;
+                        break;
+                    }
+                }
+                return numbers;
+            }
+
+            auto isAnyActive(std::vector<ParsedCcfc> &parsed) -> bool
+            {
+                for (auto el : parsed) {
+                    if (el.status == ForwardingStatus::Active) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        } // namespace ccfc
     }     // namespace response
 } // namespace at
