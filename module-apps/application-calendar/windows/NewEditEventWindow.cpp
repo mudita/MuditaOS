@@ -42,8 +42,6 @@ namespace gui
     void NewEditEventWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         switch (eventAction) {
-        case EventAction::None:
-            break;
         case EventAction::Add: {
             setTitle(utils::localize.get("app_calendar_new_event_title"));
             break;
@@ -83,15 +81,7 @@ namespace gui
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
             LOG_DEBUG("Save Event");
-            bool edit = true;
-            if (eventAction == EventAction::Edit) {
-                edit = true;
-            }
-            else if (eventAction == EventAction::Add) {
-                edit = false;
-            }
-
-            newEditEventModel->saveData(eventRecord, edit);
+            newEditEventModel->saveData(eventRecord, eventAction);
             return true;
         }
 

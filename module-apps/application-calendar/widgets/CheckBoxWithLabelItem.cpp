@@ -7,52 +7,38 @@
 #include <ListView.hpp>
 #include <Style.hpp>
 #include <Utils.hpp>
+#include <InputEvent.hpp>
 
 namespace gui
 {
 
     CheckBoxWithLabelItem::CheckBoxWithLabelItem(app::Application *application,
                                                  const std::string &description,
-                                                 std::shared_ptr<WeekDaysRepeatData> data,
-                                                 bool checkIsOnLeftBarSide)
-        : app(application), checkBoxData(std::move(data)), checkIsOnLeftBarSide(checkIsOnLeftBarSide)
+                                                 std::shared_ptr<WeekDaysRepeatData> data)
+        : app(application), checkBoxData(std::move(data))
     {
         app = application;
         assert(app != nullptr);
 
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::checkBox::height);
-        setMargins(gui::Margins(style::margins::small, style::window::calendar::item::checkBox::margin_top, 0, 0));
+        setMargins(gui::Margins(
+            style::window::calendar::leftMargin, style::window::calendar::item::checkBox::margin_top, 0, 0));
         setEdges(RectangleEdge::None);
 
         hBox = new gui::HBox(this, 0, 0, 0, 0);
         hBox->setEdges(gui::RectangleEdge::None);
 
-        if (checkIsOnLeftBarSide) {
-            checkBox = new gui::CheckBox(
-                hBox,
-                0,
-                0,
-                0,
-                0,
-                [=](const UTF8 &text) {
-                    app->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::LEFT, false);
-                },
-                [=]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-                checkIsOnLeftBarSide);
-        }
-        else {
-            checkBox = new gui::CheckBox(
-                hBox,
-                0,
-                0,
-                0,
-                0,
-                [=](const UTF8 &text) {
-                    app->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::CENTER, false);
-                },
-                [=]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-                checkIsOnLeftBarSide);
-        }
+        checkBox = new gui::CheckBox(
+            hBox,
+            0,
+            0,
+            0,
+            0,
+            [=](const UTF8 &text) {
+                app->getCurrentWindow()->bottomBarTemporaryMode(text, BottomBar::Side::LEFT, false);
+            },
+            [=]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+
         checkBox->setMinimumSize(style::window::calendar::item::checkBox::input_box_label_w,
                                  style::window::calendar::item::checkBox::height);
         checkBox->activeItem = false;
@@ -62,7 +48,7 @@ namespace gui
                                          style::window::calendar::item::checkBox::height);
         descriptionLabel->setMargins(gui::Margins(style::margins::very_big, 0, 0, 0));
         descriptionLabel->setEdges(gui::RectangleEdge::None);
-        descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         descriptionLabel->setFont(style::window::font::medium);
         descriptionLabel->activeItem = false;
         descriptionLabel->setText(description);
@@ -83,7 +69,6 @@ namespace gui
             }
             else {
                 descriptionLabel->setFont(style::window::font::medium);
-                setFocusItem(nullptr);
             }
             return true;
         };

@@ -8,10 +8,14 @@
 #include "application-calendar/widgets/TextWithLabelItem.hpp"
 #include "application-calendar/widgets/EventTimeItem.hpp"
 #include "application-calendar/widgets/SeveralOptionsItem.hpp"
-#include "application-calendar/widgets/CheckBoxWithLabelItem.hpp"
 #include "application-calendar/widgets/EventDateItem.hpp"
 #include "InternalModel.hpp"
 #include <ListItemProvider.hpp>
+
+namespace gui
+{
+    class NewEventCheckBoxWithLabel; // fw declaration
+}
 
 class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, public gui::ListItemProvider
 {
@@ -19,7 +23,7 @@ class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, pu
     bool mode24H                  = false;
 
     gui::TextWithLabelItem *eventNameInput          = nullptr;
-    gui::CheckBoxWithLabelItem *allDayEventCheckBox = nullptr;
+    gui::NewEventCheckBoxWithLabel *allDayEventCheckBox = nullptr;
     gui::EventDateItem *dateItem                    = nullptr;
     gui::EventTimeItem *startTime                   = nullptr;
     gui::EventTimeItem *endTime                     = nullptr;
@@ -33,7 +37,7 @@ class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, pu
     void loadRepeat(const std::shared_ptr<EventsRecord> &record);
     void loadDataWithoutTimeItem();
     void reloadDataWithTimeItem();
-    void saveData(std::shared_ptr<EventsRecord> event, bool edit);
+    void saveData(std::shared_ptr<EventsRecord> event, EventAction action);
     void addReapetedRecords(std::shared_ptr<EventsRecord> event);
 
     [[nodiscard]] unsigned int getMinimalItemHeight() const override;

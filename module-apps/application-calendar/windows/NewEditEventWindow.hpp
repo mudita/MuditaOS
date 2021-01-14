@@ -21,16 +21,10 @@ namespace gui
     class NewEditEventWindow : public gui::AppWindow
     {
       private:
-        enum class EventAction
-        {
-            None,
-            Add,
-            Edit
-        };
         std::shared_ptr<EventsRecord> eventRecord            = nullptr;
         gui::ListView *list                                  = nullptr;
         std::shared_ptr<NewEditEventModel> newEditEventModel = nullptr;
-        EventAction eventAction                              = EventAction::None;
+        EventAction eventAction                              = EventAction::Add;
 
       public:
         NewEditEventWindow(app::Application *app, std::string name);

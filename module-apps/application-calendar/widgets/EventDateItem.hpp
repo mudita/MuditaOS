@@ -17,14 +17,18 @@ namespace gui
         gui::Label *dayLabel   = nullptr;
         gui::Label *monthLabel = nullptr;
         gui::Label *yearLabel  = nullptr;
-        gui::Text *dayInput    = nullptr;
-        gui::Text *monthInput  = nullptr;
-        gui::Text *yearInput   = nullptr;
+        gui::Label *dayInput   = nullptr;
+        gui::Label *monthInput = nullptr;
+        gui::Label *yearInput  = nullptr;
 
         void buildInterface();
-        void applyItemSpecificProperties(gui::Text *item);
+        void applyItemSpecificProperties(gui::Label *item);
+        void applyLabelSpecificProperties(gui::Label *label);
         void applyCallbacks();
         calendar::YearMonthDay validateDate();
+        void setDate(int keyValue, gui::Label &item);
+        void setOnInputCallback(gui::Label &dateInput);
+        void clearInput(gui::Label &dateInput);
 
       public:
         EventDateItem();

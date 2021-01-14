@@ -29,7 +29,9 @@ namespace gui
         AppWindow::buildInterface();
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
+        bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
 
         setTitle(utils::localize.get("app_calendar_custom_repeat_title"));
         list = new gui::ListView(this,
@@ -60,15 +62,11 @@ namespace gui
     bool CustomRepeatWindow::onInput(const InputEvent &inputEvent)
     {
         // check if any of the lower inheritance onInput methods catch the event
-        if (Window::onInput(inputEvent)) {
+        if (AppWindow::onInput(inputEvent)) {
             return true;
         }
         // process only if key is released
-        if (!inputEvent.isShortPress())
-            return false;
-
-        switch (inputEvent.keyCode) {
-        case KeyCode::KEY_RF: {
+        if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_ENTER)) {
             if (weekDaysOptData != nullptr) {
                 auto isCheckedData = customRepeatModel->getIsCheckedData();
                 uint32_t i         = 0;
@@ -83,11 +81,6 @@ namespace gui
                 return true;
             }
         }
-        default:
-            break;
-        }
-
         return false;
     }
-
 } /* namespace gui */

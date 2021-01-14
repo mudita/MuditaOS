@@ -44,6 +44,7 @@ namespace style
             inline constexpr auto month_year_height = 60;
             inline constexpr auto week_days_number  = 7;
             inline constexpr auto max_weeks_number  = 6;
+            inline constexpr auto leftMargin        = 10;
 
             inline constexpr auto cross_x    = 48;
             inline constexpr auto cross_y    = 55;
@@ -110,11 +111,12 @@ namespace style
 
                 namespace eventTime
                 {
-                    inline constexpr auto height           = 106;
-                    inline constexpr auto margin           = 21;
+                    inline constexpr auto height           = 107;
+                    inline constexpr auto margin           = 20;
                     inline constexpr auto separator        = 30;
                     inline constexpr auto time_input_12h_w = 120;
                     inline constexpr auto time_input_24h_w = 195;
+                    inline constexpr auto hBox_h           = height - 1.25 * margin;
                 } // namespace eventTime
 
                 namespace checkBox
@@ -128,15 +130,20 @@ namespace style
                 namespace severalOptions
                 {
                     inline constexpr auto height    = 63;
-                    inline constexpr auto label_h   = 30;
-                    inline constexpr auto arrow_w_h = 20;
+                    inline constexpr auto label_h   = 20;
+                    inline constexpr auto arrow_w_h = 12;
+                    inline constexpr auto margin    = 5;
+                    inline constexpr auto hBox_h    = height - label_h - margin;
+                    inline constexpr auto option_w =
+                        style::window::default_body_width - 2 * arrow_w_h - 2 * style::window::calendar::leftMargin;
                 } // namespace severalOptions
 
                 namespace textWithLabel
                 {
-                    inline constexpr auto height        = 80;
-                    inline constexpr auto description_h = 30;
-                    inline constexpr auto text_input_h  = 40;
+                    inline constexpr auto height        = 63;
+                    inline constexpr auto description_h = 20;
+                    inline constexpr auto text_input_h  = 37;
+                    inline constexpr auto margin        = 6;
                 } // namespace textWithLabel
             }     // namespace item
         };        // namespace calendar

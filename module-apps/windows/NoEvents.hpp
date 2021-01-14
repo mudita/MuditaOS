@@ -18,9 +18,13 @@ namespace gui
 {
     class NoEvents : public Dialog
     {
+        gui::Image *arrow = nullptr;
+        gui::Image *cross = nullptr;
+
       public:
         NoEvents(app::Application *app, const std::string &name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool onInput(const gui::InputEvent &inputEvent) override;
     };
 
 }; // namespace gui
