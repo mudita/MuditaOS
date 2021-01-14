@@ -6,10 +6,11 @@
 #include <ListView.hpp>
 #include <Style.hpp>
 #include <time/time_conversion.hpp>
-#include <module-utils/date/include/date/date.h>
+#include <time/time_date_validation.hpp>
 
 namespace gui
 {
+    namespace timeItem = style::window::calendar::item::eventTime;
 
     EventTimeItem::EventTimeItem(const std::string &description,
                                  bool mode24H,
@@ -18,57 +19,49 @@ namespace gui
         : mode24H{mode24H}, bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
           bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
-        setMinimumSize(style::window::default_body_width, style::window::calendar::item::eventTime::height);
+        setMinimumSize(style::window::default_body_width, timeItem::height);
 
         setEdges(RectangleEdge::None);
-        setMargins(gui::Margins(style::margins::small, style::window::calendar::item::eventTime::margin, 0, 0));
+        setMargins(gui::Margins(style::window::calendar::leftMargin, timeItem::margin, 0, 0));
 
         vBox = new gui::VBox(this, 0, 0, 0, 0);
         vBox->setEdges(gui::RectangleEdge::None);
         vBox->activeItem = false;
 
         descriptionLabel = new gui::Label(vBox, 0, 0, 0, 0);
-        descriptionLabel->setMinimumSize(style::window::default_body_width,
-                                         style::window::calendar::item::eventTime::separator);
+        descriptionLabel->setMinimumSize(style::window::default_body_width, timeItem::margin);
+        descriptionLabel->setMargins(gui::Margins(0, 0, 0, timeItem::margin / 4));
         descriptionLabel->setEdges(gui::RectangleEdge::None);
         descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         descriptionLabel->setFont(style::window::font::small);
         descriptionLabel->activeItem = false;
 
         hBox = new gui::HBox(vBox, 0, 0, 0, 0);
-        hBox->setMinimumSize(style::window::default_body_width,
-                             style::window::calendar::item::eventTime::height -
-                                 style::window::calendar::item::eventTime::separator);
+        hBox->setMinimumSize(style::window::default_body_width, timeItem::hBox_h);
         hBox->setEdges(gui::RectangleEdge::None);
         hBox->activeItem = false;
 
-        hourInput = new gui::Text(hBox, 0, 0, 0, 0);
+        hourInput = new gui::Label(hBox, 0, 0, 0, 0);
         hourInput->setEdges(gui::RectangleEdge::Bottom);
         hourInput->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         hourInput->setFont(style::window::font::largelight);
-        hourInput->setInputMode(new InputMode({InputMode::digit}));
         hourInput->setPenFocusWidth(style::window::default_border_focus_w);
         hourInput->setPenWidth(style::window::default_border_rect_no_focus);
-        hourInput->setEditMode(gui::EditMode::Edit);
 
         colonLabel = new gui::Label(hBox, 0, 0, 0, 0);
-        colonLabel->setMinimumSize(style::window::calendar::item::eventTime::separator,
-                                   style::window::calendar::item::eventTime::height -
-                                       style::window::calendar::item::eventTime::separator);
+        colonLabel->setMinimumSize(timeItem::separator, timeItem::hBox_h);
         colonLabel->setEdges(gui::RectangleEdge::None);
         colonLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         colonLabel->setFont(style::window::font::medium);
         colonLabel->setText(":");
         colonLabel->activeItem = false;
 
-        minuteInput = new gui::Text(hBox, 0, 0, 0, 0);
+        minuteInput = new gui::Label(hBox, 0, 0, 0, 0);
         minuteInput->setEdges(gui::RectangleEdge::Bottom);
         minuteInput->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         minuteInput->setFont(style::window::font::largelight);
-        minuteInput->setInputMode(new InputMode({InputMode::digit}));
         minuteInput->setPenFocusWidth(style::window::default_border_focus_w);
         minuteInput->setPenWidth(style::window::default_border_rect_no_focus);
-        minuteInput->setEditMode(gui::EditMode::Edit);
 
         descriptionLabel->setText(description);
 
@@ -97,8 +90,6 @@ namespace gui
 
             if (focusedItem->onInput(event)) {
                 uint32_t hours;
-                uint32_t minutes;
-                uint32_t autofill_hour;
 
                 try {
                     hours = std::stoi(hourInput->getText().c_str());
@@ -108,25 +99,7 @@ namespace gui
                     return true;
                 }
 
-                try {
-                    minutes = std::stoi(minuteInput->getText().c_str());
-                }
-                catch (std::exception &e) {
-                    LOG_ERROR("EventTimeItem::applyInputCallbacks minutes: %s", e.what());
-                    return true;
-                }
-
-                if (mode24H && hours > style::window::calendar::time::max_hour_24H_mode) {
-                    hourInput->setText("00");
-                }
-                else if (!mode24H && hours > style::window::calendar::time::max_hour_12H_mode) {
-                    hourInput->setText("12");
-                }
-                if (minutes > style::window::calendar::time::max_minutes) {
-                    minuteInput->setText("00");
-                }
-
-                autofill_hour = hours + 1;
+                auto autofill_hour = hours + 1;
                 if (this->descriptionLabel->getText() ==
                         utils::localize.get("app_calendar_new_edit_event_start").c_str() &&
                     !mode24H) {
@@ -188,29 +161,8 @@ namespace gui
             }
         };
 
-        hourInput->inputCallback = [&](Item &item, const InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-            if (hourInput->getText().length() > 1 && event.keyCode != gui::KeyCode::KEY_LEFT &&
-                event.keyCode != gui::KeyCode::KEY_RIGHT && event.keyCode != gui::KeyCode::KEY_PND &&
-                event.keyCode != gui::KeyCode::KEY_UP && event.keyCode != gui::KeyCode::KEY_DOWN) {
-                return true;
-            }
-            return false;
-        };
-
-        minuteInput->inputCallback = [&](Item &item, const InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-            if (minuteInput->getText().length() > 1 && event.keyCode != gui::KeyCode::KEY_LEFT &&
-                event.keyCode != gui::KeyCode::KEY_RIGHT && event.keyCode != gui::KeyCode::KEY_PND &&
-                event.keyCode != gui::KeyCode::KEY_UP && event.keyCode != gui::KeyCode::KEY_DOWN) {
-                return true;
-            }
-            return false;
-        };
+        onInputCallback(*hourInput);
+        onInputCallback(*minuteInput);
     }
 
     void EventTimeItem::prepareForTimeMode()
@@ -249,16 +201,10 @@ namespace gui
                 return true;
             };
 
-            mode12hInput->setMinimumSize(style::window::calendar::item::eventTime::time_input_12h_w,
-                                         style::window::calendar::item::eventTime::height -
-                                             style::window::calendar::item::eventTime::separator);
-            mode12hInput->setMargins(gui::Margins(style::window::calendar::item::eventTime::separator, 0, 0, 0));
-            hourInput->setMinimumSize(style::window::calendar::item::eventTime::time_input_12h_w,
-                                      style::window::calendar::item::eventTime::height -
-                                          style::window::calendar::item::eventTime::separator);
-            minuteInput->setMinimumSize(style::window::calendar::item::eventTime::time_input_12h_w,
-                                        style::window::calendar::item::eventTime::height -
-                                            style::window::calendar::item::eventTime::separator);
+            mode12hInput->setMinimumSize(timeItem::time_input_12h_w, timeItem::hBox_h);
+            mode12hInput->setMargins(gui::Margins(timeItem::separator, 0, 0, 0));
+            hourInput->setMinimumSize(timeItem::time_input_12h_w, timeItem::hBox_h);
+            minuteInput->setMinimumSize(timeItem::time_input_12h_w, timeItem::hBox_h);
 
             onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
                 if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_start")) {
@@ -289,22 +235,18 @@ namespace gui
             };
         }
         else {
-            hourInput->setMinimumSize(style::window::calendar::item::eventTime::time_input_24h_w,
-                                      style::window::calendar::item::eventTime::height -
-                                          style::window::calendar::item::eventTime::separator);
-            minuteInput->setMinimumSize(style::window::calendar::item::eventTime::time_input_24h_w,
-                                        style::window::calendar::item::eventTime::height -
-                                            style::window::calendar::item::eventTime::separator);
+            hourInput->setMinimumSize(timeItem::time_input_24h_w, timeItem::hBox_h);
+            minuteInput->setMinimumSize(timeItem::time_input_24h_w, timeItem::hBox_h);
 
             onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
                 if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_start")) {
                     auto start_time = TimePointToHourMinSec(event->date_from);
-                    hourInput->setText(std::to_string(date::make12(start_time.hours()).count()));
+                    hourInput->setText(std::to_string(start_time.hours().count()));
                     minuteInput->setText(std::to_string(start_time.minutes().count()));
                 }
                 else if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_end")) {
                     auto end_time = TimePointToHourMinSec(event->date_till);
-                    hourInput->setText(std::to_string(date::make12(end_time.hours()).count()));
+                    hourInput->setText(std::to_string(end_time.hours().count()));
                     minuteInput->setText(std::to_string(end_time.minutes().count()));
                 }
             };
@@ -411,7 +353,7 @@ namespace gui
                 mode12hInput->setText(secondItem->mode12hInput->getText());
                 minuteInput->setText(secondItem->minuteInput->getText());
             }
-            hourInput->setText(std::to_string(hour));
+            hourInput->setText(utils::to_string(hour));
         }
     }
 
@@ -438,6 +380,53 @@ namespace gui
                                                 std::chrono::minutes minutes)
     {
         return TimePointFromYearMonthDay(date) + hours + minutes;
+    }
+
+    void EventTimeItem::setTime(int keyValue, gui::Label &item)
+    {
+        auto itemValue = item.getText();
+        auto key       = std::to_string(keyValue);
+        if (itemValue == "0") {
+            itemValue = key;
+        }
+        else {
+            itemValue += key;
+        }
+        item.setText(itemValue);
+
+        if (!utils::time::validateTime(hourInput->getText(), minuteInput->getText(), !mode24H)) {
+            item.setText(key);
+        }
+    }
+
+    void EventTimeItem::onInputCallback(gui::Label &timeInput)
+    {
+        timeInput.inputCallback = [&](Item &item, const InputEvent &event) {
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (auto value = gui::toNumeric(event.keyCode); value >= 0) {
+                setTime(value, timeInput);
+                return true;
+            }
+            else if (event.is(gui::KeyCode::KEY_PND)) {
+                clearInput(timeInput);
+                return true;
+            }
+            return false;
+        };
+    }
+
+    void EventTimeItem::clearInput(gui::Label &timeInput)
+    {
+        if (auto length = timeInput.getText().length(); length > 0) {
+            auto value = timeInput.getText();
+            value.removeChar(length - 1);
+            if (value.length() == 0) {
+                value = "0";
+            }
+            timeInput.setText(value);
+        }
     }
 
 } /* namespace gui */

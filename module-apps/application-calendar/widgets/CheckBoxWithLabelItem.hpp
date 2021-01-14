@@ -18,7 +18,6 @@ namespace gui
         gui::HBox *hBox           = nullptr;
         app::Application *app     = nullptr;
         std::shared_ptr<WeekDaysRepeatData> checkBoxData = nullptr;
-        bool checkIsOnLeftBarSide = false;
 
         virtual void applyCallbacks();
         void setCheckBoxes();
@@ -26,8 +25,7 @@ namespace gui
       public:
         CheckBoxWithLabelItem(app::Application *application,
                               const std::string &description,
-                              std::shared_ptr<WeekDaysRepeatData> data = nullptr,
-                              bool checkIsOnLeftBarSide                = false);
+                              std::shared_ptr<WeekDaysRepeatData> data = nullptr);
         virtual ~CheckBoxWithLabelItem() override = default;
 
         gui::Label *descriptionLabel = nullptr;

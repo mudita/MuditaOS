@@ -21,7 +21,7 @@ namespace utils
             if (day < 1 || day > 31) {
                 return false;
             }
-            if ((day == 31) && (month = 2 || month == 4 || month == 6 || month == 9 || month == 11)) {
+            if ((day == 31) && (month == 2 || month == 4 || month == 6 || month == 9 || month == 11)) {
                 return false;
             }
             if (day == 30 && month == 2) {
