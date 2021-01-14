@@ -23,7 +23,7 @@ namespace app
                                                  sys::ServicePriority priority)
         : Application(name, parent, false, stackDepth, priority)
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
 
     sys::MessagePointer ApplicationAlarmClock::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

@@ -6,8 +6,8 @@
 #include "service-db/QueryMessage.hpp"
 
 #include <BaseInterface.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Message.hpp>
+#include <Service/Service.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -17,17 +17,13 @@ namespace db
 {
     class Query;
 } // namespace db
-namespace sys
-{
-    class Service;
-} // namespace sys
 
 std::pair<bool, std::uint64_t> DBServiceAPI::GetQuery(sys::Service *serv,
                                                       db::Interface::Name database,
                                                       std::unique_ptr<db::Query> query)
 {
     auto msg = std::make_shared<db::QueryMessage>(database, std::move(query));
-    const auto isSuccess = sys::Bus::SendUnicast(msg, service::name::db, serv);
+    const auto isSuccess = serv->bus.sendUnicast(msg, service::name::db);
     return std::make_pair(isSuccess, msg->uniID);
 }
 
@@ -37,5 +33,5 @@ sys::SendResult DBServiceAPI::GetQueryWithReply(sys::Service *serv,
                                                 std::uint32_t timeout)
 {
     auto msg = std::make_shared<db::QueryMessage>(database, std::move(query));
-    return sys::Bus::SendUnicast(msg, service::name::db, serv, timeout);
+    return serv->bus.sendUnicast(msg, service::name::db, timeout);
 }

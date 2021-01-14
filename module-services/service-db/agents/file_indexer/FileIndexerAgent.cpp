@@ -5,7 +5,6 @@
 #include "FileIndexer_queries.hpp"
 
 #include <log/log.hpp>
-#include <module-sys/Service/Bus.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <Application.hpp>
 #include <memory>
@@ -335,13 +334,13 @@ auto FileIndexerAgent::handleSetRecord(sys::Message *req) -> sys::MessagePointer
             auto updateMsg = std::make_shared<FileIndexer::Messages::RecordChangedMessage>(
                 std::move(recordPtr), std::make_unique<FileIndexer::FileRecord>(msg->dbRecord));
 
-            sys::Bus::SendUnicast(std::move(updateMsg), msg->sender, parentService);
+            parentService->bus.sendUnicast(std::move(updateMsg), msg->sender);
             dbSetRecord(std::make_unique<FileIndexer::FileRecord>(record));
 
             for (auto recipient : fileChangeRecipents[record.directory]) {
                 auto notifyMsg = std::make_shared<FileIndexer::Messages::DirectoryContentChangedMessage>(
                     std::make_unique<std::string>(record.directory));
-                sys::Bus::SendUnicast(std::move(notifyMsg), recipient, parentService);
+                parentService->bus.sendUnicast(std::move(notifyMsg), recipient);
             }
         }
     }
@@ -357,13 +356,13 @@ auto FileIndexerAgent::handleDeleteFile(sys::Message *req) -> sys::MessagePointe
 
         auto deleteMsg = std::make_shared<FileIndexer::Messages::FileDeletedMessage>(std::move(recordPtr));
 
-        sys::Bus::SendUnicast(std::move(deleteMsg), msg->sender, parentService);
+        parentService->bus.sendUnicast(std::move(deleteMsg), msg->sender);
         dbDeleteFile(std::make_unique<FileIndexer::FileRecord>(record));
 
         for (auto recipient : fileChangeRecipents[record.directory]) {
             auto notifyMsg = std::make_shared<FileIndexer::Messages::DirectoryContentChangedMessage>(
                 std::make_unique<std::string>(record.directory));
-            sys::Bus::SendUnicast(std::move(notifyMsg), recipient, parentService);
+            parentService->bus.sendUnicast(std::move(notifyMsg), recipient);
         }
     }
     return app::msgHandled();
@@ -379,13 +378,13 @@ auto FileIndexerAgent::handleDeleteAllFilesInDir(sys::Message *req) -> sys::Mess
         auto deleteMsg =
             std::make_shared<FileIndexer::Messages::AllFilesInDirDeletedDeletedMessage>(std::move(recordPtr));
 
-        sys::Bus::SendUnicast(std::move(deleteMsg), msg->sender, parentService);
+        parentService->bus.sendUnicast(std::move(deleteMsg), msg->sender);
         dbDeleteAllFilesInDir(std::make_unique<FileIndexer::FileRecord>(record));
 
         for (auto recipient : fileChangeRecipents[record.directory]) {
             auto notifyMsg = std::make_shared<FileIndexer::Messages::DirectoryContentChangedMessage>(
                 std::make_unique<std::string>(record.directory));
-            sys::Bus::SendUnicast(std::move(notifyMsg), recipient, parentService);
+            parentService->bus.sendUnicast(std::move(notifyMsg), recipient);
         }
     }
     return app::msgHandled();
@@ -547,7 +546,7 @@ auto FileIndexerAgent::handleSetProperty(sys::Message *req) -> sys::MessagePoint
         if (dbValue != value) {
             auto updateMsg = std::make_shared<FileIndexer::Messages::PropertyChangedMessage>(
                 std::move(metaDataPtr), std::make_unique<FileIndexer::FileMetadata>(msg->dbMetaData));
-            sys::Bus::SendUnicast(std::move(updateMsg), msg->sender, parentService);
+            parentService->bus.sendUnicast(std::move(updateMsg), msg->sender);
             dbSetProperty(std::make_unique<FileIndexer::FileMetadata>(metaData));
         }
     }
@@ -562,13 +561,13 @@ auto FileIndexerAgent::handleSetProperties(sys::Message *req) -> sys::MessagePoi
         msg->dbMetaData                    = dbGetAllProperties(std::make_unique<FileIndexer::FileMetadata>(metaData));
         auto updateMsg                     = std::make_shared<FileIndexer::Messages::PropertyChangedMessage>(
             std::move(metaDataPtr), std::make_unique<FileIndexer::FileMetadata>(msg->dbMetaData));
-        sys::Bus::SendUnicast(std::move(updateMsg), msg->sender, parentService);
+        parentService->bus.sendUnicast(std::move(updateMsg), msg->sender);
         dbSetProperties(std::make_unique<FileIndexer::FileMetadata>(metaData));
 
         for (auto recipient : fileChangeRecipents[metaData.directory]) {
             auto notifyMsg = std::make_shared<FileIndexer::Messages::DirectoryContentChangedMessage>(
                 std::make_unique<std::string>(metaData.directory));
-            sys::Bus::SendUnicast(std::move(notifyMsg), recipient, parentService);
+            parentService->bus.sendUnicast(std::move(notifyMsg), recipient);
         }
     }
     return app::msgHandled();

@@ -7,7 +7,6 @@
 
 #include <service-desktop/parser/MessageHandler.hpp>
 #include <service-evtmgr/Constants.hpp>
-#include <Service/Bus.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 
@@ -35,17 +34,17 @@ auto DeveloperModeHelper::processPutRequest(Context &context) -> sys::ReturnCode
         auto msg     = std::make_shared<cellular::RawCommand>();
         msg->command = body[json::developerMode::AT].string_value();
         msg->timeout = 3000;
-        sys::Bus::SendUnicast(std::move(msg), ServiceCellular::serviceName, ownerServicePtr);
+        ownerServicePtr->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
     }
     else if (body[json::developerMode::focus].bool_value()) {
         auto event = std::make_unique<sdesktop::developerMode::AppFocusChangeEvent>();
         auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, ownerServicePtr);
+        ownerServicePtr->bus.sendUnicast(std::move(msg), service::name::evt_manager);
     }
     else if (body[json::developerMode::isLocked].bool_value()) {
         auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>();
         auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        sys::Bus::SendUnicast(std::move(msg), "ApplicationDesktop", ownerServicePtr);
+        ownerServicePtr->bus.sendUnicast(std::move(msg), "ApplicationDesktop");
     }
     else {
         context.setResponseStatus(http::Code::BadRequest);
@@ -120,5 +119,5 @@ void DeveloperModeHelper::sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::S
     LOG_INFO("Sending %s", event.str().c_str());
     auto message = std::make_shared<app::AppInputEventMessage>(std::move(event));
 
-    sys::Bus::SendUnicast(std::move(message), service::name::evt_manager, ownerServicePtr);
+    ownerServicePtr->bus.sendUnicast(std::move(message), service::name::evt_manager);
 }

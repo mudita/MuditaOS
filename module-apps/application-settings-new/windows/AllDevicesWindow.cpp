@@ -27,9 +27,8 @@ namespace gui
 
         if (inputEvent.state == InputEvent::State::keyReleasedShort) {
             if (inputEvent.keyCode == KeyCode::KEY_LEFT) {
-                sys::Bus::SendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Scan),
-                                      "ServiceBluetooth",
-                                      application);
+                application->bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Scan),
+                                             "ServiceBluetooth");
                 gui::DialogMetadata meta;
                 meta.icon                        = "search_big";
                 meta.text                        = utils::localize.get("app_settings_bluetooth_searching_devices");

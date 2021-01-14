@@ -45,7 +45,7 @@ namespace gui
     sys::ReturnCodes message_bt(app::Application *app, BluetoothMessage::Request req)
     {
         std::shared_ptr<BluetoothMessage> msg = std::make_shared<BluetoothMessage>(req);
-        auto ret                              = sys::Bus::SendUnicast(msg, "ServiceBluetooth", app);
+        auto ret                              = app->bus.sendUnicast(msg, "ServiceBluetooth");
         if (!ret) {
             LOG_ERROR("err: %d", static_cast<int>(ret));
         }

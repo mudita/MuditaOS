@@ -6,7 +6,6 @@
 
 #include <AlarmsRecord.hpp>
 #include <MessageType.hpp>
-#include <Service/Bus.hpp>
 #include <SwitchData.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-db/DBServiceAPI.hpp>     // for DBServiceAPI
@@ -30,7 +29,7 @@ void EventManager::HandleAlarmTrigger(sys::DataMessage *msgl)
     message->timestamp = msg->timestamp;
 
     if (targetApplication.empty() == false) {
-        sys::Bus::SendUnicast(message, targetApplication, this);
+        bus.sendUnicast(message, targetApplication);
     }
 
     time_t currentTime = message->timestamp;

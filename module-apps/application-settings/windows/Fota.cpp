@@ -19,17 +19,11 @@ Fota::Fota(gui::FotaWindow *parent) : currentState(State::Disconnected), parent(
 {
     app = std::shared_ptr<app::Application>(parent->getApplication(),
                                             [](app::Application *) {}); /// with deleter that doesn't delete.
-    app->busChannels.push_back(sys::BusChannels::ServiceFotaNotifications);
+    app->bus.channels.push_back(sys::BusChannel::ServiceFotaNotifications);
     registerHandlers();
-    sys::Bus::Add(std::static_pointer_cast<sys::Service>(app));
 
     getCurrentVersion();
     parent->statusLabel->setText(getStateString());
-}
-
-Fota::~Fota()
-{
-    sys::Bus::Remove(std::static_pointer_cast<sys::Service>(app));
 }
 
 void Fota::next()
@@ -200,7 +194,7 @@ void Fota::reboot()
     currentState = State::Reboot;
     parent->statusLabel->setText(getStateString());
     auto msg = std::make_shared<sys::SystemManagerCmd>(sys::Code::Reboot);
-    sys::Bus::SendUnicast(std::move(msg), service::name::system_manager, app.get());
+    app->bus.sendUnicast(std::move(msg), service::name::system_manager);
 }
 
 void Fota::registerHandlers()

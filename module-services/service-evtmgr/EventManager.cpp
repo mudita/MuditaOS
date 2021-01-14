@@ -12,7 +12,6 @@
 
 #include <BaseInterface.hpp>
 #include <MessageType.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Worker.hpp>
 #include <SystemManager/Constants.hpp>
 #include <SystemManager/SystemManager.hpp>
@@ -44,7 +43,7 @@ EventManager::EventManager(const std::string &name) : sys::Service(name)
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
     alarmID        = 0;
-    busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+    bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 }
 
 EventManager::~EventManager()
@@ -74,7 +73,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
 
         auto event   = std::make_unique<sdesktop::developerMode::ATResponseEvent>(msg->response);
         auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        sys::Bus::SendUnicast(message, service::name::service_desktop, this);
+        bus.sendUnicast(message, service::name::service_desktop);
 
         handled = true;
     }
@@ -101,12 +100,12 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
 
         if (message->key.state == RawKey::State::Pressed && message->key.key_code == bsp::KeyCodes::FnRight) {
             // and state == ShutDown
-            sys::Bus::SendUnicast(message, service::name::system_manager, this);
+            bus.sendUnicast(message, service::name::system_manager);
         }
 
         // send key to focused application
         if (!targetApplication.empty()) {
-            sys::Bus::SendUnicast(message, targetApplication, this);
+            bus.sendUnicast(message, targetApplication);
         }
         // notify application manager to prevent screen locking
         app::manager::Controller::preventBlockingDevice(this);
@@ -126,7 +125,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         auto message = std::make_shared<sevm::BatteryLevelMessage>(msg->levelPercents, msg->fullyCharged);
 
         if (!targetApplication.empty()) {
-            sys::Bus::SendUnicast(message, targetApplication, this);
+            bus.sendUnicast(message, targetApplication);
         }
 
         handled = true;
@@ -138,11 +137,11 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         message->plugged = msg->plugged;
 
         if (!message->plugged) {
-            sys::Bus::SendUnicast(message, service::name::system_manager, this);
+            bus.sendUnicast(message, service::name::system_manager);
         }
 
         if (!targetApplication.empty()) {
-            sys::Bus::SendUnicast(message, targetApplication, this);
+            bus.sendUnicast(message, targetApplication);
         }
         handled = true;
     }
@@ -157,7 +156,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         handled = true;
     }
     else if (!targetApplication.empty() && dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
-        sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication, this);
+        bus.sendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication);
     }
     else if (msgl->messageType == MessageType::EVMGetBoard) {
         using namespace bsp;
@@ -174,7 +173,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         if (msg != nullptr) {
             auto message   = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMModemStatus);
             message->state = msg->state;
-            sys::Bus::SendUnicast(message, "ServiceCellular", this);
+            bus.sendUnicast(message, "ServiceCellular");
         }
         handled = true;
     }
@@ -210,12 +209,12 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
                 utils::time::Time::setTimeZoneOffset(msg->getTimeZoneOffset().value());
             }
             auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
-            sys::Bus::SendMulticast(notification, sys::BusChannels::ServiceEvtmgrNotifications, this);
+            bus.sendMulticast(notification, sys::BusChannel::ServiceEvtmgrNotifications);
         }
     }
     else if (msgl->messageType == MessageType::EVMRingIndicator) {
         auto msg = std::make_shared<sys::CpuFrequencyMessage>(sys::CpuFrequencyMessage::Action::Increase);
-        sys::Bus::SendUnicast(msg, service::name::system_manager, this);
+        bus.sendUnicast(msg, service::name::system_manager);
     }
 
     if (handled) {
@@ -236,7 +235,7 @@ sys::ReturnCodes EventManager::InitHandler()
         if (typeid(*req->event.get()) == typeid(AppFocusChangeEvent)) {
             auto event   = std::make_unique<AppFocusChangeEvent>(targetApplication);
             auto message = std::make_shared<DeveloperModeRequest>(std::move(event));
-            sys::Bus::SendUnicast(message, service::name::service_desktop, this);
+            bus.sendUnicast(message, service::name::service_desktop);
         }
 
         return std::make_shared<sys::ResponseMessage>();
@@ -248,7 +247,7 @@ sys::ReturnCodes EventManager::InitHandler()
 
         auto message = std::make_shared<app::AppInputEventMessage>(msg->getEvent());
         if (!targetApplication.empty()) {
-            sys::Bus::SendUnicast(std::move(message), targetApplication, this);
+            bus.sendUnicast(std::move(message), targetApplication);
         }
 
         return std::make_shared<sys::ResponseMessage>();
@@ -341,7 +340,7 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
 {
 
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
-    return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
+    return sender->bus.sendUnicast(msg, service::name::evt_manager);
 }
 
 bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action act)

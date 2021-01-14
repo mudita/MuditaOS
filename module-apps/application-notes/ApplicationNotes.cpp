@@ -30,7 +30,7 @@ namespace app
     ApplicationNotes::ApplicationNotes(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground, NotesStackSize)
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
 
     // Invoked upon receiving data message

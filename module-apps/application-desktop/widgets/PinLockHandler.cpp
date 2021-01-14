@@ -173,8 +173,7 @@ namespace gui
     {
         if (type == PinLock::LockType::SimPin) {
             setSimLockHandled();
-            sys::Bus::SendUnicast(
-                std::make_shared<CellularSimPinDataMessage>(simLock.sim, passcode), serviceCellular, app);
+            app->bus.sendUnicast(std::make_shared<CellularSimPinDataMessage>(simLock.sim, passcode), serviceCellular);
         }
         else if (type == PinLock::LockType::SimPuk) {
             handlePasscodeChange(passcode);
@@ -213,12 +212,12 @@ namespace gui
     {
         setSimLockHandled();
         if (type == PinLock::LockType::SimPin) {
-            sys::Bus::SendUnicast(
-                std::make_shared<CellularSimNewPinDataMessage>(simLock.sim, passcode, pin), serviceCellular, app);
+            app->bus.sendUnicast(std::make_shared<CellularSimNewPinDataMessage>(simLock.sim, passcode, pin),
+                                 serviceCellular);
         }
         else if (type == PinLock::LockType::SimPuk) {
-            sys::Bus::SendUnicast(
-                std::make_shared<CellularSimPukDataMessage>(simLock.sim, passcode, pin), serviceCellular, app);
+            app->bus.sendUnicast(std::make_shared<CellularSimPukDataMessage>(simLock.sim, passcode, pin),
+                                 serviceCellular);
         }
     }
 

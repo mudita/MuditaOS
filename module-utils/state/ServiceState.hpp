@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <Service/Bus.hpp>
 #include <algorithm>
 #include <cassert>
 
@@ -32,7 +31,7 @@ namespace utils
             {
                 auto msg = std::make_shared<sys::DataMessage>(MessageType::StateChange);
                 if (owner != nullptr) {
-                    sys::Bus::SendUnicast(msg, owner->GetName(), owner);
+                    owner->bus.sendUnicast(msg, owner->GetName());
                     return true;
                 }
                 return false;

@@ -17,8 +17,7 @@ namespace gui
     {
         topBar->setActive(TopBar::Elements::BATTERY, false);
         topBar->setActive(TopBar::Elements::SIM, false);
-        sys::Bus::SendUnicast(
-            std::make_shared<::message::bluetooth::RequestStatus>(), service::name::bluetooth, application);
+        application->bus.sendUnicast(std::make_shared<::message::bluetooth::RequestStatus>(), service::name::bluetooth);
     }
 
     void BluetoothWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -118,8 +117,8 @@ namespace gui
         btStatus.visibility = isPhoneVisibilitySwitchOn;
         ::message::bluetooth::SetStatus setStatus(btStatus);
 
-        sys::Bus::SendUnicast(
-            std::make_shared<::message::bluetooth::SetStatus>(setStatus), service::name::bluetooth, application);
+        application->bus.sendUnicast(std::make_shared<::message::bluetooth::SetStatus>(setStatus),
+                                     service::name::bluetooth);
     }
 
     void BluetoothWindow::rebuildOptionList()

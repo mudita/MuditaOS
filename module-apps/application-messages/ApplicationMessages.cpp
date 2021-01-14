@@ -40,7 +40,7 @@ namespace app
     ApplicationMessages::ApplicationMessages(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground, 4096 * 2), AsyncCallbackReceiver{this}
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {
             switchWindow(gui::name::window::new_sms, std::move(data));
             return msgHandled();

@@ -40,7 +40,6 @@ class Fota
     };
     using VersionMap = std::unordered_map<std::string, VersionInfo>;
     Fota(gui::FotaWindow *parent);
-    virtual ~Fota();
     void next();
     std::string getCurrentFirmwareVersion()
     {

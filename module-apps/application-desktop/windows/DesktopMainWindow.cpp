@@ -100,8 +100,7 @@ namespace gui
             setFocusItem(nullptr);
             buildNotifications(app);
 
-            sys::Bus::SendUnicast(
-                std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
+            application->bus.sendUnicast(std::make_shared<TimersProcessingStopMessage>(), service::name::service_time);
         }
         else {
             topBar->setActive(TopBar::Elements::LOCK, false);
@@ -115,8 +114,7 @@ namespace gui
                 app::manager::Controller::sendAction(application, app::manager::actions::SelectSimCard);
             }
 
-            sys::Bus::SendUnicast(
-                std::make_shared<TimersProcessingStartMessage>(), service::name::service_time, application);
+            application->bus.sendUnicast(std::make_shared<TimersProcessingStartMessage>(), service::name::service_time);
         }
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }

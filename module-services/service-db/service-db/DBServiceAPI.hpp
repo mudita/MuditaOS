@@ -12,7 +12,6 @@
 #include <Interface/SMSTemplateRecord.hpp>
 #include <Interface/ThreadRecord.hpp>
 #include <PhoneNumber.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Message.hpp>
 #include <utf8/UTF8.hpp>
 

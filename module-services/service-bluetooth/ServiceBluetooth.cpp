@@ -5,7 +5,6 @@
 #include "service-bluetooth/ServiceBluetooth.hpp"
 #include "service-bluetooth/BluetoothMessage.hpp"
 
-#include <module-sys/Service/Bus.hpp>
 
 #include <Bluetooth/BluetoothWorker.hpp>
 #include <interface/profiles/Profile.hpp>
@@ -54,13 +53,13 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
 {
     // mock response on message::bluetooth::RequestStatus
     if (auto requestStatusMsg = dynamic_cast<message::bluetooth::RequestStatus *>(msg); nullptr != requestStatusMsg) {
-        sys::Bus::SendUnicast(std::make_shared<message::bluetooth::ResponseStatus>(btStatus), msg->sender, this);
+        bus.sendUnicast(std::make_shared<message::bluetooth::ResponseStatus>(btStatus), msg->sender);
     }
 
     // temporary solution for handling message::bluetooth::SetStatus
     if (auto setStatusMsg = dynamic_cast<message::bluetooth::SetStatus *>(msg); nullptr != setStatusMsg) {
         btStatus = setStatusMsg->getStatus();
-        sys::Bus::SendBroadcast(std::make_shared<message::bluetooth::ResponseStatus>(btStatus), this);
+        bus.sendBroadcast(std::make_shared<message::bluetooth::ResponseStatus>(btStatus));
     }
 
     try {
@@ -120,7 +119,7 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
         case MessageType::BluetoothRequestStream: {
             auto result =
                 std::make_shared<BluetoothRequestStreamResultMessage>(worker->currentProfile->getStreamData());
-            sys::Bus::SendUnicast(std::move(result), "ServiceAudio", this);
+            bus.sendUnicast(std::move(result), "ServiceAudio");
             LOG_INFO("Queues sent after a request!");
         } break;
         default:

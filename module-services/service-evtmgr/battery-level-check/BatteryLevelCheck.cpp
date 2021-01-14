@@ -5,7 +5,6 @@
 #include "service-evtmgr/BatteryMessages.hpp"
 #include "SystemManager/Constants.hpp"
 
-#include <Service/Bus.hpp>
 #include <common_data/EventStore.hpp>
 
 namespace battery_level_check
@@ -36,7 +35,7 @@ namespace battery_level_check
         if (Store::Battery::get().state == Store::Battery::State::Discharging) {
             if (isBatteryLevelCritical(Store::Battery::get().level)) {
                 auto levelCriticalMessage = std::make_shared<sevm::BatteryLevelCriticalMessage>();
-                sys::Bus::SendUnicast(levelCriticalMessage, service::name::system_manager, parentService);
+                parentService->bus.sendUnicast(levelCriticalMessage, service::name::system_manager);
             }
         }
     }

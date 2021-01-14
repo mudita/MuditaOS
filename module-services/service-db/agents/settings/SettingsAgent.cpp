@@ -8,7 +8,6 @@
 
 #include <Database/Database.hpp>
 #include <Service/Service.hpp>
-#include <module-sys/Service/Bus.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 namespace settings::DbPaths
@@ -228,7 +227,7 @@ auto SettingsAgent::handleSetVariable(sys::Message *req) -> sys::MessagePointer
                 if (service != path.service) {
                     auto updateMsg =
                         std::make_shared<settings::Messages::VariableChanged>(path, value, oldValue.value_or(""));
-                    sys::Bus::SendUnicast(std::move(updateMsg), service, parentService);
+                    parentService->bus.sendUnicast(std::move(updateMsg), service);
                 }
             }
         }
@@ -246,7 +245,7 @@ auto SettingsAgent::handleRegisterOnVariableChange(sys::Message *req) -> sys::Me
                 variableChangeRecipents[path.to_string()] = {path.service};
                 auto currentValue                         = dbGetValue(path).value_or("");
                 auto msgValue = std::make_shared<::settings::Messages::VariableChanged>(path, currentValue, "");
-                sys::Bus::SendUnicast(std::move(msgValue), msg->sender, parentService);
+                parentService->bus.sendUnicast(std::move(msgValue), msg->sender);
             }
             else {
                 it->second.insert(path.service);
@@ -277,7 +276,7 @@ auto SettingsAgent::handleRegisterProfileChange(sys::Message *req) -> sys::Messa
         if (dbRegisterOnProfileChange(msg->sender)) {
             profileChangedRecipents.insert(msg->sender);
             auto msgCurrentProfile = std::make_shared<settings::Messages::CurrentProfileChanged>(dbGetCurrentProfile());
-            sys::Bus::SendUnicast(std::move(msgCurrentProfile), msg->sender, parentService);
+            parentService->bus.sendUnicast(std::move(msgCurrentProfile), msg->sender);
         }
     }
     return std::make_shared<sys::ResponseMessage>();
@@ -299,7 +298,7 @@ auto SettingsAgent::handleSetCurrentProfile(sys::Message *req) -> sys::MessagePo
             for (auto service : profileChangedRecipents) {
                 if (service != msg->sender) {
                     auto msgProfileChanged = std::make_shared<settings::Messages::CurrentProfileChanged>(profile);
-                    sys::Bus::SendUnicast(std::move(msgProfileChanged), service, parentService);
+                    parentService->bus.sendUnicast(std::move(msgProfileChanged), service);
                 }
             }
         }
@@ -312,7 +311,7 @@ auto SettingsAgent::handleGetCurrentProfile(sys::Message *req) -> sys::MessagePo
         auto service = profileChangedRecipents.find(req->sender);
         if (profileChangedRecipents.end() != service) {
             auto msgCurrentProfile = std::make_shared<settings::Messages::CurrentProfileChanged>(dbGetCurrentProfile());
-            sys::Bus::SendUnicast(std::move(msgCurrentProfile), *service, parentService);
+            parentService->bus.sendUnicast(std::move(msgCurrentProfile), *service);
         }
     }
     return std::make_shared<sys::ResponseMessage>();
@@ -325,7 +324,7 @@ auto SettingsAgent::handleAddProfile(sys::Message *req) -> sys::MessagePointer
             for (auto service : profileChangedRecipents) {
                 if (service != req->sender) {
                     auto msgAllProfiles = std::make_shared<settings::Messages::ProfileListResponse>(allProfiles);
-                    sys::Bus::SendUnicast(std::move(msgAllProfiles), service, parentService);
+                    parentService->bus.sendUnicast(std::move(msgAllProfiles), service);
                 }
             }
         }
@@ -337,7 +336,7 @@ auto SettingsAgent::handleListProfiles(sys::Message *req) -> sys::MessagePointer
     if (nullptr != dynamic_cast<settings::Messages::ListProfiles *>(req)) {
         profileChangedRecipents.insert(req->sender);
         auto msgAllProfiles = std::make_shared<settings::Messages::ProfileListResponse>(dbGetAllProfiles());
-        sys::Bus::SendUnicast(std::move(msgAllProfiles), req->sender, parentService);
+        parentService->bus.sendUnicast(std::move(msgAllProfiles), req->sender);
     }
     return std::make_shared<sys::ResponseMessage>();
 }
@@ -349,7 +348,7 @@ auto SettingsAgent::handleRegisterOnModeChange(sys::Message *req) -> sys::Messag
         if (dbRegisterOnModeChange(msg->sender)) {
             modeChangeRecipents.insert(msg->sender);
             auto msgMode = std::make_shared<settings::Messages::CurrentModeChanged>(dbGetCurrentMode());
-            sys::Bus::SendUnicast(std::move(msgMode), msg->sender, parentService);
+            parentService->bus.sendUnicast(std::move(msgMode), msg->sender);
         }
     }
     return std::make_shared<sys::ResponseMessage>();
@@ -371,7 +370,7 @@ auto SettingsAgent::handleSetCurrentMode(sys::Message *req) -> sys::MessagePoint
                 for (auto service : modeChangeRecipents) {
                     if (service != msg->sender) {
                         auto msgModeChanged = std::make_shared<settings::Messages::CurrentModeChanged>(newMode);
-                        sys::Bus::SendUnicast(std::move(msgModeChanged), service, parentService);
+                        parentService->bus.sendUnicast(std::move(msgModeChanged), service);
                     }
                 }
             }
@@ -384,7 +383,7 @@ auto SettingsAgent::handleGetCurrentMode(sys::Message *req) -> sys::MessagePoint
     if (nullptr != dynamic_cast<settings::Messages::GetCurrentMode *>(req)) {
         if (modeChangeRecipents.end() != modeChangeRecipents.find(req->sender)) {
             auto msgMode = std::make_shared<settings::Messages::CurrentModeChanged>(dbGetCurrentMode());
-            sys::Bus::SendUnicast(std::move(msgMode), req->sender, parentService);
+            parentService->bus.sendUnicast(std::move(msgMode), req->sender);
         }
     }
     return std::make_shared<sys::ResponseMessage>();
@@ -397,7 +396,7 @@ auto SettingsAgent::handleAddMode(sys::Message *req) -> sys::MessagePointer
             for (auto service : modeChangeRecipents) {
                 if (service != msg->sender) {
                     auto msgAllModes = std::make_shared<settings::Messages::ModeListResponse>(allModes);
-                    sys::Bus::SendUnicast(std::move(msgAllModes), service, parentService);
+                    parentService->bus.sendUnicast(std::move(msgAllModes), service);
                 }
             }
         }
@@ -409,7 +408,7 @@ auto SettingsAgent::handleListModes(sys::Message *req) -> sys::MessagePointer
     if (nullptr != dynamic_cast<settings::Messages::ListModes *>(req)) {
         modeChangeRecipents.insert(req->sender);
         auto msgAllModes = std::make_shared<settings::Messages::ModeListResponse>(dbGetAllModes());
-        sys::Bus::SendUnicast(std::move(msgAllModes), req->sender, parentService);
+        parentService->bus.sendUnicast(std::move(msgAllModes), req->sender);
     }
     return std::make_shared<sys::ResponseMessage>();
 }

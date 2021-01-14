@@ -5,7 +5,6 @@
 #include "service-cellular/RequestFactory.hpp"
 #include "service-cellular/ServiceCellular.hpp"
 
-#include "Service/Bus.hpp"
 #include "Service/Message.hpp"
 #include "Service/Timer.hpp"
 
@@ -31,7 +30,7 @@ void CellularRequestHandler::handle(ImeiRequest &request, at::Result &result)
     }
     request.setHandled(true);
     auto msg = std::make_shared<CellularMMIPushMessage>(result.response[0]);
-    sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
+    cellular.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
 }
 
 void CellularRequestHandler::handle(UssdRequest &request, at::Result &result)
@@ -57,10 +56,9 @@ void CellularRequestHandler::handle(CallRequest &request, at::Result &result)
     // activate call state timer
     cellular.callStateTimer->reload();
     // Propagate "Ringing" notification into system
-    sys::Bus::SendMulticast(
+    cellular.bus.sendMulticast(
         std::make_shared<CellularCallMessage>(CellularCallMessage::Type::Ringing, request.getNumber()),
-        sys::BusChannels::ServiceCellularNotifications,
-        &cellular);
+        sys::BusChannel::ServiceCellularNotifications);
     request.setHandled(true);
 }
 
@@ -113,7 +111,7 @@ void CellularRequestHandler::handle(ClirRequest &request, at::Result &result)
         }
     }
     auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
-    sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
+    cellular.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
     request.setHandled(requestHandled);
 }
 void CellularRequestHandler::sendMmiResult(bool result)
@@ -122,5 +120,5 @@ void CellularRequestHandler::sendMmiResult(bool result)
 
     auto msg = std::make_shared<CellularMMIResultMessage>(result ? MMIResultParams::MMIResult::Success
                                                                  : MMIResultParams::MMIResult::Failed);
-    sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
+    cellular.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
 }

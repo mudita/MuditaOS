@@ -37,7 +37,6 @@
 #include <purefs/filesystem_paths.hpp>
 #include <SMSRecord.hpp>
 #include <SMSTemplateRecord.hpp>
-#include <Service/Bus.hpp>
 #include <Tables/Record.hpp>
 #include <ThreadRecord.hpp>
 #include <log/log.hpp>
@@ -574,7 +573,7 @@ sys::ReturnCodes ServiceDB::SwitchPowerModeHandler(const sys::ServicePowerMode m
 void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Query::Type type)
 {
     auto notificationMessage = std::make_shared<db::NotificationMessage>(interface, type);
-    sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
+    bus.sendMulticast(notificationMessage, sys::BusChannel::ServiceDBNotifications);
 }
 
 bool ServiceDB::StoreIntoBackup(const std::string &backupPath)

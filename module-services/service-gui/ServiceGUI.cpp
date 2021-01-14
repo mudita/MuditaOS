@@ -128,7 +128,7 @@ namespace service::gui
     void ServiceGUI::prepareDisplay(::gui::RefreshModes refreshMode)
     {
         auto msg = std::make_shared<service::eink::PrepareDisplayRequest>(refreshMode);
-        sys::Bus::SendUnicast(msg, service::name::eink, this);
+        bus.sendUnicast(msg, service::name::eink);
     }
 
     void ServiceGUI::notifyRenderer(std::list<std::unique_ptr<::gui::DrawCommand>> &&commands,
@@ -173,7 +173,7 @@ namespace service::gui
     {
         setState(State::Busy);
         auto imageMsg = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
-        sys::Bus::SendUnicast(imageMsg, service::name::eink, this);
+        bus.sendUnicast(imageMsg, service::name::eink);
         scheduleContextRelease(contextId);
     }
 

@@ -5,7 +5,6 @@
 
 #include "Profile.hpp"
 #include <memory>
-#include <module-sys/Service/Bus.hpp>
 
 extern "C"
 {

@@ -37,8 +37,7 @@ namespace app
     ApplicationAntenna::ApplicationAntenna(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground, 4096 * 2)
     {
-        busChannels.push_back(sys::BusChannels::AntennaNotifications);
-        busChannels.push_back(sys::BusChannels::AntennaNotifications);
+        bus.channels.push_back(sys::BusChannel::AntennaNotifications);
         appTimer = std::make_unique<sys::Timer>("Antena", this, 2000);
         appTimer->connect([=](sys::Timer &) { timerHandler(); });
         appTimer->start();

@@ -89,7 +89,7 @@ namespace settings
                 else {
                     state    = State::Start;
                     auto msg = std::make_shared<settings::UTMsg::ReqRegValChg>("brightness", "none");
-                    sys::Bus::SendUnicast(std::move(msg), getter->GetName(), this);
+                    bus.sendUnicast(std::move(msg), getter->GetName());
                 }
             }
             else if (nullptr != dynamic_cast<settings::UTMsg::CnfRegValChg *>(msg)) {
@@ -102,13 +102,13 @@ namespace settings
                     state = State::RegisterStartVal;
                     v.push_back(m->value);
                     auto msg = std::make_shared<settings::UTMsg::ReqSetVal>("brightness", v[0] + "1");
-                    sys::Bus::SendUnicast(std::move(msg), setter->GetName(), this);
+                    bus.sendUnicast(std::move(msg), setter->GetName());
                 }
                 else if (state == State::RegisterSetVal) {
                     if (m->value == v[0] + "1") {
                         v.push_back(m->value);
                         auto msg = std::make_shared<settings::UTMsg::ReqUnRegValChg>("brightness", "empty");
-                        sys::Bus::SendUnicast(std::move(msg), getter->GetName(), this);
+                        bus.sendUnicast(std::move(msg), getter->GetName());
                         state = State::UnregisterWait;
                     }
                 }
@@ -117,7 +117,7 @@ namespace settings
                 if (state == State::UnregisterWait) {
                     state    = State::Unregister;
                     auto msg = std::make_shared<settings::UTMsg::ReqSetVal>("brightness", v.back() + "2");
-                    sys::Bus::SendUnicast(std::move(msg), setter->GetName(), this);
+                    bus.sendUnicast(std::move(msg), setter->GetName());
                 }
             }
             else if (auto m = dynamic_cast<settings::UTMsg::CnfReqSetVal *>(msg)) {
@@ -128,7 +128,7 @@ namespace settings
                     std::this_thread::sleep_for(std::chrono::milliseconds(200));
                     v.push_back(m->value);
                     auto msg = std::make_shared<settings::UTMsg::UTMsgStop>();
-                    sys::Bus::SendUnicast(std::move(msg), GetName(), this);
+                    bus.sendUnicast(std::move(msg), GetName());
                 }
             }
             else if (nullptr != dynamic_cast<settings::UTMsg::UTMsgStop *>(msg)) {
@@ -162,7 +162,7 @@ namespace settings
                 else {
                     state    = State::Start;
                     auto msg = std::make_shared<settings::UTMsg::ReqRegProfileChg>();
-                    sys::Bus::SendUnicast(std::move(msg), getter->GetName(), this);
+                    bus.sendUnicast(std::move(msg), getter->GetName());
                 }
             }
             else if (nullptr != dynamic_cast<settings::UTMsg::CnfRegProfileChg *>(msg)) {
@@ -175,13 +175,13 @@ namespace settings
                     state = State::RegisterStartVal;
                     v.push_back(m->name);
                     auto msg = std::make_shared<settings::UTMsg::ReqSetCurrentProfile>(m->name + "1");
-                    sys::Bus::SendUnicast(std::move(msg), setter->GetName(), this);
+                    bus.sendUnicast(std::move(msg), setter->GetName());
                 }
                 else if (state == State::RegisterSetVal) {
                     if (m->name == v[0] + "1") {
                         v.push_back(m->name);
                         auto msg = std::make_shared<settings::UTMsg::ReqUnRegProfileChg>();
-                        sys::Bus::SendUnicast(std::move(msg), getter->GetName(), this);
+                        bus.sendUnicast(std::move(msg), getter->GetName());
                         state = State::UnregisterWait;
                     }
                 }
@@ -190,7 +190,7 @@ namespace settings
                 if (state == State::UnregisterWait) {
                     state    = State::Unregister;
                     auto msg = std::make_shared<settings::UTMsg::ReqSetCurrentProfile>(v.back() + "2");
-                    sys::Bus::SendUnicast(std::move(msg), setter->GetName(), this);
+                    bus.sendUnicast(std::move(msg), setter->GetName());
                 }
             }
             else if (auto m = dynamic_cast<settings::UTMsg::CnfSetCurrentProfile *>(msg)) {
@@ -200,7 +200,7 @@ namespace settings
                 else if (state == State::Unregister) {
                     v.push_back(m->name);
                     auto msg = std::make_shared<settings::UTMsg::ReqGetAllProfiles>();
-                    sys::Bus::SendUnicast(std::move(msg), getter->GetName(), this);
+                    bus.sendUnicast(std::move(msg), getter->GetName());
                 }
             }
             else if (nullptr != dynamic_cast<settings::UTMsg::CnfGetAllProfiles *>(msg)) {
@@ -215,7 +215,7 @@ namespace settings
                         v.push_back(prof);
                     }
                     auto msg = std::make_shared<settings::UTMsg::ReqAddProfile>("other");
-                    sys::Bus::SendUnicast(std::move(msg), setter->GetName(), this);
+                    bus.sendUnicast(std::move(msg), setter->GetName());
                 }
                 else if (state == State::RegisterAllAddWait) {
                     state = State::RegisterAllAdd;
@@ -224,7 +224,7 @@ namespace settings
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(200));
                     auto msg = std::make_shared<settings::UTMsg::UTMsgStop>();
-                    sys::Bus::SendUnicast(std::move(msg), GetName(), this);
+                    bus.sendUnicast(std::move(msg), GetName());
                 }
             }
             else if (nullptr != dynamic_cast<settings::UTMsg::CnfAddProfile *>(msg)) {
