@@ -5,6 +5,7 @@
 
 #include "windows/AddDeviceWindow.hpp"
 #include "windows/AllDevicesWindow.hpp"
+#include "windows/APNSettingsWindow.hpp"
 #include "windows/BluetoothWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/DisplayAndKeypadWindow.hpp"
@@ -169,6 +170,9 @@ namespace app
         windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NetworkWindow>(
                 app, static_cast<ApplicationSettingsNew *>(app), static_cast<ApplicationSettingsNew *>(app));
+        });
+        windowsFactory.attach(gui::window::name::apn_settings, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::APNSettingsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MessagesWindow>(app);
