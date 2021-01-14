@@ -101,10 +101,6 @@ namespace app::alarmClock
 
     auto AlarmReminderWindow::handleSwitchData(gui::SwitchData *data) -> bool
     {
-        if (data == nullptr) {
-            return false;
-        }
-
         auto item = dynamic_cast<AlarmRecordsData *>(data);
         if (item == nullptr) {
             return false;

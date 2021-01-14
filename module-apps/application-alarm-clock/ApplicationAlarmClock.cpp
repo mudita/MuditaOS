@@ -131,7 +131,7 @@ namespace app
     void ApplicationAlarmClock::destroyUserInterface()
     {}
 
-    audio::Token ApplicationAlarmClock::getAudioToken()
+    audio::Token ApplicationAlarmClock::getAudioToken() const
     {
         return audioToken;
     }

@@ -246,13 +246,13 @@ namespace app
         auto records = msg->getResult();
 
         bool rebuildMainWindow = false;
-        uint32_t counter       = std::count_if(
+        const uint32_t counter = std::count_if(
             records.begin(), records.end(), [](const AlarmsRecord &rec) { return rec.status > AlarmStatus::On; });
         rebuildMainWindow |= counter != notifications.notSeen.Alarms;
         notifications.notSeen.Alarms = counter;
 
-        uint32_t counterForToday     = countAlarmsForToday(records);
-        bool rebuildDesktopMenu      = counterForToday != notifications.notRead.Alarms;
+        const uint32_t counterForToday = countAlarmsForToday(records);
+        const bool rebuildDesktopMenu  = counterForToday != notifications.notRead.Alarms;
         notifications.notRead.Alarms = counterForToday;
 
         if (rebuildDesktopMenu) {

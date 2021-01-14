@@ -103,7 +103,7 @@ namespace app::alarmClock
         return alarmRecords.front();
     }
 
-    std::vector<AlarmsRecord> AlarmsReminderModel::getAllAlarmRecords()
+    std::vector<AlarmsRecord> AlarmsReminderModel::getAllAlarmRecords() const
     {
         return alarmRecords;
     }

@@ -24,7 +24,7 @@ namespace app::alarmClock
         virtual uint32_t getPreviousElapsedMinutes()              = 0;
         virtual void resetPreviousElapsedSeconds()                = 0;
         virtual AlarmsRecord &getAlarmRecord()                                                                = 0;
-        virtual std::vector<AlarmsRecord> getAllAlarmRecords()                                                = 0;
+        virtual std::vector<AlarmsRecord> getAllAlarmRecords() const                                          = 0;
         virtual void eraseFrontAlarmRecord()                                                                  = 0;
         virtual void clearAlarmRecords()                                                                      = 0;
         virtual std::pair<bool, std::vector<AlarmsRecord>> setAlarmRecords(std::vector<AlarmsRecord> records) = 0;
@@ -43,7 +43,7 @@ namespace app::alarmClock
         uint32_t getPreviousElapsedMinutes() override;
         void resetPreviousElapsedSeconds() override;
         AlarmsRecord &getAlarmRecord() override;
-        std::vector<AlarmsRecord> getAllAlarmRecords() override;
+        std::vector<AlarmsRecord> getAllAlarmRecords() const override;
         void eraseFrontAlarmRecord() override;
         void clearAlarmRecords() override;
         std::pair<bool, std::vector<AlarmsRecord>> setAlarmRecords(std::vector<AlarmsRecord> records) override;

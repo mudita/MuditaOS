@@ -32,7 +32,7 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
-        audio::Token getAudioToken();
+        audio::Token getAudioToken() const;
     };
 
     template <> struct ManifestTraits<ApplicationAlarmClock>
