@@ -50,6 +50,8 @@ namespace
         __REAL_DECL(__xstat64);
         __REAL_DECL(__lxstat64);
         __REAL_DECL(__fxstat64);
+
+        __REAL_DECL(read);
     } // namespace real
 
     void __attribute__((constructor)) _lib_posix_initialize()
@@ -82,13 +84,15 @@ namespace
         __REAL_DLSYM(__lxstat64);
         __REAL_DLSYM(__fxstat64);
 
+        __REAL_DLSYM(read);
 
         if (!(real::link && real::unlink && real::symlink && real::fcntl && real::fcntl64
             && real::chdir && real::fchdir && real::getcwd && real::getwd
             && real::get_current_dir_name && real::mkdir && real::chmod && real::fchmod
             && real::fsync && real::fdatasync
             && real::__xstat && real::__lxstat && real::__fxstat
-            && real::__xstat64 && real::__lxstat64 && real::__fxstat64))
+            && real::__xstat64 && real::__lxstat64 && real::__fxstat64
+            && real::read))
         {
             abort();
         }
@@ -98,6 +102,19 @@ namespace
 extern "C" {
     namespace vfs = vfsn::linux::internal;
     using fs = purefs::fs::filesystem;
+
+    int _iosys_read(int __fd, void *__buf, size_t __nbyte)
+    {
+        if (vfs::is_image_fd(__fd))
+        {
+            TRACE_SYSCALLN("(%d) -> VFS", __fd);
+            return vfs::invoke_fs(&fs::read,vfs::to_image_fd(__fd),(char*)__buf,__nbyte);
+        } else {
+            TRACE_SYSCALLN("(%d) -> linux fs", __fd);
+            return real::read(__fd, __buf, __nbyte);
+        }
+    }
+    __asm__(".symver _iosys_read,read@GLIBC_2.2.5");
 
     int _iosys_link(const char *oldpath, const char *newpath)
     {
@@ -175,7 +192,7 @@ extern "C" {
         if(vfs::is_image_fd(fd))
         {
             TRACE_SYSCALLN("(%d) -> VFS", fd);
-            return vfs::invoke_fs(&fs::fstat,fd,*pstat);
+            return vfs::invoke_fs(&fs::fstat,vfs::to_image_fd(fd),*pstat);
         }
         else
         {
@@ -371,7 +388,7 @@ extern "C" {
         if(vfs::is_image_fd(fd))
         {
             TRACE_SYSCALLN("(%d) -> VFS", fd);
-            return vfs::invoke_fs(&fs::fchmod,fd,mode);
+            return vfs::invoke_fs(&fs::fchmod,vfs::to_image_fd(fd),mode);
         }
         else
         {
@@ -386,7 +403,7 @@ extern "C" {
         if(vfs::is_image_fd(fd))
         {
             TRACE_SYSCALLN("(%d) -> VFS", fd);
-            return vfs::invoke_fs(&fs::fsync, fd);
+            return vfs::invoke_fs(&fs::fsync, vfs::to_image_fd(fd));
         }
         else
         {
@@ -401,7 +418,7 @@ extern "C" {
         if(vfs::is_image_fd(fd))
         {
             TRACE_SYSCALLN("(%d) -> VFS", fd);
-            return vfs::invoke_fs(&fs::fsync, fd);
+            return vfs::invoke_fs(&fs::fsync, vfs::to_image_fd(fd));
         }
         else
         {
@@ -468,7 +485,7 @@ extern "C" {
         if(vfs::is_image_fd(fildes))
         {
             TRACE_SYSCALLN("(%d) -> VFS", fildes);
-            return vfs::invoke_fs(&fs::fstat, fildes, *stat_buf);
+            return vfs::invoke_fs(&fs::fstat, vfs::to_image_fd(fildes), *stat_buf);
         }
         else
         {
@@ -525,7 +542,7 @@ extern "C" {
         if(vfs::is_image_fd(fildes))
         {
             TRACE_SYSCALLN("(%d) -> VFS", fildes);
-            return vfs::invoke_fs(&fs::fstat, fildes, *(struct stat*)stat_buf);
+            return vfs::invoke_fs(&fs::fstat, vfs::to_image_fd(fildes), *(struct stat*)stat_buf);
         }
         else
         {
