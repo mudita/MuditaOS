@@ -83,6 +83,8 @@ namespace gui
 
     DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_main_window)
     {
+        auto application = getAppDesktop();
+        application->requestNotSeenNotifications();
         buildInterface();
 
         preBuildDrawListHook = [this](std::list<Command> &cmd) {
@@ -298,6 +300,15 @@ namespace gui
                         std::make_unique<app::ApplicationLaunchData>(app::name_messages));
                 },
                 [app, this]() -> bool { return app->clearMessagesNotification(); },
+                onNotificationFocus);
+        }
+        if (app->notifications.notSeen.CalendarEvents > 0) {
+            notifications->addNotification(
+                "menu_calendar_W_G",
+                utils::localize.get("app_calendar_events"),
+                std::to_string(app->notifications.notSeen.CalendarEvents),
+                [app]() -> bool { return app->showCalendarEvents(); },
+                [app]() -> bool { return app->clearCalendarEventsNotification(); },
                 onNotificationFocus);
         }
 

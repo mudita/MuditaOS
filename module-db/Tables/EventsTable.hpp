@@ -82,6 +82,7 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
                                    "date_till DATETIME,"
                                    "reminder INTEGER,"
                                    "repeat INTEGER,"
+                                   "reminder_dt INTEGER,"
                                    "reminder_fired DATETIME,"
                                    "provider_type TEXT,"
                                    "provider_id TEXT,"

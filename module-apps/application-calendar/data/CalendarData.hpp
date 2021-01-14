@@ -19,7 +19,7 @@ class EventRecordData : public gui::SwitchData
 
   public:
     EventRecordData() = default;
-    EventRecordData(std::shared_ptr<EventsRecord> record) : record{std::move(record)} {};
+    explicit EventRecordData(std::shared_ptr<EventsRecord> record) : record{std::move(record)} {};
     virtual ~EventRecordData() = default;
     std::shared_ptr<EventsRecord> getData()
     {
@@ -28,6 +28,27 @@ class EventRecordData : public gui::SwitchData
     virtual void setData(std::shared_ptr<EventsRecord> rec)
     {
         record = std::move(rec);
+    };
+};
+
+class EventRecordsData : public gui::SwitchData
+{
+  protected:
+    std::shared_ptr<std::vector<EventsRecord>> records;
+
+  public:
+    EventRecordsData() = default;
+    explicit EventRecordsData(std::shared_ptr<std::vector<EventsRecord>> records) : records{std::move(records)} {};
+    virtual ~EventRecordsData() = default;
+
+    std::shared_ptr<std::vector<EventsRecord>> getData()
+    {
+        return records;
+    };
+
+    virtual void setData(std::shared_ptr<std::vector<EventsRecord>> rec)
+    {
+        records = std::move(rec);
     };
 };
 

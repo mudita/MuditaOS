@@ -4,8 +4,8 @@ import pytest
 from harness.interface.defs import status
 import copy
 
-@pytest.mark.skip("not working on CI")
 @pytest.mark.service_desktop_test
+@pytest.mark.skip(reason="Calendar DB needs to be empty on testing device. Not working on CI environment")
 def test_calendar(harness):
     # add events
     add_body = {

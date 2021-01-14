@@ -4,4 +4,9 @@
 #include "NotificationsDB.hpp"
 
 NotificationsDB::NotificationsDB(const char *name) : Database(name), notifications(this)
-{}
+{
+    if (notifications.create() == false) {
+        return;
+    }
+    isInitialized_ = true;
+}

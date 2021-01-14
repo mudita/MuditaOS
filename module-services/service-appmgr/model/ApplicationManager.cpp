@@ -459,6 +459,9 @@ namespace app::manager
         }
         case actions::CloseSystem:
             return handleCloseSystem();
+        case actions::ClosePopup: {
+            return handleClosePopupAction();
+        }
         default: {
             auto &actionParams = actionMsg->getData();
             return handleCustomAction(action, std::move(actionParams));
@@ -470,6 +473,12 @@ namespace app::manager
     {
         SwitchRequest switchRequest(ServiceName, rootApplicationName, gui::name::window::main_window, nullptr);
         return handleSwitchApplication(&switchRequest);
+    }
+
+    auto ApplicationManager::handleClosePopupAction() -> bool
+    {
+        SwitchBackRequest switchBackRequest(ServiceName);
+        return handleSwitchBack(&switchBackRequest);
     }
 
     auto ApplicationManager::handleLaunchAction(ApplicationLaunchData *launchParams) -> bool

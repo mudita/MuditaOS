@@ -7,6 +7,7 @@
 #include "Item.hpp"
 #include "Navigation.hpp"
 #include "service-appmgr/Controller.hpp"
+#include <module-db/queries/calendar/QueryEventsGetFilteredByDay.hpp>
 
 #include <tools/Common.hpp>
 #include <Style.hpp>
@@ -76,6 +77,7 @@ namespace gui
                 else if (!hasNotifications() && notificationThumbnail != nullptr) {
                     it->erase(notificationThumbnail);
                     notificationThumbnail = nullptr;
+                    return true;
                 }
                 return false;
             };
@@ -129,8 +131,15 @@ namespace gui
         return visibleStateChanged;
     }
 
+    void MenuWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        auto app = dynamic_cast<app::ApplicationDesktop *>(application);
+        app->requestNotReadNotifications();
+    }
+
     MenuWindow::MenuWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_menu)
     {
+
         buildInterface();
     }
 
@@ -176,15 +185,16 @@ namespace gui
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationAlarmClock"));
                               }),
 
-                new gui::Tile("menu_calendar_W_G",
-                              "app_desktop_menu_calendar",
-                              [=](gui::Item &item) {
-                                  return app::manager::Controller::sendAction(
-                                      application,
-                                      app::manager::actions::Launch,
-                                      std::make_unique<app::ApplicationLaunchData>("ApplicationCalendar"));
-                              }),
-
+                new gui::Tile(
+                    "menu_calendar_W_G",
+                    "app_desktop_menu_calendar",
+                    [=](gui::Item &item) {
+                        return app::manager::Controller::sendAction(
+                            application,
+                            app::manager::actions::Launch,
+                            std::make_unique<app::ApplicationLaunchData>("ApplicationCalendar"));
+                    },
+                    [=]() { return app->notifications.notRead.CalendarEvents > 0; }),
                 new gui::Tile{"menu_phone_W_G",
                               "app_desktop_menu_phone",
                               [=](gui::Item &item) {

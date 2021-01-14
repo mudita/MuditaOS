@@ -61,6 +61,7 @@ set(APPLICATIONS
     meditation
     calculator
     alarm-clock
+    popup
 )
 
 list(SORT APPLICATIONS)

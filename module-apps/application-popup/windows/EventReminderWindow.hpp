@@ -18,8 +18,10 @@ namespace gui
       private:
         std::unique_ptr<sys::Timer> reminderTimer;
 
+        void provideEventData();
+
       protected:
-        std::shared_ptr<EventsRecord> eventRecord;
+        std::shared_ptr<std::vector<EventsRecord>> eventRecords;
 
         gui::VBox *body         = nullptr;
         Label *dateLabel        = nullptr;

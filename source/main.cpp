@@ -19,6 +19,7 @@
 #include <application-meditation/ApplicationMeditation.hpp>
 #include <application-calculator/ApplicationCalculator.hpp>
 #include <application-alarm-clock/ApplicationAlarmClock.hpp>
+#include <module-apps/application-popup/ApplicationPopup.hpp>
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 
 // services
@@ -154,6 +155,9 @@ int main()
 #endif
 #ifdef ENABLE_APP_ALARM_CLOCK
             applications.push_back(app::CreateLauncher<app::ApplicationAlarmClock>(app::name_alarm_clock));
+#endif
+#ifdef ENABLE_APP_POPUP
+            applications.push_back(app::CreateLauncher<app::ApplicationPopup>(app::name_popup));
 #endif
 #ifdef ENABLE_APP_ONBOARDING
             applications.push_back(app::CreateLauncher<app::ApplicationOnBoarding>(app::name_onboarding));

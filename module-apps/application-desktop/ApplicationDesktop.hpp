@@ -11,9 +11,11 @@
 #include <service-cellular/CellularMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <module-db/queries/notifications/QueryNotificationsGetAll.hpp>
+#include <module-db/queries/notifications/QueryNotificationsIncrement.hpp>
 #include <endpoints/update/UpdateMuditaOS.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <module-db/queries/calendar/QueryEventsGetAll.hpp>
 
 namespace cellular
 {
@@ -32,19 +34,21 @@ namespace app
         {
             struct Counters
             {
-                unsigned int SMS   = 0;
-                unsigned int Calls = 0;
+                unsigned int SMS            = 0;
+                unsigned int Calls          = 0;
+                unsigned int CalendarEvents = 0;
 
                 auto areEmpty()
                 {
-                    return Calls == 0 && SMS == 0;
+                    return Calls == 0 && SMS == 0 && CalendarEvents == 0;
                 }
             };
 
             Counters notSeen;
             Counters notRead;
 
-            bool batteryLowLevel = false;
+            bool thisDayCalendarEvents = false;
+            bool batteryLowLevel       = false;
 
         } notifications;
 
@@ -69,6 +73,7 @@ namespace app
         bool handle(db::NotificationMessage *msg);
         bool handle(cellular::StateChange *msg);
         auto handle(db::query::notifications::GetAllResult *msg) -> bool;
+        auto handle(db::query::events::GetFilteredByDayResult *msg) -> bool;
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
         auto handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool;
         /**
@@ -79,6 +84,8 @@ namespace app
         bool showCalls();
         bool clearCallsNotification();
         bool clearMessagesNotification();
+        bool showCalendarEvents();
+        bool clearCalendarEventsNotification();
         bool requestNotSeenNotifications();
         bool requestNotReadNotifications();
         unsigned int getLockPassHash() const noexcept

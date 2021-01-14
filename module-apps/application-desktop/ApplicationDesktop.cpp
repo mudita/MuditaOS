@@ -31,6 +31,7 @@
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-utils/magic_enum/include/magic_enum.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
+#include <module-db/queries/calendar/QueryEventsGetFilteredByDay.hpp>
 
 #include <cassert>
 namespace app
@@ -141,6 +142,9 @@ namespace app
                 if (auto response = dynamic_cast<db::query::notifications::GetAllResult *>(result.get())) {
                     handled = handle(response);
                 }
+                if (auto response = dynamic_cast<db::query::events::GetFilteredByDayResult *>(result.get())) {
+                    handled = handle(response);
+                }
             }
         }
 
@@ -194,6 +198,11 @@ namespace app
                 notifications.notSeen.SMS = record.value;
                 break;
 
+            case NotificationsRecord::Key::CalendarEvents:
+                rebuildMainWindow |= record.value != notifications.notSeen.CalendarEvents;
+                notifications.notSeen.CalendarEvents = record.value;
+                break;
+
             case NotificationsRecord::Key::NotValidKey:
             case NotificationsRecord::Key::NumberOfKeys:
                 LOG_ERROR("Not a valid key");
@@ -207,6 +216,19 @@ namespace app
         }
 
         return true;
+    }
+
+    auto ApplicationDesktop::handle(db::query::events::GetFilteredByDayResult *msg) -> bool
+    {
+        auto recordsCount                    = msg->getCountResult();
+        notifications.notRead.CalendarEvents = recordsCount;
+
+        if (auto menuWindow = dynamic_cast<gui::MenuWindow *>(getWindow(app::window::name::desktop_menu));
+            menuWindow != nullptr) {
+            menuWindow->refresh();
+            return true;
+        }
+        return false;
     }
 
     auto ApplicationDesktop::handle(db::NotificationMessage *msg) -> bool
@@ -276,6 +298,23 @@ namespace app
         return true;
     }
 
+    bool ApplicationDesktop::showCalendarEvents()
+    {
+        LOG_DEBUG("show events!");
+        return manager::Controller::sendAction(this, manager::actions::ShowCalendarEvents);
+    }
+
+    bool ApplicationDesktop::clearCalendarEventsNotification()
+    {
+        LOG_DEBUG("Clear calendar events notifications");
+        DBServiceAPI::GetQuery(
+            this,
+            db::Interface::Name::Notifications,
+            std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::CalendarEvents));
+        notifications.notSeen.CalendarEvents = 0;
+        return true;
+    }
+
     bool ApplicationDesktop::requestNotSeenNotifications()
     {
         const auto [succeed, _] = DBServiceAPI::GetQuery(
@@ -287,6 +326,11 @@ namespace app
     {
         notifications.notRead.Calls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
         notifications.notRead.SMS   = DBServiceAPI::ThreadGetCount(this, EntryState::UNREAD);
+
+        /// request calendar events
+        auto actualDate = TimePointNow();
+        DBServiceAPI::GetQuery(
+            this, db::Interface::Name::Events, std::make_unique<db::query::events::GetFilteredByDay>(actualDate));
         return true;
     }
 
@@ -297,9 +341,6 @@ namespace app
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
-
-        requestNotReadNotifications();
-        requestNotSeenNotifications();
 
         createUserInterface();
         setActiveWindow(gui::name::window::main_window);

@@ -24,6 +24,7 @@ namespace utils
         inline constexpr auto secondsInHour          = minutesInHour * secondsInMinute;
         inline constexpr auto secondsInDay           = hoursInday * secondsInHour;
         inline constexpr auto milisecondsInSecond    = 1000;
+        inline constexpr auto never_happens_value    = 0xFFFF;
 
         enum class GetParameters
         {

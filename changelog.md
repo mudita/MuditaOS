@@ -19,6 +19,7 @@
 
 ### Fixed
 
+* Fix calendar notifications
 * Fix lock screen not showing after reset.
 * Fix lack of system clock refreshing.
 * Fix lack of audio during voice calls.

@@ -279,10 +279,8 @@ inline std::string createUID()
     utils::time::Timestamp timestamp;
     std::string UID{timestamp.str("%Y%m%dT%H%M%S")};
     UID += '-';
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(1, 100);
-    sprintf(Buffer, "%d", distrib(gen));
+    int random = std::rand();
+    sprintf(Buffer, "%d", random);
     UID += Buffer;
 
     return UID;

@@ -116,6 +116,7 @@ namespace app::manager
         void registerMessageHandlers();
         auto handleAction(ActionRequest *actionMsg) -> bool;
         auto handleHomeAction() -> bool;
+        auto handleClosePopupAction() -> bool;
         auto handleLaunchAction(ApplicationLaunchData *launchParams) -> bool;
         auto handleCloseSystem() -> bool;
         auto handleCustomAction(actions::ActionId action, actions::ActionParamsPtr &&actionParams) -> bool;

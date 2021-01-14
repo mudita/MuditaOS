@@ -26,7 +26,7 @@ namespace stm
     class CalendarTimeEvents : public TimeEvents
     {
       private:
-        EventsRecord eventRecord;
+        std::vector<EventsRecord> eventRecords;
         TimePoint startTP = TIME_POINT_INVALID;
 
       protected:

@@ -14,7 +14,6 @@
 		"${CMAKE_CURRENT_LIST_DIR}/models/AllEventsModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/EventDetailModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EventDetailWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/EventReminderWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/CustomRepeatModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/NewEditEventModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsModel.cpp"
