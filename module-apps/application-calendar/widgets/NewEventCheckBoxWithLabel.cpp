@@ -9,15 +9,16 @@ namespace gui
 
     NewEventCheckBoxWithLabel::NewEventCheckBoxWithLabel(app::Application *application,
                                                          const std::string &description,
-                                                         bool checkIsOnLeftBarSide,
                                                          NewEditEventModel *model)
-        : CheckBoxWithLabelItem(application, description, nullptr, checkIsOnLeftBarSide), model(model)
+        : CheckBoxWithLabelItem(application, description, nullptr), model(model)
     {
         app = application;
         assert(app != nullptr);
 
-        setMargins(gui::Margins(
-            style::margins::small, style::window::calendar::item::checkBox::margin_top, 0, style::margins::small));
+        setMargins(gui::Margins(style::margins::small,
+                                style::window::calendar::item::checkBox::margin_top,
+                                0,
+                                style::window::calendar::leftMargin));
         applyCallbacks();
     }
 
@@ -66,14 +67,17 @@ namespace gui
         };
         onSaveCallback = [&](std::shared_ptr<EventsRecord> event) {
             if (checkBox->isChecked()) {
-                auto event_start = TimePointToHourMinSec(event->date_from);
-                event->date_from =
-                    event->date_from - event_start.hours() - event_start.minutes() - event_start.seconds();
+                event->date_from = TimePointFromYearMonthDay(dateItem->getChosenDate());
                 event->date_till = event->date_from +
                                    std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
                                    std::chrono::minutes(style::window::calendar::time::max_minutes);
             }
         };
+    }
+
+    void NewEventCheckBoxWithLabel::setConnectionToDateItem(gui::EventDateItem *item)
+    {
+        dateItem = item;
     }
 
 } /* namespace gui */
