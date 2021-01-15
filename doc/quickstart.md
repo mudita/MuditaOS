@@ -148,14 +148,14 @@ To fix the style for Pull Request CI:
 
 ### Commit message template
 
-To add commit message template use this command:
+To add a commit message template use this command:
 
 ```bash
 git config commit.template .gitmessage
 ```
 
-This way each time you add new commit you will see template that will help
-you with proper message format. More about that in (Development Workflow)[./doc/development_workflow.md#commit-changes]
+This way each time you add a new commit you will see the template that will help
+you with the proper message format. More about that in (Development Workflow)[./doc/development_workflow.md#commit-changes]
 
 ### Commit message hook
 This hooks automatically converts your branch name to commit title

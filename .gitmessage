@@ -1,7 +1,5 @@
-# Commit subject: [JIRA-TICKET] <Add/Change/Fix> changes summary, don't end with a period
+# Commit subject: [JIRA-TICKET] Changes summary, don't end with a period
 # No more than 72 chars. ########################### 72 chars is here: #
-<Title>
-# Remember blank line between title and commit message.
 
 # Commit message: Explain *what* and *why* (not *how*).
 # Wrap at 72 chars. ################################### which is here: #
