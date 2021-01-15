@@ -70,6 +70,8 @@ GLIBC_2.2.5 {
                 poll;
                 mount;
                 umount;
+                statvfs;
+
 # posix - dirent
                 opendir;
                 closedir;
@@ -78,6 +80,7 @@ GLIBC_2.2.5 {
                 rewinddir;
                 seekdir;
                 telldir;
+
         local:
                 *;
 };
