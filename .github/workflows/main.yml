@@ -108,3 +108,24 @@ jobs:
       - name: print emulator logs
         run: cat emulator.log
         if: always()
+  emulator_on_off_test:
+    name: emulator on-off test
+    if: github.event.pull_request.draft == false
+    runs-on: self-hosted
+    steps:
+      - name: start emulator
+        run:
+          pushd tests
+          ./bootSimulator.sh
+          popd
+      - name: run test
+        run: python3 ./hardware_off -rP --port=simulator --timeout=20 -m 'not rt1051'
+        working-directory: test
+      - name: kill emulator
+        run: |
+          kill $(cat emulator.pid)
+          rm emulator.pid
+        if: always()
+      - name: print emulator logs
+        run: cat emulator.log
+        if: always()

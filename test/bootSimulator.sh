@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
-# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-find ~ -wholename '*linux/PurePhone.elf' -executable -execdir '{}' \; 2> $1
+declare JOB
+
+## run command in the background
+background() {
+  eval $1 & JOB=$!
+}
+
+## returns jobs status if job failed
+reap() {
+  local status=0
+    wait ${JOB} ; status=$?
+    if [[ $status -ne 0 ]]; then
+      echo -e "[${JOB}] Exited with status: ${status}"
+    fi
+  return ${status}
+}
+
+cd ..
+background './run_emulator_on_filesystem_image.sh 2>&1 > emulator.log'
+echo $! > emulator.pid
+
+reap || echo "Ooops! Some jobs failed"

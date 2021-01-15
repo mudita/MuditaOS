@@ -90,8 +90,8 @@ class Harness:
     def turn_phone_off(self):
         appDesktop = "ApplicationDesktop"
         while not self.get_window_name() == appDesktop:
-            self.connection.send_key(key_codes["fnRight"], Keytype.long_press)
+            self.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
 
-        self.connection.send_key(key_codes["fnRight"], Keytype.long_press)
-        self.connection.send_key(key_codes["right"], Keytype.short_press)
-        self.connection.send_key(key_codes["enter"], Keytype.short_press)
+        self.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
+        self.connection.send_key_code(key_codes["right"])
+        self.connection.send_key_code(key_codes["enter"])

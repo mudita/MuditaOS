@@ -1,33 +1,11 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-import subprocess
-import os
 import sys
-import time
 
 from harness import log
 from harness.harness import Harness
 from harness.interface.error import TestError, Error
-
-def boot_phone(err_file):
-    return subprocess.Popen(['gnome-terminal', '--', 'sh', './bootSimulator.sh', err_file])
-
-def check_for_errors(err_file):
-    search_words = ['ABORTING', 'terminate']
-
-    with open(err_file) as f:
-        if any(word in  f.read() for word in search_words):
-            return True
-    return False
-
-def run_test(port_name):
-    harness = Harness(port_name)
-    harness.unlock_phone()
-    harness.turn_phone_off()
-
-
-
 
 def main():
     if len(sys.argv) == 1 or "/dev" not in sys.argv[1]:
@@ -46,18 +24,9 @@ def main():
     else:
         port_name = sys.argv[1]
 
-    err_file='logs.txt'
-
-    boot_phone(err_file)
-    time.sleep(3)
-    run_test(port_name)
-    time.sleep(10)
-    result = check_for_errors(err_file)
-
-    os.remove(err_file)
-    if result:
-        raise TestError(Error.TEST_FAILED)
-
+    harness = Harness(port_name)
+    harness.unlock_phone()
+    harness.turn_phone_off()
 
 if __name__ == "__main__":
     try:
