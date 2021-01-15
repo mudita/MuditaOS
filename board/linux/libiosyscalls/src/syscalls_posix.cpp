@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
+#include <sys/ioctl.h>
+#include <poll.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <stdarg.h>     // for va_*
@@ -52,6 +54,15 @@ namespace
         __REAL_DECL(__fxstat64);
 
         __REAL_DECL(read);
+        __REAL_DECL(write);
+        __REAL_DECL(lseek);
+        __REAL_DECL(lseek64);
+
+        __REAL_DECL(mount);
+        __REAL_DECL(umount);
+
+        __REAL_DECL(ioctl);
+        __REAL_DECL(poll);
     } // namespace real
 
     void __attribute__((constructor)) _lib_posix_initialize()
@@ -85,6 +96,15 @@ namespace
         __REAL_DLSYM(__fxstat64);
 
         __REAL_DLSYM(read);
+        __REAL_DLSYM(write);
+        __REAL_DLSYM(lseek);
+        __REAL_DLSYM(lseek64);
+
+        __REAL_DLSYM(mount);
+        __REAL_DLSYM(umount);
+
+        __REAL_DLSYM(ioctl);
+        __REAL_DLSYM(poll);
 
         if (!(real::link && real::unlink && real::symlink && real::fcntl && real::fcntl64
             && real::chdir && real::fchdir && real::getcwd && real::getwd
@@ -92,7 +112,8 @@ namespace
             && real::fsync && real::fdatasync
             && real::__xstat && real::__lxstat && real::__fxstat
             && real::__xstat64 && real::__lxstat64 && real::__fxstat64
-            && real::read))
+            && real::read && real::write && real::lseek && real::lseek64
+            && real::mount && real::umount && real::ioctl && real::poll))
         {
             abort();
         }
@@ -105,16 +126,101 @@ extern "C" {
 
     int _iosys_read(int __fd, void *__buf, size_t __nbyte)
     {
+        int ret;
         if (vfs::is_image_fd(__fd))
         {
-            TRACE_SYSCALLN("(%d) -> VFS", __fd);
-            return vfs::invoke_fs(&fs::read,vfs::to_image_fd(__fd),(char*)__buf,__nbyte);
+            TRACE_SYSCALLN("(%d, %p, %u) -> VFS", __fd, __buf, __nbyte);
+            ret = vfs::invoke_fs(&fs::read,vfs::to_image_fd(__fd),(char*)__buf,__nbyte);
         } else {
-            TRACE_SYSCALLN("(%d) -> linux fs", __fd);
+            TRACE_SYSCALLN("(%d, %p, %u) -> linux fs", __fd, __buf, __nbyte);
+            // returning result via a variable causes strange
+            // sanitizer errors on debug build
             return real::read(__fd, __buf, __nbyte);
         }
+        TRACE_SYSCALLN("(%d, %p, %u) = %d", __fd, __buf, __nbyte, ret);
+        return ret;
     }
     __asm__(".symver _iosys_read,read@GLIBC_2.2.5");
+
+    int _iosys_write(int __fd, const void *__buf, size_t __nbyte)
+    {
+        int ret;
+        if (vfs::is_image_fd(__fd))
+        {
+            TRACE_SYSCALLN("(%d, %p, %u) -> VFS", __fd, __buf, __nbyte);
+            ret = vfs::invoke_fs(&fs::write,vfs::to_image_fd(__fd),(const char*)__buf,__nbyte);
+        } else {
+            TRACE_SYSCALLN("(%d, %p, %u) -> linux fs", __fd, __buf, __nbyte);
+            ret = real::write(__fd, __buf, __nbyte);
+        }
+        TRACE_SYSCALLN("(%d, %p, %u) = %d", __fd, __buf, __nbyte, ret);
+        return ret;
+    }
+    __asm__(".symver _iosys_write,write@GLIBC_2.2.5");
+
+    int _iosys_lseek(int __fildes, off_t __offset, int __whence)
+    {
+        if (vfs::is_image_fd(__fildes))
+        {
+            TRACE_SYSCALLN("(%d) -> VFS", __fildes);
+            return vfs::invoke_fs(&fs::seek,vfs::to_image_fd(__fildes),__offset,__whence);
+        } else {
+            TRACE_SYSCALLN("(%d) -> linux fs", __fildes);
+            return real::lseek(__fildes, __offset, __whence);
+        }
+    }
+    __asm__(".symver _iosys_lseek,lseek@GLIBC_2.2.5");
+
+    int _iosys_lseek64(int __fd, loff_t __offset, int __whence)
+    {
+        if (vfs::is_image_fd(__fd))
+        {
+            TRACE_SYSCALLN("%s", "-> lseek");
+            return lseek(__fd, __offset, __whence);
+        } else {
+            TRACE_SYSCALLN("(%d) -> linux fs", __fd);
+            return real::lseek64(__fd, __offset, __whence);
+        }
+    }
+    __asm__(".symver _iosys_lseek64,lseek64@GLIBC_2.2.5");
+
+    int _iosys_ioctl(int __fd, unsigned long int __request, ...)
+    {
+        int ret;
+        uintptr_t param;
+        va_list args;
+        va_start(args,__request);
+        param = va_arg(args,uintptr_t);
+        if (vfs::is_image_fd(__fd)) {
+            TRACE_SYSCALLN("(%d) -> VFS", __fd);
+            // VFS's ioctl works on paths, not file descriptors
+            // so we can't handle it the easy way, f ex.
+            // ret = vfs::invoke_fs(__VFS(ioctl), __fd, __request, param);
+            errno = ENOTSUP;
+            std::cerr << "Unsupported syscall " <<  __PRETTY_FUNCTION__ << std::endl;
+            ret = -1;
+        } else {
+            TRACE_SYSCALLN("(%d) -> linux fs", __fd);
+            ret = real::ioctl(__fd, __request, param);
+        }
+        va_end(args);
+        return ret;
+    }
+    __asm__(".symver _iosys_ioctl,ioctl@GLIBC_2.2.5");
+
+    int _iosys_poll(struct pollfd *__fds, nfds_t __nfds, int __timeout)
+    {
+        if (__fds && vfs::is_image_fd(__fds->fd)) {
+            TRACE_SYSCALLN("(%d) -> VFS", __fds->fd);
+            // there's no point in translating this call
+            errno = ENOTSUP;
+            std::cerr << "Unsupported syscall " <<  __PRETTY_FUNCTION__ << std::endl;
+            return -1;
+        }
+        TRACE_SYSCALLN("(%d) -> linux fs", __fds ? __fds->fd : 0);
+        return real::poll(__fds, __nfds, __timeout);
+    }
+    __asm__(".symver _iosys_poll,poll@GLIBC_2.2.5");
 
     int _iosys_link(const char *oldpath, const char *newpath)
     {
@@ -566,13 +672,13 @@ extern "C" {
     {
         if(vfs::redirect_to_image(dir))
         {
+            TRACE_SYSCALLN("(%s, %s, %s, %08lx, %p) -> VFS", special_file, dir, fstype, rwflag, data);
             return vfs::invoke_fs(&fs::mount, special_file, dir, fstype, rwflag );
         }
         else
         {
-            //NOTE: Always return zero because we will use fileystem which is always RW
-            TRACE_SYSCALLN("(%s, %s, %s, %08lx,%p) -> linux fs", special_file, dir,fstype, rwflag, data);
-            return 0;
+            TRACE_SYSCALLN("(%s, %s, %s, %08lx,%p) -> linux fs", special_file, dir, fstype, rwflag, data);
+            return real::mount(special_file, dir, fstype, rwflag, data);
         }
     }
     __asm__(".symver _iosys_mount,mount@GLIBC_2.2.5");
@@ -581,13 +687,13 @@ extern "C" {
     {
         if(vfs::redirect_to_image(mount_point))
         {
+            TRACE_SYSCALLN("(%s) -> VFS", mount_point);
             return vfs::invoke_fs(&fs::umount, mount_point );
         }
         else
         {
-            //NOTE: Always return zero because we will use fileystem which is always RW
             TRACE_SYSCALLN("(%s) -> linux fs", mount_point);
-            return 0;
+            return real::umount(mount_point);
         }
     }
     __asm__(".symver _iosys_umount,umount@GLIBC_2.2.5");
