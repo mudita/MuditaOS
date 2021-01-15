@@ -14,6 +14,7 @@
 #include <limits.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <stdarg.h>
 #include <sys/stat.h>
 
 struct lfs_info_summary
@@ -211,15 +212,20 @@ static int add_to_lfs(lfs_t *lfs, const char *dir, struct lfs_info_summary *summ
     return err;
 }
 
-static void print_error(const char *str, int error) __attribute__((nonnull(1)));
-static void print_error(const char *str, int error)
+static void print_error(int error, const char *format, ...) __attribute__((nonnull(2)));
+static void print_error(int error, const char *format, ...)
 {
+    va_list arglist;
+    va_start(arglist, format);
+    vfprintf(stderr, format, arglist);
+    va_end(arglist);
+
     if (error == -1) {
         char buf[1024];
-        fprintf(stderr, "system_error %s %s\n", str, strerror_r(errno, buf, sizeof buf));
+        fprintf(stderr, " system_error: %s\n", strerror_r(errno, buf, sizeof buf));
     }
     else {
-        fprintf(stderr, "lfs_error %s %i\n", str, error);
+        fprintf(stderr, " lfs_error: %i\n", error);
     }
 }
 
@@ -279,7 +285,7 @@ int main(int argc, char **argv)
         cfg.block_count                   = (curr_part->end - curr_part->start) / lopts.block_size;
         ioctx                             = lfs_ioaccess_open(&cfg, lopts.dst_image, curr_part);
         if (!ioctx) {
-            perror("Unable to open file:");
+            fprintf(stderr, "Unable to open file: %s error %s\n", lopts.dst_image, strerror(errno));
             free(parts);
             free(lopts.src_dirs);
             return EXIT_FAILURE;
@@ -345,7 +351,7 @@ int main(int argc, char **argv)
     for (size_t ndir = 0; ndir < lopts.src_dirs_siz; ++ndir) {
         err = add_to_lfs(&lfs, lopts.src_dirs[ndir], &prog_summary, lopts.verbose);
         if (err) {
-            print_error("Unable to open file:", err);
+            print_error(err, "Unable to open file: %s", lopts.src_dirs[ndir]);
             lfs_ioaccess_close(ioctx);
             free(lopts.src_dirs);
             lfs_unmount(&lfs);
