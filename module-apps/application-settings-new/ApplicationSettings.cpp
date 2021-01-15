@@ -5,6 +5,7 @@
 
 #include "windows/AddDeviceWindow.hpp"
 #include "windows/AllDevicesWindow.hpp"
+#include "windows/APNSettingsWindow.hpp"
 #include "windows/BluetoothWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/DisplayAndKeypadWindow.hpp"
@@ -32,6 +33,11 @@
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-db/Settings.hpp>
 #include <module-services/service-bluetooth/service-bluetooth/messages/Status.hpp>
+#include <service-bluetooth/messages/BondedDevices.hpp>
+#include <service-bluetooth/messages/DeviceName.hpp>
+#include <application-settings-new/data/BondedDevicesData.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
+#include <application-settings-new/data/PhoneNameData.hpp>
 
 namespace app
 {
@@ -51,11 +57,15 @@ namespace app
         }
         settings->registerValueChange(settings::operators_on,
                                       [this](const std::string &value) { operatorOnChanged(value); });
+
+        settings->registerValueChange(::settings::Cellular::volte_on,
+                                      [this](const std::string &value) { volteChanged(value); });
     }
 
     ApplicationSettingsNew::~ApplicationSettingsNew()
     {
         settings->unregisterValueChange(settings::operators_on);
+        settings->unregisterValueChange(::settings::Cellular::volte_on);
     }
 
     // Invoked upon receiving data message
@@ -91,7 +101,7 @@ namespace app
                 currentWindow->rebuild();
             }
         }
-        else if (auto responseStatusMsg = dynamic_cast<message::bluetooth::ResponseStatus *>(msgl);
+        else if (auto responseStatusMsg = dynamic_cast<::message::bluetooth::ResponseStatus *>(msgl);
                  nullptr != responseStatusMsg) {
             if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
                 auto btStatusData = std::make_unique<gui::BluetoothStatusData>(responseStatusMsg->getStatus());
@@ -99,7 +109,7 @@ namespace app
             }
         }
 
-        return std::make_shared<sys::ResponseMessage>();
+        return sys::MessageNone{};
     }
 
     // Invoked during initialization
@@ -111,6 +121,25 @@ namespace app
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
+
+        connect(typeid(::message::bluetooth::ResponseDeviceName), [&](sys::Message *msg) {
+            auto responseDeviceNameMsg = static_cast<::message::bluetooth::ResponseDeviceName *>(msg);
+            if (gui::window::name::phone_name == getCurrentWindow()->getName()) {
+                auto phoneNameData = std::make_unique<gui::PhoneNameData>(responseDeviceNameMsg->getName());
+                switchWindow(gui::window::name::phone_name, std::move(phoneNameData));
+            }
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(::message::bluetooth::ResponseBondedDevices), [&](sys::Message *msg) {
+            auto responseBondedDevicesMsg = static_cast<::message::bluetooth::ResponseBondedDevices *>(msg);
+            if (gui::window::name::all_devices == getCurrentWindow()->getName()) {
+                auto bondedDevicesData =
+                    std::make_unique<gui::BondedDevicesData>(responseBondedDevicesMsg->getDevices());
+                switchWindow(gui::window::name::all_devices, std::move(bondedDevicesData));
+            }
+            return sys::MessageNone{};
+        });
 
         createUserInterface();
 
@@ -164,6 +193,9 @@ namespace app
         windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NetworkWindow>(
                 app, static_cast<ApplicationSettingsNew *>(app), static_cast<ApplicationSettingsNew *>(app));
+        });
+        windowsFactory.attach(gui::window::name::apn_settings, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::APNSettingsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MessagesWindow>(app);
@@ -224,4 +256,23 @@ namespace app
         operatorsOn = value;
         settings->setValue(settings::operators_on, std::to_string(value));
     }
+
+    void ApplicationSettingsNew::setVoLTEOn(bool value)
+    {
+        voLteStateOn = value;
+        CellularServiceAPI::SetVoLTE(this, voLteStateOn);
+    };
+
+    bool ApplicationSettingsNew::getVoLTEOn() const noexcept
+    {
+        return voLteStateOn;
+    }
+
+    void ApplicationSettingsNew::volteChanged(const std::string &value)
+    {
+        if (!value.empty()) {
+            voLteStateOn = utils::getNumericValue<bool>(value);
+        }
+    }
+
 } /* namespace app */

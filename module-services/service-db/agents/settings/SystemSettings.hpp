@@ -21,6 +21,12 @@ namespace settings
         constexpr inline auto deviceVisibility = "bt_device_visibility";
         constexpr inline auto deviceName       = "bt_device_name";
         constexpr inline auto bondedDevices    = "bt_bonded_devices";
+        constexpr inline auto btKeys           = "bt_keys";
     } // namespace Bluetooth
+
+    namespace Cellular
+    {
+        constexpr inline auto volte_on = "cl_volte_on";
+    } // namespace Cellular
 
 }; // namespace settings

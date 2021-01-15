@@ -55,14 +55,20 @@ namespace sys
     {
         const auto freq      = lowPowerControl->GetCurrentFrequency();
         const auto oscSource = lowPowerControl->GetCurrentOscillatorSource();
+        const auto pll2State = lowPowerControl->GetCurrentPll2State();
 
-        /// switch osc source first
+        // switch osc source first
         if (freq == bsp::LowPowerMode::CpuFrequency::Level_1 &&
             oscSource == bsp::LowPowerMode::OscillatorSource::Internal) {
             lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::External);
         }
 
-        /// then increase frequency
+        // then turn on pll2
+        if (pll2State == bsp::LowPowerMode::Pll2State::Disable) {
+            lowPowerControl->SwitchPll2State(bsp::LowPowerMode::Pll2State::Enable);
+        }
+
+        // and increase frequency
         if (freq < bsp::LowPowerMode::CpuFrequency::Level_6) {
             lowPowerControl->SetCpuFrequency(bsp::LowPowerMode::CpuFrequency::Level_6);
         }
@@ -71,38 +77,37 @@ namespace sys
     void PowerManager::DecreaseCpuFrequency() const
     {
         const auto freq = lowPowerControl->GetCurrentFrequency();
-        const auto oscSource = lowPowerControl->GetCurrentOscillatorSource();
         auto level      = bsp::LowPowerMode::CpuFrequency::Level_1;
 
+        // We temporarily limit the minimum CPU frequency
+        // due to problems with the UART of the GSM modem
         switch (freq) {
         case bsp::LowPowerMode::CpuFrequency::Level_6:
             level = bsp::LowPowerMode::CpuFrequency::Level_5;
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_5:
+        default:
             level = bsp::LowPowerMode::CpuFrequency::Level_4;
-            break;
-        case bsp::LowPowerMode::CpuFrequency::Level_4:
-            level = bsp::LowPowerMode::CpuFrequency::Level_3;
-            break;
-        case bsp::LowPowerMode::CpuFrequency::Level_3:
-            level = bsp::LowPowerMode::CpuFrequency::Level_2;
-            break;
-        case bsp::LowPowerMode::CpuFrequency::Level_2:
-            level = bsp::LowPowerMode::CpuFrequency::Level_1;
-            break;
-        case bsp::LowPowerMode::CpuFrequency::Level_1:
             break;
         }
 
-        /// decrease frequency first
+        // decrease frequency first
         if (level != freq) {
             lowPowerControl->SetCpuFrequency(level);
         }
 
-        /// then switch osc source
-        if (level == bsp::LowPowerMode::CpuFrequency::Level_1 &&
-            oscSource == bsp::LowPowerMode::OscillatorSource::External) {
-            lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
+        if (level == bsp::LowPowerMode::CpuFrequency::Level_1) {
+            const auto oscSource = lowPowerControl->GetCurrentOscillatorSource();
+            const auto pll2State = lowPowerControl->GetCurrentPll2State();
+
+            // then switch osc source
+            if (oscSource == bsp::LowPowerMode::OscillatorSource::External) {
+                lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
+            }
+
+            // and turn off pll2
+            if (pll2State == bsp::LowPowerMode::Pll2State::Enable) {
+                lowPowerControl->SwitchPll2State(bsp::LowPowerMode::Pll2State::Disable);
+            }
         }
     }
 

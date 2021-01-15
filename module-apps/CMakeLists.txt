@@ -15,6 +15,8 @@ set( SOURCES
     "Application.cpp"
     "GuiTimer.cpp"
     "WindowsFactory.cpp"
+    "AsyncTask.cpp"
+    "CallbackStorage.cpp"
     "windows/AppWindow.cpp" 
     "windows/OptionWindow.cpp"
     "windows/Options.cpp" 
@@ -30,7 +32,7 @@ set( SOURCES
     "widgets/BrightnessBox.cpp"
     "widgets/ModesBox.cpp"
     "widgets/BarGraph.cpp"
-     )
+)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
@@ -156,3 +158,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC
 
         cxx_std_14
 )
+
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif()

@@ -9,15 +9,19 @@
 #include <module-db/queries/alarms/QueryAlarmsTurnOffAll.hpp>
 #include <service-db/DBServiceAPI.hpp>
 
+#include "AsyncTask.hpp"
+
 namespace app::alarmClock
 {
-    AlarmsDBRepository::AlarmsDBRepository(Application *application) : application{application}
+    AlarmsDBRepository::AlarmsDBRepository(Application *application)
+        : AsyncCallbackReceiver{application}, application{application}
     {}
 
     void AlarmsDBRepository::getLimited(std::uint32_t offset, std::uint32_t limit, const OnGetCallback &callback)
     {
         auto query = std::make_unique<db::query::alarms::GetLimited>(offset, limit);
-        query->setQueryListener(db::QueryCallback::fromFunction([callback](auto response) {
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Alarms);
+        task->setCallback([callback](auto response) {
             auto result = dynamic_cast<db::query::alarms::GetLimitedResult *>(response);
             if (result == nullptr) {
                 return false;
@@ -26,15 +30,16 @@ namespace app::alarmClock
                 callback(result->getResult(), result->getCountResult());
             }
             return true;
-        }));
-        DBServiceAPI::GetQuery(application, db::Interface::Name::Alarms, std::move(query));
+        });
+        task->execute(application, this);
     }
 
     template <class QueryType, class ResultType>
     void AlarmsDBRepository::GetQuery(std::unique_ptr<QueryType> query,
                                       const AbstractAlarmsRepository::OnResultCallback &callback)
     {
-        query->setQueryListener(db::QueryCallback::fromFunction([callback](auto response) {
+        auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Alarms);
+        task->setCallback([callback](auto response) {
             auto result = dynamic_cast<ResultType *>(response);
             if (result == nullptr) {
                 return false;
@@ -43,8 +48,8 @@ namespace app::alarmClock
                 callback(result->succeed());
             }
             return true;
-        }));
-        DBServiceAPI::GetQuery(application, db::Interface::Name::Alarms, std::move(query));
+        });
+        task->execute(application, this);
     }
 
     void AlarmsDBRepository::add(const AlarmsRecord &alarm, const AbstractAlarmsRepository::OnResultCallback &callback)

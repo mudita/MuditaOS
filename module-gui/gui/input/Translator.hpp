@@ -57,13 +57,14 @@ namespace gui
         std::map<std::string, gui::Profile> profilesList = {};
 
         void loadProfile(const std::string &filepath);
-        std::vector<std::string> getProfilesPaths();
+        std::vector<std::string> getProfilesNames();
         void init();
         Profile empty;
 
         static Profiles &get();
 
       public:
+        std::vector<std::string> getAvailableInputLanguages();
         Profile &get(const std::string &name);
     };
 

@@ -28,6 +28,13 @@ namespace bsp
         AudioDevice::RetCode InputPathCtrl(InputPath inputPath) final;
         bool IsFormatSupported(const Format &format) final;
 
+        void onDataReceive() final;
+        void onDataSend() final;
+        void enableInput() final;
+        void enableOutput() final;
+        void disableInput() final;
+        void disableOutput() final;
+
       private:
         audio::Stream &dataStreamOut;
         audio::Stream &dataStreamIn;

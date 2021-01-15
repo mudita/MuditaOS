@@ -4,7 +4,10 @@
 
 #include "board/rt1051/bsp/audio/RT1051Audiocodec.hpp"
 #include "board/rt1051/bsp/audio/RT1051CellularAudio.hpp"
-#include "board/rt1051/bsp/audio/RT1051BluetoothAudio.hpp"
+
+#include <Audio/Stream.hpp>
+
+#include <cassert>
 
 #elif defined(TARGET_Linux)
 #include "audio/linux_audiocodec.hpp"
@@ -13,60 +16,53 @@
 #error "Unsupported target"
 #endif
 
-namespace bsp{
+namespace bsp
+{
 
-    std::optional<std::unique_ptr<AudioDevice>> AudioDevice::Create(bsp::AudioDevice::Type type, audioCallback_t callback) {
-
+    std::optional<std::unique_ptr<AudioDevice>> AudioDevice::Create(bsp::AudioDevice::Type type,
+                                                                    audioCallback_t callback)
+    {
         std::unique_ptr<AudioDevice> inst;
 
-        switch(type){
+        switch (type) {
 
-            case Type ::Audiocodec:
-            {
+        case Type ::Audiocodec: {
 #if defined(TARGET_RT1051)
-                inst = std::make_unique<bsp::RT1051Audiocodec>(callback);
+            inst = std::make_unique<bsp::RT1051Audiocodec>(callback);
 #elif defined(TARGET_Linux)
-                inst = std::make_unique<bsp::LinuxAudiocodec>(callback );
+            inst = std::make_unique<bsp::LinuxAudiocodec>(callback);
 #else
-                #error "Unsupported target"
+#error "Unsupported target"
 #endif
 
-            }
-                break;
+        } break;
 
-
-            case Type ::Bluetooth:
-            {
+        case Type ::Bluetooth: {
 #if defined(TARGET_RT1051)
-                inst = std::make_unique<bsp::RT1051BluetoothAudio>(callback);
+            inst = nullptr;
 
 #elif defined(TARGET_Linux)
 
 #else
 #error "Unsupported target"
 #endif
-            }
-                break;
+        } break;
 
-            case Type::Cellular:
-            {
+        case Type::Cellular: {
 #if defined(TARGET_RT1051)
-                inst = std::make_unique<bsp::RT1051CellularAudio>(callback);
+            inst = std::make_unique<bsp::RT1051CellularAudio>(callback);
 #elif defined(TARGET_Linux)
-                inst = std::make_unique<bsp::LinuxCellularAudio>(callback );
+            inst = std::make_unique<bsp::LinuxCellularAudio>(callback);
 #else
 #error "Unsupported target"
 #endif
-            }
-                break;
-
+        } break;
         }
 
-        if(inst->isInitialized){
+        if (inst->isInitialized) {
             return inst;
         }
 
         return {};
     }
-
-}
+} // namespace bsp

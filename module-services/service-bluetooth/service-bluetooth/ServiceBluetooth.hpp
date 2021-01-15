@@ -29,9 +29,10 @@ class ServiceBluetooth : public sys::Service
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
     virtual sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
+    void sendWorkerCommand(Bt::Command command);
+    QueueHandle_t workerQueue = nullptr;
+    std::shared_ptr<Bluetooth::SettingsHolder> settingsHolder;
 
   private:
     std::unique_ptr<BluetoothWorker> worker;
-    std::unique_ptr<Bluetooth::SettingsHolder> settingsHolder;
-    BluetoothStatus btStatus; // will be replaced with settings storage introduced in [EGD-4579]
 };

@@ -341,3 +341,9 @@ bool CellularServiceAPI::GetDataTransfer(sys::Service *serv)
     return sys::Bus::SendUnicast(
         std::make_shared<CellularGetDataTransferMessage>(), ServiceCellular::serviceName, serv);
 }
+
+bool CellularServiceAPI::SetVoLTE(sys::Service *serv, bool voLTE)
+{
+    return sys::Bus::SendUnicast(
+        std::make_shared<CellularChangeVoLTEDataMessage>(voLTE), ServiceCellular::serviceName, serv);
+}

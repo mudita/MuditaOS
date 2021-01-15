@@ -49,12 +49,7 @@ namespace gui
         addAlignedLabelWithValue(box, "GIT branch:", std::string(GIT_BRANCH));
         addAlignedLabelWithValue(box, "Version:", std::string(VERSION));
         {
-            boot::BootConfig bootCfg;
-            bootCfg.load();
-            addAlignedLabelWithValue(box,
-                                     "Bootloader:",
-                                     (bootCfg.bootloader_version().empty() ? utils::localize.get("not available")
-                                                                           : bootCfg.bootloader_version()));
+            addAlignedLabelWithValue(box, "Bootloader:", utils::localize.get("not available"));
         }
         std::string firmwareVersion;
         CellularServiceAPI::GetFirmwareVersion(getApplication(), firmwareVersion);

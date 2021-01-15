@@ -62,7 +62,6 @@ extern "C"
      */
     void log_Log(logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
         __attribute__((format(printf, 5, 6)));
-    void log_SetLevel(logger_level level);
     void log_Printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
     void log_WriteToDevice(const uint8_t *pBuffer, unsigned NumBytes);
 
@@ -84,7 +83,8 @@ extern "C"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-static const char *logFileName = "MuditaOS.log";
+static const size_t LOGGER_BUFFER_SIZE  = 8192;
+static const double MAX_BUFFER_UTIL_MEM = 0.8 * LOGGER_BUFFER_SIZE;
 #pragma GCC diagnostic pop
 
 #endif /* LOG_LOG_H_ */
