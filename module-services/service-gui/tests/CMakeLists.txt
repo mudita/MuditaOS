@@ -7,6 +7,7 @@ add_catch2_executable(
         MockedSynchronizationMechanism.hpp
     LIBS
         service-gui
+        module-sys
 )
 
 add_catch2_executable(
@@ -18,4 +19,5 @@ add_catch2_executable(
         MockedSynchronizationMechanism.hpp
     LIBS
         service-gui
+        module-sys
 )

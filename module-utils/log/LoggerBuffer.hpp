@@ -5,19 +5,27 @@
 
 #include "circular_buffer/StringCircularBuffer.hpp"
 
-class LoggerBuffer : public StringCircularBuffer
+namespace Log
 {
-  public:
-    using StringCircularBuffer::StringCircularBuffer;
+    class LoggerBuffer : public StringCircularBuffer
+    {
+      public:
+        using StringCircularBuffer::StringCircularBuffer;
 
-    [[nodiscard]] std::pair<bool, std::string> get() override;
-    void put(const std::string &logMsg) override;
-    void put(std::string &&logMsg) override;
+        [[nodiscard]] std::pair<bool, std::string> get() override;
+        void put(const std::string &logMsg) override;
+        void put(std::string &&logMsg) override;
+        [[nodiscard]] size_t getNumOfBytes() const noexcept
+        {
+            return numOfBytesInBuffer;
+        }
 
-    static constexpr auto lostBytesMessage = "bytes was lost.";
+        static constexpr auto lostBytesMessage = "bytes was lost.";
 
-  private:
-    void updateNumOfLostBytes();
+      private:
+        void updateNumOfLostBytes();
 
-    size_t numOfLostBytes{0};
-};
+        size_t numOfLostBytes{0};
+        size_t numOfBytesInBuffer{0};
+    };
+} // namespace Log

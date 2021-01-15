@@ -10,6 +10,7 @@
 #include <vector>
 
 using namespace std;
+using namespace Log;
 
 void TestBuffer(const LoggerBuffer &buffer, size_t capacity, size_t numOfMsgs)
 {

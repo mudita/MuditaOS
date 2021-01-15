@@ -11,7 +11,7 @@ void log_Printf(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    Logger::get().log(Log::Device::DEFAULT, fmt, args);
+    Logger::get().log(fmt, args);
     va_end(args);
 }
 

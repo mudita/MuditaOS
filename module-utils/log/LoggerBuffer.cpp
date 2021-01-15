@@ -3,35 +3,42 @@
 
 #include "LoggerBuffer.hpp"
 
-std::pair<bool, std::string> LoggerBuffer::get()
+namespace Log
 {
-    auto [result, logMsg] = StringCircularBuffer::get();
-    if (!result) {
-        return {result, logMsg};
+    std::pair<bool, std::string> LoggerBuffer::get()
+    {
+        auto [result, logMsg] = StringCircularBuffer::get();
+        if (!result) {
+            return {result, logMsg};
+        }
+        if (numOfLostBytes > 0) {
+            logMsg += "\r\n" + std::to_string(numOfLostBytes) + " " + lostBytesMessage;
+            numOfLostBytes = 0;
+        }
+        numOfBytesInBuffer -= logMsg.length();
+        return {true, logMsg};
     }
-    if (numOfLostBytes > 0) {
-        logMsg += "\r\n" + std::to_string(numOfLostBytes) + " " + lostBytesMessage;
-        numOfLostBytes = 0;
+
+    void LoggerBuffer::put(const std::string &logMsg)
+    {
+        numOfBytesInBuffer += logMsg.length();
+        updateNumOfLostBytes();
+        StringCircularBuffer::put(logMsg);
     }
-    return {true, logMsg};
-}
 
-void LoggerBuffer::put(const std::string &logMsg)
-{
-    updateNumOfLostBytes();
-    StringCircularBuffer::put(logMsg);
-}
-
-void LoggerBuffer::put(std::string &&logMsg)
-{
-    updateNumOfLostBytes();
-    StringCircularBuffer::put(std::move(logMsg));
-}
-
-void LoggerBuffer::updateNumOfLostBytes()
-{
-    if (StringCircularBuffer::isFull()) {
-        auto [_, lostMsg] = StringCircularBuffer::get();
-        numOfLostBytes += lostMsg.length();
+    void LoggerBuffer::put(std::string &&logMsg)
+    {
+        numOfBytesInBuffer += logMsg.length();
+        updateNumOfLostBytes();
+        StringCircularBuffer::put(std::move(logMsg));
     }
-}
+
+    void LoggerBuffer::updateNumOfLostBytes()
+    {
+        if (StringCircularBuffer::isFull()) {
+            auto [_, lostMsg] = StringCircularBuffer::get();
+            numOfLostBytes += lostMsg.length();
+            numOfBytesInBuffer -= numOfLostBytes;
+        }
+    }
+} // namespace Log

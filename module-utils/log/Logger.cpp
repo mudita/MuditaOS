@@ -4,6 +4,7 @@
 #include "critical.hpp"
 #include <fstream>
 #include <gsl/gsl_util>
+#include "LockGuard.hpp"
 #include "Logger.hpp"
 #include "macros.h"
 
@@ -18,14 +19,27 @@ namespace Log
                                                             {"ServiceDB", logger_level::LOGINFO},
                                                             {CRIT_STR, logger_level::LOGTRACE},
                                                             {IRQ_STR, logger_level::LOGTRACE}};
-    const char *Logger::level_names[]                    = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+    const char *Logger::levelNames[]                     = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+
+    void Logger::runWorker()
+    {
+        loggerWorker = std::make_unique<LoggerWorker>();
+        const bool ret =
+            loggerWorker->init({{LoggerWorker::loggerQueueName, sizeof(std::string *), loggerQueueLength}});
+        if (ret == false) {
+            constexpr std::string_view logMsg = "!!! Logger failed to initialize logger worker !!!";
+            log(logMsg.data(), logMsg.size(), LOGERROR, __FILENAME__, __LINE__, __func__);
+            return;
+        }
+        else {
+            loggerWorker->run();
+            loggerWorkerQueue = loggerWorker->getQueue();
+        }
+    }
 
     void Logger::enableColors(bool enable)
     {
-        if (!lock()) {
-            return;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
+        LockGuard lock(mutex);
 
         if (enable) {
             logColors = &logColorsOn;
@@ -40,15 +54,9 @@ namespace Log
         return filtered[name];
     }
 
-    bool Logger::lock()
+    auto Logger::log(const char *fmt, va_list args) -> int
     {
-        if (isIRQ()) {
-            bt = cpp_freertos::CriticalSection::EnterFromISR();
-        }
-        else {
-            return mutex.Lock();
-        }
-        return true;
+        return log(currentDevice, fmt, args);
     }
 
     void Logger::init()
@@ -58,14 +66,12 @@ namespace Log
 #else
         enableColors(false);
 #endif
+        runWorker();
     }
 
     auto Logger::log(Device device, const char *fmt, va_list args) -> int
     {
-        if (!lock()) {
-            return -1;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
+        LockGuard lock(mutex);
 
         loggerBufferCurrentPos = 0;
         loggerBufferCurrentPos += vsnprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), fmt, args);
@@ -80,11 +86,7 @@ namespace Log
         if (!filterLogs(level)) {
             return;
         }
-
-        if (!lock()) {
-            return;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
+        LockGuard lock(mutex);
 
         loggerBufferCurrentPos = 0;
         addLogHeader(level, file, line, function);
@@ -92,28 +94,37 @@ namespace Log
         loggerBufferCurrentPos += vsnprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), fmt, args);
         loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), "\n");
 
-        logToDevice(Device::DEFAULT, loggerBuffer, loggerBufferCurrentPos);
+        logToDevice(currentDevice, loggerBuffer, loggerBufferCurrentPos);
+    }
+
+    void Logger::log(
+        std::string_view logMsg, size_t length, logger_level level, const char *file, int line, const char *function)
+    {
+        loggerBufferCurrentPos = 0;
+        addLogHeader(level, file, line, function);
+        const auto size = std::min(length, loggerBufferSizeLeft());
+        strncpy(&loggerBuffer[loggerBufferCurrentPos], logMsg.data(), size);
+        logToDevice(Device::DEFAULT, loggerBuffer, size);
     }
 
     auto Logger::logAssert(const char *fmt, va_list args) -> int
     {
-        if (!lock()) {
-            return -1;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
-
+        LockGuard lock(mutex);
         logToDevice(fmt, args);
-
         return loggerBufferCurrentPos;
     }
 
-    void Logger::unlock()
+    void Logger::sendLogMsgToWorker(std::string_view logMsg, size_t length)
     {
-        if (isIRQ()) {
-            cpp_freertos::CriticalSection::ExitFromISR(bt);
+        if (loggerWorkerQueue == nullptr)
+            return;
+        if (uxQueueSpacesAvailable(loggerWorkerQueue) != 0) {
+            auto data = new std::string(logMsg.data(), length);
+            xQueueSend(loggerWorkerQueue, &data, portMAX_DELAY);
         }
         else {
-            mutex.Unlock();
+            constexpr std::string_view logMsg = "!!! Logger worker queue is full !!!";
+            log(logMsg.data(), logMsg.size(), LOGWARN, __FILENAME__, __LINE__, __func__);
         }
     }
 }; // namespace Log

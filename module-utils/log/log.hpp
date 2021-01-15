@@ -84,7 +84,6 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
 static const size_t LOGGER_BUFFER_SIZE  = 8192;
-static const double MAX_BUFFER_UTIL_MEM = 0.8 * LOGGER_BUFFER_SIZE;
 #pragma GCC diagnostic pop
 
 #endif /* LOG_LOG_H_ */

@@ -28,6 +28,7 @@ add_catch2_executable(
         unittest_clipboard.cpp
     LIBS
         module-utils
+        module-sys
 )
 
 # UCS2 tests
