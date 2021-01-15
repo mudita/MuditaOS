@@ -317,6 +317,8 @@ endif()
 
 message_serial_status()
 
+include(tools/clang-tidy.cmake)
+
 option (BUILD_DOC_WITH_ALL "Build documentation" OFF)
 
 # check if Doxygen is installed
