@@ -32,7 +32,7 @@ GLIBC_2.2.5 {
                 fscanf;
                 vfscanf;
 #                ungetc;
-# stdio - disabled
+# stdio - buffering disabled
                 setbuf;
                 setvbuf;
                 setbuffer;
@@ -63,6 +63,11 @@ GLIBC_2.2.5 {
                 __lxstat64;
                 __fxstat64;
                 read;
+                write;
+                lseek;
+                lseek64;
+                ioctl;
+                poll;
                 mount;
                 umount;
 # posix - dirent
@@ -73,13 +78,6 @@ GLIBC_2.2.5 {
                 rewinddir;
                 seekdir;
                 telldir;
-# posix - not implemented
-#                write;
-#                lseek;
-#                lseek64;
-#                ioctl;
-#                poll;
-
         local:
                 *;
 };
