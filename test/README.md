@@ -77,20 +77,24 @@ methods:
 from harness.harness import Harness
 from harness.interface.defs import key_codes
 
-port_name = "/dev/ttyACM0"
+# try to init Harness object with automatic port detection
+harness = Harness.from_detect()
 
-# init Harness object and open serial port
-harness = Harness(port_name)
-
-#get current application name
+# get current application name
 current_window = harness.get_window_name()
 
 #open messages when phone is unlocked
-@harness.with_phone_unlocked()
+@harness.with_phone_unlocked
 def do_after_unlock(connection):
+    # open menu
+    connection.send_key_code(key_codes["enter"])
+
     harness.open_application("messages")
-    #send joystick down keypress
-    connection.send_key(key_codes["down"])
+    # send joystick down keypress
+    connection.send_key_code(key_codes["down"])
+
+    # open a thread
+    connection.send_key_code(key_codes["enter"])
 ```
 
 ### pyTest running

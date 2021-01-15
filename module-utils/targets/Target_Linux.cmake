@@ -1,6 +1,6 @@
 set(BOARD_SOURCES
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/log.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/log_linux.cpp
 
         CACHE INTERNAL "")
 

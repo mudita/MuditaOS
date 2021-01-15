@@ -36,6 +36,8 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/ical/ParserICS.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/time/TimeRangeParser.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/log/Logger.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/log/log.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})

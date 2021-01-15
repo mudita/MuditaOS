@@ -198,7 +198,8 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         sys::Bus::SendMulticast(msg.value(), sys::BusChannels::ServiceCellularNotifications, this);
     };
     registerMessageHandlers();
-
+    settings->registerValueChange(settings::Cellular::volte_on,
+                                  [this](const std::string &value) { volteChanged(value); });
     packetData = std::make_unique<packet_data::PacketData>(*this);
     packetData->loadAPNSettings();
 }
@@ -206,6 +207,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 ServiceCellular::~ServiceCellular()
 {
     LOG_INFO("[ServiceCellular] Cleaning resources");
+    settings->unregisterValueChange(settings::Cellular::volte_on);
 }
 
 // this static function will be replaced by Settings API
@@ -290,10 +292,12 @@ void ServiceCellular::registerMessageHandlers()
         bsp::cellular::sim::hotswap_trigger();
         return std::make_shared<CellularResponseMessage>(true);
     });
+
     connect(typeid(CellularStartOperatorsScanMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularStartOperatorsScanMessage *>(request);
         return handleCellularStartOperatorsScan(msg);
     });
+
     connect(typeid(CellularGetActiveContextsMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularGetActiveContextsMessage *>(request);
         return handleCellularGetActiveContextsMessage(msg);
@@ -333,6 +337,14 @@ void ServiceCellular::registerMessageHandlers()
         auto msg = static_cast<CellularGetActiveContextsMessage *>(request);
         return handleCellularGetActiveContextsMessage(msg);
     });
+
+    connect(typeid(CellularChangeVoLTEDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularChangeVoLTEDataMessage *>(request);
+        volteOn  = msg->getVoLTEon();
+        settings->setValue(settings::Cellular::volte_on, std::to_string(volteOn));
+        return std::make_shared<CellularResponseMessage>(true);
+    });
+
     handle_CellularGetChannelMessage();
 }
 
@@ -1031,6 +1043,9 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             auto result = msg->getResult();
             if (auto response = dynamic_cast<db::query::SMSSearchByTypeResult *>(result.get())) {
                 responseHandled = handle(response);
+            }
+            else if (result->hasListener()) {
+                responseHandled = result->handle();
             }
         }
         if (responseHandled) {
@@ -1808,7 +1823,8 @@ bool ServiceCellular::dbAddSMSRecord(const SMSRecord &record)
         onSMSReceived();
         return true;
     }));
-    return DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::move(query));
+    const auto [succeed, _] = DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::move(query));
+    return succeed;
 }
 
 void ServiceCellular::onSMSReceived()
@@ -2040,6 +2056,7 @@ std::shared_ptr<cellular::RawCommandRespAsync> ServiceCellular::handleCellularSt
     sys::Bus::SendUnicast(ret, msg->sender, this);
     return ret;
 }
+
 bool ServiceCellular::handle_apn_conf_procedure()
 {
     LOG_DEBUG("APN on modem configuration");
@@ -2130,4 +2147,11 @@ std::shared_ptr<CellularSetOperatorResponse> ServiceCellular::handleCellularSetO
     NetworkSettings networkSettings(*this);
     return std::make_shared<CellularSetOperatorResponse>(
         networkSettings.setOperator(msg->getMode(), msg->getFormat(), msg->getName()));
+}
+
+void ServiceCellular::volteChanged(const std::string &value)
+{
+    if (!value.empty()) {
+        volteOn = utils::getNumericValue<bool>(value);
+    }
 }

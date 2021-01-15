@@ -20,7 +20,7 @@ namespace gui
     auto InputLanguageWindow::buildOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optionsList;
-        const auto &langList = loader.getAvailableDisplayLanguages();
+        const auto &langList = profiles.getAvailableInputLanguages();
         for (const auto &lang : langList) {
             optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
                 lang,

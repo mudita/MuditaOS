@@ -34,28 +34,73 @@ namespace parserFSM
             const inline auto two_days_before        = Duration(0, 2, 0, 0);
             const inline auto one_week_before        = Duration(1, 0, 0, 0);
             const inline auto event_time             = Duration(0, 0, 0, 0);
+            const inline auto never                  = Duration(0, 0, 0, 0xFFFF);
         } // namespace duration
     }     // namespace ical
 
-    namespace json::calendar::events
+    namespace json::calendar
     {
-        constexpr inline auto UID         = "UID";
-        constexpr inline auto data        = "data";
+        constexpr inline auto events = "calendar_events";
+        namespace event
+        {
+            constexpr inline auto vevent = "VEVENT";
+
+            constexpr inline auto uid     = "UID";
+            constexpr inline auto summary = "SUMMARY";
+            constexpr inline auto dtstart = "DTSTART";
+            constexpr inline auto dtend   = "DTEND";
+
+            namespace recurrence_rule
+            {
+                constexpr inline auto rrule = "RRULE";
+
+                constexpr inline auto frequency = "FREQ";
+                constexpr inline auto count     = "COUNT";
+                constexpr inline auto interval  = "INTERVAL";
+            } // namespace recurrence_rule
+
+            namespace alarm
+            {
+                constexpr inline auto valarm = "VALARM";
+
+                constexpr inline auto trigger = "TRIGGER";
+                constexpr inline auto action  = "ACTION";
+            } // namespace alarm
+
+            namespace provider
+            {
+                constexpr inline auto provider = "provider";
+
+                constexpr inline auto type    = "type";
+                constexpr inline auto id      = "id";
+                constexpr inline auto iCalUid = "iCalUid";
+            } // namespace provider
+        }     // namespace event
         constexpr inline auto offset      = "offset";
         constexpr inline auto limit       = "limit";
         constexpr inline auto count       = "count";
         constexpr inline auto total_count = "total_count";
 
-        constexpr inline auto providers = "providers";
-        namespace provider
-        {
-            constexpr inline auto type    = "provider_type";
-            constexpr inline auto id      = "provider_id";
-            constexpr inline auto iCalUid = "provider_iCalUid";
-        } // namespace provider
-    }     // namespace json::calendar::events
+    } // namespace json::calendar
 } // namespace parserFSM
 using namespace parserFSM;
+
+auto CalendarEventsHelper::isICalEventValid(ICalEvent icalEvent) const -> bool
+{
+    if (!icalEvent.event.isValid) {
+        LOG_ERROR("Ical event invalid!");
+        return false;
+    }
+    if (!icalEvent.alarm.isValid) {
+        LOG_ERROR("Ical alarm invalid!");
+        return false;
+    }
+    if (!icalEvent.rrule.isValid) {
+        LOG_ERROR("Ical recurrence rule invalid!");
+        return false;
+    }
+    return true;
+}
 
 auto CalendarEventsHelper::frequencyFromCustomRepeat(Repeat repeat) const -> Frequency
 {
@@ -101,43 +146,44 @@ auto CalendarEventsHelper::alarmFrom(Reminder reminder) const -> Alarm
 {
     switch (reminder) {
     case Reminder::never: {
-        return Alarm();
+        auto beforeEvent = ical::duration::never;
+        return Alarm(beforeEvent, Action::none);
     }
     case Reminder::five_min_before: {
         auto beforeEvent = ical::duration::five_minutes_before;
-        return Alarm(beforeEvent, Action::display);
+        return Alarm(beforeEvent, Action::none);
     }
     case Reminder::fifteen_min_before: {
         auto beforeEvent = ical::duration::fifteen_minutes_before;
-        return Alarm(beforeEvent, Action::display);
+        return Alarm(beforeEvent, Action::none);
     }
     case Reminder::thirty_min_before: {
         auto beforeEvent = ical::duration::thirty_minutes_before;
-        return Alarm(beforeEvent, Action::display);
+        return Alarm(beforeEvent, Action::none);
     }
     case Reminder::one_hour_before: {
         auto beforeEvent = ical::duration::one_hour_before;
-        return Alarm(beforeEvent, Action::display);
+        return Alarm(beforeEvent, Action::none);
     }
     case Reminder::two_hour_before: {
         auto beforeEvent = ical::duration::two_hours_before;
-        return Alarm(beforeEvent, Action::display);
+        return Alarm(beforeEvent, Action::none);
     }
     case Reminder::one_day_before: {
         auto beforeEvent = ical::duration::one_day_before;
-        return Alarm(beforeEvent, Action::display);
+        return Alarm(beforeEvent, Action::none);
     }
     case Reminder::two_days_before: {
         auto beforeEvent = ical::duration::two_days_before;
-        return Alarm(beforeEvent, Action::display);
+        return Alarm(beforeEvent, Action::none);
     }
     case Reminder::one_week_before: {
         auto beforeEvent = ical::duration::one_week_before;
-        return Alarm(beforeEvent, Action::display);
+        return Alarm(beforeEvent, Action::none);
     }
     case Reminder::event_time: {
         auto beforeEvent = ical::duration::event_time;
-        return Alarm(beforeEvent, Action::display);
+        return Alarm(beforeEvent, Action::none);
     }
     }
     return Alarm();
@@ -152,11 +198,43 @@ auto CalendarEventsHelper::icalEventFrom(const EventsRecord &record) const -> IC
     return ICalEvent{event, alarm, rrule};
 }
 
+auto CalendarEventsHelper::eventJsonObjectFrom(EventsRecord record) const -> json11::Json
+{
+    auto icalEvent = icalEventFrom(record);
+    if (!isICalEventValid(icalEvent)) {
+        LOG_ERROR("Bad event record formatting  (Event UID: %s)", icalEvent.event.getUID().c_str());
+    }
+
+    auto rruleObj = json11::Json::object{
+        {json::calendar::event::recurrence_rule::frequency, icalEvent.rrule.getFrequencyString().c_str()},
+        {json::calendar::event::recurrence_rule::count, icalEvent.rrule.getCountString().c_str()},
+        {json::calendar::event::recurrence_rule::interval, icalEvent.rrule.getIntervalString().c_str()}};
+
+    auto alarmObj =
+        json11::Json::object{{json::calendar::event::alarm::trigger, icalEvent.alarm.getTriggerString().c_str()},
+                             {json::calendar::event::alarm::action, icalEvent.alarm.getActionString().c_str()}};
+
+    auto providerObj =
+        json11::Json::object{{json::calendar::event::provider::type, record.provider_type.c_str()},
+                             {json::calendar::event::provider::id, record.provider_id.c_str()},
+                             {json::calendar::event::provider::iCalUid, record.provider_iCalUid.c_str()}};
+
+    auto eventObj = json11::Json::object{{json::calendar::event::dtend, icalEvent.event.getDTEndString().c_str()},
+                                         {json::calendar::event::dtstart, icalEvent.event.getDTStartString().c_str()},
+                                         {json::calendar::event::summary, icalEvent.event.getSummary().c_str()},
+                                         {json::calendar::event::uid, icalEvent.event.getUID().c_str()},
+                                         {json::calendar::event::recurrence_rule::rrule, rruleObj},
+                                         {json::calendar::event::alarm::valarm, alarmObj},
+                                         {json::calendar::event::provider::provider, providerObj}};
+
+    return eventObj;
+}
+
 auto CalendarEventsHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
 {
-    auto obj        = context.getBody();
-    uint32_t offset = obj[json::calendar::events::offset].int_value();
-    uint32_t limit  = obj[json::calendar::events::limit].int_value();
+    const auto obj  = context.getBody();
+    uint32_t offset = obj[json::calendar::offset].int_value();
+    uint32_t limit  = obj[json::calendar::limit].int_value();
     auto query      = std::make_unique<db::query::events::GetAllLimited>(offset, limit);
 
     auto listener = std::make_unique<db::EndpointListener>(
@@ -166,17 +244,22 @@ auto CalendarEventsHelper::requestDataFromDB(Context &context) -> sys::ReturnCod
                 uint32_t totalCount = EventsResult->getCountResult();
                 auto parser         = std::make_unique<ParserICS>();
                 std::vector<ICalEvent> icalEvents;
+
+                auto eventsArray = json11::Json::array();
+
                 for (auto rec : records) {
-                    icalEvents.push_back(icalEventFrom(rec));
+                    auto eventObject = eventJsonObjectFrom(rec);
+
+                    eventsArray.emplace_back(eventObject);
                 }
-                parser->importEvents(icalEvents);
-                auto jsonObj =
-                    json11::Json::object({{json::calendar::events::data, parser->getIcsData()},
-                                          {json::calendar::events::count, std::to_string(records.size())},
-                                          {json::calendar::events::total_count, std::to_string(totalCount)}});
+
+                auto jsonObj = json11::Json::object({{json::calendar::events, eventsArray},
+                                                     {json::calendar::count, std::to_string(records.size())},
+                                                     {json::calendar::total_count, std::to_string(totalCount)}});
 
                 context.setResponseBody(jsonObj);
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
+
                 return true;
             }
             return false;
@@ -184,7 +267,7 @@ auto CalendarEventsHelper::requestDataFromDB(Context &context) -> sys::ReturnCod
         context);
 
     query->setQueryListener(std::move(listener));
-    auto ret = DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+    auto [ret, _] = DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
 
     if (ret) {
         return sys::ReturnCodes::Success;
@@ -224,8 +307,7 @@ auto CalendarEventsHelper::repeatFrom(RecurrenceRule &rrule) const -> Repeat
     case Frequency::yearly: {
         return Repeat::yearly;
     }
-    case Frequency::invalid: {
-        LOG_ERROR("Frequency invalid");
+    case Frequency::never: {
         return Repeat::never;
     }
     }
@@ -249,26 +331,67 @@ auto CalendarEventsHelper::eventsRecordFrom(ICalEvent &icalEvent) const -> Event
     return record;
 }
 
+auto CalendarEventsHelper::ICalEventFromJson(json11::Json eventObj) const -> ICalEvent
+{
+    ICalEvent icalEvent;
+    icalEvent.event.setUID(eventObj[json::calendar::event::uid].string_value());
+    icalEvent.event.setSummary(eventObj[json::calendar::event::summary].string_value());
+    icalEvent.event.setDTStart(eventObj[json::calendar::event::dtstart].string_value());
+    icalEvent.event.setDTEnd(eventObj[json::calendar::event::dtend].string_value());
+
+    icalEvent.rrule.setFrequency(
+        eventObj[json::calendar::event::recurrence_rule::rrule][json::calendar::event::recurrence_rule::frequency]
+            .string_value());
+    icalEvent.rrule.setCount(
+        eventObj[json::calendar::event::recurrence_rule::rrule][json::calendar::event::recurrence_rule::count]
+            .string_value());
+    icalEvent.rrule.setInterval(
+        eventObj[json::calendar::event::recurrence_rule::rrule][json::calendar::event::recurrence_rule::interval]
+            .string_value());
+
+    icalEvent.alarm.setTrigger(
+        eventObj[json::calendar::event::alarm::valarm][json::calendar::event::alarm::trigger].string_value());
+    icalEvent.alarm.setAction(
+        eventObj[json::calendar::event::alarm::valarm][json::calendar::event::alarm::action].string_value());
+
+    auto record = eventsRecordFrom(icalEvent);
+
+    return icalEvent;
+}
+
 auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 {
-    auto parser = std::make_shared<ParserICS>();
-    parser->loadData(context.getBody()[json::calendar::events::data].string_value());
-    auto icalEvents = parser->exportEvents();
+    auto eventsJsonObj   = context.getBody();
+    auto eventsJsonArray = eventsJsonObj[json::calendar::events].array_items();
+    bool ret             = true;
+    for (auto event : eventsJsonArray) {
 
-    bool ret = true;
-    for (auto event : icalEvents) {
-        auto UID    = event.event.getUID();
-        auto record = eventsRecordFrom(event);
-        auto query  = std::make_unique<db::query::events::Add>(record);
+        auto icalEvent = ICalEventFromJson(event);
 
+        if (!isICalEventValid(icalEvent)) {
+            context.setResponseStatus(http::Code::BadRequest);
+            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            return sys::ReturnCodes::Failure;
+        }
+
+        auto record = eventsRecordFrom(icalEvent);
+        if (record.UID.empty()) {
+            record.UID   = createUID();
+            auto jsonObj = json11::Json::object({{json::calendar::event::uid, record.UID}});
+            context.setResponseBody(jsonObj);
+        }
+        else {
+            LOG_ERROR("UID should not be recieved in put event endpoint. Recieved UID: %s", record.UID.c_str());
+            context.setResponseStatus(http::Code::BadRequest);
+            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            return sys::ReturnCodes::Failure;
+        }
+
+        auto query    = std::make_unique<db::query::events::Add>(record);
         auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, Context context) {
+            [&](db::QueryResult *result, Context context) {
                 if (auto EventResult = dynamic_cast<db::query::events::AddResult *>(result)) {
 
-                    auto jsonObj = json11::Json::object(
-                        {{json::calendar::events::data, parser->getIcsData()}, {json::calendar::events::UID, UID}});
-
-                    context.setResponseBody(jsonObj);
                     context.setResponseStatus(EventResult->getResult() ? http::Code::OK
                                                                        : http::Code::InternalServerError);
 
@@ -280,7 +403,9 @@ auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
             context);
 
         query->setQueryListener(std::move(listener));
-        ret = ret && DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+        const auto [succeed, _] =
+            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+        ret = ret && succeed;
     }
 
     if (ret) {
@@ -293,14 +418,19 @@ auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 
 auto CalendarEventsHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
 {
-    auto parser = std::make_unique<ParserICS>();
-    parser->loadData(context.getBody()[json::calendar::events::data].string_value());
-    auto icalEvents = parser->exportEvents();
+    auto eventsJsonObj = context.getBody();
 
     bool ret = true;
-    for (auto event : icalEvents) {
+    for (auto event : eventsJsonObj[json::calendar::events].array_items()) {
 
-        auto record   = eventsRecordFrom(event);
+        auto icalEvent = ICalEventFromJson(event);
+        if (!isICalEventValid(icalEvent) || icalEvent.event.getUID().empty()) {
+            context.setResponseStatus(http::Code::BadRequest);
+            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            return sys::ReturnCodes::Failure;
+        }
+
+        auto record   = eventsRecordFrom(icalEvent);
         auto query    = std::make_unique<db::query::events::EditICS>(record);
         auto listener = std::make_unique<db::EndpointListener>(
             [](db::QueryResult *result, Context context) {
@@ -315,7 +445,9 @@ auto CalendarEventsHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
             context);
 
         query->setQueryListener(std::move(listener));
-        ret = ret && DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+        const auto [succeed, _] =
+            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+        ret = ret && succeed;
     }
     if (ret) {
         return sys::ReturnCodes::Success;
@@ -327,7 +459,15 @@ auto CalendarEventsHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
 
 auto CalendarEventsHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
 {
-    auto UID      = context.getBody()[json::calendar::events::UID].string_value();
+    auto UID      = context.getBody()[json::calendar::event::uid].string_value();
+    auto checkUID = Event();
+    checkUID.setUID(UID);
+    if (!checkUID.isValid) {
+        LOG_ERROR("Wrong UID format. Provided UID: %s", UID.c_str());
+        context.setResponseStatus(http::Code::BadRequest);
+        MessageHandler::putToSendQueue(context.createSimpleResponse());
+        return sys::ReturnCodes::Failure;
+    }
     auto query    = std::make_unique<db::query::events::RemoveICS>(UID);
     auto listener = std::make_unique<db::EndpointListener>(
         [=](db::QueryResult *result, Context context) {
@@ -341,7 +481,7 @@ auto CalendarEventsHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
         context);
 
     query->setQueryListener(std::move(listener));
-    auto ret = DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
+    auto [ret, _] = DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
 
     if (ret) {
         return sys::ReturnCodes::Success;

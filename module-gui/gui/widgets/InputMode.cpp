@@ -8,10 +8,10 @@
 
 /// input mode strings - as these are stored in json (in files...)
 const std::map<InputMode::Mode, std::string> input_mode = {
-    {InputMode::digit, "common_kbd_numeric"},
-    {InputMode::ABC, "common_kbd_upper"},
-    {InputMode::abc, "common_kbd_lower"},
-    {InputMode::phone, "common_kbd_phone"},
+    {InputMode::digit, "numeric"},
+    {InputMode::ABC, "upper"},
+    {InputMode::abc, "lower"},
+    {InputMode::phone, "phone"},
 };
 
 static std::string getInputName(InputMode::Mode m)
@@ -61,7 +61,12 @@ void InputMode::next()
 
 const std::string &InputMode::get()
 {
-    return utils::localize.getInputLanguage(input_mode.at(modeNow()));
+    auto actualInputMode = input_mode.at(modeNow());
+    if (actualInputMode == input_mode.find(InputMode::digit)->second ||
+        actualInputMode == input_mode.find(InputMode::phone)->second) {
+        return input_mode.at(modeNow());
+    }
+    return utils::localize.getInputLanguage(actualInputMode);
 }
 
 void InputMode::show_input_type()

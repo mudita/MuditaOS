@@ -1,0 +1,14 @@
+@startuml
+participant "Service GUI" as gui
+participant "Context Pool" as pool
+participant "Service E Ink" as eink
+
+gui -> pool: Peek processed context
+gui -> eink: Display context
+return FinishedNotification
+gui -> pool: Return context
+group If next frame ready
+	gui -> eink: Display context
+end
+
+@enduml

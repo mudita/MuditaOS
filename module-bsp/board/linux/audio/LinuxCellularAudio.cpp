@@ -95,7 +95,7 @@ namespace bsp
         }
 
         if (inputBuffer) {
-            int16_t *pBuff = reinterpret_cast<int16_t *>(const_cast<void *>(inputBuffer));
+            int16_t *pBuff              = reinterpret_cast<int16_t *>(const_cast<void *>(inputBuffer));
             constexpr float scaleFactor = .1f;
             std::transform(pBuff, pBuff + framesToFetch, pBuff, [ptr, &scaleFactor](int16_t c) -> int16_t {
                 return static_cast<float>(c * ptr->currentFormat.inputGain * scaleFactor);
@@ -111,7 +111,7 @@ namespace bsp
 
             // Scale output buffer
             if (outputBuffer) {
-                int16_t *pBuff = reinterpret_cast<int16_t *>(outputBuffer);
+                int16_t *pBuff              = reinterpret_cast<int16_t *>(outputBuffer);
                 constexpr float scaleFactor = .1f;
                 std::transform(pBuff, pBuff + framesToFetch, pBuff, [ptr](int16_t c) -> int16_t {
                     return static_cast<float>(c * ptr->currentFormat.outputVolume / 10.f);
@@ -202,4 +202,23 @@ namespace bsp
             return false;
         }
     }
+
+    void LinuxCellularAudio::onDataReceive()
+    {}
+
+    void LinuxCellularAudio::onDataSend()
+    {}
+
+    void LinuxCellularAudio::enableInput()
+    {}
+
+    void LinuxCellularAudio::enableOutput()
+    {}
+
+    void LinuxCellularAudio::disableInput()
+    {}
+
+    void LinuxCellularAudio::disableOutput()
+    {}
+
 } // namespace bsp

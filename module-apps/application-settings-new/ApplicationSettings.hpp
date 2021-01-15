@@ -15,6 +15,7 @@ namespace gui::window::name
     inline constexpr auto add_device  = "AddDevice";
 
     inline constexpr auto network        = "Network";
+    inline constexpr auto apn_settings   = "APNSettings";
     inline constexpr auto phone_modes    = "PhoneModes";
     inline constexpr auto apps_and_tools = "AppsAndTools";
     inline constexpr auto security       = "Security";
@@ -64,6 +65,8 @@ namespace app
             virtual ~OperatorsSettings()                               = default;
             virtual void setOperatorsOn(bool value)                    = 0;
             [[nodiscard]] virtual bool getOperatorsOn() const noexcept = 0;
+            virtual void setVoLTEOn(bool value)                        = 0;
+            [[nodiscard]] virtual bool getVoLTEOn() const noexcept     = 0;
         };
     }; // namespace settingsInterface
 
@@ -93,12 +96,16 @@ namespace app
         void operatorOnChanged(const std::string &value);
         void setOperatorsOn(bool value) override;
         bool getOperatorsOn() const noexcept override;
+        void setVoLTEOn(bool value) override;
+        bool getVoLTEOn() const noexcept override;
+        void volteChanged(const std::string &value);
 
       private:
         Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
         std::string selectedSimNumber = {};
         bsp::Board board              = bsp::Board::none;
         bool operatorsOn              = false;
+        bool voLteStateOn             = false;
     };
 
     template <> struct ManifestTraits<ApplicationSettingsNew>

@@ -9,7 +9,9 @@
 #include <ListItemProvider.hpp>
 #include <module-db/Interface/EventsRecord.hpp>
 
-class DayEventsModel : public app::DatabaseModel<EventsRecord>, public gui::ListItemProvider
+class DayEventsModel : public app::DatabaseModel<EventsRecord>,
+                       public gui::ListItemProvider,
+                       public app::AsyncCallbackReceiver
 {
     app::Application *application = nullptr;
     std::string dayMonthTitle;

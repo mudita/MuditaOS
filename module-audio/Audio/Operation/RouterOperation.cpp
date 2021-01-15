@@ -25,17 +25,6 @@ namespace audio
         AddProfile(Profile::Type::RoutingHeadphones, PlaybackType::None, false);
         AddProfile(Profile::Type::RoutingEarspeaker, PlaybackType::None, true);
         AddProfile(Profile::Type::RoutingLoudspeaker, PlaybackType::None, true);
-
-        auto defaultProfile = GetProfile(Profile::Type::RoutingEarspeaker);
-        if (!defaultProfile) {
-            throw AudioInitException("Error during initializing profile", RetCode::ProfileNotSet);
-        }
-        currentProfile = defaultProfile;
-
-        auto retCode = SwitchToPriorityProfile();
-        if (retCode != RetCode::Success) {
-            throw AudioInitException("Failed to switch audio profile", retCode);
-        }
     }
 
     audio::RetCode RouterOperation::SetOutputVolume(float vol)
@@ -60,23 +49,37 @@ namespace audio
         operationToken = token;
         state          = State::Active;
 
-        if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
-            if (ret != bsp::AudioDevice::RetCode::Success) {
-                LOG_ERROR("Start error: %s", audio::str(audio::RetCode::DeviceFailure).c_str());
-            }
-        }
-        else {
+        // check if audio devices support desired audio format
+        if (!audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
             return RetCode::InvalidFormat;
         }
 
-        if (audioDeviceCellular->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            auto ret = audioDeviceCellular->Start(currentProfile->GetAudioFormat());
-            return GetDeviceError(ret);
-        }
-        else {
+        if (!audioDeviceCellular->IsFormatSupported(currentProfile->GetAudioFormat())) {
             return RetCode::InvalidFormat;
         }
+
+        // try to run devices with the format
+        if (auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+            ret != bsp::AudioDevice::RetCode::Success) {
+            return GetDeviceError(ret);
+        }
+
+        if (auto ret = audioDeviceCellular->Start(currentProfile->GetAudioFormat());
+            ret != bsp::AudioDevice::RetCode::Success) {
+            return GetDeviceError(ret);
+        }
+
+        // create audio connections
+        inputConnection =
+            std::make_unique<audio::StreamConnection>(audioDeviceCellular.get(), audioDevice.get(), dataStreamIn);
+        outputConnection =
+            std::make_unique<audio::StreamConnection>(audioDevice.get(), audioDeviceCellular.get(), dataStreamOut);
+
+        // enable audio connections
+        inputConnection->enable();
+        outputConnection->enable();
+
+        return audio::RetCode::Success;
     }
 
     audio::RetCode RouterOperation::Stop()
@@ -86,10 +89,14 @@ namespace audio
         }
 
         state = State::Idle;
+        outputConnection.reset();
+        inputConnection.reset();
+
         audioDevice->Stop();
         audioDeviceCellular->Stop();
-        dataStreamOut->reset();
-        dataStreamIn->reset();
+
+        audioDevice.reset();
+        audioDeviceCellular.reset();
 
         return RetCode::Success;
     }
@@ -101,8 +108,8 @@ namespace audio
         }
 
         state = State::Paused;
-        audioDevice->Stop();
-        audioDeviceCellular->Stop();
+        outputConnection->disable();
+        inputConnection->disable();
         return RetCode::Success;
     }
 
@@ -113,8 +120,8 @@ namespace audio
         }
 
         state = State::Active;
-        audioDevice->Start(currentProfile->GetAudioFormat());
-        audioDeviceCellular->Start(currentProfile->GetAudioFormat());
+        inputConnection->enable();
+        outputConnection->enable();
         return RetCode::Success;
     }
 
@@ -152,37 +159,38 @@ namespace audio
 
     audio::RetCode RouterOperation::SwitchProfile(const audio::Profile::Type type)
     {
-        auto ret = GetProfile(type);
-        if (ret) {
-            currentProfile = ret;
-        }
-        else {
+        auto newProfile     = GetProfile(type);
+        auto callInProgress = state == State::Active;
+
+        if (newProfile == nullptr) {
             return RetCode::UnsupportedProfile;
         }
 
-        audioDevice = CreateDevice(currentProfile->GetAudioDeviceType(), nullptr).value_or(nullptr);
+        if (currentProfile && currentProfile->GetType() == newProfile->GetType()) {
+            return RetCode::Success;
+        }
+
+        if (callInProgress) {
+            Stop();
+        }
+
+        audioDevice = CreateDevice(newProfile->GetAudioDeviceType(), nullptr).value_or(nullptr);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
         }
+
         audioDeviceCellular = CreateDevice(bsp::AudioDevice::Type::Cellular, nullptr).value_or(nullptr);
         if (audioDeviceCellular == nullptr) {
             LOG_ERROR("Error creating AudioDeviceCellular");
             return RetCode::Failed;
         }
 
-        audioDevice->source.connect(audioDeviceCellular->sink, *dataStreamIn);
-        audioDeviceCellular->source.connect(audioDevice->sink, *dataStreamOut);
+        // store new profile
+        currentProfile = newProfile;
 
-        switch (state) {
-        case State::Idle:
-        case State::Paused:
-            break;
-
-        case State::Active:
-            state = State::Idle;
-            Start(operationToken);
-            break;
+        if (callInProgress) {
+            return Start(operationToken);
         }
 
         return RetCode::Success;
@@ -197,6 +205,11 @@ namespace audio
     Position RouterOperation::GetPosition()
     {
         return 0.0;
+    }
+
+    RouterOperation::~RouterOperation()
+    {
+        Stop();
     }
 
 } // namespace audio

@@ -6,11 +6,9 @@
 #include <BaseInterface.hpp>
 #include <Common/Common.hpp>
 #include <Common/Query.hpp>
-#include <Interface/AlarmsRecord.hpp>
 #include <Interface/CalllogRecord.hpp>
 #include <Interface/ContactRecord.hpp>
 #include <Interface/NotesRecord.hpp>
-#include <Interface/SMSRecord.hpp>
 #include <Interface/SMSTemplateRecord.hpp>
 #include <Interface/ThreadRecord.hpp>
 #include <PhoneNumber.hpp>
@@ -41,26 +39,35 @@ class DBServiceAPI
   public:
     static constexpr unsigned int DefaultTimeoutInMs = 5000U;
 
-    enum ContactVerificationError
+    enum class ContactVerificationResult
     {
-        emptyContactError,
-        speedDialError,
-        primaryNumberError,
-        secondaryNumberError,
-        noError
+        emptyContact,
+        temporaryContactExists,
+        primaryNumberDuplicate,
+        secondaryNumberDuplicate,
+        speedDialDuplicate,
+        success
     };
 
-    static std::unique_ptr<ThreadRecord> ThreadGetByNumber(sys::Service *serv,
-                                                           const utils::PhoneNumber::View &phoneNumber,
-                                                           std::uint32_t timeout = DefaultTimeoutInMs);
-    static bool ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
-    static uint32_t ThreadGetCount(sys::Service *serv, EntryState state = EntryState::ALL);
+    static auto ThreadGetByNumber(sys::Service *serv,
+                                  const utils::PhoneNumber::View &phoneNumber,
+                                  std::uint32_t timeout = DefaultTimeoutInMs) -> std::unique_ptr<ThreadRecord>;
+    static auto ThreadGetCount(sys::Service *serv, EntryState state = EntryState::ALL) -> uint32_t;
 
-    static auto GetQuery(sys::Service *serv, db::Interface::Name database, std::unique_ptr<db::Query> query) -> bool;
-    static sys::SendResult GetQueryWithReply(sys::Service *serv,
-                                             db::Interface::Name database,
-                                             std::unique_ptr<db::Query> query,
-                                             std::uint32_t timeout);
+    /**
+     * Queries the database.
+     * @param serv      Sender service.
+     * @param database  Target database name.
+     * @param query     Query.
+     * @return A pair of: a flag that indicates whether query send was successful, and a message identifier that common
+     * for the query and its response.
+     */
+    static auto GetQuery(sys::Service *serv, db::Interface::Name database, std::unique_ptr<db::Query> query)
+        -> std::pair<bool, std::uint64_t>;
+    static auto GetQueryWithReply(sys::Service *serv,
+                                  db::Interface::Name database,
+                                  std::unique_ptr<db::Query> query,
+                                  std::uint32_t timeout) -> sys::SendResult;
 
     /**
      * @brief Function is checking if new contact can be added to database. Function is blocking.
@@ -75,19 +82,20 @@ class DBServiceAPI
      *
      * @note This function is blocking. It's checking until first error.
      */
-    static ContactVerificationError verifyContact(sys::Service *serv, const ContactRecord &rec);
-    static std::string getVerificationErrorString(const ContactVerificationError err);
-    static std::unique_ptr<std::vector<ContactRecord>> ContactGetByID(sys::Service *serv, uint32_t contactID);
-    static std::unique_ptr<std::vector<ContactRecord>> ContactGetByIDWithTemporary(sys::Service *serv,
-                                                                                   uint32_t contactID);
+    static auto verifyContact(sys::Service *serv, const ContactRecord &rec) -> ContactVerificationResult;
+    static auto ContactGetByID(sys::Service *serv, uint32_t contactID) -> std::unique_ptr<std::vector<ContactRecord>>;
+    static auto ContactGetByIDWithTemporary(sys::Service *serv, uint32_t contactID)
+        -> std::unique_ptr<std::vector<ContactRecord>>;
 
   private:
-    static std::unique_ptr<std::vector<ContactRecord>> ContactGetByIDCommon(
-        sys::Service *serv, std::shared_ptr<DBContactMessage> contactMsg);
+    static auto ContactGetByIDCommon(sys::Service *serv, std::shared_ptr<DBContactMessage> contactMsg)
+        -> std::unique_ptr<std::vector<ContactRecord>>;
 
   public:
-    static std::unique_ptr<std::vector<ContactRecord>> ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial);
-    static std::unique_ptr<std::vector<ContactRecord>> ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber);
+    static auto ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial)
+        -> std::unique_ptr<std::vector<ContactRecord>>;
+    static auto ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber)
+        -> std::unique_ptr<std::vector<ContactRecord>>;
 
     /**
      * @brief Matches single Contact by a provided phone number
@@ -96,24 +104,22 @@ class DBServiceAPI
      * @param numberView - number to match contact with
      * @return std::unique_ptr<ContactRecord>
      */
-    static std::unique_ptr<ContactRecord> MatchContactByPhoneNumber(sys::Service *serv,
-                                                                    const utils::PhoneNumber::View &numberView);
-    static bool ContactAdd(sys::Service *serv, const ContactRecord &rec);
-    static bool ContactRemove(sys::Service *serv, uint32_t id);
-    static bool ContactUpdate(sys::Service *serv, const ContactRecord &rec);
-    static std::unique_ptr<std::vector<ContactRecord>> ContactSearch(sys::Service *serv,
-                                                                     UTF8 primaryName,
-                                                                     UTF8 alternativeName,
-                                                                     UTF8 number);
+    static auto MatchContactByPhoneNumber(sys::Service *serv, const utils::PhoneNumber::View &numberView)
+        -> std::unique_ptr<ContactRecord>;
+    static auto ContactAdd(sys::Service *serv, const ContactRecord &rec) -> bool;
+    static auto ContactRemove(sys::Service *serv, uint32_t id) -> bool;
+    static auto ContactUpdate(sys::Service *serv, const ContactRecord &rec) -> bool;
+    static auto ContactSearch(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName, UTF8 number)
+        -> std::unique_ptr<std::vector<ContactRecord>>;
 
-    static CalllogRecord CalllogAdd(sys::Service *serv, const CalllogRecord &rec);
-    static bool CalllogRemove(sys::Service *serv, uint32_t id);
-    static bool CalllogUpdate(sys::Service *serv, const CalllogRecord &rec);
-    static uint32_t CalllogGetCount(sys::Service *serv, EntryState state = EntryState::ALL);
-    static bool CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
+    static auto CalllogAdd(sys::Service *serv, const CalllogRecord &rec) -> CalllogRecord;
+    static auto CalllogRemove(sys::Service *serv, uint32_t id) -> bool;
+    static auto CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -> bool;
+    static auto CalllogGetCount(sys::Service *serv, EntryState state = EntryState::ALL) -> uint32_t;
+    static auto CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit) -> bool;
 
     /* country codes */
-    static uint32_t GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc);
+    static auto GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc) -> uint32_t;
 
-    static bool DBBackup(sys::Service *serv, std::string backupPath);
+    static auto DBBackup(sys::Service *serv, std::string backupPath) -> bool;
 };

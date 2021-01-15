@@ -58,7 +58,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/battery-charger/battery_charger.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051Audiocodec.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051CellularAudio.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051BluetoothAudio.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/SAIAudioDevice.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/CodecMAX98090.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/qfilter.c"
 	"${USB_SRC}"
