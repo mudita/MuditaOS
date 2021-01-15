@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/statvfs.h>
 #include <sys/mount.h>
 #include <fcntl.h>
 
@@ -61,6 +62,7 @@ namespace
         __REAL_DECL(__fxstat64);
 
         __REAL_DECL(rename);
+        __REAL_DECL(statvfs);
     } // namespace real
 
     void __attribute__((constructor)) _lib_posix_initialize()
@@ -93,6 +95,7 @@ namespace
         __REAL_DLSYM(__fxstat64);
 
         __REAL_DLSYM(rename);
+        __REAL_DLSYM(statvfs);
 
         if (!(real::link && real::unlink
             && real::fcntl && real::fcntl64 && real::chdir && real::fchdir
@@ -100,7 +103,7 @@ namespace
             && real::chmod && real::chdir && real::fchdir && real::fsync && real::symlink
             && real::__xstat && real::__lxstat && real::__fxstat
             && real::__xstat64 && real::__lxstat64 && real::__fxstat64
-            && real::rename))
+            && real::rename && real::statvfs))
         {
             abort();
         }
@@ -584,4 +587,18 @@ extern "C" {
     }
     __asm__(".symver _iosys_umount,umount@GLIBC_2.2.5");
 
+    int _iosys_statvfs (const char *path, struct statvfs *vfstat)
+    {
+        TRACE_SYSCALL();
+        if (vfs::redirect_to_image(path)) {
+            return vfs::invoke_fs(__VFS(stat_vfs), path, *(struct statvfs*)vfstat);
+        }
+        else {
+            TRACE_SYSCALLN("(%s) -> linux fs", path);
+            char tmp[PATH_MAX];
+            const auto newp = vfs::npath_translate(path, tmp);
+            return real::statvfs(newp, vfstat);
+        }
+    }
+    __asm__(".symver _iosys_statvfs,statvfs@GLIBC_2.2.5");
 }

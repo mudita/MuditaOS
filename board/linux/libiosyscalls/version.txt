@@ -70,6 +70,7 @@ GLIBC_2.2.5 {
                 __fxstat64;
                 mount;
                 umount;
+                statvfs;
 
         local:
                 *;
