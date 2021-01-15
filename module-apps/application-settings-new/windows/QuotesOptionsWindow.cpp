@@ -3,6 +3,8 @@
 
 #include "QuotesOptionsWindow.hpp"
 #include "OptionSetting.hpp"
+#include "application-settings-new/model/QuotesRepository.hpp"
+#include "application-settings-new/ApplicationSettings.hpp"
 #include "DialogMetadataMessage.hpp"
 #include "QuotesMainWindow.hpp"
 #include "application-settings-new/model/QuotesRepository.hpp"
