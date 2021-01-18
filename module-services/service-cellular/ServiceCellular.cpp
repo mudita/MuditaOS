@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularUrcHandler.hpp"
@@ -94,12 +94,18 @@ const char *State::c_str(State::ST state)
     switch (state) {
     case ST::Idle:
         return "Idle";
+    case ST::WaitForStartPermission:
+        return "WaitForStartPermission";
+    case ST::PowerUpRequest:
+        return "PowerUpRequest";
     case ST::StatusCheck:
         return "StatusCheck";
     case ST::PowerUpInProgress:
         return "PowerUpInProgress";
     case ST::PowerUpProcedure:
         return "PowerUpProcedure";
+    case ST::BaudDetect:
+        return "BaudDetect";
     case ST::AudioConfigurationProcedure:
         return "AudioConfigurationProcedure";
     case ST::APNConfProcedure:
@@ -226,21 +232,8 @@ void ServiceCellular::CallStateTimerHandler()
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
     board = EventManagerServiceAPI::GetBoard(this);
-    cmux->SelectAntenna(bsp::cellular::antenna::lowBand);
-    switch (board) {
-    case bsp::Board::T4:
-        state.set(this, State::ST::StatusCheck);
-        break;
-    case bsp::Board::T3:
-        state.set(this, State::ST::PowerUpProcedure);
-        break;
-    case bsp::Board::Linux:
-        state.set(this, State::ST::PowerUpProcedure);
-        break;
-    default:
-        return sys::ReturnCodes::Failure;
-        break;
-    }
+
+    state.set(this, State::ST::WaitForStartPermission);
     return sys::ReturnCodes::Success;
 }
 
@@ -345,6 +338,12 @@ void ServiceCellular::registerMessageHandlers()
         return std::make_shared<CellularResponseMessage>(true);
     });
 
+    connect(typeid(CellularPowerStateChange), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg       = static_cast<CellularPowerStateChange *>(request);
+        nextPowerState = msg->getNewState();
+        handle_power_state_change();
+        return sys::MessageNone{};
+    });
     handle_CellularGetChannelMessage();
 }
 
@@ -385,6 +384,12 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
     case State::ST::Idle:
         handle_idle();
         break;
+    case State::ST::WaitForStartPermission:
+        handle_wait_for_start_permission();
+        break;
+    case State::ST::PowerUpRequest:
+        handle_power_up_request();
+        break;
     case State::ST::StatusCheck:
         handle_status_check();
         break;
@@ -393,6 +398,14 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
         break;
     case State::ST::PowerUpProcedure:
         handle_power_up_procedure();
+        break;
+    case State::ST::BaudDetect:
+        if (nextPowerStateChangeAwaiting) {
+            handle_power_state_change();
+        }
+        else {
+            handle_baud_detect();
+        }
         break;
     case State::ST::AudioConfigurationProcedure:
         handle_audio_conf_procedure();
@@ -435,6 +448,9 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
         break;
     case State::ST::PowerDown:
         handle_power_down();
+        if (nextPowerStateChangeAwaiting) {
+            handle_power_state_change();
+        }
         break;
     };
 }
@@ -442,6 +458,34 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
 bool ServiceCellular::handle_idle()
 {
     LOG_DEBUG("Idle");
+    return true;
+}
+
+bool ServiceCellular::handle_wait_for_start_permission()
+{
+    auto msg = std::make_shared<CellularCheckIfStartAllowedMessage>();
+    sys::Bus::SendUnicast(msg, service::name::system_manager, this);
+
+    return true;
+}
+
+bool ServiceCellular::handle_power_up_request()
+{
+    cmux->SelectAntenna(bsp::cellular::antenna::lowBand);
+    switch (board) {
+    case bsp::Board::T4:
+        state.set(this, State::ST::StatusCheck);
+        break;
+    case bsp::Board::T3:
+        state.set(this, State::ST::PowerUpProcedure);
+        break;
+    case bsp::Board::Linux:
+        state.set(this, State::ST::PowerUpProcedure);
+        break;
+    case bsp::Board::none:
+        return false;
+        break;
+    }
     return true;
 }
 
@@ -510,6 +554,13 @@ bool ServiceCellular::handle_power_up_in_progress_procedure(void)
         vTaskDelay(pdMS_TO_TICKS(msModemUartInitTime));
         isAfterForceReboot = false;
     }
+
+    state.set(this, cellular::State::ST::BaudDetect);
+    return true;
+}
+
+bool ServiceCellular::handle_baud_detect()
+{
     auto ret = cmux->BaudDetectProcedure();
     if (ret == TS0710::ConfState::Success) {
         state.set(this, cellular::State::ST::CellularConfProcedure);
@@ -552,7 +603,7 @@ bool ServiceCellular::handle_power_down()
     isAfterForceReboot = true;
     cmux.reset();
     cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
-    InitHandler();
+
     return true;
 }
 
@@ -1972,6 +2023,50 @@ void ServiceCellular::handleStateTimer(void)
         stopStateTimer();
         LOG_FATAL("State %s timeout occured!", state.c_str(state.get()));
         state.set(this, cellular::State::ST::ModemFatalFailure);
+    }
+}
+
+void ServiceCellular::handle_power_state_change()
+{
+    nextPowerStateChangeAwaiting = false;
+    auto modemActive             = cmux->IsModemActive();
+
+    if (nextPowerState == State::PowerState::On) {
+        if (state.get() == State::ST::PowerDownWaiting) {
+            LOG_DEBUG("Powerdown in progress. Powerup request queued.");
+            nextPowerStateChangeAwaiting = true;
+        }
+        else if (state.get() == State::ST::PowerUpProcedure || state.get() == State::ST::PowerUpInProgress) {
+            LOG_DEBUG("Powerup already in progress");
+        }
+        else if (state.get() == State::ST::PowerDown || state.get() == State::ST::WaitForStartPermission) {
+            LOG_INFO("Modem Power UP.");
+            state.set(this, State::ST::PowerUpRequest);
+        }
+        else {
+            LOG_DEBUG("Modem already powered up.");
+        }
+    }
+    else {
+        if (state.get() == State::ST::PowerUpProcedure || state.get() == State::ST::PowerUpInProgress) {
+            LOG_DEBUG("Powerup in progress. Powerdown request queued.");
+            nextPowerStateChangeAwaiting = true;
+        }
+        else if (state.get() == State::ST::PowerDownWaiting) {
+            LOG_DEBUG("Powerdown already in progress.");
+        }
+        else if (state.get() == State::ST::PowerDown) {
+            LOG_DEBUG("Modem already powered down.");
+        }
+        else if (state.get() == State::ST::WaitForStartPermission && !modemActive) {
+            LOG_DEBUG("Modem already powered down.");
+            state.set(this, State::ST::PowerDown);
+        }
+        else {
+            LOG_INFO("Modem Power DOWN.");
+            cmux->TurnOffModem();
+            state.set(this, State::ST::PowerDownWaiting);
+        }
     }
 }
 

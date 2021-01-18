@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -142,6 +142,22 @@ class CellularSetOperatorMessage : public sys::Message
     {
         return name;
     }
+};
+
+class CellularPowerStateChange : public CellularMessage
+{
+  public:
+    explicit CellularPowerStateChange(cellular::State::PowerState new_state)
+        : CellularMessage(MessageType::CellularPowerStateChange), newState(new_state)
+    {}
+
+    cellular::State::PowerState getNewState() const noexcept
+    {
+        return newState;
+    }
+
+  private:
+    cellular::State::PowerState newState;
 };
 
 class CellularStartOperatorsScanMessage : public CellularMessage
@@ -715,6 +731,12 @@ class CellularChangeVoLTEDataMessage : public CellularVoLTEDataMessage
     {}
 };
 
+class CellularCheckIfStartAllowedMessage : public sys::Message
+{
+  public:
+    CellularCheckIfStartAllowedMessage() : sys::Message()
+    {}
+};
 namespace cellular
 {
 

@@ -29,6 +29,7 @@
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-utils/magic_enum/include/magic_enum.hpp>
+#include <SystemManager/messages/SystemManagerMessage.hpp>
 
 #include <cassert>
 namespace app
@@ -80,6 +81,11 @@ namespace app
 
         addActionReceiver(app::manager::actions::ShowMMIResult, [this](auto &&data) {
             switchWindow(app::window::name::desktop_mmi_internal, std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::DisplayLowBatteryNotification, [this](auto &&data) {
+            handleLowBatteryNotification(std::move(data));
             return msgHandled();
         });
     }
@@ -386,6 +392,16 @@ namespace app
         }
         else {
             lockPassHash = 0;
+        }
+    }
+
+    void ApplicationDesktop::handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data)
+    {
+        auto actionData               = static_cast<manager::actions::LowBatteryNotificationParams *>(data.get());
+        notifications.batteryLowLevel = actionData->getActiveState();
+        auto currentWindow            = getCurrentWindow();
+        if (currentWindow->getName() == window::name::desktop_main_window) {
+            currentWindow->rebuild();
         }
     }
 

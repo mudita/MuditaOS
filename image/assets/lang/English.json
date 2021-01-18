@@ -217,6 +217,7 @@
   "app_desktop_screen_blocked_info": "Sorry, phone blocked",
   "app_desktop_press_to_unlock": "<text>Press <b>Unlock</b> and then <b>#</b></text>",
   "app_desktop_unread_messages": "<text>Unread <b>messages</b></text>",
+  "app_desktop_low_battery_notification": "<text>low battery level - GSM off</text>",
   "app_desktop_missed_calls": "<text>Missed <b>calls</b></text>",
   "app_desktop_menu_phone": "PHONE",
   "app_desktop_menu_contacts": "CONTACTS",
