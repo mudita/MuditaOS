@@ -73,6 +73,7 @@ methods:
     * `wait` - timeout
     
 #### Example
+
 ```python
 from harness.harness import Harness
 from harness.interface.defs import key_codes
@@ -81,20 +82,21 @@ from harness.interface.defs import key_codes
 harness = Harness.from_detect()
 
 # get current application name
-current_window = harness.get_window_name()
+current_window = harness.get_application_name()
 
-#open messages when phone is unlocked
+
+# open messages when phone is unlocked
 @harness.with_phone_unlocked
 def do_after_unlock(connection):
-    # open menu
-    connection.send_key_code(key_codes["enter"])
+  # open menu
+  connection.send_key_code(key_codes["enter"])
 
-    harness.open_application("messages")
-    # send joystick down keypress
-    connection.send_key_code(key_codes["down"])
+  harness.open_application("messages")
+  # send joystick down keypress
+  connection.send_key_code(key_codes["down"])
 
-    # open a thread
-    connection.send_key_code(key_codes["enter"])
+  # open a thread
+  connection.send_key_code(key_codes["enter"])
 ```
 
 ### pyTest running
