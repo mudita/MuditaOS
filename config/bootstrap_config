@@ -51,8 +51,11 @@ INSTALL_PACKAGES="
         python3-magic \
         python3-pip \
         python3-requests \
+        rhash \
         tzdata \
+        tar \
         vim \
         wget \
+        zip \
 "
 
