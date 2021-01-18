@@ -1,34 +1,54 @@
 # MuditaOS changelog
 
-## Latest Changes
+## [0.53.2 2020-01-15]
+
 ### Added
 
-* GSM module turnoff with low battery.
-* Battery Brownout detection
-* VoLTE ON/OFF switch in Settings Network window
-* Add PLL2 clock switching
-* Support for asynchronous callbacks on application side.
-* APN settings window - empty.
-* Bluetooth settings middleware layer
-* Add firmware update test
-
+* Add hardware in the loop tests.
+* Add empty APN settings window.
 
 ### Changed
 
-* Input keyboard language files parser from KBD to JSON.
-* Input language files are now loaded based on files in "profiles" folder.
-* Minimum CPU frequency is now 132 MHz
-* Icon widget now accepts rich text.
-* Change default gain values for audio input.
+* Improve clock scaling and power management.
+* Load input language from a file.
+* Improve English messages displayed to the user when managing contacts list and messages.
+* Change gain settings in the audio path to reduce echo.
 
 ### Fixed
 
-* Fix menu notification dot
-* Fix absent notifications
-* Fix newly added contact recognized as a duplicate of temporary contact.
-* Fix default borderCallback navigation in GridLayout.
-* Fix crash on enter Settings -> Information.
-* Fix keyboard mode in the search windows.
+* Fix crash when displaying system information window in settings.
+* Fix not audible outgoing voice during calls.
+* Fix crashing on multiple headphones connect-disconnect events.
+* Fix keyboard input mode in the search windows.
+* Fix missing notification dot when receiving a new message.
+
+### Other
+
+* Add GUI service documentation.
+* Fix query-callback synchronization mechanism.
+* Remove the requirement to start a commit message with the "Change" verb.
+
+## [0.53.1 2020-01-11]
+
+### Added
+
+* Add battery brownout detection.
+* Add several improvements to power saving.
+* Add APN settings.
+
+### Changed
+
+* Change battery icons.
+
+### Fixed
+
+* Fix duplicated actions due to an error in events generation.
+
+### Other
+
+* Several changes related to the change of the filesystem.
+* Switch to JSON format for localization files.
+* Documentation fixes.
 
 ## [0.52.1 2020-12-23]
 
@@ -39,20 +59,16 @@
 * Add custom repeat window for the alarm application.
 * Add GUI for custom MMI messages.
 * Add CPU frequency shift mechanism to save power.
-* Add oscillator clock switching mechanisms.
 
 ### Fixed
 
 * Fix auto-unlocking screen on idle.
 * Fix missing texts in the desktop application.
 * Fix occasional cases of no audio during an incoming call.
-* Charging state icons in simulator
-* Fix Debug UART conditional enabling
 
 ### Changed
 
 * Torch light control button press time recognition.
-* New battery icons
 
 ### Other
 
