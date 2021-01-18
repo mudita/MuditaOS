@@ -49,6 +49,12 @@ namespace gui::window::name
     inline constexpr auto dialog_settings    = "DialogSettings";
     inline constexpr auto change_passcode    = "ChangePasscode";
 
+    inline constexpr auto language        = "Language";
+    inline constexpr auto date_and_time   = "DateAndTime";
+    inline constexpr auto factory_reset   = "FactoryReset";
+    inline constexpr auto about_your_pure = "AboutYourPure";
+    inline constexpr auto certification   = "Certification";
+
 } // namespace gui::window::name
 
 namespace app
