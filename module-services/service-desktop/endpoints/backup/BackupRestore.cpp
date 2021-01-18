@@ -105,8 +105,14 @@ bool BackupRestore::CreateBackupDir()
     LOG_INFO("CreateBackupDir: creating backup directory %s...", backupOSPath.c_str());
 
     if (!std::filesystem::is_directory(backupOSPath.c_str())) {
-        if (!std::filesystem::create_directory(backupOSPath.c_str())) {
-            LOG_ERROR("CreateBackupDir: creating backup directory %s failed.", backupOSPath.c_str());
+        try {
+            if (!std::filesystem::create_directory(backupOSPath.c_str())) {
+                LOG_ERROR("CreateBackupDir: creating backup directory %s failed.", backupOSPath.c_str());
+                return false;
+            }
+        }
+        catch (const std::filesystem::filesystem_error &err) {
+            LOG_FATAL("Exception while creating dir %s", backupOSPath.c_str());
             return false;
         }
     }

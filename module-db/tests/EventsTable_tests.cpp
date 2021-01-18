@@ -165,11 +165,11 @@ TEST_CASE("Events Table tests")
         }
         CHECK(eventsTbl.count() == 0);
 
-        uint32_t numberOfEvents       = 7;
-        TimePoint startDate           = TimePointFromString("2019-10-20 14:30:00");
-        TimePoint endDate             = TimePointFromString("2019-10-20 15:30:00");
-        testRow1.date_from            = startDate;
-        testRow1.date_till            = endDate;
+        uint32_t numberOfEvents = 7;
+        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
+        testRow1.date_from      = startDate;
+        testRow1.date_till      = endDate;
         CHECK(eventsTbl.addDaily(testRow1));
         CHECK(eventsTbl.count() == numberOfEvents);
 
@@ -200,11 +200,11 @@ TEST_CASE("Events Table tests")
         }
         CHECK(eventsTbl.count() == 0);
 
-        uint32_t numberOfEvents       = 4;
-        TimePoint startDate           = TimePointFromString("2019-10-20 14:30:00");
-        TimePoint endDate             = TimePointFromString("2019-10-20 15:30:00");
-        testRow1.date_from            = startDate;
-        testRow1.date_till            = endDate;
+        uint32_t numberOfEvents = 4;
+        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
+        testRow1.date_from      = startDate;
+        testRow1.date_till      = endDate;
         CHECK(eventsTbl.addWeekly(testRow1));
         CHECK(eventsTbl.count() == numberOfEvents);
 
@@ -235,11 +235,11 @@ TEST_CASE("Events Table tests")
         }
         CHECK(eventsTbl.count() == 0);
 
-        uint32_t numberOfEvents       = 4;
-        TimePoint startDate           = TimePointFromString("2019-10-20 14:30:00");
-        TimePoint endDate             = TimePointFromString("2019-10-20 15:30:00");
-        testRow1.date_from            = startDate;
-        testRow1.date_till            = endDate;
+        uint32_t numberOfEvents = 4;
+        TimePoint startDate     = TimePointFromString("2019-10-20 14:30:00");
+        TimePoint endDate       = TimePointFromString("2019-10-20 15:30:00");
+        testRow1.date_from      = startDate;
+        testRow1.date_till      = endDate;
         CHECK(eventsTbl.addTwoWeeks(testRow1));
         CHECK(eventsTbl.count() == numberOfEvents);
 
@@ -438,9 +438,9 @@ TEST_CASE("Events Table tests")
         {
             uint32_t customRepeatOption =
                 static_cast<uint32_t>(weekDayOption::monday) + static_cast<uint32_t>(weekDayOption::wednesday);
-            uint32_t numberOfEvents               = 9;
-            TimePoint originalStartDate           = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            TimePoint originalEndDate             = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            uint32_t numberOfEvents     = 9;
+            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
@@ -450,19 +450,19 @@ TEST_CASE("Events Table tests")
             uint32_t customRepeatOption =
                 static_cast<uint32_t>(weekDayOption::monday) + static_cast<uint32_t>(weekDayOption::wednesday) +
                 static_cast<uint32_t>(weekDayOption::tuesday) + static_cast<uint32_t>(weekDayOption::sunday);
-            uint32_t numberOfEvents               = 17;
-            TimePoint originalStartDate           = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            TimePoint originalEndDate             = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            uint32_t numberOfEvents     = 17;
+            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
 
         SECTION("Repeat Saturdays (original thursday)")
         {
-            uint32_t customRepeatOption           = static_cast<uint32_t>(weekDayOption::saturday);
-            uint32_t numberOfEvents               = 5;
-            TimePoint originalStartDate           = TimePointFromString("2020-12-10 14:30:00"); // thursday
-            TimePoint originalEndDate             = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            uint32_t customRepeatOption = static_cast<uint32_t>(weekDayOption::saturday);
+            uint32_t numberOfEvents     = 5;
+            TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
+            TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }
@@ -516,10 +516,10 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 6);
 
         std::string newTitle = "Updated Title", newProviderID = "PurePhoneUpdated";
-        TimePoint newDateFrom           = TimePointFromString("2020-10-20 15:00:00"),
-                  newDateTill           = TimePointFromString("2020-10-20 16:00:00");
-        uint32_t newReminder            = static_cast<uint32_t>(Reminder::one_week_before);
-        uint32_t newRepeatOption        = static_cast<uint32_t>(Repeat::biweekly);
+        TimePoint newDateFrom    = TimePointFromString("2020-10-20 15:00:00"),
+                  newDateTill    = TimePointFromString("2020-10-20 16:00:00");
+        uint32_t newReminder     = static_cast<uint32_t>(Reminder::one_week_before);
+        uint32_t newRepeatOption = static_cast<uint32_t>(Repeat::biweekly);
 
         /// check title and provider id update
         auto entryToUpdate        = eventsTbl.getById(testRow6.ID);
@@ -571,11 +571,11 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 6);
 
         std::string newTitle = "Updated Title", newProviderType = "PurePhoneUpdate", newProviderID = "newID",
-                    newProvideriCalUid  = "new iCalUid";
-        TimePoint newDateFrom           = TimePointFromString("2020-10-20 15:00:00"),
-                  newDateTill           = TimePointFromString("2020-10-20 16:00:00");
-        uint32_t newReminder            = static_cast<uint32_t>(Reminder::one_week_before);
-        uint32_t newRepeatOption        = static_cast<uint32_t>(Repeat::biweekly);
+                    newProvideriCalUid = "new iCalUid";
+        TimePoint newDateFrom          = TimePointFromString("2020-10-20 15:00:00"),
+                  newDateTill          = TimePointFromString("2020-10-20 16:00:00");
+        uint32_t newReminder           = static_cast<uint32_t>(Reminder::one_week_before);
+        uint32_t newRepeatOption       = static_cast<uint32_t>(Repeat::biweekly);
 
         /// check title and provider id update
         auto entryToUpdate             = eventsTbl.getById(testRow6.ID);
@@ -629,11 +629,11 @@ TEST_CASE("Events Table tests")
         CHECK(eventsTbl.count() == 6);
 
         std::string newTitle = "Updated Title", newProviderType = "PurePhoneUpdate", newProviderID = "newID",
-                    newProvideriCalUid  = "new iCalUid";
-        TimePoint newDateFrom           = TimePointFromString("2020-10-20 15:00:00"),
-                  newDateTill           = TimePointFromString("2020-10-20 16:00:00");
-        uint32_t newReminder            = static_cast<uint32_t>(Reminder::one_week_before);
-        uint32_t newRepeatOption        = static_cast<uint32_t>(Repeat::biweekly);
+                    newProvideriCalUid = "new iCalUid";
+        TimePoint newDateFrom          = TimePointFromString("2020-10-20 15:00:00"),
+                  newDateTill          = TimePointFromString("2020-10-20 16:00:00");
+        uint32_t newReminder           = static_cast<uint32_t>(Reminder::one_week_before);
+        uint32_t newRepeatOption       = static_cast<uint32_t>(Repeat::biweekly);
 
         /// check title and provider id update
         auto entryToUpdate             = eventsTbl.getByUID(testRow6.UID);
