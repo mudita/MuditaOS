@@ -144,8 +144,14 @@ namespace FactoryReset
 
                 LOG_INFO("FactoryReset: restoring dir  %s into %s...", sourcepath.c_str(), targetpath.c_str());
 
-                if (std::filesystem::create_directory(targetpath.c_str())) {
-                    LOG_ERROR("FactoryReset: create dir %s failed", targetpath.c_str());
+                try {
+                    if (std::filesystem::create_directory(targetpath.c_str())) {
+                        LOG_ERROR("FactoryReset: create dir %s failed", targetpath.c_str());
+                        return false;
+                    }
+                }
+                catch (const std::filesystem::filesystem_error &err) {
+                    LOG_FATAL("Exception while creating dir %s", targetpath.c_str());
                     return false;
                 }
 

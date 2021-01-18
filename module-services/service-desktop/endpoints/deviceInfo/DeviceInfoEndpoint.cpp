@@ -40,7 +40,7 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
         return false;
     }
     auto totalMbytes = (vfstat.f_frsize * vfstat.f_blocks) / 1024LLU / 1024LLU;
-    auto freeMbytes  = (vfstat.f_ffree * vfstat.f_bsize) / 1024LLU / 1024LLU;
+    auto freeMbytes  = (vfstat.f_bfree * vfstat.f_bsize) / 1024LLU / 1024LLU;
     auto freePercent = (freeMbytes * 100) / totalMbytes;
 
     context.setResponseBody(json11::Json::object(
