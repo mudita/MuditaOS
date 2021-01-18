@@ -26,7 +26,7 @@ namespace gui
                 option::SettingRightItem::ArrowWhite));
         };
 
-        addOption("app_settings_language", gui::window::name::language);
+        addOption("app_settings_language", gui::window::name::languages);
         addOption("app_settings_date_and_time", gui::window::name::date_and_time);
         addOption("app_settings_factory_reset", gui::window::name::factory_reset);
         addOption("app_settings_about_your_pure", gui::window::name::about_your_pure);

@@ -141,6 +141,11 @@ namespace gui
         }
     }
 
+    void ListView::setFocusOnElement(unsigned int elementNumber)
+    {
+        body->setFocusOnElement(elementNumber);
+    }
+
     void ListView::setProvider(std::shared_ptr<ListItemProvider> prov)
     {
         if (prov != nullptr) {
