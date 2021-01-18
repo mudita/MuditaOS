@@ -26,9 +26,9 @@ namespace
                                         "/run/user",
                                         "/home",
                                         "/proc",
-                                        "/dev/shm",
                                         "PurePhone.img",
                                         "MuditaOS.log",
+                                        "/tmp",
                                         nullptr};
 
     constexpr const char *IMAGE_PATHS[]{"/sys", nullptr};
