@@ -15,12 +15,13 @@
 namespace {
     constexpr auto ENV_NAME = "IOSYSCALLS_REDIRECT_TO_IMAGE";
     constexpr auto FIRST_FILEDESC = 64'566'756;
-    bool g_readed = false ;
+    bool g_readed = false;
     bool g_redirect = false;
-    constexpr const char * ALLOWED_PATHS[] = {
+
+    constexpr const char * LINUX_PATHS[] {
         "/dev/",
         "/etc/",
-        "/sys/",
+        "/sys/.boot.json",
         "/usr/share",
         "/run/user",
         "/home",
@@ -28,22 +29,11 @@ namespace {
         "/dev/shm",
         "PurePhone.img",
         "MuditaOS.log",
-        nullptr,
-    };
-    constexpr const char * EXCLUDED_PATHS[] = {
-        "/sys/user",
-        "/sys/factory-test",
-        "/sys/current/assets",
-        "/sys/updates",
-        nullptr,
+        nullptr
     };
 
-    constexpr const char * TRANSLATION_PATHS[] =
-    {
-        "sys/user",
-        "sys/factory-test",
-        "assets",
-        "sys/updates",
+    constexpr const char * IMAGE_PATHS[] {
+        "/sys",
         nullptr
     };
 
@@ -66,37 +56,23 @@ namespace vfsn::linux::internal
 
     bool redirect_to_image(const char* inpath)
     {
-        auto native_redirect = redirect_to_image();
-        auto redirect = native_redirect;
-        if(native_redirect) {
-            for(auto path=ALLOWED_PATHS; *path; ++path) {
-                if( std::strstr(inpath,*path)==inpath) {
-                    redirect = false;
-                    break;
-                }
-            }
-        }
-        if(native_redirect && !redirect)
-        {
-            for(auto path=EXCLUDED_PATHS; *path; ++path) {
-                if( std::strstr(inpath,*path)==inpath) {
-                    redirect = true;
-                    break;
-                }
-            }
-        }
-        return redirect;
+        if (!redirect_to_image())
+            return false;
+
+        for(auto path=LINUX_PATHS; *path; ++path)
+            if( std::strstr(inpath,*path)==inpath)
+                return false;
+
+        return true;
     }
 
     const char* npath_translate(const char* inpath, char *buffer)
     {
-        for(size_t trans_pos=0; EXCLUDED_PATHS[trans_pos]; ++trans_pos) {
-            if( std::strstr(inpath,EXCLUDED_PATHS[trans_pos])==inpath) {
-                std::strncpy(buffer,TRANSLATION_PATHS[trans_pos],PATH_MAX);
-                std::strncat(buffer,inpath+std::strlen(EXCLUDED_PATHS[trans_pos]), PATH_MAX);
+        for(auto path=IMAGE_PATHS; *path; ++path)
+            if(std::strstr(inpath, *path) == inpath) {
+                std::strncpy(buffer, inpath + 1, PATH_MAX);
                 return buffer;
             }
-        }
         return inpath;
     }
 
