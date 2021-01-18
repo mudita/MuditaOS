@@ -19,4 +19,6 @@ namespace EventManagerServiceAPI
      * @return board type
      */
     bsp::Board GetBoard(sys::Service *serv);
+
+    void checkBatteryLevelCriticalState(sys::Service *serv);
 } // namespace EventManagerServiceAPI

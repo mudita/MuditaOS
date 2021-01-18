@@ -10,6 +10,7 @@
 #include <Service/Message.hpp>
 #include <Service/Timer.hpp>
 #include <SystemManager/SystemManager.hpp>
+#include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <application-call/ApplicationCall.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <i18n/i18n.hpp>
@@ -246,6 +247,7 @@ namespace app::manager
         connect(typeid(CellularMMIResultMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIPushMessage), convertibleToActionHandler);
+        connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
