@@ -23,7 +23,7 @@ namespace gui
         std::shared_ptr<OptionsModel> optionsModel = nullptr;
         ListView *optionsList                      = nullptr;
         std::list<Option> options;
-        void addOptions(std::list<Option> &optionList);
+        virtual void addOptions(std::list<Option> &optionList);
         void addOptions(std::list<Option> &&optionList);
         void resetOptions(std::list<Option> &&optionList);
 
