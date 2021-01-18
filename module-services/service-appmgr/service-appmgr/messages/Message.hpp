@@ -16,3 +16,5 @@
 #include "PowerSaveModeInitRequest.hpp"
 #include "PreventBlockingRequest.hpp"
 #include "ShutdownRequest.hpp"
+#include "GetCurrentDisplayLanguageRequest.hpp"
+#include "GetCurrentDisplayLanguageResponse.hpp"
