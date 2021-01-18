@@ -165,5 +165,5 @@ int main()
 
     cpp_freertos::Thread::StartScheduler();
 
-    return 1;
+    return 0;
 }

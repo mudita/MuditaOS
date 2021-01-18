@@ -19,9 +19,9 @@ def test_send_message(harness, phone_number, sms_text):
     # enter menu
     harness.connection.send_key_code(key_codes["enter"])
     harness.open_application("messages")
-    if harness.connection.get_window_name() != "ApplicationMessages":
+    if harness.connection.get_application_name() != "ApplicationMessages":
         time.sleep(2)
-        assert harness.connection.get_window_name() == "ApplicationMessages"
+        assert harness.connection.get_application_name() == "ApplicationMessages"
 
     # create new message
     harness.connection.send_key_code(key_codes["left"])

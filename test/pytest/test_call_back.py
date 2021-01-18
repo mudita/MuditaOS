@@ -19,9 +19,9 @@ def test_call(harness, call_duration):
     # enter menu
     harness.connection.send_key_code(key_codes["enter"])
     harness.open_application("calllog")
-    if harness.connection.get_window_name() != "ApplicationCallLog":
+    if harness.connection.get_application_name() != "ApplicationCallLog":
         time.sleep(2)
-        assert harness.connection.get_window_name() == "ApplicationCallLog"
+        assert harness.connection.get_application_name() == "ApplicationCallLog"
 
     # call
     harness.connection.send_key_code(key_codes["fnLeft"])
