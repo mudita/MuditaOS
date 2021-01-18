@@ -29,5 +29,5 @@ def test_backup(harness):
     body = {"backupUpload": True}
     ret = harness.endpoint_request("backup", "post", body)
     assert ret["status"] == status["OK"]
-    assert ret["body"]["backupUpload"] is False
+    assert ret["body"]["backupUpload"] is True
 
