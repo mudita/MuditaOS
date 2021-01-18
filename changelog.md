@@ -1,5 +1,11 @@
 # MuditaOS changelog
 
+## [0.54.1 2020-01-18]
+
+## Fixed
+
+* Fix settings broken by the accidentally removed script.
+
 ## [0.53.2 2020-01-15]
 
 ### Added
