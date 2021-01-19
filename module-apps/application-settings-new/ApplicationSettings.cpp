@@ -39,9 +39,9 @@
 #include <service-bluetooth/service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
-#include <application-settings-new/data/BondedDevicesData.hpp>
-#include <application-settings-new/data/PhoneNameData.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
+#include <application-settings-new/data/ApnListData.hpp>
+#include <application-settings-new/data/BondedDevicesData.hpp>
 #include <application-settings-new/data/PhoneNameData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
@@ -143,6 +143,17 @@ namespace app
                 auto bondedDevicesData =
                     std::make_unique<gui::BondedDevicesData>(responseBondedDevicesMsg->getDevices());
                 switchWindow(gui::window::name::all_devices, std::move(bondedDevicesData));
+            }
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(CellularGetAPNResponse), [&](sys::Message *msg) {
+            if (gui::window::name::apn_settings == getCurrentWindow()->getName()) {
+                auto apns = dynamic_cast<CellularGetAPNResponse *>(msg);
+                if (apns != nullptr) {
+                    auto apnsData = std::make_unique<gui::ApnListData>(apns->getAPNs());
+                    switchWindow(gui::window::name::apn_settings, std::move(apnsData));
+                }
             }
             return sys::MessageNone{};
         });

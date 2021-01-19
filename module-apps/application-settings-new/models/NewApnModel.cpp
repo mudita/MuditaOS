@@ -3,9 +3,7 @@
 
 #include "NewApnModel.hpp"
 
-#include "AppWindow.hpp"
 #include "application-settings-new/widgets/ApnInputWidget.hpp"
-#include <service-cellular/service-cellular/CellularServiceAPI.hpp>
 
 #include <ListView.hpp>
 #include <time/ScopedTime.hpp>
@@ -132,9 +130,4 @@ void NewApnModel::apnDataChanged()
     }
     application->getCurrentWindow()->setBottomBarActive(gui::BottomBar::Side::CENTER, false); // SAVE button
     return;
-}
-
-void NewApnModel::apnSendRecord(packet_data::APN::Config apnRecord)
-{
-    CellularServiceAPI::SetAPN(application, apnRecord);
 }
