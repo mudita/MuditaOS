@@ -19,3 +19,9 @@ template <> struct std::hash<std::vector<unsigned int>>
         return value;
     }
 };
+
+static inline uint32_t GetPinHash(const std::vector<unsigned int> &pin)
+{
+    static std::hash<std::vector<unsigned int>> hashEngine;
+    return hashEngine(pin);
+}

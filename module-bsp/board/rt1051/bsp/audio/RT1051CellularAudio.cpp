@@ -19,7 +19,8 @@ namespace bsp
     sai_edma_handle_t RT1051CellularAudio::rxHandle = {};
 
     RT1051CellularAudio::RT1051CellularAudio(bsp::AudioDevice::audioCallback_t callback)
-        : AudioDevice(callback), saiInFormat{}, saiOutFormat{}, config{}
+        : SAIAudioDevice(callback, BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &txHandle), saiInFormat{},
+          saiOutFormat{}, config{}
     {
         isInitialized = true;
     }
@@ -199,17 +200,6 @@ namespace bsp
 
         /* Reset SAI Rx internal logic */
         SAI_RxSoftwareReset(BOARD_CELLULAR_AUDIO_SAIx, kSAI_ResetTypeSoftware);
-
-        if (!source.isConnected()) {
-            LOG_FATAL("No output stream connected!");
-            return;
-        }
-
-        /// initiate first read
-        audio::Stream::Span dataSpan;
-        source.getStream()->reserve(dataSpan);
-        auto xfer = sai_transfer_t{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
-        SAI_TransferReceiveEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &xfer);
     }
 
     void RT1051CellularAudio::OutStart()
@@ -233,7 +223,6 @@ namespace bsp
                                        txCellularCallback,
                                        this,
                                        reinterpret_cast<edma_handle_t *>(txDMAHandle->GetHandle()));
-
         SAI_TransferTxSetFormatEDMA(
             BOARD_CELLULAR_AUDIO_SAIx, &txHandle, &sai_format, mclkSourceClockHz, mclkSourceClockHz);
 
@@ -241,15 +230,6 @@ namespace bsp
 
         /* Reset SAI Tx internal logic */
         SAI_TxSoftwareReset(BOARD_CELLULAR_AUDIO_SAIx, kSAI_ResetTypeSoftware);
-
-        if (!sink.isConnected()) {
-            LOG_FATAL("No input stream connected!");
-            return;
-        }
-
-        auto nullSpan = sink.getStream()->getNullSpan();
-        auto xfer     = sai_transfer_t{.data = nullSpan.data, .dataSize = nullSpan.dataSize};
-        SAI_TransferSendEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle, &xfer);
     }
 
     void RT1051CellularAudio::OutStop()
@@ -259,9 +239,6 @@ namespace bsp
             SAI_TransferTerminateSendEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle);
         }
         memset(&txHandle, 0, sizeof(txHandle));
-        if (sink.isConnected()) {
-            sink.getStream()->unpeek();
-        }
     }
 
     void RT1051CellularAudio::InStop()
@@ -271,47 +248,20 @@ namespace bsp
             SAI_TransferAbortReceiveEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle);
         }
         memset(&rxHandle, 0, sizeof(rxHandle));
-        if (source.isConnected()) {
-            source.getStream()->release();
-        }
     }
 
     void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        audio::Stream::Span dataSpan;
-        auto self    = static_cast<RT1051CellularAudio *>(userData);
-        auto &source = self->source;
+        auto self = static_cast<RT1051CellularAudio *>(userData);
 
-        /// exit if not connected to the stream
-        if (!source.isConnected()) {
-            return;
-        }
-
-        /// reserve space for the next read commiting previously reserved block before
-        source.getStream()->commit();
-        source.getStream()->reserve(dataSpan);
-
-        sai_transfer_t xfer{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
-        SAI_TransferReceiveEDMA(BOARD_CELLULAR_AUDIO_SAIx, &self->rxHandle, &xfer);
+        self->onDataReceive();
     }
 
     void txCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        audio::Stream::Span dataSpan;
-        auto self  = static_cast<RT1051CellularAudio *>(userData);
-        auto &sink = self->sink;
+        auto self = static_cast<RT1051CellularAudio *>(userData);
 
-        /// exit if not connected to the stream
-        if (!sink.isConnected()) {
-            return;
-        }
-
-        /// pop previous read and peek next
-        sink.getStream()->consume();
-        sink.getStream()->peek(dataSpan);
-
-        sai_transfer_t xfer{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
-        SAI_TransferSendEDMA(BOARD_CELLULAR_AUDIO_SAIx, &self->txHandle, &xfer);
+        self->onDataSend();
     }
 
 } // namespace bsp

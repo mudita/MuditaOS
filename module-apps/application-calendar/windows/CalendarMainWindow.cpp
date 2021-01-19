@@ -17,7 +17,8 @@
 namespace gui
 {
 
-    CalendarMainWindow::CalendarMainWindow(app::Application *app, const std::string &name) : AppWindow(app, name)
+    CalendarMainWindow::CalendarMainWindow(app::Application *app, const std::string &name)
+        : AppWindow(app, name), app::AsyncCallbackReceiver{app}
     {
         auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
         assert(appCalendar != nullptr);
@@ -185,9 +186,9 @@ namespace gui
             assert(application != nullptr);
             app->setEquivalentToEmptyWindow(EquivalentWindow::AllEventsWindow);
             auto query = std::make_unique<db::query::events::GetAll>();
-            query->setQueryListener(
-                db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
-            DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::move(query));
+            auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Events);
+            task->setCallback([this](auto response) { return handleQueryResponse(response); });
+            task->execute(application, this);
             return true;
         }
 
@@ -202,9 +203,9 @@ namespace gui
         auto filter_till       = TimePointFromYearMonthDay(date_till);
         LOG_DEBUG("filter:  %s", TimePointToString(filter_till).c_str());
         auto query = std::make_unique<db::query::events::GetFiltered>(filter_from, filter_till);
-        query->setQueryListener(
-            db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
-        DBServiceAPI::GetQuery(application, db::Interface::Name::Events, std::move(query));
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Events);
+        task->setCallback([this](auto response) { return handleQueryResponse(response); });
+        task->execute(application, this);
     }
 
     auto CalendarMainWindow::handleQueryResponse(db::QueryResult *queryResult) -> bool

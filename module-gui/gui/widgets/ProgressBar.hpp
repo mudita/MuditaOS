@@ -17,8 +17,8 @@ namespace gui
         virtual ~Progress() noexcept = default;
 
         virtual void setMaximum(unsigned int value)         = 0;
-        virtual void setValue(unsigned int value)           = 0;
-        virtual void update(int value = 1)                  = 0;
+        virtual auto setValue(unsigned int value) -> bool   = 0;
+        virtual auto update(int value = 1) -> bool          = 0;
         virtual void setPercentageValue(unsigned int value) = 0;
     };
 
@@ -28,8 +28,8 @@ namespace gui
         ProgressBar(Item *parent, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h);
 
         void setMaximum(unsigned int value) noexcept override;
-        void setValue(unsigned int value) noexcept override;
-        void update(int value = 1) noexcept override;
+        auto setValue(unsigned int value) noexcept -> bool override;
+        auto update(int value = 1) noexcept -> bool override;
         void setPercentageValue(unsigned int value) noexcept override;
 
         void buildDrawListImplementation(std::list<Command> &commands) override;
@@ -49,8 +49,8 @@ namespace gui
         CircularProgressBar(Item *parent, const Circle::ShapeParams &shape);
 
         void setMaximum(unsigned int value) noexcept override;
-        void setValue(unsigned int value) noexcept override;
-        void update(int value = 1) noexcept override;
+        auto setValue(unsigned int value) noexcept -> bool override;
+        auto update(int value = 1) noexcept -> bool override;
         void setPercentageValue(unsigned int value) noexcept override;
 
         void buildDrawListImplementation(std::list<Command> &commands) override;

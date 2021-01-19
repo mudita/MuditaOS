@@ -135,9 +135,9 @@ namespace app
         DBServiceAPI::GetQuery(this,
                                db::Interface::Name::Notifications,
                                std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Calls));
-
-        return DBServiceAPI::GetQuery(
+        const auto [succeed, _] = DBServiceAPI::GetQuery(
             this, db::Interface::Name::Calllog, std::make_unique<db::query::calllog::SetAllRead>());
+        return succeed;
     }
 
 } /* namespace app */

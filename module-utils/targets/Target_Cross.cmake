@@ -1,6 +1,6 @@
 set(BOARD_SOURCES ${BOARD_SOURCES}
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/board/cross/log.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/cross/log_rt1051.cpp
 
         CACHE INTERNAL ""
         )

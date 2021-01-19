@@ -2,13 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/BatteryMessages.hpp"
-#include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EVMessages.hpp"
-#include "service-evtmgr/EventManager.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
+#include "service-evtmgr/ScreenLightControlMessage.hpp"
+#include "service-evtmgr/Constants.hpp"
+#include "service-evtmgr/EventManager.hpp"
 #include "service-evtmgr/WorkerEvent.hpp"
-#include "screen-light-control/ScreenLightControl.hpp"
+
 #include "battery-level-check/BatteryLevelCheck.hpp"
+#include "screen-light-control/ScreenLightControl.hpp"
 
 #include <BaseInterface.hpp>
 #include <MessageType.hpp>
@@ -39,7 +41,8 @@
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
 
-EventManager::EventManager(const std::string &name) : sys::Service(name)
+EventManager::EventManager(const std::string &name)
+    : sys::Service(name), screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(this))
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
@@ -261,16 +264,28 @@ sys::ReturnCodes EventManager::InitHandler()
         return response;
     });
 
-    connect(sevm::ScreenLightControlMessage(sevm::screen_light_control::Action::turnOff), [&](sys::Message *msgl) {
-        auto request = static_cast<sevm::ScreenLightControlMessage *>(msgl);
-        sevm::screen_light_control::processRequest(request->action, request->parameters);
-        return std::make_shared<sys::ResponseMessage>();
-    });
-
     connect(sevm::BatterySetCriticalLevel(0), [&](sys::Message *msgl) {
         auto request = static_cast<sevm::BatterySetCriticalLevel *>(msgl);
         battery_level_check::setBatteryCriticalLevel(request->criticalLevel);
         return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sevm::BatteryLevelCriticalCheckMessage(), [&](sys::Message *msgl) {
+        EventWorker->checkBatteryLevelCritical();
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sevm::ScreenLightControlMessage(), [&](sys::Message *msgl) {
+        auto *m = dynamic_cast<sevm::ScreenLightControlMessage *>(msgl);
+        screenLightControl->processRequest(m->action, m->parameters);
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sevm::ScreenLightControlRequestParameters(), [&](sys::Message *msgl) {
+        screen_light_control::Parameters params = {screenLightControl->getBrightnessValue()};
+        auto msg                                = std::make_shared<sevm::ScreenLightControlParametersResponse>(
+            screenLightControl->getLightState(), screenLightControl->getAutoModeState(), params);
+        return msg;
     });
 
     // initialize keyboard worker
@@ -307,14 +322,12 @@ sys::ReturnCodes EventManager::InitHandler()
 
     EventWorker->init(list);
     EventWorker->run();
-    sevm::screen_light_control::init(this);
 
     return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes EventManager::DeinitHandler()
 {
-    sevm::screen_light_control::deinit();
     EventWorker->close();
     EventWorker.reset();
     EventWorker = nullptr;
@@ -339,7 +352,6 @@ sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMod
 
 bool EventManager::messageSetApplication(sys::Service *sender, const std::string &applicationName)
 {
-
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
     return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
 }

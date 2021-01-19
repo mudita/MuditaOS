@@ -35,4 +35,9 @@ namespace bsp{
     {
     	return currentOscSource;
     }
+
+    LowPowerMode::Pll2State LowPowerMode::GetCurrentPll2State() const noexcept
+    {
+    	return currentPll2State;
+    }
 }

@@ -5,6 +5,7 @@
 
 #include "windows/AddDeviceWindow.hpp"
 #include "windows/AllDevicesWindow.hpp"
+#include "windows/APNSettingsWindow.hpp"
 #include "windows/BluetoothWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/DisplayAndKeypadWindow.hpp"
@@ -24,21 +25,36 @@
 #include "windows/QuotesMainWindow.hpp"
 #include "windows/QuotesAddWindow.hpp"
 #include "windows/SecurityMainWindow.hpp"
+#include "windows/QuotesOptionsWindow.hpp"
+#include "windows/ChangePasscodeWindow.hpp"
 
 #include "Dialog.hpp"
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
-#include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
+#include <service-bluetooth/BluetoothMessage.hpp>
+#include <service-bluetooth/service-bluetooth/messages/Status.hpp>
+#include <service-bluetooth/messages/BondedDevices.hpp>
+#include <service-bluetooth/messages/DeviceName.hpp>
+#include <application-settings-new/data/BondedDevicesData.hpp>
+#include <application-settings-new/data/PhoneNameData.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
+#include <application-settings-new/data/PhoneNameData.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
-#include <module-services/service-bluetooth/service-bluetooth/messages/Status.hpp>
+
+#include <i18n/i18n.hpp>
+#include <module-services/service-evtmgr/service-evtmgr/ScreenLightControlMessage.hpp>
+#include <module-services/service-evtmgr/service-evtmgr/Constants.hpp>
 
 namespace app
 {
     namespace settings
     {
         constexpr inline auto operators_on = "operators_on";
-    }
+        const std::string quotesPath =
+            purefs::createPath(purefs::dir::getUserDiskPath(), "data/applications/settings/quotes.json");
+    } // namespace settings
 
     ApplicationSettingsNew::ApplicationSettingsNew(std::string name,
                                                    std::string parent,
@@ -51,11 +67,15 @@ namespace app
         }
         settings->registerValueChange(settings::operators_on,
                                       [this](const std::string &value) { operatorOnChanged(value); });
+
+        settings->registerValueChange(::settings::Cellular::volte_on,
+                                      [this](const std::string &value) { volteChanged(value); });
     }
 
     ApplicationSettingsNew::~ApplicationSettingsNew()
     {
         settings->unregisterValueChange(settings::operators_on);
+        settings->unregisterValueChange(::settings::Cellular::volte_on);
     }
 
     // Invoked upon receiving data message
@@ -91,7 +111,7 @@ namespace app
                 currentWindow->rebuild();
             }
         }
-        else if (auto responseStatusMsg = dynamic_cast<message::bluetooth::ResponseStatus *>(msgl);
+        else if (auto responseStatusMsg = dynamic_cast<::message::bluetooth::ResponseStatus *>(msgl);
                  nullptr != responseStatusMsg) {
             if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
                 auto btStatusData = std::make_unique<gui::BluetoothStatusData>(responseStatusMsg->getStatus());
@@ -99,7 +119,7 @@ namespace app
             }
         }
 
-        return std::make_shared<sys::ResponseMessage>();
+        return sys::MessageNone{};
     }
 
     // Invoked during initialization
@@ -112,9 +132,32 @@ namespace app
             return ret;
         }
 
+        connect(typeid(::message::bluetooth::ResponseDeviceName), [&](sys::Message *msg) {
+            auto responseDeviceNameMsg = static_cast<::message::bluetooth::ResponseDeviceName *>(msg);
+            if (gui::window::name::phone_name == getCurrentWindow()->getName()) {
+                auto phoneNameData = std::make_unique<gui::PhoneNameData>(responseDeviceNameMsg->getName());
+                switchWindow(gui::window::name::phone_name, std::move(phoneNameData));
+            }
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(::message::bluetooth::ResponseBondedDevices), [&](sys::Message *msg) {
+            auto responseBondedDevicesMsg = static_cast<::message::bluetooth::ResponseBondedDevices *>(msg);
+            if (gui::window::name::all_devices == getCurrentWindow()->getName()) {
+                auto bondedDevicesData =
+                    std::make_unique<gui::BondedDevicesData>(responseBondedDevicesMsg->getDevices());
+                switchWindow(gui::window::name::all_devices, std::move(bondedDevicesData));
+            }
+            return sys::MessageNone{};
+        });
+
         createUserInterface();
 
         setActiveWindow(gui::name::window::main_window);
+
+        settings->registerValueChange(::settings::SystemProperties::lockPassHash, [this](std::string value) {
+            lockPassHash = utils::getNumericValue<unsigned int>(value);
+        });
 
         return ret;
     }
@@ -153,7 +196,7 @@ namespace app
             return std::make_unique<gui::FontSizeWindow>(app);
         });
         windowsFactory.attach(gui::window::name::display_light, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::DisplayLightWindow>(app);
+            return std::make_unique<gui::DisplayLightWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
         windowsFactory.attach(gui::window::name::apps_and_tools, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AppsAndToolsWindow>(app);
@@ -164,6 +207,9 @@ namespace app
         windowsFactory.attach(gui::window::name::network, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NetworkWindow>(
                 app, static_cast<ApplicationSettingsNew *>(app), static_cast<ApplicationSettingsNew *>(app));
+        });
+        windowsFactory.attach(gui::window::name::apn_settings, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::APNSettingsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MessagesWindow>(app);
@@ -180,11 +226,8 @@ namespace app
         windowsFactory.attach(gui::window::name::wallpaper, [](Application *app, const std::string &name) {
             return std::make_unique<gui::WallpaperWindow>(app);
         });
-        windowsFactory.attach(gui::window::name::quotes, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuotesMainWindow>(app);
-        });
-        windowsFactory.attach(gui::window::name::new_quote, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuotesAddWindow>(app);
+        windowsFactory.attach(gui::window::name::quotes_dialog_yes_no, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogYesNo>(app, name);
         });
         windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SecurityMainWindow>(app);
@@ -224,4 +267,75 @@ namespace app
         operatorsOn = value;
         settings->setValue(settings::operators_on, std::to_string(value));
     }
+
+    void ApplicationSettingsNew::setVoLTEOn(bool value)
+    {
+        voLteStateOn = value;
+        CellularServiceAPI::SetVoLTE(this, voLteStateOn);
+    };
+
+    bool ApplicationSettingsNew::getVoLTEOn() const noexcept
+    {
+        return voLteStateOn;
+    }
+
+    void ApplicationSettingsNew::volteChanged(const std::string &value)
+    {
+        if (!value.empty()) {
+            voLteStateOn = utils::getNumericValue<bool>(value);
+        }
+    }
+
+    void ApplicationSettingsNew::setLockPassHash(unsigned int value)
+    {
+        lockPassHash = value;
+        settings->setValue(::settings::SystemProperties::lockPassHash, std::to_string(value));
+    }
+
+    auto ApplicationSettingsNew::getCurrentValues() -> settingsInterface::ScreenLightSettings::Values
+    {
+        constexpr int timeout = pdMS_TO_TICKS(1500);
+
+        auto response = sys::Bus::SendUnicast(
+            std::make_shared<sevm::ScreenLightControlRequestParameters>(), service::name::evt_manager, this, timeout);
+
+        if (response.first == sys::ReturnCodes::Success) {
+            auto msgState = dynamic_cast<sevm::ScreenLightControlParametersResponse *>(response.second.get());
+            if (msgState == nullptr) {
+                return {};
+            }
+
+            return {msgState->lightOn, msgState->mode, msgState->parameters};
+        }
+
+        return {};
+    }
+
+    void ApplicationSettingsNew::setBrightness(bsp::eink_frontlight::BrightnessPercentage value)
+    {
+        screen_light_control::Parameters parameters{value};
+        sys::Bus::SendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                                  screen_light_control::Action::setManualModeBrightness, parameters),
+                              service::name::evt_manager,
+                              this);
+    }
+
+    void ApplicationSettingsNew::setMode(bool isAutoLightSwitchOn)
+    {
+        sys::Bus::SendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                                  isAutoLightSwitchOn ? screen_light_control::Action::enableAutomaticMode
+                                                      : screen_light_control::Action::disableAutomaticMode),
+                              service::name::evt_manager,
+                              this);
+    }
+
+    void ApplicationSettingsNew::setStatus(bool isDisplayLightSwitchOn)
+    {
+        sys::Bus::SendUnicast(
+            std::make_shared<sevm::ScreenLightControlMessage>(
+                isDisplayLightSwitchOn ? screen_light_control::Action::turnOn : screen_light_control::Action::turnOff),
+            service::name::evt_manager,
+            this);
+    }
+
 } /* namespace app */

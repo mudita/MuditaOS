@@ -22,7 +22,7 @@ namespace db
 namespace gui
 {
 
-    class CalendarMainWindow : public gui::AppWindow
+    class CalendarMainWindow : public gui::AppWindow, public app::AsyncCallbackReceiver
     {
         bool isDayEmpty[31];
         uint32_t offsetFromTop = 0;
@@ -40,7 +40,6 @@ namespace gui
       public:
         CalendarMainWindow(app::Application *app, const std::string &name);
 
-        ~CalendarMainWindow() override = default;
         void rebuild() override;
         void refresh();
         void filterRequest();

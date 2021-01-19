@@ -15,6 +15,7 @@
 #include <service-db/Settings.hpp>
 #include "service-bluetooth/messages/Status.hpp"
 #include "service-bluetooth/messages/SetStatus.hpp"
+#include <service-bluetooth/messages/BondedDevices.hpp>
 
 #include <log/log.hpp>
 
@@ -24,7 +25,7 @@
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth)
 {
     auto settings  = std::make_unique<settings::Settings>(this);
-    settingsHolder = std::make_unique<Bluetooth::SettingsHolder>(std::move(settings));
+    settingsHolder = std::make_shared<Bluetooth::SettingsHolder>(std::move(settings));
     LOG_INFO("[ServiceBluetooth] Initializing");
 }
 
@@ -39,8 +40,54 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
 {
     LOG_ERROR("Bluetooth experimental!");
     worker = std::make_unique<BluetoothWorker>(this);
-    btStatus.state      = BluetoothStatus::BluetoothState::On;
-    btStatus.visibility = true;
+
+    connect(message::bluetooth::RequestBondedDevices(), [&](sys::Message *msg) {
+        auto bondedDevicesStr =
+            std::visit(Bluetooth::StringVisitor(), this->settingsHolder->getValue(Bluetooth::Settings::BondedDevices));
+
+        return std::make_shared<message::bluetooth::ResponseBondedDevices>(
+            SettingsSerializer::fromString(bondedDevicesStr));
+    });
+
+    connect(message::bluetooth::RequestStatus(), [&](sys::Message *msg) {
+        BluetoothStatus status;
+
+        auto state = std::visit(Bluetooth::IntVisitor(), settingsHolder->getValue(Bluetooth::Settings::State));
+        auto visibility =
+            std::visit(Bluetooth::BoolVisitor(), settingsHolder->getValue(Bluetooth::Settings::Visibility));
+        status.state      = static_cast<BluetoothStatus::State>(state);
+        status.visibility = visibility;
+
+        return std::make_shared<message::bluetooth::ResponseStatus>(status);
+    });
+
+    connect(typeid(message::bluetooth::SetStatus), [&](sys::Message *msg) {
+        auto setStatusMsg = static_cast<message::bluetooth::SetStatus *>(msg);
+        auto btStatus     = setStatusMsg->getStatus();
+        worker->setVisibility(btStatus.visibility);
+
+        switch (btStatus.state) {
+        case BluetoothStatus::State::On:
+            worker->run();
+            break;
+        case BluetoothStatus::State::Off:
+            // TODO
+            break;
+        default:
+            break;
+        }
+
+        return std::make_shared<message::bluetooth::ResponseStatus>(btStatus);
+    });
+
+    settingsHolder->onStateChange = [this]() {
+        auto initialState =
+            std::visit(Bluetooth::IntVisitor(), this->settingsHolder->getValue(Bluetooth::Settings::State));
+        if (static_cast<BluetoothStatus::State>(initialState) == BluetoothStatus::State::On) {
+            this->worker->run();
+        }
+    };
+
     return sys::ReturnCodes::Success;
 }
 
@@ -52,17 +99,6 @@ sys::ReturnCodes ServiceBluetooth::DeinitHandler()
 
 sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
-    // mock response on message::bluetooth::RequestStatus
-    if (auto requestStatusMsg = dynamic_cast<message::bluetooth::RequestStatus *>(msg); nullptr != requestStatusMsg) {
-        sys::Bus::SendUnicast(std::make_shared<message::bluetooth::ResponseStatus>(btStatus), msg->sender, this);
-    }
-
-    // temporary solution for handling message::bluetooth::SetStatus
-    if (auto setStatusMsg = dynamic_cast<message::bluetooth::SetStatus *>(msg); nullptr != setStatusMsg) {
-        btStatus = setStatusMsg->getStatus();
-        sys::Bus::SendBroadcast(std::make_shared<message::bluetooth::ResponseStatus>(btStatus), this);
-    }
-
     try {
         switch (static_cast<MessageType>(msg->messageType)) {
         case MessageType::BluetoothRequest: {
@@ -81,7 +117,7 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
                     return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
                 }
             case BluetoothMessage::StopScan:
-                worker->stopScan();
+                sendWorkerCommand(Bt::StopScan);
                 break;
             case BluetoothMessage::PAN: {
                 /// TODO request lwip first...
@@ -97,15 +133,17 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
                 worker->start_pan();
                 //                    }
             } break;
-            case BluetoothMessage::Visible:
-                worker->toggleVisibility();
-                break;
+            case BluetoothMessage::Visible: {
+                static bool visibility = true;
+                worker->setVisibility(visibility);
+                visibility = !visibility;
+            } break;
 
             case BluetoothMessage::Play:
-                worker->establishAudioConnection();
+                sendWorkerCommand(Bt::ConnectAudio);
                 break;
             case BluetoothMessage::Stop:
-                worker->disconnectAudioConnection();
+                sendWorkerCommand(Bt::DisconnectAudio);
                 break;
 
             default:
@@ -139,4 +177,7 @@ sys::ReturnCodes ServiceBluetooth::SwitchPowerModeHandler(const sys::ServicePowe
     LOG_ERROR("TODO");
     return sys::ReturnCodes::Success;
 }
-
+void ServiceBluetooth::sendWorkerCommand(Bt::Command command)
+{
+    xQueueSend(workerQueue, &command, portMAX_DELAY);
+}

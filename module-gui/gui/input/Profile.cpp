@@ -10,12 +10,20 @@
 namespace gui
 {
 
-    Profile::Profile(const std::string &filepath) : name(filepath), inputChars(createJson(filepath))
-    {}
+    Profile::Profile(const std::filesystem::path &filepath)
+    {
+        name       = filepath.stem();
+        inputChars = createJson(filepath);
+    }
 
     const std::string &Profile::getName() noexcept
     {
         return name;
+    }
+
+    const json11::Json &Profile::getJson() const noexcept
+    {
+        return inputChars;
     }
 
     const json11::Json Profile::createJson(const std::string &filepath)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SystemManager.hpp"
@@ -11,7 +11,11 @@
 #include <service-evtmgr/KbdMessage.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <Service/Timer.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
+#include <service-cellular/CellularMessage.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
 #include "messages/CpuFrequencyMessage.hpp"
 
 const inline size_t systemManagerStack = 4096 * 2;
@@ -255,13 +259,33 @@ namespace sys
             return MessageNone{};
         });
 
-        connect(sevm::BatteryLevelCriticalMessage(), [&](Message *) {
-            LOG_INFO("Battery Critical SOC Level reached!");
+        connect(sevm::BatteryBrownoutMessage(), [&](Message *) {
+            LOG_INFO("Battery Brownout voltage level reached!");
             return MessageNone{};
         });
 
-        connect(sevm::BatteryBrownoutMessage(), [&](Message *) {
-            LOG_INFO("Battery Brownout voltage level reached!");
+        connect(CellularCheckIfStartAllowedMessage(), [&](Message *) {
+            EventManagerServiceAPI::checkBatteryLevelCriticalState(this);
+            return MessageNone{};
+        });
+
+        connect(sevm::BatteryLevelCriticalMessage(), [&](Message *) {
+            LOG_INFO("Battery Critical Level reached!");
+            CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::Off);
+
+            auto msg = std::make_shared<CriticalBatteryLevelNotification>(true);
+            Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, this);
+
+            return MessageNone{};
+        });
+
+        connect(sevm::BatteryLevelNormalMessage(), [&](Message *) {
+            LOG_INFO("Battery level normal.");
+            CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::On);
+
+            auto msg = std::make_shared<CriticalBatteryLevelNotification>(false);
+            Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, this);
+
             return MessageNone{};
         });
 

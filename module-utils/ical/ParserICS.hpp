@@ -17,6 +17,7 @@ class Duration
     uint32_t week = 0, day = 0, hour = 0, minute = 0;
 
   public:
+    bool isValid = true;
     Duration(uint32_t week = 0, uint32_t day = 0, uint32_t hour = 0, uint32_t minute = 0);
     explicit Duration(const std::string &property);
 
@@ -26,7 +27,7 @@ class Duration
 
 enum class Action
 {
-    invalid,
+    none,
     audio,
     display,
     procedure
@@ -35,11 +36,12 @@ enum class Action
 class Alarm
 {
     Duration trigger;
-    Action action;
+    Action action = Action::none;
 
   public:
-    Alarm() = default;
-    explicit Alarm(Duration &beforeEvent, Action action = Action::invalid);
+    bool isValid = true;
+    Alarm()      = default;
+    explicit Alarm(Duration &beforeEvent, Action action = Action::none);
 
     void setAction(const std::string &action);
     void setTrigger(const std::string &duration);
@@ -53,7 +55,7 @@ class Alarm
 
 enum class Frequency
 {
-    invalid,
+    never,
     daily,
     weekly,
     monthly,
@@ -63,11 +65,12 @@ enum class Frequency
 
 class RecurrenceRule
 {
-    Frequency frequency = Frequency::invalid;
+    Frequency frequency = Frequency::never;
     uint32_t count      = 0;
     uint32_t interval   = 0;
 
   public:
+    bool isValid     = true;
     RecurrenceRule() = default;
     RecurrenceRule(Frequency freq, uint32_t count, uint32_t interval);
 
@@ -91,8 +94,21 @@ class Event
     TimePoint dtstart;
     TimePoint dtend;
 
+    auto isDate(const std::string &dt) -> bool;
+    auto isTime(const std::string &dt) -> bool;
+    auto validateDT(const std::string &dt) -> bool;
+    auto validateUID(const std::string &uid) -> bool;
+
     [[nodiscard]] auto getDateFromIcalFormat(const std::string &icalDateTime) const -> std::string;
+    [[nodiscard]] auto getYearFromIcalDate(const std::string &icalDate) const -> std::string;
+    [[nodiscard]] auto getMonthFromIcalDate(const std::string &icalDate) const -> std::string;
+    [[nodiscard]] auto getDayFromIcalDate(const std::string &icalDate) const -> std::string;
+
     [[nodiscard]] auto getTimeFromIcalFormat(const std::string &icalDateTime) const -> std::string;
+    [[nodiscard]] auto getHourFromIcalTime(const std::string &icalTime) const -> std::string;
+    [[nodiscard]] auto getMinutesFromIcalTime(const std::string &icalTime) const -> std::string;
+    [[nodiscard]] auto getSecondsFromIcalTime(const std::string &icalTime) const -> std::string;
+
     [[nodiscard]] auto dateStringFrom(const std::string &icalDate) const -> std::string;
     [[nodiscard]] auto timeStringFrom(const std::string &icalTime) const -> std::string;
 
@@ -100,7 +116,8 @@ class Event
     [[nodiscard]] auto TimePointToIcalDate(const TimePoint &tp) const -> std::string;
 
   public:
-    Event() = default;
+    bool isValid = true;
+    Event()      = default;
     Event(const std::string &summary, TimePoint from, TimePoint till, const std::string &uid);
 
     void setUID(const std::string &property);

@@ -4,9 +4,10 @@
 #include "ThreadWindowOptions.hpp"
 #include <i18n/i18n.hpp>
 #include "log/log.hpp"
-#include <Options.hpp>
 #include <OptionWindow.hpp>
 #include <module-services/service-db/service-db/DBServiceAPI.hpp>
+#include <OptionCall.hpp>
+#include <OptionContact.hpp>
 
 /// below just for apps names...
 
@@ -17,10 +18,11 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
         record ? DBServiceAPI::ContactGetByIDWithTemporary(app, record->contactID)->front() : ContactRecord();
     std::list<gui::Option> options;
 
-    options.emplace_back(gui::options::call(app, contact));
+    options.emplace_back(gui::Option{std::make_unique<gui::option::Call>(app, contact)});
+
     auto contactOperation =
-        contact.isTemporary() ? gui::options::ContactOperation::Add : gui::options::ContactOperation::Details;
-    options.emplace_back(gui::options::contact(app, contactOperation, contact));
+        contact.isTemporary() ? gui::option::ContactOperation::Add : gui::option::ContactOperation::Details;
+    options.emplace_back(gui::Option{std::make_unique<gui::option::Contact>(app, contactOperation, contact)});
 
     if (record->isUnread()) {
         options.emplace_back(gui::Option{utils::localize.get("sms_mark_read"), [=](gui::Item &item) {

@@ -9,6 +9,7 @@
 #include <purefs/filesystem_paths.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/DBServiceName.hpp>
+#include <module-utils/Utils.hpp>
 
 #include <cassert>
 #include <filesystem>
@@ -118,7 +119,7 @@ bool BackupRestore::PackUserFiles()
     std::string backupPathDB = purefs::dir::getBackupOSPath();
     backupPathDB += "/";
 
-    const auto backupOSPath                  = purefs::dir::getBackupOSPath();
+    const auto backupOSPath = purefs::dir::getBackupOSPath();
 
     if (std::filesystem::is_empty(backupOSPath.c_str())) {
         LOG_ERROR("PackUserFiles: backup dir %s is empty, nothing to backup, quitting...", backupOSPath.c_str());
@@ -331,7 +332,7 @@ bool BackupRestore::UnpackBackupFile()
 bool BackupRestore::ReplaceUserFiles()
 {
     /* replace existing files that have respective backup files existing */
-    const auto backupOSPath                  = purefs::dir::getBackupOSPath();
+    const auto backupOSPath = purefs::dir::getBackupOSPath();
     if (std::filesystem::is_directory(backupOSPath) && std::filesystem::is_empty(backupOSPath)) {
         LOG_INFO("ReplaceUserFiles: dir emtpy, nothing to restore, quitting...");
         return false;

@@ -1,7 +1,4 @@
 {
-  "common_kbd_lower": "Polski_lower",
-  "common_kbd_upper": "Polski_upper",
-  "common_kbd_numeric": "numeric",
   "common_add": "DODAJ",
   "common_open": "OTWÓRZ",
   "common_call": "DZWOŃ",
@@ -73,6 +70,7 @@
   "app_desktop_pin_info2": "Pozostało prób",
   "app_desktop_pin_blocked1": "Telefon zablokowany",
   "app_desktop_unread_messages": "nieprzeczytane wiadomości",
+  "app_desktop_low_battery_notification": "<text>niski poziom baterii - moduł GSM wyłączony</text>",
   "app_desktop_missed_calls": "nieodebrane połączenia",
   "app_desktop_menu_phone": "TELEFON",
   "app_desktop_menu_contacts": "KONTAKTY",

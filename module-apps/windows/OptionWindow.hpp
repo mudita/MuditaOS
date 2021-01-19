@@ -3,19 +3,25 @@
 
 #pragma once
 
-#include "../Application.hpp"
+#include "Application.hpp"
 #include "AppWindow.hpp"
-#include "PageLayout.hpp"
+#include "ListView.hpp"
 #include <functional>
-#include "OptionsWindowOption.hpp"
+#include "Option.hpp"
+#include "OptionsModel.hpp"
 
 namespace gui
 {
+    ///  @brief Options window generating various options based on provided Option list.
+    ///
+    ///  Options GUI window with ListView populated accordingly to provided options in window constructor.
+    ///
+
     class OptionWindow : public AppWindow
     {
-
       protected:
-        PageLayout *body = nullptr;
+        std::shared_ptr<OptionsModel> optionsModel = nullptr;
+        ListView *optionsList                      = nullptr;
         std::list<Option> options;
         void addOptions(std::list<Option> &optionList);
         void addOptions(std::list<Option> &&optionList);
@@ -26,11 +32,6 @@ namespace gui
         OptionWindow(app::Application *app, const std::string &name, std::list<Option> options);
         ~OptionWindow() override;
 
-        void addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow);
-        void setOptions(std::list<Option> options)
-        {
-            this->options = std::move(options);
-        }
         void clearOptions();
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

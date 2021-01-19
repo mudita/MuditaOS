@@ -2,31 +2,31 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
-#include "Common.hpp"                                    // for RefreshModes
-#include "GuiTimer.hpp"                                  // for GuiTimer
-#include "Item.hpp"                                      // for Item
-#include "MessageType.hpp"                               // for MessageType
-#include "Service/Timer.hpp"                             // for Timer
-#include "Timer.hpp"                                     // for Timer
-#include "Translator.hpp"                                // for KeyInputSim...
-#include "common_data/EventStore.hpp"                    // for Battery
-#include "common_data/RawKey.hpp"                        // for RawKey, key...
-#include "gui/input/InputEvent.hpp"                      // for InputEvent
-#include "log/debug.hpp"                                 // for DEBUG_APPLI...
-#include "log/log.hpp"                                   // for LOG_INFO
-#include "messages/AppMessage.hpp"                       // for AppSwitchMe...
-#include "service-appmgr/Controller.hpp"                 // for Controller
+#include "Common.hpp"                    // for RefreshModes
+#include "GuiTimer.hpp"                  // for GuiTimer
+#include "Item.hpp"                      // for Item
+#include "MessageType.hpp"               // for MessageType
+#include "Service/Timer.hpp"             // for Timer
+#include "Timer.hpp"                     // for Timer
+#include "Translator.hpp"                // for KeyInputSim...
+#include "common_data/EventStore.hpp"    // for Battery
+#include "common_data/RawKey.hpp"        // for RawKey, key...
+#include "gui/input/InputEvent.hpp"      // for InputEvent
+#include "log/debug.hpp"                 // for DEBUG_APPLI...
+#include "log/log.hpp"                   // for LOG_INFO
+#include "messages/AppMessage.hpp"       // for AppSwitchMe...
+#include "service-appmgr/Controller.hpp" // for Controller
 #include <service-cellular/CellularMessage.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include "service-gui/messages/DrawMessage.hpp"          // for DrawMessage
-#include "task.h"                                        // for xTaskGetTic...
-#include "windows/AppWindow.hpp"                         // for AppWindow
-#include <Text.hpp>                                      // for Text
-#include <algorithm>                                     // for find
-#include <iterator>                                      // for distance, next
-#include <type_traits>                                   // for add_const<>...
+#include "service-gui/messages/DrawMessage.hpp" // for DrawMessage
+#include "task.h"                               // for xTaskGetTic...
+#include "windows/AppWindow.hpp"                // for AppWindow
+#include <Text.hpp>                             // for Text
+#include <algorithm>                            // for find
+#include <iterator>                             // for distance, next
+#include <type_traits>                          // for add_const<>...
 #include <WindowsFactory.hpp>
 #include <service-gui/Common.hpp>
 #include <module-utils/Utils.hpp>
@@ -69,8 +69,9 @@ namespace app
                              StartInBackground startInBackground,
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
-        : Service(name, parent, stackDepth, priority), default_window(gui::name::window::main_window),
-          windowsStack(this), startInBackground{startInBackground}, settings(std::make_unique<settings::Settings>(this))
+        : Service(std::move(name), std::move(parent), stackDepth, priority),
+          default_window(gui::name::window::main_window), windowsStack(this), startInBackground{startInBackground},
+          callbackStorage{std::make_unique<CallbackStorage>()}, settings(std::make_unique<settings::Settings>(this))
     {
         keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
         busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
@@ -85,7 +86,10 @@ namespace app
                                       [this](std::string value) { timeFormatChanged(value); });
     }
 
-    Application::~Application() = default;
+    Application::~Application() noexcept
+    {
+        windowsStack.windows.clear();
+    }
 
     Application::State Application::getState()
     {
@@ -99,7 +103,6 @@ namespace app
 #endif
         state = st;
     }
-
 
     void Application::longPressTimerCallback()
     {
@@ -490,6 +493,10 @@ namespace app
         if (startInBackground) {
             setState(State::ACTIVE_BACKGROUND);
         }
+
+        settings->registerValueChange(
+            settings::SystemProperties::lockScreenPasscodeIsOn,
+            [this](const std::string &value) { setLockScreenPasscodeOn(utils::getNumericValue<bool>(value)); });
         return sys::ReturnCodes::Success;
     }
 
@@ -701,4 +708,19 @@ namespace app
         return timeFormat12;
     }
 
+    void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
+    {
+        callbackStorage->removeAll(receiver);
+    }
+
+    void Application::setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept
+    {
+        lockScreenPasscodeIsOn = screenPasscodeOn;
+        settings->setValue(settings::SystemProperties::lockScreenPasscodeIsOn, std::to_string(lockScreenPasscodeIsOn));
+    }
+
+    bool Application::isLockScreenPasscodeOn() const noexcept
+    {
+        return lockScreenPasscodeIsOn;
+    }
 } /* namespace app */

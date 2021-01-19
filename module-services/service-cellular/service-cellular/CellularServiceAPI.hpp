@@ -94,7 +94,6 @@ namespace CellularServiceAPI
                         CellularSimCardLockDataMessage::SimCardLock lock,
                         const std::vector<unsigned int> &pin);
     bool SetSimCard(sys::Service *serv, Store::GSM::SIM sim);
-
     /**
      * @brief get all APNs from phone configuration
      */
@@ -111,4 +110,7 @@ namespace CellularServiceAPI
     bool SetAPN(sys::Service *serv, packet_data::APN::Config apnConfig);
     bool SetDataTransfer(sys::Service *serv, packet_data::DataTransfer dt);
     bool GetDataTransfer(sys::Service *serv);
+    bool SetVoLTE(sys::Service *serv, bool value);
+
+    bool ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState);
 }; // namespace CellularServiceAPI

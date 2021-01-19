@@ -80,22 +80,8 @@ namespace app
         // handle database response
         if (resp != nullptr) {
             handled = true;
-            switch (resp->responseTo) {
-            case MessageType::DBQuery: {
-
-                if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
-                    auto result = queryResponse->getResult();
-
-                    if (result->hasListener()) {
-                        if (result->handle()) {
-                            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                        }
-                    }
-                }
-
-            } break;
-            default:
-                break;
+            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
         }
 

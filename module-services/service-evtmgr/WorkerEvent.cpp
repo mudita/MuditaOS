@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/BatteryMessages.hpp"
-#include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EVMessages.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
+#include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/WorkerEvent.hpp"
 #include "battery-level-check/BatteryLevelCheck.hpp"
 
@@ -78,7 +78,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         }
 
         if (bsp::headset::Handler(notification) == true) {
-            bool state = bsp::headset::IsInserted();
+            bool state   = bsp::headset::IsInserted();
             auto message = std::make_shared<AudioEventRequest>(audio::EventType::JackState,
                                                                state ? audio::Event::DeviceState::Connected
                                                                      : audio::Event::DeviceState::Disconnected);
@@ -261,4 +261,9 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
         }
     }
     sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
+}
+
+void WorkerEvent::checkBatteryLevelCritical()
+{
+    battery_level_check::checkBatteryLevelCritical();
 }

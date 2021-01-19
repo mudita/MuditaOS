@@ -9,7 +9,7 @@
 namespace bsp
 {
 
-    class AudioDevice
+    class AudioDevice : public audio::IOProxy
     {
 
       public:
@@ -139,9 +139,6 @@ namespace bsp
         {
             return callback;
         }
-
-        audio::Sink sink;
-        audio::Source source;
 
       protected:
         Format currentFormat;

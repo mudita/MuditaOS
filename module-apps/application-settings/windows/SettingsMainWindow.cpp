@@ -25,7 +25,7 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
                                        app->switchWindow(window, nullptr);
                                        return true;
                                    },
-                                   gui::Arrow::Enabled});
+                                   gui::option::Arrow::Enabled});
     };
 
     addMenu(i18("Information"), gui::window::hw_info);

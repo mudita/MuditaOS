@@ -1,0 +1,18 @@
+@startuml
+participant "Application" as app
+participant "Service GUI" as gui
+participant "Context Pool" as pool
+participant "Rendering Worker" as worker
+participant "Service E Ink" as eink
+
+app -> gui: Draw request
+gui -> eink: Prepare display
+gui -> worker: Drop awaiting requests
+gui -> worker: Add new request
+activate worker
+
+worker -> pool: Borrow context
+worker -> worker: Render
+return Finished(contextId)
+
+@enduml
