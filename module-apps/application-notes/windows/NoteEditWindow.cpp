@@ -85,8 +85,6 @@ namespace app::notes
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
 
-        topBar->setActive(gui::TopBar::Elements::TIME, true);
-
         setFocusItem(edit);
     }
 

@@ -122,9 +122,6 @@ namespace gui
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
 
-        topBar->setActive(TopBar::Elements::SIGNAL, false);
-        topBar->setActive(TopBar::Elements::BATTERY, false);
-        topBar->setActive(TopBar::Elements::SIM, false);
         return optList;
     }
     void NetworkWindow::rebuild()

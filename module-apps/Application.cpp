@@ -70,10 +70,12 @@ namespace app
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
         : Service(std::move(name), std::move(parent), stackDepth, priority),
-          default_window(gui::name::window::main_window), windowsStack(this), startInBackground{startInBackground},
-          callbackStorage{std::make_unique<CallbackStorage>()}, settings(std::make_unique<settings::Settings>(this))
+          default_window(gui::name::window::main_window), windowsStack(this),
+          keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
+          callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
+          settings(std::make_unique<settings::Settings>(this))
     {
-        keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
+        topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
         busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 
         longPressTimer = std::make_unique<sys::Timer>("LongPress", this, key_timer_ms);
@@ -691,6 +693,11 @@ namespace app
     {
         timer->sysapi.connect(item);
         item->attachTimer(std::move(timer));
+    }
+
+    const gui::top_bar::Configuration &Application::getTopBarConfiguration() const noexcept
+    {
+        return topBarManager->getConfiguration();
     }
 
     void Application::addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback)

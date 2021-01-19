@@ -40,8 +40,6 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        topBar->setActive(TopBar::Elements::TIME, true);
-
         setTitle(utils::localize.get("common_results_prefix"));
     }
 

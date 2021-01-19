@@ -27,8 +27,6 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        topBar->setActive(TopBar::Elements::SIGNAL, true);
-        topBar->setActive(TopBar::Elements::BATTERY, true);
 
         setTitle("Change eink mode");
         auto label               = new Label(this, 100, 200, 300, 50, "Change mode on click");

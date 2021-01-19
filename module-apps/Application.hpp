@@ -25,6 +25,7 @@
 #include <string>                                       // for string
 #include <utility>                                      // for move, pair
 #include <vector>                                       // for vector
+#include "TopBarManager.hpp"
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"
 
@@ -369,6 +370,8 @@ namespace app
 
         void addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback);
 
+        std::unique_ptr<TopBarManager> topBarManager;
+
         /// application's settings
         std::unique_ptr<settings::Settings> settings;
         virtual void timeFormatChanged(std::string value);
@@ -378,6 +381,7 @@ namespace app
         bool isTimeFormat12() const noexcept;
         void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;
         bool isLockScreenPasscodeOn() const noexcept;
+        const gui::top_bar::Configuration &getTopBarConfiguration() const noexcept;
     };
 
     /// Parameter pack used by application launch action.
