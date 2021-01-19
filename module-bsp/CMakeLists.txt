@@ -12,11 +12,13 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dma/DriverDMA.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c/DriverI2C.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pwm/DriverPWM.cpp"
-        #"${CMAKE_CURRENT_SOURCE_DIR}/drivers/sai/DriverSAI.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/lpspi/DriverLPSPI.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/usdhc/DriverUSDHC.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/semc/DriverSEMC.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio/DriverGPIO.cpp"
-        board/linux/lpm/LinuxLPM.cpp board/linux/lpm/LinuxLPM.h
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/bluetooth/Bluetooth.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/common.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/devices/Device.cpp"    
         )
 
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

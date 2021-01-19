@@ -5,7 +5,7 @@
 
 #include <gui/core/Color.hpp>
 #include <gsl/gsl_util>
-
+#include <bsp/BoardDefinitions.hpp>
 #include <cstdio>
 #include <cstring>
 
@@ -45,7 +45,10 @@ namespace service::eink
     EinkDisplay::EinkDisplay(::gui::Size screenSize)
         : size{screenSize}, currentWaveform{createDefaultWaveFormSettings(EinkWaveformGC16)},
           displayMode{EinkDisplayColorMode_e::EinkDisplayColorModeStandard}
-    {}
+    {
+        driverLPSPI = drivers::DriverLPSPI::Create(
+            "EInk", static_cast<drivers::LPSPIInstances>(BoardDefinitions::EINK_LPSPI_INSTANCE));
+    }
 
     EinkDisplay::~EinkDisplay() noexcept
     {
@@ -65,12 +68,18 @@ namespace service::eink
 
     void EinkDisplay::powerOn()
     {
+        if (driverLPSPI) {
+            driverLPSPI->Enable();
+        }
         EinkPowerOn();
     }
 
     void EinkDisplay::powerOff()
     {
         EinkPowerOff();
+        if (driverLPSPI) {
+            driverLPSPI->Disable();
+        }
     }
 
     void EinkDisplay::shutdown()
@@ -241,4 +250,10 @@ namespace service::eink
     {
         return size;
     }
+
+    [[nodiscard]] auto EinkDisplay::getDevice() const noexcept -> std::shared_ptr<devices::Device>
+    {
+        return driverLPSPI;
+    }
+
 } // namespace service::eink

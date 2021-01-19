@@ -11,6 +11,8 @@
 #include <log/log.hpp>
 #include <messages/EinkMessage.hpp>
 #include <messages/ImageMessage.hpp>
+#include <SystemManager/messages/DeviceRegistrationMessage.hpp>
+#include <SystemManager/Constants.hpp>
 
 #include <cstring>
 #include <memory>
@@ -47,6 +49,9 @@ namespace service::eink
             LOG_FATAL("Error: Could not initialize Eink display!");
             return sys::ReturnCodes::Failure;
         }
+
+        auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(display.getDevice());
+        bus.sendUnicast(deviceRegistrationMsg, service::name::system_manager);
 
         display.powerOn();
 

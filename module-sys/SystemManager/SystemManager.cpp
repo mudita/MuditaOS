@@ -17,6 +17,7 @@
 #include <service-cellular/CellularMessage.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include "messages/CpuFrequencyMessage.hpp"
+#include "messages/DeviceRegistrationMessage.hpp"
 
 const inline size_t systemManagerStack = 4096 * 2;
 
@@ -106,6 +107,7 @@ namespace sys
     {
         powerManager  = std::make_unique<PowerManager>();
         cpuStatistics = std::make_unique<CpuStatistics>();
+        deviceManager = std::make_unique<DeviceManager>();
 
         userInit = init;
 
@@ -299,6 +301,15 @@ namespace sys
             return sys::MessageNone{};
         });
 
+        connect(typeid(sys::DeviceRegistrationMessage), [this](sys::Message *message) -> sys::MessagePointer {
+            auto msg = static_cast<sys::DeviceRegistrationMessage *>(message);
+            deviceManager->RegisterNewDevice(msg->getDevice());
+
+            return sys::MessageNone{};
+        });
+
+        deviceManager->RegisterNewDevice(powerManager->getExternalRamDevice());
+
         return ReturnCodes::Success;
     }
 
@@ -361,5 +372,6 @@ namespace sys
     cpp_freertos::MutexStandard SystemManager::destroyMutex;
     std::unique_ptr<PowerManager> SystemManager::powerManager;
     std::unique_ptr<CpuStatistics> SystemManager::cpuStatistics;
+    std::unique_ptr<DeviceManager> SystemManager::deviceManager;
 
 } // namespace sys

@@ -10,6 +10,7 @@
 #include <clock_config.h>
 #include <fsl_clock.h>
 #include <fsl_dcdc.h>
+#include "ClockState.hpp"
 
 namespace bsp
 {
@@ -100,37 +101,6 @@ namespace bsp
         }
 
         currentOscSource = source;
-    }
-
-    void RT1051LPM::SwitchPll2State(bsp::LowPowerMode::Pll2State state)
-    {
-        if (state == bsp::LowPowerMode::Pll2State::Disable) {
-            if (IsClockEnabled(kCLOCK_Lpspi1) || IsClockEnabled(kCLOCK_Lpspi2) || IsClockEnabled(kCLOCK_Lpspi3) ||
-                IsClockEnabled(kCLOCK_Lpspi4) || IsClockEnabled(kCLOCK_Usdhc1) || IsClockEnabled(kCLOCK_Usdhc2)) {
-                return;
-            }
-
-            /// First switch external RAM clock
-            CLOCK_SetMux(kCLOCK_SemcMux, 0);
-            /// Then turn off PLL2
-            clkPLL2setup(CLK_DISABLE);
-        }
-        else {
-            /// First turn on PLL2
-            clkPLL2setup(CLK_ENABLE);
-            /// Then switch external RAM clock
-            CLOCK_SetMux(kCLOCK_SemcMux, 1);
-        }
-
-        currentPll2State = state;
-    }
-
-    bool RT1051LPM::IsClockEnabled(clock_ip_name_t name) const noexcept
-    {
-        const auto index = static_cast<uint32_t>(name) >> CCM_TupleShift;
-        const auto shift = static_cast<uint32_t>(name) & CCM_TupleMask;
-
-        return ((*reinterpret_cast<volatile uint32_t *>(&CCM->CCGR0 + index)) & (ClockNeededRunWaitMode << shift));
     }
 
 } // namespace bsp
