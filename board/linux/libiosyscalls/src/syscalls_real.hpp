@@ -4,7 +4,7 @@
 #pragma once
 
 /* Helpers for intercepting library calls */
-#define __REAL_DECL(fun) decltype(::fun) *fun
+#define __REAL_DECL(fun)  decltype(::fun) *fun
 #define __REAL_DLSYM(fun) real::fun = reinterpret_cast<decltype(real::fun)>(dlsym(RTLD_NEXT, #fun))
 
-#include <dlfcn.h>      // for dlsym()
+#include <dlfcn.h> // for dlsym()

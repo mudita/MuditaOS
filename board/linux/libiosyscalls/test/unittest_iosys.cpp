@@ -16,16 +16,18 @@ TEST_CASE("VFS linux support")
 
     static constexpr auto filenm = "assets/lang/English.json";
 
-    SECTION("std::filesystem") {
+    SECTION("std::filesystem")
+    {
         REQUIRE(std::filesystem::file_size(filenm) > 0);
     }
 
-    SECTION("iterators") {
+    SECTION("iterators")
+    {
         std::ifstream myfile(filenm);
-        REQUIRE (myfile.is_open());
+        REQUIRE(myfile.is_open());
 
         auto __first = std::istreambuf_iterator<char>(myfile);
-        auto __last = std::istreambuf_iterator<char>();
+        auto __last  = std::istreambuf_iterator<char>();
         std::vector<char> testvec(__first, __last);
 
         testvec.push_back('\0');
