@@ -38,6 +38,7 @@ namespace gui
                                  style::settings::window::newApn::h,
                                  newApnModel);
         setFocusItem(list);
+        apnSettingsModel = new ApnSettingsModel(application);
     }
 
     void NewApnWindow::destroyInterface()
@@ -89,13 +90,15 @@ namespace gui
 
     auto NewApnWindow::onInput(const InputEvent &inputEvent) -> bool
     {
-        if (inputEvent.isShortPress()) {
-            if (inputEvent.is(KeyCode::KEY_ENTER)) {
-                if (apn != nullptr)
-                    newApnModel->saveData(apn);
-                verifyAndSave();
-                return true;
+        if (!inputEvent.isShortPress()) {
+            return false;
+        }
+        if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+            if (apn != nullptr) {
+                newApnModel->saveData(apn);
             }
+            verifyAndSave();
+            return true;
         }
 
         return AppWindow::onInput(inputEvent);
@@ -103,12 +106,12 @@ namespace gui
 
     auto NewApnWindow::verifyAndSave() -> bool
     {
-        if (apn != nullptr) {
-            newApnModel->apnSendRecord(*apn);
-            LOG_DEBUG("APN record  saved : \"%s\" ", apn->apn.c_str());
-        }
-        else
+        if (apn == nullptr) {
             LOG_DEBUG("APN record not found");
+            return false;
+        }
+        apnSettingsModel->saveAPN(apn);
+        LOG_DEBUG("APN record  saved : \"%s\" ", apn->apn.c_str());
 
         return true;
     }

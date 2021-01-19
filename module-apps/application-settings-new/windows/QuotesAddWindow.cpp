@@ -6,7 +6,7 @@
 
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/data/QuoteSwitchData.hpp"
-#include "application-settings-new/model/QuotesRepository.hpp"
+#include "application-settings-new/models/QuotesRepository.hpp"
 
 #include <i18n/i18n.hpp>
 #include <widgets/Text.hpp>

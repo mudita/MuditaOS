@@ -32,5 +32,4 @@ class NewApnModel : public app::InternalModel<gui::ApnListItem *>, public gui::L
 
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
     void apnDataChanged();
-    void apnSendRecord(packet_data::APN::Config apnRecord);
 };

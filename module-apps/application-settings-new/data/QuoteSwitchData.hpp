@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "application-settings-new/model/QuotesModel.hpp"
+#include "application-settings-new/models/QuotesModel.hpp"
 
-#include <module-gui/gui/SwitchData.hpp>
+#include <SwitchData.hpp>
 #include <json/json11.hpp>
 #include <utility>
 
