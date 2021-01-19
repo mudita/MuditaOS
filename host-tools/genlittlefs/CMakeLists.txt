@@ -5,6 +5,13 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
 find_package(BLKID REQUIRED)
 
+# only add LittleFS subdirectory during a standalone config of genlittlefs
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../module-vfs/thirdparty/lfsfs
+        ${CMAKE_CURRENT_BINARY_DIR}/lfsfs EXCLUDE_FROM_ALL
+    )
+endif()
+
 set(GENLITTLEFS_SRCS
     mklfs.c
     parse_partitions.c
