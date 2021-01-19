@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 # config file for pre-commit.hook clang-format
@@ -15,7 +15,9 @@ VERBOSE=1
 # if you don't wish to format i.e one file - just pass whole path to this file from git root directory
 declare ignore_paths=(
     './module-os/'
-    './board/'
+    './board/rt1051/xip/'
+    './board/rt1051/newlib/dir-common.h'
+    './board/rt1051/newlib/include/'
     './module-bsp/bsp/'
     './module-bsp/board/rt1051/common/fsl_drivers/'
     './module-bsp/board/rt1051/common/board.cpp'
