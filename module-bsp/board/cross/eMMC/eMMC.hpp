@@ -15,6 +15,7 @@
 #endif
 
 #include "bsp/common.hpp"
+#include "drivers/usdhc/DriverUSDHC.hpp"
 
 namespace bsp
 {
@@ -55,6 +56,7 @@ namespace bsp
 #else
 #error "Unsupported target"
 #endif
+        std::shared_ptr<drivers::DriverUSDHC> driverUSDHC;
     };
 
 } // namespace bsp

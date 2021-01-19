@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <memory>
+#include "drivers/lpspi/DriverLPSPI.hpp"
 
 namespace service::eink
 {
@@ -38,6 +39,8 @@ namespace service::eink
         std::int32_t getLastTemperature() const noexcept;
         ::gui::Size getSize() const noexcept;
 
+        [[nodiscard]] auto getDevice() const noexcept -> std::shared_ptr<devices::Device>;
+
       private:
         static unsigned int toWaveformTemperatureOffset(std::int32_t temperature) noexcept;
         static unsigned int toWaveformOffset(unsigned short LUTbank, unsigned int temperatureOffset) noexcept;
@@ -50,5 +53,6 @@ namespace service::eink
         const ::gui::Size size;
         EinkWaveformSettings_t currentWaveform;
         EinkDisplayColorMode_e displayMode;
+        std::shared_ptr<drivers::DriverLPSPI> driverLPSPI;
     };
 } // namespace service::eink

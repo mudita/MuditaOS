@@ -10,6 +10,7 @@ namespace sys
     PowerManager::PowerManager()
     {
         lowPowerControl = bsp::LowPowerMode::Create().value_or(nullptr);
+        driverSEMC      = drivers::DriverSEMC::Create("ExternalRAM");
     }
 
     PowerManager::~PowerManager()
@@ -55,17 +56,17 @@ namespace sys
     {
         const auto freq      = lowPowerControl->GetCurrentFrequency();
         const auto oscSource = lowPowerControl->GetCurrentOscillatorSource();
-        const auto pll2State = lowPowerControl->GetCurrentPll2State();
 
-        // switch osc source first
-        if (freq == bsp::LowPowerMode::CpuFrequency::Level_1 &&
-            oscSource == bsp::LowPowerMode::OscillatorSource::Internal) {
-            lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::External);
-        }
+        if (freq == bsp::LowPowerMode::CpuFrequency::Level_1) {
+            // switch osc source first
+            if (oscSource == bsp::LowPowerMode::OscillatorSource::Internal) {
+                lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::External);
+            }
 
-        // then turn on pll2
-        if (pll2State == bsp::LowPowerMode::Pll2State::Disable) {
-            lowPowerControl->SwitchPll2State(bsp::LowPowerMode::Pll2State::Enable);
+            // then switch external RAM clock source
+            if (driverSEMC) {
+                driverSEMC->SwitchToPLL2ClockSource();
+            }
         }
 
         // and increase frequency
@@ -97,16 +98,15 @@ namespace sys
 
         if (level == bsp::LowPowerMode::CpuFrequency::Level_1) {
             const auto oscSource = lowPowerControl->GetCurrentOscillatorSource();
-            const auto pll2State = lowPowerControl->GetCurrentPll2State();
 
             // then switch osc source
             if (oscSource == bsp::LowPowerMode::OscillatorSource::External) {
                 lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
             }
 
-            // and turn off pll2
-            if (pll2State == bsp::LowPowerMode::Pll2State::Enable) {
-                lowPowerControl->SwitchPll2State(bsp::LowPowerMode::Pll2State::Disable);
+            // and switch external RAM clock source
+            if (driverSEMC) {
+                driverSEMC->SwitchToPeripheralClockSource();
             }
         }
     }
@@ -116,4 +116,10 @@ namespace sys
         aboveThresholdCounter = 0;
         belowThresholdCounter = 0;
     }
+
+    [[nodiscard]] auto PowerManager::getExternalRamDevice() const noexcept -> std::shared_ptr<devices::Device>
+    {
+        return driverSEMC;
+    }
+
 } // namespace sys

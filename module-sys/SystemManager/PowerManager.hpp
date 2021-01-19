@@ -7,6 +7,7 @@
 #include <functional>
 
 #include "bsp/lpm/bsp_lpm.hpp"
+#include "drivers/semc/DriverSEMC.hpp"
 
 namespace sys
 {
@@ -42,6 +43,8 @@ namespace sys
         /// @note the frequency is always reduced by one step
         void DecreaseCpuFrequency() const;
 
+        [[nodiscard]] auto getExternalRamDevice() const noexcept -> std::shared_ptr<devices::Device>;
+
       private:
         void ResetFrequencyShiftCounter();
 
@@ -49,6 +52,7 @@ namespace sys
         uint32_t aboveThresholdCounter{0};
 
         std::unique_ptr<bsp::LowPowerMode> lowPowerControl;
+        std::shared_ptr<drivers::DriverSEMC> driverSEMC;
     };
 
 } // namespace sys

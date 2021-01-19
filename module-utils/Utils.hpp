@@ -12,7 +12,6 @@
 #include <random>
 #include "time/time_conversion.hpp"
 
-#define MAGIC_ENUM_RANGE_MAX 256
 #include <magic_enum.hpp>
 
 namespace utils

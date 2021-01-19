@@ -21,6 +21,7 @@
 #include "PowerManager.hpp"
 #include "Constants.hpp"
 #include "CpuStatistics.hpp"
+#include "DeviceManager.hpp"
 #include <chrono>
 
 namespace sys
@@ -142,6 +143,7 @@ namespace sys
         static cpp_freertos::MutexStandard destroyMutex;
         static std::unique_ptr<PowerManager> powerManager;
         static std::unique_ptr<CpuStatistics> cpuStatistics;
+        static std::unique_ptr<DeviceManager> deviceManager;
     };
 
 } // namespace sys
