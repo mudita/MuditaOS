@@ -174,7 +174,7 @@ namespace purefs::fs::drivers::ffat::internal
                 }
                 break;
             case GET_SECTOR_SIZE:
-                ret = diskmm->get_info(diskh, blkdev::info_type::sector_count);
+                ret = diskmm->get_info(diskh, blkdev::info_type::sector_size);
                 if (ret >= 0) {
                     if (!buff) {
                         ret = -EINVAL;
