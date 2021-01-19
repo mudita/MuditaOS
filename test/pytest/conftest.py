@@ -12,13 +12,15 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 
 from harness import log
 from harness.harness import Harness
+from harness import utils
 from harness.interface.error import TestError, Error
+from harness.interface.CDCSerial import CDCSerial as serial
 
 simulator_port = 'simulator'
 
 
 def pytest_addoption(parser):
-    parser.addoption("--port", type=str, action="store", required=True)
+    parser.addoption("--port", type=str, action="store", required=False)
     parser.addoption("--timeout", type=int, action="store", default=15)
     parser.addoption("--phone_number", type=int, action="store")
     parser.addoption("--call_duration", type=int, action="store", default=30)
@@ -48,38 +50,76 @@ def sms_text(request):
 
 @pytest.fixture(scope='session')
 def harness(request):
+    '''
+    Try to init one Pure phone with serial port path or automatically
+    '''
     port_name = request.config.option.port
-    timeout = request.config.option.timeout
+    TIMEOUT = int(request.config.option.timeout)
+    timeout_started = time.time()
 
-    if port_name is None:
-        pytest.exit("no port provided!")
-    assert '/dev' in port_name or simulator_port in port_name
+    RETRY_EVERY_SECONDS = 1.0
+    try:
+        if port_name is None:
+            log.warning("no port provided! trying automatic detection")
+            harness = None
 
-    if simulator_port in port_name:
-        while timeout != 0:
-            try:
-                file = open("/tmp/purephone_pts_name", "r")
-                break
-            except FileNotFoundError as err:
-                time.sleep(1)
-                timeout = timeout - 1
-                print("waiting...")
-                if timeout == 0:
-                    raise TestError(Error.PORT_FILE_NOT_FOUND)
-
-        port_name = file.readline()
-        if port_name.isascii():
-            log.debug("found {} entry!".format(port_name))
+            with utils.Timeout.limit(seconds=TIMEOUT):
+                while not harness:
+                    try:
+                        harness = Harness.from_detect()
+                    except TestError as e:
+                        if e.get_error_code() == Error.PORT_NOT_FOUND:
+                            log.info(f"waiting for a serial port… ({TIMEOUT- int(time.time() - timeout_started)})")
+                            time.sleep(RETRY_EVERY_SECONDS)
         else:
-            pytest.exit("not a valid sim pts entry!")
+            assert '/dev' in port_name or simulator_port in port_name
 
-    harness = Harness(port_name)
-    return harness
+            if simulator_port in port_name:
+                file = None
+                with utils.Timeout.limit(seconds=TIMEOUT):
+                    while not file:
+                        try:
+                            file = open("/tmp/purephone_pts_name", "r")
+                        except FileNotFoundError as err:
+                            log.info(
+                                f"waiting for a simulator port… ({TIMEOUT- int(time.time() - timeout_started)})")
+                            time.sleep(RETRY_EVERY_SECONDS)
+                port_name = file.readline()
+                if port_name.isascii():
+                    log.debug("found {} entry!".format(port_name))
+                else:
+                    pytest.exit("not a valid sim pts entry!")
+
+            harness = Harness(port_name)
+    except utils.Timeout:
+        pytest.exit("couldn't find any viable port. exiting")
+    else:
+        return harness
+
+
+@pytest.fixture(scope='session')
+def harnesses():
+    '''
+    Automatically init at least two Pure phones
+    '''
+    found_pures = serial.find_Pures()
+    harnesses = [Harness(pure) for pure in found_pures]
+    if not len(harnesses) >= 2:
+        pytest.skip("At least two phones are needed for this test")
+    assert len(harnesses) >= 2
+    return harnesses
 
 @pytest.fixture(scope='session')
 def phone_unlocked(harness):
     harness.unlock_phone()
     assert harness.is_phone_unlocked
+
+
+@pytest.fixture(scope='session')
+def phones_unlocked(harnesses):
+    for harness in harnesses:
+        harness.unlock_phone()
+        assert harness.is_phone_unlocked
 
 def pytest_configure(config):
     config.addinivalue_line("markers",

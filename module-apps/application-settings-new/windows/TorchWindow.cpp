@@ -21,7 +21,8 @@ namespace gui
     {
         BaseSettingsWindow::buildInterface();
         setTitle(utils::translateI18("app_settings_title_torch"));
-        body->setSize(body->getWidth(), body->getHeight() - style::settings::window::torch::body_offset);
+        optionsList->setSize(optionsList->getWidth(),
+                             optionsList->getHeight() - style::settings::window::torch::body_offset);
         bar = new Rect(this,
                        style::window::default_left_margin,
                        style::settings::window::torch::bar_y,
@@ -42,7 +43,7 @@ namespace gui
     {
         std::list<gui::Option> optionsList;
 
-        optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+        optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translateI18("app_settings_torch_sunset_red_light_option"),
             [=](gui::Item &item) {
                 toggleSwitchState();
@@ -56,10 +57,10 @@ namespace gui
                 return true;
             },
             this,
-            switchState ? RightItem::On : RightItem::Off));
+            switchState ? gui::option::SettingRightItem::On : gui::option::SettingRightItem::Off));
 
         if (switchState) {
-            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 utils::translateI18("app_settings_torch_nightshift_time_option"),
                 [=](gui::Item &item) {
                     application->switchWindow(gui::window::name::nightshift, gui::ShowMode::GUI_SHOW_INIT);
@@ -73,7 +74,7 @@ namespace gui
                     return true;
                 },
                 nullptr,
-                RightItem::ArrowWhite));
+                gui::option::SettingRightItem::ArrowWhite));
         }
 
         return optionsList;

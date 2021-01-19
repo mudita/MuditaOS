@@ -34,6 +34,15 @@ namespace gui
 
         uint32_t rowSize = 0;
         uint32_t colSize = 0;
+        ///> elementsInIncompletedLastRow describes how many items has been put to last row,
+        /// in case when items for last row is not equal to colSize
+        uint32_t elementsInIncompletedLastRow = 0;
+
+      private:
+        uint32_t calculateColumnSizeForBorderTransition(const uint32_t currentPosition);
+        uint32_t calculateRowSizeForBorderTransition(const uint32_t currentPosition);
+
+        void handleItemsOutOfGridLayoutArea(uint32_t maxItemsInArea);
     };
 
 }; // namespace gui

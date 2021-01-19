@@ -31,7 +31,7 @@ namespace gui
         if (handleNavigation(inputEvent)) {
             return true;
         }
-        if (borderCallback && borderCallback(inputEvent)) {
+        if (borderCallback && isInputNavigation(inputEvent) && borderCallback(inputEvent)) {
             outOfDrawAreaItems.clear();
             return true;
         }

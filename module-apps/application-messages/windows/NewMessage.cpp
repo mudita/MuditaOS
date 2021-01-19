@@ -49,7 +49,8 @@ namespace gui
     std::unique_ptr<NewMessageWindow::MessageMemento> NewMessageWindow::memento =
         std::make_unique<NewMessageWindow::MessageMemento>();
 
-    NewMessageWindow::NewMessageWindow(app::Application *app) : AppWindow(app, name::window::new_sms)
+    NewMessageWindow::NewMessageWindow(app::Application *app)
+        : AppWindow(app, name::window::new_sms), app::AsyncCallbackReceiver{app}
     {
         buildInterface();
     }
@@ -311,7 +312,8 @@ namespace gui
     {
         auto number = contactRecord.numbers.front().number;
         auto query  = std::make_unique<db::query::ThreadGetByContactID>(contactRecord.ID);
-        query->setQueryListener(db::QueryCallback::fromFunction([this, number](auto response) {
+        auto task   = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+        task->setCallback([this, number](auto response) {
             const auto result = dynamic_cast<db::query::ThreadGetByContactIDResult *>(response);
             if (result == nullptr) {
                 return false;
@@ -323,15 +325,16 @@ namespace gui
                 return true;
             }
             return addDraftToExistingThread(thread->ID, number, message->getText());
-        }));
-
-        return DBServiceAPI::GetQuery(application, db::Interface::Name::SMSThread, std::move(query));
+        });
+        task->execute(application, this);
+        return true;
     }
 
     auto NewMessageWindow::addDraft(const utils::PhoneNumber &number) -> bool
     {
         auto query = std::make_unique<db::query::ThreadGetByNumber>(number.getView());
-        query->setQueryListener(db::QueryCallback::fromFunction([this, number](auto response) {
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+        task->setCallback([this, number](auto response) {
             const auto result = dynamic_cast<db::query::ThreadGetByNumberResult *>(response);
             if (result == nullptr) {
                 return false;
@@ -343,9 +346,9 @@ namespace gui
                 return true;
             }
             return addDraftToExistingThread(thread.ID, number.getView(), message->getText());
-        }));
-
-        return DBServiceAPI::GetQuery(application, db::Interface::Name::SMSThread, std::move(query));
+        });
+        task->execute(application, this);
+        return true;
     }
 
     auto NewMessageWindow::addDraftToExistingThread(unsigned int threadId,
@@ -353,7 +356,8 @@ namespace gui
                                                     const UTF8 &text) -> bool
     {
         auto query = std::make_unique<db::query::SMSGetLastByThreadID>(threadId);
-        query->setQueryListener(db::QueryCallback::fromFunction([this, number](auto response) {
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
+        task->setCallback([this, number](auto response) {
             const auto result = dynamic_cast<db::query::SMSGetLastByThreadIDResult *>(response);
             if (result == nullptr) {
                 return false;
@@ -366,9 +370,9 @@ namespace gui
             }
             storeMessageDraft(number, message->getText());
             return true;
-        }));
-
-        return DBServiceAPI::GetQuery(application, db::Interface::Name::SMS, std::move(query));
+        });
+        task->execute(application, this);
+        return true;
     }
 
     void NewMessageWindow::storeMessageDraft(const utils::PhoneNumber::View &number, const UTF8 &text)

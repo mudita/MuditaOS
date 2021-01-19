@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/CellularMessage.hpp"
@@ -340,4 +340,16 @@ bool CellularServiceAPI::GetDataTransfer(sys::Service *serv)
 {
     return sys::Bus::SendUnicast(
         std::make_shared<CellularGetDataTransferMessage>(), ServiceCellular::serviceName, serv);
+}
+
+bool CellularServiceAPI::SetVoLTE(sys::Service *serv, bool voLTE)
+{
+    return sys::Bus::SendUnicast(
+        std::make_shared<CellularChangeVoLTEDataMessage>(voLTE), ServiceCellular::serviceName, serv);
+}
+
+bool CellularServiceAPI::ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState)
+{
+    return sys::Bus::SendUnicast(
+        std::make_shared<CellularPowerStateChange>(newState), ServiceCellular::serviceName, serv);
 }

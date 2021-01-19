@@ -29,7 +29,7 @@ namespace gui
         {}
         [[nodiscard]] auto getState() const noexcept -> bool
         {
-            if (status.state == BluetoothStatus::BluetoothState::On) {
+            if (status.state == BluetoothStatus::State::On) {
                 return true;
             }
             return false;

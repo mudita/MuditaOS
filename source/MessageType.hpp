@@ -74,11 +74,13 @@ enum class MessageType
     CellularHangupCall,         ///< Hang up call
     CellularCall,               ///< Call related events
     CellularCallRequest,        ///< Call request
+    CellularPowerStateChange,   ///< Change power state of the module
 
     CellularListCurrentCalls,
     CellularSimProcedure,        // Broadcast on sim state changed
     CellularSimResponse,         // Send to PIN window (show, error state, hide)
     CellularSimVerifyPinRequest, // Send from PIN window with PIN, PUK, ... number
+    CellularSetVoLTE,
 
     CellularPacketData, ///< for all PacketData messages
 
@@ -168,9 +170,6 @@ enum class MessageType
     // battery charger messages
     EVMBatteryLevel,
     EVMChargerPlugged,
-    EVMBatterySetCriticalLevel,
-    EVMBatteryLevelCritical,
-    EVMBatteryBrownout,
     // rtc messages
     EVMMinuteUpdated, ///< This message is send to current focused application on every minute time change.
     EVMTimeUpdated,   ///< This message is send on every time update.
@@ -178,8 +177,6 @@ enum class MessageType
     EVMTorchStateMessage,
     // Keypad backlight control messages
     EVMKeypadBacklightMessage,
-    // Screen frontlight control messages
-    EVMScreenLightControlMessage,
 
     // cellular messages
     EVMGetBoard,
@@ -239,7 +236,12 @@ enum class MessageType
     AntennaLockNotification,
     Settings,
     FileContentModified,
-    FileIndexer
+    FileIndexer,
+
+    // Screen frontlight control messages
+    ScreenLightControlAction,
+    ScreenLightControlParameters,
+    ScreenLightControlParametersResponse,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

@@ -66,9 +66,9 @@ sys::ReturnCodes ServiceAudio::InitHandler()
 
         // ROUTING
         {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP), "20"},
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker), "20"},
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker), "0"},
         {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingLoudspeaker), "20"},
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones), "50"},
+        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones), "0"},
 
         {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingBluetoothHSP), defaultVolumeHigh},
         {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker), defaultVolumeHigh},

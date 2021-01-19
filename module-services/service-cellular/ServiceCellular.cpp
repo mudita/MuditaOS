@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularUrcHandler.hpp"
@@ -94,12 +94,18 @@ const char *State::c_str(State::ST state)
     switch (state) {
     case ST::Idle:
         return "Idle";
+    case ST::WaitForStartPermission:
+        return "WaitForStartPermission";
+    case ST::PowerUpRequest:
+        return "PowerUpRequest";
     case ST::StatusCheck:
         return "StatusCheck";
     case ST::PowerUpInProgress:
         return "PowerUpInProgress";
     case ST::PowerUpProcedure:
         return "PowerUpProcedure";
+    case ST::BaudDetect:
+        return "BaudDetect";
     case ST::AudioConfigurationProcedure:
         return "AudioConfigurationProcedure";
     case ST::APNConfProcedure:
@@ -198,7 +204,8 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         sys::Bus::SendMulticast(msg.value(), sys::BusChannels::ServiceCellularNotifications, this);
     };
     registerMessageHandlers();
-
+    settings->registerValueChange(settings::Cellular::volte_on,
+                                  [this](const std::string &value) { volteChanged(value); });
     packetData = std::make_unique<packet_data::PacketData>(*this);
     packetData->loadAPNSettings();
 }
@@ -206,6 +213,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 ServiceCellular::~ServiceCellular()
 {
     LOG_INFO("[ServiceCellular] Cleaning resources");
+    settings->unregisterValueChange(settings::Cellular::volte_on);
 }
 
 // this static function will be replaced by Settings API
@@ -216,6 +224,7 @@ static bool isSettingsAutomaticTimeSyncEnabled()
 
 void ServiceCellular::CallStateTimerHandler()
 {
+    LOG_DEBUG("CallStateTimerHandler");
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, this);
@@ -224,21 +233,8 @@ void ServiceCellular::CallStateTimerHandler()
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
     board = EventManagerServiceAPI::GetBoard(this);
-    cmux->SelectAntenna(bsp::cellular::antenna::lowBand);
-    switch (board) {
-    case bsp::Board::T4:
-        state.set(this, State::ST::StatusCheck);
-        break;
-    case bsp::Board::T3:
-        state.set(this, State::ST::PowerUpProcedure);
-        break;
-    case bsp::Board::Linux:
-        state.set(this, State::ST::PowerUpProcedure);
-        break;
-    default:
-        return sys::ReturnCodes::Failure;
-        break;
-    }
+
+    state.set(this, State::ST::WaitForStartPermission);
     return sys::ReturnCodes::Success;
 }
 
@@ -290,10 +286,12 @@ void ServiceCellular::registerMessageHandlers()
         bsp::cellular::sim::hotswap_trigger();
         return std::make_shared<CellularResponseMessage>(true);
     });
+
     connect(typeid(CellularStartOperatorsScanMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularStartOperatorsScanMessage *>(request);
         return handleCellularStartOperatorsScan(msg);
     });
+
     connect(typeid(CellularGetActiveContextsMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularGetActiveContextsMessage *>(request);
         return handleCellularGetActiveContextsMessage(msg);
@@ -332,6 +330,20 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularGetActiveContextsMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularGetActiveContextsMessage *>(request);
         return handleCellularGetActiveContextsMessage(msg);
+    });
+
+    connect(typeid(CellularChangeVoLTEDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularChangeVoLTEDataMessage *>(request);
+        volteOn  = msg->getVoLTEon();
+        settings->setValue(settings::Cellular::volte_on, std::to_string(volteOn));
+        return std::make_shared<CellularResponseMessage>(true);
+    });
+
+    connect(typeid(CellularPowerStateChange), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg       = static_cast<CellularPowerStateChange *>(request);
+        nextPowerState = msg->getNewState();
+        handle_power_state_change();
+        return sys::MessageNone{};
     });
     handle_CellularGetChannelMessage();
 }
@@ -373,6 +385,12 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
     case State::ST::Idle:
         handle_idle();
         break;
+    case State::ST::WaitForStartPermission:
+        handle_wait_for_start_permission();
+        break;
+    case State::ST::PowerUpRequest:
+        handle_power_up_request();
+        break;
     case State::ST::StatusCheck:
         handle_status_check();
         break;
@@ -381,6 +399,14 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
         break;
     case State::ST::PowerUpProcedure:
         handle_power_up_procedure();
+        break;
+    case State::ST::BaudDetect:
+        if (nextPowerStateChangeAwaiting) {
+            handle_power_state_change();
+        }
+        else {
+            handle_baud_detect();
+        }
         break;
     case State::ST::AudioConfigurationProcedure:
         handle_audio_conf_procedure();
@@ -423,6 +449,9 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
         break;
     case State::ST::PowerDown:
         handle_power_down();
+        if (nextPowerStateChangeAwaiting) {
+            handle_power_state_change();
+        }
         break;
     };
 }
@@ -430,6 +459,34 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
 bool ServiceCellular::handle_idle()
 {
     LOG_DEBUG("Idle");
+    return true;
+}
+
+bool ServiceCellular::handle_wait_for_start_permission()
+{
+    auto msg = std::make_shared<CellularCheckIfStartAllowedMessage>();
+    sys::Bus::SendUnicast(msg, service::name::system_manager, this);
+
+    return true;
+}
+
+bool ServiceCellular::handle_power_up_request()
+{
+    cmux->SelectAntenna(bsp::cellular::antenna::lowBand);
+    switch (board) {
+    case bsp::Board::T4:
+        state.set(this, State::ST::StatusCheck);
+        break;
+    case bsp::Board::T3:
+        state.set(this, State::ST::PowerUpProcedure);
+        break;
+    case bsp::Board::Linux:
+        state.set(this, State::ST::PowerUpProcedure);
+        break;
+    case bsp::Board::none:
+        return false;
+        break;
+    }
     return true;
 }
 
@@ -498,6 +555,13 @@ bool ServiceCellular::handle_power_up_in_progress_procedure(void)
         vTaskDelay(pdMS_TO_TICKS(msModemUartInitTime));
         isAfterForceReboot = false;
     }
+
+    state.set(this, cellular::State::ST::BaudDetect);
+    return true;
+}
+
+bool ServiceCellular::handle_baud_detect()
+{
     auto ret = cmux->BaudDetectProcedure();
     if (ret == TS0710::ConfState::Success) {
         state.set(this, cellular::State::ST::CellularConfProcedure);
@@ -540,7 +604,7 @@ bool ServiceCellular::handle_power_down()
     isAfterForceReboot = true;
     cmux.reset();
     cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
-    InitHandler();
+
     return true;
 }
 
@@ -1031,6 +1095,9 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             auto result = msg->getResult();
             if (auto response = dynamic_cast<db::query::SMSSearchByTypeResult *>(result.get())) {
                 responseHandled = handle(response);
+            }
+            else if (result->hasListener()) {
+                responseHandled = result->handle();
             }
         }
         if (responseHandled) {
@@ -1808,7 +1875,8 @@ bool ServiceCellular::dbAddSMSRecord(const SMSRecord &record)
         onSMSReceived();
         return true;
     }));
-    return DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::move(query));
+    const auto [succeed, _] = DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::move(query));
+    return succeed;
 }
 
 void ServiceCellular::onSMSReceived()
@@ -1959,6 +2027,50 @@ void ServiceCellular::handleStateTimer(void)
     }
 }
 
+void ServiceCellular::handle_power_state_change()
+{
+    nextPowerStateChangeAwaiting = false;
+    auto modemActive             = cmux->IsModemActive();
+
+    if (nextPowerState == State::PowerState::On) {
+        if (state.get() == State::ST::PowerDownWaiting) {
+            LOG_DEBUG("Powerdown in progress. Powerup request queued.");
+            nextPowerStateChangeAwaiting = true;
+        }
+        else if (state.get() == State::ST::PowerUpProcedure || state.get() == State::ST::PowerUpInProgress) {
+            LOG_DEBUG("Powerup already in progress");
+        }
+        else if (state.get() == State::ST::PowerDown || state.get() == State::ST::WaitForStartPermission) {
+            LOG_INFO("Modem Power UP.");
+            state.set(this, State::ST::PowerUpRequest);
+        }
+        else {
+            LOG_DEBUG("Modem already powered up.");
+        }
+    }
+    else {
+        if (state.get() == State::ST::PowerUpProcedure || state.get() == State::ST::PowerUpInProgress) {
+            LOG_DEBUG("Powerup in progress. Powerdown request queued.");
+            nextPowerStateChangeAwaiting = true;
+        }
+        else if (state.get() == State::ST::PowerDownWaiting) {
+            LOG_DEBUG("Powerdown already in progress.");
+        }
+        else if (state.get() == State::ST::PowerDown) {
+            LOG_DEBUG("Modem already powered down.");
+        }
+        else if (state.get() == State::ST::WaitForStartPermission && !modemActive) {
+            LOG_DEBUG("Modem already powered down.");
+            state.set(this, State::ST::PowerDown);
+        }
+        else {
+            LOG_INFO("Modem Power DOWN.");
+            cmux->TurnOffModem();
+            state.set(this, State::ST::PowerDownWaiting);
+        }
+    }
+}
+
 bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request)
 {
     constexpr uint32_t commandTimeout        = 120000;
@@ -2040,6 +2152,7 @@ std::shared_ptr<cellular::RawCommandRespAsync> ServiceCellular::handleCellularSt
     sys::Bus::SendUnicast(ret, msg->sender, this);
     return ret;
 }
+
 bool ServiceCellular::handle_apn_conf_procedure()
 {
     LOG_DEBUG("APN on modem configuration");
@@ -2130,4 +2243,11 @@ std::shared_ptr<CellularSetOperatorResponse> ServiceCellular::handleCellularSetO
     NetworkSettings networkSettings(*this);
     return std::make_shared<CellularSetOperatorResponse>(
         networkSettings.setOperator(msg->getMode(), msg->getFormat(), msg->getName()));
+}
+
+void ServiceCellular::volteChanged(const std::string &value)
+{
+    if (!value.empty()) {
+        volteOn = utils::getNumericValue<bool>(value);
+    }
 }

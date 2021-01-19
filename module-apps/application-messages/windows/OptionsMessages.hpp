@@ -5,7 +5,7 @@
 
 #include "../ApplicationMessages.hpp"
 #include "Interface/SMSRecord.hpp"
-#include <OptionsWindowOption.hpp>
+#include <Option.hpp>
 
 std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record);
 
