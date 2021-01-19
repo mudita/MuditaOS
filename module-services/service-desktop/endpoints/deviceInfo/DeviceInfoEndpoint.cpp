@@ -13,6 +13,8 @@
 #include <cstdint>
 #include <string>
 
+using namespace parserFSM;
+
 auto DeviceInfoEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {

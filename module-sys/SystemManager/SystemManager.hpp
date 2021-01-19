@@ -26,9 +26,12 @@
 
 namespace sys
 {
-    using namespace std::chrono_literals;
-    inline constexpr std::chrono::milliseconds timerInitInterval{30s};
-    inline constexpr std::chrono::milliseconds timerPeriodInterval{100ms};
+    namespace constants
+    {
+        using namespace std::chrono_literals;
+        inline constexpr std::chrono::milliseconds timerInitInterval{30s};
+        inline constexpr std::chrono::milliseconds timerPeriodInterval{100ms};
+    } // namespace constants
 
     enum class Code
     {

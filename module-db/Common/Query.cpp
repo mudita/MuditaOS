@@ -21,7 +21,7 @@ bool QueryCallback::handleQueryResponse(QueryResult *response)
     return callback(response);
 }
 
-EndpointListener::EndpointListener(EndpointQueryCallbackFunction &&_callback, Context &_context)
+EndpointListener::EndpointListener(EndpointQueryCallbackFunction &&_callback, parserFSM::Context &_context)
     : callback{std::move(_callback)}, context{_context}
 {}
 

@@ -6,6 +6,7 @@
 
 namespace sdesktop::developerMode
 {
+    using namespace parserFSM;
     void Event::send()
     {
         MessageHandler::putToSendQueue(context.createSimpleResponse());

@@ -9,13 +9,11 @@
 #include <log/log.hpp>
 #include <module-services/service-desktop/endpoints/Context.hpp>
 
-using namespace parserFSM;
-
 namespace db
 {
     class QueryResult; // Forward declaration
     using QueryCallbackFunction         = std::function<bool(db::QueryResult *)>;
-    using EndpointQueryCallbackFunction = std::function<bool(db::QueryResult *, Context &)>;
+    using EndpointQueryCallbackFunction = std::function<bool(db::QueryResult *, parserFSM::Context &)>;
 
     class QueryListener
     {
@@ -42,13 +40,13 @@ namespace db
     {
       public:
         EndpointListener() = default;
-        EndpointListener(EndpointQueryCallbackFunction &&_callback, Context &_context);
+        EndpointListener(EndpointQueryCallbackFunction &&_callback, parserFSM::Context &_context);
 
         bool handleQueryResponse(db::QueryResult *result) override;
 
       private:
         EndpointQueryCallbackFunction callback;
-        Context context;
+        parserFSM::Context context;
     };
 
     /// virtual query input interface

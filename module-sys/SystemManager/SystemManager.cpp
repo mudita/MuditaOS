@@ -116,7 +116,7 @@ namespace sys
         // pingPongTimerID = CreateTimer(Ticks::MsToTicks(pingInterval), true);
         // ReloadTimer(pingPongTimerID);
 
-        cpuStatisticsTimer = std::make_unique<sys::Timer>("cpuStatistics", this, timerInitInterval.count());
+        cpuStatisticsTimer = std::make_unique<sys::Timer>("cpuStatistics", this, constants::timerInitInterval.count());
         cpuStatisticsTimer->connect([&](sys::Timer &) { CpuStatisticsTimerHandler(); });
         cpuStatisticsTimer->start();
     }
@@ -354,7 +354,7 @@ namespace sys
     {
         if (!cpuStatisticsTimerInit) {
             cpuStatisticsTimerInit = true;
-            cpuStatisticsTimer->setInterval(timerPeriodInterval.count());
+            cpuStatisticsTimer->setInterval(constants::timerPeriodInterval.count());
         }
 
         cpuStatistics->Update();

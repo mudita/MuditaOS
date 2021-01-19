@@ -29,6 +29,7 @@ namespace sys
 
 namespace stm
 {
+    using namespace std::chrono_literals;
     constexpr static auto eventTimerMinSkipInterval = 100ms;
 
     CalendarTimeEvents::CalendarTimeEvents(sys::Service *service) : TimeEvents(service)
@@ -36,8 +37,8 @@ namespace stm
 
     bool CalendarTimeEvents::sendNextEventQuery()
     {
-        TimePoint filterFrom = TimePointNow();
-        TimePoint filterTill = filterFrom;
+        calendar::TimePoint filterFrom = TimePointNow();
+        calendar::TimePoint filterTill = filterFrom;
         if (startTP != TIME_POINT_INVALID) {
             filterFrom = std::min(startTP, filterFrom);
             filterTill = filterFrom;
@@ -64,7 +65,7 @@ namespace stm
         }
 
         eventRecord   = records.at(0);
-        startTP       = eventRecord.date_from - minutes{eventRecord.reminder};
+        startTP       = eventRecord.date_from - std::chrono::minutes{eventRecord.reminder};
         auto duration = eventRecord.date_from - std::chrono::minutes{eventRecord.reminder} - TimePointNow();
         if (duration.count() <= 0) {
             duration = std::chrono::milliseconds(eventTimerMinSkipInterval);
