@@ -25,6 +25,7 @@
 #include "windows/QuotesMainWindow.hpp"
 #include "windows/QuotesAddWindow.hpp"
 #include "windows/SecurityMainWindow.hpp"
+#include "windows/ChangePasscodeWindow.hpp"
 
 #include "Dialog.hpp"
 
@@ -38,6 +39,7 @@
 #include <application-settings-new/data/BondedDevicesData.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <application-settings-new/data/PhoneNameData.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
 namespace app
 {
@@ -145,6 +147,10 @@ namespace app
 
         setActiveWindow(gui::name::window::main_window);
 
+        settings->registerValueChange(::settings::SystemProperties::lockPassHash, [this](std::string value) {
+            lockPassHash = utils::getNumericValue<unsigned int>(value);
+        });
+
         return ret;
     }
 
@@ -221,6 +227,12 @@ namespace app
         windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SecurityMainWindow>(app);
         });
+        windowsFactory.attach(gui::window::name::change_passcode, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ChangePasscodeWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
+        });
     }
 
     void ApplicationSettingsNew::destroyUserInterface()
@@ -275,4 +287,9 @@ namespace app
         }
     }
 
+    void ApplicationSettingsNew::setLockPassHash(unsigned int value)
+    {
+        lockPassHash = value;
+        settings->setValue(::settings::SystemProperties::lockPassHash, std::to_string(value));
+    }
 } /* namespace app */

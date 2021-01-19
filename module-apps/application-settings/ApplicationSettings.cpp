@@ -24,7 +24,7 @@
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/SimSelectWindow.hpp"
 #include "windows/CellularPassthroughWindow.hpp"
-#include "windows/SettingsChange.hpp"
+#include "OptionChangePin.hpp"
 
 #include <i18n/i18n.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
@@ -127,7 +127,7 @@ namespace app
             return std::make_unique<gui::OptionWindow>(app, name, simSelectWindow(app, this));
         });
         windowsFactory.attach(app::change_setting, [this](Application *app, const std::string &name) {
-            return std::make_unique<gui::OptionWindow>(app, name, settingsChangeWindow(app, this, lockPassHash));
+            return std::make_unique<gui::OptionWindow>(app, name, settingChangePinWindow(app, this, lockPassHash));
         });
         windowsFactory.attach("Languages", [](Application *app, const std::string &name) {
             return std::make_unique<gui::LanguageWindow>(app);

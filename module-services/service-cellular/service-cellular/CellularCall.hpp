@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -41,7 +41,8 @@ namespace ModemCall
         FAX   = 2,
     };
 
-    // TODO: alek: check specification
+    /// Usually contains one of defined values
+    /// More details in 3GPP TS 24.008 subclause 10.5.4.7
     enum class CallType : uint8_t
     {
         UknownType      = 129,
@@ -57,9 +58,9 @@ namespace ModemCall
         CallMode mode;
         bool isConferenceCall;
         std::string phoneNumber;
-        CallType type;
-        std::string phoneBookName; // TODO: alek: This field is defined in the AT+CLCC command resposne but our modem is
-                                   // not returning it. Need to verify in modem specification
+        uint8_t type;              /// Usually contains on of values defined in CallType
+        std::string phoneBookName; /// This field is defined in the AT+CLCC command response but our modem is
+                                   /// not returning it.
 
         ModemCall()  = delete;
         ~ModemCall() = default;

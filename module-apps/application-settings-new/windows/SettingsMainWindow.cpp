@@ -23,7 +23,7 @@ std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
                                        app->switchWindow(window, nullptr);
                                        return true;
                                    },
-                                   gui::Arrow::Enabled});
+                                   gui::option::Arrow::Enabled});
     };
     auto addApp = [&l, &app](UTF8 name, const std::string &window = "") {
         l.emplace_back(gui::Option{name,
@@ -39,7 +39,7 @@ std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
                                        app->switchWindow(window, nullptr);
                                        return true;
                                    },
-                                   gui::Arrow::Enabled});
+                                   gui::option::Arrow::Enabled});
     };
 
     addApp(i18("app_desktop_menu_settings"), "Settings");

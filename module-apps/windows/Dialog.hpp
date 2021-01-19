@@ -8,6 +8,11 @@
 #include <functional>
 #include <DialogMetadata.hpp>
 
+namespace gui::window::name
+{
+    inline constexpr auto dialog_confirm = "DialogConfirm";
+}; // namespace gui::window::name
+
 namespace gui
 {
     /// @brief base Dialog class
