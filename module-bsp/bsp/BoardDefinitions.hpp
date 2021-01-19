@@ -6,6 +6,8 @@
 #include "drivers/i2c/DriverI2C.hpp"
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
+#include "drivers/lpspi/DriverLPSPI.hpp"
+#include "drivers/usdhc/DriverUSDHC.hpp"
 
 enum class BoardDefinitions
 {
@@ -84,6 +86,7 @@ enum class BoardDefinitions
     EINK_RESET_PIN=16,
     EINK_BUSY_PIN=17,
     EINK_PLL = static_cast<int >(drivers::PLLInstances::PLL2_PFD2),
+    EINK_LPSPI_INSTANCE = static_cast<int >(drivers::LPSPIInstances::LPSPI_1),
 
     BLUETOOTH_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     BLUETOOTH_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
@@ -91,6 +94,7 @@ enum class BoardDefinitions
     BLUETOOTH_RX_DMA_CHANNEL = 8,
 
     EMMC_PLL = static_cast<int >(drivers::PLLInstances::PLL2_PFD2),
+    EMMC_USDHC_INSTANCE = static_cast<int >(drivers::USDHCInstances::USDHC_2),
 
     AUDIO_PLL = static_cast<int >(drivers::PLLInstances::PLL4_Audio),
 

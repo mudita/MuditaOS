@@ -166,6 +166,8 @@ enum class MessageType
 
     // Power manager
     PMChangePowerMode,
+    // System manager
+    DeviceRegistration,
 
     // battery charger messages
     EVMBatteryLevel,

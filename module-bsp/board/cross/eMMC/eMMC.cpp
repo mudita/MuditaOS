@@ -20,6 +20,8 @@ namespace bsp
 
     RetCode eMMC::Init()
     {
+        driverUSDHC = drivers::DriverUSDHC::Create(
+            "EMMC", static_cast<drivers::USDHCInstances>(BoardDefinitions::EMMC_USDHC_INSTANCE));
 #if defined(TARGET_RT1051)
 
         // pll = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions ::EMMC_PLL),DriverPLLParams{});
@@ -56,7 +58,9 @@ namespace bsp
     RetCode eMMC::ReadBlocks(uint8_t *buffer, uint32_t startBlock, uint32_t blockCount)
     {
 #if defined(TARGET_RT1051)
+        driverUSDHC->Enable();
         auto ret = MMC_ReadBlocks(&mmcCard, buffer, startBlock, blockCount);
+        driverUSDHC->Disable();
         if (ret != kStatus_Success) {
             return RetCode::Failure;
         }
@@ -71,7 +75,9 @@ namespace bsp
     RetCode eMMC::WriteBlocks(const uint8_t *buffer, uint32_t startBlock, uint32_t blockCount)
     {
 #if defined(TARGET_RT1051)
+        driverUSDHC->Enable();
         auto ret = MMC_WriteBlocks(&mmcCard, buffer, startBlock, blockCount);
+        driverUSDHC->Disable();
         if (ret != kStatus_Success) {
             return RetCode::Failure;
         }
@@ -86,7 +92,9 @@ namespace bsp
     RetCode eMMC::SwitchPartition(eMMC::Partition partition)
     {
 #if defined(TARGET_RT1051)
+        driverUSDHC->Enable();
         auto ret = MMC_SelectPartition(&mmcCard, static_cast<mmc_access_partition_t>(partition));
+        driverUSDHC->Disable();
         if (ret != kStatus_Success) {
             return RetCode::Failure;
         }
