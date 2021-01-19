@@ -20,7 +20,7 @@ extern "C"
 
 static time_t timestampOffset;
 static time_t timestampAlarm;
-time_t localOffset;
+// time_t localOffset; // never used
 static xQueueHandle qHandleRtcIrq   = NULL;
 static TaskHandle_t rtcWorkerHandle = NULL;
 
@@ -45,7 +45,7 @@ namespace bsp
         time_t current   = time(NULL);
         struct tm *local = localtime(&current);
 
-        localOffset = local->tm_gmtoff;
+        //        localOffset = local->tm_gmtoff; // never used (only set)
 
         timestampOffset = timestamp - current;
         return RtcBspOK;
@@ -156,8 +156,8 @@ namespace bsp
     {
         uint32_t secondsToMinute = 60 - (timestamp % 60);
 
-        struct tm date;
-        rtc_GetCurrentDateTime(&date);
+        //        struct tm date; /// never used
+        //        rtc_GetCurrentDateTime(&date);
 
         return rtc_SetAlarmInSecondsFromNow(secondsToMinute);
     }

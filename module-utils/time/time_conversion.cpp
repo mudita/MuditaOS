@@ -53,7 +53,9 @@ namespace utils::time
     } // namespace
 
     Locale tlocale;
-    static int msTimeGmtOff = 4 * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
+    // why 3600 up from the start?
+    //    static int msTimeGmtOff = 4 * utils::time::minutesInQuarterOfHour * utils::time::secondsInMinute;
+    static int msTimeGmtOff = 0;
 
     UTF8 Localer::get_replacement(Replacements val, const struct tm &timeinfo)
     {
@@ -112,16 +114,15 @@ namespace utils::time
     constexpr uint32_t datasize = 128;
     UTF8 Timestamp::str(std::string fmt)
     {
-        if (fmt.compare("") != 0) {
-            this->format = fmt;
+        if (!fmt.empty()) {
+            format = fmt;
         }
-        UTF8 datetimestr = "";
         auto replaceFunc = [&](int idx) { return get_replacement(Replacements(idx), timeinfo); };
-        utils::findAndReplaceAll(this->format, specifiers_replacement, replaceFunc);
+        utils::findAndReplaceAll(format, specifiers_replacement, std::move(replaceFunc));
         auto data = std::unique_ptr<char[]>(new char[datasize]);
-        std::strftime(data.get(), datasize, this->format.c_str(), &timeinfo);
-        datetimestr = UTF8(data.get());
-        return datetimestr;
+        std::strftime(data.get(), datasize, format.c_str(), &timeinfo);
+        ;
+        return UTF8(data.get());
     }
 
     UTF8 Timestamp::day(bool abbrev)

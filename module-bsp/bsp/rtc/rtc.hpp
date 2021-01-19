@@ -49,6 +49,7 @@ namespace bsp {
 
 	RtcBspError_e rtc_SetDateTime(struct tm* time);
 
+    // never used, rem?
 	RtcBspError_e rtc_GetCurrentDateTime(struct tm* datetime);
 
 	RtcBspError_e rtc_GetCurrentTimestamp(time_t* timestamp);

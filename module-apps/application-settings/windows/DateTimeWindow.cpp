@@ -28,7 +28,7 @@
 
 #include <module-utils/Utils.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
-
+#include <module-utils/time/time_conversion.hpp>
 namespace gui
 {
 
@@ -236,7 +236,7 @@ namespace gui
         }
         else {
             if (inputEvent.state == gui::InputEvent::State::keyReleasedShort) {
-                auto key   = std::to_string(gui::toNumeric(inputEvent.keyCode));
+                //                auto key   = std::to_string(gui::toNumeric(inputEvent.keyCode));// never used
                 auto value = gui::toNumeric(inputEvent.keyCode);
                 // handle numeric keys
                 if (value >= 0) {
@@ -331,6 +331,9 @@ namespace gui
         if (item != nullptr) {
             auto itemValue = item->getText();
             auto key       = std::to_string(keyValue);
+            /// this behavior is is weird and inconsistent. If actual time is e.g. 2:01 then:
+            /// to set 3:01 user first has to press some key in range of (0-3) to make 23:01 and then actual 3 fpr 3:01
+            /// to set 4:01 or later time, it is enough to press 4 (because there is no time such as 24:01)
             if (itemValue == "0") {
                 itemValue = key;
             }
@@ -342,12 +345,11 @@ namespace gui
             if (utils::time::validateTime(getDateTimeItemValue(DateTimeItems::Hour),
                                           getDateTimeItemValue(DateTimeItems::Minute),
                                           application->isTimeFormat12())) {
-                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             }
             else {
                 item->setText(key);
-                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             }
+            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             return true;
         }
         return false;
@@ -357,7 +359,6 @@ namespace gui
     {
         struct tm timeinfo;
         memset(&timeinfo, 0, sizeof(timeinfo));
-
         try {
             timeinfo.tm_year = std::stoi(getDateTimeItemValue(DateTimeItems::Year)) - 1900;
             timeinfo.tm_mon  = std::stoi(getDateTimeItemValue(DateTimeItems::Month)) - 1;
@@ -376,6 +377,8 @@ namespace gui
             LOG_ERROR("DateTimeWindow::setRTC: %s", e.what());
         }
 
+        // Actual Fix. Or could be done by sending CellularTimeNotificationMessage to EventManager. What will be better?
+        utils::time::Time::setTimeZoneOffset(0);
         bsp::rtc_SetDateTime(&timeinfo);
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }

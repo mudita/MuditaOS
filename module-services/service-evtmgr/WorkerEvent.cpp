@@ -127,9 +127,10 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         bsp::rtc_GetCurrentTimestamp(&timestamp);
         bsp::rtc_SetMinuteAlarm(timestamp);
 
-        struct tm time;
-
-        bsp::rtc_GetCurrentDateTime(&time);
+        // never used
+        //        struct tm time;
+        //
+        //        bsp::rtc_GetCurrentDateTime(&time);
 
         auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
         message->timestamp = timestamp;

@@ -55,15 +55,15 @@ EventManager::~EventManager()
 }
 
 // those static functions and variables will be replaced by Settings API
-static std::string tzSet;
-static void setSettingsTimeZone(const std::string &timeZone)
-{
-    tzSet = timeZone;
-}
-std::string getSettingsTimeZone()
-{
-    return tzSet;
-}
+// static std::string tzSet; /// never used (only set)
+// static void setSettingsTimeZone(const std::string &timeZone)
+//{
+//    tzSet = timeZone;
+//}
+// std::string getSettingsTimeZone()
+//{
+//    return tzSet;
+//}
 
 // Invoked upon receiving data message
 sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -206,7 +206,8 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
                 bsp::rtc_SetDateTime(&time.value());
             }
             if (auto timeZoneOffset = msg->getTimeZoneOffset(); timeZoneOffset) {
-                setSettingsTimeZone(msg->getTimeZoneString().value());
+                //                setSettingsTimeZone(msg->getTimeZoneString().value()); // tzSet is never used (only
+                //                set)
                 utils::time::Time::setTimeZoneOffset(msg->getTimeZoneOffset().value());
             }
             auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
