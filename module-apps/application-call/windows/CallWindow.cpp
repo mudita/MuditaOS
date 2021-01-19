@@ -58,10 +58,6 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        topBar->setActive(gui::TopBar::Elements::BATTERY, true);
-        topBar->setActive(gui::TopBar::Elements::SIGNAL, true);
-        topBar->setActive(gui::TopBar::Elements::TIME, true);
-
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 

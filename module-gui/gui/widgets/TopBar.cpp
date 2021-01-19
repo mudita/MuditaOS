@@ -11,7 +11,7 @@
 
 #include "common_data/EventStore.hpp"
 
-namespace gui
+namespace gui::top_bar
 {
     namespace networkTechnology
     {
@@ -20,14 +20,47 @@ namespace gui
         constexpr uint32_t w = 130;
         constexpr uint32_t h = 20;
     } // namespace networkTechnology
-    const uint32_t TopBar::signalOffset    = 35;
-    const uint32_t TopBar::batteryOffset   = 413;
-    gui::TopBar::TimeMode TopBar::timeMode = TimeMode::TIME_24H;
+
+    static constexpr uint32_t signalOffset  = 35;
+    static constexpr uint32_t batteryOffset = 413;
+
+    TopBar::TimeMode TopBar::timeMode      = TimeMode::TIME_24H;
     uint32_t TopBar::time                  = 0;
+
+    void Configuration::enable(Indicator indicator)
+    {
+        set(indicator, true);
+    }
+
+    void Configuration::enable(const Indicators &indicators)
+    {
+        for (auto indicator : indicators) {
+            enable(indicator);
+        }
+    }
+
+    void Configuration::disable(Indicator indicator)
+    {
+        set(indicator, false);
+    }
+
+    void Configuration::set(Indicator indicator, bool enabled)
+    {
+        indicatorStatuses[indicator] = enabled;
+    }
+
+    auto Configuration::isEnabled(Indicator indicator) const -> bool
+    {
+        return indicatorStatuses.at(indicator);
+    }
+
+    auto Configuration::getIndicatorsConfiguration() const noexcept -> const IndicatorStatuses &
+    {
+        return indicatorStatuses;
+    }
 
     TopBar::TopBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
     {
-
         prepareWidget();
 
         setFillColor(ColorFullWhite);
@@ -48,7 +81,7 @@ namespace gui
             val = batteryBars.size();
         }
         for (unsigned int i = 0; i < batteryBars.size(); ++i) {
-            if (elements.battery) {
+            if (configuration.isEnabled(Indicator::Battery)) {
                 batteryBars[i]->setVisible(i == val);
             }
             else {
@@ -59,7 +92,6 @@ namespace gui
 
     void TopBar::prepareWidget()
     {
-
         signal[0] = new gui::Image(this, signalOffset, 17, 0, 0, "signal0");
         signal[1] = new gui::Image(this, signalOffset, 17, 0, 0, "signal1");
         signal[2] = new gui::Image(this, signalOffset, 17, 0, 0, "signal2");
@@ -111,48 +143,56 @@ namespace gui
         updateNetworkAccessTechnology();
     }
 
-    void TopBar::setActive(std::list<std::pair<TopBar::Elements, bool>> elements)
+    auto TopBar::getConfiguration() const noexcept -> const Configuration &
     {
-        for (auto el : elements) {
-            setActive(el.first, el.second);
+        return configuration;
+    }
+
+    void TopBar::configure(Configuration &&config)
+    {
+        if (config.isEnabled(Indicator::Lock)) {
+            // In current implementation, lock and time indicators are mutually exclusive.
+            // I.e. enabling the lock indicator disables the time indicator.
+            config.disable(Indicator::Time);
+        }
+
+        for (auto [indicator, enabled] : config.getIndicatorsConfiguration()) {
+            setIndicatorStatus(indicator, enabled);
+        }
+        configuration = std::move(config);
+    }
+
+    void TopBar::setIndicatorStatus(Indicator indicator, bool enabled)
+    {
+        switch (indicator) {
+        case Indicator::Signal:
+            updateSignalStrength();
+            break;
+        case Indicator::Time:
+            timeLabel->setVisible(enabled);
+            if (enabled) {
+                lock->setVisible(false);
+            }
+            break;
+        case Indicator::Lock:
+            lock->setVisible(enabled);
+            if (enabled) {
+                timeLabel->setVisible(false);
+            }
+            break;
+        case Indicator::Battery:
+            showBattery(enabled);
+            break;
+        case Indicator::SimCard:
+            simSet();
+            break;
+        case Indicator::NetworkAccessTechnology:
+            updateNetworkAccessTechnology();
+            break;
         }
     }
 
-    void TopBar::setActive(TopBar::Elements element, bool active)
-    {
-        switch (element) {
-        case Elements::BATTERY: {
-            elements.battery = active;
-            showBattery(elements.battery);
-        } break;
-        case Elements::LOCK: {
-            elements.lock = active;
-            lock->setVisible(active);
-            if (active)
-                timeLabel->setVisible(false);
-        } break;
-        case Elements::SIGNAL: {
-            elements.signal = active;
-            updateSignalStrength();
-        } break;
-        case Elements::TIME: {
-            elements.time = active;
-            timeLabel->setVisible(active);
-            if (active)
-                lock->setVisible(false);
-        } break;
-        case Elements::SIM:
-            elements.sim = active;
-            simSet();
-            break;
-        case Elements::NETWORK_ACCESS_TECHNOLOGY:
-            elements.networkAccessTechnology = active;
-            updateNetworkAccessTechnology();
-            break;
-        };
-    }
-
-    uint32_t calculateBatteryBars(uint32_t percentage)
+    uint32_t TopBar::calculateBatteryBars(uint32_t percentage)
     {
         uint32_t level = 0;
         if (percentage <= 5) // level critical
@@ -177,13 +217,13 @@ namespace gui
 
     bool TopBar::updateBattery(uint32_t percent)
     {
-        showBattery(elements.battery);
+        showBattery(configuration.isEnabled(Indicator::Battery));
         return true;
     }
 
     bool TopBar::updateBattery(bool plugged)
     {
-        showBattery(elements.battery);
+        showBattery(configuration.isEnabled(Indicator::Battery));
         return true;
     }
 
@@ -216,7 +256,7 @@ namespace gui
         for (uint32_t i = 0; i < signalImgCount; i++) {
             signal[i]->setVisible(false);
         }
-        if (elements.signal) {
+        if (configuration.isEnabled(Indicator::Signal)) {
             auto rssiBar = Store::GSM::get()->getSignalStrength().rssiBar;
             if (rssiBar < Store::RssiBar::noOfSupprtedBars) {
                 signal[static_cast<size_t>(rssiBar)]->setVisible(true);
@@ -229,7 +269,7 @@ namespace gui
 
     bool TopBar::updateNetworkAccessTechnology()
     {
-        if (elements.networkAccessTechnology) {
+        if (configuration.isEnabled(Indicator::NetworkAccessTechnology)) {
             auto accessTechnology = Store::GSM::get()->getNetwork().accessTechnology;
 
             constexpr auto text2g  = "2G";
@@ -258,16 +298,16 @@ namespace gui
         return true;
     }
 
-    void TopBar::setTime(const UTF8 &time)
+    void TopBar::setTime(const UTF8 &value)
     {
-        timeLabel->setText(time);
+        timeLabel->setText(value);
     }
 
-    void TopBar::setTime(const uint32_t &time, bool mode24H)
+    void TopBar::setTime(uint32_t value, bool mode24H)
     {
         setTime(utils::time::Time());
         timeMode   = (mode24H ? TimeMode::TIME_24H : TimeMode::TIME_12H);
-        this->time = time;
+        time       = value;
     }
 
     UTF8 TopBar::getTimeString()
@@ -276,13 +316,17 @@ namespace gui
         return timeLabel->getText();
     }
 
+    uint32_t TopBar::getTime() const noexcept
+    {
+        return time;
+    }
 
     void TopBar::simSet()
     {
-        if (!sim) {
+        if (sim == nullptr) {
             return;
         }
-        else if (elements.sim) {
+        if (configuration.isEnabled(Indicator::SimCard)) {
             return sim->show(Store::GSM::get()->sim);
         }
         sim->visible = false;

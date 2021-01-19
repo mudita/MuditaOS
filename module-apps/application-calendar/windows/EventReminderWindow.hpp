@@ -42,6 +42,7 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
         auto handleSwitchData(SwitchData *data) -> bool override;
     };
 

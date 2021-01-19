@@ -149,9 +149,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        topBar->setActive(TopBar::Elements::SIGNAL, true);
-        topBar->setActive(TopBar::Elements::BATTERY, true);
-
         auto app = dynamic_cast<app::ApplicationDesktop *>(application);
         assert(app);
 

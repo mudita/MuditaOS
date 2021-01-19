@@ -22,8 +22,6 @@ namespace gui
     void PhoneNameWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        topBar->setActive(TopBar::Elements::SIM, false);
-        topBar->setActive(TopBar::Elements::TIME, true);
 
         setTitle(utils::localize.get("app_settings_bluetooth_phone_name"));
 

@@ -85,7 +85,7 @@ void Item2JsonSerializingVisitor::visit(gui::BottomBar &item)
     visit(static_cast<gui::Item &>(item));
 }
 
-void Item2JsonSerializingVisitor::visit(gui::TopBar &item)
+void Item2JsonSerializingVisitor::visit(gui::top_bar::TopBar &item)
 {
     if (itemName.empty()) {
         itemName = magic_enum::enum_name(visitor::Names::TopBar);

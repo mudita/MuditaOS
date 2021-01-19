@@ -40,11 +40,16 @@ namespace gui
         /**
          * Information bar for signal, battery and lock icon on the top of the screen.
          */
-        gui::TopBar *topBar = nullptr;
+        gui::top_bar::TopBar *topBar = nullptr;
         /**
          * Pointer to the application object that owns the window.
          */
         app::Application *application = nullptr;
+
+        /**
+         * A function that applies configuration changes to the current top bar configuration.
+         */
+        using TopBarConfigurationChangeFunction = std::function<top_bar::Configuration(top_bar::Configuration)>;
 
       public:
         AppWindow() = delete;
@@ -54,10 +59,7 @@ namespace gui
         {
             return application;
         };
-        void setApplication(app::Application *app)
-        {
-            application = app;
-        };
+
         virtual bool onDatabaseMessage(sys::Message *msg);
 
         bool updateBatteryCharger(bool charging);
@@ -76,6 +78,20 @@ namespace gui
         void destroyInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
         void accept(GuiVisitor &visitor) override;
+
+        /**
+         * Configure the top bar using window-specific configuration.
+         * @param appConfiguration      Application-wide top bar configuration that it to be modified.
+         * @return window-specific configuration of the top bar.
+         */
+        virtual top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration);
+
+        /**
+         * Applies configuration change on the current top bar configuration.
+         * @param configChange  The function that contains the top bar configuration changes.
+         */
+        void applyToTopBar(TopBarConfigurationChangeFunction configChange);
+
         /// Setting bottom bar temporary text
         /// @param text - bottomBar text
         /// @param overwriteOthers - set or not other bottomBar texts to "" (default true)

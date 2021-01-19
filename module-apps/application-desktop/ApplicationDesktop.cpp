@@ -37,6 +37,12 @@ namespace app
     ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground), lockHandler(this)
     {
+        using namespace gui::top_bar;
+        topBarManager->enableIndicators({Indicator::Signal,
+                                         Indicator::Time,
+                                         Indicator::Battery,
+                                         Indicator::SimCard,
+                                         Indicator::NetworkAccessTechnology});
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
 
         addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
