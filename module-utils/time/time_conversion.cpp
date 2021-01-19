@@ -277,7 +277,7 @@ namespace utils::time
         }
         else {
             return Timestamp::str(
-                Locale::format(Locale::FormatTime12H)); // @TODO: M.G. FormatLocaleTime which actually works
+                Locale::format(Locale::FormatTime12HShort)); // @TODO: M.G. FormatLocaleTime which actually works
         }
     }
 
