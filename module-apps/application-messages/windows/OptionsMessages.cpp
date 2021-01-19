@@ -6,15 +6,14 @@
 #include "tools/Common.hpp"
 
 #include <common_data/Clipboard.hpp>
-#include <Options.hpp>
-#include <OptionWindow.hpp>
+#include <Option.hpp>
 #include <i18n/i18n.hpp>
-#include <log/log.hpp>
 
 #include <Text.hpp>
-#include <BoxLayout.hpp>
 #include <memory>
 #include <module-services/service-db/service-db/DBServiceAPI.hpp>
+#include <module-apps/options/type/OptionCall.hpp>
+#include <module-apps/options/type/OptionContact.hpp>
 
 using namespace style::window;
 
@@ -30,20 +29,25 @@ std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMS
             return true;
         });
     }
-    options.push_back(gui::options::call(app, contact));
+
+    options.emplace_back(gui::Option{std::make_unique<gui::option::Call>(app, contact)});
+
     auto contactOperation =
-        contact.isTemporary() ? gui::options::ContactOperation::Add : gui::options::ContactOperation::Details;
-    options.push_back(gui::options::contact(app, contactOperation, contact));
+        contact.isTemporary() ? gui::option::ContactOperation::Add : gui::option::ContactOperation::Details;
+    options.emplace_back(gui::Option{std::make_unique<gui::option::Contact>(app, contactOperation, contact)});
+
     options.emplace_back(UTF8(utils::localize.get("sms_forward_message")), [=](gui::Item &item) {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(record.body);
         app->switchWindow(gui::name::window::new_sms, std::move(data));
         return true;
     });
+
     options.emplace_back(UTF8(utils::localize.get("sms_copy")), [=](gui::Item &item) {
         Clipboard::getInstance().copy(record.body);
         app->returnToPreviousWindow();
         return true;
     });
+
     options.emplace_back(UTF8(utils::localize.get("sms_delete_message")),
                          [=](gui::Item &item) { return app->removeSms(record); });
 

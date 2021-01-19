@@ -17,13 +17,10 @@ set( SOURCES
     "WindowsFactory.cpp"
     "AsyncTask.cpp"
     "CallbackStorage.cpp"
-    "windows/AppWindow.cpp" 
+    "windows/AppWindow.cpp"
     "windows/OptionWindow.cpp"
-    "windows/Options.cpp" 
-    "windows/OptionsWindowOption.cpp"
     "windows/Dialog.cpp"
     "windows/NoEvents.cpp"
-    "windows/OptionSetting.cpp"
     "widgets/ButtonOnOff.cpp"
     "widgets/InputBox.cpp"
     "windows/VolumeWindow.cpp"
@@ -32,7 +29,13 @@ set( SOURCES
     "widgets/BrightnessBox.cpp"
     "widgets/ModesBox.cpp"
     "widgets/BarGraph.cpp"
-)
+    "options/OptionsModel.cpp"
+    "options/type/OptionSimple.cpp"
+    "options/type/OptionCall.cpp"
+    "options/type/OptionContact.cpp"
+    "options/type/OptionSetting.cpp"
+    "options/type/OptionChangePin.cpp"
+     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
@@ -130,6 +133,8 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/messages
         ${CMAKE_CURRENT_SOURCE_DIR}/windows
+        ${CMAKE_CURRENT_SOURCE_DIR}/options
+        ${CMAKE_CURRENT_SOURCE_DIR}/options/type
         ${CMAKE_BINARY_DIR}
 )
 
