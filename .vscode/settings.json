@@ -76,6 +76,10 @@
         "typeindex": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "pointers": "cpp",
+        "any": "cpp",
+        "charconv": "cpp",
+        "scoped_allocator": "cpp"
     },
 }
