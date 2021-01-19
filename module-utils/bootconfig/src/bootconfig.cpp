@@ -9,6 +9,7 @@
 #include <time/time_conversion.hpp>
 #include <ticks.hpp>
 #include <cstdio>
+#include <fstream>
 #include <log/log.hpp>
 #include <crc32/crc32.h>
 
@@ -101,20 +102,10 @@ namespace boot
         }
         std::string loadFileAsString(const std::filesystem::path &fileToLoad)
         {
-            auto lamb = [](::FILE *stream) { ::fclose(stream); };
-            std::unique_ptr<char[]> readBuf(new char[boot::consts::tar_buf]);
-            std::unique_ptr<::FILE, decltype(lamb)> fp(fopen(fileToLoad.c_str(), "r"), lamb);
-            std::string contents;
-            size_t readSize;
-
-            if (fp.get() != nullptr) {
-                while (!feof(fp.get())) {
-                    readSize = fread(readBuf.get(), 1, boot::consts::tar_buf, fp.get());
-                    contents.append(static_cast<const char *>(readBuf.get()), readSize);
-                }
-            }
-
-            return contents;
+            std::string content;
+            std::ifstream in(fileToLoad);
+            std::getline(in, content, std::string::traits_type::to_char_type(std::string::traits_type::eof()));
+            return content;
         }
 
     } // namespace
