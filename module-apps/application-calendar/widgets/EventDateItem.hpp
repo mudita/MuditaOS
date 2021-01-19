@@ -24,12 +24,12 @@ namespace gui
         void buildInterface();
         void applyItemSpecificProperties(gui::Text *item);
         void applyCallbacks();
-        YearMonthDay validateDate();
+        calendar::YearMonthDay validateDate();
 
       public:
         EventDateItem();
 
-        const YearMonthDay getChosenDate();
+        const calendar::YearMonthDay getChosenDate();
         // virtual methods from Item
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };

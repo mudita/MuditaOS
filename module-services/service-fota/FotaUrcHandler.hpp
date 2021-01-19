@@ -8,27 +8,25 @@
 #include <module-cellular/at/UrcHandler.hpp>
 #include <module-cellular/at/UrcQind.hpp>
 
-using namespace at::urc;
-
 /**
  * ServiceFota helper for handling Urc messages
  */
-class FotaUrcHandler : public UrcHandler
+class FotaUrcHandler : public at::urc::UrcHandler
 {
   public:
     FotaUrcHandler(FotaService::Service &fotaService) : fotaService(fotaService)
     {}
 
-    void Handle(Qind &urc) final;
-    virtual void Handle(Clip &urc){};
-    virtual void Handle(Creg &urc){};
-    virtual void Handle(Cmti &urc){};
-    virtual void Handle(Cusd &urc){};
-    virtual void Handle(Ctze &urc){};
-    virtual void Handle(Cpin &urc){};
-    virtual void Handle(Qiurc &urc){};
-    virtual void Handle(PoweredDown &urc){};
-    virtual void Handle(UrcResponse &urc){};
+    void Handle(at::urc::Qind &urc) final;
+    virtual void Handle(at::urc::Clip &urc){};
+    virtual void Handle(at::urc::Creg &urc){};
+    virtual void Handle(at::urc::Cmti &urc){};
+    virtual void Handle(at::urc::Cusd &urc){};
+    virtual void Handle(at::urc::Ctze &urc){};
+    virtual void Handle(at::urc::Cpin &urc){};
+    virtual void Handle(at::urc::Qiurc &urc){};
+    virtual void Handle(at::urc::PoweredDown &urc){};
+    virtual void Handle(at::urc::UrcResponse &urc){};
 
   private:
     FotaService::Service &fotaService;

@@ -13,8 +13,6 @@
 
 namespace audio
 {
-    using namespace cpp_freertos;
-
     class StreamQueuedEventsListener : public Stream::EventListener
     {
       private:
@@ -29,7 +27,7 @@ namespace audio
         using queuedEvent                         = std::pair<Stream *, Stream::Event>;
         static constexpr auto listenerElementSize = sizeof(EventStorage);
 
-        StreamQueuedEventsListener(std::shared_ptr<Queue> eventsQueue);
+        StreamQueuedEventsListener(std::shared_ptr<cpp_freertos::Queue> eventsQueue);
 
         void onEvent(Stream *stream, Stream::Event event, Stream::EventSourceMode source);
 
@@ -39,7 +37,7 @@ namespace audio
         std::size_t getEventsCount() const;
 
       private:
-        std::shared_ptr<Queue> queue;
+        std::shared_ptr<cpp_freertos::Queue> queue;
     };
 
 }; // namespace audio

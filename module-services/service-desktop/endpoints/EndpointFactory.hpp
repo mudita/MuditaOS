@@ -19,36 +19,35 @@
 #include "restore/RestoreEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
 
-using namespace parserFSM;
-
 class EndpointFactory
 {
   public:
-    static auto create(Context &context, sys::Service *ownerServicePtr) -> std::unique_ptr<Endpoint>
+    static auto create(parserFSM::Context &context, sys::Service *ownerServicePtr)
+        -> std::unique_ptr<parserFSM::Endpoint>
     {
         LOG_DEBUG("Creating endpoint: %d", static_cast<int>(context.getEndpoint()));
         switch (context.getEndpoint()) {
-        case EndpointType::update:
+        case parserFSM::EndpointType::update:
             return std::make_unique<UpdateEndpoint>(ownerServicePtr);
-        case EndpointType::filesystemUpload:
+        case parserFSM::EndpointType::filesystemUpload:
             return std::make_unique<FilesystemEndpoint>(ownerServicePtr);
-        case EndpointType::backup:
+        case parserFSM::EndpointType::backup:
             return std::make_unique<BackupEndpoint>(ownerServicePtr);
-        case EndpointType::deviceInfo:
+        case parserFSM::EndpointType::deviceInfo:
             return std::make_unique<DeviceInfoEndpoint>(ownerServicePtr);
-        case EndpointType::restore:
+        case parserFSM::EndpointType::restore:
             return std::make_unique<RestoreEndpoint>(ownerServicePtr);
-        case EndpointType::contacts:
+        case parserFSM::EndpointType::contacts:
             return std::make_unique<ContactsEndpoint>(ownerServicePtr);
-        case EndpointType::messages:
+        case parserFSM::EndpointType::messages:
             return std::make_unique<MessagesEndpoint>(ownerServicePtr);
-        case EndpointType::factory:
+        case parserFSM::EndpointType::factory:
             return std::make_unique<FactoryResetEndpoint>(ownerServicePtr);
-        case EndpointType::calllog:
+        case parserFSM::EndpointType::calllog:
             return std::make_unique<CalllogEndpoint>(ownerServicePtr);
-        case EndpointType::developerMode:
+        case parserFSM::EndpointType::developerMode:
             return std::make_unique<DeveloperModeEndpoint>(ownerServicePtr);
-        case EndpointType::calendarEvents:
+        case parserFSM::EndpointType::calendarEvents:
             return std::make_unique<CalendarEventsEndpoint>(ownerServicePtr);
         default:
             return nullptr;

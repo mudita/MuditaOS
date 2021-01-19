@@ -19,9 +19,7 @@ namespace sys
     class Service;
 } // namespace sys
 
-using namespace parserFSM;
-
-class DeviceInfoEndpoint : public Endpoint
+class DeviceInfoEndpoint : public parserFSM::Endpoint
 {
 
   public:
@@ -29,6 +27,6 @@ class DeviceInfoEndpoint : public Endpoint
     {
         debugName = "DeviceInfoEndpoint";
     }
-    auto handle(Context &context) -> void override;
-    auto getDeviceInfo(Context &context) -> bool;
+    auto handle(parserFSM::Context &context) -> void override;
+    auto getDeviceInfo(parserFSM::Context &context) -> bool;
 };

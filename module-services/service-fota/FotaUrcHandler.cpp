@@ -3,6 +3,8 @@
 
 #include "FotaUrcHandler.hpp"
 
+using namespace at::urc;
+
 void FotaUrcHandler::Handle(Qind &urc)
 {
     if (urc.isFotaValid()) {
