@@ -54,7 +54,6 @@ namespace app::notes
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(::style::strings::common::open));
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
-        topBar->setActive(gui::TopBar::Elements::TIME, true);
 
         namespace windowStyle = app::notes::style::main_window;
         leftArrowImage        = new gui::Image(this,

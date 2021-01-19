@@ -64,7 +64,6 @@ void MeditationOptionsWindow::buildInterface()
     MeditationListViewWindow::buildInterface();
     setTitle(utils::localize.get("common_options"));
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch));
-    topBar->setActive(TopBar::Elements::TIME, true);
 }
 
 PreparationTimeWindow::PreparationTimeWindow(app::Application *app)
@@ -79,5 +78,4 @@ void PreparationTimeWindow::buildInterface()
     MeditationListViewWindow::buildInterface();
     setTitle(utils::localize.get("app_meditation_preparation_time"));
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-    topBar->setActive(TopBar::Elements::TIME, true);
 }

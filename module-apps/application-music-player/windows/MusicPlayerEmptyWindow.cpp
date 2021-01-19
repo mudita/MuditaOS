@@ -33,8 +33,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_music_player_music_library"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_music_player_quit"));
 
-        topBar->setActive(TopBar::Elements::TIME, true);
-
         img = new gui::Image(this, noteImg::x, noteImg::y, "note");
 
         text = new Text(this, infoText::x, infoText::y, infoText::w, infoText::h);

@@ -37,9 +37,6 @@ namespace gui
         AppWindow::buildInterface();
         setTitle("Modem Firmware update (FOTA)");
 
-        topBar->setActive(TopBar::Elements::SIGNAL, true);
-        topBar->setActive(TopBar::Elements::BATTERY, true);
-
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("Go"));

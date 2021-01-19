@@ -76,14 +76,6 @@ namespace gui
         setTitle(utils::localize.get("app_settings_security_change_passcode"));
     }
 
-    void ChangePasscodeWindow::buildTopBar()
-    {
-        topBar->setActive(TopBar::Elements::SIM, false);
-        topBar->setActive(TopBar::Elements::LOCK, false);
-        topBar->setActive(TopBar::Elements::BATTERY, false);
-        topBar->setActive(TopBar::Elements::TIME, true);
-    }
-
     void ChangePasscodeWindow::destroyInterface()
     {
         erase();

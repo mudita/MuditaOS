@@ -112,7 +112,11 @@ auto MeditationTimerWindow::onInput(const InputEvent &inputEvent) -> bool
 
 void MeditationTimerWindow::setWidgetVisible(bool tBar, bool bBar, bool counter)
 {
-    topBar->setActive(TopBar::Elements::TIME, tBar);
+    applyToTopBar([tBar](top_bar::Configuration configuration) {
+        configuration.set(top_bar::Indicator::Time, tBar);
+        return configuration;
+    });
+
     title->setVisible(tBar);
     bottomBar->setActive(BottomBar::Side::CENTER, bBar);
     bottomBar->setActive(BottomBar::Side::LEFT, bBar);

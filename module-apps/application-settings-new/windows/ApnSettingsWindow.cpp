@@ -34,10 +34,6 @@ namespace gui
     {
         setTitle(utils::localize.get("app_settings_network_apn_settings"));
 
-        topBar->setActive(TopBar::Elements::SIGNAL, false);
-        topBar->setActive(TopBar::Elements::BATTERY, false);
-        topBar->setActive(TopBar::Elements::SIM, false);
-
         leftArrowImage = new gui::Image(this,
                                         style::settings::window::leftArrowImage::x,
                                         style::settings::window::leftArrowImage::y,

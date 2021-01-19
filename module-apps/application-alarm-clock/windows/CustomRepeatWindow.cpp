@@ -18,9 +18,6 @@ namespace app::alarmClock
     {
         AppWindow::buildInterface();
 
-        topBar->setActive(gui::TopBar::Elements::TIME, true);
-        topBar->setActive(gui::TopBar::Elements::SIM, false);
-        topBar->setActive(gui::TopBar::Elements::NETWORK_ACCESS_TECHNOLOGY, false);
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
