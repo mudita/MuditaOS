@@ -21,7 +21,7 @@ namespace gui
         std::list<gui::Option> optionList;
 
         auto addMenuSwitch = [&](UTF8 name, std::string window) {
-            optionList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 name,
                 [=](gui::Item &item) {
                     showUnreadMessagesFirst = !showUnreadMessagesFirst;
@@ -44,11 +44,11 @@ namespace gui
                     return true;
                 },
                 nullptr,
-                showUnreadMessagesFirst ? RightItem::On : RightItem::Off));
+                showUnreadMessagesFirst ? gui::option::SettingRightItem::On : gui::option::SettingRightItem::Off));
         };
 
         auto addMenu = [&](UTF8 name, std::string window) {
-            optionList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 name,
                 [=](gui::Item &item) {
                     if (window.empty()) {
@@ -60,7 +60,7 @@ namespace gui
                 },
                 nullptr,
                 nullptr,
-                RightItem::ArrowWhite));
+                gui::option::SettingRightItem::ArrowWhite));
         };
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));

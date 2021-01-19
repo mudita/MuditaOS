@@ -21,8 +21,3 @@ bool BaseThreadsRecordModel::updateRecords(std::vector<ThreadListStruct> records
     list->onProviderDataUpdate();
     return true;
 }
-
-void BaseThreadsRecordModel::requestRecords(uint32_t offset, uint32_t limit)
-{
-    DBServiceAPI::ThreadGetLimitOffset(application, offset, limit);
-}

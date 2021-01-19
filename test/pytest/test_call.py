@@ -18,10 +18,10 @@ def test_call(harness, phone_number, call_duration):
     # enter number
     harness.send_number(str(phone_number))
     # call
-    harness.connection.send_key(key_codes["fnLeft"])
+    harness.connection.send_key_code(key_codes["fnLeft"])
     time.sleep(call_duration)
     # hang up
-    harness.connection.send_key(key_codes["fnRight"])
+    harness.connection.send_key_code(key_codes["fnRight"])
     count_after = get_calllog_count(harness)
 
     assert count_before + 1 == count_after

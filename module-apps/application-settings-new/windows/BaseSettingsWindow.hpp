@@ -6,6 +6,7 @@
 #include "Application.hpp"
 #include "windows/AppWindow.hpp"
 #include "windows/OptionWindow.hpp"
+#include <service-db/Settings.hpp>
 
 namespace gui
 {

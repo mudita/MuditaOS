@@ -33,7 +33,7 @@ def validate_commit(commit):
   empty_line = lines[1]
   body = ''.join(lines[2:]).strip()
 
-  subject_format = r'^\[\w+-\d+\] (?:Add|Change|Fix) .+[^.]$'
+  subject_format = r'^\[\w+-\d+\] .+[^.]$'
   if not re.match(subject_format, subject):
     errors.append(f'[{commit.hexsha}] invalid subject "{subject}", should match format "{subject_format}"')
 

@@ -1,0 +1,12 @@
+@startuml
+participant "Service E Ink" as eink
+participant "Service GUI" as gui
+participant "Context Pool" as pool
+
+eink -> gui: DisplayReadyNotification()
+activate gui
+
+gui -> gui: setState(Idle)
+gui -> pool ** : create
+
+@enduml

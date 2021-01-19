@@ -14,7 +14,8 @@
 namespace gui::model
 {
 
-    ThreadsSearchResultsModel::ThreadsSearchResultsModel(app::Application *app) : BaseThreadsRecordModel(app)
+    ThreadsSearchResultsModel::ThreadsSearchResultsModel(app::Application *app)
+        : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}
     {}
 
     auto ThreadsSearchResultsModel::getMinimalItemHeight() const -> unsigned int
@@ -45,9 +46,9 @@ namespace gui::model
     {
         if (std::string(textToSearch).compare("") != 0) {
             auto query = std::make_unique<db::query::ThreadsSearchForList>(textToSearch, offset, limit);
-            query->setQueryListener(
-                db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
-            DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
+            auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+            task->setCallback([this](auto response) { return handleQueryResponse(response); });
+            task->execute(application, this);
         }
     }
 

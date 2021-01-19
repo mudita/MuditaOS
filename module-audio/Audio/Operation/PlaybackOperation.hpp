@@ -41,6 +41,7 @@ namespace audio
       private:
         std::unique_ptr<Decoder> dec;
         std::unique_ptr<Tags> tags;
+        std::unique_ptr<StreamConnection> outputConnection = nullptr;
 
         DecoderWorker::EndOfFileCallback endOfFileCallback;
     };

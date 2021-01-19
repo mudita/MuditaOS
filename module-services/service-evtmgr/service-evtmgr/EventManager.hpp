@@ -11,6 +11,7 @@
 #include <bsp/common.hpp>
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
+#include <screen-light-control/ScreenLightControl.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -39,6 +40,8 @@ class EventManager : public sys::Service
     bool alarmDBEmpty = false;
     // flag set when there is alarm to handle
     bool alarmIsValid = false;
+
+    std::unique_ptr<screen_light_control::ScreenLightControl> screenLightControl;
 
   public:
     EventManager(const std::string &name);

@@ -17,7 +17,7 @@
 
 namespace gui
 {
-    class MessagesMainWindow : public AppWindow
+    class MessagesMainWindow : public AppWindow, public app::AsyncCallbackReceiver
     {
       protected:
         Image *leftArrowImage                      = nullptr;

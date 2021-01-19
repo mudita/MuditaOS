@@ -4,7 +4,7 @@
 #include "WallpaperWindow.hpp"
 
 #include "application-settings-new/ApplicationSettings.hpp"
-#include "windows/OptionSetting.hpp"
+#include "OptionSetting.hpp"
 
 #include <i18n/i18n.hpp>
 
@@ -20,7 +20,7 @@ namespace gui
         std::list<gui::Option> optionsList;
 
         auto addCheckOption = [&](UTF8 text, bool &Switch) {
-            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 text,
                 [&](gui::Item &item) mutable {
                     switchHandler(Switch);
@@ -34,7 +34,7 @@ namespace gui
                     return true;
                 },
                 this,
-                Switch ? RightItem::Checked : RightItem::Disabled));
+                Switch ? gui::option::SettingRightItem::Checked : gui::option::SettingRightItem::Disabled));
         };
 
         addCheckOption(utils::translateI18("app_settings_display_wallpaper_logo"), isWallpaperLogoSwitchOn);
@@ -42,7 +42,7 @@ namespace gui
         addCheckOption(utils::translateI18("app_settings_display_wallpaper_quotes"), isWallpaperQuotesSwitchOn);
 
         if (isWallpaperQuotesSwitchOn) {
-            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 utils::translateI18("app_settings_display_wallpaper_select_quotes"),
                 [=](gui::Item &item) {
                     application->switchWindow(gui::window::name::quotes, nullptr);
@@ -56,7 +56,7 @@ namespace gui
                     return true;
                 },
                 this,
-                RightItem::ArrowWhite));
+                gui::option::SettingRightItem::ArrowWhite));
         }
 
         return optionsList;

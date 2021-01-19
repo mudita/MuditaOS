@@ -56,7 +56,7 @@ namespace gui
                                                                              std::move(data));
                                              return true;
                                          },
-                                         gui::Arrow::Enabled});
+                                         gui::option::Arrow::Enabled});
         if (contact->isOnBlocked()) {
             options.emplace_back(
                 gui::Option{utils::localize.get("app_phonebook_options_unblock"), [=](gui::Item &item) {

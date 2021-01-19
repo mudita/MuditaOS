@@ -3,9 +3,8 @@
 
 #include "PhonebookSearch.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
 #include "widgets/InputBox.hpp"
-
-#include <Utils.hpp>
 
 namespace gui
 {
@@ -22,6 +21,12 @@ namespace gui
         setTitle(utils::localize.get("app_phonebook_title_main"));
 
         inputField = inputBox(this, utils::localize.get("common_search_uc"), "search");
+        inputField->setInputMode(new InputMode(
+            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            [=](const UTF8 &Text) { application->getCurrentWindow()->bottomBarTemporaryMode(Text); },
+            [=]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+            [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
+
         bottomBar->setActive(BottomBar::Side::LEFT, false);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
@@ -32,60 +37,50 @@ namespace gui
         setFocusItem(inputField);
     }
 
-    void PhonebookSearch::rebuild()
-    {}
-
-    void PhonebookSearch::destroyInterface()
-    {
-        AppWindow::destroyInterface();
-    }
-
-    void PhonebookSearch::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-        inputField->setText("");
-        setFocusItem(inputField);
-    }
-
-    bool PhonebookSearch::handleSwitchData(SwitchData *data)
+    auto PhonebookSearch::handleSwitchData(SwitchData *data) -> bool
     {
         if (data == nullptr) {
             LOG_ERROR("Received null pointer");
             return false;
         }
 
-        PhonebookSearchQuery *item = dynamic_cast<PhonebookSearchQuery *>(data);
+        auto item = dynamic_cast<PhonebookSearchQuery *>(data);
+        assert(item != nullptr);
         inputField->setText(item->getQuery());
 
         return true;
     }
 
-    bool PhonebookSearch::onInput(const InputEvent &inputEvent)
+    void PhonebookSearch::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        bool ret = AppWindow::onInput(inputEvent);
-        if (ret) {
-            return ret;
-        }
+        inputField->clear();
+        setFocusItem(inputField);
+    }
 
-        if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
-            ((inputEvent.state != InputEvent::State::keyReleasedLong))) {
+    auto PhonebookSearch::onInput(const InputEvent &inputEvent) -> bool
+    {
+        if (AppWindow::onInput(inputEvent)) {
+            return true;
+        }
+        if (!inputEvent.isShortPress()) {
+            return false;
+        }
+        if (!inputEvent.is(gui::KeyCode::KEY_ENTER)) {
             return false;
         }
 
-        if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
-            std::string searchFilter = utils::trim(inputField->getText());
-
-            if (searchFilter.size() > 0) {
-                auto app = dynamic_cast<app::ApplicationPhonebook *>(application);
-                if (app == nullptr) {
-                    LOG_ERROR("Failed to get phonebook application.");
-                    return false;
-                }
-
-                app->onSearchRequest(searchFilter);
-                return true;
-            }
+        std::string searchFilter = utils::trim(inputField->getText());
+        if (searchFilter.empty()) {
+            return false;
         }
 
-        return ret;
+        auto app = dynamic_cast<app::ApplicationPhonebook *>(application);
+        if (app == nullptr) {
+            LOG_ERROR("Failed to get phonebook application.");
+            return false;
+        }
+
+        app->onSearchRequest(searchFilter);
+        return true;
     }
 } // namespace gui

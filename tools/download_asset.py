@@ -117,6 +117,7 @@ class Getter(object):
                     break
         if release is None:
             print("No release with tag:", args.tag)
+        print("release:", release['tag_name'])
         assets = release['assets']
         self.downloadAsset(assets[0])
 

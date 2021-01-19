@@ -66,7 +66,13 @@ namespace gui
 
       public:
         ListView();
-        ListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::shared_ptr<ListItemProvider> prov);
+        ListView(Item *parent,
+                 uint32_t x,
+                 uint32_t y,
+                 uint32_t w,
+                 uint32_t h,
+                 std::shared_ptr<ListItemProvider> prov,
+                 style::listview::ScrollBarType scrollType = style::listview::ScrollBarType::Proportional);
         ~ListView();
 
         void setElementsCount(unsigned int count);

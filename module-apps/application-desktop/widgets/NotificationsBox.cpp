@@ -119,11 +119,20 @@ namespace
         return number;
     }
 
+    void setNotificationHboxLayoutProperties(gui::HBox *hbox)
+    {
+        hbox->setAlignment(Alignment(gui::Alignment::Vertical::Center));
+        hbox->setMargins(gui::Margins(0, 0, 0, 10));
+        hbox->setPenWidth(style::window::default_border_no_focus_w);
+        hbox->setPenFocusWidth(style::window::default_border_focus_w);
+        hbox->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
+    }
+
 } // namespace
 
-auto NotificationsBox::addNotification(UTF8 icon,
-                                       UTF8 name,
-                                       UTF8 indicator,
+auto NotificationsBox::addNotification(const UTF8 &icon,
+                                       const UTF8 &name,
+                                       const UTF8 &indicator,
                                        std::function<bool()> showCallback,
                                        std::function<bool()> clearCallback,
                                        std::function<void(bool)> onFocus) -> bool
@@ -139,11 +148,7 @@ auto NotificationsBox::addNotification(UTF8 icon,
     el->addWidget(buildNotificationCountText(indicator));
 
     // 3. Set hbox layout properties
-    el->setAlignment(Alignment(gui::Alignment::Vertical::Center));
-    el->setMargins(gui::Margins(0, 0, 0, 10));
-    el->setPenWidth(style::window::default_border_no_focus_w);
-    el->setPenFocusWidth(style::window::default_border_focus_w);
-    el->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
+    setNotificationHboxLayoutProperties(el);
 
     el->focusChangedCallback = [el, onFocus](Item &) -> bool {
         onFocus(el->focus);
@@ -158,6 +163,17 @@ auto NotificationsBox::addNotification(UTF8 icon,
     };
 
     this->addWidget(el);
+    return el->visible;
+}
+
+auto NotificationsBox::addNotification(const UTF8 &icon, const UTF8 &name) -> bool
+{
+    auto el = new gui::HBox(this, 0, 0, style::window::default_body_width, style::window::label::default_h);
+
+    el->addWidget(buildNotificationIcon(icon));
+    el->addWidget(buildNotificationNameLabel(name, el->area().w));
+    setNotificationHboxLayoutProperties(el);
+
     return el->visible;
 }
 

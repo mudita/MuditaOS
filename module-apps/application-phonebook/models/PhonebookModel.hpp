@@ -17,7 +17,9 @@
 
 #include <string>
 
-class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::ListItemProvider
+class PhonebookModel : public app::DatabaseModel<ContactRecord>,
+                       public gui::ListItemProvider,
+                       public app::AsyncCallbackReceiver
 {
   private:
     std::string queryFilter;
@@ -31,7 +33,6 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>, public gui::Lis
                    std::string filter        = "",
                    std::uint32_t groupFilter = 0,
                    std::uint32_t displayMode = 0);
-    ~PhonebookModel() override = default;
 
     // virtual methods from DatabaseModel
     auto updateRecords(std::vector<ContactRecord> records) -> bool override;

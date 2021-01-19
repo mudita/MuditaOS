@@ -13,9 +13,12 @@ namespace cellular
         enum class ST
         {
             Idle,                        /// does nothing
+            WaitForStartPermission,      /// waiting for permission to start the module
+            PowerUpRequest,              /// process request of power up
             StatusCheck,                 /// set on service start - check for modem status - skipped on T3 board
             PowerUpProcedure,            /// due to lack of Status pin on T3, we don't know whether is on or off
             PowerUpInProgress,           /// waiting for modem powered up by polling various bauds
+            BaudDetect,                  /// baud detection procedure
             CellularConfProcedure,       /// configuration procedure
             AudioConfigurationProcedure, /// audio configuration for modem (could be in ModemConfiguration)
             APNConfProcedure,            /// Configure APN set by user, check if modem have similar
@@ -30,6 +33,12 @@ namespace cellular
             PowerDownStarted, /// modem is disconnecting from network. It might take a while if poor coverage
             PowerDownWaiting, /// modem has deregistered and is now approaching low power state
             PowerDown,        /// modem is known to be turned off
+        };
+
+        enum class PowerState
+        {
+            Off,
+            On
         };
 
       private:

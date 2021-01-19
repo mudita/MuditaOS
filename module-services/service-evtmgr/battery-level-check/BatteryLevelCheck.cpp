@@ -12,6 +12,15 @@ namespace battery_level_check
 {
     namespace
     {
+        enum class CheckState
+        {
+            InitialCheck,
+            LevelCritical,
+            LevelNormal
+        };
+
+        CheckState state = CheckState::InitialCheck;
+
         constexpr inline auto DEFAULT_LEVEL = 10;
 
         unsigned int batteryLevelCritical = DEFAULT_LEVEL;
@@ -23,21 +32,49 @@ namespace battery_level_check
             return level < batteryLevelCritical;
         }
 
+        void sendCriticalLevelMessage()
+        {
+            auto levelCriticalMessage = std::make_shared<sevm::BatteryLevelCriticalMessage>();
+            sys::Bus::SendUnicast(levelCriticalMessage, service::name::system_manager, parentService);
+        }
+
+        void sendNormalLevelMessage()
+        {
+            auto levelNormalMessage = std::make_shared<sevm::BatteryLevelNormalMessage>();
+            sys::Bus::SendUnicast(levelNormalMessage, service::name::system_manager, parentService);
+        }
     } // namespace
 
     void init(sys::Service *service)
     {
         parentService = service;
-        checkBatteryLevelCritical();
     }
 
     void checkBatteryLevelCritical()
     {
-        if (Store::Battery::get().state == Store::Battery::State::Discharging) {
+        switch (state) {
+        case CheckState::InitialCheck:
             if (isBatteryLevelCritical(Store::Battery::get().level)) {
-                auto levelCriticalMessage = std::make_shared<sevm::BatteryLevelCriticalMessage>();
-                sys::Bus::SendUnicast(levelCriticalMessage, service::name::system_manager, parentService);
+                sendCriticalLevelMessage();
+                state = CheckState::LevelCritical;
             }
+            else {
+                sendNormalLevelMessage();
+                state = CheckState::LevelNormal;
+            }
+            break;
+        case CheckState::LevelCritical:
+            if (!isBatteryLevelCritical(Store::Battery::get().level)) {
+                sendNormalLevelMessage();
+                state = CheckState::LevelNormal;
+            }
+            break;
+        case CheckState::LevelNormal:
+            if (isBatteryLevelCritical(Store::Battery::get().level)) {
+                sendCriticalLevelMessage();
+                state = CheckState::LevelCritical;
+            }
+            break;
         }
     }
 

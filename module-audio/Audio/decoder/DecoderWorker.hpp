@@ -3,8 +3,10 @@
 
 #pragma once
 
-#include <Service/Worker.hpp>
 #include "Audio/StreamQueuedEventsListener.hpp"
+
+#include <Service/Worker.hpp>
+#include <semaphore.hpp>
 
 namespace audio
 {
@@ -13,14 +15,25 @@ namespace audio
     {
       public:
         using EndOfFileCallback = std::function<void()>;
+        enum class Command
+        {
+            EnablePlayback,
+            DisablePlayback,
+        };
 
-        DecoderWorker(Stream &audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback);
+        DecoderWorker(Stream *audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback);
         ~DecoderWorker() override;
 
         virtual auto init(std::list<sys::WorkerQueueInfo> queues = std::list<sys::WorkerQueueInfo>()) -> bool override;
-        virtual auto handleMessage(uint32_t queueID) -> bool override;
+
+        auto enablePlayback() -> bool;
+        auto disablePlayback() -> bool;
 
       private:
+        virtual auto handleMessage(uint32_t queueID) -> bool override;
+        void pushAudioData();
+        bool stateChangeWait();
+
         using BufferInternalType = int16_t;
 
         static constexpr auto workerName            = "DecoderWorker";
@@ -28,10 +41,12 @@ namespace audio
         static constexpr auto listenerQueueName     = "DecoderWorkerQueue";
         static constexpr auto listenerQueueCapacity = 1024;
 
-        Stream &audioStreamOut;
-        Decoder *decoder = nullptr;
+        Stream *audioStreamOut = nullptr;
+        Decoder *decoder       = nullptr;
         EndOfFileCallback endOfFileCallback;
         std::unique_ptr<StreamQueuedEventsListener> queueListener;
+        bool playbackEnabled = false;
+        cpp_freertos::BinarySemaphore stateSemaphore;
 
         const int bufferSize;
         std::unique_ptr<BufferInternalType[]> decoderBuffer;

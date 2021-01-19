@@ -3,6 +3,8 @@
 MuditaOS – https://github.com/mudita/MuditaOS
 Copyright (c) 2017-2021, Mudita Sp. z o.o. All rights reserved.
 
+MuditaOS is licensed under GNU GPLv3.
+
 ## Sources of Intellectual Property Included in MuditaOS
 
 Where not otherwise indicated, all MuditaOS content is authored by Mudita engineers and consists of Mudita-owned intellectual property. In some specific instances, MuditaOS will incorporate work done by developers outside of Mudita with their expressed permission.
@@ -52,7 +54,7 @@ The following proprietary code is included in MuditaOS:
 ## The GNU General Public License v3.0
 
 ``` 
-Licensed under the terms of GNU General Public License Version 3 or later.
+Licensed under the terms of GNU General Public License Version 3.
 
    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007

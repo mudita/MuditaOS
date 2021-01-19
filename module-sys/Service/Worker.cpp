@@ -237,6 +237,11 @@ namespace sys
         return getControlQueue().Enqueue(&messageToSend, portMAX_DELAY);
     }
 
+    bool Worker::sendCommand(WorkerCommand command)
+    {
+        return getServiceQueue().Enqueue(&command);
+    }
+
     bool Worker::send(uint32_t cmd, uint32_t *data)
     {
         assert(xTaskGetCurrentTaskHandle() == runnerTask);

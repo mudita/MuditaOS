@@ -16,8 +16,6 @@ namespace audio
     using namespace AudioServiceMessage;
     using namespace utils;
 
-#define PERF_STATS_ON 0
-
     PlaybackOperation::PlaybackOperation(const char *file, const audio::PlaybackType &playbackType, Callback callback)
         : Operation(callback, playbackType), dec(nullptr)
     {
@@ -25,6 +23,13 @@ namespace audio
         AddProfile(Profile::Type::PlaybackBluetoothA2DP, playbackType, false);
         AddProfile(Profile::Type::PlaybackHeadphones, playbackType, false);
         AddProfile(Profile::Type::PlaybackLoudspeaker, playbackType, true);
+
+        endOfFileCallback = [this]() {
+            state          = State::Idle;
+            const auto req = AudioServiceMessage::EndOfFile(operationToken);
+            serviceCallback(&req);
+            return std::string();
+        };
 
         auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
         if (!defaultProfile) {
@@ -36,18 +41,12 @@ namespace audio
         if (dec == nullptr) {
             throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
+        tags = dec->fetchTags();
 
         auto retCode = SwitchToPriorityProfile();
         if (retCode != RetCode::Success) {
             throw AudioInitException("Failed to switch audio profile", retCode);
         }
-
-        endOfFileCallback = [this]() {
-            state          = State::Idle;
-            const auto req = AudioServiceMessage::EndOfFile(operationToken);
-            serviceCallback(&req);
-            return std::string();
-        };
     }
 
     audio::RetCode PlaybackOperation::Start(audio::Token token)
@@ -55,31 +54,21 @@ namespace audio
         if (state == State::Active || state == State::Paused) {
             return RetCode::InvokedInIncorrectState;
         }
+
+        // create audio connection
+        outputConnection = std::make_unique<StreamConnection>(dec.get(), audioDevice.get(), dataStreamOut);
+
+        // decoder worker soft start - must be called after connection setup
+        dec->startDecodingWorker(endOfFileCallback);
+
+        // start output device and enable audio connection
+        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+        outputConnection->enable();
+
+        // update state and token
+        state          = State::Active;
         operationToken = token;
 
-        assert(dataStreamOut != nullptr);
-
-        dec->startDecodingWorker(*dataStreamOut, endOfFileCallback);
-
-        if (!tags) {
-            tags = dec->fetchTags();
-        }
-
-        state         = State::Active;
-
-        if (tags->num_channel == channel::stereoSound) {
-            currentProfile->SetInOutFlags(static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputStereo));
-        }
-        else {
-            currentProfile->SetInOutFlags(static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono));
-            if (currentProfile->GetOutputPath() == bsp::AudioDevice::OutputPath::Headphones) {
-                currentProfile->SetOutputPath(bsp::AudioDevice::OutputPath::HeadphonesMono);
-            }
-        }
-
-        currentProfile->SetSampleRate(tags->sample_rate);
-
-        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
         return GetDeviceError(ret);
     }
 
@@ -90,7 +79,10 @@ namespace audio
             return audio::RetCode::DeviceFailure;
         }
 
+        // stop playback by destroying audio connection
+        outputConnection.reset();
         dec->stopDecodingWorker();
+
         return GetDeviceError(audioDevice->Stop());
     }
 
@@ -100,23 +92,18 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
         state = State::Paused;
-
-        dec->stopDecodingWorker();
-        return GetDeviceError(audioDevice->Stop());
+        outputConnection->disable();
+        return audio::RetCode::Success;
     }
 
     audio::RetCode PlaybackOperation::Resume()
     {
-
         if (state == State::Active || state == State::Idle) {
             return RetCode::InvokedInIncorrectState;
         }
-        state    = State::Active;
-
-        assert(dataStreamOut != nullptr);
-        dec->startDecodingWorker(*dataStreamOut, endOfFileCallback);
-        auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
-        return GetDeviceError(ret);
+        state = State::Active;
+        outputConnection->enable();
+        return audio::RetCode::Success;
     }
 
     audio::RetCode PlaybackOperation::SetOutputVolume(float vol)
@@ -159,41 +146,40 @@ namespace audio
 
     audio::RetCode PlaybackOperation::SwitchProfile(const Profile::Type type)
     {
-        uint32_t currentSampleRate = currentProfile->GetSampleRate();
-        uint32_t currentInOutFlags = currentProfile->GetInOutFlags();
-
-        auto ret = GetProfile(type);
-        if (ret) {
-            currentProfile = ret;
-        }
-        else {
+        auto newProfile = GetProfile(type);
+        if (newProfile == nullptr) {
             return RetCode::UnsupportedProfile;
         }
 
-        if (dec->isConnected()) {
-            dec->disconnectStream();
-        }
-
-        audioDevice = CreateDevice(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        /// profile change - (re)create output device; stop audio first by
+        /// killing audio connection
+        outputConnection.reset();
+        audioDevice.reset();
+        audioDevice = CreateDevice(newProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
         }
 
-        dec->connect(audioDevice->sink, *dataStreamOut);
+        // adjust new profile with information from file's tags
+        newProfile->SetSampleRate(tags->sample_rate);
+        if (tags->num_channel == channel::stereoSound) {
+            newProfile->SetInOutFlags(static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputStereo));
+        }
+        else {
+            newProfile->SetInOutFlags(static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono));
+            if (newProfile->GetOutputPath() == bsp::AudioDevice::OutputPath::Headphones) {
+                newProfile->SetOutputPath(bsp::AudioDevice::OutputPath::HeadphonesMono);
+            }
+        }
 
-        currentProfile->SetSampleRate(currentSampleRate);
-        currentProfile->SetInOutFlags(currentInOutFlags);
+        // store profile
+        currentProfile = newProfile;
 
-        switch (state) {
-        case State::Idle:
-        case State::Paused:
-            break;
-
-        case State::Active:
+        if (state == State::Active) {
+            // playback in progress, restart
             state = State::Idle;
             Start(operationToken);
-            break;
         }
 
         return audio::RetCode::Success;
@@ -201,10 +187,7 @@ namespace audio
 
     PlaybackOperation::~PlaybackOperation()
     {
-        dec->stopDecodingWorker();
         Stop();
-        dataStreamOut->reset();
-        dataStreamIn->reset();
     }
 
 } // namespace audio

@@ -23,36 +23,36 @@ namespace gui
         uint32_t numberOfRectangles;
         uint32_t currentLevel = 0;
 
+        [[nodiscard]] auto createRectangle(uint32_t width, uint32_t height) const -> Rect *;
+        [[nodiscard]] auto createSpace(uint32_t width, uint32_t height) const -> Rect *;
+
+        auto incrementWith(uint32_t levels) -> bool;
+        auto decrementWith(uint32_t levels) -> bool;
+
       public:
-        Rect *createRectangle(uint32_t width, uint32_t height);
-
-        Rect *createSpace(uint32_t width, uint32_t height);
-
         void setPercentageValue(unsigned int value) override;
+
+        [[nodiscard]] auto getValue() const -> uint32_t
+        {
+            return currentLevel;
+        }
+        auto update(int value = 1) -> bool final;
+
+        auto setValue(unsigned int value) -> bool override;
     };
 
     class VBarGraph : public VBox, public BarGraph
     {
-        void incrementWith(uint32_t levels);
-        void decrementWith(uint32_t levels);
-
       public:
         VBarGraph(Item *parent = nullptr, Position x = 0, Position y = 0, uint32_t numberOfRectangles = 0);
         void setMaximum(unsigned int value) final;
-        void setValue(unsigned int value) final;
-        void update(int value = 1) final;
     };
 
     class HBarGraph : public HBox, public BarGraph
     {
-        void incrementWith(uint32_t levels);
-        void decrementWith(uint32_t levels);
-
       public:
         HBarGraph(Item *parent = nullptr, Position x = 0, Position y = 0, uint32_t numberOfRectangles = 0);
         void setMaximum(unsigned int value) final;
-        void setValue(unsigned int value) final;
-        void update(int value = 1) final;
     };
 
 } /* namespace gui */

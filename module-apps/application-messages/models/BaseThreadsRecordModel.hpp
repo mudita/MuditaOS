@@ -33,7 +33,6 @@ class BaseThreadsRecordModel : public app::DatabaseModel<ThreadListStruct>, publ
 
     unsigned int requestRecordsCount() override;
     bool updateRecords(std::vector<ThreadListStruct> records) override;
-    void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     app::Application *getApplication(void)
     {

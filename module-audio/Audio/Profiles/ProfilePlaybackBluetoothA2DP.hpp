@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Profile.hpp"
-#include <module-bsp/board/rt1051/bsp/audio/RT1051BluetoothAudio.hpp>
 
 namespace audio
 {

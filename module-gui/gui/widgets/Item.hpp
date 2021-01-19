@@ -131,7 +131,7 @@ namespace gui
         std::function<bool(Item &)> focusChangedCallback;
         /// called when item has dimensions changed
         /// @note should be part of widgetArea
-        std::function<bool(Item &, void *data)> dimensionChangedCallback;
+        std::function<bool(Item &, BoundingBox data)> dimensionChangedCallback;
         /// called when item is activated, this is enter is pressed
         /// @param `this` item
         std::function<bool(Item &)> activatedCallback;
@@ -139,9 +139,6 @@ namespace gui
         /// @param `this` item
         /// @param `InputEvent`
         std::function<bool(Item &, const InputEvent &inputEvent)> inputCallback;
-        /// callback when element insides are changed
-        /// @param `this` item
-        std::function<bool(Item &)> contentCallback;
         /// callback when timer is called on Item and onTimer is executed
         /// @param `this` item
         /// @param `timer` which triggered this callback
@@ -183,10 +180,6 @@ namespace gui
         /// calls: none, inconsistent api
         /// @note TODO should be fixed so that api would be consistent
         virtual bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim);
-        /// (should be) called each time content in item was changed, added for gui::Text widget
-        /// calls: none, inconsistent behaviour
-        /// @note TODO should be fixed so that api would be consistent
-        virtual bool onContent();
         /// called on Timer event in application, triggeres timerCallback
         /// @param timer timer element which triggered this action
         virtual bool onTimer(Timer &timer);
@@ -363,5 +356,5 @@ namespace gui
     };
 
     NavigationDirection inputToNavigation(const InputEvent &evt);
-
+    bool isInputNavigation(const InputEvent &evt);
 } /* namespace gui */

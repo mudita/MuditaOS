@@ -28,19 +28,20 @@ class CDCSerial:
             try:
                 self.serial = serial.Serial(port_name, baudrate=115200, timeout=10)
                 self.serial.flushInput()
-                log.info("port opened!")
+                log.info(f"opened port {port_name}!")
                 break
             except (FileNotFoundError, serial.serialutil.SerialException) as err:
-                log.error("can't open {}, retrying...".format(port_name))
+                log.error(f"can't open {port_name}, retrying...")
                 time.sleep(1)
                 self.timeout = self.timeout - 1
                 if self.timeout == 0:
-                    log.error("uart {} not found - probably OS did not boot".format(port_name))
+                    log.error(f"uart {port_name} not found - probably OS did not boot")
                     raise TestError(Error.PORT_NOT_FOUND)
 
     def __del__(self):
         try:
             self.serial.close()
+            log.info(f"closed port {self.serial.name}")
         except (serial.serialutil.SerialException, AttributeError):
             pass
 
@@ -48,7 +49,7 @@ class CDCSerial:
         msg = {
             "endpoint": endpoint["developerMode"],
             "method": method["put"],
-            "uuid": randrange(1,100),
+            "uuid": randrange(1, 100),
             "body": body
         }
         return msg
@@ -64,7 +65,6 @@ class CDCSerial:
         header = self.readRaw(length)
         payload_length = int(header[1:])
         result = self.readRaw(payload_length)
-        log.info(f"received length: {len(result)}, payload length:{payload_length}")
         return result
 
     def readRaw(self, length):
@@ -77,11 +77,10 @@ class CDCSerial:
         return json.loads(result)
 
     def writeRaw(self, message, timeout=30):
-        log.info(message)
         self.serial.write(message.encode())
         self.serial.timeout = timeout
 
-    def send_key(self, key_code, key_type=Keytype.short_press, wait=10):
+    def send_key_code(self, key_code, key_type=Keytype.short_press, wait=10):
         if key_type is Keytype.long_press:
             body = {"keyPressed": key_code, "state": 4}
         else:
@@ -130,3 +129,12 @@ class CDCSerial:
 
         ret = self.write(self.__wrap_message(body))
         return ret["body"]["isLocked"]
+
+    @staticmethod
+    def find_Pures() -> str:
+        '''
+        Return a list of unique paths to all the Mudita Pure phones found connected to the system
+        '''
+        import serial.tools.list_ports as list_ports
+        return [_.device for _ in list_ports.comports() if _.manufacturer == 'Mudita' and _.product == 'Mudita Pure']
+

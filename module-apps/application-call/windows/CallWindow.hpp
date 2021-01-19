@@ -1,16 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "application-call/ApplicationCall.hpp"
-#include "AppWindow.hpp"
 #include "application-call/widgets/StateIcons.hpp"
+#include "application-call/data/CallState.hpp"
 
 #include <gui/input/Translator.hpp>
 #include <Rect.hpp>
 #include <Image.hpp>
-#include <application-call/data/CallWindowState.hpp>
+#include <AppWindow.hpp>
 
 namespace gui
 {
@@ -18,45 +18,44 @@ namespace gui
     {
       private:
         gui::KeyInputMappedTranslation translator;
-        std::chrono::seconds callDuration = std::chrono::seconds().zero();
-        bool stop_timer = false;
+        std::chrono::seconds callDuration                   = std::chrono::seconds().zero();
+        bool stop_timer                                     = false;
+        static constexpr inline sys::ms callDelayedStopTime = 3000;
+
+        [[nodiscard]] auto getDelayedStopTime() const
+        {
+            return callDelayedStopTime;
+        }
 
       protected:
-        // used to display both nnumber and name of contact
+        app::CallWindowInterface *interface = nullptr;
+        // used to display both number and name of contact
         gui::Label *numberLabel = nullptr;
         // used to inform user about call state of call and display duration of call
         gui::Label *durationLabel = nullptr;
 
-        gui::SendSmsIcon *sendSmsIcon  = nullptr;
+        gui::SendSmsIcon *sendSmsIcon       = nullptr;
         gui::MicrophoneIcon *microphoneIcon = nullptr;
         gui::SpeakerIcon *speakerIcon       = nullptr;
-        gui::Image *imageCircleTop     = nullptr;
-        gui::Image *imageCircleBottom  = nullptr;
+        gui::Image *imageCircleTop          = nullptr;
+        gui::Image *imageCircleBottom       = nullptr;
 
-        call::State state = call::State::IDLE;
         utils::PhoneNumber::View phoneNumber;
-        /**
-         * Manipulates widgets to handle currently set state of the window.
-         */
-        void setVisibleState();
+
         bool handleLeftButton();
         bool handleRightButton();
-        void setState(call::State state);
+        void setState(app::call::State state);
+        [[nodiscard]] auto getState() const noexcept -> app::call::State;
 
       public:
-        CallWindow(app::Application *app, std::string windowName = app::window::name_call);
-        virtual ~CallWindow();
+        CallWindow(app::Application *app,
+                   app::CallWindowInterface *interface,
+                   std::string windowName = app::window::name_call);
 
-        /**
-         * Used by application to update window's state
-         */
-        const call::State &getState();
         void updateDuration(const utils::time::Duration duration);
-        void setCallNumber(std::string);
 
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        bool handleSwitchData(SwitchData *data) override;
 
         void rebuild() override;
         void buildInterface() override;

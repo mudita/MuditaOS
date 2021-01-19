@@ -15,6 +15,6 @@ namespace gui
       private:
         auto buildOptionsList() -> std::list<Option> override;
 
-        bool lockScreenPasscodeOn = false;
+        bool lockScreenPasscodeIsOn;
     };
 } // namespace gui

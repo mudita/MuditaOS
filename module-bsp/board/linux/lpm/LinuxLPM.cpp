@@ -29,4 +29,9 @@ namespace bsp
     {
         currentOscSource = source;
     }
+
+    void LinuxLPM::SwitchPll2State(bsp::LowPowerMode::Pll2State state)
+    {
+        currentPll2State = state;
+    }
 } // namespace bsp

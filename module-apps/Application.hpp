@@ -3,8 +3,10 @@
 
 #pragma once
 
+#include "AsyncTask.hpp"
 #include "Audio/AudioCommon.hpp"                        // for Volume, Play...
 #include "Audio/Profiles/Profile.hpp"                   // for Profile, Pro...
+#include "CallbackStorage.hpp"
 #include "Service/Bus.hpp"                              // for Bus
 #include "Service/Common.hpp"                           // for ReturnCodes
 #include "Service/Message.hpp"                          // for MessagePointer
@@ -117,7 +119,7 @@ namespace app
     /// This is template for creating new applications. Main difference between Application and service is that:
     /// 1. Application has access to GUI and Input
     /// 2. Application lifetime is managed with app::manager::ApplicationManager
-    class Application : public sys::Service
+    class Application : public sys::Service, public AsyncCallbacksDeleter
     {
       public:
         /// state in which application is right now
@@ -159,6 +161,7 @@ namespace app
       private:
         std::string default_window;
         State state = State::DEACTIVATED;
+        bool lockScreenPasscodeIsOn;
 
         sys::MessagePointer handleSignalStrengthUpdate(sys::Message *msgl);
         sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);
@@ -187,7 +190,7 @@ namespace app
                     uint32_t stackDepth                 = 4096,
                     sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
-        virtual ~Application();
+        virtual ~Application() noexcept;
 
         Application::State getState();
         void setState(State st);
@@ -282,6 +285,8 @@ namespace app
 
         void toggleTorch(bsp::torch::ColourTemperature temperature);
 
+        void cancelCallbacks(AsyncCallbackReceiver::Ptr receiver) override;
+
         /// @defgroup Application Application static functions
         /// All this functions are meant to be used in ApplicationManager only
         /// @note consider moving these as private elements of ApplicationManager i.e. under names
@@ -351,6 +356,10 @@ namespace app
         /// set of rendering commands will carry information to GUI service that system needs to be closed. After
         /// displaying the screen GUI will notify application manager to request system shutdown.
         bool shutdownInProgress = false;
+        /// Storage for asynchronous tasks callbacks.
+        std::unique_ptr<CallbackStorage> callbackStorage;
+        friend class AsyncTask; // Async tasks need access to application internals, e.g. callback storage, to make
+                                // their API simple.
 
         /// informs self that there was key press
         /// used to provide a way for long press/multipress handling in application
@@ -367,6 +376,8 @@ namespace app
 
       public:
         bool isTimeFormat12() const noexcept;
+        void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;
+        bool isLockScreenPasscodeOn() const noexcept;
     };
 
     /// Parameter pack used by application launch action.

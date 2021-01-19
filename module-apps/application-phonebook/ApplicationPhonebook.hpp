@@ -16,7 +16,6 @@ namespace gui::window::name
     inline constexpr auto search                 = "Search";
     inline constexpr auto search_results         = "SearchResults";
     inline constexpr auto dialog_yes_no          = "DialogYesNo";
-    inline constexpr auto dialog_confirm         = "DialogConfirm";
     inline constexpr auto dialog                 = "Dialog";
     inline constexpr auto dialog_yes_no_icon_txt = "DialogYesNoIconTxt";
     inline constexpr auto ice_contacts           = "IceContacts";

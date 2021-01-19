@@ -29,6 +29,7 @@
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-utils/magic_enum/include/magic_enum.hpp>
+#include <SystemManager/messages/SystemManagerMessage.hpp>
 
 #include <cassert>
 namespace app
@@ -80,6 +81,11 @@ namespace app
 
         addActionReceiver(app::manager::actions::ShowMMIResult, [this](auto &&data) {
             switchWindow(app::window::name::desktop_mmi_internal, std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::DisplayLowBatteryNotification, [this](auto &&data) {
+            handleLowBatteryNotification(std::move(data));
             return msgHandled();
         });
     }
@@ -203,7 +209,11 @@ namespace app
              msg->interface == db::Interface::Name::SMS) &&
             msg->type != db::Query::Type::Read) {
             requestNotReadNotifications();
-            windowsFactory.build(this, app::window::name::desktop_menu);
+            if (auto menuWindow = dynamic_cast<gui::MenuWindow *>(getWindow(app::window::name::desktop_menu));
+                menuWindow != nullptr) {
+                menuWindow->refresh();
+                return true;
+            }
         }
 
         return false;
@@ -257,15 +267,15 @@ namespace app
 
     bool ApplicationDesktop::requestNotSeenNotifications()
     {
-        return DBServiceAPI::GetQuery(
+        const auto [succeed, _] = DBServiceAPI::GetQuery(
             this, db::Interface::Name::Notifications, std::make_unique<db::query::notifications::GetAll>());
+        return succeed;
     }
 
     bool ApplicationDesktop::requestNotReadNotifications()
     {
         notifications.notRead.Calls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
         notifications.notRead.SMS   = DBServiceAPI::ThreadGetCount(this, EntryState::UNREAD);
-
         return true;
     }
 
@@ -382,6 +392,16 @@ namespace app
         }
         else {
             lockPassHash = 0;
+        }
+    }
+
+    void ApplicationDesktop::handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data)
+    {
+        auto actionData               = static_cast<manager::actions::LowBatteryNotificationParams *>(data.get());
+        notifications.batteryLowLevel = actionData->getActiveState();
+        auto currentWindow            = getCurrentWindow();
+        if (currentWindow->getName() == window::name::desktop_main_window) {
+            currentWindow->rebuild();
         }
     }
 

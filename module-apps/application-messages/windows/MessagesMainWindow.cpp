@@ -26,7 +26,8 @@
 
 namespace gui
 {
-    MessagesMainWindow::MessagesMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
+    MessagesMainWindow::MessagesMainWindow(app::Application *app)
+        : AppWindow(app, gui::name::window::main_window), app::AsyncCallbackReceiver{app}
     {
         buildInterface();
     }
@@ -112,7 +113,8 @@ namespace gui
             if (pdata != nullptr) {
                 using db::query::ThreadGetByContactID;
                 auto query = std::make_unique<ThreadGetByContactID>(pdata->result->ID);
-                query->setQueryListener(db::QueryCallback::fromFunction([app = application](auto response) {
+                auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
+                task->setCallback([app = application](auto response) {
                     using db::query::ThreadGetByContactIDResult;
                     const auto result = dynamic_cast<ThreadGetByContactIDResult *>(response);
                     if ((result != nullptr) && result->getRecord().has_value()) {
@@ -123,8 +125,8 @@ namespace gui
                     }
                     LOG_FATAL("No thread and thread not created!");
                     return false;
-                }));
-                DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
+                });
+                task->execute(application, this);
             }
         }
 

@@ -1,0 +1,8 @@
+@startuml
+participant "Service GUI" as gui
+participant "Context Pool" as pool
+
+gui -> gui: Cache frame
+gui -> pool: Return context
+
+@enduml

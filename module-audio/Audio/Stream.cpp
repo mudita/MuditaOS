@@ -27,7 +27,7 @@ bool Stream::push(void *data, std::size_t dataSize)
 
 bool Stream::push(const Span &span)
 {
-    LockGuard lock();
+    LockGuard lock;
 
     /// sanity - do not store buffers different than internal block size
     if (span.dataSize != _blockSize) {
@@ -65,7 +65,7 @@ bool Stream::push()
 
 bool Stream::pop(Span &span)
 {
-    LockGuard lock();
+    LockGuard lock;
 
     /// sanity - do not store buffers different than internal block size
     if (span.dataSize != _blockSize) {
@@ -95,7 +95,7 @@ bool Stream::pop(Span &span)
 
 void Stream::consume()
 {
-    LockGuard lock();
+    LockGuard lock;
 
     _blocksUsed -= _peekCount;
     _peekCount = 0;
@@ -106,7 +106,7 @@ void Stream::consume()
 
 bool Stream::peek(Span &span)
 {
-    LockGuard lock();
+    LockGuard lock;
 
     if (getPeekedCount() < getUsedBlockCount()) {
         span = *_peekPosition++;
@@ -121,7 +121,7 @@ bool Stream::peek(Span &span)
 
 void Stream::unpeek()
 {
-    LockGuard lock();
+    LockGuard lock;
 
     _peekPosition = _dataStart;
     _peekCount    = 0;
@@ -129,7 +129,7 @@ void Stream::unpeek()
 
 bool Stream::reserve(Span &span)
 {
-    LockGuard lock();
+    LockGuard lock;
 
     if (getBlockCount() - getUsedBlockCount() > _reserveCount) {
         span = *++_writeReservationPosition;
@@ -143,7 +143,7 @@ bool Stream::reserve(Span &span)
 
 void Stream::commit()
 {
-    LockGuard lock();
+    LockGuard lock;
 
     _blocksUsed += _reserveCount;
     _reserveCount = 0;
@@ -154,7 +154,7 @@ void Stream::commit()
 
 void Stream::release()
 {
-    LockGuard lock();
+    LockGuard lock;
 
     _reserveCount             = 0;
     _writeReservationPosition = _dataEnd;
@@ -162,21 +162,21 @@ void Stream::release()
 
 std::size_t Stream::getBlockSize() const noexcept
 {
-    LockGuard lock();
+    LockGuard lock;
 
     return _blockSize;
 }
 
 void Stream::registerListener(EventListener *listener)
 {
-    LockGuard lock();
+    LockGuard lock;
 
     listeners.push_back(std::ref(listener));
 }
 
 void Stream::unregisterListeners(Stream::EventListener *listener)
 {
-    LockGuard lock();
+    LockGuard lock;
 
     auto it = std::find(listeners.begin(), listeners.end(), listener);
     if (it != listeners.end()) {
@@ -230,13 +230,13 @@ std::size_t Stream::getReservedCount() const noexcept
 
 bool Stream::isEmpty() const noexcept
 {
-    LockGuard lock();
+    LockGuard lock;
     return getUsedBlockCount() == 0;
 }
 
 bool Stream::isFull() const noexcept
 {
-    LockGuard lock();
+    LockGuard lock;
     return getUsedBlockCount() == getBlockCount();
 }
 
@@ -247,6 +247,8 @@ bool Stream::blocksAvailable() const noexcept
 
 void Stream::reset()
 {
+    LockGuard lock;
+
     _dataStart                = {_buffer.get(), _blockSize * _blockCount, _buffer.get(), _blockSize};
     _dataEnd                  = _dataStart;
     _peekPosition             = _dataStart;

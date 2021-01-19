@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallWindow.hpp"
-#include <application-call/data/CallWindowData.hpp>
 
 #include "GuiTimer.hpp"
 #include "InputEvent.hpp"
+#include "application-call/data/CallState.hpp"
 #include "application-call/widgets/StateIcons.hpp"
 #include "log/log.hpp"
 #include "service-appmgr/Controller.hpp"
@@ -39,10 +39,13 @@ namespace gui
 {
     using namespace callAppStyle;
     using namespace callAppStyle::callWindow;
-    using namespace call;
+    using namespace app::call;
 
-    CallWindow::CallWindow(app::Application *app, std::string windowName) : AppWindow(app, windowName)
+    CallWindow::CallWindow(app::Application *app, app::CallWindowInterface *interface, std::string windowName)
+        : AppWindow(app, windowName), interface(interface)
     {
+        assert(interface != nullptr);
+        assert(app != nullptr);
         buildInterface();
     }
 
@@ -86,7 +89,8 @@ namespace gui
 
         speakerIcon                       = new SpeakerIcon(this, speakerIcon::x, speakerIcon::y);
         speakerIcon->focusChangedCallback = [=](gui::Item &item) {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch));
+            LOG_DEBUG("speakerIcon get/lost focus");
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch), false);
             return true;
         };
         speakerIcon->activatedCallback = [=](gui::Item &item) {
@@ -113,13 +117,14 @@ namespace gui
 
         microphoneIcon                       = new MicrophoneIcon(this, microphoneIcon::x, microphoneIcon::y);
         microphoneIcon->focusChangedCallback = [=](gui::Item &item) {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch));
+            LOG_DEBUG("microphoneIcon get/lost focus");
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch), false);
             return true;
         };
         microphoneIcon->activatedCallback = [=](gui::Item &item) {
             microphoneIcon->setNext();
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-            LOG_INFO("Mic activated activated %d", static_cast<int>(microphoneIcon->get()));
+            LOG_INFO("Mic activated %d", static_cast<int>(microphoneIcon->get()));
 
             microphoneIcon->get() == MicrophoneIconState::MUTED
                 ? AudioServiceAPI::SendEvent(this->application, audio::EventType::CallMute)
@@ -130,12 +135,12 @@ namespace gui
 
         sendSmsIcon                       = new gui::SendSmsIcon(this, sendMessageIcon::x, sendMessageIcon::y);
         sendSmsIcon->focusChangedCallback = [=](gui::Item &item) {
-            LOG_INFO("Send message gets focus");
-            bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(strings::message));
+            LOG_DEBUG("Send message get/lost focus");
+            bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(strings::message), false);
             return true;
         };
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("Send messaage template and reject the call");
+            LOG_INFO("Send message template and reject the call");
             return app::manager::Controller::sendAction(application,
                                                         app::manager::actions::ShowSmsTemplates,
                                                         std::make_unique<SMSSendTemplateRequest>(phoneNumber));
@@ -154,26 +159,15 @@ namespace gui
         erase();
     }
 
-    CallWindow::~CallWindow()
-    {}
-
     void CallWindow::setState(State state)
     {
-        LOG_INFO("==> Call state change: %s -> %s", c_str(this->state), c_str(state));
-        this->state = state;
-        setVisibleState();
-    }
+        auto prevState = getState();
+        LOG_INFO("==> Call state change: %s -> %s", c_str(prevState), c_str(state));
+        interface->setState(state);
 
-    const State &CallWindow::getState()
-    {
-        return state;
-    }
-
-    void CallWindow::setVisibleState()
-    {
-        // show state of the window
         switch (state) {
         case State::INCOMING_CALL: {
+            interface->startRinging();
             bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
             bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(strings::answer), true);
             bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(strings::reject), true);
@@ -185,8 +179,8 @@ namespace gui
             setFocusItem(sendSmsIcon);
         } break;
         case State::CALL_ENDED: {
+            interface->stopAudio();
             stopCallTimer();
-
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
             bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
@@ -195,13 +189,17 @@ namespace gui
             sendSmsIcon->setVisible(false);
             speakerIcon->setVisible(false);
             microphoneIcon->setVisible(false);
-            setFocusItem(nullptr);
             speakerIcon->set(SpeakerIconState::SPEAKER);
             microphoneIcon->set(MicrophoneIconState::MUTE);
-
+            setFocusItem(nullptr);
             connectTimerOnExit();
+            LOG_FATAL("CALL_ENDED");
         } break;
         case State::CALL_IN_PROGRESS: {
+            if (prevState == State::INCOMING_CALL) { // otherwise it is already started
+                interface->startRouting();
+            }
+            runCallTimer();
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
             bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(strings::endcall), true);
@@ -209,9 +207,13 @@ namespace gui
             sendSmsIcon->setVisible(false);
             speakerIcon->setVisible(true);
             microphoneIcon->setVisible(true);
-            setFocusItem(getFocusItem() != sendSmsIcon ? getFocusItem() : microphoneIcon);
+            auto focusItem = getFocusItem();
+            if (focusItem != microphoneIcon || focusItem != speakerIcon) {
+                setFocusItem(microphoneIcon);
+            }
         } break;
         case State::OUTGOING_CALL: {
+            interface->startRouting();
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
             bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(strings::endcall), true);
@@ -238,8 +240,10 @@ namespace gui
         };
     }
 
-    void CallWindow::setCallNumber(std::string)
-    {}
+    auto CallWindow::getState() const noexcept -> State
+    {
+        return interface->getState();
+    }
 
     void CallWindow::updateDuration(const utils::time::Duration duration)
     {
@@ -248,96 +252,58 @@ namespace gui
         }
     }
 
-    bool CallWindow::handleSwitchData(SwitchData *data)
-    {
-        if (data == nullptr) {
-            LOG_DEBUG("Received null pointer");
-            return false;
-        }
-
-        if (dynamic_cast<SMSTemplateSent *>(data) != nullptr) {
-            CellularServiceAPI::HangupCall(application);
-            return true;
-        }
-
-        if (data->getDescription() == app::CallSwitchData::descriptionStr) {
-            auto *callData = dynamic_cast<app::CallSwitchData *>(data);
-            assert(callData != nullptr);
-            phoneNumber = callData->getPhoneNumber();
-            switch (callData->getType()) {
-            case app::CallSwitchData::Type::INCOMING_CALL: {
-                state = State::INCOMING_CALL;
-            } break;
-
-            case app::CallSwitchData::Type::EXECUTE_CALL: {
-                state = State::OUTGOING_CALL;
-            } break;
-
-            default:
-                LOG_ERROR("Unhandled type");
-            }
-        }
-        else {
-            return false;
-        }
-
-        auto contact            = DBServiceAPI::MatchContactByPhoneNumber(this->application, phoneNumber);
-        std::string displayName = phoneNumber.getFormatted();
-        if (contact) {
-            LOG_INFO("number = %s recognized as contact id = %" PRIu32 ", name = %s",
-                     phoneNumber.getEntered().c_str(),
-                     contact->ID,
-                     contact->getFormattedName().c_str());
-            displayName = contact->getFormattedName();
-        }
-        else {
-            LOG_INFO("number = %s was not recognized as any valid contact", phoneNumber.getEntered().c_str());
-        }
-
-        numberLabel->setText(displayName);
-
-        setVisibleState();
-        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-
-        return true;
-    }
-
     void CallWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        auto app = static_cast<app::ApplicationCall *>(application);
-
-        if (dynamic_cast<app::IncomingCallData *>(data) != nullptr) {
-            if (getState() == call::State::INCOMING_CALL) {
-                LOG_INFO("ignoring call incoming");
+        if (auto callData = dynamic_cast<app::CallSwitchData *>(data); callData != nullptr) {
+            phoneNumber      = callData->getPhoneNumber();
+            auto contact     = DBServiceAPI::MatchContactByPhoneNumber(this->application, phoneNumber);
+            auto displayName = phoneNumber.getFormatted();
+            if (contact) {
+                LOG_INFO("number = %s recognized as contact id = %" PRIu32 ", name = %s",
+                         phoneNumber.getEntered().c_str(),
+                         contact->ID,
+                         contact->getFormattedName().c_str());
+                displayName = contact->getFormattedName();
             }
-            app->startRinging();
-            setState(call::State::INCOMING_CALL);
-            return;
+            else {
+                LOG_INFO("number = %s was not recognized as any valid contact", phoneNumber.getEntered().c_str());
+            }
+
+            numberLabel->setText(displayName);
+
+            if (dynamic_cast<app::IncomingCallData *>(data) != nullptr) {
+                if (getState() == State::INCOMING_CALL) {
+                    LOG_DEBUG("ignoring call incoming");
+                    return;
+                }
+                setState(State::INCOMING_CALL);
+                return;
+            }
+            if (dynamic_cast<app::ExecuteCallData *>(data) != nullptr) {
+                setState(State::OUTGOING_CALL);
+                return;
+            }
         }
 
         if (dynamic_cast<app::CallAbortData *>(data) != nullptr) {
-            app->stopAudio();
             setState(State::CALL_ENDED);
             return;
         }
 
         if (dynamic_cast<app::CallActiveData *>(data) != nullptr) {
-            app->startRouting();
-            runCallTimer();
+            setState(State::CALL_IN_PROGRESS);
             return;
         }
 
-        if (dynamic_cast<app::ExecuteCallData *>(data) != nullptr) {
-            AudioServiceAPI::RoutingStart(application);
-            runCallTimer();
-            setState(State::OUTGOING_CALL);
+        if (dynamic_cast<SMSTemplateSent *>(data) != nullptr) {
+            CellularServiceAPI::HangupCall(application);
             return;
         }
     }
 
     bool CallWindow::handleLeftButton()
     {
-        if (state == State::INCOMING_CALL) {
+        if (getState() == State::INCOMING_CALL) {
             auto ret = CellularServiceAPI::AnswerIncomingCall(application);
 
             LOG_INFO("AnswerIncomingCall: %s", (ret ? "OK" : "FAIL"));
@@ -349,7 +315,7 @@ namespace gui
 
     bool CallWindow::handleRightButton()
     {
-        switch (state) {
+        switch (getState()) {
         case State::INCOMING_CALL:
         case State::OUTGOING_CALL:
         case State::CALL_IN_PROGRESS:
@@ -365,9 +331,7 @@ namespace gui
 
     bool CallWindow::handleDigit(const uint32_t digit)
     {
-        auto app = dynamic_cast<app::ApplicationCall *>(application);
-        assert(app != nullptr);
-        app->transmitDtmfTone(digit);
+        interface->transmitDtmfTone(digit);
         return true;
     }
 
@@ -410,18 +374,17 @@ namespace gui
 
     void CallWindow::connectTimerOnExit()
     {
-        auto app = dynamic_cast<app::ApplicationCall *>(application);
-        assert(app != nullptr);
-
-        auto timer = std::make_unique<app::GuiTimer>(app);
-        timer->setInterval(app->getDelayedStopTime());
+        auto timer = std::make_unique<app::GuiTimer>(application);
+        timer->setInterval(getDelayedStopTime());
 
         timerCallback = [this](Item &, Timer &timer) {
+            LOG_DEBUG("Delayed exit timer callback");
             setState(State::IDLE);
             detachTimer(timer);
             app::manager::Controller::switchBack(application);
             return true;
         };
+        timer->start();
         application->connect(std::move(timer), this);
     }
 
@@ -438,6 +401,7 @@ namespace gui
             std::chrono::time_point<std::chrono::system_clock> systemUnitDuration(callDuration);
             updateDuration(std::chrono::system_clock::to_time_t(systemUnitDuration));
             callDuration++;
+            LOG_DEBUG("Update duration timer callback - %" PRIu32, static_cast<uint32_t>(callDuration.count()));
             application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             return true;
         };
@@ -448,6 +412,6 @@ namespace gui
     void CallWindow::stopCallTimer()
     {
         callDuration = std::chrono::seconds().zero();
-        stop_timer = true;
+        stop_timer   = true;
     }
 } /* namespace gui */

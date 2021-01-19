@@ -74,4 +74,6 @@ class WorkerEvent : public sys::Worker
      * @param queueID Index of the queue in the queues vector.
      */
     bool handleMessage(uint32_t queueID) override final;
+
+    void checkBatteryLevelCritical();
 };

@@ -143,21 +143,34 @@ namespace gui
     {
         LOG_DEBUG("%s", __FUNCTION__);
         if (!contact->isTemporary()) {
-            auto err = DBServiceAPI::verifyContact(application, *contact);
-            LOG_INFO("Contact data verification result: \"%s\"", DBServiceAPI::getVerificationErrorString(err).c_str());
-            switch (err) {
-            case DBServiceAPI::noError:
+            auto result = DBServiceAPI::verifyContact(application, *contact);
+            switch (result) {
+            case DBServiceAPI::ContactVerificationResult::success:
                 break;
-            case DBServiceAPI::emptyContactError:
+            case DBServiceAPI::ContactVerificationResult::emptyContact:
                 return false;
-            case DBServiceAPI::primaryNumberError:
+            case DBServiceAPI::ContactVerificationResult::primaryNumberDuplicate:
                 showDialogDuplicatedNumber(contact->numbers[0].number);
                 return false;
-            case DBServiceAPI::secondaryNumberError:
+            case DBServiceAPI::ContactVerificationResult::secondaryNumberDuplicate:
                 showDialogDuplicatedNumber(contact->numbers[1].number);
                 return false;
-            case DBServiceAPI::speedDialError:
+            case DBServiceAPI::ContactVerificationResult::speedDialDuplicate:
                 showDialogDuplicatedSpeedDialNumber();
+                return false;
+            case DBServiceAPI::ContactVerificationResult::temporaryContactExists:
+                std::unique_ptr<ContactRecord> tempContact;
+                assert(!contact->numbers.empty());
+                for (auto number : contact->numbers) {
+                    if (number.number.getEntered().size() > 0) {
+                        tempContact = DBServiceAPI::MatchContactByPhoneNumber(application, number.number);
+                        if (tempContact != nullptr) {
+                            contact->ID   = tempContact->ID;
+                            contactAction = ContactAction::EditTemporary;
+                            break;
+                        }
+                    }
+                }
                 return false;
             }
         }

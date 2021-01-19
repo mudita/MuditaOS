@@ -44,6 +44,8 @@ namespace app
             Counters notSeen;
             Counters notRead;
 
+            bool batteryLowLevel = false;
+
         } notifications;
 
         gui::PinLockHandler lockHandler;
@@ -87,6 +89,7 @@ namespace app
       private:
         void activeSimChanged(std::string value);
         void lockPassHashChanged(std::string value);
+        void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);
         unsigned int lockPassHash = 0;
     };
 
@@ -103,7 +106,8 @@ namespace app
                      manager::actions::ShowMMIResponse,
                      manager::actions::ShowMMIPush,
                      manager::actions::ShowMMIResult,
-                     manager::actions::DisplayCMEError}};
+                     manager::actions::DisplayCMEError,
+                     manager::actions::DisplayLowBatteryNotification}};
         }
     };
 

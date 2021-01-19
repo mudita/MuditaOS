@@ -4,15 +4,15 @@
 #include "DecoderWorker.hpp"
 #include "Audio/decoder/Decoder.hpp"
 
-audio::DecoderWorker::DecoderWorker(Stream &audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback)
+audio::DecoderWorker::DecoderWorker(Stream *audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback)
     : sys::Worker(DecoderWorker::workerName, DecoderWorker::workerPriority), audioStreamOut(audioStreamOut),
       decoder(decoder), endOfFileCallback(endOfFileCallback),
-      bufferSize(audioStreamOut.getBlockSize() / sizeof(BufferInternalType))
+      bufferSize(audioStreamOut->getBlockSize() / sizeof(BufferInternalType))
 {}
 
 audio::DecoderWorker::~DecoderWorker()
 {
-    audioStreamOut.unregisterListeners(queueListener.get());
+    audioStreamOut->unregisterListeners(queueListener.get());
 }
 
 auto audio::DecoderWorker::init(std::list<sys::WorkerQueueInfo> queues) -> bool
@@ -27,7 +27,7 @@ auto audio::DecoderWorker::init(std::list<sys::WorkerQueueInfo> queues) -> bool
         return false;
     }
 
-    audioStreamOut.registerListener(queueListener.get());
+    audioStreamOut->registerListener(queueListener.get());
 
     decoderBuffer = std::make_unique<BufferInternalType[]>(bufferSize);
     if (!decoderBuffer) {
@@ -39,8 +39,9 @@ auto audio::DecoderWorker::init(std::list<sys::WorkerQueueInfo> queues) -> bool
 
 bool audio::DecoderWorker::handleMessage(uint32_t queueID)
 {
-    auto queue = queues[queueID];
-    if (queue->GetQueueName() == listenerQueueName && queueListener) {
+    auto queue      = queues[queueID];
+    auto &queueName = queue->GetQueueName();
+    if (queueName == listenerQueueName && queueListener) {
         auto event = queueListener->getEvent();
 
         switch (event.second) {
@@ -55,22 +56,64 @@ bool audio::DecoderWorker::handleMessage(uint32_t queueID)
         case Stream::Event::StreamHalfUsed:
             [[fallthrough]];
         case Stream::Event::StreamEmpty:
-            auto samplesRead = 0;
+            pushAudioData();
+        }
+    }
+    else if (queueName == SERVICE_QUEUE_NAME) {
+        auto &serviceQueue = getServiceQueue();
+        sys::WorkerCommand cmd;
 
-            while (!audioStreamOut.isFull()) {
-                samplesRead = decoder->decode(bufferSize, decoderBuffer.get());
-
-                if (samplesRead == 0) {
-                    endOfFileCallback();
-                    break;
-                }
-
-                if (!audioStreamOut.push(decoderBuffer.get(), samplesRead * sizeof(BufferInternalType))) {
-                    LOG_FATAL("Decoder failed to push to stream.");
-                    break;
-                }
+        if (serviceQueue.Dequeue(&cmd)) {
+            switch (static_cast<Command>(cmd.command)) {
+            case Command::EnablePlayback: {
+                playbackEnabled = true;
+                stateSemaphore.Give();
+                pushAudioData();
+                break;
+            }
+            case Command::DisablePlayback: {
+                playbackEnabled = false;
+                stateSemaphore.Give();
+            }
             }
         }
     }
+
     return true;
+}
+
+void audio::DecoderWorker::pushAudioData()
+{
+    auto samplesRead = 0;
+
+    while (!audioStreamOut->isFull() && playbackEnabled) {
+        samplesRead = decoder->decode(bufferSize, decoderBuffer.get());
+
+        if (samplesRead == 0) {
+            endOfFileCallback();
+            break;
+        }
+
+        if (!audioStreamOut->push(decoderBuffer.get(), samplesRead * sizeof(BufferInternalType))) {
+            LOG_FATAL("Decoder failed to push to stream.");
+            break;
+        }
+    }
+}
+
+bool audio::DecoderWorker::enablePlayback()
+{
+    return sendCommand({.command = static_cast<uint32_t>(Command::EnablePlayback), .data = nullptr}) &&
+           stateChangeWait();
+}
+
+bool audio::DecoderWorker::disablePlayback()
+{
+    return sendCommand({.command = static_cast<uint32_t>(Command::DisablePlayback), .data = nullptr}) &&
+           stateChangeWait();
+}
+
+bool audio::DecoderWorker::stateChangeWait()
+{
+    return stateSemaphore.Take();
 }

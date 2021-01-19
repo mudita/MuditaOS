@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCall.hpp"
 
 #include "DialogMetadata.hpp"
 #include "DialogMetadataMessage.hpp"
-#include "application-call/data/CallWindowData.hpp"
 #include "data/CallSwitchData.hpp"
 #include "windows/CallMainWindow.hpp"
 #include "windows/CallWindow.hpp"
@@ -35,11 +34,11 @@ namespace app
         : Application(name, parent, startInBackground, app::call_stack_size)
     {
         addActionReceiver(manager::actions::Call, [this](auto &&data) {
-            switchWindow(window::name_call, std::move(data));
+            switchWindow(window::name_call, std::forward<decltype(data)>(data));
             return msgHandled();
         });
-        addActionReceiver(manager::actions::Dial, [this](auto data) {
-            switchWindow(window::name_enterNumber, std::move(data));
+        addActionReceiver(manager::actions::Dial, [this](auto &&data) {
+            switchWindow(window::name_enterNumber, std::forward<decltype(data)>(data));
             return msgHandled();
         });
     }
@@ -59,8 +58,10 @@ namespace app
 
     void ApplicationCall::IncomingCallHandler(const CellularCallMessage *const msg)
     {
-        manager::Controller::sendAction(
-            this, manager::actions::Call, std::make_unique<app::IncomingCallData>(msg->number));
+        if (state == call::State::IDLE) {
+            manager::Controller::sendAction(
+                this, manager::actions::Call, std::make_unique<app::IncomingCallData>(msg->number));
+        }
     }
 
     void ApplicationCall::RingingHandler(const CellularCallMessage *const msg)
@@ -82,7 +83,7 @@ namespace app
         }
 
         if (msgl->messageType == MessageType::CellularNotification) {
-            CellularNotificationMessage *msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+            auto *msg = dynamic_cast<CellularNotificationMessage *>(msgl);
             assert(msg != nullptr);
 
             switch (msg->type) {
@@ -135,12 +136,13 @@ namespace app
     {
 
         auto ret = Application::InitHandler();
-        if (ret != sys::ReturnCodes::Success)
+        if (ret != sys::ReturnCodes::Success) {
             return ret;
+        }
 
         createUserInterface();
 
-        setActiveWindow("MainWindow");
+        setActiveWindow(gui::name::window::main_window);
 
         return ret;
     }
@@ -156,13 +158,13 @@ namespace app
             return std::make_unique<gui::CallMainWindow>(app);
         });
         windowsFactory.attach(app::window::name_enterNumber, [](Application *app, const std::string newname) {
-            return std::make_unique<gui::EnterNumberWindow>(app);
+            return std::make_unique<gui::EnterNumberWindow>(app, static_cast<ApplicationCall *>(app));
         });
         windowsFactory.attach(app::window::name_call, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::CallWindow>(app);
+            return std::make_unique<gui::CallWindow>(app, static_cast<ApplicationCall *>(app));
         });
         windowsFactory.attach(app::window::name_emergencyCall, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::EmergencyCallWindow>(app);
+            return std::make_unique<gui::EmergencyCallWindow>(app, static_cast<ApplicationCall *>(app));
         });
         windowsFactory.attach(app::window::name_dialogConfirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, name);

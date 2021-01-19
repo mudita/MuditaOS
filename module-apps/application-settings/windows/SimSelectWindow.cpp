@@ -21,12 +21,12 @@ std::list<gui::Option> simSelectWindow(app::Application *app, app::SimSetter *se
                                    setter->setSim(Store::GSM::SIM::SIM1);
                                    return true;
                                },
-                               gui::Arrow::Disabled});
+                               gui::option::Arrow::Disabled});
     l.emplace_back(gui::Option{"SIM 2",
                                [=](gui::Item &item) {
                                    setter->setSim(Store::GSM::SIM::SIM2);
                                    return true;
                                },
-                               gui::Arrow::Disabled});
+                               gui::option::Arrow::Disabled});
     return l;
 }

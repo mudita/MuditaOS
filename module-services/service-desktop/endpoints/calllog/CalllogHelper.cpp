@@ -143,7 +143,6 @@ auto CalllogHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
             }
         },
         context);
-
     query->setQueryListener(std::move(listener));
     DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Calllog, std::move(query));
     return sys::ReturnCodes::Success;

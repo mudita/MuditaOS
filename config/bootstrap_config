@@ -30,6 +30,7 @@ INSTALL_PACKAGES="
         ca-certificates \
         ccache \
         clang-format-10 \
+        clang-tidy \
         curl \
         doxygen \
         g++-9 \
@@ -38,20 +39,23 @@ INSTALL_PACKAGES="
         gnupg2 \
         graphviz \
         gtkmm-3.0 \
+        libblkid-dev 
+        libfdisk-dev \
+        libfuse-dev \
         locales \
         make \
         mtools \
         ninja-build \
         pkg-config \
         portaudio19-dev \
-        tzdata \
-        vim \
-        wget \
         python3-magic \
         python3-pip \
-        libfdisk-dev \
         python3-requests \
-        libfuse-dev \
-        libblkid-dev 
+        rhash \
+        tzdata \
+        tar \
+        vim \
+        wget \
+        zip \
 "
 

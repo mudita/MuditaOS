@@ -7,6 +7,7 @@
 #include <btstack_util.h>
 
 #include <json/json11.hpp>
+#include <service-bluetooth/SettingsHolder.hpp>
 
 namespace Bt
 {
@@ -15,6 +16,7 @@ namespace Bt
     {
       public:
         static auto getKeyStorage() -> btstack_link_key_db_t *;
+        static std::shared_ptr<Bluetooth::SettingsHolder> settings;
 
       private:
         static void openStorage();
@@ -29,11 +31,11 @@ namespace Bt
                                       link_key_type_t *type) -> int;
         static void iterator_done(btstack_link_key_iterator_t *it);
         static void set_local_bd_addr(bd_addr_t bd_addr);
-        static void writeToFile();
-        static json11::Json fileJson;
+        static void writeSettings();
+        static json11::Json keysJson;
         static btstack_link_key_db_t keyStorage;
         static json11::Json::array keys;
-        static std::string fileContent;
+        static std::string keysEntry;
     };
 
 } // namespace Bt

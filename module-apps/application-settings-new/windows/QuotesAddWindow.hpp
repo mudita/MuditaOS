@@ -4,18 +4,32 @@
 #pragma once
 
 #include "BaseSettingsWindow.hpp"
+#include "QuotesMainWindow.hpp"
+#include "application-settings-new/model/QuotesModel.hpp"
 
 namespace gui
 {
     class CheckBoxWithLabel;
 
-    class QuotesAddWindow : public AppWindow
+    class QuoteAddEditWindow : public AppWindow
     {
       public:
-        QuotesAddWindow(app::Application *app);
+        QuoteAddEditWindow(app::Application *app, std::shared_ptr<app::QuotesModel> model);
         void buildInterface() override;
 
       private:
-        std::vector<CheckBoxWithLabel *> boxes;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void setAuthorCharactersCount(uint32_t count);
+        void setQuoteCharactersCount(uint32_t count);
+
+        gui::Text *quoteText          = nullptr;
+        gui::Text *authorText         = nullptr;
+        gui::Label *authorCharCounter = nullptr;
+        gui::Label *quoteCharCounter  = nullptr;
+
+        QuoteAction quoteAction;
+        app::QuoteRecord quoteData;
+        std::shared_ptr<app::QuotesModel> quoteModel;
     };
 } // namespace gui

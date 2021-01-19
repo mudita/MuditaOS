@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -188,6 +188,8 @@ class ServiceCellular : public sys::Service
     };
     bool resetCellularModule(ResetType type);
     bool isAfterForceReboot = false;
+    bool nextPowerStateChangeAwaiting          = false;
+    cellular::State::PowerState nextPowerState = cellular::State::PowerState::Off;
 
     /// one point of state change handling
     void change_state(cellular::StateChange *msg);
@@ -202,12 +204,18 @@ class ServiceCellular : public sys::Service
     bool handle_power_down();
     /// idle handler
     bool handle_idle();
+    ///  wait for start permission handlers
+    bool handle_wait_for_start_permission();
+    ///  start the module in proper way
+    bool handle_power_up_request();
     /// cellular power up procedure
     bool handle_status_check();
     /// cellular power up procedure
     bool handle_power_up_in_progress_procedure();
     /// cellular power up procedure
     bool handle_power_up_procedure();
+    /// detect communication baud rate
+    bool handle_baud_detect();
     /// configure basic modem parameters
     bool handle_start_conf_procedure();
     /// configure modem audio parameters
@@ -229,6 +237,9 @@ class ServiceCellular : public sys::Service
     /// \note some run state should be added to ignore non system messages now...
     bool handle_fatal_failure();
     bool handle_ready();
+    /// Process change of power state
+    void handle_power_state_change();
+
     std::unique_ptr<settings::Settings> settings = std::make_unique<settings::Settings>(this);
     bool handle_apn_conf_procedure();
 
@@ -293,4 +304,7 @@ class ServiceCellular : public sys::Service
     friend class NetworkSettings;
     friend class packet_data::PDPContext;
     friend class packet_data::PacketData;
+
+    void volteChanged(const std::string &value);
+    bool volteOn = false;
 };
