@@ -353,10 +353,14 @@ namespace at
 
         namespace clir
         {
-            std::optional<ClirResponse> parseClir(const std::string &response)
+            std::optional<ClirResponse> parse(const std::string &response)
             {
                 auto constexpr toRemove    = "+CLIR: ";
                 auto constexpr emptyString = "";
+
+                if (response.find(toRemove) == std::string::npos) {
+                    return std::nullopt;
+                }
 
                 auto resp = response;
                 utils::findAndReplaceAll(resp, toRemove, emptyString);
@@ -366,8 +370,8 @@ namespace at
                     t = utils::trim(t);
                 }
                 if (tokens.size() == clirTokens) {
-                    int state;
-                    int status;
+                    int state  = 0;
+                    int status = 0;
 
                     if (!utils::toNumeric(tokens[0], state) || !utils::toNumeric(tokens[1], status)) {
                         return std::nullopt;
@@ -628,5 +632,58 @@ namespace at
                 return message;
             }
         } // namespace clck
+
+        namespace clip
+        {
+            auto parse(std::string response) -> std::optional<ClipParsed>
+            {
+                auto constexpr toRemove    = "+CLIP: ";
+                auto constexpr emptyString = "";
+
+                if (response.find(toRemove) == std::string::npos) {
+                    return std::nullopt;
+                }
+
+                utils::findAndReplaceAll(response, toRemove, emptyString);
+
+                auto tokens = utils::split(response, ",");
+                for (auto &t : tokens) {
+                    t = utils::trim(t);
+                }
+                if (tokens.size() == clipTokens) {
+                    int urcToken;
+                    int clipToken;
+
+                    if (!utils::toNumeric(tokens[0], urcToken) || !utils::toNumeric(tokens[1], clipToken)) {
+                        return std::nullopt;
+                    }
+                    auto urcState  = static_cast<UrcState>(urcToken);
+                    auto clipState = static_cast<ClipState>(clipToken);
+
+                    if (magic_enum::enum_contains<UrcState>(urcState) &&
+                        magic_enum::enum_contains<ClipState>(clipState)) {
+                        return ClipParsed(urcState, clipState);
+                    }
+                }
+                return std::nullopt;
+            }
+            auto getClipState(const ClipState &state) -> app::manager::actions::IMMICustomResultParams::MMIResultMessage
+            {
+                auto message = app::manager::actions::IMMICustomResultParams::MMIResultMessage::CommonNoMessage;
+
+                switch (state) {
+                case ClipState::NotProvisioned:
+                    message = app::manager::actions::IMMICustomResultParams::MMIResultMessage::ClipNotProvisioned;
+                    break;
+                case ClipState::Provisioned:
+                    message = app::manager::actions::IMMICustomResultParams::MMIResultMessage::ClipProvisioned;
+                    break;
+                case ClipState::Unknown:
+                    message = app::manager::actions::IMMICustomResultParams::MMIResultMessage::ClipUnknown;
+                    break;
+                }
+                return message;
+            }
+        } // namespace clip
     }     // namespace response
 } // namespace at
