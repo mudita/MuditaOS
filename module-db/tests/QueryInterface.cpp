@@ -75,9 +75,9 @@ TEST_CASE("Query interface")
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
 
-        Context context(msgJson);
+        parserFSM::Context context(msgJson);
         auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, Context &context) {
+            [=](db::QueryResult *result, parserFSM::Context &context) {
                 if (auto SMSResult = dynamic_cast<db::query::SMSGetCountResult *>(result)) {
                     auto id   = SMSResult->getResults();
                     auto body = json11::Json::object{{"count", static_cast<int>(id)}};

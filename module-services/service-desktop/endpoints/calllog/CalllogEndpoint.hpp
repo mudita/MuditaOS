@@ -20,18 +20,16 @@ namespace sys
     class Service;
 } // namespace sys
 
-using namespace parserFSM;
-
-class CalllogEndpoint : public Endpoint
+class CalllogEndpoint : public parserFSM::Endpoint
 {
   private:
-    std::unique_ptr<CalllogHelper> helper;
+    std::unique_ptr<parserFSM::CalllogHelper> helper;
 
   public:
     CalllogEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
     {
         debugName = "CalllogEndpoint";
-        helper    = std::make_unique<CalllogHelper>(ownerServicePtr);
+        helper    = std::make_unique<parserFSM::CalllogHelper>(ownerServicePtr);
     }
-    auto handle(Context &context) -> void override;
+    auto handle(parserFSM::Context &context) -> void override;
 };

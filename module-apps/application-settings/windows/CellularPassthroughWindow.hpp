@@ -30,8 +30,6 @@ namespace gui
         } // namespace cellular_passthrough
     }     // namespace window
 
-    using namespace bsp::cellular::USB;
-
     class CellularPassthroughWindow : public AppWindow
     {
       private:
@@ -76,7 +74,7 @@ namespace gui
 
         CellularPassthroughWindow::State getInitialState();
 
-        bool set(PassthroughState pass_to_set, BootPinState dfu_to_set);
+        bool set(bsp::cellular::USB::PassthroughState pass_to_set, bsp::cellular::USB::BootPinState dfu_to_set);
 
         void setWindowState(State state);
 

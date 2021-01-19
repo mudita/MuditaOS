@@ -16,14 +16,12 @@ namespace sys
     class Service;
 } // namespace sys
 
-using namespace parserFSM;
-
-class RestoreEndpoint : public Endpoint
+class RestoreEndpoint : public parserFSM::Endpoint
 {
   public:
     RestoreEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
     {
         debugName = "RestoreEndpoint";
     }
-    auto handle(Context &context) -> void override;
+    auto handle(parserFSM::Context &context) -> void override;
 };

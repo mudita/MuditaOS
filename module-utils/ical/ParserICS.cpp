@@ -446,7 +446,7 @@ auto Event::timeStringFrom(const std::string &icalTime) const -> std::string
            getSecondsFromIcalTime(icalTime);
 }
 
-auto Event::TimePointFromIcalDate(const std::string &icalDateTime) const -> TimePoint
+auto Event::TimePointFromIcalDate(const std::string &icalDateTime) const -> calendar::TimePoint
 {
     std::string icalDate(getDateFromIcalFormat(icalDateTime));
     std::string icalTime(getTimeFromIcalFormat(icalDateTime));
@@ -459,7 +459,7 @@ auto Event::TimePointFromIcalDate(const std::string &icalDateTime) const -> Time
     return TimePointFromString(dateTime.c_str());
 }
 
-auto Event::TimePointToIcalDate(const TimePoint &tp) const -> std::string
+auto Event::TimePointToIcalDate(const calendar::TimePoint &tp) const -> std::string
 {
     constexpr uint32_t bufferLimit = 16;
     auto time                      = TimePointToTimeT(tp);
@@ -541,7 +541,10 @@ auto Event::validateUID(const std::string &UID) -> bool
     return validateDT(DTimestamp);
 }
 
-Event::Event(const std::string &summary, const TimePoint from, TimePoint till, const std::string &uid)
+Event::Event(const std::string &summary,
+             const calendar::TimePoint from,
+             calendar::TimePoint till,
+             const std::string &uid)
 {
     if (summary.empty()) {
         isValid = false;
@@ -595,12 +598,12 @@ auto Event::getSummary() const -> std::string
     return summary;
 }
 
-auto Event::getDTStartTimePoint() const -> TimePoint
+auto Event::getDTStartTimePoint() const -> calendar::TimePoint
 {
     return dtstart;
 }
 
-auto Event::getDTEndTimePoint() const -> TimePoint
+auto Event::getDTEndTimePoint() const -> calendar::TimePoint
 {
     return dtend;
 }
