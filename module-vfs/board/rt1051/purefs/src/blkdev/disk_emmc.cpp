@@ -25,11 +25,6 @@ namespace purefs::blkdev
             initStatus = err;
             return initStatus;
         }
-        err = MMC_SetMaxEraseUnitSize(&mmcCard);
-        if (err != kStatus_Success) {
-            initStatus = err;
-            return initStatus;
-        }
         return statusBlkDevSuccess;
     }
 
@@ -58,16 +53,8 @@ namespace purefs::blkdev
 
     auto disk_emmc::erase(sector_t lba, std::size_t count) -> int
     {
-        // temporarily commented out until erase is tested
-        /* cpp_freertos::LockGuard lock(mutex);
-        if (!mmcCard.isHostReady) {
-            return statusBlkDevFail;
-        }
-
-        auto err = MMC_EraseGroups(&mmcCard, lba, lba + count);
-        if (err != kStatus_Success) {
-            return err;
-        } */
+        // erase group size is 512kB so it has been deliberately disallowed
+        // group of this size would make the solution inefficient in this case
         return statusBlkDevSuccess;
     }
     auto disk_emmc::read(void *buf, sector_t lba, std::size_t count) -> int
@@ -123,7 +110,8 @@ namespace purefs::blkdev
         case info_type::sector_count:
             return mmcCard.userPartitionBlocks;
         case info_type::erase_block:
-            return mmcCard.eraseGroupBlocks;
+            // not supported
+            return 0;
         }
         return -1;
     }
