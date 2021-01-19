@@ -28,6 +28,7 @@ namespace cellular
         virtual void handle(PinChangeRequest &request, at::Result &result)             = 0;
         virtual void handle(SupplementaryServicesRequest &request, at::Result &result) = 0;
         virtual void handle(ClirRequest &request, at::Result &result)                  = 0;
+        virtual void handle(ClipRequest &request, at::Result &result)                  = 0;
         virtual void handle(CallForwardingRequest &request, at::Result &result)        = 0;
         virtual void handle(CallBarringRequest &request, at::Result &result)           = 0;
     };

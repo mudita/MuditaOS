@@ -72,3 +72,8 @@ auto MMICallBarringResult::getMessages(void) noexcept -> std::vector<std::pair<M
 {
     return data;
 }
+
+auto MMIImeiResult::getImei() const noexcept -> std::string
+{
+    return imei;
+}
