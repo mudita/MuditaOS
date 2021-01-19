@@ -1,0 +1,9 @@
+add_catch2_executable(
+    NAME
+        callback-storage-test
+    SRCS
+        tests-main.cpp
+        test-CallbackStorage.cpp
+    LIBS
+        ${PROJECT_NAME}
+)

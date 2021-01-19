@@ -3,14 +3,9 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 # unlock Desktop
-from harness.uart import connection
-from interface.defs import key_codes
+from harness.harness import Harness
 
-# write pin
-connection.send_key(key_codes["enter"])
-connection.send_key(key_codes["#"])
-connection.send_key(3)
-connection.send_key(3)
-connection.send_key(3)
-connection.send_key(3)
-
+harness = Harness.from_detect()
+@harness.with_phone_unlocked
+def done(connection):
+    pass

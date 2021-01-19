@@ -15,7 +15,7 @@
 #include <module-db/queries/messages/threads/QueryThreadsGetForList.hpp>
 #include <service-db/DBServiceAPI.hpp>
 
-ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app)
+ThreadsModel::ThreadsModel(app::Application *app) : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}
 {}
 
 auto ThreadsModel::getMinimalItemHeight() const -> unsigned int
@@ -66,9 +66,9 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
 void ThreadsModel::requestRecords(uint32_t offset, uint32_t limit)
 {
     auto query = std::make_unique<db::query::ThreadsGetForList>(offset, limit);
-    query->setQueryListener(
-        db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
-    DBServiceAPI::GetQuery(getApplication(), db::Interface::Name::SMSThread, std::move(query));
+    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+    task->setCallback([this](auto response) { return handleQueryResponse(response); });
+    task->execute(getApplication(), this);
 }
 
 auto ThreadsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool

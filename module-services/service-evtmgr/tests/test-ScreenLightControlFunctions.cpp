@@ -6,7 +6,7 @@
 
 TEST_CASE("ScreenLightControlFunctions")
 {
-    using namespace sevm::screen_light_control::functions;
+    using namespace screen_light_control::functions;
     constexpr auto controlTimerMS = 25;
 
     SECTION("Ramp an hysteresis test")
@@ -14,8 +14,9 @@ TEST_CASE("ScreenLightControlFunctions")
         INFO("Setup");
         const unsigned int testRampTime                          = 500;
         const bsp::eink_frontlight::BrightnessPercentage testVal = 100.0f;
-        BrightnessFunction functionPoints = BrightnessFunction({{0.0f, testVal}, {100.0f, 0.0f}});
-        const float hysteresis            = 10.0f;
+        screen_light_control::functions::BrightnessFunction functionPoints =
+            BrightnessFunction({{0.0f, testVal}, {100.0f, 0.0f}});
+        const float hysteresis = 10.0f;
 
         setRampStep(100.0f * (static_cast<float>(controlTimerMS) / static_cast<float>(testRampTime)));
         setHysteresis(hysteresis);

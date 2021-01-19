@@ -3,13 +3,27 @@
 
 #pragma once
 
+#include <service-db/service-db/Settings.hpp>
 #include "ControlFunctions.hpp"
-#include <Service/Timer.hpp>
+
+#include <sstream>
+
+namespace sys
+{
+    class Timer;
+}
 
 /// Screen light control algorithm. Automatic/Manual mode of operation.
 /// Processing of ambient light sensor input to screen brightness output.
-namespace sevm::screen_light_control
+namespace screen_light_control
 {
+    /// Modes in which front light can operate
+    enum ScreenLightMode
+    {
+        Automatic, /// Automally sets screen brightness based on sensor data
+        Manual     /// Manually set brightness level
+    };
+
     /// Set of actions to control the screen light
     enum class Action
     {
@@ -24,6 +38,8 @@ namespace sevm::screen_light_control
 
     struct Parameters
     {
+        static constexpr auto MAX_BRIGHTNESS = 100.0;
+
         /// Screen brightness 0-100% in manual mode
         bsp::eink_frontlight::BrightnessPercentage manualModeBrightness = 50.0f;
         /// Vector of points for screen brightness [%] in relation to ambient light [Lux] function. Points have to be in
@@ -37,16 +53,53 @@ namespace sevm::screen_light_control
         float gammaFactor = 2.5f;
     };
 
-    /// Initialization of screen light control
-    /// @param 'parent' - pointer to parent sys::Service class
-    void init(sys::Service *parent);
+    /// Control screen light and keeps it's current state
+    class ScreenLightControl
+    {
+      public:
+        explicit ScreenLightControl(sys::Service *parent);
+        ~ScreenLightControl();
 
-    void deinit();
+        void processRequest(Action action, const Parameters &params);
 
-    void processRequest(Action action, const Parameters &params);
+        [[nodiscard]] auto getLightState() const noexcept -> bool;
+        [[nodiscard]] auto getAutoModeState() const noexcept -> ScreenLightMode;
+        [[nodiscard]] auto getBrightnessValue() const noexcept -> bsp::eink_frontlight::BrightnessPercentage;
 
-    void controlTimerCallback();
+      private:
+        void controlTimerCallback();
+        void readoutTimerCallback();
 
-    void readoutTimerCallback();
+        void enableTimers();
+        void disableTimers();
 
-} // namespace sevm::screen_light_control
+        void setAutomaticModeParameters(const Parameters &params);
+        void setBrightnessLevel(bsp::eink_frontlight::BrightnessPercentage brightnessPercentage);
+        void setGammaFactor(float gammaFactor);
+
+        void turnOff();
+        void turnOn();
+
+        void enableAutomaticMode();
+        void disableAutomaticMode();
+
+        template <class T> void setScreenLightSettings(const std::string &varName, T value)
+        {
+            settings->setValue(varName, std::to_string(value));
+        }
+        void initFromSettings();
+
+        static constexpr inline auto CONTROL_TIMER_MS = 25;
+        static constexpr inline auto READOUT_TIMER_MS = 500;
+
+        std::unique_ptr<sys::Timer> controlTimer;
+        std::unique_ptr<sys::Timer> readoutTimer;
+
+        bool lightOn                                               = false;
+        screen_light_control::ScreenLightMode automaticMode        = ScreenLightMode::Manual;
+        bsp::eink_frontlight::BrightnessPercentage brightnessValue = 0.0;
+
+        std::unique_ptr<settings::Settings> settings;
+    };
+
+} // namespace screen_light_control

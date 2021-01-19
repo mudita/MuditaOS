@@ -1,5 +1,6 @@
 # Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+from enum import Enum
 
 endpoint = {
     "deviceInfo": 1,
@@ -45,6 +46,15 @@ key_codes = {
     "sliderMid": 18,
     "sliderDown": 17,
     "#": ord('#'),
-    "*": ord('*')
-
+    "*": ord('*'),
 }
+
+
+class SMSType(Enum):
+    DRAFT = 0x01
+    FAILED = 0x02
+    INBOX = 0x04
+    OUTBOX = 0x08
+    QUEUED = 0x10
+    INPUT = 0x12
+    UNKNOWN = 0xFF

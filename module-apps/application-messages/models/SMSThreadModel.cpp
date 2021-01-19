@@ -12,7 +12,7 @@
 #include "SMSThreadModel.hpp"
 #include "ListView.hpp"
 
-SMSThreadModel::SMSThreadModel(app::Application *app) : DatabaseModel(app)
+SMSThreadModel::SMSThreadModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
 {
     smsInput = new gui::SMSInputWidget(application);
 }
@@ -52,9 +52,9 @@ unsigned int SMSThreadModel::requestRecordsCount()
 void SMSThreadModel::requestRecords(uint32_t offset, uint32_t limit)
 {
     auto query = std::make_unique<db::query::SMSGetForList>(smsThreadID, offset, limit, numberID);
-    query->setQueryListener(
-        db::QueryCallback::fromFunction([this](auto response) { return handleQueryResponse(response); }));
-    DBServiceAPI::GetQuery(application, db::Interface::Name::SMS, std::move(query));
+    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
+    task->setCallback([this](auto response) { return handleQueryResponse(response); });
+    task->execute(application, this);
 }
 
 bool SMSThreadModel::updateRecords(std::vector<SMSRecord> records)

@@ -56,18 +56,8 @@ namespace app
         }
 
         if (resp != nullptr) {
-            switch (resp->responseTo) {
-            case MessageType::DBQuery:
-                if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp); queryResponse != nullptr) {
-                    if (auto result = queryResponse->getResult(); result && result->hasListener()) {
-                        if (result->handle()) {
-                            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                        }
-                    }
-                }
-                break;
-            default:
-                break;
+            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
             return msgHandled();
         }

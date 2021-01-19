@@ -5,7 +5,7 @@
 
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "windows/OptionWindow.hpp"
-#include "windows/OptionSetting.hpp"
+#include "OptionSetting.hpp"
 
 #include <i18n/i18n.hpp>
 
@@ -24,7 +24,7 @@ namespace gui
         std::list<gui::Option> optionList;
 
         auto addMenu = [&](UTF8 name, std::string window) {
-            optionList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 name,
                 [=](gui::Item &item) {
                     if (window.empty()) {
@@ -42,7 +42,7 @@ namespace gui
                     return true;
                 },
                 this,
-                RightItem::ArrowWhite));
+                gui::option::SettingRightItem::ArrowWhite));
         };
 
         addMenu(utils::translateI18("app_settings_display_display_light"), gui::window::name::display_light);

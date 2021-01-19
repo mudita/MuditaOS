@@ -4,6 +4,7 @@
 #pragma once
 
 #include "BaseSettingsWindow.hpp"
+#include "Translator.hpp"
 
 namespace gui
 {
@@ -18,6 +19,6 @@ namespace gui
 
       private:
         Language selectedLang;
-        utils::LangLoader loader;
+        Profiles profiles;
     };
 } // namespace gui

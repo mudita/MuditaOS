@@ -209,15 +209,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         sendUpdateNotification(db::Interface::Name::SMSThread, db::Query::Type::Delete);
     } break;
 
-    case MessageType::DBThreadGetLimitOffset: {
-        auto time            = utils::time::Scoped("DBThreadGetLimitOffset");
-        DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
-        auto ret             = threadRecordInterface->GetLimitOffset(msg->offset, msg->limit);
-        LOG_INFO("Thread get limit offset");
-        responseMsg =
-            std::make_shared<DBThreadResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size());
-    } break;
-
     case MessageType::DBThreadGetCount: {
         auto *msg   = static_cast<DBThreadGetCountMessage *>(msgl);
         auto time   = utils::time::Scoped("DBThreadGetCountMessage");

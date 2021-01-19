@@ -19,7 +19,6 @@ target_sources( ${PROJECT_NAME}
         windows/LanguageWindow.cpp
         windows/BtWindow.cpp
         windows/BtScanWindow.cpp
-
         windows/UITestWindow.cpp
         windows/Info.cpp
         windows/SimSelectWindow.cpp
@@ -27,7 +26,6 @@ target_sources( ${PROJECT_NAME}
         windows/CellularPassthroughWindow.cpp
         windows/FotaWindow.cpp
         windows/Fota.cpp
-        windows/SettingsChange.cpp
         windows/EinkModeWindow.cpp
 
     PUBLIC

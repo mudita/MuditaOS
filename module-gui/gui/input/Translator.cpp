@@ -4,16 +4,17 @@
 #include "Translator.hpp"
 #include "log/log.hpp"
 #include <algorithm>
-#include <log/log.hpp>
 #include <filesystem>
+#include "i18n/i18n.hpp"
 
 namespace gui
 {
-    namespace
+    namespace filetype
     {
-        constexpr auto profilesFolder = "assets/profiles";
-        constexpr auto extension      = ".json";
-    } // namespace
+        constexpr auto jsonKey = "filetype";
+        constexpr auto normal  = "normal";
+        constexpr auto special = "special";
+    } // namespace filetype
 
     void recon_long_press(InputEvent &evt, const RawKey &key, const RawKey &prev_key_press, uint32_t time)
     {
@@ -202,24 +203,46 @@ namespace gui
         }
     }
 
-    std::vector<std::string> Profiles::getProfilesPaths()
+    std::vector<std::string> Profiles::getProfilesNames()
     {
-        std::vector<std::string> profileFiles;
-        LOG_INFO("Scanning %s profiles folder: %s", extension, profilesFolder);
+        std::vector<std::string> profilesNames;
+        LOG_INFO("Scanning %s profiles folder: %s",
+                 utils::files::jsonExtension,
+                 utils::localize.InputLanguageDirPath.c_str());
 
-        for (const auto &entry : std::filesystem::directory_iterator(profilesFolder)) {
-            profileFiles.push_back(std::filesystem::path(entry.path()));
+        for (const auto &entry : std::filesystem::directory_iterator(utils::localize.InputLanguageDirPath)) {
+            profilesNames.push_back(std::filesystem::path(entry.path().stem()));
         }
 
-        LOG_INFO("Total number of profiles: %u", static_cast<unsigned int>(profileFiles.size()));
-        return profileFiles;
+        LOG_INFO("Total number of profiles: %u", static_cast<unsigned int>(profilesNames.size()));
+        return profilesNames;
+    }
+
+    std::vector<std::string> Profiles::getAvailableInputLanguages()
+    {
+        std::vector<std::string> profilesNames = getProfilesNames(), availableProfiles;
+
+        for (auto &name : profilesNames) {
+            auto profile = get().profilesList[name];
+            if (profile.getJson()[filetype::jsonKey] == filetype::normal) {
+                auto breakSignPosition            = name.find_last_of(utils::files::breakSign);
+                std::string displayedLanguageName = name.substr(0, breakSignPosition);
+
+                if (std::find(availableProfiles.begin(), availableProfiles.end(), displayedLanguageName) ==
+                    availableProfiles.end()) {
+                    availableProfiles.push_back(displayedLanguageName);
+                }
+            }
+        }
+        return availableProfiles;
     }
 
     void Profiles::init()
     {
-        std::vector<std::string> profileFilesPaths = getProfilesPaths();
-        for (std::string filePath : profileFilesPaths) {
-            if (std::size(filePath)) {
+        std::vector<std::string> profilesNames = getProfilesNames();
+        for (const auto &profileName : profilesNames) {
+            if (!profileName.empty()) {
+                auto filePath = utils::localize.InputLanguageDirPath / (profileName + utils::files::jsonExtension);
                 loadProfile(filePath);
             }
         }
@@ -240,16 +263,16 @@ namespace gui
 
     Profile &Profiles::get(const std::string &name)
     {
-        auto filepath = std::string(profilesFolder) + "/" + name + extension;
+        std::filesystem::path filepath = utils::localize.InputLanguageDirPath / (name + utils::files::jsonExtension);
         // if profile not in profile map -> load
-        if (std::size(filepath) == 0) {
+        if (filepath.empty()) {
             LOG_ERROR("Request for nonexistent profile: %s", filepath.c_str());
             return get().empty;
         }
-        if (get().profilesList.find(filepath) == get().profilesList.end()) {
+        if (get().profilesList.find(name) == get().profilesList.end()) {
             get().loadProfile(filepath);
         }
-        return get().profilesList[filepath];
+        return get().profilesList[name];
     }
 
 } /* namespace gui */

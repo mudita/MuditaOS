@@ -17,21 +17,21 @@ def test_call(harness, call_duration):
     count_before = get_calllog_count(harness)
 
     # enter menu
-    harness.connection.send_key(key_codes["enter"])
+    harness.connection.send_key_code(key_codes["enter"])
     harness.open_application("calllog")
     if harness.connection.get_window_name() != "ApplicationCallLog":
         time.sleep(2)
         assert harness.connection.get_window_name() == "ApplicationCallLog"
 
     # call
-    harness.connection.send_key(key_codes["fnLeft"])
+    harness.connection.send_key_code(key_codes["fnLeft"])
     time.sleep(call_duration)
     # hang up
-    harness.connection.send_key(key_codes["fnRight"])
+    harness.connection.send_key_code(key_codes["fnRight"])
     count_after = get_calllog_count(harness)
 
     for _ in range(3):
-        harness.connection.send_key(key_codes["fnRight"])
+        harness.connection.send_key_code(key_codes["fnRight"])
         time.sleep(1)
 
     assert count_before + 1 == count_after

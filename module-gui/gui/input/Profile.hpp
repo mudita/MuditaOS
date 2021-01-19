@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include "json/json11.hpp"
+#include <filesystem>
 
 namespace gui
 {
@@ -22,10 +23,11 @@ namespace gui
       public:
         static constexpr uint32_t none_key = 0;
         Profile()                          = default;
-        explicit Profile(const std::string &filepath);
+        explicit Profile(const std::filesystem::path &filepath);
 
         [[nodiscard]] const std::string &getName() noexcept;
         [[nodiscard]] uint32_t getCharKey(bsp::KeyCodes code, uint32_t times);
+        [[nodiscard]] const json11::Json &getJson() const noexcept;
     };
 
 } /* namespace gui */

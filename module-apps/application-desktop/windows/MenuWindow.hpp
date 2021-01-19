@@ -22,7 +22,13 @@ namespace gui
         Tile(UTF8 icon,
              std::string title,
              std::function<bool(Item &)> activatedCallback,
-             unsigned int notifications = 0);
+             std::function<bool()> hasNotificationsCallback = nullptr);
+
+        bool onNotificationsChange(gui::RefreshModes);
+
+      private:
+        std::function<bool(gui::RefreshModes)> onNotificationsChangeCallback = nullptr;
+        gui::Image *notificationThumbnail                                    = nullptr;
     };
 
     class MenuPage : public gui::GridLayout
@@ -36,6 +42,7 @@ namespace gui
         MenuPage(gui::Item *parent, UTF8 title, std::vector<Tile *> tiles);
         /// set child which should be selected on start of desktop
         void setFirstTimeSelection();
+        bool refresh(gui::RefreshModes mode);
     };
 
     class MenuWindow : public AppWindow
@@ -48,7 +55,6 @@ namespace gui
       public:
         MenuWindow(app::Application *app);
 
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 
         void rebuild() override;
@@ -56,6 +62,7 @@ namespace gui
         void destroyInterface() override;
 
         void switchMenu(MenuPage *page);
+        void refresh();
 
       private:
         void invalidate() noexcept;

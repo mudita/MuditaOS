@@ -2,7 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ParserICS.hpp"
-//#include <exception>
+#include <cmath>
+#include <module-utils/time/time_date_validation.hpp>
 
 namespace ical
 {
@@ -72,6 +73,8 @@ namespace ical
         } // namespace frequency
         constexpr inline auto count    = "COUNT=";
         constexpr inline auto interval = "INTERVAL=";
+
+        constexpr inline auto max_interval = 2;
     } // namespace rrule
 
     namespace duration
@@ -79,22 +82,44 @@ namespace ical
         constexpr inline auto minutesInHour = 60;
         constexpr inline auto minutesInDay  = 24 * minutesInHour;
         constexpr inline auto minutesInWeek = 7 * minutesInDay;
+
+        namespace minutes
+        {
+            constexpr inline auto never_happens_value = 0xFFFF;
+        }
     } // namespace duration
+    constexpr inline auto date_char_length = yearDigitsNumb + monthDigitsNumb + dayDigitsNumb;
+    constexpr inline auto time_char_length = HourDigitsNumb + MinDigitsNumb + SecDigitsNumb;
+    constexpr inline auto dt_char_length   = date_char_length + 1 + time_char_length;
 } // namespace ical
 
 Duration::Duration(uint32_t week, uint32_t day, uint32_t hour, uint32_t minute)
 {
+    if (minute == ical::duration::minutes::never_happens_value) {
+        this->minute = ical::duration::minutes::never_happens_value;
+        return;
+    }
     this->week   = week;
     this->day    = day;
     this->hour   = hour;
     this->minute = minute;
+
+    if (!utils::time::validateTime(hour, minute, false)) {
+        isValid = false;
+    }
 }
 
 Duration::Duration(const std::string &property)
 {
+    if (property.empty()) {
+        LOG_DEBUG("Duration is empty. Event with no Alarm!");
+        this->minute = ical::duration::minutes::never_happens_value;
+        return;
+    }
     uint32_t i = 0;
-    if (property.empty() || (property[0] != 'P' && property[1] != 'P')) {
+    if ((property[0] != 'P' && property[1] != 'P')) {
         LOG_ERROR("Duration constructor: Invalid format provided: %s", property.c_str());
+        isValid = false;
         return;
     }
     while (property[i] != '\0' && i < property.length()) {
@@ -118,13 +143,23 @@ Duration::Duration(const std::string &property)
                 case 'M':
                     this->minute = stoi(value);
                     break;
+                default:
+                    LOG_ERROR("Wrong duration unit value format");
+                    isValid = false;
+                    break;
                 }
             }
             catch (std::exception &e) {
                 LOG_DEBUG("Duration conversion from string to int failed with exception:%s", e.what());
+                isValid = false;
             }
         }
         ++i;
+    }
+
+    if (!utils::time::validateTime(hour, minute, false)) {
+        LOG_ERROR("Duration time value is invalid");
+        isValid = false;
     }
 }
 
@@ -140,20 +175,23 @@ auto Duration::getDurationInMinutes() const -> uint32_t
 auto Duration::getDurationString() const -> std::string
 {
     std::string durationString;
+    if (minute == ical::duration::minutes::never_happens_value) {
+        return durationString;
+    }
     if (week) {
-        durationString += std::to_string(week) + 'W';
+        durationString += utils::to_string(week) + 'W';
     }
     if (day) {
-        durationString += std::to_string(day) + 'D';
+        durationString += utils::to_string(day) + 'D';
     }
     if (hour || minute) {
         durationString += 'T';
     }
     if (hour) {
-        durationString += std::to_string(hour) + 'H';
+        durationString += utils::to_string(hour) + 'H';
     }
     if (minute) {
-        durationString += std::to_string(minute) + 'M';
+        durationString += utils::to_string(minute) + 'M';
     }
     if (week == 0 && day == 0 && hour == 0 && minute == 0) {
         durationString += "T0M";
@@ -161,13 +199,14 @@ auto Duration::getDurationString() const -> std::string
     return durationString;
 }
 
-Alarm::Alarm(Duration &beforeEvent, Action action)
+Alarm::Alarm(Duration &timeBeforeEvent, Action action)
 {
-    if (beforeEvent.getDurationString().empty()) {
-        LOG_ERROR("Got empty duration value");
+    if (!timeBeforeEvent.isValid) {
+        LOG_ERROR("Duration format is invalid");
+        isValid = false;
         return;
     }
-    this->trigger = beforeEvent;
+    this->trigger = timeBeforeEvent;
     this->action  = action;
 }
 
@@ -182,14 +221,25 @@ void Alarm::setAction(const std::string &action)
     else if (action == ical::alarm::value::action::audio) {
         this->action = Action::audio;
     }
+    else if (action.empty()) {
+        LOG_DEBUG("Alarm with no action");
+        this->action = Action::none;
+    }
     else {
-        this->action = Action::invalid;
+        LOG_ERROR("Alarm action invalid");
+        isValid = false;
     }
 }
 
 void Alarm::setTrigger(const std::string &duration)
 {
-    this->trigger = Duration(duration);
+    auto timeBeforeEvent = Duration(duration);
+    if (!timeBeforeEvent.isValid) {
+        LOG_ERROR("Duration format is invalid");
+        isValid = false;
+        return;
+    }
+    this->trigger = timeBeforeEvent;
 }
 
 auto Alarm::getTriggerValue() const -> Duration
@@ -204,7 +254,11 @@ auto Alarm::getActionValue() const -> Action
 
 auto Alarm::getTriggerString() const -> std::string
 {
-    return ical::alarm::value::before + trigger.getDurationString();
+    auto durationString = trigger.getDurationString();
+    if (durationString.empty()) {
+        return durationString;
+    }
+    return ical::alarm::value::before + durationString;
 }
 
 auto Alarm::getActionString() const -> std::string
@@ -220,8 +274,8 @@ auto Alarm::getActionString() const -> std::string
     case Action::procedure: {
         return ical::alarm::value::action::procedure;
     }
-    case Action::invalid: {
-        LOG_ERROR("Alarm with no action");
+    case Action::none: {
+        LOG_DEBUG("Alarm with no action");
         return "";
     }
     }
@@ -230,11 +284,15 @@ auto Alarm::getActionString() const -> std::string
 
 RecurrenceRule::RecurrenceRule(Frequency freq, uint32_t count, uint32_t interval)
 {
-    if (count == 0 || interval == 0) {
-        LOG_ERROR("Invalid count or interval value!");
+    if ((count == 0 || interval == 0) && freq != Frequency::never) {
+        LOG_ERROR("Invalid rrule format!");
+        isValid = false;
         return;
     }
-
+    if (interval > ical::rrule::max_interval) {
+        LOG_ERROR("Invalid interval value!");
+        isValid = false;
+    }
     this->frequency = freq;
     this->count     = count;
     this->interval  = interval;
@@ -254,9 +312,12 @@ void RecurrenceRule::setFrequency(const std::string &property)
     else if (property == ical::rrule::frequency::yearly) {
         this->frequency = Frequency::yearly;
     }
+    else if (property.empty()) {
+        this->frequency = Frequency::never;
+    }
     else {
         LOG_ERROR("Invalid frequency!");
-        this->frequency = Frequency::invalid;
+        isValid = false;
     }
 }
 void RecurrenceRule::setCount(const std::string &property)
@@ -265,7 +326,8 @@ void RecurrenceRule::setCount(const std::string &property)
         this->count = stoi(property);
     }
     catch (...) {
-        LOG_ERROR("Count value not conversionable to int!");
+        LOG_ERROR("Count value is not an integer!");
+        isValid = false;
     }
 }
 
@@ -276,6 +338,7 @@ void RecurrenceRule::setInterval(const std::string &property)
     }
     catch (...) {
         LOG_ERROR("Interval value not conversionable to int!");
+        isValid = false;
     }
 }
 
@@ -314,8 +377,8 @@ auto RecurrenceRule::getFrequencyString() const -> std::string
         frequencyStr = ical::rrule::frequency::yearly;
         break;
     }
-    case Frequency::invalid: {
-        LOG_ERROR("Frequency invalid");
+    case Frequency::never: {
+        LOG_DEBUG("Frequency never");
         return "";
     }
     }
@@ -324,21 +387,12 @@ auto RecurrenceRule::getFrequencyString() const -> std::string
 
 auto RecurrenceRule::getCountString() const -> std::string
 {
-    if (this->frequency == Frequency::invalid) {
-        LOG_ERROR("Frequency value is invalid!");
-        return "";
-    }
-    return std::to_string(this->count);
+    return utils::to_string(this->count);
 }
 
 auto RecurrenceRule::getIntervalString() const -> std::string
 {
-    if (this->frequency == Frequency::invalid) {
-        LOG_ERROR("Frequency value is invalid!");
-        return "";
-    }
-
-    return std::to_string(this->interval);
+    return utils::to_string(this->interval);
 }
 
 auto Event::getDateFromIcalFormat(const std::string &icalDateTime) const -> std::string
@@ -346,21 +400,50 @@ auto Event::getDateFromIcalFormat(const std::string &icalDateTime) const -> std:
     return icalDateTime.substr(0, icalDateTime.find_first_of('T'));
 }
 
+auto Event::getYearFromIcalDate(const std::string &icalDate) const -> std::string
+{
+    return icalDate.substr(0, yearDigitsNumb);
+}
+
+auto Event::getMonthFromIcalDate(const std::string &icalDate) const -> std::string
+{
+    return icalDate.substr(yearDigitsNumb, monthDigitsNumb);
+}
+
+auto Event::getDayFromIcalDate(const std::string &icalDate) const -> std::string
+{
+    return icalDate.substr(yearDigitsNumb + monthDigitsNumb, dayDigitsNumb);
+}
+
 auto Event::getTimeFromIcalFormat(const std::string &icalDateTime) const -> std::string
 {
     return icalDateTime.substr(icalDateTime.find_first_of('T') + 1);
 }
 
+auto Event::getHourFromIcalTime(const std::string &icalTime) const -> std::string
+{
+    return icalTime.substr(0, HourDigitsNumb);
+}
+
+auto Event::getMinutesFromIcalTime(const std::string &icalTime) const -> std::string
+{
+    return icalTime.substr(HourDigitsNumb, MinDigitsNumb);
+}
+
+auto Event::getSecondsFromIcalTime(const std::string &icalTime) const -> std::string
+{
+    return icalTime.substr(HourDigitsNumb + MinDigitsNumb, SecDigitsNumb);
+}
+
 auto Event::dateStringFrom(const std::string &icalDate) const -> std::string
 {
-    return icalDate.substr(0, yearDigitsNumb) + "-" + icalDate.substr(yearDigitsNumb, monthDigitsNumb) + "-" +
-           icalDate.substr(yearDigitsNumb + monthDigitsNumb, dayDigitsNumb);
+    return getYearFromIcalDate(icalDate) + "-" + getMonthFromIcalDate(icalDate) + "-" + getDayFromIcalDate(icalDate);
 }
 
 auto Event::timeStringFrom(const std::string &icalTime) const -> std::string
 {
-    return icalTime.substr(0, HourDigitsNumb) + ":" + icalTime.substr(HourDigitsNumb, MinDigitsNumb) + ":" +
-           icalTime.substr(HourDigitsNumb + MinDigitsNumb, SecDigitsNumb);
+    return getHourFromIcalTime(icalTime) + ":" + getMinutesFromIcalTime(icalTime) + ":" +
+           getSecondsFromIcalTime(icalTime);
 }
 
 auto Event::TimePointFromIcalDate(const std::string &icalDateTime) const -> TimePoint
@@ -387,28 +470,118 @@ auto Event::TimePointToIcalDate(const TimePoint &tp) const -> std::string
     return IcalDate;
 }
 
+auto Event::isDate(const std::string &date) -> bool
+{
+    return utils::time::validateDate(getDayFromIcalDate(date), getMonthFromIcalDate(date), getYearFromIcalDate(date));
+}
+
+auto Event::isTime(const std::string &time) -> bool
+{
+    [[maybe_unused]] uint32_t seconds;
+    try {
+        seconds = stoi(getSecondsFromIcalTime(time));
+    }
+    catch (...) {
+        LOG_ERROR("Seconds value is not an integer!");
+        return false;
+    }
+    return utils::time::validateTime(getHourFromIcalTime(time), getMinutesFromIcalTime(time), false);
+}
+
+auto Event::validateDT(const std::string &dt) -> bool
+{
+    uint32_t dateTimeSize;
+    if (dt.find_first_of('Z') == ical::date_char_length + ical::time_char_length) {
+        dateTimeSize = ical::dt_char_length + 1;
+    }
+    else {
+        dateTimeSize = ical::dt_char_length;
+    }
+    if (dt.size() != dateTimeSize) {
+        LOG_ERROR("Date time length is invalid");
+        return false;
+    }
+
+    auto separatorIndex = dt.find_first_of('T');
+    LOG_DEBUG("Separator index = %d", (int)separatorIndex);
+    if (separatorIndex != (yearDigitsNumb + monthDigitsNumb + dayDigitsNumb)) {
+        LOG_ERROR("Date time separator is invalid");
+        return false;
+    }
+
+    auto date = getDateFromIcalFormat(dt);
+    auto time = getTimeFromIcalFormat(dt);
+
+    if (!isDate(date)) {
+        LOG_ERROR("Date is invalid");
+        return false;
+    }
+
+    if (!isTime(time)) {
+        LOG_ERROR("Time is invalid");
+        return false;
+    }
+
+    return true;
+}
+
+auto Event::validateUID(const std::string &UID) -> bool
+{
+    auto DTimestamp = UID.substr(0, UID.find_first_of('-'));
+    auto id         = UID.substr(UID.find_first_of('-') + 1);
+
+    try {
+        stoi(id);
+    }
+    catch (...) {
+        LOG_ERROR("UID value is not an integer!");
+        return false;
+    }
+
+    return validateDT(DTimestamp);
+}
+
 Event::Event(const std::string &summary, const TimePoint from, TimePoint till, const std::string &uid)
 {
+    if (summary.empty()) {
+        isValid = false;
+    }
+    if (!validateUID(uid) && !uid.empty()) {
+        isValid = false;
+    }
+    this->uid     = uid;
     this->summary = summary;
     this->dtstart = from;
     this->dtend   = till;
-    this->uid     = uid;
 }
 
 void Event::setUID(const std::string &property)
 {
+    if (!validateUID(property) && !property.empty()) {
+        LOG_ERROR("UID invalid format");
+        isValid = false;
+    }
     this->uid = property;
 }
 void Event::setSummary(const std::string &property)
 {
+    if (property.empty()) {
+        isValid = false;
+    }
     this->summary = property;
 }
 void Event::setDTStart(const std::string &property)
 {
+    if (!validateDT(property)) {
+        isValid = false;
+    }
     this->dtstart = TimePointFromIcalDate(property);
 }
 void Event::setDTEnd(const std::string &property)
 {
+    if (!validateDT(property)) {
+        isValid = false;
+    }
     this->dtend = TimePointFromIcalDate(property);
 }
 

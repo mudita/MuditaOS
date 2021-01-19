@@ -1,12 +1,14 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Application.hpp"
-#include "Service/Message.hpp"
-#include "Service/Timer.hpp"
-#include "SystemManager/SystemManager.hpp"
+#include "data/CallState.hpp"
+
+#include <Application.hpp>
+#include <Service/Message.hpp>
+#include <Service/Timer.hpp>
+#include <SystemManager/SystemManager.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <time/time_conversion.hpp>
 
@@ -26,7 +28,29 @@ namespace app
 
     inline constexpr auto ringtone_path = "assets/audio/Ringtone-drum2.mp3"; // Should bo moved to database
 
-    class ApplicationCall : public Application
+    class CallWindowInterface
+    {
+      public:
+        virtual ~CallWindowInterface() noexcept = default;
+
+        virtual void setState(app::call::State state) noexcept              = 0;
+        [[nodiscard]] virtual auto getState() const noexcept -> call::State = 0;
+
+        virtual void transmitDtmfTone(uint32_t digit) = 0;
+        virtual void stopAudio()                      = 0;
+        virtual void startRinging()                   = 0;
+        virtual void startRouting()                   = 0;
+    };
+
+    class EnterNumberWindowInterface
+    {
+      public:
+        virtual ~EnterNumberWindowInterface() noexcept                = default;
+        virtual void handleCallEvent(const std::string &number)       = 0;
+        virtual void handleAddContactEvent(const std::string &number) = 0;
+    };
+
+    class ApplicationCall : public Application, public CallWindowInterface, public EnterNumberWindowInterface
     {
       private:
         void CallAbortHandler();
@@ -35,7 +59,7 @@ namespace app
         void RingingHandler(const CellularCallMessage *const msg);
 
       protected:
-        sys::ms callDelayedStopTime = 3000;
+        call::State state = call::State::IDLE;
 
       public:
         ApplicationCall(std::string name                    = name_call,
@@ -52,22 +76,24 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
-        void setDisplayedNumber(std::string num);
-        const std::string &getDisplayedNumber();
 
-        void handleCallEvent(const std::string &number);
-        void handleAddContactEvent(const std::string &number);
+        void handleCallEvent(const std::string &number) override;
+        void handleAddContactEvent(const std::string &number) override;
 
-        bool showNotification(std::function<bool()> action);
-        void transmitDtmfTone(uint32_t digit);
-        auto getDelayedStopTime() const
+        auto showNotification(std::function<bool()> action) -> bool;
+
+        [[nodiscard]] auto getState() const noexcept -> call::State override
         {
-            return callDelayedStopTime;
+            return state;
         }
-
-        void stopAudio();
-        void startRinging();
-        void startRouting();
+        void setState(call::State state) noexcept override
+        {
+            this->state = state;
+        }
+        void transmitDtmfTone(uint32_t digit) override;
+        void stopAudio() override;
+        void startRinging() override;
+        void startRouting() override;
     };
 
     template <> struct ManifestTraits<ApplicationCall>

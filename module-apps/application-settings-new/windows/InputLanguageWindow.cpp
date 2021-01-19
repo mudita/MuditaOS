@@ -4,7 +4,7 @@
 #include "InputLanguageWindow.hpp"
 
 #include "application-settings-new/ApplicationSettings.hpp"
-#include "windows/OptionSetting.hpp"
+#include "OptionSetting.hpp"
 
 #include <i18n/i18n.hpp>
 #include <module-services/service-appmgr/service-appmgr/Controller.hpp>
@@ -20,9 +20,9 @@ namespace gui
     auto InputLanguageWindow::buildOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optionsList;
-        const auto &langList = loader.getAvailableDisplayLanguages();
+        const auto &langList = profiles.getAvailableInputLanguages();
         for (const auto &lang : langList) {
-            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 lang,
                 [=](gui::Item &item) {
                     selectedLang = lang;
@@ -38,7 +38,8 @@ namespace gui
                     return true;
                 },
                 this,
-                selectedLang == lang ? RightItem::Checked : RightItem::Disabled));
+                selectedLang == lang ? gui::option::SettingRightItem::Checked
+                                     : gui::option::SettingRightItem::Disabled));
         }
 
         return optionsList;

@@ -24,7 +24,8 @@ namespace gui
 {
 
     SMSThreadViewWindow::SMSThreadViewWindow(app::Application *app)
-        : AppWindow(app, name::window::thread_view), smsModel{std::make_shared<SMSThreadModel>(this->application)}
+        : AppWindow(app, name::window::thread_view), app::AsyncCallbackReceiver{app},
+          smsModel{std::make_shared<SMSThreadModel>(app)}
     {
         AppWindow::buildInterface();
         setTitle(utils::localize.get("app_messages_title_main"));
@@ -124,9 +125,9 @@ namespace gui
     auto SMSThreadViewWindow::requestContactName(unsigned int contactID) -> void
     {
         auto query = std::make_unique<db::query::ContactGetByID>(contactID, true);
-        query->setQueryListener(db::QueryCallback::fromFunction(
-            [this](auto response) { return handleContactNameQueryResponse(response); }));
-        DBServiceAPI::GetQuery(application, db::Interface::Name::Contact, std::move(query));
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
+        task->setCallback([this](auto response) { return handleContactNameQueryResponse(response); });
+        task->execute(application, this);
     }
 
     auto SMSThreadViewWindow::handleContactNameQueryResponse(db::QueryResult *queryResult) -> bool

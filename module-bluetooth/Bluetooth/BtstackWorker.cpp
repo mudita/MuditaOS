@@ -195,7 +195,6 @@ namespace Bt
 
         hci_init(transport, (void *)&config);
         hci_set_link_key_db(KeyStorage::getKeyStorage());
-
         hci_event_callback_registration.callback = &hci_packet_handler;
         hci_add_event_handler(&hci_event_callback_registration);
         LOG_DEBUG("BT worker run success");

@@ -19,7 +19,7 @@ namespace sys
     using ms = unsigned int;
 
     /// Base timer for all coarse timers in system
-    class Timer : public cpp_freertos::Timer
+    class Timer : private cpp_freertos::Timer
     {
       public:
         static const ms timeout_infinite;

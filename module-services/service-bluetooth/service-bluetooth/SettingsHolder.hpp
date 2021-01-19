@@ -1,12 +1,13 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
+#pragma once
 #include <json/json11.hpp>
 #include <string>
 #include <variant>
 #include <service-db/Settings.hpp>
 #include <agents/settings/SystemSettings.hpp>
 #include <module-utils/Utils.hpp>
+#include "SettingsSerializer.hpp"
 
 namespace Bluetooth
 {
@@ -15,8 +16,9 @@ namespace Bluetooth
     {
         DeviceName,
         Visibility,
-        Power,
-        BondedDevices
+        State,
+        BondedDevices,
+        BtKeys
     };
 
     constexpr inline auto trueStr  = "true";
@@ -39,12 +41,48 @@ namespace Bluetooth
         }
     };
 
+    struct IntVisitor
+    {
+        auto operator()(const std::string &input) const -> int
+        {
+            int value;
+            utils::toNumeric(input, value);
+            return value;
+        }
+        auto operator()(bool input) const -> int
+        {
+            return input;
+        }
+        auto operator()(int input) const -> int
+        {
+            return input;
+        }
+    };
+
+    struct BoolVisitor
+    {
+        auto operator()(const std::string &input) const -> bool
+        {
+            return input == trueStr;
+        }
+        auto operator()(bool input) const -> bool
+        {
+            return input;
+        }
+        auto operator()(int input) const -> bool
+        {
+            return input != 0;
+        }
+    };
+
     class SettingsHolder
     {
       public:
         explicit SettingsHolder(std::unique_ptr<settings::Settings> settingsPtr);
         auto getValue(const Settings setting) -> SettingEntry;
         void setValue(const Settings &newSetting, const SettingEntry &value);
+        std::function<void()> onStateChange;
+        std::function<void(std::string addr)> onLinkKeyAdded;
 
       private:
         static std::map<Settings, std::string> settingString;

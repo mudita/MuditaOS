@@ -85,8 +85,8 @@ namespace service::eink
 
     EinkBpp_e EinkDisplay::getCurrentBitsPerPixelFormat() const noexcept
     {
-        if (waveformSettings.mode == EinkWaveformDU2) {
-            return Eink1Bpp;
+        if ((waveformSettings.mode == EinkWaveformA2) || (waveformSettings.mode == EinkWaveformDU2)) {
+            return Eink4Bpp; /// this should be 1Bpp, but the OS is not ready for this
         }
         return Eink4Bpp;
     }

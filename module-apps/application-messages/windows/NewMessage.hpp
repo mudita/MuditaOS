@@ -6,6 +6,7 @@
 #include <chrono>
 #include <string>
 
+#include <AsyncTask.hpp>
 #include <AppWindow.hpp>
 #include <PhoneNumber.hpp>
 #include <widgets/Text.hpp>
@@ -14,7 +15,7 @@
 
 namespace gui
 {
-    class NewMessageWindow : public AppWindow
+    class NewMessageWindow : public AppWindow, public app::AsyncCallbackReceiver
     {
       public:
         explicit NewMessageWindow(app::Application *app);

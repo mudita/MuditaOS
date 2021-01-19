@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <limits>
 
 #include <module-utils/common_data/EventStore.hpp>
 
@@ -28,6 +29,7 @@ namespace gui
             PasscodeInvalidRetryRequired,
             Blocked,
             NewPasscodeRequired,
+            NewPasscodeInvalidRetryRequired,
             NewPasscodeConfirmRequired,
             NewPasscodeInvalid,
             ErrorOccurred
@@ -90,7 +92,7 @@ namespace gui
         /// calls
         void activate();
 
-        PinLock(Store::GSM::SIM sim, LockState state, LockType type, unsigned int value)
+        PinLock(Store::GSM::SIM sim, LockState state, LockType type, unsigned int value = unlimitedNumOfAttempts)
             : sim{sim}, lockState{state}, lockType{type}, value{value}
         {}
         PinLock(const PinLock &other) = default;
@@ -109,6 +111,7 @@ namespace gui
         bool autoActivate       = false;
 
         static constexpr unsigned int defaultPasscodeSize = 4;
+        static constexpr unsigned int unlimitedNumOfAttempts = std::numeric_limits<unsigned int>::max();
 
         void setAutoActivate(bool _autoActivate)
         {
@@ -121,6 +124,7 @@ namespace gui
         }
 
         friend class PinLockHandler;
+        friend class ChangePasscodeLockHandler;
     };
 
 } // namespace gui

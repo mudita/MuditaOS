@@ -16,9 +16,12 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         ApplicationSettings.cpp
         widgets/timeWidget.cpp
+        widgets/ChangePasscodeLockHandler.cpp
+        widgets/QuoteWidget.cpp
         windows/SettingsMainWindow.cpp
         windows/AddDeviceWindow.cpp
         windows/AllDevicesWindow.cpp
+        windows/APNSettingsWindow.cpp
         windows/BaseSettingsWindow.cpp
         windows/BluetoothWindow.cpp
         windows/FontSizeWindow.cpp
@@ -38,6 +41,9 @@ target_sources( ${PROJECT_NAME}
         windows/QuotesMainWindow.cpp
         windows/QuotesAddWindow.cpp
         windows/SecurityMainWindow.cpp
+        windows/ChangePasscodeWindow.cpp
+        widgets/SpinBox.cpp
+        widgets/SpinBoxOptionSetting.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -61,5 +67,4 @@ add_dependencies(${PROJECT_NAME} version)
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
         service-bluetooth
-        service-evtmgr
 )

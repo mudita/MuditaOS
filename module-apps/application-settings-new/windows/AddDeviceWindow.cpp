@@ -29,7 +29,7 @@ namespace gui
         std::list<gui::Option> optionsList;
 
         for (const auto &device : devices) {
-            optionsList.emplace_back(std::make_unique<gui::OptionSettings>(
+            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 device.name,
                 [=](gui::Item &item) {
                     LOG_DEBUG("Device: %s", device.name.c_str());
@@ -41,7 +41,7 @@ namespace gui
                 },
                 nullptr,
                 nullptr,
-                RightItem::Bt));
+                gui::option::SettingRightItem::Bt));
         }
 
         sys::Bus::SendUnicast(

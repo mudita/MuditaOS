@@ -30,6 +30,11 @@ namespace gui
         }
     }
 
+    bool isInputNavigation(const InputEvent &evt)
+    {
+        return inputToNavigation(evt) != NavigationDirection::NONE;
+    }
+
     Item::Item()
         : focus{false}, type{ItemType::ITEM}, parent{nullptr}, radius{0}, visible{true},
           verticalPolicy{LayoutVerticalPolicy::LAYOUT_POLICY_VERTICAL_EXPAND},
@@ -39,7 +44,7 @@ namespace gui
         focusChangedCallback     = [](Item &) { return false; };
         activatedCallback        = [](Item &) { return false; };
         inputCallback            = [](Item &, const InputEvent &inputEvent) { return false; };
-        dimensionChangedCallback = [](Item &, void *data) { return false; };
+        dimensionChangedCallback = [](Item &, const BoundingBox &data) { return false; };
     }
 
     Item::~Item()
@@ -505,13 +510,8 @@ namespace gui
     bool Item::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         if (dimensionChangedCallback) {
-            return dimensionChangedCallback(*this, nullptr);
+            return dimensionChangedCallback(*this, newDim);
         }
-        return false;
-    }
-
-    bool Item::onContent()
-    {
         return false;
     }
 

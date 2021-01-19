@@ -3,9 +3,8 @@
 
 #include "CallLogOptionsWindow.hpp"
 #include <i18n/i18n.hpp>
-#include "log/log.hpp"
-#include <Options.hpp>
 #include <module-services/service-db/service-db/DBServiceAPI.hpp>
+#include <OptionContact.hpp>
 
 /// below just for apps names...
 
@@ -17,18 +16,20 @@ std::list<gui::Option> calllogWindowOptions(app::ApplicationCallLog *app, const 
 
     if (searchResults->empty() || !searchResults->front().isValid() || searchResults->front().isTemporary()) {
         // add option - add contact
-        options.push_back(gui::options::contact(app, gui::options::ContactOperation::Add, searchResults->front()));
+        options.emplace_back(gui::Option{
+            std::make_unique<gui::option::Contact>(app, gui::option::ContactOperation::Add, searchResults->front())});
     }
     else {
         // add option - contact details
-        options.push_back(gui::options::contact(app, gui::options::ContactOperation::Details, searchResults->front()));
+        options.emplace_back(gui::Option{std::make_unique<gui::option::Contact>(
+            app, gui::option::ContactOperation::Details, searchResults->front())});
     }
 
     // add option delete call option
     options.push_back(gui::Option(
         utils::localize.get("app_calllog_options_delete_call"),
         [=](gui::Item &item) { return app->removeCalllogEntry(record); },
-        gui::Arrow::Disabled));
+        gui::option::Arrow::Disabled));
 
     return options;
 };

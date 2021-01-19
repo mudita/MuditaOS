@@ -24,6 +24,13 @@ namespace bsp
         AudioDevice::RetCode InputPathCtrl(InputPath inputPath) override final;
         bool IsFormatSupported(const Format &format) override final;
 
+        void onDataReceive() final;
+        void onDataSend() final;
+        void enableInput() final;
+        void enableOutput() final;
+        void disableInput() final;
+        void disableOutput() final;
+
       private:
         PaStream *stream;
 

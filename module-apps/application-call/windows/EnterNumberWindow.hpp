@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -35,21 +35,22 @@ namespace gui
         using Formatter       = i18n::phonenumbers::AsYouTypeFormatter;
 
       protected:
-        gui::Label *numberLabel             = nullptr;
-        gui::AddContactIcon *newContactIcon = nullptr;
+        app::EnterNumberWindowInterface *interface = nullptr;
+        gui::Label *numberLabel                    = nullptr;
+        gui::AddContactIcon *newContactIcon        = nullptr;
 
         void setNumberLabel(const std::string num);
 
       public:
-        EnterNumberWindow() = delete;
-        EnterNumberWindow(app::Application *app, std::string windowName = app::window::name_enterNumber);
-        virtual ~EnterNumberWindow();
+        EnterNumberWindow(app::Application *app,
+                          app::EnterNumberWindowInterface *interface,
+                          std::string windowName = app::window::name_enterNumber);
+        ~EnterNumberWindow() override = default;
 
-        bool onInput(const InputEvent &inputEvent) override;
-        bool handleSwitchData(SwitchData *data) override;
-        const std::string &getEnteredNumber() const noexcept;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
+        auto handleSwitchData(SwitchData *data) -> bool override;
+        [[nodiscard]] auto getEnteredNumber() const noexcept -> const std::string &;
 
-        void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
 
@@ -62,7 +63,7 @@ namespace gui
         std::string formattedNumber;
         std::string enteredNumber;
 
-        bool addNewContact();
+        auto addNewContact() -> bool;
         void switchFormatter(const std::string &countryCode);
         void initFormatterInput(const std::string &number);
         void addDigit(const std::string::value_type &digit);

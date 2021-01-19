@@ -24,16 +24,33 @@ namespace style::design
     inline const auto notify_dot_x = 80;
     inline const auto notify_dot_y = (64 - 50) / 2;
     inline const auto grid_offset  = 20;
-}; // namespace style::design
+} // namespace style::design
+
+namespace
+{
+    static constexpr auto deepRefreshDot = "dot_12px_hard_alpha_W_G";
+    static constexpr auto fastRefreshDot = "dot_12px_hard_alpha_W_M";
+
+    gui::Image *buildThumbnail(gui::RefreshModes mode)
+    {
+        gui::Image *thumbnail =
+            new gui::Image(mode == gui::RefreshModes::GUI_REFRESH_DEEP ? deepRefreshDot : fastRefreshDot);
+        thumbnail->setPosition(style::design::notify_dot_x, style::design::notify_dot_y);
+        return thumbnail;
+    }
+} // namespace
 
 namespace gui
 {
     inline const auto APP_SETTINGS_NEW = "ApplicationSettingsNew";
-    Tile::Tile(UTF8 icon, std::string title, std::function<bool(Item &)> activatedCallback, unsigned int notifications)
+    Tile::Tile(UTF8 icon,
+               std::string title,
+               std::function<bool(Item &)> activatedCallback,
+               std::function<bool()> hasNotificationsCallback)
     {
         setSize(style::design::tile_w, style::design::tile_h);
 
-        auto *it = new gui::Item();
+        auto it = new gui::Item();
         it->setSize(style::design::tile_w, style::design::tile_h - 2 * style::design::tile_margin);
         it->setPosition(area().x, area().y + style::design::tile_margin);
 
@@ -48,10 +65,21 @@ namespace gui
         desc->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
         desc->setText(utils::localize.get(title));
 
-        if (notifications > 0) {
-            auto thumbnail = new gui::Image("dot_12px_hard_alpha_W_G");
-            thumbnail->setPosition(style::design::notify_dot_x, style::design::notify_dot_y);
-            it->addWidget(thumbnail);
+        if (hasNotificationsCallback != nullptr) {
+            onNotificationsChangeCallback =
+                [this, it, hasNotifications = std::move(hasNotificationsCallback)](gui::RefreshModes mode) -> bool {
+                if (hasNotifications() && notificationThumbnail == nullptr) {
+                    notificationThumbnail = buildThumbnail(mode);
+                    it->addWidget(notificationThumbnail);
+                    return true;
+                }
+                else if (!hasNotifications() && notificationThumbnail != nullptr) {
+                    it->erase(notificationThumbnail);
+                    notificationThumbnail = nullptr;
+                }
+                return false;
+            };
+            onNotificationsChangeCallback(gui::RefreshModes::GUI_REFRESH_DEEP);
         }
 
         this->activatedCallback = activatedCallback;
@@ -59,9 +87,16 @@ namespace gui
         this->setPenFocusWidth(style::window::default_border_focus_w);
         this->setEdges(RectangleEdge::Top | RectangleEdge::Bottom);
         addWidget(it);
-    };
+    }
+    bool Tile::onNotificationsChange(gui::RefreshModes mode)
+    {
+        if (onNotificationsChangeCallback != nullptr) {
+            return onNotificationsChangeCallback(mode);
+        }
+        return false;
+    }
 
-    MenuPage::MenuPage(gui::Item *parent, UTF8 title, std::vector<Tile *> tiles) : title(title)
+    MenuPage::MenuPage(gui::Item *parent, UTF8 title, std::vector<Tile *> tiles) : title(std::move(title))
     {
         if (parent) {
             parent->addWidget(this);
@@ -81,6 +116,17 @@ namespace gui
                 first_time_selection = false;
             }
         }
+    }
+
+    bool MenuPage::refresh(gui::RefreshModes mode)
+    {
+        bool visibleStateChanged = false;
+        for (auto child : children) {
+            if (auto tile = dynamic_cast<Tile *>(child); tile != nullptr) {
+                visibleStateChanged |= tile->onNotificationsChange(mode);
+            }
+        }
+        return visibleStateChanged;
     }
 
     MenuWindow::MenuWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_menu)
@@ -150,7 +196,8 @@ namespace gui
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationCallLog"));
                               },
-                              app->notifications.notRead.Calls},
+                              [=]() { return app->notifications.notRead.Calls > 0; }},
+
                 new gui::Tile("menu_contacts_W_G",
                               "app_desktop_menu_contacts",
                               [=](gui::Item &item) {
@@ -168,7 +215,7 @@ namespace gui
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationMessages"));
                               },
-                              app->notifications.notRead.SMS},
+                              [=]() { return app->notifications.notRead.SMS > 0; }},
                 new gui::Tile{"menu_music_player_W_G",
                               "app_desktop_menu_music",
                               [=](gui::Item &item) {
@@ -185,15 +232,12 @@ namespace gui
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>("ApplicationMeditation"));
                               }},
-                new gui::Tile{"menu_settings_W_G",
-                              "app_desktop_menu_settings_new",
-                              [=](gui::Item &item) {
+                new gui::Tile{"menu_settings_W_G", "app_desktop_menu_settings_new", [=](gui::Item &item) {
                                   return app::manager::Controller::sendAction(
                                       application,
                                       app::manager::actions::Launch,
                                       std::make_unique<app::ApplicationLaunchData>(APP_SETTINGS_NEW));
-                              }},
-            });
+                              }}});
 
         toolsMenu = new MenuPage(
             this,
@@ -254,9 +298,6 @@ namespace gui
         toolsMenu = nullptr;
     }
 
-    void MenuWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {}
-
     bool MenuWindow::onInput(const InputEvent &inputEvent)
     {
         if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_RF) &&
@@ -278,7 +319,17 @@ namespace gui
 
         setTitle(page->title);
         setFocusItem(page);
-        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
+    void MenuWindow::refresh()
+    {
+        if (application->getCurrentWindow() == this) {
+            if (mainMenu->refresh(RefreshModes::GUI_REFRESH_FAST)) {
+                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+            }
+        }
+        else {
+            mainMenu->refresh(RefreshModes::GUI_REFRESH_DEEP);
+        }
+    }
 } /* namespace gui */

@@ -9,7 +9,7 @@
 namespace gui::model
 {
 
-    class ThreadsSearchResultsModel : public BaseThreadsRecordModel
+    class ThreadsSearchResultsModel : public BaseThreadsRecordModel, public app::AsyncCallbackReceiver
     {
         UTF8 textToSearch;
 

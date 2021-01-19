@@ -23,6 +23,11 @@ namespace bsp {
             External,
             Internal
         };
+        enum class Pll2State
+        {
+            Enable,
+            Disable
+        };
 
         LowPowerMode()          = default;
         virtual ~LowPowerMode() = default;
@@ -38,9 +43,13 @@ namespace bsp {
         virtual void SwitchOscillatorSource(OscillatorSource source) = 0;
         [[nodiscard]] OscillatorSource GetCurrentOscillatorSource() const noexcept;
 
+        virtual void SwitchPll2State(Pll2State state) = 0;
+        [[nodiscard]] Pll2State GetCurrentPll2State() const noexcept;
+
     protected:
         CpuFrequency currentFrequency = CpuFrequency::Level_6;
         OscillatorSource currentOscSource = OscillatorSource::External;
+        Pll2State currentPll2State = Pll2State::Enable;
     };
 } // namespace bsp
 

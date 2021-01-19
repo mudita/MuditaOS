@@ -18,11 +18,10 @@ namespace style
     } // namespace img
     namespace text
     {
-        constexpr uint32_t x  = 40;
-        constexpr uint32_t y  = 247;
-        constexpr uint32_t w  = 400;
-        constexpr uint32_t h  = 66;
-        constexpr Color color = {7, 0};
+        constexpr uint32_t x = 40;
+        constexpr uint32_t y = 247;
+        constexpr uint32_t w = 400;
+        constexpr uint32_t h = 80;
     } // namespace text
 } // namespace style
 
@@ -41,13 +40,9 @@ Icon::Icon(Item *parent,
 
     new Image(this, style::img::x, style::img::y, imageName);
     text = new Text(this, style::text::x, style::text::y, style::text::w, style::text::h);
+    text->setRichText(str);
     text->setTextType(TextType::MultiLine);
     text->setEditMode(EditMode::Browse);
     text->setEdges(RectangleEdge::None);
     text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-
-    auto format = TextFormat(Font(27).raw(), Color(7, 0));
-    for (auto &el : textToTextBlocks(str, format)) {
-        text->addText(el);
-    }
 }

@@ -26,7 +26,8 @@ namespace bsp
     sai_edma_handle_t RT1051Audiocodec::rxHandle      = {};
 
     RT1051Audiocodec::RT1051Audiocodec(bsp::AudioDevice::audioCallback_t callback)
-        : AudioDevice(callback), saiInFormat{}, saiOutFormat{}, codecParams{}, codec{}
+        : SAIAudioDevice(callback, BOARD_AUDIOCODEC_SAIx, &rxHandle, &txHandle), saiInFormat{}, saiOutFormat{},
+          codecParams{}, codec{}
     {
         isInitialized = true;
     }
@@ -238,17 +239,6 @@ namespace bsp
 
         /* Reset SAI Rx internal logic */
         SAI_RxSoftwareReset(BOARD_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
-
-        if (!source.isConnected()) {
-            LOG_FATAL("No output stream connected!");
-            return;
-        }
-
-        /// initiate first read
-        audio::Stream::Span dataSpan;
-        source.getStream()->reserve(dataSpan);
-        auto xfer = sai_transfer_t{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
-        SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, &xfer);
     }
 
     void RT1051Audiocodec::OutStart()
@@ -279,15 +269,6 @@ namespace bsp
 
         /* Reset SAI Tx internal logic */
         SAI_TxSoftwareReset(BOARD_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
-
-        if (!sink.isConnected()) {
-            LOG_FATAL("No input stream connected!");
-            return;
-        }
-
-        auto nullSpan = sink.getStream()->getNullSpan();
-        auto xfer     = sai_transfer_t{.data = nullSpan.data, .dataSize = nullSpan.dataSize};
-        SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, &xfer);
     }
 
     void RT1051Audiocodec::OutStop()
@@ -297,9 +278,6 @@ namespace bsp
             SAI_TransferTerminateSendEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle);
         }
         memset(&txHandle, 0, sizeof(txHandle));
-        if (sink.isConnected()) {
-            sink.getStream()->unpeek();
-        }
     }
 
     void RT1051Audiocodec::InStop()
@@ -309,47 +287,18 @@ namespace bsp
             SAI_TransferAbortReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle);
         }
         memset(&rxHandle, 0, sizeof(rxHandle));
-        if (source.isConnected()) {
-            source.getStream()->release();
-        }
     }
 
     void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        audio::Stream::Span dataSpan;
-        auto self    = static_cast<RT1051Audiocodec *>(userData);
-        auto &source = self->source;
-
-        /// exit if not connected to the stream
-        if (!source.isConnected()) {
-            return;
-        }
-
-        /// reserve space for the next read commiting previously reserved block before
-        source.getStream()->commit();
-        source.getStream()->reserve(dataSpan);
-
-        sai_transfer_t xfer{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
-        SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &self->rxHandle, &xfer);
+        auto self = static_cast<RT1051Audiocodec *>(userData);
+        self->onDataReceive();
     }
 
     void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
-        audio::Stream::Span dataSpan;
-        auto self  = static_cast<RT1051Audiocodec *>(userData);
-        auto &sink = self->sink;
-
-        /// exit if not connected to the stream
-        if (!sink.isConnected()) {
-            return;
-        }
-
-        /// pop previous read and peek next
-        sink.getStream()->consume();
-        sink.getStream()->peek(dataSpan);
-
-        sai_transfer_t xfer{.data = dataSpan.data, .dataSize = dataSpan.dataSize};
-        SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &self->txHandle, &xfer);
+        auto self = static_cast<RT1051Audiocodec *>(userData);
+        self->onDataSend();
     }
 
 } // namespace bsp

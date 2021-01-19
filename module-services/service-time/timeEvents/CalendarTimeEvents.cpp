@@ -43,9 +43,11 @@ namespace stm
             filterTill = filterFrom;
         }
 
-        return DBServiceAPI::GetQuery(service(),
-                                      db::Interface::Name::Events,
-                                      std::make_unique<db::query::events::SelectFirstUpcoming>(filterFrom, filterTill));
+        const auto [succeed, _] =
+            DBServiceAPI::GetQuery(service(),
+                                   db::Interface::Name::Events,
+                                   std::make_unique<db::query::events::SelectFirstUpcoming>(filterFrom, filterTill));
+        return succeed;
     }
 
     uint32_t CalendarTimeEvents::calcToNextEventInterval(std::unique_ptr<db::QueryResult> nextEventQueryResult)
@@ -74,8 +76,9 @@ namespace stm
     bool CalendarTimeEvents::sendEventFiredQuery()
     {
         eventRecord.reminder_fired = TimePointNow();
-        return DBServiceAPI::GetQuery(
+        const auto [succeed, _]    = DBServiceAPI::GetQuery(
             service(), db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(eventRecord));
+        return succeed;
     }
 
     void CalendarTimeEvents::invokeEvent()

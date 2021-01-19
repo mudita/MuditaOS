@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/CellularCall.hpp"
@@ -40,9 +40,9 @@ namespace ModemCall
             throw std::runtime_error("Wrong number of tokens" + std::to_string(numberOfTokens));
         }
 
-        idx              = std::stoul(tokens[0]);
-        auto conv_val    = std::stoul(tokens[1]);
-        auto tmp_dir     = magic_enum::enum_cast<CallDir>(conv_val);
+        idx           = std::stoul(tokens[0]);
+        auto conv_val = std::stoul(tokens[1]);
+        auto tmp_dir  = magic_enum::enum_cast<CallDir>(conv_val);
         if (tmp_dir.has_value()) {
             dir = tmp_dir.value();
         }
@@ -71,15 +71,13 @@ namespace ModemCall
         isConferenceCall = static_cast<bool>(std::stoul(tokens[4]));
         phoneNumber      = tokens[5];
 
-        conv_val = std::stoul(tokens[6]);
-
-        auto tmp_type = magic_enum::enum_cast<CallType>(conv_val);
-        if (tmp_type.has_value()) {
-            type = tmp_type.value();
+        try {
+            conv_val = std::stoul(tokens[6]);
         }
-        else {
-            throw std::runtime_error("type value out of range CallType enum - " + tokens[6]);
+        catch (const std::logic_error &) {
+            conv_val = 0;
         }
+        type = conv_val;
 
         if (numberOfTokens == 8) {
             phoneBookName = tokens[7];

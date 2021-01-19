@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "bsp/audio/bsp_audio.hpp"
+#include "SAIAudioDevice.hpp"
 #include "fsl_sai_edma.h"
 
 #include "FreeRTOS.h"
@@ -24,7 +24,7 @@ namespace bsp
     void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
     void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
 
-    class RT1051Audiocodec : public AudioDevice
+    class RT1051Audiocodec : public SAIAudioDevice
     {
 
       public:

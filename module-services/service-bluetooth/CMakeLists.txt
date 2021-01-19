@@ -5,6 +5,7 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 set(SOURCES
     ServiceBluetooth.cpp
     service-bluetooth/SettingsHolder.cpp
+    service-bluetooth/SettingsSerializer.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

@@ -138,6 +138,7 @@ namespace style
             inline constexpr auto set            = "common_set";
             inline constexpr auto yes            = "common_yes";
             inline constexpr auto no             = "common_no";
+            inline constexpr auto check          = "common_check";
             inline constexpr auto Switch         = "common_switch";
             inline constexpr auto options        = "common_options";
             inline constexpr auto information    = "common_information";
@@ -202,6 +203,14 @@ namespace style
                      ///< offset.
         };
 
+        /// Possible List ScrollBar types
+        enum class ScrollBarType
+        {
+            None,         ///< None - list without scroll bar (but with scrolling).
+            Proportional, ///< Proportional - scroll bar size calculated based on elements count in model and currently
+                          ///< displayed number of elements.
+        };
+
         enum class Orientation
         {
             TopBottom,
@@ -225,12 +234,6 @@ namespace style
             style::window::default_body_width - style::listview::scroll::item_margin;
         inline constexpr auto body_width_with_scroll =
             style::window::default_body_width + style::listview::scroll::margin;
-        inline constexpr auto right_margin        = 15U;
-        inline constexpr auto top_margin_small    = 5U;
-        inline constexpr auto top_margin_big      = 8U;
-        inline constexpr auto top_margin_very_big = 12U;
-        inline constexpr auto item_span_small     = 8U;
-        inline constexpr auto item_span_big       = 12U;
 
     } // namespace listview
 

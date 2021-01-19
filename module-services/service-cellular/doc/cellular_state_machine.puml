@@ -1,0 +1,75 @@
+@startuml
+
+[*] --> WaitForStartPermission
+
+WaitForStartPermission -> PowerDown : PowerDownRequest && !isModemActive
+
+WaitForStartPermission --> PowerUpRequest : PowerUpRequest
+
+PowerDown --> PowerUpRequest : PowerUpRequest
+
+PowerUpRequest --> PowerUpProcedure : board == T3 | Linux
+
+PowerUpRequest -> StatusCheck : board == T4
+
+StatusCheck --> PowerUpInPorgress : modemActive
+
+StatusCheck -> PowerUpProcedure : !modemActive
+
+PowerUpProcedure --> CellularConfProcedure : hotStart
+
+PowerUpProcedure --> PowerUpInPorgress : coldStart || event: modem ACTIVE
+
+PowerUpInPorgress --> BaudDetect
+
+BaudDetect -> CellularConfProcedure : Success
+
+BaudDetect --> ModemFatalFailure : Failure
+
+CellularConfProcedure --> AudioConfigurationProcedure : Success
+
+CellularConfProcedure -> Failed : Failed
+
+AudioConfigurationProcedure -> AudioConfigurationProcedure : Failed
+
+AudioConfigurationProcedure --> Failed : Baud setup fail
+
+AudioConfigurationProcedure ---> Idle : reset called
+
+AudioConfigurationProcedure --> APNConfProcedure : Success
+
+APNConfProcedure --> SanityCheck
+
+SanityCheck --> ModemOn : Success
+
+SanityCheck --> ModemFatalFailure : Failure
+
+ModemOn -> URCReady
+
+Event:CellularSimProcedure --> SimSelect 
+
+Event:SIM_READY --> SimInit
+
+SimInit --> Failed : Failure
+
+SimInit --> Ready : Success
+
+Event:PowerDownDeregistering --> PowerDownStarted : state != PowerDownWaiting
+
+Event:PowerDownDeregistered --> PowerDownWaiting
+
+Event:PowerDownRequest -> PowerDownWaiting
+
+PowerDownWaiting ---> PowerDown : (If T3 && timeout) \n || Event:modemInactive
+
+PowerDown --> PowerUpRequest : nextPowerStateChangeAwaiting \n && nextPowerState == on
+
+BaudDetect ---> PowerDownWaiting : nextPowerStateChangeAwaiting \n && nextPowerState == off
+
+Event:PowerUpProcedureComplete --> CellularConfProcedure : board == T3 || Linux
+
+Event:modemActive --> PowerDown : state != PowerUpProcedure
+
+Event:powerDownRequest --> PowerDown : state != PowerDown,PowerDownWaiting,\n PowerUpProcedure,PowerUpInProgress
+
+@enduml

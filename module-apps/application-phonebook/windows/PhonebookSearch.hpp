@@ -3,11 +3,8 @@
 
 #pragma once
 
-#include "application-phonebook/data/PhonebookItemData.hpp"
-#include "application-phonebook/models/PhonebookModel.hpp"
-#include "application-phonebook/widgets/PhonebookListView.hpp"
-
 #include <AppWindow.hpp>
+#include <ContactRecord.hpp>
 #include <Text.hpp>
 
 namespace gui
@@ -15,19 +12,16 @@ namespace gui
     class PhonebookSearch : public AppWindow
     {
       public:
-        PhonebookSearch(app::Application *app);
-        ~PhonebookSearch() override = default;
-
-        bool onInput(const InputEvent &inputEvent) override;
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        bool handleSwitchData(SwitchData *data) override;
-        void rebuild() override;
-        void buildInterface() override;
-        void destroyInterface() override;
+        explicit PhonebookSearch(app::Application *app);
 
       private:
-        Text *inputField                       = nullptr;
+        void buildInterface() override;
+        auto handleSwitchData(SwitchData *data) -> bool override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
+
         std::shared_ptr<ContactRecord> contact = nullptr;
+        Text *inputField                       = nullptr;
     };
 
 } /* namespace gui */

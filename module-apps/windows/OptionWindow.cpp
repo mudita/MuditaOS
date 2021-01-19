@@ -3,45 +3,38 @@
 
 #include "OptionWindow.hpp"
 #include "Label.hpp"
-#include "Margins.hpp"
 #include <i18n/i18n.hpp>
 #include "log/log.hpp"
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <Style.hpp>
-#include <cassert>
-#include <functional>
 #include <memory>
 #include <utility>
 #include <messages/OptionsWindow.hpp>
 
 namespace gui
 {
-
-    OptionWindow::OptionWindow(app::Application *app, const std::string &name) : AppWindow(app, name)
+    OptionWindow::OptionWindow(app::Application *app, const std::string &name)
+        : AppWindow(app, name), optionsModel{std::make_shared<OptionsModel>(app)}
     {
         buildInterface();
     }
 
     OptionWindow::OptionWindow(app::Application *app, const std::string &name, std::list<Option> options)
-        : AppWindow(app, name), options(std::move(options))
+        : AppWindow(app, name), optionsModel{std::make_shared<OptionsModel>(app)}, options(std::move(options))
     {
         buildInterface();
     }
 
     void OptionWindow::rebuild()
-    {}
-
-    void OptionWindow::addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow)
     {
-        body->addWidget(Option(text, activatedCallback, arrow).build());
+        clearOptions();
+        addOptions(options);
     }
 
     void OptionWindow::addOptions(std::list<Option> &optionList)
     {
-        for (auto &option : optionList) {
-            body->addWidget(option.build());
-        }
-        body->switchPage(0);
+        optionsModel->createData(optionList);
+        optionsList->rebuildList();
     }
 
     void OptionWindow::addOptions(std::list<Option> &&optionList)
@@ -58,7 +51,8 @@ namespace gui
 
     void OptionWindow::clearOptions()
     {
-        body->erase();
+        optionsList->clear();
+        optionsModel->clearData();
     }
 
     void OptionWindow::buildInterface()
@@ -73,24 +67,22 @@ namespace gui
         topBar->setActive(TopBar::Elements::BATTERY, true);
         setTitle(name);
 
-        // magical offset on designs
-        int32_t offset_h = 8;
+        optionsList = new gui::ListView(this,
+                                        option::window::optionsListX,
+                                        option::window::optionsListY,
+                                        option::window::optionsListW,
+                                        option::window::optionsListH,
+                                        optionsModel,
+                                        style::listview::ScrollBarType::None);
 
-        body = new gui::PageLayout(this,
-                                   {0,
-                                    title->offset_h() + offset_h,
-                                    this->getWidth(),
-                                    this->getHeight() - offset_h - this->title->offset_h() - bottomBar->getHeight()});
-
-        clearOptions();
-        addOptions(options);
-        setFocusItem(body);
+        rebuild();
+        setFocusItem(optionsList);
     }
 
     void OptionWindow::destroyInterface()
     {
         erase();
-        body = nullptr;
+        optionsList = nullptr;
     }
 
     OptionWindow::~OptionWindow()
@@ -105,4 +97,5 @@ namespace gui
             resetOptions(message->takeOptions());
         }
     }
+
 } /* namespace gui */

@@ -7,6 +7,7 @@ from harness import utils, log
 from harness.interface import CDCSerial as serial
 from harness.interface.defs import key_codes, endpoint, method
 from harness.utils import send_keystoke, application_keypath, send_char
+from harness.interface.error import TestError, Error
 import random
 
 
@@ -20,20 +21,33 @@ class Harness:
         self.port_name = port
         self.connection = serial.CDCSerial(port)
 
+    @classmethod
+    def from_detect(cls):
+        '''
+        Try to instantiate from first detected device.
+        Do not use this method if you need >1 unique devices.
+        '''
+        found = serial.CDCSerial.find_Pures()
+        if found:
+            port = found[0]
+            return cls(port)
+        else:
+            raise TestError(Error.PORT_NOT_FOUND)
+
     def get_connection(self):
         return self.connection
 
     def get_window_name(self):
-        return self.connection.get_window()
+        return self.connection.get_window_name()
 
     def unlock_phone(self):
         if self.connection.is_phone_locked():
-            self.connection.send_key(key_codes["enter"])
-            self.connection.send_key(key_codes["#"])
-            self.connection.send_key(3)
-            self.connection.send_key(3)
-            self.connection.send_key(3)
-            self.connection.send_key(3)
+            self.connection.send_key_code(key_codes["enter"])
+            self.connection.send_key_code(key_codes["#"])
+            self.connection.send_key_code(3)
+            self.connection.send_key_code(3)
+            self.connection.send_key_code(3)
+            self.connection.send_key_code(3)
             log.info("Phone unlocked")
         else:
             log.info("Phone already unlocked")
@@ -71,3 +85,4 @@ class Harness:
             "body": body
         })
         return ret
+

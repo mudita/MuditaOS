@@ -4,7 +4,7 @@
 #include "AlarmClockOptions.hpp"
 #include "application-alarm-clock/widgets/AlarmClockStyle.hpp"
 #include "application-alarm-clock/data/AlarmsData.hpp"
-#include "windows/Options.hpp"
+#include "Option.hpp"
 #include "windows/DialogMetadata.hpp"
 #include "messages/DialogMetadataMessage.hpp"
 

@@ -19,25 +19,28 @@ GridLayout::GridLayout(
         if (inputEvent.state != InputEvent::State::keyReleasedShort) {
             return false;
         }
+
+        auto it       = this->getNavigationFocusedItem();
+        auto distance = std::distance(children.begin(), it);
         switch (inputEvent.keyCode) {
         case KeyCode::KEY_UP: {
-            auto it = this->getNavigationFocusedItem();
-            this->setFocusItem((*std::next(it, (this->rowSize - 1) * this->colSize)));
+            auto realRowSize = calculateRowSizeForBorderTransition(distance);
+            this->setFocusItem((*std::next(it, (realRowSize - 1) * this->colSize)));
             return true;
         }
         case KeyCode::KEY_DOWN: {
-            auto it = this->getNavigationFocusedItem();
-            this->setFocusItem((*std::prev(it, (this->rowSize - 1) * this->colSize)));
+            auto realRowSize = calculateRowSizeForBorderTransition(distance);
+            this->setFocusItem((*std::prev(it, (realRowSize - 1) * this->colSize)));
             return true;
         }
         case KeyCode::KEY_LEFT: {
-            auto it = this->getNavigationFocusedItem();
-            this->setFocusItem((*std::next(it, this->colSize - 1)));
+            auto realColSize = calculateColumnSizeForBorderTransition(distance);
+            this->setFocusItem((*std::next(it, realColSize - 1)));
             return true;
         }
         case KeyCode::KEY_RIGHT: {
-            auto it = this->getNavigationFocusedItem();
-            this->setFocusItem((*std::prev(it, this->colSize - 1)));
+            auto realColSize = calculateColumnSizeForBorderTransition(distance);
+            this->setFocusItem((*std::prev(it, realColSize - 1)));
             return true;
         }
         default: {
@@ -45,6 +48,35 @@ GridLayout::GridLayout(
         }
         }
     };
+}
+
+uint32_t GridLayout::calculateColumnSizeForBorderTransition(const uint32_t currentPosition)
+{
+    auto realColSize = colSize;
+    if (elementsInIncompletedLastRow) {
+        if (((currentPosition / colSize) + 1) >= rowSize)
+            realColSize = elementsInIncompletedLastRow;
+    }
+    return realColSize;
+}
+uint32_t GridLayout::calculateRowSizeForBorderTransition(const uint32_t currentPosition)
+{
+    auto realRowSize = rowSize;
+    if (elementsInIncompletedLastRow) {
+        if (((currentPosition % (colSize)) + 1) > elementsInIncompletedLastRow)
+            realRowSize--;
+    }
+    return realRowSize;
+}
+
+void GridLayout::handleItemsOutOfGridLayoutArea(uint32_t maxItemsInArea)
+{
+    for (auto i = maxItemsInArea; i < children.size(); i++) {
+        auto it = std::next(children.begin(), i);
+        if ((*it)->visible) {
+            addToOutOfDrawAreaList(*it);
+        }
+    }
 }
 
 void GridLayout::resizeItems()
@@ -56,8 +88,15 @@ void GridLayout::resizeItems()
     uint32_t el_in_x = area().w / grid.x;
     uint32_t el_in_y = area().h / grid.y;
 
+    elementsInIncompletedLastRow = 0;
     colSize = children.size() < area().w / grid.x ? children.size() : area().w / grid.x;
-    rowSize = colSize != 0 ? children.size() / colSize : 1;
+    rowSize                      = colSize != 0 ? (children.size() / colSize) : 1;
+    if (colSize > 1 && (static_cast<double>(children.size()) / colSize) > 1.0) {
+        elementsInIncompletedLastRow = children.size() % colSize;
+    }
+    if (elementsInIncompletedLastRow > 0) {
+        rowSize++;
+    }
 
     uint32_t strech_x     = 0;
     uint32_t strech_y     = 0;
@@ -71,6 +110,7 @@ void GridLayout::resizeItems()
         LOG_ERROR("More children than possible to show: %u > %" PRIu32 "",
                   static_cast<unsigned int>(children.size()),
                   max_elements);
+        handleItemsOutOfGridLayoutArea(max_elements);
         return;
     }
     if (el_in_x > 2)

@@ -5,7 +5,12 @@
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "widgets/InputBox.hpp"
 
+#include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/messages/DeviceName.hpp>
+#include <service-bluetooth/messages/SetDeviceName.hpp>
+
 #include <Utils.hpp>
+#include <application-settings-new/data/PhoneNameData.hpp>
 
 namespace gui
 {
@@ -30,12 +35,36 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
+        sys::Bus::SendUnicast(
+            std::make_shared<::message::bluetooth::RequestDeviceName>(), service::name::bluetooth, application);
+
         setFocusItem(inputField);
     }
 
     void PhoneNameWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         inputField->clear();
-        setFocusItem(inputField);
+        if (const auto newData = dynamic_cast<PhoneNameData *>(data); data != nullptr) {
+            inputField->setText(newData->getName());
+        }
+    }
+
+    auto PhoneNameWindow::onInput(const InputEvent &inputEvent) -> bool
+    {
+        if (AppWindow::onInput(inputEvent)) {
+            return true;
+        }
+
+        if (!inputEvent.isShortPress()) {
+            return false;
+        }
+
+        if (inputEvent.is(gui::KeyCode::KEY_ENTER) && !inputField->isEmpty()) {
+            auto result = std::make_shared<::message::bluetooth::SetDeviceName>(inputField->getText());
+            sys::Bus::SendUnicast(std::move(result), service::name::bluetooth, application);
+            return true;
+        }
+
+        return false;
     }
 } // namespace gui

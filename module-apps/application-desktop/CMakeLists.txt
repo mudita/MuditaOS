@@ -33,6 +33,8 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPullWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPushWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiInternalMsgWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/ScreenLockBaseBox.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/LockWindow.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockPhoneData.hpp"
@@ -59,6 +61,8 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPullWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPushWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiInternalMsgWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/ScreenLockBaseBox.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/LockWindow.hpp"
 )
 
 target_link_libraries(${PROJECT_NAME}

@@ -72,4 +72,22 @@ namespace bsp
     {
         Stop();
     }
+
+    void BluetoothProxyAudio::onDataReceive()
+    {}
+
+    void BluetoothProxyAudio::onDataSend()
+    {}
+
+    void BluetoothProxyAudio::enableInput()
+    {}
+
+    void BluetoothProxyAudio::enableOutput()
+    {}
+
+    void BluetoothProxyAudio::disableInput()
+    {}
+
+    void BluetoothProxyAudio::disableOutput()
+    {}
 } // namespace bsp

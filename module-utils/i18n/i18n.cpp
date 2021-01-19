@@ -5,16 +5,12 @@
 #include "i18n.hpp"
 #include "Utils.hpp"
 #include <cstdio>
-#include <filesystem>
 #include <purefs/filesystem_paths.hpp>
 
 namespace utils
 {
     namespace
     {
-        const auto LanguageDirPath = std::filesystem::path{"assets"} / "lang";
-        constexpr auto extension   = ".json";
-
         auto returnNonEmptyString(const std::string &str, const std::string &ret) -> const std::string &
         {
             return str.empty() ? ret : str;
@@ -24,7 +20,7 @@ namespace utils
     i18n localize;
     json11::Json LangLoader::createJson(const std::string &filename)
     {
-        const auto path = LanguageDirPath / (filename + extension);
+        const auto path = utils::localize.DisplayLanguageDirPath / (filename + utils::files::jsonExtension);
         auto fd         = std::fopen(path.c_str(), "r");
         if (fd == nullptr) {
             LOG_FATAL("Error during opening file %s", path.c_str());
@@ -55,7 +51,16 @@ namespace utils
     std::vector<Language> LangLoader::getAvailableDisplayLanguages() const
     {
         std::vector<std::string> languageNames;
-        for (const auto &entry : std::filesystem::directory_iterator(LanguageDirPath)) {
+        for (const auto &entry : std::filesystem::directory_iterator(utils::localize.DisplayLanguageDirPath)) {
+            languageNames.push_back(std::filesystem::path(entry.path()).stem());
+        }
+        return languageNames;
+    }
+
+    std::vector<Language> LangLoader::getAvailableInputLanguages() const
+    {
+        std::vector<std::string> languageNames;
+        for (const auto &entry : std::filesystem::directory_iterator(utils::localize.InputLanguageDirPath)) {
             languageNames.push_back(std::filesystem::path(entry.path()).stem());
         }
         return languageNames;
@@ -63,25 +68,22 @@ namespace utils
 
     void i18n::setInputLanguage(const Language &lang)
     {
-        if (lang == currentInputLanguage) {
+        if (lang == inputLanguage) {
             return;
         }
-        currentInputLanguage = lang;
-        if (lang == fallbackLanguageName) {
-            inputLanguage = fallbackLanguage;
-        }
-        else {
-            json11::Json pack = loader.createJson(lang);
-            inputLanguage     = pack;
-        }
+        inputLanguage = lang;
     }
-    const std::string &i18n::getInputLanguage(const std::string &str)
+
+    const std::string &i18n::getInputLanguage(const std::string &inputMode)
     {
         // if language pack returned nothing then try default language
-        if (inputLanguage[str].string_value().empty()) {
-            return returnNonEmptyString(fallbackLanguage[str].string_value(), str);
+        if (inputLanguage.empty()) {
+            inputLanguageFilename = fallbackLanguageName + utils::files::breakSign + inputMode;
         }
-        return returnNonEmptyString(inputLanguage[str].string_value(), str);
+        else {
+            inputLanguageFilename = inputLanguage + utils::files::breakSign + inputMode;
+        }
+        return inputLanguageFilename;
     }
 
     const std::string &i18n::get(const std::string &str)
