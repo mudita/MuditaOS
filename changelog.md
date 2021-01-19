@@ -1,8 +1,26 @@
 # MuditaOS changelog
 
+## [0.54.2 2020-01-19]
+
+### Added
+
+* Add passcode changing.
+
+### Fixed
+
+* Fix the persistent answer and reject labels in the call window.
+* Fix the wrong call duration issue in both Call and Calls apps.
+* Fix call ignoring.
+
+### Other
+
+* Enable modem's debug output.
+* Enable timers enhanced debug.
+* Fix licensing information.
+
 ## [0.54.1 2020-01-18]
 
-## Fixed
+### Fixed
 
 * Fix settings broken by the accidentally removed script.
 
