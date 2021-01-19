@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "application-settings-new/models/ApnSettingsModel.hpp"
 #include "BaseSettingsWindow.hpp"
 
 #include <service-cellular/PacketDataTypes.hpp>
@@ -19,5 +20,6 @@ namespace gui
         auto buildOptionsList() -> std::list<gui::Option> override;
         auto handleSwitchData(SwitchData *data) -> bool override;
         std::shared_ptr<packet_data::APN::Config> apn;
+        ApnSettingsModel *apnSettingsModel = nullptr;
     };
 } // namespace gui

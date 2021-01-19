@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "application-settings-new/models/ApnSettingsModel.hpp"
 #include "application-settings-new/models/NewApnModel.hpp"
 
 #include <AppWindow.hpp>
@@ -27,7 +28,8 @@ namespace gui
         void setSaveButtonVisible(bool visible);
         std::shared_ptr<packet_data::APN::Config> apn;
         std::shared_ptr<NewApnModel> newApnModel;
-        gui::ListView *list = nullptr;
+        ApnSettingsModel *apnSettingsModel = nullptr;
+        gui::ListView *list                = nullptr;
     };
 
 } /* namespace gui */

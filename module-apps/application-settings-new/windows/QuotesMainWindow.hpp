@@ -5,7 +5,7 @@
 
 #include "BaseSettingsWindow.hpp"
 #include "application-settings-new/widgets/QuoteWidget.hpp"
-#include "application-settings-new/model/QuotesModel.hpp"
+#include "application-settings-new/models/QuotesModel.hpp"
 
 #include <purefs/filesystem_paths.hpp>
 #include <module-gui/gui/widgets/ListView.hpp>

@@ -5,6 +5,7 @@
 
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/data/SettingsItemData.hpp"
+#include "application-settings-new/models/ApnSettingsModel.hpp"
 #include "OptionSetting.hpp"
 
 namespace gui
@@ -12,6 +13,7 @@ namespace gui
     ApnOptionsWindow::ApnOptionsWindow(app::Application *app) : BaseSettingsWindow(app, window::name::apn_options)
     {
         setTitle(utils::localize.get("app_settings_apn_options"));
+        apnSettingsModel = new ApnSettingsModel(application);
     }
 
     auto ApnOptionsWindow::buildOptionsList() -> std::list<gui::Option>
@@ -31,7 +33,7 @@ namespace gui
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::localize.get("app_settings_apn_options_delete"),
             [=](gui::Item &item) {
-                // request delete APN
+                apnSettingsModel->removeAPN(apn);
                 return true;
             },
             nullptr,
@@ -40,7 +42,7 @@ namespace gui
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::localize.get("app_settings_apn_options_set_as_default"),
             [=](gui::Item &item) {
-                // set APN as default
+                apnSettingsModel->setAsDefaultAPN(apn);
                 return true;
             },
             nullptr,
