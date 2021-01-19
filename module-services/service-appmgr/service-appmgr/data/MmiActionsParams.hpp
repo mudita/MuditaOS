@@ -31,6 +31,8 @@ namespace app::manager::actions
             CallForwardingNotification,
             CallForwardingData,
             Clir,
+            Clip,
+            Imei,
             CallBarringNotification,
             CallBarringData
         };
@@ -40,17 +42,18 @@ namespace app::manager::actions
             NoneSpecifiedSuccess,
             NoneSpecifiedFailed,
             CommonFailure,
-            CommonMMINotSupported,
             CommonNoMessage,
+            CommonMMINotSupported,
+            CommonEnabled,
+            CommonDisabled,
             CommonVoice,
             CommonData,
             CommonFax,
-            CommonAsync,
             CommonSync,
+            CommonAsync,
             CommonAllDisabled,
-
-            CommonActivated,
             CommonDeactivated,
+            CommonActivated,
             CommonQuery,
 
             ClirAccordingToSubscription,
@@ -75,6 +78,12 @@ namespace app::manager::actions
 
             CallBarringActivated,
             CallBarringDeactivated,
+
+            ClipActivted,
+            ClipDaectivated,
+            ClipNotProvisioned,
+            ClipProvisioned,
+            ClipUnknown,
 
         };
 
@@ -174,5 +183,25 @@ namespace app::manager::actions
       private:
         MMIResult result;
         std::shared_ptr<MMICustomResultParams> customResult = nullptr;
+    };
+
+    class MMIClipResult : public MMICustomResultParams
+    {
+      public:
+        MMIClipResult() : MMICustomResultParams(MMIType::Clip)
+        {}
+    };
+
+    class MMIImeiResult : public MMICustomResultParams
+    {
+      public:
+        explicit MMIImeiResult(const std::string &imei) : MMICustomResultParams(MMIType::Imei), imei(imei)
+        {}
+        explicit MMIImeiResult() : MMICustomResultParams(MMIType::Imei)
+        {}
+        auto getImei() const noexcept -> std::string;
+
+      private:
+        std::string imei;
     };
 } // namespace app::manager::actions

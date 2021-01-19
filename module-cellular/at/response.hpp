@@ -273,11 +273,41 @@ namespace at
                 {}
             };
 
-            auto parseClir(const std::string &response) -> std::optional<ClirResponse>;
+            auto parse(const std::string &response) -> std::optional<ClirResponse>;
             auto getState(const ServiceState &state) -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
             auto getStatus(const ServiceStatus &status)
                 -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
         } // namespace clir
+
+        namespace clip
+        {
+            auto constexpr clipTokens = 2;
+
+            enum class UrcState
+            {
+                SupressUrc,
+                DisplayUrc
+            };
+
+            enum class ClipState
+            {
+                NotProvisioned,
+                Provisioned,
+                Unknown
+            };
+
+            struct ClipParsed
+            {
+                UrcState urcState;
+                ClipState clipState;
+                explicit ClipParsed(UrcState urc, ClipState clip) : urcState(urc), clipState(clip)
+                {}
+            };
+
+            auto parse(std::string response) -> std::optional<ClipParsed>;
+            auto getClipState(const ClipState &state)
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
+        } // namespace clip
 
         namespace ccfc
         {
