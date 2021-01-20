@@ -22,7 +22,8 @@ target_sources( ${PROJECT_NAME}
         windows/SettingsMainWindow.cpp
         windows/AddDeviceWindow.cpp
         windows/AllDevicesWindow.cpp
-        windows/APNSettingsWindow.cpp
+        windows/ApnSettingsWindow.cpp
+        windows/ApnOptionsWindow.cpp
         windows/BaseSettingsWindow.cpp
         windows/BluetoothWindow.cpp
         windows/FontSizeWindow.cpp

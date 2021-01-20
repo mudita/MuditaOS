@@ -17,6 +17,7 @@ namespace gui::window::name
 
     inline constexpr auto network        = "Network";
     inline constexpr auto apn_settings   = "APNSettings";
+    inline constexpr auto apn_options    = "APNOptions";
     inline constexpr auto phone_modes    = "PhoneModes";
     inline constexpr auto apps_and_tools = "AppsAndTools";
     inline constexpr auto security       = "Security";
