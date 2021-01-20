@@ -40,14 +40,14 @@ namespace gui
 
         using namespace style::desktop;
 
-        time = new gui::Label(this, timeLabel::X, timeLabel::Y, timeLabel::Width, timeLabel::Hight);
+        time = new gui::Label(this, timeLabel::X, timeLabel::Y, timeLabel::Width, timeLabel::Height);
         time->setFilled(false);
         time->setBorderColor(gui::ColorNoColor);
         time->setFont(style::window::font::supersizemelight);
         time->setText(ttime);
         time->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
 
-        dayText = new gui::Label(this, dayLabel::X, dayLabel::Y, dayLabel::Width, dayLabel::Hight);
+        dayText = new gui::Label(this, dayLabel::X, dayLabel::Y, dayLabel::Width, dayLabel::Height);
         dayText->setFilled(false);
         dayText->setBorderColor(gui::ColorNoColor);
         dayText->setFont(style::window::font::biglight);
