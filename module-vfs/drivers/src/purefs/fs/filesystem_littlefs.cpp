@@ -282,14 +282,17 @@ namespace purefs::fs::drivers
         }
         auto lerr = lfs_fs_size(vmnt->lfs_mount());
         if (lerr >= 0) {
-            std::memset(&stat, 0, sizeof stat);
-            stat.f_bfree   = stat.f_blocks - lerr;
-            lerr           = 0;
             const auto cfg = vmnt->lfs_config();
+            std::memset(&stat, 0, sizeof stat);
+            stat.f_blocks  = cfg->block_count;
+            stat.f_bfree   = stat.f_blocks - lerr;
+            stat.f_bavail  = stat.f_bfree;
+            lerr           = 0;
             stat.f_bsize   = cfg->prog_size;
             stat.f_frsize  = cfg->block_size;
             stat.f_blocks  = cfg->block_count;
             stat.f_namemax = PATH_MAX;
+            stat.f_flag    = vmnt->flags();
         }
         return lfs_to_errno(lerr);
     }
