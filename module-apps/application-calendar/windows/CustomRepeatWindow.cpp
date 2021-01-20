@@ -39,7 +39,8 @@ namespace gui
                                  style::window::calendar::listView_y,
                                  style::window::calendar::listView_w,
                                  style::window::calendar::listView_h,
-                                 customRepeatModel);
+                                 customRepeatModel,
+                                 style::listview::ScrollBarType::None);
         setFocusItem(list);
     }
 

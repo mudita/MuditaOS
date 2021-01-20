@@ -82,8 +82,13 @@ namespace app::notes
                                      windowStyle::search_image::ImageSource);
 
         namespace listStyle = app::notes::style::list;
-        list                = new gui::ListView(
-            this, listStyle::X, listStyle::Y, listStyle::Width, listStyle::Height, presenter->getNotesItemProvider());
+        list                = new gui::ListView(this,
+                                 listStyle::X,
+                                 listStyle::Y,
+                                 listStyle::Width,
+                                 listStyle::Height,
+                                 presenter->getNotesItemProvider(),
+                                 ::style::listview::ScrollBarType::Fixed);
         list->setPenWidth(listStyle::PenWidth);
         list->setPenFocusWidth(listStyle::FocusedPenWidth);
         list->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -42,25 +42,22 @@ namespace app
 
         gui::ListItem *getRecord(gui::Order order)
         {
-            unsigned int index = 0;
+            auto index = 0;
             if (order == gui::Order::Previous) {
-                index = internalOffset + internalLimit - 1 - modelIndex;
+                index = internalOffset + internalLimit - 1 + modelIndex;
+
+                modelIndex--;
             }
             if (order == gui::Order::Next) {
                 index = internalOffset + modelIndex;
+
+                modelIndex++;
             }
 
-            if (isValidIndex(index, order)) {
-
-                return getNextInternalDataElement(index);
-            }
-            else {
-
-                return nullptr;
-            }
+            return getInternalDataElement(index, order);
         }
 
-        [[nodiscard]] bool isValidIndex(unsigned int index, gui::Order order) const
+        [[nodiscard]] bool isIndexValid(unsigned int index, gui::Order order) const noexcept
         {
             return (index < internalData.size()) || (order == gui::Order::Previous && index < internalOffset);
         }
@@ -73,11 +70,15 @@ namespace app
             Item->clearNavigationItem(gui::NavigationDirection::DOWN);
         }
 
-        gui::ListItem *getNextInternalDataElement(unsigned int index)
+        [[nodiscard]] gui::ListItem *getInternalDataElement(unsigned int index, gui::Order order)
         {
-            modelIndex++;
-            clearItemProperties(internalData[index]);
-            return internalData[index];
+            if (isIndexValid(index, order)) {
+                clearItemProperties(internalData[index]);
+                return internalData[index];
+            }
+            else {
+                return nullptr;
+            }
         }
     };
 

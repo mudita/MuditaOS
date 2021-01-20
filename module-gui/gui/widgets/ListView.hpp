@@ -16,20 +16,50 @@ namespace gui
 
     using rebuildRequest = std::pair<style::listview::RebuildType, unsigned int>;
 
+    struct ListViewScrollUpdateData
+    {
+        const unsigned int startIndex;
+        const unsigned int listPageSize;
+        const unsigned int elementsCount;
+        const unsigned int elementMinimalHeight;
+        const style::listview::Direction direction;
+        const style::listview::Boundaries boundaries;
+        const int topMargin;
+    };
+
     class ListViewScroll : public Rect
     {
+      private:
+        unsigned int storedStartIndex = 0;
+        unsigned int currentPage      = style::listview::nPos;
+        unsigned int pagesCount       = 0;
+
+        void updateProportional(const ListViewScrollUpdateData &data);
+        void updateFixed(const ListViewScrollUpdateData &data);
+        void updatePreRendered(const ListViewScrollUpdateData &data);
+
       public:
-        ListViewScroll(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        style::listview::ScrollBarType type = style::listview::ScrollBarType::None;
+
+        ListViewScroll(Item *parent,
+                       unsigned int x,
+                       unsigned int y,
+                       unsigned int w,
+                       unsigned int h,
+                       style::listview::ScrollBarType type);
 
         bool shouldShowScroll(unsigned int listPageSize, unsigned int elementsCount);
-        void update(unsigned int startIndex, unsigned int listPageSize, unsigned int elementsCount, int topMargin);
+        void updateStartConditions(const unsigned int storedStartIndex,
+                                   const unsigned int currentPage,
+                                   const unsigned int pagesCount);
+        void update(const ListViewScrollUpdateData &data);
     };
 
     class ListView : public Rect
     {
       protected:
         unsigned int startIndex                    = 0;
-        unsigned int storedFocusIndex              = 0;
+        unsigned int storedFocusIndex              = style::listview::nPos;
         unsigned int elementsCount                 = 0;
         std::shared_ptr<ListItemProvider> provider = nullptr;
         VBox *body                                 = nullptr;
@@ -48,6 +78,12 @@ namespace gui
 
         void clearItems();
         virtual void addItemsOnPage();
+
+        bool requestCompleteData   = false;
+        bool requestFullListRender = false;
+        bool renderFullList();
+        void checkFullRenderRequirement();
+
         void setFocus();
         void refresh();
         void resizeWithScroll();
@@ -55,11 +91,13 @@ namespace gui
         void fillFirstPage();
         void setStartIndex();
         void recalculateOnBoxRequestedResize();
+        [[nodiscard]] unsigned int getFocusItemIndex();
         /// Default empty list to inform that there is no elements - callback should be override in applications
         void onElementsCountChanged();
         unsigned int calculateMaxItemsOnPage();
         unsigned int calculateLimit(style::listview::Direction value = style::listview::Direction::Bottom);
-        Order getOrderFromDirection();
+        [[nodiscard]] Order getOrderFromDirection() const noexcept;
+        [[nodiscard]] Order getOppositeOrderFromDirection() const noexcept;
         virtual bool requestNextPage();
         virtual bool requestPreviousPage();
         void setup(style::listview::RebuildType rebuildType, unsigned int dataOffset = 0);
@@ -67,10 +105,10 @@ namespace gui
       public:
         ListView();
         ListView(Item *parent,
-                 uint32_t x,
-                 uint32_t y,
-                 uint32_t w,
-                 uint32_t h,
+                 unsigned int x,
+                 unsigned int y,
+                 unsigned int w,
+                 unsigned int h,
                  std::shared_ptr<ListItemProvider> prov,
                  style::listview::ScrollBarType scrollType = style::listview::ScrollBarType::Proportional);
         ~ListView();
