@@ -174,7 +174,7 @@ extern "C" {
                 dirp->dir_data.d_ino = stdata.st_ino;
                 dirp->dir_data.d_type = S_ISREG(stdata.st_mode)?DT_REG:DT_DIR;
                 dirp->dir_data.d_reclen = fname.size();
-                std::strncpy(dirp->dir_data.d_name,fname.c_str(), sizeof(dirp->dir_data.d_name));
+                std::strncpy(dirp->dir_data.d_name,fname.c_str(), sizeof(dirp->dir_data.d_name)-1);
                 ret = &dirp->dir_data;
             }
         } else {
