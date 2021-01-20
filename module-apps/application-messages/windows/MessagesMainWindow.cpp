@@ -53,7 +53,8 @@ namespace gui
                                  msgThreadStyle::ListPositionY,
                                  msgThreadStyle::listWidth,
                                  msgThreadStyle::listHeight,
-                                 threadsModel);
+                                 threadsModel,
+                                 style::listview::ScrollBarType::Fixed);
         list->setScrollTopMargin(style::margins::small);
         list->rebuildList();
 

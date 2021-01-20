@@ -37,7 +37,8 @@ namespace gui
                                  msgThreadStyle::ListPositionY,
                                  msgThreadStyle::listWidth,
                                  msgThreadStyle::listHeight,
-                                 model);
+                                 model,
+                                 style::listview::ScrollBarType::Fixed);
         list->setScrollTopMargin(style::margins::small);
         setFocusItem(list);
 

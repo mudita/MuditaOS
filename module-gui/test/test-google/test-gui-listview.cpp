@@ -239,11 +239,11 @@ TEST_F(ListViewTesting, Continuous_Type_Test)
     moveNTimes(1, style::listview::Direction::Top);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate top by one - page should change to last page";
     testListView->listBorderReached = false;
-    ASSERT_EQ(4, testListView->currentPageSize) << "4 elements should be displayed";
+    ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should be displayed";
 
     ASSERT_EQ(9, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
         << "First element ID should be 9";
-    ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
+    ASSERT_EQ(3, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
         << "Last element ID should be 3 (9 - 6)";
     ASSERT_EQ(style::listview::Direction::Top, testListView->direction) << "List Direction should be Top";
 
@@ -251,11 +251,11 @@ TEST_F(ListViewTesting, Continuous_Type_Test)
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate top by page size - page should change";
     testListView->listBorderReached = false;
     ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should be displayed";
-    ASSERT_EQ(5, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
-        << "First element ID should be 5";
-    ASSERT_EQ(0, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
-        << "Last element ID should be 0";
-    ASSERT_EQ(style::listview::Direction::Top, testListView->direction) << "List Direction should be Top";
+    ASSERT_EQ(0, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
+        << "First element ID should be 0";
+    ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
+        << "Last element ID should be 6";
+    ASSERT_EQ(style::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
 
     moveNTimes(1, style::listview::Direction::Bottom);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate bot by one - page should change";
