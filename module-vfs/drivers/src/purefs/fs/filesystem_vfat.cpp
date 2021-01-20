@@ -236,7 +236,7 @@ namespace purefs::fs::drivers
         stat.f_blocks  = (fatfs->n_fatent - 2);
         stat.f_bfree   = xfree;
         stat.f_bavail  = xfree;
-        stat.f_flag    = 0; // TODO: Flags later
+        stat.f_flag    = vmnt->flags();
         stat.f_files   = 0;
         stat.f_ffree   = 0;
         stat.f_favail  = 0;
