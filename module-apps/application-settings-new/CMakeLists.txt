@@ -67,8 +67,8 @@ target_sources( ${PROJECT_NAME}
         widgets/SettingsStyle.hpp
         windows/AutolockWindow.hpp
         windows/WallpaperWindow.hpp
-        windows/SystemMainWindow.hpp
         windows/ChangePasscodeWindow.hpp
+        windows/SystemMainWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)
