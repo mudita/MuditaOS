@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <littlefs/lfs.h>
@@ -200,7 +200,7 @@ static int add_to_lfs(lfs_t *lfs, const char *dir, struct lfs_info_summary *summ
             summary->directories_added++;
         }
     }
-    else if (is_file) {
+    else { // is_file
         err = create_file_in_lfs(lfs, host_dir, tgt_dir, verbose);
         if (!err) {
             summary->files_added++;
