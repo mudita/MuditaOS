@@ -234,18 +234,15 @@ namespace app
         windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SecurityMainWindow>(app);
         });
-
-        windowsFactory.attach(gui::window::name::system, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::SystemMainWindow>(app);
-        });
-
         windowsFactory.attach(gui::window::name::change_passcode, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ChangePasscodeWindow>(app);
         });
         windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
         });
-
+        windowsFactory.attach(gui::window::name::system, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::SystemMainWindow>(app);
+        });
         windowsFactory.attach(gui::window::name::new_apn, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NewApnWindow>(app);
         });
