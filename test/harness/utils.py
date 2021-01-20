@@ -156,7 +156,8 @@ class Timeout(Exception):
 
     @classmethod
     @contextmanager
-    def limit(cls, seconds):
+    def limit(cls, seconds: int):
+        assert seconds >= 1, "Timeout must be at least 1 second !"
         def signal_handler(signum, frame):
             raise Timeout("Timed out!")
 
