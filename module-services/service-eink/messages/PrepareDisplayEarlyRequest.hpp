@@ -9,10 +9,10 @@
 
 namespace service::eink
 {
-    class PrepareDisplayRequest : public EinkMessage
+    class PrepareDisplayEarlyRequest : public EinkMessage
     {
       public:
-        explicit PrepareDisplayRequest(::gui::RefreshModes refreshMode);
+        explicit PrepareDisplayEarlyRequest(::gui::RefreshModes refreshMode);
 
         [[nodiscard]] auto getRefreshMode() const noexcept -> ::gui::RefreshModes;
 

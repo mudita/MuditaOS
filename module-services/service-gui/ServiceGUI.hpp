@@ -61,7 +61,7 @@ namespace service::gui
         void cacheRender(int contextId, ::gui::RefreshModes refreshMode);
         void invalidateCache();
 
-        void prepareDisplay(::gui::RefreshModes refreshMode);
+        void prepareDisplayEarly(::gui::RefreshModes refreshMode);
         void notifyRenderer(std::list<std::unique_ptr<::gui::DrawCommand>> &&commands, ::gui::RefreshModes refreshMode);
         void enqueueDrawCommands(DrawCommandsQueue::QueueItem &&item);
         void sendOnDisplay(::gui::Context *context, int contextId, ::gui::RefreshModes refreshMode);
@@ -74,7 +74,7 @@ namespace service::gui
 
         sys::MessagePointer handleDrawMessage(sys::Message *message);
         sys::MessagePointer handleGUIRenderingFinished(sys::Message *message);
-        sys::MessagePointer handleEinkReady(sys::Message *message);
+        sys::MessagePointer handleEinkInitialized(sys::Message *message);
         sys::MessagePointer handleImageDisplayedNotification(sys::Message *message);
 
         std::unique_ptr<ContextPool> contextPool;
