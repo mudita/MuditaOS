@@ -25,6 +25,7 @@ namespace {
         "/run/user",
         "/home",
         "/proc",
+        "/tmp",
         "/dev/shm",
         "PurePhone.img",
         "MuditaOS.log",
