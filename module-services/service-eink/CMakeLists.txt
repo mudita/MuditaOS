@@ -16,7 +16,7 @@ set(SOURCES
     ServiceEink.cpp
     EinkDisplay.cpp
     messages/ImageMessage.cpp
-    messages/PrepareDisplayRequest.cpp
+    messages/PrepareDisplayEarlyRequest.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

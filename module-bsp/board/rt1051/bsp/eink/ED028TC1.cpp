@@ -65,8 +65,6 @@
 
 #define _delay_ms(ms) vTaskDelay(pdMS_TO_TICKS(ms))
 
-#define EINK_SUSPEND_TASK_TILL_EPD_BUSY() BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(1000))
-
 //#define EINK_DEBUG_LOG  1
 //
 //#if EINK_DEBUG_LOG == 1
@@ -81,14 +79,11 @@ using namespace magic_enum;
 static std::shared_ptr<drivers::DriverDMA> dma;
 static std::shared_ptr<drivers::DriverDMAMux> dmamux;
 
-#define EINK_LUTS_FILE_PATH "/Luts.bin"
-
 /* Internal variable definitions */
 static uint8_t s_einkIsPoweredOn = false; //  Variable which contains the state of the power of the EPD display
 
 static EinkWaveforms_e s_einkConfiguredWaveform =
     EinkWaveformGC16;                          //  This variable contains the current waveform set in the display
-static int8_t s_einkPreviousTemperature = 127; //  This variable contains the last measured temperature of the ambient
 
 static CACHEABLE_SECTION_SDRAM(uint8_t s_einkServiceRotatedBuf[BOARD_EINK_DISPLAY_RES_X * BOARD_EINK_DISPLAY_RES_Y / 2 +
                                                                2]); // Plus 2 for the EPD command and BPP config
@@ -548,7 +543,7 @@ void EinkPowerOn()
             return;
         }
 
-        EINK_SUSPEND_TASK_TILL_EPD_BUSY();
+        BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
         s_einkIsPoweredOn = true;
     }
 }
@@ -563,7 +558,7 @@ void EinkPowerOff()
             return;
         }
 
-        EINK_SUSPEND_TASK_TILL_EPD_BUSY();
+        BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
         s_einkIsPoweredOn = false;
     }
 }
@@ -590,7 +585,7 @@ int16_t EinkGetTemperatureInternal()
         return -1;
     }
 
-    EINK_SUSPEND_TASK_TILL_EPD_BUSY();
+    BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
 
     if (BSP_EinkReadData(temp, sizeof(temp), SPI_MANUAL_CS) != 0) {
         //        LOG_ERROR("Requesting the temperature FAILED");
@@ -641,8 +636,8 @@ static void s_EinkSetInitialConfig()
     }
 
     tmpbuf[0] = EinkPanelSetting;      // 0x00
-    tmpbuf[1] = LUT_SEL | SHL | RST_N; // 0x25 -> _XON _RES0 LUT_SEL _DM - SHL _SPIWM RST_N // If 0x35 (DM - 1 is used
-                                       // (2bpp)) the SPI speed can be 25MHz
+    tmpbuf[1] = LUT_SEL | SHL | RST_N; // 0x25 -> _XON _RES0 LUT_SEL _DM - SHL _SPIWM RST_N
+                                       // If 0x35 (DM - 1 is used (2bpp)) the SPI speed can be 25MHz
     tmpbuf[2] = 0x00;
     if (BSP_EinkWriteData(tmpbuf, 3, SPI_AUTOMATIC_CS) != 0) {
         //         LOG_ERROR("Setting the initial configuration for the Eink failed");
@@ -747,13 +742,9 @@ EinkStatus_e EinkResetAndInitialize()
     return EinkOK;
 }
 
-EinkStatus_e EinkUpdateWaveform(const EinkWaveFormSettings_t *settings)
+EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings)
 {
-    // If neither the temperature nor the waveform has changed - do nothing
-    if ((settings->temperature == s_einkPreviousTemperature) && (settings->mode == s_einkConfiguredWaveform)) {
-        return EinkOK;
-    }
-
+    /// LUTD
     if (BSP_EinkWriteData(settings->LUTDData, settings->LUTDSize, SPI_AUTOMATIC_CS) != 0) {
         EinkResetAndInitialize();
         return EinkSPIErr;
@@ -1015,7 +1006,7 @@ EinkStatus_e EinkRefreshImage(
         return EinkSPIErr;
     }
 
-    EINK_SUSPEND_TASK_TILL_EPD_BUSY();
+    BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout));
 
     return EinkOK;
 }
