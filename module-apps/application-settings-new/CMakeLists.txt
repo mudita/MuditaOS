@@ -44,6 +44,7 @@ target_sources( ${PROJECT_NAME}
         windows/ChangePasscodeWindow.cpp
         widgets/SpinBox.cpp
         widgets/SpinBoxOptionSetting.cpp
+        windows/SystemMainWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -60,6 +61,7 @@ target_sources( ${PROJECT_NAME}
         widgets/SettingsStyle.hpp
         windows/AutolockWindow.hpp
         windows/WallpaperWindow.hpp
+        windows/SystemMainWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

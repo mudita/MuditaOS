@@ -6,9 +6,18 @@ if (CMAKE_CROSSCOMPILING)
         COMMAND ${CMAKE_COMMAND}
         -DCMAKE_BUILD_TYPE:STRING="Release"
         -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE:PATH="${CMAKE_BINARY_DIR}"
-        -B"build"
+        -B"lfsfuse"
         -H"${CMAKE_SOURCE_DIR}/host-tools/littlefs-fuse"
-        COMMAND ${CMAKE_COMMAND} --build build --config Release
+        COMMAND ${CMAKE_COMMAND} --build lfsfuse --config Release
+    )
+    add_custom_target(
+        genlittlefs ALL
+        COMMAND ${CMAKE_COMMAND}
+        -DCMAKE_BUILD_TYPE:STRING="Release"
+        -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE:PATH="${CMAKE_BINARY_DIR}"
+        -B"genlittlefs"
+        -H"${CMAKE_SOURCE_DIR}/host-tools/genlittlefs"
+        COMMAND ${CMAKE_COMMAND} --build genlittlefs --config Release
     )
 else()
     set(_genlittlefs "${CMAKE_BINARY_DIR}/genlittlefs${CMAKE_EXECUTABLE_SUFFIX}")
