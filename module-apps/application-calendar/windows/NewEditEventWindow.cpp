@@ -35,7 +35,8 @@ namespace gui
                                  style::window::calendar::listView_y,
                                  style::window::calendar::listView_w,
                                  style::window::calendar::listView_h,
-                                 newEditEventModel);
+                                 newEditEventModel,
+                                 style::listview::ScrollBarType::PreRendered);
         setFocusItem(list);
     }
 
@@ -54,7 +55,7 @@ namespace gui
         if (mode == ShowMode::GUI_SHOW_INIT) {
             auto rec = dynamic_cast<EventRecordData *>(data);
             if (rec != nullptr) {
-                eventRecord    = rec->getData();
+                eventRecord = rec->getData();
             }
             newEditEventModel->loadData(eventRecord);
         }

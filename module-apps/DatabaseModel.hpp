@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,14 +17,13 @@ namespace app
     template <class T> class DatabaseModel
     {
       protected:
-        /// Pointer to application that owns the model
-        Application *application = nullptr;
-        uint32_t recordsCount    = 0;
+        Application *application  = nullptr;
+        unsigned int recordsCount = 0;
+        int modelIndex            = 0;
         std::vector<std::shared_ptr<T>> records;
-        uint32_t modelIndex = 0;
 
       public:
-        DatabaseModel(Application *app) : application{app}, recordsCount{0}
+        explicit DatabaseModel(Application *app) : application{app}, recordsCount{0}
         {}
 
         virtual ~DatabaseModel()
@@ -50,7 +49,7 @@ namespace app
             }
         }
 
-        virtual void clear()
+        void clear()
         {
             records.clear();
             recordsCount = 0;
@@ -58,21 +57,29 @@ namespace app
 
         std::shared_ptr<T> getRecord(gui::Order order)
         {
-            auto index = modelIndex;
+            auto index = 0;
+            if (order == gui::Order::Next) {
+                index = modelIndex;
 
-            if (index >= records.size()) {
+                modelIndex++;
+            }
+            else if (order == gui::Order::Previous) {
+                index = records.size() - 1 + modelIndex;
+
+                modelIndex--;
+            }
+
+            if (isIndexValid(index)) {
+                return records[index];
+            }
+            else {
                 return nullptr;
             }
+        }
 
-            if (order == gui::Order::Previous) {
-                index = records.size() - 1 - modelIndex;
-            }
-
-            auto item = records[index];
-
-            modelIndex++;
-
-            return item;
+        [[nodiscard]] bool isIndexValid(unsigned int index) const noexcept
+        {
+            return index < records.size();
         }
     };
 

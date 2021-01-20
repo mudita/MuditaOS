@@ -38,7 +38,8 @@ namespace gui
                                      style::window::calendar::listView_y,
                                      style::window::calendar::listView_w,
                                      style::window::calendar::listView_h,
-                                     eventDetailModel);
+                                     eventDetailModel,
+                                     style::listview::ScrollBarType::PreRendered);
 
         setFocusItem(bodyList);
     }

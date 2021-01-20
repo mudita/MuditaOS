@@ -47,7 +47,13 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        list = new gui::ListView(this, mainWindow::x, mainWindow::y, mainWindow::w, mainWindow::h, calllogModel);
+        list = new gui::ListView(this,
+                                 mainWindow::x,
+                                 mainWindow::y,
+                                 mainWindow::w,
+                                 mainWindow::h,
+                                 calllogModel,
+                                 style::listview::ScrollBarType::Fixed);
 
         setFocusItem(list);
     }

@@ -59,7 +59,8 @@ namespace gui
                                       musicPlayerStyle::allSongsWindow::y,
                                       musicPlayerStyle::allSongsWindow::w,
                                       musicPlayerStyle::allSongsWindow::h,
-                                      songsModel);
+                                      songsModel,
+                                      style::listview::ScrollBarType::Fixed);
 
         auto successCallback = [this](const audio::Volume &volume) {
             auto volumeText = audio::GetVolumeText(volume);

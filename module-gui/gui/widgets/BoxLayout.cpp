@@ -100,6 +100,11 @@ namespace gui
         Item::erase();
     }
 
+    bool BoxLayout::empty() const noexcept
+    {
+        return children.empty();
+    }
+
     void BoxLayout::setVisible(bool value, bool previous)
     {
         visible = value; // maybe use parent setVisible(...)? would be better but which one?

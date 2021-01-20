@@ -36,7 +36,8 @@ namespace gui
                                      phonebookStyle::contactDetailsWindow::contactDetailsList::y,
                                      phonebookStyle::contactDetailsWindow::contactDetailsList::w,
                                      phonebookStyle::contactDetailsWindow::contactDetailsList::h,
-                                     contactDetailsModel);
+                                     contactDetailsModel,
+                                     style::listview::ScrollBarType::PreRendered);
         setFocusItem(bodyList);
     }
 

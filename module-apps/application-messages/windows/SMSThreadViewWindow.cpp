@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSThreadViewWindow.hpp"
@@ -37,7 +37,8 @@ namespace gui
                                     style::messages::smsList::y,
                                     style::messages::smsList::w,
                                     style::messages::smsList::h,
-                                    smsModel);
+                                    smsModel,
+                                    style::listview::ScrollBarType::Proportional);
         smsList->setOrientation(style::listview::Orientation::BottomTop);
 
         setFocusItem(smsList);

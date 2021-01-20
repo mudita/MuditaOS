@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <limits>
 #include <gui/core/Color.hpp>
 #include <gui/Common.hpp>
 #include <Alignment.hpp>
@@ -178,6 +179,8 @@ namespace style
 
     namespace listview
     {
+        inline constexpr auto nPos = std::numeric_limits<unsigned int>::max();
+
         /// Possible List boundaries handling types
         enum class Boundaries
         {
@@ -208,7 +211,12 @@ namespace style
         {
             None,         ///< None - list without scroll bar (but with scrolling).
             Proportional, ///< Proportional - scroll bar size calculated based on elements count in model and currently
-                          ///< displayed number of elements.
+                          ///< displayed number of elements. Use with large unequal heights lists elements.
+            Fixed,        ///< Fixed - scroll bar size calculated based on fixed equal elements sizes in list.
+                          ///< Use when all elements have equal heights.
+            PreRendered   ///< PreRendered - scroll bar size calculated based on pre rendered pages on whole list. Use
+                          ///< when elements are not equal heights but there are few of them as its renders whole
+                          ///< context and can be time consuming.
         };
 
         enum class Orientation
