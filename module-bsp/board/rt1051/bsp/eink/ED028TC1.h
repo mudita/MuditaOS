@@ -297,6 +297,8 @@ extern "C"
         EinkWaveforms_e mode;
         // temperature of surrounding
         int32_t temperature;
+        // counts usage of this waveform (display refreshes)
+        uint32_t useCounter;
         // pointer to lookup table for lut c
         uint8_t *LUTCData;
         // sizeo of lutc data
@@ -305,7 +307,7 @@ extern "C"
         uint8_t *LUTDData;
         // size of lutd data
         uint32_t LUTDSize;
-    } EinkWaveFormSettings_t;
+    } EinkWaveformSettings_t;
 
     /* Exported constants --------------------------------------------------------*/
 
@@ -419,7 +421,7 @@ extern "C"
      * @param LUTCData [in] - Data
      * @return
      */
-    EinkStatus_e EinkUpdateWaveform(const EinkWaveFormSettings_t *settings);
+    EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings);
 
     /**
      * This function converts the ARGB image to the L4 format

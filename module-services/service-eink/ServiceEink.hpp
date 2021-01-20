@@ -41,7 +41,7 @@ namespace service::eink
 
         sys::MessagePointer handleEinkModeChangedMessage(sys::Message *message);
         sys::MessagePointer handleImageMessage(sys::Message *message);
-        sys::MessagePointer handlePrepareRequest(sys::Message *message);
+        sys::MessagePointer handlePrepareEarlyRequest(sys::Message *message);
 
         EinkDisplay display;
         State currentState;
