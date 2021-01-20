@@ -65,7 +65,8 @@ enum class BoardDefinitions
     CELLULAR_GPIO_2_RESET_PIN = 17,
     CELLULAR_GPIO_2_RI_PIN = 21,
     CELLULAR_GPIO_2_APRDY_PIN = 16,
-    CELLULAR_GPIO_2_WAKEUP_PIN = 19,
+    CELLULAR_GPIO_2_WAKEUP_PIN = 22, /// GPIO_B1_06, long time no see. Active low, external pull-down 10kΩ
+    CELLULAR_GPIO_2_WIRELESS_DISABLE_PIN = 23, /// GPIO_B1_07, pull-up in modem, active low, equiv. AT+CFUN=4, see docs
     CELLULAR_GPIO_2_SIM_TRAY_INSERTED_PIN = 11,
     CELLULAR_GPIO_2_NC = 10, // GPIO_B0_10
     CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN = 9,
@@ -95,9 +96,6 @@ enum class BoardDefinitions
 
     VIBRATOR_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
     VIBRATOR_EN = 0, // GPIO_AD_B0_00
-
-    TORCH_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
-    TORCH_EN = 21, // GPIO_AD_B1_05
 
 	MAGNETOMETER_I2C = AUDIOCODEC_I2C,
 	MAGNETOMETER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
