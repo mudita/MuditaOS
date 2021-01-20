@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "APNSettingsWindow.hpp"
+#include "ApnSettingsWindow.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/widgets/SettingsStyle.hpp"
 #include "application-settings-new/data/SettingsItemData.hpp"
@@ -12,12 +12,12 @@
 namespace gui
 {
 
-    APNSettingsWindow::APNSettingsWindow(app::Application *app) : OptionWindow(app, gui::window::name::apn_settings)
+    ApnSettingsWindow::ApnSettingsWindow(app::Application *app) : OptionWindow(app, gui::window::name::apn_settings)
     {
         buildInterface();
     }
 
-    auto APNSettingsWindow::onInput(const InputEvent &inputEvent) -> bool
+    auto ApnSettingsWindow::onInput(const InputEvent &inputEvent) -> bool
     {
         if (inputEvent.isShortPress()) {
             if (inputEvent.is(KeyCode::KEY_LEFT)) {
@@ -30,7 +30,7 @@ namespace gui
         return AppWindow::onInput(inputEvent);
     }
 
-    void APNSettingsWindow::buildInterface()
+    void ApnSettingsWindow::buildInterface()
     {
         setTitle(utils::localize.get("app_settings_network_apn_settings"));
 
@@ -56,7 +56,7 @@ namespace gui
                                  style::window_width,
                                  style::window_height - style::header::height - style::footer::height,
                                  "phonebook_empty_grey_circle_W_G",
-                                 utils::localize.get("app_settings_network_apn_settings_no_apns"));
+                                 utils::localize.get("app_settings_apn_settings_no_apns"));
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
     }

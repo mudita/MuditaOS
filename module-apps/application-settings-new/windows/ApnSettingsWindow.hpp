@@ -8,10 +8,10 @@
 
 namespace gui
 {
-    class APNSettingsWindow : public OptionWindow
+    class ApnSettingsWindow : public OptionWindow
     {
       public:
-        APNSettingsWindow(app::Application *app);
+        ApnSettingsWindow(app::Application *app);
 
       private:
         void buildInterface() override;
