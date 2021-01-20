@@ -197,6 +197,9 @@ namespace purefs::fs
         inline auto invoke_fops(iaccess acc, T Base::*method, std::string_view path, Args &&... args) const
             -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, {}, std::forward<Args>(args)...))
         {
+            if (path.empty()) {
+                return -ENOENT;
+            }
             const auto abspath     = absolute_path(path);
             auto [mountp, pathpos] = find_mount_point(abspath);
             if (!mountp) {
@@ -219,6 +222,9 @@ namespace purefs::fs
                                         Args &&... args) const
             -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, {}, {}, std::forward<Args>(args)...))
         {
+            if (path.empty() || path2.empty()) {
+                return -ENOENT;
+            }
             const auto abspath     = absolute_path(path);
             const auto abspath2    = absolute_path(path2);
             auto [mountp, pathpos] = find_mount_point(abspath);
