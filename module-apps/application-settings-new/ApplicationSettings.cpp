@@ -27,6 +27,7 @@
 #include "windows/SecurityMainWindow.hpp"
 #include "windows/QuotesOptionsWindow.hpp"
 #include "windows/ChangePasscodeWindow.hpp"
+#include "windows/SystemMainWindow.hpp"
 
 #include "Dialog.hpp"
 
@@ -231,6 +232,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SecurityMainWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::system, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::SystemMainWindow>(app);
         });
     }
 
