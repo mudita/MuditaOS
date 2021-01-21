@@ -68,76 +68,80 @@ using namespace parserFSM;
 TEST_CASE("Parser Test")
 {
     StateMachine parser(nullptr);
-    std::string testMessage("#00000");
 
     SECTION("Parse message with divided header and payload")
     {
-        parser.processMessage(testMessage);
+        std::string testMessage("#00000");
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::ReceivedPartialHeader);
 
         testMessage = R"(0050{"endpo)";
-        parser.processMessage(testMessage);
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::ReceivedPartialPayload);
 
         testMessage = R"(int":1, "method":1, "body":{"test":"test"}})";
-        parser.processMessage(testMessage);
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
     }
 
     SECTION("Parse whole message")
     {
-        testMessage = R"(#000000050{"endpoint":1, "method":1, "body":{"test":"test"}})";
-        parser.processMessage(testMessage);
+        std::string testMessage = R"(#000000050{"endpoint":1, "method":1, "body":{"test":"test"}})";
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
     }
 
     SECTION("Parse message with start char detached from mesage")
     {
-        testMessage = R"(#)";
-        parser.processMessage(testMessage);
+        std::string testMessage = R"(#)";
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::ReceivedPartialHeader);
 
         testMessage = R"(000000050{"en)";
-        parser.processMessage(testMessage);
+        testMessage = R"(000000050{"en)";
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::ReceivedPartialPayload);
 
         testMessage = R"(dpoint":1, "method":1, "body":{"test":"test"}})";
-        parser.processMessage(testMessage);
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
     }
 
     SECTION("Parse message with beginning of another one")
     {
-        testMessage = R"(#000000050{"endpoint":1, "method":1, "body":{"test":"test"}}#000000050{"end)";
-        parser.processMessage(testMessage);
+        std::string testMessage = R"(#000000050{"endpoint":1, "method":1, "body":{"test":"test"}}#000000050{"end)";
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::ReceivedPartialPayload);
 
         testMessage = R"(point":1, "method":1, "body":{"test":"test"}})";
-        parser.processMessage(testMessage);
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::ReceivedPayload);
     }
     SECTION("Parse junk message")
     {
-        testMessage = R"({"address": "6 Czeczota St.\n02600 Warsaw"})";
-        parser.processMessage(testMessage);
+        std::string testMessage = R"({"address": "6 Czeczota St.\n02600 Warsaw"})";
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
     SECTION("Parse message with incorrect header length")
     {
-        testMessage = R"(#000000072{"endpoint":7, "method":2, "uuid":3, "body":{"threadID":1,"unread":false}})";
-        parser.processMessage(testMessage);
+        std::string testMessage =
+            R"(#000000072{"endpoint":7, "method":2, "uuid":3, "body":{"threadID":1,"unread":false}})";
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
     SECTION("Parse message with damaged json ")
     {
-        testMessage = R"(#000000074{"endpoint":7, "method":2, "uuid":3, "bo}}dy":{"threadID":1,"unread":false)";
-        parser.processMessage(testMessage);
+        std::string testMessage =
+            R"(#000000074{"endpoint":7, "method":2, "uuid":3, "bo}}dy":{"threadID":1,"unread":false)";
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
     SECTION("Parse message with damaged json and incorrect header length")
     {
-        testMessage = R"(#000000072{"endpoint":7, "method":2, "uuid":3, "bo}}dy":{"threadID":1,"unread":false)";
-        parser.processMessage(testMessage);
+        std::string testMessage =
+            R"(#000000072{"endpoint":7, "method":2, "uuid":3, "bo}}dy":{"threadID":1,"unread":false)";
+        parser.processMessage(std::move(testMessage));
         REQUIRE(parser.getCurrentState() == State::NoMsg);
     }
 }

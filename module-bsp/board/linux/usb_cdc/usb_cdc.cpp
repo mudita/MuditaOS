@@ -32,7 +32,6 @@ namespace bsp
     {
         LOG_INFO("[ServiceDesktop:BSP_Driver] Start reading on fd:%d", fd);
         char inputData[SERIAL_BUFFER_LEN];
-        static std::string receiveMsg;
 
         while (1) {
             if (uxQueueSpacesAvailable(USBReceiveQueue) != 0) {
@@ -61,7 +60,7 @@ namespace bsp
                         continue;
                     }
 #endif
-                    receiveMsg = std::string(inputData, inputData + length);
+                    std::string *receiveMsg = new std::string(inputData, inputData + length);
                     xQueueSend(USBReceiveQueue, &receiveMsg, portMAX_DELAY);
                 }
                 else {

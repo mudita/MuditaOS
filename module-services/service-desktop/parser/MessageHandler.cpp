@@ -23,7 +23,7 @@ using namespace parserFSM;
 
 xQueueHandle MessageHandler::sendQueue;
 
-MessageHandler::MessageHandler(std::string &message, sys::Service *OwnerService) : OwnerServicePtr(OwnerService)
+MessageHandler::MessageHandler(const std::string &message, sys::Service *OwnerService) : OwnerServicePtr(OwnerService)
 {
     try {
         messageJson = json11::Json::parse(message, JsonErrorMsg);
@@ -53,10 +53,10 @@ void MessageHandler::processMessage()
     }
 }
 
-void MessageHandler::putToSendQueue(const std::string msg)
+void MessageHandler::putToSendQueue(const std::string &msg)
 {
     if (uxQueueSpacesAvailable(sendQueue) != 0) {
-        auto *responseString = new std::string(msg);
+        auto responseString = new std::string(msg);
         xQueueSend(sendQueue, &responseString, portMAX_DELAY);
     }
 }
