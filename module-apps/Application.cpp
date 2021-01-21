@@ -501,7 +501,8 @@ namespace app
 
         settings->registerValueChange(
             settings::SystemProperties::lockScreenPasscodeIsOn,
-            [this](const std::string &value) { setLockScreenPasscodeOn(utils::getNumericValue<bool>(value)); });
+            [this](const std::string &value) { setLockScreenPasscodeOn(utils::getNumericValue<bool>(value)); },
+            settings::SettingsScope::Global);
         return sys::ReturnCodes::Success;
     }
 
