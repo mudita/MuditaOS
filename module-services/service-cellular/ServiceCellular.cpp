@@ -204,8 +204,6 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         sys::Bus::SendMulticast(msg.value(), sys::BusChannels::ServiceCellularNotifications, this);
     };
     registerMessageHandlers();
-    settings->registerValueChange(settings::Cellular::volte_on,
-                                  [this](const std::string &value) { volteChanged(value); });
     packetData = std::make_unique<packet_data::PacketData>(*this);
     packetData->loadAPNSettings();
 }
@@ -235,6 +233,8 @@ sys::ReturnCodes ServiceCellular::InitHandler()
     board = EventManagerServiceAPI::GetBoard(this);
 
     state.set(this, State::ST::WaitForStartPermission);
+    settings->registerValueChange(settings::Cellular::volte_on,
+                                  [this](const std::string &value) { volteChanged(value); });
     return sys::ReturnCodes::Success;
 }
 

@@ -106,6 +106,14 @@ namespace app::manager
     {
         registerMessageHandlers();
         blockingTimer->connect([this](sys::Timer &) { onPhoneLocked(); });
+    }
+
+    sys::ReturnCodes ApplicationManager::InitHandler()
+    {
+        blockingTimer->setInterval(default_application_locktime_ms);
+        utils::localize.setFallbackLanguage(utils::localize.DefaultLanguage);
+        utils::localize.setDisplayLanguage(displayLanguage);
+        utils::localize.setInputLanguage(inputLanguage);
         settings->registerValueChange(
             settings::SystemProperties::displayLanguage,
             [this](std::string value) { displayLanguageChanged(value); },
@@ -118,14 +126,6 @@ namespace app::manager
             settings::SystemProperties::lockTime,
             [this](std::string value) { lockTimeChanged(value); },
             settings::SettingsScope::Global);
-    }
-
-    sys::ReturnCodes ApplicationManager::InitHandler()
-    {
-        blockingTimer->setInterval(default_application_locktime_ms);
-        utils::localize.setFallbackLanguage(utils::localize.DefaultLanguage);
-        utils::localize.setDisplayLanguage(displayLanguage);
-        utils::localize.setInputLanguage(inputLanguage);
 
         startSystemServices();
         startBackgroundApplications();

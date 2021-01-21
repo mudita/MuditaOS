@@ -211,11 +211,13 @@ auto SettingsAgent::handleSetVariable(sys::Message *req) -> sys::MessagePointer
         auto oldValue = dbGetValue(path);
         if (oldValue.has_value() && oldValue.value() != value) {
             dbSetValue(path, value);
+            LOG_DEBUG("[SettingsAgent::handleSetVariable] %s=%s", path.to_string().c_str(), value.c_str());
             for (auto regPath : variableChangeRecipents[path.to_string()]) {
                 if (regPath.service != path.service) {
                     auto updateMsg =
                         std::make_shared<settings::Messages::VariableChanged>(regPath, value, oldValue.value_or(""));
                     sys::Bus::SendUnicast(std::move(updateMsg), regPath.service, parentService);
+                    LOG_DEBUG("[SettingsAgent::handleSetVariable] notified service: %s", regPath.service.c_str());
                 }
             }
         }
@@ -234,6 +236,10 @@ auto SettingsAgent::handleRegisterOnVariableChange(sys::Message *req) -> sys::Me
                 auto currentValue                         = dbGetValue(path).value_or("");
                 auto msgValue = std::make_shared<::settings::Messages::VariableChanged>(path, currentValue, "");
                 sys::Bus::SendUnicast(std::move(msgValue), msg->sender, parentService);
+                LOG_DEBUG("[SettingsAgent::handleRegisterOnVariableChange] %s=%s to %s",
+                          path.to_string().c_str(),
+                          currentValue.c_str(),
+                          msg->sender.c_str());
             }
             else {
                 it->second.insert(path);
@@ -251,6 +257,7 @@ auto SettingsAgent::handleUnregisterOnVariableChange(sys::Message *req) -> sys::
             auto it = variableChangeRecipents.find(path.to_string());
             if (variableChangeRecipents.end() != it) {
                 it->second.erase(path);
+                LOG_DEBUG("[SettingsAgent::handleUnregisterOnVariableChange] %s", path.to_string().c_str());
             }
         }
     }

@@ -68,17 +68,10 @@ namespace app
             Store::GSM::get()->sim == selectedSim) {
             selectedSimNumber = CellularServiceAPI::GetOwnNumber(this);
         }
-        settings->registerValueChange(settings::operators_on,
-                                      [this](const std::string &value) { operatorOnChanged(value); });
-
-        settings->registerValueChange(::settings::Cellular::volte_on,
-                                      [this](const std::string &value) { volteChanged(value); });
     }
 
     ApplicationSettingsNew::~ApplicationSettingsNew()
     {
-        settings->unregisterValueChange(settings::operators_on);
-        settings->unregisterValueChange(::settings::Cellular::volte_on);
     }
 
     // Invoked upon receiving data message
@@ -158,9 +151,14 @@ namespace app
 
         setActiveWindow(gui::name::window::main_window);
 
-        settings->registerValueChange(::settings::SystemProperties::lockPassHash, [this](std::string value) {
-            lockPassHash = utils::getNumericValue<unsigned int>(value);
-        });
+        settings->registerValueChange(settings::operators_on,
+                                      [this](const std::string &value) { operatorOnChanged(value); });
+        settings->registerValueChange(::settings::Cellular::volte_on,
+                                      [this](const std::string &value) { volteChanged(value); });
+        settings->registerValueChange(
+            ::settings::SystemProperties::lockPassHash,
+            [this](std::string value) { lockPassHash = utils::getNumericValue<unsigned int>(value); },
+            ::settings::SettingsScope::Global);
 
         return ret;
     }
@@ -272,17 +270,20 @@ namespace app
 
     void ApplicationSettingsNew::operatorOnChanged(const std::string &value)
     {
+        LOG_DEBUG("[ApplicationSettingsNew::operatorOnChanged] value=%s", value.c_str());
         if (!value.empty()) {
             operatorsOn = utils::getNumericValue<bool>(value);
         }
     }
     bool ApplicationSettingsNew::getOperatorsOn() const noexcept
     {
+        LOG_DEBUG("[ApplicationSettingsNew::getOperatorsOn] %d", operatorsOn);
         return operatorsOn;
     }
     void ApplicationSettingsNew::setOperatorsOn(bool value)
     {
         operatorsOn = value;
+        LOG_DEBUG("[ApplicationSettingsNew::setOperatorsOn] to %d", operatorsOn);
         settings->setValue(settings::operators_on, std::to_string(value));
     }
 
@@ -307,7 +308,8 @@ namespace app
     void ApplicationSettingsNew::setLockPassHash(unsigned int value)
     {
         lockPassHash = value;
-        settings->setValue(::settings::SystemProperties::lockPassHash, std::to_string(value));
+        settings->setValue(
+            ::settings::SystemProperties::lockPassHash, std::to_string(value), ::settings::SettingsScope::Global);
     }
 
     auto ApplicationSettingsNew::getCurrentValues() -> settingsInterface::ScreenLightSettings::Values
