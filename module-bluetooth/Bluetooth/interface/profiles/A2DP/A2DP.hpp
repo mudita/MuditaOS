@@ -9,7 +9,7 @@
 #include "queue.h"
 #include <memory>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
-namespace Bt
+namespace bluetooth
 {
     class A2DP : public Profile
     {

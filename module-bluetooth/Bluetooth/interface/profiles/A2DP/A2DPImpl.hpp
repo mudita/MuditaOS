@@ -15,7 +15,7 @@ extern "C"
 #include <btstack_defines.h>
 }
 
-namespace Bt
+namespace bluetooth
 {
     static constexpr int SBC_STORAGE_SIZE = 1030;
     struct MediaContext

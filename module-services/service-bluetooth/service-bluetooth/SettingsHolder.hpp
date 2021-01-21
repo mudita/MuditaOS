@@ -9,7 +9,7 @@
 #include <module-utils/Utils.hpp>
 #include "SettingsSerializer.hpp"
 
-namespace Bluetooth
+namespace bluetooth
 {
 
     enum class Settings

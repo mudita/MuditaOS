@@ -12,13 +12,14 @@
 #include <task.h>
 #include <vector>
 #include "service-bluetooth/SettingsHolder.hpp"
-
+#include "glucode/BluetoothRunLoop.hpp"
+#include "interface/BluetoothDriver.hpp"
 struct HCI;
 
 /// debug option for HCI (uart) commands debugging
 // #define DO_DEBUG_HCI_COMS
 
-namespace Bt
+namespace bluetooth
 {
     enum Message : std::uint8_t
     {
@@ -83,9 +84,8 @@ class BluetoothWorker : private sys::Worker
         queueService = 0,
         queueControl = 1,
         queueIO_handle, /// bsp support queue
-                        //        queue_profiles, /// queue for communication between profile workers,
-                        //                        /// main bt_worker_task should dispatch these in events
         queueCommands,
+        queueRunloopTrigger // btstack run_loop queue
     };
 
     TaskHandle_t bt_worker_task = nullptr;
@@ -101,32 +101,26 @@ class BluetoothWorker : private sys::Worker
     };
 
     BluetoothWorker(sys::Service *service);
-    virtual ~BluetoothWorker();
+    ~BluetoothWorker() override;
 
-    virtual bool handleMessage(uint32_t queueID);
+    auto handleMessage(uint32_t queueID) -> bool override;
 
-    bool handleCommand(QueueHandle_t queue);
-
+    auto handleCommand(QueueHandle_t queue) -> bool;
+    auto handleBtStackTrigger(QueueHandle_t queue) -> bool;
     bool run();
-
-    bool scan();
-
+    auto scan() -> bool;
     void setVisibility(bool visibility);
-
-    bool start_pan();
-
-    bool establishAudioConnection();
-
-    bool disconnectAudioConnection();
-
-    Error aud_init();
+    auto start_pan() -> bool;
+    auto establishAudioConnection() -> bool;
+    auto disconnectAudioConnection() -> bool;
     /// bluetooth stack id in use
     unsigned long active_features;
     void stopScan();
     void setDeviceAddress(bd_addr_t addr);
-    void initAudioBT();
 
-    std::shared_ptr<Bt::Profile> currentProfile;
-    std::shared_ptr<Bluetooth::SettingsHolder> settings;
+    std::shared_ptr<bluetooth::Profile> currentProfile;
+    std::shared_ptr<bluetooth::SettingsHolder> settings;
     std::vector<Devicei> pairedDevices;
+    std::unique_ptr<bluetooth::RunLoop> runLoop;
+    std::unique_ptr<bluetooth::Driver> driver;
 };

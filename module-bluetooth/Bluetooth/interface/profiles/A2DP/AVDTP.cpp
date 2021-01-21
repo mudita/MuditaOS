@@ -3,7 +3,7 @@
 
 #include "AVDTP.hpp"
 
-namespace Bt
+namespace bluetooth
 {
     AVDTP::SbcConfiguration AVDTP::sbcConfig;
     btstack_sbc_encoder_state_t AVDTP::sbcEncoderState;

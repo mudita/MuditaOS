@@ -106,7 +106,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
     }
 }
 
-namespace Bt
+namespace bluetooth
 {
 
     // Set local name with a template Bluetooth address, that will be automatically

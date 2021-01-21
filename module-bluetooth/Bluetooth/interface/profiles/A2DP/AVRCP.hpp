@@ -15,7 +15,7 @@ extern "C"
 #include <btstack_defines.h>
 }
 
-namespace Bt
+namespace bluetooth
 {
     class AVRCP
     {
