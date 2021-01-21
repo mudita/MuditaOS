@@ -128,7 +128,8 @@ static volatile portBASE_TYPE xSchedulerEnd = pdFALSE;
 static volatile portBASE_TYPE xInterruptsEnabled = pdTRUE;
 static volatile portBASE_TYPE xServicingTick = pdFALSE;
 static volatile portBASE_TYPE xPendYield = pdFALSE;
-static volatile portLONG lIndexOfLastAddedTask = 0;
+static volatile portLONG lIndexOfLastAddedTaskStack[_POSIX_THREAD_THREADS_MAX];
+static volatile portLONG lLastAddedTaskStackIdx = 0;
 static volatile portBASE_TYPE uxCriticalNesting;
 
 
@@ -326,6 +327,10 @@ static void TickSignalHandler( int sig )
             vTaskSwitchContext();
 #endif
             success = LookupThread(xTaskGetCurrentTaskHandle(), &ThreadToResume);
+            if (success == 0) {
+                LOG_FATAL("Emulator only bug." \
+                          "Ignore and restart emulator or refer to commit linked with this log and fix it better :) ");
+            }
             assert(success);
 
             /* The only thread that can process this tick is the running thread. */
@@ -474,18 +479,17 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
     {
         if (pxThreads[i].Valid == 0)
         {
-            lIndexOfLastAddedTask = i;
+            lIndexOfLastAddedTaskStack[lLastAddedTaskStackIdx] = i;
             break;
         }
     }
-
     /* No more free threads, please increase the maximum. */
     assert(i < MAX_NUMBER_OF_TASKS);
 
 
     /* Add the task parameters. */
-    pxThreads[lIndexOfLastAddedTask].pxCode = pxCode;
-    pxThreads[lIndexOfLastAddedTask].pvParams = pvParameters;
+    pxThreads[lIndexOfLastAddedTaskStack[lLastAddedTaskStackIdx]].pxCode = pxCode;
+    pxThreads[lIndexOfLastAddedTaskStack[lLastAddedTaskStackIdx]].pvParams = pvParameters;
 
     /* Create the new pThread. */
     rc = pthread_mutex_lock(&xSingleThreadMutex);
@@ -493,22 +497,23 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 
     xSentinel = 0;
 
-    rc = pthread_create(&pxThreads[lIndexOfLastAddedTask].Thread, 
+    rc = pthread_create(&pxThreads[lIndexOfLastAddedTaskStack[lLastAddedTaskStackIdx]].Thread,
                         &xThreadAttributes, 
                         ThreadStartWrapper, 
-                        (void *)&pxThreads[lIndexOfLastAddedTask]
+                        (void *)&pxThreads[lIndexOfLastAddedTaskStack[lLastAddedTaskStackIdx]]
                         );
     assert(rc == 0);
 
     CPU_ZERO(&cpuset);
     CPU_SET(0, &cpuset);
 
-    rc = pthread_setaffinity_np(pxThreads[lIndexOfLastAddedTask].Thread, 
+    rc = pthread_setaffinity_np(pxThreads[lIndexOfLastAddedTaskStack[lLastAddedTaskStackIdx]].Thread,
                                 sizeof(cpu_set_t), 
                                 &cpuset);
 	configASSERT( rc == 0 );
-    pxThreads[lIndexOfLastAddedTask].Valid = 1;
+    pxThreads[lIndexOfLastAddedTaskStack[lLastAddedTaskStackIdx]].Valid = 1;
 
+    lLastAddedTaskStackIdx++;
 
     /* Wait until the task suspends. */
     pthread_mutex_unlock( &xSingleThreadMutex );
@@ -643,7 +648,7 @@ portBASE_TYPE xPortStartScheduler( void )
     xInterruptsEnabled = pdTRUE;
     xServicingTick = pdFALSE;
     xPendYield = pdFALSE;
-    lIndexOfLastAddedTask = 0;
+    lLastAddedTaskStackIdx = 0;
     uxCriticalNesting = 0;
 
     signal(SIG_SUSPEND, SIG_DFL);
@@ -871,14 +876,15 @@ void vPortForciblyEndThread( void *pxTaskToDelete )
 void vPortAddTaskHandle( void *pxTaskHandle )
 {
     int i;
-
-    pxThreads[lIndexOfLastAddedTask].hTask = (xTaskHandle)pxTaskHandle;
+    vPortEnterCritical();
+    lLastAddedTaskStackIdx--;
+    pxThreads[lIndexOfLastAddedTaskStack[lLastAddedTaskStackIdx]].hTask = (xTaskHandle)pxTaskHandle;
 
     for (i = 0; i < MAX_NUMBER_OF_TASKS; i++)
     {
-        if ( pthread_equal(pxThreads[i].Thread, pxThreads[lIndexOfLastAddedTask].Thread))
+        if ( pthread_equal(pxThreads[i].Thread, pxThreads[lIndexOfLastAddedTaskStack[lLastAddedTaskStackIdx]].Thread))
         {
-            if ( pxThreads[i].hTask != pxThreads[ lIndexOfLastAddedTask ].hTask )
+            if ( pxThreads[i].hTask != pxThreads[ lIndexOfLastAddedTaskStack[lLastAddedTaskStackIdx] ].hTask )
             {
                 pxThreads[i].Valid = 0;
                 pxThreads[i].hTask = NULL;
@@ -886,6 +892,7 @@ void vPortAddTaskHandle( void *pxTaskHandle )
             }
         }
     }
+    vPortExitCritical();
 }
 
 
