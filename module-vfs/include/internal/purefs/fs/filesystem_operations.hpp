@@ -17,7 +17,7 @@ namespace purefs::blkdev
         class disk_handle;
     }
     class disk_manager;
-}
+} // namespace purefs::blkdev
 
 namespace purefs::fs
 {
@@ -44,9 +44,9 @@ namespace purefs::fs
          */
         virtual auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh,
                                     std::string_view path,
-                                    unsigned flags) -> fsmount = 0;
-        virtual auto mount(fsmount mnt) noexcept -> int  = 0;
-        virtual auto umount(fsmount mnt) noexcept -> int = 0;
+                                    unsigned flags) -> fsmount            = 0;
+        virtual auto mount(fsmount mnt, const void *data) noexcept -> int = 0;
+        virtual auto umount(fsmount mnt) noexcept -> int                  = 0;
         virtual auto stat_vfs(fsmount mnt, std::string_view path, statvfs &stat) const noexcept -> int;
 
         /** Standard file access API */

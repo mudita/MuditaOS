@@ -112,11 +112,21 @@ namespace
         st.st_mode    = translate_attrib_to_st_mode(fs.type, readOnly);
     }
 
-    [[gnu::nonnull(1)]] int setup_lfs_config(lfs_config *cfg, size_t sector_size, size_t part_sectors_count)
+    [[gnu::nonnull(1)]] int setup_lfs_config(lfs_config *cfg,
+                                             size_t sector_size,
+                                             size_t part_sectors_count,
+                                             const void *data)
     {
-        cfg->block_cycles   = 512;
-        cfg->block_size      = c_lfs_block_size;
-        cfg->block_count    = 0; // Read later from super block
+        if (data) {
+            // NOTE: block size from mount param
+            cfg->block_size = *(reinterpret_cast<const uint32_t *>(data));
+        }
+        else {
+            cfg->block_size = c_lfs_block_size;
+            LOG_WARN("LFS: mount block size not specified using default value");
+        }
+        cfg->block_cycles    = 512;
+        cfg->block_count     = 0; // Read later from super block
         cfg->lookahead_size  = 131072;
         const auto total_siz = uint64_t(sector_size) * uint64_t(part_sectors_count);
         if (total_siz % cfg->block_size) {
@@ -127,7 +137,7 @@ namespace
         cfg->read_size  = cfg->block_size;
         cfg->prog_size  = cfg->block_size;
         cfg->cache_size = cfg->block_size;
-        LOG_INFO("LFS: block_count %u sector_size %u", unsigned(cfg->block_count), unsigned(cfg->block_size));
+        LOG_INFO("LFS: block count %u block size %u", unsigned(cfg->block_count), unsigned(cfg->block_size));
         return 0;
     }
 
@@ -207,7 +217,7 @@ namespace purefs::fs::drivers
         return std::make_shared<mount_point_littlefs>(diskh, path, flags, shared_from_this());
     }
 
-    auto filesystem_littlefs::mount(fsmount mnt) noexcept -> int
+    auto filesystem_littlefs::mount(fsmount mnt, const void *data) noexcept -> int
     {
         auto disk = mnt->disk();
         if (!disk) {
@@ -232,7 +242,7 @@ namespace purefs::fs::drivers
             else {
                 auto sect_count = diskmm->get_info(disk, blkdev::info_type::sector_count);
                 if (sect_count > 0) {
-                    err = setup_lfs_config(vmnt->lfs_config(), ssize, sect_count);
+                    err = setup_lfs_config(vmnt->lfs_config(), ssize, sect_count, data);
                 }
                 else {
                     LOG_ERROR("Unable to read sector count %i", int(sect_count));
@@ -247,7 +257,7 @@ namespace purefs::fs::drivers
             LOG_ERROR("LFS mount error %i", err);
         }
         if (!err) {
-            filesystem_operations::mount(mnt);
+            filesystem_operations::mount(mnt, data);
         }
         else {
             littlefs::internal::remove_volume(vmnt->lfs_config());
