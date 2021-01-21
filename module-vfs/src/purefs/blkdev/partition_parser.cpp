@@ -94,6 +94,7 @@ namespace purefs::blkdev::internal
         std::size_t offs = defs::ptbl_offs;
         for (auto &part : parts) {
             part.bootable     = buffer[defs::mbr_ptbl_active + offs] & 0x80;
+            part.boot_unit    = buffer[defs::mbr_ptbl_active + offs] & 0x7F;
             part.type         = buffer[defs::mbr_ptbl_type + offs];
             part.num_sectors  = to_word(buffer, defs::mbr_ptbl_sect_cnt + offs);
             part.start_sector = to_word(buffer, defs::mbr_ptbl_lba + offs);

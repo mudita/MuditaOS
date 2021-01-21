@@ -16,6 +16,7 @@ namespace purefs::blkdev
         sector_t start_sector{};   //! First sector
         std::size_t num_sectors{}; //! Number of sectors
         bool bootable{};           //! Partition is bootable
+        unsigned char boot_unit{}; //! 7 bit boot unit field
         unsigned short type{};     //! Partition code
         std::string name;          //! Partition name in block manager
     };
