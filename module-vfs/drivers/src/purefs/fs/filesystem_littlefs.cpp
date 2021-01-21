@@ -268,25 +268,27 @@ namespace purefs::fs::drivers
         return lfs_to_errno(lerr);
     }
 
-    auto filesystem_littlefs::stat_vfs(fsmount mnt, std::string_view path, struct statvfs &stat) const noexcept -> int
+    auto filesystem_littlefs::stat_vfs(fsmount mnt, std::string_view, struct statvfs &stat) const noexcept -> int
     {
         auto vmnt = std::dynamic_pointer_cast<mount_point_littlefs>(mnt);
         if (!vmnt) {
             LOG_ERROR("Non LITTLEFS mount point");
             return -EIO;
         }
-        auto lerr = lfs_fs_size(vmnt->lfs_mount());
-        if (lerr >= 0) {
+        if (const auto lerr = lfs_fs_size(vmnt->lfs_mount()); lerr < 0) {
+            return lfs_to_errno(lerr);
+        }
+        else {
+            const auto allocated_blocks = lerr;
+            const auto cfg              = vmnt->lfs_config();
             std::memset(&stat, 0, sizeof stat);
-            stat.f_bfree   = stat.f_blocks - lerr;
-            lerr           = 0;
-            const auto cfg = vmnt->lfs_config();
+            stat.f_blocks  = cfg->block_count;
+            stat.f_bfree   = stat.f_blocks - allocated_blocks;
             stat.f_bsize   = cfg->prog_size;
             stat.f_frsize  = cfg->block_size;
-            stat.f_blocks  = cfg->block_count;
             stat.f_namemax = PATH_MAX;
+            return 0;
         }
-        return lfs_to_errno(lerr);
     }
 
     auto filesystem_littlefs::open(fsmount mnt, std::string_view path, int flags, int mode) noexcept -> fsfile

@@ -374,14 +374,13 @@ updateos::UpdateError UpdateMuditaOS::prepareRoot()
 
 updateos::UpdateError UpdateMuditaOS::updateBootJSON()
 {
-    unsigned long bootJSONAbsoulteCRC = 0;
     fs::path bootJSONAbsoulte         = purefs::createPath(purefs::dir::getRootDiskPath(), purefs::file::boot_json);
     informDebug("updateBootJSON %s", bootJSONAbsoulte.c_str());
 
     auto *fp = std::fopen(bootJSONAbsoulte.c_str(), "r");
 
     if (fp != nullptr) {
-        utils::filesystem::computeCRC32(fp, &bootJSONAbsoulteCRC);
+        unsigned long bootJSONAbsoulteCRC = utils::filesystem::computeFileCRC32(fp);
         bootJSONAbsoulte += purefs::extension::crc32;
 
         auto *fpCRC = std::fopen(bootJSONAbsoulte.c_str(), "w");

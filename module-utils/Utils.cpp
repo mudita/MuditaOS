@@ -24,23 +24,21 @@ namespace utils::filesystem
         return endPosition;
     }
 
-    void computeCRC32(std::FILE *file, unsigned long *outCrc32) noexcept
+    unsigned long computeFileCRC32(::FILE *file) noexcept
     {
-        if (outCrc32 == nullptr)
-            return;
+        auto buf = std::make_unique<unsigned char[]>(purefs::buffer::crc_buf);
 
-        auto buf = std::make_unique<unsigned char[]>(crc_buf);
-        size_t bufLen;
+        unsigned long crc32 = 0;
+        while (!::feof(file)) {
+            size_t dataLen = ::fread(buf.get(), 1, purefs::buffer::crc_buf, file);
+            if (dataLen == 0) {
+                return crc32;
+            }
 
-        *outCrc32 = 0;
-
-        while (!std::feof(file)) {
-            bufLen = std::fread(buf.get(), 1, crc_buf, file);
-            if (bufLen <= 0)
-                break;
-
-            *outCrc32 = Crc32_ComputeBuf(*outCrc32, buf.get(), bufLen);
+            crc32 = Crc32_ComputeBuf(crc32, buf.get(), dataLen);
         }
+
+        return crc32;
     }
 
     std::string generateRandomId(std::size_t length) noexcept
