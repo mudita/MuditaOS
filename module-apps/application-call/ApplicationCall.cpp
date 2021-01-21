@@ -47,6 +47,10 @@ namespace app
             switchWindow(window::name_enterNumber, std::forward<decltype(data)>(data));
             return msgHandled();
         });
+        addActionReceiver(manager::actions::EmergencyDial, [this](auto &&data) {
+            switchWindow(app::window::name_emergencyCall, std::forward<decltype(data)>(data));
+            return msgHandled();
+        });
     }
 
     //  number of seconds after end call to switch back to previous application
