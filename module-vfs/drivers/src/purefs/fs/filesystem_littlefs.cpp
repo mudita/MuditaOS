@@ -23,7 +23,7 @@
 namespace
 {
     // NOTE: lfs block size is configured during format
-    static constexpr auto c_lfs_block_size = 4096;
+    static constexpr auto c_lfs_block_size = 32U * 1024U;
 
     template <typename T> auto lfs_to_errno(T error) -> T
     {
@@ -117,7 +117,7 @@ namespace
         cfg->block_cycles   = 512;
         cfg->block_size      = c_lfs_block_size;
         cfg->block_count    = 0; // Read later from super block
-        cfg->lookahead_size = 8192;
+        cfg->lookahead_size  = 131072;
         const auto total_siz = uint64_t(sector_size) * uint64_t(part_sectors_count);
         if (total_siz % cfg->block_size) {
             LOG_ERROR("Block size doesn't match partition size");
