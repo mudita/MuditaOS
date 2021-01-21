@@ -104,6 +104,6 @@ mcopy -s -i "$PART1" data ::/current/sys
 mmd -i "$PART1" ::/updates
 
 #Littlefs generate image
-$GENLFS --image=$BLK_DEV --block_size=4096  --overwrite  --partition_num=3 -- user/*
+$GENLFS --image=$BLK_DEV --block_size=32768  --overwrite  --partition_num=3 -- user/*
 # back to previous dir
 cd -
