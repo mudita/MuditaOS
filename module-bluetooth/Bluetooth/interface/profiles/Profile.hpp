@@ -7,7 +7,7 @@
 #include <Service/Message.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <memory>
-namespace Bt
+namespace bluetooth
 {
     class Profile
     {

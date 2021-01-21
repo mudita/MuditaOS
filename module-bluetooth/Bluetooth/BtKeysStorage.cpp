@@ -4,13 +4,13 @@
 #include <algorithm>
 #include "BtKeysStorage.hpp"
 
-json11::Json Bt::KeyStorage::keysJson = json11::Json();
-btstack_link_key_db_t Bt::KeyStorage::keyStorage;
-json11::Json::array Bt::KeyStorage::keys;
-std::string Bt::KeyStorage::keysEntry;
-std::shared_ptr<Bluetooth::SettingsHolder> Bt::KeyStorage::settings = nullptr;
+json11::Json bluetooth::KeyStorage::keysJson = json11::Json();
+btstack_link_key_db_t bluetooth::KeyStorage::keyStorage;
+json11::Json::array bluetooth::KeyStorage::keys;
+std::string bluetooth::KeyStorage::keysEntry;
+std::shared_ptr<bluetooth::SettingsHolder> bluetooth::KeyStorage::settings = nullptr;
 
-namespace Bt
+namespace bluetooth
 {
     namespace strings
     {
@@ -39,7 +39,7 @@ namespace Bt
     {
         LOG_INFO("opening storage from API");
         if (settings) {
-            keysEntry = std::visit(Bluetooth::StringVisitor(), settings->getValue(Bluetooth::Settings::BtKeys));
+            keysEntry = std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::BtKeys));
         }
         else {
             LOG_ERROR("failed opening settings for BT!");
@@ -140,7 +140,7 @@ namespace Bt
         json11::Json finalJson = json11::Json::object{{strings::keys, keys}};
         keysEntry              = finalJson.dump();
         if (settings) {
-            settings->setValue(Bluetooth::Settings::BtKeys, keysEntry);
+            settings->setValue(bluetooth::Settings::BtKeys, keysEntry);
         }
         else {
             LOG_ERROR("failed to open settings to write!");

@@ -47,12 +47,12 @@ BTdev::Error BlueKitchen::read(uint8_t *buf, size_t nbytes)
     read_len  = nbytes;
 
     if (BluetoothCommon::read(buf, nbytes) == Success) {
-        val = Bt::Message::EvtReceiving;
+        val = bluetooth::Message::EvtReceiving;
         xQueueSend(qHandle, &val, portMAX_DELAY);
         return BTdev::Success;
     }
     else {
-        val = Bt::Message::EvtReceivingError;
+        val = bluetooth::Message::EvtReceivingError;
         xQueueSend(qHandle, &val, portMAX_DELAY);
         return BTdev::ErrorBSP;
     }
@@ -65,12 +65,12 @@ BTdev::Error BlueKitchen::write(const uint8_t *buf, size_t size)
     logHciStack("BlueKitchen sends %d bytes", size);
 
     if (BluetoothCommon::write(buf, size) == Success) {
-        val = Bt::Message::EvtSending;
+        val = bluetooth::Message::EvtSending;
         xQueueSend(qHandle, &val, portMAX_DELAY);
         return BTdev::Success;
     }
     else {
-        val = Bt::Message::EvtSendingError;
+        val = bluetooth::Message::EvtSendingError;
         xQueueSend(qHandle, &val, portMAX_DELAY);
         return BTdev::ErrorBSP;
     }

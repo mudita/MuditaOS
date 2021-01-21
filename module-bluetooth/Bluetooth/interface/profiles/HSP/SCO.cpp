@@ -19,7 +19,7 @@ extern "C"
 #include "hci.h"
 }
 
-namespace Bt
+namespace bluetooth
 {
 
     class SCO::SCOImpl
@@ -94,7 +94,7 @@ namespace Bt
     SCO::~SCO() = default;
 } // namespace Bt
 
-using namespace Bt;
+using namespace bluetooth;
 
 btstack_cvsd_plc_state_t SCO::SCOImpl::cvsdPlcState;
 QueueHandle_t SCO::SCOImpl::sinkQueue;

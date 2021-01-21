@@ -10,7 +10,7 @@ extern "C"
 #include <btstack_defines.h>
 #include <classic/avdtp.h>
 }
-namespace Bt
+namespace bluetooth
 {
 
     class AVDTP

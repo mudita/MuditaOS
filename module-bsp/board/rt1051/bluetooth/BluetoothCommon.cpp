@@ -273,7 +273,7 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
     case kStatus_LPUART_TxIdle: {
         logHciComs("DMA irq: TX done");
         LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
-        val = Bt::Message::EvtSent;
+        val = bluetooth::Message::EvtSent;
         xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         portEND_SWITCHING_ISR(taskwoken);
         break;
@@ -281,7 +281,7 @@ void BluetoothCommon::uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *h
     case kStatus_LPUART_RxIdle:
         logHciComs("DMA irq: RX done");
         LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, false);
-        val = Bt::Message::EvtReceived;
+        val = bluetooth::Message::EvtReceived;
         xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         portEND_SWITCHING_ISR(taskwoken);
         break;
@@ -316,7 +316,7 @@ extern "C"
     {
         uint32_t isrReg      = LPUART_GetStatusFlags(BSP_BLUETOOTH_UART_BASE);
         BaseType_t taskwoken = 0;
-        uint8_t val          = Bt::Message::EvtReceived;
+        uint8_t val          = bluetooth::Message::EvtReceived;
         bsp::BlueKitchen *bt = bsp::BlueKitchen::getInstance();
 
         if (isrReg & kLPUART_RxDataRegFullFlag) {
@@ -324,7 +324,7 @@ extern "C"
         }
         if (isrReg & kLPUART_RxOverrunFlag) {
             LOG_WARN("LPUART IRQ RX overrun");
-            val = Bt::Message::EvtUartError;
+            val = bluetooth::Message::EvtUartError;
             xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         }
         LPUART_ClearStatusFlags(BSP_BLUETOOTH_UART_BASE, isrReg);

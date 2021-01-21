@@ -17,7 +17,7 @@ extern "C"
 #include <btstack_defines.h>
 }
 
-namespace Bt
+namespace bluetooth
 {
     HSP::HSP() : pimpl(std::make_unique<HSPImpl>(HSPImpl()))
     {}
@@ -204,7 +204,7 @@ namespace Bt
 
         LOG_INFO("HSP init done!");
 
-        return Bt::Error::Success;
+        return bluetooth::Error::Success;
     }
 
     void HSP::HSPImpl::start()

@@ -7,7 +7,7 @@
 #include "SCO.hpp"
 #include <Audio/AudioCommon.hpp>
 
-namespace Bt
+namespace bluetooth
 {
     static constexpr int serviceBufferLength = 150;
     static constexpr int commandBufferLength = 150;

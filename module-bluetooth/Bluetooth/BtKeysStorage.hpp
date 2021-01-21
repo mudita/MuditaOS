@@ -9,14 +9,14 @@
 #include <json/json11.hpp>
 #include <service-bluetooth/SettingsHolder.hpp>
 
-namespace Bt
+namespace bluetooth
 {
 
     class KeyStorage
     {
       public:
         static auto getKeyStorage() -> btstack_link_key_db_t *;
-        static std::shared_ptr<Bluetooth::SettingsHolder> settings;
+        static std::shared_ptr<bluetooth::SettingsHolder> settings;
 
       private:
         static void openStorage();
