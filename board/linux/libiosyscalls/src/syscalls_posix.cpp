@@ -626,7 +626,7 @@ extern "C"
     {
         if (vfs::redirect_to_image(dir)) {
             TRACE_SYSCALLN("(%s, %s, %s, %08lx, %p) -> VFS", special_file, dir, fstype, rwflag, data);
-            return vfs::invoke_fs(&fs::mount, special_file, dir, fstype, rwflag);
+            return vfs::invoke_fs(&fs::mount, special_file, dir, fstype, rwflag, data);
         }
         else {
             TRACE_SYSCALLN("(%s, %s, %s, %08lx,%p) -> linux fs", special_file, dir, fstype, rwflag, data);

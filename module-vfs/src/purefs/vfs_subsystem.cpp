@@ -24,6 +24,7 @@ namespace purefs::subsystem
         constexpr auto old_layout_part_count = 2;
         constexpr auto new_layout_part_count = 3;
         constexpr auto boot_size_limit       = 16384L;
+        constexpr auto block_size_max_shift  = 21;
         namespace json
         {
             constexpr auto os_type = "ostype";
@@ -150,8 +151,9 @@ namespace purefs::subsystem
             }
         }
         if (lfs_it == std::end(parts) && parts.size() == old_layout_part_count) {
-            LOG_ERROR("!!!! Danger !!!! FAT partiton layout scheme. Data may be currupted when power loss.");
-            LOG_WARN("Please upgrade to new partition scheme with LITTLEFS partition.");
+            LOG_ERROR("!!!! Caution !!!! eMMC is formated with vFAT old layout scheme. Filesystem may be currupted on "
+                      "power loss.");
+            LOG_WARN("Please upgrade to new partition scheme based on the LittleFS filesystem.");
         }
         if (boot_it == std::end(parts)) {
             LOG_FATAL("Unable to find boot partition");
@@ -167,7 +169,16 @@ namespace purefs::subsystem
             return err;
         }
         if (lfs_it != std::end(parts)) {
-            err = vfs->mount(lfs_it->name, purefs::dir::getUserDiskPath().string(), "littlefs");
+            if (lfs_it->boot_unit > block_size_max_shift) {
+                LOG_FATAL("Boot sector size is out of range");
+                return -ERANGE;
+            }
+            else {
+                const uint32_t lfs_block_size = 1U << lfs_it->boot_unit;
+                const auto lfs_block_size_ptr = (lfs_it->boot_unit) ? (&lfs_block_size) : nullptr;
+                err                           = vfs->mount(
+                    lfs_it->name, purefs::dir::getUserDiskPath().string(), "littlefs", 0, lfs_block_size_ptr);
+            }
         }
         const std::string json_file = (dir::getRootDiskPath() / file::boot_json).string();
         const auto boot_dir_name    = parse_boot_json_directory(json_file);

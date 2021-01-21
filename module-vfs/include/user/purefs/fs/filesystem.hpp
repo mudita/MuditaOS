@@ -80,13 +80,18 @@ namespace purefs::fs
         auto unregister_filesystem(std::string_view fsname) -> int;
 
         /** Mount filesystem to the the specified mount point
+         * see man(2) mount
          * @param[in] dev_or_part Device or partition for mount
          * @param[in] target Target path where the fs will be mounted
          * @param[in] flags  Mount flags
+         * @param[in] data   Filesystem specific configuration
          * @return zero on success otherwise error
          */
-        auto mount(std::string_view dev_or_part, std::string_view target, std::string_view fs_type, unsigned flags = 0)
-            -> int;
+        auto mount(std::string_view dev_or_part,
+                   std::string_view target,
+                   std::string_view fs_type,
+                   unsigned flags   = 0,
+                   const void *data = nullptr) -> int;
         /** Unmont filesystem from selected mount point
          * @param[in] mount_point Mount point where the fs is mounted
          * @return zero on success otherwise error

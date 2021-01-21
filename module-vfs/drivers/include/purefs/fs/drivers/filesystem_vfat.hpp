@@ -16,7 +16,7 @@ namespace purefs::fs::drivers
       private:
         auto mount_prealloc(std::shared_ptr<blkdev::internal::disk_handle> diskh, std::string_view path, unsigned flags)
             -> fsmount override;
-        auto mount(fsmount mnt) noexcept -> int override;
+        auto mount(fsmount mnt, const void *data) noexcept -> int override;
         auto umount(fsmount mnt) noexcept -> int override;
 
         auto stat_vfs(fsmount mnt, std::string_view path, statvfs &stat) const noexcept -> int override;
