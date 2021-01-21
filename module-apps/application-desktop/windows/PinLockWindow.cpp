@@ -112,11 +112,11 @@ namespace gui
         }
         // accept only LF, enter, RF, #, and numeric values;
         if (inputEvent.is(KeyCode::KEY_LEFT) && iceBox->visible) {
-            app::manager::Controller::sendAction(application, app::manager::actions::ShowEmergencyContacts);
+            app::manager::Controller::sendAction(application, app::manager::actions::EmergencyDial);
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
-            app::manager::Controller::sendAction(application, app::manager::actions::ShowEmergencyContacts);
+            app::manager::Controller::sendAction(application, app::manager::actions::EmergencyDial);
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {

@@ -1,52 +1,40 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "../data/CallSwitchData.hpp"
-#include "../ApplicationCall.hpp"
-#include <service-appmgr/model/ApplicationManager.hpp>
-
-#include <i18n/i18n.hpp>
 #include "EmergencyCallWindow.hpp"
 
-#include <cassert>
+#include "application-call/data/CallAppStyle.hpp"
+
+#include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
 
     EmergencyCallWindow::EmergencyCallWindow(app::Application *app, app::EnterNumberWindowInterface *interface)
-        : EnterNumberWindow(app, interface, app::window::name_emergencyCall)
+        : NumberWindow(app, interface, app::window::name_emergencyCall)
     {
-        assert(app != nullptr);
-        assert(interface != nullptr);
-        numberLabel->setText(utils::localize.get("app_call_emergency"));
+        buildInterface();
     }
 
-    void EmergencyCallWindow::rebuild()
-    {}
     void EmergencyCallWindow::buildInterface()
     {
-        AppWindow::buildInterface();
-    }
-    void EmergencyCallWindow::destroyInterface()
-    {
-        AppWindow::destroyInterface();
+        using namespace callAppStyle;
+        NumberWindow::buildInterface();
+
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_ice_contacts_title"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+
+        numberDescriptionLabel->setText(utils::localize.get("app_call_emergency_text"));
     }
 
     bool EmergencyCallWindow::onInput(const InputEvent &inputEvent)
     {
-        bool ret = EnterNumberWindow::onInput(inputEvent);
+        if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+            app::manager::Controller::sendAction(application, app::manager::actions::ShowEmergencyContacts);
+            return true;
+        }
 
-        //	if( number.empty() ) {
-        //		numberLabel->setText( utils::localize.get("app_call_emergency") );
-        //	}
-
-        return ret;
-    }
-    bool EmergencyCallWindow::handleSwitchData(SwitchData *data)
-    {
-        bool ret = EnterNumberWindow::handleSwitchData(data);
-
-        return ret;
+        return NumberWindow::onInput(inputEvent);
     }
 
 } /* namespace gui */

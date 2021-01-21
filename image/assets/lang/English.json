@@ -158,6 +158,8 @@
   "app_notes_no_notes": "<text align='center' color='9'>No notes yet.<p>Press <b>left arrow</b> to add new.</p></text>",
   "app_notes_search_no_results": "No notes found.",
 
+  "app_call_emergency_text": "Emergency call",
+
   "app_calllog_title_main": "Calls",
   "app_calllog_new_note": "New Note",
   "app_calllog_save": "SAVE",

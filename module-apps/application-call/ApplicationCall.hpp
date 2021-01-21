@@ -24,6 +24,7 @@ namespace app
         inline constexpr auto name_emergencyCall     = "EmergencyCallWindow";
         inline constexpr auto name_duplicatedContact = "DuplicatedContactWindow";
         inline constexpr auto name_dialogConfirm     = "DialogConfirm";
+        inline constexpr auto name_number            = "NumberWindow";
     } // namespace window
 
     inline constexpr auto ringtone_path = "assets/audio/Ringtone-drum2.mp3"; // Should bo moved to database
@@ -100,7 +101,10 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch, manager::actions::Call, manager::actions::Dial}};
+            return {{manager::actions::Launch,
+                     manager::actions::Call,
+                     manager::actions::Dial,
+                     manager::actions::EmergencyDial}};
         }
     };
 } /* namespace app */
