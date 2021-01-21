@@ -163,6 +163,7 @@ namespace settings
             LOG_INFO("Callback function on value change (%s) does not exist", path.to_string().c_str());
         }
         else {
+            LOG_DEBUG("[Settings::unregisterValueChange] %s", path.to_string().c_str());
             cbValues.erase(it_cb);
         }
 
@@ -173,6 +174,7 @@ namespace settings
     void Settings::unregisterValueChange()
     {
         for (auto it_cb : cbValues) {
+            LOG_DEBUG("[Settings::unregisterValueChange] %s", it_cb.first.to_string().c_str());
             auto msg = std::make_shared<settings::Messages::UnregisterOnVariableChange>(it_cb.first);
             sendMsg(std::move(msg));
         }
