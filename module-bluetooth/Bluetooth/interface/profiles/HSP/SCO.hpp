@@ -11,7 +11,7 @@ extern "C"
 {
 #include <module-bluetooth/lib/btstack/src/bluetooth.h>
 };
-namespace Bt
+namespace bluetooth
 {
 
     class SCO

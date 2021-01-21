@@ -3,7 +3,7 @@
 
 #include "AVRCP.hpp"
 
-namespace Bt
+namespace bluetooth
 {
 
     AVRCP::PlaybackStatusInfo AVRCP::playInfo;

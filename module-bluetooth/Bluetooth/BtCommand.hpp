@@ -8,13 +8,12 @@
 #include "BluetoothWorker.hpp"
 #include "Error.hpp"
 #include <functional>
+#include <btstack_run_loop.h>
 
-namespace Bt
+namespace bluetooth
 {
-    auto initialize_stack() -> Error;
-    auto register_hw_error_callback(std::function<void(uint8_t)> new_callback = nullptr) -> Error;
+
     auto set_name(std::string &name) -> Error;
-    auto run_stack(TaskHandle_t *handle) -> Error;
     namespace GAP
     {
         extern std::vector<Devicei> devices;

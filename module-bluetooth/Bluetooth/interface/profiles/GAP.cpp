@@ -19,7 +19,7 @@ extern "C"
 
 btstack_packet_callback_registration_t cb_handler;
 
-std::vector<Devicei> Bt::GAP::devices;
+std::vector<Devicei> bluetooth::GAP::devices;
 static auto start_scan() -> int;
 static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size);
 
@@ -42,7 +42,7 @@ enum STATE
 };
 enum STATE state = INIT;
 
-namespace Bt::GAP
+namespace bluetooth::GAP
 {
 
     static sys::Service *ownerService = nullptr;
@@ -99,7 +99,7 @@ namespace Bt::GAP
         return false;
     }
 
-} // namespace Bt::GAP
+} // namespace bluetooth::GAP
 
 #define INQUIRY_INTERVAL 5
 static auto start_scan() -> int
@@ -110,9 +110,8 @@ static auto start_scan() -> int
 
 static auto has_more_remote_name_requests() -> int
 {
-    int i;
-    for (i = 0; i < Bt::GAP::devices.size(); i++) {
-        if (Bt::GAP::devices[i].state == REMOTE_NAME_REQUEST) {
+    for (int i = 0; i < bluetooth::GAP::devices.size(); i++) {
+        if (bluetooth::GAP::devices[i].state == REMOTE_NAME_REQUEST) {
             return 1;
         }
     }
@@ -121,15 +120,13 @@ static auto has_more_remote_name_requests() -> int
 
 static void do_next_remote_name_request()
 {
-    int i;
-    for (i = 0; i < Bt::GAP::devices.size(); i++) {
+
+    for (auto &device : bluetooth::GAP::devices) {
         // remote name request
-        if (Bt::GAP::devices[i].state == REMOTE_NAME_REQUEST) {
-            Bt::GAP::devices[i].state = REMOTE_NAME_INQUIRED;
-            LOG_INFO("Get remote name of %s...", bd_addr_to_str(Bt::GAP::devices[i].address));
-            gap_remote_name_request(Bt::GAP::devices[i].address,
-                                    Bt::GAP::devices[i].pageScanRepetitionMode,
-                                    Bt::GAP::devices[i].clockOffset | 0x8000);
+        if (device.state == REMOTE_NAME_REQUEST) {
+            device.state = REMOTE_NAME_INQUIRED;
+            LOG_INFO("Get remote name of %s...", bd_addr_to_str(device.address));
+            gap_remote_name_request(device.address, device.pageScanRepetitionMode, device.clockOffset | 0x8000);
             return;
         }
     }
@@ -189,7 +186,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
 
         case GAP_EVENT_INQUIRY_RESULT: {
             gap_event_inquiry_result_get_bd_addr(packet, addr);
-            index = getDeviceIndexForAddress(Bt::GAP::devices, addr);
+            index = getDeviceIndexForAddress(bluetooth::GAP::devices, addr);
             if (index >= 0) {
                 break; // already in our list
             }
@@ -218,36 +215,36 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
             else {
                 dev.state = REMOTE_NAME_REQUEST;
             }
-            Bt::GAP::devices.push_back(dev);
-            auto msg = std::make_shared<BluetoothScanResultMessage>(Bt::GAP::devices);
-            sys::Bus::SendUnicast(msg, "ApplicationSettings", Bt::GAP::ownerService);
-            sys::Bus::SendUnicast(msg, "ApplicationSettingsNew", Bt::GAP::ownerService);
+            bluetooth::GAP::devices.push_back(dev);
+            auto msg = std::make_shared<BluetoothScanResultMessage>(bluetooth::GAP::devices);
+            sys::Bus::SendUnicast(msg, "ApplicationSettings", bluetooth::GAP::ownerService);
+            sys::Bus::SendUnicast(msg, "ApplicationSettingsNew", bluetooth::GAP::ownerService);
 
         } break;
 
         case GAP_EVENT_INQUIRY_COMPLETE:
-            for (i = 0; i < Bt::GAP::devices.size(); i++) {
+            for (i = 0; i < bluetooth::GAP::devices.size(); i++) {
                 // retry remote name request
-                if (Bt::GAP::devices[i].state == REMOTE_NAME_INQUIRED)
-                    Bt::GAP::devices[i].state = REMOTE_NAME_REQUEST;
+                if (bluetooth::GAP::devices[i].state == REMOTE_NAME_INQUIRED)
+                    bluetooth::GAP::devices[i].state = REMOTE_NAME_REQUEST;
             }
             continue_remote_names();
             break;
 
         case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE: {
             reverse_bd_addr(&packet[3], addr);
-            index = getDeviceIndexForAddress(Bt::GAP::devices, addr);
+            index = getDeviceIndexForAddress(bluetooth::GAP::devices, addr);
             if (index >= 0) {
                 if (packet[2] == 0) {
                     LOG_INFO("Name: '%s'", &packet[9]);
-                    Bt::GAP::devices[index].state = REMOTE_NAME_FETCHED;
-                    Bt::GAP::devices[index].name  = reinterpret_cast<char *>(&packet[9]);
+                    bluetooth::GAP::devices[index].state = REMOTE_NAME_FETCHED;
+                    bluetooth::GAP::devices[index].name  = reinterpret_cast<char *>(&packet[9]);
                 }
                 else {
                     LOG_INFO("Failed to get name: page timeout");
                 }
             }
-            if (index + 1 == Bt::GAP::devices.size()) {
+            if (index + 1 == bluetooth::GAP::devices.size()) {
                 LOG_INFO("Scanned all");
                 state = DONE;
                 gap_inquiry_stop();
@@ -258,8 +255,8 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
         case GAP_EVENT_DEDICATED_BONDING_COMPLETED: {
             auto result = packet[2];
             auto msg    = std::make_shared<BluetoothPairResultMessage>(result == 0u);
-            sys::Bus::SendUnicast(msg, "ApplicationSettings", Bt::GAP::ownerService);
-            sys::Bus::SendUnicast(msg, "ApplicationSettingsNew", Bt::GAP::ownerService);
+            sys::Bus::SendUnicast(msg, "ApplicationSettings", bluetooth::GAP::ownerService);
+            sys::Bus::SendUnicast(msg, "ApplicationSettingsNew", bluetooth::GAP::ownerService);
         } break;
         default:
             break;

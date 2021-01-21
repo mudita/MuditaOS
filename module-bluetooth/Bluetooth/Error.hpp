@@ -7,7 +7,7 @@
 #include <variant>
 #include <optional>
 
-namespace Bt
+namespace bluetooth
 {
 
     struct Error
@@ -20,9 +20,9 @@ namespace Bt
             LibraryError,
         } err             = Success;
         uint32_t lib_code = 0;
-        Error(enum Code err = Success, int lib_code = Success) : err(err), lib_code(0)
+        Error(enum Code err = Success, int lib_code = Success) : err(err)
         {}
     };
 
 } // namespace Bt
-const char *c_str(Bt::Error::Code code);
+const char *c_str(bluetooth::Error::Code code);
