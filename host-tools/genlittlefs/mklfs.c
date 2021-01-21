@@ -291,6 +291,12 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
         free(parts);
+        if (write_partition_bootunit(lopts.dst_image, lopts.partition_num, lopts.block_size)) {
+            perror("Unable to write bootunit");
+            free(lopts.src_dirs);
+            lfs_ioaccess_close(ioctx);
+            return EXIT_FAILURE;
+        }
     }
     else if (lopts.mode == littlefs_opts_file) {
         int fds = open(lopts.dst_image, O_CREAT | O_WRONLY, 0644);

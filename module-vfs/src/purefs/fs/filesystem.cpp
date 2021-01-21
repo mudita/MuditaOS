@@ -69,7 +69,8 @@ namespace purefs::fs
     auto filesystem::mount(std::string_view dev_or_part,
                            std::string_view target,
                            std::string_view fs_type,
-                           unsigned flags) -> int
+                           unsigned flags,
+                           const void *data) -> int
     {
         // Sanity check input data
         if (target.size() <= 1 || target[0] != '/') {
@@ -128,7 +129,7 @@ namespace purefs::fs
             }
             if (diskh) {
                 const auto mnt_point = vsi->second->mount_prealloc(diskh, target, flags);
-                const auto ret_mnt   = vsi->second->mount(mnt_point);
+                const auto ret_mnt   = vsi->second->mount(mnt_point, data);
                 if (!ret_mnt) {
                     m_mounts.emplace(std::make_pair(target, mnt_point));
                     m_partitions.emplace(dev_or_part);

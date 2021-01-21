@@ -353,9 +353,9 @@ namespace vfsn::internal::syscalls
               const char *dir,
               const char *fstype,
               unsigned long int rwflag,
-              const void * /*data*/)
+              const void *data)
     {
-        return invoke_fs(_errno_, &purefs::fs::filesystem::mount, special_file, dir, fstype, rwflag);
+        return invoke_fs(_errno_, &purefs::fs::filesystem::mount, special_file, dir, fstype, rwflag, data);
     }
 
 } // namespace vfsn::internal::syscalls
