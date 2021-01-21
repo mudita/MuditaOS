@@ -29,8 +29,6 @@ ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, 
     updateOS = std::make_unique<UpdateMuditaOS>(this);
     settings = std::make_unique<settings::Settings>(this);
 
-    settings->registerValueChange(updateos::settings::history,
-                                  [this](const std::string &value) { updateOS->setInitialHistory(value); });
 }
 
 ServiceDesktop::~ServiceDesktop()
@@ -114,6 +112,9 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         }
         return std::make_shared<sys::ResponseMessage>();
     });
+
+    settings->registerValueChange(updateos::settings::history,
+                                  [this](const std::string &value) { updateOS->setInitialHistory(value); });
 
     return (sys::ReturnCodes::Success);
 }

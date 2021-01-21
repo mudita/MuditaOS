@@ -47,14 +47,6 @@ namespace app
             switchWindow(app::sim_select);
             return msgHandled();
         });
-        settings->registerValueChange(
-            settings::SystemProperties::lockPassHash,
-            [this](std::string value) { lockPassChanged(value); },
-            settings::SettingsScope::Global);
-        settings->registerValueChange(
-            settings::SystemProperties::timeDateFormat,
-            [this](std::string value) { timeDateChanged(value); },
-            settings::SettingsScope::Global);
     }
 
     ApplicationSettings::~ApplicationSettings()
@@ -105,6 +97,15 @@ namespace app
         auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success)
             return ret;
+
+        settings->registerValueChange(
+            settings::SystemProperties::lockPassHash,
+            [this](std::string value) { lockPassChanged(value); },
+            settings::SettingsScope::Global);
+        settings->registerValueChange(
+            settings::SystemProperties::timeDateFormat,
+            [this](std::string value) { timeDateChanged(value); },
+            settings::SettingsScope::Global);
 
         createUserInterface();
 
