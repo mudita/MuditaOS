@@ -148,7 +148,7 @@ namespace purefs::fs::drivers
         return std::make_shared<mount_point_vfat>(diskh, path, flags, shared_from_this());
     }
 
-    auto filesystem_vfat::mount(fsmount mnt) noexcept -> int
+    auto filesystem_vfat::mount(fsmount mnt, const void *data) noexcept -> int
     {
         auto disk = mnt->disk();
         if (!disk) {
@@ -168,7 +168,7 @@ namespace purefs::fs::drivers
         ret = f_mount(vmnt->fatfs(), vmnt->ff_drive(), 1);
         ret = translate_error(ret);
         if (!ret) {
-            filesystem_operations::mount(mnt);
+            filesystem_operations::mount(mnt, data);
         }
         return ret;
     }
