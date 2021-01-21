@@ -97,6 +97,6 @@ done
 mcopy -s -i "$PART1" sys/updates ::
 
 #Littlefs generate image
-$GENLFS --image=$IMAGE_NAME --block_size=4096  --overwrite  --partition_num=3 -- user/*
+$GENLFS --image=$IMAGE_NAME --block_size=32768  --overwrite  --partition_num=3 -- user/*
 # back to previous dir
 cd -
