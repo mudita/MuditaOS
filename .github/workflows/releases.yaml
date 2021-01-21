@@ -27,13 +27,17 @@ jobs:
         popd
     - name: "Build and package for RT1051"
       id: build_release_package 
+      env:
+        ASSETS_LOGIN: ${{ secrets.ASSETS_LOGIN }}
+        ASSETS_TOKEN: ${{ secrets.ASSETS_TOKEN }}
       run: |
         ./configure.sh rt1051 RelWithDebInfo && \
         pushd build-rt1051-RelWithDebInfo && \
         export JOBS=${JOBS:-`nproc`} && \
         echo "JOBS=${JOBS}" && \
         make -j ${JOBS} && \
-        make -j ${JOBS}  package && \
+        make package-update VERBOSE=1 && \
+        make package-standalone && \
         popd && \
         ./print_last_changes.sh && \
         uptime
@@ -48,15 +52,26 @@ jobs:
         draft: true
         prerelease: true
         body: ${{steps.build_release_package.outputs.release_notes }}
-    - name: Upload Release Package
-      id: upload-release-package
+    - name: Upload Standalone Package
+      id: upload-stanalone-package
       uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GitHub_PAT }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         # here we have to use relative path with starting "./"
-        asset_path: ./${{ steps.build_release_package.outputs.package_path }}/${{steps.build_release_package.outputs.package}}
-        asset_name: ${{ steps.build_release_package.outputs.package }}
-        asset_content_type: ${{ steps.build_release_package.outputs.mime_type }}
+        asset_path: ./${{ steps.build_release_package.outputs.package_path }}/${{ steps.build_release_package.outputs.package-standalone }}
+        asset_name: ${{ steps.build_release_package.outputs.package-standalone }}
+        asset_content_type: ${{ steps.build_release_package.outputs.standalone-mime_type }}
+    - name: Upload Update Package
+      id: upload-update-package
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GitHub_PAT }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        # here we have to use relative path with starting "./"
+        asset_path: ./${{ steps.build_release_package.outputs.package_path }}/${{ steps.build_release_package.outputs.package-update }}
+        asset_name: ${{ steps.build_release_package.outputs.package-update }}
+        asset_content_type: ${{ steps.build_release_package.outputs.update-mime_type }}
 
