@@ -40,7 +40,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 {
     desktopWorker = std::make_unique<WorkerDesktop>(this);
     const bool ret = desktopWorker->init(
-        {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), sdesktop::cdc_queue_len},
+        {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
          {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
 
     if (ret == false) {
