@@ -36,8 +36,6 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        topBar->setActive(TopBar::Elements::SIGNAL, true);
-        topBar->setActive(TopBar::Elements::BATTERY, true);
 
         setTitle("Info");
 

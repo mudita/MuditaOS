@@ -116,7 +116,7 @@ namespace sys
         // pingPongTimerID = CreateTimer(Ticks::MsToTicks(pingInterval), true);
         // ReloadTimer(pingPongTimerID);
 
-        cpuStatisticsTimer = std::make_unique<sys::Timer>("cpuStatistics", this, timerInitInterval.count());
+        cpuStatisticsTimer = std::make_unique<sys::Timer>("cpuStatistics", this, constants::timerInitInterval.count());
         cpuStatisticsTimer->connect([&](sys::Timer &) { CpuStatisticsTimerHandler(); });
         cpuStatisticsTimer->start();
     }
@@ -261,6 +261,10 @@ namespace sys
 
         connect(sevm::BatteryBrownoutMessage(), [&](Message *) {
             LOG_INFO("Battery Brownout voltage level reached!");
+
+            auto msg = std::make_shared<SystemBrownoutMesssage>();
+            Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, this);
+
             return MessageNone{};
         });
 
@@ -284,7 +288,7 @@ namespace sys
             CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::On);
 
             auto msg = std::make_shared<CriticalBatteryLevelNotification>(false);
-            Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, this);
+            Bus::SendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName, this);
 
             return MessageNone{};
         });
@@ -354,7 +358,7 @@ namespace sys
     {
         if (!cpuStatisticsTimerInit) {
             cpuStatisticsTimerInit = true;
-            cpuStatisticsTimer->setInterval(timerPeriodInterval.count());
+            cpuStatisticsTimer->setInterval(constants::timerPeriodInterval.count());
         }
 
         cpuStatistics->Update();

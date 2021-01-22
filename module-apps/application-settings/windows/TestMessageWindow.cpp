@@ -61,9 +61,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        topBar->setActive(TopBar::Elements::SIGNAL, true);
-        topBar->setActive(TopBar::Elements::BATTERY, true);
-
         receivedLabel = new gui::Label(this, 10, 50, 480 - 20, 50, "Received SMS");
         receivedLabel->setAlignment(
             gui::Alignment(gui::Alignment::Vertical::Center, gui::Alignment::Horizontal::Center));

@@ -34,7 +34,8 @@ namespace app::manager
 {
     namespace
     {
-        constexpr auto default_application_locktime_ms = 30000;
+        static constexpr auto default_application_locktime_ms = 30000;
+        static constexpr auto shutdown_delay_ms               = 500;
     }; // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
@@ -102,16 +103,11 @@ namespace app::manager
         : Service{serviceName}, ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           blockingTimer{std::make_unique<sys::Timer>(
               "BlockTimer", this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)},
+          shutdownDelay{std::make_unique<sys::Timer>("ShutdownDelay", this, shutdown_delay_ms)},
           settings(std::make_unique<settings::Settings>(this))
     {
         registerMessageHandlers();
         blockingTimer->connect([this](sys::Timer &) { onPhoneLocked(); });
-        settings->registerValueChange(settings::SystemProperties::displayLanguage,
-                                      [this](std::string value) { displayLanguageChanged(value); });
-        settings->registerValueChange(settings::SystemProperties::inputLanguage,
-                                      [this](std::string value) { inputLanguageChanged(value); });
-        settings->registerValueChange(settings::SystemProperties::lockTime,
-                                      [this](std::string value) { lockTimeChanged(value); });
     }
 
     sys::ReturnCodes ApplicationManager::InitHandler()
@@ -120,6 +116,18 @@ namespace app::manager
         utils::localize.setFallbackLanguage(utils::localize.DefaultLanguage);
         utils::localize.setDisplayLanguage(displayLanguage);
         utils::localize.setInputLanguage(inputLanguage);
+        settings->registerValueChange(
+            settings::SystemProperties::displayLanguage,
+            [this](std::string value) { displayLanguageChanged(value); },
+            settings::SettingsScope::Global);
+        settings->registerValueChange(
+            settings::SystemProperties::inputLanguage,
+            [this](std::string value) { inputLanguageChanged(value); },
+            settings::SettingsScope::Global);
+        settings->registerValueChange(
+            settings::SystemProperties::lockTime,
+            [this](std::string value) { lockTimeChanged(value); },
+            settings::SettingsScope::Global);
 
         startSystemServices();
         startBackgroundApplications();
@@ -161,6 +169,7 @@ namespace app::manager
 
     sys::ReturnCodes ApplicationManager::DeinitHandler()
     {
+        settings->unregisterValueChange();
         closeApplications();
         closeServices();
         return sys::ReturnCodes::Success;
@@ -248,6 +257,7 @@ namespace app::manager
         connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIPushMessage), convertibleToActionHandler);
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
+        connect(typeid(sys::SystemBrownoutMesssage), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -391,6 +401,8 @@ namespace app::manager
             auto params = static_cast<ApplicationLaunchData *>(actionMsg->getData().get());
             return handleLaunchAction(params);
         }
+        case actions::CloseSystem:
+            return handleCloseSystem();
         default: {
             auto &actionParams = actionMsg->getData();
             return handleCustomAction(action, std::move(actionParams));
@@ -413,6 +425,14 @@ namespace app::manager
 
         SwitchRequest switchRequest(ServiceName, targetApp->name(), gui::name::window::main_window, nullptr);
         return handleSwitchApplication(&switchRequest);
+    }
+
+    auto ApplicationManager::handleCloseSystem() -> bool
+    {
+        shutdownDelay->connect([&](sys::Timer &) { sys::SystemManager::CloseSystem(this); });
+        shutdownDelay->start();
+
+        return true;
     }
 
     auto ApplicationManager::handleCustomAction(actions::ActionId action, actions::ActionParamsPtr &&actionParams)
@@ -540,7 +560,8 @@ namespace app::manager
             return false;
         }
         displayLanguage = requestedLanguage;
-        settings->setValue(settings::SystemProperties::displayLanguage, displayLanguage);
+        settings->setValue(
+            settings::SystemProperties::displayLanguage, displayLanguage, settings::SettingsScope::Global);
         utils::localize.setDisplayLanguage(displayLanguage);
         rebuildActiveApplications();
         return true;
@@ -555,7 +576,7 @@ namespace app::manager
             return false;
         }
         inputLanguage = requestedLanguage;
-        settings->setValue(settings::SystemProperties::inputLanguage, inputLanguage);
+        settings->setValue(settings::SystemProperties::inputLanguage, inputLanguage, settings::SettingsScope::Global);
         utils::localize.setInputLanguage(inputLanguage);
         return true;
     }

@@ -21,18 +21,16 @@ namespace sys
     class Service;
 } // namespace sys
 
-using namespace parserFSM;
-
-class DeveloperModeEndpoint : public Endpoint
+class DeveloperModeEndpoint : public parserFSM::Endpoint
 {
   private:
-    std::unique_ptr<DeveloperModeHelper> helper;
+    std::unique_ptr<parserFSM::DeveloperModeHelper> helper;
 
   public:
     DeveloperModeEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
     {
         debugName = "DeveloperModeEndpoint";
-        helper    = std::make_unique<DeveloperModeHelper>(ownerServicePtr);
+        helper    = std::make_unique<parserFSM::DeveloperModeHelper>(ownerServicePtr);
     }
-    auto handle(Context &context) -> void override;
+    auto handle(parserFSM::Context &context) -> void override;
 };

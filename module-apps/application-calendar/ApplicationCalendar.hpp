@@ -55,7 +55,8 @@ namespace app
         }
         void createUserInterface() override;
         void destroyUserInterface() override;
-        void switchToNoEventsWindow(const std::string &title = "", const TimePoint &dateFilter = TimePoint());
+        void switchToNoEventsWindow(const std::string &title              = "",
+                                    const calendar::TimePoint &dateFilter = calendar::TimePoint());
 
         static const std::map<Reminder, const char *> reminderOptions;
         static const std::map<Repeat, const char *> repeatOptions;

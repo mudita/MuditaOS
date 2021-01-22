@@ -24,6 +24,7 @@ namespace app::manager
         {
             Home,
             Launch,
+            CloseSystem,
             Call,
             Dial,
             ShowCallLog,
@@ -48,6 +49,7 @@ namespace app::manager
             ShowMMIPush,
             DisplayCMEError,
             DisplayLowBatteryNotification,
+            SystemBrownout,
             UserAction // The last enumerator in the Action enum.
                        // All user-defined actions shall have values greater than UserAction.
                        // All system-wide actions shall have values lesser than UserAction.

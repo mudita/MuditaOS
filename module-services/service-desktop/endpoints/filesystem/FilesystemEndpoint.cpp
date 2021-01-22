@@ -6,6 +6,8 @@
 #include "service-desktop/ServiceDesktop.hpp"
 #include <purefs/filesystem_paths.hpp>
 
+using namespace parserFSM;
+
 auto FilesystemEndpoint::handle(Context &context) -> void
 {
     LOG_DEBUG("handle");

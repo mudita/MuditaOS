@@ -5,8 +5,7 @@
 
 #include <service-db/service-db/Settings.hpp>
 #include "ControlFunctions.hpp"
-
-#include <sstream>
+#include <Utils.hpp>
 
 namespace sys
 {
@@ -85,7 +84,7 @@ namespace screen_light_control
 
         template <class T> void setScreenLightSettings(const std::string &varName, T value)
         {
-            settings->setValue(varName, std::to_string(value));
+            settings->setValue(varName, utils::to_string(value));
         }
         void initFromSettings();
 

@@ -54,8 +54,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_music_player_play"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        topBar->setActive(TopBar::Elements::TIME, true);
-
         songsList = new gui::ListView(this,
                                       musicPlayerStyle::allSongsWindow::x,
                                       musicPlayerStyle::allSongsWindow::y,

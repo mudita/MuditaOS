@@ -29,7 +29,6 @@ namespace gui
     {
         AppWindow::buildInterface();
         setTitle(utils::localize.get("app_messages_title_main"));
-        topBar->setActive(TopBar::Elements::TIME, true);
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 

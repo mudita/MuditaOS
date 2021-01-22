@@ -32,7 +32,12 @@ namespace gui
         }
         return std::string{};
     }
-
+    top_bar::Configuration PinLockBaseWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    {
+        appConfiguration.enable(top_bar::Indicator::Lock);
+        appConfiguration.disable(top_bar::Indicator::Time);
+        return appConfiguration;
+    }
     void PinLockBaseWindow::restore() noexcept
     {
         LockWindow::restore();
@@ -91,10 +96,4 @@ namespace gui
         title->setPenWidth(2);
     }
 
-    void PinLockBaseWindow::buildTopBar()
-    {
-        topBar->setActive(TopBar::Elements::SIGNAL, true);
-        topBar->setActive(TopBar::Elements::BATTERY, true);
-        topBar->setActive(TopBar::Elements::LOCK, true);
-    }
 } // namespace gui

@@ -27,9 +27,6 @@ namespace gui
         gui::Image *powerImage     = nullptr;
         gui::Image *powerDownImage = nullptr;
         State state                = State::Return;
-
-        void scheduleSystemShutdown();
-
       public:
         PowerOffWindow(app::Application *app);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

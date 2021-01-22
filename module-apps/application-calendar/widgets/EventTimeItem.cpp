@@ -433,9 +433,9 @@ namespace gui
         }
     }
 
-    TimePoint EventTimeItem::calculateEventTime(YearMonthDay date,
-                                                std::chrono::hours hours,
-                                                std::chrono::minutes minutes)
+    calendar::TimePoint EventTimeItem::calculateEventTime(calendar::YearMonthDay date,
+                                                          std::chrono::hours hours,
+                                                          std::chrono::minutes minutes)
     {
         return TimePointFromYearMonthDay(date) + hours + minutes;
     }

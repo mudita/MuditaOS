@@ -21,7 +21,6 @@ namespace gui
         void buildBottomBar() override;
         void buildInterface() override;
         void buildTitleBar() override;
-        void buildTopBar() override;
         void destroyInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void processPasscode();

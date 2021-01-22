@@ -15,6 +15,8 @@
 #include <sys/statvfs.h>
 #include <purefs/filesystem_paths.hpp>
 
+using namespace parserFSM;
+
 auto DeviceInfoEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {

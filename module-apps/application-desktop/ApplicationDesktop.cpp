@@ -8,6 +8,7 @@
 #include "windows/MenuWindow.hpp"
 #include "windows/PinLockWindow.hpp"
 #include "windows/PowerOffWindow.hpp"
+#include "windows/DeadBatteryWindow.hpp"
 #include "windows/LockedInfoWindow.hpp"
 #include "windows/Reboot.hpp"
 #include "windows/Update.hpp"
@@ -37,6 +38,12 @@ namespace app
     ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground), lockHandler(this)
     {
+        using namespace gui::top_bar;
+        topBarManager->enableIndicators({Indicator::Signal,
+                                         Indicator::Time,
+                                         Indicator::Battery,
+                                         Indicator::SimCard,
+                                         Indicator::NetworkAccessTechnology});
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
 
         addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
@@ -86,6 +93,11 @@ namespace app
 
         addActionReceiver(app::manager::actions::DisplayLowBatteryNotification, [this](auto &&data) {
             handleLowBatteryNotification(std::move(data));
+            return msgHandled();
+        });
+
+        addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
+            switchWindow(app::window::name::dead_battery, std::move(data));
             return msgHandled();
         });
     }
@@ -317,11 +329,15 @@ namespace app
             std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
         sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, this);
 
-        settings->registerValueChange(settings::SystemProperties::activeSim,
-                                      [this](std::string value) { activeSimChanged(value); });
+        settings->registerValueChange(
+            settings::SystemProperties::activeSim,
+            [this](std::string value) { activeSimChanged(value); },
+            settings::SettingsScope::Global);
         Store::GSM::get()->selected = Store::GSM::SIM::NONE;
-        settings->registerValueChange(settings::SystemProperties::lockPassHash,
-                                      [this](std::string value) { lockPassHashChanged(value); });
+        settings->registerValueChange(
+            settings::SystemProperties::lockPassHash,
+            [this](std::string value) { lockPassHashChanged(value); },
+            settings::SettingsScope::Global);
 
         return sys::ReturnCodes::Success;
     }
@@ -329,6 +345,7 @@ namespace app
     sys::ReturnCodes ApplicationDesktop::DeinitHandler()
     {
         LOG_INFO("DeinitHandler");
+        settings->unregisterValueChange();
         return sys::ReturnCodes::Success;
     }
 
@@ -346,6 +363,9 @@ namespace app
         });
         windowsFactory.attach(desktop_poweroff, [](Application *app, const std::string newname) {
             return std::make_unique<gui::PowerOffWindow>(app);
+        });
+        windowsFactory.attach(dead_battery, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::DeadBatteryWindow>(app);
         });
         windowsFactory.attach(desktop_locked, [](Application *app, const std::string newname) {
             return std::make_unique<gui::LockedInfoWindow>(app);

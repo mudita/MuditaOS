@@ -71,7 +71,7 @@ namespace sdesktop
         class Event
         {
           protected:
-            Context context;
+            parserFSM::Context context;
 
           public:
             void send();

@@ -37,8 +37,6 @@ MmiPullWindow::MmiPullWindow(app::Application *app, const std::string &name) : g
 {
     AppWindow::buildInterface();
 
-    topBar->setActive(TopBar::Elements::TIME, true);
-    topBar->setActive(TopBar::Elements::SIM, false);
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_replay"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
     text = new Text(
