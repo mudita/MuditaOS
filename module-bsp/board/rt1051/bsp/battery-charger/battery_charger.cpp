@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/battery-charger/battery_charger.hpp"
+#include "fsl_common.h"
 #include "MAX77818.hpp"
 #include <purefs/filesystem_paths.hpp>
 
@@ -11,6 +12,7 @@
 #include "drivers/i2c/DriverI2C.hpp"
 #include <purefs/filesystem_paths.hpp>
 #include <utility>
+#include <cstdio>
 
 namespace bsp::battery_charger
 {
@@ -113,18 +115,6 @@ namespace bsp::battery_charger
             return kStatus_Success;
         }
 
-        std::pair<int, std::uint8_t> chargerTopControllerRead(Registers registerAddress)
-        {
-            std::uint8_t value;
-            int status                      = kStatus_Success;
-            topControllerAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
-            auto ret                        = i2c->Read(topControllerAddress, &value, sizeof(std::uint8_t));
-            if (ret != sizeof(std::uint8_t)) {
-                status = kStatus_Fail;
-            }
-            return std::make_pair(status, value);
-        }
-
         batteryRetval loadConfiguration()
         {
             auto fd = std::fopen(cfgFile.c_str(), "r");
@@ -161,7 +151,7 @@ namespace bsp::battery_charger
         batteryRetval storeConfiguration()
         {
             // TODO:M.P procedure below seems to crash system, it should be fixed.
-            if (ff_rename(cfgFile.c_str(), cfgFilePrev.c_str(), false) != 0) {
+            if (rename(cfgFile.c_str(), cfgFilePrev.c_str()) != 0) {
                 LOG_ERROR("Could not move configuration file");
                 return batteryRetval::ChargerError;
             }
@@ -378,7 +368,6 @@ namespace bsp::battery_charger
 
     bool getChargeStatus()
     {
-        std::uint8_t val = 0;
         // read clears state
         auto value = chargerRead(Registers::CHG_INT_OK);
         if (value.first != kStatus_Success) {
