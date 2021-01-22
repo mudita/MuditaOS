@@ -41,7 +41,22 @@ class CellularSetAPNMessage : public CellularMessage // also as DeleteAPN
 
   public:
     CellularSetAPNMessage(std::shared_ptr<packet_data::APN::Config> apnConfig)
-        : CellularMessage(MessageType::CellularPacketData), apnConfig(apnConfig)
+        : CellularMessage(MessageType::CellularPacketData), apnConfig(std::move(apnConfig))
+    {}
+
+    [[nodiscard]] std::shared_ptr<packet_data::APN::Config> getAPNConfig() const noexcept
+    {
+        return apnConfig;
+    }
+};
+
+class CellularNewAPNMessage : public CellularMessage
+{
+    std::shared_ptr<packet_data::APN::Config> apnConfig;
+
+  public:
+    CellularNewAPNMessage(std::shared_ptr<packet_data::APN::Config> apnConfig)
+        : CellularMessage(MessageType::CellularPacketData), apnConfig(std::move(apnConfig))
     {}
 
     [[nodiscard]] std::shared_ptr<packet_data::APN::Config> getAPNConfig() const noexcept
@@ -140,6 +155,20 @@ class CellularSetAPNResponse : public CellularATResponse
   public:
     CellularSetAPNResponse(at::Result::Code result) : CellularATResponse(result)
     {}
+};
+
+class CellularNewAPNResponse : public CellularATResponse
+{
+    std::uint8_t contextId;
+
+  public:
+    CellularNewAPNResponse(at::Result::Code result, std::uint8_t contextId)
+        : CellularATResponse(result), contextId(contextId)
+    {}
+    [[nodiscard]] std::uint8_t getContextId() const noexcept
+    {
+        return contextId;
+    }
 };
 
 class CellularSetDataTransferResponse : public CellularATResponse
