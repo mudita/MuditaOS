@@ -44,8 +44,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::use));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        topBar->setActive(TopBar::Elements::TIME, true);
-
         namespace style = style::messages::templates::list;
 
         list = new gui::ListView(this, style::x, style::y, style::w, style::h, smsTemplateModel);

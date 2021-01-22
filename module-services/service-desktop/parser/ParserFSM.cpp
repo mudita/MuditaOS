@@ -28,10 +28,10 @@ using namespace parserFSM;
 StateMachine::StateMachine(sys::Service *OwnerService) : OwnerServicePtr(OwnerService)
 {}
 
-void StateMachine::processMessage(std::string &msg)
+void StateMachine::processMessage(std::string &&msg)
 {
-    receivedMsgPtr = &msg;
-    LOG_DEBUG("Msg: %s", receivedMsgPtr->c_str());
+    receivedMsg = std::move(msg);
+    LOG_DEBUG("Msg: %s", receivedMsg.c_str());
 
     switch (state) {
     case State::ReceivedPayload:
@@ -58,20 +58,20 @@ void StateMachine::parseHeader()
     header.clear();
     payloadLength = 0;
 
-    auto messageStart = receivedMsgPtr->find(message::endpointChar);
+    auto messageStart = receivedMsg.find(message::endpointChar);
     if (messageStart == std::string::npos) {
-        LOG_ERROR("This is not a valid endpoint message! Type=%c", receivedMsgPtr->at(0));
+        LOG_ERROR("This is not a valid endpoint message! Type=%c", receivedMsg.at(0));
         return;
     }
 
-    if (receivedMsgPtr->size() < message::size_header) // header divided in few parts
+    if (receivedMsg.size() < message::size_header) // header divided in few parts
     {
         state = State::ReceivedPartialHeader;
-        header.append(*receivedMsgPtr); // append to whole header string
+        header.append(receivedMsg); // append to whole header string
         return;
     }
 
-    header        = message::getHeader(*receivedMsgPtr);
+    header        = message::getHeader(receivedMsg);
     payloadLength = message::calcPayloadLength(header);
     if (payloadLength == 0) // failed to obtain payload length from msg
     {
@@ -82,7 +82,7 @@ void StateMachine::parseHeader()
 
     LOG_DEBUG("Payload length: %lu", payloadLength);
 
-    message::removeHeader(*receivedMsgPtr);
+    message::removeHeader(receivedMsg);
     parseNewMessage();
 }
 
@@ -91,39 +91,39 @@ void StateMachine::parsePartialHeader()
     auto previousHeaderLength = header.size();
     auto missingHeaderLength  = message::size_header - previousHeaderLength;
 
-    if (receivedMsgPtr->size() >= missingHeaderLength) // rest of the message is here
+    if (receivedMsg.size() >= missingHeaderLength) // rest of the message is here
     {
-        header.append(receivedMsgPtr->substr(0, missingHeaderLength));
+        header.append(receivedMsg.substr(0, missingHeaderLength));
         LOG_DEBUG("Header: %s\n", header.c_str());
         payloadLength = message::calcPayloadLength(header);
 
         LOG_DEBUG("Payload length: %lu\n", payloadLength);
-        message::eraseFront(*receivedMsgPtr, missingHeaderLength);
+        message::eraseFront(receivedMsg, missingHeaderLength);
 
         parseNewMessage();
     }
     else // the message is even longer :(
     {
-        header.append(*receivedMsgPtr);
+        header.append(receivedMsg);
     }
 }
 
 void StateMachine::parseNewMessage()
 {
-    if (receivedMsgPtr->size() >= payloadLength) {
+    if (receivedMsg.size() >= payloadLength) {
 
-        payload = message::extractPayload(*receivedMsgPtr, payloadLength);
+        payload = message::extractPayload(receivedMsg, payloadLength);
 
         parsePayload();
 
-        if (receivedMsgPtr->size() > payloadLength) { // contains part of new header
-            message::eraseFront(*receivedMsgPtr, payloadLength);
+        if (receivedMsg.size() > payloadLength) { // contains part of new header
+            message::eraseFront(receivedMsg, payloadLength);
             parseHeader();
         }
     }
     else // message divided in 2 or more packets
     {
-        payload = receivedMsgPtr->substr(0, std::string::npos); // take rest of the message
+        payload = receivedMsg.substr(0, std::string::npos); // take rest of the message
         state   = State::ReceivedPartialPayload;
     }
 }
@@ -133,20 +133,20 @@ void StateMachine::parsePartialMessage()
     auto previousPayloadLength = payload.size();
     auto missingPayloadLength  = payloadLength - previousPayloadLength;
 
-    if (receivedMsgPtr->size() >= missingPayloadLength) // rest of the message is here
+    if (receivedMsg.size() >= missingPayloadLength) // rest of the message is here
     {
-        payload.append(message::extractPayload(*receivedMsgPtr, missingPayloadLength));
+        payload.append(message::extractPayload(receivedMsg, missingPayloadLength));
 
         parsePayload();
 
-        if (receivedMsgPtr->size() > missingPayloadLength) {
-            message::eraseFront(*receivedMsgPtr, missingPayloadLength);
+        if (receivedMsg.size() > missingPayloadLength) {
+            message::eraseFront(receivedMsg, missingPayloadLength);
             parseHeader();
         }
     }
     else // the message is even longer
     {
-        payload.append(*receivedMsgPtr);
+        payload.append(receivedMsg);
     }
 }
 

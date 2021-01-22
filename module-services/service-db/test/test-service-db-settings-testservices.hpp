@@ -28,26 +28,28 @@ namespace settings
             if (auto msg = dynamic_cast<settings::UTMsg::ReqRegValChg *>(req)) {
                 debug("ReqRegValChg", msg->name, msg->value);
                 whoRequestedNotifyOnChange = msg->sender;
-                mySettings->registerValueChange(msg->name, ([this](std::string value) {
+                mySettings->registerValueChange(msg->name,
+                                                ([this](std::string value) {
                                                     ValueChanged(value);
                                                     auto cnf = std::make_shared<settings::UTMsg::CnfValChg>("", value);
                                                     sys::Bus::SendUnicast(
                                                         std::move(cnf), whoRequestedNotifyOnChange, this);
-                                                }));
+                                                }),
+                                                settings::SettingsScope::Global);
                 auto cnf = std::make_shared<settings::UTMsg::CnfRegValChg>(msg->name, msg->value);
                 sys::Bus::SendUnicast(std::move(cnf), whoRequestedNotifyOnChange, this);
             }
             else if (auto msg = dynamic_cast<settings::UTMsg::ReqUnRegValChg *>(req)) {
                 // unregister
                 debug("ReqUnRegValChg", msg->name, msg->value);
-                mySettings->unregisterValueChange(msg->name);
+                mySettings->unregisterValueChange(msg->name, settings::SettingsScope::Global);
                 auto cnf = std::make_shared<settings::UTMsg::CnfUnRegValChg>(msg->name, msg->value);
                 sys::Bus::SendUnicast(std::move(cnf), msg->sender, this);
             }
             else if (auto msg = dynamic_cast<settings::UTMsg::ReqSetVal *>(req)) {
                 // set value
                 debug("ReqSetVal", msg->name, msg->value);
-                mySettings->setValue(msg->name, msg->value);
+                mySettings->setValue(msg->name, msg->value, settings::SettingsScope::Global);
                 auto cnf = std::make_shared<settings::UTMsg::CnfReqSetVal>(msg->name, msg->value);
                 sys::Bus::SendUnicast(std::move(cnf), msg->sender, this);
             }

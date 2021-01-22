@@ -20,12 +20,6 @@ jobs:
           fetch-depth: 0
       - name: check commit messages
         run: ./tools/check_commit_messages.py
-  build:
-    if: github.event.pull_request.draft == false
-    runs-on: self-hosted
-    steps:
-      - name: build
-        run: echo "Placeholder for old CI scripts"
   check_copyright_and_style:
     name: check copyright and style
     if: github.event.pull_request.draft == false

@@ -25,7 +25,7 @@ class VisitorMock : public gui::GuiVisitor
     MOCK_METHOD1(visit, void(gui::Window &item));
     MOCK_METHOD1(visit, void(gui::Label &item));
     MOCK_METHOD1(visit, void(gui::BottomBar &item));
-    MOCK_METHOD1(visit, void(gui::TopBar &item));
+    MOCK_METHOD1(visit, void(gui::top_bar::TopBar &item));
 };
 
 class CustomRect : public gui::Rect

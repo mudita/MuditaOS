@@ -83,8 +83,8 @@ auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     auto eventShift = app->getEventShift();
     if (eventShift) {
         for (auto &record : records) {
-            record.date_from += hours(eventShift);
-            record.date_till += hours(eventShift);
+            record.date_from += std::chrono::hours(eventShift);
+            record.date_till += std::chrono::hours(eventShift);
         }
     }
     return this->updateRecords(std::move(records));

@@ -47,16 +47,10 @@ namespace app
             switchWindow(app::sim_select);
             return msgHandled();
         });
-        settings->registerValueChange(settings::SystemProperties::lockPassHash,
-                                      [this](std::string value) { lockPassChanged(value); });
-        settings->registerValueChange(settings::SystemProperties::timeDateFormat,
-                                      [this](std::string value) { timeDateChanged(value); });
     }
 
     ApplicationSettings::~ApplicationSettings()
     {
-        settings->unregisterValueChange(settings::SystemProperties::lockPassHash);
-        settings->unregisterValueChange(settings::SystemProperties::timeDateFormat);
     }
 
     // Invoked upon receiving data message
@@ -103,6 +97,15 @@ namespace app
         auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success)
             return ret;
+
+        settings->registerValueChange(
+            settings::SystemProperties::lockPassHash,
+            [this](std::string value) { lockPassChanged(value); },
+            settings::SettingsScope::Global);
+        settings->registerValueChange(
+            settings::SystemProperties::timeDateFormat,
+            [this](std::string value) { timeDateChanged(value); },
+            settings::SettingsScope::Global);
 
         createUserInterface();
 
@@ -173,13 +176,14 @@ namespace app
 
     void ApplicationSettings::setPin(unsigned int value)
     {
-        settings->setValue(settings::SystemProperties::lockPassHash, std::to_string(value));
+        settings->setValue(
+            settings::SystemProperties::lockPassHash, std::to_string(value), settings::SettingsScope::Global);
         lockPassHash = value;
     }
 
     void ApplicationSettings::clearPin()
     {
-        settings->setValue(settings::SystemProperties::lockPassHash, "");
+        settings->setValue(settings::SystemProperties::lockPassHash, "", settings::SettingsScope::Global);
         lockPassHash = 0U;
     }
 

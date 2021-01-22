@@ -60,7 +60,10 @@ auto DBServiceAPI::ThreadGetCount(sys::Service *serv, EntryState state) -> uint3
 
     auto ret            = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
     auto threadResponse = dynamic_cast<DBThreadResponseMessage *>(ret.second.get());
-    assert(threadResponse != nullptr);
+    if (threadResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return 0;
+    }
     if ((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == 1)) {
         return threadResponse->count;
     }
@@ -91,7 +94,10 @@ auto DBServiceAPI::ContactGetByIDCommon(sys::Service *serv, std::shared_ptr<DBCo
 {
     auto ret             = sys::Bus::SendUnicast(contactMsg, service::name::db, serv, DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
-    assert(contactResponse != nullptr);
+    if (contactResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return nullptr;
+    }
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode != 0)) {
         return std::move(contactResponse->records);
     }
@@ -133,7 +139,10 @@ auto DBServiceAPI::MatchContactByPhoneNumber(sys::Service *serv, const utils::Ph
 
     auto ret             = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactNumberResponseMessage *>(ret.second.get());
-    assert(contactResponse);
+    if (contactResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return nullptr;
+    }
     return std::move(contactResponse->contact);
 }
 
@@ -180,7 +189,10 @@ auto DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec) -> b
 
     auto ret             = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
-    assert(contactResponse != nullptr);
+    if (contactResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return false;
+    }
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode != 0)) {
         return true;
     }
@@ -194,7 +206,10 @@ auto DBServiceAPI::ContactRemove(sys::Service *serv, uint32_t id) -> bool
 
     auto ret             = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
-    assert(contactResponse != nullptr);
+    if (contactResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return false;
+    }
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode != 0)) {
         return true;
     }
@@ -207,7 +222,10 @@ auto DBServiceAPI::ContactUpdate(sys::Service *serv, const ContactRecord &rec) -
 
     auto ret             = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
-    assert(contactResponse != nullptr);
+    if (contactResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return false;
+    }
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode != 0)) {
         return true;
     }
@@ -225,7 +243,10 @@ auto DBServiceAPI::ContactSearch(sys::Service *serv, UTF8 primaryName, UTF8 alte
 
     auto ret             = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
-    assert(contactResponse != nullptr);
+    if (contactResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return nullptr;
+    }
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode != 0)) {
         return std::move(contactResponse->records);
     }
@@ -240,7 +261,10 @@ auto DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec) -> C
 
     auto ret             = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
     auto calllogResponse = dynamic_cast<DBCalllogResponseMessage *>(ret.second.get());
-    assert(calllogResponse != nullptr);
+    if (calllogResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return CalllogRecord();
+    }
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode != 0)) {
         auto records = *calllogResponse->records;
         if (!records.empty()) {
@@ -258,7 +282,10 @@ auto DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id) -> bool
 
     auto ret             = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
     auto calllogResponse = dynamic_cast<DBCalllogResponseMessage *>(ret.second.get());
-    assert(calllogResponse != nullptr);
+    if (calllogResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return false;
+    }
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode != 0)) {
         return true;
     }
@@ -273,7 +300,10 @@ auto DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -
 
     auto ret             = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
     auto calllogResponse = dynamic_cast<DBCalllogResponseMessage *>(ret.second.get());
-    assert(calllogResponse != nullptr);
+    if (calllogResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return false;
+    }
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode != 0)) {
         return true;
     }
@@ -286,7 +316,10 @@ auto DBServiceAPI::CalllogGetCount(sys::Service *serv, EntryState state) -> uint
 
     auto ret             = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
     auto calllogResponse = dynamic_cast<DBCalllogResponseMessage *>(ret.second.get());
-    assert(calllogResponse != nullptr);
+    if (calllogResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return 0;
+    }
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode != 0)) {
         return calllogResponse->count;
     }
@@ -310,7 +343,10 @@ auto DBServiceAPI::GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc) -> uint
 
     auto ret      = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
     auto response = dynamic_cast<DBCountryCodeResponseMessage *>(ret.second.get());
-    assert(response != nullptr);
+    if (response == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return 0;
+    }
     if (ret.first == sys::ReturnCodes::Success) {
         return (response->row.country_code);
     }

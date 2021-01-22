@@ -138,6 +138,7 @@ namespace style
             inline constexpr auto set            = "common_set";
             inline constexpr auto yes            = "common_yes";
             inline constexpr auto no             = "common_no";
+            inline constexpr auto check          = "common_check";
             inline constexpr auto Switch         = "common_switch";
             inline constexpr auto options        = "common_options";
             inline constexpr auto information    = "common_information";

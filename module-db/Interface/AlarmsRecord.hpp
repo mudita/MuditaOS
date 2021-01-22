@@ -28,7 +28,7 @@ namespace db::query::alarms
 
 struct AlarmsRecord : public Record
 {
-    TimePoint time     = TIME_POINT_INVALID;
+    calendar::TimePoint time = TIME_POINT_INVALID;
     uint32_t snooze    = 0;
     AlarmStatus status = AlarmStatus::On;
     uint32_t repeat    = 0;

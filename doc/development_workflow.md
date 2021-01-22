@@ -15,18 +15,19 @@ Each commit that makes it from your branch or fork into the master branch must h
 If you're part of the MuditaOS core development team, your commit's title *must* start with a Jira ticket number in square brackets e.g. `[EGD-5555]`. 
 
 Commits from the community will be accompanied by a relevant Jira ticket number during the merge. Don't add commits that are out of the scope of the Jira issue you are working on.
+You should have exactly one commit in a single PR.
 
 Your commit's subject line should be a single sentence describing what you are changing using present simple tense and an imperative mood. Please follow these rules:
 
-- It must start with one of the following verbs: "Add", "Change" or "Fix", depending on whether you are adding a new feature, changing its behavior, or fixing it. This sentence will be a part of the project changelog, so please ensure it will be clear to the non-technical readers. 
+- It must start with a verb. This sentence will be a part of the project changelog, so please ensure it will be clear to the non-technical readers. 
+- If you are adding a new feature start with "Add"; start with "Fix" if you are fixing one.
 - Don't use proper names such as names of classes or functions. 
 - Try to be as concise as possible in the limit of 72 characters (including the Jira ticket number - 11 characters). 
 - Don't end the subject line with a period. 
 
 Then, in the commit message, you must include a short description of what the commit is changing in the project. You should be clear about
 your motivation to do the change and how it influences the project.
-
-If it's impossible to provide any of the above information, then your commit is likely excessive or redundant and should be squashed with another commit.
+Focus more on *why* than *how*.
 
 An example of a correctly formatted commit:
 ```
@@ -50,13 +51,13 @@ You can add a commit template and hook that will help with proper defining both 
 
 Before submitting a Pull Request please go through some basic checks:
 
-- test your changes on both Linux and RT1051 platforms (please pay special attention to the things you might break unintentionally, e.g. when working on calling funcionality, check call log too)
-- [include changelog description](changelog_howto.md) (if applicable),
+- test your changes on both Linux and RT1051 platforms (please pay special attention to the things you might break unintentionally, e.g. when working on calling, check call log too,
 - run unit tests (`make check`),
+- [run static analysis](static_analysis.md)
 - check if your code formatting complies with [`.clang-format`](../clang-format),
-- whenever you add a third party software to MuditaOS source code, please make sure that the software component is added to a dedicated [section in `LICENSE.md` file on MuditaOS GitHub repository](../LICENSE.md) with a link to the text of the license where applicable.
+- whenever you add third-party software to MuditaOS source code, please make sure that the software component is added to a dedicated [section in `LICENSE.md` file on MuditaOS GitHub repository](../LICENSE.md) with a link to the text of the license where applicable.
 
-As a part of our continuous integration proccess we will be soon introducing our own [test harness](../test/README.md).
+As a part of our continuous integration process we will be soon introducing our own [test harness](../test/README.md).
 
 ## Submit a Pull Request
 
@@ -78,7 +79,7 @@ During a PR review, team members will ask you questions regarding your solution.
 
 ## PR review - act on feedback
 
-Add changes to your PR that are requested by reviewers and push the feature branch once again. Update comments requesting changes with a simple `Done`. Don't resolve discussion on your own, it's the reviewer's responsibility to do so.
+Add changes to your PR that are requested by reviewers and push the feature branch once again. Update comments requesting changes with a simple `Done`. Don't resolve a discussion on your own, it's the reviewer's responsibility to do so.
 
 ## Merge to `master` branch
 
@@ -110,7 +111,7 @@ git rebase origin/master  # update branch you are at to origin/master
 
 `Rebase` changes your commit history (moves them on top). This means two things:
 
- - when you did a lot of changes in a lot of places - either `git push` your branch on server, or make its copy
+ - when you did a lot of changes in a lot of places - either `git push` your branch to the server, or make its copy
  - when you're happy of `git rebase` results - you'll need to push your branch with force to server - since you've changed its history (updated it) 
 
 A minimal set of commands:

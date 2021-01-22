@@ -19,7 +19,6 @@ namespace gui
 
     class OptionWindow : public AppWindow
     {
-
       protected:
         std::shared_ptr<OptionsModel> optionsModel = nullptr;
         ListView *optionsList                      = nullptr;

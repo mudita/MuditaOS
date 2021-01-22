@@ -19,9 +19,7 @@ namespace sys
     class Service;
 } // namespace sys
 
-using namespace parserFSM;
-
-class FactoryResetEndpoint : public Endpoint
+class FactoryResetEndpoint : public parserFSM::Endpoint
 {
 
   public:
@@ -29,6 +27,6 @@ class FactoryResetEndpoint : public Endpoint
     {
         debugName = "FactoryResetEndpoint";
     }
-    auto handle(Context &context) -> void override;
-    auto makeFactoryReset(Context &context) -> bool;
+    auto handle(parserFSM::Context &context) -> void override;
+    auto makeFactoryReset(parserFSM::Context &context) -> bool;
 };

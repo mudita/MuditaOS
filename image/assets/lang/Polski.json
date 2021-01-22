@@ -38,6 +38,7 @@
   "common_yesterday": "wczoraj",
   "common_today": "dzisiaj",
   "locale_12hour_min": "%I:%M",
+  "locale_12hour_min_short": "%I:%M",
   "locale_24hour_min": "%H:%M",
   "locale_date_full": "%d.%m.%y",
   "locale_date_short": "%d.%m",

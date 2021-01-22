@@ -29,8 +29,6 @@ ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, 
     updateOS = std::make_unique<UpdateMuditaOS>(this);
     settings = std::make_unique<settings::Settings>(this);
 
-    settings->registerValueChange(updateos::settings::history,
-                                  [this](const std::string &value) { updateOS->setInitialHistory(value); });
 }
 
 ServiceDesktop::~ServiceDesktop()
@@ -42,7 +40,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 {
     desktopWorker = std::make_unique<WorkerDesktop>(this);
     const bool ret = desktopWorker->init(
-        {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), sdesktop::cdc_queue_len},
+        {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
          {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
 
     if (ret == false) {
@@ -114,6 +112,9 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         }
         return std::make_shared<sys::ResponseMessage>();
     });
+
+    settings->registerValueChange(updateos::settings::history,
+                                  [this](const std::string &value) { updateOS->setInitialHistory(value); });
 
     return (sys::ReturnCodes::Success);
 }

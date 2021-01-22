@@ -149,7 +149,7 @@ namespace gui
         return true;
     }
 
-    YearMonthDay EventDateItem::validateDate()
+    calendar::YearMonthDay EventDateItem::validateDate()
     {
         auto actualDate = TimePointToYearMonthDay(TimePointNow());
         uint32_t day;
@@ -185,7 +185,7 @@ namespace gui
         }
         month = std::clamp(static_cast<unsigned>(month), 1u, static_cast<unsigned>(date::dec));
 
-        YearMonthDayLast max_date = date::year(year) / date::month(month) / date::last;
+        calendar::YearMonthDayLast max_date = date::year(year) / date::month(month) / date::last;
         if (day > static_cast<unsigned>(max_date.day())) {
             dayInput->setText(std::to_string(static_cast<unsigned>(max_date.day())));
         }
@@ -194,7 +194,7 @@ namespace gui
         return date::year(year) / date::month(month) / date::day(day);
     }
 
-    const YearMonthDay EventDateItem::getChosenDate()
+    const calendar::YearMonthDay EventDateItem::getChosenDate()
     {
         return validateDate();
     }

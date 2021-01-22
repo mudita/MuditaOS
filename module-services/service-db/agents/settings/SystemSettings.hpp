@@ -24,6 +24,13 @@ namespace settings
         constexpr inline auto bondedDevices    = "bt_bonded_devices";
         constexpr inline auto btKeys           = "bt_keys";
     } // namespace Bluetooth
+    namespace Brightness
+    {
+        constexpr inline auto state           = "br_state";
+        constexpr inline auto brightnessLevel = "br_level";
+        constexpr inline auto gammaFactor     = "br_gamma_Factor";
+        constexpr inline auto autoMode        = "br_auto_mode";
+    } // namespace Brightness
 
     namespace Cellular
     {

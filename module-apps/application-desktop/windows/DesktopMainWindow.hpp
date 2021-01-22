@@ -81,11 +81,14 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
+
         bool updateTime(const UTF8 &timeStr) override;
         bool updateTime(const uint32_t &timestamp, bool mode24H) override;
 
       private:
         void invalidate() noexcept;
+        static void updateTopBarConfiguration(bool isScreenLocked, top_bar::Configuration &configuration);
 
         gui::KeyInputMappedTranslation translator;
     };

@@ -15,8 +15,6 @@ namespace gui
 
     BluetoothWindow::BluetoothWindow(app::Application *app) : OptionWindow(app, gui::window::name::bluetooth)
     {
-        topBar->setActive(TopBar::Elements::BATTERY, false);
-        topBar->setActive(TopBar::Elements::SIM, false);
         sys::Bus::SendUnicast(
             std::make_shared<::message::bluetooth::RequestStatus>(), service::name::bluetooth, application);
     }

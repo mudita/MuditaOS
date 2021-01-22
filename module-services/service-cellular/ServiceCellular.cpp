@@ -204,8 +204,6 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         sys::Bus::SendMulticast(msg.value(), sys::BusChannels::ServiceCellularNotifications, this);
     };
     registerMessageHandlers();
-    settings->registerValueChange(settings::Cellular::volte_on,
-                                  [this](const std::string &value) { volteChanged(value); });
     packetData = std::make_unique<packet_data::PacketData>(*this);
     packetData->loadAPNSettings();
 }
@@ -235,6 +233,8 @@ sys::ReturnCodes ServiceCellular::InitHandler()
     board = EventManagerServiceAPI::GetBoard(this);
 
     state.set(this, State::ST::WaitForStartPermission);
+    settings->registerValueChange(settings::Cellular::volte_on,
+                                  [this](const std::string &value) { volteChanged(value); });
     return sys::ReturnCodes::Success;
 }
 
@@ -297,12 +297,12 @@ void ServiceCellular::registerMessageHandlers()
         return handleCellularGetActiveContextsMessage(msg);
     });
 
-    connect(typeid(CellularGetAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        connect(typeid(CellularGetCurrentOperatorMessage), [&](sys::Message *request) -> sys::MessagePointer {
-            auto msg = static_cast<CellularGetCurrentOperatorMessage *>(request);
-            return handleCellularGetCurrentOperator(msg);
-        });
+    connect(typeid(CellularGetCurrentOperatorMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularGetCurrentOperatorMessage *>(request);
+        return handleCellularGetCurrentOperator(msg);
+    });
 
+    connect(typeid(CellularGetAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularGetAPNMessage *>(request);
         return handleCellularGetAPNMessage(msg);
     });
@@ -1284,7 +1284,9 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
     switch (state) {
     case at::SimState::Ready:
         Store::GSM::get()->sim = Store::GSM::get()->selected;
-        settings->setValue(settings::SystemProperties::activeSim, utils::enumToString(Store::GSM::get()->selected));
+        settings->setValue(settings::SystemProperties::activeSim,
+                           utils::enumToString(Store::GSM::get()->selected),
+                           settings::SettingsScope::Global);
         // SIM causes SIM INIT, only on ready
         response =
             std::move(std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM_READY));

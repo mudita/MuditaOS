@@ -106,12 +106,6 @@ namespace app::manager
     {
         registerMessageHandlers();
         blockingTimer->connect([this](sys::Timer &) { onPhoneLocked(); });
-        settings->registerValueChange(settings::SystemProperties::displayLanguage,
-                                      [this](std::string value) { displayLanguageChanged(value); });
-        settings->registerValueChange(settings::SystemProperties::inputLanguage,
-                                      [this](std::string value) { inputLanguageChanged(value); });
-        settings->registerValueChange(settings::SystemProperties::lockTime,
-                                      [this](std::string value) { lockTimeChanged(value); });
     }
 
     sys::ReturnCodes ApplicationManager::InitHandler()
@@ -120,6 +114,18 @@ namespace app::manager
         utils::localize.setFallbackLanguage(utils::localize.DefaultLanguage);
         utils::localize.setDisplayLanguage(displayLanguage);
         utils::localize.setInputLanguage(inputLanguage);
+        settings->registerValueChange(
+            settings::SystemProperties::displayLanguage,
+            [this](std::string value) { displayLanguageChanged(value); },
+            settings::SettingsScope::Global);
+        settings->registerValueChange(
+            settings::SystemProperties::inputLanguage,
+            [this](std::string value) { inputLanguageChanged(value); },
+            settings::SettingsScope::Global);
+        settings->registerValueChange(
+            settings::SystemProperties::lockTime,
+            [this](std::string value) { lockTimeChanged(value); },
+            settings::SettingsScope::Global);
 
         startSystemServices();
         startBackgroundApplications();
@@ -161,6 +167,7 @@ namespace app::manager
 
     sys::ReturnCodes ApplicationManager::DeinitHandler()
     {
+        settings->unregisterValueChange();
         closeApplications();
         closeServices();
         return sys::ReturnCodes::Success;
@@ -540,7 +547,8 @@ namespace app::manager
             return false;
         }
         displayLanguage = requestedLanguage;
-        settings->setValue(settings::SystemProperties::displayLanguage, displayLanguage);
+        settings->setValue(
+            settings::SystemProperties::displayLanguage, displayLanguage, settings::SettingsScope::Global);
         utils::localize.setDisplayLanguage(displayLanguage);
         rebuildActiveApplications();
         return true;
@@ -555,7 +563,7 @@ namespace app::manager
             return false;
         }
         inputLanguage = requestedLanguage;
-        settings->setValue(settings::SystemProperties::inputLanguage, inputLanguage);
+        settings->setValue(settings::SystemProperties::inputLanguage, inputLanguage, settings::SettingsScope::Global);
         utils::localize.setInputLanguage(inputLanguage);
         return true;
     }

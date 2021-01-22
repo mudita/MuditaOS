@@ -35,19 +35,17 @@ namespace gui
         AppWindow::buildInterface();
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
-        topBar->setActive(
-            {{TopBar::Elements::SIGNAL, true}, {TopBar::Elements::LOCK, true}, {TopBar::Elements::BATTERY, true}});
 
         using namespace style::desktop;
 
-        time = new gui::Label(this, timeLabel::X, timeLabel::Y, timeLabel::Width, timeLabel::Hight);
+        time = new gui::Label(this, timeLabel::X, timeLabel::Y, timeLabel::Width, timeLabel::Height);
         time->setFilled(false);
         time->setBorderColor(gui::ColorNoColor);
         time->setFont(style::window::font::supersizemelight);
         time->setText(ttime);
         time->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
 
-        dayText = new gui::Label(this, dayLabel::X, dayLabel::Y, dayLabel::Width, dayLabel::Hight);
+        dayText = new gui::Label(this, dayLabel::X, dayLabel::Y, dayLabel::Width, dayLabel::Height);
         dayText->setFilled(false);
         dayText->setBorderColor(gui::ColorNoColor);
         dayText->setFont(style::window::font::biglight);
@@ -75,6 +73,20 @@ namespace gui
         notifications = nullptr;
     }
 
+    top_bar::Configuration DesktopMainWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    {
+        auto app            = getAppDesktop();
+        const auto isLocked = app->lockHandler.isScreenLocked();
+        updateTopBarConfiguration(isLocked, appConfiguration);
+        return appConfiguration;
+    }
+
+    void DesktopMainWindow::updateTopBarConfiguration(bool isScreenLocked, top_bar::Configuration &configuration)
+    {
+        configuration.set(top_bar::Indicator::Lock, isScreenLocked);
+        configuration.set(top_bar::Indicator::Time, !isScreenLocked);
+    }
+
     DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_main_window)
     {
         buildInterface();
@@ -89,13 +101,18 @@ namespace gui
     void DesktopMainWindow::setVisibleState()
     {
         auto app = getAppDesktop();
+        applyToTopBar([isLocked = app->lockHandler.isScreenLocked()](top_bar::Configuration configuration) {
+            updateTopBarConfiguration(isLocked, configuration);
+            return configuration;
+        });
+
         if (app->lockHandler.isScreenLocked()) {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
             bottomBar->setActive(BottomBar::Side::RIGHT, false);
             bottomBar->setText(BottomBar::Side::LEFT,
                                utils::localize.get("app_desktop_emergency"),
                                app->lockHandler.isScreenBlocked());
-            topBar->setActive(TopBar::Elements::LOCK, true);
+
             inputCallback = nullptr;
             setFocusItem(nullptr);
             buildNotifications(app);
@@ -104,8 +121,6 @@ namespace gui
                 std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
         }
         else {
-            topBar->setActive(TopBar::Elements::LOCK, false);
-
             if (!buildNotifications(app)) {
                 LOG_ERROR("Couldn't fit in all notifications");
             }
@@ -146,7 +161,6 @@ namespace gui
             if (inputEvent.is(KeyCode::KEY_PND)) {
                 app->lockHandler.lockScreen();
                 setVisibleState();
-                application->setSuspendFlag(true);
                 return true;
             }
             // long press of '0' key is translated to '+'

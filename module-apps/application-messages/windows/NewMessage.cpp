@@ -188,9 +188,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        topBar->setActive(TopBar::Elements::BATTERY, false);
-        topBar->setActive(TopBar::Elements::SIM, false);
-        topBar->setActive(TopBar::Elements::SIGNAL, false);
 
         setTitle(utils::localize.get("sms_title_message"));
 

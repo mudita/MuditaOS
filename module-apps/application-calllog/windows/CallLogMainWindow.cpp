@@ -47,8 +47,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        topBar->setActive(TopBar::Elements::TIME, true);
-
         list = new gui::ListView(this, mainWindow::x, mainWindow::y, mainWindow::w, mainWindow::h, calllogModel);
 
         setFocusItem(list);

@@ -13,7 +13,7 @@
 
 #include <memory>
 
-auto FactoryResetEndpoint::handle(Context &context) -> void
+auto FactoryResetEndpoint::handle(parserFSM::Context &context) -> void
 {
     if (context.getMethod() == parserFSM::http::Method::post) {
 
@@ -27,14 +27,14 @@ auto FactoryResetEndpoint::handle(Context &context) -> void
             context.setResponseBody(json11::Json::object({{parserFSM::json::factoryRequest, false}}));
         }
 
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
+        parserFSM::MessageHandler::putToSendQueue(context.createSimpleResponse());
 
         return;
     }
     else {
         context.setResponseBody(json11::Json::object({{parserFSM::json::factoryRequest, false}}));
 
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
+        parserFSM::MessageHandler::putToSendQueue(context.createSimpleResponse());
 
         return;
     }

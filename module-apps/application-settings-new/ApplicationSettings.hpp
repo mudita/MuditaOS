@@ -6,6 +6,7 @@
 #include "Application.hpp"
 
 #include <bsp/common.hpp>
+#include <module-services/service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 
 namespace gui::window::name
 {
@@ -16,6 +17,7 @@ namespace gui::window::name
 
     inline constexpr auto network        = "Network";
     inline constexpr auto apn_settings   = "APNSettings";
+    inline constexpr auto apn_options    = "APNOptions";
     inline constexpr auto phone_modes    = "PhoneModes";
     inline constexpr auto apps_and_tools = "AppsAndTools";
     inline constexpr auto security       = "Security";
@@ -32,10 +34,14 @@ namespace gui::window::name
     inline constexpr auto nightshift = "Nightshift";
     inline constexpr auto templates  = "Templates";
 
-    inline constexpr auto autolock  = "Autolock";
-    inline constexpr auto wallpaper = "Wallpaper";
-    inline constexpr auto quotes    = "Quotes";
-    inline constexpr auto new_quote = "NewQuote";
+    inline constexpr auto autolock             = "Autolock";
+    inline constexpr auto wallpaper            = "Wallpaper";
+    inline constexpr auto quotes               = "Quotes";
+    inline constexpr auto new_quote            = "NewQuote";
+    inline constexpr auto edit_quote           = "EditQuote";
+    inline constexpr auto options_quote        = "OptionsQuote";
+    inline constexpr auto delete_quote         = "DeleteQuote";
+    inline constexpr auto quotes_dialog_yes_no = "DialogYesNo";
 
     inline constexpr auto display_and_keypad = "DisplayAndKeypad";
     inline constexpr auto change_settings    = "ChangeSettings";
@@ -43,6 +49,14 @@ namespace gui::window::name
     inline constexpr auto import_contacts    = "ImportContacts";
     inline constexpr auto dialog_settings    = "DialogSettings";
     inline constexpr auto change_passcode    = "ChangePasscode";
+
+    inline constexpr auto language        = "Language";
+    inline constexpr auto date_and_time   = "DateAndTime";
+    inline constexpr auto factory_reset   = "FactoryReset";
+    inline constexpr auto about_your_pure = "AboutYourPure";
+    inline constexpr auto certification   = "Certification";
+
+    inline constexpr auto new_apn = "NewApn";
 
 } // namespace gui::window::name
 
@@ -69,11 +83,28 @@ namespace app
             virtual void setVoLTEOn(bool value)                        = 0;
             [[nodiscard]] virtual bool getVoLTEOn() const noexcept     = 0;
         };
+        class ScreenLightSettings
+        {
+          public:
+            struct Values
+            {
+                bool lightOn;
+                screen_light_control::ScreenLightMode mode;
+                screen_light_control::Parameters parameters;
+            };
+
+            virtual ~ScreenLightSettings()                      = default;
+            virtual auto getCurrentValues() -> Values           = 0;
+            virtual void setBrightness(float brigtnessValue)    = 0;
+            virtual void setMode(bool isAutoLightSwitchOn)      = 0;
+            virtual void setStatus(bool isDisplayLightSwitchOn) = 0;
+        };
     }; // namespace settingsInterface
 
     class ApplicationSettingsNew : public app::Application,
                                    public settingsInterface::SimParams,
-                                   public settingsInterface::OperatorsSettings
+                                   public settingsInterface::OperatorsSettings,
+                                   public settingsInterface::ScreenLightSettings
     {
       public:
         ApplicationSettingsNew(std::string name                    = name_settings_new,
@@ -106,7 +137,14 @@ namespace app
         }
         void setLockPassHash(unsigned int value);
 
+        ScreenLightSettings::Values getCurrentValues() override;
+        void setBrightness(float brigtnessValue) override;
+        void setMode(bool isAutoLightSwitchOn) override;
+        void setStatus(bool isDisplayLightSwitchOn) override;
+
       private:
+        void attachQuotesWindows();
+
         Store::GSM::SIM selectedSim   = Store::GSM::get()->selected;
         std::string selectedSimNumber = {};
         bsp::Board board              = bsp::Board::none;

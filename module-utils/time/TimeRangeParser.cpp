@@ -19,8 +19,8 @@ namespace utils::time
         return utils::localize.get(utils::time::Locale::getPM());
     }
 
-    std::string TimeRangeParser::getCalendarTimeString(TimePoint startDate,
-                                                       TimePoint endDate,
+    std::string TimeRangeParser::getCalendarTimeString(calendar::TimePoint startDate,
+                                                       calendar::TimePoint endDate,
                                                        Version version,
                                                        bool isMode24H)
     {

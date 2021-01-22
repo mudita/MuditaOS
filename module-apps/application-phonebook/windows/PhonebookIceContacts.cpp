@@ -25,7 +25,6 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        topBar->setActive(TopBar::Elements::TIME, true);
         setTitle(utils::localize.get("app_phonebook_ice_contacts_title"));
 
         contactsListIce = new gui::ListView(this,

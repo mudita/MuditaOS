@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BaseSettingsWindow.hpp"
-
 #include <i18n/i18n.hpp>
 
 namespace gui
@@ -17,9 +16,6 @@ namespace gui
 
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        topBar->setActive(TopBar::Elements::BATTERY, false);
-        topBar->setActive(TopBar::Elements::SIM, false);
-        topBar->setActive(TopBar::Elements::TIME, true);
     }
 
     void BaseSettingsWindow::destroyInterface()

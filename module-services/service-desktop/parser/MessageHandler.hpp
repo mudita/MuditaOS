@@ -24,29 +24,32 @@ namespace parserFSM
 {
     class MessageHandler
     {
-
-      public:
-        MessageHandler(std::string &message, sys::Service *OwnerService);
         static xQueueHandle sendQueue;
 
-        bool isJSONNull()
+        json11::Json messageJson;
+        std::string JsonErrorMsg;
+        sys::Service *OwnerServicePtr = nullptr;
+
+      public:
+        MessageHandler(const std::string &message, sys::Service *OwnerService);
+
+        [[nodiscard]] auto isJSONNull() const -> bool
         {
             return messageJson.is_null();
         };
-        bool isValid()
+        [[nodiscard]] auto isValid() const noexcept -> bool
         {
             return JsonErrorMsg.empty();
         }
-        std::string &getErrorString()
+        [[nodiscard]] auto getErrorString() const -> const std::string &
         {
             return JsonErrorMsg;
         };
         void processMessage();
-        static void putToSendQueue(const std::string msg);
-
-      private:
-        json11::Json messageJson;
-        std::string JsonErrorMsg;
-        sys::Service *OwnerServicePtr = nullptr;
+        static void putToSendQueue(const std::string &msg);
+        static void setSendQueueHandle(xQueueHandle handle)
+        {
+            sendQueue = handle;
+        }
     };
 } // namespace parserFSM

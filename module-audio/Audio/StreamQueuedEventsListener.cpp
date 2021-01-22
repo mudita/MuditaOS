@@ -5,7 +5,8 @@
 
 using namespace audio;
 
-StreamQueuedEventsListener::StreamQueuedEventsListener(std::shared_ptr<Queue> eventsQueue) : queue(eventsQueue)
+StreamQueuedEventsListener::StreamQueuedEventsListener(std::shared_ptr<cpp_freertos::Queue> eventsQueue)
+    : queue(eventsQueue)
 {}
 
 void StreamQueuedEventsListener::onEvent(Stream *stream, Stream::Event event, Stream::EventSourceMode source)

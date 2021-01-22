@@ -26,23 +26,29 @@ namespace gui
         {}
         GridLayout() : GridLayout(0, 0, 0, 0, {0, 0})
         {}
-        /// when reached top -> start from bottom. When reached left, start from right.
-        bool navigationRotate = true;
         void resizeItems() override;
         void setNavigation() override;
-        Item *nextNavigationItem(std::list<Item *>::iterator it);
 
         uint32_t rowSize = 0;
         uint32_t colSize = 0;
-        ///> elementsInIncompletedLastRow describes how many items has been put to last row,
-        /// in case when items for last row is not equal to colSize
-        uint32_t elementsInIncompletedLastRow = 0;
 
       private:
-        uint32_t calculateColumnSizeForBorderTransition(const uint32_t currentPosition);
-        uint32_t calculateRowSizeForBorderTransition(const uint32_t currentPosition);
-
         void handleItemsOutOfGridLayoutArea(uint32_t maxItemsInArea);
+        Item *getFirstActiveItem(uint32_t startposition, int step);
+        inline uint32_t getLastColumnIndex(uint32_t col)
+        {
+            auto lastcolumnindex = col;
+            while ((lastcolumnindex + colSize) < children.size())
+                lastcolumnindex += colSize;
+            return lastcolumnindex;
+        }
+        inline uint32_t getLastRowIndex(uint32_t row)
+        {
+            uint32_t lastrowindex = colSize * row + (colSize - 1);
+            while (lastrowindex >= children.size())
+                lastrowindex--;
+            return lastrowindex;
+        }
     };
 
 }; // namespace gui

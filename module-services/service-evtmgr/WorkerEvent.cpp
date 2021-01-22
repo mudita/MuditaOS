@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/BatteryMessages.hpp"
-#include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EVMessages.hpp"
 #include "service-evtmgr/KbdMessage.hpp"
+#include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/WorkerEvent.hpp"
 #include "battery-level-check/BatteryLevelCheck.hpp"
 
@@ -78,7 +78,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         }
 
         if (bsp::headset::Handler(notification) == true) {
-            bool state = bsp::headset::IsInserted();
+            bool state   = bsp::headset::IsInserted();
             auto message = std::make_shared<AudioEventRequest>(audio::EventType::JackState,
                                                                state ? audio::Event::DeviceState::Connected
                                                                      : audio::Event::DeviceState::Disconnected);
@@ -91,28 +91,25 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        if (notification == static_cast<uint8_t>(bsp::batteryIRQSource::INTB)) {
+        if (notification == static_cast<uint8_t>(bsp::battery_charger::batteryIRQSource::INTB)) {
             LOG_DEBUG("Battery INTB");
-            const auto status = bsp::battery_getStatusRegister();
-            if (status & static_cast<std::uint16_t>(bsp::batteryINTBSource::minVAlert)) {
+            const auto status = bsp::battery_charger::getStatusRegister();
+            if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert)) {
                 auto messageBrownout = std::make_shared<sevm::BatteryBrownoutMessage>();
                 sys::Bus::SendUnicast(messageBrownout, service::name::system_manager, this->service);
             }
-            if (status & static_cast<std::uint16_t>(bsp::batteryINTBSource::SOCOnePercentChange)) {
-                std::uint8_t battLevel = 0;
-                bsp::battery_getBatteryLevel(battLevel);
+            if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange)) {
+                bsp::battery_charger::StateOfCharge battLevel = bsp::battery_charger::getBatteryLevel();
                 auto message = std::make_shared<sevm::BatteryLevelMessage>(battLevel, false);
                 sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
                 battery_level_check::checkBatteryLevelCritical();
             }
-            bsp::battery_ClearAllIRQs();
+            bsp::battery_charger::clearAllIRQs();
         }
-        if (notification == static_cast<uint8_t>(bsp::batteryIRQSource::INOKB)) {
-            bool status;
-            bsp::battery_getChargeStatus(status);
-            bsp::battery_ClearAllIRQs();
+        if (notification == static_cast<uint8_t>(bsp::battery_charger::batteryIRQSource::INOKB)) {
+            bsp::battery_charger::clearAllIRQs();
             auto message     = std::make_shared<sevm::BatteryPlugMessage>();
-            message->plugged = status;
+            message->plugged = bsp::battery_charger::getChargeStatus();
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
         }
     }
@@ -193,7 +190,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
     bsp::vibrator::init();
     bsp::keyboard_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
     bsp::headset::Init(queues[static_cast<int32_t>(WorkerEventQueues::queueHeadsetIRQ)]->GetQueueHandle());
-    bsp::battery_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle());
+    bsp::battery_charger::init(queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle());
     bsp::rtc_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
     bsp::cellular::init(queues[static_cast<int32_t>(WorkerEventQueues::queueCellular)]->GetQueueHandle());
     bsp::magnetometer::init(queues[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]->GetQueueHandle());
@@ -216,7 +213,7 @@ bool WorkerEvent::deinit(void)
     Worker::deinit();
     bsp::keyboard_Deinit();
     bsp::headset::Deinit();
-    bsp::battery_Deinit();
+    bsp::battery_charger::deinit();
     bsp::torch::deinit();
     bsp::keypad_backlight::deinit();
     bsp::eink_frontlight::deinit();
