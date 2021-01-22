@@ -34,6 +34,7 @@ namespace style::calculator
             inline constexpr auto full_stop      = 0x002E;
             inline constexpr auto comma          = 0x002C;
             inline constexpr auto equals         = 0x003D;
+            inline constexpr auto zero           = 0x0030;
         } // namespace codes
 
         namespace strings

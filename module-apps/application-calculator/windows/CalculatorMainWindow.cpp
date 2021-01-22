@@ -63,8 +63,15 @@ namespace gui
             if (!event.isShortPress()) {
                 return false;
             }
+            if (event.is(gui::KeyCode::KEY_0) && mathOperationInput->getText() == "0") {
+                return true;
+            }
             auto lastChar         = mathOperationInput->getText()[mathOperationInput->getText().length() - 1];
             bool lastCharIsSymbol = isSymbol(lastChar);
+            if (lastChar == style::calculator::symbols::codes::zero && isSymbol(getPenultimate()) &&
+                !isDecimalSeparator(getPenultimate()) && event.is(gui::KeyCode::KEY_0)) {
+                return true;
+            }
             if (event.keyCode == gui::KeyCode::KEY_UP) {
                 writeEquation(lastCharIsSymbol, style::calculator::symbols::strings::plus);
                 return true;
@@ -89,6 +96,15 @@ namespace gui
                 }
                 return true;
             }
+            if (lastChar == style::calculator::symbols::codes::zero && isSymbol(getPenultimate()) &&
+                !isDecimalSeparator(getPenultimate()) && !event.is(gui::KeyCode::KEY_0) &&
+                !event.is(gui::KeyCode::KEY_PND) && !event.is(gui::KeyCode::KEY_ENTER)) {
+                mathOperationInput->removeChar();
+                return false;
+            }
+            if (!event.is(gui::KeyCode::KEY_0) && mathOperationInput->getText() == "0") {
+                mathOperationInput->clear();
+            }
             return false;
         };
     }
@@ -103,21 +119,36 @@ namespace gui
                character == style::calculator::symbols::codes::full_stop;
     }
 
+    bool CalculatorMainWindow::isDecimalSeparator(uint32_t character)
+    {
+        return character == style::calculator::symbols::codes::comma ||
+               character == style::calculator::symbols::codes::full_stop;
+    }
+
+    uint32_t CalculatorMainWindow::getPenultimate()
+    {
+        if (mathOperationInput->getText().length() > 1) {
+            return mathOperationInput->getText()[mathOperationInput->getText().length() - 2];
+        }
+        return 0;
+    }
+
     void CalculatorMainWindow::writeEquation(bool lastCharIsSymbol, const UTF8 &symbol)
     {
         if (!mathOperationInput->getText().empty()) {
 
             if (lastCharIsSymbol && symbol != style::calculator::symbols::strings::minus) {
-                mathOperationInput->setRichText(
-                    std::string(mathOperationInput->getText()).erase(mathOperationInput->getText().length() - 1) +
-                    symbol.c_str());
+                if (!isSymbol(getPenultimate()) && mathOperationInput->getText().length() > 1) {
+                    mathOperationInput->removeChar();
+                    mathOperationInput->addText(symbol);
+                }
             }
             else {
-                mathOperationInput->setRichText(mathOperationInput->getText() + symbol);
+                mathOperationInput->addText(symbol);
             }
         }
         else if (symbol == style::calculator::symbols::strings::minus) {
-            mathOperationInput->setRichText(mathOperationInput->getText() + symbol);
+            mathOperationInput->addText(symbol);
         }
     }
 
@@ -126,7 +157,11 @@ namespace gui
         if (!mathOperationInput->getText().empty()) {
             std::vector<int> symbolsIndexes;
             auto input = std::string(mathOperationInput->getText()).erase(mathOperationInput->getText().length() - 1);
-            symbolsIndexes.push_back(input.find_last_of(style::calculator::symbols::strings::minus));
+            auto exponentIndex = input.find_last_of('e');
+            auto minusIndex    = input.find_last_of(style::calculator::symbols::strings::minus);
+            if (minusIndex != exponentIndex + 1) {
+                symbolsIndexes.push_back(minusIndex);
+            }
             symbolsIndexes.push_back(input.find_last_of(style::calculator::symbols::strings::plus));
             symbolsIndexes.push_back(input.find_last_of(style::calculator::symbols::strings::division));
             symbolsIndexes.push_back(input.find_last_of(style::calculator::symbols::strings::multiplication));
@@ -156,7 +191,7 @@ namespace gui
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
             auto result = Calculator().calculate(std::string(mathOperationInput->getText()));
-            mathOperationInput->setRichText(result.value);
+            mathOperationInput->setText(result.value);
             clearInput = result.isError;
             return true;
         }

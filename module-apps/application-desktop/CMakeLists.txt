@@ -27,6 +27,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PowerOffWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/DeadBatteryWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/LockedInfoWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Reboot.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/Update.cpp"

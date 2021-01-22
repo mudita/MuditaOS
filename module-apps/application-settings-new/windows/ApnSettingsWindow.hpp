@@ -5,20 +5,25 @@
 
 #include "OptionWindow.hpp"
 #include <Icon.hpp>
+#include <service-cellular/PacketDataTypes.hpp>
 
 namespace gui
 {
-    class APNSettingsWindow : public OptionWindow
+    class ApnSettingsWindow : public OptionWindow
     {
       public:
-        APNSettingsWindow(app::Application *app);
+        ApnSettingsWindow(app::Application *app);
 
       private:
         void buildInterface() override;
+        auto handleSwitchData(SwitchData *data) -> bool override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto onInput(const InputEvent &inputEvent) -> bool override;
+        auto optionsList(std::vector<std::shared_ptr<packet_data::APN::Config>> vector) -> std::list<Option>;
 
         Image *leftArrowImage = nullptr;
         Image *crossImage     = nullptr;
         Icon *emptyListIcon   = nullptr;
+        std::vector<std::shared_ptr<packet_data::APN::Config>> apns;
     };
 }; // namespace gui

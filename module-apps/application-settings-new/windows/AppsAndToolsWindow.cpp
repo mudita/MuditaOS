@@ -33,10 +33,6 @@ namespace gui
                                                 gui::option::Arrow::Enabled});
         };
 
-        topBar->setActive(TopBar::Elements::SIGNAL, false);
-        topBar->setActive(TopBar::Elements::BATTERY, false);
-        topBar->setActive(TopBar::Elements::SIM, false);
-
         addMenu(i18("app_settings_apps_messages"), gui::window::name::messages);
         addMenu(i18("app_settings_apps_torch"), gui::window::name::torch);
 

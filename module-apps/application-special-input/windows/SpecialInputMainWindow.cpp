@@ -36,8 +36,6 @@ void SpecialInputMainWindow::buildInterface()
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
     bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::emoji));
 
-    topBar->setActive(TopBar::Elements::TIME, true);
-
     charList = new gui::ListView(this,
                                  specialInputStyle::specialInputListView::x,
                                  specialInputStyle::specialInputListView::y,

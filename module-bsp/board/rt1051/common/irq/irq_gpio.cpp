@@ -19,7 +19,6 @@
 #if 0 // TODO:M.P implement the rest of BSP drivers
 
 #include "bsp_cellular.h"
-#include "bsp_battery_charger.h"
 
 #include "bsp_usbc.h"
 #include "log.h"
@@ -114,13 +113,13 @@ namespace bsp
             }
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {
-                xHigherPriorityTaskWoken |= BSP_BatteryChargerINOKB_IRQHandler();
+                xHigherPriorityTaskWoken |= bsp::battery_charger::INOKB_IRQHandler();
             }
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {}
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INTB_PIN)) {
-                xHigherPriorityTaskWoken |= BSP_BatteryChargerINTB_IRQHandler();
+                xHigherPriorityTaskWoken |= bsp::battery_charger::INTB_IRQHandler();
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_SIM_TRAY_INSERTED_PIN)) {

@@ -49,9 +49,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        topBar->setActive(TopBar::Elements::SIGNAL, true);
-        topBar->setActive(TopBar::Elements::BATTERY, true);
-
         setTitle(utils::localize.get("app_settings_title_languages"));
         const auto &langList = loader.getAvailableDisplayLanguages();
         for (const auto &lang : langList) {

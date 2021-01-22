@@ -14,7 +14,6 @@ namespace gui
     void LockWindow::build()
     {
         buildBottomBar();
-        buildTopBar();
         buildTitleBar();
         buildInfoTexts();
     }

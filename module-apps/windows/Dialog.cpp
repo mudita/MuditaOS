@@ -50,7 +50,6 @@ Dialog::Dialog(app::Application *app, const std::string &name) : gui::AppWindow(
 {
     AppWindow::buildInterface();
 
-    topBar->setActive(TopBar::Elements::TIME, true);
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
     setTitle("");
@@ -77,9 +76,6 @@ void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
 
 DialogConfirm::DialogConfirm(app::Application *app, const std::string &name) : Dialog(app, name)
 {
-    topBar->setActive(TopBar::Elements::BATTERY, true);
-    topBar->setActive(TopBar::Elements::SIGNAL, true);
-
     bottomBar->setActive(BottomBar::Side::RIGHT, false);
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
     setFocusItem(icon);
@@ -169,8 +165,6 @@ void DialogYesNoIconTxt::onBeforeShow(ShowMode mode, SwitchData *data)
     if (auto metadata = dynamic_cast<DialogMetadataMessage *>(data); metadata != nullptr) {
         DialogYesNo::onBeforeShow(mode, metadata);
         iconText->setText(metadata->get().iconText);
-        topBar->setActive(TopBar::Elements::BATTERY, false);
-        topBar->setActive(TopBar::Elements::SIM, false);
         setFocusItem(no);
     }
 }

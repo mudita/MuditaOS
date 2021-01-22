@@ -34,10 +34,6 @@ void LockedInfoWindow::setVisibleState()
     bottomBar->setActive(BottomBar::Side::LEFT, true);
     bottomBar->setActive(BottomBar::Side::CENTER, false);
     bottomBar->setActive(BottomBar::Side::RIGHT, true);
-
-    topBar->setActive(TopBar::Elements::LOCK, true);
-    topBar->setActive(TopBar::Elements::BATTERY, true);
-    topBar->setActive(TopBar::Elements::SIGNAL, true);
 }
 
 bool LockedInfoWindow::onInput(const InputEvent &inputEvent)
@@ -59,6 +55,13 @@ void LockedInfoWindow::rebuild()
 {
     destroyInterface();
     buildInterface();
+}
+
+top_bar::Configuration LockedInfoWindow::configureTopBar(top_bar::Configuration appConfiguration)
+{
+    appConfiguration.enable(top_bar::Indicator::Lock);
+    appConfiguration.disable(top_bar::Indicator::Time);
+    return appConfiguration;
 }
 
 void LockedInfoWindow::buildInterface()

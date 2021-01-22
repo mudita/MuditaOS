@@ -183,7 +183,7 @@ TEST_CASE("Alarms Record tests")
     }
 
     auto getQuery = [&](uint32_t id,
-                        TimePoint alarmTime,
+                        calendar::TimePoint alarmTime,
                         uint32_t snooze,
                         AlarmStatus status,
                         uint32_t repeat,

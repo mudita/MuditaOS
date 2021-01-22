@@ -1,21 +1,52 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_GUI_GUI_WIDGETS_TOPBAR_HPP_
-#define MODULE_GUI_GUI_WIDGETS_TOPBAR_HPP_
+#pragma once
 
 #include "Image.hpp"
 #include "Label.hpp"
 #include "Rect.hpp"
 #include "TopBar/SIM.hpp"
 #include <common_data/EventStore.hpp>
+
+#include <vector>
 #include <map>
 
-namespace gui
+namespace gui::top_bar
 {
+    enum class Indicator
+    {
+        Signal,
+        Time,
+        Lock,
+        Battery,
+        SimCard,
+        NetworkAccessTechnology
+    };
+    using Indicators        = std::vector<Indicator>;
+    using IndicatorStatuses = std::map<Indicator, bool>;
 
-    static const uint32_t batteryBarsCount  = 6;
-    static const uint32_t signalImgCount    = 6;
+    /**
+     * Carries the top bar configuration.
+     */
+    class Configuration
+    {
+      public:
+        void enable(Indicator indicator);
+        void enable(const Indicators &indicators);
+        void disable(Indicator indicator);
+        void set(Indicator indicator, bool enabled);
+        [[nodiscard]] auto isEnabled(Indicator indicator) const -> bool;
+        [[nodiscard]] auto getIndicatorsConfiguration() const noexcept -> const IndicatorStatuses &;
+
+      private:
+        IndicatorStatuses indicatorStatuses = {{Indicator::Signal, false},
+                                               {Indicator::Time, false},
+                                               {Indicator::Lock, false},
+                                               {Indicator::Battery, false},
+                                               {Indicator::SimCard, false},
+                                               {Indicator::NetworkAccessTechnology, false}};
+    };
 
     /// Header of most of design Windows
     ///
@@ -31,19 +62,10 @@ namespace gui
     /// [signal]    [title ] [sim] [battery]
     class TopBar : public Rect
     {
-        static const uint32_t signalOffset;
-        static const uint32_t batteryOffset;
+        static constexpr uint32_t batteryBarsCount = 6;
+        static constexpr uint32_t signalImgCount   = 6;
 
       public:
-        enum class Elements
-        {
-            SIGNAL = 0x01,
-            LOCK,
-            BATTERY,
-            TIME,
-            SIM,
-            NETWORK_ACCESS_TECHNOLOGY
-        };
         enum class TimeMode
         {
             TIME_12H,
@@ -60,32 +82,32 @@ namespace gui
         std::map<const Store::Battery::State, Image *> batteryChargings = {
             {Store::Battery::State::Charging, nullptr}, {Store::Battery::State::PluggedNotCharging, nullptr}};
         gui::SIM *sim = nullptr;
-        void prepareWidget();
+        Configuration configuration;
         static TimeMode timeMode;
+
+        void prepareWidget();
 
         /// show bars in number - 0 bars, 1 bar, 2 bars...
         void batteryShowBars(uint32_t val);
 
-        /// elements shown on TopBar
-        struct
-        {
-            bool signal : 1;
-            bool lock : 1;
-            bool battery : 1;
-            bool time : 1;
-            bool sim : 1;
-            bool networkAccessTechnology : 1;
-        } elements = {false, false, false, false, true, true};
+        static uint32_t calculateBatteryBars(uint32_t percentage);
+
+        /**
+         * Sets the status of the top bar indicator.
+         * @param indicator     Indicator
+         */
+        void setIndicatorStatus(Indicator indicator, bool enabled);
 
       public:
         TopBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
         /**
-         * @brief Hides or shows images.
-         * @note LOCK and TIME are located in the same place so only 1 can be active at the same time.
+         * Configures the top bar.
+         * @param configuration     Top bar configuration
          */
-        void setActive(TopBar::Elements element, bool active);
-        void setActive(std::list<std::pair<TopBar::Elements, bool>> elements);
+        void configure(Configuration &&config);
+        [[nodiscard]] auto getConfiguration() const noexcept -> const Configuration &;
+
         /**
          * @brief Sets charge level of the battery based on percent value. This will cause appropriate image to be
          * displayed.
@@ -103,16 +125,14 @@ namespace gui
         bool updateNetworkAccessTechnology();
 
         void simSet();
-        void setTime(const UTF8 &time);
-        void setTime(const uint32_t &time, bool mode24H);
+
+        void setTime(const UTF8 &value);
+        void setTime(uint32_t value, bool mode24H);
+
         UTF8 getTimeString();
-        uint32_t getTime()
-        {
-            return time;
-        };
+        uint32_t getTime() const noexcept;
+
         void accept(GuiVisitor &visitor) override;
     };
 
-} /* namespace gui */
-
-#endif /* MODULE_GUI_GUI_WIDGETS_TOPBAR_HPP_ */
+} // namespace gui::top_bar

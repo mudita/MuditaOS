@@ -22,25 +22,34 @@ GridLayout::GridLayout(
 
         auto it       = this->getNavigationFocusedItem();
         auto distance = std::distance(children.begin(), it);
+
         switch (inputEvent.keyCode) {
         case KeyCode::KEY_UP: {
-            auto realRowSize = calculateRowSizeForBorderTransition(distance);
-            this->setFocusItem((*std::next(it, (realRowSize - 1) * this->colSize)));
+            auto col   = static_cast<uint32_t>(distance % colSize);
+            Item *item = getFirstActiveItem(getLastColumnIndex(col), (-1) * static_cast<int>(colSize));
+            if (item)
+                this->setFocusItem(item);
             return true;
         }
         case KeyCode::KEY_DOWN: {
-            auto realRowSize = calculateRowSizeForBorderTransition(distance);
-            this->setFocusItem((*std::prev(it, (realRowSize - 1) * this->colSize)));
+            auto col   = static_cast<uint32_t>(distance % colSize);
+            Item *item = getFirstActiveItem(col, static_cast<int>(colSize));
+            if (item)
+                this->setFocusItem(item);
             return true;
         }
         case KeyCode::KEY_LEFT: {
-            auto realColSize = calculateColumnSizeForBorderTransition(distance);
-            this->setFocusItem((*std::next(it, realColSize - 1)));
+            auto row   = static_cast<uint32_t>(distance / colSize);
+            Item *item = getFirstActiveItem(getLastRowIndex(row), -1);
+            if (item)
+                this->setFocusItem(item);
             return true;
         }
         case KeyCode::KEY_RIGHT: {
-            auto realColSize = calculateColumnSizeForBorderTransition(distance);
-            this->setFocusItem((*std::prev(it, realColSize - 1)));
+            auto row   = static_cast<uint32_t>(distance / colSize);
+            Item *item = getFirstActiveItem(colSize * row, 1);
+            if (item)
+                this->setFocusItem(item);
             return true;
         }
         default: {
@@ -48,25 +57,6 @@ GridLayout::GridLayout(
         }
         }
     };
-}
-
-uint32_t GridLayout::calculateColumnSizeForBorderTransition(const uint32_t currentPosition)
-{
-    auto realColSize = colSize;
-    if (elementsInIncompletedLastRow) {
-        if (((currentPosition / colSize) + 1) >= rowSize)
-            realColSize = elementsInIncompletedLastRow;
-    }
-    return realColSize;
-}
-uint32_t GridLayout::calculateRowSizeForBorderTransition(const uint32_t currentPosition)
-{
-    auto realRowSize = rowSize;
-    if (elementsInIncompletedLastRow) {
-        if (((currentPosition % (colSize)) + 1) > elementsInIncompletedLastRow)
-            realRowSize--;
-    }
-    return realRowSize;
 }
 
 void GridLayout::handleItemsOutOfGridLayoutArea(uint32_t maxItemsInArea)
@@ -88,16 +78,6 @@ void GridLayout::resizeItems()
     uint32_t el_in_x = area().w / grid.x;
     uint32_t el_in_y = area().h / grid.y;
 
-    elementsInIncompletedLastRow = 0;
-    colSize = children.size() < area().w / grid.x ? children.size() : area().w / grid.x;
-    rowSize                      = colSize != 0 ? (children.size() / colSize) : 1;
-    if (colSize > 1 && (static_cast<double>(children.size()) / colSize) > 1.0) {
-        elementsInIncompletedLastRow = children.size() % colSize;
-    }
-    if (elementsInIncompletedLastRow > 0) {
-        rowSize++;
-    }
-
     uint32_t strech_x     = 0;
     uint32_t strech_y     = 0;
     uint32_t max_elements = el_in_x * el_in_y;
@@ -113,6 +93,13 @@ void GridLayout::resizeItems()
         handleItemsOutOfGridLayoutArea(max_elements);
         return;
     }
+
+    colSize = children.size() < area().w / grid.x ? children.size() : area().w / grid.x;
+    rowSize = colSize != 0 ? (children.size() / colSize) : 1;
+    if (colSize > 1 && (static_cast<double>(children.size()) / colSize) > 1.0 && (children.size() % colSize)) {
+        rowSize++;
+    }
+
     if (el_in_x > 2)
         strech_x = (area().w - grid.x * el_in_x) / (el_in_x - 1);
     if (el_in_y > 2)
@@ -149,28 +136,38 @@ void GridLayout::setNavigation()
     for (auto it = children.begin(); it != children.end(); ++it, ++i) {
 
         if (it != children.begin() && (i + 1) % colSize != 1) {
-            (*it)->setNavigationItem(NavigationDirection::LEFT, nextNavigationItem(std::prev(it)));
+            (*it)->setNavigationItem(NavigationDirection::LEFT, getFirstActiveItem(i - 1, -1));
         }
 
         if (it != std::prev(children.end()) && (i + 1) % colSize != 0) {
-            (*it)->setNavigationItem(NavigationDirection::RIGHT, nextNavigationItem(std::next(it)));
+            (*it)->setNavigationItem(NavigationDirection::RIGHT, getFirstActiveItem(i + 1, 1));
         }
 
         if ((i - offset) >= 0) {
-            (*it)->setNavigationItem(NavigationDirection::UP, nextNavigationItem(std::prev(it, offset)));
+            (*it)->setNavigationItem(NavigationDirection::UP, getFirstActiveItem(i - offset, (-1) * offset));
         }
         if ((i + offset) < static_cast<int>(children.size())) {
-            (*it)->setNavigationItem(NavigationDirection::DOWN, nextNavigationItem(std::next(it, offset)));
+            (*it)->setNavigationItem(NavigationDirection::DOWN, getFirstActiveItem(i + offset, offset));
         }
     }
 }
 
-Item *GridLayout::nextNavigationItem(std::list<Item *>::iterator it)
+Item *GridLayout::getFirstActiveItem(uint32_t startposition, int step)
 {
-    if (it != this->children.end() && (*it)->visible && (*it)->activeItem) {
-        return *it;
+    Item *retItem = nullptr;
+    int index     = static_cast<int>(startposition);
+    uint32_t row  = startposition / colSize;
+    while (index >= 0 && index < static_cast<int>(children.size())) {
+        ///> condition for movement along row (+1,-1 step)
+        if ((step == 1 || step == -1) && (index / colSize != row)) {
+            break;
+        }
+        std::list<Item *>::iterator tmpit = std::next(children.begin(), index);
+        if ((*tmpit)->isActive()) {
+            retItem = *tmpit;
+            break;
+        }
+        index += step;
     }
-    else {
-        return nullptr;
-    }
+    return retItem;
 }

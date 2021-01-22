@@ -14,6 +14,8 @@
 
 #include <memory>
 
+using namespace parserFSM;
+
 auto RestoreEndpoint::handle(Context &context) -> void
 {
     if (context.getMethod() == parserFSM::http::Method::post) {

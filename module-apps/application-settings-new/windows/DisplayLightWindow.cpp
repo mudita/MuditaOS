@@ -13,14 +13,13 @@
 
 namespace gui
 {
-
     DisplayLightWindow::DisplayLightWindow(app::Application *app, app::settingsInterface::ScreenLightSettings *settings)
         : BaseSettingsWindow(app, window::name::display_light), screenLightSettings(settings)
     {
         auto values = screenLightSettings->getCurrentValues();
 
         isDisplayLightSwitchOn = values.lightOn;
-        isAutoLightSwitchOn    = values.mode;
+        isAutoLightSwitchOn    = values.mode == screen_light_control::ScreenLightMode::Automatic;
         brightnessValue        = values.parameters.manualModeBrightness;
 
         setTitle(utils::localize.get("app_settings_display_display_light"));
@@ -85,7 +84,7 @@ namespace gui
         };
 
         auto spinner = std::make_unique<gui::SpinBoxOptionSettings>(
-            utils::translateI18("app_settings_display_light_brightness") + " " + std::to_string(brightnessStep),
+            utils::translateI18("app_settings_display_light_brightness") + " " + utils::to_string(brightnessStep),
             brightnessValue * brightnessStep,
             std::ceil(screen_light_control::Parameters::MAX_BRIGHTNESS / brightnessStep),
             setBrightness,

@@ -30,8 +30,6 @@ namespace style::desktop
 MmiPushWindow::MmiPushWindow(app::Application *app, const std::string &name) : gui::AppWindow(app, name)
 {
     AppWindow::buildInterface();
-    topBar->setActive(TopBar::Elements::TIME, true);
-    topBar->setActive(TopBar::Elements::SIM, false);
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
     icon = new Image(this, style::desktop::image::x, style::desktop::image::y, "");
     icon->set("info_big_circle_W_G");
