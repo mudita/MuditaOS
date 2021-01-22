@@ -727,7 +727,9 @@ namespace app
     void Application::setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept
     {
         lockScreenPasscodeIsOn = screenPasscodeOn;
-        settings->setValue(settings::SystemProperties::lockScreenPasscodeIsOn, std::to_string(lockScreenPasscodeIsOn));
+        settings->setValue(settings::SystemProperties::lockScreenPasscodeIsOn,
+                           std::to_string(lockScreenPasscodeIsOn),
+                           settings::SettingsScope::Global);
     }
 
     bool Application::isLockScreenPasscodeOn() const noexcept
