@@ -78,6 +78,12 @@ namespace battery_level_check
         }
     }
 
+    void checkBatteryLevelCriticalWithConfirmation()
+    {
+        state = CheckState::InitialCheck;
+        checkBatteryLevelCritical();
+    }
+
     void setBatteryCriticalLevel(unsigned int level)
     {
         batteryLevelCritical = level;

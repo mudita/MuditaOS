@@ -16,5 +16,7 @@ namespace battery_level_check
 
     void checkBatteryLevelCritical();
 
+    void checkBatteryLevelCriticalWithConfirmation();
+
     void setBatteryCriticalLevel(unsigned int level);
 } // namespace battery_level_check
