@@ -22,18 +22,16 @@ namespace sys
     class Service;
 } // namespace sys
 
-using namespace parserFSM;
-
-class ContactsEndpoint : public Endpoint
+class ContactsEndpoint : public parserFSM::Endpoint
 {
   private:
-    std::unique_ptr<ContactHelper> helper;
+    std::unique_ptr<parserFSM::ContactHelper> helper;
 
   public:
     ContactsEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
     {
         debugName = "ContactsEndpoint";
-        helper    = std::make_unique<ContactHelper>(ownerServicePtr);
+        helper    = std::make_unique<parserFSM::ContactHelper>(ownerServicePtr);
     }
-    auto handle(Context &context) -> void override;
+    auto handle(parserFSM::Context &context) -> void override;
 };

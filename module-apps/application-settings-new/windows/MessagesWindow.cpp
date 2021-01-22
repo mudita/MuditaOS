@@ -64,9 +64,6 @@ namespace gui
         };
 
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-        topBar->setActive(TopBar::Elements::SIGNAL, false);
-        topBar->setActive(TopBar::Elements::BATTERY, false);
-        topBar->setActive(TopBar::Elements::SIM, false);
 
         addMenuSwitch(utils::translateI18("app_settings_show_unread_first"), "");
         addMenu(utils::translateI18("app_settings_Templates"), gui::window::name::templates);

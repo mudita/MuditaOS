@@ -269,24 +269,48 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         )
 
     # download the bootloader
-    add_custom_target(ecoboot.bin
-        COMMAND ${CMAKE_SOURCE_DIR}/tools/download_asset.py
-        -w ${CMAKE_BINARY_DIR}/update ecoboot download
-        > ${CMAKE_BINARY_DIR}/update/download_info.txt
-        BYPRODUCTS update/ecoboot.bin
-        COMMENT "Downloading ecoboot.bin"
-        )
+    set(ECOBOOT_FILE ${CMAKE_BINARY_DIR}/ecoboot.bin)
+    set(ECOBOOT_DOWNLOAD_LOG ${CMAKE_BINARY_DIR}/download_info.txt)
+
+    if(DEFINED ENV{ASSETS_LOGIN} AND DEFINED ENV{ASSETS_TOKEN})
+        message("ecooboot download with tokens")
+        add_custom_command(OUTPUT ${ECOBOOT_FILE}
+            COMMAND ${CMAKE_SOURCE_DIR}/tools/download_asset.py
+            -l $ENV{ASSETS_LOGIN}
+            -t $ENV{ASSETS_TOKEN}
+            -w ${CMAKE_BINARY_DIR} ecoboot download
+            > ${ECOBOOT_DOWNLOAD_LOG}
+            COMMENT "Downloading ecoboot.bin"
+            BYPRODUCTS ${ECOBOOT_FILE} ${ECOBOOT_DOWNLOAD_LOG}
+            )
+    else()
+        message("ecoboot download with git")
+        add_custom_command(OUTPUT ${ECOBOOT_FILE}
+            COMMAND ${CMAKE_SOURCE_DIR}/tools/download_asset.py
+            -w ${CMAKE_BINARY_DIR} ecoboot download
+            > ${ECOBOOT_DOWNLOAD_LOG}
+            COMMENT "Downloading ecoboot.bin"
+            BYPRODUCTS ${ECOBOOT_FILE} ${ECOBOOT_DOWNLOAD_LOG}
+            )
+    endif()
+
+    add_custom_target(ecoboot.bin DEPENDS ${ECOBOOT_FILE})
+
     # generate version.json file (runs CMake script at build time)
-    add_custom_target(
-        version.json
+    set(VERSION_JSON ${CMAKE_BINARY_DIR}/version.json)
+    add_custom_command(OUTPUT ${VERSION_JSON}
         COMMAND ${CMAKE_COMMAND}
         -DSRC_DIR=${CMAKE_SOURCE_DIR}
+        -DECOBOOT_DOWNLOAD_LOG=${ECOBOOT_DOWNLOAD_LOG}
         -B ${CMAKE_BINARY_DIR}
         -P ${CMAKE_SOURCE_DIR}/config/GenUpdateVersionJson.cmake
-        DEPENDS ecoboot.bin
+        DEPENDS ecoboot.bin ${ECOBOOT_DOWNLOAD_LOG}
+        BYPRODUCTS ${VERSION_JSON}
         )
-    install(FILES ${CMAKE_BINARY_DIR}/update/ecoboot.bin DESTINATION "./" COMPONENT Update)
-    install(FILES ${CMAKE_BINARY_DIR}/update/version.json DESTINATION "./" COMPONENT Update)
+    add_custom_target(version.json DEPENDS ${VERSION_JSON})
+
+    multicomp_install(PROGRAMS ${ECOBOOT_FILE} DESTINATION "./" COMPONENTS Standalone Update)
+    multicomp_install(FILES ${VERSION_JSON} DESTINATION "./" COMPONENTS Standalone Update)
 
     set(CPACK_SYSTEM_NAME "RT1051")
     # allow both standalone and update packages in RT1051 config
@@ -403,19 +427,23 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     add_custom_target(package-standalone
         COMMAND zip -rq ${CMAKE_BINARY_DIR}/${PACKAGE_STANDALONE_FILE_NAME} "."
         WORKING_DIRECTORY ${PACKAGE_STAGING_DIRECTORY}/Standalone
-        DEPENDS package-standalone-staged
+        DEPENDS ${ECOBOOT_FILE} package-standalone-staged  PurePhone
         )
+    set(UPDATE_STAGING_DIRECTORY ${PACKAGE_STAGING_DIRECTORY}/Update)
     add_custom_target(package-update-checksums
         COMMAND rhash
-        -u ${PACKAGE_STAGING_DIRECTORY}/Update/checksums.txt
-        -r ${PACKAGE_STAGING_DIRECTORY}/Update
+        -u checksums.txt
+        -r .
+        WORKING_DIRECTORY ${UPDATE_STAGING_DIRECTORY}
         DEPENDS package-update-staged
         )
+    set(PACKAGE_UPDATE_FILE_NAME ${PACKAGE_COMMON_NAME}-Update.tar)
+    set(PACKAGE_UPDATE_MIME "application/x-tar")
     add_custom_target(package-update
         COMMAND tar
-        -czf ${CMAKE_BINARY_DIR}/${PACKAGE_COMMON_NAME}-Update.tar.gz
+        -cf ${CMAKE_BINARY_DIR}/${PACKAGE_UPDATE_FILE_NAME}
         -C ${PACKAGE_STAGING_DIRECTORY}/Update "."
-        DEPENDS package-update-staged package-update-checksums
+        DEPENDS ecoboot.bin version.json PurePhone package-update-staged package-update-checksums
         )
 elseif (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     set(PACKAGE_STANDALONE_FILE_NAME ${PACKAGE_COMMON_NAME}-Standalone.tar.gz)
@@ -429,9 +457,14 @@ elseif (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 endif()
 
 if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
-    message("set-output name=package::${PACKAGE_STANDALONE_FILE_NAME}")
-    message("::set-output name=package::${PACKAGE_STANDALONE_FILE_NAME}")
-    
-    message("set-output name=mime_type::${PACKAGE_STANDALONE_MIME}")
-    message("::set-output name=mime_type::${PACKAGE_STANDALONE_MIME}")
+    message("set-output name=package-standalone::${PACKAGE_STANDALONE_FILE_NAME}")
+    message("::set-output name=package-standalone::${PACKAGE_STANDALONE_FILE_NAME}")
+    message("set-output name=standalone-mime_type::${PACKAGE_STANDALONE_MIME}")
+    message("::set-output name=standalone-mime_type::${PACKAGE_STANDALONE_MIME}")
+
+    message("set-output name=package-update::${PACKAGE_UPDATE_FILE_NAME}")
+    message("::set-output name=package-update::${PACKAGE_UPDATE_FILE_NAME}")
+    message("set-output name=update-mime_type::${PACKAGE_UPDATE_MIME}")
+    message("::set-output name=update-mime_type::${PACKAGE_UPDATE_MIME}")
+
 endif()

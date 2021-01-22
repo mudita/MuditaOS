@@ -5,7 +5,7 @@
 
 #include "BaseSettingsWindow.hpp"
 #include "QuotesMainWindow.hpp"
-#include "application-settings-new/model/QuotesModel.hpp"
+#include "application-settings-new/models/QuotesModel.hpp"
 
 namespace gui
 {

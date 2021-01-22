@@ -30,7 +30,6 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        topBar->setActive(TopBar::Elements::TIME, true);
         setTitle(utils::localize.get("app_phonebook_title_main"));
         leftArrowImage  = new gui::Image(this,
                                         phonebookStyle::mainWindow::leftArrowImage::x,

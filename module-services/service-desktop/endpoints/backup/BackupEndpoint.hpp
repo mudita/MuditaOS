@@ -20,16 +20,14 @@ namespace sys
     class Service;
 } // namespace sys
 
-using namespace parserFSM;
-
-class BackupEndpoint : public Endpoint
+class BackupEndpoint : public parserFSM::Endpoint
 {
   public:
     BackupEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
     {
         debugName = "BackupEndpoint";
     }
-    auto handle(Context &context) -> void override;
-    auto request(Context &context) -> sys::ReturnCodes;
-    auto upload(Context &context) -> sys::ReturnCodes;
+    auto handle(parserFSM::Context &context) -> void override;
+    auto request(parserFSM::Context &context) -> sys::ReturnCodes;
+    auto upload(parserFSM::Context &context) -> sys::ReturnCodes;
 };

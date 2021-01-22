@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesMainWindow.hpp"
-#include "application-settings-new/model/QuotesRepository.hpp"
-#include "application-settings-new/model/QuotesModel.hpp"
+#include "application-settings-new/models/QuotesRepository.hpp"
+#include "application-settings-new/models/QuotesModel.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/widgets/SettingsStyle.hpp"
 #include "OptionSetting.hpp"

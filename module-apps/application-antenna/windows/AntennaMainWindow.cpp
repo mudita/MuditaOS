@@ -48,10 +48,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        topBar->setActive(TopBar::Elements::SIGNAL, true);
-        topBar->setActive(TopBar::Elements::TIME, true);
-        topBar->setActive(TopBar::Elements::BATTERY, true);
-
         setTitle(utils::localize.get("app_desktop_tools_antenna"));
 
         for (auto title : titlesText) {

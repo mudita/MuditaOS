@@ -17,6 +17,7 @@ namespace gui::window::name
 
     inline constexpr auto network        = "Network";
     inline constexpr auto apn_settings   = "APNSettings";
+    inline constexpr auto apn_options    = "APNOptions";
     inline constexpr auto phone_modes    = "PhoneModes";
     inline constexpr auto apps_and_tools = "AppsAndTools";
     inline constexpr auto security       = "Security";
@@ -54,6 +55,8 @@ namespace gui::window::name
     inline constexpr auto factory_reset   = "FactoryReset";
     inline constexpr auto about_your_pure = "AboutYourPure";
     inline constexpr auto certification   = "Certification";
+
+    inline constexpr auto new_apn = "NewApn";
 
 } // namespace gui::window::name
 

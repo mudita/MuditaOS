@@ -58,7 +58,6 @@ namespace gui
       protected:
         virtual void buildBottomBar();
         virtual void buildTitleBar() = 0;
-        virtual void buildTopBar()   = 0;
 
       private:
         [[nodiscard]] auto getText(TextType type) noexcept -> gui::Text *;

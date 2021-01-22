@@ -93,4 +93,51 @@ TEST_CASE("Calculator utilities")
         REQUIRE(result.equation == "1.79769e+308*2");
         REQUIRE(result.isError);
     }
+
+    SECTION("Round to fit in screen")
+    {
+        auto result = calculator.calculate("1.1234512345");
+        REQUIRE(result.value == "1.123451");
+        REQUIRE(!result.isError);
+
+        result = calculator.calculate("0.0567891");
+        REQUIRE(result.value == "0.056789");
+        REQUIRE(!result.isError);
+
+        result = calculator.calculate("-0.056789");
+        REQUIRE(result.value == "-0.05679");
+        REQUIRE(!result.isError);
+
+        result = calculator.calculate("15.556789");
+        REQUIRE(result.value == "15.55679");
+        REQUIRE(!result.isError);
+    }
+
+    SECTION("Change to scientific notation (number > 0)")
+    {
+        auto result = calculator.calculate("12345.55555");
+        REQUIRE(result.value == "1.2346e4");
+        REQUIRE(!result.isError);
+    }
+
+    SECTION("Change to scientific notation (number < 0)")
+    {
+        auto result = calculator.calculate("-12345.55555");
+        REQUIRE(result.value == "-1.235e4");
+        REQUIRE(!result.isError);
+    }
+
+    SECTION("Change to scientific notation (0 < number < 1)")
+    {
+        auto result = calculator.calculate("0.000456712");
+        REQUIRE(result.value == "4.567e-4");
+        REQUIRE(!result.isError);
+    }
+
+    SECTION("Change to scientific notation (-1 < number < 0)")
+    {
+        auto result = calculator.calculate("-0.000456712");
+        REQUIRE(result.value == "-4.57e-4");
+        REQUIRE(!result.isError);
+    }
 }

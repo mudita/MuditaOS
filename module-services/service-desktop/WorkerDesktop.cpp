@@ -30,7 +30,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     Worker::init(queues);
 
     receiveQueue                         = Worker::getQueueHandleByName(sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
-    parserFSM::MessageHandler::sendQueue = Worker::getQueueHandleByName(sdesktop::SEND_QUEUE_BUFFER_NAME);
+    parserFSM::MessageHandler::setSendQueueHandle(Worker::getQueueHandleByName(sdesktop::SEND_QUEUE_BUFFER_NAME));
 
     return (bsp::usbInit(receiveQueue, this) < 0) ? false : true;
 }
@@ -58,16 +58,17 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
 
     LOG_INFO("handleMessage received data from queue: %s", qname.c_str());
 
-    static std::string *sendMsg = nullptr;
-    static std::string receivedMsg;
     if (qname == sdesktop::RECEIVE_QUEUE_BUFFER_NAME) {
+        std::string *receivedMsg = nullptr;
         if (!queue->Dequeue(&receivedMsg, 0)) {
             LOG_ERROR("handleMessage failed to receive from \"%s\"", sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
             return false;
         }
-        parser.processMessage(receivedMsg);
+        parser.processMessage(std::move(*receivedMsg));
+        delete receivedMsg;
     }
     else if (qname == sdesktop::SEND_QUEUE_BUFFER_NAME) {
+        std::string *sendMsg = nullptr;
         if (!queue->Dequeue(&sendMsg, 0)) {
             LOG_ERROR("handleMessage xQueueReceive failed for %s.", sdesktop::SEND_QUEUE_BUFFER_NAME);
             return false;
@@ -75,9 +76,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
 
         LOG_DEBUG("handeMessage sending %d bytes using usbCDCSend", static_cast<unsigned int>(sendMsg->length()));
         bsp::usbCDCSend(sendMsg);
-
         delete sendMsg;
-        sendMsg = nullptr;
     }
     else {
         LOG_INFO("handeMessage got message on an unhandled queue");

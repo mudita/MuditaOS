@@ -49,10 +49,22 @@ namespace gui
         title->setEllipsis(Ellipsis::Right);
         title->visible = false;
 
-        topBar = new gui::TopBar(this, 0, 0, 480, 50);
-        topBar->setActive(TopBar::Elements::LOCK, false);
-        topBar->setActive(TopBar::Elements::BATTERY, false);
-        topBar->setActive(TopBar::Elements::SIGNAL, false);
+        auto config = configureTopBar(application->getTopBarConfiguration());
+        topBar      = new gui::top_bar::TopBar(this, 0, 0, 480, 50);
+        topBar->configure(std::move(config));
+    }
+
+    top_bar::Configuration AppWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    {
+        return appConfiguration;
+    }
+
+    void AppWindow::applyToTopBar(TopBarConfigurationChangeFunction configChange)
+    {
+        if (configChange) {
+            auto newConfiguration = configChange(topBar->getConfiguration());
+            topBar->configure(std::move(newConfiguration));
+        }
     }
 
     bool AppWindow::setSIM()

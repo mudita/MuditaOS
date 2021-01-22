@@ -5,7 +5,8 @@
 
 #include "windows/AddDeviceWindow.hpp"
 #include "windows/AllDevicesWindow.hpp"
-#include "windows/APNSettingsWindow.hpp"
+#include "windows/ApnSettingsWindow.hpp"
+#include "windows/ApnOptionsWindow.hpp"
 #include "windows/BluetoothWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/DisplayAndKeypadWindow.hpp"
@@ -28,6 +29,7 @@
 #include "windows/QuotesOptionsWindow.hpp"
 #include "windows/ChangePasscodeWindow.hpp"
 #include "windows/SystemMainWindow.hpp"
+#include "windows/NewApnWindow.hpp"
 
 #include "Dialog.hpp"
 
@@ -37,9 +39,9 @@
 #include <service-bluetooth/service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
-#include <application-settings-new/data/BondedDevicesData.hpp>
-#include <application-settings-new/data/PhoneNameData.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
+#include <application-settings-new/data/ApnListData.hpp>
+#include <application-settings-new/data/BondedDevicesData.hpp>
 #include <application-settings-new/data/PhoneNameData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
@@ -66,17 +68,10 @@ namespace app
             Store::GSM::get()->sim == selectedSim) {
             selectedSimNumber = CellularServiceAPI::GetOwnNumber(this);
         }
-        settings->registerValueChange(settings::operators_on,
-                                      [this](const std::string &value) { operatorOnChanged(value); });
-
-        settings->registerValueChange(::settings::Cellular::volte_on,
-                                      [this](const std::string &value) { volteChanged(value); });
     }
 
     ApplicationSettingsNew::~ApplicationSettingsNew()
     {
-        settings->unregisterValueChange(settings::operators_on);
-        settings->unregisterValueChange(::settings::Cellular::volte_on);
     }
 
     // Invoked upon receiving data message
@@ -152,13 +147,29 @@ namespace app
             return sys::MessageNone{};
         });
 
+        connect(typeid(CellularGetAPNResponse), [&](sys::Message *msg) {
+            if (gui::window::name::apn_settings == getCurrentWindow()->getName()) {
+                auto apns = dynamic_cast<CellularGetAPNResponse *>(msg);
+                if (apns != nullptr) {
+                    auto apnsData = std::make_unique<gui::ApnListData>(apns->getAPNs());
+                    switchWindow(gui::window::name::apn_settings, std::move(apnsData));
+                }
+            }
+            return sys::MessageNone{};
+        });
+
         createUserInterface();
 
         setActiveWindow(gui::name::window::main_window);
 
-        settings->registerValueChange(::settings::SystemProperties::lockPassHash, [this](std::string value) {
-            lockPassHash = utils::getNumericValue<unsigned int>(value);
-        });
+        settings->registerValueChange(settings::operators_on,
+                                      [this](const std::string &value) { operatorOnChanged(value); });
+        settings->registerValueChange(::settings::Cellular::volte_on,
+                                      [this](const std::string &value) { volteChanged(value); });
+        settings->registerValueChange(
+            ::settings::SystemProperties::lockPassHash,
+            [this](std::string value) { lockPassHash = utils::getNumericValue<unsigned int>(value); },
+            ::settings::SettingsScope::Global);
 
         return ret;
     }
@@ -210,7 +221,10 @@ namespace app
                 app, static_cast<ApplicationSettingsNew *>(app), static_cast<ApplicationSettingsNew *>(app));
         });
         windowsFactory.attach(gui::window::name::apn_settings, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::APNSettingsWindow>(app);
+            return std::make_unique<gui::ApnSettingsWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::apn_options, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ApnOptionsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MessagesWindow>(app);
@@ -233,8 +247,17 @@ namespace app
         windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SecurityMainWindow>(app);
         });
+        windowsFactory.attach(gui::window::name::change_passcode, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ChangePasscodeWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
+        });
         windowsFactory.attach(gui::window::name::system, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SystemMainWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::new_apn, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::NewApnWindow>(app);
         });
     }
 
@@ -258,17 +281,20 @@ namespace app
 
     void ApplicationSettingsNew::operatorOnChanged(const std::string &value)
     {
+        LOG_DEBUG("[ApplicationSettingsNew::operatorOnChanged] value=%s", value.c_str());
         if (!value.empty()) {
             operatorsOn = utils::getNumericValue<bool>(value);
         }
     }
     bool ApplicationSettingsNew::getOperatorsOn() const noexcept
     {
+        LOG_DEBUG("[ApplicationSettingsNew::getOperatorsOn] %d", operatorsOn);
         return operatorsOn;
     }
     void ApplicationSettingsNew::setOperatorsOn(bool value)
     {
         operatorsOn = value;
+        LOG_DEBUG("[ApplicationSettingsNew::setOperatorsOn] to %d", operatorsOn);
         settings->setValue(settings::operators_on, std::to_string(value));
     }
 
@@ -293,7 +319,8 @@ namespace app
     void ApplicationSettingsNew::setLockPassHash(unsigned int value)
     {
         lockPassHash = value;
-        settings->setValue(::settings::SystemProperties::lockPassHash, std::to_string(value));
+        settings->setValue(
+            ::settings::SystemProperties::lockPassHash, std::to_string(value), ::settings::SettingsScope::Global);
     }
 
     auto ApplicationSettingsNew::getCurrentValues() -> settingsInterface::ScreenLightSettings::Values

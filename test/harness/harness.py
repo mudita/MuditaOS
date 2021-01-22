@@ -72,7 +72,11 @@ class Harness:
 
     def send_text(self, text: str):
         for letter in text:
-            send_char(letter, self.connection)
+            try:
+                send_char(letter, self.connection)
+            except KeyError as e:
+                available = ' '.join((f"'{_}'" for _ in utils.keymap.keys()))
+                raise LookupError(f"Character {e} not present in the keymap\nAvailable characters: {available}")
 
     def send_number(self, number: str):
         utils.send_number(number, self.connection)

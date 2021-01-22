@@ -16,9 +16,6 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        topBar->setActive(TopBar::Elements::SIM, false);
-        topBar->setActive(TopBar::Elements::TIME, true);
-
         setTitle(utils::localize.get("app_settings_title_nightshift"));
 
         body = new gui::VBox(this,

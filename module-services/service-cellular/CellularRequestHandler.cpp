@@ -22,6 +22,8 @@
 
 #include <module-cellular/at/response.hpp>
 
+using namespace cellular;
+
 void CellularRequestHandler::handle(ImeiRequest &request, at::Result &result)
 {
     if (!request.checkModemResponse(result)) {

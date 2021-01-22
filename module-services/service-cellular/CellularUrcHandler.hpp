@@ -18,27 +18,25 @@
 #include <module-cellular/at/UrcResponse.hpp>
 #include <module-cellular/at/UrcQiurc.hpp>
 
-using namespace at::urc;
-
 /**
  * ServiceCellular helper for handling Urc messages
  */
-class CellularUrcHandler : public UrcHandler
+class CellularUrcHandler : public at::urc::UrcHandler
 {
   public:
     CellularUrcHandler(ServiceCellular &cellularService) : cellularService(cellularService)
     {}
 
-    void Handle(Clip &urc) final;
-    void Handle(Creg &urc) final;
-    void Handle(Cmti &urc) final;
-    void Handle(Cusd &urc) final;
-    void Handle(Ctze &urc) final;
-    void Handle(Qind &urc) final;
-    void Handle(Cpin &urc) final;
-    void Handle(Qiurc &urc) final;
-    void Handle(PoweredDown &urc) final;
-    void Handle(UrcResponse &urc) final;
+    void Handle(at::urc::Clip &urc) final;
+    void Handle(at::urc::Creg &urc) final;
+    void Handle(at::urc::Cmti &urc) final;
+    void Handle(at::urc::Cusd &urc) final;
+    void Handle(at::urc::Ctze &urc) final;
+    void Handle(at::urc::Qind &urc) final;
+    void Handle(at::urc::Cpin &urc) final;
+    void Handle(at::urc::Qiurc &urc) final;
+    void Handle(at::urc::PoweredDown &urc) final;
+    void Handle(at::urc::UrcResponse &urc) final;
 
     /**
      * Gets the response that should be returned after handling Urc

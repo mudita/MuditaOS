@@ -14,11 +14,11 @@ namespace db::query::events
     class SelectFirstUpcoming : public Query
     {
       public:
-        SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till);
+        SelectFirstUpcoming(calendar::TimePoint filter_from, calendar::TimePoint filter_till);
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
-        TimePoint filter_from;
-        TimePoint filter_till;
+        calendar::TimePoint filter_from;
+        calendar::TimePoint filter_till;
     };
 
     /// Result of SelectFirstUpcoming query
