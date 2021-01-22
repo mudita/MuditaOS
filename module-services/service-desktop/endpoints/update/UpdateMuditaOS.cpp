@@ -54,6 +54,11 @@ UpdateMuditaOS::UpdateMuditaOS(ServiceDesktop *ownerService) : owner(ownerServic
 
 updateos::UpdateError UpdateMuditaOS::setUpdateFile(fs::path updateFileToUse)
 {
+    if (isUpdateToBeAborted()) {
+        setUpdateAbortFlag(false);
+        return informError(updateos::UpdateError::UpdateAborted, "update aborted");
+    }
+
     updateFile = purefs::dir::getUpdatesOSPath() / updateFileToUse;
     if (std::filesystem::exists(updateFile.c_str())) {
         versionInformation = UpdateMuditaOS::getVersionInfoFromFile(updateFile);
@@ -78,7 +83,7 @@ updateos::UpdateError UpdateMuditaOS::setUpdateFile(fs::path updateFileToUse)
 
 updateos::UpdateError UpdateMuditaOS::runUpdate()
 {
-    informDebug("Prepraring temp dir");
+    informDebug("Preparing temp dir");
 
     updateRunStatus.startTime   = utils::time::getCurrentTimestamp().getTime();
     updateRunStatus.fromVersion = bootConfig.to_json();
@@ -86,19 +91,32 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
 
     updateos::UpdateError err = prepareTempDirForUpdate();
     if (err != updateos::UpdateError::NoError) {
-        return informError(err, "runUpdate can't prepare temp directory for update");
+        if (err == updateos::UpdateError::UpdateAborted) {
+            return informError(updateos::UpdateError::UpdateAborted, "update aborted");
+        }
+        else {
+            return informError(err, "runUpdate can't prepare temp directory for update");
+        }
     }
 
     informDebug("Unpacking update");
-    if ((err = unpackUpdate()) == updateos::UpdateError::NoError) {
+    err = unpackUpdate();
+    if (err == updateos::UpdateError::NoError) {
         informUpdate(status, "Unpacked");
+    }
+    else if (err == updateos::UpdateError::UpdateAborted) {
+        return informError(updateos::UpdateError::UpdateAborted, "update aborted");
     }
     else {
         return informError(err, "%s can't be unpacked", updateFile.c_str());
     }
 
-    if ((err = verifyChecksums()) == updateos::UpdateError::NoError) {
+    err = verifyChecksums();
+    if (err == updateos::UpdateError::NoError) {
         informUpdate(status, "Verify checksums");
+    }
+    else if (err == updateos::UpdateError::UpdateAborted) {
+        return informError(updateos::UpdateError::UpdateAborted, "update aborted");
     }
     else {
         return informError(err, "Checksum verification failed");
@@ -149,6 +167,10 @@ updateos::UpdateError UpdateMuditaOS::unpackUpdate()
     status = updateos::UpdateState::ExtractingFiles;
     std::rewind(updateTar.stream);
     while ((mtar_read_header(&updateTar, &tarHeader)) != MTAR_ENULLRECORD) {
+        if (isUpdateToBeAborted()) {
+            setUpdateAbortFlag(false);
+            return updateos::UpdateError::UpdateAborted;
+        }
         if (std::string(tarHeader.name) == "./") {
             mtar_next(&updateTar);
             continue;
@@ -200,6 +222,11 @@ std::string UpdateMuditaOS::readContent(const char *filename) noexcept
 
 updateos::UpdateError UpdateMuditaOS::verifyChecksums()
 {
+    if (isUpdateToBeAborted()) {
+        setUpdateAbortFlag(false);
+        return informError(updateos::UpdateError::UpdateAborted, "update aborted");
+    }
+
     status = updateos::UpdateState::ChecksumVerification;
 
     auto lineBuff = std::make_unique<char[]>(
@@ -491,6 +518,11 @@ const fs::path UpdateMuditaOS::getUpdateTmpChild(const fs::path &childPath)
 
 updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate()
 {
+    if (isUpdateToBeAborted()) {
+        setUpdateAbortFlag(false);
+        return updateos::UpdateError::UpdateAborted;
+    }
+
     status = updateos::UpdateState::CreatingDirectories;
 
     updateTempDirectory = purefs::dir::getTemporaryPath() / utils::filesystem::generateRandomId(updateos::prefix_len);
