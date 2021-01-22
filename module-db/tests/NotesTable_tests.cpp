@@ -8,6 +8,7 @@
 #include "Database/Database.hpp"
 #include "Databases/NotesDB.hpp"
 #include <purefs/filesystem_paths.hpp>
+#include <vfs.hpp>
 
 TEST_CASE("Notes Table tests")
 {

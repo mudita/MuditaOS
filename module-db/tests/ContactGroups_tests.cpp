@@ -26,11 +26,12 @@ void addSomeContacts(ContactsDB &contactsDb);
 
 TEST_CASE("Contact Groups tests", "[Groups]")
 {
+    vfs.Init();
     INFO("sqlite Init");
     Database::initialize();
-    const auto callogPath = purefs::dir::getUserDiskPath() / "contacts.db";
-    std::filesystem::remove(callogPath);
-    ContactsDB contactDb{callogPath.c_str()};
+    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
+    std::filesystem::remove(contactsPath);
+    ContactsDB contactDb{contactsPath.c_str()};
     INFO("contactDB init");
     REQUIRE(contactDb.isInitialized());
     ContactsGroupsTable contactGroupsTable = ContactsGroupsTable(&contactDb);

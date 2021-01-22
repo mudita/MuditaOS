@@ -135,7 +135,7 @@ inline uint32_t TimePointToMinutes(const TimePoint &tp)
 inline TimePoint getFirstWeekDay(const TimePoint &tp)
 {
     date::year_month_day yearMonthDay = date::year_month_day{date::floor<date::days>(tp)};
-    auto hourV                        = TimePointToHour24H(tp);
+    auto hourV                        = TimePointToHour24H(tp) - 1;
     auto minuteV                      = TimePointToMinutes(tp);
     while (date::weekday{yearMonthDay} != date::mon) {
         auto decrementedDay = --yearMonthDay.day();
@@ -151,6 +151,7 @@ inline std::string TimePointToString(const TimePoint &tp, date::months months)
 {
     date::year_month_day yearMonthDay     = date::year_month_day{date::floor<date::days>(tp)};
     date::year_month_day yearMonthDayLast = yearMonthDay.year() / yearMonthDay.month() / date::last;
+    auto tpHourMinuteSecond               = TimePointToHourMinSec(tp).to_duration();
 
     TimePoint timePoint;
 
@@ -174,7 +175,19 @@ inline std::string TimePointToString(const TimePoint &tp, date::months months)
             timePoint = date::sys_days{yearMonthDay.year() / yearMonthDay.month() / yearMonthDay.day()};
         }
     }
-    return date::format("%F %T", std::chrono::time_point_cast<std::chrono::seconds>(timePoint));
+    timePoint += tpHourMinuteSecond;
+    return date::format("%F %T", time_point_cast<seconds>(timePoint));
+}
+
+inline std::string TimePointToString(const TimePoint &tp, date::years years)
+{
+    date::year_month_day yearMonthDay = date::year_month_day{date::floor<date::days>(tp)};
+    auto tpHourMinuteSecond = TimePointToHourMinSec(tp).to_duration();
+
+    yearMonthDay += years;
+    TimePoint timePoint = date::sys_days{yearMonthDay.year() / yearMonthDay.month() / yearMonthDay.day()};
+    timePoint += tpHourMinuteSecond;
+    return date::format("%F %T", time_point_cast<seconds>(timePoint));
 }
 
 inline std::string TimePointToLocalizedDateString(const TimePoint &tp, const std::string format = "")

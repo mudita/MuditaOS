@@ -30,6 +30,7 @@ struct test
 
 TEST_CASE("SMS Record tests")
 {
+    vfs.Init();
     Database::initialize();
 
     const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";

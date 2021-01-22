@@ -422,8 +422,8 @@ bool EventsTable::addYear(EventsTableRow entry)
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{1}).c_str(),
-                       TimePointToString(entry.date_till + date::years{1}).c_str(),
+                       TimePointToString(entry.date_from, date::years{1}).c_str(),
+                       TimePointToString(entry.date_till, date::years{1}).c_str(),
                        entry.reminder,
                        entry.repeat,
                        TimePointToString(entry.reminder_fired).c_str(),
@@ -432,8 +432,8 @@ bool EventsTable::addYear(EventsTableRow entry)
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{2}).c_str(),
-                       TimePointToString(entry.date_till + date::years{2}).c_str(),
+                       TimePointToString(entry.date_from, date::years{2}).c_str(),
+                       TimePointToString(entry.date_till, date::years{2}).c_str(),
                        entry.reminder,
                        entry.repeat,
                        TimePointToString(entry.reminder_fired).c_str(),
@@ -442,8 +442,8 @@ bool EventsTable::addYear(EventsTableRow entry)
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{3}).c_str(),
-                       TimePointToString(entry.date_till + date::years{3}).c_str(),
+                       TimePointToString(entry.date_from, date::years{3}).c_str(),
+                       TimePointToString(entry.date_till, date::years{3}).c_str(),
                        entry.reminder,
                        entry.repeat,
                        TimePointToString(entry.reminder_fired).c_str(),
@@ -452,8 +452,8 @@ bool EventsTable::addYear(EventsTableRow entry)
                        entry.provider_iCalUid.c_str(),
                        entry.UID.c_str(),
                        entry.title.c_str(),
-                       TimePointToString(entry.date_from + date::years{4}).c_str(),
-                       TimePointToString(entry.date_till + date::years{4}).c_str(),
+                       TimePointToString(entry.date_from, date::years{4}).c_str(),
+                       TimePointToString(entry.date_till, date::years{4}).c_str(),
                        entry.reminder,
                        entry.repeat,
                        TimePointToString(entry.reminder_fired).c_str(),
@@ -508,6 +508,8 @@ bool EventsTable::addCustom(EventsTableRow entry)
     for (uint32_t i = 1; i <= numberOfWeeks; i++) {
         for (auto option : weekDayOptions) {
             if (option) {
+                LOG_DEBUG("start: %s", TimePointToString(dateFrom + date::days{incrementation}).c_str());
+                LOG_DEBUG("start: %s", TimePointToString(dateTill + date::days{incrementation}).c_str());
                 result =
                     result &&
                     db->execute("INSERT or IGNORE INTO events (uid, title, date_from, date_till, "

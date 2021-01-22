@@ -18,9 +18,10 @@
 
 TEST_CASE("Calllog Table tests")
 {
+    vfs.Init();
     Database::initialize();
 
-    const auto callogPath = purefs::dir::getUserDiskPath() / "callog.db";
+    const auto callogPath = purefs::dir::getUserDiskPath() / "calllog.db";
     std::filesystem::remove(callogPath);
 
     CalllogDB calllogDb{callogPath.c_str()};
