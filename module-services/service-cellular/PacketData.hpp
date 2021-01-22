@@ -59,18 +59,18 @@ namespace packet_data
       public:
         explicit PacketData(ServiceCellular &cellularService);
         /**
-         * @brief load APN settings from phone memory, not call modem func.
+         * @brief load APN settings from JSON string, not call modem func.
          *
          * To synchronize with modem, this function should be call as soon as
          * the modem is ready (in sense of AT commands). Then should be call
          * setupAPNSettings to synchronize modem database with phone database.
          */
-        void loadAPNSettings();
+        void loadAPNSettings(const std::string &json);
 
         /**
-         * @brief save all APN's in phone memory
+         * @brief save all APN's JSON string
          */
-        void saveAPNSettings();
+        std::string saveAPNSettings() const;
 
         /**
          * @brief setup APN on modem, based on configuration loaded in loadAPNSettings
@@ -99,6 +99,7 @@ namespace packet_data
          */
         std::optional<std::shared_ptr<APN::Config>> getAPNFirst(APN::APNType type);
         at::Result::Code setAPN(std::shared_ptr<APN::Config> apn);
+        at::Result::Code newAPN(std::shared_ptr<APN::Config> apn, std::uint8_t &newId);
     };
 
 } // namespace packet_data
