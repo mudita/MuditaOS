@@ -130,6 +130,7 @@ namespace parserFSM
         inline constexpr auto errorCode        = "errorCode";
         inline constexpr auto statusCode       = "statusCode";
         inline constexpr auto updateHistory    = "updateHistory";
+
         namespace filesystem
         {
             inline constexpr auto command = "command";
@@ -140,6 +141,16 @@ namespace parserFSM
                 inline constexpr auto download = "download";
             } // namespace commands
         }     // namespace filesystem
+
+        namespace updateprocess
+        {
+            inline constexpr auto command       = "command";
+            inline constexpr auto updateAborted = "updateAborted";
+            namespace commands
+            {
+                inline constexpr auto abort = "abort";
+            } // namespace commands
+        }     // namespace updateprocess
 
         namespace messages
         {
