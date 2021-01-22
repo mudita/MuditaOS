@@ -18,6 +18,7 @@
 
 TEST_CASE("Contacts Number Table tests")
 {
+    vfs.Init();
     Database::initialize();
 
     const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";

@@ -19,6 +19,7 @@
 
 TEST_CASE("SMS Templates Table tests")
 {
+    vfs.Init();
     Database::initialize();
 
     const auto smsPath = purefs::dir::getUserDiskPath() / "sms.db";

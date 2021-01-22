@@ -10,6 +10,7 @@
 
 TEST_CASE("Contact Record db tests")
 {
+    vfs.Init();
     Database::initialize();
 
     const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
@@ -260,6 +261,7 @@ TEST_CASE("Test converting contact data to string")
 
 TEST_CASE("Contact record numbers update")
 {
+    vfs.Init();
     Database::initialize();
     const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
     std::filesystem::remove(contactsPath);

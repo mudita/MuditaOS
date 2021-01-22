@@ -14,13 +14,6 @@ NotificationsTable::NotificationsTable(Database *db) : Table(db)
 
 bool NotificationsTable::create()
 {
-    if (!add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0})) {
-        return false;
-    }
-    if (!add({{.ID = 0}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0})) {
-        return false;
-    }
-
     return true;
 }
 

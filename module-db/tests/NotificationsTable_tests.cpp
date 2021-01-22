@@ -18,6 +18,7 @@
 
 TEST_CASE("Notifications Table tests")
 {
+    vfs.Init();
     Database::initialize();
 
     const auto notificationsPath = purefs::dir::getUserDiskPath() / "notifications.db";

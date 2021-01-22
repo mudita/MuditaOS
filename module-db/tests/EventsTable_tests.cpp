@@ -30,6 +30,7 @@ TEST_CASE("Events Table tests")
 {
 
     Database::initialize();
+    vfs.Init();
 
     const auto eventsPath = purefs::dir::getUserDiskPath() / "events.db";
     std::filesystem::remove(eventsPath);
@@ -439,6 +440,11 @@ TEST_CASE("Events Table tests")
             uint32_t numberOfEvents     = 9;
             TimePoint originalStartDate = TimePointFromString("2020-12-10 14:30:00"); // thursday
             TimePoint originalEndDate   = TimePointFromString("2020-12-10 15:30:00"); // thursday
+            LOG_DEBUG("start: %s", TimePointToString(originalStartDate + date::days{0}).c_str());
+            LOG_DEBUG("start: %s", TimePointToString(originalEndDate + date::days{0}).c_str());
+            LOG_DEBUG("start is: %s",
+                      TimePointToString(TimePointFromTimeT(TimePointToTimeT(originalStartDate))).c_str());
+            LOG_DEBUG("start is: %s", TimePointToString(TimePointFromTimeT(TimePointToTimeT(originalEndDate))).c_str());
 
             check_custom_repeat(customRepeatOption, numberOfEvents, originalStartDate, originalEndDate);
         }

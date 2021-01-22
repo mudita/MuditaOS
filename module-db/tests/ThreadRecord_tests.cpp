@@ -28,6 +28,7 @@
 
 TEST_CASE("Thread Record tests")
 {
+    vfs.Init();
     Database::initialize();
 
     const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
