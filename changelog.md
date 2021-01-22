@@ -1,5 +1,40 @@
 # MuditaOS changelog
 
+## [0.54.3 2020-01-22]
+
+### Added
+
+* Add options to create, edit and remove quotes.
+* Add main system settings window.
+* Add APN settings window.
+
+### Changed
+
+* Improve e-ink responsiveness.
+* Change time format on home screen and status bar.
+* Add application-wide top bar manager.
+* Improved screen light control.
+
+### Fixed
+
+* Fix changing passcode windows.
+* Fix the possibility to write illogical operations in the calculator.
+* Fix the possibility to write multiple zeroes in the calculator when it is not needed.
+* Change the display format of a calculation result to scientific notation when it does not fit the screen.
+* Fix freezes and resets due to invalid assertions.
+* Fix grid layout navigation.
+* Fix Linux simulator crashes.
+
+### Other
+
+* Add build target to generate a package with version information.
+* Update licensing information.
+* Add option to change VID/PID via build system.
+* Add several filesystem improvements.
+* Update development workflow documentation and scripts.
+* Add integration with `clang-tidy`.
+* Add assets uploading to Github on release.
+
 ## [0.54.2 2020-01-19]
 
 ### Added
