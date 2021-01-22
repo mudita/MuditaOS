@@ -3,6 +3,7 @@
 
 #pragma once
 #include "CalendarListItem.hpp"
+#include "application-calendar/data/CalendarData.hpp"
 #include <Label.hpp>
 #include <Text.hpp>
 #include <BoxLayout.hpp>
@@ -20,6 +21,7 @@ namespace gui
         gui::Label *dayInput   = nullptr;
         gui::Label *monthInput = nullptr;
         gui::Label *yearInput  = nullptr;
+        DateTimeType dateTimeType = DateTimeType::Start;
 
         void buildInterface();
         void applyItemSpecificProperties(gui::Label *item);
@@ -31,7 +33,7 @@ namespace gui
         void clearInput(gui::Label &dateInput);
 
       public:
-        EventDateItem();
+        EventDateItem(DateTimeType dateTimeType);
 
         const calendar::YearMonthDay getChosenDate();
         // virtual methods from Item

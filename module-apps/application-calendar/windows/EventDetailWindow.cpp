@@ -7,6 +7,7 @@
 #include "module-apps/application-calendar/data/CalendarData.hpp"
 #include <gui/widgets/Window.hpp>
 #include <time/time_conversion.hpp>
+#include <module-utils/time/TimeRangeParser.hpp>
 
 namespace gui
 {
@@ -66,10 +67,16 @@ namespace gui
 
         eventRecord    = item->getData();
         auto startDate = TimePointToYearMonthDay(eventRecord->date_from);
-        std::string monthStr =
-            utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
-        setTitle(std::to_string(unsigned(startDate.day())) + " " + monthStr);
-
+        if (utils::time::TimeRangeParser::isMultiDay(eventRecord->date_from, eventRecord->date_till)) {
+            auto dateRange = utils::time::TimeRangeParser::getDayShortMonthString(eventRecord->date_from) + " - " +
+                             utils::time::TimeRangeParser::getDayShortMonthString(eventRecord->date_till);
+            setTitle(dateRange);
+        }
+        else {
+            std::string monthStr =
+                utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
+            setTitle(std::to_string(unsigned(startDate.day())) + " " + monthStr);
+        }
         return true;
     }
 

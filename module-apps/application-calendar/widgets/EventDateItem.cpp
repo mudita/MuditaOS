@@ -11,7 +11,7 @@
 namespace gui
 {
     namespace dateItem = style::window::calendar::item::eventTime;
-    EventDateItem::EventDateItem()
+    EventDateItem::EventDateItem(DateTimeType dateTimeType) : dateTimeType(dateTimeType)
     {
         setMinimumSize(style::window::default_body_width, dateItem::height);
         setEdges(RectangleEdge::None);
@@ -123,7 +123,13 @@ namespace gui
         };
 
         onLoadCallback = [&](std::shared_ptr<EventsRecord> record) {
-            auto date = TimePointToYearMonthDay(record->date_from);
+            calendar::YearMonthDay date;
+            if (dateTimeType == DateTimeType::Start) {
+                date = TimePointToYearMonthDay(record->date_from);
+            }
+            else {
+                date = TimePointToYearMonthDay(record->date_till);
+            }
             dayInput->setText(std::to_string(static_cast<unsigned>(date.day())));
             monthInput->setText(std::to_string(static_cast<unsigned>(date.month())));
             yearInput->setText(std::to_string(static_cast<int>(date.year())));
@@ -132,6 +138,17 @@ namespace gui
         setOnInputCallback(*dayInput);
         setOnInputCallback(*monthInput);
         setOnInputCallback(*yearInput);
+
+        onSaveCallback = [&](std::shared_ptr<EventsRecord> record) {
+            if (dateTimeType == DateTimeType::Start) {
+                auto hms          = TimePointToHourMinSec(record->date_from);
+                record->date_from = TimePointFromYearMonthDay(getChosenDate()) + hms.hours() + hms.minutes();
+            }
+            else {
+                auto hms          = TimePointToHourMinSec(record->date_till);
+                record->date_till = TimePointFromYearMonthDay(getChosenDate()) + hms.hours() + hms.minutes();
+            }
+        };
     }
 
     bool EventDateItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

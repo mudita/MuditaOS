@@ -82,7 +82,7 @@ namespace gui
         if (rec != nullptr) {
             description->setText(this->record->title.c_str());
             startTime->setText(utils::time::TimeRangeParser().getCalendarTimeString(
-                record->date_from, record->date_till, utils::time::Version::abbrev));
+                record->date_from, record->date_till, utils::time::Version::Abbrev));
         }
     }
 } /* namespace gui */

@@ -40,33 +40,86 @@ namespace utils::time
                 endIsAm   = date::is_am(endTime.hours());
             }
 
-            if (version == Version::abbrev) {
+            if (version == Version::Abbrev) {
                 if (!isMode24H) {
-                    return TimePointToHourString12H(startDate) + ":" + TimePointToMinutesString(startDate) + " " +
-                           AMPMtoString(startIsAm);
+                    return timePointToHourMinString(startDate, isMode24H) + " " + AMPMtoString(startIsAm);
                 }
-                else {
-                    return TimePointToHourString24H(startDate) + ":" + TimePointToMinutesString(startDate);
-                }
+                return timePointToHourMinString(startDate, isMode24H);
             }
-            else {
+            else if (!isMultiDay(startDate, endDate)) {
                 if (!isMode24H) {
                     if (startIsAm != endIsAm) {
-                        return TimePointToHourString12H(startDate) + ":" + TimePointToMinutesString(startDate) + " " +
-                               AMPMtoString(startIsAm) + " - " + TimePointToHourString12H(endDate) + ":" +
-                               TimePointToMinutesString(endDate) + " " + AMPMtoString(endIsAm);
+                        return timePointToHourMinString(startDate, isMode24H) + " " + AMPMtoString(startIsAm) + " - " +
+                               timePointToHourMinString(endDate, isMode24H) + " " + AMPMtoString(endIsAm);
                     }
-                    else {
-                        return TimePointToHourString12H(startDate) + ":" + TimePointToMinutesString(startDate) + " - " +
-                               TimePointToHourString12H(endDate) + ":" + TimePointToMinutesString(endDate) + " " +
-                               AMPMtoString(startIsAm);
-                    }
+                    return timePointToHourMinString(startDate, isMode24H) + " - " +
+                           timePointToHourMinString(endDate, isMode24H) + " " + AMPMtoString(startIsAm);
                 }
-                else {
-                    return TimePointToHourString24H(startDate) + ":" + TimePointToMinutesString(startDate) + " - " +
-                           TimePointToHourString24H(endDate) + ":" + TimePointToMinutesString(endDate);
-                }
+                return timePointToHourMinString(startDate, isMode24H) + " - " +
+                       timePointToHourMinString(endDate, isMode24H);
             }
+            return getMultiDayString(startDate, endDate, isMode24H);
         }
+    }
+
+    std::string TimeRangeParser::timePointToHourMinString(TimePoint time, bool isMode24H, bool addAMPM)
+    {
+        if (isMode24H) {
+            return TimePointToHourString24H(time) + ":" + TimePointToMinutesString(time);
+        }
+        else {
+            auto time12h = TimePointToHourString12H(time) + ":" + TimePointToMinutesString(time);
+            if (addAMPM) {
+                auto hms = TimePointToHourMinSec(time);
+                return time12h + " " + AMPMtoString(date::is_am(hms.hours()));
+            }
+            return time12h;
+        }
+    }
+
+    std::string TimeRangeParser::getMultiDayString(TimePoint start, TimePoint end, bool isMode24H)
+    {
+        return TimePointToLocalizedDateString(start, "%a") + " " +
+               timePointToHourMinString(start, isMode24H, !isMode24H) + " - " +
+               TimePointToLocalizedDateString(end, "%a") + " " + timePointToHourMinString(end, isMode24H, !isMode24H);
+    }
+
+    bool TimeRangeParser::isMultiDay(TimePoint start, TimePoint end)
+    {
+        auto startDate = TimePointToYearMonthDay(start);
+        auto endDate   = TimePointToYearMonthDay(end);
+        return startDate.day() != endDate.day() || startDate.month() != endDate.month() ||
+               startDate.year() != endDate.year();
+    }
+
+    uint32_t TimeRangeParser::getDaysCount(TimePoint start, TimePoint end)
+    {
+        auto eventStartDuration = utils::time::Duration(TimePointToTimeT(start));
+        auto eventEndDuration   = utils::time::Duration(TimePointToTimeT(end));
+        auto startEventDurationSinceEpochInDaysRoundedDown =
+            (eventStartDuration.getHours() - eventStartDuration.getHours() % utils::time::hoursInday) /
+            utils::time::hoursInday;
+        auto endEventDurationSinceEpochInDaysRoundedDown =
+            (eventEndDuration.getHours() - eventEndDuration.getHours() % utils::time::hoursInday) /
+            utils::time::hoursInday;
+        return endEventDurationSinceEpochInDaysRoundedDown - startEventDurationSinceEpochInDaysRoundedDown;
+    }
+
+    std::string TimeRangeParser::getDayShortMonthString(TimePoint time)
+    {
+        auto ymd = TimePointToYearMonthDay(time);
+        return std::to_string(static_cast<unsigned>(ymd.day())) + " " + TimePointToLocalizedDateString(time, "%b");
+    }
+
+    std::pair<TimePoint, TimePoint> TimeRangeParser::getPrepopulatedStartAndEndTime(TimePoint dateFilter)
+    {
+        auto time = TimePointToHourMinSec(TimePointNow());
+        if (time.minutes().count() > minutesInHour / 2) {
+            dateFilter += std::chrono::hours(time.hours().count() + 1);
+        }
+        else {
+            dateFilter += time.hours() + std::chrono::minutes(minutesInHour / 2);
+        }
+        return std::make_pair(dateFilter, dateFilter + std::chrono::hours(1));
     }
 } // namespace utils::time

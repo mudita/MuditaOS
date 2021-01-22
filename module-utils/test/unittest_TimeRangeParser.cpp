@@ -21,7 +21,7 @@ TEST_CASE("Time display parser")
         event.date_till = TimePointFromString("2020-10-10 15:36:00");
 
         auto returnString = utils::time::TimeRangeParser().getCalendarTimeString(
-            event.date_from, event.date_till, Version::normal, false);
+            event.date_from, event.date_till, Version::DayEvent, false);
         REQUIRE("2020-10-10 14:24:00" == TimePointToString(event.date_from));
         REQUIRE("2020-10-10 15:36:00" == TimePointToString(event.date_till));
         REQUIRE("2" == TimePointToHourString12H(event.date_from));
@@ -38,7 +38,7 @@ TEST_CASE("Time display parser")
         event.date_till = TimePointFromString("2020-12-31 07:45:00");
 
         auto returnString = utils::time::TimeRangeParser().getCalendarTimeString(
-            event.date_from, event.date_till, Version::normal, false);
+            event.date_from, event.date_till, Version::DayEvent, false);
         REQUIRE("2020-12-31 05:59:00" == TimePointToString(event.date_from));
         REQUIRE("2020-12-31 07:45:00" == TimePointToString(event.date_till));
         REQUIRE("5" == TimePointToHourString12H(event.date_from));
@@ -55,7 +55,7 @@ TEST_CASE("Time display parser")
         event.date_till = TimePointFromString("2021-01-01 19:55:00");
 
         auto returnString = utils::time::TimeRangeParser().getCalendarTimeString(
-            event.date_from, event.date_till, Version::normal, false);
+            event.date_from, event.date_till, Version::DayEvent, false);
         REQUIRE("2021-01-01 01:05:00" == TimePointToString(event.date_from));
         REQUIRE("2021-01-01 19:55:00" == TimePointToString(event.date_till));
         REQUIRE("1" == TimePointToHourString12H(event.date_from));
@@ -73,7 +73,7 @@ TEST_CASE("Time display parser")
         event.date_till = TimePointFromString("2020-12-31 19:55:00");
 
         auto returnString = utils::time::TimeRangeParser().getCalendarTimeString(
-            event.date_from, event.date_till, Version::abbrev, false);
+            event.date_from, event.date_till, Version::Abbrev, false);
         REQUIRE("2020-12-31 00:05:00" == TimePointToString(event.date_from));
         REQUIRE("2020-12-31 19:55:00" == TimePointToString(event.date_till));
         REQUIRE("12" == TimePointToHourString12H(event.date_from));
@@ -88,7 +88,7 @@ TEST_CASE("Time display parser")
         event.date_till = TimePointFromString("2020-12-31 19:55:00");
 
         auto returnString = utils::time::TimeRangeParser().getCalendarTimeString(
-            event.date_from, event.date_till, Version::abbrev, false);
+            event.date_from, event.date_till, Version::Abbrev, false);
         REQUIRE("2020-12-31 12:05:00" == TimePointToString(event.date_from));
         REQUIRE("2020-12-31 19:55:00" == TimePointToString(event.date_till));
         REQUIRE("12" == TimePointToHourString12H(event.date_from));
@@ -103,7 +103,7 @@ TEST_CASE("Time display parser")
         event.date_till = TimePointFromString("2021-01-01 19:55:00");
 
         auto returnString = utils::time::TimeRangeParser().getCalendarTimeString(
-            event.date_from, event.date_till, Version::normal, true);
+            event.date_from, event.date_till, Version::DayEvent, true);
         REQUIRE("2021-01-01 01:05:00" == TimePointToString(event.date_from));
         REQUIRE("2021-01-01 19:55:00" == TimePointToString(event.date_till));
         REQUIRE("1" == TimePointToHourString24H(event.date_from));
@@ -120,7 +120,7 @@ TEST_CASE("Time display parser")
         event.date_till = TimePointFromString("2021-01-01 19:55:00");
 
         auto returnString = utils::time::TimeRangeParser().getCalendarTimeString(
-            event.date_from, event.date_till, Version::abbrev, true);
+            event.date_from, event.date_till, Version::Abbrev, true);
         REQUIRE("2021-01-01 18:05:00" == TimePointToString(event.date_from));
         REQUIRE("2021-01-01 19:55:00" == TimePointToString(event.date_till));
         REQUIRE("18" == TimePointToHourString24H(event.date_from));
@@ -135,7 +135,7 @@ TEST_CASE("Time display parser")
         event.date_till = TimePointFromString("2020-10-20 23:59:00");
 
         auto returnString = utils::time::TimeRangeParser().getCalendarTimeString(
-            event.date_from, event.date_till, Version::normal, false);
+            event.date_from, event.date_till, Version::DayEvent, false);
         REQUIRE("2020-10-20 00:00:00" == TimePointToString(event.date_from));
         REQUIRE("2020-10-20 23:59:00" == TimePointToString(event.date_till));
         REQUIRE(returnString == utils::localize.get("app_calendar_all_day"));

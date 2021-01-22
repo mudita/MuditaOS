@@ -14,6 +14,7 @@
 #include <time/time_conversion.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <module-utils/time/TimeRangeParser.hpp>
 
 namespace gui
 {
@@ -56,7 +57,9 @@ namespace gui
 
     void AllEventsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
-        allEventsList->rebuildList();
+        if (mode == gui::ShowMode::GUI_SHOW_INIT) {
+            allEventsList->rebuildList();
+        }
     }
 
     auto AllEventsWindow::handleSwitchData(SwitchData *data) -> bool
@@ -69,6 +72,7 @@ namespace gui
             return false;
         }
         dateFilter = item->getDateFilter();
+        allEventsModel->setDateFilter(dateFilter);
         return true;
     }
 
@@ -78,6 +82,7 @@ namespace gui
             inputEvent.state == gui::InputEvent::State::keyReleasedShort) {
             LOG_DEBUG("Switch to desktop");
             app::manager::Controller::switchBack(application);
+            return true;
         }
 
         if (AppWindow::onInput(inputEvent)) {
@@ -92,10 +97,10 @@ namespace gui
             LOG_DEBUG("Switch to new event window");
             std::unique_ptr<EventRecordData> data = std::make_unique<EventRecordData>();
             data->setDescription(style::window::calendar::new_event);
-            auto event       = std::make_shared<EventsRecord>();
-            event->date_from = dateFilter;
-            event->date_till = dateFilter + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
-                               std::chrono::minutes(style::window::calendar::time::max_minutes);
+            auto event        = std::make_shared<EventsRecord>();
+            auto [start, end] = utils::time::TimeRangeParser::getPrepopulatedStartAndEndTime(dateFilter);
+            event->date_from  = start;
+            event->date_till  = end;
             data->setData(event);
             application->switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
@@ -117,6 +122,7 @@ namespace gui
         if (msgNotification != nullptr) {
             if (msgNotification->interface == db::Interface::Name::Events) {
                 if (msgNotification->dataModified()) {
+                    allEventsModel->setQueryType(msgNotification->type);
                     allEventsList->rebuildList(style::listview::RebuildType::InPlace);
                     return true;
                 }

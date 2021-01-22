@@ -43,13 +43,13 @@ namespace gui
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
     }
 
-    void DayEventsItem::setEvent(std::shared_ptr<EventsRecord> rec)
+    void DayEventsItem::setEvent(std::shared_ptr<EventsRecord> rec, calendar::YearMonthDay ymd)
     {
         this->record = rec;
 
         if (rec != nullptr) {
             description->setText(this->record->title.c_str());
-            title->setText(utils::time::TimeRangeParser().getCalendarTimeString(record->date_from, record->date_till));
+            title->setText(getConvertedEventTimeString(ymd));
             if (record->reminder == static_cast<uint32_t>(Reminder::never)) {
                 clock->setVisible(false);
             }
@@ -61,6 +61,28 @@ namespace gui
         vBox->setPosition(0, 0);
         vBox->setSize(newDim.w, newDim.h);
         return true;
+    }
+
+    std::string DayEventsItem::getConvertedEventTimeString(calendar::YearMonthDay ymd)
+    {
+        if (utils::time::TimeRangeParser::isMultiDay(record->date_from, record->date_till)) {
+            auto startDate = TimePointToYearMonthDay(record->date_from);
+            auto endDate   = TimePointToYearMonthDay(record->date_till);
+            if (ymd == startDate) {
+                auto convertedEndTime = TimePointFromYearMonthDay(startDate) +
+                                        std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
+                                        std::chrono::minutes(style::window::calendar::time::max_minutes);
+                return utils::time::TimeRangeParser().getCalendarTimeString(
+                    record->date_from, convertedEndTime, utils::time::Version::DayEvent);
+            }
+            else if (ymd > startDate && ymd < endDate) {
+                return utils::localize.get("app_calendar_all_day");
+            }
+            return utils::time::TimeRangeParser().getCalendarTimeString(
+                TimePointFromYearMonthDay(endDate), record->date_till, utils::time::Version::DayEvent);
+        }
+        return utils::time::TimeRangeParser().getCalendarTimeString(
+            record->date_from, record->date_till, utils::time::Version::DayEvent);
     }
 
 } /* namespace gui */

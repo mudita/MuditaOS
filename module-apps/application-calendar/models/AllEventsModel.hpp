@@ -3,24 +3,29 @@
 
 #pragma once
 #include "Application.hpp"
+#include "application-calendar/models/AllEventsDatabaseModel.hpp"
 #include <ListItemProvider.hpp>
-#include <DatabaseModel.hpp>
 #include <module-db/Interface/EventsRecord.hpp>
 #include <module-db/Common/Query.hpp>
 
-class AllEventsModel : public app::DatabaseModel<EventsRecord>,
+class AllEventsModel : public app::AllEventsDatabaseModel,
                        public gui::ListItemProvider,
                        public app::AsyncCallbackReceiver
 {
-    app::Application *application  = nullptr;
+    uint32_t counter          = 0;
+    TimePoint dateFilter      = TimePointNow();
+    db::Query::Type queryType = db::Query::Type::Create;
+    std::vector<std::pair<EventsRecord, TimePoint>> getEventsAndEventsStartTime(const std::vector<EventsRecord> &rec);
 
   public:
-    AllEventsModel(app::Application *app);
+    explicit AllEventsModel(app::Application *app);
 
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
-    bool updateRecords(std::vector<EventsRecord> records) override;
+    bool updateRecords(std::vector<std::pair<EventsRecord, TimePoint>> records) override;
 
     auto handleQueryResponse(db::QueryResult *) -> bool;
+    void setDateFilter(TimePoint filter);
+    void setQueryType(db::Query::Type type);
     // virtual methods for ListViewProvider
     [[nodiscard]] unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;

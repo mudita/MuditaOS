@@ -11,10 +11,12 @@
 #include "windows/NewEditEventWindow.hpp"
 #include "windows/CustomRepeatWindow.hpp"
 #include "windows/EventReminderWindow.hpp"
+#include "windows/CalendarDateTimeWindow.hpp"
 #include "NoEvents.hpp"
 #include "Dialog.hpp"
 #include <time/time_conversion.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
+#include <module-utils/time/TimeRangeParser.hpp>
 
 #include <service-db/DBServiceAPI.hpp>
 #include <service-db/QueryMessage.hpp>
@@ -120,10 +122,9 @@ namespace app
         windowsFactory.attach(no_events_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NoEvents>(app, name);
         });
-        windowsFactory.attach(style::window::calendar::name::events_options,
-                              [](Application *app, const std::string &name) {
-                                  return std::make_unique<gui::CalendarEventsOptions>(app);
-                              });
+        windowsFactory.attach(events_options, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::CalendarEventsOptions>(app);
+        });
         windowsFactory.attach(dialog_yes_no, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, dialog_yes_no);
         });
@@ -141,6 +142,12 @@ namespace app
         });
         windowsFactory.attach(event_reminder_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::EventReminderWindow>(app, event_reminder_window);
+        });
+        windowsFactory.attach(date_time_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::CalendarDateTimeWindow>(app);
+        });
+        windowsFactory.attach(dialog_confirm, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogConfirm>(app, dialog_confirm);
         });
     }
 
@@ -164,11 +171,10 @@ namespace app
             std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
             eventData->setDescription(style::window::calendar::new_event);
             auto event       = std::make_shared<EventsRecord>();
-            event->date_from = dateFilter;
-            event->date_till = dateFilter + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
-                               std::chrono::minutes(style::window::calendar::time::max_minutes);
+            auto [start, end] = utils::time::TimeRangeParser::getPrepopulatedStartAndEndTime(dateFilter);
+            event->date_from  = start;
+            event->date_till  = end;
             eventData->setData(event);
-
             switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(eventData));
             return true;

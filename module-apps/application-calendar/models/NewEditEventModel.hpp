@@ -6,16 +6,11 @@
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "application-calendar/widgets/CalendarListItem.hpp"
 #include "application-calendar/widgets/TextWithLabelItem.hpp"
-#include "application-calendar/widgets/EventTimeItem.hpp"
 #include "application-calendar/widgets/SeveralOptionsItem.hpp"
 #include "application-calendar/widgets/EventDateItem.hpp"
+#include "application-calendar/widgets/DateTimeItem.hpp"
 #include "InternalModel.hpp"
 #include <ListItemProvider.hpp>
-
-namespace gui
-{
-    class NewEventCheckBoxWithLabel; // fw declaration
-}
 
 class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, public gui::ListItemProvider
 {
@@ -23,21 +18,26 @@ class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, pu
     bool mode24H                  = false;
 
     gui::TextWithLabelItem *eventNameInput          = nullptr;
-    gui::NewEventCheckBoxWithLabel *allDayEventCheckBox = nullptr;
-    gui::EventDateItem *dateItem                    = nullptr;
-    gui::EventTimeItem *startTime                   = nullptr;
-    gui::EventTimeItem *endTime                     = nullptr;
+    gui::DateTimeItem *startDate                    = nullptr;
+    gui::DateTimeItem *endDate                      = nullptr;
     gui::SeveralOptionsItem *reminder               = nullptr;
     gui::SeveralOptionsItem *repeat                 = nullptr;
+
+    void createData();
+    void setDateItemInputCallback(gui::DateTimeItem *dateItem,
+                                  const std::string &description,
+                                  const std::shared_ptr<EventsRecord> &record);
+    void dateNotValid(EventAction action);
 
   public:
     NewEditEventModel(app::Application *app, bool mode24H = false);
 
     void loadData(std::shared_ptr<EventsRecord> record);
     void loadRepeat(const std::shared_ptr<EventsRecord> &record);
-    void loadDataWithoutTimeItem();
-    void reloadDataWithTimeItem();
+    void loadStartDate(const std::shared_ptr<EventsRecord> &record);
+    void loadEndDate(const std::shared_ptr<EventsRecord> &record);
     void saveData(std::shared_ptr<EventsRecord> event, EventAction action);
+    void reloadWithoutRepeat();
     void addReapetedRecords(std::shared_ptr<EventsRecord> event);
 
     [[nodiscard]] unsigned int getMinimalItemHeight() const override;
@@ -47,7 +47,4 @@ class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, pu
 
     uint32_t getRepeatOptionValue();
     void setRepeatOptionValue(const uint32_t &value);
-
-  private:
-    void createData(bool allDayEvent);
 };

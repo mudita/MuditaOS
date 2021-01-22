@@ -4,17 +4,15 @@
 #include "AllEventsModel.hpp"
 #include "application-calendar/widgets/AllEventsItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
-#include "module-apps/application-calendar/data/CalendarData.hpp"
-#include "module-apps/application-calendar/ApplicationCalendar.hpp"
+#include "application-calendar/data/CalendarData.hpp"
+#include "application-calendar/ApplicationCalendar.hpp"
 #include <ListView.hpp>
 #include <service-db/DBServiceAPI.hpp>
-#include <queries/calendar/QueryEventsGetAllLimited.hpp>
+#include <queries/calendar/QueryEventsGetAll.hpp>
+#include <module-utils/time/TimeRangeParser.hpp>
 
-AllEventsModel::AllEventsModel(app::Application *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
-{
-    application = app;
-    assert(app != nullptr);
-}
+AllEventsModel::AllEventsModel(app::Application *app) : AllEventsDatabaseModel(app), app::AsyncCallbackReceiver{app}
+{}
 
 unsigned int AllEventsModel::requestRecordsCount()
 {
@@ -23,10 +21,23 @@ unsigned int AllEventsModel::requestRecordsCount()
 
 void AllEventsModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
-    auto query = std::make_unique<db::query::events::GetAllLimited>(offset, limit);
-    auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Events);
-    task->setCallback([this](auto response) { return handleQueryResponse(response); });
-    task->execute(application, this);
+    AllEventsDatabaseModel::setOffsetAndLimit(offset, limit);
+    if (queryType == db::Query::Type::Update) {
+        AllEventsDatabaseModel::clearRecords();
+    }
+    if (offset <= counter || queryType == db::Query::Type::Update || queryType == db::Query::Type::Create ||
+        queryType == db::Query::Type::Delete) {
+        queryType  = db::Query::Type::Read;
+        auto query = std::make_unique<db::query::events::GetAll>();
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Events);
+        task->setCallback([this](auto response) { return handleQueryResponse(response); });
+        task->execute(application, this);
+        LOG_DEBUG("Load records from db");
+    }
+    else {
+        LOG_DEBUG("Update records without loading db");
+        updateRecords(std::vector<std::pair<EventsRecord, TimePoint>>());
+    }
 }
 
 unsigned int AllEventsModel::getMinimalItemHeight() const
@@ -41,12 +52,12 @@ gui::ListItem *AllEventsModel::getItem(gui::Order order)
         LOG_DEBUG("Empty record in AllEventsModel::GetItem");
         return nullptr;
     }
-
     auto *item = new gui::AllEventsItem();
-    item->setEvent(record);
+    item->setEvent(std::make_shared<EventsRecord>(record->first));
     item->activatedCallback = [=](gui::Item &item) {
         LOG_INFO("Switch to event details window");
-        auto rec  = std::make_unique<EventsRecord>(*record);
+        auto rec       = std::make_unique<EventsRecord>(record->first);
+        rec->date_from = record->second;
         auto data = std::make_unique<EventRecordData>(std::move(rec));
         application->switchWindow(style::window::calendar::name::details_window, std::move(data));
         return true;
@@ -55,29 +66,40 @@ gui::ListItem *AllEventsModel::getItem(gui::Order order)
     return item;
 }
 
-bool AllEventsModel::updateRecords(std::vector<EventsRecord> records)
+bool AllEventsModel::updateRecords(std::vector<std::pair<EventsRecord, TimePoint>> records)
 {
-    DatabaseModel::updateRecords(std::move(records));
+    AllEventsDatabaseModel::updateRecords(std::move(records));
+    list->setElementsCount(AllEventsDatabaseModel::getBufferedRecordsSize());
+    if (recordsCount != AllEventsDatabaseModel::getBufferedRecordsSize()) {
+        recordsCount = AllEventsDatabaseModel::getBufferedRecordsSize();
+        list->rebuildList(
+            style::listview::RebuildType::OnOffset, AllEventsDatabaseModel::getOffsetForCurrentTime(), true);
+        return true;
+    }
     list->onProviderDataUpdate();
     return true;
 }
 
 auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 {
-    auto response = dynamic_cast<db::query::events::GetAllLimitedResult *>(queryResult);
+    auto response = dynamic_cast<db::query::events::GetAllResult *>(queryResult);
     assert(response != nullptr);
 
     auto records = response->getResult();
-    list->setElementsCount(response->getCountResult());
+    if (counter != (records.size())) {
+        AllEventsDatabaseModel::clearRecords();
+        counter      = records.size();
+        recordsCount = counter;
+        queryType    = db::Query::Type::Create;
+        list->rebuildList(style::listview::RebuildType::Full, 0, true);
+        return false;
+    }
 
     auto app = dynamic_cast<app::ApplicationCalendar *>(application);
     assert(application != nullptr);
-
-    if (records.empty()) {
-
+    if (counter == 0) {
         if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
-            auto filter = TimePointNow();
-            app->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"), filter);
+            app->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"), dateFilter);
         }
     }
     auto eventShift = app->getEventShift();
@@ -87,5 +109,26 @@ auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
             record.date_till += std::chrono::hours(eventShift);
         }
     }
-    return this->updateRecords(std::move(records));
+    return this->updateRecords(getEventsAndEventsStartTime(records));
+}
+
+std::vector<std::pair<EventsRecord, TimePoint>> AllEventsModel::getEventsAndEventsStartTime(
+    const std::vector<EventsRecord> &rec)
+{
+    auto pairs = std::vector<std::pair<EventsRecord, TimePoint>>();
+    pairs.reserve(rec.size());
+    for (const auto &r : rec) {
+        pairs.emplace_back(r, r.date_from);
+    }
+    return pairs;
+}
+
+void AllEventsModel::setDateFilter(TimePoint filter)
+{
+    dateFilter = filter;
+}
+
+void AllEventsModel::setQueryType(db::Query::Type type)
+{
+    queryType = type;
 }

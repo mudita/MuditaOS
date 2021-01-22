@@ -67,6 +67,22 @@ namespace gui
                 eventRecord->repeat = parser->getDatabaseFieldValue(std::move(uniqueData));
                 newEditEventModel->loadRepeat(eventRecord);
             }
+
+            if (auto dateTimeData = dynamic_cast<DateTimeData *>(data); dateTimeData != nullptr) {
+                if (dateTimeData->getDateTimeType() == DateTimeType::Start) {
+                    eventRecord->date_from = dateTimeData->getDateTimeData();
+                    handleEndDateUpdate();
+                    newEditEventModel->loadStartDate(eventRecord);
+                }
+                else {
+                    eventRecord->date_till = dateTimeData->getDateTimeData();
+                    checkEventDurationCorrectness();
+                }
+            }
+        }
+        if (eventRecord->date_till - eventRecord->date_from > date::days(1)) {
+            newEditEventModel->reloadWithoutRepeat();
+            eventRecord->repeat = static_cast<uint32_t>(Repeat::never);
         }
     }
 
@@ -102,5 +118,26 @@ namespace gui
             eventAction = EventAction::Add;
         }
         return true;
+    }
+
+    void NewEditEventWindow::handleEndDateUpdate()
+    {
+        auto start = TimePointToYearMonthDay(eventRecord->date_from);
+        auto end   = TimePointToYearMonthDay(eventRecord->date_till);
+        if (start > end) {
+            auto hms               = TimePointToHourMinSec(eventRecord->date_till);
+            eventRecord->date_till = TimePointFromYearMonthDay(start) + hms.hours() + hms.minutes();
+        }
+        newEditEventModel->loadEndDate(eventRecord);
+    }
+
+    void NewEditEventWindow::checkEventDurationCorrectness()
+    {
+        auto start = TimePointToYearMonthDay(eventRecord->date_from);
+        if (eventRecord->date_till - eventRecord->date_from > date::days(31)) {
+            auto hms               = TimePointToHourMinSec(eventRecord->date_till);
+            eventRecord->date_till = TimePointFromYearMonthDay(start) + hms.hours() + hms.minutes() + date::days(31);
+        }
+        newEditEventModel->loadEndDate(eventRecord);
     }
 } /* namespace gui */

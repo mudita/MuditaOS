@@ -79,8 +79,8 @@ namespace gui
         title->setText(utils::localize.get("app_calendar_event_detail"));
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
             description->setText(event->title);
-            eventTime->setText(
-                utils::time::TimeRangeParser().getCalendarTimeString(event->date_from, event->date_till));
+            eventTime->setText(utils::time::TimeRangeParser().getCalendarTimeString(
+                event->date_from, event->date_till, utils::time::Version::EventDetails));
         };
     }
 

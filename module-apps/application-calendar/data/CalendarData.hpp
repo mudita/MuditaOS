@@ -12,6 +12,12 @@ enum class EventAction
     Edit
 };
 
+enum class DateTimeType
+{
+    Start,
+    End
+};
+
 class EventRecordData : public gui::SwitchData
 {
   protected:
@@ -68,4 +74,16 @@ class DayMonthData : public gui::SwitchData
         dayMonth   = dayMonthText;
         dateFilter = dateNumb;
     };
+};
+
+class DateTimeData : public gui::SwitchData
+{
+    TimePoint dateTime;
+    DateTimeType dateTimeType;
+
+  public:
+    DateTimeData(TimePoint dateTime, DateTimeType dateTimeType);
+
+    [[nodiscard]] TimePoint getDateTimeData() const;
+    [[nodiscard]] DateTimeType getDateTimeType() const;
 };

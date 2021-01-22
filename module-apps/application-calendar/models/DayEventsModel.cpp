@@ -42,7 +42,7 @@ gui::ListItem *DayEventsModel::getItem(gui::Order order)
     }
 
     auto *item = new gui::DayEventsItem();
-    item->setEvent(record);
+    item->setEvent(record, TimePointToYearMonthDay(filterFrom));
     item->activatedCallback = [=](gui::Item &item) {
         LOG_INFO("Switch to event details window");
         auto rec  = std::make_unique<EventsRecord>(*record);

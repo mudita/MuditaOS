@@ -19,6 +19,7 @@ namespace gui
         gui::Label *title       = nullptr;
         gui::Label *description = nullptr;
         gui::Image *clock       = nullptr;
+        std::string getConvertedEventTimeString(calendar::YearMonthDay ymd);
 
       public:
         std::shared_ptr<EventsRecord> record;
@@ -26,7 +27,7 @@ namespace gui
         virtual ~DayEventsItem() override = default;
 
         // virtual methods from Item
-        void setEvent(std::shared_ptr<EventsRecord> record);
+        void setEvent(std::shared_ptr<EventsRecord> record, calendar::YearMonthDay ymd);
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 

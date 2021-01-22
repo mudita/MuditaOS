@@ -41,3 +41,17 @@ void WeekDaysRepeatData::setData(const uint32_t weekDay, const bool value)
     }
     weekDays[weekDay] = value;
 }
+
+DateTimeData::DateTimeData(TimePoint dateTime, DateTimeType dateTimeType)
+    : dateTime(dateTime), dateTimeType(dateTimeType)
+{}
+
+TimePoint DateTimeData::getDateTimeData() const
+{
+    return dateTime;
+}
+
+DateTimeType DateTimeData::getDateTimeType() const
+{
+    return dateTimeType;
+}

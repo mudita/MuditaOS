@@ -9,13 +9,13 @@ namespace gui
 
     NewEventCheckBoxWithLabel::NewEventCheckBoxWithLabel(app::Application *application,
                                                          const std::string &description,
-                                                         NewEditEventModel *model)
+                                                         DateTimeModel *model)
         : CheckBoxWithLabelItem(application, description, nullptr), model(model)
     {
         app = application;
         assert(app != nullptr);
 
-        setMargins(gui::Margins(style::margins::small,
+        setMargins(gui::Margins(style::window::calendar::leftMargin,
                                 style::window::calendar::item::checkBox::margin_top,
                                 0,
                                 style::window::calendar::leftMargin));
@@ -37,6 +37,9 @@ namespace gui
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
+            }
+            if (event.is(gui::KeyCode::KEY_RF) || event.is(gui::KeyCode::KEY_ENTER)) {
+                setFocusItem(nullptr);
             }
             if (checkBox->isChecked() && event.keyCode == gui::KeyCode::KEY_LF) {
                 LOG_DEBUG("reloadDataWithTimeItem");
@@ -67,17 +70,13 @@ namespace gui
         };
         onSaveCallback = [&](std::shared_ptr<EventsRecord> event) {
             if (checkBox->isChecked()) {
-                event->date_from = TimePointFromYearMonthDay(dateItem->getChosenDate());
-                event->date_till = event->date_from +
+                auto event_start = TimePointToHourMinSec(event->date_from);
+                event->date_from =
+                    event->date_from - event_start.hours() - event_start.minutes() - event_start.seconds();
+                event->date_till = TimePointFromYearMonthDay(TimePointToYearMonthDay(event->date_till)) +
                                    std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
                                    std::chrono::minutes(style::window::calendar::time::max_minutes);
             }
         };
     }
-
-    void NewEventCheckBoxWithLabel::setConnectionToDateItem(gui::EventDateItem *item)
-    {
-        dateItem = item;
-    }
-
 } /* namespace gui */

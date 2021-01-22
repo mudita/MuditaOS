@@ -35,6 +35,8 @@ namespace style
                 inline constexpr auto new_edit_event        = "NewEditEvent";
                 inline constexpr auto custom_repeat_window  = "CustomRepeat";
                 inline constexpr auto event_reminder_window = "EventReminderWindow";
+                inline constexpr auto date_time_window      = "DateTimeWindow";
+                inline constexpr auto dialog_confirm        = "DialogConfirm";
             } // namespace name
 
             inline constexpr auto new_event         = "New";
@@ -77,6 +79,9 @@ namespace style
 
             namespace item
             {
+                inline constexpr auto width =
+                    style::window::default_body_width - 2 * style::window::calendar::leftMargin;
+
                 namespace dayEvents
                 {
                     inline constexpr auto title_w    = 255;
@@ -129,10 +134,10 @@ namespace style
 
                 namespace severalOptions
                 {
-                    inline constexpr auto height    = 63;
+                    inline constexpr auto height    = 68;
                     inline constexpr auto label_h   = 20;
                     inline constexpr auto arrow_w_h = 12;
-                    inline constexpr auto margin    = 5;
+                    inline constexpr auto margin    = 10;
                     inline constexpr auto hBox_h    = height - label_h - margin;
                     inline constexpr auto option_w =
                         style::window::default_body_width - 2 * arrow_w_h - 2 * style::window::calendar::leftMargin;
@@ -145,6 +150,12 @@ namespace style
                     inline constexpr auto text_input_h  = 37;
                     inline constexpr auto margin        = 6;
                 } // namespace textWithLabel
+
+                namespace dateTime
+                {
+                    inline constexpr auto image  = 45;
+                    inline constexpr auto text_w = width - image;
+                } // namespace dateTime
             }     // namespace item
         };        // namespace calendar
     }             // namespace window

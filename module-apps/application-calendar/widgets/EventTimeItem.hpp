@@ -10,11 +10,6 @@
 
 namespace gui
 {
-    namespace timeConstants
-    {
-        inline constexpr auto before_noon = "AM";
-        inline constexpr auto after_noon  = "PM";
-    } // namespace timeConstants
     class EventTimeItem : public CalendarListItem
     {
         gui::VBox *vBox                = nullptr;
@@ -24,9 +19,8 @@ namespace gui
         gui::Label *hourInput          = nullptr;
         gui::Label *minuteInput        = nullptr;
         gui::Label *mode12hInput       = nullptr;
+        DateTimeType dateTimeType      = DateTimeType::Start;
         bool mode24H                   = false;
-        gui::EventTimeItem *secondItem = nullptr;
-        gui::EventDateItem *dateItem   = nullptr;
 
         std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
@@ -36,30 +30,18 @@ namespace gui
         void setTime(int keyValue, gui::Label &item);
         void onInputCallback(gui::Label &timeInput);
         void clearInput(gui::Label &timeInput);
-        bool isPm(const std::string &text);
+        bool isPm(const UTF8 &text);
         void validateHour();
-        void validateHourFor12hMode(std::chrono::hours start_hour,
-                                    std::chrono::minutes end_hour,
-                                    uint32_t start_minutes,
-                                    uint32_t end_minutes);
-        void validateHourFor24hMode(std::chrono::hours start_hour,
-                                    std::chrono::minutes end_hour,
-                                    uint32_t start_minutes,
-                                    uint32_t end_minutes);
-        TimePoint calculateEventTime(calendar::YearMonthDay date,
-                                     std::chrono::hours hours,
-                                     std::chrono::minutes minutes);
+        void setMode12hInput(std::chrono::hours hours);
 
       public:
         EventTimeItem(const std::string &description,
+                      DateTimeType dateTimeType,
                       bool mode24H,
                       std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                       std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
         virtual ~EventTimeItem() override = default;
 
-        void setConnectionToSecondItem(gui::EventTimeItem *item);
-        void setConnectionToDateItem(gui::EventDateItem *item);
-        // virtual methods from Item
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 

@@ -3,24 +3,21 @@
 
 #pragma once
 #include "CheckBoxWithLabelItem.hpp"
-#include "application-calendar/models/NewEditEventModel.hpp"
+#include "application-calendar/models/DateTimeModel.hpp"
 
 namespace gui
 {
     class NewEventCheckBoxWithLabel : public CheckBoxWithLabelItem
     {
-        NewEditEventModel *model = nullptr;
+        DateTimeModel *model     = nullptr;
         app::Application *app    = nullptr;
-        gui::EventDateItem *dateItem = nullptr;
         void applyCallbacks() override;
 
       public:
         NewEventCheckBoxWithLabel(app::Application *application,
                                   const std::string &description,
-                                  NewEditEventModel *model  = nullptr);
+                                  DateTimeModel *model = nullptr);
         virtual ~NewEventCheckBoxWithLabel() override = default;
-
-        void setConnectionToDateItem(gui::EventDateItem *item);
     };
 
 } /* namespace gui */

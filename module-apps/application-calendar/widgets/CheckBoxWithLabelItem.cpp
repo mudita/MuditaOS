@@ -69,11 +69,15 @@ namespace gui
             }
             else {
                 descriptionLabel->setFont(style::window::font::medium);
+                setFocusItem(nullptr);
             }
             return true;
         };
 
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
+            if (event.isShortPress() && (event.is(gui::KeyCode::KEY_RF) || event.is(gui::KeyCode::KEY_ENTER))) {
+                setFocusItem(nullptr);
+            }
             if (checkBox->onInput(event)) {
                 checkBox->resizeItems();
                 onContentChangeCallback = [&]() { return checkBox->isChecked(); };

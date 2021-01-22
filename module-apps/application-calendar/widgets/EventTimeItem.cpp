@@ -13,10 +13,11 @@ namespace gui
     namespace timeItem = style::window::calendar::item::eventTime;
 
     EventTimeItem::EventTimeItem(const std::string &description,
+                                 DateTimeType dateTimeType,
                                  bool mode24H,
                                  std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
                                  std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : mode24H{mode24H}, bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
+        : dateTimeType(dateTimeType), mode24H{mode24H}, bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
           bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
         setMinimumSize(style::window::default_body_width, timeItem::height);
@@ -90,52 +91,30 @@ namespace gui
 
             if (focusedItem->onInput(event)) {
                 uint32_t hours;
-
                 try {
                     hours = std::stoi(hourInput->getText().c_str());
                 }
                 catch (std::exception &e) {
                     LOG_ERROR("EventTimeItem::applyInputCallbacks hours: %s", e.what());
-                    return true;
+                    hours = 0;
+                }
+                uint32_t minutes;
+                try {
+                    minutes = std::stoi(minuteInput->getText().c_str());
+                }
+                catch (std::exception &e) {
+                    LOG_ERROR("EventTimeItem::applyInputCallbacks minutes: %s", e.what());
+                    minutes = 0;
                 }
 
-                auto autofill_hour = hours + 1;
-                if (this->descriptionLabel->getText() ==
-                        utils::localize.get("app_calendar_new_edit_event_start").c_str() &&
-                    !mode24H) {
-                    if (mode12hInput->getText() == timeConstants::after_noon) {
-                        if (autofill_hour == style::window::calendar::time::max_hour_12H_mode) {
-                            autofill_hour = style::window::calendar::time::max_hour_12H_mode - 1;
-                            secondItem->minuteInput->setText(
-                                std::to_string(style::window::calendar::time::max_minutes));
-                        }
-                        else {
-                            secondItem->minuteInput->setText(minuteInput->getText());
-                        }
-                        secondItem->mode12hInput->setText(mode12hInput->getText());
-                    }
-                    else {
-                        if (autofill_hour == style::window::calendar::time::max_hour_12H_mode) {
-                            secondItem->mode12hInput->setText(timeConstants::after_noon);
-                        }
-                        secondItem->minuteInput->setText(minuteInput->getText());
-                    }
-                    if (autofill_hour > style::window::calendar::time::max_hour_12H_mode) {
-                        autofill_hour = 1;
-                        secondItem->mode12hInput->setText(mode12hInput->getText());
-                        secondItem->minuteInput->setText(minuteInput->getText());
-                    }
-                    secondItem->hourInput->setText(std::to_string(autofill_hour));
+                if (mode24H && hours > style::window::calendar::time::max_hour_24H_mode) {
+                    hourInput->setText("0");
                 }
-                else if (this->descriptionLabel->getText() ==
-                             utils::localize.get("app_calendar_new_edit_event_start").c_str() &&
-                         mode24H) {
-                    secondItem->minuteInput->setText(minuteInput->getText());
-                    if (autofill_hour > style::window::calendar::time::max_hour_24H_mode) {
-                        autofill_hour = style::window::calendar::time::max_hour_24H_mode;
-                        secondItem->minuteInput->setText(minuteInput->getText());
-                    }
-                    secondItem->hourInput->setText(std::to_string(autofill_hour));
+                else if (!mode24H && hours > style::window::calendar::time::max_hour_12H_mode) {
+                    hourInput->setText("12");
+                }
+                if (minutes > style::window::calendar::time::max_minutes) {
+                    minuteInput->setText("0");
                 }
                 return true;
             }
@@ -153,11 +132,13 @@ namespace gui
             if (!mode24H) {
                 hours = date::make24(hours, isPm(mode12hInput->getText()));
             }
-            if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_end")) {
-                record->date_till = calculateEventTime(dateItem->getChosenDate(), hours, minutes);
+            if (dateTimeType == DateTimeType::Start) {
+                record->date_from =
+                    TimePointFromYearMonthDay(TimePointToYearMonthDay(record->date_from)) + hours + minutes;
             }
-            else if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_start")) {
-                record->date_from = calculateEventTime(dateItem->getChosenDate(), hours, minutes);
+            else {
+                record->date_till =
+                    TimePointFromYearMonthDay(TimePointToYearMonthDay(record->date_till)) + hours + minutes;
             }
         };
 
@@ -175,17 +156,17 @@ namespace gui
             mode12hInput->setFont(style::window::font::largelight);
             mode12hInput->setPenFocusWidth(style::window::default_border_focus_w);
             mode12hInput->setPenWidth(style::window::default_border_rect_no_focus);
-            mode12hInput->setText(timeConstants::before_noon);
+            mode12hInput->setText(utils::time::Locale::getAM());
             mode12hInput->inputCallback = [&](Item &item, const InputEvent &event) {
                 if (event.state != gui::InputEvent::State::keyReleasedShort) {
                     return false;
                 }
                 if (event.keyCode == gui::KeyCode::KEY_LF) {
-                    if (mode12hInput->getText() == timeConstants::before_noon) {
-                        mode12hInput->setText(timeConstants::after_noon);
+                    if (mode12hInput->getText() == utils::time::Locale::getAM()) {
+                        mode12hInput->setText(utils::time::Locale::getPM());
                     }
                     else {
-                        mode12hInput->setText(timeConstants::before_noon);
+                        mode12hInput->setText(utils::time::Locale::getAM());
                     }
                     return true;
                 }
@@ -207,30 +188,19 @@ namespace gui
             minuteInput->setMinimumSize(timeItem::time_input_12h_w, timeItem::hBox_h);
 
             onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
-                if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_start")) {
+                if (dateTimeType == DateTimeType::Start) {
                     auto start_time = TimePointToHourMinSec(event->date_from);
 
                     hourInput->setText(TimePointToHourString12H(event->date_from));
                     minuteInput->setText(TimePointToMinutesString(event->date_from));
-
-                    if (date::is_am(start_time.hours())) {
-                        mode12hInput->setText(timeConstants::before_noon);
-                    }
-                    else {
-                        mode12hInput->setText(timeConstants::after_noon);
-                    }
+                    setMode12hInput(start_time.hours());
                 }
-                else if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_end")) {
+                else {
                     auto end_time = TimePointToHourMinSec(event->date_till);
 
                     hourInput->setText(TimePointToHourString12H(event->date_till));
                     minuteInput->setText(TimePointToMinutesString(event->date_till));
-                    if (date::is_am(end_time.hours())) {
-                        mode12hInput->setText(timeConstants::before_noon);
-                    }
-                    else {
-                        mode12hInput->setText(timeConstants::after_noon);
-                    }
+                    setMode12hInput(end_time.hours());
                 }
             };
         }
@@ -239,12 +209,12 @@ namespace gui
             minuteInput->setMinimumSize(timeItem::time_input_24h_w, timeItem::hBox_h);
 
             onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
-                if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_start")) {
+                if (dateTimeType == DateTimeType::Start) {
                     auto start_time = TimePointToHourMinSec(event->date_from);
                     hourInput->setText(std::to_string(start_time.hours().count()));
                     minuteInput->setText(std::to_string(start_time.minutes().count()));
                 }
-                else if (this->descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_end")) {
+                else {
                     auto end_time = TimePointToHourMinSec(event->date_till);
                     hourInput->setText(std::to_string(end_time.hours().count()));
                     minuteInput->setText(std::to_string(end_time.minutes().count()));
@@ -260,133 +230,24 @@ namespace gui
         return true;
     }
 
-    void EventTimeItem::setConnectionToSecondItem(gui::EventTimeItem *item)
+    bool EventTimeItem::isPm(const UTF8 &text)
     {
-        this->secondItem = item;
-    }
-
-    void EventTimeItem::setConnectionToDateItem(gui::EventDateItem *item)
-    {
-        this->dateItem = item;
-    }
-
-    bool EventTimeItem::isPm(const std::string &text)
-    {
-        return !(text == timeConstants::before_noon);
+        return !(text == utils::time::Locale::getAM());
     }
 
     void EventTimeItem::validateHour()
     {
-        if (descriptionLabel->getText() == utils::localize.get("app_calendar_new_edit_event_end")) {
-            std::chrono::hours start_hour;
-            std::chrono::hours end_hour;
-            uint32_t start_minutes;
-            uint32_t end_minutes;
-            try {
-                start_hour = date::make24(std::chrono::hours(std::stoi(secondItem->hourInput->getText().c_str())),
-                                          isPm(secondItem->mode12hInput->getText()));
-            }
-            catch (std::exception &e) {
-                LOG_ERROR("EventTimeItem::validateHour start_hour: %s", e.what());
-                start_hour = TimePointToHourMinSec(TimePointNow()).hours();
-            }
-
-            try {
-                end_hour = date::make24(std::chrono::hours(std::stoi(hourInput->getText().c_str())),
-                                        isPm(mode12hInput->getText()));
-            }
-            catch (std::exception &e) {
-                LOG_ERROR("EventTimeItem::validateHour end_hour: %s", e.what());
-                end_hour = start_hour + std::chrono::hours{1};
-            }
-
-            try {
-                start_minutes = std::stoi(secondItem->minuteInput->getText().c_str());
-            }
-            catch (std::exception &e) {
-                LOG_ERROR("EventTimeItem::validateHour start_minutes: %s", e.what());
-                start_minutes = TimePointToHourMinSec(TimePointNow()).minutes().count();
-            }
-
-            try {
-                end_minutes = std::stoi(minuteInput->getText().c_str());
-            }
-            catch (std::exception &e) {
-                LOG_ERROR("EventTimeItem::validateHour end_minutes: %s", e.what());
-                end_minutes = start_minutes;
-            }
-
-            if (!mode24H) {
-                validateHourFor12hMode(start_hour, end_hour, start_minutes, end_minutes);
-            }
-            else {
-                validateHourFor24hMode(start_hour, end_hour, start_minutes, end_minutes);
-            }
+        if (!utils::time::validateTime(hourInput->getText(), minuteInput->getText(), !mode24H)) {
+            hourInput->setText("0");
+            minuteInput->setText("0");
         }
-    }
-
-    void EventTimeItem::validateHourFor12hMode(std::chrono::hours start_hour,
-                                               std::chrono::minutes end_hour,
-                                               uint32_t start_minutes,
-                                               uint32_t end_minutes)
-    {
-        if (start_hour > end_hour || (start_hour == end_hour && start_minutes > end_minutes)) {
-            auto hour = start_hour.count() + 1;
-            if (secondItem->mode12hInput->getText() == timeConstants::after_noon) {
-                if (hour == style::window::calendar::time::max_hour_12H_mode) {
-                    hour = style::window::calendar::time::max_hour_12H_mode - 1;
-                    minuteInput->setText(std::to_string(style::window::calendar::time::max_minutes));
-                }
-                else {
-                    minuteInput->setText(secondItem->minuteInput->getText());
-                }
-                mode12hInput->setText(secondItem->mode12hInput->getText());
-            }
-            else {
-                if (hour == style::window::calendar::time::max_hour_12H_mode) {
-                    mode12hInput->setText(timeConstants::after_noon);
-                }
-                minuteInput->setText(minuteInput->getText());
-            }
-            if (hour > style::window::calendar::time::max_hour_12H_mode) {
-                hour = 1;
-                mode12hInput->setText(secondItem->mode12hInput->getText());
-                minuteInput->setText(secondItem->minuteInput->getText());
-            }
-            hourInput->setText(utils::to_string(hour));
-        }
-    }
-
-    void EventTimeItem::validateHourFor24hMode(std::chrono::hours start_hour,
-                                               std::chrono::minutes end_hour,
-                                               uint32_t start_minutes,
-                                               uint32_t end_minutes)
-    {
-        if (start_hour > end_hour || (start_hour == end_hour && start_minutes > end_minutes)) {
-            auto hour = start_hour.count() + 1;
-            if (hour > style::window::calendar::time::max_hour_24H_mode) {
-                hour = style::window::calendar::time::max_hour_24H_mode;
-                minuteInput->setText(std::to_string(style::window::calendar::time::max_minutes));
-            }
-            else {
-                minuteInput->setText(secondItem->minuteInput->getText());
-            }
-            hourInput->setText(std::to_string(hour));
-        }
-    }
-
-    TimePoint EventTimeItem::calculateEventTime(calendar::YearMonthDay date,
-                                                std::chrono::hours hours,
-                                                std::chrono::minutes minutes)
-    {
-        return TimePointFromYearMonthDay(date) + hours + minutes;
     }
 
     void EventTimeItem::setTime(int keyValue, gui::Label &item)
     {
         auto itemValue = item.getText();
         auto key       = std::to_string(keyValue);
-        if (itemValue == "0") {
+        if (itemValue == "0" || itemValue == "00") {
             itemValue = key;
         }
         else {
@@ -426,6 +287,16 @@ namespace gui
                 value = "0";
             }
             timeInput.setText(value);
+        }
+    }
+
+    void EventTimeItem::setMode12hInput(std::chrono::hours hours)
+    {
+        if (date::is_am(hours)) {
+            mode12hInput->setText(utils::time::Locale::getAM());
+        }
+        else {
+            mode12hInput->setText(utils::time::Locale::getPM());
         }
     }
 

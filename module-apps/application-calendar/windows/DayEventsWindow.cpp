@@ -14,6 +14,7 @@
 #include <module-db/queries/calendar/QueryEventsGetFiltered.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <module-utils/time/TimeRangeParser.hpp>
 
 namespace gui
 {
@@ -98,11 +99,10 @@ namespace gui
             LOG_DEBUG("Switch to new window - edit window");
             std::unique_ptr<EventRecordData> data = std::make_unique<EventRecordData>();
             data->setDescription(style::window::calendar::new_event);
-            auto rec       = new EventsRecord();
-            rec->date_from = filterFrom;
-            rec->date_till = filterFrom + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
-                             std::chrono::minutes(style::window::calendar::time::max_minutes);
-            auto event = std::make_shared<EventsRecord>(*rec);
+            auto event        = std::make_shared<EventsRecord>();
+            auto [start, end] = utils::time::TimeRangeParser::getPrepopulatedStartAndEndTime(filterFrom);
+            event->date_from  = start;
+            event->date_till  = end;
             data->setData(event);
             application->switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));

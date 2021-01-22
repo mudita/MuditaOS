@@ -26,18 +26,18 @@ namespace gui
         application = app;
         assert(app != nullptr);
 
-        setMinimumSize(style::window::default_body_width, optionsItem::height);
+        setMinimumSize(style::window::calendar::item::width, optionsItem::height);
 
         setEdges(RectangleEdge::Bottom);
         setPenWidth(style::window::default_border_rect_no_focus);
-        setMargins(gui::Margins(style::window::calendar::leftMargin, style::margins::huge, 0, 0));
+        setMargins(gui::Margins(style::window::calendar::leftMargin, style::margins::big, 0, style::margins::big));
 
         vBox = new gui::VBox(this, 0, 0, 0, 0);
         vBox->setEdges(gui::RectangleEdge::None);
         vBox->activeItem = false;
 
         descriptionLabel = new gui::Label(vBox, 0, 0, 0, 0);
-        descriptionLabel->setMinimumSize(style::window::default_body_width, optionsItem::label_h);
+        descriptionLabel->setMinimumSize(style::window::calendar::item::width, optionsItem::label_h);
         descriptionLabel->setMargins(gui::Margins(0, 0, 0, optionsItem::margin));
         descriptionLabel->setEdges(gui::RectangleEdge::None);
         descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
@@ -46,7 +46,7 @@ namespace gui
         descriptionLabel->setText(description);
 
         hBox = new gui::HBox(vBox, 0, 0, 0, 0);
-        hBox->setMinimumSize(style::window::default_body_width, optionsItem::hBox_h);
+        hBox->setMinimumSize(style::window::calendar::item::width, optionsItem::hBox_h);
         hBox->setEdges(gui::RectangleEdge::None);
         hBox->activeItem = false;
 
@@ -174,7 +174,7 @@ namespace gui
                 }
                 else if (record->repeat == optionsNames.size() - 1 ||
                          optionsNames[optionsNames.size() - 1] == utils::localize.get("app_calendar_repeat_custom")) {
-                    record->repeat = static_cast<uint32_t>(AlarmRepeat::never);
+                    record->repeat = static_cast<uint32_t>(Repeat::never);
                 }
             }
             else if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_reminder")) {

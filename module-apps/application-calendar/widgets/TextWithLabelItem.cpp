@@ -13,11 +13,9 @@ namespace gui
                                          std::function<void()> bottomBarRestoreFromTemporaryMode,
                                          std::function<void()> selectSpecialCharacter)
     {
-        setMinimumSize(style::window::default_body_width, style::window::calendar::item::textWithLabel::height);
-        setMargins(gui::Margins(style::window::calendar::leftMargin,
-                                2 * style::window::calendar::leftMargin,
-                                0,
-                                1.5 * style::window::calendar::leftMargin));
+        setMinimumSize(style::window::calendar::item::width, style::window::calendar::item::textWithLabel::height);
+        setMargins(gui::Margins(
+            style::window::calendar::leftMargin, 2 * style::window::calendar::leftMargin, 0, style::margins::big));
         setEdges(RectangleEdge::None);
         bottomBarRestoreFromTemporaryMode();
 
@@ -27,7 +25,7 @@ namespace gui
         vBox->setPenWidth(style::window::default_border_rect_no_focus);
 
         descriptionLabel = new gui::Label(vBox, 0, 0, 0, 0);
-        descriptionLabel->setMinimumSize(style::window::default_body_width,
+        descriptionLabel->setMinimumSize(style::window::calendar::item::width,
                                          style::window::calendar::item::textWithLabel::description_h);
         descriptionLabel->setMargins(gui::Margins(0, 0, 0, style::window::calendar::item::textWithLabel::margin));
         descriptionLabel->setEdges(gui::RectangleEdge::None);
@@ -37,7 +35,7 @@ namespace gui
         descriptionLabel->setText(description);
 
         textInput = new gui::Text(vBox, 0, 0, 0, 0);
-        textInput->setMinimumSize(style::window::default_body_width,
+        textInput->setMinimumSize(style::window::calendar::item::width,
                                   style::window::calendar::item::textWithLabel::text_input_h);
         textInput->setEdges(gui::RectangleEdge::Bottom);
         textInput->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));

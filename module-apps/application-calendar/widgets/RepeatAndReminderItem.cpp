@@ -104,16 +104,32 @@ namespace gui
         repeatTitle->setText(utils::localize.get("app_calendar_event_detail_repeat"));
         reminderTitle->setText(utils::localize.get("app_calendar_event_detail_reminder"));
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
-            if (event->repeat > app::ApplicationCalendar::repeatOptions.size()) {
-                repeat->setText(CustomRepeatValueParser(event->repeat).getWeekDaysText());
+            if (event->date_till - event->date_from > date::days(1)) {
+                eraseRepeatDescription();
             }
             else {
-                repeat->setText(utils::localize.get(
-                    app::ApplicationCalendar::repeatOptions.at(static_cast<Repeat>(event->repeat))));
+                if (event->repeat > app::ApplicationCalendar::repeatOptions.size()) {
+                    repeat->setText(CustomRepeatValueParser(event->repeat).getWeekDaysText());
+                }
+                else {
+                    repeat->setText(utils::localize.get(
+                        app::ApplicationCalendar::repeatOptions.at(static_cast<Repeat>(event->repeat))));
+                }
             }
             reminder->setText(utils::localize.get(
                 app::ApplicationCalendar::reminderOptions.at(static_cast<Reminder>(event->reminder))));
         };
+    }
+
+    void RepeatAndReminderItem::eraseRepeatDescription()
+    {
+        hBox->erase(repeatVBox);
+        reminderVBox->setMinimumSize(style::window::default_body_width - style::window::calendar::leftMargin,
+                                     style::window::calendar::item::repeatAndReminder::height);
+        reminder->setMinimumSize(style::window::default_body_width - style::window::calendar::leftMargin,
+                                 style::window::calendar::item::repeatAndReminder::description_h);
+        reminderVBox->resizeItems();
+        hBox->resizeItems();
     }
 
 } /* namespace gui */

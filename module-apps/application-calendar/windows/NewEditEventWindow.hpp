@@ -25,6 +25,8 @@ namespace gui
         gui::ListView *list                                  = nullptr;
         std::shared_ptr<NewEditEventModel> newEditEventModel = nullptr;
         EventAction eventAction                              = EventAction::Add;
+        void handleEndDateUpdate();
+        void checkEventDurationCorrectness();
 
       public:
         NewEditEventWindow(app::Application *app, std::string name);

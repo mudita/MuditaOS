@@ -24,6 +24,7 @@ namespace gui
         gui::Label *reminderTitle = nullptr;
         gui::Label *reminder      = nullptr;
         app::ApplicationCalendar *app = nullptr;
+        void eraseRepeatDescription();
 
       public:
         RepeatAndReminderItem(app::ApplicationCalendar *application);
