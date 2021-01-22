@@ -16,6 +16,7 @@ namespace cellular
     class ClipRequest;
     class ClirRequest;
     class CallForwardingRequest;
+    class CallBarringRequest;
 
     class RequestHandler
     {
@@ -28,5 +29,6 @@ namespace cellular
         virtual void handle(SupplementaryServicesRequest &request, at::Result &result) = 0;
         virtual void handle(ClirRequest &request, at::Result &result)                  = 0;
         virtual void handle(CallForwardingRequest &request, at::Result &result)        = 0;
+        virtual void handle(CallBarringRequest &request, at::Result &result)           = 0;
     };
 } // namespace cellular

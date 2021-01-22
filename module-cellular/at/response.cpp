@@ -520,5 +520,113 @@ namespace at
                 return false;
             }
         } // namespace ccfc
+
+        namespace mmi
+        {
+            auto getClass(const ServiceClass &serviceClass) noexcept
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage
+            {
+                using namespace app::manager::actions;
+
+                auto message = IMMICustomResultParams::MMIResultMessage::CommonNoMessage;
+                switch (serviceClass) {
+                case ServiceClass::Voice:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonVoice;
+                    break;
+                case ServiceClass::Data:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonData;
+                    break;
+                case ServiceClass::Fax:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonFax;
+                    break;
+                case ServiceClass::DataSync:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonSync;
+                    break;
+                case ServiceClass::DataAsync:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonAsync;
+                    break;
+                case ServiceClass::AllDisabled:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonAllDisabled;
+                    break;
+                }
+                return message;
+            }
+        } // namespace mmi
+
+        namespace clck
+        {
+            auto parseQueryResponse(const std::vector<std::string> &data, std::vector<ClckParsed> &parsed) -> bool
+            {
+                using namespace mmi;
+
+                auto constexpr responseToken = "+CLCK: ";
+                auto constexpr emptyString   = "";
+                auto constexpr minTokens     = 2;
+                parsed.clear();
+
+                for (auto el : data) {
+                    if (el.find("OK") != std::string::npos) {
+                        return true;
+                    }
+                    if (el.find(responseToken) == std::string::npos) {
+                        parsed.clear();
+                        return false;
+                    }
+                    utils::findAndReplaceAll(el, responseToken, emptyString);
+                    auto tokens = utils::split(el, ",");
+                    if (tokens.size() < minTokens) {
+                        parsed.clear();
+                        return false;
+                    }
+                    for (auto &t : tokens) {
+                        t = utils::trim(t);
+                    }
+
+                    int statusToken       = 0;
+                    int serviceClassToken = 0;
+
+                    if (!utils::toNumeric(tokens[0], statusToken) || !utils::toNumeric(tokens[1], serviceClassToken)) {
+                        return false;
+                    }
+                    auto status       = static_cast<Status>(statusToken);
+                    auto serviceClass = static_cast<ServiceClass>(serviceClassToken);
+
+                    if (magic_enum::enum_contains<Status>(status) &&
+                        magic_enum::enum_contains<ServiceClass>(serviceClass)) {
+                        parsed.push_back(ClckParsed(status, serviceClass));
+                    }
+                    else {
+                        parsed.clear();
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            auto iterLessIter(ClckParsed a, ClckParsed b) -> bool
+            {
+                return a.serviceClass < b.serviceClass;
+            }
+
+            auto getStatus(const Status &status) noexcept
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage
+            {
+                using namespace app::manager::actions;
+
+                auto message = IMMICustomResultParams::MMIResultMessage::CommonNoMessage;
+                switch (status) {
+                case Status::Disable:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonDeactivated;
+                    break;
+                case Status::Enable:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonActivated;
+                    break;
+                case Status::Query:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonQuery;
+                    break;
+                }
+                return message;
+            }
+        } // namespace clck
     }     // namespace response
 } // namespace at

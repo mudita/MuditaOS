@@ -152,3 +152,119 @@ TEST_CASE("Response COPS")
         REQUIRE(at::response::parseCOPS(resp, ret) == false);
     }
 }
+
+TEST_CASE("Response CLCK")
+{
+    SECTION("OK CLCK QUERY - all disabled")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::clck::ClckParsed> ret;
+        resp.response.push_back("+CLCK: 0,255");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::clck::parseQueryResponse(resp.response, ret) == true);
+        REQUIRE(ret.size() == 1);
+        REQUIRE(ret[0].status == at::response::clck::Status::Disable);
+        REQUIRE(ret[0].serviceClass == at::response::mmi::ServiceClass::AllDisabled);
+    }
+
+    SECTION("OK CLCK QUERY - voice enabled")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::clck::ClckParsed> ret;
+        resp.response.push_back("+CLCK: 1,1");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::clck::parseQueryResponse(resp.response, ret) == true);
+        REQUIRE(ret.size() == 1);
+        REQUIRE(ret[0].status == at::response::clck::Status::Enable);
+        REQUIRE(ret[0].serviceClass == at::response::mmi::ServiceClass::Voice);
+    }
+
+    SECTION("OK CLCK QUERY - voice, fax enabled")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::clck::ClckParsed> ret;
+        resp.response.push_back("+CLCK: 1,1");
+        resp.response.push_back("+CLCK: 1,4");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::clck::parseQueryResponse(resp.response, ret) == true);
+        REQUIRE(ret.size() == 2);
+
+        REQUIRE(ret[0].status == at::response::clck::Status::Enable);
+        REQUIRE(ret[0].serviceClass == at::response::mmi::ServiceClass::Voice);
+
+        REQUIRE(ret[1].status == at::response::clck::Status::Enable);
+        REQUIRE(ret[1].serviceClass == at::response::mmi::ServiceClass::Fax);
+    }
+
+    SECTION("WRONG CLCK QUERY - invalid status")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::clck::ClckParsed> ret;
+        resp.response.push_back("+CLCK: 8,1");
+        resp.response.push_back("+CLCK: 1,4");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::clck::parseQueryResponse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+
+    SECTION("WRONG CLCK QUERY - invalid class")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::clck::ClckParsed> ret;
+        resp.response.push_back("+CLCK: 1,1");
+        resp.response.push_back("+CLCK: 1,99");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::clck::parseQueryResponse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+
+    SECTION("WRONG CLCK QUERY - too short")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::clck::ClckParsed> ret;
+        resp.response.push_back("+CLCK: 1");
+        resp.response.push_back("+CLCK: 1,4");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::clck::parseQueryResponse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+
+    SECTION("WRONG CLCK QUERY - invalid response token")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::clck::ClckParsed> ret;
+        resp.response.push_back("+CLC: 1,1");
+        resp.response.push_back("+CLCK: 1,4");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::clck::parseQueryResponse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+}
