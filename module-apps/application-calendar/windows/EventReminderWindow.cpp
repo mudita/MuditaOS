@@ -38,13 +38,20 @@ namespace gui
         buildInterface();
     }
 
+    top_bar::Configuration EventReminderWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    {
+        using namespace top_bar;
+        appConfiguration.enable({Indicator::Signal,
+                                 Indicator::Time,
+                                 Indicator::Battery,
+                                 Indicator::SimCard,
+                                 Indicator::NetworkAccessTechnology});
+        return appConfiguration;
+    }
+
     void EventReminderWindow::buildInterface()
     {
         AppWindow::buildInterface();
-
-        topBar->setActive(TopBar::Elements::BATTERY, true);
-        topBar->setActive(TopBar::Elements::SIGNAL, true);
-        topBar->setActive(gui::TopBar::Elements::TIME, true);
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));

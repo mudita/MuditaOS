@@ -12,6 +12,9 @@ namespace gui
       public:
         PinLockBaseWindow(app::Application *app, std::string name) : LockWindow(app, name)
         {}
+
+        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
+
         void buildImages(const std::string &lockImg, const std::string &infoImg);
         [[nodiscard]] auto getToken(Token token) const -> std::string;
         void restore() noexcept override;
@@ -25,6 +28,5 @@ namespace gui
       private:
         void buildBottomBar() override;
         void buildTitleBar() override;
-        void buildTopBar() override;
     };
 } // namespace gui

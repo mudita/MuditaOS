@@ -58,10 +58,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_add"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_call_clear"));
 
-        topBar->setActive(TopBar::Elements::SIGNAL, true);
-        topBar->setActive(TopBar::Elements::BATTERY, true);
-        topBar->setActive(TopBar::Elements::TIME, true);
-
         numberLabel = new gui::Label(this, numberLabel::x, numberLabel::y, numberLabel::w, numberLabel::h);
         numberLabel->setPenWidth(numberLabel::borderW);
         numberLabel->setFont(style::window::font::largelight);

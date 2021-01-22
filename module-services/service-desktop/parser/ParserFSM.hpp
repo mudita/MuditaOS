@@ -23,21 +23,21 @@ namespace parserFSM
     class StateMachine
     {
       public:
-        StateMachine(sys::Service *OwnerService);
-        void processMessage(std::string &msg);
-        State getCurrentState()
+        explicit StateMachine(sys::Service *OwnerService);
+        void processMessage(std::string &&msg);
+        [[nodiscard]] auto getCurrentState() const noexcept -> State
         {
             return state;
         };
 
-        void setState(const parserFSM::State newState)
+        void setState(const parserFSM::State newState) noexcept
         {
             state = newState;
         }
 
       private:
-        std::string *receivedMsgPtr = nullptr;
-        parserFSM::State state      = State::NoMsg;
+        std::string receivedMsg;
+        parserFSM::State state = State::NoMsg;
         std::string payload;
         std::string header;
         unsigned long payloadLength   = 0;

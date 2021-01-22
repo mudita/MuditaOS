@@ -100,9 +100,9 @@ namespace gui
             }
             case KeyCode::KEY_LEFT: {
                 LOG_DEBUG("Call borderCallback -> go to the previous element");
-                auto it = monthBox->getNavigationFocusedItem();
-                if (monthBox->nextNavigationItem(std::prev(it)) != nullptr) {
-                    monthBox->setFocusItem(monthBox->nextNavigationItem(std::prev(it)));
+                auto it = std::prev(monthBox->getNavigationFocusedItem());
+                if (it != monthBox->children.end() && (*it)->isActive()) {
+                    monthBox->setFocusItem(*it);
                 }
                 else {
                     monthBox->setFocusOnLastElement();
@@ -111,9 +111,9 @@ namespace gui
             }
             case KeyCode::KEY_RIGHT: {
                 LOG_DEBUG("Call borderCallback -> go to the next element");
-                auto it = monthBox->getNavigationFocusedItem();
-                if (monthBox->nextNavigationItem(std::next(it)) != nullptr) {
-                    monthBox->setFocusItem(monthBox->nextNavigationItem(std::next(it)));
+                auto it = std::next(monthBox->getNavigationFocusedItem());
+                if (it != monthBox->children.end() && (*it)->isActive()) {
+                    monthBox->setFocusItem(*it);
                 }
                 else {
                     monthBox->setFocusOnElement(0);
@@ -197,8 +197,8 @@ namespace gui
 
     void CalendarMainWindow::filterRequest()
     {
-        YearMonthDay date_from = actualDate.year() / actualDate.month() / 1;
-        YearMonthDay date_till = date_from + date::months{1};
+        calendar::YearMonthDay date_from = actualDate.year() / actualDate.month() / 1;
+        calendar::YearMonthDay date_till = date_from + date::months{1};
         auto filter_from       = TimePointFromYearMonthDay(date_from);
         auto filter_till       = TimePointFromYearMonthDay(date_till);
         LOG_DEBUG("filter:  %s", TimePointToString(filter_till).c_str());

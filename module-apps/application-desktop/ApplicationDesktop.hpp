@@ -107,7 +107,8 @@ namespace app
                      manager::actions::ShowMMIPush,
                      manager::actions::ShowMMIResult,
                      manager::actions::DisplayCMEError,
-                     manager::actions::DisplayLowBatteryNotification}};
+                     manager::actions::DisplayLowBatteryNotification,
+                     manager::actions::SystemBrownout}};
         }
     };
 

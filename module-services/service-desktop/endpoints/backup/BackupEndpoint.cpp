@@ -18,6 +18,8 @@
 
 static bool backupReady = false;
 
+using namespace parserFSM;
+
 auto BackupEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {

@@ -3,9 +3,8 @@
 
 #include "application-settings-new/windows/QuotesMainWindow.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
-#include "application-settings-new/model/QuotesRepository.hpp"
-#include "application-settings-new/model/QuotesModel.hpp"
-#include "application-settings-new/model/QuotesModel.hpp"
+#include "QuotesRepository.hpp"
+#include "QuotesModel.hpp"
 
 #include <InputEvent.hpp>
 #include <i18n/i18n.hpp>

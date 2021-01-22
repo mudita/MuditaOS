@@ -11,6 +11,8 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
 
+using namespace at::urc;
+
 // this static function will be replaced by Settings API
 static bool isSettingsAutomaticTimeSyncEnabled()
 {

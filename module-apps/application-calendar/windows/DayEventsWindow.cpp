@@ -64,7 +64,6 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        topBar->setActive(gui::TopBar::Elements::TIME, true);
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));

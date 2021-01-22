@@ -52,7 +52,7 @@ class Getter(object):
         try:
             gitConfigReader = self.gitRepo.config_reader()
             self.apitoken = gitConfigReader.get_value("user", "apitoken")
-        except git.exc.NoOptionError as error:
+        except: 
             pass
 
     def getGHLogin(self, args=None):
@@ -63,7 +63,7 @@ class Getter(object):
         try:
             gitConfigReader = self.gitRepo.config_reader()
             self.ghLogin = gitConfigReader.get_value("user", "githublogin")
-        except git.exc.NoOptionError as error:
+        except:
             pass
 
     def findWorkDir(self):

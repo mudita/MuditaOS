@@ -1,586 +1,444 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * battery_charger.cpp
- *
- *  Created on: Jun 28, 2019
- *      Author: kuba
- */
-
-extern "C"
-{
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-}
-
 #include "bsp/battery-charger/battery_charger.hpp"
+#include "MAX77818.hpp"
+#include <purefs/filesystem_paths.hpp>
 
 #include "bsp/BoardDefinitions.hpp"
 #include "common_data/EventStore.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
-#include <cstdio>
 #include <purefs/filesystem_paths.hpp>
-#include "fsl_common.h"
-#define BSP_BATTERY_CHARGER_I2C_ADDR (0xD2 >> 1)
-#define BSP_FUEL_GAUGE_I2C_ADDR      (0x6C >> 1)
-#define BSP_TOP_CONTROLLER_I2C_ADDR  (0xCC >> 1)
+#include <utility>
 
-static const uint32_t i2cSubaddresSize = 1;
-
-namespace configs
+namespace bsp::battery_charger
 {
-    const auto battery_cfgFile     = purefs::dir::getCurrentOSPath() / "batteryAdjustementConfig.cfg";
-    const auto battery_cfgFilePrev = purefs::dir::getCurrentOSPath() / "batteryAdjustementConfig_old.cfg";
-} // namespace configs
-
-static const uint16_t BATT_SERVICE_AVG_CURRENT_PERIOD =
-    0x00; //< 0.1758 ms * 2^(2 + BATT_SERVICE_AVG_CURRENT_PERIOD)         == 700ms
-static const uint16_t BATT_SERVICE_AVG_CELL_VOLTAGE_PERIOD =
-    0x00; //< 0.1758 ms * 2^(6 + BATT_SERVICE_AVG_CELL_VOLTAGE_PERIOD)    == 11.25 s
-static const uint16_t BATT_SERVICE_AVG_MIXING_PERIOD =
-    0x0D; //< 0.1758 ms * 2^(5 + BATT_SERVICE_AVG_MIXING_PERIOD)          == 12.8 h
-static const uint16_t BATT_SERVICE_AVG_TEMP_PERIOD =
-    0x01; //< 0.1758 ms * 2^(11 + BATT_SERVICE_AVG_TEMP_PERIOD)           == 12 min
-static const uint16_t BATT_SERVICE_AVG_NEMPTY_PERIOD = 0x00;
-
-static const uint16_t battery_nominalCapacitymAh = 3000;
-
-static const uint8_t battery_fullyChargedPercent = 100;
-static const uint8_t battery_DischargedPercent   = 15;
-
-static const uint8_t battery_maxTemperatureDegrees = 50;
-static const uint8_t battery_minTemperatureDegrees = 5;
-
-static constexpr inline uint16_t battery_maxVoltagemV = 4200;
-static constexpr inline uint16_t battery_minVoltagemV = 3600;
-
-using namespace drivers;
-
-static std::shared_ptr<drivers::DriverI2C> i2c;
-static std::shared_ptr<drivers::DriverGPIO> gpio;
-
-static bsp::batteryRetval battery_loadConfiguration(void);
-
-static bsp::batteryRetval battery_storeConfiguration(void);
-
-static int battery_fuelGaugeWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value);
-
-static int battery_fuelGaugeRead(bsp::batteryChargerRegisters registerAddress, uint16_t *value);
-
-static int battery_chargerWrite(bsp::batteryChargerRegisters registerAddress, uint8_t value);
-
-static int battery_chargerRead(bsp::batteryChargerRegisters registerAddress, uint8_t *value);
-
-static int battery_chargerTopControllerWrite(bsp::batteryChargerRegisters registerAddress, uint8_t value);
-
-static int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registerAddress, uint8_t *value);
-
-static bsp::batteryRetval battery_setAvgCalcPeriods(void);
-
-static bsp::batteryRetval battery_setAvgCalcPeriods(void);
-
-static bsp::batteryRetval battery_setNominalBatteryCapacity(uint16_t capacity);
-
-static bsp::batteryRetval battery_setChargingDischargingThresholds(uint8_t chargedThresholdPercent,
-                                                                   uint8_t dischargedThresholdPercent);
-
-static bsp::batteryRetval battery_setTemperatureThresholds(uint8_t maxTemperatureDegrees,
-                                                           uint8_t minTemperatureDegrees);
-
-static bsp::batteryRetval battery_setServiceVoltageThresholds(uint16_t maxVoltage_mV, uint16_t minVoltage_mV);
-
-static bsp::batteryRetval battery_enableFuelGuageIRQs(void);
-
-static bsp::batteryRetval battery_enableTopIRQs(void);
-
-static bsp::batteryRetval battery_configureAlerts();
-
-static void s_BSP_BatteryChargerIrqPinsInit();
-
-static xQueueHandle qHandleIrq = NULL;
-
-namespace bsp
-{
-
-    // STATUS register bits
-    enum B_STATUS
+    namespace
     {
-        Inm    = (1 << 0),
-        POR    = (1 << 1),
-        SPR_2  = (1 << 2),
-        BST    = (1 << 3),
-        Isysmx = (1 << 4),
-        SPR_5  = (1 << 5),
-        ThmHot = (1 << 6),
-        dSOCi  = (1 << 7),
-        Vmn    = (1 << 8),
-        Tmn    = (1 << 9),
-        Smn    = (1 << 10),
-        Bi     = (1 << 11),
-        Vmx    = (1 << 12),
-        Tmx    = (1 << 13),
-        Smx    = (1 << 14),
-        Br     = (1 << 15),
-    };
+        constexpr std::uint32_t i2cSubaddresSize = 1;
 
-    /// CHG_INT registers from documentation
-    enum B_CHG_INT
-    {
-        BYP_I   = (1 << 0),
-        RSVD    = (1 << 1),
-        BATP_I  = (1 << 2),
-        BAT_I   = (1 << 3),
-        CHG_I   = (1 << 4),
-        WCIN_I  = (1 << 5),
-        CHGIN_I = (1 << 6),
-        AICL_I  = (1 << 7),
-    };
+        const auto cfgFile     = purefs::dir::getCurrentOSPath() / "batteryAdjustementConfig.cfg";
+        const auto cfgFilePrev = purefs::dir::getCurrentOSPath() / "batteryAdjustementConfig_old.cfg";
 
-    // CONFIG register bits
-    enum class B_CONFIG
-    {
-        Ber    = 1 << 0,
-        Bei    = 1 << 1,
-        Aen    = 1 << 2,
-        FTHRM  = 1 << 3,
-        ETHRM  = 1 << 4,
-        SPR_5  = 1 << 5,
-        I2CSH  = 1 << 6,
-        SHDN   = 1 << 7,
-        Tex    = 1 << 8,
-        Ten    = 1 << 9,
-        AINSH  = 1 << 10,
-        SPR_11 = 1 << 11,
-        Vs     = 1 << 12,
-        Ts     = 1 << 13,
-        Ss     = 1 << 14,
-        SPR_15 = 1 << 15
-    };
+        constexpr std::uint16_t BATT_SERVICE_AVG_CURRENT_PERIOD =
+            0x00; //< 0.1758 ms * 2^(2 + BATT_SERVICE_AVG_CURRENT_PERIOD)         == 700ms
+        constexpr std::uint16_t BATT_SERVICE_AVG_CELL_VOLTAGE_PERIOD =
+            0x00; //< 0.1758 ms * 2^(6 + BATT_SERVICE_AVG_CELL_VOLTAGE_PERIOD)    == 11.25 s
+        constexpr std::uint16_t BATT_SERVICE_AVG_MIXING_PERIOD =
+            0x0D; //< 0.1758 ms * 2^(5 + BATT_SERVICE_AVG_MIXING_PERIOD)          == 12.8 h
+        constexpr std::uint16_t BATT_SERVICE_AVG_TEMP_PERIOD =
+            0x01; //< 0.1758 ms * 2^(11 + BATT_SERVICE_AVG_TEMP_PERIOD)           == 12 min
+        constexpr std::uint16_t BATT_SERVICE_AVG_NEMPTY_PERIOD = 0x00;
 
-    uint16_t battery_get_CHG_INT_OK();
+        constexpr auto ENABLE_ALL_IRQ_MASK = 0xf8;
 
-    int battery_Init(xQueueHandle qHandle)
-    {
-        i2c = DriverI2C::Create(
-            static_cast<I2CInstances>(BoardDefinitions::BATTERY_CHARGER_I2C),
-            DriverI2CParams{.baudrate = static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_I2C_BAUDRATE)});
+        constexpr std::uint16_t nominalCapacitymAh = 3000;
 
-        qHandleIrq = qHandle;
+        constexpr std::uint8_t fullyChargedPercent = 100;
+        constexpr std::uint8_t DischargedPercent   = 15;
 
-        // check Power-On reset bit
-        uint16_t status        = 0;
-        const uint16_t porMask = 0x0002;
-        battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &status);
+        constexpr std::uint8_t maxTemperatureDegrees = 50;
+        constexpr std::uint8_t minTemperatureDegrees = 5;
 
-        if (status & porMask) {
-            LOG_INFO("Initializing battery charger");
-            battery_loadConfiguration();
-            battery_setAvgCalcPeriods();
-            battery_setNominalBatteryCapacity(battery_nominalCapacitymAh);
-            battery_setChargingDischargingThresholds(battery_fullyChargedPercent, battery_DischargedPercent);
-            battery_setTemperatureThresholds(battery_maxTemperatureDegrees, battery_minTemperatureDegrees);
-            battery_setServiceVoltageThresholds(battery_maxVoltagemV, battery_minVoltagemV);
+        constexpr std::uint16_t maxVoltagemV = 4200;
+        constexpr std::uint16_t minVoltagemV = 3600;
+
+        std::shared_ptr<drivers::DriverI2C> i2c;
+        std::shared_ptr<drivers::DriverGPIO> gpio;
+
+        drivers::I2CAddress fuelGaugeAddress      = {FUEL_GAUGE_I2C_ADDR, 0, i2cSubaddresSize};
+        drivers::I2CAddress batteryChargerAddress = {BATTERY_CHARGER_I2C_ADDR, 0, i2cSubaddresSize};
+        drivers::I2CAddress topControllerAddress  = {TOP_CONTROLLER_I2C_ADDR, 0, i2cSubaddresSize};
+
+        xQueueHandle IRQQueueHandle = nullptr;
+
+        int fuelGaugeWrite(Registers registerAddress, std::uint16_t value)
+        {
+            fuelGaugeAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
+            auto ret = i2c->Write(fuelGaugeAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(std::uint16_t));
+
+            if (ret != sizeof(std::uint16_t)) {
+                return kStatus_Fail;
+            }
+            return kStatus_Success;
         }
 
-        battery_configureAlerts();
-        battery_enableFuelGuageIRQs();
+        std::pair<int, std::uint16_t> fuelGaugeRead(Registers registerAddress)
+        {
+            std::uint16_t value;
+            int status                  = kStatus_Success;
+            fuelGaugeAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
+            auto ret = i2c->Read(fuelGaugeAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(std::uint16_t));
 
-        uint8_t level = 0;
-        bool charging = false;
-        battery_getBatteryLevel(level);
-        battery_getChargeStatus(charging);
+            if (ret != sizeof(std::uint16_t)) {
+                status = kStatus_Fail;
+            }
+            return std::make_pair(status, value);
+        }
+
+        int chargerWrite(Registers registerAddress, std::uint8_t value)
+        {
+            batteryChargerAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
+            auto ret =
+                i2c->Write(batteryChargerAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(std::uint8_t));
+
+            if (ret != sizeof(std::uint8_t)) {
+                return kStatus_Fail;
+            }
+            return kStatus_Success;
+        }
+
+        std::pair<int, std::uint8_t> chargerRead(Registers registerAddress)
+        {
+            std::uint8_t value;
+            int status                       = kStatus_Success;
+            batteryChargerAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
+            auto ret                         = i2c->Read(batteryChargerAddress, &value, sizeof(std::uint8_t));
+
+            if (ret != sizeof(std::uint8_t)) {
+                status = kStatus_Fail;
+            }
+            return std::make_pair(status, value);
+        }
+
+        int chargerTopControllerWrite(Registers registerAddress, std::uint8_t value)
+        {
+            topControllerAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
+            auto ret = i2c->Write(topControllerAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(std::uint8_t));
+
+            if (ret != sizeof(std::uint8_t)) {
+                return kStatus_Fail;
+            }
+            return kStatus_Success;
+        }
+
+        std::pair<int, std::uint8_t> chargerTopControllerRead(Registers registerAddress)
+        {
+            std::uint8_t value;
+            int status                      = kStatus_Success;
+            topControllerAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
+            auto ret                        = i2c->Read(topControllerAddress, &value, sizeof(std::uint8_t));
+            if (ret != sizeof(std::uint8_t)) {
+                status = kStatus_Fail;
+            }
+            return std::make_pair(status, value);
+        }
+
+        batteryRetval loadConfiguration()
+        {
+            auto fd = std::fopen(cfgFile.c_str(), "r");
+            if (fd == nullptr) {
+                LOG_WARN("Configuration file [%s] could not be opened. Trying to open file [%s]",
+                         cfgFile.c_str(),
+                         cfgFilePrev.c_str());
+                fd = std::fopen(cfgFilePrev.c_str(), "r");
+                if (fd == nullptr) {
+                    LOG_WARN("Configuration file [%s] could not be opened.", cfgFilePrev.c_str());
+                    return batteryRetval::ChargerError;
+                }
+            }
+
+            std::uint16_t regValue = 0;
+            for (auto i = 0; i < 0xff; ++i) {
+                if (std::fread(&regValue, sizeof(regValue), 1, fd) != sizeof(regValue)) {
+                    LOG_ERROR("Reading register 0x%x failed.", i);
+                    std::fclose(fd);
+                    return batteryRetval::ChargerError;
+                }
+
+                if (fuelGaugeWrite(static_cast<Registers>(i), regValue) != kStatus_Success) {
+                    LOG_ERROR("Writing register 0x%x failed.", i);
+                    std::fclose(fd);
+                    return batteryRetval::ChargerError;
+                }
+            }
+
+            std::fclose(fd);
+            return batteryRetval::OK;
+        }
+
+        batteryRetval storeConfiguration()
+        {
+            // TODO:M.P procedure below seems to crash system, it should be fixed.
+            if (ff_rename(cfgFile.c_str(), cfgFilePrev.c_str(), false) != 0) {
+                LOG_ERROR("Could not move configuration file");
+                return batteryRetval::ChargerError;
+            }
+
+            auto fd = std::fopen(cfgFile.c_str(), "w");
+            if (fd == nullptr) {
+                LOG_ERROR("Could not open configuration file");
+                return batteryRetval::ChargerError;
+            }
+
+            for (unsigned int i = 0; i < 0xff; ++i) {
+                auto regVal = fuelGaugeRead(static_cast<Registers>(i));
+                if (regVal.first != kStatus_Success) {
+                    LOG_ERROR("Reading register 0x%x failed.", i);
+                    std::fclose(fd);
+                    return batteryRetval::ChargerError;
+                }
+
+                if (std::fwrite(&regVal.second, sizeof(regVal.second), 1, fd) != sizeof(regVal.second)) {
+                    LOG_ERROR("Storing register 0x%x failed.", i);
+                    std::fclose(fd);
+                    std::remove(cfgFile.c_str());
+                    return batteryRetval::ChargerError;
+                }
+            }
+
+            std::fclose(fd);
+            return batteryRetval::OK;
+        }
+
+        batteryRetval setAvgCalcPeriods()
+        {
+            std::uint16_t regVal = 0;
+            regVal |= (BATT_SERVICE_AVG_CURRENT_PERIOD << 0);
+            regVal |= (BATT_SERVICE_AVG_CELL_VOLTAGE_PERIOD << 4);
+            regVal |= (BATT_SERVICE_AVG_MIXING_PERIOD << 7);
+            regVal |= (BATT_SERVICE_AVG_TEMP_PERIOD << 11);
+            regVal |= (BATT_SERVICE_AVG_NEMPTY_PERIOD << 14);
+
+            if (fuelGaugeWrite(Registers::FilterCFG_REG, regVal) != kStatus_Success) {
+                LOG_ERROR("setAvgCalcPeriods failed.");
+                return batteryRetval::ChargerError;
+            }
+            return batteryRetval::OK;
+        }
+
+        batteryRetval setNominalBatteryCapacity(std::uint16_t capacity)
+        {
+            std::uint16_t regVal = capacity * 2;
+
+            if (fuelGaugeWrite(Registers::DesignCap_REG, regVal) != kStatus_Success) {
+                LOG_ERROR("setNominalBatteryCapacity failed.");
+                return batteryRetval::ChargerError;
+            }
+            return batteryRetval::OK;
+        }
+
+        batteryRetval setChargingDischargingThresholds(std::uint8_t chargedThresholdPercent,
+                                                       std::uint8_t dischargedThresholdPercent)
+        {
+            uint16_t regVal = (chargedThresholdPercent << 8) | dischargedThresholdPercent;
+
+            if (fuelGaugeWrite(Registers::SALRT_Th_REG, regVal) != kStatus_Success) {
+                LOG_ERROR("setChargingDischargingThresholds failed.");
+                return batteryRetval::ChargerError;
+            }
+            return batteryRetval::OK;
+        }
+
+        batteryRetval setTemperatureThresholds(std::uint8_t maxTemperatureDegrees, std::uint8_t minTemperatureDegrees)
+        {
+            std::uint16_t regVal = (maxTemperatureDegrees << 8) | minTemperatureDegrees;
+
+            if (fuelGaugeWrite(Registers::TALRT_Th_REG, regVal) != kStatus_Success) {
+                LOG_ERROR("setTemperatureThresholds failed.");
+                return batteryRetval::ChargerError;
+            }
+            return batteryRetval::OK;
+        }
+
+        batteryRetval setServiceVoltageThresholds(std::uint16_t maxVoltage_mV, std::uint16_t minVoltage_mV)
+        {
+            std::uint16_t regVal = ((maxVoltage_mV / 20) << 8) | (minVoltage_mV / 20);
+
+            if (fuelGaugeWrite(Registers::VALRT_Th_REG, regVal) != kStatus_Success) {
+
+                LOG_ERROR("setServiceVoltageThresholds failed.");
+                return batteryRetval::ChargerError;
+            }
+            return batteryRetval::OK;
+        }
+
+        batteryRetval enableFuelGuageIRQs()
+        {
+            std::uint16_t regVal = static_cast<std::uint16_t>(CONFIG2::dSOCen);
+
+            if (fuelGaugeWrite(Registers::CONFIG2_REG, regVal) != kStatus_Success) {
+                LOG_ERROR("enableFuelGuageIRQs failed.");
+                return batteryRetval::ChargerError;
+            }
+
+            return batteryRetval::OK;
+        }
+
+        batteryRetval configureAlerts()
+        {
+            std::uint16_t regVal = static_cast<std::uint16_t>(CONFIG::Aen);
+
+            if (fuelGaugeWrite(Registers::CONFIG_REG, regVal) != kStatus_Success) {
+                LOG_ERROR("configureAlerts failed.");
+                return batteryRetval::ChargerError;
+            }
+
+            return batteryRetval::OK;
+        }
+
+        batteryRetval enableTopIRQs()
+        {
+            std::uint8_t val = ENABLE_ALL_IRQ_MASK;
+
+            if (chargerTopControllerWrite(Registers::TOP_CONTROLL_IRQ_MASK_REG, val) != kStatus_Success) {
+                LOG_ERROR("enableIRQs read failed.");
+                return batteryRetval::ChargerError;
+            }
+
+            return batteryRetval::OK;
+        }
+
+        void IRQPinsInit()
+        {
+            gpio =
+                drivers::DriverGPIO::Create(static_cast<drivers::GPIOInstances>(BoardDefinitions::BATTERY_CHARGER_GPIO),
+                                            drivers::DriverGPIOParams{});
+
+            drivers::DriverGPIOPinParams INOKBPinConfig;
+            INOKBPinConfig.dir      = drivers::DriverGPIOPinParams::Direction::Input;
+            INOKBPinConfig.irqMode  = drivers::DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge;
+            INOKBPinConfig.defLogic = 0;
+            INOKBPinConfig.pin      = static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN);
+            gpio->ConfPin(INOKBPinConfig);
+
+            drivers::DriverGPIOPinParams INTBPinConfig;
+            INTBPinConfig.dir      = drivers::DriverGPIOPinParams::Direction::Input;
+            INTBPinConfig.irqMode  = drivers::DriverGPIOPinParams::InterruptMode::IntFallingEdge;
+            INTBPinConfig.defLogic = 0;
+            INTBPinConfig.pin      = static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN);
+            gpio->ConfPin(INTBPinConfig);
+
+            gpio->EnableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
+            gpio->EnableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
+        }
+    } // namespace
+
+    int init(xQueueHandle queueHandle)
+    {
+        drivers::DriverI2CParams i2cParams;
+        i2cParams.baudrate = static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_I2C_BAUDRATE);
+        i2c = drivers::DriverI2C::Create(static_cast<drivers::I2CInstances>(BoardDefinitions::BATTERY_CHARGER_I2C),
+                                         i2cParams);
+
+        IRQQueueHandle = queueHandle;
+
+        // check Power-On reset bit
+        std::uint16_t status = fuelGaugeRead(Registers::STATUS_REG).second;
+
+        if (status & static_cast<std::uint16_t>(STATUS::POR)) {
+            LOG_INFO("Initializing battery charger");
+            loadConfiguration();
+            setAvgCalcPeriods();
+            setNominalBatteryCapacity(nominalCapacitymAh);
+            setChargingDischargingThresholds(fullyChargedPercent, DischargedPercent);
+            setTemperatureThresholds(maxTemperatureDegrees, minTemperatureDegrees);
+            setServiceVoltageThresholds(maxVoltagemV, minVoltagemV);
+        }
+
+        configureAlerts();
+        enableFuelGuageIRQs();
+
+        StateOfCharge level = getBatteryLevel();
+        bool charging       = getChargeStatus();
         LOG_INFO("Phone battery start state: %d %d", level, charging);
 
-        battery_ClearAllIRQs();
-        battery_enableTopIRQs();
+        clearAllIRQs();
+        enableTopIRQs();
 
-        s_BSP_BatteryChargerIrqPinsInit();
+        IRQPinsInit();
 
         return 0;
     }
 
-    void battery_Deinit(void)
+    void deinit()
     {
-        battery_storeConfiguration();
+        storeConfiguration();
 
         gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
         gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
-        gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_WCINOKB));
 
-        qHandleIrq = NULL;
+        IRQQueueHandle = nullptr;
 
         i2c.reset();
         gpio.reset();
     }
 
-    void battery_getBatteryLevel(uint8_t &levelPercent)
+    StateOfCharge getBatteryLevel()
     {
-        uint16_t val = 0;
-        if (battery_fuelGaugeRead(bsp::batteryChargerRegisters::RepSOC_REG, &val) != kStatus_Success) {
+        auto readout = fuelGaugeRead(Registers::RepSOC_REG);
+        if (readout.first != kStatus_Success) {
             LOG_ERROR("failed to get battery percent");
         }
-        levelPercent                   = (val & 0xff00) >> 8;
+        StateOfCharge levelPercent     = (readout.second & 0xff00) >> 8;
         Store::Battery::modify().level = levelPercent;
+        return levelPercent;
     }
 
-    void battery_getChargeStatus(bool &status)
+    bool getChargeStatus()
     {
-        uint8_t val = 0;
+        std::uint8_t val = 0;
         // read clears state
-        if (battery_chargerRead(bsp::batteryChargerRegisters::CHG_INT_OK, &val) != kStatus_Success) {
+        auto value = chargerRead(Registers::CHG_INT_OK);
+        if (value.first != kStatus_Success) {
             LOG_ERROR("failed to read charge status");
         }
-        status = val & B_CHG_INT::CHGIN_I;
+        bool status = value.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I);
         if (status) {
             Store::Battery::modify().state = Store::Battery::State::Charging;
         }
         else {
             Store::Battery::modify().state = Store::Battery::State::Discharging;
         }
-    }
-
-    std::uint16_t battery_getStatusRegister()
-    {
-        uint16_t status = 0;
-        battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &status);
         return status;
     }
 
-    void battery_ClearAllIRQs(void)
+    std::uint16_t getStatusRegister()
     {
-        uint8_t val = 0;
-        battery_chargerRead(bsp::batteryChargerRegisters::CHG_INT_REG, &val);
-        if (val != 0) {
+        auto status = fuelGaugeRead(Registers::STATUS_REG);
+        return status.second;
+    }
+
+    void clearAllIRQs()
+    {
+        auto value = chargerRead(Registers::CHG_INT_REG);
+        if (value.second != 0) {
             // write zero to clear irq source
-            battery_chargerWrite(bsp::batteryChargerRegisters::CHG_INT_REG, 0);
+            chargerWrite(Registers::CHG_INT_REG, 0);
         }
 
-        uint16_t status = battery_getStatusRegister();
+        std::uint16_t status = getStatusRegister();
         if (status != 0) {
             // write zero to clear irq source
-            battery_fuelGaugeWrite(bsp::batteryChargerRegisters::STATUS_REG, 0);
+            fuelGaugeWrite(Registers::STATUS_REG, 0);
         }
     }
 
-    void battery_clearFuelGuageIRQ(void)
+    void clearFuelGuageIRQ()
     {
         // write zero to clear interrupt source
-        battery_fuelGaugeWrite(bsp::batteryChargerRegisters::STATUS_REG, 0x0000);
+        fuelGaugeWrite(Registers::STATUS_REG, 0x0000);
     }
 
-} // namespace bsp
-
-static int battery_fuelGaugeWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value)
-{
-    I2CAddress addr{.deviceAddress  = BSP_FUEL_GAUGE_I2C_ADDR,
-                    .subAddress     = static_cast<uint32_t>(registerAddress),
-                    .subAddressSize = i2cSubaddresSize};
-    auto ret = i2c->Write(addr, reinterpret_cast<uint8_t *>(&value), sizeof(uint16_t));
-
-    if (ret != sizeof(uint16_t)) {
-        return kStatus_Fail;
-    }
-    else {
-        return kStatus_Success;
-    }
-}
-
-static int battery_fuelGaugeRead(bsp::batteryChargerRegisters registerAddress, uint16_t *value)
-{
-    if (value == NULL) {
-        return -1;
-    }
-
-    I2CAddress addr{.deviceAddress  = BSP_FUEL_GAUGE_I2C_ADDR,
-                    .subAddress     = static_cast<uint32_t>(registerAddress),
-                    .subAddressSize = i2cSubaddresSize};
-    auto ret = i2c->Read(addr, reinterpret_cast<uint8_t *>(value), sizeof(uint16_t));
-
-    if (ret != sizeof(uint16_t)) {
-        return kStatus_Fail;
-    }
-    else {
-        return kStatus_Success;
-    }
-}
-
-static int battery_chargerWrite(bsp::batteryChargerRegisters registerAddress, uint8_t value)
-{
-
-    I2CAddress addr{.deviceAddress  = BSP_BATTERY_CHARGER_I2C_ADDR,
-                    .subAddress     = static_cast<uint32_t>(registerAddress),
-                    .subAddressSize = i2cSubaddresSize};
-    auto ret = i2c->Write(addr, reinterpret_cast<uint8_t *>(&value), sizeof(uint8_t));
-
-    if (ret != sizeof(uint8_t)) {
-        return kStatus_Fail;
-    }
-    else {
-        return kStatus_Success;
-    }
-}
-
-static int battery_chargerRead(bsp::batteryChargerRegisters registerAddress, uint8_t *value)
-{
-    if (value == NULL) {
-        return -1;
-    }
-
-    I2CAddress addr{.deviceAddress  = BSP_BATTERY_CHARGER_I2C_ADDR,
-                    .subAddress     = static_cast<uint32_t>(registerAddress),
-                    .subAddressSize = i2cSubaddresSize};
-    auto ret = i2c->Read(addr, value, sizeof(uint8_t));
-    if (ret != sizeof(uint8_t)) {
-        return kStatus_Fail;
-    }
-    else {
-        return kStatus_Success;
-    }
-}
-
-static int battery_chargerTopControllerWrite(bsp::batteryChargerRegisters registerAddress, uint8_t value)
-{
-
-    I2CAddress addr{.deviceAddress  = BSP_TOP_CONTROLLER_I2C_ADDR,
-                    .subAddress     = static_cast<uint32_t>(registerAddress),
-                    .subAddressSize = i2cSubaddresSize};
-    auto ret = i2c->Write(addr, reinterpret_cast<uint8_t *>(&value), sizeof(uint8_t));
-    if (ret != sizeof(uint8_t)) {
-        return kStatus_Fail;
-    }
-    else {
-        return kStatus_Success;
-    }
-}
-
-static int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registerAddress, uint8_t *value)
-    __attribute__((used));
-static int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registerAddress, uint8_t *value)
-{
-    if (value == NULL) {
-        return -1;
-    }
-
-    I2CAddress addr{.deviceAddress  = BSP_TOP_CONTROLLER_I2C_ADDR,
-                    .subAddress     = static_cast<uint32_t>(registerAddress),
-                    .subAddressSize = i2cSubaddresSize};
-    auto ret = i2c->Read(addr, reinterpret_cast<uint8_t *>(value), sizeof(uint8_t));
-    if (ret != sizeof(uint8_t)) {
-        return kStatus_Fail;
-    }
-    else {
-        return kStatus_Success;
-    }
-}
-
-static bsp::batteryRetval battery_loadConfiguration(void)
-{
-    auto fd = std::fopen(configs::battery_cfgFile.c_str(), "r");
-    if (fd == NULL) {
-        LOG_WARN("Configuration file [%s] not found. Searching for file [%s]",
-                 configs::battery_cfgFile.c_str(),
-                 configs::battery_cfgFilePrev.c_str());
-        fd = std::fopen(configs::battery_cfgFilePrev.c_str(), "r");
-        if (fd == NULL) {
-            LOG_WARN("Configuration file [%s] not found.", configs::battery_cfgFilePrev.c_str());
-            return bsp::batteryRetval::battery_ChargerError;
+    BaseType_t INOKB_IRQHandler()
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        if (IRQQueueHandle != nullptr) {
+            std::uint8_t val = static_cast<std::uint8_t>(batteryIRQSource::INOKB);
+            xQueueSendFromISR(IRQQueueHandle, &val, &xHigherPriorityTaskWoken);
         }
+        return xHigherPriorityTaskWoken;
     }
 
-    uint16_t regValue = 0;
-    for (uint8_t i = 0; i < 0xff; ++i) {
-        if (std::fread(&regValue, sizeof(regValue), 1, fd) != sizeof(regValue)) {
-            LOG_ERROR("Reading register 0x%x failed.", i);
-            std::fclose(fd);
-            return bsp::batteryRetval::battery_ChargerError;
+    BaseType_t INTB_IRQHandler()
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        if (IRQQueueHandle != nullptr) {
+            std::uint8_t val = static_cast<std::uint8_t>(batteryIRQSource::INTB);
+            xQueueSendFromISR(IRQQueueHandle, &val, &xHigherPriorityTaskWoken);
         }
-
-        if (battery_fuelGaugeWrite(static_cast<bsp::batteryChargerRegisters>(i), regValue) != kStatus_Success) {
-            LOG_ERROR("Writing register 0x%x failed.", i);
-            std::fclose(fd);
-            return bsp::batteryRetval::battery_ChargerError;
-        }
+        return xHigherPriorityTaskWoken;
     }
 
-    return bsp::batteryRetval::battery_OK;
-}
-
-static bsp::batteryRetval battery_storeConfiguration(void)
-{
-    // TODO:M.P procedure below seems to crash system, it should be fixed.
-    if (rename(configs::battery_cfgFile.c_str(), configs::battery_cfgFilePrev.c_str()) != 0) {
-        LOG_ERROR("Could not move configuration file");
-        return bsp::batteryRetval::battery_ChargerError;
-    }
-
-    auto fd = std::fopen(configs::battery_cfgFile.c_str(), "w");
-    if (fd == NULL) {
-        LOG_ERROR("Could not open configuration file");
-        return bsp::batteryRetval::battery_ChargerError;
-    }
-
-    uint16_t regVal = 0;
-    for (unsigned int i = 0; i < 0xff; ++i) {
-        if (battery_fuelGaugeRead(static_cast<bsp::batteryChargerRegisters>(i), &regVal) != kStatus_Success) {
-            LOG_ERROR("Reading register 0x%x failed.", i);
-            std::fclose(fd);
-            return bsp::batteryRetval::battery_ChargerError;
-        }
-
-        if (std::fwrite(&regVal, sizeof(regVal), 1, fd) != sizeof(regVal)) {
-            LOG_ERROR("Storing register 0x%x failed.", i);
-            std::fclose(fd);
-            std::remove(configs::battery_cfgFile.c_str());
-            return bsp::batteryRetval::battery_ChargerError;
-        }
-    }
-    return bsp::batteryRetval::battery_OK;
-}
-
-static bsp::batteryRetval battery_setAvgCalcPeriods(void)
-{
-    uint16_t regVal = 0;
-    regVal |= (BATT_SERVICE_AVG_CURRENT_PERIOD << 0);
-    regVal |= (BATT_SERVICE_AVG_CELL_VOLTAGE_PERIOD << 4);
-    regVal |= (BATT_SERVICE_AVG_MIXING_PERIOD << 7);
-    regVal |= (BATT_SERVICE_AVG_TEMP_PERIOD << 11);
-    regVal |= (BATT_SERVICE_AVG_NEMPTY_PERIOD << 14);
-
-    if (battery_fuelGaugeWrite(bsp::batteryChargerRegisters::FilterCFG_REG, regVal) != kStatus_Success) {
-        LOG_ERROR("battery_setAvgCalcPeriods failed.");
-        return bsp::batteryRetval::battery_ChargerError;
-    }
-    return bsp::batteryRetval::battery_OK;
-}
-
-static bsp::batteryRetval battery_setNominalBatteryCapacity(uint16_t capacity)
-{
-    uint16_t regVal = capacity * 2;
-
-    if (battery_fuelGaugeWrite(bsp::batteryChargerRegisters::DesignCap_REG, regVal) != kStatus_Success) {
-        LOG_ERROR("battery_setNominalBatteryCapacity failed.");
-        return bsp::batteryRetval::battery_ChargerError;
-    }
-    return bsp::batteryRetval::battery_OK;
-}
-
-static bsp::batteryRetval battery_setChargingDischargingThresholds(uint8_t chargedThresholdPercent,
-                                                                   uint8_t dischargedThresholdPercent)
-{
-    uint16_t regVal = (chargedThresholdPercent << 8) | dischargedThresholdPercent;
-
-    if (battery_fuelGaugeWrite(bsp::batteryChargerRegisters::SALRT_Th_REG, regVal) != kStatus_Success) {
-        LOG_ERROR("battery_setChargingDischargingThresholds failed.");
-        return bsp::batteryRetval::battery_ChargerError;
-    }
-    return bsp::batteryRetval::battery_OK;
-}
-
-static bsp::batteryRetval battery_setTemperatureThresholds(uint8_t maxTemperatureDegrees, uint8_t minTemperatureDegrees)
-{
-    uint16_t regVal = (maxTemperatureDegrees << 8) | minTemperatureDegrees;
-
-    if (battery_fuelGaugeWrite(bsp::batteryChargerRegisters::TALRT_Th_REG, regVal) != kStatus_Success) {
-        LOG_ERROR("battery_setTemperatureThresholds failed.");
-        return bsp::batteryRetval::battery_ChargerError;
-    }
-    return bsp::batteryRetval::battery_OK;
-}
-
-static bsp::batteryRetval battery_setServiceVoltageThresholds(uint16_t maxVoltage_mV, uint16_t minVoltage_mV)
-{
-    uint16_t regVal = ((maxVoltage_mV / 20) << 8) | (minVoltage_mV / 20);
-
-    if (battery_fuelGaugeWrite(bsp::batteryChargerRegisters::VALRT_Th_REG, regVal) != kStatus_Success) {
-
-        LOG_ERROR("battery_setServiceVoltageThresholds failed.");
-        return bsp::batteryRetval::battery_ChargerError;
-    }
-    return bsp::batteryRetval::battery_OK;
-}
-
-static bsp::batteryRetval battery_enableFuelGuageIRQs(void)
-{
-    uint16_t regVal = 0;
-    // set dSOCen bit
-    regVal |= (1 << 7);
-    if (battery_fuelGaugeWrite(bsp::batteryChargerRegisters::CONFIG2_REG, regVal) != kStatus_Success) {
-        LOG_ERROR("battery_enableFuelGuageIRQs failed.");
-        return bsp::batteryRetval::battery_ChargerError;
-    }
-
-    return bsp::batteryRetval::battery_OK;
-}
-
-static bsp::batteryRetval battery_configureAlerts()
-{
-    auto regVal = static_cast<std::uint16_t>(bsp::B_CONFIG::Aen); // Enable alerts
-
-    if (battery_fuelGaugeWrite(bsp::batteryChargerRegisters::CONFIG_REG, regVal) != kStatus_Success) {
-        LOG_ERROR("battery_configureAlerts failed.");
-        return bsp::batteryRetval::battery_ChargerError;
-    }
-
-    return bsp::batteryRetval::battery_OK;
-}
-
-static bsp::batteryRetval battery_enableTopIRQs(void)
-{
-    uint8_t val = 0xf8;
-
-    if (battery_chargerTopControllerWrite(bsp::batteryChargerRegisters::TOP_CONTROLL_IRQ_MASK_REG, val) !=
-        kStatus_Success) {
-        LOG_ERROR("battery_enableIRQs read failed.");
-        return bsp::batteryRetval::battery_ChargerError;
-    }
-
-    return bsp::batteryRetval::battery_OK;
-}
-
-BaseType_t BSP_BatteryChargerINOKB_IRQHandler()
-{
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    if (qHandleIrq != NULL) {
-        uint8_t val = static_cast<uint8_t>(bsp::batteryIRQSource::INOKB);
-        xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
-    }
-    return xHigherPriorityTaskWoken;
-}
-
-BaseType_t BSP_BatteryChargerINTB_IRQHandler()
-{
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    if (qHandleIrq != NULL) {
-        uint8_t val = static_cast<uint8_t>(bsp::batteryIRQSource::INTB);
-        xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
-    }
-    return xHigherPriorityTaskWoken;
-}
-
-static void s_BSP_BatteryChargerIrqPinsInit()
-{
-
-    gpio = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::BATTERY_CHARGER_GPIO), DriverGPIOParams{});
-
-    gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
-                                      .irqMode  = DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
-                                      .defLogic = 0,
-                                      .pin      = static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN)});
-
-    gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
-                                      .irqMode  = DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
-                                      .defLogic = 0,
-                                      .pin      = static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_WCINOKB)});
-
-    gpio->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
-                                      .irqMode  = DriverGPIOPinParams::InterruptMode::IntFallingEdge,
-                                      .defLogic = 0,
-                                      .pin      = static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN)});
-
-    gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_WCINOKB));
-    gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
-    gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
-}
+} // namespace bsp::battery_charger

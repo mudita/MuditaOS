@@ -16,6 +16,8 @@
 #include <filesystem>
 #include <memory>
 
+using namespace parserFSM;
+
 auto UpdateEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {

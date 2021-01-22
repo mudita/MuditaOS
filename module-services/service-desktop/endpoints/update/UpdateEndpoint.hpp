@@ -20,9 +20,7 @@ namespace sys
     class Service;
 } // namespace sys
 
-using namespace parserFSM;
-
-class UpdateEndpoint : public Endpoint
+class UpdateEndpoint : public parserFSM::Endpoint
 {
 
   public:
@@ -30,7 +28,7 @@ class UpdateEndpoint : public Endpoint
     {
         debugName = "UpdateEndpoint";
     }
-    auto handle(Context &context) -> void override;
-    auto run(Context &context) -> sys::ReturnCodes;
-    auto getUpdates(Context &context) -> sys::ReturnCodes;
+    auto handle(parserFSM::Context &context) -> void override;
+    auto run(parserFSM::Context &context) -> sys::ReturnCodes;
+    auto getUpdates(parserFSM::Context &context) -> sys::ReturnCodes;
 };

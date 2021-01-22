@@ -5,7 +5,9 @@
 ### Added
 
 * Add hardware in the loop tests.
-* Add empty APN settings window.
+* Add APN settings window.
+* Add New/Edit APN window
+* Add APN options window
 
 ### Changed
 

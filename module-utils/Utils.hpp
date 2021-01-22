@@ -122,7 +122,14 @@ namespace utils
                 baseAsStr = "-0";
             }
         }
+
         auto fractionalPart = static_cast<unsigned long int>(roundl(frac));
+        auto fractionalPartLength = std::to_string(fractionalPart).length();
+        if (fractionalPartLength > precision) {
+            base += 1;
+            baseAsStr      = std::to_string(base);
+            fractionalPart = 0;
+        }
         if (fractionalPart == 0) {
             if (baseAsStr == "-0") {
                 return "0";
