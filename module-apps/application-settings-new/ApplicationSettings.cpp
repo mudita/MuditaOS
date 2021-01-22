@@ -179,8 +179,10 @@ namespace app
 
         settings->registerValueChange(settings::operators_on,
                                       [this](const std::string &value) { operatorOnChanged(value); });
-        settings->registerValueChange(::settings::Cellular::volte_on,
-                                      [this](const std::string &value) { volteChanged(value); });
+        settings->registerValueChange(
+            ::settings::Cellular::volte_on,
+            [this](const std::string &value) { volteChanged(value); },
+            ::settings::SettingsScope::Global);
         settings->registerValueChange(
             ::settings::SystemProperties::lockPassHash,
             [this](std::string value) { lockPassHash = utils::getNumericValue<unsigned int>(value); },
