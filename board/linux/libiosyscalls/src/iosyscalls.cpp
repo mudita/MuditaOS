@@ -28,6 +28,7 @@ namespace
                                         "/home",
                                         "/proc",
                                         "/dev/shm",
+                                        "/dev/pts",
                                         "PurePhone.img",
                                         "MuditaOS.log",
                                         nullptr};
