@@ -82,8 +82,8 @@ auto DayEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
             auto eventShift = app->getEventShift();
             if (eventShift) {
                 for (auto &record : records) {
-                    record.date_from += hours(eventShift);
-                    record.date_till += hours(eventShift);
+                    record.date_from += std::chrono::hours(eventShift);
+                    record.date_till += std::chrono::hours(eventShift);
                 }
             }
             return updateRecords(std::move(records));
@@ -95,7 +95,7 @@ auto DayEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     return false;
 }
 
-void DayEventsModel::setFilters(TimePoint from, TimePoint till, const std::string &dayMonth)
+void DayEventsModel::setFilters(calendar::TimePoint from, calendar::TimePoint till, const std::string &dayMonth)
 {
     this->filterFrom    = from;
     this->filterTill    = till;

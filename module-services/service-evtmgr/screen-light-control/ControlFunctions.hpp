@@ -8,7 +8,7 @@
 #include <vector>
 #include <memory>
 
-namespace sevm::screen_light_control::functions
+namespace screen_light_control::functions
 {
     using BrightnessFunction =
         std::vector<std::pair<bsp::light_sensor::IlluminanceLux, bsp::eink_frontlight::BrightnessPercentage>>;
@@ -23,4 +23,4 @@ namespace sevm::screen_light_control::functions
 
     void setFunctionFromPoints(const BrightnessFunction &points);
 
-} // namespace sevm::screen_light_control::functions
+} // namespace screen_light_control::functions

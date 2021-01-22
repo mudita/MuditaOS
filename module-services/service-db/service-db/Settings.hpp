@@ -5,6 +5,8 @@
 
 #include <module-sys/Service/Message.hpp>
 #include <service-db/DBServiceName.hpp>
+#include "SettingsScope.hpp"
+#include "SettingsMessages.hpp"
 
 #include <cstdint>
 #include <functional>
@@ -16,11 +18,6 @@
 
 namespace settings
 {
-    namespace Messages
-    {
-        class SettingsMessage;
-    }
-
     class Settings
     {
       public:
@@ -36,10 +33,18 @@ namespace settings
         Settings(sys::Service *app, const std::string &dbAgentName = service::name::db);
         virtual ~Settings();
 
-        void setValue(const std::string &variableName, const std::string &variableValue);
-        void registerValueChange(const std::string &variableName, ValueChangedCallback cb);
-        void registerValueChange(const std::string &variableName, ValueChangedCallbackWithName cb);
-        void unregisterValueChange(const std::string &variableName);
+        void setValue(const std::string &variableName,
+                      const std::string &variableValue,
+                      SettingsScope scope = SettingsScope::AppLocal);
+        void registerValueChange(const std::string &variableName,
+                                 ValueChangedCallback cb,
+                                 SettingsScope scope = SettingsScope::AppLocal);
+        void registerValueChange(const std::string &variableName,
+                                 ValueChangedCallbackWithName cb,
+                                 SettingsScope scope = SettingsScope::AppLocal);
+        void unregisterValueChange(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal);
+        /// unregisters all registered variables (both global and local)
+        void unregisterValueChange();
 
         void getAllProfiles(OnAllProfilesRetrievedCallback cb);
         void setCurrentProfile(const std::string &profile);
@@ -61,7 +66,7 @@ namespace settings
         std::string phoneMode;
         std::string profile;
 
-        using ValueCb = std::map<std::string, std::pair<ValueChangedCallback, ValueChangedCallbackWithName>>;
+        using ValueCb = std::map<EntryPath, std::pair<ValueChangedCallback, ValueChangedCallbackWithName>>;
         ValueCb cbValues;
         ModeChangedCallback cbMode;
         OnAllModesRetrievedCallback cbAllModes;

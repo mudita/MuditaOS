@@ -24,7 +24,7 @@ namespace style::desktop
         constexpr auto X     = 0;
         constexpr auto Y     = 106;
         constexpr auto Width = style::window_width;
-        constexpr auto Hight = 96;
+        constexpr auto Height = 96;
 
     } // namespace timeLabel
 
@@ -33,7 +33,7 @@ namespace style::desktop
         constexpr auto X     = 0;
         constexpr auto Y     = 204;
         constexpr auto Width = style::window_width;
-        constexpr auto Hight = 51;
+        constexpr auto Height = 51;
 
     } // namespace dayLabel
 

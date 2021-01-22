@@ -2,7 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesMainWindow.hpp"
-
+#include "application-settings-new/models/QuotesRepository.hpp"
+#include "application-settings-new/models/QuotesModel.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/widgets/SettingsStyle.hpp"
 #include "OptionSetting.hpp"
@@ -10,17 +11,54 @@
 #include <InputEvent.hpp>
 #include <i18n/i18n.hpp>
 #include <json/json11.hpp>
-#include <purefs/filesystem_paths.hpp>
-#include <Utils.hpp>
-#include <string>
+#include <utility>
+
+namespace style::quotes
+{
+    namespace list
+    {
+        constexpr auto X      = style::window::default_left_margin;
+        constexpr auto Y      = style::header::height;
+        constexpr auto Width  = style::listview::body_width_with_scroll;
+        constexpr auto Height = style::window_height - Y - style::footer::height;
+    } // namespace list
+
+    inline constexpr auto cross_x = 48;
+    inline constexpr auto cross_y = 55;
+    inline constexpr auto arrow_x = 30;
+    inline constexpr auto arrow_y = 62;
+
+} // namespace style::quotes
 
 namespace gui
 {
-    QuotesMainWindow::QuotesMainWindow(app::Application *app) : BaseSettingsWindow(app, gui::window::name::quotes)
+    QuotesMainWindow::QuotesMainWindow(app::Application *app, std::shared_ptr<app::QuotesModel> model)
+        : AppWindow(app, gui::window::name::quotes), quotesModel(std::move(model))
     {
-        const auto quotesPath = purefs::dir::getCurrentOSPath() / "data/applications/settings/quotes.json";
-        setTitle(utils::localize.get("app_settings_display_locked_screen_quotes"));
-        readQuotes(quotesPath);
+        buildInterface();
+    }
+
+    void QuotesMainWindow::buildInterface()
+    {
+        AppWindow::buildInterface();
+
+        setTitle(utils::localize.get("app_settings_display_wallpaper_quotes"));
+
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::check));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+
+        new gui::Image(this, style::quotes::arrow_x, style::quotes::arrow_y, 0, 0, "arrow_left");
+        new gui::Image(this, style::quotes::cross_x, style::quotes::cross_y, 0, 0, "cross");
+
+        list = new gui::ListView(this,
+                                 style::quotes::list::X,
+                                 style::quotes::list::Y,
+                                 style::quotes::list::Width,
+                                 style::quotes::list::Height,
+                                 quotesModel);
+
+        setFocusItem(list);
     }
 
     auto QuotesMainWindow::onInput(const InputEvent &inputEvent) -> bool
@@ -29,10 +67,12 @@ namespace gui
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
-        if (inputEvent.state == InputEvent::State::keyReleasedShort) {
+
+        if (inputEvent.isShortPress()) {
             switch (inputEvent.keyCode) {
             case gui::KeyCode::KEY_LEFT:
-                application->switchWindow(gui::window::name::new_quote, nullptr);
+                application->switchWindow(gui::window::name::new_quote,
+                                          std::make_unique<QuoteSwitchData>(QuoteAction::Add));
                 return true;
             default:
                 break;
@@ -41,70 +81,8 @@ namespace gui
         return false;
     }
 
-    void QuotesMainWindow::readQuotes(fs::path fn)
+    void QuotesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        std::string err;
-
-        const auto fileContents = readFileToString(fn);
-        auto obj                = json11::Json::parse(fileContents.c_str(), err).array_items();
-
-        if (!err.empty()) {
-            LOG_ERROR("Error while parsing quotes: %s", err.c_str());
-        }
-
-        std::transform(obj.begin(), obj.end(), std::back_inserter(quotes), [](auto item) {
-            return std::pair{item["quote"].string_value(), false};
-        });
+        quotesModel->rebuild();
     }
-
-    auto QuotesMainWindow::buildOptionsList() -> std::list<gui::Option>
-    {
-        std::list<gui::Option> optionsList;
-
-        for (auto &quote : quotes) {
-            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                utils::translateI18(quote.first),
-                [&quote, this](gui::Item &item) {
-                    switchHandler(quote.second);
-                    return true;
-                },
-                [=](gui::Item &item) {
-                    if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
-                                               BottomBar::Side::CENTER);
-                    }
-                    return true;
-                },
-                this,
-                quote.second ? gui::option::SettingRightItem::Checked : gui::option::SettingRightItem::Disabled));
-        }
-
-        return optionsList;
-    }
-
-    void QuotesMainWindow::switchHandler(bool &optionSwitch)
-    {
-        optionSwitch = !optionSwitch;
-        rebuildOptionList();
-    }
-
-    std::string QuotesMainWindow::readFileToString(const fs::path &fn)
-    {
-        constexpr auto tar_buf = 8192 * 4;
-        auto file              = std::fopen(fn.c_str(), "r");
-        if (!file) {
-            return {};
-        }
-        const auto length = utils::filesystem::filelength(file);
-        if (length >= tar_buf) {
-            LOG_ERROR("File %s length is too high!", fn.c_str());
-            std::fclose(file);
-            return {};
-        }
-        auto buffer = std::make_unique<char[]>(length + 1);
-        std::fread(buffer.get(), 1, length, file);
-        std::fclose(file);
-        return std::string(buffer.get());
-    }
-
 } // namespace gui

@@ -37,6 +37,12 @@ namespace app
     ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground), lockHandler(this)
     {
+        using namespace gui::top_bar;
+        topBarManager->enableIndicators({Indicator::Signal,
+                                         Indicator::Time,
+                                         Indicator::Battery,
+                                         Indicator::SimCard,
+                                         Indicator::NetworkAccessTechnology});
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
 
         addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
@@ -317,11 +323,15 @@ namespace app
             std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
         sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, this);
 
-        settings->registerValueChange(settings::SystemProperties::activeSim,
-                                      [this](std::string value) { activeSimChanged(value); });
+        settings->registerValueChange(
+            settings::SystemProperties::activeSim,
+            [this](std::string value) { activeSimChanged(value); },
+            settings::SettingsScope::Global);
         Store::GSM::get()->selected = Store::GSM::SIM::NONE;
-        settings->registerValueChange(settings::SystemProperties::lockPassHash,
-                                      [this](std::string value) { lockPassHashChanged(value); });
+        settings->registerValueChange(
+            settings::SystemProperties::lockPassHash,
+            [this](std::string value) { lockPassHashChanged(value); },
+            settings::SettingsScope::Global);
 
         return sys::ReturnCodes::Success;
     }
@@ -329,6 +339,7 @@ namespace app
     sys::ReturnCodes ApplicationDesktop::DeinitHandler()
     {
         LOG_INFO("DeinitHandler");
+        settings->unregisterValueChange();
         return sys::ReturnCodes::Success;
     }
 

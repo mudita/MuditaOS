@@ -14,6 +14,7 @@ include(ModuleConfig)
 include(module-lwip/lwip-includes.cmake)
 include(SerialPort)
 include(CopyGdbInit)
+include(Utils)
 
 message("PROJECT_TARGET: ${PROJECT_TARGET}")
 message("TARGET_SOURCES: ${TARGET_SOURCES}")
@@ -218,7 +219,14 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 		DEPENDS ${FAT_IMAGE}
 	)
 	add_dependencies(check ${FAT_IMAGE}-target)
-    install(TARGETS ${CMAKE_PROJECT_NAME} DESTINATION "./")
+    multicomp_install(
+        TARGETS ${CMAKE_PROJECT_NAME}
+        DESTINATION "./"
+        COMPONENTS Standalone Update
+        )
+    set(CPACK_SYSTEM_NAME "Linux")
+    # only allow the standalone package in Linux config
+    set(CPACK_COMPONENTS_ALL Standalone)
 endif()
 
 
@@ -249,14 +257,63 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         ${HEX_FILE}-target ALL
         DEPENDS ${CMAKE_BINARY_DIR}/${HEX_FILE}
         )
-    install(FILES ${CMAKE_BINARY_DIR}/${BIN_FILE}
+
+    multicomp_install(FILES ${CMAKE_BINARY_DIR}/${BIN_FILE}
         DESTINATION "./"
         PERMISSIONS
             OWNER_READ OWNER_WRITE OWNER_EXECUTE
             GROUP_READ GROUP_EXECUTE
             WORLD_READ WORLD_EXECUTE
+        COMPONENTS Standalone Update
+        )
+
+    # download the bootloader
+    set(ECOBOOT_FILE ${CMAKE_BINARY_DIR}/ecoboot.bin)
+    set(ECOBOOT_DOWNLOAD_LOG ${CMAKE_BINARY_DIR}/download_info.txt)
+
+    if(DEFINED ENV{ASSETS_LOGIN} AND DEFINED ENV{ASSETS_TOKEN})
+        message("ecooboot download with tokens")
+        add_custom_command(OUTPUT ${ECOBOOT_FILE}
+            COMMAND ${CMAKE_SOURCE_DIR}/tools/download_asset.py
+            -l $ENV{ASSETS_LOGIN}
+            -t $ENV{ASSETS_TOKEN}
+            -w ${CMAKE_BINARY_DIR} ecoboot download
+            > ${ECOBOOT_DOWNLOAD_LOG}
+            COMMENT "Downloading ecoboot.bin"
+            BYPRODUCTS ${ECOBOOT_FILE} ${ECOBOOT_DOWNLOAD_LOG}
             )
+    else()
+        message("ecoboot download with git")
+        add_custom_command(OUTPUT ${ECOBOOT_FILE}
+            COMMAND ${CMAKE_SOURCE_DIR}/tools/download_asset.py
+            -w ${CMAKE_BINARY_DIR} ecoboot download
+            > ${ECOBOOT_DOWNLOAD_LOG}
+            COMMENT "Downloading ecoboot.bin"
+            BYPRODUCTS ${ECOBOOT_FILE} ${ECOBOOT_DOWNLOAD_LOG}
+            )
+    endif()
+
+    add_custom_target(ecoboot.bin DEPENDS ${ECOBOOT_FILE})
+
+    # generate version.json file (runs CMake script at build time)
+    set(VERSION_JSON ${CMAKE_BINARY_DIR}/version.json)
+    add_custom_command(OUTPUT ${VERSION_JSON}
+        COMMAND ${CMAKE_COMMAND}
+        -DSRC_DIR=${CMAKE_SOURCE_DIR}
+        -DECOBOOT_DOWNLOAD_LOG=${ECOBOOT_DOWNLOAD_LOG}
+        -B ${CMAKE_BINARY_DIR}
+        -P ${CMAKE_SOURCE_DIR}/config/GenUpdateVersionJson.cmake
+        DEPENDS ecoboot.bin ${ECOBOOT_DOWNLOAD_LOG}
+        BYPRODUCTS ${VERSION_JSON}
+        )
+    add_custom_target(version.json DEPENDS ${VERSION_JSON})
+
+    multicomp_install(PROGRAMS ${ECOBOOT_FILE} DESTINATION "./" COMPONENTS Standalone Update)
+    multicomp_install(FILES ${VERSION_JSON} DESTINATION "./" COMPONENTS Standalone Update)
+
     set(CPACK_SYSTEM_NAME "RT1051")
+    # allow both standalone and update packages in RT1051 config
+    set(CPACK_COMPONENTS_ALL Standalone Update)
 endif()
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
@@ -265,8 +322,10 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
         )
 endif()
 
-install(FILES ${PROJECT_SOURCE_DIR}/changelog.md
+install(
+    FILES ${PROJECT_SOURCE_DIR}/changelog.md
     DESTINATION "./"
+    COMPONENT Standalone
     )
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
@@ -279,11 +338,6 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
                 $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
         )
 endif()
-
-add_custom_target(ecoboot.bin 
-    COMMAND ${CMAKE_SOURCE_DIR}/tools/download_asset.py -w ${CMAKE_BINARY_DIR}/update ecoboot download
-    BYPRODUCTS update/ecoboot.bin
-    )
 
 message_serial_status()
 
@@ -321,39 +375,95 @@ else ()
 endif ()
 
 message("SRC DIR: ${CMAKE_SOURCE_DIR}")
+
 include(Version)
+configure_file(
+    ${SRC_DIR}/source/version.hpp.template
+    ${CMAKE_BINARY_DIR}/source/version.hpp
+    )
 add_custom_target(
     version ALL
-    COMMAND
-        ${CMAKE_COMMAND} -DSRC_DIR=${CMAKE_SOURCE_DIR} -B ${CMAKE_BINARY_DIR}  -P ${CMAKE_SOURCE_DIR}/config/Version.cmake
+    COMMAND ${CMAKE_COMMAND}
+    -DSRC_DIR=${CMAKE_SOURCE_DIR}
+    -B ${CMAKE_BINARY_DIR}
+    -P ${CMAKE_SOURCE_DIR}/config/GenVersionHpp.cmake
     COMMENT
-        "Generationg version info"
+        "Generating version info"
     )
-
 add_dependencies(${PROJECT_NAME} version)
 
 set(CPACK_PACKAGE_VENDOR "Mudita")
+set(CPACK_PACKAGE_NAME "PurePhone")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://mudita.com/products/pure/")
-if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    set(CPACK_GENERATOR "ZIP")
-    set(PACKAGE_EXTENSION ".zip")
-    set(PACKAGE_MIME "application/zip")
-else()
-    set(CPACK_GENERATOR "TGZ")
-    set(PACKAGE_EXTENSION ".tar.gz")
-    set(PACKAGE_MIME "application/x-compressed-tar")
-endif()
+set(CPACK_TOPLEVEL_TAG ${CPACK_SYSTEM_NAME})
+# the CPACK_PACKAGE_FILE_NAME variable will be reset after include(CPack) hence a copy
+set(PACKAGE_COMMON_NAME ${CPACK_PACKAGE_NAME}-${CMAKE_PROJECT_VERSION}-${CPACK_TOPLEVEL_TAG})
+set(CPACK_PACKAGE_FILE_NAME ${PACKAGE_COMMON_NAME})
+# setting this will CPack prevent from additing the default 'package' target
+set(CPACK_OUTPUT_CONFIG_FILE ${CMAKE_BINARY_DIR}/PackageConfig.cmake)
+set(CPACK_GENERATOR "External")
+set(CPACK_COMPONENTS_GROUPING IGNORE)
+set(CPACK_EXTERNAL_ENABLE_STAGING TRUE)
+set(PACKAGE_STAGING_DIRECTORY ${CMAKE_BINARY_DIR}/_CPack_Packages/${CPACK_TOPLEVEL_TAG}/${CPACK_GENERATOR}/${CPACK_PACKAGE_FILE_NAME})
 
 include(CPack)
 
-if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
-    set(PACKAGE_FILE ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}${PACKAGE_EXTENSION})
+add_custom_target(package-standalone-staged
+    COMMAND ${CMAKE_CPACK_COMMAND}
+    -C $<CONFIGURATION>
+    --config ${CPACK_OUTPUT_CONFIG_FILE}
+    )
 
-    message("set-output name=package::${PACKAGE_FILE}")
-    message("::set-output name=package::${PACKAGE_FILE}")
-
-    message("set-output name=mime_type::${PACKAGE_MIME}")
-    message("::set-output name=mime_type::${PACKAGE_MIME}")
+if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    set(PACKAGE_STANDALONE_FILE_NAME ${PACKAGE_COMMON_NAME}-Standalone.zip)
+    set(PACKAGE_STANDALONE_MIME "application/zip")
+    add_custom_target(package-update-staged
+        COMMAND ${CMAKE_CPACK_COMMAND}
+        -C $<CONFIGURATION>
+        --config ${CPACK_OUTPUT_CONFIG_FILE}
+        DEPENDS ecoboot.bin version.json
+    )
+    add_custom_target(package-standalone
+        COMMAND zip -rq ${CMAKE_BINARY_DIR}/${PACKAGE_STANDALONE_FILE_NAME} "."
+        WORKING_DIRECTORY ${PACKAGE_STAGING_DIRECTORY}/Standalone
+        DEPENDS ${ECOBOOT_FILE} package-standalone-staged  PurePhone
+        )
+    set(UPDATE_STAGING_DIRECTORY ${PACKAGE_STAGING_DIRECTORY}/Update)
+    add_custom_target(package-update-checksums
+        COMMAND rhash
+        -u checksums.txt
+        -r .
+        WORKING_DIRECTORY ${UPDATE_STAGING_DIRECTORY}
+        DEPENDS package-update-staged
+        )
+    set(PACKAGE_UPDATE_FILE_NAME ${PACKAGE_COMMON_NAME}-Update.tar)
+    set(PACKAGE_UPDATE_MIME "application/x-tar")
+    add_custom_target(package-update
+        COMMAND tar
+        -cf ${CMAKE_BINARY_DIR}/${PACKAGE_UPDATE_FILE_NAME}
+        -C ${PACKAGE_STAGING_DIRECTORY}/Update "."
+        DEPENDS ecoboot.bin version.json PurePhone package-update-staged package-update-checksums
+        )
+elseif (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    set(PACKAGE_STANDALONE_FILE_NAME ${PACKAGE_COMMON_NAME}-Standalone.tar.gz)
+    set(PACKAGE_STANDALONE_MIME "application/x-compressed-tar")
+    add_custom_target(package-standalone
+        COMMAND tar
+        -czf ${CMAKE_BINARY_DIR}/${PACKAGE_STANDALONE_FILE_NAME}
+        -C ${PACKAGE_STAGING_DIRECTORY}/Standalone "."
+        DEPENDS package-standalone-staged
+        )
 endif()
 
+if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
+    message("set-output name=package-standalone::${PACKAGE_STANDALONE_FILE_NAME}")
+    message("::set-output name=package-standalone::${PACKAGE_STANDALONE_FILE_NAME}")
+    message("set-output name=standalone-mime_type::${PACKAGE_STANDALONE_MIME}")
+    message("::set-output name=standalone-mime_type::${PACKAGE_STANDALONE_MIME}")
 
+    message("set-output name=package-update::${PACKAGE_UPDATE_FILE_NAME}")
+    message("::set-output name=package-update::${PACKAGE_UPDATE_FILE_NAME}")
+    message("set-output name=update-mime_type::${PACKAGE_UPDATE_MIME}")
+    message("::set-output name=update-mime_type::${PACKAGE_UPDATE_MIME}")
+
+endif()

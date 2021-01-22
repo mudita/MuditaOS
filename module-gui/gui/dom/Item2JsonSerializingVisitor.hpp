@@ -29,7 +29,7 @@ namespace gui
         void visit(gui::Window &item) override;
         void visit(gui::Label &item) override;
         void visit(gui::BottomBar &item) override;
-        void visit(gui::TopBar &item) override;
+        void visit(gui::top_bar::TopBar &item) override;
 
       public:
         /// retrieves current state of the `sink`. The state of the `sink` after call is default-initialized

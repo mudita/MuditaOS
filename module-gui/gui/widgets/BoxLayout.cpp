@@ -110,7 +110,7 @@ namespace gui
                 /// this if back / front is crappy :|
                 if (previous) {
                     for (auto el = children.rbegin(); el != children.rend(); ++el) {
-                        if ((*el)->visible && (*el)->activeItem) {
+                        if ((*el)->isActive()) {
                             setFocusItem(*el);
                             break;
                         }
@@ -118,7 +118,7 @@ namespace gui
                 }
                 else {
                     for (auto &el : children) {
-                        if (el->visible && el->activeItem) {
+                        if (el->isActive()) {
                             setFocusItem(el);
                             break;
                         }
@@ -375,7 +375,7 @@ namespace gui
     std::list<Item *>::iterator BoxLayout::nextNavigationItem(std::list<Item *>::iterator from)
     {
         return std::find_if(from, this->children.end(), [](auto &el) -> bool {
-            if (el->visible && el->activeItem) {
+            if (el->isActive()) {
                 return true;
             }
             return false;
@@ -474,7 +474,7 @@ namespace gui
         bool success   = false;
 
         for (auto child : children) {
-            if (child->activeItem && child->visible) {
+            if (child->isActive()) {
 
                 if (elementNumber == i) {
                     child->setFocus(true);
@@ -496,7 +496,7 @@ namespace gui
         auto last = true;
         for (auto child = children.rbegin(); child != children.rend(); child++) {
 
-            if ((*child)->activeItem && (*child)->visible && last) {
+            if ((*child)->isActive() && last) {
                 (*child)->setFocus(true);
                 focusItem = (*child);
                 last      = false;
@@ -516,7 +516,7 @@ namespace gui
             if (child == focusItem) {
                 break;
             }
-            if (child->activeItem && child->visible) {
+            if (child->isActive()) {
                 index++;
             }
         }

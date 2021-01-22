@@ -7,18 +7,16 @@
 #include "Service/Service.hpp"
 #include "CalendarEventsHelper.hpp"
 
-using namespace parserFSM;
-
-class CalendarEventsEndpoint : public Endpoint
+class CalendarEventsEndpoint : public parserFSM::Endpoint
 {
   private:
     std::string debugName = "CalendarEventsEndpoint";
-    std::unique_ptr<CalendarEventsHelper> helper;
+    std::unique_ptr<parserFSM::CalendarEventsHelper> helper;
 
   public:
     CalendarEventsEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
     {
-        helper = std::make_unique<CalendarEventsHelper>(ownerServicePtr);
+        helper = std::make_unique<parserFSM::CalendarEventsHelper>(ownerServicePtr);
     }
-    void handle(Context &context) override;
+    void handle(parserFSM::Context &context) override;
 };

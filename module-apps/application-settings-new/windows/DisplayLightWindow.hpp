@@ -3,21 +3,29 @@
 
 #pragma once
 
+#include <module-services/service-evtmgr/screen-light-control/ScreenLightControl.hpp>
+#include <module-apps/application-settings-new/widgets/SpinBox.hpp>
+#include <module-apps/application-settings-new/ApplicationSettings.hpp>
+#include <module-apps/application-settings-new/widgets/OptionSetting.hpp>
 #include "BaseSettingsWindow.hpp"
 
 namespace gui
 {
-
     class DisplayLightWindow : public BaseSettingsWindow
     {
       public:
-        DisplayLightWindow(app::Application *app);
+        DisplayLightWindow(app::Application *app, app::settingsInterface::ScreenLightSettings *screenLightSettings);
 
       private:
-        void switchHandler(bool &onOffSwitch);
         auto buildOptionsList() -> std::list<Option> override;
+        void switchHandler(bool &onOffSwitch);
 
-        bool isDisplayLightSwitchOn = false;
-        bool isAutoLightSwitchOn    = false;
+        void addBrightnessOption(std::list<Option> &);
+        auto createBrightnessOption(int step) -> std::unique_ptr<SpinBoxOptionSettings>;
+
+        bool isDisplayLightSwitchOn                                      = false;
+        bool isAutoLightSwitchOn                                         = false;
+        std::uint8_t brightnessValue                                     = 0;
+        app::settingsInterface::ScreenLightSettings *screenLightSettings = nullptr;
     };
 } // namespace gui

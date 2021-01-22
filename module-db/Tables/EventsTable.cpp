@@ -643,8 +643,8 @@ EventsTableRow EventsTable::getByUID(const std::string &UID)
     };
 }
 
-std::vector<EventsTableRow> EventsTable::selectByDatePeriod(TimePoint date_filter,
-                                                            TimePoint filter_till,
+std::vector<EventsTableRow> EventsTable::selectByDatePeriod(calendar::TimePoint date_filter,
+                                                            calendar::TimePoint filter_till,
                                                             uint32_t offset,
                                                             uint32_t limit)
 {
@@ -770,7 +770,7 @@ uint32_t EventsTable::count()
     return (*queryRet)[0].getUInt32();
 }
 
-uint32_t EventsTable::countFromFilter(TimePoint from, TimePoint till)
+uint32_t EventsTable::countFromFilter(calendar::TimePoint from, calendar::TimePoint till)
 {
     auto queryRet = db->query(
         "SELECT COUNT(*) FROM events WHERE date_from >= date('%q') AND date_from < date('%q', 'start of day');",
@@ -791,7 +791,8 @@ uint32_t EventsTable::countByFieldId(const char *field, uint32_t id)
     return 0;
 }
 
-std::vector<EventsTableRow> EventsTable::SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till)
+std::vector<EventsTableRow> EventsTable::SelectFirstUpcoming(calendar::TimePoint filter_from,
+                                                             calendar::TimePoint filter_till)
 {
     auto retQuery = db->query("SELECT DATETIME(date_from, '-' || reminder || ' minutes') AS calc_dt, * "
                               "FROM events "

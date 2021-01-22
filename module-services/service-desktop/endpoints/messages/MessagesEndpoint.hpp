@@ -21,18 +21,16 @@ namespace sys
     class Service;
 } // namespace sys
 
-using namespace parserFSM;
-
-class MessagesEndpoint : public Endpoint
+class MessagesEndpoint : public parserFSM::Endpoint
 {
   private:
-    std::shared_ptr<MessageHelper> helper;
+    std::shared_ptr<parserFSM::MessageHelper> helper;
 
   public:
     MessagesEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
     {
         debugName = "MessagesEndpoint";
-        helper    = std::make_shared<MessageHelper>(ownerServicePtr);
+        helper    = std::make_shared<parserFSM::MessageHelper>(ownerServicePtr);
     }
-    auto handle(Context &context) -> void override;
+    auto handle(parserFSM::Context &context) -> void override;
 };

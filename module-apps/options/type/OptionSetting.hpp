@@ -10,7 +10,7 @@ namespace gui::option
 {
     class OptionSettings : public option::Base
     {
-      private:
+      protected:
         UTF8 text;
         std::function<bool(Item &)> activatedCallback    = nullptr;
         std::function<bool(Item &)> focusChangedCallback = nullptr;

@@ -3,119 +3,99 @@
 
 #include "ScreenLightControl.hpp"
 
-namespace sevm::screen_light_control
+#include <Service/Message.hpp>
+#include <Service/Service.hpp>
+#include <Service/Timer.hpp>
+#include <agents/settings/SystemSettings.hpp>
+
+namespace screen_light_control
 {
     namespace
     {
-        constexpr inline auto CONTROL_TIMER_MS = 25;
-        constexpr inline auto READOUT_TIMER_MS = 500;
-        std::unique_ptr<sys::Timer> controlTimer;
-        std::unique_ptr<sys::Timer> readoutTimer;
-
-        bool automaticMode = false;
-        bool lightOn       = false;
-
-        void enableTimers()
+        auto from_string(const std::string &str, bool def) -> bool
         {
-            controlTimer->connect([&](sys::Timer &) { controlTimerCallback(); });
-            readoutTimer->connect([&](sys::Timer &) { readoutTimerCallback(); });
-            controlTimer->start();
-            readoutTimer->start();
-        }
-
-        void disableTimers()
-        {
-            controlTimer->stop();
-            readoutTimer->stop();
-        }
-
-        void setAutomaticModeParameters(const Parameters &params)
-        {
-            if (lightOn && automaticMode) {
-                disableTimers();
+            try {
+                return std::stoi(str) == 0;
             }
-
-            functions::setRampStep(100.0f *
-                                   (static_cast<float>(CONTROL_TIMER_MS) / static_cast<float>(params.rampTimeMS)));
-            functions::setHysteresis(params.brightnessHysteresis);
-            functions::setFunctionFromPoints(params.functionPoints);
-
-            if (lightOn && automaticMode) {
-                enableTimers();
+            catch (std::exception &) {
+                return def;
             }
         }
 
-        void turnOff()
+        auto from_string(const std::string &str, float def) -> float
         {
-            bsp::eink_frontlight::turnOff();
-            bsp::light_sensor::standby();
-            controlTimer->stop();
-            readoutTimer->stop();
-            lightOn = false;
-        }
-
-        void turnOn()
-        {
-            bsp::eink_frontlight::turnOn();
-            bsp::light_sensor::wakeup();
-            if (automaticMode) {
-                enableTimers();
+            try {
+                return std::stof(str);
             }
-            lightOn = true;
-        }
-
-        void enableAutomaticMode()
-        {
-            if (lightOn) {
-                enableTimers();
+            catch (std::exception &) {
+                return def;
             }
-            automaticMode = true;
         }
-
-        void disableAutomaticMode()
-        {
-            disableTimers();
-            automaticMode = false;
-        }
-
     } // namespace
 
-    void init(sys::Service *parent)
+    ScreenLightControl::ScreenLightControl(sys::Service *parent)
+        : settings(std::make_unique<settings::Settings>(parent))
     {
         controlTimer = std::make_unique<sys::Timer>("LightControlTimer", parent, CONTROL_TIMER_MS);
         readoutTimer = std::make_unique<sys::Timer>("LightSensorReadoutTimer", parent, READOUT_TIMER_MS);
 
-        Parameters defaultParams;
-        setAutomaticModeParameters(defaultParams);
+        initFromSettings();
     }
 
-    void deinit()
+    ScreenLightControl::~ScreenLightControl()
     {
         disableTimers();
-        controlTimer.reset();
-        readoutTimer.reset();
     }
 
-    void processRequest(Action action, const Parameters &params)
+    void ScreenLightControl::initFromSettings()
+    {
+        settings->registerValueChange(settings::Brightness::brightnessLevel,
+                                      [&](const std::string &value) { setBrightnessLevel(from_string(value, 0.0f)); });
+
+        settings->registerValueChange(settings::Brightness::autoMode, [&](const std::string &value) {
+            if (from_string(value, false)) {
+                enableAutomaticMode();
+            }
+            else {
+                disableAutomaticMode();
+            }
+        });
+
+        settings->registerValueChange(settings::Brightness::autoMode, [&](const std::string &value) {
+            if (from_string(value, false)) {
+                turnOn();
+            }
+            else {
+                turnOff();
+            }
+        });
+    }
+
+    void ScreenLightControl::processRequest(Action action, const Parameters &params)
     {
         switch (action) {
         case Action::turnOff:
             turnOff();
+            setScreenLightSettings(settings::Brightness::state, lightOn);
             break;
         case Action::turnOn:
             turnOn();
+            setScreenLightSettings(settings::Brightness::state, lightOn);
             break;
         case Action::enableAutomaticMode:
             enableAutomaticMode();
+            setScreenLightSettings(settings::Brightness::autoMode, automaticMode);
             break;
         case Action::disableAutomaticMode:
             disableAutomaticMode();
+            setScreenLightSettings(settings::Brightness::autoMode, automaticMode);
             break;
         case Action::setManualModeBrightness:
-            bsp::eink_frontlight::setBrightness(params.manualModeBrightness);
+            setBrightnessLevel(params.manualModeBrightness);
+            setScreenLightSettings(settings::Brightness::brightnessLevel, params.manualModeBrightness);
             break;
         case Action::setGammaCorrectionFactor:
-            bsp::eink_frontlight::setGammaFactor(params.gammaFactor);
+            setGammaFactor(params.gammaFactor);
             break;
         case Action::setAutomaticModeParameters:
             setAutomaticModeParameters(params);
@@ -123,14 +103,102 @@ namespace sevm::screen_light_control
         }
     }
 
-    void controlTimerCallback()
+    void ScreenLightControl::controlTimerCallback()
     {
         bsp::eink_frontlight::setBrightness(functions::brightnessRampOut());
     }
 
-    void readoutTimerCallback()
+    void ScreenLightControl::readoutTimerCallback()
     {
         functions::calculateBrightness(bsp::light_sensor::readout());
     }
 
-} // namespace sevm::screen_light_control
+    auto ScreenLightControl::getAutoModeState() const noexcept -> ScreenLightMode
+    {
+        return automaticMode;
+    }
+
+    auto ScreenLightControl::getLightState() const noexcept -> bool
+    {
+        return lightOn;
+    }
+
+    auto ScreenLightControl::getBrightnessValue() const noexcept -> bsp::eink_frontlight::BrightnessPercentage
+    {
+        return brightnessValue;
+    }
+
+    void ScreenLightControl::enableTimers()
+    {
+        controlTimer->connect([&](sys::Timer &) { controlTimerCallback(); });
+        readoutTimer->connect([&](sys::Timer &) { readoutTimerCallback(); });
+        controlTimer->start();
+        readoutTimer->start();
+    }
+
+    void ScreenLightControl::disableTimers()
+    {
+        controlTimer->stop();
+        readoutTimer->stop();
+    }
+
+    void ScreenLightControl::setAutomaticModeParameters(const Parameters &params)
+    {
+        if (lightOn && automaticMode == ScreenLightMode::Automatic) {
+            disableTimers();
+        }
+
+        functions::setRampStep(100.0f * (static_cast<float>(CONTROL_TIMER_MS) / static_cast<float>(params.rampTimeMS)));
+        functions::setHysteresis(params.brightnessHysteresis);
+        functions::setFunctionFromPoints(params.functionPoints);
+
+        if (lightOn && automaticMode == ScreenLightMode::Automatic) {
+            enableTimers();
+        }
+    }
+
+    void ScreenLightControl::enableAutomaticMode()
+    {
+        if (lightOn) {
+            enableTimers();
+        }
+        automaticMode = ScreenLightMode::Automatic;
+    }
+
+    void ScreenLightControl::disableAutomaticMode()
+    {
+        disableTimers();
+        automaticMode = ScreenLightMode::Manual;
+    }
+
+    void ScreenLightControl::turnOn()
+    {
+        bsp::eink_frontlight::turnOn();
+        bsp::light_sensor::wakeup();
+        if (automaticMode) {
+            enableTimers();
+        }
+        lightOn = true;
+    }
+
+    void ScreenLightControl::setBrightnessLevel(bsp::eink_frontlight::BrightnessPercentage brightnessPercentage)
+    {
+        bsp::eink_frontlight::setBrightness(brightnessPercentage);
+        brightnessValue = brightnessPercentage;
+    }
+
+    void ScreenLightControl::setGammaFactor(float gammaFactor)
+    {
+        bsp::eink_frontlight::setGammaFactor(gammaFactor);
+        setScreenLightSettings(settings::Brightness::gammaFactor, gammaFactor);
+    }
+
+    void ScreenLightControl::turnOff()
+    {
+        bsp::eink_frontlight::turnOff();
+        bsp::light_sensor::standby();
+        controlTimer->stop();
+        readoutTimer->stop();
+        lightOn = false;
+    }
+} // namespace screen_light_control

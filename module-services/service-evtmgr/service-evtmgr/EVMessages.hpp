@@ -5,7 +5,6 @@
 
 #include "KbdMessage.hpp"
 #include "BatteryMessages.hpp"
-#include <screen-light-control/ScreenLightControl.hpp>
 
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
@@ -141,18 +140,6 @@ namespace sevm
         KeypadBacklightResponseMessage() : KeypadBacklightMessage()
         {}
         bool success;
-    };
-
-    class ScreenLightControlMessage : public Message
-    {
-      public:
-        ScreenLightControlMessage(screen_light_control::Action act,
-                                  screen_light_control::Parameters params = screen_light_control::Parameters())
-            : Message(MessageType::EVMScreenLightControlMessage), action(act), parameters(params)
-        {}
-
-        screen_light_control::Action action;
-        screen_light_control::Parameters parameters;
     };
 
 } /* namespace sevm*/

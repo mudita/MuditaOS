@@ -58,7 +58,7 @@ namespace gui
         auto mainWindow = dynamic_cast<CalendarMainWindow *>(parent);
         if (mainWindow->returnedFromWindow) {
             focusChangedCallback = [=](Item &item) {
-                YearMonthDay date = monthFilterValue.year() / monthFilterValue.month() / date::last;
+                calendar::YearMonthDay date = monthFilterValue.year() / monthFilterValue.month() / date::last;
                 if (unsigned(date.day()) < mainWindow->dayFocusedBefore) {
                     setFocusOnElement(unsigned(date.day()) - 1);
                 }

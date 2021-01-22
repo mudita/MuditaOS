@@ -6,21 +6,19 @@
 #include "RequestHandler.hpp"
 #include "service-cellular/ServiceCellular.hpp"
 
-using namespace cellular;
-
-class CellularRequestHandler : public RequestHandler
+class CellularRequestHandler : public cellular::RequestHandler
 {
   public:
     CellularRequestHandler(ServiceCellular &serviceCellular) : cellular(serviceCellular)
     {}
 
-    void handle(ImeiRequest &request, at::Result &result) final;
-    void handle(UssdRequest &request, at::Result &result) final;
-    void handle(CallRequest &request, at::Result &result) final;
-    void handle(PasswordRegistrationRequest &request, at::Result &result) final;
-    void handle(SupplementaryServicesRequest &request, at::Result &result) final;
-    void handle(PinChangeRequest &request, at::Result &result) final;
-    void handle(ClirRequest &request, at::Result &result) final;
+    void handle(cellular::ImeiRequest &request, at::Result &result) final;
+    void handle(cellular::UssdRequest &request, at::Result &result) final;
+    void handle(cellular::CallRequest &request, at::Result &result) final;
+    void handle(cellular::PasswordRegistrationRequest &request, at::Result &result) final;
+    void handle(cellular::SupplementaryServicesRequest &request, at::Result &result) final;
+    void handle(cellular::PinChangeRequest &request, at::Result &result) final;
+    void handle(cellular::ClirRequest &request, at::Result &result) final;
 
   private:
     ServiceCellular &cellular;

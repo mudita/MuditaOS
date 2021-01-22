@@ -186,7 +186,7 @@ static int add_to_lfs(lfs_t *lfs, const char *dir, struct lfs_info_summary *summ
         tgt_dir[0] = '/';
         strcpy(tgt_dir + 1, sep_ptr + 1);
     }
-    int err;
+    int err = 0;
     if (is_dir) {
         err = create_dir_in_lfs(lfs, tgt_dir, verbose);
         if (err) {
@@ -240,7 +240,7 @@ static void configure_lfs_params(struct lfs_config *lfsc, const struct littlefs_
 int main(int argc, char **argv)
 {
 
-    int err;
+    int err = 0;
     struct littlefs_opts lopts;
     struct lfs_config cfg;
     struct lfs_info_summary prog_summary;

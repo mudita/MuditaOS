@@ -2,31 +2,31 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
-#include "Common.hpp"                                    // for RefreshModes
-#include "GuiTimer.hpp"                                  // for GuiTimer
-#include "Item.hpp"                                      // for Item
-#include "MessageType.hpp"                               // for MessageType
-#include "Service/Timer.hpp"                             // for Timer
-#include "Timer.hpp"                                     // for Timer
-#include "Translator.hpp"                                // for KeyInputSim...
-#include "common_data/EventStore.hpp"                    // for Battery
-#include "common_data/RawKey.hpp"                        // for RawKey, key...
-#include "gui/input/InputEvent.hpp"                      // for InputEvent
-#include "log/debug.hpp"                                 // for DEBUG_APPLI...
-#include "log/log.hpp"                                   // for LOG_INFO
-#include "messages/AppMessage.hpp"                       // for AppSwitchMe...
-#include "service-appmgr/Controller.hpp"                 // for Controller
+#include "Common.hpp"                    // for RefreshModes
+#include "GuiTimer.hpp"                  // for GuiTimer
+#include "Item.hpp"                      // for Item
+#include "MessageType.hpp"               // for MessageType
+#include "Service/Timer.hpp"             // for Timer
+#include "Timer.hpp"                     // for Timer
+#include "Translator.hpp"                // for KeyInputSim...
+#include "common_data/EventStore.hpp"    // for Battery
+#include "common_data/RawKey.hpp"        // for RawKey, key...
+#include "gui/input/InputEvent.hpp"      // for InputEvent
+#include "log/debug.hpp"                 // for DEBUG_APPLI...
+#include "log/log.hpp"                   // for LOG_INFO
+#include "messages/AppMessage.hpp"       // for AppSwitchMe...
+#include "service-appmgr/Controller.hpp" // for Controller
 #include <service-cellular/CellularMessage.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include "service-gui/messages/DrawMessage.hpp"          // for DrawMessage
-#include "task.h"                                        // for xTaskGetTic...
-#include "windows/AppWindow.hpp"                         // for AppWindow
-#include <Text.hpp>                                      // for Text
-#include <algorithm>                                     // for find
-#include <iterator>                                      // for distance, next
-#include <type_traits>                                   // for add_const<>...
+#include "service-gui/messages/DrawMessage.hpp" // for DrawMessage
+#include "task.h"                               // for xTaskGetTic...
+#include "windows/AppWindow.hpp"                // for AppWindow
+#include <Text.hpp>                             // for Text
+#include <algorithm>                            // for find
+#include <iterator>                             // for distance, next
+#include <type_traits>                          // for add_const<>...
 #include <WindowsFactory.hpp>
 #include <service-gui/Common.hpp>
 #include <module-utils/Utils.hpp>
@@ -70,10 +70,12 @@ namespace app
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
         : Service(std::move(name), std::move(parent), stackDepth, priority),
-          default_window(gui::name::window::main_window), windowsStack(this), startInBackground{startInBackground},
-          callbackStorage{std::make_unique<CallbackStorage>()}, settings(std::make_unique<settings::Settings>(this))
+          default_window(gui::name::window::main_window), windowsStack(this),
+          keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
+          callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
+          settings(std::make_unique<settings::Settings>(this))
     {
-        keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
+        topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
         busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 
         longPressTimer = std::make_unique<sys::Timer>("LongPress", this, key_timer_ms);
@@ -82,13 +84,16 @@ namespace app
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
 
-        settings->registerValueChange(settings::SystemProperties::timeFormat12,
-                                      [this](std::string value) { timeFormatChanged(value); });
+        settings->registerValueChange(
+            settings::SystemProperties::timeFormat12,
+            [this](std::string value) { timeFormatChanged(value); },
+            settings::SettingsScope::Global);
     }
 
     Application::~Application() noexcept
     {
         windowsStack.windows.clear();
+        settings->unregisterValueChange();
     }
 
     Application::State Application::getState()
@@ -103,7 +108,6 @@ namespace app
 #endif
         state = st;
     }
-
 
     void Application::longPressTimerCallback()
     {
@@ -497,7 +501,8 @@ namespace app
 
         settings->registerValueChange(
             settings::SystemProperties::lockScreenPasscodeIsOn,
-            [this](const std::string &value) { setLockScreenPasscodeOn(utils::getNumericValue<bool>(value)); });
+            [this](const std::string &value) { setLockScreenPasscodeOn(utils::getNumericValue<bool>(value)); },
+            settings::SettingsScope::Global);
         return sys::ReturnCodes::Success;
     }
 
@@ -692,6 +697,11 @@ namespace app
     {
         timer->sysapi.connect(item);
         item->attachTimer(std::move(timer));
+    }
+
+    const gui::top_bar::Configuration &Application::getTopBarConfiguration() const noexcept
+    {
+        return topBarManager->getConfiguration();
     }
 
     void Application::addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback)

@@ -4,27 +4,28 @@
 #pragma once
 
 #include "BaseSettingsWindow.hpp"
+#include "application-settings-new/widgets/QuoteWidget.hpp"
+#include "application-settings-new/models/QuotesModel.hpp"
 
+#include <purefs/filesystem_paths.hpp>
+#include <module-gui/gui/widgets/ListView.hpp>
+#include <module-apps/InternalModel.hpp>
+#include <utility>
 
 namespace gui
 {
-    class CheckBoxWithLabel;
-
-    class QuotesMainWindow : public BaseSettingsWindow
+    class QuotesMainWindow : public AppWindow
     {
       public:
-        QuotesMainWindow(app::Application *app);
-
-        auto onInput(const InputEvent &inputEvent) -> bool override;
-
-      protected:
-        auto buildOptionsList() -> std::list<Option> override;
+        QuotesMainWindow(app::Application *app, std::shared_ptr<app::QuotesModel> model);
 
       private:
-        void readQuotes(fs::path fn);
-        void switchHandler(bool &optionSwitch);
-        [[nodiscard]] static std::string readFileToString(const fs::path &fn);
+        void buildInterface() override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-        std::list<std::pair<std::string, bool>> quotes;
+        std::shared_ptr<app::QuotesModel> quotesModel = nullptr;
+        gui::ListView *list                           = nullptr;
     };
+
 } // namespace gui
