@@ -67,7 +67,20 @@ class GridLayoutTesting : public ::testing::Test
             Box->addWidget(item);
         }
     }
-
+    void addItem(gui::BoxLayout *Box,
+                 uint32_t item_w,
+                 uint32_t item_h,
+                 uint32_t id,
+                 bool active                 = true,
+                 const gui::Margins &margins = gui::Margins())
+    {
+        auto item     = new TestItem(nullptr, 0, 0, item_w, item_h);
+        item->ID      = id;
+        item->visible = true;
+        item->setMargins(margins);
+        item->activeItem = active;
+        Box->addWidget(item);
+    }
     gui::GridLayout *gridLayout = nullptr;
 
     ///> GridLayout test constants
@@ -120,6 +133,139 @@ TEST_F(GridLayoutTesting, Navigate_Test)
     ASSERT_EQ(1 + expColSize, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
         << "element with ID " << 1 + expColSize << " should have focus";
 }
+
+TEST_F(GridLayoutTesting, Navigate_Test_ActiveItems_1)
+{
+    ///> Test for grid layout with 48 elements (A - active item, N - non active item, NV - non visible item)
+    ///> | 1   A | 2  NA | 3   A | 4  NA | 5   A | 6  NA | 7  A  | 8  NA | 9   A | 10 NA | 11 A  | 12 NA |
+    ///> | 13 NA | 14  A | 15 NA | 16  A | 17 NA | 18  A | 19 NA | 20  A | 21 NA | 22  A | 23 NA | 24  A |
+    ///> | 25  A | 26 NA | 27  A | 28 NA | 29  A | 30 NA | 31 A  | 32 NA | 33  A | 34 NA | 35 A  | 36 NA |
+    ///> | 37 NA | 38  A | 39 NA | 40  A | 41 NA | 42  A | 43 NA | 44  A | 45 NA | 46  A | 47 NA | 48  A |
+    ///> | 49 NV | 50 NV | 51 NV | 52 NV |
+    for (uint32_t i = 1; i <= 12; i++) {
+        addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, (i % 2) ? true : false);
+    }
+    for (uint32_t i = 13; i <= 24; i++) {
+        addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, ((i + 1) % 2) ? true : false);
+    }
+    for (uint32_t i = 25; i <= 36; i++) {
+        addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, (i % 2) ? true : false);
+    }
+    for (uint32_t i = 37; i <= 48; i++) {
+        addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, ((i + 1) % 2) ? true : false);
+    }
+    ///> Add some items to exceed grid layout area
+    for (uint32_t i = 49; i <= 52; i++) {
+        addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, true);
+    }
+    gridLayout->setFocus(true);
+    ASSERT_EQ(gridLayout->rowSize, 4) << "row size is not " << 4 << " as expected";
+    ASSERT_EQ(gridLayout->colSize, 12) << "col size is not " << 12 << " as expected";
+    ASSERT_EQ(52, gridLayout->children.size()) << "GridLayout should contain " << 52 << " elements";
+
+    ASSERT_EQ(1, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 1 << " should have focus";
+    moveNTimes(gridLayout, 2, gui::KeyCode::KEY_RIGHT);
+    ASSERT_EQ(5, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 5 << " should have focus";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_DOWN);
+    ASSERT_EQ(5 + (2 * expColSize), dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 5 + (2 * expColSize) << " should have focus";
+    moveNTimes(gridLayout, 2, gui::KeyCode::KEY_LEFT);
+    ASSERT_EQ(1 + (2 * expColSize), dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 1 + (2 * expColSize) << " should have focus";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_DOWN);
+    ASSERT_EQ(1, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 1 << " should have focus";
+}
+
+TEST_F(GridLayoutTesting, Navigate_Test_ActiveItems_2_BorderCallback)
+{
+    ///> Test for grid layout with 48 elements
+    ///> | 1   A | 2  NA | 3   A | 4  NA | 5   A | 6  NA | 7  A  | 8  NA | 9   A | 10 NA | 11 A  | 12 NA |
+    ///> | 13 NA | 14  A | 15 NA | 16  A | 17 NA | 18  A | 19 NA | 20  A | 21 NA | 22  A | 23 NA | 24  A |
+    ///> | 25  A | 26 NA | 27  A | 28 NA | 29  A | 30 NA | 31 A  | 32 NA | 33  A | 34 NA | 35 A  | 36 NA |
+    ///> | 37 NA | 38  A | 39 NA |
+    for (uint32_t i = 1; i <= 12; i++) {
+        addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, (i % 2) ? true : false);
+    }
+    for (uint32_t i = 13; i <= 24; i++) {
+        addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, ((i + 1) % 2) ? true : false);
+    }
+    for (uint32_t i = 25; i <= 36; i++) {
+        addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, (i % 2) ? true : false);
+    }
+    for (uint32_t i = 37; i <= 39; i++) {
+        addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, ((i + 1) % 2) ? true : false);
+    }
+
+    gridLayout->setFocus(true);
+    ASSERT_EQ(gridLayout->rowSize, 4) << "row size is not " << 4 << " as expected";
+    ASSERT_EQ(gridLayout->colSize, 12) << "col size is not " << 12 << " as expected";
+    ASSERT_EQ(39, gridLayout->children.size()) << "GridLayout should contain " << 39 << " elements";
+
+    ASSERT_EQ(1, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 1 << " should have focus";
+    moveNTimes(gridLayout, 2, gui::KeyCode::KEY_LEFT);
+    ASSERT_EQ(9, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 9 << " should have focus";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_UP);
+    ASSERT_EQ(33, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 33 << " should have focus";
+    moveNTimes(gridLayout, 3, gui::KeyCode::KEY_LEFT);
+    ASSERT_EQ(27, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 27 << " should have focus";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_DOWN);
+    ASSERT_EQ(3, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 3 << " should have focus";
+    moveNTimes(gridLayout, 5, gui::KeyCode::KEY_RIGHT);
+    ASSERT_EQ(1, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 1 << " should have focus";
+
+    ///> Test for grid layout with 1 element
+    ///> | 1NA |
+    gridLayout->erase();
+    addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, 1, false);
+    ASSERT_EQ(gridLayout->children.size(), 1) << "elements size is not " << 1 << " as expected";
+    ASSERT_EQ(gridLayout->rowSize, 1) << "row size is not " << 1 << " as expected";
+    ASSERT_EQ(gridLayout->colSize, 1) << "col size is not " << 1 << " as expected";
+    gridLayout->setFocus(false);
+    gridLayout->setFocus(true);
+    ASSERT_EQ(nullptr, gridLayout->getFocusItem()) << "no element shall be focused";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_LEFT);
+    ASSERT_EQ(nullptr, gridLayout->getFocusItem()) << "no element shall be focused";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_RIGHT);
+    ASSERT_EQ(nullptr, gridLayout->getFocusItem()) << "no element shall be focused";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_UP);
+    ASSERT_EQ(nullptr, gridLayout->getFocusItem()) << "no element shall be focused";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_DOWN);
+    ASSERT_EQ(nullptr, gridLayout->getFocusItem()) << "no element shall be focused";
+    ///> Test for grid layout with 1 element
+    ///> | 1NA | 1A |
+    gridLayout->erase();
+    addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, 1, false);
+    addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, 2, true);
+    ASSERT_EQ(gridLayout->children.size(), 2) << "elements size is not " << 2 << " as expected";
+    ASSERT_EQ(gridLayout->rowSize, 1) << "row size is not " << 1 << " as expected";
+    ASSERT_EQ(gridLayout->colSize, 2) << "col size is not " << 2 << " as expected";
+    gridLayout->setFocus(false);
+    gridLayout->setFocus(true);
+    ASSERT_EQ(2, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 2 << " should have focus";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_LEFT);
+    ASSERT_EQ(2, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 2 << " should have focus";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_RIGHT);
+    ASSERT_EQ(2, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 2 << " should have focus";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_UP);
+    ASSERT_EQ(2, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 2 << " should have focus";
+    moveNTimes(gridLayout, 1, gui::KeyCode::KEY_DOWN);
+    ASSERT_EQ(2, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
+        << "element with ID " << 2 << " should have focus";
+}
+
 ///> TODO: Enable this test when issue with setFocus will be resolved
 TEST_F(GridLayoutTesting, DISABLED_Border_Callback_Test)
 {
@@ -149,7 +295,7 @@ TEST_F(GridLayoutTesting, DISABLED_Border_Callback_Test)
         << "element with ID " << 37 << " should have focus";
     moveNTimes(gridLayout, 1, gui::KeyCode::KEY_LEFT);
     ASSERT_EQ(46, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
-        << "element with ID " << 37 << " should have focus";
+        << "element with ID " << 46 << " should have focus";
     moveNTimes(gridLayout, 1, gui::KeyCode::KEY_DOWN);
     ASSERT_EQ(10, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
         << "element with ID " << 10 << " should have focus";
@@ -170,6 +316,7 @@ TEST_F(GridLayoutTesting, DISABLED_Border_Callback_Test)
     ASSERT_EQ(gridLayout->children.size(), 1) << "elements size is not " << 1 << " as expected";
     ASSERT_EQ(gridLayout->rowSize, 1) << "row size is not " << 1 << " as expected";
     ASSERT_EQ(gridLayout->colSize, 1) << "col size is not " << 1 << " as expected";
+
     gridLayout->setFocus(true);
 
     ASSERT_EQ(1, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
@@ -194,6 +341,7 @@ TEST_F(GridLayoutTesting, DISABLED_Border_Callback_Test)
     ASSERT_EQ(gridLayout->children.size(), 2) << "elements size is not " << 2 << " as expected";
     ASSERT_EQ(gridLayout->rowSize, 1) << "row size is not " << 1 << " as expected";
     ASSERT_EQ(gridLayout->colSize, 2) << "col size is not " << 2 << " as expected";
+
     gridLayout->setFocus(true);
 
     ASSERT_EQ(1, dynamic_cast<TestItem *>(gridLayout->getFocusItem())->ID)
