@@ -62,3 +62,13 @@ auto MMIResultParams::getCustomData() const noexcept -> std::shared_ptr<MMICusto
 {
     return customResult;
 }
+
+void MMICallBarringResult::addMessages(const std::pair<MMIResultMessage, MMIResultMessage> &message) noexcept
+{
+    data.push_back(message);
+}
+
+auto MMICallBarringResult::getMessages(void) noexcept -> std::vector<std::pair<MMIResultMessage, MMIResultMessage>>
+{
+    return data;
+}
