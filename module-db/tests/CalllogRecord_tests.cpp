@@ -18,9 +18,10 @@
 
 TEST_CASE("Calllog Record tests")
 {
+    vfs.Init();
     Database::initialize();
 
-    const auto callogPath   = purefs::dir::getUserDiskPath() / "callog.db";
+    const auto callogPath   = purefs::dir::getUserDiskPath() / "calllog.db";
     const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
     std::filesystem::remove(callogPath);
     std::filesystem::remove(contactsPath);

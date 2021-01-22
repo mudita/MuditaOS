@@ -13,6 +13,7 @@
 
 #include "Database/Database.hpp"
 #include "Databases/NotesDB.hpp"
+#include <vfs.hpp>
 
 TEST_CASE("Notes Record tests")
 {

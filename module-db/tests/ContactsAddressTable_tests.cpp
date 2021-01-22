@@ -10,6 +10,7 @@
 
 TEST_CASE("Contacts address Table tests")
 {
+    vfs.Init();
     Database::initialize();
 
     const auto callogPath = purefs::dir::getUserDiskPath() / "contacts.db";

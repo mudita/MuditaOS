@@ -6,6 +6,7 @@
 
 #include "Database/Database.hpp"
 #include "Databases/ContactsDB.hpp"
+#include <vfs.hpp>
 
 #include <algorithm>
 
@@ -14,8 +15,10 @@
 #include <cstring>
 #include <purefs/filesystem_paths.hpp>
 
+class vfs vfs;
 TEST_CASE("Contacts Name Table tests")
 {
+    vfs.Init();
     Database::initialize();
 
     const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
