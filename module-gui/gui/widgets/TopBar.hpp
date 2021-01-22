@@ -89,6 +89,8 @@ namespace gui::top_bar
 
         /// show bars in number - 0 bars, 1 bar, 2 bars...
         void batteryShowBars(uint32_t val);
+        void showBattery(bool shown);
+        void showSim(bool enabled);
 
         static uint32_t calculateBatteryBars(uint32_t percentage);
 
@@ -115,7 +117,6 @@ namespace gui::top_bar
          */
         bool updateBattery(uint32_t percent);
         bool updateBattery(bool plugged);
-        void showBattery(bool shown);
 
         /**
          * @brief updates signal strength. This will cause appropriate image to be displayed.
