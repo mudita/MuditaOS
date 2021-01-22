@@ -203,15 +203,17 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
         sys::Bus::SendMulticast(msg.value(), sys::BusChannels::ServiceCellularNotifications, this);
     };
+
+    packetData = std::make_unique<packet_data::PacketData>(*this); /// call in apnListChanged handler
+
     registerMessageHandlers();
-    packetData = std::make_unique<packet_data::PacketData>(*this);
-    packetData->loadAPNSettings();
 }
 
 ServiceCellular::~ServiceCellular()
 {
     LOG_INFO("[ServiceCellular] Cleaning resources");
     settings->unregisterValueChange(settings::Cellular::volte_on, ::settings::SettingsScope::Global);
+    settings->unregisterValueChange(settings::Cellular::apn_list, ::settings::SettingsScope::Global);
 }
 
 // this static function will be replaced by Settings API
@@ -237,6 +239,11 @@ sys::ReturnCodes ServiceCellular::InitHandler()
         settings::Cellular::volte_on,
         [this](const std::string &value) { volteChanged(value); },
         ::settings::SettingsScope::Global);
+    settings->registerValueChange(
+        settings::Cellular::apn_list,
+        [this](const std::string &value) { apnListChanged(value); },
+        ::settings::SettingsScope::Global);
+
     return sys::ReturnCodes::Success;
 }
 
@@ -307,6 +314,16 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularGetAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularGetAPNMessage *>(request);
         return handleCellularGetAPNMessage(msg);
+    });
+
+    connect(typeid(CellularSetAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularSetAPNMessage *>(request);
+        return handleCellularSetAPNMessage(msg);
+    });
+
+    connect(typeid(CellularNewAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularNewAPNMessage *>(request);
+        return handleCellularNewAPNMessage(msg);
     });
 
     connect(typeid(CellularSetDataTransferMessage), [&](sys::Message *request) -> sys::MessagePointer {
@@ -2195,17 +2212,28 @@ std::shared_ptr<CellularGetAPNResponse> ServiceCellular::handleCellularGetAPNMes
 }
 std::shared_ptr<CellularSetAPNResponse> ServiceCellular::handleCellularSetAPNMessage(CellularSetAPNMessage *msg)
 {
-
     auto apn = msg->getAPNConfig();
-
-    return std::make_shared<CellularSetAPNResponse>(packetData->setAPN(apn));
+    auto ret = packetData->setAPN(apn);
+    settings->setValue(settings::Cellular::apn_list, packetData->saveAPNSettings(), settings::SettingsScope::Global);
+    return std::make_shared<CellularSetAPNResponse>(ret);
 }
+
+std::shared_ptr<CellularNewAPNResponse> ServiceCellular::handleCellularNewAPNMessage(CellularNewAPNMessage *msg)
+{
+    auto apn           = msg->getAPNConfig();
+    std::uint8_t newId = 0;
+    auto ret           = packetData->newAPN(apn, newId);
+    settings->setValue(settings::Cellular::apn_list, packetData->saveAPNSettings(), settings::SettingsScope::Global);
+    return std::make_shared<CellularNewAPNResponse>(ret, newId);
+}
+
 std::shared_ptr<CellularSetDataTransferResponse> ServiceCellular::handleCellularSetDataTransferMessage(
     CellularSetDataTransferMessage *msg)
 {
     packetData->setDataTransfer(msg->getDataTransfer());
     return std::make_shared<CellularSetDataTransferResponse>(at::Result::Code::OK);
 }
+
 std::shared_ptr<CellularGetDataTransferResponse> ServiceCellular::handleCellularGetDataTransferMessage(
     CellularGetDataTransferMessage *msg)
 {
@@ -2218,6 +2246,7 @@ std::shared_ptr<CellularActivateContextResponse> ServiceCellular::handleCellular
     return std::make_shared<CellularActivateContextResponse>(packetData->activateContext(msg->getContextId()),
                                                              msg->getContextId());
 }
+
 std::shared_ptr<CellularDeactivateContextResponse> ServiceCellular::handleCellularDeactivateContextMessage(
     CellularDeactivateContextMessage *msg)
 {
@@ -2253,5 +2282,13 @@ void ServiceCellular::volteChanged(const std::string &value)
 {
     if (!value.empty()) {
         volteOn = utils::getNumericValue<bool>(value);
+    }
+}
+
+void ServiceCellular::apnListChanged(const std::string &value)
+{
+    LOG_ERROR("apnListChanged");
+    if (!value.empty()) {
+        packetData->loadAPNSettings(value);
     }
 }

@@ -287,6 +287,7 @@ class ServiceCellular : public sys::Service
         CellularGetCurrentOperatorMessage *msg);
     std::shared_ptr<CellularGetAPNResponse> handleCellularGetAPNMessage(CellularGetAPNMessage *msg);
     std::shared_ptr<CellularSetAPNResponse> handleCellularSetAPNMessage(CellularSetAPNMessage *msg);
+    std::shared_ptr<CellularNewAPNResponse> handleCellularNewAPNMessage(CellularNewAPNMessage *msg);
     std::shared_ptr<CellularSetOperatorResponse> handleCellularSetOperator(CellularSetOperatorMessage *msg);
     std::shared_ptr<CellularSetDataTransferResponse> handleCellularSetDataTransferMessage(
         CellularSetDataTransferMessage *msg);
@@ -306,5 +307,6 @@ class ServiceCellular : public sys::Service
     friend class packet_data::PacketData;
 
     void volteChanged(const std::string &value);
+    void apnListChanged(const std::string &value);
     bool volteOn = false;
 };

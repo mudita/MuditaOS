@@ -330,6 +330,19 @@ bool CellularServiceAPI::SetAPN(sys::Service *serv, packet_data::APN::Config apn
     return sys::Bus::SendUnicast(std::make_shared<CellularSetAPNMessage>(apn), ServiceCellular::serviceName, serv);
 }
 
+bool CellularServiceAPI::NewAPN(sys::Service *serv, packet_data::APN::Config apnConfig)
+{
+    auto apn = std::make_shared<packet_data::APN::Config>(std::move(apnConfig));
+    return sys::Bus::SendUnicast(std::make_shared<CellularNewAPNMessage>(apn), ServiceCellular::serviceName, serv);
+}
+
+bool CellularServiceAPI::DeleteAPN(sys::Service *serv, std::uint8_t contextId)
+{
+    auto emptyApn       = std::make_shared<packet_data::APN::Config>();
+    emptyApn->contextId = contextId;
+    return sys::Bus::SendUnicast(std::make_shared<CellularSetAPNMessage>(emptyApn), ServiceCellular::serviceName, serv);
+}
+
 bool CellularServiceAPI::SetDataTransfer(sys::Service *serv, packet_data::DataTransfer dt)
 {
     return sys::Bus::SendUnicast(
