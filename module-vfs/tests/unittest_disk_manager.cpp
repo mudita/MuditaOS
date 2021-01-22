@@ -1,5 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+#include <cstdio>
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
@@ -233,5 +234,29 @@ TEST_CASE("Disk sectors out of range for partition")
         {
             REQUIRE(dm.erase("emmc1", sectors - 1, 2) == -ERANGE);
         }
+    }
+}
+
+TEST_CASE("Test access to /tmp")
+{
+    // test write
+    std::string data = "lolcat";
+    {
+        std::fstream fs;
+        fs.open("/tmp/test.txt", std::ios_base::out);
+        REQUIRE(fs.is_open());
+        fs << data;
+        fs.close();
+        REQUIRE(!fs.is_open());
+    }
+
+    // test that it's actually written
+    {
+        std::fstream fs_r;
+        fs_r.open("/tmp/test.txt", std::ios_base::in);
+        REQUIRE(fs_r.is_open());
+        std::string data_check;
+        fs_r >> data_check;
+        REQUIRE(data == data_check);
     }
 }
