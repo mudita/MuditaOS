@@ -262,5 +262,5 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
 
 void WorkerEvent::checkBatteryLevelCritical()
 {
-    battery_level_check::checkBatteryLevelCritical();
+    battery_level_check::checkBatteryLevelCriticalWithConfirmation();
 }
