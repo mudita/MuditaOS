@@ -25,6 +25,11 @@ class CDCSerial:
         self.body = ""
         self.header_length = 10
         while timeout != 0:
+            import os.path
+            if not os.path.exists(port_name):
+                log.info(f"port {port_name} not found but requested")
+                time.sleep(1)
+                continue
             try:
                 self.serial = serial.Serial(port_name, baudrate=115200, timeout=10)
                 self.serial.flushInput()

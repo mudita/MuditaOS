@@ -6,3 +6,6 @@ import harness.interface
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
+# globals
+simulator_port = 'simulator'
+simulator_file = '/tmp/purephone_pts_name'

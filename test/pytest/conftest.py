@@ -15,8 +15,7 @@ from harness.harness import Harness
 from harness import utils
 from harness.interface.error import TestError, Error
 from harness.interface.CDCSerial import CDCSerial as serial
-
-simulator_port = 'simulator'
+from harness import simulator_file, simulator_port
 
 
 def pytest_addoption(parser):
@@ -79,14 +78,14 @@ def harness(request):
                 with utils.Timeout.limit(seconds=TIMEOUT):
                     while not file:
                         try:
-                            file = open("/tmp/purephone_pts_name", "r")
-                        except FileNotFoundError as err:
+                            file = open(simulator_file, "r")
+                        except FileNotFoundError:
                             log.info(
                                 f"waiting for a simulator port… ({TIMEOUT- int(time.time() - timeout_started)})")
                             time.sleep(RETRY_EVERY_SECONDS)
                 port_name = file.readline()
                 if port_name.isascii():
-                    log.debug("found {} entry!".format(port_name))
+                    log.debug(f"found port: {port_name} entry in config file: {simulator_file}!")
                 else:
                     pytest.exit("not a valid sim pts entry!")
 
