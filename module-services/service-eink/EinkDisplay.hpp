@@ -35,6 +35,7 @@ namespace service::eink
         bool setWaveform(EinkWaveforms_e mode, std::int32_t temperature);
         void setMode(EinkDisplayColorMode_e mode) noexcept;
 
+        std::int32_t getLastTemperature() const noexcept;
         ::gui::Size getSize() const noexcept;
 
       private:

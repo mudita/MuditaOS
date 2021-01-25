@@ -232,6 +232,11 @@ namespace service::eink
         displayMode = mode;
     }
 
+    std::int32_t EinkDisplay::getLastTemperature() const noexcept
+    {
+        return currentWaveform.temperature;
+    }
+
     ::gui::Size EinkDisplay::getSize() const noexcept
     {
         return size;
