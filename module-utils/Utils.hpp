@@ -253,7 +253,7 @@ namespace utils
     namespace filesystem
     {
         [[nodiscard]] long int filelength(std::FILE *file) noexcept;
-        void computeCRC32(std::FILE *file, unsigned long *outCrc32) noexcept;
+        [[nodiscard]] unsigned long computeFileCRC32(std::FILE *file) noexcept;
         [[nodiscard]] std::string generateRandomId(std::size_t length = 0) noexcept;
         [[nodiscard]] std::string getline(std::FILE *stream, uint32_t length = 1024) noexcept;
     } // namespace filesystem
