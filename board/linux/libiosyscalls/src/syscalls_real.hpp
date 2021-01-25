@@ -8,7 +8,8 @@
 #define __REAL_DLSYM(fun)                                                                                              \
     do {                                                                                                               \
         real::fun = reinterpret_cast<decltype(real::fun)>(dlsym(RTLD_NEXT, #fun));                                     \
-        fprintf(stderr, "Missing libc syscall: %s()\n", #fun);                                                         \
+        if (!real::fun)                                                                                                \
+            fprintf(stderr, "Missing libc syscall: %s()\n", #fun);                                                     \
     } while (0);
 
 #include <dlfcn.h> // for dlsym()
