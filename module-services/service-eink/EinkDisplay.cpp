@@ -143,10 +143,10 @@ namespace service::eink
         return true;
     }
 
-    bool EinkDisplay::setWaveform(EinkWaveforms_e mode, std::int32_t temperature)
+    EinkStatus_e EinkDisplay::setWaveform(EinkWaveforms_e mode, std::int32_t temperature)
     {
         if (!isNewWaveformNeeded(mode, temperature)) {
-            return true;
+            return EinkOK;
         }
 
         auto currentOffset =
@@ -160,13 +160,13 @@ namespace service::eink
 
         if (offset == currentOffset) {
             // current waveform is still the best fit
-            return true;
+            return EinkOK;
         }
 
         auto file = std::fopen(LutsFileName, "rb");
         if (file == nullptr) {
             LOG_FATAL("Could not find the LUTS.bin file. Returning");
-            return false;
+            return EinkWaveformsFileOpenFail;
         }
         auto fileHandlerCleanup = gsl::finally([&file]() { std::fclose(file); });
 
@@ -184,7 +184,7 @@ namespace service::eink
         std::fread(&currentWaveform.LUTCData[1], 1, LUTCSize, file);
 
         EinkUpdateWaveform(&currentWaveform);
-        return true;
+        return EinkOK;
     }
 
     unsigned int EinkDisplay::toWaveformTemperatureOffset(std::int32_t temperature) noexcept
@@ -194,7 +194,7 @@ namespace service::eink
         if (temperature >= LUTTemperatureSubcritical)
             return LUTTemperatureOffsetSubcritical;
         if (temperature < LUTTemperatureMinimal) {
-            temperature = 0;
+            temperature = LUTTemperatureMinimal;
         }
         return temperature / LUTTemperatureOffsetInterval;
     }
