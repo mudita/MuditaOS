@@ -219,20 +219,16 @@ namespace gui
     {
         Rect::buildDrawListImplementation(commands);
         if (font != nullptr) {
-            auto cmd    = std::make_unique<CommandText>();
+            auto cmd    = std::make_unique<DrawText>();
             cmd->str    = textDisplayed;
             cmd->fontID = font->id;
             cmd->color  = textColor;
 
-            cmd->x          = drawArea.x;
-            cmd->y          = drawArea.y;
-            cmd->w          = drawArea.w;
-            cmd->h          = drawArea.h;
-            cmd->tx         = textArea.x;
-            cmd->ty         = textArea.y;
-            cmd->tw         = textArea.w;
-            cmd->th         = textArea.h;
-            cmd->charsWidth = stringPixelWidth;
+            cmd->origin     = {drawArea.x, drawArea.y};
+            cmd->width      = drawArea.w;
+            cmd->height     = drawArea.h;
+            cmd->textOrigin = {textArea.x, textArea.y};
+            cmd->textHeight = textArea.h;
 
             cmd->areaX = widgetArea.x;
             cmd->areaY = widgetArea.y;

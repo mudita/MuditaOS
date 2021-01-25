@@ -10,218 +10,170 @@
 #include <gui/Common.hpp>
 
 #include "Color.hpp"
+#include "Context.hpp"
+#include <FontGlyph.hpp>
+
+// image
+#include "PixMap.hpp"
+#include "VecMap.hpp"
 
 namespace gui
 {
-
-    enum class DrawCommandID
-    {
-        GUI_DRAW_UNDEFINED = 0,
-        GUI_DRAW_CLEAR     = 1,
-        GUI_DRAW_LINE,
-        GUI_DRAW_TRIANGLE,
-        GUI_DRAW_RECT,
-        GUI_DRAW_TEXT,
-        GUI_DRAW_ARC,
-        GUI_DRAW_PIE,
-        GUI_DRAW_CIRCLE,
-        GUI_DRAW_IMAGE,
-        GUI_DRAW_COMMANDS, // blob of many
-        GUI_RENDER_QUICK,
-        GUI_RENDER_DEEP,
-        GUI_RENDER_REFRESH // sent to applications so they can repaint current window
-    };
-
+    /**
+     * @brief Draw command interface.
+     */
     class DrawCommand
     {
       public:
-        DrawCommandID id;
+        int16_t areaX{0};
+        int16_t areaY{0};
+        Length areaW{0};
+        Length areaH{0};
 
-        int16_t areaX;
-        int16_t areaY;
-        int16_t areaW;
-        int16_t areaH;
+        virtual ~DrawCommand() = default;
 
-        DrawCommand() : id{DrawCommandID::GUI_DRAW_UNDEFINED}, areaX{0}, areaY{0}, areaW{0}, areaH{0} {};
-        virtual ~DrawCommand(){};
+        virtual void draw(Context *ctx) const = 0;
     };
 
-    class CommandRender : public DrawCommand
+    class Clear : public DrawCommand
     {
-      public:
-        std::string applicationName;
-        CommandRender()
-        {
-            id = DrawCommandID::GUI_RENDER_DEEP;
-        };
-    };
-
-    class CommandLine : public DrawCommand
-    {
-      public:
-        int16_t x1;
-        int16_t y1;
-        int16_t x2;
-        int16_t y2;
-        Color color;
-        uint8_t penWidth;
-
-        CommandLine() : x1{0}, y1{0}, x2{0}, y2{0}, color(ColorFullBlack), penWidth{1}
-        {
-            id = DrawCommandID::GUI_DRAW_LINE;
-        }
+        void draw(Context *ctx) const override;
     };
 
     /**
-     * @brief Draw command for triangle.
+     * @brief Draw command for line.
      */
-    class CommandTriangle : DrawCommand
+    class DrawLine : public DrawCommand
     {
       public:
-        int16_t x1;
-        int16_t y1;
-        int16_t x2;
-        int16_t y2;
-        int16_t x3;
-        int16_t y3;
-        Color fillColor;
-        gui::Color borderColor;
-        uint8_t penWidth;
+        Point start{0, 0};
+        Point end{0, 0};
+        Color color{ColorFullBlack};
+        uint8_t penWidth{1};
 
-        CommandTriangle()
-            : x1{0}, y1{0}, x2{0}, y2{0}, x3{0}, y3{0}, fillColor(ColorFullBlack),
-              borderColor(ColorFullBlack), penWidth{1}
-        {
-            id = DrawCommandID::GUI_DRAW_TRIANGLE;
-        }
+      public:
+        void draw(Context *ctx) const override;
     };
 
     /**
      * @brief Draw command for rectangle.
      */
-    class CommandRectangle : public DrawCommand
+    class DrawRectangle : public DrawCommand
     {
       public:
-        int16_t x;
-        int16_t y;
-        uint16_t w;
-        uint16_t h;
-        uint16_t radius;
+        Point origin{0, 0};
+        Length width{0};
+        Length height{0};
+        Length radius{0};
+
         // flags that defines whether paint given border
-        RectangleEdge edges;
+        RectangleEdge edges{RectangleEdge::All};
         // flags that defines which edge should be flat. This will disable roundness on both sides of the edge.
-        RectangleFlatEdge flatEdges;
+        RectangleFlatEdge flatEdges{RectangleFlatEdge::None};
         // flags that defines whether paint given corner (only for rounded corners)
-        RectangleRoundedCorner corners;
+        RectangleRoundedCorner corners{RectangleRoundedCorner::All};
         // flags indicating yaps for speech bubbles, it takes precendece over other properties
-        RectangleYap yaps;
+        RectangleYap yaps{RectangleYap::None};
         // defines which of the edges and corners are painted
-        unsigned short yapSize = 0;
-        bool filled;
-        uint8_t penWidth;
-        Color fillColor;
-        Color borderColor;
-        CommandRectangle()
-            : x{0}, y{0}, w{0}, h{0}, radius{0}, edges{RectangleEdge::All}, flatEdges{RectangleFlatEdge::None},
-              corners{RectangleRoundedCorner::All}, yaps{RectangleYap::None}, yapSize{0}, filled{false}, penWidth{1},
-              fillColor(ColorFullBlack), borderColor(ColorFullBlack)
-        {
-            id = DrawCommandID::GUI_DRAW_RECT;
-        }
+        unsigned short yapSize{0};
+
+        bool filled{false};
+        uint8_t penWidth{1};
+        Color fillColor{ColorFullBlack};
+        Color borderColor{ColorFullBlack};
+
+      public:
+        void draw(Context *ctx) const override;
     };
 
-    class CommandArc : public DrawCommand
+    /**
+     * @brief Draw command for arc.
+     */
+    class DrawArc : public DrawCommand
     {
       public:
-        CommandArc(Point _center,
-                   Length _radius,
-                   trigonometry::Degrees _start,
-                   trigonometry::Degrees _sweep,
-                   uint8_t _width,
-                   Color _color)
-            : center{_center}, radius{_radius}, start{_start}, sweep{_sweep}, width{_width}, borderColor{_color}
-        {
-            id = DrawCommandID::GUI_DRAW_ARC;
-        }
-
-        const Point center;
-        const Length radius;
         const trigonometry::Degrees start;
         const trigonometry::Degrees sweep;
-        const uint8_t width;
+        const Length width;
         const Color borderColor;
+        const Point center;
+        const Length radius;
+
+        DrawArc(Point _center,
+                Length _radius,
+                trigonometry::Degrees _start,
+                trigonometry::Degrees _sweep,
+                Length _width,
+                Color _color)
+            : start{_start}, sweep{_sweep}, width{_width}, borderColor{_color}, center{_center}, radius{_radius}
+        {}
+
+        void draw(Context *ctx) const override;
     };
 
     /**
      * @brief Draw command for circle.
      */
-    class CommandCircle : public CommandArc
+    class DrawCircle : public DrawArc
     {
       public:
-        CommandCircle(Point _center,
-                      Length _radius,
-                      uint8_t _borderWidth,
-                      Color _borderColor,
-                      bool _filled     = false,
-                      Color _fillColor = {})
-            : CommandArc{_center, _radius, 0, trigonometry::FullAngle, _borderWidth, _borderColor}, filled{_filled},
-              fillColor{_fillColor}
-        {
-            id = DrawCommandID::GUI_DRAW_CIRCLE;
-        }
-
         const bool filled;
         const Color fillColor;
+
+        DrawCircle(Point _center,
+                   Length _radius,
+                   Length _borderWidth,
+                   Color _borderColor,
+                   bool _filled     = false,
+                   Color _fillColor = {})
+            : DrawArc{_center, _radius, 0, trigonometry::FullAngle, _borderWidth, _borderColor}, filled{_filled},
+              fillColor{_fillColor}
+        {}
+
+        void draw(Context *ctx) const override;
     };
 
     /**
      * @brief Draw command for text line.
      */
-    class CommandText : public DrawCommand
+    class DrawText : public DrawCommand
     {
       public:
-        // area where label wil lbe drawn
-        int16_t x;
-        int16_t y;
-        int16_t w;
-        int16_t h;
+        // area where label wil be drawn
+        Point origin{0, 0};
+        Length width{0};
+        Length height{0};
         // area occupied by text inside the label
-        int16_t tx;
-        int16_t ty;
-        int16_t tw;
-        int16_t th;
-        uint16_t charsWidth; // number of visible pixels calculated
-        UTF8 str;
-        uint8_t fontID;
+        Point textOrigin{0, 0};
+        Length textHeight{0};
 
-        Color color;
+        UTF8 str{};
+        uint8_t fontID{0};
+        Color color{ColorFullBlack};
 
-        CommandText()
-            : x{0}, y{0}, w{0}, h{0}, tx{0}, ty{0}, tw{0}, th{0}, charsWidth{0}, str{""}, fontID{0},
-              color(ColorFullBlack)
-        {
-            id = DrawCommandID::GUI_DRAW_TEXT;
-        }
+        void draw(Context *ctx) const override;
+
+      private:
+        void drawChar(Context *ctx, const Point glyphOrigin, FontGlyph *glyph) const;
     };
 
     /**
      * @brief Draw command for image.
      */
-    class CommandImage : public DrawCommand
+    class DrawImage : public DrawCommand
     {
       public:
-        int16_t x;
-        int16_t y;
-        uint16_t w;
-        uint16_t h;
+        Point origin{0, 0};
 
         // ID of the image
-        uint16_t imageID;
+        uint16_t imageID{0};
 
-        CommandImage() : x{0}, y{0}, w{0}, h{0}, imageID{0}
-        {
-            id = DrawCommandID::GUI_DRAW_IMAGE;
-        }
+        void draw(Context *ctx) const override;
+
+      private:
+        void drawPixMap(Context *ctx, PixMap *pixMap) const;
+        void drawVecMap(Context *ctx, VecMap *vecMap) const;
+        inline void checkImageSize(Context *ctx, ImageMap *image) const;
     };
 
 } /* namespace gui */

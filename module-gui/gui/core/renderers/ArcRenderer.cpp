@@ -8,7 +8,7 @@ namespace gui::renderer
 {
     constexpr Length RadiusPrecisionLimit = 5;
 
-    auto ArcRenderer::DrawableStyle::from(const CommandArc &command) -> DrawableStyle
+    auto ArcRenderer::DrawableStyle::from(const DrawArc &command) -> DrawableStyle
     {
         return DrawableStyle{command.width, command.borderColor};
     }

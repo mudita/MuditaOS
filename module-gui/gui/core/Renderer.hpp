@@ -32,20 +32,6 @@ namespace gui
          * 3
          *
          */
-      protected:
-        void drawLine(Context *ctx, CommandLine *cmd);
-
-        void drawRectangle(Context *ctx, CommandRectangle *cmd);
-
-        void drawArc(Context *ctx, CommandArc *cmd);
-
-        void drawCircle(Context *ctx, CommandCircle *cmd);
-
-        void drawText(Context *ctx, CommandText *cmd);
-
-        void drawChar(Context *context, const int16_t x, const int16_t y, FontGlyph *glyph, const Color color);
-
-        void drawImage(Context *ctx, CommandImage *cmd);
 
       public:
         virtual ~Renderer() = default;

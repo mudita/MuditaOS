@@ -77,7 +77,7 @@ namespace gui
 
     void Circle::buildDrawListImplementation(std::list<Command> &commands)
     {
-        auto circle = std::make_unique<CommandCircle>(
+        auto circle = std::make_unique<DrawCircle>(
             center, radius, focus ? focusPenWidth : penWidth, focus ? focusBorderColor : color, isFilled, fillColor);
         circle->areaX = widgetArea.x;
         circle->areaY = widgetArea.y;
