@@ -215,30 +215,23 @@ namespace app
     {
         LOG_INFO("add contact information: %s", number.c_str());
 
-        auto searchResults = DBServiceAPI::ContactSearch(this, UTF8{}, UTF8{}, number);
-        if (const auto resultsSize = searchResults->size(); resultsSize > 1) {
-            LOG_FATAL("Found more than one contact for number %s", number.c_str());
-            for (auto i : *searchResults) {
-                LOG_FATAL("ContactID = %" PRIu32, i.ID);
-            }
-        }
-        else if (resultsSize == 1) {
-            const auto &contactRecord = searchResults->front();
+        auto numberView    = utils::PhoneNumber(number).getView();
+        auto searchResults = DBServiceAPI::MatchContactByPhoneNumber(this, numberView);
+        if (searchResults != nullptr) {
             LOG_INFO("Found contact matching search num %s : contact ID %" PRIu32 " - %s %s",
                      number.c_str(),
-                     contactRecord.ID,
-                     contactRecord.primaryName.c_str(),
-                     contactRecord.alternativeName.c_str());
-            app::manager::Controller::sendAction(
-                this,
-                app::manager::actions::AddContact,
-                std::make_unique<PhonebookItemData>(std::make_shared<ContactRecord>(contactRecord)));
+                     searchResults->ID,
+                     searchResults->primaryName.c_str(),
+                     searchResults->alternativeName.c_str());
+            app::manager::Controller::sendAction(this,
+                                                 app::manager::actions::EditContact,
+                                                 std::make_unique<PhonebookItemData>(std::move(searchResults)));
         }
         else {
-            ContactRecord contactRecord;
-            contactRecord.numbers.emplace_back(ContactRecord::Number(utils::PhoneNumber(number).getView()));
+            auto contactRecord = std::make_shared<ContactRecord>();
+            contactRecord->numbers.emplace_back(std::move(numberView));
 
-            auto data = std::make_unique<PhonebookItemData>(std::make_shared<ContactRecord>(contactRecord));
+            auto data                        = std::make_unique<PhonebookItemData>(std::move(contactRecord));
             data->ignoreCurrentWindowOnStack = true;
             app::manager::Controller::sendAction(
                 this, manager::actions::AddContact, std::move(data), manager::OnSwitchBehaviour::RunInBackground);
