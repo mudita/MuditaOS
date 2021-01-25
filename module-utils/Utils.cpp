@@ -9,7 +9,7 @@ namespace utils::filesystem
 {
     namespace
     {
-        inline constexpr auto crc_buf = 1024;
+        inline constexpr auto crc_buf_len = 1024;
     } // namespace
 
     long int filelength(std::FILE *file) noexcept
@@ -24,23 +24,21 @@ namespace utils::filesystem
         return endPosition;
     }
 
-    void computeCRC32(std::FILE *file, unsigned long *outCrc32) noexcept
+    unsigned long computeFileCRC32(::FILE *file) noexcept
     {
-        if (outCrc32 == nullptr)
-            return;
+        auto buf = std::make_unique<unsigned char[]>(crc_buf_len);
 
-        auto buf = std::make_unique<unsigned char[]>(crc_buf);
-        size_t bufLen;
-
-        *outCrc32 = 0;
-
+        unsigned long crc32 = 0;
         while (!std::feof(file)) {
-            bufLen = std::fread(buf.get(), 1, crc_buf, file);
-            if (bufLen <= 0)
-                break;
+            size_t dataLen = std::fread(buf.get(), 1, crc_buf_len, file);
+            if (dataLen == 0) {
+                return crc32;
+            }
 
-            *outCrc32 = Crc32_ComputeBuf(*outCrc32, buf.get(), bufLen);
+            crc32 = Crc32_ComputeBuf(crc32, buf.get(), dataLen);
         }
+
+        return crc32;
     }
 
     std::string generateRandomId(std::size_t length) noexcept

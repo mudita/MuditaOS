@@ -297,12 +297,11 @@ namespace purefs::fs::drivers
             stat.f_blocks  = cfg->block_count;
             stat.f_bfree   = stat.f_blocks - lerr;
             stat.f_bavail  = stat.f_bfree;
-            lerr           = 0;
             stat.f_bsize   = cfg->prog_size;
             stat.f_frsize  = cfg->block_size;
-            stat.f_blocks  = cfg->block_count;
             stat.f_namemax = PATH_MAX;
             stat.f_flag    = vmnt->flags();
+            lerr           = 0;
         }
         return lfs_to_errno(lerr);
     }
