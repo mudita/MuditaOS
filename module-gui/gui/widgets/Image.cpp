@@ -52,17 +52,14 @@ namespace gui
 
     void Image::buildDrawListImplementation(std::list<Command> &commands)
     {
-        auto img = std::make_unique<CommandImage>();
+        auto img = std::make_unique<DrawImage>();
         // image
-        img->x = drawArea.x;
-        img->y = drawArea.y;
-        img->w = drawArea.w;
-        img->h = drawArea.h;
+        img->origin = {drawArea.x, drawArea.y};
         // cmd part
-        img->areaX = img->x;
-        img->areaY = img->y;
-        img->areaW = img->w;
-        img->areaH = img->h;
+        img->areaX = img->origin.x;
+        img->areaY = img->origin.y;
+        img->areaW = drawArea.w;
+        img->areaH = drawArea.h;
 
         img->imageID = this->imageMap->getID();
 

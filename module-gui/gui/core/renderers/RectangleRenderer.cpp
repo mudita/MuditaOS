@@ -26,7 +26,7 @@ namespace gui::renderer
         }
     } // namespace
 
-    auto RectangleRenderer::DrawableStyle::from(const CommandRectangle &command) -> DrawableStyle
+    auto RectangleRenderer::DrawableStyle::from(const DrawRectangle &command) -> DrawableStyle
     {
         return DrawableStyle{command.penWidth,
                              command.radius,

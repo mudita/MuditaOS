@@ -4,7 +4,7 @@
 #include "RawFont.hpp"
 #include "Common.hpp"        // for Status, Status::GUI_SUCCESS, Status::GU...
 #include "Context.hpp"       // for Context
-#include "DrawCommand.hpp"   // for CommandRectangle, DrawCommand (ptr only)
+#include "DrawCommand.hpp"   // for DrawRectangle, DrawCommand (ptr only)
 #include "FontKerning.hpp"   // for FontKerning
 #include "Renderer.hpp"      // for Renderer
 #include "TextConstants.hpp" // for newline
@@ -294,18 +294,17 @@ namespace gui
         unsupported->xadvance =
             unsupported->width + (2 * unsupported->xoffset); // use xoffset as margins on the left/right of the glyph
         // populate with a bitmap (glyph)
-        auto commandRect      = std::make_unique<CommandRectangle>();
-        commandRect->x        = 0;
-        commandRect->y        = 0;
-        commandRect->w        = unsupported->width;
-        commandRect->h        = unsupported->height;
+        auto commandRect      = std::make_unique<DrawRectangle>();
+        commandRect->origin   = {0, 0};
+        commandRect->width    = unsupported->width;
+        commandRect->height   = unsupported->height;
         commandRect->areaX    = 0;
         commandRect->areaY    = 0;
         commandRect->areaW    = unsupported->width;
         commandRect->areaH    = unsupported->height;
         commandRect->penWidth = unsupported->xoffset;
 
-        auto renderCtx                           = std::make_unique<Context>(unsupported->width, unsupported->height);
+        auto renderCtx = std::make_unique<Context>(unsupported->width, unsupported->height);
         std::list<std::unique_ptr<gui::DrawCommand>> commands;
         commands.emplace_back(std::move(commandRect));
         Renderer().render(renderCtx.get(), commands);

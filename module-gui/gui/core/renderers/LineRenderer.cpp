@@ -27,7 +27,7 @@ namespace gui::renderer
         }
     } // namespace
 
-    auto LineRenderer::DrawableStyle::from(const CommandLine &command) -> DrawableStyle
+    auto LineRenderer::DrawableStyle::from(const DrawLine &command) -> DrawableStyle
     {
         DrawableStyle details;
         details.penWidth = command.penWidth;

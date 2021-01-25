@@ -25,7 +25,7 @@ namespace gui::renderer
             Length penWidth{1};
             Color color{ColorFullBlack};
 
-            static auto from(const CommandArc &command) -> DrawableStyle;
+            static auto from(const DrawArc &command) -> DrawableStyle;
         };
 
         static void draw(Context *ctx,

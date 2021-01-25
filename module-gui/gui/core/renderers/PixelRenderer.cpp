@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PixelRenderer.hpp"
-
 #include "Context.hpp"
 
 #include <cstring>
