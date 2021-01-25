@@ -447,6 +447,11 @@ namespace at
                         return true;
                     }
 
+                    if (el.find(toRemove) == std::string::npos) {
+                        parsed.clear();
+                        return false;
+                    }
+
                     utils::findAndReplaceAll(el, toRemove, emptyString);
                     auto tokens = utils::split(el, ",");
 
@@ -459,6 +464,7 @@ namespace at
 
                         if (!utils::toNumeric(tokens[Tokens::Status], statusToken) ||
                             !utils::toNumeric(tokens[Tokens::Class], connectionClassToken)) {
+                            parsed.clear();
                             return false;
                         }
                         auto status          = static_cast<ForwardingStatus>(statusToken);
@@ -466,12 +472,17 @@ namespace at
 
                         if (magic_enum::enum_contains<ForwardingStatus>(status) &&
                             magic_enum::enum_contains<ConnectionClass>(connectionClass)) {
+                            if (tokens[Tokens::Number].find(quote) == std::string::npos) {
+                                parsed.clear();
+                                return false;
+                            }
                             auto number = tokens[Tokens::Number];
                             utils::findAndReplaceAll(number, quote, emptyString);
                             utils::trim(number);
                             parsed.push_back(ParsedCcfc(connectionClass, status, number));
                         }
                         else {
+                            parsed.clear();
                             return false;
                         }
                     }
