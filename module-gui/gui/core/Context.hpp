@@ -13,7 +13,7 @@
 
 #include <cstdint>
 #include <iostream>
-#include "Common.hpp"
+#include "module-gui/gui/Common.hpp"
 
 namespace gui
 {
@@ -79,6 +79,12 @@ namespace gui
         inline bool addressInData(const uint8_t *ptr) const
         {
             return (ptr >= data) && (ptr < data + w * h);
+        }
+
+        inline bool addressInData(const Point point) const noexcept
+        {
+            return (point.x >= 0 && static_cast<uint32_t>(point.x) <= w) &&
+                   (point.y >= 0 && static_cast<uint32_t>(point.y) <= h);
         }
 
         friend std::ostream &operator<<(std::ostream &out, const Context &c);
