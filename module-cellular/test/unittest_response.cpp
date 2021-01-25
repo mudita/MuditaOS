@@ -549,3 +549,140 @@ TEST_CASE("Response CCWA?")
         REQUIRE(ret.size() == 0);
     }
 }
+
+TEST_CASE("Response CCFC")
+{
+    SECTION("OK CCFC? - all disabled")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccfc::ParsedCcfc> ret;
+        resp.response.push_back("+CCFC: 0,255");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccfc::parse(resp.response, ret) == true);
+        REQUIRE(ret.size() == 1);
+        REQUIRE(ret[0].status == at::response::ccfc::ForwardingStatus::NotActive);
+        REQUIRE(ret[0].connectionClass == at::response::ccfc::ConnectionClass::None);
+    }
+
+    SECTION("OK CCFC? - voice enabled")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccfc::ParsedCcfc> ret;
+        resp.response.push_back("+CCFC: 1,1,\"+48111222333\",145,,,");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccfc::parse(resp.response, ret) == true);
+        REQUIRE(ret.size() == 1);
+        REQUIRE(ret[0].status == at::response::ccfc::ForwardingStatus::Active);
+        REQUIRE(ret[0].connectionClass == at::response::ccfc::ConnectionClass::Voice);
+        REQUIRE(ret[0].number == "+48111222333");
+    }
+
+    SECTION("OK CCFC? - voice, fax, sync, async enabled")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccfc::ParsedCcfc> ret;
+        resp.response.push_back("+CCFC: 1,1,\"+48111222333\",145,,,");
+        resp.response.push_back("+CCFC: 1,4,\"+48111222333\",145,,,");
+        resp.response.push_back("+CCFC: 1,16,\"+48111222333\",145,,,");
+        resp.response.push_back("+CCFC: 1,32,\"+48111222333\",145,,,");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccfc::parse(resp.response, ret) == true);
+        REQUIRE(ret.size() == 4);
+        REQUIRE(ret[0].status == at::response::ccfc::ForwardingStatus::Active);
+        REQUIRE(ret[0].connectionClass == at::response::ccfc::ConnectionClass::Voice);
+        REQUIRE(ret[0].number == "+48111222333");
+
+        REQUIRE(ret[1].status == at::response::ccfc::ForwardingStatus::Active);
+        REQUIRE(ret[1].connectionClass == at::response::ccfc::ConnectionClass::Fax);
+        REQUIRE(ret[1].number == "+48111222333");
+
+        REQUIRE(ret[2].status == at::response::ccfc::ForwardingStatus::Active);
+        REQUIRE(ret[2].connectionClass == at::response::ccfc::ConnectionClass::DataAsync);
+        REQUIRE(ret[2].number == "+48111222333");
+
+        REQUIRE(ret[3].status == at::response::ccfc::ForwardingStatus::Active);
+        REQUIRE(ret[3].connectionClass == at::response::ccfc::ConnectionClass::DataSync);
+        REQUIRE(ret[3].number == "+48111222333");
+    }
+
+    SECTION("WRONG CCFC? - invalid status")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccfc::ParsedCcfc> ret;
+        resp.response.push_back("+CCFC: 7,1,\"+48111222333\",145,,,");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccfc::parse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+
+    SECTION("WRONG CCFC? - invalid class")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccfc::ParsedCcfc> ret;
+        resp.response.push_back("+CCFC: 1,99,\"+48111222333\",145,,,");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccfc::parse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+
+    SECTION("WRONG CCFC? - to little tokens")
+    {
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccfc::ParsedCcfc> ret;
+        resp.response.push_back("+CCFC: 1,1,\"+48111222333\",145,,,");
+        resp.response.push_back("+CCFC: 1,\"+48111222333\",145,,,");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccfc::parse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+
+    SECTION("WRONG CCFC? - to many tokens")
+    {
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccfc::ParsedCcfc> ret;
+        resp.response.push_back("+CCFC: 1,1,\"+48111222333\",145,,,");
+        resp.response.push_back("+CCFC: 1,1,23,\"+48111222333\",145,,,");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccfc::parse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+
+    SECTION("WRONG CCFC? - invalid token")
+    {
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccfc::ParsedCcfc> ret;
+        resp.response.push_back("+CFCC: 1,1,\"+48111222333\",145,,,");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccfc::parse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+}
