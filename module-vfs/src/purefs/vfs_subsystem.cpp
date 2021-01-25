@@ -150,7 +150,9 @@ namespace purefs::subsystem
                 lfs_it = it;
             }
         }
+        bool vfat_ro = true;
         if (lfs_it == std::end(parts) && parts.size() == old_layout_part_count) {
+            vfat_ro = false;
             LOG_ERROR("!!!! Caution !!!! eMMC is formated with vFAT old layout scheme. Filesystem may be currupted on "
                       "power loss.");
             LOG_WARN("Please upgrade to new partition scheme based on the LittleFS filesystem.");
@@ -164,7 +166,8 @@ namespace purefs::subsystem
             LOG_FATAL("Unable to lock vfs core");
             return -EIO;
         }
-        auto err = vfs->mount(boot_it->name, purefs::dir::getRootDiskPath().string(), "vfat");
+        auto err = vfs->mount(
+            boot_it->name, purefs::dir::getRootDiskPath().string(), "vfat", vfat_ro ? fs::mount_flags::read_only : 0);
         if (err) {
             return err;
         }
