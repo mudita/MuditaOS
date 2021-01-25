@@ -14,9 +14,9 @@ namespace at
 
         std::optional<std::string> getResponseLineATCommand(const at::Result &resp, std::string_view head)
         {
-            if (resp.code == at::Result::Code::OK) {
-                if (resp.response.size()) {
-                    for (auto el : resp.response) {
+            if (resp.getStatusCode() == at::Result::StatusCode::OK) {
+                if (resp.getResponse().size()) {
+                    for (auto el : resp.getResponse()) {
                         if (el.compare(0, head.length(), head) == 0) {
                             auto body = utils::trim(el.substr(head.length()));
                             return body;
@@ -37,11 +37,11 @@ namespace at
         }
         std::optional<ResponseTokens> getTokensForATResults(const at::Result &resp, std::string_view head)
         {
-            if (resp.code != at::Result::Code::OK)
+            if (resp.getStatusCode() != at::Result::StatusCode::OK)
                 return std::nullopt;
 
             std::vector<std::vector<std::string>> parts;
-            for (auto el : resp.response) {
+            for (auto el : resp.getResponse()) {
                 if (el.compare(0, head.length(), head) == 0) {
                     auto body = el.substr(head.length());
                     parts.push_back(utils::split(body, ","));
@@ -263,14 +263,14 @@ namespace at
 
             return false;
         }
-        bool parseQNWINFO(std::string &response, std::string &result)
+        bool parseQNWINFO(const std::string &response, std::string &result)
         {
             std::string toErase("+QNWINFO: ");
-            auto pos = response.find(toErase);
+            result   = response;
+            auto pos = result.find(toErase);
             if (pos != std::string::npos) {
-                response.erase(pos, toErase.length());
-                response.erase(std::remove(response.begin(), response.end(), '\"'), response.end());
-                result = response;
+                result.erase(pos, toErase.length());
+                result.erase(std::remove(result.begin(), result.end(), '\"'), result.end());
                 return true;
             }
 

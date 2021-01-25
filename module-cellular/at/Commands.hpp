@@ -26,7 +26,7 @@ namespace at
         uint32_t timeout = default_timeout; /// timeout for this command
         struct
         {
-            Result::Code status = Result::Code::NONE; /// last response for that command
+            Result::StatusCode status = Result::StatusCode::NONE; /// last response for that command
             time_t requested    = 0;                  /// last time comand was requested
             time_t response     = 0;                  /// last time command was received
             auto request_time() -> time_t
@@ -151,10 +151,11 @@ namespace at
         COLP_GET,
         COLP_ENABLE,
         COLP_DISABLE,
-        CSSN,   /// Supplementary Services - Supplementary Service Notifications
-        QICSGP, /// Configure Parameters of a TCP/IP Context
-        QIACT,  /// Activate a PDP Context
-        QIDEACT /// Deactivate a PDP Context
+        CSSN,       /// Supplementary Services - Supplementary Service Notifications
+        QICSGP,     /// Configure Parameters of a TCP/IP Context
+        QIACT,      /// Activate a PDP Context
+        QIDEACT,    /// Deactivate a PDP Context
+        QECCNUM_GET // Configure Emergency Call Numbers
     };
 
     // below timeouts are defined in Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf
@@ -254,7 +255,8 @@ namespace at
             {AT::CSSN, {"AT+CSSN=\"", default_doc_timeout}},
             {AT::QICSGP, {"AT+QICSGP", default_timeout}},
             {AT::QIACT, {"AT+QIACT", 150000}},
-            {AT::QIDEACT, {"AT+QIDEACT", 40000}}};
+            {AT::QIDEACT, {"AT+QIDEACT", 40000}},
+            {AT::QECCNUM_GET, {"AT+QECCNUM?", default_doc_timeout}}};
 
         if (fact.count(at)) {
             return fact.at(at);

@@ -360,7 +360,7 @@ bool ServiceCellular::resetCellularModule(ResetType type)
 
     switch (type) {
     case ResetType::SoftReset:
-        if (auto response = channel->cmd(at::AT::CFUN_RESET); response.code == at::Result::Code::OK) {
+        if (auto response = channel->cmd(at::AT::CFUN_RESET); response->getStatusCode() == at::Result::StatusCode::OK) {
             return true;
         }
         LOG_ERROR("Cellular modem reset failed.");
@@ -757,7 +757,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             }
             auto respMsg      = std::make_shared<cellular::RawCommandResp>(true);
             auto ret          = channel->cmd(m->command.c_str(), m->timeout);
-            respMsg->response = ret.response;
+            respMsg->response = ret->getResponse();
             if (respMsg->response.size()) {
                 for (auto const &el : respMsg->response) {
                     LOG_DEBUG("> %s", el.c_str());
@@ -794,11 +794,11 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
     }
     case MessageType::CellularListCurrentCalls: {
         auto ret  = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::CLCC);
-        auto size = ret.response.size();
+        auto size = ret->getResponse().size();
         if (ret && size > 1) {
             bool retVal = true;
             // sometimes there is additional active data connection, sometimes not
-            auto callEntry = ret.response[size == 2 ? 0 : 1];
+            auto callEntry = ret->getResponse()[size == 2 ? 0 : 1];
 
             try {
                 ModemCall::ModemCall call(callEntry);
@@ -877,7 +877,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
 
         auto request = factory.create();
         auto result  = channel->cmd(request->command());
-        request->handle(handler, result);
+        request->handle(handler, *result.get());
 
         responseMsg = std::make_shared<CellularResponseMessage>(request->isHandled());
     } break;
@@ -976,8 +976,8 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         auto channel = cmux->get(TS0710::Channel::Commands);
         if (channel) {
             auto resp = channel->cmd(at::AT::QGMR);
-            if (resp.code == at::Result::Code::OK) {
-                response    = resp.response[0];
+            if (resp->getStatusCode() == at::Result::StatusCode::OK) {
+                response    = resp->getResponse()[0];
                 responseMsg = std::make_shared<CellularResponseMessage>(true, response);
             }
             else {
@@ -1014,8 +1014,8 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         auto channel = cmux->get(TS0710::Channel::Commands);
         if (channel) {
             auto modemResponse = channel->cmd(at::AT::CSQ);
-            if (modemResponse.code == at::Result::Code::OK) {
-                responseMsg = std::make_shared<CellularResponseMessage>(true, modemResponse.response[0]);
+            if (modemResponse->getStatusCode() == at::Result::StatusCode::OK) {
+                responseMsg = std::make_shared<CellularResponseMessage>(true, modemResponse->getResponse()[0]);
             }
             else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
@@ -1026,8 +1026,8 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         auto channel = cmux->get(TS0710::Channel::Commands);
         if (channel) {
             auto resp = channel->cmd(at::AT::CREG);
-            if (resp.code == at::Result::Code::OK) {
-                responseMsg = std::make_shared<CellularResponseMessage>(true, resp.response[0]);
+            if (resp->getStatusCode() == at::Result::StatusCode::OK) {
+                responseMsg = std::make_shared<CellularResponseMessage>(true, resp->getResponse()[0]);
             }
             else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
@@ -1038,8 +1038,8 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         auto channel = cmux->get(TS0710::Channel::Commands);
         if (channel) {
             auto resp = channel->cmd(at::AT::QNWINFO);
-            if (resp.code == at::Result::Code::OK) {
-                responseMsg = std::make_shared<CellularResponseMessage>(true, resp.response[0]);
+            if (resp->getStatusCode() == at::Result::StatusCode::OK) {
+                responseMsg = std::make_shared<CellularResponseMessage>(true, resp->getResponse()[0]);
             }
             else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
@@ -1462,10 +1462,10 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
     std::string messageRawBody;
     UTF8 receivedNumber;
     if (ret) {
-        for (std::size_t i = 0; i < ret.response.size(); i++) {
-            if (ret.response[i].find("QCMGR") != std::string::npos) {
+        for (std::size_t i = 0; i < ret->getResponse().size(); i++) {
+            if (ret->getResponse()[i].find("QCMGR") != std::string::npos) {
 
-                std::istringstream ss(ret.response[i]);
+                std::istringstream ss(ret->getResponse()[i]);
                 std::string token;
                 std::vector<std::string> tokens;
                 while (std::getline(ss, token, ',')) {
@@ -1497,7 +1497,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                 // if its single message process
                 if (tokens.size() == 5) {
 
-                    messageRawBody = ret.response[i + 1];
+                    messageRawBody = ret->getResponse()[i + 1];
                     messageParsed  = true;
                 }
                 // if its concatenated message wait for last message
@@ -1514,7 +1514,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                         return false;
                     }
                     if (current == last) {
-                        messageParts.push_back(ret.response[i + 1]);
+                        messageParts.push_back(ret->getResponse()[i + 1]);
 
                         for (std::size_t j = 0; j < messageParts.size(); j++) {
                             messageRawBody += messageParts[j];
@@ -1523,7 +1523,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
                         messageParsed = true;
                     }
                     else {
-                        messageParts.push_back(ret.response[i + 1]);
+                        messageParts.push_back(ret->getResponse()[i + 1]);
                     }
                 }
                 if (messageParsed) {
@@ -1552,12 +1552,12 @@ bool ServiceCellular::getOwnNumber(std::string &destination)
     auto ret = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::CNUM);
 
     if (ret) {
-        auto begin = ret.response[0].find(',');
-        auto end   = ret.response[0].rfind(',');
+        auto begin = ret->getResponse()[0].find(',');
+        auto end   = ret->getResponse()[0].rfind(',');
         if (begin != std::string::npos && end != std::string::npos) {
             std::string number;
             try {
-                number = ret.response[0].substr(begin, end - begin);
+                number = ret->getResponse()[0].substr(begin, end - begin);
             }
             catch (std::exception &e) {
                 LOG_ERROR("ServiceCellular::getOwnNumber exception: %s", e.what());
@@ -1580,11 +1580,11 @@ bool ServiceCellular::getIMSI(std::string &destination, bool fullNumber)
 
     if (ret) {
         if (fullNumber) {
-            destination = ret.response[0];
+            destination = ret->getResponse()[0];
         }
         else {
             try {
-                destination = ret.response[0].substr(0, 3);
+                destination = ret->getResponse()[0].substr(0, 3);
             }
             catch (std::exception &e) {
                 LOG_ERROR("ServiceCellular::getIMSI exception: %s", e.what());
@@ -1602,26 +1602,26 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
     auto channel = cmux->get(TS0710::Channel::Commands);
     if (channel) {
         auto resp = channel->cmd(at::AT::CSQ);
-        if (resp.code == at::Result::Code::OK) {
-            data.push_back(resp.response[0]);
+        if (resp->getStatusCode() == at::Result::StatusCode::OK) {
+            data.push_back(resp->getResponse()[0]);
         }
         else {
             data.push_back("");
         }
 
         resp = channel->cmd(at::AT::CREG);
-        if (resp.code == at::Result::Code::OK) {
+        if (resp->getStatusCode() == at::Result::StatusCode::OK) {
 
-            data.push_back(resp.response[0]);
+            data.push_back(resp->getResponse()[0]);
         }
         else {
             data.push_back("");
         }
 
         resp = channel->cmd(at::AT::QNWINFO);
-        if (resp.code == at::Result::Code::OK) {
+        if (resp->getStatusCode() == at::Result::StatusCode::OK) {
             std::string ret;
-            if (at::response::parseQNWINFO(resp.response[0], ret)) {
+            if (at::response::parseQNWINFO(resp->getResponse()[0], ret)) {
                 data.push_back(ret);
             }
             else {
@@ -1638,7 +1638,7 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
 std::vector<std::string> get_last_AT_error(DLC_channel *channel)
 {
     auto ret = channel->cmd(at::AT::CEER);
-    return std::move(ret.response);
+    return std::move(ret->getResponse());
 }
 
 void log_last_AT_error(DLC_channel *channel)
@@ -1655,7 +1655,7 @@ bool is_SIM_detection_enabled(DLC_channel *channel)
 {
     auto ret = channel->cmd(at::AT::SIM_DET);
     if (ret) {
-        if (ret.response[0].find("+QSIMDET: 1") != std::string::npos) {
+        if (ret->getResponse()[0].find("+QSIMDET: 1") != std::string::npos) {
             LOG_DEBUG("SIM detecition enabled!");
             return true;
         }
@@ -1681,13 +1681,13 @@ bool is_SIM_status_enabled(DLC_channel *channel)
 {
     auto ret = channel->cmd(at::AT::QSIMSTAT);
     if (ret) {
-        if (ret.response[0].find("+QSIMSTAT: 1") != std::string::npos) {
+        if (ret->getResponse()[0].find("+QSIMSTAT: 1") != std::string::npos) {
             LOG_DEBUG("SIM swap enabled!");
             return true;
         }
     }
     else {
-        LOG_FATAL("SIM swap status failure! %s", ret.response[0].c_str());
+        LOG_FATAL("SIM swap status failure! %s", ret->getResponse()[0].c_str());
         log_last_AT_error(channel);
     }
     return false;
@@ -1757,7 +1757,7 @@ bool ServiceCellular::handle_select_sim()
         LOG_FATAL("Cant check sim stat status");
     }
     else {
-        if (ret.response[0].find("+QSIMSTAT: 1,1") != std::string::npos) {
+        if (ret.getResponse()[0].find("+QSIMSTAT: 1,1") != std::string::npos) {
             // SIM IN - only sim1 mocup
             Store::GSM::get()->sim = Store::GSM::SIM::SIM1;
         }
@@ -1769,7 +1769,7 @@ bool ServiceCellular::handle_select_sim()
         bool ready = false;
         while (!ready) {
             auto response = channel->cmd("AT+CPIN?");
-            for (auto &line : response.response) {
+            for (auto &line : response.getResponse()) {
                 if (line.find("+CPIN: READY") == std::string::npos) {
                     ready = true;
                 }
@@ -1897,11 +1897,11 @@ bool ServiceCellular::handleListMessages(const at::AT &command, DLC_channel *cha
     }
     constexpr std::string_view cmd = "CMGL: ";
     if (auto ret = channel->cmd(command)) {
-        for (std::size_t i = 0; i < ret.response.size(); i++) {
-            if (auto pos = ret.response[i].find(cmd); pos != std::string::npos) {
+        for (std::size_t i = 0; i < ret->getResponse().size(); i++) {
+            if (auto pos = ret->getResponse()[i].find(cmd); pos != std::string::npos) {
                 auto startPos = pos + cmd.size();
-                auto endPos   = ret.response[i].find_first_of(",");
-                receiveSMS(ret.response[i].substr(startPos, endPos - startPos));
+                auto endPos   = ret->getResponse()[i].find_first_of(",");
+                receiveSMS(ret->getResponse()[i].substr(startPos, endPos - startPos));
             }
         }
         return true;
@@ -1939,7 +1939,7 @@ bool ServiceCellular::SetScanMode(std::string mode)
         auto command = at::factory(at::AT::SET_SCANMODE);
 
         auto resp = channel->cmd(command.cmd + mode + ",1", 300, 1);
-        if (resp.code == at::Result::Code::OK) {
+        if (resp->getStatusCode() == at::Result::StatusCode::OK) {
             return true;
         }
     }
@@ -1952,10 +1952,10 @@ std::string ServiceCellular::GetScanMode(void)
     if (channel) {
 
         auto resp = channel->cmd(at::AT::GET_SCANMODE);
-        if (resp.code == at::Result::Code::OK) {
-            auto beg = resp.response[0].find(",");
+        if (resp->getStatusCode() == at::Result::StatusCode::OK) {
+            auto beg = resp->getResponse()[0].find(",");
             if (beg != std::string::npos) {
-                auto response = resp.response[0].substr(beg + 1, 1);
+                auto response = resp->getResponse()[0].substr(beg + 1, 1);
                 return response;
             }
         }
@@ -1966,7 +1966,7 @@ std::string ServiceCellular::GetScanMode(void)
 bool ServiceCellular::transmitDtmfTone(uint32_t digit)
 {
     auto channel = cmux->get(TS0710::Channel::Commands);
-    at::Result resp;
+    std::shared_ptr<at::Result> resp;
     if (channel) {
         auto command           = at::factory(at::AT::QLDTMF);
         std::string dtmfString = "\"" + std::string(1, digit) + "\"";
@@ -1976,7 +1976,7 @@ bool ServiceCellular::transmitDtmfTone(uint32_t digit)
             resp    = channel->cmd(command.cmd + dtmfString);
         }
     }
-    return resp.code == at::Result::Code::OK;
+    return resp->getStatusCode() == at::Result::StatusCode::OK;
 }
 
 void ServiceCellular::handle_CellularGetChannelMessage()
@@ -2084,7 +2084,7 @@ bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType request
             channel->cmd(at::AT::SMS_GSM);
             std::string command = at::factory(at::AT::CUSD_SEND) + request + ",15";
             auto result         = channel->cmd(command, commandTimeout, commandExpectedTokens);
-            if (result.code == at::Result::Code::OK) {
+            if (result->getStatusCode() == at::Result::StatusCode::OK) {
                 ussdState = ussd::State::pullRequestSent;
                 setUSSDTimer();
             }
@@ -2093,7 +2093,7 @@ bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType request
 
             ussdState   = ussd::State::sesionAborted;
             auto result = channel->cmd(at::AT::CUSD_CLOSE_SESSION);
-            if (result.code == at::Result::Code::OK) {
+            if (result->getStatusCode() == at::Result::StatusCode::OK) {
                 CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::pushSesionRequest);
             }
             else {
@@ -2104,7 +2104,7 @@ bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType request
 
             ussdState   = ussd::State::pushSesion;
             auto result = channel->cmd(at::AT::CUSD_OPEN_SESSION);
-            if (result.code == at::Result::Code::OK) {}
+            if (result->getStatusCode() == at::Result::StatusCode::OK) {}
         }
         return true;
     }
@@ -2202,7 +2202,7 @@ std::shared_ptr<CellularSetDataTransferResponse> ServiceCellular::handleCellular
     CellularSetDataTransferMessage *msg)
 {
     packetData->setDataTransfer(msg->getDataTransfer());
-    return std::make_shared<CellularSetDataTransferResponse>(at::Result::Code::OK);
+    return std::make_shared<CellularSetDataTransferResponse>(at::Result::StatusCode::OK);
 }
 std::shared_ptr<CellularGetDataTransferResponse> ServiceCellular::handleCellularGetDataTransferMessage(
     CellularGetDataTransferMessage *msg)

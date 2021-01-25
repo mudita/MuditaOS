@@ -217,9 +217,9 @@ TS0710::ConfState TS0710::ConfProcedure()
     LOG_INFO("GSM modem info:");
     auto ret = parser->cmd(at::AT::SW_INFO);
     if (ret) {
-        for (uint32_t i = 0; i < ret.response.size() - 1; ++i) // skip final "OK"
+        for (uint32_t i = 0; i < ret->getResponse().size() - 1; ++i) // skip final "OK"
         {
-            LOG_INFO("%s", ret.response[i].c_str());
+            LOG_INFO("%s", ret->getResponse()[i].c_str());
         }
     }
 
@@ -271,7 +271,7 @@ TS0710::ConfState TS0710::AudioConfProcedure()
     if (!ret) {
         return ConfState ::Failure;
     }
-    else if (ret.response[0].compare("+QDAI: 1,0,0,5,0,1,1,1") == 0) {
+    else if (ret->getResponse()[0].compare("+QDAI: 1,0,0,5,0,1,1,1") == 0) {
         return ConfState ::Success;
     }
     else {
@@ -393,9 +393,9 @@ TS0710::ConfState TS0710::StartMultiplexer()
         auto res = c->cmd(at::AT::SW_INFO);
         res      = c->cmd(at::AT::CSQ);
         if (res) {
-            auto beg = res.response[0].find(" ");
-            auto end = res.response[0].find(",", 1);
-            auto input_val = res.response[0].substr(beg + 1, end - beg - 1);
+            auto beg       = res->getResponse()[0].find(" ");
+            auto end       = res->getResponse()[0].find(",", 1);
+            auto input_val = res->getResponse()[0].substr(beg + 1, end - beg - 1);
             auto strength  = 0;
             try {
                 strength = std::stoi(input_val);

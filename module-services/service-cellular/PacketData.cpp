@@ -113,10 +113,10 @@ namespace packet_data
     {
         if (channel) {
             auto resp = channel->cmd(at::factory(at::AT::QICSGP) + "=" + utils::to_string(static_cast<int>(contextId)));
-            if (resp.code == at::Result::Code::OK) {
+            if (resp->getStatusCode() == at::Result::StatusCode::OK) {
                 std::shared_ptr<APN::Config> ret = std::make_shared<APN::Config>();
                 ret->contextId                   = contextId;
-                if (at::response::parseQICSGP(resp, ret)) {
+                if (at::response::parseQICSGP(*resp.get(), ret)) {
                     return ret;
                 }
             }
@@ -124,16 +124,16 @@ namespace packet_data
         return nullptr;
     }
 
-    at::Result::Code PDPContext::setConfiguration(std::shared_ptr<APN::Config> apn, bool setEmpty)
+    at::Result::StatusCode PDPContext::setConfiguration(std::shared_ptr<APN::Config> apn, bool setEmpty)
     {
         if (channel) {
             auto resp = channel->cmd(at::query::prepareQICSGP(apn, setEmpty));
-            return resp.code;
+            return resp->getStatusCode();
         }
-        return at::Result::Code::ERROR;
+        return at::Result::StatusCode::ERROR;
     }
 
-    at::Result::Code PDPContext::activate(std::uint8_t contextId)
+    at::Result::StatusCode PDPContext::activate(std::uint8_t contextId)
     {
 
         if (channel) {
@@ -144,20 +144,20 @@ namespace packet_data
              * 1. Reboot the module if there is no response in 150s.
              * 2. If failed to deactivate the PDP context for 3 times continuously, then reboot the module.
              */
-            return resp.code;
+            return resp->getStatusCode();
         }
-        return at::Result::Code::ERROR;
+        return at::Result::StatusCode::ERROR;
     }
-    at::Result::Code PDPContext::deactivate(std::uint8_t contextId)
+    at::Result::StatusCode PDPContext::deactivate(std::uint8_t contextId)
     {
         if (channel) {
             /// this command could generate URC, deactivate
             auto resp =
                 channel->cmd(at::factory(at::AT::QIDEACT) + "=" + utils::to_string(static_cast<int>(contextId)));
 
-            return resp.code;
+            return resp->getStatusCode();
         }
-        return at::Result::Code::ERROR;
+        return at::Result::StatusCode::ERROR;
     }
 
     std::optional<const std::vector<std::shared_ptr<APN::Config>>> PDPContext::getActive()
@@ -165,9 +165,9 @@ namespace packet_data
         if (channel) {
             auto resp = channel->cmd(at::factory(at::AT::QIACT) + "?");
 
-            if (resp.code == at::Result::Code::OK) {
+            if (resp->getStatusCode() == at::Result::StatusCode::OK) {
                 std::vector<std::shared_ptr<APN::Config>> ret;
-                if (at::response::parseQIACT(resp, ret)) {
+                if (at::response::parseQIACT(*resp.get(), ret)) {
                     return ret;
                 }
             }
@@ -196,7 +196,7 @@ namespace packet_data
         /// Save in phone memory
     }
 
-    at::Result::Code PacketData::updateAPNSettings(std::uint8_t ctxId)
+    at::Result::StatusCode PacketData::updateAPNSettings(std::uint8_t ctxId)
     {
         LOG_DEBUG("updateAPNSettings %d", ctxId);
         PDPContext pdpCtx(cellularService);
@@ -238,7 +238,7 @@ namespace packet_data
                 }
             }
         }
-        return at::Result::Code::OK;
+        return at::Result::StatusCode::OK;
     }
     void PacketData::setupAPNSettings()
     {
@@ -282,7 +282,7 @@ namespace packet_data
         return std::nullopt;
     }
 
-    at::Result::Code PacketData::setAPN(std::shared_ptr<APN::Config> apn)
+    at::Result::StatusCode PacketData::setAPN(std::shared_ptr<APN::Config> apn)
     {
         contextMap[apn->contextId] = apn;
         return updateAPNSettings(apn->contextId);
@@ -304,12 +304,12 @@ namespace packet_data
         PDPContext pdpCtx(cellularService);
         return pdpCtx.getActive();
     }
-    at::Result::Code PacketData::activateContext(std::uint8_t contextId)
+    at::Result::StatusCode PacketData::activateContext(std::uint8_t contextId)
     {
         PDPContext pdpCtx(cellularService);
         return pdpCtx.activate(contextId);
     }
-    at::Result::Code PacketData::deactivateContext(std::uint8_t contextId)
+    at::Result::StatusCode PacketData::deactivateContext(std::uint8_t contextId)
     {
         PDPContext pdpCtx(cellularService);
         return pdpCtx.deactivate(contextId);

@@ -12,7 +12,7 @@ std::string NetworkSettings::getCurrentOperator() const
         at::Cmd buildCmd = at::factory(at::AT::COPS) + "?";
         auto resp        = channel->cmd(buildCmd);
         at::response::cops::CurrentOperatorInfo ret;
-        if ((resp.code == at::Result::Code::OK) && (at::response::parseCOPS(resp, ret))) {
+        if ((resp->getStatusCode() == at::Result::StatusCode::OK) && (at::response::parseCOPS(*resp.get(), ret))) {
             if (auto _operator = ret.getOperator(); _operator) {
                 return _operator->getNameByFormat(ret.getFormat());
             }
@@ -32,7 +32,7 @@ std::vector<std::string> NetworkSettings::scanOperators(bool fullInfoList)
 
         std::vector<at::response::cops::Operator> ret;
 
-        if ((resp.code == at::Result::Code::OK) && (at::response::parseCOPS(resp, ret))) {
+        if ((resp->getStatusCode() == at::Result::StatusCode::OK) && (at::response::parseCOPS(*resp.get(), ret))) {
             std::vector<at::response::cops::Operator> uniqueOperators;
 
             if (fullInfoList) {
@@ -81,7 +81,7 @@ bool NetworkSettings::setOperatorAutoSelect()
     at::Cmd buildCmd =
         at::factory(at::AT::COPS) + "=" + utils::to_string(static_cast<int>(at::response::cops::CopsMode::Automatic));
     auto resp = channel->cmd(buildCmd);
-    return (resp.code == at::Result::Code::OK);
+    return (resp->getStatusCode() == at::Result::StatusCode::OK);
 }
 bool NetworkSettings::setOperator(at::response::cops::CopsMode mode,
                                   at::response::cops::NameFormat format,
@@ -96,5 +96,5 @@ bool NetworkSettings::setOperator(at::response::cops::CopsMode mode,
                        utils::to_string(static_cast<int>(format)) + ",\"" + name + "\"";
 
     auto resp = channel->cmd(buildCmd);
-    return (resp.code == at::Result::Code::OK);
+    return (resp->getStatusCode() == at::Result::StatusCode::OK);
 }

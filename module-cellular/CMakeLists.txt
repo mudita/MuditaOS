@@ -36,6 +36,9 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcResponse.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcFactory.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Commands.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Result.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/ResultQeccnum.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/ResultParser.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
         )
 

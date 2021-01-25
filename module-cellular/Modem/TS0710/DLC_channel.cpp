@@ -153,7 +153,7 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd, size_t 
     while (1) {
 
         if (timeElapsed >= timeoutNeeded) {
-            result.code = at::Result::Code::TIMEOUT;
+            result.setStatusCode(at::Result::StatusCode::TIMEOUT);
             break;
         }
 

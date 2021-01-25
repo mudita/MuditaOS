@@ -172,7 +172,7 @@ namespace utils
         if (value.empty()) {
             return {};
         }
-        T ret;
+        T ret = 0;
         std::istringstream(value) >> ret;
         return ret;
     }

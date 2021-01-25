@@ -23,7 +23,7 @@ namespace cellular
 
     bool Request::checkModemResponse(const at::Result &result)
     {
-        return result.code == at::Result::Code::OK;
+        return result.getStatusCode() == at::Result::StatusCode::OK;
     }
 
     bool Request::isValid() const noexcept

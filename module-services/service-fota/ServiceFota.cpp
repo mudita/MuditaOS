@@ -130,7 +130,7 @@ namespace FotaService
                     });
                 currentApnContext = msg->apnConfig.contextId;
 
-                at::Result atResult;
+                std::shared_ptr<at::Result> atResult;
 
                 if (config == contextMap.end()) {
                     LOG_DEBUG("Configuring new APN: %s", msg->apnConfig.toString().c_str());
@@ -144,7 +144,7 @@ namespace FotaService
                         atResult = sendAndLogError(prepareQICSGPcmd(msg->apnConfig));
                     }
                     else {
-                        atResult.code = at::Result::Code::OK;
+                        atResult->setStatusCode(at::Result::StatusCode::OK);
                     }
                 }
 
@@ -283,7 +283,8 @@ namespace FotaService
             auto result         = dataChannel->cmd(prepareQFOTADLcmd(msg->url));
             if (!result) {
                 LOG_WARN("Starting fota error: %s",
-                         std::accumulate(result.response.begin(), result.response.end(), std::string("\n")).c_str());
+                         std::accumulate(result->getResponse().begin(), result->getResponse().end(), std::string("\n"))
+                             .c_str());
             }
         }
         return std::make_shared<FotaResponseMessage>(true);
@@ -313,7 +314,7 @@ namespace FotaService
             for (auto &[contextId, apn] : contextMap) {
                 if (auto data = sendAndLogError(prepareQICSGPquery(apn))) {
                     const std::string QICSGP_prefix("+QICSGP:");
-                    for (auto &line : data.response) {
+                    for (auto &line : data->getResponse()) {
                         if (line.find(QICSGP_prefix) != std::string::npos) {
                             std::istringstream raw_data(line.substr(QICSGP_prefix.size()));
                             std::vector<std::string> data;
@@ -349,7 +350,7 @@ namespace FotaService
         if (dataChannel) {
             auto availableContext = sendAndLogError("AT+QIACT?");
             if (availableContext) {
-                parseQIACT(availableContext);
+                parseQIACT(*availableContext.get());
             }
         }
     }
@@ -375,7 +376,7 @@ namespace FotaService
     void Service::parseQIACT(const at::Result &availableContext)
     {
         const std::string QIACT_prefix("+QIACT:");
-        for (auto &line : availableContext.response) {
+        for (auto &line : availableContext.getResponse()) {
             LOG_DEBUG("context: %s", line.c_str());
             if (line.find(QIACT_prefix) != std::string::npos) {
                 APN::Config apnConfig;
@@ -494,9 +495,9 @@ namespace FotaService
     bool Service::openURL(const std::string &url)
     {
         auto response = dataChannel->cmd(prepareQHTTPURL(url));
-        if (response.response[0] == "CONNECT") {
+        if (response->getResponse()[0] == "CONNECT") {
             response = dataChannel->cmd(url.c_str());
-            logIfError(response, url);
+            logIfError(*response.get(), url);
             if (!response) {
                 return false;
             }
@@ -507,17 +508,17 @@ namespace FotaService
         return true;
     }
 
-    at::Result Service::sendAndLogError(const std::string &msg) const
+    std::shared_ptr<at::Result> Service::sendAndLogError(const std::string &msg) const
     {
-        at::Result result = dataChannel->cmd(msg);
-        logIfError(result, msg);
+        auto result = dataChannel->cmd(msg);
+        logIfError(*result.get(), msg);
         return result;
     }
 
-    at::Result Service::sendAndLogError(const std::string &msg, uint32_t timeout) const
+    std::shared_ptr<at::Result> Service::sendAndLogError(const std::string &msg, uint32_t timeout) const
     {
-        at::Result result = dataChannel->cmd(msg, timeout);
-        logIfError(result, msg);
+        auto result = dataChannel->cmd(msg, timeout);
+        logIfError(*result.get(), msg);
         return result;
     }
     void Service::logIfError(const at::Result &result, const std::string &cmdString) const
@@ -526,7 +527,8 @@ namespace FotaService
             auto results = dataChannel->cmd(at::AT::QIGETERROR);
             LOG_WARN("error cmd:%s", cmdString.c_str());
             LOG_WARN("Error str:%s",
-                     std::accumulate(results.response.begin(), results.response.end(), std::string("\n")).c_str());
+                     std::accumulate(results->getResponse().begin(), results->getResponse().end(), std::string("\n"))
+                         .c_str());
         }
     }
 

@@ -32,7 +32,7 @@ void CellularRequestHandler::handle(ImeiRequest &request, at::Result &result)
         return;
     }
     request.setHandled(true);
-    auto msg = std::make_shared<CellularMMIPushMessage>(result.response[0]);
+    auto msg = std::make_shared<CellularMMIPushMessage>(result.getResponse()[0]);
     sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
 }
 
@@ -104,7 +104,7 @@ void CellularRequestHandler::handle(ClirRequest &request, at::Result &result)
             response->addMessage(IMMICustomResultParams::MMIResultMessage::ClirDisabled);
         }
         else if (procedureType == SupplementaryServicesRequest::ProcedureType::Interrogation) {
-            auto clirParsed = clir::parseClir(result.response[0]);
+            auto clirParsed = clir::parseClir(result.getResponse()[0]);
             if (clirParsed != std::nullopt) {
                 response->addMessage(clir::getStatus(clirParsed->serviceStatus));
                 response->addMessage(clir::getState(clirParsed->serviceState));

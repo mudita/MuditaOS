@@ -100,8 +100,8 @@ namespace FotaService
         std::string prepareQHTTPURL(const std::string &url);
         void setupSSLContext();
         bool openURL(const std::string &url);
-        at::Result sendAndLogError(const std::string &msg) const;
-        at::Result sendAndLogError(const std::string &msg, uint32_t timeout) const;
+        std::shared_ptr<at::Result> sendAndLogError(const std::string &msg) const;
+        std::shared_ptr<at::Result> sendAndLogError(const std::string &msg, uint32_t timeout) const;
         void logIfError(const at::Result &result, const std::string &cmdString) const;
         void parseResponse();
         void parseQIACT(const at::Result &result);

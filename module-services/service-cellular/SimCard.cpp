@@ -10,9 +10,9 @@
 
 SimCardResult SimCard::convertErrorFromATResult(const at::Result atres) const
 {
-    if (std::holds_alternative<at::EquipmentErrorCode>(atres.errorCode)) {
+    if (auto err = atres.getEquipmentErrorCode(); err) {
 
-        auto cerr = static_cast<int>(std::get<at::EquipmentErrorCode>(atres.errorCode));
+        auto cerr = static_cast<int>(err.value());
         if ((cerr > static_cast<int>(SimCardResult::AT_ERROR_Begin)) &&
             (cerr < static_cast<int>(SimCardResult::AT_ERROR_End))) {
             return static_cast<SimCardResult>(cerr);
@@ -27,7 +27,7 @@ std::optional<at::response::qpinc::AttemptsCounters> SimCard::getAttemptsCounter
     if (channel) {
         auto resp = channel->cmd(at::factory(at::AT::QPINC) + "\"SC\"");
         at::response::qpinc::AttemptsCounters ret;
-        if (at::response::parseQPINC(resp, ret)) {
+        if (at::response::parseQPINC(*resp.get(), ret)) {
             return ret;
         }
     }
@@ -42,11 +42,11 @@ SimCardResult SimCard::supplyPin(const std::string pin) const
             if (auto channel = cellularService.cmux->get(TS0710::Channel::Commands); channel) {
                 auto resp = channel->cmd(at::factory(at::AT::CPIN) + "\"" + pin + "\"");
 
-                if (resp.code == at::Result::Code::OK) {
+                if (resp->getStatusCode() == at::Result::StatusCode::OK) {
                     return SimCardResult::OK;
                 }
                 else {
-                    return convertErrorFromATResult(resp);
+                    return convertErrorFromATResult(*resp.get());
                 }
             }
         }
@@ -68,11 +68,11 @@ SimCardResult SimCard::supplyPuk(const std::string puk, const std::string pin) c
         if (pc.value().PukCounter != 0) {
             if (auto channel = cellularService.cmux->get(TS0710::Channel::Commands); channel) {
                 auto resp = channel->cmd(at::factory(at::AT::CPIN) + "\"" + puk + "\"" + ",\"" + pin + "\"");
-                if (resp.code == at::Result::Code::OK) {
+                if (resp->getStatusCode() == at::Result::StatusCode::OK) {
                     return SimCardResult::OK;
                 }
                 else {
-                    return convertErrorFromATResult(resp);
+                    return convertErrorFromATResult(*resp.get());
                 }
             }
         }
@@ -89,7 +89,7 @@ bool SimCard::isPinLocked() const
     if (auto channel = cellularService.cmux->get(TS0710::Channel::Commands); channel) {
         auto resp = channel->cmd(at::factory(at::AT::CLCK) + "\"SC\",2\r");
         int val   = 0;
-        if (at::response::parseCLCK(resp, val)) {
+        if (at::response::parseCLCK(*resp.get(), val)) {
             return val != 0;
         }
     }
@@ -104,11 +104,11 @@ SimCardResult SimCard::setPinLock(bool lock, const std::string &pin) const
             if (channel) {
                 auto resp =
                     channel->cmd(at::factory(at::AT::CLCK) + "\"SC\"," + (lock ? "1" : "0") + ",\"" + pin + "\"");
-                if (resp.code == at::Result::Code::OK) {
+                if (resp->getStatusCode() == at::Result::StatusCode::OK) {
                     return SimCardResult::OK;
                 }
                 else {
-                    return convertErrorFromATResult(resp);
+                    return convertErrorFromATResult(*resp.get());
                 }
             }
         }
@@ -127,11 +127,11 @@ SimCardResult SimCard::changePin(const std::string oldPin, const std::string new
             auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
             if (channel) {
                 auto resp = channel->cmd(at::factory(at::AT::CPWD) + "\"SC\", \"" + oldPin + "\",\"" + newPin + "\"");
-                if (resp.code == at::Result::Code::OK) {
+                if (resp->getStatusCode() == at::Result::StatusCode::OK) {
                     return SimCardResult::OK;
                 }
                 else {
-                    return convertErrorFromATResult(resp);
+                    return convertErrorFromATResult(*resp.get());
                 }
             }
         }
@@ -153,9 +153,9 @@ std::optional<at::SimState> SimCard::simStateWithMessage(std::string &message) c
 {
     if (auto channel = cellularService.cmux->get(TS0710::Channel::Commands); channel) {
         auto resp = channel->cmd(at::factory(at::AT::GET_CPIN));
-        if (resp.code == at::Result::Code::OK) {
-            if (resp.response.size()) {
-                for (auto el : resp.response) {
+        if (resp->getStatusCode() == at::Result::StatusCode::OK) {
+            if (resp->getResponse().size()) {
+                for (auto el : resp->getResponse()) {
                     auto urc  = at::urc::UrcFactory::Create(el);
                     auto cpin = std::unique_ptr<at::urc::Cpin>{static_cast<at::urc::Cpin *>(urc.release())};
                     if (cpin) {

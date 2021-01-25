@@ -6,22 +6,26 @@
 #include <catch2/catch.hpp>
 #include <response.hpp>
 #include <Result.hpp>
+#include <ResultQeccnum.hpp>
+#include <ResultParser.hpp>
+
+#include <algorithm>
 
 TEST_CASE("Response COPS")
 {
-
     SECTION("OK COPS")
     {
-        at::Result resp;
-        resp.code = at::Result::Code::OK;
         std::vector<at::response::cops::Operator> ret;
 
-        resp.response.push_back("+COPS: "
-                                "(2,\"PLAY\",\"PLAY\",\"26006\",2),(1,\"Play\",\"Play\",\"26006\",0),(1,\"Plus\","
-                                "\"PLUS\",\"26001\",2),(1,\"Plus\",\"PLUS\",\"26001\",0),(1,\"Orange "
-                                "PL\",\"Orange\",\"26003\",0),(1,\"T-Mobile.pl\",\"TM PL\",\"26002\",0),(1,\"Orange "
-                                "PL\",\"Orange\",\"26003\",2),(1,\"T-Mobile.pl\",\"TM PL\",\"26002\",2),,(0-4),(0-2)");
-        REQUIRE(resp.code == at::Result::Code::OK);
+        std::string rBody = "+COPS: "
+                            "(2,\"PLAY\",\"PLAY\",\"26006\",2),(1,\"Play\",\"Play\",\"26006\",0),(1,\"Plus\","
+                            "\"PLUS\",\"26001\",2),(1,\"Plus\",\"PLUS\",\"26001\",0),(1,\"Orange "
+                            "PL\",\"Orange\",\"26003\",0),(1,\"T-Mobile.pl\",\"TM PL\",\"26002\",0),(1,\"Orange "
+                            "PL\",\"Orange\",\"26003\",2),(1,\"T-Mobile.pl\",\"TM PL\",\"26002\",2),,(0-4),(0-2)";
+        at::Result resp({rBody});
+        resp.setStatusCode(at::Result::StatusCode::OK);
+
+        REQUIRE(resp.getStatusCode() == at::Result::StatusCode::OK);
         REQUIRE(at::response::parseCOPS(resp, ret) == true);
         REQUIRE(ret.size() == 8);
         REQUIRE(ret[0].shortName == "PLAY");
@@ -32,16 +36,18 @@ TEST_CASE("Response COPS")
 
     SECTION("COPS Without params")
     {
-        at::Result resp;
-        resp.code = at::Result::Code::OK;
         std::vector<at::response::cops::Operator> ret;
 
-        resp.response.push_back(
+        std::string rBody =
             "+COPS: "
             "(2,\"PLAY\",\"PLAY\",\"26006\",2),(1,\"Play\",\"Play\",\"26006\",0),(1,\"Plus\",\"PLUS\",\"26001\",2),(1,"
             "\"Plus\",\"PLUS\",\"26001\",0),(1,\"Orange PL\",\"Orange\",\"26003\",0),(1,\"T-Mobile.pl\",\"TM "
-            "PL\",\"26002\",0),(1,\"Orange PL\",\"Orange\",\"26003\",2),(1,\"T-Mobile.pl\",\"TM PL\",\"26002\",2)");
-        REQUIRE(resp.code == at::Result::Code::OK);
+            "PL\",\"26002\",0),(1,\"Orange PL\",\"Orange\",\"26003\",2),(1,\"T-Mobile.pl\",\"TM PL\",\"26002\",2)";
+
+        at::Result resp({rBody});
+        resp.setStatusCode(at::Result::StatusCode::OK);
+
+        REQUIRE(resp.getStatusCode() == at::Result::StatusCode::OK);
         REQUIRE(at::response::parseCOPS(resp, ret) == true);
         REQUIRE(ret.size() == 8);
         REQUIRE(ret[0].shortName == "PLAY");
@@ -52,12 +58,11 @@ TEST_CASE("Response COPS")
 
     SECTION("COPS without optional ACT")
     {
-        at::Result resp;
-        resp.code = at::Result::Code::OK;
+        at::Result resp({"+COPS: (2,\"PLAY\",\"PLAY\",\"26006\")"});
+        resp.setStatusCode(at::Result::StatusCode::OK);
         std::vector<at::response::cops::Operator> ret;
 
-        resp.response.push_back("+COPS: (2,\"PLAY\",\"PLAY\",\"26006\")");
-        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(resp.getStatusCode() == at::Result::StatusCode::OK);
         REQUIRE(at::response::parseCOPS(resp, ret) == true);
         REQUIRE(ret[0].shortName == "PLAY");
         REQUIRE(ret[0].numericName == "26006");
@@ -66,12 +71,11 @@ TEST_CASE("Response COPS")
 
     SECTION("COPS Name LONG SHORT")
     {
-        at::Result resp;
-        resp.code = at::Result::Code::OK;
+        at::Result resp({"+COPS: (2,\"LONG\",\"SHORT\",\"26006\")"});
+        resp.setStatusCode(at::Result::StatusCode::OK);
         std::vector<at::response::cops::Operator> ret;
 
-        resp.response.push_back("+COPS: (2,\"LONG\",\"SHORT\",\"26006\")");
-        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(resp.getStatusCode() == at::Result::StatusCode::OK);
         REQUIRE(at::response::parseCOPS(resp, ret) == true);
         REQUIRE(ret[0].shortName == "SHORT");
         REQUIRE(ret[0].longName == "LONG");
@@ -81,30 +85,26 @@ TEST_CASE("Response COPS")
 
     SECTION("COPS not enought op parameters")
     {
-        at::Result resp;
-        resp.code = at::Result::Code::OK;
+        at::Result resp({"+COPS: (2,\"PLAY\",\"PLAY\")"});
+        resp.setStatusCode(at::Result::StatusCode::OK);
         std::vector<at::response::cops::Operator> ret;
-        resp.response.push_back("+COPS: (2,\"PLAY\",\"PLAY\")");
         REQUIRE(at::response::parseCOPS(resp, ret) == false);
     }
 
     SECTION("COPS not wrong (")
     {
-        at::Result resp;
-        resp.code = at::Result::Code::OK;
+        at::Result resp({"+COPS: (2,\"PLAY\",\"PLAY\", 4)("});
+        resp.setStatusCode(at::Result::StatusCode::OK);
         std::vector<at::response::cops::Operator> ret;
-        resp.response.push_back("+COPS: (2,\"PLAY\",\"PLAY\", 4)(");
         REQUIRE(at::response::parseCOPS(resp, ret) == false);
     }
 
     SECTION("OK COPS? - return operator")
     {
-        at::Result resp;
-        resp.code = at::Result::Code::OK;
+        at::Result resp({"+COPS: 0,0,\"PLAY\",2", "OK"});
+        resp.setStatusCode(at::Result::StatusCode::OK);
         at::response::cops::CurrentOperatorInfo ret;
-        resp.response.push_back("+COPS: 0,0,\"PLAY\",2");
-        resp.response.push_back("OK");
-        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(resp.getStatusCode() == at::Result::StatusCode::OK);
         REQUIRE(at::response::parseCOPS(resp, ret) == true);
         REQUIRE(ret.getOperator());
         REQUIRE(ret.getMode() == at::response::cops::CopsMode::Automatic);
@@ -116,12 +116,10 @@ TEST_CASE("Response COPS")
 
     SECTION("OK COPS? - return operator no act")
     {
-        at::Result resp;
-        resp.code = at::Result::Code::OK;
+        at::Result resp({"+COPS: 0,0,\"PLAY\"", "OK"});
+        resp.setStatusCode(at::Result::StatusCode::OK);
         at::response::cops::CurrentOperatorInfo ret;
-        resp.response.push_back("+COPS: 0,0,\"PLAY\"");
-        resp.response.push_back("OK");
-        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(resp.getStatusCode() == at::Result::StatusCode::OK);
         REQUIRE(at::response::parseCOPS(resp, ret) == true);
         REQUIRE(ret.getOperator());
         REQUIRE(ret.getMode() == at::response::cops::CopsMode::Automatic);
@@ -132,23 +130,36 @@ TEST_CASE("Response COPS")
 
     SECTION("OK COPS? - no operator")
     {
-        at::Result resp;
-        resp.code = at::Result::Code::OK;
+        at::Result resp({"+COPS: 0", "OK"});
+        resp.setStatusCode(at::Result::StatusCode::OK);
         at::response::cops::CurrentOperatorInfo ret;
-        resp.response.push_back("+COPS: 0");
-        resp.response.push_back("OK");
-        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(resp.getStatusCode() == at::Result::StatusCode::OK);
         REQUIRE(at::response::parseCOPS(resp, ret) == true);
         REQUIRE(ret.getMode() == at::response::cops::CopsMode::Automatic);
     }
+
     SECTION("WRONG COPS? - to many")
     {
-        at::Result resp;
-        resp.code = at::Result::Code::OK;
+        at::Result resp({"+COPS: 0,0,\"PLAY\",2, 3", "OK"});
+        resp.setStatusCode(at::Result::StatusCode::OK);
         at::response::cops::CurrentOperatorInfo ret;
-        resp.response.push_back("+COPS: 0,0,\"PLAY\",2, 3");
-        resp.response.push_back("OK");
-        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(resp.getStatusCode() == at::Result::StatusCode::OK);
         REQUIRE(at::response::parseCOPS(resp, ret) == false);
+    }
+
+    SECTION("QECCNUM")
+    {
+        at::ResultParser parser;
+        parser.appendPartialResult({"+QECCNUM: 0,\"911\",\"112\",\"00\",\"08\",\"110\",\"999\",\"118\",\"119\""});
+        parser.appendPartialResult({"+QECCNUM: 1,\"911\",\"112\""});
+        parser.appendPartialResult({"OK"});
+
+        auto result = parser.parse();
+        REQUIRE(typeid(*result.get()).name() == typeid(at::ResultQueccnum).name());
+        auto qeccnum       = std::static_pointer_cast<at::ResultQueccnum>(result);
+        auto numbersSim    = qeccnum->getEccNumbers(at::ResultQueccnum::EccNumberType::WithSim);
+        auto numbersSimRef = {"911", "112", "00", "08", "110", "999", "118", "119"};
+        auto numbersNoSim  = qeccnum->getEccNumbers(at::ResultQueccnum::EccNumberType::WithoutSim);
+        REQUIRE(std::equal(numbersSim.begin(), numbersSim.end(), numbersSimRef.begin()));
     }
 }

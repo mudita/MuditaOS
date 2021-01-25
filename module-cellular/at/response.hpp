@@ -184,7 +184,7 @@ namespace at
         bool parseCSQ(std::string cellularResponse, uint32_t &result);
         bool parseCREG(std::string &response, uint32_t &result);
         bool parseCREG(std::string &response, std::string &result);
-        bool parseQNWINFO(std::string &response, std::string &result);
+        bool parseQNWINFO(const std::string &response, std::string &result);
         bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret);
         bool parseCLCK(const at::Result &resp, int &ret);
 

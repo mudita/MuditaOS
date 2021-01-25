@@ -40,13 +40,9 @@ namespace at
 
         /// waits till ok or timeout
         virtual auto cmd(const std::string cmd, uint32_t timeout = at::default_timeout, size_t rxCount = 0)
-            -> Result final;
-        virtual auto cmd(const at::AT at) -> Result final;
-        virtual auto cmd(at::Cmd &at) -> Result final;
-        /// check for OK, ERROR in string in last token
-        virtual Result::Code at_check(const std::vector<std::string> &arr);
-        /// check for +CME ERROR: errors if exists in last token
-        virtual bool at_check_cmx_error(const std::string &CMX, const std::vector<std::string> &arr, uint32_t &errcode);
+            -> std::shared_ptr<Result> final;
+        virtual auto cmd(const at::AT at) -> std::shared_ptr<Result> final;
+        virtual auto cmd(at::Cmd &at) -> std::shared_ptr<Result> final;
         /// log result
         virtual void cmd_log(std::string cmd, const Result &result, uint32_t timeout) final;
 

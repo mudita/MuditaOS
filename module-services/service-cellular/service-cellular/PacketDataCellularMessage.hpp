@@ -123,13 +123,13 @@ class CellularGetAPNResponse : public CellularMessage
 
 class CellularATResponse : public CellularMessage
 {
-    at::Result::Code result;
+    at::Result::StatusCode result;
 
   public:
-    CellularATResponse(at::Result::Code result) : CellularMessage(MessageType::CellularPacketData), result(result)
+    CellularATResponse(at::Result::StatusCode result) : CellularMessage(MessageType::CellularPacketData), result(result)
     {}
 
-    [[nodiscard]] at::Result::Code getResult() const noexcept
+    [[nodiscard]] at::Result::StatusCode getResult() const noexcept
     {
         return result;
     }
@@ -138,14 +138,14 @@ class CellularATResponse : public CellularMessage
 class CellularSetAPNResponse : public CellularATResponse
 {
   public:
-    CellularSetAPNResponse(at::Result::Code result) : CellularATResponse(result)
+    CellularSetAPNResponse(at::Result::StatusCode result) : CellularATResponse(result)
     {}
 };
 
 class CellularSetDataTransferResponse : public CellularATResponse
 {
   public:
-    CellularSetDataTransferResponse(at::Result::Code result) : CellularATResponse(result)
+    CellularSetDataTransferResponse(at::Result::StatusCode result) : CellularATResponse(result)
     {}
 };
 
@@ -191,7 +191,7 @@ class CellularActivateContextResponse : public CellularATResponse
     std::uint8_t contextId;
 
   public:
-    CellularActivateContextResponse(at::Result::Code result, std::uint8_t contextId)
+    CellularActivateContextResponse(at::Result::StatusCode result, std::uint8_t contextId)
         : CellularATResponse(result), contextId(contextId)
     {}
     [[nodiscard]] std::uint8_t getContextId() const noexcept
@@ -205,7 +205,7 @@ class CellularDeactivateContextResponse : public CellularATResponse
     bool isUrc;
 
   public:
-    CellularDeactivateContextResponse(at::Result::Code result, std::uint8_t contextId, bool isUrc = false)
+    CellularDeactivateContextResponse(at::Result::StatusCode result, std::uint8_t contextId, bool isUrc = false)
         : CellularATResponse(result), contextId(contextId), isUrc(isUrc)
     {}
 

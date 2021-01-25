@@ -38,10 +38,10 @@ namespace packet_data
 
       public:
         explicit PDPContext(ServiceCellular &cellularService);
-        at::Result::Code setConfiguration(std::shared_ptr<APN::Config> apn, bool setEmpty = false);
+        at::Result::StatusCode setConfiguration(std::shared_ptr<APN::Config> apn, bool setEmpty = false);
         std::shared_ptr<APN::Config> getConfiguration(std::uint8_t contextId);
-        at::Result::Code activate(std::uint8_t contextId);
-        at::Result::Code deactivate(std::uint8_t contextId);
+        at::Result::StatusCode activate(std::uint8_t contextId);
+        at::Result::StatusCode deactivate(std::uint8_t contextId);
         std::optional<const std::vector<std::shared_ptr<APN::Config>>> getActive();
     };
 
@@ -78,11 +78,11 @@ namespace packet_data
          */
         void setupAPNSettings();
 
-        at::Result::Code updateAPNSettings(std::uint8_t ctxId);
+        at::Result::StatusCode updateAPNSettings(std::uint8_t ctxId);
 
         std::optional<const std::vector<std::shared_ptr<APN::Config>>> getActiveContexts();
-        at::Result::Code activateContext(std::uint8_t contextId);
-        at::Result::Code deactivateContext(std::uint8_t contextId);
+        at::Result::StatusCode activateContext(std::uint8_t contextId);
+        at::Result::StatusCode deactivateContext(std::uint8_t contextId);
 
         bool setDataTransfer(DataTransfer dt);
         DataTransfer getDataTransfer() const;
@@ -98,7 +98,7 @@ namespace packet_data
          * @brief get first APN with type, from phone configuration
          */
         std::optional<std::shared_ptr<APN::Config>> getAPNFirst(APN::APNType type);
-        at::Result::Code setAPN(std::shared_ptr<APN::Config> apn);
+        at::Result::StatusCode setAPN(std::shared_ptr<APN::Config> apn);
     };
 
 } // namespace packet_data

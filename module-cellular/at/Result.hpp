@@ -3,40 +3,53 @@
 
 #pragma once
 
+#include <utility>
 #include <variant>
 #include <string>
 #include <vector>
+#include <optional>
 
 #include <ErrorCode.hpp>
 
 namespace at
 {
-    struct Result
+    class Result
     {
-        /// result class for AT send -> receive command, could return promise :p
-        enum class Code
+      public:
+        using CmxError = std::variant<at::EquipmentErrorCode, at::NetworkErrorCode>;
+
+        enum class StatusCode
         {
             OK,      // at OK
             ERROR,   // at ERROR
             TIMEOUT, // at Timeout
             TOKENS,  // at numbers of tokens needed met
-            NONE,    // no code
-        } code = Code::NONE;
+            NONE,
+        };
 
-        //! Information about Equipment or Network error as variant type
-        /*!
-         * Example of checking for specific error type
-            if (std::holds_alternative<at::EquipmentErrorCode>(errorCode)){
-                std::get<at::EquipmentErrorCode>(errorCode);
-            }
-        */
-        std::variant<at::EquipmentErrorCode, at::NetworkErrorCode> errorCode = at::EquipmentErrorCode::NoInformation;
+        Result(std::vector<std::string> response    = std::vector<std::string>(),
+               std::optional<StatusCode> statusCode = StatusCode::NONE,
+               const CmxError &errorCode            = at::EquipmentErrorCode::NoInformation);
 
-        std::vector<std::string> response;
+        virtual ~Result() = default;
+
+        auto getResponse() const -> const std::vector<std::string> &;
+
+        auto getErrorCode() const -> const CmxError &;
+        auto getEquipmentErrorCode() const -> std::optional<at::EquipmentErrorCode>;
+        auto getNetworkErrorCode() const -> std::optional<at::NetworkErrorCode>;
+
+        auto getStatusCode() const -> StatusCode;
+        void setStatusCode(StatusCode status);
 
         explicit operator bool() const
         {
-            return code == Code::OK;
+            return statusCode == StatusCode::OK;
         }
+
+      private:
+        CmxError errorCode    = at::EquipmentErrorCode::NoInformation;
+        StatusCode statusCode = StatusCode::NONE;
+        const std::vector<std::string> responseBody;
     };
 } // namespace at

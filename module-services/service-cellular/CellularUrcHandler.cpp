@@ -166,7 +166,7 @@ void CellularUrcHandler::Handle(Qiurc &urc)
             if (auto urcFirstParam = urc.getFirstParam(); urcFirstParam) {
                 int ctxid = 0;
                 if (utils::toNumeric(*urcFirstParam, ctxid)) {
-                    response = std::make_unique<CellularDeactivateContextResponse>(at::Result::Code::OK, ctxid);
+                    response = std::make_unique<CellularDeactivateContextResponse>(at::Result::StatusCode::OK, ctxid);
                     urc.setHandled(true);
                 }
             }
