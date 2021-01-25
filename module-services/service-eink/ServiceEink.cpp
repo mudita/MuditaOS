@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceEink.hpp"
@@ -121,7 +121,7 @@ namespace service::eink
 
     void ServiceEink::updateDisplay(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode)
     {
-        prepareDisplay(refreshMode);
+        prepareDisplay(refreshMode, WaveformTemperature::KEEP_CURRENT);
 
         if (const auto status = display.update(frameBuffer); status != EinkOK) {
             LOG_FATAL("Failed to update frame");
@@ -135,11 +135,12 @@ namespace service::eink
         }
     }
 
-    void ServiceEink::prepareDisplay(::gui::RefreshModes refreshMode)
+    void ServiceEink::prepareDisplay(::gui::RefreshModes refreshMode, WaveformTemperature behaviour)
     {
         display.powerOn();
 
-        const auto temperature = EinkGetTemperatureInternal();
+        const auto temperature = behaviour == WaveformTemperature::KEEP_CURRENT ? display.getLastTemperature()
+                                                                                : EinkGetTemperatureInternal();
         if (refreshMode == ::gui::RefreshModes::GUI_REFRESH_DEEP) {
             display.setWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
             display.dither();
@@ -152,7 +153,7 @@ namespace service::eink
     sys::MessagePointer ServiceEink::handlePrepareEarlyRequest(sys::Message *message)
     {
         const auto waveformUpdateMsg = static_cast<service::eink::PrepareDisplayEarlyRequest *>(message);
-        prepareDisplay(waveformUpdateMsg->getRefreshMode());
+        prepareDisplay(waveformUpdateMsg->getRefreshMode(), WaveformTemperature::MEASURE_NEW);
         return sys::MessageNone{};
     }
 
