@@ -6,6 +6,7 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
+#include <Service/Timer.hpp>
 
 #include "EinkDisplay.hpp"
 
@@ -47,8 +48,11 @@ namespace service::eink
 
         void enterActiveMode();
         void suspend();
-        void updateDisplay(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode);
-        void prepareDisplay(::gui::RefreshModes refreshMode, WaveformTemperature behaviour);
+
+        void showImage(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode);
+        EinkStatus_e prepareDisplay(::gui::RefreshModes refreshMode, WaveformTemperature behaviour);
+        EinkStatus_e refreshDisplay(::gui::RefreshModes refreshMode);
+        EinkStatus_e updateDisplay(uint8_t *frameBuffer, ::gui::RefreshModes refreshMode);
 
         sys::MessagePointer handleEinkModeChangedMessage(sys::Message *message);
         sys::MessagePointer handleImageMessage(sys::Message *message);
@@ -56,11 +60,7 @@ namespace service::eink
 
         EinkDisplay display;
         State currentState;
-
-        /*
-         * PowerOffTimer to be implemented when needed.
-         * It should power off the display when not used for 3000ms.
-         */
+        std::unique_ptr<sys::Timer> displayPowerOffTimer;
     };
 } // namespace service::eink
 

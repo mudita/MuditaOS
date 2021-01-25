@@ -126,7 +126,7 @@ namespace service::gui
                 setState(State::Suspended);
             }
 
-            if (!contextPool->isAnyContextLocked()) {
+            if (!isAnyFrameBeingRenderedOrDisplayed()) {
                 prepareDisplayEarly(drawMsg->mode);
             }
             notifyRenderer(std::move(drawMsg->commands), drawMsg->mode);
@@ -206,7 +206,7 @@ namespace service::gui
         contextReleaseTimer->connect([this, contextId](sys::Timer &it) {
             eink::ImageDisplayedNotification notification{contextId};
             handleImageDisplayedNotification(&notification);
-            LOG_WARN("Context # %d released after timeout. Does ServiceEink respond properly?", contextId);
+            LOG_WARN("Context #%d released after timeout. Does ServiceEink respond properly?", contextId);
         });
         contextReleaseTimer->start();
     }
@@ -237,7 +237,9 @@ namespace service::gui
         contextReleaseTimer->stop();
         setState(State::Idle);
 
-        if (isNextFrameReady()) {
+        // Even if the next render is already cached, if any context in the pool is currently being processed, then
+        // we better wait for it.
+        if (isNextFrameReady() and not isAnyFrameBeingRenderedOrDisplayed()) {
             trySendNextFrame();
         }
         return sys::MessageNone{};
@@ -245,9 +247,12 @@ namespace service::gui
 
     bool ServiceGUI::isNextFrameReady() const noexcept
     {
-        // Even if the next render is already cached, if any context in the pool is currently being processed, then we
-        // better wait for it.
-        return cachedRender.has_value() && !contextPool->isAnyContextLocked();
+        return cachedRender.has_value();
+    }
+
+    bool ServiceGUI::isAnyFrameBeingRenderedOrDisplayed() const noexcept
+    {
+        return contextPool->isAnyContextLocked();
     }
 
     void ServiceGUI::trySendNextFrame()
