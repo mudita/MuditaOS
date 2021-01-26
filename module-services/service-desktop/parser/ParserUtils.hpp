@@ -104,6 +104,7 @@ namespace parserFSM
         inline constexpr auto batteryLevel     = "batteryLevel";
         inline constexpr auto batteryState     = "batteryState";
         inline constexpr auto selectedSim      = "selectedSim";
+        inline constexpr auto sim              = "sim";
         inline constexpr auto trayState        = "trayState";
         inline constexpr auto signalStrength   = "signalStrength";
         inline constexpr auto fsTotal          = "fsTotal";

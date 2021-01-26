@@ -25,9 +25,12 @@ namespace parserFSM
         static auto getKeyCode(int val) noexcept -> bsp::KeyCodes;
         void sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state);
 
+        void requestSimChange(const int simSelected);
+
       public:
         DeveloperModeHelper(sys::Service *_ownerServicePtr) : ownerServicePtr(_ownerServicePtr){};
         auto processPutRequest(Context &context) -> sys::ReturnCodes;
+        auto processGetRequest(Context &context) -> sys::ReturnCodes;
     };
 
     namespace json::developerMode
@@ -42,5 +45,10 @@ namespace parserFSM
         inline constexpr auto btState       = "btState";
         inline constexpr auto btOn          = "on";
         inline constexpr auto btCommand     = "btCommand";
+        inline constexpr auto changeSim     = "changeSim";
+        inline constexpr auto getInfo       = "getInfo";
+
+        /// values for getInfo cmd
+        inline constexpr auto simStateInfo = "simState";
     }
 } // namespace parserFSM
