@@ -24,7 +24,8 @@ class CDCSerial:
         self.timeout = timeout
         self.body = ""
         self.header_length = 10
-        while timeout != 0:
+        while self.timeout > 0:
+            self.timeout = self.timeout - 1
             import os.path
             if not os.path.exists(port_name):
                 log.info(f"port {port_name} not found but requested")
@@ -38,10 +39,10 @@ class CDCSerial:
             except (FileNotFoundError, serial.serialutil.SerialException) as err:
                 log.error(f"can't open {port_name}, retrying...")
                 time.sleep(1)
-                self.timeout = self.timeout - 1
-                if self.timeout == 0:
-                    log.error(f"uart {port_name} not found - probably OS did not boot")
-                    raise TestError(Error.PORT_NOT_FOUND)
+
+        if self.timeout == 0:
+            log.error(f"uart {port_name} not found - probably OS did not boot")
+            raise TestError(Error.PORT_NOT_FOUND)
 
     def __del__(self):
         try:
