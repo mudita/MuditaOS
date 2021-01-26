@@ -120,7 +120,19 @@ def send_char(char: str, connection):
         connection.send_key_code(int(char), key_type)
         connection.send_key_code(key_codes["right"])
         last_char = char
-
+    elif char.islower():
+        tmp = char.upper()
+        # toggle to lowercase mode
+        connection.send_key_code(key_codes["*"], key_type)
+        if last_char is keymap[tmp][0]:
+            print("repeated key!")
+            connection.send_key_code(key_codes["right"], key_type)
+        for key in keymap[tmp]:
+            connection.send_key_code(int(key), key_type)
+        last_char = keymap[tmp][0]
+        # toggle to uppercase mode
+        connection.send_key_code(key_codes["*"], key_type)
+        connection.send_key_code(key_codes["*"], key_type)
     else:
         if last_char is keymap[char][0]:
             print("repeated key!")

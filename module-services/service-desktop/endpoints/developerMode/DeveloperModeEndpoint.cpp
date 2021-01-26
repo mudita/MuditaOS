@@ -11,6 +11,7 @@ auto DeveloperModeEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {
     case http::Method::get:
+        helper->processGetRequest(context);
         break;
     case http::Method::post:
         break;
