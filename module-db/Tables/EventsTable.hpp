@@ -58,7 +58,7 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
                                                    uint32_t offset,
                                                    uint32_t limit);
 
-    std::vector<EventsTableRow> selectByDate(TimePoint date, uint32_t offset, uint32_t limit);
+    std::vector<EventsTableRow> selectByDate(utils::time::TimePoint date, uint32_t offset, uint32_t limit);
 
     uint32_t count() override final;
     uint32_t countFromFilter(utils::time::TimePoint from, utils::time::TimePoint till);

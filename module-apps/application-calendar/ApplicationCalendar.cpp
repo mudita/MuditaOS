@@ -96,7 +96,6 @@ namespace app
 
     sys::ReturnCodes ApplicationCalendar::InitHandler()
     {
-        applicationStartTime = utils::time::TimePointNow();
         auto ret             = Application::InitHandler();
         createUserInterface();
         return ret;

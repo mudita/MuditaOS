@@ -35,16 +35,7 @@ namespace utils::time
     }
 
     inline constexpr auto max_month_day            = 31;
-
-    inline constexpr auto seconds_in_minute        = 60;
-    inline constexpr auto minutes_in_hour          = 60;
-    inline constexpr auto minutes_in_day           = 24 * minutes_in_hour;
-    inline constexpr auto minutes_in_week          = 7 * minutes_in_day;
-    inline constexpr auto hours_in_day             = 24;
     inline constexpr auto minutes_in_quarter_hour  = 15;
-    inline constexpr auto seconds_in_hour          = minutes_in_hour * seconds_in_minute;
-    inline constexpr auto seconds_in_day           = hours_in_day * seconds_in_hour;
-    inline constexpr auto miliseconds_in_second    = 1000;
 
     enum class GetParameters
     {
@@ -311,6 +302,7 @@ namespace utils::time
         std::chrono::seconds get() const;
         std::chrono::minutes getMinutes() const;
         std::chrono::hours getHours() const;
+        date::days getRoundedDays() const;
 
         UTF8 str(DisplayedFormat displayedFormat = DisplayedFormat::Auto0M) const;
 
@@ -390,6 +382,7 @@ namespace utils::time
         std::chrono::minutes _hmminutes = std::chrono::minutes(0);
         std::chrono::minutes _minutes   = std::chrono::minutes(0);
         std::chrono::seconds _seconds   = std::chrono::seconds(0);
+        date::days _roundedDays         = date::days{0};
     };
 
     class CalendarConversion

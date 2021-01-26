@@ -12,22 +12,14 @@ date::year_month_day MonthModel::getYearMonthDayFromTimePoint(utils::time::TimeP
 
 uint32_t MonthModel::getEventDurationInDays(const EventsRecord &record) const
 {
-    auto eventDuration = utils::time::Duration(record.date_from, record.date_till);
-    ///TODO: save this method logic and return the exact duration in days
-    ///     add getDays method in Duration class
-    auto eventStartDuration = utils::time::Duration(TimePointToTimeT(record.date_from));
-    auto eventEndDuration   = utils::time::Duration(TimePointToTimeT(record.date_till));
-    auto startEventDurationSinceEpochInDaysRoundedDown =
-        (eventStartDuration.getHours() - eventStartDuration.getHours() % utils::time::hours_in_day) /
-        utils::time::hours_in_day;
-    auto endEventDurationSinceEpochInDaysRoundedDown =
-        (eventEndDuration.getHours() - eventEndDuration.getHours() % utils::time::hours_in_day) / utils::time::hours_in_day;
-    return endEventDurationSinceEpochInDaysRoundedDown - startEventDurationSinceEpochInDaysRoundedDown;
+    auto eventDuration = utils::time::Duration(record.date_till, record.date_from);
+    auto days = eventDuration.getRoundedDays();
+    return days.count();
 }
 
 uint32_t MonthModel::getDayIndex(utils::time::TimePoint date) const
 {
-    date::year_month_day recordDate = TimePointToYearMonthDay(date);
+    date::year_month_day recordDate = utils::time::CalendarConversion::TimePointToYearMonthDay(date);
     return (static_cast<unsigned>(recordDate.day()) - 1);
 }
 
@@ -58,7 +50,7 @@ void MonthModel::markEventsInDays(const std::vector<EventsRecord> &records, std:
         int durationInDays = getEventDurationInDays(rec);
 
         if (this->yearMonth == eventYearMonthFrom) {
-            for (int i = getDayIndex(rec.date_from); i < max_month_day && durationInDays >= 0; i++, durationInDays--) {
+            for (int i = getDayIndex(rec.date_from); i < utils::time::max_month_day && durationInDays >= 0; i++, durationInDays--) {
                 isDayEmpty[i] = false;
             }
         }
@@ -109,17 +101,11 @@ std::vector<std::string> MonthModel::split(const std::string &s, char delim)
 
 std::string MonthModel::getMonthText()
 {
-    auto monthUInt       = static_cast<unsigned>(month);
-    std::string monthStr = utils::time::Locale::get_month(utils::time::Locale::Month(monthUInt - 1));
+    std::string monthStr = utils::time::Locale::get_month(month);
     return monthStr;
 }
 
 std::string MonthModel::getMonthYearText()
 {
-    auto yearInt         = static_cast<int>(year);
-    std::string yearStr  = std::to_string(yearInt);
-    auto monthUInt       = static_cast<unsigned>(month);
-    std::string monthStr = utils::time::Locale::get_month(utils::time::Locale::Month(monthUInt - 1));
-
-    return monthStr + " " + yearStr;
+    return utils::time::Locale::get_month(month) + " " + utils::to_string(year);
 }

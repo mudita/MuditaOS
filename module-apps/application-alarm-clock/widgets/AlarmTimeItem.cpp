@@ -8,6 +8,8 @@
 #include <time/time_conversion.hpp>
 #include <time/time_date_validation.hpp>
 
+using namespace std::chrono_literals;
+
 namespace gui
 {
     namespace timeItem = style::alarmClock::window::item::time;
@@ -93,13 +95,13 @@ namespace gui
                     minutes = 0;
                 }
 
-                if (mode24H && hours > utils::time::hours_in_day - 1) {
+                if (mode24H && hours > std::chrono::hours(date::days{1}).count() - 1) {
                     hourInput->setText("0");
                 }
-                else if (!mode24H && hours > utils::time::hours_in_day / 2) {
+                else if (!mode24H && hours > std::chrono::hours(date::days{1}).count() / 2) {
                     hourInput->setText("12");
                 }
-                if (minutes > utils::time::minutes_in_hour - 1) {
+                if (minutes > std::chrono::minutes(1h).count() - 1) {
                     minuteInput->setText("00");
                 }
                 return true;

@@ -13,10 +13,10 @@ namespace db::query::events
     class GetFilteredByDay : public Query
     {
       public:
-        GetFilteredByDay(TimePoint filterDate, uint32_t offset = 0, uint32_t limit = UINT32_MAX);
+        GetFilteredByDay(utils::time::TimePoint filterDate, uint32_t offset = 0, uint32_t limit = UINT32_MAX);
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
-        TimePoint filterDate;
+        utils::time::TimePoint filterDate;
         uint32_t offset;
         uint32_t limit;
     };

@@ -12,6 +12,7 @@
 #include <memory>
 #include <module-os/RTOSWrapper/include/ticks.hpp>
 #include <sstream>
+using namespace std::chrono_literals;
 
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = {{TypeOfFrame_e::SABM, "SABM"},
                                                          {TypeOfFrame_e::UA, "UA"},
@@ -246,13 +247,13 @@ TS0710::ConfState TS0710::ConfProcedure()
     bool timed_out                 = false;
     constexpr uint32_t qsclkTmeout = 30;
     const auto qsclkTmeoutTicks =
-        cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(qsclkTmeout * utils::time::miliseconds_in_second);
+        cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(qsclkTmeout * std::chrono::milliseconds(1s).count());
     while (!timed_out) {
         if (parser->cmd(at::AT::QSCLK_ON)) {
             break;
         }
         // if error then limit polling - 1 poll per sec modem normaly takes ~ 20 sec to start anyway
-        vTaskDelay(pdMS_TO_TICKS(utils::time::miliseconds_in_second));
+        vTaskDelay(pdMS_TO_TICKS(std::chrono::milliseconds(1s).count()));
         timed_out = cpp_freertos::Ticks::GetTicks() > qsclkTmeoutTicks;
         if (timed_out) {
             return ConfState::Failure;

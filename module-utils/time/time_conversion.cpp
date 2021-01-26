@@ -21,6 +21,8 @@
 
 namespace utils::time
 {
+    using namespace std::chrono_literals;
+
     namespace duration
     {
         static constexpr auto durationFormatH0M0S = "duration_hour_0min_0sec";
@@ -54,7 +56,7 @@ namespace utils::time
 
 
     Locale tlocale;
-    static int msTimeGmtOff = 4 * utils::time::minutes_in_quarter_hour * utils::time::seconds_in_minute;
+    static int msTimeGmtOff = 4 * utils::time::minutes_in_quarter_hour * std::chrono::seconds(1min).count();
 
     UTF8 Localer::get_replacement(Replacements val, const struct tm &timeinfo)
     {
@@ -67,10 +69,10 @@ namespace utils::time
                 retval = Locale::get_day(Locale::Day(timeinfo.tm_wday)).substr(0, duration::abbrev_len);
                 break;
             case Replacements::MonthLong:
-                retval = Locale::get_month(Locale::Month(timeinfo.tm_mon));
+                retval = Locale::get_month(date::month(timeinfo.tm_mon+1));
                 break;
             case Replacements::MonthAbbrev:
-                retval = Locale::get_month(Locale::Month(timeinfo.tm_mon)).substr(0, duration::abbrev_len);
+                retval = Locale::get_month(date::month(timeinfo.tm_mon+1)).substr(0, duration::abbrev_len);
                 break;
             case Replacements::Timezone:
                 break;
@@ -420,9 +422,16 @@ namespace utils::time
         return _hours;
     }
 
+    date::days Duration::getRoundedDays() const
+    {
+        return _roundedDays;
+    }
+
     Duration::Duration(const utils::time::TimePoint &stop, const utils::time::TimePoint &start)
         : Duration(stop - start > std::chrono::seconds(0) ? std::chrono::duration_cast<std::chrono::seconds>(stop - start) : std::chrono::seconds(0))
-    {}
+    {
+        duration > std::chrono::seconds(0) ? _roundedDays = date::days{date::floor<date::days>(stop) - date::floor<date::days>(start)} : date::days{0};
+    }
 
     Duration::Duration(const Timestamp &stop, const Timestamp &start) : Duration(stop.getLocalTime(), start.getLocalTime())
     {}

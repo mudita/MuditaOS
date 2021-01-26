@@ -19,7 +19,6 @@ namespace app
 
     class ApplicationCalendar : public Application
     {
-        utils::time::TimePoint applicationStartTime;
         int eventShift                    = 0;
         EquivalentWindow equivalentWindow = EquivalentWindow::EmptyWindow;
 
@@ -38,14 +37,12 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
-        utils::time::TimePoint getCurrentTimeStamp()
-        {
-            return applicationStartTime;
-        }
+
         void setEquivalentToEmptyWindow(EquivalentWindow window)
         {
             equivalentWindow = window;
         };
+
         EquivalentWindow getEquivalentToEmptyWindow() const
         {
             return equivalentWindow;

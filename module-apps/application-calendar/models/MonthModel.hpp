@@ -56,9 +56,9 @@ class MonthModel
   private:
     YearMonth yearMonth;
 
-    [[nodiscard]] date::year_month_day getYearMonthDayFromTimePoint(TimePoint timePoint) const;
+    [[nodiscard]] date::year_month_day getYearMonthDayFromTimePoint(utils::time::TimePoint timePoint) const;
     [[nodiscard]] uint32_t getEventDurationInDays(const EventsRecord &records) const;
-    [[nodiscard]] uint32_t getDayIndex(TimePoint date) const;
+    [[nodiscard]] uint32_t getDayIndex(utils::time::TimePoint date) const;
 
   public:
     explicit MonthModel(date::year_month_day yearMonthDay);

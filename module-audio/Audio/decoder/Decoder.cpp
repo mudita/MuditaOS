@@ -14,6 +14,7 @@
 
 namespace audio
 {
+    using namespace std::chrono_literals;
 
     Decoder::Decoder(const char *fileName)
         : filePath(fileName), workerBuffer(std::make_unique<int16_t[]>(workerBufferSize)), tag(std::make_unique<Tags>())
@@ -58,9 +59,9 @@ namespace audio
                 tag->year   = std::to_string(tags->year());
 
                 tag->total_duration_s = properties->length();
-                tag->duration_min     = tag->total_duration_s / utils::secondsInMinute;
-                tag->duration_hour    = tag->duration_min / utils::secondsInMinute;
-                tag->duration_sec     = tag->total_duration_s % utils::secondsInMinute;
+                tag->duration_min     = tag->total_duration_s / std::chrono::seconds(1min).count();
+                tag->duration_hour    = tag->duration_min / std::chrono::seconds(1min).count();
+                tag->duration_sec     = tag->total_duration_s % std::chrono::seconds(1min).count();
                 tag->sample_rate      = properties->sampleRate();
                 tag->num_channel      = properties->channels();
                 tag->bitrate          = properties->bitrate();

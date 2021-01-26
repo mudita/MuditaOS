@@ -87,7 +87,7 @@ std::vector<EventsRecord> EventsRecordInterface::Select(utils::time::TimePoint f
     return records;
 }
 
-std::vector<EventsRecord> EventsRecordInterface::Select(TimePoint date, uint32_t offset, uint32_t limit)
+std::vector<EventsRecord> EventsRecordInterface::Select(utils::time::TimePoint date, uint32_t offset, uint32_t limit)
 {
     auto rows = eventsDb->events.selectByDate(date, offset, limit);
 

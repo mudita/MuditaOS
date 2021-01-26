@@ -220,7 +220,7 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
             auto data       = std::make_unique<DayMonthData>();
             auto startDate       = utils::time::CalendarConversion::TimePointToYearMonthDay(record->date_from);
             auto filterDate      = utils::time::CalendarConversion::TimePointFromYearMonthDay(startDate);
-            std::string monthStr = utils::time::Locale::get_month(utils::time::Locale::Month(unsigned(startDate.month()) - 1));
+            std::string monthStr = utils::time::Locale::get_month(startDate.month());
             data->setData(std::to_string(unsigned(startDate.day())) + " " + monthStr, filterDate);
 
             if (application->getPrevWindow() == style::window::calendar::name::no_events_window) {

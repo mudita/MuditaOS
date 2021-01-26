@@ -7,6 +7,7 @@
 #include <utf8/UTF8.hpp>
 #include "i18n/i18n.hpp"
 #include <log/log.hpp>
+#include <module-utils/date/include/date/date.h>
 
 namespace utils
 {
@@ -20,7 +21,6 @@ namespace utils
         class Locale
         {
             static const int num_days       = 7;
-            static const int num_monts      = 12;
             static const int num_formatters = 5;
             // imo it would be nicer to have datetime locales in different json with thiny bit nicer and more effective
             // getters
@@ -35,7 +35,7 @@ namespace utils
                                                             "common_friday",
                                                             "common_saturday"};
 
-            const std::array<std::string, num_monts> months = {"common_january",
+            const std::array<std::string, date::months(date::years{1}).count()> months = {"common_january",
                                                                "common_february",
                                                                "common_march",
                                                                "common_april",
@@ -72,22 +72,6 @@ namespace utils
                 Sat,
             };
 
-            enum Month
-            {
-                Jan = 0,
-                Feb,
-                Mar,
-                Apr,
-                May,
-                Jun,
-                Jul,
-                Aug,
-                Sept,
-                Oct,
-                Now,
-                Dec
-            };
-
             enum TimeFormat
             {
                 FormatTime12H = 0,     // H:M in 12h format
@@ -120,14 +104,15 @@ namespace utils
                 }
             }
 
-            static const UTF8 get_month(enum Month mon)
+            static const UTF8 get_month(date::month mon)
             {
-                if (mon >= num_monts) {
-                    LOG_ERROR("Bad value %d", mon);
+                auto monthNum = static_cast<uint32_t>(mon);
+                if (monthNum > date::months(date::years{1}).count()) {
+                    LOG_ERROR("Bad value %d", monthNum);
                     return "";
                 }
                 else {
-                    return localize.get(tlocale.months[mon]);
+                    return localize.get(tlocale.months[monthNum-1]);
                 }
             }
 

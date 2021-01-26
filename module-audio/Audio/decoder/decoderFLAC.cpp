@@ -14,6 +14,7 @@
 
 namespace audio
 {
+    using namespace std::chrono_literals;
 
     decoderFLAC::decoderFLAC(const char *fileName) : Decoder(fileName)
     {
@@ -94,9 +95,9 @@ namespace audio
                 userdata->tag->total_duration_s *= 2;
             }
 
-            userdata->tag->duration_min  = userdata->tag->total_duration_s / utils::secondsInMinute;
-            userdata->tag->duration_hour = userdata->tag->duration_min / utils::secondsInMinute;
-            userdata->tag->duration_sec  = userdata->tag->total_duration_s % utils::secondsInMinute;
+            userdata->tag->duration_min  = userdata->tag->total_duration_s / std::chrono::seconds(1min).count();
+            userdata->tag->duration_hour = userdata->tag->duration_min / std::chrono::seconds(1min).count();
+            userdata->tag->duration_sec  = userdata->tag->total_duration_s % std::chrono::seconds(1min).count();
             userdata->tag->sample_rate   = pMetadata->data.streaminfo.sampleRate;
             userdata->tag->num_channel   = pMetadata->data.streaminfo.channels;
 

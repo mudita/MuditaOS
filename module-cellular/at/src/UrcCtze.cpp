@@ -8,6 +8,7 @@
 #include <module-utils/date/include/date/date.h>
 
 using namespace at::urc;
+using namespace std::chrono_literals;
 
 auto Ctze::isValid() const noexcept -> bool
 {
@@ -25,7 +26,7 @@ int Ctze::getTimeZoneOffset() const
         LOG_ERROR("Failed to parse Ctze time zone offset: %s", tzOffsetToken.c_str());
     }
 
-    int offsetInSeconds = offsetInQuartersOfHour * utils::time::minutes_in_quarter_hour * utils::time::seconds_in_minute;
+    int offsetInSeconds = offsetInQuartersOfHour * utils::time::minutes_in_quarter_hour * std::chrono::seconds(1min).count();
 
     return offsetInSeconds;
 }
@@ -66,7 +67,7 @@ auto Ctze::getTimeInfo() const noexcept -> tm
 
         int gmtDifference = utils::getNumericValue<int>(gmtDifferenceStr);
         auto time         = system_clock::to_time_t(tp) +
-                    gmtDifference * utils::time::minutes_in_quarter_hour * utils::time::seconds_in_minute;
+                    gmtDifference * utils::time::minutes_in_quarter_hour * std::chrono::seconds(1min).count();
         timeinfo = *gmtime(&time);
     }
     return timeinfo;

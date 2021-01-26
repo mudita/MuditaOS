@@ -5,7 +5,7 @@
 
 namespace db::query::events
 {
-    GetFilteredByDay::GetFilteredByDay(TimePoint filterDate, uint32_t offset, uint32_t limit)
+    GetFilteredByDay::GetFilteredByDay(utils::time::TimePoint filterDate, uint32_t offset, uint32_t limit)
         : Query(Query::Type::Read), filterDate(filterDate), offset(offset), limit(limit)
     {}
 

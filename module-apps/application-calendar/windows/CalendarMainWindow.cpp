@@ -20,10 +20,7 @@ namespace gui
     CalendarMainWindow::CalendarMainWindow(app::Application *app, const std::string &name)
         : AppWindow(app, name), app::AsyncCallbackReceiver{app}
     {
-        auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
-        assert(appCalendar != nullptr);
-        utils::time::TimePoint tp     = appCalendar->getCurrentTimeStamp();
-        this->actualDate = date::year_month_day{date::floor<date::days>(tp)};
+        this->actualDate = date::year_month_day{date::floor<date::days>(utils::time::TimePointNow())};
         std::fill(std::begin(isDayEmpty), std::end(isDayEmpty), true);
         buildInterface();
     }
@@ -56,10 +53,9 @@ namespace gui
         dayWidth      = style::window::calendar::day_cell_width;
         dayHeight     = style::window::calendar::day_cell_height;
 
-        // create empty month box
         monthBox = new MonthBox(
             app, this, offsetFromTop, monthWidth, monthHeight, dayWidth, dayHeight, monthModel, isDayEmpty);
-        // setup month box
+
         addWidget(monthBox);
 
         monthBox->borderCallback = [this](const InputEvent &inputEvent) -> bool {
