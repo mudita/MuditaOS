@@ -181,18 +181,36 @@ namespace app
         });
     }
 
-    bool ApplicationCall::showNotification(std::function<bool()> action)
+    bool ApplicationCall::showNotification(std::function<bool()> action,
+                                           const std::string &icon,
+                                           const std::string &text)
     {
         gui::DialogMetadata meta;
-        meta.icon   = "info_big_circle_W_G";
-        meta.text   = utils::localize.get("app_call_no_sim");
-        meta.action = action;
-        switchWindow(app::window::name_dialogConfirm, std::make_unique<gui::DialogMetadataMessage>(meta));
+        meta.icon   = icon;
+        meta.text   = text;
+        meta.action = std::move(action);
+        switchWindow(app::window::name_dialogConfirm, std::make_unique<gui::DialogMetadataMessage>(std::move(meta)));
         return true;
     }
 
     void ApplicationCall::destroyUserInterface()
     {}
+
+    void ApplicationCall::handleEmergencyCallEvent(const std::string &number)
+    {
+        auto ret = CellularServiceAPI::DialNumber(this, utils::PhoneNumber(number));
+        if (ret == false) {
+            auto action = [=]() -> bool {
+                returnToPreviousWindow();
+                return true;
+            };
+            const auto icon = "emergency_W_G";
+            auto text       = utils::localize.get("app_call_wrong_emergency");
+            utils::findAndReplaceAll(text, "$NUMBER", number);
+            showNotification(action, icon, text);
+            return;
+        }
+    }
 
     void ApplicationCall::handleCallEvent(const std::string &number)
     {
@@ -202,7 +220,9 @@ namespace app
                 returnToPreviousWindow();
                 return true;
             };
-            showNotification(action);
+            const auto icon = "info_big_circle_W_G";
+            const auto text = utils::localize.get("app_call_no_sim");
+            showNotification(action, icon, text);
             return;
         }
 
