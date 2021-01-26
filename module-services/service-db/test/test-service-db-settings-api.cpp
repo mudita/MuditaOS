@@ -14,7 +14,6 @@
 #include <service-evtmgr/EventManager.hpp>
 #include <service-evtmgr/Constants.hpp>
 
-
 #include "test-service-db-settings-testmsgs.hpp"
 #include "test-service-db-settings-testservices.hpp"
 #include "test-service-db-settings-testapps.hpp"
@@ -32,7 +31,7 @@ TEST_CASE("SettingsApi")
 {
     SECTION("variable/profile/mode register/set/get/unregister")
     {
-        std::shared_ptr<sys::SystemManager> manager = std::make_shared<sys::SystemManager>(5000);
+        auto manager = std::make_shared<sys::SystemManager>();
         std::shared_ptr<settings::MyService> varWritter;
         std::shared_ptr<settings::MyService> varReader;
         std::shared_ptr<settings::AppTest> testVar;
@@ -111,24 +110,27 @@ TEST_CASE("SettingsApi")
 
         // check the results
         std::cout << "testVar values:" << std::endl << std::flush;
-        for (auto s : testVar->v)
+        for (auto s : testVar->v) {
             std::cout << s << std::endl << std::flush;
+        }
         REQUIRE(testVar->v.size() == 3);
         REQUIRE(testVar->v[1] == testVar->v[0] + "1");
         REQUIRE(testVar->v[2] == testVar->v[1] + "2");
 
         // check the result
         std::cout << "testProf values:" << std::endl << std::flush;
-        for (auto s : testProf->v)
+        for (auto s : testProf->v) {
             std::cout << s << std::endl << std::flush;
+        }
         REQUIRE(testProf->v[1] == testProf->v[0] + "1");
         REQUIRE(testProf->v[2] == testProf->v[0] + "12");
         REQUIRE(testProf->v[3] == "other");
         REQUIRE(testProf->v[4] == "other");
 
         std::cout << "testMode values:" << std::endl << std::flush;
-        for (auto s : testMode->v)
+        for (auto s : testMode->v) {
             std::cout << s << std::endl << std::flush;
+        }
         REQUIRE(testMode->v[1] == testMode->v[0] + "1");
         REQUIRE(testMode->v[2] == testMode->v[0] + "12");
         REQUIRE(testMode->v[3] == "other");
