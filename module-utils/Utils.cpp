@@ -12,19 +12,7 @@ namespace utils::filesystem
         inline constexpr auto crc_buf_len = 1024;
     } // namespace
 
-    long int filelength(std::FILE *file) noexcept
-    {
-        if (file == nullptr) {
-            return 0;
-        }
-        const auto startPosition = std::ftell(file);
-        std::fseek(file, 0, SEEK_END);
-        const auto endPosition = std::ftell(file);
-        std::fseek(file, startPosition, SEEK_SET);
-        return endPosition;
-    }
-
-    unsigned long computeFileCRC32(::FILE *file) noexcept
+    unsigned long computeFileCRC32(std::FILE *file) noexcept
     {
         auto buf = std::make_unique<unsigned char[]>(crc_buf_len);
 

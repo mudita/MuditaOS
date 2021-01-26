@@ -30,18 +30,18 @@ namespace FactoryReset
 
     static bool CopyFile(std::string sourcefile, std::string targetfile);
 
-    static int recurseDepth             = 0;
-    static const int max_recurse_depth  = 120; /* 120 is just an arbitrary value of max number of recursive calls.
-                                                * If more then error is assumed, not the real depth of directories."
-                                                */
+    static int recurseDepth            = 0;
+    static const int max_recurse_depth = 120; /* 120 is just an arbitrary value of max number of recursive calls.
+                                               * If more then error is assumed, not the real depth of directories."
+                                               */
     static const int max_filepath_length = PATH_MAX;
 
     bool Run(sys::Service *ownerService)
     {
         LOG_INFO("FactoryReset: restoring factory state started...");
 
-        recurseDepth = 0;
-        const auto factoryOSPath                 = purefs::dir::getFactoryOSPath();
+        recurseDepth             = 0;
+        const auto factoryOSPath = purefs::dir::getFactoryOSPath();
 
         if (std::filesystem::is_directory(factoryOSPath.c_str()) && std::filesystem::is_empty(factoryOSPath.c_str())) {
             LOG_ERROR("FactoryReset: restoring factory state aborted");
@@ -114,7 +114,7 @@ namespace FactoryReset
             return false;
         }
 
-        const auto factoryOSPath                 = purefs::dir::getFactoryOSPath();
+        const auto factoryOSPath = purefs::dir::getFactoryOSPath();
 
         for (auto &direntry : std::filesystem::directory_iterator(sourcedir.c_str())) {
             if ((direntry.path().string().compare(".") == 0) || (direntry.path().string().compare("..") == 0) ||
@@ -182,12 +182,12 @@ namespace FactoryReset
             std::unique_ptr<unsigned char[]> buffer(new unsigned char[copy_buf]);
 
             if (buffer.get() != nullptr) {
-                uint32_t loopcount = (utils::filesystem::filelength(sf.get()) / copy_buf) + 1u;
+                uint32_t loopcount = (std::filesystem::file_size(sourcefile) / copy_buf) + 1u;
                 uint32_t readsize  = copy_buf;
 
                 for (uint32_t i = 0u; i < loopcount; i++) {
                     if (i + 1u == loopcount) {
-                        readsize = utils::filesystem::filelength(sf.get()) % copy_buf;
+                        readsize = std::filesystem::file_size(sourcefile) % copy_buf;
                     }
 
                     if (std::fread(buffer.get(), 1, readsize, sf.get()) != readsize) {
