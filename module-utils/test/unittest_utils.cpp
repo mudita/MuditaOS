@@ -13,7 +13,6 @@
 
 #include "Utils.hpp"
 
-
 TEST_CASE("Split tests")
 {
     std::string delimiter = "\r\n";
@@ -270,37 +269,4 @@ TEST_CASE("Fill leading digit in string")
     REQUIRE(utils::addLeadingZeros(test, 2) == "45");
     REQUIRE(utils::addLeadingZeros(test, 3) == "045");
     REQUIRE(utils::addLeadingZeros(test, 4) == "0045");
-}
-
-class ScopedDir
-{
-  public:
-    ScopedDir(const std::filesystem::path &dirPath) : dirPath{dirPath}
-    {
-        REQUIRE(std::filesystem::create_directory(dirPath));
-    }
-
-    ~ScopedDir()
-    {
-        REQUIRE(std::filesystem::remove(dirPath));
-    }
-
-    auto operator()(std::string file = "") -> std::filesystem::path
-    {
-        return dirPath.c_str() + file;
-    }
-
-  private:
-    std::filesystem::path dirPath;
-};
-
-TEST_CASE("Read file length")
-{
-    ScopedDir dir("mytest");
-    auto *file = std::fopen(dir("test.txt").c_str(), "w");
-    REQUIRE(file != nullptr);
-    std::array<int, 3> v = {42, -1, 7};
-    std::fwrite(v.data(), sizeof(v[0]), v.size(), file);
-    REQUIRE(utils::filesystem::filelength(file) == static_cast<long>(sizeof(v[0]) * v.size()));
-    REQUIRE(std::fclose(file) == 0);
 }

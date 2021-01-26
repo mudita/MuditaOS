@@ -61,7 +61,7 @@ updateos::UpdateError UpdateMuditaOS::setUpdateFile(const std::filesystem::path 
     if (std::filesystem::exists(updateFile)) {
         versionInformation = UpdateMuditaOS::getVersionInfoFromFile(updateFile);
         if (mtar_open(&updateTar, updateFile.c_str(), "r") == MTAR_ESUCCESS) {
-            totalBytes = utils::filesystem::filelength(updateTar.stream);
+            totalBytes = std::filesystem::file_size(updateFile);
         }
         else {
             return informError(updateos::UpdateError::CantOpenUpdateFile,
@@ -204,7 +204,7 @@ std::string UpdateMuditaOS::readContent(const char *filename) noexcept
 
 updateos::UpdateError UpdateMuditaOS::verifyChecksums()
 {
-    status = updateos::UpdateState::ChecksumVerification;
+    status        = updateos::UpdateState::ChecksumVerification;
     auto lineBuff = std::make_unique<char[]>(
         boot::consts::tar_buf); // max line should be freertos max path + checksum, so this is enough
     fs::path checksumsFile = getUpdateTmpChild(updateos::file::checksums);
@@ -377,7 +377,7 @@ updateos::UpdateError UpdateMuditaOS::prepareRoot()
 
 updateos::UpdateError UpdateMuditaOS::updateBootJSON()
 {
-    fs::path bootJSONAbsoulte         = purefs::createPath(purefs::dir::getRootDiskPath(), purefs::file::boot_json);
+    fs::path bootJSONAbsoulte = purefs::createPath(purefs::dir::getRootDiskPath(), purefs::file::boot_json);
     informDebug("updateBootJSON %s", bootJSONAbsoulte.c_str());
 
     auto *fp = std::fopen(bootJSONAbsoulte.c_str(), "r");
@@ -426,8 +426,8 @@ bool UpdateMuditaOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
         return false;
     }
 
-    int errCode   = MTAR_ESUCCESS;
-    auto *fp      = std::fopen(fullPath.c_str(), "w+");
+    int errCode = MTAR_ESUCCESS;
+    auto *fp    = std::fopen(fullPath.c_str(), "w+");
     if (fp == nullptr) {
         informError(
             updateos::UpdateError::CantWriteToFile, "unpackFileToTemp %s can't open for writing", fullPath.c_str());
@@ -579,7 +579,7 @@ updateos::UpdateError UpdateMuditaOS::writeBootloader(fs::path bootloaderFile)
                            bootloaderFile.c_str());
     }
 
-    unsigned long fileLen = utils::filesystem::filelength(fileHandler);
+    unsigned long fileLen = std::filesystem::file_size(bootloaderFile);
     auto fileBuf          = std::make_unique<uint8_t[]>(fileLen);
     if (fileBuf == nullptr) {
         std::fclose(fileHandler);
@@ -670,7 +670,7 @@ bool UpdateMuditaOS::isUpgradeToCurrent(const std::string &versionToCompare)
 
 const fs::path UpdateMuditaOS::checkForUpdate()
 {
-    const auto updatesOSPath                  = purefs::dir::getUpdatesOSPath();
+    const auto updatesOSPath = purefs::dir::getUpdatesOSPath();
     for (auto &file : std::filesystem::directory_iterator(updatesOSPath.c_str())) {
         json11::Json versionInfo = UpdateMuditaOS::getVersionInfoFromFile(updatesOSPath / file.path());
         if (versionInfo.is_null())
