@@ -123,7 +123,7 @@ namespace utils
             }
         }
 
-        auto fractionalPart = static_cast<unsigned long int>(roundl(frac));
+        auto fractionalPart       = static_cast<unsigned long int>(roundl(frac));
         auto fractionalPartLength = std::to_string(fractionalPart).length();
         if (fractionalPartLength > precision) {
             base += 1;
@@ -252,7 +252,6 @@ namespace utils
 
     namespace filesystem
     {
-        [[nodiscard]] long int filelength(std::FILE *file) noexcept;
         [[nodiscard]] unsigned long computeFileCRC32(std::FILE *file) noexcept;
         [[nodiscard]] std::string generateRandomId(std::size_t length = 0) noexcept;
         [[nodiscard]] std::string getline(std::FILE *stream, uint32_t length = 1024) noexcept;

@@ -159,6 +159,18 @@ struct EcophoneFile
     sqlite3_int64 iBufferOfst; /* Offset in file of zBuffer[0] */
 };
 
+static std::uintmax_t file_size(std::FILE *file) noexcept
+{
+    if (file == nullptr) {
+        return 0;
+    }
+    const auto startPosition = std::ftell(file);
+    std::fseek(file, 0, SEEK_END);
+    const auto endPosition = std::ftell(file);
+    std::fseek(file, startPosition, SEEK_SET);
+    return endPosition;
+}
+
 /*
  ** Write directly to the file passed as the first argument. Even if the
  ** file has a write-buffer (EcophoneFile.aBuffer), ignore it.
@@ -170,7 +182,7 @@ static int ecophoneDirectWrite(EcophoneFile *p,   /* File handle */
 )
 {
     size_t nWrite; /* Return value from write() */
-    const auto fileSize = utils::filesystem::filelength(p->fd);
+    const auto fileSize = file_size(p->fd);
     // vfs_fseek doesn't like offset to be > file size
     if (iOfst < fileSize) {
         if (std::fseek(p->fd, iOfst, SEEK_SET) != 0) {
@@ -268,7 +280,7 @@ static int ecophoneRead(sqlite3_file *pFile, void *zBuf, int iAmt, sqlite_int64 
         return rc;
     }
 
-    auto fileSize = utils::filesystem::filelength(p->fd);
+    auto fileSize = file_size(p->fd);
 
     if (p->fd != nullptr) {
         if (iOfst >= fileSize) {
@@ -393,7 +405,7 @@ static int ecophoneFileSize(sqlite3_file *pFile, sqlite_int64 *pSize)
         return rc;
     }
 
-    *pSize = utils::filesystem::filelength(p->fd);
+    *pSize = file_size(p->fd);
 
     return SQLITE_OK;
 }

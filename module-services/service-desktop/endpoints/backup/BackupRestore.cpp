@@ -149,8 +149,9 @@ bool BackupRestore::PackUserFiles()
         if ((direntry.path().string().compare(".") != 0) && (direntry.path().string().compare("..") != 0) &&
             (direntry.path().string().compare("...") != 0)) {
 
-            LOG_INFO("PackUserFiles: archiving file %s...", (backupPathDB + direntry.path().string()).c_str());
-            auto *file = std::fopen((backupPathDB + direntry.path().string()).c_str(), "r");
+            auto path = backupPathDB + direntry.path().string().c_str();
+            LOG_INFO("PackUserFiles: archiving file %s...", path.c_str());
+            auto *file = std::fopen(path.c_str(), "r");
 
             if (file == nullptr) {
                 LOG_ERROR("PackUserFiles: archiving file %s failed, cannot open file, quitting...",
@@ -172,12 +173,13 @@ bool BackupRestore::PackUserFiles()
                 return false;
             }
 
-            uint32_t loopcount = (utils::filesystem::filelength(file) / tar_buf) + 1u;
+            uintmax_t filesize = std::filesystem::file_size(path);
+            uint32_t loopcount = (filesize / tar_buf) + 1u;
             uint32_t readsize  = 0u;
 
             for (uint32_t i = 0u; i < loopcount; i++) {
                 if (i + 1u == loopcount) {
-                    readsize = utils::filesystem::filelength(file) % tar_buf;
+                    readsize = filesize % tar_buf;
                 }
                 else {
                     readsize = tar_buf;
