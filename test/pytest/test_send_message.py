@@ -14,7 +14,7 @@ def get_message_by_text(harness, message: str, phone_number: str):
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
 def test_send_message(harness, phone_number, sms_text):
-    old_messages = get_message_by_text(harness, sms_text.upper(), str(phone_number))
+    old_messages = get_message_by_text(harness, sms_text, str(phone_number))
 
     # enter menu
     harness.connection.send_key_code(key_codes["enter"])
@@ -38,7 +38,7 @@ def test_send_message(harness, phone_number, sms_text):
         time.sleep(1.2) # it take horrendous amount of time to go back to thread view
         harness.connection.send_key_code(key_codes["fnRight"])
 
-    new_messages = get_message_by_text(harness, sms_text.upper(), str(phone_number))
+    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
     diff_messages = []
 
     for message in new_messages:
