@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DeveloperModeHelper.hpp"
@@ -11,6 +11,7 @@
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-bluetooth/messages/Status.hpp>
+#include <service-cellular/CellularServiceAPI.hpp>
 
 #include <gui/Common.hpp>
 #include <service-appmgr/Actions.hpp>
@@ -69,12 +70,40 @@ auto DeveloperModeHelper::processPutRequest(Context &context) -> sys::ReturnCode
 
         MessageHandler::putToSendQueue(context.createSimpleResponse());
     }
+    else if (body[json::developerMode::changeSim].is_number()) {
+        int simSelected = body[json::developerMode::changeSim].int_value();
+        requestSimChange(simSelected);
+        MessageHandler::putToSendQueue(context.createSimpleResponse());
+    }
     else {
         context.setResponseStatus(http::Code::BadRequest);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
     }
     return sys::ReturnCodes::Unresolved;
 }
+
+auto DeveloperModeHelper::processGetRequest(Context &context) -> sys::ReturnCodes
+{
+    auto body = context.getBody();
+    if (body[json::developerMode::getInfo].is_string()) {
+        auto keyValue = body[json::developerMode::getInfo].string_value();
+        if (keyValue == json::developerMode::simStateInfo) {
+            context.setResponseBody(json11::Json::object(
+                {{json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
+                 {json::sim, std::to_string(static_cast<int>(Store::GSM::get()->sim))},
+                 {json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))}}));
+        }
+        else {
+            context.setResponseStatus(http::Code::BadRequest);
+        }
+    }
+    else {
+        context.setResponseStatus(http::Code::BadRequest);
+    }
+    MessageHandler::putToSendQueue(context.createSimpleResponse());
+    return sys::ReturnCodes::Unresolved;
+}
+
 auto DeveloperModeHelper::getKeyCode(int val) noexcept -> bsp::KeyCodes
 {
     switch (val) {
@@ -143,4 +172,13 @@ void DeveloperModeHelper::sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::S
     auto message = std::make_shared<app::AppInputEventMessage>(std::move(event));
 
     sys::Bus::SendUnicast(std::move(message), service::name::evt_manager, ownerServicePtr);
+}
+
+void DeveloperModeHelper::requestSimChange(const int simSelected)
+{
+    Store::GSM::SIM sim = Store::GSM::SIM::SIM1;
+    if (simSelected == static_cast<int>(Store::GSM::SIM::SIM2)) {
+        sim = Store::GSM::SIM::SIM2;
+    }
+    CellularServiceAPI::SetSimCard(ownerServicePtr, sim);
 }
