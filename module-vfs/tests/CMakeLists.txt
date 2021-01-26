@@ -37,6 +37,15 @@ add_catch2_executable(
         test_lfs_image
 )
 
+add_catch2_executable(
+    NAME vfs-dualmount
+    SRCS 
+        ${CMAKE_CURRENT_LIST_DIR}/unittest_filesystem_dualmount.cpp
+    LIBS
+        module-vfs
+    DEPS
+        test_lfs_image
+)
 
 # prepare test assets
 set(ASSETS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test_dir")
