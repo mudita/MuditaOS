@@ -33,8 +33,7 @@ namespace sys
         this->state = state;
     }
 
-    SystemManager::SystemManager(TickType_t pingInterval)
-        : Service(service::name::system_manager, "", systemManagerStack), pingInterval(pingInterval)
+    SystemManager::SystemManager() : Service(service::name::system_manager, "", systemManagerStack)
     {
         // Specify list of channels which System Manager is registered to
         busChannels = {BusChannels::SystemManagerRequests};
@@ -104,17 +103,13 @@ namespace sys
 
     void SystemManager::StartSystem(InitFunction init)
     {
-        powerManager = std::make_unique<PowerManager>();
+        powerManager  = std::make_unique<PowerManager>();
         cpuStatistics = std::make_unique<CpuStatistics>();
 
         userInit = init;
 
         // Start System manager
         StartService();
-
-        // M.P: Ping/pong mechanism is turned off. It doesn't bring any value to the system.
-        // pingPongTimerID = CreateTimer(Ticks::MsToTicks(pingInterval), true);
-        // ReloadTimer(pingPongTimerID);
 
         cpuStatisticsTimer = std::make_unique<sys::Timer>("cpuStatistics", this, constants::timerInitInterval.count());
         cpuStatisticsTimer->connect([&](sys::Timer &) { CpuStatisticsTimerHandler(); });
@@ -342,8 +337,9 @@ namespace sys
                     break;
                 }
             }
-            if (!retry)
+            if (!retry) {
                 break;
+            }
         }
         set(State::Shutdown);
     }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -62,10 +62,11 @@ namespace sys
             ShutdownReady,
             Reboot,
         } state = State::Running;
-        void set(enum State state);
-        SystemManager(TickType_t pingInterval);
 
-        ~SystemManager();
+        SystemManager();
+        ~SystemManager() override;
+
+        void set(enum State state);
 
         void StartSystem(InitFunction init);
 
@@ -105,7 +106,7 @@ namespace sys
             return ReturnCodes::Success;
         }
 
-        ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) override final
+        ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) final
         {
             return ReturnCodes::Success;
         }
@@ -132,8 +133,6 @@ namespace sys
         /// periodic update of cpu statistics
         void CpuStatisticsTimerHandler();
 
-        TickType_t pingInterval;
-        uint32_t pingPongTimerID;
         bool cpuStatisticsTimerInit{false};
 
         InitFunction userInit;
