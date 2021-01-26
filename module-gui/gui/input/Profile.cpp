@@ -35,7 +35,7 @@ namespace gui
             return json11::Json();
         }
 
-        uint32_t fsize = utils::filesystem::filelength(fd);
+        uint32_t fsize = std::filesystem::file_size(filepath);
 
         auto stream = std::make_unique<char[]>(fsize + 1);
 

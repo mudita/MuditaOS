@@ -86,7 +86,7 @@ namespace app
             return {};
         }
         auto _            = gsl::finally([file] { std::fclose(file); });
-        const auto length = utils::filesystem::filelength(file);
+        const auto length = std::filesystem::file_size(filename);
 
         if (length >= tar_buf) {
             LOG_ERROR("File %s length is too high!", filename.c_str());

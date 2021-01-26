@@ -46,7 +46,7 @@ namespace gui
 
         auto file = std::fopen(filename.c_str(), "rb");
 
-        auto fileSize = utils::filesystem::filelength(file);
+        auto fileSize = std::filesystem::file_size(filename);
         std::rewind(file);
 
         char *fontData = new char[fileSize];
@@ -61,7 +61,7 @@ namespace gui
 
         // close file
         std::fclose(file);
-        if (static_cast<long>(bytesRead) != fileSize) {
+        if (static_cast<uintmax_t>(bytesRead) != fileSize) {
             LOG_ERROR("Failed to read all file");
             delete[] fontData;
             return nullptr;
