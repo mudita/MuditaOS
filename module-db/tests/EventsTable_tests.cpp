@@ -15,15 +15,3 @@
 #include <purefs/filesystem_paths.hpp>
 #include <unistd.h>
 
-using namespace std::chrono_literals;
-
-static auto remove_events(EventsDB &db) -> bool
-{
-    auto count   = db.events.count();
-    auto records = db.events.getLimitOffset(0, count);
-    bool ret     = true;
-    for (auto rec : records) {
-        ret = ret && db.events.removeById(rec.ID);
-    }
-    return ret;
-}
