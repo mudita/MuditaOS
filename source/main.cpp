@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "config.h"
@@ -67,7 +67,7 @@ int main()
 
     bsp::BoardInit();
 
-    auto sysmgr = std::make_shared<sys::SystemManager>(5000);
+    auto sysmgr = std::make_shared<sys::SystemManager>();
 
     sysmgr->StartSystem([sysmgr]() {
         /// force initialization of PhonenumberUtil because of its stack usage
