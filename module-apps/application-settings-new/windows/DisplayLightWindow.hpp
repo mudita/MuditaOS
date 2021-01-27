@@ -11,10 +11,16 @@
 
 namespace gui
 {
+    namespace lighting
+    {
+        constexpr inline auto AMBIENT_LIGHT_TIMER_MS = 2000;
+    }
+
     class DisplayLightWindow : public BaseSettingsWindow
     {
       public:
         DisplayLightWindow(app::Application *app, app::settingsInterface::ScreenLightSettings *screenLightSettings);
+        ~DisplayLightWindow();
 
       private:
         auto buildOptionsList() -> std::list<Option> override;
@@ -22,10 +28,12 @@ namespace gui
 
         void addBrightnessOption(std::list<Option> &);
         auto createBrightnessOption(int step) -> std::unique_ptr<SpinBoxOptionSettings>;
-
         bool isDisplayLightSwitchOn                                      = false;
         bool isAutoLightSwitchOn                                         = false;
         std::uint8_t brightnessValue                                     = 0;
         app::settingsInterface::ScreenLightSettings *screenLightSettings = nullptr;
+        float ambientLight                                               = 0.0;
+        std::unique_ptr<app::GuiTimer> timerTask;
+        [[nodiscard]] auto onTimerTimeout(Item &self, Timer &task) -> bool;
     };
 } // namespace gui
