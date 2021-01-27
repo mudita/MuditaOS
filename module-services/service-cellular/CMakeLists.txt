@@ -5,6 +5,7 @@ set(SOURCES
     CellularCall.cpp
     CellularServiceAPI.cpp
     CellularUrcHandler.cpp
+    checkSmsCenter.cpp
     ServiceCellular.cpp
     SignalStrength.cpp
     SimCard.cpp
