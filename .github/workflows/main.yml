@@ -98,6 +98,7 @@ jobs:
         run: |
           kill $(cat emulator.pid)
           rm emulator.pid
+          rm -f /tmp/purephone_pts_name
         if: always()
       - name: print emulator logs
         run: cat emulator.log
