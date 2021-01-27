@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "time_conversion.hpp"
@@ -194,14 +194,14 @@ namespace utils::time
         }
         if (isToday()) // if the same computer day, then return hour.
         {
-            return Timestamp::str(Locale::format(Locale::FormatTime12H));
+            return Timestamp::str(Locale::format(Locale::TimeFormat::FormatTime12H));
         }
         else if (show_textual_past && isYesterday()) {
             return Locale::yesterday();
         }
         else {
-            return Timestamp::str(
-                Locale::format(date_format_long ? Locale::FormatLocaleDateFull : Locale::FormatLocaleDateShort));
+            return Timestamp::str(Locale::format(date_format_long ? Locale::TimeFormat::FormatLocaleDateFull
+                                                                  : Locale::TimeFormat::FormatLocaleDateShort));
         }
     }
     UTF8 Timestamp::get_date_time_substr(GetParameters param)
@@ -266,8 +266,8 @@ namespace utils::time
             }
         }
 
-        return Timestamp::str(
-            Locale::format(date_format_long ? Locale::FormatLocaleDateFull : Locale::FormatLocaleDateShort));
+        return Timestamp::str(Locale::format(date_format_long ? Locale::TimeFormat::FormatLocaleDateFull
+                                                              : Locale::TimeFormat::FormatLocaleDateShort));
     }
 
     UTF8 Time::str(std::string format)
@@ -276,8 +276,8 @@ namespace utils::time
             return Timestamp::str(format);
         }
         else {
-            return Timestamp::str(
-                Locale::format(Locale::FormatTime12HShort)); // @TODO: M.G. FormatLocaleTime which actually works
+            return Timestamp::str(Locale::format(
+                Locale::TimeFormat::FormatTime12HShort)); // @TODO: M.G. FormatLocaleTime which actually works
         }
     }
 

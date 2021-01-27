@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -123,6 +123,10 @@ namespace app::manager
         auto handleInitApplication(ApplicationInitialised *msg) -> bool;
         auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
+        auto handleAutomaticDateAndTimeChange(AutomaticDateAndTimeIsOnChangeRequest *msg) -> bool;
+        auto handleAutomaticTimeZoneChange(AutomaticTimeZoneIsOnChangeRequest *msg) -> bool;
+        auto handleTimeFormatChange(TimeFormatChangeRequest *msg) -> bool;
+        auto handleDateFormatChange(DateFormatChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
         auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
 

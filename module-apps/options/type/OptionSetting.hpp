@@ -17,6 +17,7 @@ namespace gui::option
         AppWindow *app                                   = nullptr;
         SettingRightItem rightItem                       = SettingRightItem::Disabled;
         bool indent                                      = false;
+        UTF8 textOnRight;
 
       public:
         OptionSettings(UTF8 text,
@@ -24,9 +25,11 @@ namespace gui::option
                        std::function<bool(Item &)> focusChangedCallback,
                        AppWindow *app,
                        SettingRightItem rightItem = SettingRightItem::Disabled,
-                       bool indent                = false)
+                       bool indent                = false,
+                       UTF8 textOnRight           = UTF8())
             : text(std::move(text)), activatedCallback(std::move(activatedCallback)),
-              focusChangedCallback(std::move(focusChangedCallback)), app(app), rightItem(rightItem), indent(indent)
+              focusChangedCallback(std::move(focusChangedCallback)), app(app), rightItem(rightItem), indent(indent),
+              textOnRight(std::move(textOnRight))
         {}
         [[nodiscard]] auto build() const -> ListItem * override;
         [[nodiscard]] auto str() const -> std::string override

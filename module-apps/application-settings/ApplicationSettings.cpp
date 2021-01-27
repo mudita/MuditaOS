@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
@@ -101,10 +101,6 @@ namespace app
         settings->registerValueChange(
             settings::SystemProperties::lockPassHash,
             [this](std::string value) { lockPassChanged(value); },
-            settings::SettingsScope::Global);
-        settings->registerValueChange(
-            settings::SystemProperties::timeDateFormat,
-            [this](std::string value) { timeDateChanged(value); },
             settings::SettingsScope::Global);
 
         createUserInterface();
