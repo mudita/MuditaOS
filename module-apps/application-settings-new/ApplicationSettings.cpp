@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationSettings.hpp"
@@ -31,6 +31,7 @@
 #include "windows/SystemMainWindow.hpp"
 #include "windows/NewApnWindow.hpp"
 #include "windows/LanguagesWindow.hpp"
+#include "windows/DateAndTimeMainWindow.hpp"
 
 #include "Dialog.hpp"
 
@@ -279,6 +280,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::languages, [](Application *app, const std::string &name) {
             return std::make_unique<gui::LanguagesWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::date_and_time, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DateAndTimeMainWindow>(app);
         });
     }
 

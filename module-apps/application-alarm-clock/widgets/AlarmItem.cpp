@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmItem.hpp"
@@ -55,7 +55,7 @@ namespace gui
     void AlarmItem::setAlarm()
     {
         timeLabel->setText(TimePointToLocalizedTimeString(
-            alarm->time, utils::time::Locale::format(utils::time::Locale::FormatTime12H)));
+            alarm->time, utils::time::Locale::format(utils::time::Locale::TimeFormat::FormatTime12H)));
         if (alarm->status == AlarmStatus::Off) {
             onOffImage->switchState(ButtonState::Off);
         }

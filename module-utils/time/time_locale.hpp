@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -88,7 +88,7 @@ namespace utils
                 Dec
             };
 
-            enum TimeFormat
+            enum class TimeFormat
             {
                 FormatTime12H = 0,     // H:M in 12h format
                 FormatTime12HShort,    // H:M in 12h format, am/pm excluded
@@ -96,6 +96,42 @@ namespace utils
                 FormatLocaleDateFull,  // format locale specified format
                 FormatLocaleDateShort, // format locale specified format
             };
+            static constexpr TimeFormat defaultTimeFormat      = TimeFormat::FormatTime24H;
+            static constexpr std::string_view time_format_12_H = "12 H";
+            static constexpr std::string_view time_format_24_H = "24 H";
+
+            static std::string_view get_time_format(TimeFormat timeFormat)
+            {
+                switch (timeFormat) {
+                case TimeFormat::FormatTime12H:
+                    return time_format_12_H;
+                case TimeFormat::FormatTime24H:
+                    return time_format_24_H;
+                default:
+                    return time_format_24_H;
+                }
+            }
+
+            enum class DateFormat
+            {
+                DD_MM_YYYY = 0,
+                MM_DD_YYYY,
+            };
+            static constexpr DateFormat defaultDateFormat = DateFormat::DD_MM_YYYY;
+            static constexpr std::string_view dd_mm_yyyy  = "DD/MM/YYYY";
+            static constexpr std::string_view mm_dd_yyyy  = "MM/DD/YYYY";
+
+            static std::string_view get_date_format(DateFormat dateFormat)
+            {
+                switch (dateFormat) {
+                case DateFormat::DD_MM_YYYY:
+                    return dd_mm_yyyy;
+                case DateFormat::MM_DD_YYYY:
+                    return mm_dd_yyyy;
+                default:
+                    return dd_mm_yyyy;
+                }
+            }
 
             // this could return variant<bool, UTF8> -> on error -> false -> visit -> handle defaults
             static const UTF8 get_day(enum Day day)
@@ -141,9 +177,9 @@ namespace utils
                 return localize.get(tlocale.ltoday);
             }
 
-            static const std::string format(enum TimeFormat what)
+            static const std::string format(TimeFormat what)
             {
-                return localize.get(tlocale.time_formats[what]);
+                return localize.get(tlocale.time_formats[static_cast<unsigned>(what)]);
             }
 
             static const UTF8 getAM()

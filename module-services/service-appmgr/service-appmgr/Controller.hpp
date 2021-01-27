@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,6 +11,7 @@
 #include <SwitchData.hpp>
 
 #include <i18n/i18n.hpp>
+#include <time/time_locale.hpp>
 
 #include <memory>
 #include <string>
@@ -46,6 +47,10 @@ namespace app::manager
         static auto confirmClose(sys::Service *sender) -> bool;
         static auto changeDisplayLanguage(sys::Service *sender, const Language &language) -> bool;
         static auto changeInputLanguage(sys::Service *sender, const Language &language) -> bool;
+        static auto changeAutomaticDateAndTimeIsOn(sys::Service *sender, bool isOn) -> bool;
+        static auto changeAutomaticTimeZoneIsOn(sys::Service *sender, bool isOn) -> bool;
+        static auto changeTimeFormat(sys::Service *sender, utils::time::Locale::TimeFormat timeFormat) -> bool;
+        static auto changeDateFormat(sys::Service *sender, utils::time::Locale::DateFormat dateFormat) -> bool;
         static auto changePowerSaveMode(sys::Service *sender) -> bool;
         static auto preventBlockingDevice(sys::Service *sender) -> bool;
     };
