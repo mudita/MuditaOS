@@ -4,7 +4,6 @@
 #pragma once
 #include "json/json11.hpp"
 #include <string>
-#include <vfs.hpp>
 #include <filesystem>
 
 using Language = std::string;

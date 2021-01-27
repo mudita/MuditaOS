@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <log/log.hpp>
 #include <crc32/crc32.h>
+#include <vfs.hpp>
 
 namespace boot
 {
