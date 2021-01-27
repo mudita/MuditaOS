@@ -24,6 +24,7 @@ namespace sys
 
 namespace stm
 {
+    using namespace std::chrono_literals;
     constexpr static auto eventTimerMinSkipInterval = 100ms;
 
     AlarmsTimeEvents::AlarmsTimeEvents(sys::Service *service) : TimeEvents(service)
@@ -31,8 +32,9 @@ namespace stm
 
     bool AlarmsTimeEvents::sendNextEventQuery()
     {
-        return DBServiceAPI::GetQuery(
+        const auto [succeed, _] = DBServiceAPI::GetQuery(
             service(), db::Interface::Name::Alarms, std::make_unique<db::query::alarms::SelectTurnedOn>());
+        return succeed;
     }
 
     uint32_t AlarmsTimeEvents::calcToNextEventInterval(std::unique_ptr<db::QueryResult> nextEventQueryResult)

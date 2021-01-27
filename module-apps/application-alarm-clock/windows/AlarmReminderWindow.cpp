@@ -30,13 +30,20 @@ namespace app::alarmClock
         buildInterface();
     }
 
+    gui::top_bar::Configuration AlarmReminderWindow::configureTopBar(gui::top_bar::Configuration appConfiguration)
+    {
+        using namespace gui::top_bar;
+        appConfiguration.enable({Indicator::Signal,
+                                 Indicator::Time,
+                                 Indicator::Battery,
+                                 Indicator::SimCard,
+                                 Indicator::NetworkAccessTechnology});
+        return appConfiguration;
+    }
+
     void AlarmReminderWindow::buildInterface()
     {
         AppWindow::buildInterface();
-
-        topBar->setActive(gui::TopBar::Elements::BATTERY, true);
-        topBar->setActive(gui::TopBar::Elements::SIGNAL, true);
-        topBar->setActive(gui::TopBar::Elements::TIME, true);
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));

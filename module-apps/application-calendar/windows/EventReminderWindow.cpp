@@ -10,6 +10,7 @@
 
 namespace gui
 {
+    using namespace std::chrono_literals;
     constexpr static const auto reminderLifeDuration = 10000ms;
 
     EventReminderWindow::EventReminderWindow(app::Application *app, std::string name)

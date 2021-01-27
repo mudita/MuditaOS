@@ -256,7 +256,11 @@ namespace app
         notifications.notRead.Alarms = counterForToday;
 
         if (rebuildDesktopMenu) {
-            windowsFactory.build(this, app::window::name::desktop_menu);
+            if (auto menuWindow = dynamic_cast<gui::MenuWindow *>(getWindow(app::window::name::desktop_menu));
+                menuWindow != nullptr) {
+                menuWindow->refresh();
+                return true;
+            }
         }
 
         auto currentWindow = getCurrentWindow();
@@ -322,8 +326,9 @@ namespace app
 
     bool ApplicationDesktop::requestTurnedOnAlarms()
     {
-        return DBServiceAPI::GetQuery(
+        const auto [succeed, _] = DBServiceAPI::GetQuery(
             this, db::Interface::Name::Alarms, std::make_unique<db::query::alarms::SelectTurnedOn>());
+        return succeed;
     }
 
     bool ApplicationDesktop::requestNotReadNotifications()

@@ -43,6 +43,7 @@ namespace app::alarmClock
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+        gui::top_bar::Configuration configureTopBar(gui::top_bar::Configuration appConfiguration) override;
         auto handleSwitchData(gui::SwitchData *data) -> bool override;
     };
 

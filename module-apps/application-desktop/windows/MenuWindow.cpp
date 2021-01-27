@@ -176,7 +176,7 @@ namespace gui
                             app::manager::actions::Launch,
                             std::make_unique<app::ApplicationLaunchData>("ApplicationAlarmClock"));
                     },
-                    app->notifications.notRead.Alarms),
+                    [=]() { return app->notifications.notRead.Alarms > 0; }),
 
                 new gui::Tile("menu_calendar_W_G",
                               "app_desktop_menu_calendar",
