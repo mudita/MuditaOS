@@ -82,6 +82,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "checkSmsCenter.hpp"
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
@@ -775,7 +776,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
                 break;
             }
             auto respMsg      = std::make_shared<cellular::RawCommandResp>(true);
-            auto ret          = channel->cmd(m->command.c_str(), m->timeout);
+            auto ret          = channel->cmd(m->command, std::chrono::milliseconds(m->timeout));
             respMsg->response = ret.response;
             if (respMsg->response.size()) {
                 for (auto const &el : respMsg->response) {
@@ -1383,17 +1384,18 @@ bool ServiceCellular::sendSMS(SMSRecord record)
     constexpr uint32_t singleMessageLen = 30;
     bool result                         = false;
     auto channel                        = cmux->get(TS0710::Channel::Commands);
+    auto receiver                       = record.number.getEntered();
     if (channel) {
         channel->cmd(at::AT::SET_SMS_TEXT_MODE_UCS2);
         channel->cmd(at::AT::SMS_UCSC2);
         // if text fit in single message send
         if (textLen < singleMessageLen) {
-
+            std::string command      = std::string(at::factory(at::AT::CMGS));
+            std::string body         = UCS2(UTF8(receiver)).str();
+            std::string suffix       = "\"";
+            std::string command_data = command + body + suffix;
             if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(
-                    (std::string(at::factory(at::AT::CMGS)) + UCS2(UTF8(record.number.getEntered())).str() + "\"")
-                        .c_str(),
-                    1,
-                    commandTimeout))) {
+                    command_data.c_str(), 1, at::factory(at::AT::CMGS).getTimeout().count()))) {
 
                 if (channel->cmd((UCS2(record.body).str() + "\032").c_str())) {
                     result = true;
@@ -1401,6 +1403,8 @@ bool ServiceCellular::sendSMS(SMSRecord record)
                 else {
                     result = false;
                 }
+                if (!result)
+                    LOG_ERROR("Message to: %s send failure", receiver.c_str());
             }
         }
         // split text, and send concatenated messages
@@ -1426,21 +1430,25 @@ bool ServiceCellular::sendSMS(SMSRecord record)
                 }
                 UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
 
-                std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(record.number.getEntered())).str() +
-                                    "\",120," + std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
+                std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(receiver)).str() + "\",120," +
+                                    std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
 
                 if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(command.c_str(), 1, commandTimeout))) {
                     // prompt sign received, send data ended by "Ctrl+Z"
-                    if (channel->cmd((UCS2(messagePart).str() + "\032").c_str(), commandTimeout, 2)) {
+                    if (channel->cmd(UCS2(messagePart).str() + "\032", std::chrono::milliseconds(commandTimeout), 2)) {
                         result = true;
                     }
                     else {
                         result = false;
+                        if (!result)
+                            LOG_ERROR("Message send failure");
                         break;
                     }
                 }
                 else {
                     result = false;
+                    if (!result)
+                        LOG_ERROR("Message send failure");
                     break;
                 }
             }
@@ -1453,6 +1461,9 @@ bool ServiceCellular::sendSMS(SMSRecord record)
     else {
         LOG_INFO("SMS sending failed.");
         record.type = SMSType::FAILED;
+        if (checkSmsCenter(*channel)) {
+            LOG_ERROR("SMS center check");
+        }
     }
     DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(record));
 
@@ -1470,7 +1481,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
     channel->cmd(at::AT::SMS_UCSC2);
 
     auto cmd           = at::factory(at::AT::QCMGR);
-    auto ret           = channel->cmd(cmd + messageNumber, cmd.timeout);
+    auto ret           = channel->cmd(cmd + messageNumber, cmd.getTimeout());
     bool messageParsed = false;
 
     std::string messageRawBody;
@@ -1952,7 +1963,7 @@ bool ServiceCellular::SetScanMode(std::string mode)
     if (channel) {
         auto command = at::factory(at::AT::SET_SCANMODE);
 
-        auto resp = channel->cmd(command.cmd + mode + ",1", 300, 1);
+        auto resp = channel->cmd(command.getCmd() + mode + ",1", command.getTimeout(), 1);
         if (resp.code == at::Result::Code::OK) {
             return true;
         }
@@ -1984,10 +1995,10 @@ bool ServiceCellular::transmitDtmfTone(uint32_t digit)
     if (channel) {
         auto command           = at::factory(at::AT::QLDTMF);
         std::string dtmfString = "\"" + std::string(1, digit) + "\"";
-        resp                   = channel->cmd(command.cmd + dtmfString);
+        resp                   = channel->cmd(command.getCmd() + dtmfString);
         if (resp) {
             command = at::factory(at::AT::VTS);
-            resp    = channel->cmd(command.cmd + dtmfString);
+            resp    = channel->cmd(command.getCmd() + dtmfString);
         }
     }
     return resp.code == at::Result::Code::OK;
@@ -2000,7 +2011,7 @@ void ServiceCellular::handle_CellularGetChannelMessage()
         LOG_DEBUG("Handle request for channel: %s", TS0710::name(getChannelMsg->dataChannel).c_str());
         std::shared_ptr<CellularGetChannelResponseMessage> channelResponsMessage =
             std::make_shared<CellularGetChannelResponseMessage>(cmux->get(getChannelMsg->dataChannel));
-        LOG_DEBUG("chanel ptr: %p", channelResponsMessage->dataChannelPtr);
+        LOG_DEBUG("channel ptr: %p", channelResponsMessage->dataChannelPtr);
         sys::Bus::SendUnicast(std::move(channelResponsMessage), req->sender, this);
         return sys::MessageNone{};
     });
@@ -2097,7 +2108,7 @@ bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType request
         if (requestType == CellularUSSDMessage::RequestType::pullSesionRequest) {
             channel->cmd(at::AT::SMS_GSM);
             std::string command = at::factory(at::AT::CUSD_SEND) + request + ",15";
-            auto result         = channel->cmd(command, commandTimeout, commandExpectedTokens);
+            auto result = channel->cmd(command, std::chrono::milliseconds(commandTimeout), commandExpectedTokens);
             if (result.code == at::Result::Code::OK) {
                 ussdState = ussd::State::pullRequestSent;
                 setUSSDTimer();

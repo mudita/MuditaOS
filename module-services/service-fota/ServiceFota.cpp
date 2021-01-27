@@ -516,7 +516,7 @@ namespace FotaService
 
     at::Result Service::sendAndLogError(const std::string &msg, uint32_t timeout) const
     {
-        at::Result result = dataChannel->cmd(msg, timeout);
+        at::Result result = dataChannel->cmd(msg, std::chrono::milliseconds(timeout));
         logIfError(result, msg);
         return result;
     }

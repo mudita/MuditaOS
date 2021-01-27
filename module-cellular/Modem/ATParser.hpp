@@ -17,7 +17,7 @@ namespace bsp
     class Cellular;
 }
 
-class ATParser : public at::Chanel
+class ATParser : public at::Channel
 {
   public:
     enum class Urc
