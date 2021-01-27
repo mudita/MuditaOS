@@ -257,7 +257,7 @@ sys::ReturnCodes EventManager::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sevm::KeypadBacklightMessage(), [&](sys::Message *msgl) {
+    connect(sevm::KeypadBacklightMessage(bsp::keypad_backlight::Action::turnOff), [&](sys::Message *msgl) {
         auto request      = static_cast<sevm::KeypadBacklightMessage *>(msgl);
         auto response     = std::make_shared<sevm::KeypadBacklightResponseMessage>();
         response->success = processKeypadBacklightRequest(request->action);

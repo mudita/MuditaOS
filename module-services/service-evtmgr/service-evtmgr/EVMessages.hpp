@@ -125,19 +125,19 @@ namespace sevm
         bool success = false;
     };
 
-    class KeypadBacklightMessage : public Message
+    class KeypadBacklightMessage : public sys::Message
     {
       public:
-        KeypadBacklightMessage() : Message(MessageType::EVMKeypadBacklightMessage)
+        explicit KeypadBacklightMessage(bsp::keypad_backlight::Action action) : action(action)
         {}
 
         bsp::keypad_backlight::Action action;
     };
 
-    class KeypadBacklightResponseMessage : public KeypadBacklightMessage
+    class KeypadBacklightResponseMessage : public sys::Message
     {
       public:
-        KeypadBacklightResponseMessage() : KeypadBacklightMessage()
+        KeypadBacklightResponseMessage()
         {}
         bool success;
     };
