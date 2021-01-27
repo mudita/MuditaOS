@@ -54,7 +54,8 @@ def harness(request):
     Try to init one Pure phone with serial port path or automatically
     '''
     port_name = request.config.option.port
-    TIMEOUT = min(1, request.config.option.timeout)
+    TIMEOUT = request.config.option.timeout
+
     timeout_started = time.time()
 
     RETRY_EVERY_SECONDS = 1.0
