@@ -14,11 +14,11 @@ struct EventsTableRow : public Record
 {
     std::string UID;
     std::string title;
-    calendar::TimePoint date_from      = TIME_POINT_INVALID;
-    calendar::TimePoint date_till      = TIME_POINT_INVALID;
+    TimePoint date_from      = TIME_POINT_INVALID;
+    TimePoint date_till      = TIME_POINT_INVALID;
     uint32_t reminder        = 0;
     uint32_t repeat          = 0;
-    calendar::TimePoint reminder_fired = TIME_POINT_INVALID;
+    TimePoint reminder_fired = TIME_POINT_INVALID;
     std::string provider_type;
     std::string provider_id;
     std::string provider_iCalUid;
@@ -53,12 +53,16 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
     bool drop();
     EventsTableRow getByUID(const std::string &UID);
     EventsTableRow getById(uint32_t id) override final;
-    std::vector<EventsTableRow> selectByDatePeriod(calendar::TimePoint filter_from,
-                                                   calendar::TimePoint filter_till,
+    std::vector<EventsTableRow> selectByDatePeriod(TimePoint filter_from,
+                                                   TimePoint filter_till,
                                                    uint32_t offset,
                                                    uint32_t limit);
+
+    std::vector<EventsTableRow> selectByDate(TimePoint date, uint32_t offset, uint32_t limit);
+
     uint32_t count() override final;
-    uint32_t countFromFilter(calendar::TimePoint from, calendar::TimePoint till);
+    uint32_t countFromFilter(TimePoint from, TimePoint till);
+    uint32_t countFromDayFilter(TimePoint filter);
     uint32_t countByFieldId(const char *field, uint32_t id) override final;
     std::vector<EventsTableRow> getLimitOffset(uint32_t offset, uint32_t limit) override final;
     std::vector<EventsTableRow> getLimitOffsetByField(uint32_t offset,
@@ -67,7 +71,7 @@ class EventsTable : public Table<EventsTableRow, EventsTableFields>
                                                       const char *str) override final;
 
     std::vector<EventsTableRow> getLimitOffsetByDate(uint32_t offset, uint32_t limit);
-    std::vector<EventsTableRow> SelectFirstUpcoming(calendar::TimePoint filter_from, calendar::TimePoint filter_till);
+    std::vector<EventsTableRow> SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till);
 
   private:
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS events("

@@ -30,6 +30,7 @@
 #include "windows/ChangePasscodeWindow.hpp"
 #include "windows/SystemMainWindow.hpp"
 #include "windows/NewApnWindow.hpp"
+#include "windows/LanguagesWindow.hpp"
 
 #include "Dialog.hpp"
 
@@ -42,6 +43,7 @@
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <application-settings-new/data/ApnListData.hpp>
 #include <application-settings-new/data/BondedDevicesData.hpp>
+#include <application-settings-new/data/LanguagesData.hpp>
 #include <application-settings-new/data/PhoneNameData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
@@ -49,6 +51,8 @@
 #include <i18n/i18n.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/ScreenLightControlMessage.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/Constants.hpp>
+#include <module-services/service-appmgr/service-appmgr/messages/Message.hpp>
+#include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 
 namespace app
 {
@@ -158,14 +162,27 @@ namespace app
             return sys::MessageNone{};
         });
 
+        connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
+            if (gui::window::name::languages == getCurrentWindow()->getName()) {
+                auto response = dynamic_cast<manager::GetCurrentDisplayLanguageResponse *>(msg);
+                if (response != nullptr) {
+                    auto languagesData = std::make_unique<LanguagesData>(response->getLanguage());
+                    switchWindow(gui::window::name::languages, std::move(languagesData));
+                }
+            }
+            return sys::MessageNone{};
+        });
+
         createUserInterface();
 
         setActiveWindow(gui::name::window::main_window);
 
         settings->registerValueChange(settings::operators_on,
                                       [this](const std::string &value) { operatorOnChanged(value); });
-        settings->registerValueChange(::settings::Cellular::volte_on,
-                                      [this](const std::string &value) { volteChanged(value); });
+        settings->registerValueChange(
+            ::settings::Cellular::volte_on,
+            [this](const std::string &value) { volteChanged(value); },
+            ::settings::SettingsScope::Global);
         settings->registerValueChange(
             ::settings::SystemProperties::lockPassHash,
             [this](std::string value) { lockPassHash = utils::getNumericValue<unsigned int>(value); },
@@ -258,6 +275,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::new_apn, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NewApnWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::languages, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::LanguagesWindow>(app);
         });
     }
 

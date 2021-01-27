@@ -32,20 +32,22 @@ namespace service::eink
         void powerOff();
         void shutdown();
 
-        bool changeWaveform(EinkWaveforms_e mode, std::int32_t temperature);
+        bool setWaveform(EinkWaveforms_e mode, std::int32_t temperature);
         void setMode(EinkDisplayColorMode_e mode) noexcept;
 
         ::gui::Size getSize() const noexcept;
 
       private:
-        unsigned int calculateWaveFormSegment(std::int32_t temperature) const;
-        unsigned int calculateWaveFormOffset(EinkWaveforms_e mode, unsigned int segment) const;
-        void resetWaveFormSettings();
-        EinkBpp_e getCurrentBitsPerPixelFormat() const noexcept;
+        static unsigned int toWaveformTemperatureOffset(std::int32_t temperature) noexcept;
+        static unsigned int toWaveformOffset(unsigned short LUTbank, unsigned int temperatureOffset) noexcept;
+        static unsigned int toWaveformOffset(EinkWaveforms_e mode, unsigned int temperatureOffset);
+        bool isNewWaveformNeeded(EinkWaveforms_e newMode, int32_t newTemperature) const;
+        void resetWaveformSettings();
 
+        EinkBpp_e getCurrentBitsPerPixelFormat() const noexcept;
         static constexpr ::gui::Point pointTopLeft{0, 0};
         const ::gui::Size size;
-        EinkWaveFormSettings_t waveformSettings;
+        EinkWaveformSettings_t currentWaveform;
         EinkDisplayColorMode_e displayMode;
     };
 } // namespace service::eink

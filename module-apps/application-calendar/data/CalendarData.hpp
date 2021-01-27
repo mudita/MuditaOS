@@ -42,7 +42,7 @@ class DayMonthData : public gui::SwitchData
 {
   protected:
     std::string dayMonth;
-    calendar::TimePoint dateFilter;
+    TimePoint dateFilter;
 
   public:
     DayMonthData()          = default;
@@ -52,12 +52,12 @@ class DayMonthData : public gui::SwitchData
         return dayMonth;
     };
 
-    calendar::TimePoint getDateFilter()
+    TimePoint getDateFilter()
     {
         return dateFilter;
     };
 
-    virtual void setData(std::string dayMonthText, const calendar::TimePoint &dateNumb)
+    virtual void setData(std::string dayMonthText, const TimePoint &dateNumb)
     {
         dayMonth   = dayMonthText;
         dateFilter = dateNumb;

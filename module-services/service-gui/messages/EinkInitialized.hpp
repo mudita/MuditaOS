@@ -9,10 +9,10 @@
 
 namespace service::gui
 {
-    class EinkReady : public GUIMessage
+    class EinkInitialized : public GUIMessage
     {
       public:
-        explicit EinkReady(::gui::Size displaySize) : einkDisplaySize{displaySize}
+        explicit EinkInitialized(::gui::Size displaySize) : einkDisplaySize{displaySize}
         {}
 
         [[nodiscard]] auto getDisplaySize() const noexcept -> ::gui::Size

@@ -246,6 +246,9 @@ namespace app::manager
             handleAction(actionMsg);
             return std::make_shared<sys::ResponseMessage>();
         });
+        connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
+            return std::make_shared<GetCurrentDisplayLanguageResponse>(displayLanguage);
+        });
 
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
         connect(typeid(CellularSimRequestPinMessage), convertibleToActionHandler);

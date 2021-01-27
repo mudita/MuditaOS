@@ -27,7 +27,7 @@ namespace stm
     {
       private:
         EventsRecord eventRecord;
-        calendar::TimePoint startTP = TIME_POINT_INVALID;
+        TimePoint startTP = TIME_POINT_INVALID;
 
       protected:
         const std::string timerName() override
