@@ -99,12 +99,22 @@ namespace app
             virtual void setMode(bool isAutoLightSwitchOn)      = 0;
             virtual void setStatus(bool isDisplayLightSwitchOn) = 0;
         };
+
+        class KeypdBacklightSettings
+        {
+          public:
+            virtual ~KeypdBacklightSettings()                   = default;
+            virtual auto isKeypadBacklightOn() -> bool          = 0;
+            virtual void setKeypadBacklightState(bool newState) = 0;
+        };
+
     }; // namespace settingsInterface
 
     class ApplicationSettingsNew : public app::Application,
                                    public settingsInterface::SimParams,
                                    public settingsInterface::OperatorsSettings,
-                                   public settingsInterface::ScreenLightSettings
+                                   public settingsInterface::ScreenLightSettings,
+                                   public settingsInterface::KeypdBacklightSettings
     {
       public:
         ApplicationSettingsNew(std::string name                    = name_settings_new,
@@ -141,6 +151,9 @@ namespace app
         void setBrightness(float brigtnessValue) override;
         void setMode(bool isAutoLightSwitchOn) override;
         void setStatus(bool isDisplayLightSwitchOn) override;
+
+        auto isKeypadBacklightOn() -> bool override;
+        void setKeypadBacklightState(bool newState) override;
 
       private:
         void attachQuotesWindows();

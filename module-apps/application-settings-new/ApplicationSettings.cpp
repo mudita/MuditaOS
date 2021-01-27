@@ -51,6 +51,7 @@
 #include <i18n/i18n.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/ScreenLightControlMessage.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/Constants.hpp>
+#include <module-services/service-evtmgr/service-evtmgr/EVMessages.hpp>
 #include <module-services/service-appmgr/service-appmgr/messages/Message.hpp>
 #include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 
@@ -219,7 +220,7 @@ namespace app
             return std::make_unique<gui::LockedScreenWindow>(app);
         });
         windowsFactory.attach(gui::window::name::keypad_light, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::KeypadLightWindow>(app);
+            return std::make_unique<gui::KeypadLightWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
         windowsFactory.attach(gui::window::name::font_size, [](Application *app, const std::string &name) {
             return std::make_unique<gui::FontSizeWindow>(app);
@@ -385,6 +386,36 @@ namespace app
         sys::Bus::SendUnicast(
             std::make_shared<sevm::ScreenLightControlMessage>(
                 isDisplayLightSwitchOn ? screen_light_control::Action::turnOn : screen_light_control::Action::turnOff),
+            service::name::evt_manager,
+            this);
+    }
+
+    auto ApplicationSettingsNew::isKeypadBacklightOn() -> bool
+    {
+        constexpr int timeout = pdMS_TO_TICKS(1500);
+
+        auto response = sys::Bus::SendUnicast(
+            std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::checkState),
+            service::name::evt_manager,
+            this,
+            timeout);
+
+        if (response.first == sys::ReturnCodes::Success) {
+            auto msgState = dynamic_cast<sevm::KeypadBacklightResponseMessage *>(response.second.get());
+            if (msgState == nullptr) {
+                return false;
+            }
+
+            return {msgState->success};
+        }
+        return false;
+    }
+
+    void ApplicationSettingsNew::setKeypadBacklightState(bool newState)
+    {
+        sys::Bus::SendUnicast(
+            std::make_shared<sevm::KeypadBacklightMessage>(newState ? bsp::keypad_backlight::Action::turnOn
+                                                                    : bsp::keypad_backlight::Action::turnOff),
             service::name::evt_manager,
             this);
     }

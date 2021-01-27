@@ -11,8 +11,17 @@
 namespace gui
 {
 
-    KeypadLightWindow::KeypadLightWindow(app::Application *app) : BaseSettingsWindow(app, window::name::keypad_light)
+    KeypadLightWindow::KeypadLightWindow(app::Application *app,
+                                         app::settingsInterface::KeypdBacklightSettings *settings)
+        : BaseSettingsWindow(app, window::name::keypad_light), keypadLightSettings(settings)
     {
+        if (keypadLightSettings->isKeypadBacklightOn()) {
+            isAlwaysOnSwitchOn = true;
+        }
+        else {
+            isOffSwitchOn = true;
+        }
+
         setTitle(utils::localize.get("app_settings_display_keypad_light"));
     }
 
@@ -21,9 +30,9 @@ namespace gui
         isActiveSwitchOn   = false;
         isOffSwitchOn      = false;
         isAlwaysOnSwitchOn = false;
-
         toggleSwitch = !toggleSwitch;
         rebuildOptionList();
+        keypadLightSettings->setKeypadBacklightState(isAlwaysOnSwitchOn);
     }
 
     auto KeypadLightWindow::buildOptionsList() -> std::list<gui::Option>
