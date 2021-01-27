@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceGUI.hpp"
 #include "WorkerGUI.hpp"
 
 #include "messages/DrawMessage.hpp"
-#include "messages/EinkReady.hpp"
+#include "messages/EinkInitialized.hpp"
 
 #include <DrawCommand.hpp>
 #include <FontManager.hpp>
@@ -14,7 +14,7 @@
 #include <service-eink/Common.hpp>
 #include <service-eink/messages/ImageMessage.hpp>
 #include <service-eink/messages/EinkMessage.hpp>
-#include <service-eink/messages/PrepareDisplayRequest.hpp>
+#include <service-eink/messages/PrepareDisplayEarlyRequest.hpp>
 #include <SystemManager/SystemManager.hpp>
 
 #include <gsl/gsl_util>
@@ -27,7 +27,9 @@ namespace service::gui
         constexpr auto ServiceGuiStackDepth  = 4096U;
         constexpr auto ContextsCount         = 2;
         constexpr auto CommandsQueueCapacity = 3;
-        constexpr std::chrono::milliseconds ContextReleaseTimeout{1000};
+        constexpr std::chrono::milliseconds BSPEinkBusyTimeout{3000}; ///< sync with \ref BSP_EinkBusyTimeout
+        constexpr std::chrono::milliseconds RTOSMessageRoundtripTimeout{1000};
+        constexpr std::chrono::milliseconds ContextReleaseTimeout{BSPEinkBusyTimeout + RTOSMessageRoundtripTimeout};
     } // namespace
 
     ServiceGUI::ServiceGUI(const std::string &name, std::string parent)
@@ -52,8 +54,8 @@ namespace service::gui
 
     void ServiceGUI::registerMessageHandlers()
     {
-        connect(typeid(EinkReady),
-                [this](sys::Message *request) -> sys::MessagePointer { return handleEinkReady(request); });
+        connect(typeid(EinkInitialized),
+                [this](sys::Message *request) -> sys::MessagePointer { return handleEinkInitialized(request); });
 
         connect(typeid(DrawMessage),
                 [this](sys::Message *request) -> sys::MessagePointer { return handleDrawMessage(request); });
@@ -119,15 +121,17 @@ namespace service::gui
                 setState(State::Suspended);
             }
 
-            prepareDisplay(drawMsg->mode);
+            if (!contextPool->isAnyContextLocked()) {
+                prepareDisplayEarly(drawMsg->mode);
+            }
             notifyRenderer(std::move(drawMsg->commands), drawMsg->mode);
         }
         return sys::MessageNone{};
     }
 
-    void ServiceGUI::prepareDisplay(::gui::RefreshModes refreshMode)
+    void ServiceGUI::prepareDisplayEarly(::gui::RefreshModes refreshMode)
     {
-        auto msg = std::make_shared<service::eink::PrepareDisplayRequest>(refreshMode);
+        auto msg = std::make_shared<service::eink::PrepareDisplayEarlyRequest>(refreshMode);
         sys::Bus::SendUnicast(msg, service::name::eink, this);
     }
 
@@ -199,9 +203,9 @@ namespace service::gui
         cachedRender = std::nullopt;
     }
 
-    sys::MessagePointer ServiceGUI::handleEinkReady(sys::Message *message)
+    sys::MessagePointer ServiceGUI::handleEinkInitialized(sys::Message *message)
     {
-        const auto msg = static_cast<service::gui::EinkReady *>(message);
+        const auto msg = static_cast<service::gui::EinkInitialized *>(message);
         contextPool    = std::make_unique<ContextPool>(msg->getDisplaySize(), ContextsCount);
         setState(State::Idle);
         return sys::MessageNone{};
@@ -246,4 +250,4 @@ namespace service::gui
     {
         return currentState == state;
     }
-} /* namespace sgui */
+} // namespace service::gui

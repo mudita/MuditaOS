@@ -3,9 +3,9 @@
 
 #include "ServiceEink.hpp"
 #include "messages/EinkModeMessage.hpp"
-#include "messages/PrepareDisplayRequest.hpp"
+#include "messages/PrepareDisplayEarlyRequest.hpp"
 #include <service-gui/Common.hpp>
-#include <service-gui/messages/EinkReady.hpp>
+#include <service-gui/messages/EinkInitialized.hpp>
 #include <time/ScopedTime.hpp>
 
 #include <log/log.hpp>
@@ -32,8 +32,8 @@ namespace service::eink
         connect(typeid(ImageMessage),
                 [this](sys::Message *request) -> sys::MessagePointer { return handleImageMessage(request); });
 
-        connect(typeid(PrepareDisplayRequest),
-                [this](sys::Message *request) -> sys::MessagePointer { return handlePrepareRequest(request); });
+        connect(typeid(PrepareDisplayEarlyRequest),
+                [this](sys::Message *request) -> sys::MessagePointer { return handlePrepareEarlyRequest(request); });
     }
 
     sys::MessagePointer ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *response)
@@ -51,7 +51,7 @@ namespace service::eink
 
         display.powerOn();
 
-        auto msg = std::make_shared<service::gui::EinkReady>(display.getSize());
+        auto msg = std::make_shared<service::gui::EinkInitialized>(display.getSize());
         sys::Bus::SendUnicast(msg, service::name::gui, this);
 
         return sys::ReturnCodes::Success;
@@ -139,19 +139,19 @@ namespace service::eink
     {
         display.powerOn();
 
-        const auto isDeepRefresh = refreshMode == ::gui::RefreshModes::GUI_REFRESH_DEEP;
-        if (const auto temperature = EinkGetTemperatureInternal(); isDeepRefresh) {
-            display.changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
+        const auto temperature = EinkGetTemperatureInternal();
+        if (refreshMode == ::gui::RefreshModes::GUI_REFRESH_DEEP) {
+            display.setWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
             display.dither();
         }
         else {
-            display.changeWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
+            display.setWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
         }
     }
 
-    sys::MessagePointer ServiceEink::handlePrepareRequest(sys::Message *message)
+    sys::MessagePointer ServiceEink::handlePrepareEarlyRequest(sys::Message *message)
     {
-        const auto waveformUpdateMsg = static_cast<service::eink::PrepareDisplayRequest *>(message);
+        const auto waveformUpdateMsg = static_cast<service::eink::PrepareDisplayEarlyRequest *>(message);
         prepareDisplay(waveformUpdateMsg->getRefreshMode());
         return sys::MessageNone{};
     }

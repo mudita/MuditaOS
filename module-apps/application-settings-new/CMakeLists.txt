@@ -16,6 +16,7 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         ApplicationSettings.cpp
         models/ApnSettingsModel.cpp
+        models/LanguagesModel.cpp
         models/NewApnModel.cpp
         widgets/timeWidget.cpp
         widgets/ChangePasscodeLockHandler.cpp
@@ -50,6 +51,7 @@ target_sources( ${PROJECT_NAME}
         widgets/SpinBox.cpp
         widgets/SpinBoxOptionSetting.cpp
         windows/SystemMainWindow.cpp
+        windows/LanguagesWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -71,6 +73,7 @@ target_sources( ${PROJECT_NAME}
         windows/WallpaperWindow.hpp
         windows/ChangePasscodeWindow.hpp
         windows/SystemMainWindow.hpp
+        windows/LanguagesWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

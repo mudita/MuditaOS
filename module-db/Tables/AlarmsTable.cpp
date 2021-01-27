@@ -9,7 +9,7 @@ AlarmsTableRow::AlarmsTableRow(const AlarmsRecord &rec)
 {}
 
 AlarmsTableRow::AlarmsTableRow(
-    uint32_t id, calendar::TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, UTF8 path)
+    uint32_t id, TimePoint time, uint32_t snooze, AlarmStatus status, uint32_t repeat, UTF8 path)
     : Record{id}, time{time}, snooze{snooze}, status{status}, repeat{repeat}, path{std::move(path)}
 {}
 

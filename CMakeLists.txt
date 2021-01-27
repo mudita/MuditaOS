@@ -281,7 +281,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
             -w ${CMAKE_BINARY_DIR} ecoboot download
             > ${ECOBOOT_DOWNLOAD_LOG}
             COMMENT "Downloading ecoboot.bin"
-            BYPRODUCTS ${ECOBOOT_FILE} ${ECOBOOT_DOWNLOAD_LOG}
+            BYPRODUCTS ${ECOBOOT_DOWNLOAD_LOG}
             )
     else()
         message("ecoboot download with git")
@@ -290,11 +290,13 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
             -w ${CMAKE_BINARY_DIR} ecoboot download
             > ${ECOBOOT_DOWNLOAD_LOG}
             COMMENT "Downloading ecoboot.bin"
-            BYPRODUCTS ${ECOBOOT_FILE} ${ECOBOOT_DOWNLOAD_LOG}
+            BYPRODUCTS ${ECOBOOT_DOWNLOAD_LOG}
             )
     endif()
 
-    add_custom_target(ecoboot.bin DEPENDS ${ECOBOOT_FILE})
+    if(NOT ${CMAKE_GENERATOR} STREQUAL "Ninja")
+        add_custom_target(ecoboot.bin DEPENDS ${ECOBOOT_FILE})
+    endif()
 
     # generate version.json file (runs CMake script at build time)
     set(VERSION_JSON ${CMAKE_BINARY_DIR}/version.json)
@@ -305,9 +307,11 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         -B ${CMAKE_BINARY_DIR}
         -P ${CMAKE_SOURCE_DIR}/config/GenUpdateVersionJson.cmake
         DEPENDS ecoboot.bin ${ECOBOOT_DOWNLOAD_LOG}
-        BYPRODUCTS ${VERSION_JSON}
         )
-    add_custom_target(version.json DEPENDS ${VERSION_JSON})
+
+    if(NOT ${CMAKE_GENERATOR} STREQUAL "Ninja")
+        add_custom_target(version.json DEPENDS ${VERSION_JSON})
+    endif()
 
     multicomp_install(PROGRAMS ${ECOBOOT_FILE} DESTINATION "./" COMPONENTS Standalone Update)
     multicomp_install(FILES ${VERSION_JSON} DESTINATION "./" COMPONENTS Standalone Update)
