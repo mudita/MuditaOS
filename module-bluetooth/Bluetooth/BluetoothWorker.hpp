@@ -117,7 +117,7 @@ class BluetoothWorker : private sys::Worker
     unsigned long active_features;
     void stopScan();
     void setDeviceAddress(bd_addr_t addr);
-
+    auto deinit() -> bool override;
     std::shared_ptr<bluetooth::Profile> currentProfile;
     std::shared_ptr<bluetooth::SettingsHolder> settings;
     std::vector<Devicei> pairedDevices;

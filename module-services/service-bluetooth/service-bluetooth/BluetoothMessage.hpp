@@ -23,8 +23,8 @@ struct BluetoothStatus
 {
     enum class State
     {
-        On,
         Off,
+        On,
         Error,
         None
     } state;

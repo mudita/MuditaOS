@@ -10,6 +10,7 @@
 #include <Service/Bus.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/ServiceCellular.hpp>
+#include <service-bluetooth/messages/Status.hpp>
 
 #include <gui/Common.hpp>
 #include <service-appmgr/Actions.hpp>
@@ -46,6 +47,27 @@ auto DeveloperModeHelper::processPutRequest(Context &context) -> sys::ReturnCode
         auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>();
         auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
         sys::Bus::SendUnicast(std::move(msg), "ApplicationDesktop", ownerServicePtr);
+    }
+    else if (body[json::developerMode::btState].bool_value()) {
+
+        auto event = std::make_unique<sdesktop::developerMode::BluetoothStatusRequestEvent>();
+        auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+        sys::Bus::SendUnicast(std::move(msg), "ServiceBluetooth", ownerServicePtr);
+    }
+    else if (auto state = body[json::developerMode::btCommand].string_value(); !state.empty()) {
+        BluetoothMessage::Request request;
+        if (state == json::developerMode::btOn) {
+            request = BluetoothMessage::Request::Start;
+            LOG_INFO("turning on BT from harness!");
+        }
+        else {
+            request = BluetoothMessage::Request::Stop;
+            LOG_INFO("turning off BT from harness!");
+        }
+        std::shared_ptr<BluetoothMessage> msg = std::make_shared<BluetoothMessage>(request);
+        sys::Bus::SendUnicast(std::move(msg), "ServiceBluetooth", ownerServicePtr);
+
+        MessageHandler::putToSendQueue(context.createSimpleResponse());
     }
     else {
         context.setResponseStatus(http::Code::BadRequest);

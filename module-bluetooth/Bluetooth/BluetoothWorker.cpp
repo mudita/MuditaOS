@@ -89,8 +89,6 @@ auto BluetoothWorker::run() -> bool
         bluetooth::GAP::set_visibility(
             std::visit(bluetooth::BoolVisitor(), settings->getValue(bluetooth::Settings::Visibility)));
 
-        settings->setValue(bluetooth::Settings::State, static_cast<int>(BluetoothStatus::State::On));
-
         settings->onLinkKeyAdded = [this](std::string addr) {
             for (auto &device : bluetooth::GAP::devices) {
                 if (bd_addr_to_str(device.address) == addr) {
@@ -289,4 +287,8 @@ void BluetoothWorker::setDeviceAddress(bd_addr_t addr)
 {
     bluetooth::GAP::do_pairing(addr);
     currentProfile->setDeviceAddress(addr);
+}
+auto BluetoothWorker::deinit() -> bool
+{
+    return Worker::deinit();
 }
