@@ -21,8 +21,10 @@ struct tm *gmtime_r( const time_t *pxTime, struct tm *tmStruct )
 }
 #endif
 /*-----------------------------------------------------------*/
-
-time_t FreeRTOS_time(time_t *pxTime)
+extern "C"
 {
-    return utils::time::Time().getTime();
+    time_t FreeRTOS_time(time_t *pxTime)
+    {
+        return utils::time::Time().getTime();
+    }
 }
