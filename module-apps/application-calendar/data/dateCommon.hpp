@@ -180,12 +180,12 @@ inline std::string TimePointToString(const TimePoint &tp, date::months months)
         std::chrono::time_point_cast<std::chrono::seconds>(timePoint + time_of_day.hours() + time_of_day.minutes()));
 }
 
-inline std::string TimePointToString(const calendar::TimePoint &tp, date::years years)
+inline std::string TimePointToString(const TimePoint &tp, date::years years)
 {
     auto yearMonthDay     = date::year_month_day{date::floor<date::days>(tp)};
     auto yearMonthDayLast = (yearMonthDay.year() + date::years(years)) / yearMonthDay.month() / date::last;
 
-    calendar::TimePoint timePoint =
+    TimePoint timePoint =
         date::sys_days{yearMonthDayLast.year() / yearMonthDayLast.month() /
                        ((yearMonthDayLast.day() == yearMonthDay.day()) ? yearMonthDayLast.day() : yearMonthDay.day())};
 
