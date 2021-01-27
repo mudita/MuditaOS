@@ -72,3 +72,6 @@
 [submodule "module-vfs/thirdparty/lfsfs/littlefs"]
 	path = module-vfs/thirdparty/lfsfs/littlefs
 	url = https://github.com/littlefs-project/littlefs.git
+[submodule "module-utils/sml"]
+	path = module-utils/sml
+	url = https://github.com/boost-ext/sml
