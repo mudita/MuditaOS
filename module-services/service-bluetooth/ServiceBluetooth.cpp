@@ -21,6 +21,8 @@
 
 #include <bits/exception.h>
 #include <utility>
+#include <service-desktop/service-desktop/DesktopMessages.hpp>
+#include <service-desktop/service-desktop/Constants.hpp>
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth)
 {
@@ -80,11 +82,24 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
         return std::make_shared<message::bluetooth::ResponseStatus>(btStatus);
     });
 
+    connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
+        using namespace sdesktop::developerMode;
+        auto req = static_cast<DeveloperModeRequest *>(msg);
+        if (typeid(*req->event) == typeid(BluetoothStatusRequestEvent)) {
+            auto state   = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
+            auto event   = std::make_unique<BluetoothStatusRequestEvent>(state);
+            auto message = std::make_shared<DeveloperModeRequest>(std::move(event));
+            sys::Bus::SendUnicast(std::move(message), service::name::service_desktop, this);
+        }
+
+        return sys::MessageNone{};
+    });
+
     settingsHolder->onStateChange = [this]() {
-        auto initialState =
-            std::visit(bluetooth::IntVisitor(), this->settingsHolder->getValue(bluetooth::Settings::State));
+        auto initialState = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
         if (static_cast<BluetoothStatus::State>(initialState) == BluetoothStatus::State::On) {
-            this->worker->run();
+            settingsHolder->setValue(bluetooth::Settings::State, static_cast<int>(BluetoothStatus::State::Off));
+            worker->run();
         }
     };
 
@@ -93,7 +108,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
 
 sys::ReturnCodes ServiceBluetooth::DeinitHandler()
 {
-
+    worker->deinit();
     return sys::ReturnCodes::Success;
 }
 

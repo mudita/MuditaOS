@@ -98,6 +98,13 @@ namespace sdesktop
             explicit ScreenlockCheckEvent(bool isLocked);
         };
 
+        class BluetoothStatusRequestEvent : public Event
+        {
+          public:
+            BluetoothStatusRequestEvent() = default;
+            explicit BluetoothStatusRequestEvent(int state);
+        };
+
         class DeveloperModeRequest : public sys::DataMessage
         {
           public:
