@@ -3,22 +3,20 @@
 
 #pragma once
 
-#include "EnterNumberWindow.hpp"
+#include "NumberWindow.hpp"
 
 namespace gui
 {
 
-    class EmergencyCallWindow : public EnterNumberWindow
+    class EmergencyCallWindow : public NumberWindow
     {
       public:
         EmergencyCallWindow(app::Application *app, app::EnterNumberWindowInterface *interface);
+        ~EmergencyCallWindow() override = default;
 
         bool onInput(const InputEvent &inputEvent) override;
-        bool handleSwitchData(SwitchData *data) override;
 
-        void rebuild() override;
         void buildInterface() override;
-        void destroyInterface() override;
     };
 
 } /* namespace gui */

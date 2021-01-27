@@ -15,6 +15,9 @@
 #include "service-cellular/requests/PinChangeRequest.hpp"
 #include "service-cellular/requests/ImeiRequest.hpp"
 #include "service-cellular/requests/UssdRequest.hpp"
+#include "service-cellular/service-cellular/requests/ClirRequest.hpp"
+#include "service-cellular/requests/CallForwardingRequest.hpp"
+#include "service-cellular/requests/CallBarringRequest.hpp"
 
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include "service-cellular/service-cellular/requests/ClirRequest.hpp"
@@ -22,9 +25,7 @@
 
 #include <module-cellular/at/response.hpp>
 
-using namespace cellular;
-
-void CellularRequestHandler::handle(ImeiRequest &request, at::Result &result)
+void CellularRequestHandler::handle(cellular::ImeiRequest &request, at::Result &result)
 {
     if (!request.checkModemResponse(result)) {
         request.setHandled(false);
@@ -36,7 +37,7 @@ void CellularRequestHandler::handle(ImeiRequest &request, at::Result &result)
     sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
 }
 
-void CellularRequestHandler::handle(UssdRequest &request, at::Result &result)
+void CellularRequestHandler::handle(cellular::UssdRequest &request, at::Result &result)
 {
     auto requestHandled = request.checkModemResponse(result);
 
@@ -50,7 +51,7 @@ void CellularRequestHandler::handle(UssdRequest &request, at::Result &result)
     request.setHandled(requestHandled);
 }
 
-void CellularRequestHandler::handle(CallRequest &request, at::Result &result)
+void CellularRequestHandler::handle(cellular::CallRequest &request, at::Result &result)
 {
     if (!request.checkModemResponse(result)) {
         request.setHandled(false);
@@ -66,28 +67,28 @@ void CellularRequestHandler::handle(CallRequest &request, at::Result &result)
     request.setHandled(true);
 }
 
-void CellularRequestHandler::handle(SupplementaryServicesRequest &request, at::Result &result)
+void CellularRequestHandler::handle(cellular::SupplementaryServicesRequest &request, at::Result &result)
 {
     auto requestHandled = request.checkModemResponse(result);
     request.setHandled(requestHandled);
     sendMmiResult(requestHandled);
 }
 
-void CellularRequestHandler::handle(PasswordRegistrationRequest &request, at::Result &result)
+void CellularRequestHandler::handle(cellular::PasswordRegistrationRequest &request, at::Result &result)
 {
     auto requestHandled = request.checkModemResponse(result);
     request.setHandled(requestHandled);
     sendMmiResult(requestHandled);
 }
 
-void CellularRequestHandler::handle(PinChangeRequest &request, at::Result &result)
+void CellularRequestHandler::handle(cellular::PinChangeRequest &request, at::Result &result)
 {
     auto requestHandled = request.checkModemResponse(result);
     request.setHandled(requestHandled);
     sendMmiResult(requestHandled);
 }
 
-void CellularRequestHandler::handle(ClirRequest &request, at::Result &result)
+void CellularRequestHandler::handle(cellular::ClirRequest &request, at::Result &result)
 {
     using namespace app::manager::actions;
     using namespace cellular;
@@ -118,6 +119,121 @@ void CellularRequestHandler::handle(ClirRequest &request, at::Result &result)
     sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
     request.setHandled(requestHandled);
 }
+
+void CellularRequestHandler::handle(cellular::CallForwardingRequest &request, at::Result &result)
+{
+    using namespace app::manager::actions;
+    using namespace cellular;
+    using namespace at::response;
+
+    auto requestHandled = request.checkModemResponse(result);
+    std::shared_ptr<MMICustomResultParams> response;
+    if (requestHandled) {
+        auto procedureType = request.getProcedureType();
+        if (procedureType == SupplementaryServicesRequest::ProcedureType::Registration) {
+            response =
+                std::make_shared<MMICallForwardingResult>(IMMICustomResultParams::MMIType::CallForwardingNotification);
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::RegistrationSuccessful);
+        }
+        else if (procedureType == SupplementaryServicesRequest::ProcedureType::Deactivation) {
+            response =
+                std::make_shared<MMICallForwardingResult>(IMMICustomResultParams::MMIType::CallForwardingNotification);
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::DisablingSuccessful);
+        }
+        else if (procedureType == SupplementaryServicesRequest::ProcedureType::Erasure) {
+            response =
+                std::make_shared<MMICallForwardingResult>(IMMICustomResultParams::MMIType::CallForwardingNotification);
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::ErasureSuccessful);
+        }
+        else if (procedureType == SupplementaryServicesRequest::ProcedureType::Interrogation) {
+            std::vector<ccfc::ParsedCcfc> parsed;
+            if (at::response::ccfc::parse(result.response, parsed)) {
+                if (ccfc::isAnyActive(parsed)) {
+                    auto numbers = ccfc::getNumbers(parsed);
+                    response =
+                        std::make_shared<MMICallForwardingResult>(IMMICustomResultParams::MMIType::CallForwardingData,
+                                                                  numbers.voice,
+                                                                  numbers.fax,
+                                                                  numbers.sync,
+                                                                  numbers.async);
+                }
+                else {
+                    response = std::make_shared<MMICallForwardingResult>(
+                        IMMICustomResultParams::MMIType::CallForwardingNotification);
+                    response->addMessage(IMMICustomResultParams::MMIResultMessage::CallForwardingDisabled);
+                }
+            }
+        }
+    }
+
+    else {
+        if (result.code == at::Result::Code::ERROR &&
+            std::get<at::EquipmentErrorCode>(result.errorCode) == at::EquipmentErrorCode::PhoneBusy) {
+            response =
+                std::make_shared<MMICallForwardingResult>(IMMICustomResultParams::MMIType::CallForwardingNotification);
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonMMINotSupported);
+        }
+    }
+
+    if (response.get() == nullptr) {
+        response =
+            std::make_shared<MMICallForwardingResult>(IMMICustomResultParams::MMIType::CallForwardingNotification);
+        response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
+    }
+    auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
+    sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
+    request.setHandled(requestHandled);
+}
+
+void CellularRequestHandler::handle(cellular::CallBarringRequest &request, at::Result &result)
+{
+    using namespace app::manager::actions;
+    using namespace at::response;
+    using namespace cellular;
+    auto requestHandled = request.checkModemResponse(result);
+
+    std::shared_ptr<MMICustomResultParams> response;
+    if (requestHandled) {
+        auto procedureType = request.getProcedureType();
+
+        if (procedureType == cellular::SupplementaryServicesRequest::ProcedureType::Activation) {
+            response = std::make_shared<MMICallBarringResult>(IMMICustomResultParams::MMIType::CallBarringNotification);
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::CallBarringActivated);
+        }
+        else if (procedureType == SupplementaryServicesRequest::ProcedureType::Deactivation) {
+            response = std::make_shared<MMICallBarringResult>(IMMICustomResultParams::MMIType::CallBarringNotification);
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::CallBarringDeactivated);
+        }
+        else if (procedureType == SupplementaryServicesRequest::ProcedureType::Interrogation) {
+            std::vector<clck::ClckParsed> parsed;
+
+            if (clck::parseQueryResponse(result.response, parsed)) {
+                MMICallBarringResult resp = MMICallBarringResult(IMMICustomResultParams::MMIType::CallBarringData);
+                std::sort(parsed.begin(), parsed.end(), clck::iterLessIter);
+                for (auto el : parsed) {
+                    resp.addMessages(std::make_pair<IMMICustomResultParams::MMIResultMessage,
+                                                    IMMICustomResultParams::MMIResultMessage>(
+                        mmi::getClass(el.serviceClass), clck::getStatus(el.status)));
+                }
+                response = std::make_shared<MMICallBarringResult>(resp);
+            }
+        }
+        else {
+            response = std::make_shared<MMICallBarringResult>(IMMICustomResultParams::MMIType::CallBarringNotification);
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonMMINotSupported);
+        }
+    }
+
+    if (response == nullptr) {
+        response = std::make_shared<MMICallBarringResult>(IMMICustomResultParams::MMIType::CallBarringNotification);
+        response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
+    }
+
+    auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
+    sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
+    request.setHandled(requestHandled);
+}
+
 void CellularRequestHandler::sendMmiResult(bool result)
 {
     using namespace app::manager::actions;

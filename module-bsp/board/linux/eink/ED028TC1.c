@@ -129,7 +129,7 @@ EinkStatus_e EinkResetAndInitialize()
     return EinkOK;
 }
 
-EinkStatus_e EinkUpdateWaveform(const EinkWaveFormSettings_t *settings)
+EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings)
 {
     return EinkOK;
 }

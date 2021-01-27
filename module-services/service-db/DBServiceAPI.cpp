@@ -137,9 +137,9 @@ auto DBServiceAPI::MatchContactByPhoneNumber(sys::Service *serv, const utils::Ph
 {
     auto msg = std::make_shared<DBContactNumberMessage>(numberView);
 
-    auto ret             = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
+    auto ret             = sys::Bus::SendUnicast(std::move(msg), service::name::db, serv, DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactNumberResponseMessage *>(ret.second.get());
-    if (contactResponse == nullptr) {
+    if (contactResponse == nullptr || contactResponse->retCode != sys::ReturnCodes::Success) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
         return nullptr;
     }
@@ -241,7 +241,7 @@ auto DBServiceAPI::ContactSearch(sys::Service *serv, UTF8 primaryName, UTF8 alte
                                                  (alternativeName.length() > 0) ? alternativeName.c_str() : "",
                                                  (number.length() > 0) ? number.c_str() : "");
 
-    auto ret             = sys::Bus::SendUnicast(msg, service::name::db, serv, DefaultTimeoutInMs);
+    auto ret             = sys::Bus::SendUnicast(std::move(msg), service::name::db, serv, DefaultTimeoutInMs);
     auto contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
     if (contactResponse == nullptr) {
         LOG_ERROR("DB response error, return code: %s", c_str(ret.first));

@@ -15,6 +15,7 @@ import os
 import requests
 import sys
 from tqdm import tqdm
+import time
 
 
 class Getter(object):
@@ -24,12 +25,6 @@ class Getter(object):
         self.host = 'https://api.github.com/repos'
         self.organisation = 'mudita'
         self.repo = 'ecoboot'
-        self.restPrefix = self.host
-        self.restPrefix += '/'
-        self.restPrefix += self.organisation
-        self.restPrefix += '/'
-        self.restPrefix += self.repo
-        self.restPrefix += '/'
         self.apitoken = None
         self.ghLogin = None
         self.getGitRoot()
@@ -37,6 +32,16 @@ class Getter(object):
         self.getGHLogin()
         self.releases = []
         self.workdir = ""
+
+    def genRestPrefix(self):
+        self.restPrefix = self.host
+        self.restPrefix += '/'
+        self.restPrefix += self.organisation
+        self.restPrefix += '/'
+        self.restPrefix += self.repo
+        self.restPrefix += '/'
+        return self.restPrefix
+
 
     def getGitRoot(self):
         'Find git root directory'
@@ -78,7 +83,8 @@ class Getter(object):
         self.args = args
         self.getGHLogin(args)
         self.getApiToken(args)
-        request = self.restPrefix + "releases"
+        request = self.genRestPrefix() + "releases"
+        print ("Request:", request)
         headers = {'accept': 'application/vnd.github.v3+json'}
         page = 0
         itemsOnPage = 100
@@ -89,12 +95,21 @@ class Getter(object):
             response = requests.get(request, auth=(self.ghLogin, self.apitoken), headers=headers, params=queryParams)
             if response.status_code != requests.codes.ok:
                 print("download error:", response.status_code)
-                print(response.content)
+                print("content:", response.content)
                 sys.exit(1)
             items = json.loads(response.content)
             count = len(items)
             self.releases += items
-        self.releases.sort(key=lambda r: r['published_at'], reverse=True)
+        drafts = []
+        releases = []
+        for item in self.releases:
+            if item['published_at'] is None:
+                drafts.append(item)
+            else:
+                releases.append(item)
+        releases.sort(key=lambda r: r['published_at'], reverse=True)
+        self.releases=drafts
+        self.releases.extend(releases)
 
     def listReleases(self, args):
         self.getReleases(args)
@@ -106,7 +121,8 @@ class Getter(object):
     def downloadRelease(self, args):
         print(sys._getframe().f_code.co_name)
         self.getReleases(args)
-        print(args.tag)
+        print("tag:", args.tag)
+        print("asset:", args.asset)
         release = None
         if args.tag is None:
             release = self.releases[0]
@@ -119,7 +135,19 @@ class Getter(object):
             print("No release with tag:", args.tag)
         print("release:", release['tag_name'])
         assets = release['assets']
-        self.downloadAsset(assets[0])
+        if len(assets) > 1 and args.asset is None:
+            print("Available assets")
+            i=0
+            for asset in assets:
+                print(i, asset['name'])
+                i+=1
+            print("Use `-a <number>` to select file")
+            return
+        if args.asset is not None:
+            self.downloadAsset(assets[int(args.asset)])
+        else:
+            self.downloadAsset(assets[0])
+
 
     def downloadAsset(self, asset):
         self.createWorkdir()
@@ -131,8 +159,10 @@ class Getter(object):
                                 auth=(self.ghLogin, self.apitoken),
                                 headers=headers,
                                 stream=True)
+        destination_file = self.args.workdir + "/" + asset['name']
+        print("downloading to:", destination_file)
         progres_bar = tqdm(total=asset['size'], unit='iB', unit_scale=True)
-        with open(self.args.workdir + "/" + asset['name'], 'wb') as fd:
+        with open(destination_file, 'wb') as fd:
             for chunk in response.iter_content(chunk_size=1024):
                 progres_bar.update(len(chunk))
                 fd.write(chunk)
@@ -183,6 +213,7 @@ def main():
                                              description="Download Release based on tag or the latest")
     getReleases_args.set_defaults(func=getter.downloadRelease)
     getReleases_args.add_argument('tag', help="Download release with selected tag", nargs='?')
+    getReleases_args.add_argument('-a', '--asset', help="Asset name to download, use asset number")
 
     args = parser.parse_args()
     getter.repo = args.repository

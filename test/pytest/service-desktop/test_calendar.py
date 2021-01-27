@@ -4,6 +4,7 @@ import pytest
 from harness.interface.defs import status
 import copy
 
+@pytest.mark.skip("not working on CI")
 @pytest.mark.service_desktop_test
 def test_calendar(harness):
     # add events

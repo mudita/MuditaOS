@@ -20,8 +20,8 @@ namespace utils::time
         std::string AMPMtoString(bool isAm);
 
       public:
-        std::string getCalendarTimeString(calendar::TimePoint startDate,
-                                          calendar::TimePoint endDate,
+        std::string getCalendarTimeString(TimePoint startDate,
+                                          TimePoint endDate,
                                           Version version = Version::normal,
                                           bool isMode24H  = false);
     };

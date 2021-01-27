@@ -23,6 +23,8 @@ namespace db::query::events
     class GetAllLimitedResult;
     class GetFiltered;
     class GetFilteredResult;
+    class GetFilteredByDay;
+    class GetFilteredByDayResult;
     class Add;
     class AddResult;
     class Remove;
@@ -41,11 +43,11 @@ struct EventsRecord : public Record
 {
     std::string UID;
     std::string title;
-    calendar::TimePoint date_from;
-    calendar::TimePoint date_till;
+    TimePoint date_from;
+    TimePoint date_till;
     uint32_t reminder = 0;
     uint32_t repeat   = 0;
-    calendar::TimePoint reminder_fired;
+    TimePoint reminder_fired;
     std::string provider_type;
     std::string provider_id;
     std::string provider_iCalUid;
@@ -77,18 +79,17 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
     EventsRecord GetByID(uint32_t id) override final;
     EventsRecord GetByUID(const std::string &uid);
     uint32_t GetCount() override final;
-    uint32_t GetCountFiltered(calendar::TimePoint from, calendar::TimePoint till);
-    std::vector<EventsRecord> Select(calendar::TimePoint filter_from,
-                                     calendar::TimePoint filter_till,
-                                     uint32_t offset,
-                                     uint32_t limit);
+    uint32_t GetCountFiltered(TimePoint from, TimePoint till);
+    uint32_t GetCountFilteredByDay(TimePoint filter);
+    std::vector<EventsRecord> Select(TimePoint filter_from, TimePoint filter_till, uint32_t offset, uint32_t limit);
+    std::vector<EventsRecord> Select(TimePoint date, uint32_t offset, uint32_t limit);
     std::unique_ptr<std::vector<EventsRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
     std::unique_ptr<std::vector<EventsRecord>> GetLimitOffsetByField(uint32_t offset,
                                                                      uint32_t limit,
                                                                      EventsRecordField field,
                                                                      const char *str) override final;
     std::vector<EventsRecord> GetLimitOffsetByDate(uint32_t offset, uint32_t limit);
-    std::vector<EventsRecord> SelectFirstUpcoming(calendar::TimePoint filter_from, calendar::TimePoint filter_till);
+    std::vector<EventsRecord> SelectFirstUpcoming(TimePoint filter_from, TimePoint filter_till);
 
     std::unique_ptr<db::QueryResult> runQuery(std::shared_ptr<db::Query> query) override;
 
@@ -100,6 +101,8 @@ class EventsRecordInterface : public RecordInterface<EventsRecord, EventsRecordF
     std::unique_ptr<db::query::events::GetAllLimitedResult> runQueryImplGetAllLimitedResult(
         std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::events::GetFilteredResult> runQueryImplGetFilteredResult(
+        std::shared_ptr<db::Query> query);
+    std::unique_ptr<db::query::events::GetFilteredByDayResult> runQueryImplGetFilteredByDayResult(
         std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::events::AddResult> runQueryImplAdd(std::shared_ptr<db::Query> query);
     std::unique_ptr<db::query::events::RemoveResult> runQueryImplRemove(std::shared_ptr<db::Query> query);

@@ -38,7 +38,7 @@ auto MMICallForwardingResult::getData() const -> std::tuple<std::string, std::st
 void MMICallForwardingResult::accept(Visitor &v, std::string &displayMessage)
 {
     v.visit(*this, displayMessage);
-};
+}
 
 MMIParams::MMIParams(std::string mmiData) : mmiData{std::move(mmiData)}
 {}
@@ -61,4 +61,14 @@ MMIResultParams::MMIResult MMIResultParams::getData() const noexcept
 auto MMIResultParams::getCustomData() const noexcept -> std::shared_ptr<MMICustomResultParams>
 {
     return customResult;
+}
+
+void MMICallBarringResult::addMessages(const std::pair<MMIResultMessage, MMIResultMessage> &message) noexcept
+{
+    data.push_back(message);
+}
+
+auto MMICallBarringResult::getMessages(void) noexcept -> std::vector<std::pair<MMIResultMessage, MMIResultMessage>>
+{
+    return data;
 }
