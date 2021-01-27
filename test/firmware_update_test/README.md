@@ -21,5 +21,4 @@ python3 ./update.py tarball_path
 The serial port used by the phone will be detected automatically.
 
 
-To obtain the tarball package use either proper CMake target (work in progress) or the `genupdatepkg.sh` script located 
-in the `config` subfolder in the root repository.
+To obtain the tarball package use the proper CMake target: `make package-update`. The only requirement is having a properly configured API token and Python environment, required by the asset downloading script.
