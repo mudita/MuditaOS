@@ -251,7 +251,7 @@ namespace app
         rebuildMainWindow |= counter != notifications.notSeen.Alarms;
         notifications.notSeen.Alarms = counter;
 
-        const uint32_t counterForToday = countAlarmsForToday(records);
+        const uint32_t counterForToday = stm::AlarmsTimeEvents::countAlarmsForToday(records);
         const bool rebuildDesktopMenu  = counterForToday != notifications.notRead.Alarms;
         notifications.notRead.Alarms = counterForToday;
 
@@ -466,41 +466,6 @@ namespace app
         if (currentWindow->getName() == window::name::desktop_main_window) {
             currentWindow->rebuild();
         }
-    }
-
-    uint32_t ApplicationDesktop::countAlarmsForToday(std::vector<AlarmsRecord> allRecords)
-    {
-        auto counter = 0u;
-        auto weekDay = WeekdayIndexFromTimePoint(TimePointNow());
-        for (auto &record : allRecords) {
-            auto hoursAndMinutes = TimePointToHourMinSec(record.time);
-            record.time = TimePointFromYearMonthDay(TimePointToYearMonthDay(TimePointNow())) + hoursAndMinutes.hours() +
-                          hoursAndMinutes.minutes();
-            auto buffer = record.time +
-                          (static_cast<uint32_t>(record.status) - 1) * std::chrono::minutes(record.snooze) +
-                          std::chrono::minutes(record.delay);
-            if (buffer < TimePointNow()) {
-                continue;
-            }
-            if (record.repeat == static_cast<uint32_t>(AlarmRepeat::never) ||
-                record.repeat == static_cast<uint32_t>(AlarmRepeat::everyday) ||
-                (weekDay < date::Saturday.iso_encoding() - 1 &&
-                 record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays))) {
-                counter++;
-            }
-            else if (weekDay == date::Saturday.iso_encoding() - 1 &&
-                     record.repeat == static_cast<uint32_t>(AlarmRepeat::weekDays) && record.status > AlarmStatus::On) {
-                if (stm::AlarmsTimeEvents::isAlarmGoingToJumpToNextDay(record)) {
-                    counter++;
-                }
-            }
-            else if (record.repeat > static_cast<uint32_t>(AlarmRepeat::weekDays)) {
-                if (const auto &alarms = stm::AlarmsTimeEvents::customRepeatHandle(record, weekDay); !alarms.empty()) {
-                    counter += alarms.size();
-                }
-            }
-        }
-        return counter;
     }
 
 } // namespace app

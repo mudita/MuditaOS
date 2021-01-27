@@ -91,7 +91,8 @@ namespace stm
         return buffer.day() != TimePointToYearMonthDay(record.time).day();
     }
 
-    std::vector<AlarmsRecord> AlarmsTimeEvents::getPossibleNearestAlarms(std::vector<AlarmsRecord> &allRecords)
+    std::vector<AlarmsRecord> AlarmsTimeEvents::getPossibleNearestAlarms(std::vector<AlarmsRecord> &allRecords,
+                                                                         bool getAlarmsForToday)
     {
         auto weekDay = WeekdayIndexFromTimePoint(TimePointNow());
         std::vector<AlarmsRecord> nearestAlarms;
@@ -124,6 +125,9 @@ namespace stm
                         nearestAlarms.insert(nearestAlarms.end(), alarms.begin(), alarms.end());
                     }
                 }
+            }
+            if (getAlarmsForToday) {
+                return nearestAlarms;
             }
             // search in another day if there is not alarm for today
             if (nearestAlarms.empty()) {
@@ -210,5 +214,10 @@ namespace stm
                              std::chrono::minutes(alarm.delay);
             }
         }
+    }
+
+    uint32_t AlarmsTimeEvents::countAlarmsForToday(std::vector<AlarmsRecord> allRecords)
+    {
+        return getPossibleNearestAlarms(allRecords, true).size();
     }
 } // namespace stm

@@ -152,7 +152,6 @@ namespace app::alarmClock
             LOG_DEBUG("Switch to alarm main window");
             presenter->stopTimers();
             presenter->stopMusic();
-            // app::manager::Controller::sendAction(application, app::manager::actions::Home);
             application->switchWindow(gui::name::window::main_window);
         }
         else {

@@ -32,7 +32,7 @@ namespace stm
         const std::string timerName() override
         {
             return "AlarmsTimeEvents_timer";
-        };
+        }
         uint32_t calcToNextEventInterval(std::unique_ptr<db::QueryResult> nextEventQueryResult) override;
 
         bool sendNextEventQuery() override;
@@ -41,14 +41,15 @@ namespace stm
         void applySnoozeAndDelay(std::vector<AlarmsRecord> &records);
         void sortNearestAlarms(std::vector<AlarmsRecord> &nearestAlarms);
         void restoreOriginalAlarmTime(std::vector<AlarmsRecord> &nearestAlarms);
-        std::vector<AlarmsRecord> getPossibleNearestAlarms(std::vector<AlarmsRecord> &allRecords);
+        static std::vector<AlarmsRecord> getPossibleNearestAlarms(std::vector<AlarmsRecord> &allRecords,
+                                                                  bool getAlarmsForToday = false);
+        static bool isAlarmGoingToJumpToNextDay(AlarmsRecord record);
+        static std::vector<AlarmsRecord> customRepeatHandle(const AlarmsRecord &record, uint32_t weekDay);
 
       public:
         explicit AlarmsTimeEvents(sys::Service *service);
-        ~AlarmsTimeEvents() = default;
 
-        static bool isAlarmGoingToJumpToNextDay(AlarmsRecord record);
-        static std::vector<AlarmsRecord> customRepeatHandle(const AlarmsRecord &record, uint32_t weekDay);
+        static uint32_t countAlarmsForToday(std::vector<AlarmsRecord> allRecords);
     };
 
 } // namespace stm

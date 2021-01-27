@@ -64,7 +64,7 @@ namespace app::alarmClock
     void AlarmReminderWindowPresenter::updatePreviousRecords(std::vector<AlarmsRecord> &records)
     {
         for (auto &alarm : records) {
-            this->update(alarm, UserAction::Snooze, alarmsReminderModel->getPreviousElapsedMinutes());
+            update(alarm, UserAction::Snooze, alarmsReminderModel->getPreviousElapsedMinutes());
         }
         alarmsReminderModel->resetPreviousElapsedSeconds();
     }

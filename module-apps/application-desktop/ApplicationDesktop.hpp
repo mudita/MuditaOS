@@ -85,7 +85,6 @@ namespace app
         bool requestNotSeenNotifications();
         bool requestNotReadNotifications();
         bool requestTurnedOnAlarms();
-        uint32_t countAlarmsForToday(std::vector<AlarmsRecord> allRecords);
         unsigned int getLockPassHash() const noexcept
         {
             return lockPassHash;
