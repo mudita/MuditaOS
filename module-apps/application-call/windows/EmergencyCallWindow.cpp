@@ -30,7 +30,10 @@ namespace gui
     bool EmergencyCallWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-            app::manager::Controller::sendAction(application, app::manager::actions::ShowEmergencyContacts);
+            auto data                        = std::make_unique<gui::SwitchData>();
+            data->ignoreCurrentWindowOnStack = true;
+            app::manager::Controller::sendAction(
+                application, app::manager::actions::ShowEmergencyContacts, std::move(data));
             return true;
         }
 
