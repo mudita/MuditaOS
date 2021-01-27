@@ -54,6 +54,17 @@ namespace gui::option
         case SettingRightItem::Checked:
             imageName = "small_tick_W_M";
             break;
+        case SettingRightItem::Text: {
+            auto optionTextRight = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);
+            optionTextRight->setUnderline(false);
+            optionTextRight->setMinimumSize(gui::option::window::option_right_min_size, style::window::label::big_h);
+            optionTextRight->setAlignment(
+                gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+            optionTextRight->setMargins(Margins(0, 0, window::option_right_margin, 0));
+            optionTextRight->setFont(style::window::font::medium);
+            optionTextRight->setRichText(textOnRight);
+            break;
+        }
         default:
             break;
         }

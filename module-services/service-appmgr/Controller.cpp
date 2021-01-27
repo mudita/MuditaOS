@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-appmgr/Controller.hpp"
@@ -76,6 +76,30 @@ namespace app::manager
     {
         auto msg = std::make_shared<app::manager::InputLanguageChangeRequest>(sender->GetName(), language);
         return sys::Bus::SendUnicast(msg, ApplicationManager::ServiceName, sender);
+    }
+
+    auto Controller::changeAutomaticDateAndTimeIsOn(sys::Service *sender, bool isOn) -> bool
+    {
+        auto msg = std::make_shared<app::manager::AutomaticDateAndTimeIsOnChangeRequest>(isOn);
+        return sys::Bus::SendUnicast(std::move(msg), ApplicationManager::ServiceName, sender);
+    }
+
+    auto Controller::changeAutomaticTimeZoneIsOn(sys::Service *sender, bool isOn) -> bool
+    {
+        auto msg = std::make_shared<app::manager::AutomaticTimeZoneIsOnChangeRequest>(isOn);
+        return sys::Bus::SendUnicast(std::move(msg), ApplicationManager::ServiceName, sender);
+    }
+
+    auto Controller::changeTimeFormat(sys::Service *sender, utils::time::Locale::TimeFormat timeFormat) -> bool
+    {
+        auto msg = std::make_shared<app::manager::TimeFormatChangeRequest>(timeFormat);
+        return sys::Bus::SendUnicast(std::move(msg), ApplicationManager::ServiceName, sender);
+    }
+
+    auto Controller::changeDateFormat(sys::Service *sender, utils::time::Locale::DateFormat dateFormat) -> bool
+    {
+        auto msg = std::make_shared<app::manager::DateFormatChangeRequest>(dateFormat);
+        return sys::Bus::SendUnicast(std::move(msg), ApplicationManager::ServiceName, sender);
     }
 
     auto Controller::preventBlockingDevice(sys::Service *sender) -> bool

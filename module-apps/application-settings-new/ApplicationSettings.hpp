@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -55,6 +55,9 @@ namespace gui::window::name
     inline constexpr auto factory_reset   = "FactoryReset";
     inline constexpr auto about_your_pure = "AboutYourPure";
     inline constexpr auto certification   = "Certification";
+
+    inline constexpr auto change_date_and_time = "ChangeDateAndTime";
+    inline constexpr auto change_time_zone     = "ChangeTimeZone";
 
     inline constexpr auto new_apn = "NewApn";
 

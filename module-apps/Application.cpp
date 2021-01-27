@@ -31,6 +31,7 @@
 #include <service-gui/Common.hpp>
 #include <module-utils/Utils.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
+#include <module-utils/time/DateAndTimeSettings.hpp>
 
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 
@@ -83,11 +84,6 @@ namespace app
 
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
-
-        settings->registerValueChange(
-            settings::SystemProperties::timeFormat12,
-            [this](std::string value) { timeFormatChanged(value); },
-            settings::SettingsScope::Global);
     }
 
     Application::~Application() noexcept
@@ -331,7 +327,7 @@ namespace app
     sys::MessagePointer Application::handleMinuteUpdated(sys::Message *msgl)
     {
         auto *msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
-        getCurrentWindow()->updateTime(msg->timestamp, !timeFormat12);
+        getCurrentWindow()->updateTime(msg->timestamp, !isTimeFormat12());
         if (state == State::ACTIVE_FORGROUND) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
@@ -716,7 +712,7 @@ namespace app
 
     bool Application::isTimeFormat12() const noexcept
     {
-        return timeFormat12;
+        return utils::dateAndTimeSettings.getTimeFormat() == utils::time::Locale::TimeFormat::FormatTime12H;
     }
 
     void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)

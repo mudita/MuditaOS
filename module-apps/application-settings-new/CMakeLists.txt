@@ -52,6 +52,7 @@ target_sources( ${PROJECT_NAME}
         widgets/SpinBoxOptionSetting.cpp
         windows/SystemMainWindow.cpp
         windows/LanguagesWindow.cpp
+        windows/DateAndTimeMainWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -74,6 +75,7 @@ target_sources( ${PROJECT_NAME}
         windows/ChangePasscodeWindow.hpp
         windows/SystemMainWindow.hpp
         windows/LanguagesWindow.hpp
+        windows/DateAndTimeMainWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

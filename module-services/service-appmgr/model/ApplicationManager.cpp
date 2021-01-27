@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/model/ApplicationManager.hpp>
@@ -26,10 +26,10 @@
 #include <utility>
 
 #include <module-utils/Utils.hpp>
+#include <module-utils/time/DateAndTimeSettings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 // Auto phone lock disabled for now till the times when it's debugged
 // #define AUTO_PHONE_LOCK_ENABLED
-
 namespace app::manager
 {
     namespace
@@ -131,6 +131,32 @@ namespace app::manager
             settings::SystemProperties::lockTime,
             [this](std::string value) { lockTimeChanged(value); },
             settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::SystemProperties::automaticDateAndTimeIsOn,
+            [this](std::string value) {
+                utils::dateAndTimeSettings.setAutomaticDateAndTimeOn(utils::getNumericValue<bool>(value));
+            },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::SystemProperties::automaticTimeZoneIsOn,
+            [this](std::string value) {
+                utils::dateAndTimeSettings.setAutomaticTimeZoneOn(utils::getNumericValue<bool>(value));
+            },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::SystemProperties::timeFormat,
+            [this](std::string value) {
+                utils::dateAndTimeSettings.setTimeFormat(
+                    static_cast<utils::time::Locale::TimeFormat>(utils::getNumericValue<unsigned int>(value)));
+            },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::SystemProperties::dateFormat,
+            [this](std::string value) {
+                utils::dateAndTimeSettings.setDateFormat(
+                    static_cast<utils::time::Locale::DateFormat>(utils::getNumericValue<unsigned int>(value)));
+            },
+            ::settings::SettingsScope::Global);
 
         startSystemServices();
         startBackgroundApplications();
@@ -237,6 +263,26 @@ namespace app::manager
         connect(typeid(InputLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<InputLanguageChangeRequest *>(request);
             handleInputLanguageChange(msg);
+            return msgHandled();
+        });
+        connect(typeid(AutomaticDateAndTimeIsOnChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<AutomaticDateAndTimeIsOnChangeRequest *>(request);
+            handleAutomaticDateAndTimeChange(msg);
+            return msgHandled();
+        });
+        connect(typeid(AutomaticTimeZoneIsOnChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<AutomaticTimeZoneIsOnChangeRequest *>(request);
+            handleAutomaticTimeZoneChange(msg);
+            return msgHandled();
+        });
+        connect(typeid(TimeFormatChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<TimeFormatChangeRequest *>(request);
+            handleTimeFormatChange(msg);
+            return msgHandled();
+        });
+        connect(typeid(DateFormatChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<DateFormatChangeRequest *>(request);
+            handleDateFormatChange(msg);
             return msgHandled();
         });
         connect(typeid(ShutdownRequest), [this](sys::Message *) {
@@ -584,6 +630,58 @@ namespace app::manager
         inputLanguage = requestedLanguage;
         settings->setValue(settings::SystemProperties::inputLanguage, inputLanguage, settings::SettingsScope::Global);
         utils::localize.setInputLanguage(inputLanguage);
+        return true;
+    }
+
+    auto ApplicationManager::handleAutomaticDateAndTimeChange(AutomaticDateAndTimeIsOnChangeRequest *msg) -> bool
+    {
+        if (utils::dateAndTimeSettings.isAutomaticDateAndTimeOn() == msg->isOn) {
+            LOG_WARN("The selected value is already set. Ignore.");
+            return false;
+        }
+        settings->setValue(settings::SystemProperties::automaticDateAndTimeIsOn,
+                           std::to_string(msg->isOn),
+                           settings::SettingsScope::Global);
+        utils::dateAndTimeSettings.setAutomaticDateAndTimeOn(msg->isOn);
+        return true;
+    }
+
+    auto ApplicationManager::handleAutomaticTimeZoneChange(AutomaticTimeZoneIsOnChangeRequest *msg) -> bool
+    {
+        if (utils::dateAndTimeSettings.isAutomaticTimeZoneOn() == msg->isOn) {
+            LOG_WARN("The selected value is already set. Ignore.");
+            return false;
+        }
+        settings->setValue(settings::SystemProperties::automaticTimeZoneIsOn,
+                           std::to_string(msg->isOn),
+                           settings::SettingsScope::Global);
+        utils::dateAndTimeSettings.setAutomaticTimeZoneOn(msg->isOn);
+        return true;
+    }
+
+    auto ApplicationManager::handleTimeFormatChange(TimeFormatChangeRequest *msg) -> bool
+    {
+        if (utils::dateAndTimeSettings.getTimeFormat() == msg->timeFormat) {
+            LOG_WARN("The selected value is already set. Ignore.");
+            return false;
+        }
+        settings->setValue(settings::SystemProperties::timeFormat,
+                           std::to_string(static_cast<unsigned>(msg->timeFormat)),
+                           settings::SettingsScope::Global);
+        utils::dateAndTimeSettings.setTimeFormat(msg->timeFormat);
+        return true;
+    }
+
+    auto ApplicationManager::handleDateFormatChange(DateFormatChangeRequest *msg) -> bool
+    {
+        if (utils::dateAndTimeSettings.getDateFormat() == msg->dateFormat) {
+            LOG_WARN("The selected value is already set. Ignore.");
+            return false;
+        }
+        settings->setValue(settings::SystemProperties::dateFormat,
+                           std::to_string(static_cast<unsigned>(msg->dateFormat)),
+                           settings::SettingsScope::Global);
+        utils::dateAndTimeSettings.setDateFormat(msg->dateFormat);
         return true;
     }
 
