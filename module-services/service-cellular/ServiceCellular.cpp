@@ -211,7 +211,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 ServiceCellular::~ServiceCellular()
 {
     LOG_INFO("[ServiceCellular] Cleaning resources");
-    settings->unregisterValueChange(settings::Cellular::volte_on);
+    settings->unregisterValueChange(settings::Cellular::volte_on, ::settings::SettingsScope::Global);
 }
 
 // this static function will be replaced by Settings API
@@ -233,8 +233,10 @@ sys::ReturnCodes ServiceCellular::InitHandler()
     board = EventManagerServiceAPI::GetBoard(this);
 
     state.set(this, State::ST::WaitForStartPermission);
-    settings->registerValueChange(settings::Cellular::volte_on,
-                                  [this](const std::string &value) { volteChanged(value); });
+    settings->registerValueChange(
+        settings::Cellular::volte_on,
+        [this](const std::string &value) { volteChanged(value); },
+        ::settings::SettingsScope::Global);
     return sys::ReturnCodes::Success;
 }
 
@@ -335,7 +337,7 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularChangeVoLTEDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularChangeVoLTEDataMessage *>(request);
         volteOn  = msg->getVoLTEon();
-        settings->setValue(settings::Cellular::volte_on, std::to_string(volteOn));
+        settings->setValue(settings::Cellular::volte_on, std::to_string(volteOn), settings::SettingsScope::Global);
         return std::make_shared<CellularResponseMessage>(true);
     });
 

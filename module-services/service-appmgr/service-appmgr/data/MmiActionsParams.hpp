@@ -30,7 +30,9 @@ namespace app::manager::actions
             NoneSpecified,
             CallForwardingNotification,
             CallForwardingData,
-            Clir
+            Clir,
+            CallBarringNotification,
+            CallBarringData
         };
 
         enum class MMIResultMessage
@@ -38,7 +40,18 @@ namespace app::manager::actions
             NoneSpecifiedSuccess,
             NoneSpecifiedFailed,
             CommonFailure,
+            CommonMMINotSupported,
             CommonNoMessage,
+            CommonVoice,
+            CommonData,
+            CommonFax,
+            CommonAsync,
+            CommonSync,
+            CommonAllDisabled,
+
+            CommonActivated,
+            CommonDeactivated,
+            CommonQuery,
 
             ClirAccordingToSubscription,
             ClirEnabled,
@@ -49,6 +62,7 @@ namespace app::manager::actions
             ClirTemporaryRestricted,
             ClirTemporaryAllowed,
 
+            // Call forwarding
             RegistrationSuccessful,
             RegistrationFailed,
             ErasureSuccessful,
@@ -56,7 +70,12 @@ namespace app::manager::actions
             DisablingSuccessful,
             DisablingFailed,
             EnablingSuccessful,
-            EnablingFailed
+            EnablingFailed,
+            CallForwardingDisabled,
+
+            CallBarringActivated,
+            CallBarringDeactivated,
+
         };
 
         virtual auto getMessage() const -> std::vector<MMIResultMessage> = 0;
@@ -113,6 +132,18 @@ namespace app::manager::actions
       public:
         MMIClirResult() : MMICustomResultParams(MMIType::Clir)
         {}
+    };
+
+    class MMICallBarringResult : public MMICustomResultParams
+    {
+      public:
+        explicit MMICallBarringResult(MMIType type) : MMICustomResultParams(type)
+        {}
+        void addMessages(const std::pair<MMIResultMessage, MMIResultMessage> &message) noexcept;
+        auto getMessages(void) noexcept -> std::vector<std::pair<MMIResultMessage, MMIResultMessage>>;
+
+      private:
+        std::vector<std::pair<MMIResultMessage, MMIResultMessage>> data;
     };
 
     class MMIParams : public ActionParams

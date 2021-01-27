@@ -16,7 +16,7 @@ namespace gui
                        const uint32_t &dayWidth,
                        const uint32_t &dayHeight,
                        const std::unique_ptr<MonthModel> &model,
-                       bool *isDayEmpty)
+                       std::array<bool, 31> &isDayEmpty)
         : GridLayout(parent, style::window::default_left_margin, offsetTop, width, height, {dayWidth, dayHeight})
     {
         LOG_DEBUG("Call MonthBox constructor");

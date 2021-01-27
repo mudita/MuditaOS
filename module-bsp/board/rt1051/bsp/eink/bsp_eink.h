@@ -33,7 +33,7 @@ extern "C"
 
     typedef void (*bsp_eink_BusyEvent)(void);
 
-#define BSP_EINK_TRANSFER_TIMEOUT_MS 1000
+    inline constexpr auto BSP_EinkBusyTimeout = 3000U;
 
     status_t BSP_EinkInit(bsp_eink_BusyEvent event);
     void BSP_EinkDeinit(void);

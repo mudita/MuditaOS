@@ -37,8 +37,8 @@ namespace stm
 
     bool CalendarTimeEvents::sendNextEventQuery()
     {
-        calendar::TimePoint filterFrom = TimePointNow();
-        calendar::TimePoint filterTill = filterFrom;
+        TimePoint filterFrom = TimePointNow();
+        TimePoint filterTill = filterFrom;
         if (startTP != TIME_POINT_INVALID) {
             filterFrom = std::min(startTP, filterFrom);
             filterTill = filterFrom;

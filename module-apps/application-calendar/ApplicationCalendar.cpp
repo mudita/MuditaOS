@@ -147,7 +147,7 @@ namespace app
     void ApplicationCalendar::destroyUserInterface()
     {}
 
-    void ApplicationCalendar::switchToNoEventsWindow(const std::string &title, const calendar::TimePoint &dateFilter)
+    void ApplicationCalendar::switchToNoEventsWindow(const std::string &title, const TimePoint &dateFilter)
     {
         if (equivalentWindow == EquivalentWindow::DayEventsWindow) {
             popToWindow(gui::name::window::main_window);

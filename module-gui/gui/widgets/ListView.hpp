@@ -87,6 +87,7 @@ namespace gui
         std::shared_ptr<ListItemProvider> getProvider();
         void setOrientation(style::listview::Orientation value);
         void setBoundaries(style::listview::Boundaries value);
+        void setFocusOnElement(unsigned int elementNumber);
         void setScrollTopMargin(int value);
         void setAlignment(const Alignment &value) override;
         void onProviderDataUpdate();

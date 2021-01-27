@@ -334,7 +334,7 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
 
         if (ret.has_value()) {
             responseMsg = std::make_shared<DBContactNumberResponseMessage>(
-                sys::ReturnCodes::Success, std::make_unique<ContactRecord>(ret->contact));
+                sys::ReturnCodes::Success, std::make_unique<ContactRecord>(std::move(ret->contact)));
         }
         else {
             responseMsg = std::make_shared<DBContactNumberResponseMessage>(sys::ReturnCodes::Failure,
