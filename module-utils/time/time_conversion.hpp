@@ -6,6 +6,15 @@
 /// this calss uses strftime to convert timestamp to text, but for UTF8 elements (mon,day) it uses our locale
 /// as stdlib builtin locale doesn't provide way to substitute C-LOCALE
 
+/// The most important classes in this module:
+///@class Timestamp: gmt and local time calculations
+///@class DateTime: date and time displayed format representation
+
+///@typedef TimePoint: The reference point for time conversion
+
+///@note The basic unit for calculating time is std::chrono::seconds{}
+
+
 #include "time/time_locale.hpp"
 #include <bsp/rtc/rtc.hpp>
 #include <log/log.hpp>
@@ -72,6 +81,7 @@ namespace utils::time
 
     class TimeConversion
     {
+        ///@brief Implementation of methods witch are needed to convert time between 3 basic c++ time types (TimePoint, time_t, struct tm)
       public:
         static std::tm toTm(const std::time_t &t);
         static std::tm toTm(const utils::time::TimePoint &tp);
@@ -93,6 +103,10 @@ namespace utils::time
 
     class SysTimeBase : public ISysTime
     {
+        ///@brief Used to calculate UTC +0 time, and the desired local time offset.
+        ///       Defines methods that are input to the corresponding system calls.
+        ///       The methods are called internally in the DateTime and Timestamp classes to convert the appropriate local time representation.
+
       protected:
         std::chrono::seconds getLocalGMTTimeOffsetFromGMT(const utils::time::TimePoint &gmtTp) const;
         std::chrono::seconds getLocalGMTTimeOffsetFromLocal(const utils::time::TimePoint &localTp) const;
@@ -387,6 +401,8 @@ namespace utils::time
 
     class CalendarConversion
     {
+        ///@brief Implementation of methods for date and time conversion witch are not implemented in TimeConversion class
+        ///       Mostly date conversion used in Calendar Application
       public:
         static std::string TimePointToString(const utils::time::TimePoint &tp);
         static utils::time::TimePoint TimePointFromString(const char *s1);
