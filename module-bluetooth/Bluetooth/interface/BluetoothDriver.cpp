@@ -91,6 +91,8 @@ namespace bluetooth
             }
             gap_local_bd_addr(addr);
             LOG_INFO("BTstack up and running at %s", bd_addr_to_str(addr));
+            bluetooth::KeyStorage::settings->setValue(bluetooth::Settings::State,
+                                                      static_cast<int>(BluetoothStatus::State::On));
             break;
         case HCI_EVENT_COMMAND_COMPLETE:
             if (HCI_EVENT_IS_COMMAND_COMPLETE(packet, hci_read_local_name)) {

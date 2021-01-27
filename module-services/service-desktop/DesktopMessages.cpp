@@ -40,4 +40,11 @@ namespace sdesktop::developerMode
     DeveloperModeRequest::DeveloperModeRequest() : sys::DataMessage(MessageType::DeveloperModeRequest)
     {}
 
+    BluetoothStatusRequestEvent::BluetoothStatusRequestEvent(int state)
+    {
+        context.setResponseStatus(http::Code::OK);
+        context.setEndpoint(EndpointType::developerMode);
+        context.setResponseBody(json11::Json::object{{json::developerMode::btState, state}});
+    }
+
 } // namespace sdesktop::developerMode
