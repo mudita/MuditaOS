@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -289,10 +289,17 @@ class CellularAntennaRequestMessage : public CellularMessage
 class CellularCallRequestMessage : public CellularMessage
 {
   public:
-    CellularCallRequestMessage(const utils::PhoneNumber::View &number)
-        : CellularMessage(MessageType::CellularCallRequest), number(number)
+    enum class RequestMode
+    {
+        Normal,
+        Emergency
+    };
+
+    CellularCallRequestMessage(const utils::PhoneNumber::View &number, RequestMode requestMode = RequestMode::Normal)
+        : CellularMessage(MessageType::CellularCallRequest), number(number), requestMode(requestMode)
     {}
     utils::PhoneNumber::View number;
+    RequestMode requestMode = RequestMode::Normal;
 };
 
 class CellularSimMessage : public CellularMessage
@@ -612,12 +619,31 @@ class CellularResponseMessage : public sys::ResponseMessage
                             std::string retdata    = std::string(),
                             MessageType responseTo = MessageType::MessageTypeUninitialized)
         : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode), data(retdata){};
+
     CellularResponseMessage(bool retCode, MessageType responseTo)
         : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
+
     virtual ~CellularResponseMessage(){};
 
     bool retCode;
     std::string data;
+};
+
+class CellularActionResponseMessage : public CellularResponseMessage, public app::manager::actions::ConvertibleToAction
+{
+  public:
+    CellularActionResponseMessage(app::manager::actions::ActionId actionId, std::string data)
+        : CellularResponseMessage(false, data), actionId(actionId)
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender, actionId, std::make_unique<app::manager::actions::ActionParams>(data));
+    }
+
+  private:
+    const app::manager::actions::ActionId actionId;
 };
 
 class CellularAntennaResponseMessage : public sys::ResponseMessage

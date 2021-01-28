@@ -56,6 +56,21 @@ namespace at
         }
     };
 
+    class GenericChannel : public ChannelMock
+    {
+      public:
+        GenericChannel(at::Result::Code code, std::vector<std::string> response) : result(code, std::move(response))
+        {}
+
+      private:
+        virtual Result ResultMock()
+        {
+            return result;
+        }
+
+        const Result result;
+    };
+
     /// provides CSCS bad response
     class CSCS_badChannel : public ChannelMock
     {

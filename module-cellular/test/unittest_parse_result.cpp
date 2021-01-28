@@ -5,7 +5,10 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
+
 #include <at/cmd/CSCA.hpp>
+#include <at/cmd/QECCNUM.hpp>
+
 #include "mock/AtCommon_channel.hpp"
 #include "PhoneNumber.hpp"
 #include "Result.hpp"
@@ -81,5 +84,68 @@ TEST_CASE("CSCA set data")
         {
             REQUIRE(cmd.getCmd() == expected_result);
         }
+    }
+}
+
+TEST_CASE("QECCNUM parser")
+{
+    SECTION("empty data")
+    {
+        at::cmd::QECCNUM cmd;
+        at::Result base_result;
+        auto &result = cmd.parse(base_result);
+        REQUIRE(!result);
+    }
+
+    SECTION("no numbers")
+    {
+        at::cmd::QECCNUM cmd;
+        at::GenericChannel channel(at::Result::Code::OK, {"+QECCNUM: 1", "+QECCNUM: 2"});
+        auto base = channel.cmd(cmd);
+        auto resp = cmd.parse(base);
+        REQUIRE(!resp);
+    }
+
+    SECTION("only no sim numbers")
+    {
+        at::cmd::QECCNUM cmd;
+        at::GenericChannel channel(at::Result::Code::OK, {"+QECCNUM: 0,112,999", "+QECCNUM: 1"});
+        auto base = channel.cmd(cmd);
+        auto resp = cmd.parse(base);
+        REQUIRE(resp);
+        REQUIRE(resp.eccNumbersNoSim == std::vector<std::string>({"112", "999"}));
+        REQUIRE(resp.eccNumbersSim.empty());
+    }
+
+    SECTION("only sim numbers")
+    {
+        at::cmd::QECCNUM cmd;
+        at::GenericChannel channel(at::Result::Code::OK, {"+QECCNUM: 1,112,998"});
+        auto base = channel.cmd(cmd);
+        auto resp = cmd.parse(base);
+        REQUIRE(resp);
+        REQUIRE(resp.eccNumbersNoSim.empty());
+        REQUIRE(resp.eccNumbersSim == std::vector<std::string>({"112", "998"}));
+    }
+
+    SECTION("sim and no sim numbers")
+    {
+        at::cmd::QECCNUM cmd;
+        at::GenericChannel channel(at::Result::Code::OK, {"+QECCNUM: 0,112,999", "+QECCNUM: 1,4564,25435,325454"});
+        auto base = channel.cmd(cmd);
+        auto resp = cmd.parse(base);
+        REQUIRE(resp);
+        REQUIRE(resp.eccNumbersNoSim == std::vector<std::string>({"112", "999"}));
+        REQUIRE(resp.eccNumbersSim == std::vector<std::string>({"4564", "25435", "325454"}));
+    }
+
+    SECTION("add number")
+    {
+        at::cmd::QECCNUM cmdAddNoSim(
+            at::cmd::QECCNUM::Mode::Add, at::cmd::QECCNUM::NumberType::WithoutSim, {"600800900", "200300500"});
+        REQUIRE(cmdAddNoSim.getCmd() == "AT+QECCNUM=1,1,\"600800900\",\"200300500\"");
+        at::cmd::QECCNUM cmdAddSim(
+            at::cmd::QECCNUM::Mode::Add, at::cmd::QECCNUM::NumberType::WithSim, {"600800900", "112"});
+        REQUIRE(cmdAddSim.getCmd() == "AT+QECCNUM=1,0,\"600800900\",\"112\"");
     }
 }
