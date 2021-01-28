@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FileIndexerAgent.hpp"
@@ -17,9 +17,6 @@ FileIndexerAgent::FileIndexerAgent(sys::Service *parentService) : DatabaseAgent(
 
 void FileIndexerAgent::initDb()
 {
-    LOG_INFO("[ServiceDB][File Indexer] Initialized");
-    database->execute(getDbInitString().c_str());
-
     auto notifications = database->query(FileIndexer::Statements::getAllNotifications);
     if (nullptr == notifications || FileIndexer::ONE_ROW_FOUND == notifications->getRowCount()) {
         return;
@@ -76,10 +73,7 @@ void FileIndexerAgent::registerMessages()
 
 auto FileIndexerAgent::getDbInitString() -> const std::string
 {
-    const char *sql = (""
-#include "file_indexer.sql"
-    );
-    return sql;
+    return {};
 }
 
 auto FileIndexerAgent::getDbFilePath() -> const std::string
