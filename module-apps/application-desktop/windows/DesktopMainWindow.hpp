@@ -88,7 +88,6 @@ namespace gui
 
       private:
         void invalidate() noexcept;
-        static void updateTopBarConfiguration(bool isScreenLocked, top_bar::Configuration &configuration);
 
         gui::KeyInputMappedTranslation translator;
     };

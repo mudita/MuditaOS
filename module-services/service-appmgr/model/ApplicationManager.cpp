@@ -34,9 +34,12 @@ namespace app::manager
 {
     namespace
     {
-        static constexpr auto default_application_locktime_ms = 30000;
-        static constexpr auto shutdown_delay_ms               = 500;
-    }; // namespace
+        constexpr auto default_application_locktime_ms = 30000;
+        constexpr auto shutdown_delay_ms               = 500;
+
+        constexpr auto timerBlock         = "BlockTimer";
+        constexpr auto timerShutdownDelay = "ShutdownDelay";
+    } // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
         : applications{std::move(launchers)}
@@ -102,8 +105,8 @@ namespace app::manager
                                            const ApplicationName &_rootApplicationName)
         : Service{serviceName}, ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           blockingTimer{std::make_unique<sys::Timer>(
-              "BlockTimer", this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)},
-          shutdownDelay{std::make_unique<sys::Timer>("ShutdownDelay", this, shutdown_delay_ms)},
+              timerBlock, this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)},
+          shutdownDelay{std::make_unique<sys::Timer>(timerShutdownDelay, this, shutdown_delay_ms)},
           settings(std::make_unique<settings::Settings>(this))
     {
         registerMessageHandlers();
