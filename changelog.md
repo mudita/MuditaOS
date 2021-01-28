@@ -1,5 +1,34 @@
 # MuditaOS changelog
 
+## [0.55.1 2020-01-28]
+
+### Added
+
+* Add brownout information window.
+* Add language select settings window.
+* Add emergency call window.
+
+### Changed
+
+* Add several improvements to the USB handling.
+* Improve e-ink display speed.
+
+### Fixed
+
+* Fix crash on USB deinitialization.
+* Fix USB Full Speed.
+* Fix selecting contact for edit by phone number from speed dial window.
+* Fix VoLTE settings editing.
+* Fix sim indicator displaying on the top bar.
+* Fix returning from ICE contacts window.
+
+### Other
+
+* Improvements to the harness tests.
+* Improve downloading assets for selected releases.
+* Add backend for multi-day events in the calendar application.
+* Add call forwarding and MMI status parsers.
+
 ## [0.54.3 2020-01-22]
 
 ### Added
