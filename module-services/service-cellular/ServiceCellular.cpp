@@ -72,6 +72,7 @@
 
 #include <module-db/queries/messages/sms/QuerySMSUpdate.hpp>
 #include <module-db/queries/messages/sms/QuerySMSAdd.hpp>
+#include <module-db/queries/phonebook/QueryContactGet.hpp>
 
 #include <algorithm>
 #include <bits/exception.h>
@@ -892,14 +893,25 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             break;
         }
 
-        cellular::RequestFactory factory(msg->number.getEntered());
-        CellularRequestHandler handler(*this);
+        cellular::RequestFactory factory(msg->number.getEntered(),
+                                         *channel,
+                                         msg->requestMode,
+                                         Store::GSM::get()->simCardInserted()
+                                             ? RequestFactory::SimStatus::SimInsterted
+                                             : RequestFactory::SimStatus::SimSlotEmpty);
 
         auto request = factory.create();
-        auto result  = channel->cmd(request->command());
-        request->handle(handler, result);
 
-        responseMsg = std::make_shared<CellularResponseMessage>(request->isHandled());
+        if (auto action = factory.getActionRequest(); action) {
+            responseMsg = std::make_shared<CellularActionResponseMessage>(action.value(), msg->number.getEntered());
+        }
+        else {
+            CellularRequestHandler handler(*this);
+            auto result = channel->cmd(request->command());
+            request->handle(handler, result);
+            responseMsg = std::make_shared<CellularResponseMessage>(request->isHandled());
+        }
+
     } break;
     case MessageType::DBServiceNotification: {
         auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
@@ -1825,6 +1837,7 @@ bool ServiceCellular::handle_URCReady()
         channel->cmd(at::AT::SET_TIME_ZONE_REPORTING);
     }
     channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
+
     LOG_DEBUG("%s", state.c_str());
     return true;
 }

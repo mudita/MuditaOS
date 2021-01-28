@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,6 +23,8 @@ namespace sys
 namespace CellularServiceAPI
 {
     bool DialNumber(sys::Service *serv, const utils::PhoneNumber &number);
+    bool DialEmergencyNumber(sys::Service *serv, const utils::PhoneNumber &number);
+
     bool AnswerIncomingCall(sys::Service *serv);
     void HangupCall(sys::Service *serv);
     /*

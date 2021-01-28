@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,9 +18,9 @@ namespace cellular
         virtual std::string command()                              = 0;
         virtual void handle(RequestHandler &h, at::Result &result) = 0;
         virtual void setHandled(bool handled)                      = 0;
-        virtual bool isHandled() const noexcept                    = 0;
         virtual bool checkModemResponse(const at::Result &result)  = 0;
-        virtual bool isValid() const noexcept                      = 0;
+        [[nodiscard]] virtual bool isHandled() const noexcept      = 0;
+        [[nodiscard]] virtual bool isValid() const noexcept        = 0;
         virtual ~IRequest(){};
     };
 

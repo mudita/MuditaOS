@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.12)
 
 add_catch2_executable(
         NAME
-            cellular-mmi
+            cellular-request-factory
         SRCS
-            unittest_mmi.cpp
+        unittest_request_factory.cpp
         LIBS
             module-cellular
 )

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,6 +24,11 @@ namespace at
             UNDEFINED,     /// undefined result - usage of Undefined result, define and pin result to use it
             PARSING_ERROR, /// parser error
         } code = Code::UNDEFINED;
+
+        Result() = default;
+
+        Result(Code code, std::vector<std::string> response) : code(code), response(std::move(response))
+        {}
 
         //! Information about Equipment or Network error as variant type
         /*!

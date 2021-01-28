@@ -59,6 +59,7 @@ namespace app
         void CallActiveHandler();
         void IncomingCallHandler(const CellularCallMessage *const msg);
         void RingingHandler(const CellularCallMessage *const msg);
+        auto HandleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
 
       protected:
         call::State state = call::State::IDLE;

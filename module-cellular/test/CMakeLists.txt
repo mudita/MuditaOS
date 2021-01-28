@@ -21,9 +21,9 @@ add_catch2_executable(
 
 add_catch2_executable(
         NAME
-        unittest_parse_CSCA
+        cellular-parse-result
         SRCS
-        unittest_parse_CSCA.cpp
+        unittest_parse_result.cpp
         LIBS
         module-cellular
 )
