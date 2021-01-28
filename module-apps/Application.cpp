@@ -150,7 +150,7 @@ namespace app
             else if (suspendInProgress) {
                 message->setCommandType(service::gui::DrawMessage::Type::SUSPEND);
             }
-            sys::Bus::SendUnicast(message, service::name::gui, this);
+            sys::Bus::SendUnicast(std::move(message), service::name::gui, this);
         }
 
         if (suspendInProgress)
