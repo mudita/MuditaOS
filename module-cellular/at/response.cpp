@@ -685,5 +685,107 @@ namespace at
                 return message;
             }
         } // namespace clip
+
+        namespace ccwa
+        {
+            auto parse(const std::vector<std::string> &data, std::vector<CcwaParsed> &parsed) noexcept -> bool
+            {
+
+                auto constexpr toRemove    = "+CCWA: ";
+                auto constexpr emptyString = "";
+                auto constexpr tokenCount  = 2;
+                parsed.clear();
+
+                for (auto el : data) {
+
+                    if (el.find("OK") != std::string::npos) {
+                        return true;
+                    }
+
+                    if (el.find(toRemove) == std::string::npos) {
+                        parsed.clear();
+                        return false;
+                    }
+
+                    utils::findAndReplaceAll(el, toRemove, emptyString);
+                    auto tokens = utils::split(el, ",");
+                    if (tokens.size() != tokenCount) {
+                        parsed.clear();
+                        return false;
+                    }
+
+                    for (auto &t : tokens) {
+                        t = utils::trim(t);
+                    }
+                    int statusToken       = 0;
+                    int serviceClassToken = 0;
+
+                    if (!utils::toNumeric(tokens[0], statusToken) || !utils::toNumeric(tokens[1], serviceClassToken)) {
+                        parsed.clear();
+                        return false;
+                    }
+                    auto status       = static_cast<Status>(statusToken);
+                    auto serviceClass = static_cast<ServiceClass>(serviceClassToken);
+
+                    if (magic_enum::enum_contains<Status>(status) &&
+                        magic_enum::enum_contains<ServiceClass>(serviceClass)) {
+                        parsed.push_back(CcwaParsed(status, serviceClass));
+                    }
+                    else {
+                        parsed.clear();
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            auto getStatus(const Status &status) noexcept
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage
+            {
+                using namespace app::manager::actions;
+
+                auto message = IMMICustomResultParams::MMIResultMessage::CommonNoMessage;
+                switch (status) {
+                case Status::Disable:
+                    message = IMMICustomResultParams::MMIResultMessage::CallWaitingDeactivated;
+                    break;
+                case Status::Enable:
+                    message = IMMICustomResultParams::MMIResultMessage::CallWaitingActivated;
+                    break;
+                }
+                return message;
+            }
+
+            auto getClass(const ServiceClass &serviceClass) noexcept
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage
+            {
+                using namespace app::manager::actions;
+
+                auto message = IMMICustomResultParams::MMIResultMessage::CommonNoMessage;
+                switch (serviceClass) {
+                case ServiceClass::Voice:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonVoice;
+                    break;
+                case ServiceClass::Data:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonData;
+                    break;
+                case ServiceClass::Fax:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonFax;
+                    break;
+                case ServiceClass::DataSync:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonSync;
+                    break;
+                case ServiceClass::DataAsync:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonAsync;
+                    break;
+                case ServiceClass::AllDisabled:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonAllDisabled;
+                    break;
+                }
+                return message;
+            }
+
+        } // namespace ccwa
     }     // namespace response
 } // namespace at

@@ -15,15 +15,13 @@
 #include "service-cellular/requests/PinChangeRequest.hpp"
 #include "service-cellular/requests/ImeiRequest.hpp"
 #include "service-cellular/requests/UssdRequest.hpp"
-#include "service-cellular/service-cellular/requests/ClirRequest.hpp"
 #include "service-cellular/requests/CallForwardingRequest.hpp"
 #include "service-cellular/requests/CallBarringRequest.hpp"
 #include "service-cellular/requests/ClirRequest.hpp"
 #include "service-cellular/requests/ClipRequest.hpp"
+#include "service-cellular/requests/CallWaitingRequest.hpp"
 
 #include <service-appmgr/model/ApplicationManager.hpp>
-#include "service-cellular/service-cellular/requests/ClirRequest.hpp"
-#include "service-cellular/service-cellular/requests/SupplementaryServicesRequest.hpp"
 
 #include <module-cellular/at/response.hpp>
 
@@ -276,6 +274,53 @@ void CellularRequestHandler::handle(cellular::ClipRequest &request, at::Result &
         response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
     }
 
+    auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
+    sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
+    request.setHandled(requestHandled);
+}
+
+void CellularRequestHandler::handle(cellular::CallWaitingRequest &request, at::Result &result)
+{
+    using namespace app::manager::actions;
+    using namespace cellular;
+    using namespace at::response;
+    auto requestHandled = request.checkModemResponse(result);
+
+    std::shared_ptr<MMICustomResultParams> response;
+    if (requestHandled) {
+        auto procedureType = request.getProcedureType();
+        if (procedureType == SupplementaryServicesRequest::ProcedureType::Activation) {
+            response = std::make_shared<MMICallWaitingResult>(IMMICustomResultParams::MMIType::CallWaitingNotification);
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::CallWaitingActivated);
+        }
+        else if (procedureType == SupplementaryServicesRequest::ProcedureType::Deactivation) {
+            response = std::make_shared<MMICallWaitingResult>(IMMICustomResultParams::MMIType::CallWaitingNotification);
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::CallWaitingDeactivated);
+        }
+        else if (procedureType == SupplementaryServicesRequest::ProcedureType::Interrogation) {
+            std::vector<ccwa::CcwaParsed> parsed;
+            if (ccwa::parse(result.response, parsed)) {
+                MMICallWaitingResult resp = MMICallWaitingResult(IMMICustomResultParams::MMIType::CallWaitingData);
+                for (auto el : parsed) {
+                    resp.addMessages(std::make_pair(ccwa::getClass(el.serviceClass), ccwa::getStatus(el.status)));
+                }
+                response = std::make_shared<MMICallWaitingResult>(resp);
+            }
+            else {
+                response =
+                    std::make_shared<MMICallWaitingResult>(IMMICustomResultParams::MMIType::CallWaitingNotification);
+                response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
+            }
+        }
+        else {
+            response = std::make_shared<MMICallWaitingResult>(IMMICustomResultParams::MMIType::CallWaitingNotification);
+            response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonMMINotSupported);
+        }
+    }
+    else {
+        response = std::make_shared<MMICallWaitingResult>(IMMICustomResultParams::MMIType::CallWaitingNotification);
+        response->addMessage(IMMICustomResultParams::MMIResultMessage::CommonFailure);
+    }
     auto msg = std::make_shared<CellularMMIResultMessage>(MMIResultParams::MMIResult::Success, response);
     sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellular);
     request.setHandled(requestHandled);
