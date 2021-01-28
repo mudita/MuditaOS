@@ -404,5 +404,37 @@ namespace at
             auto getStatus(const Status &status) noexcept
                 -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
         } // namespace clck
+
+        namespace ccwa
+        {
+            enum class Status
+            {
+                Disable,
+                Enable
+            };
+            enum class ServiceClass
+            {
+                Voice       = 1,
+                Data        = 2,
+                Fax         = 4,
+                DataSync    = 16,
+                DataAsync   = 32,
+                AllDisabled = 255
+            };
+
+            struct CcwaParsed
+            {
+                Status status;
+                ServiceClass serviceClass;
+                explicit CcwaParsed(const Status status, const ServiceClass serviceClass)
+                    : status(status), serviceClass(serviceClass){};
+            };
+
+            auto parse(const std::vector<std::string> &data, std::vector<CcwaParsed> &parsed) noexcept -> bool;
+            auto getStatus(const Status &status) noexcept
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
+            auto getClass(const ServiceClass &serviceClass) noexcept
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
+        } // namespace ccwa
     }     // namespace response
 } // namespace at

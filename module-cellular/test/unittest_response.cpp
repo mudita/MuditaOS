@@ -434,3 +434,118 @@ TEST_CASE("Response CLCK")
         REQUIRE(ret.size() == 0);
     }
 }
+
+TEST_CASE("Response CCWA?")
+{
+    SECTION("OK CCWA?  - all disabled")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccwa::CcwaParsed> ret;
+        resp.response.push_back("+CCWA: 0,255");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccwa::parse(resp.response, ret) == true);
+        REQUIRE(ret.size() == 1);
+        REQUIRE(ret[0].status == at::response::ccwa::Status::Disable);
+        REQUIRE(ret[0].serviceClass == at::response::ccwa::ServiceClass::AllDisabled);
+    }
+
+    SECTION("OK CCWA?  - voice, fax enabled")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccwa::CcwaParsed> ret;
+        resp.response.push_back("+CCWA: 1,1");
+        resp.response.push_back("+CCWA: 1,4");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccwa::parse(resp.response, ret) == true);
+        REQUIRE(ret.size() == 2);
+
+        REQUIRE(ret[0].status == at::response::ccwa::Status::Enable);
+        REQUIRE(ret[0].serviceClass == at::response::ccwa::ServiceClass::Voice);
+
+        REQUIRE(ret[1].status == at::response::ccwa::Status::Enable);
+        REQUIRE(ret[1].serviceClass == at::response::ccwa::ServiceClass::Fax);
+    }
+
+    SECTION("WRONG CCWA?  - invalid status")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccwa::CcwaParsed> ret;
+        resp.response.push_back("+CCWA: 9,1");
+        resp.response.push_back("+CCWA: 1,4");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccwa::parse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+
+    SECTION("WRONG CCWA?  - invalid class")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccwa::CcwaParsed> ret;
+        resp.response.push_back("+CCWA: 1,1");
+        resp.response.push_back("+CCWA: 1,66");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccwa::parse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+
+    SECTION("WRONG CCWA?  - invalid token")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccwa::CcwaParsed> ret;
+        resp.response.push_back("+CCW: 1,1");
+        resp.response.push_back("+CCWA: 1,66");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccwa::parse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+
+    SECTION("WRONG CCWA?  - to little tokens")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccwa::CcwaParsed> ret;
+        resp.response.push_back("+CCWA: 1,1");
+        resp.response.push_back("+CCWA: 1");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccwa::parse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+
+    SECTION("WRONG CCWA?  - to many tokens")
+    {
+
+        at::Result resp;
+        resp.code = at::Result::Code::OK;
+        std::vector<at::response::ccwa::CcwaParsed> ret;
+        resp.response.push_back("+CCWA: 1,1,9");
+        resp.response.push_back("+CCWA: 1,4");
+        resp.response.push_back("OK");
+
+        REQUIRE(resp.code == at::Result::Code::OK);
+        REQUIRE(at::response::ccwa::parse(resp.response, ret) == false);
+        REQUIRE(ret.size() == 0);
+    }
+}

@@ -77,3 +77,13 @@ auto MMIImeiResult::getImei() const noexcept -> std::string
 {
     return imei;
 }
+
+void MMICallWaitingResult::addMessages(const std::pair<MMIResultMessage, MMIResultMessage> &message)
+{
+    messages.push_back(message);
+}
+
+auto MMICallWaitingResult::getMessages() const noexcept -> std::vector<std::pair<MMIResultMessage, MMIResultMessage>>
+{
+    return messages;
+}
