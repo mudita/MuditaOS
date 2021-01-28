@@ -51,6 +51,40 @@ namespace app
             switchWindow(app::window::name_emergencyCall, std::forward<decltype(data)>(data));
             return msgHandled();
         });
+
+        auto convertibleToActionHandler = [this](sys::Message *request) { return HandleMessageAsAction(request); };
+        connect(typeid(CellularActionResponseMessage), convertibleToActionHandler);
+    }
+
+    auto ApplicationCall::HandleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>
+    {
+        auto actionMsg = dynamic_cast<manager::actions::ConvertibleToAction *>(request);
+        if (!actionMsg) {
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
+        }
+
+        auto buttonAction = [=]() -> bool {
+            returnToPreviousWindow();
+            return true;
+        };
+
+        constexpr auto iconNoEmergency = "emergency_W_G";
+        auto textNoEmergency           = utils::localize.get("app_call_wrong_emergency");
+        constexpr auto iconNoSim       = "info_big_circle_W_G";
+        const auto textNoSim           = utils::localize.get("app_call_no_sim");
+
+        auto action = actionMsg->toAction();
+
+        switch (const auto actionId = action->getAction(); actionId) {
+        case app::manager::actions::CallRejectNotEmergency:
+            utils::findAndReplaceAll(textNoEmergency, "$NUMBER", action->getData()->getDescription());
+            showNotification(buttonAction, iconNoEmergency, textNoEmergency);
+            break;
+        case app::manager::actions::CallRejectNoSim:
+            showNotification(buttonAction, iconNoSim, textNoSim);
+            break;
+        }
+        return std::make_shared<sys::ResponseMessage>();
     }
 
     //  number of seconds after end call to switch back to previous application
@@ -198,37 +232,12 @@ namespace app
 
     void ApplicationCall::handleEmergencyCallEvent(const std::string &number)
     {
-        auto ret = CellularServiceAPI::DialNumber(this, utils::PhoneNumber(number));
-        if (ret == false) {
-            auto action = [=]() -> bool {
-                returnToPreviousWindow();
-                return true;
-            };
-            const auto icon = "emergency_W_G";
-            auto text       = utils::localize.get("app_call_wrong_emergency");
-            utils::findAndReplaceAll(text, "$NUMBER", number);
-            showNotification(action, icon, text);
-            return;
-        }
+        CellularServiceAPI::DialEmergencyNumber(this, utils::PhoneNumber(number));
     }
 
     void ApplicationCall::handleCallEvent(const std::string &number)
     {
-        if (!Store::GSM::get()->simCardInserted()) {
-            LOG_INFO("No SIM card");
-            auto action = [=]() -> bool {
-                returnToPreviousWindow();
-                return true;
-            };
-            const auto icon = "info_big_circle_W_G";
-            const auto text = utils::localize.get("app_call_no_sim");
-            showNotification(action, icon, text);
-            return;
-        }
-
-        LOG_INFO("number: [%s]", number.c_str());
-        auto ret = CellularServiceAPI::DialNumber(this, utils::PhoneNumber(number));
-        LOG_INFO("CALL RESULT: %s", (ret ? "OK" : "FAIL"));
+        CellularServiceAPI::DialNumber(this, utils::PhoneNumber(number));
     }
 
     void ApplicationCall::handleAddContactEvent(const std::string &number)

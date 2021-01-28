@@ -39,6 +39,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Cmd.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/CSCA.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/QECCNUM.cpp
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
