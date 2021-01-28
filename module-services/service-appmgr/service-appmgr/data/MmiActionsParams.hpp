@@ -34,7 +34,9 @@ namespace app::manager::actions
             Clip,
             Imei,
             CallBarringNotification,
-            CallBarringData
+            CallBarringData,
+            CallWaitingNotification,
+            CallWaitingData
         };
 
         enum class MMIResultMessage
@@ -84,6 +86,9 @@ namespace app::manager::actions
             ClipNotProvisioned,
             ClipProvisioned,
             ClipUnknown,
+
+            CallWaitingActivated,
+            CallWaitingDeactivated,
 
         };
 
@@ -203,5 +208,17 @@ namespace app::manager::actions
 
       private:
         std::string imei;
+    };
+
+    class MMICallWaitingResult : public MMICustomResultParams
+    {
+      public:
+        explicit MMICallWaitingResult(const MMIType type) : MMICustomResultParams(type)
+        {}
+        void addMessages(const std::pair<MMIResultMessage, MMIResultMessage> &message);
+        auto getMessages() const noexcept -> std::vector<std::pair<MMIResultMessage, MMIResultMessage>>;
+
+      private:
+        std::vector<std::pair<MMIResultMessage, MMIResultMessage>> messages;
     };
 } // namespace app::manager::actions
