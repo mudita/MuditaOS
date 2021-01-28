@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextBlock.hpp"
@@ -45,9 +45,17 @@ namespace gui
         return text;
     }
 
-    UTF8 TextBlock::getText(uint32_t start_position) const
+    UTF8 TextBlock::getText(uint32_t start_position, NavigationDirection direction, unsigned maxLength) const
     {
-        return text.substr(start_position, text.length() - start_position);
+        start_position = std::min<uint32_t>(start_position, text.length());
+        if (direction == NavigationDirection::LEFT) {
+            unsigned fromPos = start_position > maxLength ? start_position - maxLength : 0;
+            return text.substr(fromPos, start_position - fromPos);
+        }
+        else {
+            auto length = std::min<unsigned>(text.length() - start_position, maxLength);
+            return text.substr(start_position, length);
+        }
     }
 
     const TextFormat *TextBlock::getFormat() const

@@ -245,7 +245,7 @@ namespace gui
         message->setMaximumSize(body->getWidth(), body->getHeight());
         message->setEdges(gui::RectangleEdge::Bottom);
         message->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            {InputMode::ABC, InputMode::abc, InputMode::Abc, InputMode::digit},
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));

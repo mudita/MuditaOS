@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -37,7 +37,9 @@ namespace gui
         TextBlock(const TextBlock &);
 
         const UTF8 &getText() const;
-        UTF8 getText(uint32_t start_position) const;
+        UTF8 getText(uint32_t start_position,
+                     NavigationDirection direction = NavigationDirection::RIGHT,
+                     unsigned maxCharCount         = std::numeric_limits<unsigned>::max()) const;
         auto getFormat() const -> const TextFormat *;
         void setText(const UTF8 text);
         void insertChar(const uint32_t value, const uint32_t pos);

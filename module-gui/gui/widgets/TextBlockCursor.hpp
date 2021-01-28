@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -159,7 +159,8 @@ namespace gui
         virtual void addChar(uint32_t utf_val);
         void addTextBlock(TextBlock &&);
 
-        [[nodiscard]] auto getText() -> std::string;
+        [[nodiscard]] auto getText(NavigationDirection direction = NavigationDirection::RIGHT,
+                                   unsigned maxLength            = std::numeric_limits<unsigned>::max()) -> std::string;
         auto getUTF8Text() -> UTF8;
 
         /// iterable

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextBlockCursor.hpp"
@@ -294,12 +294,12 @@ namespace gui
         return *currentBlock();
     }
 
-    auto BlockCursor::getText() -> std::string
+    auto BlockCursor::getText(NavigationDirection direction, unsigned maxLength) -> std::string
     {
         if (currentBlock() == blocksEnd()) {
             return "";
         }
-        return currentBlock()->getText(getPosition());
+        return currentBlock()->getText(getPosition(), direction, maxLength);
     }
 
     auto BlockCursor::getUTF8Text() -> UTF8

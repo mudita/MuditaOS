@@ -545,7 +545,7 @@ namespace gui
             return false;
         }
 
-        auto code = translator.handle(inputEvent.key, mode ? mode->get() : "");
+        auto code = getCharCode(inputEvent);
 
         if (code != Profile::none_key && checkAdditionBounds(code) == AdditionBound::CanAddAll) {
 
@@ -567,6 +567,32 @@ namespace gui
 
         debug_text("handleAdChar -> End(false)");
         return false;
+    }
+
+    uint32_t Text::getCharCode(const InputEvent &inputEvent)
+    {
+        if (mode != nullptr && mode->is(InputMode::Mode::Abc)) {
+
+            auto textFragment = cursor->getText(NavigationDirection::LEFT, textCapitalization::checkDepth);
+            auto containsChar = [](char c, const std::string &chars) -> bool {
+                auto it = std::find(chars.begin(), chars.end(), c);
+                return it != std::end(chars);
+            };
+
+            bool isUpperCase = textFragment.empty();
+            for (auto c = textFragment.rbegin(); c != std::rend(textFragment); c = std::next(c)) {
+                if (containsChar(*c, textCapitalization::uppercaseTriggers)) {
+                    isUpperCase = true;
+                    break;
+                }
+                if (containsChar(*c, textCapitalization::neutralChars) == false) {
+                    break;
+                }
+            }
+            return translator.handle(inputEvent.key,
+                                     isUpperCase ? InputMode({InputMode::Mode::ABC}).get() : mode->get());
+        }
+        return translator.handle(inputEvent.key, mode ? mode->get() : "");
     }
 
     bool Text::handleDigitLongPress(const InputEvent &inputEvent)

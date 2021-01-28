@@ -67,4 +67,11 @@ namespace gui
         CantAdd
     };
 
+    namespace textCapitalization
+    {
+        constexpr auto checkDepth           = 3;
+        const std::string uppercaseTriggers = ".!?";
+        const std::string neutralChars      = " ";
+    } // namespace textCapitalization
+
 } // namespace gui

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -113,6 +113,120 @@ TEST_CASE("Text block - set/update/get text")
         auto local_update_text = starting_text + starting_text;
         block.setText(local_update_text);
         REQUIRE(block.length() == local_update_text.length());
+    }
+}
+
+TEST_CASE("Text block - set/update/get text with navigation and max length")
+{
+    using namespace gui;
+    const std::string starting_text = "some starting text";
+    auto &fontmanager               = mockup::fontManager();
+    REQUIRE(fontmanager.getFont(0) != nullptr);
+    auto block = TextBlock(starting_text, fontmanager.getFont(0), TextBlock::End::None);
+
+    SECTION("get forward/back on empty text with invalid starting pos and length")
+    {
+        auto emptyTextBlock     = TextBlock("", fontmanager.getFont(0), TextBlock::End::None);
+        const auto starting_pos = 10;
+        REQUIRE(emptyTextBlock.getText(starting_pos, NavigationDirection::RIGHT) == std::string{});
+        REQUIRE(emptyTextBlock.getText(starting_pos, NavigationDirection::LEFT) == std::string{});
+    }
+
+    SECTION("get forward full")
+    {
+        const auto starting_pos = 0;
+        REQUIRE(block.getText(starting_pos, NavigationDirection::RIGHT, starting_text.size()) == starting_text);
+    }
+
+    SECTION("get forward full with overflowing max length")
+    {
+        const auto starting_pos = 0;
+        REQUIRE(block.getText(starting_pos, NavigationDirection::RIGHT) == starting_text);
+    }
+
+    SECTION("get forward with non-zero starting position")
+    {
+        const auto starting_pos = 5;
+        REQUIRE(block.getText(starting_pos, NavigationDirection::RIGHT, starting_text.size() - starting_pos) ==
+                starting_text.substr(starting_pos));
+    }
+
+    SECTION("get forward with non-zero starting position with overflowing max length")
+    {
+        const auto starting_pos = 5;
+        REQUIRE(block.getText(starting_pos, NavigationDirection::RIGHT) == starting_text.substr(starting_pos));
+    }
+
+    SECTION("get forward from the end of text")
+    {
+        const auto starting_pos = starting_text.size();
+        REQUIRE(block.getText(starting_pos, NavigationDirection::RIGHT) == std::string{});
+    }
+
+    SECTION("get forward with overflowing starting position")
+    {
+        const auto starting_pos = starting_text.size() + 10;
+        REQUIRE(block.getText(starting_pos, NavigationDirection::RIGHT) == std::string{});
+    }
+
+    SECTION("get back only first char ")
+    {
+        const auto starting_pos = 1;
+        REQUIRE(block.getText(starting_pos, NavigationDirection::LEFT) == std::string{starting_text.front()});
+    }
+
+    SECTION("get back only last char")
+    {
+        const auto starting_pos = starting_text.size();
+        const auto length       = 1;
+        REQUIRE(block.getText(starting_pos, NavigationDirection::LEFT, length) == std::string{starting_text.back()});
+    }
+
+    SECTION("get back full")
+    {
+        const auto starting_pos = starting_text.size();
+        REQUIRE(block.getText(starting_pos, NavigationDirection::LEFT, starting_text.size()) == starting_text);
+    }
+
+    SECTION("get back full with overflowing max length")
+    {
+        const auto starting_pos = starting_text.size();
+        REQUIRE(block.getText(starting_pos, NavigationDirection::LEFT) == starting_text);
+    }
+
+    SECTION("get back with non-zero starting position")
+    {
+        const auto starting_pos = 5;
+        REQUIRE(block.getText(starting_pos, NavigationDirection::LEFT, starting_text.size() - starting_pos) ==
+                starting_text.substr(0, starting_pos));
+    }
+
+    SECTION("get back with non-zero starting position with overflowing max length")
+    {
+        const auto starting_pos = 5;
+        REQUIRE(block.getText(starting_pos, NavigationDirection::LEFT) == starting_text.substr(0, starting_pos));
+    }
+
+    SECTION("get back with overflowing starting position")
+    {
+        const auto starting_pos = starting_text.size() + 10;
+        const auto length       = 10;
+        REQUIRE(block.getText(starting_pos, NavigationDirection::LEFT, length) ==
+                starting_text.substr(starting_text.size() - length));
+    }
+
+    SECTION("get back with overflowing starting position with overflowing max length")
+    {
+        const auto starting_pos = starting_text.size() + 10;
+        REQUIRE(block.getText(starting_pos, NavigationDirection::LEFT) == starting_text);
+    }
+
+    SECTION("get forward and get back gives whole text")
+    {
+        const auto starting_pos = 10;
+        auto leftHandSide       = block.getText(starting_pos, NavigationDirection::LEFT);
+        auto rightHandSide      = block.getText(starting_pos, NavigationDirection::RIGHT);
+        REQUIRE(leftHandSide + rightHandSide == starting_text);
     }
 }
 

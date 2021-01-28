@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <InputMode.hpp>
@@ -11,6 +11,7 @@ const std::map<InputMode::Mode, std::string> input_mode = {
     {InputMode::digit, "numeric"},
     {InputMode::ABC, "upper"},
     {InputMode::abc, "lower"},
+    {InputMode::Abc, "lower"},
     {InputMode::phone, "phone"},
 };
 
@@ -23,6 +24,8 @@ static std::string getInputName(InputMode::Mode m)
         return "ABC";
     case InputMode::abc:
         return "abc";
+    case InputMode::Abc:
+        return "Abc";
     case InputMode::phone:
         return "phone";
     default:

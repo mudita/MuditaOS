@@ -69,7 +69,7 @@ namespace app::notes
         edit->setEdges(gui::RectangleEdge::None);
         edit->setFont(::style::window::font::medium);
         edit->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            {InputMode::ABC, InputMode::abc, InputMode::digit, InputMode::Abc},
             [=](const UTF8 &text) { bottomBarTemporaryMode(text); },
             [=]() { bottomBarRestoreFromTemporaryMode(); },
             [=]() { selectSpecialCharacter(); }));

@@ -15,15 +15,6 @@
 
 namespace gui
 {
-
-    // TODO if neccessary `custom` keymap can be added her
-    enum class Keymaps
-    {
-        ABC,
-        abc,
-        digit,
-    };
-
     class KeyBaseTranslation
     {
       public:

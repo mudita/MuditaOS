@@ -70,7 +70,7 @@ namespace gui
                     ->setBottomBarText(utils::localize.get("sms_reply"), BottomBar::Side::CENTER);
 
                 inputText->setInputMode(new InputMode(
-                    {InputMode::ABC, InputMode::abc, InputMode::digit},
+                    {InputMode::ABC, InputMode::abc, InputMode::digit, InputMode::Abc},
                     [=](const UTF8 &Text) { application->getCurrentWindow()->bottomBarTemporaryMode(Text); },
                     [=]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
                     [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));

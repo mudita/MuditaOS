@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -182,6 +182,9 @@ namespace gui
 
       private:
         gui::KeyInputMappedTranslation translator;
+        /// wraps UTF8 char retrieval with additional text analysis (in case of `Abc` InputMode )that provides
+        /// basic capitalization rules enforcement
+        uint32_t getCharCode(const InputEvent &inputEvent);
 
       public:
         TextChangedCallback textChangedCallback;

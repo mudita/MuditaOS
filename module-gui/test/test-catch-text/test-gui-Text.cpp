@@ -154,13 +154,13 @@ TEST_CASE("Text buildDrawList")
     }
 }
 
-TEST_CASE("handle input mode ABC/abc/1234")
+TEST_CASE("handle input mode ABC/abc/1234/Abc")
 {
     utils::localize.setInputLanguage("English"); /// needed to load input mode
     auto &fontmanager = mockup::fontManager();
     auto font         = fontmanager.getFont(0);
     auto text         = gui::TestText();
-    auto modes        = {InputMode::ABC, InputMode::abc, InputMode::digit};
+    auto modes        = {InputMode::ABC, InputMode::abc, InputMode::digit, InputMode::Abc};
     auto str          = text.getText();
     auto next_mode    = gui::InputEvent({}, gui::InputEvent::State::keyReleasedShort, gui::KeyCode::KEY_AST);
     auto key_2        = gui::InputEvent(
@@ -210,6 +210,157 @@ TEST_CASE("handle input mode ABC/abc/1234")
         text.onInput(key_2);
         str += "2";
         REQUIRE(str == text.getText());
+    }
+
+    SECTION("ABC -> abc -> digit -> Abc - ABC input first")
+    {
+        REQUIRE(text.getInputMode()->is(InputMode::ABC));
+        text.onInput(key_2);
+        str += "A";
+        REQUIRE(str == text.getText());
+
+        text.onInput(next_mode);
+        text.onInput(next_mode);
+        text.onInput(next_mode);
+        REQUIRE(text.getInputMode()->is(InputMode::Abc));
+        text.onInput(key_2);
+        str += "a";
+        REQUIRE(!(str == text.getText())); // not equal because its `key 2 double click..., A was changed to a`
+    }
+
+    SECTION("ABC -> abc -> digit -> Abc - Abc input first")
+    {
+        REQUIRE(text.getInputMode()->is(InputMode::ABC));
+        text.onInput(next_mode);
+        text.onInput(next_mode);
+        text.onInput(next_mode);
+        REQUIRE(text.getInputMode()->is(InputMode::Abc));
+        text.onInput(key_2);
+        str += "A";
+        REQUIRE(str == text.getText());
+
+        text.onInput(key_2);
+        str += "a";
+        REQUIRE(!(str == text.getText())); // not equal because its `key 2 double click..., A was changed to a`
+    }
+}
+
+TEST_CASE("handle input mode Abc")
+{
+    utils::localize.setInputLanguage("English"); /// needed to load input mode
+    auto &fontmanager = mockup::fontManager();
+    auto font         = fontmanager.getFont(0);
+    auto text         = gui::TestText();
+    auto modes        = {InputMode::Abc};
+    auto key_0        = gui::InputEvent(
+        {
+            RawKey::State::Released,
+            bsp::KeyCodes::NumericKey0,
+        },
+        gui::InputEvent::State::keyReleasedShort);
+    auto key_1 = gui::InputEvent(
+        {
+            RawKey::State::Released,
+            bsp::KeyCodes::NumericKey1,
+        },
+        gui::InputEvent::State::keyReleasedShort);
+    auto key_2 = gui::InputEvent(
+        {
+            RawKey::State::Released,
+            bsp::KeyCodes::NumericKey2,
+        },
+        gui::InputEvent::State::keyReleasedShort);
+    auto key_3 = gui::InputEvent(
+        {
+            RawKey::State::Released,
+            bsp::KeyCodes::NumericKey3,
+        },
+        gui::InputEvent::State::keyReleasedShort);
+
+    text.setInputMode(new InputMode(modes));
+    text.setFont(font);
+
+    SECTION("single capital letter")
+    {
+        const UTF8 expected = "Ada";
+        REQUIRE(text.getInputMode()->is(InputMode::Abc));
+        text.onInput(key_2);
+        text.onInput(key_3);
+        text.onInput(key_2);
+        REQUIRE(expected == text.getText());
+    }
+
+    SECTION("capital letter after dot")
+    {
+        const UTF8 expected = "Ada.Ad";
+        REQUIRE(text.getInputMode()->is(InputMode::Abc));
+        text.onInput(key_2);
+        text.onInput(key_3);
+        text.onInput(key_2);
+        text.onInput(key_1);
+        text.onInput(key_2);
+        text.onInput(key_3);
+        REQUIRE(expected == text.getText());
+    }
+
+    SECTION("capital letter after dot and space")
+    {
+        const UTF8 expected = "Ada. Ad";
+        REQUIRE(text.getInputMode()->is(InputMode::Abc));
+        text.onInput(key_2);
+        text.onInput(key_3);
+        text.onInput(key_2);
+        text.onInput(key_1);
+        text.onInput(key_0);
+        text.onInput(key_2);
+        text.onInput(key_3);
+        REQUIRE(expected == text.getText());
+    }
+
+    SECTION("capital letter after navigating behind dot and space")
+    {
+        const UTF8 expected1 = "Ada. Ad";
+        const UTF8 expected2 = "Ada. AAd";
+        const UTF8 expected3 = "Ada.D AAd";
+
+        //        const UTF8 expected = "Ada. Ad";
+        REQUIRE(text.getInputMode()->is(InputMode::Abc));
+        text.onInput(key_2);
+        text.onInput(key_3);
+        text.onInput(key_2);
+        text.onInput(key_1);
+        text.onInput(key_0);
+        text.onInput(key_2);
+        text.onInput(key_3);
+        REQUIRE(expected1 == text.getText());
+
+        text.moveCursor(gui::NavigationDirection::LEFT, 2);
+        text.onInput(key_2);
+        REQUIRE(expected2 == text.getText());
+
+        text.moveCursor(gui::NavigationDirection::LEFT, 2);
+        text.onInput(key_3);
+        REQUIRE(expected3 == text.getText());
+    }
+
+    SECTION("no capital letter after emoji")
+    {
+        text.setText("↠😁😂😃");
+        const UTF8 expected1 = "↠😁😂😃ad";
+        const UTF8 expected2 = "↠😁ad😂😃ad";
+        const UTF8 expected3 = "Ad↠😁ad😂😃ad";
+        REQUIRE(text.getInputMode()->is(InputMode::Abc));
+        text.onInput(key_2);
+        text.onInput(key_3);
+        REQUIRE(expected1 == text.getText());
+        text.moveCursor(gui::NavigationDirection::LEFT, 4);
+        text.onInput(key_2);
+        text.onInput(key_3);
+        REQUIRE(expected2 == text.getText());
+        text.moveCursor(gui::NavigationDirection::LEFT, 4);
+        text.onInput(key_2);
+        text.onInput(key_3);
+        REQUIRE(expected3 == text.getText());
     }
 }
 

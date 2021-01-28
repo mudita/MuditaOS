@@ -139,7 +139,8 @@ TESTS_LIST["catch2-gui-text"]="
     Text ctor;
     Text drawLines;
     Text buildDrawList;
-    handle input mode ABC/abc/1234;
+    handle input mode ABC/abc/1234/Abc;
+    handle input mode Abc;
     handle longpress for digit in ABC mode;
     handle text expand;
     handle newline;
@@ -152,6 +153,7 @@ TESTS_LIST["catch2-gui-text"]="
     RichText newline and empty lines tests;
     TextBlock Ctor/Dtor ;
     Text block - set/update/get text;
+    Text block - set/update/get text with navigation and max length;
     Text block - remove text;
     Text block - get width;
     Text BlockCursor Ctor/Dtor ;
