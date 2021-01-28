@@ -77,14 +77,8 @@ namespace gui
     {
         auto app            = getAppDesktop();
         const auto isLocked = app->lockHandler.isScreenLocked();
-        updateTopBarConfiguration(isLocked, appConfiguration);
+        appConfiguration.set(top_bar::Indicator::Lock, isLocked);
         return appConfiguration;
-    }
-
-    void DesktopMainWindow::updateTopBarConfiguration(bool isScreenLocked, top_bar::Configuration &configuration)
-    {
-        configuration.set(top_bar::Indicator::Lock, isScreenLocked);
-        configuration.set(top_bar::Indicator::Time, !isScreenLocked);
     }
 
     DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_main_window)
@@ -101,10 +95,8 @@ namespace gui
     void DesktopMainWindow::setVisibleState()
     {
         auto app = getAppDesktop();
-        applyToTopBar([isLocked = app->lockHandler.isScreenLocked()](top_bar::Configuration configuration) {
-            updateTopBarConfiguration(isLocked, configuration);
-            return configuration;
-        });
+        applyToTopBar(
+            [this](top_bar::Configuration configuration) { return configureTopBar(std::move(configuration)); });
 
         if (app->lockHandler.isScreenLocked()) {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
