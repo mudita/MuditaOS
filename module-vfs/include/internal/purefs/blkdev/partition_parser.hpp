@@ -2,6 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include <purefs/blkdev/defs.hpp>
+
 #include <vector>
 #include <memory>
 #include <array>
@@ -25,6 +28,7 @@ namespace purefs::blkdev
             static auto read_partitions(const std::vector<uint8_t> &buffer, std::array<partition, 4> &parts) -> void;
             static auto is_extended(uint8_t type) -> bool;
             auto parse_extended(uint32_t lba, uint32_t count) -> int;
+            auto check_partition(const std::shared_ptr<disk> disk, const partition &part) -> bool;
 
           private:
             const std::shared_ptr<disk> m_disk;
