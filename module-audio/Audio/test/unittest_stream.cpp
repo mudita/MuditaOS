@@ -203,7 +203,7 @@ TEST(Stream, Reserve)
     EXPECT_FALSE(s.reserve(span));
 
     s.commit();
-    EXPECT_EQ(s.getUsedBlockCount(), s.getBlockCount());
+    EXPECT_EQ(s.getUsedBlockCount(), 1);
 }
 
 int main(int argc, char **argv)
