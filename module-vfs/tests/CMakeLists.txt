@@ -1,11 +1,21 @@
 cmake_minimum_required(VERSION 3.12)
 
+add_custom_target("test_disk_image")
+add_custom_command(
+        PRE_BUILD
+        TARGET test_disk_image
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gendisktestimg.sh ${CMAKE_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+
 add_catch2_executable(
     NAME vfs-disk
     SRCS
         ${CMAKE_CURRENT_LIST_DIR}/unittest_disk_manager.cpp
     LIBS
         module-vfs
+    DEPS
+        test_disk_image
 )
 
 add_catch2_executable(
@@ -17,7 +27,6 @@ add_catch2_executable(
 )
 
 set(LITTLEFS_IMAGE "lfstest.img")
-
 add_custom_command( 
     OUTPUT ${LITTLEFS_IMAGE}
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genlfstestimg.sh 1G ${LITTLEFS_IMAGE}
@@ -26,7 +35,6 @@ add_custom_command(
 )
 
 add_custom_target( test_lfs_image DEPENDS ${LITTLEFS_IMAGE} )
-
 add_catch2_executable(
     NAME vfs-littlefs
     SRCS
