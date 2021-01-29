@@ -15,9 +15,9 @@ namespace gui
         explicit LanguagesWindow(app::Application *app);
 
       private:
-        void addOptions(std::list<Option> &optionList) override;
         auto buildOptionsList() -> std::list<Option> override;
         auto handleSwitchData(SwitchData *data) -> bool override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void setLanguageIndex();
 
         utils::LangLoader loader;
