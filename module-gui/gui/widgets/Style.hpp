@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -200,10 +200,11 @@ namespace style
         /// Possible List rebuild types
         enum class RebuildType
         {
-            Full,    ///< Full rebuild - resets lists to all initial conditions and request data from beginning.
-            InPlace, ///< InPlace rebuild - stores currently focused part of list and rebuild from that part.
-            OnOffset ///< OnOffset rebuild - resets lists to all initial conditions and request data from provided
-                     ///< offset.
+            Full,          ///< Full rebuild - resets lists to all initial conditions and request data from beginning.
+            InPlace,       ///< InPlace rebuild - stores currently focused part of list and rebuild from that part.
+            OnPageElement, ///< OnPageElement rebuild - same page but focus changed on provided element index.
+            OnOffset       ///< OnOffset rebuild - resets lists to all initial conditions and request data from provided
+                           ///< offset.
         };
 
         /// Possible List ScrollBar types

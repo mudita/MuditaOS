@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -84,6 +84,11 @@ namespace gui
         bool renderFullList();
         void checkFullRenderRequirement();
 
+        void prepareFullRebuild();
+        void prepareOnOffsetRebuild(unsigned int dataOffset);
+        void prepareInPlaceRebuild();
+        void prepareOnPageElementRebuild(unsigned int dataOffset);
+
         void setFocus();
         void refresh();
         void resizeWithScroll();
@@ -91,6 +96,7 @@ namespace gui
         void fillFirstPage();
         void setStartIndex();
         void recalculateOnBoxRequestedResize();
+        void setFocusOnElement(unsigned int elementNumber);
         [[nodiscard]] unsigned int getFocusItemIndex();
         /// Default empty list to inform that there is no elements - callback should be override in applications
         void onElementsCountChanged();
@@ -115,17 +121,20 @@ namespace gui
 
         void setElementsCount(unsigned int count);
         void setProvider(std::shared_ptr<ListItemProvider> provider);
+
         void rebuildList(style::listview::RebuildType rebuildType = style::listview::RebuildType::Full,
                          unsigned int dataOffset                  = 0,
                          bool forceRebuild                        = false);
         /// In case of elements count change there can be a need to resend request in case of having one async query for
         /// count and records.
         void reSendLastRebuildRequest();
+        /// Callback to be called on rebuild preparation - in example to on demand clear provider data.
+        std::function<void()> prepareRebuildCallback;
+
         void clear();
         std::shared_ptr<ListItemProvider> getProvider();
         void setOrientation(style::listview::Orientation value);
         void setBoundaries(style::listview::Boundaries value);
-        void setFocusOnElement(unsigned int elementNumber);
         void setScrollTopMargin(int value);
         void setAlignment(const Alignment &value) override;
         void onProviderDataUpdate();

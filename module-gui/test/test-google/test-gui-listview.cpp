@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "gtest/gtest.h"
@@ -375,4 +375,28 @@ TEST_F(ListViewTesting, Rebuild_Type_Test)
         << "Check if item 6 has focus";
     ASSERT_EQ(pointerToFocusedElement, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem()))
         << "Focused item should be same";
+
+    // Do full list rebuild
+    testListView->rebuildList(style::listview::RebuildType::Full);
+
+    // Do on page element rebuild on index in Page scope
+    testListView->rebuildList(style::listview::RebuildType::OnPageElement, 3);
+
+    // Check if focused item did not change
+    ASSERT_EQ(3, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 3 has focus";
+
+    // Do on page element rebuild in Page scope
+    testListView->rebuildList(style::listview::RebuildType::OnPageElement, 1);
+
+    // Check if focused item did not change
+    ASSERT_EQ(1, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 1 has focus";
+
+    // Do on page element rebuild on index outside Page scope (should focus on last possible)
+    testListView->rebuildList(style::listview::RebuildType::OnPageElement, 10);
+
+    // Check if focused item did not change
+    ASSERT_EQ(5, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 5 has focus";
 }

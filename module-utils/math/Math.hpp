@@ -25,12 +25,12 @@ namespace trigonometry
     {
         static auto fromAngle(Radians angle, SideLength hypotenuse) -> SideLength
         {
-            return std::lround(std::cos(angle) * hypotenuse);
+            return std::round(std::cos(angle) * hypotenuse);
         }
 
         static auto fromCosine(double cosine, SideLength hypotenuse) -> SideLength
         {
-            return std::lround(cosine * hypotenuse);
+            return std::round(cosine * hypotenuse);
         }
     };
 
@@ -38,12 +38,12 @@ namespace trigonometry
     {
         static auto fromAngle(Radians angle, SideLength hypotenuse) -> SideLength
         {
-            return std::lround(std::sin(angle) * hypotenuse);
+            return std::round(std::sin(angle) * hypotenuse);
         }
 
         static auto fromSine(double sine, SideLength hypotenuse) -> SideLength
         {
-            return std::lround(sine * hypotenuse);
+            return std::round(sine * hypotenuse);
         }
     };
 } // namespace trigonometry

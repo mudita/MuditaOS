@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BarGraph.hpp"
@@ -20,20 +20,14 @@ namespace gui
 
     auto BarGraph::createRectangle(uint32_t width, uint32_t height) const -> Rect *
     {
-        auto rectangle = new Rect(nullptr, 0, 0, width, height);
+        auto rectangle = new Rect(nullptr, 0, 0, 0, 0);
+        rectangle->setMinimumSize(width, height);
         rectangle->setFillColor(ColorFullBlack);
         rectangle->setBorderColor(ColorFullBlack);
         rectangle->setFilled(false);
         rectangle->setRadius(style::bargraph::radius);
         rectangle->setPenWidth(style::window::default_border_focus_w);
         return rectangle;
-    }
-
-    auto BarGraph::createSpace(uint32_t width, uint32_t height) const -> Rect *
-    {
-        auto space = new Rect(nullptr, 0, 0, width, height);
-        space->setEdges(RectangleEdge::None);
-        return space;
     }
 
     auto BarGraph::incrementWith(uint32_t levels) -> bool
@@ -94,7 +88,7 @@ namespace gui
     VBarGraph::VBarGraph(Item *parent, Position x, Position y, uint32_t numberOfRectangles)
         : VBox(parent, x, y, style::bargraph::rect_axis_length_lrg, rectAxisLenghtFrom(numberOfRectangles))
     {
-        setRadius(style::bargraph::radius);
+        setMinimumSize(style::bargraph::rect_axis_length_lrg, rectAxisLenghtFrom(numberOfRectangles));
         setEdges(RectangleEdge::None);
         setMaximum(numberOfRectangles);
         std::reverse(std::begin(rectangles), std::end(rectangles));
@@ -103,7 +97,7 @@ namespace gui
     void VBarGraph::setMaximum(unsigned int value)
     {
         numberOfRectangles = value;
-        setSize(rectAxisLenghtFrom(numberOfRectangles), Axis::Y);
+
         if (currentLevel > numberOfRectangles) {
             currentLevel = numberOfRectangles;
         }
@@ -111,19 +105,24 @@ namespace gui
             erase();
             rectangles.clear();
         }
-        for (uint32_t i = 0; i < numberOfRectangles; ++i) {
+
+        for (unsigned int i = 0; i <= numberOfRectangles; i++) {
+
             auto rectangle =
                 createRectangle(style::bargraph::rect_axis_length_lrg, style::bargraph::rect_axis_length_sml);
+
+            if ((i + 1) != numberOfRectangles) {
+                rectangle->setMargins(Margins(0, 0, 0, style::bargraph::spacing));
+            }
+
             addWidget(rectangle);
             rectangles.push_back(rectangle);
-            addWidget(createSpace(style::bargraph::rect_axis_length_lrg, style::bargraph::spacing));
         }
     }
 
     HBarGraph::HBarGraph(Item *parent, Position x, Position y, uint32_t numberOfRectangles) : HBox(parent)
     {
         setMinimumSize(rectAxisLenghtFrom(numberOfRectangles), style::bargraph::rect_axis_length_lrg);
-        setRadius(style::bargraph::radius);
         setEdges(RectangleEdge::None);
         setMaximum(numberOfRectangles);
     }
@@ -131,20 +130,26 @@ namespace gui
     void HBarGraph::setMaximum(unsigned int value)
     {
         numberOfRectangles = value;
-        setSize(rectAxisLenghtFrom(numberOfRectangles), Axis::X);
         if (currentLevel > numberOfRectangles) {
             currentLevel = numberOfRectangles;
         }
+
         if (!rectangles.empty()) {
             erase();
             rectangles.clear();
         }
-        for (uint32_t i = 0; i < numberOfRectangles; ++i) {
+
+        for (unsigned int i = 0; i <= numberOfRectangles; i++) {
+
             auto rectangle =
                 createRectangle(style::bargraph::rect_axis_length_sml, style::bargraph::rect_axis_length_lrg);
+
+            if ((i + 1) != numberOfRectangles) {
+                rectangle->setMargins(Margins(0, 0, style::bargraph::spacing, 0));
+            }
+
             addWidget(rectangle);
             rectangles.push_back(rectangle);
-            addWidget(createSpace(style::bargraph::spacing, style::bargraph::rect_axis_length_lrg));
         }
     }
 
