@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
@@ -501,7 +501,7 @@ namespace app
 
         settings->registerValueChange(
             settings::SystemProperties::lockScreenPasscodeIsOn,
-            [this](const std::string &value) { setLockScreenPasscodeOn(utils::getNumericValue<bool>(value)); },
+            [this](const std::string &value) { lockScreenPasscodeIsOn = utils::getNumericValue<bool>(value); },
             settings::SettingsScope::Global);
         return sys::ReturnCodes::Success;
     }
