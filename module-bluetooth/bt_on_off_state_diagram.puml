@@ -1,0 +1,34 @@
+@startuml
+
+[*] --> Off
+Off: Bluetooth turned off
+Off: Initial state
+
+Off --> Init : Command::TurnOn /worker->init()
+
+
+state Init{
+Init: Initialization of BT stack
+Init: Creating BluetoothWorker
+
+[*] --> WorkerSetup
+WorkerSetup: Settings fetch & setup
+WorkerSetup: BT driver setup
+
+state DriverRun{
+DriverRun: Turning on BT stack
+}
+WorkerSetup --> DriverRun : / initDone = 1
+
+DriverRun -r-> Off: Turned on [error != 0]/ send status to appMgr
+DriverRun --> On: Turned on [error == 0]/ send status to appMgr
+}
+state Restart {
+Restart: Restart Bluetooth Stack in case of hard error
+}
+state On{
+On: BT stack fully operating
+}
+On --> Off : Command::TurnOff
+Restart --> Init :/worker->Init()
+@enduml
