@@ -625,8 +625,14 @@ extern "C"
         const char *special_file, const char *dir, const char *fstype, unsigned long int rwflag, const void *data)
     {
         if (vfs::redirect_to_image(dir)) {
-            TRACE_SYSCALLN("(%s, %s, %s, %08lx, %p) -> VFS", special_file, dir, fstype, rwflag, data);
-            return vfs::invoke_fs(&fs::mount, special_file, dir, fstype, rwflag, data);
+            TRACE_SYSCALLN("(%s, %s, %s, %08lx, %p) -> VFS",
+                           special_file ? special_file : "(null)",
+                           dir ? dir : "(null)",
+                           fstype ? fstype : "(null)",
+                           rwflag,
+                           data);
+            return vfs::invoke_fs(
+                &fs::mount, special_file ? special_file : "", dir ? dir : "", fstype ? fstype : "", rwflag, data);
         }
         else {
             TRACE_SYSCALLN("(%s, %s, %s, %08lx,%p) -> linux fs", special_file, dir, fstype, rwflag, data);

@@ -109,7 +109,7 @@ namespace purefs::subsystem
         }
         err = fs_core->register_filesystem("littlefs", std::make_shared<fs::drivers::filesystem_littlefs>());
         if (err) {
-            LOG_FATAL("Unable to register vfat filesystem with error %i", err);
+            LOG_FATAL("Unable to register lfs filesystem with error %i", err);
             return {};
         }
 
