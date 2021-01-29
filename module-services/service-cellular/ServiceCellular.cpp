@@ -1086,11 +1086,6 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         }
         break;
     }
-    case MessageType::EVMTimeUpdated: {
-        auto channel = cmux->get(TS0710::Channel::Commands);
-        channel->cmd(at::AT::DISABLE_TIME_ZONE_REPORTING);
-        channel->cmd(at::AT::DISABLE_TIME_ZONE_UPDATE);
-    } break;
     case MessageType::CellularSimResponse: {
         responseMsg = std::make_shared<CellularResponseMessage>(handleSimResponse(msgl));
     } break;
