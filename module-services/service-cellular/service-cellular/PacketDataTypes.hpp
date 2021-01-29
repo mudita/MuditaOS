@@ -210,7 +210,7 @@ namespace packet_data
         };
 
     } // namespace APN
-
+    constexpr unsigned char EmptyContextId = 0;
     constexpr unsigned char MINContextId = 1;
     constexpr unsigned char MAXContextId = 16;
 
