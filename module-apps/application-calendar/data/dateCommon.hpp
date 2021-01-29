@@ -181,7 +181,7 @@ inline std::string TimePointToString(const TimePoint &tp, date::months months)
 inline std::string TimePointToString(const TimePoint &tp, date::years years)
 {
     date::year_month_day yearMonthDay = date::year_month_day{date::floor<date::days>(tp)};
-    auto tpHourMinuteSecond = TimePointToHourMinSec(tp).to_duration();
+    auto tpHourMinuteSecond           = TimePointToHourMinSec(tp).to_duration();
 
     yearMonthDay += years;
     TimePoint timePoint = date::sys_days{yearMonthDay.year() / yearMonthDay.month() / yearMonthDay.day()};
