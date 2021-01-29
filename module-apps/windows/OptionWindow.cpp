@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OptionWindow.hpp"
@@ -29,6 +29,18 @@ namespace gui
     {
         clearOptions();
         addOptions(options);
+    }
+
+    void OptionWindow::refreshOptions(std::list<Option> &&optionList)
+    {
+        options = std::move(optionList);
+        optionsList->rebuildList(style::listview::RebuildType::InPlace);
+    }
+
+    void OptionWindow::refreshOptions(std::list<Option> &&optionList, unsigned int pageIndex)
+    {
+        options = std::move(optionList);
+        optionsList->rebuildList(style::listview::RebuildType::OnPageElement, pageIndex);
     }
 
     void OptionWindow::addOptions(std::list<Option> &optionList)

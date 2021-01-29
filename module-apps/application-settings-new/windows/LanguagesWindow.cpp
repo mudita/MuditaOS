@@ -17,10 +17,9 @@ namespace gui
         languagesModel.requestCurrentDisplayLanguage();
     }
 
-    void LanguagesWindow::addOptions(std::list<Option> &optionList)
+    void LanguagesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        OptionWindow::addOptions(optionList);
-        optionsList->setFocusOnElement(selectedLanguageIndex);
+        refreshOptionsList(selectedLanguageIndex);
     }
 
     auto LanguagesWindow::buildOptionsList() -> std::list<gui::Option>
@@ -49,6 +48,7 @@ namespace gui
         if (languagesData == nullptr) {
             return false;
         }
+
         selectedLanguage = languagesData->getCurrentDisplayLanguage();
         setLanguageIndex();
 

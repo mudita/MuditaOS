@@ -263,25 +263,54 @@ namespace gui
         rebuildList(lastRebuildRequest.first, lastRebuildRequest.second, true);
     }
 
-    void ListView::setup(style::listview::RebuildType rebuildType, unsigned int dataOffset)
+    void ListView::prepareFullRebuild()
     {
-        if (rebuildType == style::listview::RebuildType::Full) {
-            setStartIndex();
+        setStartIndex();
+        storedFocusIndex = style::listview::nPos;
+    }
+
+    void ListView::prepareOnOffsetRebuild(unsigned int dataOffset)
+    {
+        if (dataOffset < elementsCount) {
+            startIndex       = dataOffset;
             storedFocusIndex = style::listview::nPos;
         }
-        else if (rebuildType == style::listview::RebuildType::OnOffset) {
-            if (dataOffset < elementsCount) {
-                startIndex       = dataOffset;
-                storedFocusIndex = style::listview::nPos;
-            }
-            else {
-                LOG_ERROR("Requested rebuild on index greater than elements count");
-            }
+        else {
+            LOG_ERROR("Requested rebuild on index greater than elements count");
         }
-        else if (rebuildType == style::listview::RebuildType::InPlace) {
-            if (!body->empty()) {
-                storedFocusIndex = getFocusItemIndex();
-            }
+    }
+
+    void ListView::prepareInPlaceRebuild()
+    {
+        if (!body->empty()) {
+            storedFocusIndex = getFocusItemIndex();
+        }
+    }
+
+    void ListView::prepareOnPageElementRebuild(unsigned int dataOffset)
+    {
+        storedFocusIndex = dataOffset;
+    }
+
+    void ListView::setup(style::listview::RebuildType rebuildType, unsigned int dataOffset)
+    {
+        switch (rebuildType) {
+        case style::listview::RebuildType::Full:
+            prepareFullRebuild();
+            break;
+        case style::listview::RebuildType::OnOffset:
+            prepareOnOffsetRebuild(dataOffset);
+            break;
+        case style::listview::RebuildType::InPlace:
+            prepareInPlaceRebuild();
+            break;
+        case style::listview::RebuildType::OnPageElement:
+            prepareOnPageElementRebuild(dataOffset);
+            break;
+        }
+
+        if (prepareRebuildCallback) {
+            prepareRebuildCallback();
         }
 
         lastRebuildRequest = {rebuildType, dataOffset};
@@ -695,5 +724,4 @@ namespace gui
 
         return true;
     }
-
 } /* namespace gui */
