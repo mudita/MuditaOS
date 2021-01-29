@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-bluetooth/ServiceBluetooth.hpp>
@@ -24,10 +24,6 @@
 
 using namespace bsp;
 
-[[nodiscard]] auto to_string(bluetooth::Error::Code code) -> std::string
-{
-    return utils::enumToString(code);
-}
 namespace queues
 {
     constexpr inline auto io  = "qBtIO";
@@ -36,112 +32,110 @@ namespace queues
 
     constexpr inline auto queueLength        = 10;
     constexpr inline auto triggerQueueLength = 3;
-
 } // namespace queues
+
+namespace
+{
+    class DeviceRegistration
+    {
+      public:
+        using OnLinkKeyAddedCallback = std::function<void(const std::string &)>;
+
+        DeviceRegistration(std::shared_ptr<bluetooth::SettingsHolder> settings, OnLinkKeyAddedCallback &&onLinkKeyAdded)
+            : settings{std::move(settings)}, onLinkKeyAdded{std::move(onLinkKeyAdded)}
+        {}
+
+        [[nodiscard]] auto operator()()
+        {
+            bluetooth::KeyStorage::settings = settings;
+            bluetooth::GAP::register_scan();
+
+            auto settingsName = std::get<std::string>(settings->getValue(bluetooth::Settings::DeviceName));
+            if (settingsName.empty()) {
+                LOG_WARN("Settings name is empty!");
+                constexpr auto name = "PurePhone";
+                settings->setValue(bluetooth::Settings::DeviceName, name);
+                settingsName = name;
+            }
+            bluetooth::set_name(settingsName);
+            bluetooth::GAP::set_visibility(
+                std::visit(bluetooth::BoolVisitor{}, settings->getValue(bluetooth::Settings::Visibility)));
+
+            settings->onLinkKeyAdded = onLinkKeyAdded;
+            return bluetooth::Error::Success;
+        }
+
+      private:
+        std::shared_ptr<bluetooth::SettingsHolder> settings;
+        OnLinkKeyAddedCallback onLinkKeyAdded;
+    };
+
+    auto createStatefulController(sys::Service *service,
+                                  bluetooth::RunLoop *loop,
+                                  std::shared_ptr<bluetooth::SettingsHolder> settings,
+                                  std::shared_ptr<bluetooth::Profile> currentProfile,
+                                  DeviceRegistration::OnLinkKeyAddedCallback &&onLinkKeyAddedCallback)
+    {
+        auto driver         = std::make_unique<bluetooth::Driver>(loop->getRunLoopInstance());
+        auto commandHandler = std::make_unique<bluetooth::CommandHandler>(service, settings, std::move(currentProfile));
+        return std::make_unique<bluetooth::StatefulController>(
+            std::move(driver),
+            std::move(commandHandler),
+            DeviceRegistration{std::move(settings), std::move(onLinkKeyAddedCallback)});
+    }
+} // namespace
 
 BluetoothWorker::BluetoothWorker(sys::Service *service)
     : Worker(service), service(service), currentProfile(std::make_shared<bluetooth::HSP>()),
       settings(static_cast<ServiceBluetooth *>(service)->settingsHolder),
-      runLoop(std::make_unique<bluetooth::RunLoop>()), driver(std::make_unique<bluetooth::Driver>())
+      runLoop(std::make_unique<bluetooth::RunLoop>()),
+      controller{createStatefulController(
+          service, runLoop.get(), settings, currentProfile, [this](const std::string &addr) { onLinkKeyAdded(addr); })}
 {
     init({
         {queues::io, sizeof(bluetooth::Message), queues::queueLength},
         {queues::cmd, sizeof(bluetooth::Command), queues::queueLength},
         {queues::btstack, sizeof(bool), queues::triggerQueueLength},
     });
+    registerQueues();
+}
+
+void BluetoothWorker::registerQueues()
+{
     static_cast<ServiceBluetooth *>(service)->workerQueue = Worker::getQueueHandleByName(queues::cmd);
     runLoop->setTriggerQueue(Worker::getQueueHandleByName(queues::btstack));
-    driver->init(runLoop->getRunLoopInstance());
+    BlueKitchen::getInstance()->qHandle = queues[queueIO_handle]->GetQueueHandle();
+}
+
+void BluetoothWorker::onLinkKeyAdded(const std::string &deviceAddress)
+{
+    for (auto &device : bluetooth::GAP::devices) {
+        if (bd_addr_to_str(device.address) == deviceAddress) {
+            pairedDevices.emplace_back(device);
+            settings->setValue(bluetooth::Settings::BondedDevices, SettingsSerializer::toString(pairedDevices));
+        }
+    }
 }
 
 BluetoothWorker::~BluetoothWorker()
 {
-    if (this->bt_worker_task != nullptr) {
-        vTaskDelete(this->bt_worker_task);
-    }
-    LOG_INFO("Worker removed");
+    controller->shutdown();
 }
 
 auto BluetoothWorker::run() -> bool
 {
     LOG_INFO("-> BluetoothWorker run request");
-    if (is_running) {
+    if (isRunning) {
         return true;
     }
-    if (Worker::run()) {
-        is_running                          = true;
-        auto el                             = queues[queueIO_handle];
-        BlueKitchen::getInstance()->qHandle = el->GetQueueHandle();
-        bluetooth::KeyStorage::settings     = settings;
 
-        driver->registerHardwareErrorCallback(nullptr);
-        bluetooth::GAP::register_scan();
-
-        std::string name = "PurePhone";
-        auto settingsName = std::get<std::string>(settings->getValue(bluetooth::Settings::DeviceName));
-        if (settingsName.empty()) {
-            LOG_ERROR("settings name empty!");
-            settings->setValue(bluetooth::Settings::DeviceName, name);
-            settingsName = name;
-        }
-
-        bluetooth::set_name(settingsName);
-        bluetooth::GAP::set_visibility(
-            std::visit(bluetooth::BoolVisitor(), settings->getValue(bluetooth::Settings::Visibility)));
-
-        settings->onLinkKeyAdded = [this](std::string addr) {
-            for (auto &device : bluetooth::GAP::devices) {
-                if (bd_addr_to_str(device.address) == addr) {
-                    // found paired device
-                    pairedDevices.emplace_back(device);
-                    settings->setValue(bluetooth::Settings::BondedDevices, SettingsSerializer::toString(pairedDevices));
-                }
-            }
-        };
-
-        return driver->run() == bluetooth::Error::Success;
-    }
-    else {
+    if (const auto status = Worker::run(); !status) {
         return false;
     }
+    isRunning = true;
+    return true;
 }
 
-auto BluetoothWorker::scan() -> bool
-{
-    std::vector<Device> empty;
-    bluetooth::GAP::setOwnerService(service);
-    auto ret = bluetooth::GAP::scan();
-    if (ret.err != bluetooth::Error::Success) {
-        LOG_ERROR("Cant start scan!: %s %" PRIu32 "", to_string(ret.err).c_str(), ret.lib_code);
-        return false;
-    }
-    else {
-        LOG_INFO("Scan started!");
-        // open new scan window
-        return true;
-    }
-}
-
-void BluetoothWorker::stopScan()
-{
-    bluetooth::GAP::stop_scan();
-}
-
-void BluetoothWorker::setVisibility(bool visibility)
-{
-    bluetooth::GAP::set_visibility(visibility);
-    settings->setValue(bluetooth::Settings::Visibility, visibility);
-}
-
-auto BluetoothWorker::start_pan() -> bool
-{
-    bluetooth::PAN::bnep_setup();
-    auto err = bluetooth::PAN::bnep_start();
-    if (err.err != bluetooth::Error::Success) {
-        LOG_ERROR("PAN setup error: %s %" PRIu32, to_string(err.err).c_str(), err.lib_code);
-    }
-    return false;
-}
 auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
 {
     bluetooth::Command command;
@@ -149,29 +143,16 @@ auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
         LOG_ERROR("Queue receive failure!");
         return false;
     }
-    switch (command) {
-    case bluetooth::PowerOn:
 
+    switch (command) {
+    case bluetooth::Command::PowerOn:
+        controller->turnOn();
         break;
-    case bluetooth::StartScan:
-        scan();
+    case bluetooth::Command::PowerOff:
+        controller->turnOff();
         break;
-    case bluetooth::StopScan:
-        stopScan();
-        break;
-    case bluetooth::VisibilityOn:
-        setVisibility(true);
-        break;
-    case bluetooth::VisibilityOff:
-        setVisibility(false);
-        break;
-    case bluetooth::ConnectAudio:
-        establishAudioConnection();
-        break;
-    case bluetooth::DisconnectAudio:
-        disconnectAudioConnection();
-        break;
-    case bluetooth::PowerOff:
+    default:
+        controller->processCommand(command);
         break;
     }
     return true;
@@ -186,12 +167,9 @@ auto BluetoothWorker::handleBtStackTrigger(QueueHandle_t queue) -> bool
     }
     if (notification) {
         runLoop->process();
-
         return true;
     }
-    else {
-        return false;
-    }
+    return false;
 }
 
 auto BluetoothWorker::handleMessage(uint32_t queueID) -> bool
@@ -269,26 +247,14 @@ auto BluetoothWorker::handleMessage(uint32_t queueID) -> bool
     return true;
 }
 
-auto BluetoothWorker::establishAudioConnection() -> bool
-{
-    currentProfile->setOwnerService(service);
-    if (currentProfile->init() != bluetooth::Error::Success) {
-        return false;
-    }
-    currentProfile->connect();
-    return true;
-}
-auto BluetoothWorker::disconnectAudioConnection() -> bool
-{
-    currentProfile->disconnect();
-    return true;
-}
 void BluetoothWorker::setDeviceAddress(bd_addr_t addr)
 {
     bluetooth::GAP::do_pairing(addr);
     currentProfile->setDeviceAddress(addr);
 }
+
 auto BluetoothWorker::deinit() -> bool
 {
+    controller->turnOff();
     return Worker::deinit();
 }

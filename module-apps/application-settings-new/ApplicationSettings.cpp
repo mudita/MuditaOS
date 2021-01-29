@@ -116,7 +116,8 @@ namespace app
         else if (auto responseStatusMsg = dynamic_cast<::message::bluetooth::ResponseStatus *>(msgl);
                  nullptr != responseStatusMsg) {
             if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
-                auto btStatusData = std::make_unique<gui::BluetoothStatusData>(responseStatusMsg->getStatus());
+                const auto status = responseStatusMsg->getStatus();
+                auto btStatusData = std::make_unique<gui::BluetoothStatusData>(status.state, status.visibility);
                 switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
             }
         }
@@ -188,6 +189,27 @@ namespace app
         settings->registerValueChange(
             ::settings::SystemProperties::lockPassHash,
             [this](std::string value) { lockPassHash = utils::getNumericValue<unsigned int>(value); },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::Bluetooth::state,
+            [this](std::string value) {
+                if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
+                    const auto isBtOn = utils::getNumericValue<bool>(value);
+                    auto btStatusData = std::make_unique<gui::BluetoothStatusData>(
+                        isBtOn ? BluetoothStatus::State::On : BluetoothStatus::State::Off);
+                    switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
+                }
+            },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::Bluetooth::deviceVisibility,
+            [this](std::string value) {
+                if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
+                    const auto isVisible = utils::getNumericValue<bool>(value);
+                    auto btStatusData    = std::make_unique<gui::BluetoothStatusData>(isVisible);
+                    switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
+                }
+            },
             ::settings::SettingsScope::Global);
 
         return ret;

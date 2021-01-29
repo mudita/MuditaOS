@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <functional>
@@ -106,7 +106,7 @@ namespace gui
 
         add_box_label(box, "  -> Stop", [=](Item &) {
             LOG_DEBUG("Stop playback");
-            message_bt(application, BluetoothMessage::Request::Stop);
+            message_bt(application, BluetoothMessage::Request::StopPlayback);
             return true;
         });
 
