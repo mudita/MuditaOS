@@ -35,15 +35,15 @@ namespace bluetooth
     hci_transport_config_uart_t Driver::config;
 
 #ifdef TARGET_RT1051
-    [[maybe_unused]] auto Driver::runLoopInitTarget(const btstack_run_loop *runLoop) -> const btstack_uart_block_t *
+    [[maybe_unused]] auto Driver::runLoopInitTarget(const btstack_run_loop *loop) -> const btstack_uart_block_t *
     {
-        btstack_run_loop_init(runLoop);
+        btstack_run_loop_init(loop);
         const btstack_uart_block_t *uartDriver = btstack_uart_block_rt1051_instance();
         return uartDriver;
     }
 #else
 
-    [[maybe_unused]] auto Driver::runLoopInitLinux(const btstack_run_loop *runLoop) -> const btstack_uart_block_t *
+    [[maybe_unused]] auto Driver::runLoopInitLinux(const btstack_run_loop *) -> const btstack_uart_block_t *
     {
         btstack_run_loop_init(btstack_run_loop_posix_get_instance());
         config.device_name = "/dev/telit";
@@ -53,7 +53,10 @@ namespace bluetooth
     }
 #endif
 
-    auto Driver::init(const btstack_run_loop *runLoop) -> Error::Code
+    Driver::Driver(const btstack_run_loop *runLoop) : runLoop{runLoop}
+    {}
+
+    auto Driver::init() -> Error::Code
     {
         btstack_memory_init();
         config = {
@@ -164,10 +167,10 @@ namespace bluetooth
         return Error::Success;
     }
 
-    void Driver::registerHardwareErrorCallback(std::function<void(uint8_t)> new_callback)
+    void Driver::registerErrorCallback(const ErrorCallback &newCallback)
     {
-        static std::function<void(uint8_t)> callback = nullptr;
-        callback                                     = new_callback;
+        static ErrorCallback callback;
+        callback = newCallback;
         hci_set_hardware_error_callback([](uint8_t val) -> void {
             LOG_ERROR("Bluetooth HW ERROR! %d", val);
             if (callback) {

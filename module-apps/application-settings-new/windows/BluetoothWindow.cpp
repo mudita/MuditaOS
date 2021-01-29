@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothWindow.hpp"
@@ -22,9 +22,13 @@ namespace gui
     void BluetoothWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (data != nullptr) {
-            const auto newData        = static_cast<BluetoothStatusData *>(data);
-            isBluetoothSwitchOn       = newData->getState();
-            isPhoneVisibilitySwitchOn = newData->getVisibility();
+            const auto newData = static_cast<BluetoothStatusData *>(data);
+            if (const auto btState = newData->getState(); btState.has_value()) {
+                isBluetoothSwitchOn = btState.value();
+            }
+            if (const auto visibility = newData->getVisibility(); visibility.has_value()) {
+                isPhoneVisibilitySwitchOn = visibility.value();
+            }
         }
         rebuildOptionList();
     }
@@ -36,7 +40,7 @@ namespace gui
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translateI18("app_settings_bluetooth_main"),
             [=](gui::Item &item) {
-                switchHandler(isBluetoothSwitchOn);
+                changeBluetoothState(isBluetoothSwitchOn);
                 return true;
             },
             [=](gui::Item &item) {
@@ -69,7 +73,7 @@ namespace gui
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 utils::translateI18("app_settings_bluetooth_phone_visibility"),
                 [=](gui::Item &item) {
-                    switchHandler(isPhoneVisibilitySwitchOn);
+                    changeVisibility(isPhoneVisibilitySwitchOn);
                     return true;
                 },
                 [=](gui::Item &item) {
@@ -104,22 +108,28 @@ namespace gui
         return optionsList;
     }
 
-    void BluetoothWindow::switchHandler(bool &switchState)
+    void BluetoothWindow::changeBluetoothState(bool currentState)
     {
-        switchState = !switchState;
-        BluetoothStatus btStatus;
+        ::message::bluetooth::SetStatus setStatus(makeDesiredStatus(!currentState, isPhoneVisibilitySwitchOn));
+        sys::Bus::SendUnicast(std::make_shared<::message::bluetooth::SetStatus>(std::move(setStatus)),
+                              service::name::bluetooth,
+                              application);
+    }
 
-        if (isBluetoothSwitchOn) {
-            btStatus.state = BluetoothStatus::State::On;
-        }
-        else {
-            btStatus.state = BluetoothStatus::State::Off;
-        }
-        btStatus.visibility = isPhoneVisibilitySwitchOn;
-        ::message::bluetooth::SetStatus setStatus(btStatus);
+    void BluetoothWindow::changeVisibility(bool currentVisibility)
+    {
+        ::message::bluetooth::SetStatus setStatus(makeDesiredStatus(isBluetoothSwitchOn, !currentVisibility));
+        sys::Bus::SendUnicast(std::make_shared<::message::bluetooth::SetStatus>(std::move(setStatus)),
+                              service::name::bluetooth,
+                              application);
+    }
 
-        sys::Bus::SendUnicast(
-            std::make_shared<::message::bluetooth::SetStatus>(setStatus), service::name::bluetooth, application);
+    BluetoothStatus BluetoothWindow::makeDesiredStatus(bool desiredBluetoothState, bool desiredVisibility) noexcept
+    {
+        BluetoothStatus status;
+        status.state      = desiredBluetoothState ? BluetoothStatus::State::On : BluetoothStatus::State::Off;
+        status.visibility = desiredVisibility;
+        return status;
     }
 
     void BluetoothWindow::rebuildOptionList()

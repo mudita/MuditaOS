@@ -62,7 +62,7 @@ auto DeveloperModeHelper::processPutRequest(Context &context) -> sys::ReturnCode
             LOG_INFO("turning on BT from harness!");
         }
         else {
-            request = BluetoothMessage::Request::Stop;
+            request = BluetoothMessage::Request::StopPlayback;
             LOG_INFO("turning off BT from harness!");
         }
         std::shared_ptr<BluetoothMessage> msg = std::make_shared<BluetoothMessage>(request);
