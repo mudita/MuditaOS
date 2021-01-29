@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,6 +14,7 @@
 #include "service-bluetooth/SettingsHolder.hpp"
 #include "glucode/BluetoothRunLoop.hpp"
 #include "interface/BluetoothDriver.hpp"
+#include "WorkerController.hpp"
 struct HCI;
 
 /// debug option for HCI (uart) commands debugging
@@ -33,18 +34,6 @@ namespace bluetooth
         EvtReceivingError, /// bsp error on receive
         EvtUartError,      /// generic uart error
         EvtErrorRec,       /// there was error o queue receive
-    };
-
-    enum Command : std::uint8_t
-    {
-        StartScan,
-        StopScan,
-        VisibilityOn,
-        VisibilityOff,
-        ConnectAudio,
-        DisconnectAudio,
-        PowerOn,
-        PowerOff,
     };
 
     inline const char *MessageCstr(Message what)
@@ -88,9 +77,11 @@ class BluetoothWorker : private sys::Worker
         queueRunloopTrigger // btstack run_loop queue
     };
 
-    TaskHandle_t bt_worker_task = nullptr;
-    int is_running              = false;
     sys::Service *service       = nullptr;
+    bool isRunning              = false;
+
+    void registerQueues();
+    void onLinkKeyAdded(const std::string &deviceAddress);
 
   public:
     enum Error
@@ -104,23 +95,18 @@ class BluetoothWorker : private sys::Worker
     ~BluetoothWorker() override;
 
     auto handleMessage(uint32_t queueID) -> bool override;
-
     auto handleCommand(QueueHandle_t queue) -> bool;
     auto handleBtStackTrigger(QueueHandle_t queue) -> bool;
-    bool run();
-    auto scan() -> bool;
-    void setVisibility(bool visibility);
-    auto start_pan() -> bool;
-    auto establishAudioConnection() -> bool;
-    auto disconnectAudioConnection() -> bool;
-    /// bluetooth stack id in use
-    unsigned long active_features;
-    void stopScan();
+
+    bool run() override;
     void setDeviceAddress(bd_addr_t addr);
     auto deinit() -> bool override;
+
+    /// bluetooth stack id in use
+    unsigned long active_features;
     std::shared_ptr<bluetooth::Profile> currentProfile;
     std::shared_ptr<bluetooth::SettingsHolder> settings;
     std::vector<Devicei> pairedDevices;
     std::unique_ptr<bluetooth::RunLoop> runLoop;
-    std::unique_ptr<bluetooth::Driver> driver;
+    std::unique_ptr<bluetooth::AbstractController> controller;
 };

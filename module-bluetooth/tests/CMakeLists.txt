@@ -1,0 +1,9 @@
+add_catch2_executable(
+    NAME
+        StatefulController-tests
+    SRCS
+        tests-main.cpp
+        tests-StatefulController.cpp
+    LIBS
+        module-bluetooth
+)

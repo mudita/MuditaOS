@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Constants.hpp"
@@ -42,6 +42,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
 {
     LOG_ERROR("Bluetooth experimental!");
     worker = std::make_unique<BluetoothWorker>(this);
+    worker->run();
 
     connect(message::bluetooth::RequestBondedDevices(), [&](sys::Message *msg) {
         auto bondedDevicesStr =
@@ -65,21 +66,20 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
 
     connect(typeid(message::bluetooth::SetStatus), [&](sys::Message *msg) {
         auto setStatusMsg = static_cast<message::bluetooth::SetStatus *>(msg);
-        auto btStatus     = setStatusMsg->getStatus();
-        worker->setVisibility(btStatus.visibility);
+        auto newBtStatus  = setStatusMsg->getStatus();
 
-        switch (btStatus.state) {
+        switch (newBtStatus.state) {
         case BluetoothStatus::State::On:
-            worker->run();
+            sendWorkerCommand(bluetooth::Command::PowerOn);
             break;
         case BluetoothStatus::State::Off:
-            // TODO
+            sendWorkerCommand(bluetooth::Command::PowerOff);
             break;
         default:
             break;
         }
-
-        return std::make_shared<message::bluetooth::ResponseStatus>(btStatus);
+        sendWorkerCommand(newBtStatus.visibility ? bluetooth::VisibilityOn : bluetooth::VisibilityOff);
+        return sys::MessageNone{};
     });
 
     connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
@@ -99,7 +99,6 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
         auto initialState = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
         if (static_cast<BluetoothStatus::State>(initialState) == BluetoothStatus::State::On) {
             settingsHolder->setValue(bluetooth::Settings::State, static_cast<int>(BluetoothStatus::State::Off));
-            worker->run();
         }
     };
 
@@ -122,15 +121,10 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
             switch (lmsg->req) {
             case BluetoothMessage::Start:
                 worker->run();
-
                 break;
             case BluetoothMessage::Scan:
-                if (worker->scan()) {
-                    return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Success);
-                }
-                else {
-                    return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
-                }
+                sendWorkerCommand(bluetooth::StartScan);
+                break;
             case BluetoothMessage::StopScan:
                 sendWorkerCommand(bluetooth::StopScan);
                 break;
@@ -145,19 +139,19 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
                 //                    else {
                 /// TODO request PPP
                 LOG_INFO("Start PAN");
-                worker->start_pan();
+                sendWorkerCommand(bluetooth::StartPan);
                 //                    }
             } break;
             case BluetoothMessage::Visible: {
                 static bool visibility = true;
-                worker->setVisibility(visibility);
+                sendWorkerCommand(visibility ? bluetooth::VisibilityOn : bluetooth::VisibilityOff);
                 visibility = !visibility;
             } break;
 
             case BluetoothMessage::Play:
                 sendWorkerCommand(bluetooth::ConnectAudio);
                 break;
-            case BluetoothMessage::Stop:
+            case BluetoothMessage::StopPlayback:
                 sendWorkerCommand(bluetooth::DisconnectAudio);
                 break;
 

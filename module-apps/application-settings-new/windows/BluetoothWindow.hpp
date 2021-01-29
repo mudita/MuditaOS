@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,28 +18,43 @@ namespace gui
         bool isBluetoothSwitchOn       = false;
         bool isPhoneVisibilitySwitchOn = false;
         auto bluetoothOptionsList() -> std::list<gui::Option>;
-        void switchHandler(bool &switchState);
+        void changeBluetoothState(bool currentState);
+        void changeVisibility(bool currentVisibility);
         void rebuildOptionList();
+
+        static BluetoothStatus makeDesiredStatus(bool desiredBluetoothState, bool desiredVisibility) noexcept;
     };
 
     class BluetoothStatusData : public SwitchData
     {
       public:
-        explicit BluetoothStatusData(BluetoothStatus status) : SwitchData(), status(std::move(status))
+        explicit BluetoothStatusData(BluetoothStatus::State state) : state{state}
         {}
-        [[nodiscard]] auto getState() const noexcept -> bool
+        explicit BluetoothStatusData(bool visibility) : visibility{visibility}
+        {}
+        BluetoothStatusData(BluetoothStatus::State state, bool visibility) : state{state}, visibility{visibility}
+        {}
+
+        [[nodiscard]] auto getState() const noexcept -> std::optional<bool>
         {
-            if (status.state == BluetoothStatus::State::On) {
+            if (!state.has_value()) {
+                return std::nullopt;
+            }
+            if (state == BluetoothStatus::State::On) {
                 return true;
             }
             return false;
         }
-        [[nodiscard]] auto getVisibility() const noexcept -> bool
+        [[nodiscard]] auto getVisibility() const noexcept -> std::optional<bool>
         {
-            return status.visibility;
+            if (!visibility.has_value()) {
+                return std::nullopt;
+            }
+            return visibility;
         }
 
       private:
-        BluetoothStatus status;
+        std::optional<BluetoothStatus::State> state;
+        std::optional<bool> visibility;
     };
 } // namespace gui
