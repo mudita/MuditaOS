@@ -15,11 +15,18 @@ void ApnSettingsModel::requestAPNList()
 
 void ApnSettingsModel::saveAPN(std::shared_ptr<packet_data::APN::Config> apn)
 {
-    sys::Bus::SendUnicast(std::make_shared<CellularSetAPNMessage>(apn), ServiceCellular::serviceName, application);
+    if (apn->contextId != packet_data::EmptyContextId) {
+        CellularServiceAPI::SetAPN(application, *apn);
+    }
+    else {
+        CellularServiceAPI::NewAPN(application, *apn);
+    }
 }
 
 void ApnSettingsModel::removeAPN(std::shared_ptr<packet_data::APN::Config> apn)
-{}
+{
+    CellularServiceAPI::DeleteAPN(application, apn->contextId);
+}
 
 void ApnSettingsModel::setAsDefaultAPN(std::shared_ptr<packet_data::APN::Config> apn)
 {
