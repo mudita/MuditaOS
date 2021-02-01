@@ -308,6 +308,8 @@ sys::ReturnCodes EventManager::InitHandler()
     sys::WorkerQueueInfo qTorch = {"qTorch", sizeof(uint8_t), 5};
     // light sensor queue
     sys::WorkerQueueInfo qLightSensor = {"qLightSensor", sizeof(uint8_t), 5};
+    // charger detector queue
+    sys::WorkerQueueInfo qChargerDetect = {"qChargerDetect", sizeof(uint8_t), 5};
 
     std::list<sys::WorkerQueueInfo> list;
 
@@ -319,6 +321,7 @@ sys::ReturnCodes EventManager::InitHandler()
     list.push_back(qMagnetometer);
     list.push_back(qTorch);
     list.push_back(qLightSensor);
+    list.push_back(qChargerDetect);
 
     EventWorker->init(list);
     EventWorker->run();
