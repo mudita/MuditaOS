@@ -15,8 +15,6 @@
 
 #include <i18n/i18n.hpp>
 
-#include <service-audio/AudioServiceAPI.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
 #include "service-db/DBServiceAPI.hpp"
 
 #include "Label.hpp"
@@ -40,6 +38,7 @@ namespace gui
     using namespace callAppStyle;
     using namespace callAppStyle::callWindow;
     using namespace app::call;
+    using AudioEvent = app::CallWindowInterface::AudioEvent;
 
     CallWindow::CallWindow(app::Application *app, app::CallWindowInterface *interface, std::string windowName)
         : AppWindow(app, windowName), interface(interface)
@@ -96,10 +95,10 @@ namespace gui
 
             switch (speakerIcon->get()) {
             case SpeakerIconState::SPEAKER: {
-                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallLoudspeakerOff);
+                interface->sendAudioEvent(AudioEvent::LoudspeakerOff);
             } break;
             case SpeakerIconState::SPEAKERON: {
-                AudioServiceAPI::SendEvent(this->application, audio::EventType::CallLoudspeakerOn);
+                interface->sendAudioEvent(AudioEvent::LoudspeakerOn);
             } break;
             // case SpeakerIconState::BLUETOOTH: {
             //     // TODO: need implementation
@@ -122,9 +121,8 @@ namespace gui
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             LOG_INFO("Mic activated %d", static_cast<int>(microphoneIcon->get()));
 
-            microphoneIcon->get() == MicrophoneIconState::MUTED
-                ? AudioServiceAPI::SendEvent(this->application, audio::EventType::CallMute)
-                : AudioServiceAPI::SendEvent(this->application, audio::EventType::CallUnmute);
+            microphoneIcon->get() == MicrophoneIconState::MUTED ? interface->sendAudioEvent(AudioEvent::Mute)
+                                                                : interface->sendAudioEvent(AudioEvent::Unmute);
 
             return true;
         };
@@ -163,7 +161,7 @@ namespace gui
 
         switch (state) {
         case State::INCOMING_CALL: {
-            interface->startRinging();
+            interface->startAudioRinging();
             bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
             bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(strings::answer), true);
             bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(strings::reject), true);
@@ -193,7 +191,7 @@ namespace gui
         } break;
         case State::CALL_IN_PROGRESS: {
             if (prevState == State::INCOMING_CALL) { // otherwise it is already started
-                interface->startRouting();
+                interface->startAudioRouting();
             }
             runCallTimer();
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
@@ -209,7 +207,7 @@ namespace gui
             }
         } break;
         case State::OUTGOING_CALL: {
-            interface->startRouting();
+            interface->startAudioRouting();
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
             bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(strings::endcall), true);
@@ -269,7 +267,7 @@ namespace gui
 
             if (dynamic_cast<app::IncomingCallData *>(data) != nullptr) {
                 if (getState() == State::INCOMING_CALL) {
-                    LOG_DEBUG("ignoring call incoming");
+                    LOG_DEBUG("ignoring IncomingCallData message");
                     return;
                 }
                 setState(State::INCOMING_CALL);
@@ -287,12 +285,16 @@ namespace gui
         }
 
         if (dynamic_cast<app::CallActiveData *>(data) != nullptr) {
-            setState(State::CALL_IN_PROGRESS);
+            if (getState() != State::CALL_ENDED) {
+                setState(State::CALL_IN_PROGRESS);
+                return;
+            }
+            LOG_DEBUG("Ignoring CallActiveData message");
             return;
         }
 
         if (dynamic_cast<SMSTemplateSent *>(data) != nullptr) {
-            CellularServiceAPI::HangupCall(application);
+            interface->hangupCall();
             return;
         }
     }
@@ -300,9 +302,7 @@ namespace gui
     bool CallWindow::handleLeftButton()
     {
         if (getState() == State::INCOMING_CALL) {
-            auto ret = CellularServiceAPI::AnswerIncomingCall(application);
-
-            LOG_INFO("AnswerIncomingCall: %s", (ret ? "OK" : "FAIL"));
+            interface->answerIncomingCall();
             return true;
         }
 
@@ -315,7 +315,7 @@ namespace gui
         case State::INCOMING_CALL:
         case State::OUTGOING_CALL:
         case State::CALL_IN_PROGRESS:
-            CellularServiceAPI::HangupCall(application);
+            interface->hangupCall();
             return true;
             break;
         default:
@@ -388,11 +388,12 @@ namespace gui
     {
         static const sys::ms one_second = 1000;
         stop_timer                      = false;
-        auto timer    = std::make_unique<app::GuiTimer>("CallTime", application, one_second, Timer::Continous);
-        timerCallback = [&](Item &, Timer &timer) {
+        auto timer = std::make_unique<app::GuiTimer>("CallTime", application, one_second, Timer::Continous);
+        durationLabel->timerCallback = [&](Item &item, Timer &timer) {
             if (stop_timer) {
                 timer.stop();
-                detachTimer(timer);
+                item.detachTimer(timer);
+                return true;
             }
             std::chrono::time_point<std::chrono::system_clock> systemUnitDuration(callDuration);
             updateDuration(std::chrono::system_clock::to_time_t(systemUnitDuration));
@@ -402,7 +403,7 @@ namespace gui
             return true;
         };
         timer->start();
-        application->connect(std::move(timer), this);
+        application->connect(std::move(timer), durationLabel);
     }
 
     void CallWindow::stopCallTimer()

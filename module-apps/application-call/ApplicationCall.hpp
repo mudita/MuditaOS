@@ -19,7 +19,7 @@ namespace app
 
     namespace window
     {
-        inline constexpr auto name_call              = "CallWindow";
+        inline constexpr auto name_call              = gui::name::window::main_window;
         inline constexpr auto name_enterNumber       = "EnterNumberWindow";
         inline constexpr auto name_emergencyCall     = "EmergencyCallWindow";
         inline constexpr auto name_duplicatedContact = "DuplicatedContactWindow";
@@ -37,10 +37,22 @@ namespace app
         virtual void setState(app::call::State state) noexcept              = 0;
         [[nodiscard]] virtual auto getState() const noexcept -> call::State = 0;
 
+        enum class AudioEvent
+        {
+            Mute,
+            Unmute,
+            LoudspeakerOn,
+            LoudspeakerOff
+        };
+
+        virtual void stopAudio()                           = 0;
+        virtual void startAudioRinging()                   = 0;
+        virtual void startAudioRouting()                   = 0;
+        virtual void sendAudioEvent(AudioEvent audioEvent) = 0;
+
         virtual void transmitDtmfTone(uint32_t digit) = 0;
-        virtual void stopAudio()                      = 0;
-        virtual void startRinging()                   = 0;
-        virtual void startRouting()                   = 0;
+        virtual void hangupCall()                     = 0;
+        virtual void answerIncomingCall()             = 0;
     };
 
     class EnterNumberWindowInterface
@@ -94,10 +106,15 @@ namespace app
         {
             this->state = state;
         }
-        void transmitDtmfTone(uint32_t digit) override;
+
         void stopAudio() override;
-        void startRinging() override;
-        void startRouting() override;
+        void startAudioRinging() override;
+        void startAudioRouting() override;
+        void sendAudioEvent(AudioEvent audioEvent) override;
+
+        void transmitDtmfTone(uint32_t digit) override;
+        void hangupCall() override;
+        void answerIncomingCall() override;
     };
 
     template <> struct ManifestTraits<ApplicationCall>

@@ -38,7 +38,7 @@ namespace gui
     /// icon::h where w = icon::w + 2 * w_margin. It is necessary as it is possible that text will exceed Icon visible
     /// area
 
-    template <class T> class [[deprecated("Class to be merged with Icon.hpp")]] StateIcon : public Rect
+    template <class T> class StateIcon : public Rect
     {
       public:
         using IconMap = std::map<T, std::pair<const std::string, const std::string>>;
@@ -98,7 +98,7 @@ namespace gui
         }
 
         // sets/clears focus of internal boundingrect
-        virtual bool onFocus(bool state) override
+        bool onFocus(bool state) override
         {
             Item::onFocus(state);
             setFocusItem(state ? boundingRect : nullptr);
