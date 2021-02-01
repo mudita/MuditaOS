@@ -323,10 +323,10 @@ extern "C"
         bsp::BlueKitchen *bt = bsp::BlueKitchen::getInstance();
 
         if (isrReg & kLPUART_RxDataRegFullFlag) {
-            LOG_WARN("LPUART IRQ RX full");
+            LOG_WARN("Bluetooth IRQ RX full");
         }
         if (isrReg & kLPUART_RxOverrunFlag) {
-            LOG_WARN("LPUART IRQ RX overrun");
+            LOG_WARN("Bluetooth IRQ RX overrun");
             val = bluetooth::Message::EvtUartError;
             xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
         }

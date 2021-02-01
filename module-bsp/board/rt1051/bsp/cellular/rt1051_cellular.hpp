@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_RT1501_CELLULAR_HPP
@@ -64,6 +64,12 @@ namespace bsp
         void SelectAntenna(bsp::cellular::antenna antenna) override final;
         bsp::cellular::antenna GetAntenna() override final;
 
+        static lpuart_edma_handle_t uartDmaHandle;
+
+        static void FinishReceive();
+
+        static bool RestartReceivingManually;
+
       private:
         void MSPInit();
 
@@ -73,17 +79,26 @@ namespace bsp
 
         void DMADeinit();
 
-        inline void EnableRx()
+      public:
+        static constexpr uint32_t startIRQMaskEnable =
+            kLPUART_RxActiveEdgeInterruptEnable | kLPUART_RxDataRegFullInterruptEnable;
+        static constexpr uint32_t finishIRQMaskEnable = kLPUART_IdleLineInterruptEnable;
+
+        static constexpr uint32_t startIRQMask  = kLPUART_RxActiveEdgeFlag | kLPUART_RxDataRegFullFlag;
+        static constexpr uint32_t finishIRQMask = kLPUART_IdleLineFlag;
+
+      private:
+        static inline void EnableRx(uint32_t irqMask = startIRQMaskEnable | finishIRQMaskEnable)
         {
             LPUART_ClearStatusFlags(CELLULAR_UART_BASE, 0xFFFFFFFF);
-            LPUART_EnableInterrupts(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
+            LPUART_EnableInterrupts(CELLULAR_UART_BASE, irqMask);
             LPUART_EnableRx(CELLULAR_UART_BASE, true);
         }
 
-        inline void DisableRx()
+        static inline void DisableRx(uint32_t irqMask = startIRQMaskEnable | finishIRQMaskEnable)
         {
-            LPUART_DisableInterrupts(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
-            LPUART_ClearStatusFlags(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
+            LPUART_DisableInterrupts(CELLULAR_UART_BASE, irqMask);
+            LPUART_ClearStatusFlags(CELLULAR_UART_BASE, irqMask);
             LPUART_EnableRx(CELLULAR_UART_BASE, false);
         }
 
@@ -105,10 +120,9 @@ namespace bsp
         std::shared_ptr<drivers::DriverDMAMux> dmamux;
         std::shared_ptr<drivers::DriverDMA> dma;
         std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;
+        std::unique_ptr<drivers::DriverDMAHandle> rxDMAHandle;
 
-        static lpuart_edma_handle_t uartDmaHandle;
-
-        static void DMATxCompletedCb(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
+        static void uartDMACallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
 
       public:
         static TaskHandle_t blockedTaskHandle;
@@ -122,6 +136,17 @@ namespace bsp
         const static uint32_t CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE = 1;
         const static uint32_t CELLULAR_BSP_ANTSEL_PIN_A_STATE        = 0;
         const static uint32_t CELLULAR_BSP_ANTSEL_PIN_B_STATE        = 1;
+
+      public:
+        static constexpr size_t RXdmaBufferSize = 16;
+        static uint8_t RXdmaBuffer[RXdmaBufferSize];
+        static ssize_t RXdmaReceivedCount;
+        static size_t RXdmaMaxReceivedCount;
+        static bool MoveRxDMAtoStreamBuf(size_t nbytes);
+        static size_t GetFreeStreamBufferSize();
+        static bool StartReceive(size_t nbytes);
+
+        static TaskHandle_t untilReceivedNewHandle;
     };
 
 } // namespace bsp

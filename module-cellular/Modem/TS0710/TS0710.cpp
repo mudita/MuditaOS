@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TS0710.h"
@@ -221,6 +221,17 @@ TS0710::ConfState TS0710::ConfProcedure()
         return ConfState::Failure;
     }
 
+    at::AT flowCmd;
+    if (hardwareControlFlowEnable) {
+        flowCmd = (at::AT::FLOW_CTRL_ON);
+    }
+    else {
+        flowCmd = (at::AT::FLOW_CTRL_OFF);
+    }
+    if (!parser->cmd(flowCmd)) {
+        return ConfState::Failure;
+    }
+
     LOG_INFO("GSM modem info:");
     auto ret = parser->cmd(at::AT::SW_INFO);
     if (ret) {
@@ -231,17 +242,6 @@ TS0710::ConfState TS0710::ConfProcedure()
     }
     else {
         LOG_ERROR("Could not get modem firmware information");
-        return ConfState::Failure;
-    }
-
-    at::AT flowCmd;
-    if (hardwareControlFlowEnable) {
-        flowCmd = (at::AT::FLOW_CTRL_ON);
-    }
-    else {
-        flowCmd = (at::AT::FLOW_CTRL_OFF);
-    }
-    if (!parser->cmd(flowCmd)) {
         return ConfState::Failure;
     }
 
