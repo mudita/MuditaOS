@@ -17,7 +17,6 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCall.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/CallMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EnterNumberWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallWindow.cpp"
@@ -37,4 +36,3 @@ target_link_libraries(${PROJECT_NAME}
         service-audio
         service-cellular
 )
-

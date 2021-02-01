@@ -26,7 +26,7 @@ namespace CellularServiceAPI
     bool DialEmergencyNumber(sys::Service *serv, const utils::PhoneNumber &number);
 
     bool AnswerIncomingCall(sys::Service *serv);
-    void HangupCall(sys::Service *serv);
+    bool HangupCall(sys::Service *serv);
     /*
      * @brief Its calls sercive-cellular for selected SIM IMSI number.
      * @param serv pointer to caller service.

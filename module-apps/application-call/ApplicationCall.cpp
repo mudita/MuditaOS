@@ -6,7 +6,6 @@
 #include "DialogMetadata.hpp"
 #include "DialogMetadataMessage.hpp"
 #include "data/CallSwitchData.hpp"
-#include "windows/CallMainWindow.hpp"
 #include "windows/CallWindow.hpp"
 #include "windows/EmergencyCallWindow.hpp"
 #include "windows/EnterNumberWindow.hpp"
@@ -198,9 +197,6 @@ namespace app
 
     void ApplicationCall::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string name) {
-            return std::make_unique<gui::CallMainWindow>(app);
-        });
         windowsFactory.attach(app::window::name_enterNumber, [](Application *app, const std::string newname) {
             return std::make_unique<gui::EnterNumberWindow>(app, static_cast<ApplicationCall *>(app));
         });
@@ -267,25 +263,53 @@ namespace app
         }
     }
 
-    void ApplicationCall::transmitDtmfTone(uint32_t digit)
-    {
-        if (!CellularServiceAPI::TransmitDtmfTones(this, digit)) {
-            LOG_ERROR("transmitDtmfTone failed");
-        }
-    }
-
     void ApplicationCall::stopAudio()
     {
         AudioServiceAPI::StopAll(this);
     }
 
-    void ApplicationCall::startRinging()
+    void ApplicationCall::startAudioRinging()
     {
         AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, ringtone_path);
     }
 
-    void ApplicationCall::startRouting()
+    void ApplicationCall::startAudioRouting()
     {
         AudioServiceAPI::RoutingStart(this);
+    }
+
+    void ApplicationCall::sendAudioEvent(AudioEvent audioEvent)
+    {
+        switch (audioEvent) {
+        case AudioEvent::Mute:
+            AudioServiceAPI::SendEvent(this, audio::EventType::CallMute);
+            break;
+        case AudioEvent::Unmute:
+            AudioServiceAPI::SendEvent(this, audio::EventType::CallUnmute);
+            break;
+        case AudioEvent::LoudspeakerOn:
+            AudioServiceAPI::SendEvent(this, audio::EventType::CallLoudspeakerOn);
+            break;
+        case AudioEvent::LoudspeakerOff:
+            AudioServiceAPI::SendEvent(this, audio::EventType::CallLoudspeakerOff);
+            break;
+        }
+    }
+
+    void ApplicationCall::hangupCall()
+    {
+        CellularServiceAPI::HangupCall(this);
+    }
+
+    void ApplicationCall::answerIncomingCall()
+    {
+        CellularServiceAPI::AnswerIncomingCall(this);
+    }
+
+    void ApplicationCall::transmitDtmfTone(uint32_t digit)
+    {
+        if (!CellularServiceAPI::TransmitDtmfTones(this, digit)) {
+            LOG_ERROR("transmitDtmfTone failed");
+        }
     }
 } // namespace app
