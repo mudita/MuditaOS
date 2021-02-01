@@ -23,8 +23,8 @@ enum class BoardDefinitions
     AUDIOCODEC_I2C            = static_cast<int>(drivers::I2CInstances ::I2C2),
     AUDIOCODEC_DMAMUX         = static_cast<int>(drivers::DMAMuxInstances ::DMAMUX0),
     AUDIOCODEC_DMA            = static_cast<int>(drivers::DMAInstances ::DMA_0),
-    AUDIOCODEC_TX_DMA_CHANNEL = 5,
-    AUDIOCODEC_RX_DMA_CHANNEL = 6,
+    AUDIOCODEC_TX_DMA_CHANNEL = 6,
+    AUDIOCODEC_RX_DMA_CHANNEL = 7,
     AUDIOCODEC_IRQ            = 31, // GPIO_B1_15  requires pull-up 10kΩ
     AUDIOCODEC_IRQ_GPIO       = static_cast<int>(drivers::GPIOInstances ::GPIO_2),
 
@@ -52,12 +52,13 @@ enum class BoardDefinitions
     BATTERY_CHARGER_I2C = AUDIOCODEC_I2C,
     BATTERY_CHARGER_GPIO = static_cast<int >(drivers::GPIOInstances ::GPIO_2),
     BATTERY_CHARGER_INOKB_PIN = 12,
-    BATTERY_CHARGER_WCINOKB = 13, /// UNUSABLE as WCIN is not connected to the charger !
-    BATTERY_CHARGER_INTB_PIN = 14, /// interrupt on battery percentage change
+    BATTERY_CHARGER_WCINOKB = 13, // UNUSABLE as WCIN is not connected to the charger !
+    BATTERY_CHARGER_INTB_PIN = 14, // interrupt on charger/fuel-gauge event
 
     CELLULAR_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     CELLULAR_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
     CELLULAR_TX_DMA_CHANNEL = 4,
+    CELLULAR_RX_DMA_CHANNEL = 5,
     CELLULAR_GPIO_1 = static_cast<int >(drivers::GPIOInstances ::GPIO_1),
     CELLULAR_GPIO_2 = static_cast<int >(drivers::GPIOInstances ::GPIO_2),
     CELLULAR_GPIO_3 = static_cast<int >(drivers::GPIOInstances ::GPIO_3),
@@ -68,8 +69,8 @@ enum class BoardDefinitions
     CELLULAR_GPIO_2_RESET_PIN = 17,
     CELLULAR_GPIO_2_RI_PIN = 21,
     CELLULAR_GPIO_2_APRDY_PIN = 16,
-    CELLULAR_GPIO_2_WAKEUP_PIN = 22, /// GPIO_B1_06, long time no see. Active low, external pull-down 10kΩ
-    CELLULAR_GPIO_2_WIRELESS_DISABLE_PIN = 23, /// GPIO_B1_07, pull-up in modem, active low, equiv. AT+CFUN=4, see docs
+    CELLULAR_GPIO_2_WAKEUP_PIN = 22, // GPIO_B1_06, long time no see. Active low, external pull-down 10kΩ. docs: 6. Do not pull up WAKEUP_IN, […], pins unless the module starts up sucessfully.
+    CELLULAR_GPIO_2_WIRELESS_DISABLE_PIN = 23, // GPIO_B1_07, pull-up in modem, active low, equiv. AT+CFUN=4, see docs
     CELLULAR_GPIO_2_SIM_TRAY_INSERTED_PIN = 11,
     CELLULAR_GPIO_2_NC = 10, // GPIO_B0_10
     CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN = 9,
@@ -92,8 +93,8 @@ enum class BoardDefinitions
 
     BLUETOOTH_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     BLUETOOTH_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
-    BLUETOOTH_TX_DMA_CHANNEL = 7,
-    BLUETOOTH_RX_DMA_CHANNEL = 8,
+    BLUETOOTH_TX_DMA_CHANNEL = 8,
+    BLUETOOTH_RX_DMA_CHANNEL = 9,
 
     EMMC_PLL = static_cast<int >(drivers::PLLInstances::PLL2_PFD2),
     EMMC_USDHC_INSTANCE = static_cast<int >(drivers::USDHCInstances::USDHC_2),

@@ -73,10 +73,6 @@ namespace bsp
                 xHigherPriorityTaskWoken |= cellular::status::statusIRQhandler();
             }
 
-            if (irq_mask & (1 << BSP_CELLULAR_UART_CTS_PIN)) {
-                LOG_DEBUG("CELLULAR CTS IRQ!");
-            }
-
             // Clear all IRQs
             GPIO_PortClearInterruptFlags(GPIO1, irq_mask);
 
