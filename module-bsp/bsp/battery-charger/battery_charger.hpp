@@ -11,6 +11,8 @@ extern "C"
 #include "queue.h"
 }
 
+#include <array>
+
 namespace bsp::battery_charger
 {
 	using StateOfCharge = std::uint8_t;
@@ -33,7 +35,16 @@ namespace bsp::battery_charger
 		SOCOnePercentChange = 1 << 7
 	};
 
-	int init(xQueueHandle queueHandle);
+	enum class batteryChargerType{
+		DcdTimeOut = 0x00U,     /*!< Dcd detect result is timeout */
+		DcdUnknownType,         /*!< Dcd detect result is unknown type */
+		DcdError,               /*!< Dcd detect result is error*/
+		DcdSDP,                 /*!< The SDP facility is detected */
+		DcdCDP,                 /*!< The CDP facility is detected */
+		DcdDCP,                 /*!< The DCP facility is detected */
+	};
+
+	int init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle);
 
 	void deinit();
 
@@ -50,6 +61,11 @@ namespace bsp::battery_charger
 	BaseType_t INOKB_IRQHandler();
 
 	BaseType_t INTB_IRQHandler();
+
+	extern "C"
+	{
+	void USB_ChargerDetectedCB(std::uint8_t detectedType);
+	}
 } // bsp::battery_charger
 
 

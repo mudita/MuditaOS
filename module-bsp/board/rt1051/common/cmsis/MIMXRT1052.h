@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /*
 ** ###################################################################
 **     Processors:          MIMXRT1051CVJ5B
@@ -27650,7 +27653,11 @@ typedef struct
         __I uint32_t VBUS_DETECT_STAT; /**< USB VBUS Detect Status Register, array offset: 0x1C0, array step: 0x60 */
         uint8_t RESERVED_0[12];
         __I uint32_t CHRG_DETECT_STAT; /**< USB Charger Detect Status Register, array offset: 0x1D0, array step: 0x60 */
-        uint8_t RESERVED_1[28];
+        uint8_t RESERVED_1[12];
+        __IO uint32_t LOOPBACK;                          /**< USB Loopback Test Register, array offset: 0x1E0, array step: 0x60 */
+        __IO uint32_t LOOPBACK_SET;                      /**< USB Loopback Test Register, array offset: 0x1E4, array step: 0x60 */
+        __IO uint32_t LOOPBACK_CLR;                      /**< USB Loopback Test Register, array offset: 0x1E8, array step: 0x60 */
+        __IO uint32_t LOOPBACK_TOG;                      /**< USB Loopback Test Register, array offset: 0x1EC, array step: 0x60 */
         __IO uint32_t MISC;     /**< USB Misc Register, array offset: 0x1F0, array step: 0x60 */
         __IO uint32_t MISC_SET; /**< USB Misc Register, array offset: 0x1F4, array step: 0x60 */
         __IO uint32_t MISC_CLR; /**< USB Misc Register, array offset: 0x1F8, array step: 0x60 */
@@ -27912,6 +27919,46 @@ typedef struct
 
 /* The count of USB_ANALOG_CHRG_DETECT_STAT */
 #define USB_ANALOG_CHRG_DETECT_STAT_COUNT (2U)
+
+/*! @name LOOPBACK - USB Loopback Test Register */
+/*! @{ */
+#define USB_ANALOG_LOOPBACK_UTMI_TESTSTART_MASK  (0x1U)
+#define USB_ANALOG_LOOPBACK_UTMI_TESTSTART_SHIFT (0U)
+#define USB_ANALOG_LOOPBACK_UTMI_TESTSTART(x)    (((uint32_t)(((uint32_t)(x)) << USB_ANALOG_LOOPBACK_UTMI_TESTSTART_SHIFT)) & USB_ANALOG_LOOPBACK_UTMI_TESTSTART_MASK)
+/*! @} */
+
+/* The count of USB_ANALOG_LOOPBACK */
+#define USB_ANALOG_LOOPBACK_COUNT                (2U)
+
+/*! @name LOOPBACK_SET - USB Loopback Test Register */
+/*! @{ */
+#define USB_ANALOG_LOOPBACK_SET_UTMI_TESTSTART_MASK (0x1U)
+#define USB_ANALOG_LOOPBACK_SET_UTMI_TESTSTART_SHIFT (0U)
+#define USB_ANALOG_LOOPBACK_SET_UTMI_TESTSTART(x) (((uint32_t)(((uint32_t)(x)) << USB_ANALOG_LOOPBACK_SET_UTMI_TESTSTART_SHIFT)) & USB_ANALOG_LOOPBACK_SET_UTMI_TESTSTART_MASK)
+/*! @} */
+
+/* The count of USB_ANALOG_LOOPBACK_SET */
+#define USB_ANALOG_LOOPBACK_SET_COUNT            (2U)
+
+/*! @name LOOPBACK_CLR - USB Loopback Test Register */
+/*! @{ */
+#define USB_ANALOG_LOOPBACK_CLR_UTMI_TESTSTART_MASK (0x1U)
+#define USB_ANALOG_LOOPBACK_CLR_UTMI_TESTSTART_SHIFT (0U)
+#define USB_ANALOG_LOOPBACK_CLR_UTMI_TESTSTART(x) (((uint32_t)(((uint32_t)(x)) << USB_ANALOG_LOOPBACK_CLR_UTMI_TESTSTART_SHIFT)) & USB_ANALOG_LOOPBACK_CLR_UTMI_TESTSTART_MASK)
+/*! @} */
+
+/* The count of USB_ANALOG_LOOPBACK_CLR */
+#define USB_ANALOG_LOOPBACK_CLR_COUNT            (2U)
+
+/*! @name LOOPBACK_TOG - USB Loopback Test Register */
+/*! @{ */
+#define USB_ANALOG_LOOPBACK_TOG_UTMI_TESTSTART_MASK (0x1U)
+#define USB_ANALOG_LOOPBACK_TOG_UTMI_TESTSTART_SHIFT (0U)
+#define USB_ANALOG_LOOPBACK_TOG_UTMI_TESTSTART(x) (((uint32_t)(((uint32_t)(x)) << USB_ANALOG_LOOPBACK_TOG_UTMI_TESTSTART_SHIFT)) & USB_ANALOG_LOOPBACK_TOG_UTMI_TESTSTART_MASK)
+/*! @} */
+
+/* The count of USB_ANALOG_LOOPBACK_TOG */
+#define USB_ANALOG_LOOPBACK_TOG_COUNT            (2U)
 
 /*! @name MISC - USB Misc Register */
 /*! @{ */
