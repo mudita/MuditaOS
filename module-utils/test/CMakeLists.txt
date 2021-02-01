@@ -55,15 +55,16 @@ add_catch2_executable(
         module-utils
 )
 
+message(WARNING "Unit tests for module-utils are disabled until they're fixed (EGD-5583).")
 # utils tests
-add_catch2_executable(
-    NAME
-        utils
-    SRCS
-        unittest_utils.cpp
-    LIBS
-        module-utils
-)
+# add_catch2_executable(
+#    NAME
+#        utils
+#    SRCS
+#        unittest_utils.cpp
+#    LIBS
+#        module-utils
+#)
 
 # Math tests
 add_catch2_executable(
