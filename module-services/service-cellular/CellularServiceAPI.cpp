@@ -36,33 +36,22 @@ bool CellularServiceAPI::DialEmergencyNumber(sys::Service *serv, const utils::Ph
 
 bool CellularServiceAPI::AnswerIncomingCall(sys::Service *serv)
 {
-    std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularAnswerIncomingCall);
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularAnswerIncomingCall);
 
-    auto ret                          = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
-    CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
-    if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {
-        return true;
-    }
-    else {
-        LOG_ERROR("Failed");
-        return false;
-    }
+    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
-void CellularServiceAPI::HangupCall(sys::Service *serv)
+bool CellularServiceAPI::HangupCall(sys::Service *serv)
 {
-    std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularHangupCall);
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularHangupCall);
 
-    serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
+    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
 std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumber)
 {
 
-    std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularGetIMSI);
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetIMSI);
 
     auto ret                          = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
     CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
@@ -278,8 +267,8 @@ bool CellularServiceAPI::TransmitDtmfTones(sys::Service *serv, uint32_t digit)
 bool CellularServiceAPI::USSDRequest(sys::Service *serv, CellularUSSDMessage::RequestType type, std::string data)
 {
     auto msg = std::make_shared<CellularUSSDMessage>(type, data);
-    serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
-    return true;
+    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
+    ;
 }
 
 bool CellularServiceAPI::ChangeSimPin(sys::Service *serv,
