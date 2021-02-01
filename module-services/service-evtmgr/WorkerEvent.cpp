@@ -180,6 +180,14 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         LOG_DEBUG("Light sensor IRQ");
     }
 
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueChargerDetect)) {
+        uint8_t notification;
+        if (!queue->Dequeue(&notification, 0)) {
+            return false;
+        }
+        LOG_DEBUG("USB charger type: %d", notification);
+    }
+
     return true;
 }
 
@@ -189,7 +197,9 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
     bsp::vibrator::init();
     bsp::keyboard_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
     bsp::headset::Init(queues[static_cast<int32_t>(WorkerEventQueues::queueHeadsetIRQ)]->GetQueueHandle());
-    bsp::battery_charger::init(queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle());
+    auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBattery)]->GetQueueHandle();
+    auto queueChargerDetect = queues[static_cast<int32_t>(WorkerEventQueues::queueChargerDetect)]->GetQueueHandle();
+    bsp::battery_charger::init(queueBatteryHandle, queueChargerDetect);
     bsp::rtc_Init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
     bsp::cellular::init(queues[static_cast<int32_t>(WorkerEventQueues::queueCellular)]->GetQueueHandle());
     bsp::magnetometer::init(queues[static_cast<int32_t>(WorkerEventQueues::queueMagnetometerIRQ)]->GetQueueHandle());

@@ -85,6 +85,7 @@ namespace bsp::battery_charger
         drivers::I2CAddress topControllerAddress  = {TOP_CONTROLLER_I2C_ADDR, 0, i2cSubaddresSize};
 
         xQueueHandle IRQQueueHandle = nullptr;
+        xQueueHandle DCDQueueHandle = nullptr;
 
         int fuelGaugeWrite(Registers registerAddress, std::uint16_t value)
         {
@@ -425,14 +426,15 @@ namespace bsp::battery_charger
         }
     } // namespace
 
-    int init(xQueueHandle queueHandle)
+    int init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle)
     {
         drivers::DriverI2CParams i2cParams;
         i2cParams.baudrate = static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_I2C_BAUDRATE);
         i2c = drivers::DriverI2C::Create(static_cast<drivers::I2CInstances>(BoardDefinitions::BATTERY_CHARGER_I2C),
                                          i2cParams);
 
-        IRQQueueHandle = queueHandle;
+        IRQQueueHandle = irqQueueHandle;
+        DCDQueueHandle = dcdQueueHandle;
 
         configureBatteryCharger();
 
@@ -470,6 +472,7 @@ namespace bsp::battery_charger
         gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
 
         IRQQueueHandle = nullptr;
+        DCDQueueHandle = nullptr;
 
         i2c.reset();
         gpio.reset();
@@ -551,4 +554,15 @@ namespace bsp::battery_charger
         return xHigherPriorityTaskWoken;
     }
 
+    extern "C"
+    {
+        void USB_ChargerDetectedCB(std::uint8_t detectedType)
+        {
+            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+            if (DCDQueueHandle != nullptr) {
+                std::uint8_t val = static_cast<std::uint8_t>(detectedType);
+                xQueueSend(DCDQueueHandle, &val, portMAX_DELAY);
+            }
+        }
+    }
 } // namespace bsp::battery_charger

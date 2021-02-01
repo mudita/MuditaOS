@@ -12,6 +12,7 @@ namespace bsp::battery_charger
     namespace
     {
         xQueueHandle IRQQueueHandle         = nullptr;
+        xQueueHandle DCDQueueHandle         = nullptr;
         TaskHandle_t batteryWorkerHandle    = nullptr;
         constexpr auto batteryFIFO          = "/tmp/fifoBattKeys";
         constexpr auto fifoFileAccessRights = 0666;
@@ -27,12 +28,18 @@ namespace bsp::battery_charger
         constexpr auto batteryLevelUp         = ']';
         constexpr auto batteryLevelDown       = '[';
 
+        constexpr auto chargerTypeDcdSDP = 'l';
+        constexpr auto chargerTypeDcdCDP = ';';
+        constexpr auto chargerTypeDcdDCP = '\'';
+
         void battery_worker(void *parameters)
         {
             mkfifo(batteryFIFO, fifoFileAccessRights);
 
             // Open FIFO for write only
             int fd = open(batteryFIFO, O_RDONLY | O_NONBLOCK);
+
+            xQueueHandle targetQueueHandle;
 
             while (true) {
                 std::uint8_t buff[fifoBuffSize];
@@ -44,6 +51,7 @@ namespace bsp::battery_charger
                     case chargerPlugStateChange:
                         notification = static_cast<std::uint8_t>(batteryIRQSource::INOKB);
                         plugged      = !plugged;
+                        targetQueueHandle = IRQQueueHandle;
                         break;
                     case batteryLevelUp:
                         notification = static_cast<std::uint8_t>(batteryIRQSource::INTB);
@@ -55,6 +63,7 @@ namespace bsp::battery_charger
                                 Store::Battery::modify().state = Store::Battery::State::PluggedNotCharging;
                             }
                         }
+                        targetQueueHandle = IRQQueueHandle;
                         break;
                     case batteryLevelDown:
                         notification = static_cast<std::uint8_t>(batteryIRQSource::INTB);
@@ -64,22 +73,38 @@ namespace bsp::battery_charger
                             // charging but not 100% anymore
                             Store::Battery::modify().state = Store::Battery::State::Charging;
                         }
+                        targetQueueHandle = IRQQueueHandle;
+                        break;
+                    case chargerTypeDcdSDP:
+                        notification      = static_cast<std::uint8_t>(batteryChargerType::DcdSDP);
+                        targetQueueHandle = DCDQueueHandle;
+                        break;
+                    case chargerTypeDcdCDP:
+                        notification      = static_cast<std::uint8_t>(batteryChargerType::DcdCDP);
+                        targetQueueHandle = DCDQueueHandle;
+                        break;
+                    case chargerTypeDcdDCP:
+                        notification      = static_cast<std::uint8_t>(batteryChargerType::DcdDCP);
+                        targetQueueHandle = DCDQueueHandle;
                         break;
                     }
-                    xQueueSend(IRQQueueHandle, &notification, queueTimeoutTicks);
+                    xQueueSend(targetQueueHandle, &notification, queueTimeoutTicks);
                 }
                 vTaskDelay(taskDelay);
             }
         }
     } // namespace
 
-    int init(xQueueHandle queueHandle)
+    int init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle)
     {
-        IRQQueueHandle = queueHandle;
-        if (xTaskCreate(battery_worker, "battery", 512, queueHandle, 0, &batteryWorkerHandle) != pdPASS) {
+        IRQQueueHandle = irqQueueHandle;
+        DCDQueueHandle = dcdQueueHandle;
+
+        if (xTaskCreate(battery_worker, "battery", 512, nullptr, 0, &batteryWorkerHandle) != pdPASS) {
             return 1;
         }
         Store::Battery::modify().level = battLevel;
+
         return 0;
     }
 
