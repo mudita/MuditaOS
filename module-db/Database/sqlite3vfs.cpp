@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -128,6 +128,10 @@
 #include <Utils.hpp>
 #include <dirent.h>
 
+#include <sys/stat.h>
+#include <sys/file.h>
+#include <fcntl.h>
+
 //#include <log/log.hpp> //left for future debug
 
 /*
@@ -172,6 +176,7 @@ static int ecophoneDirectWrite(EcophoneFile *p,   /* File handle */
     size_t nWrite; /* Return value from write() */
     const auto fileSize = utils::filesystem::filelength(p->fd);
     // vfs_fseek doesn't like offset to be > file size
+
     if (iOfst < fileSize) {
         if (std::fseek(p->fd, iOfst, SEEK_SET) != 0) {
             return SQLITE_IOERR_WRITE;
@@ -208,7 +213,6 @@ static int ecophoneDirectWrite(EcophoneFile *p,   /* File handle */
             bytesLeft -= bytesToWrite;
         }
     }
-
     nWrite = std::fwrite(zBuf, 1, iAmt, p->fd);
     if ((int)nWrite != iAmt) {
         return SQLITE_IOERR_WRITE;
@@ -286,6 +290,9 @@ static int ecophoneRead(sqlite3_file *pFile, void *zBuf, int iAmt, sqlite_int64 
         return SQLITE_OK;
     }
     else if (nRead >= 0) {
+        if (nRead < iAmt) {
+            memset(&(static_cast<char *>(zBuf))[nRead], 0, iAmt - nRead);
+        }
         return SQLITE_IOERR_SHORT_READ;
     }
 
@@ -337,6 +344,9 @@ static int ecophoneWrite(sqlite3_file *pFile, const void *zBuf, int iAmt, sqlite
         return ecophoneDirectWrite(p, zBuf, iAmt, iOfst);
     }
 
+    if (std::fflush(p->fd) != 0) {
+        return SQLITE_IOERR_WRITE;
+    }
     return SQLITE_OK;
 }
 
@@ -370,8 +380,8 @@ static int ecophoneSync(sqlite3_file *pFile, int flags)
         return rc;
     }
 
-    // rc = fflush(p->fd);  //FF doesn't have this function
-    rc = SQLITE_OK;
+    rc = std::fflush(p->fd);
+
     return (rc == 0 ? SQLITE_OK : SQLITE_IOERR_FSYNC);
 }
 
@@ -432,6 +442,7 @@ static int ecophoneFileControl(sqlite3_file *pFile, int op, void *pArg)
 {
     UNUSED(pFile);
     UNUSED(pArg);
+    UNUSED(op);
     return SQLITE_NOTFOUND;
 }
 
@@ -473,8 +484,9 @@ static int ecophoneAccess(sqlite3_vfs *pVfs, const char *zPath, int flags, int *
             *pResOut = flags;
         std::fclose(fd);
     }
-    else if (pResOut)
+    else if (pResOut != nullptr) {
         *pResOut = 0;
+    }
     return SQLITE_OK;
 }
 
@@ -570,11 +582,11 @@ static int ecophoneDelete(sqlite3_vfs *pVfs, const char *zPath, int dirSync)
     UNUSED(pVfs);
     int rc = std::filesystem::remove_all(zPath); /* Return code */
 
-    if (rc != 0)
+    if (rc != 0 && errno == ENOENT)
         return SQLITE_OK;
 
     if (rc == 0 && dirSync) {
-        DIR *dfd;                   /* File descriptor open on directory */
+        DIR *dfd = nullptr;         /* File descriptor open on directory */
         int i;                      /* Iterator variable */
         char zDir[MAXPATHNAME + 1]; /* Name of directory containing file zPath */
 
@@ -616,6 +628,7 @@ static int ecophoneFullPathname(sqlite3_vfs *pVfs, /* VFS */
 )
 {
     UNUSED(pVfs);
+
     sqlite3_snprintf(nPathOut, zPathOut, "%s", zPath);
     zPathOut[nPathOut - 1] = '\0';
     return SQLITE_OK;
@@ -667,7 +680,10 @@ static void ecophoneDlClose(sqlite3_vfs *pVfs, void *pHandle)
  */
 static int ecophoneRandomness(sqlite3_vfs *pVfs, int nByte, char *zByte)
 {
-    return SQLITE_PERM;
+    UNUSED(pVfs);
+    UNUSED(nByte);
+    UNUSED(zByte);
+    return SQLITE_OK;
 }
 
 /*
@@ -697,7 +713,6 @@ static int ecophoneSleep(sqlite3_vfs *pVfs, int nMicro)
  */
 static int ecophoneCurrentTime(sqlite3_vfs *pVfs, double *pTime)
 {
-
     time_t t = time(0);
     *pTime   = t / 86400.0 + 2440587.5;
     return SQLITE_OK;
