@@ -49,8 +49,8 @@ namespace bsp::battery_charger
                     std::uint8_t notification = 0;
                     switch (static_cast<char>(buff[0])) {
                     case chargerPlugStateChange:
-                        notification = static_cast<std::uint8_t>(batteryIRQSource::INOKB);
-                        plugged      = !plugged;
+                        notification      = static_cast<std::uint8_t>(batteryIRQSource::INOKB);
+                        plugged           = !plugged;
                         targetQueueHandle = IRQQueueHandle;
                         break;
                     case batteryLevelUp:
@@ -143,5 +143,8 @@ namespace bsp::battery_charger
     {
         return static_cast<std::uint16_t>(batteryINTBSource::SOCOnePercentChange);
     }
+
+    void chargingFinishedAction()
+    {}
 
 } // namespace bsp::battery_charger

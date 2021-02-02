@@ -58,6 +58,8 @@ namespace bsp::battery_charger
 
 	std::uint16_t getStatusRegister();
 
+	void chargingFinishedAction();
+
 	BaseType_t INOKB_IRQHandler();
 
 	BaseType_t INTB_IRQHandler();
