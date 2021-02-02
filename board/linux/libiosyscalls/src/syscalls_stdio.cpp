@@ -454,7 +454,7 @@ extern "C"
                 char *p = reinterpret_cast<char *>(__ptr);
                 do {
                     auto res       = vfs::invoke_fs(&fs::read, fx->fd, p, __size);
-                    const auto eof = res > 0 && size_t(res) < __size;
+                    const auto eof = res >= 0 && size_t(res) < __size;
                     fx->error      = errno;
                     if (res < 0 || eof)
                         break;
