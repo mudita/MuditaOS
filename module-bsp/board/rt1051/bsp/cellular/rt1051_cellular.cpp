@@ -9,6 +9,7 @@
 #include "../pit/pit.hpp"
 #include "dma_config.h"
 #include "fsl_cache.h"
+#include "../../common/chip.hpp"
 #include <common_data/EventStore.hpp>
 #include <map>
 
@@ -99,6 +100,8 @@ namespace bsp
         s_cellularConfig.rxIdleConfig  = kLPUART_IdleCharacter1;
         s_cellularConfig.enableTx      = false;
         s_cellularConfig.enableRx      = false;
+        s_cellularConfig.enableTxCTS   = true;
+        s_cellularConfig.enableRxRTS   = true;
 
         if (LPUART_Init(CELLULAR_UART_BASE, &s_cellularConfig, GetPerphSourceClock(PerphClock_LPUART)) !=
             kStatus_Success) {
@@ -109,12 +112,14 @@ namespace bsp
         LPUART_EnableInterrupts(CELLULAR_UART_BASE, kLPUART_IdleLineInterruptEnable | kLPUART_RxDataRegFullFlag);
         LPUART_ClearStatusFlags(CELLULAR_UART_BASE, 0xFFFFFFFF);
         NVIC_ClearPendingIRQ(LPUART1_IRQn);
+        NVIC_ClearPendingIRQ(GPIO1_Combined_0_15_IRQn);
+        NVIC_SetPriority(GPIO1_Combined_0_15_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
         NVIC_SetPriority(LPUART1_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
+        NVIC_EnableIRQ(GPIO1_Combined_0_15_IRQn);
         NVIC_EnableIRQ(LPUART1_IRQn);
 
         EnableRx();
         isInitialized = true;
-
     }
 
     void RT1051Cellular::SetSpeed(uint32_t portSpeed)
@@ -135,6 +140,7 @@ namespace bsp
         DisableTx();
 
         NVIC_DisableIRQ(LPUART1_IRQn);
+        NVIC_DisableIRQ(GPIO1_Combined_0_15_IRQn);
         LPUART_DisableInterrupts(CELLULAR_UART_BASE, kLPUART_IdleLineInterruptEnable | kLPUART_RxDataRegFullFlag);
         LPUART_ClearStatusFlags(CELLULAR_UART_BASE, 0xFFFFFFFF);
         NVIC_ClearPendingIRQ(LPUART1_IRQn);
@@ -330,7 +336,7 @@ namespace bsp
 
         gpio_1->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
                                             .irqMode  = DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
-                                            .defLogic = 1,
+                                            .defLogic = 0,
                                             .pin = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)});
 
         gpio_1->ConfPin(
@@ -353,8 +359,8 @@ namespace bsp
         // OUTPUTS
 
         gpio_1->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
-                                            .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
-                                            .defLogic = 0,
+                                            .irqMode  = DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
+                                            .defLogic = 1,
                                             .pin = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_RTS_PIN)});
 
         gpio_1->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
@@ -414,7 +420,8 @@ namespace bsp
         ;
         // ENABLE INTERRUPTS
 
-        gpio_1->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_STATUS_PIN));
+        gpio_1->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN) |
+                                1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_STATUS_PIN));
         gpio_2->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_SIM_TRAY_INSERTED_PIN) |
                                 1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN));
     }
@@ -621,5 +628,5 @@ namespace bsp
             }
         } // namespace ringIndicator
 
-    }     // namespace cellular
+    } // namespace cellular
 } // namespace bsp
