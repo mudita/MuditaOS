@@ -109,6 +109,9 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             bsp::battery_charger::clearAllIRQs();
             auto message     = std::make_shared<sevm::BatteryPlugMessage>();
             message->plugged = bsp::battery_charger::getChargeStatus();
+            if (!message->plugged) {
+                bsp::battery_charger::chargingFinishedAction();
+            }
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
         }
     }

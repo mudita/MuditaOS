@@ -20,7 +20,7 @@ namespace bsp::battery_charger
     {
         constexpr std::uint32_t i2cSubaddresSize = 1;
 
-        const auto cfgFile              = purefs::dir::getCurrentOSPath() / "batteryFuelGaugeConfig.cfg";
+        const auto cfgFile              = purefs::dir::getUserDiskPath() / "batteryFuelGaugeConfig.cfg";
         constexpr auto registersToStore = 0xFF + 1;
 
         constexpr std::uint16_t ENABLE_ALL_IRQ_MASK = 0xF8;
@@ -37,7 +37,7 @@ namespace bsp::battery_charger
         constexpr std::uint8_t maxTemperatureDegrees = 50;
         constexpr std::uint8_t minTemperatureDegrees = 5;
 
-        constexpr std::uint16_t maxVoltagemV = 4350;
+        constexpr std::uint16_t maxVoltagemV = 4400;
         constexpr std::uint16_t minVoltagemV = 3600;
 
         constexpr auto currentSenseGain = 0.15625;  // mA
@@ -227,6 +227,42 @@ namespace bsp::battery_charger
             return batteryRetval::OK;
         }
 
+        batteryRetval resetFuelGaugeModel()
+        {
+            auto regVal = fuelGaugeRead(Registers::CONFIG2_REG);
+
+            std::uint16_t toWrite = regVal.second | static_cast<std::uint16_t>(CONFIG2::LdMdl);
+
+            if (fuelGaugeWrite(Registers::CONFIG2_REG, toWrite) != kStatus_Success) {
+                LOG_ERROR("resetFuelGaugeModel failed.");
+                return batteryRetval::ChargerError;
+            }
+            return batteryRetval::OK;
+        }
+
+        batteryRetval storeConfiguration()
+        {
+            LOG_INFO("Storing fuel gauge configuration...");
+            std::ofstream file(cfgFile.c_str(), std::ios::binary | std::ios::out);
+            if (!file.is_open()) {
+                LOG_WARN("Configuration file [%s] could not be opened.", cfgFile.c_str());
+                return batteryRetval::ChargerError;
+            }
+
+            for (unsigned int i = 0; i < registersToStore; ++i) {
+                auto regVal = fuelGaugeRead(static_cast<Registers>(i));
+                if (regVal.first != kStatus_Success) {
+                    LOG_ERROR("Reading register 0x%x failed.", i);
+                    file.close();
+                    return batteryRetval::ChargerError;
+                }
+                file.write(reinterpret_cast<const char *>(&regVal.second), sizeof(std::uint16_t));
+            }
+            file.close();
+
+            return batteryRetval::OK;
+        }
+
         batteryRetval loadConfiguration()
         {
             std::ifstream file(cfgFile.c_str(), std::ios::binary | std::ios::in);
@@ -234,6 +270,8 @@ namespace bsp::battery_charger
                 LOG_WARN("Configuration file [%s] could not be opened. Loading initial configuration.",
                          cfgFile.c_str());
                 if (configureFuelGaugeBatteryModel() == batteryRetval::OK) {
+                    storeConfiguration();
+                    resetFuelGaugeModel();
                     return batteryRetval::OK;
                 }
                 else {
@@ -251,28 +289,7 @@ namespace bsp::battery_charger
                 }
             }
             file.close();
-
-            return batteryRetval::OK;
-        }
-
-        batteryRetval storeConfiguration()
-        {
-            std::ofstream file(cfgFile.c_str(), std::ios::binary | std::ios::out);
-            if (!file.is_open()) {
-                LOG_WARN("Configuration file [%s] could not be opened.", cfgFile.c_str());
-                return batteryRetval::ChargerError;
-            }
-
-            for (unsigned int i = 0; i < registersToStore; ++i) {
-                auto regVal = fuelGaugeRead(static_cast<Registers>(i));
-                if (regVal.first != kStatus_Success) {
-                    LOG_ERROR("Reading register 0x%x failed.", i);
-                    file.close();
-                    return batteryRetval::ChargerError;
-                }
-                file.write(reinterpret_cast<const char *>(&regVal.second), sizeof(std::uint16_t));
-            }
-            file.close();
+            resetFuelGaugeModel();
 
             return batteryRetval::OK;
         }
@@ -532,6 +549,12 @@ namespace bsp::battery_charger
     {
         // write zero to clear interrupt source
         fuelGaugeWrite(Registers::STATUS_REG, 0x0000);
+    }
+
+    void chargingFinishedAction()
+    {
+        LOG_DEBUG("Charging finished.");
+        storeConfiguration();
     }
 
     BaseType_t INOKB_IRQHandler()
