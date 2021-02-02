@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CodecMAX98090.hpp"
@@ -191,6 +191,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         case bsp::AudioDevice::InputPath::Microphone: {
             max98090_reg_input_to_record_quick_t q_input_setup = {0};
             max98090_reg_digmic_enable_t digena                = {0};
+            max98090_reg_digmic_conf_t digconf                 = {0};
 
             // Enable left and right digital mic interface
             digena.digmicl = 1;
@@ -198,8 +199,32 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             // Harman Kardon dig microphones specify valid clock range as 1.024MHz - 4.8MHz, typical ~2.4MHz
             digena.dmicclk = 3; // fDMC = fPCLK/5 - > fPCLK=12.288MHz fDMC = 2.458MHz
 
+            // Table 17 from datasheet
+            digconf.dmicfreq = 0;
+            switch (currentParams.GetSampleRateVal()) {
+            case 8000:
+                digconf.dmiccomp = 7;
+                break;
+            case 16000:
+                digconf.dmiccomp = 8;
+                break;
+            case 32000:
+            case 44100:
+            case 48000:
+                digconf.dmiccomp = 6;
+                break;
+            case 96000:
+            case 0:
+            default:
+                digconf.dmiccomp = 6;
+                break;
+            }
+
             i2cAddr.subAddress = MAX98090_REG_DIG_MIC_ENABLE;
             i2c->Write(i2cAddr, (uint8_t *)&digena, 1);
+
+            i2cAddr.subAddress = MAX98090_REG_DIG_MIC_CONF;
+            i2c->Write(i2cAddr, (uint8_t *)&digconf, 1);
 
             q_input_setup.in12sab = 1;
             i2cAddr.subAddress    = MAX98090_REG_LINE_INPUT_TO_RECORD_QUICK;
@@ -382,7 +407,7 @@ CodecRetCode CodecMAX98090::SetInputGain(const float gain)
     }
 
     max98090_reg_lrec_dig_gain_t lgain = {0};
-    lgain.avl                          = 0xF;             // fine gain - 0xF: -12dB
+    lgain.avl                          = 0x0;             // fine gain - 0x0: 0dB
     lgain.avlg                         = gainToSet * 0.7; // coarse gain (0.7 used as scaling factor)
 
     i2cAddr.subAddress = MAX98090_REG_LREC_DIG_GAIN;
@@ -390,7 +415,7 @@ CodecRetCode CodecMAX98090::SetInputGain(const float gain)
 
     // coarse gain - 18dB, fine gain - 0dB
     max98090_reg_rrec_dig_gain_t rgain = {0};
-    rgain.avr                          = 0xF;             // fine gain - 0xF: -12dB
+    rgain.avr                          = 0x0;             // fine gain - 0x0: 0dB
     rgain.avrg                         = gainToSet * 0.7; // coarse gain (0.7 used as scaling factor)
 
     i2cAddr.subAddress = MAX98090_REG_RREC_DIG_GAIN;
