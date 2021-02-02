@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,7 +24,7 @@
 class CellularUrcHandler : public at::urc::UrcHandler
 {
   public:
-    CellularUrcHandler(ServiceCellular &cellularService) : cellularService(cellularService)
+    explicit CellularUrcHandler(ServiceCellular &cellularService) : cellularService(cellularService)
     {}
 
     void Handle(at::urc::Clip &urc) final;

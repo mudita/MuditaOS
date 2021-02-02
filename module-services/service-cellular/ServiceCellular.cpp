@@ -36,6 +36,7 @@
 #include <Tables/CalllogTable.hpp>
 #include <Tables/Record.hpp>
 #include <Utils.hpp>
+#include <at/cmd/CLCC.hpp>
 #include <at/UrcClip.hpp>
 #include <at/UrcCmti.hpp>
 #include <at/UrcCreg.hpp>
@@ -225,9 +226,8 @@ static bool isSettingsAutomaticTimeSyncEnabled()
 void ServiceCellular::CallStateTimerHandler()
 {
     LOG_DEBUG("CallStateTimerHandler");
-    std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
-    bus.sendUnicast(msg, ServiceCellular::serviceName);
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
+    bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
 }
 
 sys::ReturnCodes ServiceCellular::InitHandler()
@@ -822,33 +822,22 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         break;
     }
     case MessageType::CellularListCurrentCalls: {
-        auto ret  = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::CLCC);
-        auto size = ret.response.size();
-        if (ret && size > 1) {
-            bool retVal = true;
-            // sometimes there is additional active data connection, sometimes not
-            auto callEntry = ret.response[size == 2 ? 0 : 1];
-
-            try {
-                ModemCall::ModemCall call(callEntry);
-                LOG_DEBUG("%s", utils::to_string(call).c_str());
-                // If call changed to "Active" state stop callStateTimer(used for polling for call state)
-                if (call.state == ModemCall::CallState::Active) {
-                    auto msg =
-                        std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
-                    bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
-                    callStateTimer->stop();
-                }
+        at::cmd::CLCC cmd;
+        auto base = cmux->get(TS0710::Channel::Commands)->cmd(cmd);
+        if (auto response = cmd.parse(base); response) {
+            const auto &data = response.getData();
+            auto it          = std::find_if(std::begin(data), std::end(data), [&](const auto &entry) {
+                return entry.stateOfCall == ModemCall::CallState::Active && entry.mode == ModemCall::CallMode::Voice;
+            });
+            if (it != std::end(data)) {
+                auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
+                bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceCellularNotifications);
+                callStateTimer->stop();
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
+                break;
             }
-            catch (const std::exception &e) {
-                LOG_ERROR("exception \"%s\" was thrown", e.what());
-                retVal = false;
-            }
-            responseMsg = std::make_shared<CellularResponseMessage>(retVal);
         }
-        else {
-            responseMsg = std::make_shared<CellularResponseMessage>(false);
-        }
+        responseMsg = std::make_shared<CellularResponseMessage>(false);
     } break;
 
     case MessageType::CellularHangupCall: {

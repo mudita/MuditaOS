@@ -33,6 +33,8 @@ namespace at
       private:
         std::string cmd;                                     /// command head to run (AT, CLCC etc...)
         std::chrono::milliseconds timeout = default_timeout; /// timeout for this command
+        void split(const std::string &str, Result &result) const;
+
       protected:
         std::unique_ptr<Result> result;          /// lifetime result storage to be able to return reference to it
         cmd::Modifier mod = cmd::Modifier::None; /// modifier responsible to define action we want to perform

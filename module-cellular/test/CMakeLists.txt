@@ -28,7 +28,6 @@ add_catch2_executable(
         module-cellular
 )
 
-
 add_catch2_executable(
         NAME
         unittest_ATStream

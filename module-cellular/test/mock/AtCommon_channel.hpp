@@ -111,4 +111,85 @@ namespace at
             return r;
         }
     };
+
+    /// provides proper CLCC response with one call on the list
+    class CLCC_successChannel_oneCall : public ChannelMock
+    {
+      public:
+        const std::string idx         = "1";
+        const std::string dir         = "0";
+        const std::string stateOfCall = "0";
+        const std::string mode        = "0";
+        const std::string multiparty  = "1";
+        const std::string number      = "10086";
+        const std::string type        = "129";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CLCC: " + idx + "," + dir + "," + stateOfCall + "," + mode + "," + multiparty + "," +
+                                   number + "," + type,
+                               "OK"};
+            return result;
+        }
+    };
+
+    /// provides proper CLCC response with two calls on the list
+    class CLCC_successChannel_twoCalls : public ChannelMock
+    {
+      public:
+        const std::string idx1{"1"};
+        const std::string dir1{"0"};
+        const std::string stateOfCall1{"0"};
+        const std::string mode1{"1"};
+        const std::string multiparty1{"0"};
+        const std::string number1{""};
+        const std::string type1{"129"};
+
+        const std::string idx2{"2"};
+        const std::string dir2{"0"};
+        const std::string stateOfCall2{"0"};
+        const std::string mode2{"0"};
+        const std::string multiparty2{"0"};
+        const std::string number2{"10086"};
+        const std::string type2{"129"};
+
+        const std::string tokensLTEMode{"1,0,0,1,0,\"\",129"};
+        const std::string tokensEstablishCall{"2,0,0,0,0,\"10086\",129"};
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CLCC: " + tokensLTEMode, "+CLCC: " + tokensEstablishCall, "OK"};
+            return result;
+        }
+    };
+
+    // Provides succesfull 'OK' response
+    class OK_Channel : public ChannelMock
+    {
+      public:
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"OK"};
+            return result;
+        }
+    };
+
+    // Provides bad 'OG' response
+    class OG_Channel : public ChannelMock
+    {
+      public:
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"OG"};
+            return result;
+        }
+    };
 } // namespace at
