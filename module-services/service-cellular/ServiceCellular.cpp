@@ -1391,7 +1391,7 @@ bool ServiceCellular::sendSMS(SMSRecord record)
     uint32_t textLen = record.body.length();
 
     auto commandTimeout                 = at::factory(at::AT::CMGS).getTimeout();
-    constexpr uint32_t singleMessageLen = 30;
+    constexpr uint32_t singleMessageLen = 67;
     bool result                         = false;
     auto channel                        = cmux->get(TS0710::Channel::Commands);
     auto receiver                       = record.number.getEntered();
@@ -1412,8 +1412,9 @@ bool ServiceCellular::sendSMS(SMSRecord record)
                 }
                 else {
                     result = false;
-                    LOG_ERROR("Message to: %s send failure", receiver.c_str());
                 }
+                if (!result)
+                    LOG_ERROR("Message to: %s send failure", receiver.c_str());
             }
         }
         // split text, and send concatenated messages
@@ -1426,40 +1427,39 @@ bool ServiceCellular::sendSMS(SMSRecord record)
 
             if (messagePartsCount > maxConcatenatedCount) {
                 LOG_ERROR("Message to long");
-                return false;
+                result = false;
             }
+            else {
+                auto channel = cmux->get(TS0710::Channel::Commands);
 
-            auto channel = cmux->get(TS0710::Channel::Commands);
+                for (uint32_t i = 0; i < messagePartsCount; i++) {
 
-            for (uint32_t i = 0; i < messagePartsCount; i++) {
+                    uint32_t partLength = singleMessageLen;
+                    if (i * singleMessageLen + singleMessageLen > record.body.length()) {
+                        partLength = record.body.length() - i * singleMessageLen;
+                    }
+                    UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
 
-                uint32_t partLength = singleMessageLen;
-                if (i * singleMessageLen + singleMessageLen > record.body.length()) {
-                    partLength = record.body.length() - i * singleMessageLen;
-                }
-                UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
+                    std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(receiver)).str() + "\",120," +
+                                        std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
 
-                std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(receiver)).str() + "\",120," +
-                                    std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
-
-                if (cmux->CheckATCommandPrompt(
-                        channel->SendCommandPrompt(command.c_str(), 1, commandTimeout.count()))) {
-                    // prompt sign received, send data ended by "Ctrl+Z"
-                    if (channel->cmd(UCS2(messagePart).str() + "\032", commandTimeout, 2)) {
-                        result = true;
+                    if (cmux->CheckATCommandPrompt(
+                            channel->SendCommandPrompt(command.c_str(), 1, commandTimeout.count()))) {
+                        // prompt sign received, send data ended by "Ctrl+Z"
+                        if (channel->cmd(UCS2(messagePart).str() + "\032", commandTimeout, 2)) {
+                            result = true;
+                        }
+                        else {
+                            result = false;
+                            LOG_ERROR("Message send failure");
+                            break;
+                        }
                     }
                     else {
                         result = false;
-                        if (!result)
-                            LOG_ERROR("Message send failure");
+                        LOG_ERROR("Message send failure");
                         break;
                     }
-                }
-                else {
-                    result = false;
-                    if (!result)
-                        LOG_ERROR("Message send failure");
-                    break;
                 }
             }
         }
