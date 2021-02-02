@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_RT1051LPM_HPP
@@ -18,7 +18,8 @@ namespace bsp
         RT1051LPM();
         int32_t PowerOff() override final;
         int32_t Reboot() override final;
-        void SetCpuFrequency(CpuFrequency freq) final;
+        void SetCpuFrequency(CpuFrequencyHz freq) final;
+        [[nodiscard]] uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;
 
       private:

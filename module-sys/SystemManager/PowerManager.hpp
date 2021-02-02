@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_POWERMANAGER_HPP
@@ -8,6 +8,7 @@
 
 #include "bsp/lpm/bsp_lpm.hpp"
 #include "drivers/semc/DriverSEMC.hpp"
+#include "CpuGovernor.hpp"
 
 namespace sys
 {
@@ -45,14 +46,19 @@ namespace sys
 
         [[nodiscard]] auto getExternalRamDevice() const noexcept -> std::shared_ptr<devices::Device>;
 
+        void RegisterNewSentinel(std::shared_ptr<CpuSentinel> newSentinel) const;
+        void SetCpuFrequencyRequest(std::string sentinelName, bsp::CpuFrequencyHz request) const;
+
       private:
         void ResetFrequencyShiftCounter();
+        void SetCpuFrequency(bsp::CpuFrequencyHz freq) const;
 
         uint32_t belowThresholdCounter{0};
         uint32_t aboveThresholdCounter{0};
 
         std::unique_ptr<bsp::LowPowerMode> lowPowerControl;
         std::shared_ptr<drivers::DriverSEMC> driverSEMC;
+        std::unique_ptr<CpuGovernor> cpuGovernor;
     };
 
 } // namespace sys

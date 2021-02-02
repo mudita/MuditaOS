@@ -19,6 +19,7 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
+#include <Service/CpuSentinel.hpp>
 #include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>
 #include <optional> // for optional
@@ -159,6 +160,7 @@ class ServiceCellular : public sys::Service
 
   private:
     std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
+    std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
     // used for polling for call state
     std::unique_ptr<sys::Timer> callStateTimer;

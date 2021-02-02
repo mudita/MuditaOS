@@ -7,6 +7,7 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/Timer.hpp>
+#include <Service/CpuSentinel.hpp>
 
 #include "EinkDisplay.hpp"
 
@@ -54,6 +55,11 @@ namespace service::eink
         EinkStatus_e refreshDisplay(::gui::RefreshModes refreshMode);
         EinkStatus_e updateDisplay(uint8_t *frameBuffer, ::gui::RefreshModes refreshMode);
 
+        // function called from the PowerManager context
+        // to update resources immediately
+        // critical section or mutex support necessary
+        void updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
+
         sys::MessagePointer handleEinkModeChangedMessage(sys::Message *message);
         sys::MessagePointer handleImageMessage(sys::Message *message);
         sys::MessagePointer handlePrepareEarlyRequest(sys::Message *message);
@@ -61,6 +67,7 @@ namespace service::eink
         EinkDisplay display;
         State currentState;
         std::unique_ptr<sys::Timer> displayPowerOffTimer;
+        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
     };
 } // namespace service::eink
 

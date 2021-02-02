@@ -23,6 +23,8 @@
 #include <service-appmgr/service-appmgr/Controller.hpp>
 #include "messages/CpuFrequencyMessage.hpp"
 #include "messages/DeviceRegistrationMessage.hpp"
+#include "messages/SentinelRegistrationMessage.hpp"
+#include "messages/RequestCpuFrequencyMessage.hpp"
 #include <time/ScopedTime.hpp>
 
 const inline size_t systemManagerStack = 4096 * 2;
@@ -350,6 +352,20 @@ namespace sys
         connect(typeid(sys::DeviceRegistrationMessage), [this](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::DeviceRegistrationMessage *>(message);
             deviceManager->RegisterNewDevice(msg->getDevice());
+
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(sys::SentinelRegistrationMessage), [this](sys::Message *message) -> sys::MessagePointer {
+            auto msg = static_cast<sys::SentinelRegistrationMessage *>(message);
+            powerManager->RegisterNewSentinel(msg->getSentinel());
+
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(sys::RequestCpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
+            auto msg = static_cast<sys::RequestCpuFrequencyMessage *>(message);
+            powerManager->SetCpuFrequencyRequest(msg->getName(), msg->getRequest());
 
             return sys::MessageNone{};
         });

@@ -13,11 +13,13 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Message.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Service.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Timer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Service/CpuSentinel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/SystemManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/DependencyGraph.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/PowerManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/CpuStatistics.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/DeviceManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/CpuGovernor.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/graph/TopologicalSort.cpp
 
         )

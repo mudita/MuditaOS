@@ -12,6 +12,7 @@
 #include <messages/EinkMessage.hpp>
 #include <messages/ImageMessage.hpp>
 #include <SystemManager/messages/DeviceRegistrationMessage.hpp>
+#include <SystemManager/messages/SentinelRegistrationMessage.hpp>
 #include <SystemManager/Constants.hpp>
 
 #include <cstring>
@@ -58,6 +59,13 @@ namespace service::eink
 
         auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(display.getDevice());
         bus.sendUnicast(deviceRegistrationMsg, service::name::system_manager);
+
+        cpuSentinel = std::make_shared<sys::CpuSentinel>(name::eink, this, [this](bsp::CpuFrequencyHz newFrequency) {
+            updateResourcesAfterCpuFrequencyChange(newFrequency);
+        });
+
+        auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+        bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
         display.powerOn();
 
@@ -200,4 +208,8 @@ namespace service::eink
     {
         return currentState == state;
     }
+
+    void ServiceEink::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
+    {}
+
 } // namespace service::eink
