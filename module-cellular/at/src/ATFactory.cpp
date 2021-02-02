@@ -28,7 +28,7 @@ namespace at
         {AT::CRC_ON, {"AT+CRC=1"}},
         {AT::CALLER_NUMBER_PRESENTATION, {"AT+CLIP=1", default_long_timeout}},
         {AT::SMS_TEXT_FORMAT, {"AT+CMGF=1"}},
-        {AT::SMS_UCSC2, {"AT+CSCS=\"UCS2\""}},
+        {AT::SMS_UCSC2, {"AT+CSCS=\"UCS2\"", 1s}},
         {AT::SMS_GSM, {"AT+CSCS=\"GSM\""}},
         {AT::QSCLK_ON, {"AT+QSCLK=1"}},
         {AT::QDAI, {"AT+QDAI?"}},

@@ -21,6 +21,8 @@ extern "C"
 #include "log/log.hpp"
 #include "FreeRTOS.h"
 
+#include <bsp/cellular/CellularResult.hpp>
+
 /**
  * TS0710_DLC_ESTABL implementation
  */
@@ -81,12 +83,12 @@ bool TS0710_DLC_ESTABL::request(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t syste
     frame.Address = static_cast<uint8_t>(DLCI << 2) | (1 << 1); // set C/R = 1 - command
     frame.Control = static_cast<uint8_t>(system_parameters.TypeOfFrame);
     TS0710_Frame frame_c(frame);
-    pv_cellular->Write(static_cast<void *>(frame_c.getSerData().data()), frame_c.getSerData().size());
+    pv_cellular->write(static_cast<void *>(frame_c.getSerData().data()), frame_c.getSerData().size());
     // return true;
     int retries = system_parameters.MaxNumOfRetransmissions;
     while (retries--) {
         // UartSend(frame_c.getSerData().data(), frame_c.getSerData().size());
-        pv_cellular->Write(static_cast<void *>(frame_c.getSerData().data()), frame_c.getSerData().size());
+        pv_cellular->write(static_cast<void *>(frame_c.getSerData().data()), frame_c.getSerData().size());
         vTaskDelay(system_parameters.AckTime);
         if (response(DLCI, system_parameters)) {
             LOG_DEBUG("Got response");
@@ -113,14 +115,13 @@ void TS0710_DLC_ESTABL::indication(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sy
 bool TS0710_DLC_ESTABL::response(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t system_parameters)
 {
     constexpr size_t size = 256;
-    std::unique_ptr<uint8_t[]> data(new uint8_t[size]);
+    bsp::cellular::CellularDMAResultStruct result{};
 
-    // uint32_t len = UartReceive(data);
-    ssize_t len = pv_cellular->Read(reinterpret_cast<void *>(data.get()), size);
+    ssize_t len = pv_cellular->read(&result, size, std::chrono::milliseconds{0});
     LOG_DEBUG("RX length = %d", static_cast<int>(len));
 
     if (len > 0) {
-        std::vector<uint8_t> v(data.get(), data.get() + len);
+        std::vector<uint8_t> v(result.data, result.data + result.dataSize);
         TS0710_Frame frame_c(v);
         TS0710_Frame::frame_t frame = frame_c.getFrame();
 

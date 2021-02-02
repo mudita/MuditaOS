@@ -473,4 +473,9 @@ TESTS_LIST["catch2-audio-volume-scaler"]="
     Scenario: Scale volume levels between system and bluetooth;
 "
 #---------
+TESTS_LIST["catch2-unittest_CellularResult"]="
+    CellularResult;
+"
+#---------
+
 
