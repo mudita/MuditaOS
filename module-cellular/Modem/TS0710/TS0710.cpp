@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TS0710.h"
@@ -271,7 +271,9 @@ TS0710::ConfState TS0710::AudioConfProcedure()
     if (!ret) {
         return ConfState ::Failure;
     }
-    else if (ret.response[0].compare("+QDAI: 1,0,0,5,0,1,1,1") == 0) {
+    else if (ret.response[0].compare("+QDAI: 1,0,0,3,0,1,1,1") == 0) {
+        parser->cmd(at::AT::CLVL);
+        parser->cmd(at::AT::QMIC);
         return ConfState ::Success;
     }
     else {
