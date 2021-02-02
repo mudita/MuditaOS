@@ -7,7 +7,6 @@
 
 #include "Result.hpp"
 #include <service-cellular/PacketData.hpp>
-#include <service-cellular/PacketDataTypes.hpp>
 
 using namespace cellular;
 

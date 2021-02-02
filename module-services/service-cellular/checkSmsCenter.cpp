@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "checkSmsCenter.hpp"
-#include "Modem/BaseChannel.hpp"
+#include "modem/BaseChannel.hpp"
 #include <at/cmd/CSCA.hpp>
 
 [[nodiscard]] bool checkSmsCenter(at::BaseChannel &channel)

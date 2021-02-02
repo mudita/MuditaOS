@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "Modem/ATCommon.hpp"
-#include "Modem/BaseChannel.hpp"
+#include "modem/ATCommon.hpp"
+#include "modem/BaseChannel.hpp"
 
 namespace at
 {
@@ -32,16 +32,16 @@ namespace at
             return ResultMock();
         }
 
-        void cmd_init() override
+        void cmdInit() override
         {}
 
-        void cmd_send(std::string cmd) override
+        void cmdSend(std::string cmd) override
         {}
 
-        void cmd_post() override
+        void cmdPost() override
         {}
 
-        size_t cmd_receive(std::uint8_t *buffer, std::chrono::milliseconds timeoutMs) override
+        size_t cmdReceive(std::uint8_t *buffer, std::chrono::milliseconds timeoutMs) override
         {
             return {};
         }

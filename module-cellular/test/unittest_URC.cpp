@@ -8,7 +8,7 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
-#include <module-utils/time/time_conversion.hpp>
+#include <time/time_conversion.hpp>
 
 #include "UrcQind.hpp"
 #include "UrcCusd.hpp"
