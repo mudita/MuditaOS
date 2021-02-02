@@ -156,8 +156,8 @@ namespace bsp
         auto timeoutTicks = pdMS_TO_TICKS(timeoutMs.count());
 
         uint32_t currentTime   = cpp_freertos::Ticks::GetTicks();
-        uint32_t timeoutNeeded = currentTime + timeoutTicks;
-        uint32_t timeElapsed   = currentTime;
+        uint64_t timeoutNeeded = currentTime + timeoutTicks;
+        uint64_t timeElapsed   = currentTime;
 
         for (;;) {
             if (timeElapsed >= timeoutNeeded) {

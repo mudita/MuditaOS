@@ -4,7 +4,7 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
-#include <module-bsp/bsp/cellular/CellularResult.hpp>
+#include <bsp/cellular/CellularResult.hpp>
 
 TEST_CASE("CellularResult")
 {

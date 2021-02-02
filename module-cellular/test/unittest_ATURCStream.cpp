@@ -5,7 +5,7 @@
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
-#include "Modem/ATURCStream.hpp"
+#include "modem/ATURCStream.hpp"
 
 TEST_CASE("URC AT Stream Parser")
 {

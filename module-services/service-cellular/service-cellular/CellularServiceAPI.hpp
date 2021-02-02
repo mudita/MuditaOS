@@ -6,7 +6,7 @@
 #include "CellularMessage.hpp"
 #include "PacketDataCellularMessage.hpp"
 
-#include <Modem/TS0710/TS0710.h>
+#include <modem/mux/CellularMux.h>
 #include <PhoneNumber.hpp>
 #include <module-bsp/bsp/cellular/bsp_cellular.hpp>
 #include <utf8/UTF8.hpp>
@@ -81,7 +81,7 @@ namespace CellularServiceAPI
     bool GetScanMode(sys::Service *serv);
     bool GetFirmwareVersion(sys::Service *serv, std::string &response);
     bool GetChannel(sys::Service *serv,
-                    TS0710::Channel channel); /// asynchronous, returns message CellureMessageChannelReady;
+                    CellularMux::Channel channel); /// asynchronous, returns message CellureMessageChannelReady;
     bool GetDataChannel(sys::Service *serv);
     bool GetCSQ(sys::Service *serv, std::string &response);
     bool GetCREG(sys::Service *serv, std::string &response);

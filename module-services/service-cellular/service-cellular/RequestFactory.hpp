@@ -8,7 +8,7 @@
 #include <map>
 #include <functional>
 
-#include <Modem/TS0710/DLC_channel.h>
+#include <modem/mux/DLCChannel.h>
 
 #include "requests/CallRequest.hpp"
 #include "service-appmgr/Actions.hpp"

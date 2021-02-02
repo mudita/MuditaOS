@@ -6,7 +6,7 @@
 #include "service-cellular/ServiceCellular.hpp"
 
 #include <MessageType.hpp>
-#include <Modem/TS0710/TS0710.h>
+#include <modem/mux/CellularMux.h>
 #include <PhoneNumber.hpp>
 #include <Service/Common.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
@@ -185,7 +185,7 @@ bool CellularServiceAPI::GetFirmwareVersion(sys::Service *serv, std::string &res
     return false;
 }
 
-bool CellularServiceAPI::GetChannel(sys::Service *serv, TS0710::Channel channel)
+bool CellularServiceAPI::GetChannel(sys::Service *serv, CellularMux::Channel channel)
 {
     std::shared_ptr<CellularGetChannelMessage> msg = std::make_shared<CellularGetChannelMessage>(channel);
     return serv->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
@@ -193,7 +193,7 @@ bool CellularServiceAPI::GetChannel(sys::Service *serv, TS0710::Channel channel)
 
 bool CellularServiceAPI::GetDataChannel(sys::Service *serv)
 {
-    return GetChannel(serv, TS0710::Channel::Data);
+    return GetChannel(serv, CellularMux::Channel::Data);
 }
 
 bool CellularServiceAPI::GetCSQ(sys::Service *serv, std::string &response)
