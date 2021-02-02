@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051LPM.hpp"
@@ -45,30 +45,35 @@ namespace bsp
         return 0;
     }
 
-    void RT1051LPM::SetCpuFrequency(bsp::LowPowerMode::CpuFrequency freq)
+    void RT1051LPM::SetCpuFrequency(bsp::CpuFrequencyHz freq)
     {
         currentFrequency = freq;
         switch (freq) {
-        case bsp::LowPowerMode::CpuFrequency::Level_1:
+        case bsp::CpuFrequencyHz::Level_1:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_12_Mhz);
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_2:
+        case bsp::CpuFrequencyHz::Level_2:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Osc_24_Mhz);
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_3:
+        case bsp::CpuFrequencyHz::Level_3:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_66_Mhz);
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_4:
+        case bsp::CpuFrequencyHz::Level_4:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_132_Mhz);
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_5:
+        case bsp::CpuFrequencyHz::Level_5:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_264_Mhz);
             break;
-        case bsp::LowPowerMode::CpuFrequency::Level_6:
+        case bsp::CpuFrequencyHz::Level_6:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_528_Mhz);
             break;
         }
         LOG_INFO("CPU frequency changed to %lu", CLOCK_GetFreq(kCLOCK_CpuClk));
+    }
+
+    uint32_t RT1051LPM::GetCpuFrequency() const noexcept
+    {
+        return CLOCK_GetCpuClkFreq();
     }
 
     void RT1051LPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)

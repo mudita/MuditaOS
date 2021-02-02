@@ -212,6 +212,10 @@ TESTS_LIST["catch2-service-evtmgr"]="
     ScreenLightControlFunctions;
 "
 #---------
+TESTS_LIST["catch2-PowerManager"]="
+    Power Manager CPU sentinels governor test;
+"
+#---------
 TESTS_LIST["catch2-StatefulController-tests"]="
     Given StatefulController when turn on then turned on;
     Given StatefulController when error during device registration then turned off;
