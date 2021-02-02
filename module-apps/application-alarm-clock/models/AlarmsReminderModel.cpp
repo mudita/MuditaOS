@@ -21,7 +21,11 @@ namespace app::alarmClock
     void AlarmsReminderModel::startTimers(OnTimerCallback callback)
     {
         elapsedSeconds = 0;
-        reminderTimer->connect([=](sys::Timer &) { callback(); });
+        reminderTimer->connect([=](sys::Timer &) {
+            if (callback != nullptr) {
+                callback();
+            }
+        });
         reminderTimer->reload();
         delayTimer->connect([=](sys::Timer &) { countElapsedSeconds(); });
         delayTimer->reload();
@@ -41,9 +45,9 @@ namespace app::alarmClock
         musicTimer->stop();
     }
 
-    void AlarmsReminderModel::handleMusicPlay(const std::string &filePath)
+    void AlarmsReminderModel::handleMusicPlay()
     {
-        auto fileTags = AudioServiceAPI::GetFileTags(app, filePath);
+        auto fileTags = AudioServiceAPI::GetFileTags(app, getAlarmRecord().path);
         if (fileTags != std::nullopt) {
             startMusicTimer(fileTags->duration_sec * utils::time::milisecondsInSecond, fileTags->filePath);
             playMusic(fileTags->filePath);
@@ -57,8 +61,7 @@ namespace app::alarmClock
 
     void AlarmsReminderModel::stopMusic()
     {
-        auto alarmApp = static_cast<ApplicationAlarmClock *>(app);
-        AudioServiceAPI::Stop(app, alarmApp->getAudioToken());
+        AudioServiceAPI::Stop(app, token);
     }
 
     void AlarmsReminderModel::countElapsedSeconds()
@@ -118,5 +121,10 @@ namespace app::alarmClock
     void AlarmsReminderModel::clearAlarmRecords()
     {
         alarmRecords.clear();
+    }
+
+    void AlarmsReminderModel::updateAudioToken(audio::Token token)
+    {
+        this->token = token;
     }
 } // namespace app::alarmClock

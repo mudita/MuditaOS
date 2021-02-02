@@ -36,4 +36,9 @@ namespace app::alarmClock
         auto uniqueData = std::make_unique<WeekDaysRepeatData>(data);
         record->repeat  = parser->getDatabaseFieldValue(std::move(uniqueData));
     }
+
+    void AlarmClockEditWindowPresenter::updateAudioToken(audio::Token audioToken)
+    {
+        alarmFieldsProvider->updateAudioToken(audioToken);
+    }
 } // namespace app::alarmClock

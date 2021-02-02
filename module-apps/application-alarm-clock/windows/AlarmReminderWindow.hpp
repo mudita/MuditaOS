@@ -45,6 +45,8 @@ namespace app::alarmClock
         void destroyInterface() override;
         gui::top_bar::Configuration configureTopBar(gui::top_bar::Configuration appConfiguration) override;
         auto handleSwitchData(gui::SwitchData *data) -> bool override;
+
+        void handleAudioTokenUpdate(audio::Token token);
     };
 
 } // namespace app::alarmClock

@@ -90,4 +90,9 @@ namespace app::alarmClock
         }
         return true;
     }
+
+    void NewEditAlarmWindow::handleAudioTokenUpdate(audio::Token token)
+    {
+        presenter->updateAudioToken(token);
+    }
 } // namespace app::alarmClock

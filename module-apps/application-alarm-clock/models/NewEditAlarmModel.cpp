@@ -45,11 +45,12 @@ namespace app::alarmClock
             mode24H,
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
             [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
-        internalData.push_back(new gui::AlarmOptionsItem(
+        soundItem = new gui::AlarmOptionsItem(
             application,
             AlarmOptionItemName::Sound,
             [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); }));
+            [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+        internalData.push_back(soundItem);
 
         internalData.push_back(new gui::AlarmOptionsItem(
             application,
@@ -109,5 +110,10 @@ namespace app::alarmClock
         }
         list->clear();
         eraseInternalData();
+    }
+
+    void NewEditAlarmModel::updateAudioToken(audio::Token audioToken)
+    {
+        soundItem->updateAudioToken(audioToken);
     }
 } // namespace app::alarmClock

@@ -27,6 +27,7 @@ namespace app::alarmClock
             virtual void saveData(std::shared_ptr<AlarmsRecord> record, AlarmAction action)            = 0;
             virtual void loadRepeat(std::shared_ptr<AlarmsRecord> record)                              = 0;
             virtual void updateRepeat(std::shared_ptr<AlarmsRecord> record, WeekDaysRepeatData data)   = 0;
+            virtual void updateAudioToken(audio::Token audioToken)                                     = 0;
         };
     };
 
@@ -40,6 +41,7 @@ namespace app::alarmClock
         void saveData(std::shared_ptr<AlarmsRecord> record, AlarmAction action) override;
         void loadRepeat(std::shared_ptr<AlarmsRecord> record) override;
         void updateRepeat(std::shared_ptr<AlarmsRecord> record, WeekDaysRepeatData data) override;
+        void updateAudioToken(audio::Token audioToken) override;
 
       private:
         std::shared_ptr<AlarmsInternalListItemProvider> alarmFieldsProvider;

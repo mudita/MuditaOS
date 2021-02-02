@@ -35,6 +35,7 @@ namespace gui
         MusicStatus musicStatus        = MusicStatus::Stop;
         unsigned int actualVectorIndex = 0;
         uint32_t repeatOptionValue     = 0;
+        audio::Token token;
 
         std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
@@ -49,6 +50,7 @@ namespace gui
                          std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
 
         bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+        void updateAudioToken(audio::Token audioToken);
     };
 
 } /* namespace gui */

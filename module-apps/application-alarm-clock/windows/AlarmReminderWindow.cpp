@@ -122,13 +122,11 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::displayAlarm()
     {
-        auto rec = presenter->getAlarmRecord();
-        if (rec.status == AlarmStatus::FifthSnooze) {
+        if (presenter->hasAlarmRecordFifthSnooze()) {
             snoozeVBox->setVisible(false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
         }
-        timeLabel->setText(TimePointToLocalizedTimeString(presenter->getTimeToDisplay(rec), "%I:%0M"));
-        presenter->handleMusicPlay(rec.path);
+        timeLabel->setText(TimePointToLocalizedTimeString(presenter->getTimeToDisplay(), "%I:%0M"));
     }
 
     bool AlarmReminderWindow::onInput(const gui::InputEvent &inputEvent)
@@ -137,14 +135,14 @@ namespace app::alarmClock
             return false;
         }
 
-        if (inputEvent.is(gui::KeyCode::KEY_ENTER) && presenter->getAlarmRecord().status != AlarmStatus::FifthSnooze) {
-            presenter->update(presenter->getAlarmRecord(), UserAction::Snooze, presenter->getElapsedMinutes());
+        if (inputEvent.is(gui::KeyCode::KEY_ENTER) && !presenter->hasAlarmRecordFifthSnooze()) {
+            presenter->update(UserAction::Snooze);
             closeReminder();
             return true;
         }
 
         if (inputEvent.is(gui::KeyCode::KEY_RF)) {
-            presenter->update(presenter->getAlarmRecord(), UserAction::TurnOff, 0);
+            presenter->update(UserAction::TurnOff);
             closeReminder();
             return true;
         }
@@ -154,16 +152,10 @@ namespace app::alarmClock
 
     void AlarmReminderWindow::closeReminder()
     {
-        presenter->eraseFrontAlarmRecord();
-        if (presenter->getAllAlarmRecords().empty()) {
-            LOG_DEBUG("Switch to alarm main window");
-            presenter->stopTimers();
-            presenter->stopMusic();
+        if (presenter->closeReminder()) {
             application->switchWindow(gui::name::window::main_window);
         }
         else {
-            LOG_DEBUG("Next alarm at the same time handle");
-            presenter->stopTimers();
             presenter->startTimers(getCallback());
             displayAlarm();
         }
@@ -176,5 +168,10 @@ namespace app::alarmClock
             closeReminder();
         };
         return callback;
+    }
+
+    void AlarmReminderWindow::handleAudioTokenUpdate(audio::Token token)
+    {
+        presenter->updateAudioToken(token);
     }
 } // namespace app::alarmClock

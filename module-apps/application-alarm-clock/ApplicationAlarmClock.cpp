@@ -62,7 +62,16 @@ namespace app
             }
             if (auto audioResp = dynamic_cast<AudioStartPlaybackResponse *>(resp)) {
                 LOG_DEBUG("AudioStartPlaybackResponseMessage");
-                audioToken = audioResp->token;
+                if (auto win = windowsStack.get(style::alarmClock::window::name::alarmReminder); win != nullptr) {
+                    if (auto window = dynamic_cast<alarmClock::AlarmReminderWindow *>(win); window != nullptr) {
+                        window->handleAudioTokenUpdate(audioResp->token);
+                    }
+                }
+                else if (win = windowsStack.get(style::alarmClock::window::name::newEditAlarm); win != nullptr) {
+                    if (auto window = dynamic_cast<alarmClock::NewEditAlarmWindow *>(win); window != nullptr) {
+                        window->handleAudioTokenUpdate(audioResp->token);
+                    }
+                }
             }
         }
         if (handled) {
@@ -130,10 +139,5 @@ namespace app
 
     void ApplicationAlarmClock::destroyUserInterface()
     {}
-
-    audio::Token ApplicationAlarmClock::getAudioToken() const
-    {
-        return audioToken;
-    }
 
 } /* namespace app */

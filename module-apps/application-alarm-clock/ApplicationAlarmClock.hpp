@@ -11,8 +11,6 @@ namespace app
     class ApplicationAlarmClock : public Application
     {
 
-        audio::Token audioToken;
-
       public:
         ApplicationAlarmClock(std::string name,
                               std::string parent,
@@ -32,7 +30,6 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
-        audio::Token getAudioToken() const;
     };
 
     template <> struct ManifestTraits<ApplicationAlarmClock>

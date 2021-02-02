@@ -253,7 +253,7 @@ namespace app
 
         const uint32_t counterForToday = stm::AlarmsTimeEvents::countAlarmsForToday(records);
         const bool rebuildDesktopMenu  = counterForToday != notifications.notRead.Alarms;
-        notifications.notRead.Alarms = counterForToday;
+        notifications.notRead.Alarms   = counterForToday;
 
         if (rebuildDesktopMenu) {
             if (auto menuWindow = dynamic_cast<gui::MenuWindow *>(getWindow(app::window::name::desktop_menu));

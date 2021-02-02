@@ -6,6 +6,7 @@
 #include "application-alarm-clock/widgets/AlarmInternalListItem.hpp"
 #include "application-alarm-clock/models/AlarmsRepository.hpp"
 #include "application-alarm-clock/data/AlarmsData.hpp"
+#include "application-alarm-clock/widgets/AlarmOptionsItem.hpp"
 #include "Application.hpp"
 #include "InternalModel.hpp"
 #include <ListItemProvider.hpp>
@@ -22,6 +23,7 @@ namespace app::alarmClock
         virtual void loadData(std::shared_ptr<AlarmsRecord> record)                     = 0;
         virtual void saveData(std::shared_ptr<AlarmsRecord> record, AlarmAction action) = 0;
         virtual void loadRepeat(std::shared_ptr<AlarmsRecord> record)                   = 0;
+        virtual void updateAudioToken(audio::Token audioToken)                          = 0;
     };
 
     class NewEditAlarmModel : public AlarmsInternalListItemProvider
@@ -29,6 +31,7 @@ namespace app::alarmClock
         app::Application *application = nullptr;
         std::shared_ptr<AbstractAlarmsRepository> alarmsRepository;
         gui::AlarmInternalListItem *repeatOption = nullptr;
+        gui::AlarmOptionsItem *soundItem         = nullptr;
         bool mode24H = false;
 
       public:
@@ -39,6 +42,7 @@ namespace app::alarmClock
         void loadData(std::shared_ptr<AlarmsRecord> record) override;
         void saveData(std::shared_ptr<AlarmsRecord> alarm, AlarmAction action) override;
         void loadRepeat(std::shared_ptr<AlarmsRecord> record) override;
+        void updateAudioToken(audio::Token audioToken) override;
         void createData();
 
         [[nodiscard]] unsigned int getMinimalItemHeight() const override;

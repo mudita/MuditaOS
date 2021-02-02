@@ -193,8 +193,7 @@ namespace gui
                 }
                 else if (musicStatus == MusicStatus::Play) {
                     musicStatus = MusicStatus::Stop;
-                    auto alarmApp = static_cast<app::ApplicationAlarmClock *>(application);
-                    AudioServiceAPI::Stop(application, alarmApp->getAudioToken());
+                    AudioServiceAPI::Stop(application, token);
                 }
             }
             return false;
@@ -315,5 +314,10 @@ namespace gui
         }
         LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));
         return musicFiles;
+    }
+
+    void AlarmOptionsItem::updateAudioToken(audio::Token audioToken)
+    {
+        token = audioToken;
     }
 } /* namespace gui */

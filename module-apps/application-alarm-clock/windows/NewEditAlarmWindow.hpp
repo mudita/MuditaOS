@@ -30,6 +30,8 @@ namespace app::alarmClock
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
         void buildInterface() override;
+
+        void handleAudioTokenUpdate(audio::Token token);
     };
 
 } // namespace app::alarmClock
