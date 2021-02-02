@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UpdateMuditaOS.hpp"
@@ -293,7 +293,7 @@ void UpdateMuditaOS::getChecksumInfo(const std::string &infoLine, std::string &f
     std::size_t lastSpacePos = infoLine.find_last_of(' ');
     if (lastSpacePos > 0) {
         filePath                       = infoLine.substr(0, lastSpacePos);
-        const std::string fileCRC32Str = infoLine.substr(lastSpacePos + 1, boot::consts::crc_char_size - 1);
+        const std::string fileCRC32Str = infoLine.substr(lastSpacePos + 1, boot::consts::crc_char_size);
         if (fileCRC32Long != nullptr) {
             *fileCRC32Long = strtoull(fileCRC32Str.c_str(), nullptr, boot::consts::crc_radix);
             informDebug("getChecksumInfo filePath: %s fileCRC32Str: %s fileCRC32Long: %lu fileCRC32Hex: %lX",
@@ -388,7 +388,7 @@ updateos::UpdateError UpdateMuditaOS::updateBootJSON()
 
         auto *fpCRC = std::fopen(bootJSONAbsoulte.c_str(), "w");
         if (fpCRC != nullptr) {
-            std::array<char, boot::consts::crc_char_size> crcBuf;
+            std::array<char, boot::consts::crc_char_size + 1> crcBuf;
             snprintf(crcBuf.data(), crcBuf.size(), "%lX", bootJSONAbsoulteCRC);
             std::fwrite(crcBuf.data(), 1, boot::consts::crc_char_size, fpCRC);
             std::fclose(fpCRC);
