@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/BatteryMessages.hpp"
@@ -92,7 +92,6 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             return false;
         }
         if (notification == static_cast<uint8_t>(bsp::battery_charger::batteryIRQSource::INTB)) {
-            LOG_DEBUG("Battery INTB");
             const auto status = bsp::battery_charger::getStatusRegister();
             if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert)) {
                 auto messageBrownout = std::make_shared<sevm::BatteryBrownoutMessage>();
