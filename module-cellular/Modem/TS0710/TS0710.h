@@ -275,7 +275,7 @@ class TS0710
     ATParser *parser;
 
     int CloseMultiplexer();
-    const static bool hardwareControlFlowEnable = false;
+    static constexpr auto hardwareControlFlowEnable = true;
 
     bool searchForString(const std::vector<std::string> &response, std::string str)
     {
