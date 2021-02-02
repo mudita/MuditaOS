@@ -130,7 +130,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             i2cAddr.subAddress       = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
 
-            SetupEarspeakerEqualizer();
+            // SetupEarspeakerEqualizer();
 
         } break;
 
@@ -151,7 +151,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             i2cAddr.subAddress                       = MAX98090_REG_OUTPUT_ENABLE;
             i2c->Write(i2cAddr, (uint8_t *)&outputenable, 1);
 
-            SetupLoudspeakerEqualizer();
+            // SetupLoudspeakerEqualizer();
 
         } break;
 
