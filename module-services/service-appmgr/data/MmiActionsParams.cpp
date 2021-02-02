@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/data/MmiActionsParams.hpp>
@@ -36,6 +36,31 @@ auto MMICallForwardingResult::getData() const -> std::tuple<std::string, std::st
 }
 
 void MMICallForwardingResult::accept(Visitor &v, std::string &displayMessage)
+{
+    v.visit(*this, displayMessage);
+}
+
+void MMICallBarringResult::accept(Visitor &v, std::string &displayMessage)
+{
+    v.visit(*this, displayMessage);
+}
+
+void MMICallWaitingResult::accept(Visitor &v, std::string &displayMessage)
+{
+    v.visit(*this, displayMessage);
+}
+
+void MMIClipResult::accept(Visitor &v, std::string &displayMessage)
+{
+    v.visit(*this, displayMessage);
+}
+
+void MMIClirResult::accept(Visitor &v, std::string &displayMessage)
+{
+    v.visit(*this, displayMessage);
+}
+
+void MMIImeiResult::accept(Visitor &v, std::string &displayMessage)
 {
     v.visit(*this, displayMessage);
 }

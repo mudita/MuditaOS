@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -31,7 +31,47 @@ namespace mmi
             messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonFailure,
                                       "app_desktop_info_mmi_common_failed");
             messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonNoMessage,
-                                      "app_desktop_info_mmi_common_no");
+                                      "app_desktop_info_mmi_common_no_message");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonMMINotSupported,
+                                      "app_desktop_info_mmi_common_mmi_not_supported");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonEnabled,
+                                      "app_desktop_info_mmi_common_enabled");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonDisabled,
+                                      "app_desktop_info_mmi_common_disabled");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonVoice,
+                                      "app_desktop_info_mmi_common_voice");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonData,
+                                      "app_desktop_info_mmi_common_data");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonFax,
+                                      "app_desktop_info_mmi_common_fax");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonSync,
+                                      "app_desktop_info_mmi_common_sync");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonAsync,
+                                      "app_desktop_info_mmi_common_async");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonAllDisabled,
+                                      "app_desktop_info_mmi_common_all_disabled");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonDeactivated,
+                                      "app_desktop_info_mmi_common_deactivated");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonActivated,
+                                      "app_desktop_info_mmi_common_activated");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CommonQuery,
+                                      "app_desktop_info_mmi_common_query");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClirAccordingToSubscription,
+                                      "app_desktop_info_mmi_clir_according_to_subscription");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClirEnabled,
+                                      "app_desktop_info_mmi_clir_enabled");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClirDisabled,
+                                      "app_desktop_info_mmi_clir_disabled");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClirNotProvisioned,
+                                      "app_desktop_info_mmi_clir_not_provisioned");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClirPermanentProvisioned,
+                                      "app_desktop_info_mmi_clir_permanent_provisioned");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClirUnknown,
+                                      "app_desktop_info_mmi_clir_unknown");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClirTemporaryRestricted,
+                                      "app_desktop_info_mmi_clir_temporary_restricted");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClirTemporaryAllowed,
+                                      "app_desktop_info_mmi_clir_temporary_allowed");
             messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::RegistrationSuccessful,
                                       "app_desktop_info_mmi_registration_success");
             messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::RegistrationFailed,
@@ -48,6 +88,26 @@ namespace mmi
                                       "app_desktop_info_mmi_enabling_success");
             messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::EnablingFailed,
                                       "app_desktop_info_mmi_enabling_failed");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CallForwardingDisabled,
+                                      "app_desktop_info_mmi_call_forwarding_disabled");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CallBarringActivated,
+                                      "app_desktop_info_mmi_call_barring_activated");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CallBarringDeactivated,
+                                      "app_desktop_info_mmi_call_barring_deactivated");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClipActivted,
+                                      "app_desktop_info_mmi_clip_activated");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClipDeactivated,
+                                      "app_desktop_info_mmi_clip_deactivated");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClipNotProvisioned,
+                                      "app_desktop_info_mmi_clip_not_provisioned");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClipProvisioned,
+                                      "app_desktop_info_mmi_clip_provisioned");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::ClipUnknown,
+                                      "app_desktop_info_mmi_clip_unknown");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CallWaitingActivated,
+                                      "app_desktop_info_mmi_call_waiting_activated");
+            messageDictionary.emplace(mmiactions::IMMICustomResultParams::MMIResultMessage::CallWaitingDeactivated,
+                                      "app_desktop_info_mmi_call_waiting_deactivated");
         };
 
         virtual void visit(mmiactions::MMINoneSpecifiedResult &customResult, std::string &displayMessage)
@@ -65,15 +125,75 @@ namespace mmi
             displayMessage += utils::localize.get("app_desktop_info_mmi_call_forwarding") + "\n";
             if (customResult.getMessageType() == mmiactions::IMMICustomResultParams::MMIType::CallForwardingData) {
                 auto [voice, fax, sync, async] = customResult.getData();
-                displayMessage += utils::localize.get("app_desktop_info_mmi_voice") + ": " + voice + "\n" +
-                                  utils::localize.get("app_desktop_info_mmi_fax") + ": " + fax + "\n" +
-                                  utils::localize.get("app_desktop_info_mmi_sync") + ": " + sync + "\n" +
-                                  utils::localize.get("app_desktop_info_mmi_async") + ": " + async + "\n";
+                displayMessage += utils::localize.get("app_desktop_info_mmi_common_voice") + ": " + voice + "\n" +
+                                  utils::localize.get("app_desktop_info_mmi_common_fax") + ": " + fax + "\n" +
+                                  utils::localize.get("app_desktop_info_mmi_common_sync") + ": " + sync + "\n" +
+                                  utils::localize.get("app_desktop_info_mmi_common_async") + ": " + async + "\n";
             }
             else if (customResult.getMessageType() ==
                      mmiactions::IMMICustomResultParams::MMIType::CallForwardingNotification) {
                 displayMessage += getSelectedMessagesFromDictionary(customResult.getMessage());
             }
+        }
+
+        virtual void visit(mmiactions::MMICallBarringResult &customResult, std::string &displayMessage)
+        {
+            displayMessage += utils::localize.get("app_desktop_info_mmi_call_barring") + "\n";
+            if (customResult.getMessageType() == mmiactions::IMMICustomResultParams::MMIType::CallBarringData) {
+                displayMessage += getQueryResult(customResult.getMessages());
+            }
+            else if (customResult.getMessageType() ==
+                     mmiactions::IMMICustomResultParams::MMIType::CallBarringNotification) {
+                displayMessage += getSelectedMessagesFromDictionary(customResult.getMessage());
+            }
+        }
+
+        virtual void visit(mmiactions::MMICallWaitingResult &customResult, std::string &displayMessage)
+        {
+            displayMessage += utils::localize.get("app_desktop_info_mmi_call_waiting") + "\n";
+            if (customResult.getMessageType() == mmiactions::IMMICustomResultParams::MMIType::CallWaitingData) {
+                displayMessage += getQueryResult(customResult.getMessages());
+            }
+            else if (customResult.getMessageType() ==
+                     mmiactions::IMMICustomResultParams::MMIType::CallWaitingNotification) {
+                displayMessage += getSelectedMessagesFromDictionary(customResult.getMessage());
+            }
+        }
+
+        virtual void visit(mmiactions::MMIClipResult &customResult, std::string &displayMessage)
+        {
+            displayMessage += utils::localize.get("app_desktop_info_mmi_clip") + "\n";
+            displayMessage += getSelectedMessagesFromDictionary(customResult.getMessage());
+        }
+
+        virtual void visit(mmiactions::MMIClirResult &customResult, std::string &displayMessage)
+        {
+            displayMessage += utils::localize.get("app_desktop_info_mmi_clir") + "\n";
+            displayMessage += getSelectedMessagesFromDictionary(customResult.getMessage());
+        }
+
+        virtual void visit(mmiactions::MMIImeiResult &customResult, std::string &displayMessage)
+        {
+            displayMessage += utils::localize.get("app_desktop_info_mmi_imei") + "\n";
+            displayMessage += customResult.getImei() + "\n";
+            displayMessage += getSelectedMessagesFromDictionary(customResult.getMessage());
+        }
+
+        std::string getQueryResult(std::vector<std::pair<mmiactions::IMMICustomResultParams::MMIResultMessage,
+                                                         mmiactions::IMMICustomResultParams::MMIResultMessage>> msgData)
+        {
+            std::string queryStr;
+            for (auto msg : msgData) {
+                auto serviceClass = msg.first;
+                auto serviceState = msg.second;
+                if (serviceState == mmiactions::IMMICustomResultParams::MMIResultMessage::CommonQuery) {
+                    auto it = messageDictionary.find(serviceClass);
+                    if (messageDictionary.end() != it) {
+                        queryStr += utils::localize.get(it->second) + "\n";
+                    }
+                }
+            }
+            return queryStr;
         }
 
         UTF8 getSelectedMessagesFromDictionary(

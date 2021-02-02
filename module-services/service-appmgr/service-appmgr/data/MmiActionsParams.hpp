@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,6 +13,11 @@ namespace app::manager::actions
     class MMINoneSpecifiedResult;
     class MMICallForwardingResult;
     class MMICustomResultParams;
+    class MMICallBarringResult;
+    class MMICallWaitingResult;
+    class MMIClipResult;
+    class MMIClirResult;
+    class MMIImeiResult;
 
     class Visitor
     {
@@ -20,6 +25,11 @@ namespace app::manager::actions
         virtual void visit(MMINoneSpecifiedResult &, std::string &)  = 0;
         virtual void visit(MMICallForwardingResult &, std::string &) = 0;
         virtual void visit(MMICustomResultParams &, std::string &)   = 0;
+        virtual void visit(MMICallBarringResult &, std::string &)    = 0;
+        virtual void visit(MMICallWaitingResult &, std::string &)    = 0;
+        virtual void visit(MMIClipResult &, std::string &)           = 0;
+        virtual void visit(MMIClirResult &, std::string &)           = 0;
+        virtual void visit(MMIImeiResult &, std::string &)           = 0;
     };
 
     class IMMICustomResultParams
@@ -82,7 +92,7 @@ namespace app::manager::actions
             CallBarringDeactivated,
 
             ClipActivted,
-            ClipDaectivated,
+            ClipDeactivated,
             ClipNotProvisioned,
             ClipProvisioned,
             ClipUnknown,
@@ -117,7 +127,7 @@ namespace app::manager::actions
       public:
         MMINoneSpecifiedResult() : MMICustomResultParams(MMIType::NoneSpecified)
         {}
-        virtual void accept(Visitor &v, std::string &displayMessage) override;
+        void accept(Visitor &v, std::string &displayMessage) override;
     };
 
     class MMICallForwardingResult : public MMICustomResultParams
@@ -132,7 +142,7 @@ namespace app::manager::actions
         {}
 
         auto getData() const -> std::tuple<std::string, std::string, std::string, std::string>;
-        virtual void accept(Visitor &v, std::string &displayMessage) override;
+        void accept(Visitor &v, std::string &displayMessage) override;
 
       private:
         std::string voice;
@@ -146,6 +156,7 @@ namespace app::manager::actions
       public:
         MMIClirResult() : MMICustomResultParams(MMIType::Clir)
         {}
+        void accept(Visitor &v, std::string &displayMessage) override;
     };
 
     class MMICallBarringResult : public MMICustomResultParams
@@ -155,6 +166,7 @@ namespace app::manager::actions
         {}
         void addMessages(const std::pair<MMIResultMessage, MMIResultMessage> &message) noexcept;
         auto getMessages(void) noexcept -> std::vector<std::pair<MMIResultMessage, MMIResultMessage>>;
+        void accept(Visitor &v, std::string &displayMessage) override;
 
       private:
         std::vector<std::pair<MMIResultMessage, MMIResultMessage>> data;
@@ -195,6 +207,7 @@ namespace app::manager::actions
       public:
         MMIClipResult() : MMICustomResultParams(MMIType::Clip)
         {}
+        void accept(Visitor &v, std::string &displayMessage) override;
     };
 
     class MMIImeiResult : public MMICustomResultParams
@@ -205,6 +218,7 @@ namespace app::manager::actions
         explicit MMIImeiResult() : MMICustomResultParams(MMIType::Imei)
         {}
         auto getImei() const noexcept -> std::string;
+        void accept(Visitor &v, std::string &displayMessage) override;
 
       private:
         std::string imei;
@@ -217,6 +231,7 @@ namespace app::manager::actions
         {}
         void addMessages(const std::pair<MMIResultMessage, MMIResultMessage> &message);
         auto getMessages() const noexcept -> std::vector<std::pair<MMIResultMessage, MMIResultMessage>>;
+        void accept(Visitor &v, std::string &displayMessage) override;
 
       private:
         std::vector<std::pair<MMIResultMessage, MMIResultMessage>> messages;
