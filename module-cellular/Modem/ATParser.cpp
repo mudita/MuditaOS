@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ATParser.hpp"
@@ -10,15 +10,14 @@
 #include <utility>
 #include <vector>
 
-ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular)
+ATParser::ATParser(bsp::Cellular *cellular) : Channel{new uint8_t[at::defaultReceiveBufferSize]}, cellular(cellular)
 {
-    isInitialized = true;
+    responseBuffer = xMessageBufferCreate(at::defaultMessageBufferSize);
 }
 
 /// plz see 12.7 summary of urc in documentation
 std::vector<ATParser::Urc> ATParser::ParseURC()
 {
-
     std::vector<ATParser::Urc> resp;
     size_t maxPos = 0, pos = 0;
 
@@ -30,7 +29,7 @@ std::vector<ATParser::Urc> ATParser::ParseURC()
     };
 
     for (const auto &el : vals) {
-        pos = responseBuffer.find(el.first);
+        pos = urcBuffer.find(el.first);
         if (pos != std::string::npos) {
             resp.push_back(el.second);
             maxPos = std::max(pos + el.first.length(), maxPos);
@@ -38,50 +37,50 @@ std::vector<ATParser::Urc> ATParser::ParseURC()
         }
     }
 
-    if (responseBuffer.find("+QIND: \"FOTA\"") != std::string::npos) {
-        LOG_DEBUG("%s", responseBuffer.c_str());
+    if (urcBuffer.find("+QIND: \"FOTA\"") != std::string::npos) {
+        LOG_DEBUG("%s", urcBuffer.c_str());
         resp.push_back(ATParser::Urc::Fota);
         return resp;
     }
 
     // manage string buffer
     if (maxPos == 0) {}
-    else if (responseBuffer.size() >= maxPos) {
-        responseBuffer.erase();
+    else if (urcBuffer.size() >= maxPos) {
+        urcBuffer.erase();
     }
     else {
-        responseBuffer = responseBuffer.substr(maxPos);
+        urcBuffer = urcBuffer.substr(maxPos);
     }
 
     return resp;
 }
 
-int ATParser::ProcessNewData(sys::Service *service)
+at::Result ATParser::ProcessNewData(sys::Service *service, bsp::cellular::CellularResult *cellularResult)
 {
-    char rawBuffer[256] = {0};
-
-    LOG_DEBUG("Receiving data from ProcessNewData");
-    auto length = cellular->Read(rawBuffer, sizeof(rawBuffer));
+    at::Result result;
 
     {
         cpp_freertos::LockGuard lock(mutex);
-        responseBuffer.append(reinterpret_cast<char *>(rawBuffer), length);
-        LOG_DEBUG("Appending %d bytes to responseBuffer[%u]: %s",
-                  static_cast<int>(length),
-                  static_cast<unsigned int>(responseBuffer.size()),
-                  utils::removeNewLines(responseBuffer).c_str());
+        urcBuffer.append(cellularResult->getDataAsString());
     }
 
     auto ret = ParseURC();
-    if (blockedTaskHandle) {
-        xTaskNotifyGive(blockedTaskHandle);
+
+    if (awaitingResponseFlag.state()) {
+        if (!xMessageBufferSend(responseBuffer,
+                                (void *)cellularResult->getSerialized().get(),
+                                cellularResult->getSerializedSize(),
+                                pdMS_TO_TICKS(at::defaultBufferTimeoutMs.count()))) {
+            LOG_DEBUG("[AT] Message buffer full!");
+            result.code = at::Result::Code::FULL_MSG_BUFFER;
+        }
     }
-    else if (ret.size()) {
+    else if (!ret.empty()) {
         if (ret.size() == 1 && ret[0] == ATParser::Urc::Fota) {
-            std::string fotaData(responseBuffer);
+            std::string fotaData(urcBuffer);
             LOG_DEBUG("parsing FOTA:\"%s\"", fotaData.c_str());
             FotaService::API::sendRawProgress(service, fotaData);
-            responseBuffer.erase();
+            urcBuffer.erase();
         }
         else {
             urcs.insert(std::end(urcs), std::begin(ret), std::end(ret));
@@ -93,33 +92,36 @@ int ATParser::ProcessNewData(sys::Service *service)
             cpp_freertos::LockGuard lock(mutex);
             auto msg = std::make_shared<CellularPowerUpProcedureCompleteNotification>();
             service->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
-            LOG_DEBUG("[!!!] Fucking away data");
-            responseBuffer.erase();
+            urcBuffer.erase();
             urcs.clear();
         }
     }
-    return 1;
+    else {
+        result.code = at::Result::Code::DATA_NOT_USED;
+    }
+
+    return result;
 }
 
 void ATParser::cmd_init()
 {
     cpp_freertos::LockGuard lock(mutex);
-    responseBuffer.erase();
+    urcBuffer.erase();
 }
 
 void ATParser::cmd_send(std::string cmd)
 {
-    cellular->Write(const_cast<char *>(cmd.c_str()), cmd.size());
+    cellular->write(const_cast<char *>(cmd.c_str()), cmd.size());
 }
 
-std::string ATParser::cmd_receive()
+size_t ATParser::cmd_receive(std::uint8_t *buffer, std::chrono::milliseconds timeout = std::chrono::milliseconds{0})
 {
-    cpp_freertos::LockGuard lock(mutex);
-    return responseBuffer;
+    return xMessageBufferReceive(responseBuffer, buffer, 256, pdMS_TO_TICKS(timeout.count()));
 }
 
 void ATParser::cmd_post()
 {
     cpp_freertos::LockGuard lock(mutex);
-    responseBuffer.erase(); // TODO:M.P is it okay to flush buffer here ?
+    urcBuffer.erase();
+    xMessageBufferReset(responseBuffer);
 }
