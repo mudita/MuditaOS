@@ -29,10 +29,19 @@ namespace bsp::battery_charger
 		INOKB = 0x02
 	};
 
+	enum class topControllerIRQsource{
+		CHGR_INT = (1 << 0),
+		FG_INT = (1 << 1),
+		SYS_INT = (1 << 2)
+	};
+
 	enum class batteryINTBSource{
+		maxTemp = 1 << 13,
 		minSOCAlert = 1 << 10,
+		minTemp = 1 << 9,
 		minVAlert = 1 << 8,
-		SOCOnePercentChange = 1 << 7
+		SOCOnePercentChange = 1 << 7,
+		all = 0xFFFF
 	};
 
 	enum class batteryChargerType{
@@ -52,15 +61,15 @@ namespace bsp::battery_charger
 
 	bool getChargeStatus();
 
-	void clearAllIRQs();
+	void clearAllChargerIRQs();
 
-	void clearFuelGuageIRQ();
+	void clearFuelGuageIRQ(std::uint16_t intToClear);
 
 	std::uint16_t getStatusRegister();
 
-    void chargingFinishedAction();
+	void checkTemperatureRange();
 
-    BaseType_t INOKB_IRQHandler();
+	std::uint8_t getTopControllerINTSource();
 
 	BaseType_t INTB_IRQHandler();
 

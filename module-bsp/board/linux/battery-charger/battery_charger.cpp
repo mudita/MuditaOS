@@ -23,6 +23,7 @@ namespace bsp::battery_charger
         StateOfCharge battLevel             = 100;
         constexpr StateOfCharge fullBattery = 100;
         bool plugged                        = false;
+        topControllerIRQsource IRQSrc       = topControllerIRQsource::CHGR_INT;
 
         constexpr auto chargerPlugStateChange = 'p';
         constexpr auto batteryLevelUp         = ']';
@@ -49,12 +50,14 @@ namespace bsp::battery_charger
                     std::uint8_t notification = 0;
                     switch (static_cast<char>(buff[0])) {
                     case chargerPlugStateChange:
-                        notification      = static_cast<std::uint8_t>(batteryIRQSource::INOKB);
+                        notification      = static_cast<std::uint8_t>(batteryIRQSource::INTB);
+                        IRQSrc            = topControllerIRQsource::CHGR_INT;
                         plugged           = !plugged;
                         targetQueueHandle = IRQQueueHandle;
                         break;
                     case batteryLevelUp:
                         notification = static_cast<std::uint8_t>(batteryIRQSource::INTB);
+                        IRQSrc       = topControllerIRQsource::FG_INT;
                         if (battLevel < fullBattery)
                             battLevel++;
                         else {
@@ -67,6 +70,7 @@ namespace bsp::battery_charger
                         break;
                     case batteryLevelDown:
                         notification = static_cast<std::uint8_t>(batteryIRQSource::INTB);
+                        IRQSrc       = topControllerIRQsource::FG_INT;
                         if (battLevel >= 1)
                             battLevel--;
                         if (plugged && Store::Battery::get().level == fullBattery) {
@@ -133,10 +137,10 @@ namespace bsp::battery_charger
     }
 
     // TODO function unused in linux driver, left for compatibility with target driver
-    void clearAllIRQs()
+    void clearAllChargerIRQs()
     {}
     // TODO function unused in linux driver, left for compatibility with target driver
-    void clearFuelGuageIRQ()
+    void clearFuelGuageIRQ(std::uint16_t)
     {}
 
     std::uint16_t getStatusRegister()
@@ -144,7 +148,12 @@ namespace bsp::battery_charger
         return static_cast<std::uint16_t>(batteryINTBSource::SOCOnePercentChange);
     }
 
-    void chargingFinishedAction()
+    std::uint8_t getTopControllerINTSource()
+    {
+        return static_cast<std::uint8_t>(IRQSrc);
+    }
+
+    void checkTemperatureRange()
     {}
 
 } // namespace bsp::battery_charger
