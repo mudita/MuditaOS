@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #define CATCH_CONFIG_MAIN
 
 #include <catch2/catch.hpp>
@@ -24,7 +27,7 @@ TEST_CASE("TS0170 frame")
         TS0710_Frame frame(tempFrame);
 
         REQUIRE(frame.isComplete(frame.getSerData()) == true);
-        REQUIRE(frame.isMyChannel(frame.getSerData(), DLCI) == true);
+        REQUIRE(frame.isMyChannel(DLCI) == true);
         REQUIRE(frame.getFrameDLCI(frame.getSerData()) == DLCI);
         REQUIRE(frame.getSerData().size() == cmuxMinimumFrameLength + command.length());
     }

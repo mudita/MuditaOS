@@ -16,15 +16,20 @@ namespace at
         /// result class for AT send -> receive command, could return promise :p
         enum class Code
         {
-            OK,            /// at OK
-            ERROR,         /// at ERROR For compatibility also for CME_ERROR and CMS_ERROR (details in errorCode)
-            CME_ERROR,     /// In case CME error see errorCode
-            CMS_ERROR,     /// In case CMS error see errorCode
-            TIMEOUT,       /// at Timeout
-            TOKENS,        /// at numbers of tokens needed met
-            NONE,          /// no code
-            UNDEFINED,     /// undefined result - usage of Undefined result, define and pin result to use it
-            PARSING_ERROR, /// parser error
+            OK,              /// at OK
+            ERROR,           /// at ERROR For compatibility also for CME_ERROR and CMS_ERROR (details in errorCode)
+            CME_ERROR,       /// In case CME error see errorCode
+            CMS_ERROR,       /// In case CMS error see errorCode
+            TIMEOUT,         /// at Timeout
+            TOKENS,          /// at numbers of tokens needed met
+            NONE,            /// no code
+            UNDEFINED,       /// undefined result - usage of Undefined result, define and pin result to use it
+            PARSING_ERROR,   /// parser error
+            FULL_MSG_BUFFER, /// at not enough space left in message buffer for new message
+            TRANSMISSION_NOT_STARTED, /// at dma not starting transmission
+            RECEIVING_NOT_STARTED,    /// at dma not starting requested receiving
+            DATA_NOT_USED,            /// at received data not being used
+            CMUX_FRAME_ERROR,         /// at cmux deserialize error
         } code = Code::UNDEFINED;
 
         Result() = default;
