@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CodecMAX98090.hpp"
@@ -191,7 +191,6 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         case bsp::AudioDevice::InputPath::Microphone: {
             max98090_reg_input_to_record_quick_t q_input_setup = {0};
             max98090_reg_digmic_enable_t digena                = {0};
-            max98090_reg_digmic_conf_t digconf                 = {0};
 
             // Enable left and right digital mic interface
             digena.digmicl = 1;
