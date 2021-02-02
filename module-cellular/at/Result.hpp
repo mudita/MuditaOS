@@ -42,6 +42,7 @@ namespace at
         std::variant<at::EquipmentErrorCode, at::NetworkErrorCode> errorCode = at::EquipmentErrorCode::NoInformation;
 
         std::vector<std::string> response;
+        std::vector<std::vector<std::string>> tokens;
 
         virtual explicit operator bool() const
         {

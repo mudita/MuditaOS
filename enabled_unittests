@@ -77,6 +77,15 @@ TESTS_LIST["catch2-cellular-URC"]="
     +Qiurc: TCP Context and connection message;
 "
 #---------
+TESTS_LIST["catch2-cellular-parse-result"]="
+    CSCA parser test;
+    CSCA set data;
+    QECCNUM parser;
+    CLCC parser;
+    CLCC set data;
+    CLCC conversion methods;
+"
+#---------
 TESTS_LIST["catch2-commands-queue-tests"]="
     DrawCommandsQueueTests;
 "
