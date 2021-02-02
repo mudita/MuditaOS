@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogRecord.hpp"
@@ -43,9 +43,6 @@ std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
 
 CalllogRecordInterface::CalllogRecordInterface(CalllogDB *calllogDb, ContactsDB *contactsDb)
     : calllogDB(calllogDb), contactsDB(contactsDb)
-{}
-
-CalllogRecordInterface::~CalllogRecordInterface()
 {}
 
 bool CalllogRecordInterface::Add(const CalllogRecord &rec)

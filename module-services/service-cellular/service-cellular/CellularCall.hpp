@@ -15,61 +15,6 @@
 #include <string>
 #include <sys/types.h>
 
-namespace ModemCall
-{
-    enum class CallState : uint8_t
-    {
-        Active = 0, // 0 active: call in progress (setup was successful)
-        Held,       // 1 held: call on hold
-        Dialing,    // 2 dialing (MO call): number dialed
-        Alerting,   // 3 alerting (MO call): number dialed and the called party is alerted
-        Incoming,   // 4 incoming (MT call): incoming call, ringtone played (AT RING notification)
-        Waiting // 5 waiting (MT call): call waiting notification while another call is active (if call waiting feature
-                // enabled)
-    };
-
-    enum class CallDir : uint8_t
-    {
-        MO = 0, // Mobile originated (MO) call
-        MT = 1, // Mobile terminated (MT) call
-    };
-
-    enum class CallMode : uint8_t
-    {
-        Voice = 0,
-        Data  = 1,
-        FAX   = 2,
-    };
-
-    /// Usually contains one of defined values
-    /// More details in 3GPP TS 24.008 subclause 10.5.4.7
-    enum class CallType : uint8_t
-    {
-        UknownType      = 129,
-        InternationType = 145, // contains the "+" character
-        NationalType    = 161,
-    };
-
-    struct ModemCall
-    {
-        int8_t idx;
-        CallDir dir;
-        CallState state;
-        CallMode mode;
-        bool isConferenceCall;
-        std::string phoneNumber;
-        uint8_t type;              /// Usually contains on of values defined in CallType
-        std::string phoneBookName; /// This field is defined in the AT+CLCC command response but our modem is
-                                   /// not returning it.
-
-        ModemCall()  = delete;
-        ~ModemCall() = default;
-        ModemCall(const std::string str);
-
-        friend std::ostream &operator<<(std::ostream &out, const ModemCall &call);
-    };
-} // namespace ModemCall
-
 namespace CellularCall
 {
     enum class Forced : bool
@@ -117,8 +62,6 @@ namespace CellularCall
             this->call.name        = number.getEntered(); // temporary set number as name
             this->call.contactId   = 0;
         }
-
-        ~CellularCall() = default;
 
         void setStartCallAction(const std::function<CalllogRecord(const CalllogRecord &rec)> callAction)
         {

@@ -28,7 +28,6 @@ class CellularMessage : public sys::DataMessage
 {
   public:
     CellularMessage(MessageType messageType) : sys::DataMessage(messageType){};
-    virtual ~CellularMessage(){};
 };
 
 class CellularCallMessage : public CellularMessage
@@ -256,8 +255,6 @@ class CellularRequestMessage : public CellularMessage
 {
   public:
     CellularRequestMessage(MessageType messageType, std::string data = "") : CellularMessage(messageType), data(data)
-    {}
-    ~CellularRequestMessage()
     {}
 
     std::string data;
