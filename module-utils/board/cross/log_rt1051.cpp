@@ -32,12 +32,16 @@ namespace Log
 
         loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
                                            loggerBufferSizeLeft(),
-                                           "%-5s [%s] %s:%s:%d: ",
+                                           "%s%-5s %s[%s] %s%s:%s:%d:%s ",
+                                           logColors->levelColors[level].data(),
                                            level_names[level],
+                                           logColors->serviceNameColor.data(),
                                            getTaskDesc(),
+                                           logColors->callerInfoColor.data(),
                                            file,
                                            function,
-                                           line);
+                                           line,
+                                           logColors->resetColor.data());
     }
 
     bool Logger::filterLogs(logger_level level)
