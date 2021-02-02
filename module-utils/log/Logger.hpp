@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <board.h>
 #include "log.hpp"
+#include "log_colors.hpp"
 #include <map>
 #include <mutex.hpp>
 #include <string>
@@ -21,11 +22,13 @@ namespace Log
     class Logger
     {
       public:
+        void enableColors(bool enable);
         [[nodiscard]] static Logger &get()
         {
             static Logger logger;
             return logger;
         }
+        void init();
         auto log(Device device, const char *fmt, va_list args) -> int;
         void log(logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args);
         auto logAssert(const char *fmt, va_list args) -> int;
@@ -61,6 +64,7 @@ namespace Log
         BaseType_t bt;
         cpp_freertos::MutexStandard mutex;
         logger_level level{LOGTRACE};
+        const LogColors *logColors            = &logColorsOff;
         char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
         size_t loggerBufferCurrentPos         = 0;
 
