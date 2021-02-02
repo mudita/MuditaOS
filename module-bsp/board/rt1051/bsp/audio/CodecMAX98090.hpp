@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_CODECMAX98090_HPP
@@ -38,6 +38,33 @@ class CodecParamsMAX98090 : public CodecParams
     {
         Mono,
         Stereoq
+    };
+
+    enum class DigitalMicrophoneCompensationFilter
+    {
+        DMIC_COMP_6 = 6,
+        DMIC_COMP_7 = 7,
+        DMIC_COMP_8 = 8
+    };
+
+    enum class RecordPathDigitalFineGain
+    {
+        Gain_p3dB = 0,
+        Gain_p2dB,
+        Gain_p1dB,
+        Gain_0dB,
+        Gain_n1dB0,
+        Gain_n2dB,
+        Gain_n3dB,
+        Gain_n4dB,
+        Gain_n5dB,
+        Gain_n6dB,
+        Gain_n7dB,
+        Gain_n8dB,
+        Gain_n9dB,
+        Gain_n10dB,
+        Gain_n11dB,
+        Gain_n12dB
     };
 
     static SampleRate ValToSampleRate(uint32_t rate)
