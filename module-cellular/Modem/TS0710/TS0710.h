@@ -1,8 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef _TS0710_H
-#define _TS0710_H
+#pragma once
 
 /*
 5.2.6 Basic Option
@@ -190,6 +189,9 @@ repeated until a response is obtained or action is taken by a higher layer.
 */
 
 #include <vector>
+#include <queue>
+#include <string>
+#include <module-bsp/bsp/cellular/bsp_cellular.hpp>
 
 #include "TS0710_START.h"
 #include "TS0710_CLOSE.h"
@@ -197,14 +199,13 @@ repeated until a response is obtained or action is taken by a higher layer.
 #include "TS0710_TEST.h"
 #include "TS0710_WAKEUP.h"
 #include "TS0710_types.h"
-#include "DLC_channel.h"
 #include "TS0710_Frame.h"
+
+#include "DLC_channel.h"
 #include "Modem/ATParser.hpp"
 #include "Service/Service.hpp"
-#include <queue>
-#include <string>
 
-#include "module-bsp/bsp/cellular/bsp_cellular.hpp"
+#include <message_buffer.h>
 
 #if defined(__cplusplus)
 extern "C"
@@ -221,7 +222,7 @@ namespace bsp
     class Cellular;
 }
 
-void workerTaskFunction(void *ptr);
+[[noreturn]] void workerTaskFunction(void *ptr);
 
 class TS0710
 {
@@ -233,6 +234,7 @@ class TS0710
         Notifications = 2,
         Data          = 3,
     };
+
     static std::string name(enum Channel name)
     {
         switch (name) {
@@ -247,13 +249,13 @@ class TS0710
         }
         return "";
     }
+
     enum class Mode
     {
         AT,         /// AT raw text mode
         CMUX_SETUP, /// Modem is switching from AT to CMUX
         CMUX        /// multiplexer mode enabled
     };
-    void setMode(Mode mode);
 
     enum class ConfState
     {
@@ -263,15 +265,16 @@ class TS0710
         PowerUp
     };
 
+    void setMode(Mode mode);
+
   private:
     Mode mode = Mode::AT;
     std::vector<DLC_channel *> channels;
-    friend void workerTaskFunction(void *ptr);
-    // worker's task handle
-    xTaskHandle taskHandle      = nullptr;
+
     const uint32_t taskPriority = 0;
+    xTaskHandle taskHandle      = nullptr;
+
     std::unique_ptr<bsp::Cellular> pv_cellular;
-    PortSpeed_e pv_portSpeed;
     ATParser *parser;
 
     int CloseMultiplexer();
@@ -290,7 +293,6 @@ class TS0710
     sys::Service *pv_parent;
 
     DLC_channel::Callback_t controlCallback = nullptr;
-    std::queue<uint8_t> RXFifo;
 
     enum class EchoCancellerStrength
     {
@@ -299,7 +301,14 @@ class TS0710
         Aggressive,
         Tuned
     };
-    TS0710::ConfState SetupEchoCanceller(EchoCancellerStrength strength);
+
+    friend void workerTaskFunction(void *ptr);
+    ConfState setupEchoCanceller(EchoCancellerStrength strength);
+    void parseCellularResultCMUX(bsp::cellular::CellularDMAResultStruct &result);
+    size_t flushReceiveData();
+    void processData(bsp::cellular::CellularDMAResultStruct &result);
+    void processError(bsp::cellular::CellularDMAResultStruct &result);
+    void sendFrameToChannel(bsp::cellular::CellularResult &resultStruct);
 
   public:
     /// @brief get Channel by index
@@ -316,31 +325,22 @@ class TS0710
         return nullptr;
     }
 
-    DLC_channel *OpenChannel(Channel chanel_val)
+    std::vector<DLC_channel *> &getChannels()
     {
-        DLC_channel *channel = new DLC_channel(static_cast<DLCI_t>(chanel_val), name(chanel_val), pv_cellular.get());
+        return channels;
+    }
+
+    DLC_channel *OpenChannel(Channel channelIndex)
+    {
+        auto *channel = new DLC_channel(static_cast<DLCI_t>(channelIndex), name(channelIndex), pv_cellular.get());
         channels.push_back(channel);
+
+        if (!channel->init()) {
+            channels.pop_back();
+            delete channel;
+        }
+
         return channels.back();
-    }
-
-    void CloseChannel(unsigned index)
-    {
-        if (index >= channels.size()) {
-            LOG_ERROR("Wrong channel index");
-            return;
-        }
-        delete channels[index];
-        channels.erase(channels.begin() + index);
-    }
-
-    void CloseChannel(const std::string &name)
-    {
-        for (size_t i = 0; i < channels.size(); i++) {
-            if (channels[i]->getName() == name) {
-                delete channels[i];
-                channels.erase(channels.begin() + 1);
-            }
-        }
     }
 
     void CloseChannels()
@@ -357,14 +357,12 @@ class TS0710
     {
         return static_cast<DLCI_t>(channels.size() == 0 ? 0 : channels.size() - 1);
     }
+
     ConfState BaudDetectOnce();
     ConfState BaudDetectProcedure(uint16_t timeout_s = 30);
     ConfState ConfProcedure();
     ConfState AudioConfProcedure();
     ConfState StartMultiplexer();
-
-    size_t FlushReceiveData();
-    ssize_t ReceiveData(std::vector<uint8_t> &data, uint32_t timeout);
 
     bsp::Cellular *getCellular()
     {
@@ -427,6 +425,8 @@ class TS0710
     TS0710(PortSpeed_e portSpeed, sys::Service *parent);
     TS0710() = delete;
     ~TS0710();
+    void Init(PortSpeed_e portSpeed, sys::Service *parent);
+    void SetStartParams(PortSpeed_e portSpeed);
     void SelectAntenna(bsp::cellular::antenna antenna);
     bsp::cellular::antenna GetAntenna();
     // Add error handling - only for Advanced mode. Leave for now
@@ -441,8 +441,6 @@ class TS0710
     void EnterSleepMode(void);
     void ExitSleepMode(void);
     void RegisterCellularDevice(void);
-    [[nodiscard]] auto GetLastCommunicationTimestamp() const noexcept -> TickType_t;
-    [[nodiscard]] auto IsCellularInSleepMode() const noexcept -> bool;
+    [[nodiscard]] auto getLastCommunicationTimestamp() const noexcept -> TickType_t;
+    [[nodiscard]] auto isCellularInSleepMode() const noexcept -> bool;
 };
-
-#endif //_TS0710_H

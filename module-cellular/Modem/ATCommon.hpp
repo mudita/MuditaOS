@@ -7,6 +7,7 @@
 #include <at/ErrorCode.hpp>
 #include <mutex.hpp>
 #include <task.h>
+#include <message_buffer.h>
 #include "BaseChannel.hpp"
 
 namespace sys
@@ -16,7 +17,37 @@ namespace sys
 
 namespace at
 {
-    constexpr auto delimiter = "\r\n"; /// use std::strlen()
+    constexpr auto delimiter                         = "\r\n"; /// use std::strlen()
+    constexpr auto defaultBufferTimeoutMs            = std::chrono::milliseconds{50};
+    inline constexpr size_t defaultReceiveBufferSize = 128; // receiveBuffer size used for single message processing
+    inline constexpr size_t defaultMessageBufferSize =
+        defaultReceiveBufferSize * 2; // MessageBuffer size for passing data between tasks
+
+    struct AwaitingResponseFlag
+    {
+      private:
+        cpp_freertos::MutexStandard mutex;
+        bool isWaiting = false;
+
+      public:
+        void set()
+        {
+            cpp_freertos::LockGuard lock{mutex};
+            isWaiting = true;
+        }
+
+        void clear()
+        {
+            cpp_freertos::LockGuard lock{mutex};
+            isWaiting = false;
+        }
+
+        bool state()
+        {
+            cpp_freertos::LockGuard lock{mutex};
+            return isWaiting;
+        }
+    };
 
     class Channel : public BaseChannel
     {
@@ -25,8 +56,10 @@ namespace at
         const std::array<char, 3> validTerm = {cmdSeparator, ',', '='};
         [[nodiscard]] auto formatCommand(const std::string &cmd) const -> std::string;
 
+        MessageBufferHandle_t responseBuffer = nullptr;
+        std::unique_ptr<uint8_t> receiveBuffer;
+        AwaitingResponseFlag awaitingResponseFlag;
         cpp_freertos::MutexStandard mutex;
-        TaskHandle_t blockedTaskHandle = nullptr;
 
       public:
         static const std::string OK;
@@ -41,17 +74,19 @@ namespace at
         // const std::string Channel::RING = "RING";
         // const std::string Channel::NO_DIALTONE = "NO DIALTONE";
 
+        explicit Channel(uint8_t *receiveBuffer)
+            : receiveBuffer{receiveBuffer} {
+
+              };
+
         /// waits till ok or timeout
         virtual auto cmd(const std::string &cmd,
                          std::chrono::milliseconds timeout = at::default_timeout,
                          size_t rxCount                    = 0) -> Result final;
         virtual auto cmd(const at::AT &at) -> Result final;
         virtual auto cmd(const at::Cmd &at) -> Result final;
-        virtual void cmd_log(std::string cmd, const Result &result, uint32_t timeout) final;
-        virtual auto ProcessNewData(sys::Service *service) -> int
-        {
-            return 0;
-        }
-    };
+        virtual void cmdLog(std::string cmd, const Result &result, std::chrono::milliseconds timeout) final;
 
-}; // namespace at
+        Result checkResult(bsp::cellular::CellularResultCode cellularResult);
+    };
+} // namespace at
