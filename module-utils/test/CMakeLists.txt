@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+﻿cmake_minimum_required(VERSION 3.12)
 
 # Phone number tests
 add_catch2_executable(
@@ -102,15 +102,15 @@ add_catch2_executable(
 #)
 
 #  time display tests
-#add_catch2_executable(
-#    NAME
-#        utils-time_display
-#    SRCS
-#        unittest_TimeRangeParser.cpp
-#    LIBS
-#        module-utils
-#        module-db
-#)
+add_catch2_executable(
+    NAME
+        utils-time_display
+    SRCS
+        unittest_TimeRangeParser.cpp
+    LIBS
+        module-utils
+        module-db
+)
 
 ###########################################
 # Log functional tests project

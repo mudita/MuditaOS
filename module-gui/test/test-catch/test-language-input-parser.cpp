@@ -1,8 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
 #include <Translator.hpp>
+
+#include <vfs.hpp>
+
+extern class vfs vfs;
 
 TEST_CASE("Parsing English input language")
 {
@@ -12,6 +16,8 @@ TEST_CASE("Parsing English input language")
 
     SECTION("Getting charKey from lower letters")
     {
+        vfs.Init();
+
         key.key_code = bsp::KeyCodes::NumericKey1;
         REQUIRE(translator.handle(key, "English_lower") == 46);
         key.key_code = bsp::KeyCodes::NumericKey2;
@@ -36,6 +42,8 @@ TEST_CASE("Parsing English input language")
 
     SECTION("Getting charKey from upper letters")
     {
+        vfs.Init();
+
         key.key_code = bsp::KeyCodes::NumericKey1;
         REQUIRE(translator.handle(key, "English_upper") == 46);
         key.key_code = bsp::KeyCodes::NumericKey2;
@@ -61,6 +69,8 @@ TEST_CASE("Parsing English input language")
 
 TEST_CASE("Parsing numeric keyboard")
 {
+    vfs.Init();
+
     gui::KeyInputMappedTranslation translator;
     RawKey key;
 
@@ -88,6 +98,8 @@ TEST_CASE("Parsing numeric keyboard")
 
 TEST_CASE("Getting charKey after clicking button twice")
 {
+    vfs.Init();
+
     gui::KeyInputMappedTranslation translator;
     gui::KeyBaseTranslation baseTranslation;
     RawKey key;

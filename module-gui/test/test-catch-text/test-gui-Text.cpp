@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BoundingBox.hpp"
@@ -201,16 +201,15 @@ TEST_CASE("handle input mode ABC/abc/1234")
     }
 }
 
-// this test hangs - disabling
-// TEST_CASE("handle longpress for digit in ABC mode")
-//{
-//    auto text  = gui::TestText();
-//    auto str   = text.getText() + "1";
-//    auto key_1 = gui::InputEvent({}, gui::InputEvent::State::keyReleasedLong, gui::KeyCode::KEY_1);
-//    text.setInputMode(new InputMode({InputMode::ABC}));
-//    text.onInput(key_1);
-//    REQUIRE(str == text.getText());
-//}
+TEST_CASE("handle longpress for digit in ABC mode")
+{
+    auto text  = gui::TestText();
+    auto str   = text.getText() + "1";
+    auto key_1 = gui::InputEvent({}, gui::InputEvent::State::keyReleasedLong, gui::KeyCode::KEY_1);
+    text.setInputMode(new InputMode({InputMode::ABC}));
+    text.onInput(key_1);
+    REQUIRE(str == text.getText());
+}
 
 TEST_CASE("handle text expand")
 {

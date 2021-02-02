@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef DATECOMMON_H
@@ -176,7 +176,7 @@ inline std::string TimePointToString(const TimePoint &tp, date::months months)
         }
     }
     timePoint += tpHourMinuteSecond;
-    return date::format("%F %T", time_point_cast<seconds>(timePoint));
+    return date::format("%F %T", std::chrono::time_point_cast<std::chrono::seconds>(timePoint));
 }
 
 inline std::string TimePointToString(const TimePoint &tp, date::years years)
@@ -187,7 +187,7 @@ inline std::string TimePointToString(const TimePoint &tp, date::years years)
     yearMonthDay += years;
     TimePoint timePoint = date::sys_days{yearMonthDay.year() / yearMonthDay.month() / yearMonthDay.day()};
     timePoint += tpHourMinuteSecond;
-    return date::format("%F %T", time_point_cast<seconds>(timePoint));
+    return date::format("%F %T", std::chrono::time_point_cast<std::chrono::seconds>(timePoint));
 }
 
 inline std::string TimePointToLocalizedDateString(const TimePoint &tp, const std::string format = "")

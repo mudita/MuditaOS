@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -130,7 +130,6 @@ TEST_CASE("Events Record tests")
                                .provider_iCalUid = "test6"};
 
     auto check_record = [](const EventsRecord &actual, const EventsRecord &expected) {
-        // CHECK(actual.ID == expected.ID);
         CHECK(actual.UID == expected.UID);
         CHECK(actual.title == expected.title);
         CHECK(TimePointToString(actual.date_from) == TimePointToString(expected.date_from));
