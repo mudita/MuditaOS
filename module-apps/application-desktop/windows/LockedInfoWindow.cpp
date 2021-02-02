@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LockedInfoWindow.hpp"
@@ -40,7 +40,7 @@ bool LockedInfoWindow::onInput(const InputEvent &inputEvent)
 {
     if (inputEvent.isShortPress()) {
         if (inputEvent.keyCode == KeyCode::KEY_LF && bottomBar->isActive(BottomBar::Side::LEFT)) {
-            app::manager::Controller::sendAction(application, app::manager::actions::ShowEmergencyContacts);
+            app::manager::Controller::sendAction(application, app::manager::actions::EmergencyDial);
             return true;
         }
         else if (inputEvent.keyCode == KeyCode::KEY_RF && bottomBar->isActive(BottomBar::Side::RIGHT)) {
