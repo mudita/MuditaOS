@@ -14,6 +14,7 @@
 #include "NetworkSettings.hpp"
 #include "service-cellular/RequestFactory.hpp"
 #include "service-cellular/CellularRequestHandler.hpp"
+#include "SystemManager/messages/SentinelRegistrationMessage.hpp"
 
 #include <Audio/AudioCommon.hpp>
 #include <BaseInterface.hpp>
@@ -245,6 +246,15 @@ sys::ReturnCodes ServiceCellular::InitHandler()
         settings::Cellular::apn_list,
         [this](const std::string &value) { apnListChanged(value); },
         ::settings::SettingsScope::Global);
+
+    cpuSentinel = std::make_shared<sys::CpuSentinel>(serviceName, this);
+
+    auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+    bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
+
+    // temporarily limit the minimum CPU frequency
+    // due to problems with the UART of the GSM modem
+    cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_4);
 
     return sys::ReturnCodes::Success;
 }
