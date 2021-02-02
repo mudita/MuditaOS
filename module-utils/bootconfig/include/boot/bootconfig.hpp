@@ -60,10 +60,10 @@ namespace boot
         {
             return m_os_root_path;
         }
-        void updateTimestamp();
 
       private:
         bool loadBootConfig(const std::filesystem::path &bootJsonPath);
+        void updateBootJson(const std::filesystem::path &bootJsonPath);
         std::filesystem::path getCurrentBootJSON();
 
       private:
