@@ -233,7 +233,7 @@ namespace at
             {AT::QIACT, {"AT+QIACT", 150000ms}},
             {AT::QIDEACT, {"AT+QIDEACT", 40000ms}},
             {AT::QRXGAIN, {"AT+QRXGAIN=40000", default_timeout}},
-            {AT::CLVL, {"AT+CLVL=1", default_timeout}},
+            {AT::CLVL, {"AT+CLVL=3", default_timeout}},
             {AT::QMIC, {"AT+QMIC=15000,15000", default_timeout}}};
 
         if (fact.count(at) != 0u) {

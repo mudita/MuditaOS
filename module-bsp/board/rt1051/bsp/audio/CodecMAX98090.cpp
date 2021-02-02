@@ -203,20 +203,24 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             digconf.dmicfreq = 0;
             switch (currentParams.GetSampleRateVal()) {
             case 8000:
-                digconf.dmiccomp = 7;
+                digconf.dmiccomp =
+                    static_cast<uint8_t>(CodecParamsMAX98090::DigitalMicrophoneCompensationFilter::DMIC_COMP_7);
                 break;
             case 16000:
-                digconf.dmiccomp = 8;
+                digconf.dmiccomp =
+                    static_cast<uint8_t>(CodecParamsMAX98090::DigitalMicrophoneCompensationFilter::DMIC_COMP_8);
                 break;
             case 32000:
             case 44100:
             case 48000:
-                digconf.dmiccomp = 6;
+                digconf.dmiccomp =
+                    static_cast<uint8_t>(CodecParamsMAX98090::DigitalMicrophoneCompensationFilter::DMIC_COMP_6);
                 break;
             case 96000:
             case 0:
             default:
-                digconf.dmiccomp = 6;
+                digconf.dmiccomp =
+                    static_cast<uint8_t>(CodecParamsMAX98090::DigitalMicrophoneCompensationFilter::DMIC_COMP_6);
                 break;
             }
 
@@ -407,7 +411,7 @@ CodecRetCode CodecMAX98090::SetInputGain(const float gain)
     }
 
     max98090_reg_lrec_dig_gain_t lgain = {0};
-    lgain.avl                          = 0x0;             // fine gain - 0x0: 0dB
+    lgain.avl = static_cast<uint8_t>(CodecParamsMAX98090::RecordPathDigitalFineGain::Gain_p3dB); // fine gain
     lgain.avlg                         = gainToSet * 0.7; // coarse gain (0.7 used as scaling factor)
 
     i2cAddr.subAddress = MAX98090_REG_LREC_DIG_GAIN;
@@ -415,7 +419,7 @@ CodecRetCode CodecMAX98090::SetInputGain(const float gain)
 
     // coarse gain - 18dB, fine gain - 0dB
     max98090_reg_rrec_dig_gain_t rgain = {0};
-    rgain.avr                          = 0x0;             // fine gain - 0x0: 0dB
+    rgain.avr = static_cast<uint8_t>(CodecParamsMAX98090::RecordPathDigitalFineGain::Gain_p3dB); // fine gain
     rgain.avrg                         = gainToSet * 0.7; // coarse gain (0.7 used as scaling factor)
 
     i2cAddr.subAddress = MAX98090_REG_RREC_DIG_GAIN;
