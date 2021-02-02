@@ -16,29 +16,21 @@
 #include <array>
 #include <Utils.hpp>
 
+#include <fstream>
+
+#include <purefs/filesystem_paths.hpp>
+#include <sys/mount.h>
+#include <sys/statvfs.h>
+
 namespace boot
 {
     namespace
     {
-        bool writeToFile(const std::filesystem::path &file, const std::string &stringToWrite)
-        {
-            auto fp = fopen(file.c_str(), "w");
-            if (!fp) {
-                return false;
-            }
-
-            size_t dataWritten = fwrite(stringToWrite.c_str(), stringToWrite.length(), 1, fp);
-
-            fclose(fp);
-
-            return dataWritten == 1;
-        }
-
         bool updateFileCRC32(const std::filesystem::path &file)
         {
             auto fp = fopen(file.c_str(), "r");
             if (!fp) {
-                LOG_WARN("updateFileCRC32 can't open file %s for write", file.c_str());
+                LOG_WARN("updateFileCRC32 can't open file %s for read", file.c_str());
                 return false;
             }
             auto fpCloseAct = gsl::finally([fp] { fclose(fp); });
@@ -52,13 +44,13 @@ namespace boot
                 return false;
             }
 
-            std::array<char, boot::consts::crc_char_size> crc32Buf;
+            std::array<char, boot::consts::crc_char_size + 1> crc32Buf;
 
             if (int written = sprintf(crc32Buf.data(), "%08" PRIX32, fileCRC32);
-                written != boot::consts::crc_char_size - 1) {
+                written != boot::consts::crc_char_size) {
                 LOG_INFO("updateFileCRC32 can't prepare string for crc32, sprintf returned %d instead of %d",
                          written,
-                         boot::consts::crc_char_size - 1);
+                         boot::consts::crc_char_size);
                 return false;
             }
 
@@ -117,10 +109,9 @@ namespace boot
             }
             auto fpCloseAct = gsl::finally([fp] { fclose(fp); });
 
-            std::array<char, boot::consts::crc_char_size> crcBuf;
-
-            if (size_t readSize = std::fread(crcBuf.data(), 1, boot::consts::crc_char_size, fp);
-                readSize != boot::consts::crc_char_size) {
+            std::array<char, boot::consts::crc_char_size + 1> crcBuf;
+            size_t readSize = std::fread(crcBuf.data(), 1, boot::consts::crc_char_size, fp);
+            if (readSize != boot::consts::crc_char_size) {
                 LOG_ERROR("verifyCRC fread on %s returned different size then %d [%zu]",
                           crcFilePath.c_str(),
                           boot::consts::crc_char_size,
@@ -128,7 +119,8 @@ namespace boot
                 return false;
             }
 
-            const unsigned long crc32Read = strtoull(crcBuf.data(), nullptr, boot::consts::crc_radix);
+            crcBuf[boot::consts::crc_char_size] = 0;
+            const unsigned long crc32Read       = strtoull(crcBuf.data(), nullptr, boot::consts::crc_radix);
 
             LOG_INFO("verifyCRC read %s string:\"%s\" hex:%08lX", crcFilePath.c_str(), crcBuf.data(), crc32Read);
             return verifyCRC(file, crc32Read);
@@ -137,6 +129,7 @@ namespace boot
 
     BootConfig::BootConfig() : m_os_root_path(purefs::dir::getRootDiskPath())
     {}
+
     json11::Json BootConfig::to_json() const
     {
         return json11::Json::object{
@@ -152,6 +145,7 @@ namespace boot
                                   {boot::json::os_git_branch, std::string(GIT_BRANCH)}}},
             {boot::json::bootloader, json11::Json::object{{boot::json::os_version, m_bootloader_version}}}};
     }
+
     int BootConfig::load()
     {
         return !loadBootConfig(getCurrentBootJSON());
@@ -186,22 +180,45 @@ namespace boot
         return 0;
     }
 
-    void BootConfig::updateTimestamp()
+    void BootConfig::updateBootJson(const std::filesystem::path &bootJsonPath)
     {
         m_timestamp = utils::time::Timestamp().str("%c");
-        LOG_INFO("vfs::updateTimestamp \"%s\"", to_json().dump().c_str());
 
-        if (writeToFile(m_boot_json, to_json().dump())) {
-            updateFileCRC32(m_boot_json);
+        struct statvfs stat;
+        if (statvfs(purefs::dir::getRootDiskPath().c_str(), &stat))
+            LOG_ERROR("%s: Failed to stat vfs", bootJsonPath.c_str());
+
+        auto remount_ro{true};
+        auto flags = stat.f_flag & ~MS_RDONLY;
+        if (mount(NULL, purefs::dir::getRootDiskPath().c_str(), NULL, flags | MS_REMOUNT, NULL)) {
+            LOG_WARN("%s: Failed to remount filesystem R/W - it's fine for a Linux FS", bootJsonPath.c_str());
+            remount_ro = false;
         }
+
+        LOG_INFO("Writing new %s..", bootJsonPath.c_str());
+        std::ofstream file(bootJsonPath);
+        if (file.is_open()) {
+            file << to_json().dump() << std::flush;
+            if (!file.good())
+                LOG_ERROR("%s: Error while writing a file", bootJsonPath.c_str());
+            file.close();
+            updateFileCRC32(bootJsonPath);
+        }
+        else {
+            LOG_ERROR("%s: Failed to open file", bootJsonPath.c_str());
+        }
+
+        if (remount_ro)
+            if (mount(NULL, purefs::dir::getRootDiskPath().c_str(), NULL, flags | MS_RDONLY | MS_REMOUNT, NULL))
+                LOG_ERROR("%s: Failed to remount filesystem back to RO", bootJsonPath.c_str());
     }
+
     bool BootConfig::loadBootConfig(const std::filesystem::path &bootJsonPath)
     {
         std::string parseErrors  = "";
         std::string jsonContents = loadFileAsString(bootJsonPath);
 
-        LOG_INFO("vfs::getOSRootFromJSON parsing %s", bootJsonPath.c_str());
-        LOG_INFO("vfs::getOSRootFromJSON \"%s\"", jsonContents.c_str());
+        LOG_INFO("parsed %s: \"%s\"", bootJsonPath.c_str(), jsonContents.c_str());
 
         m_boot_json_parsed = json11::Json::parse(jsonContents, parseErrors);
 
@@ -224,18 +241,19 @@ namespace boot
             m_boot_json    = bootJsonPath;
             m_timestamp    = utils::time::Timestamp().str("%c");
             m_os_version   = std::string(VERSION);
-            LOG_WARN("vfs::getOSRootFromJSON failed to parse %s: \"%s\"", bootJsonPath.c_str(), parseErrors.c_str());
+            LOG_WARN("%s failed to parse %s: \"%s\"", __FUNCTION__, bootJsonPath.c_str(), parseErrors.c_str());
             return false;
         }
     }
+
     std::filesystem::path BootConfig::getCurrentBootJSON()
     {
-        if (readAndVerifyCRC(purefs::file::boot_json)) {
-            return purefs::createPath(purefs::dir::getRootDiskPath(), purefs::file::boot_json);
+        auto boot_json_path = purefs::dir::getRootDiskPath() / purefs::file::boot_json;
+        if (!readAndVerifyCRC(boot_json_path)) {
+            LOG_INFO("CRC check failed on %s", boot_json_path.c_str());
+            // replace broken .boot.json with a default one
+            updateBootJson(boot_json_path);
         }
-        LOG_INFO("vfs::getCurrentBootJSON crc check failed on %s", purefs::file::boot_json);
-        // replace broken .boot.json with a default one
-        writeToFile(purefs::dir::getRootDiskPath() / purefs::file::boot_json, to_json().dump());
-        return purefs::createPath(purefs::dir::getRootDiskPath(), purefs::file::boot_json);
+        return boot_json_path;
     }
 } // namespace boot

@@ -21,7 +21,6 @@ namespace
 
     constexpr const char *LINUX_PATHS[]{"/dev/",
                                         "/etc/",
-                                        "/sys/.boot.json",
                                         "/usr/share",
                                         "/run/user",
                                         "/home",
