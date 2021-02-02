@@ -1,0 +1,320 @@
+# Enabled test list
+# test format
+# TESTS_LIST["catch2-<binary-name>"]=" 
+#        test 1;
+#        test 1; 
+#        test 3;
+#"
+# 
+# each test is in separate line
+# to disable test just rem it by putting # in front of it
+# 
+declare -A TESTS_LIST
+
+TESTS_LIST["catch2-audio-test"]="
+    Test audio tags;
+    Audio settings string creation;
+    Test AudioMux;
+"
+#---------
+TESTS_LIST["catch2-calculator"]="
+    Calculator utilities;
+"
+#---------
+TESTS_LIST["catch2-callback-storage-test"]="
+    CallbackStorageTests;
+"
+#---------
+TESTS_LIST["catch2-cellular-datatransfer"]="
+    Quectel AT DataTransfer commands;
+"
+#---------
+TESTS_LIST["catch2-cellular-mmi"]="
+    MMI requests;
+"
+#---------
+TESTS_LIST["catch2-cellular-response"]="
+    Response COPS;
+    Response CLIR;
+    Response CLIP;
+    Response CLCK;
+    Response CCWA?;
+"
+#---------
+TESTS_LIST["catch2-cellular-simcard"]="
+    SimCard functionality test;
+"
+#---------
+TESTS_LIST["catch2-cellular-URC"]="
+    +Qind: csq;
+    +Qind: FOTA;
+    +Cusd;
+    +Ctze;
+    +Creg;
+    +Cmti;
+    +CLIP;
+    +CPIN;
+    POWERED DOWN;
+    Urc RESPONSE;
+    +Qind: SMS DONE;
+    +Qiurc: TCP Context and connection message;
+"
+#---------
+TESTS_LIST["catch2-commands-queue-tests"]="
+    DrawCommandsQueueTests;
+"
+#---------
+TESTS_LIST["catch2-context-pool-tests"]="
+    ContextPoolTests;
+"
+#---------
+TESTS_LIST["catch2-db"]="
+    SMS Table tests;
+    Threads Table tests;
+    Contacts Table tests;
+    Contacts Name Table tests;
+    Contacts Number Table tests;
+    Contacts Ringtones Table tests;
+    Contacts address Table tests;
+    Contact Groups tests;
+    [Groups];
+    Alarms Table tests;
+    SMS Templates Table tests;
+    Calllog Table tests;
+#    Notifications Table tests;
+#    Events Table tests;
+    Notes Record tests;
+    Notes Table tests;
+    Calllog Record tests;
+    Contact Record db tests;
+    Test contact name formatting;
+    Test converting contact data to string;
+    Contact record numbers update;
+    SMS Record tests;
+    Thread Record tests;
+    Alarms Record tests;
+    SMS templates Record tests;
+#    Notifications Record tests;
+    Events Record tests;
+    Query interface;
+"
+#---------
+TESTS_LIST["catch2-db-initializer"]="
+    Create and destroy simple database;
+    Database initialization scripts;
+"
+#---------
+TESTS_LIST["catch2-gui"]="
+    Test BoundingBox intersect;
+    Are fonts loaded;
+    Draw window with labels;
+    Draw window with box layouts;
+    test context size and position;
+    insertContextTest;
+    gui::Item on input flow test;
+    gui::Window on input flow test;
+    Set size tests;
+    Parsing English input language;
+    Parsing numeric keyboard;
+    Getting charKey after clicking button twice;
+"
+#---------
+TESTS_LIST["catch2-gui-text"]="
+    Text ctor;
+    Text drawLines;
+    Text buildDrawList;
+    handle input mode ABC/abc/1234;
+    handle longpress for digit in ABC mode;
+    handle text expand;
+    handle newline;
+    handle text block - moved cursor to end;
+    Text backup and restore tests;
+    Text addition bounds - text sings count restricted;
+    Text addition bounds - text widget size restricted;
+    Text addition bounds - text widget line size restricted;
+    Text addition bounds - multiple limits tests;
+    TextBlock Ctor/Dtor ;
+    Text block - set/update/get text;
+    Text block - remove text;
+    Text block - get width;
+    Text BlockCursor Ctor/Dtor ;
+    TextDocument <-> BlockCursor fencing tests;
+    TextDocument <-> BlockCursor operators: +, ++, -, -- tests;
+    add Char to empty;
+    add Char;
+    remove Char in empty;
+    remove Char;
+    add newline;
+    add newline at the end;
+    atEOL();
+    operator-> for Text block with text;
+    operator* for TextBlock;
+    TextDocument ctor;
+    TextDocument getBlockCursor;
+    TextLine - ctor;
+    TextLine - non fitting text;
+    TextLine - multiple styles text;
+    TextLine - elements sizes checkup;
+    TextParse;
+    Testo Font;
+    TextLineCursor - navigation without scroll;
+    TextLineCursor - navigation with scroll;
+    TextLineCursor - addition and deletion with scroll;
+"
+#---------
+TESTS_LIST["catch2-service-db"]="
+    DB_API;
+    Settings Messages;
+#    FileIndexer;
+"
+#---------
+TESTS_LIST["catch2-service-db-settings"]="
+    SettingsApi;
+"
+#---------
+TESTS_LIST["catch2-service-desktop"]="
+    System Update Tests;
+    Parser Test;
+    DB Helpers test - json decoding;
+    DB Helpers test - json encoding (contacts);
+    DB Helpers test - json encoding (messages);
+    Context class test;
+    Endpoint Factory test;
+"
+#---------
+TESTS_LIST["catch2-service-evtmgr"]="
+    ScreenLightControlFunctions;
+"
+#---------
+TESTS_LIST["catch2-unittest_parse_CSCA"]="
+    CSCA parser test;
+    CSCA set data;
+"
+#---------
+TESTS_LIST["catch2-utils"]="
+    Split tests;
+    toNumeric tests;
+    findAndReplaceAll tests;
+    Converts enum to string;
+    Get value from string;
+    Swap endianness;
+    Floating point to string;
+    Fill leading digit in string;
+    Read file length;
+"
+#---------
+TESTS_LIST["catch2-utils-clipboard"]="
+    Clipboard;
+"
+#---------
+TESTS_LIST["catch2-utils-duration"]="
+    Duration - creation;
+    Duration - arithemtics;
+    Duration - comparision;
+    Duration - display;
+"
+#---------
+TESTS_LIST["catch2-utils-loggerbuffer"]="
+    LoggerBuffer tests;
+"
+#---------
+TESTS_LIST["catch2-utils-math"]="
+    Math;
+"
+#---------
+TESTS_LIST["catch2-utils-phonenumber"]="
+    PhoneNumber - parsing;
+    PhoneNumber - formatting;
+    PhoneNumber - views;
+    PhoneNumber - equality;
+    PhoneNumber - matching;
+    PhoneNumber - record validation;
+    Number matcher - basics;
+    Number matcher - match incoming (full list);
+    Number matcher - match incoming (loose);
+"
+#---------
+TESTS_LIST["catch2-utils-ucs2"]="
+    UCS2 to UTF8 conversion;
+    UCS2 from UTF8 emoji 😁;
+    UCS2 from UTF8 emoji 🍣;
+    UTF8 to UCS2 conversion;
+    TEST special input characters from UTF8;
+    TEST special input characters from std::string;
+    UTF8 emoji 🍣 from UCS2 code;
+    UTF8 emoji 😁 and text ęą from UCS2 code;
+    UTF8 emoji 😁 and text abc from UCS2 code;
+    UCS2 to UTF8 long string conversion;
+    UTF8 to UCS2 long string conversion;
+"
+#---------
+TESTS_LIST["catch2-utils-utf8"]="
+    UTF8: operator index returns value;
+    UTF8: operator index exceeds string size;
+    UTF8: operator== returns properly;
+    UTF8: substr returns empty string when zero length is passed;
+    UTF8: substr returns empty string when length is exceeded;
+    UTF8: substr returns proper begin char;
+    UTF8: substr returns proper string length;
+    UTF8: find returns npos if not found;
+    UTF8: find returns npos if pos exceeds string length;
+    UTF8: find returns position of passed string;
+    UTF8: find returns position of passed string when pos is passed;
+    UTF8: findLast returns npos if not found;
+    UTF8: findLast returns npos if pos exceeds string length;
+    UTF8: findLast returns position of passed string;
+    UTF8: findLast returns position of passed string when pos is passed;
+    UTF8: split returns empty object if idx exceeds string length;
+    UTF8: split returns propper string;
+    UTF8: split strings have propper length after split;
+    UTF8: split summary length is equal after split;
+    UTF8: getLine returns empty string if its not line;
+    UTF8: getLine returns proper string when line ends with n;
+    UTF8: getLine returns proper string when line ends with r;
+    UTF8: removeChar returns false when string to remove exceed;
+    UTF8: removeChar returns false when pos to remove exceed;
+    UTF8: removeChar returns propper string;
+    UTF8: getChar;
+    UTF8: encode / decode / how it works;
+    UTF8 bad case scenario - operator[] returns;
+    U8char && UTF8: encode;
+"
+#---------
+TESTS_LIST["catch2-vfs"]="
+    Test vfs case 1;
+    VFS lseek check;
+    Simple file notifier init;
+    Simple file notifier write;
+"
+#---------
+TESTS_LIST["catch2-vfs-core-fs"]="
+    Corefs: Registering and unregistering block device;
+    Corefs: Basic API test;
+    Corefs: Create new file, write, read from it;
+    Corefs: Register null filesystem;
+    Corefs: Mount empty strings;
+    Corefs: Write to not valid file descriptor;
+    Corefs: Directory operations;
+    Unititest integrated subsystem;
+"
+#---------
+TESTS_LIST["catch2-vfs-disk"]="
+    Registering and unregistering device;
+    Parsing and checking partititons;
+    RW boundary checking;
+    Null pointer passed to disk manager functions;
+    Boundary checks for partitions;
+    Disk sectors out of range for partition;
+"
+#---------
+TESTS_LIST["catch2-vfs-littlefs"]="
+    Littlefs: Basic mount and functionality;
+    littlefs: Basic API test;
+"
+#---------
+TESTS_LIST["catch2-utils-parserIcs"]="
+"
+#---------
+TESTS_LIST["catch2-utils-time_display"]="
+    Time display parser;
+"

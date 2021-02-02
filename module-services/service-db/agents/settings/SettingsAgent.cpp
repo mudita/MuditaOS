@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsAgent.hpp"
@@ -231,7 +231,7 @@ auto SettingsAgent::handleRegisterOnVariableChange(sys::Message *req) -> sys::Me
         if (dbRegisterValueChange(path)) {
             auto it = variableChangeRecipents.find(path.variable);
             if (variableChangeRecipents.end() == it || it->second.end() == it->second.find(path)) {
-                variableChangeRecipents[path.variable]    = {path.service};
+                variableChangeRecipents[path.to_string()] = {path};
                 auto currentValue                         = dbGetValue(path).value_or("");
                 auto msgValue = std::make_shared<::settings::Messages::VariableChanged>(path, currentValue, "");
                 sys::Bus::SendUnicast(std::move(msgValue), msg->sender, parentService);

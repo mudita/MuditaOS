@@ -35,7 +35,6 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 if (${ENABLE_TESTS})
-    message(WARNING "Unit tests for service-db are disabled until they're fixed (EGD-5583).")
-#    add_subdirectory(test)
+    add_subdirectory(test)
 endif ()
 
