@@ -78,7 +78,6 @@ class TS0710_Frame
             FCS = 0xFF - FCS;
             ret.push_back(FCS);
             ret.push_back(TS0710_FLAG);
-
             return ret;
         }
 
