@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_ATPARSER_HPP
@@ -11,6 +11,9 @@
 #include <optional>
 #include <task.h>
 #include <vector>
+#include <message_buffer.h>
+
+#include <bsp/cellular/CellularResult.hpp>
 
 namespace bsp
 {
@@ -34,19 +37,19 @@ class ATParser : public at::Channel
     ATParser(bsp::Cellular *cellular);
     virtual ~ATParser() = default;
 
-    int ProcessNewData(sys::Service *service);
+    at::Result ProcessNewData(sys::Service *service, bsp::cellular::CellularResult *cellularResult);
 
     virtual void cmd_init() override final;
     virtual void cmd_send(std::string cmd) override final;
-    virtual std::string cmd_receive() override final;
+    virtual size_t cmd_receive(std::uint8_t *buffer, std::chrono::milliseconds timeout) override final;
     virtual void cmd_post() override final;
 
   private:
     std::vector<Urc> ParseURC();
-    bsp::Cellular *cellular = nullptr;
-    std::string responseBuffer;
-    std::vector<ATParser::Urc> urcs;
-    bool isInitialized = false;
+    bsp::Cellular *cellular              = nullptr;
+    MessageBufferHandle_t responseBuffer = nullptr;
+    std::string urcBuffer                = {};
+    std::vector<ATParser::Urc> urcs      = {};
 };
 
 #endif // PUREPHONE_ATPARSER_HPP
