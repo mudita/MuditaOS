@@ -41,7 +41,7 @@ namespace at
         void cmd_post() override
         {}
 
-        std::string cmd_receive() override
+        size_t cmd_receive(std::uint8_t *buffer, std::chrono::milliseconds timeoutMs) override
         {
             return {};
         }
@@ -49,7 +49,7 @@ namespace at
 
     class FailingChannel : public ChannelMock
     {
-        virtual Result ResultMock()
+        auto ResultMock() -> Result override
         {
             auto r = Result();
             r.code = Result::Code::ERROR;
@@ -75,7 +75,7 @@ namespace at
     /// provides CSCS bad response
     class CSCS_badChannel : public ChannelMock
     {
-        virtual Result ResultMock()
+        auto ResultMock() -> Result override
         {
             auto r     = Result();
             r.code     = Result::Code::ERROR;
@@ -87,7 +87,7 @@ namespace at
     /// standard bad CSCA values I get from modem (with result OK)
     class CSCA_emptyData : public ChannelMock
     {
-        virtual Result ResultMock()
+        auto ResultMock() -> Result override
         {
             auto r     = Result();
             r.code     = Result::Code::OK;

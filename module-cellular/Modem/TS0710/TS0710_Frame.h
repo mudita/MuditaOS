@@ -34,11 +34,25 @@ class TS0710_Frame
         0xBD, 0x2C, 0x5E, 0xCF};
 
   public:
+    enum TS0710FrameStatus : std::uint8_t
+    {
+        OK,
+        EmptyFrame,
+        IncorrectStartStopFlags,
+        CRCError,
+    };
+
     struct frame_t
     {
+        TS0710FrameStatus frameStatus = OK;
         uint8_t Address;
         uint8_t Control;
         std::vector<uint8_t> data;
+
+        frame_t() = default;
+
+        explicit frame_t(uint8_t address, uint8_t control) : frameStatus{OK}, Address{address}, Control{control}
+        {}
 
         std::vector<uint8_t> serialize()
         {
@@ -65,7 +79,7 @@ class TS0710_Frame
             unsigned char i   = 1;
             if (Control == static_cast<uint8_t>(TypeOfFrame_e::UIH)) {
                 len = 3; // par. 5.3.6 of GSM0710 document states that for UIH frames, the FCS shall be calculated over
-                         // only the address, control and length fields TODO: include 2-byte address
+                // only the address, control and length fields TODO: include 2-byte address
                 // if (Length > 127)
                 //     len += 1;
             }
@@ -85,8 +99,9 @@ class TS0710_Frame
         {
             if (serData.size() < 4) {
                 LOG_ERROR("Trying to deserialize empty frame");
-                Address = 0;
-                Control = 0;
+                Address     = 0;
+                Control     = 0;
+                frameStatus = EmptyFrame;
                 return;
             }
             // iterate through frame to get correct trailing flag. In case multiple-frame stream provided
@@ -104,8 +119,9 @@ class TS0710_Frame
             }
 
             if ((serData[0] != TS0710_FLAG) || (serData[myLen - 1] != TS0710_FLAG)) {
-                Address = 0;
-                Control = 0;
+                Address     = 0;
+                Control     = 0;
+                frameStatus = IncorrectStartStopFlags;
                 LOG_ERROR("Received frame has incorrect leading/trailing flags. Dropping.");
                 return; // return empty frame. Discard frame witout proper leading & trailing flag
             }
@@ -135,7 +151,7 @@ class TS0710_Frame
             unsigned char i   = 1;
             if (Control == static_cast<uint8_t>(TypeOfFrame_e::UIH)) {
                 len = 3; // par. 5.3.6 of GSM0710 document states that for UIH frames, the FCS shall be calculated over
-                         // only the address, control and length fields: include 2-byte address
+                // only the address, control and length fields
                 // if (Length > 127)
                 //     len += 1;
             }
@@ -150,8 +166,15 @@ class TS0710_Frame
                 (Control !=
                  static_cast<uint8_t>(
                      TypeOfFrame_e::UA))) { // error - but fuck FCS check if it's faulty Quectel UIH frame or UA frame
-                Address = 0;
-                Control = 0;
+                LOG_PRINTF("\n{");
+                for (auto el : serData) {
+                    LOG_PRINTF("%02X ", el);
+                }
+                LOG_PRINTF("}\n");
+
+                Address     = 0;
+                Control     = 0;
+                frameStatus = CRCError;
                 data.clear();
                 LOG_ERROR("Received frame FCS [0x%02X] != 0xCF error. Dropping.", FCS);
                 return; // return empty frame. Discard frame witout proper leading & trailing flag
@@ -164,33 +187,42 @@ class TS0710_Frame
     std::vector<uint8_t> pv_serData;
 
   public:
-    TS0710_Frame(frame_t frame)
+    explicit TS0710_Frame(frame_t frame)
     {
         // LOG_DEBUG("Serializing given frame");
         pv_serData = frame.serialize();
         pv_frame   = frame;
     }
-    TS0710_Frame(std::vector<uint8_t> &serData)
+
+    explicit TS0710_Frame(const std::vector<uint8_t> &serData)
     {
         // LOG_DEBUG("Deserializing serData");
         pv_frame.deserialize(serData);
         pv_serData = serData;
     }
+
     TS0710_Frame()
     {
         LOG_DEBUG("Deserializing pv_serData");
         pv_frame.deserialize(pv_serData);
     }
+
     ~TS0710_Frame()
     {
         pv_serData.clear();
         pv_frame.data.clear();
     }
 
-    frame_t getFrame()
+    frame_t &getFrame()
     {
         return pv_frame;
     }
+
+    const std::vector<uint8_t> &getData() const noexcept
+    {
+        return pv_frame.data;
+    }
+
     std::vector<uint8_t> getSerData()
     {
         return pv_serData;
@@ -199,11 +231,13 @@ class TS0710_Frame
     /* F9 03 3F 01 1C F9 */
     static bool isComplete(const std::vector<uint8_t> &serData)
     {
-        if (serData.size() < 4)
+        if (serData.size() < 4) {
             return false; // check if buffer has enough data to get length
+        }
 
-        if ((serData[0] != TS0710_FLAG) || (serData[serData.size() - 1] != TS0710_FLAG))
+        if ((serData[0] != TS0710_FLAG) || (serData[serData.size() - 1] != TS0710_FLAG)) {
             return false;
+        }
 
         int Length = 0;
         if (serData[3] & 0x01) { // short length
@@ -212,22 +246,22 @@ class TS0710_Frame
         else if (serData.size() > 4) { // long length - another check if enough bytes in buffer
             Length = static_cast<uint16_t>(serData[3] >> 1) + (static_cast<uint16_t>(serData[4]) << 7);
         }
-        else
+        else {
             return false;
+        }
 
         if (serData.size() >=
             static_cast<size_t>(TS0710_FRAME_HDR_LEN + Length +
-                                (serData[3] & 0x01 ? 0 : 1))) // include extended address byte if present
+                                (serData[3] & 0x01 ? 0 : 1))) { // include extended address byte if present
             return true;
+        }
 
         return false;
     }
 
-    static bool isMyChannel(const std::vector<uint8_t> &serData, DLCI_t DLCI)
+    bool isMyChannel(DLCI_t DLCI) const
     {
-        if ((serData.size() > 1) && ((serData[1] >> 2) == DLCI))
-            return true;
-        return false;
+        return (pv_serData.size() > 1) && ((pv_serData[1] >> 2) == DLCI);
     }
 
     static DLCI_t getFrameDLCI(const std::vector<uint8_t> &serData)
@@ -235,6 +269,18 @@ class TS0710_Frame
         if (serData.size() > 1)
             return (serData[1] >> 2);
         return -1;
+    }
+
+    DLCI_t getFrameDLCI() const
+    {
+        if (pv_serData.size() > 1)
+            return (pv_serData[1] >> 2);
+        return -1;
+    }
+
+    TS0710FrameStatus getFrameStatus() const
+    {
+        return pv_frame.frameStatus;
     }
 };
 

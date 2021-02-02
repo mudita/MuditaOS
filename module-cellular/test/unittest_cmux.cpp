@@ -27,7 +27,7 @@ TEST_CASE("TS0170 frame")
         TS0710_Frame frame(tempFrame);
 
         REQUIRE(frame.isComplete(frame.getSerData()) == true);
-        REQUIRE(frame.isMyChannel(frame.getSerData(), DLCI) == true);
+        REQUIRE(frame.isMyChannel(DLCI) == true);
         REQUIRE(frame.getFrameDLCI(frame.getSerData()) == DLCI);
         REQUIRE(frame.getSerData().size() == cmuxMinimumFrameLength + command.length());
     }
