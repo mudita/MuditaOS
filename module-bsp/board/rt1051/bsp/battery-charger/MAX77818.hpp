@@ -86,20 +86,24 @@ namespace bsp::battery_charger
         VFRemCap_REG  = 0x4A,
         QH_REG        = 0x4D,
 
-        CHG_INT_REG = 0xB0,
-        CHG_INT_OK  = 0xB2,
-        CHG_CNFG_00 = 0xB7,
-        CHG_CNFG_01 = 0xB8,
-        CHG_CNFG_02 = 0xB9,
-        CHG_CNFG_03 = 0xBA,
-        CHG_CNFG_04 = 0xBB,
-        CHG_CNFG_05 = 0xBC,
-        CHG_CNFG_06 = 0xBD,
-        CHG_CNFG_07 = 0xBE,
-        CHG_CNFG_09 = 0xC0,
-        CHG_CNFG_10 = 0xC1,
-        CHG_CNFG_11 = 0xC2,
-        CHG_CNFG_12 = 0xC3
+        CHG_INT_REG    = 0xB0,
+        CHG_INT_MASK   = 0xB1,
+        CHG_INT_OK     = 0xB2,
+        CHG_DETAILS_00 = 0xB3,
+        CHG_DETAILS_01 = 0xB4,
+        CHG_DETAILS_02 = 0xB5,
+        CHG_CNFG_00    = 0xB7,
+        CHG_CNFG_01    = 0xB8,
+        CHG_CNFG_02    = 0xB9,
+        CHG_CNFG_03    = 0xBA,
+        CHG_CNFG_04    = 0xBB,
+        CHG_CNFG_05    = 0xBC,
+        CHG_CNFG_06    = 0xBD,
+        CHG_CNFG_07    = 0xBE,
+        CHG_CNFG_09    = 0xC0,
+        CHG_CNFG_10    = 0xC1,
+        CHG_CNFG_11    = 0xC2,
+        CHG_CNFG_12    = 0xC3
 
     };
 
@@ -124,17 +128,42 @@ namespace bsp::battery_charger
         Br     = (1 << 15),
     };
 
-    /// CHG_INT registers from documentation
+    /// CHG_INT register
     enum class CHG_INT
     {
         BYP_I   = (1 << 0),
-        RSVD    = (1 << 1),
+        RSVD_I  = (1 << 1),
         BATP_I  = (1 << 2),
         BAT_I   = (1 << 3),
         CHG_I   = (1 << 4),
         WCIN_I  = (1 << 5),
         CHGIN_I = (1 << 6),
         AICL_I  = (1 << 7),
+    };
+
+    enum class CHG_MASK
+    {
+        BYP_M   = (1 << 0),
+        RSVD_M  = (1 << 1),
+        BATP_M  = (1 << 2),
+        BAT_M   = (1 << 3),
+        CHG_M   = (1 << 4),
+        WCIN_M  = (1 << 5),
+        CHGIN_M = (1 << 6),
+        AICL_M  = (1 << 7)
+    };
+
+    /// CHG_DETAILS_01 register
+    enum CHG_DETAILS_01
+    {
+        CHARGER_PREQUALIFICATION = 0x00,
+        CHARGER_CC               = 0x01,
+        CHARGER_CV               = 0x02,
+        CHARGER_TOPOFF           = 0x03,
+        CHARGER_DONE             = 0x04,
+        CHARGER_TIMER_FAULT      = 0x06,
+        CHARGER_BATTERY_DETECT   = 0x07,
+        CHARGER_OFF              = 0x08,
     };
 
     // CONFIG register bits

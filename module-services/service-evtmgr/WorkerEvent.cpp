@@ -85,33 +85,44 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         }
     }
 
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueBattery)) {
-        uint8_t notification;
+    if (queueID == static_cast<std::uint32_t>(WorkerEventQueues::queueBattery)) {
+        std::uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
-        if (notification == static_cast<uint8_t>(bsp::battery_charger::batteryIRQSource::INTB)) {
-            const auto status = bsp::battery_charger::getStatusRegister();
-            if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert)) {
-                auto messageBrownout = std::make_shared<sevm::BatteryBrownoutMessage>();
-                service->bus.sendUnicast(messageBrownout, service::name::system_manager);
+        if (notification == static_cast<std::uint8_t>(bsp::battery_charger::batteryIRQSource::INTB)) {
+            auto topINT = bsp::battery_charger::getTopControllerINTSource();
+            if (topINT & static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::CHGR_INT)) {
+                auto message     = std::make_shared<sevm::BatteryPlugMessage>();
+                message->plugged = bsp::battery_charger::getChargeStatus();
+                service->bus.sendUnicast(std::move(message), service::name::evt_manager);
+                bsp::battery_charger::clearAllChargerIRQs();
             }
-            if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange)) {
-                bsp::battery_charger::StateOfCharge battLevel = bsp::battery_charger::getBatteryLevel();
-                auto message = std::make_shared<sevm::BatteryLevelMessage>(battLevel, false);
-                service->bus.sendUnicast(message, service::name::evt_manager);
-                battery_level_check::checkBatteryLevelCritical();
+            if (topINT & static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::FG_INT)) {
+                const auto status = bsp::battery_charger::getStatusRegister();
+                if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert)) {
+                    auto messageBrownout = std::make_shared<sevm::BatteryBrownoutMessage>();
+                    service->bus.sendUnicast(std::move(messageBrownout), service::name::system_manager);
+                }
+                if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange)) {
+                    bsp::battery_charger::clearFuelGuageIRQ(
+                        static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange));
+                    bsp::battery_charger::StateOfCharge battLevel = bsp::battery_charger::getBatteryLevel();
+                    auto message = std::make_shared<sevm::BatteryLevelMessage>(battLevel, false);
+                    service->bus.sendUnicast(std::move(message), service::name::evt_manager);
+                    battery_level_check::checkBatteryLevelCritical();
+                }
+                if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::maxTemp) ||
+                    status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minTemp)) {
+                    bsp::battery_charger::clearFuelGuageIRQ(
+                        static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::maxTemp) |
+                        static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minTemp));
+                    bsp::battery_charger::checkTemperatureRange();
+                    auto message     = std::make_shared<sevm::BatteryPlugMessage>();
+                    message->plugged = bsp::battery_charger::getChargeStatus();
+                    service->bus.sendUnicast(std::move(message), service::name::evt_manager);
+                }
             }
-            bsp::battery_charger::clearAllIRQs();
-        }
-        if (notification == static_cast<uint8_t>(bsp::battery_charger::batteryIRQSource::INOKB)) {
-            bsp::battery_charger::clearAllIRQs();
-            auto message     = std::make_shared<sevm::BatteryPlugMessage>();
-            message->plugged = bsp::battery_charger::getChargeStatus();
-            if (!message->plugged) {
-                bsp::battery_charger::chargingFinishedAction();
-            }
-            service->bus.sendUnicast(message, service::name::evt_manager);
         }
     }
 

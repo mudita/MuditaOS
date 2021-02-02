@@ -26,6 +26,9 @@ namespace bsp::battery_charger
         constexpr std::uint16_t ENABLE_ALL_IRQ_MASK = 0xF8;
         constexpr std::uint8_t UNLOCK_CHARGER       = 0x3 << 2;
 
+        constexpr std::uint8_t CHG_ON_OTG_OFF_BUCK_ON  = 0b00000101;
+        constexpr std::uint8_t CHG_OFF_OTG_OFF_BUCK_ON = 0b00000100;
+
         constexpr std::uint8_t VSYS_MIN              = 0x80; // 3.6V
         constexpr std::uint8_t CHARGE_TARGET_VOLTAGE = 0x1D; // 4.35V
 
@@ -34,8 +37,13 @@ namespace bsp::battery_charger
 
         constexpr std::uint16_t nominalCapacitymAh = 1600;
 
-        constexpr std::uint8_t maxTemperatureDegrees = 50;
-        constexpr std::uint8_t minTemperatureDegrees = 5;
+        constexpr std::uint16_t fullyChargedSOC = 100;
+
+        constexpr std::uint8_t maxTemperatureDegrees = 46;
+        constexpr std::uint8_t minTemperatureDegrees = 0;
+        constexpr std::uint8_t maxDisabled           = 0x7F;
+        constexpr std::uint8_t minDisabled           = 0x80;
+        constexpr auto temperatureHysteresis         = 1;
 
         constexpr std::uint16_t maxVoltagemV = 4400;
         constexpr std::uint16_t minVoltagemV = 3600;
@@ -76,6 +84,13 @@ namespace bsp::battery_charger
             constexpr std::uint16_t FullSOCthr = 0x5A00;
 
         } // namespace fuel_gauge_params
+
+        enum class TemperatureRanges
+        {
+            normal,
+            cold,
+            hot
+        };
 
         std::shared_ptr<drivers::DriverI2C> i2c;
         std::shared_ptr<drivers::DriverGPIO> gpio;
@@ -177,6 +192,20 @@ namespace bsp::battery_charger
             return batteryRetval::OK;
         }
 
+        void enableCharging()
+        {
+            if (chargerWrite(Registers::CHG_CNFG_00, CHG_ON_OTG_OFF_BUCK_ON) != kStatus_Success) {
+                LOG_ERROR("Charge enable fail");
+            }
+        }
+
+        void disableCharging()
+        {
+            if (chargerWrite(Registers::CHG_CNFG_00, CHG_OFF_OTG_OFF_BUCK_ON) != kStatus_Success) {
+                LOG_ERROR("Charge disable fail");
+            }
+        }
+
         void configureBatteryCharger()
         {
             unlockProtectedChargerRegisters();
@@ -197,6 +226,12 @@ namespace bsp::battery_charger
             }
 
             lockProtectedChargerRegisters();
+        }
+
+        std::uint8_t getChargerDetails()
+        {
+            auto status = chargerRead(Registers::CHG_DETAILS_01);
+            return status.second & 0x0F;
         }
 
         batteryRetval configureFuelGaugeBatteryModel()
@@ -331,8 +366,9 @@ namespace bsp::battery_charger
 
         batteryRetval fillConfig2RegisterValue()
         {
-            std::uint16_t regVal = static_cast<std::uint16_t>(CONFIG2::dSOCen) | // SOC 1% change alert
-                                   static_cast<std::uint16_t>(CONFIG2::OCVQen);  // Enable  automatic empty compensation
+            std::uint16_t regVal = static_cast<std::uint16_t>(CONFIG2::dSOCen) |  // SOC 1% change alert
+                                   static_cast<std::uint16_t>(CONFIG2::TAlrtEn) | // Temperature alerts
+                                   static_cast<std::uint16_t>(CONFIG2::OCVQen); // Enable  automatic empty compensation
 
             if (fuelGaugeWrite(Registers::CONFIG2_REG, regVal) != kStatus_Success) {
                 LOG_ERROR("fillConfig2RegisterValue failed.");
@@ -372,7 +408,20 @@ namespace bsp::battery_charger
             std::uint8_t val = ENABLE_ALL_IRQ_MASK;
 
             if (chargerTopControllerWrite(Registers::TOP_CONTROLL_IRQ_MASK_REG, val) != kStatus_Success) {
-                LOG_ERROR("enableIRQs read failed.");
+                LOG_ERROR("enableIRQs failed.");
+                return batteryRetval::ChargerError;
+            }
+
+            return batteryRetval::OK;
+        }
+
+        batteryRetval enableChargerIRQs()
+        {
+            std::uint8_t mask = ~(static_cast<std::uint8_t>(CHG_MASK::CHG_M) |
+                                  static_cast<std::uint8_t>(CHG_MASK::CHGIN_M)); // unmask IRQs
+
+            if (chargerWrite(Registers::CHG_INT_MASK, mask) != kStatus_Success) {
+                LOG_ERROR("enableChargerIRQs failed.");
                 return batteryRetval::ChargerError;
             }
 
@@ -385,13 +434,6 @@ namespace bsp::battery_charger
                 drivers::DriverGPIO::Create(static_cast<drivers::GPIOInstances>(BoardDefinitions::BATTERY_CHARGER_GPIO),
                                             drivers::DriverGPIOParams{});
 
-            drivers::DriverGPIOPinParams INOKBPinConfig;
-            INOKBPinConfig.dir      = drivers::DriverGPIOPinParams::Direction::Input;
-            INOKBPinConfig.irqMode  = drivers::DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge;
-            INOKBPinConfig.defLogic = 0;
-            INOKBPinConfig.pin      = static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN);
-            gpio->ConfPin(INOKBPinConfig);
-
             drivers::DriverGPIOPinParams INTBPinConfig;
             INTBPinConfig.dir      = drivers::DriverGPIOPinParams::Direction::Input;
             INTBPinConfig.irqMode  = drivers::DriverGPIOPinParams::InterruptMode::IntFallingEdge;
@@ -399,7 +441,6 @@ namespace bsp::battery_charger
             INTBPinConfig.pin      = static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN);
             gpio->ConfPin(INTBPinConfig);
 
-            gpio->EnableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
             gpio->EnableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
         }
 
@@ -410,7 +451,6 @@ namespace bsp::battery_charger
             if (value.second & 0x8000) {
                 temperature *= -1;
             }
-            LOG_INFO("Battery cell temperature = %d Cdeg.", temperature);
             return temperature;
         }
 
@@ -430,7 +470,6 @@ namespace bsp::battery_charger
                 // positive numbers
                 current = static_cast<int>(value.second * currentSenseGain);
             }
-            LOG_INFO("Battery current measurement = %d mA.", current);
             return current;
         }
 
@@ -438,9 +477,36 @@ namespace bsp::battery_charger
         {
             auto value  = fuelGaugeRead(Registers::VCELL_REG);
             int voltage = value.second * voltageSenseGain;
-            LOG_INFO("Battery cell voltage measurement = %d mV.", voltage);
             return voltage;
         }
+
+        void chargingFinishedAction()
+        {
+            LOG_DEBUG("Charging finished.");
+            storeConfiguration();
+        }
+
+        void processTemperatureRange(TemperatureRanges temperatureRange)
+        {
+            switch (temperatureRange) {
+            case TemperatureRanges::normal:
+                LOG_DEBUG("Normal temperature range, charging enabled.");
+                enableCharging();
+                setTemperatureThresholds(maxTemperatureDegrees, minTemperatureDegrees);
+                break;
+            case TemperatureRanges::cold:
+                LOG_DEBUG("Temperature too low, charging disabled.");
+                disableCharging();
+                setTemperatureThresholds(minTemperatureDegrees + temperatureHysteresis, minDisabled);
+                break;
+            case TemperatureRanges::hot:
+                LOG_DEBUG("Temperature too high, charging disabled.");
+                disableCharging();
+                setTemperatureThresholds(maxDisabled, maxTemperatureDegrees - temperatureHysteresis);
+                break;
+            }
+        }
+
     } // namespace
 
     int init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle)
@@ -474,8 +540,10 @@ namespace bsp::battery_charger
         bool charging       = getChargeStatus();
         LOG_INFO("Phone battery start state: %d %d", level, charging);
 
-        clearAllIRQs();
+        clearAllChargerIRQs();
+        clearFuelGuageIRQ(static_cast<std::uint16_t>(batteryINTBSource::all));
         enableTopIRQs();
+        enableChargerIRQs();
         IRQPinsInit();
 
         return 0;
@@ -486,7 +554,6 @@ namespace bsp::battery_charger
         storeConfiguration();
 
         gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
-        gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
 
         IRQQueueHandle = nullptr;
         DCDQueueHandle = nullptr;
@@ -508,20 +575,49 @@ namespace bsp::battery_charger
 
     bool getChargeStatus()
     {
-        std::uint8_t val = 0;
         // read clears state
-        auto value = chargerRead(Registers::CHG_INT_OK);
-        if (value.first != kStatus_Success) {
-            LOG_ERROR("failed to read charge status");
+        auto IRQSource = chargerRead(Registers::CHG_INT_REG);
+        if (IRQSource.first != kStatus_Success) {
+            LOG_ERROR("failed to read charge INT source");
         }
-        bool status = value.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I);
-        if (status) {
+        auto summary = chargerRead(Registers::CHG_INT_OK);
+        if (summary.first != kStatus_Success) {
+            LOG_ERROR("failed to read charge summary");
+        }
+        auto chargerDetails = getChargerDetails();
+
+        if (summary.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I)) {
             Store::Battery::modify().state = Store::Battery::State::Charging;
         }
         else {
             Store::Battery::modify().state = Store::Battery::State::Discharging;
         }
-        return status;
+
+        switch (chargerDetails) {
+        case CHG_DETAILS_01::CHARGER_DONE:
+            Store::Battery::modify().state = Store::Battery::State::PluggedNotCharging;
+            chargingFinishedAction();
+            break;
+        case CHG_DETAILS_01::CHARGER_OFF:
+            // IRQ from other source than CHGIN && Charger already plugged
+            if (!(IRQSource.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I)) &&
+                summary.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I)) {
+                Store::Battery::modify().state = Store::Battery::State::PluggedNotCharging;
+            }
+            break;
+        case CHG_DETAILS_01::CHARGER_PREQUALIFICATION:
+            [[fallthrough]];
+        case CHG_DETAILS_01::CHARGER_CC:
+            [[fallthrough]];
+        case CHG_DETAILS_01::CHARGER_CV:
+            [[fallthrough]];
+        case CHG_DETAILS_01::CHARGER_TOPOFF:
+            Store::Battery::modify().state = Store::Battery::State::Charging;
+            break;
+        }
+
+        return (Store::Battery::get().state == Store::Battery::State::PluggedNotCharging ||
+                Store::Battery::get().state == Store::Battery::State::Charging);
     }
 
     std::uint16_t getStatusRegister()
@@ -530,41 +626,45 @@ namespace bsp::battery_charger
         return status.second;
     }
 
-    void clearAllIRQs()
+    void clearAllChargerIRQs()
     {
         auto value = chargerRead(Registers::CHG_INT_REG);
         if (value.second != 0) {
             // write zero to clear irq source
             chargerWrite(Registers::CHG_INT_REG, 0);
         }
+    }
 
-        std::uint16_t status = getStatusRegister();
-        if (status != 0) {
-            // write zero to clear irq source
-            fuelGaugeWrite(Registers::STATUS_REG, 0);
+    void clearFuelGuageIRQ(std::uint16_t intToClear)
+    {
+        auto readout          = fuelGaugeRead(Registers::STATUS_REG);
+        std::uint16_t toWrite = readout.second & (~intToClear);
+        fuelGaugeWrite(Registers::STATUS_REG, toWrite);
+    }
+
+    void checkTemperatureRange()
+    {
+        TemperatureRanges temperatureRange;
+
+        int temperature = getCellTemperature();
+        LOG_DEBUG("Cell temperature: %d", temperature);
+        if (temperature >= maxTemperatureDegrees) {
+            temperatureRange = TemperatureRanges::hot;
         }
-    }
-
-    void clearFuelGuageIRQ()
-    {
-        // write zero to clear interrupt source
-        fuelGaugeWrite(Registers::STATUS_REG, 0x0000);
-    }
-
-    void chargingFinishedAction()
-    {
-        LOG_DEBUG("Charging finished.");
-        storeConfiguration();
-    }
-
-    BaseType_t INOKB_IRQHandler()
-    {
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        if (IRQQueueHandle != nullptr) {
-            std::uint8_t val = static_cast<std::uint8_t>(batteryIRQSource::INOKB);
-            xQueueSendFromISR(IRQQueueHandle, &val, &xHigherPriorityTaskWoken);
+        else if (temperature > minTemperatureDegrees) {
+            temperatureRange = TemperatureRanges::normal;
         }
-        return xHigherPriorityTaskWoken;
+        else {
+            temperatureRange = TemperatureRanges::cold;
+        }
+
+        processTemperatureRange(temperatureRange);
+    }
+
+    std::uint8_t getTopControllerINTSource()
+    {
+        auto value = chargerTopControllerRead(Registers::TOP_CONTROLL_IRQ_SRC_REG);
+        return value.second;
     }
 
     BaseType_t INTB_IRQHandler()
