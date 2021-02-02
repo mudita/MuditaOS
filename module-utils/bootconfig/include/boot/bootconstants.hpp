@@ -5,7 +5,7 @@
 namespace boot::consts
 {
     inline constexpr auto tar_buf       = 8192 * 4;
-    inline constexpr auto crc_char_size = 9;
+    inline constexpr auto crc_char_size = 8;
     inline constexpr auto crc_radix     = 16;
     inline constexpr auto ext_crc32     = ".crc32";
     inline constexpr auto crc_buf       = 1024;
