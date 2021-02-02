@@ -133,7 +133,7 @@ void CellularUrcHandler::Handle(Qind &urc)
         std::string httpSuccess = "0";
         if (urc.getFotaStage() == Qind::FotaStage::HTTPEND && urc.getFotaParameter() == httpSuccess) {
             LOG_DEBUG("Fota UPDATE, switching to AT mode");
-            cellularService.cmux->setMode(TS0710::Mode::AT);
+            cellularService.cmux->setMode(CellularMux::Mode::AT);
             urc.setHandled(true);
         }
     }

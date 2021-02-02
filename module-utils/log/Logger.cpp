@@ -11,8 +11,8 @@
 namespace Log
 {
     std::map<std::string, logger_level> Logger::filtered = {{"ApplicationManager", logger_level::LOGINFO},
-                                                            {"TS0710Worker", logger_level::LOGTRACE},
-                                                            {"ServiceCellular", logger_level::LOGTRACE},
+                                                            {"CellularMux", logger_level::LOGINFO},
+                                                            {"ServiceCellular", logger_level::LOGINFO},
                                                             {"ServiceAntenna", logger_level::LOGINFO},
                                                             {"ServiceAudio", logger_level::LOGINFO},
                                                             {"ServiceBluetooth", logger_level::LOGINFO},

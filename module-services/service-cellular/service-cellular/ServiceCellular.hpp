@@ -13,10 +13,10 @@
 #include "PacketDataCellularMessage.hpp"
 #include <service-cellular/connection-manager/ConnectionManager.hpp>
 
-#include <module-cellular/Modem/ATURCStream.hpp>
-#include <Modem/TS0710/DLC_channel.h>
-#include <Modem/TS0710/TS0710.h>
-#include <Modem/TS0710/TS0710_types.h>
+#include <modem/ATURCStream.hpp>
+#include <modem/mux/DLCChannel.h>
+#include <modem/mux/CellularMux.h>
+#include <modem/mux/CellularMuxTypes.h>
 #include <SMSRecord.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
@@ -25,23 +25,18 @@
 #include <Timers/TimerHandle.hpp>
 #include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>
-#include <optional> // for optional
-#include <memory>   // for unique_ptr, allocator, make_unique, shared_ptr
-#include <string>   // for string
-#include <vector>   // for vector
 #include <service-db/Settings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-sys/PhoneModes/Observer.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 
+#include <optional> // for optional
+#include <memory>   // for unique_ptr, allocator, make_unique, shared_ptr
+#include <string>   // for string
+#include <vector>   // for vector
 #include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <vector>
 
-class MuxDaemon;
 
 namespace db
 {
@@ -180,7 +175,7 @@ class ServiceCellular : public sys::Service
 
   private:
     at::ATURCStream atURCStream;
-    std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
+    std::unique_ptr<CellularMux> cmux = std::make_unique<CellularMux>(PortSpeed_e::PS460800, this);
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
     // used for polling for call state
@@ -198,7 +193,7 @@ class ServiceCellular : public sys::Service
 
     void SleepTimerHandler();
     void CallStateTimerHandler();
-    DLC_channel::Callback_t notificationCallback = nullptr;
+    DLCChannel::Callback_t notificationCallback = nullptr;
 
     std::unique_ptr<packet_data::PacketData> packetData;
     std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;

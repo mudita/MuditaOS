@@ -5,8 +5,8 @@
 
 #include "FotaServiceAPI.hpp"
 
-#include <Modem/TS0710/DLC_channel.h>
-#include <Modem/TS0710/TS0710.h>
+#include <modem/mux/DLCChannel.h>
+#include <modem/mux/CellularMux.h>
 #include <Result.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
@@ -21,7 +21,7 @@
 #include <sstream>
 #include <string>
 
-class DLC_channel;
+class DLCChannel;
 class FotaUrcHandler;
 
 namespace service::name
@@ -112,8 +112,8 @@ namespace FotaService
         void sendProgress(unsigned int progress, const std::string &receiver);
         void sendFotaFinshed(const std::string &receiver);
 
-        State state              = State ::Idle;
-        DLC_channel *dataChannel = nullptr;
+        State state             = State ::Idle;
+        DLCChannel *dataChannel = nullptr;
         APN::ContextMap contextMap;
         std::string url;
         std::string file;

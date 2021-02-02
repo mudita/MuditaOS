@@ -1,0 +1,12 @@
+@startuml
+
+abstract class BaseChannel
+
+BaseChannel <|-- Channel
+
+Channel ..> ATStream: Channel use ATStream
+
+Channel <|-- DLCChannel
+Channel <|-- ATParser
+
+@enduml

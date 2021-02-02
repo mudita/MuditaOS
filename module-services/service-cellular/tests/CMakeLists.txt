@@ -16,6 +16,7 @@ add_catch2_executable(
         unittest_simcard.cpp
         LIBS
         module-cellular
+        module-sys
 )
 
 
@@ -26,6 +27,7 @@ add_catch2_executable(
         unittest_datatransfer.cpp
         LIBS
         module-cellular
+        module-sys
 )
 
 add_catch2_executable(

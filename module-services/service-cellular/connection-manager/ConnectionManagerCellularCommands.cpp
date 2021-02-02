@@ -10,7 +10,7 @@
 auto ConnectionManagerCellularCommands::disconnectFromNetwork() -> bool
 {
     using at::cfun::Functionality;
-    auto channel = cellular.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellular.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
         auto cmd = at::cmd::CFUN(at::cmd::Modifier::Set);
         cmd.set(Functionality::DisableRF);
@@ -23,7 +23,7 @@ auto ConnectionManagerCellularCommands::disconnectFromNetwork() -> bool
 auto ConnectionManagerCellularCommands::connectToNetwork() -> bool
 {
     using at::cfun::Functionality;
-    auto channel = cellular.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellular.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
         auto cmd = at::cmd::CFUN(at::cmd::Modifier::Set);
         cmd.set(Functionality::Full);
@@ -37,7 +37,7 @@ auto ConnectionManagerCellularCommands::isConnectedToNetwork() -> bool
 {
 
     using at::cfun::Functionality;
-    auto channel = cellular.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellular.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
         auto cmd      = at::cmd::CFUN(at::cmd::Modifier::Get);
         auto response = channel->cmd(cmd);
@@ -67,7 +67,7 @@ auto ConnectionManagerCellularCommands::clearNetworkIndicator() -> bool
 auto ConnectionManagerCellularCommands::hangUpOngoingCall() -> bool
 {
     if (cellular.ongoingCall.isActive()) {
-        auto channel = cellular.cmux->get(TS0710::Channel::Commands);
+        auto channel = cellular.cmux->get(CellularMux::Channel::Commands);
         if (channel) {
             if (channel->cmd(at::factory(at::AT::ATH))) {
                 cellular.callStateTimer.stop();

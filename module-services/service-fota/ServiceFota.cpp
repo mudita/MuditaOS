@@ -8,29 +8,28 @@
 
 #include <Commands.hpp>
 #include <MessageType.hpp>
-#include <Modem/TS0710/DLC_channel.h>
+#include <modem/mux/DLCChannel.h>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <module-sys/Timers/TimerFactory.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <log/log.hpp>
-#include <module-cellular/at/Result.hpp>
-#include <module-cellular/at/UrcFactory.hpp>
+#include <at/Result.hpp>
+#include <at/UrcFactory.hpp>
 #include <portmacro.h>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-cellular/State.hpp>
 
-#include <bits/exception.h>                            // for exception
-#include <algorithm>                                   // for find_if, remove, transform
-#include <cctype>                                      // for tolower
-#include <functional>                                  // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
-#include <numeric>                                     // for accumulate
+#include <bits/exception.h> // for exception
+#include <algorithm>        // for find_if, remove, transform
+#include <cctype>           // for tolower
+#include <functional>       // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
+#include <numeric>          // for accumulate
 #include <sstream> // for operator<<, basic_ostream, ostringstream, basic_ostream::operator<<, char_traits, basic_istream, istringstream, basic_ostream<>::__ostream_type
 #include <string>  // for string, basic_string, stoi, getline, operator<<, operator==, operator+, operator!=
 #include <unordered_map> // for unordered_map<>::iterator, _Node_iterator, operator==, _Map_base<>::mapped_type, _Node_iterator_base, unordered_map<>::mapped_type
 #include <utility>       // for move, pair
 #include <vector>        // for vector
-
 
 namespace FotaService
 {
@@ -401,8 +400,8 @@ namespace FotaService
                     LOG_ERROR("Conversion error of %s, taking default value %d", data[2].c_str(), contextTypeRaw);
                 }
 
-                apnConfig.type      = static_cast<APN::ContextType>(contextTypeRaw);
-                apnConfig.ip        = data[3].substr(1, data[3].size() - 1);
+                apnConfig.type = static_cast<APN::ContextType>(contextTypeRaw);
+                apnConfig.ip   = data[3].substr(1, data[3].size() - 1);
                 LOG_DEBUG("Warking APN: %s", apnConfig.toString().c_str());
                 contextMap[apnConfig.contextId] = apnConfig;
             }

@@ -1,5 +1,8 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "RawATHandler.hpp"
-#include <Modem/ATCommon.hpp>
+#include <modem/ATCommon.hpp>
 #include <module-sys/Service/Message.hpp>
 #include <service-desktop/endpoints/developerMode/DeveloperModeEndpoint.hpp>
 #include <service-desktop/endpoints/developerMode/event/ATRequest.hpp>

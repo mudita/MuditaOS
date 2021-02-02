@@ -7,7 +7,7 @@
 #include "State.hpp"
 
 #include <MessageType.hpp>
-#include <Modem/TS0710/TS0710.h>
+#include <modem/mux/CellularMux.h>
 #include <PhoneNumber.hpp>
 #include <Service/Message.hpp>
 #include <module-bsp/bsp/cellular/bsp_cellular.hpp>
@@ -138,15 +138,15 @@ class CellularNotificationMessage : public CellularMessage
         SignalStrengthUpdate,     // update of the strength of the network's signal.
         NetworkStatusUpdate,      // update of the status of the network
         PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and
-                                  // cold start)
-        SIM_READY,                // change on SIM from URC
-        SIM_NOT_READY,            // change to not existing/not valid SIM
-        PowerDownDeregistering,   // modem informed it has started to disconnect from network
-        PowerDownDeregistered,    // modem informed it has disconnected from network
-        SMSDone,                  // SMS initialization finished
-        NewIncomingUrc,           // phone received new URC from network and we need to wake up modem and host
-        Ring,                     // phone received Ring notification
-        CallerID                  // phone received Caller Id notification
+        // cold start)
+        SIM_READY,              // change on SIM from URC
+        SIM_NOT_READY,          // change to not existing/not valid SIM
+        PowerDownDeregistering, // modem informed it has started to disconnect from network
+        PowerDownDeregistered,  // modem informed it has disconnected from network
+        SMSDone,                // SMS initialization finished
+        NewIncomingUrc,         // phone received new URC from network and we need to wake up modem and host
+        Ring,                   // phone received Ring notification
+        CallerID                // phone received Caller Id notification
     };
 
     // TODO check and fix all CellularNotificationMessage constructors
@@ -644,19 +644,19 @@ class CellularSimAbortMessage : public CellularSimDataMessage
 class CellularGetChannelMessage : public CellularMessage
 {
   public:
-    CellularGetChannelMessage(TS0710::Channel dataChannel = TS0710::Channel::None)
+    explicit CellularGetChannelMessage(CellularMux::Channel dataChannel = CellularMux::Channel::None)
         : CellularMessage{Type::GetChannel}, dataChannel(dataChannel)
     {}
-    TS0710::Channel dataChannel;
+    CellularMux::Channel dataChannel;
 };
 
 class CellularGetChannelResponseMessage : public CellularMessage
 {
   public:
-    CellularGetChannelResponseMessage(DLC_channel *dataChannelPtr = nullptr)
+    explicit CellularGetChannelResponseMessage(DLCChannel *dataChannelPtr = nullptr)
         : CellularMessage{Type::GetChannelResponse}, dataChannelPtr(dataChannelPtr)
     {}
-    DLC_channel *dataChannelPtr;
+    DLCChannel *dataChannelPtr;
 };
 
 class CellularResponseMessage : public sys::ResponseMessage

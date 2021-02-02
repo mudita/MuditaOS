@@ -8,25 +8,13 @@ include(SerialPort)
 module_is_test_entity()
 
 set(SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATParser.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATStream.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATURCStream.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATCommon.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/DLC_channel.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_CLOSE.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_CONTROL.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_DATA.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_DLC_ESTABL.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_DLC_RELEASE.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_FLOW.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_PARNEG.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_PORTNEG.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_SERVNEG.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_SLEEP.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_START.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_TEST.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710_WAKEUP.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/modem/ATParser.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/modem/ATStream.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/modem/ATURCStream.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/modem/ATCommon.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/modem/mux/DLCChannel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/modem/mux/CellularMux.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/modem/mux/CellularMuxData.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Urc.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcQind.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcCusd.cpp

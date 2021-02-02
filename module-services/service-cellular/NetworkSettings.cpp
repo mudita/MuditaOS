@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NetworkSettings.hpp"
@@ -8,7 +8,7 @@
 
 std::string NetworkSettings::getCurrentOperator() const
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
         at::Cmd buildCmd = at::factory(at::AT::COPS) + "?";
         auto resp        = channel->cmd(buildCmd);
@@ -26,7 +26,7 @@ std::string NetworkSettings::getCurrentOperator() const
 std::vector<std::string> NetworkSettings::scanOperators(bool fullInfoList)
 {
     std::vector<std::string> operatorNames;
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
         at::Cmd buildCmd = at::factory(at::AT::COPS) + "=?";
 
@@ -75,7 +75,7 @@ std::vector<std::string> NetworkSettings::scanOperators(bool fullInfoList)
 
 bool NetworkSettings::setOperatorAutoSelect()
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return false;
     }
@@ -89,7 +89,7 @@ bool NetworkSettings::setOperator(at::response::cops::CopsMode mode,
                                   at::response::cops::NameFormat format,
                                   const std::string &name)
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return false;
     }
@@ -103,7 +103,7 @@ bool NetworkSettings::setOperator(at::response::cops::CopsMode mode,
 
 at::Result::Code NetworkSettings::getPreferredVoiceDomain(VoiceDomainPreference &pref)
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -120,7 +120,7 @@ at::Result::Code NetworkSettings::getPreferredVoiceDomain(VoiceDomainPreference 
 
 at::Result::Code NetworkSettings::setPreferredVoiceDomain(VoiceDomainPreference pref)
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -132,7 +132,7 @@ at::Result::Code NetworkSettings::setPreferredVoiceDomain(VoiceDomainPreference 
 
 at::Result::Code NetworkSettings::getPreferredSMSDomain(SMSDomainPreference &pref)
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -149,7 +149,7 @@ at::Result::Code NetworkSettings::getPreferredSMSDomain(SMSDomainPreference &pre
 
 at::Result::Code NetworkSettings::setPreferredSMSDomain(SMSDomainPreference pref)
 {
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -162,7 +162,7 @@ at::Result::Code NetworkSettings::setPreferredSMSDomain(SMSDomainPreference pref
 at::Result::Code NetworkSettings::setIMSState(at::response::qcfg_ims::IMSState state)
 {
     std::vector<std::string> operatorNames;
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -175,7 +175,7 @@ std::optional<std::pair<at::response::qcfg_ims::IMSState, at::response::qcfg_ims
     getIMSState()
 {
     std::vector<std::string> operatorNames;
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
 
         at::Cmd buildCmd = at::factory(at::AT::QCFG_IMS);
@@ -209,7 +209,7 @@ at::Result::Code NetworkSettings::setVoLTEState(VoLTEState state)
      * 3) Reboot
      */
 
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (!channel) {
         return at::Result::Code::ERROR;
     }
@@ -250,7 +250,7 @@ VoLTEState NetworkSettings::getVoLTEState()
 std::string NetworkSettings::printVoLTEDebug()
 {
 
-    auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
+    auto channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     if (channel) {
         auto resp = channel->cmd("AT+QVOLTEDBG");
         if (resp.code == at::Result::Code::OK) {

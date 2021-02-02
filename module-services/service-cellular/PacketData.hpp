@@ -5,7 +5,6 @@
 
 #include <string>
 #include <unordered_map>
-#include "PacketData.hpp"
 
 #include "service-cellular/PacketDataTypes.hpp"
 #include "service-cellular/ServiceCellular.hpp"
@@ -34,7 +33,7 @@ namespace packet_data
 
       private:
         ServiceCellular &cellularService;
-        DLC_channel *channel = nullptr;
+        DLCChannel *channel = nullptr;
 
       public:
         explicit PDPContext(ServiceCellular &cellularService);

@@ -106,7 +106,7 @@ namespace packet_data
 
     PDPContext::PDPContext(ServiceCellular &cellularService) : cellularService(cellularService)
     {
-        channel = cellularService.cmux->get(TS0710::Channel::Commands);
+        channel = cellularService.cmux->get(CellularMux::Channel::Commands);
     }
 
     std::shared_ptr<APN::Config> PDPContext::getConfiguration(std::uint8_t contextId)
