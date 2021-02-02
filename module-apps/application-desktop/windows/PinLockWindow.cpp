@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 // application manager
@@ -47,7 +47,6 @@ namespace gui
 
     void PinLockWindow::invalidate() noexcept
     {
-        iceBox        = nullptr;
         title         = nullptr;
         lockImage  = nullptr;
         infoImage  = nullptr;
@@ -110,16 +109,8 @@ namespace gui
         if (!inputEvent.isShortPress()) {
             return AppWindow::onInput(inputEvent);
         }
-        // accept only LF, enter, RF, #, and numeric values;
-        if (inputEvent.is(KeyCode::KEY_LEFT) && iceBox->visible) {
-            app::manager::Controller::sendAction(application, app::manager::actions::EmergencyDial);
-            return true;
-        }
-        else if (inputEvent.is(KeyCode::KEY_LF) && bottomBar->isActive(BottomBar::Side::LEFT)) {
-            app::manager::Controller::sendAction(application, app::manager::actions::EmergencyDial);
-            return true;
-        }
-        else if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
+        // accept only enter, RF, #, and numeric values;
+        if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
             if (usesNumericKeys()) {
                 lock->clearAttempt();
             }
