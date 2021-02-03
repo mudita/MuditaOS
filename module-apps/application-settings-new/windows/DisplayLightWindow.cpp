@@ -21,21 +21,20 @@ namespace gui
         isDisplayLightSwitchOn = values.lightOn;
         isAutoLightSwitchOn    = values.mode == screen_light_control::ScreenLightMode::Automatic;
         brightnessValue        = values.parameters.manualModeBrightness;
+        timerName              = "AmbientLightTimer";
 
         setTitle(utils::localize.get("app_settings_display_display_light"));
 
-        timerTask = std::make_unique<app::GuiTimer>(
-            "AmbientLightTimer", application, gui::lighting::AMBIENT_LIGHT_TIMER_MS, Timer::Type::Continous);
+        auto timerTask = std::make_unique<app::GuiTimer>(
+            timerName, application, gui::lighting::AMBIENT_LIGHT_TIMER_MS, Timer::Type::Continous);
         timerCallback = [this](Item &it, Timer &task) { return onTimerTimeout(it, task); };
         timerTask->start();
         application->connect(std::move(timerTask), this);
     }
 
-    DisplayLightWindow::~DisplayLightWindow()
+    void DisplayLightWindow::onClose()
     {
-        if (timerTask != nullptr) {
-            timerTask->stop();
-        }
+        application->detachTimer(timerName);
     }
 
     auto DisplayLightWindow::onTimerTimeout(Item &self, Timer &task) -> bool
@@ -43,7 +42,6 @@ namespace gui
         ambientLight = bsp::light_sensor::readout();
         refreshOptionsList();
 
-        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         return true;
     }
 
