@@ -132,6 +132,7 @@ namespace at
         QRXGAIN, /// Set Downlink Gains of RX
         CLVL,    /// Loudspeaker Volume Level Selection
         QMIC,    /// Set Uplink Gains of MIC
+        QEEC,    /// Echo cancellation parameters
     };
 
     // below timeouts are defined in Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf
@@ -232,9 +233,10 @@ namespace at
             {AT::QICSGP, {"AT+QICSGP", default_timeout}},
             {AT::QIACT, {"AT+QIACT", 150000ms}},
             {AT::QIDEACT, {"AT+QIDEACT", 40000ms}},
-            {AT::QRXGAIN, {"AT+QRXGAIN=65535", default_timeout}},
+            {AT::QRXGAIN, {"AT+QRXGAIN=40000", default_timeout}},
             {AT::CLVL, {"AT+CLVL=3", default_timeout}},
-            {AT::QMIC, {"AT+QMIC=15000,15000", default_timeout}}};
+            {AT::QMIC, {"AT+QMIC=15000,15000", default_timeout}},
+            {AT::QEEC, {"AT+QEEC=", default_timeout}}};
 
         if (fact.count(at) != 0u) {
             return fact.at(at);
