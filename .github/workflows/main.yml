@@ -109,28 +109,28 @@ jobs:
         run: cat emulator.log
         if: always()
 
-        #emulator_on_off_test:
-        #Enable this test in "Clean artefacts"
-        #  name: emulator on-off test
-        #  if: github.event.pull_request.draft == false
-        #  runs-on: self-hosted
-        #  needs:
-        #    - build_linux_binary_and_run_tests
-        #  steps:
-        #    - name: clone repository
-        #      uses: actions/checkout@v2
-        #      with:
-        #        token: ${{ secrets.GitHub_PAT }}
-        #        submodules: recursive
-        #    - name: get artefacts
-        #      run: |
-        #        tar xf /artefacts/build-$(git rev-parse --short HEAD).tar
-        #    - name: start emulator on-off test
-        #      run: ./phone_on_off_test.sh
-        #      working-directory: test
-        #    - name: print emulator logs
-        #      run: cat emulator.log
-        #      if: always()
+  #emulator_on_off_test:
+  #Enable this test in "Clean artefacts"
+  #  name: emulator on-off test
+  #  if: github.event.pull_request.draft == false
+  #  runs-on: self-hosted
+  #  needs:
+  #    - build_linux_binary_and_run_tests
+  #  steps:
+  #    - name: clone repository
+  #      uses: actions/checkout@v2
+  #      with:
+  #        token: ${{ secrets.GitHub_PAT }}
+  #        submodules: recursive
+  #    - name: get artefacts
+  #      run: |
+  #        tar xf /artefacts/build-$(git rev-parse --short HEAD).tar
+  #    - name: start emulator on-off test
+  #      run: ./phone_on_off_test.sh
+  #      working-directory: test
+  #    - name: print emulator logs
+  #      run: cat emulator.log
+  #      if: always()
 
   check_run_unit_tests:
     name: Check run unit tests
