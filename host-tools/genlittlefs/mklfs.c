@@ -308,6 +308,7 @@ int main(int argc, char **argv)
         err = ftruncate(fds, lopts.filesystem_size);
         if (err) {
             perror("Unable to truncate file");
+            close(fds);
             free(lopts.src_dirs);
             return EXIT_FAILURE;
         }
@@ -364,6 +365,7 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
     }
+    const lfs_ssize_t used_blocks = lfs_fs_size(&lfs);
     err = lfs_unmount(&lfs);
     if (err < 0) {
         fprintf(stderr, "lfs umount error: error=%d\n", err);
@@ -375,11 +377,12 @@ int main(int argc, char **argv)
     lfs_ioaccess_close(ioctx);
     printf("Littlefs summary:\n"
            "     Directories created: %lu, Files added: %lu, Transferred %lu kbytes.\n"
-           "     Littlefs block size: %i blocks count: %i.\n",
+           "     Littlefs block size: %i blocks: %i/%i.\n",
            prog_summary.directories_added,
            prog_summary.files_added,
            prog_summary.bytes_transferred / 1024UL,
            cfg.block_size,
+           used_blocks,
            cfg.block_count);
     return EXIT_SUCCESS;
 }
