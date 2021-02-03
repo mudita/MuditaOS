@@ -37,6 +37,7 @@
  *
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
+#include <assert.h>
 #include <stdint.h>
 #include "log/log.hpp"
 
@@ -111,7 +112,9 @@ extern uint32_t SystemCoreClock;
 #define configTIMER_TASK_STACK_DEPTH            (1024)
 
 /* Define to trap errors during development. */
-#define configASSERT(x) if( (x) == 0 ) { taskDISABLE_INTERRUPTS(); LOG_FATAL("Assert!"); while(1){};}
+#ifndef NDEBUG
+#   define configASSERT(x)                      assert(x)
+#endif
 
 
 /* Optional functions - most linkers will remove unused functions anyway. */
