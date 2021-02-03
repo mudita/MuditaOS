@@ -69,7 +69,7 @@ class DLC_channel : public at::Channel
 
     virtual void cmd_init() override final;
     virtual void cmd_send(std::string cmd) override final;
-    virtual std::vector<std::string> cmd_receive() override final;
+    virtual std::string cmd_receive() override final;
     virtual void cmd_post() override final;
 
     std::vector<std::string> SendCommandPrompt(const char *cmd, size_t rxCount, uint32_t timeout = 300);

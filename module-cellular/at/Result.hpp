@@ -17,7 +17,9 @@ namespace at
         enum class Code
         {
             OK,            /// at OK
-            ERROR,         /// at ERROR
+            ERROR,         /// at ERROR For compatibility also for CME_ERROR and CMS_ERROR (details in errorCode)
+            CME_ERROR,     /// In case CME error see errorCode
+            CMS_ERROR,     /// In case CMS error see errorCode
             TIMEOUT,       /// at Timeout
             TOKENS,        /// at numbers of tokens needed met
             NONE,          /// no code
