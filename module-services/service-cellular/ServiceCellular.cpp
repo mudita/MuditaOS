@@ -768,6 +768,10 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             responseMsg = std::make_shared<CellularResponseMessage>(ret);
             break;
         }
+        case CellularCallMessage::Type::CallerId: {
+            ongoingCall.setNumber(msg->number);
+            break;
+        }
         }
     } break;
     // Incoming notifications from Notification Virtual Channel
@@ -932,15 +936,10 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
 
         auto request = factory.create();
 
-        if (auto action = factory.getActionRequest(); action) {
-            responseMsg = std::make_shared<CellularActionResponseMessage>(action.value(), msg->number.getEntered());
-        }
-        else {
-            CellularRequestHandler handler(*this);
-            auto result = channel->cmd(request->command(), at::default_doc_timeout);
-            request->handle(handler, result);
-            responseMsg = std::make_shared<CellularResponseMessage>(request->isHandled());
-        }
+        CellularRequestHandler handler(*this);
+        auto result = channel->cmd(request->command(), at::default_doc_timeout);
+        request->handle(handler, result);
+        responseMsg = std::make_shared<CellularResponseMessage>(request->isHandled());
 
     } break;
     case MessageType::DBServiceNotification: {

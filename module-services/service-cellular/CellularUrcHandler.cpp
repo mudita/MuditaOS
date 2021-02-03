@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularUrcHandler.hpp"
@@ -25,8 +25,13 @@ void CellularUrcHandler::Handle(Clip &urc)
     if (urc.isValid()) {
         phoneNumber = urc.getNumber();
     }
-    // continue without number
-    response = std::make_unique<CellularCallMessage>(CellularCallMessage::Type::IncomingCall, phoneNumber);
+    response = std::make_unique<CellularCallMessage>(CellularCallMessage::Type::CallerId, phoneNumber);
+    urc.setHandled(true);
+}
+
+void CellularUrcHandler::Handle(Ring &urc)
+{
+    response = std::make_unique<CellularCallMessage>(CellularCallMessage::Type::IncomingCall, "");
     urc.setHandled(true);
 }
 

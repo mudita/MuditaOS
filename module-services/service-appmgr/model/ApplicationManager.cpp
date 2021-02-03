@@ -295,6 +295,8 @@ namespace app::manager
         connect(typeid(CellularMMIResultMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIPushMessage), convertibleToActionHandler);
+        connect(typeid(CellularNoSimNotification), convertibleToActionHandler);
+        connect(typeid(CellularNotAnEmergencyNotification), convertibleToActionHandler);
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
         connect(typeid(sys::SystemBrownoutMesssage), convertibleToActionHandler);
     }

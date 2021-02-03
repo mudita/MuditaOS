@@ -32,6 +32,7 @@ namespace app
     class CallWindowInterface
     {
       public:
+        using NumberChangeCallback              = std::function<void(utils::PhoneNumber::View)>;
         virtual ~CallWindowInterface() noexcept = default;
 
         virtual void setState(app::call::State state) noexcept              = 0;
@@ -70,8 +71,10 @@ namespace app
         void CallAbortHandler();
         void CallActiveHandler();
         void IncomingCallHandler(const CellularCallMessage *const msg);
+        void CallerIdHandler(const CellularCallMessage *const msg);
         void RingingHandler(const CellularCallMessage *const msg);
-        auto HandleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+
+        std::unique_ptr<sys::Timer> callerIdTimer;
 
       protected:
         call::State state = call::State::IDLE;
@@ -124,7 +127,9 @@ namespace app
             return {{manager::actions::Launch,
                      manager::actions::Call,
                      manager::actions::Dial,
-                     manager::actions::EmergencyDial}};
+                     manager::actions::EmergencyDial,
+                     manager::actions::NotAnEmergencyNotification,
+                     manager::actions::NoSimNotification}};
         }
     };
 } /* namespace app */

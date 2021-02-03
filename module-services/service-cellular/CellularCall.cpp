@@ -29,8 +29,8 @@ namespace CellularCall
         CalllogRecord callRec;
         callRec.type        = type;
         callRec.date        = utils::time::Timestamp().getTime();
-        callRec.name        = number.getFormatted(); // temporary set name to entered number
-        callRec.phoneNumber = number;
+        callRec.presentation = PresentationType::PR_UNKNOWN;
+        callRec.phoneNumber  = number;
         call                = startCallAction ? startCallAction(callRec) : CalllogRecord();
         if (!call.isValid()) {
             LOG_ERROR("startCallAction failed");
@@ -94,5 +94,11 @@ namespace CellularCall
         clear();
 
         return true;
+    }
+
+    void CellularCall::setNumber(const utils::PhoneNumber::View &number)
+    {
+        call.presentation = number.getFormatted().empty() ? PresentationType::PR_UNKNOWN : PresentationType::PR_ALLOWED;
+        call.phoneNumber  = number;
     }
 } // namespace CellularCall

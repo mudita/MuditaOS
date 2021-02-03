@@ -14,6 +14,7 @@
 #include "service-cellular/requests/PinChangeRequest.hpp"
 #include "service-cellular/requests/ImeiRequest.hpp"
 #include "service-cellular/requests/UssdRequest.hpp"
+#include "service-cellular/requests/RejectRequest.hpp"
 
 #include <common_data/EventStore.hpp>
 #include <cmd/QECCNUM.hpp>
@@ -57,11 +58,11 @@ namespace cellular
                 return std::make_unique<CallRequest>(request);
             }
             else {
-                actionRequest = app::manager::actions::Action::CallRejectNoSim;
+                return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
             }
         }
         else if (requestMode == CellularCallRequestMessage::RequestMode::Emergency) {
-            actionRequest = app::manager::actions::Action::CallRejectNotEmergency;
+            return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NotAnEmergencyNumber, request);
         }
         return nullptr;
     }
@@ -70,10 +71,6 @@ namespace cellular
     {
         if (auto req = emergencyCheck(); req) {
             return req;
-        }
-
-        if (actionRequest) {
-            return nullptr;
         }
 
         std::string groupA, groupB, groupC, groupD, groupE, groupF;
@@ -120,15 +117,9 @@ namespace cellular
         }
 
         if (simStatus == SimStatus::SimSlotEmpty) {
-            actionRequest = app::manager::actions::Action::CallRejectNoSim;
-            return nullptr;
+            return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
         }
         return std::make_unique<CallRequest>(request);
-    }
-
-    std::optional<app::manager::actions::Action> &RequestFactory::getActionRequest()
-    {
-        return actionRequest;
     }
 
 } // namespace cellular
