@@ -108,6 +108,7 @@ namespace app::manager
         void suspendSystemServices();
         auto closeServices() -> bool;
         auto closeApplications() -> bool;
+        auto closeApplicationsOnUpdate() -> bool;
         void closeService(const std::string &name);
         void closeApplication(ApplicationHandle *application);
 

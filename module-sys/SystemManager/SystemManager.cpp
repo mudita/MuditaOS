@@ -16,9 +16,11 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <Service/Timer.hpp>
+#include <service-desktop/service-desktop/Constants.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/service-appmgr/Controller.hpp>
 #include "messages/CpuFrequencyMessage.hpp"
 #include "messages/DeviceRegistrationMessage.hpp"
 #include <time/ScopedTime.hpp>
@@ -159,6 +161,15 @@ namespace sys
         s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), service::name::system_manager);
         return true;
     }
+    bool SystemManager::Update(Service *s)
+    {
+        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Update), service::name::system_manager);
+
+        auto msg = std::make_shared<app::manager::UpdateInProgress>(service::name::system_manager);
+        s->bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+
+        return true;
+    }
 
     bool SystemManager::Reboot(Service *s)
     {
@@ -259,6 +270,9 @@ namespace sys
                 switch (data->type) {
                 case Code::CloseSystem:
                     CloseSystemHandler();
+                    break;
+                case Code::Update:
+                    UpdateSystemHandler();
                     break;
                 case Code::Reboot:
                     RebootHandler();
@@ -381,6 +395,52 @@ namespace sys
             }
         }
         set(State::Shutdown);
+    }
+
+    void SystemManager::UpdateSystemHandler()
+    {
+        LOG_DEBUG("Starting system update procedure...");
+
+        // We are going to remove services in reversed order of creation
+        CriticalSection::Enter();
+        std::reverse(servicesList.begin(), servicesList.end());
+        CriticalSection::Exit();
+
+        for (bool retry{};; retry = false) {
+            for (auto &service : servicesList) {
+                if (service->GetName() == service::name::evt_manager) {
+                    LOG_DEBUG("Delay closing %s", service::name::evt_manager);
+                    continue;
+                }
+                if (service->GetName() == service::name::service_desktop) {
+                    LOG_DEBUG("Delay closing %s", service::name::service_desktop);
+                    continue;
+                }
+
+                if (service->GetName() == service::name::db) {
+                    LOG_DEBUG("Delay closing %s", service::name::db);
+                    continue;
+                }
+
+                if (service->GetName() == app::manager::ApplicationManager::ServiceName) {
+                    LOG_DEBUG("Delay closing %s", app::manager::ApplicationManager::ServiceName);
+                    continue;
+                }
+                if (service->parent.empty()) {
+                    const auto ret = DestroyService(service->GetName(), this);
+                    if (!ret) {
+                        // no response to exit message,
+                        LOG_FATAL("%s failed to response to exit message", service->GetName().c_str());
+                        kill(service);
+                    }
+                    retry = true;
+                    break;
+                }
+            }
+            if (!retry) {
+                break;
+            }
+        }
     }
 
     void SystemManager::RebootHandler()
