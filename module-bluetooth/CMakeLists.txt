@@ -11,6 +11,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/glucode/BluetoothRunLoop.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/BluetoothDriver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BtKeysStorage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/GAP/GAP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/A2DP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVRCP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVDTP.cpp

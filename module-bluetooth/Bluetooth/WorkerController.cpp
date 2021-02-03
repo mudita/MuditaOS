@@ -7,6 +7,7 @@
 #include "interface/profiles/Profile.hpp"
 
 #include <module-utils/log/log.hpp>
+#define BOOST_SML_CFG_DISABLE_MIN_SIZE // GCC10 fix
 #include <module-utils/sml/include/boost/sml.hpp>
 #include <module-utils/magic_enum/include/magic_enum.hpp>
 
