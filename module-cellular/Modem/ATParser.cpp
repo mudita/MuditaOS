@@ -113,10 +113,10 @@ void ATParser::cmd_send(std::string cmd)
     cellular->Write(const_cast<char *>(cmd.c_str()), cmd.size());
 }
 
-std::vector<std::string> ATParser::cmd_receive()
+std::string ATParser::cmd_receive()
 {
     cpp_freertos::LockGuard lock(mutex);
-    return utils::split(responseBuffer, "\r\n");
+    return responseBuffer;
 }
 
 void ATParser::cmd_post()

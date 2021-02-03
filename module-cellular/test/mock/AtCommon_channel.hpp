@@ -3,11 +3,11 @@
 
 #pragma once
 
+#include "Modem/ATCommon.hpp"
 #include "Modem/BaseChannel.hpp"
 
 namespace at
 {
-
     class ChannelMock : public BaseChannel
     {
       public:
@@ -40,7 +40,7 @@ namespace at
         void cmd_post() override
         {}
 
-        std::vector<std::string> cmd_receive() override
+        std::string cmd_receive() override
         {
             return {};
         }

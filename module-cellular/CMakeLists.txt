@@ -7,6 +7,7 @@ include(SerialPort)
 
 set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATParser.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATStream.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATCommon.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/DLC_channel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710.cpp
