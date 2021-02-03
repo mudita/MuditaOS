@@ -55,7 +55,7 @@ namespace purefs::fs
         cpp_freertos::LockGuard _lck(*m_lock);
         const auto it = m_fstypes.find(std::string(fsname));
         if (it == std::end(m_fstypes)) {
-            LOG_ERROR("VFS: filesystem %.*s doesn't exists in manager.", int(fsname.length()), fsname.data());
+            LOG_ERROR("VFS: filesystem %s doesn't exists in manager.", std::string(fsname).c_str());
             return -ENOENT;
         }
         if (it->second->mount_count() > 0) {
@@ -74,7 +74,7 @@ namespace purefs::fs
     {
         // Sanity check input data
         if (target.size() <= 1 || target[0] != '/') {
-            LOG_ERROR("VFS: Invalid target mountpoint path %.*s", int(target.length()), target.data());
+            LOG_ERROR("VFS: Invalid target mountpoint path %s", std::string(target).c_str());
             return -EINVAL;
         }
         if (flags & ~(mount_flags::remount | mount_flags::read_only)) {

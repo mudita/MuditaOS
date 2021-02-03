@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <blkid.h>
 #include "parse_partitions.h"
@@ -6,10 +6,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+#include <linux/fs.h>
+#include <fcntl.h>
+#include <unistd.h>
 static const size_t sector_size = 512;
-static const size_t part_offset = 446;
-static const size_t part_size   = 16;
+static const size_t bootstrap_offset = 0x00E0;
 
 struct partition *find_partitions(const char *filename, part_type_t ptype, size_t *nelems)
 {
@@ -80,35 +84,55 @@ static inline unsigned calculate_shift(uint32_t v)
     return mult_bruijn_bit_position[(uint32_t)(v * 0x07C4ACDDU) >> 27];
 }
 
+static ssize_t sector_block_size(int filedes)
+{
+    struct stat statbuf;
+    int err = fstat(filedes, &statbuf);
+    if (err < 0) {
+        return err;
+    }
+    uint64_t blk_sz;
+    if (S_ISBLK(statbuf.st_mode)) {
+        err = ioctl(filedes, BLKSSZGET, &blk_sz);
+        if (err < 0) {
+            return err;
+        }
+    }
+    else {
+        blk_sz = 512;
+    }
+    return blk_sz;
+}
+
 int write_partition_bootunit(const char *filename, int part_num, uint32_t block_size)
 {
     if (!filename) {
         errno = EINVAL;
         return -1;
     }
-    const uint8_t boot    = calculate_shift(block_size);
-    const loff_t fil_offs = part_offset + (part_num - 1) * part_size;
-    FILE *fil             = fopen(filename, "r+");
-    if (!fil) {
+    const int fd = open(filename, O_RDWR);
+    if (fd < 0) {
         return -1;
     }
-    if (fseek(fil, fil_offs, SEEK_SET) < 0) {
-        fclose(fil);
+    const ssize_t sector_size = sector_block_size(fd);
+    char *const sect_buf      = malloc(sector_size);
+    if (read(fd, sect_buf, sector_size) != sector_size) {
+        close(fd);
+        free(sect_buf);
         return -1;
     }
-    uint8_t boot_rd;
-    if (fread(&boot_rd, sizeof boot_rd, 1, fil) != 1) {
-        fclose(fil);
+    const uint8_t log2_block_size         = calculate_shift(block_size);
+    sect_buf[bootstrap_offset + part_num] = log2_block_size;
+    if (lseek(fd, 0, SEEK_SET) < 0) {
+        close(fd);
+        free(sect_buf);
         return -1;
     }
-    if (fseek(fil, fil_offs, SEEK_SET) < 0) {
-        fclose(fil);
+    if (write(fd, sect_buf, sector_size) != sector_size) {
+        close(fd);
+        free(sect_buf);
         return -1;
     }
-    uint8_t boot_wr = (boot_rd & 0x80) | (boot & 0x7f);
-    if (fwrite(&boot_wr, sizeof boot_wr, 1, fil) != 1) {
-        fclose(fil);
-        return -1;
-    }
-    return fclose(fil);
+    free(sect_buf);
+    return close(fd);
 }
