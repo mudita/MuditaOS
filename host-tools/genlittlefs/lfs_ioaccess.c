@@ -171,6 +171,7 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
     }
     ret->file_des = open(filename, O_RDWR);
     if (ret->file_des < 0) {
+        free((void *)ret->empty_flash_mem);
         free(ret);
         return NULL;
     }
@@ -178,6 +179,7 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
     int err = fstat(ret->file_des, &statbuf);
     if (err < 0) {
         close(ret->file_des);
+        free((void *)ret->empty_flash_mem);
         free(ret);
         return NULL;
     }
@@ -186,6 +188,7 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
         err = ioctl(ret->file_des, BLKGETSIZE64, &blk_size);
         if (err < 0) {
             close(ret->file_des);
+            free((void *)ret->empty_flash_mem);
             free(ret);
             return NULL;
         }
@@ -199,6 +202,7 @@ struct lfs_ioaccess_context *lfs_ioaccess_open(struct lfs_config *cfg,
     if (partition) {
         if (partition->end > statbuf.st_size) {
             close(ret->file_des);
+            free((void *)ret->empty_flash_mem);
             free(ret);
             errno = E2BIG;
             return NULL;
