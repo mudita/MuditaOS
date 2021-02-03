@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-db/DBServiceAPI.hpp"
@@ -362,4 +362,12 @@ auto DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath) -> bool
     }
     LOG_ERROR("DBBackup error, return code: %s", c_str(ret.first));
     return false;
+}
+
+bool DBServiceAPI::AddSMS(sys::Service *serv, const SMSRecord &record, std::unique_ptr<db::QueryListener> &&listener)
+{
+    auto query = std::make_unique<db::query::SMSAdd>(record);
+    query->setQueryListener(std::move(listener));
+    const auto [succeed, _] = DBServiceAPI::GetQuery(serv, db::Interface::Name::SMS, std::move(query));
+    return succeed;
 }
