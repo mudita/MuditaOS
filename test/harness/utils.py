@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import time
@@ -99,6 +99,105 @@ keymap = {
     "caps": key_codes["*"],
 }
 
+special_chars_keymap = {
+    U'.': "",
+    U',': "d",
+    U'\'': "dd",
+    U'?': "ddd",
+    U'!': "dddd",
+    U'"': "ddddd",
+    U'-': "dddddd",
+    U'(': "s",
+    U')': "sd",
+    U'@': "sdd",
+    U'/': "sddd",
+    U':': "sdddd",
+    U'_': "sddddd",
+    U';': "sdddddd",
+    U'␤': "ss",
+    U'+': "ssd",
+    U'&': "ssdd",
+    U'%': "ssddd",
+    U'*': "ssdddd",
+    U'<': "ssddddd",
+    U'>': "ssdddddd",
+    U'=': "sss",
+    U'£': "sssd",
+    U'€': "sssdd",
+    U'$': "sssddd",
+    U'[': "sssdddd",
+    U']': "sssddddd",
+    U'{': "sssdddddd",
+    U'}': "ssss",
+    U'\'': "ssssd",
+    U'^': "ssssdd",
+    U'~': "ssssddd",
+    U'`': "ssssdddd",
+    U'į': "ssssddddd",
+    U'§': "ssssdddddd",
+    U'…': "sssss",
+    U'#': "sssssd",
+    U'|': "sssssdd",
+    U'÷': "sssssddd",
+    U'·': "sssssdddd",
+    U'°': "sssssddddd",
+    U'¿': "sssssdddddd",
+    U'¡': "ssssss",
+    U'ą': "ssssssd",
+    U'à': "ssssssdd",
+    U'á': "ssssssddd",
+    U'ä': "ssssssdddd",
+    U'â': "ssssssddddd",
+    U'ć': "ssssssdddddd",
+    U'ç': "sssssss",
+    U'ę': "sssssssd",
+    U'é': "sssssssdd",
+    U'è': "sssssssddd",
+    U'ê': "sssssssdddd",
+    U'ë': "sssssssddddd",
+    U'î': "sssssssdddddd",
+    U'ï': "ssssssss",
+    U'í': "ssssssssd",
+    U'ł': "ssssssssdd",
+    U'ń': "ssssssssddd",
+    U'ñ': "ssssssssdddd",
+    U'ó': "ssssssssddddd",
+    U'ô': "ssssssssdddddd",
+    U'ö': "sssssssss",
+    U'ś': "sssssssssd",
+    U'û': "sssssssssdd",
+    U'ú': "sssssssssddd",
+    U'ù': "sssssssssdddd",
+    U'ü': "sssssssssddddd",
+    U'ÿ': "sssssssssdddddd",
+    U'ż': "ssssssssss",
+    U'ź': "ssssssssssd",
+    U'ß': "ssssssssssdd"
+}
+
+emojis_keymap = {
+    U'😁': "",
+    U'😂': "d",
+    U'😃': "dd",
+    U'😄': "ddd",
+    U'😅': "dddd",
+    U'😆': "ddddd",
+    U'😉': "dddddd",
+    U'😊': "s",
+    U'😋': "sd",
+    U'😌': "sdd",
+    U'😍': "sddd",
+    U'😏': "sdddd",
+    U'😒': "sddddd",
+    U'😓': "sdddddd",
+    U'😔': "ss",
+    U'😖': "ssd",
+    U'😘': "ssdd",
+    U'😚': "ssddd",
+    U'😜': "ssdddd",
+    U'😝': "ssddddd",
+    U'😼': "ssdddddd"
+}
 
 def send_keystoke(keypath, connection):
     for key in keypath:
@@ -112,34 +211,47 @@ last_char = '\0'
 def send_char(char: str, connection):
     global last_char
     key_type = Keytype.short_press
-    if char.isdigit():
-        key_type = Keytype.long_press
-        if last_char is char:
-            print("repeated key!")
+    if char.isascii():
+        if char.isdigit():
+            key_type = Keytype.long_press
+            if last_char is char:
+                print("repeated key!")
+                connection.send_key_code(key_codes["right"])
+            connection.send_key_code(int(char), key_type)
             connection.send_key_code(key_codes["right"])
-        connection.send_key_code(int(char), key_type)
-        connection.send_key_code(key_codes["right"])
-        last_char = char
-    elif char.islower():
-        tmp = char.upper()
-        # toggle to lowercase mode
-        connection.send_key_code(key_codes["*"], key_type)
-        if last_char is keymap[tmp][0]:
-            print("repeated key!")
-            connection.send_key_code(key_codes["right"], key_type)
-        for key in keymap[tmp]:
-            connection.send_key_code(int(key), key_type)
-        last_char = keymap[tmp][0]
-        # toggle to uppercase mode
-        connection.send_key_code(key_codes["*"], key_type)
-        connection.send_key_code(key_codes["*"], key_type)
+            last_char = char
+        elif char.islower():
+            tmp = char.upper()
+            # toggle to lowercase mode
+            connection.send_key_code(key_codes["*"], key_type)
+            if last_char is keymap[tmp][0]:
+                print("repeated key!")
+                connection.send_key_code(key_codes["right"], key_type)
+            for key in keymap[tmp]:
+                connection.send_key_code(int(key), key_type)
+            last_char = keymap[tmp][0]
+            # toggle to uppercase mode
+            connection.send_key_code(key_codes["*"], key_type)
+            connection.send_key_code(key_codes["*"], key_type)
+        else:
+            if last_char is keymap[char][0]:
+                print("repeated key!")
+                connection.send_key_code(key_codes["right"], key_type)
+            for key in keymap[char]:
+                connection.send_key_code(int(key), key_type)
+            last_char = keymap[char][0]
     else:
-        if last_char is keymap[char][0]:
-            print("repeated key!")
-            connection.send_key_code(key_codes["right"], key_type)
-        for key in keymap[char]:
-            connection.send_key_code(int(key), key_type)
-        last_char = keymap[char][0]
+        connection.send_key_code(key_codes["*"], Keytype.long_press)
+        if char in special_chars_keymap:
+            for key in special_chars_keymap[char]:
+                connection.send_key_code(ord(key), key_type)
+        elif char in emojis_keymap:
+            connection.send_key_code(key_codes["fnLeft"], Keytype.short_press)
+            for key in emojis_keymap[char]:
+                connection.send_key_code(ord(key), key_type)
+        else:
+            print("Not supported char {} !!!".format(char))
+        connection.send_key_code(key_codes["enter"], key_type)
 
 
 def send_number(number: str, connection):

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,6 +10,7 @@
 #include <Service/Service.hpp>
 #include <bsp/keyboard/key_codes.hpp>
 #include <input/InputEvent.hpp>
+#include <module-db/Interface/SMSRecord.hpp>
 
 namespace sys
 {
@@ -26,6 +27,8 @@ namespace parserFSM
         void sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state);
 
         void requestSimChange(const int simSelected);
+        auto smsRecordFromJson(json11::Json msgJson) -> SMSRecord;
+        auto prepareSMS(Context &context) -> sys::ReturnCodes;
 
       public:
         DeveloperModeHelper(sys::Service *_ownerServicePtr) : ownerServicePtr(_ownerServicePtr){};
@@ -46,9 +49,11 @@ namespace parserFSM
         inline constexpr auto btOn          = "on";
         inline constexpr auto btCommand     = "btCommand";
         inline constexpr auto changeSim     = "changeSim";
+        inline constexpr auto smsCommand    = "smsCommand";
         inline constexpr auto getInfo       = "getInfo";
-
         /// values for getInfo cmd
         inline constexpr auto simStateInfo = "simState";
+        /// values for smsCommand
+        inline constexpr auto smsAdd = "smsAdd";
     }
 } // namespace parserFSM

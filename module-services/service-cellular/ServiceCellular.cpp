@@ -1903,18 +1903,14 @@ SMSRecord ServiceCellular::createSMSRecord(const UTF8 &decodedMessage,
 
 bool ServiceCellular::dbAddSMSRecord(const SMSRecord &record)
 {
-    auto query = std::make_unique<db::query::SMSAdd>(record);
-    query->setQueryListener(db::QueryCallback::fromFunction([this](auto response) {
-        auto result = dynamic_cast<db::query::SMSAddResult *>(response);
-        if (result == nullptr || !result->result) {
-            return false;
-        }
-
-        onSMSReceived();
-        return true;
-    }));
-    const auto [succeed, _] = DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::move(query));
-    return succeed;
+    return DBServiceAPI::AddSMS(this, record, db::QueryCallback::fromFunction([this](auto response) {
+                                    auto result = dynamic_cast<db::query::SMSAddResult *>(response);
+                                    if (result == nullptr || !result->result) {
+                                        return false;
+                                    }
+                                    onSMSReceived();
+                                    return true;
+                                }));
 }
 
 void ServiceCellular::onSMSReceived()
