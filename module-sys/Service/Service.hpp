@@ -3,23 +3,24 @@
 
 #pragma once
 
+#include "Timer.hpp"
 #include "BusProxy.hpp"
 #include "Common.hpp"  // for ReturnCodes, ServicePriority, BusChannels
 #include "Mailbox.hpp" // for Mailbox
 #include "Message.hpp" // for MessagePointer
 #include "ServiceManifest.hpp"
-#include "thread.hpp"  // for Thread
-#include <algorithm>   // for find, max
-#include <cstdint>     // for uint32_t, uint64_t
-#include <functional>  // for function
-#include <iterator>    // for end
-#include <map>         // for map
-#include <memory>      // for allocator, shared_ptr, enable_shared_from_this
-#include <string>      // for string
-#include <typeindex>   // for type_index
-#include <utility>     // for pair
-#include <vector>      // for vector<>::iterator, vector
-#include <typeinfo>    // for connect by type
+#include "thread.hpp" // for Thread
+#include <algorithm>  // for find, max
+#include <cstdint>    // for uint32_t, uint64_t
+#include <functional> // for function
+#include <iterator>   // for end
+#include <map>        // for map
+#include <memory>     // for allocator, shared_ptr, enable_shared_from_this
+#include <string>     // for string
+#include <typeindex>  // for type_index
+#include <utility>    // for pair
+#include <vector>     // for vector<>::iterator, vector
+#include <typeinfo>   // for connect by type
 
 namespace sys
 {
@@ -124,7 +125,17 @@ namespace sys
 
             void detach(Timer *timer)
             {
-                list.erase(std::find(list.begin(), list.end(), timer));
+                auto it = std::find(list.begin(), list.end(), timer);
+
+                if (it != list.end()) {
+                    list.erase(it);
+                }
+            }
+
+            auto findTimer(const std::string &timerName) const
+            {
+                return std::find_if(
+                    list.begin(), list.end(), [&, timerName](auto &el) -> bool { return el->getName() == timerName; });
             }
 
           public:
@@ -135,16 +146,42 @@ namespace sys
                 return std::find(list.begin(), list.end(), timer);
             }
 
+            [[nodiscard]] auto timerExists(const std::string &timerName) const
+            {
+                return findTimer(timerName) != list.end();
+            }
+
+            void detachTimer(const std::string &timerName)
+            {
+                auto it = findTimer(timerName);
+
+                if (it != list.end()) {
+                    (*it)->stop();
+                    detach((*it));
+                }
+            }
+
             [[nodiscard]] auto noTimer() const
             {
                 return std::end(list);
             }
+
         } timers;
 
       public:
-        auto getTimers() -> auto &
+        [[nodiscard]] auto getTimers() -> auto &
         {
             return timers;
+        }
+
+        [[nodiscard]] auto timerExists(const std::string &timerName) -> bool
+        {
+            return timers.timerExists(timerName);
+        }
+
+        void detachTimer(const std::string &timerName)
+        {
+            timers.detachTimer(timerName);
         }
 
         auto TimerHandle(SystemMessage &message) -> ReturnCodes;
