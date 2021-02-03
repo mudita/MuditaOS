@@ -10,8 +10,6 @@
 #define _STRINGIFY(s) #s
 #define STRINGIFY(s)  _STRINGIFY(s)
 
-#define UNUSED(x) ((void)(x))
-
 #define ALIGN_(n) __attribute__((aligned(n)))
 
 #define CACHEABLE_SECTION_SDRAM(var) __attribute__((section(".sdram"))) var

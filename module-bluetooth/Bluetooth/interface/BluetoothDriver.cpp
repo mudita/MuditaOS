@@ -53,7 +53,8 @@ namespace bluetooth
     }
 #endif
 
-    Driver::Driver(const btstack_run_loop *runLoop) : runLoop{runLoop}
+    Driver::Driver(const btstack_run_loop *runLoop, sys::Service *ownerService)
+        : runLoop{runLoop}, gap{std::make_unique<bluetooth::GAP>(ownerService)}
     {}
 
     auto Driver::init() -> Error::Code
@@ -186,5 +187,21 @@ namespace bluetooth
         }
         hci_close();
         return ret != 0 ? Error::LibraryError : Error::Success;
+    }
+    auto Driver::scan() -> Error
+    {
+        return gap->scan();
+    }
+    void Driver::stopScan()
+    {
+        gap->stopScan();
+    }
+    void Driver::setVisibility(bool visibility)
+    {
+        gap->setVisibility(visibility);
+    }
+    auto Driver::pair(uint8_t *addr, std::uint8_t protectionLevel) -> bool
+    {
+        return gap->pair(addr, protectionLevel);
     }
 } // namespace bluetooth

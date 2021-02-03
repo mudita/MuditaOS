@@ -140,7 +140,6 @@ list(APPEND TARGET_LIBRARIES_INCLUDES
     ${BT_STACK_ROOT}/platform/lwip
     )
 set(BOARD_DIR_SOURCES
-    ${BT_INT}/GAP.cpp
     ${BT_INT}/PAN.cpp
 
     ${BT_GLU}/bluetooth_init_cc2564C_1.0.c

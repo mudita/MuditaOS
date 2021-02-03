@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AllDevicesWindow.hpp"
@@ -28,6 +28,8 @@ namespace gui
     void AllDevicesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         clearOptions();
+        application->bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::StopScan),
+                                     "ServiceBluetooth");
         if (const auto newData = dynamic_cast<BondedDevicesData *>(data); newData != nullptr) {
             addOptions(allDevicesOptionsList(newData->getDevices()));
         }
