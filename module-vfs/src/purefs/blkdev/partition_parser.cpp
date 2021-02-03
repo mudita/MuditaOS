@@ -94,13 +94,13 @@ namespace purefs::blkdev::internal
 
     auto partition_parser::check_partition(const std::shared_ptr<disk> disk, const partition &part) -> bool
     {
-        auto sector_size        = disk->get_info(info_type::sector_size);
-        unsigned long this_size = disk->get_info(info_type::sector_count) * sector_size;
-        const auto poffset      = part.start_sector * sector_size;
-        const auto psize        = part.num_sectors * sector_size;
-        const auto pnext        = part.start_sector * sector_size + poffset;
-        if ((poffset + psize > this_size) ||                                      // oversized
-            (pnext < static_cast<unsigned long>(part.start_sector * sector_size)) // going backward
+        auto sector_size     = disk->get_info(info_type::sector_size);
+        const auto this_size = uint64_t(disk->get_info(info_type::sector_count)) * uint64_t(sector_size);
+        const auto poffset   = uint64_t(part.start_sector) * uint64_t(sector_size);
+        const auto psize     = uint64_t(part.num_sectors) * uint64_t(sector_size);
+        const auto pnext     = uint64_t(part.start_sector) * uint64_t(sector_size) + poffset;
+        if ((poffset + psize > this_size) ||                    // oversized
+            (pnext < uint64_t(part.start_sector) * sector_size) // going backward
         ) {
             LOG_WARN("Part %d looks strange: start_sector %u offset %u next %u\n",
                      unsigned(part.mbr_number),
