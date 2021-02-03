@@ -47,19 +47,29 @@ CalllogRecordInterface::CalllogRecordInterface(CalllogDB *calllogDb, ContactsDB 
 
 bool CalllogRecordInterface::Add(const CalllogRecord &rec)
 {
-    ContactRecordInterface contactInterface(contactsDB);
-    auto contactMatch =
-        contactInterface.MatchByNumber(rec.phoneNumber, ContactRecordInterface::CreateTempContact::True);
-    if (!contactMatch) {
-        LOG_ERROR("Cannot get contact, for number %s", rec.phoneNumber.getNonEmpty().c_str());
-        return false;
-    }
-    auto &contactRec = contactMatch->contact;
-
     auto localRec      = rec;
-    localRec.contactId = contactRec.ID;
-    localRec.name      = contactRec.getFormattedName();
-    LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
+    if (!rec.phoneNumber.getFormatted().empty()) {
+        ContactRecordInterface contactInterface(contactsDB);
+        auto contactMatch =
+            contactInterface.MatchByNumber(rec.phoneNumber, ContactRecordInterface::CreateTempContact::True);
+        if (!contactMatch) {
+            LOG_ERROR("Cannot get contact, for number %s", rec.phoneNumber.getNonEmpty().c_str());
+            return false;
+        }
+        auto &contactRec = contactMatch->contact;
+
+        localRec.contactId = contactRec.ID;
+        localRec.name      = contactRec.getFormattedName();
+        if (localRec.presentation == PresentationType::PR_UNKNOWN) {
+            localRec.presentation = PresentationType::PR_ALLOWED;
+        }
+        LOG_DEBUG("Adding call log record %s", utils::to_string(localRec).c_str());
+    }
+    else {
+        // private number so do not add contact just call log entry
+        localRec.presentation = PresentationType::PR_UNKNOWN;
+        LOG_DEBUG("Adding private call entry to call log record.");
+    }
 
     return calllogDB->calls.add(CalllogTableRow{{.ID = localRec.ID}, // this is only to remove warning
                                                 .number       = localRec.phoneNumber.getEntered(),
@@ -71,7 +81,6 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
                                                 .name         = localRec.name,
                                                 .contactId    = localRec.contactId,
                                                 .isRead       = localRec.isRead});
-    ;
 }
 
 uint32_t CalllogRecordInterface::GetLastID()
@@ -119,21 +128,37 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
 
 bool CalllogRecordInterface::Update(const CalllogRecord &rec)
 {
-
     auto call = calllogDB->calls.getById(rec.ID);
     if (!call.isValid()) {
         return false;
     }
 
+    auto contactID    = rec.contactId;
+    auto presentation = rec.presentation;
+    if (call.presentation == PresentationType::PR_UNKNOWN && rec.phoneNumber.isValid()) {
+        // entry added as private was updated with phone number
+        ContactRecordInterface contactInterface(contactsDB);
+        auto contactMatch =
+            contactInterface.MatchByNumber(rec.phoneNumber, ContactRecordInterface::CreateTempContact::True);
+        if (!contactMatch) {
+            LOG_ERROR("Cannot get or create temporary contact for number %s", rec.phoneNumber.getNonEmpty().c_str());
+            return false;
+        }
+        contactID = contactMatch->contact.ID;
+        if (presentation == PresentationType::PR_UNKNOWN) {
+            presentation = PresentationType::PR_ALLOWED;
+        }
+    }
+
     return calllogDB->calls.update(CalllogTableRow{{.ID = rec.ID},
                                                    .number       = rec.phoneNumber.getEntered(),
                                                    .e164number   = rec.phoneNumber.getE164(),
-                                                   .presentation = rec.presentation,
+                                                   .presentation = presentation,
                                                    .date         = rec.date,
                                                    .duration     = rec.duration,
                                                    .type         = rec.type,
                                                    .name         = rec.name,
-                                                   .contactId    = rec.contactId,
+                                                   .contactId    = contactID,
                                                    .isRead       = rec.isRead});
 }
 
@@ -165,13 +190,16 @@ CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
 {
     auto call = calllogDB->calls.getById(id);
 
-    auto contactRec = GetContactRecordByID(call.contactId);
-    if (contactRec.ID == DB_ID_NONE) {
-        LOG_ERROR("Cannot find contact for ID %" PRIu32, call.contactId);
-        return CalllogRecord();
+    if (call.contactId != DB_ID_NONE) {
+        auto contactRec = GetContactRecordByID(call.contactId);
+        if (contactRec.ID == DB_ID_NONE) {
+            LOG_ERROR("Cannot find contact for ID %" PRIu32, call.contactId);
+            return CalllogRecord();
+        }
+
+        call.name = contactRec.getFormattedName();
     }
 
-    call.name = contactRec.getFormattedName();
     return CalllogRecord(call);
 }
 

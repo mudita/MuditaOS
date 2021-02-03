@@ -50,40 +50,27 @@ namespace app
             switchWindow(app::window::name_emergencyCall, std::forward<decltype(data)>(data));
             return msgHandled();
         });
-
-        auto convertibleToActionHandler = [this](sys::Message *request) { return HandleMessageAsAction(request); };
-        connect(typeid(CellularActionResponseMessage), convertibleToActionHandler);
-    }
-
-    auto ApplicationCall::HandleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>
-    {
-        auto actionMsg = dynamic_cast<manager::actions::ConvertibleToAction *>(request);
-        if (!actionMsg) {
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
-        }
-
-        auto buttonAction = [=]() -> bool {
-            returnToPreviousWindow();
-            return true;
-        };
-
-        constexpr auto iconNoEmergency = "emergency_W_G";
-        auto textNoEmergency           = utils::localize.get("app_call_wrong_emergency");
-        constexpr auto iconNoSim       = "info_big_circle_W_G";
-        const auto textNoSim           = utils::localize.get("app_call_no_sim");
-
-        auto action = actionMsg->toAction();
-
-        switch (const auto actionId = action->getAction(); actionId) {
-        case app::manager::actions::CallRejectNotEmergency:
-            utils::findAndReplaceAll(textNoEmergency, "$NUMBER", action->getData()->getDescription());
+        addActionReceiver(manager::actions::NotAnEmergencyNotification, [this](auto &&data) {
+            auto buttonAction = [=]() -> bool {
+                returnToPreviousWindow();
+                return true;
+            };
+            constexpr auto iconNoEmergency = "emergency_W_G";
+            auto textNoEmergency           = utils::localize.get("app_call_wrong_emergency");
+            utils::findAndReplaceAll(textNoEmergency, "$NUMBER", data->getDescription());
             showNotification(buttonAction, iconNoEmergency, textNoEmergency);
-            break;
-        case app::manager::actions::CallRejectNoSim:
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::NoSimNotification, [this](auto &&data) {
+            auto buttonAction = [=]() -> bool {
+                returnToPreviousWindow();
+                return true;
+            };
+            constexpr auto iconNoSim = "info_big_circle_W_G";
+            const auto textNoSim     = utils::localize.get("app_call_no_sim");
             showNotification(buttonAction, iconNoSim, textNoSim);
-            break;
-        }
-        return std::make_shared<sys::ResponseMessage>();
+            return msgHandled();
+        });
     }
 
     //  number of seconds after end call to switch back to previous application
@@ -99,11 +86,31 @@ namespace app
         manager::Controller::sendAction(this, manager::actions::Call, std::make_unique<app::CallActiveData>());
     }
 
-    void ApplicationCall::IncomingCallHandler(const CellularCallMessage *const msg)
+    void ApplicationCall::CallerIdHandler(const CellularCallMessage *const msg)
     {
-        if (state == call::State::IDLE) {
+        if (getState() == call::State::IDLE) {
+            if (callerIdTimer) {
+                callerIdTimer->stop();
+                callerIdTimer.reset(nullptr);
+            }
             manager::Controller::sendAction(
                 this, manager::actions::Call, std::make_unique<app::IncomingCallData>(msg->number));
+        }
+    }
+
+    void ApplicationCall::IncomingCallHandler(const CellularCallMessage *const msg)
+    {
+        if (getState() == call::State::IDLE) {
+            constexpr sys::ms callerIdTimeout = 1000;
+            callerIdTimer =
+                std::make_unique<sys::Timer>("CallerIdTimer", this, callerIdTimeout, sys::Timer::Type::SingleShot);
+            callerIdTimer->connect([=](sys::Timer &) {
+                callerIdTimer->stop();
+                manager::Controller::sendAction(
+                    this,
+                    manager::actions::Call,
+                    std::make_unique<app::IncomingCallData>(utils::PhoneNumber().getView()));
+            });
         }
     }
 
@@ -152,6 +159,9 @@ namespace app
             } break;
             case CellularCallMessage::Type::IncomingCall: {
                 IncomingCallHandler(msg);
+            } break;
+            case CellularCallMessage::Type::CallerId: {
+                CallerIdHandler(msg);
             } break;
             }
         }

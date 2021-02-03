@@ -8,6 +8,7 @@
 #include <Tables/CalllogTable.hpp>
 #include <time/time_conversion.hpp>
 #include <utf8/UTF8.hpp>
+#include <Utils.hpp>
 
 #include <cstdint>
 #include <functional>
@@ -73,10 +74,10 @@ namespace CellularCall
             endCallAction = callAction;
         }
 
-        bool startCall(const utils::PhoneNumber::View &number, const CallType type);
-
         bool setActive();
+        void setNumber(const utils::PhoneNumber::View &number);
 
+        bool startCall(const utils::PhoneNumber::View &number, const CallType type);
         bool endCall(Forced forced = Forced::False);
 
         bool isValid() const

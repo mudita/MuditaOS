@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogModel.hpp"
@@ -61,20 +61,11 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
 
     auto item = new gui::CalllogItem(this, !(application->isTimeFormat12()));
 
-    item->setCall(call);
-    item->activatedCallback = [=](gui::Item &item) {
-        LOG_INFO("activatedCallback");
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(*call);
-        application->switchWindow(calllog::settings::DetailsWindowStr, std::move(data));
-        return true;
-    };
-
-    item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
+    auto callCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
         if (event.state != gui::InputEvent::State::keyReleasedShort) {
             return false;
         }
         if (event.keyCode == gui::KeyCode::KEY_LF) {
-            LOG_DEBUG("calling");
             return app::manager::Controller::sendAction(
                 application,
                 app::manager::actions::Dial,
@@ -82,5 +73,29 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
         }
         return false;
     };
+
+    item->focusChangedCallback = [=](gui::Item &item) {
+        if (item.focus == true) {
+            auto &callLogItem = dynamic_cast<gui::CalllogItem &>(item);
+            if (callLogItem.getCall().presentation == PresentationType::PR_UNKNOWN) {
+                // disable call button since the number is unknown
+                application->getCurrentWindow()->setBottomBarActive(gui::BottomBar::Side::LEFT, false);
+                item.inputCallback = nullptr;
+            }
+            else {
+                application->getCurrentWindow()->setBottomBarActive(gui::BottomBar::Side::LEFT, true);
+                item.inputCallback = callCallback;
+            }
+        }
+        return true;
+    };
+
+    item->setCall(call);
+    item->activatedCallback = [=](gui::Item &item) {
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(*call);
+        application->switchWindow(calllog::settings::DetailsWindowStr, std::move(data));
+        return true;
+    };
+
     return item;
 }
