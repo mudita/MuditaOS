@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -35,7 +35,7 @@ struct Devicei : public Device
     Devicei(std::string name = "") : Device(std::move(name))
     {}
     ~Devicei() override = default;
-    void address_set(bd_addr_t *addr)
+    void setAddress(bd_addr_t *addr)
     {
         memcpy(&address, addr, sizeof address);
     }

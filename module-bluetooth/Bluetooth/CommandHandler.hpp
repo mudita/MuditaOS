@@ -5,6 +5,7 @@
 
 #include "Error.hpp"
 #include "interface/profiles/Profile.hpp"
+#include "interface/BluetoothDriver.hpp"
 
 #include <service-bluetooth/SettingsHolder.hpp>
 #include <Service/Service.hpp>
@@ -39,7 +40,8 @@ namespace bluetooth
       public:
         explicit CommandHandler(sys::Service *service,
                                 std::shared_ptr<bluetooth::SettingsHolder> settings,
-                                std::shared_ptr<bluetooth::Profile> currentProfile);
+                                std::shared_ptr<bluetooth::Profile> currentProfile,
+                                std::shared_ptr<bluetooth::Driver> driver);
 
         auto handle(Command command) -> Error::Code override;
 
@@ -54,5 +56,6 @@ namespace bluetooth
         sys::Service *service;
         std::shared_ptr<bluetooth::SettingsHolder> settings;
         std::shared_ptr<bluetooth::Profile> currentProfile;
+        std::shared_ptr<Driver> driver;
     };
 } // namespace bluetooth

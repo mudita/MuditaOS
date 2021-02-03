@@ -5,6 +5,7 @@
 
 #include <btstack.h>
 #include <functional>
+#include "GAP/GAP.hpp"
 #include "Error.hpp"
 
 namespace bluetooth
@@ -27,6 +28,7 @@ namespace bluetooth
         static hci_transport_config_uart_t config;
         const btstack_run_loop *runLoop;
         btstack_packet_callback_registration_t hci_event_callback_registration;
+        std::unique_ptr<bluetooth::GAP> gap;
         static void hci_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size);
         static void local_version_information_handler(uint8_t *packet);
 #ifdef TARGET_RT1051
@@ -36,11 +38,15 @@ namespace bluetooth
 #endif
 
       public:
-        explicit Driver(const btstack_run_loop *runLoop);
+        Driver(const btstack_run_loop *runLoop, sys::Service *ownerService);
 
         [[nodiscard]] auto init() -> Error::Code override;
         [[nodiscard]] auto run() -> Error::Code override;
         [[nodiscard]] auto stop() -> Error::Code override;
         void registerErrorCallback(const ErrorCallback &newCallback) override;
+        auto scan() -> Error;
+        void stopScan();
+        void setVisibility(bool visibility);
+        auto pair(uint8_t *addr, std::uint8_t protectionLevel = 0) -> bool;
     };
 } // namespace bluetooth

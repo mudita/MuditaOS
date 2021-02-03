@@ -13,7 +13,6 @@
 #include <vector>
 #include "service-bluetooth/SettingsHolder.hpp"
 #include "glucode/BluetoothRunLoop.hpp"
-#include "interface/BluetoothDriver.hpp"
 #include "WorkerController.hpp"
 struct HCI;
 
