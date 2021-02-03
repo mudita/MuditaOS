@@ -16,6 +16,9 @@
 #include <service-appmgr/Actions.hpp>
 #include <messages/AppMessage.hpp>
 
+#include <service-db/DBServiceAPI.hpp>
+#include <time/time_conversion.hpp>
+
 namespace parserFSM
 {
     class Context;
@@ -73,6 +76,18 @@ auto DeveloperModeHelper::processPutRequest(Context &context) -> sys::ReturnCode
         int simSelected = body[json::developerMode::changeSim].int_value();
         requestSimChange(simSelected);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
+    }
+    else if (body[json::developerMode::smsCommand].is_string()) {
+        if (body[json::developerMode::smsCommand].string_value() == json::developerMode::smsAdd) {
+            SMSType smsType = static_cast<SMSType>(context.getBody()[json::messages::type].int_value());
+            if (smsType == SMSType::DRAFT || smsType == SMSType::QUEUED || smsType == SMSType::FAILED) {
+                return prepareSMS(context);
+            }
+            else {
+                context.setResponseStatus(http::Code::NotAcceptable);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
+            }
+        }
     }
     else {
         context.setResponseStatus(http::Code::BadRequest);
@@ -180,4 +195,44 @@ void DeveloperModeHelper::requestSimChange(const int simSelected)
         sim = Store::GSM::SIM::SIM2;
     }
     CellularServiceAPI::SetSimCard(ownerServicePtr, sim);
+}
+
+auto DeveloperModeHelper::smsRecordFromJson(json11::Json msgJson) -> SMSRecord
+{
+    auto record = SMSRecord();
+
+    record.type = static_cast<SMSType>(msgJson[json::messages::type].int_value());
+    record.date = utils::time::getCurrentTimestamp().getTime();
+    utils::PhoneNumber phoneNumber(msgJson[json::messages::phoneNumber].string_value());
+    record.number = phoneNumber.getView();
+    record.body   = UTF8(msgJson[json::messages::messageBody].string_value());
+    return record;
+}
+
+auto DeveloperModeHelper::prepareSMS(Context &context) -> sys::ReturnCodes
+{
+    SMSRecord record = smsRecordFromJson(context.getBody());
+
+    LOG_INFO("Adding sms of type %d to database", static_cast<int>(record.type));
+    auto listener = std::make_unique<db::EndpointListener>(
+        [=](db::QueryResult *result, Context context) {
+            bool res = false;
+            if (auto SMSAddResult = dynamic_cast<db::query::SMSAddResult *>(result)) {
+                context.setResponseStatus(SMSAddResult->result ? http::Code::OK : http::Code::InternalServerError);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
+                LOG_INFO("Adding sms of type %d to database - %s",
+                         static_cast<int>(record.type),
+                         SMSAddResult->result ? "OK" : "NOK");
+                res = true;
+            }
+            else {
+                context.setResponseStatus(http::Code::InternalServerError);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
+            }
+            return res;
+        },
+        context);
+
+    DBServiceAPI::AddSMS(ownerServicePtr, record, std::move(listener));
+    return sys::ReturnCodes::Success;
 }

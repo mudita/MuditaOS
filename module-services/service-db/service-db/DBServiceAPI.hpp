@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,6 +14,8 @@
 #include <PhoneNumber.hpp>
 #include <Service/Message.hpp>
 #include <utf8/UTF8.hpp>
+#include <module-db/queries/messages/sms/QuerySMSAdd.hpp>
+#include <module-db/Interface/SMSRecord.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -121,4 +123,14 @@ class DBServiceAPI
     static auto GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc) -> uint32_t;
 
     static auto DBBackup(sys::Service *serv, std::string backupPath) -> bool;
+
+    /**
+     * @brief Add sms via DBService interface
+     *
+     * @param serv - calling service
+     * @param record - sms record data
+     * @param listener - query listener to obtain and handle query result
+     * @return true if adding sms operation succeed, otherwise false
+     */
+    static bool AddSMS(sys::Service *serv, const SMSRecord &record, std::unique_ptr<db::QueryListener> &&listener);
 };
