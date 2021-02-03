@@ -25,6 +25,7 @@ namespace purefs::subsystem
         constexpr auto new_layout_part_count = 3;
         constexpr auto boot_size_limit       = 16384L;
         constexpr auto block_size_max_shift  = 21;
+        constexpr auto block_size_min_shift  = 8;
         namespace json
         {
             constexpr auto os_type = "ostype";
@@ -90,6 +91,27 @@ namespace purefs::subsystem
             }
             return json[json::main][json::os_type].string_value();
         }
+
+        int read_mbr_lfs_erase_size(std::shared_ptr<blkdev::disk_manager> disk_mngr,
+                                    std::string_view dev_name,
+                                    int part_no)
+        {
+            static constexpr auto MBR_ERASE_BLK_OFFSET = 0x00E0;
+            if (part_no <= 0) {
+                return -EINVAL;
+            }
+            const auto sect_size = disk_mngr->get_info(dev_name, blkdev::info_type::sector_size);
+            if (sect_size <= MBR_ERASE_BLK_OFFSET + part_no) {
+                return (sect_size > 0) ? (-ERANGE) : (sect_size);
+            }
+            auto mbr_buf = std::make_unique<char[]>(sect_size);
+            int err      = disk_mngr->read(dev_name, mbr_buf.get(), 0, 1);
+            if (err < 0) {
+                return err;
+            }
+            return mbr_buf[MBR_ERASE_BLK_OFFSET + part_no];
+        }
+
     } // namespace
 
     auto initialize() -> std::tuple<std::shared_ptr<blkdev::disk_manager>, std::shared_ptr<fs::filesystem>>
@@ -172,16 +194,14 @@ namespace purefs::subsystem
             return err;
         }
         if (lfs_it != std::end(parts)) {
-            if (lfs_it->boot_unit > block_size_max_shift) {
-                LOG_FATAL("Boot sector size is out of range");
-                return -ERANGE;
+            int lfs_block_log2           = read_mbr_lfs_erase_size(disk, default_blkdev_name, lfs_it->physical_number);
+            uint32_t lfs_block_size      = 0;
+            uint32_t *lfs_block_size_ptr = nullptr;
+            if (lfs_block_log2 >= block_size_min_shift && lfs_block_log2 <= block_size_max_shift) {
+                lfs_block_size     = 1U << lfs_block_log2;
+                lfs_block_size_ptr = &lfs_block_size;
             }
-            else {
-                const uint32_t lfs_block_size = 1U << lfs_it->boot_unit;
-                const auto lfs_block_size_ptr = (lfs_it->boot_unit) ? (&lfs_block_size) : nullptr;
-                err                           = vfs->mount(
-                    lfs_it->name, purefs::dir::getUserDiskPath().string(), "littlefs", 0, lfs_block_size_ptr);
-            }
+            err = vfs->mount(lfs_it->name, purefs::dir::getUserDiskPath().string(), "littlefs", 0, lfs_block_size_ptr);
         }
         const std::string json_file = (dir::getRootDiskPath() / file::boot_json).string();
         const auto boot_dir_name    = parse_boot_json_directory(json_file);
