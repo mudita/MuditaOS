@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UpdateMuditaOS.hpp"
@@ -131,6 +131,7 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
     // at this point we should set the system to update mode we are
     // writing directly to eMMC when updating the bootloader
     // then placing the new files in destination folders/files
+    sys::SystemManager::Update(owner);
 
     if ((err = updateBootloader()) == updateos::UpdateError::NoError) {
         informUpdate(status, "Update bootloader");

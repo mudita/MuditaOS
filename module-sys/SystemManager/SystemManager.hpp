@@ -37,6 +37,7 @@ namespace sys
     enum class Code
     {
         CloseSystem,
+        Update,
         Reboot,
         None,
     };
@@ -75,6 +76,8 @@ namespace sys
 
         // Invoke system close procedure
         static bool CloseSystem(Service *s);
+
+        static bool Update(Service *s);
 
         static bool Reboot(Service *s);
 
@@ -124,6 +127,8 @@ namespace sys
         /// It closes all workers except EventManager -as it needs information from Eventmanager that it's safe to
         /// shutdown
         void CloseSystemHandler();
+
+        void UpdateSystemHandler();
 
         void RebootHandler();
 

@@ -12,6 +12,7 @@
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <application-call/ApplicationCall.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
+#include <application-desktop/ApplicationDesktop.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <service-appmgr/messages/Message.hpp>
@@ -282,6 +283,10 @@ namespace app::manager
         connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
             return std::make_shared<GetCurrentDisplayLanguageResponse>(displayLanguage);
         });
+        connect(typeid(UpdateInProgress), [this](sys::Message *) {
+            closeApplicationsOnUpdate();
+            return msgHandled();
+        });
 
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
         connect(typeid(CellularSimRequestPinMessage), convertibleToActionHandler);
@@ -340,6 +345,23 @@ namespace app::manager
         for (const auto &app : getApplications()) {
             if (app->started()) {
                 LOG_INFO("Closing application %s", app->name().c_str());
+                closeApplication(app.get());
+                app->setState(ApplicationHandle::State::DEACTIVATED);
+            }
+        }
+        return true;
+    }
+
+    auto ApplicationManager::closeApplicationsOnUpdate() -> bool
+    {
+        for (const auto &app : getApplications()) {
+            if (app->started()) {
+                auto appName = app->name();
+                if (appName == app::name_desktop) {
+                    LOG_DEBUG("Delay closing %s", app::name_desktop);
+                    continue;
+                }
+                LOG_INFO("Closing application on Update %s", appName.c_str());
                 closeApplication(app.get());
                 app->setState(ApplicationHandle::State::DEACTIVATED);
             }
