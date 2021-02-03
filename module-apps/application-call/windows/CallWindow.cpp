@@ -162,15 +162,22 @@ namespace gui
         switch (state) {
         case State::INCOMING_CALL: {
             interface->startAudioRinging();
-            bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
             bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(strings::answer), true);
             bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(strings::reject), true);
             durationLabel->setText(utils::localize.get(strings::iscalling));
             durationLabel->setVisible(true);
-            sendSmsIcon->setVisible(true);
             speakerIcon->setVisible(false);
             microphoneIcon->setVisible(false);
-            setFocusItem(sendSmsIcon);
+            if (phoneNumber.getFormatted().empty()) {
+                bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
+                sendSmsIcon->setVisible(false);
+                setFocusItem(nullptr);
+            }
+            else {
+                bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
+                sendSmsIcon->setVisible(true);
+                setFocusItem(sendSmsIcon);
+            }
         } break;
         case State::CALL_ENDED: {
             interface->stopAudio();
@@ -222,6 +229,7 @@ namespace gui
             stopCallTimer();
             [[fallthrough]];
         default:
+            numberLabel->clear();
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
             bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
@@ -249,21 +257,26 @@ namespace gui
     void CallWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (auto callData = dynamic_cast<app::CallSwitchData *>(data); callData != nullptr) {
-            phoneNumber      = callData->getPhoneNumber();
-            auto contact     = DBServiceAPI::MatchContactByPhoneNumber(this->application, phoneNumber);
-            auto displayName = phoneNumber.getFormatted();
-            if (contact) {
-                LOG_INFO("number = %s recognized as contact id = %" PRIu32 ", name = %s",
-                         phoneNumber.getEntered().c_str(),
-                         contact->ID,
-                         contact->getFormattedName().c_str());
-                displayName = contact->getFormattedName();
+            phoneNumber = callData->getPhoneNumber();
+            if (!callData->getPhoneNumber().getFormatted().empty()) {
+                auto contact     = DBServiceAPI::MatchContactByPhoneNumber(this->application, phoneNumber);
+                auto displayName = phoneNumber.getFormatted();
+                if (contact) {
+                    LOG_INFO("number = %s recognized as contact id = %" PRIu32 ", name = %s",
+                             phoneNumber.getEntered().c_str(),
+                             contact->ID,
+                             contact->getFormattedName().c_str());
+                    displayName = contact->getFormattedName();
+                }
+                else {
+                    LOG_INFO("number = %s was not recognized as any valid contact", phoneNumber.getEntered().c_str());
+                }
+
+                numberLabel->setText(displayName);
             }
             else {
-                LOG_INFO("number = %s was not recognized as any valid contact", phoneNumber.getEntered().c_str());
+                numberLabel->setText(utils::localize.get(strings::privateNumber));
             }
-
-            numberLabel->setText(displayName);
 
             if (dynamic_cast<app::IncomingCallData *>(data) != nullptr) {
                 if (getState() == State::INCOMING_CALL) {
@@ -317,8 +330,8 @@ namespace gui
         case State::CALL_IN_PROGRESS:
             interface->hangupCall();
             return true;
-            break;
-        default:
+        case State::IDLE:
+        case State::CALL_ENDED:
             break;
         }
 
@@ -411,4 +424,5 @@ namespace gui
         callDuration = std::chrono::seconds().zero();
         stop_timer   = true;
     }
+
 } /* namespace gui */

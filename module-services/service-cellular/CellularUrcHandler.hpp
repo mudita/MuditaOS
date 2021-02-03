@@ -17,6 +17,7 @@
 #include <module-cellular/at/UrcQind.hpp>
 #include <module-cellular/at/UrcResponse.hpp>
 #include <module-cellular/at/UrcQiurc.hpp>
+#include <module-cellular/at/UrcRing.hpp>
 
 /**
  * ServiceCellular helper for handling Urc messages
@@ -35,6 +36,7 @@ class CellularUrcHandler : public at::urc::UrcHandler
     void Handle(at::urc::Qind &urc) final;
     void Handle(at::urc::Cpin &urc) final;
     void Handle(at::urc::Qiurc &urc) final;
+    void Handle(at::urc::Ring &urc) final;
     void Handle(at::urc::PoweredDown &urc) final;
     void Handle(at::urc::UrcResponse &urc) final;
 

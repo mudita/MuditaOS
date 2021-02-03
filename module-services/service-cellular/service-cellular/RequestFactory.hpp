@@ -32,7 +32,6 @@ namespace cellular
                        CellularCallRequestMessage::RequestMode requestMode,
                        SimStatus simCardStatus);
         std::unique_ptr<IRequest> create();
-        std::optional<app::manager::actions::Action> &getActionRequest();
 
       private:
         void registerRequest(std::string regex, CreateCallback);
@@ -40,7 +39,6 @@ namespace cellular
 
         std::string request;
         std::vector<std::pair<std::string, CreateCallback>> requestMap;
-        std::optional<app::manager::actions::Action> actionRequest;
 
         at::BaseChannel &channel;
         const CellularCallRequestMessage::RequestMode requestMode;

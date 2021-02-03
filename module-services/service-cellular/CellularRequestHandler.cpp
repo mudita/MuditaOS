@@ -19,6 +19,7 @@
 #include "service-cellular/requests/ClirRequest.hpp"
 #include "service-cellular/requests/ClipRequest.hpp"
 #include "service-cellular/requests/CallWaitingRequest.hpp"
+#include "service-cellular/requests/RejectRequest.hpp"
 
 #include <service-appmgr/model/ApplicationManager.hpp>
 
@@ -69,6 +70,19 @@ void CellularRequestHandler::handle(cellular::CallRequest &request, at::Result &
     cellular.bus.sendMulticast(
         std::make_shared<CellularCallMessage>(CellularCallMessage::Type::Ringing, request.getNumber()),
         sys::BusChannel::ServiceCellularNotifications);
+    request.setHandled(true);
+}
+
+void CellularRequestHandler::handle(cellular::RejectRequest &request, at::Result &result)
+{
+    if (request.getRejectReason() == cellular::RejectRequest::RejectReason::NoSim) {
+        auto message = std::make_shared<CellularNoSimNotification>(request.getNumber());
+        cellular.bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
+    }
+    else if (request.getRejectReason() == cellular::RejectRequest::RejectReason::NotAnEmergencyNumber) {
+        auto message = std::make_shared<CellularNotAnEmergencyNotification>(request.getNumber());
+        cellular.bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
+    }
     request.setHandled(true);
 }
 

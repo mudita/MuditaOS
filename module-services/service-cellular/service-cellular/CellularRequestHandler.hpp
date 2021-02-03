@@ -15,6 +15,7 @@ class CellularRequestHandler : public cellular::RequestHandler
     void handle(cellular::ImeiRequest &request, at::Result &result) final;
     void handle(cellular::UssdRequest &request, at::Result &result) final;
     void handle(cellular::CallRequest &request, at::Result &result) final;
+    void handle(cellular::RejectRequest &request, at::Result &result) final;
     void handle(cellular::PasswordRegistrationRequest &request, at::Result &result) final;
     void handle(cellular::SupplementaryServicesRequest &request, at::Result &result) final;
     void handle(cellular::PinChangeRequest &request, at::Result &result) final;

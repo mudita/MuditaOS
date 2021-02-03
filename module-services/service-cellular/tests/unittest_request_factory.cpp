@@ -15,6 +15,7 @@
 #include <service-cellular/requests/ClipRequest.hpp>
 #include <service-cellular/requests/ClirRequest.hpp>
 #include <service-cellular/requests/ColpRequest.hpp>
+#include <service-cellular/requests/RejectRequest.hpp>
 
 #include <module-cellular/test/mock/AtCommon_channel.hpp>
 
@@ -33,15 +34,15 @@ TEST_CASE("Emergency handling")
         bool isNumberEmergencyNoSim;
         // mock that sim is inserted
         bool insertSim;
-        // expected action returned
-        std::optional<app::manager::actions::Action> expectedAction;
+        // reject reason if applicable
+        std::optional<RejectRequest::RejectReason> rejectReason;
         // expected typeid name of created request
         std::string expectedType;
 
-        // test number
-        std::string number = "600700800";
         // expected command crated by factory
         std::string expectedCommand = "ATD600700800;";
+        // test number
+        std::string number = "600700800";
     };
 
     std::vector<EmergencyTest> testCases = {
@@ -58,11 +59,11 @@ TEST_CASE("Emergency handling")
         // no SIM emergency number / no sim inserted
         {false, false, true, false, std::nullopt, typeid(CallRequest).name()},
         // SIM emergency number / no sim inserted
-        {false, true, false, false, Action::CallRejectNoSim, ""},
+        {false, true, false, false, RejectRequest::RejectReason::NoSim, typeid(RejectRequest).name(), ""},
         // normal number / sim inserted
         {false, false, false, true, std::nullopt, typeid(CallRequest).name()},
         // normal number / no sim inserted
-        {false, false, false, false, Action::CallRejectNoSim, ""},
+        {false, false, false, false, RejectRequest::RejectReason::NoSim, typeid(RejectRequest).name(), ""},
 
         ////// emergency request
         // no SIM and SIM emergency number / sim inserted
@@ -76,11 +77,17 @@ TEST_CASE("Emergency handling")
         // no SIM emergency number / no sim inserted
         {true, false, true, false, std::nullopt, typeid(CallRequest).name()},
         // SIM emergency number / no sim inserted
-        {true, true, false, false, Action::CallRejectNoSim, ""},
+        {true, true, false, false, RejectRequest::RejectReason::NoSim, typeid(RejectRequest).name(), ""},
         // normal number / sim inserted
-        {true, false, false, true, Action::CallRejectNotEmergency, ""},
+        {true, false, false, true, RejectRequest::RejectReason::NotAnEmergencyNumber, typeid(RejectRequest).name(), ""},
         // normal number / no sim inserted
-        {true, false, false, false, Action::CallRejectNotEmergency, ""},
+        {true,
+         false,
+         false,
+         false,
+         RejectRequest::RejectReason::NotAnEmergencyNumber,
+         typeid(RejectRequest).name(),
+         ""},
     };
     int idx = 0;
 
@@ -108,16 +115,15 @@ TEST_CASE("Emergency handling")
                                                               : CellularCallRequestMessage::RequestMode::Normal,
                                       test.insertSim ? RequestFactory::SimStatus::SimInsterted
                                                      : RequestFactory::SimStatus::SimSlotEmpty);
-        auto request = requestFactory.create();
+        std::shared_ptr<IRequest> request = requestFactory.create();
 
-        if (test.expectedAction) {
-            INFO("Failed test case idx: " + std::to_string(idx));
-            REQUIRE(requestFactory.getActionRequest() == test.expectedAction);
-            REQUIRE(request == nullptr);
-        }
-        else {
-            REQUIRE(requestFactory.getActionRequest() == std::nullopt);
-            REQUIRE(typeid(*request.get()).name() == test.expectedType);
+        INFO("Failed test case idx: " + std::to_string(idx));
+        REQUIRE(request != nullptr);
+        REQUIRE(typeid(*request.get()).name() == test.expectedType);
+
+        if (test.expectedType == typeid(RejectRequest).name()) {
+            auto rejectRequest = std::static_pointer_cast<RejectRequest>(request);
+            REQUIRE(test.rejectReason == rejectRequest->getRejectReason());
         }
 
         if (request) {

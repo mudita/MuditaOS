@@ -503,5 +503,6 @@
   "app_desktop_update_start": "Update start",
   "app_desktop_update_size": "size",
   "app_desktop_update_bytes": "bytes",
-  "app_desktop_update_unpacking": "Unpacking"
+  "app_desktop_update_unpacking": "Unpacking",
+  "app_call_private_number": "Private number"
 }

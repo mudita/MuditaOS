@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,6 +25,7 @@ class FotaUrcHandler : public at::urc::UrcHandler
     virtual void Handle(at::urc::Ctze &urc){};
     virtual void Handle(at::urc::Cpin &urc){};
     virtual void Handle(at::urc::Qiurc &urc){};
+    virtual void Handle(at::urc::Ring &urc){};
     virtual void Handle(at::urc::PoweredDown &urc){};
     virtual void Handle(at::urc::UrcResponse &urc){};
 
