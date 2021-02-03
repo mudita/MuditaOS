@@ -16,6 +16,8 @@ namespace sys
 
 namespace at
 {
+    constexpr auto delimiter = "\r\n"; /// use std::strlen()
+
     class Channel : public BaseChannel
     {
       protected:
@@ -45,10 +47,6 @@ namespace at
                          size_t rxCount                    = 0) -> Result final;
         virtual auto cmd(const at::AT &at) -> Result final;
         virtual auto cmd(const at::Cmd &at) -> Result final;
-        /// check for OK, ERROR in string in last token
-        virtual Result::Code at_check(const std::vector<std::string> &arr);
-        /// check for +CME ERROR: errors if exists in last token
-        virtual bool at_check_cmx_error(const std::string &CMX, const std::vector<std::string> &arr, uint32_t &errcode);
         virtual void cmd_log(std::string cmd, const Result &result, uint32_t timeout) final;
         virtual auto ProcessNewData(sys::Service *service) -> int
         {

@@ -222,6 +222,10 @@ TESTS_LIST["catch2-unittest_parse_CSCA"]="
     CSCA set data;
 "
 #---------
+TESTS_LIST["catch2-unittest_ATStream"]="
+    Channel Test- AT return parser;
+"
+#---------
 TESTS_LIST["catch2-utils"]="
     Split tests;
     toNumeric tests;

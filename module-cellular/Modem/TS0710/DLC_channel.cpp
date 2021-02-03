@@ -99,7 +99,7 @@ void DLC_channel::cmd_send(std::string cmd)
     SendData(data);
 }
 
-std::vector<std::string> DLC_channel::cmd_receive()
+std::string DLC_channel::cmd_receive()
 {
     cpp_freertos::LockGuard lock(mutex);
     TS0710_Frame::frame_t frame;
@@ -128,7 +128,7 @@ std::vector<std::string> DLC_channel::cmd_receive()
         deserialisedData += str;
     }
     mFrames.clear();
-    return utils::split(deserialisedData, "\r\n");
+    return deserialisedData;
 }
 
 void DLC_channel::cmd_post()
