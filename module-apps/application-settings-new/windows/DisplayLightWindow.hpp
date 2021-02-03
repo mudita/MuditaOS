@@ -20,7 +20,7 @@ namespace gui
     {
       public:
         DisplayLightWindow(app::Application *app, app::settingsInterface::ScreenLightSettings *screenLightSettings);
-        ~DisplayLightWindow();
+        void onClose() override;
 
       private:
         auto buildOptionsList() -> std::list<Option> override;
@@ -33,7 +33,7 @@ namespace gui
         std::uint8_t brightnessValue                                     = 0;
         app::settingsInterface::ScreenLightSettings *screenLightSettings = nullptr;
         float ambientLight                                               = 0.0;
-        std::unique_ptr<app::GuiTimer> timerTask;
+        std::string timerName;
         [[nodiscard]] auto onTimerTimeout(Item &self, Timer &task) -> bool;
     };
 } // namespace gui

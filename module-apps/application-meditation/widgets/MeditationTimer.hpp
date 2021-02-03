@@ -25,8 +25,6 @@ namespace gui
                         app::ApplicationMeditation *app,
                         Item *_parent = nullptr);
 
-        [[nodiscard]] auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
-
         void start();
         void stop();
         void reset(std::chrono::seconds _duration, std::chrono::seconds period = std::chrono::seconds::zero()) noexcept;
