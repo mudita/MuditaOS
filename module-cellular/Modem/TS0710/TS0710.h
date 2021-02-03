@@ -283,6 +283,15 @@ class TS0710
 
     DLC_channel::Callback_t controlCallback = nullptr;
     std::queue<uint8_t> RXFifo;
+
+    enum class EchoCancellerStrength
+    {
+        LeastAggressive,
+        Medium,
+        Aggressive
+    };
+    void SetupEchoCalceller(EchoCancellerStrength strength);
+
   public:
     enum class ConfState
     {
