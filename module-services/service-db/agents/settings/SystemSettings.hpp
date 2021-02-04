@@ -7,16 +7,17 @@ namespace settings
 {
     namespace SystemProperties
     {
-        constexpr inline auto activeSim       = "gs_active_sim";
-        constexpr inline auto lockPassHash    = "gs_lock_pass_hash";
-        constexpr inline auto lockScreenPasscodeIsOn = "gs_lock_screen_passcode_is_on";
-        constexpr inline auto lockTime        = "gs_lock_time";
-        constexpr inline auto displayLanguage = "gs_display_language";
-        constexpr inline auto inputLanguage   = "gs_input_language";
+        constexpr inline auto activeSim                = "gs_active_sim";
+        constexpr inline auto lockPassHash             = "gs_lock_pass_hash";
+        constexpr inline auto lockScreenPasscodeIsOn   = "gs_lock_screen_passcode_is_on";
+        constexpr inline auto lockTime                 = "gs_lock_time";
+        constexpr inline auto displayLanguage          = "gs_display_language";
+        constexpr inline auto inputLanguage            = "gs_input_language";
         constexpr inline auto automaticDateAndTimeIsOn = "gs_automatic_date_and_time_is_on";
         constexpr inline auto automaticTimeZoneIsOn    = "gs_automatic_time_zone_is_on";
         constexpr inline auto timeFormat               = "gs_time_format";
         constexpr inline auto dateFormat               = "gs_date_format";
+        constexpr inline auto eulaAccepted             = "gs_eula_accepted";
     } // namespace SystemProperties
     namespace Bluetooth
     {

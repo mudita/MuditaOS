@@ -86,6 +86,26 @@ namespace utils::filesystem
         return ret;
     }
 
+    std::FILE *openFile(const std::filesystem::path &filePath) noexcept
+    {
+        return std::fopen(filePath.c_str(), "r");
+    }
+
+    std::string readFile(std::FILE *file) noexcept
+    {
+        uint32_t fsize = utils::filesystem::filelength(file);
+        auto stream    = std::make_unique<char[]>(fsize + 1);
+        std::fread(stream.get(), 1, fsize, file);
+
+        return stream.get();
+    }
+
+    void closeFile(std::FILE *file) noexcept
+    {
+        if (file != nullptr) {
+            std::fclose(file);
+        }
+    }
 } // namespace utils::filesystem
 
 namespace utils
