@@ -259,4 +259,12 @@ namespace style
         inline constexpr auto default_left_text_padding = 10U;
     } // namespace padding
 
+    namespace widgets
+    {
+        inline constexpr auto h           = 55U;
+        inline constexpr auto iconsSize   = h;
+        inline constexpr auto leftMargin  = 10U;
+        inline constexpr auto rightMargin = 10U;
+    } // namespace widgets
+
 }; // namespace style

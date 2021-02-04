@@ -308,6 +308,7 @@
   "app_messages_offline": "You're offline.\n\nTo send a SMS\n switch to the Connected mode.",
   "app_messages_thread_draft": "Draft: ",
   "app_messages_thread_not_sent": "Not sent: ",
+  "app_messages_thread_from_this": "From this message",
   "app_messages_thread_you": "You: ",
   "app_settings_title_main": "Settings",
   "app_settings_title_main_new": "Settings New",
