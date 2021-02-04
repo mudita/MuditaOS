@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef DATECOMMON_H
 #define DATECOMMON_H
 
 #include <module-utils/date/include/date/date.h>
+#include <module-utils/time/DateAndTimeSettings.hpp>
 #include <time/time_conversion.hpp>
 #include <Utils.hpp>
 #include <random>
@@ -19,6 +20,7 @@ namespace calendar
 } // namespace calendar
 
 inline constexpr auto max_month_day = 31;
+inline constexpr auto unix_epoch_year = 1900;
 
 enum class Reminder
 {
@@ -124,6 +126,14 @@ inline uint32_t TimePointToHour24H(const TimePoint &tp)
     return hour;
 }
 
+inline auto LocalizedHoursToUtcHours(int hour = 0)
+{
+    std::tm tm           = CreateTmStruct(unix_epoch_year, 1, 1, hour, 0, 0);
+    std::time_t basetime = std::mktime(&tm);
+    basetime -= utils::time::Time::getTimeZoneOffset();
+    return TimePointToHour24H(TimePointFromTimeT(basetime));
+}
+
 inline uint32_t TimePointToMinutes(const TimePoint &tp)
 {
     auto time = TimePointToTimeT(tp);
@@ -204,6 +214,12 @@ inline std::string TimePointToLocalizedTimeString(const TimePoint &tp, const std
     return timestamp.str(format);
 }
 
+inline std::string TimePointToLocalizedHourMinString(const TimePoint &tp)
+{
+    return utils::dateAndTimeSettings.isTimeFormat12() ? TimePointToLocalizedDateString(tp, "%I:%M")
+                                                       : TimePointToLocalizedDateString(tp, "%H:%M");
+}
+
 inline TimePoint TimePointFromString(const char *s1)
 {
     TimePoint tp;
@@ -246,6 +262,12 @@ inline std::string TimePointToHourString12H(const TimePoint &tp)
         utils::time::Timestamp(TimePointToTimeT(tp)).get_UTC_date_time_sub_value(utils::time::GetParameters::Hour);
     auto hour12h = date::make12(std::chrono::hours(hour)).count();
     return utils::to_string(hour12h);
+}
+
+inline std::string TimePointToLocalizedHourString(const TimePoint &tp)
+{
+    return utils::dateAndTimeSettings.isTimeFormat12() ? TimePointToLocalizedDateString(tp, "%I")
+                                                       : TimePointToLocalizedDateString(tp, "%H");
 }
 
 inline std::string TimePointToHourString24H(const TimePoint &tp)

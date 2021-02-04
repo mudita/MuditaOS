@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogModel.hpp"
@@ -7,6 +7,7 @@
 #include "data/CallLogInternals.hpp"
 #include "data/CallLogSwitchData.hpp"
 #include "widgets/CalllogItem.hpp"
+#include <module-utils/time/DateAndTimeSettings.hpp>
 #include <module-utils/Utils.hpp>
 
 #include <service-db/DBServiceAPI.hpp>
@@ -59,7 +60,7 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
         return nullptr;
     }
 
-    auto item = new gui::CalllogItem(this, !(application->isTimeFormat12()));
+    auto item = new gui::CalllogItem(this, !(utils::dateAndTimeSettings.isTimeFormat12()));
 
     item->setCall(call);
     item->activatedCallback = [=](gui::Item &item) {

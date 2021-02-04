@@ -27,8 +27,7 @@ class WorkerEvent;
 class EventManager : public sys::Service
 {
   private:
-    void HandleAlarmTrigger(sys::DataMessage *msgl);
-    void GetNextAlarmTimestamp(time_t timestamp);
+    void handleMinuteUpdate(time_t timestamp);
     bool processKeypadBacklightRequest(bsp::keypad_backlight::Action act);
 
   protected:

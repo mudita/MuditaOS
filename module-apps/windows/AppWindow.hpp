@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -69,8 +69,6 @@ namespace gui
         // updates battery level in the window
         bool updateSignalStrength();
         bool updateNetworkAccessTechnology();
-        virtual bool updateTime(const UTF8 &timeStr);
-        virtual bool updateTime(const uint32_t &timestamp, bool mode24H);
         void setTitle(const UTF8 &text);
 
         void rebuild() override;

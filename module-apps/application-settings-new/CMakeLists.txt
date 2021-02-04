@@ -18,7 +18,8 @@ target_sources( ${PROJECT_NAME}
         models/ApnSettingsModel.cpp
         models/LanguagesModel.cpp
         models/NewApnModel.cpp
-        widgets/timeWidget.cpp
+        models/DateAndTimeModel.cpp
+        models/FromTimeToTimeModel.cpp
         widgets/ChangePasscodeLockHandler.cpp
         widgets/QuoteWidget.cpp
         widgets/ApnInputWidget.cpp
@@ -53,6 +54,7 @@ target_sources( ${PROJECT_NAME}
         windows/SystemMainWindow.cpp
         windows/LanguagesWindow.cpp
         windows/DateAndTimeMainWindow.cpp
+        windows/ChangeDateAndTimeWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -76,6 +78,7 @@ target_sources( ${PROJECT_NAME}
         windows/SystemMainWindow.hpp
         windows/LanguagesWindow.hpp
         windows/DateAndTimeMainWindow.hpp
+        windows/ChangeDateAndTimeWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

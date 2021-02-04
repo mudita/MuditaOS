@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -39,6 +39,20 @@ namespace sevm
             type = Type::Data;
         }
         uint32_t timestamp = 0;
+    };
+
+    class RtcUpdateTimeMessage : public sys::Message
+    {
+      public:
+        explicit RtcUpdateTimeMessage(time_t time) : time(time)
+        {}
+        [[nodiscard]] time_t getTime() const noexcept
+        {
+            return time;
+        }
+
+      private:
+        const time_t time = 0;
     };
 
     class SIMMessage : public sys::DataMessage

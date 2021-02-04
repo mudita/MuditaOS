@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SeveralOptionsItem.hpp"
@@ -167,7 +167,7 @@ namespace gui
             return false;
         };
 
-        onSaveCallback = [&](std::shared_ptr<EventsRecord> record) {
+        onSaveCallback = [&](std::shared_ptr<EventsRecord> record) -> bool {
             if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
                 if (record->repeat < optionsNames.size() - 1 && actualVectorIndex != optionsNames.size() - 1) {
                     record->repeat = actualVectorIndex;
@@ -180,6 +180,7 @@ namespace gui
             else if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_reminder")) {
                 record->reminder = static_cast<uint32_t>(reminderTimeOptions[actualVectorIndex]);
             }
+            return true;
         };
 
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {

@@ -3,7 +3,6 @@
 
 #include "AllEventsItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
-#include "CalendarListItem.hpp"
 #include <Style.hpp>
 #include <gui/widgets/Label.hpp>
 #include <time/time_conversion.hpp>

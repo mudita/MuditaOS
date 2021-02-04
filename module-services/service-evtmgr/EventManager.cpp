@@ -149,9 +149,8 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         handled = true;
     }
     else if (msgl->messageType == MessageType::EVMMinuteUpdated && msgl->sender == this->GetName()) {
-
-        HandleAlarmTrigger(msgl);
-
+        auto msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
+        handleMinuteUpdate(msg->timestamp);
         handled = true;
     }
     else if (auto msg = dynamic_cast<AudioEventRequest *>(msgl); msg /*&& msgl->sender == this->GetName()*/) {
@@ -286,6 +285,12 @@ sys::ReturnCodes EventManager::InitHandler()
             screenLightControl->getLightState(), screenLightControl->getAutoModeState(), params);
         return msg;
     });
+    connect(sevm::RtcUpdateTimeMessage(0), [&](sys::Message *msgl) {
+        auto msg = static_cast<sevm::RtcUpdateTimeMessage *>(msgl);
+        bsp::rtc_SetDateTimeFromTimestamp(msg->getTime());
+        handleMinuteUpdate(msg->getTime());
+        return app::msgHandled();
+    });
 
     // initialize keyboard worker
     EventWorker = std::make_unique<WorkerEvent>(this);
@@ -358,6 +363,15 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
     return sender->bus.sendUnicast(msg, service::name::evt_manager);
 }
 
+void EventManager::handleMinuteUpdate(time_t timestamp)
+{
+    if (!targetApplication.empty()) {
+        auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
+        message->timestamp = timestamp;
+        bus.sendUnicast(message, targetApplication);
+    }
+}
+
 bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action act)
 {
     bool response = false;
@@ -374,6 +388,3 @@ bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action a
     }
     return response;
 }
-
-void EventManager::GetNextAlarmTimestamp(time_t timestamp)
-{}

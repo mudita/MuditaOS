@@ -66,11 +66,6 @@ namespace gui::top_bar
         static constexpr uint32_t signalImgCount   = 6;
 
       public:
-        enum class TimeMode
-        {
-            TIME_12H,
-            TIME_24H
-        };
         static uint32_t time;
 
       protected:
@@ -83,7 +78,6 @@ namespace gui::top_bar
             {Store::Battery::State::Charging, nullptr}, {Store::Battery::State::PluggedNotCharging, nullptr}};
         gui::SIM *sim = nullptr;
         Configuration configuration;
-        static TimeMode timeMode;
 
         void prepareWidget();
 
@@ -128,10 +122,6 @@ namespace gui::top_bar
         void simSet();
 
         void setTime(const UTF8 &value);
-        void setTime(uint32_t value, bool mode24H);
-
-        UTF8 getTimeString();
-        uint32_t getTime() const noexcept;
 
         void accept(GuiVisitor &visitor) override;
     };

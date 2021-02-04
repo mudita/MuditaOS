@@ -3,26 +3,28 @@
 
 #pragma once
 
-#include "application-calendar/widgets/CalendarStyle.hpp"
-#include "application-calendar/widgets/CalendarListItem.hpp"
-#include "module-apps/application-calendar/ApplicationCalendar.hpp"
 #include "Application.hpp"
 #include "InternalModel.hpp"
 #include <ListItemProvider.hpp>
+#include "widgets/DateWidget.hpp"
+#include "widgets/TimeWidget.hpp"
 
-class EventDetailModel : public app::InternalModel<gui::CalendarListItem *>, public gui::ListItemProvider
+class DateAndTimeModel : public app::InternalModel<gui::DateOrTimeListItem *>, public gui::ListItemProvider
 {
     app::Application *application = nullptr;
+    gui::DateWidget *dateItem     = nullptr;
+    gui::TimeWidget *timeItem     = nullptr;
 
   public:
-    EventDetailModel(app::Application *app);
+    DateAndTimeModel(app::Application *app);
 
     void loadData(std::shared_ptr<EventsRecord> record);
+    void saveData(std::shared_ptr<EventsRecord> record);
 
-    [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
-    [[nodiscard]] unsigned int getMinimalItemHeight() const override;
     gui::ListItem *getItem(gui::Order order) override;
+    [[nodiscard]] unsigned int getMinimalItemHeight() const override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
+    [[nodiscard]] unsigned int requestRecordsCount() override;
 
   private:
     void createData();

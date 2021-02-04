@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextWithLabelItem.hpp"
@@ -58,7 +58,10 @@ namespace gui
 
         inputCallback = [&](Item &item, const InputEvent &event) {
             auto ret       = textInput->onInput(event);
-            onSaveCallback = [&](std::shared_ptr<EventsRecord> record) { record->title = textInput->getText(); };
+            onSaveCallback = [&](std::shared_ptr<EventsRecord> record) -> bool {
+                record->title = textInput->getText();
+                return true;
+            };
             return ret;
         };
 

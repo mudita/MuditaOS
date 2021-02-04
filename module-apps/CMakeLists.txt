@@ -32,6 +32,8 @@ set( SOURCES
     "widgets/BarGraph.cpp"
     "widgets/ActiveIconFactory.cpp"
     "widgets/TextWithIconsWidget.cpp"
+    "widgets/DateWidget.cpp"
+    "widgets/TimeWidget.cpp"
     "options/OptionsModel.cpp"
     "options/type/OptionSimple.cpp"
     "options/type/OptionCall.cpp"

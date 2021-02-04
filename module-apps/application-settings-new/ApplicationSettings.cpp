@@ -32,6 +32,7 @@
 #include "windows/NewApnWindow.hpp"
 #include "windows/LanguagesWindow.hpp"
 #include "windows/DateAndTimeMainWindow.hpp"
+#include "windows/ChangeDateAndTimeWindow.hpp"
 
 #include "Dialog.hpp"
 
@@ -305,6 +306,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::date_and_time, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DateAndTimeMainWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::change_date_and_time, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ChangeDateAndTimeWindow>(app);
         });
     }
 

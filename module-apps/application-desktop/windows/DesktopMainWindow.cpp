@@ -31,7 +31,6 @@ namespace gui
 {
     void DesktopMainWindow::buildInterface()
     {
-        auto ttime = utils::time::Time();
         AppWindow::buildInterface();
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -42,14 +41,12 @@ namespace gui
         time->setFilled(false);
         time->setBorderColor(gui::ColorNoColor);
         time->setFont(style::window::font::supersizemelight);
-        time->setText(ttime);
         time->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
 
         dayText = new gui::Label(this, dayLabel::X, dayLabel::Y, dayLabel::Width, dayLabel::Height);
         dayText->setFilled(false);
         dayText->setBorderColor(gui::ColorNoColor);
         dayText->setFont(style::window::font::biglight);
-        dayText->setText(ttime.day() + ", " + ttime.str("%d %b"));
         dayText->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
 
         activatedCallback = [this](Item &) {
@@ -86,9 +83,7 @@ namespace gui
         buildInterface();
 
         preBuildDrawListHook = [this](std::list<Command> &cmd) {
-            if (time != nullptr) {
-                time->setText(topBar->getTimeString());
-            }
+            time->setText(TimePointToLocalizedHourMinString(TimePointNow()));
         };
     }
 
@@ -129,7 +124,9 @@ namespace gui
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         // update time
-        time->setText(topBar->getTimeString());
+        auto timeNow = TimePointNow();
+        time->setText(TimePointToLocalizedHourMinString(timeNow));
+        dayText->setText(TimePointToLocalizedDateString(timeNow, "%A, %d %b"));
         // check if there was a signal to lock the pone due to inactivity.
         if ((data != nullptr) && (data->getDescription() == "LockPhoneData")) {
             auto app = getAppDesktop();
@@ -237,19 +234,6 @@ namespace gui
     {
         destroyInterface();
         buildInterface();
-    }
-
-    bool DesktopMainWindow::updateTime(const UTF8 &timeStr)
-    {
-        auto ret = AppWindow::updateTime(timeStr);
-        time->setText(topBar->getTimeString());
-        return ret;
-    }
-    bool DesktopMainWindow::updateTime(const uint32_t &timestamp, bool mode24H)
-    {
-        auto ret = AppWindow::updateTime(timestamp, mode24H);
-        time->setText(topBar->getTimeString());
-        return ret;
     }
 
     auto DesktopMainWindow::buildNotifications(app::ApplicationDesktop *app) -> bool

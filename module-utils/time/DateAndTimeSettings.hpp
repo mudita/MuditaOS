@@ -26,6 +26,10 @@ namespace utils
         {
             return dateFormat;
         }
+        [[nodiscard]] bool isTimeFormat12() const noexcept
+        {
+            return timeFormat == utils::time::Locale::TimeFormat::FormatTime12H;
+        }
         void setAutomaticDateAndTimeOn(bool value);
         void setAutomaticTimeZoneOn(bool value);
         void setTimeFormat(time::Locale::TimeFormat format);

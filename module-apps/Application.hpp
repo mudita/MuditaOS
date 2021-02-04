@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -377,7 +377,6 @@ namespace app
         bool timeFormat12 = false;
 
       public:
-        bool isTimeFormat12() const noexcept;
         void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;
         bool isLockScreenPasscodeOn() const noexcept;
         const gui::top_bar::Configuration &getTopBarConfiguration() const noexcept;

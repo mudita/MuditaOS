@@ -2,14 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include "CalendarListItem.hpp"
+
+#include <BoxLayout.hpp>
 #include <Label.hpp>
 #include <Text.hpp>
-#include <BoxLayout.hpp>
+#include "DateOrTimeListItem.hpp"
 
 namespace gui
 {
-    class EventDateItem : public CalendarListItem
+    class DateWidget : public DateOrTimeListItem
     {
         gui::VBox *vBox        = nullptr;
         gui::HBox *labelsHBox  = nullptr;
@@ -31,7 +32,7 @@ namespace gui
         void clearInput(gui::Label &dateInput);
 
       public:
-        EventDateItem();
+        DateWidget();
 
         const calendar::YearMonthDay getChosenDate();
         // virtual methods from Item

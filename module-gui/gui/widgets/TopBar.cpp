@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <ctime>
@@ -10,6 +10,7 @@
 #include "Style.hpp"
 
 #include "common_data/EventStore.hpp"
+#include <module-apps/application-calendar/data/dateCommon.hpp>
 
 namespace gui::top_bar
 {
@@ -23,9 +24,6 @@ namespace gui::top_bar
 
     static constexpr uint32_t signalOffset  = 35;
     static constexpr uint32_t batteryOffset = 413;
-
-    TopBar::TimeMode TopBar::timeMode      = TimeMode::TIME_24H;
-    uint32_t TopBar::time                  = 0;
 
     void Configuration::enable(Indicator indicator)
     {
@@ -70,7 +68,7 @@ namespace gui::top_bar
         updateDrawArea();
 
         preBuildDrawListHook = [this](std::list<Command> &) {
-            setTime(time, (timeMode == TimeMode::TIME_24H) ? true : false);
+            setTime(TimePointToLocalizedHourMinString(TimePointNow()));
         };
     }
 
@@ -130,7 +128,6 @@ namespace gui::top_bar
         timeLabel->setFilled(false);
         timeLabel->setBorderColor(gui::ColorNoColor);
         timeLabel->setFont(style::header::font::time);
-        timeLabel->setText("00:00");
         timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
         networkAccessTechnologyLabel =
@@ -310,24 +307,6 @@ namespace gui::top_bar
     void TopBar::setTime(const UTF8 &value)
     {
         timeLabel->setText(value);
-    }
-
-    void TopBar::setTime(uint32_t value, bool mode24H)
-    {
-        setTime(utils::time::Time());
-        timeMode   = (mode24H ? TimeMode::TIME_24H : TimeMode::TIME_12H);
-        time       = value;
-    }
-
-    UTF8 TopBar::getTimeString()
-    {
-        setTime(time, (timeMode == TimeMode::TIME_24H) ? true : false);
-        return timeLabel->getText();
-    }
-
-    uint32_t TopBar::getTime() const noexcept
-    {
-        return time;
     }
 
     void TopBar::simSet()
