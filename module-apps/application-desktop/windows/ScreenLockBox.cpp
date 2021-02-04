@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-desktop/widgets/PinLock.hpp"
@@ -26,7 +26,7 @@ namespace gui
         LockWindow->pinLabelsBox->setVisible(true);
         LockWindow->setText("app_desktop_screen_enter_passcode_to_unlock", LockWindow::TextType::Primary, true);
         LockWindow->setImagesVisible(true, false);
-        LockWindow->setBottomBarWidgetsActive(true, false, true);
+        LockWindow->setBottomBarWidgetsActive(false, false, true);
     }
 
     void ScreenLockBox::setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value)

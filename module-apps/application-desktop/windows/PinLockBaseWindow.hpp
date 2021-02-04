@@ -21,8 +21,9 @@ namespace gui
         void setImagesVisible(bool lockImg, bool infoImg);
         void setTitleBar(bool isVisible, bool isIceActive);
 
+        gui::HBox *iceBox     = nullptr;
         gui::Image *infoImage = nullptr;
-        gui::Image *lockImage    = nullptr;
+        gui::Image *lockImage = nullptr;
 
       private:
         void buildBottomBar() override;
