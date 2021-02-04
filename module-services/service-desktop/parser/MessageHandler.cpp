@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHandler.hpp"
@@ -35,18 +35,18 @@ MessageHandler::MessageHandler(const std::string &message, sys::Service *OwnerSe
 
 void MessageHandler::processMessage()
 {
-    Context context(messageJson);
+    auto context = ContextFactory::create(messageJson);
 
     LOG_DEBUG("[MsgHandler]\nmethod: %d\nendpoint: %d\nuuid: %" PRIu32 "\nbody: %s\n",
-              static_cast<int>(context.getMethod()),
-              static_cast<int>(context.getEndpoint()),
-              context.getUuid(),
-              context.getBody().dump().c_str());
+              static_cast<int>(context->getMethod()),
+              static_cast<int>(context->getEndpoint()),
+              context->getUuid(),
+              context->getBody().dump().c_str());
 
-    auto handler = EndpointFactory::create(context, OwnerServicePtr);
+    auto handler = EndpointFactory::create(*context, OwnerServicePtr);
 
     if (handler != nullptr) {
-        handler->handle(context);
+        handler->handle(*context);
     }
     else {
         LOG_ERROR("No way to handle!");

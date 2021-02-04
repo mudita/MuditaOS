@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -26,8 +26,10 @@ namespace parserFSM
 
     class ContactHelper : public DBHelper
     {
+
       public:
-        ContactHelper(sys::Service *_ownerServicePtr) : DBHelper(_ownerServicePtr){};
+        ContactHelper(sys::Service *_ownerServicePtr) : DBHelper(_ownerServicePtr)
+        {}
 
         auto createDBEntry(Context &context) -> sys::ReturnCodes override;
         auto requestDataFromDB(Context &context) -> sys::ReturnCodes override;
@@ -42,7 +44,7 @@ namespace parserFSM
 
     namespace json::contacts
     {
-        inline constexpr auto count           = "count";
+        inline constexpr auto limit           = "limit";
         inline constexpr auto offset          = "offset";
         inline constexpr auto primaryName     = "priName";
         inline constexpr auto alternativeName = "altName";
