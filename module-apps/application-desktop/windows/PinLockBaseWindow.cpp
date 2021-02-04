@@ -53,6 +53,7 @@ namespace gui
 
     void PinLockBaseWindow::setTitleBar(bool isVisible, bool isIceActive)
     {
+        iceBox->setVisible(isIceActive);
         LockWindow::setTitleBar(isVisible);
     }
 
@@ -66,10 +67,23 @@ namespace gui
     {
         using namespace style::window::pin_lock;
 
+        iceBox = new gui::HBox(this, ice::x, ice::y, ice::w, ice::h);
+        iceBox->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
+        iceBox->setEdges(RectangleEdge::None);
+        iceBox->setVisible(false);
+
         auto arrow        = new gui::Image("left_label_arrow");
         arrow->activeItem = false;
         arrow->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         arrow->setMargins(Margins(0, 0, ice::margin, 0));
+        iceBox->addWidget(arrow);
+
+        auto iceText        = new gui::Text(nullptr, 0, 0, ice::text::w, ice::h);
+        iceText->activeItem = false;
+        iceText->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
+        iceText->setFont(style::window::font::verysmall);
+        iceText->setText(utils::localize.get("app_desktop_emergency"));
+        iceBox->addWidget(iceText);
 
         title = new gui::Text(this, title::x, title::y, title::w, title::h);
         title->setFilled(false);
