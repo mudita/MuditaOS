@@ -4,7 +4,6 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 set(SOURCES
         EventManager.cpp
         WorkerEvent.cpp
-        alarm/EventManagerAlarm.cpp
         api/EventManagerServiceAPI.cpp
         messages/Message.cpp
         battery-level-check/BatteryLevelCheck.cpp

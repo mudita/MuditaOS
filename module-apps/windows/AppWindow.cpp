@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AppWindow.hpp"
@@ -89,18 +89,6 @@ namespace gui
     bool AppWindow::updateNetworkAccessTechnology()
     {
         return topBar->updateNetworkAccessTechnology();
-    }
-
-    bool AppWindow::updateTime(const UTF8 &timeStr)
-    {
-        topBar->setTime(timeStr);
-        return true;
-    }
-
-    bool AppWindow::updateTime(const uint32_t &timestamp, bool mode24H)
-    {
-        topBar->setTime(timestamp, mode24H);
-        return true;
     }
 
     void AppWindow::setTitle(const UTF8 &text)

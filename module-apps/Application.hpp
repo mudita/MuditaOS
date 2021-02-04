@@ -379,7 +379,6 @@ namespace app
         bool timeFormat12 = false;
 
       public:
-        bool isTimeFormat12() const noexcept;
         void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;
         bool isLockScreenPasscodeOn() const noexcept;
         const gui::top_bar::Configuration &getTopBarConfiguration() const noexcept;

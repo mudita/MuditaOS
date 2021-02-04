@@ -135,9 +135,8 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         }
     }
     else if (msgl->messageType == MessageType::EVMMinuteUpdated && msgl->sender == this->GetName()) {
-
-        HandleAlarmTrigger(msgl);
-
+        auto msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
+        handleMinuteUpdate(msg->timestamp);
         handled = true;
     }
     else if (auto msg = dynamic_cast<AudioEventRequest *>(msgl); msg /*&& msgl->sender == this->GetName()*/) {
@@ -272,6 +271,13 @@ sys::ReturnCodes EventManager::InitHandler()
             screenLightControl->getLightState(), screenLightControl->getAutoModeState(), params);
         return msg;
     });
+    connect(sevm::RtcUpdateTimeMessage(0), [&](sys::Message *msgl) {
+        auto msg = static_cast<sevm::RtcUpdateTimeMessage *>(msgl);
+        bsp::rtc_SetDateTimeFromTimestamp(msg->getTime());
+        bsp::rtc_SetMinuteAlarm(msg->getTime());
+        handleMinuteUpdate(msg->getTime());
+        return app::msgHandled();
+    });
 
     connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *msgl) {
         if (msgl->sender == this->GetName()) {
@@ -367,6 +373,15 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
     return sender->bus.sendUnicast(msg, service::name::evt_manager);
 }
 
+void EventManager::handleMinuteUpdate(time_t timestamp)
+{
+    if (!targetApplication.empty()) {
+        auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
+        message->timestamp = timestamp;
+        bus.sendUnicast(message, targetApplication);
+    }
+}
+
 bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action act)
 {
     bool response = false;
@@ -402,6 +417,3 @@ bool EventManager::processVibraRequest(bsp::vibrator::Action act, sys::ms Repeti
     }
     return true;
 }
-
-void EventManager::GetNextAlarmTimestamp(time_t timestamp)
-{}

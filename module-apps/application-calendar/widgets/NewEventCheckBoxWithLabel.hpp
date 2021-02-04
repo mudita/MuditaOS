@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,7 +11,7 @@ namespace gui
     {
         NewEditEventModel *model = nullptr;
         app::Application *app    = nullptr;
-        gui::EventDateItem *dateItem = nullptr;
+        gui::DateWidget *dateItem = nullptr;
         void applyCallbacks() override;
 
       public:
@@ -20,7 +20,7 @@ namespace gui
                                   NewEditEventModel *model  = nullptr);
         virtual ~NewEventCheckBoxWithLabel() override = default;
 
-        void setConnectionToDateItem(gui::EventDateItem *item);
+        void setConnectionToDateItem(gui::DateWidget *item);
     };
 
 } /* namespace gui */
