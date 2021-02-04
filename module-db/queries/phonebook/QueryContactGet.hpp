@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -37,9 +37,9 @@ namespace db::query
          */
         ContactGet(std::size_t limit,
                    std::size_t offset,
-                   const std::string &filter        = "",
-                   const std::uint32_t &groupFilter = 0,
-                   const std::uint32_t &displayMode = 0);
+                   const std::string &filter = "",
+                   std::uint32_t groupFilter = 0,
+                   std::uint32_t displayMode = 0);
 
         /**
          * @brief debug info
@@ -72,6 +72,17 @@ namespace db::query
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 
+    class ContactGetResultWithTotalCount : public ContactGetResult
+    {
+      public:
+        ContactGetResultWithTotalCount(const std::vector<ContactRecord> &records, std::size_t allLength);
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+        auto getAllLength() const -> std::size_t;
+
+      private:
+        std::size_t allLength;
+    };
+
     /**
      * @brief A query to get a number of contacts filtered with a text
      *
@@ -96,6 +107,17 @@ namespace db::query
          *
          * @return class name
          */
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+    };
+
+    class ContactGetWithTotalCount : public ContactGet
+    {
+      public:
+        ContactGetWithTotalCount(std::size_t limit,
+                                 std::size_t offset,
+                                 const std::string &filter = "",
+                                 std::uint32_t groupFilter = 0,
+                                 std::uint32_t displayMode = 0);
         [[nodiscard]] auto debugInfo() const -> std::string override;
     };
 

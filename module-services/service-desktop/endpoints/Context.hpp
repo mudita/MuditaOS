@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,7 +15,12 @@ namespace parserFSM
         inline constexpr auto endpoint = "endpoint";
         inline constexpr auto uuid     = "uuid";
         inline constexpr auto status   = "status";
+        inline constexpr auto totalCount = "totalCount";
         inline constexpr auto body     = "body";
+        inline constexpr auto offset     = "offset";
+        inline constexpr auto limit      = "limit";
+        inline constexpr auto nextPage   = "nextPage";
+        inline constexpr auto entries    = "entries";
     } // namespace json
 
     struct endpointResponseContext
@@ -28,7 +33,7 @@ namespace parserFSM
 
     class Context
     {
-      private:
+      protected:
         json11::Json body;
         EndpointType endpoint;
         uint32_t uuid;
@@ -84,8 +89,9 @@ namespace parserFSM
             uuid     = invalidUuid;
             method   = http::Method::get;
         }
+        virtual ~Context() noexcept = default;
 
-        auto createSimpleResponse() -> std::string
+        virtual auto createSimpleResponse() -> std::string
         {
             json11::Json responseJson = json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
                                                              {json::status, static_cast<int>(responseContext.status)},
@@ -120,6 +126,81 @@ namespace parserFSM
         auto getMethod() -> http::Method
         {
             return method;
+        }
+    };
+
+    class PagedContext : public Context
+    {
+      private:
+        // from request
+        std::size_t requestedLimit, requestedOffset;
+        // set by query (during helper run)
+        std::size_t totalCount;
+        // set it before calling handle on helper
+        std::size_t pageSize;
+
+      public:
+        explicit PagedContext(json11::Json &js, size_t pageSize) : Context(js), pageSize(pageSize)
+        {}
+        PagedContext() = default;
+        void setRequestedLimit(std::size_t limit)
+        {
+            requestedLimit = limit;
+        }
+        void setRequestedOffset(std::size_t offset)
+        {
+            requestedOffset = offset;
+        }
+        void setTotalCount(std::size_t count)
+        {
+            totalCount = count;
+        }
+        std::size_t getPageSize() const
+        {
+            return pageSize;
+        }
+
+        auto createSimpleResponse() -> std::string override
+        {
+            auto elemsCount = responseContext.body.array_items().size();
+            auto newBody    = json11::Json::object{{json::entries, responseContext.body},
+                                                {json::totalCount, static_cast<int>(totalCount)}};
+            if (requestedLimit > elemsCount) {
+                std::size_t offset = requestedOffset + elemsCount;
+                if (offset < totalCount) {
+                    auto lastTableIndex = std::min(totalCount, offset + requestedLimit - elemsCount);
+                    std::size_t limit   = std::min(pageSize, lastTableIndex - offset);
+                    auto nextPageParams = json11::Json::object{{json::offset, static_cast<int>(offset)},
+                                                               {json::limit, static_cast<int>(limit)}};
+                    newBody.insert({json::nextPage, nextPageParams});
+                }
+            }
+
+            setResponseBody(newBody);
+            return Context::createSimpleResponse();
+        }
+    };
+
+    namespace endpoint_pageing
+    {
+        inline constexpr std::size_t contactsPageSize = 10;
+    }
+
+    class ContextFactory
+    {
+      public:
+        static auto create(json11::Json &js) -> std::unique_ptr<parserFSM::Context>
+        {
+            switch (static_cast<EndpointType>(js[json::endpoint].int_value())) {
+            // enable for pagination in other endpoints
+            // case EndpointType::calendarEvents:
+            // case EndpointType::calllog:
+            case EndpointType::contacts:
+                // case EndpointType::messages:
+                return std::make_unique<PagedContext>(js, endpoint_pageing::contactsPageSize);
+            default:
+                return std::make_unique<Context>(js);
+            }
         }
     };
 
