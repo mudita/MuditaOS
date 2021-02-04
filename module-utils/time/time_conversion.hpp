@@ -288,5 +288,6 @@ namespace utils
         };
 
         Timestamp getCurrentTimestamp();
+        std::string getHoursMinInCurrentTimeFormat();
     } // namespace time
 } // namespace utils

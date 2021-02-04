@@ -308,8 +308,6 @@ namespace app
 
     sys::MessagePointer Application::handleMinuteUpdated(sys::Message *msgl)
     {
-        auto *msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
-        getCurrentWindow()->updateTime(msg->timestamp, !isTimeFormat12());
         if (state == State::ACTIVE_FORGROUND) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
@@ -707,11 +705,6 @@ namespace app
     void Application::timeFormatChanged(std::string value)
     {
         timeFormat12 = utils::getNumericValue<bool>(value);
-    }
-
-    bool Application::isTimeFormat12() const noexcept
-    {
-        return utils::dateAndTimeSettings.getTimeFormat() == utils::time::Locale::TimeFormat::FormatTime12H;
     }
 
     void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)

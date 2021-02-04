@@ -28,8 +28,7 @@ class WorkerEvent;
 class EventManager : public sys::Service
 {
   private:
-    void HandleAlarmTrigger(sys::DataMessage *msgl);
-    void GetNextAlarmTimestamp(time_t timestamp);
+    void handleMinuteUpdate(time_t timestamp);
     bool processKeypadBacklightRequest(bsp::keypad_backlight::Action act);
     bool processVibraRequest(bsp::vibrator::Action act, sys::ms RepetitionTime = static_cast<sys::ms>(1000));
 

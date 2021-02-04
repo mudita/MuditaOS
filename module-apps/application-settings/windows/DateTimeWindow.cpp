@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -26,6 +26,7 @@
 #include <Style.hpp>
 #include <widgets/BoxLayout.hpp>
 
+#include <module-utils/time/DateAndTimeSettings.hpp>
 #include <module-utils/Utils.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
@@ -116,7 +117,7 @@ namespace gui
 
         auto hourValue = time.get_date_time_sub_value(utils::time::GetParameters::Hour);
 
-        if (application->isTimeFormat12()) {
+        if (utils::dateAndTimeSettings.isTimeFormat12()) {
             if (hourValue > 12) {
                 hourValue -= 12;
                 dayPeriod = true;
@@ -139,7 +140,7 @@ namespace gui
         timeBody->addWidget(addSpacer(""));
 
         item = addDateTimeItem(nullptr, (""), (""));
-        if (application->isTimeFormat12()) {
+        if (utils::dateAndTimeSettings.isTimeFormat12()) {
             if (dayPeriod) {
                 item->setText("PM");
             }
@@ -338,7 +339,7 @@ namespace gui
 
             if (utils::time::validateTime(getDateTimeItemValue(DateTimeItems::Hour),
                                           getDateTimeItemValue(DateTimeItems::Minute),
-                                          application->isTimeFormat12())) {
+                                          utils::dateAndTimeSettings.isTimeFormat12())) {
                 application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             }
             else {
@@ -361,7 +362,7 @@ namespace gui
             timeinfo.tm_mday = std::stoi(getDateTimeItemValue(DateTimeItems::Day));
 
             auto hourValue = std::stoi(getDateTimeItemValue(DateTimeItems::Hour));
-            if (application->isTimeFormat12()) {
+            if (utils::dateAndTimeSettings.isTimeFormat12()) {
                 if (dayPeriod) {
                     hourValue += 12;
                 }

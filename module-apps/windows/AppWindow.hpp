@@ -67,8 +67,6 @@ namespace gui
         bool updateBatteryStatus();
         bool updateSignalStrength();
         bool updateNetworkAccessTechnology();
-        virtual bool updateTime(const UTF8 &timeStr);
-        virtual bool updateTime(const uint32_t &timestamp, bool mode24H);
         void setTitle(const UTF8 &text);
 
         void rebuild() override;

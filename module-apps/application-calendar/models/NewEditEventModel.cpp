@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditEventModel.hpp"
@@ -72,17 +72,17 @@ void NewEditEventModel::createData(bool allDayEvent)
     allDayEventCheckBox = new gui::NewEventCheckBoxWithLabel(
         application, utils::localize.get("app_calendar_new_edit_event_allday"), this);
 
-    dateItem = new gui::EventDateItem();
+    dateItem = new gui::CalendarDateItem();
 
-    startTime = new gui::EventTimeItem(
+    startTime = new gui::CalendarTimeItem(
         utils::localize.get("app_calendar_new_edit_event_start"),
-        mode24H,
+        gui::TimeWidget::Type::Start,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
-    endTime = new gui::EventTimeItem(
+    endTime = new gui::CalendarTimeItem(
         utils::localize.get("app_calendar_new_edit_event_end"),
-        mode24H,
+        gui::TimeWidget::Type::End,
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
@@ -98,13 +98,13 @@ void NewEditEventModel::createData(bool allDayEvent)
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
-    endTime->setConnectionToSecondItem(startTime);
     startTime->setConnectionToSecondItem(endTime);
+    endTime->setConnectionToSecondItem(startTime);
 
     startTime->setConnectionToDateItem(dateItem);
     endTime->setConnectionToDateItem(dateItem);
 
-    allDayEventCheckBox->setConnectionToDateItem(dateItem);
+    allDayEventCheckBox->setConnectionToDateItem(dateItem->getDateWidget());
 
     internalData.push_back(eventNameInput);
     internalData.push_back(allDayEventCheckBox);
@@ -129,8 +129,8 @@ void NewEditEventModel::loadData(std::shared_ptr<EventsRecord> record)
     auto end_time      = TimePointToHourMinSec(record->date_till);
     auto isAllDayEvent = [&]() -> bool {
         return start_time.hours().count() == 0 && start_time.minutes().count() == 0 &&
-               end_time.hours().count() == style::window::calendar::time::max_hour_24H_mode &&
-               end_time.minutes().count() == style::window::calendar::time::max_minutes;
+               end_time.hours().count() == utils::time::Locale::max_hour_24H_mode &&
+               end_time.minutes().count() == utils::time::Locale::max_minutes;
     };
 
     createData(isAllDayEvent());
@@ -243,6 +243,7 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, EventActio
             }
         }
         else {
+            LOG_WARN("Title event is empty! Returning to previous window.");
             application->returnToPreviousWindow();
         }
     }
