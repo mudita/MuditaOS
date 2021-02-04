@@ -10,46 +10,12 @@
 #include <module-utils/sml/include/boost/sml.hpp>
 #include <module-utils/magic_enum/include/magic_enum.hpp>
 
-#include <queue>
-#include <deque>
-
 namespace bluetooth
 {
     namespace sml = boost::sml;
 
     namespace
     {
-        struct Logger
-        {
-            template <class SM, class TEvent> void log_process_event(const TEvent &)
-            {
-                LOG_INFO("[%s][process_event] %s", sml::aux::get_type_name<SM>(), sml::aux::get_type_name<TEvent>());
-            }
-
-            template <class SM, class TGuard, class TEvent> void log_guard(const TGuard &, const TEvent &, bool result)
-            {
-                LOG_INFO("[%s][guard] %s %s %s",
-                         sml::aux::get_type_name<SM>(),
-                         sml::aux::get_type_name<TGuard>(),
-                         sml::aux::get_type_name<TEvent>(),
-                         (result ? "[OK]" : "[Reject]"));
-            }
-
-            template <class SM, class TAction, class TEvent> void log_action(const TAction &, const TEvent &)
-            {
-                LOG_INFO("[%s][action] %s %s",
-                         sml::aux::get_type_name<SM>(),
-                         sml::aux::get_type_name<TAction>(),
-                         sml::aux::get_type_name<TEvent>());
-            }
-
-            template <class SM, class TSrcState, class TDstState>
-            void log_state_change(const TSrcState &src, const TDstState &dst)
-            {
-                LOG_INFO("[%s][transition] %s -> %s", sml::aux::get_type_name<SM>(), src.c_str(), dst.c_str());
-            }
-        };
-
         struct TurnOn
         {};
         struct TurnOff
@@ -156,27 +122,24 @@ namespace bluetooth
     class StatefulController::Impl
     {
       public:
-        Impl(Logger logger,
-             std::shared_ptr<AbstractDriver> &&driver,
+        Impl(std::shared_ptr<AbstractDriver> &&driver,
              std::shared_ptr<AbstractCommandHandler> &&handler,
              DeviceRegistrationFunction &&registerDevice);
 
-        using SM =
-            sml::sm<StateMachine, sml::logger<Logger>, sml::defer_queue<std::deque>, sml::process_queue<std::queue>>;
+        using SM = sml::sm<StateMachine>;
         SM sm;
     };
 
-    StatefulController::Impl::Impl(Logger logger,
-                                   std::shared_ptr<AbstractDriver> &&driver,
+    StatefulController::Impl::Impl(std::shared_ptr<AbstractDriver> &&driver,
                                    std::shared_ptr<AbstractCommandHandler> &&handler,
                                    DeviceRegistrationFunction &&registerDevice)
-        : sm{std::move(logger), std::move(driver), std::move(handler), std::move(registerDevice), InitializationState{}}
+        : sm{std::move(driver), std::move(handler), std::move(registerDevice), InitializationState{}}
     {}
 
     StatefulController::StatefulController(std::shared_ptr<AbstractDriver> &&driver,
                                            std::shared_ptr<AbstractCommandHandler> &&handler,
                                            DeviceRegistrationFunction &&registerDevice)
-        : pimpl(std::make_unique<Impl>(Logger{}, std::move(driver), std::move(handler), std::move(registerDevice)))
+        : pimpl(std::make_unique<Impl>(std::move(driver), std::move(handler), std::move(registerDevice)))
     {}
 
     StatefulController::~StatefulController() noexcept = default;
