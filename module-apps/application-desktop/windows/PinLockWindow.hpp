@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,7 +23,6 @@ namespace gui
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState();
         void buildPinLockBox();
-        void invalidate() noexcept;
         auto usesNumericKeys() const noexcept -> bool;
 
       public:

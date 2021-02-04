@@ -42,17 +42,6 @@ namespace gui
     void PinLockWindow::destroyInterface()
     {
         erase();
-        invalidate();
-    }
-
-    void PinLockWindow::invalidate() noexcept
-    {
-        title         = nullptr;
-        lockImage  = nullptr;
-        infoImage  = nullptr;
-        primaryText   = nullptr;
-        secondaryText = nullptr;
-        pinLabelsBox = nullptr;
     }
 
     void PinLockWindow::setVisibleState()
@@ -109,8 +98,12 @@ namespace gui
         if (!inputEvent.isShortPress()) {
             return AppWindow::onInput(inputEvent);
         }
-        // accept only enter, RF, #, and numeric values;
-        if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
+        // accept only LF, enter, RF, #, and numeric values;
+        if (inputEvent.is(KeyCode::KEY_LEFT) && iceBox->visible) {
+            app::manager::Controller::sendAction(application, app::manager::actions::EmergencyDial);
+            return true;
+        }
+        else if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
             if (usesNumericKeys()) {
                 lock->clearAttempt();
             }
