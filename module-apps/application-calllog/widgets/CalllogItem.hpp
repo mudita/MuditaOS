@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <BoxLayout.hpp>
 #include "Label.hpp"
 #include "Image.hpp"
 #include "ListItem.hpp"
@@ -14,21 +15,13 @@ namespace gui
 
     namespace clItemStyle
     {
-        constexpr uint32_t w = style::window::default_body_width;
-        constexpr uint32_t h = style::window::label::big_h;
-        namespace img
-        {
-            constexpr uint32_t x = 11; // TODO: alek:: change to good values
-            constexpr uint32_t y = 22;
-        } // namespace img
-        namespace text
-        {
-            constexpr uint32_t x = 37;
-            constexpr uint32_t w = 280;
-        } // namespace text
+        inline constexpr auto w                 = style::window::default_body_width;
+        inline constexpr auto h                 = style::window::label::big_h;
+        inline constexpr auto left_right_margin = 10;
+
         namespace timestamp
         {
-            constexpr uint32_t w = 115;
+            inline constexpr auto min_w = 120;
         }
     } // namespace clItemStyle
 
@@ -40,6 +33,7 @@ namespace gui
         CalllogModel *model = nullptr;
         // pointer to the calls record
         std::shared_ptr<CalllogRecord> call = nullptr;
+        gui::HBox *hBox                     = nullptr;
         // this is timestamp in the mode defined in settings
         gui::Label *timestamp                                                  = nullptr;
         gui::Image *imageCallType[calllog::CallLogCallType::NUM_OF_CALL_TYPES] = {nullptr, nullptr, nullptr};
@@ -52,9 +46,9 @@ namespace gui
         virtual ~CalllogItem() = default;
         // sets copy of alarm's
         void setCall(std::shared_ptr<CalllogRecord> &);
-        CalllogRecord getCall() const
+        [[nodiscard]] auto getCall() const -> CalllogRecord
         {
-            return *call;
+            return call != nullptr ? *call : CalllogRecord();
         };
 
         // virtual methods from Item
