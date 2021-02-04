@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewMessage.hpp"
@@ -67,7 +67,7 @@ namespace gui
             return;
         }
 
-        if (auto searchRequest = dynamic_cast<PhonebookSearchReuqest *>(data); searchRequest != nullptr) {
+        if (auto searchRequest = dynamic_cast<PhonebookSearchRequest *>(data); searchRequest != nullptr) {
             LOG_INFO("Received search results");
             contact = searchRequest->result;
             recipient->setText(contact->getFormattedName());
@@ -109,7 +109,7 @@ namespace gui
             memento->setState(message);
             return app::manager::Controller::sendAction(application,
                                                         app::manager::actions::ShowContacts,
-                                                        std::make_unique<PhonebookSearchReuqest>(),
+                                                        std::make_unique<PhonebookSearchRequest>(),
                                                         app::manager::OnSwitchBehaviour::RunInBackground);
         }
         return true;
