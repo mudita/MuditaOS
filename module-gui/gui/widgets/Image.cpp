@@ -1,13 +1,13 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "../core/DrawCommand.hpp"
-#include "../core/PixMap.hpp"
-#include "BoundingBox.hpp"
 #include "Image.hpp"
+#include "DrawCommand.hpp"
+#include "PixMap.hpp"
+#include "BoundingBox.hpp"
+#include "ImageManager.hpp"
 
-#include "../core/ImageManager.hpp"
-#include "utf8/UTF8.hpp"
+#include <utf8/UTF8.hpp>
 
 namespace gui
 {

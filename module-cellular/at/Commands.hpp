@@ -174,7 +174,7 @@ namespace at
             {AT::CNUM, {"AT+CNUM"}},
             {AT::CIMI, {"AT+CIMI"}},
             {AT::QCMGR, {"AT+QCMGR=", 2000ms}},
-            {AT::ATH, {"ATH"}},
+            {AT::ATH, {"ATH", 90000ms}},
             {AT::ATA, {"ATA", 90000ms}},
             {AT::ATD, {"ATD"}},
             {AT::IPR, {"AT+IPR="}},
