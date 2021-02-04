@@ -61,6 +61,12 @@ namespace utils
             const std::string ltimezone  = "common_timezone";
 
           public:
+            static constexpr int max_hour_24H_mode = 23;
+            static constexpr int max_hour_12H_mode = 12;
+            static constexpr int max_minutes       = 59;
+            static constexpr int max_years         = 2038;
+            static constexpr int min_years         = 1970;
+
             enum Day
             {
                 Sun = 0,

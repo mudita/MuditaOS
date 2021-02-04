@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -83,11 +83,10 @@ namespace gui
         void destroyInterface() override;
         top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
 
-        bool updateTime(const UTF8 &timeStr) override;
-        bool updateTime(const uint32_t &timestamp, bool mode24H) override;
 
       private:
         void invalidate() noexcept;
+        void updateTime();
 
         gui::KeyInputMappedTranslation translator;
     };

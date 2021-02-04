@@ -22,7 +22,7 @@ namespace gui
       public:
         std::function<bool()> onEmptyCallback                          = nullptr;
         std::function<bool()> onContentChangedCallback                 = nullptr;
-        std::function<void(std::shared_ptr<T> contact)> onSaveCallback = nullptr;
-        std::function<void(std::shared_ptr<T> contact)> onLoadCallback = nullptr;
+        std::function<void(std::shared_ptr<T> record)> onSaveCallback  = nullptr;
+        std::function<void(std::shared_ptr<T> record)> onLoadCallback  = nullptr;
     };
 } /* namespace gui */

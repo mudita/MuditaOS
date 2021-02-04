@@ -34,9 +34,6 @@ namespace gui::top_bar
     static constexpr uint32_t signalOffset  = 20;
     static constexpr uint32_t batteryOffset = 413;
 
-    TopBar::TimeMode TopBar::timeMode = TimeMode::TIME_24H;
-    uint32_t TopBar::time             = 0;
-
     void Configuration::enable(Indicator indicator)
     {
         set(indicator, true);
@@ -79,9 +76,7 @@ namespace gui::top_bar
         setSize(480, 50);
         updateDrawArea();
 
-        preBuildDrawListHook = [this](std::list<Command> &) {
-            setTime(time, (timeMode == TimeMode::TIME_24H) ? true : false);
-        };
+        preBuildDrawListHook = [this](std::list<Command> &) { setTime(utils::time::getHoursMinInCurrentTimeFormat()); };
     }
 
     void TopBar::prepareWidget()
@@ -207,24 +202,6 @@ namespace gui::top_bar
     void TopBar::setTime(const UTF8 &value)
     {
         timeLabel->setText(value);
-    }
-
-    void TopBar::setTime(uint32_t value, bool mode24H)
-    {
-        setTime(utils::time::Time());
-        timeMode = (mode24H ? TimeMode::TIME_24H : TimeMode::TIME_12H);
-        time     = value;
-    }
-
-    UTF8 TopBar::getTimeString()
-    {
-        setTime(time, (timeMode == TimeMode::TIME_24H) ? true : false);
-        return timeLabel->getText();
-    }
-
-    uint32_t TopBar::getTime() const noexcept
-    {
-        return time;
     }
 
     void TopBar::simSet()
