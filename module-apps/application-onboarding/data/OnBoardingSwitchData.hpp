@@ -7,7 +7,7 @@
 #include <json/json11.hpp>
 #include <utility>
 
-namespace gui
+namespace app::onBoarding
 {
 
     class OnBoardingSwitchData : public gui::SwitchData

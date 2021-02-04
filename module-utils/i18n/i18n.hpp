@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -44,6 +44,7 @@ namespace utils
 
         virtual ~i18n() = default;
         void setInputLanguage(const Language &lang);
+        const std::string &getInputLanguage(const std::string &inputMode);
         const std::string &getInputLanguageFilename(const std::string &inputMode);
         const std::string &getInputLanguage();
         const std::string &getDisplayLanguage();

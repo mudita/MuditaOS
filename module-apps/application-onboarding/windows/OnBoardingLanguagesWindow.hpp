@@ -5,15 +5,15 @@
 
 #include <module-apps/application-settings-new/windows/LanguagesWindow.hpp>
 
-namespace gui
+namespace app::onBoarding
 {
-    class OnBoardingLanguagesWindow : public LanguagesWindow
+    class OnBoardingLanguagesWindow : public gui::LanguagesWindow
     {
       public:
         explicit OnBoardingLanguagesWindow(app::Application *app);
 
       private:
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
     };
 } /* namespace gui */
