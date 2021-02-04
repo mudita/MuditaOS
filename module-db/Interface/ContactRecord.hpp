@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -236,10 +236,13 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     const std::uint32_t favouritesGroupId;
     auto getQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto getQueryRecords(std::shared_ptr<db::Query> query) -> std::vector<ContactRecord>;
+    auto getQueryWithTotalCount(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
     auto getForListQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
     auto getLetterMapQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
 
     auto getByIDQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+    auto getContactsSize(std::shared_ptr<db::Query> query) -> std::size_t;
     auto getSizeQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
     auto addQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
     auto updateQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;

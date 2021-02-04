@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -95,7 +95,7 @@ namespace db::query
          *
          * @param groupText group filter text
          */
-        ContactGroupFilter(const std::uint32_t &groupId) : filterData(std::move(groupId))
+        ContactGroupFilter(std::uint32_t groupId) : filterData(groupId)
         {}
 
         [[nodiscard]] const std::uint32_t &getGroupFilterData() const noexcept
@@ -121,7 +121,7 @@ namespace db::query
          *
          * @param mode contact display mode
          */
-        ContactDisplayMode(const std::uint32_t &mode) : displayMode(std::move(mode))
+        ContactDisplayMode(std::uint32_t mode) : displayMode(mode)
         {}
 
         [[nodiscard]] const std::uint32_t &getContactDisplayMode() const noexcept

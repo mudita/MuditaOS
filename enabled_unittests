@@ -215,6 +215,10 @@ TESTS_LIST["catch2-service-desktop"]="
     Endpoint Factory test;
 "
 #---------
+TESTS_LIST["catch2-service-desktop-endpoint-contacts"]="
+    Endpoint Contacts Test;
+"
+#---------
 TESTS_LIST["catch2-service-evtmgr"]="
     ScreenLightControlFunctions;
 "
