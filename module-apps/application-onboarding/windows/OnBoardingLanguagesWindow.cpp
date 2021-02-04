@@ -5,13 +5,13 @@
 #include "OnBoardingLanguagesWindow.hpp"
 #include <module-gui/gui/input/InputEvent.hpp>
 
-namespace gui
+namespace app::onBoarding
 {
     OnBoardingLanguagesWindow::OnBoardingLanguagesWindow(app::Application *app)
-        : LanguagesWindow(app, window::name::onBoarding_languages)
+        : LanguagesWindow(app, gui::window::name::onBoarding_languages)
     {}
 
-    void OnBoardingLanguagesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void OnBoardingLanguagesWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
 
@@ -20,7 +20,7 @@ namespace gui
 
     bool OnBoardingLanguagesWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_RF)) {
+        if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_RF)) {
             return true;
         }
         else {

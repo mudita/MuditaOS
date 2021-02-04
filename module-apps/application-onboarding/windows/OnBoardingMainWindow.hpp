@@ -8,7 +8,7 @@
 #include <AppWindow.hpp>
 #include <module-gui/gui/widgets/Image.hpp>
 
-namespace gui
+namespace app::onBoarding
 {
     class OnBoardingMainWindow : public gui::AppWindow
     {
@@ -18,6 +18,6 @@ namespace gui
         bool onInput(const gui::InputEvent &inputEvent) override;
 
         void buildInterface() override;
-        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
+        gui::top_bar::Configuration configureTopBar(gui::top_bar::Configuration appConfiguration) override;
     };
 } // namespace gui
