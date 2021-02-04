@@ -30,13 +30,16 @@ set( SOURCES
     "widgets/BrightnessBox.cpp"
     "widgets/ModesBox.cpp"
     "widgets/BarGraph.cpp"
+    "widgets/ActiveIconFactory.cpp"
+    "widgets/TextWithIconsWidget.cpp"
     "options/OptionsModel.cpp"
     "options/type/OptionSimple.cpp"
     "options/type/OptionCall.cpp"
     "options/type/OptionContact.cpp"
     "options/type/OptionSetting.cpp"
     "options/type/OptionChangePin.cpp"
-     )
+    "options/type/OptionWithActiveIcons.cpp"
+    )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 

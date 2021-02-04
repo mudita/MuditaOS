@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookMainWindow.hpp"
@@ -97,12 +97,12 @@ namespace gui
     {
         LOG_INFO("onBeforeShow");
 
-        auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
+        auto contactRequest = dynamic_cast<PhonebookSearchRequest *>(data);
         requestedSearch     = contactRequest != nullptr;
         if (requestedSearch) {
             enableNewContact                       = false;
             phonebookModel->messagesSelectCallback = [=](gui::PhonebookItem *item) {
-                std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
+                std::unique_ptr<PhonebookSearchRequest> data = std::make_unique<PhonebookSearchRequest>();
                 data->result                                 = item->contact;
                 data->setDescription("PhonebookSearchRequest");
                 return app::manager::Controller::switchBack(
