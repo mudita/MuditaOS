@@ -68,10 +68,15 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
 
         switch (newBtStatus.state) {
         case BluetoothStatus::State::On:
+            if (msg->sender == "ServiceDesktop") {
+                enabledFromHarness = true;
+                LOG_INFO("BT enabled from Harness");
+            }
             sendWorkerCommand(bluetooth::Command::PowerOn);
             break;
         case BluetoothStatus::State::Off:
             sendWorkerCommand(bluetooth::Command::PowerOff);
+            enabledFromHarness = false;
             break;
         default:
             break;
@@ -83,9 +88,9 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         using namespace sdesktop::developerMode;
         auto req = static_cast<DeveloperModeRequest *>(msg);
-        if (typeid(*req->event) == typeid(BluetoothStatusRequestEvent)) {
+        if (typeid(*req->event) == typeid(sdesktop::bluetooth::BluetoothStatusRequestEvent)) {
             auto state   = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
-            auto event   = std::make_unique<BluetoothStatusRequestEvent>(state);
+            auto event   = std::make_unique<sdesktop::bluetooth::BluetoothStatusRequestEvent>(state);
             auto message = std::make_shared<DeveloperModeRequest>(std::move(event));
             bus.sendUnicast(std::move(message), service::name::service_desktop);
         }
@@ -187,4 +192,20 @@ sys::ReturnCodes ServiceBluetooth::SwitchPowerModeHandler(const sys::ServicePowe
 void ServiceBluetooth::sendWorkerCommand(bluetooth::Command command)
 {
     xQueueSend(workerQueue, &command, portMAX_DELAY);
+}
+void ServiceBluetooth::scanStartedCallback()
+{
+    if (enabledFromHarness) {
+        auto event   = std::make_unique<sdesktop::bluetooth::ScanStartedEvent>();
+        auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+        bus.sendUnicast(std::move(message), service::name::service_desktop);
+    }
+}
+void ServiceBluetooth::scanStoppedCallback()
+{
+    if (enabledFromHarness) {
+        auto event   = std::make_unique<sdesktop::bluetooth::ScanStoppedEvent>();
+        auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+        bus.sendUnicast(std::move(message), service::name::service_desktop);
+    }
 }

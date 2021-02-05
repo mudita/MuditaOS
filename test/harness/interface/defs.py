@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 from enum import Enum
 
@@ -13,7 +13,8 @@ endpoint = {
     "messages": 8,
     "calllog": 9,
     "events": 10,
-    "developerMode": 11
+    "developerMode": 11,
+    "bluetooth":12
 }
 
 method = {

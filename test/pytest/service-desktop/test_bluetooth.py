@@ -11,23 +11,30 @@ import time
 @pytest.mark.service_desktop_test
 def test_bluetooth(harness):
 
-    body = {"btState": True}
-    ret = harness.endpoint_request("developerMode", "put", body)
+    body = {"state": True}
+    ret = harness.endpoint_request("bluetooth", "get", body)
     print(ret)
     assert ret["status"] == status["OK"]
-    if ret["body"]["btState"] == 0:
+    if ret["body"]["state"] == 0:
 
         log.info("BT turned off, turning on...")
-        body = {"btCommand": "on"}
-        ret = harness.endpoint_request("developerMode", "put", body)
+        body = {"state": "on"}
+        ret = harness.endpoint_request("bluetooth", "put", body)
 
         time.sleep(5)
-        body = {"btState": True}
-        ret = harness.endpoint_request("developerMode", "put", body)
+        body = {"state": True}
+        ret = harness.endpoint_request("bluetooth", "get", body)
 
         assert ret["status"] == status["OK"]
 
-    assert ret["body"]["btState"] == 1
+    assert ret["body"]["state"] == 1
 
+    body = {"command": "scanOn"}
+    ret = harness.endpoint_request("bluetooth", "put", body)
+    assert ret["body"]["scan"] == "on"
 
+    time.sleep(1)
+    body = {"command": "scanOff"}
+    ret = harness.endpoint_request("bluetooth", "put", body)
+    assert ret["body"]["scan"] == "off"
 

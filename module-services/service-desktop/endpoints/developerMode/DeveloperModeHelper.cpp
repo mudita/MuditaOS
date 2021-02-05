@@ -51,27 +51,6 @@ auto DeveloperModeHelper::processPutRequest(Context &context) -> sys::ReturnCode
         auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
         ownerServicePtr->bus.sendUnicast(std::move(msg), "ApplicationDesktop");
     }
-    else if (body[json::developerMode::btState].bool_value()) {
-
-        auto event = std::make_unique<sdesktop::developerMode::BluetoothStatusRequestEvent>();
-        auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        ownerServicePtr->bus.sendUnicast(std::move(msg), "ServiceBluetooth");
-    }
-    else if (auto state = body[json::developerMode::btCommand].string_value(); !state.empty()) {
-        BluetoothMessage::Request request;
-        if (state == json::developerMode::btOn) {
-            request = BluetoothMessage::Request::Start;
-            LOG_INFO("turning on BT from harness!");
-        }
-        else {
-            request = BluetoothMessage::Request::StopPlayback;
-            LOG_INFO("turning off BT from harness!");
-        }
-        std::shared_ptr<BluetoothMessage> msg = std::make_shared<BluetoothMessage>(request);
-        ownerServicePtr->bus.sendUnicast(std::move(msg), "ServiceBluetooth");
-
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
-    }
     else if (body[json::developerMode::changeSim].is_number()) {
         int simSelected = body[json::developerMode::changeSim].int_value();
         requestSimChange(simSelected);

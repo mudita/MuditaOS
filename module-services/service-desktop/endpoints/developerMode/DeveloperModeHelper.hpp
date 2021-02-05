@@ -45,9 +45,6 @@ namespace parserFSM
         inline constexpr auto AT            = "AT";
         inline constexpr auto focus         = "focus";
         inline constexpr auto isLocked      = "isLocked";
-        inline constexpr auto btState       = "btState";
-        inline constexpr auto btOn          = "on";
-        inline constexpr auto btCommand     = "btCommand";
         inline constexpr auto changeSim     = "changeSim";
         inline constexpr auto smsCommand    = "smsCommand";
         inline constexpr auto getInfo       = "getInfo";

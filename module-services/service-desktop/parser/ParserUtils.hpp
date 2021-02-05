@@ -26,10 +26,11 @@ namespace parserFSM
         messages,
         calllog,
         calendarEvents,
-        developerMode
+        developerMode,
+        bluetooth
     };
 
-    inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::developerMode);
+    inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::bluetooth);
     // Message defs and utils
     namespace message
     {
