@@ -4,6 +4,7 @@
 #include "CommandHandler.hpp"
 
 #include <utility>
+#include <service-bluetooth/ServiceBluetooth.hpp>
 
 #include "Device.hpp"
 #include "BtCommand.hpp"
@@ -60,6 +61,7 @@ namespace bluetooth
         }
 
         LOG_INFO("Scan started!");
+        static_cast<ServiceBluetooth *>(service)->scanStartedCallback();
         // open new scan window
         return Error::Success;
     }
@@ -67,6 +69,7 @@ namespace bluetooth
     Error::Code CommandHandler::stopScan()
     {
         driver->stopScan();
+        static_cast<ServiceBluetooth *>(service)->scanStoppedCallback();
         return Error::Success;
     }
 
