@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef _TS0710_H
@@ -341,6 +341,16 @@ class TS0710
                 channels.erase(channels.begin() + 1);
             }
         }
+    }
+
+    void CloseChannels()
+    {
+        for (auto &it : channels) {
+            delete it;
+        }
+        channels.clear();
+        TS0710_CLOSE pv_TS0710_Close = TS0710_CLOSE();
+        mode                         = Mode::AT;
     }
 
     DLCI_t GetLastDLCI()
