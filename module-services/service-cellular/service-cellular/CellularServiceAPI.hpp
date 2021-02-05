@@ -139,4 +139,5 @@ namespace CellularServiceAPI
     bool SetVoLTE(sys::Service *serv, bool value);
 
     bool ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState);
+
 }; // namespace CellularServiceAPI

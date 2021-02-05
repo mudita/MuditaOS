@@ -29,6 +29,8 @@ namespace parserFSM
         void requestSimChange(const int simSelected);
         auto smsRecordFromJson(json11::Json msgJson) -> SMSRecord;
         auto prepareSMS(Context &context) -> sys::ReturnCodes;
+        bool requestCellularPowerStateChange(const int simSelected);
+        bool requestServiceStateInfo(sys::Service *serv);
 
       public:
         DeveloperModeHelper(sys::Service *_ownerServicePtr) : ownerServicePtr(_ownerServicePtr){};
@@ -38,18 +40,22 @@ namespace parserFSM
 
     namespace json::developerMode
     {
-        inline constexpr auto keyPressed    = "keyPressed";
-        inline constexpr auto state         = "state";
-        inline constexpr auto systemStarted = "systemStarted";
-        inline constexpr auto ATResponse    = "ATResponse";
-        inline constexpr auto AT            = "AT";
-        inline constexpr auto focus         = "focus";
-        inline constexpr auto isLocked      = "isLocked";
-        inline constexpr auto changeSim     = "changeSim";
-        inline constexpr auto smsCommand    = "smsCommand";
-        inline constexpr auto getInfo       = "getInfo";
+        inline constexpr auto keyPressed             = "keyPressed";
+        inline constexpr auto state                  = "state";
+        inline constexpr auto systemStarted          = "systemStarted";
+        inline constexpr auto ATResponse             = "ATResponse";
+        inline constexpr auto AT                     = "AT";
+        inline constexpr auto focus                  = "focus";
+        inline constexpr auto isLocked               = "isLocked";
+        inline constexpr auto changeSim              = "changeSim";
+        inline constexpr auto smsCommand             = "smsCommand";
+        inline constexpr auto changeCellularStateCmd = "changeCellularStateCmd";
+        inline constexpr auto getInfo                = "getInfo";
+
         /// values for getInfo cmd
-        inline constexpr auto simStateInfo = "simState";
+        inline constexpr auto simStateInfo      = "simState";
+        inline constexpr auto cellularStateInfo = "cellularState";
+
         /// values for smsCommand
         inline constexpr auto smsAdd = "smsAdd";
     }

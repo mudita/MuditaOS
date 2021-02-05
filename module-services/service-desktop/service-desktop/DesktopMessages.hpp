@@ -94,6 +94,17 @@ namespace sdesktop
             explicit AppFocusChangeEvent(std::string appName);
         };
 
+        class CellularHotStartEvent : public Event
+        {
+          public:
+            CellularHotStartEvent() = default;
+        };
+        class CellularStateInfoRequestEvent : public Event
+        {
+          public:
+            CellularStateInfoRequestEvent() = default;
+            explicit CellularStateInfoRequestEvent(std::string stateStr);
+        };
         class ScreenlockCheckEvent : public Event
         {
           public:
