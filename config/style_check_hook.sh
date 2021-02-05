@@ -126,7 +126,7 @@ shouldnt_ignore() {
     # change full name path to path relative to root git dir
     local fname=${1/"$L_GIT_DIR"/"./"}
     for el in ${ignore_paths[@]}; do
-        if [[ ./${fname}  =~ ^${el}.* ]]; then
+        if [[ ${fname}  =~ ^${el}.* ]]; then
             [[ $VERBOSE ]] && echo "Ignore: ${fname} formatting due to: $el match!"
             return 1
         fi

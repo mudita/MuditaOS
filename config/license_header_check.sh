@@ -166,14 +166,11 @@ function excludePathFromFind(){
         fi
         I=$(( $I + 1 ))
     done
-    declare -p paths_to_ignore
-    
 }
 
 function findFiles() {
     # find files except submodule directories
-    echo "find . ${NOT_PATH} -iname \"*.${FILE_EXT}\" -print0 "
-    readarray -d '' FILES_TO_CHECK < <(find . ${NOT_PATH} -iname "*.${FILE_EXT}" -print0)
+    readarray -d '' FILES_TO_CHECK < <(find . ${NOT_PATH} -iname \"*.${FILE_EXT}\" -printf \"%P\0\")
 }
 
 function shouldnt_ignore() {
@@ -208,10 +205,14 @@ function hookMain() {
     parseArgs $@
     readarray -d '' FILES_TO_CHECK < <( ${GET_FILES_CMD} )
 
+    NOT_PATH=""
+    excludePathFromFind
+
     for FILE_TYPE in "${!FileTypes[@]}" 
     do
         echo "=== ${FILE_TYPE} ==="
         extractValues ${FILE_TYPE}
+        findFiles
         I=0
         while [[ $I -lt ${#FILES_TO_CHECK[@]} ]]
         do
