@@ -1390,7 +1390,7 @@ bool ServiceCellular::sendSMS(SMSRecord record)
 
     uint32_t textLen = record.body.length();
 
-    constexpr uint32_t commandTimeout   = 5000;
+    auto commandTimeout                 = at::factory(at::AT::CMGS).getTimeout();
     constexpr uint32_t singleMessageLen = 30;
     bool result                         = false;
     auto channel                        = cmux->get(TS0710::Channel::Commands);
@@ -1404,17 +1404,16 @@ bool ServiceCellular::sendSMS(SMSRecord record)
             std::string body         = UCS2(UTF8(receiver)).str();
             std::string suffix       = "\"";
             std::string command_data = command + body + suffix;
-            if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(
-                    command_data.c_str(), 1, at::factory(at::AT::CMGS).getTimeout().count()))) {
+            if (cmux->CheckATCommandPrompt(
+                    channel->SendCommandPrompt(command_data.c_str(), 1, commandTimeout.count()))) {
 
-                if (channel->cmd((UCS2(record.body).str() + "\032").c_str())) {
+                if (channel->cmd((UCS2(record.body).str() + "\032").c_str(), commandTimeout)) {
                     result = true;
                 }
                 else {
                     result = false;
-                }
-                if (!result)
                     LOG_ERROR("Message to: %s send failure", receiver.c_str());
+                }
             }
         }
         // split text, and send concatenated messages
@@ -1443,9 +1442,10 @@ bool ServiceCellular::sendSMS(SMSRecord record)
                 std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(receiver)).str() + "\",120," +
                                     std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
 
-                if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(command.c_str(), 1, commandTimeout))) {
+                if (cmux->CheckATCommandPrompt(
+                        channel->SendCommandPrompt(command.c_str(), 1, commandTimeout.count()))) {
                     // prompt sign received, send data ended by "Ctrl+Z"
-                    if (channel->cmd(UCS2(messagePart).str() + "\032", std::chrono::milliseconds(commandTimeout), 2)) {
+                    if (channel->cmd(UCS2(messagePart).str() + "\032", commandTimeout, 2)) {
                         result = true;
                     }
                     else {
@@ -1475,7 +1475,7 @@ bool ServiceCellular::sendSMS(SMSRecord record)
             LOG_ERROR("SMS center check");
         }
     }
-    DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(record));
+    DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(std::move(record)));
 
     channel->cmd(at::AT::SMS_GSM);
     return result;
