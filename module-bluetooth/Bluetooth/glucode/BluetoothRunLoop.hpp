@@ -47,6 +47,7 @@ namespace bluetooth
 
       public:
         auto process() -> bool;
+        static void deinit();
         void setTriggerQueue(QueueHandle_t queue);
         auto getRunLoopInstance() -> btstack_run_loop *;
     };

@@ -14,7 +14,7 @@ namespace bluetooth
     QueueHandle_t RunLoop::btstack_run_loop_queue;
     TaskHandle_t RunLoop::btstack_run_loop_task;
     QueueHandle_t RunLoop::triggerQueue;
-    TimerHandle_t RunLoop::testTimer;
+    TimerHandle_t RunLoop::testTimer = nullptr;
 
     auto RunLoop::removeTimer(btstack_timer_source_t *ts) -> bool
     {
@@ -24,6 +24,11 @@ namespace bluetooth
     {
         assert(queue != nullptr);
         triggerQueue = queue;
+    }
+    void RunLoop::deinit()
+    {
+        vQueueDelete(btstack_run_loop_queue);
+        xTimerDelete(testTimer, 0);
     }
     void RunLoop::init()
     {
@@ -125,8 +130,10 @@ namespace bluetooth
     }
     void RunLoop::start()
     {
-        testTimer = xTimerCreate("TestTimer", pdMS_TO_TICKS(1000), pdTRUE, nullptr, triggerCallback);
-        xTimerStart(testTimer, 0);
+        if (testTimer == nullptr) {
+            testTimer = xTimerCreate("TestTimer", pdMS_TO_TICKS(1000), pdTRUE, nullptr, triggerCallback);
+            xTimerStart(testTimer, 0);
+        }
     }
     auto RunLoop::process() -> bool
     {

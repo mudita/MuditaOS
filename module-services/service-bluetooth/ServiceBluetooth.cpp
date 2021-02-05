@@ -123,7 +123,6 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
             LOG_INFO("Bluetooth request!");
             switch (lmsg->req) {
             case BluetoothMessage::Start:
-                worker->run();
                 break;
             case BluetoothMessage::Scan:
                 sendWorkerCommand(bluetooth::StartScan);
