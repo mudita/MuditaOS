@@ -72,9 +72,10 @@ namespace bluetooth
 #else
         auto uartDriver = runLoopInitLinux(runLoop);
 #endif
-        const hci_transport_t *transport = hci_transport_h4_instance(uartDriver);
 
+        const hci_transport_t *transport = hci_transport_h4_instance(uartDriver);
         hci_init(transport, (void *)&config);
+
         hci_set_link_key_db(bluetooth::KeyStorage::getKeyStorage());
         hci_event_callback_registration.callback = &hci_packet_handler;
         hci_add_event_handler(&hci_event_callback_registration);
@@ -185,7 +186,8 @@ namespace bluetooth
         if (ret != 0) {
             LOG_ERROR("Can't turn off Bluetooth Stack!");
         }
-        hci_close();
+        bluetooth::KeyStorage::settings->setValue(bluetooth::Settings::State,
+                                                  static_cast<int>(BluetoothStatus::State::Off));
         return ret != 0 ? Error::LibraryError : Error::Success;
     }
     auto Driver::scan() -> Error
