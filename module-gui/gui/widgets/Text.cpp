@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <iterator>
@@ -164,9 +164,11 @@ namespace gui
     void Text::addRichText(const UTF8 &text)
     {
         auto tmp_document = text::RichTextParser().parse(text, &format);
-        if (tmp_document->isEmpty()) {
+
+        if (!tmp_document || tmp_document->isEmpty()) {
+
             debug_text("Nothing to parse/parser error in rich text: %s", text.c_str());
-            addText(text); // fallback
+            return addText(text); // fallback
         }
         for (auto block : tmp_document->getBlockCursor(0)) {
             *cursor << block;
