@@ -34,6 +34,10 @@ cat <<- EOF
 	# each test is in separate line
 	# to disable test just rem it by putting # in front of it
 	# 
+	# folowing caracters have to be escaped:
+	# [],
+	# \[ \] \,
+	
 	declare -A ${TESTS_LIST_VAR}
 	
 EOF
@@ -46,12 +50,24 @@ for TEST_BINARY in catch2-*
 do
     echo "${TEST_BINARY}"
     echo "${TESTS_LIST_VAR}[\"${TEST_BINARY}\"]=\"" >> ${TESTS_FILE}
-    
-    readarray -t TESTS_LIST < <(./${TEST_BINARY} -l | grep -e "^  " | xargs -i{} echo {} )
+
+    #sed explaind
+    #:a         - lablel 'a' current pattern space to jump to
+    #N          - append next line to pattern space (wiht \n)
+    #/\n  /     - search for this pattern
+    #s/\n //    - delete "\n " (can be "replace")
+    #ta         - if we changed something, jump to lable 'a'
+    #P          - print part until new line
+    #D          - delete part until new line
+    TESTS_LIST_STR=$(./${TEST_BINARY} -l | grep -E "^  .*" | cut -f3- -d\  | sed -e ':a;N;/\n  /s/\n //;ta;P;D' )
+
+    readarray -t TESTS_LIST < <( echo -e "$TESTS_LIST_STR" | tr "\n" "\0" | xargs -0 -i{} echo {} )
+
     I=0
     while [[ $I -lt ${#TESTS_LIST[@]} ]]
     do
-        echo -e "    ${TESTS_LIST[$I]};" >> ${TESTS_FILE}
+        #sed cannot search for single ] to search for it we use ][ patter (and also look for closing ])
+        echo -e "    ${TESTS_LIST[$I]};" | sed -e 's#[][,]#\\&#g' >> ${TESTS_FILE}
         I=$(( $I + 1 ))
     done
     echo "\"" >> ${TESTS_FILE}

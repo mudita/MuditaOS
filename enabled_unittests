@@ -9,6 +9,10 @@
 # each test is in separate line
 # to disable test just rem it by putting # in front of it
 # 
+# folowing caracters have to be escaped:
+# [],
+# \[ \] \,
+
 declare -A TESTS_LIST
 
 TESTS_LIST["catch2-audio-test"]="
@@ -29,7 +33,14 @@ TESTS_LIST["catch2-cellular-datatransfer"]="
     Quectel AT DataTransfer commands;
 "
 #---------
-TESTS_LIST["catch2-cellular-mmi"]="
+TESTS_LIST["catch2-cellular-parse-result"]="
+    CSCA parser test;
+    CSCA set data;
+    QECCNUM parser;
+"
+#---------
+TESTS_LIST["catch2-cellular-request-factory"]="
+    Emergency handling;
     MMI requests;
 "
 #---------
@@ -77,7 +88,6 @@ TESTS_LIST["catch2-db"]="
     Contacts Ringtones Table tests;
     Contacts address Table tests;
     Contact Groups tests;
-    [Groups];
     Alarms Table tests;
     SMS Templates Table tests;
     Calllog Table tests;
@@ -139,7 +149,7 @@ TESTS_LIST["catch2-gui-text"]="
     Text block - get width;
     Text BlockCursor Ctor/Dtor ;
     TextDocument <-> BlockCursor fencing tests;
-    TextDocument <-> BlockCursor operators: +, ++, -, -- tests;
+    TextDocument <-> BlockCursor operators: +\, ++\, -\, -- tests;
     add Char to empty;
     add Char;
     remove Char in empty;
@@ -184,6 +194,20 @@ TESTS_LIST["catch2-service-desktop"]="
 #---------
 TESTS_LIST["catch2-service-evtmgr"]="
     ScreenLightControlFunctions;
+"
+#---------
+TESTS_LIST["catch2-StatefulController-tests"]="
+    Given StatefulController when turn on then turned on;
+    Given StatefulController when error during device registration then turned off;
+    Given StatefulController when error during driver init then turned off;
+    Given StatefulController when error during driver run then turned off;
+    Given StatefulController when restart then don't init twice;
+    Given StatefulController when turn off in off state then turned off;
+    Given StatefulController when turn off in on state then turned off;
+    Given StatefulController when shutdown in off state then terminated;
+    Given StatefulController when shutdown in on state then terminated;
+    Given StatefulController when process command successfully then turned on;
+    Given StatefulController when processing command failed then restarted and turned on;
 "
 #---------
 TESTS_LIST["catch2-unittest_parse_CSCA"]="
@@ -234,6 +258,10 @@ TESTS_LIST["catch2-utils-phonenumber"]="
     Number matcher - match incoming (loose);
 "
 #---------
+TESTS_LIST["catch2-utils-time_display"]="
+    Time display parser;
+"
+#---------
 TESTS_LIST["catch2-utils-ucs2"]="
     UCS2 to UTF8 conversion;
     UCS2 from UTF8 emoji 😁;
@@ -276,8 +304,11 @@ TESTS_LIST["catch2-utils-utf8"]="
     UTF8: removeChar returns propper string;
     UTF8: getChar;
     UTF8: encode / decode / how it works;
-    UTF8 bad case scenario - operator[] returns;
+    UTF8 bad case scenario - operator\[\] returns;
     U8char && UTF8: encode;
+    UTF8: insert whole string which doesn't work;
+    UTF8: Convert to ascii if is ascii combination;
+    UTF8: Not ASCII combination;
 "
 #---------
 TESTS_LIST["catch2-vfs"]="
@@ -290,7 +321,7 @@ TESTS_LIST["catch2-vfs"]="
 TESTS_LIST["catch2-vfs-core-fs"]="
     Corefs: Registering and unregistering block device;
     Corefs: Basic API test;
-    Corefs: Create new file, write, read from it;
+    Corefs: Create new file\, write\, read from it;
     Corefs: Register null filesystem;
     Corefs: Mount empty strings;
     Corefs: Write to not valid file descriptor;
