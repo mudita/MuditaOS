@@ -11,6 +11,7 @@ namespace gui::option
     {
         auto optionItem = new gui::ListItem();
         optionItem->setMinimumSize(style::window::default_body_width, style::window::label::big_h);
+        optionItem->setMargins(Margins(0, 0, 0, window::option_bottom_margin));
         optionItem->activatedCallback    = activatedCallback;
         optionItem->focusChangedCallback = focusChangedCallback;
 
