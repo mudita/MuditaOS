@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,7 @@
 #include "messages/MessagesEndpoint.hpp"
 #include "restore/RestoreEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
+#include <endpoints/bluetooth/BluetoothEndpoint.hpp>
 
 class EndpointFactory
 {
@@ -49,6 +50,8 @@ class EndpointFactory
             return std::make_unique<DeveloperModeEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::calendarEvents:
             return std::make_unique<CalendarEventsEndpoint>(ownerServicePtr);
+        case parserFSM::EndpointType::bluetooth:
+            return std::make_unique<BluetoothEndpoint>(ownerServicePtr);
         default:
             return nullptr;
         }

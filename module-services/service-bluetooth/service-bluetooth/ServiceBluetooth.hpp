@@ -35,9 +35,12 @@ class ServiceBluetooth : public sys::Service
     void sendWorkerCommand(bluetooth::Command command);
     QueueHandle_t workerQueue = nullptr;
     std::shared_ptr<bluetooth::SettingsHolder> settingsHolder;
+    void scanStartedCallback();
+    void scanStoppedCallback();
 
   private:
     std::unique_ptr<BluetoothWorker> worker;
+    bool enabledFromHarness = false;
 };
 
 namespace sys
