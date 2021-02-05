@@ -64,6 +64,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/EVMessages.hpp>
+#include "service-desktop/DesktopMessages.hpp"
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <task.h>
 #include <time/time_conversion.hpp>
@@ -83,6 +84,7 @@
 #include <utility>
 #include <vector>
 #include "checkSmsCenter.hpp"
+#include <service-desktop/Constants.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
@@ -372,6 +374,28 @@ void ServiceCellular::registerMessageHandlers()
         auto msg       = static_cast<CellularPowerStateChange *>(request);
         nextPowerState = msg->getNewState();
         handle_power_state_change();
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(CellularPowerStateChange), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg       = static_cast<CellularPowerStateChange *>(request);
+        nextPowerState = msg->getNewState();
+        handle_power_state_change();
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(sdesktop::developerMode::DeveloperModeRequest), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(request);
+        if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularHotStartEvent)) {
+            cmux->CloseChannels();
+            ///> change state - simulate hot start
+            handle_power_up_request();
+        }
+        if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularStateInfoRequestEvent)) {
+            auto event   = std::make_unique<sdesktop::developerMode::CellularStateInfoRequestEvent>(state.c_str());
+            auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+            bus.sendUnicast(std::move(message), service::name::service_desktop);
+        }
         return sys::MessageNone{};
     });
     handle_CellularGetChannelMessage();

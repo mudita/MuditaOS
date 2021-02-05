@@ -56,6 +56,13 @@ auto DeveloperModeHelper::processPutRequest(Context &context) -> sys::ReturnCode
         requestSimChange(simSelected);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
     }
+    else if (body[json::developerMode::changeCellularStateCmd].is_number()) {
+        int cellularState = body[json::developerMode::changeCellularStateCmd].int_value();
+        if (requestCellularPowerStateChange(cellularState) == false) {
+            context.setResponseStatus(http::Code::NotAcceptable);
+        }
+        MessageHandler::putToSendQueue(context.createSimpleResponse());
+    }
     else if (body[json::developerMode::smsCommand].is_string()) {
         if (body[json::developerMode::smsCommand].string_value() == json::developerMode::smsAdd) {
             SMSType smsType = static_cast<SMSType>(context.getBody()[json::messages::type].int_value());
@@ -85,15 +92,24 @@ auto DeveloperModeHelper::processGetRequest(Context &context) -> sys::ReturnCode
                 {{json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
                  {json::sim, std::to_string(static_cast<int>(Store::GSM::get()->sim))},
                  {json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))}}));
+            MessageHandler::putToSendQueue(context.createSimpleResponse());
+        }
+        else if (keyValue == json::developerMode::cellularStateInfo) {
+            if (requestServiceStateInfo(ownerServicePtr) == false) {
+                context.setResponseStatus(http::Code::NotAcceptable);
+                MessageHandler::putToSendQueue(context.createSimpleResponse());
+            }
         }
         else {
             context.setResponseStatus(http::Code::BadRequest);
+            MessageHandler::putToSendQueue(context.createSimpleResponse());
         }
     }
     else {
         context.setResponseStatus(http::Code::BadRequest);
+        MessageHandler::putToSendQueue(context.createSimpleResponse());
     }
-    MessageHandler::putToSendQueue(context.createSimpleResponse());
+
     return sys::ReturnCodes::Unresolved;
 }
 
@@ -176,6 +192,22 @@ void DeveloperModeHelper::requestSimChange(const int simSelected)
     CellularServiceAPI::SetSimCard(ownerServicePtr, sim);
 }
 
+bool DeveloperModeHelper::requestCellularPowerStateChange(const int cellularState)
+{
+    bool res = false;
+    if (cellularState == 1) {
+        res = CellularServiceAPI::ChangeModulePowerState(ownerServicePtr, cellular::State::PowerState::Off);
+    }
+    else if (cellularState == 2) {
+        res = CellularServiceAPI::ChangeModulePowerState(ownerServicePtr, cellular::State::PowerState::On);
+    }
+    else if (cellularState == 3) {
+        auto event = std::make_unique<sdesktop::developerMode::CellularHotStartEvent>();
+        auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+        res        = ownerServicePtr->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
+    }
+    return res;
+}
 auto DeveloperModeHelper::smsRecordFromJson(json11::Json msgJson) -> SMSRecord
 {
     auto record = SMSRecord();
@@ -214,4 +246,11 @@ auto DeveloperModeHelper::prepareSMS(Context &context) -> sys::ReturnCodes
 
     DBServiceAPI::AddSMS(ownerServicePtr, record, std::move(listener));
     return sys::ReturnCodes::Success;
+}
+
+bool DeveloperModeHelper::requestServiceStateInfo(sys::Service *serv)
+{
+    auto event = std::make_unique<sdesktop::developerMode::CellularStateInfoRequestEvent>();
+    auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+    return serv->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
 }

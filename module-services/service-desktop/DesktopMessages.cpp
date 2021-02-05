@@ -35,6 +35,13 @@ namespace sdesktop
             context.setResponseBody(json11::Json::object{{json::developerMode::isLocked, isLocked}});
         }
 
+        CellularStateInfoRequestEvent::CellularStateInfoRequestEvent(std::string stateStr)
+        {
+            context.setResponseStatus(http::Code::OK);
+            context.setEndpoint(EndpointType::developerMode);
+            context.setResponseBody(json11::Json::object{{json::developerMode::cellularStateInfo, stateStr}});
+        }
+
         DeveloperModeRequest::DeveloperModeRequest(std::unique_ptr<Event> event)
             : sys::DataMessage(MessageType::DeveloperModeRequest), event(std::move(event))
         {}

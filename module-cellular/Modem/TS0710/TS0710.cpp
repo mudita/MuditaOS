@@ -72,8 +72,9 @@ TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent)
 
 TS0710::~TS0710()
 {
-    for (auto it : channels)
+    for (auto it : channels) {
         delete it;
+    }
     channels.clear();
     TS0710_CLOSE pv_TS0710_Close = TS0710_CLOSE();
     mode                         = Mode::AT;
