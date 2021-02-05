@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHelper.hpp"
@@ -47,7 +47,6 @@ auto MessageHelper::to_json(SMSRecord record) -> json11::Json
                                             {json::messages::dateSent, static_cast<int>(record.dateSent)},
                                             {json::messages::id, static_cast<int>(record.ID)},
                                             {json::messages::messageBody, record.body.c_str()},
-                                            {json::messages::phoneNumber, record.number.getEntered()},
                                             {json::messages::type, static_cast<int>(record.type)},
                                             {json::messages::threadID, static_cast<int>(record.threadID)}};
     return recordEntry;
