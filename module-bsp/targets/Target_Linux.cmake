@@ -30,6 +30,8 @@ set(BOARD_SOURCES
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/light_sensor/light_sensor.cpp"
 
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/watchdog/software_watchdog.cpp"
+
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/watchdog/watchdog.cpp"
 
         CACHE INTERNAL "")

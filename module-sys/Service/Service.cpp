@@ -49,11 +49,12 @@ namespace sys
     using namespace cpp_freertos;
     using namespace std;
 
-    Service::Service(std::string name, std::string parent, uint32_t stackDepth, ServicePriority priority)
+    Service::Service(
+        std::string name, std::string parent, uint32_t stackDepth, ServicePriority priority, Watchdog &watchdog)
         : cpp_freertos::Thread(name, stackDepth / 4 /* Stack depth in bytes */, static_cast<UBaseType_t>(priority)),
-          parent(parent), bus{this}, mailbox(this), pingTimestamp(UINT32_MAX), isReady(false), enableRunLoop(false)
-    {
-    }
+          parent(parent), bus(this, watchdog), mailbox(this), watchdog(watchdog), pingTimestamp(UINT32_MAX),
+          isReady(false), enableRunLoop(false)
+    {}
 
     Service::~Service()
     {
@@ -148,7 +149,7 @@ namespace sys
 
     bool Service::connect(const type_info &type, MessageHandler handler)
     {
-        auto idx   = type_index(type);
+        auto idx = type_index(type);
         if (message_handlers.find(idx) == message_handlers.end()) {
             LOG_DEBUG("Registering new message handler on %s", type.name());
             message_handlers[idx] = handler;

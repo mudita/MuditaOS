@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /*
 ** ###################################################################
 **     Processors:          MIMXRT1051CVJ5B
@@ -83,10 +86,6 @@ extern "C"
 #endif
 
 #include <stdint.h>
-
-#ifndef DISABLE_WDOG
-#define DISABLE_WDOG 1
-#endif
 
     /* Define clock source values */
 
