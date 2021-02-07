@@ -40,8 +40,7 @@ namespace bsp
 
     int32_t RT1051LPM::Reboot()
     {
-        bsp::watchdog::init();
-        bsp::watchdog::system_reset();
+        NVIC_SystemReset();
         return 0;
     }
 

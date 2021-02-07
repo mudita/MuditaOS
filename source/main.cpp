@@ -51,6 +51,7 @@
 #include <phonenumbers/phonenumberutil.h>
 #include <source/version.hpp>
 #include <SystemManager/SystemManager.hpp>
+#include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
 #include <vfs.hpp>
 
@@ -72,6 +73,13 @@ int main()
 #endif
 
     bsp::BoardInit();
+
+    if (!sys::SystemWatchdog::getInstance().init()) {
+        LOG_ERROR("System watchdog failed to initialize");
+        // wait for the hardware watchdog (initialized in reset ISR) to reset the system
+        while (1)
+            ;
+    }
 
     std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
     systemServices.emplace_back(sys::CreatorFor<EventManager>());
