@@ -23,6 +23,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/DeviceManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/CpuGovernor.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/graph/TopologicalSort.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SystemWatchdog/SystemWatchdog.cpp
 
         )
 

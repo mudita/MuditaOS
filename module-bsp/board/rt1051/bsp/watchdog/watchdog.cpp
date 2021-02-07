@@ -1,50 +1,45 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/watchdog/watchdog.hpp"
 extern "C"
 {
-#include "../../common/fsl_drivers/fsl_wdog.h"
+#include "fsl_rtwdog.h"
 }
-#include <log/log.hpp>
-
-#define WDOG_1_BASE          WDOG1
-#define DEMO_WDOG_IRQHandler RTWDOG
+#include <limits>
 
 namespace bsp::watchdog
 {
-    void init()
+    bool init(unsigned int timeoutMs)
     {
-        wdog_config_t config;
-        WDOG_GetDefaultConfig(&config);
-        config.timeoutValue = 0xFF; /* Timeout value is (0xFF + 1)/2 = 125 sec. */
-        WDOG_Init(WDOG_1_BASE, &config);
-        LOG_INFO("wdog init done-");
-    }
-    void system_reset()
-    {
-        LOG_DEBUG("request system reset to watchdog");
-        WDOG_TriggerSystemSoftwareReset(WDOG_1_BASE);
-    }
+        // 32.768kHz source clock divided by 256 prescaler
+        static constexpr unsigned int clockFreqHz = 32768 / 256;
 
-    void pet()
-    {
-        WDOG_Refresh(WDOG_1_BASE);
-    }
-
-    // taken straight from example wdog.c in NXP mcuxpresso
-    std::string reset_cause()
-    {
-        auto resetFlag = WDOG_GetStatusFlags(WDOG_1_BASE);
-        switch (resetFlag & (kWDOG_PowerOnResetFlag | kWDOG_TimeoutResetFlag | kWDOG_SoftwareResetFlag)) {
-        case kWDOG_PowerOnResetFlag:
-            return ("Power On Reset");
-        case kWDOG_TimeoutResetFlag:
-            return ("Time Out Reset!");
-        case kWDOG_SoftwareResetFlag:
-            return ("Software Reset!");
-        default:
-            return ("Error status!");
+        const unsigned int timeoutValueTicks = timeoutMs * clockFreqHz / 1000;
+        if (timeoutValueTicks > std::numeric_limits<uint16_t>::max()) {
+            return false;
         }
+
+        rtwdog_config_t config      = {0};
+        config.enableRtwdog         = true;
+        config.clockSource          = kRTWDOG_ClockSource1;            // LPO_CLK clock (32.768kHz)
+        config.prescaler            = kRTWDOG_ClockPrescalerDivide256; // 256 prescaler (effectively 128Hz clock)
+        config.workMode.enableWait  = false;
+        config.workMode.enableStop  = false;
+        config.workMode.enableDebug = false; // If true, RTWDOG will run when target is halted
+        config.testMode             = kRTWDOG_TestModeDisabled;
+        config.enableUpdate         = true;
+        config.enableInterrupt      = false;
+        config.enableWindowMode     = false;
+        config.windowValue          = 0;
+        config.timeoutValue         = static_cast<uint16_t>(timeoutValueTicks);
+        RTWDOG_Init(RTWDOG, &config);
+
+        return true;
+    }
+
+    void refresh()
+    {
+        RTWDOG_Refresh(RTWDOG);
     }
 } // namespace bsp::watchdog

@@ -3,8 +3,11 @@
 
 #pragma once
 
-namespace bsp::watchdog
+namespace sys
 {
-    bool init(unsigned int timeoutMs);
-    void refresh();
-}
+    class Watchdog
+    {
+      public:
+        virtual void refresh() = 0;
+    };
+} // namespace sys
