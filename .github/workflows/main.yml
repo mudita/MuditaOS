@@ -50,13 +50,12 @@ jobs:
           submodules: recursive
       - name: Build for RT1051
         run: |
-          ./configure.sh rt1051 Release && \
+          export JOBS=${JOBS:-$(nproc)} && \
+          echo "JOBS=${JOBS}" &&  \
+          ./configure.sh rt1051 Release -G Ninja && \
           pushd build-rt1051-Release && \
-          export JOBS=${JOBS:-`nproc`} && \
-          echo "JOBS=${JOBS}" && \
-          make -j ${JOBS} && \
-          popd && \
-          uptime
+          ninja -j ${JOBS} && \
+          popd 
 
   build_linux_binary_and_run_tests:
     name: build linux binary and run tests
@@ -72,27 +71,27 @@ jobs:
           submodules: recursive
       - name: build linux binary
         run: |
-          ./configure.sh linux Debug && \
+          export JOBS=${JOBS:-$(nproc)} && \
+          echo "JOBS=${JOBS}" &&  \
+          ./configure.sh linux Debug -G Ninja && \
           pushd build-linux-Debug && \
-          export JOBS=${JOBS:-`nproc`} && \
-          echo "JOBS=${JOBS}" && \
-          make -j ${JOBS} && \
+          ninja -j ${JOBS} && \
           popd
       - name: Check for statics
         run: ./tools/find_global_data.py build-linux-Debug/PurePhone.elf
       - name: build unit tests
         run: |
+          export JOBS=${JOBS:-$(nproc)} && \
+          echo "JOBS=${JOBS}" &&  \
           pushd build-linux-Debug && \
-          export JOBS=${JOBS:-`nproc`} && \
-          echo "JOBS=${JOBS}" && \
-          make -j ${JOBS} unittests && \
+          ninja -j ${JOBS} unittests && \
           popd
       - name: run unit tests
         run: |
           ./tools/run_unittests.sh enabled_unittests
       - name: store build artefact
         run: |
-          tar cf /artefacts/build-$(git rev-parse --short HEAD).tar build-linux-Debug
+          tar -S -cf /artefacts/build-$(git rev-parse --short HEAD).tar build-linux-Debug
       - name: start emulator
         run: |
           ./run_emulator_on_filesystem_image.sh 2>&1 > emulator.log &
