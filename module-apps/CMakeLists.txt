@@ -51,6 +51,7 @@ set(APPLICATIONS
     settings-new
     call
     notes
+    onboarding
     phonebook
     messages
     calllog
