@@ -9,6 +9,8 @@
 #include <newlib/vfs_io_syscalls.hpp>
 #include <sys/statvfs.h>
 #include <sys/mount.h>
+#include <time/time_syscalls.hpp>
+
 extern "C"
 {
     using namespace vfsn::internal;
@@ -127,5 +129,25 @@ extern "C"
     int umount(const char *special_file)
     {
         return syscalls::umount(_REENT->_errno, special_file);
+    }
+    int _gettimeofday_r(struct _reent *r, struct timeval *tp, void *tzp)
+    {
+        return utils::internal::syscalls::gettimeofday(r->_errno, tp, tzp);
+    }
+    void __tz_lock()
+    {
+        utils::internal::syscalls::tz_lock();
+    }
+    void __tz_unlock()
+    {
+        utils::internal::syscalls::tz_unlock();
+    }
+    void __env_lock(struct _reent *reent)
+    {
+        utils::internal::syscalls::env_lock(reent->_errno);
+    }
+    void __env_unlock(struct _reent *reent)
+    {
+        utils::internal::syscalls::env_unlock(reent->_errno);
     }
 }
