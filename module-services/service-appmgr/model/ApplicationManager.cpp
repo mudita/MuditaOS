@@ -157,27 +157,12 @@ namespace app::manager
             },
             ::settings::SettingsScope::Global);
 
-        startSystemServices();
         startBackgroundApplications();
         if (auto app = getApplication(rootApplicationName); app != nullptr) {
             Controller::sendAction(this, actions::Home);
         }
 
         return sys::ReturnCodes::Success;
-    }
-
-    void ApplicationManager::startSystemServices()
-    {
-        if (bool ret = sys::SystemManager::CreateService(
-                std::make_shared<service::gui::ServiceGUI>(service::name::gui, GetName()), this);
-            !ret) {
-            LOG_ERROR("Failed to initialize GUI service");
-        }
-        if (bool ret = sys::SystemManager::CreateService(
-                std::make_shared<service::eink::ServiceEink>(service::name::eink, GetName()), this);
-            !ret) {
-            LOG_ERROR("Failed to initialize EInk service");
-        }
     }
 
     void ApplicationManager::suspendSystemServices()

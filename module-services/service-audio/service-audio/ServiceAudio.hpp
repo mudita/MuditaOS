@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,6 +12,7 @@
 #include <Utils.hpp>
 
 #include <service-db/DBServiceAPI.hpp>
+#include <service-db/DBServiceName.hpp>
 #include <service-db/QueryMessage.hpp>
 
 #include <functional>
@@ -20,6 +21,11 @@ namespace settings
 {
     class Settings;
 }
+
+namespace service::name
+{
+    constexpr inline auto audio = "ServiceAudio";
+} // namespace service::name
 
 class ServiceAudio : public sys::Service
 {
@@ -35,8 +41,6 @@ class ServiceAudio : public sys::Service
     sys::ReturnCodes DeinitHandler() override;
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
-
-    static const char *serviceName;
 
   private:
     enum class VibrationType
@@ -95,3 +99,17 @@ class ServiceAudio : public sys::Service
 
     void settingsChanged(const std::string &name, std::string value);
 };
+
+namespace sys
+{
+    template <> struct ManifestTraits<ServiceAudio>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = service::name::audio;
+            manifest.dependencies = {service::name::db};
+            return manifest;
+        }
+    };
+} // namespace sys

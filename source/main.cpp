@@ -29,6 +29,10 @@
 #include <service-evtmgr/EventManager.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
 #include <service-time/ServiceTime.hpp>
+#include <Service/ServiceCreator.hpp>
+#include <module-services/service-gui/ServiceGUI.hpp>
+#include <module-services/service-gui/Common.hpp>
+#include <module-services/service-eink/ServiceEink.hpp>
 #include <service-fileindexer/Constants.hpp>
 #include <service-fileindexer/ServiceFileIndexer.hpp>
 
@@ -67,103 +71,96 @@ int main()
 
     bsp::BoardInit();
 
-    auto sysmgr = std::make_shared<sys::SystemManager>();
-
-    sysmgr->StartSystem([sysmgr]() {
-        /// force initialization of PhonenumberUtil because of its stack usage
-        /// otherwise we would end up with an init race and PhonenumberUtil could
-        /// be initiated in a task with stack not big enough to handle it
-        i18n::phonenumbers::PhoneNumberUtil::GetInstance();
-
-        vfs.Init();
-
-        auto ret = true;
-
-        ret &=
-            sys::SystemManager::CreateService(std::make_shared<EventManager>(service::name::evt_manager), sysmgr.get());
+    std::vector<std::unique_ptr<sys::BaseServiceCreator>> systemServices;
+    systemServices.emplace_back(sys::CreatorFor<EventManager>());
 #if ENABLE_FILEINDEXER_SERVICE
-        ret &= sys::SystemManager::CreateService(
-            std::make_shared<service::ServiceFileIndexer>(service::name::file_indexer), sysmgr.get());
+    systemServices.emplace_back(sys::CreatorFor<service::ServiceFileIndexer>());
 #endif
-        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
-
+    systemServices.emplace_back(sys::CreatorFor<ServiceDB>());
 #if ENABLE_GSM == 0
-        // For now disable pernamenlty Service cellular when there is no GSM configured
-        LOG_INFO("ServiceCellular (GSM) - Disabled");
+    // For now disable permanently Service cellular when there is no GSM configured
+    LOG_INFO("ServiceCellular (GSM) - Disabled");
 #else
-        LOG_INFO("ServiceCellular (GSM) - Enabling");
-        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceAntenna>(), sysmgr.get());
-        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
-        ret &= sys::SystemManager::CreateService(std::make_shared<FotaService::Service>(), sysmgr.get());
+    systemServices.emplace_back(sys::CreatorFor<ServiceAntenna>());
+    systemServices.emplace_back(sys::CreatorFor<ServiceCellular>());
+    systemServices.emplace_back(sys::CreatorFor<FotaService::Service>());
 #endif
+    systemServices.emplace_back(sys::CreatorFor<ServiceAudio>());
+    systemServices.emplace_back(sys::CreatorFor<ServiceBluetooth>());
+    systemServices.emplace_back(sys::CreatorFor<ServiceLwIP>());
+    systemServices.emplace_back(sys::CreatorFor<ServiceDesktop>());
+    systemServices.emplace_back(sys::CreatorFor<stm::ServiceTime>());
+    systemServices.emplace_back(sys::CreatorFor<service::eink::ServiceEink>());
+    systemServices.emplace_back(sys::CreatorFor<service::gui::ServiceGUI>());
 
-        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
-        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(), sysmgr.get());
-        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(), sysmgr.get());
-        ret &= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
+    auto sysmgr = std::make_shared<sys::SystemManager>(std::move(systemServices));
+    sysmgr->StartSystem(
+        []() {
+            vfs.Init();
+            return true;
+        },
+        [sysmgr]() {
+            /// force initialization of PhonenumberUtil because of its stack usage
+            /// otherwise we would end up with an init race and PhonenumberUtil could
+            /// be initiated in a task with stack not big enough to handle it
+            i18n::phonenumbers::PhoneNumberUtil::GetInstance();
 
-        ret &= sys::SystemManager::CreateService(std::make_shared<stm::ServiceTime>(), sysmgr.get());
-
-        // vector with launchers to applications
-        std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
+            // vector with launchers to applications
+            std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
 #ifdef ENABLE_APP_DESKTOP
-        applications.push_back(app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, false));
+            applications.push_back(app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, false));
 #endif
 #ifdef ENABLE_APP_CALL
-        applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call, false));
+            applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call, false));
 #endif
 #ifdef ENABLE_APP_SETTINGS
-        applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));
+            applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));
 #endif
 #ifdef ENABLE_APP_SETTINGS_NEW
-        applications.push_back(app::CreateLauncher<app::ApplicationSettingsNew>(app::name_settings_new));
+            applications.push_back(app::CreateLauncher<app::ApplicationSettingsNew>(app::name_settings_new));
 #endif
 #ifdef ENABLE_APP_NOTES
-        applications.push_back(app::CreateLauncher<app::ApplicationNotes>(app::name_notes));
+            applications.push_back(app::CreateLauncher<app::ApplicationNotes>(app::name_notes));
 #endif
 #ifdef ENABLE_APP_CALLLOG
-        applications.push_back(app::CreateLauncher<app::ApplicationCallLog>(app::CallLogAppStr));
+            applications.push_back(app::CreateLauncher<app::ApplicationCallLog>(app::CallLogAppStr));
 #endif
 #ifdef ENABLE_APP_PHONEBOOK
-        applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>(app::name_phonebook));
+            applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>(app::name_phonebook));
 #endif
 #ifdef ENABLE_APP_MESSAGES
-        applications.push_back(app::CreateLauncher<app::ApplicationMessages>(app::name_messages));
+            applications.push_back(app::CreateLauncher<app::ApplicationMessages>(app::name_messages));
 #endif
 #ifdef ENABLE_APP_SPECIAL_INPUT
-        applications.push_back(app::CreateLauncher<app::ApplicationSpecialInput>(app::special_input, false));
+            applications.push_back(app::CreateLauncher<app::ApplicationSpecialInput>(app::special_input, false));
 #endif
 #ifdef ENABLE_APP_ANTENNA
-        applications.push_back(app::CreateLauncher<app::ApplicationAntenna>(app::name_antenna));
+            applications.push_back(app::CreateLauncher<app::ApplicationAntenna>(app::name_antenna));
 #endif
 #ifdef ENABLE_APP_CALENDAR
-        applications.push_back(app::CreateLauncher<app::ApplicationCalendar>(app::name_calendar));
+            applications.push_back(app::CreateLauncher<app::ApplicationCalendar>(app::name_calendar));
 #endif
 #ifdef ENABLE_APP_MUSIC_PLAYER
-        applications.push_back(app::CreateLauncher<app::ApplicationMusicPlayer>(app::name_music_player));
+            applications.push_back(app::CreateLauncher<app::ApplicationMusicPlayer>(app::name_music_player));
 #endif
 #ifdef ENABLE_APP_MEDITATION
-        applications.push_back(app::CreateLauncher<app::ApplicationMeditation>(app::name_meditation));
+            applications.push_back(app::CreateLauncher<app::ApplicationMeditation>(app::name_meditation));
 #endif
 #ifdef ENABLE_APP_CALCULATOR
-        applications.push_back(app::CreateLauncher<app::ApplicationCalculator>(app::name_calculator));
+            applications.push_back(app::CreateLauncher<app::ApplicationCalculator>(app::name_calculator));
 #endif
 #ifdef ENABLE_APP_ALARM_CLOCK
-        applications.push_back(app::CreateLauncher<app::ApplicationAlarmClock>(app::name_alarm_clock));
+            applications.push_back(app::CreateLauncher<app::ApplicationAlarmClock>(app::name_alarm_clock));
 #endif
+            // start application manager
+            return sysmgr->RunService(
+                std::make_shared<app::manager::ApplicationManager>(
+                    app::manager::ApplicationManager::ServiceName, std::move(applications), app::name_desktop),
+                sysmgr.get());
+        });
 
-        // start application manager
-        ret &= sysmgr->CreateService(
-            std::make_shared<app::manager::ApplicationManager>(
-                app::manager::ApplicationManager::ServiceName, std::move(applications), app::name_desktop),
-            sysmgr.get());
-
-        return ret;
-    });
     LOG_PRINTF("Launching PurePhone \n");
     LOG_PRINTF("commit: %s tag: %s branch: %s\n", GIT_REV, GIT_TAG, GIT_BRANCH);
-
     cpp_freertos::Thread::StartScheduler();
-
     return 0;
 }

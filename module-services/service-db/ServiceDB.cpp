@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceDB.hpp"
@@ -11,7 +11,6 @@
 #include "service-db/DBSMSMessage.hpp"
 #include "service-db/DBSMSTemplateMessage.hpp"
 #include "service-db/DBServiceMessage.hpp"
-#include "service-db/DBServiceName.hpp"
 #include "service-db/DBThreadMessage.hpp"
 #include "service-db/QueryMessage.hpp"
 #include "service-db/DatabaseAgent.hpp"

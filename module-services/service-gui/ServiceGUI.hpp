@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,10 +9,13 @@
 #include <Service/Service.hpp>
 #include <Service/Timer.hpp>
 
+#include <service-db/DBServiceName.hpp>
+
 #include "messages/RenderingFinished.hpp"
 
 #include "ContextPool.hpp"
 #include "DrawCommandsQueue.hpp"
+#include "Common.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -33,7 +36,7 @@ namespace service::gui
         friend WorkerGUI;
 
       public:
-        explicit ServiceGUI(const std::string &name, std::string parent = {});
+        explicit ServiceGUI(const std::string &name = service::name::gui, std::string parent = {});
         ~ServiceGUI() noexcept override;
 
         sys::ReturnCodes InitHandler() override;
@@ -88,3 +91,17 @@ namespace service::gui
         State currentState;
     };
 } // namespace service::gui
+
+namespace sys
+{
+    template <> struct ManifestTraits<service::gui::ServiceGUI>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = service::name::gui;
+            manifest.dependencies = {service::name::db};
+            return manifest;
+        }
+    };
+} // namespace sys

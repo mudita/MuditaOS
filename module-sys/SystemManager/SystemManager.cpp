@@ -3,6 +3,9 @@
 
 #include "SystemManager.hpp"
 
+#include "DependencyGraph.hpp"
+#include "graph/TopologicalSort.hpp"
+
 #include <common_data/EventStore.hpp>
 #include "thread.hpp"
 #include "ticks.hpp"
@@ -18,6 +21,7 @@
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include "messages/CpuFrequencyMessage.hpp"
 #include "messages/DeviceRegistrationMessage.hpp"
+#include <time/ScopedTime.hpp>
 
 const inline size_t systemManagerStack = 4096 * 2;
 
@@ -34,7 +38,8 @@ namespace sys
         this->state = state;
     }
 
-    SystemManager::SystemManager() : Service(service::name::system_manager, "", systemManagerStack)
+    SystemManager::SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators)
+        : Service(service::name::system_manager, "", systemManagerStack), systemServiceCreators{std::move(creators)}
     {
         // Specify list of channels which System Manager is registered to
         bus.channels = {BusChannel::SystemManagerRequests};
@@ -47,12 +52,7 @@ namespace sys
 
     void SystemManager::Run()
     {
-
-        InitHandler();
-
-        if (userInit) {
-            userInit();
-        }
+        initialize();
 
         // in shutdown we need to wait till event manager tells us that it's ok to stfu
         while (state == State::Running) {
@@ -103,13 +103,48 @@ namespace sys
         };
     }
 
-    void SystemManager::StartSystem(InitFunction init)
+    void SystemManager::initialize()
+    {
+        utils::time::Scoped timer{"Initialize"};
+        InitHandler();
+        if (systemInit) {
+            systemInit();
+        }
+
+        StartSystemServices();
+        if (userInit) {
+            userInit();
+        }
+    }
+
+    void SystemManager::StartSystemServices()
+    {
+        DependencyGraph depGraph{graph::nodesFrom(systemServiceCreators), std::make_unique<graph::TopologicalSort>()};
+        const auto &sortedServices = [&depGraph]() {
+            utils::time::Scoped timer{"DependencyGraph"};
+            return depGraph.sort();
+        }();
+
+        LOG_INFO("Order of system services initialization:");
+        for (const auto &service : sortedServices) {
+            LOG_INFO("\t> %s", service.get().getName().c_str());
+        }
+        std::for_each(sortedServices.begin(), sortedServices.end(), [this](const auto &service) {
+            const auto startTimeout = service.get().getStartTimeout().count();
+            if (const auto success = RunService(service.get().create(), this, startTimeout); !success) {
+                LOG_FATAL("Unable to start service: %s", service.get().getName().c_str());
+            }
+        });
+    }
+
+    void SystemManager::StartSystem(InitFunction sysInit, InitFunction appSpaceInit)
     {
         powerManager  = std::make_unique<PowerManager>();
         cpuStatistics = std::make_unique<CpuStatistics>();
         deviceManager = std::make_unique<DeviceManager>();
 
-        userInit = init;
+        systemInit = std::move(sysInit);
+        userInit   = std::move(appSpaceInit);
 
         // Start System manager
         StartService();
@@ -157,9 +192,8 @@ namespace sys
         return true;
     }
 
-    bool SystemManager::CreateService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout)
+    bool SystemManager::RunService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout)
     {
-
         CriticalSection::Enter();
         servicesList.push_back(service);
         CriticalSection::Exit();
@@ -173,9 +207,7 @@ namespace sys
         if (ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)) {
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     bool SystemManager::DestroyService(const std::string &name, Service *caller, TickType_t timeout)

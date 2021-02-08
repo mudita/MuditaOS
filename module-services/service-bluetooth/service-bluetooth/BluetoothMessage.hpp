@@ -14,11 +14,6 @@
 #include <utility>
 #include <vector>
 
-extern "C"
-{
-#include <module-bluetooth/lib/btstack/src/btstack_util.h>
-};
-
 struct BluetoothStatus
 {
     enum class State
@@ -80,10 +75,7 @@ class BluetoothAddrMessage : public sys::DataMessage
 {
   public:
     bd_addr_t addr;
-    explicit BluetoothAddrMessage(std::string addr) : sys::DataMessage(MessageType::BluetoothAddrResult)
-    {
-        sscanf_bd_addr(addr.c_str(), this->addr);
-    };
+    explicit BluetoothAddrMessage(std::string addr);
     ~BluetoothAddrMessage() override = default;
 };
 

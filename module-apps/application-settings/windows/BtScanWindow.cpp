@@ -16,6 +16,11 @@
 
 #include <Style.hpp>
 
+extern "C"
+{
+#include <module-bluetooth/lib/btstack/src/btstack_util.h>
+}
+
 namespace gui
 {
 
