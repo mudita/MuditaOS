@@ -117,8 +117,6 @@ namespace app::manager
     {
         blockingTimer->setInterval(default_application_locktime_ms);
         utils::localize.setFallbackLanguage(utils::localize.DefaultLanguage);
-        utils::localize.setDisplayLanguage(displayLanguage);
-        utils::localize.setInputLanguage(inputLanguage);
         settings->registerValueChange(
             settings::SystemProperties::displayLanguage,
             [this](std::string value) { displayLanguageChanged(value); },
@@ -243,7 +241,7 @@ namespace app::manager
         connect(typeid(DisplayLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<DisplayLanguageChangeRequest *>(request);
             handleDisplayLanguageChange(msg);
-            return msgHandled();
+            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::localize.getDisplayLanguage());
         });
         connect(typeid(InputLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<InputLanguageChangeRequest *>(request);
@@ -281,7 +279,7 @@ namespace app::manager
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
-            return std::make_shared<GetCurrentDisplayLanguageResponse>(displayLanguage);
+            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::localize.getDisplayLanguage());
         });
         connect(typeid(UpdateInProgress), [this](sys::Message *) {
             closeApplicationsOnUpdate();
@@ -613,14 +611,13 @@ namespace app::manager
     {
         const auto &requestedLanguage = msg->getLanguage();
 
-        if (requestedLanguage == displayLanguage) {
+        if (requestedLanguage == utils::localize.getDisplayLanguage()) {
             LOG_WARN("The selected language is already set. Ignore.");
             return false;
         }
-        displayLanguage = requestedLanguage;
         settings->setValue(
-            settings::SystemProperties::displayLanguage, displayLanguage, settings::SettingsScope::Global);
-        utils::localize.setDisplayLanguage(displayLanguage);
+            settings::SystemProperties::displayLanguage, requestedLanguage, settings::SettingsScope::Global);
+        utils::localize.setDisplayLanguage(requestedLanguage);
         rebuildActiveApplications();
         return true;
     }
@@ -629,13 +626,13 @@ namespace app::manager
     {
         const auto &requestedLanguage = msg->getLanguage();
 
-        if (requestedLanguage == inputLanguage) {
+        if (requestedLanguage == utils::localize.getInputLanguage()) {
             LOG_WARN("The selected language is already set. Ignore.");
             return false;
         }
-        inputLanguage = requestedLanguage;
-        settings->setValue(settings::SystemProperties::inputLanguage, inputLanguage, settings::SettingsScope::Global);
-        utils::localize.setInputLanguage(inputLanguage);
+        settings->setValue(
+            settings::SystemProperties::inputLanguage, requestedLanguage, settings::SettingsScope::Global);
+        utils::localize.setInputLanguage(requestedLanguage);
         return true;
     }
 
@@ -817,8 +814,7 @@ namespace app::manager
         if (value.empty()) {
             return;
         }
-        displayLanguage = value;
-        utils::localize.setDisplayLanguage(displayLanguage);
+        utils::localize.setDisplayLanguage(value);
         rebuildActiveApplications();
     }
     void ApplicationManager::lockTimeChanged(std::string value)
@@ -834,7 +830,6 @@ namespace app::manager
         if (value.empty()) {
             return;
         }
-        inputLanguage = value;
         utils::localize.setInputLanguage(value);
     }
 } // namespace app::manager

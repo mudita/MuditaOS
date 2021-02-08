@@ -16,7 +16,6 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         ApplicationSettings.cpp
         models/ApnSettingsModel.cpp
-        models/LanguagesModel.cpp
         models/NewApnModel.cpp
         widgets/timeWidget.cpp
         widgets/ChangePasscodeLockHandler.cpp

@@ -19,6 +19,7 @@
 #include <application-meditation/ApplicationMeditation.hpp>
 #include <application-calculator/ApplicationCalculator.hpp>
 #include <application-alarm-clock/ApplicationAlarmClock.hpp>
+#include <application-onboarding/ApplicationOnBoarding.hpp>
 
 // services
 #include <service-appmgr/model/ApplicationManager.hpp>
@@ -153,6 +154,9 @@ int main()
 #endif
 #ifdef ENABLE_APP_ALARM_CLOCK
             applications.push_back(app::CreateLauncher<app::ApplicationAlarmClock>(app::name_alarm_clock));
+#endif
+#ifdef ENABLE_APP_ONBOARDING
+            applications.push_back(app::CreateLauncher<app::ApplicationOnBoarding>(app::name_onboarding));
 #endif
             // start application manager
             return sysmgr->RunService(

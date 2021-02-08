@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "../core/DrawCommand.hpp"
@@ -23,6 +23,12 @@ namespace gui
         type = ItemType::IMAGE;
         set(imageName);
         setPosition(x, y);
+    }
+
+    Image::Image(Item *parent, const UTF8 &imageName) : Rect(parent, 0, 0, 0, 0), imageMap{nullptr}
+    {
+        type = ItemType::IMAGE;
+        set(imageName);
     }
 
     Image::Image(const UTF8 &imageName) : imageMap{nullptr}
