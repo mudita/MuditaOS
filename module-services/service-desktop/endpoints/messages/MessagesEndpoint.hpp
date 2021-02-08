@@ -27,7 +27,7 @@ class MessagesEndpoint : public parserFSM::Endpoint
     std::shared_ptr<parserFSM::MessageHelper> helper;
 
   public:
-    MessagesEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
+    explicit MessagesEndpoint(sys::Service *_ownerServicePtr) : Endpoint(_ownerServicePtr)
     {
         debugName = "MessagesEndpoint";
         helper    = std::make_shared<parserFSM::MessageHelper>(ownerServicePtr);

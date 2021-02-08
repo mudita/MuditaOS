@@ -45,7 +45,7 @@ namespace parserFSM
             msg.erase(msg.begin(), msg.begin() + size_header);
         }
 
-        inline unsigned long calcPayloadLength(const std::string header)
+        inline unsigned long calcPayloadLength(const std::string &header)
         {
             try {
                 return std::stol(header.substr(1, std::string::npos));
@@ -67,10 +67,12 @@ namespace parserFSM
         }
         inline std::string extractPayload(std::string &msg, size_t payloadLength)
         {
-            if (msg.size() > payloadLength)
+            if (msg.size() > payloadLength) {
                 return msg.substr(0, payloadLength);
-            else
+            }
+            else {
                 return msg;
+            }
         }
     } // namespace message
 
@@ -140,9 +142,9 @@ namespace parserFSM
             inline constexpr auto command = "command";
             namespace commands
             {
-                inline constexpr auto upload   = "upload";
-                inline constexpr auto rm       = "rm";
-                inline constexpr auto download = "download";
+                inline constexpr auto upload    = "upload";
+                inline constexpr auto rm        = "rm";
+                inline constexpr auto download  = "download";
                 inline constexpr auto checkFile = "checkFile";
             } // namespace commands
         }     // namespace filesystem
@@ -159,27 +161,35 @@ namespace parserFSM
 
         namespace messages
         {
-            inline constexpr auto id           = "id";
-            inline constexpr auto count        = "count";
-            inline constexpr auto offset       = "offset";
-            inline constexpr auto phoneNumber  = "phoneNumber";
-            inline constexpr auto messageBody  = "messageBody";
-            inline constexpr auto isUnread     = "unread";
-            inline constexpr auto contactID    = "contactID";
-            inline constexpr auto date         = "date";
-            inline constexpr auto dateSent     = "dateSent";
-            inline constexpr auto type         = "type";
-            inline constexpr auto threadID     = "threadID";
-            inline constexpr auto msgTemplate  = "template";
-            inline constexpr auto templateText = "text";
-            namespace thread
-            {
-                inline constexpr auto msgCount       = "msgCount";
-                inline constexpr auto snippet        = "snippet";
-                inline constexpr auto unreadMsgCount = "unreadMsgCount";
+            inline constexpr auto count            = "count";
+            inline constexpr auto category         = "category";
+            inline constexpr auto categoryMessage  = "message";
+            inline constexpr auto categoryThread   = "thread";
+            inline constexpr auto categoryTemplate = "template";
 
-            } // namespace thread
-
+            inline constexpr auto limit              = "limit";
+            inline constexpr auto offset             = "offset";
+            inline constexpr auto totalCount         = "totalCount";
+            inline constexpr auto nextPage           = "nextPage";
+            inline constexpr auto entries            = "entries";
+            inline constexpr auto messageBody        = "messageBody";
+            inline constexpr auto messageCount       = "messageCount";
+            inline constexpr auto messageID          = "messageID";
+            inline constexpr auto messageType        = "messageType";
+            inline constexpr auto phoneNumber        = "phoneNumber";
+            inline constexpr auto receivedAt         = "receivedAt";
+            inline constexpr auto sentAt             = "sentAt";
+            inline constexpr auto lastUsedAt         = "lastUsedAt";
+            inline constexpr auto lastUpdatedAt      = "lastUpdatedAt";
+            inline constexpr auto isUnread           = "isUnread";
+            inline constexpr auto contactID          = "contactID";
+            inline constexpr auto numberID           = "numberID";
+            inline constexpr auto threadID           = "threadID";
+            inline constexpr auto messageSnippet     = "messageSnippet";
+            inline constexpr auto unreadMessageCount = "unreadMessageCount";
+            inline constexpr auto messageTemplate    = "messageTemplate";
+            inline constexpr auto templateBody       = "templateBody";
+            inline constexpr auto templateID         = "templateID";
         } // namespace messages
 
     } // namespace json
