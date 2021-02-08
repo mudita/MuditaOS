@@ -65,7 +65,7 @@ auto DeveloperModeHelper::processPutRequest(Context &context) -> sys::ReturnCode
     }
     else if (body[json::developerMode::smsCommand].is_string()) {
         if (body[json::developerMode::smsCommand].string_value() == json::developerMode::smsAdd) {
-            SMSType smsType = static_cast<SMSType>(context.getBody()[json::messages::type].int_value());
+            const auto smsType = static_cast<SMSType>(context.getBody()[json::messages::messageType].int_value());
             if (smsType == SMSType::DRAFT || smsType == SMSType::QUEUED || smsType == SMSType::FAILED) {
                 return prepareSMS(context);
             }
@@ -212,11 +212,9 @@ auto DeveloperModeHelper::smsRecordFromJson(json11::Json msgJson) -> SMSRecord
 {
     auto record = SMSRecord();
 
-    record.type = static_cast<SMSType>(msgJson[json::messages::type].int_value());
+    record.type = static_cast<SMSType>(msgJson[json::messages::messageType].int_value());
     record.date = utils::time::getCurrentTimestamp().getTime();
-    utils::PhoneNumber phoneNumber(msgJson[json::messages::phoneNumber].string_value());
-    record.number = phoneNumber.getView();
-    record.body   = UTF8(msgJson[json::messages::messageBody].string_value());
+    record.body = UTF8(msgJson[json::messages::messageBody].string_value());
     return record;
 }
 
