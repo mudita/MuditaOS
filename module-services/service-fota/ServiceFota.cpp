@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-fota/FotaMessages.hpp"
@@ -34,15 +34,13 @@
 
 namespace FotaService
 {
-
-    const char *Service::serviceName     = "ServiceFota";
     const TickType_t defaultTimer        = 1000;
     const uint32_t QIDEACTTimeout        = 40000;
     const uint32_t QIACTTimeout          = 150000;
     const char *httpErrorCode200         = "200";
     const uint32_t httpErrorCodeValue200 = 200;
 
-    Service::Service() : sys::Service(serviceName)
+    Service::Service() : sys::Service(service::name::fota)
     {
         LOG_INFO("[ServiceFota] Initializing");
 
@@ -53,7 +51,7 @@ namespace FotaService
         connectionTimer->connect([&](sys::Timer &) {
             std::shared_ptr<InternetRequestMessage> msg =
                 std::make_shared<InternetRequestMessage>(MessageType::CellularListCurrentCalls);
-            bus.sendUnicast(msg, Service::serviceName);
+            bus.sendUnicast(msg, service::name::fota);
         });
         registerMessageHandlers();
     }
@@ -598,7 +596,7 @@ namespace FotaService
         std::shared_ptr<sys::ResponseMessage> responseMsg;
 
         LOG_DEBUG("%s: DataRecieve: bus:%d | message:%d",
-                  serviceName,
+                  service::name::fota,
                   static_cast<int>(msgl->channel),
                   static_cast<int>(msgl->messageType));
         return (responseMsg ? responseMsg : std::make_shared<sys::ResponseMessage>());

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,9 @@
 #include "agents/settings/SettingsAgent.hpp"
 #include "service-db/DatabaseAgent.hpp"
 #include "service-db/DBNotificationMessage.hpp"
+#include "service-db/DBServiceName.hpp"
+
+#include "service-fileindexer/Constants.hpp"
 
 #include <Common/Query.hpp>
 #include <Interface/AlarmsRecord.hpp>
@@ -91,3 +94,19 @@ class ServiceDB : public sys::Service
     bool StoreIntoBackup(const std::string &backupPath);
     void sendUpdateNotification(db::Interface::Name interface, db::Query::Type type);
 };
+
+namespace sys
+{
+    template <> struct ManifestTraits<ServiceDB>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name = service::name::db;
+#if ENABLE_FILEINDEXER_SERVICE
+            manifest.dependencies = {service::name::file_indexer.data()};
+#endif
+            return manifest;
+        }
+    };
+} // namespace sys

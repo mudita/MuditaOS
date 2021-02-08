@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,10 +13,7 @@
 #include "Constants.hpp"
 #include "WorkerDesktop.hpp"
 #include <endpoints/update/UpdateMuditaOS.hpp>
-#include <Service/Common.hpp>
-#include <Service/Message.hpp>
-#include <Service/Service.hpp>
-#include <memory>
+#include <service-db/DBServiceName.hpp>
 
 namespace settings
 {
@@ -50,3 +47,17 @@ class ServiceDesktop : public sys::Service
   private:
     std::unique_ptr<settings::Settings> settings;
 };
+
+namespace sys
+{
+    template <> struct ManifestTraits<ServiceDesktop>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = service::name::service_desktop;
+            manifest.dependencies = {service::name::db};
+            return manifest;
+        }
+    };
+} // namespace sys

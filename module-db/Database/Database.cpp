@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Database.hpp"
@@ -70,7 +70,7 @@ Database::Database(const char *name)
 {
     LOG_INFO("Creating database: %s", dbName.c_str());
     if (const auto rc = sqlite3_open(name, &dbConnection); rc != SQLITE_OK) {
-        LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d dbName=%s", rc, name);
+        LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d ( %s ) dbName=%s", rc, sqlite3_errstr(rc), name);
         throw DatabaseInitialisationError{"Failed to initialize the sqlite db"};
     }
 

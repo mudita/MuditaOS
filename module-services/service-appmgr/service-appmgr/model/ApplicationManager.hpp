@@ -22,7 +22,10 @@
 #include <string_view>
 #include <vector>
 
+#include <service-db/DBServiceName.hpp>
 #include <service-db/Settings.hpp>
+#include <service-gui/Common.hpp>
+#include <service-eink/Common.hpp>
 
 namespace app
 {
@@ -100,7 +103,6 @@ namespace app::manager
 
       private:
         auto startApplication(ApplicationHandle &app) -> bool;
-        void startSystemServices();
         void startBackgroundApplications();
         void rebuildActiveApplications();
         void suspendSystemServices();
@@ -158,3 +160,17 @@ namespace app::manager
         std::string displayLanguage;
     };
 } // namespace app::manager
+
+namespace sys
+{
+    template <> struct ManifestTraits<app::manager::ApplicationManager>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = app::manager::ApplicationManager::ServiceName;
+            manifest.dependencies = {service::name::db, service::name::gui, service::name::eink};
+            return manifest;
+        }
+    };
+} // namespace sys

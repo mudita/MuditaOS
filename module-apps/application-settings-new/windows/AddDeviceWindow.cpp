@@ -9,6 +9,11 @@
 #include <i18n/i18n.hpp>
 #include <utility>
 
+extern "C"
+{
+#include <module-bluetooth/lib/btstack/src/btstack_util.h>
+}
+
 namespace gui
 {
 
