@@ -6,6 +6,7 @@ set(SOURCES
     ServiceBluetooth.cpp
     service-bluetooth/SettingsHolder.cpp
     service-bluetooth/SettingsSerializer.cpp
+    service-bluetooth/BluetoothMessage.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

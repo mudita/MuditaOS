@@ -14,9 +14,11 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Service.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Timer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/SystemManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/DependencyGraph.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/PowerManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/CpuStatistics.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/DeviceManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/graph/TopologicalSort.cpp
 
         )
 
@@ -67,3 +69,6 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+if (${ENABLE_TESTS})
+    add_subdirectory(SystemManager/tests)
+endif()

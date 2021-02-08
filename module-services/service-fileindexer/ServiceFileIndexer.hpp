@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Service/Service.hpp>
+
+#include "Constants.hpp"
 #include "StartupIndexer.hpp"
 
 namespace service
@@ -12,7 +14,7 @@ namespace service
     class ServiceFileIndexer final : public sys::Service
     {
       public:
-        ServiceFileIndexer(const std::string_view name);
+        ServiceFileIndexer(const std::string_view name = service::name::file_indexer);
         virtual ~ServiceFileIndexer()                  = default;
         ServiceFileIndexer(const ServiceFileIndexer &) = delete;
         ServiceFileIndexer &operator=(const ServiceFileIndexer &) = delete;
@@ -30,3 +32,16 @@ namespace service
     };
 
 }; // namespace service
+
+namespace sys
+{
+    template <> struct ManifestTraits<service::ServiceFileIndexer>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name = service::name::file_indexer;
+            return manifest;
+        }
+    };
+} // namespace sys

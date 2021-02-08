@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,7 @@
 #include "Common.hpp"  // for ReturnCodes, ServicePriority, BusChannels
 #include "Mailbox.hpp" // for Mailbox
 #include "Message.hpp" // for MessagePointer
+#include "ServiceManifest.hpp"
 #include "thread.hpp"  // for Thread
 #include <algorithm>   // for find, max
 #include <cstdint>     // for uint32_t, uint64_t

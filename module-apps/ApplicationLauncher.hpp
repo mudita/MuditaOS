@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -79,14 +79,14 @@ namespace app
         {
             parent = (caller == nullptr ? "" : caller->GetName());
             handle = std::make_shared<T>(name, parent);
-            return sys::SystemManager::CreateService(handle, caller);
+            return sys::SystemManager::RunService(handle, caller);
         }
 
         bool runBackground(sys::Service *caller) override
         {
             parent = (caller == nullptr ? "" : caller->GetName());
             handle = std::make_shared<T>(name, parent, true);
-            return sys::SystemManager::CreateService(handle, caller);
+            return sys::SystemManager::RunService(handle, caller);
         }
     };
 

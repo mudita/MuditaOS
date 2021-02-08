@@ -27,6 +27,7 @@
 #include <vector>   // for vector
 #include <service-db/Settings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <service-db/DBServiceName.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -310,3 +311,17 @@ class ServiceCellular : public sys::Service
     void apnListChanged(const std::string &value);
     bool volteOn = false;
 };
+
+namespace sys
+{
+    template <> struct ManifestTraits<ServiceCellular>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = ServiceCellular::serviceName;
+            manifest.dependencies = {service::name::db};
+            return manifest;
+        }
+    };
+} // namespace sys

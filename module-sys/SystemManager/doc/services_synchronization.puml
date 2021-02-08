@@ -1,0 +1,30 @@
+@startuml
+
+actor Driver
+participant "System Manager" as sysmgr
+participant "Dependency Graph" as graph
+participant Service as srv
+
+Driver -> sysmgr: Pass a list\nof services
+sysmgr -> graph **: create
+
+|||
+sysmgr -> graph: addServices()
+
+|||
+sysmgr -> graph: topologicalSort()
+
+|||
+activate graph
+graph --> sysmgr: sorted services
+deactivate graph
+destroy graph
+|||
+
+loop for each service in sorted services
+sysmgr -> srv: Start
+srv --> sysmgr: Confirmation
+end
+|||
+
+@enduml

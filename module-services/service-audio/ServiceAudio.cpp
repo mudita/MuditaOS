@@ -13,12 +13,10 @@
 
 #include <type_traits>
 
-const char *ServiceAudio::serviceName = "ServiceAudio";
-
 using namespace audio;
 
 ServiceAudio::ServiceAudio()
-    : sys::Service(serviceName, "", 4096 * 2, sys::ServicePriority::Idle),
+    : sys::Service(service::name::audio, "", 4096 * 2, sys::ServicePriority::Idle),
       audioMux([this](auto... params) { return this->AudioServicesCallback(params...); }),
       settingsProvider(std::make_unique<settings::Settings>(this))
 {
@@ -426,7 +424,7 @@ void ServiceAudio::HandleNotification(const AudioNotificationMessage::Type &type
         }
         else {
             auto newMsg = std::make_shared<AudioStopRequest>(token);
-            bus.sendUnicast(newMsg, ServiceAudio::serviceName);
+            bus.sendUnicast(newMsg, service::name::audio);
         }
         return;
     }

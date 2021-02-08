@@ -17,12 +17,13 @@
 #include "mutex.hpp"
 #include "Service/Mailbox.hpp"
 #include "Service/Service.hpp"
-#include "Service/Message.hpp"
+#include "Service/ServiceCreator.hpp"
 #include "PowerManager.hpp"
 #include "Constants.hpp"
 #include "CpuStatistics.hpp"
 #include "DeviceManager.hpp"
 #include <chrono>
+#include <vector>
 
 namespace sys
 {
@@ -63,12 +64,14 @@ namespace sys
             Reboot,
         } state = State::Running;
 
-        SystemManager();
+        explicit SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
         ~SystemManager() override;
 
         void set(enum State state);
 
-        void StartSystem(InitFunction init);
+        void initialize();
+
+        void StartSystem(InitFunction sysInit, InitFunction appSpaceInit);
 
         // Invoke system close procedure
         static bool CloseSystem(Service *s);
@@ -79,8 +82,8 @@ namespace sys
 
         static bool ResumeService(const std::string &name, Service *caller);
 
-        // Create new service
-        static bool CreateService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
+        /// Runs a service
+        static bool RunService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
 
         /// Destroy existing service
         /// @note there is no fallback
@@ -113,6 +116,8 @@ namespace sys
 
         void Run() override;
 
+        void StartSystemServices();
+
         /// Sysmgr stores list of all active services but some of them are under control of parent services.
         /// Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to
         /// parents.
@@ -135,9 +140,10 @@ namespace sys
 
         bool cpuStatisticsTimerInit{false};
 
-        InitFunction userInit;
-
+        std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
         std::unique_ptr<sys::Timer> cpuStatisticsTimer;
+        InitFunction userInit;
+        InitFunction systemInit;
 
         static std::vector<std::shared_ptr<Service>> servicesList;
         static cpp_freertos::MutexStandard destroyMutex;
@@ -145,7 +151,6 @@ namespace sys
         static std::unique_ptr<CpuStatistics> cpuStatistics;
         static std::unique_ptr<DeviceManager> deviceManager;
     };
-
 } // namespace sys
 
 inline const char *c_str(sys::SystemManager::State state)
