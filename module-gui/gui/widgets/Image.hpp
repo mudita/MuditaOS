@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,6 +24,7 @@ namespace gui
         Image();
         /// create new Image element and resize it to size needed by selected Image
         Image(const UTF8 &);
+        Image(Item *parent, const UTF8 &imageName);
         /// Create new Image element on position x,y w&h will be *ignored*
         Image(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const UTF8 = UTF8{""});
         Image(Item *parent, uint32_t x, uint32_t y, const UTF8 imgName = UTF8{""})
