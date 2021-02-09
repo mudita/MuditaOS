@@ -204,7 +204,12 @@ namespace audio
 
     bool RouterOperation::Mute(bool enable)
     {
-        muteEnable = enable;
+        if (enable == true) {
+            outputConnection->disable();
+        }
+        else {
+            outputConnection->enable();
+        }
         return true;
     }
 

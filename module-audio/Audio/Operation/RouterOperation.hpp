@@ -50,7 +50,6 @@ namespace audio
 
         bool Mute(bool enable);
 
-        bool muteEnable = false;
         std::unique_ptr<Stream> dataStreamOut;
         std::unique_ptr<Stream> dataStreamIn;
         std::unique_ptr<Encoder> enc;
