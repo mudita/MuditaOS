@@ -65,11 +65,13 @@ auto UpdateEndpoint::getUpdates(Context &context) -> sys::ReturnCodes
             return (json11::Json::object{{"name", fileName}, {"size", std::to_string(fileSize)}});
         }
     };
-
+    LOG_DEBUG("iterating dir %s", updatesOSPath.string().c_str());
     auto dirEntryVector = std::vector<DirectoryEntry>();
     for (const auto &p : fs::directory_iterator(updatesOSPath)) {
-        if (!p.is_directory() && p.path().c_str() == updateos::extension::update) {
+        LOG_DEBUG("update entry test: %s", p.path().string().c_str());
+        if (!p.is_directory() && p.path().extension() == updateos::extension::update) {
             dirEntryVector.push_back(DirectoryEntry{p.path().string(), static_cast<uint32_t>(p.file_size())});
+            LOG_DEBUG("updat entry found: %s", p.path().string().c_str());
         }
     }
 

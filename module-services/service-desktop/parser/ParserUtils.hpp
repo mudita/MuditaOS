@@ -130,6 +130,7 @@ namespace parserFSM
         inline constexpr auto errorCode        = "errorCode";
         inline constexpr auto statusCode       = "statusCode";
         inline constexpr auto updateHistory    = "updateHistory";
+        inline constexpr auto versionString    = "string";
         namespace filesystem
         {
             inline constexpr auto command = "command";

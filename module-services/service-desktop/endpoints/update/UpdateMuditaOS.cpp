@@ -84,7 +84,7 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
     informDebug("Prepraring temp dir");
 
     updateRunStatus.startTime   = utils::time::getCurrentTimestamp().getTime();
-    updateRunStatus.fromVersion = bootConfig.to_json();
+    updateRunStatus.fromVersion = bootConfig.to_json()[boot::json::git_info];
     storeRunStatusInDB();
 
     updateos::UpdateError err =
@@ -259,10 +259,10 @@ updateos::UpdateError UpdateMuditaOS::verifyVersion()
     }
     else {
         /* version comparison goes here */
-        updateRunStatus.toVersion = targetVersionInfo;
+        updateRunStatus.toVersion = targetVersionInfo[boot::json::git_info];
         const bool ret = bootConfig.version_compare(targetVersionInfo[boot::json::version_string].string_value(),
                                                     bootConfig.os_version());
-        LOG_DEBUG("verifyVersion comparison result == %s", ret ? "true" : "false");
+        LOG_DEBUG("comparison result == %s", ret ? "true" : "false");
     }
     return updateos::UpdateError::NoError;
 }
@@ -357,13 +357,16 @@ updateos::UpdateError UpdateMuditaOS::prepareRoot()
     }
 
     // rename the temp directory to current (extracted update)
-    informDebug("prepareRoot rename: %s->%s", updateTempDirectory.c_str(), currentOSPath.c_str());
+    informDebug("prepareRoot copy: %s->%s", updateTempDirectory.c_str(), currentOSPath.c_str());
     try {
-        std::filesystem::rename(updateTempDirectory.c_str(), currentOSPath.c_str());
+        // this won't work across different mount points
+        //
+        std::filesystem::copy(
+            updateTempDirectory.c_str(), currentOSPath.c_str(), std::filesystem::copy_options::recursive);
     }
     catch (const std::filesystem::filesystem_error &e) {
-        return informError(updateos::UpdateError::CantRenameTempToCurrent,
-                           "prepareRoot can't rename %s -> %s error %s",
+        return informError(updateos::UpdateError::CantCopyTempToCurrent,
+                           "prepareRoot can't copy %s -> %s error %s",
                            updateTempDirectory.c_str(),
                            purefs::dir::getCurrentOSPath().c_str(),
                            e.what());
@@ -394,13 +397,16 @@ updateos::UpdateError UpdateMuditaOS::updateBootJSON()
             std::fclose(fpCRC);
         }
         else {
-            return updateos::UpdateError::CantUpdateCRC32JSON;
+            return informError(updateos::UpdateError::CantUpdateCRC32JSON,
+                               "Can't open %s for writing",
+                               (bootJSONAbsoulte += boot::consts::ext_crc32).c_str());
         }
 
         std::fclose(fp);
     }
     else {
-        return updateos::UpdateError::CantUpdateCRC32JSON;
+        return informError(
+            updateos::UpdateError::CantUpdateCRC32JSON, "Can't opem %s for reading", bootJSONAbsoulte.c_str());
     }
 
     informDebug("updateBootJSON no error");
@@ -469,14 +475,24 @@ bool UpdateMuditaOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
 
 updateos::UpdateError UpdateMuditaOS::cleanupAfterUpdate()
 {
-    if (std::filesystem::is_directory(updateTempDirectory.c_str()) &&
-        std::filesystem::remove_all(updateTempDirectory.c_str())) {
-        return informError(
-            updateos::UpdateError::CantRemoveUniqueTmpDir, "remove_all failed on %s", updateTempDirectory.c_str());
+    try {
+        if (std::filesystem::is_directory(updateTempDirectory.c_str()) &&
+            std::filesystem::remove_all(updateTempDirectory.c_str())) {
+            return informError(
+                updateos::UpdateError::CantRemoveUniqueTmpDir, "remove_all failed on %s", updateTempDirectory.c_str());
+        }
     }
-    mtar_close(&updateTar);
-    if (std::remove(updateFile.c_str())) {
-        return informError(updateos::UpdateError::CantRemoveUpdateFile, "Failed to delete %s", updateFile.c_str());
+    catch (const std::filesystem::filesystem_error &e) {
+        LOG_ERROR("remove_all on %s, error %s", updateTempDirectory.c_str(), e.what());
+    }
+
+    try {
+        mtar_close(&updateTar);
+        if (std::remove(updateFile.c_str())) {
+            return informError(updateos::UpdateError::CantRemoveUpdateFile, "Failed to delete %s", updateFile.c_str());
+        }
+    }
+    catch (const std::filesystem::filesystem_error &e) {
     }
 
     status = updateos::UpdateState::ReadyForReset;
@@ -616,16 +632,14 @@ const json11::Json UpdateMuditaOS::getVersionInfoFromFile(const fs::path &update
         mtar_header_t h;
 
         if (mtar_open(&tar, updateFile.c_str(), "r") == MTAR_EOPENFAIL) {
-            LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile %s can't open", updateFile.c_str());
+            LOG_WARN("%s can't open", updateFile.c_str());
             return json11::Json();
         }
 
         std::unique_ptr<char[]> versionFilename(new char[boot::consts::crc_buf]);
         sprintf(versionFilename.get(), "./%s", updateos::file::version);
         if (mtar_find(&tar, versionFilename.get(), &h) == MTAR_ENOTFOUND) {
-            LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile can't find %s in %s",
-                     updateos::file::version,
-                     updateFile.c_str());
+            LOG_WARN("can't find %s in %s", updateos::file::version, updateFile.c_str());
 
             mtar_close(&tar);
             return json11::Json();
@@ -634,9 +648,7 @@ const json11::Json UpdateMuditaOS::getVersionInfoFromFile(const fs::path &update
         /* this file should never be larger then boot::consts::tar_buf */
         std::unique_ptr<char[]> readBuf(new char[boot::consts::tar_buf]);
         if (mtar_read_data(&tar, readBuf.get(), h.size) != MTAR_ESUCCESS) {
-            LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile can't read %s in %s",
-                     updateos::file::version,
-                     updateFile.c_str());
+            LOG_WARN("can't read %s in %s", updateos::file::version, updateFile.c_str());
 
             // mtar_close(&tar);
             return json11::Json();
@@ -648,16 +660,14 @@ const json11::Json UpdateMuditaOS::getVersionInfoFromFile(const fs::path &update
         std::string dataPackage  = std::string(static_cast<char *>(readBuf.get()), h.size);
         json11::Json versionInfo = json11::Json::parse(dataPackage, parserError);
         if (parserError != "") {
-            LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile can't parse %s as JSON error: \"%s\"",
-                     updateos::file::version,
-                     parserError.c_str());
+            LOG_WARN("can't parse %s as JSON error: \"%s\"", updateos::file::version, parserError.c_str());
             return json11::Json();
         }
 
         return versionInfo;
     }
     else {
-        LOG_INFO("UpdateMuditaOS::getVersionInfoFromFile %s does not exist", updateFile.c_str());
+        LOG_WARN("%s does not exist", updateFile.c_str());
     }
 
     return json11::Json();
@@ -720,7 +730,7 @@ updateos::UpdateError UpdateMuditaOS::informError(const updateos::UpdateError er
     updateRunStatus.finishedError = errorCode;
     return errorCode;
 }
-
+#ifdef DEBUG
 void UpdateMuditaOS::informDebug(const char *format, ...)
 {
     va_list argptr;
@@ -731,6 +741,10 @@ void UpdateMuditaOS::informDebug(const char *format, ...)
 
     LOG_DEBUG("UPDATE_DEBUG %s", readBuf.get());
 }
+#else
+void UpdateMuditaOS::informDebug(const char *format, ...)
+{}
+#endif
 
 void UpdateMuditaOS::informUpdate(const updateos::UpdateState statusCode, const char *format, ...)
 {
@@ -764,12 +778,12 @@ void UpdateMuditaOS::informUpdate(const updateos::UpdateState statusCode, const 
 
 void UpdateMuditaOS::setInitialHistory(const std::string &initialHistory)
 {
-    LOG_DEBUG("setInitialHistory %s", initialHistory.c_str());
+    LOG_DEBUG("%s", initialHistory.c_str());
     std::string parseErrors;
     updateHistory = json11::Json::parse(initialHistory, parseErrors);
 
     if (!parseErrors.empty() && !initialHistory.empty()) {
-        LOG_ERROR("Can't parse current update history, resetting");
+        LOG_WARN("Can't parse current update history, resetting");
         updateHistory = json11::Json();
     }
 }

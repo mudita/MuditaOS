@@ -122,7 +122,7 @@ void WorkerDesktop::stopTransfer(const TransferFailAction action)
     responseContext.setResponseBody(responseJson);
 
     // close the file descriptor
-    fclose(fileDes);
+    std::fclose(fileDes);
 
     // stop the timeout timer
     transferTimer->stop();

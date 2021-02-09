@@ -67,7 +67,8 @@ namespace updateos
         NoBootloaderFile,
         CantOpenBootloaderFile,
         CantAllocateBuffer,
-        CantLoadBootloaderFile
+        CantLoadBootloaderFile,
+        CantCopyTempToCurrent
     };
 
     enum class UpdateState
