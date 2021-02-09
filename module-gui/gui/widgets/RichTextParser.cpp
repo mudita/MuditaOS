@@ -325,8 +325,8 @@ struct walker : pugi::xml_tree_walker
     std::list<gui::TextFormat> style_stack;
     text::CustomTokens tokens;
 
-    bool add_newline = false;
-    bool adding_tokens = false;
+    bool add_empty_line = false;
+    bool adding_tokens  = false;
 
   public:
     walker(gui::TextFormat entry_style, ::text::CustomTokens::TokenMap &&tokens) : tokens{std::move(tokens)}
@@ -398,8 +398,17 @@ struct walker : pugi::xml_tree_walker
 
     auto push_newline_node(pugi::xml_node &)
     {
-        if (blocks.size() != 0u) {
-            blocks.back().setEnd(gui::TextBlock::End::Newline);
+        if (!blocks.empty()) {
+            if (blocks.back().getEnd() != gui::TextBlock::End::Newline) {
+                blocks.back().setEnd(gui::TextBlock::End::Newline);
+                add_empty_line = false;
+            }
+            else {
+                add_empty_line = true;
+            }
+        }
+        else {
+            add_empty_line = true;
         }
     }
 
@@ -462,7 +471,12 @@ struct walker : pugi::xml_tree_walker
 
     auto pop_newline_node(pugi::xml_node &node)
     {
-        if (blocks.size() != 0u) {
+        if (add_empty_line) {
+            blocks.emplace_back(gui::TextBlock("", std::make_unique<gui::TextFormat>(style_stack.back())));
+            add_empty_line = false;
+        }
+
+        if (!blocks.empty()) {
             blocks.back().setEnd(gui::TextBlock::End::Newline);
         }
     }
