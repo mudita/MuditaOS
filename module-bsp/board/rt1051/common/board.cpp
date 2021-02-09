@@ -10,9 +10,9 @@ extern "C"
 #include "fsl_lpuart.h"
 #endif
 }
+#include "audio.hpp"
 #include "chip.hpp"
 #include "irq/irq_gpio.hpp"
-#include "audio/RT1051Audiocodec.hpp"
 
 #include <cstdint>
 
@@ -193,7 +193,7 @@ namespace bsp
         DCDC_BootIntoDCM(DCDC);
 
         // init audio
-        RT1051Audiocodec::Init();
+        audioInit();
 
         PrintSystemClocks();
         clearAndPrintBootReason();

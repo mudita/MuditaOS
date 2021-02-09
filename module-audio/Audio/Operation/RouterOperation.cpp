@@ -3,11 +3,11 @@
 
 #include "RouterOperation.hpp"
 
+#include <Audio/AudioDevice.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
 #include <Audio/StreamFactory.hpp>
 
-#include <bsp_audio.hpp>
 #include <log/log.hpp>
 #include <mutex.hpp>
 
@@ -60,13 +60,12 @@ namespace audio
         }
 
         // try to run devices with the format
-        if (auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
-            ret != bsp::AudioDevice::RetCode::Success) {
+        if (auto ret = audioDevice->Start(currentProfile->GetAudioFormat()); ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);
         }
 
         if (auto ret = audioDeviceCellular->Start(currentProfile->GetAudioFormat());
-            ret != bsp::AudioDevice::RetCode::Success) {
+            ret != AudioDevice::RetCode::Success) {
             return GetDeviceError(ret);
         }
 
@@ -180,13 +179,13 @@ namespace audio
             Stop();
         }
 
-        audioDevice = CreateDevice(newProfile->GetAudioDeviceType()).value_or(nullptr);
+        audioDevice = CreateDevice(newProfile->GetAudioDeviceType());
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
         }
 
-        audioDeviceCellular = CreateDevice(bsp::AudioDevice::Type::Cellular).value_or(nullptr);
+        audioDeviceCellular = CreateDevice(AudioDevice::Type::Cellular);
         if (audioDeviceCellular == nullptr) {
             LOG_ERROR("Error creating AudioDeviceCellular");
             return RetCode::Failed;
