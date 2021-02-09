@@ -474,7 +474,7 @@
   "app_music_player_music_empty_window_notification": "Press Music Library to choose\n a song from the library",
   "app_special_input_window": "Special characters",
   "app_emoji_input_window": "Emoji",
-  "sms_add_rec_num": "Add contact",
+  "sms_add_rec_num": "Add recipient or type a number",
   "sms_title_message": "New message",
   "sms_call_text": "Call ",
   "sms_resend_failed": "Send again",
