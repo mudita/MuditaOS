@@ -22,6 +22,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/BoxLayoutSizeStore.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TopBar.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TopBar/SIM.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/TopBar/BatteryWidget.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Text.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TextBlock.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TextDocument.cpp"

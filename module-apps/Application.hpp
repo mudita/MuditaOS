@@ -167,8 +167,7 @@ namespace app
         sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);
         sys::MessagePointer handleInputEvent(sys::Message *msgl);
         sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl);
-        sys::MessagePointer handleBatteryLevel(sys::Message *msgl);
-        sys::MessagePointer handleChargerPlugged(sys::Message *msgl);
+        sys::MessagePointer handleBatteryStatusChange();
         sys::MessagePointer handleMinuteUpdated(sys::Message *msgl);
         sys::MessagePointer handleAction(sys::Message *msgl);
         sys::MessagePointer handleApplicationSwitch(sys::Message *msgl);
