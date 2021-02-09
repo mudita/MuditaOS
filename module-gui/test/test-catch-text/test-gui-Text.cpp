@@ -65,6 +65,18 @@ namespace gui
             return lines->get();
         }
 
+        [[nodiscard]] auto lineGet(unsigned int nr)
+        {
+            auto line = lines->get().begin();
+
+            if (nr >= lines->size()) {
+                nr = lines->size() - 1;
+            }
+
+            std::advance(line, nr);
+            return line;
+        }
+
         [[nodiscard]] auto *getInputMode()
         {
             return mode;
@@ -955,5 +967,107 @@ TEST_CASE("Text addition bounds - multiple limits tests")
 
         REQUIRE(text->linesSize() == 1);
         REQUIRE(text->getText().length() != signsLimit);
+    }
+}
+
+TEST_CASE("RichText newline and empty lines tests")
+{
+    std::string testStringBlock1 = "Test String 1";
+    std::string testStringBlock2 = "Test String 2";
+    std::string testStringBlock3 = "Test String 3";
+    std::string emptyParagraph   = "<p></p>";
+
+    SECTION("Paragraph inside no newlines blocks")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + testStringBlock1 + "<p>" + testStringBlock2 + "</p>" + testStringBlock3 +
+                          "</text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock2 + "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == testStringBlock3);
+    }
+
+    SECTION("Two empty paragraphs at beginning")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + emptyParagraph + testStringBlock1 + testStringBlock2 +
+                          testStringBlock3 + "</text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == testStringBlock1 + testStringBlock2 + testStringBlock3);
+    }
+
+    SECTION("Two empty paragraphs at end")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + testStringBlock1 + testStringBlock2 + testStringBlock3 + emptyParagraph +
+                          emptyParagraph + "</text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + testStringBlock2 + testStringBlock3 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == "");
+    }
+
+    SECTION("One empty paragraphs at beginning, one in center and one at end")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + testStringBlock1 + emptyParagraph + testStringBlock2 +
+                          testStringBlock3 + emptyParagraph + "</text>");
+
+        REQUIRE(text->linesSize() == 4);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == testStringBlock2 + testStringBlock3 + "\n");
+        REQUIRE((*text->lineGet(3)).getText(0) == "");
+    }
+
+    SECTION("Text inside paragraph at beginning")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text><p>" + testStringBlock1 + "</p>" + testStringBlock2 + testStringBlock3 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock2 + testStringBlock3);
+    }
+
+    SECTION("Text empty paragraph and text inside paragraph at beginning")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + "<p>" + testStringBlock1 + "</p></text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == "");
     }
 }
