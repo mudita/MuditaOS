@@ -10,6 +10,8 @@
 #include <source/version.hpp>
 #include <time/time_conversion.hpp>
 #include <service-desktop/service-desktop/ServiceDesktop.hpp>
+#include <version.hpp>
+
 #include <cstdint>
 #include <string>
 
@@ -50,7 +52,8 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::gitTag, (std::string)GIT_TAG},
          {json::gitBranch, (std::string)GIT_BRANCH},
          {json::updateHistory, updateHistory},
-         {json::currentRTCTime, std::to_string(static_cast<uint32_t>(utils::time::getCurrentTimestamp().getTime()))}}));
+         {json::currentRTCTime, std::to_string(static_cast<uint32_t>(utils::time::getCurrentTimestamp().getTime()))},
+         {json::version, std::string(VERSION)}}));
 
     MessageHandler::putToSendQueue(context.createSimpleResponse());
     return true;
