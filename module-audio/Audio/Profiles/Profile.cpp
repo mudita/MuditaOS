@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Profile.hpp"
@@ -24,9 +24,7 @@
 namespace audio
 {
 
-    std::unique_ptr<Profile> Profile::Create(const Type t,
-                                             std::optional<Volume> vol,
-                                             std::optional<Gain> gain)
+    std::unique_ptr<Profile> Profile::Create(const Type t, std::optional<Volume> vol, std::optional<Gain> gain)
     {
         std::unique_ptr<Profile> inst;
 
@@ -81,8 +79,8 @@ namespace audio
 
     Profile::Profile(const std::string &name,
                      const Type type,
-                     const bsp::AudioDevice::Format &fmt,
-                     bsp::AudioDevice::Type devType)
+                     const AudioDevice::Format &fmt,
+                     AudioDevice::Type devType)
         : audioFormat(fmt), audioDeviceType(devType), name(name), type(type)
     {}
 
@@ -96,12 +94,12 @@ namespace audio
         audioFormat.outputVolume = vol;
     }
 
-    void Profile::SetInputPath(bsp::AudioDevice::InputPath path)
+    void Profile::SetInputPath(AudioDevice::InputPath path)
     {
         audioFormat.inputPath = path;
     }
 
-    void Profile::SetOutputPath(bsp::AudioDevice::OutputPath path)
+    void Profile::SetOutputPath(AudioDevice::OutputPath path)
     {
         audioFormat.outputPath = path;
     }

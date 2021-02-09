@@ -1,4 +1,7 @@
-﻿cmake_minimum_required(VERSION 3.14)
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+cmake_minimum_required(VERSION 3.14)
 
 project(module-apps VERSION 1.0
         DESCRIPTION "Library with all applications.")
@@ -112,6 +115,7 @@ target_link_libraries(${PROJECT_NAME}
         service-db
         service-evtmgr
     PUBLIC
+        module-audio
         module-bsp
         module-os
         module-sys

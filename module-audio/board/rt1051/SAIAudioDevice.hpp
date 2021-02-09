@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include "bsp/audio/bsp_audio.hpp"
+#include <Audio/AudioDevice.hpp>
 
 #include "fsl_sai_edma.h"
 
-namespace bsp
+namespace audio
 {
 
-    class SAIAudioDevice : public bsp::AudioDevice
+    class SAIAudioDevice : public AudioDevice
     {
       public:
         SAIAudioDevice(I2S_Type *base, sai_edma_handle_t *rxHandle, sai_edma_handle_t *txHandle);
@@ -34,4 +34,4 @@ namespace bsp
         static constexpr Capabilities saiCapabilities = {.usesDMA = true};
     };
 
-} // namespace bsp
+} // namespace audio

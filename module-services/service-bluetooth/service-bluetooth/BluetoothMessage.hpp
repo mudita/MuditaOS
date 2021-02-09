@@ -9,7 +9,6 @@
 #include <Service/Message.hpp>
 #include <Audio/Stream.hpp>
 #include <MessageType.hpp>
-#include <bsp_audio.hpp>
 
 #include <utility>
 #include <vector>
@@ -120,72 +119,4 @@ class BluetoothRequestStreamResultMessage : public sys::DataMessage
 
   private:
     std::shared_ptr<BluetoothStreamData> data;
-};
-
-class BluetoothProxyMessage : public sys::DataMessage
-{
-  public:
-    BluetoothProxyMessage(MessageType messageType, bsp::AudioDevice::Format format)
-        : DataMessage(messageType), format(format){};
-
-    ~BluetoothProxyMessage() override = default;
-
-    bsp::AudioDevice::Format format;
-};
-
-/// Bluetooth proxy messages
-
-class BluetoothProxyStartMessage : public BluetoothProxyMessage
-{
-  public:
-    BluetoothProxyStartMessage(audio::Stream &streamOut, audio::Stream &streamIn, bsp::AudioDevice::Format format)
-        : BluetoothProxyMessage(MessageType::BluetoothProxyStart, format), audioStreamOut(streamOut),
-          audioStreamIn(streamIn){};
-
-    ~BluetoothProxyStartMessage() override = default;
-
-    audio::Stream &audioStreamOut;
-    audio::Stream &audioStreamIn;
-};
-
-class BluetoothProxyStopMessage : public BluetoothProxyMessage
-{
-  public:
-    BluetoothProxyStopMessage(bsp::AudioDevice::Format format)
-        : BluetoothProxyMessage(MessageType::BluetoothProxyStop, format){};
-    ~BluetoothProxyStopMessage() override = default;
-};
-
-class BluetoothProxySetVolumeMessage : public BluetoothProxyMessage
-{
-  public:
-    BluetoothProxySetVolumeMessage(bsp::AudioDevice::Format format)
-        : BluetoothProxyMessage(MessageType::BluetoothProxyOutputVolumeCtrl, format){};
-    ~BluetoothProxySetVolumeMessage() override = default;
-};
-
-class BluetoothProxySetGainMessage : public BluetoothProxyMessage
-{
-  public:
-    BluetoothProxySetGainMessage(bsp::AudioDevice::Format format)
-        : BluetoothProxyMessage(MessageType::BluetoothProxyInputGainCtrl, format){};
-    ~BluetoothProxySetGainMessage() override = default;
-
-    float value;
-};
-
-class BluetoothProxySetOutputPathMessage : public BluetoothProxyMessage
-{
-  public:
-    BluetoothProxySetOutputPathMessage(bsp::AudioDevice::Format format)
-        : BluetoothProxyMessage(MessageType::BluetoothProxyOutputPathCtrl, format){};
-    ~BluetoothProxySetOutputPathMessage() override = default;
-};
-
-class BluetoothProxySetInputPathMessage : public BluetoothProxyMessage
-{
-  public:
-    BluetoothProxySetInputPathMessage(bsp::AudioDevice::Format format)
-        : BluetoothProxyMessage(MessageType::BluetoothProxyInputPathCtrl, format){};
-    ~BluetoothProxySetInputPathMessage() override = default;
 };
