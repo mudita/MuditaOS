@@ -1,7 +1,6 @@
 -- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 -- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-﻿
 INSERT OR REPLACE INTO file_tab (file_id, path, size, mime_type, mtime, directory, file_type) VALUES
     (1, 'mp3/track1.mp3', 456666, 1, 1603929600, 'mp3',12297),
     (2, 'mp3/track2.mp3', 345354 ,1, 1603929604, 'mp3',12297),
