@@ -52,7 +52,11 @@ namespace gui
                                          : 0;
 
         auto newLineAtBeginningSubtraction =
-            previousLine->getEnd() == TextBlock::End::Newline && selectedLineCursorPosition == 0 ? 1 : 0;
+            (previousLine->getEnd() == TextBlock::End::Newline) && (selectedLineCursorPosition == 0) &&
+                    (selectedLineNumber >= 2) &&
+                    (text->lines->getLine(selectedLineNumber - 2)->getEnd() == TextBlock::End::None)
+                ? 1
+                : 0;
 
         auto moveCount = selectedLineCursorPosition + previousLineEndAddition + previousLineMoveCount -
                          newLineAtBeginningSubtraction;
