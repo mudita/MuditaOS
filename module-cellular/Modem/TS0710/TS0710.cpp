@@ -274,7 +274,7 @@ TS0710::ConfState TS0710::AudioConfProcedure()
         parser->cmd(at::AT::QRXGAIN);
         parser->cmd(at::AT::CLVL);
         parser->cmd(at::AT::QMIC);
-        SetupEchoCalceller(EchoCancellerStrength::Aggressive);
+        SetupEchoCalceller(EchoCancellerStrength::Tuned);
         return ConfState ::Success;
     }
     else {
@@ -593,5 +593,31 @@ void TS0710::SetupEchoCalceller(EchoCancellerStrength strength)
         parser->cmd(at::factory(at::AT::QEEC) + "24,768");
         parser->cmd(at::factory(at::AT::QEEC) + "33,896");
         break;
+    case EchoCancellerStrength::Tuned:
+        /*
+        The following steps describe the echo tuning workflow.
+        1. Tune the echo path delay.
+            a) Start with AT+QEEC=5,65436        （delay= -100）
+            b) Make call to check the echo performance and record the value.
+            c) Increase the delay in steps of 50, until 400, and check the echo performance at each delay value.
+            d) Set the parameter to the value that yielded the best echo performance.
+
+        2. Tune the tail of echo.
+            a) Start with AT+QEEC=21,20000
+            b) Make call to check the echo performance and record the value.
+            c) Increase the DENS_tail_alpha in steps of 500, until 30000, and check the echo performance at each value.
+            d) Set the parameter to the value that yielded the best echo performance.
+            e) Start with AT+QEEC=22,6000
+            f) Make call to check the echo performance and record the value.
+            g) Increase the DENS_tail_portion in steps of 500, until 30000, and check the echo performance at each
+        value. h) Set the parameter to the value that yielded the best echo performance.
+        */
+        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
+        parser->cmd(at::factory(at::AT::QEEC) + "5,40"); // best performance on experiments in step 1
+        parser->cmd(at::factory(at::AT::QEEC) + "10,160");
+        parser->cmd(at::factory(at::AT::QEEC) + "21,26600"); // best performance on experiments in step 2c
+        parser->cmd(at::factory(at::AT::QEEC) + "22,20000"); // best performance on experiments in step 2g
+        parser->cmd(at::factory(at::AT::QEEC) + "24,768");
+        parser->cmd(at::factory(at::AT::QEEC) + "33,896");
     };
 }

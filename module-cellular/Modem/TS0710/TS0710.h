@@ -288,7 +288,8 @@ class TS0710
     {
         LeastAggressive,
         Medium,
-        Aggressive
+        Aggressive,
+        Tuned
     };
     void SetupEchoCalceller(EchoCancellerStrength strength);
 
