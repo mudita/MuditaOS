@@ -3,7 +3,6 @@
 import pytest
 from harness.interface.defs import status
 
-
 @pytest.mark.service_desktop_test
 def test_device_info(harness):
     body = {}
