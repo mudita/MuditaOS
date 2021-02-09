@@ -4,7 +4,6 @@
 #pragma once
 
 #include <memory>
-#include <optional>
 #include <functional>
 
 #include <Audio/AudioCommon.hpp>
@@ -123,7 +122,7 @@ namespace audio
         };
 
         std::shared_ptr<Profile> currentProfile;
-        std::unique_ptr<bsp::AudioDevice> audioDevice;
+        std::shared_ptr<AudioDevice> audioDevice;
         std::vector<SupportedProfile> supportedProfiles;
 
         State state = State::Idle;
@@ -142,7 +141,7 @@ namespace audio
         virtual audio::RetCode SwitchProfile(const Profile::Type type) = 0;
         std::shared_ptr<Profile> GetProfile(const Profile::Type type);
 
-        std::optional<std::unique_ptr<bsp::AudioDevice>> CreateDevice(bsp::AudioDevice::Type type);
+        std::shared_ptr<AudioDevice> CreateDevice(AudioDevice::Type type);
     };
 
 } // namespace audio

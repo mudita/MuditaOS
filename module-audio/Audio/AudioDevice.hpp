@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #pragma once
 
 #include <Audio/Endpoint.hpp>
@@ -6,7 +9,7 @@
 #include <memory>
 #include <functional>
 
-namespace bsp
+namespace audio
 {
 
     class AudioDevice : public audio::IOProxy
@@ -27,26 +30,6 @@ namespace bsp
             Bluetooth
         };
 
-        enum class InputPath
-        {
-            Headphones,
-            Microphone,
-            BluetoothHSP,
-            None
-        };
-
-        enum class OutputPath
-        {
-            Headphones,
-            HeadphonesMono,
-            Earspeaker,
-            Loudspeaker,
-            LoudspeakerMono,
-            BluetoothA2DP,
-            BluetoothHSP,
-            None
-        };
-
         enum class Flags
         {
             OutputMono   = 1 << 0,
@@ -54,6 +37,21 @@ namespace bsp
             InputLeft    = 1 << 2,
             InputRight   = 1 << 3,
             InputStereo  = 1 << 4
+        };
+
+        enum class InputPath
+        {
+            Headphones,
+            Microphone,
+            None
+        };
+
+        enum class OutputPath
+        {
+            Headphones,
+            Earspeaker,
+            Loudspeaker,
+            None
         };
 
         using Format = struct
@@ -74,8 +72,6 @@ namespace bsp
         {}
 
         virtual ~AudioDevice() = default;
-
-        static std::optional<std::unique_ptr<AudioDevice>> Create(Type type);
 
         virtual RetCode Start(const Format &format) = 0;
         virtual RetCode Stop()                      = 0;
@@ -116,4 +112,4 @@ namespace bsp
 
         bool isInitialized = false;
     };
-} // namespace bsp
+} // namespace audio

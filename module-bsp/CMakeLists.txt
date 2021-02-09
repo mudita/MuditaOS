@@ -1,11 +1,13 @@
-﻿cmake_minimum_required(VERSION 3.12)
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+cmake_minimum_required(VERSION 3.12)
 
 project(module-bsp VERSION 1.0
         DESCRIPTION "VFS module library")
 
 set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/cellular/bsp_cellular.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/bsp/audio/bsp_audio.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/lpm/bsp_lpm.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pll/DriverPLL.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dmamux/DriverDMAMux.cpp"

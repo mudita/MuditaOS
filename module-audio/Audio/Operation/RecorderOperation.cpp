@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RecorderOperation.hpp"
+
+#include "Audio/AudioDevice.hpp"
 #include "Audio/encoder/Encoder.hpp"
-#include "bsp/audio/bsp_audio.hpp"
 #include "Audio/Profiles/Profile.hpp"
 #include "Audio/Profiles/ProfileRecordingHeadphones.hpp"
 #include "Audio/Profiles/ProfileRecordingOnBoardMic.hpp"
@@ -157,7 +158,7 @@ namespace audio
             return RetCode::UnsupportedProfile;
         }
 
-        audioDevice = CreateDevice(currentProfile->GetAudioDeviceType()).value_or(nullptr);
+        audioDevice = CreateDevice(currentProfile->GetAudioDeviceType());
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
