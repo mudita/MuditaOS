@@ -286,17 +286,17 @@ namespace sys
             return MessageNone{};
         });
 
-        connect(sevm::KbdMessage(), [&](Message *) {
-            // we are in shutdown mode - we received that there was red key pressed -> we need to reboot
-            if (state == State::Shutdown) {
-                set(State::Reboot);
+        connect(sevm::BatteryStatusChangeMessage(), [&](Message *) {
+            if ((state == State::Shutdown) && (Store::Battery::get().state == Store::Battery::State::Discharging)) {
+                set(State::ShutdownReady);
             }
             return MessageNone{};
         });
 
-        connect(sevm::BatteryPlugMessage(), [&](Message *) {
+        connect(sevm::KbdMessage(), [&](Message *) {
+            // we are in shutdown mode - we received that there was red key pressed -> we need to reboot
             if (state == State::Shutdown) {
-                set(State::ShutdownReady);
+                set(State::Reboot);
             }
             return MessageNone{};
         });

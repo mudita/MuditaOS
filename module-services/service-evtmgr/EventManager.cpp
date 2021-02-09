@@ -39,6 +39,7 @@
 #include <vector>
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
+#include <common_data/EventStore.hpp>
 
 EventManager::EventManager(const std::string &name)
     : sys::Service(name), screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(this))
@@ -121,32 +122,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
             handled           = true;
             LOG_INFO("Switching focus to %s", targetApplication.c_str());
         }
-    }
-    else if (msgl->messageType == MessageType::EVMBatteryLevel && msgl->sender == this->GetName()) {
-        auto *msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
-
-        auto message = std::make_shared<sevm::BatteryLevelMessage>(msg->levelPercents, msg->fullyCharged);
-
-        if (!targetApplication.empty()) {
-            bus.sendUnicast(message, targetApplication);
-        }
-
-        handled = true;
-    }
-    else if (msgl->messageType == MessageType::EVMChargerPlugged && msgl->sender == this->GetName()) {
-        auto *msg = static_cast<sevm::BatteryPlugMessage *>(msgl);
-
-        auto message     = std::make_shared<sevm::BatteryPlugMessage>();
-        message->plugged = msg->plugged;
-
-        if (!message->plugged) {
-            bus.sendUnicast(message, service::name::system_manager);
-        }
-
-        if (!targetApplication.empty()) {
-            bus.sendUnicast(message, targetApplication);
-        }
-        handled = true;
     }
     else if (msgl->messageType == MessageType::EVMMinuteUpdated && msgl->sender == this->GetName()) {
 
@@ -285,6 +260,23 @@ sys::ReturnCodes EventManager::InitHandler()
         auto msg                                = std::make_shared<sevm::ScreenLightControlParametersResponse>(
             screenLightControl->getLightState(), screenLightControl->getAutoModeState(), params);
         return msg;
+    });
+
+    connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *msgl) {
+        if (msgl->sender == this->GetName()) {
+            LOG_INFO("Battery level: %d , charging: %d",
+                     Store::Battery::get().level,
+                     Store::Battery::get().state == Store::Battery::State::Charging);
+
+            if (Store::Battery::get().state == Store::Battery::State::Discharging) {
+                bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::system_manager);
+            }
+
+            if (!targetApplication.empty()) {
+                bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), targetApplication);
+            }
+        }
+        return std::make_shared<sys::ResponseMessage>();
     });
 
     // initialize keyboard worker
