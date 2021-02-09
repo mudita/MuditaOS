@@ -173,9 +173,6 @@ enum class MessageType
     SystemManagerCpuFrequency,
     SystemManagerRegistration,
 
-    // battery charger messages
-    EVMBatteryLevel,
-    EVMChargerPlugged,
     // rtc messages
     EVMMinuteUpdated, ///< This message is send to current focused application on every minute time change.
     EVMTimeUpdated,   ///< This message is send on every time update.

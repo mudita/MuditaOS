@@ -9,27 +9,9 @@
 
 namespace sevm
 {
-    class BatteryLevelMessage : public Message
-    {
-      public:
-        BatteryLevelMessage(uint8_t levelPercents, bool fullyCharged)
-            : Message(MessageType::EVMBatteryLevel), levelPercents(levelPercents), fullyCharged(fullyCharged)
-        {
-            type = Type::Data;
-        }
-        uint8_t levelPercents = 0;
-        bool fullyCharged     = false;
-    };
+    class BatteryStatusChangeMessage : public sys::Message
+    {};
 
-    class BatteryPlugMessage : public Message
-    {
-      public:
-        BatteryPlugMessage() : Message(MessageType::EVMChargerPlugged)
-        {
-            type = Type::Data;
-        }
-        bool plugged = false;
-    };
     class BatterySetCriticalLevel : public sys::Message
     {
       public:
