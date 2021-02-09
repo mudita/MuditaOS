@@ -179,6 +179,7 @@ namespace gui
     void Text::clear()
     {
         buildDocument("");
+        onTextChanged();
     }
 
     bool Text::isEmpty()
