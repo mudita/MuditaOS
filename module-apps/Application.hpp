@@ -183,6 +183,8 @@ namespace app
 
       public:
         std::unique_ptr<sys::Timer> longPressTimer;
+        void clearLongPressTimeout();
+
         Application(std::string name,
                     std::string parent                  = "",
                     StartInBackground startInBackground = {false},
