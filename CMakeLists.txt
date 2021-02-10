@@ -200,6 +200,8 @@ else()
     )
 endif()
 
+include(tools/clang-tidy.cmake)
+
 set_source_files_properties(source/main.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
