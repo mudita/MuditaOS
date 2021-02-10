@@ -219,6 +219,7 @@ namespace gui
 
     bool AppWindow::selectSpecialCharacter()
     {
+        application->clearLongPressTimeout();
         return app::manager::Controller::sendAction(
             application,
             app::manager::actions::ShowSpecialInput,
