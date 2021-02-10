@@ -18,6 +18,9 @@ It's meant to provide interface layer for service-bluetooth like that:
 ![Flowchart](./flowchart.svg)
 <img src="./flowchart.svg">
 
+## Table of content
+- [Bluetooth on/off operation](./doc/bt_on_off.md)
+
 # Proposal of Bluetooth settings data flow
 
 The Bluetooth settings related data flow is directed by three main entities:
@@ -46,6 +49,3 @@ Flowchart below is an example of scenario, when user opens *BluetoothWindow*, an
 
 ![change_bt_status_flowchart](./change_bt_status_flowchart.svg)
 
-# Bluetooth on/off state machine diagram
-To be able to handle all events during start up and shutting down of the Bluetooth module the following state machine has been implemented:
-![bt_on_off_state_diagram](./bt_on_off_state_diagram.svg)
