@@ -32,7 +32,6 @@ TS0710_DATA::TS0710_DATA(DLCI_t DLCI,
 
     request(DLCI, sysParams, User_data);
 }
-
 /**
  * @param DLCI
  * @param User_data
