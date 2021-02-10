@@ -382,3 +382,7 @@ TESTS_LIST["catch2-vfs-littlefs"]="
     littlefs: Basic API test;
 "
 #---------
+TESTS_LIST["catch2-cellular-cmux"]="
+    TS0170 frame;
+"
+#---------
