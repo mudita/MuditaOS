@@ -211,7 +211,8 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 		OUTPUT ${FAT_IMAGE}
                 DEPENDS genlittlefs
 		DEPENDS assets
-		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/generate_fatfs_image.sh ${FAT_IMAGE} ${CMAKE_BINARY_DIR}
+                DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_purephone_image.sh
+		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/generate_purephone_image.sh ${FAT_IMAGE} ${CMAKE_BINARY_DIR}
 		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 		COMMENT "Generate ${FAT_IMAGE}"
 	)
