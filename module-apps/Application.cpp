@@ -121,6 +121,11 @@ namespace app
         }
     }
 
+    void Application::clearLongPressTimeout()
+    {
+        keyTranslator->prev_key_timedout = false;
+    }
+
     void Application::render(gui::RefreshModes mode)
     {
         if (windowsStack.isEmpty()) {
