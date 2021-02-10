@@ -8,6 +8,7 @@
 
 namespace at
 {
+
     class ChannelMock : public BaseChannel
     {
       public:

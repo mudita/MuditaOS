@@ -24,7 +24,6 @@ class TS0710_DATA
                 bsp::Cellular *cellular);
     ~TS0710_DATA()
     {}
-
   private:
     /**
      * @param DLCI
