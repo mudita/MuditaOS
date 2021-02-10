@@ -288,12 +288,14 @@ TESTS_LIST["catch2-utils-ucs2"]="
     UCS2 to UTF8 conversion;
     UCS2 from UTF8 emoji 😁;
     UCS2 from UTF8 emoji 🍣;
+    UCS2 text with emojis int the middle from UTF8 code;
     UTF8 to UCS2 conversion;
     TEST special input characters from UTF8;
     TEST special input characters from std::string;
     UTF8 emoji 🍣 from UCS2 code;
     UTF8 emoji 😁 and text ęą from UCS2 code;
     UTF8 emoji 😁 and text abc from UCS2 code;
+    UTF8 text with emojis int the middle from UCS2 code;
     UCS2 to UTF8 long string conversion;
     UTF8 to UCS2 long string conversion;
 "

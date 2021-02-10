@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "UCS2.hpp"
@@ -59,20 +59,17 @@ UCS2::UCS2(UCS2 &ucs)
 
 UTF8 UCS2::toUTF8() const noexcept
 {
-    if (length == 0)
+    if (length == 0) {
         return UTF8();
+    }
 
-    // create buffer for worst case scenario which is that every char will take 3 bytes in utf8 string
-    // + 1 for null terminator
-
-    const auto bufferSize = 3 * length + 1;
-    auto buffer           = std::make_unique<uint8_t[]>(bufferSize);
-
-    uint32_t offset = 0;
-    std::string s{};
+    constexpr auto maxDecodedCharSize = 3;
+    std::array<uint8_t, maxDecodedCharSize> localBuffer;
+    std::string decodeResult;
+    decodeResult.reserve(maxDecodedCharSize * length + 1);
     for (uint32_t i = 0; i < length; i++) {
-        uint32_t c = this->buffer[i];
-
+        uint32_t offset  = 0;
+        const uint32_t c = this->buffer[i];
         if (c > 0xffff) {
             // 32 bit conversion
             // U' = yyyyyyyyyyxxxxxxxxxx  // U - 0x10000
@@ -81,25 +78,24 @@ UTF8 UCS2::toUTF8() const noexcept
             const uint16_t y       = (c & 0x03FF0000) >> 16;
             const uint16_t x       = c & 0x03FF;
             const uint32_t decoded = 0x10000 + (y << 10) + x;
-            std::u32string u32s    = {decoded};
-
-            s.append(convertToUtf8String(u32s));
+            decodeResult.append(convertToUtf8String({decoded}));
+            continue;
         }
         else if (c > 0x07ff) {
-            buffer[offset++] = (0x00E0 | ((c & 0xF000) >> 12));
-            buffer[offset++] = (0x0080 | ((c & 0x0FC0) >> 6));
-            buffer[offset++] = (0x0080 | (c & 0x003F));
+            localBuffer[offset++] = (0x00E0 | ((c & 0xF000) >> 12));
+            localBuffer[offset++] = (0x0080 | ((c & 0x0FC0) >> 6));
+            localBuffer[offset++] = (0x0080 | (c & 0x003F));
         }
         else if (c > 0x07f) {
-            buffer[offset++] = (0x00C0 | ((c & 0x07C0) >> 6));
-            buffer[offset++] = (0x0080 | (c & 0x003F));
+            localBuffer[offset++] = (0x00C0 | ((c & 0x07C0) >> 6));
+            localBuffer[offset++] = (0x0080 | (c & 0x003F));
         }
         else {
-            buffer[offset++] = c;
+            localBuffer[offset++] = c;
         }
+        decodeResult.append(std::begin(localBuffer), std::next(std::begin(localBuffer), offset));
     }
-    return (!s.empty()) ? UTF8(s + reinterpret_cast<const char *>(buffer.get()))
-                        : UTF8(reinterpret_cast<const char *>(buffer.get()));
+    return UTF8(decodeResult.c_str());
 }
 
 void UCS2::append(const uint32_t &ucs2char)
