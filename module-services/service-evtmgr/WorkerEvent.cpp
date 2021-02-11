@@ -225,9 +225,13 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
     bsp::rtc_GetCurrentTimestamp(&timestamp);
     bsp::rtc_SetMinuteAlarm(timestamp);
 
-    battery_level_check::init(service);
-
     return true;
+}
+
+void WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList, std::shared_ptr<settings::Settings> settings)
+{
+    init(queuesList);
+    battery_level_check::init(service, settings);
 }
 
 bool WorkerEvent::deinit(void)
@@ -240,6 +244,8 @@ bool WorkerEvent::deinit(void)
     bsp::keypad_backlight::deinit();
     bsp::eink_frontlight::deinit();
     bsp::light_sensor::deinit();
+
+    battery_level_check::deinit();
 
     return true;
 }

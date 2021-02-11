@@ -43,7 +43,8 @@
 #include <SystemManager/messages/PhoneModeRequest.hpp>
 
 EventManager::EventManager(const std::string &name)
-    : sys::Service(name), screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(this))
+    : sys::Service(name), settings(std::make_shared<settings::Settings>(this)),
+      screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(settings, this))
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
@@ -322,7 +323,7 @@ sys::ReturnCodes EventManager::InitHandler()
     list.push_back(qLightSensor);
     list.push_back(qChargerDetect);
 
-    EventWorker->init(list);
+    EventWorker->init(list, settings);
     EventWorker->run();
 
     return sys::ReturnCodes::Success;

@@ -31,6 +31,8 @@ class EventManager : public sys::Service
     void GetNextAlarmTimestamp(time_t timestamp);
     bool processKeypadBacklightRequest(bsp::keypad_backlight::Action act);
 
+    std::shared_ptr<settings::Settings> settings;
+
   protected:
     std::unique_ptr<WorkerEvent> EventWorker;
     // application where key events are sent. This is also only application that is allowed to change keyboard long

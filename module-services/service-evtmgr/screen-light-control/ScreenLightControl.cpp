@@ -33,8 +33,8 @@ namespace screen_light_control
         }
     } // namespace
 
-    ScreenLightControl::ScreenLightControl(sys::Service *parent)
-        : settings(std::make_unique<settings::Settings>(parent))
+    ScreenLightControl::ScreenLightControl(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
+        : settings(settings)
     {
         controlTimer = std::make_unique<sys::Timer>("LightControlTimer", parent, CONTROL_TIMER_MS);
         readoutTimer = std::make_unique<sys::Timer>("LightSensorReadoutTimer", parent, READOUT_TIMER_MS);

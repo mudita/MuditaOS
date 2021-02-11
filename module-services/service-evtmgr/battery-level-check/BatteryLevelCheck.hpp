@@ -4,6 +4,7 @@
 #pragma once
 
 #include <Service/Service.hpp>
+#include <service-db/service-db/Settings.hpp>
 
 namespace sys
 {
@@ -12,7 +13,9 @@ namespace sys
 
 namespace battery_level_check
 {
-    void init(sys::Service *service);
+    void init(sys::Service *service, std::shared_ptr<settings::Settings> &setts);
+
+    void deinit();
 
     void checkBatteryLevelCritical();
 
