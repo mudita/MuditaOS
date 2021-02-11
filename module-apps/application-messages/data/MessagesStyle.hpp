@@ -51,6 +51,7 @@ namespace style
             namespace text
             {
                 inline constexpr uint32_t h = 43;
+                inline constexpr uint32_t maxH = 320;
             }
             namespace messageLabel
             {

@@ -246,7 +246,7 @@
   "app_desktop_unread_messages": "<text>Unread <b>messages</b></text>",
   "app_desktop_low_battery_notification": "<text>low battery level - GSM off</text>",
   "app_desktop_missed_calls": "<text>Missed <b>calls</b></text>",
-  "app_desktop_menu_phone": "PHONE",
+  "app_desktop_menu_phone": "CALLS",
   "app_desktop_menu_contacts": "CONTACTS",
   "app_desktop_menu_messages": "MESSAGES",
   "app_desktop_menu_calendar": "CALENDAR",

@@ -153,7 +153,8 @@ TESTS_LIST["catch2-gui-text"]="
     handle text expand;
     handle newline;
     handle text block - moved cursor to end;
-    Text backup and restore tests;
+    Text backup overwrite and restore tests;
+    Text backup with max width restricted - overwrite restore and add tests;
     Text addition bounds - text sings count restricted;
     Text addition bounds - text widget size restricted;
     Text addition bounds - text widget line size restricted;

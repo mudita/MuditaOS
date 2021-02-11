@@ -907,7 +907,7 @@ namespace gui
     TextBackup Text::backupText() const
     {
         return TextBackup{std::list<TextBlock>(document->getBlocks().begin(), document->getBlocks().end()),
-                          cursor->getOnScreenPosition()};
+                          cursor->getAbsolutePosition()};
     }
 
     void Text::restoreFrom(const TextBackup &backup)

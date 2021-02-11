@@ -5,6 +5,7 @@
 #include "AppWindow.hpp"
 #include "application-messages/data/MessagesStyle.hpp"
 #include <module-apps/application-messages/ApplicationMessages.hpp>
+#include <service-cellular/service-cellular/MessageConstants.hpp>
 
 #include <Style.hpp>
 #include <i18n/i18n.hpp>
@@ -33,6 +34,7 @@ namespace gui
         inputText->setMaximumSize(style::messages::smsInput::default_input_w, style::messages::smsInput::max_input_h);
         inputText->setMinimumSize(style::messages::smsInput::default_input_w,
                                   style::messages::smsInput::default_input_h);
+        inputText->setTextLimitType(gui::TextLimitType::MaxSignsCount, msgConstants::maxConcatenatedLen);
         inputText->setFont(style::window::font::medium);
         inputText->setPadding(Padding(0, 0, 0, style::messages::smsInput::bottom_padding));
         inputText->setPenFocusWidth(style::window::default_border_focus_w);
