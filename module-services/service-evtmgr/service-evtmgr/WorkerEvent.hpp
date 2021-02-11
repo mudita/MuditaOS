@@ -70,6 +70,8 @@ class WorkerEvent : public sys::Worker
     virtual bool init(std::list<sys::WorkerQueueInfo> queuesList) override;
     virtual bool deinit() override;
 
+    void init(std::list<sys::WorkerQueueInfo> queuesList, std::shared_ptr<settings::Settings> settings);
+
     /**
      * This method is called from thread when new message arrives in queue.
      * @param queueID Index of the queue in the queues vector.
