@@ -9,6 +9,7 @@
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/State.hpp"
 #include "service-cellular/USSD.hpp"
+#include "service-cellular/MessageConstants.hpp"
 
 #include "SimCard.hpp"
 #include "NetworkSettings.hpp"
@@ -1422,7 +1423,7 @@ bool ServiceCellular::sendSMS(SMSRecord record)
     uint32_t textLen = record.body.length();
 
     auto commandTimeout                 = at::factory(at::AT::CMGS).getTimeout();
-    constexpr uint32_t singleMessageLen = 67;
+    constexpr uint32_t singleMessageLen = msgConstants::singleMessageMaxLen;
     bool result                         = false;
     auto channel                        = cmux->get(TS0710::Channel::Commands);
     auto receiver                       = record.number.getEntered();
@@ -1450,7 +1451,7 @@ bool ServiceCellular::sendSMS(SMSRecord record)
         }
         // split text, and send concatenated messages
         else {
-            const uint32_t maxConcatenatedCount = 7;
+            const uint32_t maxConcatenatedCount = msgConstants::maxConcatenatedCount;
             uint32_t messagePartsCount          = textLen / singleMessageLen;
             if ((textLen % singleMessageLen) != 0) {
                 messagePartsCount++;

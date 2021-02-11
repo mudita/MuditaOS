@@ -18,6 +18,8 @@
 #include <module-db/queries/messages/threads/QueryThreadGetByNumber.hpp>
 #include <module-db/queries/messages/sms/QuerySMSGetLastByThreadID.hpp>
 
+#include <service-cellular/service-cellular/MessageConstants.hpp>
+
 #include <cassert>
 
 namespace gui
@@ -172,11 +174,11 @@ namespace gui
     void NewMessageWindow::updateBottomBar()
     {
         if (getFocusItem() == recipient) {
+            bottomBar->setActive(BottomBar::Side::LEFT, false);
             if (recipient->getText().empty()) {
                 bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
                 return;
             }
-            bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
         }
     }
@@ -185,6 +187,7 @@ namespace gui
     {
         namespace msgStyle = style::messages::newMessage;
         AppWindow::buildInterface();
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         setTitle(utils::localize.get("sms_title_message"));
@@ -248,7 +251,8 @@ namespace gui
         labelMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
         message = new gui::Text(nullptr, 0, 0, body->getWidth(), msgStyle::text::h, "", ExpandMode::Up);
-        message->setMaximumSize(body->getWidth(), body->getHeight());
+        message->setMaximumSize(body->getWidth(), msgStyle::text::maxH);
+        message->setTextLimitType(gui::TextLimitType::MaxSignsCount, msgConstants::maxConcatenatedLen);
         message->setEdges(gui::RectangleEdge::Bottom);
         message->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
