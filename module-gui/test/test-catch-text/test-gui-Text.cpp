@@ -89,7 +89,12 @@ namespace gui
 
         [[nodiscard]] auto getCursorPosition()
         {
-            return cursor->getOnScreenPosition();
+            return cursor->getAbsolutePosition();
+        }
+
+        void setExpandMode(ExpandMode expandMode)
+        {
+            this->expandMode = expandMode;
         }
     };
 } // namespace gui
@@ -266,13 +271,13 @@ TEST_CASE("handle text block - moved cursor to end")
     REQUIRE(text.getText() == test_text);
 }
 
-TEST_CASE("Text backup and restore tests")
+TEST_CASE("Text backup overwrite and restore tests")
 {
-    std::string testStringOneLine   = "Test String ";
-    std::string testStringTwoLines  = "Test String 1 \n Test String 2";
-    std::string overwriteTestString = "Overwrite test String";
+    const std::string testStringOneLine   = "Test String ";
+    const std::string testStringTwoLines  = "Test String 1 \n Test String 2";
+    const std::string overwriteTestString = "Overwrite test String";
 
-    SECTION("Backup one line text with moved cursor, overwrite text and restore")
+    SECTION("Backup one line text with moved cursor")
     {
         mockup::fontManager();
         auto text = std::make_unique<gui::TestText>();
@@ -298,7 +303,7 @@ TEST_CASE("Text backup and restore tests")
         REQUIRE(text->getCursorPosition() == testStringOneLine.length() - cursorMoveN);
     }
 
-    SECTION("Backup two line text with moved cursor, overwrite text and restore")
+    SECTION("Backup two line text with moved cursor")
     {
         mockup::fontManager();
         auto text = std::make_unique<gui::TestText>();
@@ -322,6 +327,131 @@ TEST_CASE("Text backup and restore tests")
 
         REQUIRE(text->getText() == testStringTwoLines);
         REQUIRE(text->getCursorPosition() == testStringTwoLines.length() - cursorMoveN);
+    }
+}
+
+TEST_CASE("Text backup with max width restricted - overwrite restore and add tests")
+{
+    const std::string testStringOneLine   = "Test String ";
+    const std::string testStringTwoLines  = "Test String 1 \n Test String 2";
+    const std::string overwriteTestString = "Overwrite test String";
+    const std::string toAppendString1     = "Some text1";
+    const std::string toAppendString2     = "Some text2";
+
+    auto &fontManager = mockup::fontManager();
+    auto font         = fontManager.getFont("gt_pressura_light_27");
+    gui::TestText text;
+    text.setFont(font);
+    const auto textMaxHeight = 47;
+
+    SECTION("Backup single line text")
+    {
+        const std::string expectedString1 = testStringOneLine + toAppendString1;
+        const std::string expectedString2 = testStringOneLine + toAppendString1 + toAppendString2;
+        text.setMaximumSize(font->getPixelWidth(testStringOneLine), textMaxHeight);
+
+        text.setText(testStringOneLine);
+        text.addText(toAppendString1);
+        REQUIRE(text.getCursorPosition() == expectedString1.length());
+
+        auto backup = text.backupText();
+
+        REQUIRE(backup.document.getText() == text.getText());
+        REQUIRE(backup.document.getText().length() == text.getText().length());
+        REQUIRE(backup.cursorPos == text.getCursorPosition());
+
+        text.setText(overwriteTestString);
+        REQUIRE(text.getText() != expectedString1);
+
+        text.restoreFrom(backup);
+        text.addText(toAppendString2);
+
+        REQUIRE(text.getText() == expectedString2);
+        REQUIRE(text.getCursorPosition() == expectedString2.length());
+    }
+
+    SECTION("Backup single line text with moved cursor")
+    {
+        const std::string expectedString1 = testStringOneLine + toAppendString1;
+        const std::string expectedString2 = testStringOneLine + toAppendString2 + toAppendString1;
+        text.setMaximumSize(font->getPixelWidth(testStringOneLine), textMaxHeight);
+
+        text.setText(testStringOneLine);
+        text.addText(toAppendString1);
+
+        const unsigned int cursorMoveN = toAppendString1.length();
+        text.moveCursor(gui::NavigationDirection::LEFT, cursorMoveN);
+        REQUIRE(text.getCursorPosition() == expectedString1.length() - cursorMoveN);
+
+        auto backup = text.backupText();
+
+        REQUIRE(backup.document.getText() == text.getText());
+        REQUIRE(backup.document.getText().length() == text.getText().length());
+        REQUIRE(backup.cursorPos == text.getCursorPosition());
+
+        text.setText(overwriteTestString);
+        REQUIRE(text.getText() != expectedString1);
+
+        text.restoreFrom(backup);
+        text.addText(toAppendString2);
+
+        REQUIRE(text.getText() == expectedString2);
+        REQUIRE(text.getCursorPosition() == testStringOneLine.length() + toAppendString2.length());
+    }
+
+    SECTION("Backup multi line text")
+    {
+        const std::string expectedString1 = testStringTwoLines + toAppendString1;
+        const std::string expectedString2 = testStringTwoLines + toAppendString1 + toAppendString2;
+        text.setMaximumSize(font->getPixelWidth(testStringTwoLines), textMaxHeight);
+
+        text.setText(testStringTwoLines);
+        text.addText(toAppendString1);
+        REQUIRE(text.getCursorPosition() == expectedString1.length());
+
+        auto backup = text.backupText();
+
+        REQUIRE(backup.document.getText() == text.getText());
+        REQUIRE(backup.document.getText().length() == text.getText().length());
+        REQUIRE(backup.cursorPos == text.getCursorPosition());
+
+        text.setText(overwriteTestString);
+        REQUIRE(text.getText() != expectedString1);
+
+        text.restoreFrom(backup);
+        text.addText(toAppendString2);
+
+        REQUIRE(text.getText() == expectedString2);
+        REQUIRE(text.getCursorPosition() == expectedString2.length());
+    }
+
+    SECTION("Backup multi line text with moved cursor")
+    {
+        const std::string expectedString1 = testStringTwoLines + toAppendString1;
+        const std::string expectedString2 = testStringTwoLines + toAppendString2 + toAppendString1;
+        text.setMaximumSize(font->getPixelWidth(testStringTwoLines), textMaxHeight);
+
+        text.setText(testStringTwoLines);
+        text.addText(toAppendString1);
+
+        const unsigned int cursorMoveN = toAppendString1.length();
+        text.moveCursor(gui::NavigationDirection::LEFT, cursorMoveN);
+        REQUIRE(text.getCursorPosition() == expectedString1.length() - cursorMoveN);
+
+        auto backup = text.backupText();
+
+        REQUIRE(backup.document.getText() == text.getText());
+        REQUIRE(backup.document.getText().length() == text.getText().length());
+        REQUIRE(backup.cursorPos == text.getCursorPosition());
+
+        text.setText(overwriteTestString);
+        REQUIRE(text.getText() != expectedString1);
+
+        text.restoreFrom(backup);
+        text.addText(toAppendString2);
+
+        REQUIRE(text.getText() == expectedString2);
+        REQUIRE(text.getCursorPosition() == testStringTwoLines.length() + toAppendString2.length());
     }
 }
 

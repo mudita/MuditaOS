@@ -216,6 +216,20 @@ namespace gui
         return false;
     }
 
+    auto TextCursor::getAbsolutePosition() const -> unsigned int
+    {
+        auto pos     = 0U;
+        auto blockNo = 0U;
+        for (const auto &block : document->getBlocks()) {
+            if (blockNo == getBlockNumber()) {
+                break;
+            }
+            pos += block.length();
+            blockNo++;
+        }
+        return pos + BlockCursor::getPosition();
+    }
+
 } // namespace gui
 
 const char *c_str(enum gui::TextCursor::Move what)
