@@ -27,7 +27,7 @@
 class CellularMessage : public sys::DataMessage
 {
   public:
-    CellularMessage(MessageType messageType) : sys::DataMessage(messageType){};
+    explicit CellularMessage(MessageType messageType) : sys::DataMessage(messageType){};
 };
 
 class CellularCallMessage : public CellularMessage
@@ -298,6 +298,19 @@ class CellularCallRequestMessage : public CellularMessage
     {}
     utils::PhoneNumber::View number;
     RequestMode requestMode = RequestMode::Normal;
+};
+
+class CellularSmsNoSimRequestMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
+{
+  public:
+    CellularSmsNoSimRequestMessage() : CellularMessage{MessageType::MessageTypeUninitialized}
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender, app::manager::actions::SmsRejectNoSim, std::make_unique<app::manager::actions::ActionParams>());
+    }
 };
 
 class CellularSimMessage : public CellularMessage

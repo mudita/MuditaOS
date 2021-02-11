@@ -730,6 +730,20 @@ auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
 {
     if (response->getResults().size() > 0) {
         LOG_DEBUG("sending %ud last queued message(s)", static_cast<unsigned int>(response->getResults().size()));
+        if (Store::GSM::get()->simCardInserted() == false) {
+            auto message = std::make_shared<CellularSmsNoSimRequestMessage>();
+            bus.sendUnicast(std::move(message), app::manager::ApplicationManager::ServiceName);
+            auto records = response->getResults();
+
+            for (auto &record : response->getResults()) {
+                if (record.type == SMSType::QUEUED) {
+                    record.type = SMSType::FAILED;
+                    DBServiceAPI::GetQuery(
+                        this, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(std::move(record)));
+                }
+            }
+            return true;
+        }
         for (auto &rec : response->getResults()) {
             if (rec.type == SMSType::QUEUED) {
                 sendSMS(rec);
