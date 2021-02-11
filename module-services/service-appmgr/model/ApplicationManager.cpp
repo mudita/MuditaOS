@@ -299,6 +299,7 @@ namespace app::manager
         connect(typeid(CellularNotAnEmergencyNotification), convertibleToActionHandler);
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
         connect(typeid(sys::SystemBrownoutMesssage), convertibleToActionHandler);
+        connect(typeid(CellularSmsNoSimRequestMessage), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

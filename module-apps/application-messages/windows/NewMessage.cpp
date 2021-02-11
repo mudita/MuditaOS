@@ -126,16 +126,6 @@ namespace gui
             LOG_ERROR("Failed to send the SMS.");
             return false;
         }
-        if (!Store::GSM::get()->simCardInserted()) {
-            auto action = [this, number]() {
-                if (!switchToThreadWindow(number.getView())) {
-                    LOG_ERROR("switchToThreadWindow failed");
-                }
-                return true;
-            };
-            app->showNotification(action, true);
-            return true;
-        }
         return switchToThreadWindow(number.getView());
     }
 
