@@ -202,16 +202,9 @@ int DLC_channel::ParseInputData(std::vector<uint8_t> &data)
         TS0710_Frame frame(data);
         auto deserialised = frame.getFrame().data;
 
-        std::string receivedData = part + std::string(deserialised.begin(), deserialised.end());
+        std::string receivedData = std::string(deserialised.begin(), deserialised.end());
 
-        auto pos = receivedData.find('\r', 1);
-        if (pos != std::string::npos) {
-            part.clear();
-            pv_callback(receivedData);
-        }
-        else {
-            part += receivedData;
-        }
+        pv_callback(receivedData);
     }
 
     return 1;

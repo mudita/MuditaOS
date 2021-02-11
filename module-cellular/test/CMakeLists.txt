@@ -46,3 +46,12 @@ add_catch2_executable(
         module-cellular
 )
 
+
+add_catch2_executable(
+        NAME
+        unittest_ATURCStream
+        SRCS
+        unittest_ATURCStream.cpp
+        LIBS
+        module-cellular
+)

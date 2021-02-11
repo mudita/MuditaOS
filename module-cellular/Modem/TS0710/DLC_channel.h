@@ -32,7 +32,6 @@ class DLC_channel : public at::Channel
     std::string responseBuffer;
     bsp::Cellular *pv_cellular;
 
-    std::string part;
 
   public:
     // TS0710_DLC_ESTABL ctrlChanEstabl = TS0710_DLC_ESTABL(0);  //use default values to create control channel DLCI0
