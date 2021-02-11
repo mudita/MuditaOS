@@ -342,7 +342,7 @@ TEST_CASE("Hex to bytes")
     SECTION("Next numbers")
     {
         auto b = utils::hexToBytes("010203");
-        REQUIRE(b.size() == 2);
+        REQUIRE(b.size() == 3);
         REQUIRE(b[0] == 1);
         REQUIRE(b[1] == 2);
         REQUIRE(b[2] == 3);
