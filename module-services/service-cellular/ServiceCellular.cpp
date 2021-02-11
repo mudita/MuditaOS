@@ -199,14 +199,17 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
     notificationCallback = [this](std::string &data) {
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
 
-        std::string message;
-        auto msg = identifyNotification(data);
+        atURCStream.write(data);
+        auto vUrc = atURCStream.getURCList();
 
-        if (msg == std::nullopt) {
-            return;
+        for (const auto &urc : vUrc) {
+            std::string message;
+            auto msg = identifyNotification(urc);
+
+            if (msg != std::nullopt) {
+                bus.sendMulticast(msg.value(), sys::BusChannel::ServiceCellularNotifications);
+            }
         }
-
-        bus.sendMulticast(msg.value(), sys::BusChannel::ServiceCellularNotifications);
     };
 
     packetData = std::make_unique<packet_data::PacketData>(*this); /// call in apnListChanged handler

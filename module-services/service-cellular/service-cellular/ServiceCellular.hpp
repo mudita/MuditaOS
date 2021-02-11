@@ -12,6 +12,7 @@
 #include "PacketData.hpp"
 #include "PacketDataCellularMessage.hpp"
 
+#include <module-cellular/Modem/ATURCStream.hpp>
 #include <Modem/TS0710/DLC_channel.h>
 #include <Modem/TS0710/TS0710.h>
 #include <Modem/TS0710/TS0710_types.h>
@@ -159,6 +160,7 @@ class ServiceCellular : public sys::Service
     bool setPinLock(bool lock, const std::string pin);
 
   private:
+    at::ATURCStream atURCStream;
     std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
