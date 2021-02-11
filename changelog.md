@@ -1,5 +1,48 @@
 # MuditaOS changelog
 
+## [0.57.1 2020-02-11]
+
+### Added
+
+* Add color test window to the settings app.
+* Add support for an empty line in the rich text control.
+* Add support for VoLTE on/off.
+* Add USB charger detection.
+* Add windows for custom responses to MMIs.
+
+### Changed
+
+* Add several stability improvements to the Bluetooth support.
+* Change a reaction to a fatal error - restart the system instead of hanging.
+* Change call handling to allow emergency and ICE numbers only.
+* Change list of supported files type for MTP to MP3, WAV, and FLAC.
+* Improve display features of the list view control.
+* Improve power management by adding low power support to the drivers.
+* Improve power management by powering off the e-ink display on timeout.
+* Remove audio echo during voice call by tweaking echo cancellation parameters.
+
+### Fixed
+
+* Fix broken mute on a voice call option.
+* Fix crashes when parsing a rich text.
+* Fix freezes due to invalid handling of long messages during communication with the modem.
+* Fix invalid warning about messages not being sent.
+* Fix options distances in SMS and Settings options.
+
+### Other
+
+* Add preliminary support for the T6 platform.
+* Add several harness tests.
+* Add synchronization between services.
+* Allow formatting hook scripts to ignore preconfigured paths.
+* Fix excessive logging in the USB-CDC
+* Fix memory leaks in the PIN lock window.
+* Fix several issues with unit testing.
+* Refactor code responsible for low-level drawing.
+* Restore logs coloring for the RT1051 based platforms.
+* Switch CI build to ninja to improve performance.
+* Update documentation of test harness.
+
 ## [0.56.1 2020-02-03]
 
 ### Added
