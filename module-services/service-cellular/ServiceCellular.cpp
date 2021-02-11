@@ -914,7 +914,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         }
         else {
             CellularRequestHandler handler(*this);
-            auto result = channel->cmd(request->command());
+            auto result = channel->cmd(request->command(), at::default_doc_timeout);
             request->handle(handler, result);
             responseMsg = std::make_shared<CellularResponseMessage>(request->isHandled());
         }
