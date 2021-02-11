@@ -52,6 +52,7 @@ target_sources( ${PROJECT_NAME}
         windows/SystemMainWindow.cpp
         windows/LanguagesWindow.cpp
         windows/DateAndTimeMainWindow.cpp
+        windows/ChangeTimeZone.cpp
 
     PUBLIC
         ApplicationSettings.hpp
