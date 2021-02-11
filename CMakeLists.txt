@@ -98,7 +98,7 @@ add_compile_options( ${TARGET_COMPILE_OPTIONS}
                      -fno-builtin
                      -fno-diagnostics-color
                      # warning flags
-                     -Wall -Wextra -Werror -Wno-unused-parameter -Wno-error=deprecated-declarations)
+                     -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated-declarations)
 
 target_compile_features(${PROJECT_NAME} PUBLIC
         ${TARGET_COMPILE_FEATURES})
