@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-settings-new/ApplicationSettings.hpp"
@@ -57,7 +57,7 @@ namespace gui
             [=](Item &item) {
                 automaticDateAndTimeIsOn = !automaticDateAndTimeIsOn;
                 app::manager::Controller::changeAutomaticDateAndTimeIsOn(application, automaticDateAndTimeIsOn);
-                rebuildOptionList();
+                refreshOptionsList();
                 return true;
             },
             automaticDateAndTimeIsOn ? option::SettingRightItem::On : option::SettingRightItem::Off);
@@ -75,7 +75,7 @@ namespace gui
             [=](Item &item) {
                 automaticTimeZoneIsOn = !automaticTimeZoneIsOn;
                 app::manager::Controller::changeAutomaticTimeZoneIsOn(application, automaticTimeZoneIsOn);
-                rebuildOptionList();
+                refreshOptionsList();
                 return true;
             },
             automaticTimeZoneIsOn ? option::SettingRightItem::On : option::SettingRightItem::Off);
@@ -95,7 +95,7 @@ namespace gui
                                  ? utils::time::Locale::TimeFormat::FormatTime24H
                                  : utils::time::Locale::TimeFormat::FormatTime12H;
                 app::manager::Controller::changeTimeFormat(application, timeFormat);
-                rebuildOptionList();
+                refreshOptionsList();
                 return true;
             },
             option::SettingRightItem::Text,
@@ -108,7 +108,7 @@ namespace gui
                                  ? utils::time::Locale::DateFormat::MM_DD_YYYY
                                  : utils::time::Locale::DateFormat::DD_MM_YYYY;
                 app::manager::Controller::changeDateFormat(application, dateFormat);
-                rebuildOptionList();
+                refreshOptionsList();
                 return true;
             },
             option::SettingRightItem::Text,
