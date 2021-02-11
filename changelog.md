@@ -1,5 +1,40 @@
 # MuditaOS changelog
 
+## [0.56.1 2020-02-03]
+
+### Added
+
+* Add the ability to change APNs.
+* Add SMS Center validity verification.
+* Add the "Wrong emergency number called" window.
+* Add user interface to control keypad backlight.
+
+### Changed
+
+* Improve audio quality during voice calls by tweaking microphone settings.
+* Improve network time synchronization with periodic updates.
+* Reduce audio lag during voice calls, significantly reducing echo as a result.
+* Tweak calendar's user interface.
+* Tweak battery charger parameters.
+
+### Fixed
+
+* Fix lock screen not showing after reset.
+* Fix lack of system clock refreshing.
+* Fix lack of audio during voice calls.
+* Fix SOS button showing on the PIN screen.
+
+### Other
+
+* Add an ability to interrupt the OS update process.
+* Add harness test for Bluetooth on/off.
+* Add harness test for the phone on/off.
+* Add harness test for SIM card change.
+* Add parser for the "call waiting" MMI response.
+* Fix missing build dependency for the image file.
+* Fix logs mocking in unit tests.
+* Fix unit tests not always running on `check` operation.
+
 ## [0.55.1 2020-01-28]
 
 ### Added
