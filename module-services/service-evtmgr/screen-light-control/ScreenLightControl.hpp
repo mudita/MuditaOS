@@ -56,7 +56,7 @@ namespace screen_light_control
     class ScreenLightControl
     {
       public:
-        explicit ScreenLightControl(sys::Service *parent);
+        explicit ScreenLightControl(std::shared_ptr<settings::Settings> settings, sys::Service *parent);
         ~ScreenLightControl();
 
         void processRequest(Action action, const Parameters &params);
@@ -98,7 +98,7 @@ namespace screen_light_control
         screen_light_control::ScreenLightMode automaticMode        = ScreenLightMode::Manual;
         bsp::eink_frontlight::BrightnessPercentage brightnessValue = 0.0;
 
-        std::unique_ptr<settings::Settings> settings;
+        std::shared_ptr<settings::Settings> settings;
     };
 
 } // namespace screen_light_control
