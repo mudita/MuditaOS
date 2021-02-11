@@ -73,9 +73,11 @@ namespace bsp {
             void set_irq(bool enable);
 
         private:
-            void configure_uart_io();
-            void configure_lpuart();
-            void configure_cts_irq();
+            void init_uart();
+            void deinit_uart();
+            void init_uart_dma();
+            void deinit_uart_dma();
+
 #if defined(TARGET_RT1051)
             std::shared_ptr<drivers::DriverDMAMux> dmamux;
             std::shared_ptr<drivers::DriverDMA> dma;
