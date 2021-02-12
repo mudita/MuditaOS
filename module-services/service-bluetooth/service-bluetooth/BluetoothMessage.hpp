@@ -78,6 +78,14 @@ class BluetoothAddrMessage : public sys::DataMessage
     ~BluetoothAddrMessage() override = default;
 };
 
+class BluetoothPairMessage : public sys::DataMessage
+{
+  public:
+    std::string addr;
+    explicit BluetoothPairMessage(std::string addr);
+    ~BluetoothPairMessage() override = default;
+};
+
 class BluetoothAudioRegisterMessage : public sys::DataMessage
 {
   public:

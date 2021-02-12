@@ -74,16 +74,26 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
                 enabledFromHarness = true;
                 LOG_INFO("BT enabled from Harness");
             }
-            sendWorkerCommand(bluetooth::Command::PowerOn);
+            sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOn));
             break;
         case BluetoothStatus::State::Off:
-            sendWorkerCommand(bluetooth::Command::PowerOff);
+            sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOff));
             enabledFromHarness = false;
             break;
         default:
             break;
         }
-        sendWorkerCommand(newBtStatus.visibility ? bluetooth::VisibilityOn : bluetooth::VisibilityOff);
+        bluetooth::Command command(newBtStatus.visibility ? bluetooth::Command::Type::VisibilityOn
+                                                          : bluetooth::Command::Type::VisibilityOff);
+        sendWorkerCommand(command);
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(BluetoothPairMessage), [&](sys::Message *msg) {
+        auto pairMsg = static_cast<BluetoothPairMessage *>(msg);
+        auto addr    = pairMsg->addr;
+
+        sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::Pair, addr));
         return sys::MessageNone{};
     });
 
@@ -135,10 +145,10 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
             case BluetoothMessage::Start:
                 break;
             case BluetoothMessage::Scan:
-                sendWorkerCommand(bluetooth::StartScan);
+                sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::StartScan));
                 break;
             case BluetoothMessage::StopScan:
-                sendWorkerCommand(bluetooth::StopScan);
+                sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::StopScan));
                 break;
             case BluetoothMessage::PAN: {
                 /// TODO request lwip first...
@@ -151,20 +161,22 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
                 //                    else {
                 /// TODO request PPP
                 LOG_INFO("Start PAN");
-                sendWorkerCommand(bluetooth::StartPan);
+                sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::StartPan));
                 //                    }
             } break;
             case BluetoothMessage::Visible: {
                 static bool visibility = true;
-                sendWorkerCommand(visibility ? bluetooth::VisibilityOn : bluetooth::VisibilityOff);
+                bluetooth::Command command(visibility ? bluetooth::Command::Type::VisibilityOn
+                                                      : bluetooth::Command::Type::VisibilityOff);
+                sendWorkerCommand(command);
                 visibility = !visibility;
             } break;
 
             case BluetoothMessage::Play:
-                sendWorkerCommand(bluetooth::ConnectAudio);
+                sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::ConnectAudio));
                 break;
             case BluetoothMessage::StopPlayback:
-                sendWorkerCommand(bluetooth::DisconnectAudio);
+                sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::DisconnectAudio));
                 break;
 
             default:
