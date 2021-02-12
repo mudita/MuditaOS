@@ -25,12 +25,20 @@
 #include "messages/DeviceRegistrationMessage.hpp"
 #include "messages/SentinelRegistrationMessage.hpp"
 #include "messages/RequestCpuFrequencyMessage.hpp"
+#include "messages/PhoneModeRequest.hpp"
 #include <time/ScopedTime.hpp>
 
 const inline size_t systemManagerStack = 4096 * 2;
 
 namespace sys
 {
+    namespace
+    {
+        const std::map<bsp::KeyCodes, phone_modes::PhoneMode> SliderStateToPhoneModeMapping = {
+            {bsp::KeyCodes::SSwitchUp, phone_modes::PhoneMode::Connected},
+            {bsp::KeyCodes::SSwitchMid, phone_modes::PhoneMode::DoNotDisturb},
+            {bsp::KeyCodes::SSwitchDown, phone_modes::PhoneMode::Offline}};
+    } // namespace
 
     using namespace cpp_freertos;
     using namespace std;
@@ -146,6 +154,7 @@ namespace sys
         powerManager  = std::make_unique<PowerManager>();
         cpuStatistics = std::make_unique<CpuStatistics>();
         deviceManager = std::make_unique<DeviceManager>();
+        phoneModeSubject = std::make_unique<phone_modes::Subject>(this);
 
         systemInit = std::move(sysInit);
         userInit   = std::move(appSpaceInit);
@@ -370,6 +379,11 @@ namespace sys
             return sys::MessageNone{};
         });
 
+        connect(typeid(PhoneModeRequest), [this](sys::Message *message) -> sys::MessagePointer {
+            auto request = static_cast<PhoneModeRequest *>(message);
+            return handlePhoneModeRequest(request);
+        });
+
         deviceManager->RegisterNewDevice(powerManager->getExternalRamDevice());
 
         return ReturnCodes::Success;
@@ -474,6 +488,23 @@ namespace sys
 
         cpuStatistics->Update();
         powerManager->UpdateCpuFrequency(cpuStatistics->GetPercentageCpuLoad());
+    }
+
+    phone_modes::PhoneMode SystemManager::translateSliderState(const RawKey &key)
+    {
+        const auto code = key.key_code;
+        if (code != bsp::KeyCodes::SSwitchUp && code != bsp::KeyCodes::SSwitchMid &&
+            code != bsp::KeyCodes::SSwitchDown) {
+            throw std::invalid_argument{"Invalid key code passed."};
+        }
+        return SliderStateToPhoneModeMapping.at(code);
+    }
+
+    MessagePointer SystemManager::handlePhoneModeRequest(PhoneModeRequest *request)
+    {
+        LOG_INFO("Phone mode change requested.");
+        phoneModeSubject->setPhoneMode(request->getPhoneMode());
+        return MessageNone{};
     }
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;

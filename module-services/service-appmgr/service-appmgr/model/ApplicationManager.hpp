@@ -14,6 +14,7 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/Timer.hpp>
+#include <PhoneModes/Observer.hpp>
 #include <SwitchData.hpp>
 
 #include <deque>
@@ -154,6 +155,7 @@ namespace app::manager
         std::tuple<ApplicationName, actions::ActionId, actions::ActionParamsPtr> pendingAction;
 
         std::unique_ptr<settings::Settings> settings;
+        std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
         void displayLanguageChanged(std::string value);
         void lockTimeChanged(std::string value);
         void inputLanguageChanged(std::string value);
