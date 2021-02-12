@@ -4,9 +4,6 @@
 #include <catch2/catch.hpp>
 
 #include "WorkerController.hpp"
-#include "interface/BluetoothDriver.hpp"
-
-#include <iostream>
 
 using namespace bluetooth;
 
@@ -24,6 +21,18 @@ class DriverMock : public AbstractDriver
     Error::Code stop() override
     {
         return stopReturnCode;
+    }
+    Error scan() override
+    {
+        return Error::Success;
+    }
+    void stopScan() override
+    {}
+    void setVisibility(bool visibility) override
+    {}
+    bool pair(uint8_t *addr, std::uint8_t protectionLevel = 0) override
+    {
+        return true;
     }
     void registerErrorCallback(const ErrorCallback &) override
     {}
@@ -152,7 +161,7 @@ TEST_CASE("Given StatefulController when process command successfully then turne
     controller.turnOn();
     REQUIRE(controller.isOn());
 
-    controller.processCommand(Command::PowerOn);
+    controller.processCommand(bluetooth::Command(Command::Type::PowerOn));
     REQUIRE(controller.isOn());
 }
 
@@ -165,7 +174,7 @@ TEST_CASE("Given StatefulController when processing command failed then restarte
     controller.turnOn();
     REQUIRE(controller.isOn());
 
-    controller.processCommand(Command::PowerOn);
-    controller.processCommand(Command::PowerOn);
+    controller.processCommand(bluetooth::Command(Command::Type::PowerOn));
+    controller.processCommand(bluetooth::Command(Command::Type::PowerOn));
     REQUIRE(controller.isOn());
 }
