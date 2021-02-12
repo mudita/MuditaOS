@@ -10,6 +10,7 @@
 #define BOOST_SML_CFG_DISABLE_MIN_SIZE // GCC10 fix
 #include <module-utils/sml/include/boost/sml.hpp>
 #include <module-utils/magic_enum/include/magic_enum.hpp>
+#include <stdexcept>
 
 namespace bluetooth
 {
@@ -177,7 +178,7 @@ namespace bluetooth
 
     void StatefulController::processCommand(Command command)
     {
-        LOG_INFO("Process command: %s", magic_enum::enum_name(command).data());
+        LOG_INFO("Process command: %s", magic_enum::enum_name(command.getType()).data());
         pimpl->sm.process_event(ProcessCommand{command});
     }
 } // namespace bluetooth

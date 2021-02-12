@@ -7,24 +7,52 @@
 #include "interface/profiles/Profile.hpp"
 #include "interface/BluetoothDriver.hpp"
 
-#include <service-bluetooth/SettingsHolder.hpp>
-#include <Service/Service.hpp>
-
 #include <cstdint>
+
+namespace sys
+{
+    class Service;
+}
 
 namespace bluetooth
 {
-    enum Command : std::uint8_t
+    class SettingsHolder;
+    using CommandArgument = std::variant<std::string, bool, int>;
+    class Command
     {
-        StartScan,
-        StopScan,
-        StartPan,
-        VisibilityOn,
-        VisibilityOff,
-        ConnectAudio,
-        DisconnectAudio,
-        PowerOn,
-        PowerOff,
+      public:
+        enum Type : std::uint8_t
+        {
+            StartScan,
+            StopScan,
+            StartPan,
+            VisibilityOn,
+            VisibilityOff,
+            ConnectAudio,
+            DisconnectAudio,
+            PowerOn,
+            PowerOff,
+            Pair,
+            None,
+        };
+
+        Command(Command::Type type, std::optional<CommandArgument> arg = std::nullopt)
+            : argument(std::move(arg)), type(type)
+        {}
+
+        auto getType() const noexcept -> Command::Type
+        {
+            return type;
+        }
+
+        auto getArgument() const -> std::optional<CommandArgument>
+        {
+            return argument;
+        }
+
+      private:
+        std::optional<CommandArgument> argument;
+        Type type;
     };
 
     class AbstractCommandHandler
@@ -41,7 +69,7 @@ namespace bluetooth
         explicit CommandHandler(sys::Service *service,
                                 std::shared_ptr<bluetooth::SettingsHolder> settings,
                                 std::shared_ptr<bluetooth::Profile> currentProfile,
-                                std::shared_ptr<bluetooth::Driver> driver);
+                                std::shared_ptr<bluetooth::AbstractDriver> driver);
 
         auto handle(Command command) -> Error::Code override;
 
@@ -52,10 +80,11 @@ namespace bluetooth
         Error::Code setVisibility(bool visibility);
         Error::Code establishAudioConnection();
         Error::Code disconnectAudioConnection();
+        Error::Code pair(CommandArgument arg);
 
         sys::Service *service;
         std::shared_ptr<bluetooth::SettingsHolder> settings;
         std::shared_ptr<bluetooth::Profile> currentProfile;
-        std::shared_ptr<Driver> driver;
+        std::shared_ptr<AbstractDriver> driver;
     };
 } // namespace bluetooth
