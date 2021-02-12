@@ -40,6 +40,7 @@
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
 #include <common_data/EventStore.hpp>
+#include <SystemManager/messages/PhoneModeRequest.hpp>
 
 EventManager::EventManager(const std::string &name)
     : sys::Service(name), screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(this))
@@ -102,9 +103,16 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         auto message = std::make_shared<sevm::KbdMessage>();
         message->key = msg->key;
 
-        if (message->key.state == RawKey::State::Pressed && message->key.key_code == bsp::KeyCodes::FnRight) {
-            // and state == ShutDown
-            bus.sendUnicast(message, service::name::system_manager);
+        if (message->key.state == RawKey::State::Pressed) {
+            const auto code = message->key.key_code;
+            if (code == bsp::KeyCodes::FnRight) {
+                bus.sendUnicast(message, service::name::system_manager);
+            }
+            else if (code == bsp::KeyCodes::SSwitchUp || code == bsp::KeyCodes::SSwitchMid ||
+                     code == bsp::KeyCodes::SSwitchDown) {
+                const auto mode = sys::SystemManager::translateSliderState(message->key);
+                bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
+            }
         }
 
         // send key to focused application

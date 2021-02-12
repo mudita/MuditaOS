@@ -14,6 +14,8 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Service.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Timer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/CpuSentinel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/PhoneModes/Subject.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/PhoneModes/Observer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/SystemManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/DependencyGraph.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/PowerManager.cpp
