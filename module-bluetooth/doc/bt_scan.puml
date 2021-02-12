@@ -1,0 +1,13 @@
+@startuml
+
+actor User
+participant ServiceBluetooth
+==Start scan==
+activate ServiceBluetooth
+User -> ServiceBluetooth : BluetoothMessage(BluetoothMessage::Request::Scan)
+ServiceBluetooth -> User : for each device: BluetoothScanResultMessage
+deactivate ServiceBluetooth
+==Stop scan==
+User -> ServiceBluetooth : BluetoothMessage(BluetoothMessage::Request::StopScan)
+
+@enduml
