@@ -37,15 +37,18 @@ TESTS_LIST["catch2-cellular-parse-result"]="
     CSCA parser test;
     CSCA set data;
     QECCNUM parser;
+    CLCC parser;
+    CLCC set data;
+    CLCC conversion methods;
+"
+#---------
+TESTS_LIST["catch2-cellular-qmbn"]="
+    Quectel MBN test;
 "
 #---------
 TESTS_LIST["catch2-cellular-request-factory"]="
     Emergency handling;
     MMI requests;
-"
-#---------    
-TESTS_LIST["catch2-cellular-qmbn"]="
-    Quectel MBN test;
 "
 #---------
 TESTS_LIST["catch2-cellular-response"]="
@@ -55,7 +58,7 @@ TESTS_LIST["catch2-cellular-response"]="
     Response CLCK;
     Response CCWA?;
     Response CCFC;
-    Response QCFG IMS;    
+    Response QCFG IMS;
 "
 #---------
 TESTS_LIST["catch2-cellular-simcard"]="
@@ -75,15 +78,7 @@ TESTS_LIST["catch2-cellular-URC"]="
     Urc RESPONSE;
     +Qind: SMS DONE;
     +Qiurc: TCP Context and connection message;
-"
-#---------
-TESTS_LIST["catch2-cellular-parse-result"]="
-    CSCA parser test;
-    CSCA set data;
-    QECCNUM parser;
-    CLCC parser;
-    CLCC set data;
-    CLCC conversion methods;
+    RING;
 "
 #---------
 TESTS_LIST["catch2-commands-queue-tests"]="
@@ -95,38 +90,45 @@ TESTS_LIST["catch2-context-pool-tests"]="
 "
 #---------
 TESTS_LIST["catch2-db"]="
-    SMS Table tests;
-    Threads Table tests;
-    Contacts Table tests;
+    Alarms Record tests;
+    Alarms Table tests;
+    Calllog Record tests;
+    Calllog Table tests;
+    Contact Groups tests;
+    Contacts address Table tests;
     Contacts Name Table tests;
     Contacts Number Table tests;
-    Contacts Ringtones Table tests;
-    Contacts address Table tests;
-    Contact Groups tests;
-    Alarms Table tests;
-    SMS Templates Table tests;
-    Calllog Table tests;
-#    Notifications Table tests;
-#    Events Table tests;
-    Notes Record tests;
-    Notes Table tests;
-    Calllog Record tests;
     Contact Record db tests;
     Test contact name formatting;
     Test converting contact data to string;
     Contact record numbers update;
-    SMS Record tests;
-    Thread Record tests;
-    Alarms Record tests;
-    SMS templates Record tests;
-#    Notifications Record tests;
+    Contacts Ringtones Table tests;
+    Contacts Table tests;
     Events Record tests;
+    Notes Record tests;
+    Notes Table tests;
     Query interface;
+    SMS Record tests;
+    SMS Table tests;
+    SMS templates Record tests;
+    SMS Templates Table tests;
+    Thread Record tests;
+    Threads Table tests;
 "
 #---------
 TESTS_LIST["catch2-db-initializer"]="
     Create and destroy simple database;
     Database initialization scripts;
+"
+#---------
+TESTS_LIST["catch2-dependency-graph-tests"]="
+    Given Dependency Graph When topological sort empty graph then verify if result is empty;
+    Given Dependency Graph When topological sort without dependencies then verify order;
+    Given Dependency Graph When topological sort simple case then verify order;
+    Given Dependency Graph When topological sort all depending on one then verify order;
+    Given Dependency Graph When topological sort advanced case then verify order 1;
+    Given Dependency Graph When topological sort advanced case then verify order 2;
+    Given Dependency Graph When topological sort on directed cyclic graph then verify order;
 "
 #---------
 TESTS_LIST["catch2-gui"]="
@@ -189,10 +191,13 @@ TESTS_LIST["catch2-gui-text"]="
     TextLineCursor - addition and deletion with scroll;
 "
 #---------
+TESTS_LIST["catch2-PowerManager"]="
+    Power Manager CPU sentinels governor test;
+"
+#---------
 TESTS_LIST["catch2-service-db"]="
     DB_API;
     Settings Messages;
-#    FileIndexer;
 "
 #---------
 TESTS_LIST["catch2-service-db-settings"]="
@@ -213,10 +218,6 @@ TESTS_LIST["catch2-service-evtmgr"]="
     ScreenLightControlFunctions;
 "
 #---------
-TESTS_LIST["catch2-PowerManager"]="
-    Power Manager CPU sentinels governor test;
-"
-#---------
 TESTS_LIST["catch2-StatefulController-tests"]="
     Given StatefulController when turn on then turned on;
     Given StatefulController when error during device registration then turned off;
@@ -229,11 +230,6 @@ TESTS_LIST["catch2-StatefulController-tests"]="
     Given StatefulController when shutdown in on state then terminated;
     Given StatefulController when process command successfully then turned on;
     Given StatefulController when processing command failed then restarted and turned on;
-"
-#---------
-TESTS_LIST["catch2-unittest_parse_CSCA"]="
-    CSCA parser test;
-    CSCA set data;
 "
 #---------
 TESTS_LIST["catch2-unittest_ATStream"]="
@@ -372,9 +368,3 @@ TESTS_LIST["catch2-vfs-littlefs"]="
     littlefs: Basic API test;
 "
 #---------
-TESTS_LIST["catch2-utils-parserIcs"]="
-"
-#---------
-TESTS_LIST["catch2-utils-time_display"]="
-    Time display parser;
-"
