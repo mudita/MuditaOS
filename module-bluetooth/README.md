@@ -20,6 +20,7 @@ It's meant to provide interface layer for service-bluetooth like that:
 
 ## Table of content
 - [Bluetooth on/off operation](./doc/bt_on_off.md)
+- [Bluetooth scan operation](./doc/bt_scan.md)
 
 # Proposal of Bluetooth settings data flow
 
