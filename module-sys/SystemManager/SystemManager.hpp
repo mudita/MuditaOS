@@ -19,6 +19,8 @@
 #include "Service/Service.hpp"
 #include "Service/ServiceCreator.hpp"
 #include "PowerManager.hpp"
+#include "PhoneModes/Subject.hpp"
+#include <common_data/RawKey.hpp>
 #include "Constants.hpp"
 #include "CpuStatistics.hpp"
 #include "DeviceManager.hpp"
@@ -33,6 +35,8 @@ namespace sys
         inline constexpr std::chrono::milliseconds timerInitInterval{30s};
         inline constexpr std::chrono::milliseconds timerPeriodInterval{100ms};
     } // namespace constants
+
+    class PhoneModeRequest; // Forward declaration
 
     enum class Code
     {
@@ -92,6 +96,11 @@ namespace sys
         /// @note there is no fallback
         static bool DestroyService(const std::string &name, Service *caller, TickType_t timeout = 5000);
 
+        /// Translates a slider state into a phone mode.
+        /// \param key  Slider button state
+        /// \return Phone mode.
+        static phone_modes::PhoneMode translateSliderState(const RawKey &key);
+
         /// Kill service
         /// @note - this is final, it straight takes service, calls it's close callback and it's gone
         /// please mind that services & apps not registered in SystemManager cant be killed - these should be handled by
@@ -143,10 +152,13 @@ namespace sys
         /// periodic update of cpu statistics
         void CpuStatisticsTimerHandler();
 
+        MessagePointer handlePhoneModeRequest(PhoneModeRequest *request);
+
         bool cpuStatisticsTimerInit{false};
 
         std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
         std::unique_ptr<sys::Timer> cpuStatisticsTimer;
+        std::unique_ptr<phone_modes::Subject> phoneModeSubject;
         InitFunction userInit;
         InitFunction systemInit;
 
