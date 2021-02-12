@@ -33,7 +33,7 @@ namespace gui
 {
     void Clear::draw(Context *ctx) const
     {
-        ctx->fill(ColorFullWhite.intensity);
+        ctx->fill(renderer::PixelRenderer::getColor(gui::ColorFullWhite.intensity));
     }
 
     void DrawLine::draw(Context *ctx) const
@@ -248,7 +248,9 @@ namespace gui
 
                 offsetRowContext += vecOffset;
                 if (vecColor != alphaColor) {
-                    std::memset(ctxData + offsetRowContext, vecColor, std::min(ctx->getW(), vecLength));
+                    std::memset(ctxData + offsetRowContext,
+                                renderer::PixelRenderer::getColor(vecColor),
+                                std::min(ctx->getW(), vecLength));
                 }
                 offsetRowContext += vecLength;
             }
