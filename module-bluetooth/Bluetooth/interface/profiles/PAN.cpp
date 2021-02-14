@@ -115,10 +115,10 @@ namespace bluetooth
     {
         // name has to have storage
         constexpr uint32_t size = 64;
-        static char lname[size] = {0};
-        snprintf(lname, size, "%s %s", name.c_str(), "00:00:00:00:00:00");
-        LOG_INFO("Setting local name: %s", lname);
-        gap_set_local_name(lname);
+        static std::array<char, size> lname;
+        snprintf(lname.data(), size, "%s", name.c_str());
+        LOG_INFO("Setting local name: %s", lname.data());
+        gap_set_local_name(lname.data());
         return Error();
     }
     namespace PAN
