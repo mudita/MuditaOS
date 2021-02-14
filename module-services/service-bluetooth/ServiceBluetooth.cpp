@@ -21,6 +21,8 @@
 #include <utility>
 #include <service-desktop/service-desktop/DesktopMessages.hpp>
 #include <service-desktop/service-desktop/Constants.hpp>
+#include <service-bluetooth/messages/SetDeviceName.hpp>
+#include <BtCommand.hpp>
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth)
 {
@@ -82,6 +84,14 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
             break;
         }
         sendWorkerCommand(newBtStatus.visibility ? bluetooth::VisibilityOn : bluetooth::VisibilityOff);
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(message::bluetooth::SetDeviceName), [&](sys::Message *msg) {
+        auto setNameMsg = static_cast<message::bluetooth::SetDeviceName *>(msg);
+        auto newName    = setNameMsg->getName();
+        bluetooth::set_name(newName);
+        settingsHolder->setValue(bluetooth::Settings::DeviceName, newName);
         return sys::MessageNone{};
     });
 
