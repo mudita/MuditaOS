@@ -39,8 +39,10 @@ namespace audio
         Position GetPosition() final;
 
       private:
-        static constexpr auto minimumBlockSize = 256U;
-        static constexpr auto maximumBlockSize = 2048U;
+        // these values are tightly connected to the Bluetooth A2DP update interval
+        static constexpr auto playbackBufferingSize = 8U;
+        static constexpr auto minimumBlockSize      = 512U;
+        static constexpr auto maximumBlockSize      = 512U;
         static constexpr Endpoint::Capabilities playbackCapabilities{.minBlockSize = minimumBlockSize,
                                                                      .maxBlockSize = maximumBlockSize};
 

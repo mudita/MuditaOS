@@ -1,0 +1,117 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#include "BluetoothAudioDevice.hpp"
+
+#include <Audio/Stream.hpp>
+
+#include <cassert>
+
+using namespace bluetooth;
+
+BluetoothAudioDevice::BluetoothAudioDevice(MediaContext *mediaContext)
+    : AudioDevice(btCapabilities, btCapabilities), ctx(mediaContext)
+{
+    LOG_DEBUG("Bluetooth audio device created");
+}
+
+BluetoothAudioDevice::~BluetoothAudioDevice()
+{
+    LOG_DEBUG("Destroying bluetooth audio device");
+}
+
+void BluetoothAudioDevice::setMediaContext(MediaContext *mediaContext)
+{
+    ctx = mediaContext;
+}
+
+auto BluetoothAudioDevice::Start(const Format &format) -> audio::AudioDevice::RetCode
+{
+    return audio::AudioDevice::RetCode::Success;
+}
+
+auto BluetoothAudioDevice::Stop() -> audio::AudioDevice::RetCode
+{
+    return audio::AudioDevice::RetCode::Success;
+}
+
+auto BluetoothAudioDevice::OutputVolumeCtrl(float vol) -> audio::AudioDevice::RetCode
+{
+    return audio::AudioDevice::RetCode::Success;
+}
+
+auto BluetoothAudioDevice::InputGainCtrl(float gain) -> audio::AudioDevice::RetCode
+{
+    return audio::AudioDevice::RetCode::Success;
+}
+
+auto BluetoothAudioDevice::OutputPathCtrl(OutputPath outputPath) -> audio::AudioDevice::RetCode
+{
+    return audio::AudioDevice::RetCode::Success;
+}
+
+auto BluetoothAudioDevice::InputPathCtrl(InputPath inputPath) -> audio::AudioDevice::RetCode
+{
+    return audio::AudioDevice::RetCode::Success;
+}
+
+auto BluetoothAudioDevice::IsFormatSupported(const Format &format) -> bool
+{
+    return true;
+}
+
+void BluetoothAudioDevice::onDataSend()
+{
+    if (outputEnabled) {
+        fillSbcAudioBuffer(ctx);
+    }
+}
+
+void BluetoothAudioDevice::onDataReceive()
+{}
+
+void BluetoothAudioDevice::enableInput()
+{}
+
+void BluetoothAudioDevice::enableOutput()
+{
+    LOG_DEBUG("Enabling bluetooth audio output.");
+    outputEnabled = true;
+}
+
+void BluetoothAudioDevice::disableInput()
+{}
+
+void BluetoothAudioDevice::disableOutput()
+{
+    LOG_DEBUG("Disabling bluetooth audio output.");
+    outputEnabled = false;
+}
+
+auto BluetoothAudioDevice::fillSbcAudioBuffer(MediaContext *context) -> int
+{
+    // perform sbc encodin
+    int totalNumBytesRead                    = 0;
+    unsigned int numAudioSamplesPerSbcBuffer = btstack_sbc_encoder_num_audio_frames();
+
+    assert(context != nullptr);
+
+    while (context->samples_ready >= numAudioSamplesPerSbcBuffer &&
+           (context->max_media_payload_size - context->sbc_storage_count) >= btstack_sbc_encoder_sbc_buffer_length()) {
+        audio::Stream::Span dataSpan;
+
+        Sink::_stream->peek(dataSpan);
+        btstack_sbc_encoder_process_data(reinterpret_cast<int16_t *>(dataSpan.data));
+        Sink::_stream->consume();
+
+        uint16_t sbcFrameSize = btstack_sbc_encoder_sbc_buffer_length();
+        uint8_t *sbcFrame     = btstack_sbc_encoder_sbc_buffer();
+
+        totalNumBytesRead += numAudioSamplesPerSbcBuffer;
+        memcpy(&context->sbc_storage[context->sbc_storage_count], sbcFrame, sbcFrameSize);
+        context->sbc_storage_count += sbcFrameSize;
+        context->samples_ready -= numAudioSamplesPerSbcBuffer;
+    }
+
+    return totalNumBytesRead;
+}

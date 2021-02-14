@@ -72,6 +72,11 @@ class ServiceBluetooth : public sys::Service
     void startTimeoutTimer();
     void stopTimeoutTimer();
 
+    template <typename T> auto connectHandler() -> bool
+    {
+        return connect(typeid(T), [&](sys::Message *msg) { return handle(static_cast<T *>(msg)); });
+    }
+
     [[nodiscard]] auto handle(message::bluetooth::RequestBondedDevices *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::RequestStatus *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::SetStatus *msg) -> std::shared_ptr<sys::Message>;
@@ -85,6 +90,7 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(BluetoothAddrMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::developerMode::DeveloperModeRequest *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(BluetoothAudioStartMessage *msg) -> std::shared_ptr<sys::Message>;
 };
 
 namespace sys

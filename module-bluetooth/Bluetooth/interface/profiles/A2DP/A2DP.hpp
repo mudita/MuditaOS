@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,7 @@
 #include "Service/Service.hpp"
 #include "queue.h"
 #include <memory>
-#include <service-bluetooth/ServiceBluetoothCommon.hpp>
+
 namespace bluetooth
 {
     class A2DP : public Profile
@@ -25,15 +25,16 @@ namespace bluetooth
         auto init() -> Error::Code override;
         void setDeviceAddress(uint8_t *addr) override;
         void setOwnerService(const sys::Service *service) override;
-        [[nodiscard]] auto getStreamData() -> std::shared_ptr<BluetoothStreamData> override;
 
         void connect() override;
         void disconnect() override;
         void start() override;
         void stop() override;
 
+        void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override;
+
       private:
         class A2DPImpl;
         std::unique_ptr<A2DPImpl> pimpl;
     };
-} // namespace Bt
+} // namespace bluetooth

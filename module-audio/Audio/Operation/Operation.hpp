@@ -7,6 +7,9 @@
 #include <functional>
 
 #include <Audio/AudioCommon.hpp>
+#include <Audio/AudioDeviceFactory.hpp>
+#include <Audio/AudioPlatform.hpp>
+#include <Audio/ServiceObserver.hpp>
 #include <Audio/encoder/Encoder.hpp>
 #include <Audio/Profiles/Profile.hpp>
 
@@ -17,9 +20,13 @@ namespace audio
     class Operation
     {
       public:
-        Operation(AudioServiceMessage::Callback callback, const PlaybackType &playbackType = PlaybackType::None)
-            : playbackType(playbackType), serviceCallback(callback)
-        {}
+        explicit Operation(AudioServiceMessage::Callback callback,
+                           const PlaybackType &playbackType = PlaybackType::None)
+            : playbackType(playbackType), serviceCallback(callback), observer(serviceCallback)
+        {
+            factory = AudioPlatform::GetDeviceFactory();
+            factory->setObserver(&observer);
+        }
 
         enum class State
         {
@@ -124,6 +131,7 @@ namespace audio
         std::shared_ptr<Profile> currentProfile;
         std::shared_ptr<AudioDevice> audioDevice;
         std::vector<SupportedProfile> supportedProfiles;
+        std::unique_ptr<AudioDeviceFactory> factory;
 
         State state = State::Idle;
         audio::Token operationToken;
@@ -132,6 +140,8 @@ namespace audio
         audio::PlaybackType playbackType = audio::PlaybackType::None;
 
         AudioServiceMessage::Callback serviceCallback;
+        ServiceObserver observer;
+
         std::function<int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
             audioCallback = nullptr;
 

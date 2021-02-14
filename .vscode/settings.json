@@ -6,6 +6,7 @@
     },
     "testMate.cpp.test.executables": "build-linux-Debug/{googletest,catch2}-*",
     "files.associations": {
+        "*.cc": "cpp",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -80,6 +81,7 @@
         "pointers": "cpp",
         "any": "cpp",
         "charconv": "cpp",
-        "scoped_allocator": "cpp"
+        "scoped_allocator": "cpp",
+        "*.inc": "cpp"
     },
 }

@@ -14,7 +14,8 @@ namespace audio
     class StreamFactory
     {
       public:
-        explicit StreamFactory(Endpoint::Capabilities factoryCaps);
+        explicit StreamFactory(Endpoint::Capabilities factoryCaps,
+                               unsigned int bufferingSize = Stream::defaultBufferingSize);
         auto makeStream(const Source &source, const Sink &sink) -> std::unique_ptr<Stream>;
 
       private:
@@ -24,6 +25,7 @@ namespace audio
         Endpoint::Capabilities caps;
         StandardStreamAllocator stdAlloc;
         NonCacheableStreamAllocator nonCacheableAlloc;
+        unsigned int bufferingSize;
     };
 
 } // namespace audio

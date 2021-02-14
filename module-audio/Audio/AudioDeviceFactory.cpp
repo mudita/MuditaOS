@@ -13,7 +13,7 @@ std::shared_ptr<AudioDevice> AudioDeviceFactory::CreateDevice(AudioDevice::Type 
     std::shared_ptr<AudioDevice> device = getDeviceFromType(deviceType);
 
     if (_observer != nullptr && device) {
-        _observer->onDeviceCreated(device);
+        _observer->onDeviceCreated(device, deviceType);
     }
 
     return device;

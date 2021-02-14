@@ -32,12 +32,6 @@ namespace audio
             return std::string();
         };
 
-        auto defaultProfile = GetProfile(Profile::Type::PlaybackLoudspeaker);
-        if (!defaultProfile) {
-            throw AudioInitException("Error during initializing profile", RetCode::ProfileNotSet);
-        }
-        currentProfile = defaultProfile;
-
         dec = Decoder::Create(file);
         if (dec == nullptr) {
             throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
@@ -57,7 +51,7 @@ namespace audio
         }
 
         // create stream
-        StreamFactory streamFactory(playbackCapabilities);
+        StreamFactory streamFactory(playbackCapabilities, playbackBufferingSize);
         dataStreamOut = streamFactory.makeStream(*dec.get(), *audioDevice.get());
 
         // create audio connection
@@ -155,6 +149,10 @@ namespace audio
         auto newProfile = GetProfile(type);
         if (newProfile == nullptr) {
             return RetCode::UnsupportedProfile;
+        }
+
+        if (currentProfile && currentProfile->GetType() == newProfile->GetType()) {
+            return RetCode::Success;
         }
 
         /// profile change - (re)create output device; stop audio first by

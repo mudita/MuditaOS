@@ -6,6 +6,7 @@
 
 #include <Audio/Operation/IdleOperation.hpp>
 #include <Audio/Operation/PlaybackOperation.hpp>
+#include <Bluetooth/audio/BluetoothAudioDevice.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
@@ -217,6 +218,13 @@ std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Messag
         }
         return settings_it->second;
     }
+    else if (const auto *deviceMsg = dynamic_cast<const AudioServiceMessage::AudioDeviceCreated *>(msg); deviceMsg) {
+        if (deviceMsg->getDeviceType() == AudioDevice::Type::Bluetooth) {
+            auto startBluetoothAudioMsg = std::make_shared<BluetoothAudioStartMessage>(
+                std::static_pointer_cast<bluetooth::BluetoothAudioDevice>(deviceMsg->getDevice()));
+            bus.sendUnicast(std::move(startBluetoothAudioMsg), service::name::bluetooth);
+        }
+    }
     else {
         LOG_DEBUG("Message received but not handled - no effect.");
     }
@@ -377,6 +385,13 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
     if (opType == Operation::Type::Playback) {
         auto input = audioMux.GetPlaybackInput(playbackType);
+        // stop bluetooth stream if available
+        if (bluetoothConnected) {
+            LOG_DEBUG("Sending Bluetooth start stream request");
+            bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Play),
+                            service::name::bluetooth);
+        }
+
         AudioStart(input);
         return std::make_unique<AudioStartPlaybackResponse>(retCode, retToken);
     }
@@ -395,17 +410,20 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_ptr<Event> evt)
 {
-    auto isBT =
-        evt->getType() == EventType::BlutoothHSPDeviceState || evt->getType() == EventType::BlutoothA2DPDeviceState;
-    if (isBT && evt->getDeviceState() == audio::Event::DeviceState::Connected) {
-        auto req = std::make_shared<BluetoothRequestStreamMessage>();
-        bus.sendUnicast(req, service::name::bluetooth);
-        return std::make_unique<AudioEventResponse>(RetCode::Success);
+    // update bluetooth state
+    if (evt->getType() == EventType::BlutoothA2DPDeviceState) {
+        auto newState = evt->getDeviceState() == Event::DeviceState::Connected;
+        if (newState != bluetoothConnected) {
+            LOG_DEBUG("Bluetooth connection status changed: %s", newState ? "connected" : "disconnected");
+            bluetoothConnected = newState;
+        }
     }
 
+    // update information about endpoints availability
     for (auto &input : audioMux.GetAllInputs()) {
         input.audio->SendEvent(evt);
     }
+
     return std::make_unique<AudioEventResponse>(RetCode::Success);
 }
 
@@ -449,6 +467,12 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
             auto t = input.token;
             retCodes.emplace_back(t, stopInput(&input));
         }
+    }
+
+    // stop bluetooth stream if available
+    if (bluetoothConnected) {
+        LOG_DEBUG("Sending Bluetooth stop request");
+        bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Stop), service::name::bluetooth);
     }
 
     // on failure return first false code
@@ -560,7 +584,6 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
 {
     sys::MessagePointer responseMsg;
     bool isBusy = IsBusy();
-
     auto &msgType = typeid(*msgl);
 
     if (msgType == typeid(AudioNotificationMessage)) {

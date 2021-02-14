@@ -20,6 +20,8 @@
 #include "service-bluetooth/messages/Connect.hpp"
 #include "service-bluetooth/messages/Disconnect.hpp"
 #include "service-bluetooth/Constants.hpp"
+#include <audio/BluetoothAudioDevice.hpp>
+
 extern "C"
 {
 #include "module-bluetooth/lib/btstack/src/btstack.h"
@@ -73,11 +75,6 @@ namespace bluetooth
         pimpl->setOwnerService(service);
     }
 
-    auto A2DP::getStreamData() -> std::shared_ptr<BluetoothStreamData>
-    {
-        return pimpl->getStreamData();
-    }
-
     void A2DP::connect()
     {
         pimpl->connect();
@@ -98,6 +95,11 @@ namespace bluetooth
         pimpl->stop();
     }
 
+    void A2DP::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
+    {
+        pimpl->setAudioDevice(std::move(audioDevice));
+    }
+
     const sys::Service *A2DP::A2DPImpl::ownerService;
     QueueHandle_t A2DP::A2DPImpl::sourceQueue = nullptr;
     QueueHandle_t A2DP::A2DPImpl::sinkQueue   = nullptr;
@@ -110,6 +112,7 @@ namespace bluetooth
         0xFF, //(AVDTP_SBC_BLOCK_LENGTH_16 << 4) | (AVDTP_SBC_SUBBANDS_8 << 2) | AVDTP_SBC_ALLOCATION_METHOD_LOUDNESS,
         2,
         53};
+    std::shared_ptr<BluetoothAudioDevice> A2DP::A2DPImpl::audioDevice;
 
     bool A2DP::A2DPImpl::isConnected = false;
     /* LISTING_START(MainConfiguration): Setup Audio Source and AVRCP Target services */
@@ -195,40 +198,6 @@ namespace bluetooth
         AVRCP::mediaTracker.sbc_ready_to_send = 0;
     }
 
-    auto A2DP::A2DPImpl::fillSbcAudioBuffer(MediaContext *context) -> int
-    {
-        // perform sbc encodin
-        int totalNumBytesRead                    = 0;
-        unsigned int numAudioSamplesPerSbcBuffer = btstack_sbc_encoder_num_audio_frames();
-        while (context->samples_ready >= numAudioSamplesPerSbcBuffer &&
-               (context->max_media_payload_size - context->sbc_storage_count) >=
-                   btstack_sbc_encoder_sbc_buffer_length()) {
-
-            AudioData_t audioData;
-
-            if (sourceQueue != nullptr) {
-                if (xQueueReceive(sourceQueue, &audioData, 10) != pdPASS) {
-                    audioData.data.fill(0);
-                }
-            }
-            else {
-                audioData.data.fill(0);
-                LOG_ERROR("queue is nullptr!");
-            }
-
-            btstack_sbc_encoder_process_data(audioData.data.data());
-
-            uint16_t sbcFrameSize = btstack_sbc_encoder_sbc_buffer_length();
-            uint8_t *sbcFrame     = btstack_sbc_encoder_sbc_buffer();
-
-            totalNumBytesRead += numAudioSamplesPerSbcBuffer;
-            memcpy(&context->sbc_storage[context->sbc_storage_count], sbcFrame, sbcFrameSize);
-            context->sbc_storage_count += sbcFrameSize;
-            context->samples_ready -= numAudioSamplesPerSbcBuffer;
-        }
-        return totalNumBytesRead;
-    }
-
     void A2DP::A2DPImpl::audioTimeoutHandler(btstack_timer_source_t *timer)
     {
         auto *context = static_cast<MediaContext *>(btstack_run_loop_get_timer_context(timer));
@@ -255,7 +224,9 @@ namespace bluetooth
             return;
         }
 
-        fillSbcAudioBuffer(context);
+        if (audioDevice != nullptr) {
+            audioDevice->onDataSend();
+        }
 
         if ((context->sbc_storage_count + btstack_sbc_encoder_sbc_buffer_length()) > context->max_media_payload_size) {
             // schedule sending
@@ -347,7 +318,7 @@ namespace bluetooth
                      bd_addr_to_str(address),
                      AVRCP::mediaTracker.a2dp_cid,
                      AVRCP::mediaTracker.local_seid);
-            isConnected = true;
+            isConnected    = true;
             auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
             busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(std::move(deviceAddress), true),
                                  service::name::bluetooth);
@@ -608,15 +579,10 @@ namespace bluetooth
         ownerService = service;
     }
 
-    auto A2DP::A2DPImpl::getStreamData() -> std::shared_ptr<BluetoothStreamData>
-    {
-        return std::make_shared<BluetoothStreamData>(sinkQueue, sourceQueue, metadata);
-    }
-
     void A2DP::A2DPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
     {
-        auto evt = std::make_shared<audio::Event>(event, state);
-        auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
+        auto evt       = std::make_shared<audio::Event>(event, state);
+        auto msg       = std::make_shared<AudioEventRequest>(std::move(evt));
         auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
         busProxy.sendUnicast(std::move(msg), service::name::evt_manager);
     }
@@ -634,4 +600,10 @@ namespace bluetooth
         a2dp_source_pause_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
     }
 
-} // namespace Bt
+    void A2DP::A2DPImpl::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> newAudioDevice)
+    {
+        newAudioDevice->setMediaContext(&AVRCP::mediaTracker);
+        A2DP::A2DPImpl::audioDevice = std::move(newAudioDevice);
+    }
+
+} // namespace bluetooth
