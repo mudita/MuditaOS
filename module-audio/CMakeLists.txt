@@ -7,30 +7,29 @@ project(module-audio VERSION 1.0
         DESCRIPTION "Audio module library")
 
 set(SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Audio.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioCommon.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioDeviceFactory.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioMux.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/Decoder.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/DecoderWorker.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderMP3.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderWAV.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/DecoderWorker.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/xing_header.c"
-
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/encoder/Encoder.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/encoder/EncoderWAV.cpp"
-
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Audio.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioDeviceFactory.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioMux.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioCommon.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Endpoint.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Stream.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/StreamFactory.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/StreamQueuedEventsListener.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/IdleOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/Operation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/PlaybackOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/RecorderOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/RouterOperation.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/IdleOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Profiles/Profile.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/ServiceObserver.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Stream.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/StreamFactory.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/StreamQueuedEventsListener.cpp"
 )
 
 # include target specific rules

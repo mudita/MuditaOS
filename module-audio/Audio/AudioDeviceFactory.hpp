@@ -12,13 +12,13 @@ namespace audio
 
     class AudioDeviceFactory
     {
+      public:
         class Observer
         {
           public:
-            virtual void onDeviceCreated(std::shared_ptr<AudioDevice> device) = 0;
+            virtual void onDeviceCreated(std::shared_ptr<AudioDevice> device, AudioDevice::Type deviceType) = 0;
         };
 
-      public:
         explicit AudioDeviceFactory(Observer *observer = nullptr);
 
         void setObserver(Observer *observer) noexcept;

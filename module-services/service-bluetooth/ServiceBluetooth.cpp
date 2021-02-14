@@ -69,69 +69,20 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
             LOG_ERROR("Disconnecting from timeout timer!");
         });
 
-    connect(message::bluetooth::RequestBondedDevices(), [&](sys::Message *msg) {
-        auto request = static_cast<message::bluetooth::RequestBondedDevices *>(msg);
-        return handle(request);
-    });
-
-    connect(message::bluetooth::RequestStatus(), [&](sys::Message *msg) {
-        auto request = static_cast<message::bluetooth::RequestStatus *>(msg);
-        return handle(request);
-    });
-
-    connect(typeid(message::bluetooth::SetStatus), [&](sys::Message *msg) {
-        auto request = static_cast<message::bluetooth::SetStatus *>(msg);
-        return handle(request);
-    });
-
-    connect(typeid(BluetoothPairMessage), [&](sys::Message *msg) {
-        auto request = static_cast<BluetoothPairMessage *>(msg);
-        return handle(request);
-    });
-    connect(typeid(message::bluetooth::Unpair), [&](sys::Message *msg) {
-        auto request = static_cast<message::bluetooth::Unpair *>(msg);
-        return handle(request);
-    });
-
-    connect(typeid(message::bluetooth::SetDeviceName), [&](sys::Message *msg) {
-        auto request = static_cast<message::bluetooth::SetDeviceName *>(msg);
-        return handle(request);
-    });
-
-    connect(typeid(sdesktop::developerMode::DeveloperModeRequest), [&](sys::Message *msg) {
-        auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
-        return handle(request);
-    });
-
-    connect(typeid(message::bluetooth::Connect), [&](sys::Message *msg) {
-        auto request = static_cast<message::bluetooth::Connect *>(msg);
-        return handle(request);
-    });
-
-    connect(typeid(message::bluetooth::Disconnect), [&](sys::Message *msg) {
-        auto request = static_cast<message::bluetooth::Disconnect *>(msg);
-        return handle(request);
-    });
-
-    connect(typeid(BluetoothMessage), [&](sys::Message *msg) {
-        auto request = static_cast<BluetoothMessage *>(msg);
-        return handle(request);
-    });
-
-    connect(typeid(BluetoothAddrMessage), [&](sys::Message *msg) {
-        auto request = static_cast<BluetoothAddrMessage *>(msg);
-        return handle(request);
-    });
-
-    connect(typeid(message::bluetooth::ConnectResult), [&](sys::Message *msg) {
-        auto result = static_cast<message::bluetooth::ConnectResult *>(msg);
-        return handle(result);
-    });
-
-    connect(typeid(message::bluetooth::DisconnectResult), [&](sys::Message *msg) {
-        auto result = static_cast<message::bluetooth::DisconnectResult *>(msg);
-        return handle(result);
-    });
+    connectHandler<BluetoothAddrMessage>();
+    connectHandler<BluetoothAudioStartMessage>();
+    connectHandler<BluetoothMessage>();
+    connectHandler<BluetoothPairMessage>();
+    connectHandler<message::bluetooth::Connect>();
+    connectHandler<message::bluetooth::ConnectResult>();
+    connectHandler<message::bluetooth::Disconnect>();
+    connectHandler<message::bluetooth::DisconnectResult>();
+    connectHandler<message::bluetooth::RequestBondedDevices>();
+    connectHandler<message::bluetooth::RequestStatus>();
+    connectHandler<message::bluetooth::SetDeviceName>();
+    connectHandler<message::bluetooth::SetStatus>();
+    connectHandler<message::bluetooth::Unpair>();
+    connectHandler<sdesktop::developerMode::DeveloperModeRequest>();
 
     settingsHolder->onStateChange = [this]() {
         auto initialState = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
@@ -157,6 +108,7 @@ void ServiceBluetooth::ProcessCloseReason(sys::CloseReason closeReason)
 sys::MessagePointer ServiceBluetooth::DataReceivedHandler([[maybe_unused]] sys::DataMessage *msg,
                                                           [[maybe_unused]] sys::ResponseMessage *resp)
 {
+    LOG_ERROR("Unhandled message: %s", typeid(msg).name());
     return std::make_shared<sys::ResponseMessage>();
 }
 
@@ -168,6 +120,12 @@ sys::ReturnCodes ServiceBluetooth::SwitchPowerModeHandler(const sys::ServicePowe
 void ServiceBluetooth::sendWorkerCommand(bluetooth::Command command)
 {
     xQueueSend(workerQueue, &command, portMAX_DELAY);
+}
+
+auto ServiceBluetooth::handle(BluetoothAudioStartMessage *msg) -> std::shared_ptr<sys::Message>
+{
+    worker->setAudioDevice(msg->getAudioDevice());
+    return std::make_shared<sys::ResponseMessage>();
 }
 
 auto ServiceBluetooth::handle([[maybe_unused]] message::bluetooth::RequestBondedDevices *msg)
@@ -213,6 +171,7 @@ auto ServiceBluetooth::handle(message::bluetooth::SetStatus *msg) -> std::shared
     sendWorkerCommand(command);
     return sys::MessageNone{};
 }
+
 auto ServiceBluetooth::handle(BluetoothPairMessage *msg) -> std::shared_ptr<sys::Message>
 {
     const auto addrString = msg->addr;

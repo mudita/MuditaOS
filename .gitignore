@@ -57,3 +57,6 @@ update/
 # build in docker files
 .ccache/
 .bash_history
+
+# often created by the visual studio code
+/null.d

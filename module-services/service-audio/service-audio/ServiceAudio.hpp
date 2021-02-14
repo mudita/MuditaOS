@@ -58,8 +58,8 @@ class ServiceAudio : public sys::Service
     audio::AudioMux::VibrationStatus vibrationMotorStatus = audio::AudioMux::VibrationStatus::Off;
     std::unique_ptr<settings::Settings> settingsProvider;
     std::map<std::string, std::string> settingsCache;
-
     std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
+    bool bluetoothConnected = false;
 
     auto IsVibrationMotorOn()
     {

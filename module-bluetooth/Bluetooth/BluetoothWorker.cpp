@@ -8,6 +8,7 @@
 #include "interface/BluetoothDriverImpl.hpp"
 #include "interface/profiles/A2DP/A2DP.hpp"
 #include "interface/profiles/HSP/HSP.hpp"
+#include "audio/BluetoothAudioDevice.hpp"
 #include "BtKeysStorage.hpp"
 
 #if DEBUG_BLUETOOTH_HCI_COMS == 1
@@ -27,8 +28,8 @@ using namespace bsp;
 
 namespace queues
 {
-    constexpr inline auto io  = "qBtIO";
-    constexpr inline auto cmd = "qBtCmds";
+    constexpr inline auto io      = "qBtIO";
+    constexpr inline auto cmd     = "qBtCmds";
     constexpr inline auto btstack = "qBtStack";
 
     constexpr inline auto queueLength        = 10;
@@ -174,6 +175,7 @@ auto BluetoothWorker::handleBtStackTrigger(QueueHandle_t queue) -> bool
         return false;
     }
     if (notification) {
+        cpp_freertos::LockGuard lock(loopMutex);
         runLoop->process();
         return true;
     }
@@ -275,4 +277,10 @@ void BluetoothWorker::removeFromBoundDevices(uint8_t *addr)
         settings->setValue(bluetooth::Settings::BondedDevices, SettingsSerializer::toString(pairedDevices));
         LOG_INFO("Device %s removed from paired devices list", bd_addr_to_str(addr));
     }
+}
+
+void BluetoothWorker::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> device)
+{
+    cpp_freertos::LockGuard lock(loopMutex);
+    profileManager->setAudioDevice(std::move(device));
 }
