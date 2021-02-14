@@ -192,18 +192,7 @@ enum class MessageType
     BluetoothScanResult,
     BluetoothAddrResult,
     BluetoothPairResult,
-    BluetoothAudioRegister,
-    BluetoothDeviceMetadata,
-    BluetoothRequestStream,
-    BluetoothDeviceDisconnected,
-
-    // bluetooth proxy
-    BluetoothProxyStart,
-    BluetoothProxyStop,
-    BluetoothProxyOutputVolumeCtrl,
-    BluetoothProxyInputGainCtrl,
-    BluetoothProxyOutputPathCtrl,
-    BluetoothProxyInputPathCtrl,
+    BluetoothAudioStart,
 
     LwIP_request,
     EVM_GPIO,

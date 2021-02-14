@@ -82,15 +82,26 @@ namespace bluetooth
         start();
         return Error::Success;
     }
+
     auto ProfileManager::start() -> Error::Code
     {
         currentProfilePtr->start();
         return Error::Success;
     }
+
     auto ProfileManager::stop() -> Error::Code
     {
         currentProfilePtr->stop();
         return Error::Success;
     }
 
+    auto ProfileManager::setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code
+    {
+        if (currentProfilePtr == nullptr) {
+            return Error::NotReady;
+        }
+
+        currentProfilePtr->setAudioDevice(std::move(device));
+        return Error::Success;
+    }
 } // namespace bluetooth

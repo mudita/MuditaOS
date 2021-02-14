@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "HSPImpl.hpp"
@@ -51,11 +51,6 @@ namespace bluetooth
         pimpl->setOwnerService(service);
     }
 
-    auto HSP::getStreamData() -> std::shared_ptr<BluetoothStreamData>
-    {
-        return pimpl->getStreamData();
-    }
-
     void HSP::connect()
     {
         pimpl->connect();
@@ -89,8 +84,8 @@ namespace bluetooth
 
     void HSP::HSPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
     {
-        auto evt = std::make_shared<audio::Event>(event, state);
-        auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
+        auto evt       = std::make_shared<audio::Event>(event, state);
+        auto msg       = std::make_shared<AudioEventRequest>(std::move(evt));
         auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
         busProxy.sendUnicast(std::move(msg), service::name::evt_manager);
     }
@@ -165,7 +160,7 @@ namespace bluetooth
         case HSP_SUBEVENT_AUDIO_DISCONNECTION_COMPLETE:
             LOG_DEBUG("Audio connection released.\n\n");
             sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
-            scoHandle = HCI_CON_HANDLE_INVALID;
+            scoHandle   = HCI_CON_HANDLE_INVALID;
             isConnected = false;
             break;
         case HSP_SUBEVENT_MICROPHONE_GAIN_CHANGED:
@@ -259,4 +254,4 @@ namespace bluetooth
         hsp_ag_release_audio_connection();
     }
 
-} // namespace Bt
+} // namespace bluetooth

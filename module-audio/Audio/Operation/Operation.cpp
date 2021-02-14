@@ -7,7 +7,6 @@
 
 #include "Audio/AudioDevice.hpp"
 #include "Audio/AudioDeviceFactory.hpp"
-#include "Audio/AudioPlatform.hpp"
 
 #include "IdleOperation.hpp"
 #include "PlaybackOperation.hpp"
@@ -96,8 +95,6 @@ namespace audio
 
     std::shared_ptr<AudioDevice> Operation::CreateDevice(AudioDevice::Type type)
     {
-        auto factory = AudioPlatform::GetDeviceFactory();
-
         return factory->CreateDevice(type);
     }
 } // namespace audio

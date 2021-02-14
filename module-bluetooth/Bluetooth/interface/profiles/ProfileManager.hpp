@@ -8,6 +8,9 @@
 #include "Profile.hpp"
 #include "interface/profiles/A2DP/A2DP.hpp"
 #include "interface/profiles/HSP/HSP.hpp"
+#include "audio/BluetoothAudioDevice.hpp"
+
+#include <memory>
 
 extern "C"
 {
@@ -43,6 +46,8 @@ namespace bluetooth
 
         auto start() -> Error::Code;
         auto stop() -> Error::Code;
+
+        auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code;
 
       private:
         sys::Service *ownerService;

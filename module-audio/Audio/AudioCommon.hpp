@@ -11,8 +11,9 @@
 #include <Utils.hpp>
 #include <PhoneModes/Common.hpp>
 
-#include <map>
 #include <bitset>
+#include <map>
+#include <memory>
 #include <utility>
 
 namespace audio
@@ -312,6 +313,28 @@ namespace AudioServiceMessage
         const audio::Setting setting;
         const audio::Profile::Type profile;
         const audio::PlaybackType playback;
+    };
+
+    class AudioDeviceCreated : public sys::Message
+    {
+      public:
+        explicit AudioDeviceCreated(std::shared_ptr<audio::AudioDevice> device, audio::AudioDevice::Type type)
+            : device(std::move(device)), type(type)
+        {}
+
+        auto getDevice() const noexcept -> std::shared_ptr<audio::AudioDevice>
+        {
+            return device;
+        }
+
+        auto getDeviceType() const noexcept -> audio::AudioDevice::Type
+        {
+            return type;
+        }
+
+      private:
+        std::shared_ptr<audio::AudioDevice> device;
+        audio::AudioDevice::Type type;
     };
 
     using Callback = std::function<std::optional<std::string>(const sys::Message *msg)>;

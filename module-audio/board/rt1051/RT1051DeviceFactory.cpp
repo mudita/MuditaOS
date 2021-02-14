@@ -4,6 +4,7 @@
 #include "RT1051DeviceFactory.hpp"
 #include "board/rt1051/RT1051AudioCodec.hpp"
 #include "board/rt1051/RT1051CellularAudio.hpp"
+#include "audio/BluetoothAudioDevice.hpp"
 
 using audio::AudioDevice;
 using audio::RT1051AudioCodec;
@@ -15,16 +16,15 @@ std::shared_ptr<AudioDevice> RT1051DeviceFactory::getDeviceFromType(AudioDevice:
     std::shared_ptr<AudioDevice> device;
     switch (deviceType) {
     case AudioDevice::Type::Audiocodec: {
-        device = std::make_unique<RT1051AudioCodec>();
+        device = std::make_shared<RT1051AudioCodec>();
     } break;
 
     case AudioDevice::Type::Bluetooth: {
-        LOG_FATAL("Bluetooth audio is not yet supported");
-        device = nullptr;
+        device = std::make_shared<bluetooth::BluetoothAudioDevice>();
     } break;
 
     case AudioDevice::Type::Cellular: {
-        device = std::make_unique<RT1051CellularAudio>();
+        device = std::make_shared<RT1051CellularAudio>();
     } break;
 
     default:

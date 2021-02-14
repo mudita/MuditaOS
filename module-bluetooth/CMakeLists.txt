@@ -1,8 +1,12 @@
-﻿project(module-bluetooth VERSION 1.0 DESCRIPTION "Bluetooth module library")
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+project(module-bluetooth VERSION 1.0 DESCRIPTION "Bluetooth module library")
 
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/audio/BluetoothAudioDevice.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BluetoothWorker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/WorkerController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/CommandHandler.cpp

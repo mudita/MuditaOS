@@ -6,8 +6,8 @@
 #include "ServiceBluetoothCommon.hpp"
 
 #include <Bluetooth/Device.hpp>
+#include <Bluetooth/audio/BluetoothAudioDevice.hpp>
 #include <Service/Message.hpp>
-#include <Audio/Stream.hpp>
 #include <MessageType.hpp>
 
 #include <utility>
@@ -85,49 +85,18 @@ class BluetoothPairMessage : public sys::DataMessage
     ~BluetoothPairMessage() override = default;
 };
 
-class BluetoothAudioRegisterMessage : public sys::DataMessage
+class BluetoothAudioStartMessage : public sys::DataMessage
 {
   public:
-    QueueHandle_t audioSourceQueue;
-    QueueHandle_t audioSinkQueue;
-    BluetoothAudioRegisterMessage(QueueHandle_t audioSourceQueue, QueueHandle_t audioSinkQueue)
-        : sys::DataMessage(MessageType::BluetoothAudioRegister), audioSourceQueue(audioSourceQueue),
-          audioSinkQueue(audioSinkQueue)
+    explicit BluetoothAudioStartMessage(std::shared_ptr<bluetooth::BluetoothAudioDevice> device)
+        : DataMessage(MessageType::BluetoothAudioStart), device(std::move(device))
     {}
-    ~BluetoothAudioRegisterMessage() override = default;
-};
 
-class BluetoothDeviceMetadataMessage : public sys::DataMessage
-{
-  public:
-    DeviceMetadata_t metadata;
-    BluetoothDeviceMetadataMessage(DeviceMetadata_t metadata)
-        : DataMessage(MessageType::BluetoothDeviceMetadata), metadata(std::move(metadata))
-    {}
-    ~BluetoothDeviceMetadataMessage() override = default;
-};
-
-class BluetoothRequestStreamMessage : public sys::DataMessage
-{
-  public:
-    BluetoothRequestStreamMessage() : DataMessage(MessageType::BluetoothRequestStream)
-    {}
-    ~BluetoothRequestStreamMessage() override = default;
-};
-
-class BluetoothRequestStreamResultMessage : public sys::DataMessage
-{
-  public:
-    BluetoothRequestStreamResultMessage(std::shared_ptr<BluetoothStreamData> data)
-        : DataMessage(MessageType::BluetoothRequestStream), data(data)
-    {}
-    ~BluetoothRequestStreamResultMessage() override = default;
-
-    std::shared_ptr<BluetoothStreamData> getData()
+    auto getAudioDevice() const -> std::shared_ptr<bluetooth::BluetoothAudioDevice>
     {
-        return data;
+        return device;
     }
 
   private:
-    std::shared_ptr<BluetoothStreamData> data;
+    std::shared_ptr<bluetooth::BluetoothAudioDevice> device;
 };

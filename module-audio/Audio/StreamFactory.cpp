@@ -14,14 +14,15 @@
 
 using namespace audio;
 
-StreamFactory::StreamFactory(Endpoint::Capabilities factoryCaps) : caps(std::move(factoryCaps))
+StreamFactory::StreamFactory(Endpoint::Capabilities factoryCaps, unsigned int bufferingSize)
+    : caps(std::move(factoryCaps)), bufferingSize(bufferingSize)
 {}
 
 auto StreamFactory::makeStream(const Source &source, const Sink &sink) -> std::unique_ptr<Stream>
 {
     auto negotiatedCaps = negotiateCaps({source, sink});
 
-    return std::make_unique<Stream>(getAllocator(negotiatedCaps.usesDMA), negotiatedCaps.maxBlockSize);
+    return std::make_unique<Stream>(getAllocator(negotiatedCaps.usesDMA), negotiatedCaps.maxBlockSize, bufferingSize);
 }
 
 auto StreamFactory::negotiateCaps(std::vector<std::reference_wrapper<const Endpoint>> v) -> Endpoint::Capabilities
