@@ -34,6 +34,7 @@ set( SOURCES
     "widgets/TextWithIconsWidget.cpp"
     "widgets/DateWidget.cpp"
     "widgets/TimeWidget.cpp"
+    "widgets/DateAndTimeBox.cpp"
     "options/OptionsModel.cpp"
     "options/type/OptionSimple.cpp"
     "options/type/OptionCall.cpp"

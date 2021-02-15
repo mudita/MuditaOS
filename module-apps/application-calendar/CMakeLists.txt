@@ -29,6 +29,7 @@
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/NewEventCheckBoxWithLabel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DayLabel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/MonthBox.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarDateAndTimeBox.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCalendar.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/MonthModel.hpp"

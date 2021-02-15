@@ -12,75 +12,74 @@ namespace date_and_time = style::window::date_and_time;
 
 namespace gui
 {
-    DateWidget::DateWidget()
+    DateWidget::DateWidget(Item *parent) : VBox(parent)
     {
         setMinimumSize(style::window::default_body_width, date_and_time::height);
         setEdges(RectangleEdge::None);
-        setMargins(gui::Margins(date_and_time::leftMargin, date_and_time::margin, 0, 0));
+        setMargins(Margins(date_and_time::leftMargin, date_and_time::margin, 0, 0));
 
         buildInterface();
         applyCallbacks();
+        parent->addWidget(this);
     }
 
     void DateWidget::buildInterface()
     {
-        vBox = new gui::VBox(this, 0, 0, 0, 0);
-        vBox->setEdges(RectangleEdge::None);
-        vBox->activeItem = false;
-
-        labelsHBox = new gui::HBox(vBox, 0, 0, 0, 0);
+        labelsHBox = new HBox(this, 0, 0, 0, 0);
         labelsHBox->setMinimumSize(style::window::default_body_width, date_and_time::margin);
-        labelsHBox->setMargins(gui::Margins(0, 0, 0, date_and_time::margin / 4));
+        labelsHBox->setMargins(Margins(0, 0, 0, date_and_time::margin / 4));
         labelsHBox->setEdges(RectangleEdge::None);
         labelsHBox->activeItem = false;
 
-        dayLabel = new gui::Label(labelsHBox, 0, 0, 0, 0);
+        dayLabel = new Label(labelsHBox, 0, 0, 0, 0);
         applyLabelSpecificProperties(dayLabel);
         dayLabel->setText(utils::localize.get("app_settings_title_day"));
 
-        monthLabel = new gui::Label(labelsHBox, 0, 0, 0, 0);
+        monthLabel = new Label(labelsHBox, 0, 0, 0, 0);
         applyLabelSpecificProperties(monthLabel);
-        monthLabel->setMargins(gui::Margins(date_and_time::separator, 0, 0, 0));
+        monthLabel->setMargins(Margins(date_and_time::separator, 0, 0, 0));
         monthLabel->setText(utils::localize.get("app_settings_title_month"));
 
-        yearLabel = new gui::Label(labelsHBox, 0, 0, 0, 0);
+        yearLabel = new Label(labelsHBox, 0, 0, 0, 0);
         applyLabelSpecificProperties(yearLabel);
-        yearLabel->setMargins(gui::Margins(date_and_time::separator, 0, 0, 0));
+        yearLabel->setMargins(Margins(date_and_time::separator, 0, 0, 0));
         yearLabel->setText(utils::localize.get("app_settings_title_year"));
 
-        dateHBox = new gui::HBox(vBox, 0, 0, 0, 0);
+        dateHBox = new HBox(this, 0, 0, 0, 0);
         dateHBox->setMinimumSize(style::window::default_body_width, date_and_time::hBox_h);
         dateHBox->setEdges(RectangleEdge::None);
         dateHBox->activeItem = false;
 
-        dayInput = new gui::Label(dateHBox, 0, 0, 0, 0);
+        dayInput = new Label(dateHBox, 0, 0, 0, 0);
 
-        monthInput = new gui::Label(dateHBox, 0, 0, 0, 0);
-        monthInput->setMargins(gui::Margins(date_and_time::separator, 0, 0, 0));
+        monthInput = new Label(dateHBox, 0, 0, 0, 0);
+        monthInput->setMargins(Margins(date_and_time::separator, 0, 0, 0));
 
-        yearInput = new gui::Label(dateHBox, 0, 0, 0, 0);
-        yearInput->setMargins(gui::Margins(date_and_time::separator, 0, 0, 0));
+        yearInput = new Label(dateHBox, 0, 0, 0, 0);
+        yearInput->setMargins(Margins(date_and_time::separator, 0, 0, 0));
 
         applyItemSpecificProperties(dayInput);
         applyItemSpecificProperties(monthInput);
         applyItemSpecificProperties(yearInput);
+
+        resizeItems();
     }
 
-    void DateWidget::applyItemSpecificProperties(gui::Label *item)
+    void DateWidget::applyItemSpecificProperties(Label *item)
     {
         item->setMinimumSize(date_and_time::time_input_12h_w, date_and_time::hBox_h);
         item->setEdges(RectangleEdge::Bottom);
-        item->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        item->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         item->setFont(style::window::font::largelight);
         item->setPenFocusWidth(style::window::default_border_focus_w);
         item->setPenWidth(style::window::default_border_rect_no_focus);
     }
 
-    void DateWidget::applyLabelSpecificProperties(gui::Label *label)
+    void DateWidget::applyLabelSpecificProperties(Label *label)
     {
         label->setMinimumSize(date_and_time::time_input_12h_w, date_and_time::margin);
         label->setEdges(RectangleEdge::None);
-        label->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        label->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         label->setFont(style::window::font::small);
         label->activeItem = false;
     }
@@ -94,10 +93,10 @@ namespace gui
 
         inputCallback = [&](Item &item, const InputEvent &event) {
             auto focusedItem = getFocusItem();
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (event.state != InputEvent::State::keyReleasedShort) {
                 return false;
             }
-            if (event.keyCode == gui::KeyCode::KEY_ENTER || event.keyCode == gui::KeyCode::KEY_RF) {
+            if (event.keyCode == KeyCode::KEY_ENTER || event.keyCode == KeyCode::KEY_RF) {
                 return false;
             }
             if (focusedItem->onInput(event)) {
@@ -133,13 +132,6 @@ namespace gui
         setOnInputCallback(*dayInput);
         setOnInputCallback(*monthInput);
         setOnInputCallback(*yearInput);
-    }
-
-    bool DateWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-        return true;
     }
 
     calendar::YearMonthDay DateWidget::validateDate()
@@ -192,7 +184,7 @@ namespace gui
         return validateDate();
     }
 
-    void DateWidget::setDate(int keyValue, gui::Label &item)
+    void DateWidget::setDate(int keyValue, Label &item)
     {
         auto itemValue = item.getText();
         auto key       = std::to_string(keyValue);
@@ -209,17 +201,17 @@ namespace gui
         }
     }
 
-    void DateWidget::setOnInputCallback(gui::Label &dateInput)
+    void DateWidget::setOnInputCallback(Label &dateInput)
     {
         dateInput.inputCallback = [&](Item &item, const InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+            if (event.state != InputEvent::State::keyReleasedShort) {
                 return false;
             }
-            if (auto value = gui::toNumeric(event.keyCode); value >= 0) {
+            if (auto value = toNumeric(event.keyCode); value >= 0) {
                 setDate(value, dateInput);
                 return true;
             }
-            else if (event.is(gui::KeyCode::KEY_PND)) {
+            else if (event.is(KeyCode::KEY_PND)) {
                 clearInput(dateInput);
                 return true;
             }
@@ -227,7 +219,7 @@ namespace gui
         };
     }
 
-    void DateWidget::clearInput(gui::Label &dateInput)
+    void DateWidget::clearInput(Label &dateInput)
     {
         auto value = dateInput.getText();
         if (auto length = value.length(); length > 0) {

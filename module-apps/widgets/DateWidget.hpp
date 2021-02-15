@@ -1,42 +1,43 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include "application-calendar/data/dateCommon.hpp"
 #include <BoxLayout.hpp>
 #include <Label.hpp>
 #include <Text.hpp>
-#include "DateOrTimeListItem.hpp"
+#include <module-db/Interface/EventsRecord.hpp>
 
 namespace gui
 {
-    class DateWidget : public DateOrTimeListItem
+    class DateWidget : public VBox
     {
-        gui::VBox *vBox        = nullptr;
-        gui::HBox *labelsHBox  = nullptr;
-        gui::HBox *dateHBox    = nullptr;
-        gui::Label *dayLabel   = nullptr;
-        gui::Label *monthLabel = nullptr;
-        gui::Label *yearLabel  = nullptr;
-        gui::Label *dayInput   = nullptr;
-        gui::Label *monthInput = nullptr;
-        gui::Label *yearInput  = nullptr;
+        HBox *labelsHBox  = nullptr;
+        HBox *dateHBox    = nullptr;
+        Label *dayLabel   = nullptr;
+        Label *monthLabel = nullptr;
+        Label *yearLabel  = nullptr;
+        Label *dayInput   = nullptr;
+        Label *monthInput = nullptr;
+        Label *yearInput  = nullptr;
 
         void buildInterface();
-        void applyItemSpecificProperties(gui::Label *item);
-        void applyLabelSpecificProperties(gui::Label *label);
+        void applyItemSpecificProperties(Label *item);
+        void applyLabelSpecificProperties(Label *label);
         void applyCallbacks();
         calendar::YearMonthDay validateDate();
-        void setDate(int keyValue, gui::Label &item);
-        void setOnInputCallback(gui::Label &dateInput);
-        void clearInput(gui::Label &dateInput);
+        void setDate(int keyValue, Label &item);
+        void setOnInputCallback(Label &dateInput);
+        void clearInput(Label &dateInput);
 
       public:
-        DateWidget();
+        explicit DateWidget(Item *parent);
+        ~DateWidget() override = default;
 
         const calendar::YearMonthDay getChosenDate();
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+
+        std::function<void(std::shared_ptr<EventsRecord> event)> onLoadCallback = nullptr;
     };
 
 } /* namespace gui */

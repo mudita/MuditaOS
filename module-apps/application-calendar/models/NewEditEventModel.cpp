@@ -13,7 +13,7 @@
 #include <service-db/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 
-NewEditEventModel::NewEditEventModel(app::Application *app, bool mode24H) : application(app), mode24H(mode24H)
+NewEditEventModel::NewEditEventModel(app::Application *app) : application(app)
 {}
 
 unsigned int NewEditEventModel::requestRecordsCount()
@@ -72,19 +72,7 @@ void NewEditEventModel::createData(bool allDayEvent)
     allDayEventCheckBox = new gui::NewEventCheckBoxWithLabel(
         application, utils::localize.get("app_calendar_new_edit_event_allday"), this);
 
-    dateWidget = new gui::DateWidget();
-
-    startTimeWidget = new gui::TimeWidget(
-        utils::localize.get("app_calendar_new_edit_event_start"),
-        gui::TimeWidget::Type::Start,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
-
-    endTimeWidget = new gui::TimeWidget(
-        utils::localize.get("app_calendar_new_edit_event_end"),
-        gui::TimeWidget::Type::End,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+    calendarDateAndTimeBox = new gui::CalendarDateAndTimeBox(app);
 
     reminder = new gui::SeveralOptionsItem(
         application,
@@ -98,21 +86,11 @@ void NewEditEventModel::createData(bool allDayEvent)
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
-    endTimeWidget->setConnectionToSecondItem(startTimeWidget);
-    startTimeWidget->setConnectionToSecondItem(endTimeWidget);
-
-    startTimeWidget->setConnectionToDateItem(dateWidget);
-    endTimeWidget->setConnectionToDateItem(dateWidget);
-
-    allDayEventCheckBox->setConnectionToDateItem(dateWidget);
+    allDayEventCheckBox->setConnectionToDateItem(calendarDateAndTimeBox->getDateWidget());
 
     internalData.push_back(eventNameInput);
     internalData.push_back(allDayEventCheckBox);
-    internalData.push_back(dateWidget);
-    if (!allDayEvent) {
-        internalData.push_back(startTimeWidget);
-        internalData.push_back(endTimeWidget);
-    }
+    internalData.push_back(calendarDateAndTimeBox);
     internalData.push_back(reminder);
     internalData.push_back(repeat);
 
@@ -141,20 +119,6 @@ void NewEditEventModel::loadData(std::shared_ptr<EventsRecord> record)
         }
     }
 
-    if (isAllDayEvent()) {
-        record->date_from = record->date_from - TimePointToHourMinSec(record->date_from).hours() -
-                            TimePointToHourMinSec(record->date_from).minutes() +
-                            TimePointToHourMinSec(TimePointNow()).hours() +
-                            TimePointToHourMinSec(TimePointNow()).minutes();
-        record->date_till = record->date_from + std::chrono::hours(1);
-        if (startTimeWidget->onLoadCallback) {
-            startTimeWidget->onLoadCallback(record);
-        }
-        if (endTimeWidget->onLoadCallback) {
-            endTimeWidget->onLoadCallback(record);
-        }
-    }
-
     list->rebuildList();
 }
 
@@ -167,8 +131,6 @@ void NewEditEventModel::loadRepeat(const std::shared_ptr<EventsRecord> &record)
 
 void NewEditEventModel::loadDataWithoutTimeItem()
 {
-    internalData.erase(std::find(internalData.begin(), internalData.end(), startTimeWidget));
-    internalData.erase(std::find(internalData.begin(), internalData.end(), endTimeWidget));
     list->rebuildList();
 }
 
@@ -178,9 +140,7 @@ void NewEditEventModel::reloadDataWithTimeItem()
 
     internalData.push_back(eventNameInput);
     internalData.push_back(allDayEventCheckBox);
-    internalData.push_back(dateWidget);
-    internalData.push_back(startTimeWidget);
-    internalData.push_back(endTimeWidget);
+    internalData.push_back(calendarDateAndTimeBox);
     internalData.push_back(reminder);
     internalData.push_back(repeat);
 

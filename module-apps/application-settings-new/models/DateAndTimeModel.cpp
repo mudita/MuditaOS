@@ -61,20 +61,20 @@ void DateAndTimeModel::createData()
     auto app = application;
     assert(app != nullptr);
 
-    dateItem = new gui::DateWidget();
+    // dateItem = new gui::DateWidget();
 
-    timeItem = new gui::TimeWidget(
-        utils::localize.get("app_settings_title_time"),
-        gui::TimeWidget::Type::Start,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+    // timeItem = new gui::TimeWidget(
+    //     utils::localize.get("app_settings_title_time"),
+    //     gui::TimeWidget::Type::Start,
+    //     [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
+    //     [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
-    timeItem->setConnectionToDateItem(dateItem);
+    // timeItem->setConnectionToDateItem(dateItem);
 
-    internalData.push_back(dateItem);
-    internalData.push_back(timeItem);
+    // internalData.push_back(dateItem);
+    // internalData.push_back(timeItem);
 
-    for (auto &item : internalData) {
-        item->deleteByList = false;
-    }
+    // for (auto &item : internalData) {
+    //     item->deleteByList = false;
+    // }
 }

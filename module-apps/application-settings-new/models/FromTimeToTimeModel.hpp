@@ -7,6 +7,8 @@
 #include "InternalModel.hpp"
 #include <ListItemProvider.hpp>
 #include "widgets/TimeWidget.hpp"
+#include "module-db/Interface/EventsRecord.hpp"
+#include "module-apps/widgets/DateOrTimeListItem.hpp"
 
 class FromTimeToTimeModel : public app::InternalModel<gui::DateOrTimeListItem *>, public gui::ListItemProvider
 {

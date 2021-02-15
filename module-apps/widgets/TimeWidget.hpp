@@ -6,8 +6,8 @@
 #include <Label.hpp>
 #include <Text.hpp>
 #include <BoxLayout.hpp>
-#include "widgets/DateOrTimeListItem.hpp"
 #include "widgets/DateWidget.hpp"
+#include <module-db/Interface/EventsRecord.hpp>
 
 namespace gui
 {
@@ -17,7 +17,7 @@ namespace gui
         inline constexpr auto after_noon  = "PM";
     } // namespace timeConstants
 
-    class TimeWidget : public DateOrTimeListItem
+    class TimeWidget : public VBox
     {
       public:
         enum class Type
@@ -26,7 +26,8 @@ namespace gui
             End
         };
 
-        TimeWidget(const std::string &description,
+        TimeWidget(Item *parent,
+                   const std::string &description,
                    Type type,
                    std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                    std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
@@ -34,11 +35,11 @@ namespace gui
 
         void setConnectionToSecondItem(gui::TimeWidget *item);
         void setConnectionToDateItem(gui::DateWidget *item);
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+
+        std::function<void(std::shared_ptr<EventsRecord> event)> onLoadCallback = nullptr;
+        std::function<bool(std::shared_ptr<EventsRecord> event)> onSaveCallback = nullptr;
 
       private:
-        gui::VBox *vBox              = nullptr;
         gui::HBox *hBox              = nullptr;
         gui::Label *colonLabel       = nullptr;
         gui::Label *descriptionLabel = nullptr;

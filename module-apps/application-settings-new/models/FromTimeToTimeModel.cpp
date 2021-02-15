@@ -61,25 +61,25 @@ void FromTimeToTimeModel::createData()
     auto app = application;
     assert(app != nullptr);
 
-    fromTimeWidget = new gui::TimeWidget(
-        utils::localize.get("app_settings_nightshift_from"),
-        gui::TimeWidget::Type::Start,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+    // fromTimeWidget = new gui::TimeWidget(
+    //     utils::localize.get("app_settings_nightshift_from"),
+    //     gui::TimeWidget::Type::Start,
+    //     [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
+    //     [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
-    toTimeWidget = new gui::TimeWidget(
-        utils::localize.get("app_settings_nightshift_to"),
-        gui::TimeWidget::Type::End,
-        [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
-        [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+    // toTimeWidget = new gui::TimeWidget(
+    //     utils::localize.get("app_settings_nightshift_to"),
+    //     gui::TimeWidget::Type::End,
+    //     [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
+    //     [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
-    fromTimeWidget->setConnectionToSecondItem(toTimeWidget);
-    toTimeWidget->setConnectionToSecondItem(fromTimeWidget);
+    // fromTimeWidget->setConnectionToSecondItem(toTimeWidget);
+    // toTimeWidget->setConnectionToSecondItem(fromTimeWidget);
 
-    internalData.push_back(fromTimeWidget);
-    internalData.push_back(toTimeWidget);
+    // internalData.push_back(fromTimeWidget);
+    // internalData.push_back(toTimeWidget);
 
-    for (auto &item : internalData) {
-        item->deleteByList = false;
-    }
+    // for (auto &item : internalData) {
+    //     item->deleteByList = false;
+    // }
 }

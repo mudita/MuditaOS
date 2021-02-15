@@ -13,11 +13,12 @@ namespace gui
 {
     namespace date_and_time = style::window::date_and_time;
 
-    TimeWidget::TimeWidget(const std::string &description,
+    TimeWidget::TimeWidget(Item *parent,
+                           const std::string &description,
                            Type type,
                            std::function<void(const UTF8 &text)> bottomBarTemporaryMode,
                            std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : mode24H{!utils::dateAndTimeSettings.isTimeFormat12()}, type{type},
+        : VBox(parent), mode24H{!utils::dateAndTimeSettings.isTimeFormat12()}, type{type},
           bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
           bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
@@ -26,11 +27,7 @@ namespace gui
         setEdges(RectangleEdge::None);
         setMargins(gui::Margins(date_and_time::leftMargin, date_and_time::margin, 0, 0));
 
-        vBox = new gui::VBox(this, 0, 0, 0, 0);
-        vBox->setEdges(gui::RectangleEdge::None);
-        vBox->activeItem = false;
-
-        descriptionLabel = new gui::Label(vBox, 0, 0, 0, 0);
+        descriptionLabel = new gui::Label(this, 0, 0, 0, 0);
         descriptionLabel->setMinimumSize(style::window::default_body_width, date_and_time::margin);
         descriptionLabel->setMargins(gui::Margins(0, 0, 0, date_and_time::margin / 4));
         descriptionLabel->setEdges(gui::RectangleEdge::None);
@@ -38,7 +35,7 @@ namespace gui
         descriptionLabel->setFont(style::window::font::small);
         descriptionLabel->activeItem = false;
 
-        hBox = new gui::HBox(vBox, 0, 0, 0, 0);
+        hBox = new gui::HBox(this, 0, 0, 0, 0);
         hBox->setMinimumSize(style::window::default_body_width, date_and_time::hBox_h);
         hBox->setEdges(gui::RectangleEdge::None);
         hBox->activeItem = false;
@@ -98,7 +95,7 @@ namespace gui
                         hours = std::stoi(hourInput->getText().c_str());
                     }
                     catch (std::exception &e) {
-                        LOG_ERROR("TimeWidget::applyInputCallbacks hours: %s", e.what());
+                        LOG_ERROR("applyInputCallbacks hours: %s", e.what());
                         return true;
                     }
 
@@ -179,9 +176,6 @@ namespace gui
             minuteInput->setMinimumSize(date_and_time::time_input_12h_w, date_and_time::hBox_h);
 
             onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
-                if (!event) {
-                    return;
-                }
                 if (type == Type::Start) {
                     auto start_time = TimePointToHourMinSec(event->date_from);
 
@@ -265,13 +259,6 @@ namespace gui
 
         mode12hInput->setMinimumSize(date_and_time::time_input_12h_w, date_and_time::hBox_h);
         mode12hInput->setMargins(gui::Margins(date_and_time::separator, 0, 0, 0));
-    }
-
-    bool TimeWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-        return true;
     }
 
     void TimeWidget::setConnectionToSecondItem(gui::TimeWidget *item)
