@@ -10,7 +10,7 @@ namespace audio
     class ProfileRoutingHeadphones : public Profile
     {
       public:
-        ProfileRoutingHeadphones(std::function<int32_t()> callback, Volume volume, Gain gain)
+        ProfileRoutingHeadphones(Volume volume, Gain gain)
             : Profile("Routing Headset",
                       Type::RoutingHeadphones,
                       bsp::AudioDevice::Format{
@@ -23,8 +23,7 @@ namespace audio
                           .inputGain    = static_cast<float>(gain),
                           .inputPath    = bsp::AudioDevice::InputPath::Headphones,
                           .outputPath   = bsp::AudioDevice::OutputPath::HeadphonesMono},
-                      bsp::AudioDevice::Type::Audiocodec,
-                      callback)
+                      bsp::AudioDevice::Type::Audiocodec)
         {}
     };
 
