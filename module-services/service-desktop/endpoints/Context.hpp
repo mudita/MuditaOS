@@ -85,7 +85,7 @@ namespace parserFSM
         }
         virtual ~Context() noexcept = default;
 
-        virtual auto createSimpleResponse() -> std::string
+        virtual auto createSimpleResponse(const std::string &entryTitle = json::entries) -> std::string
         {
             json11::Json responseJson = json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
                                                              {json::status, static_cast<int>(responseContext.status)},
@@ -160,10 +160,10 @@ namespace parserFSM
             return pageSize;
         }
 
-        auto createSimpleResponse() -> std::string override
+        auto createSimpleResponse(const std::string &entryTitle = json::entries) -> std::string override
         {
             auto elemsCount = responseContext.body.array_items().size();
-            auto newBody    = json11::Json::object{{json::entries, responseContext.body},
+            auto newBody    = json11::Json::object{{entryTitle, responseContext.body},
                                                 {json::totalCount, static_cast<int>(totalCount)}};
             if (requestedLimit > elemsCount) {
                 std::size_t offset = requestedOffset + elemsCount;
@@ -184,6 +184,7 @@ namespace parserFSM
     namespace endpoint_pageing
     {
         inline constexpr std::size_t contactsPageSize = 10;
+        inline constexpr std::size_t calendarEventsPageSize = 10;
     }
 
     class ContextFactory
@@ -193,7 +194,8 @@ namespace parserFSM
         {
             switch (static_cast<EndpointType>(js[json::endpoint].int_value())) {
             // enable for pagination in other endpoints
-            // case EndpointType::calendarEvents:
+            case EndpointType::calendarEvents:
+                return std::make_unique<PagedContext>(js, endpoint_pageing::calendarEventsPageSize);
             // case EndpointType::calllog:
             case EndpointType::contacts:
                 // case EndpointType::messages:

@@ -18,6 +18,7 @@
 #include <queries/calendar/QueryEventsRemoveICS.hpp>
 #include <queries/calendar/QueryEventsGetAllLimited.hpp>
 #include <variant>
+#include <utility>
 
 namespace parserFSM
 {
@@ -76,10 +77,8 @@ namespace parserFSM
                 constexpr inline auto iCalUid = "iCalUid";
             } // namespace provider
         }     // namespace event
-        constexpr inline auto offset      = "offset";
         constexpr inline auto limit       = "limit";
-        constexpr inline auto count       = "count";
-        constexpr inline auto total_count = "total_count";
+        constexpr inline auto offset      = "offset";
 
     } // namespace json::calendar
 } // namespace parserFSM
@@ -232,49 +231,45 @@ auto CalendarEventsHelper::eventJsonObjectFrom(EventsRecord record) const -> jso
 
 auto CalendarEventsHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
 {
-    const auto obj  = context.getBody();
-    uint32_t offset = obj[json::calendar::offset].int_value();
-    uint32_t limit  = obj[json::calendar::limit].int_value();
-    auto query      = std::make_unique<db::query::events::GetAllLimited>(offset, limit);
+    try {
+        auto &ctx          = dynamic_cast<PagedContext &>(context);
+        std::size_t limit  = ctx.getBody()[json::calendar::limit].int_value();
+        std::size_t offset = ctx.getBody()[json::calendar::offset].int_value();
+        ctx.setRequestedLimit(limit);
+        ctx.setRequestedOffset(offset);
+        auto query = std::make_unique<db::query::events::GetAllLimited>(offset, std::min(ctx.getPageSize(), limit));
 
-    auto listener = std::make_unique<db::EndpointListener>(
-        [&](db::QueryResult *result, Context context) {
-            if (auto EventsResult = dynamic_cast<db::query::events::GetAllLimitedResult *>(result)) {
-                auto records        = EventsResult->getResult();
-                uint32_t totalCount = EventsResult->getCountResult();
-                auto parser         = std::make_unique<ParserICS>();
-                std::vector<ICalEvent> icalEvents;
+        auto listener = std::make_unique<db::EndpointListenerWithPages>(
+            [&](db::QueryResult *result, PagedContext &context) {
+                if (auto EventsResult = dynamic_cast<db::query::events::GetAllLimitedResult *>(result)) {
+                    auto records        = EventsResult->getResult();
+                    uint32_t totalCount = EventsResult->getCountResult();
+                    auto parser         = std::make_unique<ParserICS>();
+                    std::vector<ICalEvent> icalEvents;
+                    context.setTotalCount(totalCount);
+                    auto eventsArray = json11::Json::array();
 
-                auto eventsArray = json11::Json::array();
+                    for (const auto &rec : records) {
+                        auto eventObject = eventJsonObjectFrom(rec);
+                        eventsArray.emplace_back(eventObject);
+                    }
+                    context.setResponseBody(eventsArray);
+                    MessageHandler::putToSendQueue(context.createSimpleResponse(json::calendar::events));
 
-                for (auto rec : records) {
-                    auto eventObject = eventJsonObjectFrom(rec);
-
-                    eventsArray.emplace_back(eventObject);
+                    return true;
                 }
+                return false;
+            },
+            ctx);
 
-                auto jsonObj = json11::Json::object({{json::calendar::events, eventsArray},
-                                                     {json::calendar::count, std::to_string(records.size())},
-                                                     {json::calendar::total_count, std::to_string(totalCount)}});
-
-                context.setResponseBody(jsonObj);
-                MessageHandler::putToSendQueue(context.createSimpleResponse());
-
-                return true;
-            }
-            return false;
-        },
-        context);
-
-    query->setQueryListener(std::move(listener));
-    auto [ret, _] = DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
-
-    if (ret) {
-        return sys::ReturnCodes::Success;
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Events, std::move(query));
     }
-    else {
+    catch (const std::exception &e) {
+        LOG_ERROR("%s", e.what());
         return sys::ReturnCodes::Failure;
     }
+    return sys::ReturnCodes::Success;
 }
 
 auto CalendarEventsHelper::frequencyToCustomRepeat(Frequency freq) const -> uint32_t
