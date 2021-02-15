@@ -10,7 +10,7 @@ namespace audio
     class ProfileRecordingOnBoardMic : public Profile
     {
       public:
-        ProfileRecordingOnBoardMic(std::function<int32_t()> callback, Gain gain)
+        ProfileRecordingOnBoardMic(Gain gain)
             : Profile(
                   "Recording On Board Microphone",
                   Type::RecordingBuiltInMic,
@@ -22,8 +22,7 @@ namespace audio
                                            .inputGain    = static_cast<float>(gain),
                                            .inputPath    = bsp::AudioDevice::InputPath::Microphone,
                                            .outputPath   = bsp::AudioDevice::OutputPath::None},
-                  bsp::AudioDevice::Type::Audiocodec,
-                  callback)
+                  bsp::AudioDevice::Type::Audiocodec)
         {}
     };
 

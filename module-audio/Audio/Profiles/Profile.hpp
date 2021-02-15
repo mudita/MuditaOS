@@ -43,7 +43,6 @@ namespace audio
         };
 
         static std::unique_ptr<Profile> Create(const Type t,
-                                               std::function<int32_t()> callback = nullptr,
                                                std::optional<Volume> vol         = 0,
                                                std::optional<Gain> gain          = 0);
 
@@ -113,16 +112,13 @@ namespace audio
         Profile(const std::string &name,
                 const Type type,
                 const bsp::AudioDevice::Format &fmt,
-                bsp::AudioDevice::Type devType,
-                std::function<int32_t()> callback);
+                bsp::AudioDevice::Type devType);
 
         bsp::AudioDevice::Format audioFormat{};
         bsp::AudioDevice::Type audioDeviceType = bsp::AudioDevice::Type::Audiocodec;
 
         std::string name;
         Type type = Type::Idle;
-
-        std::function<int32_t()> dbAccessCallback = nullptr;
     };
 
     [[nodiscard]] const std::string str(const Profile::Type &profileType);

@@ -11,7 +11,7 @@ namespace audio
     class ProfileIdle : public Profile
     {
       public:
-        ProfileIdle() : Profile("Idle", Type::Idle, bsp::AudioDevice::Format{}, bsp::AudioDevice::Type::None, nullptr)
+        ProfileIdle() : Profile("Idle", Type::Idle, bsp::AudioDevice::Format{}, bsp::AudioDevice::Type::None)
         {}
     };
 

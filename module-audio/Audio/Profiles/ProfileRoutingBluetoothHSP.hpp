@@ -10,7 +10,7 @@ namespace audio
     class ProfileRoutingBluetoothHSP : public Profile
     {
       public:
-        ProfileRoutingBluetoothHSP(std::function<int32_t()> callback, Volume volume, Gain gain)
+        ProfileRoutingBluetoothHSP(Volume volume, Gain gain)
             : Profile("Routing Bluetooth HSP",
                       Type::RoutingBluetoothHSP,
                       bsp::AudioDevice::Format{
@@ -23,8 +23,7 @@ namespace audio
                           .inputGain    = static_cast<float>(gain),
                           .inputPath    = bsp::AudioDevice::InputPath::BluetoothHSP,
                           .outputPath   = bsp::AudioDevice::OutputPath::BluetoothHSP},
-                      bsp::AudioDevice::Type::Bluetooth,
-                      callback)
+                      bsp::AudioDevice::Type::Bluetooth)
         {}
     };
 
