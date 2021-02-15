@@ -25,7 +25,7 @@ namespace gui
         setPenWidth(window::default_border_no_focus_w);
 
         contact = createEmptyLabel(this);
-        contact->setFont(style::window::font::big);
+        contact->setFont(style::window::font::bigbold);
         contact->setEllipsis(Ellipsis::Right);
         contact->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
 
