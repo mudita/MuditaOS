@@ -50,14 +50,11 @@ namespace gui
         timestamp->setEdges(gui::RectangleEdge::None);
         timestamp->setFont(style::window::font::small);
         timestamp->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center});
-    }
 
-    bool CalllogItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void CalllogItem::setCall(std::shared_ptr<CalllogRecord> &call)

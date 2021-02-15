@@ -24,7 +24,6 @@ namespace gui
                                        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                                        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
         ~InputBoxWithLabelAndIconWidget() override = default;
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         gui::HBox *hBox              = nullptr;
         gui::Label *inputBoxLabel    = nullptr;
         gui::Label *descriptionLabel = nullptr;

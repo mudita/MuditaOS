@@ -33,7 +33,6 @@ namespace gui
         void updateDraftMessage(const UTF8 &inputText);
         void displayDraftMessage() const;
 
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
     };
 

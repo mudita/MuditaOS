@@ -41,6 +41,11 @@ namespace gui
         description->setEdges(gui::RectangleEdge::None);
         description->setFont(style::window::font::medium);
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            vBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void DayEventsItem::setEvent(std::shared_ptr<EventsRecord> rec)
@@ -55,12 +60,4 @@ namespace gui
             }
         }
     }
-
-    bool DayEventsItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-        return true;
-    }
-
 } /* namespace gui */

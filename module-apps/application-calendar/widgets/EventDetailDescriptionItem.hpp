@@ -23,8 +23,6 @@ namespace gui
         virtual ~EventDetailDescriptionItem() override = default;
 
         void descriptionHandler();
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

@@ -24,9 +24,6 @@ namespace gui
         void setMarkerItem(UTF8 text);
         [[nodiscard]] UTF8 getLabelMarker() const;
         void setEvent(std::shared_ptr<EventsRecord> record);
-
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

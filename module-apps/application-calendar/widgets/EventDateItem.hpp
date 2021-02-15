@@ -34,8 +34,6 @@ namespace gui
         EventDateItem();
 
         const calendar::YearMonthDay getChosenDate();
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

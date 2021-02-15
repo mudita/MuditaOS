@@ -17,4 +17,12 @@ namespace gui
         ListItem();
     };
 
+    template <class T> class ListItemWithCallbacks : public ListItem
+    {
+      public:
+        std::function<bool()> onEmptyCallback                          = nullptr;
+        std::function<bool()> onContentChangedCallback                 = nullptr;
+        std::function<void(std::shared_ptr<T> contact)> onSaveCallback = nullptr;
+        std::function<void(std::shared_ptr<T> contact)> onLoadCallback = nullptr;
+    };
 } /* namespace gui */

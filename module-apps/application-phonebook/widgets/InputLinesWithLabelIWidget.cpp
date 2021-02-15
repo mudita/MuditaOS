@@ -80,15 +80,13 @@ namespace gui
             }
             return result;
         };
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            vBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
+
         setEdges(RectangleEdge::None);
-    }
-
-    auto InputLinesWithLabelIWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-
-        return true;
     }
 
     void InputLinesWithLabelIWidget::applyItemNameSpecificSettings()

@@ -89,14 +89,12 @@ namespace gui
         reminder->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         reminder->activeItem = false;
 
-        descriptionHandler();
-    }
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
 
-    bool RepeatAndReminderItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        return true;
+        descriptionHandler();
     }
 
     void RepeatAndReminderItem::descriptionHandler()

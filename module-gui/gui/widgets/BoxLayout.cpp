@@ -551,6 +551,7 @@ namespace gui
     {
         type = ItemType::HBOX;
     }
+
     HBox::HBox(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
         : BoxLayout(parent, x, y, w, h)
     {

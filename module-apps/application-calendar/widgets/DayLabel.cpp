@@ -86,6 +86,11 @@ namespace gui
             this->setPenFocusWidth(style::window::default_border_focus_w);
             this->setEdges(RectangleEdge::Top | RectangleEdge::Bottom);
         }
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            vBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     uint32_t DayLabel::getDayNumber()
@@ -105,10 +110,4 @@ namespace gui
         }
     }
 
-    bool DayLabel::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        this->vBox->setPosition(0, 0);
-        this->vBox->setSize(newDim.w, newDim.h);
-        return true;
-    }
 } /* namespace gui */

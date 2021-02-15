@@ -20,7 +20,6 @@ namespace gui
         OutputLinesTextWithLabelWidget(phonebookInternals::ListItemName listItemName);
 
         ~OutputLinesTextWithLabelWidget() override = default;
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         VBox *vBox          = nullptr;
         Label *titleLabel   = nullptr;
         Text *multilineText = nullptr;

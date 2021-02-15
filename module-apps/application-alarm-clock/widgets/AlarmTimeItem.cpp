@@ -123,6 +123,11 @@ namespace gui
 
         onInputCallback(*hourInput);
         onInputCallback(*minuteInput);
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void AlarmTimeItem::onInputCallback(gui::Text &textItem)
@@ -201,13 +206,6 @@ namespace gui
                 minuteInput->setText(TimePointToMinutesString(alarm->time));
             };
         }
-    }
-
-    bool AlarmTimeItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        return true;
     }
 
     bool AlarmTimeItem::isPm(const std::string &text) const

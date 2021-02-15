@@ -43,13 +43,11 @@ namespace gui
         onOffImage->setMargins(gui::Margins(style::alarmClock::window::item::imageMargin, 0, 0, 0));
 
         setAlarm();
-    }
 
-    bool AlarmItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void AlarmItem::setAlarm()
