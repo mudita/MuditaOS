@@ -267,7 +267,7 @@ namespace gui
             return false;
         }
 
-        if (nextBlock != blocksEnd() && nextBlock->isEmpty() && nextBlock != (--blocksEnd())) {
+        if (nextBlock != blocksEnd() && nextBlock->isEmpty()) {
             debug_cursor("Next empty block removed");
             document->removeBlock(nextBlock);
         }
@@ -280,8 +280,7 @@ namespace gui
 
         block->removeChar(pos);
 
-        if (block->isEmpty() && block != blocksEnd() &&
-            !(prevBlock->getEnd() == TextBlock::End::Newline && nextBlock->isEmpty())) {
+        if (block->isEmpty() && block == blocksBegin()) {
             debug_cursor("Current empty block removed");
             document->removeBlock(block);
         }
