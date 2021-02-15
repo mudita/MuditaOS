@@ -14,7 +14,9 @@ from harness import log
 from harness.harness import Harness
 from harness import utils
 from harness.interface.error import TestError, Error
-from harness.interface.CDCSerial import CDCSerial as serial
+from harness.interface.CDCSerial import Keytype, CDCSerial as serial
+from harness.interface.defs import key_codes
+
 
 simulator_port = 'simulator'
 
@@ -120,6 +122,19 @@ def phones_unlocked(harnesses):
     for harness in harnesses:
         harness.unlock_phone()
         assert harness.is_phone_unlocked
+
+
+@pytest.fixture(scope='session')
+def phone_in_desktop(harness):
+    # go to desktop
+    if harness.get_application_name() != "ApplicationDesktop":
+        harness.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
+        # in some cases we have to do it twice
+        if harness.get_application_name() != "ApplicationDesktop":
+            harness.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
+    # assert that we are in ApplicationDesktop
+    assert harness.get_application_name() == "ApplicationDesktop"
+
 
 def pytest_configure(config):
     config.addinivalue_line("markers",

@@ -7,7 +7,7 @@ from harness import utils, log
 from harness.interface import CDCSerial as serial
 from harness.interface.defs import key_codes, endpoint, method
 from harness.interface.CDCSerial import Keytype
-from harness.utils import send_keystoke, application_keypath, send_char
+from harness.utils import send_keystoke, application_keypath, send_char, clear_last_char
 from harness.interface.error import TestError, Error
 import random
 
@@ -73,6 +73,7 @@ class Harness:
         send_keystoke(application_keypath[app], self.connection)
 
     def send_text(self, text: str):
+        clear_last_char()
         for letter in text:
             try:
                 send_char(letter, self.connection)
