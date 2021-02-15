@@ -10,7 +10,7 @@ namespace audio
     class ProfileRoutingEarspeaker : public Profile
     {
       public:
-        ProfileRoutingEarspeaker(std::function<int32_t()> callback, Volume volume, Gain gain)
+        ProfileRoutingEarspeaker(Volume volume, Gain gain)
             : Profile("Routing Earspeaker",
                       Type::RoutingEarspeaker,
                       bsp::AudioDevice::Format{
@@ -23,8 +23,7 @@ namespace audio
                           .inputGain    = static_cast<float>(gain),
                           .inputPath    = bsp::AudioDevice::InputPath::Microphone,
                           .outputPath   = bsp::AudioDevice::OutputPath::Earspeaker},
-                      bsp::AudioDevice::Type::Audiocodec,
-                      callback)
+                      bsp::AudioDevice::Type::Audiocodec)
         {}
     };
 

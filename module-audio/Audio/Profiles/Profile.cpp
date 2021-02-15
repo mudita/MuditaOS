@@ -25,7 +25,6 @@ namespace audio
 {
 
     std::unique_ptr<Profile> Profile::Create(const Type t,
-                                             std::function<int32_t()> callback,
                                              std::optional<Volume> vol,
                                              std::optional<Gain> gain)
     {
@@ -34,43 +33,43 @@ namespace audio
         switch (t) {
         case Type::PlaybackHeadphones:
             assert(vol);
-            inst = std::make_unique<ProfilePlaybackHeadphones>(callback, vol.value());
+            inst = std::make_unique<ProfilePlaybackHeadphones>(vol.value());
             break;
         case Type::PlaybackLoudspeaker:
             assert(vol);
-            inst = std::make_unique<ProfilePlaybackLoudspeaker>(callback, vol.value());
+            inst = std::make_unique<ProfilePlaybackLoudspeaker>(vol.value());
             break;
         case Type::PlaybackBluetoothA2DP:
             assert(vol);
-            inst = std::make_unique<ProfilePlaybackBluetoothA2DP>(callback, vol.value());
+            inst = std::make_unique<ProfilePlaybackBluetoothA2DP>(vol.value());
             break;
         case Type::RecordingBuiltInMic:
             assert(gain);
-            inst = std::make_unique<ProfileRecordingOnBoardMic>(callback, gain.value());
+            inst = std::make_unique<ProfileRecordingOnBoardMic>(gain.value());
             break;
         case Type::RecordingHeadphones:
             assert(gain);
-            inst = std::make_unique<ProfileRecordingHeadphones>(callback, gain.value());
+            inst = std::make_unique<ProfileRecordingHeadphones>(gain.value());
             break;
         case Type::RecordingBluetoothHSP:
             assert(gain);
-            inst = std::make_unique<ProfileRecordingBluetoothHSP>(callback, gain.value());
+            inst = std::make_unique<ProfileRecordingBluetoothHSP>(gain.value());
             break;
         case Type::RoutingHeadphones:
             assert(gain && vol);
-            inst = std::make_unique<ProfileRoutingHeadphones>(callback, vol.value(), gain.value());
+            inst = std::make_unique<ProfileRoutingHeadphones>(vol.value(), gain.value());
             break;
         case Type::RoutingLoudspeaker:
             assert(gain && vol);
-            inst = std::make_unique<ProfileRoutingLoudspeaker>(callback, vol.value(), gain.value());
+            inst = std::make_unique<ProfileRoutingLoudspeaker>(vol.value(), gain.value());
             break;
         case Type::RoutingEarspeaker:
             assert(gain && vol);
-            inst = std::make_unique<ProfileRoutingEarspeaker>(callback, vol.value(), gain.value());
+            inst = std::make_unique<ProfileRoutingEarspeaker>(vol.value(), gain.value());
             break;
         case Type::RoutingBluetoothHSP:
             assert(gain && vol);
-            inst = std::make_unique<ProfileRoutingBluetoothHSP>(callback, vol.value(), gain.value());
+            inst = std::make_unique<ProfileRoutingBluetoothHSP>(vol.value(), gain.value());
             break;
         case Type::Idle:
             inst = std::make_unique<ProfileIdle>();
@@ -83,41 +82,28 @@ namespace audio
     Profile::Profile(const std::string &name,
                      const Type type,
                      const bsp::AudioDevice::Format &fmt,
-                     bsp::AudioDevice::Type devType,
-                     std::function<int32_t()> callback)
-        : audioFormat(fmt), audioDeviceType(devType), name(name), type(type), dbAccessCallback(callback)
+                     bsp::AudioDevice::Type devType)
+        : audioFormat(fmt), audioDeviceType(devType), name(name), type(type)
     {}
 
     void Profile::SetInputGain(Gain gain)
     {
         audioFormat.inputGain = gain;
-        if (dbAccessCallback) {
-            dbAccessCallback();
-        }
     }
 
     void Profile::SetOutputVolume(Volume vol)
     {
         audioFormat.outputVolume = vol;
-        if (dbAccessCallback) {
-            dbAccessCallback();
-        }
     }
 
     void Profile::SetInputPath(bsp::AudioDevice::InputPath path)
     {
         audioFormat.inputPath = path;
-        if (dbAccessCallback) {
-            dbAccessCallback();
-        }
     }
 
     void Profile::SetOutputPath(bsp::AudioDevice::OutputPath path)
     {
         audioFormat.outputPath = path;
-        if (dbAccessCallback) {
-            dbAccessCallback();
-        }
     }
 
     void Profile::SetInOutFlags(uint32_t flags)

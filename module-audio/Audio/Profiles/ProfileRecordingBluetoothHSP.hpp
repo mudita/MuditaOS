@@ -11,7 +11,7 @@ namespace audio
     class ProfileRecordingBluetoothHSP : public Profile
     {
       public:
-        ProfileRecordingBluetoothHSP(std::function<int32_t()> callback, Gain gain)
+        ProfileRecordingBluetoothHSP(Gain gain)
             : Profile(
                   "Recording Bluetooth HSP",
                   Type::RecordingHeadphones,
@@ -23,8 +23,7 @@ namespace audio
                                            .inputGain    = static_cast<float>(gain),
                                            .inputPath    = bsp::AudioDevice::InputPath::BluetoothHSP,
                                            .outputPath   = bsp::AudioDevice::OutputPath::None},
-                  bsp::AudioDevice::Type::Bluetooth,
-                  callback)
+                  bsp::AudioDevice::Type::Bluetooth)
         {}
     };
 

@@ -91,7 +91,7 @@ namespace audio
             gain = utils::getNumericValue<audio::Gain>(val.value());
         }
 
-        supportedProfiles.emplace_back(Profile::Create(profile, nullptr, volume, gain), isAvailable);
+        supportedProfiles.emplace_back(Profile::Create(profile, volume, gain), isAvailable);
     }
 
     std::optional<std::unique_ptr<bsp::AudioDevice>> Operation::CreateDevice(bsp::AudioDevice::Type type)
