@@ -97,6 +97,7 @@ namespace gui
         bool removeWidget(Item *item) override;
         bool erase(Item *item) override;
         void erase() override;
+        [[nodiscard]] bool empty() const noexcept;
         /// add item if it will fit in box, return true on success
         /// axis sets direction to define space left in container
         template <Axis axis> void addWidget(Item *item);

@@ -9,7 +9,6 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 
-#include <Service/Bus.hpp>
 #include <json/json11.hpp>
 
 #include <memory>
@@ -22,7 +21,7 @@ auto RestoreEndpoint::handle(Context &context) -> void
 
         if (context.getBody()[parserFSM::json::restoreRequest] == true) {
             auto msg = std::make_shared<sdesktop::RestoreMessage>();
-            sys::Bus::SendUnicast(msg, service::name::service_desktop, ownerServicePtr);
+            ownerServicePtr->bus.sendUnicast(msg, service::name::service_desktop);
 
             context.setResponseBody(json11::Json::object({{parserFSM::json::restoreRequest, true}}));
         }

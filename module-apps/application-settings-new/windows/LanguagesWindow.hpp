@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "application-settings-new/models/LanguagesModel.hpp"
+#include "application-settings-new/ApplicationSettings.hpp"
 #include "BaseSettingsWindow.hpp"
 #include <i18n/i18n.hpp>
 
@@ -12,17 +12,15 @@ namespace gui
     class LanguagesWindow : public BaseSettingsWindow
     {
       public:
-        explicit LanguagesWindow(app::Application *app);
+        explicit LanguagesWindow(app::Application *app, std::string name = window::name::languages);
 
-      private:
-        void addOptions(std::list<Option> &optionList) override;
+      protected:
         auto buildOptionsList() -> std::list<Option> override;
-        auto handleSwitchData(SwitchData *data) -> bool override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void setLanguageIndex();
 
         utils::LangLoader loader;
         const std::vector<Language> langList;
-        LanguagesModel languagesModel;
         Language selectedLanguage;
         unsigned int selectedLanguageIndex{0};
     };

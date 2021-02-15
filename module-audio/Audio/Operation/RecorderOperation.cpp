@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RecorderOperation.hpp"
@@ -37,7 +37,7 @@ namespace audio
             // during sf tests on hardware
 #endif
             if (ret == 0) {
-                state = State::Idle;
+                state          = State::Idle;
                 const auto req = AudioServiceMessage::FileSystemNoSpace(operationToken);
                 serviceCallback(&req);
             }
@@ -82,7 +82,7 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
         operationToken = token;
-        state         = State::Active;
+        state          = State::Active;
 
         if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
             auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
@@ -122,7 +122,7 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
 
-        state = State::Active;
+        state    = State::Active;
         auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
         return GetDeviceError(ret);
     }
@@ -157,7 +157,7 @@ namespace audio
             return RetCode::UnsupportedProfile;
         }
 
-        audioDevice = CreateDevice(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        audioDevice = CreateDevice(currentProfile->GetAudioDeviceType()).value_or(nullptr);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef DATECOMMON_H
@@ -150,6 +150,7 @@ inline std::string TimePointToString(const TimePoint &tp, date::months months)
 {
     date::year_month_day yearMonthDay     = date::year_month_day{date::floor<date::days>(tp)};
     date::year_month_day yearMonthDayLast = yearMonthDay.year() / yearMonthDay.month() / date::last;
+    auto tpHourMinuteSecond               = TimePointToHourMinSec(tp).to_duration();
 
     TimePoint timePoint;
 

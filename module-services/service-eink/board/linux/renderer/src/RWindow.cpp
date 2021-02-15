@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RWindow.hpp"
@@ -61,6 +61,9 @@ void RWindow::keyMapInit(void)
     batteryKeyMap.insert(std::pair<int8_t, uint32_t>('[', 1));
     batteryKeyMap.insert(std::pair<int8_t, uint32_t>(']', 2));
     batteryKeyMap.insert(std::pair<int8_t, uint32_t>('p', 3));
+    batteryKeyMap.insert(std::pair<int8_t, uint32_t>('l', 3));
+    batteryKeyMap.insert(std::pair<int8_t, uint32_t>(';', 4));
+    batteryKeyMap.insert(std::pair<int8_t, uint32_t>('\'', 5));
 }
 void RWindow::updateDrawBuffer()
 {

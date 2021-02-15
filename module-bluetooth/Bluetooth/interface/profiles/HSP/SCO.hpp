@@ -5,13 +5,12 @@
 
 #include "Profile.hpp"
 #include <memory>
-#include <module-sys/Service/Bus.hpp>
 
 extern "C"
 {
 #include <module-bluetooth/lib/btstack/src/bluetooth.h>
 };
-namespace Bt
+namespace bluetooth
 {
 
     class SCO

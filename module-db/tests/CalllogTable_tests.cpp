@@ -17,12 +17,12 @@ TEST_CASE("Calllog Table tests")
 {
     Database::initialize();
 
-    const auto callogPath = (std::filesystem::path{"user"} / "calllog.db");
-    if (std::filesystem::exists(callogPath)) {
-        REQUIRE(std::filesystem::remove(callogPath));
+    const auto calllogPath = (std::filesystem::path{"user"} / "calllog.db");
+    if (std::filesystem::exists(calllogPath)) {
+        REQUIRE(std::filesystem::remove(calllogPath));
     }
 
-    CalllogDB calllogDb{callogPath.c_str()};
+    CalllogDB calllogDb{calllogPath.c_str()};
     REQUIRE(calllogDb.isInitialized());
 
     auto &callsTbl = calllogDb.calls;

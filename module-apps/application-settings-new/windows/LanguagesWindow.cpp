@@ -4,23 +4,25 @@
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/data/LanguagesData.hpp"
 #include "LanguagesWindow.hpp"
+
+#include <utility>
 #include "OptionSetting.hpp"
 #include "service-appmgr/Controller.hpp"
 
 namespace gui
 {
-    LanguagesWindow::LanguagesWindow(app::Application *app)
-        : BaseSettingsWindow(app, window::name::languages), langList(loader.getAvailableDisplayLanguages()),
-          languagesModel(app)
+    LanguagesWindow::LanguagesWindow(app::Application *app, std::string name)
+        : BaseSettingsWindow(app, std::move(name)), langList(loader.getAvailableDisplayLanguages())
     {
         setTitle(utils::localize.get("app_settings_title_languages"));
-        languagesModel.requestCurrentDisplayLanguage();
     }
 
-    void LanguagesWindow::addOptions(std::list<Option> &optionList)
+    void LanguagesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        OptionWindow::addOptions(optionList);
-        optionsList->setFocusOnElement(selectedLanguageIndex);
+        selectedLanguage = utils::localize.getDisplayLanguage();
+        setLanguageIndex();
+
+        refreshOptionsList(selectedLanguageIndex);
     }
 
     auto LanguagesWindow::buildOptionsList() -> std::list<gui::Option>
@@ -41,18 +43,6 @@ namespace gui
         }
 
         return options;
-    }
-
-    auto LanguagesWindow::handleSwitchData(SwitchData *data) -> bool
-    {
-        auto *languagesData = dynamic_cast<LanguagesData *>(data);
-        if (languagesData == nullptr) {
-            return false;
-        }
-        selectedLanguage = languagesData->getCurrentDisplayLanguage();
-        setLanguageIndex();
-
-        return true;
     }
 
     void LanguagesWindow::setLanguageIndex()

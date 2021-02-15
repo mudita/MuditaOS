@@ -3,11 +3,6 @@
 
 #include "Message.hpp"
 #include "Service.hpp"
-#include "Bus.hpp"
-#include "Channel.hpp"
-#include "ticks.hpp"
-
-#include <string.h>
 
 namespace sys
 {
@@ -16,7 +11,7 @@ namespace sys
         return std::make_pair(retCode, msg);
     }
 
-    Message::Message(BusChannels channel) : channel{channel}
+    Message::Message(BusChannel channel) : channel{channel}
     {}
 
     MessagePointer Message::Execute(Service *service)
@@ -25,7 +20,7 @@ namespace sys
     }
 
     SystemMessage::SystemMessage(SystemMessageType systemMessageType, ServicePowerMode pwrMode)
-        : Message(BusChannels::System), systemMessageType(systemMessageType), powerMode(pwrMode)
+        : Message(BusChannel::System), systemMessageType(systemMessageType), powerMode(pwrMode)
     {
         type = Type::System;
     }
@@ -40,7 +35,7 @@ namespace sys
         type = Type::Data;
     }
 
-    DataMessage::DataMessage(BusChannels channel) : Message(channel)
+    DataMessage::DataMessage(BusChannel channel) : Message(channel)
     {
         type = Type::Data;
     }

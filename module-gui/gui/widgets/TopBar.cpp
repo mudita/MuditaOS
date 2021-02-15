@@ -184,7 +184,7 @@ namespace gui::top_bar
             showBattery(enabled);
             break;
         case Indicator::SimCard:
-            simSet();
+            showSim(enabled);
             break;
         case Indicator::NetworkAccessTechnology:
             updateNetworkAccessTechnology();
@@ -249,6 +249,15 @@ namespace gui::top_bar
                 break;
             }
         }
+    }
+
+    void TopBar::showSim(bool enabled)
+    {
+        if (!enabled) {
+            sim->setVisible(false);
+            return;
+        }
+        sim->show(Store::GSM::get()->sim);
     }
 
     bool TopBar::updateSignalStrength()
@@ -326,10 +335,7 @@ namespace gui::top_bar
         if (sim == nullptr) {
             return;
         }
-        if (configuration.isEnabled(Indicator::SimCard)) {
-            return sim->show(Store::GSM::get()->sim);
-        }
-        sim->visible = false;
+        showSim(configuration.isEnabled(Indicator::SimCard));
     }
 
     void TopBar::accept(GuiVisitor &visitor)

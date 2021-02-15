@@ -6,6 +6,8 @@
 #include "drivers/i2c/DriverI2C.hpp"
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
+#include "drivers/lpspi/DriverLPSPI.hpp"
+#include "drivers/usdhc/DriverUSDHC.hpp"
 
 enum class BoardDefinitions
 {
@@ -65,7 +67,8 @@ enum class BoardDefinitions
     CELLULAR_GPIO_2_RESET_PIN = 17,
     CELLULAR_GPIO_2_RI_PIN = 21,
     CELLULAR_GPIO_2_APRDY_PIN = 16,
-    CELLULAR_GPIO_2_WAKEUP_PIN = 19,
+    CELLULAR_GPIO_2_WAKEUP_PIN = 22, /// GPIO_B1_06, long time no see. Active low, external pull-down 10kΩ
+    CELLULAR_GPIO_2_WIRELESS_DISABLE_PIN = 23, /// GPIO_B1_07, pull-up in modem, active low, equiv. AT+CFUN=4, see docs
     CELLULAR_GPIO_2_SIM_TRAY_INSERTED_PIN = 11,
     CELLULAR_GPIO_2_NC = 10, // GPIO_B0_10
     CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN = 9,
@@ -83,6 +86,7 @@ enum class BoardDefinitions
     EINK_RESET_PIN=16,
     EINK_BUSY_PIN=17,
     EINK_PLL = static_cast<int >(drivers::PLLInstances::PLL2_PFD2),
+    EINK_LPSPI_INSTANCE = static_cast<int >(drivers::LPSPIInstances::LPSPI_1),
 
     BLUETOOTH_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     BLUETOOTH_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
@@ -90,14 +94,12 @@ enum class BoardDefinitions
     BLUETOOTH_RX_DMA_CHANNEL = 8,
 
     EMMC_PLL = static_cast<int >(drivers::PLLInstances::PLL2_PFD2),
+    EMMC_USDHC_INSTANCE = static_cast<int >(drivers::USDHCInstances::USDHC_2),
 
     AUDIO_PLL = static_cast<int >(drivers::PLLInstances::PLL4_Audio),
 
     VIBRATOR_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
     VIBRATOR_EN = 0, // GPIO_AD_B0_00
-
-    TORCH_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
-    TORCH_EN = 21, // GPIO_AD_B1_05
 
 	MAGNETOMETER_I2C = AUDIOCODEC_I2C,
 	MAGNETOMETER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,

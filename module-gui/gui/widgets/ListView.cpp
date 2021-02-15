@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ListView.hpp"
@@ -9,8 +9,13 @@
 namespace gui
 {
 
-    ListViewScroll::ListViewScroll(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
-        : Rect{parent, x, y, w, h}
+    ListViewScroll::ListViewScroll(Item *parent,
+                                   unsigned int x,
+                                   unsigned int y,
+                                   unsigned int w,
+                                   unsigned int h,
+                                   style::listview::ScrollBarType type)
+        : Rect{parent, x, y, w, h}, type(type)
     {
 
         setRadius(style::listview::scroll::radius);
@@ -19,29 +24,97 @@ namespace gui
         activeItem = false;
     }
 
+    void ListViewScroll::updateProportional(const ListViewScrollUpdateData &data)
+    {
+        double scrollStep =
+            static_cast<double>((parent->widgetArea.h - data.topMargin)) / static_cast<double>(data.elementsCount);
+
+        auto scrollH = scrollStep * data.listPageSize;
+        auto scrollY = scrollStep * data.startIndex > 0 ? scrollStep * data.startIndex : data.topMargin;
+
+        setArea(BoundingBox(
+            parent->widgetArea.w - style::listview::scroll::margin, scrollY, style::listview::scroll::w, scrollH));
+    }
+
+    void ListViewScroll::updateFixed(const ListViewScrollUpdateData &data)
+    {
+        auto elementsOnPage = (parent->widgetArea.h - data.topMargin) / data.elementMinimalHeight;
+
+        pagesCount = data.elementsCount % elementsOnPage == 0 ? data.elementsCount / elementsOnPage
+                                                              : data.elementsCount / elementsOnPage + 1;
+
+        currentPage = data.startIndex / elementsOnPage;
+
+        auto scrollH = (parent->widgetArea.h - data.topMargin) / pagesCount;
+        auto scrollY = scrollH * currentPage > 0 ? scrollH * currentPage : data.topMargin;
+
+        setArea(BoundingBox(
+            parent->widgetArea.w - style::listview::scroll::margin, scrollY, style::listview::scroll::w, scrollH));
+    }
+
+    void ListViewScroll::updatePreRendered(const ListViewScrollUpdateData &data)
+    {
+        if (data.startIndex != storedStartIndex) {
+            if (data.direction == style::listview::Direction::Bottom) {
+                if (data.boundaries == style::listview::Boundaries::Continuous && (data.startIndex == 0)) {
+                    currentPage = 0;
+                }
+                else if (currentPage + 1 < pagesCount) {
+                    currentPage++;
+                }
+            }
+            else {
+                if (data.boundaries == style::listview::Boundaries::Continuous && storedStartIndex == 0) {
+                    currentPage = pagesCount - 1;
+                }
+                else if (currentPage > 0 && storedStartIndex != 0) {
+                    currentPage--;
+                }
+            }
+        }
+
+        storedStartIndex = data.startIndex;
+
+        auto scrollH = (parent->widgetArea.h - data.topMargin) / pagesCount;
+        auto scrollY = currentPage * scrollH > 0 ? currentPage * scrollH : data.topMargin;
+
+        setArea(BoundingBox(
+            parent->widgetArea.w - style::listview::scroll::margin, scrollY, style::listview::scroll::w, scrollH));
+    }
+
+    void ListViewScroll::updateStartConditions(const unsigned int index,
+                                               const unsigned int page,
+                                               const unsigned int count)
+    {
+        storedStartIndex = index;
+        currentPage      = page;
+        pagesCount       = count;
+    }
+
     bool ListViewScroll::shouldShowScroll(unsigned int currentPageSize, unsigned int elementsCount)
     {
-
         return ((parent->widgetArea.w > style::listview::scroll::min_space) &&
                 (parent->widgetArea.h > style::listview::scroll::min_space) && currentPageSize < elementsCount);
     }
 
-    void ListViewScroll::update(unsigned int startIndex,
-                                unsigned int currentPageSize,
-                                unsigned int elementsCount,
-                                int topMargin)
+    void ListViewScroll::update(const ListViewScrollUpdateData &data)
     {
-        if (shouldShowScroll(currentPageSize, elementsCount)) {
+        if (shouldShowScroll(data.listPageSize, data.elementsCount)) {
 
-            assert(elementsCount != 0);
-            double scrollStep =
-                static_cast<double>((parent->widgetArea.h - topMargin)) / static_cast<double>(elementsCount);
+            switch (type) {
+            case style::listview::ScrollBarType::Proportional:
+                updateProportional(data);
+                break;
+            case style::listview::ScrollBarType::Fixed:
+                updateFixed(data);
+                break;
+            case style::listview::ScrollBarType::PreRendered:
+                updatePreRendered(data);
+                break;
+            case style::listview::ScrollBarType::None:
+                break;
+            }
 
-            auto scrollH = scrollStep * currentPageSize;
-            auto scrollY = scrollStep * startIndex > 0 ? scrollStep * startIndex : topMargin;
-
-            setArea(BoundingBox(
-                parent->widgetArea.w - style::listview::scroll::margin, scrollY, style::listview::scroll::w, scrollH));
             setVisible(true);
         }
         else
@@ -56,15 +129,16 @@ namespace gui
                                     style::listview::scroll::x,
                                     style::listview::scroll::y,
                                     style::listview::scroll::w,
-                                    style::listview::scroll::h);
+                                    style::listview::scroll::h,
+                                    style::listview::ScrollBarType::None);
         type   = gui::ItemType::LIST;
     }
 
     ListView::ListView(Item *parent,
-                       uint32_t x,
-                       uint32_t y,
-                       uint32_t w,
-                       uint32_t h,
+                       unsigned int x,
+                       unsigned int y,
+                       unsigned int w,
+                       unsigned int h,
                        std::shared_ptr<ListItemProvider> prov,
                        style::listview::ScrollBarType scrollBarType)
         : Rect{parent, x, y, w, h}
@@ -101,7 +175,8 @@ namespace gui
                                         style::listview::scroll::x,
                                         style::listview::scroll::y,
                                         style::listview::scroll::w,
-                                        style::listview::scroll::h);
+                                        style::listview::scroll::h,
+                                        scrollBarType);
         }
 
         setProvider(std::move(prov));
@@ -116,7 +191,10 @@ namespace gui
 
     void ListView::setElementsCount(unsigned int count)
     {
-        elementsCount = count;
+        if (elementsCount != count) {
+            elementsCount = count;
+            onElementsCountChanged();
+        }
     }
 
     void ListView::setBoundaries(style::listview::Boundaries value)
@@ -185,35 +263,72 @@ namespace gui
         rebuildList(lastRebuildRequest.first, lastRebuildRequest.second, true);
     }
 
+    void ListView::prepareFullRebuild()
+    {
+        setStartIndex();
+        storedFocusIndex = style::listview::nPos;
+    }
+
+    void ListView::prepareOnOffsetRebuild(unsigned int dataOffset)
+    {
+        if (dataOffset < elementsCount) {
+            startIndex       = dataOffset;
+            storedFocusIndex = style::listview::nPos;
+        }
+        else {
+            LOG_ERROR("Requested rebuild on index greater than elements count");
+        }
+    }
+
+    void ListView::prepareInPlaceRebuild()
+    {
+        if (!body->empty()) {
+            storedFocusIndex = getFocusItemIndex();
+        }
+    }
+
+    void ListView::prepareOnPageElementRebuild(unsigned int dataOffset)
+    {
+        storedFocusIndex = dataOffset;
+    }
+
     void ListView::setup(style::listview::RebuildType rebuildType, unsigned int dataOffset)
     {
-        if (rebuildType == style::listview::RebuildType::Full) {
-            setStartIndex();
-            storedFocusIndex = 0;
+        switch (rebuildType) {
+        case style::listview::RebuildType::Full:
+            prepareFullRebuild();
+            break;
+        case style::listview::RebuildType::OnOffset:
+            prepareOnOffsetRebuild(dataOffset);
+            break;
+        case style::listview::RebuildType::InPlace:
+            prepareInPlaceRebuild();
+            break;
+        case style::listview::RebuildType::OnPageElement:
+            prepareOnPageElementRebuild(dataOffset);
+            break;
         }
-        else if (rebuildType == style::listview::RebuildType::OnOffset) {
-            if (dataOffset < elementsCount) {
-                startIndex       = dataOffset;
-                storedFocusIndex = 0;
-            }
-            else {
-                LOG_ERROR("Requested rebuild on index greater than elements count");
-            }
-        }
-        else if (rebuildType == style::listview::RebuildType::InPlace) {
 
-            storedFocusIndex = body->getFocusItemIndex();
-
-            if (direction == style::listview::Direction::Top) {
-                int position     = currentPageSize - 1 - storedFocusIndex;
-                storedFocusIndex = std::abs(position);
-            }
+        if (prepareRebuildCallback) {
+            prepareRebuildCallback();
         }
 
         lastRebuildRequest = {rebuildType, dataOffset};
 
         body->setReverseOrder(false);
         direction = style::listview::Direction::Bottom;
+    }
+
+    unsigned int ListView::getFocusItemIndex()
+    {
+        auto index = body->getFocusItemIndex();
+
+        if (direction == style::listview::Direction::Top) {
+            int position = currentPageSize - 1 - index;
+            index        = std::abs(position);
+        }
+
+        return index;
     }
 
     std::shared_ptr<ListItemProvider> ListView::getProvider()
@@ -263,15 +378,19 @@ namespace gui
             return;
         }
 
-        onElementsCountChanged();
-
         clearItems();
 
         addItemsOnPage();
 
         setFocus();
         if (scroll) {
-            scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
+            scroll->update(ListViewScrollUpdateData{startIndex,
+                                                    currentPageSize,
+                                                    elementsCount,
+                                                    provider->getMinimalItemHeight(),
+                                                    direction,
+                                                    boundaries,
+                                                    scrollTopMargin});
         }
         resizeWithScroll();
         pageLoaded = true;
@@ -287,15 +406,27 @@ namespace gui
 
     void ListView::onProviderDataUpdate()
     {
+        if (!renderFullList()) {
+            return;
+        }
+
         refresh();
     }
 
-    Order ListView::getOrderFromDirection()
+    Order ListView::getOrderFromDirection() const noexcept
     {
         if (direction == style::listview::Direction::Bottom)
             return Order::Next;
 
         return Order::Previous;
+    }
+
+    Order ListView::getOppositeOrderFromDirection() const noexcept
+    {
+        if (direction == style::listview::Direction::Bottom)
+            return Order::Previous;
+
+        return Order::Next;
     }
 
     void ListView::setStartIndex()
@@ -311,7 +442,6 @@ namespace gui
     void ListView::recalculateStartIndex()
     {
         if (direction == style::listview::Direction::Top) {
-
             startIndex = startIndex < currentPageSize ? 0 : startIndex - currentPageSize;
         }
     }
@@ -324,6 +454,8 @@ namespace gui
             startIndex == 0) {
             if (body->getSizeLeft() > provider->getMinimalItemHeight()) {
                 focusOnLastItem = true;
+
+                checkFullRenderRequirement();
                 rebuildList();
             }
         }
@@ -332,6 +464,8 @@ namespace gui
             startIndex + currentPageSize == elementsCount) {
             if (body->getSizeLeft() > provider->getMinimalItemHeight()) {
                 focusOnLastItem = true;
+
+                checkFullRenderRequirement();
                 rebuildList();
             }
         }
@@ -357,7 +491,11 @@ namespace gui
 
             body->addWidget(item);
 
-            if (item->visible != true) {
+            if (!item->visible) {
+                // In case model is tracking internal indexes -> undo last get.
+                if (requestFullListRender) {
+                    provider->getItem(getOppositeOrderFromDirection());
+                }
                 break;
             }
 
@@ -367,11 +505,75 @@ namespace gui
         recalculateStartIndex();
     }
 
+    void ListView::checkFullRenderRequirement()
+    {
+        if (scroll && scroll->type == style::listview::ScrollBarType::PreRendered) {
+            requestFullListRender = true;
+        }
+    }
+
+    bool ListView::renderFullList()
+    {
+        if (!requestFullListRender) {
+            return true;
+        }
+
+        if (elementsCount != 0 && !requestCompleteData) {
+            requestCompleteData = true;
+            provider->requestRecords(0, elementsCount);
+            return false;
+        }
+
+        if (requestCompleteData) {
+
+            auto page           = 0;
+            auto pageStartIndex = 0;
+
+            clearItems();
+
+            while (true) {
+
+                addItemsOnPage();
+
+                if (currentPageSize == 0) {
+                    break;
+                }
+
+                if (currentPageSize + pageStartIndex == elementsCount) {
+                    break;
+                }
+
+                page += 1;
+                pageStartIndex += currentPageSize;
+
+                clearItems();
+            }
+
+            clearItems();
+            requestCompleteData   = false;
+            requestFullListRender = false;
+
+            if (lastRebuildRequest.first == style::listview::RebuildType::Full) {
+                if (orientation == style::listview::Orientation::TopBottom) {
+                    scroll->updateStartConditions(startIndex, 0, page + 1);
+                }
+                else {
+                    scroll->updateStartConditions(startIndex, page, page + 1);
+                }
+            }
+
+            reSendLastRebuildRequest();
+            return false;
+        }
+
+        return true;
+    } // namespace gui
+
     void ListView::setFocus()
     {
         setFocusItem(body);
 
-        if (storedFocusIndex != 0) {
+        if (storedFocusIndex != style::listview::nPos) {
             if (!body->setFocusOnElement(storedFocusIndex)) {
                 body->setFocusOnLastElement();
             }
@@ -393,6 +595,8 @@ namespace gui
         else if (notEmptyListCallback) {
             notEmptyListCallback();
         }
+
+        checkFullRenderRequirement();
     }
 
     bool ListView::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
@@ -400,7 +604,13 @@ namespace gui
         Rect::onDimensionChanged(oldDim, newDim);
         body->setSize(body->getWidth(), newDim.h);
         if (scroll) {
-            scroll->update(startIndex, currentPageSize, elementsCount, scrollTopMargin);
+            scroll->update(ListViewScrollUpdateData{startIndex,
+                                                    currentPageSize,
+                                                    elementsCount,
+                                                    provider->getMinimalItemHeight(),
+                                                    direction,
+                                                    boundaries,
+                                                    scrollTopMargin});
         }
 
         return true;
@@ -430,7 +640,8 @@ namespace gui
                 startIndex = startIndex < diff ? 0 : startIndex - diff;
             }
 
-            fillFirstPage();
+            checkFullRenderRequirement();
+            rebuildList();
         }
     }
 
@@ -476,7 +687,7 @@ namespace gui
         direction = style::listview::Direction::Bottom;
         body->setReverseOrder(false);
         pageLoaded       = false;
-        storedFocusIndex = 0;
+        storedFocusIndex = style::listview::nPos;
         provider->requestRecords(startIndex, calculateLimit());
 
         return true;
@@ -489,9 +700,9 @@ namespace gui
 
         if (startIndex == 0 && boundaries == style::listview::Boundaries::Continuous) {
 
-            topFetchIndex = elementsCount - (elementsCount % currentPageSize);
             startIndex    = elementsCount;
-            limit         = calculateLimit(style::listview::Direction::Top) - topFetchIndex;
+            topFetchIndex = elementsCount - calculateLimit(style::listview::Direction::Top);
+            limit         = calculateLimit(style::listview::Direction::Top);
         }
         else if (startIndex == 0 && boundaries == style::listview::Boundaries::Fixed) {
 
@@ -508,7 +719,7 @@ namespace gui
         direction = style::listview::Direction::Top;
         body->setReverseOrder(true);
         pageLoaded       = false;
-        storedFocusIndex = 0;
+        storedFocusIndex = style::listview::nPos;
         provider->requestRecords(topFetchIndex, limit);
 
         return true;

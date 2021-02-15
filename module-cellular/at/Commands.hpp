@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,46 +10,19 @@
 #include <map>
 #include <memory>
 #include <string>
+#include "Cmd.hpp"
+#include "cmd/CSCA.hpp"
+#include <chrono>
 
 namespace at
 {
-    inline const uint32_t default_timeout = 5000; /// if unsure - take this
-    inline const uint32_t default_doc_timeout =
-        300; /// if you've checked it's ok - or it was at least 300 in code somewhere, take this
-    inline const uint32_t default_long_doc_timeout = 15000;
+
+    using namespace std::chrono_literals;
+    const auto default_doc_timeout      = 5000ms; /// if unsure - take this
+    const auto default_long_doc_timeout = 15000ms;
 
     /// at::Cmd structure with command, it's timeout and some runtime data
     /// { command, timeout, last : {sent, response, status } }
-    struct Cmd
-    {
-        std::string cmd;                    /// command to run
-        uint32_t timeout = default_timeout; /// timeout for this command
-        struct
-        {
-            Result::Code status = Result::Code::NONE; /// last response for that command
-            time_t requested    = 0;                  /// last time comand was requested
-            time_t response     = 0;                  /// last time command was received
-            auto request_time() -> time_t
-            {
-                return response - requested;
-            }   /// time it took to send command and get response
-        } last; /// last status of command execution
-
-        Cmd(std::string cmd, uint32_t timeout = default_timeout) : cmd(std::move(cmd)), timeout(timeout)
-        {}
-        /// not the prettiest, for now it's ok - for commands which modify strings to execute - return copy of command
-        /// str
-        operator std::string() const
-        {
-            return cmd;
-        }
-        auto operator+(const std::string &val) const -> Cmd
-        {
-            Cmd tmp = *this;
-            tmp.cmd += val;
-            return tmp;
-        }
-    };
 
     /// doc is: per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf
     enum class AT
@@ -151,22 +124,31 @@ namespace at
         COLP_GET,
         COLP_ENABLE,
         COLP_DISABLE,
-        CSSN,   /// Supplementary Services - Supplementary Service Notifications
-        QICSGP, /// Configure Parameters of a TCP/IP Context
-        QIACT,  /// Activate a PDP Context
-        QIDEACT /// Deactivate a PDP Context
+        CSSN,     /// Supplementary Services - Supplementary Service Notifications
+        QICSGP,   /// Configure Parameters of a TCP/IP Context
+        QIACT,    /// Activate a PDP Context
+        QIDEACT,  /// Deactivate a PDP Context
+        CSCA,     /// check SMS Center
+        QRXGAIN,  /// Set Downlink Gains of RX
+        CLVL,     /// Loudspeaker Volume Level Selection
+        QMIC,     /// Set Uplink Gains of MIC
+        QNVFR,    /// Quectel command to read NV settings
+        QNVFW,    /// Quectel command to write NV settings
+        QMBNCFG,  /// Quectel command for MBN files management
+        QCFG_IMS, /// Set/Get IP Multimedia Services, get state of VoLTE
+        QEEC,     /// Echo cancellation parameters
     };
 
     // below timeouts are defined in Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf
     inline auto factory(AT at) -> const Cmd &
     {
         static const std::map<AT, const Cmd> fact{
-            {AT::AT, {"AT", 100}},
+            {AT::AT, {"AT", 100ms}},
             {AT::ECHO_OFF, {"ATE0"}},
             {AT::FACTORY_RESET, {"AT&F"}},
             {AT::SW_INFO, {"ATI\r", default_doc_timeout}},
-            {AT::FLOW_CTRL_ON, {"AT+IFC=2,2\r\n", 500}},
-            {AT::FLOW_CTRL_OFF, {"AT+IFC=0,0", 500}},
+            {AT::FLOW_CTRL_ON, {"AT+IFC=2,2\r\n", 500ms}},
+            {AT::FLOW_CTRL_OFF, {"AT+IFC=0,0", 500ms}},
             {AT::URC_NOTIF_CHANNEL, {"AT+QCFG=\"cmux/urcport\",1"}},
             {AT::RI_PIN_AUTO_CALL, {"AT+QCFG=\"urc/ri/ring\",\"auto\""}},
             {AT::RI_PIN_OFF_CALL, {"AT+QCFG=\"urc/ri/ring\",\"off\""}},
@@ -178,22 +160,22 @@ namespace at
             {AT::AT_PIN_READY_LOGIC, {"AT+QCFG=\"apready\",1,1,200"}},
             {AT::URC_NOTIF_SIGNAL, {"AT+QINDCFG=\"csq\",1"}},
             {AT::CRC_ON, {"AT+CRC=1"}},
-            {AT::CALLER_NUMBER_PRESENTATION, {"AT+CLIP=1", 18000}},
+            {AT::CALLER_NUMBER_PRESENTATION, {"AT+CLIP=1", 18000ms}},
             {AT::SMS_TEXT_FORMAT, {"AT+CMGF=1"}},
             {AT::SMS_UCSC2, {"AT+CSCS=\"UCS2\""}},
             {AT::SMS_GSM, {"AT+CSCS=\"GSM\""}},
-            {AT::QSCLK_ON, {"AT+QSCLK=1", 3000}},
+            {AT::QSCLK_ON, {"AT+QSCLK=1", 3000ms}},
             {AT::QDAI, {"AT+QDAI?"}},
-            {AT::QDAI_INIT, {"AT+QDAI=1,0,0,5,0,1"}},
+            {AT::QDAI_INIT, {"AT+QDAI=1,0,0,3,0,1,1,1"}},
             {AT::SET_URC_CHANNEL, {"AT+QCFG=\"cmux/urcport\",2", default_doc_timeout}},
             {AT::CSQ, {"AT+CSQ", default_doc_timeout}},
             {AT::CLCC, {"AT+CLCC", default_doc_timeout}},
             {AT::CMGD, {"AT+CMGD=", default_doc_timeout}},
             {AT::CNUM, {"AT+CNUM"}},
             {AT::CIMI, {"AT+CIMI"}},
-            {AT::QCMGR, {"AT+QCMGR=", 2000}},
-            {AT::ATH, {"ATH"}},
-            {AT::ATA, {"ATA", 90000}},
+            {AT::QCMGR, {"AT+QCMGR=", 2000ms}},
+            {AT::ATH, {"ATH", 90000ms}},
+            {AT::ATA, {"ATA", 90000ms}},
             {AT::ATD, {"ATD"}},
             {AT::IPR, {"AT+IPR="}},
             {AT::CMUX, {"AT+CMUX="}},
@@ -202,11 +184,11 @@ namespace at
             {AT::CFUN_MIN_FUNCTIONALITY, {"AT+CFUN=0", default_long_doc_timeout}},
             {AT::CFUN_FULL_FUNCTIONALITY, {"AT+CFUN=1", default_long_doc_timeout}},
             {AT::CFUN_DISABLE_TRANSMITTING, {"AT+CFUN=4", default_long_doc_timeout}},
-            {AT::CMGS, {"AT+CMGS=\""}},
-            {AT::QCMGS, {"AT+QCMGS=\""}},
+            {AT::CMGS, {"AT+CMGS=\"", 120s}},   // verified in docs
+            {AT::QCMGS, {"AT+QCMGS=\"", 120s}}, // verified in docs
             {AT::CREG, {"AT+CREG?", default_doc_timeout}},
             {AT::QNWINFO, {"AT+QNWINFO"}},
-            {AT::COPS, {"AT+COPS", 180000}},
+            {AT::COPS, {"AT+COPS", 180000ms}},
             {AT::QSIMSTAT, {"AT+QSIMSTAT?"}},
             {AT::SIM_DET, {"AT+QSIMDET?"}},
             {AT::SIM_DET_ON, {"AT+QSIMDET=1,0"}},
@@ -222,7 +204,7 @@ namespace at
             {AT::CUSD_OPEN_SESSION, {"AT+CUSD=1"}},
             {AT::CUSD_CLOSE_SESSION, {"AT+CUSD=2"}},
             {AT::CUSD_SEND, {"AT+CUSD=1,"}},
-            {AT::SET_SMS_STORAGE, {"AT+CPMS=\"SM\",\"SM\",\"SM\"", 300}},
+            {AT::SET_SMS_STORAGE, {"AT+CPMS=\"SM\",\"SM\",\"SM\"", 300ms}},
             {AT::CPIN, {"AT+CPIN=", default_timeout}},
             {AT::GET_CPIN, {"AT+CPIN?", default_timeout}},
             {AT::QPINC, {"AT+QPINC=", default_timeout}},
@@ -253,20 +235,30 @@ namespace at
             {AT::COLP_DISABLE, {"AT+COLP=0", default_long_doc_timeout}},
             {AT::CSSN, {"AT+CSSN=\"", default_doc_timeout}},
             {AT::QICSGP, {"AT+QICSGP", default_timeout}},
-            {AT::QIACT, {"AT+QIACT", 150000}},
-            {AT::QIDEACT, {"AT+QIDEACT", 40000}}};
+            {AT::QIACT, {"AT+QIACT", 150000ms}},
+            {AT::QIDEACT, {"AT+QIDEACT", 40000ms}},
+            {AT::QRXGAIN, {"AT+QRXGAIN=40000", default_timeout}},
+            {AT::CLVL, {"AT+CLVL=3", default_timeout}},
+            {AT::QMIC, {"AT+QMIC=15000,15000", default_timeout}},
+            {AT::QEEC, {"AT+QEEC=", default_timeout}},
+            {AT::QNVFR, {"AT+QNVFR=", default_long_doc_timeout}},
+            {AT::QNVFW, {"AT+QNVFW=", default_long_doc_timeout}},
+            {AT::QMBNCFG, {"AT+QMBNCFG=", default_long_doc_timeout}},
+            {AT::QCFG_IMS, {"AT+QCFG=\"ims\"", default_timeout}}};
 
-        if (fact.count(at)) {
+        if (fact.count(at) != 0u) {
             return fact.at(at);
         }
         LOG_ERROR("NO SUCH AT COMMAND DEFINED: %d", static_cast<int>(at));
         return fact.at(AT::AT);
     }
+
     enum class commadsSet
     {
         modemInit,
         simInit,
         smsInit
     };
+
     std::vector<AT> getCommadsSet(commadsSet set);
 }; // namespace at

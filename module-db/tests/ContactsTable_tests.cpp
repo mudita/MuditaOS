@@ -27,6 +27,22 @@ TEST_CASE("Contacts Table tests")
                                  .speedDial = "666"
 
     };
+    REQUIRE(contactsdb.execute("INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) "
+                               "VALUES (1,1,'Alek','Wyczesany');"));
+    REQUIRE(contactsdb.execute("INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) "
+                               "VALUES (2,2,'Zofia','Wyczesany');"));
+    REQUIRE(contactsdb.execute("INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) "
+                               "VALUES (3,3,'Cezary','Wyczesany');"));
+    REQUIRE(contactsdb.execute("INSERT OR REPLACE INTO  contact_name (_id,contact_id,name_primary,name_alternative) "
+                               "VALUES (4,4,'Alek','Arbuz');"));
+    REQUIRE(
+        contactsdb.execute("INSERT OR REPLACE INTO  contact_match_groups (_id,group_id,contact_id) VALUES (1,1,1);"));
+    REQUIRE(
+        contactsdb.execute("INSERT OR REPLACE INTO  contact_match_groups (_id,group_id,contact_id) VALUES (2,2,2);"));
+    REQUIRE(
+        contactsdb.execute("INSERT OR REPLACE INTO  contact_match_groups (_id,group_id,contact_id) VALUES (3,1,3);"));
+    REQUIRE(
+        contactsdb.execute("INSERT OR REPLACE INTO  contact_match_groups (_id,group_id,contact_id) VALUES (4,1,4);"));
 
     const auto contactsCount = contactsdb.contacts.count() + 1;
     // clear contacts table
@@ -65,6 +81,13 @@ TEST_CASE("Contacts Table tests")
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
     auto retOffsetLimitBigger = contactsdb.contacts.getLimitOffset(0, 100);
     REQUIRE(retOffsetLimitBigger.size() == 4);
+
+    auto sortedRetOffsetLimitBigger =
+        contactsdb.contacts.GetIDsSortedByField(ContactsTable::MatchType::Name, "", 1, 4, 0);
+    REQUIRE(sortedRetOffsetLimitBigger.size() == 4);
+
+    sortedRetOffsetLimitBigger = contactsdb.contacts.GetIDsSortedByName(1, 4);
+    REQUIRE(sortedRetOffsetLimitBigger.size() == 1);
 
     // Get table rows using invalid offset/limit parameters(should return empty object)
     auto retOffsetLimitFailed = contactsdb.contacts.getLimitOffset(5, 4);

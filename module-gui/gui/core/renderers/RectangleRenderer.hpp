@@ -30,7 +30,7 @@ namespace gui::renderer
             Color borderColor{ColorFullBlack};
             Color fillColor{ColorNoColor};
 
-            static auto from(const CommandRectangle &command) -> DrawableStyle;
+            static auto from(const DrawRectangle &command) -> DrawableStyle;
         };
 
         static void drawFlat(Context *ctx, Point position, Length width, Length height, const DrawableStyle &style);

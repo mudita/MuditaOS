@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,8 +23,10 @@ namespace sys
 namespace CellularServiceAPI
 {
     bool DialNumber(sys::Service *serv, const utils::PhoneNumber &number);
+    bool DialEmergencyNumber(sys::Service *serv, const utils::PhoneNumber &number);
+
     bool AnswerIncomingCall(sys::Service *serv);
-    void HangupCall(sys::Service *serv);
+    bool HangupCall(sys::Service *serv);
     /*
      * @brief Its calls sercive-cellular for selected SIM IMSI number.
      * @param serv pointer to caller service.
@@ -107,10 +109,35 @@ namespace CellularServiceAPI
      */
     bool GetAPN(sys::Service *serv, packet_data::APN::APNType type);
 
+    /**
+     * @brief set up/change existing APN.
+     *
+     * Allow to change internal APN, for creating New (not empty) APN
+     * should be used NewAPN functionality (to not overwrite internal APN)
+     *
+     */
     bool SetAPN(sys::Service *serv, packet_data::APN::Config apnConfig);
+
+    /**
+     * @brief setup new APN, assigns a new contextId
+     * @param serv
+     * @param apnConfig
+     * @return
+     */
+    bool NewAPN(sys::Service *serv, packet_data::APN::Config apnConfig);
+
+    /**
+     * @brief Call SetAPN with empty APN (delete it)
+     * @param serv
+     * @param contextId
+     * @return
+     */
+    bool DeleteAPN(sys::Service *serv, std::uint8_t contextId);
+
     bool SetDataTransfer(sys::Service *serv, packet_data::DataTransfer dt);
     bool GetDataTransfer(sys::Service *serv);
     bool SetVoLTE(sys::Service *serv, bool value);
 
     bool ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState);
+
 }; // namespace CellularServiceAPI

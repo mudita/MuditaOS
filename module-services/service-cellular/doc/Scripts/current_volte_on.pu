@@ -1,0 +1,25 @@
+@startuml
+
+
+
+state "Reboot modem" as Reboot
+Reboot: AT+CFUN=1,1 via SoftReset
+Reboot: Init modem, MBN auto-setup IMS APN
+
+state "IMS"  as IMS
+IMS: AT+QCFG="ims",1
+
+
+state "Set PS as preferred" as SetPS
+SetPS:Set Packets Switching as preferred method for voice 
+SetPS:AT+QNVFR="/nv/item_files/modem/mmode/voice_domain_pref"
+
+
+
+
+SetPS --> IMS
+IMS --> Reboot
+
+
+
+@enduml

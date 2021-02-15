@@ -5,7 +5,6 @@
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 
-#include <Service/Bus.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <crc32/crc32.h>
 #include <json/json11.hpp>
@@ -57,8 +56,13 @@ UpdateMuditaOS::UpdateMuditaOS(ServiceDesktop *ownerService) : owner(ownerServic
 updateos::UpdateError UpdateMuditaOS::setUpdateFile(const std::filesystem::path &updatesOSPath,
                                                     fs::path updateFileToUse)
 {
-    updateFile = updatesOSPath / updateFileToUse;
-    if (std::filesystem::exists(updateFile)) {
+    if (isUpdateToBeAborted()) {
+        setUpdateAbortFlag(false);
+        return informError(updateos::UpdateError::UpdateAborted, "update aborted");
+    }
+
+    updateFile = purefs::dir::getUpdatesOSPath() / updateFileToUse;
+    if (std::filesystem::exists(updateFile.c_str())) {
         versionInformation = UpdateMuditaOS::getVersionInfoFromFile(updateFile);
         if (mtar_open(&updateTar, updateFile.c_str(), "r") == MTAR_ESUCCESS) {
             totalBytes = std::filesystem::file_size(updateFile);
@@ -81,7 +85,7 @@ updateos::UpdateError UpdateMuditaOS::setUpdateFile(const std::filesystem::path 
 
 updateos::UpdateError UpdateMuditaOS::runUpdate()
 {
-    informDebug("Prepraring temp dir");
+    informDebug("Preparing temp dir");
 
     updateRunStatus.startTime   = utils::time::getCurrentTimestamp().getTime();
     updateRunStatus.fromVersion = bootConfig.to_json();
@@ -90,19 +94,32 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
     updateos::UpdateError err =
         prepareTempDirForUpdate(purefs::dir::getTemporaryPath(), purefs::dir::getUpdatesOSPath());
     if (err != updateos::UpdateError::NoError) {
-        return informError(err, "runUpdate can't prepare temp directory for update");
+        if (err == updateos::UpdateError::UpdateAborted) {
+            return informError(updateos::UpdateError::UpdateAborted, "update aborted");
+        }
+        else {
+            return informError(err, "runUpdate can't prepare temp directory for update");
+        }
     }
 
     informDebug("Unpacking update");
-    if ((err = unpackUpdate()) == updateos::UpdateError::NoError) {
+    err = unpackUpdate();
+    if (err == updateos::UpdateError::NoError) {
         informUpdate(status, "Unpacked");
+    }
+    else if (err == updateos::UpdateError::UpdateAborted) {
+        return informError(updateos::UpdateError::UpdateAborted, "update aborted");
     }
     else {
         return informError(err, "%s can't be unpacked", updateFile.c_str());
     }
 
-    if ((err = verifyChecksums()) == updateos::UpdateError::NoError) {
+    err = verifyChecksums();
+    if (err == updateos::UpdateError::NoError) {
         informUpdate(status, "Verify checksums");
+    }
+    else if (err == updateos::UpdateError::UpdateAborted) {
+        return informError(updateos::UpdateError::UpdateAborted, "update aborted");
     }
     else {
         return informError(err, "Checksum verification failed");
@@ -118,6 +135,7 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
     // at this point we should set the system to update mode we are
     // writing directly to eMMC when updating the bootloader
     // then placing the new files in destination folders/files
+    sys::SystemManager::Update(owner);
 
     if ((err = updateBootloader()) == updateos::UpdateError::NoError) {
         informUpdate(status, "Update bootloader");
@@ -153,6 +171,10 @@ updateos::UpdateError UpdateMuditaOS::unpackUpdate()
     status = updateos::UpdateState::ExtractingFiles;
     std::rewind(updateTar.stream);
     while ((mtar_read_header(&updateTar, &tarHeader)) != MTAR_ENULLRECORD) {
+        if (isUpdateToBeAborted()) {
+            setUpdateAbortFlag(false);
+            return updateos::UpdateError::UpdateAborted;
+        }
         if (std::string(tarHeader.name) == "./") {
             mtar_next(&updateTar);
             continue;
@@ -204,7 +226,13 @@ std::string UpdateMuditaOS::readContent(const char *filename) noexcept
 
 updateos::UpdateError UpdateMuditaOS::verifyChecksums()
 {
-    status        = updateos::UpdateState::ChecksumVerification;
+    if (isUpdateToBeAborted()) {
+        setUpdateAbortFlag(false);
+        return informError(updateos::UpdateError::UpdateAborted, "update aborted");
+    }
+
+    status = updateos::UpdateState::ChecksumVerification;
+
     auto lineBuff = std::make_unique<char[]>(
         boot::consts::tar_buf); // max line should be freertos max path + checksum, so this is enough
     fs::path checksumsFile = getUpdateTmpChild(updateos::file::checksums);
@@ -494,6 +522,11 @@ const fs::path UpdateMuditaOS::getUpdateTmpChild(const fs::path &childPath)
 updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate(const std::filesystem::path &temporaryPath,
                                                               const std::filesystem::path &updatesOSPath)
 {
+    if (isUpdateToBeAborted()) {
+        setUpdateAbortFlag(false);
+        return updateos::UpdateError::UpdateAborted;
+    }
+
     status = updateos::UpdateState::CreatingDirectories;
 
     updateTempDirectory = temporaryPath / utils::filesystem::generateRandomId(updateos::prefix_len);
@@ -705,7 +738,7 @@ updateos::UpdateError UpdateMuditaOS::informError(const updateos::UpdateError er
     auto msgToSend         = std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateError);
     messageText            = std::string(readBuf.get());
     msgToSend->updateStats = (updateos::UpdateStats)(*this);
-    sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
+    owner->bus.sendUnicast(msgToSend, app::name_desktop);
 
     parserFSM::Context responseContext;
     responseContext.setResponseStatus(parserFSM::http::Code::InternalServerError);
@@ -748,7 +781,7 @@ void UpdateMuditaOS::informUpdate(const updateos::UpdateState statusCode, const 
     if (owner == nullptr) {
         return;
     }
-    sys::Bus::SendUnicast(msgToSend, app::name_desktop, owner);
+    owner->bus.sendUnicast(msgToSend, app::name_desktop);
 
     parserFSM::Context responseContext;
     responseContext.setResponseStatus(parserFSM::http::Code::Accepted);

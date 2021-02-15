@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FilesystemEndpoint.hpp"
@@ -63,6 +63,13 @@ auto FilesystemEndpoint::run(Context &context) -> sys::ReturnCodes
         else {
             LOG_ERROR("download command failed, can't write %" PRIu32 " bytes to: %s", fileSize, tmpFilePath.c_str());
         }
+    }
+    else if (cmd == parserFSM::json::filesystem::commands::checkFile) {
+        fs::path filePath = context.getBody()[parserFSM::json::fileName].string_value();
+        LOG_DEBUG("Checking file: %s", filePath.c_str());
+
+        context.setResponseBody(json11::Json::object{{json::fileExists, std::filesystem::exists(filePath)}});
+        returnCode = sys::ReturnCodes::Success;
     }
     else {
         LOG_ERROR("unknown command: %s", cmd.c_str());

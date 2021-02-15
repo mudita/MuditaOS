@@ -39,10 +39,8 @@ namespace gui
                 last_mode = service::eink::EinkModeMessage::Mode::Normal;
             }
 
-            sys::Bus::SendUnicast(std::make_shared<service::eink::EinkModeMessage>(last_mode),
-                                  service::name::eink,
-                                  this->application,
-                                  5000);
+            application->bus.sendUnicast(
+                std::make_shared<service::eink::EinkModeMessage>(last_mode), service::name::eink, 5000);
             return true;
         };
         setFocusItem(label);

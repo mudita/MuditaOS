@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallLogDetailsWindow.hpp"
@@ -206,8 +206,6 @@ namespace gui
 
             setTitle(record.name);
 
-            number->setText(record.phoneNumber.getFormatted());
-
             auto callType = toCallLogCallType(record.type);
             for (auto &img : callTypeImg) {
                 img->setVisible(false);
@@ -243,6 +241,20 @@ namespace gui
 
         if (mode == ShowMode::GUI_SHOW_INIT)
             setFocusItem(rects[static_cast<uint32_t>(FocusRects::Call)]);
+
+        if (record.presentation == PresentationType::PR_UNKNOWN) {
+            rects[FocusRects::Call]->setVisible(false);
+            rects[FocusRects::Call]->activatedCallback    = nullptr;
+            rects[FocusRects::Call]->focusChangedCallback = nullptr;
+            rects[FocusRects::Sms]->setVisible(false);
+            rects[FocusRects::Sms]->activatedCallback    = nullptr;
+            rects[FocusRects::Sms]->focusChangedCallback = nullptr;
+            number->setText(utils::localize.get(callLogStyle::strings::privateNumber));
+            bottomBar->setActive(BottomBar::Side::CENTER, false);
+        }
+        else {
+            number->setText(record.phoneNumber.getFormatted());
+        }
     }
 
     bool CallLogDetailsWindow::onInput(const InputEvent &inputEvent)

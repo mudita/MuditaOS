@@ -44,7 +44,9 @@ namespace utils
 
         virtual ~i18n() = default;
         void setInputLanguage(const Language &lang);
-        const std::string &getInputLanguage(const std::string &inputMode);
+        const std::string &getInputLanguageFilename(const std::string &inputMode);
+        const std::string &getInputLanguage();
+        const std::string &getDisplayLanguage();
         const std::string &get(const std::string &str);
         void setDisplayLanguage(const Language &lang);
         void setFallbackLanguage(const Language &lang);

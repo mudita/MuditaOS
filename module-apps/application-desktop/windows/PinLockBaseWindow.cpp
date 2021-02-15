@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-desktop/data/AppDesktopStyle.hpp"
@@ -43,7 +43,6 @@ namespace gui
         LockWindow::restore();
         lockImage->setVisible(false);
         infoImage->setVisible(false);
-        iceBox->setVisible(false);
     }
 
     void PinLockBaseWindow::setImagesVisible(bool lockImg, bool infoImg)
@@ -62,7 +61,6 @@ namespace gui
     {
         LockWindow::buildBottomBar();
         setBottomBarWidgetsActive(false, false, false);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_emergency"));
     }
 
     void PinLockBaseWindow::buildTitleBar()

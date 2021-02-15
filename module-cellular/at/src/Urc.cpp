@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Urc.hpp>
@@ -6,7 +6,7 @@
 
 namespace at::urc
 {
-    Urc::Urc(const std::string &urcBody, const std::string &urcHead) : urcBody(urcBody), urcHead(urcHead)
+    Urc::Urc(const std::string &urcBody, const std::string &urcHead) : urcBody(utils::trim(urcBody)), urcHead(urcHead)
     {
         split(urcBody);
     }

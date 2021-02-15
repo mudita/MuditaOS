@@ -11,14 +11,16 @@ namespace gui
     {
         NewEditEventModel *model = nullptr;
         app::Application *app    = nullptr;
+        gui::EventDateItem *dateItem = nullptr;
         void applyCallbacks() override;
 
       public:
         NewEventCheckBoxWithLabel(app::Application *application,
                                   const std::string &description,
-                                  bool checkIsOnLeftBarSide = false,
                                   NewEditEventModel *model  = nullptr);
         virtual ~NewEventCheckBoxWithLabel() override = default;
+
+        void setConnectionToDateItem(gui::EventDateItem *item);
     };
 
 } /* namespace gui */

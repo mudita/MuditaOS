@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DisplayLightWindow.hpp"
@@ -6,10 +6,10 @@
 #include "OptionSetting.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "OptionSetting.hpp"
+#include "GuiTimer.hpp"
 
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <i18n/i18n.hpp>
-#include <Service/Bus.hpp>
 
 namespace gui
 {
@@ -23,16 +23,38 @@ namespace gui
         brightnessValue        = values.parameters.manualModeBrightness;
 
         setTitle(utils::localize.get("app_settings_display_display_light"));
+
+        timerTask = std::make_unique<app::GuiTimer>(
+            "AmbientLightTimer", application, gui::lighting::AMBIENT_LIGHT_TIMER_MS, Timer::Type::Continous);
+        timerCallback = [this](Item &it, Timer &task) { return onTimerTimeout(it, task); };
+        timerTask->start();
+        application->connect(std::move(timerTask), this);
+    }
+
+    DisplayLightWindow::~DisplayLightWindow()
+    {
+        if (timerTask != nullptr) {
+            timerTask->stop();
+        }
+    }
+
+    auto DisplayLightWindow::onTimerTimeout(Item &self, Timer &task) -> bool
+    {
+        ambientLight = bsp::light_sensor::readout();
+        refreshOptionsList();
+
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        return true;
     }
 
     void DisplayLightWindow::switchHandler(bool &onOffSwitch)
     {
         onOffSwitch = !onOffSwitch;
 
-        rebuildOptionList();
-
         screenLightSettings->setStatus(isDisplayLightSwitchOn);
         screenLightSettings->setMode(isAutoLightSwitchOn);
+
+        refreshOptionsList();
     }
 
     auto DisplayLightWindow::buildOptionsList() -> std::list<gui::Option>
@@ -57,6 +79,11 @@ namespace gui
                 toggle ? gui::option::SettingRightItem::On : gui::option::SettingRightItem::Off));
         };
 
+        auto addDisplayLight = [&](UTF8 text) {
+            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
+                text, nullptr, nullptr, this, gui::option::SettingRightItem::Disabled));
+        };
+
         addOnOffOoption(utils::translateI18("app_settings_display_light_main"), isDisplayLightSwitchOn);
         if (isDisplayLightSwitchOn) {
             addOnOffOoption(utils::translateI18("app_settings_display_light_auto"), isAutoLightSwitchOn);
@@ -66,6 +93,7 @@ namespace gui
             addBrightnessOption(optionsList);
         }
 
+        addDisplayLight("Light intensity = " + utils::to_string(ambientLight));
         return optionsList;
     }
 

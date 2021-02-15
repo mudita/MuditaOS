@@ -44,7 +44,7 @@ namespace app
                                          Indicator::Battery,
                                          Indicator::SimCard,
                                          Indicator::NetworkAccessTechnology});
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
         addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
             lockHandler.handlePasscodeRequest(gui::PinLock::LockType::SimPin, std::move(data));
@@ -169,7 +169,7 @@ namespace app
         if (event != nullptr) {
             auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>(lockHandler.isScreenLocked());
             auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-            sys::Bus::SendUnicast(std::move(msg), service::name::service_desktop, this);
+            bus.sendUnicast(std::move(msg), service::name::service_desktop);
         }
 
         return true;
@@ -240,9 +240,8 @@ namespace app
                 return true;
             }
             else if (need_sim_select == false) {
-                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularSimProcedure),
-                                      ServiceCellular::serviceName,
-                                      this);
+                bus.sendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularSimProcedure),
+                                ServiceCellular::serviceName);
             }
         }
         if (msg->request == cellular::State::ST::ModemFatalFailure) {
@@ -327,7 +326,7 @@ namespace app
 
         auto msgToSend =
             std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
-        sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, this);
+        bus.sendUnicast(msgToSend, service::name::service_desktop);
 
         settings->registerValueChange(
             settings::SystemProperties::activeSim,

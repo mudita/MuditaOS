@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsHolder.hpp"
-namespace Bluetooth
+namespace bluetooth
 {
     std::map<Settings, std::string> SettingsHolder::settingString{
         {Settings::DeviceName, settings::Bluetooth::deviceName},
@@ -20,7 +20,8 @@ namespace Bluetooth
     {
         settingsMap[newSetting] = value;
 
-        settingsProvider->setValue(settingString[newSetting], std::visit(StringVisitor(), value));
+        settingsProvider->setValue(
+            settingString[newSetting], std::visit(StringVisitor(), value), ::settings::SettingsScope::Global);
         LOG_INFO("setting %s set: %s", settingString[newSetting].c_str(), std::visit(StringVisitor(), value).c_str());
     }
     SettingsHolder::SettingsHolder(std::unique_ptr<settings::Settings> settingsPtr)

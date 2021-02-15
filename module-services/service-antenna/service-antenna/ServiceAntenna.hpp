@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,6 +10,7 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/Worker.hpp>
+#include <service-db/DBServiceName.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -27,6 +28,11 @@ namespace utils
         template <typename T> class State;
     } // namespace state
 } // namespace utils
+
+namespace service::name
+{
+    constexpr inline auto antenna = "ServiceAntenna";
+} // namespace service::name
 
 namespace antenna
 {
@@ -76,8 +82,6 @@ class ServiceAntenna : public sys::Service
     bool suspended = false;
 
   public:
-    static const char *serviceName;
-
     ServiceAntenna();
     ~ServiceAntenna();
 
@@ -102,3 +106,17 @@ class ServiceAntenna : public sys::Service
     bool csqChangeStateHandler(void);
     bool lockedStateHandler(void);
 };
+
+namespace sys
+{
+    template <> struct ManifestTraits<ServiceAntenna>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = service::name::antenna;
+            manifest.dependencies = {service::name::db};
+            return manifest;
+        }
+    };
+} // namespace sys

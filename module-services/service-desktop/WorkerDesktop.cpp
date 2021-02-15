@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-desktop/ServiceDesktop.hpp"
@@ -74,7 +74,6 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
             return false;
         }
 
-        LOG_DEBUG("handeMessage sending %d bytes using usbCDCSend", static_cast<unsigned int>(sendMsg->length()));
         bsp::usbCDCSend(sendMsg);
         delete sendMsg;
     }

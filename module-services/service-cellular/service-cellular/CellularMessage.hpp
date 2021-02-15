@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,8 +27,7 @@
 class CellularMessage : public sys::DataMessage
 {
   public:
-    CellularMessage(MessageType messageType) : sys::DataMessage(messageType){};
-    virtual ~CellularMessage(){};
+    explicit CellularMessage(MessageType messageType) : sys::DataMessage(messageType){};
 };
 
 class CellularCallMessage : public CellularMessage
@@ -38,6 +37,7 @@ class CellularCallMessage : public CellularMessage
     {
         Ringing,      // user provided number to call to and service initialized calling procedure.
         IncomingCall, // device receives connection from other device.
+        CallerId,     // device receives caller id
     };
 
     CellularCallMessage() = delete;
@@ -257,8 +257,6 @@ class CellularRequestMessage : public CellularMessage
   public:
     CellularRequestMessage(MessageType messageType, std::string data = "") : CellularMessage(messageType), data(data)
     {}
-    ~CellularRequestMessage()
-    {}
 
     std::string data;
 };
@@ -289,10 +287,30 @@ class CellularAntennaRequestMessage : public CellularMessage
 class CellularCallRequestMessage : public CellularMessage
 {
   public:
-    CellularCallRequestMessage(const utils::PhoneNumber::View &number)
-        : CellularMessage(MessageType::CellularCallRequest), number(number)
+    enum class RequestMode
+    {
+        Normal,
+        Emergency
+    };
+
+    CellularCallRequestMessage(const utils::PhoneNumber::View &number, RequestMode requestMode = RequestMode::Normal)
+        : CellularMessage(MessageType::CellularCallRequest), number(number), requestMode(requestMode)
     {}
     utils::PhoneNumber::View number;
+    RequestMode requestMode = RequestMode::Normal;
+};
+
+class CellularSmsNoSimRequestMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
+{
+  public:
+    CellularSmsNoSimRequestMessage() : CellularMessage{MessageType::MessageTypeUninitialized}
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender, app::manager::actions::SmsRejectNoSim, std::make_unique<app::manager::actions::ActionParams>());
+    }
 };
 
 class CellularSimMessage : public CellularMessage
@@ -612,8 +630,10 @@ class CellularResponseMessage : public sys::ResponseMessage
                             std::string retdata    = std::string(),
                             MessageType responseTo = MessageType::MessageTypeUninitialized)
         : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode), data(retdata){};
+
     CellularResponseMessage(bool retCode, MessageType responseTo)
         : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
+
     virtual ~CellularResponseMessage(){};
 
     bool retCode;
@@ -737,6 +757,38 @@ class CellularCheckIfStartAllowedMessage : public sys::Message
     CellularCheckIfStartAllowedMessage() : sys::Message()
     {}
 };
+
+class CellularNoSimNotification : public CellularResponseMessage, public app::manager::actions::ConvertibleToAction
+{
+  public:
+    CellularNoSimNotification(std::string data) : CellularResponseMessage(false, data)
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender,
+            app::manager::actions::NoSimNotification,
+            std::make_unique<app::manager::actions::ActionParams>(data));
+    }
+};
+
+class CellularNotAnEmergencyNotification : public CellularResponseMessage,
+                                           public app::manager::actions::ConvertibleToAction
+{
+  public:
+    CellularNotAnEmergencyNotification(std::string data) : CellularResponseMessage(false, data)
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender,
+            app::manager::actions::NotAnEmergencyNotification,
+            std::make_unique<app::manager::actions::ActionParams>(data));
+    }
+};
+
 namespace cellular
 {
 

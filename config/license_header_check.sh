@@ -1,8 +1,9 @@
 #!/bin/bash
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved. 
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 
+#time update doesn't work below
 SCRIPT=$(readlink -f $0)
 SCRIPT_DIR="$(dirname ${SCRIPT})"
 REPO_ROOT="${SCRIPT_DIR%/*}"
@@ -17,7 +18,11 @@ REPO_ROOT="${SCRIPT_DIR%/*}"
 
 pushd ${REPO_ROOT} >> /dev/null
 
-LICENSE1="Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved."
+CURRENT_YEAR=$(date "+%Y")
+
+LICENSE_CHEK="\(.*\)\(Copyright (c) 2017-\)\(.*\)\(, Mudita Sp. z.o.o. All rights reserved.\).*"
+LICENSE_CHEK_BASH_RE="(.*)(Copyright \(c\) 2017-)(.*)(, Mudita Sp. z.o.o. All rights reserved.)"
+LICENSE1="Copyright (c) 2017-${CURRENT_YEAR}, Mudita Sp. z.o.o. All rights reserved."
 LICENSE2="For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md"
 
 CHECK_ONLY="false"
@@ -25,10 +30,13 @@ EXIT_CODE=0
 
 #file extension; comment;checker/replacer function
 declare -A FileTypes=( 
+            ["c_header"]="h;cppChecker;"
+            ["c_source"]="c;cppChecker;"
             ["header"]="hpp;cppChecker;"
             ["source"]="cpp;cppChecker;"
             ["python"]="py;pythonChecker;"
             ["shell"]="sh;bashChecker;"
+            ["sqlite"]="sql;sqlChecker;"
         )
 declare -a paths_to_ignore
 
@@ -40,13 +48,19 @@ function addEmptyLine() {
     fi
 }
 
+function updateYear() {
+    if [[ ${CHECK_LICENSE} =~ ${LICENSE_CHEK_BASH_RE} ]]; then
+        sed -i "1,5s|${LICENSE_CHEK}|\1\2${CURRENT_YEAR}\4|g" ${FILE}
+        echo -e "${YELLOW}Updated\e[0m"
+    else 
+        echo -e "${OK}"
+    fi
+}
 
-function cppChecker(){
-    FILE=$1
-    LICENSE_LINE1="// ${LICENSE1}"
-    LICENSE_LINE2="// ${LICENSE2}"
 
-    CHECK_LICENSE=$(head -n5 ${FILE} | grep "${LICENSE1}")
+
+function codeChecker(){
+    CHECK_LICENSE=$(head -n5 ${FILE} | grep "${LICENSE_CHEK}")
     if [[ -z ${CHECK_LICENSE} ]]; then
         if [[ ${CHECK_ONLY} == "true" ]]; then
             echo -e "${ERROR}"
@@ -58,12 +72,26 @@ function cppChecker(){
             echo -e "${FIXED}"
         fi
     else 
-        echo -e "${OK}"
+        updateYear
     fi
 }
 
+function cppChecker() {
+    FILE=$1
+    LICENSE_LINE1="// ${LICENSE1}"
+    LICENSE_LINE2="// ${LICENSE2}"
+    codeChecker
+}
+
+function sqlChecker() {
+    FILE=$1
+    LICENSE_LINE1="-- ${LICENSE1}"
+    LICENSE_LINE2="-- ${LICENSE2}"
+    codeChecker
+}
+
 function scriptChecker(){
-    CHECK_LICENSE=$( head -n5 ${FILE} | grep "${LICENSE1}")
+    CHECK_LICENSE=$( head -n5 ${FILE} | grep "${LICENSE_CHEK}")
     if [[ -z ${CHECK_LICENSE} ]]; then
         if [[ ${CHECK_ONLY} == "true" ]]; then
             echo -e "${ERROR}"
@@ -82,7 +110,7 @@ function scriptChecker(){
             echo -e "${FIXED}"
         fi
     else 
-        echo -e "${OK}"
+        updateYear
     fi
 
 }
@@ -138,14 +166,11 @@ function excludePathFromFind(){
         fi
         I=$(( $I + 1 ))
     done
-    declare -p paths_to_ignore
-    
 }
 
 function findFiles() {
     # find files except submodule directories
-    echo "find . ${NOT_PATH} -iname \"*.${FILE_EXT}\" -print0 "
-    readarray -d '' FILES_TO_CHECK < <(find . ${NOT_PATH} -iname "*.${FILE_EXT}" -print0)
+    readarray -d '' FILES_TO_CHECK < <(find . ${NOT_PATH} -iname \"*.${FILE_EXT}\" -printf \"%P\0\")
 }
 
 function shouldnt_ignore() {
@@ -180,10 +205,14 @@ function hookMain() {
     parseArgs $@
     readarray -d '' FILES_TO_CHECK < <( ${GET_FILES_CMD} )
 
+    NOT_PATH=""
+    excludePathFromFind
+
     for FILE_TYPE in "${!FileTypes[@]}" 
     do
         echo "=== ${FILE_TYPE} ==="
         extractValues ${FILE_TYPE}
+        findFiles
         I=0
         while [[ $I -lt ${#FILES_TO_CHECK[@]} ]]
         do
@@ -236,7 +265,7 @@ function parseArgs() {
                 CHECK_ONLY=true
                 ;;
             "--hook")
-                GET_FILES_CMD="git diff --cached --name-only --diff-filter=A -z ${against:-HEAD}"
+                GET_FILES_CMD="git diff --cached --name-only --diff-filter=AM -z ${against:-HEAD}"
                 shift
                 hookMain $@
                 ;;

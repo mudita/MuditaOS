@@ -4,6 +4,8 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 set(SOURCES
     endpoints/backup/BackupEndpoint.cpp
     endpoints/backup/BackupRestore.cpp
+    endpoints/bluetooth/BluetoothEndpoint.cpp
+    endpoints/bluetooth/BluetoothHelper.cpp
     endpoints/calllog/CalllogEndpoint.cpp
     endpoints/calllog/CalllogHelper.cpp
     endpoints/contacts/ContactHelper.cpp

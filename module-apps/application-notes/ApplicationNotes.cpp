@@ -19,6 +19,7 @@
 #include <module-apps/windows/OptionWindow.hpp>
 #include <module-apps/windows/Dialog.hpp>
 #include <module-services/service-db/service-db/DBNotificationMessage.hpp>
+#include <utility>
 
 namespace app
 {
@@ -28,9 +29,9 @@ namespace app
     } // namespace
 
     ApplicationNotes::ApplicationNotes(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, NotesStackSize)
+        : Application(std::move(name), std::move(parent), startInBackground, NotesStackSize)
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
 
     // Invoked upon receiving data message
@@ -43,8 +44,7 @@ namespace app
         }
 
         if (msgl->messageType == MessageType::DBServiceNotification) {
-            auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
-            if (msg != nullptr) {
+            if (auto msg = dynamic_cast<db::NotificationMessage *>(msgl); msg != nullptr) {
                 // window-specific actions
                 if (msg->interface == db::Interface::Name::Notes) {
                     for (auto &[name, window] : windowsStack) {

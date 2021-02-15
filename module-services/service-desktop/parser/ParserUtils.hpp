@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -26,10 +26,11 @@ namespace parserFSM
         messages,
         calllog,
         calendarEvents,
-        developerMode
+        developerMode,
+        bluetooth
     };
 
-    inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::developerMode);
+    inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::bluetooth);
     // Message defs and utils
     namespace message
     {
@@ -104,6 +105,7 @@ namespace parserFSM
         inline constexpr auto batteryLevel     = "batteryLevel";
         inline constexpr auto batteryState     = "batteryState";
         inline constexpr auto selectedSim      = "selectedSim";
+        inline constexpr auto sim              = "sim";
         inline constexpr auto trayState        = "trayState";
         inline constexpr auto signalStrength   = "signalStrength";
         inline constexpr auto fsTotal          = "fsTotal";
@@ -130,6 +132,9 @@ namespace parserFSM
         inline constexpr auto errorCode        = "errorCode";
         inline constexpr auto statusCode       = "statusCode";
         inline constexpr auto updateHistory    = "updateHistory";
+        inline constexpr auto fileExists       = "fileExists";
+        inline constexpr auto version          = "version";
+
         namespace filesystem
         {
             inline constexpr auto command = "command";
@@ -138,8 +143,19 @@ namespace parserFSM
                 inline constexpr auto upload   = "upload";
                 inline constexpr auto rm       = "rm";
                 inline constexpr auto download = "download";
+                inline constexpr auto checkFile = "checkFile";
             } // namespace commands
         }     // namespace filesystem
+
+        namespace updateprocess
+        {
+            inline constexpr auto command       = "command";
+            inline constexpr auto updateAborted = "updateAborted";
+            namespace commands
+            {
+                inline constexpr auto abort = "abort";
+            } // namespace commands
+        }     // namespace updateprocess
 
         namespace messages
         {

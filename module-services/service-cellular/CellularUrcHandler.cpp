@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularUrcHandler.hpp"
@@ -6,7 +6,6 @@
 #include "service-cellular/CellularMessage.hpp"
 #include "service-cellular/CellularServiceAPI.hpp"
 
-#include <module-sys/Service/Bus.hpp>
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-appmgr/Controller.hpp>
@@ -26,8 +25,13 @@ void CellularUrcHandler::Handle(Clip &urc)
     if (urc.isValid()) {
         phoneNumber = urc.getNumber();
     }
-    // continue without number
-    response = std::make_unique<CellularCallMessage>(CellularCallMessage::Type::IncomingCall, phoneNumber);
+    response = std::make_unique<CellularCallMessage>(CellularCallMessage::Type::CallerId, phoneNumber);
+    urc.setHandled(true);
+}
+
+void CellularUrcHandler::Handle(Ring &urc)
+{
+    response = std::make_unique<CellularCallMessage>(CellularCallMessage::Type::IncomingCall, "");
     urc.setHandled(true);
 }
 
@@ -79,7 +83,7 @@ void CellularUrcHandler::Handle(Cusd &urc)
             cellularService.ussdState = ussd::State::pullResponseReceived;
             cellularService.setUSSDTimer();
             auto msg = std::make_shared<CellularMMIResponseMessage>(*message);
-            sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellularService);
+            cellularService.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
         }
     }
     else {
@@ -87,7 +91,7 @@ void CellularUrcHandler::Handle(Cusd &urc)
         cellularService.ussdState = ussd::State::sesionAborted;
         cellularService.setUSSDTimer();
         auto msg = std::make_shared<CellularMMIPushMessage>(*message);
-        sys::Bus::SendUnicast(msg, app::manager::ApplicationManager::ServiceName, &cellularService);
+        cellularService.bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
     }
 
     urc.setHandled(true);
@@ -102,7 +106,7 @@ void CellularUrcHandler::Handle(Ctze &urc)
     if (isSettingsAutomaticTimeSyncEnabled()) {
         auto msg = std::make_shared<CellularTimeNotificationMessage>(
             urc.getGMTTime(), urc.getTimeZoneOffset(), urc.getTimeZoneString());
-        sys::Bus::SendUnicast(msg, service::name::evt_manager, &cellularService);
+        cellularService.bus.sendUnicast(msg, service::name::evt_manager);
     }
     else {
         LOG_DEBUG("Timezone sync disabled.");

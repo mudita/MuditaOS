@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewMessage.hpp"
@@ -7,7 +7,6 @@
 #include "application-messages/data/SMSdata.hpp"
 #include "application-messages/data/MessagesStyle.hpp"
 
-#include <application-phonebook/ApplicationPhonebook.hpp>
 #include <application-phonebook/windows/PhonebookSearchResults.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-db/DBServiceAPI.hpp>
@@ -18,6 +17,8 @@
 #include <module-db/queries/messages/threads/QueryThreadGetByContactID.hpp>
 #include <module-db/queries/messages/threads/QueryThreadGetByNumber.hpp>
 #include <module-db/queries/messages/sms/QuerySMSGetLastByThreadID.hpp>
+
+#include <service-cellular/service-cellular/MessageConstants.hpp>
 
 #include <cassert>
 
@@ -67,7 +68,7 @@ namespace gui
             return;
         }
 
-        if (auto searchRequest = dynamic_cast<PhonebookSearchReuqest *>(data); searchRequest != nullptr) {
+        if (auto searchRequest = dynamic_cast<PhonebookSearchRequest *>(data); searchRequest != nullptr) {
             LOG_INFO("Received search results");
             contact = searchRequest->result;
             recipient->setText(contact->getFormattedName());
@@ -109,7 +110,7 @@ namespace gui
             memento->setState(message);
             return app::manager::Controller::sendAction(application,
                                                         app::manager::actions::ShowContacts,
-                                                        std::make_unique<PhonebookSearchReuqest>(),
+                                                        std::make_unique<PhonebookSearchRequest>(),
                                                         app::manager::OnSwitchBehaviour::RunInBackground);
         }
         return true;
@@ -124,16 +125,6 @@ namespace gui
         if (const auto success = app->sendSms(number.getView(), message->getText()); !success) {
             LOG_ERROR("Failed to send the SMS.");
             return false;
-        }
-        if (!Store::GSM::get()->simCardInserted()) {
-            auto action = [this, number]() {
-                if (!switchToThreadWindow(number.getView())) {
-                    LOG_ERROR("switchToThreadWindow failed");
-                }
-                return true;
-            };
-            app->showNotification(action, true);
-            return true;
         }
         return switchToThreadWindow(number.getView());
     }
@@ -173,6 +164,7 @@ namespace gui
     void NewMessageWindow::updateBottomBar()
     {
         if (getFocusItem() == recipient) {
+            bottomBar->setActive(BottomBar::Side::LEFT, false);
             if (recipient->getText().empty()) {
                 bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
                 return;
@@ -186,7 +178,6 @@ namespace gui
         namespace msgStyle = style::messages::newMessage;
         AppWindow::buildInterface();
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         setTitle(utils::localize.get("sms_title_message"));
@@ -202,19 +193,14 @@ namespace gui
         recipientLabel->setFont(style::window::font::small);
         recipientLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
-        auto reciepientHbox = new gui::HBox(body, 0, 0, body->getWidth(), msgStyle::text::h);
-        reciepientHbox->setAlignment(gui::Alignment::Vertical::Center);
-        reciepientHbox->setEdges(gui::RectangleEdge::Bottom);
-        reciepientHbox->setPenFocusWidth(style::window::default_border_focus_w);
-        reciepientHbox->setPenWidth(style::window::default_border_rect_no_focus);
+        auto recipientHBox = new gui::HBox(body, 0, 0, body->getWidth(), msgStyle::text::h);
+        recipientHBox->setAlignment(gui::Alignment::Vertical::Center);
+        recipientHBox->setEdges(gui::RectangleEdge::Bottom);
+        recipientHBox->setPenFocusWidth(style::window::default_border_focus_w);
+        recipientHBox->setPenWidth(style::window::default_border_rect_no_focus);
 
-        recipient = new gui::Text(reciepientHbox,
-                                  0,
-                                  0,
-                                  body->getWidth() - msgStyle::recipientImg::w,
-                                  msgStyle::text::h,
-                                  "",
-                                  ExpandMode::None);
+        recipient = new gui::Text(
+            recipientHBox, 0, 0, body->getWidth() - msgStyle::recipientImg::w, msgStyle::text::h, "", ExpandMode::None);
         recipient->setEdges(gui::RectangleEdge::None);
         recipient->setInputMode(new InputMode({InputMode::phone}));
         recipient->setFont(style::window::font::mediumbold);
@@ -222,16 +208,29 @@ namespace gui
         recipient->activatedCallback    = [=](Item &) -> bool { return selectContact(); };
         recipient->focusChangedCallback = [=](Item &) -> bool {
             updateBottomBar();
-            bottomBar->setActive(BottomBar::Side::LEFT, false);
             return true;
+        };
+        recipient->inputCallback = [this]([[maybe_unused]] Item &, const InputEvent &inputEvent) -> bool {
+            if (contact != nullptr) {
+                if (inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_PND)) {
+                    recipient->clear();
+                    return true;
+                }
+                if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
+                    return true;
+                }
+            }
+            return false;
         };
         recipient->setTextChangedCallback([this]([[maybe_unused]] Item &item, const UTF8 &text) {
             if (recipient->getText().empty()) {
                 contact = nullptr;
+                phoneNumber.clear();
             }
+            updateBottomBar();
         });
 
-        auto img        = new gui::Image(reciepientHbox, 0, 0, 0, 0, "phonebook_small");
+        auto img        = new gui::Image(recipientHBox, 0, 0, 0, 0, "phonebook_small");
         img->activeItem = false;
 
         auto labelMessage = new Label(body, 0, 0, body->getWidth(), msgStyle::messageLabel::h);
@@ -242,7 +241,8 @@ namespace gui
         labelMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
         message = new gui::Text(nullptr, 0, 0, body->getWidth(), msgStyle::text::h, "", ExpandMode::Up);
-        message->setMaximumSize(body->getWidth(), body->getHeight());
+        message->setMaximumSize(body->getWidth(), msgStyle::text::maxH);
+        message->setTextLimitType(gui::TextLimitType::MaxSignsCount, msgConstants::maxConcatenatedLen);
         message->setEdges(gui::RectangleEdge::Bottom);
         message->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <numeric>
 #include <list>
 #include "Common.hpp"
 #include "Label.hpp"
@@ -73,7 +74,14 @@ namespace gui
         /// count of elements in whole TextLine
         [[nodiscard]] unsigned int count() const noexcept
         {
-            return lineContent.size();
+            return std::accumulate(lineContent.begin(), lineContent.end(), 0U, [](const auto sum, const auto &content) {
+                return sum + content->getTextLength();
+            });
+        }
+
+        [[nodiscard]] bool empty() const noexcept
+        {
+            return ((end == TextBlock::End::Newline && count() == 1) || (end == TextBlock::End::None && count() == 0));
         }
 
         [[nodiscard]] Length width() const noexcept

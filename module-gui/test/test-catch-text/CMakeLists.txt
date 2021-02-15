@@ -1,4 +1,4 @@
-# gui tests
+﻿# gui tests
 add_catch2_executable(
         NAME
                 gui-text
@@ -19,7 +19,10 @@ add_catch2_executable(
                 ..
                 ../mock/
         LIBS
+                module-vfs
                 module-gui
+                iosyscalls
         DEPS
                 assets
+                PurePhone.img-target
 )

@@ -47,7 +47,7 @@ namespace gui
             return false;
         }
 
-        dayMonthTitle = item->getDayMonthText();
+        dayMonthTitle   = item->getDayMonthText();
         filterFrom      = item->getDateFilter();
         auto filterTill = filterFrom + date::days{1};
         dayEventsModel->setFilters(filterFrom, filterTill, dayMonthTitle);
@@ -79,7 +79,8 @@ namespace gui
                                           style::window::calendar::listView_y,
                                           style::window::calendar::listView_w,
                                           style::window::calendar::listView_h,
-                                          dayEventsModel);
+                                          dayEventsModel,
+                                          style::listview::ScrollBarType::Fixed);
         setFocusItem(dayEventsList);
     }
 
@@ -101,7 +102,7 @@ namespace gui
             rec->date_from = filterFrom;
             rec->date_till = filterFrom + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
                              std::chrono::minutes(style::window::calendar::time::max_minutes);
-            auto event     = std::make_shared<EventsRecord>(*rec);
+            auto event = std::make_shared<EventsRecord>(*rec);
             data->setData(event);
             application->switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));

@@ -25,6 +25,7 @@ namespace callAppStyle
         inline constexpr auto speaker   = "app_call_speaker";
         inline constexpr auto speakeron = "app_call_speaker_on";
         inline constexpr auto bluetooth = "app_call_bluetooth";
+        inline constexpr auto privateNumber = "app_call_private_number";
     } // namespace strings
 
     namespace numberLabel

@@ -1,11 +1,6 @@
-/*
- * @file fsl_edma.h
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 29 maj 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #ifndef MODULE_BSP_BOARD_LINUX_FSL_DRIVERS_FSL_EDMA_H_
 #define MODULE_BSP_BOARD_LINUX_FSL_DRIVERS_FSL_EDMA_H_
 

@@ -74,7 +74,7 @@ namespace utils
         inputLanguage = lang;
     }
 
-    const std::string &i18n::getInputLanguage(const std::string &inputMode)
+    const std::string &i18n::getInputLanguageFilename(const std::string &inputMode)
     {
         // if language pack returned nothing then try default language
         if (inputLanguage.empty()) {
@@ -84,6 +84,16 @@ namespace utils
             inputLanguageFilename = inputLanguage + utils::files::breakSign + inputMode;
         }
         return inputLanguageFilename;
+    }
+
+    const std::string &i18n::getInputLanguage()
+    {
+        return inputLanguage;
+    }
+
+    const std::string &i18n::getDisplayLanguage()
+    {
+        return currentDisplayLanguage;
     }
 
     const std::string &i18n::get(const std::string &str)
@@ -122,5 +132,4 @@ namespace utils
     {
         fallbackLanguageName = std::move(lang);
     }
-
 } // namespace utils

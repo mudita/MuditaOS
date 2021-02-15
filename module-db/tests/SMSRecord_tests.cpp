@@ -39,8 +39,8 @@ TEST_CASE("SMS Record tests")
         REQUIRE(std::filesystem::remove(smsPath));
     }
 
-    auto contactsDB = std::make_unique<ContactsDB>(contactsPath.c_str());
-    auto smsDB      = std::make_unique<SmsDB>(smsPath.c_str());
+    ContactsDB contactsDB(contactsPath.c_str());
+    SmsDB smsDB(smsPath.c_str());
 
     const uint32_t dateTest      = 123456789;
     const uint32_t dateSentTest  = 987654321;
@@ -51,7 +51,7 @@ TEST_CASE("SMS Record tests")
     const char *bodyTest2        = "Test SMS Body2";
     const SMSType typeTest       = SMSType ::DRAFT;
 
-    SMSRecordInterface smsRecInterface(smsDB.get(), contactsDB.get());
+    SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
 
     SMSRecord recordIN;
     recordIN.date      = dateTest;
@@ -162,7 +162,7 @@ TEST_CASE("SMS Record tests")
         }
 
         // Remove sms records in order to check automatic management of threads and contact databases
-        ThreadRecordInterface threadRecordInterface(smsDB.get(), contactsDB.get());
+        ThreadRecordInterface threadRecordInterface(&smsDB, &contactsDB);
         REQUIRE(smsRecInterface.RemoveByID(1));
         records = smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ContactID, "1");
 
@@ -175,7 +175,7 @@ TEST_CASE("SMS Record tests")
 
         // Test removing a message which belongs to non-existent thread
         REQUIRE(smsRecInterface.Add(recordIN));
-        REQUIRE(smsDB->threads.removeById(1)); // stealthy thread remove
+        REQUIRE(smsDB.threads.removeById(1)); // stealthy thread remove
         REQUIRE(smsRecInterface.RemoveByID(1));
 
         // Test handling of missmatch in sms vs. thread tables
@@ -185,6 +185,39 @@ TEST_CASE("SMS Record tests")
             recordIN.date = added;                     // for proper order
             recordIN.body = std::to_string(added + 1); // == ID
             REQUIRE(smsRecInterface.Add(recordIN));    // threadID = 1
+        }
+        ThreadRecord threadRec = threadRecordInterface.GetByID(1);
+        REQUIRE(threadRec.isValid());
+        ThreadsTableRow threadRaw{{.ID = threadRec.ID},
+                                  .date           = threadRec.date,
+                                  .msgCount       = threadRec.msgCount,
+                                  .unreadMsgCount = threadRec.unreadMsgCount,
+                                  .contactID      = threadRec.contactID,
+                                  .snippet        = threadRec.snippet,
+                                  .type           = threadRec.type};
+        threadRaw.msgCount = trueCount + 1; // break the DB
+        REQUIRE(smsDB.threads.update(threadRaw));
+
+        REQUIRE(static_cast<int>(
+                    smsRecInterface.GetLimitOffsetByField(0, 100, SMSRecordField::ThreadID, "1")->size()) == trueCount);
+        // end of preparation, now test
+        for (auto latest = trueCount; latest > 0; latest--) {
+            REQUIRE(smsRecInterface.RemoveByID(latest)); // remove the latest
+            switch (latest) {                            // was just removed
+            case 3:                                      // remaining 2 or more
+            default:
+                REQUIRE(threadRecordInterface.GetByID(1).snippet.c_str() ==
+                        std::to_string(latest - 1)); // next to newest
+                break;
+            case 2:                                                                             // remaining 1
+                REQUIRE(threadRecordInterface.GetByID(1).snippet.c_str() == std::to_string(1)); // only one remaining
+                break;
+            case 1: // no sms remaining
+                // make sure there is no thread nor sms
+                REQUIRE(threadRecordInterface.GetCount() == 0);
+                REQUIRE(smsRecInterface.GetCount() == 0);
+                break;
+            }
         }
 
         // Test removing by field

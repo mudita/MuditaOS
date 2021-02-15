@@ -9,7 +9,6 @@
 #include <endpoints/Context.hpp>
 #include <endpoints/messages/MessageHelper.hpp>
 
-#include <Service/Bus.hpp>
 #include <json/json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 
@@ -34,6 +33,25 @@ auto UpdateEndpoint::handle(Context &context) -> void
 
 auto UpdateEndpoint::run(Context &context) -> sys::ReturnCodes
 {
+    std::string cmd = context.getBody()[parserFSM::json::updateprocess::command].string_value();
+    if (cmd == parserFSM::json::updateprocess::commands::abort) {
+        auto owner        = static_cast<ServiceDesktop *>(ownerServicePtr);
+        auto currentState = owner->updateOS->status;
+        if (currentState <= updateos::UpdateState::ExtractingFiles) {
+            owner->updateOS->setUpdateAbortFlag(true);
+            context.setResponseBody(json11::Json::object({{parserFSM::json::updateprocess::updateAborted, true}}));
+            context.setResponseStatus(http::Code::OK);
+            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            return sys::ReturnCodes::Success;
+        }
+        else {
+            context.setResponseBody(json11::Json::object({{parserFSM::json::updateprocess::updateAborted, false}}));
+            context.setResponseStatus(http::Code::NotAcceptable);
+            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            return sys::ReturnCodes::Failure;
+        }
+    }
+
     std::string fileName = context.getBody()["fileName"].string_value();
     auto path            = purefs::dir::getUpdatesOSPath() / fileName;
     auto fileExists      = std::filesystem::exists(path.c_str());
@@ -41,7 +59,7 @@ auto UpdateEndpoint::run(Context &context) -> sys::ReturnCodes
         context.setResponseBody(json11::Json::object({{parserFSM::json::updateReady, true}}));
 
         auto msg = std::make_shared<sdesktop::UpdateOsMessage>(fileName, context.getUuid());
-        sys::Bus::SendUnicast(msg, service::name::service_desktop, ownerServicePtr);
+        ownerServicePtr->bus.sendUnicast(msg, service::name::service_desktop);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Success;
     }

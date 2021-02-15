@@ -1,3 +1,6 @@
+-- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+-- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 BEGIN;
 INSERT OR REPLACE INTO  contacts (_id,name_id,numbers_id,ring_id,address_id,speeddial) VALUES (1,1,'1',1,1,1);
 INSERT OR REPLACE INTO  contacts (_id,name_id,numbers_id,ring_id,address_id,speeddial) VALUES (2,2,'2',2,2,2);

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceDB.hpp"
@@ -11,7 +11,6 @@
 #include "service-db/DBSMSMessage.hpp"
 #include "service-db/DBSMSTemplateMessage.hpp"
 #include "service-db/DBServiceMessage.hpp"
-#include "service-db/DBServiceName.hpp"
 #include "service-db/DBThreadMessage.hpp"
 #include "service-db/QueryMessage.hpp"
 #include "service-db/DatabaseAgent.hpp"
@@ -37,7 +36,6 @@
 #include <purefs/filesystem_paths.hpp>
 #include <SMSRecord.hpp>
 #include <SMSTemplateRecord.hpp>
-#include <Service/Bus.hpp>
 #include <Tables/Record.hpp>
 #include <ThreadRecord.hpp>
 #include <log/log.hpp>
@@ -574,7 +572,7 @@ sys::ReturnCodes ServiceDB::SwitchPowerModeHandler(const sys::ServicePowerMode m
 void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Query::Type type)
 {
     auto notificationMessage = std::make_shared<db::NotificationMessage>(interface, type);
-    sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
+    bus.sendMulticast(notificationMessage, sys::BusChannel::ServiceDBNotifications);
 }
 
 bool ServiceDB::StoreIntoBackup(const std::string &backupPath)

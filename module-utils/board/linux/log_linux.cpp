@@ -7,10 +7,6 @@
 #include <string_view>
 #include <ticks.hpp>
 
-#if LOG_USE_COLOR == 1
-static const char *level_colors[] = {"\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"};
-#endif
-
 namespace Log
 {
     void Logger::addLogHeader(logger_level level, const char *file, int line, const char *function)
@@ -19,23 +15,17 @@ namespace Log
                                            LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
                                            "%d ms ",
                                            cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
-#if LOG_USE_COLOR == 1
+
         loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
                                            LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
-                                           "%s%-5s\x1b[0m \x1b[90m%s:%d:\x1b[0m ",
-                                           level_colors[level],
+                                           "%s%-5s %s%s:%s:%d:%s ",
+                                           logColors->levelColors[level].data(),
                                            level_names[level],
-                                           file,
-                                           line);
-#else
-        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
-                                           LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
-                                           "%-5s %s:%s:%d: ",
-                                           level_names[level],
+                                           logColors->callerInfoColor.data(),
                                            file,
                                            function,
-                                           line);
-#endif
+                                           line,
+                                           logColors->resetColor.data());
     }
 
     bool Logger::filterLogs(logger_level _level)

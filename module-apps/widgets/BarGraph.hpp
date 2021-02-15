@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,7 +24,6 @@ namespace gui
         uint32_t currentLevel = 0;
 
         [[nodiscard]] auto createRectangle(uint32_t width, uint32_t height) const -> Rect *;
-        [[nodiscard]] auto createSpace(uint32_t width, uint32_t height) const -> Rect *;
 
         auto incrementWith(uint32_t levels) -> bool;
         auto decrementWith(uint32_t levels) -> bool;

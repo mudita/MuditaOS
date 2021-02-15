@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OptionsMessages.hpp"
@@ -7,15 +7,13 @@
 
 #include <common_data/Clipboard.hpp>
 #include <Option.hpp>
+#include <Text.hpp>
 #include <i18n/i18n.hpp>
 
-#include <Text.hpp>
 #include <memory>
 #include <module-services/service-db/service-db/DBServiceAPI.hpp>
 #include <module-apps/options/type/OptionCall.hpp>
 #include <module-apps/options/type/OptionContact.hpp>
-
-using namespace style::window;
 
 std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record)
 {

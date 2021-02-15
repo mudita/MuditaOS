@@ -12,7 +12,6 @@
 #include <Bluetooth/Device.hpp>
 #include <Bluetooth/Error.hpp>
 #include <log/log.hpp>
-#include <Service/Bus.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <service-audio/AudioMessage.hpp>
@@ -24,7 +23,7 @@ extern "C"
 #include <btstack_defines.h>
 }
 
-namespace Bt
+namespace bluetooth
 {
     A2DP::A2DP() : pimpl(std::make_unique<A2DPImpl>(A2DPImpl()))
     {}
@@ -121,7 +120,7 @@ namespace Bt
                                                AVDTP::sbcCodecConfiguration.size());
         if (local_stream_endpoint == nullptr) {
             LOG_INFO("A2DP Source: not enough memory to create local stream endpoint\n");
-            return Bt::Error::SystemError;
+            return bluetooth::Error::SystemError;
         }
         AVRCP::mediaTracker.local_seid = avdtp_local_seid(local_stream_endpoint);
         avdtp_source_register_delay_reporting_category(AVRCP::mediaTracker.local_seid);
@@ -166,7 +165,7 @@ namespace Bt
 
         LOG_INFO("Init done!");
 
-        return Bt::Error::Success;
+        return bluetooth::Error::Success;
     }
 
     void A2DP::A2DPImpl::sendMediaPacket()
@@ -596,7 +595,8 @@ namespace Bt
     {
         auto evt = std::make_shared<audio::Event>(event, state);
         auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
-        sys::Bus::SendUnicast(std::move(msg), service::name::evt_manager, const_cast<sys::Service *>(ownerService));
+        auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+        busProxy.sendUnicast(std::move(msg), service::name::evt_manager);
     }
 
 } // namespace Bt

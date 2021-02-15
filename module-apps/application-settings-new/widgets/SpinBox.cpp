@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SpinBox.hpp"
+#include "OptionStyle.hpp"
 #include "widgets/BarGraph.hpp"
 
 #include <InputEvent.hpp>
@@ -71,7 +72,7 @@ namespace gui
         auto label = new Label(parent);
         label->setMinimumHeight(style::window::label::default_h);
         label->setMaximumWidth(style::window::default_body_width);
-
+        label->setMargins(Margins(option::window::option_left_margin, 0, 0, 0));
         label->setEdges(RectangleEdge::None);
         label->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         label->setFont(style::window::font::big);
@@ -85,6 +86,7 @@ namespace gui
     {
         auto barGraph = new HBarGraph(parent, 0, 0, maxValue);
         barGraph->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
+        barGraph->setMargins(Margins(0, 0, option::window::option_right_margin, 0));
         barGraph->setValue(startValue);
         barGraph->activeItem = false;
 

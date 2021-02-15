@@ -5,11 +5,13 @@ set(SOURCES
     CellularCall.cpp
     CellularServiceAPI.cpp
     CellularUrcHandler.cpp
+    checkSmsCenter.cpp
     ServiceCellular.cpp
     SignalStrength.cpp
     SimCard.cpp
     NetworkSettings.cpp
     PacketData.cpp
+    QMBNManager.cpp
     RequestFactory.cpp
     CellularRequestHandler.cpp
     requests/Request.cpp

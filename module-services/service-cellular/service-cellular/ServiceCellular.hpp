@@ -19,6 +19,7 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
+#include <Service/CpuSentinel.hpp>
 #include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>
 #include <optional> // for optional
@@ -27,6 +28,7 @@
 #include <vector>   // for vector
 #include <service-db/Settings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <service-db/DBServiceName.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -158,6 +160,7 @@ class ServiceCellular : public sys::Service
 
   private:
     std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
+    std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
     // used for polling for call state
     std::unique_ptr<sys::Timer> callStateTimer;
@@ -186,6 +189,7 @@ class ServiceCellular : public sys::Service
         PowerCycle, //<! PWRKEY pin toggle
         HardReset   //<! RESET_N pin
     };
+
     bool resetCellularModule(ResetType type);
     bool isAfterForceReboot = false;
     bool nextPowerStateChangeAwaiting          = false;
@@ -287,6 +291,7 @@ class ServiceCellular : public sys::Service
         CellularGetCurrentOperatorMessage *msg);
     std::shared_ptr<CellularGetAPNResponse> handleCellularGetAPNMessage(CellularGetAPNMessage *msg);
     std::shared_ptr<CellularSetAPNResponse> handleCellularSetAPNMessage(CellularSetAPNMessage *msg);
+    std::shared_ptr<CellularNewAPNResponse> handleCellularNewAPNMessage(CellularNewAPNMessage *msg);
     std::shared_ptr<CellularSetOperatorResponse> handleCellularSetOperator(CellularSetOperatorMessage *msg);
     std::shared_ptr<CellularSetDataTransferResponse> handleCellularSetDataTransferMessage(
         CellularSetDataTransferMessage *msg);
@@ -306,5 +311,20 @@ class ServiceCellular : public sys::Service
     friend class packet_data::PacketData;
 
     void volteChanged(const std::string &value);
+    void apnListChanged(const std::string &value);
     bool volteOn = false;
 };
+
+namespace sys
+{
+    template <> struct ManifestTraits<ServiceCellular>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = ServiceCellular::serviceName;
+            manifest.dependencies = {service::name::db};
+            return manifest;
+        }
+    };
+} // namespace sys

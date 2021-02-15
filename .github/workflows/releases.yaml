@@ -17,27 +17,30 @@ jobs:
     - name: "Style checking"
       run: |
         ./config/pre-commit.hook --last
-    - name: "Unit Tests"
+    - name: Build Unit Tests
       run: |
-        ./configure.sh linux Debug && \
+        export JOBS=${JOBS:-$(nproc)} && \
+        echo "JOBS=${JOBS}" &&  \
+        ./configure.sh linux Debug -G Ninja && \
         pushd build-linux-Debug && \
-        export JOBS=${JOBS:-`nproc`} && \
-        echo "JOBS=${JOBS}" && \
-        make -j ${JOBS} check && \
+        ninja unittests && \
         popd
+    - name: Run unit tests
+      run: |
+        ./tools/run_unittests.sh enabled_unittests
     - name: "Build and package for RT1051"
       id: build_release_package 
       env:
         ASSETS_LOGIN: ${{ secrets.ASSETS_LOGIN }}
         ASSETS_TOKEN: ${{ secrets.ASSETS_TOKEN }}
       run: |
-        ./configure.sh rt1051 RelWithDebInfo && \
+        export JOBS=${JOBS:-$(nproc)} && \
+        echo "JOBS=${JOBS}" &&  \
+        ./configure.sh rt1051 RelWithDebInfo -G Ninja && \
         pushd build-rt1051-RelWithDebInfo && \
-        export JOBS=${JOBS:-`nproc`} && \
-        echo "JOBS=${JOBS}" && \
-        make -j ${JOBS} && \
-        make package-update VERBOSE=1 && \
-        make package-standalone && \
+        ninja -j ${JOBS} && \
+        ninja -j ${JOBS} package-update && \
+        ninja -j ${JOBS} package-standalone && \
         popd && \
         ./print_last_changes.sh && \
         uptime

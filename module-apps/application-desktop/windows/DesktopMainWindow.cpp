@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <memory>
@@ -77,14 +77,8 @@ namespace gui
     {
         auto app            = getAppDesktop();
         const auto isLocked = app->lockHandler.isScreenLocked();
-        updateTopBarConfiguration(isLocked, appConfiguration);
+        appConfiguration.set(top_bar::Indicator::Lock, isLocked);
         return appConfiguration;
-    }
-
-    void DesktopMainWindow::updateTopBarConfiguration(bool isScreenLocked, top_bar::Configuration &configuration)
-    {
-        configuration.set(top_bar::Indicator::Lock, isScreenLocked);
-        configuration.set(top_bar::Indicator::Time, !isScreenLocked);
     }
 
     DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_main_window)
@@ -101,10 +95,8 @@ namespace gui
     void DesktopMainWindow::setVisibleState()
     {
         auto app = getAppDesktop();
-        applyToTopBar([isLocked = app->lockHandler.isScreenLocked()](top_bar::Configuration configuration) {
-            updateTopBarConfiguration(isLocked, configuration);
-            return configuration;
-        });
+        applyToTopBar(
+            [this](top_bar::Configuration configuration) { return configureTopBar(std::move(configuration)); });
 
         if (app->lockHandler.isScreenLocked()) {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
@@ -117,8 +109,7 @@ namespace gui
             setFocusItem(nullptr);
             buildNotifications(app);
 
-            sys::Bus::SendUnicast(
-                std::make_shared<TimersProcessingStopMessage>(), service::name::service_time, application);
+            application->bus.sendUnicast(std::make_shared<TimersProcessingStopMessage>(), service::name::service_time);
         }
         else {
             if (!buildNotifications(app)) {
@@ -130,8 +121,7 @@ namespace gui
                 app::manager::Controller::sendAction(application, app::manager::actions::SelectSimCard);
             }
 
-            sys::Bus::SendUnicast(
-                std::make_shared<TimersProcessingStartMessage>(), service::name::service_time, application);
+            application->bus.sendUnicast(std::make_shared<TimersProcessingStartMessage>(), service::name::service_time);
         }
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }

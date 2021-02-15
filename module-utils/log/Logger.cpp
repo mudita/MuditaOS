@@ -20,6 +20,21 @@ namespace Log
                                                             {IRQ_STR, logger_level::LOGTRACE}};
     const char *Logger::level_names[]                    = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
+    void Logger::enableColors(bool enable)
+    {
+        if (!lock()) {
+            return;
+        }
+        auto _ = gsl::finally([this] { unlock(); });
+
+        if (enable) {
+            logColors = &logColorsOn;
+        }
+        else {
+            logColors = &logColorsOff;
+        }
+    }
+
     auto Logger::GetLogLevel(const std::string &name) -> logger_level
     {
         return filtered[name];
@@ -34,6 +49,15 @@ namespace Log
             return mutex.Lock();
         }
         return true;
+    }
+
+    void Logger::init()
+    {
+#if LOG_USE_COLOR == 1
+        enableColors(true);
+#else
+        enableColors(false);
+#endif
     }
 
     auto Logger::log(Device device, const char *fmt, va_list args) -> int

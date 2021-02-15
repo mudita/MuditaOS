@@ -40,7 +40,8 @@ namespace gui
                                  phonebookStyle::newContactWindow::newContactsList::y,
                                  phonebookStyle::newContactWindow::newContactsList::w,
                                  phonebookStyle::newContactWindow::newContactsList::h,
-                                 newContactModel);
+                                 newContactModel,
+                                 style::listview::ScrollBarType::PreRendered);
         setFocusItem(list);
     }
 

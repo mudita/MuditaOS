@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Endpoint.hpp"
@@ -31,6 +31,15 @@ bool Endpoint::isConnected() const noexcept
 {
     return _stream != nullptr;
 }
+
+Sink::Sink(const Capabilities &caps) : Endpoint(caps)
+{}
+
+Source::Source(const Capabilities &caps) : Endpoint(caps)
+{}
+
+IOProxy::IOProxy(const Capabilities &sourceCaps, const Capabilities &sinkCaps) : Source(sourceCaps), Sink(sinkCaps)
+{}
 
 StreamConnection::StreamConnection(Source *source, Sink *sink, Stream *stream)
     : _sink(sink), _source(source), _stream(stream)

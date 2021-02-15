@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationPhonebook.hpp"
@@ -24,7 +24,7 @@ namespace app
                                                StartInBackground startInBackground)
         : Application(name, parent, startInBackground, phonebook_stack_size)
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowContacts, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
             return msgHandled();
@@ -166,7 +166,7 @@ namespace app
 
             if (main_window->isSearchRequested()) {
                 searchModel->messagesSelectCallback = [=](gui::PhonebookItem *item) {
-                    std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
+                    std::unique_ptr<PhonebookSearchRequest> data = std::make_unique<PhonebookSearchRequest>();
                     data->result                                 = item->contact;
                     data->setDescription("PhonebookSearchRequest");
                     return app::manager::Controller::switchBack(

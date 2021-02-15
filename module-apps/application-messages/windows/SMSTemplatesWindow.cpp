@@ -46,7 +46,8 @@ namespace gui
 
         namespace style = style::messages::templates::list;
 
-        list = new gui::ListView(this, style::x, style::y, style::w, style::h, smsTemplateModel);
+        list = new gui::ListView(
+            this, style::x, style::y, style::w, style::h, smsTemplateModel, ::style::listview::ScrollBarType::Fixed);
 
         setFocusItem(list);
     }

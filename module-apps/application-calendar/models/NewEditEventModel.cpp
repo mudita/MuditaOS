@@ -2,16 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditEventModel.hpp"
-#include "AppWindow.hpp"
 #include "application-calendar/widgets/NewEventCheckBoxWithLabel.hpp"
-#include "module-apps/application-calendar/data/CalendarData.hpp"
+#include "application-calendar/data/CalendarData.hpp"
+#include "application-calendar/ApplicationCalendar.hpp"
+#include "AppWindow.hpp"
 #include <BottomBar.hpp>
 #include <ListView.hpp>
 #include <module-db/queries/calendar/QueryEventsAdd.hpp>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
 #include <service-db/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
-#include <module-apps/application-calendar/ApplicationCalendar.hpp>
 
 NewEditEventModel::NewEditEventModel(app::Application *app, bool mode24H) : application(app), mode24H(mode24H)
 {}
@@ -70,7 +70,7 @@ void NewEditEventModel::createData(bool allDayEvent)
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); });
 
     allDayEventCheckBox = new gui::NewEventCheckBoxWithLabel(
-        application, utils::localize.get("app_calendar_new_edit_event_allday"), true, this);
+        application, utils::localize.get("app_calendar_new_edit_event_allday"), this);
 
     dateItem = new gui::EventDateItem();
 
@@ -104,10 +104,12 @@ void NewEditEventModel::createData(bool allDayEvent)
     startTime->setConnectionToDateItem(dateItem);
     endTime->setConnectionToDateItem(dateItem);
 
+    allDayEventCheckBox->setConnectionToDateItem(dateItem);
+
     internalData.push_back(eventNameInput);
     internalData.push_back(allDayEventCheckBox);
+    internalData.push_back(dateItem);
     if (!allDayEvent) {
-        internalData.push_back(dateItem);
         internalData.push_back(startTime);
         internalData.push_back(endTime);
     }
@@ -145,9 +147,6 @@ void NewEditEventModel::loadData(std::shared_ptr<EventsRecord> record)
                             TimePointToHourMinSec(TimePointNow()).hours() +
                             TimePointToHourMinSec(TimePointNow()).minutes();
         record->date_till = record->date_from + std::chrono::hours(1);
-        if (dateItem->onLoadCallback) {
-            dateItem->onLoadCallback(record);
-        }
         if (startTime->onLoadCallback) {
             startTime->onLoadCallback(record);
         }
@@ -168,7 +167,6 @@ void NewEditEventModel::loadRepeat(const std::shared_ptr<EventsRecord> &record)
 
 void NewEditEventModel::loadDataWithoutTimeItem()
 {
-    internalData.erase(std::find(internalData.begin(), internalData.end(), dateItem));
     internalData.erase(std::find(internalData.begin(), internalData.end(), startTime));
     internalData.erase(std::find(internalData.begin(), internalData.end(), endTime));
     list->rebuildList();
@@ -193,7 +191,7 @@ void NewEditEventModel::reloadDataWithTimeItem()
     list->rebuildList();
 }
 
-void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
+void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, EventAction action)
 {
     for (auto &item : internalData) {
         if (item->onSaveCallback) {
@@ -201,19 +199,20 @@ void NewEditEventModel::saveData(std::shared_ptr<EventsRecord> event, bool edit)
         }
     }
 
-    if (edit) {
+    if (action == EventAction::Edit) {
         auto record = event.get();
         record->reminder_fired = TIME_POINT_INVALID;
-        if (record->title != "") {
+        if (!record->title.empty()) {
             DBServiceAPI::GetQuery(
                 application, db::Interface::Name::Events, std::make_unique<db::query::events::Edit>(*record));
         }
-        const uint32_t numberOfIgnoredWindows = 3;
-        application->returnToPreviousWindow(numberOfIgnoredWindows);
+        auto rec  = std::make_unique<EventsRecord>(*record);
+        auto data = std::make_unique<EventRecordData>(std::move(rec));
+        application->switchWindow(style::window::calendar::name::details_window, std::move(data));
     }
     else {
         auto record = event.get();
-        if (record->title != "") {
+        if (!record->title.empty()) {
             DBServiceAPI::GetQuery(
                 application, db::Interface::Name::Events, std::make_unique<db::query::events::Add>(*record));
 

@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Service.hpp"
-#include "Bus.hpp"             // for Bus
 #include "FreeRTOSConfig.h"    // for configASSERT
 #include "MessageType.hpp"     // for MessageType, MessageType::MessageType...
 #include "Service/Common.hpp"  // for BusChannels, ReturnCodes, ReturnCodes...
@@ -47,17 +46,13 @@ void debug_msg(sys::Service *srvc, const sys::Message *ptr)
 
 namespace sys
 {
-
     using namespace cpp_freertos;
     using namespace std;
 
     Service::Service(std::string name, std::string parent, uint32_t stackDepth, ServicePriority priority)
         : cpp_freertos::Thread(name, stackDepth / 4 /* Stack depth in bytes */, static_cast<UBaseType_t>(priority)),
-          parent(parent), mailbox(this), pingTimestamp(UINT32_MAX), isReady(false), enableRunLoop(false)
-
+          parent(parent), bus{this}, mailbox(this), pingTimestamp(UINT32_MAX), isReady(false), enableRunLoop(false)
     {
-        // System channel is mandatory for each service
-        busChannels = {BusChannels::System};
     }
 
     Service::~Service()
@@ -68,12 +63,17 @@ namespace sys
 
     void Service::StartService()
     {
-        Bus::Add(shared_from_this());
+        bus.connect();
         enableRunLoop = true;
         if (!Start()) {
             LOG_FATAL("FATAL ERROR: Start service failed!:%s", GetName().c_str());
             configASSERT(0);
         }
+    }
+
+    void Service::CloseService()
+    {
+        bus.disconnect();
     }
 
     void Service::Run()
@@ -100,9 +100,9 @@ namespace sys
                 continue;
             }
 
-            Bus::SendResponse(response, msg, this);
+            bus.sendResponse(response, msg);
         }
-        Bus::Remove(shared_from_this());
+        CloseService();
     };
 
     auto Service::MessageEntry(Message *message, ResponseMessage *response) -> MessagePointer

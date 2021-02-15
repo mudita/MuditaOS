@@ -13,10 +13,7 @@ namespace bsp
     class SAIAudioDevice : public bsp::AudioDevice
     {
       public:
-        SAIAudioDevice(AudioDevice::audioCallback_t callback,
-                       I2S_Type *base,
-                       sai_edma_handle_t *rxHandle,
-                       sai_edma_handle_t *txHandle);
+        SAIAudioDevice(I2S_Type *base, sai_edma_handle_t *rxHandle, sai_edma_handle_t *txHandle);
 
         void onDataSend() override;
         void onDataReceive() override;
@@ -33,6 +30,8 @@ namespace bsp
         sai_edma_handle_t *tx = nullptr;
         bool txEnabled        = false;
         bool rxEnabled        = false;
+
+        static constexpr Capabilities saiCapabilities = {.usesDMA = true};
     };
 
 } // namespace bsp

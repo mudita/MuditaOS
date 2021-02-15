@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,7 +22,10 @@
 #include <string_view>
 #include <vector>
 
+#include <service-db/DBServiceName.hpp>
 #include <service-db/Settings.hpp>
+#include <service-gui/Common.hpp>
+#include <service-eink/Common.hpp>
 
 namespace app
 {
@@ -100,12 +103,12 @@ namespace app::manager
 
       private:
         auto startApplication(ApplicationHandle &app) -> bool;
-        void startSystemServices();
         void startBackgroundApplications();
         void rebuildActiveApplications();
         void suspendSystemServices();
         auto closeServices() -> bool;
         auto closeApplications() -> bool;
+        auto closeApplicationsOnUpdate() -> bool;
         void closeService(const std::string &name);
         void closeApplication(ApplicationHandle *application);
 
@@ -123,6 +126,10 @@ namespace app::manager
         auto handleInitApplication(ApplicationInitialised *msg) -> bool;
         auto handleDisplayLanguageChange(DisplayLanguageChangeRequest *msg) -> bool;
         auto handleInputLanguageChange(InputLanguageChangeRequest *msg) -> bool;
+        auto handleAutomaticDateAndTimeChange(AutomaticDateAndTimeIsOnChangeRequest *msg) -> bool;
+        auto handleAutomaticTimeZoneChange(AutomaticTimeZoneIsOnChangeRequest *msg) -> bool;
+        auto handleTimeFormatChange(TimeFormatChangeRequest *msg) -> bool;
+        auto handleDateFormatChange(DateFormatChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
         auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
 
@@ -150,7 +157,19 @@ namespace app::manager
         void displayLanguageChanged(std::string value);
         void lockTimeChanged(std::string value);
         void inputLanguageChanged(std::string value);
-        std::string inputLanguage;
-        std::string displayLanguage;
     };
 } // namespace app::manager
+
+namespace sys
+{
+    template <> struct ManifestTraits<app::manager::ApplicationManager>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = app::manager::ApplicationManager::ServiceName;
+            manifest.dependencies = {service::name::db, service::name::gui, service::name::eink};
+            return manifest;
+        }
+    };
+} // namespace sys

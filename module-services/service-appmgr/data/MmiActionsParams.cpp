@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/data/MmiActionsParams.hpp>
@@ -40,6 +40,31 @@ void MMICallForwardingResult::accept(Visitor &v, std::string &displayMessage)
     v.visit(*this, displayMessage);
 }
 
+void MMICallBarringResult::accept(Visitor &v, std::string &displayMessage)
+{
+    v.visit(*this, displayMessage);
+}
+
+void MMICallWaitingResult::accept(Visitor &v, std::string &displayMessage)
+{
+    v.visit(*this, displayMessage);
+}
+
+void MMIClipResult::accept(Visitor &v, std::string &displayMessage)
+{
+    v.visit(*this, displayMessage);
+}
+
+void MMIClirResult::accept(Visitor &v, std::string &displayMessage)
+{
+    v.visit(*this, displayMessage);
+}
+
+void MMIImeiResult::accept(Visitor &v, std::string &displayMessage)
+{
+    v.visit(*this, displayMessage);
+}
+
 MMIParams::MMIParams(std::string mmiData) : mmiData{std::move(mmiData)}
 {}
 
@@ -71,4 +96,19 @@ void MMICallBarringResult::addMessages(const std::pair<MMIResultMessage, MMIResu
 auto MMICallBarringResult::getMessages(void) noexcept -> std::vector<std::pair<MMIResultMessage, MMIResultMessage>>
 {
     return data;
+}
+
+auto MMIImeiResult::getImei() const noexcept -> std::string
+{
+    return imei;
+}
+
+void MMICallWaitingResult::addMessages(const std::pair<MMIResultMessage, MMIResultMessage> &message)
+{
+    messages.push_back(message);
+}
+
+auto MMICallWaitingResult::getMessages() const noexcept -> std::vector<std::pair<MMIResultMessage, MMIResultMessage>>
+{
+    return messages;
 }

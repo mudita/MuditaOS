@@ -1,5 +1,7 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /**
- * Project Untitled
  * @brief The request primitive is used to advice the receiving device that the transmitter wishes to enter a low
  * power state. The TS 0710 layer of the receiving unit sends an indication primitive to the upper layer in order to
  * inform that the transmitting unit has entered the power saving state. The TS 0710 layer will automatically transmit

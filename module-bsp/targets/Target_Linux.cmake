@@ -14,9 +14,6 @@ set(BOARD_SOURCES
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/lpm/LinuxLPM.cpp"
 
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/audio/linux_audiocodec.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/audio/LinuxCellularAudio.cpp"
-
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/bluetooth/Bluetooth.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/usb_cdc/usb_cdc.cpp"

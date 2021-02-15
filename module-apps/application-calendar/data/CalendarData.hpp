@@ -6,6 +6,12 @@
 #include <module-gui/gui/SwitchData.hpp>
 #include "application-calendar/widgets/CalendarStyle.hpp"
 
+enum class EventAction
+{
+    Add,
+    Edit
+};
+
 class EventRecordData : public gui::SwitchData
 {
   protected:

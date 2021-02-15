@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PlaybackOperation.hpp"
 
 #include "Audio/decoder/Decoder.hpp"
 #include "Audio/Profiles/Profile.hpp"
+#include "Audio/StreamFactory.hpp"
 
 #include "Audio/AudioCommon.hpp"
 
@@ -55,8 +56,12 @@ namespace audio
             return RetCode::InvokedInIncorrectState;
         }
 
+        // create stream
+        StreamFactory streamFactory(playbackCapabilities);
+        dataStreamOut = streamFactory.makeStream(*dec.get(), *audioDevice.get());
+
         // create audio connection
-        outputConnection = std::make_unique<StreamConnection>(dec.get(), audioDevice.get(), dataStreamOut);
+        outputConnection = std::make_unique<StreamConnection>(dec.get(), audioDevice.get(), dataStreamOut.get());
 
         // decoder worker soft start - must be called after connection setup
         dec->startDecodingWorker(endOfFileCallback);
@@ -82,6 +87,7 @@ namespace audio
         // stop playback by destroying audio connection
         outputConnection.reset();
         dec->stopDecodingWorker();
+        dataStreamOut.reset();
 
         return GetDeviceError(audioDevice->Stop());
     }
@@ -154,8 +160,10 @@ namespace audio
         /// profile change - (re)create output device; stop audio first by
         /// killing audio connection
         outputConnection.reset();
+        dec->stopDecodingWorker();
         audioDevice.reset();
-        audioDevice = CreateDevice(newProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        dataStreamOut.reset();
+        audioDevice = CreateDevice(newProfile->GetAudioDeviceType()).value_or(nullptr);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;

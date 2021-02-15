@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallLogMainWindow.hpp"
@@ -13,6 +13,7 @@
 #include <Label.hpp>
 #include <Margins.hpp>
 #include <Style.hpp>
+#include <InputEvent.hpp>
 
 #include <cassert>
 #include <functional>
@@ -47,7 +48,13 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        list = new gui::ListView(this, mainWindow::x, mainWindow::y, mainWindow::w, mainWindow::h, calllogModel);
+        list = new gui::ListView(this,
+                                 mainWindow::x,
+                                 mainWindow::y,
+                                 mainWindow::w,
+                                 mainWindow::h,
+                                 calllogModel,
+                                 style::listview::ScrollBarType::Fixed);
 
         setFocusItem(list);
     }
@@ -69,8 +76,10 @@ namespace gui
 
     bool CallLogMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        DBCalllogResponseMessage *msg = reinterpret_cast<DBCalllogResponseMessage *>(msgl);
-        return calllogModel->updateRecords(std::move(*msg->records));
+        auto *msg = dynamic_cast<DBCalllogResponseMessage *>(msgl);
+        if (msg != nullptr) {
+            return calllogModel->updateRecords(std::move(*msg->records));
+        }
+        return false;
     }
-
 } /* namespace gui */

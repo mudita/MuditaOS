@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <limits>
 #include <gui/core/Color.hpp>
 #include <gui/Common.hpp>
 #include <Alignment.hpp>
@@ -178,6 +179,8 @@ namespace style
 
     namespace listview
     {
+        inline constexpr auto nPos = std::numeric_limits<unsigned int>::max();
+
         /// Possible List boundaries handling types
         enum class Boundaries
         {
@@ -197,10 +200,11 @@ namespace style
         /// Possible List rebuild types
         enum class RebuildType
         {
-            Full,    ///< Full rebuild - resets lists to all initial conditions and request data from beginning.
-            InPlace, ///< InPlace rebuild - stores currently focused part of list and rebuild from that part.
-            OnOffset ///< OnOffset rebuild - resets lists to all initial conditions and request data from provided
-                     ///< offset.
+            Full,          ///< Full rebuild - resets lists to all initial conditions and request data from beginning.
+            InPlace,       ///< InPlace rebuild - stores currently focused part of list and rebuild from that part.
+            OnPageElement, ///< OnPageElement rebuild - same page but focus changed on provided element index.
+            OnOffset       ///< OnOffset rebuild - resets lists to all initial conditions and request data from provided
+                           ///< offset.
         };
 
         /// Possible List ScrollBar types
@@ -208,7 +212,12 @@ namespace style
         {
             None,         ///< None - list without scroll bar (but with scrolling).
             Proportional, ///< Proportional - scroll bar size calculated based on elements count in model and currently
-                          ///< displayed number of elements.
+                          ///< displayed number of elements. Use with large unequal heights lists elements.
+            Fixed,        ///< Fixed - scroll bar size calculated based on fixed equal elements sizes in list.
+                          ///< Use when all elements have equal heights.
+            PreRendered   ///< PreRendered - scroll bar size calculated based on pre rendered pages on whole list. Use
+                          ///< when elements are not equal heights but there are few of them as its renders whole
+                          ///< context and can be time consuming.
         };
 
         enum class Orientation
@@ -249,5 +258,13 @@ namespace style
     {
         inline constexpr auto default_left_text_padding = 10U;
     } // namespace padding
+
+    namespace widgets
+    {
+        inline constexpr auto h           = 55U;
+        inline constexpr auto iconsSize   = h;
+        inline constexpr auto leftMargin  = 10U;
+        inline constexpr auto rightMargin = 10U;
+    } // namespace widgets
 
 }; // namespace style

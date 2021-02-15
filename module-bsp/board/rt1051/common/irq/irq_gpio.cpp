@@ -112,9 +112,7 @@ namespace bsp
                 xHigherPriorityTaskWoken |= keyboard_right_functional_IRQHandler();
             }
 
-            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {
-                xHigherPriorityTaskWoken |= bsp::battery_charger::INOKB_IRQHandler();
-            }
+            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {}
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {}
 

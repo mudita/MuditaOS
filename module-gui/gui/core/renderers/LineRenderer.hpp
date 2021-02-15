@@ -32,7 +32,7 @@ namespace gui::renderer
             Color color{ColorFullBlack};
             LineExpansionDirection direction = LineExpansionDirection::Down;
 
-            static auto from(const CommandLine &command) -> DrawableStyle;
+            static auto from(const DrawLine &command) -> DrawableStyle;
 
             DrawableStyle &setExpansionDirection(LineExpansionDirection value) noexcept
             {

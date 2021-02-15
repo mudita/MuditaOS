@@ -19,7 +19,7 @@ namespace app
 
     namespace window
     {
-        inline constexpr auto name_call              = "CallWindow";
+        inline constexpr auto name_call              = gui::name::window::main_window;
         inline constexpr auto name_enterNumber       = "EnterNumberWindow";
         inline constexpr auto name_emergencyCall     = "EmergencyCallWindow";
         inline constexpr auto name_duplicatedContact = "DuplicatedContactWindow";
@@ -32,23 +32,37 @@ namespace app
     class CallWindowInterface
     {
       public:
+        using NumberChangeCallback              = std::function<void(utils::PhoneNumber::View)>;
         virtual ~CallWindowInterface() noexcept = default;
 
         virtual void setState(app::call::State state) noexcept              = 0;
         [[nodiscard]] virtual auto getState() const noexcept -> call::State = 0;
 
+        enum class AudioEvent
+        {
+            Mute,
+            Unmute,
+            LoudspeakerOn,
+            LoudspeakerOff
+        };
+
+        virtual void stopAudio()                           = 0;
+        virtual void startAudioRinging()                   = 0;
+        virtual void startAudioRouting()                   = 0;
+        virtual void sendAudioEvent(AudioEvent audioEvent) = 0;
+
         virtual void transmitDtmfTone(uint32_t digit) = 0;
-        virtual void stopAudio()                      = 0;
-        virtual void startRinging()                   = 0;
-        virtual void startRouting()                   = 0;
+        virtual void hangupCall()                     = 0;
+        virtual void answerIncomingCall()             = 0;
     };
 
     class EnterNumberWindowInterface
     {
       public:
-        virtual ~EnterNumberWindowInterface() noexcept                = default;
-        virtual void handleCallEvent(const std::string &number)       = 0;
-        virtual void handleAddContactEvent(const std::string &number) = 0;
+        virtual ~EnterNumberWindowInterface() noexcept                   = default;
+        virtual void handleCallEvent(const std::string &number)          = 0;
+        virtual void handleEmergencyCallEvent(const std::string &number) = 0;
+        virtual void handleAddContactEvent(const std::string &number)    = 0;
     };
 
     class ApplicationCall : public Application, public CallWindowInterface, public EnterNumberWindowInterface
@@ -57,7 +71,10 @@ namespace app
         void CallAbortHandler();
         void CallActiveHandler();
         void IncomingCallHandler(const CellularCallMessage *const msg);
+        void CallerIdHandler(const CellularCallMessage *const msg);
         void RingingHandler(const CellularCallMessage *const msg);
+
+        std::unique_ptr<sys::Timer> callerIdTimer;
 
       protected:
         call::State state = call::State::IDLE;
@@ -78,10 +95,11 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override;
 
+        void handleEmergencyCallEvent(const std::string &number) override;
         void handleCallEvent(const std::string &number) override;
         void handleAddContactEvent(const std::string &number) override;
 
-        auto showNotification(std::function<bool()> action) -> bool;
+        auto showNotification(std::function<bool()> action, const std::string &icon, const std::string &text) -> bool;
 
         [[nodiscard]] auto getState() const noexcept -> call::State override
         {
@@ -91,10 +109,15 @@ namespace app
         {
             this->state = state;
         }
-        void transmitDtmfTone(uint32_t digit) override;
+
         void stopAudio() override;
-        void startRinging() override;
-        void startRouting() override;
+        void startAudioRinging() override;
+        void startAudioRouting() override;
+        void sendAudioEvent(AudioEvent audioEvent) override;
+
+        void transmitDtmfTone(uint32_t digit) override;
+        void hangupCall() override;
+        void answerIncomingCall() override;
     };
 
     template <> struct ManifestTraits<ApplicationCall>
@@ -104,7 +127,9 @@ namespace app
             return {{manager::actions::Launch,
                      manager::actions::Call,
                      manager::actions::Dial,
-                     manager::actions::EmergencyDial}};
+                     manager::actions::EmergencyDial,
+                     manager::actions::NotAnEmergencyNotification,
+                     manager::actions::NoSimNotification}};
         }
     };
 } /* namespace app */

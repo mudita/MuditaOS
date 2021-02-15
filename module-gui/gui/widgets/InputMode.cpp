@@ -66,7 +66,7 @@ const std::string &InputMode::get()
         actualInputMode == input_mode.find(InputMode::phone)->second) {
         return input_mode.at(modeNow());
     }
-    return utils::localize.getInputLanguage(actualInputMode);
+    return utils::localize.getInputLanguageFilename(actualInputMode);
 }
 
 void InputMode::show_input_type()

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -56,6 +56,9 @@ namespace gui::window::name
     inline constexpr auto about_your_pure = "AboutYourPure";
     inline constexpr auto certification   = "Certification";
 
+    inline constexpr auto change_date_and_time = "ChangeDateAndTime";
+    inline constexpr auto change_time_zone     = "ChangeTimeZone";
+
     inline constexpr auto new_apn = "NewApn";
 
 } // namespace gui::window::name
@@ -99,12 +102,22 @@ namespace app
             virtual void setMode(bool isAutoLightSwitchOn)      = 0;
             virtual void setStatus(bool isDisplayLightSwitchOn) = 0;
         };
+
+        class KeypdBacklightSettings
+        {
+          public:
+            virtual ~KeypdBacklightSettings()                   = default;
+            virtual auto isKeypadBacklightOn() -> bool          = 0;
+            virtual void setKeypadBacklightState(bool newState) = 0;
+        };
+
     }; // namespace settingsInterface
 
     class ApplicationSettingsNew : public app::Application,
                                    public settingsInterface::SimParams,
                                    public settingsInterface::OperatorsSettings,
-                                   public settingsInterface::ScreenLightSettings
+                                   public settingsInterface::ScreenLightSettings,
+                                   public settingsInterface::KeypdBacklightSettings
     {
       public:
         ApplicationSettingsNew(std::string name                    = name_settings_new,
@@ -141,6 +154,9 @@ namespace app
         void setBrightness(float brigtnessValue) override;
         void setMode(bool isAutoLightSwitchOn) override;
         void setStatus(bool isDisplayLightSwitchOn) override;
+
+        auto isKeypadBacklightOn() -> bool override;
+        void setKeypadBacklightState(bool newState) override;
 
       private:
         void attachQuotesWindows();

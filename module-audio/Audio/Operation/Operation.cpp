@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Operation.hpp"
@@ -93,14 +93,9 @@ namespace audio
 
         supportedProfiles.emplace_back(Profile::Create(profile, nullptr, volume, gain), isAvailable);
     }
-    std::optional<std::unique_ptr<bsp::AudioDevice>> Operation::CreateDevice(bsp::AudioDevice::Type type,
-                                                                             bsp::AudioDevice::audioCallback_t callback)
+
+    std::optional<std::unique_ptr<bsp::AudioDevice>> Operation::CreateDevice(bsp::AudioDevice::Type type)
     {
-        if (type == bsp::AudioDevice::Type::Bluetooth) {
-            auto audioFormat = currentProfile->GetAudioFormat();
-            return std::make_unique<bsp::BluetoothProxyAudio>(
-                serviceCallback, *dataStreamOut, *dataStreamIn, audioFormat);
-        }
-        return bsp::AudioDevice::Create(type, callback).value_or(nullptr);
+        return bsp::AudioDevice::Create(type).value_or(nullptr);
     }
 } // namespace audio

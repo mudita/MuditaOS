@@ -19,3 +19,20 @@ add_catch2_executable(
         module-cellular
 )
 
+add_catch2_executable(
+        NAME
+        cellular-parse-result
+        SRCS
+        unittest_parse_result.cpp
+        LIBS
+        module-cellular
+)
+
+add_catch2_executable(
+        NAME
+        unittest_ATStream
+        SRCS
+        unittest_ATStream.cpp
+        LIBS
+        module-cellular
+)

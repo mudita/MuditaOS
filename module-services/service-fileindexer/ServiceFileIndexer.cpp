@@ -6,7 +6,6 @@
 #include "notesIndexer.hpp"
 #include "messages/FileChangeMessage.hpp"
 #include "Constants.hpp"
-#include <Service/Bus.hpp>
 #include <fileref.h>
 #include <tag.h>
 
@@ -60,7 +59,7 @@ namespace service
                 namespace fs       = std::filesystem;
                 const auto new_ext = fs::path(new_path).extension().string();
                 auto msg           = std::make_shared<msg::FileChangeMessage>(new_path, event, old_path);
-                sys::Bus::SendUnicast(msg, std::string(service::name::file_indexer), _this.get());
+                _this->bus.sendUnicast(msg, std::string(service::name::file_indexer));
             });
         mStartupIndexer.start(shared_from_this(), service::name::file_indexer);
         */

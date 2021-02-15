@@ -114,7 +114,7 @@ class CDCSerial:
         print(ret)
         return ret["body"]["ATResponse"]
 
-    def get_window_name(self):
+    def get_application_name(self):
         body = {
             "focus": True
         }

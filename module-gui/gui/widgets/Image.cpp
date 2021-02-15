@@ -1,13 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "../core/DrawCommand.hpp"
-#include "../core/PixMap.hpp"
-#include "BoundingBox.hpp"
 #include "Image.hpp"
+#include "DrawCommand.hpp"
+#include "PixMap.hpp"
+#include "BoundingBox.hpp"
+#include "ImageManager.hpp"
 
-#include "../core/ImageManager.hpp"
-#include "utf8/UTF8.hpp"
+#include <utf8/UTF8.hpp>
 
 namespace gui
 {
@@ -23,6 +23,12 @@ namespace gui
         type = ItemType::IMAGE;
         set(imageName);
         setPosition(x, y);
+    }
+
+    Image::Image(Item *parent, const UTF8 &imageName) : Rect(parent, 0, 0, 0, 0), imageMap{nullptr}
+    {
+        type = ItemType::IMAGE;
+        set(imageName);
     }
 
     Image::Image(const UTF8 &imageName) : imageMap{nullptr}
@@ -52,17 +58,14 @@ namespace gui
 
     void Image::buildDrawListImplementation(std::list<Command> &commands)
     {
-        auto img = std::make_unique<CommandImage>();
+        auto img = std::make_unique<DrawImage>();
         // image
-        img->x = drawArea.x;
-        img->y = drawArea.y;
-        img->w = drawArea.w;
-        img->h = drawArea.h;
+        img->origin = {drawArea.x, drawArea.y};
         // cmd part
-        img->areaX = img->x;
-        img->areaY = img->y;
-        img->areaW = img->w;
-        img->areaH = img->h;
+        img->areaX = img->origin.x;
+        img->areaY = img->origin.y;
+        img->areaW = drawArea.w;
+        img->areaH = drawArea.h;
 
         img->imageID = this->imageMap->getID();
 

@@ -227,7 +227,7 @@ namespace gui
                 percentLabel->setVisible(true);
                 percentLabel->setText(utils::localize.get("app_desktop_update_start"));
                 auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(updateFile.c_str(), 0);
-                sys::Bus::SendUnicast(msgToSend, service::name::service_desktop, application);
+                application->bus.sendUnicast(msgToSend, service::name::service_desktop);
 
                 return true;
             }

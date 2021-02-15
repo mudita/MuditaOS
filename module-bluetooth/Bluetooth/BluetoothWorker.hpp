@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,13 +12,14 @@
 #include <task.h>
 #include <vector>
 #include "service-bluetooth/SettingsHolder.hpp"
-
+#include "glucode/BluetoothRunLoop.hpp"
+#include "WorkerController.hpp"
 struct HCI;
 
 /// debug option for HCI (uart) commands debugging
 // #define DO_DEBUG_HCI_COMS
 
-namespace Bt
+namespace bluetooth
 {
     enum Message : std::uint8_t
     {
@@ -32,18 +33,6 @@ namespace Bt
         EvtReceivingError, /// bsp error on receive
         EvtUartError,      /// generic uart error
         EvtErrorRec,       /// there was error o queue receive
-    };
-
-    enum Command : std::uint8_t
-    {
-        StartScan,
-        StopScan,
-        VisibilityOn,
-        VisibilityOff,
-        ConnectAudio,
-        DisconnectAudio,
-        PowerOn,
-        PowerOff,
     };
 
     inline const char *MessageCstr(Message what)
@@ -83,14 +72,15 @@ class BluetoothWorker : private sys::Worker
         queueService = 0,
         queueControl = 1,
         queueIO_handle, /// bsp support queue
-                        //        queue_profiles, /// queue for communication between profile workers,
-                        //                        /// main bt_worker_task should dispatch these in events
         queueCommands,
+        queueRunloopTrigger // btstack run_loop queue
     };
 
-    TaskHandle_t bt_worker_task = nullptr;
-    int is_running              = false;
     sys::Service *service       = nullptr;
+    bool isRunning              = false;
+
+    void registerQueues();
+    void onLinkKeyAdded(const std::string &deviceAddress);
 
   public:
     enum Error
@@ -101,32 +91,21 @@ class BluetoothWorker : private sys::Worker
     };
 
     BluetoothWorker(sys::Service *service);
-    virtual ~BluetoothWorker();
+    ~BluetoothWorker() override;
 
-    virtual bool handleMessage(uint32_t queueID);
+    auto handleMessage(uint32_t queueID) -> bool override;
+    auto handleCommand(QueueHandle_t queue) -> bool;
+    auto handleBtStackTrigger(QueueHandle_t queue) -> bool;
 
-    bool handleCommand(QueueHandle_t queue);
+    bool run() override;
+    void setDeviceAddress(bd_addr_t addr);
+    auto deinit() -> bool override;
 
-    bool run();
-
-    bool scan();
-
-    void setVisibility(bool visibility);
-
-    bool start_pan();
-
-    bool establishAudioConnection();
-
-    bool disconnectAudioConnection();
-
-    Error aud_init();
     /// bluetooth stack id in use
     unsigned long active_features;
-    void stopScan();
-    void setDeviceAddress(bd_addr_t addr);
-    void initAudioBT();
-
-    std::shared_ptr<Bt::Profile> currentProfile;
-    std::shared_ptr<Bluetooth::SettingsHolder> settings;
+    std::shared_ptr<bluetooth::Profile> currentProfile;
+    std::shared_ptr<bluetooth::SettingsHolder> settings;
     std::vector<Devicei> pairedDevices;
+    std::unique_ptr<bluetooth::RunLoop> runLoop;
+    std::unique_ptr<bluetooth::AbstractController> controller;
 };

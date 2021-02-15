@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -22,16 +22,16 @@ namespace consts
 
 void addSomeContacts(ContactsDB &contactsDb);
 
-TEST_CASE("Contact Groups tests", "[Groups]")
+TEST_CASE("Contact Groups tests")
 {
     INFO("sqlite Init");
     Database::initialize();
-    const auto callogPath = (std::filesystem::path{"user"} / "contacts.db");
-    if (std::filesystem::exists(callogPath)) {
-        REQUIRE(std::filesystem::remove(callogPath));
+    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    if (std::filesystem::exists(contactsPath)) {
+        REQUIRE(std::filesystem::remove(contactsPath));
     }
 
-    ContactsDB contactDb{callogPath.c_str()};
+    ContactsDB contactDb{contactsPath.c_str()};
     INFO("contactDB init");
     REQUIRE(contactDb.isInitialized());
     ContactsGroupsTable contactGroupsTable = ContactsGroupsTable(&contactDb);

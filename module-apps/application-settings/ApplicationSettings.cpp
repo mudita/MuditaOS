@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
@@ -12,6 +12,7 @@
 #include "windows/Info.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
+#include "windows/ColorTestWindow.hpp"
 
 #include "windows/UITestWindow.hpp"
 
@@ -42,7 +43,7 @@ namespace app
     ApplicationSettings::ApplicationSettings(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground)
     {
-        busChannels.push_back(sys::BusChannels::AntennaNotifications);
+        bus.channels.push_back(sys::BusChannel::AntennaNotifications);
         addActionReceiver(manager::actions::SelectSimCard, [this](auto &&data) {
             switchWindow(app::sim_select);
             return msgHandled();
@@ -102,10 +103,6 @@ namespace app
             settings::SystemProperties::lockPassHash,
             [this](std::string value) { lockPassChanged(value); },
             settings::SettingsScope::Global);
-        settings->registerValueChange(
-            settings::SystemProperties::timeDateFormat,
-            [this](std::string value) { timeDateChanged(value); },
-            settings::SettingsScope::Global);
 
         createUserInterface();
 
@@ -153,9 +150,11 @@ namespace app
         windowsFactory.attach(gui::window::name::fota_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::FotaWindow>(app);
         });
-
         windowsFactory.attach(gui::window::name::eink, [](Application *app, const std::string &name) {
             return std::make_unique<gui::EinkModeWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::color_test_window, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ColorTestWindow>(app);
         });
 
         if (board == bsp::Board::T4) {

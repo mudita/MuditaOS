@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,6 +13,8 @@
 #include <Service/Service.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 
+#include <service-db/DBServiceName.hpp>
+
 #include <cstdint>
 #include <memory>
 #include <sstream>
@@ -25,6 +27,11 @@ namespace sys
 {
     class Timer;
 } // namespace sys
+
+namespace service::name
+{
+    constexpr inline auto fota = "ServiceFota";
+} // namespace service::name
 
 namespace FotaService
 {
@@ -59,8 +66,6 @@ namespace FotaService
         }
 
         void registerMessageHandlers();
-
-        static const char *serviceName;
 
       private:
         /** Get access to data channel
@@ -121,3 +126,17 @@ namespace FotaService
     };
 
 } // namespace FotaService
+
+namespace sys
+{
+    template <> struct ManifestTraits<FotaService::Service>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = service::name::fota;
+            manifest.dependencies = {service::name::db};
+            return manifest;
+        }
+    };
+} // namespace sys

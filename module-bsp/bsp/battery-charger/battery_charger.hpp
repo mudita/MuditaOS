@@ -11,6 +11,8 @@ extern "C"
 #include "queue.h"
 }
 
+#include <array>
+
 namespace bsp::battery_charger
 {
 	using StateOfCharge = std::uint8_t;
@@ -27,13 +29,31 @@ namespace bsp::battery_charger
 		INOKB = 0x02
 	};
 
-	enum class batteryINTBSource{
-		minSOCAlert = 1 << 10,
-		minVAlert = 1 << 8,
-		SOCOnePercentChange = 1 << 7
+	enum class topControllerIRQsource{
+		CHGR_INT = (1 << 0),
+		FG_INT = (1 << 1),
+		SYS_INT = (1 << 2)
 	};
 
-	int init(xQueueHandle queueHandle);
+	enum class batteryINTBSource{
+		maxTemp = 1 << 13,
+		minSOCAlert = 1 << 10,
+		minTemp = 1 << 9,
+		minVAlert = 1 << 8,
+		SOCOnePercentChange = 1 << 7,
+		all = 0xFFFF
+	};
+
+	enum class batteryChargerType{
+		DcdTimeOut = 0x00U,     /*!< Dcd detect result is timeout */
+		DcdUnknownType,         /*!< Dcd detect result is unknown type */
+		DcdError,               /*!< Dcd detect result is error*/
+		DcdSDP,                 /*!< The SDP facility is detected */
+		DcdCDP,                 /*!< The CDP facility is detected */
+		DcdDCP,                 /*!< The DCP facility is detected */
+	};
+
+	int init(xQueueHandle irqQueueHandle, xQueueHandle dcdQueueHandle);
 
 	void deinit();
 
@@ -41,15 +61,22 @@ namespace bsp::battery_charger
 
 	bool getChargeStatus();
 
-	void clearAllIRQs();
+	void clearAllChargerIRQs();
 
-	void clearFuelGuageIRQ();
+	void clearFuelGuageIRQ(std::uint16_t intToClear);
 
 	std::uint16_t getStatusRegister();
 
-	BaseType_t INOKB_IRQHandler();
+	void checkTemperatureRange();
+
+	std::uint8_t getTopControllerINTSource();
 
 	BaseType_t INTB_IRQHandler();
+
+	extern "C"
+	{
+	void USB_ChargerDetectedCB(std::uint8_t detectedType);
+	}
 } // bsp::battery_charger
 
 

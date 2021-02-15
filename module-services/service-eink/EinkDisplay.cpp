@@ -5,7 +5,7 @@
 
 #include <gui/core/Color.hpp>
 #include <gsl/gsl_util>
-
+#include <bsp/BoardDefinitions.hpp>
 #include <cstdio>
 #include <cstring>
 
@@ -45,7 +45,10 @@ namespace service::eink
     EinkDisplay::EinkDisplay(::gui::Size screenSize)
         : size{screenSize}, currentWaveform{createDefaultWaveFormSettings(EinkWaveformGC16)},
           displayMode{EinkDisplayColorMode_e::EinkDisplayColorModeStandard}
-    {}
+    {
+        driverLPSPI = drivers::DriverLPSPI::Create(
+            "EInk", static_cast<drivers::LPSPIInstances>(BoardDefinitions::EINK_LPSPI_INSTANCE));
+    }
 
     EinkDisplay::~EinkDisplay() noexcept
     {
@@ -65,12 +68,18 @@ namespace service::eink
 
     void EinkDisplay::powerOn()
     {
+        if (driverLPSPI) {
+            driverLPSPI->Enable();
+        }
         EinkPowerOn();
     }
 
     void EinkDisplay::powerOff()
     {
         EinkPowerOff();
+        if (driverLPSPI) {
+            driverLPSPI->Disable();
+        }
     }
 
     void EinkDisplay::shutdown()
@@ -134,10 +143,10 @@ namespace service::eink
         return true;
     }
 
-    bool EinkDisplay::setWaveform(EinkWaveforms_e mode, std::int32_t temperature)
+    EinkStatus_e EinkDisplay::setWaveform(EinkWaveforms_e mode, std::int32_t temperature)
     {
         if (!isNewWaveformNeeded(mode, temperature)) {
-            return true;
+            return EinkOK;
         }
 
         auto currentOffset =
@@ -151,13 +160,13 @@ namespace service::eink
 
         if (offset == currentOffset) {
             // current waveform is still the best fit
-            return true;
+            return EinkOK;
         }
 
         auto file = std::fopen(LutsFileName, "rb");
         if (file == nullptr) {
             LOG_FATAL("Could not find the LUTS.bin file. Returning");
-            return false;
+            return EinkWaveformsFileOpenFail;
         }
         auto fileHandlerCleanup = gsl::finally([&file]() { std::fclose(file); });
 
@@ -175,7 +184,7 @@ namespace service::eink
         std::fread(&currentWaveform.LUTCData[1], 1, LUTCSize, file);
 
         EinkUpdateWaveform(&currentWaveform);
-        return true;
+        return EinkOK;
     }
 
     unsigned int EinkDisplay::toWaveformTemperatureOffset(std::int32_t temperature) noexcept
@@ -185,7 +194,7 @@ namespace service::eink
         if (temperature >= LUTTemperatureSubcritical)
             return LUTTemperatureOffsetSubcritical;
         if (temperature < LUTTemperatureMinimal) {
-            temperature = 0;
+            temperature = LUTTemperatureMinimal;
         }
         return temperature / LUTTemperatureOffsetInterval;
     }
@@ -232,8 +241,19 @@ namespace service::eink
         displayMode = mode;
     }
 
+    std::int32_t EinkDisplay::getLastTemperature() const noexcept
+    {
+        return currentWaveform.temperature;
+    }
+
     ::gui::Size EinkDisplay::getSize() const noexcept
     {
         return size;
     }
+
+    [[nodiscard]] auto EinkDisplay::getDevice() const noexcept -> std::shared_ptr<devices::Device>
+    {
+        return driverLPSPI;
+    }
+
 } // namespace service::eink

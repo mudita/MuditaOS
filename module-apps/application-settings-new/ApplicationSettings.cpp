@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationSettings.hpp"
@@ -31,6 +31,8 @@
 #include "windows/SystemMainWindow.hpp"
 #include "windows/NewApnWindow.hpp"
 #include "windows/LanguagesWindow.hpp"
+#include "windows/DateAndTimeMainWindow.hpp"
+#include "windows/ChangeTimeZone.hpp"
 
 #include "Dialog.hpp"
 
@@ -51,6 +53,7 @@
 #include <i18n/i18n.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/ScreenLightControlMessage.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/Constants.hpp>
+#include <module-services/service-evtmgr/service-evtmgr/EVMessages.hpp>
 #include <module-services/service-appmgr/service-appmgr/messages/Message.hpp>
 #include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 
@@ -114,7 +117,8 @@ namespace app
         else if (auto responseStatusMsg = dynamic_cast<::message::bluetooth::ResponseStatus *>(msgl);
                  nullptr != responseStatusMsg) {
             if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
-                auto btStatusData = std::make_unique<gui::BluetoothStatusData>(responseStatusMsg->getStatus());
+                const auto status = responseStatusMsg->getStatus();
+                auto btStatusData = std::make_unique<gui::BluetoothStatusData>(status.state, status.visibility);
                 switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
             }
         }
@@ -187,6 +191,27 @@ namespace app
             ::settings::SystemProperties::lockPassHash,
             [this](std::string value) { lockPassHash = utils::getNumericValue<unsigned int>(value); },
             ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::Bluetooth::state,
+            [this](std::string value) {
+                if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
+                    const auto isBtOn = utils::getNumericValue<bool>(value);
+                    auto btStatusData = std::make_unique<gui::BluetoothStatusData>(
+                        isBtOn ? BluetoothStatus::State::On : BluetoothStatus::State::Off);
+                    switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
+                }
+            },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::Bluetooth::deviceVisibility,
+            [this](std::string value) {
+                if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
+                    const auto isVisible = utils::getNumericValue<bool>(value);
+                    auto btStatusData    = std::make_unique<gui::BluetoothStatusData>(isVisible);
+                    switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
+                }
+            },
+            ::settings::SettingsScope::Global);
 
         return ret;
     }
@@ -219,7 +244,7 @@ namespace app
             return std::make_unique<gui::LockedScreenWindow>(app);
         });
         windowsFactory.attach(gui::window::name::keypad_light, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::KeypadLightWindow>(app);
+            return std::make_unique<gui::KeypadLightWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
         windowsFactory.attach(gui::window::name::font_size, [](Application *app, const std::string &name) {
             return std::make_unique<gui::FontSizeWindow>(app);
@@ -278,6 +303,12 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::languages, [](Application *app, const std::string &name) {
             return std::make_unique<gui::LanguagesWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::date_and_time, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DateAndTimeMainWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::change_time_zone, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ChangeTimeZone>(app);
         });
     }
 
@@ -347,8 +378,8 @@ namespace app
     {
         constexpr int timeout = pdMS_TO_TICKS(1500);
 
-        auto response = sys::Bus::SendUnicast(
-            std::make_shared<sevm::ScreenLightControlRequestParameters>(), service::name::evt_manager, this, timeout);
+        auto response = bus.sendUnicast(
+            std::make_shared<sevm::ScreenLightControlRequestParameters>(), service::name::evt_manager, timeout);
 
         if (response.first == sys::ReturnCodes::Success) {
             auto msgState = dynamic_cast<sevm::ScreenLightControlParametersResponse *>(response.second.get());
@@ -365,28 +396,52 @@ namespace app
     void ApplicationSettingsNew::setBrightness(bsp::eink_frontlight::BrightnessPercentage value)
     {
         screen_light_control::Parameters parameters{value};
-        sys::Bus::SendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
-                                  screen_light_control::Action::setManualModeBrightness, parameters),
-                              service::name::evt_manager,
-                              this);
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                            screen_light_control::Action::setManualModeBrightness, parameters),
+                        service::name::evt_manager);
     }
 
     void ApplicationSettingsNew::setMode(bool isAutoLightSwitchOn)
     {
-        sys::Bus::SendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
-                                  isAutoLightSwitchOn ? screen_light_control::Action::enableAutomaticMode
-                                                      : screen_light_control::Action::disableAutomaticMode),
-                              service::name::evt_manager,
-                              this);
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
+                            isAutoLightSwitchOn ? screen_light_control::Action::enableAutomaticMode
+                                                : screen_light_control::Action::disableAutomaticMode),
+                        service::name::evt_manager);
     }
 
     void ApplicationSettingsNew::setStatus(bool isDisplayLightSwitchOn)
     {
-        sys::Bus::SendUnicast(
-            std::make_shared<sevm::ScreenLightControlMessage>(
-                isDisplayLightSwitchOn ? screen_light_control::Action::turnOn : screen_light_control::Action::turnOff),
-            service::name::evt_manager,
-            this);
+        bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(isDisplayLightSwitchOn
+                                                                              ? screen_light_control::Action::turnOn
+                                                                              : screen_light_control::Action::turnOff),
+                        service::name::evt_manager);
+    }
+
+    auto ApplicationSettingsNew::isKeypadBacklightOn() -> bool
+    {
+        constexpr int timeout = pdMS_TO_TICKS(1500);
+
+        auto response =
+            bus.sendUnicast(std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::checkState),
+                            service::name::evt_manager,
+                            timeout);
+
+        if (response.first == sys::ReturnCodes::Success) {
+            auto msgState = dynamic_cast<sevm::KeypadBacklightResponseMessage *>(response.second.get());
+            if (msgState == nullptr) {
+                return false;
+            }
+
+            return {msgState->success};
+        }
+        return false;
+    }
+
+    void ApplicationSettingsNew::setKeypadBacklightState(bool newState)
+    {
+        bus.sendUnicast(std::make_shared<sevm::KeypadBacklightMessage>(
+                            newState ? bsp::keypad_backlight::Action::turnOn : bsp::keypad_backlight::Action::turnOff),
+                        service::name::evt_manager);
     }
 
 } /* namespace app */
