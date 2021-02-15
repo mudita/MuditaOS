@@ -24,10 +24,7 @@ namespace gui
         auto optionItem = new gui::ListItem();
         optionItem->setMinimumSize(style::window::default_body_width, style::window::label::big_h);
         optionItem->inputCallback        = spinBox->inputCallback;
-        optionItem->focusChangedCallback = [spinBox, this](Item &item) {
-            spinBox->focusChangedCallback(item);
-            return focusChangedCallback(item);
-        };
+        optionItem->focusChangedCallback     = [spinBox](Item &item) { return spinBox->focusChangedCallback(item); };
         optionItem->dimensionChangedCallback = [spinBox](gui::Item &, const BoundingBox &newDim) -> bool {
             spinBox->setPosition(0, 0);
             spinBox->setSize(newDim.w, newDim.h);

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-audio/AudioServiceAPI.hpp"
@@ -6,7 +6,6 @@
 #include "service-audio/AudioMessage.hpp"
 
 #include <Audio/decoder/Decoder.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Common.hpp>
 #include <log/log.hpp>
 
@@ -26,7 +25,7 @@ namespace AudioServiceAPI
         {
             auto msgType = static_cast<int>(msg->type);
             LOG_DEBUG("Msg type %d", msgType);
-            auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, sys::defaultCmdTimeout);
+            auto ret = serv->bus.sendUnicast(msg, service::name::audio, sys::BusProxy::defaultTimeout);
             if (ret.first == sys::ReturnCodes::Success) {
                 if (auto resp = std::dynamic_pointer_cast<AudioResponseMessage>(ret.second)) {
                     LOG_DEBUG("Msg type %d done", msgType);
@@ -43,19 +42,19 @@ namespace AudioServiceAPI
     bool PlaybackStart(sys::Service *serv, const audio::PlaybackType &playbackType, const std::string &fileName)
     {
         auto msg = std::make_shared<AudioStartPlaybackRequest>(fileName, playbackType);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
     bool RecordingStart(sys::Service *serv, const std::string &fileName)
     {
         auto msg = std::make_shared<AudioStartRecorderRequest>(fileName);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
     bool RoutingStart(sys::Service *serv)
     {
         auto msg = std::make_shared<AudioStartRoutingRequest>();
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
     bool Stop(sys::Service *serv, const std::vector<audio::PlaybackType> &stopVec)
@@ -64,43 +63,43 @@ namespace AudioServiceAPI
             return true;
         }
         auto msg = std::make_shared<AudioStopRequest>(stopVec);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
     bool Stop(sys::Service *serv, const audio::Token &token)
     {
         auto msg = std::make_shared<AudioStopRequest>(token);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
     bool StopAll(sys::Service *serv)
     {
         auto msg = std::make_shared<AudioStopRequest>();
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
     bool Pause(sys::Service *serv, const audio::Token &token)
     {
         auto msg = std::make_shared<AudioPauseRequest>(token);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
     bool Resume(sys::Service *serv, const audio::Token &token)
     {
         auto msg = std::make_shared<AudioResumeRequest>(token);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
     bool SendEvent(sys::Service *serv, std::shared_ptr<audio::Event> evt)
     {
         auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
     bool SendEvent(sys::Service *serv, audio::EventType eType, audio::Event::DeviceState state)
     {
         auto msg = std::make_shared<AudioEventRequest>(eType, state);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
     template <typename T>
@@ -165,7 +164,7 @@ namespace AudioServiceAPI
     bool KeyPressed(sys::Service *serv, const int step)
     {
         auto msg = std::make_shared<AudioKeyPressedRequest>(step);
-        return sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv);
+        return serv->bus.sendUnicast(msg, service::name::audio);
     }
 
 } // namespace AudioServiceAPI

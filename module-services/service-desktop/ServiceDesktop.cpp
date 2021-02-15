@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-desktop/DesktopMessages.hpp"
@@ -11,13 +11,14 @@
 
 #include <Common/Query.hpp>
 #include <MessageType.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Worker.hpp>
 #include <json/json11.hpp>
 #include <log/log.hpp>
 #include <module-apps/application-desktop/ApplicationDesktop.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <service-db/QueryMessage.hpp>
+
+#include <module-sys/SystemManager/SystemManager.hpp>
 
 #include <cinttypes>
 #include <filesystem>
@@ -122,7 +123,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                 auto msgToSend =
                     std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateFoundOnBoot, file);
                 msgToSend->updateStats.versionInformation = UpdateMuditaOS::getVersionInfoFromFile(file);
-                sys::Bus::SendUnicast(msgToSend, app::name_desktop, this);
+                bus.sendUnicast(msgToSend, app::name_desktop);
             }
         }
 

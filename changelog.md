@@ -1,5 +1,171 @@
 # MuditaOS changelog
 
+## [0.57.1 2020-02-11]
+
+### Added
+
+* Add color test window to the settings app.
+* Add support for an empty line in the rich text control.
+* Add support for VoLTE on/off.
+* Add USB charger detection.
+* Add windows for custom responses to MMIs.
+
+### Changed
+
+* Add several stability improvements to the Bluetooth support.
+* Change a reaction to a fatal error - restart the system instead of hanging.
+* Change call handling to allow emergency and ICE numbers only.
+* Change list of supported files type for MTP to MP3, WAV, and FLAC.
+* Improve display features of the list view control.
+* Improve power management by adding low power support to the drivers.
+* Improve power management by powering off the e-ink display on timeout.
+* Remove audio echo during voice call by tweaking echo cancellation parameters.
+
+### Fixed
+
+* Fix broken mute on a voice call option.
+* Fix crashes when parsing a rich text.
+* Fix freezes due to invalid handling of long messages during communication with the modem.
+* Fix invalid warning about messages not being sent.
+* Fix options distances in SMS and Settings options.
+
+### Other
+
+* Add preliminary support for the T6 platform.
+* Add several harness tests.
+* Add synchronization between services.
+* Allow formatting hook scripts to ignore preconfigured paths.
+* Fix excessive logging in the USB-CDC
+* Fix memory leaks in the PIN lock window.
+* Fix several issues with unit testing.
+* Refactor code responsible for low-level drawing.
+* Restore logs coloring for the RT1051 based platforms.
+* Switch CI build to ninja to improve performance.
+* Update documentation of test harness.
+
+## [0.56.1 2020-02-03]
+
+### Added
+
+* Add the ability to change APNs.
+* Add SMS Center validity verification.
+* Add the "Wrong emergency number called" window.
+* Add user interface to control keypad backlight.
+
+### Changed
+
+* Improve audio quality during voice calls by tweaking microphone settings.
+* Improve network time synchronization with periodic updates.
+* Reduce audio lag during voice calls, significantly reducing echo as a result.
+* Tweak calendar's user interface.
+* Tweak battery charger parameters.
+
+### Fixed
+
+* Fix lock screen not showing after reset.
+* Fix lack of system clock refreshing.
+* Fix lack of audio during voice calls.
+* Fix SOS button showing on the PIN screen.
+
+### Other
+
+* Add an ability to interrupt the OS update process.
+* Add harness test for Bluetooth on/off.
+* Add harness test for the phone on/off.
+* Add harness test for SIM card change.
+* Add parser for the "call waiting" MMI response.
+* Fix missing build dependency for the image file.
+* Fix logs mocking in unit tests.
+* Fix unit tests not always running on `check` operation.
+
+## [0.55.1 2020-01-28]
+
+### Added
+
+* Add brownout information window.
+* Add language select settings window.
+* Add emergency call window.
+
+### Changed
+
+* Add several improvements to the USB handling.
+* Improve e-ink display speed.
+
+### Fixed
+
+* Fix crash on USB deinitialization.
+* Fix USB Full Speed.
+* Fix selecting contact for edit by phone number from speed dial window.
+* Fix VoLTE settings editing.
+* Fix sim indicator displaying on the top bar.
+* Fix returning from ICE contacts window.
+
+### Other
+
+* Improvements to the harness tests.
+* Improve downloading assets for selected releases.
+* Add backend for multi-day events in the calendar application.
+* Add call forwarding and MMI status parsers.
+
+## [0.54.3 2020-01-22]
+
+### Added
+
+* Add options to create, edit and remove quotes.
+* Add main system settings window.
+* Add APN settings window.
+
+### Changed
+
+* Improve e-ink responsiveness.
+* Change time format on home screen and status bar.
+* Add application-wide top bar manager.
+* Improved screen light control.
+
+### Fixed
+
+* Fix changing passcode windows.
+* Fix the possibility to write illogical operations in the calculator.
+* Fix the possibility to write multiple zeroes in the calculator when it is not needed.
+* Change the display format of a calculation result to scientific notation when it does not fit the screen.
+* Fix freezes and resets due to invalid assertions.
+* Fix grid layout navigation.
+* Fix Linux simulator crashes.
+
+### Other
+
+* Add build target to generate a package with version information.
+* Update licensing information.
+* Add option to change VID/PID via build system.
+* Add several filesystem improvements.
+* Update development workflow documentation and scripts.
+* Add integration with `clang-tidy`.
+* Add assets uploading to Github on release.
+
+## [0.54.2 2020-01-19]
+
+### Added
+
+* Add passcode changing.
+
+### Fixed
+
+* Fix the persistent answer and reject labels in the call window.
+* Fix the wrong call duration issue in both Call and Calls apps.
+* Fix call ignoring.
+
+### Other
+
+* Enable modem's debug output.
+* Enable timers enhanced debug.
+* Fix licensing information.
+
+## [0.54.1 2020-01-18]
+
+### Fixed
+
+* Fix settings broken by the accidentally removed script.
+
 ## [0.53.2 2020-01-15]
 
 ### Added

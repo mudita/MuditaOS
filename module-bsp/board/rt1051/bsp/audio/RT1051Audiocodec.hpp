@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,7 +34,7 @@ namespace bsp
         friend void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
         friend void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
 
-        RT1051Audiocodec(AudioDevice::audioCallback_t callback);
+        RT1051Audiocodec();
         virtual ~RT1051Audiocodec();
 
         AudioDevice::RetCode Start(const Format &format) override final;

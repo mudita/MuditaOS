@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RouterOperation.hpp"
 
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
+#include <Audio/StreamFactory.hpp>
 
 #include <bsp_audio.hpp>
 #include <log/log.hpp>
@@ -69,11 +70,16 @@ namespace audio
             return GetDeviceError(ret);
         }
 
+        // create streams
+        StreamFactory streamFactory(routerCapabilities);
+        dataStreamIn  = streamFactory.makeStream(*audioDevice.get(), *audioDeviceCellular.get());
+        dataStreamOut = streamFactory.makeStream(*audioDevice.get(), *audioDeviceCellular.get());
+
         // create audio connections
         inputConnection =
-            std::make_unique<audio::StreamConnection>(audioDeviceCellular.get(), audioDevice.get(), dataStreamIn);
-        outputConnection =
-            std::make_unique<audio::StreamConnection>(audioDevice.get(), audioDeviceCellular.get(), dataStreamOut);
+            std::make_unique<audio::StreamConnection>(audioDeviceCellular.get(), audioDevice.get(), dataStreamIn.get());
+        outputConnection = std::make_unique<audio::StreamConnection>(
+            audioDevice.get(), audioDeviceCellular.get(), dataStreamOut.get());
 
         // enable audio connections
         inputConnection->enable();
@@ -174,13 +180,13 @@ namespace audio
             Stop();
         }
 
-        audioDevice = CreateDevice(newProfile->GetAudioDeviceType(), nullptr).value_or(nullptr);
+        audioDevice = CreateDevice(newProfile->GetAudioDeviceType()).value_or(nullptr);
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
         }
 
-        audioDeviceCellular = CreateDevice(bsp::AudioDevice::Type::Cellular, nullptr).value_or(nullptr);
+        audioDeviceCellular = CreateDevice(bsp::AudioDevice::Type::Cellular).value_or(nullptr);
         if (audioDeviceCellular == nullptr) {
             LOG_ERROR("Error creating AudioDeviceCellular");
             return RetCode::Failed;
@@ -198,7 +204,12 @@ namespace audio
 
     bool RouterOperation::Mute(bool enable)
     {
-        muteEnable = enable;
+        if (enable == true) {
+            outputConnection->disable();
+        }
+        else {
+            outputConnection->enable();
+        }
         return true;
     }
 

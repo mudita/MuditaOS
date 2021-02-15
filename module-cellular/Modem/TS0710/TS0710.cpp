@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TS0710.h"
@@ -7,7 +7,6 @@
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/SignalStrength.hpp>
 #include <service-cellular/CellularMessage.hpp>
-#include <Service/Bus.hpp>
 #include <cassert>
 #include <memory>
 #include <module-os/RTOSWrapper/include/ticks.hpp>
@@ -73,8 +72,9 @@ TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent)
 
 TS0710::~TS0710()
 {
-    for (auto it : channels)
+    for (auto it : channels) {
         delete it;
+    }
     channels.clear();
     TS0710_CLOSE pv_TS0710_Close = TS0710_CLOSE();
     mode                         = Mode::AT;
@@ -271,7 +271,11 @@ TS0710::ConfState TS0710::AudioConfProcedure()
     if (!ret) {
         return ConfState ::Failure;
     }
-    else if (ret.response[0].compare("+QDAI: 1,0,0,5,0,1,1,1") == 0) {
+    else if (ret.response[0].compare("+QDAI: 1,0,0,3,0,1,1,1") == 0) {
+        parser->cmd(at::AT::QRXGAIN);
+        parser->cmd(at::AT::CLVL);
+        parser->cmd(at::AT::QMIC);
+        SetupEchoCalceller(EchoCancellerStrength::Tuned);
         return ConfState ::Success;
     }
     else {
@@ -409,7 +413,7 @@ TS0710::ConfState TS0710::StartMultiplexer()
                 Store::GSM::get()->setSignalStrength(signalStrength.data);
                 auto msg = std::make_shared<CellularNotificationMessage>(
                     CellularNotificationMessage::Type::SignalStrengthUpdate);
-                sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
+                pv_parent->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
             }
         }
         else {
@@ -555,4 +559,66 @@ void TS0710::EnterSleepMode(void)
 void TS0710::ExitSleepMode(void)
 {
     return pv_cellular->ExitSleep();
+}
+
+void TS0710::SetupEchoCalceller(EchoCancellerStrength strength)
+{
+    switch (strength) {
+    case EchoCancellerStrength::LeastAggressive:
+        // Aggressive settings
+        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
+        parser->cmd(at::factory(at::AT::QEEC) + "5,14");
+        parser->cmd(at::factory(at::AT::QEEC) + "10,140");
+        parser->cmd(at::factory(at::AT::QEEC) + "21,16000");
+        parser->cmd(at::factory(at::AT::QEEC) + "22,300");
+        parser->cmd(at::factory(at::AT::QEEC) + "24,450");
+        parser->cmd(at::factory(at::AT::QEEC) + "33,640");
+        break;
+    case EchoCancellerStrength::Medium:
+        // Aggressive settings
+        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
+        parser->cmd(at::factory(at::AT::QEEC) + "5,14");
+        parser->cmd(at::factory(at::AT::QEEC) + "10,160");
+        parser->cmd(at::factory(at::AT::QEEC) + "21,19000");
+        parser->cmd(at::factory(at::AT::QEEC) + "22,600");
+        parser->cmd(at::factory(at::AT::QEEC) + "24,600");
+        parser->cmd(at::factory(at::AT::QEEC) + "33,768");
+        break;
+    case EchoCancellerStrength::Aggressive:
+        // Aggressive settings
+        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
+        parser->cmd(at::factory(at::AT::QEEC) + "5,14");
+        parser->cmd(at::factory(at::AT::QEEC) + "10,160");
+        parser->cmd(at::factory(at::AT::QEEC) + "21,25000");
+        parser->cmd(at::factory(at::AT::QEEC) + "22,12000");
+        parser->cmd(at::factory(at::AT::QEEC) + "24,768");
+        parser->cmd(at::factory(at::AT::QEEC) + "33,896");
+        break;
+    case EchoCancellerStrength::Tuned:
+        /*
+        The following steps describe the echo tuning workflow.
+        1. Tune the echo path delay.
+            a) Start with AT+QEEC=5,65436        （delay= -100）
+            b) Make call to check the echo performance and record the value.
+            c) Increase the delay in steps of 50, until 400, and check the echo performance at each delay value.
+            d) Set the parameter to the value that yielded the best echo performance.
+
+        2. Tune the tail of echo.
+            a) Start with AT+QEEC=21,20000
+            b) Make call to check the echo performance and record the value.
+            c) Increase the DENS_tail_alpha in steps of 500, until 30000, and check the echo performance at each value.
+            d) Set the parameter to the value that yielded the best echo performance.
+            e) Start with AT+QEEC=22,6000
+            f) Make call to check the echo performance and record the value.
+            g) Increase the DENS_tail_portion in steps of 500, until 30000, and check the echo performance at each
+        value. h) Set the parameter to the value that yielded the best echo performance.
+        */
+        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
+        parser->cmd(at::factory(at::AT::QEEC) + "5,40"); // best performance on experiments in step 1
+        parser->cmd(at::factory(at::AT::QEEC) + "10,160");
+        parser->cmd(at::factory(at::AT::QEEC) + "21,26600"); // best performance on experiments in step 2c
+        parser->cmd(at::factory(at::AT::QEEC) + "22,20000"); // best performance on experiments in step 2g
+        parser->cmd(at::factory(at::AT::QEEC) + "24,768");
+        parser->cmd(at::factory(at::AT::QEEC) + "33,896");
+    };
 }

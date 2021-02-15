@@ -1,7 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include "Constants.hpp"
 
 #include <MessageType.hpp>
 #include <Service/Common.hpp>
@@ -12,6 +14,8 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <screen-light-control/ScreenLightControl.hpp>
+
+#include <service-db/DBServiceName.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -44,7 +48,7 @@ class EventManager : public sys::Service
     std::unique_ptr<screen_light_control::ScreenLightControl> screenLightControl;
 
   public:
-    EventManager(const std::string &name);
+    EventManager(const std::string &name = service::name::evt_manager);
     ~EventManager();
 
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -62,3 +66,17 @@ class EventManager : public sys::Service
      */
     static bool messageSetApplication(sys::Service *sender, const std::string &applicationName);
 };
+
+namespace sys
+{
+    template <> struct ManifestTraits<EventManager>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = service::name::evt_manager;
+            manifest.dependencies = {service::name::db};
+            return manifest;
+        }
+    };
+} // namespace sys

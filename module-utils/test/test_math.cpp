@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
@@ -7,7 +7,10 @@
 
 #include "math/Math.hpp"
 
+#include <climits>
+
 using namespace trigonometry;
+using namespace binary;
 
 TEST_CASE("Math")
 {
@@ -45,6 +48,41 @@ TEST_CASE("Math")
 
             REQUIRE(OppositeSide::fromAngle(toRadians(60), 6) == 5);
             REQUIRE(OppositeSide::fromSine(std::sin(toRadians(60)), 6) == 5);
+        }
+    }
+
+    SECTION("Binary operations")
+    {
+        SECTION("Is number a power of two")
+        {
+            REQUIRE(isPowerOfTwo(0) == false);
+            REQUIRE(isPowerOfTwo(1) == true);
+            REQUIRE(isPowerOfTwo(2) == true);
+            REQUIRE(isPowerOfTwo(3) == false);
+            REQUIRE(isPowerOfTwo(64) == true);
+            REQUIRE(isPowerOfTwo(128) == true);
+            REQUIRE(isPowerOfTwo(64 + 128) == false);
+        }
+
+        SECTION("Find nearest power of two (floor)")
+        {
+            REQUIRE(floorPowerOfTwo(0) == 0);
+            REQUIRE(floorPowerOfTwo(1) == 1);
+            REQUIRE(floorPowerOfTwo(2) == 2);
+            REQUIRE(floorPowerOfTwo(3) == 2);
+            REQUIRE(floorPowerOfTwo(7) == 4);
+            REQUIRE(floorPowerOfTwo(0xffffffff) == 0x80000000);
+        }
+
+        SECTION("Find nearest power of two (ceil)")
+        {
+            REQUIRE(ceilPowerOfTwo(0) == 0);
+            REQUIRE(ceilPowerOfTwo(1) == 1);
+            REQUIRE(ceilPowerOfTwo(2) == 2);
+            REQUIRE(ceilPowerOfTwo(3) == 4);
+            REQUIRE(ceilPowerOfTwo(7) == 8);
+            REQUIRE(ceilPowerOfTwo(62) == 64);
+            REQUIRE(ceilPowerOfTwo(UINT_MAX) == 0);
         }
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/usb/usb.hpp"
@@ -7,6 +7,25 @@
 #include <fstream>
 #include <string>
 
+#ifndef DEUBG_USB
+#undef LOG_PRINTF
+#undef LOG_TRACE
+#undef LOG_DEBUG
+#undef LOG_INFO
+#undef LOG_WARN
+#undef LOG_ERROR
+#undef LOG_FATAL
+#undef LOG_CUSTOM
+
+#define LOG_PRINTF(...)
+#define LOG_TRACE(...)
+#define LOG_DEBUG(...)
+#define LOG_INFO(...)
+#define LOG_WARN(...)
+#define LOG_ERROR(...)
+#define LOG_FATAL(...)
+#define LOG_CUSTOM(loggerLevel, ...)
+#endif
 namespace bsp
 {
     int fd;
@@ -39,8 +58,7 @@ namespace bsp
 
                 ssize_t length = read(fd, &inputData[0], SERIAL_BUFFER_LEN);
                 if (length > 0) {
-                    LOG_DEBUG(
-                        "[ServiceDesktop:BSP_Driver] Received: %d signs: [%s]", static_cast<int>(length), inputData);
+                    LOG_DEBUG("[ServiceDesktop:BSP_Driver] Received: %d signs", static_cast<int>(length));
 #if USBCDC_ECHO_ENABLED
                     bool usbCdcEchoEnabledPrev = usbCdcEchoEnabled;
 

@@ -45,3 +45,7 @@ When all variables are loaded from *DB*, then *BluetoothWorker* reloads Bluetoot
 Flowchart below is an example of scenario, when user opens *BluetoothWindow*, and tries to change some of settings presented there.
 
 ![change_bt_status_flowchart](./change_bt_status_flowchart.svg)
+
+# Bluetooth on/off state machine diagram
+To be able to handle all events during start up and shutting down of the Bluetooth module the following state machine has been implemented:
+![bt_on_off_state_diagram](./bt_on_off_state_diagram.svg)

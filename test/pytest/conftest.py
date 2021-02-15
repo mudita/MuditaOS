@@ -129,3 +129,5 @@ def pytest_configure(config):
                             "rt1051: mark test if it's target only (eg. calls, messages)")
     config.addinivalue_line("markers",
                             "usb_cdc_echo: mark test if it's intended for usb-cdc echo mode")
+    config.addinivalue_line("markers",
+                            "two_sim_cards: mark test in case when two sim cards are required")

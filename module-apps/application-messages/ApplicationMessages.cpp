@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -31,6 +31,8 @@
 #include <module-db/queries/messages/threads/QueryThreadRemove.hpp>
 #include <module-db/queries/phonebook/QueryContactGetByID.hpp>
 
+#include <service-cellular/CellularMessage.hpp>
+
 #include <cassert>
 #include <time/time_conversion.hpp>
 #include <messages/OptionsWindow.hpp>
@@ -40,13 +42,21 @@ namespace app
     ApplicationMessages::ApplicationMessages(std::string name, std::string parent, StartInBackground startInBackground)
         : Application(name, parent, startInBackground, 4096 * 2), AsyncCallbackReceiver{this}
     {
-        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {
             switchWindow(gui::name::window::new_sms, std::move(data));
             return msgHandled();
         });
         addActionReceiver(manager::actions::ShowSmsTemplates, [this](auto &&data) {
             switchWindow(gui::name::window::sms_templates, std::move(data));
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::SmsRejectNoSim, [this](auto &&data) {
+            auto action = [this]() {
+                returnToPreviousWindow();
+                return true;
+            };
+            showNotification(action);
             return msgHandled();
         });
     }
@@ -59,7 +69,6 @@ namespace app
         if (reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
-
         if (msgl->messageType == MessageType::DBServiceNotification) {
             auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
             if (msg != nullptr) {
@@ -367,14 +376,6 @@ namespace app
     {
         if (!sendSms(number, body)) {
             return false;
-        }
-
-        if (!Store::GSM::get()->simCardInserted()) {
-            auto action = [=]() -> bool {
-                returnToPreviousWindow();
-                return true;
-            };
-            return showNotification(action);
         }
 
         return true;

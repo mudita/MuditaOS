@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /**
  * Project Untitled
  * @brief The request primitive is used to convey control information to the remote port. The indication is sent to

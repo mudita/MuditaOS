@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -16,13 +16,14 @@
 #include "condition_variable.hpp"
 #include "mutex.hpp"
 #include "Service/Mailbox.hpp"
-#include "Service/Bus.hpp"
 #include "Service/Service.hpp"
-#include "Service/Message.hpp"
+#include "Service/ServiceCreator.hpp"
 #include "PowerManager.hpp"
 #include "Constants.hpp"
 #include "CpuStatistics.hpp"
+#include "DeviceManager.hpp"
 #include <chrono>
+#include <vector>
 
 namespace sys
 {
@@ -36,6 +37,7 @@ namespace sys
     enum class Code
     {
         CloseSystem,
+        Update,
         Reboot,
         None,
     };
@@ -43,7 +45,7 @@ namespace sys
     class SystemManagerCmd : public DataMessage
     {
       public:
-        SystemManagerCmd(Code type = Code::None) : DataMessage(BusChannels::SystemManagerRequests), type(type)
+        SystemManagerCmd(Code type = Code::None) : DataMessage(BusChannel::SystemManagerRequests), type(type)
         {}
 
         Code type;
@@ -62,15 +64,20 @@ namespace sys
             ShutdownReady,
             Reboot,
         } state = State::Running;
+
+        explicit SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
+        ~SystemManager() override;
+
         void set(enum State state);
-        SystemManager(TickType_t pingInterval);
 
-        ~SystemManager();
+        void initialize();
 
-        void StartSystem(InitFunction init);
+        void StartSystem(InitFunction sysInit, InitFunction appSpaceInit);
 
         // Invoke system close procedure
         static bool CloseSystem(Service *s);
+
+        static bool Update(Service *s);
 
         static bool Reboot(Service *s);
 
@@ -78,8 +85,8 @@ namespace sys
 
         static bool ResumeService(const std::string &name, Service *caller);
 
-        // Create new service
-        static bool CreateService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
+        /// Runs a service
+        static bool RunService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
 
         /// Destroy existing service
         /// @note there is no fallback
@@ -105,12 +112,14 @@ namespace sys
             return ReturnCodes::Success;
         }
 
-        ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) override final
+        ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) final
         {
             return ReturnCodes::Success;
         }
 
         void Run() override;
+
+        void StartSystemServices();
 
         /// Sysmgr stores list of all active services but some of them are under control of parent services.
         /// Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to
@@ -118,6 +127,8 @@ namespace sys
         /// It closes all workers except EventManager -as it needs information from Eventmanager that it's safe to
         /// shutdown
         void CloseSystemHandler();
+
+        void UpdateSystemHandler();
 
         void RebootHandler();
 
@@ -132,20 +143,19 @@ namespace sys
         /// periodic update of cpu statistics
         void CpuStatisticsTimerHandler();
 
-        TickType_t pingInterval;
-        uint32_t pingPongTimerID;
         bool cpuStatisticsTimerInit{false};
 
-        InitFunction userInit;
-
+        std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
         std::unique_ptr<sys::Timer> cpuStatisticsTimer;
+        InitFunction userInit;
+        InitFunction systemInit;
 
         static std::vector<std::shared_ptr<Service>> servicesList;
         static cpp_freertos::MutexStandard destroyMutex;
         static std::unique_ptr<PowerManager> powerManager;
         static std::unique_ptr<CpuStatistics> cpuStatistics;
+        static std::unique_ptr<DeviceManager> deviceManager;
     };
-
 } // namespace sys
 
 inline const char *c_str(sys::SystemManager::State state)

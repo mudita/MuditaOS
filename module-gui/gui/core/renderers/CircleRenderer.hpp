@@ -24,7 +24,7 @@ namespace gui::renderer
             Color borderColor{ColorFullBlack};
             Color fillColor{ColorNoColor};
 
-            static auto from(const CommandCircle &command) -> DrawableStyle;
+            static auto from(const DrawCircle &command) -> DrawableStyle;
         };
 
         static void draw(Context *ctx, Point center, Length radius, const DrawableStyle &style);

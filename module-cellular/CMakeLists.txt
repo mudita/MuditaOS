@@ -7,6 +7,7 @@ include(SerialPort)
 
 set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATParser.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATStream.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATCommon.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/DLC_channel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/TS0710/TS0710.cpp
@@ -33,10 +34,15 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcCpin.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcQiurc.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcPoweredDown.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcRing.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcResponse.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcFactory.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Commands.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Cmd.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/CSCA.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/QECCNUM.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/CLCC.cpp
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

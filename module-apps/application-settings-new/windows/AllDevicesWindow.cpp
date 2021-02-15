@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AllDevicesWindow.hpp"
@@ -21,13 +21,15 @@ namespace gui
     AllDevicesWindow::AllDevicesWindow(app::Application *app) : OptionWindow(app, gui::window::name::all_devices)
     {
         setTitle(utils::localize.get("app_settings_bluetooth_all_devices"));
-        sys::Bus::SendUnicast(
-            std::make_shared<::message::bluetooth::RequestBondedDevices>(), service::name::bluetooth, application);
+        application->bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(),
+                                     service::name::bluetooth);
     }
 
     void AllDevicesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         clearOptions();
+        application->bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::StopScan),
+                                     "ServiceBluetooth");
         if (const auto newData = dynamic_cast<BondedDevicesData *>(data); newData != nullptr) {
             addOptions(allDevicesOptionsList(newData->getDevices()));
         }
@@ -38,9 +40,8 @@ namespace gui
 
         if (inputEvent.state == InputEvent::State::keyReleasedShort) {
             if (inputEvent.keyCode == KeyCode::KEY_LEFT) {
-                sys::Bus::SendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Scan),
-                                      "ServiceBluetooth",
-                                      application);
+                application->bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Scan),
+                                             "ServiceBluetooth");
                 gui::DialogMetadata meta;
                 meta.icon                        = "search_big";
                 meta.text                        = utils::localize.get("app_settings_bluetooth_searching_devices");

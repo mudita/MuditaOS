@@ -1,6 +1,5 @@
-/**
- * Project Untitled
- */
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef _TS0710_H
 #define _TS0710_H
@@ -284,6 +283,16 @@ class TS0710
 
     DLC_channel::Callback_t controlCallback = nullptr;
     std::queue<uint8_t> RXFifo;
+
+    enum class EchoCancellerStrength
+    {
+        LeastAggressive,
+        Medium,
+        Aggressive,
+        Tuned
+    };
+    void SetupEchoCalceller(EchoCancellerStrength strength);
+
   public:
     enum class ConfState
     {
@@ -332,6 +341,16 @@ class TS0710
                 channels.erase(channels.begin() + 1);
             }
         }
+    }
+
+    void CloseChannels()
+    {
+        for (auto &it : channels) {
+            delete it;
+        }
+        channels.clear();
+        TS0710_CLOSE pv_TS0710_Close = TS0710_CLOSE();
+        mode                         = Mode::AT;
     }
 
     DLCI_t GetLastDLCI()
@@ -390,33 +409,6 @@ class TS0710
                        static_cast<unsigned int>(numberOfExpectedTokens));
             return false;
         }
-    }
-
-    /// @brief It is serching the resposne for "OK "string
-    ///
-    /// @note Invalid responses are logged by defult as LOG_ERRORs
-    ///
-    /// @param response - tokenized resposne
-    /// @param numberOfExpectedTokens - number of expected tokens, 0 means do not validate number of tokens
-    /// @param level - determine how the errors are logged
-    /// @return true - str string is found, false - otherwise
-    bool CheckATCommandResponse(const std::vector<std::string> &response,
-                                size_t numberOfExpectedTokens,
-                                logger_level level = LOGERROR)
-    {
-        return SearchATCommandResponse(response, "OK", numberOfExpectedTokens, level);
-    }
-
-    /// @brief It is serching the resposne for "OK "string
-    ///
-    /// @note Invalid responses are logged by defult as LOG_ERRORs
-    ///
-    /// @param response - tokenized resposne
-    /// @param level - determine how the errors are logged
-    /// @return true - str string is found, false - otherwise
-    bool CheckATCommandResponse(const std::vector<std::string> &response, logger_level level = LOGERROR)
-    {
-        return SearchATCommandResponse(response, "OK", 0, level);
     }
 
     /// @brief It is serching the resposne for ">" string

@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /**
  * Project Untitled
  * @brief The transmitting unit initiates transmission of data using the frame type specified for the chosen DLCI by

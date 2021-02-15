@@ -508,6 +508,8 @@ bool EventsTable::addCustom(EventsTableRow entry)
     for (uint32_t i = 1; i <= numberOfWeeks; i++) {
         for (auto option : weekDayOptions) {
             if (option) {
+                LOG_DEBUG("start: %s", TimePointToString(dateFrom + date::days{incrementation}).c_str());
+                LOG_DEBUG("start: %s", TimePointToString(dateTill + date::days{incrementation}).c_str());
                 result =
                     result &&
                     db->execute("INSERT or IGNORE INTO events (uid, title, date_from, date_till, "

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,11 @@
 #include <map>
 #include <functional>
 
+#include <Modem/TS0710/DLC_channel.h>
+
 #include "requests/CallRequest.hpp"
+#include "service-appmgr/Actions.hpp"
+#include "CellularMessage.hpp"
 
 namespace cellular
 {
@@ -17,12 +21,27 @@ namespace cellular
     class RequestFactory
     {
       public:
-        RequestFactory(const std::string &data);
+        enum class SimStatus
+        {
+            SimInsterted,
+            SimSlotEmpty
+        };
+
+        RequestFactory(const std::string &data,
+                       at::BaseChannel &channel,
+                       CellularCallRequestMessage::RequestMode requestMode,
+                       SimStatus simCardStatus);
         std::unique_ptr<IRequest> create();
 
       private:
+        void registerRequest(std::string regex, CreateCallback);
+        std::unique_ptr<IRequest> emergencyCheck();
+
         std::string request;
         std::vector<std::pair<std::string, CreateCallback>> requestMap;
-        void registerRequest(std::string regex, CreateCallback);
+
+        at::BaseChannel &channel;
+        const CellularCallRequestMessage::RequestMode requestMode;
+        const SimStatus simStatus;
     };
 } // namespace cellular

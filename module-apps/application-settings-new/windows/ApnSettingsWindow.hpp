@@ -4,6 +4,8 @@
 #pragma once
 
 #include "OptionWindow.hpp"
+#include "application-settings-new/models/ApnSettingsModel.hpp"
+
 #include <Icon.hpp>
 #include <service-cellular/PacketDataTypes.hpp>
 
@@ -25,5 +27,7 @@ namespace gui
         Image *crossImage     = nullptr;
         Icon *emptyListIcon   = nullptr;
         std::vector<std::shared_ptr<packet_data::APN::Config>> apns;
+        std::shared_ptr<packet_data::APN::Config> activeApn;
+        std::shared_ptr<ApnSettingsModel> apnSettingsModel;
     };
 }; // namespace gui

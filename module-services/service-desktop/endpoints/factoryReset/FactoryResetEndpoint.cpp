@@ -8,7 +8,6 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 
-#include <Service/Bus.hpp>
 #include <json/json11.hpp>
 
 #include <memory>
@@ -19,7 +18,7 @@ auto FactoryResetEndpoint::handle(parserFSM::Context &context) -> void
 
         if (context.getBody()[parserFSM::json::factoryRequest] == true) {
             auto msg = std::make_shared<sdesktop::FactoryMessage>();
-            sys::Bus::SendUnicast(msg, service::name::service_desktop, ownerServicePtr);
+            ownerServicePtr->bus.sendUnicast(msg, service::name::service_desktop);
 
             context.setResponseBody(json11::Json::object({{parserFSM::json::factoryRequest, true}}));
         }

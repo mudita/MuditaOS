@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,17 +14,12 @@
 #include <utility>
 #include <vector>
 
-extern "C"
-{
-#include <module-bluetooth/lib/btstack/src/btstack_util.h>
-};
-
 struct BluetoothStatus
 {
     enum class State
     {
-        On,
         Off,
+        On,
         Error,
         None
     } state;
@@ -43,7 +38,7 @@ class BluetoothMessage : public sys::DataMessage
         PAN,
         Visible,
         Play,
-        Stop
+        StopPlayback
     };
     enum Request req = Request::None;
     BluetoothMessage(enum Request req = None) : sys::DataMessage(MessageType::BluetoothRequest), req(req){};
@@ -80,10 +75,7 @@ class BluetoothAddrMessage : public sys::DataMessage
 {
   public:
     bd_addr_t addr;
-    explicit BluetoothAddrMessage(std::string addr) : sys::DataMessage(MessageType::BluetoothAddrResult)
-    {
-        sscanf_bd_addr(addr.c_str(), this->addr);
-    };
+    explicit BluetoothAddrMessage(std::string addr);
     ~BluetoothAddrMessage() override = default;
 };
 

@@ -33,8 +33,8 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
-        sys::Bus::SendUnicast(
-            std::make_shared<::message::bluetooth::RequestDeviceName>(), service::name::bluetooth, application);
+        application->bus.sendUnicast(std::make_shared<::message::bluetooth::RequestDeviceName>(),
+                                     service::name::bluetooth);
 
         setFocusItem(inputField);
     }
@@ -59,7 +59,7 @@ namespace gui
 
         if (inputEvent.is(gui::KeyCode::KEY_ENTER) && !inputField->isEmpty()) {
             auto result = std::make_shared<::message::bluetooth::SetDeviceName>(inputField->getText());
-            sys::Bus::SendUnicast(std::move(result), service::name::bluetooth, application);
+            application->bus.sendUnicast(std::move(result), service::name::bluetooth);
             return true;
         }
 

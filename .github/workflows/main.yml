@@ -50,13 +50,12 @@ jobs:
           submodules: recursive
       - name: Build for RT1051
         run: |
-          ./configure.sh rt1051 Release && \
+          export JOBS=${JOBS:-$(nproc)} && \
+          echo "JOBS=${JOBS}" &&  \
+          ./configure.sh rt1051 Release -G Ninja && \
           pushd build-rt1051-Release && \
-          export JOBS=${JOBS:-`nproc`} && \
-          echo "JOBS=${JOBS}" && \
-          make -j ${JOBS} && \
-          popd && \
-          uptime
+          ninja -j ${JOBS} && \
+          popd 
 
   build_linux_binary_and_run_tests:
     name: build linux binary and run tests
@@ -72,21 +71,27 @@ jobs:
           submodules: recursive
       - name: build linux binary
         run: |
-          ./configure.sh linux Debug && \
+          export JOBS=${JOBS:-$(nproc)} && \
+          echo "JOBS=${JOBS}" &&  \
+          ./configure.sh linux Debug -G Ninja && \
           pushd build-linux-Debug && \
-          export JOBS=${JOBS:-`nproc`} && \
-          echo "JOBS=${JOBS}" && \
-          make -j ${JOBS} && \
+          ninja -j ${JOBS} && \
           popd
       - name: Check for statics
         run: ./tools/find_global_data.py build-linux-Debug/PurePhone.elf
+      - name: build unit tests
+        run: |
+          export JOBS=${JOBS:-$(nproc)} && \
+          echo "JOBS=${JOBS}" &&  \
+          pushd build-linux-Debug && \
+          ninja -j ${JOBS} unittests && \
+          popd
       - name: run unit tests
         run: |
-          pushd build-linux-Debug && \
-          export JOBS=${JOBS:-`nproc`} && \
-          echo "JOBS=${JOBS}" && \
-          make -j ${JOBS} check && \
-          popd
+          ./tools/run_unittests.sh enabled_unittests
+      - name: store build artefact
+        run: |
+          tar -S -cf /artefacts/build-$(git rev-parse --short HEAD).tar build-linux-Debug
       - name: start emulator
         run: |
           rm -f /tmp/purephone_pts_name
@@ -103,3 +108,61 @@ jobs:
       - name: print emulator logs
         run: cat emulator.log
         if: always()
+
+  #emulator_on_off_test:
+  #Enable this test in "Clean artefacts"
+  #  name: emulator on-off test
+  #  if: github.event.pull_request.draft == false
+  #  runs-on: self-hosted
+  #  needs:
+  #    - build_linux_binary_and_run_tests
+  #  steps:
+  #    - name: clone repository
+  #      uses: actions/checkout@v2
+  #      with:
+  #        token: ${{ secrets.GitHub_PAT }}
+  #        submodules: recursive
+  #    - name: get artefacts
+  #      run: |
+  #        tar xf /artefacts/build-$(git rev-parse --short HEAD).tar
+  #    - name: start emulator on-off test
+  #      run: ./phone_on_off_test.sh
+  #      working-directory: test
+  #    - name: print emulator logs
+  #      run: cat emulator.log
+  #      if: always()
+
+  check_run_unit_tests:
+    name: Check run unit tests
+    needs:
+      - build_linux_binary_and_run_tests
+    runs-on: self-hosted
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GitHub_PAT }}
+          submodules: recursive
+      - name: get artefacts
+        run: |
+          tar xf /artefacts/build-$(git rev-parse --short HEAD).tar
+      - name: check if all Unit Tests where run
+        run: |
+          ./tools/check_unittests.sh enabled_unit_tests
+
+  clean_artefacts:
+    name: Clean Artefacts
+    if: always()
+    #needs: [ build_linux_binary_and_run_tests, emulator_on_off_test, check_run_unit_tests ]
+    needs: [ build_linux_binary_and_run_tests, check_run_unit_tests ]
+    runs-on: self-hosted
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GitHub_PAT }}
+          submodules: recursive
+      - name: Delete Artefact
+        run: |
+          rm -f /artefacts/build-$(git rev-parse --short HEAD).tar
+

@@ -14,7 +14,10 @@ namespace gui
                                          std::function<void()> selectSpecialCharacter)
     {
         setMinimumSize(style::window::default_body_width, style::window::calendar::item::textWithLabel::height);
-        setMargins(gui::Margins(style::margins::small, 0, 0, 0));
+        setMargins(gui::Margins(style::window::calendar::leftMargin,
+                                2 * style::window::calendar::leftMargin,
+                                0,
+                                1.5 * style::window::calendar::leftMargin));
         setEdges(RectangleEdge::None);
         bottomBarRestoreFromTemporaryMode();
 
@@ -26,7 +29,7 @@ namespace gui
         descriptionLabel = new gui::Label(vBox, 0, 0, 0, 0);
         descriptionLabel->setMinimumSize(style::window::default_body_width,
                                          style::window::calendar::item::textWithLabel::description_h);
-        descriptionLabel->setMargins(gui::Margins(0, style::margins::small, 0, 0));
+        descriptionLabel->setMargins(gui::Margins(0, 0, 0, style::window::calendar::item::textWithLabel::margin));
         descriptionLabel->setEdges(gui::RectangleEdge::None);
         descriptionLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
         descriptionLabel->setFont(style::window::font::small);
@@ -37,7 +40,7 @@ namespace gui
         textInput->setMinimumSize(style::window::default_body_width,
                                   style::window::calendar::item::textWithLabel::text_input_h);
         textInput->setEdges(gui::RectangleEdge::Bottom);
-        textInput->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
+        textInput->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         textInput->setFont(style::window::font::medium);
         textInput->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},

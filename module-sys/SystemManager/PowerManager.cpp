@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log/log.hpp>
@@ -10,6 +10,8 @@ namespace sys
     PowerManager::PowerManager()
     {
         lowPowerControl = bsp::LowPowerMode::Create().value_or(nullptr);
+        driverSEMC      = drivers::DriverSEMC::Create("ExternalRAM");
+        cpuGovernor     = std::make_unique<CpuGovernor>();
     }
 
     PowerManager::~PowerManager()
@@ -27,13 +29,14 @@ namespace sys
 
     void PowerManager::UpdateCpuFrequency(uint32_t cpuLoad)
     {
-        const auto freq = lowPowerControl->GetCurrentFrequency();
+        const auto currentCpuFreq        = lowPowerControl->GetCurrentFrequencyLevel();
+        const auto minFrequencyRequested = cpuGovernor->GetMinimumFrequencyRequested();
 
-        if (cpuLoad > frequencyShiftUpperThreshold && freq < bsp::LowPowerMode::CpuFrequency::Level_6) {
+        if (cpuLoad > frequencyShiftUpperThreshold && currentCpuFreq < bsp::CpuFrequencyHz::Level_6) {
             aboveThresholdCounter++;
             belowThresholdCounter = 0;
         }
-        else if (cpuLoad < frequencyShiftLowerThreshold && freq > bsp::LowPowerMode::CpuFrequency::Level_1) {
+        else if (cpuLoad < frequencyShiftLowerThreshold && currentCpuFreq > bsp::CpuFrequencyHz::Level_1) {
             belowThresholdCounter++;
             aboveThresholdCounter = 0;
         }
@@ -41,74 +44,100 @@ namespace sys
             ResetFrequencyShiftCounter();
         }
 
-        if (aboveThresholdCounter >= maxAboveThresholdCount) {
+        if (aboveThresholdCounter >= maxAboveThresholdCount || minFrequencyRequested > currentCpuFreq) {
             ResetFrequencyShiftCounter();
             IncreaseCpuFrequency();
         }
-        if (belowThresholdCounter >= maxBelowThresholdCount) {
-            ResetFrequencyShiftCounter();
-            DecreaseCpuFrequency();
+        else {
+            if (belowThresholdCounter >= maxBelowThresholdCount && currentCpuFreq > minFrequencyRequested) {
+                ResetFrequencyShiftCounter();
+                DecreaseCpuFrequency();
+            }
         }
     }
 
     void PowerManager::IncreaseCpuFrequency() const
     {
-        const auto freq      = lowPowerControl->GetCurrentFrequency();
+        const auto freq      = lowPowerControl->GetCurrentFrequencyLevel();
         const auto oscSource = lowPowerControl->GetCurrentOscillatorSource();
-        const auto pll2State = lowPowerControl->GetCurrentPll2State();
 
-        // switch osc source first
-        if (freq == bsp::LowPowerMode::CpuFrequency::Level_1 &&
-            oscSource == bsp::LowPowerMode::OscillatorSource::Internal) {
-            lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::External);
-        }
+        if (freq == bsp::CpuFrequencyHz::Level_1) {
+            // switch osc source first
+            if (oscSource == bsp::LowPowerMode::OscillatorSource::Internal) {
+                lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::External);
+            }
 
-        // then turn on pll2
-        if (pll2State == bsp::LowPowerMode::Pll2State::Disable) {
-            lowPowerControl->SwitchPll2State(bsp::LowPowerMode::Pll2State::Enable);
+            // then switch external RAM clock source
+            if (driverSEMC) {
+                driverSEMC->SwitchToPLL2ClockSource();
+            }
         }
 
         // and increase frequency
-        if (freq < bsp::LowPowerMode::CpuFrequency::Level_6) {
-            lowPowerControl->SetCpuFrequency(bsp::LowPowerMode::CpuFrequency::Level_6);
+        if (freq < bsp::CpuFrequencyHz::Level_6) {
+            SetCpuFrequency(bsp::CpuFrequencyHz::Level_6);
         }
     }
 
     void PowerManager::DecreaseCpuFrequency() const
     {
-        const auto freq = lowPowerControl->GetCurrentFrequency();
-        auto level      = bsp::LowPowerMode::CpuFrequency::Level_1;
+        const auto freq = lowPowerControl->GetCurrentFrequencyLevel();
+        auto level      = bsp::CpuFrequencyHz::Level_1;
 
-        // We temporarily limit the minimum CPU frequency
-        // due to problems with the UART of the GSM modem
         switch (freq) {
-        case bsp::LowPowerMode::CpuFrequency::Level_6:
-            level = bsp::LowPowerMode::CpuFrequency::Level_5;
+        case bsp::CpuFrequencyHz::Level_6:
+            level = bsp::CpuFrequencyHz::Level_5;
             break;
-        default:
-            level = bsp::LowPowerMode::CpuFrequency::Level_4;
+        case bsp::CpuFrequencyHz::Level_5:
+            level = bsp::CpuFrequencyHz::Level_4;
+            break;
+        case bsp::CpuFrequencyHz::Level_4:
+            level = bsp::CpuFrequencyHz::Level_3;
+            break;
+        case bsp::CpuFrequencyHz::Level_3:
+            level = bsp::CpuFrequencyHz::Level_2;
+            break;
+        case bsp::CpuFrequencyHz::Level_2:
+            level = bsp::CpuFrequencyHz::Level_1;
+            break;
+        case bsp::CpuFrequencyHz::Level_1:
             break;
         }
 
         // decrease frequency first
         if (level != freq) {
-            lowPowerControl->SetCpuFrequency(level);
+            SetCpuFrequency(level);
         }
 
-        if (level == bsp::LowPowerMode::CpuFrequency::Level_1) {
+        if (level == bsp::CpuFrequencyHz::Level_1) {
             const auto oscSource = lowPowerControl->GetCurrentOscillatorSource();
-            const auto pll2State = lowPowerControl->GetCurrentPll2State();
 
             // then switch osc source
             if (oscSource == bsp::LowPowerMode::OscillatorSource::External) {
                 lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
             }
 
-            // and turn off pll2
-            if (pll2State == bsp::LowPowerMode::Pll2State::Enable) {
-                lowPowerControl->SwitchPll2State(bsp::LowPowerMode::Pll2State::Disable);
+            // and switch external RAM clock source
+            if (driverSEMC) {
+                driverSEMC->SwitchToPeripheralClockSource();
             }
         }
+    }
+
+    void PowerManager::RegisterNewSentinel(std::shared_ptr<CpuSentinel> newSentinel) const
+    {
+        cpuGovernor->RegisterNewSentinel(newSentinel);
+    }
+
+    void PowerManager::SetCpuFrequencyRequest(std::string sentinelName, bsp::CpuFrequencyHz request) const
+    {
+        cpuGovernor->SetCpuFrequencyRequest(sentinelName, request);
+    }
+
+    void PowerManager::SetCpuFrequency(bsp::CpuFrequencyHz freq) const
+    {
+        lowPowerControl->SetCpuFrequency(freq);
+        cpuGovernor->InformSentinelsAboutCpuFrequencyChange(freq);
     }
 
     void PowerManager::ResetFrequencyShiftCounter()
@@ -116,4 +145,10 @@ namespace sys
         aboveThresholdCounter = 0;
         belowThresholdCounter = 0;
     }
+
+    [[nodiscard]] auto PowerManager::getExternalRamDevice() const noexcept -> std::shared_ptr<devices::Device>
+    {
+        return driverSEMC;
+    }
+
 } // namespace sys

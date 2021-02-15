@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -43,9 +43,15 @@ namespace audio
         Position GetPosition() final;
 
       private:
+        static constexpr auto minimumBlockSize = 64U;
+        static constexpr auto maximumBlockSize = 64U;
+        static constexpr Endpoint::Capabilities routerCapabilities{.minBlockSize = minimumBlockSize,
+                                                                   .maxBlockSize = maximumBlockSize};
+
         bool Mute(bool enable);
 
-        bool muteEnable = false;
+        std::unique_ptr<Stream> dataStreamOut;
+        std::unique_ptr<Stream> dataStreamIn;
         std::unique_ptr<Encoder> enc;
         std::unique_ptr<bsp::AudioDevice> audioDeviceCellular;
         std::unique_ptr<StreamConnection> outputConnection;

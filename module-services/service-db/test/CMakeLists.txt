@@ -6,6 +6,7 @@ add_catch2_executable(
             main.cpp
             test-service-db-api.cpp
             test-service-db-settings-messages.cpp
+            #test-service-db-file_indexer.cpp
         LIBS
             service-audio
             module-vfs
@@ -13,5 +14,7 @@ add_catch2_executable(
             service-cellular
             module-cellular
             iosyscalls
+        DEPS
+            PurePhone.img-target
 )
-
+add_subdirectory(test-settings)

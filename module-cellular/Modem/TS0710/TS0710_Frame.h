@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #ifndef _TS0710_FRAME_H
 #define _TS0710_FRAME_H
 
@@ -75,7 +78,6 @@ class TS0710_Frame
             FCS = 0xFF - FCS;
             ret.push_back(FCS);
             ret.push_back(TS0710_FLAG);
-
             return ret;
         }
 

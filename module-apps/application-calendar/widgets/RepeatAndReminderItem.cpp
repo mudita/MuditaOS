@@ -3,9 +3,10 @@
 
 #include "RepeatAndReminderItem.hpp"
 #include "application-calendar/widgets/CalendarStyle.hpp"
+#include "application-calendar/ApplicationCalendar.hpp"
+#include "application-alarm-clock/data/AlarmsData.hpp"
 #include <Style.hpp>
 #include <Utils.hpp>
-#include <module-apps/application-calendar/ApplicationCalendar.hpp>
 
 namespace gui
 {
@@ -104,7 +105,7 @@ namespace gui
         reminderTitle->setText(utils::localize.get("app_calendar_event_detail_reminder"));
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
             if (event->repeat > app::ApplicationCalendar::repeatOptions.size()) {
-                repeat->setText("app_calendar_custom_repeat_title");
+                repeat->setText(CustomRepeatValueParser(event->repeat).getWeekDaysText());
             }
             else {
                 repeat->setText(utils::localize.get(

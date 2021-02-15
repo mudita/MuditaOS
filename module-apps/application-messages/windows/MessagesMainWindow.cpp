@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessagesMainWindow.hpp"
@@ -53,7 +53,8 @@ namespace gui
                                  msgThreadStyle::ListPositionY,
                                  msgThreadStyle::listWidth,
                                  msgThreadStyle::listHeight,
-                                 threadsModel);
+                                 threadsModel,
+                                 style::listview::ScrollBarType::Fixed);
         list->setScrollTopMargin(style::margins::small);
         list->rebuildList();
 
@@ -107,7 +108,7 @@ namespace gui
     {
         LOG_INFO("Data: %s", data ? data->getDescription().c_str() : "");
         {
-            auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data);
+            auto pdata = dynamic_cast<PhonebookSearchRequest *>(data);
             if (pdata != nullptr) {
                 using db::query::ThreadGetByContactID;
                 auto query = std::make_unique<ThreadGetByContactID>(pdata->result->ID);

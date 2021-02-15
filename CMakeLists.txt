@@ -97,7 +97,7 @@ add_compile_options( ${TARGET_COMPILE_OPTIONS}
                      -fno-builtin
                      -fno-diagnostics-color
                      # warning flags
-                     -Wall -Wextra -Werror -Wno-unused-parameter -Wno-error=deprecated-declarations)
+                     -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated-declarations)
 
 target_compile_features(${PROJECT_NAME} PUBLIC
         ${TARGET_COMPILE_FEATURES})
@@ -198,6 +198,8 @@ else()
         service-antenna
     )
 endif()
+
+include(tools/clang-tidy.cmake)
 
 set_source_files_properties(source/main.cpp PROPERTIES COMPILE_DEFINITIONS "${ENABLED_APPS_DEFINES}")
 

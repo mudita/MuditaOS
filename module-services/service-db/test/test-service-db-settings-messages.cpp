@@ -4,7 +4,6 @@
 #include <catch2/catch.hpp>           // for Section, SourceLineInfo, SECTION, SectionInfo, StringRef, TEST_CASE
 #include <Service/Service.hpp>        // for Service
 #include <Service/Message.hpp>        // for MessagePointer, ResponseMessage, DataMessage
-#include <module-sys/Service/Bus.hpp> // for Bus
 #include <functional>                 // for _Bind_helper<>::type, _Placeholder, bind, _1, _2
 #include <list>                       // for list
 #include <memory>                     // for make_shared, allocator, shared_ptr
@@ -80,7 +79,7 @@ namespace settings
                 auto old_value = setValue(path, msg->getValue().value_or(""));
 
                 auto update_msg = std::make_shared<settings::Messages::VariableChanged>(path, value, old_value);
-                sys::Bus::SendUnicast(std::move(update_msg), "db-worker", this);
+                bus.sendUnicast(std::move(update_msg), "db-worker");
             }
             return std::make_shared<sys::ResponseMessage>();
         };
@@ -118,15 +117,13 @@ TEST_CASE("Settings Messages")
         settings::Service settings("settings");
         settings.InitHandler();
 
-        sys::Bus::SendUnicast(std::make_shared<settings::Messages::RegisterOnVariableChange>(settings::EntryPath(
-                                  {"mode", "service", "profile", "variable", settings::SettingsScope::AppLocal})),
-                              "db-worker",
-                              &settings);
+        settings.bus.sendUnicast(std::make_shared<settings::Messages::RegisterOnVariableChange>(settings::EntryPath(
+                                     {"mode", "service", "profile", "variable", settings::SettingsScope::AppLocal})),
+                                 "db-worker");
 
-        sys::Bus::SendUnicast(std::make_shared<settings::Messages::UnregisterOnVariableChange>(settings::EntryPath(
-                                  {"mode", "service", "profile", "variable", settings::SettingsScope::AppLocal})),
-                              "db-worker",
-                              &settings);
+        settings.bus.sendUnicast(std::make_shared<settings::Messages::UnregisterOnVariableChange>(settings::EntryPath(
+                                     {"mode", "service", "profile", "variable", settings::SettingsScope::AppLocal})),
+                                 "db-worker");
     }
 
     SECTION("Send profile messages")
@@ -134,14 +131,13 @@ TEST_CASE("Settings Messages")
         settings::Service settings("settings");
         settings.InitHandler();
 
-        sys::Bus::SendUnicast(std::make_shared<settings::Messages::ListProfiles>(), "settings", &settings);
+        settings.bus.sendUnicast(std::make_shared<settings::Messages::ListProfiles>(), "settings");
 
-        sys::Bus::SendUnicast(std::make_shared<settings::Messages::AddProfile>("new-profile"), "settings", &settings);
+        settings.bus.sendUnicast(std::make_shared<settings::Messages::AddProfile>("new-profile"), "settings");
 
-        sys::Bus::SendUnicast(std::make_shared<settings::Messages::GetCurrentProfile>(), "settings", &settings);
+        settings.bus.sendUnicast(std::make_shared<settings::Messages::GetCurrentProfile>(), "settings");
 
-        sys::Bus::SendUnicast(
-            std::make_shared<settings::Messages::CurrentProfileChanged>("profile"), "settings", &settings);
+        settings.bus.sendUnicast(std::make_shared<settings::Messages::CurrentProfileChanged>("profile"), "settings");
     }
 
     SECTION("Send mode messages")
@@ -149,12 +145,12 @@ TEST_CASE("Settings Messages")
         settings::Service settings("settings");
         settings.InitHandler();
 
-        sys::Bus::SendUnicast(std::make_shared<settings::Messages::ListModes>(), "settings", &settings);
+        settings.bus.sendUnicast(std::make_shared<settings::Messages::ListModes>(), "settings");
 
-        sys::Bus::SendUnicast(std::make_shared<settings::Messages::GetCurrentMode>(), "settings", &settings);
+        settings.bus.sendUnicast(std::make_shared<settings::Messages::GetCurrentMode>(), "settings");
 
-        sys::Bus::SendUnicast(std::make_shared<settings::Messages::AddMode>("new-mode"), "settings", &settings);
+        settings.bus.sendUnicast(std::make_shared<settings::Messages::AddMode>("new-mode"), "settings");
 
-        sys::Bus::SendUnicast(std::make_shared<settings::Messages::CurrentModeChanged>("mode"), "settings", &settings);
+        settings.bus.sendUnicast(std::make_shared<settings::Messages::CurrentModeChanged>("mode"), "settings");
     }
 }

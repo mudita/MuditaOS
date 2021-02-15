@@ -1,10 +1,12 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "service-time/CalendarTimeEvents.hpp"
 #include "service-time/ServiceTime.hpp"
+
+#include <service-db/DBServiceName.hpp>
 
 #include <MessageType.hpp>
 #include <Service/Common.hpp>
@@ -41,3 +43,17 @@ namespace stm
     };
 
 } /* namespace stm */
+
+namespace sys
+{
+    template <> struct ManifestTraits<stm::ServiceTime>
+    {
+        static auto GetManifest() -> ServiceManifest
+        {
+            ServiceManifest manifest;
+            manifest.name         = service::name::service_time;
+            manifest.dependencies = {service::name::db};
+            return manifest;
+        }
+    };
+} // namespace sys

@@ -34,8 +34,13 @@ namespace app::notes
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
 
-        list =
-            new gui::ListView(this, style::list::X, style::list::Y, style::list::Width, style::list::Height, listModel);
+        list = new gui::ListView(this,
+                                 style::list::X,
+                                 style::list::Y,
+                                 style::list::Width,
+                                 style::list::Height,
+                                 listModel,
+                                 ::style::listview::ScrollBarType::Fixed);
         list->setScrollTopMargin(::style::margins::small);
         setFocusItem(list);
     }

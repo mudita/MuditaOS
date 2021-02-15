@@ -1,30 +1,36 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceEink.hpp"
 #include "messages/EinkModeMessage.hpp"
 #include "messages/PrepareDisplayEarlyRequest.hpp"
-#include <service-gui/Common.hpp>
 #include <service-gui/messages/EinkInitialized.hpp>
+#include <service-gui/Common.hpp>
 #include <time/ScopedTime.hpp>
 
 #include <log/log.hpp>
 #include <messages/EinkMessage.hpp>
 #include <messages/ImageMessage.hpp>
-#include <Service/Bus.hpp>
+#include <SystemManager/messages/DeviceRegistrationMessage.hpp>
+#include <SystemManager/messages/SentinelRegistrationMessage.hpp>
+#include <SystemManager/Constants.hpp>
 
 #include <cstring>
 #include <memory>
+#include <gsl_util>
 
 namespace service::eink
 {
     namespace
     {
         constexpr auto ServceEinkStackDepth = 4096 + 1024;
+        constexpr std::chrono::milliseconds displayPowerOffTimeout{3800};
     } // namespace
 
     ServiceEink::ServiceEink(const std::string &name, std::string parent)
-        : sys::Service(name, parent, ServceEinkStackDepth), currentState{State::Running}
+        : sys::Service(name, std::move(parent), ServceEinkStackDepth), currentState{State::Running},
+          displayPowerOffTimer{
+              std::make_unique<sys::Timer>(this, displayPowerOffTimeout.count(), sys::Timer::Type::SingleShot)}
     {
         connect(typeid(EinkModeMessage),
                 [this](sys::Message *message) -> sys::MessagePointer { return handleEinkModeChangedMessage(message); });
@@ -34,6 +40,8 @@ namespace service::eink
 
         connect(typeid(PrepareDisplayEarlyRequest),
                 [this](sys::Message *request) -> sys::MessagePointer { return handlePrepareEarlyRequest(request); });
+
+        displayPowerOffTimer->connect([this](sys::Timer &it) { display.powerOff(); });
     }
 
     sys::MessagePointer ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *response)
@@ -49,11 +57,20 @@ namespace service::eink
             return sys::ReturnCodes::Failure;
         }
 
+        auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(display.getDevice());
+        bus.sendUnicast(deviceRegistrationMsg, service::name::system_manager);
+
+        cpuSentinel = std::make_shared<sys::CpuSentinel>(name::eink, this, [this](bsp::CpuFrequencyHz newFrequency) {
+            updateResourcesAfterCpuFrequencyChange(newFrequency);
+        });
+
+        auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+        bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
+
         display.powerOn();
 
         auto msg = std::make_shared<service::gui::EinkInitialized>(display.getSize());
-        sys::Bus::SendUnicast(msg, service::name::gui, this);
-
+        bus.sendUnicast(msg, service::name::gui);
         return sys::ReturnCodes::Success;
     }
 
@@ -115,44 +132,70 @@ namespace service::eink
         }
         utils::time::Scoped measurement("ImageMessage");
 
-        updateDisplay(message->getData(), message->getRefreshMode());
+        showImage(message->getData(), message->getRefreshMode());
         return std::make_shared<service::eink::ImageDisplayedNotification>(message->getContextId());
     }
 
-    void ServiceEink::updateDisplay(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode)
+    void ServiceEink::showImage(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode)
     {
-        prepareDisplay(refreshMode);
+        displayPowerOffTimer->stop();
 
-        if (const auto status = display.update(frameBuffer); status != EinkOK) {
-            LOG_FATAL("Failed to update frame");
+        auto displayPowerOffTimerReload = gsl::finally([this]() { displayPowerOffTimer->reload(); });
+
+        if (const auto status = prepareDisplay(refreshMode, WaveformTemperature::KEEP_CURRENT);
+            status != EinkStatus_e ::EinkOK) {
+            LOG_FATAL("Failed to prepare frame");
+            return;
         }
 
-        const auto isDeepRefresh = refreshMode == ::gui::RefreshModes::GUI_REFRESH_DEEP;
-        if (const auto status =
-                display.refresh(isDeepRefresh ? EinkDisplayTimingsDeepCleanMode : EinkDisplayTimingsFastRefreshMode);
-            status != EinkOK) {
+        if (const auto status = updateDisplay(frameBuffer, refreshMode); status != EinkStatus_e ::EinkOK) {
+            LOG_FATAL("Failed to update frame");
+            return;
+        }
+
+        if (const auto status = refreshDisplay(refreshMode); status != EinkStatus_e ::EinkOK) {
             LOG_FATAL("Failed to refresh frame");
+            return;
         }
     }
 
-    void ServiceEink::prepareDisplay(::gui::RefreshModes refreshMode)
+    EinkStatus_e ServiceEink::updateDisplay(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode)
     {
+        return display.update(frameBuffer);
+    }
+
+    EinkStatus_e ServiceEink::refreshDisplay(::gui::RefreshModes refreshMode)
+    {
+        const auto isDeepRefresh = refreshMode == ::gui::RefreshModes::GUI_REFRESH_DEEP;
+        return display.refresh(isDeepRefresh ? EinkDisplayTimingsDeepCleanMode : EinkDisplayTimingsFastRefreshMode);
+    }
+
+    EinkStatus_e ServiceEink::prepareDisplay(::gui::RefreshModes refreshMode, WaveformTemperature behaviour)
+    {
+        EinkStatus_e status;
+
+        displayPowerOffTimer->stop();
         display.powerOn();
 
-        const auto temperature = EinkGetTemperatureInternal();
+        const auto temperature = behaviour == WaveformTemperature::KEEP_CURRENT ? display.getLastTemperature()
+                                                                                : EinkGetTemperatureInternal();
+
         if (refreshMode == ::gui::RefreshModes::GUI_REFRESH_DEEP) {
-            display.setWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
-            display.dither();
+            status = display.setWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
+            if (status == EinkOK) {
+                display.dither();
+            }
         }
         else {
-            display.setWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
+            status = display.setWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
         }
+        return status;
     }
 
     sys::MessagePointer ServiceEink::handlePrepareEarlyRequest(sys::Message *message)
     {
         const auto waveformUpdateMsg = static_cast<service::eink::PrepareDisplayEarlyRequest *>(message);
-        prepareDisplay(waveformUpdateMsg->getRefreshMode());
+        prepareDisplay(waveformUpdateMsg->getRefreshMode(), WaveformTemperature::MEASURE_NEW);
         return sys::MessageNone{};
     }
 
@@ -165,4 +208,8 @@ namespace service::eink
     {
         return currentState == state;
     }
+
+    void ServiceEink::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
+    {}
+
 } // namespace service::eink

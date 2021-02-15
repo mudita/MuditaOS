@@ -8,7 +8,6 @@
 #include <MessageType.hpp>
 #include <Modem/TS0710/TS0710.h>
 #include <PhoneNumber.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Common.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <log/log.hpp>
@@ -24,49 +23,37 @@ namespace sys
 
 bool CellularServiceAPI::DialNumber(sys::Service *serv, const utils::PhoneNumber &number)
 {
-    auto msg                          = std::make_shared<CellularCallRequestMessage>(number.getView());
-    auto ret                          = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
-    CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
-    if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {
-        return true;
-    }
-    else {
-        LOG_ERROR("Failed");
-        return false;
-    }
+    auto msg = std::make_shared<CellularCallRequestMessage>(number.getView());
+    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
+}
+
+bool CellularServiceAPI::DialEmergencyNumber(sys::Service *serv, const utils::PhoneNumber &number)
+{
+    auto msg = std::make_shared<CellularCallRequestMessage>(number.getView(),
+                                                            CellularCallRequestMessage::RequestMode::Emergency);
+    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::AnswerIncomingCall(sys::Service *serv)
 {
-    std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularAnswerIncomingCall);
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularAnswerIncomingCall);
 
-    auto ret                          = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
-    CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
-    if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {
-        return true;
-    }
-    else {
-        LOG_ERROR("Failed");
-        return false;
-    }
+    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
-void CellularServiceAPI::HangupCall(sys::Service *serv)
+bool CellularServiceAPI::HangupCall(sys::Service *serv)
 {
-    std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularHangupCall);
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularHangupCall);
 
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
 std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumber)
 {
 
-    std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularGetIMSI);
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetIMSI);
 
-    auto ret                          = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    auto ret                          = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
     CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
 
     if (response == nullptr) {
@@ -88,7 +75,7 @@ std::string CellularServiceAPI::GetOwnNumber(sys::Service *serv)
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularGetOwnNumber);
 
-    auto ret                          = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    auto ret                          = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
     CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
 
     if (response == nullptr) {
@@ -109,26 +96,26 @@ void CellularServiceAPI::GetNetworkInfo(sys::Service *serv)
 {
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularGetNetworkInfo);
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+    serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
 void CellularServiceAPI::GetCurrentOperator(sys::Service *serv)
 {
     std::shared_ptr<CellularGetCurrentOperatorMessage> msg = std::make_shared<CellularGetCurrentOperatorMessage>();
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+    serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
 void CellularServiceAPI::StartOperatorsScan(sys::Service *serv, bool fullInfo)
 {
     std::shared_ptr<CellularStartOperatorsScanMessage> msg =
         std::make_shared<CellularStartOperatorsScanMessage>(fullInfo);
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+    serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
 void CellularServiceAPI::SetOperatorAutoSelect(sys::Service *serv)
 {
     auto msg = std::make_shared<CellularSetOperatorAutoSelectMessage>();
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+    serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
 void CellularServiceAPI::SetOperator(sys::Service *serv,
@@ -137,14 +124,14 @@ void CellularServiceAPI::SetOperator(sys::Service *serv,
                                      const std::string &name)
 {
     auto msg = std::make_shared<CellularSetOperatorMessage>(mode, format, name);
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+    serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::SelectAntenna(sys::Service *serv, bsp::cellular::antenna antenna)
 {
     auto msg     = std::make_shared<CellularAntennaRequestMessage>(MessageType::CellularSelectAntenna);
     msg->antenna = antenna;
-    auto ret     = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    auto ret     = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
 
     CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
 
@@ -162,7 +149,7 @@ bool CellularServiceAPI::SetScanMode(sys::Service *serv, std::string mode)
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularSetScanMode);
     msg->data = mode;
-    auto ret  = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    auto ret  = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
 
     CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
 
@@ -177,7 +164,7 @@ bool CellularServiceAPI::GetScanMode(sys::Service *serv)
 {
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularGetScanMode);
-    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 1000);
+    auto ret = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 1000);
 
     CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
 
@@ -193,7 +180,7 @@ bool CellularServiceAPI::GetFirmwareVersion(sys::Service *serv, std::string &res
 {
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularGetFirmwareVersion);
-    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 1000);
+    auto ret = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 1000);
     if (ret.first == sys::ReturnCodes::Success) {
         auto celResponse = std::dynamic_pointer_cast<CellularResponseMessage>(ret.second);
         if ((celResponse != nullptr) && (celResponse->retCode == true)) {
@@ -208,7 +195,7 @@ bool CellularServiceAPI::GetFirmwareVersion(sys::Service *serv, std::string &res
 bool CellularServiceAPI::GetChannel(sys::Service *serv, TS0710::Channel channel)
 {
     std::shared_ptr<CellularGetChannelMessage> msg = std::make_shared<CellularGetChannelMessage>(channel);
-    return sys::Bus::SendUnicast(std::move(msg), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::GetDataChannel(sys::Service *serv)
@@ -220,7 +207,7 @@ bool CellularServiceAPI::GetCSQ(sys::Service *serv, std::string &response)
 {
 
     auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetCSQ);
-    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    auto ret = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
     if (ret.first == sys::ReturnCodes::Success) {
         auto responseMsg = std::dynamic_pointer_cast<CellularResponseMessage>(ret.second);
         if ((responseMsg != nullptr) && (responseMsg->retCode == true)) {
@@ -233,7 +220,7 @@ bool CellularServiceAPI::GetCSQ(sys::Service *serv, std::string &response)
 bool CellularServiceAPI::GetCREG(sys::Service *serv, std::string &response)
 {
     auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetCREG);
-    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    auto ret = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
     if (ret.first == sys::ReturnCodes::Success) {
         auto responseMsg = std::dynamic_pointer_cast<CellularResponseMessage>(ret.second);
         if ((responseMsg != nullptr) && (responseMsg->retCode == true)) {
@@ -246,7 +233,7 @@ bool CellularServiceAPI::GetCREG(sys::Service *serv, std::string &response)
 bool CellularServiceAPI::GetQNWINFO(sys::Service *serv, std::string &response)
 {
     auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetNWINFO);
-    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    auto ret = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
     if (ret.first == sys::ReturnCodes::Success) {
         auto responseMsg = std::dynamic_pointer_cast<CellularResponseMessage>(ret.second);
         if ((responseMsg != nullptr) && (responseMsg->retCode == true)) {
@@ -260,7 +247,7 @@ bool CellularServiceAPI::GetQNWINFO(sys::Service *serv, std::string &response)
 bool CellularServiceAPI::GetAntenna(sys::Service *serv, bsp::cellular::antenna &response)
 {
     auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetAntenna);
-    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    auto ret = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
     if (ret.first == sys::ReturnCodes::Success) {
         auto responseMsg = std::dynamic_pointer_cast<CellularAntennaResponseMessage>(ret.second);
         if ((responseMsg != nullptr) && (responseMsg->retCode == true)) {
@@ -274,14 +261,14 @@ bool CellularServiceAPI::GetAntenna(sys::Service *serv, bsp::cellular::antenna &
 bool CellularServiceAPI::TransmitDtmfTones(sys::Service *serv, uint32_t digit)
 {
     auto msg = std::make_shared<CellularDtmfRequestMessage>(digit);
-    return sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::USSDRequest(sys::Service *serv, CellularUSSDMessage::RequestType type, std::string data)
 {
     auto msg = std::make_shared<CellularUSSDMessage>(type, data);
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
-    return true;
+    return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
+    ;
 }
 
 bool CellularServiceAPI::ChangeSimPin(sys::Service *serv,
@@ -289,8 +276,8 @@ bool CellularServiceAPI::ChangeSimPin(sys::Service *serv,
                                       const std::vector<unsigned int> &passcode,
                                       const std::vector<unsigned int> &pin)
 {
-    return sys::Bus::SendUnicast(
-        std::make_shared<CellularSimPukDataMessage>(sim, passcode, pin), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::make_shared<CellularSimPukDataMessage>(sim, passcode, pin),
+                                 ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::SetSimCardLock(sys::Service *serv,
@@ -298,58 +285,65 @@ bool CellularServiceAPI::SetSimCardLock(sys::Service *serv,
                                         CellularSimCardLockDataMessage::SimCardLock lock,
                                         const std::vector<unsigned int> &pin)
 {
-    return sys::Bus::SendUnicast(
-        std::make_shared<CellularSimCardLockDataMessage>(sim, lock, pin), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::make_shared<CellularSimCardLockDataMessage>(sim, lock, pin),
+                                 ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::SetSimCard(sys::Service *serv, Store::GSM::SIM sim)
 {
-    return sys::Bus::SendUnicast(
-        std::make_shared<CellularChangeSimDataMessage>(sim), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::make_shared<CellularChangeSimDataMessage>(sim), ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::GetAPN(sys::Service *serv)
 {
-    return sys::Bus::SendUnicast(std::make_shared<CellularGetAPNMessage>(), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::make_shared<CellularGetAPNMessage>(), ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::GetAPN(sys::Service *serv, std::uint8_t contextId)
 {
-    return sys::Bus::SendUnicast(
-        std::make_shared<CellularGetAPNMessage>(contextId), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::make_shared<CellularGetAPNMessage>(contextId), ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::GetAPN(sys::Service *serv, packet_data::APN::APNType type)
 {
-    return sys::Bus::SendUnicast(std::make_shared<CellularGetAPNMessage>(type), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::make_shared<CellularGetAPNMessage>(type), ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::SetAPN(sys::Service *serv, packet_data::APN::Config apnConfig)
 {
     auto apn = std::make_shared<packet_data::APN::Config>(std::move(apnConfig));
-    return sys::Bus::SendUnicast(std::make_shared<CellularSetAPNMessage>(apn), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::make_shared<CellularSetAPNMessage>(apn), ServiceCellular::serviceName);
+}
+
+bool CellularServiceAPI::NewAPN(sys::Service *serv, packet_data::APN::Config apnConfig)
+{
+    auto apn = std::make_shared<packet_data::APN::Config>(std::move(apnConfig));
+    return serv->bus.sendUnicast(std::make_shared<CellularNewAPNMessage>(apn), ServiceCellular::serviceName);
+}
+
+bool CellularServiceAPI::DeleteAPN(sys::Service *serv, std::uint8_t contextId)
+{
+    auto emptyApn       = std::make_shared<packet_data::APN::Config>();
+    emptyApn->contextId = contextId;
+    return serv->bus.sendUnicast(std::make_shared<CellularSetAPNMessage>(emptyApn), ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::SetDataTransfer(sys::Service *serv, packet_data::DataTransfer dt)
 {
-    return sys::Bus::SendUnicast(
-        std::make_shared<CellularSetDataTransferMessage>(dt), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::make_shared<CellularSetDataTransferMessage>(dt), ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::GetDataTransfer(sys::Service *serv)
 {
-    return sys::Bus::SendUnicast(
-        std::make_shared<CellularGetDataTransferMessage>(), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::make_shared<CellularGetDataTransferMessage>(), ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::SetVoLTE(sys::Service *serv, bool voLTE)
 {
-    return sys::Bus::SendUnicast(
-        std::make_shared<CellularChangeVoLTEDataMessage>(voLTE), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::make_shared<CellularChangeVoLTEDataMessage>(voLTE), ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState)
 {
-    return sys::Bus::SendUnicast(
-        std::make_shared<CellularPowerStateChange>(newState), ServiceCellular::serviceName, serv);
+    return serv->bus.sendUnicast(std::make_shared<CellularPowerStateChange>(newState), ServiceCellular::serviceName);
 }

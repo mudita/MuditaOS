@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "gtest/gtest.h"
@@ -239,11 +239,11 @@ TEST_F(ListViewTesting, Continuous_Type_Test)
     moveNTimes(1, style::listview::Direction::Top);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate top by one - page should change to last page";
     testListView->listBorderReached = false;
-    ASSERT_EQ(4, testListView->currentPageSize) << "4 elements should be displayed";
+    ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should be displayed";
 
     ASSERT_EQ(9, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
         << "First element ID should be 9";
-    ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
+    ASSERT_EQ(3, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
         << "Last element ID should be 3 (9 - 6)";
     ASSERT_EQ(style::listview::Direction::Top, testListView->direction) << "List Direction should be Top";
 
@@ -251,11 +251,11 @@ TEST_F(ListViewTesting, Continuous_Type_Test)
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate top by page size - page should change";
     testListView->listBorderReached = false;
     ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should be displayed";
-    ASSERT_EQ(5, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
-        << "First element ID should be 5";
-    ASSERT_EQ(0, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
-        << "Last element ID should be 0";
-    ASSERT_EQ(style::listview::Direction::Top, testListView->direction) << "List Direction should be Top";
+    ASSERT_EQ(0, dynamic_cast<gui::TestListItem *>(testListView->body->children.front())->ID)
+        << "First element ID should be 0";
+    ASSERT_EQ(6, dynamic_cast<gui::TestListItem *>(testListView->body->children.back())->ID)
+        << "Last element ID should be 6";
+    ASSERT_EQ(style::listview::Direction::Bottom, testListView->direction) << "List Direction should be Bottom";
 
     moveNTimes(1, style::listview::Direction::Bottom);
     ASSERT_TRUE(testListView->listBorderReached) << "Navigate bot by one - page should change";
@@ -375,4 +375,28 @@ TEST_F(ListViewTesting, Rebuild_Type_Test)
         << "Check if item 6 has focus";
     ASSERT_EQ(pointerToFocusedElement, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem()))
         << "Focused item should be same";
+
+    // Do full list rebuild
+    testListView->rebuildList(style::listview::RebuildType::Full);
+
+    // Do on page element rebuild on index in Page scope
+    testListView->rebuildList(style::listview::RebuildType::OnPageElement, 3);
+
+    // Check if focused item did not change
+    ASSERT_EQ(3, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 3 has focus";
+
+    // Do on page element rebuild in Page scope
+    testListView->rebuildList(style::listview::RebuildType::OnPageElement, 1);
+
+    // Check if focused item did not change
+    ASSERT_EQ(1, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 1 has focus";
+
+    // Do on page element rebuild on index outside Page scope (should focus on last possible)
+    testListView->rebuildList(style::listview::RebuildType::OnPageElement, 10);
+
+    // Check if focused item did not change
+    ASSERT_EQ(5, dynamic_cast<gui::TestListItem *>(testListView->body->getFocusItem())->ID)
+        << "Check if item 5 has focus";
 }

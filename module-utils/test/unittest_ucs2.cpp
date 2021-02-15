@@ -47,6 +47,18 @@ TEST_CASE("UCS2 from UTF8 emoji 🍣")
     REQUIRE(ucs2.str() == str);
 }
 
+TEST_CASE("UCS2 text with emojis int the middle from UTF8 code")
+{
+    UTF8 utf8("ęą😁ęą🍣ęą");
+    UCS2 ucs2 = UCS2(utf8);
+    std::string expected("01190105" //ęą
+                         "D83DDE01" // 😁
+                         "01190105" // ęą
+                         "D83CDF63" // 🍣
+                         "01190105");
+    REQUIRE(ucs2.str() == expected);
+}
+
 TEST_CASE("UTF8 to UCS2 conversion")
 {
     UTF8 utf8("Test");
@@ -88,6 +100,17 @@ TEST_CASE("UTF8 emoji 😁 and text abc from UCS2 code")
 {
     UCS2 ucs2(std::string("D83CDF63006100620063"));
     UTF8 utf8("🍣abc");
+    REQUIRE(ucs2.toUTF8() == utf8);
+}
+
+TEST_CASE("UTF8 text with emojis int the middle from UCS2 code")
+{
+    UCS2 ucs2(std::string("01190105" //ęą
+                          "D83DDE01" // 😁
+                          "01190105" // ęą
+                          "D83CDF63" // 🍣
+                          "01190105"));
+    UTF8 utf8("ęą😁ęą🍣ęą");
     REQUIRE(ucs2.toUTF8() == utf8);
 }
 

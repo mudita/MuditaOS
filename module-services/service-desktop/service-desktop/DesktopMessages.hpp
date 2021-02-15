@@ -1,14 +1,14 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <endpoints/update/UpdateMuditaOS.hpp>
 #include <endpoints/developerMode/DeveloperModeEndpoint.hpp>
+#include <endpoints/bluetooth/BluetoothEndpoint.hpp>
 
 #include <Service/Message.hpp>
 #include <MessageType.hpp>
-
 
 namespace sdesktop
 {
@@ -65,18 +65,18 @@ namespace sdesktop
         ~FactoryMessage() override = default;
     };
 
+    class Event
+    {
+      protected:
+        parserFSM::Context context;
+
+      public:
+        void send();
+        virtual ~Event() = default;
+    };
+
     namespace developerMode
     {
-
-        class Event
-        {
-          protected:
-            parserFSM::Context context;
-
-          public:
-            void send();
-            virtual ~Event() = default;
-        };
 
         class ATResponseEvent : public Event
         {
@@ -91,6 +91,17 @@ namespace sdesktop
             explicit AppFocusChangeEvent(std::string appName);
         };
 
+        class CellularHotStartEvent : public Event
+        {
+          public:
+            CellularHotStartEvent() = default;
+        };
+        class CellularStateInfoRequestEvent : public Event
+        {
+          public:
+            CellularStateInfoRequestEvent() = default;
+            explicit CellularStateInfoRequestEvent(std::string stateStr);
+        };
         class ScreenlockCheckEvent : public Event
         {
           public:
@@ -108,4 +119,24 @@ namespace sdesktop
         };
     } // namespace developerMode
 
+    namespace bluetooth
+    {
+        class BluetoothStatusRequestEvent : public Event
+        {
+          public:
+            BluetoothStatusRequestEvent() = default;
+            explicit BluetoothStatusRequestEvent(int state);
+        };
+        class ScanStartedEvent : public Event
+        {
+          public:
+            ScanStartedEvent();
+        };
+        class ScanStoppedEvent : public Event
+        {
+          public:
+            ScanStoppedEvent();
+        };
+
+    } // namespace bluetooth
 } // namespace sdesktop

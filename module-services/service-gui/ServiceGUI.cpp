@@ -5,7 +5,9 @@
 #include "WorkerGUI.hpp"
 
 #include "messages/DrawMessage.hpp"
+
 #include "messages/EinkInitialized.hpp"
+#include "messages/ChangeColorScheme.hpp"
 
 #include <DrawCommand.hpp>
 #include <FontManager.hpp>
@@ -62,6 +64,9 @@ namespace service::gui
 
         connect(typeid(RenderingFinished),
                 [this](sys::Message *request) -> sys::MessagePointer { return handleGUIRenderingFinished(request); });
+
+        connect(typeid(ChangeColorScheme),
+                [this](sys::Message *request) -> sys::MessagePointer { return handleChangeColorScheme(request); });
 
         connect(typeid(eink::ImageDisplayedNotification), [this](sys::Message *request) -> sys::MessagePointer {
             return handleImageDisplayedNotification(request);
@@ -121,7 +126,7 @@ namespace service::gui
                 setState(State::Suspended);
             }
 
-            if (!contextPool->isAnyContextLocked()) {
+            if (!isAnyFrameBeingRenderedOrDisplayed()) {
                 prepareDisplayEarly(drawMsg->mode);
             }
             notifyRenderer(std::move(drawMsg->commands), drawMsg->mode);
@@ -129,10 +134,17 @@ namespace service::gui
         return sys::MessageNone{};
     }
 
+    sys::MessagePointer ServiceGUI::handleChangeColorScheme(sys::Message *message)
+    {
+        const auto msg = static_cast<ChangeColorScheme *>(message);
+        notifyRenderColorSchemeChange(msg->getColorScheme());
+        return sys::MessageNone{};
+    }
+
     void ServiceGUI::prepareDisplayEarly(::gui::RefreshModes refreshMode)
     {
         auto msg = std::make_shared<service::eink::PrepareDisplayEarlyRequest>(refreshMode);
-        sys::Bus::SendUnicast(msg, service::name::eink, this);
+        bus.sendUnicast(msg, service::name::eink);
     }
 
     void ServiceGUI::notifyRenderer(std::list<std::unique_ptr<::gui::DrawCommand>> &&commands,
@@ -140,6 +152,12 @@ namespace service::gui
     {
         enqueueDrawCommands(DrawCommandsQueue::QueueItem{std::move(commands), refreshMode});
         worker->notify(WorkerGUI::Signal::Render);
+    }
+
+    void ServiceGUI::notifyRenderColorSchemeChange(::gui::ColorScheme &&scheme)
+    {
+        colorSchemeUpdate = std::make_unique<::gui::ColorScheme>(scheme);
+        worker->notify(WorkerGUI::Signal::ChangeColorScheme);
     }
 
     void ServiceGUI::enqueueDrawCommands(DrawCommandsQueue::QueueItem &&item)
@@ -177,7 +195,7 @@ namespace service::gui
     {
         setState(State::Busy);
         auto imageMsg = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
-        sys::Bus::SendUnicast(imageMsg, service::name::eink, this);
+        bus.sendUnicast(imageMsg, service::name::eink);
         scheduleContextRelease(contextId);
     }
 
@@ -188,7 +206,7 @@ namespace service::gui
         contextReleaseTimer->connect([this, contextId](sys::Timer &it) {
             eink::ImageDisplayedNotification notification{contextId};
             handleImageDisplayedNotification(&notification);
-            LOG_WARN("Context # %d released after timeout. Does ServiceEink respond properly?", contextId);
+            LOG_WARN("Context #%d released after timeout. Does ServiceEink respond properly?", contextId);
         });
         contextReleaseTimer->start();
     }
@@ -219,7 +237,9 @@ namespace service::gui
         contextReleaseTimer->stop();
         setState(State::Idle);
 
-        if (isNextFrameReady()) {
+        // Even if the next render is already cached, if any context in the pool is currently being processed, then
+        // we better wait for it.
+        if (isNextFrameReady() and not isAnyFrameBeingRenderedOrDisplayed()) {
             trySendNextFrame();
         }
         return sys::MessageNone{};
@@ -227,9 +247,12 @@ namespace service::gui
 
     bool ServiceGUI::isNextFrameReady() const noexcept
     {
-        // Even if the next render is already cached, if any context in the pool is currently being processed, then we
-        // better wait for it.
-        return cachedRender.has_value() && !contextPool->isAnyContextLocked();
+        return cachedRender.has_value();
+    }
+
+    bool ServiceGUI::isAnyFrameBeingRenderedOrDisplayed() const noexcept
+    {
+        return contextPool->isAnyContextLocked();
     }
 
     void ServiceGUI::trySendNextFrame()

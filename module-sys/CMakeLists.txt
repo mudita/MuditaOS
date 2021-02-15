@@ -3,16 +3,24 @@
 project(module-sys VERSION 1.0
         DESCRIPTION "Core module library")
 
-set(SOURCES
+set(BUS_IMPL_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/Service/details/bus/Bus.cpp
+)
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/Service/Bus.cpp
+set(SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/Service/BusProxy.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Worker.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Message.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Service.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Timer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Service/CpuSentinel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/SystemManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/DependencyGraph.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/PowerManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/CpuStatistics.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/DeviceManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/CpuGovernor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/graph/TopologicalSort.cpp
 
         )
 
@@ -24,11 +32,23 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(bus STATIC ${BUS_IMPL_SOURCES})
+target_link_libraries(bus PRIVATE module-os)
 
+target_compile_definitions(bus PRIVATE ${PROJECT_CONFIG_DEFINITIONS})
+target_compile_definitions(bus PRIVATE ${PROJECT_TARGET})
+target_compile_definitions(bus PRIVATE ${TARGET_COMPILE_DEFINITIONS})
+target_compile_features(bus PRIVATE ${TARGET_COMPILE_FEATURES})
+target_compile_options(bus PRIVATE ${TARGET_COMPILE_OPTIONS})
+target_include_directories(bus PRIVATE ${BOARD_DIR_INCLUDES})
+target_include_directories(bus PRIVATE ${PROJECT_INCLUDES})
+target_link_options(bus PRIVATE ${TARGET_LINK_OPTIONS})
+
+add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        bus
         service-evtmgr
     PUBLIC
         module-os)
@@ -51,3 +71,6 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+if (${ENABLE_TESTS})
+    add_subdirectory(SystemManager/tests)
+endif()

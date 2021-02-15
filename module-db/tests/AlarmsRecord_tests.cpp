@@ -28,7 +28,7 @@ TEST_CASE("Alarms Record tests")
         REQUIRE(std::filesystem::remove(alarmsPath));
     }
 
-    auto alarmsDB = AlarmsDB(alarmsPath.c_str());
+    AlarmsDB alarmsDB(alarmsPath.c_str());
     REQUIRE(alarmsDB.isInitialized());
 
     SECTION("Default Constructor")

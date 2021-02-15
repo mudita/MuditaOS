@@ -9,11 +9,13 @@
 #include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/State.hpp"
 #include "service-cellular/USSD.hpp"
+#include "service-cellular/MessageConstants.hpp"
 
 #include "SimCard.hpp"
 #include "NetworkSettings.hpp"
 #include "service-cellular/RequestFactory.hpp"
 #include "service-cellular/CellularRequestHandler.hpp"
+#include "SystemManager/messages/SentinelRegistrationMessage.hpp"
 
 #include <Audio/AudioCommon.hpp>
 #include <BaseInterface.hpp>
@@ -30,13 +32,13 @@
 #include <NotificationsRecord.hpp>
 #include <PhoneNumber.hpp>
 #include <Result.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/Timer.hpp>
 #include <Tables/CalllogTable.hpp>
 #include <Tables/Record.hpp>
 #include <Utils.hpp>
+#include <at/cmd/CLCC.hpp>
 #include <at/UrcClip.hpp>
 #include <at/UrcCmti.hpp>
 #include <at/UrcCreg.hpp>
@@ -64,6 +66,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/EVMessages.hpp>
+#include "service-desktop/DesktopMessages.hpp"
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <task.h>
 #include <time/time_conversion.hpp>
@@ -82,6 +85,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "checkSmsCenter.hpp"
+#include <service-desktop/Constants.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
@@ -149,7 +154,7 @@ void State::set(ServiceCellular *owner, ST state)
     LOG_DEBUG("GSM state: (%s) -> (%s)", c_str(this->state), c_str(state));
     this->state = state;
     auto msg    = std::make_shared<StateChange>(state);
-    sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, owner);
+    owner->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
 }
 
 State::ST State::get() const
@@ -162,9 +167,9 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
     LOG_INFO("[ServiceCellular] Initializing");
 
-    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-    busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
-    busChannels.push_back(sys::BusChannels::ServiceEvtmgrNotifications);
+    bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
+    bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+    bus.channels.push_back(sys::BusChannel::ServiceEvtmgrNotifications);
 
     callStateTimer = std::make_unique<sys::Timer>("call_state", this, 1000);
     callStateTimer->connect([&](sys::Timer &) { CallStateTimerHandler(); });
@@ -201,17 +206,19 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
             return;
         }
 
-        sys::Bus::SendMulticast(msg.value(), sys::BusChannels::ServiceCellularNotifications, this);
+        bus.sendMulticast(msg.value(), sys::BusChannel::ServiceCellularNotifications);
     };
+
+    packetData = std::make_unique<packet_data::PacketData>(*this); /// call in apnListChanged handler
+
     registerMessageHandlers();
-    packetData = std::make_unique<packet_data::PacketData>(*this);
-    packetData->loadAPNSettings();
 }
 
 ServiceCellular::~ServiceCellular()
 {
     LOG_INFO("[ServiceCellular] Cleaning resources");
     settings->unregisterValueChange(settings::Cellular::volte_on, ::settings::SettingsScope::Global);
+    settings->unregisterValueChange(settings::Cellular::apn_list, ::settings::SettingsScope::Global);
 }
 
 // this static function will be replaced by Settings API
@@ -223,9 +230,8 @@ static bool isSettingsAutomaticTimeSyncEnabled()
 void ServiceCellular::CallStateTimerHandler()
 {
     LOG_DEBUG("CallStateTimerHandler");
-    std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, this);
+    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
+    bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
 }
 
 sys::ReturnCodes ServiceCellular::InitHandler()
@@ -237,6 +243,20 @@ sys::ReturnCodes ServiceCellular::InitHandler()
         settings::Cellular::volte_on,
         [this](const std::string &value) { volteChanged(value); },
         ::settings::SettingsScope::Global);
+    settings->registerValueChange(
+        settings::Cellular::apn_list,
+        [this](const std::string &value) { apnListChanged(value); },
+        ::settings::SettingsScope::Global);
+
+    cpuSentinel = std::make_shared<sys::CpuSentinel>(serviceName, this);
+
+    auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+    bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
+
+    // temporarily limit the minimum CPU frequency
+    // due to problems with the UART of the GSM modem
+    cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_4);
+
     return sys::ReturnCodes::Success;
 }
 
@@ -309,6 +329,16 @@ void ServiceCellular::registerMessageHandlers()
         return handleCellularGetAPNMessage(msg);
     });
 
+    connect(typeid(CellularSetAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularSetAPNMessage *>(request);
+        return handleCellularSetAPNMessage(msg);
+    });
+
+    connect(typeid(CellularNewAPNMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularNewAPNMessage *>(request);
+        return handleCellularNewAPNMessage(msg);
+    });
+
     connect(typeid(CellularSetDataTransferMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularSetDataTransferMessage *>(request);
         return handleCellularSetDataTransferMessage(msg);
@@ -338,6 +368,16 @@ void ServiceCellular::registerMessageHandlers()
         auto msg = static_cast<CellularChangeVoLTEDataMessage *>(request);
         volteOn  = msg->getVoLTEon();
         settings->setValue(settings::Cellular::volte_on, std::to_string(volteOn), settings::SettingsScope::Global);
+        NetworkSettings networkSettings(*this);
+        auto vstate = networkSettings.getVoLTEState();
+        if ((vstate != VoLTEState::On) && volteOn) {
+            LOG_DEBUG("VoLTE On");
+            networkSettings.setVoLTEState(VoLTEState::On);
+        }
+        else if (!volteOn) {
+            LOG_DEBUG("VoLTE Off");
+            networkSettings.setVoLTEState(VoLTEState::Off);
+        }
         return std::make_shared<CellularResponseMessage>(true);
     });
 
@@ -345,6 +385,28 @@ void ServiceCellular::registerMessageHandlers()
         auto msg       = static_cast<CellularPowerStateChange *>(request);
         nextPowerState = msg->getNewState();
         handle_power_state_change();
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(CellularPowerStateChange), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg       = static_cast<CellularPowerStateChange *>(request);
+        nextPowerState = msg->getNewState();
+        handle_power_state_change();
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(sdesktop::developerMode::DeveloperModeRequest), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(request);
+        if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularHotStartEvent)) {
+            cmux->CloseChannels();
+            ///> change state - simulate hot start
+            handle_power_up_request();
+        }
+        if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularStateInfoRequestEvent)) {
+            auto event   = std::make_unique<sdesktop::developerMode::CellularStateInfoRequestEvent>(state.c_str());
+            auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+            bus.sendUnicast(std::move(message), service::name::service_desktop);
+        }
         return sys::MessageNone{};
     });
     handle_CellularGetChannelMessage();
@@ -467,7 +529,7 @@ bool ServiceCellular::handle_idle()
 bool ServiceCellular::handle_wait_for_start_permission()
 {
     auto msg = std::make_shared<CellularCheckIfStartAllowedMessage>();
-    sys::Bus::SendUnicast(msg, service::name::system_manager, this);
+    bus.sendUnicast(msg, service::name::system_manager);
 
     return true;
 }
@@ -502,19 +564,19 @@ bool ServiceCellular::handle_power_up_procedure()
         break;
     }
     case bsp::Board::T3: {
-        // check baud once to determine if it's already turned on
+        // check baud once to determine if it�s already turned on
         auto ret = cmux->BaudDetectOnce();
         if (ret == TS0710::ConfState::Success) {
-            // it's on aka hot start.
+            // it�s on aka hot start.
             LOG_DEBUG("T3 - hot start");
             state.set(this, State::ST::CellularConfProcedure);
             break;
         }
         else {
-            // it's off aka cold start
+            // it�s off aka cold start
             LOG_DEBUG("T3 - cold start");
             cmux->TurnOnModem();
-            // if it's T3, then wait for status pin to become active, to align its starting position with T4
+            // if it�s T3, then wait for status pin to become active, to align its starting position with T4
             vTaskDelay(pdMS_TO_TICKS(8000));
             state.set(this, State::ST::PowerUpInProgress);
             break;
@@ -522,20 +584,20 @@ bool ServiceCellular::handle_power_up_procedure()
     }
     case bsp::Board::Linux: {
         // it is basically the same as T3
-        // check baud once to determine if it's already turned on
+        // check baud once to determine if it�s already turned on
         auto ret = cmux->BaudDetectOnce();
         if (ret == TS0710::ConfState::Success) {
-            // it's on aka hot start.
+            // it�s on aka hot start.
             LOG_DEBUG("Linux - hot start");
             state.set(this, State::ST::CellularConfProcedure);
             break;
         }
         else {
-            // it's off aka cold start
+            // it�s off aka cold start
             LOG_DEBUG("Linux - cold start");
             LOG_WARN("Press PWR_KEY for 2 sec on modem eval board!");
             vTaskDelay(pdMS_TO_TICKS(2000)); // give some 2 secs more for user input
-            // if it's Linux (T3), then wait for status pin to become active, to align its starting position with T4
+            // if it�s Linux (T3), then wait for status pin to become active, to align its starting position with T4
             vTaskDelay(pdMS_TO_TICKS(8000));
             state.set(this, State::ST::PowerUpInProgress);
             break;
@@ -589,12 +651,12 @@ bool ServiceCellular::handle_power_down_waiting()
         break;
     case bsp::Board::Linux:
     case bsp::Board::T3:
-        // if it's T3, then wait for status pin to become inactive, to align with T4
-        vTaskDelay(pdMS_TO_TICKS(17000)); // according to docs this shouldn't be needed, but better be safe than Quectel
+        // if it�s T3, then wait for status pin to become inactive, to align with T4
+        vTaskDelay(pdMS_TO_TICKS(17000)); // according to docs this shouldn�t be needed, but better be safe than Quectel
         state.set(this, cellular::State::ST::PowerDown);
         break;
     default:
-        LOG_ERROR("Powering `down an unknown device not handled");
+        LOG_ERROR("Powering �down an unknown device not handled");
         return false;
     }
     return true;
@@ -612,7 +674,7 @@ bool ServiceCellular::handle_power_down()
 
 bool ServiceCellular::handle_start_conf_procedure()
 {
-    // Start configuration procedure, if it's first run modem will be restarted
+    // Start configuration procedure, if it�s first run modem will be restarted
     auto confRet = cmux->ConfProcedure();
     if (confRet == TS0710::ConfState::Success) {
         state.set(this, State::ST::AudioConfigurationProcedure);
@@ -668,6 +730,20 @@ auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
 {
     if (response->getResults().size() > 0) {
         LOG_DEBUG("sending %ud last queued message(s)", static_cast<unsigned int>(response->getResults().size()));
+        if (Store::GSM::get()->simCardInserted() == false) {
+            auto message = std::make_shared<CellularSmsNoSimRequestMessage>();
+            bus.sendUnicast(std::move(message), app::manager::ApplicationManager::ServiceName);
+            auto records = response->getResults();
+
+            for (auto &record : response->getResults()) {
+                if (record.type == SMSType::QUEUED) {
+                    record.type = SMSType::FAILED;
+                    DBServiceAPI::GetQuery(
+                        this, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(std::move(record)));
+                }
+            }
+            return true;
+        }
         for (auto &rec : response->getResults()) {
             if (rec.type == SMSType::QUEUED) {
                 sendSMS(rec);
@@ -705,6 +781,10 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
                 ret = ongoingCall.startCall(msg->number, CallType::CT_INCOMING);
             }
             responseMsg = std::make_shared<CellularResponseMessage>(ret);
+            break;
+        }
+        case CellularCallMessage::Type::CallerId: {
+            ongoingCall.setNumber(msg->number);
             break;
         }
         }
@@ -758,7 +838,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
                 break;
             }
             auto respMsg      = std::make_shared<cellular::RawCommandResp>(true);
-            auto ret          = channel->cmd(m->command.c_str(), m->timeout);
+            auto ret          = channel->cmd(m->command, std::chrono::milliseconds(m->timeout));
             respMsg->response = ret.response;
             if (respMsg->response.size()) {
                 for (auto const &el : respMsg->response) {
@@ -795,33 +875,22 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         break;
     }
     case MessageType::CellularListCurrentCalls: {
-        auto ret  = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::CLCC);
-        auto size = ret.response.size();
-        if (ret && size > 1) {
-            bool retVal = true;
-            // sometimes there is additional active data connection, sometimes not
-            auto callEntry = ret.response[size == 2 ? 0 : 1];
-
-            try {
-                ModemCall::ModemCall call(callEntry);
-                LOG_DEBUG("%s", utils::to_string(call).c_str());
-                // If call changed to "Active" state stop callStateTimer(used for polling for call state)
-                if (call.state == ModemCall::CallState::Active) {
-                    auto msg =
-                        std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
-                    sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
-                    callStateTimer->stop();
-                }
+        at::cmd::CLCC cmd;
+        auto base = cmux->get(TS0710::Channel::Commands)->cmd(cmd);
+        if (auto response = cmd.parse(base); response) {
+            const auto &data = response.getData();
+            auto it          = std::find_if(std::begin(data), std::end(data), [&](const auto &entry) {
+                return entry.stateOfCall == ModemCall::CallState::Active && entry.mode == ModemCall::CallMode::Voice;
+            });
+            if (it != std::end(data)) {
+                auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
+                bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceCellularNotifications);
+                callStateTimer->stop();
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
+                break;
             }
-            catch (const std::exception &e) {
-                LOG_ERROR("exception \"%s\" was thrown", e.what());
-                retVal = false;
-            }
-            responseMsg = std::make_shared<CellularResponseMessage>(retVal);
         }
-        else {
-            responseMsg = std::make_shared<CellularResponseMessage>(false);
-        }
+        responseMsg = std::make_shared<CellularResponseMessage>(false);
     } break;
 
     case MessageType::CellularHangupCall: {
@@ -849,15 +918,14 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         auto channel = cmux->get(TS0710::Channel::Commands);
         auto ret     = false;
         if (channel) {
-            // TODO alek: check if your request isn't for 5 sec when you wait in command for 90000, it's exclusivelly
+            // TODO alek: check if your request isn�t for 5 sec when you wait in command for 90000, it�s exclusivelly
             // set to 5000ms in command requesting...
             auto response = channel->cmd(at::AT::ATA);
             if (response) {
                 // Propagate "CallActive" notification into system
-                sys::Bus::SendMulticast(
+                bus.sendMulticast(
                     std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive),
-                    sys::BusChannels::ServiceCellularNotifications,
-                    this);
+                    sys::BusChannel::ServiceCellularNotifications);
                 ret = true;
             }
         }
@@ -874,14 +942,20 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             break;
         }
 
-        cellular::RequestFactory factory(msg->number.getEntered());
-        CellularRequestHandler handler(*this);
+        cellular::RequestFactory factory(msg->number.getEntered(),
+                                         *channel,
+                                         msg->requestMode,
+                                         Store::GSM::get()->simCardInserted()
+                                             ? RequestFactory::SimStatus::SimInsterted
+                                             : RequestFactory::SimStatus::SimSlotEmpty);
 
         auto request = factory.create();
-        auto result  = channel->cmd(request->command());
-        request->handle(handler, result);
 
+        CellularRequestHandler handler(*this);
+        auto result = channel->cmd(request->command(), at::default_doc_timeout);
+        request->handle(handler, result);
         responseMsg = std::make_shared<CellularResponseMessage>(request->isHandled());
+
     } break;
     case MessageType::DBServiceNotification: {
         auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
@@ -891,7 +965,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         }
         if (msg->interface == db::Interface::Name::SMS &&
             (msg->type == db::Query::Type::Create || msg->type == db::Query::Type::Update)) {
-            // note: this gets triggered on every type update, e.g. on QUEUED → FAILED so way too often
+            // note: this gets triggered on every type update, e.g. on QUEUED ? FAILED so way too often
 
             // are there new messges queued for sending ?
             auto limitTo = 15; // how many to send in this Query
@@ -930,7 +1004,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
 
         auto msg  = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularNetworkInfoResult);
         msg->data = getNetworkInfo();
-        sys::Bus::SendUnicast(msg, msgl->sender, this);
+        bus.sendUnicast(msg, msgl->sender);
     } break;
     case MessageType::CellularSelectAntenna: {
         auto msg = dynamic_cast<CellularAntennaRequestMessage *>(msgl);
@@ -943,7 +1017,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             responseMsg         = std::make_shared<CellularResponseMessage>(changedAntenna);
 
             auto notification = std::make_shared<AntennaChangedMessage>();
-            sys::Bus::SendMulticast(notification, sys::BusChannels::AntennaNotifications, this);
+            bus.sendMulticast(notification, sys::BusChannel::AntennaNotifications);
         }
         else {
             responseMsg = std::make_shared<CellularResponseMessage>(false);
@@ -967,7 +1041,7 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
             responseMsg = std::make_shared<CellularResponseMessage>(true);
             auto msg    = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularGetScanModeResult);
             msg->data.push_back(response);
-            sys::Bus::SendUnicast(msg, msgl->sender, this);
+            bus.sendUnicast(msg, msgl->sender);
             break;
         }
         responseMsg = std::make_shared<CellularResponseMessage>(false);
@@ -1069,11 +1143,6 @@ sys::MessagePointer ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,
         }
         break;
     }
-    case MessageType::EVMTimeUpdated: {
-        auto channel = cmux->get(TS0710::Channel::Commands);
-        channel->cmd(at::AT::DISABLE_TIME_ZONE_REPORTING);
-        channel->cmd(at::AT::DISABLE_TIME_ZONE_UPDATE);
-    } break;
     case MessageType::CellularSimResponse: {
         responseMsg = std::make_shared<CellularResponseMessage>(handleSimResponse(msgl));
     } break;
@@ -1142,7 +1211,7 @@ std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotific
 bool ServiceCellular::requestPin(unsigned int attempts, const std::string msg)
 {
     auto message = std::make_shared<CellularSimRequestPinMessage>(Store::GSM::get()->selected, attempts, msg);
-    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
+    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
     LOG_DEBUG("REQUEST PIN");
     return true;
 }
@@ -1150,7 +1219,7 @@ bool ServiceCellular::requestPin(unsigned int attempts, const std::string msg)
 bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
 {
     auto message = std::make_shared<CellularSimRequestPukMessage>(Store::GSM::get()->selected, attempts, msg);
-    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
+    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
     LOG_DEBUG("REQUEST PUK");
     return true;
 }
@@ -1158,7 +1227,7 @@ bool ServiceCellular::requestPuk(unsigned int attempts, const std::string msg)
 bool ServiceCellular::sendSimUnlocked()
 {
     auto message = std::make_shared<CellularUnlockSimMessage>(Store::GSM::get()->selected);
-    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
+    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
     LOG_DEBUG("SIM UNLOCKED");
     return true;
 }
@@ -1166,7 +1235,7 @@ bool ServiceCellular::sendSimUnlocked()
 bool ServiceCellular::sendSimBlocked()
 {
     auto message = std::make_shared<CellularBlockSimMessage>(Store::GSM::get()->selected);
-    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
+    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
     LOG_ERROR("SIM BLOCKED");
     return true;
 }
@@ -1174,7 +1243,7 @@ bool ServiceCellular::sendSimBlocked()
 bool ServiceCellular::sendUnhandledCME(unsigned int cme_error)
 {
     auto message = std::make_shared<CellularDisplayCMEMessage>(Store::GSM::get()->selected, cme_error);
-    sys::Bus::SendUnicast(message, app::manager::ApplicationManager::ServiceName, this);
+    bus.sendUnicast(message, app::manager::ApplicationManager::ServiceName);
     LOG_ERROR("UNHANDLED CME %d", cme_error);
     return true;
 }
@@ -1292,7 +1361,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         // SIM causes SIM INIT, only on ready
         response =
             std::move(std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM_READY));
-        sys::Bus::SendMulticast(response, sys::BusChannels::ServiceCellularNotifications, this);
+        bus.sendMulticast(response, sys::BusChannel::ServiceCellularNotifications);
         sendSimUnlocked();
         break;
     case at::SimState::NotReady:
@@ -1300,7 +1369,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         response =
             std::move(std::make_unique<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM_NOT_READY));
-        sys::Bus::SendMulticast(response, sys::BusChannels::ServiceCellularNotifications, this);
+        bus.sendMulticast(response, sys::BusChannel::ServiceCellularNotifications);
         break;
     case at::SimState::SimPin: {
         SimCard simCard(*this);
@@ -1356,7 +1425,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         break;
     }
     auto simMessage = std::make_shared<sevm::SIMMessage>();
-    sys::Bus::SendUnicast(simMessage, service::name::evt_manager, this);
+    bus.sendUnicast(simMessage, service::name::evt_manager);
 
     return true;
 }
@@ -1367,33 +1436,36 @@ bool ServiceCellular::sendSMS(SMSRecord record)
 
     uint32_t textLen = record.body.length();
 
-    constexpr uint32_t commandTimeout   = 5000;
-    constexpr uint32_t singleMessageLen = 30;
+    auto commandTimeout                 = at::factory(at::AT::CMGS).getTimeout();
+    constexpr uint32_t singleMessageLen = msgConstants::singleMessageMaxLen;
     bool result                         = false;
     auto channel                        = cmux->get(TS0710::Channel::Commands);
+    auto receiver                       = record.number.getEntered();
     if (channel) {
         channel->cmd(at::AT::SET_SMS_TEXT_MODE_UCS2);
         channel->cmd(at::AT::SMS_UCSC2);
         // if text fit in single message send
         if (textLen < singleMessageLen) {
+            std::string command      = std::string(at::factory(at::AT::CMGS));
+            std::string body         = UCS2(UTF8(receiver)).str();
+            std::string suffix       = "\"";
+            std::string command_data = command + body + suffix;
+            if (cmux->CheckATCommandPrompt(
+                    channel->SendCommandPrompt(command_data.c_str(), 1, commandTimeout.count()))) {
 
-            if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(
-                    (std::string(at::factory(at::AT::CMGS)) + UCS2(UTF8(record.number.getEntered())).str() + "\"")
-                        .c_str(),
-                    1,
-                    commandTimeout))) {
-
-                if (channel->cmd((UCS2(record.body).str() + "\032").c_str())) {
+                if (channel->cmd((UCS2(record.body).str() + "\032").c_str(), commandTimeout)) {
                     result = true;
                 }
                 else {
                     result = false;
                 }
+                if (!result)
+                    LOG_ERROR("Message to: %s send failure", receiver.c_str());
             }
         }
         // split text, and send concatenated messages
         else {
-            const uint32_t maxConcatenatedCount = 7;
+            const uint32_t maxConcatenatedCount = msgConstants::maxConcatenatedCount;
             uint32_t messagePartsCount          = textLen / singleMessageLen;
             if ((textLen % singleMessageLen) != 0) {
                 messagePartsCount++;
@@ -1401,35 +1473,39 @@ bool ServiceCellular::sendSMS(SMSRecord record)
 
             if (messagePartsCount > maxConcatenatedCount) {
                 LOG_ERROR("Message to long");
-                return false;
+                result = false;
             }
+            else {
+                auto channel = cmux->get(TS0710::Channel::Commands);
 
-            auto channel = cmux->get(TS0710::Channel::Commands);
+                for (uint32_t i = 0; i < messagePartsCount; i++) {
 
-            for (uint32_t i = 0; i < messagePartsCount; i++) {
+                    uint32_t partLength = singleMessageLen;
+                    if (i * singleMessageLen + singleMessageLen > record.body.length()) {
+                        partLength = record.body.length() - i * singleMessageLen;
+                    }
+                    UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
 
-                uint32_t partLength = singleMessageLen;
-                if (i * singleMessageLen + singleMessageLen > record.body.length()) {
-                    partLength = record.body.length() - i * singleMessageLen;
-                }
-                UTF8 messagePart = record.body.substr(i * singleMessageLen, partLength);
+                    std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(receiver)).str() + "\",120," +
+                                        std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
 
-                std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(record.number.getEntered())).str() +
-                                    "\",120," + std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
-
-                if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(command.c_str(), 1, commandTimeout))) {
-                    // prompt sign received, send data ended by "Ctrl+Z"
-                    if (channel->cmd((UCS2(messagePart).str() + "\032").c_str(), commandTimeout, 2)) {
-                        result = true;
+                    if (cmux->CheckATCommandPrompt(
+                            channel->SendCommandPrompt(command.c_str(), 1, commandTimeout.count()))) {
+                        // prompt sign received, send data ended by "Ctrl+Z"
+                        if (channel->cmd(UCS2(messagePart).str() + "\032", commandTimeout, 2)) {
+                            result = true;
+                        }
+                        else {
+                            result = false;
+                            LOG_ERROR("Message send failure");
+                            break;
+                        }
                     }
                     else {
                         result = false;
+                        LOG_ERROR("Message send failure");
                         break;
                     }
-                }
-                else {
-                    result = false;
-                    break;
                 }
             }
         }
@@ -1441,8 +1517,11 @@ bool ServiceCellular::sendSMS(SMSRecord record)
     else {
         LOG_INFO("SMS sending failed.");
         record.type = SMSType::FAILED;
+        if (checkSmsCenter(*channel)) {
+            LOG_ERROR("SMS center check");
+        }
     }
-    DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(record));
+    DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(std::move(record)));
 
     channel->cmd(at::AT::SMS_GSM);
     return result;
@@ -1458,7 +1537,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
     channel->cmd(at::AT::SMS_UCSC2);
 
     auto cmd           = at::factory(at::AT::QCMGR);
-    auto ret           = channel->cmd(cmd + messageNumber, cmd.timeout);
+    auto ret           = channel->cmd(cmd + messageNumber, cmd.getTimeout());
     bool messageParsed = false;
 
     std::string messageRawBody;
@@ -1767,7 +1846,7 @@ bool ServiceCellular::handle_select_sim()
             // NO SIM IN
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
-        sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), service::name::evt_manager, this);
+        bus.sendUnicast(std::make_shared<sevm::SIMMessage>(), service::name::evt_manager);
         bool ready = false;
         while (!ready) {
             auto response = channel->cmd("AT+CPIN?");
@@ -1802,6 +1881,7 @@ bool ServiceCellular::handle_URCReady()
         channel->cmd(at::AT::SET_TIME_ZONE_REPORTING);
     }
     channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
+
     LOG_DEBUG("%s", state.c_str());
     return true;
 }
@@ -1869,18 +1949,14 @@ SMSRecord ServiceCellular::createSMSRecord(const UTF8 &decodedMessage,
 
 bool ServiceCellular::dbAddSMSRecord(const SMSRecord &record)
 {
-    auto query = std::make_unique<db::query::SMSAdd>(record);
-    query->setQueryListener(db::QueryCallback::fromFunction([this](auto response) {
-        auto result = dynamic_cast<db::query::SMSAddResult *>(response);
-        if (result == nullptr || !result->result) {
-            return false;
-        }
-
-        onSMSReceived();
-        return true;
-    }));
-    const auto [succeed, _] = DBServiceAPI::GetQuery(this, db::Interface::Name::SMS, std::move(query));
-    return succeed;
+    return DBServiceAPI::AddSMS(this, record, db::QueryCallback::fromFunction([this](auto response) {
+                                    auto result = dynamic_cast<db::query::SMSAddResult *>(response);
+                                    if (result == nullptr || !result->result) {
+                                        return false;
+                                    }
+                                    onSMSReceived();
+                                    return true;
+                                }));
 }
 
 void ServiceCellular::onSMSReceived()
@@ -1940,7 +2016,7 @@ bool ServiceCellular::SetScanMode(std::string mode)
     if (channel) {
         auto command = at::factory(at::AT::SET_SCANMODE);
 
-        auto resp = channel->cmd(command.cmd + mode + ",1", 300, 1);
+        auto resp = channel->cmd(command.getCmd() + mode + ",1", command.getTimeout(), 1);
         if (resp.code == at::Result::Code::OK) {
             return true;
         }
@@ -1972,10 +2048,10 @@ bool ServiceCellular::transmitDtmfTone(uint32_t digit)
     if (channel) {
         auto command           = at::factory(at::AT::QLDTMF);
         std::string dtmfString = "\"" + std::string(1, digit) + "\"";
-        resp                   = channel->cmd(command.cmd + dtmfString);
+        resp                   = channel->cmd(command.getCmd() + dtmfString);
         if (resp) {
             command = at::factory(at::AT::VTS);
-            resp    = channel->cmd(command.cmd + dtmfString);
+            resp    = channel->cmd(command.getCmd() + dtmfString);
         }
     }
     return resp.code == at::Result::Code::OK;
@@ -1988,8 +2064,8 @@ void ServiceCellular::handle_CellularGetChannelMessage()
         LOG_DEBUG("Handle request for channel: %s", TS0710::name(getChannelMsg->dataChannel).c_str());
         std::shared_ptr<CellularGetChannelResponseMessage> channelResponsMessage =
             std::make_shared<CellularGetChannelResponseMessage>(cmux->get(getChannelMsg->dataChannel));
-        LOG_DEBUG("chanel ptr: %p", channelResponsMessage->dataChannelPtr);
-        sys::Bus::SendUnicast(std::move(channelResponsMessage), req->sender, this);
+        LOG_DEBUG("channel ptr: %p", channelResponsMessage->dataChannelPtr);
+        bus.sendUnicast(std::move(channelResponsMessage), req->sender);
         return sys::MessageNone{};
     });
 }
@@ -2085,7 +2161,7 @@ bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType request
         if (requestType == CellularUSSDMessage::RequestType::pullSesionRequest) {
             channel->cmd(at::AT::SMS_GSM);
             std::string command = at::factory(at::AT::CUSD_SEND) + request + ",15";
-            auto result         = channel->cmd(command, commandTimeout, commandExpectedTokens);
+            auto result = channel->cmd(command, std::chrono::milliseconds(commandTimeout), commandExpectedTokens);
             if (result.code == at::Result::Code::OK) {
                 ussdState = ussd::State::pullRequestSent;
                 setUSSDTimer();
@@ -2153,7 +2229,7 @@ std::shared_ptr<cellular::RawCommandRespAsync> ServiceCellular::handleCellularSt
     auto ret = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularOperatorsScanResult);
     NetworkSettings networkSettings(*this);
     ret->data = networkSettings.scanOperators(msg->getFullInfo());
-    sys::Bus::SendUnicast(ret, msg->sender, this);
+    bus.sendUnicast(ret, msg->sender);
     return ret;
 }
 
@@ -2193,19 +2269,30 @@ std::shared_ptr<CellularGetAPNResponse> ServiceCellular::handleCellularGetAPNMes
 
     return std::make_shared<CellularGetAPNResponse>(packetData->getAPNs());
 }
+
 std::shared_ptr<CellularSetAPNResponse> ServiceCellular::handleCellularSetAPNMessage(CellularSetAPNMessage *msg)
 {
-
     auto apn = msg->getAPNConfig();
-
-    return std::make_shared<CellularSetAPNResponse>(packetData->setAPN(apn));
+    auto ret = packetData->setAPN(apn);
+    settings->setValue(settings::Cellular::apn_list, packetData->saveAPNSettings(), settings::SettingsScope::Global);
+    return std::make_shared<CellularSetAPNResponse>(ret);
 }
+std::shared_ptr<CellularNewAPNResponse> ServiceCellular::handleCellularNewAPNMessage(CellularNewAPNMessage *msg)
+{
+    auto apn           = msg->getAPNConfig();
+    std::uint8_t newId = 0;
+    auto ret           = packetData->newAPN(apn, newId);
+    settings->setValue(settings::Cellular::apn_list, packetData->saveAPNSettings(), settings::SettingsScope::Global);
+    return std::make_shared<CellularNewAPNResponse>(ret, newId);
+}
+
 std::shared_ptr<CellularSetDataTransferResponse> ServiceCellular::handleCellularSetDataTransferMessage(
     CellularSetDataTransferMessage *msg)
 {
     packetData->setDataTransfer(msg->getDataTransfer());
     return std::make_shared<CellularSetDataTransferResponse>(at::Result::Code::OK);
 }
+
 std::shared_ptr<CellularGetDataTransferResponse> ServiceCellular::handleCellularGetDataTransferMessage(
     CellularGetDataTransferMessage *msg)
 {
@@ -2218,6 +2305,7 @@ std::shared_ptr<CellularActivateContextResponse> ServiceCellular::handleCellular
     return std::make_shared<CellularActivateContextResponse>(packetData->activateContext(msg->getContextId()),
                                                              msg->getContextId());
 }
+
 std::shared_ptr<CellularDeactivateContextResponse> ServiceCellular::handleCellularDeactivateContextMessage(
     CellularDeactivateContextMessage *msg)
 {
@@ -2253,5 +2341,13 @@ void ServiceCellular::volteChanged(const std::string &value)
 {
     if (!value.empty()) {
         volteOn = utils::getNumericValue<bool>(value);
+    }
+}
+
+void ServiceCellular::apnListChanged(const std::string &value)
+{
+    LOG_ERROR("apnListChanged");
+    if (!value.empty()) {
+        packetData->loadAPNSettings(value);
     }
 }

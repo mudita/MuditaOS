@@ -270,3 +270,115 @@ TEST_CASE("Fill leading digit in string")
     REQUIRE(utils::addLeadingZeros(test, 3) == "045");
     REQUIRE(utils::addLeadingZeros(test, 4) == "0045");
 }
+
+class ScopedDir
+{
+  public:
+    ScopedDir(const std::filesystem::path &dirPath) : dirPath{dirPath}
+    {
+        REQUIRE(std::filesystem::create_directory(dirPath));
+    }
+
+    ~ScopedDir()
+    {
+        REQUIRE(std::filesystem::remove(dirPath));
+    }
+
+    auto operator()(std::string file = "") -> std::filesystem::path
+    {
+        return dirPath.c_str() + file;
+    }
+
+  private:
+    std::filesystem::path dirPath;
+};
+
+TEST_CASE("Read file length")
+{
+    ScopedDir dir("test");
+    auto *file = std::fopen(dir("test.txt").c_str(), "w");
+    REQUIRE(file != nullptr);
+    std::array<int, 3> v = {42, -1, 7};
+    std::fwrite(v.data(), sizeof(v[0]), v.size(), file);
+    REQUIRE(utils::filesystem::filelength(file) == static_cast<long>(sizeof(v[0]) * v.size()));
+    REQUIRE(std::fclose(file) == 0);
+}
+
+TEST_CASE("Hex to bytes")
+{
+    SECTION("One byte as two hex digits")
+    {
+        auto b = utils::hexToBytes("11");
+        REQUIRE(b.size() == 1);
+        REQUIRE(b[0] == 0x11);
+    }
+
+    SECTION("One byte as one hex digit")
+    {
+        auto b = utils::hexToBytes("2");
+        REQUIRE(b.size() == 1);
+        REQUIRE(b[0] == 2);
+    }
+
+    SECTION("Next numbers")
+    {
+        auto b = utils::hexToBytes("010203");
+        REQUIRE(b.size() == 2);
+        REQUIRE(b[0] == 1);
+        REQUIRE(b[1] == 2);
+        REQUIRE(b[2] == 3);
+    }
+
+    SECTION("Upper case")
+    {
+        auto b = utils::hexToBytes("DEADBEEF");
+        REQUIRE(b.size() == 4);
+        REQUIRE(b[0] == 0xDE);
+        REQUIRE(b[1] == 0xAD);
+        REQUIRE(b[2] == 0xBE);
+        REQUIRE(b[3] == 0xEF);
+    }
+
+    SECTION("Lower case")
+    {
+        auto b = utils::hexToBytes("deadbeef");
+        REQUIRE(b.size() == 4);
+        REQUIRE(b[0] == 0xDE);
+        REQUIRE(b[1] == 0xAD);
+        REQUIRE(b[2] == 0xBE);
+        REQUIRE(b[3] == 0xEF);
+    }
+
+    SECTION("Mixed case")
+    {
+        auto b = utils::hexToBytes("deAdbEEf");
+        REQUIRE(b.size() == 4);
+        REQUIRE(b[0] == 0xDE);
+        REQUIRE(b[1] == 0xAD);
+        REQUIRE(b[2] == 0xBE);
+        REQUIRE(b[3] == 0xEF);
+    }
+
+    SECTION("Out of hex")
+    {
+
+        bool isthrow = false;
+        try {
+            auto b = utils::hexToBytes("deAdbEZZ");
+        }
+        catch (const std::invalid_argument &ia) {
+            isthrow = true;
+        }
+        REQUIRE(isthrow);
+    }
+}
+
+TEST_CASE("Bytes to hex")
+{
+    SECTION("Vector of bytes")
+    {
+        std::vector<std::uint8_t> vb = {1, 2, 3, 4, 0xFF};
+        auto ret                     = utils::bytesToHex(vb);
+        REQUIRE((ret == "01020304ff"));
+    }
+}

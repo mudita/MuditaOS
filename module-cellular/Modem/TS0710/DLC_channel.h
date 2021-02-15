@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /**
  * Project Untitled
  */
@@ -14,7 +17,7 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-class DLC_channel : public at::Chanel
+class DLC_channel : public at::Channel
 {
   public:
     using Callback_t = std::function<void(std::string &data)>;
@@ -66,7 +69,7 @@ class DLC_channel : public at::Chanel
 
     virtual void cmd_init() override final;
     virtual void cmd_send(std::string cmd) override final;
-    virtual std::vector<std::string> cmd_receive() override final;
+    virtual std::string cmd_receive() override final;
     virtual void cmd_post() override final;
 
     std::vector<std::string> SendCommandPrompt(const char *cmd, size_t rxCount, uint32_t timeout = 300);

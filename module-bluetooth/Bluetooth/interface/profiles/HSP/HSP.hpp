@@ -6,7 +6,7 @@
 #include "Profile.hpp"
 #include <service-bluetooth/BluetoothMessage.hpp>
 
-namespace Bt
+namespace bluetooth
 {
 
     class HSP : public Profile

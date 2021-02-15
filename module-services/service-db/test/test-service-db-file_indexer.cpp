@@ -42,6 +42,7 @@ class ClientService : public sys::Service
 
 TEST_CASE("FileIndexer")
 {
+    Database::initialize();
     std::string serviceName = "file_indexer_client";
     ClientService file_indexer_client_service(serviceName);
     file_indexer_client_service.InitHandler();
@@ -312,4 +313,6 @@ TEST_CASE("FileIndexer")
         REQUIRE(fileCountAfterDel == 0);
         std::cout << "DeleteFile /DeleteAllFilesInDir  finished" << std::endl << std::flush;
     }
+
+    Database::deinitialize();
 }

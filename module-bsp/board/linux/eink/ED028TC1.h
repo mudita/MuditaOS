@@ -1,9 +1,8 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /**
- * @file ED028TC1.h
- * @author Lukasz Skrzypczak (l.skrzypczak@mudita.com)
- * @date Sep 6, 2017
  * @brief Header for EInk ED028TC1 electronic paper display driver
- * @copyright Copyright (C) 2017 mudita.com.
  * @details This is hardware specific electronic paper display ED028TC1 driver.
  */
 

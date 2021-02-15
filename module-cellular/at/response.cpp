@@ -156,6 +156,20 @@ namespace at
             return false;
         }
 
+        bool parseQCFG_IMS(const at::Result &resp, std::pair<qcfg_ims::IMSState, qcfg_ims::VoLTEIMSState> &ret)
+        {
+            const std::string_view AT_QCFG_IMS = "+QCFG: \"ims\"";
+            if (auto tokens = getTokensForATCommand(resp, AT_QCFG_IMS); tokens) {
+                constexpr int QCFG_IMS_TokensCount = 2;
+                if ((*tokens).size() == QCFG_IMS_TokensCount) {
+                    ret.first  = static_cast<qcfg_ims::IMSState>(utils::getNumericValue<int>((*tokens)[0]));
+                    ret.second = static_cast<qcfg_ims::VoLTEIMSState>(utils::getNumericValue<int>((*tokens)[1]));
+                    return true;
+                }
+            }
+            return false;
+        }
+
         bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret)
         {
             /// parse only first result from QPINC
@@ -353,10 +367,14 @@ namespace at
 
         namespace clir
         {
-            std::optional<ClirResponse> parseClir(const std::string &response)
+            std::optional<ClirResponse> parse(const std::string &response)
             {
                 auto constexpr toRemove    = "+CLIR: ";
                 auto constexpr emptyString = "";
+
+                if (response.find(toRemove) == std::string::npos) {
+                    return std::nullopt;
+                }
 
                 auto resp = response;
                 utils::findAndReplaceAll(resp, toRemove, emptyString);
@@ -366,8 +384,8 @@ namespace at
                     t = utils::trim(t);
                 }
                 if (tokens.size() == clirTokens) {
-                    int state;
-                    int status;
+                    int state  = 0;
+                    int status = 0;
 
                     if (!utils::toNumeric(tokens[0], state) || !utils::toNumeric(tokens[1], status)) {
                         return std::nullopt;
@@ -443,6 +461,11 @@ namespace at
                         return true;
                     }
 
+                    if (el.find(toRemove) == std::string::npos) {
+                        parsed.clear();
+                        return false;
+                    }
+
                     utils::findAndReplaceAll(el, toRemove, emptyString);
                     auto tokens = utils::split(el, ",");
 
@@ -455,6 +478,7 @@ namespace at
 
                         if (!utils::toNumeric(tokens[Tokens::Status], statusToken) ||
                             !utils::toNumeric(tokens[Tokens::Class], connectionClassToken)) {
+                            parsed.clear();
                             return false;
                         }
                         auto status          = static_cast<ForwardingStatus>(statusToken);
@@ -462,12 +486,17 @@ namespace at
 
                         if (magic_enum::enum_contains<ForwardingStatus>(status) &&
                             magic_enum::enum_contains<ConnectionClass>(connectionClass)) {
+                            if (tokens[Tokens::Number].find(quote) == std::string::npos) {
+                                parsed.clear();
+                                return false;
+                            }
                             auto number = tokens[Tokens::Number];
                             utils::findAndReplaceAll(number, quote, emptyString);
                             utils::trim(number);
                             parsed.push_back(ParsedCcfc(connectionClass, status, number));
                         }
                         else {
+                            parsed.clear();
                             return false;
                         }
                     }
@@ -628,5 +657,160 @@ namespace at
                 return message;
             }
         } // namespace clck
+
+        namespace clip
+        {
+            auto parse(std::string response) -> std::optional<ClipParsed>
+            {
+                auto constexpr toRemove    = "+CLIP: ";
+                auto constexpr emptyString = "";
+
+                if (response.find(toRemove) == std::string::npos) {
+                    return std::nullopt;
+                }
+
+                utils::findAndReplaceAll(response, toRemove, emptyString);
+
+                auto tokens = utils::split(response, ",");
+                for (auto &t : tokens) {
+                    t = utils::trim(t);
+                }
+                if (tokens.size() == clipTokens) {
+                    int urcToken;
+                    int clipToken;
+
+                    if (!utils::toNumeric(tokens[0], urcToken) || !utils::toNumeric(tokens[1], clipToken)) {
+                        return std::nullopt;
+                    }
+                    auto urcState  = static_cast<UrcState>(urcToken);
+                    auto clipState = static_cast<ClipState>(clipToken);
+
+                    if (magic_enum::enum_contains<UrcState>(urcState) &&
+                        magic_enum::enum_contains<ClipState>(clipState)) {
+                        return ClipParsed(urcState, clipState);
+                    }
+                }
+                return std::nullopt;
+            }
+            auto getClipState(const ClipState &state) -> app::manager::actions::IMMICustomResultParams::MMIResultMessage
+            {
+                auto message = app::manager::actions::IMMICustomResultParams::MMIResultMessage::CommonNoMessage;
+
+                switch (state) {
+                case ClipState::NotProvisioned:
+                    message = app::manager::actions::IMMICustomResultParams::MMIResultMessage::ClipNotProvisioned;
+                    break;
+                case ClipState::Provisioned:
+                    message = app::manager::actions::IMMICustomResultParams::MMIResultMessage::ClipProvisioned;
+                    break;
+                case ClipState::Unknown:
+                    message = app::manager::actions::IMMICustomResultParams::MMIResultMessage::ClipUnknown;
+                    break;
+                }
+                return message;
+            }
+        } // namespace clip
+
+        namespace ccwa
+        {
+            auto parse(const std::vector<std::string> &data, std::vector<CcwaParsed> &parsed) noexcept -> bool
+            {
+
+                auto constexpr toRemove    = "+CCWA: ";
+                auto constexpr emptyString = "";
+                auto constexpr tokenCount  = 2;
+                parsed.clear();
+
+                for (auto el : data) {
+
+                    if (el.find("OK") != std::string::npos) {
+                        return true;
+                    }
+
+                    if (el.find(toRemove) == std::string::npos) {
+                        parsed.clear();
+                        return false;
+                    }
+
+                    utils::findAndReplaceAll(el, toRemove, emptyString);
+                    auto tokens = utils::split(el, ",");
+                    if (tokens.size() != tokenCount) {
+                        parsed.clear();
+                        return false;
+                    }
+
+                    for (auto &t : tokens) {
+                        t = utils::trim(t);
+                    }
+                    int statusToken       = 0;
+                    int serviceClassToken = 0;
+
+                    if (!utils::toNumeric(tokens[0], statusToken) || !utils::toNumeric(tokens[1], serviceClassToken)) {
+                        parsed.clear();
+                        return false;
+                    }
+                    auto status       = static_cast<Status>(statusToken);
+                    auto serviceClass = static_cast<ServiceClass>(serviceClassToken);
+
+                    if (magic_enum::enum_contains<Status>(status) &&
+                        magic_enum::enum_contains<ServiceClass>(serviceClass)) {
+                        parsed.push_back(CcwaParsed(status, serviceClass));
+                    }
+                    else {
+                        parsed.clear();
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            auto getStatus(const Status &status) noexcept
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage
+            {
+                using namespace app::manager::actions;
+
+                auto message = IMMICustomResultParams::MMIResultMessage::CommonNoMessage;
+                switch (status) {
+                case Status::Disable:
+                    message = IMMICustomResultParams::MMIResultMessage::CallWaitingDeactivated;
+                    break;
+                case Status::Enable:
+                    message = IMMICustomResultParams::MMIResultMessage::CallWaitingActivated;
+                    break;
+                }
+                return message;
+            }
+
+            auto getClass(const ServiceClass &serviceClass) noexcept
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage
+            {
+                using namespace app::manager::actions;
+
+                auto message = IMMICustomResultParams::MMIResultMessage::CommonNoMessage;
+                switch (serviceClass) {
+                case ServiceClass::Voice:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonVoice;
+                    break;
+                case ServiceClass::Data:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonData;
+                    break;
+                case ServiceClass::Fax:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonFax;
+                    break;
+                case ServiceClass::DataSync:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonSync;
+                    break;
+                case ServiceClass::DataAsync:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonAsync;
+                    break;
+                case ServiceClass::AllDisabled:
+                    message = IMMICustomResultParams::MMIResultMessage::CommonAllDisabled;
+                    break;
+                }
+                return message;
+            }
+
+        } // namespace ccwa
     }     // namespace response
 } // namespace at

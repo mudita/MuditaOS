@@ -12,7 +12,6 @@
 #include <random>
 #include "time/time_conversion.hpp"
 
-#define MAGIC_ENUM_RANGE_MAX 256
 #include <magic_enum.hpp>
 
 namespace utils
@@ -21,6 +20,16 @@ namespace utils
     constexpr unsigned int secondsInMinute =
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::minutes(1)).count();
 
+    std::string bytesToHex(const std::vector<std::uint8_t> &bytes);
+    std::vector<std::uint8_t> hexToBytes(const std::string &hex);
+    // template <typename T> std::string numToHex(T c);
+    template <typename T> std::string numToHex(T c)
+    {
+        std::stringstream s;
+        s.fill('0');
+        s << std::setw(sizeof(T) * 2) << std::hex << static_cast<unsigned long long>(c);
+        return s.str();
+    }
     template <typename Out> void split(const std::string &s, char delim, Out result)
     {
         std::stringstream ss(s);

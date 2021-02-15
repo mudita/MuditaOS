@@ -22,8 +22,13 @@ void MeditationListViewWindow::buildInterface()
 {
     AppWindow::buildInterface();
     model->createData();
-    list = new gui::ListView(
-        this, listViewWindow::X, listViewWindow::Y, listViewWindow::Width, listViewWindow::Height, model);
+    list = new gui::ListView(this,
+                             listViewWindow::X,
+                             listViewWindow::Y,
+                             listViewWindow::Width,
+                             listViewWindow::Height,
+                             model,
+                             style::listview::ScrollBarType::Fixed);
     setFocusItem(list);
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 }

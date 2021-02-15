@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -115,7 +115,8 @@ namespace audio
 
         void convertmono2stereo(int16_t *pcm, uint32_t samplecount);
 
-        const uint32_t workerBufferSize = 1024 * 8;
+        static constexpr auto workerBufferSize              = 1024 * 8;
+        static constexpr Endpoint::Capabilities decoderCaps = {.usesDMA = false};
 
         uint32_t sampleRate = 0;
         uint32_t chanNumber = 0;

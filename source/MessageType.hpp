@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef SOURCE_MESSAGETYPE_HPP_
@@ -166,6 +166,12 @@ enum class MessageType
 
     // Power manager
     PMChangePowerMode,
+    // System manager
+    DeviceRegistration,
+
+    // System manager
+    SystemManagerCpuFrequency,
+    SystemManagerRegistration,
 
     // battery charger messages
     EVMBatteryLevel,
@@ -175,8 +181,6 @@ enum class MessageType
     EVMTimeUpdated,   ///< This message is send on every time update.
     // Torch messages
     EVMTorchStateMessage,
-    // Keypad backlight control messages
-    EVMKeypadBacklightMessage,
 
     // cellular messages
     EVMGetBoard,

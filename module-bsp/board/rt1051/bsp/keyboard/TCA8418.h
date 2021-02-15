@@ -1,10 +1,9 @@
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /**
  * @file TCA8418.h
- * @author Lukasz Skrzypczak (lukasz.skrypczak@mudita.com)
- * @date 29 aug 2018
  * @brief Basic IO driver for TCA8418 keyboard controller
- * @copyright Copyright (C) 2018 mudita.com.
- * @details
  */
 
 #ifndef INCLUDE_TCA8418_H_

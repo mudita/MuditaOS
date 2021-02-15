@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothProxyAudio.hpp"
@@ -10,7 +10,7 @@ namespace bsp
                                              audio::Stream &dataStreamOut,
                                              audio::Stream &dataStreamIn,
                                              AudioDevice::Format &format)
-        : AudioDevice(nullptr), dataStreamOut(dataStreamOut), dataStreamIn(dataStreamIn), serviceCallback(callback),
+        : dataStreamOut(dataStreamOut), dataStreamIn(dataStreamIn), serviceCallback(std::move(callback)),
           audioFormat(format)
     {
         LOG_DEBUG("BluetoothProxyAudio created.");

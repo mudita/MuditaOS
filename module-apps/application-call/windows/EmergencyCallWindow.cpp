@@ -29,9 +29,19 @@ namespace gui
 
     bool EmergencyCallWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-            app::manager::Controller::sendAction(application, app::manager::actions::ShowEmergencyContacts);
-            return true;
+        if (inputEvent.isShortPress()) {
+            // Call function
+            if (inputEvent.is(KeyCode::KEY_LF)) {
+                interface->handleEmergencyCallEvent(enteredNumber);
+                return true;
+            }
+            else if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+                auto data                        = std::make_unique<gui::SwitchData>();
+                data->ignoreCurrentWindowOnStack = true;
+                app::manager::Controller::sendAction(
+                    application, app::manager::actions::ShowEmergencyContacts, std::move(data));
+                return true;
+            }
         }
 
         return NumberWindow::onInput(inputEvent);

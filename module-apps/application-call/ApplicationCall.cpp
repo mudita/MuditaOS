@@ -6,7 +6,6 @@
 #include "DialogMetadata.hpp"
 #include "DialogMetadataMessage.hpp"
 #include "data/CallSwitchData.hpp"
-#include "windows/CallMainWindow.hpp"
 #include "windows/CallWindow.hpp"
 #include "windows/EmergencyCallWindow.hpp"
 #include "windows/EnterNumberWindow.hpp"
@@ -51,6 +50,27 @@ namespace app
             switchWindow(app::window::name_emergencyCall, std::forward<decltype(data)>(data));
             return msgHandled();
         });
+        addActionReceiver(manager::actions::NotAnEmergencyNotification, [this](auto &&data) {
+            auto buttonAction = [=]() -> bool {
+                returnToPreviousWindow();
+                return true;
+            };
+            constexpr auto iconNoEmergency = "emergency_W_G";
+            auto textNoEmergency           = utils::localize.get("app_call_wrong_emergency");
+            utils::findAndReplaceAll(textNoEmergency, "$NUMBER", data->getDescription());
+            showNotification(buttonAction, iconNoEmergency, textNoEmergency);
+            return msgHandled();
+        });
+        addActionReceiver(manager::actions::NoSimNotification, [this](auto &&data) {
+            auto buttonAction = [=]() -> bool {
+                returnToPreviousWindow();
+                return true;
+            };
+            constexpr auto iconNoSim = "info_big_circle_W_G";
+            const auto textNoSim     = utils::localize.get("app_call_no_sim");
+            showNotification(buttonAction, iconNoSim, textNoSim);
+            return msgHandled();
+        });
     }
 
     //  number of seconds after end call to switch back to previous application
@@ -66,11 +86,31 @@ namespace app
         manager::Controller::sendAction(this, manager::actions::Call, std::make_unique<app::CallActiveData>());
     }
 
-    void ApplicationCall::IncomingCallHandler(const CellularCallMessage *const msg)
+    void ApplicationCall::CallerIdHandler(const CellularCallMessage *const msg)
     {
-        if (state == call::State::IDLE) {
+        if (getState() == call::State::IDLE) {
+            if (callerIdTimer) {
+                callerIdTimer->stop();
+                callerIdTimer.reset(nullptr);
+            }
             manager::Controller::sendAction(
                 this, manager::actions::Call, std::make_unique<app::IncomingCallData>(msg->number));
+        }
+    }
+
+    void ApplicationCall::IncomingCallHandler(const CellularCallMessage *const msg)
+    {
+        if (getState() == call::State::IDLE) {
+            constexpr sys::ms callerIdTimeout = 1000;
+            callerIdTimer =
+                std::make_unique<sys::Timer>("CallerIdTimer", this, callerIdTimeout, sys::Timer::Type::SingleShot);
+            callerIdTimer->connect([=](sys::Timer &) {
+                callerIdTimer->stop();
+                manager::Controller::sendAction(
+                    this,
+                    manager::actions::Call,
+                    std::make_unique<app::IncomingCallData>(utils::PhoneNumber().getView()));
+            });
         }
     }
 
@@ -120,6 +160,9 @@ namespace app
             case CellularCallMessage::Type::IncomingCall: {
                 IncomingCallHandler(msg);
             } break;
+            case CellularCallMessage::Type::CallerId: {
+                CallerIdHandler(msg);
+            } break;
             }
         }
 
@@ -164,9 +207,6 @@ namespace app
 
     void ApplicationCall::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string name) {
-            return std::make_unique<gui::CallMainWindow>(app);
-        });
         windowsFactory.attach(app::window::name_enterNumber, [](Application *app, const std::string newname) {
             return std::make_unique<gui::EnterNumberWindow>(app, static_cast<ApplicationCall *>(app));
         });
@@ -181,34 +221,29 @@ namespace app
         });
     }
 
-    bool ApplicationCall::showNotification(std::function<bool()> action)
+    bool ApplicationCall::showNotification(std::function<bool()> action,
+                                           const std::string &icon,
+                                           const std::string &text)
     {
         gui::DialogMetadata meta;
-        meta.icon   = "info_big_circle_W_G";
-        meta.text   = utils::localize.get("app_call_no_sim");
-        meta.action = action;
-        switchWindow(app::window::name_dialogConfirm, std::make_unique<gui::DialogMetadataMessage>(meta));
+        meta.icon   = icon;
+        meta.text   = text;
+        meta.action = std::move(action);
+        switchWindow(app::window::name_dialogConfirm, std::make_unique<gui::DialogMetadataMessage>(std::move(meta)));
         return true;
     }
 
     void ApplicationCall::destroyUserInterface()
     {}
 
+    void ApplicationCall::handleEmergencyCallEvent(const std::string &number)
+    {
+        CellularServiceAPI::DialEmergencyNumber(this, utils::PhoneNumber(number));
+    }
+
     void ApplicationCall::handleCallEvent(const std::string &number)
     {
-        if (!Store::GSM::get()->simCardInserted()) {
-            LOG_INFO("No SIM card");
-            auto action = [=]() -> bool {
-                returnToPreviousWindow();
-                return true;
-            };
-            showNotification(action);
-            return;
-        }
-
-        LOG_INFO("number: [%s]", number.c_str());
-        auto ret = CellularServiceAPI::DialNumber(this, utils::PhoneNumber(number));
-        LOG_INFO("CALL RESULT: %s", (ret ? "OK" : "FAIL"));
+        CellularServiceAPI::DialNumber(this, utils::PhoneNumber(number));
     }
 
     void ApplicationCall::handleAddContactEvent(const std::string &number)
@@ -238,25 +273,53 @@ namespace app
         }
     }
 
-    void ApplicationCall::transmitDtmfTone(uint32_t digit)
-    {
-        if (!CellularServiceAPI::TransmitDtmfTones(this, digit)) {
-            LOG_ERROR("transmitDtmfTone failed");
-        }
-    }
-
     void ApplicationCall::stopAudio()
     {
         AudioServiceAPI::StopAll(this);
     }
 
-    void ApplicationCall::startRinging()
+    void ApplicationCall::startAudioRinging()
     {
         AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, ringtone_path);
     }
 
-    void ApplicationCall::startRouting()
+    void ApplicationCall::startAudioRouting()
     {
         AudioServiceAPI::RoutingStart(this);
+    }
+
+    void ApplicationCall::sendAudioEvent(AudioEvent audioEvent)
+    {
+        switch (audioEvent) {
+        case AudioEvent::Mute:
+            AudioServiceAPI::SendEvent(this, audio::EventType::CallMute);
+            break;
+        case AudioEvent::Unmute:
+            AudioServiceAPI::SendEvent(this, audio::EventType::CallUnmute);
+            break;
+        case AudioEvent::LoudspeakerOn:
+            AudioServiceAPI::SendEvent(this, audio::EventType::CallLoudspeakerOn);
+            break;
+        case AudioEvent::LoudspeakerOff:
+            AudioServiceAPI::SendEvent(this, audio::EventType::CallLoudspeakerOff);
+            break;
+        }
+    }
+
+    void ApplicationCall::hangupCall()
+    {
+        CellularServiceAPI::HangupCall(this);
+    }
+
+    void ApplicationCall::answerIncomingCall()
+    {
+        CellularServiceAPI::AnswerIncomingCall(this);
+    }
+
+    void ApplicationCall::transmitDtmfTone(uint32_t digit)
+    {
+        if (!CellularServiceAPI::TransmitDtmfTones(this, digit)) {
+            LOG_ERROR("transmitDtmfTone failed");
+        }
     }
 } // namespace app

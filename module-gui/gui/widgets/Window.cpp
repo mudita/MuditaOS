@@ -28,10 +28,10 @@ namespace gui
 
     void Window::getRefreshArea(uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h)
     {
-        x    = widgetArea.x;
-        y    = widgetArea.y;
-        w    = widgetArea.w;
-        h    = widgetArea.h;
+        x = widgetArea.x;
+        y = widgetArea.y;
+        w = widgetArea.w;
+        h = widgetArea.h;
     }
 
     bool Window::handleSwitchData(SwitchData *data)
@@ -41,8 +41,7 @@ namespace gui
 
     void Window::buildDrawListImplementation(std::list<Command> &commands)
     {
-        auto clearCommand         = std::make_unique<DrawCommand>();
-        clearCommand->id          = DrawCommandID::GUI_DRAW_CLEAR;
+        auto clearCommand = std::make_unique<Clear>();
         commands.emplace_back(std::move(clearCommand));
     }
 

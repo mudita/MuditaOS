@@ -180,6 +180,7 @@ namespace at
          * Warning: should not be used for URC !
          */
         std::optional<ResponseTokens> getTokensForATResults(const at::Result &resp, std::string_view head);
+
         bool parseCSQ(std::string response, std::string &result);
         bool parseCSQ(std::string cellularResponse, uint32_t &result);
         bool parseCREG(std::string &response, uint32_t &result);
@@ -187,7 +188,25 @@ namespace at
         bool parseQNWINFO(std::string &response, std::string &result);
         bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret);
         bool parseCLCK(const at::Result &resp, int &ret);
+        namespace qcfg_ims
+        {
+            /**
+             * VoLTE state based on QCFG="ims" command
+             */
+            enum class VoLTEIMSState
+            {
+                NotReady = 0,
+                Ready    = 1
+            };
 
+            enum class IMSState
+            {
+                ViaMBN  = 0, /// configuration could be setup via MBN file in NVRAM
+                Enable  = 1,
+                Disable = 2
+            };
+        } // namespace qcfg_ims
+        bool parseQCFG_IMS(const at::Result &resp, std::pair<qcfg_ims::IMSState, qcfg_ims::VoLTEIMSState> &ret);
         namespace creg
         {
             bool isRegistered(uint32_t commandData);
@@ -273,11 +292,41 @@ namespace at
                 {}
             };
 
-            auto parseClir(const std::string &response) -> std::optional<ClirResponse>;
+            auto parse(const std::string &response) -> std::optional<ClirResponse>;
             auto getState(const ServiceState &state) -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
             auto getStatus(const ServiceStatus &status)
                 -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
         } // namespace clir
+
+        namespace clip
+        {
+            auto constexpr clipTokens = 2;
+
+            enum class UrcState
+            {
+                SupressUrc,
+                DisplayUrc
+            };
+
+            enum class ClipState
+            {
+                NotProvisioned,
+                Provisioned,
+                Unknown
+            };
+
+            struct ClipParsed
+            {
+                UrcState urcState;
+                ClipState clipState;
+                explicit ClipParsed(UrcState urc, ClipState clip) : urcState(urc), clipState(clip)
+                {}
+            };
+
+            auto parse(std::string response) -> std::optional<ClipParsed>;
+            auto getClipState(const ClipState &state)
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
+        } // namespace clip
 
         namespace ccfc
         {
@@ -374,5 +423,37 @@ namespace at
             auto getStatus(const Status &status) noexcept
                 -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
         } // namespace clck
+
+        namespace ccwa
+        {
+            enum class Status
+            {
+                Disable,
+                Enable
+            };
+            enum class ServiceClass
+            {
+                Voice       = 1,
+                Data        = 2,
+                Fax         = 4,
+                DataSync    = 16,
+                DataAsync   = 32,
+                AllDisabled = 255
+            };
+
+            struct CcwaParsed
+            {
+                Status status;
+                ServiceClass serviceClass;
+                explicit CcwaParsed(const Status status, const ServiceClass serviceClass)
+                    : status(status), serviceClass(serviceClass){};
+            };
+
+            auto parse(const std::vector<std::string> &data, std::vector<CcwaParsed> &parsed) noexcept -> bool;
+            auto getStatus(const Status &status) noexcept
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
+            auto getClass(const ServiceClass &serviceClass) noexcept
+                -> app::manager::actions::IMMICustomResultParams::MMIResultMessage;
+        } // namespace ccwa
     }     // namespace response
 } // namespace at

@@ -1,3 +1,6 @@
+-- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+-- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 BEGIN;
 INSERT OR IGNORE INTO notes ("_id","date","snippet") VALUES (1,1565586181,'snippet 1');
 INSERT OR IGNORE INTO notes ("_id","date","snippet") VALUES (2,1565586381,'snippet 2

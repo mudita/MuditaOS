@@ -12,6 +12,7 @@ auto gui::option::ChangePin::build() const -> gui::ListItem *
     auto optionItem = new gui::ListItem();
     optionItem->setEdges(RectangleEdge::None);
     optionItem->setMinimumSize(style::window::default_body_width, style::window::label::big_h);
+    optionItem->setMargins(Margins(0, 0, 0, window::option_bottom_margin));
 
     auto optionBodyHBox = new gui::HBox(optionItem, 0, 0, 0, 0);
     auto font           = FontManager::getInstance().getFont(style::window::font::medium);

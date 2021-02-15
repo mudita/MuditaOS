@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-antenna/ServiceAntenna.hpp"
@@ -24,8 +24,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-const char *ServiceAntenna::serviceName = "ServiceAntenna";
 
 namespace antenna
 {
@@ -55,9 +53,9 @@ namespace antenna
     }
 } // namespace antenna
 
-ServiceAntenna::ServiceAntenna() : sys::Service(serviceName)
+ServiceAntenna::ServiceAntenna() : sys::Service(service::name::antenna)
 {
-    LOG_INFO("[%s] Initializing", serviceName);
+    LOG_INFO("[%s] Initializing", service::name::antenna);
 
     timer = std::make_unique<sys::Timer>("Antena", this, 5000, sys::Timer::Type::Periodic);
     timer->connect([&](sys::Timer &) {
@@ -74,13 +72,13 @@ ServiceAntenna::ServiceAntenna() : sys::Service(serviceName)
 
     state = new utils::state::State<antenna::State>(this);
 
-    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-    busChannels.push_back(sys::BusChannels::AntennaNotifications);
+    bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
+    bus.channels.push_back(sys::BusChannel::AntennaNotifications);
 }
 
 ServiceAntenna::~ServiceAntenna()
 {
-    LOG_INFO("[%s] Cleaning resources", serviceName);
+    LOG_INFO("[%s] Cleaning resources", service::name::antenna);
 }
 
 // Invoked upon receiving data message

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
@@ -31,6 +31,7 @@
 #include <service-gui/Common.hpp>
 #include <module-utils/Utils.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
+#include <module-utils/time/DateAndTimeSettings.hpp>
 
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 
@@ -76,18 +77,13 @@ namespace app
           settings(std::make_unique<settings::Settings>(this))
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
-        busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 
         longPressTimer = std::make_unique<sys::Timer>("LongPress", this, key_timer_ms);
         longPressTimer->connect([&](sys::Timer &) { longPressTimerCallback(); });
 
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
-
-        settings->registerValueChange(
-            settings::SystemProperties::timeFormat12,
-            [this](std::string value) { timeFormatChanged(value); },
-            settings::SettingsScope::Global);
     }
 
     Application::~Application() noexcept
@@ -150,7 +146,7 @@ namespace app
             else if (suspendInProgress) {
                 message->setCommandType(service::gui::DrawMessage::Type::SUSPEND);
             }
-            sys::Bus::SendUnicast(message, service::name::gui, this);
+            bus.sendUnicast(std::move(message), service::name::gui);
         }
 
         if (suspendInProgress)
@@ -175,12 +171,12 @@ namespace app
             window = getCurrentWindow()->getName();
             auto msg =
                 std::make_shared<AppSwitchWindowMessage>(window, getCurrentWindow()->getName(), std::move(data), cmd);
-            sys::Bus::SendUnicast(msg, this->GetName(), this);
+            bus.sendUnicast(msg, this->GetName());
         }
         else {
             auto msg = std::make_shared<AppSwitchWindowMessage>(
                 windowName, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd);
-            sys::Bus::SendUnicast(msg, this->GetName(), this);
+            bus.sendUnicast(msg, this->GetName());
         }
     }
 
@@ -199,7 +195,7 @@ namespace app
     {
         if (not windowsStack.isEmpty()) {
             auto msg = std::make_shared<AppRefreshMessage>(mode, getCurrentWindow()->getName());
-            sys::Bus::SendUnicast(msg, this->GetName(), this);
+            bus.sendUnicast(msg, this->GetName());
         }
     }
 
@@ -331,7 +327,7 @@ namespace app
     sys::MessagePointer Application::handleMinuteUpdated(sys::Message *msgl)
     {
         auto *msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
-        getCurrentWindow()->updateTime(msg->timestamp, !timeFormat12);
+        getCurrentWindow()->updateTime(msg->timestamp, !isTimeFormat12());
         if (state == State::ACTIVE_FORGROUND) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
@@ -501,7 +497,7 @@ namespace app
 
         settings->registerValueChange(
             settings::SystemProperties::lockScreenPasscodeIsOn,
-            [this](const std::string &value) { setLockScreenPasscodeOn(utils::getNumericValue<bool>(value)); },
+            [this](const std::string &value) { lockScreenPasscodeIsOn = utils::getNumericValue<bool>(value); },
             settings::SettingsScope::Global);
         return sys::ReturnCodes::Success;
     }
@@ -553,10 +549,8 @@ namespace app
     {
         using namespace bsp;
 
-        auto retGetState = sys::Bus::SendUnicast(std::make_shared<sevm::TorchStateMessage>(torch::Action::getState),
-                                                 service::name::evt_manager,
-                                                 this,
-                                                 pdMS_TO_TICKS(1500));
+        auto message     = std::make_shared<sevm::TorchStateMessage>(torch::Action::getState);
+        auto retGetState = bus.sendUnicast(std::move(message), service::name::evt_manager, pdMS_TO_TICKS(1500));
         if (retGetState.first == sys::ReturnCodes::Success) {
             auto msgGetState = dynamic_cast<sevm::TorchStateResultMessage *>(retGetState.second.get());
             if (msgGetState == nullptr) {
@@ -573,7 +567,7 @@ namespace app
                 msgSetState->state = torch::State::off;
                 break;
             }
-            sys::Bus::SendUnicast(msgSetState, service::name::evt_manager, this);
+            bus.sendUnicast(msgSetState, service::name::evt_manager);
         }
     }
 
@@ -583,7 +577,7 @@ namespace app
                                     manager::actions::ActionParamsPtr &&data)
     {
         auto msg = std::make_shared<AppActionRequest>(actionId, std::move(data));
-        sys::Bus::SendUnicast(msg, applicationName, sender);
+        sender->bus.sendUnicast(msg, applicationName);
     }
 
     void Application::messageSwitchApplication(sys::Service *sender,
@@ -592,26 +586,26 @@ namespace app
                                                std::unique_ptr<gui::SwitchData> data)
     {
         auto msg = std::make_shared<AppSwitchMessage>(application, window, std::move(data));
-        sys::Bus::SendUnicast(msg, application, sender);
+        sender->bus.sendUnicast(msg, application);
     }
 
     void Application::messageCloseApplication(sys::Service *sender, std::string application)
     {
 
         auto msg = std::make_shared<AppMessage>(MessageType::AppClose);
-        sys::Bus::SendUnicast(msg, application, sender);
+        sender->bus.sendUnicast(msg, application);
     }
 
     void Application::messageRebuildApplication(sys::Service *sender, std::string application)
     {
         auto msg = std::make_shared<AppRebuildMessage>();
-        sys::Bus::SendUnicast(msg, application, sender);
+        sender->bus.sendUnicast(msg, application);
     }
 
     void Application::messageApplicationLostFocus(sys::Service *sender, std::string application)
     {
         auto msg = std::make_shared<AppLostFocusMessage>();
-        sys::Bus::SendUnicast(msg, application, sender);
+        sender->bus.sendUnicast(msg, application);
     }
 
     void Application::messageInputEventApplication(sys::Service *sender,
@@ -619,7 +613,7 @@ namespace app
                                                    const gui::InputEvent &event)
     {
         auto msg = std::make_shared<AppInputEventMessage>(event);
-        sys::Bus::SendUnicast(msg, application, sender);
+        sender->bus.sendUnicast(msg, application);
     }
 
     bool Application::popToWindow(const std::string &window)
@@ -716,7 +710,7 @@ namespace app
 
     bool Application::isTimeFormat12() const noexcept
     {
-        return timeFormat12;
+        return utils::dateAndTimeSettings.getTimeFormat() == utils::time::Locale::TimeFormat::FormatTime12H;
     }
 
     void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)

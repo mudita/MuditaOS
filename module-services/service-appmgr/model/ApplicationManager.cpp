@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/model/ApplicationManager.hpp>
@@ -6,13 +6,13 @@
 
 #include <module-apps/messages/AppMessage.hpp>
 #include <Common.hpp>
-#include <Service/Bus.hpp>
 #include <Service/Message.hpp>
 #include <Service/Timer.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <application-call/ApplicationCall.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
+#include <application-desktop/ApplicationDesktop.hpp>
 #include <i18n/i18n.hpp>
 #include <log/log.hpp>
 #include <service-appmgr/messages/Message.hpp>
@@ -26,17 +26,20 @@
 #include <utility>
 
 #include <module-utils/Utils.hpp>
+#include <module-utils/time/DateAndTimeSettings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 // Auto phone lock disabled for now till the times when it's debugged
 // #define AUTO_PHONE_LOCK_ENABLED
-
 namespace app::manager
 {
     namespace
     {
-        static constexpr auto default_application_locktime_ms = 30000;
-        static constexpr auto shutdown_delay_ms               = 500;
-    }; // namespace
+        constexpr auto default_application_locktime_ms = 30000;
+        constexpr auto shutdown_delay_ms               = 500;
+
+        constexpr auto timerBlock         = "BlockTimer";
+        constexpr auto timerShutdownDelay = "ShutdownDelay";
+    } // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
         : applications{std::move(launchers)}
@@ -102,8 +105,8 @@ namespace app::manager
                                            const ApplicationName &_rootApplicationName)
         : Service{serviceName}, ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           blockingTimer{std::make_unique<sys::Timer>(
-              "BlockTimer", this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)},
-          shutdownDelay{std::make_unique<sys::Timer>("ShutdownDelay", this, shutdown_delay_ms)},
+              timerBlock, this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)},
+          shutdownDelay{std::make_unique<sys::Timer>(timerShutdownDelay, this, shutdown_delay_ms)},
           settings(std::make_unique<settings::Settings>(this))
     {
         registerMessageHandlers();
@@ -114,8 +117,6 @@ namespace app::manager
     {
         blockingTimer->setInterval(default_application_locktime_ms);
         utils::localize.setFallbackLanguage(utils::localize.DefaultLanguage);
-        utils::localize.setDisplayLanguage(displayLanguage);
-        utils::localize.setInputLanguage(inputLanguage);
         settings->registerValueChange(
             settings::SystemProperties::displayLanguage,
             [this](std::string value) { displayLanguageChanged(value); },
@@ -128,28 +129,39 @@ namespace app::manager
             settings::SystemProperties::lockTime,
             [this](std::string value) { lockTimeChanged(value); },
             settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::SystemProperties::automaticDateAndTimeIsOn,
+            [this](std::string value) {
+                utils::dateAndTimeSettings.setAutomaticDateAndTimeOn(utils::getNumericValue<bool>(value));
+            },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::SystemProperties::automaticTimeZoneIsOn,
+            [this](std::string value) {
+                utils::dateAndTimeSettings.setAutomaticTimeZoneOn(utils::getNumericValue<bool>(value));
+            },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::SystemProperties::timeFormat,
+            [this](std::string value) {
+                utils::dateAndTimeSettings.setTimeFormat(
+                    static_cast<utils::time::Locale::TimeFormat>(utils::getNumericValue<unsigned int>(value)));
+            },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::SystemProperties::dateFormat,
+            [this](std::string value) {
+                utils::dateAndTimeSettings.setDateFormat(
+                    static_cast<utils::time::Locale::DateFormat>(utils::getNumericValue<unsigned int>(value)));
+            },
+            ::settings::SettingsScope::Global);
 
-        startSystemServices();
         startBackgroundApplications();
         if (auto app = getApplication(rootApplicationName); app != nullptr) {
             Controller::sendAction(this, actions::Home);
         }
 
         return sys::ReturnCodes::Success;
-    }
-
-    void ApplicationManager::startSystemServices()
-    {
-        if (bool ret = sys::SystemManager::CreateService(
-                std::make_shared<service::gui::ServiceGUI>(service::name::gui, GetName()), this);
-            !ret) {
-            LOG_ERROR("Failed to initialize GUI service");
-        }
-        if (bool ret = sys::SystemManager::CreateService(
-                std::make_shared<service::eink::ServiceEink>(service::name::eink, GetName()), this);
-            !ret) {
-            LOG_ERROR("Failed to initialize EInk service");
-        }
     }
 
     void ApplicationManager::suspendSystemServices()
@@ -229,11 +241,31 @@ namespace app::manager
         connect(typeid(DisplayLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<DisplayLanguageChangeRequest *>(request);
             handleDisplayLanguageChange(msg);
-            return msgHandled();
+            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::localize.getDisplayLanguage());
         });
         connect(typeid(InputLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<InputLanguageChangeRequest *>(request);
             handleInputLanguageChange(msg);
+            return msgHandled();
+        });
+        connect(typeid(AutomaticDateAndTimeIsOnChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<AutomaticDateAndTimeIsOnChangeRequest *>(request);
+            handleAutomaticDateAndTimeChange(msg);
+            return msgHandled();
+        });
+        connect(typeid(AutomaticTimeZoneIsOnChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<AutomaticTimeZoneIsOnChangeRequest *>(request);
+            handleAutomaticTimeZoneChange(msg);
+            return msgHandled();
+        });
+        connect(typeid(TimeFormatChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<TimeFormatChangeRequest *>(request);
+            handleTimeFormatChange(msg);
+            return msgHandled();
+        });
+        connect(typeid(DateFormatChangeRequest), [this](sys::Message *request) {
+            auto msg = static_cast<DateFormatChangeRequest *>(request);
+            handleDateFormatChange(msg);
             return msgHandled();
         });
         connect(typeid(ShutdownRequest), [this](sys::Message *) {
@@ -247,7 +279,11 @@ namespace app::manager
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
-            return std::make_shared<GetCurrentDisplayLanguageResponse>(displayLanguage);
+            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::localize.getDisplayLanguage());
+        });
+        connect(typeid(UpdateInProgress), [this](sys::Message *) {
+            closeApplicationsOnUpdate();
+            return msgHandled();
         });
 
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
@@ -259,8 +295,11 @@ namespace app::manager
         connect(typeid(CellularMMIResultMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIResponseMessage), convertibleToActionHandler);
         connect(typeid(CellularMMIPushMessage), convertibleToActionHandler);
+        connect(typeid(CellularNoSimNotification), convertibleToActionHandler);
+        connect(typeid(CellularNotAnEmergencyNotification), convertibleToActionHandler);
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
         connect(typeid(sys::SystemBrownoutMesssage), convertibleToActionHandler);
+        connect(typeid(CellularSmsNoSimRequestMessage), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -307,6 +346,23 @@ namespace app::manager
         for (const auto &app : getApplications()) {
             if (app->started()) {
                 LOG_INFO("Closing application %s", app->name().c_str());
+                closeApplication(app.get());
+                app->setState(ApplicationHandle::State::DEACTIVATED);
+            }
+        }
+        return true;
+    }
+
+    auto ApplicationManager::closeApplicationsOnUpdate() -> bool
+    {
+        for (const auto &app : getApplications()) {
+            if (app->started()) {
+                auto appName = app->name();
+                if (appName == app::name_desktop) {
+                    LOG_DEBUG("Delay closing %s", app::name_desktop);
+                    continue;
+                }
+                LOG_INFO("Closing application on Update %s", appName.c_str());
                 closeApplication(app.get());
                 app->setState(ApplicationHandle::State::DEACTIVATED);
             }
@@ -522,7 +578,7 @@ namespace app::manager
         }
 
         auto notification = std::make_shared<ApplicationStatusRequest>(GetName(), app->name());
-        sys::Bus::SendMulticast(notification, sys::BusChannels::AppManagerNotifications, this);
+        bus.sendMulticast(notification, sys::BusChannel::AppManagerNotifications);
         return true;
     }
 
@@ -558,14 +614,13 @@ namespace app::manager
     {
         const auto &requestedLanguage = msg->getLanguage();
 
-        if (requestedLanguage == displayLanguage) {
+        if (requestedLanguage == utils::localize.getDisplayLanguage()) {
             LOG_WARN("The selected language is already set. Ignore.");
             return false;
         }
-        displayLanguage = requestedLanguage;
         settings->setValue(
-            settings::SystemProperties::displayLanguage, displayLanguage, settings::SettingsScope::Global);
-        utils::localize.setDisplayLanguage(displayLanguage);
+            settings::SystemProperties::displayLanguage, requestedLanguage, settings::SettingsScope::Global);
+        utils::localize.setDisplayLanguage(requestedLanguage);
         rebuildActiveApplications();
         return true;
     }
@@ -574,13 +629,65 @@ namespace app::manager
     {
         const auto &requestedLanguage = msg->getLanguage();
 
-        if (requestedLanguage == inputLanguage) {
+        if (requestedLanguage == utils::localize.getInputLanguage()) {
             LOG_WARN("The selected language is already set. Ignore.");
             return false;
         }
-        inputLanguage = requestedLanguage;
-        settings->setValue(settings::SystemProperties::inputLanguage, inputLanguage, settings::SettingsScope::Global);
-        utils::localize.setInputLanguage(inputLanguage);
+        settings->setValue(
+            settings::SystemProperties::inputLanguage, requestedLanguage, settings::SettingsScope::Global);
+        utils::localize.setInputLanguage(requestedLanguage);
+        return true;
+    }
+
+    auto ApplicationManager::handleAutomaticDateAndTimeChange(AutomaticDateAndTimeIsOnChangeRequest *msg) -> bool
+    {
+        if (utils::dateAndTimeSettings.isAutomaticDateAndTimeOn() == msg->isOn) {
+            LOG_WARN("The selected value is already set. Ignore.");
+            return false;
+        }
+        settings->setValue(settings::SystemProperties::automaticDateAndTimeIsOn,
+                           std::to_string(msg->isOn),
+                           settings::SettingsScope::Global);
+        utils::dateAndTimeSettings.setAutomaticDateAndTimeOn(msg->isOn);
+        return true;
+    }
+
+    auto ApplicationManager::handleAutomaticTimeZoneChange(AutomaticTimeZoneIsOnChangeRequest *msg) -> bool
+    {
+        if (utils::dateAndTimeSettings.isAutomaticTimeZoneOn() == msg->isOn) {
+            LOG_WARN("The selected value is already set. Ignore.");
+            return false;
+        }
+        settings->setValue(settings::SystemProperties::automaticTimeZoneIsOn,
+                           std::to_string(msg->isOn),
+                           settings::SettingsScope::Global);
+        utils::dateAndTimeSettings.setAutomaticTimeZoneOn(msg->isOn);
+        return true;
+    }
+
+    auto ApplicationManager::handleTimeFormatChange(TimeFormatChangeRequest *msg) -> bool
+    {
+        if (utils::dateAndTimeSettings.getTimeFormat() == msg->timeFormat) {
+            LOG_WARN("The selected value is already set. Ignore.");
+            return false;
+        }
+        settings->setValue(settings::SystemProperties::timeFormat,
+                           std::to_string(static_cast<unsigned>(msg->timeFormat)),
+                           settings::SettingsScope::Global);
+        utils::dateAndTimeSettings.setTimeFormat(msg->timeFormat);
+        return true;
+    }
+
+    auto ApplicationManager::handleDateFormatChange(DateFormatChangeRequest *msg) -> bool
+    {
+        if (utils::dateAndTimeSettings.getDateFormat() == msg->dateFormat) {
+            LOG_WARN("The selected value is already set. Ignore.");
+            return false;
+        }
+        settings->setValue(settings::SystemProperties::dateFormat,
+                           std::to_string(static_cast<unsigned>(msg->dateFormat)),
+                           settings::SettingsScope::Global);
+        utils::dateAndTimeSettings.setDateFormat(msg->dateFormat);
         return true;
     }
 
@@ -710,8 +817,7 @@ namespace app::manager
         if (value.empty()) {
             return;
         }
-        displayLanguage = value;
-        utils::localize.setDisplayLanguage(displayLanguage);
+        utils::localize.setDisplayLanguage(value);
         rebuildActiveApplications();
     }
     void ApplicationManager::lockTimeChanged(std::string value)
@@ -727,7 +833,6 @@ namespace app::manager
         if (value.empty()) {
             return;
         }
-        inputLanguage = value;
         utils::localize.setInputLanguage(value);
     }
 } // namespace app::manager

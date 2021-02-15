@@ -1,6 +1,5 @@
-//
-// Created by mati on 09.09.2019.
-//
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_LINUXLPM_H
 #define PUREPHONE_LINUXLPM_H
@@ -15,9 +14,9 @@ namespace bsp
       public:
         int32_t PowerOff() override final;
         int32_t Reboot() override final;
-        void SetCpuFrequency(CpuFrequency freq) final;
+        void SetCpuFrequency(CpuFrequencyHz freq) final;
+        [[nodiscard]] uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;
-        void SwitchPll2State(Pll2State state) final;
     };
 
 } // namespace bsp

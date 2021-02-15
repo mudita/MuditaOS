@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ArcRenderer.hpp"
@@ -6,7 +6,9 @@
 
 namespace gui::renderer
 {
-    auto ArcRenderer::DrawableStyle::from(const CommandArc &command) -> DrawableStyle
+    constexpr Length RadiusPrecisionLimit = 5;
+
+    auto ArcRenderer::DrawableStyle::from(const DrawArc &command) -> DrawableStyle
     {
         return DrawableStyle{command.width, command.borderColor};
     }
@@ -41,7 +43,14 @@ namespace gui::renderer
 
         const auto start = trigonometry::toRadians(begin);
         const auto end   = trigonometry::toRadians(begin + sweep);
-        constexpr double step{0.001};
+        double step;
+
+        if (radius < RadiusPrecisionLimit) {
+            step = 0.01;
+        }
+        else {
+            step = 0.001;
+        }
 
         double cosine, sine;
         for (double radians = start; radians <= end; radians += step) {
@@ -65,7 +74,14 @@ namespace gui::renderer
     {
         const auto start = trigonometry::toRadians(begin);
         const auto end   = trigonometry::toRadians(begin + sweep);
-        constexpr double step{0.001};
+        double step;
+
+        if (radius < RadiusPrecisionLimit) {
+            step = 0.01;
+        }
+        else {
+            step = 0.001;
+        }
 
         long int x, y;
         for (double radians = start; radians <= end; radians += step) {

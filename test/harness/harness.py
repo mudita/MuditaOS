@@ -6,6 +6,7 @@ from enum import Enum
 from harness import utils, log
 from harness.interface import CDCSerial as serial
 from harness.interface.defs import key_codes, endpoint, method
+from harness.interface.CDCSerial import Keytype
 from harness.utils import send_keystoke, application_keypath, send_char
 from harness.interface.error import TestError, Error
 import random
@@ -37,17 +38,18 @@ class Harness:
     def get_connection(self):
         return self.connection
 
-    def get_window_name(self):
-        return self.connection.get_window_name()
+    def get_application_name(self):
+        return self.connection.get_application_name()
 
     def unlock_phone(self):
         if self.connection.is_phone_locked():
             self.connection.send_key_code(key_codes["enter"])
             self.connection.send_key_code(key_codes["#"])
-            self.connection.send_key_code(3)
-            self.connection.send_key_code(3)
-            self.connection.send_key_code(3)
-            self.connection.send_key_code(3)
+            if self.connection.is_phone_locked():
+                self.connection.send_key_code(3)
+                self.connection.send_key_code(3)
+                self.connection.send_key_code(3)
+                self.connection.send_key_code(3)
             log.info("Phone unlocked")
         else:
             log.info("Phone already unlocked")
@@ -90,3 +92,18 @@ class Harness:
         })
         return ret
 
+    def turn_phone_off(self):
+        log.info("Turning phone off...")
+        app_desktop = "ApplicationDesktop"
+        end_loop_counter = 10
+
+        while not self.get_application_name() == app_desktop:
+            if not end_loop_counter > 0:
+                raise LookupError("Filed to switch to {}".format(app_desktop))
+            log.info("Not on the Application Desktop, fnRight.")
+            self.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
+            end_loop_counter -=  1
+
+        self.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
+        self.connection.send_key_code(key_codes["right"])
+        self.connection.send_key_code(key_codes["enter"])

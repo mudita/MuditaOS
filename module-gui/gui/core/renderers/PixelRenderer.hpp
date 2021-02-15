@@ -6,6 +6,8 @@
 #include "Color.hpp"
 #include "Common.hpp"
 
+#include <memory>
+
 namespace gui
 {
     class Context;
@@ -15,7 +17,12 @@ namespace gui::renderer
 {
     class PixelRenderer
     {
+
       public:
+        PixelRenderer() = delete;
+
         static void draw(Context *ctx, Point point, Color color);
+        static void updateColorScheme(const std::unique_ptr<ColorScheme> &scheme);
+        [[nodiscard]] static auto getColor(const uint8_t intensity) -> uint8_t;
     };
 } // namespace gui::renderer

@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /**
  * Project Untitled
  * @brief When the request primitive is passed to the TS 0710 layer of the transmitting device close down of the

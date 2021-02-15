@@ -6,14 +6,18 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BluetoothWorker.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BtstackWorker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/WorkerController.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/CommandHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/glucode/BluetoothRunLoop.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/BluetoothDriver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BtKeysStorage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/GAP/GAP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/A2DP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVRCP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/A2DP/AVDTP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HSP/HSP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/interface/profiles/HSP/SCO.cpp
-    )
+)
 
 message("Build with BlueKitchen")
 include(lib/btstack.cmake)
@@ -67,3 +71,7 @@ target_link_libraries(${PROJECT_NAME}
     service-audio
     ${BOARD_DIR_LIBRARIES}
     )
+
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif()

@@ -67,6 +67,7 @@ namespace gui
         {
             return onScreenPosition;
         }
+        [[nodiscard]] auto getAbsolutePosition() const -> unsigned int;
     };
 } // namespace gui
 
