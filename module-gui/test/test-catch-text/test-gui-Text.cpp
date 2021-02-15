@@ -82,6 +82,13 @@ namespace gui
             return mode;
         }
 
+        auto removeNCharacters(unsigned int n)
+        {
+            for (unsigned int i = 0; i < n; i++) {
+                removeChar();
+            }
+        }
+
         auto moveCursor(NavigationDirection direction, unsigned int n)
         {
             cursor->moveCursor(direction, n);
@@ -1097,6 +1104,102 @@ TEST_CASE("Text addition bounds - multiple limits tests")
 
         REQUIRE(text->linesSize() == 1);
         REQUIRE(text->getText().length() != signsLimit);
+    }
+}
+
+TEST_CASE("Text newline navigation and deletion tests")
+{
+    std::string testStringBlock1 = "Test String 1";
+    std::string testStringBlock2 = "Test String 2";
+    std::string emptyParagraph   = "<p></p>";
+
+    SECTION("Empty new block at start and delete from text end")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + testStringBlock1 + "</text>");
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1);
+
+        text->removeNCharacters(text->getText().length());
+
+        REQUIRE(text->linesSize() == 0);
+        REQUIRE(text->linesGet().empty());
+    }
+
+    SECTION("Empty new block at start and delete from text center")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + testStringBlock1 + emptyParagraph + testStringBlock2 + "</text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == testStringBlock2);
+
+        text->moveCursor(gui::NavigationDirection::LEFT, testStringBlock2.length());
+        text->removeNCharacters(1);
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + testStringBlock2);
+
+        text->removeNCharacters(testStringBlock1.length());
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock2);
+
+        text->removeNCharacters(1);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock2);
+
+        text->removeNCharacters(testStringBlock2.length());
+
+        REQUIRE(text->linesSize() == 0);
+        REQUIRE(text->linesGet().empty());
+    }
+
+    SECTION("Empty new block at start and delete from text beginning")
+    {
+        mockup::fontManager();
+        using namespace gui;
+        auto text = std::make_unique<gui::TestText>();
+        text->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
+        text->setMaximumSize(600, 200);
+
+        text->addRichText("<text>" + emptyParagraph + testStringBlock1 + emptyParagraph + testStringBlock2 + "</text>");
+
+        REQUIRE(text->linesSize() == 3);
+        REQUIRE((*text->lineGet(0)).getText(0) == "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(2)).getText(0) == testStringBlock2);
+
+        text->removeNCharacters(1);
+
+        REQUIRE(text->linesSize() == 2);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock1 + "\n");
+        REQUIRE((*text->lineGet(1)).getText(0) == testStringBlock2);
+
+        text->removeNCharacters(testStringBlock1.length() + 1);
+
+        REQUIRE(text->linesSize() == 1);
+        REQUIRE((*text->lineGet(0)).getText(0) == testStringBlock2);
+
+        text->removeNCharacters(testStringBlock2.length());
+
+        REQUIRE(text->linesSize() == 0);
+        REQUIRE(text->linesGet().empty());
     }
 }
 

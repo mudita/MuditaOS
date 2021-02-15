@@ -161,6 +161,7 @@ TESTS_LIST["catch2-gui-text"]="
     Text addition bounds - text widget size restricted;
     Text addition bounds - text widget line size restricted;
     Text addition bounds - multiple limits tests;
+    Text newline navigation and deletion tests;
     RichText newline and empty lines tests;
     TextBlock Ctor/Dtor ;
     Text block - set/update/get text;
