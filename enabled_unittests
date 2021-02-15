@@ -254,6 +254,15 @@ TESTS_LIST["catch2-utils-clipboard"]="
     Clipboard;
 "
 #---------
+TESTS_LIST["catch2-utils-conditional-invoke-tests"]="
+    Successful global function call;
+    Failed global function call;
+    Successful class static function call;
+    Failed class static function call;
+    Successful class member function call;
+    Failed class member function call;
+"
+#---------
 TESTS_LIST["catch2-utils-duration"]="
     Duration - creation;
     Duration - arithemtics;
