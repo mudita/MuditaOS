@@ -208,6 +208,11 @@ def send_keystoke(keypath, connection):
 last_char = '\0'
 
 
+def clear_last_char():
+    global last_char
+    last_char = '\0'
+
+
 def send_char(char: str, connection):
     global last_char
     key_type = Keytype.short_press
