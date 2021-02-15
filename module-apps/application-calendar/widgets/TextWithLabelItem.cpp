@@ -63,13 +63,10 @@ namespace gui
         };
 
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) { textInput->setText(event->title); };
-    }
 
-    bool TextWithLabelItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            vBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
-
 } /* namespace gui */

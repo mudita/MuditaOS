@@ -7,12 +7,5 @@
 
 namespace gui
 {
-    class ApnListItem : public ListItem
-    {
-      public:
-        std::function<void(std::shared_ptr<packet_data::APN::Config> apnRecord)> onSaveCallback = nullptr;
-        std::function<void(std::shared_ptr<packet_data::APN::Config> apnRecord)> onLoadCallback = nullptr;
-        std::function<bool()> onEmptyCallback                                                   = nullptr;
-    };
-
+    using ApnListItem = ListItemWithCallbacks<packet_data::APN::Config>;
 } /* namespace gui */

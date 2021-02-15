@@ -30,7 +30,6 @@ namespace gui
         virtual ~RepeatAndReminderItem() = default;
 
         void descriptionHandler();
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

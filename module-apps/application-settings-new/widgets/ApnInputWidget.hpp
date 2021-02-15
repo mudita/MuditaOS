@@ -31,7 +31,6 @@ namespace gui
         std::function<void()> checkTextContent = nullptr;
 
         void applyItemNameSpecificSettings();
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         void nameHandler();
         void apnHandler();
         void usernameHandler();

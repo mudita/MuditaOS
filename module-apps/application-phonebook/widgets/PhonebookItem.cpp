@@ -29,13 +29,11 @@ namespace gui
         contactName->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
         contactName->setMinimumHeight(phonebookStyle::contactItem::h);
         contactName->setMaximumWidth(phonebookStyle::contactItem::w);
-    }
 
-    bool PhonebookItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     // sets copy of alarm's

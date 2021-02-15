@@ -25,7 +25,6 @@ namespace gui
         explicit ColorTestListItem(app::Application *app, const Color color);
 
         bool onInput(const InputEvent &inputEvent) override;
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         [[nodiscard]] uint8_t getColorIntensity();
     };
 } /* namespace gui */

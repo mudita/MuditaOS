@@ -26,7 +26,6 @@ namespace gui
                                    unsigned int lines                                           = 1);
 
         ~InputLinesWithLabelIWidget() override = default;
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         VBox *vBox               = nullptr;
         Label *titleLabel        = nullptr;
         TextFixedSize *inputText = nullptr;

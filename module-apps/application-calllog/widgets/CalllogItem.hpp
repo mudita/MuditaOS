@@ -50,9 +50,6 @@ namespace gui
         {
             return call != nullptr ? *call : CalllogRecord();
         };
-
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

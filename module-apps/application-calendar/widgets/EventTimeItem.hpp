@@ -59,8 +59,6 @@ namespace gui
 
         void setConnectionToSecondItem(gui::EventTimeItem *item);
         void setConnectionToDateItem(gui::EventDateItem *item);
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

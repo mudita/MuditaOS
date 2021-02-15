@@ -66,15 +66,11 @@ namespace gui
         applyItemNameSpecificSettings();
 
         setEdges(gui::RectangleEdge::None);
-    }
 
-    auto InputBoxWithLabelAndIconWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-        -> bool
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void InputBoxWithLabelAndIconWidget::applyItemNameSpecificSettings()

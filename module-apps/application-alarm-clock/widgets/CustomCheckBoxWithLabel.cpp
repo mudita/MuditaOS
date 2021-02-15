@@ -80,6 +80,11 @@ namespace gui
             return false;
         };
         onContentChangedCallback = [&]() { return checkBox->isChecked(); };
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void CustomCheckBoxWithLabel::setCheckBoxes()
@@ -91,10 +96,4 @@ namespace gui
         }
     }
 
-    bool CustomCheckBoxWithLabel::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        return true;
-    }
 } // namespace gui

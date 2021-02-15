@@ -27,7 +27,6 @@ namespace gui
 
         // virtual methods from Item
         void setEvent(std::shared_ptr<EventsRecord> record);
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

@@ -75,14 +75,11 @@ namespace gui
         replyImage->setAlignment(Alignment(gui::Alignment::Vertical::Center));
         replyImage->setMargins(Margins(0, 0, 0, 0));
         replyImage->activeItem = false;
-    }
 
-    auto DesktopInputWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
-    {
-        body->setPosition(0, 0);
-        body->setSize(newDim.w, newDim.h);
-
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            body->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     auto DesktopInputWidget::handleRequestResize([[maybe_unused]] const Item *child,
