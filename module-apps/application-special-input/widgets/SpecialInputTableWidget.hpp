@@ -33,7 +33,6 @@ namespace gui
 
       public:
         SpecialInputTableWidget(app::Application *app, std::list<Carrier> &&carier);
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
     };
 
 } /* namespace gui */

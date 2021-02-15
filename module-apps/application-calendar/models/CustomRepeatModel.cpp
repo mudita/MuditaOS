@@ -66,7 +66,7 @@ std::vector<bool> CustomRepeatModel::getIsCheckedData()
 {
     std::vector<bool> isCheckedData;
     for (auto item : internalData) {
-        if (item->onContentChangeCallback && item->onContentChangeCallback()) {
+        if (item->onContentChangedCallback && item->onContentChangedCallback()) {
             isCheckedData.push_back(true);
         }
         else {

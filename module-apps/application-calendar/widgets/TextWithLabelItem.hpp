@@ -21,9 +21,6 @@ namespace gui
                           std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr,
                           std::function<void()> selectSpecialCharacter                 = nullptr);
         virtual ~TextWithLabelItem() override = default;
-
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

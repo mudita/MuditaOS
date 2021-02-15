@@ -30,9 +30,6 @@ namespace gui
 
         gui::Label *descriptionLabel = nullptr;
         gui::CheckBox *checkBox      = nullptr;
-
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

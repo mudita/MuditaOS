@@ -61,13 +61,12 @@ namespace gui
             }
             return true;
         };
-    }
 
-    auto SpecialInputTableWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
-    {
-        box->setPosition(0, 0);
-        box->setSize(specialCharacterTableWidget::window_grid_w, specialCharacterTableWidget::window_grid_h);
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            box->setArea(
+                {0, 0, specialCharacterTableWidget::window_grid_w, specialCharacterTableWidget::window_grid_h});
+            return true;
+        };
     }
 
     void SpecialInputTableWidget::decorateActionActivated(Item *it, const std::string &str)
