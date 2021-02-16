@@ -67,6 +67,7 @@ namespace gui
             simLock.sim       = passcodeData->getSim();
             simLock.lockType  = type;
         }
+        simLock.passcodeName = passcodeData->getPasscodeName();
         simLock.value = passcodeData->getAttempts();
     }
 

@@ -29,7 +29,8 @@ namespace gui
             Sim,
             Attempts,
             Mins,
-            CmeCode
+            CmeCode,
+            PinType
         };
 
         LockWindow(app::Application *app, std::string name) : AppWindow(app, std::move(name))

@@ -1396,10 +1396,28 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
         sendSimBlocked();
         break;
     }
-    case at::SimState::SimPin2:
-        [[fallthrough]];
-    case at::SimState::SimPuk2:
-        [[fallthrough]];
+    case at::SimState::SimPin2: {
+        SimCard simCard(*this);
+        if (auto pc = simCard.getAttemptsCounters(SimPinType::SimPin2); pc) {
+            if (pc.value().PukCounter != 0) {
+                requestPin(pc.value().PinCounter, message);
+                break;
+            }
+        }
+        sendSimBlocked();
+        break;
+    }
+    case at::SimState::SimPuk2: {
+        SimCard simCard(*this);
+        if (auto pc = simCard.getAttemptsCounters(SimPinType::SimPin2); pc) {
+            if (pc.value().PukCounter != 0) {
+                requestPuk(pc.value().PukCounter, message);
+                break;
+            }
+        }
+        sendSimBlocked();
+        break;
+    }
     case at::SimState::PhNetPin:
         [[fallthrough]];
     case at::SimState::PhNetPuk:
