@@ -5,6 +5,7 @@
 
 #include "Profile.hpp"
 #include <service-bluetooth/BluetoothMessage.hpp>
+#include <btstack_run_loop.h>
 
 namespace bluetooth
 {
@@ -29,11 +30,14 @@ namespace bluetooth
 
         void connect() override;
         void disconnect() override;
+        void start() override;
+        void stop() override;
 
       private:
         class HSPImpl;
         std::unique_ptr<HSPImpl> pimpl;
-        const sys::Service *ownerService;
+        const sys::Service *ownerService{};
+        btstack_run_loop *runLoopInstance{};
     };
 
 } // namespace Bt

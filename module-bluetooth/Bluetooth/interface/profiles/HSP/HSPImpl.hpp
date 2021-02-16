@@ -19,6 +19,8 @@ namespace bluetooth
         auto init() -> Error::Code;
         void start();
         void stop();
+        void connect();
+        void disconnect();
         void setDeviceAddress(bd_addr_t addr);
         void setOwnerService(const sys::Service *service);
         auto getStreamData() -> std::shared_ptr<BluetoothStreamData>;
@@ -35,5 +37,6 @@ namespace bluetooth
         static std::array<char, commandBufferLength> ATcommandBuffer;
         static bd_addr_t deviceAddr;
         static const sys::Service *ownerService;
+        static bool isConnected;
     };
 } // namespace Bt

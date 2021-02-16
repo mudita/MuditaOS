@@ -4,7 +4,7 @@
 #include "WorkerController.hpp"
 
 #include "Device.hpp"
-#include "interface/profiles/Profile.hpp"
+#include "interface/profiles/ProfileManager.hpp"
 
 #include <module-utils/log/log.hpp>
 #define BOOST_SML_CFG_DISABLE_MIN_SIZE // GCC10 fix

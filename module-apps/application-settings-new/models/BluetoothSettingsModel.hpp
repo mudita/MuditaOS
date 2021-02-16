@@ -21,10 +21,10 @@ class BluetoothSettingsModel
     void setDeviceName(const UTF8 &deviceName);
     void requestBondedDevices();
     void requestScan();
+    void requestAudioConnection(std::string addr);
     void stopScan();
     void requestDevicePairing(std::string addr);
     void responsePasskey(std::string passkey);
-    void setAddrForAudioProfiles(std::string addr);
 
   private:
     app::Application *application = nullptr;

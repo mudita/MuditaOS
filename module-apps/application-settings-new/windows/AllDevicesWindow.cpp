@@ -70,6 +70,8 @@ namespace gui
                 device.name,
                 [=](gui::Item & /*item*/) {
                     LOG_DEBUG("Device: %s", device.name.c_str());
+                    std::string addr{bd_addr_to_str(device.address)};
+                    bluetoothSettingsModel->requestAudioConnection(std::move(addr));
                     return true;
                 },
                 nullptr,

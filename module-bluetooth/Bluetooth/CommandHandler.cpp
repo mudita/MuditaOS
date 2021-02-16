@@ -29,9 +29,9 @@ namespace bluetooth
 
     CommandHandler::CommandHandler(sys::Service *service,
                                    std::shared_ptr<bluetooth::SettingsHolder> settings,
-                                   std::shared_ptr<bluetooth::Profile> currentProfile,
+                                   std::shared_ptr<bluetooth::ProfileManager> profileManager,
                                    std::shared_ptr<bluetooth::AbstractDriver> driver)
-        : service{service}, settings{std::move(settings)}, currentProfile{std::move(currentProfile)}, driver{std::move(
+        : service{service}, settings{std::move(settings)}, profileManager{std::move(profileManager)}, driver{std::move(
                                                                                                           driver)}
     {}
 
@@ -47,18 +47,26 @@ namespace bluetooth
         case bluetooth::Command::StartPan:
             return startPan();
         case bluetooth::Command::Pair:
-            return pair(command.getArgument().value());
+            return pair(command.getAddress());
         case bluetooth::Command::VisibilityOn:
             return setVisibility(true);
         case bluetooth::Command::VisibilityOff:
             return setVisibility(false);
         case bluetooth::Command::ConnectAudio:
-            return establishAudioConnection();
+            return establishAudioConnection(command.getAddress());
         case bluetooth::Command::DisconnectAudio:
             return disconnectAudioConnection();
         case bluetooth::Command::PowerOff:
             return Error::Success;
+        case bluetooth::Command::SwitchProfile:
+            return switchAudioProfile();
         case bluetooth::Command::None:
+            return Error::Success;
+        case Command::StartStream:
+            profileManager->start();
+            return Error::Success;
+        case Command::StopStream:
+            profileManager->stop();
             return Error::Success;
         }
         return Error::LibraryError;
@@ -102,38 +110,39 @@ namespace bluetooth
         return Error::Success;
     }
 
-    Error::Code CommandHandler::establishAudioConnection()
+    Error::Code CommandHandler::establishAudioConnection(uint8_t *addr)
     {
-        currentProfile->setOwnerService(service);
-        if (const auto status = currentProfile->init(); status != bluetooth::Error::Success) {
-            return status;
-        }
+        profileManager->init();
+        LOG_INFO("Connecting audio with %s", bd_addr_to_str(addr));
+        profileManager->connect(addr);
 
-        currentProfile->connect();
         return Error::Success;
     }
 
     Error::Code CommandHandler::disconnectAudioConnection()
     {
-        currentProfile->disconnect();
+        profileManager->disconnect();
         return Error::Success;
     }
-    Error::Code CommandHandler::pair(CommandArgument arg)
+    Error::Code CommandHandler::pair(bd_addr_t addr)
     {
-        try {
-            auto addrString = std::get<std::string>(arg);
-            bd_addr_t addr;
-            if (sscanf_bd_addr(addrString.c_str(), addr) != 0) {
-                LOG_INFO("Pairing with %s", addrString.c_str());
-                driver->pair(addr);
-            }
-            else {
-                return Error::SystemError;
-            }
+        LOG_INFO("Pairing with %s", bd_addr_to_str(addr));
+
+        return driver->pair(addr) ? Error::Success : Error::LibraryError;
+    }
+    Error::Code CommandHandler::switchAudioProfile()
+    {
+        static auto profile = AudioProfile::A2DP;
+        if (profile == AudioProfile::A2DP) {
+            profile = AudioProfile::HSP;
+            LOG_INFO("New profile: HSP");
         }
-        catch (const std::bad_variant_access &) {
-            return Error::SystemError;
+        else {
+            profile = AudioProfile::A2DP;
+            LOG_INFO("New profile: A2DP");
         }
+        profileManager->switchProfile(profile);
         return Error::Success;
     }
+
 } // namespace bluetooth

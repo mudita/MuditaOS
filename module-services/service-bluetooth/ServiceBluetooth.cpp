@@ -25,7 +25,7 @@
 #include <BtCommand.hpp>
 #include <BtKeysStorage.hpp>
 
-ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth)
+ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth, "", 4096)
 {
     auto settings  = std::make_unique<settings::Settings>(this);
     settingsHolder = std::make_shared<bluetooth::SettingsHolder>(std::move(settings));
@@ -93,8 +93,9 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
 
     connect(typeid(BluetoothPairMessage), [&](sys::Message *msg) {
         auto pairMsg = static_cast<BluetoothPairMessage *>(msg);
-        auto addr    = pairMsg->addr;
-
+        const auto addrString = pairMsg->addr;
+        bd_addr_t addr;
+        sscanf_bd_addr(addrString.c_str(), addr);
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::Pair, addr));
         return sys::MessageNone{};
     });
@@ -175,10 +176,17 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
             } break;
 
             case BluetoothMessage::Play:
-                sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::ConnectAudio));
+                sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::StartStream));
                 break;
-            case BluetoothMessage::StopPlayback:
+            case BluetoothMessage::SwitchProfile:
+                sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::SwitchProfile));
+
+                break;
+            case BluetoothMessage::Disconnect:
                 sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::DisconnectAudio));
+                break;
+            case BluetoothMessage::Stop:
+                sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::StopStream));
                 break;
 
             default:
@@ -188,13 +196,10 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg,
         }
         case MessageType::BluetoothAddrResult: {
             auto addrMsg = static_cast<BluetoothAddrMessage *>(msg);
-            worker->setDeviceAddress(addrMsg->addr);
-        } break;
-        case MessageType::BluetoothRequestStream: {
-            auto result =
-                std::make_shared<BluetoothRequestStreamResultMessage>(worker->currentProfile->getStreamData());
-            bus.sendUnicast(std::move(result), "ServiceAudio");
-            LOG_INFO("Queues sent after a request!");
+            std::string addrString{bd_addr_to_str(addrMsg->addr)};
+            LOG_INFO("Connecting with %s", addrString.c_str());
+            sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::ConnectAudio, addrMsg->addr));
+
         } break;
         default:
             break;
