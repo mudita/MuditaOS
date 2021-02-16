@@ -7,7 +7,7 @@
 #include "Label.hpp"
 #include "Rect.hpp"
 #include "TopBar/SIM.hpp"
-#include "TopBar/BatteryWidget.hpp"
+#include "TopBar/BatteryWidgetBase.hpp"
 #include <common_data/EventStore.hpp>
 
 #include <vector>
@@ -83,7 +83,7 @@ namespace gui::top_bar
         std::map<const Store::Battery::State, Image *> batteryChargings = {
             {Store::Battery::State::Charging, nullptr}, {Store::Battery::State::PluggedNotCharging, nullptr}};
         gui::SIM *sim = nullptr;
-        gui::BatteryWidget *batteryWidget = nullptr;
+        gui::BatteryWidgetBase *batteryWidget = nullptr;
         Configuration configuration;
         static TimeMode timeMode;
 
