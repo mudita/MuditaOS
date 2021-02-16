@@ -62,6 +62,14 @@ sys::ReturnCodes ServiceAudio::InitHandler()
         {dbPath(Setting::Volume, PlaybackType::TextMessageRingtone, Profile::Type::PlaybackLoudspeaker),
          defaultVolumeHigh},
 
+        {dbPath(Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackBluetoothA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
+
+        {dbPath(Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackBluetoothA2DP), defaultVolumeLow},
+        {dbPath(Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
+
         // ROUTING
         {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP), "20"},
         {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker), "3"},
@@ -84,12 +92,16 @@ sys::ReturnCodes ServiceAudio::InitHandler()
         {dbPath(Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle), defaultFalse},
         {dbPath(Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle), defaultTrue},
         {dbPath(Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle), defaultTrue},
+        {dbPath(Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle), defaultFalse},
+        {dbPath(Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle), defaultTrue},
 
         {dbPath(Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle), defaultTrue},
         {dbPath(Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle), defaultTrue},
         {dbPath(Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle), defaultTrue},
         {dbPath(Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle), defaultTrue},
         {dbPath(Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle), defaultTrue},
+        {dbPath(Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle), defaultTrue},
+        {dbPath(Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle), defaultTrue},
     };
 
     for (const auto &setting : settingsCache) {
