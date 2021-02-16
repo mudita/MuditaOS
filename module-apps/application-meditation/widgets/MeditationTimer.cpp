@@ -164,7 +164,7 @@ namespace gui
 
     void MeditationTimer::onInterval() const
     {
-        AudioServiceAPI::PlaybackStart(application, audio::PlaybackType::Multimedia, intervalSoundPath);
+        AudioServiceAPI::PlaybackStart(application, audio::PlaybackType::Meditation, intervalSoundPath);
     }
 
     void MeditationTimer::registerTimeoutCallback(const std::function<void()> &cb)

@@ -239,9 +239,11 @@ TEST_CASE("Test AudioMux")
         std::vector<AudioMux::Input> audioInputs;
         AudioMux aMux(audioInputs);
 
-        auto testPlaybackTypeLowPrio  = PlaybackType::Multimedia;
-        auto testPlaybackTypeMidPrio  = PlaybackType::Notifications;
+        auto testPlaybackTypeLowPrio  = PlaybackType::Alarm;
+        auto testPlaybackTypeMidPrio  = PlaybackType::Multimedia;
         auto testPlaybackTypeHighPrio = PlaybackType::CallRingtone;
+
+        auto mergableType = PlaybackType::Notifications;
 
         GIVEN("One Input")
         {
@@ -270,9 +272,8 @@ TEST_CASE("Test AudioMux")
             }
             WHEN("Should merge due to same mergable type active")
             {
-                tkId = insertAudio(
-                    audioInputs, Audio::State::Playback, testPlaybackTypeMidPrio, Operation::State::Idle, tokenIdx);
-                auto retInput = aMux.GetAvailableInput(testPlaybackTypeMidPrio);
+                tkId = insertAudio(audioInputs, Audio::State::Playback, mergableType, Operation::State::Idle, tokenIdx);
+                auto retInput = aMux.GetAvailableInput(mergableType);
                 REQUIRE(retInput == std::nullopt);
             }
         }
@@ -314,9 +315,8 @@ TEST_CASE("Test AudioMux")
             }
             WHEN("Should merge due to same mergable type active")
             {
-                insertAudio(
-                    audioInputs, Audio::State::Playback, testPlaybackTypeMidPrio, Operation::State::Idle, tokenIdx);
-                auto retInput = aMux.GetAvailableInput(testPlaybackTypeMidPrio);
+                insertAudio(audioInputs, Audio::State::Playback, mergableType, Operation::State::Idle, tokenIdx);
+                auto retInput = aMux.GetAvailableInput(mergableType);
                 REQUIRE(retInput == std::nullopt);
             }
             WHEN("Should merge due to same mergable type active even if Idle available")
