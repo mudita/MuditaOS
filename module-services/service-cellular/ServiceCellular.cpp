@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularUrcHandler.hpp"
@@ -90,7 +90,7 @@
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
-inline constexpr auto cellularStack = 24000UL;
+inline constexpr auto cellularStack = 25000UL;
 
 using namespace cellular;
 
