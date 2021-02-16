@@ -8,11 +8,15 @@
 #include "TopBar.hpp"
 #include <time/time_conversion.hpp>
 #include "Style.hpp"
-
+#include "TopBar/BatteryWidgetBar.hpp"
+#include "TopBar/BatteryWidgetText.hpp"
 #include "common_data/EventStore.hpp"
 
 namespace gui::top_bar
 {
+    constexpr auto batteryWidgetAsText = false;
+    using BatteryWidgetType = std::conditional<batteryWidgetAsText, BatteryWidgetText, BatteryWidgetBar>::type;
+
     namespace networkTechnology
     {
         constexpr uint32_t x = 80;
@@ -24,8 +28,8 @@ namespace gui::top_bar
     static constexpr uint32_t signalOffset  = 35;
     static constexpr uint32_t batteryOffset = 413;
 
-    TopBar::TimeMode TopBar::timeMode      = TimeMode::TIME_24H;
-    uint32_t TopBar::time                  = 0;
+    TopBar::TimeMode TopBar::timeMode = TimeMode::TIME_24H;
+    uint32_t TopBar::time             = 0;
 
     void Configuration::enable(Indicator indicator)
     {
@@ -84,7 +88,7 @@ namespace gui::top_bar
         signal[5] = new gui::Image(this, signalOffset, 17, 0, 0, "signal5");
         updateSignalStrength();
 
-        batteryWidget = new BatteryWidget(this, batteryOffset, 15);
+        batteryWidget = new BatteryWidgetType(this, batteryOffset, 15, 60, 24);
 
         const auto design_sim_offset = 376; // this offset is not final, but it is pixel Purefect
         sim                          = new SIM(this, design_sim_offset, 12);
@@ -229,8 +233,8 @@ namespace gui::top_bar
     void TopBar::setTime(uint32_t value, bool mode24H)
     {
         setTime(utils::time::Time());
-        timeMode   = (mode24H ? TimeMode::TIME_24H : TimeMode::TIME_12H);
-        time       = value;
+        timeMode = (mode24H ? TimeMode::TIME_24H : TimeMode::TIME_12H);
+        time     = value;
     }
 
     UTF8 TopBar::getTimeString()
@@ -256,4 +260,4 @@ namespace gui::top_bar
     {
         visitor.visit(*this);
     }
-} /* namespace gui */
+} // namespace gui::top_bar
