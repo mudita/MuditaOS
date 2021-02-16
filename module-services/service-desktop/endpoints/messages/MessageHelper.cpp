@@ -204,19 +204,17 @@ namespace parserFSM
                 [=](db::QueryResult *result, Context context) {
                     if (auto smsResult = dynamic_cast<db::query::SMSGetByThreadIDResult *>(result)) {
 
-                        auto paginationInfo = json11::Json::object{
-                            {json::messages::totalCount, 0},
-                            {json::messages::nextPage,
-                             json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}}};
-
                         json11::Json::array smsArray;
                         for (const auto &record : smsResult->getResults()) {
                             smsArray.emplace_back(MessageHelper::toJson(record));
                         }
 
-                        json11::Json::array responseBody;
-                        responseBody.emplace_back(paginationInfo);
-                        responseBody.emplace_back(json11::Json::array{{json::messages::entries, smsArray}});
+                        auto responseBody = json11::Json::object{
+                            {json::messages::totalCount, 0},
+                            {json::messages::nextPage,
+                             json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}},
+                            {json::messages::entries, smsArray},
+                        };
 
                         context.setResponseBody(responseBody);
                         MessageHandler::putToSendQueue(context.createSimpleResponse());
@@ -276,20 +274,19 @@ namespace parserFSM
                 [=](db::QueryResult *result, Context context) {
                     if (auto smsResult = dynamic_cast<db::query::SMSGetResult *>(result)) {
 
-                        auto paginationInfo = json11::Json::object{
-                            {json::messages::totalCount, 0},
-                            {json::messages::nextPage,
-                             json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}}};
-
                         json11::Json::array smsArray;
                         for (const auto &record : smsResult->getRecords()) {
                             smsArray.emplace_back(MessageHelper::toJson(record));
                             LOG_DEBUG("Record found!: %" PRIu32 "\n", record.ID);
                         }
 
-                        json11::Json::array responseBody;
-                        responseBody.emplace_back(paginationInfo);
-                        responseBody.emplace_back(json11::Json::array{{json::messages::entries, smsArray}});
+                        auto responseBody = json11::Json::object{
+                            {json::messages::totalCount, 0},
+                            {json::messages::nextPage,
+                             json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}},
+                            {json::messages::entries, smsArray},
+                        };
+
                         context.setResponseBody(responseBody);
                         MessageHandler::putToSendQueue(context.createSimpleResponse());
                         return true;
@@ -398,19 +395,17 @@ namespace parserFSM
                 [=](db::QueryResult *result, Context context) {
                     if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateGetResult *>(result)) {
 
-                        auto paginationInfo = json11::Json::object{
-                            {json::messages::totalCount, 0},
-                            {json::messages::nextPage,
-                             json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}}};
-
                         json11::Json::array smsTemplateArray;
                         for (const auto &record : smsTemplateResult->getResults()) {
                             smsTemplateArray.emplace_back(toJson(record));
                         }
 
-                        json11::Json::array responseBody;
-                        responseBody.emplace_back(paginationInfo);
-                        responseBody.emplace_back(json11::Json::array{{json::messages::entries, smsTemplateArray}});
+                        auto responseBody = json11::Json::object{
+                            {json::messages::totalCount, 0},
+                            {json::messages::nextPage,
+                             json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}},
+                            {json::messages::entries, smsTemplateArray},
+                        };
 
                         context.setResponseBody(responseBody);
                         MessageHandler::putToSendQueue(context.createSimpleResponse());
@@ -545,19 +540,17 @@ namespace parserFSM
             [=](db::QueryResult *result, Context context) {
                 if (auto threadsResults = dynamic_cast<db::query::ThreadsGetResults *>(result)) {
 
-                    auto paginationInfo = json11::Json::object{
-                        {json::messages::totalCount, 0},
-                        {json::messages::nextPage,
-                         json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}}};
-
                     json11::Json::array threadsArray;
                     for (const auto &record : threadsResults->getResults()) {
                         threadsArray.emplace_back(MessageHelper::toJson(record));
                     }
 
-                    json11::Json::array responseBody;
-                    responseBody.emplace_back(paginationInfo);
-                    responseBody.emplace_back(json11::Json::array{{json::messages::entries, threadsArray}});
+                    auto responseBody = json11::Json::object{
+                        {json::messages::totalCount, 0},
+                        {json::messages::nextPage,
+                         json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}},
+                        {json::messages::entries, threadsArray},
+                    };
 
                     context.setResponseBody(responseBody);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());

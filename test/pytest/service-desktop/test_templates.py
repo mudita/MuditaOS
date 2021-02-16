@@ -27,7 +27,7 @@ def test_templates(harness):
     body = {"category": "template", "limit": count}
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
-    assert len(ret["body"][1][1]) == count
+    assert len(ret["body"]["entries"]) == count
 
     # getting a number of templates
     number_of_requested_templates = 3
@@ -35,7 +35,7 @@ def test_templates(harness):
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
 
-    templates = ret["body"][1][1]  # getting entries
+    templates = ret["body"]["entries"]  # getting entries
     templates_count = len(templates)
     assert templates_count == number_of_requested_templates
 
@@ -61,7 +61,7 @@ def test_templates(harness):
     assert ret["status"] == status["OK"]
 
     templateid = 0
-    for template in ret["body"][1][1]:
+    for template in ret["body"]["entries"]:
         if template["templateBody"] == "test template":
             templateid = template["templateID"]
             break

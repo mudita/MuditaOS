@@ -17,7 +17,7 @@ def test_threads(harness):
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
 
-    threads = ret["body"][1][1]  # getting entries
+    threads = ret["body"]["entries"]  # getting entries
     threads_count = len(threads)
     assert threads_count == number_of_requested_threads
 
