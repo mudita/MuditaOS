@@ -228,7 +228,7 @@
   "app_desktop_info_mmi_result_success": "Success",
   "app_desktop_info_mmi_result_failed": "Failed",
   "app_desktop_header_sim_setup": "<text><token>$SIM</token> setup</text>",
-  "app_desktop_sim_enter_pin_unlock": "Type current PIN code:",
+  "app_desktop_sim_enter_pin_unlock": "<text>Type current <token>$PINTYPE</token> code:</text>",
   "app_desktop_sim_enter_new_pin": "Enter new PIN code:",
   "app_desktop_sim_confirm_new_pin": "Confirm new PIN code:",
   "app_desktop_sim_setup_wrong_pin_last_attempt": "<text>Wrong PIN code. You have<br></br>1 attempt left.</text>",

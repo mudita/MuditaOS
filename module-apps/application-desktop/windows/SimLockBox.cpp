@@ -49,7 +49,11 @@ namespace gui
         LockWindow->pinLabelsBox->setVisible(true);
         switch (type) {
         case PinLockBox::EnterPasscodeType::ProvidePasscode: {
-            LockWindow->setText("app_desktop_sim_enter_pin_unlock", PinLockBaseWindow::TextType::Primary, true);
+            LockWindow->setText(
+                "app_desktop_sim_enter_pin_unlock",
+                PinLockBaseWindow::TextType::Primary,
+                true,
+                {{LockWindow->getToken(PinLockBaseWindow::Token::PinType), LockWindow->lock->getPasscodeName()}});
             break;
         }
         case PinLockBox::EnterPasscodeType::ProvideNewPasscode:
