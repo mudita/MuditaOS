@@ -98,12 +98,11 @@ class BluetoothWorker : private sys::Worker
     auto handleBtStackTrigger(QueueHandle_t queue) -> bool;
 
     bool run() override;
-    void setDeviceAddress(bd_addr_t addr);
     auto deinit() -> bool override;
 
     /// bluetooth stack id in use
     unsigned long active_features;
-    std::shared_ptr<bluetooth::Profile> currentProfile;
+    std::shared_ptr<bluetooth::ProfileManager> profileManager;
     std::shared_ptr<bluetooth::SettingsHolder> settings;
     std::vector<Devicei> pairedDevices;
     std::unique_ptr<bluetooth::RunLoop> runLoop;

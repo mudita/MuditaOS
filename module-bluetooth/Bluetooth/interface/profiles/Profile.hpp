@@ -18,6 +18,8 @@ namespace bluetooth
         virtual void setOwnerService(const sys::Service *service)            = 0;
         virtual auto getStreamData() -> std::shared_ptr<BluetoothStreamData> = 0;
         virtual void connect()                                               = 0;
+        virtual void start()                                                 = 0;
+        virtual void stop()                                                  = 0;
         virtual void disconnect()                                            = 0;
     };
 

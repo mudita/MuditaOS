@@ -71,12 +71,12 @@ namespace
     auto createStatefulController(sys::Service *service,
                                   bluetooth::RunLoop *loop,
                                   std::shared_ptr<bluetooth::SettingsHolder> settings,
-                                  std::shared_ptr<bluetooth::Profile> currentProfile,
+                                  std::shared_ptr<bluetooth::ProfileManager> profileManager,
                                   DeviceRegistration::OnLinkKeyAddedCallback &&onLinkKeyAddedCallback)
     {
         auto driver = std::make_shared<bluetooth::Driver>(loop->getRunLoopInstance(), service);
         auto commandHandler =
-            std::make_unique<bluetooth::CommandHandler>(service, settings, std::move(currentProfile), driver);
+            std::make_unique<bluetooth::CommandHandler>(service, settings, std::move(profileManager), driver);
         return std::make_unique<bluetooth::StatefulController>(
             std::move(driver),
             std::move(commandHandler),
@@ -85,11 +85,11 @@ namespace
 } // namespace
 
 BluetoothWorker::BluetoothWorker(sys::Service *service)
-    : Worker(service), service(service), currentProfile(std::make_shared<bluetooth::HSP>()),
+    : Worker(service), service(service), profileManager(std::make_shared<bluetooth::ProfileManager>(service)),
       settings(static_cast<ServiceBluetooth *>(service)->settingsHolder),
       runLoop(std::make_unique<bluetooth::RunLoop>()),
       controller{createStatefulController(
-          service, runLoop.get(), settings, currentProfile, [this](const std::string &addr) { onLinkKeyAdded(addr); })}
+          service, runLoop.get(), settings, profileManager, [this](const std::string &addr) { onLinkKeyAdded(addr); })}
 {
     init({
         {queues::io, sizeof(bluetooth::Message), queues::queueLength},
@@ -245,11 +245,6 @@ auto BluetoothWorker::handleMessage(uint32_t queueID) -> bool
     }
 
     return true;
-}
-
-void BluetoothWorker::setDeviceAddress(bd_addr_t addr)
-{
-    currentProfile->setDeviceAddress(addr);
 }
 
 auto BluetoothWorker::deinit() -> bool

@@ -12,6 +12,7 @@
 #include <service-audio/ServiceAudio.hpp>
 #include <module-bluetooth/Bluetooth/CommandHandler.hpp>
 #include "BluetoothMessage.hpp"
+#include "ProfileManager.hpp"
 
 #include <memory> // for unique_ptr
 
@@ -35,6 +36,7 @@ class ServiceBluetooth : public sys::Service
     void sendWorkerCommand(bluetooth::Command command);
     QueueHandle_t workerQueue = nullptr;
     std::shared_ptr<bluetooth::SettingsHolder> settingsHolder;
+    bluetooth::ProfileManager *profileManagerPtr = nullptr;
     void scanStartedCallback();
     void scanStoppedCallback();
 

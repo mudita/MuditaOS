@@ -68,9 +68,12 @@ namespace bluetooth
         static void sendMediaPacket();
         static auto fillSbcAudioBuffer(MediaContext *context) -> int;
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
+        static bool isConnected;
 
       public:
         auto init() -> Error::Code;
+        void connect();
+        void disconnect();
         void start();
         void stop();
         void setDeviceAddress(bd_addr_t addr);

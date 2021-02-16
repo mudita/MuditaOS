@@ -29,6 +29,8 @@ namespace bluetooth
 
         void connect() override;
         void disconnect() override;
+        void start() override;
+        void stop() override;
 
       private:
         class A2DPImpl;

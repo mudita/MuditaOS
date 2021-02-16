@@ -57,11 +57,6 @@ void BluetoothSettingsModel::stopScan()
                                  service::name::bluetooth);
 }
 
-void BluetoothSettingsModel::setAddrForAudioProfiles(std::string addr)
-{
-    application->bus.sendUnicast(std::make_shared<BluetoothAddrMessage>(std::move(addr)), service::name::bluetooth);
-}
-
 void BluetoothSettingsModel::requestDevicePairing(std::string addr)
 {
     application->bus.sendUnicast(std::make_shared<BluetoothPairMessage>(std::move(addr)), service::name::bluetooth);
@@ -71,4 +66,8 @@ void BluetoothSettingsModel::responsePasskey(std::string passkey)
 {
     application->bus.sendUnicast(std::make_shared<message::bluetooth::ResponsePasskey>(std::move(passkey)),
                                  service::name::bluetooth);
+}
+void BluetoothSettingsModel::requestAudioConnection(std::string addr)
+{
+    application->bus.sendUnicast(std::make_shared<BluetoothAddrMessage>(std::move(addr)), service::name::bluetooth);
 }
