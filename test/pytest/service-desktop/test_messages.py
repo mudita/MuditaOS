@@ -21,7 +21,7 @@ def test_messages(harness):
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
 
-    messages = ret["body"][1][1]  # getting entries
+    messages = ret["body"]["entries"]  # getting entries
     messages_count = len(messages)
     assert messages_count == count
 
@@ -31,7 +31,7 @@ def test_messages(harness):
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
 
-    messages = ret["body"][1][1]  # getting entries
+    messages = ret["body"]["entries"]  # getting entries
     messages_count = len(messages)
     assert messages_count == number_of_requested_messages
 
@@ -41,7 +41,7 @@ def test_messages(harness):
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
 
-    for message in ret["body"][1][1]:
+    for message in ret["body"]["entries"]:
         assert message["threadID"] == thread_id
 
     # remove message
