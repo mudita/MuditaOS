@@ -8,6 +8,7 @@
 #include <log/log.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-audio/AudioMessage.hpp>
+#include <BluetoothWorker.hpp>
 
 extern "C"
 {
@@ -57,10 +58,20 @@ namespace bluetooth
 
     void HSP::connect()
     {
-        pimpl->start();
+        pimpl->connect();
     }
 
     void HSP::disconnect()
+    {
+        pimpl->disconnect();
+    }
+
+    void HSP::start()
+    {
+        pimpl->start();
+    }
+
+    void HSP::stop()
     {
         pimpl->stop();
     }
@@ -74,6 +85,7 @@ namespace bluetooth
     std::unique_ptr<SCO> HSP::HSPImpl::sco;
     const sys::Service *HSP::HSPImpl::ownerService;
     std::string HSP::HSPImpl::agServiceName = "PurePhone HSP";
+    bool HSP::HSPImpl::isConnected          = false;
 
     void HSP::HSPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
     {
@@ -126,8 +138,7 @@ namespace bluetooth
                 break;
             }
             LOG_DEBUG("RFCOMM connection established.\n");
-            LOG_DEBUG("Establish Audio connection to %s...\n", bd_addr_to_str(deviceAddr));
-            hsp_ag_establish_audio_connection();
+            isConnected = true;
             break;
         case HSP_SUBEVENT_RFCOMM_DISCONNECTION_COMPLETE:
             if (hsp_subevent_rfcomm_disconnection_complete_get_status(event) != 0u) {
@@ -148,13 +159,14 @@ namespace bluetooth
                 scoHandle = hsp_subevent_audio_connection_complete_get_handle(event);
                 LOG_DEBUG("Audio connection established with SCO handle 0x%04x.\n", scoHandle);
                 hci_request_sco_can_send_now_event();
-                btstack_run_loop_freertos_trigger();
+                RunLoop::trigger();
             }
             break;
         case HSP_SUBEVENT_AUDIO_DISCONNECTION_COMPLETE:
             LOG_DEBUG("Audio connection released.\n\n");
             sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
             scoHandle = HCI_CON_HANDLE_INVALID;
+            isConnected = false;
             break;
         case HSP_SUBEVENT_MICROPHONE_GAIN_CHANGED:
             LOG_DEBUG("Received microphone gain change %d\n", hsp_subevent_microphone_gain_changed_get_gain(event));
@@ -199,7 +211,6 @@ namespace bluetooth
         // register for SCO packets
         hci_register_sco_packet_handler(&packetHandler);
 
-        gap_set_local_name("PurePhone");
         gap_discoverable_control(1);
         gap_set_class_of_device(CLASS_OF_DEVICE);
 
@@ -208,14 +219,15 @@ namespace bluetooth
         return bluetooth::Error::Success;
     }
 
-    void HSP::HSPImpl::start()
+    void HSP::HSPImpl::connect()
     {
-        hsp_ag_connect(deviceAddr);
+        if (!isConnected) {
+            hsp_ag_connect(deviceAddr);
+        }
     }
 
-    void HSP::HSPImpl::stop()
+    void HSP::HSPImpl::disconnect()
     {
-        hsp_ag_release_audio_connection();
         hsp_ag_disconnect();
     }
 
@@ -233,6 +245,18 @@ namespace bluetooth
     auto HSP::HSPImpl::getStreamData() -> std::shared_ptr<BluetoothStreamData>
     {
         return sco->getStreamData();
+    }
+    void HSP::HSPImpl::start()
+    {
+        if (!isConnected) {
+            connect();
+        }
+        LOG_DEBUG("Establish Audio connection to %s...\n", bd_addr_to_str(deviceAddr));
+        hsp_ag_establish_audio_connection();
+    }
+    void HSP::HSPImpl::stop()
+    {
+        hsp_ag_release_audio_connection();
     }
 
 } // namespace Bt

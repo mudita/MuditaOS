@@ -72,7 +72,8 @@ namespace bluetooth
     {
         if (type != nullptr && bd_addr != nullptr) {
             LOG_INFO("getting key for address %s from API", bd_addr_to_str(bd_addr));
-            if (keys.size() == 0) {
+            if (keys.empty()) {
+                LOG_ERROR("Keys empty!");
                 return 0;
             }
             for (auto key : keys) {
@@ -81,11 +82,13 @@ namespace bluetooth
 
                 if (bd_addr_cmp(addr, bd_addr) == 0) {
                     auto foundLinkKey = key[strings::link_key].string_value().c_str();
-                    memcpy(link_key, foundLinkKey, sizeof(link_key_t));
+                    memcpy(link_key, reinterpret_cast<const uint8_t *>(foundLinkKey), sizeof(link_key_t));
+                    LOG_INFO("Getting key: %s", foundLinkKey);
                     *type = static_cast<link_key_type_t>(key[strings::type].int_value());
 
                     return 1;
                 }
+                LOG_ERROR("Can't find key for this address!");
             }
         }
         return 0;

@@ -77,10 +77,20 @@ namespace bluetooth
 
     void A2DP::connect()
     {
-        pimpl->start();
+        pimpl->connect();
     }
 
     void A2DP::disconnect()
+    {
+        pimpl->disconnect();
+    }
+
+    void A2DP::start()
+    {
+        pimpl->start();
+    }
+
+    void A2DP::stop()
     {
         pimpl->stop();
     }
@@ -98,6 +108,7 @@ namespace bluetooth
         2,
         53};
 
+    bool A2DP::A2DPImpl::isConnected = false;
     /* LISTING_START(MainConfiguration): Setup Audio Source and AVRCP Target services */
 
     auto A2DP::A2DPImpl::init() -> Error::Code
@@ -155,8 +166,6 @@ namespace bluetooth
         // Set local name with a template Bluetooth address, that will be automatically
         // replaced with a actual address once it is available, i.e. when BTstack boots
         // up and starts talking to a Bluetooth module.
-        gap_set_local_name("PurePhone");
-        gap_discoverable_control(1);
         gap_set_class_of_device(0x200408);
 
         // Register for HCI events.
@@ -330,6 +339,7 @@ namespace bluetooth
                      bd_addr_to_str(address),
                      AVRCP::mediaTracker.a2dp_cid,
                      AVRCP::mediaTracker.local_seid);
+            isConnected = true;
             break;
 
         case A2DP_SUBEVENT_SIGNALING_MEDIA_CODEC_SBC_CONFIGURATION: {
@@ -458,8 +468,6 @@ namespace bluetooth
                 LOG_ERROR("failed to create queue!");
             }
 
-            AVRCP::mediaTracker.stream_opened = 1;
-            a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
             break;
 
         case A2DP_SUBEVENT_STREAM_RECONFIGURED:
@@ -553,24 +561,26 @@ namespace bluetooth
                 AVRCP::mediaTracker.a2dp_cid  = 0;
                 LOG_INFO("A2DP Source: Signaling released.\n\n");
             }
+            isConnected = false;
             break;
         default:
             break;
         }
     }
 
-    void A2DP::A2DPImpl::start()
+    void A2DP::A2DPImpl::connect()
     {
-        LOG_INFO("Starting playback to %s", bd_addr_to_str(deviceAddr));
-        a2dp_source_establish_stream(deviceAddr, &AVRCP::mediaTracker.a2dp_cid);
+        if (!isConnected) {
+            LOG_INFO("Starting playback to %s", bd_addr_to_str(deviceAddr));
+            a2dp_source_establish_stream(deviceAddr, &AVRCP::mediaTracker.a2dp_cid);
+        }
     }
 
-    void A2DP::A2DPImpl::stop()
+    void A2DP::A2DPImpl::disconnect()
     {
         LOG_INFO("Stopping playback");
         a2dp_source_disconnect(AVRCP::mediaTracker.a2dp_cid);
-        l2cap_unregister_service(1);
-    };
+    }
 
     void A2DP::A2DPImpl::setDeviceAddress(bd_addr_t addr)
     {
@@ -594,6 +604,19 @@ namespace bluetooth
         auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
         auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
         busProxy.sendUnicast(std::move(msg), service::name::evt_manager);
+    }
+    void A2DP::A2DPImpl::start()
+    {
+        if (!isConnected) {
+            connect();
+        }
+        AVRCP::mediaTracker.stream_opened = 1;
+        a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
+    }
+    void A2DP::A2DPImpl::stop()
+    {
+        AVRCP::mediaTracker.stream_opened = 1;
+        a2dp_source_pause_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
     }
 
 } // namespace Bt

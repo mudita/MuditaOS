@@ -30,7 +30,6 @@ namespace bluetooth
         static auto removeDataSource(btstack_data_source_t *ds) -> bool;
         static void triggerExit();
         static auto getTimeMs() -> TickType_t;
-        static void trigger();
         static void executeCodeOnMainThread(void (*fn)(void *arg), void *arg);
         static void addTimer(btstack_timer_source_t *ts);
         static void setTimer(btstack_timer_source_t *ts, uint32_t timeout_in_ms);
@@ -46,6 +45,7 @@ namespace bluetooth
         btstack_run_loop runLoop;
 
       public:
+        static void trigger();
         auto process() -> bool;
         static void deinit();
         void setTriggerQueue(QueueHandle_t queue);
