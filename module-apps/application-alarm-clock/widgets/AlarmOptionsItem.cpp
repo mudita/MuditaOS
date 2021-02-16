@@ -188,7 +188,7 @@ namespace gui
                 if (musicStatus == MusicStatus::Stop) {
                     musicStatus = MusicStatus::Play;
                     AudioServiceAPI::PlaybackStart(
-                        application, audio::PlaybackType::Multimedia, songsList[actualVectorIndex].filePath);
+                        application, audio::PlaybackType::Alarm, songsList[actualVectorIndex].filePath);
                 }
                 else if (musicStatus == MusicStatus::Play) {
                     musicStatus = MusicStatus::Stop;

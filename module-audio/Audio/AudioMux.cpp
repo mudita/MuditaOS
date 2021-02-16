@@ -9,11 +9,13 @@ namespace audio
     namespace
     {
         const std::map<PlaybackType, uint8_t> PlaybackTypePriority = {
+            {PlaybackType::Meditation, 1},
             {PlaybackType::CallRingtone, 2},
-            {PlaybackType::TextMessageRingtone, 3},
-            {PlaybackType::Notifications, 3},
-            {PlaybackType::Multimedia, 4},
-            {PlaybackType::KeypadSound, 5},
+            {PlaybackType::Multimedia, 3},
+            {PlaybackType::Alarm, 4},
+            {PlaybackType::TextMessageRingtone, 5},
+            {PlaybackType::Notifications, 5},
+            {PlaybackType::KeypadSound, 6},
             {PlaybackType::None, static_cast<uint8_t>(PlaybackType::Last)},
         };
     } // namespace
@@ -159,6 +161,24 @@ namespace audio
 
     constexpr bool AudioMux::IsMergable(const audio::PlaybackType &type) const
     {
-        return !(type == audio::PlaybackType::Multimedia);
+        switch (type) {
+        case PlaybackType::None:
+            [[fallthrough]];
+        case PlaybackType::Notifications:
+            [[fallthrough]];
+        case PlaybackType::KeypadSound:
+            [[fallthrough]];
+        case PlaybackType::TextMessageRingtone:
+            return true;
+        case PlaybackType::CallRingtone:
+            [[fallthrough]];
+        case PlaybackType::Meditation:
+            [[fallthrough]];
+        case PlaybackType::Alarm:
+            [[fallthrough]];
+        case PlaybackType::Multimedia:
+            return false;
+        }
+        return false;
     }
 } // namespace audio
