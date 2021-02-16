@@ -24,7 +24,8 @@ class SimCard
      * return SIMFailure which could mean 0 attempts (happen if lock during session, on modem/sim reboot again return
      * 0,0);
      */
-    std::optional<at::response::qpinc::AttemptsCounters> getAttemptsCounters() const;
+    std::optional<at::response::qpinc::AttemptsCounters> getAttemptsCounters(
+        const std::string &type = SimPinType::SimPin) const;
 
     /** Supply pin for modem
      * \param pin digits as a string from 4-8 digits

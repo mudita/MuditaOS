@@ -2,7 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-
+class SimPinType
+{
+  public:
+    static constexpr auto SimPin  = "SC";
+    static constexpr auto SimPin2 = "P2";
+};
 enum class SimCardResult
 {
     OK     = 0,
