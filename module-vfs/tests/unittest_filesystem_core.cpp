@@ -272,7 +272,7 @@ TEST_CASE("Corefs: Directory operations")
     }
 }
 
-TEST_CASE("Read only filesystem")
+TEST_CASE("Corefs: Read only filesystem")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
@@ -309,7 +309,7 @@ TEST_CASE("Read only filesystem")
     REQUIRE(fscore.umount("/sys") == 0);
 }
 
-TEST_CASE("Remount filesystem from RO to RW and to RO")
+TEST_CASE("Corefs: Remount filesystem from RO to RW and to RO")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
@@ -345,7 +345,7 @@ TEST_CASE("Remount filesystem from RO to RW and to RO")
     REQUIRE(fscore->umount("/sys") == 0);
 }
 
-TEST_CASE("Autodetect filesystems")
+TEST_CASE("Corefs: Autodetect filesystems")
 {
     using namespace purefs;
     auto dm   = std::make_shared<blkdev::disk_manager>();
@@ -361,7 +361,7 @@ TEST_CASE("Autodetect filesystems")
     REQUIRE(fscore->umount("/sys") == 0);
 }
 
-TEST_CASE("Unititest integrated subsystem")
+TEST_CASE("Corefs: Unittest integrated subsystem")
 {
     auto [disk, vfs] = purefs::subsystem::initialize();
     REQUIRE(purefs::subsystem::mount_defaults() == 0);
