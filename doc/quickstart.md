@@ -13,6 +13,16 @@ You can quickstart the project by going through one of the following guides:
 
 ## Introduction
 
+Before running the scripts add yourself to a `docker` group:
+
+```bash
+NAME=$(whoami)
+sudo usermod -aG docker ${NAME}
+```
+
+After that you have to log out and log back in as groups are set during the login process. To make sure you are in docker group enter the `groups` command and 
+you will see the list of groups your user is assigned to.
+
 Run the provisioning script `./config/bootstrap.sh` to install all dependencies. The script is written for Ubuntu and tested on 20.04.
 
 To run the script execute the following command: `cd config && ./bootstrap.sh 0-`
