@@ -23,6 +23,8 @@ namespace app::manager
         enum Action : ActionId
         {
             Home,
+            AutoLock,
+            HomeUnlocked,
             Launch,
             CloseSystem,
             Call,

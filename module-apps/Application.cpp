@@ -506,7 +506,6 @@ namespace app
     sys::ReturnCodes Application::DeinitHandler()
     {
         LOG_INFO("Closing an application: %s", GetName().c_str());
-
         for (const auto &[windowName, window] : windowsStack) {
             LOG_INFO("Closing a window: %s", windowName.c_str());
             window->onClose();
@@ -643,7 +642,6 @@ namespace app
     void Application::pushWindow(const std::string &newWindow)
     {
         // handle if window was already on
-        LOG_DEBUG("App: %s window %s request", GetName().c_str(), newWindow.c_str());
         if (popToWindow(newWindow)) {
             return;
         }

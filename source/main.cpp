@@ -122,7 +122,7 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, false));
 #endif
 #ifdef ENABLE_APP_CALL
-            applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call, false));
+            applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call, false, true));
 #endif
 #ifdef ENABLE_APP_SETTINGS
             applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));
@@ -155,7 +155,7 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationMusicPlayer>(app::name_music_player));
 #endif
 #ifdef ENABLE_APP_MEDITATION
-            applications.push_back(app::CreateLauncher<app::ApplicationMeditation>(app::name_meditation));
+            applications.push_back(app::CreateLauncher<app::ApplicationMeditation>(app::name_meditation, true, true));
 #endif
 #ifdef ENABLE_APP_CALCULATOR
             applications.push_back(app::CreateLauncher<app::ApplicationCalculator>(app::name_calculator));

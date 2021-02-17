@@ -9,6 +9,7 @@
 
 #include <module-utils/common_data/EventStore.hpp>
 #include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
+#include <service-appmgr/service-appmgr/Controller.hpp>
 #include <service-cellular/CellularMessage.hpp>
 
 namespace gui
@@ -147,6 +148,7 @@ namespace gui
         else if (lock->isState(gui::PinLock::LockState::Unlocked)) {
             setSimLockHandled();
             app->switchWindow(app::window::name::desktop_main_window);
+            app::manager::Controller::sendAction(app, app::manager::actions::HomeUnlocked);
             return;
         }
         else {

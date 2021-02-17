@@ -117,6 +117,7 @@ namespace app::manager
         void registerMessageHandlers();
         auto handleAction(ActionRequest *actionMsg) -> bool;
         auto handleHomeAction() -> bool;
+        auto handleHomeUnlockedAction() -> bool;
         auto handleLaunchAction(ApplicationLaunchData *launchParams) -> bool;
         auto handleCloseSystem() -> bool;
         auto handleCustomAction(actions::ActionId action, actions::ActionParamsPtr &&actionParams) -> bool;
@@ -145,13 +146,21 @@ namespace app::manager
         void onApplicationInitFailure(ApplicationHandle &app);
         auto onSwitchConfirmed(ApplicationHandle &app) -> bool;
         auto onCloseConfirmed(ApplicationHandle &app) -> bool;
+        /// @brief method is called on auto-locking timer tick event (blockTimer)
+        /// @detailed It sends AutoLock action to ApplicationDesktop to lock the screen.
+        /// @note AutoLock action is sent only if following conditions are met:
+        ///  - tethering is off
+        ///  - focused application is not prevent blocking
         void onPhoneLocked();
 
         ApplicationName rootApplicationName;
-        std::unique_ptr<sys::Timer> blockingTimer; //< timer to count time from last user's activity. If it reaches time
-                                                   // defined in settings database application
-                                                   // manager is sending signal to power manager and changing window to
-                                                   // the desktop window in the blocked state.
+        bool autoLockEnabled = false; ///< flag which indicates whether blockingTimer should be armed.
+                                      /// @note: Value depends on database settings "gs_lock_time". If "gs_lock_time" is
+                                      /// set to less than 1000 ms, it will be false, otherwise true.
+        std::unique_ptr<sys::Timer> blockingTimer; //< auto-lock timer to count time from last user's activity.
+                                                   // If it reaches time defined in settings database application
+                                                   // manager is sending signal to Application Desktop in order to
+                                                   // lock screen.
         std::unique_ptr<sys::Timer> shutdownDelay;
         // Temporary solution - to be replaced with ActionsMiddleware.
         std::tuple<ApplicationName, actions::ActionId, actions::ActionParamsPtr> pendingAction;

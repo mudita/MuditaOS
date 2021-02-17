@@ -51,6 +51,7 @@ namespace parserFSM
         inline constexpr auto focus                  = "focus";
         inline constexpr auto isLocked               = "isLocked";
         inline constexpr auto changeSim              = "changeSim";
+        inline constexpr auto changeAutoLockTimeout  = "changeAutoLockTimeout";
         inline constexpr auto smsCommand             = "smsCommand";
         inline constexpr auto changeCellularStateCmd = "changeCellularStateCmd";
         inline constexpr auto getInfo                = "getInfo";
