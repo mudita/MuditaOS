@@ -11,6 +11,7 @@
 #include <bsp/common.hpp>
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/keyboard/key_codes.hpp>
+#include <Service/CpuSentinel.hpp>
 
 #include <cstdint>
 #include <list>
@@ -52,6 +53,8 @@ class WorkerEvent : public sys::Worker
      * @note It sends message to service if event is processed successfully.
      */
     void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code);
+
+    void updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
     /**
      * @brief list of keys with long press enabled. First item is key code, second is long press time.
      */
@@ -60,6 +63,7 @@ class WorkerEvent : public sys::Worker
     bsp::KeyEvents lastState  = bsp::KeyEvents::Released;
     bsp::KeyCodes lastPressed = static_cast<bsp::KeyCodes>(0);
     sys::Service *service     = nullptr;
+    std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
   public:
     WorkerEvent(sys::Service *service) : sys::Worker(service), service(service){};
