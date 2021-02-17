@@ -60,4 +60,9 @@ namespace bsp::eink_frontlight
         gammaFactor = gamma;
     }
 
+    void updateClockFrequency(CpuFrequencyHz newFrequency)
+    {
+        pwm->UpdateClockFrequency(static_cast<std::uint32_t>(newFrequency));
+    }
+
 } // namespace bsp::eink_frontlight
