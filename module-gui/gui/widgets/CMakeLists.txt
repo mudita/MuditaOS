@@ -22,6 +22,9 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/BoxLayoutSizeStore.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TopBar.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TopBar/SIM.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/TopBar/BatteryWidgetBase.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/TopBar/BatteryWidgetBar.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/TopBar/BatteryWidgetText.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Text.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TextBlock.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TextDocument.cpp"
@@ -71,4 +74,3 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/visitor/ItemTree.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/visitor/DepthFirstItemTree.hpp"
 )
-

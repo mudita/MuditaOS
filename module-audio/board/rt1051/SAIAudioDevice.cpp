@@ -3,7 +3,7 @@
 
 #include "SAIAudioDevice.hpp"
 
-using namespace bsp;
+using namespace audio;
 
 SAIAudioDevice::SAIAudioDevice(I2S_Type *base, sai_edma_handle_t *rxHandle, sai_edma_handle_t *txHandle)
     : AudioDevice(saiCapabilities, saiCapabilities), _base(base), rx(rxHandle), tx(txHandle)

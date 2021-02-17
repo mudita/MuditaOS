@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactHelper.hpp"
@@ -27,6 +27,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 using namespace parserFSM;
 
@@ -72,38 +73,46 @@ auto ContactHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
     if (context.getBody()[json::contacts::id].int_value() != 0) {
         return requestContactByID(context);
     }
-    else if (context.getBody()[json::contacts::count].bool_value()) {
+    else if (context.getBody()[json::contacts::limit].bool_value()) {
         return requestCount(context);
     }
 
-    auto limit = context.getBody()[json::contacts::count].int_value();
-    auto offset = context.getBody()[json::contacts::offset].int_value();
-    auto query  = std::make_unique<db::query::ContactGet>(offset, limit, "");
+    try {
+        auto &ctx          = dynamic_cast<PagedContext &>(context);
+        std::size_t limit  = ctx.getBody()[json::contacts::limit].int_value();
+        std::size_t offset = ctx.getBody()[json::contacts::offset].int_value();
+        ctx.setRequestedLimit(limit);
+        ctx.setRequestedOffset(offset);
+        auto query = std::make_unique<db::query::ContactGetWithTotalCount>(std::min(ctx.getPageSize(), limit), offset);
+        auto listener = std::make_unique<db::EndpointListenerWithPages>(
+            [](db::QueryResult *result, PagedContext &context) {
+                if (auto contactResult = dynamic_cast<db::query::ContactGetResultWithTotalCount *>(result)) {
 
-    auto listener = std::make_unique<db::EndpointListener>(
-        [](db::QueryResult *result, Context context) {
-            if (auto contactResult = dynamic_cast<db::query::ContactGetResult *>(result)) {
+                    auto recordsPtr = std::make_unique<std::vector<ContactRecord>>(contactResult->getRecords());
+                    context.setTotalCount(contactResult->getAllLength());
+                    json11::Json::array contactsArray;
 
-                auto recordsPtr = std::make_unique<std::vector<ContactRecord>>(contactResult->getRecords());
-                json11::Json::array contactsArray;
+                    for (const auto &record : *recordsPtr.get()) {
+                        contactsArray.emplace_back(ContactHelper::to_json(record));
+                    }
 
-                for (auto record : *recordsPtr.get()) {
-                    contactsArray.emplace_back(ContactHelper::to_json(record));
+                    context.setResponseBody(contactsArray);
+
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    return true;
                 }
-
-                context.setResponseBody(contactsArray);
-                MessageHandler::putToSendQueue(context.createSimpleResponse());
-                return true;
-            }
-            else {
-                return false;
-            }
-        },
-        context);
-
-    query->setQueryListener(std::move(listener));
-
-    DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Contact, std::move(query));
+                else {
+                    return false;
+                }
+            },
+            ctx);
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Contact, std::move(query));
+    }
+    catch (const std::exception &e) {
+        LOG_ERROR("%s", e.what());
+        return sys::ReturnCodes::Failure;
+    }
 
     return sys::ReturnCodes::Success;
 }
@@ -118,7 +127,7 @@ sys::ReturnCodes ContactHelper::requestCount(Context &context)
 
                 auto count = contactResult->getSize();
 
-                context.setResponseBody(json11::Json::object({{json::contacts::count, static_cast<int>(count)}}));
+                context.setResponseBody(json11::Json::object({{json::contacts::limit, static_cast<int>(count)}}));
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;
             }

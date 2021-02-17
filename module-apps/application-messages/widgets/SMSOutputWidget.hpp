@@ -31,7 +31,6 @@ namespace gui
         SMSOutputWidget(app::Application *application, const std::shared_ptr<SMSRecord> &record);
         virtual ~SMSOutputWidget() = default;
 
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
     };
 

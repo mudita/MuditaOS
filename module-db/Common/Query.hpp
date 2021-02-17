@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,7 +14,7 @@ namespace db
     class QueryResult; // Forward declaration
     using QueryCallbackFunction         = std::function<bool(db::QueryResult *)>;
     using EndpointQueryCallbackFunction = std::function<bool(db::QueryResult *, parserFSM::Context &)>;
-
+    using EndpointQueryCallbackFunctionWithPages = std::function<bool(db::QueryResult *, parserFSM::PagedContext &)>;
     class QueryListener
     {
       public:
@@ -47,6 +47,20 @@ namespace db
       private:
         EndpointQueryCallbackFunction callback;
         parserFSM::Context context;
+    };
+
+    class EndpointListenerWithPages : public EndpointListener
+    {
+      public:
+        EndpointListenerWithPages() = default;
+        EndpointListenerWithPages(EndpointQueryCallbackFunctionWithPages &&_callback,
+                                  const parserFSM::PagedContext &_context);
+
+        bool handleQueryResponse(db::QueryResult *result) override;
+
+      private:
+        EndpointQueryCallbackFunctionWithPages callback;
+        parserFSM::PagedContext context;
     };
 
     /// virtual query input interface

@@ -6,7 +6,6 @@
 
 #include "Codec.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
-#include "bsp/audio/bsp_audio.hpp"
 
 class CodecParamsMAX98090 : public CodecParams
 {
@@ -67,6 +66,23 @@ class CodecParamsMAX98090 : public CodecParams
         Gain_n12dB
     };
 
+    enum class InputPath
+    {
+        Headphones,
+        Microphone,
+        None
+    };
+
+    enum class OutputPath
+    {
+        Headphones,
+        HeadphonesMono,
+        Earspeaker,
+        Loudspeaker,
+        LoudspeakerMono,
+        None
+    };
+
     static SampleRate ValToSampleRate(uint32_t rate)
     {
         switch (rate) {
@@ -113,8 +129,8 @@ class CodecParamsMAX98090 : public CodecParams
     bool muteEnable       = false;
     bool resetEnable      = false;
     bool micBiasEnable    = false;
-    bsp::AudioDevice::InputPath inputPath   = bsp::AudioDevice::InputPath::None;
-    bsp::AudioDevice::OutputPath outputPath = bsp::AudioDevice::OutputPath::None;
+    InputPath inputPath   = InputPath::None;
+    OutputPath outputPath = OutputPath::None;
     SampleRate sampleRate = SampleRate ::Rate44K1Hz;
 };
 
@@ -144,8 +160,8 @@ class CodecMAX98090 : public Codec
     CodecRetCode SetOutputVolume(const float vol);
     CodecRetCode SetInputGain(const float gain);
     CodecRetCode SetMute(const bool enable);
-    CodecRetCode SetInputPath(const bsp::AudioDevice::InputPath path);
-    CodecRetCode SetOutputPath(const bsp::AudioDevice::OutputPath path);
+    CodecRetCode SetInputPath(const CodecParamsMAX98090::InputPath path);
+    CodecRetCode SetOutputPath(const CodecParamsMAX98090::OutputPath path);
     CodecRetCode MicBias(const bool enable);
     CodecRetCode SetupEarspeakerEqualizer();
     CodecRetCode SetupLoudspeakerEqualizer();

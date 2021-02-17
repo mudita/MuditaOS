@@ -284,13 +284,11 @@ namespace gui
             }
             optionLabel->setText(optionsNames[actualVectorIndex]);
         };
-    }
 
-    bool AlarmOptionsItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            vBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     std::vector<audio::Tags> AlarmOptionsItem::getMusicFilesList()

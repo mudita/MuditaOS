@@ -5,14 +5,14 @@
 
 #include <algorithm>
 
+#include "Audio/AudioDevice.hpp"
+#include "Audio/AudioDeviceFactory.hpp"
+#include "Audio/AudioPlatform.hpp"
+
 #include "IdleOperation.hpp"
 #include "PlaybackOperation.hpp"
 #include "RecorderOperation.hpp"
 #include "RouterOperation.hpp"
-
-#include "Audio/BluetoothProxyAudio.hpp"
-
-#include <bsp/audio/bsp_audio.hpp>
 
 namespace audio
 {
@@ -91,11 +91,13 @@ namespace audio
             gain = utils::getNumericValue<audio::Gain>(val.value());
         }
 
-        supportedProfiles.emplace_back(Profile::Create(profile, nullptr, volume, gain), isAvailable);
+        supportedProfiles.emplace_back(Profile::Create(profile, volume, gain), isAvailable);
     }
 
-    std::optional<std::unique_ptr<bsp::AudioDevice>> Operation::CreateDevice(bsp::AudioDevice::Type type)
+    std::shared_ptr<AudioDevice> Operation::CreateDevice(AudioDevice::Type type)
     {
-        return bsp::AudioDevice::Create(type).value_or(nullptr);
+        auto factory = AudioPlatform::GetDeviceFactory();
+
+        return factory->CreateDevice(type);
     }
 } // namespace audio

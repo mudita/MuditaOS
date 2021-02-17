@@ -26,8 +26,6 @@ namespace gui
       public:
         CustomCheckBoxWithLabel(app::Application *app, const std::string &description, const WeekDaysRepeatData &data);
 
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
-
         static const std::map<WeekDayIso, std::string> weekDays;
     };
 } // namespace gui

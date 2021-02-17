@@ -34,13 +34,11 @@ namespace gui
         description->setEdges(gui::RectangleEdge::None);
         description->setFont(style::window::font::bigbold);
         description->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center});
-    }
 
-    bool AllEventsItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        return true;
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
 
     void AllEventsItem::setMarkerItem(UTF8 text)

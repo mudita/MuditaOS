@@ -14,11 +14,11 @@ auto MessagesEndpoint::handle(Context &context) -> void
     case http::Method::get:
         helper->requestDataFromDB(context);
         break;
-    case http::Method::post: // update entry
-        helper->updateDBEntry(context);
+    case http::Method::post:
+        helper->createDBEntry(context);
         break;
     case http::Method::put:
-        helper->createDBEntry(context);
+        helper->updateDBEntry(context);
         break;
     case http::Method::del:
         helper->deleteDBEntry(context);

@@ -1,0 +1,70 @@
+@startuml
+
+service_eInk -> eInkSentinel : SetFrequencyValueRequest
+eInkSentinel -> PowerManager : RequestCpuFrequencyMessage
+
+PowerManager -> CpuGovernor : SetCpuFrequencyRequest
+
+service_eInk -> EinkDisplay : powerOn
+EinkDisplay -> driverLPSPI : Enable
+
+driverLPSPI -> driverPLL2 : Pll2ClockEnable
+note right
+Critical section!
+mutex necessary
+end note
+
+driverLPSPI -> clock_config : LPSPIClockEnable
+
+...screen redraw...
+ 
+EinkDisplay -> driverLPSPI : Disable
+ 
+driverLPSPI -> clock_config : LPSPIClockDisable
+
+driverLPSPI -> driverPLL2 : Pll2ClockDisable
+note right
+Critical section!
+mutex necessary
+end note
+
+service_eInk -> eInkSentinel : ResetCpuFrequencyRequest
+eInkSentinel -> PowerManager : RequestCpuFrequencyMessage
+
+PowerManager -> CpuGovernor : ResetCpuFrequencyRequest
+
+@enduml
+ 
+
+
+
+@startuml
+
+service_cellular -> cellularSentinel : SetFrequencyValueRequest
+cellularSentinel -> PowerManager : RequestCpuFrequencyMessage
+
+PowerManager -> CpuGovernor : SetCpuFrequencyRequest
+
+service_cellular -> bsp_cellular : wakeUp
+bsp_cellular -> driverUART : Enable
+
+driverUART -> clock_config : ExternalOscillatorEnable
+note right
+Critical section!
+mutex necessary
+end note
+
+driverUART -> clock_config : UARTClockEnable
+
+...call ended...
+ 
+bsp_cellular -> driverUART : Disable
+ 
+driverUART -> clock_config : UARTClockDisable
+
+service_cellular -> cellularSentinel : ResetCpuFrequencyRequest
+cellularSentinel -> PowerManager : RequestCpuFrequencyMessage
+
+PowerManager -> CpuGovernor : ResetCpuFrequencyRequest
+
+@enduml

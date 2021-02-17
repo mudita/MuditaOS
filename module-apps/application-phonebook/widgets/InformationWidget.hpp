@@ -19,7 +19,6 @@ namespace gui
       public:
         InformationWidget(app::Application *app);
         ~InformationWidget() override = default;
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         VBox *vBox                               = nullptr;
         Label *titleLabel                        = nullptr;
         TextWithIconsWidget *primaryNumberHBox   = nullptr;

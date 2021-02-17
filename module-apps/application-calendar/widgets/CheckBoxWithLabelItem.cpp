@@ -57,7 +57,7 @@ namespace gui
         if (checkBoxData != nullptr) {
             setCheckBoxes();
         }
-        onContentChangeCallback = [&]() { return checkBox->isChecked(); };
+        onContentChangedCallback = [&]() { return checkBox->isChecked(); };
     }
 
     void CheckBoxWithLabelItem::applyCallbacks()
@@ -76,10 +76,15 @@ namespace gui
         inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
             if (checkBox->onInput(event)) {
                 checkBox->resizeItems();
-                onContentChangeCallback = [&]() { return checkBox->isChecked(); };
+                onContentChangedCallback = [&]() { return checkBox->isChecked(); };
                 return true;
             }
             return false;
+        };
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            hBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
         };
     }
 
@@ -106,13 +111,6 @@ namespace gui
         else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Sunday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Sunday.iso_encoding() - 1));
         }
-    }
-
-    bool CheckBoxWithLabelItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-    {
-        hBox->setPosition(0, 0);
-        hBox->setSize(newDim.w, newDim.h);
-        return true;
     }
 
 } /* namespace gui */

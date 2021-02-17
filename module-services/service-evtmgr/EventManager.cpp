@@ -39,9 +39,12 @@
 #include <vector>
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
+#include <common_data/EventStore.hpp>
+#include <SystemManager/messages/PhoneModeRequest.hpp>
 
 EventManager::EventManager(const std::string &name)
-    : sys::Service(name), screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(this))
+    : sys::Service(name), settings(std::make_shared<settings::Settings>(this)),
+      screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(settings, this))
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
@@ -101,9 +104,16 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         auto message = std::make_shared<sevm::KbdMessage>();
         message->key = msg->key;
 
-        if (message->key.state == RawKey::State::Pressed && message->key.key_code == bsp::KeyCodes::FnRight) {
-            // and state == ShutDown
-            bus.sendUnicast(message, service::name::system_manager);
+        if (message->key.state == RawKey::State::Pressed) {
+            const auto code = message->key.key_code;
+            if (code == bsp::KeyCodes::FnRight) {
+                bus.sendUnicast(message, service::name::system_manager);
+            }
+            else if (code == bsp::KeyCodes::SSwitchUp || code == bsp::KeyCodes::SSwitchMid ||
+                     code == bsp::KeyCodes::SSwitchDown) {
+                const auto mode = sys::SystemManager::translateSliderState(message->key);
+                bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
+            }
         }
 
         // send key to focused application
@@ -121,32 +131,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
             handled           = true;
             LOG_INFO("Switching focus to %s", targetApplication.c_str());
         }
-    }
-    else if (msgl->messageType == MessageType::EVMBatteryLevel && msgl->sender == this->GetName()) {
-        auto *msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
-
-        auto message = std::make_shared<sevm::BatteryLevelMessage>(msg->levelPercents, msg->fullyCharged);
-
-        if (!targetApplication.empty()) {
-            bus.sendUnicast(message, targetApplication);
-        }
-
-        handled = true;
-    }
-    else if (msgl->messageType == MessageType::EVMChargerPlugged && msgl->sender == this->GetName()) {
-        auto *msg = static_cast<sevm::BatteryPlugMessage *>(msgl);
-
-        auto message     = std::make_shared<sevm::BatteryPlugMessage>();
-        message->plugged = msg->plugged;
-
-        if (!message->plugged) {
-            bus.sendUnicast(message, service::name::system_manager);
-        }
-
-        if (!targetApplication.empty()) {
-            bus.sendUnicast(message, targetApplication);
-        }
-        handled = true;
     }
     else if (msgl->messageType == MessageType::EVMMinuteUpdated && msgl->sender == this->GetName()) {
 
@@ -287,6 +271,23 @@ sys::ReturnCodes EventManager::InitHandler()
         return msg;
     });
 
+    connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *msgl) {
+        if (msgl->sender == this->GetName()) {
+            LOG_INFO("Battery level: %d , charging: %d",
+                     Store::Battery::get().level,
+                     Store::Battery::get().state == Store::Battery::State::Charging);
+
+            if (Store::Battery::get().state == Store::Battery::State::Discharging) {
+                bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::system_manager);
+            }
+
+            if (!targetApplication.empty()) {
+                bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), targetApplication);
+            }
+        }
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
     // initialize keyboard worker
     EventWorker = std::make_unique<WorkerEvent>(this);
 
@@ -322,7 +323,7 @@ sys::ReturnCodes EventManager::InitHandler()
     list.push_back(qLightSensor);
     list.push_back(qChargerDetect);
 
-    EventWorker->init(list);
+    EventWorker->init(list, settings);
     EventWorker->run();
 
     return sys::ReturnCodes::Success;

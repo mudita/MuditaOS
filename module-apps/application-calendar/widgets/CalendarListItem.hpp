@@ -7,12 +7,5 @@
 
 namespace gui
 {
-    class CalendarListItem : public ListItem
-    {
-      public:
-        std::function<void(std::shared_ptr<EventsRecord> event)> onSaveCallback = nullptr;
-        std::function<void(std::shared_ptr<EventsRecord> event)> onLoadCallback = nullptr;
-        std::function<bool()> onContentChangeCallback                           = nullptr;
-    };
-
+    using CalendarListItem = ListItemWithCallbacks<EventsRecord>;
 } /* namespace gui */

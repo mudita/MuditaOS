@@ -8,11 +8,15 @@
 #include "TopBar.hpp"
 #include <time/time_conversion.hpp>
 #include "Style.hpp"
-
+#include "TopBar/BatteryWidgetBar.hpp"
+#include "TopBar/BatteryWidgetText.hpp"
 #include "common_data/EventStore.hpp"
 
 namespace gui::top_bar
 {
+    constexpr auto batteryWidgetAsText = false;
+    using BatteryWidgetType = std::conditional<batteryWidgetAsText, BatteryWidgetText, BatteryWidgetBar>::type;
+
     namespace networkTechnology
     {
         constexpr uint32_t x = 80;
@@ -24,8 +28,8 @@ namespace gui::top_bar
     static constexpr uint32_t signalOffset  = 35;
     static constexpr uint32_t batteryOffset = 413;
 
-    TopBar::TimeMode TopBar::timeMode      = TimeMode::TIME_24H;
-    uint32_t TopBar::time                  = 0;
+    TopBar::TimeMode TopBar::timeMode = TimeMode::TIME_24H;
+    uint32_t TopBar::time             = 0;
 
     void Configuration::enable(Indicator indicator)
     {
@@ -74,22 +78,6 @@ namespace gui::top_bar
         };
     }
 
-    void TopBar::batteryShowBars(uint32_t val)
-    {
-        if (val > batteryBars.size()) {
-            LOG_ERROR("Trying to set battery level out of scope");
-            val = batteryBars.size();
-        }
-        for (unsigned int i = 0; i < batteryBars.size(); ++i) {
-            if (configuration.isEnabled(Indicator::Battery)) {
-                batteryBars[i]->setVisible(i == val);
-            }
-            else {
-                batteryBars[i]->setVisible(false);
-            }
-        }
-    }
-
     void TopBar::prepareWidget()
     {
         signal[0] = new gui::Image(this, signalOffset, 17, 0, 0, "signal0");
@@ -100,24 +88,7 @@ namespace gui::top_bar
         signal[5] = new gui::Image(this, signalOffset, 17, 0, 0, "signal5");
         updateSignalStrength();
 
-        // icons for battery
-        batteryBars = {
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery_low_W_M"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery1_W_M"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery2_W_M"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery3_W_M"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery4_W_M"),
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery5_W_M"),
-        };
-        batteryShowBars(0);
-
-        batteryChargings[Store::Battery::State::Charging] =
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery_charging_W_M");
-        batteryChargings[Store::Battery::State::PluggedNotCharging] =
-            new gui::Image(this, batteryOffset, 15, 0, 0, "battery_charging_ready_W_M");
-        for (auto &el : batteryChargings) {
-            el.second->setVisible(false);
-        }
+        batteryWidget = new BatteryWidgetType(this, batteryOffset, 15, 60, 24);
 
         const auto design_sim_offset = 376; // this offset is not final, but it is pixel Purefect
         sim                          = new SIM(this, design_sim_offset, 12);
@@ -181,7 +152,7 @@ namespace gui::top_bar
             }
             break;
         case Indicator::Battery:
-            showBattery(enabled);
+            batteryWidget->show(Store::Battery::get(), enabled);
             break;
         case Indicator::SimCard:
             showSim(enabled);
@@ -192,63 +163,10 @@ namespace gui::top_bar
         }
     }
 
-    uint32_t TopBar::calculateBatteryBars(uint32_t percentage)
+    bool TopBar::updateBattery()
     {
-        uint32_t level = 0;
-        if (percentage <= 5) // level critical
-            level = 0;
-        else if (percentage <= 27)
-            level = 1;
-        else if (percentage <= 50)
-            level = 2;
-        else if (percentage <= 73)
-            level = 3;
-        else if (percentage <= 95)
-            level = 4;
-        else
-            level = 5;
-
-        if (level >= batteryBarsCount) {
-            LOG_ERROR("Battery level calculations are done wrong!");
-            return batteryBarsCount - 1;
-        }
-        return level;
-    }
-
-    bool TopBar::updateBattery(uint32_t percent)
-    {
-        showBattery(configuration.isEnabled(Indicator::Battery));
+        batteryWidget->show(Store::Battery::get(), configuration.isEnabled(Indicator::Battery));
         return true;
-    }
-
-    bool TopBar::updateBattery(bool plugged)
-    {
-        showBattery(configuration.isEnabled(Indicator::Battery));
-        return true;
-    }
-
-    void TopBar::showBattery(bool shown)
-    {
-        // hide battery bars icons
-        for (const auto &bars : batteryBars) {
-            bars->setVisible(false);
-        }
-        // hide battery charging icons
-        for (const auto &charging : batteryChargings) {
-            charging.second->setVisible(false);
-        }
-
-        if (shown) {
-            switch (Store::Battery::get().state) {
-            case Store::Battery::State::Discharging:
-                batteryShowBars(calculateBatteryBars(Store::Battery::get().level));
-                break;
-            case Store::Battery::State::Charging:
-            case Store::Battery::State::PluggedNotCharging:
-                batteryChargings[Store::Battery::get().state]->setVisible(true);
-                break;
-            }
-        }
     }
 
     void TopBar::showSim(bool enabled)
@@ -315,8 +233,8 @@ namespace gui::top_bar
     void TopBar::setTime(uint32_t value, bool mode24H)
     {
         setTime(utils::time::Time());
-        timeMode   = (mode24H ? TimeMode::TIME_24H : TimeMode::TIME_12H);
-        time       = value;
+        timeMode = (mode24H ? TimeMode::TIME_24H : TimeMode::TIME_12H);
+        time     = value;
     }
 
     UTF8 TopBar::getTimeString()
@@ -342,4 +260,4 @@ namespace gui::top_bar
     {
         visitor.visit(*this);
     }
-} /* namespace gui */
+} // namespace gui::top_bar

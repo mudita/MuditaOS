@@ -5,11 +5,12 @@
 
 #include "Operation.hpp"
 
+#include <Audio/AudioDevice.hpp>
 #include <Audio/encoder/Encoder.hpp>
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
 #include <Audio/Endpoint.hpp>
-#include <bsp/audio/bsp_audio.hpp>
+
 #include <mutex.hpp>
 
 #include <memory>
@@ -53,7 +54,7 @@ namespace audio
         std::unique_ptr<Stream> dataStreamOut;
         std::unique_ptr<Stream> dataStreamIn;
         std::unique_ptr<Encoder> enc;
-        std::unique_ptr<bsp::AudioDevice> audioDeviceCellular;
+        std::shared_ptr<AudioDevice> audioDeviceCellular;
         std::unique_ptr<StreamConnection> outputConnection;
         std::unique_ptr<StreamConnection> inputConnection;
     };

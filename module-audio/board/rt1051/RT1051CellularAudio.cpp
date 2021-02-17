@@ -10,7 +10,7 @@
 
 #include <mutex.hpp>
 
-namespace bsp
+namespace audio
 {
 
     using namespace drivers;
@@ -30,7 +30,7 @@ namespace bsp
         Deinit();
     }
 
-    AudioDevice::RetCode RT1051CellularAudio::Start(const bsp::AudioDevice::Format &format)
+    AudioDevice::RetCode RT1051CellularAudio::Start(const AudioDevice::Format &format)
     {
         cpp_freertos::LockGuard lock(mutex);
 
@@ -118,7 +118,7 @@ namespace bsp
         return AudioDevice::RetCode::Success;
     }
 
-    bool RT1051CellularAudio::IsFormatSupported(const bsp::AudioDevice::Format &format)
+    bool RT1051CellularAudio::IsFormatSupported(const AudioDevice::Format &format)
     {
         return true;
     }
@@ -203,7 +203,7 @@ namespace bsp
 
     void RT1051CellularAudio::OutStart()
     {
-        sai_transfer_format_t sai_format = {};
+        sai_transfer_format_t sai_format;
 
         /* Configure the audio format */
         sai_format.bitWidth           = saiOutFormat.bitWidth;
@@ -263,4 +263,4 @@ namespace bsp
         self->onDataSend();
     }
 
-} // namespace bsp
+} // namespace audio

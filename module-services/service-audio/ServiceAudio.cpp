@@ -121,29 +121,6 @@ std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Messag
         }
         return settings_it->second;
     }
-    else if (const auto *btReq = dynamic_cast<const BluetoothProxyMessage *>(msg); btReq) {
-        std::shared_ptr<BluetoothProxyMessage> request;
-        if (const auto *btStart = dynamic_cast<const BluetoothProxyStartMessage *>(msg); btStart) {
-            request = std::make_shared<BluetoothProxyStartMessage>(*btStart);
-        }
-        else if (const auto *btVolume = dynamic_cast<const BluetoothProxySetVolumeMessage *>(msg); btVolume) {
-            request = std::make_shared<BluetoothProxySetVolumeMessage>(*btVolume);
-        }
-        else if (const auto *btGain = dynamic_cast<const BluetoothProxySetGainMessage *>(msg); btGain) {
-            request = std::make_shared<BluetoothProxySetGainMessage>(*btGain);
-        }
-        else if (const auto *btOutPath = dynamic_cast<const BluetoothProxySetOutputPathMessage *>(msg); btOutPath) {
-            request = std::make_shared<BluetoothProxySetOutputPathMessage>(*btOutPath);
-        }
-        else if (const auto *btInPath = dynamic_cast<const BluetoothProxySetInputPathMessage *>(msg); btInPath) {
-            request = std::make_shared<BluetoothProxySetInputPathMessage>(*btInPath);
-        }
-        else {
-            LOG_DEBUG("BluetoothProxyMessage not supported.");
-            return std::nullopt;
-        }
-        bus.sendUnicast(request, service::name::bluetooth);
-    }
     else {
         LOG_DEBUG("Message received but not handled - no effect.");
     }
@@ -383,7 +360,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
         for (auto &input : audioMux.GetAllInputs()) {
             const auto &currentOperation = input.audio->GetCurrentOperation();
             if (std::find(stopTypes.begin(), stopTypes.end(), currentOperation.GetPlaybackType()) != stopTypes.end()) {
-                muted = true;
+                muted  = true;
                 auto t = input.token;
                 retCodes.emplace_back(t, stopInput(&input));
             }

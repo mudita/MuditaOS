@@ -93,6 +93,15 @@ namespace gui
             }
             return false;
         };
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            body->setArea({0, 0, newDim.w, newDim.h});
+
+            // We need to calculate margin between sms and timeLabel and we can do it only after sizes are set.
+            positionTimeLabel();
+
+            return true;
+        };
     }
 
     void SMSOutputWidget::positionTimeLabel() const
@@ -134,17 +143,6 @@ namespace gui
                                       style::messages::smsOutput::sms_error_icon_right_margin,
                                       0));
         body->addWidget(errorIcon);
-    }
-
-    auto SMSOutputWidget::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
-    {
-        body->setPosition(0, 0);
-        body->setSize(newDim.w, newDim.h);
-
-        // We need to calculate margin between sms and timeLabel and we can do it only after sizes are set.
-        positionTimeLabel();
-
-        return true;
     }
 
     auto SMSOutputWidget::handleRequestResize([[maybe_unused]] const Item *child,

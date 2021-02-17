@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RecordQuery.hpp"
@@ -13,7 +13,7 @@ using namespace db::query;
 RecordQuery::RecordQuery() noexcept : Query(Query::Type::Read)
 {}
 
-RecordQuery::RecordQuery(std::size_t offset, std::size_t limit) noexcept
+RecordQuery::RecordQuery(std::size_t limit, std::size_t offset) noexcept
     : Query(Query::Type::Read), limit(limit), offset(offset)
 {}
 

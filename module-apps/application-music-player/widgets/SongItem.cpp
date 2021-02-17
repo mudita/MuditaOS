@@ -63,14 +63,10 @@ namespace gui
         authorText->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
         authorText->setEditMode(EditMode::Browse);
         authorText->setText(authorName);
+
+        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            vBox->setArea({0, 0, newDim.w, newDim.h});
+            return true;
+        };
     }
-
-    auto SongItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
-    {
-        vBox->setPosition(0, 0);
-        vBox->setSize(newDim.w, newDim.h);
-
-        return true;
-    }
-
 } /* namespace gui */

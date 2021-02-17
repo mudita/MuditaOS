@@ -20,11 +20,21 @@ namespace app
         : Application(name, parent, startInBackground, 4096)
     {
         LOG_INFO("ApplicationMusicPlayer::create");
+        connect(typeid(AudioStartPlaybackResponse), [&](sys::Message *msg) {
+            handlePlayResponse(msg);
+            return sys::MessageNone{};
+        });
     }
 
     ApplicationMusicPlayer::~ApplicationMusicPlayer()
     {
         LOG_INFO("ApplicationMusicPlayer::destroy");
+    }
+
+    void ApplicationMusicPlayer::handlePlayResponse(sys::Message *msg)
+    {
+        auto startResponse = static_cast<AudioStartPlaybackResponse *>(msg);
+        currentFileToken   = startResponse->token;
     }
 
     sys::MessagePointer ApplicationMusicPlayer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -93,6 +103,23 @@ namespace app
     {
         AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::Multimedia, fileName);
         return true;
+    }
+
+    bool ApplicationMusicPlayer::pause()
+    {
+        if (currentFileToken) {
+            return AudioServiceAPI::Pause(this, currentFileToken.value());
+        }
+        return false;
+    }
+
+    bool ApplicationMusicPlayer::resume()
+    {
+        if (currentFileToken) {
+
+            return AudioServiceAPI::Resume(this, currentFileToken.value());
+        }
+        return false;
     }
 
     std::optional<audio::Tags> ApplicationMusicPlayer::getFileTags(const std::string &filePath)

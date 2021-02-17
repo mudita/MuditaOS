@@ -14,7 +14,7 @@ from harness.interface.error import TestError, Error
 def search_sms(harness, message: str, phone_number: str):
     @harness.with_phone_unlocked
     def do_it(connection):
-        body = {"messageBody": message, "phoneNumber": phone_number}
+        body = {"category": "message", "messageBody": message, "phoneNumber": phone_number}
         messages = harness.endpoint_request("messages", "get", body)["body"]
         print(f'Found {len(messages)} messages')
 
@@ -49,4 +49,3 @@ if __name__ == "__main__":
     except TestError as err:
         log.error(err)
         exit(err.get_error_code())
-

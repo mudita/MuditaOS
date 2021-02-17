@@ -73,19 +73,10 @@ namespace gui
         return true;
     }
 
-    bool AppWindow::updateBatteryCharger(bool charging)
+    bool AppWindow::updateBatteryStatus()
     {
-        topBar->updateBattery(charging);
-        return true;
-    }
-
-    // updates battery level in the window
-    bool AppWindow::updateBatteryLevel(uint32_t percentage)
-    {
-        // get old value of battery level, calcualte new level and comapre both
-        // if they are different make a change and return true, otherwise return false;
         if (topBar != nullptr) {
-            return topBar->updateBattery(percentage);
+            return topBar->updateBattery();
         }
         return false;
     }

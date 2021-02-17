@@ -27,7 +27,6 @@ namespace gui
         DesktopInputWidget(app::Application *application, Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
         ~DesktopInputWidget() override = default;
 
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
         auto handleRequestResize(const Item *, unsigned short request_w, unsigned short request_h) -> Size override;
     };
 

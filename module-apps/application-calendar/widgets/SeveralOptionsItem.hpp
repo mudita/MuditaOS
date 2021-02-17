@@ -49,9 +49,6 @@ namespace gui
         void prepareOptionsNames();
         void applyCallbacks();
         uint32_t repeatOptionValue = 0;
-
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

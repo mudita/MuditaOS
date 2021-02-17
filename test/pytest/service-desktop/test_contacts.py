@@ -7,49 +7,49 @@ from harness.interface.defs import status
 @pytest.mark.service_desktop_test
 def test_contacts(harness):
     # getting the contacts count
-    body = {"count": True}
+    body = {"limit": True}
     ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["OK"]
 
-    count = ret["body"]["count"]
+    count = ret["body"]["limit"]
     if count == 0:
         pytest.skip("No contacts entries, skipping")
 
     # getting all contacts
-    batch_size = 30
+    batch_size = 10
     divider = int(count / batch_size)
     reminder = count % batch_size
     contacts = []
     for i in range(divider):
-        body = {"count": batch_size, "offset": batch_size*i}
+        body = {"limit": batch_size, "offset": batch_size*i}
         ret = harness.endpoint_request("contacts", "get", body)
         assert ret["status"] == status["OK"]
-        contacts = contacts + ret["body"]
+        contacts = contacts + ret["body"]["entries"]
 
-    body = {"count": reminder, "offset": count-reminder}
+    body = {"limit": reminder, "offset": count-reminder}
     ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["OK"]
-    contacts = contacts + ret["body"]
+    contacts = contacts + ret["body"]["entries"]
 
     contacts_length = len(contacts)
     assert contacts_length
     assert contacts_length == count
 
     # try to get more than available
-    batch_size = 30
+    batch_size = 10
     divider = int((count+10) / batch_size)
     reminder = (count+10) % batch_size
     contacts = []
     for i in range(divider):
-        body = {"count": batch_size, "offset": batch_size * i}
+        body = {"limit": batch_size, "offset": batch_size * i}
         ret = harness.endpoint_request("contacts", "get", body)
         assert ret["status"] == status["OK"]
-        contacts = contacts + ret["body"]
+        contacts = contacts + ret["body"]["entries"]
 
-    body = {"count": reminder, "offset": (count+10)-reminder}
+    body = {"limit": reminder, "offset": (count+10)-reminder}
     ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["OK"]
-    contacts = contacts + ret["body"]
+    contacts = contacts + ret["body"]["entries"]
 
     contacts_length = len(contacts)
     assert contacts_length
@@ -78,10 +78,10 @@ def test_contacts(harness):
     assert ret["status"] == status["NotAcceptable"]
 
     # checking count after adding
-    body = {"count": True}
+    body = {"limit": True}
     ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["OK"]
-    assert ret["body"]["count"] == count + 1
+    assert ret["body"]["limit"] == count + 1
 
     # updating existing contact
     body = {"address": "6 Czeczota St.\n02600 Warsaw",
@@ -112,8 +112,8 @@ def test_contacts(harness):
     assert ret["status"] == status["OK"]
 
     # verifying count
-    body = {"count": True}
+    body = {"limit": True}
     ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["OK"]
 
-    assert ret["body"]["count"] == count
+    assert ret["body"]["limit"] == count

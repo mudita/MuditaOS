@@ -7,12 +7,5 @@
 
 namespace gui
 {
-    class AlarmInternalListItem : public ListItem
-    {
-      public:
-        std::function<void(std::shared_ptr<AlarmsRecord> event)> onSaveCallback = nullptr;
-        std::function<void(std::shared_ptr<AlarmsRecord> event)> onLoadCallback = nullptr;
-        std::function<bool()> onContentChangedCallback                          = nullptr;
-    };
-
+    using AlarmInternalListItem = ListItemWithCallbacks<AlarmsRecord>;
 } /* namespace gui */
