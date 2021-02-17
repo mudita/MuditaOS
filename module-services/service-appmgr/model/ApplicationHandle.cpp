@@ -35,9 +35,9 @@ namespace app::manager
         }
     }
 
-    auto ApplicationHandle::preventsBlocking() const noexcept -> bool
+    auto ApplicationHandle::preventsAutoLocking() const noexcept -> bool
     {
-        return launcher->isBlocking();
+        return launcher->isPreventAutoLockingOn();
     }
 
     auto ApplicationHandle::closeable() const noexcept -> bool

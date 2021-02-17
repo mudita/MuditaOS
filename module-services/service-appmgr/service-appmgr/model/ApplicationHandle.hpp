@@ -31,7 +31,7 @@ namespace app::manager
         auto valid() const noexcept -> bool;
         auto name() const -> ApplicationName;
         auto state() const noexcept -> State;
-        auto preventsBlocking() const noexcept -> bool;
+        auto preventsAutoLocking() const noexcept -> bool;
         auto closeable() const noexcept -> bool;
         auto started() const noexcept -> bool;
         auto handles(actions::ActionId action) const noexcept -> bool;
