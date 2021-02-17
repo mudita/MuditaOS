@@ -316,6 +316,7 @@
   "app_settings_bluetooth_main": "Bluetooth",
   "app_settings_bluetooth_phone_name": "Phone name",
   "app_settings_bluetooth_phone_visibility": "Phone visibility",
+  "app_settings_bluetooth_enter_passkey": "Enter passkey:",
   "app_settings_net": "Network",
   "app_settings_disp_key": "Display and keypad",
   "app_settings_display_display_light": "Display light",

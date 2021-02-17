@@ -60,6 +60,7 @@ namespace gui::window::name
     inline constexpr auto change_time_zone     = "ChangeTimeZone";
 
     inline constexpr auto new_apn = "NewApn";
+    inline constexpr auto bluetooth_check_passkey = "BluetoothCheckPasskey";
 
 } // namespace gui::window::name
 

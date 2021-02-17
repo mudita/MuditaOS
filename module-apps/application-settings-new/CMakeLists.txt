@@ -53,6 +53,7 @@ target_sources( ${PROJECT_NAME}
         windows/LanguagesWindow.cpp
         windows/DateAndTimeMainWindow.cpp
         windows/ChangeTimeZone.cpp
+        windows/BluetoothCheckPasskeyWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
