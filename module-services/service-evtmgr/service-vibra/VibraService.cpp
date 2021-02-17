@@ -46,12 +46,13 @@ namespace service_vibra
 
     void VibraService::PulseRepeat(sys::ms time)
     {
-        _repetitions = static_cast<int>(time) / (static_cast<int>(bsp::vibrator::default_vibra_pulse) +
-                                                 static_cast<int>(bsp::vibrator::default_vibra_pause));
+        repetitions = static_cast<int>(time) / (static_cast<int>(bsp::vibrator::default_vibra_pulse) +
+                                                static_cast<int>(bsp::vibrator::default_vibra_pause));
 
         vibratorTimerPause->connect([&](sys::Timer &) {
-            if ((_repetitions) && (_repetitions--)) /// call itself for calculated number of repetitions
+            if (repetitions) /// call itself for calculated number of repetitions
             {
+                repetitions--;
                 intPulse(true);
             }
         });
@@ -60,19 +61,10 @@ namespace service_vibra
 
     void VibraService::PulseRepeatStop()
     {
-        _repetitions = 1;
+        repetitions = 1;
         bsp::vibrator::disable();
         vibratorTimerPause->stop();
         vibratorTimerOneshot->stop();
-    }
-    bool VibraService::checkState()
-    {
-        if (_repetitions > 1) {
-            return true;
-        }
-        else {
-            return false;
-        }
     }
 
 } // namespace service_vibra

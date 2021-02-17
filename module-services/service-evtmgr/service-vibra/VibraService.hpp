@@ -27,7 +27,6 @@ namespace service_vibra
         /// but we also want to repeat pulses during eg. full length of ringtone
         void PulseRepeat(sys::ms time);
         void PulseRepeatStop();
-        bool checkState();
 
         /// to use, send message:
         /// eg. vibrate 10 seconds:
@@ -42,7 +41,7 @@ namespace service_vibra
         std::unique_ptr<sys::Timer> vibratorTimerOneshot;
         std::unique_ptr<sys::Timer> vibratorTimerPause;
 
-        int _repetitions = 1;
+        int repetitions = 1;
 
         void intPulse(bool repetitive);
     };

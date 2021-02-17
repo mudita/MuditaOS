@@ -386,7 +386,6 @@ bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action a
 
 bool EventManager::processVibraRequest(bsp::vibrator::Action act, sys::ms RepetitionTime)
 {
-    bool response = true;
     switch (act) {
     case bsp::vibrator::Action::pulse:
         vibraService->Pulse();
@@ -397,11 +396,8 @@ bool EventManager::processVibraRequest(bsp::vibrator::Action act, sys::ms Repeti
     case bsp::vibrator::Action::stop:
         vibraService->PulseRepeatStop();
         break;
-    case bsp::vibrator::Action::checkState:
-        response = vibraService->checkState();
-        break;
     }
-    return response;
+    return true;
 }
 
 void EventManager::GetNextAlarmTimestamp(time_t timestamp)
