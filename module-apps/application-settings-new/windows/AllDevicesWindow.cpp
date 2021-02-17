@@ -15,6 +15,7 @@
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include "application-settings-new/data/BondedDevicesData.hpp"
+
 namespace gui
 {
 
@@ -43,11 +44,10 @@ namespace gui
                 application->bus.sendUnicast(std::make_shared<BluetoothMessage>(BluetoothMessage::Request::Scan),
                                              "ServiceBluetooth");
                 gui::DialogMetadata meta;
-                meta.icon                        = "search_big";
-                meta.text                        = utils::localize.get("app_settings_bluetooth_searching_devices");
-                meta.title                       = utils::localize.get("app_settings_bluetooth_add_device");
-                auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
-                data->ignoreCurrentWindowOnStack = true;
+                meta.icon  = "search_big";
+                meta.text  = utils::localize.get("app_settings_bluetooth_searching_devices");
+                meta.title = utils::localize.get("app_settings_bluetooth_add_device");
+                auto data  = std::make_unique<gui::DialogMetadataMessage>(meta);
                 application->switchWindow(gui::window::name::dialog_settings, std::move(data));
                 return true;
             }
