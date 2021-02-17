@@ -4,8 +4,9 @@
 #include "BatteryLevelCheck.hpp"
 #include "service-evtmgr/BatteryMessages.hpp"
 #include "SystemManager/Constants.hpp"
-
+#include <agents/settings/SystemSettings.hpp>
 #include <common_data/EventStore.hpp>
+#include <Utils.hpp>
 
 namespace battery_level_check
 {
@@ -20,11 +21,11 @@ namespace battery_level_check
 
         CheckState state = CheckState::InitialCheck;
 
-        constexpr inline auto DEFAULT_LEVEL = 10;
-
-        unsigned int batteryLevelCritical = DEFAULT_LEVEL;
+        unsigned int batteryLevelCritical = 0;
 
         sys::Service *parentService = nullptr;
+
+        std::shared_ptr<settings::Settings> settings = nullptr;
 
         bool isBatteryLevelCritical(unsigned int level)
         {
@@ -44,9 +45,20 @@ namespace battery_level_check
         }
     } // namespace
 
-    void init(sys::Service *service)
+    void init(sys::Service *service, std::shared_ptr<settings::Settings> &setts)
     {
         parentService = service;
+        settings      = setts;
+        settings->registerValueChange(
+            settings::Battery::batteryCriticalLevel,
+            [&](const std::string &value) { batteryLevelCritical = utils::getNumericValue<unsigned int>(value); },
+            settings::SettingsScope::Global);
+    }
+
+    void deinit()
+    {
+        settings->unregisterValueChange(settings::Battery::batteryCriticalLevel, settings::SettingsScope::Global);
+        settings.reset();
     }
 
     void checkBatteryLevelCritical()
@@ -86,6 +98,8 @@ namespace battery_level_check
     void setBatteryCriticalLevel(unsigned int level)
     {
         batteryLevelCritical = level;
+        settings->setValue(
+            settings::Battery::batteryCriticalLevel, utils::to_string(level), settings::SettingsScope::Global);
         checkBatteryLevelCritical();
     }
 

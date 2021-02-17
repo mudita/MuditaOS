@@ -37,6 +37,7 @@ MuditaOS is a mobile operating system optimized for E Ink displays. Built on Fre
 * [Contributing](#Contributing)
    * [Discussions](#Discussions)
    * [Reporting issues and feature requests](#Reporting-bugs-and-feature-requests)
+   * [Internationalization](#Internationalization)
    * [Development workflow](#Development-workflow)
 * [Documentation](#documentation)
    * [How to generate documentation using Doxygen](#How-to-generate-documentation-using-Doxygen)    
@@ -66,6 +67,10 @@ For general questions and ideas regarding MuditaOS please post in the [“Mudita
 ### Reporting bugs and feature requests
 
 You can report bugs and feature requests on [GitHub](https://github.com/mudita/MuditaOS/issues). This is also a good place to discuss architecture decisions and things that aren’t yet covered by the documentation. Please refer to the ["Contributing to MuditaOS"](./CONTRIBUTING.md) article for more details.
+
+### Internationalization
+
+If you want to start localizing MuditaOS interface please start from [the "Internationalization" article](./doc/i18n.md).
 
 ### Development workflow
 

@@ -40,4 +40,9 @@ namespace settings
         constexpr inline auto apn_list = "cl_apn_list";
     } // namespace Cellular
 
+    namespace Battery
+    {
+        constexpr inline auto batteryCriticalLevel = "battery_critical_level";
+    } // namespace Battery
+
 }; // namespace settings

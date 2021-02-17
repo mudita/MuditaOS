@@ -163,7 +163,7 @@ namespace audio
         dec->stopDecodingWorker();
         audioDevice.reset();
         dataStreamOut.reset();
-        audioDevice = CreateDevice(newProfile->GetAudioDeviceType()).value_or(nullptr);
+        audioDevice = CreateDevice(newProfile->GetAudioDeviceType());
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return RetCode::Failed;
@@ -172,13 +172,10 @@ namespace audio
         // adjust new profile with information from file's tags
         newProfile->SetSampleRate(tags->sample_rate);
         if (tags->num_channel == channel::stereoSound) {
-            newProfile->SetInOutFlags(static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputStereo));
+            newProfile->SetInOutFlags(static_cast<uint32_t>(AudioDevice::Flags::OutputStereo));
         }
         else {
-            newProfile->SetInOutFlags(static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono));
-            if (newProfile->GetOutputPath() == bsp::AudioDevice::OutputPath::Headphones) {
-                newProfile->SetOutputPath(bsp::AudioDevice::OutputPath::HeadphonesMono);
-            }
+            newProfile->SetInOutFlags(static_cast<uint32_t>(AudioDevice::Flags::OutputMono));
         }
 
         // store profile

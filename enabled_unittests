@@ -161,6 +161,7 @@ TESTS_LIST["catch2-gui-text"]="
     Text addition bounds - text widget size restricted;
     Text addition bounds - text widget line size restricted;
     Text addition bounds - multiple limits tests;
+    Text newline navigation and deletion tests;
     RichText newline and empty lines tests;
     TextBlock Ctor/Dtor ;
     Text block - set/update/get text;
@@ -214,6 +215,10 @@ TESTS_LIST["catch2-service-desktop"]="
     Endpoint Factory test;
 "
 #---------
+TESTS_LIST["catch2-service-desktop-endpoint-contacts"]="
+    Endpoint Contacts Test;
+"
+#---------
 TESTS_LIST["catch2-service-evtmgr"]="
     ScreenLightControlFunctions;
 "
@@ -252,6 +257,15 @@ TESTS_LIST["catch2-utils"]="
 #---------
 TESTS_LIST["catch2-utils-clipboard"]="
     Clipboard;
+"
+#---------
+TESTS_LIST["catch2-utils-conditional-invoke-tests"]="
+    Successful global function call;
+    Failed global function call;
+    Successful class static function call;
+    Failed class static function call;
+    Successful class member function call;
+    Failed class member function call;
 "
 #---------
 TESTS_LIST["catch2-utils-duration"]="

@@ -7,6 +7,7 @@
 #include "Label.hpp"
 #include "Rect.hpp"
 #include "TopBar/SIM.hpp"
+#include "TopBar/BatteryWidgetBase.hpp"
 #include <common_data/EventStore.hpp>
 
 #include <vector>
@@ -82,17 +83,13 @@ namespace gui::top_bar
         std::map<const Store::Battery::State, Image *> batteryChargings = {
             {Store::Battery::State::Charging, nullptr}, {Store::Battery::State::PluggedNotCharging, nullptr}};
         gui::SIM *sim = nullptr;
+        gui::BatteryWidgetBase *batteryWidget = nullptr;
         Configuration configuration;
         static TimeMode timeMode;
 
         void prepareWidget();
 
-        /// show bars in number - 0 bars, 1 bar, 2 bars...
-        void batteryShowBars(uint32_t val);
-        void showBattery(bool shown);
         void showSim(bool enabled);
-
-        static uint32_t calculateBatteryBars(uint32_t percentage);
 
         /**
          * Sets the status of the top bar indicator.
@@ -111,12 +108,11 @@ namespace gui::top_bar
         [[nodiscard]] auto getConfiguration() const noexcept -> const Configuration &;
 
         /**
-         * @brief Sets charge level of the battery based on percent value. This will cause appropriate image to be
+         * @brief Sets charge level of the battery. This will cause appropriate image to be
          * displayed.
          * @return if display should be refreshed or not
          */
-        bool updateBattery(uint32_t percent);
-        bool updateBattery(bool plugged);
+        bool updateBattery();
 
         /**
          * @brief updates signal strength. This will cause appropriate image to be displayed.

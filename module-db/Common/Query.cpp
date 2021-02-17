@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Query.hpp"
@@ -22,10 +22,28 @@ bool QueryCallback::handleQueryResponse(QueryResult *response)
 }
 
 EndpointListener::EndpointListener(EndpointQueryCallbackFunction &&_callback, parserFSM::Context &_context)
-    : callback{std::move(_callback)}, context{_context}
+    : callback{std::move(_callback)}, context(_context)
+{}
+
+EndpointListenerWithPages::EndpointListenerWithPages(EndpointQueryCallbackFunctionWithPages &&_callback,
+                                                     const parserFSM::PagedContext &_context)
+    : callback{std::move(_callback)}, context(_context)
 {}
 
 bool EndpointListener::handleQueryResponse(db::QueryResult *response)
+{
+    if (callback) {
+        LOG_DEBUG("Executing callback...");
+        const auto ret = callback(response, context);
+        LOG_DEBUG("Callback finished");
+        return ret;
+    }
+
+    LOG_ERROR("callback is nullptr!");
+    return false;
+}
+
+bool EndpointListenerWithPages::handleQueryResponse(db::QueryResult *response)
 {
     if (callback) {
         LOG_DEBUG("Executing callback...");

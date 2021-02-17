@@ -17,7 +17,7 @@
 
 #include <mutex.hpp>
 
-namespace bsp
+namespace audio
 {
 
     void txCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
@@ -80,6 +80,6 @@ namespace bsp
         void OutStop();
         void InStop();
     };
-} // namespace bsp
+} // namespace audio
 
 #endif // PUREPHONE_RT1051CELLULARAUDIO_HPP

@@ -84,6 +84,8 @@ namespace app
 
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
+
+        connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *) { return handleBatteryStatusChange(); });
     }
 
     Application::~Application() noexcept
@@ -129,12 +131,7 @@ namespace app
         // send drawing commands only when if application is in active and visible.
         if (state == State::ACTIVE_FORGROUND) {
             auto window = getCurrentWindow();
-            if (Store::Battery::get().state == Store::Battery::State::Charging) {
-                window->updateBatteryCharger(true);
-            }
-            else {
-                window->updateBatteryLevel(Store::Battery::get().level);
-            }
+            window->updateBatteryStatus();
             window->setSIM();
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
@@ -216,12 +213,6 @@ namespace app
         else if (msgl->messageType == MessageType::KBDKeyEvent) {
             return handleKBDKeyEvent(msgl);
         }
-        else if (msgl->messageType == MessageType::EVMBatteryLevel) {
-            return handleBatteryLevel(msgl);
-        }
-        else if (msgl->messageType == MessageType::EVMChargerPlugged) {
-            return handleChargerPlugged(msgl);
-        }
         else if (msgl->messageType == MessageType::EVMMinuteUpdated) {
             return handleMinuteUpdated(msgl);
         }
@@ -299,28 +290,11 @@ namespace app
         return msgHandled();
     }
 
-    sys::MessagePointer Application::handleBatteryLevel(sys::Message *msgl)
+    sys::MessagePointer Application::handleBatteryStatusChange()
     {
-        auto msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
-        LOG_INFO("Battery level: %d", msg->levelPercents);
-
-        if (getCurrentWindow()->updateBatteryLevel(msg->levelPercents)) {
+        if (getCurrentWindow()->updateBatteryStatus()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
-        return msgHandled();
-    }
-
-    sys::MessagePointer Application::handleChargerPlugged(sys::Message *msgl)
-    {
-        auto *msg = static_cast<sevm::BatteryPlugMessage *>(msgl);
-        if (msg->plugged == true) {
-            LOG_INFO("Charger connected");
-        }
-        else {
-            LOG_INFO("Charger disconnected");
-        }
-        getCurrentWindow()->updateBatteryCharger(msg->plugged);
-        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         return msgHandled();
     }
 

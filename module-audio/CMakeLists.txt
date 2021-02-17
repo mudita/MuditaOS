@@ -1,8 +1,10 @@
-﻿cmake_minimum_required(VERSION 3.12)
+﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+cmake_minimum_required(VERSION 3.12)
 
 project(module-audio VERSION 1.0
         DESCRIPTION "Audio module library")
-
 
 set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/Decoder.cpp"
@@ -16,13 +18,13 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/encoder/EncoderWAV.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Audio.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioDeviceFactory.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioMux.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioCommon.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Endpoint.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Stream.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/StreamFactory.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/StreamQueuedEventsListener.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/BluetoothProxyAudio.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/Operation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/PlaybackOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/RecorderOperation.cpp"
@@ -31,51 +33,30 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Profiles/Profile.cpp"
 )
 
-if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    include(targets/Target_Cross.cmake)
-else()
-    include(targets/Target_Linux.cmake)
-endif()
+# include target specific rules
+set(AUDIO_BOARD_LIBRARY audio-${PROJECT_TARGET_NAME})
+add_subdirectory(board/${PROJECT_TARGET_NAME})
+target_include_directories(${AUDIO_BOARD_LIBRARY} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
-
-target_include_directories( ${PROJECT_NAME} PRIVATE ${TAGLIB_INCLUDE_DIRS} )
-
-
-# Board specific compilation definitions,options,include directories and features
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${TAGLIB_INCLUDE_DIRS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
-
-target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/../module-bsp/bsp/audio")
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # supress warning for flac decoder
 set_source_files_properties(
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp"
         PROPERTIES COMPILE_FLAGS
-	    "-Wno-implicit-fallthrough -Wno-error=maybe-uninitialized"
-)
-
-target_compile_definitions(${PROJECT_NAME}
-
-        PUBLIC
-
-)
-
-target_include_directories(${PROJECT_NAME}
-
-        PUBLIC
-
-        ${CMAKE_CURRENT_SOURCE_DIR}
-
+	"-Wno-implicit-fallthrough -Wno-error=maybe-uninitialized"
 )
 
 target_link_libraries(${PROJECT_NAME}
+    ${AUDIO_BOARD_LIBRARY}
     module-bsp
     module-os
     module-utils
@@ -86,4 +67,3 @@ target_link_libraries(${PROJECT_NAME}
 if (${ENABLE_TESTS})
     add_subdirectory(Audio/test)
 endif ()
-

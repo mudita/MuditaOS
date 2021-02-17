@@ -209,24 +209,24 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
     message->ID        = 10;
     message->type      = SMSType::DRAFT;
 
-    auto messageJson = helper->to_json(*message);
+    auto messageJson = helper->toJson(*message);
 
     REQUIRE(messageJson[json::messages::messageBody] == "test message");
     REQUIRE(messageJson[json::messages::contactID] == 1);
-    REQUIRE(messageJson[json::messages::date] == 12345);
-    REQUIRE(messageJson[json::messages::dateSent] == 54321);
+    REQUIRE(messageJson[json::messages::receivedAt] == 12345);
+    REQUIRE(messageJson[json::messages::sentAt] == 54321);
     REQUIRE(messageJson[json::messages::threadID] == 1);
-    REQUIRE(messageJson[json::messages::id] == 10);
+    REQUIRE(messageJson[json::messages::messageID] == 10);
 
     auto messageTemplate = std::make_unique<SMSTemplateRecord>();
 
     messageTemplate->text = "test template";
     messageTemplate->ID   = 1;
 
-    auto messageTemplateJson = helper->to_json(*messageTemplate);
+    auto messageTemplateJson = helper->toJson(*messageTemplate);
 
-    REQUIRE(messageTemplateJson[json::messages::templateText] == "test template");
-    REQUIRE(messageTemplateJson[json::messages::id] == 1);
+    REQUIRE(messageTemplateJson[json::messages::templateBody] == "test template");
+    REQUIRE(messageTemplateJson[json::messages::templateID] == 1);
 }
 
 TEST_CASE("Context class test")

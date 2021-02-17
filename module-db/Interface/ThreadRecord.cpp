@@ -226,7 +226,9 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::markAsReadQuery(const st
         ret                   = Update(record);
     }
 
-    return std::make_unique<db::query::MarkAsReadResult>(ret);
+    auto response = std::make_unique<db::query::MarkAsReadResult>(ret);
+    response->setRequestQuery(query);
+    return response;
 }
 
 std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadsGetQuery(const std::shared_ptr<db::Query> &query)

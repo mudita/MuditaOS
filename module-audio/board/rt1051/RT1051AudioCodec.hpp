@@ -10,7 +10,7 @@
 #include "task.h"
 #include "macros.h"
 
-#include "CodecMAX98090.hpp"
+#include "board/rt1051/bsp/audio/CodecMAX98090.hpp"
 
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"
@@ -18,24 +18,21 @@
 
 #include <mutex.hpp>
 
-namespace bsp
+namespace audio
 {
 
     void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
     void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
 
-    class RT1051Audiocodec : public SAIAudioDevice
+    class RT1051AudioCodec : public SAIAudioDevice
     {
 
       public:
-        static void Init();
-        static void Deinit();
-
         friend void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
         friend void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
 
-        RT1051Audiocodec();
-        virtual ~RT1051Audiocodec();
+        RT1051AudioCodec();
+        virtual ~RT1051AudioCodec();
 
         AudioDevice::RetCode Start(const Format &format) override final;
         AudioDevice::RetCode Stop() override final;
@@ -63,21 +60,11 @@ namespace bsp
             sai_mono_stereo_t stereo; /*!< Mono or stereo */
         };
 
-        static sai_config_t config;
-        static std::uint32_t mclkSourceClockHz;
-
         State state = State::Stopped;
         SAIFormat saiInFormat;
         SAIFormat saiOutFormat;
         CodecParamsMAX98090 codecParams;
         CodecMAX98090 codec;
-
-        // M.P: It is important to destroy these drivers in specific order
-        static std::shared_ptr<drivers::DriverPLL> pllAudio;
-        static std::shared_ptr<drivers::DriverDMAMux> dmamux;
-        static std::shared_ptr<drivers::DriverDMA> dma;
-        static std::unique_ptr<drivers::DriverDMAHandle> rxDMAHandle;
-        static std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t rxHandle);
@@ -86,5 +73,8 @@ namespace bsp
         void InStart();
         void OutStop();
         void InStop();
+
+        CodecParamsMAX98090::InputPath getCodecInputPath(const AudioDevice::Format &format);
+        CodecParamsMAX98090::OutputPath getCodecOutputPath(const AudioDevice::Format &format);
     };
-} // namespace bsp
+} // namespace audio

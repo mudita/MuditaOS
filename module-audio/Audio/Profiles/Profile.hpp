@@ -1,13 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include "Audio/AudioDevice.hpp"
+
 #include <memory>
 #include <functional>
 #include <string>
-
-#include <bsp/audio/bsp_audio.hpp>
 
 namespace audio
 {
@@ -43,9 +43,8 @@ namespace audio
         };
 
         static std::unique_ptr<Profile> Create(const Type t,
-                                               std::function<int32_t()> callback = nullptr,
-                                               std::optional<Volume> vol         = 0,
-                                               std::optional<Gain> gain          = 0);
+                                               std::optional<Volume> vol = 0,
+                                               std::optional<Gain> gain  = 0);
 
         void SetOutputVolume(Volume vol);
 
@@ -55,9 +54,9 @@ namespace audio
 
         void SetSampleRate(uint32_t samplerate);
 
-        void SetOutputPath(bsp::AudioDevice::OutputPath path);
+        void SetOutputPath(AudioDevice::OutputPath path);
 
-        void SetInputPath(bsp::AudioDevice::InputPath path);
+        void SetInputPath(AudioDevice::InputPath path);
 
         Volume GetOutputVolume() const
         {
@@ -79,22 +78,22 @@ namespace audio
             return audioFormat.flags;
         }
 
-        bsp::AudioDevice::OutputPath GetOutputPath() const
+        AudioDevice::OutputPath GetOutputPath() const
         {
             return audioFormat.outputPath;
         }
 
-        bsp::AudioDevice::InputPath GetInputPath() const
+        AudioDevice::InputPath GetInputPath() const
         {
             return audioFormat.inputPath;
         }
 
-        bsp::AudioDevice::Type GetAudioDeviceType() const
+        AudioDevice::Type GetAudioDeviceType() const
         {
             return audioDeviceType;
         }
 
-        bsp::AudioDevice::Format GetAudioFormat()
+        AudioDevice::Format GetAudioFormat()
         {
             return audioFormat;
         }
@@ -110,19 +109,13 @@ namespace audio
         }
 
       protected:
-        Profile(const std::string &name,
-                const Type type,
-                const bsp::AudioDevice::Format &fmt,
-                bsp::AudioDevice::Type devType,
-                std::function<int32_t()> callback);
+        Profile(const std::string &name, const Type type, const AudioDevice::Format &fmt, AudioDevice::Type devType);
 
-        bsp::AudioDevice::Format audioFormat{};
-        bsp::AudioDevice::Type audioDeviceType = bsp::AudioDevice::Type::Audiocodec;
+        AudioDevice::Format audioFormat{};
+        AudioDevice::Type audioDeviceType = AudioDevice::Type::Audiocodec;
 
         std::string name;
         Type type = Type::Idle;
-
-        std::function<int32_t()> dbAccessCallback = nullptr;
     };
 
     [[nodiscard]] const std::string str(const Profile::Type &profileType);

@@ -26,6 +26,7 @@ namespace app
 
     class ApplicationMusicPlayer : public Application
     {
+        std::optional<audio::Token> currentFileToken;
 
       public:
         ApplicationMusicPlayer(std::string name                    = name_music_player,
@@ -51,6 +52,8 @@ namespace app
         bool resume();
         bool stop();
         std::optional<audio::Tags> getFileTags(const std::string &filePath);
+
+        void handlePlayResponse(sys::Message *msg);
     };
 
     template <> struct ManifestTraits<ApplicationMusicPlayer>

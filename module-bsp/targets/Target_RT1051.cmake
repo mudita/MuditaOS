@@ -1,3 +1,6 @@
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 include(board/rt1051/bsp/usb/usb.cmake)
 
 set(BOARD_SOURCES ${BOARD_SOURCES}
@@ -31,6 +34,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_wdog.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers/fsl_pwm.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/irq/irq_gpio.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/audio.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/board.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/chip.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/clock_config.cpp"
@@ -57,9 +61,6 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bluetooth/BlueKitchen.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/rtc/rtc.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/battery-charger/battery_charger.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051Audiocodec.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051CellularAudio.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/SAIAudioDevice.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/CodecMAX98090.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/qfilter.c"
 	"${USB_SRC}"

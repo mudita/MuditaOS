@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
@@ -10,21 +10,20 @@ namespace audio
     class ProfileRoutingHeadphones : public Profile
     {
       public:
-        ProfileRoutingHeadphones(std::function<int32_t()> callback, Volume volume, Gain gain)
-            : Profile("Routing Headset",
-                      Type::RoutingHeadphones,
-                      bsp::AudioDevice::Format{
-                          .sampleRate_Hz = 16000,
-                          .bitWidth      = 16,
-                          .flags         = static_cast<uint32_t>(
-                                       bsp::AudioDevice::Flags::InputLeft) | // microphone use left audio channel
-                                   static_cast<uint32_t>(bsp::AudioDevice::Flags::OutputMono),
-                          .outputVolume = static_cast<float>(volume),
-                          .inputGain    = static_cast<float>(gain),
-                          .inputPath    = bsp::AudioDevice::InputPath::Headphones,
-                          .outputPath   = bsp::AudioDevice::OutputPath::HeadphonesMono},
-                      bsp::AudioDevice::Type::Audiocodec,
-                      callback)
+        ProfileRoutingHeadphones(Volume volume, Gain gain)
+            : Profile(
+                  "Routing Headset",
+                  Type::RoutingHeadphones,
+                  AudioDevice::Format{.sampleRate_Hz = 16000,
+                                      .bitWidth      = 16,
+                                      .flags         = static_cast<uint32_t>(
+                                                   AudioDevice::Flags::InputLeft) | // microphone use left audio channel
+                                               static_cast<uint32_t>(AudioDevice::Flags::OutputMono),
+                                      .outputVolume = static_cast<float>(volume),
+                                      .inputGain    = static_cast<float>(gain),
+                                      .inputPath    = AudioDevice::InputPath::Headphones,
+                                      .outputPath   = AudioDevice::OutputPath::Headphones},
+                  AudioDevice::Type::Audiocodec)
         {}
     };
 

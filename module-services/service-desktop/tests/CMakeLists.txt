@@ -15,3 +15,17 @@ add_catch2_executable(
     DEPS
         PurePhone.img-target
 )
+
+add_catch2_executable(
+    NAME
+        service-desktop-endpoint-contacts
+    SRCS
+        tests-main.cpp
+        test-contacts.cpp
+    LIBS
+        service-desktop
+        module-utils
+        module-apps
+        module-vfs
+        iosyscalls
+)

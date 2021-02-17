@@ -24,7 +24,5 @@ namespace gui
 
       public:
         explicit AlarmItem(std::shared_ptr<AlarmsRecord> record);
-
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 } // namespace gui

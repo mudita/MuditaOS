@@ -9,27 +9,27 @@ from harness.interface.CDCSerial import Keytype
 
 def erase_all_templates(harness):
     # getting the templates count
-    body = {"template": True, "count": True}
+    body = {"category": "template", "count": True}
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
     count = ret["body"]["count"]
 
     # getting all templates
-    body = {"template": True, "count": count}
+    body = {"category": "template", "limit": count}
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
-    assert len(ret["body"]) == count
+    assert len(ret["body"][1][1]) == count
 
-    for template in ret["body"]:
-        body = {"template": True, "id": template["id"]}
+    for template in ret["body"][1][1]:
+        body = {"category": "template", "templateID": template["templateID"]}
         del_res = harness.endpoint_request("messages", "del", body)
         assert del_res["status"] == status["OK"]
 
 
 def add_new_template(harness, template_text: str):
     # adding new template
-    body = {"template": True, "text": template_text}
-    ret = harness.endpoint_request("messages", "put", body)
+    body = {"category": "template", "templateBody": template_text}
+    ret = harness.endpoint_request("messages", "post", body)
     assert ret["status"] == status["OK"]
 
 
@@ -72,19 +72,19 @@ def erase_contacts_by_name(harness, name):
 
 
 def get_message_by_text(harness, message: str, phone_number: str):
-    body = {"messageBody": message, "phoneNumber": phone_number}
+    body = {"category": "message", "messageBody": message, "phoneNumber": phone_number}
     return harness.endpoint_request("messages", "get", body)["body"]
 
 
 # default sms type is draft
 def prepare_sms(harness, message: str, phone_number: str, sms_type: int = 1):
     body = {"smsCommand": "smsAdd", "messageBody": message, "phoneNumber": phone_number, "type": sms_type}
-    return harness.endpoint_request("developerMode", "put", body)
+    return harness.endpoint_request("developerMode", "post", body)
 
 
 def prepare_sms_template(harness, message: str, phone_number: str):
     body = {"template": True, "messageBody": message, "phoneNumber": phone_number}
-    return harness.endpoint_request("developerMode", "put", body)
+    return harness.endpoint_request("developerMode", "post", body)
 
 
 def compare_messages(old_messages, new_messages, sms_type: SMSType = SMSType.OUTBOX):

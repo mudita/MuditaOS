@@ -25,9 +25,6 @@ namespace gui
         SMSTemplateItem();
         virtual ~SMSTemplateItem() = default;
         void setTemplate(std::shared_ptr<SMSTemplateRecord>);
-
-        // virtual methods from Item
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
     };
 
 } /* namespace gui */

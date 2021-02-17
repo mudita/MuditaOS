@@ -34,7 +34,6 @@ namespace gui
         void setMarkerItem(UTF8 text);
         UTF8 getLabelMarker();
 
-        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
         void setLabelMarkerDisplayMode(LabelMarkerDisplayMode mode);
     };
 

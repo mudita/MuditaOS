@@ -1,16 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include "AudioDevice.hpp"
+#include "Profiles/Profile.hpp"
+
+#include <Service/Message.hpp>
+#include <Utils.hpp>
+
 #include <map>
 #include <bitset>
-#include <bsp/audio/bsp_audio.hpp>
-#include <Utils.hpp>
 #include <utility>
-#include <Service/Message.hpp>
-
-#include "Profiles/Profile.hpp"
 
 namespace audio
 {
@@ -243,7 +244,7 @@ namespace audio
         friend class ::audio::AudioMux;
     };
 
-    RetCode GetDeviceError(bsp::AudioDevice::RetCode retCode);
+    RetCode GetDeviceError(AudioDevice::RetCode retCode);
     const std::string str(RetCode retcode);
     [[nodiscard]] auto GetVolumeText(const audio::Volume &volume) -> std::string;
 } // namespace audio

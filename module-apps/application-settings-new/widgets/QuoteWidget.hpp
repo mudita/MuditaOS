@@ -20,8 +20,6 @@ namespace gui
                     std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                     std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
 
-        auto onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool override;
-
         [[nodiscard]] auto getQuoteData() const -> app::QuoteRecord
         {
             return quote;

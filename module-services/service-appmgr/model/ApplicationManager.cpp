@@ -107,8 +107,10 @@ namespace app::manager
           blockingTimer{std::make_unique<sys::Timer>(
               timerBlock, this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)},
           shutdownDelay{std::make_unique<sys::Timer>(timerShutdownDelay, this, shutdown_delay_ms)},
-          settings(std::make_unique<settings::Settings>(this))
+          settings(std::make_unique<settings::Settings>(this)),
+          phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
     {
+        bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
         registerMessageHandlers();
         blockingTimer->connect([this](sys::Timer &) { onPhoneLocked(); });
     }
@@ -195,6 +197,12 @@ namespace app::manager
 
     void ApplicationManager::registerMessageHandlers()
     {
+        phoneModeObserver->connect(this);
+        phoneModeObserver->subscribe(
+            [](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
+                LOG_INFO("Phone mode changed.");
+            });
+
         connect(typeid(ApplicationStatusRequest), [this](sys::Message *request) {
             auto msg = static_cast<ApplicationStatusRequest *>(request);
             return std::make_shared<ApplicationStatusResponse>(msg->checkAppName,
