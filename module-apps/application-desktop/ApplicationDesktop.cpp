@@ -53,7 +53,7 @@ namespace app
 
         addActionReceiver(app::manager::actions::RequestScreenPasscode, [this](auto &&data) {
             lockHandler.handleScreenPasscodeRequest(std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::RequestPuk, [this](auto &&data) {

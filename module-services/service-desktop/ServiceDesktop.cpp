@@ -201,7 +201,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     });
 
     connect(sdesktop::usb::USBDisconnected(), [&](sys::Message *msg) {
-        bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(),
+        LOG_INFO("USB disconnected. Enabling secured endpoints.");
+        bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(true),
                         app::manager::ApplicationManager::ServiceName);
         return std::make_shared<sys::ResponseMessage>();
     });

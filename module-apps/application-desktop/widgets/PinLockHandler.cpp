@@ -68,7 +68,7 @@ namespace gui
             simLock.lockType  = type;
         }
         simLock.passcodeName = passcodeData->getPasscodeName();
-        simLock.value = passcodeData->getAttempts();
+        simLock.value        = passcodeData->getAttempts();
     }
 
     void PinLockHandler::handlePasscodeRequest(PinLock::LockType type, app::manager::actions::ActionParamsPtr &&data)
@@ -90,7 +90,11 @@ namespace gui
             Store::GSM::SIM::NONE, PinLock::LockState::PasscodeRequired, PinLock::LockType::Screen);
 
         if (params->isCancel()) {
-            app->switchWindow(app::window::name::desktop_main_window);
+            if (app->getCurrentWindow()->getName() == app::window::name::desktop_pin_lock) {
+                app->switchWindow(app::window::name::desktop_main_window);
+            }
+            app->bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>(),
+                                 service::name::service_desktop);
             return;
         }
 
