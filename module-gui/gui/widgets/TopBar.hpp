@@ -7,12 +7,16 @@
 #include "Label.hpp"
 #include "Rect.hpp"
 #include "TopBar/SIM.hpp"
-#include "TopBar/BatteryWidgetBase.hpp"
 #include <common_data/EventStore.hpp>
 
 #include <vector>
 #include <map>
 
+namespace gui
+{
+    class SignalStrengthWidgetBase;
+    class BatteryWidgetBase;
+} // namespace gui
 namespace gui::top_bar
 {
     enum class Indicator
@@ -75,15 +79,14 @@ namespace gui::top_bar
         static uint32_t time;
 
       protected:
-        Label *timeLabel                    = nullptr;
-        Label *networkAccessTechnologyLabel = nullptr;
-        Image *signal[static_cast<size_t>(Store::RssiBar::noOfSupprtedBars)];
+        Label *timeLabel                       = nullptr;
+        Label *networkAccessTechnologyLabel    = nullptr;
+        SignalStrengthWidgetBase *signalWidget = nullptr;
         Image *lock;
-        std::array<Image *, batteryBarsCount> batteryBars               = {nullptr};
         std::map<const Store::Battery::State, Image *> batteryChargings = {
             {Store::Battery::State::Charging, nullptr}, {Store::Battery::State::PluggedNotCharging, nullptr}};
-        gui::SIM *sim = nullptr;
-        gui::BatteryWidgetBase *batteryWidget = nullptr;
+        gui::SIM *sim                    = nullptr;
+        BatteryWidgetBase *batteryWidget = nullptr;
         Configuration configuration;
         static TimeMode timeMode;
 
