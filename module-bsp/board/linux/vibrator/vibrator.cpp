@@ -17,18 +17,9 @@ namespace bsp
         {
             LOG_DEBUG("vibration ends  \t\U0001f6d1\U0001f4f3");
         }
-        void init()
+        void init(sys::ms pulse)
         {}
         void deinit()
         {}
-        void set(State state)
-        {
-            if (state == State::On) {
-                enable();
-            }
-            else {
-                disable();
-            }
-        }
     } // namespace vibrator
 } // namespace bsp
