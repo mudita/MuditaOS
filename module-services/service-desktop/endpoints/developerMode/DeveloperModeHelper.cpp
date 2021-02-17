@@ -22,6 +22,7 @@
 #include <time/time_conversion.hpp>
 #include <service-desktop/parser/MessageHandler.hpp>
 #include <service-desktop/endpoints/developerMode/event/ATRequest.hpp>
+#include <service-appmgr/service-appmgr/Controller.hpp>
 
 namespace parserFSM
 {
@@ -52,6 +53,7 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
         auto keyValue = body[json::developerMode::keyPressed].int_value();
         auto state    = body[json::developerMode::state].int_value();
         sendKeypress(getKeyCode(keyValue), static_cast<gui::InputEvent::State>(state));
+        app::manager::Controller::preventBlockingDevice(owner);
         return {sent::no, std::nullopt};
     }
     else if (body[json::developerMode::AT].is_string()) {
@@ -76,18 +78,26 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
         code       = toCode(owner->bus.sendUnicast(std::move(msg), "ApplicationDesktop"));
         return {sent::delayed, std::nullopt};
     }
+    else if (body[json::developerMode::changeAutoLockTimeout].is_string()) {
+        auto value = body[json::developerMode::changeAutoLockTimeout].string_value();
+        settings::EntryPath path;
+        path.variable = settings::SystemProperties::lockTime;
+        path.service  = service::name::db;
+        path.scope    = settings::SettingsScope::Global;
+        auto msg      = std::make_shared<settings::Messages::SetVariable>(std::move(path), std::move(value));
+        code          = toCode(owner->bus.sendUnicast(std::move(msg), service::name::db));
+        return {sent::no, endpoint::ResponseContext{.status = code}};
+    }
     else if (body[json::developerMode::changeSim].is_number()) {
         int simSelected = body[json::developerMode::changeSim].int_value();
         requestSimChange(simSelected);
         code = toCode(true);
-        return {sent::no, std::nullopt};
+        return {sent::no, endpoint::ResponseContext{.status = code}};
     }
     else if (body[json::developerMode::changeCellularStateCmd].is_number()) {
         int cellularState = body[json::developerMode::changeCellularStateCmd].int_value();
-        if (requestCellularPowerStateChange(cellularState) == false) {
-            context.setResponseStatus(http::Code::NotAcceptable);
-        }
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
+        code              = toCode(requestCellularPowerStateChange(cellularState));
+        return {sent::no, endpoint::ResponseContext{.status = code}};
     }
     else if (body[json::developerMode::smsCommand].is_string()) {
         if (body[json::developerMode::smsCommand].string_value() == json::developerMode::smsAdd) {

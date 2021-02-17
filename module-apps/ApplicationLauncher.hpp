@@ -9,6 +9,16 @@ namespace app
 {
     using ApplicationManifest = app::manager::ApplicationManifest;
 
+    enum class PreventAutoLocking : bool
+    {
+        False,
+        True
+    };
+    enum class Closeable : bool
+    {
+        False,
+        True
+    };
     /// used in ApplicationManager to start applications
     class ApplicationLauncher
     {
@@ -20,18 +30,19 @@ namespace app
         /// Application's manifest
         ApplicationManifest manifest;
         /// defines whether application can be closed when it looses focus
-        bool closeable = true;
+        Closeable closeable = Closeable::False;
         /// defines whether application should be run without gaining focus, it will remian in the BACKGROUND state
         bool startBackground = false;
-        /// flag defines whether this application can prevent power manager from changing
-        bool preventBlocking = false;
+        /// flag defines whether this application can prevent auto-locking mechanism
+        PreventAutoLocking preventAutoLocking = PreventAutoLocking::False;
 
       public:
         ApplicationLauncher(std::string name,
                             ApplicationManifest &&manifest,
-                            bool isCloseable,
-                            bool preventBlocking = false)
-            : name{name}, manifest{std::move(manifest)}, closeable{isCloseable}, preventBlocking{preventBlocking} {};
+                            Closeable isCloseable,
+                            PreventAutoLocking preventAutoLocking = PreventAutoLocking::False)
+            : name{std::move(name)}, manifest{std::move(manifest)}, closeable{isCloseable}, preventAutoLocking{
+                                                                                                preventAutoLocking} {};
         virtual ~ApplicationLauncher() = default;
 
         [[nodiscard]] std::string getName() const noexcept
@@ -46,12 +57,12 @@ namespace app
 
         [[nodiscard]] bool isCloseable() const noexcept
         {
-            return closeable;
+            return (closeable == Closeable::True);
         }
 
-        [[nodiscard]] bool isBlocking() const noexcept
+        [[nodiscard]] bool isPreventAutoLockingOn() const noexcept
         {
-            return preventBlocking;
+            return (preventAutoLocking == PreventAutoLocking::True);
         }
 
         virtual bool run(sys::Service *caller = nullptr)
@@ -71,8 +82,11 @@ namespace app
     template <class T> class ApplicationLauncherT : public ApplicationLauncher
     {
       public:
-        ApplicationLauncherT(std::string name, ApplicationManifest &&manifest, bool isCloseable = true)
-            : ApplicationLauncher(name, std::move(manifest), isCloseable)
+        ApplicationLauncherT(std::string name,
+                             ApplicationManifest &&manifest,
+                             Closeable isCloseable              = Closeable::True,
+                             PreventAutoLocking preventBlocking = PreventAutoLocking::True)
+            : ApplicationLauncher(name, std::move(manifest), isCloseable, preventBlocking)
         {}
 
         bool run(sys::Service *caller) override
@@ -92,9 +106,12 @@ namespace app
 
     /// creates application launcher per class provided
     template <class T>
-    std::unique_ptr<ApplicationLauncherT<T>> CreateLauncher(std::string name, bool isCloseable = true)
+    std::unique_ptr<ApplicationLauncherT<T>> CreateLauncher(
+        std::string name,
+        Closeable isCloseable                 = Closeable::True,
+        PreventAutoLocking preventAutoLocking = PreventAutoLocking::False)
     {
         return std::unique_ptr<ApplicationLauncherT<T>>(
-            new ApplicationLauncherT<T>(name, ManifestOf<T>(), isCloseable));
+            new ApplicationLauncherT<T>(name, ManifestOf<T>(), isCloseable, preventAutoLocking));
     }
 } // namespace app

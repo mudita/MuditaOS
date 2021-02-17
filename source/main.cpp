@@ -122,10 +122,12 @@ int main()
             // vector with launchers to applications
             std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
 #ifdef ENABLE_APP_DESKTOP
-            applications.push_back(app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, false));
+            applications.push_back(
+                app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, app::Closeable::False));
 #endif
 #ifdef ENABLE_APP_CALL
-            applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call, false));
+            applications.push_back(app::CreateLauncher<app::ApplicationCall>(
+                app::name_call, app::Closeable::False, app::PreventAutoLocking::True));
 #endif
 #ifdef ENABLE_APP_SETTINGS
             applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));
@@ -146,7 +148,8 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationMessages>(app::name_messages));
 #endif
 #ifdef ENABLE_APP_SPECIAL_INPUT
-            applications.push_back(app::CreateLauncher<app::ApplicationSpecialInput>(app::special_input, false));
+            applications.push_back(
+                app::CreateLauncher<app::ApplicationSpecialInput>(app::special_input, app::Closeable::False));
 #endif
 #ifdef ENABLE_APP_ANTENNA
             applications.push_back(app::CreateLauncher<app::ApplicationAntenna>(app::name_antenna));
@@ -158,7 +161,8 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationMusicPlayer>(app::name_music_player));
 #endif
 #ifdef ENABLE_APP_MEDITATION
-            applications.push_back(app::CreateLauncher<app::ApplicationMeditation>(app::name_meditation));
+            applications.push_back(app::CreateLauncher<app::ApplicationMeditation>(
+                app::name_meditation, app::Closeable::True, app::PreventAutoLocking::True));
 #endif
 #ifdef ENABLE_APP_CALCULATOR
             applications.push_back(app::CreateLauncher<app::ApplicationCalculator>(app::name_calculator));
