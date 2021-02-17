@@ -42,9 +42,12 @@
 #include <service-bluetooth/service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
+#include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <application-settings-new/data/ApnListData.hpp>
 #include <application-settings-new/data/BondedDevicesData.hpp>
+#include <application-settings-new/data/BluetoothStatusData.hpp>
+#include <application-settings-new/data/DeviceData.hpp>
 #include <application-settings-new/data/LanguagesData.hpp>
 #include <application-settings-new/data/PhoneNameData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
@@ -69,7 +72,7 @@ namespace app
     ApplicationSettingsNew::ApplicationSettingsNew(std::string name,
                                                    std::string parent,
                                                    StartInBackground startInBackground)
-        : Application(name, parent, startInBackground)
+        : Application(std::move(name), std::move(parent), startInBackground)
     {
         if ((Store::GSM::SIM::SIM1 == selectedSim || Store::GSM::SIM::SIM2 == selectedSim) &&
             Store::GSM::get()->sim == selectedSim) {
@@ -78,8 +81,7 @@ namespace app
     }
 
     ApplicationSettingsNew::~ApplicationSettingsNew()
-    {
-    }
+    {}
 
     // Invoked upon receiving data message
     auto ApplicationSettingsNew::DataReceivedHandler(sys::DataMessage *msgl,
@@ -92,16 +94,7 @@ namespace app
             return retMsg;
         }
 
-        if (auto btMsg = dynamic_cast<BluetoothScanResultMessage *>(msgl); btMsg != nullptr) {
-            auto scannedBtDevices = btMsg->devices;
-            LOG_INFO("Received BT Scan message!");
-
-            auto data = std::make_unique<gui::DeviceData>(scannedBtDevices);
-            windowsFactory.build(this, gui::window::name::add_device);
-            switchWindow(gui::window::name::add_device, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-            render(gui::RefreshModes::GUI_REFRESH_FAST);
-        }
-        else if (auto phoneMsg = dynamic_cast<CellularNotificationMessage *>(msgl); nullptr != phoneMsg) {
+        if (auto phoneMsg = dynamic_cast<CellularNotificationMessage *>(msgl); nullptr != phoneMsg) {
             selectedSim = Store::GSM::get()->selected;
             if (CellularNotificationMessage::Type::SIM_READY == phoneMsg->type) {
                 selectedSimNumber = CellularServiceAPI::GetOwnNumber(this);
@@ -155,6 +148,19 @@ namespace app
             return sys::MessageNone{};
         });
 
+        connect(typeid(::message::bluetooth::ResponseVisibleDevices), [&](sys::Message *msg) {
+            auto responseVisibleDevicesMsg = static_cast<::message::bluetooth::ResponseVisibleDevices *>(msg);
+            if (gui::window::name::add_device == getCurrentWindow()->getName() ||
+                gui::window::name::dialog_settings == getCurrentWindow()->getName()) {
+                auto visibleDevicesData = std::make_unique<gui::DeviceData>(responseVisibleDevicesMsg->getDevices());
+                if (gui::window::name::dialog_settings == getCurrentWindow()->getName()) {
+                    visibleDevicesData->ignoreCurrentWindowOnStack = true;
+                }
+                switchWindow(gui::window::name::add_device, std::move(visibleDevicesData));
+            }
+            return sys::MessageNone{};
+        });
+
         connect(typeid(CellularGetAPNResponse), [&](sys::Message *msg) {
             if (gui::window::name::apn_settings == getCurrentWindow()->getName()) {
                 auto apns = dynamic_cast<CellularGetAPNResponse *>(msg);
@@ -189,11 +195,11 @@ namespace app
             ::settings::SettingsScope::Global);
         settings->registerValueChange(
             ::settings::SystemProperties::lockPassHash,
-            [this](std::string value) { lockPassHash = utils::getNumericValue<unsigned int>(value); },
+            [this](const std::string &value) { lockPassHash = utils::getNumericValue<unsigned int>(value); },
             ::settings::SettingsScope::Global);
         settings->registerValueChange(
             ::settings::Bluetooth::state,
-            [this](std::string value) {
+            [this](const std::string &value) {
                 if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
                     const auto isBtOn = utils::getNumericValue<bool>(value);
                     auto btStatusData = std::make_unique<gui::BluetoothStatusData>(
@@ -204,7 +210,7 @@ namespace app
             ::settings::SettingsScope::Global);
         settings->registerValueChange(
             ::settings::Bluetooth::deviceVisibility,
-            [this](std::string value) {
+            [this](const std::string &value) {
                 if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
                     const auto isVisible = utils::getNumericValue<bool>(value);
                     auto btStatusData    = std::make_unique<gui::BluetoothStatusData>(isVisible);
@@ -346,7 +352,7 @@ namespace app
     {
         operatorsOn = value;
         LOG_DEBUG("[ApplicationSettingsNew::setOperatorsOn] to %d", operatorsOn);
-        settings->setValue(settings::operators_on, std::to_string(value));
+        settings->setValue(settings::operators_on, std::to_string(static_cast<int>(value)));
     }
 
     void ApplicationSettingsNew::setVoLTEOn(bool value)
@@ -432,7 +438,7 @@ namespace app
                 return false;
             }
 
-            return {msgState->success};
+            return msgState->success;
         }
         return false;
     }
