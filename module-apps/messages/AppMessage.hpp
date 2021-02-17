@@ -35,6 +35,14 @@ namespace app
         manager::actions::ActionParamsPtr data;
     };
 
+    class ActionHandledResponse : public sys::ResponseMessage
+    {
+      public:
+        explicit ActionHandledResponse(sys::ReturnCodes retCode = sys::ReturnCodes::Success)
+            : sys::ResponseMessage{retCode, MessageType::AppAction}
+        {}
+    };
+
     // this message is used to notify application about switching event. Application will gain or lose focus upon
     // receiving this message. Application gains focus when it was in init or active background state. Application loose
     // focus when it was in active foreground state. if no window is specified it is assumed that MainWindow is the

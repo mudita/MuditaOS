@@ -52,7 +52,7 @@ namespace app
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowReminder, [this](auto &&data) {
             switchWindow(style::window::calendar::name::event_reminder_window, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
     }
 

@@ -15,6 +15,18 @@
 
 declare -A TESTS_LIST
 
+TESTS_LIST["catch2-actions-registry-tests"]="
+    Given actions registry when initialise it incorrectly then verify;
+    Given empty actions registry when verify its state then no pending actions;
+    Given actions registry when enqueue then check pending action;
+    Given actions registry when enqueue then check if action was processed;
+    Given actions registry when finished queued action then no pending actions;
+    Given actions registry when enqueue multiple actions sequentially then count handled actions;
+    Given actions registry when enqueue multiple actions at once then count handled actions;
+    Given actions registry when enqueue multiple actions at once then wait for them to expire.;
+    Given actions registry when enqueue multiple actions at once then process the specific ones only.;
+"
+#---------
 TESTS_LIST["catch2-audio-test"]="
     Test audio tags;
     Audio settings string creation;

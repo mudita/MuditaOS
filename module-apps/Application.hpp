@@ -73,6 +73,11 @@ namespace app
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
     }
 
+    class ActionHandledResponse; // Forward declaration
+    using ActionResult = std::shared_ptr<ActionHandledResponse>;
+    auto actionHandled() -> ActionResult;
+    auto actionNotHandled() -> ActionResult;
+
     using ApplicationName = std::string;
 
     enum class StartupStatus
@@ -156,7 +161,7 @@ namespace app
         /// c_str() function for Application::State
         static const char *stateStr(State st);
 
-        using OnActionReceived = std::function<sys::MessagePointer(manager::actions::ActionParamsPtr &&)>;
+        using OnActionReceived = std::function<ActionResult(manager::actions::ActionParamsPtr &&)>;
 
       private:
         std::string default_window;
