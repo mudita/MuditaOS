@@ -4,25 +4,25 @@
 #pragma once
 
 #include <purefs/blkdev/disk.hpp>
-#include <bsp/common.hpp>
-
-#include "board/rt1051/bsp/eMMC/fsl_mmc.h"
-
 #include <mutex.hpp>
+#include <memory>
 
 #if !defined(TARGET_RT1051)
 static_assert(false, "Unsupported target.");
 #endif
+
+struct _mmc_card;
 
 namespace purefs::blkdev
 {
     class disk_emmc final : public disk
     {
       public:
-        static constexpr status_t statusBlkDevSuccess = 0;
-        static constexpr status_t statusBlkDevFail    = -1;
+        static constexpr auto statusBlkDevSuccess = 0;
+        static constexpr auto statusBlkDevFail    = -1;
 
         disk_emmc();
+        virtual ~disk_emmc();
 
         auto probe(unsigned flags) -> int override;
         auto cleanup() -> int override;
@@ -34,9 +34,8 @@ namespace purefs::blkdev
         auto erase(sector_t lba, std::size_t count) -> int override;
 
       private:
-        status_t initStatus = kStatus_Success;
-
-        mmc_card_t mmcCard;
+        int initStatus;
+        std::unique_ptr<_mmc_card> mmcCard;
         mutable cpp_freertos::MutexRecursive mutex;
     };
 } // namespace purefs::blkdev

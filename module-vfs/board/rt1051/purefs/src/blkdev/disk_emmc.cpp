@@ -6,21 +6,30 @@
 #include <cstring>
 #include <task.h>
 
+#include <bsp/common.hpp>
+#include "board/rt1051/bsp/eMMC/fsl_mmc.h"
+
 namespace purefs::blkdev
 {
-    disk_emmc::disk_emmc()
+
+    disk_emmc::disk_emmc() : initStatus(kStatus_Success), mmcCard(std::make_unique<_mmc_card>())
     {
-        mmcCard.busWidth                   = kMMC_DataBusWidth8bit;
-        mmcCard.busTiming                  = kMMC_HighSpeedTiming;
-        mmcCard.enablePreDefinedBlockCount = true;
-        mmcCard.host.base                  = USDHC2;
-        mmcCard.host.sourceClock_Hz        = GetPerphSourceClock(PerphClock_USDHC2);
+        assert(mmcCard.get());
+        std::memset(mmcCard.get(), 0, sizeof(_mmc_card));
+        mmcCard->busWidth                   = kMMC_DataBusWidth8bit;
+        mmcCard->busTiming                  = kMMC_HighSpeedTiming;
+        mmcCard->enablePreDefinedBlockCount = true;
+        mmcCard->host.base                  = USDHC2;
+        mmcCard->host.sourceClock_Hz        = GetPerphSourceClock(PerphClock_USDHC2);
     }
+
+    disk_emmc::~disk_emmc()
+    {}
 
     auto disk_emmc::probe(unsigned int flags) -> int
     {
         cpp_freertos::LockGuard lock(mutex);
-        auto err = MMC_Init(&mmcCard);
+        auto err = MMC_Init(mmcCard.get());
         if (err != kStatus_Success) {
             initStatus = err;
             return initStatus;
@@ -31,20 +40,20 @@ namespace purefs::blkdev
     auto disk_emmc::cleanup() -> int
     {
         cpp_freertos::LockGuard lock(mutex);
-        if (!mmcCard.isHostReady) {
+        if (!mmcCard->isHostReady) {
             return statusBlkDevFail;
         }
-        MMC_Deinit(&mmcCard);
+        MMC_Deinit(mmcCard.get());
         return statusBlkDevSuccess;
     }
 
     auto disk_emmc::write(const void *buf, sector_t lba, std::size_t count) -> int
     {
         cpp_freertos::LockGuard lock(mutex);
-        if (!mmcCard.isHostReady || buf == nullptr) {
+        if (!mmcCard->isHostReady || buf == nullptr) {
             return statusBlkDevFail;
         }
-        auto err = MMC_WriteBlocks(&mmcCard, static_cast<const uint8_t *>(buf), lba, count);
+        auto err = MMC_WriteBlocks(mmcCard.get(), static_cast<const uint8_t *>(buf), lba, count);
         if (err != kStatus_Success) {
             return err;
         }
@@ -60,10 +69,10 @@ namespace purefs::blkdev
     auto disk_emmc::read(void *buf, sector_t lba, std::size_t count) -> int
     {
         cpp_freertos::LockGuard lock(mutex);
-        if (!mmcCard.isHostReady || buf == nullptr) {
+        if (!mmcCard->isHostReady || buf == nullptr) {
             return statusBlkDevFail;
         }
-        auto err = MMC_ReadBlocks(&mmcCard, static_cast<uint8_t *>(buf), lba, count);
+        auto err = MMC_ReadBlocks(mmcCard.get(), static_cast<uint8_t *>(buf), lba, count);
         if (err != kStatus_Success) {
             return err;
         }
@@ -72,15 +81,15 @@ namespace purefs::blkdev
     auto disk_emmc::sync() -> int
     {
         cpp_freertos::LockGuard lock(mutex);
-        if (!mmcCard.isHostReady) {
+        if (!mmcCard->isHostReady) {
             return statusBlkDevFail;
         }
         // Wait for the card's buffer to become empty
-        while ((GET_SDMMCHOST_STATUS(mmcCard.host.base) & CARD_DATA0_STATUS_MASK) != CARD_DATA0_NOT_BUSY) {
+        while ((GET_SDMMCHOST_STATUS(mmcCard->host.base) & CARD_DATA0_STATUS_MASK) != CARD_DATA0_NOT_BUSY) {
             taskYIELD();
         }
 
-        if (kStatus_Success != MMC_WaitWriteComplete(&mmcCard)) {
+        if (kStatus_Success != MMC_WaitWriteComplete(mmcCard.get())) {
             return kStatus_SDMMC_WaitWriteCompleteFailed;
         }
         return statusBlkDevSuccess;
@@ -91,11 +100,11 @@ namespace purefs::blkdev
         if (initStatus != kStatus_Success) {
             return media_status::error;
         }
-        if (!mmcCard.isHostReady) {
+        if (!mmcCard->isHostReady) {
             return media_status::uninit;
         }
-        if ((mmcCard.csd.flags & kMMC_CsdPermanentWriteProtectFlag) ||
-            (mmcCard.csd.flags & kMMC_CsdTemporaryWriteProtectFlag)) {
+        if ((mmcCard->csd.flags & kMMC_CsdPermanentWriteProtectFlag) ||
+            (mmcCard->csd.flags & kMMC_CsdTemporaryWriteProtectFlag)) {
             return media_status::wprotect;
         }
         return media_status::healthly;
@@ -106,9 +115,9 @@ namespace purefs::blkdev
         cpp_freertos::LockGuard lock(mutex);
         switch (what) {
         case info_type::sector_size:
-            return mmcCard.blockSize;
+            return mmcCard->blockSize;
         case info_type::sector_count:
-            return mmcCard.userPartitionBlocks;
+            return mmcCard->userPartitionBlocks;
         case info_type::erase_block:
             // not supported
             return 0;
