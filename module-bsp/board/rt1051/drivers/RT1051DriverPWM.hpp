@@ -19,14 +19,18 @@ namespace drivers
 
         ~RT1051DriverPWM() final;
 
-        void SetDutyCycle(std::uint8_t duty_cycle_percent) final;
+        void SetDutyCycle(std::uint8_t dutyCyclePercent) final;
 
         void Start() final;
 
         void Stop() final;
 
+        void UpdateClockFrequency(std::uint32_t newFrequency) final;
+
       private:
-        void SetupPWMChannel(PWMChannel channel, std::uint32_t frequency);
+        void SetupPWMChannel(PWMChannel channel);
+
+        void SetupPWMInstance(std::uint32_t clockFrequency);
 
         void ForceLowOutput();
 
@@ -44,7 +48,7 @@ namespace drivers
 
         std::uint8_t lastDutyCycle = 0;
 
-        cpp_freertos::MutexStandard dutyCycleMutex;
+        cpp_freertos::MutexStandard frequencyChangeMutex;
     };
 
 } // namespace drivers

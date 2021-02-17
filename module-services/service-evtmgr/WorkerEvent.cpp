@@ -29,6 +29,7 @@
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <SystemManager/SystemManager.hpp>
+#include <SystemManager/messages/SentinelRegistrationMessage.hpp>
 
 extern "C"
 {
@@ -221,6 +222,14 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queuesList)
     bsp::rtc_GetCurrentTimestamp(&timestamp);
     bsp::rtc_SetMinuteAlarm(timestamp);
 
+    cpuSentinel = std::make_shared<sys::CpuSentinel>(
+        service::name::evt_manager, service, [this](bsp::CpuFrequencyHz newFrequency) {
+            updateResourcesAfterCpuFrequencyChange(newFrequency);
+        });
+
+    auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+    service->bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
+
     return true;
 }
 
@@ -245,6 +254,11 @@ bool WorkerEvent::deinit(void)
     battery_level_check::deinit();
 
     return true;
+}
+
+void WorkerEvent::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
+{
+    bsp::eink_frontlight::updateClockFrequency(newFrequency);
 }
 
 void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)

@@ -29,4 +29,6 @@ namespace bsp::eink_frontlight
     void turnOff();
 
     void setGammaFactor(float gamma);
+
+    void updateClockFrequency(CpuFrequencyHz newFrequency);
 } // namespace bsp::eink_frontlight

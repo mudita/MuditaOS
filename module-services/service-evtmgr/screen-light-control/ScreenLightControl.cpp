@@ -175,7 +175,7 @@ namespace screen_light_control
     {
         bsp::eink_frontlight::turnOn();
         bsp::light_sensor::wakeup();
-        if (automaticMode) {
+        if (automaticMode == ScreenLightMode::Automatic) {
             enableTimers();
         }
         lightOn = true;
