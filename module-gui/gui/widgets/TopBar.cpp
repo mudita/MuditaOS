@@ -10,22 +10,27 @@
 #include "Style.hpp"
 #include "TopBar/BatteryWidgetBar.hpp"
 #include "TopBar/BatteryWidgetText.hpp"
+#include "TopBar/SignalStrengthWidgetBar.hpp"
+#include "TopBar/SignalStrengthWidgetText.hpp"
 #include "common_data/EventStore.hpp"
 
 namespace gui::top_bar
 {
     constexpr auto batteryWidgetAsText = false;
     using BatteryWidgetType = std::conditional<batteryWidgetAsText, BatteryWidgetText, BatteryWidgetBar>::type;
+    constexpr auto signalWidgetAsText = false;
+    using SignalWidgetType =
+        std::conditional<signalWidgetAsText, SignalStrengthWidgetText, SignalStrengthWidgetBar>::type;
 
     namespace networkTechnology
     {
-        constexpr uint32_t x = 80;
+        constexpr uint32_t x = 100;
         constexpr uint32_t y = 21;
         constexpr uint32_t w = 130;
         constexpr uint32_t h = 20;
     } // namespace networkTechnology
 
-    static constexpr uint32_t signalOffset  = 35;
+    static constexpr uint32_t signalOffset  = 20;
     static constexpr uint32_t batteryOffset = 413;
 
     TopBar::TimeMode TopBar::timeMode = TimeMode::TIME_24H;
@@ -80,15 +85,10 @@ namespace gui::top_bar
 
     void TopBar::prepareWidget()
     {
-        signal[0] = new gui::Image(this, signalOffset, 17, 0, 0, "signal0");
-        signal[1] = new gui::Image(this, signalOffset, 17, 0, 0, "signal1");
-        signal[2] = new gui::Image(this, signalOffset, 17, 0, 0, "signal2");
-        signal[3] = new gui::Image(this, signalOffset, 17, 0, 0, "signal3");
-        signal[4] = new gui::Image(this, signalOffset, 17, 0, 0, "signal4");
-        signal[5] = new gui::Image(this, signalOffset, 17, 0, 0, "signal5");
-        updateSignalStrength();
-
         batteryWidget = new BatteryWidgetType(this, batteryOffset, 15, 60, 24);
+        signalWidget  = new SignalWidgetType(this, signalOffset, 17, 70, 24);
+
+        updateSignalStrength();
 
         const auto design_sim_offset = 376; // this offset is not final, but it is pixel Purefect
         sim                          = new SIM(this, design_sim_offset, 12);
@@ -180,17 +180,9 @@ namespace gui::top_bar
 
     bool TopBar::updateSignalStrength()
     {
-        for (uint32_t i = 0; i < signalImgCount; i++) {
-            signal[i]->setVisible(false);
-        }
-        if (configuration.isEnabled(Indicator::Signal)) {
-            auto rssiBar = Store::GSM::get()->getSignalStrength().rssiBar;
-            if (rssiBar < Store::RssiBar::noOfSupprtedBars) {
-                signal[static_cast<size_t>(rssiBar)]->setVisible(true);
-                return true;
-            }
-            return false;
-        }
+        auto signalStrength = Store::GSM::get()->getSignalStrength();
+        signalWidget->show(signalStrength, configuration.isEnabled(Indicator::Signal));
+
         return true;
     }
 
