@@ -211,6 +211,7 @@ enum class MessageType
     Restore,
     Factory,
     DeveloperModeRequest,
+    TransferTimer,
 
     // FOTA messages
     HttpRequest,

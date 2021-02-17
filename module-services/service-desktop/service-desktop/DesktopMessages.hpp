@@ -143,4 +143,22 @@ namespace sdesktop
         };
 
     } // namespace bluetooth
+
+    namespace transfer
+    {
+        class TransferTimerState : public sys::DataMessage
+        {
+          public:
+            enum Request
+            {
+                None,
+                Start,
+                Reload,
+                Stop
+            };
+            enum Request req = Request::None;
+            TransferTimerState(enum Request req = None) : sys::DataMessage(MessageType::TransferTimer), req(req){};
+            ~TransferTimerState() override = default;
+        };
+    } // namespace transfer
 } // namespace sdesktop

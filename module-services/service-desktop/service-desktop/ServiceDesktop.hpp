@@ -46,6 +46,7 @@ class ServiceDesktop : public sys::Service
 
   private:
     std::unique_ptr<settings::Settings> settings;
+    std::unique_ptr<sys::Timer> transferTimer;
 };
 
 namespace sys
