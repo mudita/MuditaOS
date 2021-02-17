@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <filesystem>
+#include <atomic>
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "Service/Worker.hpp"
@@ -21,6 +22,10 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
         doNothing,
         removeDesitnationFile
     };
+    enum class Command
+    {
+        CancelTransfer,
+    };
     WorkerDesktop(sys::Service *ownerServicePtr);
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
@@ -34,21 +39,30 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     {
         return receiveQueue;
     }
+
     sys::ReturnCodes startDownload(const std::filesystem::path &destinationPath, const uint32_t fileSize);
     void stopTransfer(const TransferFailAction action);
 
-    void timerHandler(void);
+    void cancelTransferOnTimeout();
 
     void rawDataReceived(void *dataPtr, uint32_t dataLen) override;
     bool getRawMode() const noexcept override;
 
   private:
     void uploadFileFailedResponse();
+
+    void transferTimeoutHandler();
+
+    void startTransferTimer();
+    void stopTransferTimer();
+    void reloadTransferTimer();
+
+    bool stateChangeWait();
+
     xQueueHandle receiveQueue;
     FILE *fileDes                  = nullptr;
     uint32_t writeFileSizeExpected = 0;
     uint32_t writeFileDataWritten  = 0;
     std::filesystem::path filePath;
-    volatile bool rawModeEnabled = false;
-    std::unique_ptr<sys::Timer> transferTimer;
+    std::atomic<bool> rawModeEnabled = false;
 };
