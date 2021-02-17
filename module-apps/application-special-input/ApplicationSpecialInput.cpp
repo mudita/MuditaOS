@@ -14,7 +14,7 @@ ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
 {
     addActionReceiver(manager::actions::ShowSpecialInput, [this](auto &&data) {
         switchWindow(app::char_select, std::move(data));
-        return msgHandled();
+        return actionHandled();
     });
 
     windowsFactory.attach(app::char_select, [](Application *app, const std::string &name) {

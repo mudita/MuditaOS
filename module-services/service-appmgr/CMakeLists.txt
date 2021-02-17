@@ -9,6 +9,7 @@ set(SOURCES
     model/ApplicationManager.cpp
     model/ApplicationHandle.cpp
     model/ApplicationsRegistry.cpp
+    model/ActionsRegistry.cpp
     messages/ActionRequest.cpp
     messages/ApplicationCloseRequest.cpp
     messages/ApplicationInitialised.cpp
@@ -41,3 +42,6 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_LIST_DIR}
 )
 
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif()

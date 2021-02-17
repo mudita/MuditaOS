@@ -40,15 +40,15 @@ namespace app
                                          Indicator::NetworkAccessTechnology});
         addActionReceiver(manager::actions::Call, [this](auto &&data) {
             switchWindow(window::name_call, std::forward<decltype(data)>(data));
-            return msgHandled();
+            return actionHandled();
         });
         addActionReceiver(manager::actions::Dial, [this](auto &&data) {
             switchWindow(window::name_enterNumber, std::forward<decltype(data)>(data));
-            return msgHandled();
+            return actionHandled();
         });
         addActionReceiver(manager::actions::EmergencyDial, [this](auto &&data) {
             switchWindow(app::window::name_emergencyCall, std::forward<decltype(data)>(data));
-            return msgHandled();
+            return actionHandled();
         });
         addActionReceiver(manager::actions::NotAnEmergencyNotification, [this](auto &&data) {
             auto buttonAction = [=]() -> bool {
@@ -59,7 +59,7 @@ namespace app
             auto textNoEmergency           = utils::localize.get("app_call_wrong_emergency");
             utils::findAndReplaceAll(textNoEmergency, "$NUMBER", data->getDescription());
             showNotification(buttonAction, iconNoEmergency, textNoEmergency);
-            return msgHandled();
+            return actionHandled();
         });
         addActionReceiver(manager::actions::NoSimNotification, [this](auto &&data) {
             auto buttonAction = [=]() -> bool {
@@ -69,7 +69,7 @@ namespace app
             constexpr auto iconNoSim = "info_big_circle_W_G";
             const auto textNoSim     = utils::localize.get("app_call_no_sim");
             showNotification(buttonAction, iconNoSim, textNoSim);
-            return msgHandled();
+            return actionHandled();
         });
     }
 

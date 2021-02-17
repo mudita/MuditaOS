@@ -46,7 +46,7 @@ namespace app
         bus.channels.push_back(sys::BusChannel::AntennaNotifications);
         addActionReceiver(manager::actions::SelectSimCard, [this](auto &&data) {
             switchWindow(app::sim_select);
-            return msgHandled();
+            return actionHandled();
         });
     }
 

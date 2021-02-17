@@ -5,6 +5,7 @@
 
 #include "ApplicationHandle.hpp"
 #include "ApplicationsRegistry.hpp"
+#include "ActionsRegistry.hpp"
 
 #include <module-apps/Application.hpp>
 #include <module-apps/ApplicationLauncher.hpp>
@@ -115,11 +116,12 @@ namespace app::manager
 
         // Message handlers
         void registerMessageHandlers();
-        auto handleAction(ActionRequest *actionMsg) -> bool;
-        auto handleHomeAction() -> bool;
-        auto handleLaunchAction(ApplicationLaunchData *launchParams) -> bool;
+        bool handleAction(ActionEntry &action);
+        void handleActionRequest(ActionRequest *actionMsg);
+        auto handleHomeAction(ActionEntry &action) -> bool;
+        auto handleLaunchAction(ActionEntry &action) -> bool;
         auto handleCloseSystem() -> bool;
-        auto handleCustomAction(actions::ActionId action, actions::ActionParamsPtr &&actionParams) -> bool;
+        auto handleCustomAction(ActionEntry &action) -> bool;
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
@@ -144,18 +146,17 @@ namespace app::manager
         void onApplicationInitialised(ApplicationHandle &app, StartInBackground startInBackground);
         void onApplicationInitFailure(ApplicationHandle &app);
         auto onSwitchConfirmed(ApplicationHandle &app) -> bool;
+        void onLaunchFinished(ApplicationHandle &app);
         auto onCloseConfirmed(ApplicationHandle &app) -> bool;
         void onPhoneLocked();
 
         ApplicationName rootApplicationName;
+        ActionsRegistry actionsRegistry;
         std::unique_ptr<sys::Timer> blockingTimer; //< timer to count time from last user's activity. If it reaches time
                                                    // defined in settings database application
                                                    // manager is sending signal to power manager and changing window to
                                                    // the desktop window in the blocked state.
         std::unique_ptr<sys::Timer> shutdownDelay;
-        // Temporary solution - to be replaced with ActionsMiddleware.
-        std::tuple<ApplicationName, actions::ActionId, actions::ActionParamsPtr> pendingAction;
-
         std::unique_ptr<settings::Settings> settings;
         std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
         void displayLanguageChanged(std::string value);
