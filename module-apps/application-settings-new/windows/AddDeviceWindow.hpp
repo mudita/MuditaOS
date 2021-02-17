@@ -1,36 +1,27 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "OptionWindow.hpp"
+#include "BaseSettingsWindow.hpp"
+#include "application-settings-new/ApplicationSettings.hpp"
+#include "application-settings-new/models/BluetoothSettingsModel.hpp"
 
-#include <service-bluetooth/BluetoothMessage.hpp>
+#include <Device.hpp>
 
 namespace gui
 {
-    class AddDeviceWindow : public OptionWindow
+    class AddDeviceWindow : public BaseSettingsWindow
     {
       public:
-        AddDeviceWindow(app::Application *app);
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        explicit AddDeviceWindow(app::Application *app, std::string name = window::name::add_device);
 
       private:
-        auto devicesOptionsList() -> std::list<gui::Option>;
-        void rebuildOptionList();
-        std::vector<Devicei> devices;
-    };
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void onClose() override;
+        auto buildOptionsList() -> std::list<Option> override;
 
-    class DeviceData : public SwitchData
-    {
+        std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
         std::vector<Devicei> devices;
-
-      public:
-        DeviceData(std::vector<Devicei> devices) : SwitchData(), devices(std::move(devices))
-        {}
-        auto getDevices() -> const std::vector<Devicei> &
-        {
-            return devices;
-        }
     };
 }; // namespace gui

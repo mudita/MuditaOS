@@ -5,6 +5,7 @@
 
 #include <log/log.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
+#include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 
 extern "C"
 {
@@ -78,7 +79,7 @@ namespace bluetooth
 
     void GAP::sendDevices()
     {
-        auto msg = std::make_shared<BluetoothScanResultMessage>(devices);
+        auto msg = std::make_shared<message::bluetooth::ResponseVisibleDevices>(devices);
         ownerService->bus.sendUnicast(msg, "ApplicationSettings");
         ownerService->bus.sendUnicast(std::move(msg), "ApplicationSettingsNew");
     }
