@@ -366,9 +366,11 @@ namespace bsp::battery_charger
 
         batteryRetval fillConfig2RegisterValue()
         {
-            std::uint16_t regVal = static_cast<std::uint16_t>(CONFIG2::dSOCen) |  // SOC 1% change alert
-                                   static_cast<std::uint16_t>(CONFIG2::TAlrtEn) | // Temperature alerts
-                                   static_cast<std::uint16_t>(CONFIG2::OCVQen); // Enable  automatic empty compensation
+            std::uint16_t regVal =
+                static_cast<std::uint16_t>(
+                    CONFIG2::dSOCen) | // SOC 1% change alert
+                                       //    static_cast<std::uint16_t>(CONFIG2::TAlrtEn) | // Temperature alerts
+                static_cast<std::uint16_t>(CONFIG2::OCVQen); // Enable  automatic empty compensation
 
             if (fuelGaugeWrite(Registers::CONFIG2_REG, regVal) != kStatus_Success) {
                 LOG_ERROR("fillConfig2RegisterValue failed.");
