@@ -244,6 +244,7 @@ bool WorkerEvent::deinit(void)
     bsp::keypad_backlight::deinit();
     bsp::eink_frontlight::deinit();
     bsp::light_sensor::deinit();
+    bsp::vibrator::deinit();
 
     battery_level_check::deinit();
 

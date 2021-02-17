@@ -245,6 +245,9 @@ enum class MessageType
     ScreenLightControlAction,
     ScreenLightControlParameters,
     ScreenLightControlParametersResponse,
+
+    // Vibra messages
+    VibraPulseMessage,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */
