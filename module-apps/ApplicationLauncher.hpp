@@ -23,7 +23,7 @@ namespace app
         bool closeable = true;
         /// defines whether application should be run without gaining focus, it will remian in the BACKGROUND state
         bool startBackground = false;
-        /// flag defines whether this application can prevent power manager from changing
+        /// flag defines whether this application can prevent auto-locking mechanism
         bool preventBlocking = false;
 
       public:
@@ -71,8 +71,11 @@ namespace app
     template <class T> class ApplicationLauncherT : public ApplicationLauncher
     {
       public:
-        ApplicationLauncherT(std::string name, ApplicationManifest &&manifest, bool isCloseable = true)
-            : ApplicationLauncher(name, std::move(manifest), isCloseable)
+        ApplicationLauncherT(std::string name,
+                             ApplicationManifest &&manifest,
+                             bool isCloseable     = true,
+                             bool preventBlocking = false)
+            : ApplicationLauncher(name, std::move(manifest), isCloseable, preventBlocking)
         {}
 
         bool run(sys::Service *caller) override
@@ -92,9 +95,11 @@ namespace app
 
     /// creates application launcher per class provided
     template <class T>
-    std::unique_ptr<ApplicationLauncherT<T>> CreateLauncher(std::string name, bool isCloseable = true)
+    std::unique_ptr<ApplicationLauncherT<T>> CreateLauncher(std::string name,
+                                                            bool isCloseable     = true,
+                                                            bool preventBlocking = false)
     {
         return std::unique_ptr<ApplicationLauncherT<T>>(
-            new ApplicationLauncherT<T>(name, ManifestOf<T>(), isCloseable));
+            new ApplicationLauncherT<T>(name, ManifestOf<T>(), isCloseable, preventBlocking));
     }
 } // namespace app

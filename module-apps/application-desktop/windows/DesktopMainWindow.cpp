@@ -124,16 +124,6 @@ namespace gui
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         updateTime();
-        // check if there was a signal to lock the pone due to inactivity.
-        if ((data != nullptr) && (data->getDescription() == "LockPhoneData")) {
-            auto app = getAppDesktop();
-            if (app->lockHandler.isScreenLocked()) {
-                return;
-            }
-            auto *lockData          = dynamic_cast<LockPhoneData *>(data);
-            lockTimeoutApplilcation = lockData->getPreviousApplication();
-            application->setSuspendFlag(true);
-        }
         setVisibleState();
     }
 

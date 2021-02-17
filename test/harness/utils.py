@@ -49,7 +49,6 @@ application_keypath = {
     "calendar": [
         "up",
         "left",
-        "left",
         "enter"
     ]
 }

@@ -30,6 +30,7 @@
 #include <module-db/queries/notifications/QueryNotificationsClear.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-utils/magic_enum/include/magic_enum.hpp>
+#include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 
 #include <cassert>
@@ -100,8 +101,16 @@ namespace app
             switchWindow(app::window::name::dead_battery, std::move(data));
             return msgHandled();
         });
-    }
 
+        addActionReceiver(app::manager::actions::AutoLock, [this](auto &&data) {
+            if (lockHandler.isScreenLocked()) {
+                return msgHandled();
+            }
+            lockHandler.lockScreen();
+            switchWindow(app::window::name::desktop_main_window, std::move(data));
+            return msgHandled();
+        });
+    }
     ApplicationDesktop::~ApplicationDesktop()
     {
         LOG_INFO("Desktop destruktor");
@@ -129,7 +138,6 @@ namespace app
                 handled = handle(event);
             }
         }
-
         else if (auto msg = dynamic_cast<sdesktop::UpdateOsMessage *>(msgl)) {
             handled = handle(msg);
         }
@@ -293,6 +301,7 @@ namespace app
     // Invoked during initialization
     sys::ReturnCodes ApplicationDesktop::InitHandler()
     {
+
         auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success) {
             return ret;

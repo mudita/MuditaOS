@@ -30,13 +30,12 @@
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-appmgr/messages/DOMRequest.hpp>
 
-// Auto phone lock disabled for now till the times when it's debugged
-// #define AUTO_PHONE_LOCK_ENABLED
+#include "module-services/service-appmgr/service-appmgr/messages/ApplicationStatus.hpp"
+
 namespace app::manager
 {
     namespace
     {
-        constexpr auto default_application_locktime_ms = 30000;
         constexpr auto shutdown_delay_ms               = 500;
 
         constexpr auto timerBlock         = "BlockTimer";
@@ -106,8 +105,10 @@ namespace app::manager
                                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
                                            const ApplicationName &_rootApplicationName)
         : Service{serviceName}, ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
-          blockingTimer{std::make_unique<sys::Timer>(
-              timerBlock, this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)},
+          autoLockEnabled(false), blockingTimer{std::make_unique<sys::Timer>(timerBlock,
+                                                                             this,
+                                                                             std::numeric_limits<sys::ms>::max(),
+                                                                             sys::Timer::Type::SingleShot)},
           shutdownDelay{std::make_unique<sys::Timer>(timerShutdownDelay, this, shutdown_delay_ms)},
           settings(std::make_unique<settings::Settings>(this)),
           phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
@@ -119,7 +120,6 @@ namespace app::manager
 
     sys::ReturnCodes ApplicationManager::InitHandler()
     {
-        blockingTimer->setInterval(default_application_locktime_ms);
         utils::localize.setFallbackLanguage(utils::localize.DefaultLanguage);
         settings->registerValueChange(
             settings::SystemProperties::displayLanguage,
@@ -164,7 +164,6 @@ namespace app::manager
         if (auto app = getApplication(rootApplicationName); app != nullptr) {
             Controller::sendAction(this, actions::Home);
         }
-
         return sys::ReturnCodes::Success;
     }
 
@@ -215,7 +214,9 @@ namespace app::manager
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(PreventBlockingRequest), [this](sys::Message *) {
-            blockingTimer->reload();
+            if (autoLockEnabled) {
+                blockingTimer->reload();
+            }
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(SwitchRequest), [this](sys::Message *request) {
@@ -411,6 +412,9 @@ namespace app::manager
 
     auto ApplicationManager::handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp) -> bool
     {
+        if (getFocusedApplication()) {
+            LOG_ERROR("currrently focused application %s", getFocusedApplication()->name().c_str());
+        }
         auto app = getApplication(msg->getName());
         if (app == nullptr) {
             LOG_ERROR("Failed to switch to application %s: No such application.", msg->getName().c_str());
@@ -442,7 +446,10 @@ namespace app::manager
                                                  std::string targetWindow)
     {
         if (app.name() == rootApplicationName) {
-            clearStack();
+            ///> Clear the stack only if we are not during auto-lock
+            if ((data.get() && data->getDescription() != std::string("AutoLock")) || !data.get()) {
+                clearStack();
+            }
         }
         pushApplication(app.name());
         app.switchData   = std::move(data);
@@ -486,7 +493,6 @@ namespace app::manager
         SwitchRequest switchRequest(ServiceName, rootApplicationName, gui::name::window::main_window, nullptr);
         return handleSwitchApplication(&switchRequest);
     }
-
     auto ApplicationManager::handleLaunchAction(ApplicationLaunchData *launchParams) -> bool
     {
         auto targetApp = getApplication(launchParams->getTargetApplicationName());
@@ -528,7 +534,6 @@ namespace app::manager
                 ServiceName, targetApp->name(), targetApp->switchWindow, std::move(targetApp->switchData));
             return handleSwitchApplication(&switchRequest, focusedAppClose);
         }
-
         app::Application::requestAction(this, targetApp->name(), action, std::move(actionParams));
         return true;
     }
@@ -540,7 +545,6 @@ namespace app::manager
             LOG_WARN("Failed to switch to the previous application: No such application.");
             return false;
         }
-
         auto currentlyFocusedApp = getFocusedApplication();
         if (currentlyFocusedApp == nullptr) {
             LOG_INFO("No focused application at the moment. Starting previous application...");
@@ -798,31 +802,29 @@ namespace app::manager
 
     void ApplicationManager::onPhoneLocked()
     {
-#ifdef AUTO_PHONE_LOCK_ENABLED
-        LOG_INFO("Screen lock timer triggered.");
-        blockingTimer->stop();
+        if (!autoLockEnabled) {
+            return;
+        }
 
         auto focusedApp = getFocusedApplication();
         if (focusedApp == nullptr || focusedApp->preventsBlocking()) {
             blockingTimer->reload();
             return;
         }
-
-        if (focusedApp->name() == rootApplicationName) {
-            app::Application::messageSwitchApplication(
-                this,
-                rootApplicationName,
-                gui::name::window::main_window,
-                std::make_unique<gui::LockPhoneData>(gui::LockPhoneData::Request::NoPin));
+        if (phoneModeObserver->isTetheringOn()) {
+            blockingTimer->reload();
+            return;
         }
-        else {
-            focusedApp->blockClosing = true;
-            std::unique_ptr<gui::LockPhoneData> data =
-                std::make_unique<gui::LockPhoneData>(gui::LockPhoneData::Request::NoPin);
-            data->setPrevApplication(focusedApp->name());
-            Controller::switchApplication(this, rootApplicationName, gui::name::window::main_window, std::move(data));
+        std::unique_ptr<gui::SwitchData> appSwitchData = std::make_unique<gui::SwitchData>("AutoLock");
+        app::Application::requestAction(this, rootApplicationName, actions::AutoLock, std::move(appSwitchData));
+        if (focusedApp->name() != rootApplicationName) {
+            ///> try to switch application
+            std::unique_ptr<gui::SwitchData> nappSwitchData = std::make_unique<gui::SwitchData>("AutoLock");
+            SwitchRequest switchRequest(
+                ServiceName, rootApplicationName, gui::name::window::main_window, std::move(nappSwitchData));
+            handleSwitchApplication(&switchRequest, true);
         }
-#endif
+        blockingTimer->reload();
     }
     void ApplicationManager::displayLanguageChanged(std::string value)
     {
@@ -834,10 +836,23 @@ namespace app::manager
     }
     void ApplicationManager::lockTimeChanged(std::string value)
     {
-        if (value.empty()) {
+        LOG_ERROR("lockTimeChanges %s\n", value.c_str());
+
+        blockingTimer->stop();
+        ///> We should not allowed to set this timeout to less then 1s.
+        if (utils::getNumericValue<unsigned int>(value) < 1000) {
+            autoLockEnabled = false;
+            LOG_ERROR("Auto-locking is disabled due to lock time setting %s\n", value.c_str());
             return;
         }
+        ///> Something went wrong - reload timer
+        if (value.empty()) {
+            blockingTimer->reload();
+            return;
+        }
+        autoLockEnabled = true;
         blockingTimer->setInterval(utils::getNumericValue<unsigned int>(value));
+        blockingTimer->reload();
         //?any additional action needed here?
     }
     void ApplicationManager::inputLanguageChanged(std::string value)

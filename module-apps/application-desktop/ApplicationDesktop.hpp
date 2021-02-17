@@ -98,6 +98,7 @@ namespace app
         static auto GetManifest() -> manager::ApplicationManifest
         {
             return {{manager::actions::Launch,
+                     manager::actions::AutoLock,
                      manager::actions::RequestPin,
                      manager::actions::RequestPuk,
                      manager::actions::RequestPinChange,
