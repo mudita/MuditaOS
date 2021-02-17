@@ -18,7 +18,6 @@ namespace bsp
             pulse,
             pulseRepeat,
             stop,
-            checkState,
         };
 
         void enable();
