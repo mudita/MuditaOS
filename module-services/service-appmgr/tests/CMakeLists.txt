@@ -1,0 +1,10 @@
+add_catch2_executable(
+    NAME
+        actions-registry-tests
+    SRCS
+        tests-main.cpp
+        test-ActionsRegistry.cpp
+    LIBS
+        service-appmgr
+        module-utils
+)

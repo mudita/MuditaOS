@@ -45,11 +45,11 @@ namespace app
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {
             switchWindow(gui::name::window::new_sms, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
         addActionReceiver(manager::actions::ShowSmsTemplates, [this](auto &&data) {
             switchWindow(gui::name::window::sms_templates, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
         addActionReceiver(manager::actions::SmsRejectNoSim, [this](auto &&data) {
             auto action = [this]() {
@@ -57,7 +57,7 @@ namespace app
                 return true;
             };
             showNotification(action);
-            return msgHandled();
+            return actionHandled();
         });
     }
 

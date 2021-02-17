@@ -44,6 +44,15 @@ namespace gui
 
 namespace app
 {
+    auto actionHandled() -> ActionResult
+    {
+        return std::make_shared<ActionHandledResponse>();
+    }
+
+    auto actionNotHandled() -> ActionResult
+    {
+        return std::make_shared<ActionHandledResponse>(sys::ReturnCodes::Failure);
+    }
 
     const char *Application::stateStr(Application::State st)
     {
@@ -321,12 +330,12 @@ namespace app
         try {
             const auto &actionHandler = receivers.at(action);
             auto &data                = msg->getData();
-            actionHandler(std::move(data));
+            return actionHandler(std::move(data));
         }
         catch (const std::out_of_range &) {
             LOG_ERROR("Application %s is not able to handle action #%d", GetName().c_str(), action);
         }
-        return msgNotHandled();
+        return actionNotHandled();
     }
 
     sys::MessagePointer Application::handleApplicationSwitch(sys::Message *msgl)

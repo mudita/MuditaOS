@@ -48,57 +48,57 @@ namespace app
 
         addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
             lockHandler.handlePasscodeRequest(gui::PinLock::LockType::SimPin, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::RequestPuk, [this](auto &&data) {
             lockHandler.handlePasscodeRequest(gui::PinLock::LockType::SimPuk, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::RequestPinChange, [this](auto &&data) {
             lockHandler.handlePinChangeRequest(std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::BlockSim, [this](auto &&data) {
             lockHandler.handleSimBlocked(std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::UnlockSim, [this](auto &&data) {
             lockHandler.handleUnlockSim(std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::DisplayCMEError, [this](auto &&data) {
             lockHandler.handleCMEError(std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::ShowMMIResponse, [this](auto &&data) {
             switchWindow(app::window::name::desktop_mmi_pull, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::ShowMMIPush, [this](auto &&data) {
             switchWindow(app::window::name::desktop_mmi_push, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::ShowMMIResult, [this](auto &&data) {
             switchWindow(app::window::name::desktop_mmi_internal, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::DisplayLowBatteryNotification, [this](auto &&data) {
             handleLowBatteryNotification(std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
 
         addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
             switchWindow(app::window::name::dead_battery, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
     }
 

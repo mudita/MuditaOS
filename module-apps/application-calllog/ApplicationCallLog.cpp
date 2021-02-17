@@ -28,7 +28,7 @@ namespace app
     {
         addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
-            return msgHandled();
+            return actionHandled();
         });
     }
 

@@ -106,6 +106,7 @@ namespace app::manager
                                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
                                            const ApplicationName &_rootApplicationName)
         : Service{serviceName}, ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
+          actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }},
           blockingTimer{std::make_unique<sys::Timer>(
               timerBlock, this, std::numeric_limits<sys::ms>::max(), sys::Timer::Type::SingleShot)},
           shutdownDelay{std::make_unique<sys::Timer>(timerShutdownDelay, this, shutdown_delay_ms)},
@@ -285,8 +286,12 @@ namespace app::manager
         });
         connect(typeid(ActionRequest), [this](sys::Message *request) {
             auto actionMsg = static_cast<ActionRequest *>(request);
-            handleAction(actionMsg);
+            handleActionRequest(actionMsg);
             return std::make_shared<sys::ResponseMessage>();
+        });
+        connect(typeid(ActionHandledResponse), [this](sys::Message *response) {
+            actionsRegistry.finished();
+            return nullptr;
         });
         connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
             return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::localize.getDisplayLanguage());
@@ -463,37 +468,42 @@ namespace app::manager
         }
     }
 
-    auto ApplicationManager::handleAction(ActionRequest *actionMsg) -> bool
+    void ApplicationManager::handleActionRequest(ActionRequest *actionMsg)
     {
-        switch (const auto action = actionMsg->getAction(); action) {
+        ActionEntry entry{actionMsg->getAction(), std::move(actionMsg->getData())};
+        actionsRegistry.enqueue(std::move(entry));
+    }
+
+    bool ApplicationManager::handleAction(ActionEntry &action)
+    {
+        switch (action.actionId) {
         case actions::Home:
-            return handleHomeAction();
-        case actions::Launch: {
-            auto params = static_cast<ApplicationLaunchData *>(actionMsg->getData().get());
-            return handleLaunchAction(params);
-        }
+            return handleHomeAction(action);
+        case actions::Launch:
+            return handleLaunchAction(action);
         case actions::CloseSystem:
             return handleCloseSystem();
-        default: {
-            auto &actionParams = actionMsg->getData();
-            return handleCustomAction(action, std::move(actionParams));
-        }
+        default:
+            return handleCustomAction(action);
         }
     }
 
-    auto ApplicationManager::handleHomeAction() -> bool
+    auto ApplicationManager::handleHomeAction(ActionEntry &action) -> bool
     {
+        action.setTargetApplication(rootApplicationName);
         SwitchRequest switchRequest(ServiceName, rootApplicationName, gui::name::window::main_window, nullptr);
         return handleSwitchApplication(&switchRequest);
     }
 
-    auto ApplicationManager::handleLaunchAction(ApplicationLaunchData *launchParams) -> bool
+    auto ApplicationManager::handleLaunchAction(ActionEntry &action) -> bool
     {
+        auto launchParams = static_cast<ApplicationLaunchData *>(action.params.get());
         auto targetApp = getApplication(launchParams->getTargetApplicationName());
         if (targetApp == nullptr || !targetApp->handles(actions::Launch)) {
             return false;
         }
 
+        action.setTargetApplication(targetApp->name());
         SwitchRequest switchRequest(ServiceName, targetApp->name(), gui::name::window::main_window, nullptr);
         return handleSwitchApplication(&switchRequest);
     }
@@ -506,12 +516,11 @@ namespace app::manager
         return true;
     }
 
-    auto ApplicationManager::handleCustomAction(actions::ActionId action, actions::ActionParamsPtr &&actionParams)
-        -> bool
+    auto ApplicationManager::handleCustomAction(ActionEntry &action) -> bool
     {
-        const auto actionHandlers = applications.findByAction(action);
+        const auto actionHandlers = applications.findByAction(action.actionId);
         if (actionHandlers.empty()) {
-            LOG_ERROR("No applications handling action #%d.", action);
+            LOG_ERROR("No applications handling action #%d.", action.actionId);
             return false;
         }
         if (actionHandlers.size() > 1) {
@@ -520,16 +529,16 @@ namespace app::manager
         }
 
         const auto targetApp = actionHandlers.front();
+        action.setTargetApplication(targetApp->name());
+        auto &actionParams = action.params;
         if (targetApp->state() != ApplicationHandle::State::ACTIVE_FORGROUND) {
             const auto focusedAppClose = !(actionParams && actionParams->disableAppClose);
-            pendingAction              = std::make_tuple(targetApp->name(), action, std::move(actionParams));
-
             SwitchRequest switchRequest(
                 ServiceName, targetApp->name(), targetApp->switchWindow, std::move(targetApp->switchData));
             return handleSwitchApplication(&switchRequest, focusedAppClose);
         }
 
-        app::Application::requestAction(this, targetApp->name(), action, std::move(actionParams));
+        app::Application::requestAction(this, targetApp->name(), action.actionId, std::move(actionParams));
         return true;
     }
 
@@ -734,12 +743,7 @@ namespace app::manager
             app.setState(ApplicationHandle::State::ACTIVE_FORGROUND);
             setState(State::Running);
             EventManager::messageSetApplication(this, app.name());
-
-            auto &[appName, action, data] = pendingAction;
-            if (appName == app.name()) {
-                app::Application::requestAction(this, appName, action, std::move(data));
-                pendingAction = std::make_tuple(ApplicationName{}, 0, nullptr);
-            }
+            onLaunchFinished(app);
             return true;
         }
         if (getState() == State::AwaitingLostFocusConfirmation) {
@@ -754,6 +758,31 @@ namespace app::manager
             }
         }
         return false;
+    }
+
+    void ApplicationManager::onLaunchFinished(ApplicationHandle &app)
+    {
+        if (!actionsRegistry.hasPendingAction()) {
+            return;
+        }
+
+        auto action = actionsRegistry.getPendingAction();
+        if (app.name() != action->target) {
+            return;
+        }
+
+        switch (action->actionId) {
+        case actions::Home:
+            [[fallthrough]];
+        case actions::Launch:
+            actionsRegistry.finished();
+            break;
+        default: {
+            auto &params = action->params;
+            app::Application::requestAction(this, app.name(), action->actionId, std::move(params));
+            break;
+        }
+        }
     }
 
     auto ApplicationManager::handleCloseConfirmation(CloseConfirmation *msg) -> bool
@@ -791,7 +820,7 @@ namespace app::manager
             return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
         }
         auto action = actionMsg->toAction();
-        handleAction(action.get());
+        handleActionRequest(action.get());
 
         return std::make_shared<sys::ResponseMessage>();
     }
