@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <ctime>
@@ -16,9 +16,9 @@
 
 namespace gui::top_bar
 {
-    constexpr auto batteryWidgetAsText = false;
+    constexpr auto batteryWidgetAsText = true;
     using BatteryWidgetType = std::conditional<batteryWidgetAsText, BatteryWidgetText, BatteryWidgetBar>::type;
-    constexpr auto signalWidgetAsText = false;
+    constexpr auto signalWidgetAsText  = true;
     using SignalWidgetType =
         std::conditional<signalWidgetAsText, SignalStrengthWidgetText, SignalStrengthWidgetBar>::type;
 
