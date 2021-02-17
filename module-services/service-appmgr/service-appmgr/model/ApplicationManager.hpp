@@ -149,14 +149,23 @@ namespace app::manager
         auto onSwitchConfirmed(ApplicationHandle &app) -> bool;
         void onLaunchFinished(ApplicationHandle &app);
         auto onCloseConfirmed(ApplicationHandle &app) -> bool;
+        /// @brief method is called on auto-locking timer tick event (blockTimer)
+        /// @detailed It sends AutoLock action to ApplicationDesktop to lock the screen.
+        /// @note AutoLock action is sent only if following conditions are met:
+        ///  - tethering is off
+        ///  - focused application is not preventing AutoLock
         void onPhoneLocked();
 
         ApplicationName rootApplicationName;
         ActionsRegistry actionsRegistry;
-        std::unique_ptr<sys::Timer> blockingTimer; //< timer to count time from last user's activity. If it reaches time
-                                                   // defined in settings database application
-                                                   // manager is sending signal to power manager and changing window to
-                                                   // the desktop window in the blocked state.
+
+        bool autoLockEnabled; ///< a flag which indicates whether the autoLockTimer should be armed.
+                              /// @note: The flag value depends on database settings "gs_lock_time". If the
+                              /// "gs_lock_time" is set to less than 1000 ms, it will be false, otherwise true.
+        std::unique_ptr<sys::Timer> autoLockTimer; //< auto-lock timer to count time from last user's activity.
+                                                   // If it reaches time defined in settings database application
+                                                   // manager is sending signal to Application Desktop in order to
+                                                   // lock screen.
         std::unique_ptr<sys::Timer> shutdownDelay;
         std::unique_ptr<settings::Settings> settings;
         std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;

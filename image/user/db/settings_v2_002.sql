@@ -15,7 +15,7 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('gs_active_sim', 'SIM1'),
     ('gs_lock_pass_hash', '3333'),
     ('gs_lock_screen_passcode_is_on', '1'),
-    ('gs_lock_time', '30000'),
+    ('gs_lock_time', '0'),
     ('gs_display_language', 'English'),
     ('gs_input_language', 'English'),
     ('gs_eula_accepted', '0'),
