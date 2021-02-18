@@ -83,8 +83,6 @@ namespace gui::top_bar
         Label *networkAccessTechnologyLabel    = nullptr;
         SignalStrengthWidgetBase *signalWidget = nullptr;
         Image *lock;
-        std::map<const Store::Battery::State, Image *> batteryChargings = {
-            {Store::Battery::State::Charging, nullptr}, {Store::Battery::State::PluggedNotCharging, nullptr}};
         gui::SIM *sim                    = nullptr;
         BatteryWidgetBase *batteryWidget = nullptr;
         Configuration configuration;

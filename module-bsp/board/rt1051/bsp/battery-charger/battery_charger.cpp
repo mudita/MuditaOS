@@ -585,6 +585,7 @@ namespace bsp::battery_charger
             LOG_ERROR("failed to read charge summary");
         }
         auto chargerDetails = getChargerDetails();
+        auto chargingSetup  = chargerRead(Registers::CHG_CNFG_00);
 
         if (summary.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I)) {
             Store::Battery::modify().state = Store::Battery::State::Charging;
@@ -595,13 +596,11 @@ namespace bsp::battery_charger
 
         switch (chargerDetails) {
         case CHG_DETAILS_01::CHARGER_DONE:
-            Store::Battery::modify().state = Store::Battery::State::PluggedNotCharging;
+            Store::Battery::modify().state = Store::Battery::State::ChargingDone;
             chargingFinishedAction();
             break;
         case CHG_DETAILS_01::CHARGER_OFF:
-            // IRQ from other source than CHGIN && Charger already plugged
-            if (!(IRQSource.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I)) &&
-                summary.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I)) {
+            if (chargingSetup.second != CHG_ON_OTG_OFF_BUCK_ON) {
                 Store::Battery::modify().state = Store::Battery::State::PluggedNotCharging;
             }
             break;
@@ -616,7 +615,7 @@ namespace bsp::battery_charger
             break;
         }
 
-        return (Store::Battery::get().state == Store::Battery::State::PluggedNotCharging ||
+        return (Store::Battery::get().state == Store::Battery::State::ChargingDone ||
                 Store::Battery::get().state == Store::Battery::State::Charging);
     }
 
