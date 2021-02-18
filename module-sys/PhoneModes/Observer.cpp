@@ -28,6 +28,11 @@ namespace sys::phone_modes
         return phoneMode == mode;
     }
 
+    PhoneMode Observer::getCurrentPhoneMode() const noexcept
+    {
+        return phoneMode;
+    }
+
     bool Observer::isTetheringOn() const noexcept
     {
         return tetheringMode == Tethering::On;

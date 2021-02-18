@@ -77,8 +77,8 @@ namespace audio
     }
     void Operation::AddProfile(const Profile::Type &profile, const PlaybackType &playback, bool isAvailable)
     {
-        const auto reqVol  = AudioServiceMessage::DbRequest(audio::dbPath(Setting::Volume, playback, profile));
-        const auto reqGain = AudioServiceMessage::DbRequest(audio::dbPath(Setting::Gain, playback, profile));
+        const auto reqVol  = AudioServiceMessage::DbRequest(Setting::Volume, playback, profile);
+        const auto reqGain = AudioServiceMessage::DbRequest(Setting::Gain, playback, profile);
 
         std::optional<audio::Volume> volume;
         std::optional<audio::Gain> gain;
