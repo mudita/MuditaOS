@@ -171,6 +171,7 @@ class UpdateMuditaOS : public updateos::UpdateStats
     static const fs::path checkForUpdate();
     void historyValueChanged(const std::string &value);
     void setInitialHistory(const std::string &initialHistory);
+    void informUpdateWindow();
     json11::Json getUpdateHistory() const
     {
         return updateHistory;

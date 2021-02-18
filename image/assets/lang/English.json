@@ -24,6 +24,7 @@
   "common_resume": "RESUME",
   "common_pause": "PAUSE",
   "common_retry": "TRY AGAIN",
+  "common_abort": "ABORT",
   "common_mo": "MO",
   "common_tu": "TU",
   "common_we": "WE",
@@ -511,5 +512,9 @@
   "app_desktop_update_size": "size",
   "app_desktop_update_bytes": "bytes",
   "app_desktop_update_unpacking": "Unpacking",
+  "app_desktop_update_preparing": "Preparing MuditaOS update ver.",
+  "app_desktop_update_muditaos": "MuditaOS update",
+  "app_desktop_update_in_progress": "Update in progress...",
+  "app_desktop_update_ready_for_reset": "Ready for reset...",
   "app_call_private_number": "Private number"
 }

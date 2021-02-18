@@ -48,6 +48,7 @@ namespace gui
       public:
         UpdateSwitchData(sdesktop::UpdateOsMessage *messageToCopyFrom) : updateOsMessage(*messageToCopyFrom)
         {}
+
         const sdesktop::UpdateOsMessage &getUpdateOsMessage()
         {
             return updateOsMessage;

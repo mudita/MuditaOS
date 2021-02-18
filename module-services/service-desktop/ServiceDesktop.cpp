@@ -158,6 +158,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                 updateOS->runUpdate();
             }
         }
+
         return std::make_shared<sys::ResponseMessage>();
     });
 

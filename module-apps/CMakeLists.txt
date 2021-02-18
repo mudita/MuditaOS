@@ -46,7 +46,7 @@ set( SOURCES
     "options/type/OptionSetting.cpp"
     "options/type/OptionChangePin.cpp"
     "options/type/OptionWithActiveIcons.cpp"
-    )
+    "application-desktop/windows/UpdateProgress.cpp")
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 

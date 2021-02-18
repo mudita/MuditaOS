@@ -12,6 +12,7 @@
 #include "windows/LockedInfoWindow.hpp"
 #include "windows/Reboot.hpp"
 #include "windows/Update.hpp"
+#include "windows/UpdateProgress.hpp"
 #include "windows/MmiPullWindow.hpp"
 #include "windows/MmiPushWindow.hpp"
 #include "windows/MmiInternalMsgWindow.hpp"
@@ -315,9 +316,13 @@ namespace app
 
                 if (getWindow(app::window::name::desktop_update)) {
                     std::unique_ptr<gui::UpdateSwitchData> data = std::make_unique<gui::UpdateSwitchData>(updateMsg);
-
                     switchWindow(app::window::name::desktop_update, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                 }
+            }
+
+            if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateNow) {
+                auto data = std::make_unique<gui::UpdateSwitchData>(updateMsg);
+                switchWindow(app::window::name::desktop_update_progress, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             }
 
             if (updateMsg != nullptr && updateMsg->messageType == updateos::UpdateMessageType::UpdateInform) {
@@ -379,6 +384,9 @@ namespace app
         });
         windowsFactory.attach(desktop_update, [](Application *app, const std::string newname) {
             return std::make_unique<gui::UpdateWindow>(app);
+        });
+        windowsFactory.attach(desktop_update_progress, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::UpdateProgressWindow>(app);
         });
         windowsFactory.attach(desktop_mmi_pull, [](Application *app, const std::string newname) {
             return std::make_unique<gui::MmiPullWindow>(app, desktop_mmi_pull);
