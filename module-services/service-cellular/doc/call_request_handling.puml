@@ -1,0 +1,43 @@
+@startuml
+participant ServiceCellular as cellular
+participant RequestFactory as factory
+participant IRequest as request
+participant CellularRequestHandler as handler
+participant DLC_channel as channel
+
+
+?->     cellular + : ""call request""
+cellular -> factory + : Create
+factory -> factory : emergencyCheck()
+alt is emergency and allowed
+        factory -> request ** : <<create CallRequest>>
+    factory --> cellular : <<CallRequest : IRequest>>
+else is emergency and not allowed
+    factory -> request : <<create RejectRequest>>
+    factory --> cellular : <<RejectRequest : IRequest>>
+end
+note left: decision depends on the emergency\nnumber itself and state of SIM card
+loop request types
+    factory -> factory : <<regexmatch>>
+    alt matched
+        factory -> request : <<create matched request>>
+        factory --> cellular : << matched : IRequest>>
+    end
+end
+alt SIM not present
+    factory -> request : <<create RejectRequest>>
+    factory --> cellular : <<RejectRequest>>
+else else
+    factory -> request : <<create CallRequest>>
+    factory --> cellular -: <<CallRequest>>
+end
+cellular ->request : command()
+request --> cellular: <<command>>
+cellular -> channel: cmd(command)
+channel -->cellular : at::Result
+cellular -> request +: Handle(CellularRequestHandler, at::Result)
+request -> handler + : Handle(IRequest)
+handler->? - : <<specific system actions>>
+?<--    cellular -- : ""multicast response""
+cellular -> request !! : delete
+@enduml
