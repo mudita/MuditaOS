@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "Timer.hpp"
 #include "BusProxy.hpp"
 #include "Common.hpp"  // for ReturnCodes, ServicePriority, BusChannels
 #include "Mailbox.hpp" // for Mailbox
@@ -125,17 +124,7 @@ namespace sys
 
             void detach(Timer *timer)
             {
-                auto it = std::find(list.begin(), list.end(), timer);
-
-                if (it != list.end()) {
-                    list.erase(it);
-                }
-            }
-
-            auto findTimer(const std::string &timerName) const
-            {
-                return std::find_if(
-                    list.begin(), list.end(), [&, timerName](auto &el) -> bool { return el->getName() == timerName; });
+                list.erase(std::find(list.begin(), list.end(), timer));
             }
 
           public:
@@ -146,42 +135,16 @@ namespace sys
                 return std::find(list.begin(), list.end(), timer);
             }
 
-            [[nodiscard]] auto timerExists(const std::string &timerName) const
-            {
-                return findTimer(timerName) != list.end();
-            }
-
-            void detachTimer(const std::string &timerName)
-            {
-                auto it = findTimer(timerName);
-
-                if (it != list.end()) {
-                    (*it)->stop();
-                    detach((*it));
-                }
-            }
-
             [[nodiscard]] auto noTimer() const
             {
                 return std::end(list);
             }
-
         } timers;
 
       public:
-        [[nodiscard]] auto getTimers() -> auto &
+        auto getTimers() -> auto &
         {
             return timers;
-        }
-
-        [[nodiscard]] auto timerExists(const std::string &timerName) -> bool
-        {
-            return timers.timerExists(timerName);
-        }
-
-        void detachTimer(const std::string &timerName)
-        {
-            timers.detachTimer(timerName);
         }
 
         auto TimerHandle(SystemMessage &message) -> ReturnCodes;
