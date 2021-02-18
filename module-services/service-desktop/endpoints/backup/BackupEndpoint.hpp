@@ -28,5 +28,4 @@ class BackupEndpoint : public parserFSM::Endpoint
     }
     auto handle(parserFSM::Context &context) -> void override;
     auto request(parserFSM::Context &context) -> sys::ReturnCodes;
-    auto upload(parserFSM::Context &context) -> sys::ReturnCodes;
 };

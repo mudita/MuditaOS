@@ -91,7 +91,7 @@ class ServiceDB : public sys::Service
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) final;
 
-    bool StoreIntoBackup(const std::string &backupPath);
+    bool StoreIntoBackup(const std::filesystem::path &backupPath);
     void sendUpdateNotification(db::Interface::Name interface, db::Query::Type type);
 };
 

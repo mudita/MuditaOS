@@ -30,6 +30,7 @@ class SettingsAgent : public DatabaseAgent
     void deinitDb() override;
     void registerMessages() override;
     auto getAgentName() -> const std::string override;
+    auto getDbFilePath() -> const std::string override;
 
   private:
     // using MapOfRecipentsToBeNotified = std::map<std::string, std::set<std::string>>;
@@ -59,7 +60,6 @@ class SettingsAgent : public DatabaseAgent
     auto dbAddMode(const std::string &mode) -> bool;
 
     auto getDbInitString() -> const std::string override;
-    auto getDbFilePath() -> const std::string override;
 
     // msg handlers
     // variable
