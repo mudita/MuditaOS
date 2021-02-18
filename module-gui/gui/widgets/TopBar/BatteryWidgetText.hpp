@@ -15,7 +15,7 @@ namespace gui
 
       private:
         void showBatteryLevel(std::uint32_t percentage) override;
-        void showBatteryPluggedNotCharging() override;
+        void showBatteryChargingDone() override;
         void showBatteryCharging() override;
         Label *label = nullptr;
     };
