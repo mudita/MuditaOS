@@ -58,7 +58,11 @@ updateos::UpdateError UpdateMuditaOS::setUpdateFile(const std::filesystem::path 
 {
     if (isUpdateToBeAborted()) {
         setUpdateAbortFlag(false);
+        sys::SystemManager::Reboot(owner);
         return informError(updateos::UpdateError::UpdateAborted, "update aborted");
+    }
+    else {
+        informUpdateWindow();
     }
 
     updateFile = purefs::dir::getUpdatesOSPath() / updateFileToUse;
@@ -80,6 +84,9 @@ updateos::UpdateError UpdateMuditaOS::setUpdateFile(const std::filesystem::path 
     }
 
     status = updateos::UpdateState::UpdateFileSet;
+
+    informUpdateWindow();
+
     return updateos::UpdateError::NoError;
 }
 
@@ -166,13 +173,25 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
 
 updateos::UpdateError UpdateMuditaOS::unpackUpdate()
 {
+    status = updateos::UpdateState::ExtractingFiles;
+
+    if (isUpdateToBeAborted()) {
+        setUpdateAbortFlag(false);
+        sys::SystemManager::Reboot(owner);
+        return updateos::UpdateError::UpdateAborted;
+    }
+    else {
+        informUpdateWindow();
+    }
+
     mtar_header_t tarHeader;
     filesInUpdatePackage.clear();
-    status = updateos::UpdateState::ExtractingFiles;
+
     std::rewind(updateTar.stream);
     while ((mtar_read_header(&updateTar, &tarHeader)) != MTAR_ENULLRECORD) {
         if (isUpdateToBeAborted()) {
             setUpdateAbortFlag(false);
+            sys::SystemManager::Reboot(owner);
             return updateos::UpdateError::UpdateAborted;
         }
         if (std::string(tarHeader.name) == "./") {
@@ -226,12 +245,16 @@ std::string UpdateMuditaOS::readContent(const char *filename) noexcept
 
 updateos::UpdateError UpdateMuditaOS::verifyChecksums()
 {
+    status = updateos::UpdateState::ChecksumVerification;
+
     if (isUpdateToBeAborted()) {
         setUpdateAbortFlag(false);
-        return informError(updateos::UpdateError::UpdateAborted, "update aborted");
+        sys::SystemManager::Reboot(owner);
+        return updateos::UpdateError::UpdateAborted;
     }
-
-    status = updateos::UpdateState::ChecksumVerification;
+    else {
+        informUpdateWindow();
+    }
 
     auto lineBuff = std::make_unique<char[]>(
         boot::consts::tar_buf); // max line should be freertos max path + checksum, so this is enough
@@ -272,6 +295,15 @@ updateos::UpdateError UpdateMuditaOS::verifyVersion()
 {
     status = updateos::UpdateState::VersionVerificiation;
 
+    if (isUpdateToBeAborted()) {
+        setUpdateAbortFlag(false);
+        sys::SystemManager::Reboot(owner);
+        return updateos::UpdateError::UpdateAborted;
+    }
+    else {
+        informUpdateWindow();
+    }
+
     if (!std::filesystem::exists(getUpdateTmpChild(updateos::file::version).c_str())) {
         return informError(updateos::UpdateError::VerifyVersionFailure,
                            "verifyVersion %s does not exist",
@@ -298,6 +330,17 @@ updateos::UpdateError UpdateMuditaOS::verifyVersion()
 updateos::UpdateError UpdateMuditaOS::updateBootloader()
 {
     informDebug("updateBootloader");
+    status = updateos::UpdateState::UpdatingBootloader;
+
+    if (isUpdateToBeAborted()) {
+        setUpdateAbortFlag(false);
+        sys::SystemManager::Reboot(owner);
+        return updateos::UpdateError::UpdateAborted;
+    }
+    else {
+        informUpdateWindow();
+    }
+
     if (targetVersionInfo[boot::json::bootloader][parserFSM::json::fileName].is_string()) {
         fs::path bootloaderFile =
             getUpdateTmpChild(targetVersionInfo[boot::json::bootloader][parserFSM::json::fileName].string_value());
@@ -338,6 +381,7 @@ updateos::UpdateError UpdateMuditaOS::prepareRoot()
     informDebug("prepareRoot()");
     // basic needed dirs
 
+    status                    = updateos::UpdateState::VersionVerificiation;
     const auto previousOSPath = purefs::dir::getPreviousOSPath();
     const auto currentOSPath  = purefs::dir::getCurrentOSPath();
     const auto userDiskPath   = purefs::dir::getUserDiskPath();
@@ -508,6 +552,9 @@ updateos::UpdateError UpdateMuditaOS::cleanupAfterUpdate()
     }
 
     status = updateos::UpdateState::ReadyForReset;
+
+    informUpdateWindow();
+
     return updateos::UpdateError::NoError;
 }
 
@@ -522,12 +569,16 @@ const fs::path UpdateMuditaOS::getUpdateTmpChild(const fs::path &childPath)
 updateos::UpdateError UpdateMuditaOS::prepareTempDirForUpdate(const std::filesystem::path &temporaryPath,
                                                               const std::filesystem::path &updatesOSPath)
 {
+    status = updateos::UpdateState::CreatingDirectories;
+
     if (isUpdateToBeAborted()) {
         setUpdateAbortFlag(false);
+        sys::SystemManager::Reboot(owner);
         return updateos::UpdateError::UpdateAborted;
     }
-
-    status = updateos::UpdateState::CreatingDirectories;
+    else {
+        informUpdateWindow();
+    }
 
     updateTempDirectory = temporaryPath / utils::filesystem::generateRandomId(updateos::prefix_len);
 
@@ -805,6 +856,14 @@ void UpdateMuditaOS::setInitialHistory(const std::string &initialHistory)
         LOG_ERROR("Can't parse current update history, resetting");
         updateHistory = json11::Json();
     }
+}
+void UpdateMuditaOS::informUpdateWindow()
+{
+    fs::path file  = UpdateMuditaOS::checkForUpdate();
+    auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateNow, file);
+    msgToSend->updateStats.versionInformation = UpdateMuditaOS::getVersionInfoFromFile(file);
+    msgToSend->updateStats.status             = status;
+    owner->bus.sendUnicast(msgToSend, app::name_desktop);
 }
 
 void UpdateMuditaOS::storeRunStatusInDB()
