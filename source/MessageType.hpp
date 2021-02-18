@@ -72,9 +72,11 @@ enum class MessageType
     CellularNotification,       ///< Async notification message
     CellularAnswerIncomingCall, ///< Answer incoming call
     CellularHangupCall,         ///< Hang up call
-    CellularCall,               ///< Call related events
-    CellularCallRequest,        ///< Call request
-    CellularPowerStateChange,   ///< Change power state of the module
+    CellularRinging,
+    CellularIncomingCall,
+    CellularCallerId,
+    CellularCallRequest,      ///< Call request
+    CellularPowerStateChange, ///< Change power state of the module
 
     CellularListCurrentCalls,
     CellularSimProcedure,        // Broadcast on sim state changed
@@ -107,6 +109,7 @@ enum class MessageType
     CellularTimeUpdated,
     CellularSimState,
     CellularMMIData,
+    CellularNewIncomingSMS,
 
     DBNotesAdd,            ///< Add new note's record
     DBNotesRemove,         ///< Remove selected note's record
