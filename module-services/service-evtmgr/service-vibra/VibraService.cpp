@@ -59,6 +59,12 @@ namespace service_vibra
         intPulse(true);
     }
 
+    void VibraService::PulseRepeat()
+    {
+        vibratorTimerPause->connect([&](sys::Timer &) { intPulse(true); });
+        intPulse(true);
+    }
+
     void VibraService::PulseRepeatStop()
     {
         repetitions = 1;

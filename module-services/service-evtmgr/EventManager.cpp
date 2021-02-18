@@ -393,6 +393,9 @@ bool EventManager::processVibraRequest(bsp::vibrator::Action act, sys::ms Repeti
     case bsp::vibrator::Action::pulseRepeat:
         vibraService->PulseRepeat(RepetitionTime);
         break;
+    case bsp::vibrator::Action::pulseRepeatInfinite:
+        vibraService->PulseRepeat();
+        break;
     case bsp::vibrator::Action::stop:
         vibraService->PulseRepeatStop();
         break;
