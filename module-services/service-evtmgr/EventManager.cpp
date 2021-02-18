@@ -41,12 +41,12 @@
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
 #include <common_data/EventStore.hpp>
 #include <SystemManager/messages/PhoneModeRequest.hpp>
-#include <service-vibra/VibraService.hpp>
+#include <vibra/Vibra.hpp>
 
 EventManager::EventManager(const std::string &name)
     : sys::Service(name), settings(std::make_shared<settings::Settings>(this)),
       screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(settings, this)),
-      vibraService(std::make_unique<service_vibra::VibraService>(this))
+      Vibra(std::make_unique<vibra_handle::Vibra>(this))
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
@@ -388,16 +388,16 @@ bool EventManager::processVibraRequest(bsp::vibrator::Action act, sys::ms Repeti
 {
     switch (act) {
     case bsp::vibrator::Action::pulse:
-        vibraService->Pulse();
+        Vibra->Pulse();
         break;
     case bsp::vibrator::Action::pulseRepeat:
-        vibraService->PulseRepeat(RepetitionTime);
+        Vibra->PulseRepeat(RepetitionTime);
         break;
     case bsp::vibrator::Action::pulseRepeatInfinite:
-        vibraService->PulseRepeat();
+        Vibra->PulseRepeat();
         break;
     case bsp::vibrator::Action::stop:
-        vibraService->PulseRepeatStop();
+        Vibra->PulseRepeatStop();
         break;
     }
     return true;

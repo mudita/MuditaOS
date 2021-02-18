@@ -12,13 +12,13 @@ namespace sys
     class Service;
 } // namespace sys
 
-namespace service_vibra
+namespace vibra_handle
 {
-    class VibraService
+    class Vibra
     {
       public:
-        explicit VibraService(sys::Service *parent);
-        ~VibraService();
+        explicit Vibra(sys::Service *parent);
+        ~Vibra() = default;
 
         /// According to design : 04.06 — Apps Tools.png there is only ON/OFF setting for vibra.
         /// But there is also number of sound repetitions so we may assume that vibra should be
@@ -29,15 +29,6 @@ namespace service_vibra
         void PulseRepeat(); /// infinite repeat ... until stop summoned
         void PulseRepeatStop();
 
-        /// to use, send message:
-        /// eg. vibrate 10 seconds:
-        /// bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::pulseRepeat, 10000),
-        /// service::name::evt_manager); vibrate once:
-        /// bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::pulse),
-        /// service::name::evt_manager); stop vibrating:
-        /// bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::stop),
-        /// service::name::evt_manager);
-
       private:
         std::unique_ptr<sys::Timer> vibratorTimerOneshot;
         std::unique_ptr<sys::Timer> vibratorTimerPause;
@@ -46,4 +37,4 @@ namespace service_vibra
 
         void intPulse(bool repetitive);
     };
-} // namespace service_vibra
+} // namespace vibra_handle

@@ -40,3 +40,36 @@ void EventManagerServiceAPI::checkBatteryLevelCriticalState(sys::Service *serv)
     auto msg = std::make_shared<sevm::BatteryLevelCriticalCheckMessage>();
     serv->bus.sendUnicast(msg, service::name::evt_manager);
 }
+
+/*
+ * @brief Call single vibra pulse
+ */
+void EventManagerServiceAPI::vibraPulseOnce(sys::Service *serv)
+{
+    serv->bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::pulse),
+                          service::name::evt_manager);
+}
+/*
+ * @brief Call vibra to stop
+ */
+void EventManagerServiceAPI::vibraStop(sys::Service *serv)
+{
+    serv->bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::stop),
+                          service::name::evt_manager);
+}
+/*
+ * @brief Call repetitive vibra pulses for given time [ms]
+ */
+void EventManagerServiceAPI::vibraPulseRepeat(sys::Service *serv, sys::ms time)
+{
+    serv->bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::pulseRepeat, time),
+                          service::name::evt_manager);
+}
+/*
+ * @brief Call repetitive vibra pulses until stop message is sent
+ */
+void EventManagerServiceAPI::vibraPulseRepeatUntilStop(sys::Service *serv)
+{
+    serv->bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::pulseRepeatInfinite),
+                          service::name::evt_manager);
+}
