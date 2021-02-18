@@ -13,7 +13,7 @@ namespace gui
     class BatteryWidgetBase : public HBox
     {
         virtual void showBatteryLevel(std::uint32_t percentage) = 0;
-        virtual void showBatteryPluggedNotCharging()            = 0;
+        virtual void showBatteryChargingDone()                  = 0;
         virtual void showBatteryCharging()                      = 0;
 
       public:

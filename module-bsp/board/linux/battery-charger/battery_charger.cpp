@@ -63,7 +63,7 @@ namespace bsp::battery_charger
                         else {
                             // second 100% in a row
                             if (plugged && Store::Battery::get().level == fullBattery) {
-                                Store::Battery::modify().state = Store::Battery::State::PluggedNotCharging;
+                                Store::Battery::modify().state = Store::Battery::State::ChargingDone;
                             }
                         }
                         targetQueueHandle = IRQQueueHandle;

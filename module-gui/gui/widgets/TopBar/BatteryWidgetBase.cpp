@@ -18,13 +18,15 @@ namespace gui
             setVisible(true);
             switch (batteryContext.state) {
             case Store::Battery::State::Discharging:
+                [[fallthrough]];
+            case Store::Battery::State::PluggedNotCharging:
                 showBatteryLevel(batteryContext.level);
                 break;
             case Store::Battery::State::Charging:
                 showBatteryCharging();
                 break;
-            case Store::Battery::State::PluggedNotCharging:
-                showBatteryPluggedNotCharging();
+            case Store::Battery::State::ChargingDone:
+                showBatteryChargingDone();
                 break;
             }
         }

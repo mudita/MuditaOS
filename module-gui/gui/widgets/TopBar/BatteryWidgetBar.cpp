@@ -59,7 +59,7 @@ namespace gui
         img->set(batteryCharging);
     }
 
-    void BatteryWidgetBar::showBatteryPluggedNotCharging()
+    void BatteryWidgetBar::showBatteryChargingDone()
     {
         img->set(batteryChargingReady);
     }
