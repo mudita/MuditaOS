@@ -27,7 +27,6 @@
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
 #include <module-services/service-db/service-db/DBServiceAPI.hpp>
 
-
 namespace app
 {
     ApplicationCall::ApplicationCall(std::string name, std::string parent, StartInBackground startInBackground)
