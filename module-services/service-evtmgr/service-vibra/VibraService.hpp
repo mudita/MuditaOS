@@ -26,6 +26,7 @@ namespace service_vibra
         void Pulse();
         /// but we also want to repeat pulses during eg. full length of ringtone
         void PulseRepeat(sys::ms time);
+        void PulseRepeat(); /// infinite repeat ... until stop summoned
         void PulseRepeatStop();
 
         /// to use, send message:

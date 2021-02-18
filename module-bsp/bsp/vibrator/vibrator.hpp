@@ -17,6 +17,7 @@ namespace bsp
         {
             pulse,
             pulseRepeat,
+            pulseRepeatInfinite,
             stop,
         };
 
