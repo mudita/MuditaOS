@@ -14,7 +14,7 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <screen-light-control/ScreenLightControl.hpp>
-#include <service-vibra/VibraService.hpp>
+#include <vibra/Vibra.hpp>
 
 #include <service-db/DBServiceName.hpp>
 
@@ -50,7 +50,7 @@ class EventManager : public sys::Service
     bool alarmIsValid = false;
 
     std::unique_ptr<screen_light_control::ScreenLightControl> screenLightControl;
-    std::unique_ptr<service_vibra::VibraService> vibraService;
+    std::unique_ptr<vibra_handle::Vibra> Vibra;
 
   public:
     EventManager(const std::string &name = service::name::evt_manager);

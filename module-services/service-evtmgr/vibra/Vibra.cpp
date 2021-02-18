@@ -1,30 +1,26 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "VibraService.hpp"
-#include "service-evtmgr/BatteryMessages.hpp"
+#include "Vibra.hpp"
 #include "SystemManager/Constants.hpp"
 #include <Service/Timer.hpp>
 
 #include <common_data/EventStore.hpp>
 
-namespace service_vibra
+namespace vibra_handle
 {
-    VibraService::VibraService(sys::Service *parent)
+    Vibra::Vibra(sys::Service *parent)
     {
         vibratorTimerOneshot =
-            std::make_unique<sys::Timer>("VibraOneshotTimer", parent, bsp::vibrator::default_vibra_pulse);
+            std::make_unique<sys::Timer>("VibraOneshotTimer", parent, bsp::vibrator::defaultVibraPulseMs);
         vibratorTimerPause =
-            std::make_unique<sys::Timer>("VibraPauseTimer", parent, bsp::vibrator::default_vibra_pause);
+            std::make_unique<sys::Timer>("VibraPauseTimer", parent, bsp::vibrator::defaultVibraPauseMs);
 
-        vibratorTimerOneshot->setInterval(bsp::vibrator::default_vibra_pulse);
-        vibratorTimerPause->setInterval(bsp::vibrator::default_vibra_pause);
+        vibratorTimerOneshot->setInterval(bsp::vibrator::defaultVibraPulseMs);
+        vibratorTimerPause->setInterval(bsp::vibrator::defaultVibraPauseMs);
     }
 
-    VibraService::~VibraService()
-    {}
-
-    void VibraService::intPulse(bool repetitive)
+    void Vibra::intPulse(bool repetitive)
     {
         if (repetitive) {
             vibratorTimerOneshot->connect([&](sys::Timer &) {
@@ -39,15 +35,15 @@ namespace service_vibra
         vibratorTimerOneshot->start();
     }
 
-    void VibraService::Pulse()
+    void Vibra::Pulse()
     {
         intPulse(false);
     }
 
-    void VibraService::PulseRepeat(sys::ms time)
+    void Vibra::PulseRepeat(sys::ms time)
     {
-        repetitions = static_cast<int>(time) / (static_cast<int>(bsp::vibrator::default_vibra_pulse) +
-                                                static_cast<int>(bsp::vibrator::default_vibra_pause));
+        repetitions = static_cast<int>(time) / (static_cast<int>(bsp::vibrator::defaultVibraPulseMs) +
+                                                static_cast<int>(bsp::vibrator::defaultVibraPauseMs));
 
         vibratorTimerPause->connect([&](sys::Timer &) {
             if (repetitions) /// call itself for calculated number of repetitions
@@ -59,13 +55,13 @@ namespace service_vibra
         intPulse(true);
     }
 
-    void VibraService::PulseRepeat()
+    void Vibra::PulseRepeat()
     {
         vibratorTimerPause->connect([&](sys::Timer &) { intPulse(true); });
         intPulse(true);
     }
 
-    void VibraService::PulseRepeatStop()
+    void Vibra::PulseRepeatStop()
     {
         repetitions = 1;
         bsp::vibrator::disable();
@@ -73,4 +69,4 @@ namespace service_vibra
         vibratorTimerOneshot->stop();
     }
 
-} // namespace service_vibra
+} // namespace vibra_handle

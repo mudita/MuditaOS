@@ -10,7 +10,7 @@ set(SOURCES
         battery-level-check/BatteryLevelCheck.cpp
         screen-light-control/ControlFunctions.cpp
         screen-light-control/ScreenLightControl.cpp
-        service-vibra/VibraService.cpp
+        vibra/Vibra.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

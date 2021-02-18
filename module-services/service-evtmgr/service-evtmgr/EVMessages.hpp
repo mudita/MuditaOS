@@ -15,7 +15,7 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/torch/torch.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
-#include <service-vibra/VibraService.hpp>
+#include <vibra/Vibra.hpp>
 #include <Timer.hpp>
 
 #include <string>
@@ -147,7 +147,7 @@ namespace sevm
     class VibraMessage : public Message
     {
       public:
-        VibraMessage(bsp::vibrator::Action act, sys::ms rptTime = bsp::vibrator::default_vibra_pause)
+        VibraMessage(bsp::vibrator::Action act, sys::ms rptTime = bsp::vibrator::defaultVibraPauseMs)
             : Message(MessageType::VibraPulseMessage), action(act), repetitionTime(rptTime)
         {}
 
