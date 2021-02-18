@@ -10,8 +10,8 @@ namespace bsp
 {
     namespace vibrator
     {
-        inline constexpr auto default_vibra_pulse = 1000;        /// default: 1000 ms vibra pulse
-        inline constexpr auto default_vibra_pause = 1000;        /// default: 1000 ms vibra pause between pulses
+        inline constexpr auto defaultVibraPulseMs = 1000;        /// default: 1000 ms vibra pulse
+        inline constexpr auto defaultVibraPauseMs = 1000;        /// default: 1000 ms vibra pause between pulses
 
         enum class Action
         {
@@ -23,7 +23,7 @@ namespace bsp
 
         void enable();
         void disable();
-        void init(sys::ms pulse = static_cast<sys::ms>(default_vibra_pulse));
+        void init(sys::ms pulse = static_cast<sys::ms>(defaultVibraPulseMs));
         void deinit();
     } // namespace vibrator
 } // namespace bsp
