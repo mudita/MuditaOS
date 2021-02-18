@@ -13,7 +13,9 @@ namespace parserFSM::http
     {
         OK                  = 200,
         Accepted            = 202,
+        SeeOther            = 303,
         BadRequest          = 400,
+        NotFound            = 404,
         NotAcceptable       = 406,
         InternalServerError = 500
     };

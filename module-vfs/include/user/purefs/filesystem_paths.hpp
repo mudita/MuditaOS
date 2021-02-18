@@ -26,4 +26,14 @@ namespace purefs
         constexpr inline auto boot_json = ".boot.json";
         constexpr inline auto boot_bin  = "boot.bin";
     } // namespace file
+
+    namespace extension
+    {
+        constexpr inline auto tar = ".tar";
+    }
+
+    namespace buffer
+    {
+        constexpr inline auto tar_buf = 512;
+    }
 } // namespace purefs

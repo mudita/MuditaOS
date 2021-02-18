@@ -18,7 +18,7 @@
 #include <module-apps/application-desktop/ApplicationDesktop.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <service-db/QueryMessage.hpp>
-
+#include <purefs/filesystem_paths.hpp>
 #include <module-sys/SystemManager/SystemManager.hpp>
 
 #include <cinttypes>
@@ -87,9 +87,9 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::BackupMessage(), [&](sys::Message *msg) {
         sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
         if (backupMessage != nullptr) {
-            RemountFS();
-            BackupRestore::BackupUserFiles(this);
-            RemountFS(true);
+            backupStatus.state = BackupRestore::BackupUserFiles(this, backupStatus.backupTempDir);
+            backupStatus.location =
+                (purefs::dir::getBackupOSPath() / backupStatus.task).replace_extension(purefs::extension::tar);
         }
         return std::make_shared<sys::ResponseMessage>();
     });
@@ -219,4 +219,11 @@ sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, s
 void ServiceDesktop::storeHistory(const std::string &historyValue)
 {
     settings->setValue(updateos::settings::history, historyValue);
+}
+
+void ServiceDesktop::prepareBackupData()
+{
+    backupStatus.task          = std::to_string(static_cast<uint32_t>(utils::time::getCurrentTimestamp().getTime()));
+    backupStatus.state         = false;
+    backupStatus.backupTempDir = purefs::dir::getTemporaryPath() / backupStatus.task;
 }

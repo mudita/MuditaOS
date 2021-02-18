@@ -575,13 +575,19 @@ void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Query:
     bus.sendMulticast(notificationMessage, sys::BusChannel::ServiceDBNotifications);
 }
 
-bool ServiceDB::StoreIntoBackup(const std::string &backupPath)
+bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
 {
-    bool rc = contactsDB.get()->storeIntoFile(backupPath + "contacts.db");
-    rc |= smsDB.get()->storeIntoFile(backupPath + "sms.db");
-    rc |= alarmsDB.get()->storeIntoFile(backupPath + "alarms.db");
-    rc |= notesDB.get()->storeIntoFile(backupPath + "notes.db");
-    rc |= calllogDB.get()->storeIntoFile(backupPath + "calllog.db");
-    rc |= eventsDB.get()->storeIntoFile(backupPath + "events.db");
+    bool rc =
+        contactsDB.get()->storeIntoFile(backupPath / std::filesystem::path(contactsDB.get()->getName()).filename());
+    rc |= smsDB.get()->storeIntoFile(backupPath / std::filesystem::path(smsDB.get()->getName()).filename());
+    rc |= alarmsDB.get()->storeIntoFile(backupPath / std::filesystem::path(alarmsDB.get()->getName()).filename());
+    rc |= notesDB.get()->storeIntoFile(backupPath / std::filesystem::path(notesDB.get()->getName()).filename());
+    rc |= calllogDB.get()->storeIntoFile(backupPath / std::filesystem::path(calllogDB.get()->getName()).filename());
+    rc |= eventsDB.get()->storeIntoFile(backupPath / std::filesystem::path(eventsDB.get()->getName()).filename());
+
+    auto db = std::next(databaseAgents.begin(), 0); // settings agent is first
+    if (db->get() && db->get()->getAgentName() == "settingsAgent") {
+        rc |= db->get()->storeIntoFile(backupPath / std::filesystem::path(db->get()->getDbFilePath()).filename());
+    }
     return rc;
 }
