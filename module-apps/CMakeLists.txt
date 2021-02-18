@@ -17,6 +17,7 @@ endif()
 set( SOURCES 
     "Application.cpp"
     "GuiTimer.cpp"
+    "DOMResponder.cpp"
     "WindowsFactory.cpp"
     "TopBarManager.cpp"
     "AsyncTask.cpp"

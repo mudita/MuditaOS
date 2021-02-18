@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "Common.hpp"
 #include "MessageType.hpp"
+#include "MessageForward.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -12,11 +13,6 @@
 
 namespace sys
 {
-    class Service;
-    class Message;
-    using MessagePointer = std::shared_ptr<Message>;
-    using MessageNone    = std::nullptr_t;
-    using SendResult     = std::pair<ReturnCodes, std::shared_ptr<Message>>;
     SendResult CreateSendResult(ReturnCodes retCode, MessagePointer msg);
 
     class Message

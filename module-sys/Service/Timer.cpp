@@ -12,7 +12,7 @@
 #include <cstdint>
 
 #if DEBUG_TIMER == 1
-#define log(...) LOG_DEBUG(__VA_ARGS__)
+#define log_debug(...) LOG_DEBUG(__VA_ARGS__)
 #else
 #define log_debug(...)
 #endif

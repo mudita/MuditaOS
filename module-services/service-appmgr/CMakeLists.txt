@@ -22,7 +22,9 @@ set(SOURCES
     messages/SwitchBackRequest.cpp
     messages/SwitchConfirmation.cpp
     messages/SwitchRequest.cpp
-    messages/UpdateInProgress.cpp)
+    messages/UpdateInProgress.cpp
+    messages/DOMRequest.cpp
+)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 

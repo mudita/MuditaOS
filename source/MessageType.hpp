@@ -124,6 +124,7 @@ enum class MessageType
     AudioMessage,
 
     // application manager
+    APMGeneric,
     APMAction,          ///< Used to send an action request to application manager.
     APMCheckAppRunning, ///< check if application is running in application manager
     APMSwitch,          ///< request to switch to given application, optionally also to specified window

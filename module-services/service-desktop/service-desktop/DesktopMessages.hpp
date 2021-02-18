@@ -3,13 +3,14 @@
 
 #pragma once
 
-#include <endpoints/update/UpdateMuditaOS.hpp>
 #include <endpoints/developerMode/DeveloperModeEndpoint.hpp>
 #include <endpoints/bluetooth/BluetoothEndpoint.hpp>
+#include <endpoints/update/UpdateMuditaOS.hpp>
 
 #include <Service/Message.hpp>
 #include <MessageType.hpp>
-
+#include <service-desktop/DeveloperModeMessage.hpp>
+#include <service-desktop/DesktopEvent.hpp>
 
 namespace sdesktop
 {
@@ -66,20 +67,8 @@ namespace sdesktop
         ~FactoryMessage() override = default;
     };
 
-    class Event
-    {
-      protected:
-        parserFSM::Context context;
-
-      public:
-        void send();
-        virtual ~Event() = default;
-    };
-
     namespace developerMode
     {
-
-
 
         class ATResponseEvent : public Event
         {
@@ -110,16 +99,6 @@ namespace sdesktop
           public:
             ScreenlockCheckEvent() = default;
             explicit ScreenlockCheckEvent(bool isLocked);
-        };
-
-
-        class DeveloperModeRequest : public sys::DataMessage
-        {
-          public:
-            std::unique_ptr<Event> event;
-            DeveloperModeRequest(std::unique_ptr<Event> event);
-            DeveloperModeRequest();
-            ~DeveloperModeRequest() override = default;
         };
     } // namespace developerMode
 
