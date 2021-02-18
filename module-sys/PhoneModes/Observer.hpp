@@ -28,6 +28,7 @@ namespace sys::phone_modes
                        OnErrorCallback &&onError       = {}) noexcept;
 
         bool isInMode(PhoneMode mode) const noexcept;
+        PhoneMode getCurrentPhoneMode() const noexcept;
         bool isTetheringOn() const noexcept;
 
       private:

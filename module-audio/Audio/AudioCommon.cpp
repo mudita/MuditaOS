@@ -2,9 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AudioCommon.hpp"
-#include <sstream>
-#include <Utils.hpp>
 #include "Profiles/Profile.hpp"
+
+#include <Utils.hpp>
+
+#include <sstream>
 
 namespace audio
 {
@@ -35,18 +37,25 @@ namespace audio
         return utils::enumToString(setting);
     }
 
-    const std::string dbPath(const Setting &setting, const PlaybackType &playbackType, const Profile::Type &profileType)
+    const std::string dbPath(const sys::phone_modes::PhoneMode &phoneMode,
+                             const Setting &setting,
+                             const PlaybackType &playbackType,
+                             const Profile::Type &profileType)
     {
         if (profileType == Profile::Type::Idle && playbackType == PlaybackType::None) {
             return std::string();
         }
 
+        constexpr auto separator = '/';
         std::string path(audioDbPrefix);
+
+        path.append(utils::enumToString(phoneMode));
+        path.append(1, separator);
         if (auto s = str(profileType); !s.empty()) {
-            path.append(s + "/");
+            path.append(s.append(1, separator));
         }
         if (auto s = str(playbackType); !s.empty()) {
-            path.append(s + "/");
+            path.append(s.append(1, separator));
         }
         if (auto s = str(setting); !s.empty()) {
             path.append(s);

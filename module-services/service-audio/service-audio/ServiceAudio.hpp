@@ -7,8 +7,10 @@
 
 #include <Audio/Audio.hpp>
 #include <Audio/AudioMux.hpp>
+
 #include <MessageType.hpp>
 #include <Service/Service.hpp>
+#include <PhoneModes/Observer.hpp>
 #include <Utils.hpp>
 
 #include <service-db/DBServiceAPI.hpp>
@@ -55,6 +57,8 @@ class ServiceAudio : public sys::Service
     std::unique_ptr<settings::Settings> settingsProvider;
     std::map<std::string, std::string> settingsCache;
 
+    std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
+
     auto IsVibrationMotorOn()
     {
         return vibrationMotorStatus == audio::AudioMux::VibrationStatus::On;
@@ -77,6 +81,7 @@ class ServiceAudio : public sys::Service
     auto HandleGetFileTags(const std::string &fileName) -> std::unique_ptr<AudioResponseMessage>;
     void HandleNotification(const AudioNotificationMessage::Type &type, const audio::Token &token);
     auto HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyPressedResponse>;
+    void HandlePhoneModeChange(sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode);
     void VibrationUpdate(const audio::PlaybackType &type               = audio::PlaybackType::None,
                          std::optional<audio::AudioMux::Input *> input = std::nullopt);
     auto GetVibrationType(const audio::PlaybackType &type) -> VibrationType;
