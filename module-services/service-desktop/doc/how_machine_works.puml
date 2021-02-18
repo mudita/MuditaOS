@@ -1,0 +1,9 @@
+@startuml
+Worker -> Worker : get data
+Worker --> ServiceDesktop : pass frame
+ServiceDesktop -> ServiceDesktop :  parse payload{ data request }
+ServiceDesktop --> System : get {data}
+System --> ServiceDesktop : responds {data}
+ServiceDesktop -> ServiceDesktop : response final touch
+ServiceDesktop -> Worker : push response
+@enduml

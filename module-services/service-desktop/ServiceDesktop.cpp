@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "service-appmgr/service-appmgr/messages/DOMRequest.hpp"
 #include "service-desktop/DesktopMessages.hpp"
 #include "service-desktop/ServiceDesktop.hpp"
 #include "service-desktop/WorkerDesktop.hpp"

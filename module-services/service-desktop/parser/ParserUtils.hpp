@@ -2,12 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-#include <stdint.h>         // for uint8_t
 #include <log/log.hpp>      // for LOG_ERROR
 #include <bits/exception.h> // for exception
-#include <stddef.h>         // for size_t
+#include <cstddef>          // for size_t
 #include <string>           // for string, allocator, basic_string, stol
 #include <vector>
+#include <parser/HttpEnums.hpp>
 
 namespace parserFSM
 {
@@ -75,32 +75,6 @@ namespace parserFSM
             }
         }
     } // namespace message
-
-    namespace http
-    {
-        /*! Enum class for the HTTP status codes.
-         */
-        enum class Code
-        {
-            OK                  = 200,
-            Accepted            = 202,
-            BadRequest          = 400,
-            NotAcceptable       = 406,
-            InternalServerError = 500
-        };
-
-        /*! Enum class for the HTTP methods.
-         */
-        enum class Method
-        {
-            get = 1,
-            post,
-            put,
-            del
-        };
-
-        bool isMethodValid(uint8_t);
-    }; // namespace http
 
     namespace json
     {

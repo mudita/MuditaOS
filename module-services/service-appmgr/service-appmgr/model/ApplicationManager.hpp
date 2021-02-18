@@ -133,6 +133,8 @@ namespace app::manager
         auto handleDateFormatChange(DateFormatChangeRequest *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
         auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        /// handles dom request by passing this request to application which should provide the dom
+        auto handleDOMRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
         void onApplicationSwitch(ApplicationHandle &app,

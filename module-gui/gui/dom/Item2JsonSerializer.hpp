@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -26,5 +26,6 @@ namespace gui
         /// JSON format and kept in `document`.
         void traverse(gui::Item &root);
         void dump(std::ostream &stream);
+        [[nodiscard]] auto get() -> json11::Json &&;
     };
 } // namespace gui
