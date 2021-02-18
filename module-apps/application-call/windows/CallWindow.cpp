@@ -412,6 +412,7 @@ namespace gui
             updateDuration(std::chrono::system_clock::to_time_t(systemUnitDuration));
             callDuration++;
             LOG_DEBUG("Update duration timer callback - %" PRIu32, static_cast<uint32_t>(callDuration.count()));
+            application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             return true;
         };
         timer->start();

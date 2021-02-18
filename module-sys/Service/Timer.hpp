@@ -18,45 +18,6 @@ namespace sys
 {
     using ms = unsigned int;
 
-    class TimerIDGenerator
-    {
-      public:
-        virtual ~TimerIDGenerator() = default;
-
-        virtual void incrementID() const                                           = 0;
-        [[nodiscard]] virtual std::string generateID(const std::string &val) const = 0;
-    };
-
-    class UserTimerIDGenerator : public TimerIDGenerator
-    {
-      public:
-        void incrementID() const override{};
-
-        [[nodiscard]] std::string generateID(const std::string &val) const override
-        {
-            return val;
-        }
-    };
-    class SystemTimerIDGenerator : public TimerIDGenerator
-    {
-        static uint32_t &getId() noexcept
-        {
-            static uint32_t timer_id = 0;
-            return timer_id;
-        }
-
-      public:
-        void incrementID() const override
-        {
-            getId()++;
-        };
-
-        [[nodiscard]] std::string generateID(const std::string &val) const override
-        {
-            return val + "_" + std::to_string(getId());
-        }
-    };
-
     /// Base timer for all coarse timers in system
     class Timer : private cpp_freertos::Timer
     {
@@ -73,11 +34,7 @@ namespace sys
         /// @param name this will be name of timer + postfix
         /// @param parent service on which behalf timer events will be sent and received
         /// @param interval time for next timer event in
-        Timer(const std::string &name,
-              Service *parent,
-              ms interval,
-              Type type                         = Type::Periodic,
-              const TimerIDGenerator &generator = SystemTimerIDGenerator());
+        Timer(const std::string &name, Service *parent, ms interval, Type type = Type::Periodic);
 
         /// Create timer with default name `_<id_number>` and register it in parent
         /// @param parent service on which behalf timer events will be sent and received
