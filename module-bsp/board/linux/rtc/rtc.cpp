@@ -180,7 +180,12 @@ static void rtc_worker(void *pvp)
 
 // TODO delete function if it will not be used in service
 void SNVS_HP_WRAPPER_IRQHandler()
-{}
+{
+    /// HERE on TICK set_time timer monotonic
+    /// gmtime    <- based on timer monotonic
+    /// localtime <- based on timer monotonic
+    /// timezone  <- can be based on offset between two if one super wishes... (+1, +2 etc... )
+}
 /*
  *  **********************************************************************************************************************
  *  * *
