@@ -27,10 +27,6 @@
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
 #include <module-services/service-db/service-db/DBServiceAPI.hpp>
 
-#include <bsp/vibrator/vibrator.hpp>
-#include <service-evtmgr/Constants.hpp>
-#include <service-evtmgr/Message.hpp>
-#include "service-evtmgr/EVMessages.hpp"
 
 namespace app
 {

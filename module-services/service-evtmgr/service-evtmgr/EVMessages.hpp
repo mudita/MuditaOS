@@ -134,7 +134,6 @@ namespace sevm
         {}
 
         bsp::keypad_backlight::Action action;
-        std::chrono::seconds repetitionTime;
     };
 
     class KeypadBacklightResponseMessage : public sys::Message
