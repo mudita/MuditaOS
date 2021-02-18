@@ -1,0 +1,7 @@
+@startuml
+if (is on desktop main) then (no)
+  :navigate to desktop main;
+else (yes)
+endif
+: navigate to settings - BT Main;
+@enduml
