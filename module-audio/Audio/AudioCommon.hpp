@@ -7,6 +7,7 @@
 #include "Profiles/Profile.hpp"
 
 #include <Service/Message.hpp>
+#include <PhoneModes/Common.hpp>
 #include <Utils.hpp>
 
 #include <map>
@@ -60,7 +61,8 @@ namespace audio
 
     [[nodiscard]] const std::string str(const Setting &setting) noexcept;
 
-    [[nodiscard]] const std::string dbPath(const Setting &setting,
+    [[nodiscard]] const std::string dbPath(const sys::phone_modes::PhoneMode &phoneMode,
+                                           const Setting &setting,
                                            const PlaybackType &playbackType,
                                            const Profile::Type &profileType);
 
@@ -285,15 +287,15 @@ namespace AudioServiceMessage
     class DbRequest : public sys::Message
     {
       public:
-        explicit DbRequest(std::string path) : path(std::move(path))
+        explicit DbRequest(const audio::Setting &setting,
+                           const audio::PlaybackType &playback,
+                           const audio::Profile::Type &profile)
+            : setting(setting), profile(profile), playback(playback)
         {}
-        const std::string &GetPath() const
-        {
-            return path;
-        }
 
-      private:
-        const std::string path;
+        const audio::Setting setting;
+        const audio::Profile::Type profile;
+        const audio::PlaybackType playback;
     };
 
     using Callback = std::function<std::optional<std::string>(const sys::Message *msg)>;

@@ -40,31 +40,40 @@ TEST_CASE("Audio settings string creation")
 {
     SECTION("Create volume string for playback loudspeaker, multimedia")
     {
-        const auto str = audio::dbPath(
-            audio::Setting::Volume, audio::PlaybackType::Multimedia, audio::Profile::Type::PlaybackLoudspeaker);
+        const auto str = audio::dbPath(sys::phone_modes::PhoneMode::Connected,
+                                       audio::Setting::Volume,
+                                       audio::PlaybackType::Multimedia,
+                                       audio::Profile::Type::PlaybackLoudspeaker);
         REQUIRE_FALSE(str.empty());
-        REQUIRE(str == "audio/PlaybackLoudspeaker/Multimedia/Volume");
+        REQUIRE(str == "audio/Connected/PlaybackLoudspeaker/Multimedia/Volume");
     }
 
     SECTION("Create volume string for routing speakerphone")
     {
-        const auto str =
-            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingLoudspeaker);
+        const auto str = audio::dbPath(sys::phone_modes::PhoneMode::Offline,
+                                       audio::Setting::Volume,
+                                       audio::PlaybackType::None,
+                                       audio::Profile::Type::RoutingLoudspeaker);
         REQUIRE_FALSE(str.empty());
-        REQUIRE(str == "audio/RoutingLoudspeaker/Volume");
+        REQUIRE(str == "audio/Offline/RoutingLoudspeaker/Volume");
     }
 
     SECTION("Create gain string for recording built-in microphone")
     {
-        const auto str =
-            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingBuiltInMic);
+        const auto str = audio::dbPath(sys::phone_modes::PhoneMode::DoNotDisturb,
+                                       audio::Setting::Gain,
+                                       audio::PlaybackType::None,
+                                       audio::Profile::Type::RecordingBuiltInMic);
         REQUIRE_FALSE(str.empty());
-        REQUIRE(str == "audio/RecordingBuiltInMic/Gain");
+        REQUIRE(str == "audio/DoNotDisturb/RecordingBuiltInMic/Gain");
     }
 
     SECTION("Create empty volume string when Idle")
     {
-        const auto str = audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::Idle);
+        const auto str = audio::dbPath(sys::phone_modes::PhoneMode::Offline,
+                                       audio::Setting::Volume,
+                                       audio::PlaybackType::None,
+                                       audio::Profile::Type::Idle);
         REQUIRE(str.empty());
     }
 }
