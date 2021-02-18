@@ -17,6 +17,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <sys/statvfs.h>
+#include <gsl>
 
 namespace sys
 {
@@ -24,37 +26,102 @@ namespace sys
 } // namespace sys
 
 static const long unsigned int empty_dirlist_size = 2;
-static const auto backup_file_name                = "backup.tar";
-static constexpr auto tar_buf                     = 8192 * 4;
 
-void BackupRestore::BackupUserFiles(sys::Service *ownerService)
+// this replaces std::filesystem::copy_file that is broken at
+// the time this is implemented (chown issues after copy)
+// once fixed this can be replaced
+static bool copyFile(const std::filesystem::path &from, const std::filesystem::path &to)
+{
+    std::FILE *fromFp = std::fopen(from.c_str(), "r");
+    std::FILE *toFp   = std::fopen(to.c_str(), "w");
+
+    auto end = gsl::finally([fromFp, toFp] {
+        std::fclose(fromFp);
+        std::fclose(toFp);
+    });
+
+    if (fromFp == nullptr) {
+        LOG_ERROR("can't open %s for reading", from.c_str());
+        return false;
+    }
+
+    if (toFp == nullptr) {
+        LOG_ERROR("can't open %s for writing", to.c_str());
+        return false;
+    }
+
+    std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::tar_buf]);
+    size_t bytes;
+
+    while ((bytes = std::fread(buffer.get(), 1, purefs::buffer::tar_buf, fromFp)) != 0) {
+        if (std::fwrite(buffer.get(), 1, bytes, toFp) != bytes) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool BackupRestore::BackupUserFiles(sys::Service *ownerService, std::filesystem::path &path)
 {
     assert(ownerService != nullptr);
-
     LOG_INFO("BackupUserFiles: backup started...");
 
-    if (BackupRestore::RemoveBackupDir() == false) {
-        return;
+    if (BackupRestore::RemoveBackupDir(path) == false) {
+        return false;
     }
 
-    if (BackupRestore::CreateBackupDir() == false) {
-        return;
+    if (BackupRestore::CreateBackupDir(path) == false) {
+        return false;
     }
-
-    std::string backupPathDB = purefs::dir::getBackupOSPath();
-    backupPathDB += "/";
 
     LOG_INFO("BackupUserFiles: database backup started...");
 
-    if (DBServiceAPI::DBBackup(ownerService, backupPathDB) == false) {
+    if (DBServiceAPI::DBBackup(ownerService, path) == false) {
         LOG_ERROR("BackupUserFiles: database backup failed, quitting...");
-        BackupRestore::RemoveBackupDir();
-        return;
+        BackupRestore::RemoveBackupDir(path);
+        return false;
     }
 
-    BackupRestore::PackUserFiles();
+    if (WriteBackupInfo(ownerService, path) == false) {
+        LOG_ERROR("Failed to write backup info");
+        BackupRestore::RemoveBackupDir(path);
+        return false;
+    }
 
-    LOG_INFO("BackupUserFiles: backup finished");
+    LOG_INFO("BackupUserFiles: packing files");
+    return BackupRestore::PackUserFiles(path);
+}
+
+bool BackupRestore::WriteBackupInfo(sys::Service *ownerService, const std::filesystem::path &path)
+{
+    LOG_INFO("Writing backup info to %s", path.c_str());
+
+    if (std::filesystem::is_directory(path)) {
+        try {
+            copyFile(purefs::dir::getRootDiskPath() / purefs::file::boot_json, path / purefs::file::boot_json);
+
+            LOG_DEBUG("%s copied to %s",
+                      (purefs::dir::getRootDiskPath() / purefs::file::boot_json).c_str(),
+                      (path / "backup.json").c_str());
+
+            return true;
+        }
+        catch (std::filesystem::filesystem_error &e) {
+            LOG_ERROR("failed to copy %s->%s error:\"%s\"",
+                      (purefs::dir::getRootDiskPath() / purefs::file::boot_json).c_str(),
+                      (path / "backup.json").c_str(),
+                      e.what());
+
+            return false;
+        }
+    }
+    else {
+        LOG_ERROR("%s is not a directory", path.c_str());
+        return false;
+    }
+
+    return true;
 }
 
 void BackupRestore::RestoreUserFiles(sys::Service *ownerService)
@@ -74,24 +141,23 @@ void BackupRestore::RestoreUserFiles(sys::Service *ownerService)
 
     BackupRestore::ReplaceUserFiles();
 
-    BackupRestore::RemoveBackupDir();
+    // BackupRestore::RemoveBackupDir(path);
 
     LOG_INFO("RestoreUserFiles: restoring finished, rebooting...");
     sys::SystemManager::Reboot(ownerService);
 }
 
-bool BackupRestore::RemoveBackupDir()
+bool BackupRestore::RemoveBackupDir(std::filesystem::path &path)
 {
     /* prepare directories */
-    if (const auto backupOSPath = purefs::dir::getBackupOSPath(); std::filesystem::is_directory(backupOSPath.c_str())) {
-        LOG_INFO("RemoveBackupDir: removing backup directory %s...", backupOSPath.c_str());
+    if (std::filesystem::is_directory(path)) {
+        LOG_INFO("RemoveBackupDir: removing backup directory %s...", path.c_str());
 
         try {
-            std::filesystem::remove_all(backupOSPath.c_str());
+            std::filesystem::remove_all(path);
         }
         catch (const std::filesystem::filesystem_error &e) {
-            LOG_ERROR(
-                "RemoveBackupDir: removing backup directory %s failed, error: %s.", backupOSPath.c_str(), e.what());
+            LOG_ERROR("RemoveBackupDir: removing backup directory %s failed, error: %s.", path.c_str(), e.what());
             return false;
         }
     }
@@ -99,44 +165,61 @@ bool BackupRestore::RemoveBackupDir()
     return true;
 }
 
-bool BackupRestore::CreateBackupDir()
+bool BackupRestore::CreateBackupDir(std::filesystem::path &path)
 {
-    const auto backupOSPath = purefs::dir::getBackupOSPath();
-    LOG_INFO("CreateBackupDir: creating backup directory %s...", backupOSPath.c_str());
+    LOG_INFO("CreateBackupDir: creating backup directory %s...", path.c_str());
+    std::error_code e;
 
-    if (!std::filesystem::is_directory(backupOSPath.c_str())) {
-        try {
-            if (!std::filesystem::create_directory(backupOSPath.c_str())) {
-                LOG_ERROR("CreateBackupDir: creating backup directory %s failed.", backupOSPath.c_str());
-                return false;
-            }
-        }
-        catch (const std::filesystem::filesystem_error &err) {
-            LOG_FATAL("Exception while creating dir %s", backupOSPath.c_str());
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool BackupRestore::PackUserFiles()
-{
-    std::string backupPathDB = purefs::dir::getBackupOSPath();
-    backupPathDB += "/";
-
-    const auto backupOSPath = purefs::dir::getBackupOSPath();
-
-    if (std::filesystem::is_empty(backupOSPath.c_str())) {
-        LOG_ERROR("PackUserFiles: backup dir %s is empty, nothing to backup, quitting...", backupOSPath.c_str());
-        BackupRestore::RemoveBackupDir();
+    struct statvfs stat;
+    if (statvfs(path.c_str(), &stat)) {
+        LOG_ERROR("statvdfs failed on %s", path.c_str());
         return false;
     }
 
-    std::string tarFilePath = backupOSPath;
-    tarFilePath += "/";
-    tarFilePath += backup_file_name;
+    if (stat.f_flag & ST_RDONLY) {
+        LOG_ERROR("%s is on a RO fs", path.c_str());
+        return false;
+    }
 
+    if (!std::filesystem::is_directory(purefs::dir::getBackupOSPath())) {
+        if (!std::filesystem::create_directory(purefs::dir::getBackupOSPath(), e)) {
+            LOG_ERROR("CreateBackupDir: creating backup directory %s failed. \"%s\"",
+                      purefs::dir::getBackupOSPath().c_str(),
+                      e.message().c_str());
+            return false;
+        }
+    }
+
+    if (!std::filesystem::is_directory(purefs::dir::getTemporaryPath())) {
+        if (!std::filesystem::create_directory(purefs::dir::getTemporaryPath(), e)) {
+            LOG_ERROR("CreateBackupDir: creating backup directory %s failed. \"%s\"",
+                      purefs::dir::getTemporaryPath().c_str(),
+                      e.message().c_str());
+            return false;
+        }
+    }
+
+    if (!std::filesystem::is_directory(path)) {
+        if (!std::filesystem::create_directory(path, e)) {
+            LOG_ERROR(
+                "CreateBackupDir: creating backup directory %s failed. \"%s\"", path.c_str(), e.message().c_str());
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool BackupRestore::PackUserFiles(std::filesystem::path &path)
+{
+    if (std::filesystem::is_empty(path)) {
+        LOG_ERROR("PackUserFiles: backup dir %s is empty, nothing to backup, quitting...", path.c_str());
+        BackupRestore::RemoveBackupDir(path);
+        return false;
+    }
+
+    std::filesystem::path tarFilePath =
+        (purefs::dir::getBackupOSPath() / path.filename()).replace_extension(purefs::extension::tar);
     mtar_t tarFile;
 
     LOG_INFO("PackUserFiles: opening file %s...", tarFilePath.c_str());
@@ -146,87 +229,90 @@ bool BackupRestore::PackUserFiles()
     if (ret != MTAR_ESUCCESS) {
         LOG_ERROR(
             "PackUserFiles: opening file %s failed, error: %s, quitting...", tarFilePath.c_str(), mtar_strerror(ret));
-        BackupRestore::RemoveBackupDir();
+        BackupRestore::RemoveBackupDir(path);
         return false;
     }
-    std::unique_ptr<unsigned char[]> buffer(new unsigned char[tar_buf]);
+    std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::tar_buf]);
+    std::error_code e;
 
-    for (auto &direntry : std::filesystem::directory_iterator(backupOSPath.c_str())) {
-        if ((direntry.path().string().compare(".") != 0) && (direntry.path().string().compare("..") != 0) &&
-            (direntry.path().string().compare("...") != 0)) {
+    for (auto &direntry : std::filesystem::directory_iterator(path)) {
+        if ((direntry.path().string() != ".") && (direntry.path().string() != "..") &&
+            (direntry.path().string() != "...")) {
 
-            auto path = backupPathDB + direntry.path().string().c_str();
-            LOG_INFO("PackUserFiles: archiving file %s...", path.c_str());
-            auto *file = std::fopen(path.c_str(), "r");
+            LOG_INFO("PackUserFiles: archiving file %s...", direntry.path().c_str());
+            auto *file = std::fopen(direntry.path().string().c_str(), "r");
 
             if (file == nullptr) {
                 LOG_ERROR("PackUserFiles: archiving file %s failed, cannot open file, quitting...",
-                          direntry.path().string().c_str());
+                          direntry.path().c_str());
                 mtar_close(&tarFile);
-                BackupRestore::RemoveBackupDir();
+                BackupRestore::RemoveBackupDir(path);
                 return false;
             }
 
-            LOG_INFO("PackUserFiles: writting tar header for %s...", direntry.path().string().c_str());
+            LOG_DEBUG("PackUserFiles: writting tar header for %s...", direntry.path().c_str());
 
             if (mtar_write_file_header(&tarFile,
-                                       direntry.path().string().c_str(),
+                                       direntry.path().filename().c_str(),
                                        static_cast<unsigned>(std::filesystem::file_size(direntry))) != MTAR_ESUCCESS) {
-                LOG_ERROR("PackUserFiles: writing tar header for %s failed", direntry.path().string().c_str());
+                LOG_ERROR("PackUserFiles: writing tar header for %s failed", direntry.path().filename().c_str());
                 std::fclose(file);
                 mtar_close(&tarFile);
-                BackupRestore::RemoveBackupDir();
+                BackupRestore::RemoveBackupDir(path);
                 return false;
             }
 
-            uintmax_t filesize = std::filesystem::file_size(path);
-            uint32_t loopcount = (filesize / tar_buf) + 1u;
+            uintmax_t filesize = std::filesystem::file_size(direntry.path(), e);
+            if (e) {
+                LOG_ERROR("failed to get size for file: %s \"%s\"", path.c_str(), e.message().c_str());
+                BackupRestore::RemoveBackupDir(path);
+                return false;
+            }
+            uint32_t loopcount = (filesize / purefs::buffer::tar_buf) + 1u;
             uint32_t readsize  = 0u;
 
             for (uint32_t i = 0u; i < loopcount; i++) {
                 if (i + 1u == loopcount) {
-                    readsize = filesize % tar_buf;
+                    readsize = filesize % purefs::buffer::tar_buf;
                 }
                 else {
-                    readsize = tar_buf;
+                    readsize = purefs::buffer::tar_buf;
                 }
 
-                LOG_INFO("PackUserFiles: reading file %s...", direntry.path().string().c_str());
+                LOG_DEBUG("PackUserFiles: reading file %s...", direntry.path().c_str());
 
                 if (std::fread(buffer.get(), 1, readsize, file) != readsize) {
-                    LOG_ERROR("PackUserFiles: reading file %s failed, quitting...", direntry.path().string().c_str());
+                    LOG_ERROR("PackUserFiles: reading file %s failed, quitting...", direntry.path().c_str());
                     std::fclose(file);
                     mtar_close(&tarFile);
-                    BackupRestore::RemoveBackupDir();
+                    BackupRestore::RemoveBackupDir(path);
                     return false;
                 }
 
-                LOG_INFO("PackUserFiles: writting %s into backup...", direntry.path().string().c_str());
+                LOG_DEBUG("PackUserFiles: writting %s into backup...", direntry.path().c_str());
                 if (mtar_write_data(&tarFile, buffer.get(), readsize) != MTAR_ESUCCESS) {
-                    LOG_ERROR("PackUserFiles: writting %s into backup failed, quitting...",
-                              direntry.path().string().c_str());
+                    LOG_ERROR("PackUserFiles: writting %s into backup failed, quitting...", direntry.path().c_str());
                     std::fclose(file);
                     mtar_close(&tarFile);
-                    BackupRestore::RemoveBackupDir();
+                    BackupRestore::RemoveBackupDir(path);
                     return false;
                 }
             }
 
-            LOG_INFO("PackUserFiles: closing file %s...", (backupPathDB + direntry.path().string()).c_str());
+            LOG_INFO("PackUserFiles: closing file %s...", direntry.path().c_str());
             if (std::fclose(file) != 0) {
-                LOG_ERROR("PackUserFiles: closing file %s failed, quitting...",
-                          (backupPathDB + direntry.path().string()).c_str());
+                LOG_ERROR("PackUserFiles: closing file %s failed, quitting...", direntry.path().c_str());
                 mtar_close(&tarFile);
-                BackupRestore::RemoveBackupDir();
+                BackupRestore::RemoveBackupDir(path);
                 return false;
             }
 
-            LOG_INFO("PackUserFiles: deleting file %s...", (backupPathDB + direntry.path().string()).c_str());
-            if (std::remove((backupPathDB + direntry.path().string()).c_str()) != 0) {
-                LOG_ERROR("PackUserFiles: deleting file %s failed, quitting...",
-                          (backupPathDB + direntry.path().string()).c_str());
+            LOG_INFO("PackUserFiles: deleting file %s...", direntry.path().c_str());
+
+            if (std::remove(direntry.path().c_str()) != 0) {
+                LOG_ERROR("PackUserFiles: deleting file %s failed, quitting...", direntry.path().c_str());
                 mtar_close(&tarFile);
-                BackupRestore::RemoveBackupDir();
+                BackupRestore::RemoveBackupDir(path);
                 return false;
             }
         }
@@ -236,14 +322,14 @@ bool BackupRestore::PackUserFiles()
     if (mtar_finalize(&tarFile) != MTAR_ESUCCESS) {
         LOG_ERROR("PackUserFiles: finalizing file %s failed, quitting....", tarFilePath.c_str());
         mtar_close(&tarFile);
-        BackupRestore::RemoveBackupDir();
+        BackupRestore::RemoveBackupDir(path);
         return false;
     }
 
     LOG_INFO("PackUserFiles: closing file %s...", tarFilePath.c_str());
     if (mtar_close(&tarFile) != MTAR_ESUCCESS) {
         LOG_ERROR("PackUserFiles: closing file %s failed, quitting...", tarFilePath.c_str());
-        BackupRestore::RemoveBackupDir();
+        BackupRestore::RemoveBackupDir(path);
         return false;
     }
 
@@ -254,7 +340,6 @@ bool BackupRestore::UnpackBackupFile()
 {
     std::string tarFilePath = purefs::dir::getBackupOSPath();
     tarFilePath += "/";
-    tarFilePath += backup_file_name;
 
     mtar_t tarFile;
     mtar_header_t tarHeader;
@@ -270,7 +355,7 @@ bool BackupRestore::UnpackBackupFile()
         return false;
     }
 
-    std::unique_ptr<unsigned char[]> buffer(new unsigned char[tar_buf]);
+    std::unique_ptr<unsigned char[]> buffer(new unsigned char[purefs::buffer::tar_buf]);
 
     do {
         ret = mtar_read_header(&tarFile, &tarHeader);
@@ -290,16 +375,16 @@ bool BackupRestore::UnpackBackupFile()
                 return false;
             }
 
-            uint32_t loopcount = (tarHeader.size / tar_buf) + 1u;
+            uint32_t loopcount = (tarHeader.size / purefs::buffer::tar_buf) + 1u;
             uint32_t readsize  = 0u;
 
             for (uint32_t i = 0u; i < loopcount; i++) {
 
                 if (i + 1u == loopcount) {
-                    readsize = tarHeader.size % tar_buf;
+                    readsize = tarHeader.size % purefs::buffer::tar_buf;
                 }
                 else {
-                    readsize = tar_buf;
+                    readsize = purefs::buffer::tar_buf;
                 }
 
                 if (mtar_read_data(&tarFile, buffer.get(), readsize) != MTAR_ESUCCESS) {

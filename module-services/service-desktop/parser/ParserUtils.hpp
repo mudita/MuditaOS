@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -93,9 +93,6 @@ namespace parserFSM
         inline constexpr auto currentRTCTime   = "currentRTCTime";
         inline constexpr auto updateReady      = "updateReady";
         inline constexpr auto updateFileList   = "updateFileList";
-        inline constexpr auto backupRequest    = "backupRequest";
-        inline constexpr auto backupReady      = "backupReady";
-        inline constexpr auto backupUpload     = "backupUpload";
         inline constexpr auto restoreRequest   = "restoreRequest";
         inline constexpr auto factoryRequest   = "factoryRequest";
         inline constexpr auto networkStatus    = "networkStatus";
@@ -110,7 +107,13 @@ namespace parserFSM
         inline constexpr auto updateHistory    = "updateHistory";
         inline constexpr auto fileExists       = "fileExists";
         inline constexpr auto version          = "version";
-
+        inline constexpr auto task             = "task";
+        inline constexpr auto state            = "state";
+        inline constexpr auto success          = "success";
+        inline constexpr auto request          = "request";
+        inline constexpr auto finished         = "finished";
+        inline constexpr auto pending          = "pending";
+        inline constexpr auto location         = "location";
         namespace filesystem
         {
             inline constexpr auto command = "command";

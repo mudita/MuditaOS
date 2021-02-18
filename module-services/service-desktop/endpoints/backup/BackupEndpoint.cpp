@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BackupEndpoint.hpp"
@@ -15,21 +15,16 @@
 #include <filesystem>
 #include <memory>
 
-static bool backupReady = false;
-
 using namespace parserFSM;
 
 auto BackupEndpoint::handle(Context &context) -> void
 {
     switch (context.getMethod()) {
-    case http::Method::post:
-        upload(context);
-        break;
     case http::Method::get:
         request(context);
         break;
+    case http::Method::post:
     case http::Method::put:
-        [[fallthrough]];
     case http::Method::del:
         context.setResponseStatus(http::Code::BadRequest);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
@@ -39,39 +34,43 @@ auto BackupEndpoint::handle(Context &context) -> void
 auto BackupEndpoint::request(Context &context) -> sys::ReturnCodes
 {
     json11::Json responseBodyJson;
-    if (context.getBody()[json::backupReady] == true) {
-        context.setResponseBody(json11::Json::object({{json::backupReady, backupReady}}));
-    }
-    else if (context.getBody()[json::backupRequest] == true) {
-        auto msg = std::make_shared<sdesktop::BackupMessage>();
-        ownerServicePtr->bus.sendUnicast(msg, service::name::service_desktop);
-        backupReady = true;
+    auto owner = static_cast<ServiceDesktop *>(ownerServicePtr);
 
-        context.setResponseBody(json11::Json::object({{json::backupRequest, true}}));
-    }
-    else {
-        context.setResponseBody(json11::Json::object({{json::backupRequest, false}}));
-    }
+    if (context.getBody()[json::task].is_string()) {
+        if (owner->getBackupStatus().task == context.getBody()[json::task].string_value()) {
+            if (owner->getBackupStatus().state == true) {
+                context.setResponseStatus(parserFSM::http::Code::SeeOther);
+            }
 
-    MessageHandler::putToSendQueue(context.createSimpleResponse());
-
-    return sys::ReturnCodes::Success;
-}
-
-auto BackupEndpoint::upload(Context &context) -> sys::ReturnCodes
-{
-    if (context.getBody()[json::backupUpload] == true) {
-        if (const auto backupOSPath = purefs::dir::getBackupOSPath(); std::filesystem::exists(backupOSPath.c_str())) {
-            context.setResponseBody(json11::Json::object({{json::backupUpload, true}}));
+            context.setResponseBody(owner->getBackupStatus());
         }
         else {
-            context.setResponseBody(json11::Json::object({{json::backupUpload, false}}));
+            context.setResponseStatus(parserFSM::http::Code::NotFound);
+        }
+    }
+    else if (context.getBody()[json::request] == true) {
+        if (owner->getBackupStatus().state == true) {
+            // a backup is already running, don't start a second task
+            context.setResponseStatus(parserFSM::http::Code::NotAcceptable);
+        }
+        else {
+            // initialize new backup information
+            owner->prepareBackupData();
+
+            // start the backup process in the background
+            ownerServicePtr->bus.sendUnicast(std::make_shared<sdesktop::BackupMessage>(),
+                                             service::name::service_desktop);
+
+            // return new generated backup info
+            context.setResponseBody(owner->getBackupStatus());
         }
     }
     else {
-        context.setResponseBody(json11::Json::object({{json::backupReady, false}}));
+        // unknown request for backup endpoint
+        context.setResponseStatus(parserFSM::http::Code::BadRequest);
     }
 
+    LOG_DEBUG("responding: %s", context.createSimpleResponse().c_str());
     MessageHandler::putToSendQueue(context.createSimpleResponse());
 
     return sys::ReturnCodes::Success;

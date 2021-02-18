@@ -202,7 +202,7 @@ void Database::pragmaQuery(const std::string &pragmaStatemnt)
     }
 }
 
-bool Database::storeIntoFile(const std::string &backupPath)
+bool Database::storeIntoFile(const std::filesystem::path &backupPath)
 {
     LOG_INFO("Backup database: %s, into file: %s - STARTED", dbName.c_str(), backupPath.c_str());
     if (const auto rc = execute("VACUUM INTO '%q';", backupPath.c_str()); !rc) {

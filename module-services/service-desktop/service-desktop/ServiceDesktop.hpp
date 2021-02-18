@@ -38,6 +38,22 @@ class ServiceDesktop : public sys::Service
   public:
     ServiceDesktop();
     ~ServiceDesktop() override;
+
+    struct BackupStatus
+    {
+        std::filesystem::path backupTempDir;
+        std::filesystem::path location;
+        std::string task;
+        bool state = false;
+        json11::Json to_json() const
+        {
+            return json11::Json::object{
+                {parserFSM::json::task, task},
+                {parserFSM::json::state, state ? parserFSM::json::finished : parserFSM::json::pending},
+                {parserFSM::json::location, location.string()}};
+        }
+    } backupStatus;
+
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
@@ -46,6 +62,11 @@ class ServiceDesktop : public sys::Service
     std::unique_ptr<UpdateMuditaOS> updateOS;
     std::unique_ptr<WorkerDesktop> desktopWorker;
     void storeHistory(const std::string &historyValue);
+    void prepareBackupData();
+    const BackupStatus getBackupStatus()
+    {
+        return backupStatus;
+    }
 
   private:
     std::unique_ptr<settings::Settings> settings;
