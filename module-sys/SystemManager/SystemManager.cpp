@@ -458,6 +458,16 @@ namespace sys
                     continue;
                 }
 
+                if (service->GetName() == service::name::gui) {
+                    LOG_DEBUG("Delay closing %s", service::name::gui);
+                    continue;
+                }
+
+                if (service->GetName() == service::name::eink) {
+                    LOG_DEBUG("Delay closing %s", service::name::eink);
+                    continue;
+                }
+
                 if (service->GetName() == app::manager::ApplicationManager::ServiceName) {
                     LOG_DEBUG("Delay closing %s", app::manager::ApplicationManager::ServiceName);
                     continue;
