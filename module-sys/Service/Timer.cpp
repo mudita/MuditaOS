@@ -1,7 +1,6 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "GuiTimer.hpp"
 #include "Timer.hpp"
 #include "Service.hpp"
 #include "TimerMessage.hpp"
@@ -22,24 +21,26 @@
 
 namespace sys
 {
-    const ms Timer::timeout_infinite = std::numeric_limits<ms>().max();
 
-    Timer::Timer(const std::string &name, Service *service, ms interval, Type type, const TimerIDGenerator &generator)
-        : cpp_freertos::Timer(generator.generateID(name).c_str(), pdMS_TO_TICKS(interval), type == Type::Periodic),
-          parent(service), type(type), interval(interval), name(generator.generateID(name).c_str())
+    const ms Timer::timeout_infinite = std::numeric_limits<ms>().max();
+    static uint32_t timer_id;
+
+    auto toName(const std::string &val, uint32_t no) -> std::string
+    {
+        return val + "_" + std::to_string(no);
+    }
+
+    Timer::Timer(const std::string &name, Service *service, ms interval, Type type)
+        : cpp_freertos::Timer((toName(name, timer_id)).c_str(), pdMS_TO_TICKS(interval), type == Type::Periodic),
+          parent(service), type(type), interval(interval), name(toName(name, timer_id))
     {
         if (service != nullptr) {
-
-            if (service->timerExists(name)) {
-                throw std::runtime_error("Timer: " + name + " exits in service: " + service->GetName());
-            }
-
             service->getTimers().attach(this);
-            generator.incrementID();
         }
         else {
             log_error("Bad timer creation!");
         }
+        ++timer_id;
         log_debug("Timer %s created %s", name.c_str(), type == Type::Periodic ? "periodic" : "singleshot");
     }
 
