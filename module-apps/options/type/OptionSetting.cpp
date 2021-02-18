@@ -50,7 +50,7 @@ namespace gui::option
             button = new ButtonOnOff(optionBodyHBox, ButtonState::Off);
             break;
         case SettingRightItem::Bt:
-            imageName = "bt";
+            imageName = "Bluetooth_small";
             break;
         case SettingRightItem::Checked:
             imageName = "small_tick_W_M";
