@@ -36,14 +36,14 @@ bool CellularServiceAPI::DialEmergencyNumber(sys::Service *serv, const utils::Ph
 
 bool CellularServiceAPI::AnswerIncomingCall(sys::Service *serv)
 {
-    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularAnswerIncomingCall);
+    auto msg = std::make_shared<CellularAnswerIncomingCallMessage>();
 
     return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 
 bool CellularServiceAPI::HangupCall(sys::Service *serv)
 {
-    auto msg = std::make_shared<CellularRequestMessage>(MessageType::CellularHangupCall);
+    auto msg = std::make_shared<CellularHangupCallMessage>();
 
     return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }

@@ -30,6 +30,7 @@
 #include <service-db/Settings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/DBServiceName.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -78,7 +79,7 @@ class ServiceCellular : public sys::Service
     static const char *serviceName;
 
     bool sendSMS(SMSRecord record);
-    bool receiveSMS(std::string messageNumber);
+    auto receiveSMS(std::string messageNumber) -> std::shared_ptr<CellularResponseMessage>;
     /**
      * @brief Its getting selected SIM card own number.
      * @param destination Reference to destination string.
@@ -315,6 +316,16 @@ class ServiceCellular : public sys::Service
     void volteChanged(const std::string &value);
     void apnListChanged(const std::string &value);
     bool volteOn = false;
+
+    auto handleCellularAnswerIncomingCallMessage(CellularMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
+    auto handleCellularCallRequestMessage(CellularCallRequestMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
+    auto handleCellularHangupCallMessage(CellularHangupCallMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
+    auto handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularListCallsMessage(CellularMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleDBNotificatioMessage(db::NotificationMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularIncominCallMessage(CellularIncominCallMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularCallerIdMessage(CellularCallerIdMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
 };
 
 namespace sys

@@ -30,28 +30,51 @@ class CellularMessage : public sys::DataMessage
     explicit CellularMessage(MessageType messageType) : sys::DataMessage(messageType){};
 };
 
-class CellularCallMessage : public CellularMessage
+class CellularRingingMessage : public CellularMessage
 {
   public:
-    enum class Type
-    {
-        Ringing,      // user provided number to call to and service initialized calling procedure.
-        IncomingCall, // device receives connection from other device.
-        CallerId,     // device receives caller id
-    };
-
-    CellularCallMessage() = delete;
-    CellularCallMessage(Type type, const utils::PhoneNumber::View &number)
-        : CellularMessage(MessageType::CellularCall), type(type), number(number)
+    CellularRingingMessage(const utils::PhoneNumber::View &number)
+        : CellularMessage(MessageType::CellularRinging), number(number)
     {}
-    CellularCallMessage(Type type, const utils::PhoneNumber &number)
-        : CellularMessage(MessageType::CellularCall), type(type), number(number.getView())
+    CellularRingingMessage(const utils::PhoneNumber &number)
+        : CellularMessage(MessageType::CellularRinging), number(number.getView())
     {}
-    CellularCallMessage(Type type, const std::string &e164number)
-        : CellularMessage(MessageType::CellularCall), type(type), number(utils::PhoneNumber::parse(e164number))
+    CellularRingingMessage(const std::string &e164number)
+        : CellularMessage(MessageType::CellularRinging), number(utils::PhoneNumber::parse(e164number))
     {}
 
-    Type type;
+    utils::PhoneNumber::View number;
+};
+
+class CellularIncominCallMessage : public CellularMessage
+{
+  public:
+    CellularIncominCallMessage(const utils::PhoneNumber::View &number)
+        : CellularMessage(MessageType::CellularIncomingCall), number(number)
+    {}
+    CellularIncominCallMessage(const utils::PhoneNumber &number)
+        : CellularMessage(MessageType::CellularIncomingCall), number(number.getView())
+    {}
+    CellularIncominCallMessage(const std::string &e164number)
+        : CellularMessage(MessageType::CellularIncomingCall), number(utils::PhoneNumber::parse(e164number))
+    {}
+
+    utils::PhoneNumber::View number;
+};
+
+class CellularCallerIdMessage : public CellularMessage
+{
+  public:
+    CellularCallerIdMessage(const utils::PhoneNumber::View &number)
+        : CellularMessage(MessageType::CellularCallerId), number(number)
+    {}
+    CellularCallerIdMessage(const utils::PhoneNumber &number)
+        : CellularMessage(MessageType::CellularCallerId), number(number.getView())
+    {}
+    CellularCallerIdMessage(const std::string &e164number)
+        : CellularMessage(MessageType::CellularCallerId), number(utils::PhoneNumber::parse(e164number))
+    {}
+
     utils::PhoneNumber::View number;
 };
 
@@ -787,6 +810,42 @@ class CellularNotAnEmergencyNotification : public CellularResponseMessage,
             app::manager::actions::NotAnEmergencyNotification,
             std::make_unique<app::manager::actions::ActionParams>(data));
     }
+};
+
+class CellularNewIncomingSMSMessage : public CellularMessage
+{
+  public:
+    explicit CellularNewIncomingSMSMessage(const std::string &data)
+        : CellularMessage(MessageType::CellularNewIncomingSMS), notificationData(data)
+    {}
+    auto getData() const -> std::string
+    {
+        return notificationData;
+    }
+
+  private:
+    std::string notificationData;
+};
+
+class CellularAnswerIncomingCallMessage : public CellularMessage
+{
+  public:
+    CellularAnswerIncomingCallMessage() : CellularMessage(MessageType::CellularAnswerIncomingCall)
+    {}
+};
+
+class CellularHangupCallMessage : public CellularMessage
+{
+  public:
+    CellularHangupCallMessage() : CellularMessage(MessageType::CellularHangupCall)
+    {}
+};
+
+class CellularListCallsMessage : public CellularMessage
+{
+  public:
+    CellularListCallsMessage() : CellularMessage(MessageType::CellularListCurrentCalls)
+    {}
 };
 
 namespace cellular
