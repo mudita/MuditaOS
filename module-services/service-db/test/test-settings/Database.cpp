@@ -215,7 +215,7 @@ uint32_t Database::getLastInsertRowId()
 void Database::pragmaQuery(const std::string &pragmaStatemnt)
 {}
 
-bool Database::storeIntoFile(const std::string &backupPath)
+bool Database::storeIntoFile(const std::filesystem::path &backupPath)
 {
     return true;
 }

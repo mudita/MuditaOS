@@ -98,7 +98,7 @@ jobs:
           ./run_emulator_on_filesystem_image.sh > emulator.log 2>&1 &
           echo $! > emulator.pid
       - name: run tests
-        run: pytest ./pytest -rP -s --port=simulator --timeout=30 -m 'not rt1051'
+        run: pytest ./pytest -rP -s --port=simulator --timeout=120 -m 'not rt1051'
         working-directory: test
       - name: kill emulator
         run: |

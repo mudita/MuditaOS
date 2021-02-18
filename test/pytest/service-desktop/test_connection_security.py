@@ -34,7 +34,7 @@ def test_secured_endpoint(harness):
     assert ret["status"] == status["OK"]
 
     ret = harness.endpoint_request("backup", "get", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["BadRequest"]
 
     ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["OK"]

@@ -575,13 +575,48 @@ void ServiceDB::sendUpdateNotification(db::Interface::Name interface, db::Query:
     bus.sendMulticast(notificationMessage, sys::BusChannel::ServiceDBNotifications);
 }
 
-bool ServiceDB::StoreIntoBackup(const std::string &backupPath)
+bool ServiceDB::StoreIntoBackup(const std::filesystem::path &backupPath)
 {
-    bool rc = contactsDB.get()->storeIntoFile(backupPath + "contacts.db");
-    rc |= smsDB.get()->storeIntoFile(backupPath + "sms.db");
-    rc |= alarmsDB.get()->storeIntoFile(backupPath + "alarms.db");
-    rc |= notesDB.get()->storeIntoFile(backupPath + "notes.db");
-    rc |= calllogDB.get()->storeIntoFile(backupPath + "calllog.db");
-    rc |= eventsDB.get()->storeIntoFile(backupPath + "events.db");
-    return rc;
+    if (contactsDB->storeIntoFile(backupPath / std::filesystem::path(contactsDB->getName()).filename()) == false) {
+        LOG_ERROR("contactsDB backup failed");
+        return false;
+    }
+
+    if (smsDB->storeIntoFile(backupPath / std::filesystem::path(smsDB->getName()).filename()) == false) {
+        LOG_ERROR("smsDB backup failed");
+        return false;
+    }
+
+    if (alarmsDB->storeIntoFile(backupPath / std::filesystem::path(alarmsDB->getName()).filename()) == false) {
+        LOG_ERROR("alarmsDB backup failed");
+        return false;
+    }
+
+    if (notesDB->storeIntoFile(backupPath / std::filesystem::path(notesDB->getName()).filename()) == false) {
+        LOG_ERROR("notesDB backup failed");
+        return false;
+    }
+
+    if (calllogDB->storeIntoFile(backupPath / std::filesystem::path(calllogDB->getName()).filename()) == false) {
+        LOG_ERROR("calllogDB backup failed");
+        return false;
+    }
+
+    if (eventsDB->storeIntoFile(backupPath / std::filesystem::path(eventsDB->getName()).filename()) == false) {
+        LOG_ERROR("eventsDB backup failed");
+        return false;
+    }
+
+    for (auto &db : databaseAgents) {
+        if (db.get() && db.get()->getAgentName() == "settingsAgent") {
+
+            if (db->storeIntoFile(backupPath / std::filesystem::path(db->getDbFilePath()).filename()) == false) {
+                LOG_ERROR("settingsAgent backup failed");
+                return false;
+            }
+            break;
+        }
+    }
+
+    return true;
 }

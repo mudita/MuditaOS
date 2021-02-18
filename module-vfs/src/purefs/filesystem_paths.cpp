@@ -56,7 +56,7 @@ namespace purefs
 
         std::filesystem::path getBackupOSPath() noexcept
         {
-            return std::filesystem::path{eMMC_disk} / PATH_BACKUP;
+            return std::filesystem::path{eMMC_disk} / PATH_USER / PATH_BACKUP;
         }
 
         std::filesystem::path getFactoryOSPath() noexcept
