@@ -267,11 +267,12 @@ namespace app
         {
             suspendInProgress = val;
         };
-        /// see shutdownInProgress documentation
-        virtual void setShutdownFlag()
+
+        // Latching close system in progress flag
+        virtual void setSystemCloseInProgress()
         {
-            shutdownInProgress = true;
-        };
+            systemCloseInProgress = true;
+        }
 
         bool setVolume(const audio::Volume &value,
                        const audio::Profile::Type &profileType,
@@ -368,10 +369,8 @@ namespace app
         /// sent to gui service. If suspend is true, application manager will receive information from both eink and gui
         /// services if last rendering mesage will be processed.
         bool suspendInProgress = false;
-        /// Flag defines case when display needs to be refreshed before closing the system. If flag is set to true next
-        /// set of rendering commands will carry information to GUI service that system needs to be closed. After
-        /// displaying the screen GUI will notify application manager to request system shutdown.
-        bool shutdownInProgress = false;
+
+        bool systemCloseInProgress = false;
         /// Storage for asynchronous tasks callbacks.
         std::unique_ptr<CallbackStorage> callbackStorage;
         friend class AsyncTask; // Async tasks need access to application internals, e.g. callback storage, to make

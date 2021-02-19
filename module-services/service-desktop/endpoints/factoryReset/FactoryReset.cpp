@@ -52,7 +52,7 @@ namespace FactoryReset
         if (ownerService != nullptr) {
             LOG_INFO("FactoryReset: closing ServiceDB...");
             std::string dbServiceName = service::name::db;
-            sys::SystemManager::DestroyService(dbServiceName, ownerService);
+            sys::SystemManager::DestroySystemService(dbServiceName, ownerService);
         }
 
         if (DeleteDirContent(purefs::dir::getRootDiskPath()) != true) {

@@ -66,6 +66,8 @@ namespace sys
          */
         virtual ReturnCodes DeinitHandler() = 0;
 
+        virtual auto ProcessCloseReason(CloseReason closeReason) -> void;
+
         virtual ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) = 0;
 
         /**
@@ -91,6 +93,8 @@ namespace sys
         bool connect(const std::type_info &type, MessageHandler handler);
         bool connect(Message *msg, MessageHandler handler);
         bool connect(Message &&msg, MessageHandler handler);
+
+        void sendCloseReadyMessage(Service *service);
 
       protected:
         bool enableRunLoop;
@@ -164,5 +168,6 @@ namespace sys
         static auto handleMessage(Service *service, Message *message, ResponseMessage *response = nullptr)
             -> MessagePointer;
         static auto handleSystemMessage(Service *service, SystemMessage *message) -> MessagePointer;
+        static auto handleCloseReasonMessage(Service *service, ServiceCloseReasonMessage *message) -> void;
     };
 } // namespace sys

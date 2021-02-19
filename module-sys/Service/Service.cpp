@@ -19,6 +19,7 @@
 #include <cstdint>             // for uint32_t, uint64_t, UINT32_MAX
 #include <iosfwd>              // for std
 #include <typeinfo>            // for type_info
+#include <module-sys/SystemManager/Constants.hpp>
 
 #if (DEBUG_SERVICE_MESSAGES > 0)
 #include <cxxabi.h>
@@ -184,6 +185,8 @@ namespace sys
         enableRunLoop = false;
     }
 
+    auto Service::ProcessCloseReason(CloseReason closeReason) -> void{};
+
     auto Service::TimerHandle(SystemMessage &message) -> ReturnCodes
     {
         auto timer_message = dynamic_cast<sys::TimerMessage *>(&message);
@@ -207,6 +210,12 @@ namespace sys
         for (auto timer : list) {
             timer->stop();
         }
+    }
+
+    void Service::sendCloseReadyMessage(Service *service)
+    {
+        auto msg = std::make_shared<sys::ReadyToCloseMessage>();
+        service->bus.sendUnicast(std::move(msg), service::name::system_manager);
     }
 
     auto Proxy::handleMessage(Service *service, Message *message, ResponseMessage *response) -> MessagePointer
@@ -243,4 +252,10 @@ namespace sys
         }
         return std::make_shared<ResponseMessage>(ret);
     }
+
+    auto Proxy::handleCloseReasonMessage(Service *service, ServiceCloseReasonMessage *message) -> void
+    {
+        service->ProcessCloseReason(message->getCloseReason());
+    }
+
 } // namespace sys

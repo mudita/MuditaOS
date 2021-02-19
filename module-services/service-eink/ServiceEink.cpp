@@ -81,6 +81,11 @@ namespace service::eink
         return sys::ReturnCodes::Success;
     }
 
+    void ServiceEink::ProcessCloseReason(sys::CloseReason closeReason)
+    {
+        sendCloseReadyMessage(this);
+    }
+
     sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
         LOG_INFO("PowerModeHandler: %s", c_str(mode));

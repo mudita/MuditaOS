@@ -61,6 +61,7 @@ namespace sys
         void reload(ms from_time = 0);
         void stop();
         void setInterval(ms new_interval);
+        bool isCurrentlyActive() const noexcept;
         /// }
 
       protected:

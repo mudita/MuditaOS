@@ -41,6 +41,14 @@ namespace sys
         SuspendToRAM,
         SuspendToNVM
     };
+
+    enum class CloseReason
+    {
+        RegularPowerDown,
+        Reboot,
+        SystemBrownout
+    };
+
 } // namespace sys
 
 inline const char *c_str(sys::ReturnCodes code)

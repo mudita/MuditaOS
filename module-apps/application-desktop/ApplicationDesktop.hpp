@@ -123,7 +123,8 @@ namespace app
                      manager::actions::ShowMMIResult,
                      manager::actions::DisplayCMEError,
                      manager::actions::DisplayLowBatteryNotification,
-                     manager::actions::SystemBrownout}};
+                     manager::actions::SystemBrownout,
+                     manager::actions::DisplayLogoAtExit}};
         }
     };
 

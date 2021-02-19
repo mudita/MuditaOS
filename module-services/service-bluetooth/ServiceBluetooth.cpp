@@ -176,6 +176,11 @@ sys::ReturnCodes ServiceBluetooth::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
+void ServiceBluetooth::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    sendCloseReadyMessage(this);
+}
+
 sys::MessagePointer ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
     try {

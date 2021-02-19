@@ -15,6 +15,7 @@
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
+#include <service-appmgr/messages/UserPowerDownRequest.hpp>
 #include <Service/Timer.hpp>
 #include <service-desktop/service-desktop/Constants.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
@@ -39,6 +40,8 @@ namespace sys
             {bsp::KeyCodes::SSwitchUp, phone_modes::PhoneMode::Connected},
             {bsp::KeyCodes::SSwitchMid, phone_modes::PhoneMode::DoNotDisturb},
             {bsp::KeyCodes::SSwitchDown, phone_modes::PhoneMode::Offline}};
+
+        constexpr auto preShutdownRoutineTimeout = 1500;
     } // namespace
 
     using namespace cpp_freertos;
@@ -93,7 +96,7 @@ namespace sys
             }
         }
 
-        DestroyService(service::name::evt_manager, this);
+        DestroySystemService(service::name::evt_manager, this);
 
         CloseService();
 
@@ -144,7 +147,7 @@ namespace sys
         }
         std::for_each(sortedServices.begin(), sortedServices.end(), [this](const auto &service) {
             const auto startTimeout = service.get().getStartTimeout().count();
-            if (const auto success = RunService(service.get().create(), this, startTimeout); !success) {
+            if (const auto success = RunSystemService(service.get().create(), this, startTimeout); !success) {
                 LOG_FATAL("Unable to start service: %s", service.get().getName().c_str());
             }
         });
@@ -168,11 +171,6 @@ namespace sys
         cpuStatisticsTimer->start();
     }
 
-    bool SystemManager::CloseSystem(Service *s)
-    {
-        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), service::name::system_manager);
-        return true;
-    }
     bool SystemManager::Update(Service *s, const std::string &updateOSVer, std::string &currentOSVer)
     {
         // set update OS version (and also current os version) in Settings
@@ -230,10 +228,6 @@ namespace sys
 
     bool SystemManager::RunService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout)
     {
-        CriticalSection::Enter();
-        servicesList.push_back(service);
-        CriticalSection::Exit();
-
         service->StartService();
 
         auto msg  = std::make_shared<SystemMessage>(SystemMessageType::Start);
@@ -246,9 +240,29 @@ namespace sys
         return false;
     }
 
-    bool SystemManager::DestroyService(const std::string &name, Service *caller, TickType_t timeout)
+    bool SystemManager::RunSystemService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout)
     {
+        CriticalSection::Enter();
+        servicesList.push_back(service);
+        CriticalSection::Exit();
 
+        return RunService(std::move(service), caller, timeout);
+    }
+
+    bool SystemManager::RunApplication(std::shared_ptr<Service> app, Service *caller, TickType_t timeout)
+    {
+        CriticalSection::Enter();
+        applicationsList.push_back(app);
+        CriticalSection::Exit();
+
+        return RunService(std::move(app), caller, timeout);
+    }
+
+    bool SystemManager::DestroyService(std::vector<std::shared_ptr<Service>> &serviceContainer,
+                                       const std::string &name,
+                                       Service *caller,
+                                       TickType_t timeout)
+    {
         auto msg  = std::make_shared<SystemMessage>(SystemMessageType::Exit);
         auto ret  = caller->bus.sendUnicast(msg, name, timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
@@ -257,21 +271,63 @@ namespace sys
 
             cpp_freertos::LockGuard lck(destroyMutex);
 
-            auto serv = std::find_if(servicesList.begin(), servicesList.end(), [&](std::shared_ptr<Service> const &s) {
-                return s->GetName() == name;
-            });
-            if (serv == servicesList.end()) {
+            auto serv = std::find_if(serviceContainer.begin(),
+                                     serviceContainer.end(),
+                                     [&name](std::shared_ptr<Service> const &s) { return s->GetName() == name; });
+            if (serv == serviceContainer.end()) {
                 LOG_ERROR("No such service to destroy in services list: %s", name.c_str());
                 return false;
             }
 
-            servicesList.erase(serv);
+            serviceContainer.erase(serv);
 
             return true;
         }
         else {
             LOG_ERROR("Service to close: %s doesn't exist", name.c_str());
             return false;
+        }
+    }
+
+    bool SystemManager::DestroySystemService(const std::string &name, Service *caller, TickType_t timeout)
+    {
+        return DestroyService(servicesList, name, caller, timeout);
+    }
+
+    bool SystemManager::DestroyApplication(const std::string &name, Service *caller, TickType_t timeout)
+    {
+        return DestroyService(applicationsList, name, caller, timeout);
+    }
+
+    void SystemManager::preCloseRoutine(CloseReason closeReason)
+    {
+        for (const auto &service : servicesList) {
+            auto msg = std::make_shared<ServiceCloseReasonMessage>(closeReason);
+            bus.sendUnicast(std::move(msg), service->GetName());
+            readyForCloseRegister.push_back(service->GetName());
+        }
+
+        servicesPreShutdownRoutineTimeout =
+            std::make_unique<sys::Timer>("servicesPreShutdownRoutine", this, preShutdownRoutineTimeout);
+        servicesPreShutdownRoutineTimeout->connect([&](sys::Timer &) { CloseServices(); });
+        servicesPreShutdownRoutineTimeout->start();
+    }
+
+    void SystemManager::readyToCloseHandler(Message *msg)
+    {
+        if (!readyForCloseRegister.empty() && servicesPreShutdownRoutineTimeout->isCurrentlyActive()) {
+            auto message = static_cast<ReadyToCloseMessage *>(msg);
+            LOG_INFO("ready to close %s", message->sender.c_str());
+            readyForCloseRegister.erase(
+                std::remove(readyForCloseRegister.begin(), readyForCloseRegister.end(), message->sender),
+                readyForCloseRegister.end());
+
+            // All services responded
+            if (readyForCloseRegister.empty()) {
+                LOG_INFO("All services ready to close.");
+                servicesPreShutdownRoutineTimeout->stop();
+                CloseServices();
+            }
         }
     }
 
@@ -294,7 +350,7 @@ namespace sys
 
                 switch (data->type) {
                 case Code::CloseSystem:
-                    CloseSystemHandler();
+                    CloseSystemHandler(data->closeReason);
                     break;
                 case Code::Update:
                     UpdateSystemHandler();
@@ -325,11 +381,8 @@ namespace sys
         });
 
         connect(sevm::BatteryBrownoutMessage(), [&](Message *) {
-            LOG_INFO("Battery Brownout voltage level reached!");
-
-            auto msg = std::make_shared<SystemBrownoutMesssage>();
-            bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
-
+            LOG_INFO("Battery Brownout voltage level reached! Closing system...");
+            CloseSystemHandler(CloseReason::SystemBrownout);
             return MessageNone{};
         });
 
@@ -354,6 +407,16 @@ namespace sys
 
             auto msg = std::make_shared<CriticalBatteryLevelNotification>(false);
             bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+            return MessageNone{};
+        });
+
+        connect(app::UserPowerDownRequest(), [&](Message *) {
+            CloseSystemHandler(CloseReason::RegularPowerDown);
+            return MessageNone{};
+        });
+
+        connect(ReadyToCloseMessage(), [&](Message *msg) {
+            readyToCloseHandler(msg);
             return MessageNone{};
         });
 
@@ -413,7 +476,7 @@ namespace sys
         return std::make_shared<ResponseMessage>();
     }
 
-    void SystemManager::CloseSystemHandler()
+    void SystemManager::CloseSystemHandler(CloseReason closeReason)
     {
         LOG_DEBUG("Invoking closing procedure...");
 
@@ -422,6 +485,15 @@ namespace sys
         std::reverse(servicesList.begin(), servicesList.end());
         CriticalSection::Exit();
 
+        preCloseRoutine(closeReason);
+    }
+
+    void SystemManager::CloseServices()
+    {
+        for (const auto &element : readyForCloseRegister) {
+            LOG_INFO("Service: %s did not reported before timeout", element.c_str());
+        }
+
         for (bool retry{};; retry = false) {
             for (auto &service : servicesList) {
                 if (service->GetName() == service::name::evt_manager) {
@@ -429,7 +501,7 @@ namespace sys
                     continue;
                 }
                 if (service->parent == "") {
-                    const auto ret = DestroyService(service->GetName(), this);
+                    const auto ret = DestroySystemService(service->GetName(), this);
                     if (!ret) {
                         // no response to exit message,
                         LOG_FATAL("%s", (service->GetName() + " failed to response to exit message").c_str());
@@ -486,7 +558,7 @@ namespace sys
                     continue;
                 }
                 if (service->parent.empty()) {
-                    const auto ret = DestroyService(service->GetName(), this);
+                    const auto ret = DestroySystemService(service->GetName(), this);
                     if (!ret) {
                         // no response to exit message,
                         LOG_FATAL("%s failed to response to exit message", service->GetName().c_str());
@@ -504,7 +576,7 @@ namespace sys
 
     void SystemManager::RebootHandler()
     {
-        CloseSystemHandler();
+        CloseSystemHandler(CloseReason::Reboot);
         set(State::Reboot);
     }
 
@@ -544,6 +616,7 @@ namespace sys
     }
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
+    std::vector<std::shared_ptr<Service>> SystemManager::applicationsList;
     cpp_freertos::MutexStandard SystemManager::destroyMutex;
     std::unique_ptr<PowerManager> SystemManager::powerManager;
     std::unique_ptr<CpuStatistics> SystemManager::cpuStatistics;
