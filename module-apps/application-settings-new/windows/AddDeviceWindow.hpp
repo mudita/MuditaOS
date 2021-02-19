@@ -4,7 +4,6 @@
 #pragma once
 
 #include "BaseSettingsWindow.hpp"
-#include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/models/BluetoothSettingsModel.hpp"
 
 #include <Device.hpp>
@@ -14,7 +13,7 @@ namespace gui
     class AddDeviceWindow : public BaseSettingsWindow
     {
       public:
-        explicit AddDeviceWindow(app::Application *app, std::string name = window::name::add_device);
+        explicit AddDeviceWindow(app::Application *app);
 
       private:
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
