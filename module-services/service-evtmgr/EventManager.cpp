@@ -324,6 +324,11 @@ sys::ReturnCodes EventManager::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
+void EventManager::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    sendCloseReadyMessage(this);
+}
+
 sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
     LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %s", c_str(mode));

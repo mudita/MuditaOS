@@ -37,10 +37,7 @@ namespace app::manager
 {
     namespace
     {
-        constexpr auto shutdown_delay_ms               = 500;
-
         constexpr auto timerBlock         = "BlockTimer";
-        constexpr auto timerShutdownDelay = "ShutdownDelay";
     } // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
@@ -111,7 +108,6 @@ namespace app::manager
                                                                              this,
                                                                              std::numeric_limits<sys::ms>::max(),
                                                                              sys::Timer::Type::SingleShot)},
-          shutdownDelay{std::make_unique<sys::Timer>(timerShutdownDelay, this, shutdown_delay_ms)},
           settings(std::make_unique<settings::Settings>(this)),
           phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
     {
@@ -189,8 +185,23 @@ namespace app::manager
     {
         settings->unregisterValueChange();
         closeApplications();
-        closeServices();
         return sys::ReturnCodes::Success;
+    }
+
+    auto ApplicationManager::ProcessCloseReason(sys::CloseReason closeReason) -> void
+    {
+        ActionRequest act = ActionRequest{this->GetName(), app::manager::actions::DisplayLogoAtExit, nullptr};
+        switch (closeReason) {
+        case sys::CloseReason::SystemBrownout:
+            act = ActionRequest{this->GetName(), app::manager::actions::SystemBrownout, nullptr};
+            break;
+        case sys::CloseReason::RegularPowerDown:
+            break;
+        case sys::CloseReason::Reboot:
+            break;
+        }
+        handleActionRequest(&act);
+        sendCloseReadyMessage(this);
     }
 
     auto ApplicationManager::DataReceivedHandler([[maybe_unused]] sys::DataMessage *msgl,
@@ -284,7 +295,6 @@ namespace app::manager
         });
         connect(typeid(ShutdownRequest), [this](sys::Message *) {
             closeApplications();
-            closeServices();
             return std::make_shared<sys::ResponseMessage>();
         });
         connect(typeid(ActionRequest), [this](sys::Message *request) {
@@ -323,7 +333,6 @@ namespace app::manager
         connect(typeid(CellularNoSimNotification), convertibleToActionHandler);
         connect(typeid(CellularNotAnEmergencyNotification), convertibleToActionHandler);
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
-        connect(typeid(sys::SystemBrownoutMesssage), convertibleToActionHandler);
         connect(typeid(CellularSmsNoSimRequestMessage), convertibleToActionHandler);
         connect(typeid(sdesktop::passcode::ScreenPasscodeRequest), convertibleToActionHandler);
     }
@@ -360,13 +369,6 @@ namespace app::manager
         return true;
     }
 
-    auto ApplicationManager::closeServices() -> bool
-    {
-        closeService(service::name::gui);
-        closeService(service::name::eink);
-        return true;
-    }
-
     auto ApplicationManager::closeApplications() -> bool
     {
         for (const auto &app : getApplications()) {
@@ -398,7 +400,7 @@ namespace app::manager
 
     void ApplicationManager::closeService(const std::string &name)
     {
-        bool ret = sys::SystemManager::DestroyService(name, this);
+        bool ret = sys::SystemManager::DestroyApplication(name, this);
         if (ret) {
             LOG_INFO("Service/Application %s closed", name.c_str());
         }
@@ -490,8 +492,6 @@ namespace app::manager
             return handleHomeAction(action);
         case actions::Launch:
             return handleLaunchAction(action);
-        case actions::CloseSystem:
-            return handleCloseSystem();
         default:
             return handleCustomAction(action);
         }
@@ -515,14 +515,6 @@ namespace app::manager
         action.setTargetApplication(targetApp->name());
         SwitchRequest switchRequest(ServiceName, targetApp->name(), gui::name::window::main_window, nullptr);
         return handleSwitchApplication(&switchRequest);
-    }
-
-    auto ApplicationManager::handleCloseSystem() -> bool
-    {
-        shutdownDelay->connect([&](sys::Timer &) { sys::SystemManager::CloseSystem(this); });
-        shutdownDelay->start();
-
-        return true;
     }
 
     auto ApplicationManager::handleCustomAction(ActionEntry &action) -> bool

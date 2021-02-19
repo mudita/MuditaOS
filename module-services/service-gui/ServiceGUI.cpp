@@ -39,7 +39,7 @@ namespace service::gui
                                                                 CommandsQueueCapacity)},
           contextReleaseTimer{
               std::make_unique<sys::Timer>(this, ContextReleaseTimeout.count(), sys::Timer::Type::SingleShot)},
-          currentState{State::NotInitialised}
+          currentState{State::NotInitialised}, lastRenderScheduled{false}, waitingForLastRender{false}
     {
         initAssetManagers();
         registerMessageHandlers();
@@ -94,6 +94,11 @@ namespace service::gui
         return sys::ReturnCodes::Success;
     }
 
+    void ServiceGUI::ProcessCloseReason(sys::CloseReason closeReason)
+    {
+        waitingForLastRender = true;
+    }
+
     sys::ReturnCodes ServiceGUI::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
         LOG_INFO("PowerModeHandler: %s", c_str(mode));
@@ -114,24 +119,26 @@ namespace service::gui
     {
         if (isInState(State::NotInitialised)) {
             LOG_WARN("Service not yet initialised - ignoring draw commands");
-            return sys::MessageNone{};
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
         }
-        if (isInState(State::Suspended)) {
-            LOG_WARN("Suspended - ignoring draw commands");
-            return sys::MessageNone{};
+        if (isInState(State::Suspended) || lastRenderScheduled) {
+            LOG_WARN("Ignoring draw commands");
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
         }
 
         if (const auto drawMsg = static_cast<DrawMessage *>(message); !drawMsg->commands.empty()) {
-            if (drawMsg->isType(DrawMessage::Type::SHUTDOWN) || drawMsg->isType(DrawMessage::Type::SUSPEND)) {
+            if (drawMsg->isType(DrawMessage::Type::SUSPEND)) {
                 setState(State::Suspended);
             }
-
+            else if (drawMsg->isType(DrawMessage::Type::SHUTDOWN)) {
+                lastRenderScheduled = true;
+            }
             if (!isAnyFrameBeingRenderedOrDisplayed()) {
                 prepareDisplayEarly(drawMsg->mode);
             }
             notifyRenderer(std::move(drawMsg->commands), drawMsg->mode);
         }
-        return sys::MessageNone{};
+        return std::make_shared<sys::ResponseMessage>();
     }
 
     sys::MessagePointer ServiceGUI::handleChangeColorScheme(sys::Message *message)
@@ -242,6 +249,10 @@ namespace service::gui
         if (isNextFrameReady() and not isAnyFrameBeingRenderedOrDisplayed()) {
             trySendNextFrame();
         }
+        else if (lastRenderScheduled && waitingForLastRender) {
+            sendCloseReadyMessage(this);
+        }
+
         return sys::MessageNone{};
     }
 

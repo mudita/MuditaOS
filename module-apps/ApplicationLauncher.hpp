@@ -93,14 +93,14 @@ namespace app
         {
             parent = (caller == nullptr ? "" : caller->GetName());
             handle = std::make_shared<T>(name, parent);
-            return sys::SystemManager::RunService(handle, caller);
+            return sys::SystemManager::RunApplication(handle, caller);
         }
 
         bool runBackground(sys::Service *caller) override
         {
             parent = (caller == nullptr ? "" : caller->GetName());
             handle = std::make_shared<T>(name, parent, true);
-            return sys::SystemManager::RunService(handle, caller);
+            return sys::SystemManager::RunApplication(handle, caller);
         }
     };
 

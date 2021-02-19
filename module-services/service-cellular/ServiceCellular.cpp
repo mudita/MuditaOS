@@ -270,8 +270,12 @@ sys::ReturnCodes ServiceCellular::InitHandler()
 
 sys::ReturnCodes ServiceCellular::DeinitHandler()
 {
-
     return sys::ReturnCodes::Success;
+}
+
+void ServiceCellular::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    sendCloseReadyMessage(this);
 }
 
 sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

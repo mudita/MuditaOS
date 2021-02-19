@@ -9,7 +9,8 @@
 namespace gui
 {
 
-    RebootWindow::RebootWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_reboot)
+    RebootWindow::RebootWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter)
+        : AppWindow(app, app::window::name::desktop_reboot), presenter(std::move(presenter))
     {
         buildInterface();
     }
@@ -58,12 +59,7 @@ namespace gui
 
     bool RebootWindow::onInput(const InputEvent &inputEvent)
     {
-        text->setText("!!! Shutdown !!!");
-        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-        /// needed to actually have time to show stuff on screen before system close
-        ulTaskNotifyTake(pdTRUE, 1000);
-        // shutdown
-        sys::SystemManager::CloseSystem(application);
+        presenter->powerOff();
         return true;
     }
 

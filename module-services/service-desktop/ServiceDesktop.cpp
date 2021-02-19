@@ -236,6 +236,11 @@ sys::ReturnCodes ServiceDesktop::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
+void ServiceDesktop::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    sendCloseReadyMessage(this);
+}
+
 sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
     return sys::ReturnCodes::Success;

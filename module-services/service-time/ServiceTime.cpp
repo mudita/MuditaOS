@@ -40,6 +40,11 @@ namespace stm
         return sys::ReturnCodes::Success;
     }
 
+    void ServiceTime::ProcessCloseReason(sys::CloseReason closeReason)
+    {
+        sendCloseReadyMessage(this);
+    }
+
     sys::ReturnCodes ServiceTime::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
         LOG_FATAL("[ServiceTime] PowerModeHandler: %s", c_str(mode));

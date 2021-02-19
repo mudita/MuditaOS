@@ -11,6 +11,7 @@ namespace app::window::name
     inline constexpr auto desktop_reboot             = "Reboot";
     inline constexpr auto desktop_poweroff           = "PowerOffWindow";
     inline constexpr auto dead_battery               = "DeadBatteryWindow";
+    inline constexpr auto logo_window                = "LogoWindow";
     inline constexpr auto desktop_pin_lock           = "PinLockWindow";
     inline constexpr auto desktop_locked             = "LockedInfoWindow";
     inline constexpr auto desktop_update             = "Update";

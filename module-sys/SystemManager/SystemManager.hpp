@@ -50,10 +50,12 @@ namespace sys
     class SystemManagerCmd : public DataMessage
     {
       public:
-        SystemManagerCmd(Code type = Code::None) : DataMessage(BusChannel::SystemManagerRequests), type(type)
+        explicit SystemManagerCmd(Code type = Code::None, CloseReason closeReason = CloseReason::RegularPowerDown)
+            : DataMessage(BusChannel::SystemManagerRequests), type(type), closeReason(closeReason)
         {}
 
         Code type;
+        CloseReason closeReason;
     };
 
     class SystemManager : public Service
@@ -79,9 +81,6 @@ namespace sys
 
         void StartSystem(InitFunction sysInit, InitFunction appSpaceInit);
 
-        // Invoke system close procedure
-        static bool CloseSystem(Service *s);
-
         static bool Update(Service *s, const std::string &updateOSVer, std::string &currentOSVer);
 
         static bool Reboot(Service *s);
@@ -93,11 +92,15 @@ namespace sys
         static bool ResumeService(const std::string &name, Service *caller);
 
         /// Runs a service
-        static bool RunService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
+        static bool RunSystemService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
+        /// Runs an application
+        static bool RunApplication(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
 
         /// Destroy existing service
         /// @note there is no fallback
-        static bool DestroyService(const std::string &name, Service *caller, TickType_t timeout = 5000);
+        static bool DestroySystemService(const std::string &name, Service *caller, TickType_t timeout = 5000);
+        /// Destroy existing application
+        static bool DestroyApplication(const std::string &name, Service *caller, TickType_t timeout = 5000);
 
         /// Translates a slider state into a phone mode.
         /// \param key  Slider button state
@@ -133,12 +136,24 @@ namespace sys
 
         void StartSystemServices();
 
+        static bool RunService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
+        static bool DestroyService(std::vector<std::shared_ptr<Service>> &serviceContainer,
+                                   const std::string &name,
+                                   Service *caller,
+                                   TickType_t timeout = 5000);
+
         /// Sysmgr stores list of all active services but some of them are under control of parent services.
         /// Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to
         /// parents.
         /// It closes all workers except EventManager -as it needs information from Eventmanager that it's safe to
         /// shutdown
-        void CloseSystemHandler();
+        void CloseSystemHandler(CloseReason closeReason = CloseReason::RegularPowerDown);
+
+        void CloseServices();
+
+        void preCloseRoutine(CloseReason closeReason);
+
+        void readyToCloseHandler(Message *msg);
 
         void UpdateSystemHandler();
 
@@ -162,11 +177,14 @@ namespace sys
 
         std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
         std::unique_ptr<sys::Timer> cpuStatisticsTimer;
+        std::unique_ptr<sys::Timer> servicesPreShutdownRoutineTimeout;
         std::unique_ptr<phone_modes::Subject> phoneModeSubject;
         InitFunction userInit;
         InitFunction systemInit;
+        std::vector<std::string> readyForCloseRegister;
 
         static std::vector<std::shared_ptr<Service>> servicesList;
+        static std::vector<std::shared_ptr<Service>> applicationsList;
         static cpp_freertos::MutexStandard destroyMutex;
         static std::unique_ptr<PowerManager> powerManager;
         static std::unique_ptr<CpuStatistics> cpuStatistics;

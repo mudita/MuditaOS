@@ -3,15 +3,14 @@
 
 #pragma once
 
-#include <vector>
 #include "AppWindow.hpp"
 
 namespace gui
 {
-    class DeadBatteryWindow : public AppWindow
+    class LogoWindow : public AppWindow
     {
       public:
-        explicit DeadBatteryWindow(app::Application *app);
+        explicit LogoWindow(app::Application *app);
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;

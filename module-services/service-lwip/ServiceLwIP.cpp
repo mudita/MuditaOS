@@ -72,6 +72,11 @@ sys::ReturnCodes ServiceLwIP::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
+void ServiceLwIP::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    sendCloseReadyMessage(this);
+}
+
 sys::MessagePointer ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
     LOG_ERROR("TRY START LWIP");

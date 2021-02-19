@@ -41,6 +41,7 @@ namespace service::gui
 
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
+        void ProcessCloseReason(sys::CloseReason closeReason) override;
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
@@ -90,6 +91,8 @@ namespace service::gui
         std::optional<CachedRender> cachedRender;
         std::unique_ptr<sys::Timer> contextReleaseTimer;
         State currentState;
+        bool lastRenderScheduled;
+        bool waitingForLastRender;
     };
 } // namespace service::gui
 

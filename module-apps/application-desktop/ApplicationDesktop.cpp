@@ -9,6 +9,7 @@
 #include "windows/PinLockWindow.hpp"
 #include "windows/PowerOffWindow.hpp"
 #include "windows/DeadBatteryWindow.hpp"
+#include "windows/LogoWindow.hpp"
 #include "windows/LockedInfoWindow.hpp"
 #include "windows/Reboot.hpp"
 #include "windows/Update.hpp"
@@ -17,6 +18,7 @@
 #include "windows/MmiPullWindow.hpp"
 #include "windows/MmiPushWindow.hpp"
 #include "windows/MmiInternalMsgWindow.hpp"
+#include "presenter/PowerOffPresenter.hpp"
 
 #include "AppWindow.hpp"
 #include "data/LockPhoneData.hpp"
@@ -105,7 +107,14 @@ namespace app
         });
 
         addActionReceiver(app::manager::actions::SystemBrownout, [this](auto &&data) {
+            setSystemCloseInProgress();
             switchWindow(app::window::name::dead_battery, std::move(data));
+            return actionHandled();
+        });
+
+        addActionReceiver(app::manager::actions::DisplayLogoAtExit, [this](auto &&data) {
+            setSystemCloseInProgress();
+            switchWindow(app::window::name::logo_window, std::move(data));
             return actionHandled();
         });
 
@@ -401,16 +410,21 @@ namespace app
             return std::make_unique<gui::MenuWindow>(app);
         });
         windowsFactory.attach(desktop_poweroff, [](Application *app, const std::string newname) {
-            return std::make_unique<gui::PowerOffWindow>(app);
+            auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
+            return std::make_unique<gui::PowerOffWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(dead_battery, [](Application *app, const std::string newname) {
             return std::make_unique<gui::DeadBatteryWindow>(app);
+        });
+        windowsFactory.attach(logo_window, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::LogoWindow>(app);
         });
         windowsFactory.attach(desktop_locked, [](Application *app, const std::string newname) {
             return std::make_unique<gui::LockedInfoWindow>(app);
         });
         windowsFactory.attach(desktop_reboot, [](Application *app, const std::string newname) {
-            return std::make_unique<gui::RebootWindow>(app);
+            auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
+            return std::make_unique<gui::RebootWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(desktop_update, [](Application *app, const std::string newname) {
             return std::make_unique<gui::UpdateWindow>(app);

@@ -71,6 +71,22 @@ namespace sys
         ServicePowerMode powerMode;
     };
 
+    class ServiceCloseReasonMessage : public Message
+    {
+      public:
+        explicit ServiceCloseReasonMessage(CloseReason closeReason);
+
+        MessagePointer Execute(Service *service) final;
+
+        CloseReason getCloseReason() const noexcept;
+
+      private:
+        const CloseReason closeReason;
+    };
+
+    class ReadyToCloseMessage : public Message
+    {};
+
     class DataMessage : public Message
     {
       public:

@@ -175,6 +175,11 @@ sys::ReturnCodes ServiceAntenna::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
+void ServiceAntenna::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    sendCloseReadyMessage(this);
+}
+
 sys::ReturnCodes ServiceAntenna::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
     LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %s", c_str(mode));

@@ -10,7 +10,6 @@
 #include <i18n/i18n.hpp>
 
 #include "PowerOffWindow.hpp"
-#include "../ApplicationDesktop.hpp"
 
 // services
 #include <service-appmgr/model/ApplicationManager.hpp>
@@ -18,11 +17,13 @@
 
 #include "service-cellular/ServiceCellular.hpp"
 #include <Style.hpp>
+#include <application-desktop/windows/Names.hpp>
 
 namespace gui
 {
 
-    PowerOffWindow::PowerOffWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_poweroff)
+    PowerOffWindow::PowerOffWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter)
+        : AppWindow(app, app::window::name::desktop_poweroff), presenter(std::move(presenter))
     {
         buildInterface();
     }
@@ -50,8 +51,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         powerImage     = new gui::Image(this, 177, 132, 0, 0, "pin_lock_info");
-        powerDownImage = new gui::Image(this, 0, 0, 0, 0, "logo");
-        powerDownImage->setVisible(false);
 
         // title label
         titleLabel = new gui::Label(this, 0, 60, 480, 40);
@@ -128,21 +127,10 @@ namespace gui
         };
 
         selectionLabels[1]->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("Closing system");
-            application->setShutdownFlag();
+            LOG_INFO("User call close system");
 
-            bottomBar->setVisible(false);
-            topBar->setVisible(false);
-            selectionLabels[0]->setVisible(false);
-            selectionLabels[1]->setVisible(false);
-            eventMgrLabel->setVisible(false);
-            powerImage->setVisible(false);
-            powerDownImage->setVisible(true);
-            titleLabel->setVisible(false);
-            infoLabel->setVisible(false);
+            presenter->powerOff();
 
-            application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
-            app::manager::Controller::sendAction(application, app::manager::actions::CloseSystem);
             return true;
         };
 
@@ -172,7 +160,6 @@ namespace gui
         infoLabel      = nullptr;
         eventMgrLabel  = nullptr;
         powerImage     = nullptr;
-        powerDownImage = nullptr;
         selectionLabels.clear();
     }
 

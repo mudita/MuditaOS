@@ -1,6 +1,11 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+namespace app
+{
+    class UserPowerDownRequest : public sys::Message
+    {};
+} // namespace app
 namespace settings
 {
     class TestService : public sys::Service
@@ -84,7 +89,7 @@ namespace settings
                 testStart->lock();
                 testStart->unlock();
                 if (state != State::Unk) {
-                    sys::SystemManager::CloseSystem(this);
+                    closeSystem();
                 }
                 else {
                     state    = State::Start;
@@ -133,11 +138,18 @@ namespace settings
             }
             else if (nullptr != dynamic_cast<settings::UTMsg::UTMsgStop *>(msg)) {
                 if (state == State::Unregister) {
-                    sys::SystemManager::CloseSystem(this);
+                    closeSystem();
                 }
             }
 
             return std::make_shared<sys::ResponseMessage>();
+        }
+
+      protected:
+        void closeSystem()
+        {
+            auto msg = std::make_shared<app::UserPowerDownRequest>();
+            bus.sendUnicast(std::move(msg), service::name::system_manager);
         }
     };
 
@@ -157,7 +169,7 @@ namespace settings
                 testStart->lock();
                 testStart->unlock();
                 if (state != State::Unk) {
-                    sys::SystemManager::CloseSystem(this);
+                    closeSystem();
                 }
                 else {
                     state    = State::Start;
@@ -234,7 +246,7 @@ namespace settings
             }
             else if (nullptr != dynamic_cast<settings::UTMsg::UTMsgStop *>(msg)) {
                 if (state == State::RegisterAllAdd) {
-                    sys::SystemManager::CloseSystem(this);
+                    closeSystem();
                 }
             }
 
