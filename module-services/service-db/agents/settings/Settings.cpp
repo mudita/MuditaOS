@@ -3,6 +3,7 @@
 
 #include <service-db/Settings.hpp>
 #include <service-db/SettingsMessages.hpp>
+#include <service-db/SettingsCache.hpp>
 
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
@@ -14,10 +15,14 @@
 
 namespace settings
 {
-    Settings::Settings(sys::Service *app, const std::string &dbAgentName) : dbAgentName(dbAgentName)
+    Settings::Settings(sys::Service *app, const std::string &dbAgentName, SettingsCache *cache)
+        : dbAgentName(dbAgentName), cache(cache)
     {
         this->app = std::shared_ptr<sys::Service>(app, [](sys::Service *) {}); /// with deleter that doesn't delete.
         this->app->bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+        if (nullptr == cache) {
+            this->cache = SettingsCache::getInstance();
+        }
         registerHandlers();
     }
 
@@ -187,6 +192,16 @@ namespace settings
         path.scope    = scope;
         auto msg      = std::make_shared<settings::Messages::SetVariable>(path, variableValue);
         sendMsg(std::move(msg));
+        cache->setValue(path, variableValue);
+    }
+
+    std::string Settings::getValue(const std::string &variableName, SettingsScope scope)
+    {
+        EntryPath path;
+        path.variable = variableName;
+        path.service  = app->GetName();
+        path.scope    = scope;
+        return cache->getValue(path);
     }
 
     void Settings::getAllProfiles(OnAllProfilesRetrievedCallback cb)

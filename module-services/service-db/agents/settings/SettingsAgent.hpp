@@ -14,6 +14,7 @@
 namespace settings
 {
     struct EntryPath;
+    class SettingsCache;
 } // namespace settings
 namespace sys
 {
@@ -23,7 +24,7 @@ namespace sys
 class SettingsAgent : public DatabaseAgent
 {
   public:
-    SettingsAgent(sys::Service *parentService);
+    SettingsAgent(sys::Service *parentService, settings::SettingsCache *cache = nullptr);
     ~SettingsAgent() = default;
 
     void initDb() override;
@@ -33,7 +34,7 @@ class SettingsAgent : public DatabaseAgent
     auto getDbFilePath() -> const std::string override;
 
   private:
-    // using MapOfRecipentsToBeNotified = std::map<std::string, std::set<std::string>>;
+    settings::SettingsCache *cache;
     using MapOfRecipentsToBeNotified = std::map<std::string, std::set<settings::EntryPath>>;
     MapOfRecipentsToBeNotified variableChangeRecipents;
     using SetOfRecipents = std::set<std::string>;
