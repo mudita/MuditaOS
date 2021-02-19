@@ -18,7 +18,7 @@ namespace gui
         setValue(absoluteValue);
     }
 
-    auto BarGraph::createRectangle(uint32_t width, uint32_t height) const -> Rect *
+    auto BarGraph::createRectangle(std::uint32_t width, std::uint32_t height) const -> Rect *
     {
         auto rectangle = new Rect(nullptr, 0, 0, 0, 0);
         rectangle->setMinimumSize(width, height);
@@ -38,10 +38,10 @@ namespace gui
         }
 
         currentLevel = value;
-        for (unsigned int i = 0; i < currentLevel; i++) {
+        for (std::uint32_t i = 0; i < currentLevel; i++) {
             rectangles[i]->setFillColor(ColorFullBlack);
         }
-        for (unsigned int i = currentLevel; i < numberOfRectangles; i++) {
+        for (std::uint32_t i = currentLevel; i < numberOfRectangles; i++) {
             rectangles[i]->setFillColor(ColorFullWhite);
         }
 
@@ -69,7 +69,7 @@ namespace gui
             rectangles.clear();
         }
 
-        for (unsigned int i = 0; i < numberOfRectangles; i++) {
+        for (std::uint32_t i = 0; i < numberOfRectangles; i++) {
 
             auto rectangle =
                 createRectangle(style::bargraph::rect_axis_length_lrg, style::bargraph::rect_axis_length_sml);
@@ -103,7 +103,7 @@ namespace gui
             rectangles.clear();
         }
 
-        for (unsigned int i = 0; i <= numberOfRectangles; i++) {
+        for (std::uint32_t i = 0; i <= numberOfRectangles; i++) {
 
             auto rectangle =
                 createRectangle(style::bargraph::rect_axis_length_sml, style::bargraph::rect_axis_length_lrg);

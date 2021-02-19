@@ -72,8 +72,6 @@ namespace app
             showNotification(buttonAction, iconNoSim, textNoSim);
             return actionHandled();
         });
-
-        attachPopups({gui::popup::ID::Volume});
     }
 
     //  number of seconds after end call to switch back to previous application
@@ -224,6 +222,7 @@ namespace app
         windowsFactory.attach(app::window::name_dialogConfirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
+        attachPopups({gui::popup::ID::Volume});
     }
 
     bool ApplicationCall::showNotification(std::function<bool()> action,

@@ -1,13 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <i18n/i18n.hpp>
 #include "VolumeWindow.hpp"
+#include "popups/data/PopupData.hpp"
 
 namespace gui
 {
-    VolumeWindow::VolumeWindow(app::Application *app, const std::string &name) : AppWindow(app, name)
+    VolumeWindow::VolumeWindow(app::Application *app, const std::string &name) : WindowWithTimer(app, name)
     {
         buildInterface();
     }
@@ -19,7 +20,7 @@ namespace gui
                                title->offset_h(),
                                style::window::default_body_width,
                                style::window::volume::title_height,
-                               utils::localize.get(style::window::volume::title_key));
+                               utils::localize.get(style::window::volume::base_title_key));
 
         volumeText->setPenWidth(style::window::default_border_no_focus_w);
         volumeText->setFont(style::window::font::mediumbold);
@@ -37,7 +38,11 @@ namespace gui
 
     void VolumeWindow::buildInterface()
     {
-        AppWindow::buildInterface();
+        WindowWithTimer::buildInterface();
+
+        bottomBar->setVisible(false);
+        topBar->setVisible(false);
+
         addVolumeText();
         addVolumeBar();
     }
@@ -45,54 +50,61 @@ namespace gui
     void VolumeWindow::rebuild()
     {}
 
-    void VolumeWindow::destroyInterface()
-    {
-        erase();
-    }
-
-    VolumeWindow::~VolumeWindow()
-    {
-        destroyInterface();
-    }
-
     void VolumeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        updateGraph();
+        WindowWithTimer::onBeforeShow(mode, data);
+        const auto popupData = static_cast<VolumePopupData *>(data);
+        volume               = popupData->getVolume();
+        audioContext         = popupData->getAudioContext();
+        if (volumeBar != nullptr) {
+            volumeBar->setValue(volume);
+        }
+        if (volumeText != nullptr) {
+            showProperText(audioContext, volume);
+        }
+    }
+
+    void VolumeWindow::showProperText(const AudioContext &audioContext, const audio::Volume volume) noexcept
+    {
+        volumeText->setText(utils::localize.get(style::window::volume::base_title_key));
+        const auto [profileType, playbackType] = audioContext;
+        if (playbackType == audio::PlaybackType::Multimedia) {
+            showMultimediaPlayback();
+        }
+        else if (profileType == audio::Profile::Type::RoutingBluetoothHSP ||
+                 profileType == audio::Profile::Type::RoutingEarspeaker ||
+                 profileType == audio::Profile::Type::RoutingHeadphones ||
+                 profileType == audio::Profile::Type::RoutingLoudspeaker) {
+            showCalling();
+        }
+
+        if (volume == 0) {
+            showMuted();
+        }
+    }
+
+    void VolumeWindow::showMultimediaPlayback() noexcept
+    {
+        volumeText->setText(utils::localize.get(style::window::volume::music_title_key));
+    }
+
+    void VolumeWindow::showCalling() noexcept
+    {
+        volumeText->setText(utils::localize.get(style::window::volume::call_title_key));
+    }
+
+    void VolumeWindow::showMuted() noexcept
+    {
+        volumeText->setText(utils::localize.get(style::window::volume::mute_title_key));
     }
 
     bool VolumeWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
         if ((inputEvent.isShortPress())) {
-            switch (inputEvent.keyCode) {
-            case KeyCode::KEY_VOLUP: {
-                application->increaseCurrentVolume();
-                updateGraph();
-                return true;
-            }
-            case KeyCode::KEY_VOLDN: {
-                application->decreaseCurrentVolume();
-                updateGraph();
-                return true;
-            }
-            case KeyCode::KEY_RF: {
-                application->returnToPreviousWindow();
-                return true;
-            }
-            default:
-                break;
+            if (inputEvent.keyCode == KeyCode::KEY_RF) {
+                return false;
             }
         }
-
         return AppWindow::onInput(inputEvent);
-    }
-
-    void VolumeWindow::updateGraph()
-    {
-        application->getCurrentVolume(Volume);
-        volumeBar->setValue(Volume);
     }
 } // namespace gui

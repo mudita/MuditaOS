@@ -37,6 +37,7 @@
 #include <module-utils/time/DateAndTimeSettings.hpp>
 
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
+#include "popups/data/PopupData.hpp"
 
 namespace gui
 {
@@ -103,7 +104,6 @@ namespace app
         connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *) { return handleBatteryStatusChange(); });
         connect(typeid(app::manager::DOMRequest),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleGetDOM(msg); });
-
         connect(typeid(AppUpdateWindowMessage),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleUpdateWindow(msg); });
     }
@@ -273,11 +273,8 @@ namespace app
         else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
             return handleSIMMessage(msgl);
         }
-        else if (auto msg = dynamic_cast<AudioKeyPressedResponse *>(msgl)) {
-            if (!msg->muted) {
-                handleVolumePopup();
-                return sys::msgHandled();
-            }
+        else if (dynamic_cast<AudioKeyPressedResponse *>(msgl) != nullptr) {
+            return handleAudioKeyMessage(msgl);
         }
         return sys::msgNotHandled();
     }
@@ -529,6 +526,25 @@ namespace app
         return sys::msgHandled();
     }
 
+    sys::MessagePointer Application::handleAudioKeyMessage(sys::Message *msgl)
+    {
+        using namespace gui::popup;
+        const auto msg = static_cast<AudioKeyPressedResponse *>(msgl);
+        if (!msg->muted) {
+            LOG_INFO("Playback: %s, volume: %s",
+                     audio::str(msg->context.second).c_str(),
+                     std::to_string(msg->volume).c_str());
+            auto data = std::make_unique<gui::VolumePopupData>(msg->volume, msg->context);
+            if (getCurrentWindow()->getName() == window::volume_window) {
+                updateWindow(window::volume_window, std::move(data));
+            }
+            else {
+                switchWindow(window::volume_window, std::move(data));
+            }
+        }
+        return sys::msgHandled();
+    }
+
     sys::ReturnCodes Application::InitHandler()
     {
         setState(State::INITIALIZING);
@@ -661,19 +677,6 @@ namespace app
                 break;
             }
         }
-    }
-
-    bool Application::handleVolumePopup()
-    {
-        using namespace gui::popup;
-        if (getCurrentWindow()->getName() == window::volume_window) {
-            return true;
-        }
-        else if (windowsFactory.isRegistered(window::volume_window)) {
-            switchWindow(window::volume_window);
-            return true;
-        }
-        return false;
     }
 
     bool Application::popToWindow(const std::string &window)
