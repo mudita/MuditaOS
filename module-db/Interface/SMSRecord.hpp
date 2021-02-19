@@ -92,7 +92,11 @@ class SMSRecordInterface : public RecordInterface<SMSRecord, SMSRecordField>
     std::unique_ptr<db::QueryResult> removeQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> updateQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> getQuery(const std::shared_ptr<db::Query> &query);
-    std::unique_ptr<db::QueryResult> getByThreadIDQuery(const std::shared_ptr<db::Query> &query);
+    auto getQueryRecords(const std::shared_ptr<db::Query> &query) -> std::vector<SMSRecord>;
+    auto getQueryWithTotalCount(const std::shared_ptr<db::Query> &query) -> std::unique_ptr<db::QueryResult>;
+    auto getByThreadIDQueryRecords(const std::shared_ptr<db::Query> &query) -> std::vector<SMSRecord>;
+    auto getByThreadIDQuery(const std::shared_ptr<db::Query> &query) -> std::unique_ptr<db::QueryResult>;
+    auto getByThreadIDQueryWithTotalCount(const std::shared_ptr<db::Query> &query) -> std::unique_ptr<db::QueryResult>;
     std::unique_ptr<db::QueryResult> getForListQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> getCountByThreadIDQuery(const std::shared_ptr<db::Query> &query);
     std::unique_ptr<db::QueryResult> getLastByThreadIDQuery(const std::shared_ptr<db::Query> &query);
