@@ -20,13 +20,9 @@ namespace gui
         label->setMaximumSize(this->getWidth(), this->getHeight());
     }
 
-    void SignalStrengthWidgetText::show(const Store::SignalStrength data, bool shown)
+    void SignalStrengthWidgetText::update()
     {
-        setVisible(shown);
-        if (shown) {
-            label->setText(utils::to_string(data.rssidBm) + " dBm");
-            return;
-        }
+        label->setText(utils::to_string(signalStrength.rssidBm) + " dBm");
     }
 
 } // namespace gui
