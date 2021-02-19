@@ -42,7 +42,7 @@ namespace at
             if (posDelimiter != std::string::npos) {
                 auto posMark2 = atBuffer.find("\"", posMark + 1);
                 if ((posMark2 != std::string::npos) && (posDelimiter > posMark2)) {
-                    posMark           = posMark2 + 1;
+                    posMark           = posMark2;
                     openQuotationMark = !openQuotationMark;
                     return false;
                 }
@@ -59,13 +59,15 @@ namespace at
     /**
      * Check for next quotation and urc, in general could look like
      * \r\n+URC: "literal \r\n...."\r\n\r\n+URC: "param",4,4\r\n ...
+     * or
+     * \r\nURC... \r\n
      * @return true if found and we could look for next URCin buffer
      */
     bool ATURCStream::lookForNext()
     {
         lookForNextURC    = false;
         openQuotationMark = false;
-        posMark           = 0; /// start from \r\n+ from search
+        posMark           = 0; /// start from \r\n(+) from search
         do {
             if (checkQuotation())
                 break;
