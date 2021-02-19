@@ -82,9 +82,7 @@ namespace gui
     {
         buildInterface();
 
-        preBuildDrawListHook = [this](std::list<Command> &cmd) {
-            time->setText(TimePointToLocalizedHourMinString(TimePointNow()));
-        };
+        preBuildDrawListHook = [this](std::list<Command> &cmd) { updateTime(); };
     }
 
     void DesktopMainWindow::setVisibleState()
@@ -132,7 +130,6 @@ namespace gui
 
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        updateTime();
         setVisibleState();
     }
 
@@ -325,10 +322,20 @@ namespace gui
         return app;
     }
 
-    void DesktopMainWindow::updateTime()
+    bool DesktopMainWindow::updateTime()
     {
-        auto timeNow = TimePointNow();
-        time->setText(TimePointToLocalizedHourMinString(timeNow));
-        dayText->setText(TimePointToLocalizedDateString(timeNow, "%A, %d %b"));
+        using namespace utils::time;
+        auto ret       = AppWindow::updateTime();
+        auto timestamp = utils::time::Timestamp();
+        if (time != nullptr) {
+            auto fmt = utils::dateAndTimeSettings.isTimeFormat12()
+                           ? Locale::format(Locale::TimeFormat::FormatTime12HShort)
+                           : Locale::format(Locale::TimeFormat::FormatTime24H);
+            time->setText(timestamp.str(fmt));
+        }
+        if (dayText != nullptr) {
+            dayText->setText(timestamp.str("%A, %d %b"));
+        }
+        return ret;
     }
 } /* namespace gui */

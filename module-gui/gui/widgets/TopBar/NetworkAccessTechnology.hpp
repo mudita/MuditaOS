@@ -7,14 +7,14 @@
 #include <Label.hpp>
 #include <common_data/EventStore.hpp>
 
-namespace gui
+namespace gui::top_bar
 {
-    class NetworkAccessTechnologyWidget : public StatusBarWidgetBase<Label>
+    class NetworkAccessTechnology : public StatusBarWidgetBase<Label>
     {
         Store::Network::AccessTechnology _accessTechnology = Store::Network::AccessTechnology::Unknown;
 
       public:
-        NetworkAccessTechnologyWidget(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        NetworkAccessTechnology(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
         void update(Store::Network::AccessTechnology accessTechnology);
     };
-} // namespace gui
+} // namespace gui::top_bar

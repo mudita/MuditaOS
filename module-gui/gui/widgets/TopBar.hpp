@@ -3,21 +3,28 @@
 
 #pragma once
 
-#include "Image.hpp"
-#include "Label.hpp"
-#include "Rect.hpp"
-#include "TopBar/SIM.hpp"
+#include <Rect.hpp>
+#include <Image.hpp>
 #include <common_data/EventStore.hpp>
-
 #include <vector>
 #include <map>
 
 namespace gui
 {
-    class SignalStrengthWidgetBase;
-    class BatteryWidgetBase;
-    class NetworkAccessTechnologyWidget;
+    class Label;
+    namespace top_bar
+    {
+        class SignalStrengthBase;
+        class BatteryBase;
+        class NetworkAccessTechnology;
+        class SIM;
+        class Time;
+        class Lock;
+    } // namespace top_bar
 } // namespace gui
+
+class UTF8;
+
 namespace gui::top_bar
 {
     enum class Indicator
@@ -27,10 +34,16 @@ namespace gui::top_bar
         Lock,
         Battery,
         SimCard,
-        NetworkAccessTechnology
+        NetworkAccessTechnology,
     };
     using Indicators        = std::vector<Indicator>;
     using IndicatorStatuses = std::map<Indicator, bool>;
+
+    enum class TimeMode
+    {
+        Time12h,
+        Time24h
+    };
 
     /**
      * Carries the top bar configuration.
@@ -42,6 +55,8 @@ namespace gui::top_bar
         void enable(const Indicators &indicators);
         void disable(Indicator indicator);
         void set(Indicator indicator, bool enabled);
+        void set(TimeMode timeMode);
+        [[nodiscard]] auto getTimeMode() const noexcept -> TimeMode;
         [[nodiscard]] auto isEnabled(Indicator indicator) const -> bool;
         [[nodiscard]] auto getIndicatorsConfiguration() const noexcept -> const IndicatorStatuses &;
 
@@ -52,40 +67,29 @@ namespace gui::top_bar
                                                {Indicator::Battery, false},
                                                {Indicator::SimCard, false},
                                                {Indicator::NetworkAccessTechnology, false}};
+        TimeMode timeMode                   = TimeMode::Time12h;
     };
 
     /// Header of most of design Windows
-    ///
-    /// Provides way to show:
-    ///    0. Window title
-    ///    1. battery state
-    ///    2. signal
-    ///    3. time
-    ///    4. sim state
-    /// in separate areas, when enabled
-    ///
-    ///              [time]
-    /// [signal]    [title ] [sim] [battery]
     class TopBar : public Rect
     {
-        static constexpr uint32_t batteryBarsCount = 6;
-        static constexpr uint32_t signalImgCount   = 6;
-
-      public:
-        static uint32_t time;
-
       protected:
-        Label *timeLabel                                             = nullptr;
-        NetworkAccessTechnologyWidget *networkAccessTechnologyWidget = nullptr;
-        SignalStrengthWidgetBase *signalWidget                       = nullptr;
-        Image *lock;
-        gui::SIM *sim                    = nullptr;
-        BatteryWidgetBase *batteryWidget = nullptr;
+        Time *time                                       = nullptr;
+        NetworkAccessTechnology *networkAccessTechnology = nullptr;
+        SignalStrengthBase *signal                       = nullptr;
+        Lock *lock                                       = nullptr;
+        SIM *sim                                         = nullptr;
+        BatteryBase *battery                             = nullptr;
         Configuration configuration;
 
         void prepareWidget();
 
         void showSim(bool enabled);
+        void showTime(bool enabled);
+        void showLock(bool enabled);
+        void showBattery(bool enabled);
+        void showSignalStrength(bool enabled);
+        void showNetworkAccessTechnology(bool enabled);
 
         /**
          * Sets the status of the top bar indicator.
@@ -103,23 +107,11 @@ namespace gui::top_bar
         void configure(Configuration &&config);
         [[nodiscard]] auto getConfiguration() const noexcept -> const Configuration &;
 
-        /**
-         * @brief Sets charge level of the battery. This will cause appropriate image to be
-         * displayed.
-         * @return if display should be refreshed or not
-         */
+        bool updateSim();
+        bool updateTime();
         bool updateBattery();
-
-        /**
-         * @brief updates signal strength. This will cause appropriate image to be displayed.
-         */
         bool updateSignalStrength();
-
         bool updateNetworkAccessTechnology();
-
-        void simSet();
-
-        void setTime(const UTF8 &value);
 
         void accept(GuiVisitor &visitor) override;
     };

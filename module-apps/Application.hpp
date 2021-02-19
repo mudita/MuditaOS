@@ -381,8 +381,6 @@ namespace app
 
         /// application's settings
         std::unique_ptr<settings::Settings> settings;
-        virtual void timeFormatChanged(std::string value);
-        bool timeFormat12 = false;
 
       public:
         void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;

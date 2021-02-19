@@ -83,10 +83,10 @@ namespace gui
         void destroyInterface() override;
         top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
 
+        bool updateTime() override;
 
       private:
         void invalidate() noexcept;
-        void updateTime();
 
         gui::KeyInputMappedTranslation translator;
     };

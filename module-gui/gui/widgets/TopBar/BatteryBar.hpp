@@ -3,20 +3,25 @@
 
 #pragma once
 
-#include "BatteryWidgetBase.hpp"
+#include "BatteryBase.hpp"
 
 namespace gui
 {
-    class Label;
-    class BatteryWidgetText : public BatteryWidgetBase
+    class Image;
+}
+
+namespace gui::top_bar
+{
+    class BatteryBar : public BatteryBase
     {
       public:
-        BatteryWidgetText(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        BatteryBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
       private:
         void showBatteryLevel(std::uint32_t percentage) override;
         void showBatteryChargingDone() override;
         void showBatteryCharging() override;
-        Label *label = nullptr;
+
+        Image *img = nullptr;
     };
-} // namespace gui
+} // namespace gui::top_bar
