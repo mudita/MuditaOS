@@ -70,9 +70,10 @@ function add_ignore_revs_for_blame() {
 function setup_gcc_alternatives() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     cat <<-MSGEND
-		# set gcc-9 as default alternative (instead of default current in ubuntu)
-		sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 900 --slave /usr/bin/g++ g++ /usr/bin/g++-9
+		# set gcc-10 as default alternative (instead of default current in ubuntu)
+		sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 1000 --slave /usr/bin/g++ g++ /usr/bin/g++-10
 		MSGEND
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 1000 --slave /usr/bin/g++ g++ /usr/bin/g++-10
 }
 
 function install_pip_packages() {
@@ -158,8 +159,8 @@ BUILD_STEPS=(
         setup_arm_toolchain
         setup_cmake
         setup_gcc_alternatives
-        "add_to_path ${ARM_GCC_PATH_VAR} ${HOME}/${ARM_GCC}/bin"
-        "add_to_path ${CMAKE_PATH_VAR} ${HOME}/${CMAKE_NAME}/bin"
+        "add_to_path ARM_GCC ${HOME}/${ARM_GCC}/bin"
+        "add_to_path CMAKE ${HOME}/${CMAKE_NAME}/bin"
         install_docker
         add_to_docker_group
         )

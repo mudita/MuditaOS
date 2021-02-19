@@ -3,7 +3,7 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 CONTAINER_NAME="wearemudita/mudita_os_builder"
-CONTAINER_TAG="1.8"
+CONTAINER_TAG="1.9"
 CONTAINER=${CONTAINER_NAME}:${CONTAINER_TAG}
 PURE_HOME=`pwd`
 STANDARD_OPTIONS="-v `pwd`:${PURE_HOME} --user \"$(id -u):$(id -g)\" --env HOME=${PURE_HOME} -t"
@@ -29,7 +29,7 @@ function help() {
 		                                              <target> and <build_type> are required
 		                                              OPTIONS are passed to cmake as is
 		                                              run '${0} config' without params to see details
-		    make <build_directory> [OPTIONS]        - run 'make' in container. You have to pass directory
+		    make|ninja <build_directory> [OPTIONS]        - run 'make' in container. You have to pass directory
 		                                              creted by '${0} config' command.
 		                                              you can pass additional arguments for make linke '-j' or 'VERBOSE=1'
 		MSGEND
@@ -50,6 +50,11 @@ case ${TARGET} in
         shift
         JOBS=$(nproc)
         CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME}/${BUILD_DIR} --entrypoint make ${CONTAINER} -j ${JOBS} $@"
+        ;;
+    "ninja")
+        BUILD_DIR=$1
+        shift
+        CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME}/${BUILD_DIR} --entrypoint ninja ${CONTAINER} $@"
         ;;
     *)
         help
