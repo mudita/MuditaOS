@@ -107,14 +107,6 @@ namespace app
                 currentWindow->rebuild();
             }
         }
-        else if (auto responseStatusMsg = dynamic_cast<::message::bluetooth::ResponseStatus *>(msgl);
-                 nullptr != responseStatusMsg) {
-            if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
-                const auto status = responseStatusMsg->getStatus();
-                auto btStatusData = std::make_unique<gui::BluetoothStatusData>(status.state, status.visibility);
-                switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
-            }
-        }
 
         return sys::MessageNone{};
     }
@@ -128,6 +120,16 @@ namespace app
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
+
+        connect(typeid(::message::bluetooth::ResponseStatus), [&](sys::Message *msg) {
+            auto responseStatusMsg = static_cast<::message::bluetooth::ResponseStatus *>(msg);
+            if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
+                const auto status = responseStatusMsg->getStatus();
+                auto btStatusData = std::make_unique<gui::BluetoothStatusData>(status.state, status.visibility);
+                switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
+            }
+            return sys::MessageNone{};
+        });
 
         connect(typeid(::message::bluetooth::ResponseDeviceName), [&](sys::Message *msg) {
             auto responseDeviceNameMsg = static_cast<::message::bluetooth::ResponseDeviceName *>(msg);

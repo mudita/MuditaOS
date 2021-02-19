@@ -15,7 +15,7 @@ extern "C"
 namespace gui
 {
 
-    AddDeviceWindow::AddDeviceWindow(app::Application *app, std::string name) : BaseSettingsWindow(app, std::move(name))
+    AddDeviceWindow::AddDeviceWindow(app::Application *app) : BaseSettingsWindow(app, window::name::add_device)
     {
         bluetoothSettingsModel = std::make_unique<BluetoothSettingsModel>(application);
     }
