@@ -1,7 +1,5 @@
 ﻿project(module-bluetooth VERSION 1.0 DESCRIPTION "Bluetooth module library")
 
-include(${CMAKE_SOURCE_DIR}/config/ModuleConfig.cmake)
-
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES
