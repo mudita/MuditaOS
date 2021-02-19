@@ -14,6 +14,11 @@ namespace settings::Statements
                          COLLATE NOCASE;
                          )sql";
 
+    constexpr auto getAllValues = R"sql(
+                                        SELECT path, value
+                                        FROM settings_tab;
+                                        )sql";
+
     constexpr auto checkPathExists = R"sql(
                         SELECT COUNT(value) AS PATH_EXISTS FROM  settings_tab AS ST
                         WHERE ST.path = '%q'
