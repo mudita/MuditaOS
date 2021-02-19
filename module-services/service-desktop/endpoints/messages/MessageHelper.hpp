@@ -52,6 +52,16 @@ namespace parserFSM
         auto updateTemplate(Context &context) -> sys::ReturnCodes;
         auto deleteTemplate(Context &context) -> sys::ReturnCodes;
 
+        void requestCount(Context &context);
+        void getMessageById(Context &context);
+        auto getMessagesByThreadID(Context &context) -> sys::ReturnCodes;
+        void getByMessageBody(Context &context);
+        auto getMessages(Context &context) -> sys::ReturnCodes;
+
+        void getTemplatesCount(Context &context);
+        void getTemplateByID(Context &context);
+        auto getMessagesTemplates(Context &context) -> sys::ReturnCodes;
+
         json11::Json receivedJson;
 
         const int defaultLimit = 100; // will be removed after introducing pagination

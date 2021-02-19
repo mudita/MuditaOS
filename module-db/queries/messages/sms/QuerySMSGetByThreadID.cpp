@@ -5,8 +5,8 @@
 
 namespace db::query
 {
-    SMSGetByThreadID::SMSGetByThreadID(unsigned int threadId, unsigned int offset, unsigned int limit)
-        : Query(Query::Type::Read), threadId(threadId), offset(offset), limit(limit)
+    SMSGetByThreadID::SMSGetByThreadID(unsigned int threadId, unsigned int limit, unsigned int offset)
+        : Query(Query::Type::Read), threadId(threadId), limit(limit), offset(offset)
     {}
 
     auto SMSGetByThreadID::debugInfo() const -> std::string
@@ -14,15 +14,43 @@ namespace db::query
         return "SMSGetByThreadID";
     }
 
+    SMSGetByThreadIDWithTotalCount::SMSGetByThreadIDWithTotalCount(unsigned int threadId,
+                                                                   std::size_t limit,
+                                                                   std::size_t offset)
+        : SMSGetByThreadID(threadId, limit, offset)
+    {}
+
+    [[nodiscard]] auto SMSGetByThreadIDWithTotalCount::debugInfo() const -> std::string
+    {
+        return "SMSGetByThreadIDWithTotalCount";
+    }
+
     SMSGetByThreadIDResult::SMSGetByThreadIDResult(std::vector<SMSRecord> result) : result(std::move(result))
     {}
+
     auto SMSGetByThreadIDResult::getResults() const -> std::vector<SMSRecord>
     {
         return result;
     }
+
     auto SMSGetByThreadIDResult::debugInfo() const -> std::string
     {
         return "SMSGetByThreadIDResult";
+    }
+
+    SMSGetByThreadIDResultWithTotalCount::SMSGetByThreadIDResultWithTotalCount(std::vector<SMSRecord> records,
+                                                                               std::size_t totalCount)
+        : SMSGetByThreadIDResult(std::move(records)), totalCount(totalCount)
+    {}
+
+    auto SMSGetByThreadIDResultWithTotalCount::getTotalCount() const -> std::size_t
+    {
+        return totalCount;
+    }
+
+    auto SMSGetByThreadIDResultWithTotalCount::debugInfo() const -> std::string
+    {
+        return "SMSGetByThreadIDResultWithTotalCount";
     }
 
 } // namespace db::query
