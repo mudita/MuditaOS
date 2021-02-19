@@ -52,38 +52,38 @@ TEST_CASE("SettingsApi")
                 testStart = std::make_shared<std::mutex>();
                 testStart->lock();
                 std::cout << "start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
-                auto ret = sys::SystemManager::RunService(std::make_shared<EventManager>(service::name::evt_manager),
-                                                          manager.get());
-                ret &= sys::SystemManager::RunService(std::make_shared<ServiceDB>(), manager.get());
+                auto ret = sys::SystemManager::RunSystemService(
+                    std::make_shared<EventManager>(service::name::evt_manager), manager.get());
+                ret &= sys::SystemManager::RunSystemService(std::make_shared<ServiceDB>(), manager.get());
 
                 varWritter = std::make_shared<settings::MyService>("writterVar");
                 varReader  = std::make_shared<settings::MyService>("readerVar");
 
-                ret &= sys::SystemManager::RunService(varWritter, manager.get());
-                ret &= sys::SystemManager::RunService(varReader, manager.get());
+                ret &= sys::SystemManager::RunSystemService(varWritter, manager.get());
+                ret &= sys::SystemManager::RunSystemService(varReader, manager.get());
 
                 testVar = std::make_shared<settings::AppTest>("appTest", varWritter, varReader, testStart);
-                ret &= sys::SystemManager::RunService(testVar, manager.get());
+                ret &= sys::SystemManager::RunSystemService(testVar, manager.get());
 
                 profWritter = std::make_shared<settings::ServiceProfile>("writterProf");
                 profReader  = std::make_shared<settings::ServiceProfile>("readerProf");
 
-                ret &= sys::SystemManager::RunService(profWritter, manager.get());
-                ret &= sys::SystemManager::RunService(profReader, manager.get());
+                ret &= sys::SystemManager::RunSystemService(profWritter, manager.get());
+                ret &= sys::SystemManager::RunSystemService(profReader, manager.get());
 
                 testProf = std::make_shared<settings::AppTestProfileMode>(
                     "appTestProfile", profWritter, profReader, testStart);
-                ret &= sys::SystemManager::RunService(testProf, manager.get());
+                ret &= sys::SystemManager::RunSystemService(testProf, manager.get());
 
                 modeWritter = std::make_shared<settings::ServiceMode>("writterMode");
                 modeReader  = std::make_shared<settings::ServiceMode>("readerMode");
 
-                ret &= sys::SystemManager::RunService(modeWritter, manager.get());
-                ret &= sys::SystemManager::RunService(modeReader, manager.get());
+                ret &= sys::SystemManager::RunSystemService(modeWritter, manager.get());
+                ret &= sys::SystemManager::RunSystemService(modeReader, manager.get());
 
                 testMode =
                     std::make_shared<settings::AppTestProfileMode>("appTestMode", modeWritter, modeReader, testStart);
-                ret &= sys::SystemManager::RunService(testMode, manager.get());
+                ret &= sys::SystemManager::RunSystemService(testMode, manager.get());
 
                 std::cout << "koniec start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
                 testStart->unlock();

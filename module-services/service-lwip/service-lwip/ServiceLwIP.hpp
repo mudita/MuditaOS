@@ -44,6 +44,7 @@ class ServiceLwIP : public sys::Service
     virtual sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
+    void ProcessCloseReason(sys::CloseReason closeReason) override;
     virtual sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 };
 

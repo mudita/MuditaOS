@@ -28,6 +28,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PowerOffWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DeadBatteryWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/LogoWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/LockedInfoWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Reboot.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/Update.cpp"
@@ -38,6 +39,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiInternalMsgWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/ScreenLockBaseBox.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/LockWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/presenter/PowerOffPresenter.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockPhoneData.hpp"

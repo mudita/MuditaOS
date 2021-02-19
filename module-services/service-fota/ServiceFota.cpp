@@ -71,6 +71,11 @@ namespace FotaService
         return sys::ReturnCodes::Success;
     }
 
+    void Service::ProcessCloseReason(sys::CloseReason closeReason)
+    {
+        sendCloseReadyMessage(this);
+    }
+
     void Service::registerMessageHandlers()
     {
         LOG_DEBUG("Registring Handlers for Fota::Service:");

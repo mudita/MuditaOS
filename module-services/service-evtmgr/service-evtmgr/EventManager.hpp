@@ -63,6 +63,8 @@ class EventManager : public sys::Service
 
     sys::ReturnCodes DeinitHandler() override;
 
+    void ProcessCloseReason(sys::CloseReason closeReason) override;
+
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
     /**

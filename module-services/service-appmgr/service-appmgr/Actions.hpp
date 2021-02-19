@@ -25,7 +25,6 @@ namespace app::manager
             Home,
             AutoLock,
             Launch,
-            CloseSystem,
             Call,
             NotAnEmergencyNotification,
             NoSimNotification,
@@ -56,6 +55,7 @@ namespace app::manager
             DisplayLowBatteryNotification,
             SystemBrownout,
             RequestScreenPasscode,
+            DisplayLogoAtExit,
             UserAction // The last enumerator in the Action enum.
                        // All user-defined actions shall have values greater than UserAction.
                        // All system-wide actions shall have values lesser than UserAction.

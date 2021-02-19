@@ -179,6 +179,11 @@ sys::ReturnCodes ServiceAudio::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
+void ServiceAudio::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    sendCloseReadyMessage(this);
+}
+
 std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Message *msg)
 {
     if (const auto *eof = dynamic_cast<const AudioServiceMessage::EndOfFile *>(msg); eof) {

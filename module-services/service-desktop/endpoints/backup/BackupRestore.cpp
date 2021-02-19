@@ -137,7 +137,7 @@ void BackupRestore::RestoreUserFiles(sys::Service *ownerService)
     /* close user files to be restored */
     LOG_INFO("RestoreUserFiles: closing ServiceDB...");
     std::string dbServiceName = service::name::db;
-    sys::SystemManager::DestroyService(dbServiceName, ownerService);
+    sys::SystemManager::DestroySystemService(dbServiceName, ownerService);
 
     BackupRestore::ReplaceUserFiles();
 

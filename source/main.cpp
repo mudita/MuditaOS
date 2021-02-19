@@ -174,7 +174,7 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationOnBoarding>(app::name_onboarding));
 #endif
             // start application manager
-            return sysmgr->RunService(
+            return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(
                     app::manager::ApplicationManager::ServiceName, std::move(applications), app::name_desktop),
                 sysmgr.get());

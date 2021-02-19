@@ -100,6 +100,7 @@ namespace app::manager
 
         auto InitHandler() -> sys::ReturnCodes override;
         auto DeinitHandler() -> sys::ReturnCodes override;
+        auto ProcessCloseReason(sys::CloseReason closeReason) -> void override;
         auto SwitchPowerModeHandler(const sys::ServicePowerMode mode) -> sys::ReturnCodes override;
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
 
@@ -108,7 +109,6 @@ namespace app::manager
         void startBackgroundApplications();
         void rebuildActiveApplications();
         void suspendSystemServices();
-        auto closeServices() -> bool;
         auto closeApplications() -> bool;
         auto closeApplicationsOnUpdate() -> bool;
         void closeService(const std::string &name);
@@ -120,7 +120,6 @@ namespace app::manager
         void handleActionRequest(ActionRequest *actionMsg);
         auto handleHomeAction(ActionEntry &action) -> bool;
         auto handleLaunchAction(ActionEntry &action) -> bool;
-        auto handleCloseSystem() -> bool;
         auto handleCustomAction(ActionEntry &action) -> bool;
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
@@ -166,7 +165,6 @@ namespace app::manager
                                                    // If it reaches time defined in settings database application
                                                    // manager is sending signal to Application Desktop in order to
                                                    // lock screen.
-        std::unique_ptr<sys::Timer> shutdownDelay;
         std::unique_ptr<settings::Settings> settings;
         std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
         void displayLanguageChanged(std::string value);

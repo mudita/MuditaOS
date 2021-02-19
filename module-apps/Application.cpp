@@ -22,6 +22,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/service-appmgr/messages/DOMRequest.hpp>
+#include <service-appmgr/messages/UserPowerDownRequest.hpp>
 #include "service-gui/messages/DrawMessage.hpp" // for DrawMessage
 #include "task.h"                               // for xTaskGetTic...
 #include "windows/AppWindow.hpp"                // for AppWindow
@@ -158,12 +159,14 @@ namespace app
             window->updateTime();
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
-            if (shutdownInProgress) {
+
+            if (systemCloseInProgress) {
                 message->setCommandType(service::gui::DrawMessage::Type::SHUTDOWN);
             }
             else if (suspendInProgress) {
                 message->setCommandType(service::gui::DrawMessage::Type::SUSPEND);
             }
+
             bus.sendUnicast(std::move(message), service::name::gui);
         }
 

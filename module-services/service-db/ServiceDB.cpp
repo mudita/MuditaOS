@@ -563,6 +563,11 @@ sys::ReturnCodes ServiceDB::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
+void ServiceDB::ProcessCloseReason(sys::CloseReason closeReason)
+{
+    sendCloseReadyMessage(this);
+}
+
 sys::ReturnCodes ServiceDB::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
     LOG_FATAL("[%s] PowerModeHandler: %s", this->GetName().c_str(), c_str(mode));

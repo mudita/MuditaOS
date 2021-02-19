@@ -111,4 +111,10 @@ namespace sys
         log_warn(
             "callback from %s non valid - %d, or not active - %d", name.c_str(), callback == nullptr, isActive != true);
     }
+
+    bool Timer::isCurrentlyActive() const noexcept
+    {
+        return isActive;
+    }
+
 } // namespace sys

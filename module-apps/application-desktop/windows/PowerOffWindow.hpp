@@ -8,6 +8,7 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/BottomBar.hpp"
+#include "../presenter/PowerOffPresenter.hpp"
 
 namespace gui
 {
@@ -22,13 +23,14 @@ namespace gui
         gui::Label *titleLabel = nullptr;
         gui::Label *infoLabel  = nullptr;
 
+        std::unique_ptr<PowerOffPresenter> presenter;
         std::vector<gui::Label *> selectionLabels;
         gui::Label *eventMgrLabel  = nullptr;
         gui::Image *powerImage     = nullptr;
         gui::Image *powerDownImage = nullptr;
         State state                = State::Return;
       public:
-        PowerOffWindow(app::Application *app);
+        PowerOffWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 

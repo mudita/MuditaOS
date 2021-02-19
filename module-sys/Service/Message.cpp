@@ -30,6 +30,20 @@ namespace sys
         return Proxy::handleSystemMessage(service, this);
     }
 
+    ServiceCloseReasonMessage::ServiceCloseReasonMessage(CloseReason closeReason) : closeReason(closeReason)
+    {}
+
+    MessagePointer ServiceCloseReasonMessage::Execute(Service *service)
+    {
+        Proxy::handleCloseReasonMessage(service, this);
+        return MessageNone{};
+    }
+
+    CloseReason ServiceCloseReasonMessage::getCloseReason() const noexcept
+    {
+        return closeReason;
+    }
+
     DataMessage::DataMessage(MessageType messageType) : messageType{messageType}
     {
         type = Type::Data;
