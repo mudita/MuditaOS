@@ -172,6 +172,7 @@ namespace app
         sys::MessagePointer handleGetDOM(sys::Message *msgl);
         sys::MessagePointer handleAppFocusLost(sys::Message *msgl);
         sys::MessagePointer handleSIMMessage(sys::Message *msgl);
+        sys::MessagePointer handleAudioKeyMessage(sys::Message *msgl);
 
         std::list<std::unique_ptr<app::GuiTimer>> gui_timers;
         std::unordered_map<manager::actions::ActionId, OnActionReceived> receivers;
@@ -323,10 +324,6 @@ namespace app
 
         /// Method used to attach popups windows to application
         void attachPopups(const std::vector<gui::popup::ID> &popupsList);
-
-        /// Individual popups handlers
-      public:
-        bool handleVolumePopup();
 
       public:
         /// @ingrup AppWindowStack

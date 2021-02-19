@@ -41,7 +41,6 @@ namespace app::manager
 
     auto Controller::switchBack(sys::Service *sender, std::unique_ptr<SwitchBackRequest> msg) -> bool
     {
-
         std::shared_ptr<SwitchBackRequest> switchMsg =
             msg ? std::move(msg) : std::make_shared<app::manager::SwitchBackRequest>(sender->GetName());
         return sender->bus.sendUnicast(switchMsg, ApplicationManager::ServiceName);
