@@ -157,28 +157,30 @@ namespace app
         if (equivalentWindow == EquivalentWindow::AllEventsWindow) {
             popToWindow(gui::name::window::main_window);
         }
-        gui::DialogMetadata meta;
-        meta.text   = utils::localize.get("app_calendar_no_events_information");
-        meta.title  = title;
-        meta.icon   = "phonebook_empty_grey_circle_W_G";
-        meta.action = [=]() -> bool {
-            LOG_DEBUG("Switch to new event window");
-            std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
-            eventData->setDescription(style::window::calendar::new_event);
-            auto event       = std::make_shared<EventsRecord>();
-            event->date_from = dateFilter;
-            event->date_till = dateFilter + std::chrono::hours(utils::time::Locale::max_hour_24H_mode) +
-                               std::chrono::minutes(utils::time::Locale::max_minutes);
-            eventData->setData(event);
-
-            switchWindow(
-                style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(eventData));
-            return true;
-        };
 
         LOG_DEBUG("Switch to no events window");
-        switchWindow(style::window::calendar::name::no_events_window,
-                     std::make_unique<gui::DialogMetadataMessage>(meta));
+
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+            title,
+            "phonebook_empty_grey_circle_W_G",
+            utils::localize.get("app_calendar_no_events_information"),
+            "",
+            [=]() -> bool {
+                LOG_DEBUG("Switch to new event window");
+                std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
+                eventData->setDescription(style::window::calendar::new_event);
+                auto event       = std::make_shared<EventsRecord>();
+                event->date_from = dateFilter;
+                event->date_till = dateFilter + std::chrono::hours(utils::time::Locale::max_hour_24H_mode) +
+                                   std::chrono::minutes(utils::time::Locale::max_minutes);
+                eventData->setData(event);
+
+                switchWindow(
+                    style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(eventData));
+                return true;
+            }});
+
+        switchWindow(style::window::calendar::name::no_events_window, std::move(metaData));
     }
 
 } /* namespace app */

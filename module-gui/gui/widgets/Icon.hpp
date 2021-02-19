@@ -9,6 +9,12 @@
 
 namespace gui
 {
+    namespace icon
+    {
+        inline constexpr auto image_top_margin    = 30;
+        inline constexpr auto image_bottom_margin = 33;
+    } // namespace icon
+
     class Icon : public VBox
     {
       public:
@@ -21,6 +27,9 @@ namespace gui
              const UTF8 &text);
 
         ~Icon() override = default;
+
+        Text *text   = nullptr;
+        Image *image = nullptr;
     };
 
 }; // namespace gui

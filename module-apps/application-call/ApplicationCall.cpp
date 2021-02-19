@@ -233,11 +233,9 @@ namespace app
                                            const std::string &icon,
                                            const std::string &text)
     {
-        gui::DialogMetadata meta;
-        meta.icon   = icon;
-        meta.text   = text;
-        meta.action = std::move(action);
-        switchWindow(app::window::name_dialogConfirm, std::make_unique<gui::DialogMetadataMessage>(std::move(meta)));
+        auto metaData =
+            std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{"", icon, text, "", std::move(action)});
+        switchWindow(app::window::name_dialogConfirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
         return true;
     }
 

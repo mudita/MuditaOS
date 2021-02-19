@@ -80,33 +80,32 @@ namespace gui
     auto PhonebookContactOptions::contactBlock(bool shouldBeBlocked) -> bool
     {
         LOG_DEBUG("Blocking contact: %" PRIu32, contact->ID);
-        std::unique_ptr<DialogMetadata> meta = std::make_unique<DialogMetadata>();
+        std::string dialogText;
 
-        meta->action = [=]() -> bool {
-            contact->addToBlocked(shouldBeBlocked);
-            DBServiceAPI::ContactUpdate(this->application, *contact);
-            if (shouldBeBlocked) {
-                showNotification(NotificationType::Block);
-            }
-            else {
-                showNotification(NotificationType::Unblock);
-            }
-
-            return true;
-        };
         if (shouldBeBlocked) {
-            meta->text = utils::localize.get("app_phonebook_options_block_confirm");
+            dialogText = utils::localize.get("app_phonebook_options_block_confirm");
         }
         else {
-            meta->text = utils::localize.get("app_phonebook_options_unblock_confirm");
+            dialogText = utils::localize.get("app_phonebook_options_unblock_confirm");
         }
 
         auto contactRec = DBServiceAPI::ContactGetByID(this->application, contact->ID);
         auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
-        meta->title     = cont.getFormattedName();
-        meta->icon      = "phonebook_contact_delete_trashcan";
-        application->switchWindow(gui::window::name::dialog_yes_no,
-                                  std::make_unique<gui::DialogMetadataMessage>(std::move(*meta)));
+
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+            cont.getFormattedName(), "phonebook_contact_delete_trashcan", dialogText, "", [=]() -> bool {
+                contact->addToBlocked(shouldBeBlocked);
+                DBServiceAPI::ContactUpdate(this->application, *contact);
+                if (shouldBeBlocked) {
+                    showNotification(NotificationType::Block);
+                }
+                else {
+                    showNotification(NotificationType::Unblock);
+                }
+                return true;
+            }});
+
+        application->switchWindow(gui::window::name::dialog_yes_no, std::move(metaData));
         return true;
     }
 
@@ -115,46 +114,54 @@ namespace gui
         LOG_DEBUG("Removing contact: %" PRIu32, contact->ID);
         std::unique_ptr<DialogMetadata> meta = std::make_unique<DialogMetadata>();
 
-        meta->action = [=]() -> bool {
-            if (!DBServiceAPI::ContactRemove(this->application, contact->ID)) {
-                LOG_ERROR("Contact id=%" PRIu32 "  remove failed", contact->ID);
-                return false;
-            }
-            showNotification(NotificationType::Delete);
-            return true;
-        };
-        meta->text      = utils::localize.get("app_phonebook_options_delete_confirm");
         auto contactRec = DBServiceAPI::ContactGetByID(this->application, contact->ID);
         auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
-        meta->title     = cont.getFormattedName();
-        meta->icon      = "phonebook_contact_delete_trashcan";
-        application->switchWindow(gui::window::name::dialog_yes_no,
-                                  std::make_unique<DialogMetadataMessage>(std::move(*meta)));
+
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{cont.getFormattedName(),
+                                "phonebook_contact_delete_trashcan",
+                                utils::localize.get("app_phonebook_options_delete_confirm"),
+                                "",
+                                [=]() -> bool {
+                                    if (!DBServiceAPI::ContactRemove(this->application, contact->ID)) {
+                                        LOG_ERROR("Contact id=%" PRIu32 "  remove failed", contact->ID);
+                                        return false;
+                                    }
+                                    showNotification(NotificationType::Delete);
+                                    return true;
+                                }});
+
+        application->switchWindow(gui::window::name::dialog_yes_no, std::move(metaData));
         return true;
     }
 
     auto PhonebookContactOptions::showNotification(NotificationType notificationType) -> bool
     {
-        DialogMetadata meta;
-        meta.icon = "info_big_circle_W_G";
+        std::string dialogText;
+
         switch (notificationType) {
         case NotificationType::Block:
-            meta.text = utils::localize.get("app_phonebook_options_block_notification");
+            dialogText = utils::localize.get("app_phonebook_options_block_notification");
             break;
         case NotificationType::Delete:
-            meta.text = utils::localize.get("app_phonebook_options_delete_notification");
+            dialogText = utils::localize.get("app_phonebook_options_delete_notification");
             break;
         case NotificationType::Unblock:
-            meta.text = utils::localize.get("app_phonebook_options_unblock_notification");
+            dialogText = utils::localize.get("app_phonebook_options_unblock_notification");
             break;
         }
-        meta.action = [=]() -> bool {
-            this->application->switchWindow(gui::name::window::main_window);
-            return true;
-        };
-        meta.title = contact->getFormattedName(ContactRecord::NameFormatType::Title);
-        application->switchWindow(gui::window::name::dialog_confirm,
-                                  std::make_unique<gui::DialogMetadataMessage>(std::move(meta)));
+
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{contact->getFormattedName(ContactRecord::NameFormatType::Title),
+                                "info_big_circle_W_G",
+                                dialogText,
+                                "",
+                                [=]() -> bool {
+                                    this->application->switchWindow(gui::name::window::main_window);
+                                    return true;
+                                }});
+
+        application->switchWindow(gui::window::name::dialog_confirm, std::move(metaData));
         return true;
     }
 } // namespace gui

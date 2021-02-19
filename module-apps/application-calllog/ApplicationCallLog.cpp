@@ -107,19 +107,20 @@ namespace app
     bool ApplicationCallLog::removeCalllogEntry(const CalllogRecord &record)
     {
         LOG_DEBUG("Removing CalllogRecord: %" PRIu32, record.ID);
-        gui::DialogMetadata meta;
-        meta.action = [=]() -> bool {
-            if (DBServiceAPI::CalllogRemove(this, record.ID) == false) {
-                LOG_ERROR("CalllogRemove id=%" PRIu32 " failed", record.ID);
-                return false;
-            }
-            this->switchWindow(calllog::settings::MainWindowStr);
-            return true;
-        };
-        meta.title = record.name;
-        meta.text  = utils::localize.get("app_calllog_delete_call_confirmation");
-        meta.icon  = "phonebook_contact_delete_trashcan";
-        switchWindow(calllog::settings::DialogYesNoStr, std::make_unique<gui::DialogMetadataMessage>(meta));
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{record.name,
+                                "phonebook_contact_delete_trashcan",
+                                utils::localize.get("app_calllog_delete_call_confirmation"),
+                                "",
+                                [=]() -> bool {
+                                    if (DBServiceAPI::CalllogRemove(this, record.ID) == false) {
+                                        LOG_ERROR("CalllogRemove id=%" PRIu32 " failed", record.ID);
+                                        return false;
+                                    }
+                                    this->switchWindow(calllog::settings::MainWindowStr);
+                                    return true;
+                                }});
+        switchWindow(calllog::settings::DialogYesNoStr, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
         return true;
     }
 

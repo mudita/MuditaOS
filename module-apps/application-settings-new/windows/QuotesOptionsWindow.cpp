@@ -46,19 +46,19 @@ namespace gui
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translateI18("app_settings_display_wallpaper_quotes_delete"),
             [=](gui::Item &item) {
-                gui::DialogMetadata meta;
-                meta.text   = utils::localize.get("app_settings_display_wallpaper_quotes_delete_confirmation");
-                meta.title  = quote.quote;
-                meta.icon   = "phonebook_contact_delete_trashcan";
-                meta.action = [this]() {
-                    auto backToQuotesMainWindow = 2;
-                    quotesModel->remove(quote);
-                    application->returnToPreviousWindow(backToQuotesMainWindow);
-                    return true;
-                };
-
-                application->switchWindow(gui::window::name::quotes_dialog_yes_no,
-                                          std::make_unique<gui::DialogMetadataMessage>(meta));
+                auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+                    quote.quote,
+                    "phonebook_contact_delete_trashcan",
+                    utils::localize.get("app_settings_display_wallpaper_quotes_delete_confirmation"),
+                    "",
+                    [this]() {
+                        auto backToQuotesMainWindow = 2;
+                        quotesModel->remove(quote);
+                        application->returnToPreviousWindow(backToQuotesMainWindow);
+                        return true;
+                    }});
+                application->switchWindow(
+                    gui::window::name::quotes_dialog_yes_no, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
                 return true;
             },
             [=](gui::Item &item) {
