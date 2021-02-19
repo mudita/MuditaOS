@@ -62,11 +62,11 @@ namespace gui
 
         virtual bool onDatabaseMessage(sys::Message *msg);
 
-        bool setSIM();
-        // updates battery level in the window
+        bool updateSim();
         bool updateBatteryStatus();
         bool updateSignalStrength();
         bool updateNetworkAccessTechnology();
+        virtual bool updateTime();
         void setTitle(const UTF8 &text);
 
         void rebuild() override;

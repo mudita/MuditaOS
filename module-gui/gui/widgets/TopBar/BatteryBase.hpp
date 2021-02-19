@@ -7,18 +7,16 @@
 #include "BoxLayout.hpp"
 #include <common_data/EventStore.hpp>
 
-namespace gui
+namespace gui::top_bar
 {
-    class HBox;
-
-    class BatteryWidgetBase : public StatusBarWidgetBase<HBox>
+    class BatteryBase : public StatusBarWidgetBase<HBox>
     {
         virtual void showBatteryLevel(std::uint32_t percentage) = 0;
         virtual void showBatteryChargingDone()                  = 0;
         virtual void showBatteryCharging()                      = 0;
 
       public:
-        BatteryWidgetBase(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        BatteryBase(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
         void update(const Store::Battery &batteryContext);
     };
-} // namespace gui
+} // namespace gui::top_bar

@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TopBarManager.hpp"
+#include "TopBar.hpp"
 
 namespace app
 {
@@ -13,5 +14,10 @@ namespace app
     auto TopBarManager::getConfiguration() const noexcept -> const gui::top_bar::Configuration &
     {
         return topBarConfiguration;
+    }
+
+    void TopBarManager::set(gui::top_bar::TimeMode timeMode)
+    {
+        topBarConfiguration.set(timeMode);
     }
 } // namespace app

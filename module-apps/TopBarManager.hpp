@@ -12,6 +12,7 @@ namespace app
       public:
         void enableIndicators(const gui::top_bar::Indicators &indicators);
         [[nodiscard]] auto getConfiguration() const noexcept -> const gui::top_bar::Configuration &;
+        void set(gui::top_bar::TimeMode timeMode);
 
       private:
         gui::top_bar::Configuration topBarConfiguration;

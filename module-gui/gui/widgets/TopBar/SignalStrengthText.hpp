@@ -3,12 +3,15 @@
 
 #pragma once
 
-#include "SignalStrengthWidgetBase.hpp"
+#include "SignalStrengthBase.hpp"
 
 namespace gui
 {
     class Label;
-    class SignalStrengthWidgetText : public SignalStrengthWidgetBase
+}
+namespace gui::top_bar
+{
+    class SignalStrengthText : public SignalStrengthBase
     {
       private:
         Label *label = nullptr;
@@ -17,6 +20,6 @@ namespace gui
         void update() override;
 
       public:
-        SignalStrengthWidgetText(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        SignalStrengthText(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
     };
-} // namespace gui
+} // namespace gui::top_bar
