@@ -308,6 +308,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(std::shared_ptr<db
     else if (typeid(*query) == typeid(db::query::SMSGetByThreadID)) {
         return getByThreadIDQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::SMSGetByThreadIDWithTotalCount)) {
+        return getByThreadIDQueryWithTotalCount(query);
+    }
     else if (typeid(*query) == typeid(db::query::SMSGetForList)) {
         return getForListQuery(query);
     }
@@ -334,6 +337,9 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::runQuery(std::shared_ptr<db
     }
     else if (typeid(*query) == typeid(db::query::SMSGet)) {
         return getQuery(query);
+    }
+    else if (typeid(*query) == typeid(db::query::SMSGetWithTotalCount)) {
+        return getQueryWithTotalCount(query);
     }
 
     return nullptr;
@@ -455,24 +461,49 @@ std::unique_ptr<db::QueryResult> SMSRecordInterface::updateQuery(const std::shar
     response->setRequestQuery(query);
     return response;
 }
-std::unique_ptr<db::QueryResult> SMSRecordInterface::getQuery(const std::shared_ptr<db::Query> &query)
+
+auto SMSRecordInterface::getQueryRecords(const std::shared_ptr<db::Query> &query) -> std::vector<SMSRecord>
 {
     const auto localQuery = static_cast<const db::query::SMSGet *>(query.get());
-
     auto smsVector    = smsDB->sms.getLimitOffset(localQuery->getOffset(), localQuery->getLimit());
-    auto recordVector = std::vector<SMSRecord>(smsVector.begin(), smsVector.end());
+    return std::vector<SMSRecord>(smsVector.begin(), smsVector.end());
+}
 
-    auto response = std::make_unique<db::query::SMSGetResult>(recordVector);
+auto SMSRecordInterface::getQuery(const std::shared_ptr<db::Query> &query) -> std::unique_ptr<db::QueryResult>
+{
+    auto response = std::make_unique<db::query::SMSGetResult>(getQueryRecords(query));
     response->setRequestQuery(query);
     return response;
 }
-std::unique_ptr<db::QueryResult> SMSRecordInterface::getByThreadIDQuery(const std::shared_ptr<db::Query> &query)
+
+auto SMSRecordInterface::getQueryWithTotalCount(const std::shared_ptr<db::Query> &query)
+    -> std::unique_ptr<db::QueryResult>
+{
+    auto response = std::make_unique<db::query::SMSGetResultWithTotalCount>(getQueryRecords(query), smsDB->sms.count());
+    response->setRequestQuery(query);
+    return response;
+}
+
+auto SMSRecordInterface::getByThreadIDQueryRecords(const std::shared_ptr<db::Query> &query) -> std::vector<SMSRecord>
 {
     const auto localQuery = static_cast<const db::query::SMSGetByThreadID *>(query.get());
     auto smsVector        = smsDB->sms.getByThreadId(localQuery->threadId, localQuery->offset, localQuery->limit);
-    auto recordVector     = std::vector<SMSRecord>(smsVector.begin(), smsVector.end());
+    return std::vector<SMSRecord>(smsVector.begin(), smsVector.end());
+}
 
-    auto response = std::make_unique<db::query::SMSGetByThreadIDResult>(recordVector);
+auto SMSRecordInterface::getByThreadIDQuery(const std::shared_ptr<db::Query> &query) -> std::unique_ptr<db::QueryResult>
+{
+    auto response = std::make_unique<db::query::SMSGetByThreadIDResult>(getByThreadIDQueryRecords(query));
+    response->setRequestQuery(query);
+    return response;
+}
+
+auto SMSRecordInterface::getByThreadIDQueryWithTotalCount(const std::shared_ptr<db::Query> &query)
+    -> std::unique_ptr<db::QueryResult>
+{
+    const auto smsGetByThreadIDQuery = static_cast<const db::query::SMSGetByThreadID *>(query.get());
+    auto response                    = std::make_unique<db::query::SMSGetByThreadIDResultWithTotalCount>(
+        getByThreadIDQueryRecords(query), smsDB->sms.countWithoutDraftsByThreadId(smsGetByThreadIDQuery->threadId));
     response->setRequestQuery(query);
     return response;
 }

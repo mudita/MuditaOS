@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHelper.hpp"
@@ -147,158 +147,20 @@ namespace parserFSM
 
     auto MessageHelper::requestSMS(Context &context) -> sys::ReturnCodes
     {
-        if (context.getBody()[json::messages::count].bool_value()) // get messages count
-        {
-            auto query = std::make_unique<db::query::SMSGetCount>();
-
-            auto listener = std::make_unique<db::EndpointListener>(
-                [=](db::QueryResult *result, Context context) {
-                    if (auto smsResult = dynamic_cast<db::query::SMSGetCountResult *>(result)) {
-                        auto id = smsResult->getResults();
-
-                        context.setResponseBody(json11::Json::object{{json::messages::count, static_cast<int>(id)}});
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                context);
-
-            query->setQueryListener(std::move(listener));
-            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
+        if (context.getBody()[json::messages::count].bool_value()) {
+            requestCount(context);
         }
-        else if (context.getBody()[json::messages::messageID].int_value() != 0) { // get message by ID
-
-            auto query =
-                std::make_unique<db::query::SMSGetByID>(context.getBody()[json::messages::messageID].int_value());
-
-            auto listener = std::make_unique<db::EndpointListener>(
-                [=](db::QueryResult *result, Context context) {
-                    if (auto smsResult = dynamic_cast<db::query::SMSGetByIDResult *>(result)) {
-
-                        context.setResponseBody(MessageHelper::toJson(smsResult->getResults()));
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                context);
-
-            query->setQueryListener(std::move(listener));
-            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
+        else if (context.getBody()[json::messages::messageID].int_value() != 0) {
+            getMessageById(context);
         }
-        else if (context.getBody()[json::messages::threadID].int_value() != 0) { // get messages by thread ID
-
-            auto query =
-                std::make_unique<db::query::SMSGetByThreadID>(context.getBody()[json::messages::threadID].int_value(),
-                                                              context.getBody()[json::messages::offset].int_value(),
-                                                              context.getBody()[json::messages::limit].is_number()
-                                                                  ? context.getBody()[json::messages::limit].int_value()
-                                                                  : defaultLimit);
-
-            auto listener = std::make_unique<db::EndpointListener>(
-                [=](db::QueryResult *result, Context context) {
-                    if (auto smsResult = dynamic_cast<db::query::SMSGetByThreadIDResult *>(result)) {
-
-                        json11::Json::array smsArray;
-                        for (const auto &record : smsResult->getResults()) {
-                            smsArray.emplace_back(MessageHelper::toJson(record));
-                        }
-
-                        auto responseBody = json11::Json::object{
-                            {json::messages::totalCount, 0},
-                            {json::messages::nextPage,
-                             json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}},
-                            {json::messages::entries, smsArray},
-                        };
-
-                        context.setResponseBody(responseBody);
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                context);
-
-            query->setQueryListener(std::move(listener));
-            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
+        else if (context.getBody()[json::messages::threadID].int_value() != 0) {
+            return getMessagesByThreadID(context);
         }
-        else if (!context.getBody()[json::messages::messageBody].string_value().empty()) // get by message body
-        {
-            // not adding pagination for this request, since it is just for development and testing purposes, and it's
-            // not going to be used by Mudita Center
-            auto query = std::make_unique<db::query::SMSGetByText>(
-                context.getBody()[json::messages::messageBody].string_value());
-            if (const auto filterByNumber = !context.getBody()[json::messages::phoneNumber].string_value().empty();
-                filterByNumber) {
-                utils::PhoneNumber number{context.getBody()[json::messages::phoneNumber].string_value()};
-                query->filterByPhoneNumber(number.getView());
-            }
-
-            auto listener = std::make_unique<db::EndpointListener>(
-                [=](db::QueryResult *result, Context context) {
-                    if (auto smsResult = dynamic_cast<db::query::SMSGetByTextResult *>(result)) {
-
-                        json11::Json::array smsArray;
-                        for (const auto &record : smsResult->getResults()) {
-                            smsArray.emplace_back(MessageHelper::toJson(record));
-                        }
-
-                        context.setResponseBody(smsArray);
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                context);
-
-            query->setQueryListener(std::move(listener));
-            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
+        else if (!context.getBody()[json::messages::messageBody].string_value().empty()) {
+            getByMessageBody(context);
         }
-        else // get messages
-        {
-            auto query = std::make_unique<db::query::SMSGet>(context.getBody()[json::messages::limit].is_number()
-                                                                 ? context.getBody()[json::messages::limit].int_value()
-                                                                 : defaultLimit,
-                                                             context.getBody()[json::messages::offset].int_value());
-
-            auto listener = std::make_unique<db::EndpointListener>(
-                [=](db::QueryResult *result, Context context) {
-                    if (auto smsResult = dynamic_cast<db::query::SMSGetResult *>(result)) {
-
-                        json11::Json::array smsArray;
-                        for (const auto &record : smsResult->getRecords()) {
-                            smsArray.emplace_back(MessageHelper::toJson(record));
-                            LOG_DEBUG("Record found!: %" PRIu32 "\n", record.ID);
-                        }
-
-                        auto responseBody = json11::Json::object{
-                            {json::messages::totalCount, 0},
-                            {json::messages::nextPage,
-                             json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}},
-                            {json::messages::entries, smsArray},
-                        };
-
-                        context.setResponseBody(responseBody);
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                context);
-
-            query->setQueryListener(std::move(listener));
-            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
+        else {
+            return getMessages(context);
         }
         return sys::ReturnCodes::Success;
     }
@@ -341,86 +203,15 @@ namespace parserFSM
 
     auto MessageHelper::requestTemplate(Context &context) -> sys::ReturnCodes
     {
-        if (context.getBody()[json::messages::count].bool_value()) // get templates count
-        {
-            auto query = std::make_unique<db::query::SMSTemplateGetCount>();
-
-            auto listener = std::make_unique<db::EndpointListener>(
-                [=](db::QueryResult *result, Context context) {
-                    if (auto smsResult = dynamic_cast<db::query::SMSTemplateGetCountResult *>(result)) {
-                        auto id = smsResult->getResults();
-
-                        context.setResponseBody(json11::Json::object{{json::messages::count, static_cast<int>(id)}});
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                context);
-
-            query->setQueryListener(std::move(listener));
-            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
+        if (context.getBody()[json::messages::count].bool_value()) {
+            getTemplatesCount(context);
         }
-        else if (context.getBody()[json::messages::templateID].int_value() != 0) { // get template by ID
-            auto query = std::make_unique<db::query::SMSTemplateGetByID>(
-                context.getBody()[json::messages::templateID].int_value());
-
-            auto listener = std::make_unique<db::EndpointListener>(
-                [=](db::QueryResult *result, Context context) {
-                    if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateGetByIDResult *>(result)) {
-
-                        context.setResponseBody(MessageHelper::toJson(smsTemplateResult->getResults()));
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                context);
-
-            query->setQueryListener(std::move(listener));
-            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
+        else if (context.getBody()[json::messages::templateID].int_value() != 0) {
+            getTemplateByID(context);
         }
-        else // get messages templates
-        {
-            auto query =
-                std::make_unique<db::query::SMSTemplateGet>(context.getBody()[json::messages::offset].int_value(),
-                                                            context.getBody()[json::messages::limit].is_number()
-                                                                ? context.getBody()[json::messages::limit].int_value()
-                                                                : defaultLimit);
-            auto listener = std::make_unique<db::EndpointListener>(
-                [=](db::QueryResult *result, Context context) {
-                    if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateGetResult *>(result)) {
-
-                        json11::Json::array smsTemplateArray;
-                        for (const auto &record : smsTemplateResult->getResults()) {
-                            smsTemplateArray.emplace_back(toJson(record));
-                        }
-
-                        auto responseBody = json11::Json::object{
-                            {json::messages::totalCount, 0},
-                            {json::messages::nextPage,
-                             json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}},
-                            {json::messages::entries, smsTemplateArray},
-                        };
-
-                        context.setResponseBody(responseBody);
-                        MessageHandler::putToSendQueue(context.createSimpleResponse());
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                context);
-
-            query->setQueryListener(std::move(listener));
-            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
+        else {
+            getMessagesTemplates(context);
         }
-
         return sys::ReturnCodes::Success;
     }
     auto MessageHelper::updateTemplate(Context &context) -> sys::ReturnCodes
@@ -559,7 +350,6 @@ namespace parserFSM
                     }
                 },
                 ctx);
-
             query->setQueryListener(std::move(listener));
             DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSThread, std::move(query));
         }
@@ -617,6 +407,256 @@ namespace parserFSM
     {
         context.setResponseStatus(http::Code::InternalServerError);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
+        return sys::ReturnCodes::Success;
+    }
+
+    void MessageHelper::requestCount(Context &context)
+    {
+        auto query = std::make_unique<db::query::SMSGetCount>();
+
+        auto listener = std::make_unique<db::EndpointListener>(
+            [](db::QueryResult *result, Context &context) {
+                if (auto smsResult = dynamic_cast<db::query::SMSGetCountResult *>(result)) {
+                    auto count = smsResult->getResults();
+                    context.setResponseBody(json11::Json::object{{json::messages::count, static_cast<int>(count)}});
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            context);
+
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
+    }
+
+    void MessageHelper::getMessageById(Context &context)
+    {
+        auto query = std::make_unique<db::query::SMSGetByID>(context.getBody()[json::messages::messageID].int_value());
+
+        auto listener = std::make_unique<db::EndpointListener>(
+            [](db::QueryResult *result, Context &context) {
+                if (auto smsResult = dynamic_cast<db::query::SMSGetByIDResult *>(result)) {
+
+                    context.setResponseBody(MessageHelper::toJson(smsResult->getResults()));
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            context);
+
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
+    }
+
+    auto MessageHelper::getMessagesByThreadID(Context &context) -> sys::ReturnCodes
+    {
+        try {
+            auto &ctx                = dynamic_cast<PagedContext &>(context);
+            const std::size_t limit  = ctx.getBody()[json::messages::limit].int_value();
+            const std::size_t offset = ctx.getBody()[json::messages::offset].int_value();
+            ctx.setRequestedLimit(limit);
+            ctx.setRequestedOffset(offset);
+            auto query = std::make_unique<db::query::SMSGetByThreadIDWithTotalCount>(
+                context.getBody()[json::messages::threadID].int_value(), std::min(ctx.getPageSize(), limit), offset);
+
+            auto listener = std::make_unique<db::EndpointListenerWithPages>(
+                [](db::QueryResult *result, PagedContext &context) {
+                    if (auto smsResult = dynamic_cast<db::query::SMSGetByThreadIDResultWithTotalCount *>(result)) {
+
+                        const auto &results = smsResult->getResults();
+                        json11::Json::array smsArray;
+                        smsArray.reserve(results.size());
+                        for (const auto &record : results) {
+                            smsArray.emplace_back(MessageHelper::toJson(record));
+                        }
+
+                        context.setResponseBody(std::move(smsArray));
+                        context.setTotalCount(smsResult->getTotalCount());
+                        MessageHandler::putToSendQueue(context.createSimpleResponse());
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                },
+                ctx);
+
+            query->setQueryListener(std::move(listener));
+            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
+        }
+        catch (const std::bad_cast &e) {
+            LOG_ERROR("%s", e.what());
+            return sys::ReturnCodes::Failure;
+        }
+        return sys::ReturnCodes::Success;
+    }
+
+    void MessageHelper::getByMessageBody(Context &context)
+    {
+        // not adding pagination for this request, since it is just for development and testing purposes, and it's
+        // not going to be used by Mudita Center
+        auto query =
+            std::make_unique<db::query::SMSGetByText>(context.getBody()[json::messages::messageBody].string_value());
+        if (const auto filterByNumber = !context.getBody()[json::messages::phoneNumber].string_value().empty();
+            filterByNumber) {
+            utils::PhoneNumber number{context.getBody()[json::messages::phoneNumber].string_value()};
+            query->filterByPhoneNumber(number.getView());
+        }
+
+        auto listener = std::make_unique<db::EndpointListener>(
+            [](db::QueryResult *result, Context &context) {
+                if (auto smsResult = dynamic_cast<db::query::SMSGetByTextResult *>(result)) {
+
+                    const auto &results = smsResult->getResults();
+                    json11::Json::array smsArray;
+                    smsArray.reserve(results.size());
+                    for (const auto &record : results) {
+                        smsArray.emplace_back(MessageHelper::toJson(record));
+                    }
+
+                    context.setResponseBody(std::move(smsArray));
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            context);
+
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
+    }
+
+    auto MessageHelper::getMessages(Context &context) -> sys::ReturnCodes
+    {
+        try {
+            auto &ctx                = dynamic_cast<PagedContext &>(context);
+            const std::size_t limit  = ctx.getBody()[json::messages::limit].int_value();
+            const std::size_t offset = ctx.getBody()[json::messages::offset].int_value();
+            ctx.setRequestedLimit(limit);
+            ctx.setRequestedOffset(offset);
+            auto query = std::make_unique<db::query::SMSGetWithTotalCount>(std::min(ctx.getPageSize(), limit), offset);
+
+            auto listener = std::make_unique<db::EndpointListenerWithPages>(
+                [](db::QueryResult *result, PagedContext &context) {
+                    if (auto smsResult = dynamic_cast<db::query::SMSGetResultWithTotalCount *>(result)) {
+
+                        const auto &results = smsResult->getRecords();
+                        json11::Json::array smsArray;
+                        smsArray.reserve(results.size());
+                        for (const auto &record : results) {
+                            smsArray.emplace_back(MessageHelper::toJson(record));
+                            LOG_DEBUG("Record found!: %" PRIu32 "\n", record.ID);
+                        }
+
+                        context.setResponseBody(std::move(smsArray));
+                        context.setTotalCount(smsResult->getTotalCount());
+                        MessageHandler::putToSendQueue(context.createSimpleResponse());
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                },
+                ctx);
+
+            query->setQueryListener(std::move(listener));
+            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
+        }
+        catch (const std::bad_cast &e) {
+            LOG_ERROR("%s", e.what());
+            return sys::ReturnCodes::Failure;
+        }
+        return sys::ReturnCodes::Success;
+    }
+
+    void MessageHelper::getTemplatesCount(Context &context)
+    {
+        auto query = std::make_unique<db::query::SMSTemplateGetCount>();
+
+        auto listener = std::make_unique<db::EndpointListener>(
+            [=](db::QueryResult *result, Context context) {
+                if (auto smsResult = dynamic_cast<db::query::SMSTemplateGetCountResult *>(result)) {
+                    auto id = smsResult->getResults();
+
+                    context.setResponseBody(json11::Json::object{{json::messages::count, static_cast<int>(id)}});
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            context);
+
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
+    }
+
+    void MessageHelper::getTemplateByID(Context &context)
+    {
+        auto query =
+            std::make_unique<db::query::SMSTemplateGetByID>(context.getBody()[json::messages::templateID].int_value());
+
+        auto listener = std::make_unique<db::EndpointListener>(
+            [=](db::QueryResult *result, Context context) {
+                if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateGetByIDResult *>(result)) {
+
+                    context.setResponseBody(MessageHelper::toJson(smsTemplateResult->getResults()));
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            context);
+
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
+    }
+
+    auto MessageHelper::getMessagesTemplates(Context &context) -> sys::ReturnCodes
+    {
+        auto query = std::make_unique<db::query::SMSTemplateGet>(
+            context.getBody()[json::messages::offset].int_value(),
+            context.getBody()[json::messages::limit].is_number() ? context.getBody()[json::messages::limit].int_value()
+                                                                 : defaultLimit);
+        auto listener = std::make_unique<db::EndpointListener>(
+            [=](db::QueryResult *result, Context context) {
+                if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateGetResult *>(result)) {
+
+                    json11::Json::array smsTemplateArray;
+                    for (const auto &record : smsTemplateResult->getResults()) {
+                        smsTemplateArray.emplace_back(toJson(record));
+                    }
+
+                    auto responseBody = json11::Json::object{
+                        {json::messages::totalCount, 0},
+                        {json::messages::nextPage,
+                         json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}},
+                        {json::messages::entries, smsTemplateArray},
+                    };
+
+                    context.setResponseBody(responseBody);
+                    MessageHandler::putToSendQueue(context.createSimpleResponse());
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            context);
+
+        query->setQueryListener(std::move(listener));
+        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
         return sys::ReturnCodes::Success;
     }
 } // namespace parserFSM
