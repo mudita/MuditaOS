@@ -12,6 +12,7 @@
 #include <set>
 #include <utility>
 #include <variant>
+#include <module-utils/Utils.hpp>
 
 namespace settings
 {
@@ -29,6 +30,22 @@ namespace settings
                 return variable;
             }
             return mode + sep + service + sep + profile + sep + variable;
+        }
+
+        void parse(const std::string &dbPath)
+        {
+            auto parts = utils::split(dbPath, "\\");
+            if (1 == parts.size()) {
+                variable = dbPath;
+                scope    = SettingsScope::Global;
+            }
+            else {
+                mode     = parts[0];
+                service  = parts[1];
+                profile  = parts[2];
+                variable = parts[3];
+                scope    = SettingsScope::AppLocal;
+            }
         }
 
         bool operator<(const EntryPath &other) const

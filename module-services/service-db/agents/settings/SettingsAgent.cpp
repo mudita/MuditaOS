@@ -7,6 +7,7 @@
 #include <Database/Database.hpp>
 #include <Service/Service.hpp>
 #include <purefs/filesystem_paths.hpp>
+#include <service-db/SettingsCache.hpp>
 
 namespace settings::DbPaths
 {
@@ -14,13 +15,30 @@ namespace settings::DbPaths
     constexpr auto phone_profile = "system/phone_profile";
 }; // namespace settings::DbPaths
 
-SettingsAgent::SettingsAgent(sys::Service *parentService) : DatabaseAgent(parentService)
+SettingsAgent::SettingsAgent(sys::Service *parentService, settings::SettingsCache *cache)
+    : DatabaseAgent(parentService), cache(cache)
 {
+    if (nullptr == cache) {
+        this->cache = settings::SettingsCache::getInstance();
+    }
     database = std::make_unique<Database>(getDbFilePath().c_str());
 }
 
 void SettingsAgent::initDb()
 {
+    // first approach -> take care about big amount of variables
+    auto allVars = database->query(settings::Statements::getAllValues);
+    if (nullptr == allVars || 0 == allVars->getRowCount()) {
+        return;
+    }
+
+    do {
+        auto path  = (*allVars)[0].getString();
+        auto value = (*allVars)[0].getString();
+        settings::EntryPath variablePath;
+        variablePath.parse(path);
+        cache->setValue(variablePath, value);
+    } while (allVars->nextRow());
 }
 
 void SettingsAgent::deinitDb()

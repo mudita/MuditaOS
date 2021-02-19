@@ -18,6 +18,7 @@
 
 namespace settings
 {
+    class SettingsCache;
     class Settings
     {
       public:
@@ -30,7 +31,7 @@ namespace settings
         using OnAllProfilesRetrievedCallback = std::function<void(const ListOfProfiles &)>;
         using OnAllModesRetrievedCallback    = std::function<void(const ListOfModes &)>;
 
-        Settings(sys::Service *app, const std::string &dbAgentName = service::name::db);
+        Settings(sys::Service *app, const std::string &dbAgentName = service::name::db, SettingsCache *cache = nullptr);
         virtual ~Settings();
 
         void setValue(const std::string &variableName,
@@ -45,6 +46,7 @@ namespace settings
         void unregisterValueChange(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal);
         /// unregisters all registered variables (both global and local)
         void unregisterValueChange();
+        std::string getValue(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal);
 
         void getAllProfiles(OnAllProfilesRetrievedCallback cb);
         void setCurrentProfile(const std::string &profile);
@@ -65,6 +67,8 @@ namespace settings
         std::string serviceName;
         std::string phoneMode;
         std::string profile;
+
+        SettingsCache *cache;
 
         using ValueCb = std::map<EntryPath, std::pair<ValueChangedCallback, ValueChangedCallbackWithName>>;
         ValueCb cbValues;
