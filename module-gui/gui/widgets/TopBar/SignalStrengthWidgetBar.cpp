@@ -34,13 +34,9 @@ namespace gui
         img->setMargins(gui::Margins(signalBarMarginX, 0, 0, 0));
     }
 
-    void SignalStrengthWidgetBar::show(const Store::SignalStrength data, bool shown)
+    void SignalStrengthWidgetBar::update()
     {
-        setVisible(shown);
-        if (shown) {
-            img->set(signalMap.at(data.rssiBar));
-            return;
-        }
+        img->set(signalMap.at(signalStrength.rssiBar));
     }
 
 } // namespace gui

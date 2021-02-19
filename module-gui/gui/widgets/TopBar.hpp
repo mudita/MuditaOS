@@ -16,6 +16,7 @@ namespace gui
 {
     class SignalStrengthWidgetBase;
     class BatteryWidgetBase;
+    class NetworkAccessTechnologyWidget;
 } // namespace gui
 namespace gui::top_bar
 {
@@ -79,9 +80,9 @@ namespace gui::top_bar
         static uint32_t time;
 
       protected:
-        Label *timeLabel                       = nullptr;
-        Label *networkAccessTechnologyLabel    = nullptr;
-        SignalStrengthWidgetBase *signalWidget = nullptr;
+        Label *timeLabel                                             = nullptr;
+        NetworkAccessTechnologyWidget *networkAccessTechnologyWidget = nullptr;
+        SignalStrengthWidgetBase *signalWidget                       = nullptr;
         Image *lock;
         gui::SIM *sim                    = nullptr;
         BatteryWidgetBase *batteryWidget = nullptr;

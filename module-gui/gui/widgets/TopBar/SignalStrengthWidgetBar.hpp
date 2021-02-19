@@ -13,9 +13,10 @@ namespace gui
     {
         Image *img = nullptr;
 
+      protected:
+        void update() override;
+
       public:
         SignalStrengthWidgetBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-
-        void show(const Store::SignalStrength data, bool shown) override;
     };
 } // namespace gui

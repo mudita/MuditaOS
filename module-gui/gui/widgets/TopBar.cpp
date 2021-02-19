@@ -12,6 +12,7 @@
 #include "TopBar/BatteryWidgetText.hpp"
 #include "TopBar/SignalStrengthWidgetBar.hpp"
 #include "TopBar/SignalStrengthWidgetText.hpp"
+#include "TopBar/NetworkAccessTechnologyWidget.hpp"
 #include "common_data/EventStore.hpp"
 
 namespace gui::top_bar
@@ -104,13 +105,8 @@ namespace gui::top_bar
         timeLabel->setText("00:00");
         timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
 
-        networkAccessTechnologyLabel =
-            new Label(this, networkTechnology::x, networkTechnology::y, networkTechnology::w, networkTechnology::h);
-        networkAccessTechnologyLabel->setFilled(false);
-        networkAccessTechnologyLabel->setBorderColor(gui::ColorNoColor);
-        networkAccessTechnologyLabel->setFont(style::header::font::modes);
-        networkAccessTechnologyLabel->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        networkAccessTechnologyWidget = new NetworkAccessTechnologyWidget(
+            this, networkTechnology::x, networkTechnology::y, networkTechnology::w, networkTechnology::h);
         updateNetworkAccessTechnology();
     }
 
@@ -137,7 +133,12 @@ namespace gui::top_bar
     {
         switch (indicator) {
         case Indicator::Signal:
-            updateSignalStrength();
+            if (enabled) {
+                signalWidget->show();
+                updateSignalStrength();
+                break;
+            }
+            signalWidget->hide();
             break;
         case Indicator::Time:
             timeLabel->setVisible(enabled);
@@ -152,20 +153,30 @@ namespace gui::top_bar
             }
             break;
         case Indicator::Battery:
-            batteryWidget->show(Store::Battery::get(), enabled);
+            if (enabled) {
+                batteryWidget->show();
+                updateBattery();
+                break;
+            }
+            batteryWidget->hide();
             break;
         case Indicator::SimCard:
             showSim(enabled);
             break;
         case Indicator::NetworkAccessTechnology:
-            updateNetworkAccessTechnology();
+            if (enabled) {
+                networkAccessTechnologyWidget->show();
+                updateNetworkAccessTechnology();
+                break;
+            }
+            networkAccessTechnologyWidget->hide();
             break;
         }
     }
 
     bool TopBar::updateBattery()
     {
-        batteryWidget->show(Store::Battery::get(), configuration.isEnabled(Indicator::Battery));
+        batteryWidget->update(Store::Battery::get());
         return true;
     }
 
@@ -181,39 +192,15 @@ namespace gui::top_bar
     bool TopBar::updateSignalStrength()
     {
         auto signalStrength = Store::GSM::get()->getSignalStrength();
-        signalWidget->show(signalStrength, configuration.isEnabled(Indicator::Signal));
+        signalWidget->update(signalStrength);
 
         return true;
     }
 
     bool TopBar::updateNetworkAccessTechnology()
     {
-        if (configuration.isEnabled(Indicator::NetworkAccessTechnology)) {
-            auto accessTechnology = Store::GSM::get()->getNetwork().accessTechnology;
-
-            constexpr auto text2g  = "2G";
-            constexpr auto text3g  = "3G";
-            constexpr auto textLte = "LTE";
-
-            switch (accessTechnology) {
-            case Store::Network::AccessTechnology::Gsm:
-            case Store::Network::AccessTechnology::GsmWEgprs:
-                networkAccessTechnologyLabel->setText(text2g);
-                break;
-            case Store::Network::AccessTechnology::Utran:
-            case Store::Network::AccessTechnology::UtranWHsdpa:
-            case Store::Network::AccessTechnology::UtranWHsupa:
-            case Store::Network::AccessTechnology::UtranWHsdpaAndWHsupa:
-                networkAccessTechnologyLabel->setText(text3g);
-                break;
-            case Store::Network::AccessTechnology::EUtran:
-                networkAccessTechnologyLabel->setText(textLte);
-                break;
-            case Store::Network::AccessTechnology::Unknown:
-                networkAccessTechnologyLabel->setText("");
-                break;
-            }
-        }
+        auto accessTechnology = Store::GSM::get()->getNetwork().accessTechnology;
+        networkAccessTechnologyWidget->update(accessTechnology);
         return true;
     }
 
