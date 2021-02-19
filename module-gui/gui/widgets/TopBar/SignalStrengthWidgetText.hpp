@@ -10,12 +10,13 @@ namespace gui
     class Label;
     class SignalStrengthWidgetText : public SignalStrengthWidgetBase
     {
-      public:
-        SignalStrengthWidgetText(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-
-        void show(const Store::SignalStrength data, bool shown) override;
-
       private:
         Label *label = nullptr;
+
+      protected:
+        void update() override;
+
+      public:
+        SignalStrengthWidgetText(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
     };
 } // namespace gui
