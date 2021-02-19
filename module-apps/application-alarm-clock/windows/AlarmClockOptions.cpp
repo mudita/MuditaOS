@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmClockOptions.hpp"
@@ -23,18 +23,18 @@ namespace app::alarmClock
                          Application *application,
                          AbstractAlarmsRepository &alarmsRepository)
         {
-            gui::DialogMetadata meta;
-            meta.text   = utils::localize.get("app_alarm_clock_delete_confirmation");
-            meta.title  = utils::localize.get("app_alarm_clock_title_main");
-            meta.icon   = "phonebook_contact_delete_trashcan";
-            meta.action = [record, application, &alarmsRepository] {
-                alarmsRepository.remove(
-                    record, [application](bool) { application->switchWindow(gui::name::window::main_window); });
-                return true;
-            };
-
-            application->switchWindow(style::alarmClock::window::name::dialogYesNo,
-                                      std::make_unique<gui::DialogMetadataMessage>(meta));
+            auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+                gui::DialogMetadata{utils::localize.get("app_alarm_clock_title_main"),
+                                    "phonebook_contact_delete_trashcan",
+                                    utils::localize.get("app_alarm_clock_delete_confirmation"),
+                                    "",
+                                    [record, application, &alarmsRepository] {
+                                        alarmsRepository.remove(record, [application](bool) {
+                                            application->switchWindow(gui::name::window::main_window);
+                                        });
+                                        return true;
+                                    }});
+            application->switchWindow(style::alarmClock::window::name::dialogYesNo, std::move(metaData));
         }
     } // namespace
 

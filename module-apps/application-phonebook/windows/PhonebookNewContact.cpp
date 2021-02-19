@@ -204,7 +204,6 @@ namespace gui
 
     void PhonebookNewContact::showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber)
     {
-        std::unique_ptr<DialogMetadata> meta = std::make_unique<DialogMetadata>();
         auto matchedContact   = DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber);
         auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
 
@@ -212,21 +211,19 @@ namespace gui
             contact->ID = oldContactRecord.ID;
         }
 
-        meta->action = [=]() -> bool {
-            if (!DBServiceAPI::ContactUpdate(application, *contact)) {
-                LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
-                return false;
-            }
-            application->switchWindow(gui::name::window::main_window);
-            return true;
-        };
         std::string duplicatedNumberPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
         phonebookUtils::fillContactData(duplicatedNumberPhrase, oldContactRecord);
-        meta->text  = duplicatedNumberPhrase;
-        meta->title = duplicatedNumber.getFormatted();
-        meta->icon  = "info_big_circle_W_G";
-        application->switchWindow(gui::window::name::dialog_yes_no,
-                                  std::make_unique<gui::DialogMetadataMessage>(std::move(*meta)));
+
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+            duplicatedNumber.getFormatted(), "info_big_circle_W_G", duplicatedNumberPhrase, "", [=]() -> bool {
+                if (!DBServiceAPI::ContactUpdate(application, *contact)) {
+                    LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
+                    return false;
+                }
+                application->switchWindow(gui::name::window::main_window);
+                return true;
+            }});
+        application->switchWindow(gui::window::name::dialog_yes_no, std::move(metaData));
     }
 
     void PhonebookNewContact::showDialogDuplicatedSpeedDialNumber()
@@ -238,26 +235,25 @@ namespace gui
             contact->ID = oldContactRecord.ID;
         }
 
-        std::unique_ptr<DialogMetadata> metadata = std::make_unique<DialogMetadata>();
-        metadata->action                         = [=]() -> bool {
-            if (!DBServiceAPI::ContactUpdate(application, *contact)) {
-                LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
-                return false;
-            }
-            application->switchWindow(gui::name::window::main_window);
-            return true;
-        };
         std::string duplicatedSpeedDialPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
         phonebookUtils::fillContactData(duplicatedSpeedDialPhrase, oldContactRecord);
         std::string duplicatedSpeedDialTitle = utils::localize.get("app_phonebook_duplicate_speed_dial_title");
         phonebookUtils::fillContactData(duplicatedSpeedDialTitle, oldContactRecord);
-        metadata->text     = duplicatedSpeedDialPhrase;
-        metadata->title    = duplicatedSpeedDialTitle;
-        metadata->icon     = "phonebook_empty_grey_circle_speed_dial";
-        metadata->iconText = contact->speeddial;
 
-        application->switchWindow(gui::window::name::dialog_yes_no_icon_txt,
-                                  std::make_unique<gui::DialogMetadataMessage>(std::move(*metadata)));
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{duplicatedSpeedDialTitle,
+                                "phonebook_empty_grey_circle_speed_dial",
+                                duplicatedSpeedDialPhrase,
+                                contact->speeddial,
+                                [=]() -> bool {
+                                    if (!DBServiceAPI::ContactUpdate(application, *contact)) {
+                                        LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
+                                        return false;
+                                    }
+                                    application->switchWindow(gui::name::window::main_window);
+                                    return true;
+                                }});
+        application->switchWindow(gui::window::name::dialog_yes_no_icon_txt, std::move(metaData));
     }
 
 } // namespace gui

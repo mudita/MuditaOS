@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventsRecord.hpp"
@@ -356,9 +356,9 @@ auto CalendarEventsHelper::ICalEventFromJson(json11::Json eventObj) const -> ICa
 
 auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 {
-    auto eventsJsonObj   = context.getBody();
-    auto eventsJsonArray = eventsJsonObj[json::calendar::events].array_items();
-    bool ret             = true;
+    const auto eventsJsonObj   = context.getBody();
+    const auto eventsJsonArray = eventsJsonObj[json::calendar::events].array_items();
+    bool ret                   = true;
     for (auto event : eventsJsonArray) {
 
         auto icalEvent = ICalEventFromJson(event);

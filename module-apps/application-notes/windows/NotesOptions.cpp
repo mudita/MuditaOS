@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesOptions.hpp"
@@ -26,16 +26,19 @@ namespace app::notes
 
         void removeNote(const NotesRecord &record, Application *application, AbstractNotesRepository &notesRepository)
         {
-            gui::DialogMetadata meta;
-            meta.action = [record, application, &notesRepository] {
-                notesRepository.remove(
-                    record, [application](bool) { application->switchWindow(gui::name::window::main_window); });
-                return true;
-            };
-            meta.text = utils::localize.get("app_notes_note_delete_confirmation");
-            meta.icon = "phonebook_contact_delete_trashcan";
-            application->switchWindow(gui::name::window::note_confirm_dialog,
-                                      std::make_unique<gui::DialogMetadataMessage>(meta));
+            auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+                gui::DialogMetadata{utils::localize.get("app_alarm_clock_title_main"),
+                                    "phonebook_contact_delete_trashcan",
+                                    utils::localize.get("app_notes_note_delete_confirmation"),
+                                    "",
+                                    [record, application, &notesRepository] {
+                                        notesRepository.remove(record, [application](bool) {
+                                            application->switchWindow(gui::name::window::main_window);
+                                        });
+                                        return true;
+                                    }});
+            application->switchWindow(
+                gui::name::window::note_confirm_dialog, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
         }
     } // namespace
 

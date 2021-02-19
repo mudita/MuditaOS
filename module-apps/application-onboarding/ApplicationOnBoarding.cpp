@@ -9,11 +9,16 @@
 #include "windows/StartConfigurationWindow.hpp"
 #include "windows/OnBoardingLanguagesWindow.hpp"
 #include "windows/EULALicenseWindow.hpp"
+#include "windows/ConfigurationSuccessfulDialogWindow.hpp"
+#include "windows/NoConfigurationDialogWindow.hpp"
+#include "windows/UpdateDialogWindow.hpp"
+#include "windows/SkipDialogWindow.hpp"
 
 #include <service-db/DBMessage.hpp>
 #include <module-services/service-appmgr/service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 #include <module-apps/application-settings-new/data/LanguagesData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <module-apps/windows/Dialog.hpp>
 
 namespace app
 {
@@ -104,6 +109,21 @@ namespace app
             auto presenter      = std::make_unique<app::onBoarding::EULALicenseWindowPresenter>([&]() { acceptEULA(); },
                                                                                            std::move(eulaRepository));
             return std::make_unique<app::onBoarding::EULALicenseWindow>(app, std::move(presenter));
+        });
+        windowsFactory.attach(gui::window::name::onBoarding_configuration_successful,
+                              [](Application *app, const std::string &name) {
+                                  return std::make_unique<app::onBoarding::ConfigurationSuccessfulDialogWindow>(app);
+                              });
+        windowsFactory.attach(gui::window::name::onBoarding_no_configuration,
+                              [](Application *app, const std::string &name) {
+                                  return std::make_unique<app::onBoarding::NoConfigurationDialogWindow>(app);
+                              });
+        windowsFactory.attach(gui::window::name::onBoarding_update, [](Application *app, const std::string &name) {
+            return std::make_unique<app::onBoarding::UpdateDialogWindow>(app);
+        });
+
+        windowsFactory.attach(gui::window::name::onBoarding_skip, [](Application *app, const std::string &name) {
+            return std::make_unique<app::onBoarding::SkipDialogWindow>(app);
         });
 
         attachPopups({gui::popup::ID::Volume});
