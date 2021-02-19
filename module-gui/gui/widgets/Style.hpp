@@ -147,6 +147,7 @@ namespace style
             inline constexpr auto use            = "common_use";
             inline constexpr auto ok             = "common_ok";
             inline constexpr auto back           = "common_back";
+            inline constexpr auto skip           = "common_skip";
             inline constexpr auto set            = "common_set";
             inline constexpr auto yes            = "common_yes";
             inline constexpr auto no             = "common_no";

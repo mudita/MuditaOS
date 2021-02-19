@@ -190,12 +190,13 @@ namespace app
             auto result = dynamic_cast<ContactGetByIDResult *>(response);
             if (result != nullptr) {
                 const auto &contact = result->getResult();
-                gui::DialogMetadata meta;
-                meta.action = [this, record]() { return onRemoveSmsThreadConfirmed(*record); };
-                meta.text   = utils::localize.get("app_messages_thread_delete_confirmation");
-                meta.title  = contact.getFormattedName();
-                meta.icon   = "phonebook_contact_delete_trashcan";
-                switchWindow(gui::name::window::dialog_yes_no, std::make_unique<gui::DialogMetadataMessage>(meta));
+                auto metaData       = std::make_unique<gui::DialogMetadataMessage>(
+                    gui::DialogMetadata{contact.getFormattedName(),
+                                        "phonebook_contact_delete_trashcan",
+                                        utils::localize.get("app_messages_thread_delete_confirmation"),
+                                        "",
+                                        [this, record]() { return onRemoveSmsThreadConfirmed(*record); }});
+                switchWindow(gui::name::window::dialog_yes_no, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
                 return true;
             }
             return false;
@@ -227,14 +228,13 @@ namespace app
     bool ApplicationMessages::removeSms(const SMSRecord &record)
     {
         LOG_DEBUG("Removing sms: %" PRIu32, record.ID);
-
-        gui::DialogMetadata meta;
-        meta.action = [this, record] { return onRemoveSmsConfirmed(record); };
-        meta.text   = utils::localize.get("app_messages_message_delete_confirmation");
-        meta.title  = record.body;
-        meta.icon   = "phonebook_contact_delete_trashcan";
-
-        switchWindow(gui::name::window::dialog_yes_no, std::make_unique<gui::DialogMetadataMessage>(meta));
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{record.body,
+                                "phonebook_contact_delete_trashcan",
+                                utils::localize.get("app_messages_message_delete_confirmation"),
+                                "",
+                                [this, record] { return onRemoveSmsConfirmed(record); }});
+        switchWindow(gui::name::window::dialog_yes_no, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
         return true;
     }
 
@@ -285,6 +285,7 @@ namespace app
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         data->ignoreCurrentWindowOnStack = true;
         switchWindow(gui::name::window::dialog, std::make_unique<gui::DialogMetadataMessage>(meta));
+
         return true;
     }
 

@@ -102,17 +102,19 @@ namespace gui
             lockState = lockHandler.checkPasscode(app->getLockPassHash());
             if (ChangePasscodeAction::OnlyCheckCurrentPasscode == changePasscodeAction &&
                 lockState == PinLock::LockState::NewPasscodeRequired) {
-                DialogMetadata meta;
-                meta.icon   = "big_circle_placeholder";
-                meta.text   = utils::localize.get("app_settings_security_passcode_disabled");
-                meta.title  = utils::localize.get("app_settings_security_change_passcode");
-                meta.action = [this]() {
-                    application->switchWindow(gui::window::name::security);
-                    return true;
-                };
                 application->setLockScreenPasscodeOn(false);
-                application->switchWindow(gui::window::name::dialog_confirm,
-                                          std::make_unique<gui::DialogMetadataMessage>(meta));
+
+                auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+                    gui::DialogMetadata{utils::localize.get("app_settings_security_change_passcode"),
+                                        "big_circle_placeholder",
+                                        utils::localize.get("app_settings_security_passcode_disabled"),
+                                        "",
+                                        [this]() {
+                                            application->switchWindow(gui::window::name::security);
+                                            return true;
+                                        }});
+                application->switchWindow(
+                    gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
                 return;
             }
             break;
@@ -162,17 +164,19 @@ namespace gui
             break;
         }
         case PinLock::LockState::Unlocked: {
-            DialogMetadata meta;
-            meta.icon   = "big_circle_placeholder";
-            meta.text   = utils::localize.get("app_settings_security_passcode_changed_successfully");
-            meta.title  = utils::localize.get("app_settings_security_change_passcode");
-            meta.action = [this]() {
-                application->switchWindow(gui::window::name::security);
-                return true;
-            };
             application->setLockScreenPasscodeOn(true);
-            application->switchWindow(gui::window::name::dialog_confirm,
-                                      std::make_unique<gui::DialogMetadataMessage>(meta));
+
+            auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+                gui::DialogMetadata{utils::localize.get("app_settings_security_change_passcode"),
+                                    "big_circle_placeholder",
+                                    utils::localize.get("app_settings_security_passcode_changed_successfully"),
+                                    "",
+                                    [this]() {
+                                        application->switchWindow(gui::window::name::security);
+                                        return true;
+                                    }});
+            application->switchWindow(
+                gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
             break;
         }
         default: {

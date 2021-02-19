@@ -7,9 +7,13 @@
 
 namespace gui::window::name
 {
-    inline constexpr auto onBoarding_languages           = "OnBoardingLanguages";
-    inline constexpr auto onBoarding_start_configuration = "OnBoardingStartingConfiguration";
-    inline constexpr auto onBoarding_eula                = "OnBoardingEula";
+    inline constexpr auto onBoarding_languages                = "OnBoardingLanguages";
+    inline constexpr auto onBoarding_start_configuration      = "OnBoardingStartingConfiguration";
+    inline constexpr auto onBoarding_eula                     = "OnBoardingEula";
+    inline constexpr auto onBoarding_configuration_successful = "OnBoardingConfigurationSuccessful";
+    inline constexpr auto onBoarding_no_configuration         = "OnBoardingNoConfiguration";
+    inline constexpr auto onBoarding_update                   = "OnBoardingUpdate";
+    inline constexpr auto onBoarding_skip                     = "OnBoardingSkipConfirm";
 } // namespace gui::window::name
 
 namespace app

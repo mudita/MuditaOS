@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,7 @@
 #include <Text.hpp>
 #include <functional>
 #include <DialogMetadata.hpp>
+#include <module-gui/gui/widgets/Icon.hpp>
 
 namespace gui::window::name
 {
@@ -16,7 +17,31 @@ namespace gui::window::name
 
 namespace gui
 {
-    class Image;
+    namespace dialog
+    {
+        enum Option
+        {
+            YES,
+            NO
+        };
+
+        namespace style
+        {
+            namespace option
+            {
+                inline constexpr auto w         = 150;
+                inline constexpr auto h         = 75;
+                inline constexpr auto margin    = 30;
+                inline constexpr auto iconTextH = 99;
+            } // namespace option
+
+            namespace iconTextLabel
+            {
+                inline constexpr auto h = 188;
+            } // namespace iconTextLabel
+
+        } // namespace style
+    }     // namespace dialog
 
     /// @brief base Dialog class
     ///
@@ -24,8 +49,7 @@ namespace gui
     class Dialog : public AppWindow
     {
       protected:
-        Text *text  = nullptr;
-        Image *icon = nullptr;
+        Icon *icon = nullptr;
 
       public:
         Dialog(app::Application *app, const std::string &name);
@@ -51,12 +75,17 @@ namespace gui
     class DialogYesNo : public Dialog
     {
       protected:
-        Label *yes = nullptr, *no = nullptr;
+        Label *yes = nullptr;
+        Label *no  = nullptr;
+        HBox *hBox = nullptr;
 
       public:
         DialogYesNo(app::Application *app, const std::string &name);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+
+      private:
+        Label *createYesNoOption(Item *parent, const gui::dialog::Option &optionName);
     };
 
     /// @brief Yes/No Icon Text  Dialog class
@@ -65,7 +94,7 @@ namespace gui
     class DialogYesNoIconTxt : public DialogYesNo
     {
       protected:
-        Text *iconText = nullptr;
+        Label *iconText = nullptr;
 
       public:
         DialogYesNoIconTxt(app::Application *app, const std::string &name);

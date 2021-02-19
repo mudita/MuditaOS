@@ -42,9 +42,6 @@ NoEvents::NoEvents(app::Application *app, const std::string &name) : gui::Dialog
 {
     arrow = new gui::Image(this, style::arrow::x, style::arrow::y, 0, 0, "arrow_left");
     cross = new gui::Image(this, style::cross::x, style::cross::y, 0, 0, "cross");
-
-    icon->setPosition(style::icon::x, style::icon::y);
-    text->setPosition(style::text::x, style::text::y);
 }
 
 void NoEvents::onBeforeShow(ShowMode mode, SwitchData *data)

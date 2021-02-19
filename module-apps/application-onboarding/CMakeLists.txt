@@ -10,7 +10,7 @@ include_directories( ${PROJECT_NAME}
 
 target_sources(${PROJECT_NAME}
 
-	PRIVATE
+		PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationOnBoarding.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/StartConfigurationWindow.cpp"
@@ -18,7 +18,11 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EULALicenseWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/presenter/EULALicenseWindowPresenter.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/model/EULARepository.cpp"
-	PUBLIC
+		"${CMAKE_CURRENT_LIST_DIR}/windows/ConfigurationSuccessfulDialogWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/NoConfigurationDialogWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/UpdateDialogWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/SkipDialogWindow.cpp"
+		PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationOnBoarding.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingMainWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/StartConfigurationWindow.hpp"
@@ -27,7 +31,12 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EULALicenseWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/presenter/EULALicenseWindowPresenter.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/model/EULARepository.hpp"
-)
+		"${CMAKE_CURRENT_LIST_DIR}/windows/ConfigurationSuccessfulDialogWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/NoConfigurationDialogWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/UpdateDialogWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/SkipDialogWindow.hpp"
+
+		)
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         service-db
