@@ -64,7 +64,6 @@ BUILD_TYPE=$2
 
 if check_target && check_build_type ; then
     shift 2
-
     BUILD_DIR="build-${TARGET,,}-${CMAKE_BUILD_TYPE}"
     echo -e "build dir:\e[34m\n\t${BUILD_DIR}\e[0m"
     SRC_DIR=`pwd`
@@ -86,7 +85,12 @@ if check_target && check_build_type ; then
                     ${SRC_DIR} "
         echo -e "\e[32m${CMAKE_CMD}\e[0m" | tr -s " "
         if $CMAKE_CMD; then
-            echo -e "\e[32mcd ${BUILD_DIR} && make -j\e[0m"
+            Ninja=$(echo $@ | grep "Ninja")
+            if [[ -z ${Ninja} ]]; then
+                echo -e "\e[32mcd ${BUILD_DIR} && make -j $(nproc)\e[0m"
+            else
+                echo -e "\e[32mcd ${BUILD_DIR} && ninja\e[0m"
+            fi
         else
             echo -e "configuration error!"
         fi

@@ -5,7 +5,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 project(PurePhone)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/config")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 include(Colours)
 include(CCacheConfig)
@@ -396,7 +396,7 @@ add_custom_target(
     COMMAND ${CMAKE_COMMAND}
     -DSRC_DIR=${CMAKE_SOURCE_DIR}
     -B ${CMAKE_BINARY_DIR}
-    -P ${CMAKE_SOURCE_DIR}/config/GenVersionHpp.cmake
+    -P ${CMAKE_SOURCE_DIR}/cmake/modules/GenVersionHpp.cmake
     COMMENT
         "Generating version info"
     )
