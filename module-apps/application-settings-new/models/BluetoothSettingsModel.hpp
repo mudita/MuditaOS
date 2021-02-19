@@ -17,6 +17,10 @@ class BluetoothSettingsModel
 
     void requestStatus();
     void setStatus(bool desiredBluetoothState, bool desiredVisibility);
+    void requestDeviceName();
+    void setDeviceName(const UTF8 &deviceName);
+    void requestBondedDevices();
+    void requestScan();
     void stopScan();
     void setAddrForAudioProfiles(std::string addr);
 

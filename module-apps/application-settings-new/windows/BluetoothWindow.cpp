@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothWindow.hpp"
+#include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/data/BluetoothStatusData.hpp"
 
 #include "OptionSetting.hpp"
@@ -9,7 +10,7 @@
 namespace gui
 {
 
-    BluetoothWindow::BluetoothWindow(app::Application *app, std::string name) : BaseSettingsWindow(app, std::move(name))
+    BluetoothWindow::BluetoothWindow(app::Application *app) : BaseSettingsWindow(app, window::name::bluetooth)
     {
         bluetoothSettingsModel = std::make_unique<BluetoothSettingsModel>(application);
         bluetoothSettingsModel->requestStatus();

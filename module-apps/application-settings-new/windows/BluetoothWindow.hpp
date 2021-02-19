@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/models/BluetoothSettingsModel.hpp"
 #include "BaseSettingsWindow.hpp"
 
@@ -12,7 +11,7 @@ namespace gui
     class BluetoothWindow : public BaseSettingsWindow
     {
       public:
-        explicit BluetoothWindow(app::Application *app, std::string name = window::name::bluetooth);
+        explicit BluetoothWindow(app::Application *app);
 
       private:
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
