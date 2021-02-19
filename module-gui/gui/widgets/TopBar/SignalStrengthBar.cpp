@@ -1,12 +1,12 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "SignalStrengthWidgetBar.hpp"
+#include "SignalStrengthBar.hpp"
 #include <string>
 #include <Image.hpp>
 #include <unordered_map>
 
-namespace gui
+namespace gui::top_bar
 {
     namespace
     {
@@ -26,17 +26,17 @@ namespace gui
                                      {Store::RssiBar::five, signal5}};
     } // namespace
 
-    SignalStrengthWidgetBar::SignalStrengthWidgetBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
-        : SignalStrengthWidgetBase(parent, x, y, w, h)
+    SignalStrengthBar::SignalStrengthBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+        : SignalStrengthBase(parent, x, y, w, h)
     {
         img                             = new Image(this, signalMap.at(Store::RssiBar::zero));
         constexpr auto signalBarMarginX = 10u;
         img->setMargins(gui::Margins(signalBarMarginX, 0, 0, 0));
     }
 
-    void SignalStrengthWidgetBar::update()
+    void SignalStrengthBar::update()
     {
         img->set(signalMap.at(signalStrength.rssiBar));
     }
 
-} // namespace gui
+} // namespace gui::top_bar

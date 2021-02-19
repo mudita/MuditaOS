@@ -4,6 +4,7 @@
 #include "AppWindow.hpp"
 #include "Application.hpp"
 #include "InputEvent.hpp"
+#include "TopBar.hpp"
 #include <Style.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <i18n/i18n.hpp>
@@ -67,28 +68,49 @@ namespace gui
         }
     }
 
-    bool AppWindow::setSIM()
+    bool AppWindow::updateSim()
     {
-        topBar->simSet();
-        return true;
+        if (topBar == nullptr) {
+            return false;
+        }
+        return topBar->updateSim();
     }
 
     bool AppWindow::updateBatteryStatus()
     {
-        if (topBar != nullptr) {
-            return topBar->updateBattery();
+        if (topBar == nullptr) {
+            return false;
         }
-        return false;
+        return topBar->updateBattery();
     }
     // updates battery level in the window
     bool AppWindow::updateSignalStrength()
     {
+        if (topBar == nullptr) {
+            return false;
+        }
         return topBar->updateSignalStrength();
     }
 
     bool AppWindow::updateNetworkAccessTechnology()
     {
+        if (topBar == nullptr) {
+            return false;
+        }
         return topBar->updateNetworkAccessTechnology();
+    }
+
+    bool AppWindow::updateTime()
+    {
+        applyToTopBar([](top_bar::Configuration configuration) {
+            configuration.set(utils::dateAndTimeSettings.isTimeFormat12() ? gui::top_bar::TimeMode::Time12h
+                                                                          : (gui::top_bar::TimeMode::Time24h));
+            return configuration;
+        });
+        if (topBar == nullptr) {
+            return false;
+        }
+        return topBar->updateTime();
     }
 
     void AppWindow::setTitle(const UTF8 &text)

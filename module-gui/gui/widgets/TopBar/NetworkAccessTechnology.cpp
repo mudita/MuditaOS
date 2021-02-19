@@ -1,13 +1,12 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "NetworkAccessTechnologyWidget.hpp"
+#include "NetworkAccessTechnology.hpp"
 #include "Item.hpp"
 
-namespace gui
+namespace gui::top_bar
 {
-    NetworkAccessTechnologyWidget::NetworkAccessTechnologyWidget(
-        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+    NetworkAccessTechnology::NetworkAccessTechnology(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : StatusBarWidgetBase(parent, x, y, w, h)
     {
         setFilled(false);
@@ -16,7 +15,7 @@ namespace gui
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
     }
 
-    void NetworkAccessTechnologyWidget::update(const Store::Network::AccessTechnology accessTechnology)
+    void NetworkAccessTechnology::update(const Store::Network::AccessTechnology accessTechnology)
     {
         _accessTechnology      = accessTechnology;
         constexpr auto text2g  = "2G";
@@ -42,4 +41,4 @@ namespace gui
             break;
         }
     }
-} // namespace gui
+} // namespace gui::top_bar

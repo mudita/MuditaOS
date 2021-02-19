@@ -3,21 +3,27 @@
 
 #include "SIM.hpp"
 
-namespace gui
+namespace gui::top_bar
 {
     using namespace Store;
 
-    SIM::SIM(Item *parent, uint32_t x, uint32_t y) : Image(parent, x, y, 0, 0)
+    constexpr auto sim1       = "sim1";       // sim 1 indicator
+    constexpr auto sim2       = "sim2";       // sim 2 indicator
+    constexpr auto simunknown = "simunknown"; // sim - unknown sim state indicator (i.e. no initialization was done)
+    constexpr auto simfailed  = "simfail";    // sim - notification for sim failure
+
+    SIM::SIM(Item *parent, uint32_t x, uint32_t y) : StatusBarWidgetBase(parent, x, y, 0, 0)
     {
         set(simunknown);
     }
 
-    void SIM::show(Store::GSM::SIM state)
+    void SIM::update(const Store::GSM::SIM &state)
     {
         if (state == current) {
             return;
         }
-        switch (state) {
+        current = state;
+        switch (current) {
         case GSM::SIM::SIM1:
             set(sim1);
             break;
@@ -34,4 +40,4 @@ namespace gui
             break;
         }
     }
-}; // namespace gui
+}; // namespace gui::top_bar

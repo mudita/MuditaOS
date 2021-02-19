@@ -1,18 +1,18 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BatteryWidgetBase.hpp"
+#include "BatteryBase.hpp"
 #include "BoxLayout.hpp"
 
-namespace gui
+namespace gui::top_bar
 {
-    BatteryWidgetBase::BatteryWidgetBase(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+    BatteryBase::BatteryBase(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : StatusBarWidgetBase(parent, x, y, w, h)
     {
         setBorderColor(gui::ColorNoColor);
     }
 
-    void BatteryWidgetBase::update(const Store::Battery &batteryContext)
+    void BatteryBase::update(const Store::Battery &batteryContext)
     {
         switch (batteryContext.state) {
         case Store::Battery::State::Discharging:
@@ -28,4 +28,4 @@ namespace gui
             break;
         }
     }
-} // namespace gui
+} // namespace gui::top_bar

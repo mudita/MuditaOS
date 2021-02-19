@@ -8,20 +8,23 @@
 #include "TopBar.hpp"
 #include <time/time_conversion.hpp>
 #include "Style.hpp"
-#include "TopBar/BatteryWidgetBar.hpp"
-#include "TopBar/BatteryWidgetText.hpp"
-#include "TopBar/SignalStrengthWidgetBar.hpp"
-#include "TopBar/SignalStrengthWidgetText.hpp"
-#include "TopBar/NetworkAccessTechnologyWidget.hpp"
+#include "TopBar/BatteryBar.hpp"
+#include "TopBar/BatteryText.hpp"
+#include "TopBar/SignalStrengthBar.hpp"
+#include "TopBar/SignalStrengthText.hpp"
+#include "TopBar/NetworkAccessTechnology.hpp"
+#include "TopBar/SIM.hpp"
+#include "TopBar/Time.hpp"
+#include "TopBar/Lock.hpp"
 #include "common_data/EventStore.hpp"
+#include "time/time_locale.hpp"
 
 namespace gui::top_bar
 {
     constexpr auto batteryWidgetAsText = true;
-    using BatteryWidgetType = std::conditional<batteryWidgetAsText, BatteryWidgetText, BatteryWidgetBar>::type;
+    using BatteryType                  = std::conditional<batteryWidgetAsText, BatteryText, BatteryBar>::type;
     constexpr auto signalWidgetAsText  = true;
-    using SignalWidgetType =
-        std::conditional<signalWidgetAsText, SignalStrengthWidgetText, SignalStrengthWidgetBar>::type;
+    using SignalType = std::conditional<signalWidgetAsText, SignalStrengthText, SignalStrengthBar>::type;
 
     namespace networkTechnology
     {
@@ -56,6 +59,16 @@ namespace gui::top_bar
         indicatorStatuses[indicator] = enabled;
     }
 
+    auto Configuration::getTimeMode() const noexcept -> TimeMode
+    {
+        return timeMode;
+    }
+
+    void Configuration::set(TimeMode _timeMode)
+    {
+        timeMode = _timeMode;
+    }
+
     auto Configuration::isEnabled(Indicator indicator) const -> bool
     {
         return indicatorStatuses.at(indicator);
@@ -76,32 +89,24 @@ namespace gui::top_bar
         setSize(480, 50);
         updateDrawArea();
 
-        preBuildDrawListHook = [this](std::list<Command> &) { setTime(utils::time::getHoursMinInCurrentTimeFormat()); };
+        preBuildDrawListHook = [this](std::list<Command> &) { updateTime(); };
     }
 
     void TopBar::prepareWidget()
     {
-        batteryWidget = new BatteryWidgetType(this, batteryOffset, 15, 60, 24);
-        signalWidget  = new SignalWidgetType(this, signalOffset, 17, 70, 24);
-
-        updateSignalStrength();
-
+        battery                      = new BatteryType(this, batteryOffset, 15, 60, 24);
+        signal                       = new SignalType(this, signalOffset, 17, 70, 24);
         const auto design_sim_offset = 376; // this offset is not final, but it is pixel Purefect
         sim                          = new SIM(this, design_sim_offset, 12);
 
-        // icon of the lock
-        lock = new gui::Image(this, 240 - 11, 17, 0, 0, "lock");
+        lock = new Lock(this, 240 - 11, 17);
 
-        // time label
-        timeLabel = new Label(this, 0, 0, 480, this->drawArea.h);
-        timeLabel->setFilled(false);
-        timeLabel->setBorderColor(gui::ColorNoColor);
-        timeLabel->setFont(style::header::font::time);
-        timeLabel->setText("00:00");
-        timeLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        time = new Time(this, 0, 0, 480, this->drawArea.h);
 
-        networkAccessTechnologyWidget = new NetworkAccessTechnologyWidget(
+        networkAccessTechnology = new NetworkAccessTechnology(
             this, networkTechnology::x, networkTechnology::y, networkTechnology::w, networkTechnology::h);
+
+        updateSignalStrength();
         updateNetworkAccessTechnology();
     }
 
@@ -118,6 +123,10 @@ namespace gui::top_bar
             config.disable(Indicator::Time);
         }
 
+        using namespace utils::time;
+        config.getTimeMode() == TimeMode::Time12h ? time->setFormat(Locale::format(Locale::TimeFormat::FormatTime12H))
+                                                  : time->setFormat(Locale::format(Locale::TimeFormat::FormatTime24H));
+
         for (auto [indicator, enabled] : config.getIndicatorsConfiguration()) {
             setIndicatorStatus(indicator, enabled);
         }
@@ -128,88 +137,115 @@ namespace gui::top_bar
     {
         switch (indicator) {
         case Indicator::Signal:
-            if (enabled) {
-                signalWidget->show();
-                updateSignalStrength();
-                break;
-            }
-            signalWidget->hide();
+            showSignalStrength(enabled);
             break;
         case Indicator::Time:
-            timeLabel->setVisible(enabled);
-            if (enabled) {
-                lock->setVisible(false);
-            }
+            showTime(enabled);
             break;
         case Indicator::Lock:
-            lock->setVisible(enabled);
-            if (enabled) {
-                timeLabel->setVisible(false);
-            }
+            showLock(enabled);
             break;
         case Indicator::Battery:
-            if (enabled) {
-                batteryWidget->show();
-                updateBattery();
-                break;
-            }
-            batteryWidget->hide();
+            showBattery(enabled);
             break;
         case Indicator::SimCard:
             showSim(enabled);
             break;
         case Indicator::NetworkAccessTechnology:
-            if (enabled) {
-                networkAccessTechnologyWidget->show();
-                updateNetworkAccessTechnology();
-                break;
-            }
-            networkAccessTechnologyWidget->hide();
+            showNetworkAccessTechnology(enabled);
             break;
         }
     }
 
     bool TopBar::updateBattery()
     {
-        batteryWidget->update(Store::Battery::get());
+        if (battery == nullptr) {
+            return false;
+        }
+        showBattery(configuration.isEnabled(Indicator::Battery));
         return true;
+    }
+
+    void TopBar::showBattery(bool enabled)
+    {
+        battery->update(Store::Battery::get());
+        enabled ? battery->show() : battery->hide();
     }
 
     void TopBar::showSim(bool enabled)
     {
-        if (!enabled) {
-            sim->setVisible(false);
-            return;
+        sim->update(Store::GSM::get()->sim);
+        enabled ? sim->show() : sim->hide();
+    }
+
+    bool TopBar::updateSim()
+    {
+        if (sim == nullptr) {
+            return false;
         }
-        sim->show(Store::GSM::get()->sim);
+        showSim(configuration.isEnabled(Indicator::SimCard));
+        return true;
+    }
+
+    void TopBar::showSignalStrength(bool enabled)
+    {
+        auto signalStrength = Store::GSM::get()->getSignalStrength();
+        signal->update(signalStrength);
+        enabled ? signal->show() : signal->hide();
     }
 
     bool TopBar::updateSignalStrength()
     {
-        auto signalStrength = Store::GSM::get()->getSignalStrength();
-        signalWidget->update(signalStrength);
-
+        if (signal == nullptr) {
+            return false;
+        }
+        showSignalStrength(configuration.isEnabled(Indicator::Signal));
         return true;
     }
 
     bool TopBar::updateNetworkAccessTechnology()
     {
-        auto accessTechnology = Store::GSM::get()->getNetwork().accessTechnology;
-        networkAccessTechnologyWidget->update(accessTechnology);
+        if (networkAccessTechnology == nullptr) {
+            return false;
+        }
+        showNetworkAccessTechnology(configuration.isEnabled(Indicator::NetworkAccessTechnology));
         return true;
     }
 
-    void TopBar::setTime(const UTF8 &value)
+    void TopBar::showNetworkAccessTechnology(bool enabled)
     {
-        timeLabel->setText(value);
+        networkAccessTechnology->update(Store::GSM::get()->getNetwork().accessTechnology);
+        enabled ? networkAccessTechnology->show() : networkAccessTechnology->hide();
     }
 
-    void TopBar::simSet()
+    void TopBar::showTime(bool enabled)
     {
-        if (sim == nullptr) {
+        time->update();
+        if (enabled) {
+            time->show();
+            lock->hide();
             return;
         }
-        showSim(configuration.isEnabled(Indicator::SimCard));
+        time->hide();
+    }
+
+    void TopBar::showLock(bool enabled)
+    {
+        if (enabled) {
+            lock->show();
+            time->hide();
+            return;
+        }
+        lock->hide();
+    }
+
+    bool TopBar::updateTime()
+    {
+        if (time == nullptr) {
+            return false;
+        }
+        showTime(configuration.isEnabled(Indicator::Time));
+        return true;
     }
 
     void TopBar::accept(GuiVisitor &visitor)

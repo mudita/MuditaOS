@@ -83,11 +83,11 @@ namespace utils::time
     Timestamp::Timestamp()
     {
         auto err     = bsp::rtc_GetCurrentTimestamp(&time);
-        auto curTime = time + utils::time::Time::getTimeZoneOffset();
+        time += utils::time::Time::getTimeZoneOffset();
         if (err) {
             LOG_ERROR("rtc_GetCurrentTimestamp failure!");
         }
-        timeinfo = *localtime(&curTime);
+        timeinfo = *localtime(&time);
     }
 
     void Timestamp::set_time(time_t newtime)

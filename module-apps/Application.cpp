@@ -2,12 +2,13 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
-#include "Common.hpp"                    // for RefreshModes
-#include "GuiTimer.hpp"                  // for GuiTimer
-#include "Item.hpp"                      // for Item
-#include "MessageType.hpp"               // for MessageType
-#include "Service/Timer.hpp"             // for Timer
-#include "Timer.hpp"                     // for Timer
+#include "Common.hpp"        // for RefreshModes
+#include "GuiTimer.hpp"      // for GuiTimer
+#include "Item.hpp"          // for Item
+#include "MessageType.hpp"   // for MessageType
+#include "Service/Timer.hpp" // for Timer
+#include "Timer.hpp"         // for Timer
+#include "TopBar.hpp"
 #include "Translator.hpp"                // for KeyInputSim...
 #include "common_data/EventStore.hpp"    // for Battery
 #include "common_data/RawKey.hpp"        // for RawKey, key...
@@ -25,10 +26,10 @@
 #include "task.h"                               // for xTaskGetTic...
 #include "windows/AppWindow.hpp"                // for AppWindow
 #include "DOMResponder.hpp"
-#include <Text.hpp>                             // for Text
-#include <algorithm>                            // for find
-#include <iterator>                             // for distance, next
-#include <type_traits>                          // for add_const<>...
+#include <Text.hpp>    // for Text
+#include <algorithm>   // for find
+#include <iterator>    // for distance, next
+#include <type_traits> // for add_const<>...
 #include <WindowsFactory.hpp>
 #include <service-gui/Common.hpp>
 #include <module-utils/Utils.hpp>
@@ -88,6 +89,8 @@ namespace app
           settings(std::make_unique<settings::Settings>(this))
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
+        topBarManager->set(utils::dateAndTimeSettings.isTimeFormat12() ? gui::top_bar::TimeMode::Time12h
+                                                                       : gui::top_bar::TimeMode::Time24h);
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 
         longPressTimer = std::make_unique<sys::Timer>("LongPress", this, key_timer_ms);
@@ -149,9 +152,10 @@ namespace app
         if (state == State::ACTIVE_FORGROUND) {
             auto window = getCurrentWindow();
             window->updateBatteryStatus();
-            window->setSIM();
+            window->updateSim();
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
+            window->updateTime();
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
             if (shutdownInProgress) {
@@ -309,7 +313,7 @@ namespace app
 
     sys::MessagePointer Application::handleBatteryStatusChange()
     {
-        if (getCurrentWindow()->updateBatteryStatus()) {
+        if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateBatteryStatus()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return msgHandled();
@@ -317,7 +321,7 @@ namespace app
 
     sys::MessagePointer Application::handleMinuteUpdated(sys::Message *msgl)
     {
-        if (state == State::ACTIVE_FORGROUND) {
+        if (state == State::ACTIVE_FORGROUND && getCurrentWindow()->updateTime()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return msgHandled();
@@ -488,8 +492,9 @@ namespace app
 
     sys::MessagePointer Application::handleSIMMessage(sys::Message *msgl)
     {
-        getCurrentWindow()->setSIM();
-        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        if (getCurrentWindow()->updateSim()) {
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
         return msgHandled();
     }
 
@@ -709,11 +714,6 @@ namespace app
     void Application::addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback)
     {
         receivers.insert_or_assign(actionId, std::move(callback));
-    }
-
-    void Application::timeFormatChanged(std::string value)
-    {
-        timeFormat12 = utils::getNumericValue<bool>(value);
     }
 
     void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
