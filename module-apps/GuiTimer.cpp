@@ -44,17 +44,13 @@ namespace app
     {}
 
     GuiTimer::GuiTimer(const std::string &name, Application *parent, gui::ms timeout, gui::Timer::Type type)
-        : sys::Timer(name, parent, timeout, toSysTimerType(type), sys::UserTimerIDGenerator()), sysapi{*this, parent}
+        : sys::Timer(name, parent, timeout, toSysTimerType(type)), sysapi{*this}
     {}
 
     void GuiTimer::Sysapi::connect(gui::Item *item)
     {
         if (item != nullptr) {
-            parent.connect([item, this](sys::Timer &timer) {
-                if (item->onTimer(parent)) {
-                    app->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                }
-            });
+            parent.connect([item, this](sys::Timer &timer) { item->onTimer(parent); });
         }
     }
 } // namespace app
