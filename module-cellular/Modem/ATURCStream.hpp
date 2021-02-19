@@ -8,7 +8,7 @@
 
 namespace at
 {
-    constexpr auto urcStart = "\r\n+";
+    constexpr auto urcStart = "\r\n";
 
     class ATURCStream
     {
