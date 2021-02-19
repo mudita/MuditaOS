@@ -73,23 +73,23 @@ namespace app
               data{std::move(data)}, returnApplication{returnApplication}, returnWindow{returnWindow} {};
         virtual ~AppSwitchMessage(){};
 
-        std::string getTargetWindowName()
+        [[nodiscard]] std::string getTargetWindowName() const
         {
             return targetWindow;
         };
-        std::string getReturnWindowName()
+        [[nodiscard]] std::string getReturnWindowName() const
         {
             return returnWindow;
         };
-        std::unique_ptr<gui::SwitchData> &getData()
+        [[nodiscard]] std::unique_ptr<gui::SwitchData> &getData()
         {
             return data;
         };
-        std::string getTargetApplicationName()
+        [[nodiscard]] std::string getTargetApplicationName() const
         {
             return targetApplication;
         };
-        std::string getReturnApplicationName()
+        [[nodiscard]] std::string getReturnApplicationName() const
         {
             return returnApplication;
         };
@@ -229,4 +229,4 @@ namespace app
         AppLostFocusMessage() : AppMessage{MessageType::AppFocusLost}
         {}
     };
-};     // namespace app
+} // namespace app

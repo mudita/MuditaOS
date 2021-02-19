@@ -29,6 +29,7 @@ set( SOURCES
     "widgets/ButtonOnOff.cpp"
     "widgets/InputBox.cpp"
     "popups/VolumeWindow.cpp"
+    "popups/WindowWithTimer.cpp"
     "windows/BrightnessWindow.cpp"
     "windows/HomeModesWindow.cpp"
     "widgets/BrightnessBox.cpp"

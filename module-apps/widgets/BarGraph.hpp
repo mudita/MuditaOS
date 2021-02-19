@@ -20,15 +20,15 @@ namespace gui
     {
       protected:
         std::vector<gui::Rect *> rectangles;
-        uint32_t numberOfRectangles;
-        uint32_t currentLevel = 0;
+        std::uint32_t numberOfRectangles;
+        std::uint32_t currentLevel = 0;
 
-        [[nodiscard]] auto createRectangle(uint32_t width, uint32_t height) const -> Rect *;
+        [[nodiscard]] auto createRectangle(std::uint32_t width, std::uint32_t height) const -> Rect *;
 
       public:
         void setPercentageValue(unsigned int value) override;
 
-        [[nodiscard]] auto getValue() const -> uint32_t
+        [[nodiscard]] auto getValue() const -> std::uint32_t
         {
             return currentLevel;
         }
