@@ -50,11 +50,6 @@ namespace gui
         timer->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         timer->setEditMode(EditMode::Browse);
 
-        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
-            setArea({newDim.x, newDim.y, newDim.w, newDim.h});
-            return true;
-        };
-
         onReset();
     }
 
@@ -69,6 +64,7 @@ namespace gui
     {
         updateTimer();
         progressBar->setPercentageValue(calculatePercentageValue());
+        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }
 
     void MeditationTimer::updateTimer()
@@ -78,6 +74,13 @@ namespace gui
         const auto secondsRemaining = duration - elapsed;
         const Duration remainingDuration{std::time_t{secondsRemaining.count()}};
         timer->setText(remainingDuration.str(Duration::DisplayedFormat::Fixed0M0S));
+    }
+
+    auto MeditationTimer::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) -> bool
+    {
+        setPosition(newDim.x, newDim.y);
+        setSize(newDim.w, newDim.h);
+        return true;
     }
 
     void MeditationTimer::reset(std::chrono::seconds _duration, std::chrono::seconds _intervalPeriod) noexcept
@@ -110,7 +113,8 @@ namespace gui
     auto MeditationTimer::onTimerTimeout(Item &self, Timer &timerTask) -> bool
     {
         if (isStopped() || isFinished()) {
-            application->getTimers().detachTimer("MeditationTimer");
+            timerTask.stop();
+            detachTimer(timerTask);
 
             if (isFinished() && timeoutCallback != nullptr) {
                 timeoutCallback();

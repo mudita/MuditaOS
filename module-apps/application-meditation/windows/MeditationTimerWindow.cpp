@@ -68,10 +68,12 @@ void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
         setVisibleRunning();
         auto onMeditationEnd = [&]() -> void {
             setVisibleMeditationEnd();
+            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         };
         timer->registerTimeoutCallback(onMeditationEnd);
         timer->reset(meditationTime, meditationIntervalPeriod);
         timer->start();
+        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     };
 
     timer->registerTimeoutCallback(onPreparation);
