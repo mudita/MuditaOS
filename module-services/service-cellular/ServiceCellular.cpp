@@ -199,6 +199,8 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
     notificationCallback = [this](std::string &data) {
         LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
 
+        std::string logStr = utils::removeNewLines(data);
+        LOG_DEBUG("Data: %s", logStr.c_str());
         atURCStream.write(data);
         auto vUrc = atURCStream.getURCList();
 
