@@ -19,7 +19,7 @@
 		"${CMAKE_CURRENT_LIST_DIR}/models/NewEditEventModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/DayEventsModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/DateTimeModel.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/models/AllEventsDatabaseModel.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/models/MultiDayEventsDatabaseModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DayEventsItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/AllEventsItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/CalendarListView.cpp"

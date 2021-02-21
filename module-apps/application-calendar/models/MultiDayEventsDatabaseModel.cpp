@@ -2,20 +2,28 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-utils/time/TimeRangeParser.hpp>
-#include "AllEventsDatabaseModel.hpp"
+#include <queries/calendar/QueryEventsGetAll.hpp>
+#include <service-db/DBServiceAPI.hpp>
+#include "MultiDayEventsDatabaseModel.hpp"
 
 namespace app
 {
-    AllEventsDatabaseModel::AllEventsDatabaseModel(Application *app) : DatabaseModel(app)
+    MultiDayEventsDatabaseModel::MultiDayEventsDatabaseModel(Application *app) : DatabaseModel(app)
     {}
 
-    AllEventsDatabaseModel::~AllEventsDatabaseModel()
+    MultiDayEventsDatabaseModel::~MultiDayEventsDatabaseModel()
     {
         clearRecords();
         DatabaseModel::clear();
     }
 
-    bool AllEventsDatabaseModel::updateRecords(std::vector<std::pair<EventsRecord, TimePoint>> dbRecords)
+    void MultiDayEventsDatabaseModel::setOffsetLimit(const uint32_t offset, const uint32_t limit)
+    {
+        this->offset = offset;
+        this->limit = limit;
+    }
+
+    bool MultiDayEventsDatabaseModel::updateRecords(std::vector<std::pair<EventsRecord, TimePoint>> dbRecords)
     {
         if (!dbRecords.empty()) {
             sortAndDuplicateRecords(dbRecords);
@@ -23,7 +31,7 @@ namespace app
 
         modelIndex = 0;
         records.clear();
-        checkCorrectnessOfOffsetAndLimit();
+        offsetAndLimitCorrection();
         std::vector<std::pair<EventsRecord, TimePoint>> part(bufferedRecords.begin() + offset,
                                                              bufferedRecords.begin() + limit + offset);
         if (!part.empty()) {
@@ -36,7 +44,7 @@ namespace app
         return false;
     }
 
-    void AllEventsDatabaseModel::sortAndDuplicateRecords(std::vector<std::pair<EventsRecord, TimePoint>> dbRecords)
+    void MultiDayEventsDatabaseModel::sortAndDuplicateRecords(std::vector<std::pair<EventsRecord, TimePoint>> dbRecords)
     {
         bool addedNewRecord = false;
         LOG_DEBUG("Sort and duplicate records");
@@ -58,13 +66,7 @@ namespace app
         }
     }
 
-    void AllEventsDatabaseModel::setOffsetAndLimit(uint32_t offset, uint32_t limit)
-    {
-        this->offset = offset;
-        this->limit  = limit;
-    }
-
-    void AllEventsDatabaseModel::handleMultiDayEvent(const EventsRecord &record)
+    void MultiDayEventsDatabaseModel::handleMultiDayEvent(const EventsRecord &record)
     {
         bufferedRecords.emplace_back(record, record.date_from);
         auto daysCount = utils::time::TimeRangeParser::getDaysCount(record.date_from, record.date_till);
@@ -75,28 +77,35 @@ namespace app
         }
     }
 
-    void AllEventsDatabaseModel::sortRecords()
+    void MultiDayEventsDatabaseModel::sortRecords()
     {
         std::sort(
             bufferedRecords.begin(),
             bufferedRecords.end(),
-            [](const std::pair<EventsRecord, TimePoint> &first, const std::pair<EventsRecord, TimePoint> &second) {
-                return first.first.date_from < second.first.date_from;
+            [](const std::pair<EventsRecord, TimePoint> &left, const std::pair<EventsRecord, TimePoint> &right) {
+                if(left.first.date_from == right.first.date_from)
+                {
+                    return left.first.ID < right.first.ID;
+                }
+                else
+                {
+                    return left.first.date_from < right.first.date_from;
+                }
             });
     }
 
-    uint32_t AllEventsDatabaseModel::getBufferedRecordsSize() const
+    uint32_t MultiDayEventsDatabaseModel::getBufferedRecordsSize() const
     {
         return bufferedRecords.size();
     }
 
-    void AllEventsDatabaseModel::clearRecords()
+    void MultiDayEventsDatabaseModel::clearRecords()
     {
         bufferedRecords.clear();
         recordsID.clear();
     }
 
-    uint32_t AllEventsDatabaseModel::getOffsetForCurrentTime() const
+    uint32_t MultiDayEventsDatabaseModel::getOffsetForCurrentTime() const
     {
         auto ymd         = TimePointToYearMonthDay(TimePointNow());
         uint32_t counter = std::count_if(
@@ -106,7 +115,7 @@ namespace app
         return counter;
     }
 
-    void AllEventsDatabaseModel::checkCorrectnessOfOffsetAndLimit()
+    void MultiDayEventsDatabaseModel::offsetAndLimitCorrection()
     {
         if (offset > bufferedRecords.size()) {
             offset = bufferedRecords.size() - 1;

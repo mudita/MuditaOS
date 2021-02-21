@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AllEventsModel.hpp"
@@ -11,7 +11,7 @@
 #include <queries/calendar/QueryEventsGetAll.hpp>
 #include <module-utils/time/TimeRangeParser.hpp>
 
-AllEventsModel::AllEventsModel(app::Application *app) : AllEventsDatabaseModel(app), app::AsyncCallbackReceiver{app}
+AllEventsModel::AllEventsModel(app::Application *app) : MultiDayEventsDatabaseModel(app), app::AsyncCallbackReceiver{app}
 {}
 
 unsigned int AllEventsModel::requestRecordsCount()
@@ -23,7 +23,7 @@ void AllEventsModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     AllEventsDatabaseModel::setOffsetAndLimit(offset, limit);
     if (queryType == db::Query::Type::Update) {
-        AllEventsDatabaseModel::clearRecords();
+        MultiDayEventsDatabaseModel::clearRecords();
     }
     if (offset <= counter || queryType == db::Query::Type::Update || queryType == db::Query::Type::Create ||
         queryType == db::Query::Type::Delete) {
@@ -68,12 +68,12 @@ gui::ListItem *AllEventsModel::getItem(gui::Order order)
 
 bool AllEventsModel::updateRecords(std::vector<std::pair<EventsRecord, TimePoint>> records)
 {
-    AllEventsDatabaseModel::updateRecords(std::move(records));
-    list->setElementsCount(AllEventsDatabaseModel::getBufferedRecordsSize());
-    if (recordsCount != AllEventsDatabaseModel::getBufferedRecordsSize()) {
-        recordsCount = AllEventsDatabaseModel::getBufferedRecordsSize();
+    MultiDayEventsDatabaseModel::updateRecords(std::move(records));
+    list->setElementsCount(MultiDayEventsDatabaseModel::getBufferedRecordsSize());
+    if (recordsCount != MultiDayEventsDatabaseModel::getBufferedRecordsSize()) {
+        recordsCount = MultiDayEventsDatabaseModel::getBufferedRecordsSize();
         list->rebuildList(
-            style::listview::RebuildType::OnOffset, AllEventsDatabaseModel::getOffsetForCurrentTime(), true);
+            style::listview::RebuildType::OnOffset, MultiDayEventsDatabaseModel::getOffsetForCurrentTime(), true);
         return true;
     }
     list->onProviderDataUpdate();
@@ -87,7 +87,7 @@ auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 
     auto records = response->getResult();
     if (counter != (records.size())) {
-        AllEventsDatabaseModel::clearRecords();
+        MultiDayEventsDatabaseModel::clearRecords();
         counter      = records.size();
         recordsCount = counter;
         queryType    = db::Query::Type::Create;

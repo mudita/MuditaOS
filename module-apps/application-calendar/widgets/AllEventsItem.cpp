@@ -79,10 +79,21 @@ namespace gui
     void AllEventsItem::setEvent(std::shared_ptr<EventsRecord> rec)
     {
         this->record = rec;
-        if (rec != nullptr) {
+        if (rec != nullptr)
+        {
             description->setText(this->record->title.c_str());
-            startTime->setText(utils::time::TimeRangeParser().getCalendarTimeString(
-                record->date_from, record->date_till, utils::time::Version::Abbrev));
+
+            auto eventDuration = utils::time::Duration(TimePointToTimeT(record->date_till), TimePointToTimeT(record->date_from));
+            auto eventStartTime = TimePointToHourMinSec(record->date_from);
+            if(eventDuration.getHours() >= utils::time::hoursInday && eventStartTime.hours().count() == 0 && eventStartTime.minutes().count() == 0)
+            {
+                startTime->setText(utils::localize.get("app_calendar_all_day"));
+            }
+            else
+            {
+                startTime->setText(utils::time::TimeRangeParser().getCalendarTimeString(
+                        record->date_from, record->date_till, utils::time::Version::Abbrev));
+            }
         }
     }
 } /* namespace gui */

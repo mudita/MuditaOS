@@ -3,12 +3,12 @@
 
 #pragma once
 #include "Application.hpp"
-#include "application-calendar/models/AllEventsDatabaseModel.hpp"
+#include "application-calendar/models/MultiDayEventsDatabaseModel.hpp"
 #include <ListItemProvider.hpp>
 #include <module-db/Interface/EventsRecord.hpp>
 #include <module-db/Common/Query.hpp>
 
-class AllEventsModel : public app::AllEventsDatabaseModel,
+class AllEventsModel : public app::MultiDayEventsDatabaseModel,
                        public gui::ListItemProvider,
                        public app::AsyncCallbackReceiver
 {

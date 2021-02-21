@@ -8,8 +8,9 @@
 
 namespace app
 {
-    class AllEventsDatabaseModel : public DatabaseModel<std::pair<EventsRecord, TimePoint>>
+    class MultiDayEventsDatabaseModel : public DatabaseModel<std::pair<EventsRecord, TimePoint>>
     {
+
         std::vector<std::pair<EventsRecord, TimePoint>> bufferedRecords;
         std::vector<uint32_t> recordsID;
         uint32_t offset = 0;
@@ -17,11 +18,12 @@ namespace app
         void sortAndDuplicateRecords(std::vector<std::pair<EventsRecord, TimePoint>> dbRecords);
         void sortRecords();
         void handleMultiDayEvent(const EventsRecord &record);
-        void checkCorrectnessOfOffsetAndLimit();
+        void offsetAndLimitCorrection();
 
       public:
-        explicit AllEventsDatabaseModel(Application *app);
-        ~AllEventsDatabaseModel() override;
+
+        explicit MultiDayEventsDatabaseModel(Application *app);
+        ~MultiDayEventsDatabaseModel() override;
 
         bool updateRecords(std::vector<std::pair<EventsRecord, TimePoint>> dbRecords) override;
         void setOffsetAndLimit(uint32_t offset, uint32_t limit);
