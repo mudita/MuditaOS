@@ -51,7 +51,7 @@ TimePoint DateTimeData::getDateTimeData() const
     return dateTime;
 }
 
-DateTimeType DateTimeData::getDateTimeType() const
+DateTimeType DateTimeData::getDateTimeType() const noexcept
 {
     return dateTimeType;
 }

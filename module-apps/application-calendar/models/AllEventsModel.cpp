@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AllEventsModel.hpp"
@@ -21,12 +21,13 @@ unsigned int AllEventsModel::requestRecordsCount()
 
 void AllEventsModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
-    AllEventsDatabaseModel::setOffsetAndLimit(offset, limit);
     if (queryType == db::Query::Type::Update) {
         MultiDayEventsDatabaseModel::clearRecords();
     }
-    if (offset <= counter || queryType == db::Query::Type::Update || queryType == db::Query::Type::Create ||
-        queryType == db::Query::Type::Delete) {
+
+    MultiDayEventsDatabaseModel::setOffsetLimit(offset,limit);
+
+    if (offset <= counter || queryType != db::Query::Type::Read) {
         queryType  = db::Query::Type::Read;
         auto query = std::make_unique<db::query::events::GetAll>();
         auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Events);
@@ -109,10 +110,11 @@ auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
             record.date_till += std::chrono::hours(eventShift);
         }
     }
-    return this->updateRecords(getEventsAndEventsStartTime(records));
+    return this->updateRecords(getEventsWithOriginalStartTime(records));
 }
 
-std::vector<std::pair<EventsRecord, TimePoint>> AllEventsModel::getEventsAndEventsStartTime(
+
+std::vector<std::pair<EventsRecord, TimePoint>> AllEventsModel::getEventsWithOriginalStartTime(
     const std::vector<EventsRecord> &rec)
 {
     auto pairs = std::vector<std::pair<EventsRecord, TimePoint>>();
@@ -122,6 +124,7 @@ std::vector<std::pair<EventsRecord, TimePoint>> AllEventsModel::getEventsAndEven
     }
     return pairs;
 }
+
 
 void AllEventsModel::setDateFilter(TimePoint filter)
 {

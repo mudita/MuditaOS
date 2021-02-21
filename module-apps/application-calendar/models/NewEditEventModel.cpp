@@ -118,7 +118,7 @@ void NewEditEventModel::setDateItemInputCallback(gui::DateTimeItem *dateItem,
                                                  const std::shared_ptr<EventsRecord> &record)
 {
     dateItem->inputCallback = [=](gui::Item &item, const gui::InputEvent &event) {
-        if (event.isShortPress() && (event.is(gui::KeyCode::KEY_LF) || gui::toNumeric(event.keyCode) >= 0)) {
+        if (event.isShortPress() && (event.is(gui::KeyCode::KEY_LF) || gui::toNumeric(event.keyCode) != gui::InvalidNumericKeyCode)) {
             auto data = std::make_unique<EventRecordData>(record);
             data->setDescription(description);
             application->switchWindow(style::window::calendar::name::date_time_window, std::move(data));

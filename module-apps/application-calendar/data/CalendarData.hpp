@@ -85,5 +85,5 @@ class DateTimeData : public gui::SwitchData
     DateTimeData(TimePoint dateTime, DateTimeType dateTimeType);
 
     [[nodiscard]] TimePoint getDateTimeData() const;
-    [[nodiscard]] DateTimeType getDateTimeType() const;
+    [[nodiscard]] DateTimeType getDateTimeType() const noexcept;
 };

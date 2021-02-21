@@ -15,15 +15,15 @@ class AllEventsModel : public app::MultiDayEventsDatabaseModel,
     uint32_t counter          = 0;
     TimePoint dateFilter      = TimePointNow();
     db::Query::Type queryType = db::Query::Type::Create;
-    std::vector<std::pair<EventsRecord, TimePoint>> getEventsAndEventsStartTime(const std::vector<EventsRecord> &rec);
 
+    std::vector<std::pair<EventsRecord, TimePoint>> getEventsWithOriginalStartTime(const std::vector<EventsRecord> &rec);
   public:
     explicit AllEventsModel(app::Application *app);
 
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
     bool updateRecords(std::vector<std::pair<EventsRecord, TimePoint>> records) override;
 
-    auto handleQueryResponse(db::QueryResult *) -> bool;
+    auto handleQueryResponse(db::QueryResult *) -> bool override;
     void setDateFilter(TimePoint filter);
     void setQueryType(db::Query::Type type);
     // virtual methods for ListViewProvider

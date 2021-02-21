@@ -25,8 +25,10 @@ namespace app
         explicit MultiDayEventsDatabaseModel(Application *app);
         ~MultiDayEventsDatabaseModel() override;
 
+        void setOffsetLimit(const uint32_t offset, const uint32_t limit);
         bool updateRecords(std::vector<std::pair<EventsRecord, TimePoint>> dbRecords) override;
-        void setOffsetAndLimit(uint32_t offset, uint32_t limit);
+        virtual auto handleQueryResponse(db::QueryResult *) -> bool = 0;
+
         void clearRecords();
         [[nodiscard]] uint32_t getBufferedRecordsSize() const;
         [[nodiscard]] uint32_t getOffsetForCurrentTime() const;
