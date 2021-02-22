@@ -20,7 +20,7 @@ namespace bsp::watchdog
             return false;
         }
 
-        rtwdog_config_t config      = {0};
+        rtwdog_config_t config      = {};
         config.enableRtwdog         = true;
         config.clockSource          = kRTWDOG_ClockSource1;            // LPO_CLK clock (32.768kHz)
         config.prescaler            = kRTWDOG_ClockPrescalerDivide256; // 256 prescaler (effectively 128Hz clock)

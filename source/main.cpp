@@ -72,6 +72,7 @@ int main()
 
     bsp::BoardInit();
 
+    purefs::subsystem::vfs_handle_t vfs;
     if (!sys::SystemWatchdog::getInstance().init()) {
         LOG_ERROR("System watchdog failed to initialize");
         // wait for the hardware watchdog (initialized in reset ISR) to reset the system

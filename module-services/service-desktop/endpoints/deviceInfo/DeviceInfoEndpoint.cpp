@@ -14,7 +14,8 @@
 
 #include <cstdint>
 #include <string>
-#include <vfs.hpp>
+#include <sys/statvfs.h>
+#include <purefs/filesystem_paths.hpp>
 
 using namespace parserFSM;
 
