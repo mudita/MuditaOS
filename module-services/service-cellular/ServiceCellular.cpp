@@ -2075,14 +2075,13 @@ void ServiceCellular::handle_power_state_change()
 bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request)
 {
     constexpr uint32_t commandTimeout        = 120000;
-    constexpr uint32_t commandExpectedTokens = 2;
 
     auto channel = cmux->get(TS0710::Channel::Commands);
     if (channel != nullptr) {
         if (requestType == CellularUSSDMessage::RequestType::pullSesionRequest) {
             channel->cmd(at::AT::SMS_GSM);
             std::string command = at::factory(at::AT::CUSD_SEND) + request + ",15";
-            auto result = channel->cmd(command, std::chrono::milliseconds(commandTimeout), commandExpectedTokens);
+            auto result         = channel->cmd(command, std::chrono::milliseconds(commandTimeout));
             if (result.code == at::Result::Code::OK) {
                 ussdState = ussd::State::pullRequestSent;
                 setUSSDTimer();
