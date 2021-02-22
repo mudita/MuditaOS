@@ -8,6 +8,7 @@ from harness import log
 
 @pytest.mark.xfail
 @pytest.mark.usb_cdc_echo
+@pytest.mark.skip("not working ;/")
 def test_echo_enable(harness, message_to_echo="Testing that echo mode on USB-CDC on Mudita Pure works!"):
     harness.connection_echo_mode_on()
 

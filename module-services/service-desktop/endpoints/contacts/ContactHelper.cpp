@@ -73,7 +73,7 @@ auto ContactHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
     if (context.getBody()[json::contacts::id].int_value() != 0) {
         return requestContactByID(context);
     }
-    else if (context.getBody()[json::contacts::limit].bool_value()) {
+    else if (context.getBody()[json::contacts::count].bool_value()) {
         return requestCount(context);
     }
 
@@ -127,7 +127,7 @@ sys::ReturnCodes ContactHelper::requestCount(Context &context)
 
                 auto count = contactResult->getSize();
 
-                context.setResponseBody(json11::Json::object({{json::contacts::limit, static_cast<int>(count)}}));
+                context.setResponseBody(json11::Json::object({{json::contacts::count, static_cast<int>(count)}}));
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;
             }
