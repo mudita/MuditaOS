@@ -60,6 +60,7 @@ void MessageHandler::putToSendQueue(const std::string &msg)
 {
     if (uxQueueSpacesAvailable(sendQueue) != 0) {
         auto responseString = new std::string(msg);
+        LOG_DEBUG("%s", responseString->c_str());
         xQueueSend(sendQueue, &responseString, portMAX_DELAY);
     }
 }

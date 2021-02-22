@@ -53,6 +53,7 @@ namespace parserFSM
         inline constexpr auto numbers         = "numbers";
         inline constexpr auto isBlocked       = "blocked";
         inline constexpr auto isFavourite     = "favourite";
+        inline constexpr auto count           = "count";
 
     } // namespace json::contacts
 } // namespace parserFSM
