@@ -457,9 +457,16 @@ namespace sys
             return sys::MessageNone{};
         });
 
-        connect(typeid(sys::RequestCpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
-            auto msg = static_cast<sys::RequestCpuFrequencyMessage *>(message);
+        connect(typeid(sys::HoldCpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
+            auto msg = static_cast<sys::HoldCpuFrequencyMessage *>(message);
             powerManager->SetCpuFrequencyRequest(msg->getName(), msg->getRequest());
+
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(sys::ReleaseCpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
+            auto msg = static_cast<sys::ReleaseCpuFrequencyMessage *>(message);
+            powerManager->ResetCpuFrequencyRequest(msg->getName());
 
             return sys::MessageNone{};
         });

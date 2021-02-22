@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <memory>
 #include "drivers/lpspi/DriverLPSPI.hpp"
+#include <Service/CpuSentinel.hpp>
 
 namespace service::eink
 {
@@ -41,6 +42,7 @@ namespace service::eink
         ::gui::Size getSize() const noexcept;
 
         [[nodiscard]] auto getDevice() const noexcept -> std::shared_ptr<devices::Device>;
+        void setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel);
 
       private:
         static unsigned int toWaveformTemperatureOffset(std::int32_t temperature) noexcept;
@@ -55,5 +57,6 @@ namespace service::eink
         EinkWaveformSettings_t currentWaveform;
         EinkDisplayColorMode_e displayMode;
         std::shared_ptr<drivers::DriverLPSPI> driverLPSPI;
+        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
     };
 } // namespace service::eink
