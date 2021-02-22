@@ -8,11 +8,11 @@ from harness.interface.defs import status
 @pytest.mark.usefixtures("usb_unlocked")
 def test_contacts(harness):
     # getting the contacts count
-    body = {"limit": True}
+    body = {"count": True}
     ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["OK"]
 
-    count = ret["body"]["limit"]
+    count = ret["body"]["count"]
     if count == 0:
         pytest.skip("No contacts entries, skipping")
 
@@ -79,10 +79,10 @@ def test_contacts(harness):
     assert ret["status"] == status["NotAcceptable"]
 
     # checking count after adding
-    body = {"limit": True}
+    body = {"count": True}
     ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["OK"]
-    assert ret["body"]["limit"] == count + 1
+    assert ret["body"]["count"] == count + 1
 
     # updating existing contact
     body = {"address": "6 Czeczota St.\n02600 Warsaw",
@@ -113,8 +113,8 @@ def test_contacts(harness):
     assert ret["status"] == status["OK"]
 
     # verifying count
-    body = {"limit": True}
+    body = {"count": True}
     ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["OK"]
 
-    assert ret["body"]["limit"] == count
+    assert ret["body"]["count"] == count
