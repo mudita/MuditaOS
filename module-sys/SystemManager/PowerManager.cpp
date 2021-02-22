@@ -122,9 +122,14 @@ namespace sys
         cpuGovernor->RegisterNewSentinel(newSentinel);
     }
 
-    void PowerManager::SetCpuFrequencyRequest(std::string sentinelName, bsp::CpuFrequencyHz request) const
+    void PowerManager::SetCpuFrequencyRequest(std::string sentinelName, bsp::CpuFrequencyHz request)
     {
-        cpuGovernor->SetCpuFrequencyRequest(sentinelName, request);
+        cpuGovernor->SetCpuFrequencyRequest(std::move(sentinelName), request);
+    }
+
+    void PowerManager::ResetCpuFrequencyRequest(std::string sentinelName)
+    {
+        cpuGovernor->ResetCpuFrequencyRequest(std::move(sentinelName));
     }
 
     void PowerManager::SetCpuFrequency(bsp::CpuFrequencyHz freq) const

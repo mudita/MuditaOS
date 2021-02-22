@@ -47,7 +47,8 @@ namespace sys
         [[nodiscard]] auto getExternalRamDevice() const noexcept -> std::shared_ptr<devices::Device>;
 
         void RegisterNewSentinel(std::shared_ptr<CpuSentinel> newSentinel) const;
-        void SetCpuFrequencyRequest(std::string sentinelName, bsp::CpuFrequencyHz request) const;
+        void SetCpuFrequencyRequest(std::string sentinelName, bsp::CpuFrequencyHz request);
+        void ResetCpuFrequencyRequest(std::string sentinelName);
 
       private:
         void ResetFrequencyShiftCounter();

@@ -56,11 +56,6 @@ namespace service::eink
         EinkStatus_e refreshDisplay(::gui::RefreshModes refreshMode);
         EinkStatus_e updateDisplay(uint8_t *frameBuffer, ::gui::RefreshModes refreshMode);
 
-        // function called from the PowerManager context
-        // to update resources immediately
-        // critical section or mutex support necessary
-        void updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
-
         sys::MessagePointer handleEinkModeChangedMessage(sys::Message *message);
         sys::MessagePointer handleImageMessage(sys::Message *message);
         sys::MessagePointer handlePrepareEarlyRequest(sys::Message *message);
