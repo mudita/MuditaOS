@@ -16,8 +16,11 @@ namespace vibra_handle
         vibratorTimerPause =
             std::make_unique<sys::Timer>("VibraPauseTimer", parent, bsp::vibrator::defaultVibraPauseMs);
 
-        vibratorTimerOneshot->setInterval(bsp::vibrator::defaultVibraPulseMs);
-        vibratorTimerPause->setInterval(bsp::vibrator::defaultVibraPauseMs);
+        vibratorTimerOneshot->connect(nullTimerCallback);
+        vibratorTimerPause->connect(nullTimerCallback);
+
+        vibratorTimerOneshot->stop();
+        vibratorTimerPause->stop();
     }
 
     void Vibra::intPulse(bool repetitive)
