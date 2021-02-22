@@ -23,23 +23,27 @@ namespace cellular
         }
     }
 
-    auto ColpRequest::command() -> std::string
+    auto ColpRequest::command() -> at::Cmd
     {
+        std::string body;
         switch (procedureType) {
         case ProcedureType::Deactivation:
-            return std::string(at::factory(at::AT::COLP_DISABLE));
+            body = at::factory(at::AT::COLP_DISABLE);
+            break;
         case ProcedureType::Activation:
-            return std::string(at::factory(at::AT::COLP_ENABLE));
+            body = at::factory(at::AT::COLP_ENABLE);
+            break;
         case ProcedureType::Interrogation:
-            return std::string(at::factory(at::AT::COLP_GET));
+            body = at::factory(at::AT::COLP_GET);
+            break;
         case ProcedureType::Registration:
             // not supported
-            return std::string();
+            break;
         case ProcedureType::Erasure:
             // not supported
-            return std::string();
+            break;
         }
-        return std::string();
+        return at::Cmd(body, at::default_long_doc_timeout);
     }
 
     void ColpRequest::handle(RequestHandler &h, at::Result &result)

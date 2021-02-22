@@ -35,7 +35,7 @@ namespace cellular
         return nullptr;
     }
 
-    auto CallForwardingRequest::command() -> std::string
+    auto CallForwardingRequest::command() -> at::Cmd
     {
         std::vector<commandBuilderFunc> commandParts = {[this]() { return getCommandReason(); },
                                                         [this]() { return getCommandMode(); },
@@ -56,7 +56,7 @@ namespace cellular
             trimEmpty = false;
         }
 
-        return buildCommand(at::AT::CCFC, commandParts, trimEmpty);
+        return at::Cmd(buildCommand(at::AT::CCFC, commandParts, trimEmpty), at::default_doc_timeout);
     }
 
     auto CallForwardingRequest::getCommandReason() const -> std::string

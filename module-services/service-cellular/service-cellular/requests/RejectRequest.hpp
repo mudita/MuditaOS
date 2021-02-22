@@ -22,9 +22,9 @@ namespace cellular
         RejectRequest(RejectReason rejectReason, const std::string &number)
             : Request(number), rejectReason(rejectReason){};
 
-        std::string command() final
+        at::Cmd command() final
         {
-            return std::string();
+            return at::Cmd(std::string());
         }
 
         void handle(RequestHandler &h, at::Result &result)
