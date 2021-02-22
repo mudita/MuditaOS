@@ -10,6 +10,7 @@
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-db/Settings.hpp>
+#include <service-evtmgr/EventManagerServiceAPI.hpp>
 
 #include <type_traits>
 
@@ -157,20 +158,6 @@ constexpr bool ServiceAudio::ShouldLoop(const std::optional<audio::PlaybackType>
     return type.value_or(audio::PlaybackType::None) == audio::PlaybackType::CallRingtone;
 }
 
-// below static methods will be replaced by final vibration API
-static void ExtVibrateOnce()
-{
-    LOG_ERROR("[Vibration] - Unimplemented - vibration one shot");
-}
-static void ExtVibrationStart()
-{
-    LOG_ERROR("[Vibration] - Unimplemented - vibration start");
-}
-static void ExtVibrationStop()
-{
-    LOG_ERROR("[Vibration] - Unimplemented - vibration stop");
-}
-
 bool ServiceAudio::IsVibrationEnabled(const audio::PlaybackType &type)
 {
     auto isEnabled =
@@ -206,7 +193,7 @@ void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optiona
 {
     auto curVibrationType = GetVibrationType(type);
     if (curVibrationType == VibrationType::OneShot && !IsVibrationMotorOn()) {
-        ExtVibrateOnce();
+        EventManagerServiceAPI::vibraPulseOnce(this);
     }
     else if (input && curVibrationType == VibrationType::Continuous) {
         input.value()->EnableVibration();
@@ -217,11 +204,11 @@ void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optiona
         return i.GetVibrationStatus() == AudioMux::VibrationStatus::On;
     });
     if (anyOfInputsOn && !IsVibrationMotorOn()) {
-        ExtVibrationStart();
+        EventManagerServiceAPI::vibraPulseRepeatUntilStop(this);
         vibrationMotorStatus = AudioMux::VibrationStatus::On;
     }
     else if (!anyOfInputsOn && IsVibrationMotorOn()) {
-        ExtVibrationStop();
+        EventManagerServiceAPI::vibraStop(this);
         vibrationMotorStatus = AudioMux::VibrationStatus::Off;
     }
 }
@@ -302,10 +289,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
             }
         }
 
-        if (retToken.IsValid()) {
-            VibrationUpdate(playbackType, input);
-            retCode = audio::RetCode::Success;
-        }
+        VibrationUpdate(playbackType, input);
     };
 
     if (opType == Operation::Type::Playback) {
