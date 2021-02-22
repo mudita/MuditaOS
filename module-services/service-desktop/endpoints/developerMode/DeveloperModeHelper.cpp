@@ -217,6 +217,8 @@ auto DeveloperModeHelper::smsRecordFromJson(json11::Json msgJson) -> SMSRecord
     auto record = SMSRecord();
 
     record.type = static_cast<SMSType>(msgJson[json::messages::messageType].int_value());
+    utils::PhoneNumber phoneNumber(msgJson[json::messages::phoneNumber].string_value());
+    record.number = phoneNumber.getView();
     record.date = utils::time::getCurrentTimestamp().getTime();
     record.body = UTF8(msgJson[json::messages::messageBody].string_value());
     return record;
