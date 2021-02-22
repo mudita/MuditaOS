@@ -36,5 +36,6 @@ namespace vibra_handle
         int repetitions = 1;
 
         void intPulse(bool repetitive);
+        std::function<void(sys::Timer &)> nullTimerCallback{};
     };
 } // namespace vibra_handle
