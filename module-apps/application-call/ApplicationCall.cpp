@@ -111,6 +111,9 @@ namespace app
                     manager::actions::Call,
                     std::make_unique<app::IncomingCallData>(utils::PhoneNumber().getView()));
             });
+            if (callerIdTimer) {
+                callerIdTimer->start();
+            }
         }
     }
 
@@ -138,6 +141,7 @@ namespace app
 
             switch (msg->type) {
             case CellularNotificationMessage::Type::CallAborted: {
+                callerIdTimer.reset(nullptr);
                 CallAbortHandler();
             } break;
             case CellularNotificationMessage::Type::CallActive: {
