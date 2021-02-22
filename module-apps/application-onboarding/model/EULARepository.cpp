@@ -3,9 +3,10 @@
 
 #include <module-utils/gsl/gsl_util>
 #include "module-utils/i18n/i18n.hpp"
-#include "module-utils/Utils.hpp"
 
 #include "EULARepository.hpp"
+#include <fstream>
+#include <sstream>
 
 namespace app::onBoarding
 {
@@ -16,18 +17,19 @@ namespace app::onBoarding
     std::string EULARepository::getEulaText()
     {
         auto displayLanguageName = utils::localize.getDisplayLanguage();
-        auto eulaFile            = utils::filesystem::openFile(licensesPath / displayLanguageName / fileName);
-        auto fileHandlerCleanup  = gsl::finally([&eulaFile]() { utils::filesystem::closeFile(eulaFile); });
+        auto eulaFile            = std::ifstream(licensesPath / displayLanguageName / fileName);
+        auto fileHandlerCleanup  = gsl::finally([&eulaFile]() { eulaFile.close(); });
 
-        if (eulaFile == nullptr) {
-            eulaFile = utils::filesystem::openFile(licensesPath / utils::i18n::DefaultLanguage / fileName);
+        if (!eulaFile.is_open()) {
+            eulaFile.open(licensesPath / utils::i18n::DefaultLanguage / fileName);
 
-            if (eulaFile == nullptr) {
+            if (!eulaFile.is_open()) {
                 throw std::runtime_error("EULA assets missing in system!");
             }
         }
-        auto eulaText = utils::filesystem::readFile(eulaFile);
+        std::ostringstream eulaText;
+        eulaText << eulaFile.rdbuf();
 
-        return eulaText;
+        return eulaText.str();
     }
 } // namespace app::onBoarding

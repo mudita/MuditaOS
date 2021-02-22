@@ -13,7 +13,7 @@
 #include <iosfwd>
 #include <string>
 #include <vector>
-#include <vfs.hpp>
+#include <atomic>
 
 class ServiceDesktop;
 namespace fs = std::filesystem;
