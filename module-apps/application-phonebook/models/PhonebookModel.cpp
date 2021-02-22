@@ -61,7 +61,7 @@ auto PhonebookModel::requestRecordsCount() -> unsigned int
 void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
     auto query =
-        std::make_unique<db::query::ContactGet>(offset, limit, queryFilter, queryGroupFilter, queryDisplayMode);
+        std::make_unique<db::query::ContactGet>(limit, offset, queryFilter, queryGroupFilter, queryDisplayMode);
     auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Contact);
     task->setCallback([this](auto response) { return handleQueryResponse(response); });
     task->execute(application, this);
