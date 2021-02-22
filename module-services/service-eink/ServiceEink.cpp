@@ -60,9 +60,8 @@ namespace service::eink
         auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(display.getDevice());
         bus.sendUnicast(deviceRegistrationMsg, service::name::system_manager);
 
-        cpuSentinel = std::make_shared<sys::CpuSentinel>(name::eink, this, [this](bsp::CpuFrequencyHz newFrequency) {
-            updateResourcesAfterCpuFrequencyChange(newFrequency);
-        });
+        cpuSentinel = std::make_shared<sys::CpuSentinel>(name::eink, this);
+        display.setCpuSentinel(cpuSentinel);
 
         auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
         bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
@@ -214,8 +213,5 @@ namespace service::eink
     {
         return currentState == state;
     }
-
-    void ServiceEink::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
-    {}
 
 } // namespace service::eink

@@ -71,6 +71,9 @@ namespace service::eink
         if (driverLPSPI) {
             driverLPSPI->Enable();
         }
+        if (cpuSentinel) {
+            cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6);
+        }
         EinkPowerOn();
     }
 
@@ -79,6 +82,9 @@ namespace service::eink
         EinkPowerOff();
         if (driverLPSPI) {
             driverLPSPI->Disable();
+        }
+        if (cpuSentinel) {
+            cpuSentinel->ReleaseMinimumFrequency();
         }
     }
 
@@ -259,6 +265,11 @@ namespace service::eink
     [[nodiscard]] auto EinkDisplay::getDevice() const noexcept -> std::shared_ptr<devices::Device>
     {
         return driverLPSPI;
+    }
+
+    void EinkDisplay::setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel)
+    {
+        cpuSentinel = std::move(sentinel);
     }
 
 } // namespace service::eink
