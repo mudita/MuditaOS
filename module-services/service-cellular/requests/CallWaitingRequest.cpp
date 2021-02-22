@@ -23,7 +23,7 @@ namespace cellular
         }
     }
 
-    auto CallWaitingRequest::command() -> std::string
+    auto CallWaitingRequest::command() -> at::Cmd
     {
         std::vector<commandBuilderFunc> commandParts = {
             [this]() { return getCommandPresentation(); },
@@ -31,7 +31,7 @@ namespace cellular
             [this]() { return getCommandClass(); },
         };
 
-        return buildCommand(at::AT::CCWA, commandParts);
+        return at::Cmd(buildCommand(at::AT::CCWA, commandParts), at::default_doc_timeout);
     }
 
     auto CallWaitingRequest::getCommandPresentation() const noexcept -> std::string

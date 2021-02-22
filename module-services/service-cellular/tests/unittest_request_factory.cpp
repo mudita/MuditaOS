@@ -128,7 +128,7 @@ TEST_CASE("Emergency handling")
 
         if (request) {
             auto requestCommand = request->command();
-            REQUIRE(requestCommand == test.expectedCommand);
+            REQUIRE(requestCommand.getCmd() == test.expectedCommand);
         }
         idx++;
     }
@@ -456,16 +456,16 @@ TEST_CASE("MMI requests")
         REQUIRE(typeid(*request.get()).name() == testCase.expectedType.name());
         REQUIRE(request->isValid() == testCase.expectedValid);
         if (typeid(*request.get()).name() == typeid(CallRequest).name()) {
-            REQUIRE(requestCommand == "ATD" + testCase.requestString + ";");
+            REQUIRE(requestCommand.getCmd() == "ATD" + testCase.requestString + ";");
         }
         else if (typeid(*request.get()).name() == typeid(UssdRequest).name()) {
-            REQUIRE(requestCommand == "AT+CUSD=1," + testCase.requestString + ",15");
+            REQUIRE(requestCommand.getCmd() == "AT+CUSD=1," + testCase.requestString + ",15");
         }
         else {
-            if (requestCommand == testCase.expectedCommandString) {
+            if (requestCommand.getCmd() == testCase.expectedCommandString) {
                 LOG_ERROR("HERE");
             }
-            REQUIRE(requestCommand == testCase.expectedCommandString);
+            REQUIRE(requestCommand.getCmd() == testCase.expectedCommandString);
         }
     }
 }
