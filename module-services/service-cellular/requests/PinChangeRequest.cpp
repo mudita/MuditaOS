@@ -42,7 +42,7 @@ namespace cellular
         return std::make_unique<PinChangeRequest>(data, matchGroups);
     }
 
-    auto PinChangeRequest::command() -> std::string
+    auto PinChangeRequest::command() -> at::Cmd
     {
         std::array<std::function<std::string()>, 2> commandParts = {
             [this]() { return this->getOldPinOrPuk(); },
@@ -50,7 +50,7 @@ namespace cellular
         };
 
         if (!isValid()) {
-            return std::string();
+            return at::Cmd(std::string());
         }
 
         std::string cmd;
@@ -70,7 +70,7 @@ namespace cellular
             cmd.append(cmdPart());
         }
 
-        return cmd;
+        return at::Cmd(cmd, at::default_doc_timeout);
     }
 
     auto PinChangeRequest::getOldPinOrPuk() const noexcept -> std::string

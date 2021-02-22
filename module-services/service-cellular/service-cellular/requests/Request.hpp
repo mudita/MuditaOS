@@ -15,7 +15,7 @@ namespace cellular
     class IRequest
     {
       public:
-        virtual std::string command()                              = 0;
+        virtual at::Cmd command()                                  = 0;
         virtual void handle(RequestHandler &h, at::Result &result) = 0;
         virtual void setHandled(bool handled)                      = 0;
         virtual bool checkModemResponse(const at::Result &result)  = 0;

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <chrono>
 
 #include <at/Result.hpp>
 #include <at/Commands.hpp>
@@ -11,12 +12,15 @@
 
 namespace cellular
 {
-    std::string UssdRequest::command()
+    auto UssdRequest::command() -> at::Cmd
     {
-        return std::string(at::factory(at::AT::CUSD_SEND) + request + ",15");
+        using namespace std::chrono_literals;
+
+        const auto timeout = 120000ms;
+        return at::Cmd(at::factory(at::AT::CUSD_SEND) + request + ",15", timeout);
     }
 
-    std::unique_ptr<UssdRequest> UssdRequest::create(const std::string &data, GroupMatch)
+    auto UssdRequest::create(const std::string &data, GroupMatch) -> std::unique_ptr<UssdRequest>
     {
         return std::make_unique<UssdRequest>(data);
     }

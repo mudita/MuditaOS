@@ -11,9 +11,9 @@
 
 namespace cellular
 {
-    std::string ImeiRequest::command()
+    at::Cmd ImeiRequest::command()
     {
-        return std::string(at::factory(at::AT::GET_IMEI));
+        return at::Cmd(at::factory(at::AT::GET_IMEI));
     }
 
     void ImeiRequest::handle(RequestHandler &h, at::Result &result)

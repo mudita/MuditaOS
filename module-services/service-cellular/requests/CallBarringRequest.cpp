@@ -24,7 +24,7 @@ namespace cellular
         return nullptr;
     }
 
-    auto CallBarringRequest::command() -> std::string
+    auto CallBarringRequest::command() -> at::Cmd
     {
         std::vector<commandBuilderFunc> commandParts = {
             [this]() { return getCommandFacility(); },
@@ -33,7 +33,7 @@ namespace cellular
             [this]() { return getCommandClass(); },
         };
 
-        return buildCommand(at::AT::CLCK, commandParts);
+        return at::Cmd(buildCommand(at::AT::CLCK, commandParts), at::default_doc_timeout);
     }
 
     auto CallBarringRequest::getCommandFacility() const -> std::string
