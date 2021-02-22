@@ -111,7 +111,7 @@ class CDCSerial:
         }
 
         ret = self.write(self.__wrap_message(body), wait)
-        print(ret)
+        log.info(f"at response {ret}")
         return ret["body"]["ATResponse"]
 
     def get_application_name(self):
