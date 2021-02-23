@@ -45,7 +45,7 @@ namespace bluetooth
 
     void GAP::stopScan()
     {
-        gap_inquiry_force_stop();
+        gap_inquiry_stop();
         devices.clear();
         LOG_INFO("Scan stopped!");
     }
