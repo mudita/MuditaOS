@@ -13,6 +13,7 @@ namespace gui
 
       public:
         bool deleteByList = true;
+        void accept(GuiVisitor &visitor) override;
 
         ListItem();
     };

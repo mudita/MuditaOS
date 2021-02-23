@@ -18,4 +18,10 @@ namespace gui
 
         type = ItemType::LIST_ITEM;
     }
+
+    void ListItem::accept(GuiVisitor &visitor)
+    {
+        visitor.visit(*this);
+    }
+
 } /* namespace gui */
