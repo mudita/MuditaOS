@@ -94,6 +94,19 @@ def harness(request):
                     pytest.exit("not a valid sim pts entry!")
 
             harness = Harness(port_name)
+
+            '''
+            Wait for endpoints to initialize
+            '''
+            testbody = {"ui": True, "getWindow": True}
+            result = None
+            with utils.Timeout.limit(seconds=305):
+                while not result:
+                    try:
+                        result = harness.endpoint_request("developerMode", "get", testbody)
+                    except ValueError:
+                        log.info("Endpoints not ready..")
+
     except utils.Timeout:
         pytest.exit("couldn't find any viable port. exiting")
     else:
