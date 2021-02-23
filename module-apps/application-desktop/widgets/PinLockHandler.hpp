@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -52,6 +52,7 @@ namespace gui
         void handleSimBlocked(app::manager::actions::ActionParamsPtr &&data);
         void handleUnlockSim(app::manager::actions::ActionParamsPtr &&data);
         void handleCMEError(app::manager::actions::ActionParamsPtr &&data) const;
+        void handleScreenPasscodeRequest(app::manager::actions::ActionParamsPtr &&data) const;
 
         [[nodiscard]] auto isScreenLocked() const noexcept -> bool
         {

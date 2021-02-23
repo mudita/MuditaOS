@@ -60,6 +60,8 @@
 #include <module-services/service-evtmgr/service-evtmgr/EVMessages.hpp>
 #include <module-services/service-appmgr/service-appmgr/messages/Message.hpp>
 #include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
+#include <module-apps/application-desktop/windows/PinLockWindow.hpp>
+#include <module-apps/application-desktop/windows/Names.hpp>
 
 namespace app
 {
@@ -222,6 +224,13 @@ namespace app
             },
             ::settings::SettingsScope::Global);
 
+        /*
+        settings->registerValueChange(
+            ::settings::SystemProperties::usbSecurity,
+            [this](std::string value) { usbSecured = utils::getNumericValue<bool>(value); },
+            ::settings::SettingsScope::Global);
+        */
+
         return ret;
     }
 
@@ -296,7 +305,10 @@ namespace app
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
         windowsFactory.attach(gui::window::name::security, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::SecurityMainWindow>(app);
+            return std::make_unique<gui::SecurityMainWindow>(app, static_cast<ApplicationSettingsNew *>(app));
+        });
+        windowsFactory.attach(app::window::name::desktop_pin_lock, [&](Application *app, const std::string newname) {
+            return std::make_unique<gui::PinLockWindow>(app, app::window::name::desktop_pin_lock);
         });
         windowsFactory.attach(gui::window::name::change_passcode, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ChangePasscodeWindow>(app);
@@ -459,4 +471,15 @@ namespace app
                         service::name::evt_manager);
     }
 
+    bool ApplicationSettingsNew::isUSBSecured() const
+    {
+        return usbSecured;
+    }
+
+    void ApplicationSettingsNew::setUSBSecurity(bool security)
+    {
+        usbSecured = security;
+        settings->setValue(
+            ::settings::SystemProperties::usbSecurity, std::to_string(security), ::settings::SettingsScope::Global);
+    }
 } /* namespace app */

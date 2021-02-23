@@ -138,11 +138,17 @@ bool DBServiceAPI::AddSMS(sys::Service *serv, const SMSRecord &record, std::uniq
 }
 
 xQueueHandle parserFSM::MessageHandler::sendQueue;
-parserFSM::MessageHandler::MessageHandler(const std::string &message, sys::Service *OwnerService)
-    : OwnerServicePtr(OwnerService)
+
+parserFSM::MessageHandler::MessageHandler(sys::Service *OwnerService, std::unique_ptr<EndpointFactory> endpointFactory)
+    : OwnerServicePtr(OwnerService), endpointFactory(std::move(endpointFactory))
 {}
+
+void parserFSM::MessageHandler::parseMessage(const std::string &msg)
+{}
+
 void parserFSM::MessageHandler::processMessage()
 {}
+
 void parserFSM::MessageHandler::putToSendQueue(const std::string &msg)
 {
     messageStrings.push_back(msg);
@@ -174,7 +180,8 @@ TEST_CASE("Endpoint Contacts Test")
         REQUIRE(err.empty());
 
         parserFSM::PagedContext context(msgJson, 10);
-        auto handler = EndpointFactory::create(context, nullptr);
+        auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Allow);
+        auto handler = factory->create(context, nullptr);
         handler->handle(context);
         auto pageSize = context.getPageSize();
         REQUIRE(10 == pageSize);

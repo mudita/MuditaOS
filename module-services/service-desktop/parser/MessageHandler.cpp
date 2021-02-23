@@ -4,7 +4,6 @@
 #include "MessageHandler.hpp"
 
 #include <endpoints/Context.hpp>
-#include <endpoints/Endpoint.hpp>
 #include <endpoints/EndpointFactory.hpp>
 
 #include <FreeRTOS.h>
@@ -23,10 +22,14 @@ using namespace parserFSM;
 
 xQueueHandle MessageHandler::sendQueue;
 
-MessageHandler::MessageHandler(const std::string &message, sys::Service *OwnerService) : OwnerServicePtr(OwnerService)
+MessageHandler::MessageHandler(sys::Service *OwnerService, std::unique_ptr<EndpointFactory> endpointFactory)
+    : OwnerServicePtr(OwnerService), endpointFactory(std::move(endpointFactory))
+{}
+
+void MessageHandler::parseMessage(const std::string &msg)
 {
     try {
-        messageJson = json11::Json::parse(message, JsonErrorMsg);
+        messageJson = json11::Json::parse(msg, JsonErrorMsg);
     }
     catch (const std::exception &e) {
         LOG_ERROR("Cannot create MessageHandler! err:%s", e.what());
@@ -43,7 +46,7 @@ void MessageHandler::processMessage()
               context->getUuid(),
               context->getBody().dump().c_str());
 
-    auto handler = EndpointFactory::create(*context, OwnerServicePtr);
+    auto handler = endpointFactory->create(*context, OwnerServicePtr);
 
     if (handler != nullptr) {
         handler->handle(*context);

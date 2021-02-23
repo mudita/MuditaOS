@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #pragma once
 
 extern "C"
@@ -15,19 +18,27 @@ extern "C"
 #include <unistd.h>
 
 inline constexpr auto SERIAL_BUFFER_LEN = 512;
-inline constexpr auto  SERIAL_BAUDRATE = 115200;
+inline constexpr auto SERIAL_BAUDRATE   = 115200;
 
 namespace bsp
 {
-    class USBDeviceListener {
+    enum class USBDeviceStatus : uint32_t
+    {
+        Disconnected,
+        Connected
+    };
+
+    class USBDeviceListener
+    {
       public:
-        virtual bool getRawMode() const noexcept{
+        virtual bool getRawMode() const noexcept
+        {
             return false;
         }
         virtual void rawDataReceived(void *dataPtr, uint32_t dataLen) = 0;
     };
 
-    int usbInit(xQueueHandle, USBDeviceListener *deviceListener = nullptr);
+    int usbInit(xQueueHandle, xQueueHandle, USBDeviceListener *deviceListener = nullptr);
     int usbCDCReceive(void *ptr);
     int usbCDCSend(std::string *sendMsg);
     int usbCDCSendRaw(const char *dataPtr, size_t dataLen);

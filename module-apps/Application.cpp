@@ -733,4 +733,5 @@ namespace app
     {
         return lockScreenPasscodeIsOn;
     }
+
 } /* namespace app */

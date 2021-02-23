@@ -215,7 +215,14 @@ enum class MessageType
     Restore,
     Factory,
     DeveloperModeRequest,
+    PasscodeRequest,
     TransferTimer,
+
+    USBConnected,
+    USBDisconnected,
+
+    ScreenPasscodeRequest,
+    ScreenPasscodeUnlocked,
 
     // FOTA messages
     HttpRequest,

@@ -5,6 +5,7 @@ from harness.interface.defs import status
 
 
 @pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("usb_unlocked")
 def test_backup(harness):
     body = {"backupReady": True}
     ret = harness.endpoint_request("backup", "get", body)

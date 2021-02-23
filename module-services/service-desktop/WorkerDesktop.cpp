@@ -3,6 +3,7 @@
 
 #include "service-desktop/ServiceDesktop.hpp"
 #include "service-desktop/WorkerDesktop.hpp"
+#include "service-desktop/endpoints/EndpointFactory.hpp"
 #include "service-desktop/DesktopMessages.hpp"
 #include "parser/MessageHandler.hpp"
 #include "parser/ParserFSM.hpp"
@@ -10,27 +11,26 @@
 
 #include <bsp/usb/usb.hpp>
 #include <log/log.hpp>
-#include <projdefs.h>
-#include <queue.h>
 
 #include <map>
 #include <vector>
+#include <module-services/service-desktop/service-desktop/DesktopMessages.hpp>
 
 inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
 
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr)
     : sys::Worker(ownerServicePtr), ownerService(ownerServicePtr), parser(ownerServicePtr), fileDes(nullptr)
-{
-}
+{}
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 {
     Worker::init(queues);
 
-    receiveQueue                         = Worker::getQueueHandleByName(sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
+    irqQueue     = Worker::getQueueHandleByName(sdesktop::IRQ_QUEUE_BUFFER_NAME);
+    receiveQueue = Worker::getQueueHandleByName(sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
     parserFSM::MessageHandler::setSendQueueHandle(Worker::getQueueHandleByName(sdesktop::SEND_QUEUE_BUFFER_NAME));
 
-    return (bsp::usbInit(receiveQueue, this) < 0) ? false : true;
+    return (bsp::usbInit(receiveQueue, irqQueue, this) < 0) ? false : true;
 }
 
 bool WorkerDesktop::deinit(void)
@@ -62,7 +62,13 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
             LOG_ERROR("handleMessage failed to receive from \"%s\"", sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
             return false;
         }
+
+        auto factory = std::make_unique<SecuredEndpointFactory>(endpointSecurity);
+        auto handler = std::make_unique<parserFSM::MessageHandler>(ownerService, std::move(factory));
+
+        parser.setMessageHandler(std::move(handler));
         parser.processMessage(std::move(*receivedMsg));
+
         delete receivedMsg;
     }
     else if (qname == sdesktop::SEND_QUEUE_BUFFER_NAME) {
@@ -89,6 +95,24 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         else {
             LOG_ERROR("handleMessage xQueueReceive failed for %s.", SERVICE_QUEUE_NAME.c_str());
             return false;
+        }
+    }
+    else if (qname == sdesktop::IRQ_QUEUE_BUFFER_NAME) {
+        bsp::USBDeviceStatus notification = bsp::USBDeviceStatus::Disconnected;
+        if (!queue->Dequeue(&notification, 0)) {
+            LOG_ERROR("handleMessage xQueueReceive failed for %s.", sdesktop::IRQ_QUEUE_BUFFER_NAME);
+            return false;
+        }
+
+        LOG_DEBUG("USB status: %d", static_cast<int>(notification));
+
+        if (notification == bsp::USBDeviceStatus::Connected) {
+            ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConnected>(),
+                                          service::name::service_desktop);
+        }
+        else if (notification == bsp::USBDeviceStatus::Disconnected) {
+            ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBDisconnected>(),
+                                          service::name::service_desktop);
         }
     }
     else {

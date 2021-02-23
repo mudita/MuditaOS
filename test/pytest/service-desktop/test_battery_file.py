@@ -5,6 +5,7 @@ from harness.interface.defs import status
 
 @pytest.mark.rt1051
 @pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("usb_unlocked")
 def test_battery_file(harness):
     body = {"command" : "checkFile" , "fileName" : "/sys/user/batteryFuelGaugeConfig.cfg"}
     ret = harness.endpoint_request("filesystemUpload", "post", body)

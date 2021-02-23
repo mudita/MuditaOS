@@ -6,6 +6,7 @@ from harness.interface.defs import status
 
 
 @pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("usb_unlocked")
 def test_messages(harness):
     # getting the messages count
     body = {"category": "message", "count": True}

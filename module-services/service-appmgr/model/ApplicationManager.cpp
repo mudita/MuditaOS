@@ -20,6 +20,7 @@
 #include <service-gui/ServiceGUI.hpp>
 #include <service-eink/ServiceEink.hpp>
 #include <service-gui/Common.hpp>
+#include <service-desktop/DesktopMessages.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -317,6 +318,7 @@ namespace app::manager
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
         connect(typeid(sys::SystemBrownoutMesssage), convertibleToActionHandler);
         connect(typeid(CellularSmsNoSimRequestMessage), convertibleToActionHandler);
+        connect(typeid(sdesktop::passcode::ScreenPasscodeRequest), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

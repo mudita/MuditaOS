@@ -6,6 +6,7 @@ import copy
 
 @pytest.mark.skip("not working on CI")
 @pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("usb_unlocked")
 def test_calendar(harness):
     # add events
     add_body = {

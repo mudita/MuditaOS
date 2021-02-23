@@ -112,7 +112,6 @@ def harness(request):
     else:
         return harness
 
-
 @pytest.fixture(scope='session')
 def harnesses():
     '''
@@ -130,6 +129,13 @@ def phone_unlocked(harness):
     harness.unlock_phone()
     assert harness.is_phone_unlocked
 
+@pytest.fixture(scope='session')
+def usb_unlocked(harness):
+    harness.unlock_usb()
+
+@pytest.fixture(scope='session')
+def usb_locked(harness):
+    harness.lock_usb()
 
 @pytest.fixture(scope='session')
 def phones_unlocked(harnesses):

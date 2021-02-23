@@ -404,6 +404,7 @@
   "app_settings_security_wrong_passcode": "Wrong passcode!",
   "app_settings_security_passcode_changed_successfully": "Passcode changed successfully!",
   "app_settings_security_passcode_disabled": "Passcode disabled!",
+  "app_settings_security_usb_passcode": "USB security",
   "app_settings_apn_settings_no_apns": "<text align='center' color='9'>No APNs yet.<p>Press <b>left arrow</b> to add new.</p></text>",
   "app_settings_apn_options": "Options",
   "app_settings_apn_options_delete": "Delete",
