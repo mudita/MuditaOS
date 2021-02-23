@@ -3,9 +3,6 @@
 
 #include "InitializedFontManager.hpp"
 #include <mutex>
-#include <vfs.hpp>
-
-extern class vfs vfs;
 
 namespace mockup
 {
@@ -13,7 +10,6 @@ namespace mockup
 
     auto fontManager() -> gui::FontManager &
     {
-        vfs.Init();
         std::lock_guard<std::mutex> scoped(guard);
         auto &fontmanager = gui::FontManager::getInstance();
         if (!fontmanager.isInitialized()) {

@@ -1,8 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <vfs.hpp>
-
 #include <catch2/catch.hpp>
 
 #include "Database/Database.hpp"
@@ -14,21 +12,26 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Contacts Ringtones Table tests")
 {
-    vfs.Init();
     Database::initialize();
 
-    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
-    std::filesystem::remove(contactsPath);
+    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    if (std::filesystem::exists(contactsPath)) {
+        REQUIRE(std::filesystem::remove(contactsPath));
+    }
 
     ContactsDB contactsdb{contactsPath.c_str()};
     REQUIRE(contactsdb.isInitialized());
 
     ContactsRingtonesTableRow testRow1(DB_ID_NONE, DB_ID_NONE, "/test/assets/path/ringtone.wr");
 
+    const auto contactsCount = contactsdb.ringtones.count() + 1;
+    // clear contacts table
+    for (std::uint32_t id = 1; id <= contactsCount; id++) {
+        REQUIRE(contactsdb.ringtones.removeById(id));
+    }
     // add 4 elements into table
     REQUIRE(contactsdb.ringtones.add(testRow1));
     REQUIRE(contactsdb.ringtones.add(testRow1));

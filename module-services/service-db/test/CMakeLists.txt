@@ -17,4 +17,5 @@ add_catch2_executable(
         DEPS
             PurePhone.img-target
 )
+
 add_subdirectory(test-settings)

@@ -71,6 +71,10 @@ namespace purefs::blkdev::internal
         for (auto &part : root_part) {
             if (is_extended(part.type))
                 continue;
+
+            if (!check_partition(m_disk, part))
+                continue;
+
             if (part.num_sectors) {
                 part.physical_number = part_no;
                 part.mbr_number      = part_no;
@@ -88,12 +92,33 @@ namespace purefs::blkdev::internal
         return ret;
     }
 
+    auto partition_parser::check_partition(const std::shared_ptr<disk> disk, const partition &part) -> bool
+    {
+        auto sector_size     = disk->get_info(info_type::sector_size);
+        const auto this_size = uint64_t(disk->get_info(info_type::sector_count)) * uint64_t(sector_size);
+        const auto poffset   = uint64_t(part.start_sector) * uint64_t(sector_size);
+        const auto psize     = uint64_t(part.num_sectors) * uint64_t(sector_size);
+        const auto pnext     = uint64_t(part.start_sector) * uint64_t(sector_size) + poffset;
+        if ((poffset + psize > this_size) ||                    // oversized
+            (pnext < uint64_t(part.start_sector) * sector_size) // going backward
+        ) {
+            LOG_WARN("Part %d looks strange: start_sector %u offset %u next %u\n",
+                     unsigned(part.mbr_number),
+                     unsigned(part.start_sector),
+                     unsigned(poffset),
+                     unsigned(pnext));
+            return false;
+        }
+        return true;
+    }
+
     auto partition_parser::read_partitions(const std::vector<uint8_t> &buffer,
                                            std::array<partition, defs::num_parts> &parts) -> void
     {
         std::size_t offs = defs::ptbl_offs;
         for (auto &part : parts) {
             part.bootable     = buffer[defs::mbr_ptbl_active + offs] & 0x80;
+            part.boot_unit    = buffer[defs::mbr_ptbl_active + offs] & 0x7F;
             part.type         = buffer[defs::mbr_ptbl_type + offs];
             part.num_sectors  = to_word(buffer, defs::mbr_ptbl_sect_cnt + offs);
             part.start_sector = to_word(buffer, defs::mbr_ptbl_lba + offs);
@@ -111,8 +136,8 @@ namespace purefs::blkdev::internal
         auto sector_size = m_disk->get_info(info_type::sector_size);
         int extended_part_num;
         std::array<partition, defs::num_parts> parts;
-        auto current_sector = lba;
-        auto this_size      = count;
+        auto current_sector     = lba;
+        unsigned long this_size = count * sector_size;
         if (sector_size < 0) {
             return sector_size;
         }
@@ -155,10 +180,10 @@ namespace purefs::blkdev::internal
                 /* Some sanity checks */
                 const auto poffset = parts[partition_num].start_sector * sector_size;
                 const auto psize   = parts[partition_num].num_sectors * sector_size;
-                const auto pnext   = current_sector + poffset;
-                if ((poffset + psize > this_size) || // oversized
-                    (pnext < lba) ||                 // going backward
-                    (pnext > lba + count)            // outsized
+                const auto pnext   = current_sector * sector_size + poffset;
+                if ((poffset + psize > this_size) ||                                  // oversized
+                    (pnext < static_cast<unsigned long>(lba * sector_size)) ||        // going backward
+                    (pnext > static_cast<unsigned long>((lba + count) * sector_size)) // outsized
                 ) {
                     LOG_WARN("Part %d looks strange: current_sector %u offset %u next %u\n",
                              int(partition_num),
@@ -178,7 +203,7 @@ namespace purefs::blkdev::internal
                 break; /* nothing left to do */
             }
             /* Examine the next extended partition */
-            current_sector = lba + parts[extended_part_num].start_sector * sector_size;
+            current_sector = lba + parts[extended_part_num].start_sector;
             this_size      = parts[extended_part_num].num_sectors * sector_size;
         }
         return error;

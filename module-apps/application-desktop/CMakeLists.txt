@@ -72,4 +72,5 @@ target_link_libraries(${PROJECT_NAME}
         service-db
         service-desktop
         service-time
+        utils-bootconfig
     )

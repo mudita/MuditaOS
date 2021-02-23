@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 # config file for pre-commit.hook clang-format
@@ -16,8 +16,10 @@ VERBOSE=1
 declare ignore_paths=(
     '.*/catch.hpp'
     '.*/lib/'
-    'board/'
     'build'
+    'board/rt1051/xip/'
+    'board/rt1051/newlib/dir-common.h'
+    'board/rt1051/newlib/include/'
     'host-tools/littlefs-fuse/lfsfuse/'
     'module-audio/Audio/decoder/dr_flac.h'
     'module-bluetooth/Bluetooth/btstack_config.h'

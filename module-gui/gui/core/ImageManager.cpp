@@ -86,7 +86,7 @@ namespace gui
 
         auto file = std::fopen(filename.c_str(), "rb");
 
-        auto fileSize = utils::filesystem::filelength(file);
+        auto fileSize = std::filesystem::file_size(filename);
 
         char *data = new char[fileSize];
         if (data == nullptr) {
@@ -130,7 +130,7 @@ namespace gui
 
         auto file = std::fopen(filename.c_str(), "rb");
 
-        auto fileSize = utils::filesystem::filelength(file);
+        auto fileSize = std::filesystem::file_size(filename);
 
         char *data = new char[fileSize];
         if (data == nullptr) {

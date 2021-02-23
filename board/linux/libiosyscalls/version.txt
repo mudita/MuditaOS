@@ -1,44 +1,48 @@
 GLIBC_2.2.5 {
         global:
-                fclose;
-                fdopen;
-                feof;
-                ferror;
-                fflush;
-                fgetc;
-                fgetpos;
-                fgetpos64;
-                fgets;
-                fileno;
+# stdio
+                fprintf;
+                fwrite;
+                fread;
                 fopen;
                 fopen64;
-                fprintf;
+                fclose;
                 fputc;
                 fputs;
-                fread;
+                putc;
+                fgetc;
+                fgets;
+                getc;
                 freopen;
+                fdopen;
                 fseek;
-                fscanf;
+                ftell;
                 fsetpos;
                 fsetpos64;
-                ftell;
-                fwrite;
-                getc;
-                putc;
-                remove;
+                fgetpos;
+                fgetpos64;
+                feof;
                 rewind;
+                fileno;
+                ferror;
+                fflush;
+                remove;
+                rename;
+# stdio - scan family
+                fscanf;
+                vfscanf;
+#                ungetc;
+# stdio - buffering disabled
                 setbuf;
                 setvbuf;
                 setbuffer;
                 setlinebuf;
-                fscanf;
-                vfscanf;
-                ungetc;
+# posix
                 link;
                 unlink;
                 stat;
-                fstat;
                 lstat;
+                fstat;
                 fcntl;
                 fcntl64;
                 chdir;
@@ -46,12 +50,29 @@ GLIBC_2.2.5 {
                 getcwd;
                 getwd;
                 get_current_dir_name;
-                rename;
                 mkdir;
                 chmod;
                 fchmod;
                 fsync;
                 fdatasync;
+                symlink;
+                __xstat;
+                __lxstat;
+                __fxstat;
+                __xstat64;
+                __lxstat64;
+                __fxstat64;
+                read;
+                write;
+                lseek;
+                lseek64;
+                ioctl;
+                poll;
+                mount;
+                umount;
+                statvfs;
+
+# posix - dirent
                 opendir;
                 closedir;
                 readdir;
@@ -59,12 +80,12 @@ GLIBC_2.2.5 {
                 rewinddir;
                 seekdir;
                 telldir;
-                symlink;
-                fstatat;
-                __xstat;
-                __lxstat;
-                __fxstat;
-                __symlink;
+
         local:
                 *;
+};
+GLIBC_2.4 {
+        global:
+                __fxstatat;
+                __fxstatat64;
 };

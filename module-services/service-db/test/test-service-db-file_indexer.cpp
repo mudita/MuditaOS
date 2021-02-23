@@ -40,11 +40,8 @@ class ClientService : public sys::Service
     }
 };
 
-#include <vfs.hpp>
-
 TEST_CASE("FileIndexer")
 {
-    vfs.Init();
     Database::initialize();
     std::string serviceName = "file_indexer_client";
     ClientService file_indexer_client_service(serviceName);

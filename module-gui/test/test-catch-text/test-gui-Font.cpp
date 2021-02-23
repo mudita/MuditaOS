@@ -5,11 +5,9 @@
 #include <FontManager.hpp>
 #include <Font.hpp>
 #include <Style.hpp>
-#include <vfs.hpp>
 
 TEST_CASE("Testo Font")
 {
-    vfs.Init();
     using namespace gui;
     auto &fm = FontManager::getInstance();
     fm.init("assets");

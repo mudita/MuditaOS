@@ -35,6 +35,8 @@ namespace drivers
             base = GPIO5;
             name = "GPIO_5";
         } break;
+        default:
+            break;
         }
 
         LOG_DEBUG("Init: %s", name.c_str());

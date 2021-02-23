@@ -20,25 +20,21 @@
 #include <json/json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <utf8/UTF8.hpp>
-#include <vfs.hpp>
-
 #include <memory>
 #include <filesystem>
 #include <string>
 #include <vector>
 
-class vfs vfs;
 
 TEST_CASE("System Update Tests")
 {
-    vfs.Init();
-
     UpdateMuditaOS updateOS(nullptr);
 
-    updateos::UpdateError err = updateOS.prepareTempDirForUpdate();
+    updateos::UpdateError err = updateOS.prepareTempDirForUpdate(std::filesystem::path{"user"} / "tmp",
+                                                                 std::filesystem::path{"sys"} / "updates");
     REQUIRE(err == updateos::UpdateError::NoError);
 
-    updateOS.setUpdateFile("muditaos-unittest.tar");
+    updateOS.setUpdateFile(std::filesystem::path{"sys"} / "updates", "muditaos-unittest.tar");
 
     err = updateOS.unpackUpdate();
     REQUIRE(err == updateos::UpdateError::NoError);
@@ -51,8 +47,6 @@ using namespace parserFSM;
 
 TEST_CASE("Parser Test")
 {
-    vfs.Init();
-
     StateMachine parser(nullptr);
 
     SECTION("Parse message with divided header and payload")
@@ -134,8 +128,6 @@ TEST_CASE("Parser Test")
 
 TEST_CASE("DB Helpers test - json decoding")
 {
-    vfs.Init();
-
     std::string err;
 
     SECTION("correct json")
@@ -175,8 +167,6 @@ TEST_CASE("DB Helpers test - json decoding")
 
 TEST_CASE("DB Helpers test - json encoding (contacts)")
 {
-    vfs.Init();
-
     auto helper = std::make_unique<ContactHelper>(nullptr);
 
     auto contact             = std::make_unique<ContactRecord>();
@@ -203,8 +193,6 @@ TEST_CASE("DB Helpers test - json encoding (contacts)")
 
 TEST_CASE("DB Helpers test - json encoding (messages)")
 {
-    vfs.Init();
-
     auto helper  = std::make_unique<MessageHelper>(nullptr);
     auto message = std::make_unique<SMSRecord>();
 
@@ -243,8 +231,6 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
 
 TEST_CASE("Context class test")
 {
-    vfs.Init();
-
     SECTION("Correct message")
     {
         auto testMessage = R"({"endpoint":7, "method":1, "uuid":12345, "body":{"test":"test"}})";
@@ -281,8 +267,6 @@ TEST_CASE("Context class test")
 
 TEST_CASE("Endpoint Factory test")
 {
-    vfs.Init();
-
     SECTION("Proper endpoint")
     {
         auto testMessage = R"({"endpoint":7, "method":1, "uuid":12345, "body":{"test":"test"}})";

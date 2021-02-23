@@ -17,11 +17,9 @@
 #include "module-db/queries/calendar/QueryEventsEditICS.hpp"
 #include "module-db/queries/calendar/QueryEventsSelectFirstUpcoming.hpp"
 
-#include <vfs.hpp>
-#include <purefs/filesystem_paths.hpp>
-
-#include <stdint.h>
 #include <algorithm>
+#include <cstdint>
+#include <filesystem>
 #include <iostream>
 
 using namespace std::chrono_literals;
@@ -39,11 +37,12 @@ static auto remove_events(EventsDB &db) -> bool
 
 TEST_CASE("Events Record tests")
 {
-    vfs.Init();
     Database::initialize();
 
-    const auto eventsPath = purefs::dir::getUserDiskPath() / "events.db";
-    std::filesystem::remove(eventsPath);
+    const auto eventsPath = (std::filesystem::path{"user"} / "events.db");
+    if (std::filesystem::exists(eventsPath)) {
+        REQUIRE(std::filesystem::remove(eventsPath));
+    }
 
     EventsDB eventsDb{eventsPath.c_str()};
 

@@ -149,7 +149,7 @@ TEST_CASE("Corefs: Create new file, write, read from it")
         REQUIRE(hwnd >= 3);
         char buf[4096]{};
         REQUIRE(fscore.read(hwnd, buf, sizeof(buf)) == 4);
-        REQUIRE(fscore.seek(hwnd, 0, SEEK_END) == 0);
+        REQUIRE(fscore.seek(hwnd, 0, SEEK_END) == 4);
         REQUIRE(fscore.read(hwnd, buf, sizeof(buf)) == 0);
         REQUIRE(fscore.seek(hwnd, 0, SEEK_SET) == 0);
         fscore.close(hwnd);
@@ -220,7 +220,7 @@ TEST_CASE("Corefs: Directory operations")
     REQUIRE(ret == 0);
     REQUIRE(fscore.mount("emmc0part0", "/sys", "vfat") == 0);
 
-    const auto dirhandle = fscore.diropen("/sys/user");
+    const auto dirhandle = fscore.diropen("/sys/current");
     REQUIRE(dirhandle);
     REQUIRE(dirhandle->error() == 0);
 
@@ -272,7 +272,96 @@ TEST_CASE("Corefs: Directory operations")
     }
 }
 
-TEST_CASE("Unititest integrated subsystem")
+TEST_CASE("Corefs: Read only filesystem")
+{
+    using namespace purefs;
+    auto dm   = std::make_shared<blkdev::disk_manager>();
+    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    REQUIRE(disk);
+    REQUIRE(dm->register_device(disk, "emmc0") == 0);
+    purefs::fs::filesystem fscore(dm);
+    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
+    REQUIRE(vfs_vfat->mount_count() == 0);
+    auto ret = fscore.register_filesystem("vfat", vfs_vfat);
+    REQUIRE(ret == 0);
+    REQUIRE(fscore.mount("emmc0part0", "/sys", "vfat", fs::mount_flags::read_only) == 0);
+    SECTION("Open file in O_RDWR")
+    {
+        int hwnd = fscore.open("/sys/rotest.txt", O_RDWR | O_CREAT, 0660);
+        REQUIRE(hwnd == -EACCES);
+        const std::string text = "test";
+        fscore.write(hwnd, text.c_str(), text.size());
+    }
+    SECTION("Check function which not modify fs")
+    {
+        struct statvfs ssv;
+        ret = fscore.stat_vfs("/sys/", ssv);
+        REQUIRE(ret == 0);
+    }
+    SECTION("Check stat to not set S_IW...")
+    {
+        struct stat st;
+        ret = fscore.stat("/sys/current", st);
+        REQUIRE(ret == 0);
+        REQUIRE(st.st_mode & S_IFDIR);
+        REQUIRE((st.st_mode & (S_IWGRP | S_IWUSR | S_IWOTH)) == 0);
+    }
+    REQUIRE(fscore.umount("/sys") == 0);
+}
+
+TEST_CASE("Corefs: Remount filesystem from RO to RW and to RO")
+{
+    using namespace purefs;
+    auto dm   = std::make_shared<blkdev::disk_manager>();
+    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    REQUIRE(disk);
+    REQUIRE(dm->register_device(disk, "emmc0") == 0);
+    auto fscore         = std::make_shared<purefs::fs::filesystem>(dm);
+    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
+    REQUIRE(vfs_vfat->mount_count() == 0);
+    auto ret = fscore->register_filesystem("vfat", vfs_vfat);
+    REQUIRE(ret == 0);
+    REQUIRE(fscore->mount("emmc0part0", "/sys", "vfat", fs::mount_flags::read_only) == 0);
+
+    {
+        const int hwnd = fscore->open("/sys/remount_test.txt", O_RDWR | O_CREAT, 0660);
+        REQUIRE(hwnd == -EACCES);
+    }
+    REQUIRE(fscore->mount("", "/sys", "", fs::mount_flags::remount) == 0);
+    {
+        int hwnd = fscore->open("/sys/remount_test4.txt", O_RDWR | O_CREAT, 0660);
+        REQUIRE(hwnd > 2);
+        const std::string text = "test";
+        fscore->write(hwnd, text.c_str(), text.size());
+        REQUIRE(fscore->close(hwnd) == 0);
+    }
+    {
+        struct stat st;
+        ret = fscore->stat("/sys/current", st);
+        REQUIRE(ret == 0);
+        REQUIRE(st.st_mode & S_IFDIR);
+        REQUIRE(st.st_mode & (S_IWGRP | S_IWUSR | S_IWOTH));
+    }
+    REQUIRE(fscore->umount("/sys") == 0);
+}
+
+TEST_CASE("Corefs: Autodetect filesystems")
+{
+    using namespace purefs;
+    auto dm   = std::make_shared<blkdev::disk_manager>();
+    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    REQUIRE(disk);
+    REQUIRE(dm->register_device(disk, "emmc0") == 0);
+    auto fscore         = std::make_shared<purefs::fs::filesystem>(dm);
+    const auto vfs_vfat = std::make_shared<fs::drivers::filesystem_vfat>();
+    REQUIRE(vfs_vfat->mount_count() == 0);
+    auto ret = fscore->register_filesystem("vfat", vfs_vfat);
+    REQUIRE(ret == 0);
+    REQUIRE(fscore->mount("emmc0part0", "/sys", "auto") == 0);
+    REQUIRE(fscore->umount("/sys") == 0);
+}
+
+TEST_CASE("Corefs: Unittest integrated subsystem")
 {
     auto [disk, vfs] = purefs::subsystem::initialize();
     REQUIRE(purefs::subsystem::mount_defaults() == 0);

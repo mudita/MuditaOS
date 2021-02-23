@@ -3,6 +3,8 @@
 
 #pragma once
 #include <stddef.h>
+#include <stdint.h>
+#include <sys/types.h>
 
 typedef int part_type_t;
 
@@ -22,3 +24,5 @@ struct partition *find_partitions(const char *filename, part_type_t ptype, size_
     __attribute__((nonnull(1, 3)));
 
 void print_partitions(const struct partition *part, size_t nparts);
+
+int write_partition_bootunit(const char *filename, int part_num, uint32_t block_size);

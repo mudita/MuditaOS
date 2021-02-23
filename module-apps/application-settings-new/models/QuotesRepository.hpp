@@ -10,8 +10,8 @@
 
 #include <list>
 #include <functional>
+#include <filesystem>
 #include <module-apps/Application.hpp>
-#include <vfs.hpp>
 
 namespace app
 {
@@ -49,9 +49,9 @@ namespace app
         void remove(const QuoteRecord &quote) override;
 
       private:
-        void writeQuotes(const fs::path &path);
-        void readQuotes(const fs::path &fn);
-        std::string readFileToString(const fs::path &fn);
+        void writeQuotes(const std::filesystem::path &path);
+        void readQuotes(const std::filesystem::path &fn);
+        std::string readFileToString(const std::filesystem::path &fn);
 
         std::list<QuoteRecord> quotes;
         std::string repositoryPath;

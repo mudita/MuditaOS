@@ -6,23 +6,22 @@
 
 #include "Database/Database.hpp"
 #include "Databases/ContactsDB.hpp"
-#include <vfs.hpp>
 
 #include <algorithm>
 
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <purefs/filesystem_paths.hpp>
+#include <filesystem>
 
-class vfs vfs;
 TEST_CASE("Contacts Name Table tests")
 {
-    vfs.Init();
     Database::initialize();
 
-    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
-    std::filesystem::remove(contactsPath);
+    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    if (std::filesystem::exists(contactsPath)) {
+        REQUIRE(std::filesystem::remove(contactsPath));
+    }
 
     ContactsDB contactsdb(contactsPath.c_str());
     REQUIRE(contactsdb.isInitialized());
@@ -30,6 +29,11 @@ TEST_CASE("Contacts Name Table tests")
     ContactsNameTableRow testRow1 = {
         {.ID = DB_ID_NONE}, .contactID = DB_ID_NONE, .namePrimary = "Mateusz", .nameAlternative = "Pati"};
 
+    const auto contactsCount = contactsdb.name.count() + 1;
+    // clear contacts table
+    for (std::uint32_t id = 1; id <= contactsCount; id++) {
+        REQUIRE(contactsdb.name.removeById(id));
+    }
     // add 4 elements into table
     REQUIRE(contactsdb.name.add(testRow1));
     REQUIRE(contactsdb.name.add(testRow1));

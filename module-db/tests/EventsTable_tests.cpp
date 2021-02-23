@@ -7,7 +7,7 @@
 #include "Databases/EventsDB.hpp"
 #include "Tables/EventsTable.hpp"
 
-#include <vfs.hpp>
+#include <purefs/filesystem_paths.hpp>
 #include <stdint.h>
 #include <string>
 #include <algorithm>
@@ -30,12 +30,12 @@ static auto remove_events(EventsDB &db) -> bool
 
 TEST_CASE("Events Table tests")
 {
-
     Database::initialize();
-    vfs.Init();
 
-    const auto eventsPath = purefs::dir::getUserDiskPath() / "events.db";
-    // std::filesystem::remove(eventsPath);
+    const auto eventsPath = (std::filesystem::path{"user"} / "events.db");
+    if (std::filesystem::exists(eventsPath)) {
+        REQUIRE(std::filesystem::remove(eventsPath));
+    }
 
     EventsDB eventsDb{eventsPath.c_str()};
     REQUIRE(eventsDb.isInitialized());
@@ -702,7 +702,7 @@ TEST_CASE("Events Table tests")
         check_tableRow(entries[2], testRow3);
     }
 
-    SECTION("Select entry by date period max")
+    SECTION("Select entry by date max")
     {
         auto entries = eventsTbl.selectByDatePeriod(
             TimePointFromString("2019-10-21 10:00:00"), TimePointFromString("2019-10-24 10:00:00"), 0, UINT32_MAX);
@@ -726,291 +726,6 @@ TEST_CASE("Events Table tests")
     {
         auto entries = eventsTbl.getLimitOffsetByDate(0, 6);
         CHECK(entries.size() == 6);
-    }
-
-    SECTION("Check multiday events")
-    {
-        /// 8.12 <-> 11.12
-        EventsTableRow multidayEvent1 = {{1},
-                                         .UID              = "test1",
-                                         .title            = "Event1",
-                                         .date_from        = TimePointFromString("2020-12-8 14:25:00"),
-                                         .date_till        = TimePointFromString("2020-12-11 15:36:00"),
-                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
-                                         .repeat           = static_cast<uint32_t>(Repeat::never),
-                                         .reminder_fired   = TimePointFromString("2020-10-20 14:20:00"),
-                                         .provider_type    = "PurePhone",
-                                         .provider_id      = "testID",
-                                         .provider_iCalUid = "test6"};
-
-        /// 14.12 <-> 21.12
-        EventsTableRow multidayEvent2 = {{2},
-                                         .UID              = "test2",
-                                         .title            = "Event2",
-                                         .date_from        = TimePointFromString("2020-12-14 14:24:00"),
-                                         .date_till        = TimePointFromString("2020-12-21 15:36:00"),
-                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
-                                         .repeat           = static_cast<uint32_t>(Repeat::never),
-                                         .reminder_fired   = TimePointFromString("2020-10-21 14:20:00"),
-                                         .provider_type    = "PurePhone",
-                                         .provider_id      = "testID",
-                                         .provider_iCalUid = "test6"};
-
-        EventsTableRow singleDayEvent = {{3},
-                                         .UID              = "test3",
-                                         .title            = "Event3",
-                                         .date_from        = TimePointFromString("2020-12-18 14:24:00"),
-                                         .date_till        = TimePointFromString("2020-12-18 15:36:00"),
-                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
-                                         .repeat           = static_cast<uint32_t>(Repeat::never),
-                                         .reminder_fired   = TimePointFromString("2020-10-21 14:20:00"),
-                                         .provider_type    = "PurePhone",
-                                         .provider_id      = "testID",
-                                         .provider_iCalUid = "test6"};
-
-        /// 23.12 <-> 24.12
-        EventsTableRow multidayEvent3 = {{4},
-                                         .UID              = "test4",
-                                         .title            = "Event4",
-                                         .date_from        = TimePointFromString("2020-12-23 14:25:00"),
-                                         .date_till        = TimePointFromString("2020-12-24 15:36:00"),
-                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
-                                         .repeat           = static_cast<uint32_t>(Repeat::never),
-                                         .reminder_fired   = TimePointFromString("2020-10-22 14:20:00"),
-                                         .provider_type    = "PurePhone",
-                                         .provider_id      = "testID",
-                                         .provider_iCalUid = "test6"};
-
-        /// 24.12 <-> 26.12
-        EventsTableRow multidayEvent4 = {{5},
-                                         .UID              = "test5",
-                                         .title            = "Event5",
-                                         .date_from        = TimePointFromString("2020-12-24 16:25:00"),
-                                         .date_till        = TimePointFromString("2020-12-26 15:36:00"),
-                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
-                                         .repeat           = static_cast<uint32_t>(Repeat::never),
-                                         .reminder_fired   = TimePointFromString("2020-10-22 14:20:00"),
-                                         .provider_type    = "PurePhone",
-                                         .provider_id      = "testID",
-                                         .provider_iCalUid = "test6"};
-
-        /// 25.12 <-> 28.12
-        EventsTableRow multidayEvent5 = {{6},
-                                         .UID              = "test6",
-                                         .title            = "Event6",
-                                         .date_from        = TimePointFromString("2020-12-25 16:25:00"),
-                                         .date_till        = TimePointFromString("2020-12-28 15:36:00"),
-                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
-                                         .repeat           = static_cast<uint32_t>(Repeat::never),
-                                         .reminder_fired   = TimePointFromString("2020-10-22 14:20:00"),
-                                         .provider_type    = "PurePhone",
-                                         .provider_id      = "testID",
-                                         .provider_iCalUid = "test6"};
-
-        /// 31.12 <-> 03.01
-        EventsTableRow multidayEvent6 = {{7},
-                                         .UID              = "test7",
-                                         .title            = "Event7",
-                                         .date_from        = TimePointFromString("2020-12-31 16:25:00"),
-                                         .date_till        = TimePointFromString("2021-01-23 15:36:00"),
-                                         .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
-                                         .repeat           = static_cast<uint32_t>(Repeat::never),
-                                         .reminder_fired   = TimePointFromString("2020-10-22 14:20:00"),
-                                         .provider_type    = "PurePhone",
-                                         .provider_id      = "testID",
-                                         .provider_iCalUid = "test6"};
-
-        SECTION("Select entry by date (multi day events)")
-        {
-            auto entries = eventsTbl.selectByDate(TimePointFromString("2020-12-07 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.empty());
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-08 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent1);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-09 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent1);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-10 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent1);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-11 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent1);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-12 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.empty());
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-13 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.empty());
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-14 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent2);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-15 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent2);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-16 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent2);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-17 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent2);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-18 10:00:00"), 0, UINT32_MAX);
-            REQUIRE(entries.size() == 2);
-
-            check_tableRow(entries[0], multidayEvent2);
-            check_tableRow(entries[1], singleDayEvent);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-19 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent2);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-20 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent2);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-21 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent2);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-22 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.empty());
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-23 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent3);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-24 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 2);
-
-            check_tableRow(entries[0], multidayEvent3);
-            check_tableRow(entries[1], multidayEvent4);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-25 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 2);
-
-            check_tableRow(entries[0], multidayEvent4);
-            check_tableRow(entries[1], multidayEvent5);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-26 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 2);
-
-            check_tableRow(entries[0], multidayEvent4);
-            check_tableRow(entries[1], multidayEvent5);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-27 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent5);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-28 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent5);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-29 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.empty());
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-30 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.empty());
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-12-31 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent6);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2021-01-01 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent6);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2021-01-02 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent6);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2021-01-03 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], multidayEvent6);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2021-01-04 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.empty());
-        }
-
-        SECTION("Select entry by date (single day events)")
-        {
-            EventsTableRow singleDayEvent1 = {{1},
-                                              .UID              = "test1",
-                                              .title            = "Event1",
-                                              .date_from        = TimePointFromString("2020-10-20 14:25:00"),
-                                              .date_till        = TimePointFromString("2020-10-20 15:36:00"),
-                                              .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
-                                              .repeat           = static_cast<uint32_t>(Repeat::never),
-                                              .reminder_fired   = TimePointFromString("2020-10-20 14:20:00"),
-                                              .provider_type    = "PurePhone",
-                                              .provider_id      = "testID",
-                                              .provider_iCalUid = "test6"};
-
-            EventsTableRow singleDayEvent2 = {{2},
-                                              .UID              = "test2",
-                                              .title            = "Event2",
-                                              .date_from        = TimePointFromString("2020-10-21 14:24:00"),
-                                              .date_till        = TimePointFromString("2020-10-21 15:36:00"),
-                                              .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
-                                              .repeat           = static_cast<uint32_t>(Repeat::never),
-                                              .reminder_fired   = TimePointFromString("2020-10-21 14:20:00"),
-                                              .provider_type    = "PurePhone",
-                                              .provider_id      = "testID",
-                                              .provider_iCalUid = "test6"};
-
-            EventsTableRow singleDayEvent3 = {{3},
-                                              .UID              = "test3",
-                                              .title            = "Event3",
-                                              .date_from        = TimePointFromString("2020-10-22 14:25:00"),
-                                              .date_till        = TimePointFromString("2020-10-22 15:36:00"),
-                                              .reminder         = static_cast<uint32_t>(Reminder::five_min_before),
-                                              .repeat           = static_cast<uint32_t>(Repeat::never),
-                                              .reminder_fired   = TimePointFromString("2020-10-22 14:20:00"),
-                                              .provider_type    = "PurePhone",
-                                              .provider_id      = "testID",
-                                              .provider_iCalUid = "test6"};
-
-            auto entries = eventsTbl.selectByDate(TimePointFromString("2020-10-20 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], singleDayEvent1);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-10-21 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], singleDayEvent2);
-
-            entries = eventsTbl.selectByDate(TimePointFromString("2020-10-22 10:00:00"), 0, UINT32_MAX);
-            CHECK(entries.size() == 1);
-
-            check_tableRow(entries[0], singleDayEvent3);
-        }
     }
 
     SECTION("Select first upcoming event")

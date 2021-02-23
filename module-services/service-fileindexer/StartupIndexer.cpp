@@ -4,7 +4,7 @@
 #include "StartupIndexer.hpp"
 #include "messages/FileChangeMessage.hpp"
 #include <filesystem>
-#include <ff_stdio_listdir_recursive.h>
+//#include <ff_stdio_listdir_recursive.h>
 #include <purefs/filesystem_paths.hpp>
 #include "Constants.hpp"
 
@@ -36,6 +36,7 @@ namespace service::detail
     // Collect startup files when service starts
     auto StartupIndexer::collectStartupFiles() -> void
     {
+        /*
         using namespace std::string_literals;
         auto searcher_cb = [](void *ctx, const char *path, bool isDir) {
             auto _this = reinterpret_cast<StartupIndexer *>(ctx);
@@ -52,6 +53,7 @@ namespace service::detail
         for (const auto &path : start_dirs) {
             ff_stdio_listdir_recursive(path.c_str(), searcher_cb, this);
         }
+        */
     }
     // Setup timers for notification
     auto StartupIndexer::setupTimers(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void

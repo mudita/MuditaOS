@@ -7,8 +7,11 @@
 
 namespace
 {
-    constexpr auto disk_image = "PurePhone.img";
-}
+    constexpr auto disk_image          = "PurePhone.img";
+    constexpr auto part_disk_image     = "test_disk.img";
+    constexpr auto part_disk_image_ext = "test_disk_ext.img";
+    constexpr auto part_disk_image_bad = "test_disk_bad.img";
+} // namespace
 TEST_CASE("Registering and unregistering device")
 {
     using namespace purefs;
@@ -29,22 +32,58 @@ TEST_CASE("Parsing and checking partititons")
 {
     using namespace purefs;
     blkdev::disk_manager dm;
-    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    auto disk = std::make_shared<blkdev::disk_image>(part_disk_image);
     REQUIRE(disk);
     REQUIRE(dm.register_device(disk, "emmc0") == 0);
     const auto parts = dm.partitions("emmc0");
-    REQUIRE(parts.size() > 1);
+    REQUIRE(parts.size() == 3);
     unsigned long prev_start = 0;
     int num{};
     for (const auto &part : parts) {
         REQUIRE(part.physical_number > 0);
-        REQUIRE(part.start_sector >= 2048);
+        REQUIRE(part.start_sector > 0);
         REQUIRE(part.num_sectors > 0);
         REQUIRE(part.start_sector >= prev_start);
         REQUIRE(part.type > 0);
         REQUIRE(part.name == ("emmc0part" + std::to_string(num++)));
         prev_start = part.num_sectors + part.start_sector;
     }
+}
+
+TEST_CASE("Parsing and checking extended partititons")
+{
+    using namespace purefs;
+    blkdev::disk_manager dm;
+    auto disk = std::make_shared<blkdev::disk_image>(part_disk_image_ext);
+    REQUIRE(disk);
+    REQUIRE(dm.register_device(disk, "emmc0") == 0);
+    const auto parts = dm.partitions("emmc0");
+
+    REQUIRE(parts.size() == 7);
+    unsigned long prev_start = 0;
+    int num{};
+    for (const auto &part : parts) {
+        REQUIRE(part.physical_number > 0);
+        REQUIRE(part.start_sector >= 1);
+        REQUIRE(part.num_sectors > 0);
+        REQUIRE(part.num_sectors < 0xFF);
+        REQUIRE(part.start_sector >= prev_start);
+        REQUIRE(part.type > 0);
+        REQUIRE(part.name == ("emmc0part" + std::to_string(num++)));
+        prev_start = part.num_sectors + part.start_sector;
+    }
+}
+
+TEST_CASE("Parsing and checking invalid partititons")
+{
+    using namespace purefs;
+    blkdev::disk_manager dm;
+    auto disk = std::make_shared<blkdev::disk_image>(part_disk_image_bad);
+    REQUIRE(disk);
+    REQUIRE(dm.register_device(disk, "emmc0") == 0);
+    const auto parts = dm.partitions("emmc0");
+
+    REQUIRE(parts.size() == 0);
 }
 
 TEST_CASE("RW boundary checking")
@@ -194,22 +233,44 @@ TEST_CASE("Disk sectors out of range for partition")
     REQUIRE(dm.register_device(disk, "emmc1") == 0);
     const auto parts = dm.partitions("emmc1");
     REQUIRE(parts.size() > 1);
+    const auto sectors   = dm.get_info("emmc1", blkdev::info_type::sector_count);
     const auto sect_size = dm.get_info("emmc1", blkdev::info_type::sector_size);
 
-    SECTION("Read out of range")
+    SECTION("Read out of range ")
     {
         std::vector<uint8_t> buf(sect_size);
-        REQUIRE(dm.read("emmc1", buf.data(), parts[0].num_sectors - 1, parts[0].num_sectors) == -ERANGE);
+        SECTION("Pass lba bigger than sectors")
+        {
+            REQUIRE(dm.read("emmc1", buf.data(), sectors + 1, 1) == -ERANGE);
+        }
+        SECTION("Pass sum of lba and count bigger than sectors")
+        {
+            REQUIRE(dm.read("emmc1", buf.data(), sectors - 1, 2) == -ERANGE);
+        }
     }
 
     SECTION("Write out of range")
     {
         std::vector<uint8_t> buf(sect_size);
-        REQUIRE(dm.write("emmc1", buf.data(), parts[0].num_sectors - 1, parts[0].num_sectors) == -ERANGE);
+        SECTION("Pass lba bigger than sectors")
+        {
+            REQUIRE(dm.write("emmc1", buf.data(), sectors + 1, 1) == -ERANGE);
+        }
+        SECTION("Pass sum of lba and count bigger than sectors")
+        {
+            REQUIRE(dm.write("emmc1", buf.data(), sectors - 1, 2) == -ERANGE);
+        }
     }
 
     SECTION("Erase out of range")
     {
-        REQUIRE(dm.erase("emmc1", parts[0].num_sectors - 1, parts[0].num_sectors) == -ERANGE);
+        SECTION("Pass lba bigger than sectors")
+        {
+            REQUIRE(dm.erase("emmc1", sectors + 1, 1) == -ERANGE);
+        }
+        SECTION("Pass sum of lba and count bigger than sectors")
+        {
+            REQUIRE(dm.erase("emmc1", sectors - 1, 2) == -ERANGE);
+        }
     }
 }

@@ -37,7 +37,8 @@ namespace bsp
 
         static std::shared_ptr<drivers::DriverI2C> i2c;
         static std::shared_ptr<drivers::DriverGPIO> gpio;
-        static drivers::I2CAddress i2cAddr = {.deviceAddress = HEADSET_I2C_ADDR, .subAddressSize = 0x01};
+        static drivers::I2CAddress i2cAddr = {
+            .deviceAddress = HEADSET_I2C_ADDR, .subAddress = 0, .subAddressSize = 0x01};
         static TimerHandle_t timerHandle;
 
         static xQueueHandle qHandleIrq = nullptr;
@@ -50,7 +51,7 @@ namespace bsp
             bool ret = false;
 
             i2cAddr.subAddress = HEADSET_INT_REG_ADDR;
-            auto err           = i2c->Read(i2cAddr, (uint8_t *)&reg, 1);
+            i2c->Read(i2cAddr, (uint8_t *)&reg, 1);
 
             i2cAddr.subAddress = HEADSET_DET_RES_ADDR;
             i2c->Read(i2cAddr, (uint8_t *)&reg, 1);

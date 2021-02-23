@@ -20,7 +20,7 @@ class DatabaseInitialisationError : public std::runtime_error
 class Database
 {
   public:
-    explicit Database(const char *name);
+    explicit Database(const char *name, bool readOnly = false);
     virtual ~Database();
 
     std::unique_ptr<QueryResult> query(const char *format, ...);

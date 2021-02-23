@@ -27,7 +27,7 @@ namespace utils
             return json11::Json();
         }
 
-        uint32_t fsize = utils::filesystem::filelength(fd);
+        uint32_t fsize = std::filesystem::file_size(path);
 
         auto stream = std::make_unique<char[]>(fsize + 1); // +1 for NULL terminator
 

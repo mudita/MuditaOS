@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log/log.hpp>
-#include <vfs.hpp>
 #include "ServiceFileIndexer.hpp"
 #include "notesIndexer.hpp"
 #include "messages/FileChangeMessage.hpp"
@@ -54,6 +53,7 @@ namespace service
     // Initialize data notification handler
     sys::ReturnCodes ServiceFileIndexer::InitHandler()
     {
+        /*
         vfs.registerNotificationHandler(
             [_this = shared_from_this()](std::string_view new_path, vfs::FsEvent event, std::string_view old_path) {
                 namespace fs       = std::filesystem;
@@ -62,12 +62,15 @@ namespace service
                 _this->bus.sendUnicast(msg, std::string(service::name::file_indexer));
             });
         mStartupIndexer.start(shared_from_this(), service::name::file_indexer);
+        */
         return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes ServiceFileIndexer::DeinitHandler()
     {
+        /*
         vfs.registerNotificationHandler(nullptr);
+        */
         return sys::ReturnCodes::Success;
     }
 

@@ -5,7 +5,6 @@
 #include <time/time_conversion.hpp>
 #include <algorithm>
 #include <thread.hpp>
-#include <vfs.hpp>
 #include "i18n/i18n.hpp"
 
 namespace
@@ -43,8 +42,6 @@ class NullStream : public std::ostream
     NullStream() : std::ostream(&m_nb)
     {}
 };
-
-class vfs vfs;
 
 using namespace utils::time;
 
@@ -234,7 +231,6 @@ int main(int argc, char *argv[])
 {
     time_t time_today = 0;
 
-    vfs.Init();
     // get reference Today time
     if (bsp::rtc_GetCurrentTimestamp(&time_today)) {
         std::cerr << "Error on gettime" << std::endl;

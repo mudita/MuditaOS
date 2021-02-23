@@ -64,13 +64,14 @@ extern "C"
     }
 }
 
-Database::Database(const char *name)
+Database::Database(const char *name, bool readOnly)
     : dbConnection(nullptr), dbName(name), queryStatementBuffer{nullptr}, isInitialized_(false),
       initializer(std::make_unique<DatabaseInitializer>(this))
 {
+    const int flags = (readOnly) ? (SQLITE_OPEN_READONLY) : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
     LOG_INFO("Creating database: %s", dbName.c_str());
-    if (const auto rc = sqlite3_open(name, &dbConnection); rc != SQLITE_OK) {
-        LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d ( %s ) dbName=%s", rc, sqlite3_errstr(rc), name);
+    if (const auto rc = sqlite3_open_v2(name, &dbConnection, flags, nullptr); rc != SQLITE_OK) {
+        LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d dbName=%s", rc, name);
         throw DatabaseInitialisationError{"Failed to initialize the sqlite db"};
     }
 

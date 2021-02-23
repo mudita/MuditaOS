@@ -7,16 +7,14 @@
 #include "Databases/ContactsDB.hpp"
 #include "Tables/ContactsTable.hpp"
 
-#include <vfs.hpp>
-#include <purefs/filesystem_paths.hpp>
-
 TEST_CASE("Contacts Table tests")
 {
-    vfs.Init();
     Database::initialize();
 
-    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
-    std::filesystem::remove(contactsPath);
+    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    if (std::filesystem::exists(contactsPath)) {
+        REQUIRE(std::filesystem::remove(contactsPath));
+    }
 
     ContactsDB contactsdb{contactsPath.c_str()};
     REQUIRE(contactsdb.isInitialized());
@@ -46,6 +44,11 @@ TEST_CASE("Contacts Table tests")
     REQUIRE(
         contactsdb.execute("INSERT OR REPLACE INTO  contact_match_groups (_id,group_id,contact_id) VALUES (4,1,4);"));
 
+    const auto contactsCount = contactsdb.contacts.count() + 1;
+    // clear contacts table
+    for (std::uint32_t id = 1; id <= contactsCount; id++) {
+        REQUIRE(contactsdb.contacts.removeById(id));
+    }
     // add 4 elements into table
     REQUIRE(contactsdb.contacts.add(testRow1));
     REQUIRE(contactsdb.contacts.add(testRow1));

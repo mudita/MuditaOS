@@ -44,6 +44,8 @@ namespace drivers
         case PLLInstances::OSC_24M: {
             // not used
         } break;
+        default:
+            break;
         }
         LOG_DEBUG("Init: %s", name.c_str());
     }
@@ -75,6 +77,8 @@ namespace drivers
         case PLLInstances::OSC_24M: {
             // not used
         } break;
+        default:
+            break;
         }
 
         LOG_DEBUG("Deinit: %s", name.c_str());

@@ -7,9 +7,6 @@
 #include "Database/Database.hpp"
 #include "Databases/SmsDB.hpp"
 
-#include <vfs.hpp>
-#include <purefs/filesystem_paths.hpp>
-
 #include <algorithm>
 #include <filesystem>
 
@@ -19,11 +16,12 @@
 
 TEST_CASE("SMS templates Record tests")
 {
-    vfs.Init();
     Database::initialize();
 
-    const auto smsPath = purefs::dir::getUserDiskPath() / "sms.db";
-    std::filesystem::remove(smsPath);
+    const auto smsPath = (std::filesystem::path{"user"} / "sms.db");
+    if (std::filesystem::exists(smsPath)) {
+        REQUIRE(std::filesystem::remove(smsPath));
+    }
 
     SmsDB smsDB(smsPath.c_str());
     REQUIRE(smsDB.isInitialized());
@@ -33,6 +31,11 @@ TEST_CASE("SMS templates Record tests")
     testRec.text               = "Test text";
     testRec.lastUsageTimestamp = 100;
 
+    const auto smsRecords = SMSTemplateRecordInterface.GetCount();
+    // clear sms table
+    for (std::uint32_t id = 1; id <= smsRecords; id++) {
+        REQUIRE(SMSTemplateRecordInterface.RemoveByID(id));
+    }
     // Add 4 records
     REQUIRE(SMSTemplateRecordInterface.Add(testRec));
     REQUIRE(SMSTemplateRecordInterface.Add(testRec));

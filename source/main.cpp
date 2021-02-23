@@ -53,12 +53,10 @@
 #include <SystemManager/SystemManager.hpp>
 #include <SystemWatchdog/SystemWatchdog.hpp>
 #include <thread.hpp>
-#include <vfs.hpp>
+#include <purefs/vfs_subsystem.hpp>
 
 #include <memory>
 #include <vector>
-
-class vfs vfs;
 
 int main()
 {
@@ -74,6 +72,7 @@ int main()
 
     bsp::BoardInit();
 
+    purefs::subsystem::vfs_handle_t vfs;
     if (!sys::SystemWatchdog::getInstance().init()) {
         LOG_ERROR("System watchdog failed to initialize");
         // wait for the hardware watchdog (initialized in reset ISR) to reset the system
@@ -105,17 +104,21 @@ int main()
 
     auto sysmgr = std::make_shared<sys::SystemManager>(std::move(systemServices));
     sysmgr->StartSystem(
-        []() {
-            vfs.Init();
+        [&vfs]() {
+            vfs     = purefs::subsystem::initialize();
+            int err = purefs::subsystem::mount_defaults();
+            if (err) {
+                LOG_FATAL("VFS subystem fatal error %i", err);
+                std::abort();
+            }
             Log::Logger::get().init();
-            return true;
-        },
-        [sysmgr]() {
             /// force initialization of PhonenumberUtil because of its stack usage
             /// otherwise we would end up with an init race and PhonenumberUtil could
             /// be initiated in a task with stack not big enough to handle it
             i18n::phonenumbers::PhoneNumberUtil::GetInstance();
-
+            return true;
+        },
+        [sysmgr]() {
             // vector with launchers to applications
             std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
 #ifdef ENABLE_APP_DESKTOP

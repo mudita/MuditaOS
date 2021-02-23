@@ -81,7 +81,7 @@ extern uint32_t SystemCoreClock;
 #define configSUPPORT_STATIC_ALLOCATION         1
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
 #ifdef TARGET_Linux
-#   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*500))
+#   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*512))
 #else
 #   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*324))
 #endif

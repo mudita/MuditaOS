@@ -25,7 +25,8 @@ namespace bsp::keypad_backlight
 
         std::shared_ptr<drivers::DriverI2C> i2c;
 
-        drivers::I2CAddress addr = {.deviceAddress = static_cast<uint32_t>(LP55281_DEVICE_ADDR), .subAddressSize = 1};
+        drivers::I2CAddress addr = {
+            .deviceAddress = static_cast<uint32_t>(LP55281_DEVICE_ADDR), .subAddress = 0, .subAddressSize = 1};
 
         constexpr auto rgbChannelsNum = 3;
 

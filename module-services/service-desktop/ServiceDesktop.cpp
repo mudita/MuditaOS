@@ -24,6 +24,26 @@
 #include <cinttypes>
 #include <filesystem>
 
+#include <purefs/filesystem_paths.hpp>
+#include <sys/mount.h>
+#include <sys/statvfs.h>
+
+namespace
+{
+    auto RemountFS(bool readOnly = false, std::string path = std::string(purefs::dir::getRootDiskPath()))
+    {
+        struct statvfs stat;
+        if (auto ret = statvfs(path.c_str(), &stat))
+            return ret;
+        auto flags = stat.f_flag;
+        if (readOnly)
+            flags |= MS_RDONLY;
+        else
+            flags &= ~MS_RDONLY;
+        return mount(NULL, path.c_str(), NULL, flags | MS_REMOUNT, NULL);
+    }
+} // namespace
+
 ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
 {
     LOG_INFO("[ServiceDesktop] Initializing");
@@ -39,7 +59,7 @@ ServiceDesktop::~ServiceDesktop()
 
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
-    desktopWorker = std::make_unique<WorkerDesktop>(this);
+    desktopWorker  = std::make_unique<WorkerDesktop>(this);
     const bool ret = desktopWorker->init(
         {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
          {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
@@ -67,8 +87,9 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::BackupMessage(), [&](sys::Message *msg) {
         sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
         if (backupMessage != nullptr) {
-
+            RemountFS();
             BackupRestore::BackupUserFiles(this);
+            RemountFS(true);
         }
         return std::make_shared<sys::ResponseMessage>();
     });
@@ -76,7 +97,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::RestoreMessage(), [&](sys::Message *msg) {
         sdesktop::RestoreMessage *restoreMessage = dynamic_cast<sdesktop::RestoreMessage *>(msg);
         if (restoreMessage != nullptr) {
-
+            RemountFS();
             BackupRestore::RestoreUserFiles(this);
         }
         return std::make_shared<sys::ResponseMessage>();
@@ -86,6 +107,10 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         auto *factoryMessage = dynamic_cast<sdesktop::FactoryMessage *>(msg);
         if (factoryMessage != nullptr) {
             LOG_DEBUG("ServiceDesktop: FactoryMessage received");
+            RemountFS();
+            // Factory reset calls SystemManager::Reboot(), but
+            // there is no umount() in SystemManager::CloseSystemHandler() -
+            // this might theoretically cause filesystem corruption
             FactoryReset::Run(this);
         }
         return std::make_shared<sys::ResponseMessage>();
@@ -112,8 +137,12 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                       updateOsMsg->updateStats.updateFile.c_str(),
                       updateOsMsg->updateStats.uuid);
 
-            if (updateOS->setUpdateFile(updateOsMsg->updateStats.updateFile) == updateos::UpdateError::NoError)
+            if (updateOS->setUpdateFile(purefs::dir::getUpdatesOSPath(), updateOsMsg->updateStats.updateFile) ==
+                updateos::UpdateError::NoError) {
+                RemountFS();
+                // Same possible issue as with FactoryReset::Run()
                 updateOS->runUpdate();
+            }
         }
         return std::make_shared<sys::ResponseMessage>();
     });

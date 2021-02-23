@@ -26,9 +26,9 @@ namespace purefs::blkdev
     // Information parameter
     enum class info_type
     {
-        sector_count,
-        sector_size,
-        erase_block
+        sector_count, //! Number of sectors on disk or part
+        sector_size,  //! Single sector size
+        erase_block   //! Number of sectors in erase block
     };
 
     //! Power control states

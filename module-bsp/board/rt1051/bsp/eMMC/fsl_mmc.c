@@ -54,16 +54,7 @@
  * @retval kStatus_SDMMC_TransferFailed Transfer failed.
  * @retval kStatus_Success Operate successfully.
  */
-static status_t inline MMC_SelectCard(mmc_card_t *card, bool isSelected);
-
-/*!
- * @brief Wait write process complete.
- *
- * @param card Card descriptor.
- * @retval kStatus_Timeout Operation timeout.
- * @retval kStatus_Success Operate successfully.
- */
-static status_t MMC_WaitWriteComplete(mmc_card_t *card);
+inline static status_t MMC_SelectCard(mmc_card_t *card, bool isSelected);
 
 /*!
  * @brief Send SET_BLOCK_COUNT command.
@@ -73,7 +64,7 @@ static status_t MMC_WaitWriteComplete(mmc_card_t *card);
  * @retval kStatus_SDMMC_TransferFailed Transfer failed.
  * @retval kStatus_Success Operate successfully.
  */
-static status_t inline MMC_SetBlockCount(mmc_card_t *card, uint32_t blockCount);
+inline static status_t MMC_SetBlockCount(mmc_card_t *card, uint32_t blockCount);
 
 /*!
  * @brief Send GO_IDLE command to reset all cards to idle state
@@ -82,7 +73,7 @@ static status_t inline MMC_SetBlockCount(mmc_card_t *card, uint32_t blockCount);
  * @retval kStatus_SDMMC_TransferFailed Transfer failed.
  * @retval kStatus_Success Operate successfully.
  */
-static status_t inline MMC_GoIdle(mmc_card_t *card);
+inline static status_t MMC_GoIdle(mmc_card_t *card);
 
 /*!
  * @brief Send STOP_TRANSMISSION command to card to stop ongoing data transferring.
@@ -101,7 +92,7 @@ static status_t MMC_StopTransmission(mmc_card_t *card);
  * @retval kStatus_SDMMC_TransferFailed Transfer failed.
  * @retval kStatus_Success Operate successfully.
  */
-static status_t inline MMC_SetBlockSize(mmc_card_t *card, uint32_t blockSize);
+inline static status_t MMC_SetBlockSize(mmc_card_t *card, uint32_t blockSize);
 
 /*!
  * @brief switch voltage.
@@ -149,15 +140,6 @@ static void MMC_DecodeCsd(mmc_card_t *card, uint32_t *rawCsd);
 static void MMC_SetMaxFrequency(mmc_card_t *card);
 
 /*!
- * @brief Set erase unit size of the card
- *
- * @param card Card descriptor.
- * @retval kStatus_SDMMC_ConfigureExtendedCsdFailed Configure Extended CSD failed.
- * @retval kStatus_Success Operate successfully.
- */
-static status_t MMC_SetMaxEraseUnitSize(mmc_card_t *card);
-
-/*!
  * @brief Send SWITCH command to set the specific byte in Extended CSD.
  *
  * Example:
@@ -203,7 +185,7 @@ static status_t MMC_SendExtendedCsd(mmc_card_t *card, uint8_t *targetAddr, uint3
  * @param card Card descriptor.
  * @return The power class switch status.
  */
-static status_t MMC_SetPowerClass(mmc_card_t *card);
+static status_t MMC_SetPowerClass(mmc_card_t *card) __attribute__((used));
 
 /*!
  * @brief Send test pattern to get the functional pin in the MMC bus
@@ -369,7 +351,7 @@ static status_t MMC_CheckEraseGroupRange(mmc_card_t *card, uint32_t startGroup, 
  * @retval kStatus_SDMMC_TuningFail tuning fail.
  * @retval kStatus_SDMMC_TransferFailed transfer fail
  */
-static status_t inline MMC_ExecuteTuning(mmc_card_t *card);
+inline static status_t MMC_ExecuteTuning(mmc_card_t *card);
 
 /*!
  * @brief Read data from specific MMC card
@@ -420,7 +402,6 @@ static status_t MMC_Write(
 static status_t MMC_Transfer(mmc_card_t *card, SDMMCHOST_TRANSFER *content, uint32_t retry);
 
 static status_t MMC_SendIdentifyDevice(mmc_card_t *card, uint32_t arg);
-static status_t MMC_SwitchToHS(mmc_card_t *card);
 
 /*******************************************************************************
  * Variables
@@ -436,28 +417,28 @@ extern uint32_t g_sdmmc[SDK_SIZEALIGN(SDMMC_GLOBAL_BUFFER_SIZE, SDMMC_DATA_BUFFE
 /*******************************************************************************
  * Code
  ******************************************************************************/
-static status_t inline MMC_SelectCard(mmc_card_t *card, bool isSelected)
+inline static status_t MMC_SelectCard(mmc_card_t *card, bool isSelected)
 {
     assert(card);
 
     return SDMMC_SelectCard(card->host.base, card->host.transfer, card->relativeAddress, isSelected);
 }
 
-static status_t inline MMC_SetBlockCount(mmc_card_t *card, uint32_t blockCount)
+inline static status_t MMC_SetBlockCount(mmc_card_t *card, uint32_t blockCount)
 {
     assert(card);
 
     return SDMMC_SetBlockCount(card->host.base, card->host.transfer, blockCount);
 }
 
-static status_t inline MMC_GoIdle(mmc_card_t *card)
+inline static status_t MMC_GoIdle(mmc_card_t *card)
 {
     assert(card);
 
     return SDMMC_GoIdle(card->host.base, card->host.transfer);
 }
 
-static status_t inline MMC_SetBlockSize(mmc_card_t *card, uint32_t blockSize)
+inline static status_t MMC_SetBlockSize(mmc_card_t *card, uint32_t blockSize)
 {
     assert(card);
 
@@ -525,7 +506,7 @@ static status_t MMC_Transfer(mmc_card_t *card, SDMMCHOST_TRANSFER *content, uint
     return error;
 }
 
-static status_t MMC_WaitWriteComplete(mmc_card_t *card)
+status_t MMC_WaitWriteComplete(mmc_card_t *card)
 {
     assert(card);
 
@@ -579,6 +560,7 @@ static status_t MMC_StopTransmission(mmc_card_t *card)
     return kStatus_Success;
 }
 
+static status_t MMC_SwitchVoltage(mmc_card_t *card, uint32_t *opCode) __attribute__((used));
 static status_t MMC_SwitchVoltage(mmc_card_t *card, uint32_t *opCode)
 {
     mmc_voltage_window_t tempVoltage = kMMC_VoltageWindowNone;
@@ -663,6 +645,7 @@ static status_t MMC_SendIdentifyDevice(mmc_card_t *card, uint32_t arg)
     return kStatus_Success;
 }
 
+static status_t MMC_SendOperationCondition(mmc_card_t *card, uint32_t arg) __attribute((used));
 static status_t MMC_SendOperationCondition(mmc_card_t *card, uint32_t arg)
 {
     assert(card);
@@ -804,6 +787,7 @@ static void MMC_DecodeCsd(mmc_card_t *card, uint32_t *rawCsd)
     card->blockSize = FSL_SDMMC_DEFAULT_BLOCK_SIZE;
 }
 
+static void MMC_SetMaxFrequency(mmc_card_t *card) __attribute__((used));
 static void MMC_SetMaxFrequency(mmc_card_t *card)
 {
     assert(card);
@@ -823,7 +807,8 @@ static void MMC_SetMaxFrequency(mmc_card_t *card)
     card->busClock_Hz = SDMMCHOST_SET_CARD_CLOCK(card->host.base, card->host.sourceClock_Hz, maxBusClock_Hz);
 }
 
-static status_t MMC_SetMaxEraseUnitSize(mmc_card_t *card)
+status_t MMC_SetMaxEraseUnitSize(mmc_card_t *card) __attribute__((used));
+status_t MMC_SetMaxEraseUnitSize(mmc_card_t *card)
 {
     assert(card);
 
@@ -1320,6 +1305,7 @@ static status_t MMC_SetMaxDataBusWidth(mmc_card_t *card, mmc_high_speed_timing_t
                 return kStatus_SDMMC_SetDataBusWidthFailed;
             }
         }
+        __attribute__((fallthrough));
     case kMMC_DataBusWidth4bitDDR:
         if ((SDMMCHOST_NOT_SUPPORT != kSDMMCHOST_Support4BitBusWidth) &&
             (card->flags & (kMMC_SupportHighSpeedDDR52MHZ180V300VFlag | kMMC_SupportHighSpeedDDR52MHZ120VFlag)) &&
@@ -1333,6 +1319,7 @@ static status_t MMC_SetMaxDataBusWidth(mmc_card_t *card, mmc_high_speed_timing_t
                 break;
             }
         }
+        __attribute__((fallthrough));
     case kMMC_DataBusWidth8bit:
         if ((SDMMCHOST_NOT_SUPPORT != kSDMMCHOST_Support8BitBusWidth) &&
             ((targetTiming == kMMC_HighSpeedTiming) || (targetTiming == kMMC_HighSpeed200Timing))) {
@@ -1344,7 +1331,7 @@ static status_t MMC_SetMaxDataBusWidth(mmc_card_t *card, mmc_high_speed_timing_t
                 break;
             }
         }
-
+        __attribute__((fallthrough));
     case kMMC_DataBusWidth4bit:
         if ((SDMMCHOST_NOT_SUPPORT != kSDMMCHOST_Support4BitBusWidth) &&
             ((targetTiming == kMMC_HighSpeedTiming) || (targetTiming == kMMC_HighSpeed200Timing))) {
@@ -1589,6 +1576,7 @@ static status_t MMC_SelectBusTiming(mmc_card_t *card)
     switch (targetTiming) {
     case kMMC_HighSpeedTimingNone:
     case kMMC_HighSpeed400Timing:
+        /* fall through */
         if ((card->flags & (kMMC_SupportHS400DDR200MHZ180VFlag | kMMC_SupportHS400DDR200MHZ120VFlag)) &&
             ((kSDMMCHOST_SupportHS400 != SDMMCHOST_NOT_SUPPORT))) {
             /* switch to HS200 perform tuning */
@@ -1601,6 +1589,7 @@ static status_t MMC_SelectBusTiming(mmc_card_t *card)
             }
             break;
         }
+        __attribute__((fallthrough));
     case kMMC_HighSpeed200Timing:
         if ((card->flags & (kMMC_SupportHS200200MHZ180VFlag | kMMC_SupportHS200200MHZ120VFlag)) &&
             ((kSDMMCHOST_SupportHS200 != SDMMCHOST_NOT_SUPPORT))) {
@@ -1609,6 +1598,7 @@ static status_t MMC_SelectBusTiming(mmc_card_t *card)
             }
             break;
         }
+        __attribute__((fallthrough));
     case kMMC_HighSpeedTiming:
         if (kStatus_Success != MMC_SwitchToHighSpeed(card)) {
             return kStatus_SDMMC_SwitchBusTimingFailed;

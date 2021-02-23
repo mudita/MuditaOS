@@ -1,26 +1,23 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "vfs.hpp"
 #include <catch2/catch.hpp>
 
+#include <filesystem>
 #include <Interface/NotesRecord.hpp>
 #include <queries/notes/QueryNotesGet.hpp>
 #include <queries/notes/QueryNotesGetByText.hpp>
 #include <queries/notes/QueryNoteRemove.hpp>
 #include <queries/notes/QueryNoteStore.hpp>
-#include <purefs/filesystem_paths.hpp>
 
 #include "Database/Database.hpp"
 #include "Databases/NotesDB.hpp"
-#include <vfs.hpp>
 
 TEST_CASE("Notes Record tests")
 {
-    vfs.Init();
     Database::initialize();
 
-    const auto notesDbPath = purefs::dir::getUserDiskPath() / "notes.db";
+    const auto notesDbPath = std::filesystem::path{"user"} / "notes.db";
     NotesDB notesDb{notesDbPath.c_str()};
     REQUIRE(notesDb.isInitialized());
 

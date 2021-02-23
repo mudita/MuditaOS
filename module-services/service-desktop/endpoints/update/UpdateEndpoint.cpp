@@ -11,7 +11,6 @@
 
 #include <json/json11.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <vfs.hpp>
 
 #include <filesystem>
 #include <memory>
@@ -75,8 +74,24 @@ auto UpdateEndpoint::run(Context &context) -> sys::ReturnCodes
 auto UpdateEndpoint::getUpdates(Context &context) -> sys::ReturnCodes
 {
     const auto updatesOSPath = purefs::dir::getUpdatesOSPath();
-    json11::Json fileList    = vfs.listdir(updatesOSPath.c_str(), updateos::extension::update, true);
+    struct DirectoryEntry
+    {
+        std::string fileName;
+        uint32_t fileSize;
+        json11::Json to_json() const
+        {
+            return (json11::Json::object{{"name", fileName}, {"size", std::to_string(fileSize)}});
+        }
+    };
 
+    auto dirEntryVector = std::vector<DirectoryEntry>();
+    for (const auto &p : fs::directory_iterator(updatesOSPath)) {
+        if (!p.is_directory() && p.path().c_str() == updateos::extension::update) {
+            dirEntryVector.push_back(DirectoryEntry{p.path().string(), static_cast<uint32_t>(p.file_size())});
+        }
+    }
+
+    json11::Json fileList = dirEntryVector;
     context.setResponseBody(json11::Json::object{{parserFSM::json::updateFileList, fileList}});
 
     MessageHandler::putToSendQueue(context.createSimpleResponse());

@@ -2,45 +2,31 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Utils.hpp"
-#include <purefs/fs/filesystem.hpp>
+#include <filesystem>
 #include <crc32/crc32.h>
 
 namespace utils::filesystem
 {
     namespace
     {
-        inline constexpr auto crc_buf = 1024;
+        inline constexpr auto crc_buf_len = 1024;
     } // namespace
 
-    long int filelength(std::FILE *file) noexcept
+    unsigned long computeFileCRC32(std::FILE *file) noexcept
     {
-        if (file == nullptr) {
-            return 0;
-        }
-        const auto startPosition = std::ftell(file);
-        std::fseek(file, 0, SEEK_END);
-        const auto endPosition = std::ftell(file);
-        std::fseek(file, startPosition, SEEK_SET);
-        return endPosition;
-    }
+        auto buf = std::make_unique<unsigned char[]>(crc_buf_len);
 
-    void computeCRC32(std::FILE *file, unsigned long *outCrc32) noexcept
-    {
-        if (outCrc32 == nullptr)
-            return;
-
-        auto buf = std::make_unique<unsigned char[]>(crc_buf);
-        size_t bufLen;
-
-        *outCrc32 = 0;
-
+        unsigned long crc32 = 0;
         while (!std::feof(file)) {
-            bufLen = std::fread(buf.get(), 1, crc_buf, file);
-            if (bufLen <= 0)
-                break;
+            size_t dataLen = std::fread(buf.get(), 1, crc_buf_len, file);
+            if (dataLen == 0) {
+                return crc32;
+            }
 
-            *outCrc32 = Crc32_ComputeBuf(*outCrc32, buf.get(), bufLen);
+            crc32 = Crc32_ComputeBuf(crc32, buf.get(), dataLen);
         }
+
+        return crc32;
     }
 
     std::string generateRandomId(std::size_t length) noexcept
@@ -86,26 +72,6 @@ namespace utils::filesystem
         return ret;
     }
 
-    std::FILE *openFile(const std::filesystem::path &filePath) noexcept
-    {
-        return std::fopen(filePath.c_str(), "r");
-    }
-
-    std::string readFile(std::FILE *file) noexcept
-    {
-        uint32_t fsize = utils::filesystem::filelength(file);
-        auto stream    = std::make_unique<char[]>(fsize + 1);
-        std::fread(stream.get(), 1, fsize, file);
-
-        return stream.get();
-    }
-
-    void closeFile(std::FILE *file) noexcept
-    {
-        if (file != nullptr) {
-            std::fclose(file);
-        }
-    }
 } // namespace utils::filesystem
 
 namespace utils
