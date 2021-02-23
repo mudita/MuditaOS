@@ -72,9 +72,11 @@ enum class MessageType
     CellularNotification,       ///< Async notification message
     CellularAnswerIncomingCall, ///< Answer incoming call
     CellularHangupCall,         ///< Hang up call
-    CellularCall,               ///< Call related events
-    CellularCallRequest,        ///< Call request
-    CellularPowerStateChange,   ///< Change power state of the module
+    CellularRinging,
+    CellularIncomingCall,
+    CellularCallerId,
+    CellularCallRequest,      ///< Call request
+    CellularPowerStateChange, ///< Change power state of the module
 
     CellularListCurrentCalls,
     CellularSimProcedure,        // Broadcast on sim state changed
@@ -107,6 +109,7 @@ enum class MessageType
     CellularTimeUpdated,
     CellularSimState,
     CellularMMIData,
+    CellularNewIncomingSMS,
 
     DBNotesAdd,            ///< Add new note's record
     DBNotesRemove,         ///< Remove selected note's record
@@ -124,6 +127,7 @@ enum class MessageType
     AudioMessage,
 
     // application manager
+    APMGeneric,
     APMAction,          ///< Used to send an action request to application manager.
     APMCheckAppRunning, ///< check if application is running in application manager
     APMSwitch,          ///< request to switch to given application, optionally also to specified window
@@ -211,6 +215,7 @@ enum class MessageType
     Restore,
     Factory,
     DeveloperModeRequest,
+    TransferTimer,
 
     // FOTA messages
     HttpRequest,
@@ -243,6 +248,9 @@ enum class MessageType
     ScreenLightControlAction,
     ScreenLightControlParameters,
     ScreenLightControlParametersResponse,
+
+    // Vibra messages
+    VibraPulseMessage,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

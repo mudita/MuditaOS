@@ -264,5 +264,8 @@ namespace utils
         [[nodiscard]] unsigned long computeFileCRC32(std::FILE *file) noexcept;
         [[nodiscard]] std::string generateRandomId(std::size_t length = 0) noexcept;
         [[nodiscard]] std::string getline(std::FILE *stream, uint32_t length = 1024) noexcept;
+        [[nodiscard]] std::FILE *openFile(const std::filesystem::path &filePath) noexcept;
+        [[nodiscard]] std::string readFile(std::FILE *file) noexcept;
+        void closeFile(std::FILE *file) noexcept;
     } // namespace filesystem
 } // namespace utils

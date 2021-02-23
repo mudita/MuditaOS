@@ -7,7 +7,7 @@
 
 using namespace db::query;
 
-SMSGet::SMSGet(std::size_t limit, std::size_t offset) : RecordQuery(offset, limit)
+SMSGet::SMSGet(std::size_t limit, std::size_t offset) : RecordQuery(limit, offset)
 {}
 
 SMSGetResult::SMSGetResult(const std::vector<SMSRecord> &records) : RecordQueryResult(records)

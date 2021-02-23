@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,6 +15,8 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/torch/torch.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
+#include <vibra/Vibra.hpp>
+#include <Timer.hpp>
 
 #include <string>
 
@@ -39,6 +41,20 @@ namespace sevm
             type = Type::Data;
         }
         uint32_t timestamp = 0;
+    };
+
+    class RtcUpdateTimeMessage : public sys::Message
+    {
+      public:
+        explicit RtcUpdateTimeMessage(time_t time) : time(time)
+        {}
+        [[nodiscard]] time_t getTime() const noexcept
+        {
+            return time;
+        }
+
+      private:
+        const time_t time = 0;
     };
 
     class SIMMessage : public sys::DataMessage
@@ -140,6 +156,17 @@ namespace sevm
         KeypadBacklightResponseMessage()
         {}
         bool success;
+    };
+
+    class VibraMessage : public Message
+    {
+      public:
+        VibraMessage(bsp::vibrator::Action act, sys::ms rptTime = bsp::vibrator::defaultVibraPauseMs)
+            : Message(MessageType::VibraPulseMessage), action(act), repetitionTime(rptTime)
+        {}
+
+        bsp::vibrator::Action action;
+        sys::ms repetitionTime;
     };
 
 } /* namespace sevm*/

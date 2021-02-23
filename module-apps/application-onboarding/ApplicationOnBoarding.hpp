@@ -9,6 +9,7 @@ namespace gui::window::name
 {
     inline constexpr auto onBoarding_languages           = "OnBoardingLanguages";
     inline constexpr auto onBoarding_start_configuration = "OnBoardingStartingConfiguration";
+    inline constexpr auto onBoarding_eula                = "OnBoardingEula";
 } // namespace gui::window::name
 
 namespace app
@@ -26,6 +27,8 @@ namespace app
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
+
+        void acceptEULA();
 
         void createUserInterface() override;
         void destroyUserInterface() override;

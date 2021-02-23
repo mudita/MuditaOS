@@ -29,7 +29,7 @@ namespace gui
         label->setText(utils::localize.get("topbar_battery_charging"));
     }
 
-    void BatteryWidgetText::showBatteryPluggedNotCharging()
+    void BatteryWidgetText::showBatteryChargingDone()
     {
         label->setText(utils::localize.get("topbar_battery_plugged"));
     }

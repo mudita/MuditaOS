@@ -1,28 +1,17 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "Common.hpp"
-#include "MessageType.hpp"
-#include "Service/Message.hpp"
 #include "SwitchData.hpp"
 #include "gui/input/InputEvent.hpp"
+#include "BaseAppMessage.hpp"
 #include <memory>
 #include <string>
 
 namespace app
 {
-
-    /*
-     * @brief Template for all messages that go to application manager
-     */
-    class AppMessage : public sys::DataMessage
-    {
-      public:
-        AppMessage(MessageType messageType) : sys::DataMessage(messageType){};
-        AppMessage() : sys::DataMessage(MessageType::AppMessage){};
-    };
 
     class AppActionRequest : public AppMessage
     {

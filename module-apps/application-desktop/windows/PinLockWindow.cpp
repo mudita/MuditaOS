@@ -147,7 +147,10 @@ namespace gui
         else if (lockType == PinLock::LockType::SimPuk) {
             LockBox = std::make_unique<PukLockBox>(this);
             setTitleBar(true, true);
-            setText("app_desktop_header_sim_setup", TextType::Title, true, {{getToken(Token::Sim), "SIM1"}});
+            setText("app_desktop_header_sim_setup",
+                    TextType::Title,
+                    true,
+                    {{getToken(Token::Sim), utils::enumToString(lock->getSim())}});
         }
         else if (lockType == PinLock::LockType::SimPin) {
             LockBox = std::make_unique<SimLockBox>(this);

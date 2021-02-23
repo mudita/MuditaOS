@@ -20,9 +20,11 @@
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EVMessages.hpp>
+#include <service-appmgr/service-appmgr/messages/DOMRequest.hpp>
 #include "service-gui/messages/DrawMessage.hpp" // for DrawMessage
 #include "task.h"                               // for xTaskGetTic...
 #include "windows/AppWindow.hpp"                // for AppWindow
+#include "DOMResponder.hpp"
 #include <Text.hpp>                             // for Text
 #include <algorithm>                            // for find
 #include <iterator>                             // for distance, next
@@ -84,8 +86,9 @@ namespace app
 
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
-
         connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *) { return handleBatteryStatusChange(); });
+        connect(typeid(app::manager::DOMRequest),
+                [&](sys::Message *msg) -> sys::MessagePointer { return handleGetDOM(msg); });
     }
 
     Application::~Application() noexcept
@@ -119,6 +122,11 @@ namespace app
             keyTranslator->prev_key_press = {};
             longPressTimer->stop();
         }
+    }
+
+    void Application::clearLongPressTimeout()
+    {
+        keyTranslator->prev_key_timedout = false;
     }
 
     void Application::render(gui::RefreshModes mode)
@@ -300,8 +308,6 @@ namespace app
 
     sys::MessagePointer Application::handleMinuteUpdated(sys::Message *msgl)
     {
-        auto *msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
-        getCurrentWindow()->updateTime(msg->timestamp, !isTimeFormat12());
         if (state == State::ACTIVE_FORGROUND) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
@@ -440,6 +446,25 @@ namespace app
             return msgNotHandled();
         }
         render(msg->getMode());
+        return msgHandled();
+    }
+
+    sys::MessagePointer Application::handleGetDOM(sys::Message *msgl)
+    {
+        if (windowsStack.isEmpty()) {
+            LOG_ERROR("Current window is not defined - can't dump DOM");
+            return msgNotHandled();
+        }
+        auto window = getCurrentWindow();
+        if (window == nullptr) {
+            LOG_ERROR("No window - can't dump DOM");
+            return msgNotHandled();
+        }
+
+        auto request = static_cast<app::manager::DOMRequest *>(msgl);
+        LOG_DEBUG("Get DOM for: %s", request->getSenderName().c_str());
+        bus.sendUnicast(DOMResponder(GetName(), *window, std::move(request->event)).build(), request->getSenderName());
+
         return msgHandled();
     }
 
@@ -680,11 +705,6 @@ namespace app
     void Application::timeFormatChanged(std::string value)
     {
         timeFormat12 = utils::getNumericValue<bool>(value);
-    }
-
-    bool Application::isTimeFormat12() const noexcept
-    {
-        return utils::dateAndTimeSettings.getTimeFormat() == utils::time::Locale::TimeFormat::FormatTime12H;
     }
 
     void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)

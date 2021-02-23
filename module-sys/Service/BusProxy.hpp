@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Message.hpp"
+#include "Watchdog.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -31,13 +32,14 @@ namespace sys
 
       private:
         friend class Service;
-        explicit BusProxy(Service *owner);
+        explicit BusProxy(Service *owner, Watchdog &watchdog);
 
         void sendResponse(std::shared_ptr<Message> response, std::shared_ptr<Message> request);
         void connect();
         void disconnect();
 
         Service *owner;
+        Watchdog &watchdog;
         std::unique_ptr<Bus> busImpl;
     };
 } // namespace sys

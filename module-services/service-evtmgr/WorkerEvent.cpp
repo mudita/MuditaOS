@@ -136,10 +136,6 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         bsp::rtc_GetCurrentTimestamp(&timestamp);
         bsp::rtc_SetMinuteAlarm(timestamp);
 
-        struct tm time;
-
-        bsp::rtc_GetCurrentDateTime(&time);
-
         auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
         message->timestamp = timestamp;
         service->bus.sendUnicast(message, service::name::evt_manager);
@@ -244,6 +240,7 @@ bool WorkerEvent::deinit(void)
     bsp::keypad_backlight::deinit();
     bsp::eink_frontlight::deinit();
     bsp::light_sensor::deinit();
+    bsp::vibrator::deinit();
 
     battery_level_check::deinit();
 

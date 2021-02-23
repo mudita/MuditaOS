@@ -91,7 +91,7 @@ jobs:
           ./tools/run_unittests.sh enabled_unittests
       - name: store build artefact
         run: |
-          tar -S -cf /artefacts/build-$(git rev-parse --short HEAD).tar build-linux-Debug
+          tar -S -cf /artefacts/build-${GITHUB_SHA}.tar build-linux-Debug
       - name: start emulator
         run: |
           rm -f /tmp/purephone_pts_name
@@ -138,14 +138,9 @@ jobs:
       - build_linux_binary_and_run_tests
     runs-on: self-hosted
     steps:
-      - name: clone repository
-        uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GitHub_PAT }}
-          submodules: recursive
       - name: get artefacts
         run: |
-          tar xf /artefacts/build-$(git rev-parse --short HEAD).tar
+          tar xf /artefacts/build-${GITHUB_SHA}.tar
       - name: check if all Unit Tests where run
         run: |
           ./tools/check_unittests.sh enabled_unit_tests
@@ -157,12 +152,7 @@ jobs:
     needs: [ build_linux_binary_and_run_tests, check_run_unit_tests ]
     runs-on: self-hosted
     steps:
-      - name: clone repository
-        uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GitHub_PAT }}
-          submodules: recursive
       - name: Delete Artefact
         run: |
-          rm -f /artefacts/build-$(git rev-parse --short HEAD).tar
+          rm -f /artefacts/build-${GITHUB_SHA}.tar
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DayEventsWindow.hpp"
@@ -100,8 +100,8 @@ namespace gui
             data->setDescription(style::window::calendar::new_event);
             auto rec       = new EventsRecord();
             rec->date_from = filterFrom;
-            rec->date_till = filterFrom + std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
-                             std::chrono::minutes(style::window::calendar::time::max_minutes);
+            rec->date_till = filterFrom + std::chrono::hours(utils::time::Locale::max_hour_24H_mode) +
+                             std::chrono::minutes(utils::time::Locale::max_minutes);
             auto event = std::make_shared<EventsRecord>(*rec);
             data->setData(event);
             application->switchWindow(

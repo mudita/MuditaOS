@@ -16,11 +16,15 @@ target_sources( ${PROJECT_NAME}
     PRIVATE
         ApplicationSettings.cpp
         models/ApnSettingsModel.cpp
+        models/BluetoothSettingsModel.cpp
         models/NewApnModel.cpp
-        widgets/timeWidget.cpp
+        models/DateAndTimeModel.cpp
+        models/FromTimeToTimeModel.cpp
         widgets/ChangePasscodeLockHandler.cpp
         widgets/QuoteWidget.cpp
         widgets/ApnInputWidget.cpp
+        widgets/SettingsDateItem.cpp
+        widgets/SettingsTimeItem.cpp
         windows/SettingsMainWindow.cpp
         windows/AddDeviceWindow.cpp
         windows/AllDevicesWindow.cpp
@@ -53,6 +57,8 @@ target_sources( ${PROJECT_NAME}
         windows/LanguagesWindow.cpp
         windows/DateAndTimeMainWindow.cpp
         windows/ChangeTimeZone.cpp
+        windows/ChangeDateAndTimeWindow.cpp
+        windows/BluetoothCheckPasskeyWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -76,6 +82,7 @@ target_sources( ${PROJECT_NAME}
         windows/SystemMainWindow.hpp
         windows/LanguagesWindow.hpp
         windows/DateAndTimeMainWindow.hpp
+        windows/ChangeDateAndTimeWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

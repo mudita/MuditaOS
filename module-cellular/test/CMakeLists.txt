@@ -36,3 +36,22 @@ add_catch2_executable(
         LIBS
         module-cellular
 )
+
+add_catch2_executable(
+        NAME
+        cellular-cmux
+        SRCS
+        unittest_cmux.cpp
+        LIBS
+        module-cellular
+)
+
+
+add_catch2_executable(
+        NAME
+        unittest_ATURCStream
+        SRCS
+        unittest_ATURCStream.cpp
+        LIBS
+        module-cellular
+)

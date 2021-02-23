@@ -1,18 +1,21 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "bsp/watchdog/watchdog.hpp"
+#include "software_watchdog.hpp"
 #include <bsp/watchdog/watchdog.hpp>
 
 namespace bsp::watchdog
 {
-    __attribute__((weak)) void init()
-    {}
-    __attribute__((weak)) void system_reset()
-    {}
-    __attribute__((weak)) void pet()
-    {}
-    __attribute__((weak)) std::string reset_cause()
+    static SoftwareWatchdog swWatchdog;
+
+    bool init(unsigned int timeoutMs)
     {
-        return {};
+        return swWatchdog.init(static_cast<TickType_t>(timeoutMs));
+    }
+
+    void refresh()
+    {
+        swWatchdog.refresh();
     }
 } // namespace bsp::watchdog

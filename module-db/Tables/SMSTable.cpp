@@ -210,7 +210,7 @@ SMSTableRow SMSTable::getDraftByThreadId(uint32_t threadId)
 std::vector<SMSTableRow> SMSTable::getByText(std::string text)
 {
 
-    auto retQuery = db->query("SELECT *, INSTR(body,'%s') pos FROM sms WHERE pos > 0;", text.c_str());
+    auto retQuery = db->query("SELECT *, INSTR(body,'%q') pos FROM sms WHERE pos > 0;", text.c_str());
 
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return std::vector<SMSTableRow>();
@@ -237,7 +237,7 @@ std::vector<SMSTableRow> SMSTable::getByText(std::string text)
 std::vector<SMSTableRow> SMSTable::getByText(std::string text, uint32_t threadId)
 {
     auto retQuery =
-        db->query("SELECT *, INSTR(body,'%s') pos FROM sms WHERE pos > 0 AND thread_id=%u;", text.c_str(), threadId);
+        db->query("SELECT *, INSTR(body,'%q') pos FROM sms WHERE pos > 0 AND thread_id=%u;", text.c_str(), threadId);
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
         return {};
     }

@@ -70,9 +70,9 @@ namespace app
       private:
         void CallAbortHandler();
         void CallActiveHandler();
-        void IncomingCallHandler(const CellularCallMessage *const msg);
-        void CallerIdHandler(const CellularCallMessage *const msg);
-        void RingingHandler(const CellularCallMessage *const msg);
+        void IncomingCallHandler(const CellularIncominCallMessage *const msg);
+        void CallerIdHandler(const CellularCallerIdMessage *const msg);
+        void RingingHandler(const CellularRingingMessage *const msg);
 
         std::unique_ptr<sys::Timer> callerIdTimer;
 

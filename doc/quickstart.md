@@ -186,33 +186,27 @@ git commit
 ## CI build using Docker
 You can build MuditaOS using a Docker container. To do that, follow these steps
 
-1. Get Docker by running `./config/bootstrap.sh 8` or [install it yourself](https://www.docker.com/get-started) (if was not installed previously with `./config/bootstrap 0-`).
+1. Get Docker by running `./config/bootstrap.sh 8` or [install it yourself](https://www.docker.com/get-started) (if was not installed previously with `./config/bootstrap.sh 0-`).
 
-2. Add yourself to a `docker` group:
-
-```bash
-NAME=$(whoami)
-sudo usermod -aG docker ${NAME}
-```
 After that you have to log out and log back in as groups are set during the login process. To make sure you are in docker group enter the `groups` command and 
 you will see the list of groups your user is assigned to.
 
-3. Configure for Linux Debug: 
+2. Configure for Linux Debug: 
 ```bash
 ./in_docker.sh config linux Debug
 ```
 
-4. Build linux Debug:
+3. Build linux Debug:
 ```bash
 ./in_docker.sh make build-linux-Debug
 ```
 
-5. Build RT1051 Release
+4. Build RT1051 Release
 ```bash
 ./in_docker.sh config rt1051 Release
 ./in_docker.sh make build-rt1051-Release
 ```
-6. Build and run tests (Linux only)
+5. Build and run tests (Linux only)
 
 ```bash
 ./in_docker.sh make build-linux-Debug

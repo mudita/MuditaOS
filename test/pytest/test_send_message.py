@@ -18,9 +18,9 @@ def erase_all_templates(harness):
     body = {"category": "template", "limit": count}
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
-    assert len(ret["body"][1][1]) == count
+    assert len(ret["body"]["entries"]) == count
 
-    for template in ret["body"][1][1]:
+    for template in ret["body"]["entries"]:
         body = {"category": "template", "templateID": template["templateID"]}
         del_res = harness.endpoint_request("messages", "del", body)
         assert del_res["status"] == status["OK"]
@@ -33,35 +33,63 @@ def add_new_template(harness, template_text: str):
     assert ret["status"] == status["OK"]
 
 
-def erase_contacts_by_name(harness, name):
-    body = {"count": True}
+def get_all_contacts(harness):
+    body = {"limit": True}
     ret = harness.endpoint_request("contacts", "get", body)
+
     assert ret["status"] == status["OK"]
 
-    count = ret["body"]["count"]
+    contacts = []
+    count = ret["body"]["limit"]
     if count == 0:
-        return 0
+        return contacts
 
     # try to get more than available
     batch_size = 30
     divider = int((count + 10) / batch_size)
     reminder = (count + 10) % batch_size
-    contacts = []
+
     for i in range(divider):
         body = {"count": batch_size, "offset": batch_size * i}
         ret = harness.endpoint_request("contacts", "get", body)
         assert ret["status"] == status["OK"]
-        contacts = contacts + ret["body"]
+        contacts = contacts + ret["body"]["entries"]
 
     body = {"count": reminder, "offset": (count + 10) - reminder}
     ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["OK"]
-    contacts = contacts + ret["body"]
+    contacts = contacts + ret["body"]["entries"]
+    return contacts
 
+
+def erase_contacts_by_name(harness, name):
+    contacts = get_all_contacts(harness)
+
+    # collecting contacts to remove by name
     ids = []
     for contact in contacts:
         if name in contact["priName"]:
             ids.append(contact["id"])
+
+    # erase all contacts by id
+    for identifier in ids:
+        # removing added contact
+        body = {"id": identifier}
+        ret = harness.endpoint_request("contacts", "del", body)
+        assert ret["status"] == status["OK"]
+
+
+def erase_contacts_by_phone_number(harness, phone_number):
+    contacts = get_all_contacts(harness)
+
+    # collecting contacts to remove by phone number
+    ids = []
+    for contact in contacts:
+        numbers = contact["numbers"]
+        for number in numbers:
+            if number == phone_number:
+                ids.append(contact["id"])
+                break
 
     # erase all contacts by id
     for identifier in ids:
@@ -78,8 +106,8 @@ def get_message_by_text(harness, message: str, phone_number: str):
 
 # default sms type is draft
 def prepare_sms(harness, message: str, phone_number: str, sms_type: int = 1):
-    body = {"smsCommand": "smsAdd", "messageBody": message, "phoneNumber": phone_number, "type": sms_type}
-    return harness.endpoint_request("developerMode", "post", body)
+    body = {"smsCommand": "smsAdd", "messageBody": message, "phoneNumber": phone_number, "messageType": sms_type}
+    return harness.endpoint_request("developerMode", "put", body)
 
 
 def prepare_sms_template(harness, message: str, phone_number: str):
@@ -95,7 +123,7 @@ def compare_messages(old_messages, new_messages, sms_type: SMSType = SMSType.OUT
             diff_messages.append(message)
 
     assert len(diff_messages) == 1
-    assert SMSType(diff_messages[0]["type"]) == sms_type
+    assert SMSType(diff_messages[0]["messageType"]) == sms_type
 
 
 def enter_messages_menu(harness):
@@ -116,6 +144,7 @@ def enter_contacts_menu(harness):
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("phone_in_desktop")
 def test_send_message(harness, phone_number, sms_text):
     old_messages = get_message_by_text(harness, sms_text, str(phone_number))
 
@@ -146,6 +175,7 @@ def test_send_message(harness, phone_number, sms_text):
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("phone_in_desktop")
 def test_send_prepared_message(harness, phone_number, sms_text):
     old_messages = get_message_by_text(harness, sms_text, str(phone_number))
 
@@ -159,7 +189,7 @@ def test_send_prepared_message(harness, phone_number, sms_text):
 
 
 testdata = [
-    "Ala1Ma śżżń 😚",
+    "'\"\\àśżżńú😚",
     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA😚"
@@ -195,6 +225,7 @@ def test_send_prepared_draft_message(harness, phone_number, sms_text):
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("phone_in_desktop")
 def test_send_message_from_template(harness, phone_number, sms_text):
     old_messages = get_message_by_text(harness, sms_text, str(phone_number))
     # erasing all templates
@@ -232,6 +263,7 @@ def test_send_message_from_template(harness, phone_number, sms_text):
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("phone_in_desktop")
 def test_forward_message(harness, phone_number, sms_text):
     # send first message in order to forward it
     test_send_prepared_message(harness, phone_number, sms_text)
@@ -273,6 +305,7 @@ def test_forward_message(harness, phone_number, sms_text):
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("phone_in_desktop")
 def test_resend_message(harness, phone_number, sms_text):
     # send first message in order to resend it
     prepare_sms(harness, sms_text, str(phone_number), SMSType.FAILED.value)
@@ -304,9 +337,12 @@ def test_resend_message(harness, phone_number, sms_text):
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("phone_in_desktop")
 def test_send_message_from_phonebook(harness, phone_number, sms_text):
     # erase Test contacts
     erase_contacts_by_name(harness, "Test")
+    # erase Test contacts
+    erase_contacts_by_phone_number(harness, "Test")
 
     old_messages = get_message_by_text(harness, sms_text, str(phone_number))
     # adding new test contact
@@ -349,6 +385,77 @@ def test_send_message_from_phonebook(harness, phone_number, sms_text):
     # go back to main screen
     harness.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
     # give some time to back to ApplicationDesktop and send message
+    time.sleep(3)
+    # check if we back to ApplicationDesktop
+    assert harness.get_application_name() == "ApplicationDesktop"
+    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
+    compare_messages(old_messages, new_messages)
+
+    # removing added contact
+    body = {"id": added_contact_id}
+    ret = harness.endpoint_request("contacts", "del", body)
+    assert ret["status"] == status["OK"]
+
+
+@pytest.mark.rt1051
+@pytest.mark.usefixtures("phone_unlocked")
+@pytest.mark.usefixtures("phone_in_desktop")
+def test_send_message_using_phonebook(harness, phone_number, sms_text):
+    # erase Test contacts
+    erase_contacts_by_name(harness, "Test")
+    # erase Test contacts
+    erase_contacts_by_phone_number(harness, str(phone_number))
+
+    old_messages = get_message_by_text(harness, sms_text, str(phone_number))
+    # adding new test contact
+    body = {"address": "6 Czeczota St.\n02600 Warsaw",
+            "altName": "Testowy",
+            "blocked": False,
+            "favourite": True,
+            "numbers": [str(phone_number)],
+            "priName": "Test"}
+    ret = harness.endpoint_request("contacts", "put", body)
+    assert ret["status"] == status["OK"]
+    added_contact_id = ret["body"]["id"]
+
+    # enter messages menu
+    enter_messages_menu(harness)
+    # create new message
+    harness.connection.send_key_code(key_codes["left"])
+    # select contact
+    harness.connection.send_key_code(key_codes["enter"])
+    # search test contact
+    harness.connection.send_key_code(key_codes["right"])
+    # write search text
+    harness.send_text("Test")
+    # search for added contact
+    harness.connection.send_key_code(key_codes["enter"])
+    # choose contact
+    harness.connection.send_key_code(key_codes["enter"])
+    # reset contact
+    harness.connection.send_key_code(key_codes["#"])
+    # select contact
+    harness.connection.send_key_code(key_codes["enter"])
+    # search test contact
+    harness.connection.send_key_code(key_codes["right"])
+    # write search text
+    harness.send_text("Test")
+
+    # search for added contact
+    harness.connection.send_key_code(key_codes["enter"])
+    # select contact
+    harness.connection.send_key_code(key_codes["enter"])
+
+    # go to text in new message windows
+    harness.connection.send_key_code(key_codes["down"])
+
+    # write a message
+    harness.send_text(sms_text)
+    # send
+    harness.connection.send_key_code(key_codes["enter"])
+    # go back to main screen
+    harness.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
+
     time.sleep(3)
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"

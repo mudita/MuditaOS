@@ -5,6 +5,7 @@
 #include "BluetoothWorker.hpp"
 #include "BtCommand.hpp"
 #include "log/log.hpp"
+#include "interface/BluetoothDriverImpl.hpp"
 #include "interface/profiles/A2DP/A2DP.hpp"
 #include "interface/profiles/HSP/HSP.hpp"
 #include "BtKeysStorage.hpp"
@@ -47,7 +48,6 @@ namespace
 
         [[nodiscard]] auto operator()()
         {
-            bluetooth::KeyStorage::settings = settings;
             bluetooth::GAP::registerScan();
 
             auto settingsName = std::get<std::string>(settings->getValue(bluetooth::Settings::DeviceName));
@@ -138,13 +138,13 @@ auto BluetoothWorker::run() -> bool
 
 auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
 {
-    bluetooth::Command command;
-    if (xQueueReceive(queue, &command, 0) != pdTRUE) {
+    bluetooth::Command command(bluetooth::Command::Type::None);
+    if (xQueueReceive(queue, static_cast<void *>(&command), 0) != pdTRUE) {
         LOG_ERROR("Queue receive failure!");
         return false;
     }
 
-    switch (command) {
+    switch (command.getType()) {
     case bluetooth::Command::PowerOn:
         controller->turnOn();
         break;
@@ -249,7 +249,6 @@ auto BluetoothWorker::handleMessage(uint32_t queueID) -> bool
 
 void BluetoothWorker::setDeviceAddress(bd_addr_t addr)
 {
-
     currentProfile->setDeviceAddress(addr);
 }
 

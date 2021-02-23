@@ -86,7 +86,7 @@ namespace app
         manager::Controller::sendAction(this, manager::actions::Call, std::make_unique<app::CallActiveData>());
     }
 
-    void ApplicationCall::CallerIdHandler(const CellularCallMessage *const msg)
+    void ApplicationCall::CallerIdHandler(const CellularCallerIdMessage *const msg)
     {
         if (getState() == call::State::IDLE) {
             if (callerIdTimer) {
@@ -98,7 +98,7 @@ namespace app
         }
     }
 
-    void ApplicationCall::IncomingCallHandler(const CellularCallMessage *const msg)
+    void ApplicationCall::IncomingCallHandler(const CellularIncominCallMessage *const msg)
     {
         if (getState() == call::State::IDLE) {
             constexpr sys::ms callerIdTimeout = 1000;
@@ -114,7 +114,7 @@ namespace app
         }
     }
 
-    void ApplicationCall::RingingHandler(const CellularCallMessage *const msg)
+    void ApplicationCall::RingingHandler(const CellularRingingMessage *const msg)
     {
         manager::Controller::sendAction(
             this, manager::actions::Call, std::make_unique<app::ExecuteCallData>(msg->number));
@@ -149,21 +149,23 @@ namespace app
 
             return std::make_shared<sys::ResponseMessage>();
         }
-        else if (msgl->messageType == MessageType::CellularCall) {
-            auto *msg = dynamic_cast<CellularCallMessage *>(msgl);
-            assert(msg != nullptr);
 
-            switch (msg->type) {
-            case CellularCallMessage::Type::Ringing: {
-                RingingHandler(msg);
-            } break;
-            case CellularCallMessage::Type::IncomingCall: {
-                IncomingCallHandler(msg);
-            } break;
-            case CellularCallMessage::Type::CallerId: {
-                CallerIdHandler(msg);
-            } break;
-            }
+        else if (msgl->messageType == MessageType::CellularRinging) {
+            auto msg = dynamic_cast<CellularRingingMessage *>(msgl);
+            assert(msg != nullptr);
+            RingingHandler(msg);
+        }
+
+        else if (msgl->messageType == MessageType::CellularIncomingCall) {
+            auto msg = dynamic_cast<CellularIncominCallMessage *>(msgl);
+            assert(msg != nullptr);
+            IncomingCallHandler(msg);
+        }
+
+        else if (msgl->messageType == MessageType::CellularCallerId) {
+            auto msg = dynamic_cast<CellularCallerIdMessage *>(msgl);
+            assert(msg != nullptr);
+            CallerIdHandler(msg);
         }
 
         if (resp != nullptr) {

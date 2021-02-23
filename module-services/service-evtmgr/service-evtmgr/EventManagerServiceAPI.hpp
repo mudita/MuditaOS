@@ -6,6 +6,7 @@
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
 #include <bsp/common.hpp>
+#include <Service/Timer.hpp>
 
 namespace sys
 {
@@ -21,4 +22,25 @@ namespace EventManagerServiceAPI
     bsp::Board GetBoard(sys::Service *serv);
 
     void checkBatteryLevelCriticalState(sys::Service *serv);
+
+    /*
+     * @brief Call single vibra pulse
+     */
+    void vibraPulseOnce(sys::Service *serv);
+
+    /*
+     * @brief Call vibra to stop
+     */
+    void vibraStop(sys::Service *serv);
+
+    /*
+     * @brief Call repetitive vibra pulses for given time [ms]
+     */
+    void vibraPulseRepeat(sys::Service *serv, sys::ms time);
+
+    /*
+     * @brief Call repetitive vibra pulses until stop message is sent
+     */
+    void vibraPulseRepeatUntilStop(sys::Service *serv);
+
 } // namespace EventManagerServiceAPI

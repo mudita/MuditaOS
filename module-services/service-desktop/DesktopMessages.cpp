@@ -7,10 +7,6 @@
 namespace sdesktop
 {
     using namespace parserFSM;
-    void Event::send()
-    {
-        MessageHandler::putToSendQueue(context.createSimpleResponse());
-    }
     namespace developerMode
     {
 
@@ -41,17 +37,9 @@ namespace sdesktop
             context.setEndpoint(EndpointType::developerMode);
             context.setResponseBody(json11::Json::object{{json::developerMode::cellularStateInfo, stateStr}});
         }
-
-        DeveloperModeRequest::DeveloperModeRequest(std::unique_ptr<Event> event)
-            : sys::DataMessage(MessageType::DeveloperModeRequest), event(std::move(event))
-        {}
-
-        DeveloperModeRequest::DeveloperModeRequest() : sys::DataMessage(MessageType::DeveloperModeRequest)
-        {}
     } // namespace developerMode
     namespace bluetooth
     {
-
         BluetoothStatusRequestEvent::BluetoothStatusRequestEvent(int state)
         {
             context.setResponseStatus(http::Code::OK);

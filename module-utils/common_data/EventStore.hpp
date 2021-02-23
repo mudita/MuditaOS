@@ -25,6 +25,7 @@ namespace Store
         {
             Discharging,
             Charging,
+            ChargingDone,
             PluggedNotCharging,
         } state            = State::Discharging;
         unsigned int level = 0;

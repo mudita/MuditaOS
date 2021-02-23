@@ -8,10 +8,12 @@
 #include "windows/OnBoardingMainWindow.hpp"
 #include "windows/StartConfigurationWindow.hpp"
 #include "windows/OnBoardingLanguagesWindow.hpp"
+#include "windows/EULALicenseWindow.hpp"
 
 #include <service-db/DBMessage.hpp>
 #include <module-services/service-appmgr/service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 #include <module-apps/application-settings-new/data/LanguagesData.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
 namespace app
 {
@@ -59,7 +61,7 @@ namespace app
 
         connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
             if (gui::window::name::onBoarding_languages == getCurrentWindow()->getName()) {
-                switchWindow(gui::window::name::onBoarding_start_configuration, nullptr);
+                switchWindow(gui::window::name::onBoarding_eula, nullptr);
                 return msgHandled();
             }
             else {
@@ -68,6 +70,11 @@ namespace app
         });
 
         return ret;
+    }
+
+    void ApplicationOnBoarding::acceptEULA()
+    {
+        settings->setValue(settings::SystemProperties::eulaAccepted, "1", settings::SettingsScope::Global);
     }
 
     sys::ReturnCodes ApplicationOnBoarding::DeinitHandler()
@@ -83,17 +90,24 @@ namespace app
     void ApplicationOnBoarding::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::OnBoardingMainWindow>(app);
+            return std::make_unique<app::onBoarding::OnBoardingMainWindow>(app);
         });
         windowsFactory.attach(gui::window::name::onBoarding_languages, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::OnBoardingLanguagesWindow>(app);
+            return std::make_unique<app::onBoarding::OnBoardingLanguagesWindow>(app);
         });
         windowsFactory.attach(gui::window::name::onBoarding_start_configuration,
                               [](Application *app, const std::string &name) {
-                                  return std::make_unique<gui::StartConfigurationWindow>(app);
+                                  return std::make_unique<app::onBoarding::StartConfigurationWindow>(app);
                               });
+        windowsFactory.attach(gui::window::name::onBoarding_eula, [&](Application *app, const std::string &name) {
+            auto eulaRepository = std::make_unique<app::onBoarding::EULARepository>("assets/licenses", "eula.txt");
+            auto presenter      = std::make_unique<app::onBoarding::EULALicenseWindowPresenter>([&]() { acceptEULA(); },
+                                                                                           std::move(eulaRepository));
+            return std::make_unique<app::onBoarding::EULALicenseWindow>(app, std::move(presenter));
+        });
     }
 
     void ApplicationOnBoarding::destroyUserInterface()
     {}
+
 } // namespace app

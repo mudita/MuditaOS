@@ -17,6 +17,7 @@ endif()
 set( SOURCES 
     "Application.cpp"
     "GuiTimer.cpp"
+    "DOMResponder.cpp"
     "WindowsFactory.cpp"
     "TopBarManager.cpp"
     "AsyncTask.cpp"
@@ -35,6 +36,9 @@ set( SOURCES
     "widgets/BarGraph.cpp"
     "widgets/ActiveIconFactory.cpp"
     "widgets/TextWithIconsWidget.cpp"
+    "widgets/DateWidget.cpp"
+    "widgets/TimeWidget.cpp"
+    "widgets/WidgetsUtils.cpp"
     "options/OptionsModel.cpp"
     "options/type/OptionSimple.cpp"
     "options/type/OptionCall.cpp"

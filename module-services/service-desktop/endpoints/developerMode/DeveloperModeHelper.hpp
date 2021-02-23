@@ -11,6 +11,7 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <input/InputEvent.hpp>
 #include <module-db/Interface/SMSRecord.hpp>
+#include "Mode/BaseHelper.hpp"
 
 namespace sys
 {
@@ -20,22 +21,24 @@ namespace sys
 namespace parserFSM
 {
 
-    class DeveloperModeHelper
+    class DeveloperModeHelper : public BaseHelper
     {
-        sys::Service *ownerServicePtr = nullptr;
         static auto getKeyCode(int val) noexcept -> bsp::KeyCodes;
-        void sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state);
+        bool sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state);
 
         void requestSimChange(const int simSelected);
         auto smsRecordFromJson(json11::Json msgJson) -> SMSRecord;
-        auto prepareSMS(Context &context) -> sys::ReturnCodes;
         bool requestCellularPowerStateChange(const int simSelected);
         bool requestServiceStateInfo(sys::Service *serv);
+        auto prepareSMS(Context &context) -> ProcessResult;
 
       public:
-        DeveloperModeHelper(sys::Service *_ownerServicePtr) : ownerServicePtr(_ownerServicePtr){};
-        auto processPutRequest(Context &context) -> sys::ReturnCodes;
-        auto processGetRequest(Context &context) -> sys::ReturnCodes;
+        explicit DeveloperModeHelper(sys::Service *p) : BaseHelper(p)
+        {}
+
+      private:
+        auto processPut(Context &context) -> ProcessResult final;
+        auto processGet(Context &context) -> ProcessResult final;
     };
 
     namespace json::developerMode

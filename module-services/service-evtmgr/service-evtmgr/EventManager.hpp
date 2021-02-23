@@ -14,6 +14,7 @@
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <screen-light-control/ScreenLightControl.hpp>
+#include <vibra/Vibra.hpp>
 
 #include <service-db/DBServiceName.hpp>
 
@@ -27,9 +28,9 @@ class WorkerEvent;
 class EventManager : public sys::Service
 {
   private:
-    void HandleAlarmTrigger(sys::DataMessage *msgl);
-    void GetNextAlarmTimestamp(time_t timestamp);
+    void handleMinuteUpdate(time_t timestamp);
     bool processKeypadBacklightRequest(bsp::keypad_backlight::Action act);
+    bool processVibraRequest(bsp::vibrator::Action act, sys::ms RepetitionTime = static_cast<sys::ms>(1000));
 
     std::shared_ptr<settings::Settings> settings;
 
@@ -48,6 +49,7 @@ class EventManager : public sys::Service
     bool alarmIsValid = false;
 
     std::unique_ptr<screen_light_control::ScreenLightControl> screenLightControl;
+    std::unique_ptr<vibra_handle::Vibra> Vibra;
 
   public:
     EventManager(const std::string &name = service::name::evt_manager);
