@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import time
 from enum import Enum
@@ -40,6 +40,12 @@ class Harness:
 
     def get_application_name(self):
         return self.connection.get_application_name()
+
+    def unlock_usb(self):
+        self.connection.usb_unlock()
+
+    def lock_usb(self):
+        self.connection.usb_lock()
 
     def unlock_phone(self):
         if self.connection.is_phone_locked():

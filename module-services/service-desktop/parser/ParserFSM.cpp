@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessageHandler.hpp"
@@ -161,14 +161,18 @@ void StateMachine::parsePayload()
 
     state = State::ReceivedPayload;
 
-    // processing payload
-    auto handler = std::make_unique<MessageHandler>(payload, OwnerServicePtr);
+    messageHandler->parseMessage(payload);
 
-    if (!handler->isValid() || handler->isJSONNull()) {
-        LOG_DEBUG("JsonErr: %s", handler->getErrorString().c_str());
+    if (!messageHandler->isValid() || messageHandler->isJSONNull()) {
+        LOG_DEBUG("JsonErr: %s", messageHandler->getErrorString().c_str());
         state = State::NoMsg;
         return;
     }
 
-    handler->processMessage();
+    messageHandler->processMessage();
+}
+
+void StateMachine::setMessageHandler(std::unique_ptr<MessageHandler> handler)
+{
+    messageHandler = std::move(handler);
 }

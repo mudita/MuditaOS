@@ -9,6 +9,7 @@ import time
 
 @pytest.mark.rt1051
 @pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("usb_unlocked")
 def test_bluetooth_on_off(harness):
     body = {"state": True}
     ret = harness.endpoint_request("bluetooth", "get", body)
@@ -38,6 +39,7 @@ def test_bluetooth_on_off(harness):
 
 @pytest.mark.rt1051
 @pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("usb_unlocked")
 def test_bluetooth_scan(harness):
     body = {"state": True}
     ret = harness.endpoint_request("bluetooth", "get", body)

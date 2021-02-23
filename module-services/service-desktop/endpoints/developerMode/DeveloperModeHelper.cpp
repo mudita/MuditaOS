@@ -103,6 +103,17 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
                                service::name::system_manager);
         return {sent::delayed, std::nullopt};
     }
+    else if (body[json::developerMode::usbSecurity].is_string()) {
+        std::shared_ptr<sys::DataMessage> msg = std::make_shared<sdesktop::usb::USBConnected>();
+        if (body[json::developerMode::usbSecurity].string_value() == json::developerMode::usbUnlock) {
+            msg = std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>();
+        }
+        code = toCode(owner->bus.sendUnicast(std::move(msg), "ServiceDesktop"));
+    }
+    else {
+        context.setResponseStatus(http::Code::BadRequest);
+        MessageHandler::putToSendQueue(context.createSimpleResponse());
+    }
     return {sent::no, endpoint::ResponseContext{.status = code}};
 }
 
@@ -237,8 +248,8 @@ auto DeveloperModeHelper::smsRecordFromJson(json11::Json msgJson) -> SMSRecord
     record.type = static_cast<SMSType>(msgJson[json::messages::messageType].int_value());
     utils::PhoneNumber phoneNumber(msgJson[json::messages::phoneNumber].string_value());
     record.number = phoneNumber.getView();
-    record.date = utils::time::getCurrentTimestamp().getTime();
-    record.body = UTF8(msgJson[json::messages::messageBody].string_value());
+    record.date   = utils::time::getCurrentTimestamp().getTime();
+    record.body   = UTF8(msgJson[json::messages::messageBody].string_value());
     return record;
 }
 

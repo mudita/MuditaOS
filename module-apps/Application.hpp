@@ -4,26 +4,27 @@
 #pragma once
 
 #include "AsyncTask.hpp"
-#include "Audio/AudioCommon.hpp"                        // for Volume, Play...
-#include "Audio/Profiles/Profile.hpp"                   // for Profile, Pro...
+#include "Audio/AudioCommon.hpp"      // for Volume, Play...
+#include "Audio/Profiles/Profile.hpp" // for Profile, Pro...
 #include "CallbackStorage.hpp"
-#include "Service/Common.hpp"                           // for ReturnCodes
-#include "Service/Message.hpp"                          // for MessagePointer
-#include "Service/Service.hpp"                          // for Service
-#include "SwitchData.hpp"                               // for SwitchData
-#include "SystemManager/SystemManager.hpp"              // for SystemManager
-#include "bsp/keyboard/key_codes.hpp"                   // for bsp
-#include "gui/Common.hpp"                               // for ShowMode
-#include "projdefs.h"                                   // for pdMS_TO_TICKS
+
+#include "Service/Common.hpp"              // for ReturnCodes
+#include "Service/Message.hpp"             // for MessagePointer
+#include "Service/Service.hpp"             // for Service
+#include "SwitchData.hpp"                  // for SwitchData
+#include "SystemManager/SystemManager.hpp" // for SystemManager
+#include "bsp/keyboard/key_codes.hpp"      // for bsp
+#include "gui/Common.hpp"                  // for ShowMode
+#include "projdefs.h"                      // for pdMS_TO_TICKS
 #include <service-appmgr/ApplicationManifest.hpp>
-#include <list>                                         // for list
-#include <map>                                          // for allocator, map
-#include <memory>                                       // for make_shared
-#include <module-bsp/bsp/torch/torch.hpp>               // for State, State...
-#include <stdint.h>                                     // for uint32_t
-#include <string>                                       // for string
-#include <utility>                                      // for move, pair
-#include <vector>                                       // for vector
+#include <list>                           // for list
+#include <map>                            // for allocator, map
+#include <memory>                         // for make_shared
+#include <module-bsp/bsp/torch/torch.hpp> // for State, State...
+#include <stdint.h>                       // for uint32_t
+#include <string>                         // for string
+#include <utility>                        // for move, pair
+#include <vector>                         // for vector
 #include "TopBarManager.hpp"
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"

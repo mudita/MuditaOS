@@ -28,6 +28,7 @@ status = {
     "OK": 200,
     "Accepted": 202,
     "BadRequest": 400,
+    "Forbidden": 403,
     "NotAcceptable": 406,
     "InternalServerError": 500,
 }

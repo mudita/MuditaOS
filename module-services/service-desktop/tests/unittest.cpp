@@ -25,7 +25,6 @@
 #include <string>
 #include <vector>
 
-
 TEST_CASE("System Update Tests")
 {
     UpdateMuditaOS updateOS(nullptr);
@@ -48,6 +47,10 @@ using namespace parserFSM;
 TEST_CASE("Parser Test")
 {
     StateMachine parser(nullptr);
+
+    auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Allow);
+    auto handler = std::make_unique<parserFSM::MessageHandler>(nullptr, std::move(factory));
+    parser.setMessageHandler(std::move(handler));
 
     SECTION("Parse message with divided header and payload")
     {
@@ -275,7 +278,8 @@ TEST_CASE("Endpoint Factory test")
         REQUIRE(err.empty());
 
         Context context(msgJson);
-        auto handler = EndpointFactory::create(context, nullptr);
+        auto factory = std::make_unique<EndpointFactory>();
+        auto handler = factory->create(context, nullptr);
         REQUIRE(dynamic_cast<ContactsEndpoint *>(handler.get()));
     }
 
@@ -287,7 +291,37 @@ TEST_CASE("Endpoint Factory test")
         REQUIRE(err.empty());
 
         Context context(msgJson);
-        auto handler = EndpointFactory::create(context, nullptr);
+        auto factory = std::make_unique<EndpointFactory>();
+        auto handler = factory->create(context, nullptr);
         REQUIRE(handler == nullptr);
+    }
+}
+
+TEST_CASE("Secured Endpoint Factory test")
+{
+    SECTION("Allowed endpoint")
+    {
+        auto testMessage = R"({"endpoint":7, "method":1, "uuid":12345, "body":{"test":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Allow);
+        auto handler = factory->create(context, nullptr);
+        REQUIRE(dynamic_cast<ContactsEndpoint *>(handler.get()));
+    }
+
+    SECTION("Secured endpoint")
+    {
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"12345", "body":{"te":"test"}})";
+        std::string err;
+        auto msgJson = json11::Json::parse(testMessage, err);
+        REQUIRE(err.empty());
+
+        Context context(msgJson);
+        auto factory = std::make_unique<SecuredEndpointFactory>(EndpointSecurity::Block);
+        auto handler = factory->create(context, nullptr);
+        REQUIRE(dynamic_cast<SecuredEndpoint *>(handler.get()));
     }
 }

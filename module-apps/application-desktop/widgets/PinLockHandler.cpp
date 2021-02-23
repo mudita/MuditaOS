@@ -1,4 +1,4 @@
-//// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+//// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 //// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PinLockHandler.hpp"
@@ -79,6 +79,30 @@ namespace gui
         if (!getStrongestLock().isType(PinLock::LockType::Screen)) {
             unlock();
         }
+    }
+
+    void PinLockHandler::handleScreenPasscodeRequest(app::manager::actions::ActionParamsPtr &&data) const
+    {
+        LOG_DEBUG("Handling ScreenPasscode action");
+
+        auto params = static_cast<app::manager::actions::ScreenPasscodeParams *>(data.get());
+        auto lock   = std::make_unique<gui::PinLock>(
+            Store::GSM::SIM::NONE, PinLock::LockState::PasscodeRequired, PinLock::LockType::Screen);
+
+        if (params->isCancel()) {
+            app->switchWindow(app::window::name::desktop_main_window);
+            return;
+        }
+
+        lock->onActivatedCallback = [this](PinLock::LockType type, const std::vector<unsigned int> &data) {
+            app->bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>(),
+                                 service::name::service_desktop);
+            app->switchWindow(app::window::name::desktop_main_window);
+        };
+
+        app->switchWindow(app::window::name::desktop_pin_lock,
+                          gui::ShowMode::GUI_SHOW_INIT,
+                          std::make_unique<gui::LockPhoneData>(std::move(lock)));
     }
 
     void PinLockHandler::handlePinChangeRequest(app::manager::actions::ActionParamsPtr &&data)

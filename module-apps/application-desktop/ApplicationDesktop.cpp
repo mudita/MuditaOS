@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationDesktop.hpp"
@@ -49,6 +49,11 @@ namespace app
         addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
             lockHandler.handlePasscodeRequest(gui::PinLock::LockType::SimPin, std::move(data));
             return actionHandled();
+        });
+
+        addActionReceiver(app::manager::actions::RequestScreenPasscode, [this](auto &&data) {
+            lockHandler.handleScreenPasscodeRequest(std::move(data));
+            return msgHandled();
         });
 
         addActionReceiver(app::manager::actions::RequestPuk, [this](auto &&data) {

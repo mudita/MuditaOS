@@ -112,13 +112,23 @@ namespace app
             virtual void setKeypadBacklightState(bool newState) = 0;
         };
 
+        class SecuritySettings
+        {
+          public:
+            virtual ~SecuritySettings() = default;
+
+            virtual auto isUSBSecured() const -> bool  = 0;
+            virtual void setUSBSecurity(bool security) = 0;
+        };
+
     }; // namespace settingsInterface
 
     class ApplicationSettingsNew : public app::Application,
                                    public settingsInterface::SimParams,
                                    public settingsInterface::OperatorsSettings,
                                    public settingsInterface::ScreenLightSettings,
-                                   public settingsInterface::KeypdBacklightSettings
+                                   public settingsInterface::KeypdBacklightSettings,
+                                   public settingsInterface::SecuritySettings
     {
       public:
         ApplicationSettingsNew(std::string name                    = name_settings_new,
@@ -159,6 +169,12 @@ namespace app
         auto isKeypadBacklightOn() -> bool override;
         void setKeypadBacklightState(bool newState) override;
 
+        auto isUSBSecured() const -> bool override;
+        void setUSBSecurity(bool security) override;
+
+        void setLockScreenPasscodeOn(bool passcodeOn);
+        auto isLockScreenPasscodeOn() const -> bool;
+
       private:
         void attachQuotesWindows();
 
@@ -167,6 +183,8 @@ namespace app
         bsp::Board board              = bsp::Board::none;
         bool operatorsOn              = false;
         bool voLteStateOn             = false;
+        bool usbSecured               = true;
+        bool lockScreenPasscodeOn     = true;
         unsigned int lockPassHash     = 0;
     };
 
