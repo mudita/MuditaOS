@@ -23,11 +23,13 @@
 #include <service-desktop/service-desktop/Constants.hpp>
 #include <service-bluetooth/messages/SetDeviceName.hpp>
 #include <BtCommand.hpp>
+#include <BtKeysStorage.hpp>
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth)
 {
     auto settings  = std::make_unique<settings::Settings>(this);
     settingsHolder = std::make_shared<bluetooth::SettingsHolder>(std::move(settings));
+    bluetooth::KeyStorage::settings = settingsHolder;
     LOG_INFO("[ServiceBluetooth] Initializing");
 }
 
