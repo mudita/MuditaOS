@@ -54,6 +54,7 @@ namespace parserFSM
         inline constexpr auto smsCommand             = "smsCommand";
         inline constexpr auto changeCellularStateCmd = "changeCellularStateCmd";
         inline constexpr auto getInfo                = "getInfo";
+        inline constexpr auto tethering              = "tethering";
 
         /// values for getInfo cmd
         inline constexpr auto simStateInfo      = "simState";
@@ -61,5 +62,9 @@ namespace parserFSM
 
         /// values for smsCommand
         inline constexpr auto smsAdd = "smsAdd";
+
+        /// values for tethering
+        inline constexpr auto tetheringOn  = "on";
+        inline constexpr auto tetheringOff = "off";
     }
 } // namespace parserFSM
