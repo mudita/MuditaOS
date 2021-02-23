@@ -11,6 +11,8 @@ namespace gui
     class Window;
     class Label;
     class BottomBar;
+    class ListItem;
+
     namespace top_bar
     {
         class TopBar;
@@ -28,6 +30,7 @@ namespace gui
         virtual void visit(gui::Label &item)     = 0;
         virtual void visit(gui::BottomBar &item) = 0;
         virtual void visit(gui::top_bar::TopBar &item) = 0;
+        virtual void visit(gui::ListItem &item)        = 0;
         virtual ~GuiVisitor()                    = default;
     };
 } // namespace gui

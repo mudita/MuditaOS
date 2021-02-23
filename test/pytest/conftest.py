@@ -20,13 +20,13 @@ from harness.interface.defs import key_codes
 
 simulator_port = 'simulator'
 
-
 def pytest_addoption(parser):
     parser.addoption("--port", type=str, action="store", required=False)
     parser.addoption("--timeout", type=int, action="store", default=15)
     parser.addoption("--phone_number", type=int, action="store")
     parser.addoption("--call_duration", type=int, action="store", default=30)
     parser.addoption("--sms_text", type=str, action="store", default='')
+    parser.addoption("--bt_device", type=str, action="store", default='')
 
 
 @pytest.fixture(scope='session')
@@ -49,6 +49,10 @@ def sms_text(request):
     assert sms_text != ''
     return sms_text
 
+@pytest.fixture(scope='session')
+def bt_device(request):
+    bt_device = request.config.option.bt_device
+    return bt_device
 
 @pytest.fixture(scope='session')
 def harness(request):

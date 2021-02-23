@@ -15,7 +15,8 @@ namespace gui::visitor
         TopBar,
         BottomBar,
         Window,
-        Children
+        Children,
+        ListItem
     };
 
     enum Item
