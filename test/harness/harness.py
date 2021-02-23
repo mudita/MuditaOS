@@ -108,3 +108,9 @@ class Harness:
         self.connection.send_key_code(key_codes["fnRight"], Keytype.long_press)
         self.connection.send_key_code(key_codes["right"])
         self.connection.send_key_code(key_codes["enter"])
+
+    def set_tethering_state(self, enabled: bool):
+        state = 'on' if enabled else 'off'
+        body = {"tethering": state}
+        log.info(f"Set tethering state to: {state}")
+        return self.endpoint_request("developerMode", "put", body)

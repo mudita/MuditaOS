@@ -37,6 +37,7 @@ namespace sys
     } // namespace constants
 
     class PhoneModeRequest; // Forward declaration
+    class TetheringStateRequest; // Forward declaration
 
     enum class Code
     {
@@ -153,6 +154,7 @@ namespace sys
         void CpuStatisticsTimerHandler();
 
         MessagePointer handlePhoneModeRequest(PhoneModeRequest *request);
+        MessagePointer handleTetheringStateRequest(TetheringStateRequest *request);
 
         bool cpuStatisticsTimerInit{false};
 

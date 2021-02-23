@@ -15,6 +15,9 @@
 #include <service-appmgr/Actions.hpp>
 #include <messages/AppMessage.hpp>
 
+#include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>
+#include <module-sys/SystemManager/Constants.hpp>
+
 #include <service-db/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 #include <service-desktop/parser/MessageHandler.hpp>
@@ -26,10 +29,19 @@ namespace parserFSM
 
 using namespace parserFSM;
 
-constexpr http::Code toCode(bool r)
+namespace
 {
-    return r ? http::Code::OK : http::Code::InternalServerError;
-}
+    constexpr http::Code toCode(bool r)
+    {
+        return r ? http::Code::OK : http::Code::InternalServerError;
+    }
+
+    auto toTetheringState(const std::string &state) -> sys::phone_modes::Tethering
+    {
+        return state == json::developerMode::tetheringOn ? sys::phone_modes::Tethering::On
+                                                         : sys::phone_modes::Tethering::Off;
+    }
+} // namespace
 
 auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
 {
@@ -84,6 +96,12 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
                 return {sent::no, endpoint::ResponseContext{.status = http::Code::NotAcceptable}};
             }
         }
+    }
+    else if (body[json::developerMode::tethering].is_string()) {
+        const auto &tetheringState = body[json::developerMode::tethering].string_value();
+        owner->bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(toTetheringState(tetheringState)),
+                               service::name::system_manager);
+        return {sent::delayed, std::nullopt};
     }
     return {sent::no, endpoint::ResponseContext{.status = code}};
 }

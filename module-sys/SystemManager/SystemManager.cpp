@@ -26,6 +26,7 @@
 #include "messages/SentinelRegistrationMessage.hpp"
 #include "messages/RequestCpuFrequencyMessage.hpp"
 #include "messages/PhoneModeRequest.hpp"
+#include "messages/TetheringStateRequest.hpp"
 #include <time/ScopedTime.hpp>
 
 const inline size_t systemManagerStack = 4096 * 2;
@@ -384,6 +385,11 @@ namespace sys
             return handlePhoneModeRequest(request);
         });
 
+        connect(typeid(TetheringStateRequest), [this](sys::Message *message) -> sys::MessagePointer {
+            auto request = static_cast<TetheringStateRequest *>(message);
+            return handleTetheringStateRequest(request);
+        });
+
         deviceManager->RegisterNewDevice(powerManager->getExternalRamDevice());
 
         return ReturnCodes::Success;
@@ -504,6 +510,13 @@ namespace sys
     {
         LOG_INFO("Phone mode change requested.");
         phoneModeSubject->setPhoneMode(request->getPhoneMode());
+        return MessageNone{};
+    }
+
+    MessagePointer SystemManager::handleTetheringStateRequest(TetheringStateRequest *request)
+    {
+        LOG_INFO("Tethering state change requested");
+        phoneModeSubject->setTetheringMode(request->getTetheringState());
         return MessageNone{};
     }
 
