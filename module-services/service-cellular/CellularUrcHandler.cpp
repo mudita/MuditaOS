@@ -25,13 +25,13 @@ void CellularUrcHandler::Handle(Clip &urc)
     if (urc.isValid()) {
         phoneNumber = urc.getNumber();
     }
-    response = std::make_unique<CellularCallMessage>(CellularCallMessage::Type::CallerId, phoneNumber);
+    response = std::make_unique<CellularCallerIdMessage>(phoneNumber);
     urc.setHandled(true);
 }
 
 void CellularUrcHandler::Handle(Ring &urc)
 {
-    response = std::make_unique<CellularCallMessage>(CellularCallMessage::Type::IncomingCall, "");
+    response = std::make_unique<CellularIncominCallMessage>("");
     urc.setHandled(true);
 }
 

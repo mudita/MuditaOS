@@ -51,7 +51,9 @@ namespace audio
         KeypadSound,
         CallRingtone,
         TextMessageRingtone,
-        Last = TextMessageRingtone,
+        Meditation,
+        Alarm,
+        Last = Alarm,
     };
 
     [[nodiscard]] const std::string str(const PlaybackType &playbackType) noexcept;
@@ -160,6 +162,7 @@ namespace audio
         ProfileNotSet,
         DeviceFailure,
         TokenNotFound,
+        Ignored,
         Failed
     };
 

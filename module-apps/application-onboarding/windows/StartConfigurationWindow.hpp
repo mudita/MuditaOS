@@ -8,7 +8,7 @@
 #include <AppWindow.hpp>
 #include <module-gui/gui/widgets/Icon.hpp>
 
-namespace gui
+namespace app::onBoarding
 {
     class StartConfigurationWindow : public gui::AppWindow
     {

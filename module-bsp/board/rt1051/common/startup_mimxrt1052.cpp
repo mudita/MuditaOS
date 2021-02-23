@@ -1,6 +1,3 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
-// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
-
 //*****************************************************************************
 // MIMXRT1052 startup code for use with MCUXpresso IDE
 //
@@ -72,17 +69,15 @@ extern "C"
 {
 #endif
 
-//*****************************************************************************
-// Variable to store CRP value in. Will be placed automatically
-// by the linker when "Enable Code Read Protect" selected.
-// See crp.h header for more information
-//*****************************************************************************
-//*****************************************************************************
-// Declaration of external SystemInit function
-//*****************************************************************************
-#if defined(__USE_CMSIS)
+    //*****************************************************************************
+    // Variable to store CRP value in. Will be placed automatically
+    // by the linker when "Enable Code Read Protect" selected.
+    // See crp.h header for more information
+    //*****************************************************************************
+    //*****************************************************************************
+    // Declaration of external SystemInit function
+    //*****************************************************************************
     extern void SystemInit(void);
-#endif // (__USE_CMSIS)
 
     //*****************************************************************************
     // Forward declaration of the core exception handlers.
@@ -703,24 +698,7 @@ __attribute__((section(".after_vectors.reset"))) void ResetISR(void)
     // Disable interrupts
     __asm volatile("cpsid i");
 
-#if defined(__USE_CMSIS)
-    // If __USE_CMSIS defined, then call CMSIS SystemInit code
     SystemInit();
-#else
-    // Disable Watchdog
-    volatile unsigned int *WDOG1_WCR = (unsigned int *)0x400B8000;
-    *WDOG1_WCR                       = *WDOG1_WCR & ~(1 << 2);
-    volatile unsigned int *WDOG2_WCR = (unsigned int *)0x400D0000;
-    *WDOG2_WCR                       = *WDOG2_WCR & ~(1 << 2);
-    // Write watchdog update key to unlock
-    *((volatile unsigned int *)0x400BC004) = 0xD928C520;
-    // Set timeout value
-    *((volatile unsigned int *)0x400BC008) = 0xFFFF;
-    // Now disable watchdog via control register
-    volatile unsigned int *RTWDOG_CS = (unsigned int *)0x400BC000;
-    *RTWDOG_CS                       = (*RTWDOG_CS & ~(1 << 7)) | (1 << 5);
-
-#endif // (__USE_CMSIS)
 
     unsigned int LoadAddr, ExeAddr, SectionLen;
     unsigned int *SectionTableAddr;
@@ -746,20 +724,6 @@ __attribute__((section(".after_vectors.reset"))) void ResetISR(void)
         SectionLen = *SectionTableAddr++;
         bss_init(ExeAddr, SectionLen);
     }
-
-#if !defined(__USE_CMSIS)
-    // Assume that if __USE_CMSIS defined, then CMSIS SystemInit code
-    // will setup the VTOR register
-
-    // Check to see if we are running the code from a non-zero
-    // address (eg RAM, external flash), in which case we need
-    // to modify the VTOR register to tell the CPU that the
-    // vector table is located at a non-0x0 address.
-    unsigned int *pSCB_VTOR = (unsigned int *)0xE000ED08;
-    if ((unsigned int *)g_pfnVectors != (unsigned int *)0x00000000) {
-        *pSCB_VTOR = (unsigned int)g_pfnVectors;
-    }
-#endif // (__USE_CMSIS)
 
 #if defined(__cplusplus)
     //

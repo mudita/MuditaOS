@@ -4,12 +4,12 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 set(SOURCES
         EventManager.cpp
         WorkerEvent.cpp
-        alarm/EventManagerAlarm.cpp
         api/EventManagerServiceAPI.cpp
         messages/Message.cpp
         battery-level-check/BatteryLevelCheck.cpp
         screen-light-control/ControlFunctions.cpp
         screen-light-control/ScreenLightControl.cpp
+        vibra/Vibra.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

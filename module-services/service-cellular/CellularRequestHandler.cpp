@@ -67,9 +67,8 @@ void CellularRequestHandler::handle(cellular::CallRequest &request, at::Result &
     // activate call state timer
     cellular.callStateTimer->reload();
     // Propagate "Ringing" notification into system
-    cellular.bus.sendMulticast(
-        std::make_shared<CellularCallMessage>(CellularCallMessage::Type::Ringing, request.getNumber()),
-        sys::BusChannel::ServiceCellularNotifications);
+    cellular.bus.sendMulticast(std::make_shared<CellularRingingMessage>(request.getNumber()),
+                               sys::BusChannel::ServiceCellularNotifications);
     request.setHandled(true);
 }
 

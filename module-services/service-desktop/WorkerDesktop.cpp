@@ -3,6 +3,7 @@
 
 #include "service-desktop/ServiceDesktop.hpp"
 #include "service-desktop/WorkerDesktop.hpp"
+#include "service-desktop/DesktopMessages.hpp"
 #include "parser/MessageHandler.hpp"
 #include "parser/ParserFSM.hpp"
 #include "endpoints/Context.hpp"
@@ -20,9 +21,6 @@ inline constexpr auto uploadFailedMessage = "file upload terminated before all d
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr)
     : sys::Worker(ownerServicePtr), ownerService(ownerServicePtr), parser(ownerServicePtr), fileDes(nullptr)
 {
-    transferTimer =
-        std::make_unique<sys::Timer>("WorkerDesktop file upload", ownerServicePtr, sdesktop::file_transfer_timeout);
-    transferTimer->connect([=](sys::Timer &) { timerHandler(); });
 }
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
@@ -77,6 +75,22 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         bsp::usbCDCSend(sendMsg);
         delete sendMsg;
     }
+    else if (qname == SERVICE_QUEUE_NAME) {
+        auto &serviceQueue = getServiceQueue();
+        sys::WorkerCommand cmd;
+
+        if (serviceQueue.Dequeue(&cmd, 0)) {
+            switch (static_cast<Command>(cmd.command)) {
+            case Command::CancelTransfer:
+                transferTimeoutHandler();
+                break;
+            }
+        }
+        else {
+            LOG_ERROR("handleMessage xQueueReceive failed for %s.", SERVICE_QUEUE_NAME.c_str());
+            return false;
+        }
+    }
     else {
         LOG_INFO("handeMessage got message on an unhandled queue");
     }
@@ -95,13 +109,33 @@ sys::ReturnCodes WorkerDesktop::startDownload(const std::filesystem::path &desti
     if (fileSize <= 0)
         return sys::ReturnCodes::Failure;
 
-    transferTimer->start();
+    startTransferTimer();
 
     writeFileSizeExpected = fileSize;
     rawModeEnabled        = true;
 
     LOG_DEBUG("startDownload all checks passed starting download");
     return sys::ReturnCodes::Success;
+}
+
+void WorkerDesktop::startTransferTimer()
+{
+    auto msg = std::make_shared<sdesktop::transfer::TransferTimerState>(
+        sdesktop::transfer::TransferTimerState::Request::Start);
+    ownerService->bus.sendUnicast(std::move(msg), service::name::service_desktop);
+}
+
+void WorkerDesktop::stopTransferTimer()
+{
+    auto msg =
+        std::make_shared<sdesktop::transfer::TransferTimerState>(sdesktop::transfer::TransferTimerState::Request::Stop);
+    ownerService->bus.sendUnicast(std::move(msg), service::name::service_desktop);
+}
+void WorkerDesktop::reloadTransferTimer()
+{
+    auto msg = std::make_shared<sdesktop::transfer::TransferTimerState>(
+        sdesktop::transfer::TransferTimerState::Request::Reload);
+    ownerService->bus.sendUnicast(std::move(msg), service::name::service_desktop);
 }
 
 void WorkerDesktop::stopTransfer(const TransferFailAction action)
@@ -124,7 +158,7 @@ void WorkerDesktop::stopTransfer(const TransferFailAction action)
     fclose(fileDes);
 
     // stop the timeout timer
-    transferTimer->stop();
+    stopTransferTimer();
 
     // reset all counters
     writeFileSizeExpected = 0;
@@ -142,7 +176,7 @@ void WorkerDesktop::stopTransfer(const TransferFailAction action)
 void WorkerDesktop::rawDataReceived(void *dataPtr, uint32_t dataLen)
 {
     if (getRawMode()) {
-        transferTimer->reload();
+        reloadTransferTimer();
 
         if (dataPtr == nullptr || dataLen == 0) {
             LOG_ERROR("transferDataReceived invalid data");
@@ -170,10 +204,14 @@ void WorkerDesktop::rawDataReceived(void *dataPtr, uint32_t dataLen)
     }
 }
 
-void WorkerDesktop::timerHandler()
+void WorkerDesktop::cancelTransferOnTimeout()
 {
     LOG_DEBUG("timeout timer: run");
+    sendCommand({.command = static_cast<uint32_t>(Command::CancelTransfer), .data = nullptr});
+}
 
+void WorkerDesktop::transferTimeoutHandler()
+{
     if (getRawMode()) {
         LOG_DEBUG("timeout timer: stopping transfer");
         uploadFileFailedResponse();

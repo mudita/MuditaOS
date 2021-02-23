@@ -80,6 +80,14 @@ namespace gui
         {
             return lockType == type;
         }
+        [[nodiscard]] const std::string &getPasscodeName() const noexcept
+        {
+            return passcodeName;
+        }
+        [[nodiscard]] Store::GSM::SIM getSim() const noexcept
+        {
+            return sim;
+        }
 
         void putNextChar(unsigned int c);
         /// removes a last character passed to Lock via putNextChar. The last character can not be popped
@@ -100,6 +108,7 @@ namespace gui
         std::function<void(LockType type, const std::vector<unsigned int> &)> onActivatedCallback = nullptr;
 
       private:
+        std::string passcodeName;
         Store::GSM::SIM sim = Store::GSM::SIM::NONE;
         LockState lockState = LockState::Unlocked;
         LockType lockType   = LockType::Screen;

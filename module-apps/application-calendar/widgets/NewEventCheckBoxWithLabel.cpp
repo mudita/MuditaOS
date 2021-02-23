@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEventCheckBoxWithLabel.hpp"
@@ -60,22 +60,21 @@ namespace gui
             auto start_time = TimePointToHourMinSec(event->date_from);
             auto end_time   = TimePointToHourMinSec(event->date_till);
             if (start_time.hours().count() == 0 && start_time.minutes().count() == 0 &&
-                end_time.hours().count() == style::window::calendar::time::max_hour_24H_mode &&
-                end_time.minutes().count() == style::window::calendar::time::max_minutes) {
+                end_time.hours().count() == utils::time::Locale::max_hour_24H_mode &&
+                end_time.minutes().count() == utils::time::Locale::max_minutes) {
                 checkBox->setImageVisible(true);
             }
         };
         onSaveCallback = [&](std::shared_ptr<EventsRecord> event) {
             if (checkBox->isChecked()) {
                 event->date_from = TimePointFromYearMonthDay(dateItem->getChosenDate());
-                event->date_till = event->date_from +
-                                   std::chrono::hours(style::window::calendar::time::max_hour_24H_mode) +
-                                   std::chrono::minutes(style::window::calendar::time::max_minutes);
+                event->date_till = event->date_from + std::chrono::hours(utils::time::Locale::max_hour_24H_mode) +
+                                   std::chrono::minutes(utils::time::Locale::max_minutes);
             }
         };
     }
 
-    void NewEventCheckBoxWithLabel::setConnectionToDateItem(gui::EventDateItem *item)
+    void NewEventCheckBoxWithLabel::setConnectionToDateItem(gui::DateWidget *item)
     {
         dateItem = item;
     }

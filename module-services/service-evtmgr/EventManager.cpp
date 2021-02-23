@@ -41,10 +41,12 @@
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
 #include <common_data/EventStore.hpp>
 #include <SystemManager/messages/PhoneModeRequest.hpp>
+#include <vibra/Vibra.hpp>
 
 EventManager::EventManager(const std::string &name)
     : sys::Service(name), settings(std::make_shared<settings::Settings>(this)),
-      screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(settings, this))
+      screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(settings, this)),
+      Vibra(std::make_unique<vibra_handle::Vibra>(this))
 {
     LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
@@ -133,9 +135,8 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         }
     }
     else if (msgl->messageType == MessageType::EVMMinuteUpdated && msgl->sender == this->GetName()) {
-
-        HandleAlarmTrigger(msgl);
-
+        auto msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
+        handleMinuteUpdate(msg->timestamp);
         handled = true;
     }
     else if (auto msg = dynamic_cast<AudioEventRequest *>(msgl); msg /*&& msgl->sender == this->GetName()*/) {
@@ -270,6 +271,13 @@ sys::ReturnCodes EventManager::InitHandler()
             screenLightControl->getLightState(), screenLightControl->getAutoModeState(), params);
         return msg;
     });
+    connect(sevm::RtcUpdateTimeMessage(0), [&](sys::Message *msgl) {
+        auto msg = static_cast<sevm::RtcUpdateTimeMessage *>(msgl);
+        bsp::rtc_SetDateTimeFromTimestamp(msg->getTime());
+        bsp::rtc_SetMinuteAlarm(msg->getTime());
+        handleMinuteUpdate(msg->getTime());
+        return app::msgHandled();
+    });
 
     connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *msgl) {
         if (msgl->sender == this->GetName()) {
@@ -285,6 +293,12 @@ sys::ReturnCodes EventManager::InitHandler()
                 bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), targetApplication);
             }
         }
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sevm::VibraMessage(bsp::vibrator::Action::stop), [&](sys::Message *msgl) {
+        auto request = static_cast<sevm::VibraMessage *>(msgl);
+        processVibraRequest(request->action, request->repetitionTime);
         return std::make_shared<sys::ResponseMessage>();
     });
 
@@ -359,6 +373,15 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
     return sender->bus.sendUnicast(msg, service::name::evt_manager);
 }
 
+void EventManager::handleMinuteUpdate(time_t timestamp)
+{
+    if (!targetApplication.empty()) {
+        auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
+        message->timestamp = timestamp;
+        bus.sendUnicast(message, targetApplication);
+    }
+}
+
 bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action act)
 {
     bool response = false;
@@ -376,5 +399,21 @@ bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action a
     return response;
 }
 
-void EventManager::GetNextAlarmTimestamp(time_t timestamp)
-{}
+bool EventManager::processVibraRequest(bsp::vibrator::Action act, sys::ms RepetitionTime)
+{
+    switch (act) {
+    case bsp::vibrator::Action::pulse:
+        Vibra->Pulse();
+        break;
+    case bsp::vibrator::Action::pulseRepeat:
+        Vibra->PulseRepeat(RepetitionTime);
+        break;
+    case bsp::vibrator::Action::pulseRepeatInfinite:
+        Vibra->PulseRepeat();
+        break;
+    case bsp::vibrator::Action::stop:
+        Vibra->PulseRepeatStop();
+        break;
+    }
+    return true;
+}

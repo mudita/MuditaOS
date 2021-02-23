@@ -87,8 +87,8 @@ namespace gui
     {
         assert(_duration != std::chrono::seconds::zero()); // Pre-condition check.
 
-        duration = _duration;
-        elapsed  = std::chrono::seconds::zero();
+        duration       = _duration;
+        elapsed        = std::chrono::seconds::zero();
         intervalPeriod = _intervalPeriod;
         hasInterval    = _intervalPeriod != std::chrono::seconds::zero();
         onReset();
@@ -168,7 +168,7 @@ namespace gui
 
     void MeditationTimer::onInterval() const
     {
-        AudioServiceAPI::PlaybackStart(application, audio::PlaybackType::Multimedia, intervalSoundPath);
+        AudioServiceAPI::PlaybackStart(application, audio::PlaybackType::Meditation, intervalSoundPath);
     }
 
     void MeditationTimer::registerTimeoutCallback(const std::function<void()> &cb)

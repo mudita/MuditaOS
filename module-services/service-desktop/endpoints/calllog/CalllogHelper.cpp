@@ -38,7 +38,7 @@ auto CalllogHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
     else {
         auto limit  = context.getBody()[json::calllog::limit].int_value();
         auto offset = context.getBody()[json::calllog::offset].int_value();
-        auto query  = std::make_unique<db::query::CalllogGet>(offset, limit);
+        auto query  = std::make_unique<db::query::CalllogGet>(limit, offset);
 
         auto listener = std::make_unique<db::EndpointListener>(
             [](db::QueryResult *result, Context context) {

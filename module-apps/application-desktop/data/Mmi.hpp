@@ -140,7 +140,7 @@ namespace mmi
         {
             displayMessage += utils::localize.get("app_desktop_info_mmi_call_barring") + "\n";
             if (customResult.getMessageType() == mmiactions::IMMICustomResultParams::MMIType::CallBarringData) {
-                displayMessage += getQueryResult(customResult.getMessages());
+                displayMessage += getCustomMessagesFromDictionary(customResult.getMessages());
             }
             else if (customResult.getMessageType() ==
                      mmiactions::IMMICustomResultParams::MMIType::CallBarringNotification) {
@@ -152,7 +152,7 @@ namespace mmi
         {
             displayMessage += utils::localize.get("app_desktop_info_mmi_call_waiting") + "\n";
             if (customResult.getMessageType() == mmiactions::IMMICustomResultParams::MMIType::CallWaitingData) {
-                displayMessage += getQueryResult(customResult.getMessages());
+                displayMessage += getCustomMessagesFromDictionary(customResult.getMessages());
             }
             else if (customResult.getMessageType() ==
                      mmiactions::IMMICustomResultParams::MMIType::CallWaitingNotification) {
@@ -179,18 +179,24 @@ namespace mmi
             displayMessage += getSelectedMessagesFromDictionary(customResult.getMessage());
         }
 
-        std::string getQueryResult(std::vector<std::pair<mmiactions::IMMICustomResultParams::MMIResultMessage,
-                                                         mmiactions::IMMICustomResultParams::MMIResultMessage>> msgData)
+        std::string getCustomMessagesFromDictionary(
+            std::vector<std::pair<mmiactions::IMMICustomResultParams::MMIResultMessage,
+                                  mmiactions::IMMICustomResultParams::MMIResultMessage>> msgData)
         {
             std::string queryStr;
             for (auto msg : msgData) {
                 auto serviceClass = msg.first;
                 auto serviceState = msg.second;
-                if (serviceState == mmiactions::IMMICustomResultParams::MMIResultMessage::CommonQuery) {
-                    auto it = messageDictionary.find(serviceClass);
-                    if (messageDictionary.end() != it) {
+
+                auto it = messageDictionary.find(serviceState);
+                if (messageDictionary.end() != it) {
+                    if (queryStr.empty()) {
                         queryStr += utils::localize.get(it->second) + "\n";
                     }
+                }
+                it = messageDictionary.find(serviceClass);
+                if (messageDictionary.end() != it) {
+                    queryStr += utils::localize.get(it->second) + "\n";
                 }
             }
             return queryStr;

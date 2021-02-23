@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "service-appmgr/service-appmgr/messages/DOMRequest.hpp"
 #include "service-desktop/DesktopMessages.hpp"
 #include "service-desktop/ServiceDesktop.hpp"
 #include "service-desktop/WorkerDesktop.hpp"
@@ -70,6 +71,10 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     else {
         desktopWorker->run();
     }
+
+    transferTimer = std::make_unique<sys::Timer>("WorkerDesktop file upload", this, sdesktop::file_transfer_timeout);
+    transferTimer->connect([&](sys::Timer &) { desktopWorker->cancelTransferOnTimeout(); });
+
     connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
         if (request->event != nullptr) {
@@ -137,6 +142,31 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
                 RemountFS();
                 // Same possible issue as with FactoryReset::Run()
                 updateOS->runUpdate();
+            }
+        }
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sdesktop::transfer::TransferTimerState(), [&](sys::Message *msg) {
+        sdesktop::transfer::TransferTimerState *timerStateMsg =
+            dynamic_cast<sdesktop::transfer::TransferTimerState *>(msg);
+
+        if (timerStateMsg != nullptr && timerStateMsg->messageType == MessageType::TransferTimer) {
+            switch (timerStateMsg->req) {
+            case sdesktop::transfer::TransferTimerState::Start:
+                transferTimer->start();
+                break;
+            case sdesktop::transfer::TransferTimerState::Reload:
+                transferTimer->reload();
+                break;
+            case sdesktop::transfer::TransferTimerState::Stop:
+                transferTimer->stop();
+                break;
+            case sdesktop::transfer::TransferTimerState::None:
+                [[fallthrough]];
+            default:
+                LOG_DEBUG("ServiceDesktop::SetTransferTimerState unhandled req:%u", timerStateMsg->req);
+                break;
             }
         }
         return std::make_shared<sys::ResponseMessage>();

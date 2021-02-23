@@ -11,10 +11,10 @@
 
 #include "StartConfigurationWindow.hpp"
 
-namespace gui
+namespace app::onBoarding
 {
     StartConfigurationWindow::StartConfigurationWindow(app::Application *app)
-        : AppWindow(app, gui::window::name::onBoarding_start_configuration)
+        : gui::AppWindow(app, gui::window::name::onBoarding_start_configuration)
     {
         buildInterface();
     }
@@ -28,22 +28,22 @@ namespace gui
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
 
-        new Icon(this,
-                 0,
-                 0,
-                 style::window_width,
-                 style::window::default_body_height,
-                 "logo_no_text",
-                 utils::localize.get("app_onboarding_start_configuration"));
+        new gui::Icon(this,
+                      0,
+                      0,
+                      style::window_width,
+                      style::window::default_body_height,
+                      "logo_no_text",
+                      utils::localize.get("app_onboarding_start_configuration"));
     }
 
     bool StartConfigurationWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (inputEvent.isShortPress()) {
-            if (inputEvent.is(KeyCode::KEY_RF)) {
-                application->switchWindow(gui::window::name::onBoarding_languages,
+            if (inputEvent.is(gui::KeyCode::KEY_RF)) {
+                application->switchWindow(gui::window::name::onBoarding_eula,
                                           gui::ShowMode::GUI_SHOW_INIT,
-                                          std::make_unique<gui::OnBoardingSwitchData>());
+                                          std::make_unique<OnBoardingSwitchData>());
             }
             return true;
         }

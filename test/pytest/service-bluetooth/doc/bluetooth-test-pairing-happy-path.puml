@@ -1,0 +1,46 @@
+@startuml
+
+partition Initialization {
+    :enforce pretest machine conditions:
+    -read test input data:
+    **requires BT device name
+    **optional BT device password
+    -inject test data to DB:
+    ** BT device
+    -PurePhone visible state:
+    ** in ApplicationSettings:Bluetooth
+    ** bluetooth turned off;
+}
+partition test-run {
+    : turn BT on;
+    : enter AllDevices;
+if (BT device name displayed) then (yes)
+    : connect;
+else (no)
+    : press "+" for scan;
+    repeat
+        if( timeout exceeded ) then (no)
+        else (yes = failure)
+            stop
+        endif
+        : wait x seconds;
+    repeatwhile (BT device name not displayed)
+    : add device;
+endif
+
+if (need password) then (yes)
+    :enter password;
+    if(valid password ) then (yes)
+    else (no = failure)
+        stop
+    endif
+else (no)
+endif
+}
+partition post-test-analysis {
+    : check if connected successfully:
+    -parse all devices window content
+    -check for BT device name + connected icon;
+}
+
+@enduml

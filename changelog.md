@@ -1,5 +1,48 @@
 # MuditaOS changelog
 
+## [0.58.1 2020-02-19]
+
+### Added
+
+* Add charger temperature cutoff.
+* Add onboarding application.
+* Add signal strength bar indicator.
+
+### Changed
+
+* Change the date format separator from "/" to ".".
+* Improve update process stability by introducing a special phone mode for updating.
+* Increase visibility time of the "Call ended" window.
+* Store battery critical level in the settings.
+
+### Fixed
+
+* Fix crashing on text removal.
+* Fix displaying the "call waiting" and "call barring" MMI responses.
+* Fix displaying white color during Color Test.
+* Fix focus reset on GUI refresh in the "Time and Date" window.
+* Fix handling of private numbers.
+* Fix invalid parsing of messages containing emojis.
+* Fix no call log entry when aborting a call.
+* Fix problems with adding characters in the special input window.
+* Fix problems with the inability to send long messages by setting a message size limit in the user interface to 7*67 characters.
+* Fix problems with setting message recipient when creating a new message.
+* Fix timeouts on MMI operations.
+* Fix turning off Bluetooth.
+
+### Other
+
+* Add documentation for the Low Power mode.
+* Add support for handling phone modes.
+* Add tests harness for cellular hot/cold start.
+* Improve charger state detection.
+* Improve parsing of CLCC commands.
+* Several improvements to the low power mode support.
+* Update `clang-tidy` rules.
+* Update documentation for Bluetooth support. 
+* Update i18n documentation related to font rendering.
+* Update test harness for Bluetooth.
+
 ## [0.57.1 2020-02-11]
 
 ### Added

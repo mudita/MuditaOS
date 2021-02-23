@@ -18,7 +18,18 @@ SCRIPT_DIR="$(dirname ${SCRIPT})"
 . ${SCRIPT_DIR}/bootstrap_config
 . ${SCRIPT_DIR}/common_scripsts_lib
 
-
+function test_if_run_as_root() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
+    MY_NAME=$(whoami)
+    if [[ "${MY_NAME}" == "root" ]]; then
+        cat <<-MSGEND
+			Please do not run this script as a root.
+			Script will ask for your password for taks it needs
+			to run as a root (sudo ...)
+			MSGEND
+        exit 1
+    fi
+}
 function add_to_path() {
     echo -e "\e[32m${FUNCNAME[0]} $1 $2\e[0m"
     TOOL_NAME=$1
@@ -59,9 +70,10 @@ function add_ignore_revs_for_blame() {
 function setup_gcc_alternatives() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     cat <<-MSGEND
-		# set gcc-9 as default alternative (instead of default current in ubuntu)
-		sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 900 --slave /usr/bin/g++ g++ /usr/bin/g++-9
+		# set gcc-10 as default alternative (instead of default current in ubuntu)
+		sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 1000 --slave /usr/bin/g++ g++ /usr/bin/g++-10
 		MSGEND
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 1000 --slave /usr/bin/g++ g++ /usr/bin/g++-10
 }
 
 function install_pip_packages() {
@@ -126,6 +138,19 @@ function install_docker() {
     fi
 }
 
+function add_to_docker_group() {
+    DOCKER_GRP="docker"
+    if grep -q $DOCKER_GRP /etc/group
+    then
+        NAME=$(whoami)
+        sudo usermod -aG ${DOCKER_GRP} ${NAME}
+        cat <<-MSGEND
+		Group is updated, please logout and login back so
+		the change has come into effect
+		MSGEND
+    fi
+}
+
 
 BUILD_STEPS=(
         install_hooks
@@ -134,12 +159,13 @@ BUILD_STEPS=(
         setup_arm_toolchain
         setup_cmake
         setup_gcc_alternatives
-        "add_to_path ${ARM_GCC_PATH_VAR} ${HOME}/${ARM_GCC}/bin"
-        "add_to_path ${CMAKE_PATH_VAR} ${HOME}/${CMAKE_NAME}/bin"
+        "add_to_path ARM_GCC ${HOME}/${ARM_GCC}/bin"
+        "add_to_path CMAKE ${HOME}/${CMAKE_NAME}/bin"
         install_docker
+        add_to_docker_group
         )
 
-
+test_if_run_as_root
 
 if [ $# -eq 1 ]; then 
     PARAM=$1

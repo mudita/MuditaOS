@@ -1,14 +1,13 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 #include "Application.hpp"
+#include <application-calendar/widgets/CalendarDateItem.hpp>
+#include <application-calendar/widgets/CalendarTimeItem.hpp>
 #include "application-calendar/widgets/CalendarStyle.hpp"
-#include "application-calendar/widgets/CalendarListItem.hpp"
 #include "application-calendar/widgets/TextWithLabelItem.hpp"
-#include "application-calendar/widgets/EventTimeItem.hpp"
 #include "application-calendar/widgets/SeveralOptionsItem.hpp"
-#include "application-calendar/widgets/EventDateItem.hpp"
 #include "InternalModel.hpp"
 #include <ListItemProvider.hpp>
 
@@ -22,13 +21,15 @@ class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, pu
     app::Application *application = nullptr;
     bool mode24H                  = false;
 
-    gui::TextWithLabelItem *eventNameInput          = nullptr;
     gui::NewEventCheckBoxWithLabel *allDayEventCheckBox = nullptr;
-    gui::EventDateItem *dateItem                    = nullptr;
-    gui::EventTimeItem *startTime                   = nullptr;
-    gui::EventTimeItem *endTime                     = nullptr;
-    gui::SeveralOptionsItem *reminder               = nullptr;
-    gui::SeveralOptionsItem *repeat                 = nullptr;
+
+    gui::CalendarDateItem *dateItem  = nullptr;
+    gui::CalendarTimeItem *startTime = nullptr;
+    gui::CalendarTimeItem *endTime   = nullptr;
+
+    gui::SeveralOptionsItem *reminder      = nullptr;
+    gui::SeveralOptionsItem *repeat        = nullptr;
+    gui::TextWithLabelItem *eventNameInput = nullptr;
 
   public:
     NewEditEventModel(app::Application *app, bool mode24H = false);
@@ -38,7 +39,6 @@ class NewEditEventModel : public app::InternalModel<gui::CalendarListItem *>, pu
     void loadDataWithoutTimeItem();
     void reloadDataWithTimeItem();
     void saveData(std::shared_ptr<EventsRecord> event, EventAction action);
-    void addReapetedRecords(std::shared_ptr<EventsRecord> event);
 
     [[nodiscard]] unsigned int getMinimalItemHeight() const override;
     [[nodiscard]] unsigned int requestRecordsCount() override;

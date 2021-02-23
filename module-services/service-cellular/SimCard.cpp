@@ -21,11 +21,11 @@ SimCardResult SimCard::convertErrorFromATResult(const at::Result atres) const
     return SimCardResult::Unknown;
 }
 
-std::optional<at::response::qpinc::AttemptsCounters> SimCard::getAttemptsCounters() const
+std::optional<at::response::qpinc::AttemptsCounters> SimCard::getAttemptsCounters(const std::string &type) const
 {
     auto channel = cellularService.cmux->get(TS0710::Channel::Commands);
     if (channel) {
-        auto resp = channel->cmd(at::factory(at::AT::QPINC) + "\"SC\"");
+        auto resp = channel->cmd(at::factory(at::AT::QPINC) + "\"" + type + "\"");
         at::response::qpinc::AttemptsCounters ret;
         if (at::response::parseQPINC(resp, ret)) {
             return ret;

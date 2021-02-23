@@ -1,16 +1,16 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <Service/Message.hpp>
+#pragma once
+
 #include "service-bluetooth/BluetoothMessage.hpp"
-#include <string>
 
 namespace message::bluetooth
 {
     class ResponseVisibleDevices : public BluetoothMessage
     {
       public:
-        ResponseVisibleDevices(std::vector<Devicei> devices) : devices(std::move(devices))
+        explicit ResponseVisibleDevices(std::vector<Devicei> devices) : devices(std::move(devices))
         {}
         [[nodiscard]] auto getDevices() const -> std::vector<Devicei>
         {

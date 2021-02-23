@@ -151,6 +151,7 @@ namespace style
             inline constexpr auto stop           = "common_stop";
             inline constexpr auto resume         = "common_resume";
             inline constexpr auto pause          = "common_pause";
+            inline constexpr auto accept         = "common_accept";
             // days
             inline constexpr auto Monday    = "common_monday";
             inline constexpr auto Tuesday   = "common_tuesday";

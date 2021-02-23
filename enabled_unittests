@@ -392,3 +392,11 @@ TESTS_LIST["catch2-iosyscalls"]="
     VFS linux support;
 "
 #---------
+TESTS_LIST["catch2-cellular-cmux"]="
+    TS0170 frame;
+"
+#---------
+TESTS_LIST["catch2-unittest_ATURCStream"]="
+    URC AT Stream Parser;
+"
+#---------

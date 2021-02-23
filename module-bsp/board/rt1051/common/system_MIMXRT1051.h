@@ -84,10 +84,6 @@ extern "C"
 
 #include <stdint.h>
 
-#ifndef DISABLE_WDOG
-#define DISABLE_WDOG 1
-#endif
-
     /* Define clock source values */
 
 #define CPU_XTAL_CLK_HZ 24000000UL /* Value of the external crystal or oscillator clock frequency in Hz */

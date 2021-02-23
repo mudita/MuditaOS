@@ -117,11 +117,14 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
         handled = true;
         break;
     }
-    case MessageType::CellularCall: {
-        auto msg = dynamic_cast<CellularCallMessage *>(msgl);
-        if (msg != nullptr) {
-            AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
-        }
+    case MessageType::CellularIncomingCall: {
+        AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+    } break;
+    case MessageType::CellularRinging: {
+        AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+    } break;
+    case MessageType::CellularHangupCall: {
+        AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
     } break;
     case MessageType::CellularStateRequest: {
         auto msg = dynamic_cast<cellular::StateChange *>(msgl);

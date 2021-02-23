@@ -18,7 +18,10 @@ namespace gui
 
     auto PinLockBaseWindow::getToken(Token token) const -> std::string
     {
-        if (token == Token::Sim) {
+        if (token == Token::PinType) {
+            return "$PINTYPE";
+        }
+        else if (token == Token::Sim) {
             return "$SIM";
         }
         else if (token == Token::Attempts) {

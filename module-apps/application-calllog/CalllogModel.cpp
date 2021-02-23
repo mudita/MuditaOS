@@ -7,6 +7,7 @@
 #include "data/CallLogInternals.hpp"
 #include "data/CallLogSwitchData.hpp"
 #include "widgets/CalllogItem.hpp"
+#include <module-utils/time/DateAndTimeSettings.hpp>
 #include <module-utils/Utils.hpp>
 
 #include <service-db/DBServiceAPI.hpp>
@@ -59,7 +60,7 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
         return nullptr;
     }
 
-    auto item = new gui::CalllogItem(this, !(application->isTimeFormat12()));
+    auto item = new gui::CalllogItem(this, !(utils::dateAndTimeSettings.isTimeFormat12()));
 
     auto callCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
         if (event.state != gui::InputEvent::State::keyReleasedShort) {

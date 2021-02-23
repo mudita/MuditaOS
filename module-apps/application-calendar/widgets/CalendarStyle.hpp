@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -65,16 +65,6 @@ namespace style
                 inline constexpr auto date_text_3   = "March 2019";
             } // namespace test
 
-            namespace time
-            {
-                inline constexpr auto max_time_length   = 2;
-                inline constexpr auto max_hour_24H_mode = 23;
-                inline constexpr auto max_hour_12H_mode = 12;
-                inline constexpr auto max_minutes       = 59;
-                inline constexpr auto max_years         = 2038;
-                inline constexpr auto min_years         = 1970;
-            } // namespace time
-
             namespace item
             {
                 namespace dayEvents
@@ -108,16 +98,6 @@ namespace style
                     inline constexpr auto title_h           = 20;
                     inline constexpr auto label_h           = 35;
                 } // namespace eventDetail
-
-                namespace eventTime
-                {
-                    inline constexpr auto height           = 107;
-                    inline constexpr auto margin           = 20;
-                    inline constexpr auto separator        = 30;
-                    inline constexpr auto time_input_12h_w = 120;
-                    inline constexpr auto time_input_24h_w = 195;
-                    inline constexpr auto hBox_h           = height - 1.25 * margin;
-                } // namespace eventTime
 
                 namespace checkBox
                 {

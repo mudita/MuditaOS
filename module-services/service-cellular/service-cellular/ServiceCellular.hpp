@@ -12,6 +12,7 @@
 #include "PacketData.hpp"
 #include "PacketDataCellularMessage.hpp"
 
+#include <module-cellular/Modem/ATURCStream.hpp>
 #include <Modem/TS0710/DLC_channel.h>
 #include <Modem/TS0710/TS0710.h>
 #include <Modem/TS0710/TS0710_types.h>
@@ -29,6 +30,7 @@
 #include <service-db/Settings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/DBServiceName.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -77,7 +79,7 @@ class ServiceCellular : public sys::Service
     static const char *serviceName;
 
     bool sendSMS(SMSRecord record);
-    bool receiveSMS(std::string messageNumber);
+    auto receiveSMS(std::string messageNumber) -> std::shared_ptr<CellularResponseMessage>;
     /**
      * @brief Its getting selected SIM card own number.
      * @param destination Reference to destination string.
@@ -159,6 +161,7 @@ class ServiceCellular : public sys::Service
     bool setPinLock(bool lock, const std::string pin);
 
   private:
+    at::ATURCStream atURCStream;
     std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
@@ -313,6 +316,16 @@ class ServiceCellular : public sys::Service
     void volteChanged(const std::string &value);
     void apnListChanged(const std::string &value);
     bool volteOn = false;
+
+    auto handleCellularAnswerIncomingCallMessage(CellularMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
+    auto handleCellularCallRequestMessage(CellularCallRequestMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
+    auto handleCellularHangupCallMessage(CellularHangupCallMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
+    auto handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularListCallsMessage(CellularMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleDBNotificatioMessage(db::NotificationMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularIncominCallMessage(CellularIncominCallMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularCallerIdMessage(CellularCallerIdMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
 };
 
 namespace sys

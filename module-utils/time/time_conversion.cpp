@@ -17,6 +17,7 @@
 #include "i18n/i18n.hpp"
 
 #include "time_locale.hpp"
+#include "DateAndTimeSettings.hpp"
 #include <Utils.hpp>
 
 namespace utils::time
@@ -33,6 +34,8 @@ namespace utils::time
                                                                  "%b",  // month abbrew
                                                                  "%B",  // month long
                                                                  "%Z"}; // timezone
+        constexpr auto hoursMinFormat12H                      = "%I:%M";
+        constexpr auto hoursMinFormat24H                      = "%H:%M";
 
         struct Format
         {
@@ -343,5 +346,12 @@ namespace utils::time
     Timestamp getCurrentTimestamp()
     {
         return Timestamp{};
+    }
+
+    std::string getHoursMinInCurrentTimeFormat()
+    {
+        auto timestamp = getCurrentTimestamp();
+        return utils::dateAndTimeSettings.isTimeFormat12() ? timestamp.str(hoursMinFormat12H)
+                                                           : timestamp.str(hoursMinFormat24H);
     }
 }; // namespace utils::time
