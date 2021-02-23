@@ -8,7 +8,6 @@
 #include <json/json11.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <utf8/UTF8.hpp>
-#include <vfs.hpp>
 
 #include <memory>
 #include <filesystem>
@@ -18,7 +17,6 @@
 #include <module-db/Interface/ContactRecord.hpp>
 #include <module-db/Databases/ContactsDB.hpp>
 
-class vfs vfs;
 std::unique_ptr<ContactsDB> contactsDb = nullptr;
 std::vector<std::string> messageStrings;
 
@@ -154,7 +152,6 @@ void parserFSM::MessageHandler::putToSendQueue(const std::string &msg)
 
 TEST_CASE("Endpoint Contacts Test")
 {
-    vfs.Init();
     Database::initialize();
 
     const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";

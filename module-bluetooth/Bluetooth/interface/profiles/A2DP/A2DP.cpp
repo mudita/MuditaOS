@@ -16,6 +16,7 @@
 #include <Audio/AudioCommon.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <log/log.hpp>
 extern "C"
 {
 #include "module-bluetooth/lib/btstack/src/btstack.h"

@@ -6,8 +6,6 @@
 #include <memory>
 #include <list>
 #include <array>
-#include <mutex.hpp>
-#include <unordered_map>
 #include <map>
 #include <functional>
 #include <ctime>
@@ -16,6 +14,7 @@
 #include <purefs/fs/file_handle.hpp>
 #include <purefs/fs/directory_handle.hpp>
 #include <purefs/fs/mount_point.hpp>
+#include <purefs/fs/mount_flags.hpp>
 #include <type_traits>
 
 struct statvfs;
@@ -24,6 +23,11 @@ struct stat;
 namespace purefs::blkdev
 {
     class disk_manager;
+}
+
+namespace cpp_freertos
+{
+    class MutexRecursive;
 }
 
 namespace purefs::fs
@@ -38,15 +42,6 @@ namespace purefs::fs
     {
         class directory_handle;
     }
-    //! Mount flags struct
-    struct mount_flags
-    {
-        enum _mount_flags
-        {
-            read_only = 1U < 0U, // !Read only filesystem
-        };
-    };
-
     class filesystem
     {
         static constexpr auto path_separator = '/';
@@ -61,6 +56,7 @@ namespace purefs::fs
         using fsdir                    = std::shared_ptr<internal::directory_handle>;
         using fsfile                         = std::shared_ptr<internal::file_handle>;
         explicit filesystem(std::shared_ptr<blkdev::disk_manager> diskmm);
+        ~filesystem();
         filesystem(const filesystem &) = delete;
         auto operator=(const filesystem &) = delete;
         /** Utility API */
@@ -72,7 +68,6 @@ namespace purefs::fs
         template <typename T> auto register_filesystem(std::string_view fsname, std::shared_ptr<T> fops) -> int
         {
             if (!fops || !std::is_convertible_v<T *, filesystem_operations *>) {
-                LOG_ERROR("Filesystem not valid");
                 return -EINVAL;
             }
             return register_filesystem(fsname, std::shared_ptr<filesystem_operations>(fops));
@@ -85,13 +80,18 @@ namespace purefs::fs
         auto unregister_filesystem(std::string_view fsname) -> int;
 
         /** Mount filesystem to the the specified mount point
+         * see man(2) mount
          * @param[in] dev_or_part Device or partition for mount
          * @param[in] target Target path where the fs will be mounted
          * @param[in] flags  Mount flags
+         * @param[in] data   Filesystem specific configuration
          * @return zero on success otherwise error
          */
-        auto mount(std::string_view dev_or_part, std::string_view target, std::string_view fs_type, unsigned flags = 0)
-            -> int;
+        auto mount(std::string_view dev_or_part,
+                   std::string_view target,
+                   std::string_view fs_type,
+                   unsigned flags   = 0,
+                   const void *data = nullptr) -> int;
         /** Unmont filesystem from selected mount point
          * @param[in] mount_point Mount point where the fs is mounted
          * @return zero on success otherwise error
@@ -168,8 +168,13 @@ namespace purefs::fs
         auto add_filehandle(fsfile file) noexcept -> int;
         auto remove_filehandle(int fds) noexcept -> fsfile;
         auto find_filehandle(int fds) const noexcept -> fsfile;
+        auto autodetect_filesystem_type(std::string_view dev_or_part) const noexcept -> std::string;
 
-      private:
+        enum class iaccess : bool
+        {
+            ro, //! Syscall is RO
+            rw  //! Syscall is RW
+        };
         template <class Base, class T, typename... Args>
         inline auto invoke_fops(T Base::*method, int fds, Args &&... args)
             -> decltype((static_cast<Base *>(nullptr)->*method)(0, std::forward<Args>(args)...))
@@ -194,13 +199,19 @@ namespace purefs::fs
         }
 
         template <class Base, class T, typename... Args>
-        inline auto invoke_fops(T Base::*method, std::string_view path, Args &&... args) const
+        inline auto invoke_fops(iaccess acc, T Base::*method, std::string_view path, Args &&... args) const
             -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, {}, std::forward<Args>(args)...))
         {
+            if (path.empty()) {
+                return -ENOENT;
+            }
             const auto abspath     = absolute_path(path);
             auto [mountp, pathpos] = find_mount_point(abspath);
             if (!mountp) {
                 return -ENOENT;
+            }
+            if (acc == iaccess::rw && mountp->is_ro()) {
+                return -EACCES;
             }
             auto fsops = mountp->fs_ops();
             if (fsops)
@@ -216,11 +227,17 @@ namespace purefs::fs
                                         Args &&... args) const
             -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, {}, {}, std::forward<Args>(args)...))
         {
+            if (path.empty() || path2.empty()) {
+                return -ENOENT;
+            }
             const auto abspath     = absolute_path(path);
             const auto abspath2    = absolute_path(path2);
             auto [mountp, pathpos] = find_mount_point(abspath);
             if (!mountp) {
                 return -ENOENT;
+            }
+            if (mountp->is_ro()) {
+                return -EACCES;
             }
             if (path.compare(0, pathpos, path2, 0, pathpos) != 0) {
                 // Mount points are not the same
@@ -261,6 +278,6 @@ namespace purefs::fs
         std::map<std::string, std::shared_ptr<internal::mount_point>> m_mounts;
         std::unordered_set<std::string> m_partitions;
         internal::handle_mapper<fsfile> m_fds;
-        mutable cpp_freertos::MutexRecursive m_lock;
+        std::unique_ptr<cpp_freertos::MutexRecursive> m_lock;
     };
 } // namespace purefs::fs

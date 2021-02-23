@@ -172,7 +172,7 @@ namespace audio
 
     void RT1051CellularAudio::InStart()
     {
-        sai_transfer_format_t sai_format;
+        sai_transfer_format_t sai_format = {};
 
         /* Configure the audio format */
         sai_format.bitWidth           = saiInFormat.bitWidth;

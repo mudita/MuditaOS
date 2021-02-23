@@ -6,14 +6,10 @@
 #include "application-calculator/data/CalculatorUtility.hpp"
 #include <i18n/i18n.hpp>
 #include <cstring>
-#include <vfs.hpp>
 
-class vfs vfs;
 
 TEST_CASE("Calculator utilities")
 {
-    vfs.Init();
-
     auto calculator = Calculator();
     utils::localize.setDisplayLanguage("English");
 

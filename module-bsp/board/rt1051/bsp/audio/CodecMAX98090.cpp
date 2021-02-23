@@ -31,15 +31,15 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
 
     // Turn off device
     i2cAddr.subAddress                   = MAX98090_REG_DEVICE_SHUTDOWN;
-    max98090_reg_shutdown_t dev_shutdown = {.shdn = 0};
+    max98090_reg_shutdown_t dev_shutdown = {};
     i2c->Write(i2cAddr, (uint8_t *)&dev_shutdown, 1);
 
-    max98090_reg_masterclock_quick_setup_t masterclock_setup = {0};
+    max98090_reg_masterclock_quick_setup_t masterclock_setup = {};
     masterclock_setup.M12P288                                = 1;
     i2cAddr.subAddress                                       = MAX98090_REG_MASTER_CLOCK_QUICK_SETUP;
     i2c->Write(i2cAddr, (uint8_t *)&masterclock_setup, 1);
 
-    max98090_reg_master_samplerate_quick_setup_t samplerate_setup = {0};
+    max98090_reg_master_samplerate_quick_setup_t samplerate_setup = {};
     switch (params.sampleRate) {
 
     case CodecParamsMAX98090::SampleRate::Rate8KHz:
@@ -73,7 +73,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
     i2c->Write(i2cAddr, (uint8_t *)&samplerate_setup, 1);
 
     // Sets up DAI for I2S master mode operation.
-    max98090_reg_dai_quick_setup_t q_dai_setup = {0};
+    max98090_reg_dai_quick_setup_t q_dai_setup = {};
     q_dai_setup.i2sm                           = 1;
     i2cAddr.subAddress                         = MAX98090_REG_DAI_QUICK_SETUP;
     i2c->Write(i2cAddr, (uint8_t *)&q_dai_setup, 1);
@@ -82,7 +82,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
     if (params.outputPath != CodecParamsMAX98090::OutputPath::None) {
 
         // Control HP performance
-        max98090_reg_dachp_perfmode_t dacperf = {0};
+        max98090_reg_dachp_perfmode_t dacperf = {};
         dacperf.dachp                         = 1;
         dacperf.perfmode                      = 0;
         i2cAddr.subAddress                    = MAX98090_REG_DACHP_PERF_MODE;
@@ -91,24 +91,24 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         switch (params.outputPath) {
 
         case CodecParamsMAX98090::OutputPath::HeadphonesMono: {
-            max98090_reg_playback_quick_setup_t q_playback_setup = {0};
+            max98090_reg_playback_quick_setup_t q_playback_setup = {};
             q_playback_setup.dig2hp                              = 1;
             i2cAddr.subAddress                                   = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
 
             // Mix left DAC channel to left&right HP output
-            max98090_reg_lhp_mixer_t lmixconf = {0};
+            max98090_reg_lhp_mixer_t lmixconf = {};
             lmixconf.mixhpl                   = 1;
             i2cAddr.subAddress                = MAX98090_REG_LHP_MIXER_CONF;
             i2c->Write(i2cAddr, (uint8_t *)&lmixconf, 1);
 
-            max98090_reg_rhp_mixer_t rmixconf = {0};
+            max98090_reg_rhp_mixer_t rmixconf = {};
             rmixconf.mixhpr                   = 1;
             i2cAddr.subAddress                = MAX98090_REG_RHP_MIXER_CONF;
             i2c->Write(i2cAddr, (uint8_t *)&rmixconf, 1);
 
             // Use mixer outputs instead of direct DAC outputs
-            max98090_reg_hpmix_conf_t mixconf = {0};
+            max98090_reg_hpmix_conf_t mixconf = {};
             mixconf.mixhplsel                 = 1;
             mixconf.mixhprsel                 = 1;
             i2cAddr.subAddress                = MAX98090_REG_HP_MIX_CONF;
@@ -117,7 +117,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         } break;
 
         case CodecParamsMAX98090::OutputPath::Headphones: {
-            max98090_reg_playback_quick_setup_t q_playback_setup = {0};
+            max98090_reg_playback_quick_setup_t q_playback_setup = {};
             q_playback_setup.dig2hp                              = 1;
             i2cAddr.subAddress                                   = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
@@ -125,7 +125,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         } break;
 
         case CodecParamsMAX98090::OutputPath::Earspeaker: {
-            max98090_reg_playback_quick_setup_t q_playback_setup = {0};
+            max98090_reg_playback_quick_setup_t q_playback_setup = {};
             q_playback_setup.dig2ear                             = 1;
             i2cAddr.subAddress                                   = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
@@ -133,7 +133,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         } break;
 
         case CodecParamsMAX98090::OutputPath::Loudspeaker: {
-            max98090_reg_playback_quick_setup_t q_playback_setup = {0};
+            max98090_reg_playback_quick_setup_t q_playback_setup = {};
             q_playback_setup.dig2spk                             = 1;
             i2cAddr.subAddress                                   = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
@@ -143,7 +143,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
             i2c->Modify(i2cAddr, mask, true, 1);
 
             // Turn off right speaker path
-            max98090_reg_outputenable_t outputenable = {0};
+            max98090_reg_outputenable_t outputenable = {};
             outputenable.dalen                       = 1;
             outputenable.splen                       = 1;
             i2cAddr.subAddress                       = MAX98090_REG_OUTPUT_ENABLE;
@@ -152,13 +152,13 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         } break;
 
         case CodecParamsMAX98090::OutputPath::LoudspeakerMono: {
-            max98090_reg_playback_quick_setup_t q_playback_setup = {0};
+            max98090_reg_playback_quick_setup_t q_playback_setup = {};
             q_playback_setup.dig2spk                             = 1;
             i2cAddr.subAddress                                   = MAX98090_REG_PLAYBACK_QUICK_SETUP;
             i2c->Write(i2cAddr, (uint8_t *)&q_playback_setup, 1);
 
             // Turn off right speaker path
-            max98090_reg_outputenable_t outputenable = {0};
+            max98090_reg_outputenable_t outputenable = {};
             outputenable.dalen                       = 1;
             outputenable.splen                       = 1;
             i2cAddr.subAddress                       = MAX98090_REG_OUTPUT_ENABLE;
@@ -177,16 +177,16 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
         switch (params.inputPath) {
 
         case CodecParamsMAX98090::InputPath::Headphones: {
-            max98090_reg_input_to_record_quick_t q_input_setup = {0};
+            max98090_reg_input_to_record_quick_t q_input_setup = {};
             q_input_setup.in34dan                              = 1;
             i2cAddr.subAddress                                 = MAX98090_REG_LINE_INPUT_TO_RECORD_QUICK;
             i2c->Write(i2cAddr, (uint8_t *)&q_input_setup, 1);
         } break;
 
         case CodecParamsMAX98090::InputPath::Microphone: {
-            max98090_reg_input_to_record_quick_t q_input_setup = {0};
-            max98090_reg_digmic_enable_t digena                = {0};
-            max98090_reg_digmic_conf_t digconf                 = {0};
+            max98090_reg_input_to_record_quick_t q_input_setup = {};
+            max98090_reg_digmic_enable_t digena                = {};
+            max98090_reg_digmic_conf_t digconf                 = {};
 
             // Enable left and right digital mic interface
             digena.digmicl = 1;
@@ -264,7 +264,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param)
 CodecRetCode CodecMAX98090::Pause()
 {
     // Turn off device
-    max98090_reg_shutdown_t dev_shutdown = {.shdn = 0};
+    max98090_reg_shutdown_t dev_shutdown = {};
     i2cAddr.subAddress                   = MAX98090_REG_DEVICE_SHUTDOWN;
     i2c->Write(i2cAddr, (uint8_t *)&dev_shutdown, 1);
 
@@ -274,7 +274,7 @@ CodecRetCode CodecMAX98090::Pause()
 CodecRetCode CodecMAX98090::Resume()
 {
     // Turn on device
-    max98090_reg_shutdown_t dev_shutdown = {.shdn = 1};
+    max98090_reg_shutdown_t dev_shutdown = {.unused = 0, .shdn = 1};
     i2cAddr.subAddress                   = MAX98090_REG_DEVICE_SHUTDOWN;
     i2c->Write(i2cAddr, (uint8_t *)&dev_shutdown, 1);
 
@@ -339,8 +339,8 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
         constexpr float scale_factor     = .31f * 10.f;
         uint8_t volume                   = static_cast<float>(vol * scale_factor);
-        max98090_reg_lhp_vol_ctrl_t lvol = {0};
-        max98090_reg_rhp_vol_ctrl_t rvol = {0};
+        max98090_reg_lhp_vol_ctrl_t lvol = {};
+        max98090_reg_rhp_vol_ctrl_t rvol = {};
 
         lvol.hplm   = mute;
         rvol.hprm   = mute;
@@ -358,7 +358,7 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
         // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
         constexpr float scale_factor     = .31f * 10.f;
         uint8_t volume                   = static_cast<float>(vol * scale_factor);
-        max98090_reg_recv_vol_ctrl_t vol = {0};
+        max98090_reg_recv_vol_ctrl_t vol = {};
 
         vol.rcvlm   = mute;
         vol.rcvlvol = volume;
@@ -373,8 +373,8 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol)
         constexpr float scale_factor = .39f * 10.f;
         uint8_t volume               = static_cast<float>(vol * scale_factor) + 0x18;
 
-        max98090_reg_lspk_vol_ctrl_t lvol = {0};
-        max98090_reg_rspk_vol_ctrl_t rvol = {0};
+        max98090_reg_lspk_vol_ctrl_t lvol = {};
+        max98090_reg_rspk_vol_ctrl_t rvol = {};
 
         lvol.splm   = mute;
         rvol.sprm   = mute;
@@ -405,7 +405,7 @@ CodecRetCode CodecMAX98090::SetInputGain(const float gain)
         gainToSet = 10;
     }
 
-    max98090_reg_lrec_dig_gain_t lgain = {0};
+    max98090_reg_lrec_dig_gain_t lgain = {};
     lgain.avl  = static_cast<uint8_t>(CodecParamsMAX98090::RecordPathDigitalFineGain::Gain_p3dB); // fine gain
     lgain.avlg = gainToSet * 0.7; // coarse gain (0.7 used as scaling factor)
 
@@ -413,7 +413,7 @@ CodecRetCode CodecMAX98090::SetInputGain(const float gain)
     i2c->Write(i2cAddr, (uint8_t *)&lgain, 1);
 
     // coarse gain - 18dB, fine gain - 0dB
-    max98090_reg_rrec_dig_gain_t rgain = {0};
+    max98090_reg_rrec_dig_gain_t rgain = {};
     rgain.avr  = static_cast<uint8_t>(CodecParamsMAX98090::RecordPathDigitalFineGain::Gain_p3dB); // fine gain
     rgain.avrg = gainToSet * 0.7; // coarse gain (0.7 used as scaling factor)
 
@@ -450,7 +450,7 @@ CodecRetCode CodecMAX98090::WriteFilterCoeff(const float coeff, const uint8_t ba
 
 CodecRetCode CodecMAX98090::MicBias(const bool enable)
 {
-    max98090_reg_bias_mode_t biasmode = {0};
+    max98090_reg_bias_mode_t biasmode = {};
     // BIAS created by bandgap reference
     biasmode.biasmode = 1;
 
@@ -468,9 +468,9 @@ CodecRetCode CodecMAX98090::MicBias(const bool enable)
 
 CodecRetCode CodecMAX98090::SetupEarspeakerEqualizer()
 {
-    qfilter_coefficients_t band1_filter = {0};
-    qfilter_coefficients_t band2_filter = {0};
-    qfilter_coefficients_t band3_filter = {0};
+    qfilter_coefficients_t band1_filter = {};
+    qfilter_coefficients_t band2_filter = {};
+    qfilter_coefficients_t band3_filter = {};
 
     // Highpass,lowpass & flat filters don't use Gain parameter
     qfilter_CalculateCoeffs(FilterHighPass, 800, currentParams.GetSampleRateVal(), 0.707, 1, &band1_filter);
@@ -499,7 +499,7 @@ CodecRetCode CodecMAX98090::SetupEarspeakerEqualizer()
     WriteFilterCoeff(band3_filter.a2, 0x70);
 
     // Enable 3-band filter
-    max98090_reg_dsp_biquadfilter_enable_t filter = {0};
+    max98090_reg_dsp_biquadfilter_enable_t filter = {};
     filter.eq3banden                              = 1;
     i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
     i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
@@ -509,9 +509,9 @@ CodecRetCode CodecMAX98090::SetupEarspeakerEqualizer()
 
 CodecRetCode CodecMAX98090::SetupLoudspeakerEqualizer()
 {
-    qfilter_coefficients_t band1_filter = {0};
-    qfilter_coefficients_t band2_filter = {0};
-    qfilter_coefficients_t band3_filter = {0};
+    qfilter_coefficients_t band1_filter = {};
+    qfilter_coefficients_t band2_filter = {};
+    qfilter_coefficients_t band3_filter = {};
 
     // Highpass,lowpass & flat filters don't use Gain parameter
     qfilter_CalculateCoeffs(FilterHighPass, 500, currentParams.GetSampleRateVal(), 0.707, 1, &band1_filter);
@@ -540,7 +540,7 @@ CodecRetCode CodecMAX98090::SetupLoudspeakerEqualizer()
     WriteFilterCoeff(band3_filter.a2, 0x70);
 
     // Enable 3-band filter
-    max98090_reg_dsp_biquadfilter_enable_t filter = {0};
+    max98090_reg_dsp_biquadfilter_enable_t filter = {};
     filter.eq3banden                              = 1;
     i2cAddr.subAddress                            = MAX98090_REG_DSP_BIQUAD_FILTER_ENABLE;
     i2c->Write(i2cAddr, (uint8_t *)&filter, 1);
@@ -552,13 +552,13 @@ CodecRetCode CodecMAX98090::Reset()
 {
 
     // Turn off device
-    max98090_reg_shutdown_t dev_shutdown = {.shdn = 0};
+    max98090_reg_shutdown_t dev_shutdown = {.unused = 0, .shdn = 0};
 
     i2cAddr.subAddress = MAX98090_REG_DEVICE_SHUTDOWN;
     i2c->Write(i2cAddr, (uint8_t *)&dev_shutdown, 1);
 
     // Set all registers to default state
-    max98090_reg_swreset_t reset = {0};
+    max98090_reg_swreset_t reset = {};
     reset.swreset                = 1;
     i2cAddr.subAddress           = MAX98090_REG_SWRESET;
     i2c->Write(i2cAddr, (uint8_t *)&reset, 1);

@@ -7,6 +7,7 @@
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/fs/drivers/file_handle_vfat.hpp>
 #include <purefs/fs/drivers/directory_handle_vfat.hpp>
+#include <purefs/fs/mount_flags.hpp>
 #include <log/log.hpp>
 #include <fatfs/volume_mapper.hpp>
 #include <ff.h>
@@ -82,7 +83,7 @@ namespace purefs::fs::drivers
             return fat_mode;
         }
 
-        auto translate_fat_attrib_to_mode(BYTE fattrib)
+        auto translate_fat_attrib_to_mode(BYTE fattrib, bool ro)
         {
             decltype(static_cast<struct stat *>(nullptr)->st_mode) mode = S_IRUSR | S_IRGRP | S_IROTH;
 
@@ -92,7 +93,7 @@ namespace purefs::fs::drivers
             else {
                 mode |= S_IFREG;
             }
-            if ((fattrib & AM_RDO) == 0) {
+            if ((fattrib & AM_RDO) == 0 && !ro) {
                 mode |= (S_IWUSR | S_IWGRP | S_IWOTH);
             }
             if (fattrib & AM_HID) {}
@@ -109,7 +110,7 @@ namespace purefs::fs::drivers
             return attr;
         }
 
-        void translate_filinfo_to_stat(const FILINFO &fs, const FIL *fil, struct stat &st)
+        void translate_filinfo_to_stat(const FILINFO &fs, const FIL *fil, bool ro, struct stat &st)
         {
             if (fil) {
                 st.st_dev = fil->obj.id;
@@ -119,7 +120,7 @@ namespace purefs::fs::drivers
                 st.st_dev = 0;
                 st.st_ino = 0;
             }
-            st.st_mode  = translate_fat_attrib_to_mode(fs.fattrib);
+            st.st_mode  = translate_fat_attrib_to_mode(fs.fattrib, ro);
             st.st_nlink = 1;
             st.st_uid   = 0;
             st.st_gid   = 0;
@@ -147,7 +148,7 @@ namespace purefs::fs::drivers
         return std::make_shared<mount_point_vfat>(diskh, path, flags, shared_from_this());
     }
 
-    auto filesystem_vfat::mount(fsmount mnt) noexcept -> int
+    auto filesystem_vfat::mount(fsmount mnt, const void *data) noexcept -> int
     {
         auto disk = mnt->disk();
         if (!disk) {
@@ -167,7 +168,7 @@ namespace purefs::fs::drivers
         ret = f_mount(vmnt->fatfs(), vmnt->ff_drive(), 1);
         ret = translate_error(ret);
         if (!ret) {
-            filesystem_operations::mount(mnt);
+            filesystem_operations::mount(mnt, data);
         }
         return ret;
     }
@@ -235,7 +236,7 @@ namespace purefs::fs::drivers
         stat.f_blocks  = (fatfs->n_fatent - 2);
         stat.f_bfree   = xfree;
         stat.f_bavail  = xfree;
-        stat.f_flag    = 0; // TODO: Flags later
+        stat.f_flag    = vmnt->flags();
         stat.f_files   = 0;
         stat.f_ffree   = 0;
         stat.f_favail  = 0;
@@ -322,8 +323,11 @@ namespace purefs::fs::drivers
         if (newpos < 0) {
             return -ENXIO;
         }
-        const auto fres = f_lseek(fp, newpos);
-        return translate_error(fres);
+        FRESULT fres{FR_OK};
+        if (f_tell(fp) != static_cast<unsigned long>(newpos)) {
+            fres = f_lseek(fp, newpos);
+        }
+        return (fres == FR_OK) ? (f_tell(fp)) : translate_error(fres);
     }
 
     auto filesystem_vfat::fstat(fsfile zfile, struct stat &st) noexcept -> int
@@ -336,7 +340,13 @@ namespace purefs::fs::drivers
         FILINFO finfo;
         const auto fres = f_stat(vfile->open_path().c_str(), &finfo);
         if (fres == FR_OK) {
-            translate_filinfo_to_stat(finfo, vfile->ff_filp(), st);
+            const auto vmnt = vfile->mntpoint();
+            if (vmnt) {
+                translate_filinfo_to_stat(finfo, vfile->ff_filp(), vmnt->is_ro(), st);
+            }
+            else {
+                return -EIO;
+            }
         }
         return translate_error(fres);
     }
@@ -352,7 +362,7 @@ namespace purefs::fs::drivers
         const auto fspath = vmnt->native_path(file);
         const int fres    = f_stat(fspath.c_str(), &finfo);
         if (fres == FR_OK) {
-            translate_filinfo_to_stat(finfo, nullptr, st);
+            translate_filinfo_to_stat(finfo, nullptr, vmnt->is_ro(), st);
         }
         return translate_error(fres);
     }
@@ -433,8 +443,14 @@ namespace purefs::fs::drivers
                 return -ENODATA;
             }
             else {
-                translate_filinfo_to_stat(ffinfo, nullptr, filestat);
-                filename = ffinfo.fname;
+                const auto vmnt = dirp->mntpoint();
+                if (vmnt) {
+                    translate_filinfo_to_stat(ffinfo, nullptr, vmnt->is_ro(), filestat);
+                    filename = ffinfo.fname;
+                }
+                else {
+                    return -EIO;
+                }
             }
         }
         return translate_error(ferr);

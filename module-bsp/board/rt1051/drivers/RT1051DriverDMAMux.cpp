@@ -17,6 +17,8 @@ namespace drivers
             DMAMUX_Init(base);
             LOG_DEBUG("Init: DMAMUX0");
         } break;
+        default:
+            break;
         }
     }
 
@@ -30,6 +32,8 @@ namespace drivers
             DMAMUX_Deinit(DMAMUX);
             LOG_DEBUG("Deinit DMAMUX0");
         } break;
+        default:
+            break;
         }
     }
 

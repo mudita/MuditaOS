@@ -1,12 +1,19 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <blkid.h>
 #include "parse_partitions.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+#include <linux/fs.h>
+#include <fcntl.h>
+#include <unistd.h>
 static const size_t sector_size = 512;
+static const size_t bootstrap_offset = 0x00E0;
 
 struct partition *find_partitions(const char *filename, part_type_t ptype, size_t *nelems)
 {
@@ -60,4 +67,72 @@ void print_partitions(const struct partition *part, size_t nparts)
                part[s].start / 1024,
                part[s].end / 1024);
     }
+}
+
+static inline unsigned calculate_shift(uint32_t v)
+{
+
+    static const int mult_bruijn_bit_position[32] = {0, 9,  1,  10, 13, 21, 2,  29, 11, 14, 16, 18, 22, 25, 3, 30,
+                                                     8, 12, 20, 28, 15, 17, 24, 7,  19, 27, 23, 6,  26, 5,  4, 31};
+
+    v |= v >> 1; // first round down to one less than a power of 2
+    v |= v >> 2;
+    v |= v >> 4;
+    v |= v >> 8;
+    v |= v >> 16;
+
+    return mult_bruijn_bit_position[(uint32_t)(v * 0x07C4ACDDU) >> 27];
+}
+
+static ssize_t sector_block_size(int filedes)
+{
+    struct stat statbuf;
+    int err = fstat(filedes, &statbuf);
+    if (err < 0) {
+        return err;
+    }
+    uint64_t blk_sz;
+    if (S_ISBLK(statbuf.st_mode)) {
+        err = ioctl(filedes, BLKSSZGET, &blk_sz);
+        if (err < 0) {
+            return err;
+        }
+    }
+    else {
+        blk_sz = 512;
+    }
+    return blk_sz;
+}
+
+int write_partition_bootunit(const char *filename, int part_num, uint32_t block_size)
+{
+    if (!filename) {
+        errno = EINVAL;
+        return -1;
+    }
+    const int fd = open(filename, O_RDWR);
+    if (fd < 0) {
+        return -1;
+    }
+    const ssize_t sector_size = sector_block_size(fd);
+    char *const sect_buf      = malloc(sector_size);
+    if (read(fd, sect_buf, sector_size) != sector_size) {
+        close(fd);
+        free(sect_buf);
+        return -1;
+    }
+    const uint8_t log2_block_size         = calculate_shift(block_size);
+    sect_buf[bootstrap_offset + part_num] = log2_block_size;
+    if (lseek(fd, 0, SEEK_SET) < 0) {
+        close(fd);
+        free(sect_buf);
+        return -1;
+    }
+    if (write(fd, sect_buf, sector_size) != sector_size) {
+        close(fd);
+        free(sect_buf);
+        return -1;
+    }
+    free(sect_buf);
+    return close(fd);
 }

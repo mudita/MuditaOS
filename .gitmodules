@@ -53,9 +53,6 @@
 [submodule "module-utils/magic_enum"]
 	path = module-utils/magic_enum
 	url = git@github.com:Neargye/magic_enum.git
-[submodule "module-vfs/board/freeRTOS_FAT"]
-	path = module-vfs/board/freeRTOS_FAT
-	url = ../Lab-Project-FreeRTOS-FAT.git
 [submodule "module-utils/tinyexpr"]
 	path = module-utils/tinyexpr
 	url = https://github.com/codeplea/tinyexpr.git
@@ -72,6 +69,9 @@
 [submodule "module-vfs/thirdparty/lfsfs/littlefs"]
 	path = module-vfs/thirdparty/lfsfs/littlefs
 	url = https://github.com/littlefs-project/littlefs.git
+[submodule "module-utils/parallel-hashmap"]
+	path = module-utils/parallel-hashmap
+	url = https://github.com/greg7mdp/parallel-hashmap.git
 [submodule "module-utils/sml"]
 	path = module-utils/sml
 	url = https://github.com/boost-ext/sml

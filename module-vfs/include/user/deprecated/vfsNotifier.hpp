@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 //
 #pragma once
-#include "ff_stdio.h"
 #include <unordered_map>
 #include <mutex.hpp>
 #include <functional>
@@ -13,6 +12,7 @@ namespace vfsn::utility
 {
     class vfsNotifier
     {
+        struct FF_FILE;
         using FILE = FF_FILE;
 
       public:

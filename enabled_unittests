@@ -250,7 +250,6 @@ TESTS_LIST["catch2-utils"]="
     Swap endianness;
     Floating point to string;
     Fill leading digit in string;
-    Read file length;
     Hex to bytes;
     Bytes to hex;
 "
@@ -350,13 +349,6 @@ TESTS_LIST["catch2-utils-utf8"]="
     UTF8: Not ASCII combination;
 "
 #---------
-TESTS_LIST["catch2-vfs"]="
-    Test vfs case 1;
-    VFS lseek check;
-    Simple file notifier init;
-    Simple file notifier write;
-"
-#---------
 TESTS_LIST["catch2-vfs-core-fs"]="
     Corefs: Registering and unregistering block device;
     Corefs: Basic API test;
@@ -365,12 +357,17 @@ TESTS_LIST["catch2-vfs-core-fs"]="
     Corefs: Mount empty strings;
     Corefs: Write to not valid file descriptor;
     Corefs: Directory operations;
-    Unititest integrated subsystem;
+    Corefs: Read only filesystem;
+    Corefs: Remount filesystem from RO to RW and to RO;
+    Corefs: Autodetect filesystems;
+    Corefs: Unittest integrated subsystem;
 "
 #---------
 TESTS_LIST["catch2-vfs-disk"]="
     Registering and unregistering device;
     Parsing and checking partititons;
+    Parsing and checking extended partititons;
+    Parsing and checking invalid partititons;
     RW boundary checking;
     Null pointer passed to disk manager functions;
     Boundary checks for partitions;
@@ -378,8 +375,21 @@ TESTS_LIST["catch2-vfs-disk"]="
 "
 #---------
 TESTS_LIST["catch2-vfs-littlefs"]="
-    Littlefs: Basic mount and functionality;
-    littlefs: Basic API test;
+    littlefs: Basic mount and functionality;
+    littlefs: Read tests;
+    littlefs: Write tests;
+    littlefs: Read-only filesystem tests;
+    littlefs: Directory tests;
+    littlefs: Remount RO->RW->RW;
+"
+#---------
+TESTS_LIST["catch2-vfs-dualmount"]="
+    dualmount: Basic mount;
+    dualmount: API tests;
+"
+#---------
+TESTS_LIST["catch2-iosyscalls"]="
+    VFS linux support;
 "
 #---------
 TESTS_LIST["catch2-cellular-cmux"]="

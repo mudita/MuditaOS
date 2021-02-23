@@ -4,6 +4,7 @@
 #pragma once
 
 #include <purefs/blkdev/disk.hpp>
+#include <mutex>
 
 namespace purefs::blkdev
 {
@@ -24,10 +25,13 @@ namespace purefs::blkdev
         auto sync() -> int override;
         auto status() const -> media_status override;
         auto get_info(info_type what) const -> scount_t override;
+        auto erase(sector_t lba, std::size_t count) -> int override;
+        auto range_valid(sector_t lba, std::size_t count) const -> bool;
 
       private:
         int m_filedes{-1};
         unsigned long m_sectors{0};
         std::string m_image_name;
+        mutable std::recursive_mutex m_mtx;
     };
 } // namespace purefs::blkdev

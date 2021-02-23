@@ -18,12 +18,9 @@
 #include "test-service-db-settings-testservices.hpp"
 #include "test-service-db-settings-testapps.hpp"
 #include "Database.cpp"
-#include <vfs.hpp>
 
 TEST_CASE("SettingsApi")
 {
-    vfs.Init();
-
     SECTION("variable/profile/mode register/set/get/unregister")
     {
         auto manager = std::make_shared<sys::SystemManager>(std::vector<std::unique_ptr<sys::BaseServiceCreator>>{});

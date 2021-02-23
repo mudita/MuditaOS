@@ -41,5 +41,5 @@ unit: sectors
 
 /dev/sdz1 : start=$SECTOR_START, size=$SECTOR_END, type=9e
 ==sfdisk
-./genlittlefs --image $IMAGE_FILE --block_size=4096  --overwrite  --partition_num 1 -- "$@"
+./genlittlefs --image $IMAGE_FILE --block_size=32768  --overwrite  --partition_num 1 -- assets/* module-vfs/test_dir/* .boot.json
 

@@ -3,18 +3,16 @@
 
 #include <catch2/catch.hpp>
 
+#include <filesystem>
 #include <Tables/NotesTable.hpp>
 #include "Database/Database.hpp"
 #include "Databases/NotesDB.hpp"
-#include <purefs/filesystem_paths.hpp>
-#include <vfs.hpp>
 
 TEST_CASE("Notes Table tests")
 {
-    vfs.Init();
     Database::initialize();
 
-    const auto notesDbPath = purefs::dir::getUserDiskPath() / "notes.db";
+    const auto notesDbPath = std::filesystem::path{"user"} / "notes.db";
     NotesDB notesDb{notesDbPath.c_str()};
     REQUIRE(notesDb.isInitialized());
 

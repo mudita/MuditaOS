@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstring>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <unistd.h>
@@ -11,13 +12,9 @@
 #include <catch2/catch.hpp>
 
 #include "Utils.hpp"
-#include <vfs.hpp>
-
-class vfs vfs;
 
 TEST_CASE("Split tests")
 {
-    vfs.Init();
     std::string delimiter = "\r\n";
 
     std::string inputStr1 = "\r\nOK\r\n\r\nNO CARRIER\r\n\r\nFINISHED\r\n";
@@ -74,8 +71,6 @@ TEST_CASE("Split tests")
 
 TEST_CASE("toNumeric tests")
 {
-    vfs.Init();
-
     std::string inputStr1 = "2";
     int value;
 
@@ -86,8 +81,6 @@ TEST_CASE("toNumeric tests")
 
 TEST_CASE("findAndReplaceAll tests")
 {
-    vfs.Init();
-
     // helper lambda
     auto compare = [](std::string &data, std::string &expected, bool &retVal) {
         if (data.compare(expected)) {
@@ -161,8 +154,6 @@ TEST_CASE("findAndReplaceAll tests")
 
 TEST_CASE("Converts enum to string")
 {
-    vfs.Init();
-
     enum class Test : bool
     {
         True  = true,
@@ -175,8 +166,6 @@ TEST_CASE("Converts enum to string")
 
 TEST_CASE("Get value from string")
 {
-    vfs.Init();
-
     SECTION("UInt32_t")
     {
         std::string testString = "10";
@@ -195,8 +184,6 @@ TEST_CASE("Get value from string")
 
 TEST_CASE("Swap endianness")
 {
-    vfs.Init();
-
     uint32_t as_long = 0x11223344;
 
     SECTION("endiannes check")
@@ -225,8 +212,6 @@ TEST_CASE("Swap endianness")
 
 TEST_CASE("Floating point to string")
 {
-    vfs.Init();
-
     SECTION("Double")
     {
         double test = 15.0965432456321;
@@ -278,49 +263,12 @@ TEST_CASE("Floating point to string")
 
 TEST_CASE("Fill leading digit in string")
 {
-    vfs.Init();
-
     std::string test = "45";
     REQUIRE(utils::addLeadingZeros(test) == "45");
     REQUIRE(utils::addLeadingZeros(test, 1) == "45");
     REQUIRE(utils::addLeadingZeros(test, 2) == "45");
     REQUIRE(utils::addLeadingZeros(test, 3) == "045");
     REQUIRE(utils::addLeadingZeros(test, 4) == "0045");
-}
-
-class ScopedDir
-{
-  public:
-    ScopedDir(const std::filesystem::path &dirPath) : dirPath{dirPath}
-    {
-        REQUIRE(std::filesystem::create_directory(dirPath));
-    }
-
-    ~ScopedDir()
-    {
-        REQUIRE(std::filesystem::remove(dirPath));
-    }
-
-    auto operator()(std::string file = "") -> std::filesystem::path
-    {
-        return dirPath.c_str() + file;
-    }
-
-  private:
-    std::filesystem::path dirPath;
-};
-
-TEST_CASE("Read file length")
-{
-    vfs.Init();
-
-    ScopedDir dir(USER_PATH("test"));
-    auto *file = std::fopen(dir("test.txt").c_str(), "w");
-    REQUIRE(file != nullptr);
-    std::array<int, 3> v = {42, -1, 7};
-    std::fwrite(v.data(), sizeof(v[0]), v.size(), file);
-    REQUIRE(utils::filesystem::filelength(file) == static_cast<long>(sizeof(v[0]) * v.size()));
-    REQUIRE(std::fclose(file) == 0);
 }
 
 TEST_CASE("Hex to bytes")

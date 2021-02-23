@@ -3,7 +3,7 @@
 
 #include "CountryCodesDB.hpp"
 
-CountryCodesDB::CountryCodesDB(const char *name) : Database(name), countryCodes(this)
+CountryCodesDB::CountryCodesDB(const char *name) : Database(name, true), countryCodes(this)
 {
     if (countryCodes.create() == false)
         return;

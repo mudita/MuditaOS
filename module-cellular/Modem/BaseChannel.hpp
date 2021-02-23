@@ -28,10 +28,10 @@ namespace at
         /// {
         virtual void cmd_log(std::string cmd, const Result &result, uint32_t timeout)
         {}
-        virtual void cmd_init()                        = 0;
-        virtual void cmd_send(std::string cmd)         = 0;
-        virtual std::string cmd_receive()              = 0;
-        virtual void cmd_post()                        = 0;
+        virtual void cmd_init()                = 0;
+        virtual void cmd_send(std::string cmd) = 0;
+        virtual std::string cmd_receive()      = 0;
+        virtual void cmd_post()                = 0;
         /// }
     };
 } // namespace at

@@ -4,7 +4,6 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
-#include <vfs.hpp>
 #include <unistd.h>
 
 #include "time/time_conversion.hpp"
@@ -13,13 +12,10 @@
 
 #include <catch2/catch.hpp>
 
-class vfs vfs;
 utils::i18n localize;
 
 TEST_CASE("Duration - creation")
 {
-    vfs.Init();
-
     utils::localize.setDisplayLanguage("English");
 
     SECTION("default constructor")
@@ -63,7 +59,6 @@ TEST_CASE("Duration - creation")
 
 TEST_CASE("Duration - arithemtics")
 {
-    vfs.Init();
     utils::localize.setDisplayLanguage("English");
 
     SECTION("Addition")
@@ -102,8 +97,6 @@ TEST_CASE("Duration - arithemtics")
 
 TEST_CASE("Duration - comparision")
 {
-    vfs.Init();
-
     utils::localize.setDisplayLanguage("English");
 
     SECTION("Duration")
@@ -148,8 +141,6 @@ TEST_CASE("Duration - comparision")
 
 TEST_CASE("Duration - display")
 {
-    vfs.Init();
-
     utils::localize.setDisplayLanguage("English");
 
     {

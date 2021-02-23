@@ -14,7 +14,8 @@
 
 #include <cstdint>
 #include <string>
-#include <vfs.hpp>
+#include <sys/statvfs.h>
+#include <purefs/filesystem_paths.hpp>
 
 using namespace parserFSM;
 
@@ -35,8 +36,14 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
     if (ownerServicePtr == nullptr) {
         return false;
     }
-    vfs::FilesystemStats fsStats = vfs.getFilesystemStats();
     json11::Json updateHistory   = static_cast<ServiceDesktop *>(ownerServicePtr)->updateOS->getUpdateHistory();
+    struct statvfs vfstat;
+    if (statvfs(purefs::dir::getRootDiskPath().c_str(), &vfstat) < 0) {
+        return false;
+    }
+    auto totalMbytes = (vfstat.f_frsize * vfstat.f_blocks) / 1024LLU / 1024LLU;
+    auto freeMbytes  = (vfstat.f_bfree * vfstat.f_bsize) / 1024LLU / 1024LLU;
+    auto freePercent = (freeMbytes * 100) / totalMbytes;
 
     context.setResponseBody(json11::Json::object(
         {{json::batteryLevel, std::to_string(Store::Battery::get().level)},
@@ -46,9 +53,9 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
          {json::signalStrength, std::to_string(static_cast<int>(Store::GSM::get()->getSignalStrength().rssiBar))},
          {json::accessTechnology, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().accessTechnology))},
          {json::networkStatus, std::to_string(static_cast<int>(Store::GSM::get()->getNetwork().status))},
-         {json::fsTotal, std::to_string(fsStats.totalMbytes)},
-         {json::fsFree, std::to_string(fsStats.freeMbytes)},
-         {json::fsFreePercent, std::to_string(fsStats.freePercent)},
+         {json::fsTotal, std::to_string(totalMbytes)},
+         {json::fsFree, std::to_string(freeMbytes)},
+         {json::fsFreePercent, std::to_string(freePercent)},
          {json::gitRevision, (std::string)(GIT_REV)},
          {json::gitTag, (std::string)GIT_TAG},
          {json::gitBranch, (std::string)GIT_BRANCH},

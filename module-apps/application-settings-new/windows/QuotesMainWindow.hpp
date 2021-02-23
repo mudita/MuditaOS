@@ -11,7 +11,6 @@
 #include <module-gui/gui/widgets/ListView.hpp>
 #include <module-apps/InternalModel.hpp>
 #include <utility>
-#include <vfs.hpp>
 
 namespace gui
 {

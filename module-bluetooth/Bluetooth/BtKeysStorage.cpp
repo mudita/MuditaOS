@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include "BtKeysStorage.hpp"
+#include <log/log.hpp>
 
 json11::Json bluetooth::KeyStorage::keysJson = json11::Json();
 btstack_link_key_db_t bluetooth::KeyStorage::keyStorage;

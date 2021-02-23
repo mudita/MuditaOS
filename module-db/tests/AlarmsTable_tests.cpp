@@ -1,9 +1,6 @@
 // Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <vfs.hpp>
-#include <filesystem>
-
 #include <catch2/catch.hpp>
 
 #include "Database/Database.hpp"
@@ -15,15 +12,16 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <purefs/filesystem_paths.hpp>
+#include <filesystem>
 
 TEST_CASE("Alarms Table tests")
 {
-    vfs.Init();
     Database::initialize();
 
-    const auto alarmsPath = purefs::dir::getUserDiskPath() / "alarms.db";
-    std::filesystem::remove(alarmsPath);
+    const auto alarmsPath = (std::filesystem::path{"user"} / "alarms.db");
+    if (std::filesystem::exists(alarmsPath)) {
+        REQUIRE(std::filesystem::remove(alarmsPath));
+    }
 
     AlarmsDB alarmsDb(alarmsPath.c_str());
     REQUIRE(alarmsDb.isInitialized());

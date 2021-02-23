@@ -4,6 +4,7 @@
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk.hpp>
 #include <log/log.hpp>
+#include <mutex.hpp>
 #include <errno.h>
 #include <charconv>
 #include <tuple>
@@ -19,16 +20,23 @@ namespace purefs::blkdev
         using namespace std::literals;
         static constexpr auto part_suffix = "part"sv;
     } // namespace
+
+    disk_manager::disk_manager() : m_lock(std::make_unique<cpp_freertos::MutexRecursive>())
+    {}
+
+    disk_manager::~disk_manager()
+    {}
+
     auto disk_manager::register_device(std::shared_ptr<disk> disk, std::string_view device_name, unsigned flags) -> int
     {
         if (!disk) {
             LOG_ERROR("Disk doesn't exists");
             return -EINVAL;
         }
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         const auto ret = m_dev_map.find(std::string(device_name));
         if (ret != std::end(m_dev_map)) {
-            LOG_ERROR("Disc: %.*s already registered.", int(device_name.length()), device_name.data());
+            LOG_ERROR("Disc: %s already registered.", std::string(device_name).c_str());
             return -EEXIST;
         }
         else {
@@ -43,10 +51,10 @@ namespace purefs::blkdev
     }
     auto disk_manager::unregister_device(std::string_view device_name) -> int
     {
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         auto it = m_dev_map.find(std::string(device_name));
         if (it == std::end(m_dev_map)) {
-            LOG_ERROR("Disc: %.*s doesn't exists in manager.", int(device_name.length()), device_name.data());
+            LOG_ERROR("Disc: %s doesn't exists in manager.", std::string(device_name).c_str());
             return -ENOENT;
         }
         auto ret = it->second->cleanup();
@@ -65,7 +73,7 @@ namespace purefs::blkdev
             ret = nullptr;
         }
         else {
-            cpp_freertos::LockGuard _lck(m_lock);
+            cpp_freertos::LockGuard _lck(*m_lock);
             const auto it = m_dev_map.find(std::string(dev));
             if (it == std::end(m_dev_map)) {
                 ret = nullptr;
@@ -253,6 +261,32 @@ namespace purefs::blkdev
         }
         return disk->partitions();
     }
+    auto disk_manager::partition_info(disk_fd dfd) const -> std::optional<partition>
+    {
+        if (!dfd) {
+            LOG_ERROR("Disk handle doesn't exists");
+            return std::nullopt;
+        }
+        auto disk = dfd->disk();
+        if (!disk) {
+            LOG_ERROR("Disk doesn't exists");
+            return std::nullopt;
+        }
+        if (dfd->has_partition()) {
+            auto parts = disk->partitions();
+            if (size_t(dfd->partition()) >= parts.size()) {
+                LOG_ERROR("Partition num out of range");
+                return std::nullopt;
+            }
+            else {
+                return {parts[dfd->partition()]};
+            }
+        }
+        else {
+            LOG_ERROR("No paritions on disc");
+            return std::nullopt;
+        }
+    }
     auto disk_manager::get_info(disk_fd dfd, info_type what) const -> scount_t
     {
         if (!dfd) {
@@ -264,7 +298,18 @@ namespace purefs::blkdev
             LOG_ERROR("Disk doesn't exists");
             return {};
         }
-        return disk->get_info(what);
+        //! When it is partition as for partition sectors count
+        if (what == info_type::sector_count && dfd->has_partition()) {
+            if (unsigned(dfd->partition()) >= disk->partitions().size()) {
+                LOG_ERROR("Partition number out of range");
+                return -ERANGE;
+            }
+            const auto part = disk->partitions()[dfd->partition()];
+            return part.num_sectors;
+        }
+        else {
+            return disk->get_info(what);
+        }
     }
     auto disk_manager::reread_partitions(disk_fd dfd) -> int
     {
@@ -355,6 +400,14 @@ namespace purefs::blkdev
         else
             return {};
     }
+    auto disk_manager::partition_info(std::string_view device_name) const -> std::optional<partition>
+    {
+        auto dfd = device_handle(device_name);
+        if (dfd)
+            return partition_info(dfd);
+        else
+            return std::nullopt;
+    }
     auto disk_manager::get_info(std::string_view device_name, info_type what) const -> scount_t
     {
         auto dfd = device_handle(device_name);
@@ -376,4 +429,5 @@ namespace purefs::blkdev
         const auto new_name = std::get<0>(parse_device_name(disk->name()));
         return std::make_shared<internal::disk_handle>(disk->disk(), new_name);
     }
+
 } // namespace purefs::blkdev

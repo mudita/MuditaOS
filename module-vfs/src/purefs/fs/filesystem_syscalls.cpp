@@ -7,37 +7,38 @@
 #include <purefs/fs/file_handle.hpp>
 #include <purefs/fs/directory_handle.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
+#include <fcntl.h>
 
 namespace purefs::fs
 {
     auto filesystem::stat_vfs(std::string_view path, struct ::statvfs &stat) const noexcept -> int
     {
-        return invoke_fops(&filesystem_operations::stat_vfs, path, stat);
+        return invoke_fops(iaccess::ro, &filesystem_operations::stat_vfs, path, stat);
     }
 
     auto filesystem::stat(std::string_view file, struct stat &st) noexcept -> int
     {
-        return invoke_fops(&filesystem_operations::stat, file, st);
+        return invoke_fops(iaccess::ro, &filesystem_operations::stat, file, st);
     }
 
     auto filesystem::unlink(std::string_view name) noexcept -> int
     {
-        return invoke_fops(&filesystem_operations::unlink, name);
+        return invoke_fops(iaccess::rw, &filesystem_operations::unlink, name);
     }
 
     auto filesystem::mkdir(std::string_view path, int mode) noexcept -> int
     {
-        return invoke_fops(&filesystem_operations::mkdir, path, mode);
+        return invoke_fops(iaccess::rw, &filesystem_operations::mkdir, path, mode);
     }
 
     auto filesystem::ioctl(std::string_view path, int cmd, void *arg) noexcept -> int
     {
-        return invoke_fops(&filesystem_operations::ioctl, path, cmd, arg);
+        return invoke_fops(iaccess::ro, &filesystem_operations::ioctl, path, cmd, arg);
     }
 
     auto filesystem::utimens(std::string_view path, std::array<timespec, 2> &tv) noexcept -> int
     {
-        return invoke_fops(&filesystem_operations::utimens, path, tv);
+        return invoke_fops(iaccess::ro, &filesystem_operations::utimens, path, tv);
     }
 
     auto filesystem::flock(int fd, int cmd) noexcept -> int
@@ -52,7 +53,7 @@ namespace purefs::fs
 
     auto filesystem::chmod(std::string_view path, mode_t mode) noexcept -> int
     {
-        return invoke_fops(&filesystem_operations::chmod, path, mode);
+        return invoke_fops(iaccess::rw, &filesystem_operations::chmod, path, mode);
     }
 
     auto filesystem::write(int fd, const char *ptr, size_t len) noexcept -> ssize_t
@@ -110,11 +111,15 @@ namespace purefs::fs
         const auto abspath     = absolute_path(path);
         auto [mountp, pathpos] = find_mount_point(abspath);
         if (!mountp) {
-            LOG_ERROR("VFS: Unable to find mount point");
+            LOG_ERROR("VFS: Unable to find mount point: %s", std::string(path).c_str());
             return -ENOENT;
         }
         auto fsops = mountp->fs_ops();
         if (fsops) {
+            if ((flags & O_ACCMODE) != O_RDONLY && (mountp->flags() & mount_flags::read_only)) {
+                LOG_ERROR("Trying to open file %.*s with WR... flag on RO filesystem", int(path.size()), path.data());
+                return -EACCES;
+            }
             auto fh = fsops->open(mountp, abspath, flags, mode);
             if (!fh) {
                 LOG_ERROR("VFS: Unable to get fops");
@@ -146,7 +151,7 @@ namespace purefs::fs
         const auto abspath     = absolute_path(path);
         auto [mountp, pathpos] = find_mount_point(abspath);
         if (!mountp) {
-            LOG_ERROR("VFS: Unable to find mount point");
+            LOG_ERROR("VFS: Unable to find mount point: %s", std::string(path).c_str());
             return std::make_shared<internal::directory_handle>(nullptr, -ENOENT);
         }
         auto fsops = mountp->fs_ops();

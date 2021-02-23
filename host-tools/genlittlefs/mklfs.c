@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <littlefs/lfs.h>
@@ -14,6 +14,7 @@
 #include <limits.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <stdarg.h>
 #include <sys/stat.h>
 
 struct lfs_info_summary
@@ -103,7 +104,7 @@ static int add_directory_to_lfs(
     struct dirent *ent;
     char lfs_curr_path[PATH_MAX];
     char host_curr_path[PATH_MAX];
-    int err = -1;
+    int err = 0;
     dir     = opendir(host_path);
     if (dir) {
         while ((ent = readdir(dir))) {
@@ -199,7 +200,7 @@ static int add_to_lfs(lfs_t *lfs, const char *dir, struct lfs_info_summary *summ
             summary->directories_added++;
         }
     }
-    else if (is_file) {
+    else { // is_file
         err = create_file_in_lfs(lfs, host_dir, tgt_dir, verbose);
         if (!err) {
             summary->files_added++;
@@ -211,15 +212,20 @@ static int add_to_lfs(lfs_t *lfs, const char *dir, struct lfs_info_summary *summ
     return err;
 }
 
-static void print_error(const char *str, int error) __attribute__((nonnull(1)));
-static void print_error(const char *str, int error)
+static void print_error(int error, const char *format, ...) __attribute__((nonnull(2)));
+static void print_error(int error, const char *format, ...)
 {
+    va_list arglist;
+    va_start(arglist, format);
+    vfprintf(stderr, format, arglist);
+    va_end(arglist);
+
     if (error == -1) {
         char buf[1024];
-        fprintf(stderr, "system_error %s %s\n", str, strerror_r(errno, buf, sizeof buf));
+        fprintf(stderr, " system_error: %s\n", strerror_r(errno, buf, sizeof buf));
     }
     else {
-        fprintf(stderr, "lfs_error %s %i\n", str, error);
+        fprintf(stderr, " lfs_error: %i\n", error);
     }
 }
 
@@ -279,12 +285,18 @@ int main(int argc, char **argv)
         cfg.block_count                   = (curr_part->end - curr_part->start) / lopts.block_size;
         ioctx                             = lfs_ioaccess_open(&cfg, lopts.dst_image, curr_part);
         if (!ioctx) {
-            perror("Unable to open file:");
+            fprintf(stderr, "Unable to open file: %s error %s\n", lopts.dst_image, strerror(errno));
             free(parts);
             free(lopts.src_dirs);
             return EXIT_FAILURE;
         }
         free(parts);
+        if (write_partition_bootunit(lopts.dst_image, lopts.partition_num, lopts.block_size)) {
+            perror("Unable to write bootunit");
+            free(lopts.src_dirs);
+            lfs_ioaccess_close(ioctx);
+            return EXIT_FAILURE;
+        }
     }
     else if (lopts.mode == littlefs_opts_file) {
         int fds = open(lopts.dst_image, O_CREAT | O_WRONLY, 0644);
@@ -296,6 +308,7 @@ int main(int argc, char **argv)
         err = ftruncate(fds, lopts.filesystem_size);
         if (err) {
             perror("Unable to truncate file");
+            close(fds);
             free(lopts.src_dirs);
             return EXIT_FAILURE;
         }
@@ -345,13 +358,14 @@ int main(int argc, char **argv)
     for (size_t ndir = 0; ndir < lopts.src_dirs_siz; ++ndir) {
         err = add_to_lfs(&lfs, lopts.src_dirs[ndir], &prog_summary, lopts.verbose);
         if (err) {
-            print_error("Unable to open file:", err);
+            print_error(err, "Unable to open file: %s", lopts.src_dirs[ndir]);
             lfs_ioaccess_close(ioctx);
             free(lopts.src_dirs);
             lfs_unmount(&lfs);
             return EXIT_FAILURE;
         }
     }
+    const lfs_ssize_t used_blocks = lfs_fs_size(&lfs);
     err = lfs_unmount(&lfs);
     if (err < 0) {
         fprintf(stderr, "lfs umount error: error=%d\n", err);
@@ -363,11 +377,12 @@ int main(int argc, char **argv)
     lfs_ioaccess_close(ioctx);
     printf("Littlefs summary:\n"
            "     Directories created: %lu, Files added: %lu, Transferred %lu kbytes.\n"
-           "     Littlefs block size: %i blocks count: %i.\n",
+           "     Littlefs block size: %i blocks: %i/%i.\n",
            prog_summary.directories_added,
            prog_summary.files_added,
            prog_summary.bytes_transferred / 1024UL,
            cfg.block_size,
+           used_blocks,
            cfg.block_count);
     return EXIT_SUCCESS;
 }

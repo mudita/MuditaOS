@@ -8,6 +8,7 @@
 #include <dirent.h>
 #include <stdint.h>
 
+struct statvfs;
 namespace vfsn::internal::syscalls
 {
     int open(int &_errno_, const char *file, int flags, int mode);
@@ -34,4 +35,13 @@ namespace vfsn::internal::syscalls
     int chmod(int &_errno_, const char *path, mode_t mode);
     int fchmod(int &_errno_, int fd, mode_t mode);
     int fsync(int &_errno_, int fd);
+    int mount(int &_errno_,
+              const char *special_file,
+              const char *dir,
+              const char *fstype,
+              unsigned long int rwflag,
+              const void *data);
+    int umount(int &_errno_, const char *special_file);
+    int statvfs(int &_errno_, const char *path, struct statvfs *buf);
+
 } // namespace vfsn::internal::syscalls

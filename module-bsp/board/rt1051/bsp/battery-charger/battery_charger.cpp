@@ -3,7 +3,7 @@
 
 #include "bsp/battery-charger/battery_charger.hpp"
 #include "MAX77818.hpp"
-#include "vfs.hpp"
+#include "fsl_common.h"
 
 #include "bsp/BoardDefinitions.hpp"
 #include "common_data/EventStore.hpp"
@@ -328,19 +328,19 @@ namespace bsp::battery_charger
 
             return batteryRetval::OK;
         }
+        /*
+                batteryRetval setChargingDischargingThresholds(std::uint8_t chargedThresholdPercent,
+                                                               std::uint8_t dischargedThresholdPercent)
+                {
+                    uint16_t regVal = (chargedThresholdPercent << 8) | dischargedThresholdPercent;
 
-        batteryRetval setChargingDischargingThresholds(std::uint8_t chargedThresholdPercent,
-                                                       std::uint8_t dischargedThresholdPercent)
-        {
-            uint16_t regVal = (chargedThresholdPercent << 8) | dischargedThresholdPercent;
-
-            if (fuelGaugeWrite(Registers::SALRT_Th_REG, regVal) != kStatus_Success) {
-                LOG_ERROR("setChargingDischargingThresholds failed.");
-                return batteryRetval::ChargerError;
-            }
-            return batteryRetval::OK;
-        }
-
+                    if (fuelGaugeWrite(Registers::SALRT_Th_REG, regVal) != kStatus_Success) {
+                        LOG_ERROR("setChargingDischargingThresholds failed.");
+                        return batteryRetval::ChargerError;
+                    }
+                    return batteryRetval::OK;
+                }
+        */
         batteryRetval setTemperatureThresholds(std::uint8_t maxTemperatureDegrees, std::uint8_t minTemperatureDegrees)
         {
             std::uint16_t regVal = (maxTemperatureDegrees << 8) | minTemperatureDegrees;
@@ -455,7 +455,7 @@ namespace bsp::battery_charger
             }
             return temperature;
         }
-
+        /*
         int getCurrentMeasurement()
         {
             auto value = fuelGaugeRead(Registers::Current_REG);
@@ -481,7 +481,7 @@ namespace bsp::battery_charger
             int voltage = value.second * voltageSenseGain;
             return voltage;
         }
-
+        */
         void chargingFinishedAction()
         {
             LOG_DEBUG("Charging finished.");
@@ -682,7 +682,6 @@ namespace bsp::battery_charger
     {
         void USB_ChargerDetectedCB(std::uint8_t detectedType)
         {
-            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
             if (DCDQueueHandle != nullptr) {
                 std::uint8_t val = static_cast<std::uint8_t>(detectedType);
                 xQueueSend(DCDQueueHandle, &val, portMAX_DELAY);

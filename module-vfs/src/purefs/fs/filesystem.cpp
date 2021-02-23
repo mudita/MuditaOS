@@ -9,10 +9,22 @@
 #include <log/log.hpp>
 #include <split_sv.hpp>
 #include <errno.h>
+#include <mutex.hpp>
 
 namespace purefs::fs
 {
-    filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm) : m_diskmm(diskmm)
+    namespace
+    {
+        constexpr std::pair<short, std::string_view> part_types_to_vfs[] = {
+            {0x0b, "vfat"},
+            {0x9e, "littlefs"},
+        };
+    }
+    filesystem::filesystem(std::shared_ptr<blkdev::disk_manager> diskmm)
+        : m_diskmm(diskmm), m_lock(new cpp_freertos::MutexRecursive)
+    {}
+
+    filesystem::~filesystem()
     {}
 
     auto filesystem::register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operations> fops) -> int
@@ -21,10 +33,10 @@ namespace purefs::fs
             LOG_ERROR("Filesystem operations doesn't exists");
             return -EINVAL;
         }
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         const auto it = m_fstypes.find(std::string(fsname));
         if (it != std::end(m_fstypes)) {
-            LOG_ERROR("Disc: %.*s already registered.", int(fsname.length()), fsname.data());
+            LOG_ERROR("Disc: %s already registered.", std::string(fsname).c_str());
             return -EEXIST;
         }
         else {
@@ -40,14 +52,14 @@ namespace purefs::fs
 
     auto filesystem::unregister_filesystem(std::string_view fsname) -> int
     {
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         const auto it = m_fstypes.find(std::string(fsname));
         if (it == std::end(m_fstypes)) {
-            LOG_ERROR("VFS: filesystem %.*s doesn't exists in manager.", int(fsname.length()), fsname.data());
+            LOG_ERROR("VFS: filesystem %s doesn't exists in manager.", std::string(fsname).c_str());
             return -ENOENT;
         }
         if (it->second->mount_count() > 0) {
-            LOG_ERROR("VFS: fileystem %.*s  is already used", int(fsname.length()), fsname.data());
+            LOG_ERROR("VFS: fileystem %s  is already used", std::string(fsname).c_str());
             return -EBUSY;
         }
         m_fstypes.erase(it);
@@ -57,28 +69,50 @@ namespace purefs::fs
     auto filesystem::mount(std::string_view dev_or_part,
                            std::string_view target,
                            std::string_view fs_type,
-                           unsigned flags) -> int
+                           unsigned flags,
+                           const void *data) -> int
     {
         // Sanity check input data
         if (target.size() <= 1 || target[0] != '/') {
-            LOG_ERROR("VFS: Invalid target mountpoint path %.*s", int(target.length()), target.data());
+            LOG_ERROR("VFS: Invalid target mountpoint path %s", std::string(target).c_str());
             return -EINVAL;
         }
+        if (flags & ~(mount_flags::remount | mount_flags::read_only)) {
+            LOG_ERROR("VFS: passed mount flags is not supported");
+            return -ENOTSUP;
+        }
         {
-            cpp_freertos::LockGuard _lock(m_lock);
+            cpp_freertos::LockGuard _lock(*m_lock);
             const auto mpi = m_mounts.find(std::string(target));
             if (mpi != std::end(m_mounts)) {
-                LOG_ERROR("VFS: mount point already exists %.*s", int(target.length()), target.data());
-                return -EBUSY;
+                if (flags & mount_flags::remount) {
+                    mpi->second->modify_flags(flags & ~mount_flags::remount);
+                    return {};
+                }
+                else {
+                    LOG_ERROR("VFS: mount point already exists %s", std::string(target).c_str());
+                    return -EBUSY;
+                }
             }
             const auto mpp = m_partitions.find(std::string(dev_or_part));
             if (mpp != std::end(m_partitions)) {
-                LOG_ERROR("VFS: partition already used %.*s", int(dev_or_part.length()), dev_or_part.data());
+                LOG_ERROR("VFS: partition already used %s", std::string(dev_or_part).c_str());
                 return -EBUSY;
             }
-            const auto vsi = m_fstypes.find(std::string(fs_type));
+            std::string filesystem_type;
+            if (fs_type.compare("auto") == 0) {
+                filesystem_type = autodetect_filesystem_type(std::string(dev_or_part));
+                if (filesystem_type.empty()) {
+                    LOG_ERROR("Unable to auto detect filesystem");
+                    return -ENODEV;
+                }
+            }
+            else {
+                filesystem_type = fs_type;
+            }
+            const auto vsi = m_fstypes.find(filesystem_type);
             if (vsi == std::end(m_fstypes)) {
-                LOG_ERROR("VFS: requested filesystem %.*s not registered", int(fs_type.length()), fs_type.data());
+                LOG_ERROR("VFS: requested filesystem %s not registered", std::string(fs_type).c_str());
                 return -ENODEV;
             }
             // Trying to open disk or part by manager
@@ -95,7 +129,7 @@ namespace purefs::fs
             }
             if (diskh) {
                 const auto mnt_point = vsi->second->mount_prealloc(diskh, target, flags);
-                const auto ret_mnt   = vsi->second->mount(mnt_point);
+                const auto ret_mnt   = vsi->second->mount(mnt_point, data);
                 if (!ret_mnt) {
                     m_mounts.emplace(std::make_pair(target, mnt_point));
                     m_partitions.emplace(dev_or_part);
@@ -105,7 +139,7 @@ namespace purefs::fs
                 }
             }
             else {
-                LOG_ERROR("Device or partition %.*s doesn't exists", int(dev_or_part.size()), dev_or_part.data());
+                LOG_ERROR("Device or partition %s doesn't exists", std::string(dev_or_part).c_str());
                 return -ENXIO;
             }
         }
@@ -114,7 +148,7 @@ namespace purefs::fs
 
     auto filesystem::umount(std::string_view mount_point) -> int
     {
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         auto mnti = m_mounts.find(std::string(mount_point));
         if (mnti == std::end(m_mounts)) {
             return -ENOENT;
@@ -138,7 +172,7 @@ namespace purefs::fs
 
     auto filesystem::read_mountpoints(std::list<std::string> &mountpoints) const -> int
     {
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         for (const auto &mntp : m_mounts) {
             mountpoints.push_back(mntp.first);
         }
@@ -150,7 +184,7 @@ namespace purefs::fs
     {
         size_t longest_match{};
         std::shared_ptr<internal::mount_point> mount_pnt;
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         for (const auto &mntp : m_mounts) {
             const auto slen = mntp.first.size();
             if ((slen < longest_match) || (slen > path.size())) {
@@ -215,7 +249,7 @@ namespace purefs::fs
 
     auto filesystem::add_filehandle(fsfile file) noexcept -> int
     {
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         return m_fds.insert(file) + first_file_descriptor;
     }
 
@@ -225,7 +259,7 @@ namespace purefs::fs
             return nullptr;
         }
         fds -= first_file_descriptor;
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         fsfile ret{};
         if (m_fds.exists(fds)) {
             ret = m_fds[fds];
@@ -241,11 +275,37 @@ namespace purefs::fs
             return ret;
         }
         fds -= first_file_descriptor;
-        cpp_freertos::LockGuard _lck(m_lock);
+        cpp_freertos::LockGuard _lck(*m_lock);
         if (m_fds.exists(fds)) {
             ret = m_fds[fds];
         }
         return ret;
     }
 
+    auto filesystem::autodetect_filesystem_type(std::string_view dev_or_part) const noexcept -> std::string
+    {
+        auto disk_mgr = m_diskmm.lock();
+        if (disk_mgr) {
+            auto part = disk_mgr->partition_info(dev_or_part);
+            if (part) {
+                for (auto &ptype : part_types_to_vfs) {
+                    if (ptype.first == part.value().type) {
+                        const auto ret = std::string(ptype.second);
+                        LOG_INFO("Autodetected filesystem type %s", ret.c_str());
+                        return ret;
+                    }
+                }
+                LOG_ERROR("Unable to detect filesystem type");
+                return {};
+            }
+            else {
+                LOG_ERROR("No partition on device");
+                return {};
+            }
+        }
+        else {
+            LOG_ERROR("VFS: Unable to lock device manager");
+            return {};
+        }
+    }
 } // namespace purefs::fs

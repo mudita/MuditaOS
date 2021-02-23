@@ -4,17 +4,17 @@
 #include <catch2/catch.hpp>
 
 #include "Interface/ContactRecord.hpp"
+#include <filesystem>
 #include <i18n/i18n.hpp>
-#include "vfs.hpp"
-#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Contact Record db tests")
 {
-    vfs.Init();
     Database::initialize();
 
-    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
-    std::filesystem::remove(contactsPath);
+    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    if (std::filesystem::exists(contactsPath)) {
+        REQUIRE(std::filesystem::remove(contactsPath));
+    }
 
     ContactsDB contactDB(contactsPath.c_str());
     REQUIRE(contactDB.isInitialized());
@@ -261,10 +261,11 @@ TEST_CASE("Test converting contact data to string")
 
 TEST_CASE("Contact record numbers update")
 {
-    vfs.Init();
     Database::initialize();
-    const auto contactsPath = purefs::dir::getUserDiskPath() / "contacts.db";
-    std::filesystem::remove(contactsPath);
+    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    if (std::filesystem::exists(contactsPath)) {
+        REQUIRE(std::filesystem::remove(contactsPath));
+    }
 
     ContactsDB contactDB(contactsPath.c_str());
     REQUIRE(contactDB.isInitialized());

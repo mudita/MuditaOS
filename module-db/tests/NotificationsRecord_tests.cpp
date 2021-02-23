@@ -11,7 +11,6 @@
 #include "module-db/queries/notifications/QueryNotificationsClear.hpp"
 #include "module-db/queries/notifications/QueryNotificationsGetAll.hpp"
 
-#include <vfs.hpp>
 #include <filesystem>
 
 #include <stdint.h>
@@ -19,15 +18,15 @@
 #include <string.h>
 #include <algorithm>
 #include <iostream>
-#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Notifications Record tests")
 {
-    vfs.Init();
     Database::initialize();
 
-    const auto notificationsPath = purefs::dir::getUserDiskPath() / "notifications.db";
-    std::filesystem::remove(notificationsPath);
+    const auto notificationsPath = (std::filesystem::path{"user"} / "notifications.db");
+    if (std::filesystem::exists(notificationsPath)) {
+        REQUIRE(std::filesystem::remove(notificationsPath));
+    }
 
     NotificationsDB notificationsDb{notificationsPath.c_str()};
 
@@ -54,8 +53,22 @@ TEST_CASE("Notifications Record tests")
         REQUIRE(testRec.value == 2);
     }
 
+    const auto notificationsCount = notificationsDb.notifications.count() + 1;
+    // clear notifications table
+    for (std::size_t id = 1; id <= notificationsCount; id++) {
+        REQUIRE(notificationsDb.notifications.removeById(id));
+    }
     NotificationsRecordInterface notificationsRecordInterface(&notificationsDb);
+    REQUIRE(notificationsRecordInterface.GetCount() == 0);
+    NotificationsTableRow callsRow{
+        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0};
 
+    REQUIRE(notificationsDb.notifications.add(callsRow));
+
+    NotificationsTableRow smsRow{
+        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0};
+
+    REQUIRE(notificationsDb.notifications.add(smsRow));
     NotificationsRecord testRec;
     auto numberOfNotifcations = notificationsRecordInterface.GetCount();
     REQUIRE(numberOfNotifcations == 2); // calls and sms notifications

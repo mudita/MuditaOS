@@ -5,29 +5,43 @@
 
 #include "Database/Database.hpp"
 #include "Databases/NotificationsDB.hpp"
-
+#include "Interface/NotificationsRecord.hpp"
 #include "Tables/NotificationsTable.hpp"
 
-#include <vfs.hpp>
 #include <stdint.h>
 #include <string>
 #include <algorithm>
 #include <iostream>
 #include <filesystem>
-#include <purefs/filesystem_paths.hpp>
 
 TEST_CASE("Notifications Table tests")
 {
-    vfs.Init();
     Database::initialize();
 
-    const auto notificationsPath = purefs::dir::getUserDiskPath() / "notifications.db";
-    std::filesystem::remove(notificationsPath);
+    const auto notificationsPath = (std::filesystem::path{"user"} / "notifications.db");
+    if (std::filesystem::exists(notificationsPath)) {
+        REQUIRE(std::filesystem::remove(notificationsPath));
+    }
 
     NotificationsDB notificationsDb{notificationsPath.c_str()};
     REQUIRE(notificationsDb.isInitialized());
 
     auto &notificationsTbl = notificationsDb.notifications;
+    const auto notificationsCount = notificationsTbl.count() + 1;
+    // clear notifications table
+    for (std::size_t id = 1; id <= notificationsCount; id++) {
+        REQUIRE(notificationsTbl.removeById(id));
+    }
+    REQUIRE(notificationsTbl.count() == 0);
+
+    NotificationsTableRow callsRow{
+        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Calls), .value = 0};
+    REQUIRE(notificationsTbl.add(callsRow));
+
+    NotificationsTableRow smsRow{
+        {.ID = DB_ID_NONE}, .key = static_cast<uint32_t>(NotificationsRecord::Key::Sms), .value = 0};
+    REQUIRE(notificationsTbl.add(smsRow));
+
     REQUIRE(notificationsTbl.count() == 2); // it already got some entries Calls(1) and Sms(2)
 
     SECTION("Default Constructor")
