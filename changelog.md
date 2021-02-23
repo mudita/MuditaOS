@@ -7,6 +7,7 @@
 * Add charger temperature cutoff.
 * Add onboarding application.
 * Add signal strength bar indicator.
+* Add phone personalisation data validator.
 
 ### Changed
 
