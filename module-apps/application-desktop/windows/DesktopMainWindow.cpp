@@ -112,6 +112,15 @@ namespace gui
             }
             setActiveState(app);
 
+            auto osUpdateVer  = getAppDesktop()->getOsUpdateVersion();
+            auto osCurrentVer = getAppDesktop()->getOsCurrentVersion();
+
+            if (osUpdateVer == osCurrentVer && osUpdateVer != updateos::initSysVer &&
+                osCurrentVer != updateos::initSysVer) {
+                application->switchWindow(app::window::name::desktop_post_update_window);
+                getAppDesktop()->setOsUpdateVersion(updateos::initSysVer);
+            }
+
             if (app->need_sim_select && Store::GSM::get()->sim == Store::GSM::SIM::SIM_UNKNOWN) {
                 app::manager::Controller::sendAction(application, app::manager::actions::SelectSimCard);
             }

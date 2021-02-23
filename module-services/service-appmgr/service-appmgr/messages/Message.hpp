@@ -20,3 +20,4 @@
 #include "GetCurrentDisplayLanguageResponse.hpp"
 #include "DateAndTimeChangeRequest.hpp"
 #include "UpdateInProgress.hpp"
+#include "SetOsUpdateVersion.hpp"

@@ -91,6 +91,7 @@
   "app_desktop_tools_antenna": "ANTENNA TEST",
   "app_desktop_poweroff_title": "Turn Off",
   "app_desktop_poweroff_question": "Select Yes to power down",
+  "app_desktop_update_success": "MuditaOS has been updated succesfully.",
   "app_call_call": "CALL",
   "app_call_clear": "CLEAR",
   "app_call_reject": "REJECT",

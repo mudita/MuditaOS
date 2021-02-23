@@ -155,6 +155,7 @@ namespace app
         void setVoLTEOn(bool value) override;
         bool getVoLTEOn() const noexcept override;
         void volteChanged(const std::string &value);
+        void setOsUpdateVersion(const std::string &value);
         [[nodiscard]] auto getLockPassHash() const noexcept -> unsigned int
         {
             return lockPassHash;
