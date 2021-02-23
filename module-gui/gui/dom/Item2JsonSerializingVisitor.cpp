@@ -9,6 +9,7 @@
 #include "Window.hpp"
 #include "BottomBar.hpp"
 #include "TopBar.hpp"
+#include "ListItem.hpp"
 
 #include "ItemDataNames.hpp"
 #include <module-utils/magic_enum/include/magic_enum.hpp>
@@ -91,6 +92,14 @@ void Item2JsonSerializingVisitor::visit(gui::top_bar::TopBar &item)
         itemName = magic_enum::enum_name(visitor::Names::TopBar);
     }
     visit(static_cast<gui::Item &>(item));
+}
+
+void Item2JsonSerializingVisitor::visit(gui::ListItem &item)
+{
+    if (itemName.empty()) {
+        itemName = magic_enum::enum_name(visitor::Names::ListItem);
+    }
+    visit(static_cast<gui::Rect &>(item));
 }
 
 auto Item2JsonSerializingVisitor::serialize(gui::BoundingBox &box) -> json11::Json::array
