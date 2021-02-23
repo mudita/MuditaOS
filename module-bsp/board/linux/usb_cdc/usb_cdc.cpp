@@ -6,6 +6,9 @@
 #include <fcntl.h>
 #include <fstream>
 #include <string>
+#include <sys/inotify.h>
+#include <array>
+#include <limits.h>
 
 #ifndef DEUBG_USB
 #undef LOG_PRINTF
@@ -29,8 +32,11 @@
 namespace bsp
 {
     int fd;
+    int fdNofity;
     xQueueHandle USBReceiveQueue;
+    xQueueHandle USBIrqQueue;
     constexpr auto ptsFileName = "/tmp/purephone_pts_name";
+    char *pts_name             = NULL;
 
 #if USBCDC_ECHO_ENABLED
     bool usbCdcEchoEnabled = false;
@@ -47,12 +53,32 @@ namespace bsp
         usbCDCReceive(ptr);
     }
 
+    void checkUsbStatus()
+    {
+        char eventsBuff[((sizeof(inotify_event) + NAME_MAX + 1))];
+        int len = read(fdNofity, eventsBuff, ((sizeof(inotify_event) + NAME_MAX + 1)));
+        if (len > 0) {
+            const inotify_event *event = (inotify_event *)&eventsBuff[0];
+            if (event->mask & IN_OPEN) {
+                USBDeviceStatus notification = USBDeviceStatus::Connected;
+                xQueueSend(USBIrqQueue, &notification, 0);
+            }
+            if (event->mask & IN_CLOSE_WRITE) {
+                USBDeviceStatus notification = USBDeviceStatus::Disconnected;
+                xQueueSend(USBIrqQueue, &notification, 0);
+            }
+        }
+    }
+
     int usbCDCReceive(void *)
     {
         LOG_INFO("[ServiceDesktop:BSP_Driver] Start reading on fd:%d", fd);
         char inputData[SERIAL_BUFFER_LEN];
 
         while (1) {
+
+            checkUsbStatus();
+
             if (uxQueueSpacesAvailable(USBReceiveQueue) != 0) {
                 memset(inputData, 0, SERIAL_BUFFER_LEN);
 
@@ -124,7 +150,7 @@ namespace bsp
         std::remove(ptsFileName);
     }
 
-    int usbInit(xQueueHandle receiveQueue, USBDeviceListener *)
+    int usbInit(xQueueHandle receiveQueue, xQueueHandle irqQueue, USBDeviceListener *)
     {
 
         fd = 0;
@@ -137,11 +163,14 @@ namespace bsp
         grantpt(fd);
         unlockpt(fd);
 
-        char *pts_name = ptsname(fd);
+        pts_name = ptsname(fd);
         if (pts_name == nullptr) {
             LOG_ERROR("bsp::usbInit ptsname returned NULL, no pseudo terminal allocated");
             return -1;
         }
+
+        fdNofity = inotify_init1(O_NONBLOCK);
+        inotify_add_watch(fdNofity, pts_name, IN_OPEN | IN_CLOSE_WRITE);
 
         writePtsToFile(pts_name);
         LOG_INFO("bsp::usbInit linux ptsname: %s", pts_name);
@@ -165,6 +194,7 @@ namespace bsp
 
         xTaskHandle taskHandleReceive;
         USBReceiveQueue = receiveQueue;
+        USBIrqQueue     = irqQueue;
 
         BaseType_t task_error = xTaskCreate(&bsp::usbDeviceTask,
                                             "USBLinuxReceive",

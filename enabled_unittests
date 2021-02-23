@@ -225,6 +225,7 @@ TESTS_LIST["catch2-service-desktop"]="
     DB Helpers test - json encoding (messages);
     Context class test;
     Endpoint Factory test;
+    Secured Endpoint Factory test;
 "
 #---------
 TESTS_LIST["catch2-service-desktop-endpoint-contacts"]="

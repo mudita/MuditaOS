@@ -20,9 +20,9 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('gs_input_language', 'English'),
     ('gs_eula_accepted', '0'),
     ('gs_onboarding_done', '0'),
+    ('gs_usb_security', '1');
     ('bt_state', '0'),
     ('bt_device_visibility', '0'),
     ('bt_device_name', 'PurePhone'),
     ('bt_bonded_devices', ''),
     ('battery_critical_level', '0');
-

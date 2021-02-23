@@ -5,6 +5,7 @@
 
 #include "Context.hpp"
 #include <parser/ParserUtils.hpp>
+#include <parser/MessageHandler.hpp>
 
 #include <json/json11.hpp>
 #include <Common/Query.hpp>
@@ -17,10 +18,9 @@ namespace parserFSM
 
     class Endpoint
     {
-
       public:
         Endpoint(sys::Service *_ownerServicePtr) : ownerServicePtr(_ownerServicePtr){};
-        virtual ~Endpoint()                           = default;
+        virtual ~Endpoint()                                      = default;
         virtual auto handle(parserFSM::Context &context) -> void = 0;
         auto c_str() -> const char *
         {
@@ -30,6 +30,21 @@ namespace parserFSM
       protected:
         std::string debugName         = "";
         sys::Service *ownerServicePtr = nullptr;
+    };
+
+    class SecuredEndpoint : public Endpoint
+    {
+      public:
+        explicit SecuredEndpoint(sys::Service *ownerServicePtr) : Endpoint(ownerServicePtr)
+        {}
+        ~SecuredEndpoint() = default;
+
+        auto handle(Context &context) -> void override
+        {
+            context.setResponseStatus(http::Code::Forbidden);
+            MessageHandler::putToSendQueue(context.createSimpleResponse());
+            LOG_INFO("Endpoint #%d secured", static_cast<int>(context.getEndpoint()));
+        }
     };
 
 } // namespace parserFSM

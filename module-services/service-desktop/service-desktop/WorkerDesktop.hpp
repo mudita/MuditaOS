@@ -1,10 +1,8 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <string.h>
-#include <stdio.h>
 #include <filesystem>
 #include <atomic>
 #include "Service/Message.hpp"
@@ -12,6 +10,7 @@
 #include "Service/Worker.hpp"
 #include "Service/Timer.hpp"
 #include "parser/ParserFSM.hpp"
+#include "endpoints/EndpointFactory.hpp"
 #include "bsp/usb/usb.hpp"
 
 class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
@@ -26,6 +25,7 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     {
         CancelTransfer,
     };
+
     WorkerDesktop(sys::Service *ownerServicePtr);
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
@@ -48,6 +48,21 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     void rawDataReceived(void *dataPtr, uint32_t dataLen) override;
     bool getRawMode() const noexcept override;
 
+    void setEndpointSecurity(EndpointSecurity security)
+    {
+        endpointSecurity = security;
+    }
+
+    void enableEndpointSecurity(bool enable)
+    {
+        endpointSecurityEnabled = enable;
+    }
+
+    bool isEndpointSecurityEnabled()
+    {
+        return endpointSecurityEnabled;
+    }
+
   private:
     void uploadFileFailedResponse();
 
@@ -60,9 +75,12 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     bool stateChangeWait();
 
     xQueueHandle receiveQueue;
+    xQueueHandle irqQueue;
     FILE *fileDes                  = nullptr;
     uint32_t writeFileSizeExpected = 0;
     uint32_t writeFileDataWritten  = 0;
     std::filesystem::path filePath;
     std::atomic<bool> rawModeEnabled = false;
+    bool endpointSecurityEnabled     = true;
+    EndpointSecurity endpointSecurity;
 };

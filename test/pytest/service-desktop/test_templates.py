@@ -5,6 +5,7 @@ from harness.interface.defs import status
 
 
 @pytest.mark.service_desktop_test
+@pytest.mark.usefixtures("usb_unlocked")
 def test_templates(harness):
     # getting the templates count
     body = {"category": "template", "count": True}

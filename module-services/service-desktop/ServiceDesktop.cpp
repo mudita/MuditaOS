@@ -23,6 +23,8 @@
 
 #include <cinttypes>
 #include <filesystem>
+#include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
 #include <purefs/filesystem_paths.hpp>
 #include <sys/mount.h>
@@ -69,10 +71,11 @@ ServiceDesktop::~ServiceDesktop()
 
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
-    desktopWorker  = std::make_unique<WorkerDesktop>(this);
-    const bool ret = desktopWorker->init(
-        {{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
-         {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size}});
+    desktopWorker = std::make_unique<WorkerDesktop>(this);
+    const bool ret =
+        desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
+                             {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size},
+                             {sdesktop::IRQ_QUEUE_BUFFER_NAME, 1, sdesktop::irq_queue_object_size}});
 
     if (ret == false) {
         LOG_ERROR("!!! service-desktop InitHandler failed to initialize worker, service-desktop won't work");
@@ -183,8 +186,44 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
+    connect(sdesktop::usb::USBConnected(), [&](sys::Message *msg) {
+        if (!desktopWorker->isEndpointSecurityEnabled()) {
+            LOG_INFO("Endpoint security disabled.");
+            return std::make_shared<sys::ResponseMessage>();
+        }
+
+        LOG_INFO("USB connected with endpoint security enabled. Requesting passcode.");
+        desktopWorker->setEndpointSecurity(EndpointSecurity::Block);
+        bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(),
+                        app::manager::ApplicationManager::ServiceName);
+
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sdesktop::usb::USBDisconnected(), [&](sys::Message *msg) {
+        bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(),
+                        app::manager::ApplicationManager::ServiceName);
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sdesktop::passcode::ScreenPasscodeUnlocked(), [&](sys::Message *msg) {
+        LOG_INFO("Passcode accepted. Enabling secured endpoints.");
+        desktopWorker->setEndpointSecurity(EndpointSecurity::Allow);
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
     settings->registerValueChange(updateos::settings::history,
                                   [this](const std::string &value) { updateOS->setInitialHistory(value); });
+
+    settings->registerValueChange(
+        ::settings::SystemProperties::usbSecurity,
+        [this](std::string value) {
+            bool securityEnabled = utils::getNumericValue<bool>(value);
+            LOG_INFO("Setting endpoint security: %d", securityEnabled);
+            desktopWorker->enableEndpointSecurity(securityEnabled);
+            desktopWorker->setEndpointSecurity(securityEnabled ? EndpointSecurity::Block : EndpointSecurity::Allow);
+        },
+        settings::SettingsScope::Global);
 
     return (sys::ReturnCodes::Success);
 }

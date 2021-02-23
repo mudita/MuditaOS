@@ -130,6 +130,22 @@ class CDCSerial:
         ret = self.write(self.__wrap_message(body))
         return ret["body"]["isLocked"]
 
+    def usb_lock(self):
+        body = {
+            "usbSecurity": "usbLock"
+        }
+
+        ret = self.write(self.__wrap_message(body))
+        return ret["status"]
+
+    def usb_unlock(self):
+        body = {
+            "usbSecurity": "usbUnlock"
+        }
+
+        ret = self.write(self.__wrap_message(body))
+        return ret["status"]
+
     @staticmethod
     def find_Pures() -> str:
         '''

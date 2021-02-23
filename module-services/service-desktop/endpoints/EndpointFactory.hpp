@@ -23,7 +23,8 @@
 class EndpointFactory
 {
   public:
-    static auto create(parserFSM::Context &context, sys::Service *ownerServicePtr)
+    virtual ~EndpointFactory() = default;
+    virtual auto create(parserFSM::Context &context, sys::Service *ownerServicePtr)
         -> std::unique_ptr<parserFSM::Endpoint>
     {
         LOG_DEBUG("Creating endpoint: %d", static_cast<int>(context.getEndpoint()));
@@ -56,4 +57,38 @@ class EndpointFactory
             return nullptr;
         }
     }
+};
+
+enum class EndpointSecurity
+{
+    Allow = 0,
+    Block = 1
+};
+
+class SecuredEndpointFactory : public EndpointFactory
+{
+    static constexpr auto Whitelist = {parserFSM::EndpointType::developerMode};
+
+  public:
+    explicit SecuredEndpointFactory(EndpointSecurity security) : endpointSecurity(security)
+    {}
+
+    auto create(parserFSM::Context &context, sys::Service *ownerServicePtr)
+        -> std::unique_ptr<parserFSM::Endpoint> override
+    {
+        auto security = endpointSecurity;
+        if (std::find(Whitelist.begin(), Whitelist.end(), context.getEndpoint()) != Whitelist.end()) {
+            security = EndpointSecurity::Allow;
+        }
+
+        switch (security) {
+        case EndpointSecurity::Allow:
+            return EndpointFactory::create(context, ownerServicePtr);
+        default:
+            return std::make_unique<parserFSM::SecuredEndpoint>(ownerServicePtr);
+        }
+    }
+
+  private:
+    EndpointSecurity endpointSecurity;
 };
