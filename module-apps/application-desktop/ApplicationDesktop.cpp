@@ -13,6 +13,7 @@
 #include "windows/Reboot.hpp"
 #include "windows/Update.hpp"
 #include "windows/UpdateProgress.hpp"
+#include "windows/PostUpdateWindow.hpp"
 #include "windows/MmiPullWindow.hpp"
 #include "windows/MmiPushWindow.hpp"
 #include "windows/MmiInternalMsgWindow.hpp"
@@ -348,6 +349,16 @@ namespace app
             [this](std::string value) { lockPassHashChanged(value); },
             settings::SettingsScope::Global);
 
+        settings->registerValueChange(
+            settings::SystemProperties::osCurrentVersion,
+            [this](std::string value) { osCurrentVersionChanged(std::move(value)); },
+            settings::SettingsScope::Global);
+
+        settings->registerValueChange(
+            settings::SystemProperties::osUpdateVersion,
+            [this](std::string value) { osUpdateVersionChanged(std::move(value)); },
+            settings::SettingsScope::Global);
+
         return sys::ReturnCodes::Success;
     }
 
@@ -387,6 +398,9 @@ namespace app
         });
         windowsFactory.attach(desktop_update_progress, [](Application *app, const std::string newname) {
             return std::make_unique<gui::UpdateProgressWindow>(app);
+        });
+        windowsFactory.attach(desktop_post_update_window, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::PostUpdateWindow>(app);
         });
         windowsFactory.attach(desktop_mmi_pull, [](Application *app, const std::string newname) {
             return std::make_unique<gui::MmiPullWindow>(app, desktop_mmi_pull);
@@ -437,4 +451,31 @@ namespace app
         }
     }
 
+    void ApplicationDesktop::osUpdateVersionChanged(const std::string &value)
+    {
+        LOG_DEBUG("[ApplicationDesktop::osUpdateVersionChanged] value=%s", value.c_str());
+        if (value.empty()) {
+            return;
+        }
+        osUpdateVersion = value;
+    }
+
+    void ApplicationDesktop::osCurrentVersionChanged(const std::string &value)
+    {
+        LOG_DEBUG("[ApplicationDesktop::osCurrentVersionChanged] value=%s", value.c_str());
+        if (value.empty()) {
+            return;
+        }
+        osCurrentVersion = std::move(value);
+    }
+    void ApplicationDesktop::setOsUpdateVersion(const std::string &value)
+    {
+        LOG_DEBUG("[ApplicationDesktop::setOsUpdateVersion] value=%s", value.c_str());
+        if (value.empty()) {
+            return;
+        }
+        osUpdateVersion = value;
+        settings->setValue(
+            settings::SystemProperties::osUpdateVersion, std::move(value), settings::SettingsScope::Global);
+    }
 } // namespace app

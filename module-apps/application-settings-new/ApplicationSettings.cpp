@@ -490,6 +490,12 @@ namespace app
         }
     }
 
+    void ApplicationSettingsNew::setOsUpdateVersion(const std::string &value)
+    {
+        LOG_DEBUG("[ApplicationSettingsNew::setOsUpdateVersion] to value=%s", value.c_str());
+        settings->setValue(::settings::SystemProperties::osUpdateVersion, value, ::settings::SettingsScope::Global);
+    }
+
     void ApplicationSettingsNew::setLockPassHash(unsigned int value)
     {
         lockPassHash = value;

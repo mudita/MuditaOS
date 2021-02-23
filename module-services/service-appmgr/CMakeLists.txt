@@ -26,7 +26,7 @@ set(SOURCES
     messages/SwitchRequest.cpp
     messages/UpdateInProgress.cpp
     messages/DOMRequest.cpp
-)
+    messages/SetOsUpdateVersion.cpp)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 

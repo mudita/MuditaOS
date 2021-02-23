@@ -19,6 +19,8 @@ namespace settings
         constexpr inline auto timeFormat               = "gs_time_format";
         constexpr inline auto dateFormat               = "gs_date_format";
         constexpr inline auto eulaAccepted             = "gs_eula_accepted";
+        constexpr inline auto osCurrentVersion         = "gs_os_current_version";
+        constexpr inline auto osUpdateVersion          = "gs_os_update_version";
     } // namespace SystemProperties
     namespace Bluetooth
     {

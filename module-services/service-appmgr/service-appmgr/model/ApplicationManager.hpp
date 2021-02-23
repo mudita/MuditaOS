@@ -133,6 +133,7 @@ namespace app::manager
         auto handleAutomaticTimeZoneChange(AutomaticTimeZoneIsOnChangeRequest *msg) -> bool;
         auto handleTimeFormatChange(TimeFormatChangeRequest *msg) -> bool;
         auto handleDateFormatChange(DateFormatChangeRequest *msg) -> bool;
+        auto handleSetOsUpdateVersionChange(SetOsUpdateVersion *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
         auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         /// handles dom request by passing this request to application which should provide the dom

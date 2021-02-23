@@ -301,6 +301,11 @@ namespace app::manager
             closeApplicationsOnUpdate();
             return msgHandled();
         });
+        connect(typeid(SetOsUpdateVersion), [this](sys::Message *request) {
+            auto msg = static_cast<SetOsUpdateVersion *>(request);
+            handleSetOsUpdateVersionChange(msg);
+            return msgHandled();
+        });
 
         connect(typeid(app::manager::DOMRequest), [&](sys::Message *request) { return handleDOMRequest(request); });
 
@@ -714,6 +719,17 @@ namespace app::manager
         return true;
     }
 
+    auto ApplicationManager::handleSetOsUpdateVersionChange(SetOsUpdateVersion *msg) -> bool
+    {
+        LOG_DEBUG("[ApplicationManager::handleSetOsUpdateVersionChange] value ....");
+        settings->setValue(
+            settings::SystemProperties::osUpdateVersion, msg->osUpdateVer, settings::SettingsScope::Global);
+
+        settings->setValue(
+            settings::SystemProperties::osCurrentVersion, msg->osCurrentVer, settings::SettingsScope::Global);
+        return true;
+    }
+
     void ApplicationManager::rebuildActiveApplications()
     {
         for (const auto &app : getApplications()) {
@@ -890,4 +906,5 @@ namespace app::manager
         }
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
     }
+
 } // namespace app::manager
