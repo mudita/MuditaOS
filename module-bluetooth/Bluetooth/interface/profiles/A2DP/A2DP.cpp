@@ -338,7 +338,7 @@ namespace bluetooth
                 return;
             }
             AVRCP::mediaTracker.remote_seid =
-                a2dp_subevent_signaling_media_codec_sbc_configuration_get_acp_seid(packet);
+                a2dp_subevent_signaling_media_codec_sbc_configuration_get_remote_seid(packet);
 
             AVDTP::sbcConfig.reconfigure =
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_reconfigure(packet);
@@ -346,43 +346,40 @@ namespace bluetooth
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_num_channels(packet);
             AVDTP::sbcConfig.samplingFrequency =
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_sampling_frequency(packet);
-            AVDTP::sbcConfig.channelMode =
-                a2dp_subevent_signaling_media_codec_sbc_configuration_get_channel_mode(packet);
             AVDTP::sbcConfig.blockLength =
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_block_length(packet);
             AVDTP::sbcConfig.subbands = a2dp_subevent_signaling_media_codec_sbc_configuration_get_subbands(packet);
-            AVDTP::sbcConfig.allocationMethod =
-                a2dp_subevent_signaling_media_codec_sbc_configuration_get_allocation_method(packet);
             AVDTP::sbcConfig.minBitpoolValue =
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_min_bitpool_value(packet);
             AVDTP::sbcConfig.maxBitpoolValue =
                 a2dp_subevent_signaling_media_codec_sbc_configuration_get_max_bitpool_value(packet);
-            AVDTP::sbcConfig.framesPerBuffer = AVDTP::sbcConfig.subbands * AVDTP::sbcConfig.blockLength;
-            LOG_INFO(
-                "A2DP Source: Received SBC codec configuration, sampling frequency %u, a2dp_cid 0x%02x, local seid %d "
-                "(expected %d), remote seid %d .\n",
-                AVDTP::sbcConfig.samplingFrequency,
-                cid,
-                a2dp_subevent_signaling_media_codec_sbc_configuration_get_int_seid(packet),
-                AVRCP::mediaTracker.local_seid,
-                AVRCP::mediaTracker.remote_seid);
+            LOG_INFO("A2DP Source: Received SBC codec configuration, sampling frequency %u, a2dp_cid 0x%02x, local "
+                     "seid 0x%02x, remote seid 0x%02x.\n",
+                     AVDTP::sbcConfig.samplingFrequency,
+                     cid,
+                     AVRCP::mediaTracker.local_seid,
+                     AVRCP::mediaTracker.remote_seid);
 
             // Adapt Bluetooth spec definition to SBC Encoder expected input
-            AVDTP::sbcConfig.allocationMethod -= 1;
+            auto allocation_method =
+                a2dp_subevent_signaling_media_codec_sbc_configuration_get_allocation_method(packet);
+            AVDTP::sbcConfig.allocationMethod = static_cast<btstack_sbc_allocation_method_t>(allocation_method - 1);
+            auto channel_mode                 = static_cast<avdtp_channel_mode_t>(
+                a2dp_subevent_signaling_media_codec_sbc_configuration_get_channel_mode(packet));
+
             AVDTP::sbcConfig.numChannels = 2;
-            switch (AVDTP::sbcConfig.channelMode) {
-            case AVDTP_SBC_JOINT_STEREO:
-                AVDTP::sbcConfig.channelMode = 3;
+            switch (channel_mode) {
+            case AVDTP_CHANNEL_MODE_JOINT_STEREO:
+                AVDTP::sbcConfig.channelMode = SBC_CHANNEL_MODE_JOINT_STEREO;
                 break;
-            case AVDTP_SBC_STEREO:
-                AVDTP::sbcConfig.channelMode = 2;
+            case AVDTP_CHANNEL_MODE_STEREO:
+                AVDTP::sbcConfig.channelMode = SBC_CHANNEL_MODE_STEREO;
                 break;
-            case AVDTP_SBC_DUAL_CHANNEL:
-                AVDTP::sbcConfig.channelMode = 1;
+            case AVDTP_CHANNEL_MODE_DUAL_CHANNEL:
+                AVDTP::sbcConfig.channelMode = SBC_CHANNEL_MODE_DUAL_CHANNEL;
                 break;
-            case AVDTP_SBC_MONO:
-                AVDTP::sbcConfig.channelMode = 0;
-                AVDTP::sbcConfig.numChannels = 1;
+            case AVDTP_CHANNEL_MODE_MONO:
+                AVDTP::sbcConfig.channelMode = SBC_CHANNEL_MODE_MONO;
                 break;
             }
             AVDTP::dumpSbcConfiguration();
@@ -565,7 +562,7 @@ namespace bluetooth
     void A2DP::A2DPImpl::start()
     {
         LOG_INFO("Starting playback to %s", bd_addr_to_str(deviceAddr));
-        a2dp_source_establish_stream(deviceAddr, AVRCP::mediaTracker.local_seid, &AVRCP::mediaTracker.a2dp_cid);
+        a2dp_source_establish_stream(deviceAddr, &AVRCP::mediaTracker.a2dp_cid);
     }
 
     void A2DP::A2DPImpl::stop()
