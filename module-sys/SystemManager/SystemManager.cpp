@@ -173,14 +173,27 @@ namespace sys
         s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), service::name::system_manager);
         return true;
     }
-    bool SystemManager::Update(Service *s)
+    bool SystemManager::Update(Service *s, const std::string &updateOSVer, std::string &currentOSVer)
     {
+        // set update OS version (and also current os version) in Settings
+        storeOsVersion(s, updateOSVer, currentOSVer);
+
+        // close some services
         s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Update), service::name::system_manager);
 
-        auto msg = std::make_shared<app::manager::UpdateInProgress>(service::name::system_manager);
-        s->bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+        // close some applications
+        auto msgCloseApplications = std::make_shared<app::manager::UpdateInProgress>(service::name::system_manager);
+        s->bus.sendUnicast(std::move(msgCloseApplications), app::manager::ApplicationManager::ServiceName);
 
         return true;
+    }
+
+    void SystemManager::storeOsVersion(Service *s, const std::string &updateOSVer, const std::string &currentOSVer)
+    {
+        // store OS version in Settings
+        auto msgSetUpdateVersion = std::make_shared<app::manager::SetOsUpdateVersion>(
+            service::name::system_manager, updateOSVer, currentOSVer);
+        s->bus.sendUnicast(std::move(msgSetUpdateVersion), app::manager::ApplicationManager::ServiceName);
     }
 
     bool SystemManager::Reboot(Service *s)

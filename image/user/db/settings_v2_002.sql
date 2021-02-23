@@ -21,8 +21,11 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('gs_eula_accepted', '0'),
     ('gs_onboarding_done', '0'),
     ('gs_usb_security', '1');
+    ('gs_os_update_version', '0.00.0'),
+    ('gs_os_current_version', '0.00.0'),
     ('bt_state', '0'),
     ('bt_device_visibility', '0'),
     ('bt_device_name', 'PurePhone'),
     ('bt_bonded_devices', ''),
     ('battery_critical_level', '0');
+

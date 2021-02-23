@@ -19,6 +19,8 @@ class ServiceDesktop;
 namespace fs = std::filesystem;
 namespace updateos
 {
+    inline constexpr auto initSysVer = "0.00.0";
+
     namespace file
     {
         inline constexpr auto checksums = "checksums.txt";

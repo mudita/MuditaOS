@@ -85,12 +85,25 @@ namespace app
         {
             return lockPassHash;
         }
+        std::string getOsUpdateVersion() const
+        {
+            return osUpdateVersion;
+        }
+        std::string getOsCurrentVersion() const
+        {
+            return osCurrentVersion;
+        }
+        void setOsUpdateVersion(const std::string &value);
 
       private:
         void activeSimChanged(std::string value);
         void lockPassHashChanged(std::string value);
         void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);
         unsigned int lockPassHash = 0;
+        void osUpdateVersionChanged(const std::string &value);
+        void osCurrentVersionChanged(const std::string &value);
+        std::string osUpdateVersion{updateos::initSysVer};
+        std::string osCurrentVersion{updateos::initSysVer};
     };
 
     template <> struct ManifestTraits<ApplicationDesktop>

@@ -96,6 +96,11 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
 
     updateRunStatus.startTime   = utils::time::getCurrentTimestamp().getTime();
     updateRunStatus.fromVersion = bootConfig.to_json();
+    versionInformation          = UpdateMuditaOS::getVersionInfoFromFile(updateFile);
+
+    auto currentOSVersion = bootConfig.os_version();
+    auto updateOSVersion  = versionInformation[boot::json::os_version][boot::json::version_string].string_value();
+
     storeRunStatusInDB();
 
     updateos::UpdateError err =
@@ -142,7 +147,7 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
     // at this point we should set the system to update mode we are
     // writing directly to eMMC when updating the bootloader
     // then placing the new files in destination folders/files
-    sys::SystemManager::Update(owner);
+    sys::SystemManager::Update(owner, updateOSVersion, currentOSVersion);
 
     if ((err = updateBootloader()) == updateos::UpdateError::NoError) {
         informUpdate(status, "Update bootloader");
@@ -167,6 +172,8 @@ updateos::UpdateError UpdateMuditaOS::runUpdate()
 
     // reboot always
     sys::SystemManager::Reboot(owner);
+
+    sys::SystemManager::storeOsVersion(owner, updateOSVersion, updateOSVersion);
 
     return err;
 }
