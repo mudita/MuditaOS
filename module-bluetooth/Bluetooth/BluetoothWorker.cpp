@@ -48,7 +48,6 @@ namespace
 
         [[nodiscard]] auto operator()()
         {
-            bluetooth::KeyStorage::settings = settings;
             bluetooth::GAP::registerScan();
 
             auto settingsName = std::get<std::string>(settings->getValue(bluetooth::Settings::DeviceName));
