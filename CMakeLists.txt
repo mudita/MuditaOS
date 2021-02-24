@@ -312,7 +312,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         -DSRC_DIR=${CMAKE_SOURCE_DIR}
         -DECOBOOT_DOWNLOAD_LOG=${ECOBOOT_DOWNLOAD_LOG}
         -B ${CMAKE_BINARY_DIR}
-        -P ${CMAKE_SOURCE_DIR}/config/GenUpdateVersionJson.cmake
+        -P ${CMAKE_SOURCE_DIR}/cmake/modules/GenUpdateVersionJson.cmake
         DEPENDS ecoboot.bin ${ECOBOOT_DOWNLOAD_LOG}
         )
 
@@ -420,11 +420,20 @@ set(PACKAGE_STAGING_DIRECTORY ${CMAKE_BINARY_DIR}/_CPack_Packages/${CPACK_TOPLEV
 
 include(CPack)
 
-add_custom_target(package-standalone-staged
-    COMMAND ${CMAKE_CPACK_COMMAND}
-    -C $<CONFIGURATION>
-    --config ${CPACK_OUTPUT_CONFIG_FILE}
+if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    add_custom_target(package-standalone-staged
+        COMMAND ${CMAKE_CPACK_COMMAND}
+        -C $<CONFIGURATION>
+        --config ${CPACK_OUTPUT_CONFIG_FILE}
     )
+else()
+    add_custom_target(package-standalone-staged
+        COMMAND ${CMAKE_CPACK_COMMAND}
+        -C $<CONFIGURATION>
+        --config ${CPACK_OUTPUT_CONFIG_FILE}
+        DEPENDS ${BIN_FILE}-target ecoboot.bin version.json
+    )
+endif()
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     set(PACKAGE_STANDALONE_FILE_NAME ${PACKAGE_COMMON_NAME}-Standalone.zip)
@@ -433,12 +442,12 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         COMMAND ${CMAKE_CPACK_COMMAND}
         -C $<CONFIGURATION>
         --config ${CPACK_OUTPUT_CONFIG_FILE}
-        DEPENDS ecoboot.bin version.json
+        DEPENDS ${BIN_FILE}-target ecoboot.bin version.json
     )
     add_custom_target(package-standalone
         COMMAND zip -rq ${CMAKE_BINARY_DIR}/${PACKAGE_STANDALONE_FILE_NAME} "."
         WORKING_DIRECTORY ${PACKAGE_STAGING_DIRECTORY}/Standalone
-        DEPENDS ${ECOBOOT_FILE} package-standalone-staged  PurePhone
+        DEPENDS ${BIN_FILE}-target ${ECOBOOT_FILE} package-standalone-staged  PurePhone
         )
     set(UPDATE_STAGING_DIRECTORY ${PACKAGE_STAGING_DIRECTORY}/Update)
     add_custom_target(package-update-checksums
@@ -454,7 +463,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         COMMAND tar
         -cf ${CMAKE_BINARY_DIR}/${PACKAGE_UPDATE_FILE_NAME}
         -C ${PACKAGE_STAGING_DIRECTORY}/Update "."
-        DEPENDS ecoboot.bin version.json PurePhone package-update-staged package-update-checksums
+        DEPENDS  ecoboot.bin version.json PurePhone package-update-staged package-update-checksums 
         )
 elseif (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     set(PACKAGE_STANDALONE_FILE_NAME ${PACKAGE_COMMON_NAME}-Standalone.tar.gz)
