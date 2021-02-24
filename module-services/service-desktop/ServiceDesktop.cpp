@@ -30,17 +30,27 @@
 
 namespace
 {
-    auto RemountFS(bool readOnly = false, std::string path = std::string(purefs::dir::getRootDiskPath()))
+    bool RemountFS(bool readOnly = false, std::string path = std::string(purefs::dir::getRootDiskPath()))
     {
         struct statvfs stat;
-        if (auto ret = statvfs(path.c_str(), &stat))
-            return ret;
+        if (statvfs(path.c_str(), &stat)) {
+            LOG_ERROR("Failed reading statvfs!");
+            return false;
+        }
         auto flags = stat.f_flag;
-        if (readOnly)
+        if ((readOnly && (flags & MS_RDONLY)) || (!readOnly && !(flags & MS_RDONLY))) {
+            LOG_WARN("Filesystem is already mounted in requested mode!");
+            return false;
+        }
+        if (readOnly) {
+            LOG_INFO("Remounting filesystem RO");
             flags |= MS_RDONLY;
-        else
+        }
+        else {
+            LOG_INFO("Remounting filesystem R/W");
             flags &= ~MS_RDONLY;
-        return mount(NULL, path.c_str(), NULL, flags | MS_REMOUNT, NULL);
+        }
+        return !mount(NULL, path.c_str(), NULL, flags | MS_REMOUNT, NULL);
     }
 } // namespace
 
@@ -87,9 +97,10 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     connect(sdesktop::BackupMessage(), [&](sys::Message *msg) {
         sdesktop::BackupMessage *backupMessage = dynamic_cast<sdesktop::BackupMessage *>(msg);
         if (backupMessage != nullptr) {
-            RemountFS();
+            auto remounted = RemountFS();
             BackupRestore::BackupUserFiles(this);
-            RemountFS(true);
+            if (remounted)
+                RemountFS(true);
         }
         return std::make_shared<sys::ResponseMessage>();
     });
