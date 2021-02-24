@@ -36,15 +36,15 @@ class SettingsAgent : public DatabaseAgent
   private:
     settings::SettingsCache *cache;
     using MapOfRecipentsToBeNotified = std::map<std::string, std::set<settings::EntryPath>>;
-    MapOfRecipentsToBeNotified variableChangeRecipents;
+    MapOfRecipentsToBeNotified variableChangeRecipients;
     using SetOfRecipents = std::set<std::string>;
-    SetOfRecipents profileChangedRecipents;
-    SetOfRecipents modeChangeRecipents;
+    SetOfRecipents profileChangedRecipients;
+    SetOfRecipents modeChangeRecipients;
     // db operations
-    auto dbGetValue(settings::EntryPath path) -> std::optional<std::string>;
-    auto dbSetValue(settings::EntryPath path, std::string value) -> bool;
-    auto dbRegisterValueChange(settings::EntryPath path) -> bool;
-    auto dbUnregisterValueChange(settings::EntryPath path) -> bool;
+    auto dbGetValue(const settings::EntryPath &path) -> std::optional<std::string>;
+    auto dbSetValue(const settings::EntryPath &path, const std::string &value) -> bool;
+    auto dbRegisterValueChange(const settings::EntryPath &path) -> bool;
+    auto dbUnregisterValueChange(const settings::EntryPath &path) -> bool;
 
     auto dbRegisterOnProfileChange(const std::string &service) -> bool;
     auto dbUnregisterOnProfileChange(const std::string &service) -> bool;
