@@ -185,6 +185,7 @@ namespace parserFSM
     {
         inline constexpr std::size_t contactsPageSize = 10;
         inline constexpr std::size_t calendarEventsPageSize = 10;
+        inline constexpr std::size_t threadsPageSize        = 11;
     }
 
     class ContextFactory
@@ -198,8 +199,9 @@ namespace parserFSM
                 return std::make_unique<PagedContext>(js, endpoint_pageing::calendarEventsPageSize);
             // case EndpointType::calllog:
             case EndpointType::contacts:
-                // case EndpointType::messages:
                 return std::make_unique<PagedContext>(js, endpoint_pageing::contactsPageSize);
+            case EndpointType::messages:
+                return std::make_unique<PagedContext>(js, endpoint_pageing::threadsPageSize);
             default:
                 return std::make_unique<Context>(js);
             }

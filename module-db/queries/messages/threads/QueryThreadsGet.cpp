@@ -16,6 +16,15 @@ namespace db::query
         return "SMSThreadsGet";
     }
 
+    ThreadsGetWithTotalCount::ThreadsGetWithTotalCount(std::size_t offset, std::size_t limit)
+        : ThreadsGet(offset, limit)
+    {}
+
+    [[nodiscard]] auto ThreadsGetWithTotalCount::debugInfo() const -> std::string
+    {
+        return "ThreadsGetWithTotalCount";
+    }
+
     ThreadsGetResults::ThreadsGetResults(std::vector<ThreadRecord> result_rows) : results(std::move(result_rows))
     {}
 
@@ -27,5 +36,20 @@ namespace db::query
     [[nodiscard]] auto ThreadsGetResults::debugInfo() const -> std::string
     {
         return "SMSThreadsGetResults";
+    }
+
+    ThreadsGetResultsWithTotalCount::ThreadsGetResultsWithTotalCount(std::vector<ThreadRecord> records,
+                                                                     std::size_t totalCount)
+        : ThreadsGetResults(std::move(records)), totalCount(totalCount)
+    {}
+
+    auto ThreadsGetResultsWithTotalCount::getTotalCount() const noexcept -> std::size_t
+    {
+        return totalCount;
+    }
+
+    [[nodiscard]] auto ThreadsGetResultsWithTotalCount::debugInfo() const -> std::string
+    {
+        return "ThreadsGetResultsWithTotalCount";
     }
 } // namespace db::query
