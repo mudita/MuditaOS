@@ -206,7 +206,7 @@
   "app_desktop_info_mmi_disabling_success": "Tjänsten har kopplats bort",
   "app_desktop_info_mmi_enabling_failed": "Tjänstkoppling misslyckades",
   "app_desktop_info_mmi_enabling_success": "Tjänsten har slagits på",
-  "app_desktop_info_mmi_call_forwarding_disabled": "Vidarebefodring frånkopplat",
+  "app_desktop_info_mmi_call_forwarding_disabled": "Vidarebefordring frånkopplat",
   "app_desktop_info_mmi_call_barring_activated": "Samtalsblockering påslaget",
   "app_desktop_info_mmi_call_barring_deactivated": "Samtalblockering borttagen",
   "app_desktop_info_mmi_clip_activated": "Nummerpresentation påslagen",
