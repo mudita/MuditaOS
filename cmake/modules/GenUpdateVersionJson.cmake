@@ -2,7 +2,7 @@
 # and bootloader version information for update packages . It is meant to be run
 # at build time by running CMake as a target.
 
-list(APPEND CMAKE_MODULE_PATH "${SRC_DIR}/config")
+list(APPEND CMAKE_MODULE_PATH "${SRC_DIR}/cmake/modules")
 include(Version)
 
 set(BOOTLOADER_INCLUDED "true")
