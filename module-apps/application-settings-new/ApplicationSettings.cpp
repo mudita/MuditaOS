@@ -322,6 +322,9 @@ namespace app
         windowsFactory.attach(gui::window::name::change_date_and_time, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ChangeDateAndTimeWindow>(app);
         });
+        windowsFactory.attach(gui::window::name::dialog_retry, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogRetry>(app, name);
+        });
     }
 
     void ApplicationSettingsNew::destroyUserInterface()
