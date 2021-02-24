@@ -44,6 +44,7 @@ namespace gui
                 [=](gui::Item & /*unused*/) {
                     LOG_DEBUG("Device: %s", device.name.c_str());
                     bluetoothSettingsModel->setAddrForAudioProfiles(bd_addr_to_str(device.address));
+                    bluetoothSettingsModel->requestDevicePairing(bd_addr_to_str(device.address));
                     return true;
                 },
                 nullptr,
