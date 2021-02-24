@@ -75,3 +75,6 @@
 [submodule "module-utils/sml"]
 	path = module-utils/sml
 	url = https://github.com/boost-ext/sml
+[submodule "tools/misc"]
+	path = tools/misc
+	url = ../misc-tools.git
