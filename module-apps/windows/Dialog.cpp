@@ -168,3 +168,18 @@ void DialogYesNoIconTxt::onBeforeShow(ShowMode mode, SwitchData *data)
         setFocusItem(no);
     }
 }
+
+DialogRetry::DialogRetry(app::Application *app, const std::string &name) : Dialog(app, name)
+{
+    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::retry));
+    setFocusItem(bottomBar);
+}
+
+void DialogRetry::onBeforeShow(ShowMode mode, SwitchData *data)
+{
+    if (auto metadata = dynamic_cast<DialogMetadataMessage *>(data); metadata != nullptr) {
+        Dialog::onBeforeShow(mode, metadata);
+        auto foo                     = metadata->get().action;
+        bottomBar->activatedCallback = [foo](Item &) -> bool { return foo(); };
+    }
+}

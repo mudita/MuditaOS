@@ -23,6 +23,7 @@
   "common_stop": "STOP",
   "common_resume": "RESUME",
   "common_pause": "PAUSE",
+  "common_retry": "TRY AGAIN",
   "common_mo": "MO",
   "common_tu": "TU",
   "common_we": "WE",
