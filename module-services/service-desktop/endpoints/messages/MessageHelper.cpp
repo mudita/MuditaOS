@@ -531,40 +531,42 @@ namespace parserFSM
 
     auto MessageHelper::requestThread(Context &context) -> sys::ReturnCodes
     {
-        auto query = std::make_unique<db::query::ThreadsGet>(context.getBody()[json::messages::offset].int_value(),
-                                                             context.getBody()[json::messages::limit].is_number()
-                                                                 ? context.getBody()[json::messages::limit].int_value()
-                                                                 : defaultLimit);
+        try {
+            auto &ctx                = dynamic_cast<PagedContext &>(context);
+            const std::size_t limit  = ctx.getBody()[json::messages::limit].int_value();
+            const std::size_t offset = ctx.getBody()[json::messages::offset].int_value();
+            ctx.setRequestedLimit(limit);
+            ctx.setRequestedOffset(offset);
+            auto query =
+                std::make_unique<db::query::ThreadsGetWithTotalCount>(offset, std::min(ctx.getPageSize(), limit));
 
-        auto listener = std::make_unique<db::EndpointListener>(
-            [=](db::QueryResult *result, Context context) {
-                if (auto threadsResults = dynamic_cast<db::query::ThreadsGetResults *>(result)) {
-
-                    json11::Json::array threadsArray;
-                    for (const auto &record : threadsResults->getResults()) {
-                        threadsArray.emplace_back(MessageHelper::toJson(record));
+            auto listener = std::make_unique<db::EndpointListenerWithPages>(
+                [](db::QueryResult *result, PagedContext &context) {
+                    if (auto threadsResults = dynamic_cast<db::query::ThreadsGetResultsWithTotalCount *>(result)) {
+                        json11::Json::array threadsArray;
+                        auto theResults = threadsResults->getResults();
+                        threadsArray.reserve(theResults.size());
+                        for (auto &record : theResults) {
+                            threadsArray.emplace_back(MessageHelper::toJson(std::move(record)));
+                        }
+                        context.setResponseBody(std::move(threadsArray));
+                        context.setTotalCount(threadsResults->getTotalCount());
+                        MessageHandler::putToSendQueue(context.createSimpleResponse());
+                        return true;
                     }
+                    else {
+                        return false;
+                    }
+                },
+                ctx);
 
-                    auto responseBody = json11::Json::object{
-                        {json::messages::totalCount, 0},
-                        {json::messages::nextPage,
-                         json11::Json::object{{json::messages::offset, 0}, {json::messages::limit, 0}}},
-                        {json::messages::entries, threadsArray},
-                    };
-
-                    context.setResponseBody(responseBody);
-                    MessageHandler::putToSendQueue(context.createSimpleResponse());
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            },
-            context);
-
-        query->setQueryListener(std::move(listener));
-        DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSThread, std::move(query));
-
+            query->setQueryListener(std::move(listener));
+            DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSThread, std::move(query));
+        }
+        catch (const std::bad_cast &e) {
+            LOG_ERROR("%s", e.what());
+            return sys::ReturnCodes::Failure;
+        }
         return sys::ReturnCodes::Success;
     }
 

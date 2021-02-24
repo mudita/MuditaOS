@@ -175,6 +175,9 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::runQuery(std::shared_ptr
     else if (typeid(*query) == typeid(db::query::ThreadsGet)) {
         return threadsGetQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::ThreadsGetWithTotalCount)) {
+        return threadsGetQueryWithTotalCount(query);
+    }
     else if (typeid(*query) == typeid(db::query::ThreadsGetForList)) {
         return threadsGetForListQuery(query);
     }
@@ -231,14 +234,25 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::markAsReadQuery(const st
     return response;
 }
 
-std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadsGetQuery(const std::shared_ptr<db::Query> &query)
+std::vector<ThreadRecord> ThreadRecordInterface::getThreads(const std::shared_ptr<db::Query> &query)
 {
     const auto localQuery = static_cast<const db::query::ThreadsGet *>(query.get());
-
     auto dbResult = smsDB->threads.getLimitOffset(localQuery->offset, localQuery->limit);
-    auto records  = std::vector<ThreadRecord>(dbResult.begin(), dbResult.end());
+    return std::vector<ThreadRecord>(dbResult.begin(), dbResult.end());
+}
 
-    auto response = std::make_unique<db::query::ThreadsGetResults>(records);
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadsGetQuery(const std::shared_ptr<db::Query> &query)
+{
+    auto response = std::make_unique<db::query::ThreadsGetResults>(std::move(getThreads(query)));
+    response->setRequestQuery(query);
+    return response;
+}
+
+std::unique_ptr<db::QueryResult> ThreadRecordInterface::threadsGetQueryWithTotalCount(
+    const std::shared_ptr<db::Query> &query)
+{
+    auto count    = smsDB->threads.count();
+    auto response = std::make_unique<db::query::ThreadsGetResultsWithTotalCount>(std::move(getThreads(query)), count);
     response->setRequestQuery(query);
     return response;
 }
