@@ -244,7 +244,7 @@
   "app_desktop_screen_blocked_info": "Tyvärr, telefonen blockerad.",
   "app_desktop_press_to_unlock": "<text>Tryck <b>Lås upp</b> följt av <b>#</b></text>",
   "app_desktop_unread_messages": "<text>Olästa <b>meddelanden</b></text>",
-  "app_desktop_low_battery_notification": "<text>batterinivå lång - GSM av</text>",
+  "app_desktop_low_battery_notification": "<text>batterinivå låg - GSM av</text>",
   "app_desktop_missed_calls": "<text>Missade <b>samtal</b></text>",
   "app_desktop_menu_phone": "SAMTAL",
   "app_desktop_menu_contacts": "KONTAKTER",
