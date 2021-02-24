@@ -11,6 +11,7 @@
 namespace gui::window::name
 {
     inline constexpr auto dialog_confirm = "DialogConfirm";
+    inline constexpr auto dialog_retry   = "DialogRetry";
 }; // namespace gui::window::name
 
 namespace gui
@@ -66,6 +67,17 @@ namespace gui
 
       public:
         DialogYesNoIconTxt(app::Application *app, const std::string &name);
+
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+    };
+
+    /// @brief Retry Dialog class
+    ///
+    /// Contain same items as Dialog but instead of OK there is a TRY AGAIN button
+    class DialogRetry : public Dialog
+    {
+      public:
+        DialogRetry(app::Application *app, const std::string &name);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
