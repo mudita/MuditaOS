@@ -17,6 +17,7 @@
 #include "Audio/Audio.hpp"
 #include "Audio/Operation/Operation.hpp"
 
+using namespace audio;
 
 TEST_CASE("Test audio tags")
 {
@@ -75,6 +76,64 @@ TEST_CASE("Audio settings string creation")
                                        audio::PlaybackType::None,
                                        audio::Profile::Type::Idle);
         REQUIRE(str.empty());
+    }
+
+    SECTION("System settings change")
+    {
+        struct TestCase
+        {
+            PlaybackType playbackType;
+            Setting setting;
+            std::string path;
+        };
+
+        std::vector<TestCase> testCases = {
+            // system volume
+            {PlaybackType::System, Setting::Volume, "audio/Offline/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::Meditation, Setting::Volume, "audio/Offline/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::CallRingtone, Setting::Volume, "audio/Offline/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::KeypadSound, Setting::Volume, "audio/Offline/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::TextMessageRingtone,
+             Setting::Volume,
+             "audio/Offline/RecordingBuiltInMic/Notifications/Volume"},
+            {PlaybackType::Notifications, Setting::Volume, "audio/Offline/RecordingBuiltInMic/Notifications/Volume"},
+            // other types volume
+            {PlaybackType::Alarm, Setting::Volume, "audio/Offline/RecordingBuiltInMic/Alarm/Volume"},
+            {PlaybackType::Multimedia, Setting::Volume, "audio/Offline/RecordingBuiltInMic/Multimedia/Volume"},
+            {PlaybackType::None, Setting::Volume, "audio/Offline/RecordingBuiltInMic/Volume"},
+
+            // EnableSound
+            {PlaybackType::System, Setting::EnableSound, "audio/Offline/RecordingBuiltInMic/Notifications/EnableSound"},
+            {PlaybackType::Meditation,
+             Setting::EnableSound,
+             "audio/Offline/RecordingBuiltInMic/Meditation/EnableSound"},
+            {PlaybackType::CallRingtone,
+             Setting::EnableSound,
+             "audio/Offline/RecordingBuiltInMic/CallRingtone/EnableSound"},
+            {PlaybackType::KeypadSound,
+             Setting::EnableSound,
+             "audio/Offline/RecordingBuiltInMic/KeypadSound/EnableSound"},
+            {PlaybackType::TextMessageRingtone,
+             Setting::EnableSound,
+             "audio/Offline/RecordingBuiltInMic/TextMessageRingtone/EnableSound"},
+            {PlaybackType::Notifications,
+             Setting::EnableSound,
+             "audio/Offline/RecordingBuiltInMic/Notifications/EnableSound"},
+            {PlaybackType::Alarm, Setting::EnableSound, "audio/Offline/RecordingBuiltInMic/Alarm/EnableSound"},
+            {PlaybackType::Multimedia,
+             Setting::EnableSound,
+             "audio/Offline/RecordingBuiltInMic/Multimedia/EnableSound"},
+            {PlaybackType::None, Setting::EnableSound, "audio/Offline/RecordingBuiltInMic/EnableSound"},
+        };
+
+        for (auto &testCase : testCases) {
+            const auto str = audio::dbPath(sys::phone_modes::PhoneMode::Offline,
+                                           testCase.setting,
+                                           testCase.playbackType,
+                                           audio::Profile::Type::RecordingBuiltInMic);
+            REQUIRE_FALSE(str.empty());
+            REQUIRE(str == testCase.path);
+        }
     }
 }
 

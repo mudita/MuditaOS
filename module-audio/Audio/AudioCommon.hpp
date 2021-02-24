@@ -9,6 +9,7 @@
 #include <Service/Message.hpp>
 #include <PhoneModes/Common.hpp>
 #include <Utils.hpp>
+#include <PhoneModes/Common.hpp>
 
 #include <map>
 #include <bitset>
@@ -34,7 +35,9 @@ namespace audio
 
     inline constexpr auto audioOperationTimeout = 1000U;
 
-    inline constexpr auto audioDbPrefix = "audio/";
+    inline constexpr auto audioDbPrefix   = "audio";
+    inline constexpr auto systemDbPrefix  = "system";
+    inline constexpr auto dbPathSeparator = '/';
 
     enum class Setting
     {
@@ -49,6 +52,7 @@ namespace audio
         None,
         Multimedia,
         Notifications,
+        System = Notifications,
         KeypadSound,
         CallRingtone,
         TextMessageRingtone,
@@ -65,6 +69,8 @@ namespace audio
                                            const Setting &setting,
                                            const PlaybackType &playbackType,
                                            const Profile::Type &profileType);
+
+    [[nodiscard]] bool isSystemSound(const PlaybackType &playbackType) noexcept;
 
     enum class EventType
     {

@@ -92,10 +92,17 @@ class ServiceAudio : public sys::Service
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
     auto IsBusy() -> bool;
 
+    //! Setter for settings
+    //! \param setting Setting be controlled
+    //! \param value New value of setting
+    //! \param profileType Audio profile to be controlled
+    //! \param playbackType Playback type to be controlled
+    //! \note when profileType and playbackType are not set currently active sound will be controlled
     void setSetting(const audio::Setting &setting,
                     const std::string &value,
-                    const audio::Profile::Type &profileType,
-                    const audio::PlaybackType &playbackType);
+                    const audio::Profile::Type &profileType = audio::Profile::Type::Idle,
+                    const audio::PlaybackType &playbackType = audio::PlaybackType::None);
+
     [[nodiscard]] std::string getSetting(const audio::Setting &setting,
                                          const audio::Profile::Type &profileType,
                                          const audio::PlaybackType &playbackType);
