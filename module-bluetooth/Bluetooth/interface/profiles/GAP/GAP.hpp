@@ -40,7 +40,7 @@ namespace bluetooth
         static void processInquiryResult(std::uint8_t *packet, bd_addr_t &addr);
         static void processInquiryComplete();
         static void processNameRequestComplete(std::uint8_t *packet, bd_addr_t &addr);
-        static void processDedicatedBondingCompleted(std::uint8_t *packet);
+        static void processDedicatedBondingCompleted(std::uint8_t *packet, bd_addr_t &addr);
         static void initStateHandler(std::uint8_t eventType, std::uint8_t *packet);
 
       public:
