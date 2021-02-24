@@ -25,7 +25,8 @@ namespace bsp
     enum class USBDeviceStatus : uint32_t
     {
         Disconnected,
-        Connected
+        Connected,
+        Configured
     };
 
     class USBDeviceListener

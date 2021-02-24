@@ -187,7 +187,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sdesktop::usb::USBConnected(), [&](sys::Message *msg) {
+    connect(sdesktop::usb::USBConfigured(), [&](sys::Message *msg) {
         if (!desktopWorker->isEndpointSecurityEnabled()) {
             LOG_INFO("Endpoint security disabled.");
             return std::make_shared<sys::ResponseMessage>();
