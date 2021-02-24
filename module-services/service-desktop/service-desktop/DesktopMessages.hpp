@@ -81,6 +81,14 @@ namespace sdesktop
             ~USBConnected() override = default;
         };
 
+        class USBConfigured : public sys::DataMessage
+        {
+          public:
+            USBConfigured() : sys::DataMessage(MessageType::USBConfigured)
+            {}
+            ~USBConfigured() override = default;
+        };
+
         class USBDisconnected : public sys::DataMessage
         {
           public:

@@ -219,6 +219,7 @@ enum class MessageType
     TransferTimer,
 
     USBConnected,
+    USBConfigured,
     USBDisconnected,
 
     ScreenPasscodeRequest,
