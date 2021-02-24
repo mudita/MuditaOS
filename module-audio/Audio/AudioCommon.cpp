@@ -37,6 +37,30 @@ namespace audio
         return utils::enumToString(setting);
     }
 
+    bool isSystemSound(const PlaybackType &playbackType) noexcept
+    {
+        switch (playbackType) {
+
+        case PlaybackType::Notifications:
+            [[fallthrough]];
+        case PlaybackType::KeypadSound:
+            [[fallthrough]];
+        case PlaybackType::CallRingtone:
+            [[fallthrough]];
+        case PlaybackType::TextMessageRingtone:
+            [[fallthrough]];
+        case PlaybackType::Meditation:
+            return true;
+        case PlaybackType::None:
+            [[fallthrough]];
+        case PlaybackType::Alarm:
+            [[fallthrough]];
+        case PlaybackType::Multimedia:
+            return false;
+        }
+        return false;
+    }
+
     const std::string dbPath(const sys::phone_modes::PhoneMode &phoneMode,
                              const Setting &setting,
                              const PlaybackType &playbackType,
@@ -46,20 +70,37 @@ namespace audio
             return std::string();
         }
 
-        constexpr auto separator = '/';
-        std::string path(audioDbPrefix);
+        std::vector<std::string> pathElements;
+        std::string path;
 
-        path.append(utils::enumToString(phoneMode));
-        path.append(1, separator);
+        pathElements.emplace_back(audioDbPrefix);
+        pathElements.emplace_back(utils::enumToString(phoneMode));
+
         if (auto s = str(profileType); !s.empty()) {
-            path.append(s.append(1, separator));
+            pathElements.emplace_back(s);
         }
+
         if (auto s = str(playbackType); !s.empty()) {
-            path.append(s.append(1, separator));
+
+            if (setting == Setting::Volume && isSystemSound(playbackType)) {
+                pathElements.emplace_back(str(PlaybackType::System));
+            }
+            else {
+                pathElements.emplace_back(s);
+            }
         }
+
         if (auto s = str(setting); !s.empty()) {
-            path.append(s);
+            pathElements.emplace_back(s);
         }
+
+        for (size_t idx = 0; idx < pathElements.size(); idx++) {
+            path.append(pathElements[idx]);
+            if (idx != pathElements.size() - 1) {
+                path.append(1, dbPathSeparator);
+            }
+        }
+
         return path;
     }
 
