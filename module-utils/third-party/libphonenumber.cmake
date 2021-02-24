@@ -1,14 +1,21 @@
 include (thirdparty)
 
+# choose metadata to use
+option (LIBPHONENUMBER_USE_MINIMAL_METADATA "Use minimal metadata for libphonenumber" OFF)
+
 # add sources
 set (LIBPHONENUMBER_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR}/libphonenumber/cpp/src)
 set (LIBPHONENUMBER ${LIBPHONENUMBER_SRCDIR}/phonenumbers)
+if (LIBPHONENUMBER_USE_MINIMAL_METADATA)
+        set (LIBPHONENUMBER_METADATA ${LIBPHONENUMBER}/metadata-minimal.cc)
+else ()
+        set (LIBPHONENUMBER_METADATA ${LIBPHONENUMBER}/metadata.cc)
+endif ()
 set (LIBPHONENUMBER_SOURCES
         ${LIBPHONENUMBER}/asyoutypeformatter.cc
         ${LIBPHONENUMBER}/base/strings/string_piece.cc
         ${LIBPHONENUMBER}/default_logger.cc
         ${LIBPHONENUMBER}/logger.cc
-        ${LIBPHONENUMBER}/metadata.cc
         ${LIBPHONENUMBER}/phonemetadata.pb.cc
         ${LIBPHONENUMBER}/phonenumber.cc
         ${LIBPHONENUMBER}/phonenumber.pb.cc
@@ -22,6 +29,7 @@ set (LIBPHONENUMBER_SOURCES
         ${LIBPHONENUMBER}/utf/rune.c
         ${LIBPHONENUMBER}/utf/unicodetext.cc
         ${LIBPHONENUMBER}/utf/unilib.cc
+        ${LIBPHONENUMBER_METADATA}
 )
 
 # create static library for the third party
