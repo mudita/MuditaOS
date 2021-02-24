@@ -56,9 +56,11 @@ class BluetoothScanResultMessage : public sys::DataMessage
 class BluetoothPairResultMessage : public sys::DataMessage
 {
   public:
+    std::string addr;
+    std::string name;
     bool status;
-    explicit BluetoothPairResultMessage(bool status)
-        : sys::DataMessage(MessageType::BluetoothPairResult), status(status){};
+    explicit BluetoothPairResultMessage(std::string addr, std::string name, bool status)
+        : sys::DataMessage(MessageType::BluetoothPairResult), addr(addr), name(name), status(status){};
 };
 
 class BluetoothScanMessage : public sys::DataMessage

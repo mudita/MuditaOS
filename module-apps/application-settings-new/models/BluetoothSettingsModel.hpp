@@ -22,6 +22,7 @@ class BluetoothSettingsModel
     void requestBondedDevices();
     void requestScan();
     void stopScan();
+    void requestDevicePairing(std::string addr);
     void setAddrForAudioProfiles(std::string addr);
 
   private:

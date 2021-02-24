@@ -193,10 +193,11 @@ namespace bluetooth
         }
         continueScanning();
     }
-    void GAP::processDedicatedBondingCompleted(std::uint8_t *packet)
+    void GAP::processDedicatedBondingCompleted(std::uint8_t *packet, bd_addr_t &addr)
     {
         auto result = packet[2];
-        auto msg    = std::make_shared<BluetoothPairResultMessage>(result == 0u);
+        auto name   = std::string{reinterpret_cast<const char *>(&packet[9])};
+        auto msg    = std::make_shared<BluetoothPairResultMessage>(bd_addr_to_str(addr), name, result == 0u);
         ownerService->bus.sendUnicast(msg, "ApplicationSettings");
         ownerService->bus.sendUnicast(std::move(msg), "ApplicationSettingsNew");
     }
@@ -225,7 +226,7 @@ namespace bluetooth
             processNameRequestComplete(packet, addr);
             break;
         case GAP_EVENT_DEDICATED_BONDING_COMPLETED:
-            processDedicatedBondingCompleted(packet);
+            processDedicatedBondingCompleted(packet, addr);
             break;
         default:
             break;

@@ -36,11 +36,13 @@
 #include "windows/ChangeDateAndTimeWindow.hpp"
 
 #include "Dialog.hpp"
+#include "DialogMetadataMessage.hpp"
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
-#include <service-bluetooth/service-bluetooth/messages/Status.hpp>
+#include <service-bluetooth/Constants.hpp>
+#include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
@@ -163,6 +165,29 @@ namespace app
                 }
                 switchWindow(gui::window::name::add_device, std::move(visibleDevicesData));
             }
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(BluetoothPairResultMessage), [&](sys::Message *msg) {
+            auto bluetoothPairResultMsg = static_cast<BluetoothPairResultMessage *>(msg);
+            if (bluetoothPairResultMsg->status) {
+                return sys::MessageNone{};
+            }
+            const std::string toReplace     = "%NAME";
+            std::string pairingErrorMessage = utils::localize.get("app_settings_bluetooth_pairing_error_message");
+            pairingErrorMessage.replace(
+                pairingErrorMessage.find(toReplace), toReplace.size(), bluetoothPairResultMsg->name);
+
+            switchWindow(
+                gui::window::name::dialog_retry,
+                gui::ShowMode::GUI_SHOW_INIT,
+                std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+                    utils::localize.get("app_settings_bt"), "search_big", pairingErrorMessage, "", [=]() -> bool {
+                        bus.sendUnicast(std::make_shared<BluetoothPairMessage>(std::move(bluetoothPairResultMsg->addr)),
+                                        service::name::bluetooth);
+                        return true;
+                    }}));
+
             return sys::MessageNone{};
         });
 

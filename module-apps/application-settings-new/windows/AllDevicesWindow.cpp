@@ -51,7 +51,6 @@ namespace gui
     {
         if (inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_LEFT)) {
             bluetoothSettingsModel->requestScan();
-            gui::DialogMetadata meta;
             application->switchWindow(gui::window::name::dialog_settings,
                                       gui::ShowMode::GUI_SHOW_INIT,
                                       std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
