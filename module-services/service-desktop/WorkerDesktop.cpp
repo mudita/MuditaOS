@@ -110,6 +110,10 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
             ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConnected>(),
                                           service::name::service_desktop);
         }
+        else if (notification == bsp::USBDeviceStatus::Configured) {
+            ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConfigured>(),
+                                          service::name::service_desktop);
+        }
         else if (notification == bsp::USBDeviceStatus::Disconnected) {
             ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBDisconnected>(),
                                           service::name::service_desktop);

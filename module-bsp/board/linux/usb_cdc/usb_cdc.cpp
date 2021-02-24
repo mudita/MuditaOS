@@ -60,7 +60,7 @@ namespace bsp
         if (len > 0) {
             const inotify_event *event = (inotify_event *)&eventsBuff[0];
             if (event->mask & IN_OPEN) {
-                USBDeviceStatus notification = USBDeviceStatus::Connected;
+                USBDeviceStatus notification = USBDeviceStatus::Configured;
                 xQueueSend(USBIrqQueue, &notification, 0);
             }
             if (event->mask & IN_CLOSE_WRITE) {

@@ -104,7 +104,7 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
         return {sent::delayed, std::nullopt};
     }
     else if (body[json::developerMode::usbSecurity].is_string()) {
-        std::shared_ptr<sys::DataMessage> msg = std::make_shared<sdesktop::usb::USBConnected>();
+        std::shared_ptr<sys::DataMessage> msg = std::make_shared<sdesktop::usb::USBConfigured>();
         if (body[json::developerMode::usbSecurity].string_value() == json::developerMode::usbUnlock) {
             msg = std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>();
         }
