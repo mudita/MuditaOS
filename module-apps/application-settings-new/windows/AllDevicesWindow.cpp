@@ -42,7 +42,8 @@ namespace gui
     {
         const auto newData = dynamic_cast<BondedDevicesData *>(data);
         if (newData != nullptr) {
-            devices = newData->getDevices();
+            devices                  = newData->getDevices();
+            addressOfConnectedDevice = newData->getAddressOfConnectedDevice();
         }
         refreshOptionsList();
     }
@@ -66,17 +67,27 @@ namespace gui
     {
         std::list<gui::Option> optionsList;
         for (const auto &device : devices) {
+            std::string addr{bd_addr_to_str(device.address)};
+            auto isConnected = addr == addressOfConnectedDevice;
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 device.name,
                 [=](gui::Item & /*item*/) {
                     LOG_DEBUG("Device: %s", device.name.c_str());
-                    std::string addr{bd_addr_to_str(device.address)};
-                    bluetoothSettingsModel->requestAudioConnection(std::move(addr));
+                    bluetoothSettingsModel->requestConnection(addr);
+                    return true;
+                },
+                [=](gui::Item &item) {
+                    if (item.focus) {
+                        this->setBottomBarText(isConnected ? utils::translateI18("common_disconnect")
+                                                           : utils::translateI18("common_connect"),
+                                               BottomBar::Side::CENTER);
+                    }
                     return true;
                 },
                 nullptr,
-                nullptr,
-                gui::option::SettingRightItem::Bt));
+                isConnected ? gui::option::SettingRightItem::Text : gui::option::SettingRightItem::Bt,
+                false,
+                utils::localize.get("app_settings_option_connected")));
         }
         return optionsList;
     }

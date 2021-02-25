@@ -44,6 +44,7 @@
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
+#include <service-bluetooth/messages/Connect.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
 #include <service-bluetooth/messages/Passkey.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
@@ -149,8 +150,8 @@ namespace app
         connect(typeid(::message::bluetooth::ResponseBondedDevices), [&](sys::Message *msg) {
             auto responseBondedDevicesMsg = static_cast<::message::bluetooth::ResponseBondedDevices *>(msg);
             if (gui::window::name::all_devices == getCurrentWindow()->getName()) {
-                auto bondedDevicesData =
-                    std::make_unique<gui::BondedDevicesData>(responseBondedDevicesMsg->getDevices());
+                auto bondedDevicesData = std::make_unique<gui::BondedDevicesData>(
+                    responseBondedDevicesMsg->getDevices(), responseBondedDevicesMsg->getAddressOfConnectedDevice());
                 switchWindow(gui::window::name::all_devices, std::move(bondedDevicesData));
             }
             return sys::MessageNone{};
@@ -194,6 +195,31 @@ namespace app
 
         connect(typeid(::message::bluetooth::RequestPasskey), [&](sys::Message *msg) {
             switchWindow(gui::window::name::bluetooth_check_passkey);
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(::message::bluetooth::ConnectResult), [&](sys::Message *msg) {
+            auto connectResultMsg = static_cast<::message::bluetooth::ConnectResult *>(msg);
+            if (connectResultMsg->isSucceed()) {
+                bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(),
+                                service::name::bluetooth);
+                return sys::MessageNone{};
+            }
+
+            switchWindow(gui::window::name::dialog_retry,
+                         gui::ShowMode::GUI_SHOW_INIT,
+                         std::make_unique<gui::DialogMetadataMessage>(
+                             gui::DialogMetadata{utils::localize.get("app_settings_bt"),
+                                                 "search_big",
+                                                 utils::localize.get("app_settings_bluetooth_connecting_error_message"),
+                                                 "",
+                                                 [=]() -> bool {
+                                                     bus.sendUnicast(std::make_shared<message::bluetooth::Connect>(
+                                                                         connectResultMsg->getAddr()),
+                                                                     service::name::bluetooth);
+                                                     return true;
+                                                 }}));
+
             return sys::MessageNone{};
         });
 
