@@ -105,6 +105,8 @@ namespace app
         windowsFactory.attach(calllog::settings::DialogYesNoStr, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationCallLog::destroyUserInterface()

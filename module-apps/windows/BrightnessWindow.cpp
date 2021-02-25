@@ -66,12 +66,17 @@ namespace gui
             return false;
         }
 
+        int update = brightnessBar->getValue();
         if (inputEvent.keyCode == gui::KeyCode::KEY_VOLUP) {
-            brightnessBar->update(1);
+            update++;
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_VOLDN) {
-            brightnessBar->update(-1);
+            update--;
+        }
+
+        if (update >= 0) {
+            brightnessBar->setValue(update);
         }
 
         return AppWindow::onInput(inputEvent);

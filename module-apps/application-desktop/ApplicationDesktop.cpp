@@ -430,6 +430,8 @@ namespace app
         windowsFactory.attach(desktop_mmi_internal, [](Application *app, const std::string newname) {
             return std::make_unique<gui::MmiInternalMsgWindow>(app, desktop_mmi_internal);
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationDesktop::destroyUserInterface()

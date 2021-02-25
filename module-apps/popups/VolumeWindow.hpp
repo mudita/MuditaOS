@@ -24,10 +24,12 @@ namespace gui
 {
     class VolumeWindow : public AppWindow
     {
-
       protected:
         Label *volumeText    = nullptr;
         VBarGraph *volumeBar = nullptr;
+        audio::Volume Volume = 0;
+
+        void updateGraph();
 
       public:
         VolumeWindow(app::Application *app, const std::string &name);

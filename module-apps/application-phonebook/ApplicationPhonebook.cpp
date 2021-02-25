@@ -146,6 +146,8 @@ namespace app
         windowsFactory.attach(gui::window::name::new_contact, [](Application *app, const std::string &name) {
             return std::make_unique<gui::PhonebookNewContact>(app);
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationPhonebook::destroyUserInterface()

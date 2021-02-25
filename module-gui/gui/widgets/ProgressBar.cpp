@@ -41,11 +41,6 @@ namespace gui
         return currentValue == value;
     }
 
-    bool ProgressBar::update(int value) noexcept
-    {
-        return setValue(currentValue + value);
-    }
-
     void ProgressBar::setPercentageValue(unsigned int value) noexcept
     {
         const auto percent       = static_cast<float>(value) / 100.0f;
@@ -115,11 +110,6 @@ namespace gui
     {
         currentValue = std::clamp(value, 0U, maxValue);
         return value == currentValue;
-    }
-
-    bool CircularProgressBar::update(int value) noexcept
-    {
-        return setValue(currentValue + value);
     }
 
     void CircularProgressBar::setPercentageValue(unsigned int value) noexcept

@@ -107,6 +107,8 @@ namespace app
         windowsFactory.attach(
             style::alarmClock::window::name::dialogYesNo,
             [](Application *app, const std::string &name) { return std::make_unique<gui::DialogYesNo>(app, name); });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationAlarmClock::destroyUserInterface()

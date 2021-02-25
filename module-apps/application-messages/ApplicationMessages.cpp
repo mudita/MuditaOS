@@ -146,6 +146,8 @@ namespace app
         windowsFactory.attach(gui::name::window::search_results, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SearchResults>(app);
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationMessages::destroyUserInterface()
