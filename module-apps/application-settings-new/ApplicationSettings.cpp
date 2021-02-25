@@ -45,6 +45,7 @@
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
+#include <service-bluetooth/messages/Passkey.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <application-settings-new/data/ApnListData.hpp>
@@ -188,6 +189,11 @@ namespace app
                         return true;
                     }}));
 
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(::message::bluetooth::RequestPasskey), [&](sys::Message *msg) {
+            switchWindow(gui::window::name::bluetooth_check_passkey);
             return sys::MessageNone{};
         });
 
