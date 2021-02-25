@@ -11,7 +11,8 @@ namespace gui
     namespace
     {
         constexpr auto maxPasskeyCharactersCount = 16U;
-    }
+        constexpr auto minPasskeyCharactersCount = 4U;
+    } // namespace
     namespace passkey_style = style::settings::window::bluetooth::passkey;
 
     BluetoothCheckPasskeyWindow::BluetoothCheckPasskeyWindow(app::Application *app)
@@ -52,5 +53,16 @@ namespace gui
         text->setFont(style::window::font::largelight);
 
         setFocusItem(text);
+    }
+
+    auto BluetoothCheckPasskeyWindow::onInput(const InputEvent &inputEvent) -> bool
+    {
+        auto passkey = text->getText();
+        if (passkey.length() >= minPasskeyCharactersCount && inputEvent.isShortPress() &&
+            inputEvent.is(KeyCode::KEY_ENTER)) {
+            bluetoothSettingsModel->responsePasskey(passkey);
+            return true;
+        }
+        return AppWindow::onInput(inputEvent);
     }
 } // namespace gui

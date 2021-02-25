@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "application-settings-new/models/BluetoothSettingsModel.hpp"
 #include <AppWindow.hpp>
 
 namespace gui
@@ -13,13 +14,15 @@ namespace gui
     class BluetoothCheckPasskeyWindow : public AppWindow
     {
       public:
-        BluetoothCheckPasskeyWindow(app::Application *app);
+        explicit BluetoothCheckPasskeyWindow(app::Application *app);
 
       private:
         void buildInterface() override;
+        auto onInput(const InputEvent &inputEvent) -> bool override;
 
         Image *image = nullptr;
         Label *label = nullptr;
         Text *text   = nullptr;
+        std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
     };
 } // namespace gui
