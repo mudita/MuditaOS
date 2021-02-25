@@ -52,6 +52,8 @@ namespace app
         windowsFactory.attach(app::window::name::meditation_preparation, [](Application *app, const std::string &name) {
             return std::make_unique<gui::PreparationTimeWindow>(app);
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationMeditation::destroyUserInterface()

@@ -18,7 +18,6 @@ namespace gui
 
         virtual void setMaximum(unsigned int value)         = 0;
         virtual auto setValue(unsigned int value) -> bool   = 0;
-        virtual auto update(int value = 1) -> bool          = 0;
         virtual void setPercentageValue(unsigned int value) = 0;
     };
 
@@ -29,7 +28,6 @@ namespace gui
 
         void setMaximum(unsigned int value) noexcept override;
         auto setValue(unsigned int value) noexcept -> bool override;
-        auto update(int value = 1) noexcept -> bool override;
         void setPercentageValue(unsigned int value) noexcept override;
 
         void buildDrawListImplementation(std::list<Command> &commands) override;
@@ -50,7 +48,6 @@ namespace gui
 
         void setMaximum(unsigned int value) noexcept override;
         auto setValue(unsigned int value) noexcept -> bool override;
-        auto update(int value = 1) noexcept -> bool override;
         void setPercentageValue(unsigned int value) noexcept override;
 
         void buildDrawListImplementation(std::list<Command> &commands) override;

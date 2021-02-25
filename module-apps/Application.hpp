@@ -26,6 +26,7 @@
 #include <utility>                        // for move, pair
 #include <vector>                         // for vector
 #include "TopBarManager.hpp"
+#include "popups/Popups.hpp"
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"
 
@@ -323,6 +324,13 @@ namespace app
         /// @ingrup AppWindowStack
         WindowsStack windowsStack;
         WindowsFactory windowsFactory;
+
+        /// Method used to attach popups windows to application
+        void attachPopups(const std::vector<gui::popup::ID> &popupsList);
+
+        /// Individual popups handlers
+      public:
+        bool handleVolumePopup();
 
       public:
         /// @ingrup AppWindowStack

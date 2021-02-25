@@ -30,59 +30,22 @@ namespace gui
         return rectangle;
     }
 
-    auto BarGraph::incrementWith(uint32_t levels) -> bool
-    {
-        if ((currentLevel + levels) <= numberOfRectangles) {
-            for (uint32_t i = 0; i < levels; ++i) {
-                rectangles[currentLevel]->setFillColor(ColorFullBlack);
-                rectangles[currentLevel]->setBorderColor(ColorFullBlack);
-                ++currentLevel;
-            }
-            return true;
-        }
-        else {
-            LOG_ERROR("bargraph incremented out of size");
-            return false;
-        }
-    }
-
-    auto BarGraph::decrementWith(uint32_t levels) -> bool
-    {
-        if (currentLevel >= levels) {
-            for (uint32_t i = levels; i > 0; --i) {
-                --currentLevel;
-                rectangles[currentLevel]->setFillColor(ColorFullWhite);
-                rectangles[currentLevel]->setBorderColor(ColorFullBlack);
-            }
-            return true;
-        }
-        else {
-            LOG_ERROR("bargraph incremented out of size");
-            return false;
-        }
-    }
-
-    auto BarGraph::update(int value) -> bool
-    {
-        if (value > 0) {
-            return incrementWith(value);
-        }
-        else if (value < 0) {
-            return decrementWith((-value));
-        }
-
-        return false;
-    }
-
     bool BarGraph::setValue(unsigned int value)
     {
-        if (const auto levels = static_cast<int>(value) - static_cast<int>(currentLevel); levels > 0) {
-            return incrementWith(levels);
+        if (value > numberOfRectangles) {
+            LOG_ERROR("Provider value greater than graph scale");
+            return false;
         }
-        else if (levels < 0) {
-            return decrementWith(-levels);
+
+        currentLevel = value;
+        for (unsigned int i = 0; i < currentLevel; i++) {
+            rectangles[i]->setFillColor(ColorFullBlack);
         }
-        return false;
+        for (unsigned int i = currentLevel; i < numberOfRectangles; i++) {
+            rectangles[i]->setFillColor(ColorFullWhite);
+        }
+
+        return true;
     }
 
     VBarGraph::VBarGraph(Item *parent, Position x, Position y, uint32_t numberOfRectangles)
@@ -106,10 +69,11 @@ namespace gui
             rectangles.clear();
         }
 
-        for (unsigned int i = 0; i <= numberOfRectangles; i++) {
+        for (unsigned int i = 0; i < numberOfRectangles; i++) {
 
             auto rectangle =
                 createRectangle(style::bargraph::rect_axis_length_lrg, style::bargraph::rect_axis_length_sml);
+            rectangle->setBorderColor(ColorFullBlack);
 
             if ((i + 1) != numberOfRectangles) {
                 rectangle->setMargins(Margins(0, 0, 0, style::bargraph::spacing));

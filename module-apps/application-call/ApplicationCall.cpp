@@ -71,6 +71,8 @@ namespace app
             showNotification(buttonAction, iconNoSim, textNoSim);
             return actionHandled();
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     //  number of seconds after end call to switch back to previous application

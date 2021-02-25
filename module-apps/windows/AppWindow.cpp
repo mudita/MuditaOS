@@ -144,12 +144,10 @@ namespace gui
         if ((inputEvent.isShortPress())) {
             switch (inputEvent.keyCode) {
             case KeyCode::KEY_VOLUP: {
-                application->increaseCurrentVolume();
-                return true;
+                return application->increaseCurrentVolume();
             }
             case KeyCode::KEY_VOLDN: {
-                application->decreaseCurrentVolume();
-                return true;
+                return application->decreaseCurrentVolume();
             }
             case KeyCode::KEY_RF: {
                 application->returnToPreviousWindow();

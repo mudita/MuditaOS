@@ -260,8 +260,8 @@ namespace app
         }
         else if (auto msg = dynamic_cast<AudioKeyPressedResponse *>(msgl)) {
             if (!msg->muted) {
-                // Popup should show up
-                LOG_ERROR("Popup with volume level %s", std::to_string(msg->volume).c_str());
+                handleVolumePopup();
+                return msgHandled();
             }
         }
         return msgNotHandled();
@@ -627,6 +627,36 @@ namespace app
     {
         auto msg = std::make_shared<AppInputEventMessage>(event);
         sender->bus.sendUnicast(msg, application);
+    }
+
+    void Application::attachPopups(const std::vector<gui::popup::ID> &popupsList)
+    {
+        using namespace gui::popup;
+        for (auto popup : popupsList) {
+            switch (popup) {
+            case ID::Volume:
+                windowsFactory.attach(window::volume_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::VolumeWindow>(app, window::volume_window);
+                });
+                break;
+            case ID::PhoneModes:
+            case ID::Brightness:
+                break;
+            }
+        }
+    }
+
+    bool Application::handleVolumePopup()
+    {
+        using namespace gui::popup;
+        if (getCurrentWindow()->getName() == window::volume_window) {
+            return true;
+        }
+        else if (windowsFactory.isRegistered(window::volume_window)) {
+            switchWindow(window::volume_window);
+            return true;
+        }
+        return false;
     }
 
     bool Application::popToWindow(const std::string &window)

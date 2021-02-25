@@ -142,6 +142,8 @@ namespace app
         windowsFactory.attach(event_reminder_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::EventReminderWindow>(app, event_reminder_window);
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationCalendar::destroyUserInterface()

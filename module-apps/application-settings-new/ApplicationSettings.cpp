@@ -435,6 +435,8 @@ namespace app
         windowsFactory.attach(gui::window::name::options_quote, [](Application *app, const std::string &name) {
             return std::make_unique<gui::QuotesOptionsWindow>(app, std::move(settings::getQuotesModel(app)));
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationSettingsNew::destroyUserInterface()

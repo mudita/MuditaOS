@@ -66,6 +66,8 @@ namespace app
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MusicPlayerEmptyWindow>(app);
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationMusicPlayer::destroyUserInterface()
