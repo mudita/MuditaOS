@@ -105,3 +105,6 @@ mmd -i "$PART1" ::/updates
 $GENLFS --image=$IMAGE_NAME --block_size=32768  --overwrite  --partition_num=3 -- user/*
 # back to previous dir
 cd -
+sync
+sleep 7
+
