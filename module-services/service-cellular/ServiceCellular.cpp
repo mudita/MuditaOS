@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "endpoints/developerMode/event/ATRequest.hpp"
+#include "handler/RawATHandler.hpp"
 #include "CellularUrcHandler.hpp"
 #include "service-cellular/CellularCall.hpp"
 #include "service-cellular/CellularMessage.hpp"
@@ -66,7 +68,8 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-evtmgr/EVMessages.hpp>
-#include "service-desktop/DesktopMessages.hpp"
+#include <service-desktop/DesktopMessages.hpp>
+#include <service-desktop/DeveloperModeMessage.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
 #include <task.h>
 #include <time/time_conversion.hpp>
@@ -412,6 +415,12 @@ void ServiceCellular::registerMessageHandlers()
             auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
             bus.sendUnicast(std::move(message), service::name::service_desktop);
         }
+        if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::ATResponseEvent)) {
+            auto channel = cmux->get(TS0710::Channel::Commands);
+            assert(channel);
+            auto handler = cellular::RawATHandler(*channel);
+            return handler.handle(msg);
+        }
         return sys::MessageNone{};
     });
 
@@ -540,9 +549,6 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(CellularNewIncomingSMSNotification),
             [&](sys::Message *request) -> sys::MessagePointer { return handleNewIncomingSMSNotification(request); });
-
-    connect(typeid(cellular::RawCommand),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleRawCommandNotification(request); });
 
     connect(typeid(CellularSimReadyNotification),
             [&](sys::Message *request) -> sys::MessagePointer { return handleSimReadyNotification(request); });
@@ -2441,26 +2447,6 @@ auto ServiceCellular::handleNewIncomingSMSNotification(sys::Message *msg) -> std
     auto notification = std::make_shared<CellularNewIncomingSMSMessage>(message->data);
     bus.sendUnicast(std::move(notification), msg->sender);
     return std::make_shared<CellularResponseMessage>(true);
-}
-
-auto ServiceCellular::handleRawCommandNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    auto message = static_cast<cellular::RawCommand *>(msg);
-    auto channel = cmux->get(TS0710::Channel::Commands);
-    if (!message || !channel) {
-        LOG_ERROR("RawCommand error: %s %s", message == nullptr ? "" : "bad cmd", !channel ? "no channel" : "");
-        return std::make_shared<CellularResponseMessage>(false);
-    }
-    auto respMsg      = std::make_shared<cellular::RawCommandResp>(true);
-    auto ret          = channel->cmd(message->command, std::chrono::milliseconds(message->timeout));
-    respMsg->response = ret.response;
-    if (respMsg->response.size()) {
-        for (auto const &el : respMsg->response) {
-            LOG_DEBUG("> %s", el.c_str());
-        }
-        return std::make_shared<CellularResponseMessage>(false);
-    }
-    return respMsg;
 }
 
 auto ServiceCellular::handleSimReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>

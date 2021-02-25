@@ -243,10 +243,6 @@ sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerM
 
 sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
-    if (auto msg = dynamic_cast<cellular::RawCommandResp *>(resp)) {
-        auto event = std::make_unique<sdesktop::developerMode::ATResponseEvent>(msg->response);
-        event->send();
-    }
     if (resp != nullptr) {
         if (resp->responseTo == MessageType::DBQuery) {
             if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {

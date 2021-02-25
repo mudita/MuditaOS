@@ -132,13 +132,6 @@ namespace sdesktop
 
     namespace developerMode
     {
-
-        class ATResponseEvent : public Event
-        {
-          public:
-            explicit ATResponseEvent(std::vector<std::string> resp);
-        };
-
         class AppFocusChangeEvent : public Event
         {
           public:

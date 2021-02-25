@@ -10,7 +10,8 @@ namespace sdesktop::developerMode
     class DomRequestEvent : public sdesktop::Event
     {
       public:
-        DomRequestEvent(sdesktop::Event &);
+        explicit DomRequestEvent(sdesktop::Event &);
+        DomRequestEvent() = delete;
         void setJson(json11::Json json);
     };
 } // namespace sdesktop::developerMode
