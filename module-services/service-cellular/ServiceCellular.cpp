@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "endpoints/developerMode/event/ATRequest.hpp"
@@ -165,14 +165,16 @@ State::ST State::get() const
     return this->state;
 }
 
-ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack, sys::ServicePriority::Idle)
+ServiceCellular::ServiceCellular()
+    : sys::Service(serviceName, "", cellularStack, sys::ServicePriority::Idle),
+      phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()}
 {
-
     LOG_INFO("[ServiceCellular] Initializing");
 
     bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
     bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     bus.channels.push_back(sys::BusChannel::ServiceEvtmgrNotifications);
+    bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
     callStateTimer = std::make_unique<sys::Timer>("call_state", this, 1000);
     callStateTimer->connect([&](sys::Timer &) { CallStateTimerHandler(); });
@@ -304,6 +306,15 @@ void handleCellularSimNewPinDataMessage(CellularSimNewPinDataMessage *msg)
 
 void ServiceCellular::registerMessageHandlers()
 {
+    phoneModeObserver->connect(this);
+    phoneModeObserver->subscribe(
+        []([[maybe_unused]] sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering) {
+            using bsp::cellular::USB::setPassthrough;
+            using bsp::cellular::USB::PassthroughState;
+            setPassthrough(tethering == sys::phone_modes::Tethering::On ? PassthroughState::ENABLED
+                                                                        : PassthroughState::DISABLED);
+        });
+
     connect(typeid(CellularSimNewPinDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularSimNewPinDataMessage *>(request);
         return std::make_shared<CellularResponseMessage>(
