@@ -210,32 +210,6 @@ set_source_files_properties(source/main.cpp PROPERTIES COMPILE_DEFINITIONS "${EN
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 add_subdirectory(host-tools)
-if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-
-	set(FAT_IMAGE ${CMAKE_PROJECT_NAME}.img)
-	add_custom_command(
-		OUTPUT ${FAT_IMAGE}
-                DEPENDS genlittlefs
-		DEPENDS assets
-                DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_purephone_image.sh
-		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/generate_purephone_image.sh ${FAT_IMAGE} ${CMAKE_BINARY_DIR}
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-		COMMENT "Generate ${FAT_IMAGE}"
-	)
-	add_custom_target(
-		${FAT_IMAGE}-target ALL
-		DEPENDS ${FAT_IMAGE}
-	)
-	add_dependencies(check ${FAT_IMAGE}-target)
-    multicomp_install(
-        TARGETS ${CMAKE_PROJECT_NAME}
-        DESTINATION "./"
-        COMPONENTS Standalone Update
-        )
-    set(CPACK_SYSTEM_NAME "Linux")
-    # only allow the standalone package in Linux config
-    set(CPACK_COMPONENTS_ALL Standalone)
-endif()
 
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
@@ -276,7 +250,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         )
 
     # download the bootloader
-    set(ECOBOOT_FILE ${CMAKE_BINARY_DIR}/ecoboot.bin)
+    set(ECOBOOT_FILE ecoboot.bin)
     set(ECOBOOT_DOWNLOAD_LOG ${CMAKE_BINARY_DIR}/download_info.txt)
 
     if(DEFINED ENV{ASSETS_LOGIN} AND DEFINED ENV{ASSETS_TOKEN})
@@ -287,7 +261,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
             -t $ENV{ASSETS_TOKEN}
             -w ${CMAKE_BINARY_DIR} ecoboot download
             > ${ECOBOOT_DOWNLOAD_LOG}
-            COMMENT "Downloading ecoboot.bin"
+            COMMENT "Downloading ${ECOBOOT_FILE}"
             BYPRODUCTS ${ECOBOOT_DOWNLOAD_LOG}
             )
     else()
@@ -296,36 +270,30 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
             COMMAND ${CMAKE_SOURCE_DIR}/tools/download_asset.py
             -w ${CMAKE_BINARY_DIR} ecoboot download
             > ${ECOBOOT_DOWNLOAD_LOG}
-            COMMENT "Downloading ecoboot.bin"
+            COMMENT "Downloading ${ECOBOOT_FILE}"
             BYPRODUCTS ${ECOBOOT_DOWNLOAD_LOG}
             )
     endif()
 
-    if(NOT ${CMAKE_GENERATOR} STREQUAL "Ninja")
-        add_custom_target(ecoboot.bin DEPENDS ${ECOBOOT_FILE})
-    endif()
+    add_custom_target(${ECOBOOT_FILE}-target DEPENDS ${ECOBOOT_FILE})
 
     # generate version.json file (runs CMake script at build time)
-    set(VERSION_JSON ${CMAKE_BINARY_DIR}/version.json)
-    add_custom_command(OUTPUT ${VERSION_JSON}
+    set(VERSION_JSON_FILE version.json)
+    add_custom_command(OUTPUT ${VERSION_JSON_FILE}
         COMMAND ${CMAKE_COMMAND}
         -DSRC_DIR=${CMAKE_SOURCE_DIR}
         -DECOBOOT_DOWNLOAD_LOG=${ECOBOOT_DOWNLOAD_LOG}
         -B ${CMAKE_BINARY_DIR}
         -P ${CMAKE_SOURCE_DIR}/cmake/modules/GenUpdateVersionJson.cmake
-        DEPENDS ecoboot.bin ${ECOBOOT_DOWNLOAD_LOG}
+        DEPENDS ${ECOBOOT_FILE}-target ${ECOBOOT_DOWNLOAD_LOG}
         )
 
-    if(NOT ${CMAKE_GENERATOR} STREQUAL "Ninja")
-        add_custom_target(version.json DEPENDS ${VERSION_JSON})
-    endif()
+    add_custom_target(${VERSION_JSON_FILE}-target DEPENDS ${VERSION_JSON})
 
-    multicomp_install(PROGRAMS ${ECOBOOT_FILE} DESTINATION "./" COMPONENTS Standalone Update)
-    multicomp_install(FILES ${VERSION_JSON} DESTINATION "./" COMPONENTS Standalone Update)
-
-    set(CPACK_SYSTEM_NAME "RT1051")
-    # allow both standalone and update packages in RT1051 config
-    set(CPACK_COMPONENTS_ALL Standalone Update)
+    multicomp_install(PROGRAMS ${CMAKE_BINARY_DIR}/${ECOBOOT_FILE} DESTINATION "./" 
+        COMPONENTS Standalone Update)
+    multicomp_install(FILES ${VERSION_JSON} DESTINATION "./" 
+        COMPONENTS Standalone Update)
 endif()
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
@@ -351,40 +319,12 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
         )
 endif()
 
+include(DiskImage)
+
 message_serial_status()
 
 option (BUILD_DOC_WITH_ALL "Build documentation" OFF)
-
-# check if Doxygen is installed
-find_package (Doxygen COMPONENTS dot)
-if (DOXYGEN_FOUND)
-        # set custom command scope
-        unset (_DOC_ALL)
-        if (BUILD_DOC_WITH_ALL)
-                set (_DOC_ALL ALL)
-        endif ()
-
-        # set input and output files
-        set (DOXYGEN_IN ${PROJECT_SOURCE_DIR}/doc/Doxyfile.in)
-        set (DOXYGEN_OUT ${CMAKE_BINARY_DIR}/Doxyfile)
-
-        # request to configure the file
-        configure_file (${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-
-        # add target for doxygen documentation
-        add_custom_target(doc ${_DOC_ALL}
-                COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                COMMENT "Generating API documentation with Doxygen"
-                VERBATIM
-        )
-else ()
-        if (BUILD_DOC_WITH_ALL)
-                message (SEND_ERROR ${BoldRed} "Could not find doxygen with dot to build code documentation." ${ColourReset})
-        else()
-                message (WARNING ${BoldYellow} "Install doxygen and graphviz to be able to build code documentation" ${ColourReset})
-        endif()
-endif ()
+include (GenDoxygenDoc)
 
 message("SRC DIR: ${CMAKE_SOURCE_DIR}")
 
@@ -404,6 +344,13 @@ add_custom_target(
     )
 add_dependencies(${PROJECT_NAME} version)
 
+if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    set(CPACK_SYSTEM_NAME "Linux")
+    set(CPACK_COMPONENTS_ALL Standalone)
+else()
+    set(CPACK_SYSTEM_NAME "RT1051")
+    set(CPACK_COMPONENTS_ALL Standalone Update)
+endif()
 set(CPACK_PACKAGE_VENDOR "Mudita")
 set(CPACK_PACKAGE_NAME "PurePhone")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://mudita.com/products/pure/")
@@ -417,57 +364,28 @@ set(CPACK_GENERATOR "External")
 set(CPACK_COMPONENTS_GROUPING IGNORE)
 set(CPACK_EXTERNAL_ENABLE_STAGING TRUE)
 set(PACKAGE_STAGING_DIRECTORY ${CMAKE_BINARY_DIR}/_CPack_Packages/${CPACK_TOPLEVEL_TAG}/${CPACK_GENERATOR}/${CPACK_PACKAGE_FILE_NAME})
+message(PACKAGE_STAGING_DIRECTORY ${CMAKE_BINARY_DIR}/_CPack_Packages/${CPACK_TOPLEVEL_TAG}/${CPACK_GENERATOR}/${CPACK_PACKAGE_FILE_NAME})
+message("CPACK_TOPLEVEL_TAG:'${CPACK_TOPLEVEL_TAG}'")
+message("CPACK_GENERATOR:'${CPACK_GENERATOR}'")
+message("CPACK_PACKAGE_FILE_NAME:'${CPACK_PACKAGE_FILE_NAME}'")
 
 include(CPack)
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    multicomp_install(
+        TARGETS ${CMAKE_PROJECT_NAME}
+        DESTINATION "./"
+        COMPONENTS Standalone Update
+        )
     add_custom_target(package-standalone-staged
         COMMAND ${CMAKE_CPACK_COMMAND}
         -C $<CONFIGURATION>
         --config ${CPACK_OUTPUT_CONFIG_FILE}
+        DEPENDS ${CMAKE_PROJECT_NAME} service_renderer
     )
-else()
-    add_custom_target(package-standalone-staged
-        COMMAND ${CMAKE_CPACK_COMMAND}
-        -C $<CONFIGURATION>
-        --config ${CPACK_OUTPUT_CONFIG_FILE}
-        DEPENDS ${BIN_FILE}-target ecoboot.bin version.json
-    )
-endif()
-
-if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    set(PACKAGE_STANDALONE_FILE_NAME ${PACKAGE_COMMON_NAME}-Standalone.zip)
-    set(PACKAGE_STANDALONE_MIME "application/zip")
-    add_custom_target(package-update-staged
-        COMMAND ${CMAKE_CPACK_COMMAND}
-        -C $<CONFIGURATION>
-        --config ${CPACK_OUTPUT_CONFIG_FILE}
-        DEPENDS ${BIN_FILE}-target ecoboot.bin version.json
-    )
-    add_custom_target(package-standalone
-        COMMAND zip -rq ${CMAKE_BINARY_DIR}/${PACKAGE_STANDALONE_FILE_NAME} "."
-        WORKING_DIRECTORY ${PACKAGE_STAGING_DIRECTORY}/Standalone
-        DEPENDS ${BIN_FILE}-target ${ECOBOOT_FILE} package-standalone-staged  PurePhone
-        )
-    set(UPDATE_STAGING_DIRECTORY ${PACKAGE_STAGING_DIRECTORY}/Update)
-    add_custom_target(package-update-checksums
-        COMMAND rhash
-        -u checksums.txt
-        -r .
-        WORKING_DIRECTORY ${UPDATE_STAGING_DIRECTORY}
-        DEPENDS package-update-staged
-        )
-    set(PACKAGE_UPDATE_FILE_NAME ${PACKAGE_COMMON_NAME}-Update.tar)
-    set(PACKAGE_UPDATE_MIME "application/x-tar")
-    add_custom_target(package-update
-        COMMAND tar
-        -cf ${CMAKE_BINARY_DIR}/${PACKAGE_UPDATE_FILE_NAME}
-        -C ${PACKAGE_STAGING_DIRECTORY}/Update "."
-        DEPENDS  ecoboot.bin version.json PurePhone package-update-staged package-update-checksums 
-        )
-elseif (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     set(PACKAGE_STANDALONE_FILE_NAME ${PACKAGE_COMMON_NAME}-Standalone.tar.gz)
     set(PACKAGE_STANDALONE_MIME "application/x-compressed-tar")
+
     add_custom_target(package-standalone
         COMMAND tar
         -czf ${CMAKE_BINARY_DIR}/${PACKAGE_STANDALONE_FILE_NAME}
@@ -475,6 +393,44 @@ elseif (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
         DEPENDS package-standalone-staged
         )
 endif()
+
+if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    set(PACKAGE_STANDALONE_MIME "application/x-xz")
+    set(PACKAGE_STANDALONE_FILE_NAME ${PACKAGE_COMMON_NAME}-image.xz)
+    add_custom_target(package-standalone
+        COMMAND tar -ScJf ${PACKAGE_STANDALONE_FILE_NAME} ${DISK_IMAGE_NAME}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        DEPENDS ${BIN_FILE}-target ${ECOBOOT_FILE}-target ${VERSION_JSON_FILE}-target  disk_image 
+        )
+
+    set(PACKAGE_UPDATE_FILE_NAME ${PACKAGE_COMMON_NAME}-Update.tar)
+    set(PACKAGE_UPDATE_MIME "application/x-tar")
+    set(UPDATE_STAGING_DIRECTORY ${PACKAGE_STAGING_DIRECTORY}/Update)
+    add_custom_target(package-update-staged
+        COMMAND ${CMAKE_CPACK_COMMAND}
+        -C $<CONFIGURATION>
+        --config ${CPACK_OUTPUT_CONFIG_FILE}
+        DEPENDS  ${BIN_FILE}-target ${ECOBOOT_FILE}-target ${VERSION_JSON_FILE}-target 
+        )
+    add_custom_target(package-update-checksums
+        COMMAND rhash
+        -u checksums.txt
+        -r .
+        WORKING_DIRECTORY ${UPDATE_STAGING_DIRECTORY}
+        DEPENDS package-update-staged
+        )
+
+    
+    add_custom_target(package-update
+        COMMAND tar
+        -cf ${CMAKE_BINARY_DIR}/${PACKAGE_UPDATE_FILE_NAME}
+        -C ${PACKAGE_STAGING_DIRECTORY}/Update "."
+        DEPENDS  ${ECOBOOT_FILE}-target ${VERSION_JSON_FILE}-target PurePhone package-update-staged package-update-checksums 
+        )
+endif()
+
+
+
 
 if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
     message("set-output name=package-standalone::${PACKAGE_STANDALONE_FILE_NAME}")
@@ -488,3 +444,4 @@ if (NOT "$ENV{GITHUB_WORKSPACE}" STREQUAL "")
     message("::set-output name=update-mime_type::${PACKAGE_UPDATE_MIME}")
 
 endif()
+
