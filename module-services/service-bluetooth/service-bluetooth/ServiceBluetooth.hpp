@@ -13,6 +13,7 @@
 #include <module-bluetooth/Bluetooth/CommandHandler.hpp>
 #include "BluetoothMessage.hpp"
 #include "ProfileManager.hpp"
+#include <Service/CpuSentinel.hpp>
 
 #include <memory> // for unique_ptr
 
@@ -42,6 +43,7 @@ class ServiceBluetooth : public sys::Service
 
   private:
     std::unique_ptr<BluetoothWorker> worker;
+    std::shared_ptr<sys::CpuSentinel> cpuSentinel;
     bool enabledFromHarness = false;
 };
 
