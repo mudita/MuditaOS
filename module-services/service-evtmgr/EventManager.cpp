@@ -77,14 +77,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
 {
     bool handled = false;
 
-    if (auto msg = dynamic_cast<cellular::RawCommandResp *>(resp)) {
-
-        auto event   = std::make_unique<sdesktop::developerMode::ATResponseEvent>(msg->response);
-        auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        bus.sendUnicast(message, service::name::service_desktop);
-
-        handled = true;
-    }
     if (msgl->messageType == MessageType::DBServiceNotification) {
         auto *msg = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msg != nullptr) {

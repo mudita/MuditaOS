@@ -48,6 +48,7 @@ namespace parserFSM
         inline constexpr auto systemStarted          = "systemStarted";
         inline constexpr auto ATResponse             = "ATResponse";
         inline constexpr auto AT                     = "AT";
+        inline constexpr auto timeout                = "timeout";
         inline constexpr auto focus                  = "focus";
         inline constexpr auto isLocked               = "isLocked";
         inline constexpr auto changeSim              = "changeSim";

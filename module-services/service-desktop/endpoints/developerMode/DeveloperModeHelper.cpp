@@ -21,6 +21,7 @@
 #include <service-db/DBServiceAPI.hpp>
 #include <time/time_conversion.hpp>
 #include <service-desktop/parser/MessageHandler.hpp>
+#include <service-desktop/endpoints/developerMode/event/ATRequest.hpp>
 
 namespace parserFSM
 {
@@ -54,11 +55,13 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
         return {sent::no, std::nullopt};
     }
     else if (body[json::developerMode::AT].is_string()) {
-
-        auto msg     = std::make_shared<cellular::RawCommand>();
-        msg->command = body[json::developerMode::AT].string_value();
-        msg->timeout = 3000;
-        code         = toCode(owner->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName));
+        using namespace sdesktop::developerMode;
+        auto cmd     = body[json::developerMode::AT].string_value();
+        auto timeout = std::chrono::milliseconds(body[json::developerMode::timeout].int_value());
+        LOG_DEBUG("at request send >%s\n< with timeout >%d<", cmd.c_str(), int(timeout.count()));
+        auto event = std::make_unique<ATResponseEvent>(cmd, timeout);
+        auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
+        code       = toCode(owner->bus.sendUnicast(msg, ServiceCellular::serviceName));
         return {sent::delayed, std::nullopt};
     }
     else if (body[json::developerMode::focus].bool_value()) {

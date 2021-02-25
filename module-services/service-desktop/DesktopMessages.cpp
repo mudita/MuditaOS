@@ -10,13 +10,6 @@ namespace sdesktop
     namespace developerMode
     {
 
-        ATResponseEvent::ATResponseEvent(std::vector<std::string> resp)
-        {
-            context.setResponseStatus(http::Code::OK);
-            context.setEndpoint(EndpointType::developerMode);
-            context.setResponseBody(json11::Json::object{{json::developerMode::ATResponse, resp}});
-        }
-
         AppFocusChangeEvent::AppFocusChangeEvent(std::string appName)
         {
             context.setResponseStatus(http::Code::OK);

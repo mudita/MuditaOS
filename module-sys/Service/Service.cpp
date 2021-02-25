@@ -29,17 +29,25 @@ void debug_msg(sys::Service *srvc, const sys::Message *ptr)
 {
 #if (DEBUG_SERVICE_MESSAGES > 0)
 
-    int status     = -1;
-    char *realname = nullptr;
-    realname       = abi::__cxa_demangle(typeid(*ptr).name(), 0, 0, &status);
+    int status           = -4; /// assign error number which is not  defined for __cxa_demangle
+    const char *realname = nullptr;
+    realname             = typeid(*ptr).name();
+    char *demangled      = abi::__cxa_demangle(realname, 0, 0, &status);
 
-    LOG_DEBUG("Handle message ([%s] -> [%s] (%s) data: %s",
-              ptr->sender.c_str(),
-              srvc->GetName().c_str(),
-              realname,
-              std::string(*ptr).c_str());
+    assert(srvc);
+    assert(ptr);
 
-    free(realname);
+    LOG_DEBUG("Handle message ([%s] -> [%s] (%s) data: %s %s",
+              ptr ? ptr->sender.c_str() : "",
+              srvc ? srvc->GetName().c_str() : "",
+              status == 0 ? demangled ? demangled : realname : realname,
+              std::string(*ptr).c_str(),
+              status != 0 ? status == -1
+                                ? "!mem fail!"
+                                : status == -2 ? "name ABI fail" : status == -3 ? "arg invalid" : "other failure!"
+                          : "");
+
+    free(demangled);
 #else
 #endif
 }

@@ -105,12 +105,13 @@ class CDCSerial:
         ret = (result == echoOffCmd)
         return ret
 
-    def send_at(self, at_command, wait=10):
+    def send_at(self, at_command, timeout, wait=10):
         body = {
-            "AT": at_command + "\r"
+            "AT": at_command + "\r",
+            "timeout": timeout
         }
 
-        ret = self.write(self.__wrap_message(body), wait)
+        ret = self.write(self.__wrap_message(body), timeout / 1000 + wait)
         log.info(f"at response {ret}")
         return ret["body"]["ATResponse"]
 
