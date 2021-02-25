@@ -4,6 +4,6 @@
 
 from harness.uart import connection, log
 
-results = connection.send_at("AT+CPIN?")
+results = connection.send_at("AT+CPIN?", 10000)
 for result in results:
     print(result)

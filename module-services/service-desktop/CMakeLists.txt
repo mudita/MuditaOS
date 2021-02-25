@@ -15,6 +15,7 @@ set(SOURCES
     endpoints/developerMode/Mode/BaseHelper.cpp
     endpoints/developerMode/Mode/UI_Helper.cpp
     endpoints/developerMode/event/DomRequest.cpp
+    endpoints/developerMode/event/ATRequest.cpp
     endpoints/deviceInfo/DeviceInfoEndpoint.cpp
     endpoints/factoryReset/FactoryReset.cpp
     endpoints/factoryReset/FactoryResetEndpoint.cpp

@@ -92,7 +92,6 @@ class CellularNotificationMessage : public CellularMessage
                                   // cold start)
         SIM_READY,                // change on SIM from URC
         SIM_NOT_READY,            // change to not existing/not valid SIM
-        RawCommand,               // send raw command to modem -> returns raw, tokenised result
         PowerDownDeregistering,   // modem informed it has started to disconnect from network
         PowerDownDeregistered,    // modem informed it has disconnected from network
         SMSDone,                  // SMS initialization finished
@@ -1024,23 +1023,6 @@ namespace cellular
         StateChange(const State::ST request = State::ST::Failed)
             : CellularMessage(MessageType::CellularStateRequest), request(request)
         {}
-    };
-
-    class RawCommand : public CellularNotificationMessage
-    {
-      public:
-        RawCommand() : CellularNotificationMessage(CellularNotificationMessage::Type::RawCommand){};
-        virtual ~RawCommand() = default;
-        std::string command;
-        uint32_t timeout = 1000;
-    };
-
-    class RawCommandResp : public CellularResponseMessage
-    {
-      public:
-        RawCommandResp(uint32_t retCode) : CellularResponseMessage(retCode){};
-        virtual ~RawCommandResp() = default;
-        std::vector<std::string> response;
     };
 
     class RawCommandRespAsync : public CellularMessage
