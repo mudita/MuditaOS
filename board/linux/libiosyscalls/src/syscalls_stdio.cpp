@@ -8,6 +8,7 @@
 #include <stdarg.h> // for va_*
 #include <limits.h> // for PATH_MAX
 #include <string.h> // for strlen
+#include <cassert>
 
 #include "syscalls_real.hpp"
 
@@ -450,18 +451,23 @@ extern "C"
         if (__size != 0 && __n != 0) {
             if (vfs::is_filex(__stream)) {
                 TRACE_SYSCALLN("(%p) -> VFS", __stream);
-                auto fx = reinterpret_cast<FILEX *>(__stream);
-                char *p = reinterpret_cast<char *>(__ptr);
-                do {
-                    auto res       = vfs::invoke_fs(&fs::read, fx->fd, p, __size);
-                    const auto eof = res >= 0 && size_t(res) < __size;
-                    fx->error      = errno;
-                    if (res < 0 || eof)
+                auto fx   = reinterpret_cast<FILEX *>(__stream);
+                char *p   = reinterpret_cast<char *>(__ptr);
+                bool eof  = false;
+                auto size = __size * __n;
+                assert(__size == (size / __n));
+                while (size && !eof) {
+                    size_t readsize = (size > 8192) ? 8192 : size;
+                    auto res        = vfs::invoke_fs(&fs::read, fx->fd, p, readsize);
+                    fx->error       = errno;
+                    if (res < 0)
                         break;
-                    p += __size;
-                    --__n;
-                    ++ret;
-                } while (__n > 0);
+                    if (size_t(res) < readsize)
+                        eof = true;
+                    p += res;
+                    ret += res;
+                    size -= res;
+                }
             }
             else {
                 TRACE_SYSCALLN("(%p) -> linux fs", __stream);
@@ -563,18 +569,21 @@ extern "C"
                 TRACE_SYSCALLN("(%p) -> VFS", __s);
                 auto fx       = reinterpret_cast<FILEX *>(__s);
                 const char *p = reinterpret_cast<const char *>(__ptr);
-                size_t items{};
-                do {
-                    auto ret       = vfs::invoke_fs(&fs::write, fx->fd, p, __size);
-                    const auto eof = ret >= 0 && size_t(ret) != __size;
-                    fx->error      = errno;
-                    if (ret < 0 || eof)
-                        return ret;
-                    p += __size;
-                    --__n;
-                    ++items;
-                } while (__n > 0);
-                ret = (ret < 0) ? (-1) : (items);
+                bool eos      = false;
+                auto size     = __size * __n;
+                assert(__size == (size / __n));
+                while (size && !eos) {
+                    size_t wrsize = (size > 8192) ? 8192 : size;
+                    auto res      = vfs::invoke_fs(&fs::write, fx->fd, p, wrsize);
+                    fx->error     = errno;
+                    if (res < 0)
+                        break;
+                    if (size_t(res) < wrsize)
+                        eos = true;
+                    p += res;
+                    ret += res;
+                    size -= res;
+                }
             }
             else {
                 if (__s != stdout && __s != stderr)
