@@ -16,6 +16,7 @@
 #include <service-bluetooth/messages/BondedDevices.hpp>
 
 #include <log/log.hpp>
+#include "SystemManager/messages/SentinelRegistrationMessage.hpp"
 
 #include <bits/exception.h>
 #include <utility>
@@ -42,7 +43,15 @@ ServiceBluetooth::~ServiceBluetooth()
 // this means it is an init point of bluetooth feature handling
 sys::ReturnCodes ServiceBluetooth::InitHandler()
 {
-    LOG_ERROR("Bluetooth experimental!");
+    cpuSentinel = std::make_shared<sys::CpuSentinel>(service::name::bluetooth, this);
+
+    auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+    bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
+
+    // temporarily limit the minimum CPU frequency
+    // due to problems with the UART of the BT module
+    cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6);
+
     worker = std::make_unique<BluetoothWorker>(this);
     worker->run();
 
