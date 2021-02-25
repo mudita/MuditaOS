@@ -175,6 +175,8 @@ namespace app
         windowsFactory.attach(algo_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AlgoParamsWindow>(app);
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationAntenna::destroyUserInterface()

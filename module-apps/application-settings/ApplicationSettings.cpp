@@ -163,6 +163,8 @@ namespace app
                                       return std::make_unique<gui::CellularPassthroughWindow>(app);
                                   });
         }
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationSettings::destroyUserInterface()

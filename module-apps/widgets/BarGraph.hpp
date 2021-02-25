@@ -25,9 +25,6 @@ namespace gui
 
         [[nodiscard]] auto createRectangle(uint32_t width, uint32_t height) const -> Rect *;
 
-        auto incrementWith(uint32_t levels) -> bool;
-        auto decrementWith(uint32_t levels) -> bool;
-
       public:
         void setPercentageValue(unsigned int value) override;
 
@@ -35,7 +32,6 @@ namespace gui
         {
             return currentLevel;
         }
-        auto update(int value = 1) -> bool final;
 
         auto setValue(unsigned int value) -> bool override;
     };

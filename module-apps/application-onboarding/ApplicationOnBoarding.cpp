@@ -105,6 +105,8 @@ namespace app
                                                                                            std::move(eulaRepository));
             return std::make_unique<app::onBoarding::EULALicenseWindow>(app, std::move(presenter));
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationOnBoarding::destroyUserInterface()

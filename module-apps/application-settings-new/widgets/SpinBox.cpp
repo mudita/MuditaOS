@@ -39,15 +39,15 @@ namespace gui
                 return false;
             }
 
-            int update = 0;
+            int update = bar->getValue();
             if (event.is(KeyCode::KEY_LEFT)) {
-                update = -1;
+                update--;
             }
             else if (event.is(KeyCode::KEY_RIGHT)) {
-                update = 1;
+                update++;
             }
 
-            if (update != 0 && bar->update(update)) {
+            if (update >= 0 && bar->setValue(update)) {
                 updateBarCallback(bar->getValue());
                 return true;
             }

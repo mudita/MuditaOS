@@ -85,6 +85,8 @@ namespace app
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ClockMainWindow>(app, name);
         });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationClock::destroyUserInterface()

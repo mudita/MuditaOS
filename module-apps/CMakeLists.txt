@@ -28,7 +28,7 @@ set( SOURCES
     "windows/NoEvents.cpp"
     "widgets/ButtonOnOff.cpp"
     "widgets/InputBox.cpp"
-    "windows/VolumeWindow.cpp"
+    "popups/VolumeWindow.cpp"
     "windows/BrightnessWindow.cpp"
     "windows/HomeModesWindow.cpp"
     "widgets/BrightnessBox.cpp"
@@ -146,6 +146,7 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/messages
         ${CMAKE_CURRENT_SOURCE_DIR}/windows
+        ${CMAKE_CURRENT_SOURCE_DIR}/popups
         ${CMAKE_CURRENT_SOURCE_DIR}/options
         ${CMAKE_CURRENT_SOURCE_DIR}/options/type
         ${CMAKE_BINARY_DIR}

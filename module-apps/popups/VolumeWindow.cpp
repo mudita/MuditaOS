@@ -56,7 +56,9 @@ namespace gui
     }
 
     void VolumeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {}
+    {
+        updateGraph();
+    }
 
     bool VolumeWindow::onInput(const gui::InputEvent &inputEvent)
     {
@@ -64,14 +66,33 @@ namespace gui
             return false;
         }
 
-        if (inputEvent.keyCode == gui::KeyCode::KEY_VOLUP) {
-            volumeBar->update(1);
-        }
-
-        if (inputEvent.keyCode == gui::KeyCode::KEY_VOLDN) {
-            volumeBar->update(-1);
+        if ((inputEvent.isShortPress())) {
+            switch (inputEvent.keyCode) {
+            case KeyCode::KEY_VOLUP: {
+                application->increaseCurrentVolume();
+                updateGraph();
+                return true;
+            }
+            case KeyCode::KEY_VOLDN: {
+                application->decreaseCurrentVolume();
+                updateGraph();
+                return true;
+            }
+            case KeyCode::KEY_RF: {
+                application->returnToPreviousWindow();
+                return true;
+            }
+            default:
+                break;
+            }
         }
 
         return AppWindow::onInput(inputEvent);
+    }
+
+    void VolumeWindow::updateGraph()
+    {
+        application->getCurrentVolume(Volume);
+        volumeBar->setValue(Volume);
     }
 } // namespace gui

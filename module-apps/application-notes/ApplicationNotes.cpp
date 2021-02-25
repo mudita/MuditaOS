@@ -121,6 +121,8 @@ namespace app
         windowsFactory.attach(
             utils::localize.get("app_phonebook_options_title"),
             [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
+
+        attachPopups({gui::popup::ID::Volume});
     }
 
     void ApplicationNotes::destroyUserInterface()
