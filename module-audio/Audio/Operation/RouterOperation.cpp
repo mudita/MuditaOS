@@ -144,9 +144,11 @@ namespace audio
             SwitchToPriorityProfile();
             break;
         case EventType::CallLoudspeakerOn:
+            SetProfileAvailability({Profile::Type::RoutingEarspeaker}, false);
             SwitchProfile(Profile::Type::RoutingLoudspeaker);
             break;
         case EventType::CallLoudspeakerOff:
+            SetProfileAvailability({Profile::Type::RoutingEarspeaker}, true);
             SwitchToPriorityProfile();
             break;
         case EventType::CallMute:
