@@ -38,6 +38,6 @@ add_catch2_executable(
         module-vfs
         iosyscalls
     DEPS
-        PurePhone.img-target
+        disk_image
 )
 add_subdirectory(test-initializer)

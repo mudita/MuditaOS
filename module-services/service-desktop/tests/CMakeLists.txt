@@ -13,7 +13,7 @@ add_catch2_executable(
         module-apps
         iosyscalls
     DEPS
-        PurePhone.img-target
+        disk_image
 )
 
 add_catch2_executable(

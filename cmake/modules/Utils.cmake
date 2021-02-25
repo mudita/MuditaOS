@@ -11,3 +11,4 @@ function(multicomp_install)
         install(${INSTALL_ARGN} COMPONENT ${COMP})
     endforeach()
 endfunction()
+

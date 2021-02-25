@@ -18,5 +18,5 @@ add_catch2_executable(
                 iosyscalls
         DEPS
                 assets
-                PurePhone.img-target
+                disk_image
 )
