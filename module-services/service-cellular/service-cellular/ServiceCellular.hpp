@@ -29,6 +29,7 @@
 #include <vector>   // for vector
 #include <service-db/Settings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <module-sys/PhoneModes/Observer.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 
@@ -176,6 +177,7 @@ class ServiceCellular : public sys::Service
     DLC_channel::Callback_t notificationCallback = nullptr;
 
     std::unique_ptr<packet_data::PacketData> packetData;
+    std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
 
     cellular::State state;
     bsp::Board board = bsp::Board::none;

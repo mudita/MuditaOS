@@ -25,6 +25,8 @@
 #include <filesystem>
 #include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
+#include <module-sys/SystemManager/Constants.hpp>
+#include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>
 
 #include <purefs/filesystem_paths.hpp>
 #include <sys/mount.h>
@@ -206,6 +208,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         LOG_INFO("USB disconnected. Enabling secured endpoints.");
         bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(true),
                         app::manager::ApplicationManager::ServiceName);
+        bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::Off),
+                        service::name::system_manager);
         return sys::MessageNone{};
     });
 
