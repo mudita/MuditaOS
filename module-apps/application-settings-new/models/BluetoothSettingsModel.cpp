@@ -9,6 +9,7 @@
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/SetStatus.hpp>
 #include <service-bluetooth/messages/SetDeviceName.hpp>
+#include <service-bluetooth/messages/Passkey.hpp>
 
 BluetoothSettingsModel::BluetoothSettingsModel(app::Application *application) : application{application}
 {}
@@ -64,4 +65,10 @@ void BluetoothSettingsModel::setAddrForAudioProfiles(std::string addr)
 void BluetoothSettingsModel::requestDevicePairing(std::string addr)
 {
     application->bus.sendUnicast(std::make_shared<BluetoothPairMessage>(std::move(addr)), service::name::bluetooth);
+}
+
+void BluetoothSettingsModel::responsePasskey(std::string passkey)
+{
+    application->bus.sendUnicast(std::make_shared<message::bluetooth::ResponsePasskey>(std::move(passkey)),
+                                 service::name::bluetooth);
 }
