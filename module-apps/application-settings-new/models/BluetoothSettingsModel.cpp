@@ -5,7 +5,9 @@
 
 #include <Constants.hpp>
 #include <service-bluetooth/messages/BondedDevices.hpp>
+#include <service-bluetooth/messages/Connect.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
+#include <service-bluetooth/messages/Disconnect.hpp>
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/messages/SetStatus.hpp>
 #include <service-bluetooth/messages/SetDeviceName.hpp>
@@ -67,7 +69,14 @@ void BluetoothSettingsModel::responsePasskey(std::string passkey)
     application->bus.sendUnicast(std::make_shared<message::bluetooth::ResponsePasskey>(std::move(passkey)),
                                  service::name::bluetooth);
 }
-void BluetoothSettingsModel::requestAudioConnection(std::string addr)
+
+void BluetoothSettingsModel::requestConnection(std::string addr)
 {
-    application->bus.sendUnicast(std::make_shared<BluetoothAddrMessage>(std::move(addr)), service::name::bluetooth);
+    application->bus.sendUnicast(std::make_shared<message::bluetooth::Connect>(std::move(addr)),
+                                 service::name::bluetooth);
+}
+
+void BluetoothSettingsModel::requestDisconnection()
+{
+    application->bus.sendUnicast(std::make_shared<message::bluetooth::Disconnect>(), service::name::bluetooth);
 }

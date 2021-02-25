@@ -23,6 +23,7 @@ namespace gui
         Image *leftArrowImage = nullptr;
         Image *crossImage     = nullptr;
         std::vector<Devicei> devices;
+        std::string addressOfConnectedDevice;
         std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
     };
 

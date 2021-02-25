@@ -4,13 +4,14 @@
 #include "service-bluetooth/ServiceBluetooth.hpp"
 #include "service-bluetooth/BluetoothMessage.hpp"
 
-
 #include <Bluetooth/BluetoothWorker.hpp>
 #include <interface/profiles/Profile.hpp>
 #include <MessageType.hpp>
 #include <Service/Service.hpp>
 #include <Service/Message.hpp>
 #include <service-db/Settings.hpp>
+#include "service-bluetooth/messages/Connect.hpp"
+#include "service-bluetooth/messages/Disconnect.hpp"
 #include "service-bluetooth/messages/Status.hpp"
 #include "service-bluetooth/messages/SetStatus.hpp"
 #include <service-bluetooth/messages/BondedDevices.hpp>
@@ -28,8 +29,8 @@
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth, "", 4096)
 {
-    auto settings  = std::make_unique<settings::Settings>(this);
-    settingsHolder = std::make_shared<bluetooth::SettingsHolder>(std::move(settings));
+    auto settings                   = std::make_unique<settings::Settings>(this);
+    settingsHolder                  = std::make_shared<bluetooth::SettingsHolder>(std::move(settings));
     bluetooth::KeyStorage::settings = settingsHolder;
     LOG_INFO("[ServiceBluetooth] Initializing");
 }
@@ -60,7 +61,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
             std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::BondedDevices));
 
         return std::make_shared<message::bluetooth::ResponseBondedDevices>(
-            SettingsSerializer::fromString(bondedDevicesStr));
+            SettingsSerializer::fromString(bondedDevicesStr), std::string());
     });
 
     connect(message::bluetooth::RequestStatus(), [&](sys::Message *msg) {
@@ -101,7 +102,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     });
 
     connect(typeid(BluetoothPairMessage), [&](sys::Message *msg) {
-        auto pairMsg = static_cast<BluetoothPairMessage *>(msg);
+        auto pairMsg          = static_cast<BluetoothPairMessage *>(msg);
         const auto addrString = pairMsg->addr;
         bd_addr_t addr;
         sscanf_bd_addr(addrString.c_str(), addr);
@@ -127,6 +128,23 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
             bus.sendUnicast(std::move(message), service::name::service_desktop);
         }
 
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(message::bluetooth::Connect), [&](sys::Message *msg) {
+        auto connectMsg       = static_cast<message::bluetooth::Connect *>(msg);
+        const auto addrString = connectMsg->getAddr();
+        LOG_DEBUG("Connecting with %s", addrString.c_str());
+        bd_addr_t addr;
+        sscanf_bd_addr(addrString.c_str(), addr);
+        sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::ConnectAudio, addr));
+        bus.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(addrString, true),
+                        service::name::bluetooth);
+        return sys::MessageNone{};
+    });
+
+    connect(typeid(message::bluetooth::Disconnect), [&](sys::Message *msg) {
+        sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::DisconnectAudio));
         return sys::MessageNone{};
     });
 
