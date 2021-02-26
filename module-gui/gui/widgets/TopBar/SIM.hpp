@@ -14,9 +14,17 @@ namespace gui::top_bar
         Store::GSM::SIM current = Store::GSM::SIM::SIM_UNKNOWN;
 
       public:
+        enum class SimIndicatorFlag
+        {
+            SIM_NO_FLAGS = 0, ///> default action, only sim blocked and sim error is displayed
+            SIM_SHOW_ALL = 1  ///> includes sim1 and sim2 icon
+        };
         SIM(Item *parent, uint32_t x, uint32_t y);
 
         /// check if sim set in state -> if not -> show new sim
-        void update(const Store::GSM::SIM &state);
+        void update(const Store::GSM::SIM &state, SimIndicatorFlag flag = SimIndicatorFlag::SIM_NO_FLAGS);
+
+      private:
+        void setSimWithNumber(const char *sim, SimIndicatorFlag flag);
     };
 } // namespace gui::top_bar

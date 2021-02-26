@@ -38,6 +38,7 @@ namespace gui::top_bar
     };
     using Indicators        = std::vector<Indicator>;
     using IndicatorStatuses = std::map<Indicator, bool>;
+    using IndicatorFlags    = std::map<Indicator, int>;
 
     enum class TimeMode
     {
@@ -57,7 +58,9 @@ namespace gui::top_bar
         void set(Indicator indicator, bool enabled);
         void set(TimeMode timeMode);
         [[nodiscard]] auto getTimeMode() const noexcept -> TimeMode;
+        void setIndicatorFlag(Indicator indicator, int flag);
         [[nodiscard]] auto isEnabled(Indicator indicator) const -> bool;
+        [[nodiscard]] auto getIndicatorFlag(Indicator indicator) -> int;
         [[nodiscard]] auto getIndicatorsConfiguration() const noexcept -> const IndicatorStatuses &;
 
       private:
@@ -67,6 +70,8 @@ namespace gui::top_bar
                                                {Indicator::Battery, false},
                                                {Indicator::SimCard, false},
                                                {Indicator::NetworkAccessTechnology, false}};
+
+        IndicatorFlags indicatorFlags;
         TimeMode timeMode                   = TimeMode::Time12h;
     };
 

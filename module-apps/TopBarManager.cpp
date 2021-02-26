@@ -16,6 +16,11 @@ namespace app
         return topBarConfiguration;
     }
 
+    void TopBarManager::setIndicatorFlag(gui::top_bar::Indicator indicator, int flag)
+    {
+        topBarConfiguration.setIndicatorFlag(indicator, flag);
+    }
+
     void TopBarManager::set(gui::top_bar::TimeMode timeMode)
     {
         topBarConfiguration.set(timeMode);

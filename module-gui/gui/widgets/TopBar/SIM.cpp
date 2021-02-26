@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SIM.hpp"
@@ -17,18 +17,18 @@ namespace gui::top_bar
         set(simunknown);
     }
 
-    void SIM::update(const Store::GSM::SIM &state)
+    void SIM::update(const Store::GSM::SIM &state, SimIndicatorFlag flag)
     {
         if (state == current) {
             return;
         }
-        current = state;
-        switch (current) {
+        setVisible(true);
+        switch (state) {
         case GSM::SIM::SIM1:
-            set(sim1);
+            setSimWithNumber(sim1, flag);
             break;
         case GSM::SIM::SIM2:
-            set(sim2);
+            setSimWithNumber(sim2, flag);
             break;
         case GSM::SIM::SIM_FAIL:
             set(simfailed);
@@ -40,4 +40,13 @@ namespace gui::top_bar
             break;
         }
     }
-}; // namespace gui::top_bar
+    void SIM::setSimWithNumber(const char *sim, SimIndicatorFlag flag)
+    {
+        if (flag == SimIndicatorFlag::SIM_SHOW_ALL) {
+            set(sim);
+        }
+        else {
+            setVisible(false);
+        }
+    }
+}; // namespace gui

@@ -170,6 +170,15 @@ namespace gui::top_bar
         }
     }
 
+    void Configuration::setIndicatorFlag(Indicator indicator, int flag)
+    {
+        indicatorFlags[indicator] = flag;
+    }
+    auto Configuration::getIndicatorFlag(Indicator indicator) -> int
+    {
+        return (indicatorFlags.count(indicator) == 0 ? 0 : indicatorFlags[indicator]);
+    }
+
     bool TopBar::updateBattery()
     {
         if (battery == nullptr) {
@@ -187,8 +196,12 @@ namespace gui::top_bar
 
     void TopBar::showSim(bool enabled)
     {
-        sim->update(Store::GSM::get()->sim);
-        enabled ? sim->show() : sim->hide();
+        if (!enabled) {
+            sim->setVisible(false);
+            return;
+        }
+        int flag = configuration.getIndicatorFlag(Indicator::SimCard);
+        sim->update(Store::GSM::get()->sim, static_cast<SIM::SimIndicatorFlag>(flag));
     }
 
     bool TopBar::updateSim()

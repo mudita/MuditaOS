@@ -26,6 +26,7 @@
 #include <cassert>
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
 #include <module-services/service-db/service-db/DBServiceAPI.hpp>
+#include <module-gui/gui/widgets/TopBar/SIM.hpp>
 
 namespace app
 {
@@ -38,6 +39,8 @@ namespace app
                                          Indicator::Battery,
                                          Indicator::SimCard,
                                          Indicator::NetworkAccessTechnology});
+        topBarManager->setIndicatorFlag(Indicator::SimCard,
+                                        static_cast<int>(gui::top_bar::SIM::SimIndicatorFlag::SIM_SHOW_ALL));
         addActionReceiver(manager::actions::Call, [this](auto &&data) {
             switchWindow(window::name_call, std::forward<decltype(data)>(data));
             return actionHandled();
