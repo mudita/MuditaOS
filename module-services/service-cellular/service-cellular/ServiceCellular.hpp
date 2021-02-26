@@ -65,8 +65,10 @@ class ServiceCellular : public sys::Service
 
     ~ServiceCellular() override;
 
-    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
-
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override
+    {
+        return std::make_shared<sys::ResponseMessage>();
+    }
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;
     sys::ReturnCodes DeinitHandler() override;
@@ -283,7 +285,7 @@ class ServiceCellular : public sys::Service
     void handleUSSDTimer();
 
     bool handleSimState(at::SimState state, const std::string message);
-    bool handleSimResponse(sys::DataMessage *msgl);
+    auto handleSimResponse(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>;
 
     std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
         CellularStartOperatorsScanMessage *msg);
@@ -326,6 +328,36 @@ class ServiceCellular : public sys::Service
     auto handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularIncominCallMessage(CellularIncominCallMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularCallerIdMessage(CellularCallerIdMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularSimProcedureMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetIMSIMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetOwnNumberMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetNetworkInfoMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularSelectAntennaMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularSetScanModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetScanModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetFirmwareVersionMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleEVMStatusMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetCsqMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetCregMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetNwinfoMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularGetAntennaMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularDtmfRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularUSSDMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleSimStateMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleStateRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+
+    auto handleCallActiveNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCallAbortedNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handlePowerUpProcedureCompleteNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handlePowerDownDeregisteringNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handlePowerDownDeregisteredNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleNewIncomingSMSNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleRawCommandNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleSimReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleSmsDoneNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleSignalStrengthUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleNetworkStatusUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleSimNotReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
 };
 
 namespace sys

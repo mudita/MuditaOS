@@ -411,8 +411,7 @@ TS0710::ConfState TS0710::StartMultiplexer()
             SignalStrength signalStrength(strength);
             if (signalStrength.isValid()) {
                 Store::GSM::get()->setSignalStrength(signalStrength.data);
-                auto msg = std::make_shared<CellularNotificationMessage>(
-                    CellularNotificationMessage::Type::SignalStrengthUpdate);
+                auto msg = std::make_shared<CellularSignalStrengthUpdateNotification>();
                 pv_parent->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
             }
         }
