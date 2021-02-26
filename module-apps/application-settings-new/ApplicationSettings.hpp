@@ -65,6 +65,10 @@ namespace gui::window::name
     inline constexpr auto new_apn = "NewApn";
     inline constexpr auto bluetooth_check_passkey = "BluetoothCheckPasskey";
 
+    inline constexpr auto do_not_disturb       = "DoNotDisturb";
+    inline constexpr auto offline              = "Offline";
+    inline constexpr auto connection_frequency = "ConnectionFrequency";
+
 } // namespace gui::window::name
 
 namespace app
@@ -124,6 +128,32 @@ namespace app
             virtual void setUSBSecurity(bool security) = 0;
         };
 
+        class DndSettings
+        {
+          public:
+            virtual ~DndSettings() = default;
+
+            virtual auto getNotificationsWhenLocked() const noexcept -> bool = 0;
+            virtual void setNotificationsWhenLocked(bool on) noexcept        = 0;
+            virtual auto getCallsFromFavourite() const noexcept -> bool      = 0;
+            virtual void setCallsFromFavourite(bool on) noexcept             = 0;
+        };
+
+        class ConnectionSettings
+        {
+          public:
+            virtual ~ConnectionSettings() = default;
+
+            virtual auto getConnectionFrequency() const noexcept -> uint8_t = 0;
+            virtual void setConnectionFrequency(uint8_t val) noexcept       = 0;
+        };
+
+        class OfflineSettings
+        {
+          public:
+            virtual auto isFlightMode() const noexcept -> bool     = 0;
+            virtual void setFlightMode(bool flightModeOn) noexcept = 0;
+        };
     }; // namespace settingsInterface
 
     class ApplicationSettingsNew : public app::Application,
@@ -131,7 +161,10 @@ namespace app
                                    public settingsInterface::OperatorsSettings,
                                    public settingsInterface::ScreenLightSettings,
                                    public settingsInterface::KeypdBacklightSettings,
-                                   public settingsInterface::SecuritySettings
+                                   public settingsInterface::SecuritySettings,
+                                   public settingsInterface::DndSettings,
+                                   public settingsInterface::OfflineSettings,
+                                   public settingsInterface::ConnectionSettings
     {
       public:
         ApplicationSettingsNew(std::string name                    = name_settings_new,
@@ -179,6 +212,17 @@ namespace app
         void setLockScreenPasscodeOn(bool passcodeOn);
         auto isLockScreenPasscodeOn() const -> bool;
 
+        auto getNotificationsWhenLocked() const noexcept -> bool override;
+        void setNotificationsWhenLocked(bool on) noexcept override;
+        auto getCallsFromFavourite() const noexcept -> bool override;
+        void setCallsFromFavourite(bool on) noexcept override;
+
+        auto isFlightMode() const noexcept -> bool override;
+        void setFlightMode(bool flightModeOn) noexcept override;
+
+        auto getConnectionFrequency() const noexcept -> uint8_t override;
+        void setConnectionFrequency(uint8_t val) noexcept override;
+
       private:
         void attachQuotesWindows();
 
@@ -190,6 +234,10 @@ namespace app
         bool usbSecured               = true;
         bool lockScreenPasscodeOn     = true;
         unsigned int lockPassHash     = 0;
+        bool notificationsWhenLocked  = true;
+        bool callsFromFavorites       = false;
+        int connectionFrequency       = 0;
+        bool flightModeOn             = true;
     };
 
     template <> struct ManifestTraits<ApplicationSettingsNew>

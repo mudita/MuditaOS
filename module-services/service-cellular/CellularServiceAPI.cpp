@@ -341,3 +341,9 @@ bool CellularServiceAPI::ChangeModulePowerState(sys::Service *serv, cellular::St
 {
     return serv->bus.sendUnicast(std::make_shared<CellularPowerStateChange>(newState), ServiceCellular::serviceName);
 }
+
+bool CellularServiceAPI::SetFlightMode(sys::Service *serv, bool flightModeOn)
+{
+    return serv->bus.sendUnicast(std::make_shared<CellularSetFlightModeMessage>(flightModeOn),
+                                 ServiceCellular::serviceName);
+}

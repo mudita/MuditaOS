@@ -925,6 +925,15 @@ class CellularGetAntennaMessage : public CellularMessage
     {}
 };
 
+class CellularSetFlightModeMessage : public CellularMessage
+{
+  public:
+    explicit CellularSetFlightModeMessage(bool flightModeOn)
+        : CellularMessage(MessageType::CellularSetFlightMode), flightModeOn(flightModeOn)
+    {}
+    bool flightModeOn;
+};
+
 class CellularCallActiveNotification : public CellularNotificationMessage
 {
   public:
