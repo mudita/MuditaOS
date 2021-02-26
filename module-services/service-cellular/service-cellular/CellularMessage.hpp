@@ -301,7 +301,7 @@ class CellularDtmfRequestMessage : public CellularMessage
 class CellularAntennaRequestMessage : public CellularMessage
 {
   public:
-    CellularAntennaRequestMessage(MessageType messageType) : CellularMessage(messageType)
+    CellularAntennaRequestMessage() : CellularMessage(MessageType::CellularSelectAntenna)
     {}
 
     bsp::cellular::antenna antenna;
@@ -845,6 +845,172 @@ class CellularListCallsMessage : public CellularMessage
 {
   public:
     CellularListCallsMessage() : CellularMessage(MessageType::CellularListCurrentCalls)
+    {}
+};
+
+class CellularSimProcedureMessage : public CellularMessage
+{
+  public:
+    CellularSimProcedureMessage() : CellularMessage(MessageType::CellularSimProcedure)
+    {}
+};
+
+class CellularGetIMSIMessage : public CellularMessage
+{
+  public:
+    CellularGetIMSIMessage() : CellularMessage(MessageType::CellularGetIMSI)
+    {}
+};
+
+class CellularGetOwnNumberMessage : public CellularMessage
+{
+  public:
+    CellularGetOwnNumberMessage() : CellularMessage(MessageType::CellularGetOwnNumber)
+    {}
+};
+
+class CellularGetNetworkInfoMessage : public CellularMessage
+{
+  public:
+    CellularGetNetworkInfoMessage() : CellularMessage(MessageType::CellularGetNetworkInfo)
+    {}
+};
+
+class CellularSetScanModeMessage : public CellularMessage
+{
+  public:
+    CellularSetScanModeMessage(const std::string &mode) : CellularMessage(MessageType::CellularSetScanMode), data(mode)
+    {}
+    std::string data;
+};
+
+class CellularGetScanModeMessage : public CellularMessage
+{
+  public:
+    CellularGetScanModeMessage() : CellularMessage(MessageType::CellularGetScanMode)
+    {}
+};
+
+class CellularGetFirmwareVersionMessage : public CellularMessage
+{
+  public:
+    CellularGetFirmwareVersionMessage() : CellularMessage(MessageType::CellularGetFirmwareVersion)
+    {}
+};
+
+class CellularGetCsqMessage : public CellularMessage
+{
+  public:
+    CellularGetCsqMessage() : CellularMessage(MessageType::CellularGetCSQ)
+    {}
+};
+
+class CellularGetCregMessage : public CellularMessage
+{
+  public:
+    CellularGetCregMessage() : CellularMessage(MessageType::CellularGetCREG)
+    {}
+};
+
+class CellularGetNwinfoMessage : public CellularMessage
+{
+  public:
+    CellularGetNwinfoMessage() : CellularMessage(MessageType::CellularGetNWINFO)
+    {}
+};
+
+class CellularGetAntennaMessage : public CellularMessage
+{
+  public:
+    CellularGetAntennaMessage() : CellularMessage(MessageType::CellularGetAntenna)
+    {}
+};
+
+class CellularCallActiveNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularCallActiveNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::CallActive, data)
+    {}
+};
+
+class CellularCallAbortedNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularCallAbortedNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::CallAborted, data)
+    {}
+};
+
+class CellularPowerUpProcedureCompleteNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularPowerUpProcedureCompleteNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::PowerUpProcedureComplete, data)
+    {}
+};
+
+class CellularPowerDownDeregisteringNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularPowerDownDeregisteringNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::PowerDownDeregistering, data)
+    {}
+};
+
+class CellularPowerDownDeregisteredNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularPowerDownDeregisteredNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::PowerDownDeregistered, data)
+    {}
+};
+
+class CellularNewIncomingSMSNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularNewIncomingSMSNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::NewIncomingSMS, data)
+    {}
+};
+
+class CellularSimReadyNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularSimReadyNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::SIM_READY, data)
+    {}
+};
+
+class CellularSmsDoneNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularSmsDoneNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::SMSDone, data)
+    {}
+};
+
+class CellularSignalStrengthUpdateNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularSignalStrengthUpdateNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::SignalStrengthUpdate, data)
+    {}
+};
+
+class CellularNetworkStatusUpdateNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularNetworkStatusUpdateNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::NetworkStatusUpdate, data)
+    {}
+};
+
+class CellularSimNotReadyNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularSimNotReadyNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::SIM_NOT_READY, data)
     {}
 };
 

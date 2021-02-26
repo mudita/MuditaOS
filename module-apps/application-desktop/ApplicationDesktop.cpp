@@ -247,8 +247,7 @@ namespace app
                 return true;
             }
             else if (need_sim_select == false) {
-                bus.sendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularSimProcedure),
-                                ServiceCellular::serviceName);
+                bus.sendUnicast(std::make_shared<CellularSimProcedureMessage>(), ServiceCellular::serviceName);
             }
         }
         if (msg->request == cellular::State::ST::ModemFatalFailure) {
