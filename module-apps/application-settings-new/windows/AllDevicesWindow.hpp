@@ -24,6 +24,7 @@ namespace gui
         Image *crossImage     = nullptr;
         std::vector<Devicei> devices;
         std::string addressOfConnectedDevice;
+        std::string addressOfSelectedDevice;
         std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel;
     };
 

@@ -7,12 +7,12 @@
 
 namespace message::bluetooth
 {
-    class Connect : public BluetoothMessage
+    class Unpair : public BluetoothMessage
     {
       public:
-        explicit Connect(std::string addr) : addr(std::move(addr))
+        explicit Unpair(std::string addr) : addr(std::move(addr))
         {}
-        [[nodiscard]] auto getAddr() const noexcept -> std::string
+        [[nodiscard]] auto getAddr() const -> std::string
         {
             return addr;
         }
@@ -21,10 +21,10 @@ namespace message::bluetooth
         std::string addr;
     };
 
-    class ConnectResult : public BluetoothMessage
+    class UnpairResult : public BluetoothMessage
     {
       public:
-        explicit ConnectResult(std::string addr, bool succeed) : addr(std::move(addr)), succeed(succeed)
+        explicit UnpairResult(std::string addr, bool succeed) : addr(std::move(addr)), succeed(succeed)
         {}
         [[nodiscard]] auto getAddr() const noexcept -> std::string
         {

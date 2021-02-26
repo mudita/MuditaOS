@@ -16,7 +16,7 @@ namespace message::bluetooth
         explicit ResponseBondedDevices(std::vector<Devicei> devices, std::string addressOfConnectedDevice)
             : devices(std::move(devices)), addressOfConnectedDevice(std::move(addressOfConnectedDevice))
         {}
-        [[nodiscard]] auto getDevices() const -> std::vector<Devicei>
+        [[nodiscard]] auto getDevices() const noexcept -> std::vector<Devicei>
         {
             return devices;
         }
