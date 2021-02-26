@@ -48,7 +48,7 @@ namespace app
         writeQuotes(repositoryPath);
     }
 
-    void QuotesJsonRepository::writeQuotes(const fs::path &quotesFilename)
+    void QuotesJsonRepository::writeQuotes(const std::filesystem::path &quotesFilename)
     {
         if (auto file = std::fopen(repositoryPath.c_str(), "w"); file != nullptr) {
             auto _    = gsl::finally([file] { std::fclose(file); });
@@ -58,7 +58,7 @@ namespace app
         }
     }
 
-    void QuotesJsonRepository::readQuotes(const fs::path &quotesFilename)
+    void QuotesJsonRepository::readQuotes(const std::filesystem::path &quotesFilename)
     {
         std::string err;
 
@@ -78,7 +78,7 @@ namespace app
         });
     }
 
-    auto QuotesJsonRepository::readFileToString(const fs::path &filename) -> std::string
+    auto QuotesJsonRepository::readFileToString(const std::filesystem::path &filename) -> std::string
     {
         constexpr auto tar_buf = 8192 * 4;
         auto file              = std::fopen(filename.c_str(), "r");
@@ -92,7 +92,7 @@ namespace app
             LOG_ERROR("File %s length is too high!", filename.c_str());
             return {};
         }
-        LOG_INFO("file length: %ld", length);
+        LOG_INFO("file length: %u", static_cast<unsigned int>(length));
         auto buffer = std::make_unique<char[]>(length + 1);
         std::fread(buffer.get(), 1, length, file);
         return std::string(buffer.get());

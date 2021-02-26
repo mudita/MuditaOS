@@ -43,7 +43,7 @@ namespace gui
 
         if (isWallpaperQuotesSwitchOn) {
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                utils::translateI18("app_settings_display_wallpaper_select_quotes"),
+                utils::translateI18("app_settings_display_wallpaper_edit_quotes"),
                 [=](gui::Item &item) {
                     application->switchWindow(gui::window::name::quotes, nullptr);
                     return true;

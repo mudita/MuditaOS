@@ -34,6 +34,7 @@
 #include "windows/DateAndTimeMainWindow.hpp"
 #include "windows/ChangeTimeZone.hpp"
 #include "windows/ChangeDateAndTimeWindow.hpp"
+#include <application-settings-new/models/QuotesRepository.hpp>
 
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
@@ -74,6 +75,12 @@ namespace app
         constexpr inline auto operators_on = "operators_on";
         const std::string quotesPath =
             purefs::createPath(purefs::dir::getUserDiskPath(), "data/applications/settings/quotes.json");
+
+        auto getQuotesModel(Application *app) -> std::unique_ptr<QuotesModel>
+        {
+            auto repo = std::make_unique<QuotesJsonRepository>(settings::quotesPath);
+            return std::make_unique<QuotesModel>(app, std::move(repo));
+        }
     } // namespace settings
 
     ApplicationSettingsNew::ApplicationSettingsNew(std::string name,
@@ -393,6 +400,15 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::dialog_retry, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogRetry>(app, name);
+        });
+        windowsFactory.attach(gui::window::name::quotes, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::QuotesMainWindow>(app, std::move(settings::getQuotesModel(app)));
+        });
+        windowsFactory.attach(gui::window::name::new_quote, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::QuoteAddEditWindow>(app, std::move(settings::getQuotesModel(app)));
+        });
+        windowsFactory.attach(gui::window::name::options_quote, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::QuotesOptionsWindow>(app, std::move(settings::getQuotesModel(app)));
         });
     }
 
