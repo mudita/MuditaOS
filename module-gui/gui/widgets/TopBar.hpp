@@ -29,9 +29,10 @@ namespace gui::top_bar
         SimCard,
         NetworkAccessTechnology
     };
+
     using Indicators        = std::vector<Indicator>;
     using IndicatorStatuses = std::map<Indicator, bool>;
-
+    using IndicatorFlags    = std::map<Indicator, int>;
     /**
      * Carries the top bar configuration.
      */
@@ -42,7 +43,9 @@ namespace gui::top_bar
         void enable(const Indicators &indicators);
         void disable(Indicator indicator);
         void set(Indicator indicator, bool enabled);
+        void setIndicatorFlag(Indicator indicator, int flag);
         [[nodiscard]] auto isEnabled(Indicator indicator) const -> bool;
+        [[nodiscard]] auto getIndicatorFlag(Indicator indicator) -> int;
         [[nodiscard]] auto getIndicatorsConfiguration() const noexcept -> const IndicatorStatuses &;
 
       private:
@@ -52,6 +55,7 @@ namespace gui::top_bar
                                                {Indicator::Battery, false},
                                                {Indicator::SimCard, false},
                                                {Indicator::NetworkAccessTechnology, false}};
+        IndicatorFlags indicatorFlags;
     };
 
     /// Header of most of design Windows

@@ -56,6 +56,14 @@ namespace gui::top_bar
         indicatorStatuses[indicator] = enabled;
     }
 
+    void Configuration::setIndicatorFlag(Indicator indicator, int flag)
+    {
+        indicatorFlags[indicator] = flag;
+    }
+    auto Configuration::getIndicatorFlag(Indicator indicator) -> int
+    {
+        return (indicatorFlags.count(indicator) == 0 ? 0 : indicatorFlags[indicator]);
+    }
     auto Configuration::isEnabled(Indicator indicator) const -> bool
     {
         return indicatorStatuses.at(indicator);
@@ -181,7 +189,8 @@ namespace gui::top_bar
             sim->setVisible(false);
             return;
         }
-        sim->show(Store::GSM::get()->sim);
+        int flag = configuration.getIndicatorFlag(Indicator::SimCard);
+        sim->show(Store::GSM::get()->sim, static_cast<SIM::SimIndicatorFlag>(flag));
     }
 
     bool TopBar::updateSignalStrength()

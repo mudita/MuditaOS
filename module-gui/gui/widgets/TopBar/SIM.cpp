@@ -12,17 +12,18 @@ namespace gui
         set(simunknown);
     }
 
-    void SIM::show(Store::GSM::SIM state)
+    void SIM::show(Store::GSM::SIM state, SimIndicatorFlag flag)
     {
         if (state == current) {
             return;
         }
+        setVisible(true);
         switch (state) {
         case GSM::SIM::SIM1:
-            set(sim1);
+            setSimWithNumber(sim1, flag);
             break;
         case GSM::SIM::SIM2:
-            set(sim2);
+            setSimWithNumber(sim2, flag);
             break;
         case GSM::SIM::SIM_FAIL:
             set(simfailed);
@@ -32,6 +33,15 @@ namespace gui
         case GSM::SIM::SIM_UNKNOWN:
             set(simunknown);
             break;
+        }
+    }
+    void SIM::setSimWithNumber(const char *sim, SimIndicatorFlag flag)
+    {
+        if (flag == SimIndicatorFlag::SIM_SHOW_ALL) {
+            set(sim);
+        }
+        else {
+            setVisible(false);
         }
     }
 }; // namespace gui

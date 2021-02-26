@@ -14,4 +14,9 @@ namespace app
     {
         return topBarConfiguration;
     }
+
+    void TopBarManager::setIndicatorFlag(gui::top_bar::Indicator indicator, int flag)
+    {
+        topBarConfiguration.setIndicatorFlag(indicator, flag);
+    }
 } // namespace app

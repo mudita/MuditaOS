@@ -13,6 +13,11 @@ namespace gui
         Store::GSM::SIM current = Store::GSM::SIM::SIM_UNKNOWN;
 
       public:
+        enum class SimIndicatorFlag
+        {
+            SIM_NO_FLAGS = 0, ///> default action, only sim blocked and sim error is displayed
+            SIM_SHOW_ALL = 1  ///> includes sim1 and sim2 icon
+        };
         /// create first image (sim unknown) and set it
         const unsigned int w   = 24;
         const unsigned int h   = 30;
@@ -22,7 +27,10 @@ namespace gui
         const char *simfailed  = "simfail";    // sim - notification for sim failure
 
         /// check if sim set in state -> if not -> show new sim
-        void show(Store::GSM::SIM state);
+        void show(Store::GSM::SIM state, SimIndicatorFlag flag = SimIndicatorFlag::SIM_NO_FLAGS);
         SIM(Item *parent, uint32_t x, uint32_t y);
+
+      private:
+        void setSimWithNumber(const char *sim, SimIndicatorFlag flag);
     };
 } // namespace gui

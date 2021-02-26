@@ -11,6 +11,7 @@ namespace app
     {
       public:
         void enableIndicators(const gui::top_bar::Indicators &indicators);
+        void setIndicatorFlag(gui::top_bar::Indicator indicator, int flag);
         [[nodiscard]] auto getConfiguration() const noexcept -> const gui::top_bar::Configuration &;
 
       private:
