@@ -12,7 +12,7 @@ namespace message::bluetooth
       public:
         explicit ResponseVisibleDevices(std::vector<Devicei> devices) : devices(std::move(devices))
         {}
-        [[nodiscard]] auto getDevices() const -> std::vector<Devicei>
+        [[nodiscard]] auto getDevices() const noexcept -> std::vector<Devicei>
         {
             return devices;
         }
