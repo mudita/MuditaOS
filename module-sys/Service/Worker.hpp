@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -100,7 +100,7 @@ namespace sys
         WorkerQueue &getControlQueue() const;
 
         static constexpr std::size_t controlMessagesCount = static_cast<std::size_t>(ControlMessage::MessageCount);
-        static constexpr std::size_t defaultStackSize     = 2048;
+        static constexpr std::size_t defaultStackSize     = 8192;
         static constexpr TickType_t defaultJoinTimeout    = portMAX_DELAY;
         static constexpr auto controlQueueNamePrefix      = "wctrl";
 
@@ -132,13 +132,14 @@ namespace sys
 
         static unsigned int count;
         const UBaseType_t priority;
+        std::uint16_t stackDepth = defaultStackSize;
 
         QueueSetHandle_t queueSet = nullptr;
         std::vector<std::shared_ptr<WorkerQueue>> queues;
 
       public:
-        Worker(sys::Service *service);
-        Worker(std::string workerNamePrefix, const UBaseType_t priority);
+        Worker(sys::Service *service, std::uint16_t stackDepth = defaultStackSize);
+        Worker(std::string workerNamePrefix, const UBaseType_t priority, std::uint16_t stackDepth = defaultStackSize);
 
         virtual ~Worker();
 
