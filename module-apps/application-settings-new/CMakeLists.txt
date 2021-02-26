@@ -20,6 +20,8 @@ target_sources( ${PROJECT_NAME}
         models/NewApnModel.cpp
         models/DateAndTimeModel.cpp
         models/FromTimeToTimeModel.cpp
+        models/QuotesModel.cpp
+        models/QuotesRepository.cpp
         widgets/ChangePasscodeLockHandler.cpp
         widgets/QuoteWidget.cpp
         widgets/ApnInputWidget.cpp
@@ -48,6 +50,7 @@ target_sources( ${PROJECT_NAME}
         windows/WallpaperWindow.cpp
         windows/QuotesMainWindow.cpp
         windows/QuotesAddWindow.cpp
+        windows/QuotesOptionsWindow.cpp
         windows/SecurityMainWindow.cpp
         windows/ChangePasscodeWindow.cpp
         windows/NewApnWindow.cpp
