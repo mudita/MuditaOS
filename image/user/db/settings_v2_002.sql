@@ -28,5 +28,10 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('bt_device_visibility', '0'),
     ('bt_device_name', 'PurePhone'),
     ('bt_bonded_devices', ''),
-    ('battery_critical_level', '0');
+    ('battery_critical_level', '0'),
+    ('cl_offline_mode', '0'),
+    ('off_connection_frequency', '0'),
+    ('off_notifications_when_locked', '0'),
+    ('off_calls_from_favorites', '0');
+
 

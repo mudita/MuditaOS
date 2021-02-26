@@ -37,6 +37,10 @@
 #include "windows/ChangeTimeZone.hpp"
 #include "windows/ChangeDateAndTimeWindow.hpp"
 #include <application-settings-new/models/QuotesRepository.hpp>
+#include "windows/PhoneModesWindow.hpp"
+#include "windows/DoNotDisturbWindow.hpp"
+#include "windows/OfflineWindow.hpp"
+#include "windows/ConnectionFrequencyWindow.hpp"
 
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
@@ -349,6 +353,23 @@ namespace app
             [this](std::string value) { usbSecured = utils::getNumericValue<bool>(value); },
             ::settings::SettingsScope::Global);
         */
+        settings->registerValueChange(
+            ::settings::Cellular::offlineMode,
+            [this](const std::string &value) { flightModeOn = utils::getNumericValue<bool>(value); },
+            ::settings::SettingsScope::Global);
+
+        settings->registerValueChange(
+            ::settings::Offline::callsFromFavorites,
+            [this](const std::string &value) { callsFromFavorites = utils::getNumericValue<bool>(value); },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::Offline::connectionFrequency,
+            [this](const std::string &value) { utils::toNumeric(value, connectionFrequency); },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::Offline::notificationsWhenLocked,
+            [this](const std::string &value) { notificationsWhenLocked = utils::getNumericValue<bool>(value); },
+            ::settings::SettingsScope::Global);
 
         return ret;
     }
@@ -473,6 +494,19 @@ namespace app
         });
 
         attachPopups({gui::popup::ID::Volume});
+        windowsFactory.attach(gui::window::name::phone_modes, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::PhoneModesWindow>(
+                app, static_cast<ApplicationSettingsNew *>(app), static_cast<ApplicationSettingsNew *>(app));
+        });
+        windowsFactory.attach(gui::window::name::do_not_disturb, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DoNotDisturbWindow>(app, static_cast<ApplicationSettingsNew *>(app));
+        });
+        windowsFactory.attach(gui::window::name::offline, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::OfflineWindow>(app, static_cast<ApplicationSettingsNew *>(app));
+        });
+        windowsFactory.attach(gui::window::name::connection_frequency, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettingsNew *>(app));
+        });
     }
 
     void ApplicationSettingsNew::destroyUserInterface()
@@ -624,4 +658,49 @@ namespace app
         settings->setValue(
             ::settings::SystemProperties::usbSecurity, std::to_string(security), ::settings::SettingsScope::Global);
     }
+
+    auto ApplicationSettingsNew::getNotificationsWhenLocked() const noexcept -> bool
+    {
+        return notificationsWhenLocked;
+    }
+    void ApplicationSettingsNew::setNotificationsWhenLocked(bool on) noexcept
+    {
+        notificationsWhenLocked = on;
+        settings->setValue(
+            ::settings::Offline::notificationsWhenLocked, std::to_string(on), ::settings::SettingsScope::Global);
+    }
+    auto ApplicationSettingsNew::getCallsFromFavourite() const noexcept -> bool
+    {
+        return callsFromFavorites;
+    }
+    void ApplicationSettingsNew::setCallsFromFavourite(bool on) noexcept
+    {
+        callsFromFavorites = on;
+        settings->setValue(
+            ::settings::Offline::callsFromFavorites, std::to_string(on), ::settings::SettingsScope::Global);
+    }
+
+    auto ApplicationSettingsNew::isFlightMode() const noexcept -> bool
+    {
+        return flightModeOn;
+    }
+
+    void ApplicationSettingsNew::setFlightMode(bool flightModeOn) noexcept
+    {
+        this->flightModeOn = flightModeOn;
+        CellularServiceAPI::SetFlightMode(this, flightModeOn);
+    }
+
+    auto ApplicationSettingsNew::getConnectionFrequency() const noexcept -> uint8_t
+    {
+        return connectionFrequency;
+    }
+
+    void ApplicationSettingsNew::setConnectionFrequency(uint8_t val) noexcept
+    {
+        connectionFrequency = val;
+        settings->setValue(
+            ::settings::Offline::connectionFrequency, std::to_string(val), ::settings::SettingsScope::Global);
+    }
+
 } /* namespace app */

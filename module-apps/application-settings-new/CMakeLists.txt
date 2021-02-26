@@ -66,6 +66,10 @@ target_sources( ${PROJECT_NAME}
         windows/BluetoothCheckPasskeyWindow.cpp
         windows/EditQuotesWindow.cpp
         windows/QuoteCategoriesWindow.cpp
+        windows/ConnectionFrequencyWindow.cpp
+        windows/DoNotDisturbWindow.cpp
+        windows/OfflineWindow.cpp
+        windows/PhoneModesWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp

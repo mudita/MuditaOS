@@ -140,4 +140,6 @@ namespace CellularServiceAPI
 
     bool ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState);
 
+    bool SetFlightMode(sys::Service *serv, bool flightModeOn);
+
 }; // namespace CellularServiceAPI

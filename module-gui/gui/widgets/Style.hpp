@@ -165,6 +165,7 @@ namespace style
             inline constexpr auto accept         = "common_accept";
             inline constexpr auto retry          = "common_retry";
             inline constexpr auto abort          = "common_abort";
+            inline constexpr auto adjust         = "common_adjust";
             // days
             inline constexpr auto Monday    = "common_monday";
             inline constexpr auto Tuesday   = "common_tuesday";
