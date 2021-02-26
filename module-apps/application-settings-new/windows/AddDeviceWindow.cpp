@@ -43,7 +43,7 @@ namespace gui
                 device.name,
                 [=](gui::Item & /*unused*/) {
                     LOG_DEBUG("Device: %s", device.name.c_str());
-                    bluetoothSettingsModel->requestDevicePairing(bd_addr_to_str(device.address));
+                    bluetoothSettingsModel->requestDevicePair(bd_addr_to_str(device.address));
                     application->switchWindow(gui::window::name::all_devices);
                     return true;
                 },

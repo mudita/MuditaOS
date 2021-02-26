@@ -49,6 +49,7 @@
 #include <service-bluetooth/messages/DeviceName.hpp>
 #include <service-bluetooth/messages/Passkey.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
+#include <service-bluetooth/messages/Unpair.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <application-settings-new/data/ApnListData.hpp>
 #include <application-settings-new/data/BondedDevicesData.hpp>
@@ -202,6 +203,28 @@ namespace app
 
         connect(typeid(::message::bluetooth::RequestPasskey), [&](sys::Message *msg) {
             switchWindow(gui::window::name::bluetooth_check_passkey);
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(::message::bluetooth::UnpairResult), [&](sys::Message *msg) {
+            auto unpairResultMsg = static_cast<::message::bluetooth::UnpairResult *>(msg);
+            if (unpairResultMsg->isSucceed()) {
+                return sys::MessageNone{};
+            }
+            bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(), service::name::bluetooth);
+            switchWindow(gui::window::name::dialog_retry,
+                         gui::ShowMode::GUI_SHOW_INIT,
+                         std::make_unique<gui::DialogMetadataMessage>(
+                             gui::DialogMetadata{utils::localize.get("app_settings_bt"),
+                                                 "search_big",
+                                                 utils::localize.get("app_settings_bluetooth_unpairing_error_message"),
+                                                 "",
+                                                 [=]() -> bool {
+                                                     bus.sendUnicast(std::make_shared<message::bluetooth::Unpair>(
+                                                                         unpairResultMsg->getAddr()),
+                                                                     service::name::bluetooth);
+                                                     return true;
+                                                 }}));
             return sys::MessageNone{};
         });
 

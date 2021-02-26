@@ -50,7 +50,10 @@ namespace gui
 
     auto AllDevicesWindow::onInput(const InputEvent &inputEvent) -> bool
     {
-        if (inputEvent.isShortPress() && inputEvent.is(KeyCode::KEY_LEFT)) {
+        if (!inputEvent.isShortPress()) {
+            return AppWindow::onInput(inputEvent);
+        }
+        if (inputEvent.is(KeyCode::KEY_LEFT)) {
             bluetoothSettingsModel->requestScan();
             application->switchWindow(gui::window::name::dialog_settings,
                                       gui::ShowMode::GUI_SHOW_INIT,
@@ -58,6 +61,17 @@ namespace gui
                                           utils::localize.get("app_settings_bluetooth_add_device"),
                                           "search_big",
                                           utils::localize.get("app_settings_bluetooth_searching_devices")}));
+            return true;
+        }
+        if (inputEvent.is(KeyCode::KEY_LF)) {
+            devices.erase(std::remove_if(devices.begin(),
+                                         devices.end(),
+                                         [&](const auto &device) {
+                                             return (bd_addr_to_str(device.address) == addressOfSelectedDevice);
+                                         }),
+                          devices.end());
+            refreshOptionsList();
+            bluetoothSettingsModel->requestDeviceUnpair(addressOfSelectedDevice);
             return true;
         }
         return AppWindow::onInput(inputEvent);
@@ -81,6 +95,9 @@ namespace gui
                         this->setBottomBarText(isConnected ? utils::translateI18("common_disconnect")
                                                            : utils::translateI18("common_connect"),
                                                BottomBar::Side::CENTER);
+                        this->setBottomBarText(utils::translateI18("common_forget"), BottomBar::Side::LEFT);
+                        this->bottomBar->setActive(BottomBar::Side::LEFT, true);
+                        addressOfSelectedDevice = addr;
                     }
                     return true;
                 },
