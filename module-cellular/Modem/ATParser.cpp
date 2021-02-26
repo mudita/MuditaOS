@@ -91,8 +91,7 @@ int ATParser::ProcessNewData(sys::Service *service)
         // 2) +CFUN: 1
         if (urcs.size() == 2) {
             cpp_freertos::LockGuard lock(mutex);
-            auto msg = std::make_shared<CellularNotificationMessage>(
-                CellularNotificationMessage::Type::PowerUpProcedureComplete);
+            auto msg = std::make_shared<CellularPowerUpProcedureCompleteNotification>();
             service->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
             LOG_DEBUG("[!!!] Fucking away data");
             responseBuffer.erase();
