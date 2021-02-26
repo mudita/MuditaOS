@@ -361,6 +361,8 @@ class ServiceCellular : public sys::Service
     auto handleSignalStrengthUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleNetworkStatusUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleSimNotReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+
+    auto handleCellularSetFlightModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
 };
 
 namespace sys

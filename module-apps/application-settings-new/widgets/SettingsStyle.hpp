@@ -116,6 +116,18 @@ namespace style
                     } // namespace text
                 }     // namespace passkey
             }         // namespace bluetooth
+
+            namespace offline
+            {
+                inline constexpr auto body_offset = 155;
+
+                inline constexpr auto bar_y = 396;
+                inline constexpr auto bar_h = 1;
+
+                inline constexpr auto description_y = 375;
+                inline constexpr auto description_h = 150;
+            } // namespace offline
+
         }     // namespace window
     };        // namespace settings
     namespace quotes::categories

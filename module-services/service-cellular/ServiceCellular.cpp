@@ -403,6 +403,11 @@ void ServiceCellular::registerMessageHandlers()
         return std::make_shared<CellularResponseMessage>(true);
     });
 
+    connect(typeid(CellularSetFlightModeMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        auto msg = static_cast<CellularSetFlightModeMessage *>(request);
+        return handleCellularSetFlightModeMessage(msg);
+    });
+
     connect(typeid(CellularPowerStateChange), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg       = static_cast<CellularPowerStateChange *>(request);
         nextPowerState = msg->getNewState();
@@ -2502,4 +2507,12 @@ auto ServiceCellular::handleNetworkStatusUpdateNotification(sys::Message *msg) -
 auto ServiceCellular::handleSimNotReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     return std::make_shared<CellularResponseMessage>(false);
+}
+
+auto ServiceCellular::handleCellularSetFlightModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
+{
+    auto setMsg = static_cast<CellularSetFlightModeMessage *>(msg);
+    settings->setValue(
+        settings::Cellular::offlineMode, std::to_string(setMsg->flightModeOn), settings::SettingsScope::Global);
+    return std::make_shared<CellularResponseMessage>(true);
 }

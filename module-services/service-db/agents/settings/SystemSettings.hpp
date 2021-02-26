@@ -44,11 +44,19 @@ namespace settings
     {
         constexpr inline auto volte_on = "cl_volte_on";
         constexpr inline auto apn_list = "cl_apn_list";
+        constexpr inline auto offlineMode = "cl_offline_mode";
     } // namespace Cellular
 
     namespace Battery
     {
         constexpr inline auto batteryCriticalLevel = "battery_critical_level";
     } // namespace Battery
+
+    namespace Offline
+    {
+        constexpr inline auto connectionFrequency     = "off_connection_frequency";
+        constexpr inline auto notificationsWhenLocked = "off_notifications_when_locked";
+        constexpr inline auto callsFromFavorites      = "off_calls_from_favorites";
+    } // namespace Offline
 
 }; // namespace settings
