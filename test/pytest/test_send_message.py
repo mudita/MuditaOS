@@ -6,6 +6,8 @@ import pytest
 from harness.interface.defs import key_codes, SMSType, status
 from harness.interface.CDCSerial import Keytype
 
+# time for  message to leave the sending queue
+extra_time_to_send_message  = 5
 
 def erase_all_templates(harness):
     # getting the templates count
@@ -34,13 +36,13 @@ def add_new_template(harness, template_text: str):
 
 
 def get_all_contacts(harness):
-    body = {"limit": True}
+    body = {"count": True}
     ret = harness.endpoint_request("contacts", "get", body)
 
     assert ret["status"] == status["OK"]
 
     contacts = []
-    count = ret["body"]["limit"]
+    count = ret["body"]["count"]
     if count == 0:
         return contacts
 
@@ -124,6 +126,7 @@ def compare_messages(old_messages, new_messages, sms_type: SMSType = SMSType.OUT
 
     assert len(diff_messages) == 1
     assert SMSType(diff_messages[0]["messageType"]) == sms_type
+    return diff_messages
 
 
 def enter_messages_menu(harness):
@@ -142,9 +145,17 @@ def enter_contacts_menu(harness):
         assert harness.get_application_name() == "ApplicationPhonebook"
 
 
+def remove_added_messages(harness, diff_messages):
+    for  message in diff_messages:
+        body = {"category": "message", "messageID": message["messageID"]}
+        del_res = harness.endpoint_request("messages", "del", body)
+        assert del_res["status"] == status["OK"]
+
+
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.usefixtures("phone_in_desktop")
+@pytest.mark.usefixtures("usb_unlocked")
 def test_send_message(harness, phone_number, sms_text):
     old_messages = get_message_by_text(harness, sms_text, str(phone_number))
 
@@ -167,25 +178,41 @@ def test_send_message(harness, phone_number, sms_text):
         harness.connection.send_key_code(key_codes["fnRight"])
 
     time.sleep(3)
+    time.sleep(extra_time_to_send_message)
+
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
     new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+
+    diff_messages = compare_messages(old_messages, new_messages)
+    # cleaning
+    remove_added_messages(harness,diff_messages)
+
 
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.usefixtures("phone_in_desktop")
-def test_send_prepared_message(harness, phone_number, sms_text):
+def test_send_prepared_message(harness, phone_number, sms_text, clean = True):
     old_messages = get_message_by_text(harness, sms_text, str(phone_number))
 
     # prepare sms and send it (add sms to sending queue)
     prepare_sms(harness, sms_text, str(phone_number), SMSType.QUEUED.value)
     # time to send message
     time.sleep(3)
+
+    time.sleep(extra_time_to_send_message)
+
     # check whether message was sent
     new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+
+    diff_messages = compare_messages(old_messages, new_messages)
+    # cleaning
+    if(clean == True):
+        remove_added_messages(harness,diff_messages)
+    return diff_messages
+
+
 
 
 testdata = [
@@ -218,9 +245,14 @@ def test_send_prepared_draft_message(harness, phone_number, sms_text):
     time.sleep(3)
     assert harness.get_application_name() == "ApplicationDesktop"
 
+    time.sleep(extra_time_to_send_message)
+
     # check whether message was sent
     new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+    diff_messages = compare_messages(old_messages, new_messages)
+    # cleaning
+    remove_added_messages(harness,diff_messages)
+
 
 
 @pytest.mark.rt1051
@@ -256,9 +288,13 @@ def test_send_message_from_template(harness, phone_number, sms_text):
     time.sleep(3)
     assert harness.get_application_name() == "ApplicationDesktop"
 
+    time.sleep(extra_time_to_send_message)
+
     # check whether message was sent
     new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+    diff_messages = compare_messages(old_messages, new_messages)
+    # cleaning
+    remove_added_messages(harness,diff_messages)
 
 
 @pytest.mark.rt1051
@@ -266,7 +302,7 @@ def test_send_message_from_template(harness, phone_number, sms_text):
 @pytest.mark.usefixtures("phone_in_desktop")
 def test_forward_message(harness, phone_number, sms_text):
     # send first message in order to forward it
-    test_send_prepared_message(harness, phone_number, sms_text)
+    diff_messages_org = test_send_prepared_message(harness, phone_number, sms_text, False)
 
     old_messages = get_message_by_text(harness, sms_text, str(phone_number))
 
@@ -298,9 +334,13 @@ def test_forward_message(harness, phone_number, sms_text):
     time.sleep(3)
     assert harness.get_application_name() == "ApplicationDesktop"
 
+    time.sleep(extra_time_to_send_message)
     # check whether message was sent
     new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+    diff_messages = compare_messages(old_messages, new_messages)
+    # cleaning
+    remove_added_messages(harness,diff_messages)
+    remove_added_messages(harness,diff_messages_org)
 
 
 @pytest.mark.rt1051
@@ -330,9 +370,14 @@ def test_resend_message(harness, phone_number, sms_text):
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
 
+    time.sleep(extra_time_to_send_message)
+
     # check whether message was sent
     new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+    diff_messages = compare_messages(old_messages, new_messages)
+    # cleaning
+    remove_added_messages(harness,diff_messages)
+
 
 
 @pytest.mark.rt1051
@@ -388,14 +433,18 @@ def test_send_message_from_phonebook(harness, phone_number, sms_text):
     time.sleep(3)
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
+
+    time.sleep(extra_time_to_send_message)
+
     new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+    diff_messages = compare_messages(old_messages, new_messages)
+    # cleaning
+    remove_added_messages(harness,diff_messages)
 
     # removing added contact
     body = {"id": added_contact_id}
     ret = harness.endpoint_request("contacts", "del", body)
     assert ret["status"] == status["OK"]
-
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
@@ -459,10 +508,17 @@ def test_send_message_using_phonebook(harness, phone_number, sms_text):
     time.sleep(3)
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
+
+    time.sleep(extra_time_to_send_message)
+
     new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    compare_messages(old_messages, new_messages)
+    diff_messages = compare_messages(old_messages, new_messages)
+    # cleaning
+    remove_added_messages(harness,diff_messages)
 
     # removing added contact
     body = {"id": added_contact_id}
     ret = harness.endpoint_request("contacts", "del", body)
     assert ret["status"] == status["OK"]
+
+

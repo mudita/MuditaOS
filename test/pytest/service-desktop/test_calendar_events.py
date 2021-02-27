@@ -5,8 +5,8 @@ from harness.interface.defs import status
 import copy
 import time
 
+@pytest.mark.skip("not working on CI")
 @pytest.mark.service_desktop_test
-@pytest.mark.skip("not working ;/")
 def test_calendar(harness):
     # add events
     add_body = {
@@ -37,7 +37,6 @@ def test_calendar(harness):
     UIDS = []
     ret = harness.endpoint_request("events", "put", add_body)
     assert ret["status"] == status["OK"]
-    print(ret)
     UIDS.insert(0,ret["body"]["UID"])
     event_count = 15
     for new_event_counter  in range(2,event_count+1):
@@ -45,31 +44,25 @@ def test_calendar(harness):
         new_event["calendar_events"][0]["SUMMARY"] = "Test" + str(new_event_counter)
         ret = harness.endpoint_request("events", "put", new_event)
         assert ret["status"] == status["OK"]
-        print(ret)
         UIDS.insert(new_event_counter-1,ret["body"]["UID"])
-    print('\n')
 
     # get events limit < pageSize - pagination not used
     print("get events without pagination")
     limit =  2
     offset=  2
-    print("limit =",limit, "offset =",offset)
     get_body = {"limit": limit, "offset": offset}
     ret = harness.endpoint_request("events", "get", get_body)
-    print(ret)
-    print('\n')
     assert ret["status"] == status["OK"]
+    print("status =",ret["status"])
 
     # get events limit > pageSize - pagination used - basic scenario
     print("get events with pagination")
     limit = 12
     offset=  1
-    print("limit =",limit, "offset =",offset)
     get_body = {"limit": limit, "offset": offset}
     ret = harness.endpoint_request("events", "get", get_body)
-    print(ret)
-    print('\n')
     assert ret["status"] == status["OK"]
+    print("status =",ret["status"])
 
     # get events limit > pageSize - pagination used - get all events
     print("get all events with pagination")
