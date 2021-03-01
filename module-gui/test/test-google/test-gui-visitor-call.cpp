@@ -12,6 +12,7 @@
 #include "Window.hpp"
 #include "BottomBar.hpp"
 #include "TopBar.hpp"
+#include "ListItem.hpp"
 
 using ::testing::Matcher;
 using ::testing::Ref;
@@ -26,6 +27,7 @@ class VisitorMock : public gui::GuiVisitor
     MOCK_METHOD1(visit, void(gui::Label &item));
     MOCK_METHOD1(visit, void(gui::BottomBar &item));
     MOCK_METHOD1(visit, void(gui::top_bar::TopBar &item));
+    MOCK_METHOD1(visit, void(gui::ListItem &item));
 };
 
 class CustomRect : public gui::Rect
