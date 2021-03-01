@@ -12,7 +12,7 @@ add_custom_command(
     )
 
 add_custom_target(
-    disk_image 
+    disk_image ALL
     DEPENDS ${DISK_IMAGE}
     )
 
@@ -20,7 +20,6 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     add_dependencies(disk_image ${CMAKE_PROJECT_NAME})
     add_dependencies(check disk_image)
 else()
-    message("!!!!!!!!!!!!!!!!!!!!!!!!")
     add_dependencies(disk_image ${BIN_FILE}-target)
 endif()
 
