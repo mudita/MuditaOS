@@ -171,9 +171,10 @@ TEST_CASE("Endpoint Contacts Test")
     {
         auto count       = 29; // requested number of record to return
         auto endpoint    = 7;
-        auto uuid        = "1103";
+        auto uuid        = 1103;
         auto totalCount  = contactsDb->contacts.count();
-        auto testMessage = "{\"endpoint\":" + std::to_string(endpoint) + ", \"method\":1, \"uuid\":" + uuid +
+        auto testMessage = "{\"endpoint\":" + std::to_string(endpoint) +
+                           ", \"method\":1, \"uuid\":" + std::to_string(uuid) +
                            ", \"body\":{\"limit\":" + std::to_string(count) + ", \"offset\":20}}";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
@@ -191,7 +192,7 @@ TEST_CASE("Endpoint Contacts Test")
         auto retJson = json11::Json::parse(msg.substr(10), err); // string length and go to real data
 
         REQUIRE(err.empty());
-        REQUIRE(uuid == retJson[parserFSM::json::uuid].string_value());
+        REQUIRE(uuid == retJson[parserFSM::json::uuid].int_value());
         REQUIRE(endpoint == retJson[parserFSM::json::endpoint].int_value());
 
         auto body = retJson[parserFSM::json::body];

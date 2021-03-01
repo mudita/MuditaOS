@@ -247,15 +247,15 @@ TEST_CASE("Context class test")
         REQUIRE(context.getUuid() == 12345);
         REQUIRE(context.getEndpoint() == EndpointType::contacts);
         REQUIRE(context.createSimpleResponse() ==
-                R"(#000000061{"body": null, "endpoint": 7, "status": 200, "uuid": "12345"})");
+                R"(#000000061{"body": null, "endpoint": 7, "status": 200, "uuid": 12345})");
 
         context.setResponseBody(context.getBody());
         REQUIRE(context.createSimpleResponse() ==
-                R"(#000000073{"body": {"test": "test"}, "endpoint": 7, "status": 200, "uuid": "12345"})");
+                R"(#000000073{"body": {"test": "test"}, "endpoint": 7, "status": 200, "uuid": 12345})");
     }
     SECTION("Invalid message")
     {
-        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"0", "body":{"te":"test"}})";
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":0, "body":{"te":"test"}})";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
@@ -285,7 +285,7 @@ TEST_CASE("Endpoint Factory test")
 
     SECTION("Wrong endpoint")
     {
-        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"12345", "body":{"te":"test"}})";
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":12345, "body":{"te":"test"}})";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
@@ -314,7 +314,7 @@ TEST_CASE("Secured Endpoint Factory test")
 
     SECTION("Secured endpoint")
     {
-        auto testMessage = R"({"endpoint":25, "method":8, "uuid":"12345", "body":{"te":"test"}})";
+        auto testMessage = R"({"endpoint":25, "method":8, "uuid":12345, "body":{"te":"test"}})";
         std::string err;
         auto msgJson = json11::Json::parse(testMessage, err);
         REQUIRE(err.empty());
