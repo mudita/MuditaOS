@@ -62,12 +62,13 @@ namespace style
         namespace smsInput
         {
             inline constexpr gui::Length min_h                   = 40;
-            inline constexpr gui::Length default_input_w         = 395;
+            inline constexpr gui::Length default_input_w         = 385;
             inline constexpr gui::Length default_input_h         = 30;
             inline constexpr gui::Length bottom_padding          = 5;
             inline constexpr gui::Length max_input_h             = default_input_h * 4 + bottom_padding;
-            inline constexpr gui::Length reply_bottom_margin     = 5;
+            inline constexpr gui::Length reply_bottom_margin     = 8;
             inline constexpr gui::Length new_sms_vertical_spacer = 25;
+            inline constexpr gui::Length new_sms_left_margin     = 10;
         } // namespace smsInput
 
         namespace smsOutput
