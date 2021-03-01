@@ -65,10 +65,10 @@ namespace audio
 
     [[nodiscard]] const std::string str(const Setting &setting) noexcept;
 
-    [[nodiscard]] const std::string dbPath(const sys::phone_modes::PhoneMode &phoneMode,
-                                           const Setting &setting,
+    [[nodiscard]] const std::string dbPath(const Setting &setting,
                                            const PlaybackType &playbackType,
-                                           const Profile::Type &profileType);
+                                           const Profile::Type &profileType,
+                                           const std::optional<sys::phone_modes::PhoneMode> phoneMode = std::nullopt);
 
     [[nodiscard]] bool isSystemSound(const PlaybackType &playbackType) noexcept;
 
