@@ -103,6 +103,11 @@ add_compile_options( ${TARGET_COMPILE_OPTIONS}
                      # warning flags
                      -Wall -Wextra -Werror -Wno-unused-parameter -Wno-deprecated-declarations)
 
+option (GENERATE_STACK_USAGE "Generate stack usage report" OFF)
+if (GENERATE_STACK_USAGE)
+    add_compile_options (-fstack-usage)
+endif ()
+
 target_compile_features(${PROJECT_NAME} PUBLIC
         ${TARGET_COMPILE_FEATURES})
 
