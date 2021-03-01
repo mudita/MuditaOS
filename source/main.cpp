@@ -179,5 +179,8 @@ int main()
     LOG_PRINTF("Launching PurePhone \n");
     LOG_PRINTF("commit: %s tag: %s branch: %s\n", GIT_REV, GIT_TAG, GIT_BRANCH);
     cpp_freertos::Thread::StartScheduler();
+
+    purefs::subsystem::unmount_all();
+
     return 0;
 }
