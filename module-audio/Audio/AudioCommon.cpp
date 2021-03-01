@@ -61,10 +61,10 @@ namespace audio
         return false;
     }
 
-    const std::string dbPath(const sys::phone_modes::PhoneMode &phoneMode,
-                             const Setting &setting,
+    const std::string dbPath(const Setting &setting,
                              const PlaybackType &playbackType,
-                             const Profile::Type &profileType)
+                             const Profile::Type &profileType,
+                             const std::optional<sys::phone_modes::PhoneMode> phoneMode)
     {
         if (profileType == Profile::Type::Idle && playbackType == PlaybackType::None) {
             return std::string();
@@ -74,7 +74,9 @@ namespace audio
         std::string path;
 
         pathElements.emplace_back(audioDbPrefix);
-        pathElements.emplace_back(utils::enumToString(phoneMode));
+        if ((setting == Setting::EnableSound || setting == Setting::EnableVibration) && phoneMode.has_value()) {
+            pathElements.emplace_back(utils::enumToString(phoneMode.value()));
+        }
 
         if (auto s = str(profileType); !s.empty()) {
             pathElements.emplace_back(s);
