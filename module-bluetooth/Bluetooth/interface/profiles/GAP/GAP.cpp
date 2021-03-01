@@ -46,7 +46,6 @@ namespace bluetooth
     void GAP::stopScan()
     {
         gap_inquiry_stop();
-        devices.clear();
         LOG_INFO("Scan stopped!");
     }
 
@@ -87,6 +86,7 @@ namespace bluetooth
     auto GAP::startScan() -> int
     {
         LOG_INFO("Starting inquiry scan..");
+        devices.clear();
         return gap_inquiry_start(inquiryIntervalSeconds);
     }
 
