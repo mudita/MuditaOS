@@ -21,6 +21,7 @@ namespace
 
     constexpr const char *LINUX_PATHS[]{"/dev/",
                                         "/etc/",
+                                        "/lib",
                                         "/usr/share",
                                         "/run/user",
                                         "/home",
