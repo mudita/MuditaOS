@@ -21,7 +21,8 @@ namespace gui
     SMSInputWidget::SMSInputWidget(app::Application *application) : application(application)
     {
         setMinimumSize(style::window::default_body_width, style::messages::smsInput::min_h);
-        setMargins(Margins(0, style::messages::smsInput::new_sms_vertical_spacer, 0, 0));
+        setMargins(Margins(
+            style::messages::smsInput::new_sms_left_margin, style::messages::smsInput::new_sms_vertical_spacer, 0, 0));
         setEdges(gui::RectangleEdge::None);
 
         body = new HBox(this, 0, 0, 0, 0);
@@ -29,7 +30,6 @@ namespace gui
         body->setMaximumSize(style::window::default_body_width, style::messages::smsInput::max_input_h);
 
         deleteByList = false;
-
         inputText = new gui::Text(body, 0, 0, 0, 0, "", ExpandMode::Up);
         inputText->setMaximumSize(style::messages::smsInput::default_input_w, style::messages::smsInput::max_input_h);
         inputText->setMinimumSize(style::messages::smsInput::default_input_w,
@@ -99,6 +99,16 @@ namespace gui
         };
 
         dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+            if (newDim.w == style::listview::item_width_with_scroll - style::messages::smsInput::new_sms_left_margin) {
+                inputText->setMinimumWidth(style::messages::smsInput::default_input_w);
+                inputText->setMaximumWidth(style::messages::smsInput::default_input_w);
+            }
+            else {
+                inputText->setMinimumWidth(style::messages::smsInput::default_input_w +
+                                           style::listview::scroll::item_margin);
+                inputText->setMaximumWidth(style::messages::smsInput::default_input_w +
+                                           style::listview::scroll::item_margin);
+            }
             body->setArea({0, 0, newDim.w, newDim.h});
             return true;
         };
