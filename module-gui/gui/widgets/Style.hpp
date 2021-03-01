@@ -84,6 +84,14 @@ namespace style
         /// minimal label decoration for Option
         void decorateOption(gui::Label *el);
 
+        namespace bottomBar
+        {
+            inline constexpr auto leftMargin  = 30U;
+            inline constexpr auto rightMargin = 30U;
+
+            inline constexpr auto h = 54U;
+            inline constexpr auto w = window_width;
+        } // namespace bottomBar
     }; // namespace window
 
     namespace settings
