@@ -11,12 +11,12 @@ namespace parserFSM
 
     namespace json
     {
-        inline constexpr auto method   = "method";
-        inline constexpr auto endpoint = "endpoint";
-        inline constexpr auto uuid     = "uuid";
-        inline constexpr auto status   = "status";
+        inline constexpr auto method     = "method";
+        inline constexpr auto endpoint   = "endpoint";
+        inline constexpr auto uuid       = "uuid";
+        inline constexpr auto status     = "status";
         inline constexpr auto totalCount = "totalCount";
-        inline constexpr auto body     = "body";
+        inline constexpr auto body       = "body";
         inline constexpr auto offset     = "offset";
         inline constexpr auto limit      = "limit";
         inline constexpr auto nextPage   = "nextPage";
@@ -30,7 +30,7 @@ namespace parserFSM
       protected:
         json11::Json body;
         EndpointType endpoint;
-        uint32_t uuid;
+        int uuid;
         http::Method method;
         endpoint::ResponseContext responseContext;
 
@@ -46,7 +46,7 @@ namespace parserFSM
                 method = http::Method::get;
             }
         }
-        auto buildResponseStr(std::size_t responseSize, std::string responsePayloadString) -> std::string
+        auto buildResponseStr(std::size_t responseSize, const std::string &responsePayloadString) -> std::string
         {
             constexpr auto pos                 = 0;
             constexpr auto count               = 1;
@@ -60,20 +60,12 @@ namespace parserFSM
         }
 
       public:
-        Context(json11::Json &js)
+        explicit Context(json11::Json &js)
         {
             body     = js[json::body];
             endpoint = static_cast<EndpointType>(js[json::endpoint].int_value());
             uuid     = js[json::uuid].int_value();
-            if (uuid == invalidUuid) {
-                try {
-                    uuid = stoi(js[json::uuid].string_value());
-                }
-                catch (...) {
-                    uuid = invalidUuid;
-                }
-            }
-            method = static_cast<http::Method>(js[json::method].int_value());
+            method   = static_cast<http::Method>(js[json::method].int_value());
             validate();
         }
         Context()
@@ -89,7 +81,7 @@ namespace parserFSM
         {
             json11::Json responseJson = json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
                                                              {json::status, static_cast<int>(responseContext.status)},
-                                                             {json::uuid, std::to_string(getUuid())},
+                                                             {json::uuid, getUuid()},
                                                              {json::body, responseContext.body}};
             return buildResponseStr(responseJson.dump().size(), responseJson.dump());
         }
@@ -109,7 +101,7 @@ namespace parserFSM
         }
         auto setResponseBody(json11::Json respBody)
         {
-            responseContext.body = respBody;
+            responseContext.body = std::move(respBody);
         }
         auto getBody() -> const json11::Json &
         {
@@ -119,7 +111,7 @@ namespace parserFSM
         {
             return endpoint;
         }
-        auto getUuid() -> uint32_t
+        auto getUuid() -> int
         {
             return uuid;
         }
@@ -133,11 +125,11 @@ namespace parserFSM
     {
       private:
         // from request
-        std::size_t requestedLimit, requestedOffset;
+        std::size_t requestedLimit{}, requestedOffset{};
         // set by query (during helper run)
-        std::size_t totalCount;
+        std::size_t totalCount{};
         // set it before calling handle on helper
-        std::size_t pageSize;
+        std::size_t pageSize{};
 
       public:
         explicit PagedContext(json11::Json &js, size_t pageSize) : Context(js), pageSize(pageSize)
@@ -183,10 +175,10 @@ namespace parserFSM
 
     namespace endpoint_pageing
     {
-        inline constexpr std::size_t contactsPageSize = 10;
+        inline constexpr std::size_t contactsPageSize       = 10;
         inline constexpr std::size_t calendarEventsPageSize = 10;
         inline constexpr std::size_t messagesPageSize       = 4;
-    }
+    } // namespace endpoint_pageing
 
     class ContextFactory
     {
