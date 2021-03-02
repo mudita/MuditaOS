@@ -61,9 +61,11 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
         LOG_INFO("Requested bonded devices!");
         auto bondedDevicesStr =
             std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::BondedDevices));
+        auto connectedAddress = std::visit(bluetooth::StringVisitor(),
+                                           this->settingsHolder->getValue(bluetooth::Settings::ConnectedDevice));
 
         return std::make_shared<message::bluetooth::ResponseBondedDevices>(
-            SettingsSerializer::fromString(bondedDevicesStr), std::string());
+            SettingsSerializer::fromString(bondedDevicesStr), std::move(connectedAddress));
     });
 
     connect(message::bluetooth::RequestStatus(), [&](sys::Message *msg) {
