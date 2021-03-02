@@ -87,6 +87,11 @@ namespace service::eink
         EinkPowerDown();
     }
 
+    void EinkDisplay::wipeOut()
+    {
+        EinkFillScreenWithColor(EinkDisplayColorFilling_e::EinkDisplayColorWhite);
+    }
+
     EinkStatus_e EinkDisplay::update(std::uint8_t *displayBuffer)
     {
         return EinkUpdateFrame(pointTopLeft.x,
