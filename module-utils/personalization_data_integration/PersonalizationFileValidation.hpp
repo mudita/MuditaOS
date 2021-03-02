@@ -52,24 +52,26 @@ class ParamValidator
     auto validate(json11::Json obj) -> ValidationResult;
 };
 
-class FileValidator
+class PersonalizationFileParser
 {
   protected:
-    [[nodiscard]] auto getJsonObject(const std::filesystem::path &filePath) const -> json11::Json;
     auto validateFile(const std::filesystem::path &filePath) -> bool;
+    [[nodiscard]] auto getJsonObject(const std::filesystem::path &filePath) const -> json11::Json;
+
+    [[nodiscard]] auto parse(const std::filesystem::path &filePath) -> json11::Json;
 };
 
-class PersonalizationFileParser : public FileValidator
+class PersonalizationData : public PersonalizationFileParser
 {
     json11::Json params = nullptr;
     std::vector<ParamValidator> paramsValidator;
     bool valid = true;
 
-    std::string serialNumber = "";
-    std::string caseColour   = "";
+    std::string serialNumber;
+    std::string caseColour;
 
   public:
-    explicit PersonalizationFileParser(const std::filesystem::path &filePath);
+    explicit PersonalizationData(const std::filesystem::path &filePath);
 
     [[nodiscard]] auto getSerialNumber() const -> std::string
     {

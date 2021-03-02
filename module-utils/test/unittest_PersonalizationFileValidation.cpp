@@ -6,7 +6,7 @@
 #include "personalization_data_integration/PersonalizationFileValidation.hpp"
 #include <filesystem>
 
-class FileValidatorTestWrapper : public FileValidator
+class FileValidatorTestWrapper : public PersonalizationFileParser
 {
   public:
     json11::Json test_getJsonObject(const std::filesystem::path &fileToLoad)
@@ -148,7 +148,7 @@ TEST_CASE("Personalization File Validation")
         }
     }
 
-    SECTION("Check PersonalizationFileParser class")
+    SECTION("Check PersonalizationData class")
     {
         SECTION("Check: parse personalization file")
         {
@@ -160,7 +160,7 @@ TEST_CASE("Personalization File Validation")
                 auto expectedSerialNumber = "TestSerialNumber";
                 auto expectedCaseColour   = "black";
 
-                auto parsedData = PersonalizationFileParser(path);
+                auto parsedData = PersonalizationData(path);
 
                 REQUIRE(parsedData.getSerialNumber() == expectedSerialNumber);
                 REQUIRE(parsedData.getCaseColour() == expectedCaseColour);
@@ -172,7 +172,7 @@ TEST_CASE("Personalization File Validation")
 
                 expectedCaseColour = "white";
 
-                parsedData = PersonalizationFileParser(path);
+                parsedData = PersonalizationData(path);
 
                 REQUIRE(parsedData.getSerialNumber() == expectedSerialNumber);
                 REQUIRE(parsedData.getCaseColour() == expectedCaseColour);
@@ -191,7 +191,7 @@ TEST_CASE("Personalization File Validation")
                     auto invalidSerialNumber = "";
                     auto invalidCaseColour   = "";
 
-                    auto parsedData = PersonalizationFileParser(path);
+                    auto parsedData = PersonalizationData(path);
 
                     REQUIRE(parsedData.getSerialNumber() == invalidSerialNumber);
                     REQUIRE(parsedData.getCaseColour() == invalidCaseColour);
@@ -208,7 +208,7 @@ TEST_CASE("Personalization File Validation")
                     auto invalidSerialNumber = "";
                     auto invalidCaseColour   = "";
 
-                    auto parsedData = PersonalizationFileParser(path);
+                    auto parsedData = PersonalizationData(path);
 
                     REQUIRE(parsedData.getSerialNumber() == invalidSerialNumber);
                     REQUIRE(parsedData.getCaseColour() == invalidCaseColour);
@@ -225,7 +225,7 @@ TEST_CASE("Personalization File Validation")
                     auto invalidSerialNumber = "";
                     auto invalidCaseColour   = "";
 
-                    auto parsedData = PersonalizationFileParser(path);
+                    auto parsedData = PersonalizationData(path);
 
                     REQUIRE(parsedData.getSerialNumber() == invalidSerialNumber);
                     REQUIRE(parsedData.getCaseColour() == invalidCaseColour);
@@ -242,7 +242,7 @@ TEST_CASE("Personalization File Validation")
                     auto expectedSerialNumber = "ProvidedSerialNumber";
                     auto caseColour           = "black";
 
-                    auto parsedData = PersonalizationFileParser(path);
+                    auto parsedData = PersonalizationData(path);
 
                     REQUIRE(parsedData.getCaseColour() == caseColour);
 
@@ -257,7 +257,7 @@ TEST_CASE("Personalization File Validation")
                     auto expectedSerialNumber = "TestSerialNumber";
                     auto caseColour           = "yellow";
 
-                    auto parsedData = PersonalizationFileParser(path);
+                    auto parsedData = PersonalizationData(path);
 
                     REQUIRE(parsedData.getSerialNumber() == expectedSerialNumber);
                     REQUIRE(parsedData.getCaseColour() == caseColour);

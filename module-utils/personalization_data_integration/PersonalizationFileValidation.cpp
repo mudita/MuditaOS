@@ -5,48 +5,11 @@
 #include "module-utils/bootconfig/src/bootconfig.cpp"
 #include "PersonalizationFileValidation.hpp"
 
-auto FileValidator::getJsonObject(const std::filesystem::path &filePath) const -> json11::Json
-{
-    auto lamb = [](::FILE *stream) { ::fclose(stream); };
-    std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
-    std::unique_ptr<::FILE, decltype(lamb)> fp(fopen(filePath.c_str(), "r"), lamb);
-    std::string contents;
-    size_t readSize;
-
-    if (fp.get() != nullptr) {
-        while (!feof(fp.get())) {
-            readSize = fread(readBuf.get(), 1, purefs::buffer::tar_buf, fp.get());
-            contents.append(static_cast<const char *>(readBuf.get()), readSize);
-        }
-    }
-
-    LOG_INFO("CONTENTS: %s", contents.c_str());
-    std::string err;
-    json11::Json jsonObject = json11::Json::parse(contents.c_str(), err);
-
-    if (err.length() != 0) {
-        LOG_FATAL("JSON format error: %s", err.c_str());
-        return nullptr;
-    }
-
-    return jsonObject;
-}
-
-auto FileValidator::validateFile(const std::filesystem::path &filePath) -> bool
-{
-    if (!boot::readAndVerifyCRC(filePath)) {
-        LOG_ERROR("Invalid crc calculation!");
-        return false;
-    }
-
-    LOG_INFO("CRC is correct");
-    return true;
-};
 
 ParamValidator::ParamValidator(const std::string &paramKey,
                                const bool isMandatory,
                                const std::vector<std::string> &validValues)
-                               : paramKey{paramKey}, validValues{validValues}, isMandatory{isMandatory} {}
+        : paramKey{paramKey}, validValues{validValues}, isMandatory{isMandatory} {}
 
 auto ParamValidator::validate(json11::Json obj) -> ValidationResult
 {
@@ -66,23 +29,70 @@ auto ParamValidator::validate(json11::Json obj) -> ValidationResult
     return ValidationResult::critical;
 }
 
-PersonalizationFileParser::PersonalizationFileParser(const std::filesystem::path &filePath)
+auto PersonalizationFileParser::getJsonObject(const std::filesystem::path &filePath) const -> json11::Json
 {
-    if (validateFile(filePath)) {
-        params = getJsonObject(filePath);
-        if (params != nullptr) {
-            serialNumber = params[phone_personalization::json::serial_number].string_value();
-            caseColour   = params[phone_personalization::json::case_color].string_value();
-            return;
+    auto fileHandle = fopen(filePath.c_str(), "r");
+    auto readBuf = std::make_unique<char[]>(purefs::buffer::tar_buf);
+
+    std::string contents;
+    size_t readSize;
+
+    if (fileHandle) {
+        while (!feof(fileHandle)) {
+            readSize = fread(readBuf.get(), 1, purefs::buffer::tar_buf, fileHandle);
+            contents.append(static_cast<const char *>(readBuf.get()), readSize);
         }
     }
+
+    auto fpCloseAct = gsl::finally([fileHandle] { fclose(fileHandle); });
+
+    LOG_INFO("CONTENTS: %s", contents.c_str());
+    std::string err;
+    json11::Json jsonObject = json11::Json::parse(contents.c_str(), err);
+
+    if (err.length() != 0) {
+        LOG_FATAL("JSON format error: %s", err.c_str());
+        return nullptr;
+    }
+
+    return jsonObject;
+}
+
+auto PersonalizationFileParser::validateFile(const std::filesystem::path &filePath) -> bool
+{
+    if (!boot::readAndVerifyCRC(filePath)) {
+        LOG_ERROR("Invalid crc calculation!");
+        return false;
+    }
+
+    LOG_INFO("CRC is correct");
+    return true;
+};
+
+auto PersonalizationFileParser::parse(const std::filesystem::path &filePath) -> json11::Json
+{
+    if (validateFile(filePath)) {
+        return getJsonObject(filePath);
+    }
+    LOG_ERROR("Personalization file is invalid!");
+    return nullptr;
+}
+
+PersonalizationData::PersonalizationData(const std::filesystem::path &filePath)
+{
+    params = parse(filePath);
+    if (params != nullptr) {
+        serialNumber = params[phone_personalization::json::serial_number].string_value();
+        caseColour   = params[phone_personalization::json::case_color].string_value();
+        return;
+    }
+
     LOG_ERROR("Personalization file is invalid!");
     valid = false;
 }
 
-auto PersonalizationFileParser::validate(const std::string &expectedSerialNumber) -> bool
+auto PersonalizationData::validate(const std::string &expectedSerialNumber) -> bool
 {
-
     if (!valid) {
         return false;
     }
