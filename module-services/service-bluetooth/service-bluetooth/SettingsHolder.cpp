@@ -10,6 +10,8 @@ namespace bluetooth
         {Settings::State, settings::Bluetooth::state},
         {Settings::BondedDevices, settings::Bluetooth::bondedDevices},
         {Settings::BtKeys, settings::Bluetooth::btKeys},
+        {Settings::ConnectedDevice, settings::Bluetooth::connectedDevice},
+
     };
 
     auto SettingsHolder::getValue(const Settings setting) -> SettingEntry

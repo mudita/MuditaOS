@@ -29,6 +29,7 @@ namespace settings
         constexpr inline auto deviceName       = "bt_device_name";
         constexpr inline auto bondedDevices    = "bt_bonded_devices";
         constexpr inline auto btKeys           = "bt_keys";
+        constexpr inline auto connectedDevice  = "connected_device";
     } // namespace Bluetooth
     namespace Brightness
     {

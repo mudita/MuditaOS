@@ -87,7 +87,14 @@ namespace gui
                 device.name,
                 [=](gui::Item & /*item*/) {
                     LOG_DEBUG("Device: %s", device.name.c_str());
-                    bluetoothSettingsModel->requestConnection(addr);
+                    if (isConnected) {
+                        bluetoothSettingsModel->requestDisconnection();
+                        refreshOptionsList();
+                    }
+                    else {
+                        bluetoothSettingsModel->requestConnection(addr);
+                    }
+
                     return true;
                 },
                 [=](gui::Item &item) {
