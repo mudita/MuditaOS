@@ -48,6 +48,8 @@ namespace bluetooth
             return startPan();
         case bluetooth::Command::Pair:
             return pair(command.getAddress());
+        case bluetooth::Command::Unpair:
+            return unpair(command.getAddress());
         case bluetooth::Command::VisibilityOn:
             return setVisibility(true);
         case bluetooth::Command::VisibilityOff:
@@ -143,6 +145,12 @@ namespace bluetooth
         }
         profileManager->switchProfile(profile);
         return Error::Success;
+    }
+    Error::Code CommandHandler::unpair(uint8_t *addr)
+    {
+        LOG_INFO("Unpairing %s", bd_addr_to_str(addr));
+
+        return driver->unpair(addr) ? Error::Success : Error::LibraryError;
     }
 
 } // namespace bluetooth

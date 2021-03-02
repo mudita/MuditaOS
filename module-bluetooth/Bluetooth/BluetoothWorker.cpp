@@ -152,6 +152,10 @@ auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
     case bluetooth::Command::PowerOff:
         controller->turnOff();
         break;
+    case bluetooth::Command::Unpair:
+        controller->processCommand(command);
+        removeFromBoundDevices(command.getAddress());
+        break;
     default:
         controller->processCommand(command);
         break;
@@ -258,4 +262,14 @@ void BluetoothWorker::initDevicesList()
     auto bondedDevicesStr =
         std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::BondedDevices));
     pairedDevices = SettingsSerializer::fromString(bondedDevicesStr);
+}
+void BluetoothWorker::removeFromBoundDevices(uint8_t *addr)
+{
+    auto position = std::find_if(
+        pairedDevices.begin(), pairedDevices.end(), [&](Devicei device) { return !bd_addr_cmp(addr, device.address); });
+    if (position != pairedDevices.end()) {
+        pairedDevices.erase(position);
+        settings->setValue(bluetooth::Settings::BondedDevices, SettingsSerializer::toString(pairedDevices));
+        LOG_INFO("Device %s removed from paired devices list", bd_addr_to_str(addr));
+    }
 }

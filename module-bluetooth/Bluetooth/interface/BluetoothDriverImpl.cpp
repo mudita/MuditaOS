@@ -206,4 +206,8 @@ namespace bluetooth
     {
         return gap->pair(addr, protectionLevel);
     }
+    auto Driver::unpair(uint8_t *addr) -> bool
+    {
+        return gap->unpair(addr);
+    }
 } // namespace bluetooth

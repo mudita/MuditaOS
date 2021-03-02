@@ -39,5 +39,6 @@ namespace bluetooth
         void stopScan() override;
         void setVisibility(bool visibility) override;
         auto pair(uint8_t *addr, std::uint8_t protectionLevel = 0) -> bool override;
+        auto unpair(uint8_t *addr) -> bool override;
     };
 } // namespace bluetooth
