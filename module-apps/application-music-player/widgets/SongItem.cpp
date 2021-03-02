@@ -8,7 +8,7 @@ namespace gui
 
     using namespace musicPlayerStyle;
 
-    SongItem::SongItem(std::string songName, std::string authorName, std::string duration)
+    SongItem::SongItem(const std::string &authorName, const std::string &songName, const std::string &duration)
     {
         setMinimumSize(songItem::w, songItem::h);
         setMargins(Margins(0, style::margins::small, 0, style::margins::small));
@@ -64,7 +64,7 @@ namespace gui
         authorText->setEditMode(EditMode::Browse);
         authorText->setText(authorName);
 
-        dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
+        dimensionChangedCallback = [&]([[maybe_unused]] gui::Item &item, const BoundingBox &newDim) -> bool {
             vBox->setArea({0, 0, newDim.w, newDim.h});
             return true;
         };
