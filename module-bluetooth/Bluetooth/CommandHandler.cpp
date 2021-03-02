@@ -116,6 +116,8 @@ namespace bluetooth
     {
         profileManager->init();
         LOG_INFO("Connecting audio with %s", bd_addr_to_str(addr));
+        std::string devAddr{bd_addr_to_str(addr)};
+        settings->setValue(bluetooth::Settings::ConnectedDevice, std::move(devAddr));
         profileManager->connect(addr);
 
         return Error::Success;
@@ -123,6 +125,7 @@ namespace bluetooth
 
     Error::Code CommandHandler::disconnectAudioConnection()
     {
+        settings->setValue(bluetooth::Settings::ConnectedDevice, std::string());
         profileManager->disconnect();
         return Error::Success;
     }

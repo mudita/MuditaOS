@@ -18,7 +18,8 @@ namespace bluetooth
         Visibility,
         State,
         BondedDevices,
-        BtKeys
+        BtKeys,
+        ConnectedDevice
     };
 
     constexpr inline auto trueStr  = "true";

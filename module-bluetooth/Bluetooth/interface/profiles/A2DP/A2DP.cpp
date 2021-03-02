@@ -17,6 +17,7 @@
 #include <service-audio/AudioMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <log/log.hpp>
+#include "service-bluetooth/messages/Connect.hpp"
 extern "C"
 {
 #include "module-bluetooth/lib/btstack/src/btstack.h"
@@ -319,17 +320,22 @@ namespace bluetooth
         }
 
         switch (hci_event_a2dp_meta_get_subevent_code(packet)) {
-        case A2DP_SUBEVENT_SIGNALING_CONNECTION_ESTABLISHED:
+        case A2DP_SUBEVENT_SIGNALING_CONNECTION_ESTABLISHED: {
             a2dp_subevent_signaling_connection_established_get_bd_addr(packet, address);
             cid    = a2dp_subevent_signaling_connection_established_get_a2dp_cid(packet);
             status = a2dp_subevent_signaling_connection_established_get_status(packet);
-
+            std::string deviceAddress{bd_addr_to_str(address)};
             if (status != ERROR_CODE_SUCCESS) {
                 LOG_INFO("A2DP Source: Connection failed, status 0x%02x, cid 0x%02x, a2dp_cid 0x%02x \n",
                          status,
                          cid,
                          AVRCP::mediaTracker.a2dp_cid);
                 AVRCP::mediaTracker.a2dp_cid = 0;
+
+                auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+                busProxy.sendUnicast(
+                    std::make_shared<message::bluetooth::ConnectResult>(std::move(deviceAddress), false),
+                    "ApplicationSettingsNew");
                 break;
             }
             AVRCP::mediaTracker.a2dp_cid = cid;
@@ -340,8 +346,11 @@ namespace bluetooth
                      AVRCP::mediaTracker.a2dp_cid,
                      AVRCP::mediaTracker.local_seid);
             isConnected = true;
+            auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+            busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(std::move(deviceAddress), true),
+                                 "ApplicationSettingsNew");
             break;
-
+        }
         case A2DP_SUBEVENT_SIGNALING_MEDIA_CODEC_SBC_CONFIGURATION: {
             cid = avdtp_subevent_signaling_media_codec_sbc_configuration_get_avdtp_cid(packet);
             if (cid != AVRCP::mediaTracker.a2dp_cid) {

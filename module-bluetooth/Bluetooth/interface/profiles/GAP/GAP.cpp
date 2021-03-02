@@ -15,6 +15,7 @@ extern "C"
 };
 namespace bluetooth
 {
+    std::string GAP::currentlyProcessedDeviceAddr;
     sys::Service *GAP::ownerService = nullptr;
     std::vector<Devicei> GAP::devices;
     btstack_packet_callback_registration_t GAP::cb_handler;
@@ -60,6 +61,7 @@ namespace bluetooth
     auto GAP::pair(std::uint8_t *addr, std::uint8_t protectionLevel) -> bool
     {
         if (hci_get_state() == HCI_STATE_WORKING) {
+            currentlyProcessedDeviceAddr = bd_addr_to_str(addr);
             return gap_dedicated_bonding(addr, protectionLevel) == 0;
         }
         return false;
@@ -196,10 +198,11 @@ namespace bluetooth
     }
     void GAP::processDedicatedBondingCompleted(std::uint8_t *packet, bd_addr_t &addr)
     {
-        LOG_INFO("Pairing completed!");
         auto result = packet[2];
         auto name   = std::string{reinterpret_cast<const char *>(&packet[9])};
-        auto msg    = std::make_shared<BluetoothPairResultMessage>(bd_addr_to_str(addr), name, result == 0u);
+        auto msg =
+            std::make_shared<BluetoothPairResultMessage>(currentlyProcessedDeviceAddr, std::move(name), result == 0u);
+        currentlyProcessedDeviceAddr.clear();
         ownerService->bus.sendUnicast(std::move(msg), "ApplicationSettingsNew");
     }
     /* @text In ACTIVE, the following events are processed:
