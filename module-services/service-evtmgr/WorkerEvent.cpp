@@ -97,6 +97,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
                 bsp::battery_charger::getChargeStatus();
                 auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
                 service->bus.sendUnicast(std::move(message), service::name::evt_manager);
+                battery_level_check::checkBatteryLevelCritical();
                 bsp::battery_charger::clearAllChargerIRQs();
             }
             if (topINT & static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::FG_INT)) {
@@ -122,6 +123,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
                     bsp::battery_charger::getChargeStatus();
                     auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
                     service->bus.sendUnicast(std::move(message), service::name::evt_manager);
+                    battery_level_check::checkBatteryLevelCritical();
                 }
             }
         }

@@ -20,10 +20,10 @@ namespace gui::top_bar
         constexpr auto battery4             = "battery4_W_M";
         constexpr auto battery5             = "battery5_W_M";
 
-        constexpr auto level1Threshold = 5;
-        constexpr auto level2Threshold = 27;
-        constexpr auto level3Threshold = 50;
-        constexpr auto level4Threshold = 73;
+        constexpr auto level1Threshold = 15;
+        constexpr auto level2Threshold = 35;
+        constexpr auto level3Threshold = 55;
+        constexpr auto level4Threshold = 75;
         constexpr auto level5Threshold = 95;
     } // namespace
 
@@ -37,19 +37,19 @@ namespace gui::top_bar
 
     void BatteryBar::showBatteryLevel(std::uint32_t percentage)
     {
-        if (percentage <= level1Threshold) {
+        if (percentage < level1Threshold) {
             img->set(batteryLow);
         }
-        else if (percentage <= level2Threshold) {
+        else if (percentage < level2Threshold) {
             img->set(battery1);
         }
-        else if (percentage <= level3Threshold) {
+        else if (percentage < level3Threshold) {
             img->set(battery2);
         }
-        else if (percentage <= level4Threshold) {
+        else if (percentage < level4Threshold) {
             img->set(battery3);
         }
-        else if (percentage <= level5Threshold) {
+        else if (percentage < level5Threshold) {
             img->set(battery4);
         }
         else {

@@ -1,0 +1,18 @@
+@startuml
+
+[*] --> InitialCheck
+InitialCheck --> LevelCriticalNotCharging : criticalLevelCheck [isCriticalNotCharging] / sendCriticalNotCharging
+InitialCheck --> LevelCriticalCharging : criticalLevelCheck [isCriticalCharging] / sendCriticalCharging
+InitialCheck --> LevelNormal : criticalLevelCheck [isNormal] / sendNormal
+LevelNormal --> LevelCriticalNotCharging : criticalLevelCheck [isCriticalNotCharging] / sendCriticalNotCharging
+LevelCriticalNotCharging --> LevelCriticalCharging : criticalLevelCheck [isCriticalCharging] / sendCriticalCharging
+LevelCriticalCharging --> LevelCriticalNotCharging : criticalLevelCheck [isCriticalNotCharging] / sendCriticalNotCharging
+LevelCriticalNotCharging --> LevelNormal : criticalLevelCheck [isNormal] / sendNormal
+LevelCriticalCharging --> LevelNormal : criticalLevelCheck [isNormal] / sendNormal
+LevelCriticalNotCharging --> Shutdown : criticalLevelCheck [isShutdown] / sendShutdown
+LevelNormal --> LevelNormal : confirmState / sendNormal
+LevelCriticalNotCharging --> LevelCriticalNotCharging : confirmState / sendCriticalNotCharging
+LevelCriticalCharging --> LevelCriticalCharging : confirmState / sendCriticalCharging
+Shutdown --> terminate
+
+@enduml

@@ -46,7 +46,8 @@ namespace sys
     {
         RegularPowerDown,
         Reboot,
-        SystemBrownout
+        SystemBrownout,
+        LowBattery
     };
 
 } // namespace sys
