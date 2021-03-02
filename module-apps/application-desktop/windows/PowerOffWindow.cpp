@@ -18,177 +18,40 @@
 #include "service-cellular/ServiceCellular.hpp"
 #include <Style.hpp>
 #include <application-desktop/windows/Names.hpp>
+#include <module-apps/messages/DialogMetadataMessage.hpp>
 
 namespace gui
 {
-
     PowerOffWindow::PowerOffWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter)
-        : AppWindow(app, app::window::name::desktop_poweroff), presenter(std::move(presenter))
+        : DialogYesNo(app, app::window::name::desktop_poweroff), presenter(std::move(presenter))
     {
-        buildInterface();
+        topBar->configure(std::move(configureTopBar(application->getTopBarConfiguration())));
     }
 
-    void PowerOffWindow::rebuild()
+    top_bar::Configuration PowerOffWindow::configureTopBar(top_bar::Configuration appConfiguration)
     {
-        // find which widget has focus
-        uint32_t index = 0;
-        for (uint32_t i = 0; i < selectionLabels.size(); i++)
-            if (selectionLabels[i] == getFocusItem()) {
-                index = i;
-                break;
-            }
-
-        destroyInterface();
-        buildInterface();
-        setFocusItem(selectionLabels[index]);
-    }
-    void PowerOffWindow::buildInterface()
-    {
-        AppWindow::buildInterface();
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-
-        powerImage     = new gui::Image(this, 177, 132, 0, 0, "pin_lock_info");
-
-        // title label
-        titleLabel = new gui::Label(this, 0, 60, 480, 40);
-        titleLabel->setFilled(false);
-        titleLabel->setBorderColor(gui::ColorFullBlack);
-        titleLabel->setFont(style::header::font::title);
-        titleLabel->setText(utils::localize.get("app_desktop_poweroff_title"));
-        titleLabel->setEdges(RectangleEdge::None);
-        titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
-
-        // label with question for powering down
-        infoLabel = new gui::Label(this, 0, 294, 480, 30);
-        infoLabel->setFilled(false);
-        infoLabel->setBorderColor(gui::ColorNoColor);
-        infoLabel->setFont(style::window::font::medium);
-        infoLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
-        infoLabel->setText(utils::localize.get("app_desktop_poweroff_question"));
-
-        uint32_t pinLabelX = 46;
-        uint32_t pinLabelY = 350;
-        for (uint32_t i = 0; i < 4; i++) {
-            gui::Label *label = new gui::Label(this, pinLabelX, pinLabelY, 193, 75);
-            label->setFilled(false);
-            label->setBorderColor(gui::ColorFullBlack);
-            label->setPenWidth(0);
-            label->setPenFocusWidth(2);
-            label->setRadius(5);
-            label->setFont(style::window::font::medium);
-            label->setEdges(RectangleEdge::All);
-            label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-            selectionLabels.push_back(label);
-            pinLabelX += 193;
-        }
-
-        selectionLabels[0]->setText(utils::localize.get(style::strings::common::no));
-        selectionLabels[1]->setText(utils::localize.get(style::strings::common::yes));
-
-        pinLabelX = 46;
-        pinLabelY += 75;
-        eventMgrLabel = new gui::Label(this, pinLabelX, pinLabelY, 193 * 2, 75);
-        eventMgrLabel->setFilled(false);
-        eventMgrLabel->setBorderColor(gui::ColorFullBlack);
-        eventMgrLabel->setPenWidth(0);
-        eventMgrLabel->setPenFocusWidth(2);
-        eventMgrLabel->setRadius(5);
-        eventMgrLabel->setFont(style::window::font::bigbold);
-        eventMgrLabel->setText("TURN PWR MGR OFF");
-        eventMgrLabel->setEdges(RectangleEdge::All);
-        eventMgrLabel->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-
-        // define navigation between labels
-        selectionLabels[0]->setNavigationItem(NavigationDirection::LEFT, selectionLabels[1]);
-        selectionLabels[0]->setNavigationItem(NavigationDirection::RIGHT, selectionLabels[1]);
-        selectionLabels[0]->setNavigationItem(NavigationDirection::DOWN, eventMgrLabel);
-
-        selectionLabels[1]->setNavigationItem(NavigationDirection::LEFT, selectionLabels[0]);
-        selectionLabels[1]->setNavigationItem(NavigationDirection::RIGHT, selectionLabels[0]);
-        selectionLabels[1]->setNavigationItem(NavigationDirection::DOWN, eventMgrLabel);
-
-        eventMgrLabel->setNavigationItem(NavigationDirection::UP, selectionLabels[0]);
-
-        // callbacks for getting focus
-        selectionLabels[0]->focusChangedCallback = [=](gui::Item &item) {
-            if (item.focus)
-                this->state = State::Return;
-            return true;
-        };
-
-        selectionLabels[1]->focusChangedCallback = [=](gui::Item &item) {
-            if (item.focus)
-                this->state = State::PowerDown;
-            return true;
-        };
-
-        selectionLabels[1]->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("User call close system");
-
-            presenter->powerOff();
-
-            return true;
-        };
-
-        eventMgrLabel->activatedCallback = [=](gui::Item &item) {
-            static bool state = false;
-            if (state == false) {
-                LOG_INFO("SUSPEND SYSTEM");
-                state = true;
-            }
-            else {
-                LOG_INFO("RESUME SYSTEM");
-                state = false;
-            }
-            return true;
-        };
-    }
-
-    void PowerOffWindow::destroyInterface()
-    {
-        erase();
-        invalidate();
-    }
-
-    void PowerOffWindow::invalidate() noexcept
-    {
-        titleLabel     = nullptr;
-        infoLabel      = nullptr;
-        eventMgrLabel  = nullptr;
-        powerImage     = nullptr;
-        selectionLabels.clear();
+        appConfiguration.enable(top_bar::Indicator::Time);
+        appConfiguration.disable(top_bar::Indicator::Lock);
+        appConfiguration.disable(top_bar::Indicator::Battery);
+        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.disable(top_bar::Indicator::Signal);
+        appConfiguration.disable(top_bar::Indicator::SimCard);
+        return appConfiguration;
     }
 
     void PowerOffWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        // on entering screen always set default result as returning to home screen and set focus to "No" label
-        state = State::Return;
-        setFocusItem(selectionLabels[0]);
-    }
-
-    bool PowerOffWindow::onInput(const InputEvent &inputEvent)
-    {
-        // check if any of the lower inheritance onInput methods catch the event
-        if (AppWindow::onInput(inputEvent)) {
+        DialogMetadata metadata;
+        metadata.action = [=]() -> bool {
+            LOG_INFO("User call close system");
+            presenter->powerOff();
             return true;
-        }
-
-        // process only short press, consume rest
-        if (inputEvent.state != gui::InputEvent::State::keyReleasedShort)
-            return true;
-
-        // if enter was pressed check state and power down or return to main desktop's window
-        if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
-            if (state != State::PowerDown) {
-                application->switchWindow("MainWindow");
-            }
-        }
-
-        return false;
+        };
+        metadata.title = utils::localize.get("app_desktop_poweroff_title");
+        metadata.text  = utils::localize.get("app_desktop_poweroff_question");
+        metadata.icon  = "turn_off_W_G";
+        auto msg       = std::make_unique<DialogMetadataMessage>(std::move(metadata));
+        DialogYesNo::onBeforeShow(mode, msg.get());
     }
 
 } /* namespace gui */
