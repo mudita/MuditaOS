@@ -32,6 +32,7 @@ namespace service::eink
         void powerOn();
         void powerOff();
         void shutdown();
+        void wipeOut();
 
         EinkStatus_e setWaveform(EinkWaveforms_e mode, std::int32_t temperature);
         void setMode(EinkDisplayColorMode_e mode) noexcept;
