@@ -32,6 +32,7 @@ namespace bluetooth
     auto GAP::scan() -> Error
     {
         if (hci_get_state() == HCI_STATE_WORKING) {
+            devices.clear();
             if (auto ret = startScan(); ret != 0) {
                 LOG_ERROR("Start scan error!: 0x%X", ret);
                 return Error(Error::LibraryError, ret);
@@ -45,7 +46,7 @@ namespace bluetooth
 
     void GAP::stopScan()
     {
-        gap_inquiry_stop();
+        gap_inquiry_force_stop();
         LOG_INFO("Scan stopped!");
     }
 
@@ -86,7 +87,6 @@ namespace bluetooth
     auto GAP::startScan() -> int
     {
         LOG_INFO("Starting inquiry scan..");
-        devices.clear();
         return gap_inquiry_start(inquiryIntervalSeconds);
     }
 
@@ -195,10 +195,10 @@ namespace bluetooth
     }
     void GAP::processDedicatedBondingCompleted(std::uint8_t *packet, bd_addr_t &addr)
     {
+        LOG_INFO("Pairing completed!");
         auto result = packet[2];
         auto name   = std::string{reinterpret_cast<const char *>(&packet[9])};
         auto msg    = std::make_shared<BluetoothPairResultMessage>(bd_addr_to_str(addr), name, result == 0u);
-        ownerService->bus.sendUnicast(msg, "ApplicationSettings");
         ownerService->bus.sendUnicast(std::move(msg), "ApplicationSettingsNew");
     }
     /* @text In ACTIVE, the following events are processed:
