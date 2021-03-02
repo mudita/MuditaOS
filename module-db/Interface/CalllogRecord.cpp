@@ -274,7 +274,8 @@ std::unique_ptr<db::QueryResult> CalllogRecordInterface::getQuery(std::shared_pt
         record.ID           = calllog.ID;
         recordVector.emplace_back(record);
     }
-    auto response = std::make_unique<db::query::CalllogGetResult>(recordVector);
+
+    auto response = std::make_unique<db::query::CalllogGetResult>(std::move(recordVector), GetCount());
     response->setRequestQuery(query);
     return response;
 }

@@ -24,7 +24,7 @@ namespace gui
         gui::ListView *list                        = nullptr;
 
       public:
-        CallLogMainWindow(app::Application *app);
+        explicit CallLogMainWindow(app::Application *app);
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
@@ -32,6 +32,8 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+      private:
         bool onDatabaseMessage(sys::Message *msg) override;
     };
 
