@@ -29,16 +29,16 @@ namespace app
         std::optional<audio::Token> currentFileToken;
 
       public:
-        ApplicationMusicPlayer(std::string name                    = name_music_player,
-                               std::string parent                  = {},
-                               StartInBackground startInBackground = {false});
-        virtual ~ApplicationMusicPlayer();
+        explicit ApplicationMusicPlayer(std::string name                    = name_music_player,
+                                        std::string parent                  = {},
+                                        StartInBackground startInBackground = {false});
 
-        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl,
+                                                [[maybe_unused]] sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
 
-        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override
         {
             return sys::ReturnCodes::Success;
         }
