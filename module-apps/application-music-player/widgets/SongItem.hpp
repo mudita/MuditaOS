@@ -16,9 +16,9 @@ namespace gui
     {
 
       public:
-        SongItem(std::string authorName, std::string songName, std::string duration);
+        SongItem(const std::string &authorName, const std::string &songName, const std::string &duration);
 
-        ~SongItem() override = default;
+      private:
         VBox *vBox                  = nullptr;
         HBox *firstHBox             = nullptr;
         HBox *secondHBox            = nullptr;

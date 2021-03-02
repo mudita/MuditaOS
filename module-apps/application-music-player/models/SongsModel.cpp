@@ -7,7 +7,7 @@
 #include <ListView.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 #include <time/time_conversion.hpp>
-
+ 
 SongsModel::SongsModel(app::Application *app) : application(app)
 {}
 
@@ -32,9 +32,9 @@ auto SongsModel::getItem(gui::Order order) -> gui::ListItem *
     return getRecord(order);
 }
 
-void SongsModel::createData(std::vector<audio::Tags> songsList, std::function<bool(const std::string &fileName)> func)
+void SongsModel::createData(const std::vector<audio::Tags> &songsList, std::function<bool(const std::string &fileName)> func)
 {
-    for (auto song : songsList) {
+    for (const auto &song : songsList) {
         auto item = new gui::SongItem(song.title, song.artist, utils::time::Duration(song.total_duration_s).str());
 
         item->activatedCallback = [=](gui::Item &) {

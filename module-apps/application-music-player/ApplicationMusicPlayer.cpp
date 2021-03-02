@@ -17,7 +17,7 @@ namespace app
     ApplicationMusicPlayer::ApplicationMusicPlayer(std::string name,
                                                    std::string parent,
                                                    StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, 4096)
+        : Application(std::move(name), std::move(parent), startInBackground, 4096)
     {
         LOG_INFO("ApplicationMusicPlayer::create");
         connect(typeid(AudioStartPlaybackResponse), [&](sys::Message *msg) {
@@ -26,18 +26,13 @@ namespace app
         });
     }
 
-    ApplicationMusicPlayer::~ApplicationMusicPlayer()
-    {
-        LOG_INFO("ApplicationMusicPlayer::destroy");
-    }
-
     void ApplicationMusicPlayer::handlePlayResponse(sys::Message *msg)
     {
         auto startResponse = static_cast<AudioStartPlaybackResponse *>(msg);
         currentFileToken   = startResponse->token;
     }
 
-    sys::MessagePointer ApplicationMusicPlayer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    sys::MessagePointer ApplicationMusicPlayer::DataReceivedHandler(sys::DataMessage *msgl, [[maybe_unused]] sys::ResponseMessage *resp)
     {
         return Application::DataReceivedHandler(msgl);
     }
@@ -46,8 +41,9 @@ namespace app
     sys::ReturnCodes ApplicationMusicPlayer::InitHandler()
     {
         auto ret = Application::InitHandler();
-        if (ret != sys::ReturnCodes::Success)
+        if (ret != sys::ReturnCodes::Success) {
             return ret;
+        }
 
         createUserInterface();
 
@@ -83,7 +79,7 @@ namespace app
             auto time = utils::time::Scoped("fetch tags time");
             for (const auto &entry : std::filesystem::directory_iterator(musicFolder)) {
                 if (!std::filesystem::is_directory(entry)) {
-                    const auto filePath = entry.path();
+                    const auto &filePath = entry.path();
                     auto fileTags       = getFileTags(filePath);
                     if (fileTags) {
                         musicFiles.push_back(*fileTags);
