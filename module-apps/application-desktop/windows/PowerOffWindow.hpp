@@ -4,7 +4,7 @@
 #pragma once
 
 #include <vector>
-#include "AppWindow.hpp"
+#include <module-apps/windows/Dialog.hpp>
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/BottomBar.hpp"
@@ -12,34 +12,14 @@
 
 namespace gui
 {
-    class PowerOffWindow : public AppWindow
+    class PowerOffWindow : public DialogYesNo
     {
-        enum class State
-        {
-            PowerDown,
-            Return,
-        };
-
-        gui::Label *titleLabel = nullptr;
-        gui::Label *infoLabel  = nullptr;
 
         std::unique_ptr<PowerOffPresenter> presenter;
-        std::vector<gui::Label *> selectionLabels;
-        gui::Label *eventMgrLabel  = nullptr;
-        gui::Image *powerImage     = nullptr;
-        gui::Image *powerDownImage = nullptr;
-        State state                = State::Return;
       public:
         PowerOffWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        bool onInput(const InputEvent &inputEvent) override;
-
-        void rebuild() override;
-        void buildInterface() override;
-        void destroyInterface() override;
-
-      private:
-        void invalidate() noexcept;
+        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
     };
 
 } /* namespace gui */
