@@ -181,6 +181,8 @@ namespace app
         connect(typeid(BluetoothPairResultMessage), [&](sys::Message *msg) {
             auto bluetoothPairResultMsg = static_cast<BluetoothPairResultMessage *>(msg);
             if (bluetoothPairResultMsg->status) {
+                bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(),
+                                service::name::bluetooth);
                 return sys::MessageNone{};
             }
             const std::string toReplace     = "%NAME";

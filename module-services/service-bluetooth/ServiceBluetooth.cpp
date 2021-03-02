@@ -57,6 +57,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     worker->run();
 
     connect(message::bluetooth::RequestBondedDevices(), [&](sys::Message *msg) {
+        LOG_INFO("Requested bonded devices!");
         auto bondedDevicesStr =
             std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::BondedDevices));
 
