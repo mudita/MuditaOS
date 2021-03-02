@@ -27,13 +27,6 @@ namespace phone_personalization
             const std::vector<std::string> valid_values = {"white", "black"};
         } // namespace case_colour
     }     // namespace params
-
-    namespace crc
-    {
-        constexpr auto size      = 8;
-        constexpr auto radix     = 16;
-        constexpr auto extension = ".crc";
-    } // namespace crc
 } // namespace phone_personalization
 
 enum class ValidationResult
@@ -64,7 +57,6 @@ class FileValidator
 {
   protected:
     json11::Json getJsonObject(const std::filesystem::path &filePath);
-    unsigned long readCRC(const std::filesystem::path &filePath);
     bool validateFile(const std::filesystem::path &filePath);
 };
 

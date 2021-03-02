@@ -1,6 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <module-utils/gsl/gsl>
+#include "module-utils/bootconfig/src/bootconfig.cpp"
 #include "PersonalizationFileValidation.hpp"
 
 json11::Json FileValidator::getJsonObject(const std::filesystem::path &filePath)
@@ -30,66 +32,15 @@ json11::Json FileValidator::getJsonObject(const std::filesystem::path &filePath)
     return jsonObject;
 }
 
-unsigned long FileValidator::readCRC(const std::filesystem::path &filePath)
-{
-    auto lamb = [](::FILE *stream) { ::fclose(stream); };
-
-    std::unique_ptr<char[]> crcBuff(new char[phone_personalization::crc::size]);
-
-    size_t readSize;
-    std::filesystem::path crcFilePath(filePath);
-    crcFilePath += phone_personalization::crc::extension;
-
-    std::unique_ptr<::FILE, decltype(lamb)> fileHandle(::fopen(crcFilePath.c_str(), "r"), lamb);
-
-    if (fileHandle.get() != nullptr) {
-        if ((readSize = ::fread(crcBuff.get(), 1, phone_personalization::crc::size, fileHandle.get())) !=
-            (phone_personalization::crc::size)) {
-            LOG_ERROR("fread on %s returned different size then %d [%zu]",
-                      crcFilePath.c_str(),
-                      phone_personalization::crc::size,
-                      readSize);
-            return 0;
-        }
-
-        const unsigned long crc32Readed = strtoull(crcBuff.get(), nullptr, phone_personalization::crc::radix);
-        LOG_DEBUG("CRC32 readed: %d", (int)crc32Readed);
-        return crc32Readed;
-    }
-
-    LOG_ERROR("Reading CRC file error!");
-
-    return 0;
-}
-
 bool FileValidator::validateFile(const std::filesystem::path &filePath)
 {
-    auto crcReaded = readCRC(filePath);
-    if (!crcReaded) {
-        LOG_ERROR("crc32 is invalid!");
+    if (!boot::readAndVerifyCRC(filePath)) {
+        LOG_ERROR("Invalid crc calculation!");
         return false;
     }
 
-    unsigned long crc32Computed;
-
-    auto fileHandle = std::fopen(filePath.c_str(), "r");
-
-    if (fileHandle != nullptr) {
-        crc32Computed = utils::filesystem::computeFileCRC32(fileHandle);
-        LOG_INFO("Computed crc32 for %s is %08" PRIX32, filePath.c_str(), static_cast<std::uint32_t>(crc32Computed));
-
-        if (crcReaded == crc32Computed) {
-            LOG_INFO("CRC is correct");
-            return true;
-        }
-
-        LOG_ERROR("Wrong calculation of crc32!");
-        std::fclose(fileHandle);
-        return false;
-    }
-
-    LOG_ERROR("Can't open %s", filePath.c_str());
-    return false;
+    LOG_INFO("CRC is correct");
+    return true;
 };
 
 ParamValidator::ParamValidator(const std::string &paramKey,
