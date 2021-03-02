@@ -387,16 +387,23 @@ namespace sys
             return MessageNone{};
         });
 
+        connect(sevm::BatteryShutdownLevelMessage(), [&](Message *) {
+            LOG_INFO("Battery level too low - shutting down the system");
+            CloseSystemHandler(CloseReason::LowBattery);
+            return MessageNone{};
+        });
+
         connect(CellularCheckIfStartAllowedMessage(), [&](Message *) {
             EventManagerServiceAPI::checkBatteryLevelCriticalState(this);
             return MessageNone{};
         });
 
-        connect(sevm::BatteryLevelCriticalMessage(), [&](Message *) {
+        connect(sevm::BatteryLevelCriticalMessage(bool{}), [&](Message *req) {
             LOG_INFO("Battery Critical Level reached!");
             CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::Off);
 
-            auto msg = std::make_shared<CriticalBatteryLevelNotification>(true);
+            auto request = static_cast<sevm::BatteryLevelCriticalMessage *>(req);
+            auto msg     = std::make_shared<CriticalBatteryLevelNotification>(true, request->isCharging());
             bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
 
             return MessageNone{};

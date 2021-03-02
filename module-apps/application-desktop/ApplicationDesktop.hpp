@@ -44,8 +44,6 @@ namespace app
             Counters notSeen;
             Counters notRead;
 
-            bool batteryLowLevel = false;
-
         } notifications;
 
         gui::PinLockHandler lockHandler;
@@ -122,7 +120,7 @@ namespace app
                      manager::actions::ShowMMIPush,
                      manager::actions::ShowMMIResult,
                      manager::actions::DisplayCMEError,
-                     manager::actions::DisplayLowBatteryNotification,
+                     manager::actions::DisplayLowBatteryScreen,
                      manager::actions::SystemBrownout,
                      manager::actions::DisplayLogoAtExit}};
         }

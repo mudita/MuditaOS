@@ -22,19 +22,21 @@ namespace sys
     class CriticalBatteryLevelNotification : public sys::Message, public app::manager::actions::ConvertibleToAction
     {
       public:
-        explicit CriticalBatteryLevelNotification(bool isActive) : sys::Message(), isActive(isActive)
+        explicit CriticalBatteryLevelNotification(bool isActive, bool isCharging = false)
+            : sys::Message(), isActive(isActive), isCharging(isCharging)
         {}
 
         [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
         {
             return std::make_unique<app::manager::ActionRequest>(
                 service::name::system_manager,
-                app::manager::actions::DisplayLowBatteryNotification,
-                std::make_unique<app::manager::actions::LowBatteryNotificationParams>(isActive));
+                app::manager::actions::DisplayLowBatteryScreen,
+                std::make_unique<app::manager::actions::LowBatteryNotificationParams>(isActive, isCharging));
         }
 
       private:
         bool isActive;
+        bool isCharging;
     };
 
 } // namespace sys
