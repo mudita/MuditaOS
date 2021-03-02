@@ -5,7 +5,6 @@
 
 #include <module-utils/log/log.hpp>
 #include <module-utils/Utils.hpp>
-#include <module-vfs/include/user/deprecated/vfsNotifier.hpp>
 #include <module-vfs/include/user/purefs/fs/filesystem.hpp>
 #include <module-vfs/include/user/purefs/filesystem_paths.hpp>
 #include "module-utils/json/json11.hpp"
@@ -39,7 +38,7 @@ enum class ValidationResult
 class ParamValidator
 {
     std::string paramKey = "";
-    std::unique_ptr<std::vector<std::string>> validValues;
+    std::vector<std::string> validValues;
     bool isMandatory = true;
 
   public:
@@ -56,8 +55,8 @@ class ParamValidator
 class FileValidator
 {
   protected:
-    json11::Json getJsonObject(const std::filesystem::path &filePath);
-    bool validateFile(const std::filesystem::path &filePath);
+    [[nodiscard]] auto getJsonObject(const std::filesystem::path &filePath) const -> json11::Json;
+    auto validateFile(const std::filesystem::path &filePath) -> bool;
 };
 
 class PersonalizationFileParser : public FileValidator

@@ -5,7 +5,7 @@
 #include "module-utils/bootconfig/src/bootconfig.cpp"
 #include "PersonalizationFileValidation.hpp"
 
-json11::Json FileValidator::getJsonObject(const std::filesystem::path &filePath)
+auto FileValidator::getJsonObject(const std::filesystem::path &filePath) const -> json11::Json
 {
     auto lamb = [](::FILE *stream) { ::fclose(stream); };
     std::unique_ptr<char[]> readBuf(new char[purefs::buffer::tar_buf]);
@@ -32,7 +32,7 @@ json11::Json FileValidator::getJsonObject(const std::filesystem::path &filePath)
     return jsonObject;
 }
 
-bool FileValidator::validateFile(const std::filesystem::path &filePath)
+auto FileValidator::validateFile(const std::filesystem::path &filePath) -> bool
 {
     if (!boot::readAndVerifyCRC(filePath)) {
         LOG_ERROR("Invalid crc calculation!");
@@ -46,16 +46,12 @@ bool FileValidator::validateFile(const std::filesystem::path &filePath)
 ParamValidator::ParamValidator(const std::string &paramKey,
                                const bool isMandatory,
                                const std::vector<std::string> &validValues)
-{
-    this->paramKey    = paramKey;
-    this->isMandatory = isMandatory;
-    this->validValues = std::make_unique<std::vector<std::string>>(validValues);
-}
+                               : paramKey{paramKey}, validValues{validValues}, isMandatory{isMandatory} {}
 
 auto ParamValidator::validate(json11::Json obj) -> ValidationResult
 {
     if (!paramKey.empty()) {
-        for (auto valid : *validValues) {
+        for (auto valid : validValues) {
             if (obj[paramKey].string_value() == valid) {
                 return ValidationResult::valid;
             }
