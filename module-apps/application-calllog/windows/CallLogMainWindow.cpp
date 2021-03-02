@@ -18,6 +18,7 @@
 #include <cassert>
 #include <functional>
 #include <memory>
+#include <module-services/service-db/service-db/DBNotificationMessage.hpp>
 
 using namespace style;
 using namespace callLogStyle;
@@ -34,8 +35,10 @@ namespace gui
 
     void CallLogMainWindow::rebuild()
     {
-        destroyInterface();
-        buildInterface();
+        if (list == nullptr) {
+            return;
+        }
+        list->rebuildList(style::listview::RebuildType::InPlace);
     }
 
     void CallLogMainWindow::buildInterface()
@@ -74,11 +77,14 @@ namespace gui
         app->setAllEntriesRead();
     }
 
-    bool CallLogMainWindow::onDatabaseMessage(sys::Message *msgl)
+    bool CallLogMainWindow::onDatabaseMessage(sys::Message *msg)
     {
-        auto *msg = dynamic_cast<DBCalllogResponseMessage *>(msgl);
-        if (msg != nullptr) {
-            return calllogModel->updateRecords(std::move(*msg->records));
+        auto notification = dynamic_cast<db::NotificationMessage *>(msg);
+        if (notification != nullptr) {
+            if (notification->interface == db::Interface::Name::Calllog && notification->dataModified()) {
+                rebuild();
+                return true;
+            }
         }
         return false;
     }

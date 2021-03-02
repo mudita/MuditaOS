@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCallLog.hpp"
@@ -40,36 +40,28 @@ namespace app
     // Invoked upon receiving data message
     sys::MessagePointer ApplicationCallLog::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-
-        auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
-        if ((reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
+        auto retMsg = Application::DataReceivedHandler(msgl);
+        if (auto responseMsg = dynamic_cast<sys::ResponseMessage *>(retMsg.get());
+            responseMsg != nullptr && responseMsg->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
 
-        auto handled = false;
+        if (msgl->messageType == MessageType::DBServiceNotification) {
+            for (auto &[name, window] : windowsStack.windows) {
+                window->onDatabaseMessage(msgl);
+            }
+            return msgHandled();
+        }
 
-        // handle database response
         if (resp != nullptr) {
-            handled = true;
-            switch (resp->responseTo) {
-            case MessageType::DBCalllogGetLimitOffset: {
-                if (getCurrentWindow()->onDatabaseMessage(resp)) {
-                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                }
-                break;
-            }
-            default:
-                break;
+            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                return msgHandled();
             }
         }
 
-        if (handled) {
-            return std::make_shared<sys::ResponseMessage>();
-        }
-        else {
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-        }
+        return msgNotHandled();
     }
 
     // Invoked during initialization
