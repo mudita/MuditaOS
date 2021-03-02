@@ -15,10 +15,10 @@ class SongsModel : public app::InternalModel<gui::ListItem *>, public gui::ListI
     app::Application *application = nullptr;
 
   public:
-    SongsModel(app::Application *app);
+    explicit SongsModel(app::Application *app);
 
     void clearData();
-    void createData(std::vector<audio::Tags> songsList, std::function<bool(const std::string &fileName)>);
+    void createData(const std::vector<audio::Tags> &songsList, std::function<bool(const std::string &fileName)>);
 
     [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
 
