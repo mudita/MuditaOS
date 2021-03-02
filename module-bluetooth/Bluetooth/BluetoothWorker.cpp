@@ -258,5 +258,4 @@ void BluetoothWorker::initDevicesList()
     auto bondedDevicesStr =
         std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::BondedDevices));
     pairedDevices = SettingsSerializer::fromString(bondedDevicesStr);
-    LOG_INFO("Imported %d devices", pairedDevices.size());
 }
