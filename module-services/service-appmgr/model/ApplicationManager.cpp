@@ -196,8 +196,8 @@ namespace app::manager
             act = ActionRequest{this->GetName(), app::manager::actions::SystemBrownout, nullptr};
             break;
         case sys::CloseReason::RegularPowerDown:
-            break;
         case sys::CloseReason::Reboot:
+        case sys::CloseReason::LowBattery:
             break;
         }
         handleActionRequest(&act);

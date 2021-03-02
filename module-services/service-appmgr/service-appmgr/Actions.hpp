@@ -52,7 +52,7 @@ namespace app::manager
             ShowMMIPush,
             SmsRejectNoSim,
             DisplayCMEError,
-            DisplayLowBatteryNotification,
+            DisplayLowBatteryScreen,
             SystemBrownout,
             RequestScreenPasscode,
             DisplayLogoAtExit,

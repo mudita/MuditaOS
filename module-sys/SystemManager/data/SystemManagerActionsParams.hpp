@@ -10,15 +10,22 @@ namespace app::manager::actions
     class LowBatteryNotificationParams : public ActionParams
     {
       public:
-        explicit LowBatteryNotificationParams(bool isActive) : isActive(isActive){};
+        explicit LowBatteryNotificationParams(bool isActive, bool isCharging)
+            : active(isActive), charging(isCharging){};
 
-        [[nodiscard]] bool getActiveState() const noexcept
+        [[nodiscard]] bool isActive() const noexcept
         {
-            return isActive;
+            return active;
+        }
+
+        [[nodiscard]] bool isCharging() const noexcept
+        {
+            return charging;
         }
 
       private:
-        bool isActive;
+        bool active;
+        bool charging;
     };
 
 } // namespace app::manager::actions

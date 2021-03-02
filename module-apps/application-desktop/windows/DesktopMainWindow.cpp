@@ -251,9 +251,6 @@ namespace gui
             bottomBar->setActive(BottomBar::Side::LEFT, !isFocused);
         };
 
-        if (app->notifications.batteryLowLevel) {
-            notifications->addNotification("battery1_W_M", utils::localize.get("app_desktop_low_battery_notification"));
-        }
         if (app->notifications.notSeen.Calls > 0) {
             notifications->addNotification(
                 "phone",

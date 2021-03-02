@@ -8,11 +8,10 @@
 
 namespace gui
 {
-    class Image;
-    class DeadBatteryWindow : public AppWindow
+    class ChargingBatteryWindow : public AppWindow
     {
       public:
-        explicit DeadBatteryWindow(app::Application *app);
+        explicit ChargingBatteryWindow(app::Application *app);
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;

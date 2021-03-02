@@ -23,6 +23,21 @@ namespace sevm
     class BatteryLevelCriticalCheckMessage : public sys::Message
     {};
     class BatteryLevelCriticalMessage : public sys::Message
+    {
+      public:
+        explicit BatteryLevelCriticalMessage(bool charging) : charging(charging)
+        {}
+
+        bool isCharging() const noexcept
+        {
+            return charging;
+        }
+
+      private:
+        bool charging;
+    };
+
+    class BatteryShutdownLevelMessage : public sys::Message
     {};
 
     class BatteryLevelNormalMessage : public sys::Message

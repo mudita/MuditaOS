@@ -10,6 +10,7 @@
 #include "windows/PowerOffWindow.hpp"
 #include "windows/DeadBatteryWindow.hpp"
 #include "windows/LogoWindow.hpp"
+#include "windows/ChargingBatteryWindow.hpp"
 #include "windows/LockedInfoWindow.hpp"
 #include "windows/Reboot.hpp"
 #include "windows/Update.hpp"
@@ -101,7 +102,7 @@ namespace app
             return actionHandled();
         });
 
-        addActionReceiver(app::manager::actions::DisplayLowBatteryNotification, [this](auto &&data) {
+        addActionReceiver(app::manager::actions::DisplayLowBatteryScreen, [this](auto &&data) {
             handleLowBatteryNotification(std::move(data));
             return actionHandled();
         });
@@ -419,6 +420,9 @@ namespace app
         windowsFactory.attach(logo_window, [](Application *app, const std::string newname) {
             return std::make_unique<gui::LogoWindow>(app);
         });
+        windowsFactory.attach(charging_battery, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::ChargingBatteryWindow>(app);
+        });
         windowsFactory.attach(desktop_locked, [](Application *app, const std::string newname) {
             return std::make_unique<gui::LockedInfoWindow>(app);
         });
@@ -478,11 +482,21 @@ namespace app
 
     void ApplicationDesktop::handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data)
     {
-        auto actionData               = static_cast<manager::actions::LowBatteryNotificationParams *>(data.get());
-        notifications.batteryLowLevel = actionData->getActiveState();
-        auto currentWindow            = getCurrentWindow();
-        if (currentWindow->getName() == window::name::desktop_main_window) {
-            currentWindow->rebuild();
+        auto lowBatteryState = static_cast<manager::actions::LowBatteryNotificationParams *>(data.get());
+        if (lowBatteryState->isActive()) {
+            if (lowBatteryState->isCharging()) {
+                switchWindow(app::window::name::charging_battery, std::move(data));
+            }
+            else {
+                switchWindow(app::window::name::dead_battery, std::move(data));
+            }
+        }
+        else {
+            auto currentWindow = getCurrentWindow();
+            if (currentWindow->getName() == app::window::name::dead_battery ||
+                currentWindow->getName() == app::window::name::charging_battery) {
+                switchWindow(app::window::name::desktop_main_window);
+            }
         }
     }
 
