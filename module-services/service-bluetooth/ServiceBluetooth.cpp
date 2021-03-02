@@ -26,6 +26,7 @@
 #include <service-bluetooth/messages/SetDeviceName.hpp>
 #include <BtCommand.hpp>
 #include <BtKeysStorage.hpp>
+#include <service-bluetooth/messages/Unpair.hpp>
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth, "", 4096)
 {
@@ -108,6 +109,14 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
         bd_addr_t addr;
         sscanf_bd_addr(addrString.c_str(), addr);
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::Pair, addr));
+        return sys::MessageNone{};
+    });
+    connect(typeid(message::bluetooth::Unpair), [&](sys::Message *msg) {
+        auto unpairMsg        = static_cast<message::bluetooth::Unpair *>(msg);
+        const auto addrString = unpairMsg->getAddr();
+        bd_addr_t addr;
+        sscanf_bd_addr(addrString.c_str(), addr);
+        sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::Unpair, addr));
         return sys::MessageNone{};
     });
 
