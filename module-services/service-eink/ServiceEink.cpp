@@ -76,6 +76,7 @@ namespace service::eink
 
     sys::ReturnCodes ServiceEink::DeinitHandler()
     {
+        display.wipeOut();
         display.shutdown();
         return sys::ReturnCodes::Success;
     }
