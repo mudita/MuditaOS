@@ -82,6 +82,7 @@ class BluetoothWorker : private sys::Worker
     void registerQueues();
     void onLinkKeyAdded(const std::string &deviceAddress);
     void initDevicesList();
+    void removeFromBoundDevices(uint8_t *addr);
 
   public:
     enum Error

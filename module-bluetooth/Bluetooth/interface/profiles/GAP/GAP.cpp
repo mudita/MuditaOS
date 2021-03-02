@@ -6,6 +6,7 @@
 #include <log/log.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
+#include <service-bluetooth/messages/Unpair.hpp>
 
 extern "C"
 {
@@ -268,6 +269,18 @@ namespace bluetooth
     auto GAP::getDevicesList() -> const std::vector<Devicei> &
     {
         return devices;
+    }
+    auto GAP::unpair(uint8_t *addr) -> bool
+    {
+        LOG_INFO("Unpairing device %s", bd_addr_to_str(addr));
+        gap_drop_link_key_for_bd_addr(addr);
+
+        LOG_INFO("Device %s unpaired", bd_addr_to_str(addr));
+        std::string unpairedDevAddr{bd_addr_to_str(addr)};
+        ownerService->bus.sendUnicast(
+            std::make_shared<message::bluetooth::UnpairResult>(std::move(unpairedDevAddr), true),
+            "ApplicationSettingsNew");
+        return true;
     }
 
 } // namespace bluetooth

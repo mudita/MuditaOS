@@ -32,6 +32,7 @@ namespace bluetooth
             PowerOn,
             PowerOff,
             Pair,
+            Unpair,
             StartStream,
             StopStream,
             SwitchProfile,
@@ -89,6 +90,7 @@ namespace bluetooth
         Error::Code establishAudioConnection(bd_addr_t addr);
         Error::Code disconnectAudioConnection();
         Error::Code pair(bd_addr_t addr);
+        Error::Code unpair(bd_addr_t addr);
 
         Error::Code switchAudioProfile();
         sys::Service *service;
