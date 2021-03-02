@@ -146,6 +146,7 @@ auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
 
     switch (command.getType()) {
     case bluetooth::Command::PowerOn:
+        initDevicesList();
         controller->turnOn();
         break;
     case bluetooth::Command::PowerOff:
@@ -251,4 +252,11 @@ auto BluetoothWorker::deinit() -> bool
 {
     controller->turnOff();
     return Worker::deinit();
+}
+void BluetoothWorker::initDevicesList()
+{
+    auto bondedDevicesStr =
+        std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::BondedDevices));
+    pairedDevices = SettingsSerializer::fromString(bondedDevicesStr);
+    LOG_INFO("Imported %d devices", pairedDevices.size());
 }
