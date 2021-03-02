@@ -151,7 +151,7 @@ namespace gui
         }
 
         if (inputEvent.is(KeyCode::KEY_RF)) {
-            application->switchWindow("PowerOffWindow");
+            application->switchWindow(app::window::name::desktop_poweroff);
             return true;
         }
         // check if any of the lower inheritance onInput methods catch the event
