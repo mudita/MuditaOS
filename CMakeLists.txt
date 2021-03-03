@@ -202,10 +202,6 @@ target_link_libraries(${PROJECT_NAME}
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     target_link_libraries(${PROJECT_NAME} iosyscalls)
-else()
-    target_link_libraries(${PROJECT_NAME}
-        service-antenna
-    )
 endif()
 
 include(tools/clang-tidy.cmake)
