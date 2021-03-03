@@ -4,7 +4,6 @@
 #pragma once
 #include "i18n/i18n.hpp"
 #include <algorithm> // std::find_if_not
-#include <log/log.hpp>
 #include <sstream>
 #include <iomanip>
 #include <cmath>

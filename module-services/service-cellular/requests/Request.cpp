@@ -6,6 +6,7 @@
 
 #include <at/Result.hpp>
 #include <at/Commands.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/Request.hpp"
 

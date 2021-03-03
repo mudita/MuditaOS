@@ -2,6 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TS0710.h"
+#include <at/ATFactory.hpp>
+#include <at/Cmd.hpp>
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "projdefs.h"
 #include <service-cellular/ServiceCellular.hpp>

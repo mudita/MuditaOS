@@ -5,6 +5,7 @@
 
 #include <at/Commands.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/PasswordRegistrationRequest.hpp"
 #include "service-cellular/requests/CallBarringRequest.hpp" // for barringServiceToFacility map

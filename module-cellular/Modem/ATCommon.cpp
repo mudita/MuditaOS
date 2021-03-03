@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ATCommon.hpp"
+#include <at/Cmd.hpp>
 #include "time/ScopedTime.hpp"
 #include <functional>
 #include <log/log.hpp>
@@ -11,6 +12,7 @@
 #include <inttypes.h> // for PRIu32
 #include <Utils.hpp>
 #include "ATStream.hpp"
+#include <at/ATFactory.hpp>
 
 using namespace at;
 
