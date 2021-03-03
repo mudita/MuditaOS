@@ -7,6 +7,7 @@
 #include <gui/widgets/Window.hpp>
 #include <time/time_conversion.hpp>
 #include "service-appmgr/Controller.hpp"
+#include <Image.hpp>
 
 namespace gui
 {

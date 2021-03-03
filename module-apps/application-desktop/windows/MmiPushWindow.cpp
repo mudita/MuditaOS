@@ -6,6 +6,7 @@
 #include <service-appmgr/data/MmiActionsParams.hpp>
 #include <application-desktop/data/Mmi.hpp>
 #include <i18n/i18n.hpp>
+#include <Image.hpp>
 
 using namespace gui;
 

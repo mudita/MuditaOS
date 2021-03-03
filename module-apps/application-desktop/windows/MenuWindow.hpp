@@ -10,12 +10,12 @@
 #include "widgets/BottomBar.hpp"
 #include "widgets/Label.hpp"
 #include "widgets/Rect.hpp"
-#include "widgets/TopBar.hpp"
 
 #include "utf8/UTF8.hpp"
 
 namespace gui
 {
+    class Image;
     /// icon, description, name of application to run
     struct Tile : public Rect
     {

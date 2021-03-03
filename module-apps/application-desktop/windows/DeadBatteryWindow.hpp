@@ -8,6 +8,7 @@
 
 namespace gui
 {
+    class Image;
     class DeadBatteryWindow : public AppWindow
     {
       public:

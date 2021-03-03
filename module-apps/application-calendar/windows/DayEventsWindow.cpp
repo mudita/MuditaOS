@@ -7,6 +7,7 @@
 #include <gui/widgets/Window.hpp>
 #include <gui/widgets/Label.hpp>
 #include <gui/widgets/Item.hpp>
+#include <gui/widgets/Image.hpp>
 #include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/TopBar.hpp>
 

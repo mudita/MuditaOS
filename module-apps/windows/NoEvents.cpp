@@ -7,6 +7,7 @@
 #include "log/log.hpp"
 
 #include <service-appmgr/Controller.hpp>
+#include <Image.hpp>
 
 using namespace gui;
 

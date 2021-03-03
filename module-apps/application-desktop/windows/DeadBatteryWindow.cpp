@@ -8,6 +8,9 @@
 #include "gui/widgets/TopBar.hpp"
 #include "log/log.hpp"
 #include <application-desktop/windows/Names.hpp>
+#include <service-appmgr/model/ApplicationManager.hpp>
+#include <service-appmgr/Controller.hpp>
+#include <Image.hpp>
 
 namespace gui
 {

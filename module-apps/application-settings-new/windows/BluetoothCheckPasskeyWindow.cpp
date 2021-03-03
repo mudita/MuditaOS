@@ -5,6 +5,7 @@
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/widgets/SettingsStyle.hpp"
 #include <widgets/Text.hpp>
+#include <Image.hpp>
 
 namespace gui
 {

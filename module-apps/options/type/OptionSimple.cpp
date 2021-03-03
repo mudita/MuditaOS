@@ -6,6 +6,7 @@
 #include "FontManager.hpp"
 #include "Text.hpp"
 #include "TextFixedSize.hpp"
+#include <Image.hpp>
 
 namespace gui::option
 {

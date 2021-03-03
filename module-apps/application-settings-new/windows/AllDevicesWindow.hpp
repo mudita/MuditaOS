@@ -9,6 +9,8 @@
 
 namespace gui
 {
+    class Image;
+
     class AllDevicesWindow : public BaseSettingsWindow
     {
       public:

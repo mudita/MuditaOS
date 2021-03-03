@@ -7,6 +7,7 @@
 #include "application-alarm-clock/data/AlarmsData.hpp"
 #include <Style.hpp>
 #include <Utils.hpp>
+#include <Image.hpp>
 
 namespace gui
 {
