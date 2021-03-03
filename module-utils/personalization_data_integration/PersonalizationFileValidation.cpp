@@ -5,60 +5,37 @@
 #include "module-utils/bootconfig/src/bootconfig.cpp"
 #include "PersonalizationFileValidation.hpp"
 
-
-ParamValidator::ParamValidator(const std::string &paramKey,
-                               const bool isMandatory,
-                               const std::vector<std::string> &validValues)
-        : paramKey{paramKey}, validValues{validValues}, isMandatory{isMandatory} {}
-
-auto ParamValidator::validate(json11::Json obj) -> ValidationResult
+auto PersonalizationFileParser::loadFileAsString() -> std::string
 {
-    if (!paramKey.empty()) {
-        for (auto valid : validValues) {
-            if (obj[paramKey].string_value() == valid) {
-                return ValidationResult::valid;
-            }
-        }
+    std::string content;
+    std::ifstream in(filePath);
+    if(!in.is_open())
+    {
+        LOG_FATAL("Error while loading file");
+        return "";
     }
-
-    if (!isMandatory) {
-        return ValidationResult::invalid;
-    }
-
-    LOG_FATAL("Mandatory data is invalid!");
-    return ValidationResult::critical;
+    std::getline(in, content, std::string::traits_type::to_char_type(std::string::traits_type::eof()));
+    return content;
 }
 
-auto PersonalizationFileParser::getJsonObject(const std::filesystem::path &filePath) const -> json11::Json
+auto PersonalizationFileParser::parseJsonFromContent(const std::string &content) -> bool
 {
-    auto fileHandle = fopen(filePath.c_str(), "r");
-    auto readBuf = std::make_unique<char[]>(purefs::buffer::tar_buf);
+    std::string parseErrors;
+    std::string jsonContents = loadFileAsString();
 
-    std::string contents;
-    size_t readSize;
+    LOG_INFO("parsed %s: \"%s\"", filePath.c_str(), jsonContents.c_str());
 
-    if (fileHandle) {
-        while (!feof(fileHandle)) {
-            readSize = fread(readBuf.get(), 1, purefs::buffer::tar_buf, fileHandle);
-            contents.append(static_cast<const char *>(readBuf.get()), readSize);
-        }
+    params = json11::Json::parse(jsonContents, parseErrors);
+
+    if (parseErrors.length() != 0) {
+        LOG_FATAL("JSON format error: %s", parseErrors.c_str());
+        return false;
     }
 
-    auto fpCloseAct = gsl::finally([fileHandle] { fclose(fileHandle); });
-
-    LOG_INFO("CONTENTS: %s", contents.c_str());
-    std::string err;
-    json11::Json jsonObject = json11::Json::parse(contents.c_str(), err);
-
-    if (err.length() != 0) {
-        LOG_FATAL("JSON format error: %s", err.c_str());
-        return nullptr;
-    }
-
-    return jsonObject;
+    return true;
 }
 
-auto PersonalizationFileParser::validateFile(const std::filesystem::path &filePath) -> bool
+auto PersonalizationFileValidator::validateFileAndCRC() -> bool
 {
     if (!boot::readAndVerifyCRC(filePath)) {
         LOG_ERROR("Invalid crc calculation!");
@@ -67,60 +44,30 @@ auto PersonalizationFileParser::validateFile(const std::filesystem::path &filePa
 
     LOG_INFO("CRC is correct");
     return true;
-};
-
-auto PersonalizationFileParser::parse(const std::filesystem::path &filePath) -> json11::Json
-{
-    if (validateFile(filePath)) {
-        return getJsonObject(filePath);
-    }
-    LOG_ERROR("Personalization file is invalid!");
-    return nullptr;
 }
 
-PersonalizationData::PersonalizationData(const std::filesystem::path &filePath)
+auto PersonalizationFileValidator::validateFileAndItsContent() -> bool
 {
-    params = parse(filePath);
-    if (params != nullptr) {
-        serialNumber = params[phone_personalization::json::serial_number].string_value();
-        caseColour   = params[phone_personalization::json::case_color].string_value();
-        return;
-    }
-
-    LOG_ERROR("Personalization file is invalid!");
-    valid = false;
-}
-
-auto PersonalizationData::validate(const std::string &expectedSerialNumber) -> bool
-{
-    if (!valid) {
+    auto content = PersonalizationFileParser::loadFileAsString();
+    if(content.empty()){
         return false;
     }
 
-    auto validSerialNumber = std::vector<std::string>({expectedSerialNumber});
+    return PersonalizationFileParser::parseJsonFromContent(content);
+}
 
-    paramsValidator.emplace_back(ParamValidator(phone_personalization::json::serial_number, true, validSerialNumber));
-    paramsValidator.emplace_back(ParamValidator(
-        phone_personalization::json::case_color, false, phone_personalization::params::case_colour::valid_values));
+auto PersonalizationFileValidator::validateParameters(const std::map<std::string, std::vector<std::string>> &parametersMap) -> bool
+{
+    std::map<std::string, std::string> optionalParams; ///Maybe even not need to store this map (defalt values can be replaced if param is valid)
+    std::map<std::string, std::string> defaultValues; ///TODO: move to consts also parametersMap (should be optional parameters map -> serial number should checked separetly)
 
-    for (auto &validator : paramsValidator) {
-        switch (validator.validate(params)) {
-        case ValidationResult::valid: {
-            break;
-        }
-        case ValidationResult::invalid: {
-            if (validator.getParamKey() == phone_personalization::json::case_color) {
-                caseColour = phone_personalization::params::case_colour::default_value;
-            }
-            break;
-        }
-        case ValidationResult::critical: {
-            LOG_ERROR("Personalization parameter is invalid!");
-            return false;
-        }
+    for (auto it = parametersMap.begin(); it != parametersMap.end(); it++)
+    {
+        auto result = std::find(std::begin(it->second),std::end(it->second), params[it->first].string_value());
+        if(result == std::end(it->second)){
+            LOG_ERROR("Optional parameter invalid!");
+            ///TODO: maybe create a map as default output params
+            optionalParams[it->first] = defaultValues[it->first];
         }
     }
-
-    LOG_INFO("Personalization file is valid");
-    return true;
 }

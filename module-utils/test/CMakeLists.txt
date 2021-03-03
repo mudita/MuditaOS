@@ -9,16 +9,17 @@ add_catch2_executable(
         module-utils
 )
 
+# Personalization data integration tests
 add_catch2_executable(
-     NAME
+        NAME
         utils-personalizationFileValidation
-     SRCS
+        SRCS
         unittest_PersonalizationFileValidation.cpp
-     LIBS
+        LIBS
         module-utils
 )
-
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/data" DESTINATION "${CMAKE_BINARY_DIR}/testfiles")
+## ======================================
 
 # Phone number tests
 add_catch2_executable(

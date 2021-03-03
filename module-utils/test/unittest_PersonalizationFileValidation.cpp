@@ -6,17 +6,20 @@
 #include "personalization_data_integration/PersonalizationFileValidation.hpp"
 #include <filesystem>
 
-class FileValidatorTestWrapper : public PersonalizationFileParser
+class FileParserTestWrapper : public PersonalizationFileParser
 {
   public:
-    json11::Json test_getJsonObject(const std::filesystem::path &fileToLoad)
+    explicit FileParserTestWrapper(const std::filesystem::path &filePath) : PersonalizationFileParser(filePath) {};
+
+    json11::Json test_getJsonObject()
     {
-        return getJsonObject(fileToLoad);
+        auto content = loadFileAsString();
+        return getJsonObjectFromContent(content);
     }
 
-    bool test_validateFile(const std::filesystem::path &filePath)
+    bool test_validateFile()
     {
-        return validateFile(filePath);
+        return validateFile();
     }
 };
 
@@ -84,7 +87,7 @@ TEST_CASE("Personalization File Validation")
 
     SECTION("Check FileValidator class")
     {
-        auto fileValidatorWrapper = FileValidatorTestWrapper();
+
 
         SECTION("Check getJsonObject method")
         {
@@ -93,10 +96,12 @@ TEST_CASE("Personalization File Validation")
                 auto path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/valid/personalization_black.json";
 
+                auto fileParserTestWrapper = FileParserTestWrapper(path);
+
                 auto expectedSerialNumber = "TestSerialNumber";
                 auto expectedCaseColour   = "black";
 
-                auto jsonObj      = fileValidatorWrapper.test_getJsonObject(path);
+                auto jsonObj      = fileParserTestWrapper.test_getJsonObject();
                 auto serialNumber = jsonObj[phone_personalization::json::serial_number].string_value();
                 auto caseColour   = jsonObj[phone_personalization::json::case_color].string_value();
 
@@ -108,8 +113,9 @@ TEST_CASE("Personalization File Validation")
             {
                 auto path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/invalid/invalid_json_format.json";
+                auto fileValidatorWrapper = FileParserTestWrapper(path);
 
-                auto jsonObj = fileValidatorWrapper.test_getJsonObject(path);
+                auto jsonObj = fileValidatorWrapper.test_getJsonObject();
                 REQUIRE(jsonObj == nullptr);
             }
         }
@@ -120,8 +126,9 @@ TEST_CASE("Personalization File Validation")
             {
                 auto path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/valid/personalization_black.json";
+                auto fileParserTestWrapper = FileParserTestWrapper(path);
 
-                auto result = fileValidatorWrapper.test_validateFile(std::string(path));
+                auto result = fileParserTestWrapper.test_validateFile();
 
                 REQUIRE(result);
             }
@@ -131,7 +138,9 @@ TEST_CASE("Personalization File Validation")
                 auto path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/invalid/not_existing.json";
 
-                auto result = fileValidatorWrapper.test_validateFile(path);
+                auto fileParserTestWrapper = FileParserTestWrapper(path);
+
+                auto result = fileParserTestWrapper.test_validateFile();
 
                 REQUIRE(!result);
             }
@@ -141,7 +150,9 @@ TEST_CASE("Personalization File Validation")
                 auto path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/invalid/invalid_crc.json";
 
-                auto result = fileValidatorWrapper.test_validateFile(path);
+                auto fileParserTestWrapper = FileParserTestWrapper(path);
+
+                auto result = fileParserTestWrapper.test_validateFile();
 
                 REQUIRE(!result);
             }
@@ -191,6 +202,7 @@ TEST_CASE("Personalization File Validation")
                     auto invalidSerialNumber = "";
                     auto invalidCaseColour   = "";
 
+                    LOG_DEBUG("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111111111111111");
                     auto parsedData = PersonalizationData(path);
 
                     REQUIRE(parsedData.getSerialNumber() == invalidSerialNumber);
