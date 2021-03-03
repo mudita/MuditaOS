@@ -46,7 +46,7 @@ namespace purefs
 
         std::filesystem::path getUpdatesOSPath() noexcept
         {
-            return std::filesystem::path{eMMC_disk} / PATH_UPDATES;
+            return std::filesystem::path{eMMC_disk} / PATH_USER / PATH_UPDATES;
         }
 
         std::filesystem::path getTemporaryPath() noexcept

@@ -74,6 +74,7 @@ auto UpdateEndpoint::run(Context &context) -> sys::ReturnCodes
 auto UpdateEndpoint::getUpdates(Context &context) -> sys::ReturnCodes
 {
     const auto updatesOSPath = purefs::dir::getUpdatesOSPath();
+    std::error_code errorCode;
     struct DirectoryEntry
     {
         std::string fileName;
@@ -85,8 +86,13 @@ auto UpdateEndpoint::getUpdates(Context &context) -> sys::ReturnCodes
     };
 
     auto dirEntryVector = std::vector<DirectoryEntry>();
-    for (const auto &p : fs::directory_iterator(updatesOSPath)) {
-        if (!p.is_directory() && p.path().c_str() == updateos::extension::update) {
+    for (const auto &p : fs::directory_iterator(updatesOSPath, errorCode)) {
+        if (errorCode) {
+            LOG_WARN("can't get directory contents for %s, \"%s\"", updatesOSPath.c_str(), errorCode.message().c_str());
+            return sys::ReturnCodes::Failure;
+        }
+
+        if (!p.is_directory() && p.path().extension() == updateos::extension::update) {
             dirEntryVector.push_back(DirectoryEntry{p.path().string(), static_cast<uint32_t>(p.file_size())});
         }
     }
