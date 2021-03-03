@@ -23,9 +23,11 @@
 #include <BaseInterface.hpp>
 #include <CalllogRecord.hpp>
 #include <Commands.hpp>
+#include <at/ATFactory.hpp>
 #include <Common/Common.hpp>
 #include <Common/Query.hpp>
 #include <MessageType.hpp>
+#include <Modem/ATCommon.hpp>
 #include <Modem/ATCommon.hpp>
 #include <Modem/ATParser.hpp>
 #include <Modem/TS0710/DLC_channel.h>
@@ -93,7 +95,7 @@
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
-inline constexpr auto cellularStack = 25000UL;
+inline constexpr auto cellularStack = 8000;
 
 using namespace cellular;
 

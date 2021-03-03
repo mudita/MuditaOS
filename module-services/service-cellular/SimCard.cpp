@@ -7,6 +7,8 @@
 #include "Result.hpp"
 #include "UrcCpin.hpp" //for Cpin parseState
 #include "UrcFactory.hpp"
+#include <at/ATFactory.hpp>
+#include <at/Cmd.hpp>
 
 SimCardResult SimCard::convertErrorFromATResult(const at::Result atres) const
 {

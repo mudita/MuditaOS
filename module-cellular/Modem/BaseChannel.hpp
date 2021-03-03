@@ -7,9 +7,12 @@
 #include <vector>
 #include <at/Commands.hpp>
 #include <at/Result.hpp>
+#include <at/Constants.hpp>
 
 namespace at
 {
+    struct Cmd;
+
     class BaseChannel
     {
       public:

@@ -9,6 +9,7 @@
 #include <at/Commands.hpp>
 
 #include "service-cellular/requests/UssdRequest.hpp"
+#include <at/ATFactory.hpp>
 
 namespace cellular
 {

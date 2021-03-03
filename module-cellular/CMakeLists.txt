@@ -40,6 +40,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/UrcFactory.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Commands.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/src/Cmd.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/at/src/ATFactory.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/response.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/CSCA.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/at/cmd/src/QECCNUM.cpp

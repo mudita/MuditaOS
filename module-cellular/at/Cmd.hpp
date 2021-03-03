@@ -6,15 +6,11 @@
 #include <string>
 #include <Result.hpp>
 #include <chrono>
+#include <at/Constants.hpp>
 
 namespace at
 {
-    using namespace std::chrono_literals;
-
     struct Cmd;
-
-    /// if you've checked it's ok - or it was at least 300 in code somewhere, take this
-    const auto default_timeout = 300ms;
 
     namespace cmd
     {
