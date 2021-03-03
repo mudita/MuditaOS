@@ -27,4 +27,4 @@ def test_threads(harness):
     # set thread as read
     body = {"category": "thread", "threadID": 1, "isUnread": False}
     ret = harness.endpoint_request("messages", "put", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]

@@ -77,14 +77,14 @@ namespace parserFSM
                 constexpr inline auto iCalUid = "iCalUid";
             } // namespace provider
         }     // namespace event
-        constexpr inline auto limit       = "limit";
-        constexpr inline auto offset      = "offset";
+        constexpr inline auto limit  = "limit";
+        constexpr inline auto offset = "offset";
 
     } // namespace json::calendar
 } // namespace parserFSM
 using namespace parserFSM;
 
-auto CalendarEventsHelper::isICalEventValid(ICalEvent icalEvent) const -> bool
+auto CalendarEventsHelper::isICalEventValid(const ICalEvent &icalEvent) const -> bool
 {
     if (!icalEvent.event.isValid) {
         LOG_ERROR("Ical event invalid!");
@@ -197,7 +197,7 @@ auto CalendarEventsHelper::icalEventFrom(const EventsRecord &record) const -> IC
     return ICalEvent{event, alarm, rrule};
 }
 
-auto CalendarEventsHelper::eventJsonObjectFrom(EventsRecord record) const -> json11::Json
+auto CalendarEventsHelper::eventJsonObjectFrom(const EventsRecord &record) const -> json11::Json
 {
     auto icalEvent = icalEventFrom(record);
     if (!isICalEventValid(icalEvent)) {
@@ -326,7 +326,7 @@ auto CalendarEventsHelper::eventsRecordFrom(ICalEvent &icalEvent) const -> Event
     return record;
 }
 
-auto CalendarEventsHelper::ICalEventFromJson(json11::Json eventObj) const -> ICalEvent
+auto CalendarEventsHelper::ICalEventFromJson(const json11::Json &eventObj) const -> ICalEvent
 {
     ICalEvent icalEvent;
     icalEvent.event.setUID(eventObj[json::calendar::event::uid].string_value());
@@ -359,7 +359,7 @@ auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
     const auto eventsJsonObj   = context.getBody();
     const auto eventsJsonArray = eventsJsonObj[json::calendar::events].array_items();
     bool ret                   = true;
-    for (auto event : eventsJsonArray) {
+    for (const auto &event : eventsJsonArray) {
 
         auto icalEvent = ICalEventFromJson(event);
 
@@ -385,9 +385,9 @@ auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
         auto query    = std::make_unique<db::query::events::Add>(record);
         auto listener = std::make_unique<db::EndpointListener>(
             [&](db::QueryResult *result, Context context) {
-                if (auto EventResult = dynamic_cast<db::query::events::AddResult *>(result)) {
+                if (auto eventResult = dynamic_cast<db::query::events::AddResult *>(result)) {
 
-                    context.setResponseStatus(EventResult->getResult() ? http::Code::OK
+                    context.setResponseStatus(eventResult->getResult() ? http::Code::OK
                                                                        : http::Code::InternalServerError);
 
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
@@ -416,7 +416,7 @@ auto CalendarEventsHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
     auto eventsJsonObj = context.getBody();
 
     bool ret = true;
-    for (auto event : eventsJsonObj[json::calendar::events].array_items()) {
+    for (const auto &event : eventsJsonObj[json::calendar::events].array_items()) {
 
         auto icalEvent = ICalEventFromJson(event);
         if (!isICalEventValid(icalEvent) || icalEvent.event.getUID().empty()) {
@@ -429,8 +429,8 @@ auto CalendarEventsHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
         auto query    = std::make_unique<db::query::events::EditICS>(record);
         auto listener = std::make_unique<db::EndpointListener>(
             [](db::QueryResult *result, Context context) {
-                if (auto EventResult = dynamic_cast<db::query::events::EditICSResult *>(result)) {
-                    context.setResponseStatus(EventResult->getResult() ? http::Code::OK
+                if (auto eventResult = dynamic_cast<db::query::events::EditICSResult *>(result)) {
+                    context.setResponseStatus(eventResult->getResult() ? http::Code::NoContent
                                                                        : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -466,8 +466,9 @@ auto CalendarEventsHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
     auto query    = std::make_unique<db::query::events::RemoveICS>(UID);
     auto listener = std::make_unique<db::EndpointListener>(
         [=](db::QueryResult *result, Context context) {
-            if (auto EventResult = dynamic_cast<db::query::events::RemoveICSResult *>(result)) {
-                context.setResponseStatus(EventResult->getResult() ? http::Code::OK : http::Code::InternalServerError);
+            if (auto eventResult = dynamic_cast<db::query::events::RemoveICSResult *>(result)) {
+                context.setResponseStatus(eventResult->getResult() ? http::Code::NoContent
+                                                                   : http::Code::InternalServerError);
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
                 return true;
             }

@@ -235,7 +235,7 @@ bool DeveloperModeHelper::sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::S
 
     gui::InputEvent event(key, state, static_cast<gui::KeyCode>(keyCode));
     LOG_INFO("Sending %s", event.str().c_str());
-    auto message = std::make_shared<app::AppInputEventMessage>(std::move(event));
+    auto message = std::make_shared<app::AppInputEventMessage>(event);
 
     return owner->bus.sendUnicast(std::move(message), service::name::evt_manager);
 }
@@ -265,7 +265,7 @@ bool DeveloperModeHelper::requestCellularPowerStateChange(const int cellularStat
     }
     return res;
 }
-auto DeveloperModeHelper::smsRecordFromJson(json11::Json msgJson) -> SMSRecord
+auto DeveloperModeHelper::smsRecordFromJson(const json11::Json &msgJson) -> SMSRecord
 {
     auto record = SMSRecord();
 
