@@ -864,13 +864,15 @@ void UpdateMuditaOS::setInitialHistory(const std::string &initialHistory)
         updateHistory = json11::Json();
     }
 }
+
 void UpdateMuditaOS::informUpdateWindow()
 {
     fs::path file  = UpdateMuditaOS::checkForUpdate();
     auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateNow, file);
     msgToSend->updateStats.versionInformation = UpdateMuditaOS::getVersionInfoFromFile(file);
     msgToSend->updateStats.status             = status;
-    owner->bus.sendUnicast(msgToSend, app::name_desktop);
+    if (owner)
+        owner->bus.sendUnicast(msgToSend, app::name_desktop);
 }
 
 void UpdateMuditaOS::storeRunStatusInDB()
