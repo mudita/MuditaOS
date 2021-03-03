@@ -26,11 +26,6 @@ namespace settings
         registerHandlers();
     }
 
-    Settings::~Settings()
-    {
-        LOG_DEBUG("Settings::~Settings on %s", app->GetName().c_str());
-    }
-
     void Settings::sendMsg(std::shared_ptr<settings::Messages::SettingsMessage> &&msg)
     {
         app->bus.sendUnicast(std::move(msg), dbAgentName);
