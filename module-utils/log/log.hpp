@@ -60,9 +60,9 @@ extern "C"
     /**
      * Forward declarations
      */
-    void log_Log(logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
+    int log_Log(logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
         __attribute__((format(printf, 5, 6)));
-    void log_Printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+    int log_Printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
     void log_WriteToDevice(const uint8_t *pBuffer, unsigned NumBytes);
 
 /**
