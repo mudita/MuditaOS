@@ -34,7 +34,7 @@ namespace settings
 
         void parse(const std::string &dbPath)
         {
-            auto parts = utils::split(dbPath, "\\");
+            auto parts = utils::split(dbPath, "\\", false);
             if (1 == parts.size()) {
                 variable = dbPath;
                 scope    = SettingsScope::Global;
