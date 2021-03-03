@@ -51,8 +51,7 @@ namespace app
     }
 
     ApplicationSettings::~ApplicationSettings()
-    {
-    }
+    {}
 
     // Invoked upon receiving data message
     sys::MessagePointer ApplicationSettings::DataReceivedHandler(sys::DataMessage *msgl,
@@ -74,7 +73,7 @@ namespace app
             render(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         if (auto btmsg = dynamic_cast<BluetoothPairResultMessage *>(msgl); btmsg != nullptr) {
-            if (btmsg->status) {
+            if (btmsg->isSucceed()) {
                 LOG_INFO("Paired successfully");
             }
             else {
