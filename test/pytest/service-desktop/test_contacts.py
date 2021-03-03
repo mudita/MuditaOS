@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import pytest
 from harness.interface.defs import status
@@ -93,7 +93,7 @@ def test_contacts(harness):
             "priName": "Test2",
             "id": contact_id_to_update}
     ret = harness.endpoint_request("contacts", "post", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # gathering updated contact
     body = {"id": contact_id_to_update}
@@ -110,7 +110,7 @@ def test_contacts(harness):
     # removing added contact
     body = {"id": contact_id_to_update}
     ret = harness.endpoint_request("contacts", "del", body)
-    assert ret["status"] == status["OK"]
+    assert ret["status"] == status["NoContent"]
 
     # verifying count
     body = {"count": True}
