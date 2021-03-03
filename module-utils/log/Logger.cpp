@@ -68,31 +68,45 @@ namespace Log
         auto _ = gsl::finally([this] { unlock(); });
 
         loggerBufferCurrentPos = 0;
-        loggerBufferCurrentPos += vsnprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), fmt, args);
-        logToDevice(device, loggerBuffer, loggerBufferCurrentPos);
 
-        return loggerBufferCurrentPos;
+        const auto sizeLeft = loggerBufferSizeLeft();
+        const auto result   = vsnprintf(&loggerBuffer[loggerBufferCurrentPos], sizeLeft, fmt, args);
+        if (0 <= result) {
+            const auto numOfBytesAddedToBuffer = static_cast<size_t>(result);
+            loggerBufferCurrentPos += (numOfBytesAddedToBuffer < sizeLeft) ? numOfBytesAddedToBuffer : (sizeLeft - 1);
+
+            logToDevice(device, loggerBuffer, loggerBufferCurrentPos);
+            return loggerBufferCurrentPos;
+        }
+        return -1;
     }
 
-    void Logger::log(
-        logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args)
+    auto Logger::log(
+        logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args) -> int
     {
         if (!filterLogs(level)) {
-            return;
+            return -1;
         }
 
         if (!lock()) {
-            return;
+            return -1;
         }
         auto _ = gsl::finally([this] { unlock(); });
 
         loggerBufferCurrentPos = 0;
         addLogHeader(level, file, line, function);
 
-        loggerBufferCurrentPos += vsnprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), fmt, args);
-        loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), "\n");
+        const auto sizeLeft = loggerBufferSizeLeft();
+        const auto result   = vsnprintf(&loggerBuffer[loggerBufferCurrentPos], sizeLeft, fmt, args);
+        if (0 <= result) {
+            const auto numOfBytesAddedToBuffer = static_cast<size_t>(result);
+            loggerBufferCurrentPos += (numOfBytesAddedToBuffer < sizeLeft) ? numOfBytesAddedToBuffer : (sizeLeft - 1);
+            loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), "\n");
 
-        logToDevice(Device::DEFAULT, loggerBuffer, loggerBufferCurrentPos);
+            logToDevice(Device::DEFAULT, loggerBuffer, loggerBufferCurrentPos);
+            return loggerBufferCurrentPos;
+        }
+        return -1;
     }
 
     auto Logger::logAssert(const char *fmt, va_list args) -> int

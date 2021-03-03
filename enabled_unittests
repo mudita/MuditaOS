@@ -287,6 +287,10 @@ TESTS_LIST["catch2-utils-duration"]="
     Duration - display;
 "
 #---------
+TESTS_LIST["catch2-utils-log"]="
+    Log tests;
+"
+#---------
 TESTS_LIST["catch2-utils-loggerbuffer"]="
     LoggerBuffer tests;
 "

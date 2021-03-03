@@ -30,7 +30,8 @@ namespace Log
         }
         void init();
         auto log(Device device, const char *fmt, va_list args) -> int;
-        void log(logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args);
+        auto log(logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args)
+            -> int;
         auto logAssert(const char *fmt, va_list args) -> int;
 
         static constexpr auto CRIT_STR = "CRIT";
