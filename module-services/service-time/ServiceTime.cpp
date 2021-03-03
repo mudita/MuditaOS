@@ -19,7 +19,7 @@
 
 namespace stm
 {
-    ServiceTime::ServiceTime() : sys::Service(service::name::service_time), calendarEvents(this)
+    ServiceTime::ServiceTime() : sys::Service(service::name::service_time, "", StackDepth), calendarEvents(this)
     {
         LOG_INFO("[ServiceTime] Initializing");
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
