@@ -6,6 +6,7 @@
 
 #include <at/Commands.hpp>
 #include <Utils.hpp>
+#include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/SupplementaryServicesRequest.hpp"
 #include "service-cellular/requests/CallForwardingRequest.hpp"

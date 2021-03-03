@@ -6,6 +6,7 @@
 #include <at/Result.hpp>
 #include <at/Commands.hpp>
 #include "service-cellular/RequestHandler.hpp"
+#include <at/Cmd.hpp>
 
 namespace cellular
 {

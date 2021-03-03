@@ -8,6 +8,7 @@
 #include <at/Commands.hpp>
 
 #include "service-cellular/requests/CallRequest.hpp"
+#include <at/ATFactory.hpp>
 
 namespace cellular
 {

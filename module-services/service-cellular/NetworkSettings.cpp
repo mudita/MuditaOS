@@ -4,6 +4,7 @@
 #include "NetworkSettings.hpp"
 #include "QMBNManager.hpp"
 #include <unordered_map>
+#include <at/ATFactory.hpp>
 
 std::string NetworkSettings::getCurrentOperator() const
 {

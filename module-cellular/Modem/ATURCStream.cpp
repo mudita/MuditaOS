@@ -5,6 +5,8 @@
 #include "ATCommon.hpp"
 
 #include <module-os/RTOSWrapper/include/ticks.hpp>
+#include <cstring>
+
 namespace at
 {
 

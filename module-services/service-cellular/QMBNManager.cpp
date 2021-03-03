@@ -4,6 +4,7 @@
 #include "QMBNManager.hpp"
 #include "Utils.hpp"
 #include "response.hpp"
+#include <at/ATFactory.hpp>
 
 namespace at
 {

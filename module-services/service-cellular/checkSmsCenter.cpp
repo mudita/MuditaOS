@@ -3,6 +3,7 @@
 
 #include "checkSmsCenter.hpp"
 #include "Modem/BaseChannel.hpp"
+#include <at/cmd/CSCA.hpp>
 
 [[nodiscard]] bool checkSmsCenter(at::BaseChannel &channel)
 {
