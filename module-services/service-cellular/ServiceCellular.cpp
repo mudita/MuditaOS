@@ -367,11 +367,6 @@ void ServiceCellular::registerMessageHandlers()
         return handleCellularDeactivateContextMessage(msg);
     });
 
-    connect(typeid(CellularGetActiveContextsMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        auto msg = static_cast<CellularGetActiveContextsMessage *>(request);
-        return handleCellularGetActiveContextsMessage(msg);
-    });
-
     connect(typeid(CellularChangeVoLTEDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularChangeVoLTEDataMessage *>(request);
         volteOn  = msg->getVoLTEon();
@@ -387,13 +382,6 @@ void ServiceCellular::registerMessageHandlers()
             networkSettings.setVoLTEState(VoLTEState::Off);
         }
         return std::make_shared<CellularResponseMessage>(true);
-    });
-
-    connect(typeid(CellularPowerStateChange), [&](sys::Message *request) -> sys::MessagePointer {
-        auto msg       = static_cast<CellularPowerStateChange *>(request);
-        nextPowerState = msg->getNewState();
-        handle_power_state_change();
-        return sys::MessageNone{};
     });
 
     connect(typeid(CellularPowerStateChange), [&](sys::Message *request) -> sys::MessagePointer {
