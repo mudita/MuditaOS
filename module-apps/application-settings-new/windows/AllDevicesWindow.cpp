@@ -38,8 +38,11 @@ namespace gui
                                     "cross");
     }
 
-    void AllDevicesWindow::onBeforeShow(ShowMode /*mode*/, SwitchData *data)
+    void AllDevicesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        if (mode == ShowMode::GUI_SHOW_RETURN) {
+            bluetoothSettingsModel->stopScan();
+        }
         const auto newData = dynamic_cast<BondedDevicesData *>(data);
         if (newData != nullptr) {
             devices                  = newData->getDevices();

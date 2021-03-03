@@ -90,6 +90,7 @@ namespace bluetooth
 
     Error::Code CommandHandler::stopScan()
     {
+        LOG_INFO("Stopping scan!");
         driver->stopScan();
         static_cast<ServiceBluetooth *>(service)->scanStoppedCallback();
         return Error::Success;
