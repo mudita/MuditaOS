@@ -13,6 +13,8 @@
 
 namespace gui
 {
+    class Image;
+
     class EventReminderWindow : public gui::AppWindow
     {
       private:

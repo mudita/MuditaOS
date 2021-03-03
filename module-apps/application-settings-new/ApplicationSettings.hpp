@@ -7,6 +7,7 @@
 
 #include <bsp/common.hpp>
 #include <module-services/service-evtmgr/screen-light-control/ScreenLightControl.hpp>
+#include <common_data/EventStore.hpp>
 
 namespace gui::window::name
 {

@@ -4,6 +4,7 @@
 #include <TextFixedSize.hpp>
 #include "OptionSetting.hpp"
 #include "widgets/ButtonOnOff.hpp"
+#include <Image.hpp>
 
 namespace gui::option
 {

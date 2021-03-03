@@ -16,6 +16,8 @@ namespace gui::window::name
 
 namespace gui
 {
+    class Image;
+
     /// @brief base Dialog class
     ///
     /// Contain icon, text and Back action

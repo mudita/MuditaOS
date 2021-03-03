@@ -7,6 +7,7 @@
 
 namespace gui
 {
+    class Image;
     class PinLockBaseWindow : public LockWindow
     {
       public:

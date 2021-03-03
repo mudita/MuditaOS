@@ -12,6 +12,7 @@
 #include <Style.hpp>
 #include <cassert>
 #include <i18n/i18n.hpp>
+#include <Image.hpp>
 
 namespace style::design
 {

@@ -10,6 +10,7 @@
 #include "OptionSetting.hpp"
 
 #include <InputEvent.hpp>
+#include <Image.hpp>
 
 namespace gui
 {

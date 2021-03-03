@@ -16,6 +16,8 @@ enum class EquivalentWindow
 
 namespace gui
 {
+    class Image;
+
     class NoEvents : public Dialog
     {
         gui::Image *arrow = nullptr;
