@@ -29,6 +29,7 @@ namespace stm
     class ServiceTime : public sys::Service
     {
       private:
+        static constexpr auto StackDepth = 1300;
         CalendarTimeEvents calendarEvents;
 
       public:
