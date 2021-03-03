@@ -215,6 +215,9 @@ namespace app
 
     void ApplicationCall::createUserInterface()
     {
+        windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string newname) {
+            return std::make_unique<gui::AppWindow>(app, gui::name::window::main_window);
+        });
         windowsFactory.attach(app::window::name_enterNumber, [](Application *app, const std::string newname) {
             return std::make_unique<gui::EnterNumberWindow>(app, static_cast<ApplicationCall *>(app));
         });

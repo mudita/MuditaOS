@@ -62,7 +62,7 @@ namespace gui
 
     void AppWindow::applyToTopBar(TopBarConfigurationChangeFunction configChange)
     {
-        if (configChange) {
+        if (configChange && topBar != nullptr) {
             auto newConfiguration = configChange(topBar->getConfiguration());
             topBar->configure(std::move(newConfiguration));
         }
@@ -217,11 +217,17 @@ namespace gui
 
     void AppWindow::setBottomBarText(const UTF8 &text, BottomBar::Side side)
     {
+        if (bottomBar == nullptr) {
+            return;
+        }
         bottomBar->setText(side, text);
     }
 
     void AppWindow::clearBottomBarText(BottomBar::Side side)
     {
+        if (bottomBar == nullptr) {
+            return;
+        }
         bottomBar->setText(side, "");
     }
 
@@ -245,6 +251,9 @@ namespace gui
 
     void AppWindow::setBottomBarActive(BottomBar::Side side, bool value)
     {
+        if (bottomBar == nullptr) {
+            return;
+        }
         bottomBar->setActive(side, value);
     }
 

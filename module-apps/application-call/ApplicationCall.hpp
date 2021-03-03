@@ -19,7 +19,7 @@ namespace app
 
     namespace window
     {
-        inline constexpr auto name_call              = gui::name::window::main_window;
+        inline constexpr auto name_call              = "CallWindow";
         inline constexpr auto name_enterNumber       = "EnterNumberWindow";
         inline constexpr auto name_emergencyCall     = "EmergencyCallWindow";
         inline constexpr auto name_duplicatedContact = "DuplicatedContactWindow";

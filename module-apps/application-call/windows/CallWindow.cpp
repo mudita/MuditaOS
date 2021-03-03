@@ -310,6 +310,12 @@ namespace gui
             interface->hangupCall();
             return;
         }
+
+        // empty window should fallback to desktop
+        if (getState() == app::call::State::IDLE) {
+            app::manager::Controller::sendAction(application, app::manager::actions::Home);
+            return;
+        }
     }
 
     bool CallWindow::handleLeftButton()
