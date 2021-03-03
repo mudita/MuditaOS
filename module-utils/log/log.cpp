@@ -7,20 +7,22 @@
 
 using Log::Logger;
 
-void log_Printf(const char *fmt, ...)
+int log_Printf(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    Logger::get().log(Log::Device::DEFAULT, fmt, args);
+    const int result = Logger::get().log(Log::Device::DEFAULT, fmt, args);
     va_end(args);
+    return result;
 }
 
-void log_Log(logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
+int log_Log(logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    Logger::get().log(level, file, line, function, fmt, args);
+    const int result = Logger::get().log(level, file, line, function, fmt, args);
     va_end(args);
+    return result;
 }
 
 extern "C"

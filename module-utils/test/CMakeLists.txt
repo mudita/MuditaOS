@@ -90,6 +90,16 @@ add_catch2_executable(
         module-utils
 )
 
+# Log tests
+add_catch2_executable(
+    NAME
+        utils-log
+    SRCS
+        test_log.cpp
+    LIBS
+        module-utils
+)
+
 # Logger buffer tests
 add_catch2_executable(
     NAME
@@ -120,24 +130,6 @@ add_catch2_executable(
         module-utils
         module-db
 )
-
-###########################################
-# Log functional tests project
-project(test_module-utils_log VERSION 1.0
-    DESCRIPTION "Module-utils log functional tests")
-
-add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
-    test_log.cpp
-    test_log2.cpp
-)
-add_test(NAME ${PROJECT_NAME}
-    COMMAND ${PROJECT_NAME}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    )
-add_dependencies(check ${PROJECT_NAME})
-
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..")
-target_link_libraries(${PROJECT_NAME} PRIVATE module-utils)
 
 ###########################################
 # UTF8 functional tests projeet
