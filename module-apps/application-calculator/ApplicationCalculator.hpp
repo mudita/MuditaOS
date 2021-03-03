@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,7 @@
 namespace app
 {
     inline constexpr auto name_calculator     = "ApplicationCalculator";
-    inline constexpr std::uint16_t stack_size = 4096;
+    inline constexpr std::uint16_t stack_size = 2560;
 
     class ApplicationCalculator : public Application
     {
