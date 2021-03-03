@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FactoryReset.hpp"
@@ -28,7 +28,7 @@ namespace FactoryReset
         inline constexpr auto copy_buf = 8192 * 4;
     } // namespace
 
-    static bool CopyFile(std::string sourcefile, std::string targetfile);
+    static bool CopyFile(const std::string &sourcefile, const std::string &targetfile);
 
     static int recurseDepth            = 0;
     static const int max_recurse_depth = 120; /* 120 is just an arbitrary value of max number of recursive calls.
@@ -70,7 +70,7 @@ namespace FactoryReset
         return true;
     }
 
-    bool DeleteDirContent(std::string dir)
+    bool DeleteDirContent(const std::string &dir)
     {
         for (auto &direntry : std::filesystem::directory_iterator(dir.c_str())) {
             if ((direntry.path().string().compare(".") != 0) && (direntry.path().string().compare("..") != 0) &&
@@ -105,7 +105,7 @@ namespace FactoryReset
         return true;
     }
 
-    bool CopyDirContent(std::string sourcedir, std::string targetdir)
+    bool CopyDirContent(const std::string &sourcedir, const std::string &targetdir)
     {
         if (recurseDepth >= max_recurse_depth) {
             LOG_ERROR("FactoryReset: recurse level %d (too high), error assumed, skipping restore of dir %s",
@@ -176,7 +176,7 @@ namespace FactoryReset
         return true;
     }
 
-    static bool CopyFile(std::string sourcefile, std::string targetfile)
+    static bool CopyFile(const std::string &sourcefile, const std::string &targetfile)
     {
         bool ret  = true;
         auto lamb = [](std::FILE *stream) { std::fclose(stream); };
@@ -184,10 +184,10 @@ namespace FactoryReset
         std::unique_ptr<std::FILE, decltype(lamb)> sf(std::fopen(sourcefile.c_str(), "r"), lamb);
         std::unique_ptr<std::FILE, decltype(lamb)> tf(std::fopen(targetfile.c_str(), "w"), lamb);
 
-        if ((sf.get() != nullptr) && (tf.get() != nullptr)) {
+        if ((sf != nullptr) && (tf != nullptr)) {
             std::unique_ptr<unsigned char[]> buffer(new unsigned char[copy_buf]);
 
-            if (buffer.get() != nullptr) {
+            if (buffer != nullptr) {
                 uint32_t loopcount = (std::filesystem::file_size(sourcefile) / copy_buf) + 1u;
                 uint32_t readsize  = copy_buf;
 

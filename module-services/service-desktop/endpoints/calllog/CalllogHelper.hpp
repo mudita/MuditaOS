@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,7 +27,7 @@ namespace parserFSM
     class CalllogHelper : public DBHelper
     {
       public:
-        CalllogHelper(sys::Service *_ownerServicePtr) : DBHelper(_ownerServicePtr){};
+        explicit CalllogHelper(sys::Service *_ownerServicePtr) : DBHelper(_ownerServicePtr){};
 
         auto createDBEntry(Context &context) -> sys::ReturnCodes override;
         auto requestDataFromDB(Context &context) -> sys::ReturnCodes override;
@@ -35,7 +35,7 @@ namespace parserFSM
         auto deleteDBEntry(Context &context) -> sys::ReturnCodes override;
 
         auto requestCount(Context &context) -> sys::ReturnCodes;
-        static auto to_json(CalllogRecord record) -> json11::Json;
+        static auto to_json(const CalllogRecord &record) -> json11::Json;
         auto getCalllogCount(Context &context) -> sys::ReturnCodes;
         auto getCalllogByContactID(Context &context) -> sys::ReturnCodes;
     };

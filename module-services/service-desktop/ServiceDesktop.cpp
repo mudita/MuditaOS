@@ -158,7 +158,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         }
 
         if (updateOsMsg != nullptr && updateOsMsg->messageType == updateos::UpdateMessageType::UpdateNow) {
-            LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuuid:%" PRIu32 "",
+            LOG_DEBUG("ServiceDesktop::DataReceivedHandler file:%s uuid:%" PRIu32 "",
                       updateOsMsg->updateStats.updateFile.c_str(),
                       updateOsMsg->updateStats.uuid);
 

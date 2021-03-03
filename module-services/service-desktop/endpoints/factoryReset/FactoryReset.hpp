@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,6 +15,6 @@ namespace sys
 namespace FactoryReset
 {
     bool Run(sys::Service *ownerService);
-    bool DeleteDirContent(std::string dir);
-    bool CopyDirContent(std::string sourcedir, std::string targetdir);
+    bool DeleteDirContent(const std::string &dir);
+    bool CopyDirContent(const std::string &sourcedir, const std::string &targetdir);
 } // namespace FactoryReset
