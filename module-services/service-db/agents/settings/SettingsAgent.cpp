@@ -34,7 +34,7 @@ void SettingsAgent::initDb()
 
     do {
         auto path  = (*allVars)[0].getString();
-        auto value = (*allVars)[0].getString();
+        auto value = (*allVars)[1].getString();
         settings::EntryPath variablePath;
         variablePath.parse(path);
         cache->setValue(variablePath, value);
@@ -100,7 +100,7 @@ auto SettingsAgent::getAgentName() -> const std::string
 // dbSingleVar
 auto SettingsAgent::dbGetValue(settings::EntryPath path) -> std::optional<std::string>
 {
-    auto retQuery = database->query(settings::Statements::getValue, path.variable.c_str());
+    auto retQuery = database->query(settings::Statements::getValue, path.to_string().c_str());
     if (nullptr == retQuery || 1 != retQuery->getRowCount()) {
         return std::string{};
     }
