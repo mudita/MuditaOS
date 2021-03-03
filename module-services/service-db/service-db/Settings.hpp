@@ -32,7 +32,6 @@ namespace settings
         using OnAllModesRetrievedCallback    = std::function<void(const ListOfModes &)>;
 
         Settings(sys::Service *app, const std::string &dbAgentName = service::name::db, SettingsCache *cache = nullptr);
-        virtual ~Settings();
 
         void setValue(const std::string &variableName,
                       const std::string &variableValue,
