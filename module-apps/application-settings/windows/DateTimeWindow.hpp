@@ -17,7 +17,6 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
-#include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/Window.hpp"
 #include <widgets/BoxLayout.hpp>
 

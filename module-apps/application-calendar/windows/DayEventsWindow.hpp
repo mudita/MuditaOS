@@ -16,6 +16,8 @@
 
 namespace gui
 {
+    class Image;
+
     class DayEventsWindow : public gui::AppWindow
     {
         std::string dayMonthTitle;

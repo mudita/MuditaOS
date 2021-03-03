@@ -10,6 +10,7 @@
 
 namespace gui
 {
+    class Image;
     class MmiPushWindow : public AppWindow
     {
       protected:

@@ -4,14 +4,14 @@
 #pragma once
 
 #include <Rect.hpp>
-#include <Image.hpp>
-#include <common_data/EventStore.hpp>
 #include <vector>
 #include <map>
 
 namespace gui
 {
     class Label;
+    class Image;
+
     namespace top_bar
     {
         class SignalStrengthBase;

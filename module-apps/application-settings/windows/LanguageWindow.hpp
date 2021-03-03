@@ -12,7 +12,6 @@
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Window.hpp"
 #include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/TopBar.hpp"
 
 namespace gui
 {
