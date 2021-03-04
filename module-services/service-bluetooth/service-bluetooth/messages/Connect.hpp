@@ -12,7 +12,7 @@ namespace message::bluetooth
       public:
         explicit Connect(std::string addr) : addr(std::move(addr))
         {}
-        [[nodiscard]] auto getAddr() const noexcept -> std::string
+        [[nodiscard]] auto getAddr() const -> std::string
         {
             return addr;
         }
@@ -26,7 +26,7 @@ namespace message::bluetooth
       public:
         explicit ConnectResult(std::string addr, bool succeed) : addr(std::move(addr)), succeed(succeed)
         {}
-        [[nodiscard]] auto getAddr() const noexcept -> std::string
+        [[nodiscard]] auto getAddr() const -> std::string
         {
             return addr;
         }

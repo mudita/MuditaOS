@@ -26,7 +26,7 @@ namespace message::bluetooth
       public:
         explicit UnpairResult(std::string addr, bool succeed) : addr(std::move(addr)), succeed(succeed)
         {}
-        [[nodiscard]] auto getAddr() const noexcept -> std::string
+        [[nodiscard]] auto getAddr() const -> std::string
         {
             return addr;
         }

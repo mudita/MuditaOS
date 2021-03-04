@@ -199,9 +199,9 @@ namespace bluetooth
     void GAP::processDedicatedBondingCompleted(std::uint8_t *packet, bd_addr_t &addr)
     {
         auto result = packet[2];
-        auto name   = std::string{reinterpret_cast<const char *>(&packet[9])};
+
         auto msg =
-            std::make_shared<BluetoothPairResultMessage>(currentlyProcessedDeviceAddr, std::move(name), result == 0u);
+            std::make_shared<BluetoothPairResultMessage>(currentlyProcessedDeviceAddr, std::string{}, result == 0u);
         currentlyProcessedDeviceAddr.clear();
         ownerService->bus.sendUnicast(std::move(msg), "ApplicationSettingsNew");
     }

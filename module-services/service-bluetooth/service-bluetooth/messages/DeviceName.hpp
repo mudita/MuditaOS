@@ -15,7 +15,7 @@ namespace message::bluetooth
       public:
         explicit ResponseDeviceName(std::string name) : name(std::move(name))
         {}
-        [[nodiscard]] auto getName() const noexcept -> std::string
+        [[nodiscard]] auto getName() const -> std::string
         {
             return name;
         }
