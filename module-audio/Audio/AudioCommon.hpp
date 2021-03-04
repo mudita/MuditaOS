@@ -61,9 +61,19 @@ namespace audio
         Last = Alarm,
     };
 
+    struct DbPathElement
+    {
+        Setting setting;
+        PlaybackType playbackType;
+        Profile::Type profileType;
+        std::optional<sys::phone_modes::PhoneMode> phoneMode = std::nullopt;
+    };
+
     [[nodiscard]] const std::string str(const PlaybackType &playbackType) noexcept;
 
     [[nodiscard]] const std::string str(const Setting &setting) noexcept;
+
+    [[nodiscard]] const std::string dbPath(const DbPathElement &element);
 
     [[nodiscard]] const std::string dbPath(const Setting &setting,
                                            const PlaybackType &playbackType,

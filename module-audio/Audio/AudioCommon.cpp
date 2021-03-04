@@ -61,6 +61,11 @@ namespace audio
         return false;
     }
 
+    const std::string dbPath(const DbPathElement &element)
+    {
+        return dbPath(element.setting, element.playbackType, element.profileType, element.phoneMode);
+    }
+
     const std::string dbPath(const Setting &setting,
                              const PlaybackType &playbackType,
                              const Profile::Type &profileType,

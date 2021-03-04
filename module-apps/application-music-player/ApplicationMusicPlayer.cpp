@@ -14,10 +14,12 @@
 
 namespace app
 {
+    constexpr std::size_t applicationMusicPlayerStackSize = 4 * 1024;
+
     ApplicationMusicPlayer::ApplicationMusicPlayer(std::string name,
                                                    std::string parent,
                                                    StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), startInBackground, 4096)
+        : Application(std::move(name), std::move(parent), startInBackground, applicationMusicPlayerStackSize)
     {
         LOG_INFO("ApplicationMusicPlayer::create");
         connect(typeid(AudioStartPlaybackResponse), [&](sys::Message *msg) {
