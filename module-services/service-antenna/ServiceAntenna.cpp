@@ -53,7 +53,10 @@ namespace antenna
     }
 } // namespace antenna
 
-ServiceAntenna::ServiceAntenna() : sys::Service(service::name::antenna)
+inline constexpr auto antennaServiceStackSize = 1024 * 2;
+
+ServiceAntenna::ServiceAntenna()
+    : sys::Service(service::name::antenna, "", antennaServiceStackSize, sys::ServicePriority::Idle)
 {
     LOG_INFO("[%s] Initializing", service::name::antenna);
 
