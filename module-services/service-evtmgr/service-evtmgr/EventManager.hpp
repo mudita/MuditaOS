@@ -9,13 +9,13 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
+#include <Service/Timer.hpp>
 #include <Service/Worker.hpp>
 #include <bsp/common.hpp>
 #include <bsp/keyboard/key_codes.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <screen-light-control/ScreenLightControl.hpp>
 #include <vibra/Vibra.hpp>
-
 #include <service-db/DBServiceName.hpp>
 
 #include <cstdint>
@@ -34,6 +34,7 @@ class EventManager : public sys::Service
     bool processVibraRequest(bsp::vibrator::Action act, sys::ms RepetitionTime = static_cast<sys::ms>(1000));
 
     std::shared_ptr<settings::Settings> settings;
+    std::unique_ptr<sys::Timer> loggerTimer;
 
   protected:
     std::unique_ptr<WorkerEvent> EventWorker;
@@ -66,6 +67,8 @@ class EventManager : public sys::Service
     void ProcessCloseReason(sys::CloseReason closeReason) override;
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
+
+    void dumpLogsToFile();
 
     /**
      * @brief Sends request to application manager to switch from current application to specific window in application

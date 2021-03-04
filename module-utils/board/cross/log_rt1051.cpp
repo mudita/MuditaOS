@@ -34,7 +34,7 @@ namespace Log
                                            loggerBufferSizeLeft(),
                                            "%s%-5s %s[%s] %s%s:%s:%d:%s ",
                                            logColors->levelColors[level].data(),
-                                           level_names[level],
+                                           levelNames[level],
                                            logColors->serviceNameColor.data(),
                                            getTaskDesc(),
                                            logColors->callerInfoColor.data(),
@@ -46,7 +46,7 @@ namespace Log
 
     bool Logger::filterLogs(logger_level level)
     {
-        return GetLogLevel(getTaskDesc()) < level;
+        return getLogLevel(getTaskDesc()) < level;
     }
 
     void Logger::logToDevice(const char *fmt, va_list args)
@@ -60,21 +60,22 @@ namespace Log
         loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos],
                                            loggerBufferSizeLeft(),
                                            "%-5s [%-10s] \x1b[31mASSERTION ",
-                                           level_names[LOGFATAL],
+                                           levelNames[LOGFATAL],
                                            getTaskDesc());
 
         loggerBufferCurrentPos += vsnprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), fmt, args);
         logToDevice(Device::DEFAULT, loggerBuffer, loggerBufferCurrentPos);
+        circularBuffer.put(std::string(loggerBuffer, loggerBufferCurrentPos));
     }
 
-    void Logger::logToDevice(Device device, std::string_view log, size_t length)
+    void Logger::logToDevice(Device device, std::string_view logMsg, size_t length)
     {
         switch (device) {
         case Device::DEFAULT:
-            log_WriteToDevice(reinterpret_cast<const uint8_t *>(log.data()), length);
+            log_WriteToDevice(reinterpret_cast<const uint8_t *>(logMsg.data()), length);
             break;
         case Device::SEGGER_RTT:
-            SEGGER_RTT_Write(0, reinterpret_cast<const void *>(log.data()), length);
+            SEGGER_RTT_Write(0, reinterpret_cast<const void *>(logMsg.data()), length);
             break;
         default:
             break;

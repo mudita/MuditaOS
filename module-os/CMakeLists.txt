@@ -28,6 +28,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/usermem.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/CriticalSectionGuard.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/LockGuard.cpp
         )
 
 #Substitute FreeRTOS SystemvView sources if enabled
