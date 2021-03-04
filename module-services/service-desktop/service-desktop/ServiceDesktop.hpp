@@ -22,7 +22,7 @@ namespace settings
 
 namespace sdesktop
 {
-    inline constexpr auto service_stack             = 8192;
+    inline constexpr auto service_stack             = 4096;
     inline constexpr auto cdc_queue_len             = 32;
     inline constexpr auto cdc_queue_object_size     = 1024;
     inline constexpr auto irq_queue_object_size     = sizeof(bsp::USBDeviceStatus);

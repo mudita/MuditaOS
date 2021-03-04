@@ -153,15 +153,16 @@ auto CalllogHelper::requestCount(Context &context) -> sys::ReturnCodes
 }
 auto CalllogHelper::to_json(CalllogRecord record) -> json11::Json
 {
-    std::stringstream ss;
-    ss << record.date;
-    std::string date = ss.str();
+    std::unique_ptr<std::stringstream> ss = std::make_unique<std::stringstream>();
 
-    ss.clear();
-    ss.str(std::string{});
+    (*ss) << record.date;
+    std::string date = ss->str();
 
-    ss << record.duration;
-    std::string duration = ss.str();
+    ss->clear();
+    ss->str(std::string{});
+
+    (*ss) << record.duration;
+    std::string duration = ss->str();
 
     auto recordEntry = json11::Json::object{{json::calllog::presentation, static_cast<int>(record.presentation)},
                                             {json::calllog::date, date},

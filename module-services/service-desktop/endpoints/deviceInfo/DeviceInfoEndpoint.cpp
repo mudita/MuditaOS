@@ -37,13 +37,13 @@ auto DeviceInfoEndpoint::getDeviceInfo(Context &context) -> bool
         return false;
     }
     json11::Json updateHistory   = static_cast<ServiceDesktop *>(ownerServicePtr)->updateOS->getUpdateHistory();
-    struct statvfs vfstat;
-    if (statvfs(purefs::dir::getRootDiskPath().c_str(), &vfstat) < 0) {
+    std::unique_ptr<struct statvfs> vfstat = std::make_unique<struct statvfs>();
+    if ((*statvfs)(purefs::dir::getRootDiskPath().c_str(), vfstat.get()) < 0) {
         return false;
     }
-    auto totalMbytes = (vfstat.f_frsize * vfstat.f_blocks) / 1024LLU / 1024LLU;
-    auto freeMbytes  = (vfstat.f_bfree * vfstat.f_bsize) / 1024LLU / 1024LLU;
-    auto freePercent = (freeMbytes * 100) / totalMbytes;
+    unsigned long totalMbytes = (vfstat->f_frsize * vfstat->f_blocks) / 1024LLU / 1024LLU;
+    unsigned long freeMbytes  = (vfstat->f_bfree * vfstat->f_bsize) / 1024LLU / 1024LLU;
+    unsigned long freePercent = (freeMbytes * 100) / totalMbytes;
 
     context.setResponseBody(json11::Json::object(
         {{json::batteryLevel, std::to_string(Store::Battery::get().level)},
