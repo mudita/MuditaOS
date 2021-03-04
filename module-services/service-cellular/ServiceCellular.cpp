@@ -257,9 +257,12 @@ sys::ReturnCodes ServiceCellular::InitHandler()
         ::settings::SettingsScope::Global);
 
     cpuSentinel = std::make_shared<sys::CpuSentinel>(serviceName, this);
+    ongoingCall.setCpuSentinel(cpuSentinel);
 
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
+
+    cmux->RegisterCellularDevice();
 
     // temporarily limit the minimum CPU frequency
     // due to problems with the UART of the GSM modem

@@ -32,7 +32,6 @@ namespace bsp
 
     void LinuxLPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
     {
-        currentOscSource = source;
     }
 
 } // namespace bsp

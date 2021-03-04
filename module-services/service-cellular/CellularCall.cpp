@@ -25,6 +25,10 @@ namespace CellularCall
             return false;
         }
 
+        if (cpuSentinel) {
+            cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6);
+        }
+
         clear();
         CalllogRecord callRec;
         callRec.type        = type;
@@ -101,4 +105,10 @@ namespace CellularCall
         call.presentation = number.getFormatted().empty() ? PresentationType::PR_UNKNOWN : PresentationType::PR_ALLOWED;
         call.phoneNumber  = number;
     }
+
+    void CellularCall::setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel)
+    {
+        cpuSentinel = std::move(sentinel);
+    }
+
 } // namespace CellularCall

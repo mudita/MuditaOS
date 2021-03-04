@@ -15,6 +15,7 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c/DriverI2C.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pwm/DriverPWM.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/lpspi/DriverLPSPI.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/lpuart/DriverLPUART.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/usdhc/DriverUSDHC.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/semc/DriverSEMC.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio/DriverGPIO.cpp"
