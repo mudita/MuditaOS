@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef MODULE_APPS_APPLICATION_DESKTOP_DATA_LOCKPHONEDATA_HPP_
@@ -56,6 +56,22 @@ namespace gui
 
       private:
         sdesktop::UpdateOsMessage updateOsMessage;
+    };
+
+    class CurrentOsVersion : public gui::SwitchData
+    {
+        std::string osVersion;
+
+      public:
+        [[nodiscard]] std::string getCurrentOsVersion() const
+        {
+            return osVersion;
+        }
+
+        void setData(std::string version)
+        {
+            osVersion = version;
+        }
     };
 
 } // namespace gui

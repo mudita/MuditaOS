@@ -92,7 +92,7 @@
   "app_desktop_tools_antenna": "ANTENNA TEST",
   "app_desktop_poweroff_title": "Wyłączanie",
   "app_desktop_poweroff_question": "Czy wyłączyć telefon?",
-  "app_desktop_update_success": "MuditaOS został zaktualizowany.",
+  "app_desktop_update_success": "MuditaOS został zaktualizowany do wersji $VERSION.",
   "app_call_call": "DZWOŃ",
   "app_call_clear": "WYCZYŚĆ",
   "app_call_reject": "ODRZUĆ",

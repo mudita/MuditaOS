@@ -80,6 +80,9 @@ namespace gui
 
     DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_main_window)
     {
+        osUpdateVer  = getAppDesktop()->getOsUpdateVersion();
+        osCurrentVer = getAppDesktop()->getOsCurrentVersion();
+
         buildInterface();
 
         preBuildDrawListHook = [this](std::list<Command> &cmd) { updateTime(); };
@@ -110,12 +113,11 @@ namespace gui
             }
             setActiveState(app);
 
-            auto osUpdateVer  = getAppDesktop()->getOsUpdateVersion();
-            auto osCurrentVer = getAppDesktop()->getOsCurrentVersion();
-
             if (osUpdateVer == osCurrentVer && osUpdateVer != updateos::initSysVer &&
                 osCurrentVer != updateos::initSysVer) {
-                application->switchWindow(app::window::name::desktop_post_update_window);
+                auto data = std::make_unique<CurrentOsVersion>();
+                data->setData(osCurrentVer);
+                application->switchWindow(app::window::name::desktop_post_update_window, std::move(data));
                 getAppDesktop()->setOsUpdateVersion(updateos::initSysVer);
             }
 

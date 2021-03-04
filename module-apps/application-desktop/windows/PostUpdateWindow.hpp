@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "AppWindow.hpp"
-#include "Text.hpp"
-#include "gui/widgets/Image.hpp"
+#include <module-apps/windows/AppWindow.hpp>
+#include <module-gui/gui/widgets/Text.hpp>
+#include <module-gui/gui/widgets/Image.hpp>
 
 namespace gui
 {
@@ -16,6 +16,8 @@ namespace gui
 
         void setVisibleState();
         void invalidate() noexcept;
+
+        std::string currentOsVersion;
 
       public:
         explicit PostUpdateWindow(app::Application *app);

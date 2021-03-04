@@ -87,6 +87,8 @@ namespace gui
 
       private:
         void invalidate() noexcept;
+        std::string osUpdateVer;
+        std::string osCurrentVer;
 
         gui::KeyInputMappedTranslation translator;
     };
