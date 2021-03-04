@@ -150,8 +150,6 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
         bd_addr_t addr;
         sscanf_bd_addr(addrString.c_str(), addr);
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::ConnectAudio, addr));
-        bus.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(addrString, true),
-                        service::name::bluetooth);
         return sys::MessageNone{};
     });
 

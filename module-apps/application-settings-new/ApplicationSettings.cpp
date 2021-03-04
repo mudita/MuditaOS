@@ -185,19 +185,21 @@ namespace app
                                 service::name::bluetooth);
                 return sys::MessageNone{};
             }
-            auto addr                       = bluetoothPairResultMsg->getAddr();
-            const std::string toReplace     = "%NAME";
-            std::string pairingErrorMessage = utils::localize.get("app_settings_bluetooth_pairing_error_message");
-            pairingErrorMessage.replace(
-                pairingErrorMessage.find(toReplace), toReplace.size(), bluetoothPairResultMsg->getName());
-            switchWindow(
-                gui::window::name::dialog_retry,
-                gui::ShowMode::GUI_SHOW_INIT,
-                std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
-                    utils::localize.get("app_settings_bt"), "search_big", pairingErrorMessage, "", [=]() -> bool {
-                        bus.sendUnicast(std::make_shared<BluetoothPairMessage>(addr), service::name::bluetooth);
-                        return true;
-                    }}));
+            auto addr = bluetoothPairResultMsg->getAddr();
+            switchWindow(gui::window::name::dialog_retry,
+                         gui::ShowMode::GUI_SHOW_INIT,
+                         std::make_unique<gui::DialogMetadataMessage>(
+                             gui::DialogMetadata{utils::localize.get("app_settings_bt"),
+                                                 "search_big",
+                                                 utils::localize.get("app_settings_bluetooth_pairing_error_message"),
+                                                 "",
+                                                 [=]() -> bool {
+                                                     bus.sendUnicast(std::make_shared<BluetoothPairMessage>(addr),
+                                                                     service::name::bluetooth);
+
+                                                     returnToPreviousWindow();
+                                                     return true;
+                                                 }}));
 
             return sys::MessageNone{};
         });
@@ -224,6 +226,7 @@ namespace app
                                                  [=]() -> bool {
                                                      bus.sendUnicast(std::make_shared<message::bluetooth::Unpair>(addr),
                                                                      service::name::bluetooth);
+                                                     returnToPreviousWindow();
                                                      return true;
                                                  }}));
             return sys::MessageNone{};
@@ -247,6 +250,7 @@ namespace app
                              [=]() -> bool {
                                  bus.sendUnicast(std::make_shared<message::bluetooth::Connect>(addr),
                                                  service::name::bluetooth);
+                                 returnToPreviousWindow();
                                  return true;
                              }}));
 
