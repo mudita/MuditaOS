@@ -28,7 +28,12 @@
 #include <BtKeysStorage.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
 
-ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth, "", 4096)
+namespace
+{
+    constexpr auto BluetoothServiceStackDepth = 2560U;
+} // namespace
+
+ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth, "", BluetoothServiceStackDepth)
 {
     auto settings                   = std::make_unique<settings::Settings>(this);
     settingsHolder                  = std::make_shared<bluetooth::SettingsHolder>(std::move(settings));

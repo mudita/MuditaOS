@@ -7,10 +7,15 @@
 
 using namespace app;
 
+namespace
+{
+    constexpr auto SpecialInputAppStackDepth = 2048U;
+} // namespace
+
 ApplicationSpecialInput::ApplicationSpecialInput(std::string name,
                                                  std::string parent,
                                                  StartInBackground startInBackground)
-    : Application(name, parent, startInBackground)
+    : Application(name, parent, startInBackground, SpecialInputAppStackDepth)
 {
     addActionReceiver(manager::actions::ShowSpecialInput, [this](auto &&data) {
         switchWindow(app::char_select, std::move(data));

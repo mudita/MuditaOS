@@ -37,6 +37,8 @@ namespace queues
 
 namespace
 {
+    constexpr auto BluetoothWorkerStackDepth = 3072U;
+
     class DeviceRegistration
     {
       public:
@@ -85,7 +87,8 @@ namespace
 } // namespace
 
 BluetoothWorker::BluetoothWorker(sys::Service *service)
-    : Worker(service), service(service), profileManager(std::make_shared<bluetooth::ProfileManager>(service)),
+    : Worker(service, BluetoothWorkerStackDepth), service(service),
+      profileManager(std::make_shared<bluetooth::ProfileManager>(service)),
       settings(static_cast<ServiceBluetooth *>(service)->settingsHolder),
       runLoop(std::make_unique<bluetooth::RunLoop>()),
       controller{createStatefulController(
