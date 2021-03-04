@@ -17,6 +17,9 @@ namespace sys
     class WorkerQueueInfo
     {
       public:
+        WorkerQueueInfo(std::string_view _name, int _elementSize, int _length)
+            : name(_name), elementSize(_elementSize), length(_length)
+        {}
         std::string name;
         int elementSize;
         int length;
