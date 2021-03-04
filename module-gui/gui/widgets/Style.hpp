@@ -95,6 +95,14 @@ namespace style
             inline constexpr auto h = 54U;
             inline constexpr auto w = window_width;
         } // namespace bottomBar
+
+        namespace progressBar
+        {
+            inline constexpr auto x     = 100U;
+            inline constexpr auto y     = 400U;
+            inline constexpr auto width = 280U;
+            inline constexpr auto h     = 50U;
+        }; // namespace progressBar
     };    // namespace window
 
     namespace settings

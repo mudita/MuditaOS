@@ -4,36 +4,31 @@
 #pragma once
 
 #include <vector>
-#include "AppWindow.hpp"
-#include "Dialog.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/TextFixedSize.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/ProgressBar.hpp"
+#include <module-apps/windows/AppWindow.hpp>
+#include <module-apps/windows/Dialog.hpp>
+#include <module-gui/gui/widgets/Label.hpp>
+#include <module-gui/gui/widgets/TextFixedSize.hpp>
+#include <module-gui/gui/widgets/Image.hpp>
+#include <module-gui/gui/widgets/BottomBar.hpp>
+#include <module-gui/gui/widgets/ProgressBar.hpp>
 namespace gui
 {
 
     class UpdateProgressWindow : public AppWindow
     {
-
-        enum class State
-        {
-            UpdateNow,
-            Return,
-        };
-
         unsigned int progressPercent = 0;
+        std::string textInfo;
 
         gui::Label *percentLabel    = nullptr;
         ProgressBar *updateProgress = nullptr;
 
-        State state = State::Return;
         fs::path updateFile;
 
-      protected:
         Text *text  = nullptr;
         Image *icon = nullptr;
+
+        void setVisibleState();
+        void invalidate() noexcept;
 
       public:
         UpdateProgressWindow(app::Application *app);
@@ -42,6 +37,7 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+        top_bar::Configuration configureTopBar(top_bar::Configuration appConfiguration) override;
     };
 
 } /* namespace gui */
