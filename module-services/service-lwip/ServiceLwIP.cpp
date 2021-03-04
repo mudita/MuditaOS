@@ -51,7 +51,7 @@ sys::ReturnCodes message_lwip(sys::Service *app, LwIP_message::Request req)
     return ret.first;
 }
 
-ServiceLwIP::ServiceLwIP() : sys::Service(service::name::lwip)
+ServiceLwIP::ServiceLwIP() : sys::Service(service::name::lwip, "", StackDepth)
 {
     LOG_INFO("[ServiceLwIP] Initializing");
     tcpip_init(nullptr, nullptr);

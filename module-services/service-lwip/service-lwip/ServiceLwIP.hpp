@@ -35,6 +35,8 @@ sys::ReturnCodes message_lwip(sys::Service *app, LwIP_message::Request req);
 
 class ServiceLwIP : public sys::Service
 {
+    static constexpr auto StackDepth = 1024;
+
   public:
     ServiceLwIP();
     ~ServiceLwIP() = default;
