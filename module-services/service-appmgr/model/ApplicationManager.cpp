@@ -37,6 +37,7 @@ namespace app::manager
 {
     namespace
     {
+        constexpr auto ApplicationManagerStackDepth = 3072;
         constexpr auto timerBlock         = "BlockTimer";
     } // namespace
 
@@ -102,7 +103,8 @@ namespace app::manager
     ApplicationManager::ApplicationManager(const ApplicationName &serviceName,
                                            std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers,
                                            const ApplicationName &_rootApplicationName)
-        : Service{serviceName}, ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
+        : Service{serviceName, {}, ApplicationManagerStackDepth},
+          ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }},
           autoLockEnabled(false), autoLockTimer{std::make_unique<sys::Timer>(timerBlock,
                                                                              this,

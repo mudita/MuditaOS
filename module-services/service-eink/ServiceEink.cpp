@@ -23,7 +23,7 @@ namespace service::eink
 {
     namespace
     {
-        constexpr auto ServceEinkStackDepth = 4096 + 1024;
+        constexpr auto ServceEinkStackDepth = 2048U;
         constexpr std::chrono::milliseconds displayPowerOffTimeout{3800};
     } // namespace
 
