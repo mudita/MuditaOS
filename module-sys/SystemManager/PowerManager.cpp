@@ -59,13 +59,10 @@ namespace sys
     void PowerManager::IncreaseCpuFrequency() const
     {
         const auto freq      = lowPowerControl->GetCurrentFrequencyLevel();
-        const auto oscSource = lowPowerControl->GetCurrentOscillatorSource();
 
         if (freq == bsp::CpuFrequencyHz::Level_1) {
             // switch osc source first
-            if (oscSource == bsp::LowPowerMode::OscillatorSource::Internal) {
-                lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::External);
-            }
+            lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::External);
 
             // then switch external RAM clock source
             if (driverSEMC) {
@@ -110,12 +107,8 @@ namespace sys
         }
 
         if (level == bsp::CpuFrequencyHz::Level_1) {
-            const auto oscSource = lowPowerControl->GetCurrentOscillatorSource();
-
             // then switch osc source
-            if (oscSource == bsp::LowPowerMode::OscillatorSource::External) {
-                lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
-            }
+            lowPowerControl->SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
 
             // and switch external RAM clock source
             if (driverSEMC) {

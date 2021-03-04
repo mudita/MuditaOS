@@ -9,8 +9,9 @@
 #include "bsp/watchdog/watchdog.hpp"
 #include <clock_config.h>
 #include <fsl_clock.h>
-#include <fsl_dcdc.h>
 #include "ClockState.hpp"
+#include "Oscillator.hpp"
+#include "critical.hpp"
 
 namespace bsp
 {
@@ -78,33 +79,15 @@ namespace bsp
     void RT1051LPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
     {
         if (source == bsp::LowPowerMode::OscillatorSource::Internal) {
-            if (IsClockEnabled(kCLOCK_Lpuart1) || IsClockEnabled(kCLOCK_Lpuart2) || IsClockEnabled(kCLOCK_Lpuart3) ||
-                IsClockEnabled(kCLOCK_Lpuart4) || IsClockEnabled(kCLOCK_Lpuart5) || IsClockEnabled(kCLOCK_Lpuart6) ||
-                IsClockEnabled(kCLOCK_Lpuart7) || IsClockEnabled(kCLOCK_Lpuart8)) {
-                return;
-            }
-
-            /// Switch DCDC to use DCDC internal OSC
-            DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
-            /// Switch clock source to internal RC
-            CLOCK_SwitchOsc(kCLOCK_RcOsc);
-            CLOCK_DeinitExternalClk();
-            /// Wait CCM operation finishes
-            while (CCM->CDHIPR != 0) {}
+            cpp_freertos::CriticalSection::Enter();
+            bsp::DisableExternalOscillator();
+            cpp_freertos::CriticalSection::Exit();
         }
         else if (source == bsp::LowPowerMode::OscillatorSource::External) {
-            CLOCK_InitExternalClk(0);
-            /// Switch DCDC to use DCDC external OSC
-            DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
-            /// Switch clock source to external OSC.
-            CLOCK_SwitchOsc(kCLOCK_XtalOsc);
-            /// Wait CCM operation finishes
-            while (CCM->CDHIPR != 0) {}
-            /// Set Oscillator ready counter value.
-            CCM->CCR = (CCM->CCR & (~CCM_CCR_OSCNT_MASK)) | CCM_CCR_OSCNT(bsp::OscillatorReadyCounterValue);
+            cpp_freertos::CriticalSection::Enter();
+            bsp::EnableExternalOscillator();
+            cpp_freertos::CriticalSection::Exit();
         }
-
-        currentOscSource = source;
     }
 
 } // namespace bsp

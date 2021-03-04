@@ -7,7 +7,7 @@
 #include <memory>
 #include <FreeRTOS.h>
 #include <FreeRTOS/include/queue.h>
-
+#include "drivers/lpuart/DriverLPUART.hpp"
 #include <common_data/EventStore.hpp>
 
 namespace bsp {
@@ -55,8 +55,11 @@ namespace cellular
         virtual void SelectAntenna(bsp::cellular::antenna antenna) = 0;
         virtual bsp::cellular::antenna GetAntenna() = 0;
 
+        [[nodiscard]] auto GetCellularDevice() const noexcept -> std::shared_ptr<devices::Device>;
+
     protected:
         bool isInitialized = false;
+        std::shared_ptr<drivers::DriverLPUART> driverLPUART;
     };
     namespace cellular
         {

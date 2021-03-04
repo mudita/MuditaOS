@@ -31,4 +31,9 @@ namespace bsp{
         return {};
     }
 
+    [[nodiscard]] auto Cellular::GetCellularDevice() const noexcept -> std::shared_ptr<devices::Device>
+    {
+        return driverLPUART;
+    }
+
 }

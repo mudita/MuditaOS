@@ -439,6 +439,7 @@ class TS0710
     void TurnOffModem(void);
     void EnterSleepMode(void);
     void ExitSleepMode(void);
+    void RegisterCellularDevice(void);
 };
 
 #endif //_TS0710_H

@@ -8,6 +8,7 @@
 #include "drivers/gpio/DriverGPIO.hpp"
 #include "drivers/lpspi/DriverLPSPI.hpp"
 #include "drivers/usdhc/DriverUSDHC.hpp"
+#include "drivers/lpuart/DriverLPUART.hpp"
 
 enum class BoardDefinitions
 {
@@ -76,6 +77,7 @@ enum class BoardDefinitions
     CELLULAR_GPIO_2_ANTSEL_PIN = 2,
     CELLULAR_GPIO_1_STATUS_PIN = 2, // GPIO_AD_B0_02
     CELLULAR_GPIO_2_USB_BOOT_PIN = 24, // GPIO_B1_08, output
+    CELLULAR_LPUART_INSTANCE = static_cast<int >(drivers::LPUARTInstances::LPUART_1),
 
     EINK_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     EINK_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),

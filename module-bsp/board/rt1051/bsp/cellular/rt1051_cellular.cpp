@@ -84,6 +84,9 @@ namespace bsp
             return;
         }
 
+        driverLPUART = drivers::DriverLPUART::Create(
+            "cellular", static_cast<drivers::LPUARTInstances>(BoardDefinitions::CELLULAR_LPUART_INSTANCE));
+
         lpuart_config_t s_cellularConfig;
 
         LPUART_GetDefaultConfig(&s_cellularConfig);
@@ -210,6 +213,10 @@ namespace bsp
         sendXfer.data     = static_cast<uint8_t *>(buf);
         sendXfer.dataSize = nbytes;
 
+        if (isInSleepMode) {
+            ExitSleep();
+        }
+
         EnableTx();
 
         uartDmaHandle.userData = xTaskGetCurrentTaskHandle();
@@ -280,12 +287,20 @@ namespace bsp
     {
         gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN), 1);
         gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN), 1);
+        if (driverLPUART) {
+            driverLPUART->Disable();
+        }
+        isInSleepMode = true;
     }
 
     void RT1051Cellular::ExitSleep()
     {
+        if (driverLPUART) {
+            driverLPUART->Enable();
+        }
         gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN), 0);
         gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN), 0);
+        isInSleepMode = false;
         vTaskDelay(pdMS_TO_TICKS(15));
     }
 

@@ -11,6 +11,7 @@
 #include <memory>
 #include <module-os/RTOSWrapper/include/ticks.hpp>
 #include <sstream>
+#include <SystemManager/messages/DeviceRegistrationMessage.hpp>
 
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = {{TypeOfFrame_e::SABM, "SABM"},
                                                          {TypeOfFrame_e::UA, "UA"},
@@ -558,6 +559,12 @@ void TS0710::EnterSleepMode(void)
 void TS0710::ExitSleepMode(void)
 {
     return pv_cellular->ExitSleep();
+}
+
+void TS0710::RegisterCellularDevice(void)
+{
+    auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(pv_cellular->GetCellularDevice());
+    pv_parent->bus.sendUnicast(std::move(deviceRegistrationMsg), service::name::system_manager);
 }
 
 void TS0710::SetupEchoCalceller(EchoCancellerStrength strength)
