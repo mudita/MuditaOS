@@ -16,7 +16,13 @@ You can quickstart the project by going through one of the following guides:
 Run the provisioning script `./config/bootstrap.sh` to install all dependencies. The script is written for Ubuntu and tested on 20.04.
 
 To run the script execute the following command: `cd config && ./bootstrap.sh 0-`
-Note that this curls a shellscript from get.docker.com and runs it with sudo.  
+Note that this downloads a shellscript from `get.docker.com` and runs it with sudo for Docker installation.
+
+This script also installs few required packages (`cat config/bootstrap_config`) which also require root privileges.
+
+Installation of `GCCv10` and `CMake` is done to `$HOME` directory.
+
+Running the script without parameters will display a list of steps.
 
 After running provisioning you are ready to checkout and build project for both linux and RT1051. Please follow these steps:
 
