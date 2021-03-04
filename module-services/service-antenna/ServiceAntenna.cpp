@@ -138,7 +138,7 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
         }
     } break;
     case MessageType::AntennaCSQChange:
-        LOG_WARN("CSQChange message");
+        LOG_DEBUG("CSQChange message");
         if (state->get() == antenna::State::idle) {
             state->set(antenna::State::csqChange);
         }
