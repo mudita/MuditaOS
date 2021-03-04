@@ -34,8 +34,10 @@ namespace app
         }
     }
 
+    inline constexpr auto antennaApplicationStackSize = 1024 * 3;
+
     ApplicationAntenna::ApplicationAntenna(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, 4096 * 2)
+        : Application(name, parent, startInBackground, antennaApplicationStackSize)
     {
         bus.channels.push_back(sys::BusChannel::AntennaNotifications);
         appTimer = std::make_unique<sys::Timer>("Antena", this, 2000);
