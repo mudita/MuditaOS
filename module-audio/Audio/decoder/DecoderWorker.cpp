@@ -5,7 +5,7 @@
 #include "Audio/decoder/Decoder.hpp"
 
 audio::DecoderWorker::DecoderWorker(Stream *audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback)
-    : sys::Worker(DecoderWorker::workerName, DecoderWorker::workerPriority), audioStreamOut(audioStreamOut),
+    : sys::Worker(DecoderWorker::workerName, DecoderWorker::workerPriority, stackDepth), audioStreamOut(audioStreamOut),
       decoder(decoder), endOfFileCallback(endOfFileCallback),
       bufferSize(audioStreamOut->getBlockSize() / sizeof(BufferInternalType))
 {}
