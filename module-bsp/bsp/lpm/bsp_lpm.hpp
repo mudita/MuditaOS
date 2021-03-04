@@ -31,11 +31,9 @@ namespace bsp {
         [[nodiscard]] virtual uint32_t GetCpuFrequency() const noexcept = 0;
 
         virtual void SwitchOscillatorSource(OscillatorSource source) = 0;
-        [[nodiscard]] OscillatorSource GetCurrentOscillatorSource() const noexcept;
 
     protected:
         CpuFrequencyHz currentFrequency = CpuFrequencyHz::Level_6;
-        OscillatorSource currentOscSource = OscillatorSource::External;
     };
 } // namespace bsp
 

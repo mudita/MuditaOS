@@ -10,8 +10,6 @@
 
 namespace bsp
 {
-    inline constexpr uint8_t OscillatorReadyCounterValue{127};
-
     class RT1051LPM : public LowPowerMode
     {
       public:
