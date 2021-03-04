@@ -31,17 +31,16 @@ void Channel::cmd_log(std::string cmd, const Result &result, uint32_t timeout)
     cmd.erase(std::remove(cmd.begin(), cmd.end(), '\n'), cmd.end());
     switch (result.code) {
     case Result::Code::TIMEOUT: {
-        LOG_ERROR("[AT]: >%s<, timeout %" PRIu32
-                  " - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf",
-                  cmd.c_str(),
-                  timeout);
+        LOG_INFO("[AT]: >%s<, timeout %" PRIu32
+                 " - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf",
+                 cmd.c_str(),
+                 timeout);
     } break;
     case Result::Code::ERROR: {
-
-        LOG_ERROR("[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
+        LOG_INFO("[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
     } break;
     default:
-        LOG_DEBUG("[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
+        LOG_INFO("[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
         break;
     }
 #if DEBUG_MODEM_OUTPUT_RESPONSE
