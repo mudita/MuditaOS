@@ -255,6 +255,14 @@ class TS0710
     };
     void setMode(Mode mode);
 
+    enum class ConfState
+    {
+        Success,
+        Failure,
+        ModemNeedsReset,
+        PowerUp
+    };
+
   private:
     Mode mode = Mode::AT;
     std::vector<DLC_channel *> channels;
@@ -291,17 +299,9 @@ class TS0710
         Aggressive,
         Tuned
     };
-    void SetupEchoCalceller(EchoCancellerStrength strength);
+    TS0710::ConfState SetupEchoCanceller(EchoCancellerStrength strength);
 
   public:
-    enum class ConfState
-    {
-        Success,
-        Failure,
-        ModemNeedsReset,
-        PowerUp
-    };
-
     /// @brief get Channel by index
     /// @param channel enum Channel
     /// @return pointer to channel or nullptr if such channel doesn't exist (nullptr return should never happen how -

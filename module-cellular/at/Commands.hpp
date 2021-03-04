@@ -240,7 +240,7 @@ namespace at
             {AT::QRXGAIN, {"AT+QRXGAIN=40000", default_timeout}},
             {AT::CLVL, {"AT+CLVL=3", default_timeout}},
             {AT::QMIC, {"AT+QMIC=15000,15000", default_timeout}},
-            {AT::QEEC, {"AT+QEEC=", default_timeout}},
+            {AT::QEEC, {"AT+QEEC=", 3000ms}},
             {AT::QNVFR, {"AT+QNVFR=", default_long_doc_timeout}},
             {AT::QNVFW, {"AT+QNVFW=", default_long_doc_timeout}},
             {AT::QMBNCFG, {"AT+QMBNCFG=", default_long_doc_timeout}},

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TS0710.h"
@@ -176,7 +176,7 @@ TS0710::ConfState TS0710::BaudDetectOnce()
             break;
         case BaudTestStep::baud_NotFound:
             pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
-            LOG_ERROR("No Baud found for modem.");
+            LOG_DEBUG("No Baud found for modem.");
             return ConfState::Failure;
             break;
         }
@@ -199,7 +199,7 @@ TS0710::ConfState TS0710::BaudDetectProcedure(uint16_t timeout_s)
         }
     }
     pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
-    LOG_DEBUG("No Baud found.");
+    LOG_ERROR("No Baud found.");
     return ConfState::Failure;
 }
 
@@ -223,6 +223,10 @@ TS0710::ConfState TS0710::ConfProcedure()
             LOG_INFO("%s", ret.response[i].c_str());
         }
     }
+    else {
+        LOG_ERROR("Could not get modem firmware information");
+        return ConfState::Failure;
+    }
 
     at::AT flowCmd;
     if (hardwareControlFlowEnable) {
@@ -243,7 +247,6 @@ TS0710::ConfState TS0710::ConfProcedure()
         }
     }
 
-    LOG_WARN("TODO: determine while this retry loop is necessary");
     bool timed_out                 = false;
     constexpr uint32_t qsclkTmeout = 30;
     const auto qsclkTmeoutTicks =
@@ -252,7 +255,6 @@ TS0710::ConfState TS0710::ConfProcedure()
         if (parser->cmd(at::AT::QSCLK_ON)) {
             break;
         }
-        // if error then limit polling - 1 poll per sec modem normaly takes ~ 20 sec to start anyway
         vTaskDelay(pdMS_TO_TICKS(utils::time::milisecondsInSecond));
         timed_out = cpp_freertos::Ticks::GetTicks() > qsclkTmeoutTicks;
         if (timed_out) {
@@ -270,18 +272,23 @@ TS0710::ConfState TS0710::AudioConfProcedure()
     // Hence we are checking here for beginning of valid response for at::QDAI command. AudioConfProcedure
     // procedure will be invoked from AudioService's context as many times as needed.
     if (!ret) {
-        return ConfState ::Failure;
+        return ConfState::Failure;
     }
     else if (ret.response[0].compare("+QDAI: 1,0,0,3,0,1,1,1") == 0) {
-        parser->cmd(at::AT::QRXGAIN);
-        parser->cmd(at::AT::CLVL);
-        parser->cmd(at::AT::QMIC);
-        SetupEchoCalceller(EchoCancellerStrength::Tuned);
-        return ConfState ::Success;
+        if (!parser->cmd(at::AT::QRXGAIN)) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::AT::CLVL)) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::AT::QMIC)) {
+            return ConfState::Failure;
+        }
+        return SetupEchoCanceller(EchoCancellerStrength::Tuned);
     }
     else {
         if (!parser->cmd(at::AT::QDAI_INIT)) {
-            return ConfState ::Failure;
+            return ConfState::Failure;
         }
         else {
             pv_cellular->Restart();
@@ -396,10 +403,13 @@ TS0710::ConfState TS0710::StartMultiplexer()
         c->cmd(at::AT::SET_URC_CHANNEL);
         LOG_DEBUG("Sending test ATI");
         auto res = c->cmd(at::AT::SW_INFO);
-        res      = c->cmd(at::AT::CSQ);
+        if (!res) {
+            LOG_ERROR("Sending test ATI command failed");
+        }
+        res = c->cmd(at::AT::CSQ);
         if (res) {
-            auto beg = res.response[0].find(" ");
-            auto end = res.response[0].find(",", 1);
+            auto beg       = res.response[0].find(" ");
+            auto end       = res.response[0].find(",", 1);
             auto input_val = res.response[0].substr(beg + 1, end - beg - 1);
             auto strength  = 0;
             try {
@@ -566,39 +576,82 @@ void TS0710::RegisterCellularDevice(void)
     auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(pv_cellular->GetCellularDevice());
     pv_parent->bus.sendUnicast(std::move(deviceRegistrationMsg), service::name::system_manager);
 }
-
-void TS0710::SetupEchoCalceller(EchoCancellerStrength strength)
+TS0710::ConfState TS0710::SetupEchoCanceller(EchoCancellerStrength strength)
 {
+
     switch (strength) {
     case EchoCancellerStrength::LeastAggressive:
         // Aggressive settings
-        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
-        parser->cmd(at::factory(at::AT::QEEC) + "5,14");
-        parser->cmd(at::factory(at::AT::QEEC) + "10,140");
-        parser->cmd(at::factory(at::AT::QEEC) + "21,16000");
-        parser->cmd(at::factory(at::AT::QEEC) + "22,300");
-        parser->cmd(at::factory(at::AT::QEEC) + "24,450");
-        parser->cmd(at::factory(at::AT::QEEC) + "33,640");
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "0,2048")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "5,14")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "10,140")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "21,16000")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "22,300")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "24,450")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "33,640")) {
+            return ConfState::Failure;
+        }
+
         break;
     case EchoCancellerStrength::Medium:
         // Aggressive settings
-        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
-        parser->cmd(at::factory(at::AT::QEEC) + "5,14");
-        parser->cmd(at::factory(at::AT::QEEC) + "10,160");
-        parser->cmd(at::factory(at::AT::QEEC) + "21,19000");
-        parser->cmd(at::factory(at::AT::QEEC) + "22,600");
-        parser->cmd(at::factory(at::AT::QEEC) + "24,600");
-        parser->cmd(at::factory(at::AT::QEEC) + "33,768");
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "0,2048")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "5,14")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "10,160")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "21,19000")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "22,600")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "24,600")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "33,768")) {
+            return ConfState::Failure;
+        }
         break;
     case EchoCancellerStrength::Aggressive:
         // Aggressive settings
-        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
-        parser->cmd(at::factory(at::AT::QEEC) + "5,14");
-        parser->cmd(at::factory(at::AT::QEEC) + "10,160");
-        parser->cmd(at::factory(at::AT::QEEC) + "21,25000");
-        parser->cmd(at::factory(at::AT::QEEC) + "22,12000");
-        parser->cmd(at::factory(at::AT::QEEC) + "24,768");
-        parser->cmd(at::factory(at::AT::QEEC) + "33,896");
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "0,2048")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "5,14")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "10,160")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "21,25000")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "22,12000")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "24,768")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "33,896")) {
+            return ConfState::Failure;
+        }
         break;
     case EchoCancellerStrength::Tuned:
         /*
@@ -619,12 +672,31 @@ void TS0710::SetupEchoCalceller(EchoCancellerStrength strength)
             g) Increase the DENS_tail_portion in steps of 500, until 30000, and check the echo performance at each
         value. h) Set the parameter to the value that yielded the best echo performance.
         */
-        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
-        parser->cmd(at::factory(at::AT::QEEC) + "5,40"); // best performance on experiments in step 1
-        parser->cmd(at::factory(at::AT::QEEC) + "10,160");
-        parser->cmd(at::factory(at::AT::QEEC) + "21,26600"); // best performance on experiments in step 2c
-        parser->cmd(at::factory(at::AT::QEEC) + "22,20000"); // best performance on experiments in step 2g
-        parser->cmd(at::factory(at::AT::QEEC) + "24,768");
-        parser->cmd(at::factory(at::AT::QEEC) + "33,896");
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "0,2048")) {
+            return ConfState::Failure;
+        }
+        // best performance on experiments in step 1
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "5,40")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "10,160")) {
+            return ConfState::Failure;
+        }
+        // best performance on experiments in step 2c
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "21,26600")) {
+            return ConfState::Failure;
+        }
+        // best performance on experiments in step 2g
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "22,20000")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "24,768")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "33,896")) {
+            return ConfState::Failure;
+        }
     };
+
+    return ConfState::Success;
 }

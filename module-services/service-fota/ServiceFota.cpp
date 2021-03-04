@@ -346,7 +346,7 @@ namespace FotaService
     void Service::getActiveCotext()
     {
         if (dataChannel) {
-            auto availableContext = sendAndLogError("AT+QIACT?");
+            auto availableContext = sendAndLogError("AT+QIACT?", 150000);
             if (availableContext) {
                 parseQIACT(availableContext);
             }
@@ -525,7 +525,9 @@ namespace FotaService
             auto results = dataChannel->cmd(at::AT::QIGETERROR);
             LOG_WARN("error cmd:%s", cmdString.c_str());
             LOG_WARN("Error str:%s",
-                     std::accumulate(results.response.begin(), results.response.end(), std::string("\n")).c_str());
+                     utils::removeNewLines(
+                         std::accumulate(results.response.begin(), results.response.end(), std::string("\n")))
+                         .c_str());
         }
     }
 
