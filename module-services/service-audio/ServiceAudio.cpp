@@ -12,11 +12,146 @@
 #include <service-db/Settings.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 
+#include <algorithm>
+#include <initializer_list>
+#include <iterator>
 #include <type_traits>
+#include <utility>
 
 using namespace audio;
+using namespace sys::phone_modes;
 
-inline constexpr auto audioServiceStackSize = 1024 * 13;
+inline constexpr auto audioServiceStackSize = 1024 * 4;
+
+static constexpr auto defaultVolumeHigh  = "10";
+static constexpr auto defaultVolumeLow   = "2";
+static constexpr auto defaultVolumeMuted = "0";
+static constexpr auto defaultTrue        = "1";
+static constexpr auto defaultFalse       = "0";
+
+static constexpr std::initializer_list<std::pair<audio::DbPathElement, const char *>> cacheInitializer{
+
+    // PLAYBACK
+    {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackBluetoothA2DP}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker}, defaultVolumeHigh},
+
+    {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackHeadphones}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackBluetoothA2DP}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackLoudspeaker}, defaultVolumeHigh},
+
+    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackHeadphones}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackBluetoothA2DP}, defaultVolumeLow},
+    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker}, defaultVolumeHigh},
+
+    // ROUTING
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP}, "20"},
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker}, "3"},
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RoutingLoudspeaker}, "10"},
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones}, "0"},
+
+    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingBluetoothHSP}, defaultVolumeHigh},
+    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker}, defaultVolumeHigh},
+    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones}, defaultVolumeHigh},
+    {DbPathElement{Setting::Volume, PlaybackType::None, Profile::Type::RoutingLoudspeaker}, defaultVolumeHigh},
+
+    // RECORDING
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RecordingBuiltInMic}, "200"},
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RecordingHeadphones}, "100"},
+    {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RecordingBluetoothHSP}, "100"},
+
+    // MISC
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Connected},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Connected},
+     defaultTrue},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Connected},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Connected},
+     defaultTrue},
+    {DbPathElement{
+         Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Connected},
+     defaultTrue},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Connected},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle}, defaultTrue},
+
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultFalse},
+    {DbPathElement{
+         Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultTrue},
+
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Offline},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Offline},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Offline},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Offline},
+     defaultFalse},
+    {DbPathElement{
+         Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Offline},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Offline},
+     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::Offline},
+     defaultTrue},
+
+    {DbPathElement{Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Connected},
+     defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Connected},
+     defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Connected},
+     defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Connected},
+     defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Connected},
+     defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Connected},
+     defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::Connected}, defaultTrue},
+
+    {DbPathElement{Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultFalse},
+    {DbPathElement{Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultFalse},
+    {DbPathElement{Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultFalse},
+    {DbPathElement{
+         Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultFalse},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::DoNotDisturb},
+     defaultTrue},
+
+    {DbPathElement{Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Offline},
+     defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Offline},
+     defaultFalse},
+    {DbPathElement{Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Offline},
+     defaultFalse},
+    {DbPathElement{Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Offline},
+     defaultFalse},
+    {DbPathElement{Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Offline},
+     defaultFalse},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Offline},
+     defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::Offline}, defaultTrue},
+};
 
 ServiceAudio::ServiceAudio()
     : sys::Service(service::name::audio, "", audioServiceStackSize, sys::ServicePriority::Idle),
@@ -41,130 +176,10 @@ ServiceAudio::~ServiceAudio()
 
 sys::ReturnCodes ServiceAudio::InitHandler()
 {
-    static const std::string defaultVolumeHigh  = "10";
-    static const std::string defaultVolumeLow   = "2";
-    static const std::string defaultVolumeMuted = "0";
-    static const std::string defaultTrue        = "1";
-    static const std::string defaultFalse       = "0";
-
-    using namespace sys::phone_modes;
-
-    settingsCache = {
-
-        // PLAYBACK
-        {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
-        {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackBluetoothA2DP), defaultVolumeLow},
-        {dbPath(Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
-
-        {dbPath(Setting::Volume, PlaybackType::System, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
-        {dbPath(Setting::Volume, PlaybackType::System, Profile::Type::PlaybackBluetoothA2DP), defaultVolumeLow},
-        {dbPath(Setting::Volume, PlaybackType::System, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
-
-        {dbPath(Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackHeadphones), defaultVolumeLow},
-        {dbPath(Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackBluetoothA2DP), defaultVolumeLow},
-        {dbPath(Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker), defaultVolumeHigh},
-
-        // ROUTING
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP), "20"},
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingEarspeaker), "3"},
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingLoudspeaker), "10"},
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RoutingHeadphones), "0"},
-
-        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingBluetoothHSP), defaultVolumeHigh},
-        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingEarspeaker), defaultVolumeHigh},
-        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingHeadphones), defaultVolumeHigh},
-        {dbPath(Setting::Volume, PlaybackType::None, Profile::Type::RoutingLoudspeaker), defaultVolumeHigh},
-
-        // RECORDING
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RecordingBuiltInMic), "200"},
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RecordingHeadphones), "100"},
-        {dbPath(Setting::Gain, PlaybackType::None, Profile::Type::RecordingBluetoothHSP), "100"},
-
-        // MISC
-        {dbPath(Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Connected),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Connected),
-         defaultTrue},
-        {dbPath(Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Connected),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Connected),
-         defaultTrue},
-        {dbPath(Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Connected),
-         defaultTrue},
-        {dbPath(Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Connected),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle), defaultTrue},
-
-        {dbPath(Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultFalse},
-        {dbPath(
-             Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultTrue},
-
-        {dbPath(Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Offline),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Offline),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Offline),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Offline),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Offline),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Offline),
-         defaultFalse},
-        {dbPath(Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::Offline), defaultTrue},
-
-        {dbPath(Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Connected),
-         defaultTrue},
-        {dbPath(Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Connected),
-         defaultTrue},
-        {dbPath(Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Connected),
-         defaultTrue},
-        {dbPath(Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Connected),
-         defaultTrue},
-        {dbPath(Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Connected),
-         defaultTrue},
-        {dbPath(Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Connected),
-         defaultTrue},
-        {dbPath(Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::Connected), defaultTrue},
-
-        {dbPath(Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultTrue},
-        {dbPath(Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultFalse},
-        {dbPath(Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultFalse},
-        {dbPath(Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultFalse},
-        {dbPath(Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultFalse},
-        {dbPath(Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::DoNotDisturb),
-         defaultTrue},
-        {dbPath(Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::DoNotDisturb), defaultTrue},
-
-        {dbPath(Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Offline), defaultTrue},
-        {dbPath(Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Offline),
-         defaultFalse},
-        {dbPath(Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Offline),
-         defaultFalse},
-        {dbPath(Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Offline),
-         defaultFalse},
-        {dbPath(Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Offline),
-         defaultFalse},
-        {dbPath(Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Offline), defaultTrue},
-        {dbPath(Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::Offline), defaultTrue},
-    };
+    std::transform(std::begin(cacheInitializer),
+                   std::end(cacheInitializer),
+                   std::inserter(settingsCache, std::end(settingsCache)),
+                   [](auto &el) { return std::make_pair(dbPath(el.first), el.second); });
 
     for (const auto &setting : settingsCache) {
         settingsProvider->registerValueChange(
@@ -479,8 +494,8 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyP
 {
 
     // mute if 0 and return with parameter shouldn't popup
-    bool muted         = false;
-    auto context       = getCurrentContext();
+    bool muted   = false;
+    auto context = getCurrentContext();
 
     const auto currentVolume =
         utils::getNumericValue<int>(getSetting(Setting::Volume, Profile::Type::Idle, PlaybackType::None));
