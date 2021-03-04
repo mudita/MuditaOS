@@ -272,11 +272,16 @@ TS0710::ConfState TS0710::AudioConfProcedure()
         return ConfState ::Failure;
     }
     else if (ret.response[0].compare("+QDAI: 1,0,0,3,0,1,1,1") == 0) {
-        parser->cmd(at::AT::QRXGAIN);
-        parser->cmd(at::AT::CLVL);
-        parser->cmd(at::AT::QMIC);
-        SetupEchoCalceller(EchoCancellerStrength::Tuned);
-        return ConfState ::Success;
+        if (!parser->cmd(at::AT::QRXGAIN)) {
+            return ConfState ::Failure;
+        }
+        if (!parser->cmd(at::AT::CLVL)) {
+            return ConfState ::Failure;
+        }
+        if (!parser->cmd(at::AT::QMIC)) {
+            return ConfState ::Failure;
+        }
+        return SetupEchoCalceller(EchoCancellerStrength::Tuned);
     }
     else {
         if (!parser->cmd(at::AT::QDAI_INIT)) {
@@ -560,38 +565,80 @@ void TS0710::ExitSleepMode(void)
     return pv_cellular->ExitSleep();
 }
 
-void TS0710::SetupEchoCalceller(EchoCancellerStrength strength)
+TS0710::ConfState TS0710::SetupEchoCalceller(EchoCancellerStrength strength)
 {
     switch (strength) {
     case EchoCancellerStrength::LeastAggressive:
         // Aggressive settings
-        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
-        parser->cmd(at::factory(at::AT::QEEC) + "5,14");
-        parser->cmd(at::factory(at::AT::QEEC) + "10,140");
-        parser->cmd(at::factory(at::AT::QEEC) + "21,16000");
-        parser->cmd(at::factory(at::AT::QEEC) + "22,300");
-        parser->cmd(at::factory(at::AT::QEEC) + "24,450");
-        parser->cmd(at::factory(at::AT::QEEC) + "33,640");
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "0,2048")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "5,14")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "10,140")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "21,16000")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "22,300")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "24,450")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "33,640")) {
+            return ConfState::Failure;
+        }
         break;
     case EchoCancellerStrength::Medium:
         // Aggressive settings
-        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
-        parser->cmd(at::factory(at::AT::QEEC) + "5,14");
-        parser->cmd(at::factory(at::AT::QEEC) + "10,160");
-        parser->cmd(at::factory(at::AT::QEEC) + "21,19000");
-        parser->cmd(at::factory(at::AT::QEEC) + "22,600");
-        parser->cmd(at::factory(at::AT::QEEC) + "24,600");
-        parser->cmd(at::factory(at::AT::QEEC) + "33,768");
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "0,2048")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "5,14")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "10,160")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "21,19000")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "22,600")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "24,600")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "33,768")) {
+            return ConfState::Failure;
+        }
         break;
     case EchoCancellerStrength::Aggressive:
         // Aggressive settings
-        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
-        parser->cmd(at::factory(at::AT::QEEC) + "5,14");
-        parser->cmd(at::factory(at::AT::QEEC) + "10,160");
-        parser->cmd(at::factory(at::AT::QEEC) + "21,25000");
-        parser->cmd(at::factory(at::AT::QEEC) + "22,12000");
-        parser->cmd(at::factory(at::AT::QEEC) + "24,768");
-        parser->cmd(at::factory(at::AT::QEEC) + "33,896");
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "0,2048")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "5,14")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "10,160")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "21,25000")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "22,12000")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "24,768")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "33,896")) {
+            return ConfState::Failure;
+        }
         break;
     case EchoCancellerStrength::Tuned:
         /*
@@ -612,12 +659,31 @@ void TS0710::SetupEchoCalceller(EchoCancellerStrength strength)
             g) Increase the DENS_tail_portion in steps of 500, until 30000, and check the echo performance at each
         value. h) Set the parameter to the value that yielded the best echo performance.
         */
-        parser->cmd(at::factory(at::AT::QEEC) + "0,2048");
-        parser->cmd(at::factory(at::AT::QEEC) + "5,40"); // best performance on experiments in step 1
-        parser->cmd(at::factory(at::AT::QEEC) + "10,160");
-        parser->cmd(at::factory(at::AT::QEEC) + "21,26600"); // best performance on experiments in step 2c
-        parser->cmd(at::factory(at::AT::QEEC) + "22,20000"); // best performance on experiments in step 2g
-        parser->cmd(at::factory(at::AT::QEEC) + "24,768");
-        parser->cmd(at::factory(at::AT::QEEC) + "33,896");
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "0,2048")) {
+            return ConfState::Failure;
+        }
+        // best performance on experiments in step 1
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "5,40")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "10,160")) {
+            return ConfState::Failure;
+        }
+        // best performance on experiments in step 2c
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "21,26600")) {
+            return ConfState::Failure;
+        }
+        // best performance on experiments in step 2g
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "22,20000")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "24,768")) {
+            return ConfState::Failure;
+        }
+        if (!parser->cmd(at::factory(at::AT::QEEC) + "33,896")) {
+            return ConfState::Failure;
+        }
+        break;
     };
+    return ConfState::Success;
 }
