@@ -363,6 +363,7 @@ class TS0710
     ConfState AudioConfProcedure();
     ConfState StartMultiplexer();
 
+    size_t FlushReceiveData();
     ssize_t ReceiveData(std::vector<uint8_t> &data, uint32_t timeout);
 
     bsp::Cellular *getCellular()
