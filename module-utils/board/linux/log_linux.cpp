@@ -20,7 +20,7 @@ namespace Log
                                            LOGGER_BUFFER_SIZE - loggerBufferCurrentPos,
                                            "%s%-5s %s%s:%s:%d:%s ",
                                            logColors->levelColors[level].data(),
-                                           level_names[level],
+                                           levelNames[level],
                                            logColors->callerInfoColor.data(),
                                            file,
                                            function,
@@ -38,8 +38,8 @@ namespace Log
         assert(false && "Not implemented");
     }
 
-    void Logger::logToDevice(Device, std::string_view log, size_t)
+    void Logger::logToDevice(Device, std::string_view logMsg, size_t)
     {
-        std::cout << log;
+        std::cout << logMsg;
     }
 } // namespace Log

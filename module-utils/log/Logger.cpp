@@ -4,6 +4,7 @@
 #include "critical.hpp"
 #include <fstream>
 #include <gsl/gsl_util>
+#include "LockGuard.hpp"
 #include "Logger.hpp"
 #include "macros.h"
 
@@ -18,14 +19,14 @@ namespace Log
                                                             {"ServiceDB", logger_level::LOGINFO},
                                                             {CRIT_STR, logger_level::LOGTRACE},
                                                             {IRQ_STR, logger_level::LOGTRACE}};
-    const char *Logger::level_names[]                    = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+    const char *Logger::levelNames[]                     = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+
+    Logger::Logger() : circularBuffer(circularBufferSize)
+    {}
 
     void Logger::enableColors(bool enable)
     {
-        if (!lock()) {
-            return;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
+        LockGuard lock(mutex);
 
         if (enable) {
             logColors = &logColorsOn;
@@ -35,20 +36,23 @@ namespace Log
         }
     }
 
-    auto Logger::GetLogLevel(const std::string &name) -> logger_level
+    auto Logger::getLogLevel(const std::string &name) -> logger_level
     {
         return filtered[name];
     }
 
-    bool Logger::lock()
+    auto Logger::getLogs() -> std::string
     {
-        if (isIRQ()) {
-            bt = cpp_freertos::CriticalSection::EnterFromISR();
+        LockGuard lock(mutex);
+
+        std::string logs;
+        while (!circularBuffer.isEmpty()) {
+            const auto [result, msg] = circularBuffer.get();
+            if (result) {
+                logs += msg;
+            }
         }
-        else {
-            return mutex.Lock();
-        }
-        return true;
+        return logs;
     }
 
     void Logger::init()
@@ -62,10 +66,7 @@ namespace Log
 
     auto Logger::log(Device device, const char *fmt, va_list args) -> int
     {
-        if (!lock()) {
-            return -1;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
+        LockGuard lock(mutex);
 
         loggerBufferCurrentPos = 0;
 
@@ -76,6 +77,7 @@ namespace Log
             loggerBufferCurrentPos += (numOfBytesAddedToBuffer < sizeLeft) ? numOfBytesAddedToBuffer : (sizeLeft - 1);
 
             logToDevice(device, loggerBuffer, loggerBufferCurrentPos);
+            circularBuffer.put(std::string(loggerBuffer, loggerBufferCurrentPos));
             return loggerBufferCurrentPos;
         }
         return -1;
@@ -87,11 +89,7 @@ namespace Log
         if (!filterLogs(level)) {
             return -1;
         }
-
-        if (!lock()) {
-            return -1;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
+        LockGuard lock(mutex);
 
         loggerBufferCurrentPos = 0;
         addLogHeader(level, file, line, function);
@@ -104,6 +102,7 @@ namespace Log
             loggerBufferCurrentPos += snprintf(&loggerBuffer[loggerBufferCurrentPos], loggerBufferSizeLeft(), "\n");
 
             logToDevice(Device::DEFAULT, loggerBuffer, loggerBufferCurrentPos);
+            circularBuffer.put(std::string(loggerBuffer, loggerBufferCurrentPos));
             return loggerBufferCurrentPos;
         }
         return -1;
@@ -111,23 +110,10 @@ namespace Log
 
     auto Logger::logAssert(const char *fmt, va_list args) -> int
     {
-        if (!lock()) {
-            return -1;
-        }
-        auto _ = gsl::finally([this] { unlock(); });
+        LockGuard lock(mutex);
 
         logToDevice(fmt, args);
 
         return loggerBufferCurrentPos;
-    }
-
-    void Logger::unlock()
-    {
-        if (isIRQ()) {
-            cpp_freertos::CriticalSection::ExitFromISR(bt);
-        }
-        else {
-            mutex.Unlock();
-        }
     }
 }; // namespace Log
