@@ -6,11 +6,15 @@
 #include "service-appmgr/Controller.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
-#include "RichTextParser.hpp"
 #include "FontManager.hpp"
 
-#include "application-desktop/data/AppDesktopStyle.hpp"
-#include "Names.hpp"
+#include <module-gui/gui/widgets/BottomBar.hpp>
+#include <module-gui/gui/widgets/TopBar.hpp>
+#include <module-gui/gui/core/FontManager.hpp>
+
+#include <module-apps/application-desktop/data/AppDesktopStyle.hpp>
+#include <module-apps/application-desktop/data/LockPhoneData.hpp>
+#include <module-apps/application-desktop/windows/Names.hpp>
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <i18n/i18n.hpp>
@@ -25,6 +29,18 @@ PostUpdateWindow::PostUpdateWindow(app::Application *app)
 
 void PostUpdateWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
+    if (data == nullptr) {
+        LOG_ERROR("Received null pointer");
+    }
+    else {
+        auto *item = dynamic_cast<CurrentOsVersion *>(data);
+        if (item != nullptr) {
+            currentOsVersion = item->getCurrentOsVersion();
+            auto info        = utils::localize.get("app_desktop_update_success");
+            utils::findAndReplaceAll(info, "$VERSION", currentOsVersion);
+            infoText->setText(info);
+        }
+    }
     setVisibleState();
 }
 
@@ -78,8 +94,6 @@ void PostUpdateWindow::buildInterface()
                         post_update_style::primary_text::y,
                         post_update_style::primary_text::w,
                         post_update_style::primary_text::h);
-
-    infoText->setText(utils::localize.get("app_desktop_update_success"));
     infoText->setAlignment(Alignment::Horizontal::Center);
 }
 

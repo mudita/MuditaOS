@@ -11,98 +11,21 @@
 #include <i18n/i18n.hpp>
 
 #include <application-desktop/ApplicationDesktop.hpp>
+#include <application-desktop/data/Style.hpp>
 
 // services
 #include <service-appmgr/model/ApplicationManager.hpp>
 
 #include <Style.hpp>
 #include <DialogMetadataMessage.hpp>
-
 #include "UpdateProgress.hpp"
 
-namespace style
-{
-    namespace image
-    {
-        constexpr uint32_t x = 176;
-        constexpr uint32_t y = 132;
-    } // namespace image
-
-    namespace text
-    {
-        constexpr uint32_t x = 120;
-        constexpr uint32_t y = 250;
-        constexpr uint32_t w = 250;
-        constexpr uint32_t h = 100;
-    } // namespace text
-
-    namespace percentlabel
-    {
-        constexpr uint32_t x = 0;
-        constexpr uint32_t y = 450;
-        constexpr uint32_t w = 500;
-        constexpr uint32_t h = 100;
-    } // namespace percentlabel
-
-    namespace progressbar
-    {
-        constexpr uint32_t x = 100;
-        constexpr uint32_t y = 400;
-    } // namespace progressbar
-
-} // namespace style
 namespace gui
 {
-
     UpdateProgressWindow::UpdateProgressWindow(app::Application *app)
         : AppWindow(app, app::window::name::desktop_update_progress)
     {
         buildInterface();
-    }
-
-    void UpdateProgressWindow::rebuild()
-    {
-        destroyInterface();
-        buildInterface();
-    }
-
-    void UpdateProgressWindow::buildInterface()
-    {
-        AppWindow::buildInterface();
-
-        setTitle(utils::localize.get("app_desktop_update_muditaos"));
-
-        icon = new Image(this, style::image::x, style::image::y, "circle_update");
-
-        text = new Text(this, style::text::x, style::text::y, style::text::w, style::text::h);
-        text->setTextType(TextType::MultiLine);
-        text->setEditMode(EditMode::Browse);
-        text->setEdges(RectangleEdge::None);
-        text->setFont(style::window::font::biglight);
-        text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-
-        percentLabel = new gui::Label(
-            this, style::percentlabel::x, style::percentlabel::y, style::percentlabel::w, style::percentlabel::h);
-        percentLabel->setFilled(false);
-        percentLabel->setBorderColor(gui::ColorNoColor);
-        percentLabel->setFont(style::window::font::biglight);
-        percentLabel->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        percentLabel->setVisible(true);
-
-        updateProgress = new ProgressBar(this,
-                                         style::progressbar::x,
-                                         style::progressbar::y,
-                                         style::window_width - 2 * style::progressbar::x,
-                                         style::window::label::default_h);
-        updateProgress->setMaximum(100);
-        updateProgress->setValue(0);
-        updateProgress->setVisible(true);
-    }
-
-    void UpdateProgressWindow::destroyInterface()
-    {
-        erase();
     }
 
     void UpdateProgressWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -118,10 +41,95 @@ namespace gui
                 auto updateVersion =
                     msg.updateStats.versionInformation[boot::json::os_version][boot::json::version_string]
                         .string_value();
-                text->setRichText(utils::localize.get("app_desktop_update_preparing") + " " + updateVersion);
+                if (text->getText().empty()) {
+                    text->setText(utils::localize.get("app_desktop_update_preparing") + " " + updateVersion);
+                }
+                else {
+                    text->setText(textInfo);
+                }
             }
+            percentLabel->setText(std::to_string(progressPercent) + " %");
+            updateProgress->setValue(progressPercent);
         }
-        state = State::Return;
+        setVisibleState();
+    }
+
+    void UpdateProgressWindow::setVisibleState()
+    {
+        percentLabel->setVisible(true);
+        updateProgress->setVisible(true);
+        updateProgress->setVisible(true);
+        text->setVisible(true);
+    }
+
+    void UpdateProgressWindow::rebuild()
+    {
+        destroyInterface();
+        buildInterface();
+    }
+
+    top_bar::Configuration UpdateProgressWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    {
+        appConfiguration.enable(top_bar::Indicator::Time);
+        appConfiguration.disable(top_bar::Indicator::Lock);
+        appConfiguration.disable(top_bar::Indicator::Battery);
+        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.disable(top_bar::Indicator::Signal);
+        appConfiguration.disable(top_bar::Indicator::SimCard);
+        return appConfiguration;
+    }
+
+    void UpdateProgressWindow::buildInterface()
+    {
+        AppWindow::buildInterface();
+
+        setTitle(utils::localize.get("app_desktop_update_muditaos"));
+
+        icon = new Image(this, style::desktop::image::x, style::desktop::image::y, "circle_update");
+
+        text = new Text(this,
+                        style::desktop::textupdate::x,
+                        style::desktop::textupdate::y,
+                        style::desktop::textupdate::w,
+                        style::desktop::textupdate::h);
+        text->setTextType(TextType::MultiLine);
+        text->setEditMode(EditMode::Browse);
+        text->setEdges(RectangleEdge::None);
+        text->setFont(style::window::font::biglight);
+        text->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+
+        percentLabel = new gui::Label(this,
+                                      style::desktop::percentlabel::x,
+                                      style::desktop::percentlabel::y,
+                                      style::desktop::percentlabel::w,
+                                      style::desktop::percentlabel::h);
+        percentLabel->setFilled(false);
+        percentLabel->setBorderColor(gui::ColorNoColor);
+        percentLabel->setFont(style::window::font::biglight);
+        percentLabel->setAlignment(
+            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+
+        updateProgress = new ProgressBar(this,
+                                         style::window::progressBar::x,
+                                         style::window::progressBar::y,
+                                         style::window::progressBar::width,
+                                         style::window::progressBar::h);
+        updateProgress->setMaximum(100);
+        updateProgress->setValue(0);
+    }
+
+    void UpdateProgressWindow::destroyInterface()
+    {
+        erase();
+        invalidate();
+    }
+
+    void UpdateProgressWindow::invalidate() noexcept
+    {
+        percentLabel   = nullptr;
+        updateProgress = nullptr;
+        text           = nullptr;
+        icon           = nullptr;
     }
 
     bool UpdateProgressWindow::handleSwitchData(SwitchData *data)
@@ -129,52 +137,40 @@ namespace gui
         auto *item = dynamic_cast<gui::UpdateSwitchData *>(data);
         if (item != nullptr) {
             auto status = static_cast<updateos::UpdateState>(item->getUpdateOsMessage().updateStats.status);
-
             switch (status) {
             case updateos::UpdateState::Initial:
-                text->setRichText(text->getText());
+                textInfo        = text->getText();
                 progressPercent = 10;
                 break;
             case updateos::UpdateState::UpdateFileSet:
-                text->setRichText(text->getText());
+                textInfo        = text->getText();
                 progressPercent = 20;
                 break;
             case updateos::UpdateState::CreatingDirectories:
-                text->setRichText(text->getText());
+                textInfo        = text->getText();
                 progressPercent = 30;
                 break;
             case updateos::UpdateState::ExtractingFiles:
-                text->setRichText(utils::localize.get("app_desktop_update_in_progress"));
+                textInfo        = utils::localize.get("app_desktop_update_in_progress");
                 progressPercent = 40;
                 break;
             case updateos::UpdateState::ChecksumVerification:
-                text->setRichText(text->getText());
+                textInfo        = text->getText();
                 progressPercent = 70;
                 break;
             case updateos::UpdateState::VersionVerificiation:
-                text->setRichText(text->getText());
-                progressPercent = 90;
+                textInfo        = text->getText();
+                progressPercent = 80;
                 break;
             case updateos::UpdateState::UpdatingBootloader:
-                text->setRichText(text->getText());
+                textInfo        = utils::localize.get("app_desktop_update_ready_for_reset");
                 progressPercent = 99;
                 break;
             case updateos::UpdateState::ReadyForReset:
-                text->setRichText(utils::localize.get("app_desktop_update_ready_for_reset"));
+                textInfo        = text->getText();
                 progressPercent = 100;
                 break;
-            default:
-                if (item->getUpdateOsMessage().updateStats.messageText != "") {
-                    percentLabel->setText(item->getUpdateOsMessage().updateStats.messageText);
-                }
             }
-
-            percentLabel->setVisible(true);
-            percentLabel->setText(std::to_string(progressPercent) + " %");
-            updateProgress->setVisible(true);
-            updateProgress->setFocus(true);
-            updateProgress->setValue(progressPercent);
-            text->setVisible(true);
         }
         return true;
     }

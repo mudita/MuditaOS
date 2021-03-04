@@ -515,7 +515,7 @@ namespace app
         if (value.empty()) {
             return;
         }
-        osCurrentVersion = std::move(value);
+        osCurrentVersion = value;
     }
     void ApplicationDesktop::setOsUpdateVersion(const std::string &value)
     {
@@ -524,7 +524,6 @@ namespace app
             return;
         }
         osUpdateVersion = value;
-        settings->setValue(
-            settings::SystemProperties::osUpdateVersion, std::move(value), settings::SettingsScope::Global);
+        settings->setValue(settings::SystemProperties::osUpdateVersion, value, settings::SettingsScope::Global);
     }
 } // namespace app
