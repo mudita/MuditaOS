@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -38,41 +38,79 @@ namespace parserFSM
 
       private:
         auto processPut(Context &context) -> ProcessResult final;
+        auto processPutKeyPressed(Context &context) -> ProcessResult;
+        auto processPutAT(Context &context) -> ProcessResult;
+        auto processPutFocus() -> ProcessResult;
+        auto processPutIsLocked() -> ProcessResult;
+        auto processPutChangeAutoLockTimeout(Context &context) -> ProcessResult;
+        auto processPutChangeSim(Context &context) -> ProcessResult;
+        auto processPutChangeCellularState(Context &context) -> ProcessResult;
+        auto processPutSms(Context &context) -> ProcessResult;
+        auto processPutTethering(Context &context) -> ProcessResult;
+        auto processPutUsbSecurity(Context &context) -> ProcessResult;
+        auto processPutAppMgr(Context &context) -> ProcessResult;
+
         auto processGet(Context &context) -> ProcessResult final;
+        auto processGetInfo(Context &context) -> ProcessResult;
+        auto processGetAppMgr(Context &context) -> ProcessResult;
     };
 
     namespace json::developerMode
     {
-        inline constexpr auto keyPressed             = "keyPressed";
-        inline constexpr auto state                  = "state";
-        inline constexpr auto systemStarted          = "systemStarted";
-        inline constexpr auto ATResponse             = "ATResponse";
-        inline constexpr auto AT                     = "AT";
-        inline constexpr auto timeout                = "timeout";
-        inline constexpr auto focus                  = "focus";
-        inline constexpr auto isLocked               = "isLocked";
-        inline constexpr auto changeSim              = "changeSim";
-        inline constexpr auto changeAutoLockTimeout  = "changeAutoLockTimeout";
-        inline constexpr auto smsCommand             = "smsCommand";
-        inline constexpr auto changeCellularStateCmd = "changeCellularStateCmd";
-        inline constexpr auto getInfo                = "getInfo";
-        inline constexpr auto tethering              = "tethering";
-        inline constexpr auto usbSecurityStatus      = "usbSecurityStatus";
-        /// values for getInfo cmd
-        inline constexpr auto simStateInfo      = "simState";
-        inline constexpr auto cellularStateInfo = "cellularState";
+        namespace cmd
+        {
+            inline constexpr auto keyPressed            = "keyPressed";
+            inline constexpr auto state                 = "state";
+            inline constexpr auto systemStarted         = "systemStarted";
+            inline constexpr auto ATResponse            = "ATResponse";
+            inline constexpr auto AT                    = "AT";
+            inline constexpr auto focus                 = "focus";
+            inline constexpr auto isLocked              = "isLocked";
+            inline constexpr auto changeSim             = "changeSim";
+            inline constexpr auto sms                   = "smsCommand";
+            inline constexpr auto changeAutoLockTimeout = "changeAutoLockTimeout";
+            inline constexpr auto changeCellularState   = "changeCellularStateCmd";
+            inline constexpr auto getInfo               = "getInfo";
+            inline constexpr auto tethering             = "tethering";
+            inline constexpr auto usbSecurityStatus     = "usbSecurityStatus";
+            inline constexpr auto appmgr                = "applicationManager";
+        } // namespace cmd
 
-        /// values for smsCommand
-        inline constexpr auto smsAdd = "smsAdd";
+        namespace at
+        {
+            inline constexpr auto timeout = "timeout";
+        } // namespace at
 
-        /// values for tethering
-        inline constexpr auto tetheringOn  = "on";
-        inline constexpr auto tetheringOff = "off";
+        namespace getInfo
+        {
+            inline constexpr auto simStateInfo      = "simState";
+            inline constexpr auto cellularStateInfo = "cellularState";
+        } // namespace getInfo
 
-        // values for usb security
-        inline constexpr auto usbLocked   = "locked";
-        inline constexpr auto usbUnlocked = "unlocked";
+        namespace sms
+        {
+            inline constexpr auto smsAdd = "smsAdd";
+        } // namespace sms
 
+        namespace tethering
+        {
+            inline constexpr auto on  = "on";
+            inline constexpr auto off = "off";
+        } // namespace tethering
+
+        namespace usbSecurityStatus
+        {
+            inline constexpr auto locked   = "locked";
+            inline constexpr auto unlocked = "unlocked";
+        } // namespace usbSecurityStatus
+
+        namespace appmgr
+        {
+            inline constexpr auto appStack   = "applicationStack";
+            inline constexpr auto startApp   = "startApplication";
+            inline constexpr auto closeApp   = "closeApplication";
+            inline constexpr auto switchBack = "switchBack";
+        } // namespace appmgr
     } // namespace json::developerMode
 
 } // namespace parserFSM

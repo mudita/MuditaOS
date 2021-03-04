@@ -4,15 +4,15 @@
 namespace sdesktop::developerMode
 {
     ATResponseEvent::ATResponseEvent(std::string command, std::chrono::milliseconds timeout)
-        : command(std::move(command)), timeout(timeout)
+        : Event(), command(std::move(command)), timeout(timeout)
     {
         context.setResponseStatus(parserFSM::http::Code::InternalServerError);
-        context.setResponseBody(json11::Json::object{{parserFSM::json::developerMode::ATResponse, ""}});
+        context.setResponseBody(json11::Json::object{{parserFSM::json::developerMode::cmd::ATResponse, ""}});
     }
 
     void ATResponseEvent::setResponse(const std::vector<std::string> &response)
     {
-        context.setResponseBody(json11::Json::object{{parserFSM::json::developerMode::ATResponse, response}});
+        context.setResponseBody(json11::Json::object{{parserFSM::json::developerMode::cmd::ATResponse, response}});
         context.setResponseStatus(parserFSM::http::Code::OK);
     }
 

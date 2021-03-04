@@ -147,7 +147,15 @@ namespace sys
         }
         std::for_each(sortedServices.begin(), sortedServices.end(), [this](const auto &service) {
             const auto startTimeout = service.get().getStartTimeout().count();
-            if (const auto success = RunSystemService(service.get().create(), this, startTimeout); !success) {
+            bool success            = false;
+            try {
+                success = RunSystemService(service.get().create(), this, startTimeout);
+            }
+            catch (const std::exception &e) {
+                LOG_FATAL("Exeception during service [%s] creation: %s.", service.get().getName().c_str(), e.what());
+            }
+
+            if (!success) {
                 LOG_FATAL("Unable to start service: %s", service.get().getName().c_str());
                 throw SystemInitialisationError{"System startup failed: unable to start a system service."};
             }

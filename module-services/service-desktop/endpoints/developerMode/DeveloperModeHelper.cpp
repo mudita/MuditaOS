@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DeveloperModeHelper.hpp"
@@ -22,6 +22,8 @@
 #include <time/time_conversion.hpp>
 #include <service-desktop/parser/MessageHandler.hpp>
 #include <service-desktop/endpoints/developerMode/event/ATRequest.hpp>
+#include <service-desktop/endpoints/developerMode/event/ApplicationManagerEvents.hpp>
+#include <service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 #include <service-appmgr/service-appmgr/Controller.hpp>
 
 namespace parserFSM
@@ -36,124 +38,247 @@ namespace
 
     auto toTetheringState(const std::string &state) -> sys::phone_modes::Tethering
     {
-        return state == json::developerMode::tetheringOn ? sys::phone_modes::Tethering::On
-                                                         : sys::phone_modes::Tethering::Off;
+        return state == json::developerMode::tethering::on ? sys::phone_modes::Tethering::On
+                                                           : sys::phone_modes::Tethering::Off;
     }
 } // namespace
 
 auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
 {
-    auto body = context.getBody();
-    auto code = http::Code::BadRequest;
-    if (body[json::developerMode::keyPressed].is_number()) {
-        auto keyValue = body[json::developerMode::keyPressed].int_value();
-        auto state    = body[json::developerMode::state].int_value();
-        sendKeypress(getKeyCode(keyValue), static_cast<gui::InputEvent::State>(state));
-        app::manager::Controller::preventBlockingDevice(owner);
-        return {sent::no, std::nullopt};
-    }
-    else if (body[json::developerMode::AT].is_string()) {
-        using namespace sdesktop::developerMode;
-        auto cmd     = body[json::developerMode::AT].string_value();
-        auto timeout = std::chrono::milliseconds(body[json::developerMode::timeout].int_value());
-        LOG_DEBUG("at request send >%s\n< with timeout >%d<", cmd.c_str(), int(timeout.count()));
-        auto event = std::make_unique<ATResponseEvent>(cmd, timeout);
-        auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
-        code       = toCode(owner->bus.sendUnicast(msg, ServiceCellular::serviceName));
-        return {sent::delayed, std::nullopt};
-    }
-    else if (body[json::developerMode::focus].bool_value()) {
-        auto event = std::make_unique<sdesktop::developerMode::AppFocusChangeEvent>();
-        auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        code       = toCode(owner->bus.sendUnicast(std::move(msg), service::name::evt_manager));
-        return {sent::delayed, std::nullopt};
-    }
-    else if (body[json::developerMode::isLocked].bool_value()) {
-        auto event = std::make_unique<sdesktop::developerMode::ScreenlockCheckEvent>();
-        auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
-        code       = toCode(owner->bus.sendUnicast(std::move(msg), "ApplicationDesktop"));
-        return {sent::delayed, std::nullopt};
-    }
-    else if (body[json::developerMode::changeAutoLockTimeout].is_string()) {
-        auto value = body[json::developerMode::changeAutoLockTimeout].string_value();
-        settings::EntryPath path;
-        path.variable = settings::SystemProperties::lockTime;
-        path.service  = service::name::db;
-        path.scope    = settings::SettingsScope::Global;
-        auto msg      = std::make_shared<settings::Messages::SetVariable>(std::move(path), std::move(value));
-        code          = toCode(owner->bus.sendUnicast(std::move(msg), service::name::db));
-        return {sent::no, endpoint::ResponseContext{.status = code}};
-    }
-    else if (body[json::developerMode::changeSim].is_number()) {
-        int simSelected = body[json::developerMode::changeSim].int_value();
-        requestSimChange(simSelected);
-        code = toCode(true);
-        return {sent::no, endpoint::ResponseContext{.status = code}};
-    }
-    else if (body[json::developerMode::changeCellularStateCmd].is_number()) {
-        int cellularState = body[json::developerMode::changeCellularStateCmd].int_value();
-        code              = toCode(requestCellularPowerStateChange(cellularState));
-        return {sent::no, endpoint::ResponseContext{.status = code}};
-    }
-    else if (body[json::developerMode::smsCommand].is_string()) {
-        if (body[json::developerMode::smsCommand].string_value() == json::developerMode::smsAdd) {
-            const auto smsType = static_cast<SMSType>(context.getBody()[json::messages::messageType].int_value());
-            if (smsType == SMSType::DRAFT || smsType == SMSType::QUEUED || smsType == SMSType::FAILED) {
-                return prepareSMS(context);
-            }
-            else {
-                return {sent::no, endpoint::ResponseContext{.status = http::Code::NotAcceptable}};
-            }
-        }
-    }
-    else if (body[json::developerMode::tethering].is_string()) {
-        const auto &tetheringState = body[json::developerMode::tethering].string_value();
-        owner->bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(toTetheringState(tetheringState)),
-                               service::name::system_manager);
-        return {sent::delayed, std::nullopt};
-    }
-    else if (body[json::developerMode::usbSecurityStatus].is_string()) {
-        std::shared_ptr<sys::DataMessage> msg = std::make_shared<sdesktop::usb::USBConfigured>();
-        if (body[json::developerMode::usbSecurityStatus].string_value() == json::developerMode::usbUnlocked) {
-            msg = std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>();
-        }
-        code = toCode(owner->bus.sendUnicast(std::move(msg), "ServiceDesktop"));
-    }
+    using namespace json::developerMode;
+    const auto &body = context.getBody();
 
+    if (body[cmd::keyPressed].is_number()) {
+        return processPutKeyPressed(context);
+    }
+    else if (body[cmd::AT].is_string()) {
+        return processPutAT(context);
+    }
+    else if (body[cmd::focus].bool_value()) {
+        return processPutFocus();
+    }
+    else if (body[cmd::isLocked].bool_value()) {
+        return processPutIsLocked();
+    }
+    else if (body[cmd::changeAutoLockTimeout].is_string()) {
+        return processPutChangeAutoLockTimeout(context);
+    }
+    else if (body[cmd::changeSim].is_number()) {
+        return processPutChangeSim(context);
+    }
+    else if (body[cmd::changeCellularState].is_number()) {
+        return processPutChangeCellularState(context);
+    }
+    else if (body[cmd::sms].is_string()) {
+        return processPutSms(context);
+    }
+    else if (body[cmd::tethering].is_string()) {
+        return processPutTethering(context);
+    }
+    else if (body[cmd::usbSecurityStatus].is_string()) {
+        return processPutUsbSecurity(context);
+    }
+    else if (body[cmd::appmgr].bool_value()) {
+        return processPutAppMgr(context);
+    }
     else {
         context.setResponseStatus(http::Code::BadRequest);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
     }
+
+    return {sent::no, endpoint::ResponseContext{.status = http::Code::BadRequest}};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processPutKeyPressed(Context &context)
+{
+    using namespace json::developerMode;
+    const auto &body    = context.getBody();
+    const auto keyValue = body[cmd::keyPressed].int_value();
+    const auto state    = body[cmd::state].int_value();
+    sendKeypress(getKeyCode(keyValue), static_cast<gui::InputEvent::State>(state));
+    app::manager::Controller::preventBlockingDevice(owner);
+    return {sent::no, std::nullopt};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processPutAT(Context &context)
+{
+    using namespace json::developerMode;
+    using namespace sdesktop::developerMode;
+    const auto &body    = context.getBody();
+    const auto &cmd     = body[cmd::AT].string_value();
+    const auto &timeout = std::chrono::milliseconds(body[json::developerMode::at::timeout].int_value());
+    LOG_DEBUG("at request send >%s\n< with timeout >%d<", cmd.c_str(), int(timeout.count()));
+    auto event = std::make_unique<ATResponseEvent>(cmd, timeout);
+    auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
+    owner->bus.sendUnicast(msg, ServiceCellular::serviceName);
+    return {sent::delayed, std::nullopt};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processPutFocus()
+{
+    using namespace sdesktop::developerMode;
+    auto event = std::make_unique<AppFocusChangeEvent>();
+    auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
+    owner->bus.sendUnicast(std::move(msg), service::name::evt_manager);
+    return {sent::delayed, std::nullopt};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processPutIsLocked()
+{
+    using namespace sdesktop::developerMode;
+    auto event = std::make_unique<ScreenlockCheckEvent>();
+    auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
+    owner->bus.sendUnicast(std::move(msg), "ApplicationDesktop");
+    return {sent::delayed, std::nullopt};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processPutChangeAutoLockTimeout(Context &context)
+{
+    using namespace json::developerMode;
+    const auto &body  = context.getBody();
+    const auto &value = body[cmd::changeAutoLockTimeout].string_value();
+    settings::EntryPath path;
+    path.variable   = settings::SystemProperties::lockTime;
+    path.service    = service::name::db;
+    path.scope      = settings::SettingsScope::Global;
+    auto msg        = std::make_shared<settings::Messages::SetVariable>(std::move(path), std::move(value));
+    const auto code = toCode(owner->bus.sendUnicast(std::move(msg), service::name::db));
     return {sent::no, endpoint::ResponseContext{.status = code}};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processPutChangeSim(Context &context)
+{
+    using namespace json::developerMode;
+    const auto &body      = context.getBody();
+    const int simSelected = body[cmd::changeSim].int_value();
+    requestSimChange(simSelected);
+    return {sent::no, endpoint::ResponseContext{.status = toCode(true)}};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processPutChangeCellularState(Context &context)
+{
+    using namespace json::developerMode;
+    const auto &body        = context.getBody();
+    const int cellularState = body[cmd::changeCellularState].int_value();
+    const auto code         = toCode(requestCellularPowerStateChange(cellularState));
+    return {sent::no, endpoint::ResponseContext{.status = code}};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processPutSms(Context &context)
+{
+    using namespace json::developerMode;
+    const auto &body = context.getBody();
+
+    if (body[cmd::sms].string_value() != sms::smsAdd) {
+        return {sent::no, endpoint::ResponseContext{.status = http::Code::BadRequest}};
+    }
+
+    const auto smsType = static_cast<SMSType>(body[json::messages::messageType].int_value());
+    if (smsType == SMSType::DRAFT || smsType == SMSType::QUEUED || smsType == SMSType::FAILED) {
+        return prepareSMS(context);
+    }
+
+    return {sent::no, endpoint::ResponseContext{.status = http::Code::NotAcceptable}};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processPutTethering(Context &context)
+{
+    using namespace json::developerMode;
+    const auto &body           = context.getBody();
+    const auto &tetheringState = body[cmd::tethering].string_value();
+    owner->bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(toTetheringState(tetheringState)),
+                           service::name::system_manager);
+    return {sent::delayed, std::nullopt};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processPutUsbSecurity(Context &context)
+{
+    using namespace json::developerMode;
+    const auto &body                      = context.getBody();
+    std::shared_ptr<sys::DataMessage> msg = std::make_shared<sdesktop::usb::USBConfigured>();
+    if (body[cmd::usbSecurityStatus].string_value() == usbSecurityStatus::unlocked) {
+        msg = std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>();
+    }
+    auto code = toCode(owner->bus.sendUnicast(std::move(msg), "ServiceDesktop"));
+
+    return {sent::no, endpoint::ResponseContext{.status = code}};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processPutAppMgr(Context &context)
+{
+    using namespace sdesktop::developerMode;
+    using namespace json::developerMode;
+    const auto &body = context.getBody();
+
+    if (body[appmgr::startApp].is_string()) {
+        auto event = std::make_unique<ApplicationStartRequest>(body[appmgr::startApp].string_value());
+        auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
+        owner->bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName);
+        return {sent::delayed, std::nullopt};
+    }
+    else if (body[appmgr::switchBack].bool_value()) {
+        auto event = std::make_unique<ApplicationSwitchBackRequest>();
+        auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
+        owner->bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName);
+        return {sent::delayed, std::nullopt};
+    }
+
+    return {sent::no, endpoint::ResponseContext{.status = http::Code::BadRequest}};
 }
 
 auto DeveloperModeHelper::processGet(Context &context) -> ProcessResult
 {
-    auto body = context.getBody();
-    if (body[json::developerMode::getInfo].is_string()) {
-        auto keyValue = body[json::developerMode::getInfo].string_value();
-        if (keyValue == json::developerMode::simStateInfo) {
-            auto response = endpoint::ResponseContext{
-                .body = json11::Json::object(
-                    {{json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
-                     {json::sim, std::to_string(static_cast<int>(Store::GSM::get()->sim))},
-                     {json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))}})};
-            response.status = http::Code::OK;
-            return {sent::no, std::move(response)};
-        }
-        else if (keyValue == json::developerMode::cellularStateInfo) {
-            if (requestServiceStateInfo(owner) == false) {
-                return {sent::no, endpoint::ResponseContext{.status = http::Code::NotAcceptable}};
-            }
-        }
-        else {
-            return {sent::no, endpoint::ResponseContext{.status = http::Code::BadRequest}};
+    using namespace json::developerMode;
+    const auto body = context.getBody();
+
+    if (body[cmd::getInfo].is_string()) {
+        return processGetInfo(context);
+    }
+    else if (body[cmd::appmgr].bool_value()) {
+        return processGetAppMgr(context);
+    }
+
+    return {sent::no, endpoint::ResponseContext{.status = http::Code::BadRequest}};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processGetInfo(Context &context)
+{
+    using namespace json::developerMode;
+    const auto body     = context.getBody();
+    const auto keyValue = body[cmd::getInfo].string_value();
+
+    if (keyValue == getInfo::simStateInfo) {
+        auto response = endpoint::ResponseContext{
+            .body = json11::Json::object(
+                {{json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
+                 {json::sim, std::to_string(static_cast<int>(Store::GSM::get()->sim))},
+                 {json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))}})};
+        response.status = http::Code::OK;
+        return {sent::no, std::move(response)};
+    }
+    else if (keyValue == getInfo::cellularStateInfo) {
+        if (requestServiceStateInfo(owner) == false) {
+            return {sent::no, endpoint::ResponseContext{.status = http::Code::NotAcceptable}};
         }
     }
-    else {
-        return {sent::no, endpoint::ResponseContext{.status = http::Code::BadRequest}};
+
+    return {sent::no, endpoint::ResponseContext{.status = http::Code::BadRequest}};
+}
+
+BaseHelper::ProcessResult DeveloperModeHelper::processGetAppMgr(Context &context)
+{
+    using namespace sdesktop::developerMode;
+    using namespace json::developerMode;
+    const auto body = context.getBody();
+
+    if (body[appmgr::appStack].bool_value()) {
+        auto event = std::make_unique<ApplicationStackRequest>();
+        auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
+        owner->bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName);
+        return {sent::delayed, std::nullopt};
     }
-    return {sent::no, std::nullopt};
+
+    return {sent::no, endpoint::ResponseContext{.status = http::Code::BadRequest}};
 }
 
 auto DeveloperModeHelper::getKeyCode(int val) noexcept -> bsp::KeyCodes

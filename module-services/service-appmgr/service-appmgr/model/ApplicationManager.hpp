@@ -44,6 +44,13 @@ namespace app
     } // namespace manager
 } // namespace app
 
+namespace sdesktop::developerMode
+{
+    class ApplicationStackRequest;
+    class ApplicationStartRequest;
+    class ApplicationSwitchBackRequest;
+} // namespace sdesktop::developerMode
+
 namespace app::manager
 {
     class ApplicationManagerBase
@@ -56,6 +63,8 @@ namespace app::manager
             AwaitingCloseConfirmation,
             AwaitingLostFocusConfirmation
         };
+
+        using ApplicationsStack = std::deque<ApplicationName>;
 
         explicit ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers);
         virtual ~ApplicationManagerBase() = default;
@@ -80,11 +89,11 @@ namespace app::manager
         }
 
       protected:
+        const ApplicationsStack &getApplicationStack() const;
+
         ApplicationsRegistry applications;
 
       private:
-        using ApplicationsStack = std::deque<ApplicationName>;
-
         State state = State::Running;
         ApplicationsStack stack;
     };
@@ -137,6 +146,13 @@ namespace app::manager
         auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         /// handles dom request by passing this request to application which should provide the dom
         auto handleDOMRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
+        auto handleDeveloperModeMessage(sys::Message *request) -> sys::MessagePointer;
+        auto handleApplicationStackRequest(sdesktop::developerMode::ApplicationStackRequest *request)
+            -> sys::MessagePointer;
+        auto handleApplicationStartRequest(sdesktop::developerMode::ApplicationStartRequest *request)
+            -> sys::MessagePointer;
+        auto handleApplicationSwitchBackRequest(sdesktop::developerMode::ApplicationSwitchBackRequest *request)
+            -> sys::MessagePointer;
 
         void requestApplicationClose(ApplicationHandle &app, bool isCloseable);
         void onApplicationSwitch(ApplicationHandle &app,

@@ -174,10 +174,16 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationOnBoarding>(app::name_onboarding));
 #endif
             // start application manager
-            return sysmgr->RunSystemService(
-                std::make_shared<app::manager::ApplicationManager>(
-                    app::manager::ApplicationManager::ServiceName, std::move(applications), app::name_desktop),
-                sysmgr.get());
+            try {
+                return sysmgr->RunSystemService(
+                    std::make_shared<app::manager::ApplicationManager>(
+                        app::manager::ApplicationManager::ServiceName, std::move(applications), app::name_desktop),
+                    sysmgr.get());
+            }
+            catch (const std::exception &e) {
+                LOG_FATAL("Exeception during appmgr creation: %s.", e.what());
+                return false;
+            }
         });
 
     LOG_PRINTF("Launching PurePhone \n");

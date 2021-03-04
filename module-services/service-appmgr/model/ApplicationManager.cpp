@@ -21,6 +21,7 @@
 #include <service-eink/ServiceEink.hpp>
 #include <service-gui/Common.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <service-desktop/endpoints/developerMode/event/ApplicationManagerEvents.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -38,7 +39,7 @@ namespace app::manager
     namespace
     {
         constexpr auto ApplicationManagerStackDepth = 3072;
-        constexpr auto timerBlock         = "BlockTimer";
+        constexpr auto timerBlock                   = "BlockTimer";
     } // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
@@ -65,6 +66,11 @@ namespace app::manager
     void ApplicationManagerBase::clearStack()
     {
         stack.clear();
+    }
+
+    const ApplicationManagerBase::ApplicationsStack &ApplicationManagerBase::getApplicationStack() const
+    {
+        return stack;
     }
 
     auto ApplicationManagerBase::getFocusedApplication() const noexcept -> ApplicationHandle *
@@ -174,11 +180,76 @@ namespace app::manager
         sys::SystemManager::SuspendService(service::name::eink, this);
     }
 
+    sys::MessagePointer ApplicationManager::handleDeveloperModeMessage(sys::Message *request)
+    {
+        using namespace sdesktop::developerMode;
+        const auto devMsg = static_cast<DeveloperModeRequest *>(request);
+        const auto &evt   = devMsg->event;
+
+        if (typeid(*evt.get()) == typeid(ApplicationStackRequest)) {
+            return handleApplicationStackRequest(dynamic_cast<ApplicationStackRequest *>(evt.get()));
+        }
+        else if (typeid(*evt.get()) == typeid(ApplicationStartRequest)) {
+            return handleApplicationStartRequest(dynamic_cast<ApplicationStartRequest *>(evt.get()));
+        }
+        else if (typeid(*evt.get()) == typeid(ApplicationSwitchBackRequest)) {
+            return handleApplicationSwitchBackRequest(dynamic_cast<ApplicationSwitchBackRequest *>(evt.get()));
+        }
+        else {
+            LOG_WARN("Received unsupported event type.");
+            return sys::MessageNone{};
+        }
+    }
+
+    sys::MessagePointer ApplicationManager::handleApplicationStackRequest(
+        sdesktop::developerMode::ApplicationStackRequest *request)
+    {
+        request->setResponse(getApplicationStack());
+        request->send();
+        return sys::MessageNone{};
+    }
+
+    sys::MessagePointer ApplicationManager::handleApplicationStartRequest(
+        sdesktop::developerMode::ApplicationStartRequest *request)
+    {
+        if (Controller::sendAction(
+                this, actions::Launch, std::make_unique<app::ApplicationLaunchData>(request->getAppToStart()))) {
+            request->appStartConfirmed();
+        }
+        else {
+            request->appStartFailed();
+        }
+
+        request->send();
+
+        return sys::MessageNone{};
+    }
+
+    sys::MessagePointer ApplicationManager::handleApplicationSwitchBackRequest(
+        sdesktop::developerMode::ApplicationSwitchBackRequest *request)
+    {
+        if (Controller::switchBack(this)) {
+            request->switchBackConfirmed();
+        }
+        else {
+            request->switchBackFailed();
+        }
+
+        request->send();
+
+        return sys::MessageNone{};
+    }
+
     void ApplicationManager::startBackgroundApplications()
     {
         for (const auto &name : std::vector<ApplicationName>{app::name_call, app::special_input}) {
             if (auto app = getApplication(name); app != nullptr) {
-                app->runInBackground(this);
+                try {
+                    app->runInBackground(this);
+                }
+                catch (const std::exception &e) {
+                    LOG_FATAL("Exeception during app [%s] creation: %s.", app->name().c_str(), e.what());
+                }
             }
         }
     }
@@ -322,6 +393,8 @@ namespace app::manager
         });
 
         connect(typeid(app::manager::DOMRequest), [&](sys::Message *request) { return handleDOMRequest(request); });
+        connect(typeid(sdesktop::developerMode::DeveloperModeRequest),
+                [this](sys::Message *request) { return handleDeveloperModeMessage(request); });
 
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
         connect(typeid(CellularSimRequestPinMessage), convertibleToActionHandler);
@@ -363,12 +436,18 @@ namespace app::manager
             LOG_INFO("Switching focus to application [%s] (window [%s])", app.name().c_str(), app.switchWindow.c_str());
             setState(State::AwaitingFocusConfirmation);
             app::Application::messageSwitchApplication(this, app.name(), app.switchWindow, std::move(app.switchData));
+            return true;
         }
-        else {
+
+        try {
             LOG_INFO("Starting application %s", app.name().c_str());
             app.run(this);
+            return true;
         }
-        return true;
+        catch (const std::exception &e) {
+            LOG_FATAL("Exeception during app [%s] creation: %s.", app.name().c_str(), e.what());
+            return false;
+        }
     }
 
     auto ApplicationManager::closeApplications() -> bool
@@ -509,7 +588,7 @@ namespace app::manager
     auto ApplicationManager::handleLaunchAction(ActionEntry &action) -> bool
     {
         auto launchParams = static_cast<ApplicationLaunchData *>(action.params.get());
-        auto targetApp = getApplication(launchParams->getTargetApplicationName());
+        auto targetApp    = getApplication(launchParams->getTargetApplicationName());
         if (targetApp == nullptr || !targetApp->handles(actions::Launch)) {
             return false;
         }
