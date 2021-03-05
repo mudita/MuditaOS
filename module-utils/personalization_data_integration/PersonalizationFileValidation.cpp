@@ -95,19 +95,17 @@ namespace phone_personalization {
                 {
                     LOG_ERROR("Optional parameter: '%s' is invalid! Parameter value remains set to default",
                               param->first.c_str());
+                    param->second.isValid = false;
                 }
                 else
                 {
-                    LOG_INFO(
-                            "Optional parameter: '%s' is valid. Default value '%s' will be changed to value provided with personalization file: '%s'",
-                            param->first.c_str(), param->second.value.c_str(),
-                            jsonObj[param->first].string_value().c_str());
-                    param->second.value = jsonObj[param->first].string_value();
+                    LOG_INFO("Optional parameter: '%s' is valid", param->first.c_str());
+                    param->second.isValid = true;
                 }
             }
             LOG_INFO("Optional parameters are valid");
         }
-        LOG_ERROR("Empty json object!");
+        LOG_ERROR("Params json object not parsed!");
     }
 
     auto PersonalizationFileValidator::validate() -> bool
@@ -124,13 +122,30 @@ namespace phone_personalization {
         {
             return false;
         }
+        validateOptionalParams();
 
         return true;
     }
 
-    auto PersonalizationFileValidator::getValidatedOptionalParams() -> std::map<std::string, OptionalParameter>
+    auto PersonalizationParamsGetter::getParams() -> std::map<std::string, std::string>
     {
-        validateOptionalParams();
-        return optionalParams;
+        auto jsonObj = personalizationParser.getJsonObject();
+        auto optionalParams = personalizationParser.getDefaultOptionalParamsMap();
+
+        if(jsonObj != nullptr)
+        {
+            parameters[param::serial_number::key] = jsonObj[param::serial_number::key].string_value();
+            for (auto param : optionalParams) {
+                if (param.second.isValid) {
+                    parameters[param.first] = jsonObj[param.first].string_value();
+                } else {
+                    parameters[param.first] = param.second.defaultValue;
+                }
+            }
+            return parameters;
+        }
+        LOG_ERROR("Parameter object not parsed");
+        return parameters;
     }
+
 } // namespace phone_personalization

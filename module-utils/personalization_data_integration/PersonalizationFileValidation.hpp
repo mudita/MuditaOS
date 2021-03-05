@@ -13,8 +13,9 @@ namespace phone_personalization
 {
     struct OptionalParameter
     {
-        std::string value;
+        std::string defaultValue;
         std::vector<std::string> validValues;
+        bool isValid = false;
     };
 
     namespace param
@@ -37,12 +38,22 @@ namespace phone_personalization
 
     class PersonalizationFileParser
     {
+        void setDefaultOptionalParamsMap()
+        {
+            optionalParams = {
+                    {param::case_colour::key, OptionalParameter{param::case_colour::default_value, param::case_colour::valid_values}}
+            };
+        }
     protected:
+        std::map<std::string, OptionalParameter> optionalParams;
         json11::Json jsonObj = nullptr;
         std::filesystem::path filePath;
 
         explicit PersonalizationFileParser(const std::filesystem::path &filePath)
-        : filePath{filePath} {};
+        : filePath{filePath}
+        {
+            setDefaultOptionalParamsMap();
+        };
 
         auto loadFileContent() -> std::string;
         auto parseJsonFromContent(const std::string &content) -> bool;
@@ -52,20 +63,16 @@ namespace phone_personalization
         {
             return jsonObj;
         }
+
+        [[nodiscard]] auto getDefaultOptionalParamsMap() const -> std::map<std::string, OptionalParameter>
+        {
+            return optionalParams;
+        }
     };
 
     class PersonalizationFileValidator : public PersonalizationFileParser {
 
-        void setDefaultOptionalParamsMap()
-        {
-            optionalParams = {
-                    {param::case_colour::key, OptionalParameter{param::case_colour::default_value, param::case_colour::valid_values}}
-            };
-        }
-
     protected:
-        std::map<std::string, OptionalParameter> optionalParams;
-
         auto validateFileAndCRC() -> bool;
         auto validateFileAndItsContent() -> bool;
         auto validateSerialNumber() -> bool;
@@ -73,13 +80,20 @@ namespace phone_personalization
 
     public:
         explicit PersonalizationFileValidator(const std::filesystem::path &filePath)
-        : PersonalizationFileParser(filePath)
-        {
-            setDefaultOptionalParamsMap();
-        }
+        : PersonalizationFileParser(filePath) {}
 
         auto validate() -> bool;
-        [[nodiscard]] auto getValidatedOptionalParams() -> std::map<std::string, OptionalParameter>;
+    };
+
+    class PersonalizationParamsGetter
+    {
+        PersonalizationFileParser personalizationParser;
+        std::map<std::string, std::string> parameters;
+    public:
+        explicit PersonalizationParamsGetter(const PersonalizationFileParser &parser) : personalizationParser{parser}
+        {}
+        ///Set invalid optional params as default -> get parameters map
+        std::map<std::string, std::string> getParams();
     };
 }
 
