@@ -35,6 +35,11 @@ namespace sdesktop
 
 }; // namespace sdesktop
 
+namespace sdesktop::bluetooth
+{
+    class BluetoothMessagesHandler;
+}
+
 class ServiceDesktop : public sys::Service
 {
   public:
@@ -83,6 +88,7 @@ class ServiceDesktop : public sys::Service
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;
     std::unique_ptr<sys::Timer> transferTimer;
+    std::unique_ptr<sdesktop::bluetooth::BluetoothMessagesHandler> btMsgHandler;
 };
 
 namespace sys

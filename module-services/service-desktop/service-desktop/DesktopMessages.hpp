@@ -4,7 +4,6 @@
 #pragma once
 
 #include <endpoints/developerMode/DeveloperModeEndpoint.hpp>
-#include <endpoints/bluetooth/BluetoothEndpoint.hpp>
 #include <endpoints/update/UpdateMuditaOS.hpp>
 
 #include <service-appmgr/Actions.hpp>
@@ -198,26 +197,6 @@ namespace sdesktop
         };
     } // namespace developerMode
 
-    namespace bluetooth
-    {
-        class BluetoothStatusRequestEvent : public Event
-        {
-          public:
-            BluetoothStatusRequestEvent() = default;
-            explicit BluetoothStatusRequestEvent(int state);
-        };
-        class ScanStartedEvent : public Event
-        {
-          public:
-            ScanStartedEvent();
-        };
-        class ScanStoppedEvent : public Event
-        {
-          public:
-            ScanStoppedEvent();
-        };
-
-    } // namespace bluetooth
 
     namespace transfer
     {

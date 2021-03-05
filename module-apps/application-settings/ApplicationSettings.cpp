@@ -30,6 +30,7 @@
 #include <i18n/i18n.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
+#include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-db/Settings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 
@@ -63,10 +64,9 @@ namespace app
         if (reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
         }
-        if (auto btmsg = dynamic_cast<BluetoothScanResultMessage *>(msgl); btmsg != nullptr) {
-            auto devices = btmsg->devices;
+        if (auto btmsg = dynamic_cast<message::bluetooth::ResponseVisibleDevices *>(msgl); btmsg != nullptr) {
             LOG_INFO("received BT Scan message!");
-            auto data = std::make_unique<gui::DeviceData>(devices);
+            auto data = std::make_unique<gui::DeviceData>(btmsg->getDevices());
             windowsFactory.build(this, gui::name::window::name_btscan);
             switchWindow(gui::name::window::name_btscan, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
 

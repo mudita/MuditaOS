@@ -6,6 +6,8 @@ set(SOURCES
     endpoints/backup/BackupRestore.cpp
     endpoints/bluetooth/BluetoothEndpoint.cpp
     endpoints/bluetooth/BluetoothHelper.cpp
+    endpoints/bluetooth/BluetoothEventMessages.cpp
+    endpoints/bluetooth/BluetoothMessagesHandler.cpp
     endpoints/calllog/CalllogEndpoint.cpp
     endpoints/calllog/CalllogHelper.cpp
     endpoints/contacts/ContactHelper.cpp
