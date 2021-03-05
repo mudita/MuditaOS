@@ -44,7 +44,7 @@
 #include <vibra/Vibra.hpp>
 
 EventManager::EventManager(const std::string &name)
-    : sys::Service(name, "", stackDepth), settings(std::make_shared<settings::Settings>(this)),
+    : sys::Service(name), settings(std::make_shared<settings::Settings>(this)),
       screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(settings, this)),
       Vibra(std::make_unique<vibra_handle::Vibra>(this))
 {
@@ -297,17 +297,37 @@ sys::ReturnCodes EventManager::InitHandler()
     // initialize keyboard worker
     EventWorker = std::make_unique<WorkerEvent>(this);
 
-    using namespace std::string_literals;
+    // create queues for worker
+    // keyboard irq queue
+    sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(uint8_t), 10};
+    // headset irq queue
+    sys::WorkerQueueInfo qHeadset = {"qHeadset", sizeof(uint8_t), 10};
+    // battery manager queue
+    sys::WorkerQueueInfo qBattery = {"qBattery", sizeof(uint8_t), 10};
+    // RTC irq queue
+    sys::WorkerQueueInfo qRTC = {"qRTC", sizeof(uint8_t), 20};
+    // sim tray queue
+    sys::WorkerQueueInfo qSIM = {"qSIM", sizeof(uint8_t), 5};
+    // magnetometer queue
+    sys::WorkerQueueInfo qMagnetometer = {"qMagnetometer", sizeof(uint8_t), 5};
+    // torch driver queue
+    sys::WorkerQueueInfo qTorch = {"qTorch", sizeof(uint8_t), 5};
+    // light sensor queue
+    sys::WorkerQueueInfo qLightSensor = {"qLightSensor", sizeof(uint8_t), 5};
+    // charger detector queue
+    sys::WorkerQueueInfo qChargerDetect = {"qChargerDetect", sizeof(uint8_t), 5};
+
     std::list<sys::WorkerQueueInfo> list;
-    list.emplace_back("qIrq"s, sizeof(uint8_t), 10);
-    list.emplace_back("qHeadset"s, sizeof(uint8_t), 10);
-    list.emplace_back("qBattery"s, sizeof(uint8_t), 10);
-    list.emplace_back("qRTC"s, sizeof(uint8_t), 20);
-    list.emplace_back("qSIM"s, sizeof(uint8_t), 5);
-    list.emplace_back("qMagnetometer"s, sizeof(uint8_t), 5);
-    list.emplace_back("qTorch"s, sizeof(uint8_t), 5);
-    list.emplace_back("qLightSensor"s, sizeof(uint8_t), 5);
-    list.emplace_back("qChargerDetect"s, sizeof(uint8_t), 5);
+
+    list.push_back(qIrq);
+    list.push_back(qHeadset);
+    list.push_back(qBattery);
+    list.push_back(qRTC);
+    list.push_back(qSIM);
+    list.push_back(qMagnetometer);
+    list.push_back(qTorch);
+    list.push_back(qLightSensor);
+    list.push_back(qChargerDetect);
 
     EventWorker->init(list, settings);
     EventWorker->run();

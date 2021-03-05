@@ -28,7 +28,6 @@ class WorkerEvent;
 class EventManager : public sys::Service
 {
   private:
-    static constexpr auto stackDepth = 2048;
     void handleMinuteUpdate(time_t timestamp);
     bool processKeypadBacklightRequest(bsp::keypad_backlight::Action act);
     bool processVibraRequest(bsp::vibrator::Action act, sys::ms RepetitionTime = static_cast<sys::ms>(1000));
