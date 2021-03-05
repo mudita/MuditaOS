@@ -6,160 +6,275 @@
 #include "personalization_data_integration/PersonalizationFileValidation.hpp"
 #include <filesystem>
 
-class FileParserTestWrapper : public PersonalizationFileParser
-{
-  public:
-    explicit FileParserTestWrapper(const std::filesystem::path &filePath) : PersonalizationFileParser(filePath) {};
+namespace phone_personalization {
 
-    json11::Json test_getJsonObject()
-    {
-        auto content = loadFileAsString();
-        return getJsonObjectFromContent(content);
-    }
+    class PersonalizationFileParserTestWrapper : public PersonalizationFileParser {
+    public:
+        explicit PersonalizationFileParserTestWrapper(const std::filesystem::path &filePath)
+                : PersonalizationFileParser(filePath) {};
 
-    bool test_validateFile()
-    {
-        return validateFile();
-    }
-};
-
-TEST_CASE("Personalization File Validation")
-{
-    SECTION("Check ParamValidator class")
-    {
-        /// Expected serial number
-        auto expectedSerialNumber = "qwerty123456";
-
-        /// Valid params:
-        std::string testSerialNumber = "qwerty123456";
-        std::string testCaseColour   = "black";
-
-        auto personalizationTestObj =
-            json11::Json::object{{phone_personalization::json::serial_number, testSerialNumber.c_str()},
-                                 {phone_personalization::json::case_color, testCaseColour.c_str()}};
-
-        SECTION("Mandatory Parameter valid")
-        {
-            auto serialNumberValidValue = std::vector<std::string>({expectedSerialNumber});
-            auto paramValidator =
-                ParamValidator(phone_personalization::json::serial_number, true, serialNumberValidValue);
-            REQUIRE(paramValidator.validate(personalizationTestObj) == ValidationResult::valid);
+        std::string test_loadFileContent() {
+            return loadFileContent();
         }
 
-        SECTION("Optional Parameter valid")
-        {
-            std::vector<std::string> caseColourValidValues = {"white", "black"};
-
-            auto paramValidator = ParamValidator(phone_personalization::json::case_color, false, caseColourValidValues);
-            REQUIRE(paramValidator.validate(personalizationTestObj) == ValidationResult::valid);
-        }
-    }
-
-    SECTION("Check ParamValidator class invalid cases")
-    {
-        /// Expected serial number
-        auto expectedSerialNumber = "qwerty123456";
-
-        /// Valid params:
-        std::string testSerialNumber = "";
-        std::string testCaseColour   = "yellow";
-
-        auto personalizationTestObj =
-            json11::Json::object{{phone_personalization::json::serial_number, testSerialNumber.c_str()},
-                                 {phone_personalization::json::case_color, testCaseColour.c_str()}};
-
-        SECTION("Mandatory parameter invalid")
-        {
-            auto serialNumberValidValue = std::vector<std::string>({expectedSerialNumber});
-            auto paramValidator =
-                ParamValidator(phone_personalization::json::serial_number, true, serialNumberValidValue);
-            REQUIRE(paramValidator.validate(personalizationTestObj) == ValidationResult::critical);
+        bool test_parseJsonFromContent(const std::string &content) {
+            return parseJsonFromContent(content);
         }
 
-        SECTION("Optional parameter invalid")
-        {
-            std::vector<std::string> caseColourValidValues = {"white", "black"};
-
-            auto paramValidator = ParamValidator(phone_personalization::json::case_color, false, caseColourValidValues);
-            REQUIRE(paramValidator.validate(personalizationTestObj) == ValidationResult::invalid);
+        json11::Json getJsonObj() {
+            return jsonObj;
         }
-    }
+    };
 
-    SECTION("Check FileValidator class")
-    {
+    class PersonalizationFileValidatorWrapper : public PersonalizationFileValidator {
+    public:
+        explicit PersonalizationFileValidatorWrapper(const std::filesystem::path &filePath)
+                : PersonalizationFileValidator(filePath) {};
 
+        bool test_validateFileAndCRC() {
+            return validateFileAndCRC();
+        }
 
-        SECTION("Check getJsonObject method")
+        bool test_validateFileAndItsContent() {
+            return validateFileAndItsContent();
+        }
+
+        bool test_validateSerialNumber() {
+            auto content = loadFileContent();
+            parseJsonFromContent(content);
+            return validateSerialNumber();
+        }
+
+        std::map<std::string, OptionalParameter> test_optionalParamsValidation() {
+            auto content = loadFileContent();
+            parseJsonFromContent(content);
+            return getValidatedOptionalParams();
+        }
+
+        std::map<std::string, OptionalParameter> getDefaultOptionalParams()
         {
-            SECTION("Valid case")
-            {
+            return optionalParams;
+        }
+    };
+
+    TEST_CASE("Personalization File Validation") {
+
+        SECTION("Check PersonalizationFileParser class") {
+
+            SECTION("Valid case") {
                 auto path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/valid/personalization_black.json";
 
-                auto fileParserTestWrapper = FileParserTestWrapper(path);
+                auto fileParserTestWrapper = PersonalizationFileParserTestWrapper(path);
 
-                auto expectedSerialNumber = "TestSerialNumber";
-                auto expectedCaseColour   = "black";
+                auto expectedSerialNumber = "SN123456789098";
+                auto expectedCaseColour = "black";
 
-                auto jsonObj      = fileParserTestWrapper.test_getJsonObject();
-                auto serialNumber = jsonObj[phone_personalization::json::serial_number].string_value();
-                auto caseColour   = jsonObj[phone_personalization::json::case_color].string_value();
+                auto content = fileParserTestWrapper.test_loadFileContent();
+                REQUIRE(!content.empty());
+
+                REQUIRE(fileParserTestWrapper.test_parseJsonFromContent(content));
+                auto jsonObj = fileParserTestWrapper.getJsonObj();
+                REQUIRE(jsonObj != nullptr);
+
+                auto serialNumber = jsonObj[param::serial_number::key].string_value();
+                auto caseColour = jsonObj[param::case_colour::key].string_value();
 
                 REQUIRE(serialNumber == expectedSerialNumber);
                 REQUIRE(caseColour == expectedCaseColour);
             }
 
-            SECTION("Wrong json format")
-            {
+            SECTION("Wrong json format") {
                 auto path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/invalid/invalid_json_format.json";
-                auto fileValidatorWrapper = FileParserTestWrapper(path);
 
-                auto jsonObj = fileValidatorWrapper.test_getJsonObject();
-                REQUIRE(jsonObj == nullptr);
-            }
-        }
+                auto fileParserTestWrapper = PersonalizationFileParserTestWrapper(path);
 
-        SECTION("Check test validateFile")
-        {
-            SECTION("Valid case")
-            {
-                auto path = std::filesystem::current_path();
-                path += "/testfiles/data/personalization_files/valid/personalization_black.json";
-                auto fileParserTestWrapper = FileParserTestWrapper(path);
+                auto content = fileParserTestWrapper.test_loadFileContent();
+                REQUIRE(!content.empty());
 
-                auto result = fileParserTestWrapper.test_validateFile();
-
-                REQUIRE(result);
+                REQUIRE(!fileParserTestWrapper.test_parseJsonFromContent(content));
+                REQUIRE(fileParserTestWrapper.getJsonObj() == nullptr);
             }
 
-            SECTION("File does not exist")
-            {
+            SECTION("File doesn't exist") {
                 auto path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/invalid/not_existing.json";
 
-                auto fileParserTestWrapper = FileParserTestWrapper(path);
+                auto fileParserTestWrapper = PersonalizationFileParserTestWrapper(path);
 
-                auto result = fileParserTestWrapper.test_validateFile();
-
-                REQUIRE(!result);
+                auto content = fileParserTestWrapper.test_loadFileContent();
+                REQUIRE(content.empty());
             }
 
-            SECTION("Wrong crc")
-            {
-                auto path = std::filesystem::current_path();
-                path += "/testfiles/data/personalization_files/invalid/invalid_crc.json";
+        }
 
-                auto fileParserTestWrapper = FileParserTestWrapper(path);
+        SECTION("Check PersonalizationFileParser class") {
 
-                auto result = fileParserTestWrapper.test_validateFile();
+            SECTION("Check test validateFileAndCRC") {
+                SECTION("Valid case") {
+                    auto path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/valid/personalization_black.json";
 
-                REQUIRE(!result);
+                    auto fileParserTestWrapper = PersonalizationFileValidatorWrapper(path);
+                    auto result = fileParserTestWrapper.test_validateFileAndCRC();
+
+                    REQUIRE(result);
+                }
+
+                SECTION("File does not exist") {
+                    auto path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/invalid/not_existing.json";
+
+                    auto fileParserTestWrapper = PersonalizationFileValidatorWrapper(path);
+                    auto result = fileParserTestWrapper.test_validateFileAndCRC();
+
+                    REQUIRE(!result);
+                }
+
+                SECTION("Wrong crc") {
+                    auto path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/invalid/invalid_crc.json";
+
+                    auto fileParserTestWrapper = PersonalizationFileValidatorWrapper(path);
+                    auto result = fileParserTestWrapper.test_validateFileAndCRC();
+
+                    REQUIRE(!result);
+                }
+            }
+
+            SECTION("Check test validateFileAndItsContent") {
+                SECTION("Valid case") {
+                    auto path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/valid/personalization_black.json";
+
+                    auto fileValidatorTestWrapper = PersonalizationFileValidatorWrapper(path);
+                    auto result = fileValidatorTestWrapper.test_validateFileAndItsContent();
+
+                    REQUIRE(result);
+                }
+
+                SECTION("File does not exist") {
+                    auto path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/invalid/not_existing.json";
+
+                    auto fileValidatorTestWrapper = PersonalizationFileValidatorWrapper(path);
+                    auto result = fileValidatorTestWrapper.test_validateFileAndItsContent();
+
+                    REQUIRE(!result);
+                }
+
+                SECTION("Wrong json format") {
+                    auto path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/invalid/invalid_json_format.json";
+
+                    auto fileValidatorTestWrapper = PersonalizationFileValidatorWrapper(path);
+                    auto result = fileValidatorTestWrapper.test_validateFileAndItsContent();
+
+                    REQUIRE(!result);
+                }
+            }
+
+            SECTION("Check test validateSerialNumber") {
+                SECTION("Valid cases") {
+
+                    auto path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/valid/personalization_black.json";
+
+                    auto fileValidatorTestWrapper = PersonalizationFileValidatorWrapper(path);
+                    auto result = fileValidatorTestWrapper.test_validateSerialNumber();
+
+                    REQUIRE(result);
+
+                    path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/valid/personalization_white.json";
+
+                    auto fileValidatorTestWrapper2 = PersonalizationFileValidatorWrapper(path);
+                    result = fileValidatorTestWrapper2.test_validateSerialNumber();
+
+                    REQUIRE(result);
+                }
+
+                SECTION("Empty serial field") {
+                    auto path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/invalid/personalization_empty_serial.json";
+
+                    auto fileValidatorTestWrapper = PersonalizationFileValidatorWrapper(path);
+                    auto result = fileValidatorTestWrapper.test_validateSerialNumber();
+
+                    REQUIRE(!result);
+                }
+
+                SECTION("Wrong serial number format") {
+                    auto path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/invalid/invalid_serial_number.json";
+
+                    auto fileValidatorTestWrapper = PersonalizationFileValidatorWrapper(path);
+                    auto result = fileValidatorTestWrapper.test_validateSerialNumber();
+
+                    REQUIRE(!result);
+                }
+            }
+
+            SECTION("Check test validateOptionalParams") {
+                SECTION("Valid cases") {
+                    SECTION("case colour black") {
+                        auto expectedCaseColour = "black";
+                        auto path = std::filesystem::current_path();
+                        path += "/testfiles/data/personalization_files/valid/personalization_black.json";
+
+                        auto fileValidatorTestWrapper = PersonalizationFileValidatorWrapper(path);
+                        auto validatedParams = fileValidatorTestWrapper.test_optionalParamsValidation();
+
+                        for (auto param : validatedParams) {
+                            if (param.first == param::case_colour::key) {
+                                auto jsonObject = fileValidatorTestWrapper.getJsonObject();
+                                REQUIRE(expectedCaseColour == jsonObject[param.first].string_value());
+                                REQUIRE(param.second.value == jsonObject[param.first].string_value());
+                            }
+                        }
+                    }
+
+                    SECTION("case colour white") {
+                        auto expectedCaseColour = "white";
+                        auto path = std::filesystem::current_path();
+                        path += "/testfiles/data/personalization_files/valid/personalization_white.json";
+
+                        auto fileValidatorTestWrapper = PersonalizationFileValidatorWrapper(path);
+                        auto validatedParams = fileValidatorTestWrapper.test_optionalParamsValidation();
+
+                        for (auto param : validatedParams) {
+                            if (param.first == param::case_colour::key) {
+                                auto jsonObject = fileValidatorTestWrapper.getJsonObject();
+                                REQUIRE(expectedCaseColour == jsonObject[param.first].string_value());
+                                REQUIRE(param.second.value == jsonObject[param.first].string_value());
+                            }
+                        }
+                    }
+                }
+
+                SECTION("Invalid case")
+                {
+                    auto path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/invalid/personalization_yellow.json";
+
+                    auto fileValidatorTestWrapper = PersonalizationFileValidatorWrapper(path);
+                    auto expectedParameters = fileValidatorTestWrapper.getDefaultOptionalParams();
+                    auto validatedParams = fileValidatorTestWrapper.test_optionalParamsValidation();
+
+                    for (auto param : validatedParams)
+                    {
+                        if (param.first == param::case_colour::key)
+                        {
+                            REQUIRE(param.second.value == expectedParameters[param::case_colour::key].value);
+                        }
+                    }
+                }
             }
         }
-    }
 
-    SECTION("Check PersonalizationData class")
+
+    SECTION("Check PersonalizationFileValidator class")
     {
         SECTION("Check: parse personalization file")
         {
@@ -168,27 +283,32 @@ TEST_CASE("Personalization File Validation")
                 auto path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/valid/personalization_black.json";
 
-                auto expectedSerialNumber = "TestSerialNumber";
+                auto expectedSerialNumber = "SN123456789098";
                 auto expectedCaseColour   = "black";
 
-                auto parsedData = PersonalizationData(path);
+                auto personalizationValidator = PersonalizationFileValidator(path);
+                REQUIRE(personalizationValidator.validate());
+                auto serialNumber = personalizationValidator.getJsonObject()[param::serial_number::key];
+                auto caseColour   = personalizationValidator.getValidatedOptionalParams()[param::case_colour::key].value;
 
-                REQUIRE(parsedData.getSerialNumber() == expectedSerialNumber);
-                REQUIRE(parsedData.getCaseColour() == expectedCaseColour);
 
-                REQUIRE(parsedData.validate(expectedSerialNumber));
+                REQUIRE(serialNumber == expectedSerialNumber);
+                REQUIRE(caseColour == expectedCaseColour);
+
 
                 path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/valid/personalization_white.json";
 
                 expectedCaseColour = "white";
 
-                parsedData = PersonalizationData(path);
+                auto personalizationValidator2 = PersonalizationFileValidator(path);
+                REQUIRE(personalizationValidator2.validate());
+                serialNumber = personalizationValidator2.getJsonObject()[param::serial_number::key];
+                caseColour   = personalizationValidator2.getValidatedOptionalParams()[param::case_colour::key].value;
 
-                REQUIRE(parsedData.getSerialNumber() == expectedSerialNumber);
-                REQUIRE(parsedData.getCaseColour() == expectedCaseColour);
 
-                REQUIRE(parsedData.validate(expectedSerialNumber));
+                REQUIRE(serialNumber == expectedSerialNumber);
+                REQUIRE(caseColour == expectedCaseColour);
             }
 
             SECTION("Invalid file")
@@ -199,17 +319,8 @@ TEST_CASE("Personalization File Validation")
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/not_existing.json";
 
-                    auto invalidSerialNumber = "";
-                    auto invalidCaseColour   = "";
-
-                    LOG_DEBUG("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111111111111111");
-                    auto parsedData = PersonalizationData(path);
-
-                    REQUIRE(parsedData.getSerialNumber() == invalidSerialNumber);
-                    REQUIRE(parsedData.getCaseColour() == invalidCaseColour);
-
-                    auto actualSerialNumber = parsedData.getSerialNumber();
-                    REQUIRE(!parsedData.validate(actualSerialNumber));
+                    auto personalizationValidator = PersonalizationFileValidator(path);
+                    REQUIRE(!personalizationValidator.validate());
                 }
 
                 SECTION("Invalid crc")
@@ -217,16 +328,8 @@ TEST_CASE("Personalization File Validation")
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/invalid_crc.json";
 
-                    auto invalidSerialNumber = "";
-                    auto invalidCaseColour   = "";
-
-                    auto parsedData = PersonalizationData(path);
-
-                    REQUIRE(parsedData.getSerialNumber() == invalidSerialNumber);
-                    REQUIRE(parsedData.getCaseColour() == invalidCaseColour);
-
-                    auto actualSerialNumber = parsedData.getSerialNumber();
-                    REQUIRE(!parsedData.validate(actualSerialNumber));
+                    auto personalizationValidator = PersonalizationFileValidator(path);
+                    REQUIRE(!personalizationValidator.validate());
                 }
 
                 SECTION("Invalid format")
@@ -234,31 +337,26 @@ TEST_CASE("Personalization File Validation")
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/invalid_json_format.json";
 
-                    auto invalidSerialNumber = "";
-                    auto invalidCaseColour   = "";
-
-                    auto parsedData = PersonalizationData(path);
-
-                    REQUIRE(parsedData.getSerialNumber() == invalidSerialNumber);
-                    REQUIRE(parsedData.getCaseColour() == invalidCaseColour);
-
-                    auto actualSerialNumber = parsedData.getSerialNumber();
-                    REQUIRE(!parsedData.validate(actualSerialNumber));
+                    auto personalizationValidator = PersonalizationFileValidator(path);
+                    REQUIRE(!personalizationValidator.validate());
                 }
 
-                SECTION("Invalid mandatory param")
+                SECTION("Empty serial number")
                 {
                     auto path = std::filesystem::current_path();
-                    path += "/testfiles/data/personalization_files/valid/personalization_black.json";
+                    path += "/testfiles/data/personalization_files/invalid/personalization_empty_serial.json";
 
-                    auto expectedSerialNumber = "ProvidedSerialNumber";
-                    auto caseColour           = "black";
+                    auto personalizationValidator = PersonalizationFileValidator(path);
+                    REQUIRE(!personalizationValidator.validate());
+                }
 
-                    auto parsedData = PersonalizationData(path);
+                SECTION("Invalid serial number")
+                {
+                    auto path = std::filesystem::current_path();
+                    path += "/testfiles/data/personalization_files/invalid/invalid_serial_number.json";
 
-                    REQUIRE(parsedData.getCaseColour() == caseColour);
-
-                    REQUIRE(!parsedData.validate(expectedSerialNumber));
+                    auto personalizationValidator = PersonalizationFileValidator(path);
+                    REQUIRE(!personalizationValidator.validate());
                 }
 
                 SECTION("Invalid optional params")
@@ -266,19 +364,20 @@ TEST_CASE("Personalization File Validation")
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/personalization_yellow.json";
 
-                    auto expectedSerialNumber = "TestSerialNumber";
-                    auto caseColour           = "yellow";
+                    auto expectedSerialNumber = "SN123456789098";
+                    auto expectedCaseColour   = param::case_colour::default_value;
 
-                    auto parsedData = PersonalizationData(path);
+                    auto personalizationValidator2 = PersonalizationFileValidator(path);
+                    REQUIRE(personalizationValidator2.validate());
+                    auto serialNumber = personalizationValidator2.getJsonObject()[param::serial_number::key];
+                    auto caseColour   = personalizationValidator2.getValidatedOptionalParams()[param::case_colour::key].value;
 
-                    REQUIRE(parsedData.getSerialNumber() == expectedSerialNumber);
-                    REQUIRE(parsedData.getCaseColour() == caseColour);
 
-                    REQUIRE(parsedData.validate(expectedSerialNumber));
-
-                    REQUIRE(parsedData.getCaseColour() == "white");
+                    REQUIRE(serialNumber == expectedSerialNumber);
+                    REQUIRE(caseColour == expectedCaseColour);
                 }
             }
         }
+    }
     }
 }

@@ -11,80 +11,77 @@
 
 namespace phone_personalization
 {
-    namespace json::key
+    struct OptionalParameter
     {
-        constexpr inline auto serial_number = "serial";
-        constexpr inline auto case_color    = "case_colour";
-    } // namespace json
+        std::string value;
+        std::vector<std::string> validValues;
+    };
 
-    namespace params
+    namespace param
     {
+        namespace serial_number
+        {
+            constexpr inline auto key = "serial";
+            constexpr inline auto prefix = "SN";  ///Need access to req witch describes SN format
+            constexpr inline auto length = 14;
+        } // namespace serial_number
+
         namespace case_colour
         {
+            constexpr inline auto key = "case_colour";
             constexpr inline auto default_value = "white";
-
             const std::vector<std::string> valid_values = {"white", "black"};
         } // namespace case_colour
 
-    }     // namespace params
-} // namespace phone_personalization
+    } // namespace params
 
-///TODO: 1. cleanUp 2. method for checking serial number  3. UT
+    class PersonalizationFileParser
+    {
+    protected:
+        json11::Json jsonObj = nullptr;
+        std::filesystem::path filePath;
 
-//class PersonalizationData
-//{
-//    ///TODO: Check if it can be removed!!! think
-//    std::string serialNumber;
-//    std::string caseColour;
-//
-//public:
-//    void setSerialNumber(const std::string &serialNumber)
-//    {
-//        this->serialNumber = serialNumber;
-//    }
-//
-//    void setCaseColour(const std::string &caseColour)
-//    {
-//        this->caseColour = caseColour;
-//    }
-//
-//    [[nodiscard]] auto getSerialNumber() const -> std::string
-//    {
-//        return serialNumber;
-//    }
-//
-//    [[nodiscard]] auto getCaseColour() const -> std::string
-//    {
-//        return caseColour;
-//    }
-//};
+        explicit PersonalizationFileParser(const std::filesystem::path &filePath)
+        : filePath{filePath} {};
 
-class PersonalizationFileParser
-{
-  protected:
-    //PersonalizationData data;
-    json11::Json params = nullptr;
-    std::filesystem::path filePath;
+        auto loadFileContent() -> std::string;
+        auto parseJsonFromContent(const std::string &content) -> bool;
 
-    explicit PersonalizationFileParser(const std::filesystem::path &filePath) : filePath{filePath} {};
+    public:
+        [[nodiscard]] auto getJsonObject() const -> json11::Json
+        {
+            return jsonObj;
+        }
+    };
 
-    auto loadFileAsString() -> std::string;
-    auto parseJsonFromContent(const std::string &content) -> bool;
-};
+    class PersonalizationFileValidator : public PersonalizationFileParser {
 
-class PersonalizationFileValidator : public PersonalizationFileParser
-{
+        void setDefaultOptionalParamsMap()
+        {
+            optionalParams = {
+                    {param::case_colour::key, OptionalParameter{param::case_colour::default_value, param::case_colour::valid_values}}
+            };
+        }
 
-protected:
-    auto validateFileAndCRC() -> bool;
-    auto validateFileAndItsContent() -> bool;
-    auto validateParameters(const std::map<std::string, std::vector<std::string>> &parametersMap) -> bool;
+    protected:
+        std::map<std::string, OptionalParameter> optionalParams;
 
-public:
-    explicit PersonalizationFileValidator(const std::filesystem::path &filePath) : PersonalizationFileParser(filePath) {}
+        auto validateFileAndCRC() -> bool;
+        auto validateFileAndItsContent() -> bool;
+        auto validateSerialNumber() -> bool;
+        void validateOptionalParams();
 
-};
+    public:
+        explicit PersonalizationFileValidator(const std::filesystem::path &filePath)
+        : PersonalizationFileParser(filePath)
+        {
+            setDefaultOptionalParamsMap();
+        }
 
+        auto validate() -> bool;
+        [[nodiscard]] auto getValidatedOptionalParams() -> std::map<std::string, OptionalParameter>;
+    };
+}
 
 
 
