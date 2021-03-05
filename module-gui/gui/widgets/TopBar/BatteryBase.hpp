@@ -9,7 +9,7 @@
 
 namespace gui::top_bar
 {
-    class BatteryBase : public StatusBarWidgetBase<HBox>
+    class BatteryBase : public StatusBarWidgetBase<gui::HBox>
     {
         virtual void showBatteryLevel(std::uint32_t percentage) = 0;
         virtual void showBatteryChargingDone()                  = 0;

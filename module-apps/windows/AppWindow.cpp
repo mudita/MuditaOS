@@ -50,8 +50,10 @@ namespace gui
         title->setEllipsis(Ellipsis::Right);
         title->visible = false;
 
-        auto config = configureTopBar(application->getTopBarConfiguration());
-        topBar      = new gui::top_bar::TopBar(this, 0, 0, 480, 50);
+        auto config          = configureTopBar(application->getTopBarConfiguration());
+        namespace status_bar = style::header::status_bar;
+        topBar               = new gui::top_bar::TopBar(
+            this, (style::window_width - status_bar::width) / 2, 0, status_bar::width, status_bar::height);
         topBar->configure(std::move(config));
     }
 

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <Rect.hpp>
+#include <BoxLayout.hpp>
 #include <vector>
 #include <map>
 
@@ -71,7 +71,7 @@ namespace gui::top_bar
     };
 
     /// Header of most of design Windows
-    class TopBar : public Rect
+    class TopBar : public HBox
     {
       protected:
         Time *time                                       = nullptr;
@@ -80,6 +80,9 @@ namespace gui::top_bar
         Lock *lock                                       = nullptr;
         SIM *sim                                         = nullptr;
         BatteryBase *battery                             = nullptr;
+        HBox *leftBox                                    = nullptr;
+        HBox *centralBox                                 = nullptr;
+        HBox *rightBox                                   = nullptr;
         Configuration configuration;
 
         void prepareWidget();
