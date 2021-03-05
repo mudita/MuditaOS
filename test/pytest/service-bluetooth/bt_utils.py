@@ -1,48 +1,95 @@
-import pytest
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+from harness.interface.defs import status
 from harness import log
-from harness.interface.defs import key_codes
-from harness.dom_parser_utils import *
 import time
 
-@pytest.fixture(scope='function')
-def bt_main_window(harness):
-    current_window_content = get_window_content(harness, 1)
-    assert item_contains_recursively(current_window_content, 'WindowName', 'MainWindow' )
-    harness.connection.send_key_code(key_codes["enter"])
-
-    log.info("Navigating to ApplicationSettings")
-    harness.open_application("settings")
-    if harness.connection.get_application_name() != "ApplicationSettingsNew":
-        time.sleep(5)
-        assert harness.connection.get_application_name() == "ApplicationSettingsNew"
-
-    log.info("Opening Bluetooth")
-    harness.connection.send_key_code(key_codes["down"])
-    harness.connection.send_key_code(key_codes["enter"])
-
-@pytest.fixture(scope='function')
-def bt_reset(harness):
-    current_window_content = get_window_content(harness, 1)
-    assert item_contains_recursively(current_window_content, 'WindowName', 'Bluetooth' )
-
-    parent_of_list_items = find_parent(current_window_content, 'ListItem')
-    if item_has_child_that_contains_recursively( parent_of_list_items, [('TextValue','Bluetooth'), ('TextValue', 'ON')] ) :
-        log.info("Bluetooth is ON, turing OFF...")
-        harness.connection.send_key_code(key_codes["enter"])
-
-    current_window_content = get_window_content(harness, 1)
-    parent_of_list_items = find_parent(current_window_content, 'ListItem')
-    assert item_has_child_that_contains_recursively( parent_of_list_items, [('TextValue','Bluetooth'), ('TextValue', 'OFF')] )
-
-    log.info("Turing Bluetooth ON...")
-    harness.connection.send_key_code(key_codes["enter"])
-
-@pytest.fixture(scope='function')
-def bt_all_devices(harness):
-    log.info("Navigating to AllDevices window...")
+def bt_get_state(harness):
     time.sleep(1)
-    harness.connection.send_key_code(key_codes["down"])
-    harness.connection.send_key_code(key_codes["enter"])
+    body = {"state": True}
+    ret = harness.endpoint_request("bluetooth", "get", body)
+    assert ret["status"] == status["OK"]
+    return ret["body"]["state"]
 
-    current_window_content = get_window_content(harness, 1)
-    assert item_contains_recursively(current_window_content, 'WindowName', 'AllDevices')
+def bt_set_status(harness, power, visibility = "off"):
+    log.info("Turning Bluetooth {} with visibility {}...".format(power, visibility))
+    body = {"state": {"power" : power , "visibility" : visibility }}
+    ret = harness.endpoint_request("bluetooth", "put", body)
+    assert ret["status"] == status["OK"]
+
+def bt_command(harness, command,  http_method = "put"):
+    log.info("Sending command: {} with http_method={}".format(command, http_method))
+    body = {"command": command}
+    ret = harness.endpoint_request("bluetooth", http_method, body)
+    assert ret["status"] == status["OK"]
+
+def bt_pair_command(harness, pair_command, address, http_method):
+    log.info("Requesting {}ing with address={}...".format(pair_command, address))
+    body = {pair_command: address}
+    ret = harness.endpoint_request("bluetooth", http_method, body)
+    assert ret["status"] == status["OK"]
+
+def bt_get_device_by_name(devices, name) -> dict :
+    for device in devices:
+        if device["name"] == name :
+            return device
+    return {}
+
+def bt_find_device(harness, device_origin, device_name, max_attempts = 7):
+    log.info("Getting {} devices".format(device_origin))
+    body = {"devices": device_origin}
+
+    for i in range(max_attempts):
+        ret = harness.endpoint_request("bluetooth", "get", body)
+        device = bt_get_device_by_name(ret["body"]["devices"], device_name)
+        if device:
+            log.info("Found {}, address={}".format(device_name, device.get('address')))
+            return device
+        if i != max_attempts - 1:
+            log.info("Device {} not found, retrying...".format(device_name))
+            time.sleep(2)
+    return {}
+
+def bt_is_device_forgotten(harness, device_name, max_attempts = 7):
+    log.info("Checking if pair forgetting succeeded...")
+    body = {"devices": "bonded"}
+
+    for i in range(max_attempts):
+        ret = harness.endpoint_request("bluetooth", "get", body)
+        device = bt_get_device_by_name(ret["body"]["devices"], device_name)
+        if not device:
+            return True
+        if i != max_attempts - 1:
+            log.info("Device {} still paired, retrying...".format(device_name))
+            time.sleep(2)
+    return False
+
+def bt_get_connected_address(harness, max_attempts = 10):
+    log.info("Getting address of connected device")
+    body = {"devices": "bonded"}
+
+    for i in range(max_attempts):
+        ret = harness.endpoint_request("bluetooth", "get", body)
+        address = ret["body"]["address"]
+        if len(address) > 0:
+            log.info("Device connected={}".format(address))
+            return address
+        if i != max_attempts - 1:
+            log.info("No device connected, retrying...")
+            time.sleep(2)
+    return ""
+
+def bt_is_device_disconnected(harness, max_attempts = 7):
+    log.info("Checking if disconnecting succeeded...")
+    body = {"devices": "bonded"}
+
+    for i in range(max_attempts):
+        ret = harness.endpoint_request("bluetooth", "get", body)
+        address = ret["body"]["address"]
+        if len(address) == 0:
+            return True
+        if i != max_attempts - 1:
+            log.info("Device {} connected, retrying...".format(address))
+            time.sleep(2)
+    return False

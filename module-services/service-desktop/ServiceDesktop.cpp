@@ -27,6 +27,7 @@
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-sys/SystemManager/Constants.hpp>
 #include <module-sys/SystemManager/messages/TetheringStateRequest.hpp>
+#include <endpoints/bluetooth/BluetoothMessagesHandler.hpp>
 
 #include <purefs/filesystem_paths.hpp>
 #include <sys/mount.h>
@@ -58,7 +59,9 @@ namespace
     }
 } // namespace
 
-ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, "", sdesktop::service_stack)
+ServiceDesktop::ServiceDesktop()
+    : sys::Service(service::name::service_desktop, "", sdesktop::service_stack),
+      btMsgHandler(std::make_unique<sdesktop::bluetooth::BluetoothMessagesHandler>(this))
 {
     LOG_INFO("[ServiceDesktop] Initializing");
 
@@ -237,6 +240,20 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return sys::MessageNone{};
     });
 
+    connect(typeid(message::bluetooth::ResponseStatus), [&](sys::Message *msg) {
+        auto msgl = static_cast<message::bluetooth::ResponseStatus *>(msg);
+        return btMsgHandler->handle(msgl);
+    });
+
+    connect(typeid(message::bluetooth::ResponseBondedDevices), [&](sys::Message *msg) {
+        auto msgl = static_cast<message::bluetooth::ResponseBondedDevices *>(msg);
+        return btMsgHandler->handle(msgl);
+    });
+
+    connect(typeid(message::bluetooth::ResponseVisibleDevices), [&](sys::Message *msg) {
+        auto msgl = static_cast<message::bluetooth::ResponseVisibleDevices *>(msg);
+        return btMsgHandler->handle(msgl);
+    });
     settings->registerValueChange(updateos::settings::history,
                                   [this](const std::string &value) { updateOS->setInitialHistory(value); });
 

@@ -1,9 +1,12 @@
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 import time
 import pytest
 from harness import log
 from harness.dom_parser_utils import *
 from harness.interface.defs import key_codes
-from bt_utils import *
+from bt_fixtures import *
 
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("bt_all_devices")
@@ -12,7 +15,7 @@ from bt_utils import *
 @pytest.mark.usefixtures("phone_in_desktop")
 @pytest.mark.usefixtures("phone_unlocked")
 @pytest.mark.skipif("not config.getvalue('--bt_device')", reason='--bt_device was not specified')
-def test_bt_pairing(harness, bt_device):
+def test_bt_pairing_hmi(harness, bt_device):
     if not bt_device:
         return
     bt_device_name = bt_device

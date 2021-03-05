@@ -18,6 +18,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <log/log.hpp>
 #include "service-bluetooth/messages/Connect.hpp"
+#include "service-bluetooth/messages/Disconnect.hpp"
 #include "service-bluetooth/Constants.hpp"
 extern "C"
 {
@@ -336,7 +337,7 @@ namespace bluetooth
                 auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
                 busProxy.sendUnicast(
                     std::make_shared<message::bluetooth::ConnectResult>(std::move(deviceAddress), false),
-                    "ApplicationSettingsNew");
+                    service::name::bluetooth);
                 break;
             }
             AVRCP::mediaTracker.a2dp_cid = cid;
@@ -349,7 +350,7 @@ namespace bluetooth
             isConnected = true;
             auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
             busProxy.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(std::move(deviceAddress), true),
-                                 "ApplicationSettingsNew");
+                                 service::name::bluetooth);
             break;
         }
         case A2DP_SUBEVENT_SIGNALING_MEDIA_CODEC_SBC_CONFIGURATION: {
@@ -572,7 +573,8 @@ namespace bluetooth
                 AVRCP::mediaTracker.a2dp_cid  = 0;
                 LOG_INFO("A2DP Source: Signaling released.\n\n");
                 auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
-                busProxy.sendUnicast(std::make_shared<BluetoothDeviceDisconnectedMessage>(), service::name::bluetooth);
+                busProxy.sendUnicast(std::make_shared<message::bluetooth::DisconnectResult>(),
+                                     service::name::bluetooth);
             }
             isConnected = false;
             break;

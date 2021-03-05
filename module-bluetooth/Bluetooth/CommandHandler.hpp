@@ -12,6 +12,7 @@
 namespace sys
 {
     class Service;
+    class Message;
 }
 
 namespace bluetooth
@@ -24,6 +25,7 @@ namespace bluetooth
         {
             StartScan,
             StopScan,
+            getDevicesAvailable,
             StartPan,
             VisibilityOn,
             VisibilityOff,
@@ -91,7 +93,7 @@ namespace bluetooth
         Error::Code disconnectAudioConnection();
         Error::Code pair(bd_addr_t addr);
         Error::Code unpair(bd_addr_t addr);
-
+        Error::Code availableDevices();
         Error::Code switchAudioProfile();
         sys::Service *service;
         std::shared_ptr<bluetooth::SettingsHolder> settings;
