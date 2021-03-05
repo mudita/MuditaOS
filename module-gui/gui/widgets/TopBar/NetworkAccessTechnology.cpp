@@ -3,20 +3,21 @@
 
 #include "NetworkAccessTechnology.hpp"
 #include "Item.hpp"
+#include "Style.hpp"
 
 namespace gui::top_bar
 {
     NetworkAccessTechnology::NetworkAccessTechnology(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : StatusBarWidgetBase(parent, x, y, w, h)
     {
-        setFilled(false);
-        setBorderColor(gui::ColorNoColor);
-        setFont(style::header::font::modes);
-        setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+        setEdges(RectangleEdge::None);
+        setFont(style::header::status_bar::nat::font);
+        setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
     }
 
     void NetworkAccessTechnology::update(const Store::Network::AccessTechnology accessTechnology)
     {
+        setMaximumSize(this->getWidth(), this->getHeight());
         _accessTechnology      = accessTechnology;
         constexpr auto text2g  = "2G";
         constexpr auto text3g  = "3G";

@@ -4,7 +4,7 @@
 #include "BatteryText.hpp"
 #include "Label.hpp"
 #include <Utils.hpp>
-#include <Style.hpp>
+#include "Style.hpp"
 
 namespace gui::top_bar
 {
@@ -14,9 +14,11 @@ namespace gui::top_bar
         label = new Label(this, 0, 0, 0, 0);
         label->setFilled(false);
         label->setBorderColor(gui::ColorNoColor);
-        label->setFont(style::header::font::modes);
-        label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
-        label->setMaximumSize(this->getWidth(), this->getHeight());
+        label->setFont(style::header::status_bar::battery::font);
+        label->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Bottom));
+
+        setMinimumSize(style::header::status_bar::battery::maxX, style::header::status_bar::height);
+        label->setMaximumSize(style::header::status_bar::battery::maxX, style::header::status_bar::height);
     }
 
     void BatteryText::showBatteryLevel(std::uint32_t percentage)

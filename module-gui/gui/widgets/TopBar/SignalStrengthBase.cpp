@@ -8,7 +8,8 @@ namespace gui::top_bar
     SignalStrengthBase::SignalStrengthBase(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
         : StatusBarWidgetBase(parent, x, y, w, h)
     {
-        setBorderColor(gui::ColorNoColor);
+        setEdges(RectangleEdge::None);
+        setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
     }
 
     void SignalStrengthBase::update(const Store::SignalStrength &data)

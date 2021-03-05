@@ -23,10 +23,13 @@ namespace style
     namespace header
     {
         inline constexpr auto height = 105U;
+        namespace status_bar
+        {
+            inline constexpr auto height = 46U;
+            inline constexpr auto width  = 440U;
+        }; // namespace status_bar
         namespace font
         {
-            inline constexpr auto time  = "gt_pressura_regular_24";
-            inline constexpr auto modes = "gt_pressura_regular_20";
             inline constexpr auto title = "gt_pressura_bold_32";
         }; // namespace font
     };     // namespace header
@@ -92,7 +95,7 @@ namespace style
             inline constexpr auto h = 54U;
             inline constexpr auto w = window_width;
         } // namespace bottomBar
-    }; // namespace window
+    };    // namespace window
 
     namespace settings
     {
