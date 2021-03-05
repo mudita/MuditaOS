@@ -268,11 +268,8 @@ namespace phone_personalization {
 
                     auto personalizationValidator = PersonalizationFileValidator(path);
                     REQUIRE(personalizationValidator.validate());
-                    LOG_DEBUG("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1111!!!!!");
                     auto personalizationParser = static_cast<PersonalizationFileParser>(personalizationValidator);
-                    LOG_DEBUG("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!2222!!!!!");
                     auto paramsGetter = PersonalizationParamsGetter(personalizationParser);
-                    LOG_DEBUG("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!3333!!!!!");
 
                     auto params = paramsGetter.getParams();
                     auto serialNumber = params[param::serial_number::key];
