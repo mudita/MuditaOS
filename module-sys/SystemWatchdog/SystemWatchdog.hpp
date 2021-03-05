@@ -22,7 +22,7 @@ namespace sys
     class SystemWatchdog : public Watchdog, private cpp_freertos::Thread
     {
       public:
-        static constexpr auto threadName = "System_Watchdog";
+        static constexpr auto threadName = "SystemWatchdog";
 
         SystemWatchdog(const SystemWatchdog &) = delete;
         SystemWatchdog(SystemWatchdog &&)      = delete;
