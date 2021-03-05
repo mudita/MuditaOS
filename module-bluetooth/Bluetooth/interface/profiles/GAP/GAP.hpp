@@ -52,6 +52,8 @@ namespace bluetooth
         auto pair(uint8_t *addr, std::uint8_t protectionLevel = 0) -> bool;
         auto unpair(uint8_t *addr) -> bool;
         static auto getDevicesList() -> const std::vector<Devicei> &;
+        static auto isServiceSupportedByRemote(bd_addr_t addr, uint32_t typeOfService) -> bool;
+
         static std::string currentlyProcessedDeviceAddr;
         explicit GAP(sys::Service *owner);
     };
