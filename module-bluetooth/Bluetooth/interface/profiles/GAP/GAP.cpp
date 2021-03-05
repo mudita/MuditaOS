@@ -146,18 +146,18 @@ namespace bluetooth
         device.setAddress(&addr);
         device.pageScanRepetitionMode = gap_event_inquiry_result_get_page_scan_repetition_mode(packet);
         device.clockOffset            = gap_event_inquiry_result_get_clock_offset(packet);
-
+        device.classOfDevice          = gap_event_inquiry_result_get_class_of_device(packet);
         LOG_INFO("Device found: %s ", bd_addr_to_str(addr));
-        LOG_INFO("with COD: 0x%06x, ", static_cast<unsigned int>(gap_event_inquiry_result_get_class_of_device(packet)));
+        LOG_INFO("with COD: 0x%06x, ", static_cast<unsigned int>(device.classOfDevice));
         LOG_INFO("pageScan %d, ", device.pageScanRepetitionMode);
         LOG_INFO("clock offset 0x%04x", device.clockOffset);
+
         if (gap_event_inquiry_result_get_rssi_available(packet) != 0u) {
             LOG_INFO(", rssi %d dBm", static_cast<int8_t>(gap_event_inquiry_result_get_rssi(packet)));
         }
         if (gap_event_inquiry_result_get_name_available(packet) != 0u) {
             auto name   = gap_event_inquiry_result_get_name(packet);
             device.name = std::string{reinterpret_cast<const char *>(name)};
-
             LOG_INFO(", name '%s'", device.name.c_str());
             device.state = REMOTE_NAME_FETCHED;
         }
@@ -175,6 +175,13 @@ namespace bluetooth
         auto index = getDeviceIndexForAddress(devices, addr);
         if (index >= 0) {
             return; // already in our list
+        }
+        uint32_t classOfDevice = gap_event_inquiry_result_get_class_of_device(packet);
+        ///> Device has to support services: AUDIO for HFP and HSP profiles, and RENDERING for SNK of A2DP profile
+        if (!(classOfDevice & TYPE_OF_SERVICE::REMOTE_SUPPORTED_SERVICES)) {
+            LOG_INFO("Ignoring device with incompatible services: %s, ",
+                     getListOfSupportedServicesInString(classOfDevice).c_str());
+            return;
         }
         addNewDevice(packet, addr);
         sendDevices();
@@ -284,5 +291,13 @@ namespace bluetooth
             "ApplicationSettingsNew");
         return true;
     }
-
+    auto GAP::isServiceSupportedByRemote(bd_addr_t addr, uint32_t typeOfService) -> bool
+    {
+        for (const auto &device : devices) {
+            if (bd_addr_cmp(device.address, addr) == 0) {
+                return (device.classOfDevice & typeOfService);
+            }
+        }
+        return false;
+    }
 } // namespace bluetooth

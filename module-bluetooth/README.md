@@ -14,6 +14,14 @@ It's meant to provide interface layer for service-bluetooth like that:
 * `lib`
     Libraries used with as little modifications as possible
 
+## Supported profiles
+* `A2DP`
+* `HSP`
+* `HFP` (Currently not supported)
+
+NOTE: Remote devices that do not support at least one of above profiles will not be added to list of devices during scan
+process.
+
 ## Events flowchart
 ![Flowchart](./flowchart.svg)
 <img src="./flowchart.svg">

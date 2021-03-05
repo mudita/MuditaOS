@@ -1,5 +1,9 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include <service-bluetooth/ServiceBluetooth.hpp>
 #include "ProfileManager.hpp"
+#include <GAP/GAP.hpp>
 
 namespace bluetooth
 {
@@ -34,10 +38,21 @@ namespace bluetooth
     auto ProfileManager::connect(bd_addr_t address) -> Error::Code
     {
         bd_addr_copy(remoteAddr, address);
-        for (auto &[profileName, ptr] : profilesList) {
-            if (ptr != nullptr) {
-                ptr->setDeviceAddress(remoteAddr);
-                ptr->connect();
+        ///> connect to remote only if we are sure that remote side supports our profiles
+        if (GAP::isServiceSupportedByRemote(address, TYPE_OF_SERVICE::RENDERING)) {
+            auto profilePtr = profilesList[AudioProfile::A2DP].get();
+            if (profilePtr != nullptr) {
+                LOG_DEBUG("Connecting device %s to A2DP", bd_addr_to_str(address));
+                profilePtr->setDeviceAddress(remoteAddr);
+                profilePtr->connect();
+            }
+        }
+        if (GAP::isServiceSupportedByRemote(address, TYPE_OF_SERVICE::AUDIO)) {
+            auto profilePtr = profilesList[AudioProfile::HSP].get();
+            if (profilePtr != nullptr) {
+                LOG_DEBUG("Connecting device %s to HSP", bd_addr_to_str(address));
+                profilePtr->setDeviceAddress(remoteAddr);
+                profilePtr->connect();
             }
         }
         return Error::Success;
