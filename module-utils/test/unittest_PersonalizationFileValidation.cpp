@@ -20,10 +20,6 @@ namespace phone_personalization {
         bool test_parseJsonFromContent(const std::string &content) {
             return parseJsonFromContent(content);
         }
-
-        json11::Json getJsonObject() {
-            return jsonObj;
-        }
     };
 
     class PersonalizationFileValidatorWrapper : public PersonalizationFileValidator {
@@ -54,10 +50,6 @@ namespace phone_personalization {
 
         std::map<std::string, OptionalParameter> getDefaultOptionalParams() {
             return optionalParams;
-        }
-
-        json11::Json getJsonObject() {
-            return jsonObj;
         }
     };
 
@@ -268,8 +260,7 @@ namespace phone_personalization {
 
                     auto personalizationValidator = PersonalizationFileValidator(path);
                     REQUIRE(personalizationValidator.validate());
-                    auto personalizationParser = static_cast<PersonalizationFileParser>(personalizationValidator);
-                    auto paramsGetter = PersonalizationParamsGetter(personalizationParser);
+                    auto paramsGetter = PersonalizationParamsGetter(personalizationValidator);
 
                     auto params = paramsGetter.getParams();
                     auto serialNumber = params[param::serial_number::key];
@@ -286,8 +277,7 @@ namespace phone_personalization {
 
                     auto personalizationValidator2 = PersonalizationFileValidator(path);
                     REQUIRE(personalizationValidator2.validate());
-                    auto personalizationParser2 = static_cast<PersonalizationFileParser>(personalizationValidator2);
-                    auto paramsGetter2 = PersonalizationParamsGetter(personalizationParser2);
+                    auto paramsGetter2 = PersonalizationParamsGetter(personalizationValidator2);
 
                     auto params2 = paramsGetter2.getParams();
                     serialNumber = params2[param::serial_number::key];
@@ -349,8 +339,7 @@ namespace phone_personalization {
 
                         auto personalizationValidator = PersonalizationFileValidator(path);
                         REQUIRE(personalizationValidator.validate());
-                        auto personalizationParser = static_cast<PersonalizationFileParser>(personalizationValidator);
-                        auto paramsGetter = PersonalizationParamsGetter(personalizationParser);
+                        auto paramsGetter = PersonalizationParamsGetter(personalizationValidator);
 
                         auto params = paramsGetter.getParams();
                         auto serialNumber = params[param::serial_number::key];

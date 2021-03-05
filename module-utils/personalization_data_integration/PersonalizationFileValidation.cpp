@@ -8,7 +8,6 @@
 
 namespace phone_personalization {
 
-
     auto PersonalizationFileParser::loadFileContent() -> std::string {
         std::string content;
         std::ifstream in(filePath);

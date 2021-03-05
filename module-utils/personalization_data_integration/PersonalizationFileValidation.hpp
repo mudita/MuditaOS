@@ -90,8 +90,11 @@ namespace phone_personalization
         PersonalizationFileParser personalizationParser;
         std::map<std::string, std::string> parameters;
     public:
-        explicit PersonalizationParamsGetter(const PersonalizationFileParser &parser) : personalizationParser{parser}
+        explicit PersonalizationParamsGetter(const PersonalizationFileValidator &parser)
+        : personalizationParser{static_cast<PersonalizationFileParser>(parser)}
         {}
+
+        PersonalizationParamsGetter(PersonalizationFileParser) = delete;
         ///Set invalid optional params as default -> get parameters map
         std::map<std::string, std::string> getParams();
     };
