@@ -4,7 +4,7 @@
 #include "Time.hpp"
 #include "time/time_conversion.hpp"
 #include <Utils.hpp>
-#include <Style.hpp>
+#include "Style.hpp"
 
 namespace gui::top_bar
 {
@@ -13,7 +13,7 @@ namespace gui::top_bar
     {
         setFilled(false);
         setBorderColor(gui::ColorNoColor);
-        setFont(style::header::font::time);
+        setFont(style::header::status_bar::time::font);
         setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         using namespace utils::time;
         setFormat(Locale::format(Locale::TimeFormat::FormatTime12H));
