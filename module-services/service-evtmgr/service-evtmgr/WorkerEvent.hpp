@@ -46,6 +46,8 @@ enum class WorkerEventQueues
 class WorkerEvent : public sys::Worker
 {
   private:
+    static constexpr auto stackDepthBytes = 3072;
+
     /**
      * @brief This method is responsible for catch and process keyboard event.
      * @param event key event
@@ -66,7 +68,7 @@ class WorkerEvent : public sys::Worker
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
   public:
-    WorkerEvent(sys::Service *service) : sys::Worker(service), service(service){};
+    WorkerEvent(sys::Service *service) : sys::Worker(service, stackDepthBytes), service(service){};
     /**
      * This function is responsible for creating all queues provided in the constructor.
      * When all queues are created this method creates set of queues.
