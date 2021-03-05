@@ -14,6 +14,5 @@ namespace sdesktop::developerMode
         std::unique_ptr<sdesktop::Event> event;
         explicit DeveloperModeRequest(std::unique_ptr<sdesktop::Event> event);
         DeveloperModeRequest();
-        ~DeveloperModeRequest() override = default;
     };
 } // namespace sdesktop::developerMode

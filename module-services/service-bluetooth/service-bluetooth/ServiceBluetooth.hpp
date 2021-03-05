@@ -11,7 +11,6 @@
 #include <service-db/DBServiceName.hpp>
 #include <service-audio/ServiceAudio.hpp>
 #include <module-bluetooth/Bluetooth/CommandHandler.hpp>
-#include "BluetoothMessage.hpp"
 #include "ProfileManager.hpp"
 #include <Service/CpuSentinel.hpp>
 
@@ -22,6 +21,30 @@ namespace settings
 {
     class Settings;
 }
+
+namespace sdesktop
+{
+    class Event;
+    namespace developerMode
+    {
+        class DeveloperModeRequest;
+        class DeveloperModeMessageWrapper;
+    } // namespace developerMode
+} // namespace sdesktop
+
+namespace message::bluetooth
+{
+    class RequestBondedDevices;
+    class RequestStatus;
+    class SetStatus;
+    class Unpair;
+    class SetDeviceName;
+    class Connect;
+    class ConnectResult;
+    class Disconnect;
+    class DisconnectResult;
+
+} // namespace message::bluetooth
 
 class ServiceBluetooth : public sys::Service
 {
@@ -39,14 +62,24 @@ class ServiceBluetooth : public sys::Service
     QueueHandle_t workerQueue = nullptr;
     std::shared_ptr<bluetooth::SettingsHolder> settingsHolder;
     bluetooth::ProfileManager *profileManagerPtr = nullptr;
-    void scanStartedCallback();
-    void scanStoppedCallback();
 
   private:
     std::unique_ptr<BluetoothWorker> worker;
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
-    bool enabledFromHarness = false;
-    void sendDevicesAfterDisconnect();
+
+    [[nodiscard]] auto handle(message::bluetooth::RequestBondedDevices *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::RequestStatus *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::SetStatus *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(BluetoothPairMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::Unpair *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::SetDeviceName *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::Connect *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::ConnectResult *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::Disconnect *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::DisconnectResult *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(BluetoothAddrMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(sdesktop::developerMode::DeveloperModeRequest *msg) -> std::shared_ptr<sys::Message>;
 };
 
 namespace sys

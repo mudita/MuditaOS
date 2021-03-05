@@ -215,6 +215,7 @@ enum class MessageType
     Restore,
     Factory,
     DeveloperModeRequest,
+    DeveloperModeMessageWrapper,
     PasscodeRequest,
     TransferTimer,
 

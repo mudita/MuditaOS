@@ -9,4 +9,7 @@ namespace message::bluetooth
 {
     class Disconnect : public BluetoothMessage
     {};
+
+    class DisconnectResult : public BluetoothMessage
+    {};
 } // namespace message::bluetooth

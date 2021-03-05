@@ -34,6 +34,7 @@ class BluetoothMessage : public sys::DataMessage
         Start,
         Scan,
         StopScan,
+        getDevicesAvailable,
         PAN,
         Visible,
         Play,
@@ -45,16 +46,6 @@ class BluetoothMessage : public sys::DataMessage
     BluetoothMessage(enum Request req = None) : sys::DataMessage(MessageType::BluetoothRequest), req(req)
     {}
     ~BluetoothMessage() override = default;
-};
-
-class BluetoothScanResultMessage : public sys::DataMessage
-{
-  public:
-    std::vector<Devicei> devices;
-    BluetoothScanResultMessage(std::vector<Devicei> devices)
-        : sys::DataMessage(MessageType::BluetoothScanResult), devices(std::move(devices))
-    {}
-    ~BluetoothScanResultMessage() override = default;
 };
 
 class BluetoothPairResultMessage : public sys::DataMessage
@@ -76,16 +67,6 @@ class BluetoothPairResultMessage : public sys::DataMessage
     std::string addr;
     std::string name;
     bool succeed;
-};
-
-class BluetoothScanMessage : public sys::DataMessage
-{
-  public:
-    std::vector<Devicei> devices;
-    BluetoothScanMessage(std::vector<Devicei> devices)
-        : sys::DataMessage(MessageType::BluetoothScanResult), devices(std::move(devices))
-    {}
-    ~BluetoothScanMessage() override = default;
 };
 
 class BluetoothAddrMessage : public sys::DataMessage
@@ -149,11 +130,4 @@ class BluetoothRequestStreamResultMessage : public sys::DataMessage
 
   private:
     std::shared_ptr<BluetoothStreamData> data;
-};
-
-class BluetoothDeviceDisconnectedMessage : public sys::DataMessage
-{
-  public:
-    BluetoothDeviceDisconnectedMessage() : DataMessage(MessageType::BluetoothDeviceDisconnected)
-    {}
 };
