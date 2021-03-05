@@ -149,6 +149,7 @@ namespace sys
             const auto startTimeout = service.get().getStartTimeout().count();
             if (const auto success = RunSystemService(service.get().create(), this, startTimeout); !success) {
                 LOG_FATAL("Unable to start service: %s", service.get().getName().c_str());
+                throw SystemInitialisationError{"System startup failed: unable to start a system service."};
             }
         });
     }

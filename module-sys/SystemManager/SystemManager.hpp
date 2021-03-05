@@ -12,6 +12,7 @@
 #define SYSTEMMANAGER_SYSTEMMANAGER_HPP_
 
 #include <functional>
+#include <stdexcept>
 #include "thread.hpp"
 #include "condition_variable.hpp"
 #include "mutex.hpp"
@@ -45,6 +46,12 @@ namespace sys
         Update,
         Reboot,
         None,
+    };
+
+    class SystemInitialisationError : public std::runtime_error
+    {
+      public:
+        using std::runtime_error::runtime_error;
     };
 
     class SystemManagerCmd : public DataMessage
