@@ -529,7 +529,6 @@
   "app_desktop_update_muditaos": "MuditaOS update",
   "app_desktop_update_in_progress": "Update in progress...",
   "app_desktop_update_ready_for_reset": "Ready for reset...",
-  "app_desktop_update_success": "MuditaOS has been updated to ver.... succesfully.",
-  "app_desktop_update_success": "MuditaOS has been updated succesfully.",
+  "app_desktop_update_success": "MuditaOS has been updated to $VERSION succesfully.",
   "app_call_private_number": "Private number"
 }

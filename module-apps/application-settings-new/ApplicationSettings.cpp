@@ -26,6 +26,7 @@
 #include "windows/QuotesMainWindow.hpp"
 #include "windows/QuotesAddWindow.hpp"
 #include "windows/EditQuotesWindow.hpp"
+#include "windows/QuoteCategoriesWindow.hpp"
 #include "windows/SecurityMainWindow.hpp"
 #include "windows/QuotesOptionsWindow.hpp"
 #include "windows/ChangePasscodeWindow.hpp"
@@ -83,6 +84,11 @@ namespace app
         {
             auto repo = std::make_unique<QuotesJsonRepository>(settings::quotesPath);
             return std::make_unique<QuotesModel>(app, std::move(repo));
+        }
+
+        auto getCategoriesModel(Application *app) -> std::unique_ptr<CategoriesModel>
+        {
+            return std::make_unique<CategoriesModel>(app);
         }
     } // namespace settings
 
@@ -461,6 +467,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::edit_quotes, [](Application *app, const std::string &name) {
             return std::make_unique<gui::EditQuotesWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::quote_categories, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::QuoteCategoriesWindow>(app, std::move(settings::getCategoriesModel(app)));
         });
 
         attachPopups({gui::popup::ID::Volume});

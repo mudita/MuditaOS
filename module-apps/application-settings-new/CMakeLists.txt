@@ -22,8 +22,10 @@ target_sources( ${PROJECT_NAME}
         models/FromTimeToTimeModel.cpp
         models/QuotesModel.cpp
         models/QuotesRepository.cpp
+        models/CategoriesModel.cpp
         widgets/ChangePasscodeLockHandler.cpp
         widgets/QuoteWidget.cpp
+        widgets/CategoryWidget.cpp
         widgets/ApnInputWidget.cpp
         widgets/SettingsDateItem.cpp
         widgets/SettingsTimeItem.cpp
@@ -63,11 +65,13 @@ target_sources( ${PROJECT_NAME}
         windows/ChangeDateAndTimeWindow.cpp
         windows/BluetoothCheckPasskeyWindow.cpp
         windows/EditQuotesWindow.cpp
+        windows/QuoteCategoriesWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
         widgets/ChangePasscodeLockHandler.hpp
         widgets/ApnInputWidget.hpp
+        widgets/CategoryWidget.hpp
         windows/NewApnWindow.hpp
         windows/SettingsMainWindow.hpp
         windows/BaseSettingsWindow.hpp
@@ -88,6 +92,7 @@ target_sources( ${PROJECT_NAME}
         windows/DateAndTimeMainWindow.hpp
         windows/ChangeDateAndTimeWindow.hpp
         windows/EditQuotesWindow.hpp
+        windows/QuoteCategoriesWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

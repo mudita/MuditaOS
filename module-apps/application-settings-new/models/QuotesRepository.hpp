@@ -27,6 +27,12 @@ namespace app
         }
     };
 
+    struct QuoteCategory
+    {
+        int id = 0;
+        std::string categoryDescription;
+    };
+
     class QuotesRepository
     {
       public:
