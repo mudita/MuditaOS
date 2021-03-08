@@ -83,7 +83,7 @@ extern uint32_t SystemCoreClock;
 #ifdef TARGET_Linux
 #   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*512))
 #else
-#   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*324))
+#   define configTOTAL_HEAP_SIZE                   ((size_t)(1024*386))
 #endif
 
 #define configAPPLICATION_ALLOCATED_HEAP        0
