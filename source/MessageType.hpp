@@ -259,6 +259,9 @@ enum class MessageType
 
     // Vibra messages
     VibraPulseMessage,
+
+    // Quotes messages
+    Quotes,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

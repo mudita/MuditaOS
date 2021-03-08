@@ -211,6 +211,7 @@ TESTS_LIST["catch2-PowerManager"]="
 TESTS_LIST["catch2-service-db"]="
     DB_API;
     Settings Messages;
+    Quotes;
 "
 #---------
 TESTS_LIST["catch2-service-db-settings"]="

@@ -2,11 +2,11 @@
 -- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 INSERT OR REPLACE INTO quote_languages (lang_id, lang_name) VALUES
-    (1, "Polish"),
-    (2, "English"),
-    (3, "Spanish"),
-    (4, "French"),
-    (5, "German");
+    (1, 'Polish'),
+    (2, 'English'),
+    (3, 'Spanish'),
+    (4, 'French'),
+    (5, 'German');
 
 
 INSERT OR REPLACE INTO category_table (category_id, category_name) VALUES
@@ -59,10 +59,10 @@ INSERT OR REPLACE INTO quote_table (quote_id, lang_id, quote, author) VALUES
     (38, 3, 'La única manera de vivir es aceptar cada minuto como un milagro irrepetible.', 'Tara Brach'),
     (39, 3, 'Las cosas más simples son a menudo las más reales.', 'Richard Bach'),
     (40, 3, 'Di siempre "sí" al momento presente. Di "sí" a la vida.', 'Eckhart Tolle'),
-    (41, 4, "Ne t'attarde pas sur le passé, ne rêve pas de l'avenir, concentre-toi sur le moment présent.", 'Buddha'),
-    (42, 4, "La seule façon de vivre est d'accepter chaque minute comme un miracle non répétable.", 'Tara Brach'),
-    (43, 4, "Les choses les plus simples sont souvent les plus vraies.", 'Richard Bach'),
-    (44, 4, "Dites toujours “oui” au moment présent. Dites “oui” à la vie.", 'Eckhart Tolle'),
+    (41, 4, 'Ne t''attarde pas sur le passé, ne rêve pas de l''avenir, concentre-toi sur le moment présent.', 'Buddha'),
+    (42, 4, 'La seule façon de vivre est d''accepter chaque minute comme un miracle non répétable.', 'Tara Brach'),
+    (43, 4, 'Les choses les plus simples sont souvent les plus vraies.', 'Richard Bach'),
+    (44, 4, 'Dites toujours “oui” au moment présent. Dites “oui” à la vie.', 'Eckhart Tolle'),
     (45, 5, 'Bleibe nicht in der Vergangenheit stecken und träume nicht von der Zukunft. Konzentriere dich auf das Jetzt.', 'Buddha'),
     (46, 5, 'Die einzige Art, zu leben, besteht darin, jede Minute als unwiederbringliches Wunder anzusehen.', 'Tara Brach'),
     (47, 5, 'Die einfachsten Dinge sind manchmal die echtesten', 'Richard Bach'),

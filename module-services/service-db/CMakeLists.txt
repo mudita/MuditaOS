@@ -21,6 +21,7 @@ set(SOURCES
     agents/settings/Settings.cpp
     agents/settings/SettingsCache.cpp
     agents/file_indexer/FileIndexerAgent.cpp
+    agents/quotes/QuotesAgent.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

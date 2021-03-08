@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,7 +23,7 @@ class FileIndexerTest : public FileIndexerAgent
         return FileIndexerAgent::handleSetRecord(req);
     }
 
-    auto handleListDirTest(FileIndexer::Messages::GetListDirMessage *req) -> sys::MessagePointer
+    auto handleListDirTest(FileIndexer::Messages::GetListDirRequest *req) -> sys::MessagePointer
     {
         return FileIndexerAgent::handleListDir(req);
     }
