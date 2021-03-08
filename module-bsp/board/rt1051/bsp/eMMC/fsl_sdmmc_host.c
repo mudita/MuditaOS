@@ -203,7 +203,7 @@ void SDMMCHOST_PowerOffCard(SDMMCHOST_TYPE *base, const sdmmchost_pwr_card_t *pw
         /* only SD card need card detect*/
         SDMMCHOST_ENABLE_SD_POWER(false);
         /* Delay several milliseconds to make card stable. */
-        SDMMCHOST_Delay(500U);
+        SDMMCHOST_Delay(100U);
     }
 }
 
@@ -218,7 +218,7 @@ void SDMMCHOST_PowerOnCard(SDMMCHOST_TYPE *base, const sdmmchost_pwr_card_t *pwr
         /* card power on */
         SDMMCHOST_ENABLE_SD_POWER(true);
         /* Delay several milliseconds to make card stable. */
-        SDMMCHOST_Delay(1000U);
+        SDMMCHOST_Delay(300U);
     }
 }
 
