@@ -7,6 +7,7 @@ add_catch2_executable(
             test-service-db-api.cpp
             test-service-db-settings-messages.cpp
             #test-service-db-file_indexer.cpp
+            test-service-db-quotes.cpp
         LIBS
             service-audio
             module-vfs

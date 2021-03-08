@@ -15,6 +15,7 @@
 #include "service-db/QueryMessage.hpp"
 #include "service-db/DatabaseAgent.hpp"
 #include "agents/settings/SettingsAgent.hpp"
+#include "agents/quotes/QuotesAgent.hpp"
 
 #include <AlarmsRecord.hpp>
 #include <CalllogRecord.hpp>
@@ -549,6 +550,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
 
     databaseAgents.emplace(std::make_unique<SettingsAgent>(this));
     databaseAgents.emplace(std::make_unique<FileIndexerAgent>(this));
+    databaseAgents.emplace(std::make_unique<Quotes::QuotesAgent>(this));
 
     for (auto &dbAgent : databaseAgents) {
         dbAgent->initDb();

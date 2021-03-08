@@ -34,6 +34,9 @@ class DatabaseAgent
     }
     [[nodiscard]] virtual auto getDbFilePath() -> const std::string = 0;
 
+    static constexpr auto ZERO_ROWS_FOUND = 0;
+    static constexpr auto ONE_ROW_FOUND   = 1;
+
   protected:
     [[nodiscard]] virtual auto getDbInitString() -> const std::string = 0;
 
