@@ -39,8 +39,10 @@
 
 namespace app
 {
+    static constexpr auto messagesStackDepth = 1024 * 6; // 6Kb stack size
+
     ApplicationMessages::ApplicationMessages(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, 4096 * 2), AsyncCallbackReceiver{this}
+        : Application(name, parent, startInBackground, messagesStackDepth), AsyncCallbackReceiver{this}
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {
@@ -277,9 +279,9 @@ namespace app
     bool ApplicationMessages::searchEmpty(const std::string &query)
     {
         gui::DialogMetadata meta;
-        meta.icon  = "search_big";
-        meta.text  = utils::localize.get("app_messages_thread_no_result");
-        meta.title = utils::localize.get("common_results_prefix") + query;
+        meta.icon                        = "search_big";
+        meta.text                        = utils::localize.get("app_messages_thread_no_result");
+        meta.title                       = utils::localize.get("common_results_prefix") + query;
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         data->ignoreCurrentWindowOnStack = true;
         switchWindow(gui::name::window::dialog, std::make_unique<gui::DialogMetadataMessage>(meta));
@@ -295,9 +297,9 @@ namespace app
     bool ApplicationMessages::showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack)
     {
         gui::DialogMetadata meta;
-        meta.icon   = "info_big_circle_W_G";
-        meta.text   = utils::localize.get("app_messages_no_sim");
-        meta.action = action;
+        meta.icon                              = "info_big_circle_W_G";
+        meta.text                              = utils::localize.get("app_messages_no_sim");
+        meta.action                            = action;
         auto switchData                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         switchData->ignoreCurrentWindowOnStack = ignoreCurrentWindowOnStack;
         switchWindow(gui::name::window::dialog_confirm, std::move(switchData));
