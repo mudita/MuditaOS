@@ -48,6 +48,9 @@ namespace vfsn::linux::internal
             errno = -ret;
             ret   = -1;
         }
+        else {
+            errno = 0;
+        }
         return ret;
     }
 } // namespace vfsn::linux::internal
