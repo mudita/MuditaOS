@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WallpaperWindow.hpp"
@@ -45,7 +45,7 @@ namespace gui
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 utils::translateI18("app_settings_display_wallpaper_edit_quotes"),
                 [=](gui::Item &item) {
-                    application->switchWindow(gui::window::name::quotes, nullptr);
+                    application->switchWindow(gui::window::name::edit_quotes, nullptr);
                     return true;
                 },
                 [=](gui::Item &item) {

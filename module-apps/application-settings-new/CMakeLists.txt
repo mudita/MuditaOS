@@ -62,6 +62,7 @@ target_sources( ${PROJECT_NAME}
         windows/ChangeTimeZone.cpp
         windows/ChangeDateAndTimeWindow.cpp
         windows/BluetoothCheckPasskeyWindow.cpp
+        windows/EditQuotesWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -86,6 +87,7 @@ target_sources( ${PROJECT_NAME}
         windows/LanguagesWindow.hpp
         windows/DateAndTimeMainWindow.hpp
         windows/ChangeDateAndTimeWindow.hpp
+        windows/EditQuotesWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)
