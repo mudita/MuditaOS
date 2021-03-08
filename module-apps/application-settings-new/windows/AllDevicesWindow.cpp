@@ -93,6 +93,7 @@ namespace gui
                     LOG_DEBUG("Device: %s", device.name.c_str());
                     if (isConnected) {
                         bluetoothSettingsModel->requestDisconnection();
+                        addressOfConnectedDevice.clear();
                         refreshOptionsList();
                     }
                     else {

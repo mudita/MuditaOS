@@ -86,6 +86,4 @@ void BluetoothSettingsModel::requestConnection(std::string addr)
 void BluetoothSettingsModel::requestDisconnection()
 {
     application->bus.sendUnicast(std::make_shared<message::bluetooth::Disconnect>(), service::name::bluetooth);
-    application->bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(),
-                                 service::name::bluetooth);
 }
