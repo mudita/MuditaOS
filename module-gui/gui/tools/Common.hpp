@@ -8,7 +8,7 @@
 namespace gui
 {
 
-    /** Center \a child intem in \a paretn on \a axix
+    /** Center \a child item in \a parent on \a axis
      */
     inline void center(gui::Item *parent, gui::Item *child, gui::Axis axis)
     {
@@ -20,7 +20,7 @@ namespace gui
         }
     }
 
-    /** Postion at \a child at \a parent bottom
+    /** Positon at \a child at \a parent bottom
      */
     inline void bottom(gui::Item *parent, gui::Item *child, gui::Axis axis)
     {
