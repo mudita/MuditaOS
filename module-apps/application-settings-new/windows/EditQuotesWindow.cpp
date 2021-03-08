@@ -44,7 +44,7 @@ namespace gui
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 utils::translateI18("app_settings_display_wallpaper_quotes_categories"),
                 [=](gui::Item &item) {
-                    application->switchWindow(gui::window::name::quotes, nullptr);
+                    application->switchWindow(gui::window::name::quote_categories, nullptr);
                     return true;
                 },
                 [=](gui::Item &item) {

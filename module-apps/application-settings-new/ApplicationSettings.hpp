@@ -44,6 +44,7 @@ namespace gui::window::name
     inline constexpr auto options_quote        = "OptionsQuote";
     inline constexpr auto delete_quote         = "DeleteQuote";
     inline constexpr auto quotes_dialog_yes_no = "DialogYesNo";
+    inline constexpr auto quote_categories     = "QuoteCategories";
 
     inline constexpr auto display_and_keypad = "DisplayAndKeypad";
     inline constexpr auto change_settings    = "ChangeSettings";

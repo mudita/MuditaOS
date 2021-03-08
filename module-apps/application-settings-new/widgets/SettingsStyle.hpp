@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -118,4 +118,20 @@ namespace style
             }         // namespace bluetooth
         }     // namespace window
     };        // namespace settings
+    namespace quotes::categories
+    {
+        namespace list
+        {
+            inline constexpr auto X      = style::window::default_left_margin;
+            inline constexpr auto Y      = style::header::height;
+            inline constexpr auto Width  = style::listview::body_width_with_scroll;
+            inline constexpr auto Height = style::window_height - Y - style::footer::height;
+        } // namespace list
+
+        inline constexpr auto cross_x = 48;
+        inline constexpr auto cross_y = 55;
+        inline constexpr auto arrow_x = 30;
+        inline constexpr auto arrow_y = 62;
+
+    } // namespace quotes::categories
 } // namespace style
