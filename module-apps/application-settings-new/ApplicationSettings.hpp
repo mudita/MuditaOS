@@ -40,6 +40,7 @@ namespace gui::window::name
     inline constexpr auto quotes               = "Quotes";
     inline constexpr auto new_quote            = "NewQuote";
     inline constexpr auto edit_quote           = "EditQuote";
+    inline constexpr auto edit_quotes          = "EditQuotes";
     inline constexpr auto options_quote        = "OptionsQuote";
     inline constexpr auto delete_quote         = "DeleteQuote";
     inline constexpr auto quotes_dialog_yes_no = "DialogYesNo";

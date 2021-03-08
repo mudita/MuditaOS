@@ -25,6 +25,7 @@
 #include "windows/WallpaperWindow.hpp"
 #include "windows/QuotesMainWindow.hpp"
 #include "windows/QuotesAddWindow.hpp"
+#include "windows/EditQuotesWindow.hpp"
 #include "windows/SecurityMainWindow.hpp"
 #include "windows/QuotesOptionsWindow.hpp"
 #include "windows/ChangePasscodeWindow.hpp"
@@ -457,6 +458,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::options_quote, [](Application *app, const std::string &name) {
             return std::make_unique<gui::QuotesOptionsWindow>(app, std::move(settings::getQuotesModel(app)));
+        });
+        windowsFactory.attach(gui::window::name::edit_quotes, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::EditQuotesWindow>(app);
         });
 
         attachPopups({gui::popup::ID::Volume});
