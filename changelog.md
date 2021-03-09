@@ -1,5 +1,71 @@
 # MuditaOS changelog
 
+## [0.59.1 2020-03-09]
+
+### Added
+
+* Add a separate set of audio settings for each mode.
+* Add Bluetooth pairing.
+* Add cache for settings reducing average settings processing time.
+* Add clearing the phone screen when the phone is off.
+* Add EULA window for the onboarding process.
+* Add Handling a simultaneous A2DP/HSP Bluetooth connection.
+* Add missing Swedish glyphs.
+* Add pagination for message threads.
+* Add post-update window with update status information.
+* Add reusable "Retry action" dialog window.
+* Add SIM PIN2 handling.
+* Add system watchdog preventing random freezes.
+* Add the ability to send a message using the contact information.
+* Add time selection window.
+* Add vibration handling.
+* Add window for entering Bluetooth pairing code.
+* Add windows to visualize the progress of the phone update process.
+
+### Changed
+
+* Improve Bluetooth communication stability.
+* Improve displaying information on the top bar.
+* Improve handling of URC, increasing communication stability with the modem.
+* Improve quickstart procedure.
+* Improve user actions handling by processing them in order. 
+* Improve volume buttons logic to be more intuitive for the user.
+* Increase stability by changing filesystem to littleFS.
+* Introduce an improved and unified way to close the system.
+* Remove volume indicator from the music player to be replaced with popup volume indicator in the future.
+* Restore phone auto-locking on timeout.
+* Secure USB endpoints with screen passcode.
+* Several improvements to low power mode.
+
+### Fixed
+
+* Fix call application not showing up when there is no caller information available.
+* Fix crashes in logging subsystem related to long messages.
+* Fix database startup process.
+* Fix improper contacts being displayed in the phonebook window.
+* Fix minor UX issues in messages' user interface.
+* Fix multimedia playback priorities regarding alarm and meditation sounds.
+* Fix quotes windows.
+* Fix several minor issues with system stability.
+* Fix several random issues related to system heap shortage.
+* Fix small Bluetooth icon.
+* Fix status icons indicating charging status.
+* Fix switching to loudspeaker not working on rare occasions.
+* Fix timeout timer, increasing update process stability.
+* Fix URC handling.
+* Fix USD settings menu navigation.
+
+### Other
+
+* Add an option to use minimal phone number data, reducing firmware size.
+* Add map parser and `puregdb` tools to the main repo.
+* Add support for `newlib` time syscalls.
+* Disable OS optimization for development build configurations.
+* Enable differential static analysis with `clang-tidy-diff`.
+* Fix Linux build with GSM enabled.
+* Several tests added.
+* Update GCC to version 10.
+
 ## [0.58.1 2020-02-19]
 
 ### Added
