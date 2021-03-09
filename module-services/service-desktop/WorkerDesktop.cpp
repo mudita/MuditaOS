@@ -19,7 +19,8 @@
 inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
 
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr)
-    : sys::Worker(ownerServicePtr), ownerService(ownerServicePtr), parser(ownerServicePtr), fileDes(nullptr)
+    : sys::Worker(ownerServicePtr, sdesktop::worker_stack), ownerService(ownerServicePtr), parser(ownerServicePtr),
+      fileDes(nullptr)
 {}
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
