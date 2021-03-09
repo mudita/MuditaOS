@@ -78,3 +78,7 @@
 [submodule "tools/misc"]
 	path = tools/misc
 	url = ../misc-tools.git
+[submodule "test/harness"]
+	path = test/harness
+	url = ../QAMuditaHarness.git
+	shallow = true
