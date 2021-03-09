@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-db/Settings.hpp>
@@ -132,7 +132,7 @@ namespace settings
         }
         cbValues[path].first = std::move(cb);
 
-        auto msg      = std::make_shared<settings::Messages::RegisterOnVariableChange>(path);
+        auto msg = std::make_shared<settings::Messages::RegisterOnVariableChange>(path);
         sendMsg(std::move(msg));
     }
 
@@ -151,7 +151,7 @@ namespace settings
         }
         cbValues[path].second = std::move(cb);
 
-        auto msg      = std::make_shared<settings::Messages::RegisterOnVariableChange>(path);
+        auto msg = std::make_shared<settings::Messages::RegisterOnVariableChange>(path);
         sendMsg(std::move(msg));
     }
 
@@ -171,7 +171,7 @@ namespace settings
             cbValues.erase(it_cb);
         }
 
-        auto msg      = std::make_shared<settings::Messages::UnregisterOnVariableChange>(path);
+        auto msg = std::make_shared<settings::Messages::UnregisterOnVariableChange>(path);
         sendMsg(std::move(msg));
     }
 
