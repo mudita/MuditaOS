@@ -12,6 +12,7 @@
 #include "Service/Service.hpp" // for Service
 #include "Constants.hpp"
 #include "WorkerDesktop.hpp"
+#include "USBSecurityModel.hpp"
 #include <endpoints/update/UpdateMuditaOS.hpp>
 #include <service-db/DBServiceName.hpp>
 
@@ -63,14 +64,20 @@ class ServiceDesktop : public sys::Service
 
     std::unique_ptr<UpdateMuditaOS> updateOS;
     std::unique_ptr<WorkerDesktop> desktopWorker;
+
     void storeHistory(const std::string &historyValue);
     void prepareBackupData();
     const BackupStatus getBackupStatus()
     {
         return backupStatus;
     }
+    const sdesktop::USBSecurityModel *getSecurity()
+    {
+        return usbSecurityModel.get();
+    }
 
   private:
+    std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;
     std::unique_ptr<sys::Timer> transferTimer;
 };

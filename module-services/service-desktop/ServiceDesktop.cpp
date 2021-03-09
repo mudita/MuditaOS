@@ -60,8 +60,9 @@ ServiceDesktop::ServiceDesktop() : sys::Service(service::name::service_desktop, 
 {
     LOG_INFO("[ServiceDesktop] Initializing");
 
-    updateOS = std::make_unique<UpdateMuditaOS>(this);
-    settings = std::make_unique<settings::Settings>(this);
+    updateOS         = std::make_unique<UpdateMuditaOS>(this);
+    settings         = std::make_unique<settings::Settings>(this);
+    usbSecurityModel = std::make_unique<sdesktop::USBSecurityModel>(this, settings.get());
 }
 
 ServiceDesktop::~ServiceDesktop()
@@ -71,7 +72,7 @@ ServiceDesktop::~ServiceDesktop()
 
 sys::ReturnCodes ServiceDesktop::InitHandler()
 {
-    desktopWorker = std::make_unique<WorkerDesktop>(this);
+    desktopWorker = std::make_unique<WorkerDesktop>(this, *usbSecurityModel.get());
     const bool ret =
         desktopWorker->init({{sdesktop::RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_len},
                              {sdesktop::SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), sdesktop::cdc_queue_object_size},
@@ -188,13 +189,13 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     });
 
     connect(sdesktop::usb::USBConfigured(), [&](sys::Message *msg) {
-        if (!desktopWorker->isEndpointSecurityEnabled()) {
+        if (!usbSecurityModel->isSecurityEnabled()) {
             LOG_INFO("Endpoint security disabled.");
             return std::make_shared<sys::ResponseMessage>();
         }
 
         LOG_INFO("USB connected with endpoint security enabled. Requesting passcode.");
-        desktopWorker->setEndpointSecurity(EndpointSecurity::Block);
+        usbSecurityModel->setEndpointSecurity(EndpointSecurity::Block);
         bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(),
                         app::manager::ApplicationManager::ServiceName);
 
@@ -208,9 +209,31 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
+    connect(sdesktop::usb::USBHandshake(), [&](sys::Message *msg) {
+        auto handshakeMsg = dynamic_cast<sdesktop::usb::USBHandshake *>(msg);
+        if (usbSecurityModel->processHandshake(handshakeMsg)) {
+            LOG_DEBUG("Handshake ok. Unlocking.");
+            bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>(),
+                            service::name::service_desktop);
+        }
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sdesktop::usb::USBSecurityOn(), [&](sys::Message *msg) {
+        usbSecurityModel->enableEndpointSecurity(true);
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sdesktop::usb::USBSecurityOff(), [&](sys::Message *msg) {
+        usbSecurityModel->enableEndpointSecurity(false);
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
     connect(sdesktop::passcode::ScreenPasscodeUnlocked(), [&](sys::Message *msg) {
-        LOG_INFO("Passcode accepted. Enabling secured endpoints.");
-        desktopWorker->setEndpointSecurity(EndpointSecurity::Allow);
+        LOG_INFO("Passcode accepted. Enabling endpoints.");
+        bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(true),
+                        app::manager::ApplicationManager::ServiceName);
+        usbSecurityModel->setEndpointSecurity(EndpointSecurity::Allow);
         return std::make_shared<sys::ResponseMessage>();
     });
 
@@ -221,9 +244,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         ::settings::SystemProperties::usbSecurity,
         [this](std::string value) {
             bool securityEnabled = utils::getNumericValue<bool>(value);
-            LOG_INFO("Setting endpoint security: %d", securityEnabled);
-            desktopWorker->enableEndpointSecurity(securityEnabled);
-            desktopWorker->setEndpointSecurity(securityEnabled ? EndpointSecurity::Block : EndpointSecurity::Allow);
+            usbSecurityModel->enableEndpointSecurity(securityEnabled);
+            usbSecurityModel->setEndpointSecurity(securityEnabled ? EndpointSecurity::Block : EndpointSecurity::Allow);
         },
         settings::SettingsScope::Global);
 

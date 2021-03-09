@@ -57,7 +57,7 @@ namespace parserFSM
         inline constexpr auto changeCellularStateCmd = "changeCellularStateCmd";
         inline constexpr auto getInfo                = "getInfo";
         inline constexpr auto tethering              = "tethering";
-        inline constexpr auto usbSecurity            = "usbSecurity";
+        inline constexpr auto usbSecurityStatus      = "usbSecurityStatus";
         /// values for getInfo cmd
         inline constexpr auto simStateInfo      = "simState";
         inline constexpr auto cellularStateInfo = "cellularState";
@@ -69,9 +69,9 @@ namespace parserFSM
         inline constexpr auto tetheringOn  = "on";
         inline constexpr auto tetheringOff = "off";
 
-        /// values for usbSecurity
-        inline constexpr auto usbLock   = "usbLock";
-        inline constexpr auto usbUnlock = "usbUnlock";
+        // values for usb security
+        inline constexpr auto usbLocked   = "locked";
+        inline constexpr auto usbUnlocked = "unlocked";
 
     } // namespace json::developerMode
 

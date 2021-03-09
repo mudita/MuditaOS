@@ -1893,7 +1893,7 @@ void ServiceCellular::handle_power_state_change()
 
 bool ServiceCellular::handleUSSDRequest(CellularUSSDMessage::RequestType requestType, const std::string &request)
 {
-    constexpr uint32_t commandTimeout        = 120000;
+    constexpr uint32_t commandTimeout = 120000;
 
     auto channel = cmux->get(TS0710::Channel::Commands);
     if (channel != nullptr) {

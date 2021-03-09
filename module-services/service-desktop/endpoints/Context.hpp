@@ -8,6 +8,10 @@
 
 namespace parserFSM
 {
+    constexpr http::Code toCode(bool r)
+    {
+        return r ? http::Code::OK : http::Code::InternalServerError;
+    }
 
     namespace json
     {
