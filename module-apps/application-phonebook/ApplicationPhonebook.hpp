@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,7 +25,7 @@ namespace gui::window::name
 namespace app
 {
     inline constexpr auto name_phonebook         = "ApplicationPhonebook";
-    constexpr std::uint16_t phonebook_stack_size = 8192;
+    constexpr std::uint16_t phonebook_stack_size = 4096;
 
     class ApplicationPhonebook : public app::Application
     {
