@@ -27,6 +27,7 @@ set(SOURCES
     endpoints/filesystem/FilesystemEndpoint.cpp
     endpoints/calendarEvents/CalendarEventsHelper.cpp
     endpoints/calendarEvents/CalendarEventsEndpoint.cpp
+    endpoints/security/SecurityEndpoint.cpp
 
     parser/HttpEnums.cpp
     parser/ParserFSM.cpp
@@ -37,6 +38,7 @@ set(SOURCES
     DesktopMessages.cpp
     ServiceDesktop.cpp
     WorkerDesktop.cpp
+    USBSecurityModel.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

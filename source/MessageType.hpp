@@ -221,6 +221,9 @@ enum class MessageType
     USBConnected,
     USBConfigured,
     USBDisconnected,
+    USBSecurityOn,
+    USBSecurityOff,
+    USBHandshake,
 
     ScreenPasscodeRequest,
     ScreenPasscodeUnlocked,

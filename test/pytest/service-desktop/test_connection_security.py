@@ -6,24 +6,12 @@ from harness.interface.defs import status
 from harness import utils, log
 
 @pytest.mark.service_desktop_test
-@pytest.mark.usefixtures("usb_locked")
-@pytest.mark.skip("not working ;/")
 def test_secured_endpoint(harness):
     body = {}
 
+    harness.lock_usb()
+
     ret = harness.endpoint_request("deviceInfo", "get", body)
-    assert ret["status"] == status["Forbidden"]
-
-    ret = harness.endpoint_request("messages", "get", body)
-    assert ret["status"] == status["Forbidden"]
-
-    ret = harness.endpoint_request("calllog", "get", body)
-    assert ret["status"] == status["Forbidden"]
-
-    ret = harness.endpoint_request("backup", "get", body)
-    assert ret["status"] == status["Forbidden"]
-
-    ret = harness.endpoint_request("contacts", "get", body)
     assert ret["status"] == status["Forbidden"]
 
     harness.unlock_usb()
@@ -31,11 +19,74 @@ def test_secured_endpoint(harness):
     ret = harness.endpoint_request("deviceInfo", "get", body)
     assert ret["status"] == status["OK"]
 
-    ret = harness.endpoint_request("calllog", "get", body)
+@pytest.mark.service_desktop_test
+def test_secured_paired(harness):
+    body = {
+        "uniqueId": "11111",
+        "passcode": 3333
+    }
+
+    harness.lock_usb()
+
+    ret = harness.endpoint_request("deviceInfo", "get", {})
+    assert ret["status"] == status["Forbidden"]
+
+    ret = harness.endpoint_request("usbSecurity", "post", {
+        "uniqueId": "11111",
+        "passcode": 5555
+    })
+    assert ret["status"] == status["Forbidden"]
+
+    ret = harness.endpoint_request("usbSecurity", "post", body)
     assert ret["status"] == status["OK"]
 
-    ret = harness.endpoint_request("backup", "get", body)
-    assert ret["status"] == status["BadRequest"]
+    ret = harness.endpoint_request("calllog", "get", {})
+    assert ret["status"] == status["OK"]
 
-    ret = harness.endpoint_request("contacts", "get", body)
+    harness.lock_usb()
+
+    ret = harness.endpoint_request("backup", "get", {})
+    assert ret["status"] == status["Forbidden"]
+
+    ret = harness.endpoint_request("usbSecurity", "post", body)
+    assert ret["status"] == status["OK"]
+
+    ret = harness.endpoint_request("calllog", "get", {})
+    assert ret["status"] == status["OK"]
+
+    harness.lock_usb()
+
+    ret = harness.endpoint_request("usbSecurity", "post", {"uniqueId": "11111"})
+    assert ret["status"] == status["OK"]
+
+    ret = harness.endpoint_request("calllog", "get", {})
+    assert ret["status"] == status["OK"]
+
+
+@pytest.mark.service_desktop_test
+def test_usb_status(harness):
+    body = {
+        "uniqueId": "11111",
+        "passcode": 3333
+    }
+
+    harness.lock_usb()
+
+    ret = harness.endpoint_request("usbSecurity", "get", {})
+    assert ret["status"] == status["Forbidden"]
+
+    harness.unlock_usb()
+
+    ret = harness.endpoint_request("usbSecurity", "get", {})
+    assert ret["status"] == status["OK"]
+
+    harness.lock_usb()
+
+    ret = harness.endpoint_request("usbSecurity", "get", {})
+    assert ret["status"] == status["Forbidden"]
+
+    ret = harness.endpoint_request("usbSecurity", "post", body)
+    assert ret["status"] == status["OK"]
+
+    ret = harness.endpoint_request("usbSecurity", "get", {})
     assert ret["status"] == status["OK"]

@@ -33,10 +33,6 @@ using namespace parserFSM;
 
 namespace
 {
-    constexpr http::Code toCode(bool r)
-    {
-        return r ? http::Code::OK : http::Code::InternalServerError;
-    }
 
     auto toTetheringState(const std::string &state) -> sys::phone_modes::Tethering
     {
@@ -116,13 +112,14 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
                                service::name::system_manager);
         return {sent::delayed, std::nullopt};
     }
-    else if (body[json::developerMode::usbSecurity].is_string()) {
+    else if (body[json::developerMode::usbSecurityStatus].is_string()) {
         std::shared_ptr<sys::DataMessage> msg = std::make_shared<sdesktop::usb::USBConfigured>();
-        if (body[json::developerMode::usbSecurity].string_value() == json::developerMode::usbUnlock) {
+        if (body[json::developerMode::usbSecurityStatus].string_value() == json::developerMode::usbUnlocked) {
             msg = std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>();
         }
         code = toCode(owner->bus.sendUnicast(std::move(msg), "ServiceDesktop"));
     }
+
     else {
         context.setResponseStatus(http::Code::BadRequest);
         MessageHandler::putToSendQueue(context.createSimpleResponse());

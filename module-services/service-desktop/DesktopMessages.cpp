@@ -52,4 +52,5 @@ namespace sdesktop
             context.setResponseBody(json11::Json::object{{json::bluetooth::scan, json::bluetooth::btOff}});
         }
     } // namespace bluetooth
+
 } // namespace sdesktop

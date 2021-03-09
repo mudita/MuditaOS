@@ -12,6 +12,7 @@
 #include "parser/ParserFSM.hpp"
 #include "endpoints/EndpointFactory.hpp"
 #include "bsp/usb/usb.hpp"
+#include "USBSecurityModel.hpp"
 
 class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
 {
@@ -26,14 +27,11 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
         CancelTransfer,
     };
 
-    WorkerDesktop(sys::Service *ownerServicePtr);
+    WorkerDesktop(sys::Service *ownerServicePtr, const sdesktop::USBSecurityModel &securityModel);
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
     virtual bool deinit() override;
     bool handleMessage(uint32_t queueID) override final;
-
-    sys::Service *ownerService = nullptr;
-    parserFSM::StateMachine parser;
 
     xQueueHandle getReceiveQueue()
     {
@@ -47,21 +45,6 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
 
     void rawDataReceived(void *dataPtr, uint32_t dataLen) override;
     bool getRawMode() const noexcept override;
-
-    void setEndpointSecurity(EndpointSecurity security)
-    {
-        endpointSecurity = security;
-    }
-
-    void enableEndpointSecurity(bool enable)
-    {
-        endpointSecurityEnabled = enable;
-    }
-
-    bool isEndpointSecurityEnabled()
-    {
-        return endpointSecurityEnabled;
-    }
 
   private:
     void uploadFileFailedResponse();
@@ -81,6 +64,7 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     uint32_t writeFileDataWritten  = 0;
     std::filesystem::path filePath;
     std::atomic<bool> rawModeEnabled = false;
-    bool endpointSecurityEnabled     = true;
-    EndpointSecurity endpointSecurity;
+    const sdesktop::USBSecurityModel &securityModel;
+    sys::Service *ownerService = nullptr;
+    parserFSM::StateMachine parser;
 };
