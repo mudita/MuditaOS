@@ -7,7 +7,7 @@ from harness.interface.defs import key_codes, SMSType, status
 from harness.interface.CDCSerial import Keytype
 
 # time for  message to leave the sending queue
-extra_time_to_send_message  = 5
+extra_time_to_send_message  = 10
 
 def erase_all_templates(harness):
     # getting the templates count

@@ -14,6 +14,8 @@ def test_threads(harness):
 
     # getting a number of threads
     number_of_requested_threads = 3
+    if ret["body"]["totalCount"] < number_of_requested_threads:
+        number_of_requested_threads = ret["body"]["totalCount"]
     body = {"category": "thread", "limit": number_of_requested_threads, "offset": 0}
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]

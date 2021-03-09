@@ -77,7 +77,7 @@ def get_dom(harness):
     assert 'Window' in result['body']['dom']
     return result
 
-
+@pytest.mark.skip("not fully implemented - should work after EGD-5884")
 @pytest.mark.rt1051
 @pytest.mark.usefixtures("phone_unlocked")
 def test_auto_lock(harness):
