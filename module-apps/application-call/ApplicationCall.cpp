@@ -222,7 +222,7 @@ namespace app
         windowsFactory.attach(app::window::name_dialogConfirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
-        attachPopups({gui::popup::ID::Volume});
+        attachPopups({gui::popup::ID::Volume, gui::popup::ID::PhoneModes});
     }
 
     bool ApplicationCall::showNotification(std::function<bool()> action,

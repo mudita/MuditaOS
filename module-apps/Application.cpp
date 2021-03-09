@@ -87,18 +87,31 @@ namespace app
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
-          settings(std::make_unique<settings::Settings>(this))
+          settings(std::make_unique<settings::Settings>(this)),
+          phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
         topBarManager->set(utils::dateAndTimeSettings.isTimeFormat12() ? gui::top_bar::TimeMode::Time12h
                                                                        : gui::top_bar::TimeMode::Time24h);
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
+        bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
         longPressTimer = sys::TimerFactory::createPeriodicTimer(this,
                                                                 "LongPress",
                                                                 std::chrono::milliseconds{key_timer_ms},
                                                                 [this](sys::Timer &) { longPressTimerCallback(); });
 
+        phoneModeObserver->connect(this);
+        phoneModeObserver->subscribe(
+            [=](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
+                using namespace gui::popup;
+                if (getCurrentWindow()->getName() == window::phone_modes_window) {
+                    updateWindow(window::phone_modes_window, std::make_unique<gui::ModesPopupData>(phoneMode));
+                }
+                else {
+                    switchWindow(window::phone_modes_window, std::make_unique<gui::ModesPopupData>(phoneMode));
+                }
+            });
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
         connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *) { return handleBatteryStatusChange(); });
@@ -673,6 +686,10 @@ namespace app
                 });
                 break;
             case ID::PhoneModes:
+                windowsFactory.attach(window::phone_modes_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::HomeModesWindow>(app, window::phone_modes_window);
+                });
+                break;
             case ID::Brightness:
                 break;
             }
