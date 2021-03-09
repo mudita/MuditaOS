@@ -93,8 +93,6 @@ namespace gui
             if (app->getCurrentWindow()->getName() == app::window::name::desktop_pin_lock) {
                 app->switchWindow(app::window::name::desktop_main_window);
             }
-            app->bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeUnlocked>(),
-                                 service::name::service_desktop);
             return;
         }
 

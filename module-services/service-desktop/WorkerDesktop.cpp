@@ -18,9 +18,9 @@
 
 inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
 
-WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr)
-    : sys::Worker(ownerServicePtr, sdesktop::worker_stack), ownerService(ownerServicePtr), parser(ownerServicePtr),
-      fileDes(nullptr)
+WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr, const sdesktop::USBSecurityModel &securityModel)
+    : sys::Worker(ownerServicePtr, sdesktop::worker_stack), fileDes(nullptr), securityModel(securityModel),
+      ownerService(ownerServicePtr), parser(ownerServicePtr)
 {}
 
 bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
@@ -64,7 +64,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
             return false;
         }
 
-        auto factory = std::make_unique<SecuredEndpointFactory>(endpointSecurity);
+        auto factory = std::make_unique<SecuredEndpointFactory>(securityModel.getEndpointSecurity());
         auto handler = std::make_unique<parserFSM::MessageHandler>(ownerService, std::move(factory));
 
         parser.setMessageHandler(std::move(handler));

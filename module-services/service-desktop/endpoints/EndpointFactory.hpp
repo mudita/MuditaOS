@@ -19,6 +19,7 @@
 #include "restore/RestoreEndpoint.hpp"
 #include "update/UpdateEndpoint.hpp"
 #include <endpoints/bluetooth/BluetoothEndpoint.hpp>
+#include <module-services/service-desktop/endpoints/security/SecurityEndpoint.hpp>
 
 class EndpointFactory
 {
@@ -53,6 +54,8 @@ class EndpointFactory
             return std::make_unique<CalendarEventsEndpoint>(ownerServicePtr);
         case parserFSM::EndpointType::bluetooth:
             return std::make_unique<BluetoothEndpoint>(ownerServicePtr);
+        case parserFSM::EndpointType::usbSecurity:
+            return std::make_unique<SecurityEndpoint>(ownerServicePtr);
         default:
             return nullptr;
         }
@@ -67,7 +70,7 @@ enum class EndpointSecurity
 
 class SecuredEndpointFactory : public EndpointFactory
 {
-    static constexpr auto Whitelist = {parserFSM::EndpointType::developerMode};
+    static constexpr auto Whitelist = {parserFSM::EndpointType::developerMode, parserFSM::EndpointType::usbSecurity};
 
   public:
     explicit SecuredEndpointFactory(EndpointSecurity security) : endpointSecurity(security)

@@ -27,10 +27,11 @@ namespace parserFSM
         calllog,
         calendarEvents,
         developerMode,
-        bluetooth
+        bluetooth,
+        usbSecurity
     };
 
-    inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::bluetooth);
+    inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::usbSecurity);
     // Message defs and utils
     namespace message
     {
@@ -168,6 +169,20 @@ namespace parserFSM
             inline constexpr auto templateBody       = "templateBody";
             inline constexpr auto templateID         = "templateID";
         } // namespace messages
+
+        namespace usb
+        {
+            inline constexpr auto passcode = "passcode";
+            inline constexpr auto id       = "uniqueId";
+            inline constexpr auto config   = "config";
+            inline constexpr auto status   = "usbSecurityStatus";
+            inline constexpr auto on       = "on";
+            inline constexpr auto off      = "off";
+            inline constexpr auto locked   = "locked";
+            inline constexpr auto unlocked = "unlocked";
+            inline constexpr auto security = "usbSecurity";
+
+        } // namespace usb
 
     } // namespace json
 
