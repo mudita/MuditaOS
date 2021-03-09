@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookContactOptions.hpp"
@@ -80,8 +80,9 @@ namespace gui
     auto PhonebookContactOptions::contactBlock(bool shouldBeBlocked) -> bool
     {
         LOG_DEBUG("Blocking contact: %" PRIu32, contact->ID);
-        DialogMetadata meta;
-        meta.action = [=]() -> bool {
+        std::unique_ptr<DialogMetadata> meta = std::make_unique<DialogMetadata>();
+
+        meta->action = [=]() -> bool {
             contact->addToBlocked(shouldBeBlocked);
             DBServiceAPI::ContactUpdate(this->application, *contact);
             if (shouldBeBlocked) {
@@ -94,25 +95,27 @@ namespace gui
             return true;
         };
         if (shouldBeBlocked) {
-            meta.text = utils::localize.get("app_phonebook_options_block_confirm");
+            meta->text = utils::localize.get("app_phonebook_options_block_confirm");
         }
         else {
-            meta.text = utils::localize.get("app_phonebook_options_unblock_confirm");
+            meta->text = utils::localize.get("app_phonebook_options_unblock_confirm");
         }
 
         auto contactRec = DBServiceAPI::ContactGetByID(this->application, contact->ID);
         auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
-        meta.title      = cont.getFormattedName();
-        meta.icon       = "phonebook_contact_delete_trashcan";
-        application->switchWindow(gui::window::name::dialog_yes_no, std::make_unique<gui::DialogMetadataMessage>(meta));
+        meta->title     = cont.getFormattedName();
+        meta->icon      = "phonebook_contact_delete_trashcan";
+        application->switchWindow(gui::window::name::dialog_yes_no,
+                                  std::make_unique<gui::DialogMetadataMessage>(std::move(*meta.release())));
         return true;
     }
 
     auto PhonebookContactOptions::contactRemove() -> bool
     {
         LOG_DEBUG("Removing contact: %" PRIu32, contact->ID);
-        DialogMetadata meta;
-        meta.action = [=]() -> bool {
+        std::unique_ptr<DialogMetadata> meta = std::make_unique<DialogMetadata>();
+
+        meta->action = [=]() -> bool {
             if (!DBServiceAPI::ContactRemove(this->application, contact->ID)) {
                 LOG_ERROR("Contact id=%" PRIu32 "  remove failed", contact->ID);
                 return false;
@@ -120,12 +123,13 @@ namespace gui
             showNotification(NotificationType::Delete);
             return true;
         };
-        meta.text       = utils::localize.get("app_phonebook_options_delete_confirm");
+        meta->text      = utils::localize.get("app_phonebook_options_delete_confirm");
         auto contactRec = DBServiceAPI::ContactGetByID(this->application, contact->ID);
         auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
-        meta.title      = cont.getFormattedName();
-        meta.icon       = "phonebook_contact_delete_trashcan";
-        application->switchWindow(gui::window::name::dialog_yes_no, std::make_unique<DialogMetadataMessage>(meta));
+        meta->title     = cont.getFormattedName();
+        meta->icon      = "phonebook_contact_delete_trashcan";
+        application->switchWindow(gui::window::name::dialog_yes_no,
+                                  std::make_unique<DialogMetadataMessage>(std::move(*meta.release())));
         return true;
     }
 
