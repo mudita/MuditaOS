@@ -53,6 +53,12 @@ void debug_msg(sys::Service *srvc, const sys::Message *ptr)
 #endif
 }
 
+#if (DEBUG_SERVICE_MESSAGES > 0)
+#define log_debug(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define log_debug(...)
+#endif
+
 namespace sys
 {
     using namespace cpp_freertos;
@@ -160,7 +166,7 @@ namespace sys
     {
         auto idx = type_index(type);
         if (message_handlers.find(idx) == message_handlers.end()) {
-            LOG_DEBUG("Registering new message handler on %s", type.name());
+            log_debug("Registering new message handler on %s", type.name());
             message_handlers[idx] = handler;
             return true;
         }
