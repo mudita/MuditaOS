@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import time
 import pytest
@@ -12,6 +12,7 @@ def get_calllog_count(harness):
 
 
 @pytest.mark.rt1051
+@pytest.mark.usefixtures("phone_in_desktop")
 @pytest.mark.usefixtures("phone_unlocked")
 def test_call(harness, call_duration):
     count_before = get_calllog_count(harness)

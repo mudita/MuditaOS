@@ -2,12 +2,30 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import time
 import pytest
+import copy
 
 from harness.interface.defs import key_codes, SMSType, status
 from harness.interface.CDCSerial import Keytype
 
 # time for  message to leave the sending queue
-extra_time_to_send_message  = 5
+extra_time_to_send_message  = 40
+
+def check_for_sent(old_messages,harness, sms_text, phone_number,timeout):
+    local_timeout = copy.deepcopy(timeout)
+    while local_timeout != 0:
+
+        new_messages = get_message_by_text(harness, sms_text, str(phone_number))
+        diff_messages = []
+
+        for message in new_messages:
+            if message not in old_messages:
+                diff_messages.append(message)
+
+        if len(diff_messages) > 0 and SMSType(diff_messages[0]["messageType"]) == SMSType.OUTBOX:
+            return diff_messages
+        local_timeout -=1
+        time.sleep(1)
+    pytest.fail("Message send timeout!")
 
 def erase_all_templates(harness):
     # getting the templates count
@@ -20,6 +38,7 @@ def erase_all_templates(harness):
     body = {"category": "template", "limit": count}
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
+
     assert len(ret["body"]["entries"]) == count
 
     for template in ret["body"]["entries"]:
@@ -178,13 +197,11 @@ def test_send_message(harness, phone_number, sms_text):
         harness.connection.send_key_code(key_codes["fnRight"])
 
     time.sleep(3)
-    time.sleep(extra_time_to_send_message)
 
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
 
-    diff_messages = compare_messages(old_messages, new_messages)
+    diff_messages = check_for_sent(old_messages,harness,sms_text,phone_number,extra_time_to_send_message)
     # cleaning
     remove_added_messages(harness,diff_messages)
 
@@ -201,12 +218,8 @@ def test_send_prepared_message(harness, phone_number, sms_text, clean = True):
     # time to send message
     time.sleep(3)
 
-    time.sleep(extra_time_to_send_message)
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
 
-    # check whether message was sent
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-
-    diff_messages = compare_messages(old_messages, new_messages)
     # cleaning
     if(clean == True):
         remove_added_messages(harness,diff_messages)
@@ -245,11 +258,8 @@ def test_send_prepared_draft_message(harness, phone_number, sms_text):
     time.sleep(3)
     assert harness.get_application_name() == "ApplicationDesktop"
 
-    time.sleep(extra_time_to_send_message)
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
 
-    # check whether message was sent
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    diff_messages = compare_messages(old_messages, new_messages)
     # cleaning
     remove_added_messages(harness,diff_messages)
 
@@ -288,11 +298,8 @@ def test_send_message_from_template(harness, phone_number, sms_text):
     time.sleep(3)
     assert harness.get_application_name() == "ApplicationDesktop"
 
-    time.sleep(extra_time_to_send_message)
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
 
-    # check whether message was sent
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    diff_messages = compare_messages(old_messages, new_messages)
     # cleaning
     remove_added_messages(harness,diff_messages)
 
@@ -334,10 +341,8 @@ def test_forward_message(harness, phone_number, sms_text):
     time.sleep(3)
     assert harness.get_application_name() == "ApplicationDesktop"
 
-    time.sleep(extra_time_to_send_message)
-    # check whether message was sent
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    diff_messages = compare_messages(old_messages, new_messages)
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
+
     # cleaning
     remove_added_messages(harness,diff_messages)
     remove_added_messages(harness,diff_messages_org)
@@ -370,11 +375,8 @@ def test_resend_message(harness, phone_number, sms_text):
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
 
-    time.sleep(extra_time_to_send_message)
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
 
-    # check whether message was sent
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    diff_messages = compare_messages(old_messages, new_messages)
     # cleaning
     remove_added_messages(harness,diff_messages)
 
@@ -434,10 +436,8 @@ def test_send_message_from_phonebook(harness, phone_number, sms_text):
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
 
-    time.sleep(extra_time_to_send_message)
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
 
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    diff_messages = compare_messages(old_messages, new_messages)
     # cleaning
     remove_added_messages(harness,diff_messages)
 
@@ -509,10 +509,8 @@ def test_send_message_using_phonebook(harness, phone_number, sms_text):
     # check if we back to ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
 
-    time.sleep(extra_time_to_send_message)
+    diff_messages = check_for_sent(old_messages, harness, sms_text, phone_number, extra_time_to_send_message)
 
-    new_messages = get_message_by_text(harness, sms_text, str(phone_number))
-    diff_messages = compare_messages(old_messages, new_messages)
     # cleaning
     remove_added_messages(harness,diff_messages)
 
