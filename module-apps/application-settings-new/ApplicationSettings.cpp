@@ -47,6 +47,7 @@
 #include <service-bluetooth/messages/BondedDevices.hpp>
 #include <service-bluetooth/messages/Connect.hpp>
 #include <service-bluetooth/messages/DeviceName.hpp>
+#include <service-bluetooth/messages/InitializationResult.hpp>
 #include <service-bluetooth/messages/Passkey.hpp>
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
@@ -253,6 +254,26 @@ namespace app
                                  returnToPreviousWindow();
                                  return true;
                              }}));
+
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(::message::bluetooth::InitializationResult), [&](sys::Message *msg) {
+            auto initializationResultMsg = static_cast<::message::bluetooth::InitializationResult *>(msg);
+            if (initializationResultMsg->isSucceed()) {
+                return sys::MessageNone{};
+            }
+            switchWindow(gui::window::name::dialog_confirm,
+                         gui::ShowMode::GUI_SHOW_INIT,
+                         std::make_unique<gui::DialogMetadataMessage>(
+                             gui::DialogMetadata{utils::localize.get("app_settings_bt"),
+                                                 "info_big_circle_W_G",
+                                                 utils::localize.get("app_settings_bluetooth_init_error_message"),
+                                                 "",
+                                                 [=]() -> bool {
+                                                     switchWindow(gui::window::name::bluetooth);
+                                                     return true;
+                                                 }}));
 
             return sys::MessageNone{};
         });
