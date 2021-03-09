@@ -1,32 +1,23 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "module-apps/Application.hpp"
-#include "AppWindow.hpp"
-#include "module-apps/widgets/BarGraph.hpp"
-#include "module-apps/widgets/ModesBox.hpp"
-#include <functional>
+#include "popups/WindowWithTimer.hpp"
 
 namespace gui
 {
-    class HomeModesWindow : public AppWindow
+    class ModesBox;
+    class HomeModesWindow : public WindowWithTimer
     {
       protected:
         ModesBox *modesBox = nullptr;
 
       public:
         HomeModesWindow(app::Application *app, const std::string &name);
-
-        ~HomeModesWindow() override;
-
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-
         void rebuild() override;
-
         void buildInterface() override;
-
-        void destroyInterface() override;
+        bool onInput(const gui::InputEvent &inputEvent) override;
     };
-}; // namespace gui
+} // namespace gui

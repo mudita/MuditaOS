@@ -126,7 +126,7 @@ namespace app
             return std::make_unique<app::onBoarding::SkipDialogWindow>(app);
         });
 
-        attachPopups({gui::popup::ID::Volume});
+        attachPopups({gui::popup::ID::Volume, gui::popup::ID::PhoneModes});
     }
 
     void ApplicationOnBoarding::destroyUserInterface()

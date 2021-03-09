@@ -143,7 +143,7 @@ namespace app
             return std::make_unique<gui::EventReminderWindow>(app, event_reminder_window);
         });
 
-        attachPopups({gui::popup::ID::Volume});
+        attachPopups({gui::popup::ID::Volume, gui::popup::ID::PhoneModes});
     }
 
     void ApplicationCalendar::destroyUserInterface()

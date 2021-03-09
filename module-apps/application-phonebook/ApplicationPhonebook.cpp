@@ -147,7 +147,7 @@ namespace app
             return std::make_unique<gui::PhonebookNewContact>(app);
         });
 
-        attachPopups({gui::popup::ID::Volume});
+        attachPopups({gui::popup::ID::Volume, gui::popup::ID::PhoneModes});
     }
 
     void ApplicationPhonebook::destroyUserInterface()

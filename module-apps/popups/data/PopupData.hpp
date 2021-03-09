@@ -1,9 +1,10 @@
 
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 #include <SwitchData.hpp>
+#include <module-audio/Audio/AudioCommon.hpp>
 
 namespace gui
 {
@@ -29,5 +30,20 @@ namespace gui
       private:
         const audio::Volume volume;
         const AudioContext audioContext;
+    };
+
+    class ModesPopupData : public SwitchData
+    {
+      public:
+        explicit ModesPopupData(const sys::phone_modes::PhoneMode phoneMode) : SwitchData(), phoneMode{phoneMode}
+        {}
+
+        [[nodiscard]] auto getPhoneMode() const noexcept -> sys::phone_modes::PhoneMode
+        {
+            return phoneMode;
+        }
+
+      private:
+        const sys::phone_modes::PhoneMode phoneMode;
     };
 } // namespace gui

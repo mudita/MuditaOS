@@ -163,7 +163,7 @@ namespace app
                                   });
         }
 
-        attachPopups({gui::popup::ID::Volume});
+        attachPopups({gui::popup::ID::Volume, gui::popup::ID::PhoneModes});
     }
 
     void ApplicationSettings::destroyUserInterface()

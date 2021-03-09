@@ -53,14 +53,16 @@ namespace gui
     void VolumeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         WindowWithTimer::onBeforeShow(mode, data);
-        const auto popupData = static_cast<VolumePopupData *>(data);
-        volume               = popupData->getVolume();
-        audioContext         = popupData->getAudioContext();
-        if (volumeBar != nullptr) {
-            volumeBar->setValue(volume);
-        }
-        if (volumeText != nullptr) {
-            showProperText(audioContext, volume);
+        const auto popupData = dynamic_cast<VolumePopupData *>(data);
+        if (popupData) {
+            volume       = popupData->getVolume();
+            audioContext = popupData->getAudioContext();
+            if (volumeBar != nullptr) {
+                volumeBar->setValue(volume);
+            }
+            if (volumeText != nullptr) {
+                showProperText(audioContext, volume);
+            }
         }
     }
 
