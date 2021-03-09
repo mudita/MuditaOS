@@ -84,6 +84,7 @@
   "home_modes_connected": "CONNECTED",
   "home_modes_notdisturb": "DO NOT DISTURB",
   "home_modes_offline": "OFFLINE",
+  "home_modes_message_only": "Message only",
   "topbar_battery_charging": "Charg",
   "topbar_battery_plugged": "Plug",
   "app_alarm_clock_title_main": "Alarm clock",

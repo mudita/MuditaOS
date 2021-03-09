@@ -178,7 +178,7 @@ namespace app
             return std::make_unique<gui::AlgoParamsWindow>(app);
         });
 
-        attachPopups({gui::popup::ID::Volume});
+        attachPopups({gui::popup::ID::Volume, gui::popup::ID::PhoneModes});
     }
 
     void ApplicationAntenna::destroyUserInterface()

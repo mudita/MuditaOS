@@ -52,4 +52,4 @@ namespace gui
         void buildInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
     };
-}; // namespace gui
+} // namespace gui

@@ -17,6 +17,8 @@
 #include "bsp/keyboard/key_codes.hpp"      // for bsp
 #include "gui/Common.hpp"                  // for ShowMode
 #include "projdefs.h"                      // for pdMS_TO_TICKS
+#include <PhoneModes/Observer.hpp>
+
 #include <service-appmgr/ApplicationManifest.hpp>
 #include <list>                           // for list
 #include <map>                            // for allocator, map
@@ -380,6 +382,7 @@ namespace app
 
         /// application's settings
         std::unique_ptr<settings::Settings> settings;
+        std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
 
       public:
         void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;
