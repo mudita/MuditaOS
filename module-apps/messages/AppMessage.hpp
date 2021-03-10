@@ -153,6 +153,43 @@ namespace app
         };
     };
 
+    class AppUpdateWindowMessage : public AppMessage
+    {
+      private:
+        const std::string window;
+        const std::unique_ptr<gui::SwitchData> data;
+        const gui::ShowMode command;
+        const gui::RefreshModes refreshMode;
+
+      public:
+        AppUpdateWindowMessage(const std::string &window,
+                               std::unique_ptr<gui::SwitchData> data,
+                               gui::ShowMode command         = gui::ShowMode::GUI_SHOW_INIT,
+                               gui::RefreshModes refreshMode = gui::RefreshModes::GUI_REFRESH_FAST)
+            : AppMessage(), window{window}, data{std::move(data)}, command{command}, refreshMode{refreshMode}
+        {}
+
+        [[nodiscard]] auto getWindowName() const
+        {
+            return window;
+        }
+
+        [[nodiscard]] const auto &getData() const noexcept
+        {
+            return data;
+        }
+
+        [[nodiscard]] auto getCommand() const noexcept
+        {
+            return command;
+        }
+
+        [[nodiscard]] auto getRefreshMode() const noexcept
+        {
+            return refreshMode;
+        }
+    };
+
     class AppInputEventMessage : public AppMessage
     {
       protected:
