@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 //
@@ -18,6 +18,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <log/log.hpp>
 #include "service-bluetooth/messages/Connect.hpp"
+#include "service-bluetooth/Constants.hpp"
 extern "C"
 {
 #include "module-bluetooth/lib/btstack/src/btstack.h"
@@ -539,7 +540,7 @@ namespace bluetooth
             stopTimer(&AVRCP::mediaTracker);
             break;
 
-        case A2DP_SUBEVENT_STREAM_RELEASED:
+        case A2DP_SUBEVENT_STREAM_RELEASED: {
             AVRCP::playInfo.status = AVRCP_PLAYBACK_STATUS_STOPPED;
             cid                    = a2dp_subevent_stream_released_get_a2dp_cid(packet);
             local_seid             = a2dp_subevent_stream_released_get_local_seid(packet);
@@ -563,12 +564,15 @@ namespace bluetooth
 
             stopTimer(&AVRCP::mediaTracker);
             break;
+        }
         case A2DP_SUBEVENT_SIGNALING_CONNECTION_RELEASED:
             cid = a2dp_subevent_signaling_connection_released_get_a2dp_cid(packet);
             if (cid == AVRCP::mediaTracker.a2dp_cid) {
                 AVRCP::mediaTracker.avrcp_cid = 0;
                 AVRCP::mediaTracker.a2dp_cid  = 0;
                 LOG_INFO("A2DP Source: Signaling released.\n\n");
+                auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+                busProxy.sendUnicast(std::make_shared<BluetoothDeviceDisconnectedMessage>(), service::name::bluetooth);
             }
             isConnected = false;
             break;

@@ -196,6 +196,7 @@ enum class MessageType
     BluetoothAudioRegister,
     BluetoothDeviceMetadata,
     BluetoothRequestStream,
+    BluetoothDeviceDisconnected,
 
     // bluetooth proxy
     BluetoothProxyStart,

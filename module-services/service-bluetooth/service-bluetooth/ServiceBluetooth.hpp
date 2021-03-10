@@ -46,6 +46,7 @@ class ServiceBluetooth : public sys::Service
     std::unique_ptr<BluetoothWorker> worker;
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
     bool enabledFromHarness = false;
+    void sendDevicesAfterDisconnect();
 };
 
 namespace sys

@@ -158,6 +158,13 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
         return sys::MessageNone{};
     });
 
+    connect(typeid(BluetoothDeviceDisconnectedMessage), [&](sys::Message *msg) {
+        settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, std::string());
+
+        sendDevicesAfterDisconnect();
+        return sys::MessageNone{};
+    });
+
     settingsHolder->onStateChange = [this]() {
         auto initialState = std::visit(bluetooth::IntVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
         if (static_cast<BluetoothStatus::State>(initialState) == BluetoothStatus::State::On) {
@@ -278,4 +285,14 @@ void ServiceBluetooth::scanStoppedCallback()
         auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
         bus.sendUnicast(std::move(message), service::name::service_desktop);
     }
+}
+
+void ServiceBluetooth::sendDevicesAfterDisconnect()
+{
+    auto bondedDevicesStr =
+        std::visit(bluetooth::StringVisitor(), this->settingsHolder->getValue(bluetooth::Settings::BondedDevices));
+
+    bus.sendUnicast(std::make_shared<message::bluetooth::ResponseBondedDevices>(
+                        SettingsSerializer::fromString(bondedDevicesStr), std::string()),
+                    "ApplicationSettingsNew");
 }
