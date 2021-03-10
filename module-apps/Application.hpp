@@ -179,6 +179,7 @@ namespace app
         sys::MessagePointer handleAction(sys::Message *msgl);
         sys::MessagePointer handleApplicationSwitch(sys::Message *msgl);
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl);
+        sys::MessagePointer handleUpdateWindow(sys::Message *msgl);
         sys::MessagePointer handleAppClose(sys::Message *msgl);
         sys::MessagePointer handleAppRebuild(sys::Message *msgl);
         sys::MessagePointer handleAppRefresh(sys::Message *msgl);
@@ -208,6 +209,12 @@ namespace app
         /// 1. queries for static data for all windows form Store (i.e. battery level, sim card level)
         /// 2. loads rendering commands and send them to GUI renderer (sgui::ServiceGUI)
         void render(gui::RefreshModes mode);
+
+        /// Responsible for sending updated data to the current window.
+        /// @note Sending different window name than the current one won't cause switch.
+        /// @param windowName name of the window that suppose to be updated.
+        /// @param data contextual data for windows flow control.
+        void updateWindow(const std::string &windowName, std::unique_ptr<gui::SwitchData> data);
 
         /// Method sending switch command for another window. It will switch window within active application.
         /// To switch windows between applications use app::manager::Controller::switchApplication
