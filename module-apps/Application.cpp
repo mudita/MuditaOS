@@ -102,6 +102,9 @@ namespace app
         connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *) { return handleBatteryStatusChange(); });
         connect(typeid(app::manager::DOMRequest),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleGetDOM(msg); });
+
+        connect(typeid(AppUpdateWindowMessage),
+                [&](sys::Message *msg) -> sys::MessagePointer { return handleUpdateWindow(msg); });
     }
 
     Application::~Application() noexcept
@@ -172,6 +175,14 @@ namespace app
 
         if (suspendInProgress)
             suspendInProgress = false;
+    }
+
+    void Application::updateWindow(const std::string &windowName, std::unique_ptr<gui::SwitchData> data)
+    {
+        const auto currentWindow = getCurrentWindow();
+        auto msg =
+            std::make_shared<AppUpdateWindowMessage>(currentWindow ? currentWindow->getName() : "", std::move(data));
+        bus.sendUnicast(std::move(msg), this->GetName());
     }
 
     void Application::switchWindow(const std::string &windowName,
@@ -422,6 +433,22 @@ namespace app
             }
             getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
             refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+        }
+        else {
+            LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
+        }
+        return msgHandled();
+    }
+
+    sys::MessagePointer Application::handleUpdateWindow(sys::Message *msgl)
+    {
+        auto msg = static_cast<AppUpdateWindowMessage *>(msgl);
+
+        if (windowsFactory.isRegistered(msg->getWindowName()) && isCurrentWindow(msg->getWindowName())) {
+            const auto &switchData = msg->getData();
+            getCurrentWindow()->handleSwitchData(switchData.get());
+            getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
+            refreshWindow(msg->getRefreshMode());
         }
         else {
             LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
