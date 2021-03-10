@@ -5,10 +5,11 @@
 #include "module-utils/bootconfig/src/bootconfig.cpp"
 #include "PersonalizationFileValidation.hpp"
 
+namespace phone_personalization
+{
 
-namespace phone_personalization {
-
-    auto PersonalizationFileParser::loadFileContent() -> std::string {
+    auto PersonalizationFileParser::loadFileContent() const -> std::string
+    {
         std::string content;
         std::ifstream in(filePath);
         if (!in.is_open()) {
@@ -19,22 +20,75 @@ namespace phone_personalization {
         return content;
     }
 
-    auto PersonalizationFileParser::parseJsonFromContent(const std::string &content) -> bool {
+    auto PersonalizationFileParser::parseJson() const -> json11::Json
+    {
+
+        auto content = loadFileContent();
 
         std::string parseErrors;
         LOG_INFO("parsed %s: \"%s\"", filePath.c_str(), content.c_str());
 
-        jsonObj = json11::Json::parse(content, parseErrors);
+        auto jsonObj = json11::Json::parse(content, parseErrors);
 
         if (parseErrors.length() != 0) {
             LOG_FATAL("JSON format error: %s", parseErrors.c_str());
-            return false;
+            return nullptr;
         }
 
-        return true;
+        return jsonObj;
     }
 
-    auto PersonalizationFileValidator::validateFileAndCRC() -> bool {
+    void PersonalizationFileValidator::validateByFormat(const std::string &key)
+    {
+        auto paramObj = jsonObj[key];
+        if (paramObj != nullptr) {
+            auto param = paramObj.string_value();
+            if (param.empty()) {
+                LOG_ERROR("Parameter: '%s' is epmty!", param.c_str());
+                paramsModel[key].isValid = false;
+                return;
+            }
+            if (param.find(param::serial_number::prefix) != 0) {
+                LOG_ERROR("Wrong format of parameter: '%s'", key.c_str());
+                paramsModel[key].isValid = false;
+                return;
+            }
+            if (param.size() != param::serial_number::length) {
+                LOG_ERROR("Parameter: '%s' has wrong size", key.c_str());
+                paramsModel[key].isValid = false;
+                return;
+            }
+            LOG_INFO("Valid parameter: %s with value: %s", key.c_str(), param.c_str());
+            paramsModel[key].isValid = true;
+            return;
+        }
+
+        LOG_ERROR("Parameter does not exist in json object!");
+        paramsModel[key].isValid = false;
+    }
+
+    void PersonalizationFileValidator::validateByValues(const std::string &key)
+    {
+        if (jsonObj != nullptr) {
+            auto result = std::find(std::begin(paramsModel[key].validValues),
+                                    std::end(paramsModel[key].validValues),
+                                    jsonObj[key].string_value());
+
+            if (result == std::end(paramsModel[key].validValues)) {
+                LOG_ERROR("Parameter: '%s' is invalid!", key.c_str());
+                paramsModel[key].isValid = false;
+            }
+            else {
+                LOG_INFO("Parameter: '%s' is valid", key.c_str());
+                paramsModel[key].isValid = true;
+            }
+            return;
+        }
+        LOG_ERROR("Params json object not parsed!");
+    }
+
+    auto PersonalizationFileValidator::validateFileCRC() -> bool
+    {
         if (!boot::readAndVerifyCRC(filePath)) {
             LOG_ERROR("Invalid crc calculation!");
             return false;
@@ -44,107 +98,62 @@ namespace phone_personalization {
         return true;
     }
 
-    auto PersonalizationFileValidator::validateFileAndItsContent() -> bool {
-        auto content = PersonalizationFileParser::loadFileContent();
-        if (content.empty()) {
+    auto PersonalizationFileValidator::validateJsonObject() -> bool
+    {
+        if (jsonObj == nullptr || jsonObj == json11::Json()) {
             return false;
         }
-
-        return PersonalizationFileParser::parseJsonFromContent(content);
-    }
-
-    auto PersonalizationFileValidator::validateSerialNumber() -> bool
-    {
-        if(jsonObj != nullptr)
-        {
-            auto serialNumber = jsonObj[param::serial_number::key].string_value();
-            if(serialNumber.empty())
-            {
-                LOG_ERROR("Serial number: '%s' is epmty", serialNumber.c_str());
-                return false;
-            }
-            if(serialNumber.find(param::serial_number::prefix) != 0)
-            {
-                LOG_ERROR("Wrong format of serial number: '%s'", serialNumber.c_str());
-                return false;
-            }
-            if(serialNumber.size() != param::serial_number::length)
-            {
-                LOG_ERROR("Serial number: '%s' has wrong size", serialNumber.c_str());
-                return false;
-            }
-            LOG_INFO("Valid serial number: %s", serialNumber.c_str());
+        else {
             return true;
         }
-
-        LOG_ERROR("Empty json object!");
-        return false;
     }
 
-    void PersonalizationFileValidator::validateOptionalParams()
+    auto PersonalizationFileValidator::validateParameters() -> bool
     {
-        if(jsonObj != nullptr)
-        {
-            for (auto param = optionalParams.begin(); param != optionalParams.end(); param++)
-            {
-                auto result = std::find(std::begin(param->second.validValues), std::end(param->second.validValues),
-                                        jsonObj[param->first].string_value());
-
-                if (result == std::end(param->second.validValues))
-                {
-                    LOG_ERROR("Optional parameter: '%s' is invalid! Parameter value remains set to default",
-                              param->first.c_str());
-                    param->second.isValid = false;
-                }
-                else
-                {
-                    LOG_INFO("Optional parameter: '%s' is valid", param->first.c_str());
-                    param->second.isValid = true;
-                }
+        for (const auto &param : paramsModel) {
+            param.second.validateCallback();
+            if (!param.second.isValid && param.second.mandatory == MandatoryParameter::yes) {
+                LOG_FATAL("Mandatory parameter: %s  is invalid", param.first.c_str());
+                return false;
             }
-            LOG_INFO("Optional parameters are valid");
         }
-        LOG_ERROR("Params json object not parsed!");
+        return true;
     }
 
     auto PersonalizationFileValidator::validate() -> bool
     {
-        if(!validateFileAndCRC())
-        {
+        if (!validateFileCRC()) {
             return false;
         }
-        if(!validateFileAndItsContent())
-        {
+        if (!validateJsonObject()) {
             return false;
         }
-        if(!validateSerialNumber())
-        {
+        if (!validateParameters()) {
             return false;
         }
-        validateOptionalParams();
 
         return true;
     }
 
-    auto PersonalizationParamsGetter::getParams() -> std::map<std::string, std::string>
+    void PersonalizationData::setParamsFromJson(const json11::Json &jsonObj)
     {
-        auto jsonObj = personalizationParser.getJsonObject();
-        auto optionalParams = personalizationParser.getDefaultOptionalParamsMap();
+        this->serialNumber = jsonObj[param::serial_number::key].string_value();
+        this->caseColour   = jsonObj[param::case_colour::key].string_value();
+    }
 
-        if(jsonObj != nullptr)
-        {
-            parameters[param::serial_number::key] = jsonObj[param::serial_number::key].string_value();
-            for (auto param : optionalParams) {
-                if (param.second.isValid) {
-                    parameters[param.first] = jsonObj[param.first].string_value();
-                } else {
-                    parameters[param.first] = param.second.defaultValue;
+    void PersonalizationData::setInvalidParamsAsDefault(const std::map<std::string, ParamModel> &paramsModel)
+    {
+        for (const auto &param : paramsModel) {
+            if (param.second.mandatory == MandatoryParameter::no && !param.second.isValid) {
+                LOG_ERROR("Optional parameter: %s  is invalid", param.first.c_str());
+                if (param.first == param::serial_number::key) {
+                    serialNumber = param.second.defaultValue;
+                }
+                else if (param.first == param::case_colour::key) {
+                    caseColour = param.second.defaultValue;
                 }
             }
-            return parameters;
         }
-        LOG_ERROR("Parameter object not parsed");
-        return parameters;
     }
 
 } // namespace phone_personalization

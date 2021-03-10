@@ -11,94 +11,122 @@
 
 namespace phone_personalization
 {
-    struct OptionalParameter
-    {
-        std::string defaultValue;
-        std::vector<std::string> validValues;
-        bool isValid = false;
-    };
-
     namespace param
     {
         namespace serial_number
         {
-            constexpr inline auto key = "serial";
-            constexpr inline auto prefix = "SN";  ///Need access to req witch describes SN format
+            constexpr inline auto key    = "serial";
+            constexpr inline auto prefix = "SN"; /// Need access to req witch describes SN format
             constexpr inline auto length = 14;
         } // namespace serial_number
 
         namespace case_colour
         {
-            constexpr inline auto key = "case_colour";
-            constexpr inline auto default_value = "white";
+            constexpr inline auto key                   = "case_colour";
+            constexpr inline auto default_value         = "white";
             const std::vector<std::string> valid_values = {"white", "black"};
         } // namespace case_colour
 
-    } // namespace params
+    } // namespace param
 
     class PersonalizationFileParser
     {
-        void setDefaultOptionalParamsMap()
-        {
-            optionalParams = {
-                    {param::case_colour::key, OptionalParameter{param::case_colour::default_value, param::case_colour::valid_values}}
-            };
-        }
-    protected:
-        std::map<std::string, OptionalParameter> optionalParams;
+        std::filesystem::path filePath;
+
+      protected:
+        auto loadFileContent() const -> std::string;
+
+      public:
+        explicit PersonalizationFileParser(const std::filesystem::path &filePath) : filePath{filePath} {};
+        auto parseJson() const -> json11::Json;
+    };
+
+    enum class MandatoryParameter
+    {
+        no,
+        yes
+    };
+
+    class ParamModel
+    {
+    public:
+        std::string defaultValue;
+        std::vector<std::string> validValues;
+        MandatoryParameter mandatory;
+        std::function<void()> validateCallback;
+        bool isValid = false;
+
+        ParamModel() = default;
+
+        explicit ParamModel(const std::string &defaultValue,
+                            const std::vector<std::string> &validValues,
+                            MandatoryParameter mandatory,
+                            const std::function<void()> &validateCallback)
+                : defaultValue{defaultValue}, validValues{validValues}, mandatory{mandatory}, validateCallback{
+                validateCallback} {};
+    };
+
+    class PersonalizationFileValidator
+    {
+
+        std::map<std::string, ParamModel> paramsModel = {
+            {param::serial_number::key,
+             ParamModel(
+                     "",
+                     {},
+                     MandatoryParameter::yes,
+                     [&]() { validateByFormat(param::serial_number::key); })},
+            {param::case_colour::key,
+             ParamModel(
+                 param::case_colour::default_value,
+                 param::case_colour::valid_values,
+                 MandatoryParameter::no,
+                 [&]() { validateByValues(param::case_colour::key);})}
+        };
+
+      protected:
+        void validateByValues(const std::string &key);
+        void validateByFormat(const std::string &key);
+
         json11::Json jsonObj = nullptr;
         std::filesystem::path filePath;
 
-        explicit PersonalizationFileParser(const std::filesystem::path &filePath)
-        : filePath{filePath}
-        {
-            setDefaultOptionalParamsMap();
-        };
+        auto validateFileCRC() -> bool;
+        auto validateJsonObject() -> bool;
+        auto validateParameters() -> bool;
 
-        auto loadFileContent() -> std::string;
-        auto parseJsonFromContent(const std::string &content) -> bool;
-
-    public:
-        [[nodiscard]] auto getJsonObject() const -> json11::Json
-        {
-            return jsonObj;
-        }
-
-        [[nodiscard]] auto getDefaultOptionalParamsMap() const -> std::map<std::string, OptionalParameter>
-        {
-            return optionalParams;
-        }
-    };
-
-    class PersonalizationFileValidator : public PersonalizationFileParser {
-
-    protected:
-        auto validateFileAndCRC() -> bool;
-        auto validateFileAndItsContent() -> bool;
-        auto validateSerialNumber() -> bool;
-        void validateOptionalParams();
-
-    public:
-        explicit PersonalizationFileValidator(const std::filesystem::path &filePath)
-        : PersonalizationFileParser(filePath) {}
-
-        auto validate() -> bool;
-    };
-
-    class PersonalizationParamsGetter
-    {
-        PersonalizationFileParser personalizationParser;
-        std::map<std::string, std::string> parameters;
-    public:
-        explicit PersonalizationParamsGetter(const PersonalizationFileValidator &parser)
-        : personalizationParser{static_cast<PersonalizationFileParser>(parser)}
+      public:
+        explicit PersonalizationFileValidator(const json11::Json &jsonObj, const std::filesystem::path &filePath)
+            : jsonObj{jsonObj}, filePath{filePath}
         {}
 
-        PersonalizationParamsGetter(PersonalizationFileParser) = delete;
-        ///Set invalid optional params as default -> get parameters map
-        std::map<std::string, std::string> getParams();
+        auto validate() -> bool;
+
+        [[nodiscard]] auto getParamsModel() const -> std::map<std::string, ParamModel>
+        {
+            return paramsModel;
+        };
     };
-}
 
+    class PersonalizationData
+    {
+        std::string serialNumber;
+        std::string caseColour;
 
+      public:
+        explicit PersonalizationData() = default;
 
+        void setParamsFromJson(const json11::Json &jsonObj);
+        void setInvalidParamsAsDefault(const std::map<std::string, ParamModel> &paramsModel);
+
+        [[nodiscard]] auto getSerialNumber() const -> std::string
+        {
+            return serialNumber;
+        };
+
+        [[nodiscard]] auto getCaseColour() const -> std::string
+        {
+            return caseColour;
+        };
+    };
+} // namespace phone_personalization
