@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSRecord.hpp"
@@ -205,7 +205,8 @@ bool SMSRecordInterface::Update(const SMSRecord &recUpdated)
 
 void SMSRecordInterface::UpdateThreadSummary(ThreadRecord &threadToUpdate, const SMSRecord &rec)
 {
-    threadToUpdate.snippet = rec.body.substr(0, rec.body.length() >= snippetLength ? snippetLength : rec.body.length());
+    threadToUpdate.snippet = rec.body.substr(
+        0, std::min<size_t>({snippetLength, rec.body.length(), rec.body.find("\n"), rec.body.find("\r")}));
     threadToUpdate.date    = rec.date;
     threadToUpdate.type    = rec.type;
 }

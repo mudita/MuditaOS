@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cassert>
@@ -407,7 +407,7 @@ UTF8 UTF8::substr(const uint32_t begin, const uint32_t length) const
     return retString;
 }
 
-uint32_t UTF8::find(const char *s, uint32_t pos)
+uint32_t UTF8::find(const char *s, uint32_t pos) const
 {
     uint32_t stringCount;
     uint32_t stringSize;
@@ -440,7 +440,7 @@ uint32_t UTF8::find(const char *s, uint32_t pos)
     return npos;
 }
 
-uint32_t UTF8::findLast(const char *s, uint32_t pos)
+uint32_t UTF8::findLast(const char *s, uint32_t pos) const
 {
     uint32_t stringCount;
     uint32_t stringSize;
