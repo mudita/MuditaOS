@@ -9,6 +9,7 @@ using namespace Quotes;
 
 constexpr auto totalNumOfCategoriesInDb = 6;
 constexpr auto totalNumOfQuotesInDb     = 48;
+constexpr auto numOfQuotesWithCategoryIdEqualToOne = 9;
 
 TEST_CASE("Quotes")
 {
@@ -72,6 +73,57 @@ TEST_CASE("Quotes")
 
         REQUIRE(response->getCount() == totalNumOfQuotesInDb);
         REQUIRE(response->getResults().size() == totalNumOfQuotesInDb);
+    }
+
+    SECTION("Get quotes by category id")
+    {
+        const unsigned int categoryId = 1;
+        auto quotes                   = tester->getQuotesByCategoryId(categoryId);
+        REQUIRE(quotes.size() == numOfQuotesWithCategoryIdEqualToOne);
+    }
+
+    SECTION("Enable category by id")
+    {
+        bool enable                   = false;
+        const unsigned int categoryId = 1;
+
+        auto response = tester->enableCategory(categoryId, enable);
+        REQUIRE(response->success);
+
+        // Quotes in category one should be disabled
+        auto quotes = tester->getQuotesByCategoryId(categoryId);
+        REQUIRE(quotes.size() == 0);
+
+        enable = true;
+
+        response = tester->enableCategory(categoryId, enable);
+        REQUIRE(response->success);
+
+        // Quotes in category one should be enabled
+        quotes = tester->getQuotesByCategoryId(categoryId);
+        REQUIRE(quotes.size() == numOfQuotesWithCategoryIdEqualToOne);
+    }
+
+    SECTION("Enable quote by id")
+    {
+        bool enable                = false;
+        const unsigned int quoteId = 1;
+
+        auto response = tester->enableQuote(quoteId, enable);
+        REQUIRE(response->success);
+
+        // All quotes except quote with id=1 should be enabled
+        auto quotes = tester->getEnabledQuotes();
+        REQUIRE(quotes.size() == totalNumOfQuotesInDb - 1);
+
+        enable = true;
+
+        response = tester->enableQuote(quoteId, enable);
+        REQUIRE(response->success);
+
+        // All quotes should be enabled
+        quotes = tester->getEnabledQuotes();
+        REQUIRE(quotes.size() == totalNumOfQuotesInDb);
     }
 
     Database::deinitialize();

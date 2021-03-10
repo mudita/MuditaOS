@@ -273,27 +273,27 @@ namespace app::manager
         connect(typeid(InputLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<InputLanguageChangeRequest *>(request);
             handleInputLanguageChange(msg);
-            return msgHandled();
+            return sys::msgHandled();
         });
         connect(typeid(AutomaticDateAndTimeIsOnChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<AutomaticDateAndTimeIsOnChangeRequest *>(request);
             handleAutomaticDateAndTimeChange(msg);
-            return msgHandled();
+            return sys::msgHandled();
         });
         connect(typeid(AutomaticTimeZoneIsOnChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<AutomaticTimeZoneIsOnChangeRequest *>(request);
             handleAutomaticTimeZoneChange(msg);
-            return msgHandled();
+            return sys::msgHandled();
         });
         connect(typeid(TimeFormatChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<TimeFormatChangeRequest *>(request);
             handleTimeFormatChange(msg);
-            return msgHandled();
+            return sys::msgHandled();
         });
         connect(typeid(DateFormatChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<DateFormatChangeRequest *>(request);
             handleDateFormatChange(msg);
-            return msgHandled();
+            return sys::msgHandled();
         });
         connect(typeid(ShutdownRequest), [this](sys::Message *) {
             closeApplications();
@@ -313,12 +313,12 @@ namespace app::manager
         });
         connect(typeid(UpdateInProgress), [this](sys::Message *) {
             closeApplicationsOnUpdate();
-            return msgHandled();
+            return sys::msgHandled();
         });
         connect(typeid(SetOsUpdateVersion), [this](sys::Message *request) {
             auto msg = static_cast<SetOsUpdateVersion *>(request);
             handleSetOsUpdateVersionChange(msg);
-            return msgHandled();
+            return sys::msgHandled();
         });
 
         connect(typeid(app::manager::DOMRequest), [&](sys::Message *request) { return handleDOMRequest(request); });

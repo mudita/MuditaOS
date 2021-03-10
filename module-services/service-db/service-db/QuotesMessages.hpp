@@ -45,11 +45,6 @@ namespace Quotes
         std::string author;
         bool enabled;
 
-        [[nodiscard]] auto RecordEqual(QuoteRecord qr) const noexcept -> bool
-        {
-            return qr.lang_id == lang_id && qr.quote == quote;
-        }
-
         QuoteRecord() = default;
 
         explicit QuoteRecord(QueryResult *query)
@@ -77,7 +72,6 @@ namespace Quotes
         class GetCategoryListRequest : public QuotesMessage
         {
           public:
-            GetCategoryListRequest() = default;
             explicit GetCategoryListRequest(std::unique_ptr<CategoryList> categoryList)
                 : QuotesMessage(), categoryList(std::move(categoryList))
             {}
@@ -91,7 +85,6 @@ namespace Quotes
                                              sys::ReturnCodes code = sys::ReturnCodes::Success)
                 : sys::ResponseMessage(code), categoryList(std::move(categoryList))
             {}
-            std::unique_ptr<CategoryList> categoryList;
 
             [[nodiscard]] unsigned int getCount() const noexcept
             {
@@ -102,14 +95,15 @@ namespace Quotes
             {
                 return categoryList->data;
             }
+
+          private:
+            std::unique_ptr<CategoryList> categoryList;
         };
 
         class GetQuotesListRequest : public QuotesMessage
         {
           public:
-            GetQuotesListRequest() = default;
-            explicit GetQuotesListRequest(std::unique_ptr<QuotesList> quotesList)
-                : QuotesMessage(), quotesList(std::move(quotesList))
+            explicit GetQuotesListRequest(std::unique_ptr<QuotesList> quotesList) : quotesList(std::move(quotesList))
             {}
             std::unique_ptr<QuotesList> quotesList;
         };
@@ -121,7 +115,6 @@ namespace Quotes
                                            sys::ReturnCodes code = sys::ReturnCodes::Success)
                 : sys::ResponseMessage(code), quotesList(std::move(quotesList))
             {}
-            std::unique_ptr<QuotesList> quotesList;
 
             [[nodiscard]] unsigned int getCount() const noexcept
             {
@@ -132,6 +125,107 @@ namespace Quotes
             {
                 return quotesList->data;
             }
+
+          private:
+            std::unique_ptr<QuotesList> quotesList;
+        };
+
+        class GetQuotesListByCategoryIdRequest : public QuotesMessage
+        {
+          public:
+            explicit GetQuotesListByCategoryIdRequest(std::unique_ptr<QuotesList> quotesList, unsigned int categoryId)
+                : quotesList(std::move(quotesList)), categoryId(categoryId)
+            {}
+            std::unique_ptr<QuotesList> quotesList;
+            const unsigned int categoryId;
+        };
+
+        class GetQuotesListByCategoryIdResponse : public sys::ResponseMessage
+        {
+          public:
+            explicit GetQuotesListByCategoryIdResponse(std::unique_ptr<QuotesList> quotesList,
+                                                       sys::ReturnCodes code = sys::ReturnCodes::Success)
+                : sys::ResponseMessage(code), quotesList(std::move(quotesList))
+            {}
+
+            [[nodiscard]] unsigned int getCount() const noexcept
+            {
+                return quotesList->count;
+            }
+
+            [[nodiscard]] auto getResults() const -> std::vector<QuoteRecord>
+            {
+                return quotesList->data;
+            }
+
+          private:
+            std::unique_ptr<QuotesList> quotesList;
+        };
+
+        class EnableCategoryByIdRequest : public QuotesMessage
+        {
+          public:
+            explicit EnableCategoryByIdRequest(unsigned int categoryId, bool enable)
+                : categoryId(categoryId), enable(enable)
+            {}
+            const unsigned int categoryId;
+            const bool enable;
+        };
+
+        class EnableCategoryByIdResponse : public QuotesMessage
+        {
+          public:
+            explicit EnableCategoryByIdResponse(bool success) : success(success)
+            {}
+            const bool success;
+        };
+
+        class EnableQuoteByIdRequest : public QuotesMessage
+        {
+          public:
+            explicit EnableQuoteByIdRequest(unsigned int quoteId, bool enable) : quoteId(quoteId), enable(enable)
+            {}
+            const unsigned int quoteId;
+            const bool enable;
+        };
+
+        class EnableQuoteByIdResponse : public QuotesMessage
+        {
+          public:
+            explicit EnableQuoteByIdResponse(bool success) : success(success)
+            {}
+            const bool success;
+        };
+
+        class GetEnabledQuotesListRequest : public QuotesMessage
+        {
+          public:
+            explicit GetEnabledQuotesListRequest(std::unique_ptr<QuotesList> quotesList)
+                : quotesList(std::move(quotesList))
+            {}
+            std::unique_ptr<QuotesList> quotesList;
+        };
+
+        class GetEnabledQuotesListResponse : public sys::ResponseMessage
+        {
+          public:
+            explicit GetEnabledQuotesListResponse(std::unique_ptr<QuotesList> quotesList,
+                                                  sys::ReturnCodes code = sys::ReturnCodes::Success)
+                : sys::ResponseMessage(code), quotesList(std::move(quotesList))
+            {}
+
+            [[nodiscard]] unsigned int getCount() const noexcept
+            {
+                return quotesList->count;
+            }
+
+            [[nodiscard]] auto getResults() const -> std::vector<QuoteRecord>
+            {
+                return quotesList->data;
+            }
+
+          private:
+            std::unique_ptr<QuotesList> quotesList;
         };
     } // namespace Messages
 } // namespace Quotes

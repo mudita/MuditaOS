@@ -11,7 +11,7 @@ namespace Quotes
     class QuotesAgent : public DatabaseAgent
     {
       public:
-        QuotesAgent(sys::Service *parentService);
+        explicit QuotesAgent(sys::Service *parentService);
         ~QuotesAgent() = default;
 
         void initDb() override
@@ -24,6 +24,10 @@ namespace Quotes
       protected:
         auto handleCategoryList(sys::Message *req) -> sys::MessagePointer;
         auto handleQuotesList(sys::Message *req) -> sys::MessagePointer;
+        auto handleQuotesListByCategoryId(sys::Message *req) -> sys::MessagePointer;
+        auto handleEnableCategoryById(sys::Message *req) -> sys::MessagePointer;
+        auto handleEnableQuoteById(sys::Message *req) -> sys::MessagePointer;
+        auto handleEnabledQuotesList(sys::Message *req) -> sys::MessagePointer;
 
       private:
         auto getDbInitString() -> const std::string override;

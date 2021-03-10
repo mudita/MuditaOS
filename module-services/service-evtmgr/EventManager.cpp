@@ -269,7 +269,7 @@ sys::ReturnCodes EventManager::InitHandler()
         bsp::rtc_SetDateTimeFromTimestamp(msg->getTime());
         bsp::rtc_SetMinuteAlarm(msg->getTime());
         handleMinuteUpdate(msg->getTime());
-        return app::msgHandled();
+        return sys::msgHandled();
     });
 
     connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *msgl) {

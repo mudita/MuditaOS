@@ -275,10 +275,10 @@ namespace app
         else if (auto msg = dynamic_cast<AudioKeyPressedResponse *>(msgl)) {
             if (!msg->muted) {
                 handleVolumePopup();
-                return msgHandled();
+                return sys::msgHandled();
             }
         }
-        return msgNotHandled();
+        return sys::msgNotHandled();
     }
 
     sys::MessagePointer Application::handleSignalStrengthUpdate(sys::Message *msgl)
@@ -286,7 +286,7 @@ namespace app
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleNetworkAccessTechnologyUpdate(sys::Message *msgl)
@@ -294,7 +294,7 @@ namespace app
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateNetworkAccessTechnology()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleInputEvent(sys::Message *msgl)
@@ -309,7 +309,7 @@ namespace app
         if (not windowsStack.isEmpty() && getCurrentWindow()->onInput(msg->getEvent())) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleKBDKeyEvent(sys::Message *msgl)
@@ -322,7 +322,7 @@ namespace app
         if (iev.keyCode != gui::KeyCode::KEY_UNDEFINED) {
             messageInputEventApplication(this, this->GetName(), iev);
         }
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleBatteryStatusChange()
@@ -330,7 +330,7 @@ namespace app
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateBatteryStatus()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleMinuteUpdated(sys::Message *msgl)
@@ -338,7 +338,7 @@ namespace app
         if (state == State::ACTIVE_FORGROUND && getCurrentWindow()->updateTime()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleAction(sys::Message *msgl)
@@ -398,9 +398,9 @@ namespace app
                       stateStr(state));
         }
         if (handled) {
-            return msgHandled();
+            return sys::msgHandled();
         }
-        return msgNotHandled();
+        return sys::msgNotHandled();
     }
 
     sys::MessagePointer Application::handleSwitchWindow(sys::Message *msgl)
@@ -428,7 +428,7 @@ namespace app
                 if (text != nullptr) {
                     text->addText(ret->getDescription());
                     refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                    return msgHandled();
+                    return sys::msgHandled();
                 }
             }
             getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
@@ -437,7 +437,7 @@ namespace app
         else {
             LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
         }
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleUpdateWindow(sys::Message *msgl)
@@ -453,14 +453,14 @@ namespace app
         else {
             LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
         }
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleAppClose(sys::Message *msgl)
     {
         setState(State::DEACTIVATING);
         app::manager::Controller::confirmClose(this);
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleAppRebuild(sys::Message *msgl)
@@ -475,7 +475,7 @@ namespace app
             refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         }
         LOG_INFO("App rebuild done");
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleAppRefresh(sys::Message *msgl)
@@ -486,29 +486,29 @@ namespace app
             LOG_DEBUG("Ignore request for window %s we are on window %s",
                       msg->getWindowName().c_str(),
                       windowsStack.isEmpty() ? "none" : getCurrentWindow()->getName().c_str());
-            return msgNotHandled();
+            return sys::msgNotHandled();
         }
         render(msg->getMode());
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleGetDOM(sys::Message *msgl)
     {
         if (windowsStack.isEmpty()) {
             LOG_ERROR("Current window is not defined - can't dump DOM");
-            return msgNotHandled();
+            return sys::msgNotHandled();
         }
         auto window = getCurrentWindow();
         if (window == nullptr) {
             LOG_ERROR("No window - can't dump DOM");
-            return msgNotHandled();
+            return sys::msgNotHandled();
         }
 
         auto request = static_cast<app::manager::DOMRequest *>(msgl);
         LOG_DEBUG("Get DOM for: %s", request->getSenderName().c_str());
         bus.sendUnicast(DOMResponder(GetName(), *window, std::move(request->event)).build(), request->getSenderName());
 
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleAppFocusLost(sys::Message *msgl)
@@ -517,7 +517,7 @@ namespace app
             setState(State::ACTIVE_BACKGROUND);
             app::manager::Controller::confirmSwitch(this);
         }
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleSIMMessage(sys::Message *msgl)
@@ -525,7 +525,7 @@ namespace app
         if (getCurrentWindow()->updateSim()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
-        return msgHandled();
+        return sys::msgHandled();
     }
 
     sys::ReturnCodes Application::InitHandler()

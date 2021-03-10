@@ -279,7 +279,7 @@ auto FileIndexerAgent::handleGetRecord(sys::Message *req) -> sys::MessagePointer
         return std::make_shared<FileIndexer::Messages::GetRecordResponseMessage>(
             std::make_unique<FileIndexer::FileRecord>(msg->dbRecord));
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleSetRecord(sys::Message *req) -> sys::MessagePointer
@@ -303,7 +303,7 @@ auto FileIndexerAgent::handleSetRecord(sys::Message *req) -> sys::MessagePointer
             }
         }
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleDeleteFile(sys::Message *req) -> sys::MessagePointer
@@ -324,7 +324,7 @@ auto FileIndexerAgent::handleDeleteFile(sys::Message *req) -> sys::MessagePointe
             parentService->bus.sendUnicast(std::move(notifyMsg), recipient);
         }
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleDeleteAllFilesInDir(sys::Message *req) -> sys::MessagePointer
@@ -346,7 +346,7 @@ auto FileIndexerAgent::handleDeleteAllFilesInDir(sys::Message *req) -> sys::Mess
             parentService->bus.sendUnicast(std::move(notifyMsg), recipient);
         }
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::dbGetProperty(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> FileIndexer::FileMetadata
@@ -474,7 +474,7 @@ auto FileIndexerAgent::handleGetProperty(sys::Message *req) -> sys::MessagePoint
         return std::make_shared<FileIndexer::Messages::GetPropertyResponseMessage>(
             std::make_unique<FileIndexer::FileMetadata>(msg->dbMetaData));
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleGetAllProperties(sys::Message *req) -> sys::MessagePointer
@@ -486,7 +486,7 @@ auto FileIndexerAgent::handleGetAllProperties(sys::Message *req) -> sys::Message
         return std::make_shared<FileIndexer::Messages::GetPropertyResponseMessage>(
             std::make_unique<FileIndexer::FileMetadata>(msg->dbMetaData));
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleSetProperty(sys::Message *req) -> sys::MessagePointer
@@ -509,7 +509,7 @@ auto FileIndexerAgent::handleSetProperty(sys::Message *req) -> sys::MessagePoint
             dbSetProperty(std::make_unique<FileIndexer::FileMetadata>(metaData));
         }
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }
 
 auto FileIndexerAgent::handleSetProperties(sys::Message *req) -> sys::MessagePointer
@@ -529,5 +529,5 @@ auto FileIndexerAgent::handleSetProperties(sys::Message *req) -> sys::MessagePoi
             parentService->bus.sendUnicast(std::move(notifyMsg), recipient);
         }
     }
-    return app::msgHandled();
+    return sys::msgHandled();
 }

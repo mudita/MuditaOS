@@ -51,7 +51,7 @@ namespace app
             return retMsg;
         }
 
-        return msgNotHandled();
+        return sys::msgNotHandled();
     }
 
     sys::ReturnCodes ApplicationOnBoarding::InitHandler()
@@ -67,10 +67,10 @@ namespace app
         connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
             if (gui::window::name::onBoarding_languages == getCurrentWindow()->getName()) {
                 switchWindow(gui::window::name::onBoarding_eula, nullptr);
-                return msgHandled();
+                return sys::msgHandled();
             }
             else {
-                return msgNotHandled();
+                return sys::msgNotHandled();
             }
         });
 

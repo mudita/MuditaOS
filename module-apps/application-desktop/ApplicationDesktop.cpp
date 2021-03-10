@@ -361,7 +361,7 @@ namespace app
                     getWindow(app::window::name::desktop_update)->handleSwitchData(data.get());
                 }
             }
-            return msgHandled();
+            return sys::msgHandled();
         });
 
         auto msgToSend =

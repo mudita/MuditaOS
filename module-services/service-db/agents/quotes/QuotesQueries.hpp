@@ -14,4 +14,48 @@ namespace Quotes::Queries
                         SELECT quote_id, lang_id, quote, author, enabled
                         FROM quote_table;
                         )sql";
+
+    constexpr auto getQuotesByCategoryId = R"sql(
+                        SELECT QT.quote_id, QT.lang_id, QT.quote, QT.author, QT.enabled
+                        FROM 
+                            quote_table as QT,
+                            quote_category_map as QCM,
+                            category_table as CT
+                        WHERE
+                            QCM.quote_id = QT.quote_id
+                            and 
+                            QCM.category_id = CT.category_id
+                            and
+                            QCM.category_id = '%lu'
+                            and
+                            QT.enabled = TRUE
+                            and
+                            CT.enabled = TRUE
+                        )sql";
+
+    constexpr auto enableCategory = R"sql(
+                        UPDATE category_table SET enabled = '%d'
+                        WHERE category_id = '%lu';
+                        )sql";
+
+    constexpr auto enableQuote = R"sql(
+                        UPDATE quote_table SET enabled = '%d'
+                        WHERE quote_id = '%lu';
+                        )sql";
+
+    constexpr auto getEnabledQuotes = R"sql(
+                        SELECT QT.quote_id, QT.lang_id, QT.quote, QT.author, QT.enabled
+                        FROM
+                            quote_table as QT,
+                            quote_category_map as QCM,
+                            category_table as CT
+                        WHERE
+                            QCM.quote_id = QT.quote_id
+                            and
+                            QCM.category_id = CT.category_id
+                            and
+                            QT.enabled = TRUE
+                            and
+                            CT.enabled = TRUE
+                        )sql";
 } // namespace Quotes::Queries
