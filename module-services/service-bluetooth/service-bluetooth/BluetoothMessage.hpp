@@ -25,6 +25,20 @@ struct BluetoothStatus
     bool visibility;
 };
 
+class BluetoothEventMessage : public sys::DataMessage
+{
+  public:
+    enum BluetoothEvent
+    {
+        None,
+        HSP_BUTTON_PRESSED
+    };
+    enum BluetoothEvent event = BluetoothEvent::None;
+    BluetoothEventMessage(BluetoothEvent event = None) : sys::DataMessage(MessageType::BluetoothEvent), event(event)
+    {}
+    ~BluetoothEventMessage() override = default;
+};
+
 class BluetoothMessage : public sys::DataMessage
 {
   public:

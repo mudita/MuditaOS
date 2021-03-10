@@ -198,6 +198,8 @@ enum class MessageType
     BluetoothRequestStream,
     BluetoothDeviceDisconnected,
 
+    BluetoothEvent,
+
     // bluetooth proxy
     BluetoothProxyStart,
     BluetoothProxyStop,

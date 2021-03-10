@@ -312,7 +312,7 @@ namespace gui
         }
     }
 
-    bool CallWindow::handleLeftButton()
+    bool CallWindow::handleAnswerCallRequest()
     {
         if (getState() == State::INCOMING_CALL) {
             interface->answerIncomingCall();
@@ -322,7 +322,7 @@ namespace gui
         return false;
     }
 
-    bool CallWindow::handleRightButton()
+    bool CallWindow::handleHangUpCallRequest()
     {
         switch (getState()) {
         case State::INCOMING_CALL:
@@ -359,10 +359,21 @@ namespace gui
             auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
             switch (inputEvent.keyCode) {
             case KeyCode::KEY_LF:
-                handled = handleLeftButton();
+                handled = handleAnswerCallRequest();
                 break;
             case KeyCode::KEY_RF:
-                handled = handleRightButton();
+                handled = handleHangUpCallRequest();
+                break;
+            case KeyCode::BLUETOOTH_HSP_KEYPAD_STROKE:
+                LOG_INFO("Bluetooth event received");
+                if (getState() == State::INCOMING_CALL) {
+                    ///> handle answering the call - left button in gui
+                    handled = handleAnswerCallRequest();
+                }
+                else {
+                    ///> handle hangup the call - right button in gui
+                    handled = handleHangUpCallRequest();
+                }
                 break;
             default:
                 break;

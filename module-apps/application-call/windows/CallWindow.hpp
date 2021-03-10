@@ -42,8 +42,8 @@ namespace gui
 
         utils::PhoneNumber::View phoneNumber;
 
-        bool handleLeftButton();
-        bool handleRightButton();
+        bool handleAnswerCallRequest();
+        bool handleHangUpCallRequest();
         void setState(app::call::State state);
         [[nodiscard]] auto getState() const noexcept -> app::call::State;
 

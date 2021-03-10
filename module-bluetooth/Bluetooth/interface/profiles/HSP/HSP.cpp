@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "HSPImpl.hpp"
@@ -9,6 +9,7 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-audio/AudioMessage.hpp>
 #include <BluetoothWorker.hpp>
+#include <module-services/service-bluetooth/service-bluetooth/BluetoothMessage.hpp>
 
 extern "C"
 {
@@ -94,7 +95,17 @@ namespace bluetooth
         auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
         busProxy.sendUnicast(std::move(msg), service::name::evt_manager);
     }
+    void HSP::HSPImpl::sendBluetoothEvent(BluetoothEventMessage::BluetoothEvent event)
+    {
+        auto evtMsg = std::make_shared<BluetoothEventMessage>(event);
 
+        /*RawKey key{.state = RawKey::State::Released, .key_code = keyCode};
+        gui::InputEvent event(key, gui::InputEvent::State::keyReleasedShort, static_cast<gui::KeyCode>(keyCode));*/
+        LOG_INFO("Sending %s", "BluetoothEventMessage::BluetoothEvent::HSP_BUTTON_PRESSED");
+        // auto message   = std::make_shared<app::AppInputEventMessage>(std::move(event));
+        auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
+        busProxy.sendUnicast(std::move(evtMsg), service::name::evt_manager);
+    }
     void HSP::HSPImpl::packetHandler(uint8_t packetType, uint16_t channel, uint8_t *event, uint16_t eventSize)
     {
         switch (packetType) {
@@ -182,6 +193,10 @@ namespace bluetooth
             memcpy(ATcommandBuffer.data(), commandValue, size - 1);
             LOG_DEBUG("Received custom command: \"%s\". \nExit code or call hsp_ag_send_result.\n",
                       ATcommandBuffer.data());
+            break;
+        }
+        case HSP_SUBEVENT_BUTTON_PRESSED: {
+            sendBluetoothEvent(BluetoothEventMessage::BluetoothEvent::HSP_BUTTON_PRESSED);
             break;
         }
         default:

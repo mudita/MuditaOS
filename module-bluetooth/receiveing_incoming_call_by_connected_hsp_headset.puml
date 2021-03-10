@@ -1,0 +1,18 @@
+@startuml
+actor BTUser
+participant BTDevice
+participant BT
+participant EVM
+participant AppCall
+participant ServiceCellular
+
+== Receiving incoming call - BT perspective ==
+hnote over BTDevice,BT : CONNECTED
+BTUser -> BTDevice: Answer Call Button Pressed
+BTDevice -> BT: AT+CKPD=200
+BT --> BTDevice: OK
+BT ->  EVM: Send HSP Button Pressed event (same key symualtion)
+EVM -> AppCall: InputEvent (HSPButtonPressed)
+AppCall -> ServiceCellular: AnswerCall
+@enduml
+

@@ -33,7 +33,10 @@ namespace bsp {
 
         SSwitchUp = 34,
         SSwitchDown = 54,
-        SSwitchMid = 44
+        SSwitchMid = 44,
+
+        BluetoothHSPKeyPadStroke = 101
+
     };
 }
 
@@ -92,6 +95,9 @@ inline const char *c_str(bsp::KeyCodes code)
         return "SSwitchDown";
     case bsp::KeyCodes::SSwitchMid:
         return "SSwitchMid";
+    case bsp::KeyCodes::BluetoothHSPKeyPadStroke:
+        return "BluetoothHSPKeyPadStroke";
     }
+
     return "";
 }

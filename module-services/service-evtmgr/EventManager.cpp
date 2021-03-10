@@ -38,6 +38,8 @@
 #include <tuple>
 #include <vector>
 #include <module-apps/messages/AppMessage.hpp>
+#include <module-services/service-bluetooth/service-bluetooth/BluetoothMessage.hpp>
+
 #include <SystemManager/messages/CpuFrequencyMessage.hpp>
 #include <common_data/EventStore.hpp>
 #include <SystemManager/messages/PhoneModeRequest.hpp>
@@ -230,6 +232,21 @@ sys::ReturnCodes EventManager::InitHandler()
             bus.sendUnicast(std::move(message), targetApplication);
         }
 
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(BluetoothEventMessage(BluetoothEventMessage::BluetoothEvent::None), [&](sys::Message *msgl) {
+        auto btEvent = static_cast<BluetoothEventMessage *>(msgl);
+        if (btEvent->event == BluetoothEventMessage::BluetoothEvent::HSP_BUTTON_PRESSED) {
+            RawKey key{.state = RawKey::State::Released, .key_code = bsp::KeyCodes::BluetoothHSPKeyPadStroke};
+            gui::InputEvent event(key,
+                                  gui::InputEvent::State::keyReleasedShort,
+                                  static_cast<gui::KeyCode>(bsp::KeyCodes::BluetoothHSPKeyPadStroke));
+            auto message = std::make_shared<app::AppInputEventMessage>(std::move(event));
+            if (!targetApplication.empty()) {
+                bus.sendUnicast(std::move(message), targetApplication);
+            }
+        }
         return std::make_shared<sys::ResponseMessage>();
     });
 

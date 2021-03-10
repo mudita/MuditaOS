@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -35,12 +35,13 @@ namespace gui
         KEY_PND       = static_cast<int>(bsp::KeyCodes::NumericKeyPnd),
         //	KEY_GREEN,
         //	KEY_RED,
-        KEY_VOLUP  = static_cast<int>(bsp::KeyCodes::VolUp),
-        KEY_VOLDN  = static_cast<int>(bsp::KeyCodes::VolDown),
-        KEY_TORCH  = static_cast<int>(bsp::KeyCodes::Torch),
-        SWITCH_UP  = static_cast<int>(bsp::KeyCodes::SSwitchUp),
-        SWITCH_MID = static_cast<int>(bsp::KeyCodes::SSwitchMid),
-        SWITCH_DN  = static_cast<int>(bsp::KeyCodes::SSwitchDown),
+        KEY_VOLUP                   = static_cast<int>(bsp::KeyCodes::VolUp),
+        KEY_VOLDN                   = static_cast<int>(bsp::KeyCodes::VolDown),
+        KEY_TORCH                   = static_cast<int>(bsp::KeyCodes::Torch),
+        SWITCH_UP                   = static_cast<int>(bsp::KeyCodes::SSwitchUp),
+        SWITCH_MID                  = static_cast<int>(bsp::KeyCodes::SSwitchMid),
+        SWITCH_DN                   = static_cast<int>(bsp::KeyCodes::SSwitchDown),
+        BLUETOOTH_HSP_KEYPAD_STROKE = static_cast<int>(bsp::KeyCodes::BluetoothHSPKeyPadStroke)
     };
 
     static const int InvalidNumericKeyCode = -1;
@@ -181,6 +182,8 @@ namespace gui
         return "SWITCH_MID";
     case gui::KeyCode::SWITCH_DN:
         return "SWITCH_DN";
+    case gui::KeyCode::BLUETOOTH_HSP_KEYPAD_STROKE:
+        return "BLUETOOTH_HSP_KEYPAD_STROKE";
     }
     return "";
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,6 +27,7 @@ namespace bluetooth
 
       private:
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
+        static void sendBluetoothEvent(BluetoothEventMessage::BluetoothEvent event);
         static void processHCIEvent(uint8_t *event);
         static void processHSPEvent(uint8_t *event);
         static std::array<uint8_t, serviceBufferLength> serviceBuffer;

@@ -18,6 +18,10 @@ It's meant to provide interface layer for service-bluetooth like that:
 ![Flowchart](./flowchart.svg)
 <img src="./flowchart.svg">
 
+## Receiving call by HSP headset user
+![Flowchart](./receiveing_incoming_call_by_connected_hsp_headset.png)
+<img src="./receiveing_incoming_call_by_connected_hsp_headset.png">
+
 ## Table of content
 - [Bluetooth on/off operation](./doc/bt_on_off.md)
 - [Bluetooth scan operation](./doc/bt_scan.md)
