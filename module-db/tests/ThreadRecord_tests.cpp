@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -264,6 +264,50 @@ TEST_CASE("Thread Record tests")
             auto smsRec = getLastResult->record;
             REQUIRE(smsRec.has_value());
             REQUIRE(smsRec->body == lastSmsBody);
+        }
+    }
+
+    SECTION("Thread with end of line in the body")
+    {
+
+        const utils::PhoneNumber phoneNumber("+48600123456", utils::country::Id::UNKNOWN);
+
+        SMSRecordInterface smsRecInterface(&smsDB, &contactsDB);
+        SMSRecord recordIN;
+        recordIN.date      = 123456789;
+        recordIN.dateSent  = 987654321;
+        recordIN.errorCode = 0;
+        recordIN.number    = phoneNumber.getView();
+        recordIN.type      = SMSType ::DRAFT;
+
+        UTF8 snippetIncluded = "Good 😁IS GOOD";
+        UTF8 snippetExcluded = "\nthis part should not be included in snippet";
+        UTF8 smsBody         = snippetIncluded + snippetExcluded;
+
+        recordIN.body = smsBody;
+        REQUIRE(smsRecInterface.Add(recordIN));
+
+        auto getThreadQuery  = std::make_shared<db::query::ThreadGetByNumber>(phoneNumber.getView());
+        auto getThreadRet    = threadRecordInterface1.runQuery(getThreadQuery);
+        auto getThreatResult = dynamic_cast<db::query::ThreadGetByNumberResult *>(getThreadRet.get());
+        REQUIRE(getThreatResult != nullptr);
+        auto threadRec = getThreatResult->getThread();
+        REQUIRE(threadRec.isValid());
+
+        SECTION("Snippet should not contain characters after EoL")
+        {
+            REQUIRE(snippetIncluded == threadRec.snippet);
+        }
+
+        SECTION("Body content should not be affected by EoL")
+        {
+            auto getLastQuery  = std::make_shared<db::query::SMSGetLastByThreadID>(threadRec.ID);
+            auto getLastRet    = smsRecInterface.runQuery(getLastQuery);
+            auto getLastResult = dynamic_cast<db::query::SMSGetLastByThreadIDResult *>(getLastRet.get());
+            REQUIRE(getLastResult != nullptr);
+            auto smsRec = getLastResult->record;
+            REQUIRE(smsRec.has_value());
+            REQUIRE(smsRec->body == smsBody);
         }
     }
 
