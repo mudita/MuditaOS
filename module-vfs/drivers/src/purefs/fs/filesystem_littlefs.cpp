@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/drivers/filesystem_littlefs.hpp>
@@ -446,6 +446,13 @@ namespace purefs::fs::drivers
     auto filesystem_littlefs::dirclose(fsdir dirstate) noexcept -> int
     {
         return invoke_lfs(dirstate, ::lfs_dir_close);
+    }
+
+    auto filesystem_littlefs::fchmod(fsfile zfile, mode_t mode) noexcept -> int
+    {
+        // Littlefs doesn't support chmod() so we need that path exists
+        struct stat filestat;
+        return fstat(zfile, filestat);
     }
 
 } // namespace purefs::fs::drivers

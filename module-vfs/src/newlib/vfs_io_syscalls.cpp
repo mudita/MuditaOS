@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <errno.h>
@@ -362,6 +362,40 @@ namespace vfsn::internal::syscalls
                          fstype ? fstype : "",
                          rwflag,
                          data);
+    }
+
+    ssize_t readlink(int &_errno_, const char *path, char *buf, size_t buflen)
+    {
+        // Symlinks are not supported. According to man(2) symlink EINVAL when is not symlink.
+        _errno_ = EINVAL;
+        return -1;
+    }
+
+    int symlink(int &_errno_, const char *name1, const char *name2)
+    {
+        return invoke_fs(_errno_, &purefs::fs::filesystem::symlink, name1, name2);
+    }
+
+    long fpathconf(int &_errno, int fd, int name)
+    {
+        if (name == _PC_PATH_MAX) {
+            return PATH_MAX;
+        }
+        else {
+            _errno = EINVAL;
+            return -1;
+        }
+    }
+
+    long pathconf(int &_errno, const char *path, int name)
+    {
+        if (name == _PC_PATH_MAX) {
+            return PATH_MAX;
+        }
+        else {
+            _errno = EINVAL;
+            return -1;
+        }
     }
 
 } // namespace vfsn::internal::syscalls
