@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -146,7 +146,7 @@ class UTF8
      * @note returns npos when substring is not found
      */
 
-    uint32_t find(const char *s, uint32_t pos = 0);
+    uint32_t find(const char *s, uint32_t pos = 0) const;
     /**
      * @brief Finds last occurrence of substring in string
      * @param s string to find
@@ -154,7 +154,7 @@ class UTF8
      * @return index of first matched string
      * @note returns npos when substring is not found.
      */
-    uint32_t findLast(const char *s, uint32_t pos);
+    uint32_t findLast(const char *s, uint32_t pos) const;
     /**
      * @brief splits UTF8 sting into two strings.
      * @param idx index of character from which the division will be made.
@@ -203,7 +203,7 @@ class UTF8
      * @brief Check if string has only ASCII characters
      * @return true if there are only ASCII characters in string, false otherwise.
      */
-    bool isAscii(void)
+    bool isAscii(void) const
     {
         if (this->sizeUsed - 1 == this->length())
             return true;
