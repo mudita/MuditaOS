@@ -33,6 +33,7 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <service-desktop/Constants.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <service-cellular/ServiceCellular.hpp>
 #include <cassert>
 #include <list>
 #include <tuple>
@@ -193,8 +194,8 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         }
     }
     else if (msgl->messageType == MessageType::EVMRingIndicator) {
-        auto msg = std::make_shared<sys::CpuFrequencyMessage>(sys::CpuFrequencyMessage::Action::Increase);
-        bus.sendUnicast(msg, service::name::system_manager);
+        auto msg = std::make_shared<CellularUrcIncomingNotification>();
+        bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
     }
 
     if (handled) {

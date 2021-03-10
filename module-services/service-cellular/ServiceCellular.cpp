@@ -579,6 +579,9 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularSimNotReadyNotification),
             [&](sys::Message *request) -> sys::MessagePointer { return handleSimNotReadyNotification(request); });
 
+    connect(typeid(CellularUrcIncomingNotification),
+            [&](sys::Message *request) -> sys::MessagePointer { return handleUrcIncomingNotification(request); });
+
     handle_CellularGetChannelMessage();
 }
 
@@ -2507,6 +2510,12 @@ auto ServiceCellular::handleNetworkStatusUpdateNotification(sys::Message *msg) -
 auto ServiceCellular::handleSimNotReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     return std::make_shared<CellularResponseMessage>(false);
+}
+
+auto ServiceCellular::handleUrcIncomingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
+{
+    cmux->ExitSleepMode();
+    return std::make_shared<CellularResponseMessage>(true);
 }
 
 auto ServiceCellular::handleCellularSetFlightModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>

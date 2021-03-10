@@ -185,7 +185,6 @@ namespace bsp
         DisableRx();
 
         ExitSleep();
-        InformModemHostAsleep();
 
         TickType_t tick = xTaskGetTickCount();
         gpio_2->WritePin(static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN), 1);
@@ -201,7 +200,6 @@ namespace bsp
         const uint16_t POWER_DOWN_DELAY_MS = 700;
 
         ExitSleep();
-        InformModemHostWakeup();
 
         TickType_t tick = xTaskGetTickCount();
         gpio_2->WritePin(static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN), 1);
@@ -222,7 +220,6 @@ namespace bsp
     {
         const uint16_t RESET_DELAY_MS = 460;
 
-        InformModemHostWakeup();
         ExitSleep();
 
         gpio_2->WritePin(static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_RESET_PIN), 1);
@@ -415,23 +412,36 @@ namespace bsp
 
     void RT1051Cellular::EnterSleep()
     {
-        gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN), 1);
-        gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN), 1);
-        if (driverLPUART) {
-            driverLPUART->Disable();
+        if (!isInSleepMode) {
+            isInSleepMode = true;
+
+            gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN), 1);
+            gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN), 1);
+
+            // Host sleep information must be before UART disable
+            InformModemHostAsleep();
+            if (driverLPUART) {
+                driverLPUART->Disable();
+            }
         }
-        isInSleepMode = true;
     }
 
     void RT1051Cellular::ExitSleep()
     {
-        if (driverLPUART) {
-            driverLPUART->Enable();
+        if (isInSleepMode) {
+            isInSleepMode = false;
+
+            if (driverLPUART) {
+                driverLPUART->Enable();
+            }
+
+            gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN), 0);
+            gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN), 0);
+            vTaskDelay(pdMS_TO_TICKS(15));
+
+            // Host wake up information must be after UART enable
+            InformModemHostWakeup();
         }
-        gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN), 0);
-        gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN), 0);
-        isInSleepMode = false;
-        vTaskDelay(pdMS_TO_TICKS(15));
     }
 
     void RT1051Cellular::MSPInit()
