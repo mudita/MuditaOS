@@ -65,16 +65,6 @@ namespace app
     class Application;
     class GuiTimer;
 
-    inline auto msgHandled() -> sys::MessagePointer
-    {
-        return std::make_shared<sys::ResponseMessage>();
-    }
-
-    inline auto msgNotHandled() -> sys::MessagePointer
-    {
-        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-    }
-
     class ActionHandledResponse; // Forward declaration
     using ActionResult = std::shared_ptr<ActionHandledResponse>;
     auto actionHandled() -> ActionResult;

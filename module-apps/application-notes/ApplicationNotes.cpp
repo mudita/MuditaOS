@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationNotes.hpp"
@@ -59,9 +59,9 @@ namespace app
             if (auto command = callbackStorage->getCallback(resp); command->execute()) {
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
-            return msgHandled();
+            return sys::msgHandled();
         }
-        return msgNotHandled();
+        return sys::msgNotHandled();
     }
 
     sys::ReturnCodes ApplicationNotes::InitHandler()

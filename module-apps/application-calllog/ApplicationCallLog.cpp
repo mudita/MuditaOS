@@ -51,17 +51,17 @@ namespace app
             for (auto &[name, window] : windowsStack.windows) {
                 window->onDatabaseMessage(msgl);
             }
-            return msgHandled();
+            return sys::msgHandled();
         }
 
         if (resp != nullptr) {
             if (auto command = callbackStorage->getCallback(resp); command->execute()) {
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                return msgHandled();
+                return sys::msgHandled();
             }
         }
 
-        return msgNotHandled();
+        return sys::msgNotHandled();
     }
 
     // Invoked during initialization
