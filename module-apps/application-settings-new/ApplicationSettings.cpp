@@ -190,7 +190,7 @@ namespace app
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(
                              gui::DialogMetadata{utils::localize.get("app_settings_bt"),
-                                                 "search_big",
+                                                 "info_big_circle_W_G",
                                                  utils::localize.get("app_settings_bluetooth_pairing_error_message"),
                                                  "",
                                                  [=]() -> bool {
@@ -220,7 +220,7 @@ namespace app
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(
                              gui::DialogMetadata{utils::localize.get("app_settings_bt"),
-                                                 "search_big",
+                                                 "info_big_circle_W_G",
                                                  utils::localize.get("app_settings_bluetooth_unpairing_error_message"),
                                                  "",
                                                  [=]() -> bool {
@@ -244,7 +244,7 @@ namespace app
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
                              utils::localize.get("app_settings_bt"),
-                             "search_big",
+                             "info_big_circle_W_G",
                              utils::localize.get("app_settings_bluetooth_connecting_error_message"),
                              "",
                              [=]() -> bool {
