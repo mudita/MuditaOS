@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS quote_languages (
 CREATE TABLE IF NOT EXISTS category_table (
     category_id INTEGER NOT NULL,
     category_name TEXT NOT NULL UNIQUE,
-    enabled BOOLEAN DEFAULT TRUE,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
     PRIMARY KEY (category_id)
     );
 
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS quote_table (
     lang_id INTEGER NOT NULL,
     quote TEXT NOT NULL,
     author TEXT,
-    enabled BOOLEAN DEFAULT TRUE,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
     PRIMARY KEY (quote_id),
     FOREIGN KEY (lang_id) REFERENCES quote_languages(lang_id)
     );

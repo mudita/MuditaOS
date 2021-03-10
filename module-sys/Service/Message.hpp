@@ -108,4 +108,14 @@ namespace sys
         ReturnCodes retCode;
         MessageType responseTo;
     };
+
+    inline auto msgHandled() -> MessagePointer
+    {
+        return std::make_shared<ResponseMessage>();
+    }
+
+    inline auto msgNotHandled() -> MessagePointer
+    {
+        return std::make_shared<ResponseMessage>(ReturnCodes::Unresolved);
+    }
 } // namespace sys
