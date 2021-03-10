@@ -38,7 +38,7 @@ namespace at
         RI_PIN_OFF_CALL,            /// Turn off RI pin for incoming calls
         RI_PIN_PULSE_SMS,           /// Turn on RI pin for incoming sms
         RI_PIN_OFF_SMS,             /// Turn off RI pin for incoming sms
-        RI_PIN_OFF_OTHER,           /// Turn off RI pin for other URCs
+        RI_PIN_PULSE_OTHER,         /// Turn on RI pin for other incoming URCs
         URC_DELAY_ON,               /// Enable delay the output of URC indication until ring indicator pulse ends
         URC_UART1,                  /// Route URCs to UART1
         AT_PIN_READY_LOGIC,         /// Configure AP_Ready pin logic ( enable, logic level 1, 200ms )
@@ -154,7 +154,7 @@ namespace at
             {AT::RI_PIN_OFF_CALL, {"AT+QCFG=\"urc/ri/ring\",\"off\""}},
             {AT::RI_PIN_PULSE_SMS, {"AT+QCFG=\"urc/ri/smsincoming\",\"pulse\",450"}},
             {AT::RI_PIN_OFF_SMS, {"AT+QCFG=\"urc/ri/smsincoming\",\"off\""}},
-            {AT::RI_PIN_OFF_OTHER, {"AT+QCFG=\"urc/ri/other\",\"off\""}},
+            {AT::RI_PIN_PULSE_OTHER, {"AT+QCFG=\"urc/ri/other\",\"pulse\""}},
             {AT::URC_DELAY_ON, {"AT+QCFG=\"urc/delay\",1"}},
             {AT::URC_UART1, {"AT+QURCCFG=\"urcport\",\"uart1\""}},
             {AT::AT_PIN_READY_LOGIC, {"AT+QCFG=\"apready\",1,1,200"}},
