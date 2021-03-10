@@ -200,8 +200,7 @@ namespace bluetooth
     {
         auto result = packet[2];
 
-        auto msg =
-            std::make_shared<BluetoothPairResultMessage>(currentlyProcessedDeviceAddr, std::string{}, result == 0u);
+        auto msg = std::make_shared<BluetoothPairResultMessage>(currentlyProcessedDeviceAddr, result == 0u);
         currentlyProcessedDeviceAddr.clear();
         ownerService->bus.sendUnicast(std::move(msg), "ApplicationSettingsNew");
     }

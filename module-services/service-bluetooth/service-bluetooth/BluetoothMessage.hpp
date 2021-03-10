@@ -58,17 +58,12 @@ class BluetoothScanResultMessage : public sys::DataMessage
 class BluetoothPairResultMessage : public sys::DataMessage
 {
   public:
-    explicit BluetoothPairResultMessage(std::string addr, std::string name, bool succeed)
-        : sys::DataMessage(MessageType::BluetoothPairResult), addr(std::move(addr)), name(std::move(name)),
-          succeed(succeed)
+    explicit BluetoothPairResultMessage(std::string addr, bool succeed)
+        : sys::DataMessage(MessageType::BluetoothPairResult), addr(std::move(addr)), succeed(succeed)
     {}
     [[nodiscard]] auto getAddr() const -> std::string
     {
         return addr;
-    }
-    [[nodiscard]] auto getName() const -> std::string
-    {
-        return name;
     }
     [[nodiscard]] auto isSucceed() const noexcept -> bool
     {
