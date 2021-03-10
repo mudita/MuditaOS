@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventsRecord.hpp"
@@ -356,20 +356,21 @@ auto CalendarEventsHelper::ICalEventFromJson(json11::Json eventObj) const -> ICa
 
 auto CalendarEventsHelper::createDBEntry(Context &context) -> sys::ReturnCodes
 {
-    auto eventsJsonObj   = context.getBody();
-    auto eventsJsonArray = eventsJsonObj[json::calendar::events].array_items();
-    bool ret             = true;
-    for (auto event : eventsJsonArray) {
+    const auto eventsJsonObj = context.getBody();
+    const auto eventsJsonArray =
+        std::make_unique<std::vector<json11::Json>>(eventsJsonObj[json::calendar::events].array_items());
+    bool ret = true;
+    for (auto event : *eventsJsonArray) {
 
-        auto icalEvent = ICalEventFromJson(event);
+        const auto icalEvent = std::make_unique<ICalEvent>(ICalEventFromJson(event));
 
-        if (!isICalEventValid(icalEvent)) {
+        if (!isICalEventValid(*icalEvent)) {
             context.setResponseStatus(http::Code::BadRequest);
             MessageHandler::putToSendQueue(context.createSimpleResponse());
             return sys::ReturnCodes::Failure;
         }
 
-        auto record = eventsRecordFrom(icalEvent);
+        auto record = eventsRecordFrom(*icalEvent);
         if (record.UID.empty()) {
             record.UID   = createUID();
             auto jsonObj = json11::Json::object({{json::calendar::event::uid, record.UID}});

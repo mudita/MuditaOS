@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,7 +14,8 @@
 namespace app
 {
 
-    inline constexpr auto name_calendar = "ApplicationCalendar";
+    inline constexpr auto name_calendar         = "ApplicationCalendar";
+    constexpr std::uint32_t calendar_stack_size = 8192;
 
     class ApplicationCalendar : public Application
     {
@@ -26,7 +27,7 @@ namespace app
         ApplicationCalendar(std::string name,
                             std::string parent,
                             StartInBackground startInBackground = {false},
-                            uint32_t stackDepth                 = 8192,
+                            uint32_t stackDepth                 = app::calendar_stack_size,
                             sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
