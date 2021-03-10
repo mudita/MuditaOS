@@ -15,7 +15,7 @@ namespace at
             ret.push_back(AT::URC_NOTIF_CHANNEL);
             ret.push_back(AT::RI_PIN_AUTO_CALL);
             ret.push_back(AT::RI_PIN_PULSE_SMS);
-            ret.push_back(AT::RI_PIN_OFF_OTHER);
+            ret.push_back(AT::RI_PIN_PULSE_OTHER);
             ret.push_back(AT::URC_DELAY_ON);
             ret.push_back(AT::URC_UART1);
             ret.push_back(AT::AT_PIN_READY_LOGIC);

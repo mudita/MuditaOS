@@ -95,6 +95,7 @@ class CellularNotificationMessage : public CellularMessage
         PowerDownDeregistering,   // modem informed it has started to disconnect from network
         PowerDownDeregistered,    // modem informed it has disconnected from network
         SMSDone,                  // SMS initialization finished
+        NewIncomingUrc,           // phone received new URC from network and we need to wake up modem and host
     };
 
     // TODO check and fix all CellularNotificationMessage constructors
@@ -1019,6 +1020,14 @@ class CellularSimNotReadyNotification : public CellularNotificationMessage
   public:
     explicit CellularSimNotReadyNotification(const std::string &data = "")
         : CellularNotificationMessage(CellularNotificationMessage::Type::SIM_NOT_READY, data)
+    {}
+};
+
+class CellularUrcIncomingNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularUrcIncomingNotification(const std::string &data = "")
+        : CellularNotificationMessage(CellularNotificationMessage::Type::NewIncomingUrc, data)
     {}
 };
 
