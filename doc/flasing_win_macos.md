@@ -20,9 +20,9 @@ The `.xz` image is compressed twice using both `tar` and `xz`. Some unpackers wi
 
 - run balenaEtcher and choose the ISO image as the image type. Load unzipped image. It might look something like this:
 
-![balenEtacher interface screenshot](./balenaetcher1.png)
+![balenaEtcher interface screenshot](./balenaetcher1.png)
 
-![balenEtacher interface screenshot](./balenaetcher2.png)
+![balenaEtcher interface screenshot](./balenaetcher2.png)
 
 - press `Flash!`` and confirm if asked for the superuser password.
 - wait for the flashing to complete:
