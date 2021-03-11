@@ -226,7 +226,7 @@ namespace gui
         meta->title = duplicatedNumber.getFormatted();
         meta->icon  = "info_big_circle_W_G";
         application->switchWindow(gui::window::name::dialog_yes_no,
-                                  std::make_unique<gui::DialogMetadataMessage>(std::move(*meta.release())));
+                                  std::make_unique<gui::DialogMetadataMessage>(std::move(*meta)));
     }
 
     void PhonebookNewContact::showDialogDuplicatedSpeedDialNumber()
@@ -257,7 +257,7 @@ namespace gui
         metadata->iconText = contact->speeddial;
 
         application->switchWindow(gui::window::name::dialog_yes_no_icon_txt,
-                                  std::make_unique<gui::DialogMetadataMessage>(std::move(*metadata.release())));
+                                  std::make_unique<gui::DialogMetadataMessage>(std::move(*metadata)));
     }
 
 } // namespace gui
