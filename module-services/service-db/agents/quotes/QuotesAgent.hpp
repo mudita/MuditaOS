@@ -28,6 +28,10 @@ namespace Quotes
         auto handleEnableCategoryById(sys::Message *req) -> sys::MessagePointer;
         auto handleEnableQuoteById(sys::Message *req) -> sys::MessagePointer;
         auto handleEnabledQuotesList(sys::Message *req) -> sys::MessagePointer;
+        auto handleAddQuote(sys::Message *req) -> sys::MessagePointer;
+        auto handleReadQuote(sys::Message *req) -> sys::MessagePointer;
+        auto handleWriteQuote(sys::Message *req) -> sys::MessagePointer;
+        auto handleDeleteQuote(sys::Message *req) -> sys::MessagePointer;
 
       private:
         auto getDbInitString() -> const std::string override;

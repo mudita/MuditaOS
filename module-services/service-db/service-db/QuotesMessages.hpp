@@ -227,5 +227,86 @@ namespace Quotes
           private:
             std::unique_ptr<QuotesList> quotesList;
         };
+
+        class AddQuoteRequest : public QuotesMessage
+        {
+          public:
+            explicit AddQuoteRequest(unsigned int langId, std::string quote, std::string author, bool enabled)
+                : langId(langId), quote(std::move(quote)), author(std::move(author)), enabled(enabled)
+            {}
+            const unsigned int langId;
+            const std::string quote;
+            const std::string author;
+            const bool enabled;
+        };
+
+        class AddQuoteResponse : public QuotesMessage
+        {
+          public:
+            explicit AddQuoteResponse(bool success, unsigned int quoteId) : success(success), quoteId(quoteId)
+            {}
+            const bool success;
+            const unsigned int quoteId;
+        };
+
+        class ReadQuoteRequest : public QuotesMessage
+        {
+          public:
+            explicit ReadQuoteRequest(unsigned int quoteId) : quoteId(quoteId)
+            {}
+            const unsigned int quoteId;
+        };
+
+        class ReadQuoteResponse : public QuotesMessage
+        {
+          public:
+            explicit ReadQuoteResponse(
+                unsigned int quoteId, unsigned int langId, std::string quote, std::string author, bool enabled)
+                : quoteId(quoteId), langId(langId), quote(std::move(quote)), author(std::move(author)), enabled(enabled)
+            {}
+            const unsigned int quoteId;
+            const unsigned int langId;
+            const std::string quote;
+            const std::string author;
+            const bool enabled;
+        };
+
+        class WriteQuoteRequest : public QuotesMessage
+        {
+          public:
+            explicit WriteQuoteRequest(
+                unsigned int quoteId, unsigned int langId, std::string quote, std::string author, bool enabled)
+                : quoteId(quoteId), langId(langId), quote(std::move(quote)), author(std::move(author)), enabled(enabled)
+            {}
+            const unsigned int quoteId;
+            const unsigned int langId;
+            const std::string quote;
+            const std::string author;
+            const bool enabled;
+        };
+
+        class WriteQuoteResponse : public QuotesMessage
+        {
+          public:
+            explicit WriteQuoteResponse(bool success) : success(success)
+            {}
+            const bool success;
+        };
+
+        class DeleteQuoteRequest : public QuotesMessage
+        {
+          public:
+            explicit DeleteQuoteRequest(unsigned int quoteId) : quoteId(quoteId)
+            {}
+            const unsigned int quoteId;
+        };
+
+        class DeleteQuoteResponse : public QuotesMessage
+        {
+          public:
+            explicit DeleteQuoteResponse(bool success) : success(success)
+            {}
+            const bool success;
+        };
     } // namespace Messages
 } // namespace Quotes
