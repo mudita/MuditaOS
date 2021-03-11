@@ -106,7 +106,7 @@ namespace gui
         meta->title     = cont.getFormattedName();
         meta->icon      = "phonebook_contact_delete_trashcan";
         application->switchWindow(gui::window::name::dialog_yes_no,
-                                  std::make_unique<gui::DialogMetadataMessage>(std::move(*meta.release())));
+                                  std::make_unique<gui::DialogMetadataMessage>(std::move(*meta)));
         return true;
     }
 
@@ -129,7 +129,7 @@ namespace gui
         meta->title     = cont.getFormattedName();
         meta->icon      = "phonebook_contact_delete_trashcan";
         application->switchWindow(gui::window::name::dialog_yes_no,
-                                  std::make_unique<DialogMetadataMessage>(std::move(*meta.release())));
+                                  std::make_unique<DialogMetadataMessage>(std::move(*meta)));
         return true;
     }
 
@@ -154,7 +154,7 @@ namespace gui
         };
         meta.title = contact->getFormattedName(ContactRecord::NameFormatType::Title);
         application->switchWindow(gui::window::name::dialog_confirm,
-                                  std::make_unique<gui::DialogMetadataMessage>(meta));
+                                  std::make_unique<gui::DialogMetadataMessage>(std::move(meta)));
         return true;
     }
 } // namespace gui
