@@ -58,4 +58,26 @@ namespace Quotes::Queries
                             and
                             CT.enabled = TRUE
                         )sql";
+
+    constexpr auto addQuote = R"sql(
+                        INSERT INTO quote_table (lang_id, quote, author, enabled)
+                        VALUES ('%lu', '%q' , '%q', '%d');
+                        )sql";
+
+    constexpr auto readQuote = R"sql(
+                        SELECT quote_id, lang_id, quote, author, enabled
+                        FROM quote_table
+                        WHERE quote_id = '%lu';
+                        )sql";
+
+    constexpr auto writeQuote = R"sql(
+                        UPDATE quote_table
+                        SET lang_id = '%lu', quote = '%q', author = '%q', enabled = '%d'
+                        WHERE quote_id = '%lu';
+                        )sql";
+
+    constexpr auto deleteQuote = R"sql(
+                        DELETE FROM quote_table
+                        WHERE quote_id = '%lu';
+                        )sql";
 } // namespace Quotes::Queries

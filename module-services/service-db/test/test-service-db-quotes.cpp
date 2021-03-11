@@ -48,28 +48,18 @@ TEST_CASE("Quotes")
 
     SECTION("Get quotes with limit and offset")
     {
-        QuotesList quotesList;
-        quotesList.limit  = 3;
-        quotesList.offset = 4;
+        unsigned int limit  = 3;
+        unsigned int offset = 4;
 
-        auto record  = std::make_unique<QuotesList>(quotesList);
-        auto request = std::make_shared<Messages::GetQuotesListRequest>(std::move(record));
-        auto response =
-            std::dynamic_pointer_cast<Messages::GetQuotesListResponse>(tester->handleQuotesList(request.get()));
+        auto response = tester->getAllQuotes(limit, offset);
 
         REQUIRE(response->getCount() == totalNumOfQuotesInDb);
-        REQUIRE(response->getResults().size() == quotesList.limit);
+        REQUIRE(response->getResults().size() == limit);
     }
 
     SECTION("Get all quotes")
     {
-        QuotesList quotesList;
-        quotesList.limit = 0;
-
-        auto record  = std::make_unique<QuotesList>(quotesList);
-        auto request = std::make_shared<Messages::GetQuotesListRequest>(std::move(record));
-        auto response =
-            std::dynamic_pointer_cast<Messages::GetQuotesListResponse>(tester->handleQuotesList(request.get()));
+        auto response = tester->getAllQuotes();
 
         REQUIRE(response->getCount() == totalNumOfQuotesInDb);
         REQUIRE(response->getResults().size() == totalNumOfQuotesInDb);
@@ -124,6 +114,55 @@ TEST_CASE("Quotes")
         // All quotes should be enabled
         quotes = tester->getEnabledQuotes();
         REQUIRE(quotes.size() == totalNumOfQuotesInDb);
+    }
+
+    SECTION("Add/Read/Write/Delete quote")
+    {
+        unsigned int langId = 1;
+        std::string quote   = "TEST QUOTE";
+        std::string author  = "TEST AUTHOR";
+        bool enabled        = true;
+
+        // Add a new quote
+        auto addQuoteResponse = tester->addQuote(langId, quote, author, enabled);
+        REQUIRE(addQuoteResponse->success);
+        const auto quoteId = addQuoteResponse->quoteId;
+
+        // Check if quotes count has increased
+        auto getAllQuotesResponse = tester->getAllQuotes();
+
+        REQUIRE(getAllQuotesResponse->getCount() == totalNumOfQuotesInDb + 1);
+        REQUIRE(getAllQuotesResponse->getResults().size() == totalNumOfQuotesInDb + 1);
+
+        // Read added quote
+        auto readQuoteResponse = tester->readQuote(quoteId);
+
+        REQUIRE(readQuoteResponse->quoteId == quoteId);
+        REQUIRE(readQuoteResponse->quote == quote);
+        REQUIRE(readQuoteResponse->author == author);
+
+        // Change added quote (overwrite)
+        quote                   = "TEST QUOTE CHANGED";
+        author                  = "TEST AUTHOR CHANGED";
+        auto writeQuoteResponse = tester->writeQuote(quoteId, langId, quote, author, enabled);
+        REQUIRE(writeQuoteResponse->success);
+
+        // Read quote if values have been properly updated
+        readQuoteResponse = tester->readQuote(quoteId);
+
+        REQUIRE(readQuoteResponse->quoteId == quoteId);
+        REQUIRE(readQuoteResponse->quote == quote);
+        REQUIRE(readQuoteResponse->author == author);
+
+        // Delete added quote
+        auto deleteQuoteResponse = tester->deleteQuote(quoteId);
+        REQUIRE(deleteQuoteResponse->success);
+
+        // Check if quotes count match count before added quote
+        getAllQuotesResponse = tester->getAllQuotes();
+
+        REQUIRE(getAllQuotesResponse->getCount() == totalNumOfQuotesInDb);
+        REQUIRE(getAllQuotesResponse->getResults().size() == totalNumOfQuotesInDb);
     }
 
     Database::deinitialize();
