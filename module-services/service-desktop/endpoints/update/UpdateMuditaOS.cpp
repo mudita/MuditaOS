@@ -438,9 +438,8 @@ updateos::UpdateError UpdateMuditaOS::prepareRoot()
     // rename the temp directory to current (extracted update)
     informDebug("prepareRoot copy: %s->%s", updateTempDirectory.c_str(), currentOSPath.c_str());
     try {
-        // std::filesystem::copy(updateTempDirectory.c_str(), currentOSPath.c_str(),
-        // std::filesystem::copy_options::recursive);
-        std::filesystem::rename(updateTempDirectory.c_str(), currentOSPath.c_str());
+        std::filesystem::copy(
+            updateTempDirectory.c_str(), currentOSPath.c_str(), std::filesystem::copy_options::recursive);
     }
     catch (const std::filesystem::filesystem_error &fsError) {
         return informError(updateos::UpdateError::CantCopyTempToCurrent,
