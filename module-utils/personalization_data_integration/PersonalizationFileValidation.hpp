@@ -68,7 +68,6 @@ namespace phone_personalization
 
     class PersonalizationFileValidator
     {
-
         std::map<std::string, ParamModel> paramsModel = {
             {param::serial_number::key,
              ParamModel(
@@ -89,20 +88,18 @@ namespace phone_personalization
         void validateByFormat(const std::string &key);
 
         json11::Json jsonObj = nullptr;
-        std::filesystem::path filePath;
 
-        auto validateFileCRC() -> bool;
+      public:
+        static auto validateFileCRC(const std::filesystem::path &filePath) -> bool;
         auto validateJsonObject() -> bool;
         auto validateParameters() -> bool;
 
-      public:
-        explicit PersonalizationFileValidator(const json11::Json &jsonObj, const std::filesystem::path &filePath)
-            : jsonObj{jsonObj}, filePath{filePath}
+
+        explicit PersonalizationFileValidator(const json11::Json &jsonObj)
+            : jsonObj{jsonObj}
         {}
 
-        auto validate() -> bool;
-
-        [[nodiscard]] auto getParamsModel() const -> std::map<std::string, ParamModel>
+        [[nodiscard]] auto getParamsValidationModel() const -> std::map<std::string, ParamModel>
         {
             return paramsModel;
         };
@@ -110,23 +107,40 @@ namespace phone_personalization
 
     class PersonalizationData
     {
-        std::string serialNumber;
-        std::string caseColour;
-
-      public:
-        explicit PersonalizationData() = default;
+        std::map<std::string, std::string> parameters;
 
         void setParamsFromJson(const json11::Json &jsonObj);
+
+      public:
+        explicit PersonalizationData(const json11::Json &jsonObj)
+        {
+            setParamsFromJson(jsonObj);
+        };
+
         void setInvalidParamsAsDefault(const std::map<std::string, ParamModel> &paramsModel);
 
-        [[nodiscard]] auto getSerialNumber() const -> std::string
+        [[nodiscard]] auto getParameterByKey(const std::string &key) -> std::string
         {
-            return serialNumber;
-        };
-
-        [[nodiscard]] auto getCaseColour() const -> std::string
-        {
-            return caseColour;
+            return parameters[key];
         };
     };
+
+    class PersonalizationDataIntegrationProcess
+    {
+        std::unique_ptr<PersonalizationFileParser>    parser;
+        std::unique_ptr<PersonalizationFileValidator> validator;
+        std::unique_ptr<PersonalizationData> data;
+
+    public:
+
+        auto proceed(const std::filesystem::path &filePath) -> bool;
+
+        [[nodiscard]] auto getData() -> std::unique_ptr<PersonalizationData>
+        {
+            return std::move(data);
+        };
+
+    };
+
+
 } // namespace phone_personalization

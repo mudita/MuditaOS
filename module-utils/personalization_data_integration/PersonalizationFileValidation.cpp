@@ -10,13 +10,13 @@ namespace phone_personalization
 
     auto PersonalizationFileParser::loadFileContent() const -> std::string
     {
-        std::string content;
         std::ifstream in(filePath);
         if (!in.is_open()) {
             LOG_FATAL("Error while loading personalization file");
             return "";
         }
-        std::getline(in, content, std::string::traits_type::to_char_type(std::string::traits_type::eof()));
+        std::string content( (std::istreambuf_iterator<char>(in) ),
+                             (std::istreambuf_iterator<char>()) );
         return content;
     }
 
@@ -30,7 +30,7 @@ namespace phone_personalization
 
         auto jsonObj = json11::Json::parse(content, parseErrors);
 
-        if (parseErrors.length() != 0) {
+        if (!parseErrors.empty()) {
             LOG_FATAL("JSON format error: %s", parseErrors.c_str());
             return nullptr;
         }
@@ -87,7 +87,7 @@ namespace phone_personalization
         LOG_ERROR("Params json object not parsed!");
     }
 
-    auto PersonalizationFileValidator::validateFileCRC() -> bool
+    auto PersonalizationFileValidator::validateFileCRC(const std::filesystem::path &filePath) -> bool
     {
         if (!boot::readAndVerifyCRC(filePath)) {
             LOG_ERROR("Invalid crc calculation!");
@@ -120,25 +120,10 @@ namespace phone_personalization
         return true;
     }
 
-    auto PersonalizationFileValidator::validate() -> bool
-    {
-        if (!validateFileCRC()) {
-            return false;
-        }
-        if (!validateJsonObject()) {
-            return false;
-        }
-        if (!validateParameters()) {
-            return false;
-        }
-
-        return true;
-    }
-
     void PersonalizationData::setParamsFromJson(const json11::Json &jsonObj)
     {
-        this->serialNumber = jsonObj[param::serial_number::key].string_value();
-        this->caseColour   = jsonObj[param::case_colour::key].string_value();
+        parameters[param::serial_number::key] = jsonObj[param::serial_number::key].string_value();
+        parameters[param::case_colour::key] = jsonObj[param::case_colour::key].string_value();
     }
 
     void PersonalizationData::setInvalidParamsAsDefault(const std::map<std::string, ParamModel> &paramsModel)
@@ -146,14 +131,33 @@ namespace phone_personalization
         for (const auto &param : paramsModel) {
             if (param.second.mandatory == MandatoryParameter::no && !param.second.isValid) {
                 LOG_ERROR("Optional parameter: %s  is invalid", param.first.c_str());
-                if (param.first == param::serial_number::key) {
-                    serialNumber = param.second.defaultValue;
-                }
-                else if (param.first == param::case_colour::key) {
-                    caseColour = param.second.defaultValue;
-                }
+                parameters[param.first] = param.second.defaultValue;
             }
         }
     }
+
+    auto PersonalizationDataIntegrationProcess::proceed(const std::filesystem::path &filePath) -> bool
+    {
+        if (!PersonalizationFileValidator::validateFileCRC(filePath)) {
+            return false;
+        }
+        parser = std::make_unique<PersonalizationFileParser>(filePath);
+        auto jsonObj = parser->parseJson();
+
+        validator = std::make_unique<PersonalizationFileValidator>(jsonObj);
+
+        if (!validator->validateJsonObject()) {
+            return false;
+        }
+        if (!validator->validateParameters()) {
+            return false;
+        }
+
+        data = std::make_unique<PersonalizationData>(jsonObj);
+        data->setInvalidParamsAsDefault(validator->getParamsValidationModel());
+
+        return true;
+    }
+
 
 } // namespace phone_personalization

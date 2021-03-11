@@ -24,12 +24,12 @@ namespace phone_personalization
     class PersonalizationFileValidatorWrapper : public PersonalizationFileValidator
     {
       public:
-        explicit PersonalizationFileValidatorWrapper(const json11::Json &jsonObj, const std::filesystem::path &filePath)
-            : PersonalizationFileValidator(jsonObj, filePath){};
+        explicit PersonalizationFileValidatorWrapper(const json11::Json &jsonObj)
+            : PersonalizationFileValidator(jsonObj){};
 
-        bool test_validateFileAndCRC()
+        bool test_validateFileAndCRC(const std::filesystem::path &filePath)
         {
-            return validateFileCRC();
+            return validateFileCRC(filePath);
         }
 
         bool test_validateJsonObject()
@@ -40,14 +40,14 @@ namespace phone_personalization
         ParamModel test_validateByFormat(const std::string &key)
         {
             validateByFormat(key);
-            auto param = getParamsModel()[key];
+            auto param = getParamsValidationModel()[key];
             return param;
         }
 
         ParamModel test_validateByValues(const std::string &key)
         {
             validateByValues(key);
-            auto param = getParamsModel()[key];
+            auto param = getParamsValidationModel()[key];
             return param;
         }
     };
@@ -126,8 +126,8 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                    auto result    = validator.test_validateFileAndCRC();
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
+                    auto result    = validator.test_validateFileAndCRC(path);
 
                     REQUIRE(result);
                 }
@@ -140,8 +140,8 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                    auto result    = validator.test_validateFileAndCRC();
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
+                    auto result    = validator.test_validateFileAndCRC(path);
 
                     REQUIRE(!result);
                 }
@@ -154,8 +154,8 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                    auto result    = validator.test_validateFileAndCRC();
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
+                    auto result    = validator.test_validateFileAndCRC(path);
 
                     REQUIRE(!result);
                 }
@@ -171,7 +171,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
                     auto result    = validator.test_validateJsonObject();
 
                     REQUIRE(result);
@@ -185,7 +185,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
                     auto result    = validator.test_validateJsonObject();
 
                     REQUIRE(!result);
@@ -199,7 +199,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
                     auto result    = validator.test_validateJsonObject();
 
                     REQUIRE(!result);
@@ -217,7 +217,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
                     auto serialNumber =
                         validator.test_validateByFormat(phone_personalization::param::serial_number::key);
 
@@ -233,7 +233,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
                     auto serialNumber =
                         validator.test_validateByFormat(phone_personalization::param::serial_number::key);
 
@@ -249,7 +249,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
                     auto serialNumber =
                         validator.test_validateByValues(phone_personalization::param::serial_number::key);
 
@@ -264,7 +264,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
                     auto serialNumber =
                         validator.test_validateByFormat(phone_personalization::param::serial_number::key);
 
@@ -279,7 +279,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
                     auto serialNumber =
                         validator.test_validateByFormat(phone_personalization::param::serial_number::key);
 
@@ -294,7 +294,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator = PersonalizationFileValidatorWrapper(jsonObj);
                     auto serialNumber =
                         validator.test_validateByFormat(phone_personalization::param::serial_number::key);
 
@@ -314,7 +314,7 @@ namespace phone_personalization
                         auto parser  = PersonalizationFileParser(path);
                         auto jsonObj = parser.parseJson();
 
-                        auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
+                        auto validator = PersonalizationFileValidatorWrapper(jsonObj);
                         auto caseColour =
                             validator.test_validateByValues(phone_personalization::param::case_colour::key);
 
@@ -330,7 +330,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator  = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator  = PersonalizationFileValidatorWrapper(jsonObj);
                     auto caseColour = validator.test_validateByValues(phone_personalization::param::case_colour::key);
 
                     REQUIRE(caseColour.isValid);
@@ -344,7 +344,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator  = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator  = PersonalizationFileValidatorWrapper(jsonObj);
                     auto caseColour = validator.test_validateByValues(phone_personalization::param::case_colour::key);
 
                     REQUIRE(!caseColour.isValid);
@@ -358,7 +358,7 @@ namespace phone_personalization
                     auto parser  = PersonalizationFileParser(path);
                     auto jsonObj = parser.parseJson();
 
-                    auto validator  = PersonalizationFileValidatorWrapper(jsonObj, path);
+                    auto validator  = PersonalizationFileValidatorWrapper(jsonObj);
                     auto caseColour = validator.test_validateByValues(phone_personalization::param::case_colour::key);
 
                     REQUIRE(!caseColour.isValid);
@@ -376,19 +376,13 @@ namespace phone_personalization
                 auto expectedSerialNumber = "SN123456789098";
                 auto expectedCaseColour   = "black";
 
-                auto parser  = PersonalizationFileParser(path);
-                auto jsonObj = parser.parseJson();
+                auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
+                REQUIRE(dataIntegrationProcess.proceed(path));
 
-                auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                REQUIRE(validator.validate());
+                auto paramsData = dataIntegrationProcess.getData();
 
-                auto paramsData = PersonalizationData();
-                paramsData.setParamsFromJson(jsonObj);
-
-                paramsData.setInvalidParamsAsDefault(validator.getParamsModel());
-
-                REQUIRE(paramsData.getSerialNumber() == expectedSerialNumber);
-                REQUIRE(paramsData.getCaseColour() == expectedCaseColour);
+                REQUIRE(paramsData->getParameterByKey(param::serial_number::key) == expectedSerialNumber);
+                REQUIRE(paramsData->getParameterByKey(param::case_colour::key) == expectedCaseColour);
             }
 
             SECTION("Valid file 2")
@@ -399,19 +393,13 @@ namespace phone_personalization
                 auto expectedSerialNumber = "SN123456789098";
                 auto expectedCaseColour   = "white";
 
-                auto parser  = PersonalizationFileParser(path);
-                auto jsonObj = parser.parseJson();
+                auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
+                REQUIRE(dataIntegrationProcess.proceed(path));
 
-                auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                REQUIRE(validator.validate());
+                auto paramsData = dataIntegrationProcess.getData();
 
-                auto paramsData = PersonalizationData();
-                paramsData.setParamsFromJson(jsonObj);
-
-                paramsData.setInvalidParamsAsDefault(validator.getParamsModel());
-
-                REQUIRE(paramsData.getSerialNumber() == expectedSerialNumber);
-                REQUIRE(paramsData.getCaseColour() == expectedCaseColour);
+                REQUIRE(paramsData->getParameterByKey(param::serial_number::key) == expectedSerialNumber);
+                REQUIRE(paramsData->getParameterByKey(param::case_colour::key) == expectedCaseColour);
             }
 
             SECTION("Invalid file")
@@ -422,11 +410,8 @@ namespace phone_personalization
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/not_existing.json";
 
-                    auto parser  = PersonalizationFileParser(path);
-                    auto jsonObj = parser.parseJson();
-
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                    REQUIRE(!validator.validate());
+                    auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
+                    REQUIRE(!dataIntegrationProcess.proceed(path));
                 }
 
                 SECTION("Invalid crc")
@@ -434,11 +419,8 @@ namespace phone_personalization
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/invalid_crc.json";
 
-                    auto parser  = PersonalizationFileParser(path);
-                    auto jsonObj = parser.parseJson();
-
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                    REQUIRE(!validator.validate());
+                    auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
+                    REQUIRE(!dataIntegrationProcess.proceed(path));
                 }
 
                 SECTION("Invalid format")
@@ -446,11 +428,8 @@ namespace phone_personalization
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/invalid_json_format.json";
 
-                    auto parser  = PersonalizationFileParser(path);
-                    auto jsonObj = parser.parseJson();
-
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                    REQUIRE(!validator.validate());
+                    auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
+                    REQUIRE(!dataIntegrationProcess.proceed(path));
                 }
 
                 SECTION("Empty serial number")
@@ -458,11 +437,8 @@ namespace phone_personalization
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/personalization_empty_serial.json";
 
-                    auto parser  = PersonalizationFileParser(path);
-                    auto jsonObj = parser.parseJson();
-
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                    REQUIRE(!validator.validate());
+                    auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
+                    REQUIRE(!dataIntegrationProcess.proceed(path));
                 }
 
                 SECTION("Invalid serial number")
@@ -470,11 +446,8 @@ namespace phone_personalization
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/invalid_serial_number.json";
 
-                    auto parser  = PersonalizationFileParser(path);
-                    auto jsonObj = parser.parseJson();
-
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                    REQUIRE(!validator.validate());
+                    auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
+                    REQUIRE(!dataIntegrationProcess.proceed(path));
                 }
 
                 SECTION("Serial number is missing")
@@ -482,11 +455,8 @@ namespace phone_personalization
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/serial_number_missing.json";
 
-                    auto parser  = PersonalizationFileParser(path);
-                    auto jsonObj = parser.parseJson();
-
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                    REQUIRE(!validator.validate());
+                    auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
+                    REQUIRE(!dataIntegrationProcess.proceed(path));
                 }
 
                 SECTION("Invalid case colour")
@@ -497,19 +467,13 @@ namespace phone_personalization
                     auto expectedSerialNumber = "SN123456789098";
                     auto expectedCaseColour   = param::case_colour::default_value;
 
-                    auto parser  = PersonalizationFileParser(path);
-                    auto jsonObj = parser.parseJson();
+                    auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
+                    REQUIRE(dataIntegrationProcess.proceed(path));
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                    REQUIRE(validator.validate());
+                    auto paramsData = dataIntegrationProcess.getData();
 
-                    auto paramsData = PersonalizationData();
-                    paramsData.setParamsFromJson(jsonObj);
-
-                    paramsData.setInvalidParamsAsDefault(validator.getParamsModel());
-
-                    REQUIRE(paramsData.getSerialNumber() == expectedSerialNumber);
-                    REQUIRE(paramsData.getCaseColour() == expectedCaseColour);
+                    REQUIRE(paramsData->getParameterByKey(param::serial_number::key) == expectedSerialNumber);
+                    REQUIRE(paramsData->getParameterByKey(param::case_colour::key) == expectedCaseColour);
                 }
 
                 SECTION("Case colour is missing")
@@ -520,19 +484,13 @@ namespace phone_personalization
                     auto expectedSerialNumber = "SN123456789098";
                     auto expectedCaseColour   = param::case_colour::default_value;
 
-                    auto parser  = PersonalizationFileParser(path);
-                    auto jsonObj = parser.parseJson();
+                    auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
+                    REQUIRE(dataIntegrationProcess.proceed(path));
 
-                    auto validator = PersonalizationFileValidatorWrapper(jsonObj, path);
-                    REQUIRE(validator.validate());
+                    auto paramsData = dataIntegrationProcess.getData();
 
-                    auto paramsData = PersonalizationData();
-                    paramsData.setParamsFromJson(jsonObj);
-
-                    paramsData.setInvalidParamsAsDefault(validator.getParamsModel());
-
-                    REQUIRE(paramsData.getSerialNumber() == expectedSerialNumber);
-                    REQUIRE(paramsData.getCaseColour() == expectedCaseColour);
+                    REQUIRE(paramsData->getParameterByKey(param::serial_number::key) == expectedSerialNumber);
+                    REQUIRE(paramsData->getParameterByKey(param::case_colour::key) == expectedCaseColour);
                 }
             }
         }
