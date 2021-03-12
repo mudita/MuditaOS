@@ -17,7 +17,7 @@ namespace phone_personalization
         namespace serial_number
         {
             constexpr inline auto key    = "serial";
-            constexpr inline auto patern = "SN-[\\d]{3}-[\\d]{6}"; /// Need to get provided docs witch describes exact S/N format
+            constexpr inline auto patern = "SN-[\\d]{3}-[\\d]{6}"; ///(Documentation witch describes exact S/N format is missing)
             //constexpr inline auto length = 14;
         } // namespace serial_number
 
