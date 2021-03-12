@@ -243,11 +243,6 @@ sys::ReturnCodes EventManager::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sevm::BatteryLevelCriticalCheckMessage(), [&](sys::Message *msgl) {
-        EventWorker->checkBatteryLevelCritical();
-        return std::make_shared<sys::ResponseMessage>();
-    });
-
     connect(sevm::ScreenLightControlMessage(), [&](sys::Message *msgl) {
         auto *m = dynamic_cast<sevm::ScreenLightControlMessage *>(msgl);
         screenLightControl->processRequest(m->action, m->parameters);

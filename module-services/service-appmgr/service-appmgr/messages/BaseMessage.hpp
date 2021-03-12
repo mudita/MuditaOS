@@ -14,6 +14,7 @@ namespace app::manager
       public:
         BaseMessage(MessageType type, ApplicationName sender);
         explicit BaseMessage(ApplicationName sender);
+        BaseMessage() = default;
 
         [[nodiscard]] auto getSenderName() const noexcept -> const ApplicationName &;
 

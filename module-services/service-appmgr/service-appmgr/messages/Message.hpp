@@ -10,6 +10,7 @@
 #include "SwitchConfirmation.hpp"
 #include "ApplicationCloseRequest.hpp"
 #include "CloseConfirmation.hpp"
+#include "StartAllowedMessage.hpp"
 #include "ApplicationInitialised.hpp"
 #include "ApplicationStatus.hpp"
 #include "LanguageChangeRequest.hpp"
