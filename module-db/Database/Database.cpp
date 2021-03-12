@@ -78,6 +78,7 @@ Database::Database(const char *name, bool readOnly)
     initQueryStatementBuffer();
     pragmaQuery("PRAGMA integrity_check;");
     pragmaQuery("PRAGMA locking_mode=EXCLUSIVE");
+    pragmaQuery("PRAGMA journal_mode=WAL");
 
     const auto filePath = (purefs::dir::getUserDiskPath() / "db");
     LOG_INFO("Running scripts: %s", filePath.c_str());
