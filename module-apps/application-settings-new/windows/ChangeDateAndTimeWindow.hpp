@@ -4,6 +4,7 @@
 #pragma once
 
 #include <AppWindow.hpp>
+#include <application-settings-new/ApplicationSettings.hpp>
 #include "application-settings-new/models/DateAndTimeModel.hpp"
 
 namespace gui
@@ -12,7 +13,8 @@ namespace gui
     class ChangeDateAndTimeWindow : public AppWindow
     {
       public:
-        explicit ChangeDateAndTimeWindow(app::Application *app);
+        explicit ChangeDateAndTimeWindow(app::Application *app,
+                                         std::string name = gui::window::name::change_date_and_time);
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;

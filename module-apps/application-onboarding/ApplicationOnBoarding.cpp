@@ -13,12 +13,14 @@
 #include "windows/NoConfigurationDialogWindow.hpp"
 #include "windows/UpdateDialogWindow.hpp"
 #include "windows/SkipDialogWindow.hpp"
+#include "windows/OnBoardingDateAndTimeWindow.hpp"
+#include "windows/OnBoardingChangeDateAndTimeWindow.hpp"
 
 #include <service-db/DBMessage.hpp>
 #include <module-services/service-appmgr/service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 #include <module-apps/application-settings-new/data/LanguagesData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
-#include <module-apps/windows/Dialog.hpp>
+#include <module-apps/application-settings-new/windows/ChangeTimeZone.hpp>
 
 namespace app
 {
@@ -124,6 +126,17 @@ namespace app
 
         windowsFactory.attach(gui::window::name::onBoarding_skip, [](Application *app, const std::string &name) {
             return std::make_unique<app::onBoarding::SkipDialogWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::onBoarding_date_and_time,
+                              [](Application *app, const std::string &name) {
+                                  return std::make_unique<app::onBoarding::OnBoardingDateAndTimeWindow>(app);
+                              });
+        windowsFactory.attach(gui::window::name::onBoarding_change_date_and_time,
+                              [](Application *app, const std::string &name) {
+                                  return std::make_unique<gui::OnBoardingChangeDateAndTimeWindow>(app);
+                              });
+        windowsFactory.attach(gui::window::name::change_time_zone, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::ChangeTimeZone>(app);
         });
 
         attachPopups({gui::popup::ID::Volume, gui::popup::ID::PhoneModes});

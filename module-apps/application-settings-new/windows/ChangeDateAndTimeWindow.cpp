@@ -11,9 +11,8 @@
 
 namespace gui
 {
-    ChangeDateAndTimeWindow::ChangeDateAndTimeWindow(app::Application *app)
-        : AppWindow(app, gui::window::name::change_date_and_time), dateAndTimeModel{std::make_shared<DateAndTimeModel>(
-                                                                       this->application)}
+    ChangeDateAndTimeWindow::ChangeDateAndTimeWindow(app::Application *app, std::string name)
+        : AppWindow(app, name), dateAndTimeModel{std::make_shared<DateAndTimeModel>(this->application)}
     {
         buildInterface();
     }

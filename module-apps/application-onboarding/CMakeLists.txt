@@ -22,6 +22,8 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/NoConfigurationDialogWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/UpdateDialogWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/SkipDialogWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingDateAndTimeWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingChangeDateAndTimeWindow.cpp"
 		PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationOnBoarding.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingMainWindow.hpp"
@@ -35,6 +37,7 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/NoConfigurationDialogWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/UpdateDialogWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/SkipDialogWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/OnBoardingDateAndTimeWindow.hpp"
 
 		)
 target_include_directories(${PROJECT_NAME}

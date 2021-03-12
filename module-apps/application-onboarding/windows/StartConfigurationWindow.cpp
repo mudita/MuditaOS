@@ -51,15 +51,9 @@ namespace app::onBoarding
                                           std::make_unique<OnBoardingSwitchData>());
             }
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-                auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                    gui::DialogMetadata{utils::localize.get("app_onboarding_title_configuration"),
-                                        "success_icon_W_G",
-                                        utils::localize.get("app_onboarding_configuration_successful"),
-                                        "",
-                                        [=]() -> bool { return true; }});
-                application->switchWindow(gui::window::name::onBoarding_configuration_successful,
+                application->switchWindow(gui::window::name::onBoarding_date_and_time,
                                           gui::ShowMode::GUI_SHOW_INIT,
-                                          std::move(metaData));
+                                          std::make_unique<OnBoardingSwitchData>());
             }
             if (inputEvent.is(gui::KeyCode::KEY_LF)) {
 
