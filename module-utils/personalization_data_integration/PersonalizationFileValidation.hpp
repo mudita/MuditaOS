@@ -8,6 +8,7 @@
 #include <module-vfs/include/user/purefs/fs/filesystem.hpp>
 #include <module-vfs/include/user/purefs/filesystem_paths.hpp>
 #include "module-utils/json/json11.hpp"
+#include <module-utils/re2/re2/re2.h>
 
 namespace phone_personalization
 {
@@ -16,8 +17,8 @@ namespace phone_personalization
         namespace serial_number
         {
             constexpr inline auto key    = "serial";
-            constexpr inline auto prefix = "SN"; /// Need access to req witch describes SN format
-            constexpr inline auto length = 14;
+            constexpr inline auto patern = "SN-[\\d]{3}-[\\d]{6}"; /// Need to get provided docs witch describes exact S/N format
+            //constexpr inline auto length = 14;
         } // namespace serial_number
 
         namespace case_colour
@@ -74,7 +75,7 @@ namespace phone_personalization
                      "",
                      {},
                      MandatoryParameter::yes,
-                     [&]() { validateByFormat(param::serial_number::key); })},
+                     [&]() { validateSerialNumber(param::serial_number::key); })},
             {param::case_colour::key,
              ParamModel(
                  param::case_colour::default_value,
@@ -85,7 +86,7 @@ namespace phone_personalization
 
       protected:
         void validateByValues(const std::string &key);
-        void validateByFormat(const std::string &key);
+        void validateSerialNumber(const std::string &key);
 
         json11::Json jsonObj = nullptr;
 

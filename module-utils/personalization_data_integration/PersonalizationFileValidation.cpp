@@ -38,33 +38,11 @@ namespace phone_personalization
         return jsonObj;
     }
 
-    void PersonalizationFileValidator::validateByFormat(const std::string &key)
+    void PersonalizationFileValidator::validateSerialNumber(const std::string &key)
     {
-        auto paramObj = jsonObj[key];
-        if (paramObj != nullptr) {
-            auto param = paramObj.string_value();
-            if (param.empty()) {
-                LOG_ERROR("Parameter: '%s' is epmty!", param.c_str());
-                paramsModel[key].isValid = false;
-                return;
-            }
-            if (param.find(param::serial_number::prefix) != 0) {
-                LOG_ERROR("Wrong format of parameter: '%s'", key.c_str());
-                paramsModel[key].isValid = false;
-                return;
-            }
-            if (param.size() != param::serial_number::length) {
-                LOG_ERROR("Parameter: '%s' has wrong size", key.c_str());
-                paramsModel[key].isValid = false;
-                return;
-            }
-            LOG_INFO("Valid parameter: %s with value: %s", key.c_str(), param.c_str());
-            paramsModel[key].isValid = true;
-            return;
-        }
-
-        LOG_ERROR("Parameter does not exist in json object!");
-        paramsModel[key].isValid = false;
+        auto regex = RE2(param::serial_number::patern);
+        paramsModel[key].isValid = re2::RE2::FullMatch(jsonObj[key].string_value(), regex);
+        paramsModel[key].isValid ? LOG_FATAL("Serial number: %s is invalid", jsonObj[key].string_value().c_str()) : LOG_INFO("Serial number is valid");
     }
 
     void PersonalizationFileValidator::validateByValues(const std::string &key)
@@ -141,6 +119,7 @@ namespace phone_personalization
         if (!PersonalizationFileValidator::validateFileCRC(filePath)) {
             return false;
         }
+
         parser = std::make_unique<PersonalizationFileParser>(filePath);
         auto jsonObj = parser->parseJson();
 

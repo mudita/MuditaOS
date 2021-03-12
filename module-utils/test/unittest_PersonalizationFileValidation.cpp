@@ -39,7 +39,7 @@ namespace phone_personalization
 
         ParamModel test_validateByFormat(const std::string &key)
         {
-            validateByFormat(key);
+            validateSerialNumber(key);
             auto param = getParamsValidationModel()[key];
             return param;
         }
@@ -65,7 +65,7 @@ namespace phone_personalization
 
                 auto fileParserTestWrapper = PersonalizationFileParserTestWrapper(path);
 
-                auto expectedSerialNumber = "SN123456789098";
+                auto expectedSerialNumber = "SN-123-456789";
                 auto expectedCaseColour   = "black";
 
                 auto content = fileParserTestWrapper.test_loadFileContent();
@@ -373,7 +373,7 @@ namespace phone_personalization
                 auto path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/valid/personalization_black.json";
 
-                auto expectedSerialNumber = "SN123456789098";
+                auto expectedSerialNumber = "SN-123-456789";
                 auto expectedCaseColour   = "black";
 
                 auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
@@ -390,7 +390,7 @@ namespace phone_personalization
                 auto path = std::filesystem::current_path();
                 path += "/testfiles/data/personalization_files/valid/personalization_white.json";
 
-                auto expectedSerialNumber = "SN123456789098";
+                auto expectedSerialNumber = "SN-123-456789";
                 auto expectedCaseColour   = "white";
 
                 auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
@@ -464,7 +464,7 @@ namespace phone_personalization
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/personalization_yellow.json";
 
-                    auto expectedSerialNumber = "SN123456789098";
+                    auto expectedSerialNumber = "SN-123-456789";
                     auto expectedCaseColour   = param::case_colour::default_value;
 
                     auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
@@ -481,7 +481,7 @@ namespace phone_personalization
                     auto path = std::filesystem::current_path();
                     path += "/testfiles/data/personalization_files/invalid/case_colour_missing.json";
 
-                    auto expectedSerialNumber = "SN123456789098";
+                    auto expectedSerialNumber = "SN-123-456789";
                     auto expectedCaseColour   = param::case_colour::default_value;
 
                     auto dataIntegrationProcess = PersonalizationDataIntegrationProcess();
