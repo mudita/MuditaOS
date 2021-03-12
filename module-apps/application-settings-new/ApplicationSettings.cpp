@@ -325,27 +325,6 @@ namespace app
             ::settings::SystemProperties::lockPassHash,
             [this](const std::string &value) { lockPassHash = utils::getNumericValue<unsigned int>(value); },
             ::settings::SettingsScope::Global);
-        settings->registerValueChange(
-            ::settings::Bluetooth::state,
-            [this](const std::string &value) {
-                if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
-                    const auto isBtOn = utils::getNumericValue<bool>(value);
-                    auto btStatusData = std::make_unique<gui::BluetoothStatusData>(
-                        isBtOn ? BluetoothStatus::State::On : BluetoothStatus::State::Off);
-                    switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
-                }
-            },
-            ::settings::SettingsScope::Global);
-        settings->registerValueChange(
-            ::settings::Bluetooth::deviceVisibility,
-            [this](const std::string &value) {
-                if (gui::window::name::bluetooth == getCurrentWindow()->getName()) {
-                    const auto isVisible = utils::getNumericValue<bool>(value);
-                    auto btStatusData    = std::make_unique<gui::BluetoothStatusData>(isVisible);
-                    switchWindow(gui::window::name::bluetooth, std::move(btStatusData));
-                }
-            },
-            ::settings::SettingsScope::Global);
 
         /*
         settings->registerValueChange(
