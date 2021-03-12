@@ -161,6 +161,8 @@ namespace sys
 
         void preCloseRoutine(CloseReason closeReason);
 
+        void postStartRoutine();
+
         void readyToCloseHandler(Message *msg);
 
         void UpdateSystemHandler();
@@ -181,11 +183,16 @@ namespace sys
         MessagePointer handlePhoneModeRequest(PhoneModeRequest *request);
         MessagePointer handleTetheringStateRequest(TetheringStateRequest *request);
 
+        void batteryCriticalLevelAction(bool charging);
+        void batteryNormalLevelAction();
+        void batteryShutdownLevelAction();
+
         bool cpuStatisticsTimerInit{false};
 
         std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
         sys::TimerHandle cpuStatisticsTimer;
         sys::TimerHandle servicesPreShutdownRoutineTimeout;
+        sys::TimerHandle lowBatteryShutdownDelay;
         std::unique_ptr<phone_modes::Subject> phoneModeSubject;
         InitFunction userInit;
         InitFunction systemInit;

@@ -21,6 +21,7 @@
 #include <service-eink/ServiceEink.hpp>
 #include <service-gui/Common.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <service-appmgr/StartupType.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -158,11 +159,30 @@ namespace app::manager
             ::settings::SettingsScope::Global);
 
         startBackgroundApplications();
-        if (auto app = getApplication(rootApplicationName); app != nullptr) {
-            Controller::sendAction(this, actions::Home);
-        }
+        bus.sendUnicast(std::make_unique<CheckIfStartAllowedMessage>(), service::name::system_manager);
 
         return sys::ReturnCodes::Success;
+    }
+
+    void ApplicationManager::handleStart(StartAllowedMessage *msg)
+    {
+        switch (msg->getStartupType()) {
+        case StartupType::Regular:
+            if (auto app = getApplication(rootApplicationName); app != nullptr) {
+                Controller::sendAction(this, actions::Home);
+            }
+            break;
+        case StartupType::LowBattery:
+            handleSwitchApplication(
+                std::make_unique<SwitchRequest>(ServiceName, app::name_desktop, window::name::dead_battery, nullptr)
+                    .get());
+            break;
+        case StartupType::LowBatteryCharging:
+            handleSwitchApplication(
+                std::make_unique<SwitchRequest>(ServiceName, app::name_desktop, window::name::charging_battery, nullptr)
+                    .get());
+            break;
+        }
     }
 
     void ApplicationManager::suspendSystemServices()
@@ -192,11 +212,13 @@ namespace app::manager
         ActionRequest act = ActionRequest{this->GetName(), app::manager::actions::DisplayLogoAtExit, nullptr};
         switch (closeReason) {
         case sys::CloseReason::SystemBrownout:
+            [[fallthrough]];
+        case sys::CloseReason::LowBattery:
             act = ActionRequest{this->GetName(), app::manager::actions::SystemBrownout, nullptr};
             break;
         case sys::CloseReason::RegularPowerDown:
+            [[fallthrough]];
         case sys::CloseReason::Reboot:
-        case sys::CloseReason::LowBattery:
             break;
         }
         handleActionRequest(&act);
@@ -217,6 +239,11 @@ namespace app::manager
                 LOG_INFO("Phone mode changed.");
             });
 
+        connect(typeid(StartAllowedMessage), [this](sys::Message *request) {
+            auto msg = static_cast<StartAllowedMessage *>(request);
+            handleStart(msg);
+            return sys::MessageNone{};
+        });
         connect(typeid(ApplicationStatusRequest), [this](sys::Message *request) {
             auto msg = static_cast<ApplicationStatusRequest *>(request);
             return std::make_shared<ApplicationStatusResponse>(msg->checkAppName,

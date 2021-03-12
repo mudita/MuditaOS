@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,41 +9,21 @@
 
 namespace sevm
 {
-    class BatteryStatusChangeMessage : public sys::Message
+    class BatteryStatusChangeMessage : public Message
     {};
 
-    class BatterySetCriticalLevel : public sys::Message
+    class BatterySetCriticalLevel : public Message
     {
       public:
-        BatterySetCriticalLevel(std::uint8_t level) : Message(), criticalLevel(level)
+        BatterySetCriticalLevel(std::uint8_t level) : criticalLevel(level)
         {}
-        unsigned int criticalLevel = 0;
+        const unsigned int criticalLevel = 0;
     };
 
-    class BatteryLevelCriticalCheckMessage : public sys::Message
-    {};
-    class BatteryLevelCriticalMessage : public sys::Message
-    {
-      public:
-        explicit BatteryLevelCriticalMessage(bool charging) : charging(charging)
-        {}
-
-        bool isCharging() const noexcept
-        {
-            return charging;
-        }
-
-      private:
-        bool charging;
-    };
-
-    class BatteryShutdownLevelMessage : public sys::Message
+    class BatteryStateChangeMessage : public Message
     {};
 
-    class BatteryLevelNormalMessage : public sys::Message
-    {};
-
-    class BatteryBrownoutMessage : public sys::Message
+    class BatteryBrownoutMessage : public Message
     {};
 
 } // namespace sevm
