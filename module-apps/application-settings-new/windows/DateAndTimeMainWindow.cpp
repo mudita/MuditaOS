@@ -35,17 +35,7 @@ namespace gui
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
                 text,
                 activatedCallback,
-                [=](Item &item) {
-                    if (item.focus) {
-                        this->setBottomBarText(utils::localize.get(style::strings::common::Switch),
-                                               BottomBar::Side::CENTER);
-                    }
-                    else {
-                        this->setBottomBarText(utils::localize.get(style::strings::common::select),
-                                               BottomBar::Side::CENTER);
-                    }
-                    return true;
-                },
+                [=](Item &item) { return bottomBarCallback(item); },
                 nullptr,
                 rightItem,
                 false,
@@ -115,5 +105,16 @@ namespace gui
             utils::time::Locale::get_date_format(dateFormat).data());
 
         return optionList;
+    }
+
+    bool DateAndTimeMainWindow::bottomBarCallback(Item &item)
+    {
+        if (item.focus) {
+            setBottomBarText(utils::localize.get(style::strings::common::Switch), BottomBar::Side::CENTER);
+        }
+        else {
+            setBottomBarText(utils::localize.get(style::strings::common::select), BottomBar::Side::CENTER);
+        }
+        return true;
     }
 } // namespace gui
