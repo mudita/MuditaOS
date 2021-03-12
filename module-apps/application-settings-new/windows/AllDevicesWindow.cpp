@@ -74,6 +74,8 @@ namespace gui
                                              return (bd_addr_to_str(device.address) == addressOfSelectedDevice);
                                          }),
                           devices.end());
+            bottomBar->setActive(BottomBar::Side::LEFT, false);
+            bottomBar->setActive(BottomBar::Side::CENTER, false);
             refreshOptionsList();
             bluetoothSettingsModel->requestDeviceUnpair(addressOfSelectedDevice);
             return true;
