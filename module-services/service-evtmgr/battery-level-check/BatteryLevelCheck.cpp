@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryLevelCheck.hpp"
@@ -116,10 +116,8 @@ namespace battery_level_check
                 using namespace sml;
                 // clang-format off
                 return make_transition_table(
-                *"InitialCheck"_s + event<criticalLevelCheck> [ isCriticalNotCharging ] / sendCriticalNotCharging = "LevelCriticalNotCharging"_s,
-                "InitialCheck"_s + event<criticalLevelCheck> [ isCriticalCharging ] / sendCriticalCharging = "LevelCriticalCharging"_s,
-                "InitialCheck"_s + event<criticalLevelCheck> [ isNormal ] / sendNormal = "LevelNormal"_s,
-                "LevelNormal"_s + event<criticalLevelCheck> [ isCriticalNotCharging ] / sendCriticalNotCharging = "LevelCriticalNotCharging"_s,
+                *"LevelNormal"_s + event<criticalLevelCheck> [ isCriticalNotCharging ] / sendCriticalNotCharging = "LevelCriticalNotCharging"_s,
+                "LevelNormal"_s + event<criticalLevelCheck> [ isCriticalCharging ] / sendCriticalCharging = "LevelCriticalCharging"_s,
                 "LevelCriticalNotCharging"_s + event<criticalLevelCheck> [ isCriticalCharging ] / sendCriticalCharging = "LevelCriticalCharging"_s,
                 "LevelCriticalCharging"_s + event<criticalLevelCheck> [ isCriticalNotCharging ] / sendCriticalNotCharging = "LevelCriticalNotCharging"_s,
                 "LevelCriticalNotCharging"_s + event<criticalLevelCheck> [ isNormal ] / sendNormal = "LevelNormal"_s,
@@ -146,6 +144,7 @@ namespace battery_level_check
             settings::Battery::batteryCriticalLevel,
             [&](const std::string &value) { batteryLevelCritical = utils::getNumericValue<unsigned int>(value); },
             settings::SettingsScope::Global);
+        checkBatteryLevelCritical();
     }
 
     void deinit()
