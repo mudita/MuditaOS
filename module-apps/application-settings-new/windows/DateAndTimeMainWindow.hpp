@@ -13,11 +13,13 @@ namespace gui
       public:
         explicit DateAndTimeMainWindow(app::Application *app);
 
-      private:
+      protected:
         auto buildOptionsList() -> std::list<Option> override;
+        virtual bool bottomBarCallback(Item &item);
 
-        bool automaticDateAndTimeIsOn              = false;
-        bool automaticTimeZoneIsOn                 = false;
+        bool automaticDateAndTimeIsOn = false;
+        bool automaticTimeZoneIsOn    = false;
+
         utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::defaultTimeFormat;
         utils::time::Locale::DateFormat dateFormat = utils::time::Locale::defaultDateFormat;
     };
