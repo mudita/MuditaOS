@@ -22,10 +22,10 @@ class BluetoothSettingsModel
     void requestBondedDevices();
     void requestScan();
     void stopScan();
-    void requestDevicePair(std::string addr);
-    void requestDeviceUnpair(std::string addr);
-    void responsePasskey(std::string passkey);
-    void requestConnection(std::string addr);
+    void requestDevicePair(const std::string &addr);
+    void requestDeviceUnpair(const std::string &addr);
+    void responsePasskey(const std::string &passkey);
+    void requestConnection(const std::string &addr);
     void requestDisconnection();
 
   private:

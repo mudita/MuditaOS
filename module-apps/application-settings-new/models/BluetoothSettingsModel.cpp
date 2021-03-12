@@ -60,27 +60,25 @@ void BluetoothSettingsModel::stopScan()
                                  service::name::bluetooth);
 }
 
-void BluetoothSettingsModel::requestDevicePair(std::string addr)
+void BluetoothSettingsModel::requestDevicePair(const std::string &addr)
 {
-    application->bus.sendUnicast(std::make_shared<BluetoothPairMessage>(std::move(addr)), service::name::bluetooth);
+    application->bus.sendUnicast(std::make_shared<BluetoothPairMessage>(addr), service::name::bluetooth);
 }
 
-void BluetoothSettingsModel::requestDeviceUnpair(std::string addr)
+void BluetoothSettingsModel::requestDeviceUnpair(const std::string &addr)
 {
-    application->bus.sendUnicast(std::make_shared<message::bluetooth::Unpair>(std::move(addr)),
+    application->bus.sendUnicast(std::make_shared<message::bluetooth::Unpair>(addr), service::name::bluetooth);
+}
+
+void BluetoothSettingsModel::responsePasskey(const std::string &passkey)
+{
+    application->bus.sendUnicast(std::make_shared<message::bluetooth::ResponsePasskey>(passkey),
                                  service::name::bluetooth);
 }
 
-void BluetoothSettingsModel::responsePasskey(std::string passkey)
+void BluetoothSettingsModel::requestConnection(const std::string &addr)
 {
-    application->bus.sendUnicast(std::make_shared<message::bluetooth::ResponsePasskey>(std::move(passkey)),
-                                 service::name::bluetooth);
-}
-
-void BluetoothSettingsModel::requestConnection(std::string addr)
-{
-    application->bus.sendUnicast(std::make_shared<message::bluetooth::Connect>(std::move(addr)),
-                                 service::name::bluetooth);
+    application->bus.sendUnicast(std::make_shared<message::bluetooth::Connect>(addr), service::name::bluetooth);
 }
 
 void BluetoothSettingsModel::requestDisconnection()
