@@ -35,12 +35,6 @@ bsp::Board EventManagerServiceAPI::GetBoard(sys::Service *serv)
     return bsp::Board::none;
 }
 
-void EventManagerServiceAPI::checkBatteryLevelCriticalState(sys::Service *serv)
-{
-    auto msg = std::make_shared<sevm::BatteryLevelCriticalCheckMessage>();
-    serv->bus.sendUnicast(msg, service::name::evt_manager);
-}
-
 /*
  * @brief Call single vibra pulse
  */

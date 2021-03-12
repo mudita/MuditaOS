@@ -29,6 +29,7 @@
 #include "messages/TetheringStateRequest.hpp"
 #include <time/ScopedTime.hpp>
 #include "Timers/TimerFactory.hpp"
+#include <service-appmgr/StartupType.hpp>
 
 const inline size_t systemManagerStack = 4096 * 2;
 
@@ -41,7 +42,8 @@ namespace sys
             {bsp::KeyCodes::SSwitchMid, phone_modes::PhoneMode::DoNotDisturb},
             {bsp::KeyCodes::SSwitchDown, phone_modes::PhoneMode::Offline}};
 
-        constexpr auto preShutdownRoutineTimeout = 1500;
+        constexpr std::chrono::milliseconds preShutdownRoutineTimeout{1500};
+        constexpr std::chrono::milliseconds lowBatteryShutdownDelayTime{5000};
     } // namespace
 
     using namespace cpp_freertos;
@@ -59,6 +61,10 @@ namespace sys
     {
         // Specify list of channels which System Manager is registered to
         bus.channels = {BusChannel::SystemManagerRequests};
+        lowBatteryShutdownDelay = sys::TimerFactory::createPeriodicTimer(
+            this, "lowBatteryShutdownDelay", lowBatteryShutdownDelayTime, [this](sys::Timer &) {
+                CloseSystemHandler(CloseReason::LowBattery);
+            });
     }
 
     SystemManager::~SystemManager()
@@ -152,6 +158,8 @@ namespace sys
                 throw SystemInitialisationError{"System startup failed: unable to start a system service."};
             }
         });
+
+        postStartRoutine();
     }
 
     void SystemManager::StartSystem(InitFunction sysInit, InitFunction appSpaceInit)
@@ -308,12 +316,52 @@ namespace sys
             readyForCloseRegister.push_back(service->GetName());
         }
 
-        servicesPreShutdownRoutineTimeout =
-            sys::TimerFactory::createPeriodicTimer(this,
-                                                   "servicesPreShutdownRoutine",
-                                                   std::chrono::milliseconds{preShutdownRoutineTimeout},
-                                                   [this](sys::Timer &) { CloseServices(); });
+        servicesPreShutdownRoutineTimeout = sys::TimerFactory::createPeriodicTimer(
+            this, "servicesPreShutdownRoutine", preShutdownRoutineTimeout, [this](sys::Timer &) { CloseServices(); });
         servicesPreShutdownRoutineTimeout.start();
+    }
+
+    void SystemManager::postStartRoutine()
+    {
+        connect(sevm::BatteryStateChangeMessage(), [&](Message *) {
+            switch (Store::Battery::get().levelState) {
+            case Store::Battery::LevelState::Normal:
+                batteryNormalLevelAction();
+                break;
+            case Store::Battery::LevelState::Shutdown:
+                batteryShutdownLevelAction();
+                break;
+            case Store::Battery::LevelState::CriticalCharging:
+                batteryCriticalLevelAction(true);
+                break;
+            case Store::Battery::LevelState::CriticalNotCharging:
+                batteryCriticalLevelAction(false);
+                break;
+            }
+            return MessageNone{};
+        });
+    }
+
+    void SystemManager::batteryCriticalLevelAction(bool charging)
+    {
+        LOG_INFO("Battery Critical Level reached!");
+        CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::Off);
+        auto msg = std::make_shared<CriticalBatteryLevelNotification>(true, charging);
+        bus.sendUnicast(std::move(msg), app::manager::ApplicationManager::ServiceName);
+    }
+
+    void SystemManager::batteryShutdownLevelAction()
+    {
+        LOG_INFO("Battery level too low - shutting down the system...");
+        CloseSystemHandler(CloseReason::LowBattery);
+    }
+
+    void SystemManager::batteryNormalLevelAction()
+    {
+        LOG_INFO("Battery level normal.");
+        CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::On);
+        auto battNormalMsg = std::make_shared<CriticalBatteryLevelNotification>(false);
+        bus.sendUnicast(std::move(battNormalMsg), app::manager::ApplicationManager::ServiceName);
     }
 
     void SystemManager::readyToCloseHandler(Message *msg)
@@ -341,6 +389,11 @@ namespace sys
             LOG_DEBUG("deinit handler: %s", c_str(ret));
         }
         toKill->CloseHandler();
+
+        servicesList.erase(
+            std::find_if(servicesList.begin(), servicesList.end(), [&toKill](std::shared_ptr<Service> const &s) {
+                return s->GetName() == toKill->GetName();
+            }));
     }
 
     ReturnCodes SystemManager::InitHandler()
@@ -389,34 +442,19 @@ namespace sys
             return MessageNone{};
         });
 
-        connect(sevm::BatteryShutdownLevelMessage(), [&](Message *) {
-            LOG_INFO("Battery level too low - shutting down the system");
-            CloseSystemHandler(CloseReason::LowBattery);
-            return MessageNone{};
-        });
-
         connect(CellularCheckIfStartAllowedMessage(), [&](Message *) {
-            EventManagerServiceAPI::checkBatteryLevelCriticalState(this);
-            return MessageNone{};
-        });
-
-        connect(sevm::BatteryLevelCriticalMessage(bool{}), [&](Message *req) {
-            LOG_INFO("Battery Critical Level reached!");
-            CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::Off);
-
-            auto request = static_cast<sevm::BatteryLevelCriticalMessage *>(req);
-            auto msg     = std::make_shared<CriticalBatteryLevelNotification>(true, request->isCharging());
-            bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
-
-            return MessageNone{};
-        });
-
-        connect(sevm::BatteryLevelNormalMessage(), [&](Message *) {
-            LOG_INFO("Battery level normal.");
-            CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::On);
-
-            auto msg = std::make_shared<CriticalBatteryLevelNotification>(false);
-            bus.sendUnicast(msg, app::manager::ApplicationManager::ServiceName);
+            switch (Store::Battery::get().levelState) {
+            case Store::Battery::LevelState::Normal:
+                CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::On);
+                break;
+            case Store::Battery::LevelState::CriticalCharging:
+                [[fallthrough]];
+            case Store::Battery::LevelState::CriticalNotCharging:
+                CellularServiceAPI::ChangeModulePowerState(this, cellular::State::PowerState::Off);
+                break;
+            case Store::Battery::LevelState::Shutdown:
+                break;
+            }
             return MessageNone{};
         });
 
@@ -483,6 +521,31 @@ namespace sys
             return handleTetheringStateRequest(request);
         });
 
+        connect(typeid(app::manager::CheckIfStartAllowedMessage), [this](sys::Message *) -> sys::MessagePointer {
+            switch (Store::Battery::get().levelState) {
+            case Store::Battery::LevelState::Normal:
+                bus.sendUnicast(std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::Regular),
+                                app::manager::ApplicationManager::ServiceName);
+                break;
+            case Store::Battery::LevelState::Shutdown:
+                if (!lowBatteryShutdownDelay.isActive()) {
+                    lowBatteryShutdownDelay.start();
+                }
+                [[fallthrough]];
+            case Store::Battery::LevelState::CriticalNotCharging:
+                bus.sendUnicast(
+                    std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::LowBattery),
+                    app::manager::ApplicationManager::ServiceName);
+                break;
+            case Store::Battery::LevelState::CriticalCharging:
+                bus.sendUnicast(
+                    std::make_unique<app::manager::StartAllowedMessage>(app::manager::StartupType::LowBatteryCharging),
+                    app::manager::ApplicationManager::ServiceName);
+                break;
+            }
+            return sys::MessageNone{};
+        });
+
         deviceManager->RegisterNewDevice(powerManager->getExternalRamDevice());
 
         return ReturnCodes::Success;
@@ -497,6 +560,9 @@ namespace sys
     {
         LOG_DEBUG("Invoking closing procedure...");
 
+        // In case if other power down request arrive in the meantime
+        lowBatteryShutdownDelay.stop();
+
         // We are going to remove services in reversed order of creation
         CriticalSection::Enter();
         std::reverse(servicesList.begin(), servicesList.end());
@@ -510,6 +576,8 @@ namespace sys
         for (const auto &element : readyForCloseRegister) {
             LOG_INFO("Service: %s did not reported before timeout", element.c_str());
         }
+        // All delayed messages will be ignored
+        readyForCloseRegister.clear();
 
         for (bool retry{};; retry = false) {
             for (auto &service : servicesList) {

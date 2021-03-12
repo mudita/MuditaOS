@@ -84,5 +84,4 @@ class WorkerEvent : public sys::Worker
      */
     bool handleMessage(uint32_t queueID) override final;
 
-    void checkBatteryLevelCritical();
 };

@@ -22,8 +22,6 @@ namespace EventManagerServiceAPI
      */
     bsp::Board GetBoard(sys::Service *serv);
 
-    void checkBatteryLevelCriticalState(sys::Service *serv);
-
     /*
      * @brief Call single vibra pulse
      */

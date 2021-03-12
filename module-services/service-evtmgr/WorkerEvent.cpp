@@ -97,7 +97,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
                 bsp::battery_charger::getChargeStatus();
                 auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
                 service->bus.sendUnicast(std::move(message), service::name::evt_manager);
-                battery_level_check::checkBatteryLevelCritical();
+                battery_level_check::checkBatteryLevel();
                 bsp::battery_charger::clearAllChargerIRQs();
             }
             if (topINT & static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::FG_INT)) {
@@ -112,7 +112,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
                     bsp::battery_charger::getBatteryLevel();
                     auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
                     service->bus.sendUnicast(std::move(message), service::name::evt_manager);
-                    battery_level_check::checkBatteryLevelCritical();
+                    battery_level_check::checkBatteryLevel();
                 }
                 if (status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::maxTemp) ||
                     status & static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minTemp)) {
@@ -123,7 +123,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
                     bsp::battery_charger::getChargeStatus();
                     auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
                     service->bus.sendUnicast(std::move(message), service::name::evt_manager);
-                    battery_level_check::checkBatteryLevelCritical();
+                    battery_level_check::checkBatteryLevel();
                 }
             }
         }
@@ -299,9 +299,4 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
         }
     }
     service->bus.sendUnicast(message, service::name::evt_manager);
-}
-
-void WorkerEvent::checkBatteryLevelCritical()
-{
-    battery_level_check::checkBatteryLevelCriticalWithConfirmation();
 }
