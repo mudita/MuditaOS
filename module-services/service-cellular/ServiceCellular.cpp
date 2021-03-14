@@ -93,6 +93,7 @@
 #include "checkSmsCenter.hpp"
 #include <service-desktop/Constants.hpp>
 #include <module-utils/gsl/gsl_util>
+#include <ticks.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
@@ -185,6 +186,8 @@ ServiceCellular::ServiceCellular()
         this, "state", std::chrono::milliseconds{1000}, [&](sys::Timer &) { handleStateTimer(); });
     ussdTimer = sys::TimerFactory::createPeriodicTimer(
         this, "ussd", std::chrono::milliseconds{1000}, [this](sys::Timer &) { handleUSSDTimer(); });
+    sleepTimer = sys::TimerFactory::createPeriodicTimer(
+        this, "sleep", constants::sleepTimerInterval, [this](sys::Timer &) { SleepTimerHandler(); });
 
     ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
         auto call = DBServiceAPI::CalllogAdd(this, rec);
@@ -240,6 +243,20 @@ static bool isSettingsAutomaticTimeSyncEnabled()
     return true;
 }
 
+void ServiceCellular::SleepTimerHandler()
+{
+    auto currentTime                = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
+    auto lastCommunicationTimestamp = cmux->GetLastCommunicationTimestamp();
+    auto timeOfInactivity           = currentTime >= lastCommunicationTimestamp
+                                ? currentTime - lastCommunicationTimestamp
+                                : std::numeric_limits<TickType_t>::max() - lastCommunicationTimestamp + currentTime;
+
+    if (!ongoingCall.isValid() && timeOfInactivity >= constants::enterSleepModeTime.count()) {
+        cmux->EnterSleepMode();
+        cpuSentinel->ReleaseMinimumFrequency();
+    }
+}
+
 void ServiceCellular::CallStateTimerHandler()
 {
     LOG_DEBUG("CallStateTimerHandler");
@@ -268,10 +285,6 @@ sys::ReturnCodes ServiceCellular::InitHandler()
     bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
     cmux->RegisterCellularDevice();
-
-    // temporarily limit the minimum CPU frequency
-    // due to problems with the UART of the GSM modem
-    cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_4);
 
     return sys::ReturnCodes::Success;
 }
@@ -1806,6 +1819,7 @@ bool ServiceCellular::handle_fatal_failure()
 bool ServiceCellular::handle_ready()
 {
     LOG_DEBUG("%s", state.c_str());
+    sleepTimer.start();
     return true;
 }
 
@@ -2532,6 +2546,8 @@ auto ServiceCellular::handleSimNotReadyNotification(sys::Message *msg) -> std::s
 
 auto ServiceCellular::handleUrcIncomingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
+    // when handling URC, the CPU frequency does not go below a certain level
+    cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_4);
     cmux->ExitSleepMode();
     return std::make_shared<CellularResponseMessage>(true);
 }

@@ -36,4 +36,9 @@ namespace bsp{
         return driverLPUART;
     }
 
+    [[nodiscard]] auto Cellular::GetLastCommunicationTimestamp() const noexcept -> TickType_t
+    {
+    	return lastCommunicationTimestamp;
+    }
+
 }
