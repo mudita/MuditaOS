@@ -39,6 +39,9 @@ namespace CellularCall
         if (!call.isValid()) {
             LOG_ERROR("startCallAction failed");
             clear();
+            if (cpuSentinel) {
+                cpuSentinel->ReleaseMinimumFrequency();
+            }
             return false;
         }
 
@@ -60,6 +63,10 @@ namespace CellularCall
         if (!isValid()) {
             LOG_ERROR("Trying to update invalid call");
             return false;
+        }
+
+        if (cpuSentinel) {
+            cpuSentinel->ReleaseMinimumFrequency();
         }
 
         if (isActiveCall) {

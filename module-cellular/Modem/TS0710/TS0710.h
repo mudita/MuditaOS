@@ -441,6 +441,7 @@ class TS0710
     void EnterSleepMode(void);
     void ExitSleepMode(void);
     void RegisterCellularDevice(void);
+    [[nodiscard]] auto GetLastCommunicationTimestamp() const noexcept -> TickType_t;
 };
 
 #endif //_TS0710_H
