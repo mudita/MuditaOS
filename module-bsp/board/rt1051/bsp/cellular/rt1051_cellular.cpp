@@ -9,6 +9,7 @@
 #include "dma_config.h"
 #include "fsl_cache.h"
 #include <common_data/EventStore.hpp>
+#include <ticks.hpp>
 
 #include <algorithm>
 
@@ -246,9 +247,7 @@ namespace bsp
         sendXfer.data     = static_cast<uint8_t *>(buf);
         sendXfer.dataSize = nbytes;
 
-        if (isInSleepMode) {
-            ExitSleep();
-        }
+        ExitSleep();
 
         uartDmaHandle.userData = xTaskGetCurrentTaskHandle();
         SCB_CleanInvalidateDCache();
@@ -342,6 +341,7 @@ namespace bsp
 
     ssize_t RT1051Cellular::Read(void *buf, size_t nbytes)
     {
+        ExitSleep();
         ssize_t ret = xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
 #if _RT1051_UART_DEBUG
         if (ret > 0) {
@@ -420,6 +420,7 @@ namespace bsp
 
             // Host sleep information must be before UART disable
             InformModemHostAsleep();
+
             if (driverLPUART) {
                 driverLPUART->Disable();
             }
@@ -428,6 +429,9 @@ namespace bsp
 
     void RT1051Cellular::ExitSleep()
     {
+        // reset sleep timer countdown
+        lastCommunicationTimestamp = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
+
         if (isInSleepMode) {
             isInSleepMode = false;
 

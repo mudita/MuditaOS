@@ -55,6 +55,14 @@ namespace packet_data
     class PacketData;
     class PDPContext;
 } // namespace packet_data
+
+namespace constants
+{
+    using namespace std::chrono_literals;
+    inline constexpr std::chrono::milliseconds sleepTimerInterval{500ms};
+    inline constexpr std::chrono::milliseconds enterSleepModeTime{5s};
+} // namespace constants
+
 class ServiceCellular : public sys::Service
 {
 
@@ -171,6 +179,11 @@ class ServiceCellular : public sys::Service
     sys::TimerHandle callStateTimer;
     sys::TimerHandle stateTimer;
     sys::TimerHandle ussdTimer;
+
+    // used to enter modem sleep mode
+    sys::TimerHandle sleepTimer;
+
+    void SleepTimerHandler();
     void CallStateTimerHandler();
     DLC_channel::Callback_t notificationCallback = nullptr;
 

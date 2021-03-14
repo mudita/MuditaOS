@@ -56,9 +56,11 @@ namespace cellular
         virtual bsp::cellular::antenna GetAntenna() = 0;
 
         [[nodiscard]] auto GetCellularDevice() const noexcept -> std::shared_ptr<devices::Device>;
+        [[nodiscard]] auto GetLastCommunicationTimestamp() const noexcept -> TickType_t;
 
     protected:
         bool isInitialized = false;
+        TickType_t lastCommunicationTimestamp;
         std::shared_ptr<drivers::DriverLPUART> driverLPUART;
     };
     namespace cellular

@@ -597,6 +597,12 @@ void TS0710::RegisterCellularDevice(void)
     auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(pv_cellular->GetCellularDevice());
     pv_parent->bus.sendUnicast(std::move(deviceRegistrationMsg), service::name::system_manager);
 }
+
+[[nodiscard]] auto TS0710::GetLastCommunicationTimestamp() const noexcept -> TickType_t
+{
+    return pv_cellular->GetLastCommunicationTimestamp();
+}
+
 TS0710::ConfState TS0710::SetupEchoCanceller(EchoCancellerStrength strength)
 {
 
