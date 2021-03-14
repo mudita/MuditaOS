@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalculatorMainWindow.hpp"
@@ -66,6 +66,9 @@ namespace gui
             if (event.is(gui::KeyCode::KEY_0) && mathOperationInput->getText() == "0") {
                 return true;
             }
+            if (event.is(gui::KeyCode::KEY_PND)) {
+                processClearInput();
+            }
             auto lastChar         = mathOperationInput->getText()[mathOperationInput->getText().length() - 1];
             bool lastCharIsSymbol = isSymbol(lastChar);
             if (lastChar == style::calculator::symbols::codes::zero && isSymbol(getPenultimate()) &&
@@ -73,26 +76,26 @@ namespace gui
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_UP) {
-                writeEquation(lastCharIsSymbol, style::calculator::symbols::strings::plus);
+                processInput(lastCharIsSymbol, style::calculator::symbols::strings::plus);
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_DOWN) {
                 if (lastChar != style::calculator::symbols::codes::minus) {
-                    writeEquation(lastCharIsSymbol, style::calculator::symbols::strings::minus);
+                    processInput(lastCharIsSymbol, style::calculator::symbols::strings::minus);
                 }
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_LEFT) {
-                writeEquation(lastCharIsSymbol, style::calculator::symbols::strings::multiplication);
+                processInput(lastCharIsSymbol, style::calculator::symbols::strings::multiplication);
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_RIGHT) {
-                writeEquation(lastCharIsSymbol, style::calculator::symbols::strings::division);
+                processInput(lastCharIsSymbol, style::calculator::symbols::strings::division);
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_LF) {
                 if (!isPreviousNumberDecimal()) {
-                    writeEquation(lastCharIsSymbol, utils::localize.get("app_calculator_decimal_separator"));
+                    processInput(lastCharIsSymbol, utils::localize.get("app_calculator_decimal_separator"));
                 }
                 return true;
             }
@@ -152,6 +155,46 @@ namespace gui
         }
     }
 
+    void CalculatorMainWindow::processInput(bool lastCharIsSymbol, const UTF8 &symbol)
+    {
+        if ((!previousOperation.empty() && lastCharIsSymbol && symbol == style::calculator::symbols::strings::minus) ||
+            previousOperation.empty() || lastCharIsSymbol ||
+            symbol == utils::localize.get("app_calculator_decimal_separator")) {
+            writeEquation(lastCharIsSymbol, symbol);
+        }
+        else {
+            showResult();
+            if (!clearInput) {
+                mathOperationInput->addText(symbol);
+            }
+        }
+        if (symbol != utils::localize.get("app_calculator_decimal_separator") &&
+            mathOperationInput->getText().length() != 0) {
+            previousOperation = symbol;
+        }
+    }
+
+    void CalculatorMainWindow::processClearInput()
+    {
+        if (const auto length = mathOperationInput->getText().length(); length != 0) {
+            const auto lastChar = mathOperationInput->getText()[length - 1];
+            if (isSymbol(lastChar) && !isDecimalSeparator(lastChar)) {
+                previousOperation = "";
+            }
+        }
+        else {
+            previousOperation = "";
+        }
+    }
+
+    void CalculatorMainWindow::showResult()
+    {
+        auto result = Calculator().calculate(std::string(mathOperationInput->getText()));
+        mathOperationInput->setText(result.value);
+        clearInput        = result.isError;
+        previousOperation = "";
+    }
+
     bool CalculatorMainWindow::isPreviousNumberDecimal()
     {
         if (!mathOperationInput->getText().empty()) {
@@ -190,9 +233,7 @@ namespace gui
         }
 
         if (inputEvent.keyCode == gui::KeyCode::KEY_ENTER) {
-            auto result = Calculator().calculate(std::string(mathOperationInput->getText()));
-            mathOperationInput->setText(result.value);
-            clearInput = result.isError;
+            showResult();
             return true;
         }
 

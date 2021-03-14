@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,11 +18,15 @@ namespace gui
         gui::MathOperationsBox *mathBox = nullptr;
 
         bool clearInput = false;
+        UTF8 previousOperation = "";
         void writeEquation(bool lastCharIsSymbol, const UTF8 &symbol);
         void applyInputCallback();
         bool isPreviousNumberDecimal();
         bool isSymbol(uint32_t character);
         bool isDecimalSeparator(uint32_t character);
+        void processInput(bool lastCharIsSymbol, const UTF8 &symbol);
+        void processClearInput();
+        void showResult();
         uint32_t getPenultimate();
 
       public:
