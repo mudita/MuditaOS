@@ -114,6 +114,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
             backupStatus.state = BackupRestore::BackupUserFiles(this, backupStatus.backupTempDir);
             backupStatus.location =
                 (purefs::dir::getBackupOSPath() / backupStatus.task).replace_extension(purefs::extension::tar);
+            desktopWorker->reinit(backupStatus.location.parent_path());
         }
         return sys::MessageNone{};
     });

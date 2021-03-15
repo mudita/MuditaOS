@@ -50,6 +50,16 @@ bool WorkerDesktop::deinit(void)
     return true;
 }
 
+bool WorkerDesktop::reinit(const std::filesystem::path &path)
+{
+    LOG_DEBUG("Reinit USB begin");
+
+    bsp::usbReinit(path.c_str());
+
+    LOG_DEBUG("Reinit USB end");
+    return true;
+}
+
 bool WorkerDesktop::handleMessage(uint32_t queueID)
 {
     auto &queue       = queues[queueID];

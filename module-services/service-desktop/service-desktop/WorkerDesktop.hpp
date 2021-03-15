@@ -30,6 +30,8 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
 
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
     virtual bool deinit() override;
+    bool reinit(const std::filesystem::path &path);
+
     bool handleMessage(uint32_t queueID) override final;
 
     xQueueHandle getReceiveQueue()
