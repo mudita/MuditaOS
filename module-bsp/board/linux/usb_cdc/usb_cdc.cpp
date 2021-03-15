@@ -150,6 +150,11 @@ namespace bsp
         std::remove(ptsFileName);
     }
 
+    void usbReinit(const char * /*mtpRoot*/)
+    {
+        LOG_INFO("usbReinit");
+    }
+
     int usbInit(xQueueHandle receiveQueue, xQueueHandle irqQueue, USBDeviceListener *)
     {
 
