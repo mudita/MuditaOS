@@ -108,7 +108,6 @@ void ServiceBluetooth::ProcessCloseReason(sys::CloseReason closeReason)
 sys::MessagePointer ServiceBluetooth::DataReceivedHandler([[maybe_unused]] sys::DataMessage *msg,
                                                           [[maybe_unused]] sys::ResponseMessage *resp)
 {
-    LOG_ERROR("Unhandled message: %s", typeid(msg).name());
     return std::make_shared<sys::ResponseMessage>();
 }
 

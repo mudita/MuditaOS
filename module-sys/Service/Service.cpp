@@ -278,13 +278,11 @@ namespace sys
                 service->isReady = true;
             }
             break;
+        case SystemMessageType::ServiceCloseReason:
+            service->ProcessCloseReason(static_cast<ServiceCloseReasonMessage *>(message)->getCloseReason());
+            break;
         }
         return std::make_shared<ResponseMessage>(ret);
-    }
-
-    auto Proxy::handleCloseReasonMessage(Service *service, ServiceCloseReasonMessage *message) -> void
-    {
-        service->ProcessCloseReason(message->getCloseReason());
     }
 
 } // namespace sys

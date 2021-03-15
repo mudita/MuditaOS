@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -19,11 +19,11 @@ namespace sys
         SystemManagerMessage() : sys::DataMessage(MessageType::PMChangePowerMode){};
     };
 
-    class CriticalBatteryLevelNotification : public sys::Message, public app::manager::actions::ConvertibleToAction
+    class CriticalBatteryLevelNotification : public sys::DataMessage, public app::manager::actions::ConvertibleToAction
     {
       public:
         explicit CriticalBatteryLevelNotification(bool isActive, bool isCharging = false)
-            : sys::Message(), isActive(isActive), isCharging(isCharging)
+            : isActive(isActive), isCharging(isCharging)
         {}
 
         [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
