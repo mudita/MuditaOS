@@ -7,7 +7,7 @@
 - plug in the USB cable
 - wait while the text scrolls from the bottom
 - release the center button
-- press the `4` key
+- choose USB MSC mode by pressing the `4` key
 
 2. Flashing on Windows and macOS
 
