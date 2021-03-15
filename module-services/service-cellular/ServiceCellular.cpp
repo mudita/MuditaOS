@@ -1393,11 +1393,11 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> std::shared_ptr<C
             }
         }
     }
-    if (channel->cmd(at::AT::SMS_GSM)) {
+    if (!channel->cmd(at::AT::SMS_GSM)) {
         LOG_ERROR("Could not set GSM (default) charset mode for TE");
     }
     // delete message from modem memory
-    if (channel->cmd(at::factory(at::AT::CMGD) + messageNumber)) {
+    if (!channel->cmd(at::factory(at::AT::CMGD) + messageNumber)) {
         LOG_ERROR("Could not delete SMS from modem");
     }
     return std::make_shared<CellularResponseMessage>(true);
