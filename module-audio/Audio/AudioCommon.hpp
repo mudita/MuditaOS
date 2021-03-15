@@ -273,7 +273,7 @@ namespace audio
 
 namespace AudioServiceMessage
 {
-    class EndOfFile : public sys::Message
+    class EndOfFile : public sys::DataMessage
     {
       public:
         explicit EndOfFile(audio::Token &token) : token(token)
@@ -287,7 +287,7 @@ namespace AudioServiceMessage
         audio::Token token = audio::Token::MakeBadToken();
     };
 
-    class FileSystemNoSpace : public sys::Message
+    class FileSystemNoSpace : public sys::DataMessage
     {
       public:
         explicit FileSystemNoSpace(audio::Token &token) : token(token)
@@ -301,7 +301,7 @@ namespace AudioServiceMessage
         audio::Token token = audio::Token::MakeBadToken();
     };
 
-    class DbRequest : public sys::Message
+    class DbRequest : public sys::DataMessage
     {
       public:
         explicit DbRequest(const audio::Setting &setting,
@@ -315,7 +315,7 @@ namespace AudioServiceMessage
         const audio::PlaybackType playback;
     };
 
-    class AudioDeviceCreated : public sys::Message
+    class AudioDeviceCreated : public sys::DataMessage
     {
       public:
         explicit AudioDeviceCreated(std::shared_ptr<audio::AudioDevice> device, audio::AudioDevice::Type type)

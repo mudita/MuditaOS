@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <module-utils/magic_enum/include/magic_enum.hpp>
 #include "Common.hpp"
 #include "MessageType.hpp"
 #include "MessageForward.hpp"
@@ -15,39 +16,94 @@ namespace sys
 {
     SendResult CreateSendResult(ReturnCodes retCode, MessagePointer msg);
 
+    inline constexpr std::uint64_t invalidMessageUid = std::numeric_limits<uint64_t>().max();
+
+    using MessageUIDType = std::uint64_t;
+
+    class MessageUID
+    {
+      protected:
+        MessageUIDType value = 0;
+
+      public:
+        [[nodiscard]] MessageUIDType get() const noexcept;
+        [[nodiscard]] MessageUIDType getNext() noexcept;
+    };
+
     class Message
     {
       public:
         enum class TransmissionType
         {
+            Unspecified,
             Unicast,
             Multicast,
             Broadcast
         };
+
         enum class Type
         {
+            Unspecified,
             System,
             Data,
             Response
         };
 
-        Message() = default;
-        explicit Message(BusChannel channel);
+        explicit Message(Type type);
+        Message(Type type, BusChannel channel);
         virtual ~Message() noexcept = default;
 
         virtual MessagePointer Execute(Service *service);
 
-        virtual operator std::string() const
+        virtual explicit operator std::string() const
         {
             return {"{}"};
         }
 
-        std::uint64_t id;
-        std::uint64_t uniID;
-        Type type;
-        TransmissionType transType;
-        BusChannel channel;
-        std::string sender;
+        MessageUIDType id          = invalidMessageUid;
+        MessageUIDType uniID       = invalidMessageUid;
+        Type type                  = Type::Unspecified;
+        TransmissionType transType = TransmissionType::Unspecified;
+        BusChannel channel         = BusChannel::Unknown;
+        std::string sender         = "Unknown";
+
+        [[nodiscard]] std::string to_string() const
+        {
+            return "| ID:" + std::to_string(id) + " | uniID: " + std::to_string(uniID) +
+                   " | Type: " + std::string(magic_enum::enum_name(type)) +
+                   " | TransmissionType: " + std::string(magic_enum::enum_name(transType)) +
+                   " | Channel: " + std::string(magic_enum::enum_name(channel)) + " | Sender: " + sender + " |";
+        }
+
+        /**
+         * Validate base message have all essential fields set.
+         * @return Return validation result.
+         */
+        [[nodiscard]] bool ValidateMessage() const noexcept;
+
+        /**
+         * Validate if response message have all essential fields set.
+         * @return Return validation result.
+         */
+        void ValidateResponseMessage() const;
+
+        /**
+         * Validate if message sent via Unicast have all essential fields set.
+         * @return Return validation result.
+         */
+        void ValidateUnicastMessage() const;
+
+        /**
+         * Validate if message sent via Broadcast have all essential fields set.
+         * @return Return validation result.
+         */
+        void ValidateBroadcastMessage() const;
+
+        /**
+         * Validate if message sent via Multicast have all essential fields set.
+         * @return Return validation result.
+         */
+        void ValidateMulticastMessage() const;
     };
 
     enum class SystemMessageType
@@ -56,7 +112,8 @@ namespace sys
         SwitchPowerMode,
         Start,
         Timer,
-        Exit
+        Exit,
+        ServiceCloseReason
     };
 
     class SystemMessage : public Message
@@ -71,21 +128,16 @@ namespace sys
         ServicePowerMode powerMode;
     };
 
-    class ServiceCloseReasonMessage : public Message
+    class ServiceCloseReasonMessage : public SystemMessage
     {
       public:
         explicit ServiceCloseReasonMessage(CloseReason closeReason);
 
-        MessagePointer Execute(Service *service) final;
-
-        CloseReason getCloseReason() const noexcept;
+        [[nodiscard]] CloseReason getCloseReason() const noexcept;
 
       private:
         const CloseReason closeReason;
     };
-
-    class ReadyToCloseMessage : public Message
-    {};
 
     class DataMessage : public Message
     {
@@ -97,6 +149,9 @@ namespace sys
         // This field must by provided by the class that inherits DataMessage
         MessageType messageType = MessageType::MessageTypeUninitialized;
     };
+
+    class ReadyToCloseMessage : public DataMessage
+    {};
 
     class ResponseMessage : public Message
     {

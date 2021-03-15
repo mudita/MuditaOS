@@ -78,4 +78,5 @@ target_include_directories(${PROJECT_NAME}
 
 if (${ENABLE_TESTS})
     add_subdirectory(SystemManager/tests)
+    add_subdirectory(Service/tests)
 endif()

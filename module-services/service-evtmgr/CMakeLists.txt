@@ -5,7 +5,6 @@ set(SOURCES
         EventManager.cpp
         WorkerEvent.cpp
         api/EventManagerServiceAPI.cpp
-        messages/Message.cpp
         battery-level-check/BatteryLevelCheck.cpp
         screen-light-control/ControlFunctions.cpp
         screen-light-control/ScreenLightControl.cpp

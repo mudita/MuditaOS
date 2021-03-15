@@ -1,21 +1,19 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Message.hpp"
+#include "module-sys/Service/Message.hpp"
 
 #include <common_data/RawKey.hpp>
 
 namespace sevm
 {
-    class KbdMessage : public Message
+    class KbdMessage : public sys::DataMessage
     {
       public:
-        KbdMessage() : Message(MessageType::KBDKeyEvent)
-        {
-            type = Type::Data;
-        }
+        KbdMessage() : DataMessage(MessageType::KBDKeyEvent)
+        {}
         RawKey key = {};
     };
 } // namespace sevm
