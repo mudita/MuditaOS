@@ -368,25 +368,31 @@ namespace app
             std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
         bus.sendUnicast(msgToSend, service::name::service_desktop);
 
-        settings->registerValueChange(
-            settings::SystemProperties::activeSim,
-            [this](std::string value) { activeSimChanged(value); },
-            settings::SettingsScope::Global);
-        Store::GSM::get()->selected = Store::GSM::SIM::NONE;
-        settings->registerValueChange(
-            settings::SystemProperties::lockPassHash,
-            [this](std::string value) { lockPassHashChanged(value); },
-            settings::SettingsScope::Global);
+        //        settings->registerValueChange(
+        //            settings::SystemProperties::activeSim,
+        //            [this](std::string value) { activeSimChanged(value); },
+        //            settings::SettingsScope::Global);
+        //        Store::GSM::get()->selected = Store::GSM::SIM::NONE;
+        //        settings->registerValueChange(
+        //            settings::SystemProperties::lockPassHash,
+        //            [this](std::string value) { lockPassHashChanged(value); },
+        //            settings::SettingsScope::Global);
+        //
+        //        settings->registerValueChange(
+        //            settings::SystemProperties::osCurrentVersion,
+        //            [this](std::string value) { osCurrentVersionChanged(std::move(value)); },
+        //            settings::SettingsScope::Global);
+        //
+        //        settings->registerValueChange(
+        //            settings::SystemProperties::osUpdateVersion,
+        //            [this](std::string value) { osUpdateVersionChanged(std::move(value)); },
+        //            settings::SettingsScope::Global);
 
-        settings->registerValueChange(
-            settings::SystemProperties::osCurrentVersion,
-            [this](std::string value) { osCurrentVersionChanged(std::move(value)); },
-            settings::SettingsScope::Global);
-
-        settings->registerValueChange(
-            settings::SystemProperties::osUpdateVersion,
-            [this](std::string value) { osUpdateVersionChanged(std::move(value)); },
-            settings::SettingsScope::Global);
+        LOG_ERROR(
+            "hmm ale jak ? %s",
+            settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global).c_str());
+        lockPassHashChanged(
+            settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global));
 
         return sys::ReturnCodes::Success;
     }

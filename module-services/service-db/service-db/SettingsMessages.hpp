@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -71,6 +71,17 @@ namespace settings
             if (scope > other.scope)
                 return false;
             return false;
+        }
+
+        bool operator==(const EntryPath &rhs) const noexcept
+        {
+            LOG_ERROR("wola sie ten operator?");
+            return this->to_string() == rhs.to_string();
+        }
+
+        bool operator!=(const EntryPath &rhs) const noexcept
+        {
+            return !operator==(rhs);
         }
     };
 
