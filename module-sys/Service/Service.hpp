@@ -153,6 +153,5 @@ namespace sys
         static auto handleMessage(Service *service, Message *message, ResponseMessage *response = nullptr)
             -> MessagePointer;
         static auto handleSystemMessage(Service *service, SystemMessage *message) -> MessagePointer;
-        static auto handleCloseReasonMessage(Service *service, ServiceCloseReasonMessage *message) -> void;
     };
 } // namespace sys

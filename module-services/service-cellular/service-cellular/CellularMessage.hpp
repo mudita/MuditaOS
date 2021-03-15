@@ -118,12 +118,8 @@ class CellularGetCurrentOperatorMessage : public CellularMessage
     {}
 };
 
-class CellularSetOperatorAutoSelectMessage : public sys::Message
-{
-  public:
-    CellularSetOperatorAutoSelectMessage()
-    {}
-};
+class CellularSetOperatorAutoSelectMessage : public sys::DataMessage
+{};
 
 class CellularGetCurrentOperatorResponse : public CellularMessage
 {
@@ -139,7 +135,7 @@ class CellularGetCurrentOperatorResponse : public CellularMessage
         return currentOperatorName;
     }
 };
-class CellularSetOperatorMessage : public sys::Message
+class CellularSetOperatorMessage : public sys::DataMessage
 {
     at::response::cops::CopsMode mode;
     at::response::cops::NameFormat format;
@@ -696,7 +692,6 @@ class CellularMMIResultMessage : public CellularMMIResult, public app::manager::
         : CellularMMIResult(result, std::move(customResult))
     {}
 
-
     [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
     {
         return std::make_unique<app::manager::ActionRequest>(
@@ -774,12 +769,8 @@ class CellularChangeVoLTEDataMessage : public CellularVoLTEDataMessage
     {}
 };
 
-class CellularCheckIfStartAllowedMessage : public sys::Message
-{
-  public:
-    CellularCheckIfStartAllowedMessage() : sys::Message()
-    {}
-};
+class CellularCheckIfStartAllowedMessage : public sys::DataMessage
+{};
 
 class CellularNoSimNotification : public CellularResponseMessage, public app::manager::actions::ConvertibleToAction
 {

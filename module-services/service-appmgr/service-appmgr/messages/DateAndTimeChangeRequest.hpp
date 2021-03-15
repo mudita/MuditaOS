@@ -8,7 +8,7 @@
 
 namespace app::manager
 {
-    class DateAndTimeChangeRequest : public sys::Message
+    class DateAndTimeChangeRequest : public sys::DataMessage
     {};
 
     class AutomaticDateAndTimeIsOnChangeRequest : public DateAndTimeChangeRequest

@@ -7,6 +7,6 @@
 
 namespace app::manager
 {
-    class GetCurrentDisplayLanguageRequest : public sys::Message
+    class GetCurrentDisplayLanguageRequest : public sys::DataMessage
     {};
 } // namespace app::manager

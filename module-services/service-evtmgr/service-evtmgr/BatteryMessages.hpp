@@ -3,16 +3,16 @@
 
 #pragma once
 
-#include "Message.hpp"
+#include "module-sys/Service/Message.hpp"
 
 #include <module-bsp/bsp/torch/torch.hpp>
 
 namespace sevm
 {
-    class BatteryStatusChangeMessage : public Message
+    class BatteryStatusChangeMessage : public sys::DataMessage
     {};
 
-    class BatterySetCriticalLevel : public Message
+    class BatterySetCriticalLevel : public sys::DataMessage
     {
       public:
         BatterySetCriticalLevel(std::uint8_t level) : criticalLevel(level)
@@ -20,10 +20,10 @@ namespace sevm
         const unsigned int criticalLevel = 0;
     };
 
-    class BatteryStateChangeMessage : public Message
+    class BatteryStateChangeMessage : public sys::DataMessage
     {};
 
-    class BatteryBrownoutMessage : public Message
+    class BatteryBrownoutMessage : public sys::DataMessage
     {};
 
 } // namespace sevm

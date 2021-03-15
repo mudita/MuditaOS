@@ -133,6 +133,15 @@ TESTS_LIST["catch2-db-initializer"]="
     Database initialization scripts;
 "
 #---------
+TESTS_LIST["catch2-system_messages-tests"]="
+    Test basic messages constructors;
+    Test message MessageUID provider class;
+    Test message transmission required fields validators - response;
+    Test message transmission required fields validators - unicast;
+    Test message transmission required fields validators - broadcast;
+    Test message transmission required fields validators - multicast;
+"
+#---------
 TESTS_LIST["catch2-dependency-graph-tests"]="
     Given Dependency Graph When topological sort empty graph then verify if result is empty;
     Given Dependency Graph When topological sort without dependencies then verify order;

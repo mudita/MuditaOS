@@ -7,7 +7,6 @@
 
 namespace app
 {
-    class UserPowerDownRequest : public sys::Message
+    class UserPowerDownRequest : public sys::DataMessage
     {};
-
 } // namespace app

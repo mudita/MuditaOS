@@ -11,6 +11,7 @@ namespace sys
 
     enum class BusChannel
     {
+        Unknown,
         System,
         SystemManagerRequests,
         PowerManagerRequests,
@@ -85,6 +86,8 @@ inline const char *c_str(sys::ServicePowerMode code)
 inline const char *c_str(sys::BusChannel channel)
 {
     switch (channel) {
+    case sys::BusChannel::Unknown:
+        return "Unknown";
     case sys::BusChannel::System:
         return "System";
     case sys::BusChannel::SystemManagerRequests:
