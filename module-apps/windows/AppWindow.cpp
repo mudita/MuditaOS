@@ -162,11 +162,11 @@ namespace gui
 
         if (inputEvent.keyCode == KeyCode::KEY_TORCH) {
             if (inputEvent.isLongPress()) {
-                application->toggleTorch(bsp::torch::ColourTemperature::warmest);
+                application->toggleTorchOnOff();
                 return true;
             }
             else if (inputEvent.isShortPress()) {
-                application->toggleTorch(bsp::torch::ColourTemperature::coldest);
+                application->toggleTorchColor();
                 return true;
             }
         }

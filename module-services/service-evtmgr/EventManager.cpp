@@ -171,26 +171,6 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         }
         handled = true;
     }
-    else if (msgl->messageType == MessageType::EVMTorchStateMessage) {
-        auto msg = dynamic_cast<sevm::TorchStateMessage *>(msgl);
-        if (msg != nullptr) {
-            auto message = std::make_shared<sevm::TorchStateResultMessage>(msg->action);
-
-            switch (msg->action) {
-            case bsp::torch::Action::getState:
-                std::tie(message->success, message->state) = bsp::torch::getState();
-                message->colourTemp                        = bsp::torch::getColorTemp();
-                break;
-            case bsp::torch::Action::setState:
-                message->success = bsp::torch::turn(msg->state, msg->colourTemp);
-                break;
-            case bsp::torch::Action::toggle:
-                message->success = bsp::torch::toggle();
-                break;
-            }
-            return message;
-        }
-    }
     else if (msgl->messageType == MessageType::CellularTimeUpdated) {
         auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl);
         if (msg != nullptr) {
@@ -308,6 +288,16 @@ sys::ReturnCodes EventManager::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
+    connect(sevm::ToggleTorchOnOffMessage(), [&](sys::Message *) {
+        toggleTorchOnOff();
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
+    connect(sevm::ToggleTorchColorMessage(), [&](sys::Message *) {
+        toggleTorchColor();
+        return std::make_shared<sys::ResponseMessage>();
+    });
+
     // initialize keyboard worker
     EventWorker = std::make_unique<WorkerEvent>(this);
 
@@ -418,4 +408,22 @@ bool EventManager::processVibraRequest(bsp::vibrator::Action act, sys::ms Repeti
         break;
     }
     return true;
+}
+
+void EventManager::toggleTorchOnOff()
+{
+    auto state    = bsp::torch::getState();
+    auto newState = (state.second == bsp::torch::State::off) ? bsp::torch::State::on : bsp::torch::State::off;
+    bsp::torch::turn(newState, bsp::torch::ColourTemperature::coldest);
+}
+
+void EventManager::toggleTorchColor()
+{
+    auto state = bsp::torch::getState();
+    if (state.second == bsp::torch::State::on) {
+        auto color    = bsp::torch::getColorTemp();
+        auto newColor = (color == bsp::torch::ColourTemperature::coldest) ? bsp::torch::ColourTemperature::warmest
+                                                                          : bsp::torch::ColourTemperature::coldest;
+        bsp::torch::turn(bsp::torch::State::on, newColor);
+    }
 }
