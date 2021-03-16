@@ -1,8 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QuotesMainWindow.hpp"
-#include "application-settings-new/models/QuotesRepository.hpp"
 #include "application-settings-new/models/QuotesModel.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/widgets/SettingsStyle.hpp"
@@ -32,8 +31,8 @@ namespace style::quotes
 
 namespace gui
 {
-    QuotesMainWindow::QuotesMainWindow(app::Application *app, std::shared_ptr<app::QuotesModel> model)
-        : AppWindow(app, gui::window::name::quotes), quotesModel(std::move(model))
+    QuotesMainWindow::QuotesMainWindow(app::Application *app)
+        : AppWindow(app, gui::window::name::quotes), quotesModel(std::make_shared<Quotes::QuotesModel>(app))
     {
         buildInterface();
     }
@@ -56,7 +55,8 @@ namespace gui
                                  style::quotes::list::Y,
                                  style::quotes::list::Width,
                                  style::quotes::list::Height,
-                                 quotesModel);
+                                 quotesModel,
+                                 style::listview::ScrollBarType::Fixed);
 
         setFocusItem(list);
     }
@@ -83,6 +83,6 @@ namespace gui
 
     void QuotesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        quotesModel->rebuild();
+        list->rebuildList();
     }
 } // namespace gui

@@ -6,7 +6,6 @@
 
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/data/QuoteSwitchData.hpp"
-#include "application-settings-new/models/QuotesRepository.hpp"
 
 #include <i18n/i18n.hpp>
 #include <widgets/Text.hpp>
@@ -33,8 +32,8 @@ namespace gui
         }
     } // namespace
 
-    QuoteAddEditWindow::QuoteAddEditWindow(app::Application *app, std::shared_ptr<app::QuotesModel> model)
-        : AppWindow(app, gui::window::name::quotes), quoteModel(std::move(model))
+    QuoteAddEditWindow::QuoteAddEditWindow(app::Application *app)
+        : AppWindow(app, gui::window::name::quotes), quoteModel(std::make_shared<Quotes::QuotesModel>(app))
     {
         buildInterface();
     }
@@ -154,7 +153,13 @@ namespace gui
             LOG_DEBUG("Save Quote: %s", quoteText->getText().c_str());
             quoteData.quote  = quoteText->getText();
             quoteData.author = authorText->getText();
-            quoteModel->save(quoteData);
+
+            if (quoteAction == QuoteAction::Add) {
+                quoteModel->add(quoteData);
+            }
+            else {
+                quoteModel->edit(quoteData);
+            }
 
             auto backToOptionWindow = 1;
             auto backToMainWindow   = 2;

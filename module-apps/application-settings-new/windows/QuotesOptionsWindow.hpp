@@ -12,13 +12,13 @@ namespace gui
     class QuotesOptionsWindow : public BaseSettingsWindow
     {
       public:
-        QuotesOptionsWindow(app::Application *app, std::shared_ptr<app::QuotesModel> model);
+        explicit QuotesOptionsWindow(app::Application *app);
 
       private:
         std::list<Option> buildOptionsList() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-        std::shared_ptr<app::QuotesModel> quotesModel;
-        app::QuoteRecord quote;
+        std::shared_ptr<Quotes::QuotesModel> quotesModel;
+        Quotes::QuoteRecord quote;
     };
 } // namespace gui

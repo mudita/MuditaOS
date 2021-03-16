@@ -14,7 +14,7 @@ namespace gui
     class QuoteAddEditWindow : public AppWindow
     {
       public:
-        QuoteAddEditWindow(app::Application *app, std::shared_ptr<app::QuotesModel> model);
+        explicit QuoteAddEditWindow(app::Application *app);
         void buildInterface() override;
 
       private:
@@ -28,7 +28,7 @@ namespace gui
         gui::Label *quoteCharCounter  = nullptr;
 
         QuoteAction quoteAction;
-        app::QuoteRecord quoteData;
-        std::shared_ptr<app::QuotesModel> quoteModel;
+        Quotes::QuoteRecord quoteData;
+        std::shared_ptr<Quotes::QuotesModel> quoteModel;
     };
 } // namespace gui

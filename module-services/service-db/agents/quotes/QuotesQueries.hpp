@@ -28,9 +28,31 @@ namespace Quotes::Queries
                             and
                             QCM.category_id = '%lu'
                             and
-                            QT.enabled = TRUE
+                            CT.enabled = TRUE
+                        )sql";
+
+    constexpr auto getQuotesFromCustomCategory = R"sql(
+                        SELECT QT.quote_id, QT.lang_id, QT.quote, QT.author, QT.enabled
+                        FROM
+                            quote_table as QT,
+                            quote_category_map as QCM,
+                            category_table as CT
+                        WHERE
+                            QCM.quote_id = QT.quote_id
+                            and 
+                            QCM.category_id = CT.category_id
+                            and
+                            CT.category_name = 'Custom'
                             and
                             CT.enabled = TRUE
+                        )sql";
+
+    constexpr auto getCustomCategoryId = R"sql(
+                        SELECT category_id, category_name, enabled
+                        FROM
+                            category_table
+                        WHERE
+                            category_name = 'Custom'
                         )sql";
 
     constexpr auto enableCategory = R"sql(
@@ -59,9 +81,14 @@ namespace Quotes::Queries
                             CT.enabled = TRUE
                         )sql";
 
-    constexpr auto addQuote = R"sql(
+    constexpr auto addQuoteToQuoteTable = R"sql(
                         INSERT INTO quote_table (lang_id, quote, author, enabled)
                         VALUES ('%lu', '%q' , '%q', '%d');
+                        )sql";
+
+    constexpr auto addQuoteToQuoteCategoryMapTable = R"sql(
+                        INSERT INTO quote_category_map (category_id, quote_id)
+                        VALUES ('%lu', '%lu');
                         )sql";
 
     constexpr auto readQuote = R"sql(
@@ -76,7 +103,12 @@ namespace Quotes::Queries
                         WHERE quote_id = '%lu';
                         )sql";
 
-    constexpr auto deleteQuote = R"sql(
+    constexpr auto deleteQuoteFromQuoteCategoryMapTable = R"sql(
+                        DELETE FROM quote_category_map
+                        WHERE quote_id = '%lu';
+                        )sql";
+
+    constexpr auto deleteQuoteFromQuoteTable = R"sql(
                         DELETE FROM quote_table
                         WHERE quote_id = '%lu';
                         )sql";

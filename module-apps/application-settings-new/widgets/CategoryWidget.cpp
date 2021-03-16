@@ -34,7 +34,7 @@ namespace gui
 {
 
     CategoryWidget::CategoryWidget(const Quotes::CategoryRecord &categoryRecord,
-                                   std::function<bool(bool)> enableCategoryCallback,
+                                   std::function<void(bool)> enableCategoryCallback,
                                    std::function<void(const UTF8 &)> bottomBarTemporaryMode,
                                    std::function<void()> bottomBarRestoreFromTemporaryMode)
         : category(categoryRecord), enableCategory(std::move(enableCategoryCallback)),
@@ -96,14 +96,13 @@ namespace gui
         };
 
         activatedCallback = [&](gui::Item &item) {
-            if (enableCategory(!category.enabled)) {
-                category.enabled = !category.enabled;
-                tickImage->setVisible(category.enabled);
-                auto bottorBarText =
-                    category.enabled ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
-                this->bottomBarTemporaryMode(bottorBarText);
-                hBox->resizeItems();
-            }
+            category.enabled = !category.enabled;
+            enableCategory(category.enabled);
+            tickImage->setVisible(category.enabled);
+            auto bottorBarText =
+                category.enabled ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
+            this->bottomBarTemporaryMode(bottorBarText);
+            hBox->resizeItems();
             return true;
         };
 

@@ -14,7 +14,7 @@ namespace gui
     class QuoteCategoriesWindow : public AppWindow
     {
       public:
-        QuoteCategoriesWindow(app::Application *app, std::shared_ptr<Quotes::CategoriesModel> model);
+        QuoteCategoriesWindow(app::Application *app);
 
       private:
         void buildInterface() override;
