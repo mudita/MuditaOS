@@ -9,13 +9,15 @@
 #include <Image.hpp>
 #include <Label.hpp>
 #include <ListItem.hpp>
+#include <service-db/QuotesMessages.hpp>
 
 namespace gui
 {
     class CategoryWidget : public ListItem
     {
       public:
-        CategoryWidget(const app::QuoteCategory &category,
+        CategoryWidget(const Quotes::CategoryRecord &categoryRecord,
+                       std::function<bool(bool)> enableCategory,
                        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
 
@@ -25,10 +27,11 @@ namespace gui
         gui::Label *descriptionLabel = nullptr;
         gui::Image *tickImage        = nullptr;
 
+        Quotes::CategoryRecord category;
+        std::function<bool(bool)> enableCategory                     = nullptr;
         std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
 
-        app::QuoteCategory category;
     };
 
 } /* namespace gui */

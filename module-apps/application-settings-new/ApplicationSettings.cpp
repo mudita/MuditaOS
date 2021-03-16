@@ -89,11 +89,6 @@ namespace app
             auto repo = std::make_unique<QuotesJsonRepository>(settings::quotesPath);
             return std::make_unique<QuotesModel>(app, std::move(repo));
         }
-
-        auto getCategoriesModel(Application *app) -> std::unique_ptr<CategoriesModel>
-        {
-            return std::make_unique<CategoriesModel>(app);
-        }
     } // namespace settings
 
     ApplicationSettingsNew::ApplicationSettingsNew(std::string name,
@@ -469,7 +464,7 @@ namespace app
             return std::make_unique<gui::EditQuotesWindow>(app);
         });
         windowsFactory.attach(gui::window::name::quote_categories, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuoteCategoriesWindow>(app, std::move(settings::getCategoriesModel(app)));
+            return std::make_unique<gui::QuoteCategoriesWindow>(app, std::make_unique<Quotes::CategoriesModel>(app));
         });
 
         attachPopups({gui::popup::ID::Volume});
