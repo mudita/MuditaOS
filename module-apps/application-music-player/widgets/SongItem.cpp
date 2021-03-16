@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "module-apps/application-music-player/widgets/SongItem.hpp"
@@ -52,6 +52,7 @@ namespace gui
         playedSong = new ImageBox(secondHBox, 0, 0, 0, 0, new Image("messages_error_W_M"));
         playedSong->setMinimumSize(songItem::duration_w, songItem::text_h);
         playedSong->setVisible(false);
+        playedSong->setEdges(RectangleEdge::None);
 
         authorText = new TextFixedSize(secondHBox, 0, 0, 0, 0);
         authorText->setMinimumHeight(songItem::text_h);

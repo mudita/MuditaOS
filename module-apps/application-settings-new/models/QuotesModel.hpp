@@ -3,23 +3,22 @@
 
 #pragma once
 
-#include "QuotesRepository.hpp"
-
 #include <purefs/filesystem_paths.hpp>
-#include <module-gui/gui/widgets/ListView.hpp>
-#include <module-apps/InternalModel.hpp>
+#include <gui/widgets/ListView.hpp>
+#include <InternalModel.hpp>
+#include <service-db/QuotesMessages.hpp>
 
 namespace gui
 {
     class QuoteWidget;
 }
 
-namespace app
+namespace Quotes
 {
     class QuotesModel : public app::InternalModel<gui::QuoteWidget *>, public gui::ListItemProvider
     {
       public:
-        QuotesModel(app::Application *app, std::unique_ptr<QuotesRepository> repository);
+        explicit QuotesModel(app::Application *application);
 
         [[nodiscard]] auto requestRecordsCount() -> unsigned int final;
         [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int final;
@@ -29,14 +28,16 @@ namespace app
 
         void rebuild();
 
-        void remove(const app::QuoteRecord &quote);
-        void save(const app::QuoteRecord &quote);
+        void remove(const QuoteRecord &quote);
+        void save(const QuoteRecord &quote);
 
       private:
         void createData();
+        auto getCustomCategoryId() -> std::optional<unsigned int>;
 
-        app::Application *application                     = nullptr;
-        std::unique_ptr<app::QuotesRepository> repository = nullptr;
+        app::Application *app = nullptr;
+
+        static constexpr auto customCategoryName = "Custom";
     };
 
 } // namespace app

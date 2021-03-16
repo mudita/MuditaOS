@@ -28,8 +28,6 @@ namespace Quotes::Queries
                             and
                             QCM.category_id = '%lu'
                             and
-                            QT.enabled = TRUE
-                            and
                             CT.enabled = TRUE
                         )sql";
 

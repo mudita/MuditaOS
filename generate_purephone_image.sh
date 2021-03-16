@@ -98,7 +98,6 @@ done
 mcopy -s -i "$PART1" .boot.json ::
 mcopy -s -i "$PART1" .boot.json.crc32 ::
 mmd -i "$PART1" ::/current/sys
-mcopy -s -i "$PART1" data ::/current/sys
 mmd -i "$PART1" ::/updates
 
 #Littlefs generate image

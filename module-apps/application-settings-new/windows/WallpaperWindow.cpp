@@ -69,7 +69,7 @@ namespace gui
         isWallpaperLogoSwitchOn   = false;
 
         optionSwitch = !optionSwitch;
-        rebuildOptionList();
+        refreshOptionsList();
     }
 
 } // namespace gui

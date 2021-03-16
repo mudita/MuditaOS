@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "QuotesRepository.hpp"
-
 #include <module-gui/gui/widgets/ListView.hpp>
 #include <module-apps/InternalModel.hpp>
 

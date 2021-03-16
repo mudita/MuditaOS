@@ -2,14 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-settings-new/windows/QuoteCategoriesWindow.hpp"
-#include "QuotesRepository.hpp"
 #include "CategoriesModel.hpp"
 #include <service-db/QuotesMessages.hpp>
 
 namespace style::quotes::list
 {
     constexpr auto item_height = 63;
-    constexpr auto max_quotes  = 100;
 } // namespace style::quotes::list
 
 namespace Quotes
