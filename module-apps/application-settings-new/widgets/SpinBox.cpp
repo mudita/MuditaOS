@@ -35,6 +35,7 @@ namespace gui
         };
 
         inputCallback = [this](gui::Item &item, const gui::InputEvent &event) {
+            auto ret = false;
             if (!event.isShortPress()) {
                 return false;
             }
@@ -42,17 +43,18 @@ namespace gui
             int update = bar->getValue();
             if (event.is(KeyCode::KEY_LEFT)) {
                 update--;
+                ret = true;
             }
             else if (event.is(KeyCode::KEY_RIGHT)) {
                 update++;
+                ret = true;
             }
 
             if (update >= 0 && bar->setValue(update)) {
                 updateBarCallback(bar->getValue());
-                return true;
             }
 
-            return false;
+            return ret;
         };
     }
 
