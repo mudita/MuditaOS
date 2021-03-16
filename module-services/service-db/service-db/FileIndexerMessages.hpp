@@ -117,10 +117,12 @@ namespace FileIndexer
         {
           public:
             GetListDirRequest() = default;
-            explicit GetListDirRequest(std::unique_ptr<ListDir> listDir)
-                : FileIndexerMessage(), listDir(std::move(listDir))
+            explicit GetListDirRequest(unsigned int offset, unsigned int limit, const std::string &directory)
+                : FileIndexerMessage(), offset(offset), limit(limit), directory(directory)
             {}
-            std::unique_ptr<ListDir> listDir;
+            const unsigned int offset   = 0;
+            const unsigned int limit    = 0;
+            const std::string directory = std::string();
         };
 
         class GetListDirResponse : public sys::ResponseMessage

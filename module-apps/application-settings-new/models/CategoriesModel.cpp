@@ -2,24 +2,31 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-settings-new/windows/QuoteCategoriesWindow.hpp"
-#include "QuotesRepository.hpp"
 #include "CategoriesModel.hpp"
-#include <service-db/QuotesMessages.hpp>
 
 namespace style::quotes::list
 {
     constexpr auto item_height = 63;
-    constexpr auto max_quotes  = 100;
 } // namespace style::quotes::list
 
 namespace Quotes
 {
-    CategoriesModel::CategoriesModel(app::Application *app) : application(app)
+    CategoriesModel::CategoriesModel(app::Application *application)
+        : DatabaseModel(application), app::AsyncCallbackReceiver{application}, app(application)
     {}
 
     auto CategoriesModel::requestRecordsCount() -> unsigned int
     {
-        return internalData.size();
+        return recordsCount;
+    }
+
+    bool CategoriesModel::updateRecords(std::vector<CategoryRecord> records)
+    {
+        if (DatabaseModel::updateRecords(std::move(records))) {
+            list->onProviderDataUpdate();
+            return true;
+        }
+        return false;
     }
 
     auto CategoriesModel::getMinimalItemHeight() const -> unsigned int
@@ -29,82 +36,55 @@ namespace Quotes
 
     void CategoriesModel::requestRecords(const uint32_t offset, const uint32_t limit)
     {
-        setupModel(offset, limit);
-        list->onProviderDataUpdate();
+        LOG_DEBUG(
+            "Request categories: offset = %u, limit = %u", static_cast<unsigned>(offset), static_cast<unsigned>(limit));
+        auto query = std::make_unique<Messages::GetCategoryListRequest>(offset, limit);
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
+        task->setCallback([this](auto response) { return handleQueryResponse(response); });
+        task->execute(app, this);
+    }
+
+    auto CategoriesModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
+    {
+        auto msgResponse = dynamic_cast<Messages::GetCategoryListResponse *>(queryResult);
+        assert(msgResponse != nullptr);
+
+        // If list record count has changed we need to rebuild list.
+        if (recordsCount != (msgResponse->getCount())) {
+            recordsCount = msgResponse->getCount();
+            list->reSendLastRebuildRequest();
+            return false;
+        }
+
+        LOG_DEBUG("Categories count: %u", static_cast<unsigned>(msgResponse->getCount()));
+        auto records = msgResponse->getResults();
+        return this->updateRecords(std::move(records));
     }
 
     auto CategoriesModel::getItem(gui::Order order) -> gui::ListItem *
     {
-        return getRecord(order);
-    }
+        auto category = getRecord(order);
 
-    void CategoriesModel::createData()
-    {
-        const auto categoryList = getCategoryList();
-        if (!categoryList) {
-            return;
+        if (!category) {
+            return nullptr;
         }
 
-        for (const auto &category : *categoryList) {
-            auto app  = application;
-            auto item = new gui::CategoryWidget(
-                category,
-                [app, category](bool enable) -> bool {
-                    LOG_DEBUG(
-                        "Sending enable category request: category_id = %d, enable = %d", category.category_id, enable);
-                    auto request = std::make_shared<Messages::EnableCategoryByIdRequest>(category.category_id, enable);
-                    auto result  = app->bus.sendUnicast(request, service::name::db, DBServiceAPI::DefaultTimeoutInMs);
+        auto item = new gui::CategoryWidget(
+            *category,
+            [this, &category = *category](bool enable) {
+                LOG_DEBUG("Sending enable category request: category_id = %u, enable = %d",
+                          static_cast<unsigned>(category.category_id),
+                          enable);
 
-                    if (result.first != sys::ReturnCodes::Success) {
-                        LOG_WARN("Enable category request failed! error code = %d", static_cast<int>(result.first));
-                        return false;
-                    }
+                auto query = std::make_unique<Messages::EnableCategoryByIdRequest>(category.category_id, enable);
+                auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
+                task->execute(app, this);
+            },
+            [app = app](const UTF8 &text) {
+                app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::CENTER, false);
+            },
+            [app = app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
-                    auto response      = std::dynamic_pointer_cast<Messages::EnableCategoryByIdResponse>(result.second);
-                    const auto success = response && response->success;
-                    if (!success)
-                        LOG_WARN("Enable category request failed!");
-                    return success;
-                },
-                [app](const UTF8 &text) {
-                    app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::CENTER, false);
-                },
-                [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
-
-            item->deleteByList = false;
-            internalData.push_back(item);
-        }
-    }
-
-    void CategoriesModel::rebuild()
-    {
-        list->clear();
-        eraseInternalData();
-        createData();
-        list->rebuildList();
-    }
-
-    auto CategoriesModel::getCategoryList() -> std::optional<std::vector<CategoryRecord>>
-    {
-        auto categoryList    = std::make_unique<CategoryList>();
-        categoryList->limit  = 0;
-        categoryList->offset = 0;
-
-        auto request = std::make_shared<Messages::GetCategoryListRequest>(std::move(categoryList));
-        auto result =
-            application->bus.sendUnicast(std::move(request), service::name::db, DBServiceAPI::DefaultTimeoutInMs);
-        if (result.first != sys::ReturnCodes::Success) {
-            LOG_WARN("Getting category list failed! error code = %d", static_cast<int>(result.first));
-            return std::nullopt;
-        }
-
-        auto response = std::dynamic_pointer_cast<Messages::GetCategoryListResponse>(result.second);
-        if (!response) {
-            LOG_WARN("Wrong response on category list request!");
-            return std::nullopt;
-        }
-
-        LOG_DEBUG("Categories list count: %u", response->getCount());
-        return response->getResults();
+        return item;
     }
 } // namespace Quotes

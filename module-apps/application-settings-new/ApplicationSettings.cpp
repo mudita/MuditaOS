@@ -36,7 +36,6 @@
 #include "windows/DateAndTimeMainWindow.hpp"
 #include "windows/ChangeTimeZone.hpp"
 #include "windows/ChangeDateAndTimeWindow.hpp"
-#include <application-settings-new/models/QuotesRepository.hpp>
 #include "windows/PhoneModesWindow.hpp"
 #include "windows/DoNotDisturbWindow.hpp"
 #include "windows/OfflineWindow.hpp"
@@ -82,20 +81,12 @@ namespace app
     namespace settings
     {
         constexpr inline auto operators_on = "operators_on";
-        const std::string quotesPath =
-            purefs::createPath(purefs::dir::getUserDiskPath(), "data/applications/settings/quotes.json");
-
-        auto getQuotesModel(Application *app) -> std::unique_ptr<QuotesModel>
-        {
-            auto repo = std::make_unique<QuotesJsonRepository>(settings::quotesPath);
-            return std::make_unique<QuotesModel>(app, std::move(repo));
-        }
     } // namespace settings
 
     ApplicationSettingsNew::ApplicationSettingsNew(std::string name,
                                                    std::string parent,
                                                    StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), startInBackground)
+        : Application(std::move(name), std::move(parent), startInBackground), AsyncCallbackReceiver{this}
     {
         if ((Store::GSM::SIM::SIM1 == selectedSim || Store::GSM::SIM::SIM2 == selectedSim) &&
             Store::GSM::get()->sim == selectedSim) {
@@ -128,6 +119,13 @@ namespace app
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::network == currentWindow->getName()) {
                 currentWindow->rebuild();
+            }
+        }
+
+        // handle database response
+        if (resp != nullptr) {
+            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
         }
 
@@ -456,19 +454,19 @@ namespace app
             return std::make_unique<gui::DialogRetry>(app, name);
         });
         windowsFactory.attach(gui::window::name::quotes, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuotesMainWindow>(app, std::move(settings::getQuotesModel(app)));
+            return std::make_unique<gui::QuotesMainWindow>(app);
         });
         windowsFactory.attach(gui::window::name::new_quote, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuoteAddEditWindow>(app, std::move(settings::getQuotesModel(app)));
+            return std::make_unique<gui::QuoteAddEditWindow>(app);
         });
         windowsFactory.attach(gui::window::name::options_quote, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuotesOptionsWindow>(app, std::move(settings::getQuotesModel(app)));
+            return std::make_unique<gui::QuotesOptionsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::edit_quotes, [](Application *app, const std::string &name) {
             return std::make_unique<gui::EditQuotesWindow>(app);
         });
         windowsFactory.attach(gui::window::name::quote_categories, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuoteCategoriesWindow>(app, std::make_unique<Quotes::CategoriesModel>(app));
+            return std::make_unique<gui::QuoteCategoriesWindow>(app);
         });
 
         attachPopups({gui::popup::ID::Volume});

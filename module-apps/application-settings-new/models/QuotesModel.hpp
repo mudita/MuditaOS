@@ -3,40 +3,40 @@
 
 #pragma once
 
-#include "QuotesRepository.hpp"
-
-#include <purefs/filesystem_paths.hpp>
-#include <module-gui/gui/widgets/ListView.hpp>
-#include <module-apps/InternalModel.hpp>
+#include <Application.hpp>
+#include <DatabaseModel.hpp>
+#include <ListItemProvider.hpp>
+#include <service-db/QuotesMessages.hpp>
 
 namespace gui
 {
     class QuoteWidget;
 }
 
-namespace app
+namespace Quotes
 {
-    class QuotesModel : public app::InternalModel<gui::QuoteWidget *>, public gui::ListItemProvider
+    class QuotesModel : public app::DatabaseModel<QuoteRecord>,
+                        public gui::ListItemProvider,
+                        public app::AsyncCallbackReceiver
     {
       public:
-        QuotesModel(app::Application *app, std::unique_ptr<QuotesRepository> repository);
+        explicit QuotesModel(app::Application *application);
 
         [[nodiscard]] auto requestRecordsCount() -> unsigned int final;
         [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int final;
 
         auto getItem(gui::Order order) -> gui::ListItem * final;
         void requestRecords(const uint32_t offset, const uint32_t limit) final;
+        bool updateRecords(std::vector<QuoteRecord> records) override;
 
-        void rebuild();
+        void add(const QuoteRecord &record);
+        void edit(const QuoteRecord &record);
+        void remove(const QuoteRecord &record);
 
-        void remove(const app::QuoteRecord &quote);
-        void save(const app::QuoteRecord &quote);
+        auto handleQueryResponse(db::QueryResult *queryResult) -> bool;
 
       private:
-        void createData();
-
-        app::Application *application                     = nullptr;
-        std::unique_ptr<app::QuotesRepository> repository = nullptr;
+        app::Application *app = nullptr;
     };
 
 } // namespace app

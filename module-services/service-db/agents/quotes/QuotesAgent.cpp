@@ -5,151 +5,170 @@
 #include "QuotesQueries.hpp"
 
 #include <Application.hpp>
-#include <purefs/filesystem_paths.hpp>
+#include <Common/Query.hpp>
 
 namespace Quotes
 {
-    QuotesAgent::QuotesAgent(sys::Service *parentService) : DatabaseAgent(parentService)
+    QuotesAgent::QuotesAgent(Database *quotesDB) : database(quotesDB)
     {
-        database = std::make_unique<Database>(getDbFilePath().c_str());
     }
 
-    void QuotesAgent::registerMessages()
+    auto QuotesAgent::runQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
     {
-        using std::placeholders::_1;
-
-        parentService->connect(typeid(Messages::GetCategoryListRequest),
-                               std::bind(&QuotesAgent::handleCategoryList, this, _1));
-        parentService->connect(typeid(Messages::GetQuotesListRequest),
-                               std::bind(&QuotesAgent::handleQuotesList, this, _1));
-        parentService->connect(typeid(Messages::GetQuotesListByCategoryIdRequest),
-                               std::bind(&QuotesAgent::handleQuotesListByCategoryId, this, _1));
-        parentService->connect(typeid(Messages::EnableCategoryByIdRequest),
-                               std::bind(&QuotesAgent::handleEnableCategoryById, this, _1));
-        parentService->connect(typeid(Messages::EnableQuoteByIdRequest),
-                               std::bind(&QuotesAgent::handleEnableQuoteById, this, _1));
-        parentService->connect(typeid(Messages::GetEnabledQuotesListRequest),
-                               std::bind(&QuotesAgent::handleEnabledQuotesList, this, _1));
-        parentService->connect(typeid(Messages::AddQuoteRequest), std::bind(&QuotesAgent::handleAddQuote, this, _1));
-        parentService->connect(typeid(Messages::ReadQuoteRequest), std::bind(&QuotesAgent::handleReadQuote, this, _1));
-        parentService->connect(typeid(Messages::WriteQuoteRequest),
-                               std::bind(&QuotesAgent::handleWriteQuote, this, _1));
-        parentService->connect(typeid(Messages::DeleteQuoteRequest),
-                               std::bind(&QuotesAgent::handleDeleteQuote, this, _1));
-    }
-
-    auto QuotesAgent::getDbFilePath() -> const std::string
-    {
-        return (purefs::dir::getUserDiskPath() / "quotes.db").string();
-    }
-
-    auto QuotesAgent::getDbInitString() -> const std::string
-    {
-        return {};
-    }
-
-    auto QuotesAgent::getAgentName() -> const std::string
-    {
-        return std::string("quotesAgent");
-    }
-
-    auto QuotesAgent::handleCategoryList(sys::Message *req) -> sys::MessagePointer
-    {
-        if (auto msg = dynamic_cast<Messages::GetCategoryListRequest *>(req)) {
-            auto query        = database->query(Queries::getAllCategories);
-            auto categoryList = getList<CategoryList, CategoryRecord>(std::move(msg->categoryList), std::move(query));
-            return std::make_shared<Messages::GetCategoryListResponse>(std::move(categoryList));
+        if (typeid(*query) == typeid(Messages::GetCategoryListRequest)) {
+            return handleCategoryList(query);
         }
-        return sys::msgNotHandled();
-    }
-
-    auto QuotesAgent::handleQuotesList(sys::Message *req) -> sys::MessagePointer
-    {
-        if (auto msg = dynamic_cast<Messages::GetQuotesListRequest *>(req)) {
-            auto query      = database->query(Queries::getAllQuotes);
-            auto quotesList = getList<QuotesList, QuoteRecord>(std::move(msg->quotesList), std::move(query));
-            return std::make_shared<Messages::GetQuotesListResponse>(std::move(quotesList));
+        else if (typeid(*query) == typeid(Messages::EnableCategoryByIdRequest)) {
+            return handleEnableCategoryById(query);
         }
-        return sys::msgNotHandled();
-    }
-
-    auto QuotesAgent::handleQuotesListByCategoryId(sys::Message *req) -> sys::MessagePointer
-    {
-        if (auto msg = dynamic_cast<Messages::GetQuotesListByCategoryIdRequest *>(req)) {
-            auto query      = database->query(Queries::getQuotesByCategoryId, msg->categoryId);
-            auto quotesList = getList<QuotesList, QuoteRecord>(std::move(msg->quotesList), std::move(query));
-            return std::make_shared<Messages::GetQuotesListByCategoryIdResponse>(std::move(quotesList));
+        else if (typeid(*query) == typeid(Messages::GetQuotesListRequest)) {
+            return handleQuotesList(query);
         }
-        return sys::msgNotHandled();
-    }
-
-    auto QuotesAgent::handleEnableCategoryById(sys::Message *req) -> sys::MessagePointer
-    {
-        if (auto msg = dynamic_cast<Messages::EnableCategoryByIdRequest *>(req)) {
-            auto result = database->execute(Queries::enableCategory, msg->enable, msg->categoryId);
-            return std::make_shared<Messages::EnableCategoryByIdResponse>(result);
+        else if (typeid(*query) == typeid(Messages::GetQuotesListByCategoryIdRequest)) {
+            return handleQuotesListByCategoryId(query);
         }
-        return sys::msgNotHandled();
-    }
-
-    auto QuotesAgent::handleEnableQuoteById(sys::Message *req) -> sys::MessagePointer
-    {
-        if (auto msg = dynamic_cast<Messages::EnableQuoteByIdRequest *>(req)) {
-            auto result = database->execute(Queries::enableQuote, msg->enable, msg->quoteId);
-            return std::make_shared<Messages::EnableQuoteByIdResponse>(result);
+        else if (typeid(*query) == typeid(Messages::GetQuotesListFromCustomCategoryRequest)) {
+            return handleQuotesListFromCustomCategory(query);
         }
-        return sys::msgNotHandled();
-    }
-
-    auto QuotesAgent::handleEnabledQuotesList(sys::Message *req) -> sys::MessagePointer
-    {
-        if (auto msg = dynamic_cast<Messages::GetEnabledQuotesListRequest *>(req)) {
-            auto query      = database->query(Queries::getEnabledQuotes);
-            auto quotesList = getList<QuotesList, QuoteRecord>(std::move(msg->quotesList), std::move(query));
-            return std::make_shared<Messages::GetEnabledQuotesListResponse>(std::move(quotesList));
+        else if (typeid(*query) == typeid(Messages::GetEnabledQuotesListRequest)) {
+            return handleEnabledQuotesList(query);
         }
-        return sys::msgNotHandled();
-    }
-
-    auto QuotesAgent::handleAddQuote(sys::Message *req) -> sys::MessagePointer
-    {
-        if (auto msg = dynamic_cast<Messages::AddQuoteRequest *>(req)) {
-            auto result = database->execute(
-                Queries::addQuote, msg->langId, msg->quote.c_str(), msg->author.c_str(), msg->enabled);
-            auto quoteId = database->getLastInsertRowId();
-            return std::make_shared<Messages::AddQuoteResponse>(result, quoteId);
+        else if (typeid(*query) == typeid(Messages::EnableQuoteByIdRequest)) {
+            return handleEnableQuoteById(query);
         }
-        return sys::msgNotHandled();
-    }
-
-    auto QuotesAgent::handleReadQuote(sys::Message *req) -> sys::MessagePointer
-    {
-        if (auto msg = dynamic_cast<Messages::ReadQuoteRequest *>(req)) {
-            auto result = database->query(Queries::readQuote, msg->quoteId);
-            QuoteRecord quoteRecord(result.get());
-            return std::make_shared<Messages::ReadQuoteResponse>(
-                quoteRecord.quote_id, quoteRecord.lang_id, quoteRecord.quote, quoteRecord.author, quoteRecord.enabled);
+        else if (typeid(*query) == typeid(Messages::AddQuoteRequest)) {
+            return handleAddQuote(query);
         }
-        return sys::msgNotHandled();
-    }
-
-    auto QuotesAgent::handleWriteQuote(sys::Message *req) -> sys::MessagePointer
-    {
-        if (auto msg = dynamic_cast<Messages::WriteQuoteRequest *>(req)) {
-            auto result = database->execute(
-                Queries::writeQuote, msg->langId, msg->quote.c_str(), msg->author.c_str(), msg->enabled, msg->quoteId);
-            return std::make_shared<Messages::WriteQuoteResponse>(result);
+        else if (typeid(*query) == typeid(Messages::ReadQuoteRequest)) {
+            return handleReadQuote(query);
         }
-        return sys::msgNotHandled();
-    }
-
-    auto QuotesAgent::handleDeleteQuote(sys::Message *req) -> sys::MessagePointer
-    {
-        if (auto msg = dynamic_cast<Messages::DeleteQuoteRequest *>(req)) {
-            auto result = database->execute(Queries::deleteQuote, msg->quoteId);
-            return std::make_shared<Messages::DeleteQuoteResponse>(result);
+        else if (typeid(*query) == typeid(Messages::WriteQuoteRequest)) {
+            return handleWriteQuote(query);
         }
-        return sys::msgNotHandled();
+        else if (typeid(*query) == typeid(Messages::DeleteQuoteRequest)) {
+            return handleDeleteQuote(query);
+        }
+        return nullptr;
     }
 
+    auto QuotesAgent::handleCategoryList(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req          = std::dynamic_pointer_cast<Messages::GetCategoryListRequest>(query);
+        auto queryResult  = database->query(Queries::getAllCategories);
+        auto categoryList = getList<CategoryList, CategoryRecord>(req->offset, req->limit, std::move(queryResult));
+        auto response     = std::make_unique<Messages::GetCategoryListResponse>(std::move(categoryList));
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleEnableCategoryById(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req         = std::dynamic_pointer_cast<Messages::EnableCategoryByIdRequest>(query);
+        auto queryResult = database->execute(Queries::enableCategory, req->enable, req->categoryId);
+        auto response    = std::make_unique<Messages::EnableCategoryByIdResponse>(std::move(queryResult));
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleQuotesList(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req         = std::dynamic_pointer_cast<Messages::GetQuotesListRequest>(query);
+        auto queryResult = database->query(Queries::getAllQuotes);
+        auto quotesList  = getList<QuotesList, QuoteRecord>(req->offset, req->limit, std::move(queryResult));
+        auto response    = std::make_unique<Messages::GetQuotesListResponse>(std::move(quotesList));
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleQuotesListByCategoryId(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req         = std::dynamic_pointer_cast<Messages::GetQuotesListByCategoryIdRequest>(query);
+        auto queryResult = database->query(Queries::getQuotesByCategoryId, req->categoryId);
+        auto quotesList  = getList<QuotesList, QuoteRecord>(req->offset, req->limit, std::move(queryResult));
+        auto response    = std::make_unique<Messages::GetQuotesListByCategoryIdResponse>(std::move(quotesList));
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleQuotesListFromCustomCategory(std::shared_ptr<db::Query> query)
+        -> std::unique_ptr<db::QueryResult>
+    {
+        auto req         = std::dynamic_pointer_cast<Messages::GetQuotesListFromCustomCategoryRequest>(query);
+        auto queryResult = database->query(Queries::getQuotesFromCustomCategory);
+        auto quotesList  = getList<QuotesList, QuoteRecord>(req->offset, req->limit, std::move(queryResult));
+        auto response    = std::make_unique<Messages::GetQuotesListFromCustomCategoryResponse>(std::move(quotesList));
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleEnabledQuotesList(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req         = std::dynamic_pointer_cast<Messages::GetEnabledQuotesListRequest>(query);
+        auto queryResult = database->query(Queries::getEnabledQuotes);
+        auto quotesList  = getList<QuotesList, QuoteRecord>(req->offset, req->limit, std::move(queryResult));
+        auto response    = std::make_unique<Messages::GetEnabledQuotesListResponse>(std::move(quotesList));
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleEnableQuoteById(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req         = std::dynamic_pointer_cast<Messages::EnableQuoteByIdRequest>(query);
+        auto queryResult = database->execute(Queries::enableQuote, req->enable, req->quoteId);
+        auto response    = std::make_unique<Messages::EnableQuoteByIdResponse>(queryResult);
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleAddQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req = std::dynamic_pointer_cast<Messages::AddQuoteRequest>(query);
+
+        database->execute(
+            Queries::addQuoteToQuoteTable, req->langId, req->quote.c_str(), req->author.c_str(), req->enabled);
+
+        auto quoteId = database->getLastInsertRowId();
+
+        auto queryResult = database->query(Queries::getCustomCategoryId);
+        CategoryRecord categoryRecord(queryResult.get());
+
+        auto success = database->execute(Queries::addQuoteToQuoteCategoryMapTable, categoryRecord.category_id, quoteId);
+
+        auto response = std::make_unique<Messages::AddQuoteResponse>(success, quoteId);
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleReadQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req         = std::dynamic_pointer_cast<Messages::ReadQuoteRequest>(query);
+        auto queryResult = database->query(Queries::readQuote, req->quoteId);
+        QuoteRecord quoteRecord(queryResult.get());
+        auto response = std::make_unique<Messages::ReadQuoteResponse>(
+            quoteRecord.quote_id, quoteRecord.lang_id, quoteRecord.quote, quoteRecord.author, quoteRecord.enabled);
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleWriteQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req         = std::dynamic_pointer_cast<Messages::WriteQuoteRequest>(query);
+        auto queryResult = database->execute(
+            Queries::writeQuote, req->langId, req->quote.c_str(), req->author.c_str(), req->enabled, req->quoteId);
+        auto response = std::make_unique<Messages::WriteQuoteResponse>(queryResult);
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleDeleteQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req = std::dynamic_pointer_cast<Messages::DeleteQuoteRequest>(query);
+        database->execute(Queries::deleteQuoteFromQuoteCategoryMapTable, req->quoteId);
+
+        auto queryResult = database->execute(Queries::deleteQuoteFromQuoteTable, req->quoteId);
+
+        auto response = std::make_unique<Messages::DeleteQuoteResponse>(queryResult);
+        response->setRequestQuery(query);
+        return response;
+    }
 } // namespace Quotes

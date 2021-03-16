@@ -8,8 +8,9 @@
 
 namespace gui
 {
-    QuoteCategoriesWindow::QuoteCategoriesWindow(app::Application *app, std::shared_ptr<Quotes::CategoriesModel> model)
-        : AppWindow(app, gui::window::name::quote_categories), categoriesModel(std::move(model))
+    QuoteCategoriesWindow::QuoteCategoriesWindow(app::Application *app)
+        : AppWindow(app, gui::window::name::quote_categories),
+          categoriesModel(std::make_shared<Quotes::CategoriesModel>(app))
     {
         buildInterface();
     }
@@ -28,13 +29,16 @@ namespace gui
                                  style::quotes::categories::list::Y,
                                  style::quotes::categories::list::Width,
                                  style::quotes::categories::list::Height,
-                                 categoriesModel);
+                                 categoriesModel,
+                                 style::listview::ScrollBarType::Fixed);
 
         setFocusItem(list);
     }
 
     void QuoteCategoriesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        categoriesModel->rebuild();
+        if (mode == ShowMode::GUI_SHOW_INIT) {
+            list->rebuildList();
+        }
     }
 } // namespace gui

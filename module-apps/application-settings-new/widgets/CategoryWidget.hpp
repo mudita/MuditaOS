@@ -17,7 +17,7 @@ namespace gui
     {
       public:
         CategoryWidget(const Quotes::CategoryRecord &categoryRecord,
-                       std::function<bool(bool)> enableCategory,
+                       std::function<void(bool)> enableCategory,
                        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
 
@@ -28,7 +28,7 @@ namespace gui
         gui::Image *tickImage        = nullptr;
 
         Quotes::CategoryRecord category;
-        std::function<bool(bool)> enableCategory                     = nullptr;
+        std::function<void(bool)> enableCategory                     = nullptr;
         std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
 

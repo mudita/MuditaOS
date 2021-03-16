@@ -157,16 +157,18 @@ auto FileIndexerAgent::dbGeMetadataCount() -> unsigned int
     return (*retQuery)[0].getUInt32();
 }
 
-auto FileIndexerAgent::dbListDir(std::unique_ptr<FileIndexer::ListDir> listDir) -> std::unique_ptr<FileIndexer::ListDir>
+auto FileIndexerAgent::dbListDir(unsigned int offset, unsigned int limit, const std::string &directory)
+    -> std::unique_ptr<FileIndexer::ListDir>
 {
-    auto retQuery = database->query(FileIndexer::Statements::getFilesByDir, listDir->directory.c_str());
-    return getList<FileIndexer::ListDir, FileIndexer::FileRecord>(std::move(listDir), std::move(retQuery));
+    auto retQuery = database->query(FileIndexer::Statements::getFilesByDir, directory.c_str());
+    return getList<FileIndexer::ListDir, FileIndexer::FileRecord>(offset, limit, std::move(retQuery));
 }
 
 auto FileIndexerAgent::handleListDir(sys::Message *req) -> sys::MessagePointer
 {
     if (auto msg = dynamic_cast<FileIndexer::Messages::GetListDirRequest *>(req)) {
-        return std::make_shared<FileIndexer::Messages::GetListDirResponse>(dbListDir(std::move(msg->listDir)));
+        return std::make_shared<FileIndexer::Messages::GetListDirResponse>(
+            dbListDir(msg->offset, msg->limit, msg->directory));
     }
     return std::make_shared<sys::ResponseMessage>();
 }

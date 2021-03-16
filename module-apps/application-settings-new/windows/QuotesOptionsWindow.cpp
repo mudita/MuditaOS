@@ -3,11 +3,9 @@
 
 #include "QuotesOptionsWindow.hpp"
 #include "OptionSetting.hpp"
-#include "application-settings-new/models/QuotesRepository.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "DialogMetadataMessage.hpp"
 #include "QuotesMainWindow.hpp"
-#include "application-settings-new/models/QuotesRepository.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/widgets/QuoteWidget.hpp"
 
@@ -17,8 +15,8 @@
 namespace gui
 {
 
-    QuotesOptionsWindow::QuotesOptionsWindow(app::Application *app, std::shared_ptr<app::QuotesModel> model)
-        : BaseSettingsWindow(app, gui::window::name::quotes), quotesModel(std::move(model))
+    QuotesOptionsWindow::QuotesOptionsWindow(app::Application *app)
+        : BaseSettingsWindow(app, gui::window::name::quotes), quotesModel(std::make_shared<Quotes::QuotesModel>(app))
     {
         setTitle(utils::localize.get("app_settings_display_wallpaper_quotes_options"));
     }
