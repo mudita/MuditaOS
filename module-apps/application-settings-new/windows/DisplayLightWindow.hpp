@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <module-apps/GuiTimer.hpp>
 #include <module-services/service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <module-apps/application-settings-new/widgets/SpinBox.hpp>
 #include <module-apps/application-settings-new/ApplicationSettings.hpp>
@@ -33,7 +34,7 @@ namespace gui
         std::uint8_t brightnessValue                                     = 0;
         app::settingsInterface::ScreenLightSettings *screenLightSettings = nullptr;
         float ambientLight                                               = 0.0;
-        std::unique_ptr<app::GuiTimer> timerTask;
-        [[nodiscard]] auto onTimerTimeout(Item &self, Timer &task) -> bool;
+        sys::TimerHandle timerTask;
+        [[nodiscard]] auto onTimerTimeout(Item &self, sys::Timer &task) -> bool;
     };
 } // namespace gui

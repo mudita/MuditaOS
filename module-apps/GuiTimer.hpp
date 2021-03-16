@@ -1,16 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Service/Timer.hpp"             // for Timer
-#include <module-gui/gui/core/Timer.hpp> // for ms, Timer
-#include <string>                        // for string
+#include "module-sys/Timers/Timer.hpp"       // for Timer
+#include "module-sys/Timers/TimerHandle.hpp" // for TimerHandle
 
-namespace app
-{
-    class Application;
-} // namespace app
+#include <memory>
+#include <string> // for string
+
 namespace gui
 {
     class Item;
@@ -18,42 +16,52 @@ namespace gui
 
 namespace app
 {
-
     class Application;
 
-    /// proxies system Timer capabilities to gui::Timer and disconnects dependencies
-    /// by default one time run
-    class GuiTimer : public gui::Timer, protected sys::Timer
+    /// Proxies system timer capabilities to the gui layer
+    class GuiTimer : public sys::Timer
     {
       public:
-        /// gui timer default named GUI, infinite timeout on start
-        explicit GuiTimer(Application *parent);
-        /// gui timer with user name, infinite timeout on start
-        GuiTimer(const std::string &name,
-                 Application *parent,
-                 gui::ms timeout       = sys::Timer::timeout_infinite,
-                 gui::Timer::Type type = gui::Timer::Single);
-        /// there is no valid reason to create timer without app
-        GuiTimer() = delete;
-
-        /// @defgroup interface
-        /// @ {
-        void start() override;
-        void stop() override;
-        void reset() override;
-        void setInterval(gui::ms time) override;
-        /// @ }
-
-        /// interface to trigger timing callback
-        class Sysapi
+        enum class Type
         {
-            friend Application;
-            GuiTimer &parent;
-            void connect(gui::Item *item);
+            SingleShot,
+            Periodic
+        };
 
-          public:
-            Sysapi(GuiTimer &parent) : parent(parent)
-            {}
-        } sysapi;
+        GuiTimer(Application *parent,
+                 gui::Item *item,
+                 const std::string &name,
+                 std::chrono::milliseconds timeout,
+                 Type type);
+        ~GuiTimer() noexcept override;
+
+        void start() override;
+        void restart(std::chrono::milliseconds newInterval) override;
+        void stop() override;
+        bool isActive() const noexcept override;
+
+        class Impl;
+        std::unique_ptr<Impl> pimpl;
+        gui::Item *item = nullptr;
+    };
+
+    class GuiTimerFactory
+    {
+      public:
+        static sys::TimerHandle createSingleShotTimer(Application *parent,
+                                                      gui::Item *item,
+                                                      const std::string &name,
+                                                      std::chrono::milliseconds interval);
+        static sys::TimerHandle createPeriodicTimer(Application *parent,
+                                                    gui::Item *item,
+                                                    const std::string &name,
+                                                    std::chrono::milliseconds interval);
+
+      private:
+        static sys::TimerHandle createGuiTimer(Application *parent,
+                                               gui::Item *item,
+                                               const std::string &name,
+                                               std::chrono::milliseconds interval,
+                                               GuiTimer::Type type);
     };
 }; // namespace app

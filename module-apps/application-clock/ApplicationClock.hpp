@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,7 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/ProgressBar.hpp"
+#include "module-sys/Timers/TimerHandle.hpp"
 
 namespace app
 {
@@ -14,7 +15,7 @@ namespace app
 
     class ApplicationClock : public Application
     {
-        std::unique_ptr<sys::Timer> timerClock;
+        sys::TimerHandle timerClock;
         void timerClockCallback();
 
       public:

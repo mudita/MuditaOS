@@ -13,7 +13,7 @@
 #include <MessageType.hpp>
 #include <module-utils/state/ServiceState.hpp>
 #include <projdefs.h>
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 #include <service-cellular/State.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-cellular/CellularMessage.hpp>
@@ -59,22 +59,19 @@ ServiceAntenna::ServiceAntenna()
     : sys::Service(service::name::antenna, "", antennaServiceStackSize, sys::ServicePriority::Idle)
 {
     LOG_INFO("[%s] Initializing", service::name::antenna);
-
-    timer = std::make_unique<sys::Timer>("Antena", this, 5000, sys::Timer::Type::Periodic);
-    timer->connect([&](sys::Timer &) {
-        timer->stop();
-        auto stateToSet = state->get();
-        if (state->timeoutOccured(cpp_freertos::Ticks::GetTicks())) {
-            LOG_WARN("State [ %s ] timeout occured, setting [ %s ] state",
-                     c_str(state->get()),
-                     c_str(state->getTimeoutState()));
-            stateToSet = state->getTimeoutState();
-        }
-        state->set(stateToSet);
-    });
-
     state = new utils::state::State<antenna::State>(this);
-
+    timer = sys::TimerFactory::createPeriodicTimer(
+        this, "Antenna", std::chrono::seconds{5}, [this](sys::Timer & /*timer*/) {
+            timer.stop();
+            auto stateToSet = state->get();
+            if (state->timeoutOccured(cpp_freertos::Ticks::GetTicks())) {
+                LOG_WARN("State [ %s ] timeout occured, setting [ %s ] state",
+                         c_str(state->get()),
+                         c_str(state->getTimeoutState()));
+                stateToSet = state->getTimeoutState();
+            }
+            state->set(stateToSet);
+        });
     bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
     bus.channels.push_back(sys::BusChannel::AntennaNotifications);
 }
@@ -258,8 +255,7 @@ bool ServiceAntenna::HandleStateChange(antenna::State state)
     }
     if (!ret) {
         LOG_WARN("State [ %s ] not handled. Reloading timer.", c_str(state));
-        timer->reload();
-        timer->start();
+        timer.start();
     }
     return ret;
 }

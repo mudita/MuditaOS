@@ -12,7 +12,9 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Worker.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Message.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Service.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Service/Timer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Timers/SystemTimer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Timers/TimerHandle.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Timers/TimerFactory.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/CpuSentinel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneModes/Subject.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneModes/Observer.cpp

@@ -383,31 +383,22 @@ namespace gui
 
     void CallWindow::connectTimerOnExit()
     {
-        auto timer = std::make_unique<app::GuiTimer>(application);
-        timer->setInterval(getDelayedStopTime());
-
-        timerCallback = [this](Item &, Timer &timer) {
+        timerCallback = [this](Item &, sys::Timer &timer) {
             LOG_DEBUG("Delayed exit timer callback");
             setState(State::IDLE);
-            detachTimer(timer);
             app::manager::Controller::switchBack(application);
             return true;
         };
-        timer->start();
-        application->connect(std::move(timer), this);
+        delayedExitTimer =
+            app::GuiTimerFactory::createSingleShotTimer(application, this, "DelayedExitTimer", getDelayedStopTime());
+        delayedExitTimer.start();
     }
 
     void CallWindow::runCallTimer()
     {
-        static const sys::ms one_second = 1000;
-        stop_timer                      = false;
-        auto timer = std::make_unique<app::GuiTimer>("CallTime", application, one_second, Timer::Continous);
-        durationLabel->timerCallback = [&](Item &item, Timer &timer) {
-            if (stop_timer) {
-                timer.stop();
-                item.detachTimer(timer);
-                return true;
-            }
+        constexpr auto callTimeTimeout = std::chrono::seconds{1};
+        callTimer = app::GuiTimerFactory::createPeriodicTimer(application, durationLabel, "CallTime", callTimeTimeout);
+        durationLabel->timerCallback = [&](Item &item, sys::Timer &timer) {
             std::chrono::time_point<std::chrono::system_clock> systemUnitDuration(callDuration);
             updateDuration(std::chrono::system_clock::to_time_t(systemUnitDuration));
             callDuration++;
@@ -415,14 +406,14 @@ namespace gui
             application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             return true;
         };
-        timer->start();
-        application->connect(std::move(timer), durationLabel);
+        callTimer.start();
     }
 
     void CallWindow::stopCallTimer()
     {
         callDuration = std::chrono::seconds().zero();
-        stop_timer   = true;
+        if (callTimer.isActive()) {
+            callTimer.stop();
+        }
     }
-
 } /* namespace gui */

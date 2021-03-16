@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "endpoints/developerMode/event/ATRequest.hpp"
@@ -36,7 +36,7 @@
 #include <Result.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 #include <Tables/CalllogTable.hpp>
 #include <Tables/Record.hpp>
 #include <Utils.hpp>
@@ -176,12 +176,12 @@ ServiceCellular::ServiceCellular()
     bus.channels.push_back(sys::BusChannel::ServiceEvtmgrNotifications);
     bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
-    callStateTimer = std::make_unique<sys::Timer>("call_state", this, 1000);
-    callStateTimer->connect([&](sys::Timer &) { CallStateTimerHandler(); });
-    stateTimer = std::make_unique<sys::Timer>("state", this, 1000);
-    stateTimer->connect([&](sys::Timer &) { handleStateTimer(); });
-    ussdTimer = std::make_unique<sys::Timer>("ussd", this, 1000);
-    ussdTimer->connect([&](sys::Timer &) { handleUSSDTimer(); });
+    callStateTimer = sys::TimerFactory::createPeriodicTimer(
+        this, "call_state", std::chrono::milliseconds{1000}, [this](sys::Timer &) { CallStateTimerHandler(); });
+    stateTimer = sys::TimerFactory::createPeriodicTimer(
+        this, "state", std::chrono::milliseconds{1000}, [&](sys::Timer &) { handleStateTimer(); });
+    ussdTimer = sys::TimerFactory::createPeriodicTimer(
+        this, "ussd", std::chrono::milliseconds{1000}, [this](sys::Timer &) { handleUSSDTimer(); });
 
     ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
         auto call = DBServiceAPI::CalllogAdd(this, rec);
@@ -1872,13 +1872,13 @@ bool ServiceCellular::handle_status_check(void)
 void ServiceCellular::startStateTimer(uint32_t timeout)
 {
     stateTimeout = timeout;
-    stateTimer->reload();
+    stateTimer.start();
 }
 
 void ServiceCellular::stopStateTimer()
 {
     stateTimeout = 0;
-    stateTimer->stop();
+    stateTimer.stop();
 }
 
 void ServiceCellular::handleStateTimer(void)
@@ -1979,7 +1979,7 @@ void ServiceCellular::handleUSSDTimer(void)
     }
     else {
         LOG_WARN("USSD timeout occured, abotrig current session");
-        ussdTimer->stop();
+        ussdTimer.stop();
         CellularServiceAPI::USSDRequest(this, CellularUSSDMessage::RequestType::abortSesion);
     }
 }
@@ -1999,10 +1999,10 @@ void ServiceCellular::setUSSDTimer(void)
         break;
     }
     if (ussdTimeout == ussd::noTimeout) {
-        ussdTimer->stop();
+        ussdTimer.stop();
         return;
     }
-    ussdTimer->reload();
+    ussdTimer.start();
 }
 
 std::shared_ptr<cellular::RawCommandRespAsync> ServiceCellular::handleCellularStartOperatorsScan(
@@ -2184,7 +2184,7 @@ auto ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage 
     if (channel) {
         if (channel->cmd(at::AT::ATH)) {
             AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
-            callStateTimer->stop();
+            callStateTimer.stop();
             if (!ongoingCall.endCall(CellularCall::Forced::True)) {
                 LOG_ERROR("Failed to end ongoing call");
             }
@@ -2230,7 +2230,7 @@ auto ServiceCellular::handleCellularListCallsMessage(CellularMessage *msg) -> st
         if (it != std::end(data)) {
             auto notification = std::make_shared<CellularCallActiveNotification>();
             bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
-            callStateTimer->stop();
+            callStateTimer.stop();
             return std::make_shared<CellularResponseMessage>(true);
         }
     }
@@ -2450,7 +2450,7 @@ auto ServiceCellular::handleCallActiveNotification(sys::Message *msg) -> std::sh
 }
 auto ServiceCellular::handleCallAbortedNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    callStateTimer->stop();
+    callStateTimer.stop();
     auto ret = ongoingCall.endCall();
     return std::make_shared<CellularResponseMessage>(ret);
 }

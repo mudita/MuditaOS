@@ -14,7 +14,7 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <Service/Timer.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <PhoneModes/Observer.hpp>
 #include <SwitchData.hpp>
 
@@ -161,10 +161,10 @@ namespace app::manager
         bool autoLockEnabled; ///< a flag which indicates whether the autoLockTimer should be armed.
                               /// @note: The flag value depends on database settings "gs_lock_time". If the
                               /// "gs_lock_time" is set to less than 1000 ms, it will be false, otherwise true.
-        std::unique_ptr<sys::Timer> autoLockTimer; //< auto-lock timer to count time from last user's activity.
-                                                   // If it reaches time defined in settings database application
-                                                   // manager is sending signal to Application Desktop in order to
-                                                   // lock screen.
+        sys::TimerHandle autoLockTimer; //< auto-lock timer to count time from last user's activity.
+                                        // If it reaches time defined in settings database application
+                                        // manager is sending signal to Application Desktop in order to
+                                        // lock screen.
         std::unique_ptr<settings::Settings> settings;
         std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
         void displayLanguageChanged(std::string value);

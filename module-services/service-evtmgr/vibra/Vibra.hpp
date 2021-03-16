@@ -1,14 +1,14 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Service/Service.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <bsp/vibrator/vibrator.hpp>
 
 namespace sys
 {
-    class Timer;
     class Service;
 } // namespace sys
 
@@ -25,17 +25,17 @@ namespace vibra_handle
         /// set the same way.
         void Pulse();
         /// but we also want to repeat pulses during eg. full length of ringtone
-        void PulseRepeat(sys::ms time);
+        void PulseRepeat(std::chrono::milliseconds time);
         void PulseRepeat(); /// infinite repeat ... until stop summoned
         void PulseRepeatStop();
 
       private:
-        std::unique_ptr<sys::Timer> vibratorTimerOneshot;
-        std::unique_ptr<sys::Timer> vibratorTimerPause;
+        sys::TimerHandle vibratorTimer;
+        sys::TimerHandle vibratorTimerPause;
+        sys::Service *parent;
 
         int repetitions = 1;
 
         void intPulse(bool repetitive);
-        std::function<void(sys::Timer &)> nullTimerCallback{};
     };
 } // namespace vibra_handle

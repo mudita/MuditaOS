@@ -6,7 +6,6 @@
 #include "OptionSetting.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "OptionSetting.hpp"
-#include "GuiTimer.hpp"
 
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <i18n/i18n.hpp>
@@ -24,21 +23,20 @@ namespace gui
 
         setTitle(utils::localize.get("app_settings_display_display_light"));
 
-        timerTask = std::make_unique<app::GuiTimer>(
-            "AmbientLightTimer", application, gui::lighting::AMBIENT_LIGHT_TIMER_MS, Timer::Type::Continous);
-        timerCallback = [this](Item &it, Timer &task) { return onTimerTimeout(it, task); };
-        timerTask->start();
-        application->connect(std::move(timerTask), this);
+        timerCallback = [this](Item &it, sys::Timer &task) { return onTimerTimeout(it, task); };
+        timerTask     = app::GuiTimerFactory::createPeriodicTimer(
+            application, this, "AmbientLightTimer", std::chrono::milliseconds{gui::lighting::AMBIENT_LIGHT_TIMER_MS});
+        timerTask.start();
     }
 
     DisplayLightWindow::~DisplayLightWindow()
     {
-        if (timerTask != nullptr) {
-            timerTask->stop();
+        if (timerTask.isActive()) {
+            timerTask.stop();
         }
     }
 
-    auto DisplayLightWindow::onTimerTimeout(Item &self, Timer &task) -> bool
+    auto DisplayLightWindow::onTimerTimeout(Item &self, sys::Timer &task) -> bool
     {
         ambientLight = bsp::light_sensor::readout();
         refreshOptionsList();

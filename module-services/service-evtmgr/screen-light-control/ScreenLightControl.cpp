@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ScreenLightControl.hpp"
 
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 #include <agents/settings/SystemSettings.hpp>
 
 namespace screen_light_control
@@ -36,9 +36,14 @@ namespace screen_light_control
     ScreenLightControl::ScreenLightControl(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
         : settings(settings)
     {
-        controlTimer = std::make_unique<sys::Timer>("LightControlTimer", parent, CONTROL_TIMER_MS);
-        readoutTimer = std::make_unique<sys::Timer>("LightSensorReadoutTimer", parent, READOUT_TIMER_MS);
-
+        controlTimer = sys::TimerFactory::createPeriodicTimer(parent,
+                                                              "LightControlTimer",
+                                                              std::chrono::milliseconds{CONTROL_TIMER_MS},
+                                                              [this](sys::Timer &) { controlTimerCallback(); });
+        readoutTimer = sys::TimerFactory::createPeriodicTimer(parent,
+                                                              "LightSensorReadoutTimer",
+                                                              std::chrono::milliseconds{READOUT_TIMER_MS},
+                                                              [this](sys::Timer &) { readoutTimerCallback(); });
         initFromSettings();
     }
 
@@ -130,16 +135,14 @@ namespace screen_light_control
 
     void ScreenLightControl::enableTimers()
     {
-        controlTimer->connect([&](sys::Timer &) { controlTimerCallback(); });
-        readoutTimer->connect([&](sys::Timer &) { readoutTimerCallback(); });
-        controlTimer->start();
-        readoutTimer->start();
+        controlTimer.start();
+        readoutTimer.start();
     }
 
     void ScreenLightControl::disableTimers()
     {
-        controlTimer->stop();
-        readoutTimer->stop();
+        controlTimer.stop();
+        readoutTimer.stop();
     }
 
     void ScreenLightControl::setAutomaticModeParameters(const Parameters &params)
@@ -197,8 +200,8 @@ namespace screen_light_control
     {
         bsp::eink_frontlight::turnOff();
         bsp::light_sensor::standby();
-        controlTimer->stop();
-        readoutTimer->stop();
+        controlTimer.stop();
+        readoutTimer.stop();
         lightOn = false;
     }
 } // namespace screen_light_control

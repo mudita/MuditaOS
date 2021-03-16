@@ -20,6 +20,7 @@
 #include <service-db/QueryMessage.hpp>
 #include <purefs/filesystem_paths.hpp>
 #include <module-sys/SystemManager/SystemManager.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 
 #include <cinttypes>
 #include <filesystem>
@@ -91,8 +92,11 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         desktopWorker->run();
     }
 
-    transferTimer = std::make_unique<sys::Timer>("WorkerDesktop file upload", this, sdesktop::file_transfer_timeout);
-    transferTimer->connect([&](sys::Timer &) { desktopWorker->cancelTransferOnTimeout(); });
+    transferTimer =
+        sys::TimerFactory::createPeriodicTimer(this,
+                                               "WorkerDesktop file upload",
+                                               std::chrono::milliseconds{sdesktop::file_transfer_timeout},
+                                               [this](sys::Timer &) { desktopWorker->cancelTransferOnTimeout(); });
 
     connect(sdesktop::developerMode::DeveloperModeRequest(), [&](sys::Message *msg) {
         auto request = static_cast<sdesktop::developerMode::DeveloperModeRequest *>(msg);
@@ -175,13 +179,12 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
         if (timerStateMsg != nullptr && timerStateMsg->messageType == MessageType::TransferTimer) {
             switch (timerStateMsg->req) {
             case sdesktop::transfer::TransferTimerState::Start:
-                transferTimer->start();
-                break;
+                [[fallthrough]];
             case sdesktop::transfer::TransferTimerState::Reload:
-                transferTimer->reload();
+                transferTimer.start();
                 break;
             case sdesktop::transfer::TransferTimerState::Stop:
-                transferTimer->stop();
+                transferTimer.stop();
                 break;
             case sdesktop::transfer::TransferTimerState::None:
                 [[fallthrough]];

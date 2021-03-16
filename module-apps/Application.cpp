@@ -6,8 +6,7 @@
 #include "GuiTimer.hpp"      // for GuiTimer
 #include "Item.hpp"          // for Item
 #include "MessageType.hpp"   // for MessageType
-#include "Service/Timer.hpp" // for Timer
-#include "Timer.hpp"         // for Timer
+#include "module-sys/Timers/TimerFactory.hpp" // for Timer
 #include "TopBar.hpp"
 #include "Translator.hpp"                // for KeyInputSim...
 #include "common_data/EventStore.hpp"    // for Battery
@@ -94,8 +93,10 @@ namespace app
                                                                        : gui::top_bar::TimeMode::Time24h);
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 
-        longPressTimer = std::make_unique<sys::Timer>("LongPress", this, key_timer_ms);
-        longPressTimer->connect([&](sys::Timer &) { longPressTimerCallback(); });
+        longPressTimer = sys::TimerFactory::createPeriodicTimer(this,
+                                                                "LongPress",
+                                                                std::chrono::milliseconds{key_timer_ms},
+                                                                [this](sys::Timer &) { longPressTimerCallback(); });
 
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
@@ -136,7 +137,7 @@ namespace app
             messageInputEventApplication(this, this->GetName(), iev);
             // clean previous key
             keyTranslator->prev_key_press = {};
-            longPressTimer->stop();
+            longPressTimer.stop();
         }
     }
 
@@ -301,10 +302,10 @@ namespace app
     {
         AppInputEventMessage *msg = reinterpret_cast<AppInputEventMessage *>(msgl);
         if (msg->getEvent().state == gui::InputEvent::State::keyPressed) {
-            longPressTimer->start();
+            longPressTimer.start();
         }
         else if (msg->getEvent().state == gui::InputEvent::State::keyReleasedShort) {
-            longPressTimer->stop();
+            longPressTimer.stop();
         }
         if (not windowsStack.isEmpty() && getCurrentWindow()->onInput(msg->getEvent())) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -746,10 +747,9 @@ namespace app
         return windowsStack.get(name);
     }
 
-    void Application::connect(std::unique_ptr<app::GuiTimer> &&timer, gui::Item *item)
+    void Application::connect(GuiTimer *timer, gui::Item *item)
     {
-        timer->sysapi.connect(item);
-        item->attachTimer(std::move(timer));
+        item->attachTimer(timer);
     }
 
     const gui::top_bar::Configuration &Application::getTopBarConfiguration() const noexcept

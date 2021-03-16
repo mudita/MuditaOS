@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Service/Service.hpp>
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/TimerHandle.hpp>
 
 #include <list>
 
@@ -50,6 +50,6 @@ namespace service::detail
 
       private:
         std::list<std::shared_ptr<msg::FileChangeMessage>> mMsgs;
-        std::unique_ptr<sys::Timer> mIdxTimer;
+        sys::TimerHandle mIdxTimer;
     };
 } // namespace service::detail

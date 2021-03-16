@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
@@ -60,7 +60,7 @@ void EventManagerServiceAPI::vibraStop(sys::Service *serv)
 /*
  * @brief Call repetitive vibra pulses for given time [ms]
  */
-void EventManagerServiceAPI::vibraPulseRepeat(sys::Service *serv, sys::ms time)
+void EventManagerServiceAPI::vibraPulseRepeat(sys::Service *serv, std::chrono::milliseconds time)
 {
     serv->bus.sendUnicast(std::make_shared<sevm::VibraMessage>(bsp::vibrator::Action::pulseRepeat, time),
                           service::name::evt_manager);

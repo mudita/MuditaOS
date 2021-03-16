@@ -11,7 +11,7 @@
 #include <Modem/TS0710/DLC_channel.h>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 #include <log/log.hpp>
 #include <module-cellular/at/Result.hpp>
 #include <module-cellular/at/UrcFactory.hpp>
@@ -47,12 +47,12 @@ namespace FotaService
         bus.channels.push_back(sys::BusChannel::ServiceFotaNotifications);
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 
-        connectionTimer = std::make_unique<sys::Timer>("Fota", this, defaultTimer);
-        connectionTimer->connect([&](sys::Timer &) {
-            std::shared_ptr<InternetRequestMessage> msg =
-                std::make_shared<InternetRequestMessage>(MessageType::CellularListCurrentCalls);
-            bus.sendUnicast(msg, service::name::fota);
-        });
+        connectionTimer = sys::TimerFactory::createPeriodicTimer(
+            this, "Fota", std::chrono::milliseconds{defaultTimer}, [this](sys::Timer &) {
+                std::shared_ptr<InternetRequestMessage> msg =
+                    std::make_shared<InternetRequestMessage>(MessageType::CellularListCurrentCalls);
+                bus.sendUnicast(msg, service::name::fota);
+            });
         registerMessageHandlers();
     }
 
