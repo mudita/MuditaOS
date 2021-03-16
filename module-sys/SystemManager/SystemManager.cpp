@@ -16,7 +16,6 @@
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
-#include <Service/Timer.hpp>
 #include <service-desktop/service-desktop/Constants.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-cellular/CellularMessage.hpp>
@@ -29,6 +28,7 @@
 #include "messages/PhoneModeRequest.hpp"
 #include "messages/TetheringStateRequest.hpp"
 #include <time/ScopedTime.hpp>
+#include "Timers/TimerFactory.hpp"
 
 const inline size_t systemManagerStack = 4096 * 2;
 
@@ -167,9 +167,9 @@ namespace sys
         // Start System manager
         StartService();
 
-        cpuStatisticsTimer = std::make_unique<sys::Timer>("cpuStatistics", this, constants::timerInitInterval.count());
-        cpuStatisticsTimer->connect([&](sys::Timer &) { CpuStatisticsTimerHandler(); });
-        cpuStatisticsTimer->start();
+        cpuStatisticsTimer = sys::TimerFactory::createPeriodicTimer(
+            this, "cpuStatistics", constants::timerInitInterval, [this](sys::Timer &) { CpuStatisticsTimerHandler(); });
+        cpuStatisticsTimer.start();
     }
 
     bool SystemManager::Update(Service *s, const std::string &updateOSVer, std::string &currentOSVer)
@@ -309,14 +309,16 @@ namespace sys
         }
 
         servicesPreShutdownRoutineTimeout =
-            std::make_unique<sys::Timer>("servicesPreShutdownRoutine", this, preShutdownRoutineTimeout);
-        servicesPreShutdownRoutineTimeout->connect([&](sys::Timer &) { CloseServices(); });
-        servicesPreShutdownRoutineTimeout->start();
+            sys::TimerFactory::createPeriodicTimer(this,
+                                                   "servicesPreShutdownRoutine",
+                                                   std::chrono::milliseconds{preShutdownRoutineTimeout},
+                                                   [this](sys::Timer &) { CloseServices(); });
+        servicesPreShutdownRoutineTimeout.start();
     }
 
     void SystemManager::readyToCloseHandler(Message *msg)
     {
-        if (!readyForCloseRegister.empty() && servicesPreShutdownRoutineTimeout->isCurrentlyActive()) {
+        if (!readyForCloseRegister.empty() && servicesPreShutdownRoutineTimeout.isActive()) {
             auto message = static_cast<ReadyToCloseMessage *>(msg);
             LOG_INFO("ready to close %s", message->sender.c_str());
             readyForCloseRegister.erase(
@@ -326,7 +328,7 @@ namespace sys
             // All services responded
             if (readyForCloseRegister.empty()) {
                 LOG_INFO("All services ready to close.");
-                servicesPreShutdownRoutineTimeout->stop();
+                servicesPreShutdownRoutineTimeout.stop();
                 CloseServices();
             }
         }
@@ -433,11 +435,11 @@ namespace sys
 
             if (msg->getAction() == sys::CpuFrequencyMessage::Action::Increase) {
                 powerManager->IncreaseCpuFrequency();
-                cpuStatisticsTimer->reload();
+                cpuStatisticsTimer.start();
             }
             else if (msg->getAction() == sys::CpuFrequencyMessage::Action::Decrease) {
                 powerManager->DecreaseCpuFrequency();
-                cpuStatisticsTimer->reload();
+                cpuStatisticsTimer.start();
             }
 
             return sys::MessageNone{};
@@ -599,7 +601,7 @@ namespace sys
     {
         if (!cpuStatisticsTimerInit) {
             cpuStatisticsTimerInit = true;
-            cpuStatisticsTimer->setInterval(constants::timerPeriodInterval.count());
+            cpuStatisticsTimer.restart(constants::timerPeriodInterval);
         }
 
         cpuStatistics->Update();

@@ -11,6 +11,7 @@
 #include "Service/Common.hpp"              // for ReturnCodes
 #include "Service/Message.hpp"             // for MessagePointer
 #include "Service/Service.hpp"             // for Service
+#include "Timers/TimerHandle.hpp"
 #include "SwitchData.hpp"                  // for SwitchData
 #include "SystemManager/SystemManager.hpp" // for SystemManager
 #include "bsp/keyboard/key_codes.hpp"      // for bsp
@@ -31,7 +32,6 @@
 
 namespace app
 {
-    class GuiTimer;
     class WindowsStack;
 } // namespace app
 namespace gui
@@ -49,10 +49,6 @@ namespace gui
 namespace gui
 {
     class KeyInputSimpleTranslation;
-}
-namespace sys
-{
-    class Timer;
 }
 namespace settings
 {
@@ -181,7 +177,7 @@ namespace app
         std::unordered_map<manager::actions::ActionId, OnActionReceived> receivers;
 
       public:
-        std::unique_ptr<sys::Timer> longPressTimer;
+        sys::TimerHandle longPressTimer;
         void clearLongPressTimeout();
 
         Application(std::string name,
@@ -355,7 +351,7 @@ namespace app
         /// to avoid conflicts with connect below
         using Service::connect;
         /// connects item with GuiTimer and stores it in app
-        void connect(std::unique_ptr<GuiTimer> &&timer, gui::Item *item);
+        void connect(GuiTimer *timer, gui::Item *item);
 
       protected:
         /// key translator to handle

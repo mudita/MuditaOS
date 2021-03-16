@@ -11,6 +11,7 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 
 #include <service-db/DBServiceName.hpp>
@@ -22,11 +23,6 @@
 
 class DLC_channel;
 class FotaUrcHandler;
-
-namespace sys
-{
-    class Timer;
-} // namespace sys
 
 namespace service::name
 {
@@ -89,7 +85,7 @@ namespace FotaService
          */
         sys::MessagePointer handleRawProgress(sys::Message *req);
 
-        std::unique_ptr<sys::Timer> connectionTimer;
+        sys::TimerHandle connectionTimer;
         void getApnConfiguration();
         void getConfig();
         void getActiveCotext();

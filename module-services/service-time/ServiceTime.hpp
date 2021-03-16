@@ -14,7 +14,6 @@
 #include <Service/Service.hpp>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
 #include <module-db/queries/calendar/QueryEventsGet.hpp>
-#include <module-sys/Service/Timer.hpp>
 
 #include <functional>
 #include <string> // for allocator, string

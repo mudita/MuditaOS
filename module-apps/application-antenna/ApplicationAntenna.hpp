@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <module-sys/Timers/TimerHandle.hpp>
 #include <Application.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <windows/AppWindow.hpp>
@@ -26,7 +27,7 @@ namespace app
     class ApplicationAntenna : public app::Application
     {
       protected:
-        std::unique_ptr<sys::Timer> appTimer;
+        sys::TimerHandle appTimer;
         void timerHandler(void);
         bool cellularRequestInProgress = false;
         bsp::cellular::antenna antenna;

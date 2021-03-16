@@ -10,6 +10,7 @@
 #include "Service/Common.hpp"  // for ReturnCodes, ServicePowerMode
 #include "Service/Message.hpp" // for MessagePointer, DataMessage (ptr only), ResponseMessage (ptr only)
 #include "Service/Service.hpp" // for Service
+#include "Timers/TimerHandle.hpp"
 #include "Constants.hpp"
 #include "WorkerDesktop.hpp"
 #include "USBSecurityModel.hpp"
@@ -87,7 +88,7 @@ class ServiceDesktop : public sys::Service
   private:
     std::unique_ptr<sdesktop::USBSecurityModel> usbSecurityModel;
     std::unique_ptr<settings::Settings> settings;
-    std::unique_ptr<sys::Timer> transferTimer;
+    sys::TimerHandle transferTimer;
     std::unique_ptr<sdesktop::bluetooth::BluetoothMessagesHandler> btMsgHandler;
 };
 

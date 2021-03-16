@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Service.hpp"
@@ -7,8 +7,9 @@
 #include "Service/Common.hpp"  // for BusChannels, ReturnCodes, ReturnCodes...
 #include "Service/Mailbox.hpp" // for Mailbox
 #include "Service/Message.hpp" // for Message, MessagePointer, DataMessage, Resp...
-#include "Timer.hpp"           // for Timer
-#include "TimerMessage.hpp"    // for TimerMessage
+#include "Timers/SystemTimer.hpp"
+#include "module-sys/Timers/TimerHandle.hpp"  // for Timer
+#include "module-sys/Timers/TimerMessage.hpp" // for TimerMessage
 #include "log/debug.hpp"       // for DEBUG_SERVICE_MESSAGES
 #include "log/log.hpp"         // for LOG_ERROR, LOG_DEBUG, LOG_FATAL
 #include "mutex.hpp"           // for cpp_freertos
@@ -201,14 +202,27 @@ namespace sys
             return ReturnCodes::Failure;
         }
 
-        auto timer = timers.get(timer_message->getTimer());
-        if (timer == timers.noTimer()) {
+        auto sysTimer = timer_message->getTimer();
+        auto timer    = timers.get(sysTimer);
+        if (timer == nullptr) {
             LOG_ERROR("No such timer registered in Service");
             return ReturnCodes::Failure;
         }
-
-        (*timer)->onTimeout();
+        timer->onTimeout();
         return ReturnCodes::Success;
+    }
+
+    void Service::Timers::attach(timer::SystemTimer *timer)
+    {
+        list.push_back(timer);
+    }
+
+    void Service::Timers::detach(timer::SystemTimer *timer)
+    {
+        const auto it = std::find(list.begin(), list.end(), timer);
+        if (it != list.end()) {
+            list.erase(it);
+        }
     }
 
     void Service::Timers::stop()
@@ -216,6 +230,15 @@ namespace sys
         for (auto timer : list) {
             timer->stop();
         }
+    }
+
+    auto Service::Timers::get(timer::SystemTimer *timer) noexcept -> timer::SystemTimer *
+    {
+        auto it = std::find(list.begin(), list.end(), timer);
+        if (it == list.end()) {
+            return nullptr;
+        }
+        return *it;
     }
 
     void Service::sendCloseReadyMessage(Service *service)

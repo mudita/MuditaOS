@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/Timer.hpp>
 #include <Utils.hpp>
 
 #include <chrono>
@@ -23,7 +23,7 @@ namespace bsp
 
         void enable();
         void disable();
-        void init(sys::ms pulse = static_cast<sys::ms>(defaultVibraPulseMs));
+        void init(std::chrono::milliseconds pulse = std::chrono::milliseconds{defaultVibraPulseMs});
         void deinit();
     } // namespace vibrator
 } // namespace bsp

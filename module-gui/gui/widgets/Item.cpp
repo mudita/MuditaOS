@@ -1,12 +1,10 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Item.hpp"
 #include "BoundingBox.hpp" // for BoundingBox, BoundingBox::(anonymous)
 #include "InputEvent.hpp"  // for InputEvent, KeyCode, InputEvent::State
 #include "Navigation.hpp"  // for Navigation
-#include "Timer.hpp"       // for Timer
-#include <Timer.hpp>
 #include <algorithm> // for find
 #include <list>      // for list<>::iterator, list, operator!=, _List...
 #include <memory>
@@ -515,7 +513,7 @@ namespace gui
         return false;
     }
 
-    auto Item::onTimer(Timer &timer) -> bool
+    auto Item::onTimer(sys::Timer &timer) -> bool
     {
         if (timerCallback != nullptr) {
             return timerCallback(*this, timer);
@@ -523,10 +521,12 @@ namespace gui
         return false;
     }
 
-    void Item::detachTimer(Timer &timer)
+    void Item::detachTimer(sys::Timer &timer)
     {
-        auto el = std::find_if(timers.begin(), timers.end(), [&](auto &el) -> bool { return el.get() == &timer; });
-        timers.erase(el);
+        const auto it = std::find_if(timers.begin(), timers.end(), [&timer](auto &ptr) { return ptr == &timer; });
+        if (it != timers.end()) {
+            timers.erase(it);
+        }
     }
 
     void Item::accept(GuiVisitor &visitor)

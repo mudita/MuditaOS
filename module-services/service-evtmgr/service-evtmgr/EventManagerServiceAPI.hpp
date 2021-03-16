@@ -1,12 +1,13 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <chrono>
+
 #include <MessageType.hpp>
 #include <Service/Message.hpp>
 #include <bsp/common.hpp>
-#include <Service/Timer.hpp>
 
 namespace sys
 {
@@ -36,7 +37,7 @@ namespace EventManagerServiceAPI
     /*
      * @brief Call repetitive vibra pulses for given time [ms]
      */
-    void vibraPulseRepeat(sys::Service *serv, sys::ms time);
+    void vibraPulseRepeat(sys::Service *serv, std::chrono::milliseconds time);
 
     /*
      * @brief Call repetitive vibra pulses until stop message is sent

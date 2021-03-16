@@ -7,7 +7,7 @@
 
 #include <Application.hpp>
 #include <Service/Message.hpp>
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/TimerHandle.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <time/time_conversion.hpp>
@@ -74,7 +74,7 @@ namespace app
         void CallerIdHandler(const CellularCallerIdMessage *const msg);
         void RingingHandler(const CellularRingingMessage *const msg);
 
-        std::unique_ptr<sys::Timer> callerIdTimer;
+        sys::TimerHandle callerIdTimer;
 
       protected:
         call::State state = call::State::IDLE;

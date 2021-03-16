@@ -7,7 +7,7 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <Service/Timer.hpp>
+#include <Timers/TimerHandle.hpp>
 
 #include <service-db/DBServiceName.hpp>
 
@@ -89,7 +89,7 @@ namespace service::gui
         std::unique_ptr<DrawCommandsQueue> commandsQueue;
         std::unique_ptr<::gui::ColorScheme> colorSchemeUpdate;
         std::optional<CachedRender> cachedRender;
-        std::unique_ptr<sys::Timer> contextReleaseTimer;
+        sys::TimerHandle contextReleaseTimer;
         State currentState;
         bool lastRenderScheduled;
         bool waitingForLastRender;

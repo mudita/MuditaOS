@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -9,7 +9,7 @@
  */
 
 #include "ApplicationAntenna.hpp"
-#include "Service/Timer.hpp"
+#include "module-sys/Timers/TimerFactory.hpp"
 #include "module-cellular/at/response.hpp"
 #include <service-cellular/CellularServiceAPI.hpp>
 
@@ -40,9 +40,9 @@ namespace app
         : Application(name, parent, startInBackground, antennaApplicationStackSize)
     {
         bus.channels.push_back(sys::BusChannel::AntennaNotifications);
-        appTimer = std::make_unique<sys::Timer>("Antena", this, 2000);
-        appTimer->connect([=](sys::Timer &) { timerHandler(); });
-        appTimer->start();
+        appTimer = sys::TimerFactory::createPeriodicTimer(
+            this, "Antena", std::chrono::milliseconds{2000}, [this](sys::Timer &) { timerHandler(); });
+        appTimer.start();
     }
 
     ApplicationAntenna::~ApplicationAntenna()

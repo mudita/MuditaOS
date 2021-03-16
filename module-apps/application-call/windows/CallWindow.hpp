@@ -18,9 +18,10 @@ namespace gui
     {
       private:
         gui::KeyInputMappedTranslation translator;
+        sys::TimerHandle callTimer;
+        sys::TimerHandle delayedExitTimer;
         std::chrono::seconds callDuration                   = std::chrono::seconds().zero();
-        bool stop_timer                                     = false;
-        static constexpr inline sys::ms callDelayedStopTime = 3000;
+        static constexpr inline auto callDelayedStopTime    = std::chrono::milliseconds{3000};
 
         [[nodiscard]] auto getDelayedStopTime() const
         {

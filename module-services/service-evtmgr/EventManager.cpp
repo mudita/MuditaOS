@@ -15,6 +15,7 @@
 #include <BaseInterface.hpp>
 #include <MessageType.hpp>
 #include <Service/Worker.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <SystemManager/Constants.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <bsp/common.hpp>
@@ -55,8 +56,11 @@ namespace
 
 EventManager::EventManager(const std::string &name)
     : sys::Service(name, "", stackDepth),
-      settings(std::make_shared<settings::Settings>(this)), loggerTimer{std::make_unique<sys::Timer>(
-                                                                loggerTimerName, this, loggerDelayMs)},
+      settings(std::make_shared<settings::Settings>(this)), loggerTimer{sys::TimerFactory::createPeriodicTimer(
+                                                                this,
+                                                                loggerTimerName,
+                                                                std::chrono::milliseconds{loggerDelayMs},
+                                                                [this](sys::Timer & /*timer*/) { dumpLogsToFile(); })},
       screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(settings, this)),
       Vibra(std::make_unique<vibra_handle::Vibra>(this))
 {
@@ -64,8 +68,7 @@ EventManager::EventManager(const std::string &name)
     alarmTimestamp = 0;
     alarmID        = 0;
     bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
-    loggerTimer->connect([&](sys::Timer &) { dumpLogsToFile(); });
-    loggerTimer->start();
+    loggerTimer.start();
 }
 
 EventManager::~EventManager()
@@ -391,7 +394,7 @@ bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action a
     return response;
 }
 
-bool EventManager::processVibraRequest(bsp::vibrator::Action act, sys::ms RepetitionTime)
+bool EventManager::processVibraRequest(bsp::vibrator::Action act, std::chrono::milliseconds RepetitionTime)
 {
     switch (act) {
     case bsp::vibrator::Action::pulse:

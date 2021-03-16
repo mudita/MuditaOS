@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventReminderWindow.hpp"
+#include <Timers/TimerFactory.hpp>
 #include "application-calendar/widgets/CalendarStyle.hpp"
 #include "module-apps/application-calendar/data/CalendarData.hpp"
 #include <gui/widgets/Window.hpp>
@@ -18,9 +19,10 @@ namespace gui
     {
         buildInterface();
 
-        reminderTimer = std::make_unique<sys::Timer>(
-            "CalendarReminderTimer", app, reminderLifeDuration, sys::Timer::Type::SingleShot);
-        reminderTimer->connect([=](sys::Timer &) { reminderTimerCallback(); });
+        reminderTimer = sys::TimerFactory::createSingleShotTimer(app,
+                                                                 "CalendarReminderTimer",
+                                                                 std::chrono::milliseconds{reminderLifeDuration},
+                                                                 [this](sys::Timer &) { reminderTimerCallback(); });
     }
 
     EventReminderWindow::~EventReminderWindow()
@@ -106,13 +108,12 @@ namespace gui
 
     void EventReminderWindow::startTimer()
     {
-        reminderTimer->connect([=](sys::Timer &) { reminderTimerCallback(); });
-        reminderTimer->reload();
+        reminderTimer.start();
     }
 
     void EventReminderWindow::destroyTimer()
     {
-        reminderTimer->stop();
+        reminderTimer.stop();
     }
 
     auto EventReminderWindow::handleSwitchData(SwitchData *data) -> bool

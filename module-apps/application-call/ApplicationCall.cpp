@@ -26,6 +26,7 @@
 #include <cassert>
 #include <module-apps/application-phonebook/data/PhonebookItemData.hpp>
 #include <module-services/service-db/service-db/DBServiceAPI.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 
 namespace app
 {
@@ -91,9 +92,9 @@ namespace app
     void ApplicationCall::CallerIdHandler(const CellularCallerIdMessage *const msg)
     {
         if (getState() == call::State::IDLE) {
-            if (callerIdTimer) {
-                callerIdTimer->stop();
-                callerIdTimer.reset(nullptr);
+            if (callerIdTimer.isValid()) {
+                callerIdTimer.stop();
+                callerIdTimer.reset();
             }
             manager::Controller::sendAction(
                 this, manager::actions::Call, std::make_unique<app::IncomingCallData>(msg->number));
@@ -103,19 +104,15 @@ namespace app
     void ApplicationCall::IncomingCallHandler(const CellularIncominCallMessage *const msg)
     {
         if (getState() == call::State::IDLE) {
-            constexpr sys::ms callerIdTimeout = 1000;
+            constexpr auto callerIdTimeout = std::chrono::milliseconds{1000};
             callerIdTimer =
-                std::make_unique<sys::Timer>("CallerIdTimer", this, callerIdTimeout, sys::Timer::Type::SingleShot);
-            callerIdTimer->connect([=](sys::Timer &) {
-                callerIdTimer->stop();
-                manager::Controller::sendAction(
-                    this,
-                    manager::actions::Call,
-                    std::make_unique<app::IncomingCallData>(utils::PhoneNumber().getView()));
-            });
-            if (callerIdTimer) {
-                callerIdTimer->start();
-            }
+                sys::TimerFactory::createSingleShotTimer(this, "CallerIdTimer", callerIdTimeout, [=](sys::Timer &) {
+                    manager::Controller::sendAction(
+                        this,
+                        manager::actions::Call,
+                        std::make_unique<app::IncomingCallData>(utils::PhoneNumber().getView()));
+                });
+            callerIdTimer.start();
         }
     }
 
@@ -143,7 +140,7 @@ namespace app
 
             switch (msg->type) {
             case CellularNotificationMessage::Type::CallAborted: {
-                callerIdTimer.reset(nullptr);
+                callerIdTimer.reset();
                 CallAbortHandler();
             } break;
             case CellularNotificationMessage::Type::CallActive: {
