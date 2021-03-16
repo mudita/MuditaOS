@@ -14,14 +14,14 @@ namespace gui
     class QuoteCategoriesWindow : public AppWindow
     {
       public:
-        QuoteCategoriesWindow(app::Application *app, std::shared_ptr<app::CategoriesModel> model);
+        QuoteCategoriesWindow(app::Application *app, std::shared_ptr<Quotes::CategoriesModel> model);
 
       private:
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-        std::shared_ptr<app::CategoriesModel> categoriesModel = nullptr;
-        gui::ListView *list                                   = nullptr;
+        std::shared_ptr<Quotes::CategoriesModel> categoriesModel = nullptr;
+        gui::ListView *list                                      = nullptr;
     };
 
 } // namespace gui

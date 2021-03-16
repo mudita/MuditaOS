@@ -33,13 +33,14 @@ namespace style::quotes
 namespace gui
 {
 
-    CategoryWidget::CategoryWidget(const app::QuoteCategory &category,
+    CategoryWidget::CategoryWidget(const Quotes::CategoryRecord &categoryRecord,
+                                   std::function<bool(bool)> enableCategoryCallback,
                                    std::function<void(const UTF8 &)> bottomBarTemporaryMode,
                                    std::function<void()> bottomBarRestoreFromTemporaryMode)
-        : bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
-          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode)), category(category)
+        : category(categoryRecord), enableCategory(std::move(enableCategoryCallback)),
+          bottomBarTemporaryMode(std::move(bottomBarTemporaryMode)),
+          bottomBarRestoreFromTemporaryMode(std::move(bottomBarRestoreFromTemporaryMode))
     {
-
         setMinimumSize(style::quotes::widget::w, style::quotes::widget::h);
 
         setMargins(gui::Margins(0, style::margins::big, 0, 0));
@@ -64,7 +65,7 @@ namespace gui
         tickImage->setMargins(gui::Margins(
             style::quotes::widget::tick_image_left_margin, 0, style::quotes::widget::tick_image_right_margin, 0));
         tickImage->set("small_tick_W_M");
-        tickImage->setVisible(true);
+        tickImage->setVisible(category.enabled);
         tickImage->activeItem = false;
 
         descriptionLabel = new gui::Label(hBox, 0, 0, 0, 0);
@@ -76,18 +77,18 @@ namespace gui
         descriptionLabel->setFont(style::window::font::medium);
         descriptionLabel->activeItem = false;
 
-        descriptionLabel->setText(category.categoryDescription);
+        descriptionLabel->setText(category.category_name);
 
         focusChangedCallback = [&](gui::Item &item) {
             if (item.focus) {
-                descriptionLabel->setFont(style::footer::font::bold);
+                descriptionLabel->setFont(style::window::font::mediumbold);
                 setFocusItem(inputBoxLabel);
                 auto bottorBarText =
-                    tickImage->visible ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
+                    category.enabled ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
                 this->bottomBarTemporaryMode(bottorBarText);
             }
             else {
-                descriptionLabel->setFont(style::footer::font::medium);
+                descriptionLabel->setFont(style::window::font::medium);
                 setFocusItem(nullptr);
                 this->bottomBarRestoreFromTemporaryMode();
             }
@@ -95,11 +96,14 @@ namespace gui
         };
 
         activatedCallback = [&](gui::Item &item) {
-            tickImage->setVisible(!tickImage->visible);
-            auto bottorBarText =
-                tickImage->visible ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
-            this->bottomBarTemporaryMode(bottorBarText);
-            hBox->resizeItems();
+            if (enableCategory(!category.enabled)) {
+                category.enabled = !category.enabled;
+                tickImage->setVisible(category.enabled);
+                auto bottorBarText =
+                    category.enabled ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
+                this->bottomBarTemporaryMode(bottorBarText);
+                hBox->resizeItems();
+            }
             return true;
         };
 

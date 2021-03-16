@@ -8,7 +8,7 @@
 
 namespace gui
 {
-    QuoteCategoriesWindow::QuoteCategoriesWindow(app::Application *app, std::shared_ptr<app::CategoriesModel> model)
+    QuoteCategoriesWindow::QuoteCategoriesWindow(app::Application *app, std::shared_ptr<Quotes::CategoriesModel> model)
         : AppWindow(app, gui::window::name::quote_categories), categoriesModel(std::move(model))
     {
         buildInterface();

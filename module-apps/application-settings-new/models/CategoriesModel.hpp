@@ -13,16 +13,17 @@ namespace gui
     class CategoryWidget;
 }
 
-namespace app
+namespace Quotes
 {
-
     class CategoriesModel : public app::InternalModel<gui::CategoryWidget *>, public gui::ListItemProvider
     {
       private:
         app::Application *application = nullptr;
 
+        auto getCategoryList() -> std::optional<std::vector<CategoryRecord>>;
+
       public:
-        CategoriesModel(app::Application *app);
+        explicit CategoriesModel(app::Application *app);
         [[nodiscard]] auto requestRecordsCount() -> unsigned int final;
         [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int final;
         auto getItem(gui::Order order) -> gui::ListItem * final;
@@ -30,5 +31,4 @@ namespace app
         void createData();
         void rebuild();
     };
-
-} // namespace app
+} // namespace Quotes
