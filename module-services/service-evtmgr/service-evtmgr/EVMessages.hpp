@@ -123,25 +123,13 @@ namespace sevm
         bsp::cellular::status::value state = bsp::cellular::status::value::INACTIVE;
     };
 
-    class TorchStateMessage : public Message
-    {
-      public:
-        TorchStateMessage(bsp::torch::Action direction) : Message(MessageType::EVMTorchStateMessage), action(direction)
-        {}
-        bsp::torch::Action action;
-        bsp::torch::State state                  = bsp::torch::State::off;
-        bsp::torch::ColourTemperature colourTemp = bsp::torch::ColourTemperature::no_change;
-    };
+    class ToggleTorchOnOffMessage : public Message
+    {};
 
-    class TorchStateResultMessage : public TorchStateMessage
-    {
-      public:
-        TorchStateResultMessage(bsp::torch::Action direction) : TorchStateMessage(direction)
-        {}
-        bool success = false;
-    };
+    class ToggleTorchColorMessage : public Message
+    {};
 
-    class KeypadBacklightMessage : public sys::Message
+    class KeypadBacklightMessage : public Message
     {
       public:
         explicit KeypadBacklightMessage(bsp::keypad_backlight::Action action) : action(action)
@@ -150,7 +138,7 @@ namespace sevm
         bsp::keypad_backlight::Action action;
     };
 
-    class KeypadBacklightResponseMessage : public sys::Message
+    class KeypadBacklightResponseMessage : public Message
     {
       public:
         KeypadBacklightResponseMessage()

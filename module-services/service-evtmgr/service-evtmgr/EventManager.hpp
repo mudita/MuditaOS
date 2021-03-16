@@ -32,6 +32,8 @@ class EventManager : public sys::Service
     void handleMinuteUpdate(time_t timestamp);
     bool processKeypadBacklightRequest(bsp::keypad_backlight::Action act);
     bool processVibraRequest(bsp::vibrator::Action act, sys::ms RepetitionTime = static_cast<sys::ms>(1000));
+    void toggleTorchOnOff();
+    void toggleTorchColor();
 
     std::shared_ptr<settings::Settings> settings;
     std::unique_ptr<sys::Timer> loggerTimer;

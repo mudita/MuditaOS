@@ -588,30 +588,16 @@ namespace app
         return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
     }
 
-    void Application::toggleTorch(bsp::torch::ColourTemperature temperature)
+    void Application::toggleTorchOnOff()
     {
-        using namespace bsp;
+        auto msg = std::make_shared<sevm::ToggleTorchOnOffMessage>();
+        bus.sendUnicast(std::move(msg), service::name::evt_manager);
+    }
 
-        auto message     = std::make_shared<sevm::TorchStateMessage>(torch::Action::getState);
-        auto retGetState = bus.sendUnicast(std::move(message), service::name::evt_manager, pdMS_TO_TICKS(1500));
-        if (retGetState.first == sys::ReturnCodes::Success) {
-            auto msgGetState = dynamic_cast<sevm::TorchStateResultMessage *>(retGetState.second.get());
-            if (msgGetState == nullptr) {
-                return;
-            }
-            auto msgSetState = std::make_shared<sevm::TorchStateMessage>(torch::Action::setState);
-
-            switch (msgGetState->state) {
-            case torch::State::off:
-                msgSetState->state      = torch::State::on;
-                msgSetState->colourTemp = temperature;
-                break;
-            case torch::State::on:
-                msgSetState->state = torch::State::off;
-                break;
-            }
-            bus.sendUnicast(msgSetState, service::name::evt_manager);
-        }
+    void Application::toggleTorchColor()
+    {
+        auto msg = std::make_shared<sevm::ToggleTorchColorMessage>();
+        bus.sendUnicast(std::move(msg), service::name::evt_manager);
     }
 
     void Application::requestAction(sys::Service *sender,
