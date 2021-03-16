@@ -1,16 +1,12 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <module-sys/Timers/TimerHandle.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include "ControlFunctions.hpp"
 #include <Utils.hpp>
-
-namespace sys
-{
-    class Timer;
-}
 
 /// Screen light control algorithm. Automatic/Manual mode of operation.
 /// Processing of ambient light sensor input to screen brightness output.
@@ -91,8 +87,8 @@ namespace screen_light_control
         static constexpr inline auto CONTROL_TIMER_MS = 25;
         static constexpr inline auto READOUT_TIMER_MS = 500;
 
-        std::unique_ptr<sys::Timer> controlTimer;
-        std::unique_ptr<sys::Timer> readoutTimer;
+        sys::TimerHandle controlTimer;
+        sys::TimerHandle readoutTimer;
 
         bool lightOn                                               = false;
         screen_light_control::ScreenLightMode automaticMode        = ScreenLightMode::Manual;

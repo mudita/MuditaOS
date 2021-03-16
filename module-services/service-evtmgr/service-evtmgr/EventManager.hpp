@@ -9,7 +9,7 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <Service/Timer.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <Service/Worker.hpp>
 #include <bsp/common.hpp>
 #include <bsp/keyboard/key_codes.hpp>
@@ -31,12 +31,13 @@ class EventManager : public sys::Service
     static constexpr auto stackDepth = 4096;
     void handleMinuteUpdate(time_t timestamp);
     bool processKeypadBacklightRequest(bsp::keypad_backlight::Action act);
-    bool processVibraRequest(bsp::vibrator::Action act, sys::ms RepetitionTime = static_cast<sys::ms>(1000));
+    bool processVibraRequest(bsp::vibrator::Action act,
+                             std::chrono::milliseconds RepetitionTime = std::chrono::milliseconds{1000});
     void toggleTorchOnOff();
     void toggleTorchColor();
 
     std::shared_ptr<settings::Settings> settings;
-    std::unique_ptr<sys::Timer> loggerTimer;
+    sys::TimerHandle loggerTimer;
 
   protected:
     std::unique_ptr<WorkerEvent> EventWorker;

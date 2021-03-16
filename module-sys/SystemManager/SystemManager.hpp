@@ -19,6 +19,7 @@
 #include "Service/Mailbox.hpp"
 #include "Service/Service.hpp"
 #include "Service/ServiceCreator.hpp"
+#include "Timers/TimerHandle.hpp"
 #include "PowerManager.hpp"
 #include "PhoneModes/Subject.hpp"
 #include <common_data/RawKey.hpp>
@@ -183,8 +184,8 @@ namespace sys
         bool cpuStatisticsTimerInit{false};
 
         std::vector<std::unique_ptr<BaseServiceCreator>> systemServiceCreators;
-        std::unique_ptr<sys::Timer> cpuStatisticsTimer;
-        std::unique_ptr<sys::Timer> servicesPreShutdownRoutineTimeout;
+        sys::TimerHandle cpuStatisticsTimer;
+        sys::TimerHandle servicesPreShutdownRoutineTimeout;
         std::unique_ptr<phone_modes::Subject> phoneModeSubject;
         InitFunction userInit;
         InitFunction systemInit;

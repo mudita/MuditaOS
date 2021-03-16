@@ -1,9 +1,8 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 // module-gui
 #include "AppWindow.hpp"
-#include "Service/Timer.hpp"
 #include "gui/widgets/Window.hpp"
 
 // module-utils
@@ -11,6 +10,7 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-evtmgr/EventManager.hpp>
 #include <service-appmgr/model/ApplicationManager.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 // MessageType
 #include "MessageType.hpp"
 // this module
@@ -26,9 +26,9 @@ namespace app
                                        sys::ServicePriority priority)
         : Application(name, parent, startInBackground, stackDepth, priority)
     {
-        timerClock = std::make_unique<sys::Timer>("Clock", this, 1000);
-        timerClock->connect([&](sys::Timer &) { timerClockCallback(); });
-        timerClock->start();
+        timerClock = sys::TimerFactory::createPeriodicTimer(
+            this, "Clock", std::chrono::milliseconds{1000}, [&](sys::Timer &) { timerClockCallback(); });
+        timerClock.start();
     }
 
     void ApplicationClock::timerClockCallback()
@@ -76,7 +76,7 @@ namespace app
 
     sys::ReturnCodes ApplicationClock::DeinitHandler()
     {
-        timerClock->stop();
+        timerClock.stop();
         return sys::ReturnCodes::Success;
     }
 

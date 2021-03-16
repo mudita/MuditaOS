@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,6 +16,7 @@
 #include <utility>              // for move
 #include <core/DrawCommandForward.hpp>
 #include <module-gui/gui/widgets/visitor/GuiVisitor.hpp>
+#include <module-sys/Timers/Timer.hpp>
 
 namespace gui
 {
@@ -25,10 +26,6 @@ namespace gui
 {
     class Navigation;
 } // namespace gui
-namespace gui
-{
-    class Timer;
-}
 
 namespace gui
 {
@@ -147,7 +144,7 @@ namespace gui
         /// callback when timer is called on Item and onTimer is executed
         /// @param `this` : item
         /// @param `timer` : which triggered this callback
-        std::function<bool(Item &, Timer &)> timerCallback = nullptr;
+        std::function<bool(Item &, sys::Timer &)> timerCallback = nullptr;
 
         /// callback on navigation, called when item passes navigation to handle by its children
         /// @param `InputEvent` : input event e.g. key pressed
@@ -197,7 +194,7 @@ namespace gui
         virtual bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim);
         /// called on Timer event in application, triggeres timerCallback
         /// @param : timer timer element which triggered this action
-        virtual bool onTimer(Timer &timer);
+        virtual bool onTimer(sys::Timer &timer);
 
         /// @}
 
@@ -378,13 +375,13 @@ namespace gui
         /// @note this is needed so that timer for element would live as long as element lives.
         /// @details Timers can be attached to Item
         /// in order to pass on an ownership of timer to application/widget which uses its functionalities.
-        void attachTimer(std::unique_ptr<Timer> &&timer)
+        void attachTimer(sys::Timer *timer)
         {
-            timers.emplace_back(std::move(timer));
+            timers.push_back(timer);
         }
 
         /// remove timer from item and as a result - destory it.
-        void detachTimer(Timer &timer);
+        void detachTimer(sys::Timer &timer);
 
         /// simple check function to determine if item is active && visible.
         /// @return true if item is active and visible. Otherwise false.
@@ -407,7 +404,7 @@ namespace gui
 
       private:
         /// list of attached timers to item.
-        std::list<std::unique_ptr<Timer>> timers;
+        std::list<sys::Timer *> timers;
     };
     /// gets navigation direction (LEFT,RIGHT,UP,DOWN) based on incoming input event
     /// @param[in] evt : input event e.g. key pressed

@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Service/Service.hpp>
 #include <module-db/queries/calendar/QueryEventsEdit.hpp>
-#include <module-sys/Service/Timer.hpp>
+#include <module-sys/Timers/TimerHandle.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -25,10 +25,10 @@ namespace stm
     class TimeEvents
     {
       private:
-        bool timersProcessingStarted               = false;
-        std::unique_ptr<sys::Timer> fireEventTimer = nullptr;
-        sys::Service *serv                         = nullptr;
-        std::unique_ptr<sys::Timer> &timer();
+        bool timersProcessingStarted = false;
+        sys::TimerHandle fireEventTimer;
+        sys::Service *serv = nullptr;
+        sys::TimerHandle &timer();
 
       protected:
         sys::Service *service()

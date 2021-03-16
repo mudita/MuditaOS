@@ -21,6 +21,7 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/CpuSentinel.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <bsp/common.hpp>
 #include <utf8/UTF8.hpp>
 #include <optional> // for optional
@@ -48,10 +49,6 @@ namespace db
         class SMSSearchByTypeResult;
     } // namespace query
 } // namespace db
-namespace sys
-{
-    class Timer;
-} // namespace sys
 
 namespace packet_data
 {
@@ -170,9 +167,9 @@ class ServiceCellular : public sys::Service
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
     // used for polling for call state
-    std::unique_ptr<sys::Timer> callStateTimer;
-    std::unique_ptr<sys::Timer> stateTimer;
-    std::unique_ptr<sys::Timer> ussdTimer;
+    sys::TimerHandle callStateTimer;
+    sys::TimerHandle stateTimer;
+    sys::TimerHandle ussdTimer;
     void CallStateTimerHandler();
     DLC_channel::Callback_t notificationCallback = nullptr;
 

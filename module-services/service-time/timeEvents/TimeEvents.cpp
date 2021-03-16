@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-time/TimeEvents.hpp>
 
 #include <Common/Query.hpp>
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 
 #include <utility>
 
@@ -25,11 +25,13 @@ namespace stm
         stopTimer();
     }
 
-    std::unique_ptr<sys::Timer> &TimeEvents::timer()
+    sys::TimerHandle &TimeEvents::timer()
     {
-        if (fireEventTimer == nullptr) {
-            fireEventTimer = std::make_unique<sys::Timer>(
-                timerName(), service(), eventTimerInitInterval, sys::Timer::Type::SingleShot);
+        if (!fireEventTimer.isValid()) {
+            fireEventTimer = sys::TimerFactory::createSingleShotTimer(
+                service(), timerName(), std::chrono::milliseconds{eventTimerInitInterval}, [this](sys::Timer &) {
+                    fireEventTimerCallback();
+                });
         }
         return fireEventTimer;
     }
@@ -58,7 +60,7 @@ namespace stm
 
     void TimeEvents::stopTimer()
     {
-        timer()->stop();
+        timer().stop();
     }
 
     void TimeEvents::recreateTimer(uint32_t interval)
@@ -68,8 +70,7 @@ namespace stm
             return;
         }
 
-        timer()->connect([=](sys::Timer &) { fireEventTimerCallback(); });
-        timer()->reload(interval);
+        timer().restart(std::chrono::milliseconds{interval});
     }
 
     void TimeEvents::fireEventTimerCallback()

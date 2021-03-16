@@ -7,6 +7,7 @@
 #include <service-gui/messages/EinkInitialized.hpp>
 #include <service-gui/Common.hpp>
 #include <time/ScopedTime.hpp>
+#include <Timers/TimerFactory.hpp>
 
 #include <log/log.hpp>
 #include <messages/EinkMessage.hpp>
@@ -28,10 +29,10 @@ namespace service::eink
     } // namespace
 
     ServiceEink::ServiceEink(const std::string &name, std::string parent)
-        : sys::Service(name, std::move(parent), ServceEinkStackDepth), currentState{State::Running},
-          displayPowerOffTimer{
-              std::make_unique<sys::Timer>(this, displayPowerOffTimeout.count(), sys::Timer::Type::SingleShot)}
+        : sys::Service(name, std::move(parent), ServceEinkStackDepth), currentState{State::Running}
     {
+        displayPowerOffTimer = sys::TimerFactory::createSingleShotTimer(
+            this, "einkDisplayPowerOff", displayPowerOffTimeout, [this](sys::Timer &) { display.powerOff(); });
         connect(typeid(EinkModeMessage),
                 [this](sys::Message *message) -> sys::MessagePointer { return handleEinkModeChangedMessage(message); });
 
@@ -40,8 +41,6 @@ namespace service::eink
 
         connect(typeid(PrepareDisplayEarlyRequest),
                 [this](sys::Message *request) -> sys::MessagePointer { return handlePrepareEarlyRequest(request); });
-
-        displayPowerOffTimer->connect([this](sys::Timer &it) { display.powerOff(); });
     }
 
     sys::MessagePointer ServiceEink::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *response)
@@ -143,9 +142,9 @@ namespace service::eink
 
     void ServiceEink::showImage(std::uint8_t *frameBuffer, ::gui::RefreshModes refreshMode)
     {
-        displayPowerOffTimer->stop();
+        displayPowerOffTimer.stop();
 
-        auto displayPowerOffTimerReload = gsl::finally([this]() { displayPowerOffTimer->reload(); });
+        auto displayPowerOffTimerReload = gsl::finally([this]() { displayPowerOffTimer.start(); });
 
         if (const auto status = prepareDisplay(refreshMode, WaveformTemperature::KEEP_CURRENT);
             status != EinkStatus_e ::EinkOK) {
@@ -179,7 +178,7 @@ namespace service::eink
     {
         EinkStatus_e status;
 
-        displayPowerOffTimer->stop();
+        displayPowerOffTimer.stop();
         display.powerOn();
 
         const auto temperature = behaviour == WaveformTemperature::KEEP_CURRENT ? display.getLastTemperature()

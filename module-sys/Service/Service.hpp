@@ -25,11 +25,13 @@
 
 namespace sys
 {
-    class Timer;
-} // namespace sys
-namespace sys
-{
     struct Proxy;
+    class Timer;
+
+    namespace timer
+    {
+        class SystemTimer;
+    } // namespace timer
 } // namespace sys
 
 namespace sys
@@ -121,33 +123,16 @@ namespace sys
 
         class Timers
         {
-
-            friend Timer;
+            friend timer::SystemTimer;
 
           private:
-            std::vector<Timer *> list;
-            auto attach(Timer *timer)
-            {
-                list.push_back(timer);
-            }
-
-            void detach(Timer *timer)
-            {
-                list.erase(std::find(list.begin(), list.end(), timer));
-            }
+            std::vector<timer::SystemTimer *> list;
+            void attach(timer::SystemTimer *timer);
+            void detach(timer::SystemTimer *timer);
 
           public:
             void stop();
-
-            [[nodiscard]] auto get(Timer *timer) const
-            {
-                return std::find(list.begin(), list.end(), timer);
-            }
-
-            [[nodiscard]] auto noTimer() const
-            {
-                return std::end(list);
-            }
+            [[nodiscard]] auto get(timer::SystemTimer *timer) noexcept -> timer::SystemTimer *;
         } timers;
 
       public:

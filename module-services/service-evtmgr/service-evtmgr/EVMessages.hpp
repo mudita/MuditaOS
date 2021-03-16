@@ -16,7 +16,6 @@
 #include <bsp/torch/torch.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <vibra/Vibra.hpp>
-#include <Timer.hpp>
 
 #include <string>
 
@@ -149,12 +148,13 @@ namespace sevm
     class VibraMessage : public Message
     {
       public:
-        VibraMessage(bsp::vibrator::Action act, sys::ms rptTime = bsp::vibrator::defaultVibraPauseMs)
+        VibraMessage(bsp::vibrator::Action act,
+                     std::chrono::milliseconds rptTime = std::chrono::milliseconds{bsp::vibrator::defaultVibraPauseMs})
             : Message(MessageType::VibraPulseMessage), action(act), repetitionTime(rptTime)
         {}
 
         bsp::vibrator::Action action;
-        sys::ms repetitionTime;
+        std::chrono::milliseconds repetitionTime;
     };
 
 } /* namespace sevm*/

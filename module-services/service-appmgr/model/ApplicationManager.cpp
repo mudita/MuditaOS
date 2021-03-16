@@ -7,7 +7,7 @@
 #include <module-apps/messages/AppMessage.hpp>
 #include <Common.hpp>
 #include <Service/Message.hpp>
-#include <Service/Timer.hpp>
+#include <module-sys/Timers/TimerFactory.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <application-call/ApplicationCall.hpp>
@@ -105,17 +105,14 @@ namespace app::manager
                                            const ApplicationName &_rootApplicationName)
         : Service{serviceName, {}, ApplicationManagerStackDepth},
           ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
-          actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }},
-          autoLockEnabled(false), autoLockTimer{std::make_unique<sys::Timer>(timerBlock,
-                                                                             this,
-                                                                             std::numeric_limits<sys::ms>::max(),
-                                                                             sys::Timer::Type::SingleShot)},
+          actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, autoLockEnabled(false),
           settings(std::make_unique<settings::Settings>(this)),
           phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
     {
+        autoLockTimer = sys::TimerFactory::createSingleShotTimer(
+            this, timerBlock, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
         bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
         registerMessageHandlers();
-        autoLockTimer->connect([this](sys::Timer &) { onPhoneLocked(); });
     }
 
     sys::ReturnCodes ApplicationManager::InitHandler()
@@ -231,7 +228,7 @@ namespace app::manager
         });
         connect(typeid(PreventBlockingRequest), [this](sys::Message *) {
             if (autoLockEnabled) {
-                autoLockTimer->reload();
+                autoLockTimer.start();
             }
             return std::make_shared<sys::ResponseMessage>();
         });
@@ -847,18 +844,18 @@ namespace app::manager
 
         auto focusedApp = getFocusedApplication();
         if (focusedApp == nullptr || focusedApp->preventsAutoLocking()) {
-            autoLockTimer->reload();
+            autoLockTimer.start();
             return;
         }
         if (phoneModeObserver->isTetheringOn()) {
-            autoLockTimer->reload();
+            autoLockTimer.start();
             return;
         }
         std::unique_ptr<gui::SwitchData> appSwitchData = std::make_unique<gui::SwitchData>("AutoLock");
         std::unique_ptr<ActionRequest> actionRequest =
             std::make_unique<ActionRequest>(rootApplicationName, actions::AutoLock, std::move(appSwitchData));
         handleActionRequest(actionRequest.get());
-        autoLockTimer->reload();
+        autoLockTimer.start();
     }
     void ApplicationManager::displayLanguageChanged(std::string value)
     {
@@ -870,7 +867,7 @@ namespace app::manager
     }
     void ApplicationManager::lockTimeChanged(std::string value)
     {
-        autoLockTimer->stop();
+        autoLockTimer.stop();
         /// It should not be allowed to set this timeout to less then 1s.
         if (utils::getNumericValue<unsigned int>(value) < 1000) {
             autoLockEnabled = false;
@@ -879,12 +876,12 @@ namespace app::manager
         }
         ///> Something went wrong - reload timer
         if (value.empty()) {
-            autoLockTimer->reload();
+            autoLockTimer.start();
             return;
         }
         autoLockEnabled = true;
-        autoLockTimer->setInterval(utils::getNumericValue<unsigned int>(value));
-        autoLockTimer->reload();
+        const auto interval = std::chrono::milliseconds{utils::getNumericValue<unsigned int>(value)};
+        autoLockTimer.restart(interval);
         //?any additional action needed here?
     }
     void ApplicationManager::inputLanguageChanged(std::string value)

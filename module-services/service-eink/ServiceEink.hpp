@@ -6,7 +6,7 @@
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <Service/Timer.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <Service/CpuSentinel.hpp>
 
 #include "EinkDisplay.hpp"
@@ -62,7 +62,7 @@ namespace service::eink
 
         EinkDisplay display;
         State currentState;
-        std::unique_ptr<sys::Timer> displayPowerOffTimer;
+        sys::TimerHandle displayPowerOffTimer;
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
     };
 } // namespace service::eink

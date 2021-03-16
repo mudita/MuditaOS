@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,12 +6,12 @@
 #include <atomic>
 #include <chrono>
 
+#include <module-apps/GuiTimer.hpp>
 #include <application-meditation/ApplicationMeditation.hpp>
 
 #include "BoxLayout.hpp"
 #include "ProgressBar.hpp"
 #include "Text.hpp"
-#include "Timer.hpp"
 
 namespace gui
 {
@@ -42,7 +42,7 @@ namespace gui
         void onReset();
 
         void startTimer();
-        [[nodiscard]] auto onTimerTimeout(Item &self, Timer &timerTask) -> bool;
+        [[nodiscard]] auto onTimerTimeout(Item &self, sys::Timer &timerTask) -> bool;
         [[nodiscard]] auto isFinished() const noexcept -> bool;
         [[nodiscard]] auto intervalReached() const noexcept -> bool;
         [[nodiscard]] auto calculatePercentageValue() const noexcept -> unsigned int;
@@ -53,6 +53,7 @@ namespace gui
         std::chrono::seconds intervalPeriod{std::chrono::seconds::zero()};
         bool hasInterval = false;
 
+        sys::TimerHandle timerTask;
         app::ApplicationMeditation *application = nullptr;
         CircularProgressBar *progressBar        = nullptr;
         Text *timer                             = nullptr;

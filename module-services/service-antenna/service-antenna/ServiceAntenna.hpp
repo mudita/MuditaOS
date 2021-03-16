@@ -10,6 +10,7 @@
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
 #include <Service/Worker.hpp>
+#include <Timers/TimerHandle.hpp>
 #include <service-db/DBServiceName.hpp>
 
 #include <algorithm>
@@ -17,10 +18,6 @@
 #include <cstdint>
 #include <memory>
 
-namespace sys
-{
-    class Timer;
-} // namespace sys
 namespace utils
 {
     namespace state
@@ -67,7 +64,7 @@ class ServiceAntenna : public sys::Service
     utils::state::State<antenna::State> *state;
     bool HandleStateChange(antenna::State state);
 
-    std::unique_ptr<sys::Timer> timer;
+    sys::TimerHandle timer;
 
     bsp::cellular::antenna currentAntenna;
     uint32_t lastCsq    = 0;

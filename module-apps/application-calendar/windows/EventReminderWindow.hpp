@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,7 +9,7 @@
 #include <module-db/Interface/EventsRecord.hpp>
 #include <Text.hpp>
 #include <Label.hpp>
-#include <module-sys/Service/Timer.hpp>
+#include <module-sys/Timers/TimerHandle.hpp>
 
 namespace gui
 {
@@ -18,7 +18,7 @@ namespace gui
     class EventReminderWindow : public gui::AppWindow
     {
       private:
-        std::unique_ptr<sys::Timer> reminderTimer;
+        sys::TimerHandle reminderTimer;
 
       protected:
         std::shared_ptr<EventsRecord> eventRecord;

@@ -17,6 +17,7 @@
 #include <service-eink/messages/ImageMessage.hpp>
 #include <service-eink/messages/EinkMessage.hpp>
 #include <service-eink/messages/PrepareDisplayEarlyRequest.hpp>
+#include <Timers/TimerFactory.hpp>
 #include <SystemManager/SystemManager.hpp>
 
 #include <gsl/gsl_util>
@@ -37,8 +38,6 @@ namespace service::gui
     ServiceGUI::ServiceGUI(const std::string &name, std::string parent)
         : sys::Service(name, parent, ServiceGuiStackDepth), commandsQueue{std::make_unique<DrawCommandsQueue>(
                                                                 CommandsQueueCapacity)},
-          contextReleaseTimer{
-              std::make_unique<sys::Timer>(this, ContextReleaseTimeout.count(), sys::Timer::Type::SingleShot)},
           currentState{State::NotInitialised}, lastRenderScheduled{false}, waitingForLastRender{false}
     {
         initAssetManagers();
@@ -210,12 +209,13 @@ namespace service::gui
     {
         // Whenever the response from ServiceEink doesn't come, the context has to be released automatically after a
         // timeout.
-        contextReleaseTimer->connect([this, contextId](sys::Timer &it) {
-            eink::ImageDisplayedNotification notification{contextId};
-            handleImageDisplayedNotification(&notification);
-            LOG_WARN("Context #%d released after timeout. Does ServiceEink respond properly?", contextId);
-        });
-        contextReleaseTimer->start();
+        contextReleaseTimer = sys::TimerFactory::createSingleShotTimer(
+            this, "contextRelease", ContextReleaseTimeout, [this, contextId](sys::Timer &it) {
+                eink::ImageDisplayedNotification notification{contextId};
+                handleImageDisplayedNotification(&notification);
+                LOG_WARN("Context #%d released after timeout. Does ServiceEink respond properly?", contextId);
+            });
+        contextReleaseTimer.start();
     }
 
     void ServiceGUI::cacheRender(int contextId, ::gui::RefreshModes refreshMode)
@@ -241,7 +241,7 @@ namespace service::gui
         const auto msg       = static_cast<eink::ImageDisplayedNotification *>(message);
         const auto contextId = msg->getContextId();
         contextPool->returnContext(contextId);
-        contextReleaseTimer->stop();
+        contextReleaseTimer.stop();
         setState(State::Idle);
 
         // Even if the next render is already cached, if any context in the pool is currently being processed, then
