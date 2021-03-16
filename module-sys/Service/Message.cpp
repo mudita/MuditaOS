@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Message.hpp"
@@ -50,6 +50,11 @@ namespace sys
     }
 
     DataMessage::DataMessage(BusChannel channel) : Message(channel)
+    {
+        type = Type::Data;
+    }
+
+    DataMessage::DataMessage() : Message()
     {
         type = Type::Data;
     }

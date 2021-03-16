@@ -92,6 +92,7 @@ namespace sys
       public:
         explicit DataMessage(MessageType messageType);
         explicit DataMessage(BusChannel channel);
+        DataMessage();
 
         // This field must by provided by the class that inherits DataMessage
         MessageType messageType = MessageType::MessageTypeUninitialized;
