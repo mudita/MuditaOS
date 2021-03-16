@@ -167,7 +167,8 @@ namespace app
                                    public settingsInterface::SecuritySettings,
                                    public settingsInterface::DndSettings,
                                    public settingsInterface::OfflineSettings,
-                                   public settingsInterface::ConnectionSettings
+                                   public settingsInterface::ConnectionSettings,
+                                   public AsyncCallbackReceiver
     {
       public:
         ApplicationSettingsNew(std::string name                    = name_settings_new,

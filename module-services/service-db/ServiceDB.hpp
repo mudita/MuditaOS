@@ -51,6 +51,10 @@ class SMSTemplateRecordInterface;
 class SettingsDB;
 class SmsDB;
 class ThreadRecordInterface;
+namespace Quotes
+{
+    class QuotesAgent;
+}
 
 class ServiceDB : public sys::Service
 {
@@ -63,6 +67,7 @@ class ServiceDB : public sys::Service
     std::unique_ptr<CountryCodesDB> countryCodesDB;
     std::unique_ptr<NotificationsDB> notificationsDB;
     std::unique_ptr<EventsDB> eventsDB;
+    std::unique_ptr<Database> quotesDB;
 
     std::unique_ptr<SMSRecordInterface> smsRecordInterface;
     std::unique_ptr<ThreadRecordInterface> threadRecordInterface;
@@ -74,6 +79,7 @@ class ServiceDB : public sys::Service
     std::unique_ptr<CountryCodeRecordInterface> countryCodeRecordInterface;
     std::unique_ptr<NotificationsRecordInterface> notificationsRecordInterface;
     std::unique_ptr<EventsRecordInterface> eventsRecordInterface;
+    std::unique_ptr<Quotes::QuotesAgent> quotesRecordInterface;
 
   protected:
     db::Interface *getInterface(db::Interface::Name interface);

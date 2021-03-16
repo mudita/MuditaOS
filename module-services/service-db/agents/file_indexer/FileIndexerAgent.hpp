@@ -40,7 +40,8 @@ class FileIndexerAgent : public DatabaseAgent
     // db operations
     auto dbRegisterFileChange(std::string dir, std::string service) -> bool;
     auto dbUnregisterFileChange(std::string dir, std::string service) -> bool;
-    auto dbListDir(std::unique_ptr<FileIndexer::ListDir> listDir) -> std::unique_ptr<FileIndexer::ListDir>;
+    auto dbListDir(unsigned int offset, unsigned int limit, const std::string &directory)
+        -> std::unique_ptr<FileIndexer::ListDir>;
     auto dbGetProperty(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> FileIndexer::FileMetadata;
     auto dbSetProperty(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> bool;
     auto dbSetProperties(std::unique_ptr<FileIndexer::FileMetadata> metaData) -> bool;

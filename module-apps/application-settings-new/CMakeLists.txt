@@ -21,7 +21,6 @@ target_sources( ${PROJECT_NAME}
         models/DateAndTimeModel.cpp
         models/FromTimeToTimeModel.cpp
         models/QuotesModel.cpp
-        models/QuotesRepository.cpp
         models/CategoriesModel.cpp
         widgets/ChangePasscodeLockHandler.cpp
         widgets/QuoteWidget.cpp

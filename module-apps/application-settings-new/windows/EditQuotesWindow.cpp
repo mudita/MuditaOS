@@ -88,7 +88,7 @@ namespace gui
 
         optionSwitch = !optionSwitch;
 
-        rebuildOptionList();
+        refreshOptionsList();
     }
 
 } // namespace gui

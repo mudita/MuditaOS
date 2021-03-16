@@ -11,132 +11,103 @@ namespace Quotes
     class QuotesAgentTester : public QuotesAgent
     {
       public:
-        QuotesAgentTester(sys::Service *parentService) : QuotesAgent(parentService){};
+        QuotesAgentTester(Database *quotesDB) : QuotesAgent(quotesDB){};
         ~QuotesAgentTester() = default;
 
-        auto handleCategoryList(Messages::GetCategoryListRequest *req) -> sys::MessagePointer
+        auto handleCategoryList(std::shared_ptr<Messages::GetCategoryListRequest> query)
+            -> std::unique_ptr<db::QueryResult>
         {
-            return QuotesAgent::handleCategoryList(req);
+            return QuotesAgent::handleCategoryList(query);
         }
 
-        auto handleQuotesList(Messages::GetQuotesListRequest *req) -> sys::MessagePointer
+        auto getAllQuotes(unsigned int limit = 0, unsigned int offset = 0) -> std::vector<QuoteRecord>
         {
-            return QuotesAgent::handleQuotesList(req);
+            auto request     = std::make_shared<Messages::GetQuotesListRequest>(offset, limit);
+            auto queryResult = handleQuotesList(request);
+            auto response    = dynamic_cast<Messages::GetQuotesListResponse *>(queryResult.get());
+            return response->getResults();
         }
 
-        auto handleQuotesListByCategoryId(Messages::GetQuotesListByCategoryIdRequest *req) -> sys::MessagePointer
+        auto getQuotesFromCustomCategory() -> std::vector<QuoteRecord>
         {
-            return QuotesAgent::handleQuotesListByCategoryId(req);
-        }
+            unsigned int offset = 0;
+            unsigned int limit  = 0;
 
-        auto handleEnableCategoryById(Messages::EnableCategoryByIdRequest *req) -> sys::MessagePointer
-        {
-            return QuotesAgent::handleEnableCategoryById(req);
-        }
-
-        auto handleEnableQuoteById(Messages::EnableQuoteByIdRequest *req) -> sys::MessagePointer
-        {
-            return QuotesAgent::handleEnableQuoteById(req);
-        }
-
-        auto handleEnabledQuotesList(Messages::GetEnabledQuotesListRequest *req) -> sys::MessagePointer
-        {
-            return QuotesAgent::handleEnabledQuotesList(req);
-        }
-
-        auto handleAddQuote(Messages::AddQuoteRequest *req) -> sys::MessagePointer
-        {
-            return QuotesAgent::handleAddQuote(req);
-        }
-
-        auto handleReadQuote(Messages::ReadQuoteRequest *req) -> sys::MessagePointer
-        {
-            return QuotesAgent::handleReadQuote(req);
-        }
-
-        auto handleWriteQuote(Messages::WriteQuoteRequest *req) -> sys::MessagePointer
-        {
-            return QuotesAgent::handleWriteQuote(req);
-        }
-
-        auto getAllQuotes(unsigned int limit = 0, unsigned int offset = 0)
-            -> std::shared_ptr<Messages::GetQuotesListResponse>
-        {
-            QuotesList quotesList;
-            quotesList.limit  = limit;
-            quotesList.offset = offset;
-
-            auto record  = std::make_unique<QuotesList>(quotesList);
-            auto request = std::make_shared<Messages::GetQuotesListRequest>(std::move(record));
-            return std::dynamic_pointer_cast<Messages::GetQuotesListResponse>(handleQuotesList(request.get()));
+            auto request     = std::make_shared<Messages::GetQuotesListFromCustomCategoryRequest>(offset, limit);
+            auto queryResult = handleQuotesListFromCustomCategory(request);
+            auto response    = dynamic_cast<Messages::GetQuotesListFromCustomCategoryResponse *>(queryResult.get());
+            return response->getResults();
         }
 
         auto getQuotesByCategoryId(unsigned int categoryId) -> std::vector<QuoteRecord>
         {
-            QuotesList quotesList;
-            quotesList.limit = 0;
+            unsigned int offset = 0;
+            unsigned int limit  = 0;
 
-            auto record   = std::make_unique<QuotesList>(quotesList);
-            auto request  = std::make_shared<Messages::GetQuotesListByCategoryIdRequest>(std::move(record), categoryId);
-            auto response = std::dynamic_pointer_cast<Messages::GetQuotesListByCategoryIdResponse>(
-                handleQuotesListByCategoryId(request.get()));
-
+            auto request     = std::make_shared<Messages::GetQuotesListByCategoryIdRequest>(offset, limit, categoryId);
+            auto queryResult = handleQuotesListByCategoryId(request);
+            auto response    = dynamic_cast<Messages::GetQuotesListByCategoryIdResponse *>(queryResult.get());
             return response->getResults();
         }
 
         auto getEnabledQuotes() -> std::vector<QuoteRecord>
         {
-            QuotesList quotesList;
-            quotesList.limit = 0;
+            unsigned int offset = 0;
+            unsigned int limit  = 0;
 
-            auto record   = std::make_unique<QuotesList>(quotesList);
-            auto request  = std::make_shared<Messages::GetEnabledQuotesListRequest>(std::move(record));
-            auto response = std::dynamic_pointer_cast<Messages::GetEnabledQuotesListResponse>(
-                handleEnabledQuotesList(request.get()));
-
+            auto request     = std::make_shared<Messages::GetEnabledQuotesListRequest>(offset, limit);
+            auto queryResult = handleEnabledQuotesList(request);
+            auto response    = dynamic_cast<Messages::GetEnabledQuotesListResponse *>(queryResult.get());
             return response->getResults();
         }
 
-        auto enableCategory(unsigned int categoryId, bool enable)
-            -> std::shared_ptr<Messages::EnableCategoryByIdResponse>
+        auto enableCategory(unsigned int categoryId, bool enable) -> bool
         {
-            auto request = std::make_shared<Messages::EnableCategoryByIdRequest>(categoryId, enable);
-            return std::dynamic_pointer_cast<Messages::EnableCategoryByIdResponse>(
-                handleEnableCategoryById(request.get()));
+            auto request     = std::make_shared<Messages::EnableCategoryByIdRequest>(categoryId, enable);
+            auto queryResult = handleEnableCategoryById(request);
+            auto response    = dynamic_cast<Messages::EnableCategoryByIdResponse *>(queryResult.get());
+            return response->success;
         }
 
-        auto enableQuote(unsigned int quoteId, bool enable) -> std::shared_ptr<Messages::EnableQuoteByIdResponse>
+        auto enableQuote(unsigned int quoteId, bool enable) -> bool
         {
-            auto request = std::make_shared<Messages::EnableQuoteByIdRequest>(quoteId, enable);
-            return std::dynamic_pointer_cast<Messages::EnableQuoteByIdResponse>(handleEnableQuoteById(request.get()));
+            auto request     = std::make_shared<Messages::EnableQuoteByIdRequest>(quoteId, enable);
+            auto queryResult = handleEnableQuoteById(request);
+            auto response    = dynamic_cast<Messages::EnableQuoteByIdResponse *>(queryResult.get());
+            return response->success;
         }
 
-        auto addQuote(unsigned int langId, std::string quote, std::string author, bool enabled)
-            -> std::shared_ptr<Messages::AddQuoteResponse>
+        auto addQuote(unsigned int langId, std::string quote, std::string author, bool enabled) -> unsigned int
         {
             auto request =
                 std::make_shared<Messages::AddQuoteRequest>(langId, std::move(quote), std::move(author), enabled);
-            return std::dynamic_pointer_cast<Messages::AddQuoteResponse>(handleAddQuote(request.get()));
+            auto queryResult = handleAddQuote(request);
+            auto response    = dynamic_cast<Messages::AddQuoteResponse *>(queryResult.get());
+            return response->quoteId;
         }
 
-        auto readQuote(unsigned int quoteId) -> std::shared_ptr<Messages::ReadQuoteResponse>
+        auto readQuote(unsigned int quoteId) -> std::unique_ptr<db::QueryResult>
         {
             auto request = std::make_shared<Messages::ReadQuoteRequest>(quoteId);
-            return std::dynamic_pointer_cast<Messages::ReadQuoteResponse>(handleReadQuote(request.get()));
+            return handleReadQuote(request);
         }
 
         auto writeQuote(unsigned int quoteId, unsigned int langId, std::string quote, std::string author, bool enabled)
-            -> std::shared_ptr<Messages::WriteQuoteResponse>
+            -> bool
         {
             auto request = std::make_shared<Messages::WriteQuoteRequest>(
                 quoteId, langId, std::move(quote), std::move(author), enabled);
-            return std::dynamic_pointer_cast<Messages::WriteQuoteResponse>(handleWriteQuote(request.get()));
+            auto queryResult = handleWriteQuote(request);
+            auto response    = dynamic_cast<Messages::WriteQuoteResponse *>(queryResult.get());
+            return response->success;
         }
 
-        auto deleteQuote(unsigned int quoteId) -> std::shared_ptr<Messages::DeleteQuoteResponse>
+        auto deleteQuote(unsigned int quoteId) -> bool
         {
-            auto request = std::make_shared<Messages::DeleteQuoteRequest>(quoteId);
-            return std::dynamic_pointer_cast<Messages::DeleteQuoteResponse>(handleDeleteQuote(request.get()));
+            auto request     = std::make_shared<Messages::DeleteQuoteRequest>(quoteId);
+            auto queryResult = handleDeleteQuote(request);
+            auto response    = dynamic_cast<Messages::DeleteQuoteResponse *>(queryResult.get());
+            return response->success;
         }
     };
 } // namespace Quotes
