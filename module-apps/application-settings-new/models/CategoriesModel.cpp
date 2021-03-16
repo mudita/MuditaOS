@@ -4,6 +4,7 @@
 #include "application-settings-new/windows/QuoteCategoriesWindow.hpp"
 #include "QuotesRepository.hpp"
 #include "CategoriesModel.hpp"
+#include <service-db/QuotesMessages.hpp>
 
 namespace style::quotes::list
 {
@@ -11,7 +12,7 @@ namespace style::quotes::list
     constexpr auto max_quotes  = 100;
 } // namespace style::quotes::list
 
-namespace app
+namespace Quotes
 {
     CategoriesModel::CategoriesModel(app::Application *app) : application(app)
     {}
@@ -39,18 +40,32 @@ namespace app
 
     void CategoriesModel::createData()
     {
-        // fake categories for testing
-        // matter to be changed with the final connection of the appropriate agent
-        std::vector<app::QuoteCategory> categories{{0, "Category 1"},
-                                                   {1, "Category 2"},
-                                                   {2, "Category 3"},
-                                                   {3, "Category 4"},
-                                                   {4, "Category 5"},
-                                                   {5, "Category 6"}};
-        for (const auto &category : categories) {
+        const auto categoryList = getCategoryList();
+        if (!categoryList) {
+            return;
+        }
+
+        for (const auto &category : *categoryList) {
             auto app  = application;
             auto item = new gui::CategoryWidget(
                 category,
+                [app, category](bool enable) -> bool {
+                    LOG_DEBUG(
+                        "Sending enable category request: category_id = %d, enable = %d", category.category_id, enable);
+                    auto request = std::make_shared<Messages::EnableCategoryByIdRequest>(category.category_id, enable);
+                    auto result  = app->bus.sendUnicast(request, service::name::db, DBServiceAPI::DefaultTimeoutInMs);
+
+                    if (result.first != sys::ReturnCodes::Success) {
+                        LOG_WARN("Enable category request failed! error code = %d", static_cast<int>(result.first));
+                        return false;
+                    }
+
+                    auto response      = std::dynamic_pointer_cast<Messages::EnableCategoryByIdResponse>(result.second);
+                    const auto success = response && response->success;
+                    if (!success)
+                        LOG_WARN("Enable category request failed!");
+                    return success;
+                },
                 [app](const UTF8 &text) {
                     app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::CENTER, false);
                 },
@@ -68,4 +83,28 @@ namespace app
         createData();
         list->rebuildList();
     }
-} // namespace app
+
+    auto CategoriesModel::getCategoryList() -> std::optional<std::vector<CategoryRecord>>
+    {
+        auto categoryList    = std::make_unique<CategoryList>();
+        categoryList->limit  = 0;
+        categoryList->offset = 0;
+
+        auto request = std::make_shared<Messages::GetCategoryListRequest>(std::move(categoryList));
+        auto result =
+            application->bus.sendUnicast(std::move(request), service::name::db, DBServiceAPI::DefaultTimeoutInMs);
+        if (result.first != sys::ReturnCodes::Success) {
+            LOG_WARN("Getting category list failed! error code = %d", static_cast<int>(result.first));
+            return std::nullopt;
+        }
+
+        auto response = std::dynamic_pointer_cast<Messages::GetCategoryListResponse>(result.second);
+        if (!response) {
+            LOG_WARN("Wrong response on category list request!");
+            return std::nullopt;
+        }
+
+        LOG_DEBUG("Categories list count: %u", response->getCount());
+        return response->getResults();
+    }
+} // namespace Quotes
