@@ -91,6 +91,8 @@ namespace bsp::battery_charger
                         notification      = static_cast<std::uint8_t>(batteryChargerType::DcdDCP);
                         targetQueueHandle = DCDQueueHandle;
                         break;
+                    default:
+                        continue;
                     }
                     xQueueSend(targetQueueHandle, &notification, queueTimeoutTicks);
                 }

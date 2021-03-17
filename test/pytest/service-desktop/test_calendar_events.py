@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import pytest
 from harness.interface.defs import status
@@ -47,25 +47,21 @@ def test_calendar(harness):
         UIDS.insert(new_event_counter-1,ret["body"]["UID"])
 
     # get events limit < pageSize - pagination not used
-    print("get events without pagination")
     limit =  2
     offset=  2
     get_body = {"limit": limit, "offset": offset}
     ret = harness.endpoint_request("events", "get", get_body)
     assert ret["status"] == status["OK"]
-    print("status =",ret["status"])
 
     # get events limit > pageSize - pagination used - basic scenario
-    print("get events with pagination")
     limit = 12
     offset=  1
     get_body = {"limit": limit, "offset": offset}
     ret = harness.endpoint_request("events", "get", get_body)
     assert ret["status"] == status["OK"]
-    print("status =",ret["status"])
+
 
     # get events limit > pageSize - pagination used - get all events
-    print("get all events with pagination")
     count = ret["body"]["totalCount"]
     batch_size = 10
     divider = int(count / batch_size)
@@ -79,15 +75,12 @@ def test_calendar(harness):
     body = {"limit": reminder, "offset": count-reminder}
     ret = harness.endpoint_request("events", "get", body)
     assert ret["status"] == status["OK"]
-    print("status =",ret["status"])
     events = events + ret["body"]["calendar_events"]
     events_length = len(events)
     assert events_length
     assert events_length == count
 
     # remove all added events - clean up
-    print("\n")
-    print("remove all added events")
     for ev in range(0,event_count):
         del_body = {"UID": UIDS[ev]}
         ret = harness.endpoint_request("events", "del", del_body)
