@@ -18,11 +18,6 @@ Result Calculator::calculate(std::string source)
         if (output.length() > CalculatorConstants::maxStringLength) {
             output = getValueThatFitsOnScreen(result);
         }
-        if (utils::localize.get("app_calculator_decimal_separator") == style::calculator::symbols::strings::comma) {
-            output.replace(output.find(style::calculator::symbols::strings::full_stop),
-                           std::size(std::string_view(style::calculator::symbols::strings::full_stop)),
-                           style::calculator::symbols::strings::comma);
-        }
         return Result{source, output, false};
     }
     return Result{source, utils::localize.get("app_calculator_error"), true};
