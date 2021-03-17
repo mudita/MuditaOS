@@ -289,11 +289,11 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         DEPENDS ${ECOBOOT_FILE}-target ${ECOBOOT_DOWNLOAD_LOG}
         )
 
-    add_custom_target(${VERSION_JSON_FILE}-target DEPENDS ${VERSION_JSON})
+    add_custom_target(${VERSION_JSON_FILE}-target DEPENDS ${VERSION_JSON_FILE})
 
     multicomp_install(PROGRAMS ${CMAKE_BINARY_DIR}/${ECOBOOT_FILE} DESTINATION "./" 
         COMPONENTS Standalone Update)
-    multicomp_install(FILES ${VERSION_JSON} DESTINATION "./" 
+    multicomp_install(FILES ${CMAKE_BINARY_DIR}/${VERSION_JSON_FILE} DESTINATION "./" 
         COMPONENTS Standalone Update)
 endif()
 

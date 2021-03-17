@@ -14,6 +14,7 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+message("preparing version file")
 configure_file(
     ${SRC_DIR}/config/version.json.cmake_template
     ${CMAKE_BINARY_DIR}/version.json
