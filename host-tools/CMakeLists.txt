@@ -19,9 +19,20 @@ if (CMAKE_CROSSCOMPILING)
         -H"${CMAKE_SOURCE_DIR}/host-tools/genlittlefs"
         COMMAND ${CMAKE_COMMAND} --build genlittlefs --config Release
     )
+    add_custom_target(
+        pureflash ALL
+        COMMAND ${CMAKE_COMMAND}
+        -DCMAKE_BUILD_TYPE:STRING="Release"
+        -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE:PATH="${CMAKE_BINARY_DIR}"
+        -B"pureflash"
+        -H"${CMAKE_SOURCE_DIR}/host-tools/pure-flash"
+        COMMAND ${CMAKE_COMMAND} --build pureflash --config Release
+    )
+
 else()
     set(_genlittlefs "${CMAKE_BINARY_DIR}/genlittlefs${CMAKE_EXECUTABLE_SUFFIX}")
     add_subdirectory(genlittlefs)
     add_subdirectory(littlefs-fuse)
+    add_subdirectory(pure-flash)
 endif()
 
