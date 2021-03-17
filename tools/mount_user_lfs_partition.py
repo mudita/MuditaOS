@@ -7,8 +7,8 @@ import os
 parser = argparse.ArgumentParser(
     usage=
 "\ne.g.:\n"
-"For Linux: python3 tools/mount_user_lfs.py --mount_dir /mnt/user --lfsfuse build-linux-Debug/lfsfuse --image build-linux-Debug/PurePhone.img --loop 1\n"
-"For  Pure: python3 tools/mount_user_lfs.py --mount_dir /mnt/user --lfsfuse build-rt1051-RelWithDebInfo/lfsfuse --part3_path /dev/sda3")
+"For         simulator: python3 tools/mount_user_lfs_partition.py --mount_dir /mnt/user --lfsfuse build-linux-Debug/lfsfuse --image build-linux-Debug/PurePhone.img --loop 1\n"
+"For device (MSC mode): python3 tools/mount_user_lfs_partition.py --mount_dir /mnt/user --lfsfuse build-rt1051-RelWithDebInfo/lfsfuse --part3_path /dev/sda3")
 
 parser.add_argument('--mount_dir', type=str,
                     help="Directory where LFS should be mounted", required=True)
