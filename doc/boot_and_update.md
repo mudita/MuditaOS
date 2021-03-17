@@ -104,11 +104,11 @@ Littlefs summary:
 
 ```
 
-7. Once completed, flash the phone with the latest MuditaOS build. To do that run the `dd` command 
+7. Once completed, flash the phone with the latest MuditaOS build. To do that run the `pureflash` command 
 on the image:
 
 ```bash
-sudo dd if=pure.img of=/dev/sdX status=progress  conv=sparse 
+sudo pureflash pure.img /dev/sdX
 ```
 
 **Note:** Replace `/dev/sdX` with the disk name you found for your phone after connecting it to your computer.
@@ -116,12 +116,25 @@ sudo dd if=pure.img of=/dev/sdX status=progress  conv=sparse
 Example output:
 
 ```bash
-sudo dd if=pure.img of=/dev/sda status=progress  conv=sparse                    
-[sudo] password for lucck: 
-Sorry, try again.
-[sudo] password for lucck: 
-15484559360 bytes (15 GB, 14 GiB) copied, 19 s, 815 MB/s 
-30621696+0 records in
-30621696+0 records out
-15678308352 bytes (16 GB, 15 GiB) copied, 19,3531 s, 810 MB/s
+➜  build-linux-Debug git:(EGD-6188_flashing_script) ✗ ./pureflash ~/worksrc/MuditaOS/build-rt1051-RelWithDebInfo/PurePhone.img /dev/sda 
+File /home/lucck/worksrc/MuditaOS/build-rt1051-RelWithDebInfo/PurePhone.img copy 7 extents:
+#       Offset          Length           Status
+0:      0000000000000000 0000000000001000 OK
+1:      0000000000100000 0000000000001000 OK
+2:      0000000000104000 0000000000a2d000 OK
+3:      0000000040100000 0000000000001000 OK
+4:      0000000040104000 0000000000200000 OK
+5:      0000000080100000 0000000000010000 OK
+6:      0000000320e20000 00000000001c0000 OK
+File /home/lucck/worksrc/MuditaOS/build-rt1051-RelWithDebInfo/PurePhone.img verify 7 extents:
+#       Offset          Length           Verify
+0:      0000000000000000 0000000000001000 OK
+1:      0000000000100000 0000000000001000 OK
+2:      0000000000104000 0000000000a2d000 OK
+3:      0000000040100000 0000000000001000 OK
+4:      0000000040104000 0000000000200000 OK
+5:      0000000080100000 0000000000010000 OK
+6:      0000000320e20000 00000000001c0000 OK
+Write image /home/lucck/worksrc/MuditaOS/build-rt1051-RelWithDebInfo/PurePhone.img to /dev/sda SUCCESS
+➜  build-linux-Debug git:(EGD-6188_flashing_script) ✗ 
 ```
