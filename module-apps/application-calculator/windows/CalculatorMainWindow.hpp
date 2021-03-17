@@ -18,13 +18,13 @@ namespace gui
         gui::MathOperationsBox *mathBox = nullptr;
 
         bool clearInput = false;
-        UTF8 previousOperation = "";
+        UTF8 previousOperation;
         void writeEquation(bool lastCharIsSymbol, const UTF8 &symbol);
         void applyInputCallback();
         bool isPreviousNumberDecimal();
         bool isSymbol(uint32_t character);
         bool isDecimalSeparator(uint32_t character);
-        void processInput(bool lastCharIsSymbol, const UTF8 &symbol);
+        void processInput(bool lastCharIsSymbol, const UTF8 &symbol, uint32_t lastChar);
         void processClearInput();
         void showResult();
         uint32_t getPenultimate();

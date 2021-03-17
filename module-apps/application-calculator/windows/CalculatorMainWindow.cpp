@@ -76,26 +76,26 @@ namespace gui
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_UP) {
-                processInput(lastCharIsSymbol, style::calculator::symbols::strings::plus);
+                processInput(lastCharIsSymbol, style::calculator::symbols::strings::plus, lastChar);
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_DOWN) {
                 if (lastChar != style::calculator::symbols::codes::minus) {
-                    processInput(lastCharIsSymbol, style::calculator::symbols::strings::minus);
+                    processInput(lastCharIsSymbol, style::calculator::symbols::strings::minus, lastChar);
                 }
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_LEFT) {
-                processInput(lastCharIsSymbol, style::calculator::symbols::strings::multiplication);
+                processInput(lastCharIsSymbol, style::calculator::symbols::strings::multiplication, lastChar);
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_RIGHT) {
-                processInput(lastCharIsSymbol, style::calculator::symbols::strings::division);
+                processInput(lastCharIsSymbol, style::calculator::symbols::strings::division, lastChar);
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_LF) {
                 if (!isPreviousNumberDecimal()) {
-                    processInput(lastCharIsSymbol, utils::localize.get("app_calculator_decimal_separator"));
+                    processInput(lastCharIsSymbol, utils::localize.get("app_calculator_decimal_separator"), lastChar);
                 }
                 return true;
             }
@@ -155,11 +155,12 @@ namespace gui
         }
     }
 
-    void CalculatorMainWindow::processInput(bool lastCharIsSymbol, const UTF8 &symbol)
+    void CalculatorMainWindow::processInput(bool lastCharIsSymbol, const UTF8 &symbol, uint32_t lastChar)
     {
-        if ((!previousOperation.empty() && lastCharIsSymbol && symbol == style::calculator::symbols::strings::minus) ||
-            previousOperation.empty() || lastCharIsSymbol ||
-            symbol == utils::localize.get("app_calculator_decimal_separator")) {
+        if (((!previousOperation.empty() && lastCharIsSymbol && symbol == style::calculator::symbols::strings::minus) ||
+             previousOperation.empty() || lastCharIsSymbol ||
+             symbol == utils::localize.get("app_calculator_decimal_separator")) &&
+            !(!previousOperation.empty() && isDecimalSeparator(lastChar))) {
             writeEquation(lastCharIsSymbol, symbol);
         }
         else {
@@ -169,15 +170,15 @@ namespace gui
             }
         }
         if (symbol != utils::localize.get("app_calculator_decimal_separator") &&
-            mathOperationInput->getText().length() != 0) {
+            !mathOperationInput->getText().empty()) {
             previousOperation = symbol;
         }
     }
 
     void CalculatorMainWindow::processClearInput()
     {
-        if (const auto length = mathOperationInput->getText().length(); length != 0) {
-            const auto lastChar = mathOperationInput->getText()[length - 1];
+        if (const auto text = mathOperationInput->getText(); !text.empty()) {
+            const auto lastChar = text[text.length() - 1];
             if (isSymbol(lastChar) && !isDecimalSeparator(lastChar)) {
                 previousOperation = "";
             }
@@ -189,17 +190,24 @@ namespace gui
 
     void CalculatorMainWindow::showResult()
     {
-        auto result = Calculator().calculate(std::string(mathOperationInput->getText()));
-        mathOperationInput->setText(result.value);
-        clearInput        = result.isError;
-        previousOperation = "";
+        if (const auto text = std::string(mathOperationInput->getText()); !text.empty()) {
+            auto result = Calculator().calculate(text);
+            mathOperationInput->setText(result.value);
+            clearInput        = result.isError;
+            previousOperation = "";
+        }
     }
 
     bool CalculatorMainWindow::isPreviousNumberDecimal()
     {
         if (!mathOperationInput->getText().empty()) {
             std::vector<int> symbolsIndexes;
-            auto input = std::string(mathOperationInput->getText()).erase(mathOperationInput->getText().length() - 1);
+            auto directInput = mathOperationInput->getText();
+            auto lastChar    = directInput[directInput.length() - 1];
+            if (isSymbol(lastChar) && !isDecimalSeparator(lastChar)) {
+                directInput.removeChar(directInput.length() - 1);
+            }
+            auto input         = std::string(directInput);
             auto exponentIndex = input.find_last_of('e');
             auto minusIndex    = input.find_last_of(style::calculator::symbols::strings::minus);
             if (minusIndex != exponentIndex + 1) {
@@ -212,10 +220,10 @@ namespace gui
             std::string lastNumber;
 
             if (*it == -1) {
-                lastNumber = input.substr(0, std::string::npos);
+                lastNumber = input.substr(0);
             }
             else {
-                lastNumber = input.substr(*it, std::string::npos);
+                lastNumber = input.substr(*it + 1);
             }
             return lastNumber.find(utils::localize.get("app_calculator_decimal_separator")) != std::string::npos;
         }
