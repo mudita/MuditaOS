@@ -58,6 +58,13 @@ namespace parserFSM
         inline constexpr auto getInfo                = "getInfo";
         inline constexpr auto tethering              = "tethering";
         inline constexpr auto usbSecurityStatus      = "usbSecurityStatus";
+        inline constexpr auto switchApplication      = "switchApplication";
+        inline constexpr auto switchWindow           = "switchWindow";
+        namespace switchData
+        {
+            inline constexpr auto applicationName = "applicationName";
+            inline constexpr auto windowName      = "windowName";
+        } // namespace switchData
         /// values for getInfo cmd
         inline constexpr auto simStateInfo      = "simState";
         inline constexpr auto cellularStateInfo = "cellularState";

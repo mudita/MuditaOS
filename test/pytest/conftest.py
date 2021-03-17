@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import time
@@ -159,6 +159,36 @@ def phone_in_desktop(harness):
     # assert that we are in ApplicationDesktop
     assert harness.get_application_name() == "ApplicationDesktop"
 
+@pytest.fixture(scope='function')
+def phone_ends_test_in_desktop(harness):
+    yield
+    target_application = "ApplicationDesktop"
+    target_window     = "MainWindow"
+    log.info(f"returning to {target_window} of {target_application} ...")
+    time.sleep(1)
+
+    if harness.get_application_name() != target_application :
+        body = {"switchApplication" : {"applicationName": target_application, "windowName" : target_window }}
+        harness.endpoint_request("developerMode", "put", body)
+        time.sleep(1)
+
+        max_retry_counter = 5
+        while harness.get_application_name() != target_application:
+            max_retry_counter -= 1
+            if max_retry_counter == 0:
+                break
+
+            log.info(f"Not in {target_application}, {max_retry_counter} attempts left...")
+            time.sleep(1)
+    else :
+        # switching window in case ApplicationDesktop is not on MainWindow:
+        body = {"switchWindow" : {"applicationName": target_application, "windowName" : target_window }}
+        harness.endpoint_request("developerMode", "put", body)
+        time.sleep(1)
+
+    # assert that we are in ApplicationDesktop
+    assert harness.get_application_name() == target_application
+    time.sleep(1)
 
 def pytest_configure(config):
     config.addinivalue_line("markers",

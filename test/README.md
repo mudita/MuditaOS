@@ -22,10 +22,6 @@ As for now, it consists of the following methods that can be used during writing
 
    returns a `CDCSerial` object - wrapper for Python's `Serial`
    
-* `get_window_name()`
-
-   returns current application(window) name
-   
 * `with_phone_unlocked(func)`
 
     decorator allowing to call a function with an unlocked operating system
