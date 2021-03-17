@@ -55,6 +55,7 @@ You can quickstart the project by going through one of the following guides:
 - [Super dirty quickstart with unit tests](./doc/quickstart.md#super-dirty-quickstart-with-unit-tests)
 - [Super dirty quickstart on the phone](./doc/quickstart.md#super-dirty-quickstart-on-the-phone)
 - [Preparing packages](./doc/quickstart.md#preparing-packages)
+- [Logging engine](./module-utils/log/doc/logging_engine.md)
 
 ## Contributing
 
