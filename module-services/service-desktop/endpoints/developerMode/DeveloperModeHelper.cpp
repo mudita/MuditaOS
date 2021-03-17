@@ -119,6 +119,20 @@ auto DeveloperModeHelper::processPut(Context &context) -> ProcessResult
         }
         code = toCode(owner->bus.sendUnicast(std::move(msg), "ServiceDesktop"));
     }
+    else if (auto switchData = body[json::developerMode::switchApplication].object_items(); !switchData.empty()) {
+        auto msg = std::make_shared<app::manager::SwitchRequest>(
+            owner->GetName(),
+            switchData[json::developerMode::switchData::applicationName].string_value(),
+            switchData[json::developerMode::switchData::windowName].string_value(),
+            nullptr);
+        code = toCode(owner->bus.sendUnicast(std::move(msg), "ApplicationManager"));
+    }
+    else if (auto switchData = body[json::developerMode::switchWindow].object_items(); !switchData.empty()) {
+        auto msg = std::make_shared<app::AppSwitchWindowMessage>(
+            switchData[json::developerMode::switchData::windowName].string_value(), "", nullptr);
+        code = toCode(owner->bus.sendUnicast(
+            std::move(msg), switchData[json::developerMode::switchData::applicationName].string_value()));
+    }
 
     else {
         context.setResponseStatus(http::Code::BadRequest);
