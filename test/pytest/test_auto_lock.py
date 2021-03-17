@@ -2,9 +2,9 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 import pytest
-from harness.interface.defs import status
+from harness.interface.defs import status, key_codes
 from harness.interface.CDCSerial import Keytype
-from harness.interface.defs import key_codes
+from harness import log
 import time
 import random
 
@@ -14,6 +14,12 @@ def change_auto_lock_timer(harness, value: str):
     ret = harness.endpoint_request("developerMode", "put", body)
     assert ret["status"] == status["OK"]
 
+@pytest.fixture(scope='function')
+def phone_ends_with_default_auto_lock(harness):
+    yield
+    timeout = str(30000)
+    log.info("Setting back default timeout to {}ms".format(timeout))
+    change_auto_lock_timer(harness, timeout)
 
 app_navigation_to_name_mapping = {
     "messages": "ApplicationMessages",
@@ -79,6 +85,7 @@ def get_dom(harness):
 
 @pytest.mark.skip("not fully implemented - should work after EGD-5884")
 @pytest.mark.rt1051
+@pytest.mark.usefixtures("phone_ends_with_default_auto_lock")
 @pytest.mark.usefixtures("phone_unlocked")
 def test_auto_lock(harness):
     # change timer lock value
@@ -107,6 +114,7 @@ def test_auto_lock(harness):
 
 
 @pytest.mark.rt1051
+@pytest.mark.usefixtures("phone_ends_with_default_auto_lock")
 @pytest.mark.usefixtures("phone_unlocked")
 def test_no_auto_lock_for_meditation_app(harness):
     # change timer lock value
