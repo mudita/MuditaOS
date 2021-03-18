@@ -74,7 +74,7 @@ namespace gui
     {
         auto app            = getAppDesktop();
         const auto isLocked = app->lockHandler.isScreenLocked();
-        appConfiguration.set(top_bar::Indicator::Lock, isLocked);
+        appConfiguration.setIndicator(top_bar::Indicator::Lock, isLocked);
         return appConfiguration;
     }
 

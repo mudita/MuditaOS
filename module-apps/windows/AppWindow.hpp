@@ -66,6 +66,7 @@ namespace gui
         bool updateBatteryStatus();
         bool updateSignalStrength();
         bool updateNetworkAccessTechnology();
+        void updatePhoneMode(sys::phone_modes::PhoneMode mode);
         virtual bool updateTime();
         void setTitle(const UTF8 &text);
 

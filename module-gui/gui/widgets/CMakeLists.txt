@@ -29,6 +29,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/TopBar/SignalStrengthBar.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TopBar/SignalStrengthText.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TopBar/NetworkAccessTechnology.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/TopBar/PhoneMode.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TopBar/Time.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/TopBar/Lock.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Text.cpp"

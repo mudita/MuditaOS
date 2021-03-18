@@ -14,6 +14,7 @@
 #include "TopBar/SignalStrengthBar.hpp"
 #include "TopBar/SignalStrengthText.hpp"
 #include "TopBar/NetworkAccessTechnology.hpp"
+#include "TopBar/PhoneMode.hpp"
 #include "TopBar/SIM.hpp"
 #include "TopBar/Time.hpp"
 #include "TopBar/Lock.hpp"
@@ -31,7 +32,7 @@ namespace gui::top_bar
 
     void Configuration::enable(Indicator indicator)
     {
-        set(indicator, true);
+        setIndicator(indicator, true);
     }
 
     void Configuration::enable(const Indicators &indicators)
@@ -43,22 +44,32 @@ namespace gui::top_bar
 
     void Configuration::disable(Indicator indicator)
     {
-        set(indicator, false);
+        setIndicator(indicator, false);
     }
 
-    void Configuration::set(Indicator indicator, bool enabled)
+    void Configuration::setIndicator(Indicator indicator, bool enabled)
     {
         indicatorStatuses[indicator] = enabled;
     }
 
     auto Configuration::getTimeMode() const noexcept -> TimeMode
     {
-        return timeMode;
+        return mTimeMode;
     }
 
-    void Configuration::set(TimeMode _timeMode)
+    auto Configuration::getPhoneMode() const noexcept -> sys::phone_modes::PhoneMode
     {
-        timeMode = _timeMode;
+        return mPhoneMode;
+    }
+
+    void Configuration::setTimeMode(TimeMode timeMode)
+    {
+        mTimeMode = timeMode;
+    }
+
+    void Configuration::setPhoneMode(sys::phone_modes::PhoneMode phoneMode)
+    {
+        mPhoneMode = phoneMode;
     }
 
     auto Configuration::isEnabled(Indicator indicator) const -> bool
@@ -95,6 +106,10 @@ namespace gui::top_bar
         networkAccessTechnology = new NetworkAccessTechnology(leftBox, 0, 0, 0, 0);
         networkAccessTechnology->setMaximumSize(nat::maxX, this->drawArea.h);
         networkAccessTechnology->setMargins(gui::Margins(margins::between, 0, 0, margins::textBottom));
+        phoneMode = new PhoneMode(leftBox, 0, 0, 0, 0);
+        phoneMode->setMaximumSize(phonemode::maxX, this->drawArea.h);
+        phoneMode->setMargins(gui::Margins(margins::between, 0, 0, margins::textBottom));
+        phoneMode->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Bottom));
 
         // center
         centralBox = new HBox(this, 0, 0, 0, 0);
@@ -119,6 +134,7 @@ namespace gui::top_bar
 
         updateSignalStrength();
         updateNetworkAccessTechnology();
+        updatePhoneMode();
     }
 
     auto TopBar::getConfiguration() const noexcept -> const Configuration &
@@ -134,6 +150,12 @@ namespace gui::top_bar
             config.disable(Indicator::Time);
         }
 
+        // phone mode and NAT are mutually exclusive.
+        if (config.isEnabled(Indicator::PhoneMode)) {
+            phoneMode->setPhoneMode(config.getPhoneMode());
+            config.disable(Indicator::NetworkAccessTechnology);
+        }
+
         using namespace utils::time;
         config.getTimeMode() == TimeMode::Time12h ? time->setFormat(Locale::format(Locale::TimeFormat::FormatTime12H))
                                                   : time->setFormat(Locale::format(Locale::TimeFormat::FormatTime24H));
@@ -143,6 +165,7 @@ namespace gui::top_bar
         }
         configuration = std::move(config);
 
+        leftBox->resizeItems();
         resizeItems();
     }
 
@@ -166,6 +189,9 @@ namespace gui::top_bar
             break;
         case Indicator::NetworkAccessTechnology:
             showNetworkAccessTechnology(enabled);
+            break;
+        case Indicator::PhoneMode:
+            showPhoneMode(enabled);
             break;
         }
     }
@@ -214,6 +240,20 @@ namespace gui::top_bar
         }
         showSignalStrength(configuration.isEnabled(Indicator::Signal));
         return true;
+    }
+
+    bool TopBar::updatePhoneMode()
+    {
+        if (phoneMode == nullptr) {
+            return false;
+        }
+        showPhoneMode(configuration.isEnabled(Indicator::PhoneMode));
+        return true;
+    }
+
+    void TopBar::showPhoneMode(bool enabled)
+    {
+        enabled ? phoneMode->show() : phoneMode->hide();
     }
 
     bool TopBar::updateNetworkAccessTechnology()
