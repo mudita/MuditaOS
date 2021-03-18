@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -38,10 +38,17 @@ namespace app::manager
     bool operator==(const ActionEntry &lhs, const ActionEntry &rhs) noexcept;
     bool operator!=(const ActionEntry &lhs, const ActionEntry &rhs) noexcept;
 
+    enum class ActionProcessStatus
+    {
+        Accepted,
+        Skipped,
+        Dropped
+    };
+
     class ActionsRegistry
     {
       public:
-        using OnNextActionReadyCallback = std::function<bool(ActionEntry &action)>;
+        using OnNextActionReadyCallback = std::function<ActionProcessStatus(ActionEntry &action)>;
 
         explicit ActionsRegistry(OnNextActionReadyCallback &&callback);
 

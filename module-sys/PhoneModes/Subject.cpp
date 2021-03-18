@@ -19,18 +19,22 @@ namespace sys::phone_modes
         }
     }
 
-    void Subject::setMode(PhoneMode _phoneMode, Tethering _tetheringMode)
+    bool Subject::setMode(PhoneMode _phoneMode, Tethering _tetheringMode)
     {
-        if (const bool changed = changePhoneMode(_phoneMode) || changeTetheringMode(_tetheringMode); changed) {
+        const bool changed = changePhoneMode(_phoneMode) || changeTetheringMode(_tetheringMode);
+        if (changed) {
             notifyChange();
         }
+        return changed;
     }
 
-    void Subject::setPhoneMode(PhoneMode mode)
+    bool Subject::setPhoneMode(PhoneMode mode)
     {
-        if (const auto changed = changePhoneMode(mode); changed) {
+        const auto changed = changePhoneMode(mode);
+        if (changed) {
             notifyChange();
         }
+        return changed;
     }
 
     bool Subject::changePhoneMode(PhoneMode mode) noexcept
@@ -38,11 +42,13 @@ namespace sys::phone_modes
         return std::exchange(phoneMode, mode) != mode;
     }
 
-    void Subject::setTetheringMode(Tethering mode)
+    bool Subject::setTetheringMode(Tethering mode)
     {
-        if (const auto changed = changeTetheringMode(mode); changed) {
+        const auto changed = changeTetheringMode(mode);
+        if (changed) {
             notifyChange();
         }
+        return changed;
     }
 
     bool Subject::changeTetheringMode(Tethering mode) noexcept

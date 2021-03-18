@@ -27,6 +27,7 @@
 #include "messages/RequestCpuFrequencyMessage.hpp"
 #include "messages/PhoneModeRequest.hpp"
 #include "messages/TetheringStateRequest.hpp"
+#include "messages/TetheringQuestionRequest.hpp"
 #include <time/ScopedTime.hpp>
 #include "Timers/TimerFactory.hpp"
 #include <service-appmgr/StartupType.hpp>
@@ -603,6 +604,11 @@ namespace sys
             return sys::MessageNone{};
         });
 
+        connect(typeid(TetheringEnabledResponse), [this](sys::Message *message) -> sys::MessagePointer {
+            auto response = static_cast<TetheringEnabledResponse *>(message);
+            return enableTethering(response);
+        });
+
         deviceManager->RegisterNewDevice(powerManager->getExternalRamDevice());
 
         return ReturnCodes::Success;
@@ -768,7 +774,23 @@ namespace sys
     MessagePointer SystemManager::handleTetheringStateRequest(TetheringStateRequest *request)
     {
         LOG_INFO("Tethering state change requested");
-        phoneModeSubject->setTetheringMode(request->getTetheringState());
+        if (const auto requestedState = request->getTetheringState(); requestedState == phone_modes::Tethering::On) {
+            bus.sendUnicast(std::make_shared<TetheringQuestionRequest>(),
+                            app::manager::ApplicationManager::ServiceName);
+        }
+        else {
+            if (const auto tetheringChanged = phoneModeSubject->setTetheringMode(phone_modes::Tethering::Off);
+                !tetheringChanged) {
+                bus.sendUnicast(std::make_shared<TetheringQuestionAbort>(),
+                                app::manager::ApplicationManager::ServiceName);
+            }
+        }
+        return MessageNone{};
+    }
+
+    MessagePointer SystemManager::enableTethering([[maybe_unused]] TetheringEnabledResponse *response)
+    {
+        phoneModeSubject->setTetheringMode(phone_modes::Tethering::On);
         return MessageNone{};
     }
 

@@ -41,6 +41,7 @@ namespace sys
 
     class PhoneModeRequest; // Forward declaration
     class TetheringStateRequest; // Forward declaration
+    class TetheringEnabledResponse; // Forward declaration
 
     enum class Code
     {
@@ -191,6 +192,7 @@ namespace sys
 
         MessagePointer handlePhoneModeRequest(PhoneModeRequest *request);
         MessagePointer handleTetheringStateRequest(TetheringStateRequest *request);
+        MessagePointer enableTethering(TetheringEnabledResponse *response);
 
         void batteryCriticalLevelAction(bool charging);
         void batteryNormalLevelAction();
