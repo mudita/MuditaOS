@@ -102,11 +102,22 @@ namespace gui
         return topBar->updateNetworkAccessTechnology();
     }
 
+    void AppWindow::updatePhoneMode(sys::phone_modes::PhoneMode mode)
+    {
+        auto fn = [&](gui::top_bar::Configuration cfg) -> gui::top_bar::Configuration {
+            gui::top_bar::Configuration ret(cfg);
+            ret.setPhoneMode(mode);
+            return ret;
+        };
+
+        applyToTopBar(std::move(fn));
+    }
+
     bool AppWindow::updateTime()
     {
         applyToTopBar([](top_bar::Configuration configuration) {
-            configuration.set(utils::dateAndTimeSettings.isTimeFormat12() ? gui::top_bar::TimeMode::Time12h
-                                                                          : (gui::top_bar::TimeMode::Time24h));
+            configuration.setTimeMode(utils::dateAndTimeSettings.isTimeFormat12() ? gui::top_bar::TimeMode::Time12h
+                                                                                  : (gui::top_bar::TimeMode::Time24h));
             return configuration;
         });
         if (topBar == nullptr) {

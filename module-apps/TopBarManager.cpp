@@ -18,6 +18,6 @@ namespace app
 
     void TopBarManager::set(gui::top_bar::TimeMode timeMode)
     {
-        topBarConfiguration.set(timeMode);
+        topBarConfiguration.setTimeMode(timeMode);
     }
 } // namespace app

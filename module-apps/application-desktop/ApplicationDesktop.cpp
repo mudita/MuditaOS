@@ -49,7 +49,8 @@ namespace app
                                          Indicator::Time,
                                          Indicator::Battery,
                                          Indicator::SimCard,
-                                         Indicator::NetworkAccessTechnology});
+                                         Indicator::NetworkAccessTechnology,
+                                         Indicator::PhoneMode});
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
         addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {

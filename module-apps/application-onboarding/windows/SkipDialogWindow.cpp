@@ -14,10 +14,10 @@ namespace app::onBoarding
 
     gui::top_bar::Configuration SkipDialogWindow::configureTopBar(gui::top_bar::Configuration appConfiguration)
     {
-        appConfiguration.set(gui::top_bar::Indicator::Time, true);
-        appConfiguration.set(gui::top_bar::Indicator::Battery, false);
-        appConfiguration.set(gui::top_bar::Indicator::SimCard, false);
-        appConfiguration.set(gui::top_bar::Indicator::Signal, false);
+        appConfiguration.setIndicator(gui::top_bar::Indicator::Time, true);
+        appConfiguration.setIndicator(gui::top_bar::Indicator::Battery, false);
+        appConfiguration.setIndicator(gui::top_bar::Indicator::SimCard, false);
+        appConfiguration.setIndicator(gui::top_bar::Indicator::Signal, false);
         return appConfiguration;
     }
 } // namespace app::onBoarding

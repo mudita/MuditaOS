@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimerWindow.hpp"
@@ -113,7 +113,7 @@ auto MeditationTimerWindow::onInput(const InputEvent &inputEvent) -> bool
 void MeditationTimerWindow::setWidgetVisible(bool tBar, bool bBar, bool counter)
 {
     applyToTopBar([tBar](top_bar::Configuration configuration) {
-        configuration.set(top_bar::Indicator::Time, tBar);
+        configuration.setIndicator(top_bar::Indicator::Time, tBar);
         return configuration;
     });
 
