@@ -29,6 +29,11 @@ namespace style::header::status_bar
         inline constexpr auto maxX = 35u;
         inline constexpr auto font = "gt_pressura_regular_20";
     }; // namespace nat
+    namespace phonemode
+    {
+        inline constexpr auto maxX = 157u;
+        inline constexpr auto font = "gt_pressura_regular_20";
+    }; // namespace phonemode
     namespace signal
     {
         inline constexpr auto font = "gt_pressura_regular_20";

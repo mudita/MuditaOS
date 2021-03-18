@@ -119,6 +119,14 @@ namespace app
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleGetDOM(msg); });
         connect(typeid(AppUpdateWindowMessage),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleUpdateWindow(msg); });
+
+        // handle phone mode changes
+        bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
+        phoneModeObserver->connect(this);
+        phoneModeObserver->subscribe(
+            [&](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
+                handlePhoneModeChanged(phoneMode, tetheringMode);
+            });
     }
 
     Application::~Application() noexcept
@@ -174,6 +182,7 @@ namespace app
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
             window->updateTime();
+            window->updatePhoneMode(phoneModeObserver->getCurrentPhoneMode());
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
 
@@ -673,6 +682,16 @@ namespace app
     {
         auto msg = std::make_shared<AppInputEventMessage>(event);
         sender->bus.sendUnicast(msg, application);
+    }
+
+    void Application::handlePhoneModeChanged(sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering)
+    {
+        // only foreground rendering application will react to mode changes
+        if (state != State::ACTIVE_FORGROUND) {
+            return;
+        }
+
+        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
     void Application::attachPopups(const std::vector<gui::popup::ID> &popupsList)

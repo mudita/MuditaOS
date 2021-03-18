@@ -320,6 +320,11 @@ namespace app
         /// Method closing application's windows.
         virtual void destroyUserInterface() = 0;
 
+        /// Handle the change of phone mode and tethering mode
+        /// @param mode new phone mode
+        /// @param tethering new tethering mode
+        void handlePhoneModeChanged(sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering);
+
         /// @ingrup AppWindowStack
         WindowsStack windowsStack;
         WindowsFactory windowsFactory;
