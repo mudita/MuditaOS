@@ -17,6 +17,7 @@ namespace gui
             Volume,
             PhoneModes,
             Brightness,
+            Tethering
         };
 
         namespace window
@@ -24,6 +25,9 @@ namespace gui
             inline constexpr auto volume_window      = "VolumePopup";
             inline constexpr auto phone_modes_window = "PhoneModesPopup";
             inline constexpr auto brightness_window  = "BrightnessPopup";
+            inline constexpr auto tethering_confirmation_window = "TetheringConfirmationPopup";
         } // namespace window
+
+        std::string resolveWindowName(ID id);
     }     // namespace popup
 } // namespace gui

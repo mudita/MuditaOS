@@ -10,6 +10,7 @@
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
+#include <SystemManager/messages/TetheringQuestionRequest.hpp>
 #include <application-call/ApplicationCall.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
@@ -331,7 +332,7 @@ namespace app::manager
         });
         connect(typeid(ActionHandledResponse), [this](sys::Message *response) {
             actionsRegistry.finished();
-            return nullptr;
+            return sys::MessageNone{};
         });
         connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
             return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::localize.getDisplayLanguage());
@@ -364,6 +365,8 @@ namespace app::manager
         connect(typeid(sdesktop::passcode::ScreenPasscodeRequest), convertibleToActionHandler);
         connect(typeid(CellularSMSRejectedByOfflineNotification), convertibleToActionHandler);
         connect(typeid(CellularCallRejectedByOfflineNotification), convertibleToActionHandler);
+        connect(typeid(sys::TetheringQuestionRequest), convertibleToActionHandler);
+        connect(typeid(sys::TetheringQuestionAbort), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -467,15 +470,17 @@ namespace app::manager
             LOG_INFO("No focused application at the moment. Starting new application...");
             onApplicationSwitch(*app, std::move(msg->getData()), msg->getWindow());
             startApplication(*app);
-            return true;
-        }
-
-        if (app->name() == currentlyFocusedApp->name()) {
-            LOG_WARN("Failed to return to currently focused application.");
             return false;
         }
 
         onApplicationSwitch(*app, std::move(msg->getData()), msg->getWindow());
+        if (app->name() == currentlyFocusedApp->name()) {
+            // Switch window only.
+            app::Application::messageSwitchApplication(
+                this, app->name(), app->switchWindow, std::move(app->switchData));
+            return false;
+        }
+
         const bool isFocusedAppCloseable =
             closeCurrentlyFocusedApp && currentlyFocusedApp->closeable() && !currentlyFocusedApp->blockClosing;
         requestApplicationClose(*currentlyFocusedApp, isFocusedAppCloseable);
@@ -514,48 +519,65 @@ namespace app::manager
         actionsRegistry.enqueue(std::move(entry));
     }
 
-    bool ApplicationManager::handleAction(ActionEntry &action)
+    ActionProcessStatus ApplicationManager::handleAction(ActionEntry &action)
     {
         switch (action.actionId) {
         case actions::Home:
             return handleHomeAction(action);
         case actions::Launch:
             return handleLaunchAction(action);
+        case actions::ShowPopup:
+            [[fallthrough]];
+        case actions::AbortPopup:
+            return handlePopupAction(action);
         default:
             return handleCustomAction(action);
         }
     }
 
-    auto ApplicationManager::handleHomeAction(ActionEntry &action) -> bool
+    auto ApplicationManager::handleHomeAction(ActionEntry &action) -> ActionProcessStatus
     {
         action.setTargetApplication(rootApplicationName);
         SwitchRequest switchRequest(ServiceName, rootApplicationName, gui::name::window::main_window, nullptr);
-        return handleSwitchApplication(&switchRequest);
+        return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
     }
 
-    auto ApplicationManager::handleLaunchAction(ActionEntry &action) -> bool
+    auto ApplicationManager::handleLaunchAction(ActionEntry &action) -> ActionProcessStatus
     {
         auto launchParams = static_cast<ApplicationLaunchData *>(action.params.get());
         auto targetApp    = getApplication(launchParams->getTargetApplicationName());
         if (targetApp == nullptr || !targetApp->handles(actions::Launch)) {
-            return false;
+            return ActionProcessStatus::Dropped;
         }
 
         action.setTargetApplication(targetApp->name());
         SwitchRequest switchRequest(ServiceName, targetApp->name(), gui::name::window::main_window, nullptr);
-        return handleSwitchApplication(&switchRequest);
+        return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
     }
 
-    auto ApplicationManager::handleCustomAction(ActionEntry &action) -> bool
+    auto ApplicationManager::handlePopupAction(ActionEntry &action) -> ActionProcessStatus
+    {
+        auto targetApp = getFocusedApplication();
+        if (targetApp == nullptr) {
+            return ActionProcessStatus::Skipped;
+        }
+        action.setTargetApplication(targetApp->name());
+
+        auto &params = action.params;
+        app::Application::requestAction(this, targetApp->name(), action.actionId, std::move(params));
+        return ActionProcessStatus::Accepted;
+    }
+
+    auto ApplicationManager::handleCustomAction(ActionEntry &action) -> ActionProcessStatus
     {
         const auto actionHandlers = applications.findByAction(action.actionId);
         if (actionHandlers.empty()) {
             LOG_ERROR("No applications handling action #%d.", action.actionId);
-            return false;
+            return ActionProcessStatus::Dropped;
         }
         if (actionHandlers.size() > 1) {
             LOG_FATAL("Choosing amongst multiple action handler applications is not yet implemented.");
-            return false;
+            return ActionProcessStatus::Dropped;
         }
 
         const auto targetApp = actionHandlers.front();
@@ -565,11 +587,12 @@ namespace app::manager
             const auto focusedAppClose = !(actionParams && actionParams->disableAppClose);
             SwitchRequest switchRequest(
                 ServiceName, targetApp->name(), targetApp->switchWindow, std::move(targetApp->switchData));
-            return handleSwitchApplication(&switchRequest, focusedAppClose);
+            return handleSwitchApplication(&switchRequest, focusedAppClose) ? ActionProcessStatus::Accepted
+                                                                            : ActionProcessStatus::Skipped;
         }
 
         app::Application::requestAction(this, targetApp->name(), action.actionId, std::move(actionParams));
-        return true;
+        return ActionProcessStatus::Accepted;
     }
 
     auto ApplicationManager::handleSwitchBack(SwitchBackRequest *msg) -> bool

@@ -3,6 +3,7 @@
 
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <i18n/i18n.hpp>
+#include "Application.hpp"
 #include "VolumeWindow.hpp"
 #include "popups/data/PopupData.hpp"
 

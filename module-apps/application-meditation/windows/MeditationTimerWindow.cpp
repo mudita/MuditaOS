@@ -75,7 +75,6 @@ void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
             timer->start();
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         };
-
         timer->registerTimeoutCallback(onPreparation);
         timer->setCounterVisible(timerData->isCounterEnabled());
         timer->reset(timerData->getPreparationTime());

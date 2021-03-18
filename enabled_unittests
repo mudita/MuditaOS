@@ -25,6 +25,7 @@ TESTS_LIST["catch2-actions-registry-tests"]="
     Given actions registry when enqueue multiple actions at once then count handled actions;
     Given actions registry when enqueue multiple actions at once then wait for them to expire.;
     Given actions registry when enqueue multiple actions at once then process the specific ones only.;
+    Process the specific actions only and skip others.;
 "
 #---------
 TESTS_LIST["catch2-audio-test"]="

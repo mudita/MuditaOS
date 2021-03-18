@@ -60,6 +60,8 @@ namespace app::manager
             DisplayLogoAtExit,
             SMSRejectedByOfflineNotification,
             CallRejectedByOfflineNotification,
+            ShowPopup,
+            AbortPopup,
             UserAction // The last enumerator in the Action enum.
                        // All user-defined actions shall have values greater than UserAction.
                        // All system-wide actions shall have values lesser than UserAction.

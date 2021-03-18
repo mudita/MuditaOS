@@ -3,9 +3,12 @@
 
 #pragma once
 
-#include "Application.hpp"
-#include "widgets/BarGraph.hpp"
+#include "module-apps/widgets/BarGraph.hpp"
 #include "WindowWithTimer.hpp"
+
+#include <module-audio/Audio/AudioCommon.hpp>
+#include <module-audio/Audio/Profiles/Profile.hpp>
+
 #include <functional>
 
 namespace style::window::volume
@@ -23,6 +26,12 @@ namespace style::window::volume
     } // namespace bar
 
 } // namespace style::window::volume
+
+namespace app
+{
+    class Application;
+} // namespace app
+
 namespace gui
 {
     class VolumeWindow : public WindowWithTimer

@@ -84,6 +84,11 @@ namespace app
         });
     }
 
+    bool ApplicationCall::isPopupPermitted(gui::popup::ID popupId) const
+    {
+        return getState() == call::State::IDLE;
+    }
+
     //  number of seconds after end call to switch back to previous application
     const inline utils::time::Duration delayToSwitchToPreviousApp = 3;
 
@@ -232,7 +237,7 @@ namespace app
         windowsFactory.attach(app::window::name_dialogConfirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
     }
 
     bool ApplicationCall::showNotification(std::function<bool()> action,
