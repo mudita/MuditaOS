@@ -8,7 +8,7 @@ from harness.interface.defs import key_codes, SMSType, status
 from harness.interface.CDCSerial import Keytype
 
 # time for  message to leave the sending queue
-extra_time_to_send_message  = 40
+extra_time_to_send_message  = 50
 
 def check_for_sent(old_messages,harness, sms_text, phone_number,timeout):
     local_timeout = copy.deepcopy(timeout)
@@ -35,11 +35,11 @@ def erase_all_templates(harness):
     count = ret["body"]["count"]
 
     # getting all templates
-    body = {"category": "template", "limit": count}
+    body = {"category": "template", "limit": count, "offset": 0}
     ret = harness.endpoint_request("messages", "get", body)
     assert ret["status"] == status["OK"]
 
-    assert len(ret["body"]["entries"]) == count
+    assert ret["body"]["totalCount"] == count
 
     for template in ret["body"]["entries"]:
         body = {"category": "template", "templateID": template["templateID"]}
