@@ -29,6 +29,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <memory>
+#include <fstream>
 
 FileInfo::FileInfo(mtar_header_t &h, unsigned long crc32) : fileSize(h.size), fileCRC32(crc32)
 {
@@ -229,29 +230,9 @@ updateos::UpdateError UpdateMuditaOS::unpackUpdate()
     return updateos::UpdateError::NoError;
 }
 
-std::string UpdateMuditaOS::readContent(const char *filename) noexcept
-{
-    std::unique_ptr<char[]> fcontent;
-    long fsize = 0;
-
-    auto fp = std::fopen(filename, "r");
-    if (fp) {
-        std::fseek(fp, 0, SEEK_END);
-        fsize = std::ftell(fp);
-        std::rewind(fp);
-
-        fcontent = std::make_unique<char[]>(fsize + 1);
-
-        std::fread(fcontent.get(), 1, fsize, fp);
-
-        std::fclose(fp);
-    }
-
-    return std::string(fcontent.get());
-}
-
 updateos::UpdateError UpdateMuditaOS::verifyChecksums()
 {
+    LOG_DEBUG("Checksum Verify");
     status = updateos::UpdateState::ChecksumVerification;
 
     if (isUpdateToBeAborted()) {
@@ -263,30 +244,30 @@ updateos::UpdateError UpdateMuditaOS::verifyChecksums()
         informUpdateWindow();
     }
 
-    auto lineBuff = std::make_unique<char[]>(
-        boot::consts::tar_buf); // max line should be freertos max path + checksum, so this is enough
     fs::path checksumsFile = getUpdateTmpChild(updateos::file::checksums);
-    auto fpChecksums       = std::fopen(checksumsFile.c_str(), "r");
+    std::ifstream fpChecksums(checksumsFile.string(), std::ios::binary);
 
-    if (fpChecksums == nullptr) {
+    if (!fpChecksums.is_open()) {
         return informError(updateos::UpdateError::CantOpenChecksumsFile,
                            "verifyChecksums can't open checksums file %s",
                            checksumsFile.c_str());
     }
 
-    while (!std::feof(fpChecksums)) {
-        char *line = std::fgets(lineBuff.get(), boot::consts::tar_buf, fpChecksums);
+    while (!fpChecksums.eof()) {
+        std::string line;
+        std::getline(fpChecksums, line);
+
         std::string filePath;
         unsigned long fileCRC32;
 
-        if (lineBuff[0] == ';' || line == nullptr) {
+        if (line[0] == ';') {
             continue;
         }
 
         getChecksumInfo(line, filePath, &fileCRC32);
         unsigned long computedCRC32 = getExtractedFileCRC32(filePath);
         if (computedCRC32 != fileCRC32) {
-            std::fclose(fpChecksums);
+            fpChecksums.close();
             return informError(updateos::UpdateError::VerifyChecksumsFailure,
                                "verifyChecksums %s crc32 match FAIL %lX != %lX",
                                filePath.c_str(),
@@ -294,7 +275,7 @@ updateos::UpdateError UpdateMuditaOS::verifyChecksums()
                                computedCRC32);
         }
     }
-    std::fclose(fpChecksums);
+    fpChecksums.close();
     return updateos::UpdateError::NoError;
 }
 
@@ -317,7 +298,8 @@ updateos::UpdateError UpdateMuditaOS::verifyVersion()
                            getUpdateTmpChild(updateos::file::version).c_str());
     }
 
-    std::string versionJsonString = readContent(getUpdateTmpChild(updateos::file::version).c_str());
+    std::ifstream version_file(getUpdateTmpChild(updateos::file::version).string(), std::ios::binary);
+    std::string versionJsonString(std::istreambuf_iterator<char>(version_file), (std::istreambuf_iterator<char>()));
     std::string parserError;
     targetVersionInfo = json11::Json::parse(versionJsonString, parserError);
     if (!parserError.empty()) {

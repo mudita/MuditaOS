@@ -200,5 +200,4 @@ class UpdateMuditaOS : public updateos::UpdateStats
     json11::Json updateHistory;
     json11::Json targetVersionInfo;
     boot::BootConfig bootConfig;
-    [[nodiscard]] static std::string readContent(const char *filename) noexcept;
 };
