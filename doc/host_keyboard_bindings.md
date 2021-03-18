@@ -1,4 +1,4 @@
-# Keyboard bindinging on Linux
+# Keyboard binding on Linux Pure simulator
 
 ## Table of contents
 
