@@ -31,6 +31,7 @@
 #include "popups/Popups.hpp"
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"
+#include "Popups.hpp"
 
 namespace app
 {
@@ -175,6 +176,8 @@ namespace app
         sys::MessagePointer handleAppFocusLost(sys::Message *msgl);
         sys::MessagePointer handleSIMMessage(sys::Message *msgl);
         sys::MessagePointer handleAudioKeyMessage(sys::Message *msgl);
+
+        virtual bool isPopupPermitted(gui::popup::ID popupId) const;
 
         std::list<std::unique_ptr<app::GuiTimer>> gui_timers;
         std::unordered_map<manager::actions::ActionId, OnActionReceived> receivers;
@@ -331,6 +334,7 @@ namespace app
 
         /// Method used to attach popups windows to application
         void attachPopups(const std::vector<gui::popup::ID> &popupsList);
+        void abortPopup(gui::popup::ID id);
 
       public:
         /// @ingrup AppWindowStack
@@ -399,7 +403,7 @@ namespace app
     class ApplicationLaunchData : public manager::actions::ActionParams
     {
       public:
-        ApplicationLaunchData(const app::ApplicationName &appName)
+        explicit ApplicationLaunchData(const app::ApplicationName &appName)
             : manager::actions::ActionParams{"Application launch parameters"}, targetAppName{appName}
         {}
 
@@ -410,5 +414,21 @@ namespace app
 
       private:
         ApplicationName targetAppName;
+    };
+
+    class PopupRequestParams : public manager::actions::ActionParams
+    {
+      public:
+        explicit PopupRequestParams(gui::popup::ID popupId)
+            : manager::actions::ActionParams{"Popup request parameters"}, popupId{popupId}
+        {}
+
+        [[nodiscard]] auto getPopupId() const noexcept
+        {
+            return popupId;
+        }
+
+      private:
+        gui::popup::ID popupId;
     };
 } /* namespace app */

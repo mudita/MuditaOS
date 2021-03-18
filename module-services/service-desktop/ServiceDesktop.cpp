@@ -211,6 +211,9 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     });
 
     connect(sdesktop::usb::USBConfigured(), [&](sys::Message *msg) {
+        bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
+                        service::name::system_manager);
+
         if (!usbSecurityModel->isSecurityEnabled()) {
             LOG_INFO("Endpoint security disabled.");
             return sys::MessageNone{};

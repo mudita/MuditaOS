@@ -8,6 +8,7 @@
 #include "MessageType.hpp"   // for MessageType
 #include "module-sys/Timers/TimerFactory.hpp" // for Timer
 #include "TopBar.hpp"
+#include "popups/TetheringConfirmationPopup.hpp"
 #include "Translator.hpp"                // for KeyInputSim...
 #include "common_data/EventStore.hpp"    // for Battery
 #include "common_data/RawKey.hpp"        // for RawKey, key...
@@ -115,6 +116,20 @@ namespace app
             [&](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
                 handlePhoneModeChanged(phoneMode, tetheringMode);
             });
+
+        addActionReceiver(app::manager::actions::ShowPopup, [this](auto &&params) {
+            auto popupParams = static_cast<app::PopupRequestParams *>(params.get());
+            if (const auto popupId = popupParams->getPopupId(); isPopupPermitted(popupId)) {
+                switchWindow(gui::popup::resolveWindowName(popupId));
+            }
+            return actionHandled();
+        });
+        addActionReceiver(app::manager::actions::AbortPopup, [this](auto &&params) {
+            auto popupParams   = static_cast<app::PopupRequestParams *>(params.get());
+            const auto popupId = popupParams->getPopupId();
+            abortPopup(popupId);
+            return actionHandled();
+        });
     }
 
     Application::~Application() noexcept
@@ -647,7 +662,6 @@ namespace app
 
     void Application::messageCloseApplication(sys::Service *sender, std::string application)
     {
-
         auto msg = std::make_shared<AppMessage>(MessageType::AppClose);
         sender->bus.sendUnicast(msg, application);
     }
@@ -698,6 +712,13 @@ namespace app
                     return std::make_unique<gui::VolumeWindow>(app, window::volume_window);
                 });
                 break;
+            case ID::Tethering:
+                windowsFactory.attach(window::tethering_confirmation_window,
+                                      [](Application *app, const std::string &name) {
+                                          return std::make_unique<gui::TetheringConfirmationPopup>(
+                                              app, window::tethering_confirmation_window);
+                                      });
+                break;
             case ID::PhoneModes:
                 windowsFactory.attach(window::phone_modes_window, [](Application *app, const std::string &name) {
                     return std::make_unique<gui::HomeModesWindow>(app, window::phone_modes_window);
@@ -707,6 +728,19 @@ namespace app
                 break;
             }
         }
+    }
+
+    void Application::abortPopup(gui::popup::ID id)
+    {
+        const auto popupName = gui::popup::resolveWindowName(id);
+        if (getCurrentWindow()->getName() == popupName) {
+            returnToPreviousWindow();
+        }
+    }
+
+    bool Application::isPopupPermitted([[maybe_unused]] gui::popup::ID popupId) const
+    {
+        return true;
     }
 
     bool Application::popToWindow(const std::string &window)

@@ -493,7 +493,7 @@ namespace app
             return std::make_unique<gui::MmiInternalMsgWindow>(app, desktop_mmi_internal);
         });
 
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
     }
 
     void ApplicationDesktop::destroyUserInterface()

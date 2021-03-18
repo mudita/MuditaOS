@@ -524,8 +524,6 @@ namespace app
         windowsFactory.attach(gui::window::name::quote_categories, [](Application *app, const std::string &name) {
             return std::make_unique<gui::QuoteCategoriesWindow>(app);
         });
-
-        attachPopups({gui::popup::ID::Volume});
         windowsFactory.attach(gui::window::name::phone_modes, [](Application *app, const std::string &name) {
             return std::make_unique<gui::PhoneModesWindow>(
                 app, static_cast<ApplicationSettingsNew *>(app), static_cast<ApplicationSettingsNew *>(app));
@@ -539,6 +537,7 @@ namespace app
         windowsFactory.attach(gui::window::name::connection_frequency, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
+        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering});
     }
 
     void ApplicationSettingsNew::destroyUserInterface()

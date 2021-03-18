@@ -116,11 +116,12 @@ namespace app::manager
 
         // Message handlers
         void registerMessageHandlers();
-        bool handleAction(ActionEntry &action);
+        auto handleAction(ActionEntry &action) -> ActionProcessStatus;
         void handleActionRequest(ActionRequest *actionMsg);
-        auto handleHomeAction(ActionEntry &action) -> bool;
-        auto handleLaunchAction(ActionEntry &action) -> bool;
-        auto handleCustomAction(ActionEntry &action) -> bool;
+        auto handleHomeAction(ActionEntry &action) -> ActionProcessStatus;
+        auto handleLaunchAction(ActionEntry &action) -> ActionProcessStatus;
+        auto handlePopupAction(ActionEntry &action) -> ActionProcessStatus;
+        auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;
         auto handleSwitchConfirmation(SwitchConfirmation *msg) -> bool;
