@@ -95,16 +95,14 @@ namespace gui
             return false;
         }
 
-        if (inputEvent.keyCode == gui::KeyCode::KEY_LEFT) {
+        if (inputEvent.is(gui::KeyCode::KEY_LEFT)) {
             LOG_DEBUG("Switch to new window - edit window");
-            std::unique_ptr<EventRecordData> data = std::make_unique<EventRecordData>();
+            auto event       = std::make_shared<EventsRecord>();
+            event->date_from = filterFrom;
+            event->date_till = filterFrom + std::chrono::hours(utils::time::Locale::max_hour_24H_mode) +
+                               std::chrono::minutes(utils::time::Locale::max_minutes);
+            auto data = std::make_unique<EventRecordData>(std::move(event));
             data->setDescription(style::window::calendar::new_event);
-            auto rec       = new EventsRecord();
-            rec->date_from = filterFrom;
-            rec->date_till = filterFrom + std::chrono::hours(utils::time::Locale::max_hour_24H_mode) +
-                             std::chrono::minutes(utils::time::Locale::max_minutes);
-            auto event = std::make_shared<EventsRecord>(*rec);
-            data->setData(event);
             application->switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;

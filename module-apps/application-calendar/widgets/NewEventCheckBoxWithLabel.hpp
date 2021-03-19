@@ -3,13 +3,14 @@
 
 #pragma once
 #include "CheckBoxWithLabelItem.hpp"
-#include "application-calendar/models/NewEditEventModel.hpp"
+#include <widgets/DateWidget.hpp>
 
 namespace gui
 {
     class NewEventCheckBoxWithLabel : public CheckBoxWithLabelItem
     {
-        NewEditEventModel *model = nullptr;
+        using OnCheckCallback     = std::function<void(bool)>;
+        OnCheckCallback onCheck   = nullptr;
         app::Application *app    = nullptr;
         gui::DateWidget *dateItem = nullptr;
         void applyCallbacks() override;
@@ -17,10 +18,14 @@ namespace gui
       public:
         NewEventCheckBoxWithLabel(app::Application *application,
                                   const std::string &description,
-                                  NewEditEventModel *model  = nullptr);
-        virtual ~NewEventCheckBoxWithLabel() override = default;
+                                  OnCheckCallback onCheck);
 
         void setConnectionToDateItem(gui::DateWidget *item);
     };
+
+    namespace allDayEvents
+    {
+        bool isAllDayEvent(TimePoint start, TimePoint end);
+    }
 
 } /* namespace gui */
