@@ -14,6 +14,7 @@ namespace Log
                                                             {"TS0710Worker", logger_level::LOGINFO},
                                                             {"ServiceCellular", logger_level::LOGINFO},
                                                             {"ServiceAntenna", logger_level::LOGINFO},
+                                                            {"ServiceAudio", logger_level::LOGINFO},
                                                             {"ServiceFota", logger_level::LOGINFO},
                                                             {"ServiceEink", logger_level::LOGINFO},
                                                             {"ServiceDB", logger_level::LOGINFO},
