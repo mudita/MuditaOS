@@ -246,8 +246,8 @@ inline TimePoint TimePointFromYearMonthDay(const calendar::YearMonthDay &ymd)
 inline time_t TimePointToMin(const TimePoint &tp)
 {
     auto time     = TimePointToTimeT(tp);
-    auto duration = new utils::time::Duration(time);
-    auto minutes  = duration->getMinutes();
+    auto duration = utils::time::Duration(time);
+    auto minutes  = duration.getMinutes();
     return minutes;
 }
 

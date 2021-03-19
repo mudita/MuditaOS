@@ -209,12 +209,12 @@ namespace gui
         this->dateItem = item;
     }
 
-    bool TimeWidget::isPm(const std::string &text)
+    bool TimeWidget::isPm(const std::string &text) const
     {
         return !(text == timeConstants::before_noon);
     }
 
-    bool TimeWidget::validateHour()
+    bool TimeWidget::validateHour() const
     {
         if (type == Type::End) {
             if (secondItem == nullptr) {
@@ -282,7 +282,7 @@ namespace gui
     void TimeWidget::validateHourFor12hMode(std::chrono::hours start_hour,
                                             std::chrono::minutes end_hour,
                                             uint32_t start_minutes,
-                                            uint32_t end_minutes)
+                                            uint32_t end_minutes) const
     {
         if (start_hour > end_hour || (start_hour == end_hour && start_minutes > end_minutes)) {
             auto hour = start_hour.count() + 1;
@@ -314,7 +314,7 @@ namespace gui
     void TimeWidget::validateHourFor24hMode(std::chrono::hours start_hour,
                                             std::chrono::minutes end_hour,
                                             uint32_t start_minutes,
-                                            uint32_t end_minutes)
+                                            uint32_t end_minutes) const
     {
         if (start_hour > end_hour || (start_hour == end_hour && start_minutes > end_minutes)) {
             auto hour = start_hour.count() + 1;
@@ -417,7 +417,7 @@ namespace gui
         }
     }
 
-    bool TimeWidget::saveData(std::shared_ptr<utils::time::FromTillDate> fromTillDate)
+    bool TimeWidget::saveData(std::shared_ptr<utils::time::FromTillDate> fromTillDate) const
     {
         if (!validateHour()) {
             return false;

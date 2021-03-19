@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,16 +18,10 @@ class EventRecordData : public gui::SwitchData
     std::shared_ptr<EventsRecord> record;
 
   public:
-    EventRecordData() = default;
-    EventRecordData(std::shared_ptr<EventsRecord> record) : record{std::move(record)} {};
-    virtual ~EventRecordData() = default;
+    explicit EventRecordData(std::shared_ptr<EventsRecord> record) : record{std::move(record)} {};
     std::shared_ptr<EventsRecord> getData()
     {
         return record;
-    };
-    virtual void setData(std::shared_ptr<EventsRecord> rec)
-    {
-        record = std::move(rec);
     };
 };
 

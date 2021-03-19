@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DayEventsModel.hpp"
@@ -70,7 +70,6 @@ auto DayEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
             return false;
         }
 
-        auto records = response->getResult();
         if (auto app = dynamic_cast<app::ApplicationCalendar *>(application); app != nullptr) {
             if (response->getCountResult() == 0) {
                 LOG_DEBUG("Empty records");
@@ -80,6 +79,7 @@ auto DayEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
                 }
             }
             auto eventShift = app->getEventShift();
+            auto records    = response->getResult();
             if (eventShift) {
                 for (auto &record : records) {
                     record.date_from += std::chrono::hours(eventShift);

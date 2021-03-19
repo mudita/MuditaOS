@@ -74,12 +74,6 @@ namespace gui
 
     bool AllEventsWindow::onInput(const gui::InputEvent &inputEvent)
     {
-        if (inputEvent.keyCode == gui::KeyCode::KEY_RF &&
-            inputEvent.state == gui::InputEvent::State::keyReleasedShort) {
-            LOG_DEBUG("Switch to desktop");
-            app::manager::Controller::switchBack(application);
-        }
-
         if (AppWindow::onInput(inputEvent)) {
             return true;
         }
@@ -88,26 +82,18 @@ namespace gui
             return false;
         }
 
-        if (inputEvent.keyCode == gui::KeyCode::KEY_LEFT) {
+        if (inputEvent.is(gui::KeyCode::KEY_LEFT)) {
             LOG_DEBUG("Switch to new event window");
-            std::unique_ptr<EventRecordData> data = std::make_unique<EventRecordData>();
-            data->setDescription(style::window::calendar::new_event);
             auto event       = std::make_shared<EventsRecord>();
             event->date_from = dateFilter;
             event->date_till = dateFilter + std::chrono::hours(utils::time::Locale::max_hour_24H_mode) +
                                std::chrono::minutes(utils::time::Locale::max_minutes);
-            data->setData(event);
+            auto data = std::make_unique<EventRecordData>(std::move(event));
+            data->setDescription(style::window::calendar::new_event);
             application->switchWindow(
                 style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return true;
         }
-
-        if (inputEvent.keyCode == gui::KeyCode::KEY_LF) {
-            application->switchWindow(gui::name::window::main_window);
-            LOG_DEBUG("Switch to month view - main window");
-            return true;
-        }
-
         return false;
     }
 
