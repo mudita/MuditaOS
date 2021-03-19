@@ -92,6 +92,7 @@
 #include <vector>
 #include "checkSmsCenter.hpp"
 #include <service-desktop/Constants.hpp>
+#include <module-utils/gsl/gsl_util>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
@@ -288,7 +289,7 @@ void ServiceCellular::ProcessCloseReason(sys::CloseReason closeReason)
 
 sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
-    LOG_FATAL("[ServiceCellular] PowerModeHandler: %s", c_str(mode));
+    LOG_INFO("[ServiceCellular] PowerModeHandler: %s", c_str(mode));
 
     switch (mode) {
     case sys::ServicePowerMode ::Active:
@@ -440,7 +441,8 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(CellularNewIncomingSMSMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularNewIncomingSMSMessage *>(request);
-        return receiveSMS(msg->getData());
+        auto ret = receiveSMS(msg->getData());
+        return std::make_shared<CellularResponseMessage>(ret);
     });
 
     connect(typeid(CellularAnswerIncomingCallMessage), [&](sys::Message *request) -> sys::MessagePointer {
@@ -1195,7 +1197,7 @@ bool ServiceCellular::handleSimState(at::SimState state, const std::string messa
     return true;
 }
 
-bool ServiceCellular::sendSMS(SMSRecord record)
+auto ServiceCellular::sendSMS(SMSRecord record) -> bool
 {
     LOG_INFO("Trying to send SMS");
 
@@ -1301,24 +1303,41 @@ bool ServiceCellular::sendSMS(SMSRecord record)
     return result;
 }
 
-auto ServiceCellular::receiveSMS(std::string messageNumber) -> std::shared_ptr<CellularResponseMessage>
+auto ServiceCellular::receiveSMS(std::string messageNumber) -> bool
 {
+    auto retVal = true;
+
     auto channel = cmux->get(TS0710::Channel::Commands);
     if (channel == nullptr) {
-        return std::make_shared<CellularResponseMessage>(false);
+        retVal = false;
+        return retVal;
     }
 
     if (!channel->cmd(at::AT::SMS_UCSC2)) {
         LOG_ERROR("Could not set UCS2 charset mode for TE");
     }
+    auto _ = gsl::finally([&channel, &retVal, &messageNumber] {
+        if (!channel->cmd(at::AT::SMS_GSM)) {
+            LOG_ERROR("Could not set GSM (default) charset mode for TE");
+        }
 
-    auto cmd           = at::factory(at::AT::QCMGR);
-    auto ret           = channel->cmd(cmd + messageNumber, cmd.getTimeout());
+        // delete message from modem memory
+        if (retVal && !channel->cmd(at::factory(at::AT::CMGD) + messageNumber)) {
+            LOG_ERROR("Could not delete SMS from modem");
+        }
+    });
+
     bool messageParsed = false;
 
     std::string messageRawBody;
     UTF8 receivedNumber;
-    if (ret) {
+    const auto &cmd = at::factory(at::AT::QCMGR);
+    auto ret        = channel->cmd(cmd + messageNumber, cmd.getTimeout());
+    if (!ret) {
+        LOG_ERROR("!!!! Could not read text message !!!!");
+        retVal = false;
+    }
+    else {
         for (std::size_t i = 0; i < ret.response.size(); i++) {
             if (ret.response[i].find("QCMGR") != std::string::npos) {
 
@@ -1351,15 +1370,13 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> std::shared_ptr<C
                 utils::time::Timestamp time;
                 auto messageDate = time.getTime();
 
-                // if its single message process
                 if (tokens.size() == 5) {
-
+                    LOG_DEBUG("Single message");
                     messageRawBody = ret.response[i + 1];
                     messageParsed  = true;
                 }
-                // if its concatenated message wait for last message
                 else if (tokens.size() == 8) {
-
+                    LOG_DEBUG("Concatenated message");
                     uint32_t last    = 0;
                     uint32_t current = 0;
                     try {
@@ -1368,8 +1385,10 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> std::shared_ptr<C
                     }
                     catch (const std::exception &e) {
                         LOG_ERROR("ServiceCellular::receiveSMS error %s", e.what());
-                        return std::make_shared<CellularResponseMessage>(false);
+                        retVal = false;
+                        break;
                     }
+                    LOG_DEBUG("part %" PRIu32 "from %" PRIu32, current, last);
                     if (current == last) {
                         messageParts.push_back(ret.response[i + 1]);
 
@@ -1392,20 +1411,15 @@ auto ServiceCellular::receiveSMS(std::string messageNumber) -> std::shared_ptr<C
 
                     if (!dbAddSMSRecord(record)) {
                         LOG_ERROR("Failed to add text message to db");
-                        return std::make_shared<CellularResponseMessage>(false);
+                        retVal = false;
+                        break;
                     }
                 }
             }
         }
     }
-    if (!channel->cmd(at::AT::SMS_GSM)) {
-        LOG_ERROR("Could not set GSM (default) charset mode for TE");
-    }
-    // delete message from modem memory
-    if (!channel->cmd(at::factory(at::AT::CMGD) + messageNumber)) {
-        LOG_ERROR("Could not delete SMS from modem");
-    }
-    return std::make_shared<CellularResponseMessage>(true);
+
+    return retVal;
 }
 
 bool ServiceCellular::getOwnNumber(std::string &destination)
@@ -1691,7 +1705,7 @@ bool ServiceCellular::handle_sim_init()
     return success;
 }
 
-bool ServiceCellular::handleAllMessagesFromMessageStorage()
+bool ServiceCellular::handleTextMessagesInit()
 {
     auto channel = cmux->get(TS0710::Channel::Commands);
     if (channel == nullptr) {
@@ -1700,19 +1714,15 @@ bool ServiceCellular::handleAllMessagesFromMessageStorage()
     }
 
     auto commands = at::getCommadsSet(at::commadsSet::smsInit);
-
-    const auto errorState = []() {
-        LOG_ERROR("HANDLE ALL MESSAGE FROM MESSAGE STORAGE FAILED!");
-        return false;
-    };
-
     for (const auto &command : commands) {
-        if (command == at::AT::LIST_MESSAGES && !handleListMessages(command, channel)) {
-            return errorState();
+        if (!channel->cmd(command)) {
+            LOG_ERROR("Text messages init failed!");
+            return false;
         }
-        else if (!channel->cmd(command)) {
-            return errorState();
-        }
+    }
+    if (!receiveAllMessages()) {
+        LOG_ERROR("Receiving all messages from modem failed");
+        return true; // this is not blocking issue
     }
     return true;
 }
@@ -1751,18 +1761,24 @@ void ServiceCellular::onSMSReceived()
     AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::TextMessageRingtone, ringtone_path);
 }
 
-bool ServiceCellular::handleListMessages(const at::AT &command, DLC_channel *channel)
+bool ServiceCellular::receiveAllMessages()
 {
+    auto channel = cmux->get(TS0710::Channel::Commands);
     if (channel == nullptr) {
         return false;
     }
+
     constexpr std::string_view cmd = "CMGL: ";
-    if (auto ret = channel->cmd(command)) {
+    if (auto ret = channel->cmd(at::AT::LIST_MESSAGES)) {
         for (std::size_t i = 0; i < ret.response.size(); i++) {
             if (auto pos = ret.response[i].find(cmd); pos != std::string::npos) {
                 auto startPos = pos + cmd.size();
-                auto endPos   = ret.response[i].find_first_of(",");
-                receiveSMS(ret.response[i].substr(startPos, endPos - startPos));
+                auto endPos   = ret.response[i].find_first_of(',');
+                if (receiveSMS(ret.response[i].substr(startPos, endPos - startPos))) {
+                    LOG_WARN("Cannot receive text message - %" PRIu32 " / %" PRIu32,
+                             static_cast<uint32_t>(i),
+                             static_cast<uint32_t>(ret.response.size()));
+                }
             }
         }
         return true;
@@ -2497,7 +2513,7 @@ auto ServiceCellular::handleSimReadyNotification(sys::Message *msg) -> std::shar
 
 auto ServiceCellular::handleSmsDoneNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    auto resp = handleAllMessagesFromMessageStorage();
+    auto resp = handleTextMessagesInit();
     return std::make_shared<CellularResponseMessage>(resp);
 }
 auto ServiceCellular::handleSignalStrengthUpdateNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
