@@ -15,10 +15,13 @@ namespace gui
         CalendarTimeItem(const std::string &description,
                          TimeWidget::Type type,
                          const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode,
-                         const std::function<void()> &bottomBarRestoreFromTemporaryMode);
+                         const std::function<void()> &bottomBarRestoreFromTemporaryMode,
+                         TimePoint dateFrom,
+                         TimePoint dateTill);
 
         void setConnectionToSecondItem(CalendarTimeItem *item);
         void setConnectionToDateItem(CalendarDateItem *item);
+        auto getFromTillDate() const -> std::shared_ptr<utils::time::FromTillDate>;
 
       private:
         TimeWidget *timeWidget = nullptr;

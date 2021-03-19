@@ -14,7 +14,9 @@ namespace gui
     CalendarTimeItem::CalendarTimeItem(const std::string &description,
                                        TimeWidget::Type type,
                                        const std::function<void(const UTF8 &text)> &bottomBarTemporaryMode,
-                                       const std::function<void()> &bottomBarRestoreFromTemporaryMode)
+                                       const std::function<void()> &bottomBarRestoreFromTemporaryMode,
+                                       TimePoint dateFrom,
+                                       TimePoint dateTill)
     {
         setMinimumSize(style::window::default_body_width, date_and_time::height);
         setEdges(RectangleEdge::None);
@@ -24,6 +26,10 @@ namespace gui
         vBox->setEdges(RectangleEdge::None);
 
         timeWidget = new TimeWidget(vBox, description, type, bottomBarTemporaryMode, bottomBarRestoreFromTemporaryMode);
+        timeWidget->loadData(std::chrono::hours(TimePointToHour24H(dateFrom)),
+                             std::chrono::minutes(TimePointToMin(dateFrom)),
+                             std::chrono::hours(TimePointToHour24H(dateTill)),
+                             std::chrono::minutes(TimePointToMin(dateTill)));
 
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
             timeWidget->loadData(std::chrono::hours(TimePointToHour24H(event->date_from)),
@@ -42,6 +48,13 @@ namespace gui
             return false;
         };
         passDefaultCallbacksFromListItem(this, vBox);
+    }
+
+    auto CalendarTimeItem::getFromTillDate() const -> std::shared_ptr<utils::time::FromTillDate>
+    {
+        auto fromTillDate = std::make_shared<utils::time::FromTillDate>();
+        timeWidget->saveData(fromTillDate);
+        return fromTillDate;
     }
 
     void CalendarTimeItem::setConnectionToSecondItem(CalendarTimeItem *item)

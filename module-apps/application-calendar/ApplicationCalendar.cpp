@@ -167,14 +167,13 @@ namespace app
             "",
             [=]() -> bool {
                 LOG_DEBUG("Switch to new event window");
-                std::unique_ptr<EventRecordData> eventData = std::make_unique<EventRecordData>();
-                eventData->setDescription(style::window::calendar::new_event);
                 auto event       = std::make_shared<EventsRecord>();
                 event->date_from = dateFilter;
                 event->date_till = dateFilter + std::chrono::hours(utils::time::Locale::max_hour_24H_mode) +
                                    std::chrono::minutes(utils::time::Locale::max_minutes);
-                eventData->setData(event);
 
+                auto eventData = std::make_unique<EventRecordData>(std::move(event));
+                eventData->setDescription(style::window::calendar::new_event);
                 switchWindow(
                     style::window::calendar::name::new_edit_event, gui::ShowMode::GUI_SHOW_INIT, std::move(eventData));
                 return true;

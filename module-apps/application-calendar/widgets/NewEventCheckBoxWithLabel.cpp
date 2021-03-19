@@ -3,14 +3,15 @@
 
 #include "NewEventCheckBoxWithLabel.hpp"
 #include "AppWindow.hpp"
+#include "InputEvent.hpp"
 
 namespace gui
 {
 
     NewEventCheckBoxWithLabel::NewEventCheckBoxWithLabel(app::Application *application,
                                                          const std::string &description,
-                                                         NewEditEventModel *model)
-        : CheckBoxWithLabelItem(application, description, nullptr), model(model)
+                                                         OnCheckCallback onCheck)
+        : CheckBoxWithLabelItem(application, description, nullptr), onCheck(std::move(onCheck))
     {
         app = application;
         assert(app != nullptr);
@@ -38,13 +39,9 @@ namespace gui
             if (event.state != gui::InputEvent::State::keyReleasedShort) {
                 return false;
             }
-            if (checkBox->isChecked() && event.keyCode == gui::KeyCode::KEY_LF) {
-                LOG_DEBUG("reloadDataWithTimeItem");
-                model->reloadDataWithTimeItem();
-            }
-            else if (!checkBox->isChecked() && event.keyCode == gui::KeyCode::KEY_LF) {
-                LOG_DEBUG("loadDataWithoutTimeItem");
-                model->loadDataWithoutTimeItem();
+
+            if (event.is(gui::KeyCode::KEY_LF)) {
+                onCheck(checkBox->isChecked());
             }
 
             if (checkBox->onInput(event)) {
@@ -57,11 +54,7 @@ namespace gui
         };
 
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
-            auto start_time = TimePointToHourMinSec(event->date_from);
-            auto end_time   = TimePointToHourMinSec(event->date_till);
-            if (start_time.hours().count() == 0 && start_time.minutes().count() == 0 &&
-                end_time.hours().count() == utils::time::Locale::max_hour_24H_mode &&
-                end_time.minutes().count() == utils::time::Locale::max_minutes) {
+            if (allDayEvents::isAllDayEvent(event->date_from, event->date_till)) {
                 checkBox->setImageVisible(true);
             }
         };
@@ -77,6 +70,15 @@ namespace gui
     void NewEventCheckBoxWithLabel::setConnectionToDateItem(gui::DateWidget *item)
     {
         dateItem = item;
+    }
+
+    bool allDayEvents::isAllDayEvent(TimePoint start, TimePoint end)
+    {
+        auto startTime = TimePointToHourMinSec(start);
+        auto endTime   = TimePointToHourMinSec(end);
+        return startTime.hours().count() == 0 && startTime.minutes().count() == 0 &&
+               endTime.hours().count() == utils::time::Locale::max_hour_24H_mode &&
+               endTime.minutes().count() == utils::time::Locale::max_minutes;
     }
 
 } /* namespace gui */
