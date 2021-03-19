@@ -79,8 +79,9 @@ class ServiceCellular : public sys::Service
 
     static const char *serviceName;
 
-    bool sendSMS(SMSRecord record);
-    auto receiveSMS(std::string messageNumber) -> std::shared_ptr<CellularResponseMessage>;
+    auto sendSMS(SMSRecord record) -> bool;
+    auto receiveSMS(std::string messageNumber) -> bool;
+
     /**
      * @brief Its getting selected SIM card own number.
      * @param destination Reference to destination string.
@@ -196,7 +197,7 @@ class ServiceCellular : public sys::Service
     };
 
     bool resetCellularModule(ResetType type);
-    bool isAfterForceReboot = false;
+    bool isAfterForceReboot                    = false;
     bool nextPowerStateChangeAwaiting          = false;
     cellular::State::PowerState nextPowerState = cellular::State::PowerState::Off;
 
@@ -252,14 +253,14 @@ class ServiceCellular : public sys::Service
     std::unique_ptr<settings::Settings> settings = std::make_unique<settings::Settings>(this);
     bool handle_apn_conf_procedure();
 
-    bool handleAllMessagesFromMessageStorage();
+    bool handleTextMessagesInit();
     [[nodiscard]] SMSRecord createSMSRecord(const UTF8 &decodedMessage,
                                             const UTF8 &receivedNumber,
                                             const time_t messageDate,
                                             const SMSType &smsType = SMSType::INBOX) const noexcept;
     bool dbAddSMSRecord(const SMSRecord &record);
     void onSMSReceived();
-    [[nodiscard]] bool handleListMessages(const at::AT &command, DLC_channel *channel);
+    [[nodiscard]] bool receiveAllMessages();
     /// @}
 
     bool transmitDtmfTone(uint32_t digit);
