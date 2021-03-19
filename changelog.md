@@ -1,5 +1,57 @@
 # MuditaOS changelog
 
+## [0.60.1 2020-03-19]
+
+### Added
+
+* Add ability to discover disconnection of connected Bluetooth device.
+* Add ability to pre-setup paired USB devices.
+* Add battery charging UI
+* Add dialog windows for the onboarding application.
+* Add DMA transfers handling to the cellular modem communication.
+* Add documentation for Bluetooth automatic tests.
+* Add option to update windows' contents more effectively.
+* Add phone flashing guide.
+* Add selective Bluetooth connection based on a device class.
+* Add status window on Bluetooth connection fail.
+* Add technical documentation on Bluetooth pairing process implementation.
+* Add the category for the quote selection window.
+* Add USB passthrough to tethering.
+* Add window to edit quotes.
+* Add windows for phone modes.
+* Introduce daily builds.
+
+### Changed
+
+* Change quotes storing from JSON files to the database.
+* Improve communication stability with the cellular modem by fixing the configuration of the hardware flow control pins.
+* Improve layout of the status bar.
+* Improve power saving when using the cellular modem.
+* Improve stability by tweaking applications' and services' stack size.
+* Improve the design of the power-off window.
+* Improve the number of logs produced by cellular modem handling.
+* Improved design of the quote edit window.
+* Optimize displaying of a call log by retrieving data in chunks.
+* Reduce the number of logs produced by services and settings.
+* Unify settings' menu text labels in terms of capital and small letters.
+* Update quickstart guide with security-related information.
+
+### Fixed
+
+* Fix database performance issues related to the filesystem interface.
+* Fix displaying Bluetooth configuration data window after changing phone visibility.
+* Fix issues with e-ink refresh by prohibiting CPU frequency change during the process.
+* Fix issues with the update process related to filesystem usage.
+* Fix memory leak in the phonebook application.
+* Fix missing version file in an update package issue.
+* Fix modem start issue associated with an invalid battery level check.
+* Fix parsing issues with first cellular command reply after a hot start.
+* Fix refreshing Bluetooth devices list after disconnect.
+* Fix removing buttons on Bluetooth devices list window's bottom bar after removing last Bluetooth device.
+* Fix several broken functional tests.
+* Fix text formatting in retry windows.
+* Fix UI issues caused by consuming too much data by spin boxes.
+
 ## [0.59.1 2020-03-09]
 
 ### Added
