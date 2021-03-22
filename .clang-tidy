@@ -52,8 +52,6 @@ CheckOptions:
     value:           '::realloc'
   - key:             cppcoreguidelines-pro-bounds-constant-array-index.GslHeader
     value:           ''
-  - key:             cppcoreguidelines-pro-bounds-constant-array-index.IncludeStyle
-    value:           '1'
   - key:             cppcoreguidelines-pro-type-member-init.IgnoreArrays
     value:           '0'
   - key:             cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
