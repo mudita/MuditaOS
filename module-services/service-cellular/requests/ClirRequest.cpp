@@ -26,25 +26,19 @@ namespace cellular
 
     auto ClirRequest::command() -> at::Cmd
     {
-        std::string body;
         switch (procedureType) {
         case ProcedureType::Deactivation:
-            body = at::factory(at::AT::CLIR_DISABLE);
-            break;
+            return at::factory(at::AT::CLIR_DISABLE);
         case ProcedureType::Activation:
-            body = at::factory(at::AT::CLIR_ENABLE);
-            break;
+            return at::factory(at::AT::CLIR_ENABLE);
         case ProcedureType::Interrogation:
-            body = at::factory(at::AT::CLIR_GET);
-            break;
+            return at::factory(at::AT::CLIR_GET);
         case ProcedureType::Registration:
-            // not supported
-            break;
         case ProcedureType::Erasure:
             // not supported
             break;
         }
-        return at::Cmd(body, at::default_long_doc_timeout);
+        return at::Cmd("");
     }
 
     void ClirRequest::handle(RequestHandler &h, at::Result &result)

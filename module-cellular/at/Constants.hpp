@@ -7,7 +7,9 @@
 
 namespace at
 {
-    constexpr std::chrono::milliseconds default_timeout{300};            /// if you've checked that it's ok
-    constexpr std::chrono::milliseconds default_doc_timeout{5000};       /// if unsure - take this
-    constexpr std::chrono::milliseconds default_long_doc_timeout{15000}; /// long timeout from docs
+    constexpr std::chrono::milliseconds default_timeout{
+        5000}; /// applies for all timeout values smaller than itself - docs timeout < default_timeout
+    constexpr std::chrono::milliseconds default_long_timeout{
+        18000}; /// applies for all timeout values between default_timeout and istelf - default_timeout <= docs timout <
+                /// default_long_timeout
 } // namespace at
