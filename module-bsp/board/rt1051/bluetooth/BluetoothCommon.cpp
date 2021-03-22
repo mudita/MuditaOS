@@ -174,6 +174,8 @@ BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
         LOG_ERROR("BT error: baudrate [%lu] set err: %d", bd, err);
         ret = ErrorBSP;
     }
+    BSP_BLUETOOTH_UART_BASE->FIFO |= LPUART_FIFO_RXFLUSH_MASK; // flush fifo
+    BSP_BLUETOOTH_UART_BASE->FIFO &= ~LPUART_FIFO_RXFE_MASK;   // disable fifo
     return ret;
 }
 
