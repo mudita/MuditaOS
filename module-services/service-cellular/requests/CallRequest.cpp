@@ -14,7 +14,8 @@ namespace cellular
 {
     at::Cmd CallRequest::command()
     {
-        return at::Cmd(std::string(at::factory(at::AT::ATD) + request + ";"), at::default_doc_timeout);
+        auto cmd = at::factory(at::AT::ATD);
+        return cmd + request + ";";
     }
 
     void CallRequest::handle(RequestHandler &h, at::Result &result)

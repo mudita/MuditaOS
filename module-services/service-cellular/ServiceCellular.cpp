@@ -2189,7 +2189,7 @@ auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessag
     auto request = factory.create();
 
     CellularRequestHandler handler(*this);
-    auto result = channel->cmd(request->command(), at::default_doc_timeout);
+    auto result = channel->cmd(request->command());
     request->handle(handler, result);
     return std::make_shared<CellularResponseMessage>(request->isHandled());
 }

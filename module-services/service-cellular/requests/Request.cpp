@@ -32,15 +32,15 @@ namespace cellular
         return true;
     }
 
-    std::string Request::buildCommand(at::AT atCommand,
-                                      const std::vector<commandBuilderFunc> &builderFunctions,
-                                      bool trim) const
+    at::Cmd Request::buildCommand(at::AT atCommand,
+                                  const std::vector<commandBuilderFunc> &builderFunctions,
+                                  bool trim) const
     {
         if (!isValid()) {
-            return std::string();
+            return at::Cmd("");
         }
 
-        std::string cmd(at::factory(atCommand));
+        auto cmd = at::factory(atCommand);
 
         auto formatFirst = true;
         for (auto &cmdPart : builderFunctions) {
@@ -48,7 +48,7 @@ namespace cellular
             if (partStr.empty() && trim) {
                 break;
             }
-            cmd.append(formatFirst ? partStr : "," + partStr);
+            cmd         = cmd + (formatFirst ? partStr : "," + partStr);
             formatFirst = false;
         }
 

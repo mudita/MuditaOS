@@ -34,7 +34,7 @@ namespace cellular
             [this]() { return getCommandClass(); },
         };
 
-        return at::Cmd(buildCommand(at::AT::CLCK, commandParts), at::default_doc_timeout);
+        return buildCommand(at::AT::CLCK, commandParts);
     }
 
     auto CallBarringRequest::getCommandFacility() const -> std::string
