@@ -6,14 +6,14 @@
 # ignore file for clang-format autoformating
 
 # set this variable in your shell if you wish to disable autoformatting on commit for time being
-#DISABLE_AUTO_FORMATTING=1
+export DISABLE_AUTO_FORMATTING=0
 
 # set this variable to get more verbose output
-VERBOSE=1
+export VERBOSE=1
 
 # ignore_paths for formatter - these are regex matched with filenames to be formated
 # if you don't wish to format i.e one file - just pass whole path to this file from git root directory
-declare ignore_paths=(
+export declare ignore_paths=(
     '.*/catch.hpp'
     '.*/lib/'
     'build'
@@ -57,3 +57,16 @@ declare ignore_paths=(
     'module-vfs/drivers/include/thirdparty/fatfs/ffconf.h'
     'module-vfs/thirdparty/*'
 )
+
+# bash function using above config function
+shouldnt_ignore() {
+    # change full name path to path relative to root git dir
+    local fname=${1/"$L_GIT_DIR"/"./"}
+    for el in ${ignore_paths[@]}; do
+        if [[ ${fname}  =~ ^${el}.* ]]; then
+            [[ $VERBOSE ]] && echo "Ignore: ${fname} formatting due to: $el match!"
+            return 1
+        fi
+    done
+    return 0
+}
