@@ -36,6 +36,8 @@ jobs:
         run: config/license_header_check.sh --ci --check-only
       - name: Style checking
         run: ./config/style_check_hook.sh --last
+      - name: Clang tidy check
+        run: ./config/clang_check.sh
 
   build_rt1051_binary:
     name: build rt1051 binary
