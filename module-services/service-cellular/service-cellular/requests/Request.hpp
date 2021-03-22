@@ -46,7 +46,7 @@ namespace cellular
          */
         auto buildCommand(at::AT atCommand,
                           const std::vector<commandBuilderFunc> &builderFunctions,
-                          bool trim = true) const -> std::string;
+                          bool trim = true) const -> at::Cmd;
         bool isRequestHandled = false;
         std::string request;
     };

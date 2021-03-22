@@ -26,8 +26,7 @@ namespace cellular
 
     auto ClipRequest::command() -> at::Cmd
     {
-        return at::Cmd(isValid() ? std::string(at::factory(at::AT::CLIP_GET)) : std::string(),
-                       at::default_long_doc_timeout);
+        return isValid() ? at::factory(at::AT::CLIP_GET) : at::Cmd("");
     }
 
     auto ClipRequest::isValid() const noexcept -> bool

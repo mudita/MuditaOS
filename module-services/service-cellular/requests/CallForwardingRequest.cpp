@@ -57,7 +57,7 @@ namespace cellular
             trimEmpty = false;
         }
 
-        return at::Cmd(buildCommand(at::AT::CCFC, commandParts, trimEmpty), at::default_doc_timeout);
+        return buildCommand(at::AT::CCFC, commandParts, trimEmpty);
     }
 
     auto CallForwardingRequest::getCommandReason() const -> std::string

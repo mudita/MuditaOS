@@ -32,7 +32,7 @@ namespace cellular
             [this]() { return getCommandClass(); },
         };
 
-        return at::Cmd(buildCommand(at::AT::CCWA, commandParts), at::default_doc_timeout);
+        return buildCommand(at::AT::CCWA, commandParts);
     }
 
     auto CallWaitingRequest::getCommandPresentation() const noexcept -> std::string

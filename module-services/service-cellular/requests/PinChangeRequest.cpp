@@ -55,24 +55,26 @@ namespace cellular
             return at::Cmd(std::string());
         }
 
-        std::string cmd;
+        at::Cmd cmd("");
         switch (passChangeType) {
         case PassChangeType::ChangePin:
-            cmd.append(at::factory(at::AT::CPWD) + "\"SC\",");
+            cmd = at::factory(at::AT::CPWD);
+            cmd = cmd + "\"SC\",";
             break;
         case PassChangeType::ChangePin2:
-            cmd.append(at::factory(at::AT::CPWD) + "\"P2\",");
+            cmd = at::factory(at::AT::CPWD);
+            cmd = cmd + "\"P2\",";
             break;
         case PassChangeType::ChangePinByPuk:
-            cmd.append(at::factory(at::AT::CPIN));
+            cmd = at::factory(at::AT::CPIN);
             break;
         };
 
         for (auto &cmdPart : commandParts) {
-            cmd.append(cmdPart());
+            cmd = cmd + cmdPart();
         }
 
-        return at::Cmd(cmd, at::default_doc_timeout);
+        return cmd;
     }
 
     auto PinChangeRequest::getOldPinOrPuk() const noexcept -> std::string
