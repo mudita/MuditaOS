@@ -40,7 +40,7 @@ namespace bsp::battery_charger
             // Open FIFO for write only
             int fd = open(batteryFIFO, O_RDONLY | O_NONBLOCK);
 
-            xQueueHandle targetQueueHandle;
+            xQueueHandle targetQueueHandle = nullptr;
 
             while (true) {
                 std::uint8_t buff[fifoBuffSize];
