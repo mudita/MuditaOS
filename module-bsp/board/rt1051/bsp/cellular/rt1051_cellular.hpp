@@ -128,7 +128,6 @@ namespace bsp
         static TaskHandle_t blockedTaskHandle;
 
       private:
-        bool isInSleepMode{false};
         // Constants
         const static uint32_t baudrate                               = 115200;
         const static uint32_t rxStreamBufferLength                   = 1024;
