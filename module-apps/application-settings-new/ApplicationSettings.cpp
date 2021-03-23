@@ -455,7 +455,7 @@ namespace app
             return std::make_unique<gui::EditQuotesWindow>(app);
         });
         windowsFactory.attach(gui::window::name::quote_categories, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::QuoteCategoriesWindow>(app, std::make_unique<Quotes::CategoriesModel>(app));
+            return std::make_unique<gui::QuoteCategoriesWindow>(app);
         });
 
         attachPopups({gui::popup::ID::Volume});

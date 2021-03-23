@@ -3,38 +3,36 @@
 
 #pragma once
 
-#include <service-db/DatabaseAgent.hpp>
 #include <service-db/QuotesMessages.hpp>
+#include <Interface/Record.hpp>
 
 namespace Quotes
 {
-    class QuotesAgent : public DatabaseAgent
+    enum class QuotesRecordField
+    {
+    };
+
+    class QuotesAgent : public RecordInterface<QuoteRecord, QuotesRecordField>
     {
       public:
-        explicit QuotesAgent(sys::Service *parentService);
+        explicit QuotesAgent(Database *quotesDB);
         ~QuotesAgent() = default;
 
-        void initDb() override
-        {}
-        void deinitDb() override
-        {}
-        void registerMessages() override;
-        auto getAgentName() -> const std::string override;
+        auto runQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
 
       protected:
-        auto handleCategoryList(sys::Message *req) -> sys::MessagePointer;
-        auto handleQuotesList(sys::Message *req) -> sys::MessagePointer;
-        auto handleQuotesListByCategoryId(sys::Message *req) -> sys::MessagePointer;
-        auto handleEnableCategoryById(sys::Message *req) -> sys::MessagePointer;
-        auto handleEnableQuoteById(sys::Message *req) -> sys::MessagePointer;
-        auto handleEnabledQuotesList(sys::Message *req) -> sys::MessagePointer;
-        auto handleAddQuote(sys::Message *req) -> sys::MessagePointer;
-        auto handleReadQuote(sys::Message *req) -> sys::MessagePointer;
-        auto handleWriteQuote(sys::Message *req) -> sys::MessagePointer;
-        auto handleDeleteQuote(sys::Message *req) -> sys::MessagePointer;
+        auto handleCategoryList(std::shared_ptr<db::Query> msg) -> std::unique_ptr<db::QueryResult>;
+        // auto handleQuotesList(sys::Message *req) -> sys::MessagePointer;
+        // auto handleQuotesListByCategoryId(sys::Message *req) -> sys::MessagePointer;
+        // auto handleEnableCategoryById(sys::Message *req) -> sys::MessagePointer;
+        // auto handleEnableQuoteById(sys::Message *req) -> sys::MessagePointer;
+        // auto handleEnabledQuotesList(sys::Message *req) -> sys::MessagePointer;
+        // auto handleAddQuote(sys::Message *req) -> sys::MessagePointer;
+        // auto handleReadQuote(sys::Message *req) -> sys::MessagePointer;
+        // auto handleWriteQuote(sys::Message *req) -> sys::MessagePointer;
+        // auto handleDeleteQuote(sys::Message *req) -> sys::MessagePointer;
 
       private:
-        auto getDbInitString() -> const std::string override;
-        auto getDbFilePath() -> const std::string override;
+        Database *database;
     };
 } // namespace Quotes

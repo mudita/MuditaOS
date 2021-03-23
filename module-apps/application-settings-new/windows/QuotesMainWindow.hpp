@@ -22,7 +22,6 @@ namespace gui
       private:
         void buildInterface() override;
         auto onInput(const InputEvent &inputEvent) -> bool override;
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         std::shared_ptr<Quotes::QuotesModel> quotesModel = nullptr;
         gui::ListView *list                           = nullptr;

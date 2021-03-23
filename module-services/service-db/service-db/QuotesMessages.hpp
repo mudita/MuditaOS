@@ -3,11 +3,11 @@
 
 #pragma once
 
+#include <Common/Query.hpp>
 #include <MessageType.hpp>
 #include <module-db/Database/QueryResult.hpp>
 #include "PagedData.hpp"
 #include <Service/Message.hpp>
-
 #include <memory>
 #include <vector>
 
@@ -62,28 +62,26 @@ namespace Quotes
 
     namespace Messages
     {
-        class QuotesMessage : public sys::DataMessage
+        class GetCategoryListRequest : public db::Query
         {
           public:
-            explicit QuotesMessage(MessageType type = MessageType::Quotes) : sys::DataMessage(type){};
-            ~QuotesMessage() override = default;
-        };
-
-        class GetCategoryListRequest : public QuotesMessage
-        {
-          public:
-            explicit GetCategoryListRequest(std::unique_ptr<CategoryList> categoryList)
-                : QuotesMessage(), categoryList(std::move(categoryList))
+            explicit GetCategoryListRequest(unsigned int limit, unsigned int offset)
+                : Query(Query::Type::Read), limit(limit), offset(offset)
             {}
-            std::unique_ptr<CategoryList> categoryList;
+            const unsigned int limit;
+            const unsigned int offset;
+
+            auto debugInfo() const -> std::string
+            {
+                return "GetCategoryListRequest";
+            }
         };
 
-        class GetCategoryListResponse : public sys::ResponseMessage
+        class GetCategoryListResponse : public db::QueryResult
         {
           public:
-            explicit GetCategoryListResponse(std::unique_ptr<CategoryList> categoryList,
-                                             sys::ReturnCodes code = sys::ReturnCodes::Success)
-                : sys::ResponseMessage(code), categoryList(std::move(categoryList))
+            explicit GetCategoryListResponse(std::unique_ptr<CategoryList> categoryList)
+                : categoryList(std::move(categoryList))
             {}
 
             [[nodiscard]] unsigned int getCount() const noexcept
@@ -96,24 +94,29 @@ namespace Quotes
                 return categoryList->data;
             }
 
+            auto debugInfo() const -> std::string
+            {
+                return "GetCategoryListResponse";
+            }
+
           private:
             std::unique_ptr<CategoryList> categoryList;
         };
 
-        class GetQuotesListRequest : public QuotesMessage
+        class GetQuotesListRequest : public db::Query
         {
           public:
-            explicit GetQuotesListRequest(std::unique_ptr<QuotesList> quotesList) : quotesList(std::move(quotesList))
+            explicit GetQuotesListRequest(unsigned int limit, unsigned int offset)
+                : Query(Query::Type::Read), limit(limit), offset(offset)
             {}
-            std::unique_ptr<QuotesList> quotesList;
+            const unsigned int limit;
+            const unsigned int offset;
         };
 
-        class GetQuotesListResponse : public sys::ResponseMessage
+        class GetQuotesListResponse : public db::QueryResult
         {
           public:
-            explicit GetQuotesListResponse(std::unique_ptr<QuotesList> quotesList,
-                                           sys::ReturnCodes code = sys::ReturnCodes::Success)
-                : sys::ResponseMessage(code), quotesList(std::move(quotesList))
+            explicit GetQuotesListResponse(std::unique_ptr<QuotesList> quotesList) : quotesList(std::move(quotesList))
             {}
 
             [[nodiscard]] unsigned int getCount() const noexcept
@@ -130,22 +133,27 @@ namespace Quotes
             std::unique_ptr<QuotesList> quotesList;
         };
 
-        class GetQuotesListByCategoryIdRequest : public QuotesMessage
+        class GetQuotesListByCategoryIdRequest : public db::Query
         {
           public:
-            explicit GetQuotesListByCategoryIdRequest(std::unique_ptr<QuotesList> quotesList, unsigned int categoryId)
-                : quotesList(std::move(quotesList)), categoryId(categoryId)
+            explicit GetQuotesListByCategoryIdRequest(unsigned int limit, unsigned int offset, unsigned int categoryId)
+                : Query(Query::Type::Read), limit(limit), offset(offset), categoryId(categoryId)
             {}
-            std::unique_ptr<QuotesList> quotesList;
+            const unsigned int limit;
+            const unsigned int offset;
             const unsigned int categoryId;
+
+            auto debugInfo() const -> std::string
+            {
+                return "GetQuotesListByCategoryIdRequest";
+            }
         };
 
-        class GetQuotesListByCategoryIdResponse : public sys::ResponseMessage
+        class GetQuotesListByCategoryIdResponse : public db::QueryResult
         {
           public:
-            explicit GetQuotesListByCategoryIdResponse(std::unique_ptr<QuotesList> quotesList,
-                                                       sys::ReturnCodes code = sys::ReturnCodes::Success)
-                : sys::ResponseMessage(code), quotesList(std::move(quotesList))
+            explicit GetQuotesListByCategoryIdResponse(std::unique_ptr<QuotesList> quotesList)
+                : quotesList(std::move(quotesList))
             {}
 
             [[nodiscard]] unsigned int getCount() const noexcept
@@ -158,21 +166,26 @@ namespace Quotes
                 return quotesList->data;
             }
 
+            auto debugInfo() const -> std::string
+            {
+                return "GetQuotesListByCategoryIdResponse";
+            }
+
           private:
             std::unique_ptr<QuotesList> quotesList;
         };
 
-        class EnableCategoryByIdRequest : public QuotesMessage
+        class EnableCategoryByIdRequest : public db::Query
         {
           public:
             explicit EnableCategoryByIdRequest(unsigned int categoryId, bool enable)
-                : categoryId(categoryId), enable(enable)
+                : Query(Query::Type::Read), categoryId(categoryId), enable(enable)
             {}
             const unsigned int categoryId;
             const bool enable;
         };
 
-        class EnableCategoryByIdResponse : public QuotesMessage
+        class EnableCategoryByIdResponse : public db::QueryResult
         {
           public:
             explicit EnableCategoryByIdResponse(bool success) : success(success)
@@ -180,16 +193,17 @@ namespace Quotes
             const bool success;
         };
 
-        class EnableQuoteByIdRequest : public QuotesMessage
+        class EnableQuoteByIdRequest : public db::Query
         {
           public:
-            explicit EnableQuoteByIdRequest(unsigned int quoteId, bool enable) : quoteId(quoteId), enable(enable)
+            explicit EnableQuoteByIdRequest(unsigned int quoteId, bool enable)
+                : Query(Query::Type::Read), quoteId(quoteId), enable(enable)
             {}
             const unsigned int quoteId;
             const bool enable;
         };
 
-        class EnableQuoteByIdResponse : public QuotesMessage
+        class EnableQuoteByIdResponse : public db::QueryResult
         {
           public:
             explicit EnableQuoteByIdResponse(bool success) : success(success)
@@ -197,21 +211,21 @@ namespace Quotes
             const bool success;
         };
 
-        class GetEnabledQuotesListRequest : public QuotesMessage
+        class GetEnabledQuotesListRequest : public db::Query
         {
           public:
-            explicit GetEnabledQuotesListRequest(std::unique_ptr<QuotesList> quotesList)
-                : quotesList(std::move(quotesList))
+            explicit GetEnabledQuotesListRequest(unsigned int limit, unsigned int offset)
+                : Query(Query::Type::Read), limit(limit), offset(offset)
             {}
-            std::unique_ptr<QuotesList> quotesList;
+            const unsigned int limit;
+            const unsigned int offset;
         };
 
-        class GetEnabledQuotesListResponse : public sys::ResponseMessage
+        class GetEnabledQuotesListResponse : public db::QueryResult
         {
           public:
-            explicit GetEnabledQuotesListResponse(std::unique_ptr<QuotesList> quotesList,
-                                                  sys::ReturnCodes code = sys::ReturnCodes::Success)
-                : sys::ResponseMessage(code), quotesList(std::move(quotesList))
+            explicit GetEnabledQuotesListResponse(std::unique_ptr<QuotesList> quotesList)
+                : quotesList(std::move(quotesList))
             {}
 
             [[nodiscard]] unsigned int getCount() const noexcept
@@ -228,11 +242,12 @@ namespace Quotes
             std::unique_ptr<QuotesList> quotesList;
         };
 
-        class AddQuoteRequest : public QuotesMessage
+        class AddQuoteRequest : public db::Query
         {
           public:
             explicit AddQuoteRequest(unsigned int langId, std::string quote, std::string author, bool enabled)
-                : langId(langId), quote(std::move(quote)), author(std::move(author)), enabled(enabled)
+                : Query(Query::Type::Read), langId(langId), quote(std::move(quote)), author(std::move(author)),
+                  enabled(enabled)
             {}
             const unsigned int langId;
             const std::string quote;
@@ -240,7 +255,7 @@ namespace Quotes
             const bool enabled;
         };
 
-        class AddQuoteResponse : public QuotesMessage
+        class AddQuoteResponse : public db::QueryResult
         {
           public:
             explicit AddQuoteResponse(bool success, unsigned int quoteId) : success(success), quoteId(quoteId)
@@ -249,15 +264,15 @@ namespace Quotes
             const unsigned int quoteId;
         };
 
-        class ReadQuoteRequest : public QuotesMessage
+        class ReadQuoteRequest : public db::Query
         {
           public:
-            explicit ReadQuoteRequest(unsigned int quoteId) : quoteId(quoteId)
+            explicit ReadQuoteRequest(unsigned int quoteId) : Query(Query::Type::Read), quoteId(quoteId)
             {}
             const unsigned int quoteId;
         };
 
-        class ReadQuoteResponse : public QuotesMessage
+        class ReadQuoteResponse : public db::QueryResult
         {
           public:
             explicit ReadQuoteResponse(
@@ -271,12 +286,13 @@ namespace Quotes
             const bool enabled;
         };
 
-        class WriteQuoteRequest : public QuotesMessage
+        class WriteQuoteRequest : public db::Query
         {
           public:
             explicit WriteQuoteRequest(
                 unsigned int quoteId, unsigned int langId, std::string quote, std::string author, bool enabled)
-                : quoteId(quoteId), langId(langId), quote(std::move(quote)), author(std::move(author)), enabled(enabled)
+                : Query(Query::Type::Read), quoteId(quoteId), langId(langId), quote(std::move(quote)),
+                  author(std::move(author)), enabled(enabled)
             {}
             const unsigned int quoteId;
             const unsigned int langId;
@@ -285,7 +301,7 @@ namespace Quotes
             const bool enabled;
         };
 
-        class WriteQuoteResponse : public QuotesMessage
+        class WriteQuoteResponse : public db::QueryResult
         {
           public:
             explicit WriteQuoteResponse(bool success) : success(success)
@@ -293,15 +309,15 @@ namespace Quotes
             const bool success;
         };
 
-        class DeleteQuoteRequest : public QuotesMessage
+        class DeleteQuoteRequest : public db::Query
         {
           public:
-            explicit DeleteQuoteRequest(unsigned int quoteId) : quoteId(quoteId)
+            explicit DeleteQuoteRequest(unsigned int quoteId) : Query(Query::Type::Read), quoteId(quoteId)
             {}
             const unsigned int quoteId;
         };
 
-        class DeleteQuoteResponse : public QuotesMessage
+        class DeleteQuoteResponse : public db::QueryResult
         {
           public:
             explicit DeleteQuoteResponse(bool success) : success(success)

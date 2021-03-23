@@ -20,12 +20,22 @@ namespace style::quotes::list
 
 namespace Quotes
 {
-    QuotesModel::QuotesModel(app::Application *application) : app(application)
+    QuotesModel::QuotesModel(app::Application *application)
+        : DatabaseModel(application), app::AsyncCallbackReceiver{application}, app(application)
     {}
 
     auto QuotesModel::requestRecordsCount() -> unsigned int
     {
-        return internalData.size();
+        return recordsCount;
+    }
+
+    bool QuotesModel::updateRecords(std::vector<QuoteRecord> records)
+    {
+        if (DatabaseModel::updateRecords(std::move(records))) {
+            list->onProviderDataUpdate();
+            return true;
+        }
+        return false;
     }
 
     auto QuotesModel::getMinimalItemHeight() const -> unsigned int
@@ -35,90 +45,75 @@ namespace Quotes
 
     void QuotesModel::requestRecords(const uint32_t offset, const uint32_t limit)
     {
-        setupModel(offset, limit);
-        list->onProviderDataUpdate();
-    }
-
-    auto QuotesModel::getItem(gui::Order order) -> gui::ListItem *
-    {
-        auto *item = dynamic_cast<gui::QuoteWidget *>(getRecord(order));
-
-        if (item != nullptr) {
-            item->inputCallback = [app = app, item](gui::Item &, const gui::InputEvent &event) {
-                if (event.isShortPress() && event.is(gui::KeyCode::KEY_LF)) {
-                    app->switchWindow(
-                        gui::window::name::options_quote,
-                        std::make_unique<gui::QuoteSwitchData>(gui::QuoteAction::None, item->getQuoteData()));
-                }
-                return false;
-            };
-        }
-        return item;
-    }
-
-    void QuotesModel::rebuild()
-    {
-        list->clear();
-        eraseInternalData();
-        createData();
-        list->rebuildList();
-    }
-
-    void QuotesModel::createData()
-    {
         const auto customCategoryId = getCustomCategoryId();
         if (!customCategoryId) {
             LOG_WARN("No CUSTOM category in database!");
             return;
         }
 
-        auto quotesList    = std::make_unique<QuotesList>();
-        quotesList->limit  = 0;
-        quotesList->offset = 0;
+        auto query = std::make_unique<Messages::GetQuotesListByCategoryIdRequest>(offset, limit, *customCategoryId);
+        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::Quotes);
+        task->setCallback([this](auto response) { return handleQueryResponse(response); });
+        task->execute(application, this);
+    }
 
-        auto request =
-            std::make_shared<Messages::GetQuotesListByCategoryIdRequest>(std::move(quotesList), *customCategoryId);
-        auto result = app->bus.sendUnicast(request, service::name::db, DBServiceAPI::DefaultTimeoutInMs);
+    auto QuotesModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
+    {
+        auto msgResponse = dynamic_cast<Messages::GetQuotesListByCategoryIdResponse *>(queryResult);
+        assert(msgResponse != nullptr);
 
-        if (result.first != sys::ReturnCodes::Success) {
-            LOG_WARN("Getting quotes list by category id failed! error code = %d", static_cast<int>(result.first));
-            return;
+        // If list record count has changed we need to rebuild list.
+        if (recordsCount != (msgResponse->getCount())) {
+            recordsCount = msgResponse->getCount();
+            list->reSendLastRebuildRequest();
+            return false;
         }
 
-        auto response = std::dynamic_pointer_cast<Messages::GetQuotesListByCategoryIdResponse>(result.second);
-        if (response) {
-            LOG_WARN("Wrong response on quotes list by category id request!");
-            return;
+        auto records = msgResponse->getResults();
+        return this->updateRecords(std::move(records));
+    }
+
+    auto QuotesModel::getItem(gui::Order order) -> gui::ListItem *
+    {
+        auto quote = getRecord(order);
+
+        if (!quote) {
+            return nullptr;
         }
-        LOG_DEBUG("Quotes list count: %u", response->getCount());
 
-        for (const auto &quote : response->getResults()) {
-            auto item = new gui::QuoteWidget(
-                quote,
-                [app = app, quote](bool enable) -> bool {
-                    LOG_DEBUG("Sending enable quote request: quote_id = %d, enable = %d", quote.quote_id, enable);
-                    auto request = std::make_shared<Messages::EnableQuoteByIdRequest>(quote.quote_id, enable);
-                    auto result  = app->bus.sendUnicast(request, service::name::db, DBServiceAPI::DefaultTimeoutInMs);
+        auto item = new gui::QuoteWidget(
+            *quote,
+            [](bool) -> bool {
+                // LOG_DEBUG("Sending enable quote request: quote_id = %d, enable = %d", quote.quote_id, enable);
+                // auto request = std::make_shared<Messages::EnableQuoteByIdRequest>(quote.quote_id, enable);
+                // auto result  = app->bus.sendUnicast(request, service::name::db, DBServiceAPI::DefaultTimeoutInMs);
 
-                    if (result.first == sys::ReturnCodes::Success) {
-                        auto response = std::dynamic_pointer_cast<Messages::EnableQuoteByIdResponse>(result.second);
-                        const auto success = response && response->success;
-                        if (!success)
-                            LOG_WARN("Enable quote request failed!");
-                        return success;
-                    }
+                // if (result.first != sys::ReturnCodes::Success) {
+                //     LOG_WARN("Enable quote request failed! error code = %d", static_cast<int>(result.first));
+                //     return false;
+                // }
 
-                    LOG_WARN("Enable quote request failed! error code = %d", static_cast<int>(result.first));
-                    return false;
-                },
-                [app = app](const UTF8 &text) {
-                    app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::CENTER, false);
-                },
-                [app = app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
+                // auto response      = std::dynamic_pointer_cast<Messages::EnableQuoteByIdResponse>(result.second);
+                // const auto success = response && response->success;
+                // if (!success)
+                //     LOG_WARN("Enable quote request failed!");
+                // return success;
+                return true;
+            },
+            [app = app](const UTF8 &text) {
+                app->getCurrentWindow()->bottomBarTemporaryMode(text, gui::BottomBar::Side::CENTER, false);
+            },
+            [app = app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
-            item->deleteByList = false;
-            internalData.push_back(item);
-        }
+        item->inputCallback = [app = app, item](gui::Item &, const gui::InputEvent &event) {
+            if (event.isShortPress() && event.is(gui::KeyCode::KEY_LF)) {
+                app->switchWindow(gui::window::name::options_quote,
+                                  std::make_unique<gui::QuoteSwitchData>(gui::QuoteAction::None, item->getQuoteData()));
+            }
+            return false;
+        };
+
+        return item;
     }
 
     void QuotesModel::remove(const Quotes::QuoteRecord &quote)
@@ -130,29 +125,30 @@ namespace Quotes
 
     auto QuotesModel::getCustomCategoryId() -> std::optional<unsigned int>
     {
-        auto categoryList    = std::make_unique<CategoryList>();
-        categoryList->limit  = 0;
-        categoryList->offset = 0;
+        // auto categoryList    = std::make_unique<CategoryList>();
+        // categoryList->limit  = 0;
+        // categoryList->offset = 0;
 
-        auto request = std::make_shared<Messages::GetCategoryListRequest>(std::move(categoryList));
-        auto result  = app->bus.sendUnicast(request, service::name::db, DBServiceAPI::DefaultTimeoutInMs);
+        // auto request = std::make_shared<Messages::GetCategoryListRequest>(std::move(categoryList));
+        // auto result  = app->bus.sendUnicast(request, service::name::db, DBServiceAPI::DefaultTimeoutInMs);
 
-        if (result.first != sys::ReturnCodes::Success) {
-            LOG_WARN("Getting category list failed! error code = %d", static_cast<int>(result.first));
-            return std::nullopt;
-        }
+        // if (result.first != sys::ReturnCodes::Success) {
+        //     LOG_WARN("Getting category list failed! error code = %d", static_cast<int>(result.first));
+        //     return std::nullopt;
+        // }
 
-        auto response = std::dynamic_pointer_cast<Messages::GetCategoryListResponse>(result.second);
-        if (response) {
-            LOG_WARN("Wrong response on category list request!");
-            return std::nullopt;
-        }
+        // auto response = std::dynamic_pointer_cast<Messages::GetCategoryListResponse>(result.second);
+        // if (response) {
+        //     LOG_WARN("Wrong response on category list request!");
+        //     return std::nullopt;
+        // }
 
-        const auto categories = response->getResults();
-        const auto it         = std::find_if(categories.begin(), categories.end(), [](const CategoryRecord &rec) {
-            return strcmp(rec.category_name.c_str(), customCategoryName) == 0;
-        });
-        return (it != categories.end()) ? std::optional<unsigned int>(it->category_id) : std::nullopt;
+        // const auto categories = response->getResults();
+        // const auto it         = std::find_if(categories.begin(), categories.end(), [](const CategoryRecord &rec) {
+        //     return strcmp(rec.category_name.c_str(), customCategoryName) == 0;
+        // });
+        // return (it != categories.end()) ? std::optional<unsigned int>(it->category_id) : std::nullopt;
+        return std::nullopt;
     }
 
 } // namespace Quotes

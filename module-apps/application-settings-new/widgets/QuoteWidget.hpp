@@ -29,7 +29,6 @@ namespace gui
 
       private:
         HBox *hBox              = nullptr;
-        Label *inputBoxLabel    = nullptr;
         Label *descriptionLabel = nullptr;
         ImageBox *tickImage     = nullptr;
 

@@ -79,9 +79,4 @@ namespace gui
         }
         return false;
     }
-
-    void QuotesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-        quotesModel->rebuild();
-    }
 } // namespace gui

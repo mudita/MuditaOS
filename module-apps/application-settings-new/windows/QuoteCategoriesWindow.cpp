@@ -8,8 +8,9 @@
 
 namespace gui
 {
-    QuoteCategoriesWindow::QuoteCategoriesWindow(app::Application *app, std::shared_ptr<Quotes::CategoriesModel> model)
-        : AppWindow(app, gui::window::name::quote_categories), categoriesModel(std::move(model))
+    QuoteCategoriesWindow::QuoteCategoriesWindow(app::Application *app)
+        : AppWindow(app, gui::window::name::quote_categories),
+          categoriesModel(std::make_shared<Quotes::CategoriesModel>(app))
     {
         buildInterface();
     }
@@ -35,6 +36,15 @@ namespace gui
 
     void QuoteCategoriesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        categoriesModel->rebuild();
+        if (mode == ShowMode::GUI_SHOW_INIT) {
+            list->rebuildList();
+        }
+    }
+
+    bool QuoteCategoriesWindow::onDatabaseMessage(sys::Message *msgl)
+    {
+        LOG_ERROR("onDatabaseMessage");
+        auto msg = dynamic_cast<Quotes::Messages::GetCategoryListResponse *>(msgl);
+        return msg && categoriesModel->updateRecords(msg->getResults());
     }
 } // namespace gui

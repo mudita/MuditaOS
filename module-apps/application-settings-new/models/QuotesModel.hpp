@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <purefs/filesystem_paths.hpp>
-#include <gui/widgets/ListView.hpp>
-#include <InternalModel.hpp>
+#include <Application.hpp>
+#include <DatabaseModel.hpp>
+#include <ListItemProvider.hpp>
 #include <service-db/QuotesMessages.hpp>
 
 namespace gui
@@ -15,7 +15,9 @@ namespace gui
 
 namespace Quotes
 {
-    class QuotesModel : public app::InternalModel<gui::QuoteWidget *>, public gui::ListItemProvider
+    class QuotesModel : public app::DatabaseModel<QuoteRecord>,
+                        public gui::ListItemProvider,
+                        public app::AsyncCallbackReceiver
     {
       public:
         explicit QuotesModel(app::Application *application);
@@ -25,17 +27,18 @@ namespace Quotes
 
         auto getItem(gui::Order order) -> gui::ListItem * final;
         void requestRecords(const uint32_t offset, const uint32_t limit) final;
-
-        void rebuild();
+        bool updateRecords(std::vector<QuoteRecord> records) override;
 
         void remove(const QuoteRecord &quote);
         void save(const QuoteRecord &quote);
 
+        auto handleQueryResponse(db::QueryResult *queryResult) -> bool;
+
       private:
+        app::Application *app = nullptr;
+
         void createData();
         auto getCustomCategoryId() -> std::optional<unsigned int>;
-
-        app::Application *app = nullptr;
 
         static constexpr auto customCategoryName = "Custom";
     };

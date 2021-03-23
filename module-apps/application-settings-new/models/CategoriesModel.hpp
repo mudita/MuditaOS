@@ -3,30 +3,28 @@
 
 #pragma once
 
-#include <module-gui/gui/widgets/ListView.hpp>
-#include <module-apps/InternalModel.hpp>
-
-namespace gui
-{
-    class CategoryWidget;
-}
+#include <Application.hpp>
+#include <DatabaseModel.hpp>
+#include <ListItemProvider.hpp>
+#include <service-db/QuotesMessages.hpp>
 
 namespace Quotes
 {
-    class CategoriesModel : public app::InternalModel<gui::CategoryWidget *>, public gui::ListItemProvider
+    class CategoriesModel : public app::DatabaseModel<CategoryRecord>,
+                            public gui::ListItemProvider,
+                            public app::AsyncCallbackReceiver
     {
-      private:
-        app::Application *application = nullptr;
-
-        auto getCategoryList() -> std::optional<std::vector<CategoryRecord>>;
-
       public:
         explicit CategoriesModel(app::Application *app);
         [[nodiscard]] auto requestRecordsCount() -> unsigned int final;
         [[nodiscard]] auto getMinimalItemHeight() const -> unsigned int final;
         auto getItem(gui::Order order) -> gui::ListItem * final;
         void requestRecords(const uint32_t offset, const uint32_t limit) final;
-        void createData();
-        void rebuild();
+        bool updateRecords(std::vector<CategoryRecord> records);
+
+      private:
+        app::Application *app = nullptr;
+
+        auto handleQueryResponse(db::QueryResult *queryResult) -> bool;
     };
 } // namespace Quotes
