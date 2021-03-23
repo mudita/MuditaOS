@@ -70,6 +70,7 @@ target_sources( ${PROJECT_NAME}
         windows/DoNotDisturbWindow.cpp
         windows/OfflineWindow.cpp
         windows/PhoneModesWindow.cpp
+        windows/AboutYourPureWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -97,6 +98,7 @@ target_sources( ${PROJECT_NAME}
         windows/ChangeDateAndTimeWindow.hpp
         windows/EditQuotesWindow.hpp
         windows/QuoteCategoriesWindow.hpp
+        windows/AboutYourPureWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)

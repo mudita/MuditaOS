@@ -3,14 +3,17 @@
 
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "OptionSetting.hpp"
-#include "SystemMainWindow.hpp"
+#include "AboutYourPureWindow.hpp"
 
 namespace gui
 {
-    SystemMainWindow::SystemMainWindow(app::Application *app) : BaseSettingsWindow(app, window::name::system)
-    {}
+    AboutYourPureWindow::AboutYourPureWindow(app::Application *app)
+        : BaseSettingsWindow(app, window::name::about_your_pure)
+    {
+        setTitle(utils::localize.get("app_settings_about_your_pure"));
+    }
 
-    auto SystemMainWindow::buildOptionsList() -> std::list<Option>
+    auto AboutYourPureWindow::buildOptionsList() -> std::list<Option>
     {
         std::list<Option> optionList;
         auto addOption = [&](UTF8 name, const std::string &window) {
@@ -26,10 +29,9 @@ namespace gui
                 option::SettingRightItem::ArrowWhite));
         };
 
-        addOption("app_settings_language", gui::window::name::languages);
-        addOption("app_settings_date_and_time", gui::window::name::date_and_time);
-        addOption("app_settings_factory_reset", gui::window::name::factory_reset);
-        addOption("app_settings_about_your_pure", gui::window::name::about_your_pure);
+        addOption("app_settings_technical_information", gui::window::name::technical_information);
+        addOption("app_settings_certification", gui::window::name::certification);
+        addOption("app_settings_sar", gui::window::name::sar);
 
         return optionList;
     }

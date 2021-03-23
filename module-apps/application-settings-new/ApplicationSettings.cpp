@@ -41,6 +41,7 @@
 #include "windows/DoNotDisturbWindow.hpp"
 #include "windows/OfflineWindow.hpp"
 #include "windows/ConnectionFrequencyWindow.hpp"
+#include "windows/AboutYourPureWindow.hpp"
 
 #include "Dialog.hpp"
 #include "DialogMetadataMessage.hpp"
@@ -441,6 +442,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::date_and_time, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DateAndTimeMainWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::about_your_pure, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::AboutYourPureWindow>(app);
         });
         windowsFactory.attach(gui::window::name::change_time_zone, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ChangeTimeZone>(app);
