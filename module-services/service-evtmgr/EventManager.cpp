@@ -50,7 +50,7 @@
 
 namespace
 {
-    constexpr auto loggerDelayMs   = 1000 * 10;
+    constexpr auto loggerDelayMs   = 1000 * 60 * 5;
     constexpr auto loggerTimerName = "Logger";
 } // namespace
 
