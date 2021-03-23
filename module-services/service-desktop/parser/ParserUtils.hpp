@@ -157,7 +157,7 @@ namespace parserFSM
             inline constexpr auto messageType        = "messageType";
             inline constexpr auto phoneNumber        = "phoneNumber";
             inline constexpr auto receivedAt         = "receivedAt";
-            inline constexpr auto createdAt          = "createdAt";
+            inline constexpr auto sentAt             = "sentAt";
             inline constexpr auto lastUsedAt         = "lastUsedAt";
             inline constexpr auto lastUpdatedAt      = "lastUpdatedAt";
             inline constexpr auto isUnread           = "isUnread";

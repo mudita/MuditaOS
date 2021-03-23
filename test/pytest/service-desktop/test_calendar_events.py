@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 import pytest
 from harness.interface.defs import status
@@ -91,6 +91,6 @@ def test_calendar(harness):
     for ev in range(0,event_count):
         del_body = {"UID": UIDS[ev]}
         ret = harness.endpoint_request("events", "del", del_body)
-        assert ret["status"] == status["NoContent"]
+        assert ret["status"] == status["OK"]
 
 

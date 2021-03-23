@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/Endpoint.hpp>
@@ -217,7 +217,7 @@ TEST_CASE("DB Helpers test - json encoding (messages)")
     REQUIRE(messageJson[json::messages::messageBody] == "test message");
     REQUIRE(messageJson[json::messages::contactID] == 1);
     REQUIRE(messageJson[json::messages::receivedAt] == 12345);
-    REQUIRE(messageJson[json::messages::createdAt] == 54321);
+    REQUIRE(messageJson[json::messages::sentAt] == 54321);
     REQUIRE(messageJson[json::messages::threadID] == 1);
     REQUIRE(messageJson[json::messages::messageID] == 10);
 
@@ -246,7 +246,8 @@ TEST_CASE("Context class test")
         REQUIRE(context.getMethod() == http::Method::get);
         REQUIRE(context.getUuid() == 12345);
         REQUIRE(context.getEndpoint() == EndpointType::contacts);
-        REQUIRE(context.createSimpleResponse() == R"(#000000045{"endpoint": 7, "status": 204, "uuid": 12345})");
+        REQUIRE(context.createSimpleResponse() ==
+                R"(#000000059{"body": null, "endpoint": 7, "status": 200, "uuid": 12345})");
 
         context.setResponseBody(context.getBody());
         REQUIRE(context.createSimpleResponse() ==
