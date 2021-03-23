@@ -57,10 +57,13 @@ namespace cellular
 
         [[nodiscard]] auto GetCellularDevice() const noexcept -> std::shared_ptr<devices::Device>;
         [[nodiscard]] auto GetLastCommunicationTimestamp() const noexcept -> TickType_t;
+        [[nodiscard]] auto IsCellularInSleepMode() const noexcept -> bool;
 
     protected:
         bool isInitialized = false;
+        bool isInSleepMode{false};
         TickType_t lastCommunicationTimestamp;
+
         std::shared_ptr<drivers::DriverLPUART> driverLPUART;
     };
     namespace cellular

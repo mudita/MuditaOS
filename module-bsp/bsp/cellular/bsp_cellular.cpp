@@ -41,4 +41,9 @@ namespace bsp{
     	return lastCommunicationTimestamp;
     }
 
+    [[nodiscard]] auto Cellular::IsCellularInSleepMode() const noexcept -> bool
+    {
+    	return isInSleepMode;
+    }
+
 }

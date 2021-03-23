@@ -443,6 +443,12 @@ void ServiceCellular::registerMessageHandlers()
             auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
             bus.sendUnicast(std::move(message), service::name::service_desktop);
         }
+        if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularSleepModeInfoRequestEvent)) {
+            auto event = std::make_unique<sdesktop::developerMode::CellularSleepModeInfoRequestEvent>(
+                cmux->IsCellularInSleepMode());
+            auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+            bus.sendUnicast(std::move(message), service::name::service_desktop);
+        }
         if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::ATResponseEvent)) {
             auto channel = cmux->get(TS0710::Channel::Commands);
             assert(channel);

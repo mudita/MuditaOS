@@ -603,6 +603,11 @@ void TS0710::RegisterCellularDevice(void)
     return pv_cellular->GetLastCommunicationTimestamp();
 }
 
+[[nodiscard]] auto TS0710::IsCellularInSleepMode() const noexcept -> bool
+{
+    return pv_cellular->IsCellularInSleepMode();
+}
+
 TS0710::ConfState TS0710::SetupEchoCanceller(EchoCancellerStrength strength)
 {
 
