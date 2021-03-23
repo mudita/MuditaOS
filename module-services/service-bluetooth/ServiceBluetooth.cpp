@@ -18,9 +18,9 @@
 #include "service-bluetooth/messages/Unpair.hpp"
 #include "service-bluetooth/messages/SetDeviceName.hpp"
 
-#include <log/log.hpp>
 #include "SystemManager/messages/SentinelRegistrationMessage.hpp"
 
+#include <log/log.hpp>
 #include <bits/exception.h>
 #include <utility>
 #include <service-desktop/service-desktop/DesktopMessages.hpp>
@@ -54,17 +54,13 @@ ServiceBluetooth::~ServiceBluetooth()
 // this means it is an init point of bluetooth feature handling
 sys::ReturnCodes ServiceBluetooth::InitHandler()
 {
+    worker = std::make_unique<BluetoothWorker>(this);
+    worker->run();
+
     cpuSentinel = std::make_shared<sys::CpuSentinel>(service::name::bluetooth, this);
 
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
-    bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
-
-    // temporarily limit the minimum CPU frequency
-    // due to problems with the UART of the BT module
-    cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_6);
-
-    worker = std::make_unique<BluetoothWorker>(this);
-    worker->run();
+    bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
     connect(message::bluetooth::RequestBondedDevices(), [&](sys::Message *msg) {
         auto request = static_cast<message::bluetooth::RequestBondedDevices *>(msg);
@@ -195,10 +191,12 @@ auto ServiceBluetooth::handle(message::bluetooth::SetStatus *msg) -> std::shared
 
     switch (newBtStatus.state) {
     case BluetoothStatus::State::On:
+        cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_3);
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOn));
         break;
     case BluetoothStatus::State::Off:
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::PowerOff));
+        cpuSentinel->ReleaseMinimumFrequency();
         break;
     default:
         break;
