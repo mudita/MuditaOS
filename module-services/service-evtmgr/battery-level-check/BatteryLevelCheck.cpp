@@ -7,6 +7,8 @@
 #include <agents/settings/SystemSettings.hpp>
 #include <common_data/EventStore.hpp>
 #include <Utils.hpp>
+
+#define BOOST_SML_CFG_DISABLE_MIN_SIZE // GCC10 fix
 #include <module-utils/sml/include/boost/sml.hpp>
 
 namespace battery_level_check
