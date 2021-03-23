@@ -31,11 +31,11 @@
 
 using namespace parserFSM;
 
-auto ContactHelper::to_json(const ContactRecord &record) -> json11::Json
+auto ContactHelper::to_json(ContactRecord record) -> json11::Json
 {
     auto numberArray = json11::Json::array();
 
-    for (const auto &number : record.numbers) {
+    for (auto number : record.numbers) {
         numberArray.emplace_back(number.number.getEntered().c_str());
     }
 
@@ -49,7 +49,7 @@ auto ContactHelper::to_json(const ContactRecord &record) -> json11::Json
     return recordEntry;
 }
 
-auto ContactHelper::from_json(const json11::Json &contactJSON) -> ContactRecord
+auto ContactHelper::from_json(json11::Json contactJSON) -> ContactRecord
 {
     auto newRecord            = ContactRecord();
     newRecord.primaryName     = UTF8(contactJSON[json::contacts::primaryName].string_value());
@@ -57,7 +57,7 @@ auto ContactHelper::from_json(const json11::Json &contactJSON) -> ContactRecord
     newRecord.alternativeName = UTF8(contactJSON[json::contacts::alternativeName].string_value());
     newRecord.address         = UTF8(contactJSON[json::contacts::address].string_value());
 
-    for (const auto &num : contactJSON[json::contacts::numbers].array_items()) {
+    for (auto num : contactJSON[json::contacts::numbers].array_items()) {
         utils::PhoneNumber phoneNumber(num.string_value());
         auto contactNum = ContactRecord::Number(phoneNumber.get(), phoneNumber.toE164(), ContactNumberType ::CELL);
         newRecord.numbers.push_back(contactNum);
@@ -92,7 +92,7 @@ auto ContactHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
                     context.setTotalCount(contactResult->getAllLength());
                     json11::Json::array contactsArray;
 
-                    for (const auto &record : *recordsPtr) {
+                    for (const auto &record : *recordsPtr.get()) {
                         contactsArray.emplace_back(ContactHelper::to_json(record));
                     }
 
@@ -216,7 +216,7 @@ auto ContactHelper::updateDBEntry(Context &context) -> sys::ReturnCodes
         [](db::QueryResult *result, Context context) {
             if (auto contactResult = dynamic_cast<db::query::ContactUpdateResult *>(result)) {
 
-                context.setResponseStatus(contactResult->getResult() ? http::Code::NoContent
+                context.setResponseStatus(contactResult->getResult() ? http::Code::OK
                                                                      : http::Code::InternalServerError);
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
 
@@ -243,7 +243,7 @@ auto ContactHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
         [](db::QueryResult *result, Context context) {
             if (auto contactResult = dynamic_cast<db::query::ContactRemoveResult *>(result)) {
 
-                context.setResponseStatus(contactResult->getResult() ? http::Code::NoContent
+                context.setResponseStatus(contactResult->getResult() ? http::Code::OK
                                                                      : http::Code::InternalServerError);
                 MessageHandler::putToSendQueue(context.createSimpleResponse());
 

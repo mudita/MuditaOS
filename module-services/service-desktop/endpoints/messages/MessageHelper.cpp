@@ -42,7 +42,7 @@ namespace parserFSM
 
         auto recordEntry = json11::Json::object{{json::messages::contactID, static_cast<int>(record.contactID)},
                                                 {json::messages::receivedAt, static_cast<int>(record.date)},
-                                                {json::messages::createdAt, static_cast<int>(record.dateSent)},
+                                                {json::messages::sentAt, static_cast<int>(record.dateSent)},
                                                 {json::messages::messageID, static_cast<int>(record.ID)},
                                                 {json::messages::messageBody, record.body.c_str()},
                                                 {json::messages::messageType, static_cast<int>(record.type)},
@@ -167,7 +167,7 @@ namespace parserFSM
 
     auto MessageHelper::createSMS(Context &context) -> sys::ReturnCodes
     {
-        context.setResponseStatus(http::Code::NotImplemented);
+        context.setResponseStatus(http::Code::InternalServerError);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Success;
     }
@@ -184,7 +184,7 @@ namespace parserFSM
             [=](db::QueryResult *result, Context context) {
                 if (auto smsTemplateResult = dynamic_cast<db::query::SMSRemoveResult *>(result)) {
 
-                    context.setResponseStatus(smsTemplateResult->getResults() ? http::Code::NoContent
+                    context.setResponseStatus(smsTemplateResult->getResults() ? http::Code::OK
                                                                               : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -240,7 +240,7 @@ namespace parserFSM
             [=](db::QueryResult *result, Context context) {
                 if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateUpdateResult *>(result)) {
 
-                    context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::NoContent
+                    context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::OK
                                                                              : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -273,7 +273,7 @@ namespace parserFSM
             [=](db::QueryResult *result, Context context) {
                 if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateAddResult *>(result)) {
 
-                    context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::NoContent
+                    context.setResponseStatus(smsTemplateResult->getResult() ? http::Code::OK
                                                                              : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -305,7 +305,7 @@ namespace parserFSM
             [=](db::QueryResult *result, Context context) {
                 if (auto smsTemplateResult = dynamic_cast<db::query::SMSTemplateRemoveResult *>(result)) {
 
-                    context.setResponseStatus(smsTemplateResult->getResults() ? http::Code::NoContent
+                    context.setResponseStatus(smsTemplateResult->getResults() ? http::Code::OK
                                                                               : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -339,7 +339,7 @@ namespace parserFSM
                         auto theResults = threadsResults->getResults();
                         threadsArray.reserve(theResults.size());
                         for (auto &record : theResults) {
-                            threadsArray.emplace_back(MessageHelper::toJson(record));
+                            threadsArray.emplace_back(MessageHelper::toJson(std::move(record)));
                         }
                         context.setResponseBody(std::move(threadsArray));
                         context.setTotalCount(threadsResults->getTotalCount());
@@ -386,7 +386,7 @@ namespace parserFSM
             [=](db::QueryResult *result, Context context) {
                 if (auto threadResult = dynamic_cast<db::query::MarkAsReadResult *>(result)) {
 
-                    context.setResponseStatus(threadResult->getResult() ? http::Code::NoContent
+                    context.setResponseStatus(threadResult->getResult() ? http::Code::OK
                                                                         : http::Code::InternalServerError);
                     MessageHandler::putToSendQueue(context.createSimpleResponse());
                     return true;
@@ -406,7 +406,7 @@ namespace parserFSM
 
     auto MessageHelper::deleteThread(Context &context) -> sys::ReturnCodes
     {
-        context.setResponseStatus(http::Code::NotImplemented);
+        context.setResponseStatus(http::Code::InternalServerError);
         MessageHandler::putToSendQueue(context.createSimpleResponse());
         return sys::ReturnCodes::Success;
     }

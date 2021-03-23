@@ -52,7 +52,7 @@ responsePayloadJson:
     { "endpoint", endpointNumber },
     { "status", statusCode},
     { "body", responseBodyJson },
-    { "uuid", uuidNumber }
+    { "uuid", uuidString }
 }
 ```
 The `Bluetooth` endpoint provides responses according to the following table: 
