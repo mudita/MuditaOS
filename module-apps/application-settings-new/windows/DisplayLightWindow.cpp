@@ -23,6 +23,8 @@ namespace gui
 
         setTitle(utils::localize.get("app_settings_display_display_light"));
 
+        screenLightSettings->setBrightnessFunction();
+
         timerCallback = [this](Item &it, sys::Timer &task) { return onTimerTimeout(it, task); };
         timerTask     = app::GuiTimerFactory::createPeriodicTimer(
             application, this, "AmbientLightTimer", std::chrono::milliseconds{gui::lighting::AMBIENT_LIGHT_TIMER_MS});
@@ -39,6 +41,8 @@ namespace gui
     auto DisplayLightWindow::onTimerTimeout(Item &self, sys::Timer &task) -> bool
     {
         ambientLight = bsp::light_sensor::readout();
+        auto values     = screenLightSettings->getCurrentValues();
+        brightnessValue = values.parameters.manualModeBrightness;
         refreshOptionsList();
 
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -82,6 +86,11 @@ namespace gui
                 text, nullptr, nullptr, this, gui::option::SettingRightItem::Disabled));
         };
 
+        auto addBrightnessValue = [&](UTF8 text) {
+            optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
+                text, nullptr, nullptr, this, gui::option::SettingRightItem::Disabled));
+        };
+
         addOnOffOoption(utils::translateI18("app_settings_display_light_main"), isDisplayLightSwitchOn);
         if (isDisplayLightSwitchOn) {
             addOnOffOoption(utils::translateI18("app_settings_display_light_auto"), isAutoLightSwitchOn);
@@ -92,6 +101,8 @@ namespace gui
         }
 
         addDisplayLight("Light intensity = " + utils::to_string(ambientLight));
+        addBrightnessValue("Manual brightness = " + utils::to_string(brightnessValue) + "%");
+
         return optionsList;
     }
 
@@ -110,8 +121,8 @@ namespace gui
         };
 
         auto spinner = std::make_unique<gui::SpinBoxOptionSettings>(
-            utils::translateI18("app_settings_display_light_brightness") + " " + utils::to_string(brightnessStep),
-            brightnessValue * brightnessStep,
+            utils::translateI18("app_settings_display_light_brightness"),
+            std::ceil(brightnessValue / brightnessStep),
             std::ceil(screen_light_control::Parameters::MAX_BRIGHTNESS / brightnessStep),
             setBrightness,
             setBottomBarOnSpinnerFocus);
@@ -121,11 +132,6 @@ namespace gui
 
     void DisplayLightWindow::addBrightnessOption(std::list<gui::Option> &options)
     {
-        /*
-         * We are adding 4 brightness widgets to easily check what is the best step for setting screen brightness.
-         */
-        for (auto step : {10, 15, 20, 25}) {
-            options.emplace_back(createBrightnessOption(step));
-        }
+        options.emplace_back(createBrightnessOption(lighting::LIGHT_CONTROL_STEP));
     }
 } // namespace gui
