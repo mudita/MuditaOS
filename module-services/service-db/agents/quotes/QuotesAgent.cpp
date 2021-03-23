@@ -24,29 +24,29 @@ namespace Quotes
         return nullptr;
     }
 
-    // void QuotesAgent::registerMessages()
-    // {
-    //     using std::placeholders::_1;
-
-    //     parentService->connect(typeid(Messages::GetCategoryListRequest),
-    //                            std::bind(&QuotesAgent::handleCategoryList, this, _1));
-    //     parentService->connect(typeid(Messages::GetQuotesListRequest),
-    //                            std::bind(&QuotesAgent::handleQuotesList, this, _1));
-    //     parentService->connect(typeid(Messages::GetQuotesListByCategoryIdRequest),
-    //                            std::bind(&QuotesAgent::handleQuotesListByCategoryId, this, _1));
-    //     parentService->connect(typeid(Messages::EnableCategoryByIdRequest),
-    //                            std::bind(&QuotesAgent::handleEnableCategoryById, this, _1));
-    //     parentService->connect(typeid(Messages::EnableQuoteByIdRequest),
-    //                            std::bind(&QuotesAgent::handleEnableQuoteById, this, _1));
-    //     parentService->connect(typeid(Messages::GetEnabledQuotesListRequest),
-    //                            std::bind(&QuotesAgent::handleEnabledQuotesList, this, _1));
-    //     parentService->connect(typeid(Messages::AddQuoteRequest), std::bind(&QuotesAgent::handleAddQuote, this, _1));
-    //     parentService->connect(typeid(Messages::ReadQuoteRequest), std::bind(&QuotesAgent::handleReadQuote, this,
-    //     _1)); parentService->connect(typeid(Messages::WriteQuoteRequest),
-    //                            std::bind(&QuotesAgent::handleWriteQuote, this, _1));
-    //     parentService->connect(typeid(Messages::DeleteQuoteRequest),
-    //                            std::bind(&QuotesAgent::handleDeleteQuote, this, _1));
-    // }
+    //     void QuotesAgent::registerMessages()
+    //     {
+    //         using std::placeholders::_1;
+    //
+    //         parentService->connect(typeid(Messages::GetCategoryListRequest),
+    //                                std::bind(&QuotesAgent::handleCategoryList, this, _1));
+    //         parentService->connect(typeid(Messages::GetQuotesListRequest),
+    //                                std::bind(&QuotesAgent::handleQuotesList, this, _1));
+    //         parentService->connect(typeid(Messages::GetQuotesListByCategoryIdRequest),
+    //                                std::bind(&QuotesAgent::handleQuotesListByCategoryId, this, _1));
+    //         parentService->connect(typeid(Messages::EnableCategoryByIdRequest),
+    //                                std::bind(&QuotesAgent::handleEnableCategoryById, this, _1));
+    //         parentService->connect(typeid(Messages::EnableQuoteByIdRequest),
+    //                                std::bind(&QuotesAgent::handleEnableQuoteById, this, _1));
+    //         parentService->connect(typeid(Messages::GetEnabledQuotesListRequest),
+    //                                std::bind(&QuotesAgent::handleEnabledQuotesList, this, _1));
+    //         parentService->connect(typeid(Messages::AddQuoteRequest), std::bind(&QuotesAgent::handleAddQuote, this,
+    //         _1)); parentService->connect(typeid(Messages::ReadQuoteRequest), std::bind(&QuotesAgent::handleReadQuote,
+    //         this, _1)); parentService->connect(typeid(Messages::WriteQuoteRequest),
+    //                                std::bind(&QuotesAgent::handleWriteQuote, this, _1));
+    //         parentService->connect(typeid(Messages::DeleteQuoteRequest),
+    //                                std::bind(&QuotesAgent::handleDeleteQuote, this, _1));
+    //     }
 
     auto QuotesAgent::handleCategoryList(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
     {

@@ -85,7 +85,7 @@ namespace app
     ApplicationSettingsNew::ApplicationSettingsNew(std::string name,
                                                    std::string parent,
                                                    StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), startInBackground)
+        : Application(std::move(name), std::move(parent), startInBackground), AsyncCallbackReceiver{this}
     {
         if ((Store::GSM::SIM::SIM1 == selectedSim || Store::GSM::SIM::SIM2 == selectedSim) &&
             Store::GSM::get()->sim == selectedSim) {
@@ -118,6 +118,16 @@ namespace app
             auto currentWindow = getCurrentWindow();
             if (gui::window::name::network == currentWindow->getName()) {
                 currentWindow->rebuild();
+            }
+        }
+
+        // handle database response
+        if (resp != nullptr) {
+
+            LOG_ERROR("To jest odpowiedzailne za te callbacki prawda?");
+
+            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
         }
 
