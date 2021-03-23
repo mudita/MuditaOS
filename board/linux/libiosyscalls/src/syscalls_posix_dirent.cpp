@@ -214,7 +214,7 @@ extern "C"
                 entry->d_ino    = stdata.st_ino;
                 entry->d_type   = S_ISREG(stdata.st_mode) ? DT_REG : DT_DIR;
                 entry->d_reclen = fname.size();
-                std::strncpy(entry->d_name, fname.c_str(), sizeof(entry->d_name));
+                std::strncpy(entry->d_name, fname.c_str(), sizeof(entry->d_name) - 1);
                 *result = entry;
                 return 0;
             }
