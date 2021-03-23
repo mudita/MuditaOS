@@ -111,6 +111,7 @@ namespace app
             virtual void setBrightness(float brigtnessValue)    = 0;
             virtual void setMode(bool isAutoLightSwitchOn)      = 0;
             virtual void setStatus(bool isDisplayLightSwitchOn) = 0;
+            virtual void setBrightnessFunction()                = 0;
         };
 
         class KeypdBacklightSettings
@@ -204,6 +205,7 @@ namespace app
         void setBrightness(float brigtnessValue) override;
         void setMode(bool isAutoLightSwitchOn) override;
         void setStatus(bool isDisplayLightSwitchOn) override;
+        void setBrightnessFunction() override;
 
         auto isKeypadBacklightOn() -> bool override;
         void setKeypadBacklightState(bool newState) override;

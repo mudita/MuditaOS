@@ -15,6 +15,7 @@ namespace gui
     namespace lighting
     {
         constexpr inline auto AMBIENT_LIGHT_TIMER_MS = 2000;
+        constexpr inline auto LIGHT_CONTROL_STEP     = 10;
     }
 
     class DisplayLightWindow : public BaseSettingsWindow
@@ -31,7 +32,8 @@ namespace gui
         auto createBrightnessOption(int step) -> std::unique_ptr<SpinBoxOptionSettings>;
         bool isDisplayLightSwitchOn                                      = false;
         bool isAutoLightSwitchOn                                         = false;
-        std::uint8_t brightnessValue                                     = 0;
+        bsp::eink_frontlight::BrightnessPercentage brightnessValue       = 0.0;
+
         app::settingsInterface::ScreenLightSettings *screenLightSettings = nullptr;
         float ambientLight                                               = 0.0;
         sys::TimerHandle timerTask;
