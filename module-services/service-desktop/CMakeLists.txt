@@ -47,6 +47,8 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 add_dependencies(${PROJECT_NAME} version)
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE DISABLE_USB_SECURITY)
+
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}
