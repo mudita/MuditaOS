@@ -30,6 +30,7 @@ namespace parserFSM
         auto smsRecordFromJson(json11::Json msgJson) -> SMSRecord;
         bool requestCellularPowerStateChange(const int simSelected);
         bool requestServiceStateInfo(sys::Service *serv);
+        bool requestCellularSleepModeInfo(sys::Service *serv);
         auto prepareSMS(Context &context) -> ProcessResult;
 
       public:
@@ -68,6 +69,7 @@ namespace parserFSM
         /// values for getInfo cmd
         inline constexpr auto simStateInfo      = "simState";
         inline constexpr auto cellularStateInfo = "cellularState";
+        inline constexpr auto cellularSleepModeInfo = "cellularSleepMode";
 
         /// values for smsCommand
         inline constexpr auto smsAdd = "smsAdd";

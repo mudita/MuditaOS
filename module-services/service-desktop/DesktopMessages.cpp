@@ -31,6 +31,13 @@ namespace sdesktop
             context.setEndpoint(EndpointType::developerMode);
             context.setResponseBody(json11::Json::object{{json::developerMode::cellularStateInfo, stateStr}});
         }
+
+        CellularSleepModeInfoRequestEvent::CellularSleepModeInfoRequestEvent(bool isInSleepMode)
+        {
+            context.setResponseStatus(http::Code::OK);
+            context.setEndpoint(EndpointType::developerMode);
+            context.setResponseBody(json11::Json::object{{json::developerMode::cellularSleepModeInfo, isInSleepMode}});
+        }
     } // namespace developerMode
 
 } // namespace sdesktop

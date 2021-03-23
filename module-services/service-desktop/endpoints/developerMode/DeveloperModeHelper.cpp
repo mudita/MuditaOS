@@ -159,6 +159,17 @@ auto DeveloperModeHelper::processGet(Context &context) -> ProcessResult
             if (requestServiceStateInfo(owner) == false) {
                 return {sent::no, endpoint::ResponseContext{.status = http::Code::NotAcceptable}};
             }
+            else {
+                return {sent::delayed, std::nullopt};
+            }
+        }
+        else if (keyValue == json::developerMode::cellularSleepModeInfo) {
+            if (requestCellularSleepModeInfo(owner) == false) {
+                return {sent::no, endpoint::ResponseContext{.status = http::Code::NotAcceptable}};
+            }
+            else {
+                return {sent::delayed, std::nullopt};
+            }
         }
         else {
             return {sent::no, endpoint::ResponseContext{.status = http::Code::BadRequest}};
@@ -309,6 +320,13 @@ auto DeveloperModeHelper::prepareSMS(Context &context) -> ProcessResult
 bool DeveloperModeHelper::requestServiceStateInfo(sys::Service *serv)
 {
     auto event = std::make_unique<sdesktop::developerMode::CellularStateInfoRequestEvent>();
+    auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
+    return serv->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
+}
+
+bool DeveloperModeHelper::requestCellularSleepModeInfo(sys::Service *serv)
+{
+    auto event = std::make_unique<sdesktop::developerMode::CellularSleepModeInfoRequestEvent>();
     auto msg   = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
     return serv->bus.sendUnicast(std::move(msg), ServiceCellular::serviceName);
 }

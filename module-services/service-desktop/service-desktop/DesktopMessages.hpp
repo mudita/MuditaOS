@@ -189,6 +189,12 @@ namespace sdesktop
             CellularStateInfoRequestEvent() = default;
             explicit CellularStateInfoRequestEvent(std::string stateStr);
         };
+        class CellularSleepModeInfoRequestEvent : public Event
+        {
+          public:
+            CellularSleepModeInfoRequestEvent() = default;
+            explicit CellularSleepModeInfoRequestEvent(bool isInSleepMode);
+        };
         class ScreenlockCheckEvent : public Event
         {
           public:
