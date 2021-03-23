@@ -19,7 +19,7 @@ class TemplatesTester:
     def __add_template(self):
         body = {"category": "template", "templateBody": self.template_body}
         ret = self.harness.endpoint_request("messages", "post", body)
-        assert ret["status"] == status["NoContent"]
+        assert ret["status"] == status["OK"]
         return ret
 
     def __get_templates(self, limit, offset):
@@ -29,7 +29,7 @@ class TemplatesTester:
     def __remove_template(self, template_id):
         body = {"category": "template", "templateID": template_id}
         ret = self.harness.endpoint_request("messages", "del", body)
-        assert ret["status"] == status["NoContent"]
+        assert ret["status"] == status["OK"]
 
     def __get_all_templates(self):
         body = {"category": "template", "count": True}
@@ -100,7 +100,7 @@ class TemplatesTester:
                 new_template_body = "NEW TEMPLATE BODY TEST"
                 body = {"category": "template", "templateID": template["templateID"], "templateBody": new_template_body}
                 ret = self.harness.endpoint_request("messages", "put", body)
-                assert ret["status"] == status["NoContent"]
+                assert ret["status"] == status["OK"]
 
                 # and then remove it to clean env
                 self.__remove_template(template["templateID"])

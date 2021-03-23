@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -29,9 +29,9 @@ namespace parserFSM
         [[nodiscard]] auto repeatFrom(RecurrenceRule &rrule) const -> Repeat;
         [[nodiscard]] auto eventsRecordFrom(ICalEvent &icalEvent) const -> EventsRecord;
 
-        [[nodiscard]] auto eventJsonObjectFrom(const EventsRecord &record) const -> json11::Json;
-        [[nodiscard]] auto ICalEventFromJson(const json11::Json &eventObj) const -> ICalEvent;
-        [[nodiscard]] auto isICalEventValid(const ICalEvent &event) const -> bool;
+        [[nodiscard]] auto eventJsonObjectFrom(EventsRecord record) const -> json11::Json;
+        [[nodiscard]] auto ICalEventFromJson(json11::Json eventObj) const -> ICalEvent;
+        [[nodiscard]] auto isICalEventValid(ICalEvent event) const -> bool;
 
       public:
         CalendarEventsHelper(sys::Service *_ownerServicePtr) : DBHelper(_ownerServicePtr)

@@ -176,7 +176,7 @@ def test_remove_message(harness):
     sms_to_remove = messages[0]
     body = {"category": "message", "messageID": sms_to_remove["messageID"]}
     ret = harness.endpoint_request("messages", "del", body)
-    assert ret["status"] == status["NoContent"]
+    assert ret["status"] == status["OK"]
 
     # get messages count again
     body = {"category": "message", "count": True}

@@ -83,16 +83,10 @@ namespace parserFSM
 
         virtual auto createSimpleResponse(const std::string &entryTitle = json::entries) -> std::string
         {
-            const json11::Json responseJson =
-                responseContext.body.is_null()
-                    ? json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
-                                           {json::status, static_cast<int>(responseContext.status)},
-                                           {json::uuid, getUuid()}}
-                    : json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
-                                           {json::status, static_cast<int>(responseContext.status)},
-                                           {json::uuid, getUuid()},
-                                           {json::body, responseContext.body}};
-
+            json11::Json responseJson = json11::Json::object{{json::endpoint, static_cast<int>(getEndpoint())},
+                                                             {json::status, static_cast<int>(responseContext.status)},
+                                                             {json::uuid, getUuid()},
+                                                             {json::body, responseContext.body}};
             return buildResponseStr(responseJson.dump().size(), responseJson.dump());
         }
 

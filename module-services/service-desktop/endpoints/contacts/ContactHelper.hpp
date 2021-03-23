@@ -38,8 +38,8 @@ namespace parserFSM
 
         auto requestCount(Context &context) -> sys::ReturnCodes;
         auto requestContactByID(Context &context) -> sys::ReturnCodes;
-        static auto to_json(const ContactRecord &record) -> json11::Json;
-        static auto from_json(const json11::Json &contactJSON) -> ContactRecord;
+        static auto to_json(ContactRecord record) -> json11::Json;
+        static auto from_json(json11::Json contactJSON) -> ContactRecord;
     };
 
     namespace json::contacts

@@ -27,7 +27,7 @@ namespace parserFSM
         bool sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state);
 
         void requestSimChange(const int simSelected);
-        auto smsRecordFromJson(const json11::Json &msgJson) -> SMSRecord;
+        auto smsRecordFromJson(json11::Json msgJson) -> SMSRecord;
         bool requestCellularPowerStateChange(const int simSelected);
         bool requestServiceStateInfo(sys::Service *serv);
         auto prepareSMS(Context &context) -> ProcessResult;
