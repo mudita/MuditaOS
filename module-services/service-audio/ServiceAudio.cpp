@@ -410,8 +410,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleSendEvent(std::shared_
 }
 
 std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector<audio::PlaybackType> &stopTypes,
-                                                               const Token &token,
-                                                               bool &muted)
+                                                               const Token &token)
 {
     std::vector<std::pair<Token, audio::RetCode>> retCodes;
 
@@ -439,7 +438,6 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
         for (auto &input : audioMux.GetAllInputs()) {
             const auto &currentOperation = input.audio->GetCurrentOperation();
             if (std::find(stopTypes.begin(), stopTypes.end(), currentOperation.GetPlaybackType()) != stopTypes.end()) {
-                muted  = true;
                 auto t = input.token;
                 retCodes.emplace_back(t, stopInput(&input));
             }
@@ -464,19 +462,15 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
     return std::make_unique<AudioStopResponse>(audio::RetCode::Success, token);
 }
 
-std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector<audio::PlaybackType> &stopTypes,
-                                                               const Token &token)
-{
-    bool muted = false;
-    return HandleStop(stopTypes, token, muted);
-}
-
 void ServiceAudio::HandleNotification(const AudioNotificationMessage::Type &type, const Token &token)
 {
     if (type == AudioNotificationMessage::Type::EndOfFile) {
         auto input = audioMux.GetInput(token);
         if (input && ShouldLoop((*input)->audio->GetCurrentOperationPlaybackType())) {
             (*input)->audio->Start();
+            if ((*input)->audio->IsMuted()) {
+                (*input)->audio->Mute();
+            }
         }
         else {
             auto newMsg = std::make_shared<AudioStopRequest>(token);
@@ -492,9 +486,6 @@ void ServiceAudio::HandleNotification(const AudioNotificationMessage::Type &type
 
 auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyPressedResponse>
 {
-
-    // mute if 0 and return with parameter shouldn't popup
-    bool muted   = false;
     auto context = getCurrentContext();
 
     const auto currentVolume =
@@ -503,13 +494,13 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyP
     if (isSystemSound(context.second)) {
         // active system sounds can be only muted, no volume control is possible
         if (step < 0) {
-            HandleStop({context.second}, Token(), muted);
-            if (muted) {
-                return std::make_unique<AudioKeyPressedResponse>(audio::RetCode::Success, 0, muted, context);
-            }
+            MuteCurrentOperation();
+            return std::make_unique<AudioKeyPressedResponse>(
+                audio::RetCode::Success, 0, AudioKeyPressedResponse::ShowPopup::False, context);
         }
         else {
-            return std::make_unique<AudioKeyPressedResponse>(audio::RetCode::Success, currentVolume, muted, context);
+            return std::make_unique<AudioKeyPressedResponse>(
+                audio::RetCode::Success, currentVolume, AudioKeyPressedResponse::ShowPopup::False, context);
         }
     }
 
@@ -524,7 +515,8 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyP
         // update volume of currently active sound
         setSetting(Setting::Volume, std::to_string(newVolume));
     }
-    return std::make_unique<AudioKeyPressedResponse>(audio::RetCode::Success, newVolume, muted, context);
+    return std::make_unique<AudioKeyPressedResponse>(
+        audio::RetCode::Success, newVolume, AudioKeyPressedResponse::ShowPopup::True, context);
 }
 
 void ServiceAudio::HandlePhoneModeChange(sys::phone_modes::PhoneMode phoneMode,
@@ -544,6 +536,13 @@ void ServiceAudio::HandlePhoneModeChange(sys::phone_modes::PhoneMode phoneMode,
                 LOG_ERROR("Requested uninitialized DB value %s", path.c_str());
             }
         }
+    }
+}
+
+void ServiceAudio::MuteCurrentOperation()
+{
+    for (auto &input : audioMux.GetAllInputs()) {
+        input.audio->Mute();
     }
 }
 

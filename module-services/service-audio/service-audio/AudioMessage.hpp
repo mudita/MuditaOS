@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -262,14 +262,19 @@ class AudioKeyPressedRequest : public AudioMessage
 class AudioKeyPressedResponse : public sys::DataMessage
 {
   public:
+    enum class ShowPopup : bool
+    {
+        True,
+        False
+    };
     AudioKeyPressedResponse(audio::RetCode retCode,
                             const audio::Volume &volume,
-                            const bool muted,
+                            const ShowPopup showPopup,
                             const std::pair<audio::Profile::Type, audio::PlaybackType> &context)
-        : sys::DataMessage(MessageType::AudioMessage), volume(volume), muted(muted), context(context)
+        : sys::DataMessage(MessageType::AudioMessage), volume(volume), showPopup(showPopup), context(context)
     {}
 
     const audio::Volume volume{};
-    const bool muted = false;
+    const ShowPopup showPopup = ShowPopup::False;
     std::pair<audio::Profile::Type, audio::PlaybackType> context;
 };
