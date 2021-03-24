@@ -13,6 +13,7 @@
 #include <module-bluetooth/Bluetooth/CommandHandler.hpp>
 #include "ProfileManager.hpp"
 #include <Service/CpuSentinel.hpp>
+#include <Timers/TimerHandle.hpp>
 
 #include <memory> // for unique_ptr
 
@@ -66,6 +67,10 @@ class ServiceBluetooth : public sys::Service
   private:
     std::unique_ptr<BluetoothWorker> worker;
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
+    sys::TimerHandle connectionTimeoutTimer;
+
+    void startTimeoutTimer();
+    void stopTimeoutTimer();
 
     [[nodiscard]] auto handle(message::bluetooth::RequestBondedDevices *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(message::bluetooth::RequestStatus *msg) -> std::shared_ptr<sys::Message>;
