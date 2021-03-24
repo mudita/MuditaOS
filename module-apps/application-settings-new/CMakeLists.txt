@@ -71,6 +71,7 @@ target_sources( ${PROJECT_NAME}
         windows/PhoneModesWindow.cpp
         windows/AboutYourPureWindow.cpp
         windows/CertificationWindow.cpp
+        windows/TechnicalInformationWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -100,6 +101,7 @@ target_sources( ${PROJECT_NAME}
         windows/QuoteCategoriesWindow.hpp
         windows/AboutYourPureWindow.hpp
         windows/CertificationWindow.hpp
+        windows/TechnicalInformationWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)
