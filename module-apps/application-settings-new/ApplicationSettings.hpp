@@ -64,7 +64,7 @@ namespace gui::window::name
     inline constexpr auto change_date_and_time = "ChangeDateAndTime";
     inline constexpr auto change_time_zone     = "ChangeTimeZone";
 
-    inline constexpr auto new_apn = "NewApn";
+    inline constexpr auto new_apn                 = "NewApn";
     inline constexpr auto bluetooth_check_passkey = "BluetoothCheckPasskey";
 
     inline constexpr auto do_not_disturb       = "DoNotDisturb";
@@ -171,9 +171,9 @@ namespace app
                                    public AsyncCallbackReceiver
     {
       public:
-        ApplicationSettingsNew(std::string name                    = name_settings_new,
-                               std::string parent                  = {},
-                               StartInBackground startInBackground = {false});
+        explicit ApplicationSettingsNew(std::string name                    = name_settings_new,
+                                        std::string parent                  = {},
+                                        StartInBackground startInBackground = {false});
         ~ApplicationSettingsNew() override;
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
         auto InitHandler() -> sys::ReturnCodes override;

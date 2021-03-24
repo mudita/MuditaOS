@@ -128,8 +128,26 @@ namespace style
                 inline constexpr auto description_h = 150;
             } // namespace offline
 
-        }     // namespace window
-    };        // namespace settings
+            namespace sar
+            {
+                inline constexpr auto LeftMargin = ::style::window::default_left_margin;
+                inline constexpr auto TopMargin  = ::style::header::height + ::style::margins::very_big - 1;
+                inline constexpr auto Width      = ::style::window::default_body_width;
+                inline constexpr auto Height     = ::style::window::default_body_height - ::style::margins::very_big;
+
+                namespace date
+                {
+                    inline constexpr auto Height = 30;
+                } // namespace date
+                namespace text
+                {
+                    inline constexpr auto TopMargin = 7;
+                    inline constexpr auto Height    = sar::Height - date::Height - TopMargin;
+                } // namespace text
+            }     // namespace sar
+
+        } // namespace window
+    };    // namespace settings
     namespace quotes::categories
     {
         namespace list
