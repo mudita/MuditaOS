@@ -10,12 +10,12 @@
 class ApnSettingsModel
 {
   public:
-    ApnSettingsModel(app::Application *application);
+    explicit ApnSettingsModel(app::Application *application);
 
     void requestAPNList();
-    void saveAPN(std::shared_ptr<packet_data::APN::Config> apn);
-    void removeAPN(std::shared_ptr<packet_data::APN::Config> apn);
-    void setAsDefaultAPN(std::shared_ptr<packet_data::APN::Config> apn);
+    void saveAPN(const std::shared_ptr<packet_data::APN::Config> &apn);
+    void removeAPN(const std::shared_ptr<packet_data::APN::Config> &apn);
+    void setAsDefaultAPN(const std::shared_ptr<packet_data::APN::Config> &apn);
 
   private:
     app::Application *application = nullptr;

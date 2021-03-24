@@ -16,11 +16,11 @@ class NewApnModel : public app::InternalModel<gui::ApnListItem *>, public gui::L
     app::Application *application = nullptr;
 
   public:
-    NewApnModel(app::Application *app);
+    explicit NewApnModel(app::Application *app);
 
     void clearData();
-    void saveData(std::shared_ptr<packet_data::APN::Config> apnRecord);
-    void loadData(std::shared_ptr<packet_data::APN::Config> apnRecord);
+    void saveData(const std::shared_ptr<packet_data::APN::Config> &apnRecord);
+    void loadData(const std::shared_ptr<packet_data::APN::Config> &apnRecord);
 
     void createData();
 
@@ -30,6 +30,6 @@ class NewApnModel : public app::InternalModel<gui::ApnListItem *>, public gui::L
 
     auto getItem(gui::Order order) -> gui::ListItem * override;
 
-    void requestRecords(const uint32_t offset, const uint32_t limit) override;
+    void requestRecords(uint32_t offset, uint32_t limit) override;
     void apnDataChanged();
 };

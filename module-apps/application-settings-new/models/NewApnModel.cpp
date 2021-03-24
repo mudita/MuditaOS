@@ -102,7 +102,7 @@ void NewApnModel::clearData()
     list->rebuildList();
 }
 
-void NewApnModel::saveData(std::shared_ptr<packet_data::APN::Config> apnRecord)
+void NewApnModel::saveData(const std::shared_ptr<packet_data::APN::Config> &apnRecord)
 {
     for (auto item : internalData) {
         if (item->onSaveCallback) {
@@ -111,7 +111,7 @@ void NewApnModel::saveData(std::shared_ptr<packet_data::APN::Config> apnRecord)
     }
 }
 
-void NewApnModel::loadData(std::shared_ptr<packet_data::APN::Config> apnRecord)
+void NewApnModel::loadData(const std::shared_ptr<packet_data::APN::Config> &apnRecord)
 {
     for (auto item : internalData) {
         if (item->onLoadCallback) {
@@ -128,6 +128,5 @@ void NewApnModel::apnDataChanged()
             return;
         }
     }
-    application->getCurrentWindow()->setBottomBarActive(gui::BottomBar::Side::CENTER, false); // SAVE button
-    return;
+    application->getCurrentWindow()->setBottomBarActive(gui::BottomBar::Side::CENTER, false);
 }
