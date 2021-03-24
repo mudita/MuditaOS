@@ -38,8 +38,7 @@ namespace app
                                          Indicator::Time,
                                          Indicator::Battery,
                                          Indicator::SimCard,
-                                         Indicator::NetworkAccessTechnology,
-                                         Indicator::PhoneMode});
+                                         Indicator::NetworkAccessTechnology});
         addActionReceiver(manager::actions::Call, [this](auto &&data) {
             switchWindow(window::name_call, std::forward<decltype(data)>(data));
             return actionHandled();

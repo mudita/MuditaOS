@@ -42,6 +42,13 @@ namespace gui
         setFocusItem(newContactIcon);
     }
 
+    top_bar::Configuration EnterNumberWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    {
+        appConfiguration.enable(top_bar::Indicator::PhoneMode);
+        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
+        return appConfiguration;
+    }
+
     bool EnterNumberWindow::addNewContact()
     {
         interface->handleAddContactEvent(enteredNumber);
