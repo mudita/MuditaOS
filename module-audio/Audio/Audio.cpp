@@ -124,6 +124,7 @@ namespace audio
             LOG_ERROR("Operation STOP failure: %s", audio::str(retStop).c_str());
         }
 
+        muted    = Muted::False;
         auto ret = Operation::Create(Operation::Type::Idle);
         if (ret) {
             currentState     = State::Idle;
@@ -154,6 +155,7 @@ namespace audio
 
     audio::RetCode Audio::Mute()
     {
+        muted = Muted::True;
         return SetOutputVolume(0);
     }
 

@@ -59,27 +59,28 @@ void MeditationTimerWindow::destroyInterface()
 void MeditationTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     auto timerData = dynamic_cast<MeditationTimerData *>(data);
-    assert(timerData);
-    setVisiblePreparation();
-    meditationTime = timerData->getMeditationTime();
-    meditationIntervalPeriod = timerData->getMeditationIntervals();
+    if (timerData != nullptr) {
+        setVisiblePreparation();
+        meditationTime           = timerData->getMeditationTime();
+        meditationIntervalPeriod = timerData->getMeditationIntervals();
 
-    auto onPreparation = [&]() -> void {
-        setVisibleRunning();
-        auto onMeditationEnd = [&]() -> void {
-            setVisibleMeditationEnd();
+        auto onPreparation = [&]() -> void {
+            setVisibleRunning();
+            auto onMeditationEnd = [&]() -> void {
+                setVisibleMeditationEnd();
+                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+            };
+            timer->registerTimeoutCallback(onMeditationEnd);
+            timer->reset(meditationTime, meditationIntervalPeriod);
+            timer->start();
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         };
-        timer->registerTimeoutCallback(onMeditationEnd);
-        timer->reset(meditationTime, meditationIntervalPeriod);
-        timer->start();
-        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-    };
 
-    timer->registerTimeoutCallback(onPreparation);
-    timer->setCounterVisible(timerData->isCounterEnabled());
-    timer->reset(timerData->getPreparationTime());
-    timer->start();
+        timer->registerTimeoutCallback(onPreparation);
+        timer->setCounterVisible(timerData->isCounterEnabled());
+        timer->reset(timerData->getPreparationTime());
+        timer->start();
+    }
 }
 
 auto MeditationTimerWindow::onInput(const InputEvent &inputEvent) -> bool
