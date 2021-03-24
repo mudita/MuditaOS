@@ -353,7 +353,7 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(
-                app, utils::localize.get("app_settings_title_main"), mainWindowOptionsNew(app));
+                app, utils::localize.get("app_settings_title_main_new"), mainWindowOptionsNew(app));
         });
         windowsFactory.attach(gui::window::name::bluetooth, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BluetoothWindow>(app);
