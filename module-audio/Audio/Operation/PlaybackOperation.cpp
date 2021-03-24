@@ -169,12 +169,7 @@ namespace audio
 
         // adjust new profile with information from file's tags
         newProfile->SetSampleRate(tags->sample_rate);
-        if (tags->num_channel == channel::stereoSound) {
-            newProfile->SetInOutFlags(static_cast<uint32_t>(AudioDevice::Flags::OutputStereo));
-        }
-        else {
-            newProfile->SetInOutFlags(static_cast<uint32_t>(AudioDevice::Flags::OutputMono));
-        }
+        newProfile->SetInOutFlags(static_cast<uint32_t>(AudioDevice::Flags::OutputStereo));
 
         // store profile
         currentProfile = newProfile;

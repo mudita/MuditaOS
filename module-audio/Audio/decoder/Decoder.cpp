@@ -126,7 +126,12 @@ namespace audio
     {
         assert(_stream != nullptr);
         if (!audioWorker) {
-            audioWorker = std::make_unique<DecoderWorker>(_stream, this, endOfFileCallback);
+            audioWorker =
+                std::make_unique<DecoderWorker>(_stream,
+                                                this,
+                                                endOfFileCallback,
+                                                tag->num_channel == 1 ? DecoderWorker::ChannelMode::ForceStereo
+                                                                      : DecoderWorker::ChannelMode::NoConversion);
             audioWorker->init();
             audioWorker->run();
         }
