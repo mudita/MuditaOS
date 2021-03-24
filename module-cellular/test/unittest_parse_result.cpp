@@ -9,6 +9,7 @@
 #include <at/cmd/CLCC.hpp>
 #include <at/cmd/CSCA.hpp>
 #include <at/cmd/QECCNUM.hpp>
+#include <at/cmd/CFUN.hpp>
 
 #include "mock/AtCommon_channel.hpp"
 #include "PhoneNumber.hpp"
@@ -336,5 +337,85 @@ TEST_CASE("CLCC conversion methods")
             REQUIRE(at::cmd::CLCCStub::toEnum<ModemCall::CallMode>("2").value() == ModemCall::CallMode::FAX);
             REQUIRE(at::cmd::CLCCStub::toEnum<ModemCall::CallMode>("3") == std::nullopt);
         }
+    }
+}
+
+TEST_CASE("CFUN parser")
+{
+    SECTION("Empty data")
+    {
+        at::cmd::CFUN cmd;
+        at::Result result;
+        auto response = cmd.parse(result);
+        REQUIRE(!response);
+    }
+
+    SECTION("Failing channel")
+    {
+        at::cmd::CFUN cmd;
+        at::FailingChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+        REQUIRE(!response);
+        REQUIRE(response.code == at::Result::Code::ERROR);
+    }
+
+    SECTION("Success - valid token")
+    {
+        at::cmd::CFUN cmd;
+        at::CFUN_successChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+        REQUIRE(response);
+        REQUIRE(response.functionality == at::cfun::Functionality::Full);
+    }
+
+    SECTION("Failed - invalid token")
+    {
+        at::cmd::CFUN cmd;
+        at::CFUN_invalidTokenChannel channel;
+        auto base     = channel.cmd(cmd);
+        auto response = cmd.parse(base);
+        REQUIRE(!response);
+    }
+}
+
+TEST_CASE("CFUN set data")
+{
+    at::cmd::CFUN cmd;
+    SECTION("None modifier set")
+    {
+        constexpr auto expectedResult = "AT+CFUN";
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+
+    SECTION("Get modifier set")
+    {
+        constexpr auto expectedResult = "AT+CFUN?";
+        cmd.setModifier(at::cmd::Modifier::Get);
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+
+    SECTION("Set modifier set")
+    {
+        constexpr auto expectedResult = "AT+CFUN=";
+        cmd.setModifier(at::cmd::Modifier::Set);
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+
+    SECTION("Set modifier set functionality only")
+    {
+        constexpr auto expectedResult = "AT+CFUN=1";
+        cmd.setModifier(at::cmd::Modifier::Set);
+        cmd.set(at::cfun::Functionality::Full);
+        REQUIRE(cmd.getCmd() == expectedResult);
+    }
+
+    SECTION("Set modifier set functionality and reset")
+    {
+        constexpr auto expectedResult = "AT+CFUN=4,1";
+        cmd.setModifier(at::cmd::Modifier::Set);
+        cmd.set(at::cfun::Functionality::DisableRF, at::cfun::Reset::ResetTheME);
+        REQUIRE(cmd.getCmd() == expectedResult);
     }
 }

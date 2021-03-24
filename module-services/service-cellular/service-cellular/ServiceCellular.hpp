@@ -375,6 +375,14 @@ class ServiceCellular : public sys::Service
     auto handleSimNotReadyNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleUrcIncomingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSetFlightModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularSetRadioOnOffMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularSendSMSMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+
+    auto isModemRadioModuleOn() -> bool;
+    auto turnOnRadioModule() -> bool;
+    auto turnOffRadioModule() -> bool;
+
+    auto switchToOffline() -> bool;
 };
 
 namespace sys

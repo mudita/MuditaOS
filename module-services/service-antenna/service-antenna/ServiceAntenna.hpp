@@ -12,6 +12,7 @@
 #include <Service/Worker.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <service-db/DBServiceName.hpp>
+#include <module-sys/PhoneModes/Observer.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -73,6 +74,7 @@ class ServiceAntenna : public sys::Service
     antenna::lockState serviceLocked = antenna::lockState::unlocked;
 
     void handleLockRequest(antenna::lockState request);
+    std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
 
   protected:
     // flag informs about suspend/resume status

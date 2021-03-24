@@ -111,6 +111,8 @@ enum class MessageType
     CellularSimState,
     CellularMMIData,
     CellularNewIncomingSMS,
+    CellularRadioOnOff,
+    CellularSendSMS,
 
     DBNotesAdd,            ///< Add new note's record
     DBNotesRemove,         ///< Remove selected note's record

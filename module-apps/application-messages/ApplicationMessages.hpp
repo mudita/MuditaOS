@@ -63,7 +63,9 @@ namespace app
         bool sendSms(const utils::PhoneNumber::View &number, const UTF8 &body);
         bool resendSms(const SMSRecord &record);
         bool newMessageOptions(const std::string &requestingWindow, gui::Text *text);
-        bool showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack = false);
+        bool showNotification(std::function<bool()> action,
+                              const std::string &notification,
+                              bool ignoreCurrentWindowOnStack = false);
         bool handleSendSmsFromThread(const utils::PhoneNumber::View &number, const UTF8 &body);
 
         std::pair<SMSRecord, bool> createDraft(const utils::PhoneNumber::View &number, const UTF8 &body);
@@ -84,7 +86,8 @@ namespace app
             return {{manager::actions::Launch,
                      manager::actions::CreateSms,
                      manager::actions::ShowSmsTemplates,
-                     manager::actions::SmsRejectNoSim}};
+                     manager::actions::SmsRejectNoSim,
+                     manager::actions::SMSRejectedByOfflineNotification}};
         }
     };
 } /* namespace app */

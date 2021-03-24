@@ -129,7 +129,8 @@ namespace app
                      manager::actions::Dial,
                      manager::actions::EmergencyDial,
                      manager::actions::NotAnEmergencyNotification,
-                     manager::actions::NoSimNotification}};
+                     manager::actions::NoSimNotification,
+                     manager::actions::CallRejectedByOfflineNotification}};
         }
     };
 } /* namespace app */

@@ -52,6 +52,8 @@ TESTS_LIST["catch2-cellular-parse-result"]="
     CLCC parser;
     CLCC set data;
     CLCC conversion methods;
+    CFUN parser;
+    CFUN set data;
 "
 #---------
 TESTS_LIST["catch2-cellular-qmbn"]="
