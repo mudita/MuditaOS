@@ -70,6 +70,7 @@ target_sources( ${PROJECT_NAME}
         windows/OfflineWindow.cpp
         windows/PhoneModesWindow.cpp
         windows/AboutYourPureWindow.cpp
+        windows/CertificationWindow.cpp
 
     PUBLIC
         ApplicationSettings.hpp
@@ -98,6 +99,7 @@ target_sources( ${PROJECT_NAME}
         windows/EditQuotesWindow.hpp
         windows/QuoteCategoriesWindow.hpp
         windows/AboutYourPureWindow.hpp
+        windows/CertificationWindow.hpp
 )
 
 add_dependencies(${PROJECT_NAME} version)
