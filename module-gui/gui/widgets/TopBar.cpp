@@ -151,9 +151,12 @@ namespace gui::top_bar
         }
 
         // phone mode and NAT are mutually exclusive.
+        if (config.isEnabled(Indicator::NetworkAccessTechnology)) {
+            config.disable(Indicator::PhoneMode);
+        }
+
         if (config.isEnabled(Indicator::PhoneMode)) {
             phoneMode->setPhoneMode(config.getPhoneMode());
-            config.disable(Indicator::NetworkAccessTechnology);
         }
 
         using namespace utils::time;

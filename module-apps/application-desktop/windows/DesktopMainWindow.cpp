@@ -75,6 +75,8 @@ namespace gui
         auto app            = getAppDesktop();
         const auto isLocked = app->lockHandler.isScreenLocked();
         appConfiguration.setIndicator(top_bar::Indicator::Lock, isLocked);
+        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.enable(top_bar::Indicator::PhoneMode);
         return appConfiguration;
     }
 

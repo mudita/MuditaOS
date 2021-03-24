@@ -27,6 +27,13 @@ namespace gui
         numberDescriptionLabel->setText(utils::localize.get("app_call_emergency_text"));
     }
 
+    top_bar::Configuration EmergencyCallWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    {
+        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.enable(top_bar::Indicator::PhoneMode);
+        return appConfiguration;
+    }
+
     bool EmergencyCallWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortPress()) {
