@@ -11,7 +11,6 @@ inline constexpr auto certno = "XXXXXXXXXXXXXXXXXXX";
 
 namespace gui
 {
-
     CertificationWindow::CertificationWindow(app::Application *app) : AppWindow(app, gui::window::name::certification)
     {
         buildInterface();
