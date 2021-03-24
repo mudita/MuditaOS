@@ -21,7 +21,13 @@ namespace audio
             DisablePlayback,
         };
 
-        DecoderWorker(Stream *audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback);
+        enum class ChannelMode
+        {
+            NoConversion,
+            ForceStereo
+        };
+
+        DecoderWorker(Stream *audioStreamOut, Decoder *decoder, EndOfFileCallback endOfFileCallback, ChannelMode mode);
         ~DecoderWorker() override;
 
         virtual auto init(std::list<sys::WorkerQueueInfo> queues = std::list<sys::WorkerQueueInfo>()) -> bool override;
@@ -52,5 +58,6 @@ namespace audio
 
         const int bufferSize;
         std::unique_ptr<BufferInternalType[]> decoderBuffer;
+        ChannelMode channelMode = ChannelMode::NoConversion;
     };
 } // namespace audio
