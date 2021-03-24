@@ -8,6 +8,7 @@
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "Service/Worker.hpp"
+#include "Service/CpuSentinel.hpp"
 #include "parser/ParserFSM.hpp"
 #include "endpoints/EndpointFactory.hpp"
 #include "bsp/usb/usb.hpp"
@@ -68,4 +69,6 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     const sdesktop::USBSecurityModel &securityModel;
     sys::Service *ownerService = nullptr;
     parserFSM::StateMachine parser;
+
+    std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 };

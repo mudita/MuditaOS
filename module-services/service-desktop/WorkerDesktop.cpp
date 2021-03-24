@@ -15,6 +15,7 @@
 #include <map>
 #include <vector>
 #include <module-services/service-desktop/service-desktop/DesktopMessages.hpp>
+#include "SystemManager/messages/SentinelRegistrationMessage.hpp"
 
 inline constexpr auto uploadFailedMessage = "file upload terminated before all data transferred";
 
@@ -30,6 +31,10 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     irqQueue     = Worker::getQueueHandleByName(sdesktop::IRQ_QUEUE_BUFFER_NAME);
     receiveQueue = Worker::getQueueHandleByName(sdesktop::RECEIVE_QUEUE_BUFFER_NAME);
     parserFSM::MessageHandler::setSendQueueHandle(Worker::getQueueHandleByName(sdesktop::SEND_QUEUE_BUFFER_NAME));
+
+    cpuSentinel                  = std::make_shared<sys::CpuSentinel>("WorkerDesktop", ownerService);
+    auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+    ownerService->bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
     return (bsp::usbInit(receiveQueue, irqQueue, this) < 0) ? false : true;
 }
@@ -122,10 +127,12 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
                                           service::name::service_desktop);
         }
         else if (notification == bsp::USBDeviceStatus::Configured) {
+            cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyHz::Level_4);
             ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConfigured>(),
                                           service::name::service_desktop);
         }
         else if (notification == bsp::USBDeviceStatus::Disconnected) {
+            cpuSentinel->ReleaseMinimumFrequency();
             ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBDisconnected>(),
                                           service::name::service_desktop);
         }
