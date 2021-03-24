@@ -28,13 +28,14 @@
 #include <service-desktop/endpoints/bluetooth/BluetoothHelper.hpp>
 #include <BtCommand.hpp>
 #include <BtKeysStorage.hpp>
-
+#include <Timers/TimerFactory.hpp>
 #include <typeinfo>
 
 namespace
 {
     constexpr auto BluetoothServiceStackDepth = 2560U;
     inline constexpr auto nameSettingsNew     = "ApplicationSettingsNew";
+    inline constexpr auto connectionTimeout   = std::chrono::minutes{30};
 } // namespace
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth, "", BluetoothServiceStackDepth)
@@ -61,6 +62,12 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
 
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
+
+    connectionTimeoutTimer =
+        sys::TimerFactory::createSingleShotTimer(this, "btTimeoutTimer", connectionTimeout, [this](sys::Timer &_) {
+            sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::DisconnectAudio));
+            LOG_ERROR("Disconnecting from timeout timer!");
+        });
 
     connect(message::bluetooth::RequestBondedDevices(), [&](sys::Message *msg) {
         auto request = static_cast<message::bluetooth::RequestBondedDevices *>(msg);
@@ -246,6 +253,7 @@ auto ServiceBluetooth::handle(message::bluetooth::ConnectResult *msg) -> std::sh
 {
     if (msg->isSucceed()) {
         settingsHolder->setValue(bluetooth::Settings::ConnectedDevice, msg->getAddr());
+        startTimeoutTimer();
     }
     bus.sendUnicast(std::make_shared<message::bluetooth::ConnectResult>(*msg), nameSettingsNew);
     return sys::MessageNone{};
@@ -265,6 +273,8 @@ auto ServiceBluetooth::handle(message::bluetooth::DisconnectResult *msg) -> std:
     bus.sendUnicast(std::make_shared<message::bluetooth::ResponseBondedDevices>(
                         SettingsSerializer::fromString(bondedDevicesStr), std::string()),
                     nameSettingsNew);
+    stopTimeoutTimer();
+
     return sys::MessageNone{};
 }
 
@@ -306,6 +316,8 @@ auto ServiceBluetooth::handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Mes
     } break;
     case BluetoothMessage::Play:
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::StartStream));
+        stopTimeoutTimer();
+
         break;
     case BluetoothMessage::SwitchProfile:
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::SwitchProfile));
@@ -315,6 +327,7 @@ auto ServiceBluetooth::handle(BluetoothMessage *msg) -> std::shared_ptr<sys::Mes
         break;
     case BluetoothMessage::Stop:
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::StopStream));
+        startTimeoutTimer();
         break;
     default:
         break;
@@ -337,4 +350,16 @@ auto ServiceBluetooth::handle(sdesktop::developerMode::DeveloperModeRequest *msg
         sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::getDevicesAvailable));
     }
     return sys::MessageNone{};
+}
+void ServiceBluetooth::startTimeoutTimer()
+{
+    if (connectionTimeoutTimer.isValid()) {
+        connectionTimeoutTimer.start();
+    }
+}
+void ServiceBluetooth::stopTimeoutTimer()
+{
+    if (connectionTimeoutTimer.isValid()) {
+        connectionTimeoutTimer.stop();
+    }
 }
