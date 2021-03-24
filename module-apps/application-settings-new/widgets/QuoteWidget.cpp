@@ -34,7 +34,7 @@ namespace gui
 {
 
     QuoteWidget::QuoteWidget(const Quotes::QuoteRecord &quoteRecord,
-                             std::function<bool(bool)> enableQuoteCallback,
+                             std::function<void(bool)> enableQuoteCallback,
                              std::function<void(const UTF8 &)> bottomBarTemporaryMode,
                              std::function<void()> bottomBarRestoreFromTemporaryMode)
         : quote(quoteRecord), enableQuote(std::move(enableQuoteCallback)),
@@ -83,14 +83,13 @@ namespace gui
         };
 
         activatedCallback = [&](gui::Item &item) {
-            if (enableQuote(!quote.enabled)) {
-                quote.enabled = !quote.enabled;
-                tickImage->showImage(quote.enabled);
-                auto bottorBarText =
-                    quote.enabled ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
-                this->bottomBarTemporaryMode(bottorBarText);
-                hBox->resizeItems();
-            }
+            quote.enabled = !quote.enabled;
+            enableQuote(quote.enabled);
+            tickImage->showImage(quote.enabled);
+            auto bottorBarText =
+                quote.enabled ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
+            this->bottomBarTemporaryMode(bottorBarText);
+            hBox->resizeItems();
             return true;
         };
 

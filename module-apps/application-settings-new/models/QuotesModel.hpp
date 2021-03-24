@@ -36,11 +36,6 @@ namespace Quotes
 
       private:
         app::Application *app = nullptr;
-
-        void createData();
-        auto getCustomCategoryId() -> std::optional<unsigned int>;
-
-        static constexpr auto customCategoryName = "Custom";
     };
 
 } // namespace app

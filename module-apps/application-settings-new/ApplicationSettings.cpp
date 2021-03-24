@@ -123,9 +123,6 @@ namespace app
 
         // handle database response
         if (resp != nullptr) {
-
-            LOG_ERROR("To jest odpowiedzailne za te callbacki prawda?");
-
             if (auto command = callbackStorage->getCallback(resp); command->execute()) {
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }

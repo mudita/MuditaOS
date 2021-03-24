@@ -19,7 +19,6 @@ namespace gui
 
       private:
         void buildInterface() override;
-        bool onDatabaseMessage(sys::Message *msg) override;
 
         std::shared_ptr<Quotes::CategoriesModel> categoriesModel = nullptr;
         gui::ListView *list                                      = nullptr;

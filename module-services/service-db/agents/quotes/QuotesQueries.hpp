@@ -31,6 +31,22 @@ namespace Quotes::Queries
                             CT.enabled = TRUE
                         )sql";
 
+    constexpr auto getQuotesFromCustomCategory = R"sql(
+                        SELECT QT.quote_id, QT.lang_id, QT.quote, QT.author, QT.enabled
+                        FROM
+                            quote_table as QT,
+                            quote_category_map as QCM,
+                            category_table as CT
+                        WHERE
+                            QCM.quote_id = QT.quote_id
+                            and 
+                            QCM.category_id = CT.category_id
+                            and
+                            CT.category_name = 'Custom'
+                            and
+                            CT.enabled = TRUE
+                        )sql";
+
     constexpr auto enableCategory = R"sql(
                         UPDATE category_table SET enabled = '%d'
                         WHERE category_id = '%lu';

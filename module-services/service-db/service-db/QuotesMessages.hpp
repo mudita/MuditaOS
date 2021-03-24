@@ -65,11 +65,11 @@ namespace Quotes
         class GetCategoryListRequest : public db::Query
         {
           public:
-            explicit GetCategoryListRequest(unsigned int limit, unsigned int offset)
-                : Query(Query::Type::Read), limit(limit), offset(offset)
+            explicit GetCategoryListRequest(unsigned int offset, unsigned int limit)
+                : Query(Query::Type::Read), offset(offset), limit(limit)
             {}
-            const unsigned int limit;
             const unsigned int offset;
+            const unsigned int limit;
 
             auto debugInfo() const -> std::string
             {
@@ -106,11 +106,16 @@ namespace Quotes
         class GetQuotesListRequest : public db::Query
         {
           public:
-            explicit GetQuotesListRequest(unsigned int limit, unsigned int offset)
-                : Query(Query::Type::Read), limit(limit), offset(offset)
+            explicit GetQuotesListRequest(unsigned int offset, unsigned int limit)
+                : Query(Query::Type::Read), offset(offset), limit(limit)
             {}
-            const unsigned int limit;
             const unsigned int offset;
+            const unsigned int limit;
+
+            auto debugInfo() const -> std::string
+            {
+                return "GetQuotesListRequest";
+            }
         };
 
         class GetQuotesListResponse : public db::QueryResult
@@ -129,6 +134,11 @@ namespace Quotes
                 return quotesList->data;
             }
 
+            auto debugInfo() const -> std::string
+            {
+                return "GetQuotesListResponse";
+            }
+
           private:
             std::unique_ptr<QuotesList> quotesList;
         };
@@ -136,11 +146,11 @@ namespace Quotes
         class GetQuotesListByCategoryIdRequest : public db::Query
         {
           public:
-            explicit GetQuotesListByCategoryIdRequest(unsigned int limit, unsigned int offset, unsigned int categoryId)
-                : Query(Query::Type::Read), limit(limit), offset(offset), categoryId(categoryId)
+            explicit GetQuotesListByCategoryIdRequest(unsigned int offset, unsigned int limit, unsigned int categoryId)
+                : Query(Query::Type::Read), offset(offset), limit(limit), categoryId(categoryId)
             {}
-            const unsigned int limit;
             const unsigned int offset;
+            const unsigned int limit;
             const unsigned int categoryId;
 
             auto debugInfo() const -> std::string
@@ -175,6 +185,47 @@ namespace Quotes
             std::unique_ptr<QuotesList> quotesList;
         };
 
+        class GetQuotesListFromCustomCategoryRequest : public db::Query
+        {
+          public:
+            explicit GetQuotesListFromCustomCategoryRequest(unsigned int offset, unsigned int limit)
+                : Query(Query::Type::Read), offset(offset), limit(limit)
+            {}
+            const unsigned int offset;
+            const unsigned int limit;
+
+            auto debugInfo() const -> std::string
+            {
+                return "GetQuotesListFromCustomCategoryRequest";
+            }
+        };
+
+        class GetQuotesListFromCustomCategoryResponse : public db::QueryResult
+        {
+          public:
+            explicit GetQuotesListFromCustomCategoryResponse(std::unique_ptr<QuotesList> quotesList)
+                : quotesList(std::move(quotesList))
+            {}
+
+            [[nodiscard]] unsigned int getCount() const noexcept
+            {
+                return quotesList->count;
+            }
+
+            [[nodiscard]] auto getResults() const -> std::vector<QuoteRecord>
+            {
+                return quotesList->data;
+            }
+
+            auto debugInfo() const -> std::string
+            {
+                return "GetQuotesListFromCustomCategoryResponse";
+            }
+
+          private:
+            std::unique_ptr<QuotesList> quotesList;
+        };
+
         class EnableCategoryByIdRequest : public db::Query
         {
           public:
@@ -183,6 +234,11 @@ namespace Quotes
             {}
             const unsigned int categoryId;
             const bool enable;
+
+            auto debugInfo() const -> std::string
+            {
+                return "EnableCategoryByIdRequest";
+            }
         };
 
         class EnableCategoryByIdResponse : public db::QueryResult
@@ -191,6 +247,11 @@ namespace Quotes
             explicit EnableCategoryByIdResponse(bool success) : success(success)
             {}
             const bool success;
+
+            auto debugInfo() const -> std::string
+            {
+                return "EnableCategoryByIdResponse";
+            }
         };
 
         class EnableQuoteByIdRequest : public db::Query
@@ -201,6 +262,11 @@ namespace Quotes
             {}
             const unsigned int quoteId;
             const bool enable;
+
+            auto debugInfo() const -> std::string
+            {
+                return "EnableQuoteByIdRequest";
+            }
         };
 
         class EnableQuoteByIdResponse : public db::QueryResult
@@ -209,6 +275,11 @@ namespace Quotes
             explicit EnableQuoteByIdResponse(bool success) : success(success)
             {}
             const bool success;
+
+            auto debugInfo() const -> std::string
+            {
+                return "EnableQuoteByIdResponse";
+            }
         };
 
         class GetEnabledQuotesListRequest : public db::Query
@@ -238,6 +309,11 @@ namespace Quotes
                 return quotesList->data;
             }
 
+            auto debugInfo() const -> std::string
+            {
+                return "GetEnabledQuotesListResponse";
+            }
+
           private:
             std::unique_ptr<QuotesList> quotesList;
         };
@@ -253,6 +329,11 @@ namespace Quotes
             const std::string quote;
             const std::string author;
             const bool enabled;
+
+            auto debugInfo() const -> std::string
+            {
+                return "AddQuoteRequest";
+            }
         };
 
         class AddQuoteResponse : public db::QueryResult
@@ -262,6 +343,11 @@ namespace Quotes
             {}
             const bool success;
             const unsigned int quoteId;
+
+            auto debugInfo() const -> std::string
+            {
+                return "AddQuoteResponse";
+            }
         };
 
         class ReadQuoteRequest : public db::Query
@@ -270,6 +356,11 @@ namespace Quotes
             explicit ReadQuoteRequest(unsigned int quoteId) : Query(Query::Type::Read), quoteId(quoteId)
             {}
             const unsigned int quoteId;
+
+            auto debugInfo() const -> std::string
+            {
+                return "ReadQuoteRequest";
+            }
         };
 
         class ReadQuoteResponse : public db::QueryResult
@@ -284,6 +375,11 @@ namespace Quotes
             const std::string quote;
             const std::string author;
             const bool enabled;
+
+            auto debugInfo() const -> std::string
+            {
+                return "ReadQuoteResponse";
+            }
         };
 
         class WriteQuoteRequest : public db::Query
@@ -299,6 +395,11 @@ namespace Quotes
             const std::string quote;
             const std::string author;
             const bool enabled;
+
+            auto debugInfo() const -> std::string
+            {
+                return "WriteQuoteRequest";
+            }
         };
 
         class WriteQuoteResponse : public db::QueryResult
@@ -307,6 +408,11 @@ namespace Quotes
             explicit WriteQuoteResponse(bool success) : success(success)
             {}
             const bool success;
+
+            auto debugInfo() const -> std::string
+            {
+                return "WriteQuoteResponse";
+            }
         };
 
         class DeleteQuoteRequest : public db::Query
@@ -315,6 +421,11 @@ namespace Quotes
             explicit DeleteQuoteRequest(unsigned int quoteId) : Query(Query::Type::Read), quoteId(quoteId)
             {}
             const unsigned int quoteId;
+
+            auto debugInfo() const -> std::string
+            {
+                return "DeleteQuoteRequest";
+            }
         };
 
         class DeleteQuoteResponse : public db::QueryResult
@@ -323,6 +434,11 @@ namespace Quotes
             explicit DeleteQuoteResponse(bool success) : success(success)
             {}
             const bool success;
+
+            auto debugInfo() const -> std::string
+            {
+                return "DeleteQuoteResponse";
+            }
         };
     } // namespace Messages
 } // namespace Quotes

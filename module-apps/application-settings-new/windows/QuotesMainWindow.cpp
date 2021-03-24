@@ -79,4 +79,11 @@ namespace gui
         }
         return false;
     }
+
+    void QuotesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        if (mode == ShowMode::GUI_SHOW_INIT) {
+            list->rebuildList();
+        }
+    }
 } // namespace gui

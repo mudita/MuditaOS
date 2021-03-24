@@ -18,7 +18,7 @@ namespace gui
     {
       public:
         QuoteWidget(const Quotes::QuoteRecord &quoteRecord,
-                    std::function<bool(bool)> enableQuoteCallback,
+                    std::function<void(bool)> enableQuoteCallback,
                     std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                     std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr);
 
@@ -33,7 +33,7 @@ namespace gui
         ImageBox *tickImage     = nullptr;
 
         Quotes::QuoteRecord quote;
-        std::function<bool(bool)> enableQuote                        = nullptr;
+        std::function<void(bool)> enableQuote                        = nullptr;
         std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr;
         std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr;
 

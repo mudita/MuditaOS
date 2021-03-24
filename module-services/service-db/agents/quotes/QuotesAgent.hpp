@@ -22,15 +22,13 @@ namespace Quotes
 
       protected:
         auto handleCategoryList(std::shared_ptr<db::Query> msg) -> std::unique_ptr<db::QueryResult>;
-        // auto handleQuotesList(sys::Message *req) -> sys::MessagePointer;
-        // auto handleQuotesListByCategoryId(sys::Message *req) -> sys::MessagePointer;
-        // auto handleEnableCategoryById(sys::Message *req) -> sys::MessagePointer;
-        // auto handleEnableQuoteById(sys::Message *req) -> sys::MessagePointer;
-        // auto handleEnabledQuotesList(sys::Message *req) -> sys::MessagePointer;
-        // auto handleAddQuote(sys::Message *req) -> sys::MessagePointer;
-        // auto handleReadQuote(sys::Message *req) -> sys::MessagePointer;
-        // auto handleWriteQuote(sys::Message *req) -> sys::MessagePointer;
-        // auto handleDeleteQuote(sys::Message *req) -> sys::MessagePointer;
+        auto handleQuotesListFromCustomCategory(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+        auto handleEnableCategoryById(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+        auto handleEnableQuoteById(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+        auto handleAddQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+        auto handleReadQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+        auto handleWriteQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+        auto handleDeleteQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
 
       private:
         Database *database;

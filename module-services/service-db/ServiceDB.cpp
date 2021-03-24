@@ -41,7 +41,6 @@
 #include <ThreadRecord.hpp>
 #include <log/log.hpp>
 #include <time/ScopedTime.hpp>
-#include <QuotesRecord.hpp>
 
 #include <cassert>
 #include <cinttypes>
@@ -523,7 +522,6 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
     }
 
     responseMsg->responseTo = msgl->messageType;
-    LOG_ERROR("responseMsg->responseTo=%d", static_cast<int>(responseMsg->responseTo));
     return responseMsg;
 }
 

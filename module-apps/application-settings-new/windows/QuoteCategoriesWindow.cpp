@@ -40,11 +40,4 @@ namespace gui
             list->rebuildList();
         }
     }
-
-    bool QuoteCategoriesWindow::onDatabaseMessage(sys::Message *msgl)
-    {
-        LOG_ERROR("onDatabaseMessage");
-        auto msg = dynamic_cast<Quotes::Messages::GetCategoryListResponse *>(msgl);
-        return msg && categoriesModel->updateRecords(msg->getResults());
-    }
 } // namespace gui
