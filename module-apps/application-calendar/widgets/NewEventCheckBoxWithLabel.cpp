@@ -25,40 +25,19 @@ namespace gui
 
     void NewEventCheckBoxWithLabel::applyCallbacks()
     {
-        focusChangedCallback = [&](Item &item) {
-            if (focus) {
-                setFocusItem(checkBox);
-            }
-            else {
-                setFocusItem(nullptr);
-            }
-            return true;
-        };
-
-        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            if (event.state != gui::InputEvent::State::keyReleasedShort) {
-                return false;
-            }
-
-            if (event.is(gui::KeyCode::KEY_LF)) {
+        inputCallback = [this](gui::Item &item, const gui::InputEvent &event) {
+            if (event.is(gui::KeyCode::KEY_LF) && event.isShortPress()) {
                 onCheck(checkBox->isChecked());
             }
-
-            if (checkBox->onInput(event)) {
-                checkBox->resizeItems();
-                app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode();
-                return true;
-            }
-
-            return false;
+            return checkBox->onInput(event);
         };
 
-        onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
+        onLoadCallback = [this](std::shared_ptr<EventsRecord> event) {
             if (allDayEvents::isAllDayEvent(event->date_from, event->date_till)) {
                 checkBox->setImageVisible(true);
             }
         };
-        onSaveCallback = [&](std::shared_ptr<EventsRecord> event) {
+        onSaveCallback = [this](std::shared_ptr<EventsRecord> event) {
             if (checkBox->isChecked()) {
                 event->date_from = TimePointFromYearMonthDay(dateItem->getChosenDate());
                 event->date_till = event->date_from + std::chrono::hours(utils::time::Locale::max_hour_24H_mode) +
