@@ -29,6 +29,7 @@
 #include "windows/QuoteCategoriesWindow.hpp"
 #include "windows/SecurityMainWindow.hpp"
 #include "windows/QuotesOptionsWindow.hpp"
+#include "windows/SARInfoWindow.hpp"
 #include "windows/ChangePasscodeWindow.hpp"
 #include "windows/SystemMainWindow.hpp"
 #include "windows/NewApnWindow.hpp"
@@ -451,6 +452,11 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::technical_information, [](Application *app, const std::string &name) {
             return std::make_unique<gui::TechnicalInformationWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::sar, [&](Application *app, const std::string &name) {
+            auto sarInfoRepository = std::make_unique<SARInfoRepository>("assets/certification_info", "sar.txt");
+            auto presenter         = std::make_unique<SARInfoWindowPresenter>(std::move(sarInfoRepository));
+            return std::make_unique<gui::SARInfoWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::window::name::change_time_zone, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ChangeTimeZone>(app);

@@ -22,6 +22,8 @@ target_sources( ${PROJECT_NAME}
         models/FromTimeToTimeModel.cpp
         models/QuotesModel.cpp
         models/CategoriesModel.cpp
+        models/SARInfoRepository.cpp
+        presenter/SARInfoWindowPresenter.cpp
         widgets/ChangePasscodeLockHandler.cpp
         widgets/QuoteWidget.cpp
         widgets/CategoryWidget.cpp
@@ -52,6 +54,7 @@ target_sources( ${PROJECT_NAME}
         windows/QuotesMainWindow.cpp
         windows/QuotesAddWindow.cpp
         windows/QuotesOptionsWindow.cpp
+        windows/SARInfoWindow.cpp
         windows/SecurityMainWindow.cpp
         windows/ChangePasscodeWindow.cpp
         windows/NewApnWindow.cpp
