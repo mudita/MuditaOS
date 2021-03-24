@@ -19,6 +19,12 @@ namespace audio
 
     class Audio
     {
+        enum class Muted : bool
+        {
+            True,
+            False
+        };
+
       public:
         enum class State
         {
@@ -59,6 +65,11 @@ namespace audio
         Gain GetInputGain()
         {
             return currentOperation->GetInputGain();
+        }
+
+        [[nodiscard]] auto IsMuted() const noexcept
+        {
+            return muted == Muted::True;
         }
 
         const Operation &GetCurrentOperation() const
@@ -103,6 +114,7 @@ namespace audio
       private:
         void UpdateProfiles();
 
+        Muted muted = Muted::False;
         AudioSinkState audioSinkState;
 
         std::shared_ptr<BluetoothStreamData> btData;

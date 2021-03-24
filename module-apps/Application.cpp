@@ -101,17 +101,6 @@ namespace app
                                                                 std::chrono::milliseconds{key_timer_ms},
                                                                 [this](sys::Timer &) { longPressTimerCallback(); });
 
-        phoneModeObserver->connect(this);
-        phoneModeObserver->subscribe(
-            [=](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
-                using namespace gui::popup;
-                if (getCurrentWindow()->getName() == window::phone_modes_window) {
-                    updateWindow(window::phone_modes_window, std::make_unique<gui::ModesPopupData>(phoneMode));
-                }
-                else {
-                    switchWindow(window::phone_modes_window, std::make_unique<gui::ModesPopupData>(phoneMode));
-                }
-            });
         connect(typeid(AppRefreshMessage),
                 [this](sys::Message *msg) -> sys::MessagePointer { return handleAppRefresh(msg); });
         connect(sevm::BatteryStatusChangeMessage(), [&](sys::Message *) { return handleBatteryStatusChange(); });
@@ -121,7 +110,6 @@ namespace app
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleUpdateWindow(msg); });
 
         // handle phone mode changes
-        bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
         phoneModeObserver->connect(this);
         phoneModeObserver->subscribe(
             [&](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
@@ -552,7 +540,7 @@ namespace app
     {
         using namespace gui::popup;
         const auto msg = static_cast<AudioKeyPressedResponse *>(msgl);
-        if (!msg->muted) {
+        if (msg->showPopup == AudioKeyPressedResponse::ShowPopup::True) {
             LOG_INFO("Playback: %s, volume: %s",
                      audio::str(msg->context.second).c_str(),
                      std::to_string(msg->volume).c_str());
@@ -691,7 +679,13 @@ namespace app
             return;
         }
 
-        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        using namespace gui::popup;
+        if (getCurrentWindow()->getName() == window::phone_modes_window) {
+            updateWindow(window::phone_modes_window, std::make_unique<gui::ModesPopupData>(mode));
+        }
+        else {
+            switchWindow(window::phone_modes_window, std::make_unique<gui::ModesPopupData>(mode));
+        }
     }
 
     void Application::attachPopups(const std::vector<gui::popup::ID> &popupsList)
