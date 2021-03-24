@@ -73,7 +73,6 @@ ServiceDB::~ServiceDB()
 
 db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
 {
-    LOG_ERROR("interface=%d", static_cast<int>(interface));
     switch (interface) {
     case db::Interface::Name::SMS:
         return smsRecordInterface.get();
@@ -96,7 +95,6 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
     case db::Interface::Name::Events:
         return eventsRecordInterface.get();
     case db::Interface::Name::Quotes:
-        LOG_ERROR("quotesRecordInterface");
         return quotesRecordInterface.get();
     }
     return nullptr;

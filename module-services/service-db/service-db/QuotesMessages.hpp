@@ -285,11 +285,16 @@ namespace Quotes
         class GetEnabledQuotesListRequest : public db::Query
         {
           public:
-            explicit GetEnabledQuotesListRequest(unsigned int limit, unsigned int offset)
-                : Query(Query::Type::Read), limit(limit), offset(offset)
+            explicit GetEnabledQuotesListRequest(unsigned int offset, unsigned int limit)
+                : Query(Query::Type::Read), offset(offset), limit(limit)
             {}
-            const unsigned int limit;
             const unsigned int offset;
+            const unsigned int limit;
+
+            auto debugInfo() const -> std::string
+            {
+                return "GetEnabledQuotesListRequest";
+            }
         };
 
         class GetEnabledQuotesListResponse : public db::QueryResult

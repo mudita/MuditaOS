@@ -13,6 +13,8 @@
 #include <cstring>
 #include <memory>
 
+#include <iostream>
+
 /* Declarations *********************/
 extern sqlite3_vfs *sqlite3_ecophonevfs(void);
 
@@ -142,6 +144,7 @@ bool Database::execute(const char *format, ...)
 
 std::unique_ptr<QueryResult> Database::query(const char *format, ...)
 {
+    std::cout << format << std::endl;
     if (format == nullptr) {
         return nullptr;
     }

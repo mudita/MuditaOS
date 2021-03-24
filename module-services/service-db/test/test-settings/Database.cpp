@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "module-db/Database/Database.hpp"
@@ -16,6 +16,8 @@
 
 #include <map>
 #include <string>
+
+#include <iostream>
 
 class DatabaseInitializer
 {
@@ -127,6 +129,7 @@ Database::Database(const char *name, bool)
     : dbName(name), queryStatementBuffer{nullptr}, isInitialized_(false),
       initializer(std::make_unique<DatabaseInitializer>(this))
 {
+    std::cout << "name" << std::endl;
     isInitialized_ = true;
 }
 
@@ -180,6 +183,7 @@ bool Database::execute(const char *format, ...)
 
 std::unique_ptr<QueryResult> Database::query(const char *format, ...)
 {
+    std::cout << format << std::endl;
     if (format == nullptr) {
         return nullptr;
     }

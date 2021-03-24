@@ -13,7 +13,7 @@ template <typename RecordType> struct PagedData
 };
 
 template <typename PagedDataType, typename RecordType>
-auto getList(unsigned int limit, unsigned int offset, std::unique_ptr<QueryResult> query)
+auto getList(unsigned int offset, unsigned int limit, std::shared_ptr<QueryResult> query)
     -> std::unique_ptr<PagedDataType>
 {
     auto pagedData = std::make_unique<PagedDataType>();

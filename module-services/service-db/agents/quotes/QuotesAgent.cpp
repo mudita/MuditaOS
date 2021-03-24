@@ -6,7 +6,6 @@
 
 #include <Application.hpp>
 #include <Common/Query.hpp>
-#include <purefs/filesystem_paths.hpp>
 
 namespace Quotes
 {
@@ -22,8 +21,17 @@ namespace Quotes
         else if (typeid(*query) == typeid(Messages::EnableCategoryByIdRequest)) {
             return handleEnableCategoryById(query);
         }
+        else if (typeid(*query) == typeid(Messages::GetQuotesListRequest)) {
+            return handleQuotesList(query);
+        }
+        else if (typeid(*query) == typeid(Messages::GetQuotesListByCategoryIdRequest)) {
+            return handleQuotesListByCategoryId(query);
+        }
         else if (typeid(*query) == typeid(Messages::GetQuotesListFromCustomCategoryRequest)) {
             return handleQuotesListFromCustomCategory(query);
+        }
+        else if (typeid(*query) == typeid(Messages::GetEnabledQuotesListRequest)) {
+            return handleEnabledQuotesList(query);
         }
         else if (typeid(*query) == typeid(Messages::EnableQuoteByIdRequest)) {
             return handleEnableQuoteById(query);
@@ -47,8 +55,37 @@ namespace Quotes
     {
         auto req          = std::dynamic_pointer_cast<Messages::GetCategoryListRequest>(query);
         auto queryResult  = database->query(Queries::getAllCategories);
-        auto categoryList = getList<CategoryList, CategoryRecord>(req->limit, req->offset, std::move(queryResult));
+        auto categoryList = getList<CategoryList, CategoryRecord>(req->offset, req->limit, std::move(queryResult));
         auto response = std::make_unique<Messages::GetCategoryListResponse>(std::move(categoryList));
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleEnableCategoryById(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req         = std::dynamic_pointer_cast<Messages::EnableCategoryByIdRequest>(query);
+        auto queryResult = database->execute(Queries::enableCategory, req->enable, req->categoryId);
+        auto response    = std::make_unique<Messages::EnableCategoryByIdResponse>(std::move(queryResult));
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleQuotesList(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req         = std::dynamic_pointer_cast<Messages::GetQuotesListRequest>(query);
+        auto queryResult = database->query(Queries::getAllQuotes);
+        auto quotesList  = getList<QuotesList, QuoteRecord>(req->offset, req->limit, std::move(queryResult));
+        auto response    = std::make_unique<Messages::GetQuotesListResponse>(std::move(quotesList));
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleQuotesListByCategoryId(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        auto req         = std::dynamic_pointer_cast<Messages::GetQuotesListByCategoryIdRequest>(query);
+        auto queryResult = database->query(Queries::getQuotesByCategoryId, req->categoryId);
+        auto quotesList  = getList<QuotesList, QuoteRecord>(req->offset, req->limit, std::move(queryResult));
+        auto response    = std::make_unique<Messages::GetQuotesListByCategoryIdResponse>(std::move(quotesList));
         response->setRequestQuery(query);
         return response;
     }
@@ -64,11 +101,12 @@ namespace Quotes
         return response;
     }
 
-    auto QuotesAgent::handleEnableCategoryById(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    auto QuotesAgent::handleEnabledQuotesList(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
     {
-        auto req         = std::dynamic_pointer_cast<Messages::EnableCategoryByIdRequest>(query);
-        auto queryResult = database->execute(Queries::enableCategory, req->enable, req->categoryId);
-        auto response    = std::make_unique<Messages::EnableCategoryByIdResponse>(queryResult);
+        auto req         = std::dynamic_pointer_cast<Messages::GetEnabledQuotesListRequest>(query);
+        auto queryResult = database->query(Queries::getEnabledQuotes);
+        auto quotesList  = getList<QuotesList, QuoteRecord>(req->limit, req->offset, std::move(queryResult));
+        auto response    = std::make_unique<Messages::GetEnabledQuotesListResponse>(std::move(quotesList));
         response->setRequestQuery(query);
         return response;
     }
@@ -122,5 +160,4 @@ namespace Quotes
         response->setRequestQuery(query);
         return response;
     }
-
 } // namespace Quotes
