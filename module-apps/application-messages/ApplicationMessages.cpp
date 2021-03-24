@@ -58,7 +58,18 @@ namespace app
                 returnToPreviousWindow();
                 return true;
             };
-            showNotification(action);
+            const auto notification = utils::localize.get("app_messages_no_sim");
+            showNotification(action, notification);
+            return actionHandled();
+        });
+        addActionReceiver(manager::actions::SMSRejectedByOfflineNotification, [this](auto &&data) {
+            auto action = [=]() -> bool {
+                returnToPreviousWindow();
+                return true;
+            };
+            const auto notification = utils::localize.get("app_sms_offline");
+            showNotification(action, notification);
+
             return actionHandled();
         });
     }
@@ -295,11 +306,13 @@ namespace app
         return true;
     }
 
-    bool ApplicationMessages::showNotification(std::function<bool()> action, bool ignoreCurrentWindowOnStack)
+    bool ApplicationMessages::showNotification(std::function<bool()> action,
+                                               const std::string &notification,
+                                               bool ignoreCurrentWindowOnStack)
     {
         gui::DialogMetadata meta;
         meta.icon                              = "info_big_circle_W_G";
-        meta.text                              = utils::localize.get("app_messages_no_sim");
+        meta.text                              = notification;
         meta.action                            = action;
         auto switchData                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         switchData->ignoreCurrentWindowOnStack = ignoreCurrentWindowOnStack;
