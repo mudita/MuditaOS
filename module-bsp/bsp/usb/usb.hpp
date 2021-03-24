@@ -18,7 +18,7 @@ extern "C"
 #include <unistd.h>
 
 inline constexpr auto SERIAL_BUFFER_LEN = 512;
-inline constexpr auto SERIAL_BAUDRATE   = 115200;
+inline constexpr auto SERIAL_BAUDRATE   = 460800;
 
 namespace bsp
 {
