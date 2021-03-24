@@ -128,7 +128,6 @@
 #include <Utils.hpp>
 #include <dirent.h>
 
-//#include <log/log.hpp> //left for future debug
 
 /*
  ** Size of the write buffer used by journal files in bytes.
@@ -433,9 +432,10 @@ static int ecophoneSync(sqlite3_file *pFile, int flags)
     if (rc != SQLITE_OK) {
         return rc;
     }
-
-    // rc = fflush(p->fd);  //FF doesn't have this function
-    rc = SQLITE_OK;
+    rc = fileno(p->fd);
+    if (rc > 0) {
+        rc = fsync(rc);
+    }
     return (rc == 0 ? SQLITE_OK : SQLITE_IOERR_FSYNC);
 }
 
