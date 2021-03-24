@@ -146,4 +146,74 @@ namespace style
         inline constexpr auto arrow_y = 62;
 
     } // namespace quotes::categories
+
+    namespace certification
+    {
+        namespace textfc
+        {
+            inline constexpr auto x      = 30;
+            inline constexpr auto y      = 128;
+            inline constexpr auto width  = 128;
+            inline constexpr auto height = 35;
+        } // namespace textfc
+        namespace valuefc
+        {
+            inline constexpr auto x      = 30;
+            inline constexpr auto y      = 166;
+            inline constexpr auto width  = 420;
+            inline constexpr auto height = 33;
+        } // namespace valuefc
+        namespace imagefc
+        {
+            inline constexpr auto x      = 373;
+            inline constexpr auto y      = 138;
+            inline constexpr auto width  = 64;
+            inline constexpr auto height = 44;
+        } // namespace imagefc
+
+        namespace textic
+        {
+            inline constexpr auto x      = 30;
+            inline constexpr auto y      = 236;
+            inline constexpr auto width  = 133;
+            inline constexpr auto height = 35;
+        } // namespace textic
+        namespace valueic
+        {
+            inline constexpr auto x      = 30;
+            inline constexpr auto y      = 274;
+            inline constexpr auto width  = 420;
+            inline constexpr auto height = 33;
+        } // namespace valueic
+        namespace imageic
+        {
+            inline constexpr auto x      = 373;
+            inline constexpr auto y      = 239;
+            inline constexpr auto width  = 64;
+            inline constexpr auto height = 59;
+        } // namespace imageic
+
+        namespace textce
+        {
+            inline constexpr auto x      = 30;
+            inline constexpr auto y      = 339;
+            inline constexpr auto width  = 94;
+            inline constexpr auto height = 35;
+        } // namespace textce
+        namespace valuece
+        {
+            inline constexpr auto x      = 30;
+            inline constexpr auto y      = 382;
+            inline constexpr auto width  = 420;
+            inline constexpr auto height = 33;
+        } // namespace valuece
+        namespace imagece
+        {
+            inline constexpr auto x      = 373;
+            inline constexpr auto y      = 354;
+            inline constexpr auto width  = 64;
+            inline constexpr auto height = 46;
+        } // namespace imagece
+
+    } // namespace certification
 } // namespace style
