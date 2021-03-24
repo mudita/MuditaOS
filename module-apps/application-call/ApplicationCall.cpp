@@ -72,6 +72,16 @@ namespace app
             showNotification(buttonAction, iconNoSim, textNoSim);
             return actionHandled();
         });
+        addActionReceiver(manager::actions::CallRejectedByOfflineNotification, [this](auto &&data) {
+            auto buttonAction = [=]() -> bool {
+                returnToPreviousWindow();
+                return true;
+            };
+            constexpr auto icon    = "info_big_circle_W_G";
+            const auto textOffline = utils::localize.get("app_call_offline");
+            showNotification(buttonAction, icon, textOffline);
+            return actionHandled();
+        });
     }
 
     //  number of seconds after end call to switch back to previous application

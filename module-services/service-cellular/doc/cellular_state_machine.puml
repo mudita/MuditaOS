@@ -32,7 +32,7 @@ CellularConfProcedure -> Failed : Failed
 
 AudioConfigurationProcedure -> AudioConfigurationProcedure : Failed
 
-AudioConfigurationProcedure --> Failed : Baud setup fail
+AudioConfigurationProcedure --> Failed : Baud setup fail | radio enabling/disabling fail
 
 AudioConfigurationProcedure ---> Idle : reset called
 

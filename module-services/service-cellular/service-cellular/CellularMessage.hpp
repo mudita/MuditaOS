@@ -974,6 +974,59 @@ class CellularUrcIncomingNotification : public CellularNotificationMessage
     {}
 };
 
+class CellularSetRadioOnOffMessage : public CellularMessage
+{
+  public:
+    explicit CellularSetRadioOnOffMessage(bool radioOnOff)
+        : CellularMessage(MessageType::CellularRadioOnOff), radioOnOff(radioOnOff)
+    {}
+    auto getRadioOnOf() -> bool
+    {
+        return radioOnOff;
+    }
+
+  private:
+    bool radioOnOff;
+};
+
+class CellularSMSRejectedByOfflineNotification : public CellularResponseMessage,
+                                                 public app::manager::actions::ConvertibleToAction
+{
+  public:
+    CellularSMSRejectedByOfflineNotification() : CellularResponseMessage(false)
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(sender,
+                                                             app::manager::actions::SMSRejectedByOfflineNotification,
+                                                             std::make_unique<app::manager::actions::ActionParams>());
+    }
+};
+
+class CellularCallRejectedByOfflineNotification : public CellularResponseMessage,
+                                                  public app::manager::actions::ConvertibleToAction
+{
+  public:
+    CellularCallRejectedByOfflineNotification() : CellularResponseMessage(false)
+    {}
+
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
+    {
+        return std::make_unique<app::manager::ActionRequest>(sender,
+                                                             app::manager::actions::CallRejectedByOfflineNotification,
+                                                             std::make_unique<app::manager::actions::ActionParams>());
+    }
+};
+
+class CellularSendSMSMessage : public CellularMessage
+{
+  public:
+    explicit CellularSendSMSMessage(SMSRecord record) : CellularMessage(MessageType::CellularSendSMS), record(record)
+    {}
+    SMSRecord record;
+};
+
 namespace cellular
 {
 

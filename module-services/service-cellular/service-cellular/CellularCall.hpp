@@ -88,6 +88,10 @@ namespace CellularCall
             return call.ID != 0;
         }
 
+        bool isActive() const
+        {
+            return isActiveCall;
+        }
         void setCpuSentinel(std::shared_ptr<sys::CpuSentinel> sentinel);
     };
 } // namespace CellularCall

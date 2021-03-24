@@ -193,4 +193,34 @@ namespace at
             return result;
         }
     };
+
+    /// provides proper CFUN response
+    class CFUN_successChannel : public ChannelMock
+    {
+      public:
+        const std::string token = "1";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CFUN: " + token, "OK"};
+            return result;
+        }
+    };
+
+    /// provides invalid CFUN response
+    class CFUN_invalidTokenChannel : public ChannelMock
+    {
+      public:
+        const std::string token = "7";
+
+        auto ResultMock() -> Result final
+        {
+            auto result     = Result();
+            result.code     = Result::Code::OK;
+            result.response = {"+CFUN: " + token, "OK"};
+            return result;
+        }
+    };
 } // namespace at

@@ -42,7 +42,9 @@
 #include <Tables/CalllogTable.hpp>
 #include <Tables/Record.hpp>
 #include <Utils.hpp>
+#include <utility/Utility.hpp>
 #include <at/cmd/CLCC.hpp>
+#include <at/cmd/CFUN.hpp>
 #include <at/UrcClip.hpp>
 #include <at/UrcCmti.hpp>
 #include <at/UrcCreg.hpp>
@@ -324,11 +326,20 @@ void ServiceCellular::registerMessageHandlers()
 {
     phoneModeObserver->connect(this);
     phoneModeObserver->subscribe(
-        []([[maybe_unused]] sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering) {
+        [=]([[maybe_unused]] sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering) {
             using bsp::cellular::USB::setPassthrough;
             using bsp::cellular::USB::PassthroughState;
             setPassthrough(tethering == sys::phone_modes::Tethering::On ? PassthroughState::ENABLED
                                                                         : PassthroughState::DISABLED);
+
+            if (mode == sys::phone_modes::PhoneMode::Offline) {
+                this->switchToOffline();
+            }
+            else {
+                if (!this->isModemRadioModuleOn()) {
+                    this->turnOnRadioModule();
+                }
+            }
         });
 
     connect(typeid(CellularSimNewPinDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
@@ -470,6 +481,12 @@ void ServiceCellular::registerMessageHandlers()
     });
 
     connect(typeid(CellularCallRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        if (phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline)) {
+            this->bus.sendUnicast(std::make_shared<CellularCallRejectedByOfflineNotification>(),
+                                  app::manager::ApplicationManager::ServiceName);
+            return std::make_shared<CellularResponseMessage>(true);
+        }
+
         auto msg = static_cast<CellularCallRequestMessage *>(request);
         return handleCellularCallRequestMessage(msg);
     });
@@ -607,6 +624,12 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(CellularUrcIncomingNotification),
             [&](sys::Message *request) -> sys::MessagePointer { return handleUrcIncomingNotification(request); });
+
+    connect(typeid(CellularSetRadioOnOffMessage),
+            [&](sys::Message *request) -> sys::MessagePointer { return handleCellularSetRadioOnOffMessage(request); });
+
+    connect(typeid(CellularSendSMSMessage),
+            [&](sys::Message *request) -> sys::MessagePointer { return handleCellularSendSMSMessage(request); });
 
     handle_CellularGetChannelMessage();
 }
@@ -907,6 +930,23 @@ bool ServiceCellular::handle_audio_conf_procedure()
                 LOG_DEBUG("Setting up notifications callback");
                 notificationsChannel->setCallback(notificationCallback);
             }
+            auto mode = phoneModeObserver->getCurrentPhoneMode();
+            if (mode == sys::phone_modes::PhoneMode::Offline) {
+                if (!turnOffRadioModule()) {
+                    LOG_ERROR("Disabling RF modeule failed");
+                    state.set(this, State::ST::Failed);
+                    return false;
+                }
+            }
+            else {
+                if (!isModemRadioModuleOn()) {
+                    if (turnOnRadioModule()) {
+                        LOG_ERROR("Enabling RF modeule failed");
+                        state.set(this, State::ST::Failed);
+                        return false;
+                    }
+                }
+            }
             state.set(this, State::ST::APNConfProcedure);
             return true;
         }
@@ -945,7 +985,7 @@ auto ServiceCellular::handle(db::query::SMSSearchByTypeResult *response) -> bool
         }
         for (auto &rec : response->getResults()) {
             if (rec.type == SMSType::QUEUED) {
-                sendSMS(rec);
+                bus.sendUnicast(std::make_shared<CellularSendSMSMessage>(rec), ServiceCellular::serviceName);
             }
         }
         if (response->getMaxDepth() > response->getResults().size()) {
@@ -2201,6 +2241,7 @@ auto ServiceCellular::handleCellularAnswerIncomingCallMessage(CellularMessage *m
 auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessage *msg)
     -> std::shared_ptr<CellularResponseMessage>
 {
+
     auto channel = cmux->get(TS0710::Channel::Commands);
     if (channel == nullptr) {
         return std::make_shared<CellularResponseMessage>(false);
@@ -2570,4 +2611,104 @@ auto ServiceCellular::handleCellularSetFlightModeMessage(sys::Message *msg) -> s
     settings->setValue(
         settings::Cellular::offlineMode, std::to_string(setMsg->flightModeOn), settings::SettingsScope::Global);
     return std::make_shared<CellularResponseMessage>(true);
+}
+
+auto ServiceCellular::handleCellularSetRadioOnOffMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
+{
+    auto message = static_cast<CellularSetRadioOnOffMessage *>(msg);
+    if (message->getRadioOnOf()) {
+        return std::make_shared<CellularResponseMessage>(turnOnRadioModule());
+    }
+    return std::make_shared<CellularResponseMessage>(turnOffRadioModule());
+}
+
+auto ServiceCellular::handleCellularSendSMSMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
+{
+    auto message = static_cast<CellularSendSMSMessage *>(msg);
+
+    if (phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline)) {
+        bus.sendUnicast(std::make_shared<CellularSMSRejectedByOfflineNotification>(),
+                        app::manager::ApplicationManager::ServiceName);
+        message->record.type = SMSType::FAILED;
+        DBServiceAPI::GetQuery(
+            this, db::Interface::Name::SMS, std::make_unique<db::query::SMSUpdate>(std::move(message->record)));
+        return std::make_shared<CellularResponseMessage>(true);
+    }
+
+    sendSMS(message->record);
+    return std::make_shared<CellularResponseMessage>(true);
+}
+
+auto ServiceCellular::isModemRadioModuleOn() -> bool
+{
+    using at::cfun::Functionality;
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel) {
+        auto cmd      = at::cmd::CFUN(at::cmd::Modifier::Get);
+        auto response = channel->cmd(cmd);
+        if (response.code == at::Result::Code::OK) {
+            auto result = cmd.parse(response);
+            if (result.code == at::Result::Code::OK) {
+                return result.functionality == Functionality::Full;
+            }
+        }
+    }
+    return false;
+}
+auto ServiceCellular::turnOnRadioModule() -> bool
+{
+    using at::cfun::Functionality;
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel) {
+        auto cmd = at::cmd::CFUN(at::cmd::Modifier::Set);
+        cmd.set(Functionality::Full);
+        auto resp = channel->cmd(cmd);
+        return resp.code == at::Result::Code::OK;
+    }
+    return false;
+}
+
+auto ServiceCellular::turnOffRadioModule() -> bool
+{
+    using at::cfun::Functionality;
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel) {
+        auto cmd = at::cmd::CFUN(at::cmd::Modifier::Set);
+        cmd.set(Functionality::DisableRF);
+        auto resp = channel->cmd(cmd);
+        return resp.code == at::Result::Code::OK;
+    }
+    return false;
+}
+
+auto ServiceCellular::switchToOffline() -> bool
+{
+    if (ongoingCall.isActive()) {
+        auto channel = cmux->get(TS0710::Channel::Commands);
+        if (channel) {
+            if (channel->cmd(at::factory(at::AT::ATH))) {
+                callStateTimer.stop();
+                if (!ongoingCall.endCall(CellularCall::Forced::True)) {
+                    LOG_ERROR("Failed to end ongoing call");
+                    return false;
+                }
+                auto msg = std::make_shared<CellularCallAbortedNotification>();
+                bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
+            }
+        }
+    }
+
+    if (!turnOffRadioModule()) {
+        LOG_ERROR("Failed to disable RF module");
+        return false;
+    }
+
+    // force clear signal indicator
+    auto rssi = 0;
+    SignalStrength signalStrength(rssi);
+    Store::GSM::get()->setSignalStrength(signalStrength.data);
+    auto msg = std::make_shared<CellularSignalStrengthUpdateNotification>();
+    bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
+
+    return true;
 }

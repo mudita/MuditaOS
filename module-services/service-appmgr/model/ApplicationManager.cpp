@@ -361,6 +361,8 @@ namespace app::manager
         connect(typeid(sys::CriticalBatteryLevelNotification), convertibleToActionHandler);
         connect(typeid(CellularSmsNoSimRequestMessage), convertibleToActionHandler);
         connect(typeid(sdesktop::passcode::ScreenPasscodeRequest), convertibleToActionHandler);
+        connect(typeid(CellularSMSRejectedByOfflineNotification), convertibleToActionHandler);
+        connect(typeid(CellularCallRejectedByOfflineNotification), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

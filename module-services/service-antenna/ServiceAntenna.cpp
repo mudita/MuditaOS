@@ -56,7 +56,8 @@ namespace antenna
 inline constexpr auto antennaServiceStackSize = 1024 * 2;
 
 ServiceAntenna::ServiceAntenna()
-    : sys::Service(service::name::antenna, "", antennaServiceStackSize, sys::ServicePriority::Idle)
+    : sys::Service(service::name::antenna, "", antennaServiceStackSize, sys::ServicePriority::Idle),
+      phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()}
 {
     LOG_INFO("[%s] Initializing", service::name::antenna);
     state = new utils::state::State<antenna::State>(this);
@@ -74,6 +75,18 @@ ServiceAntenna::ServiceAntenna()
         });
     bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
     bus.channels.push_back(sys::BusChannel::AntennaNotifications);
+    bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
+
+    phoneModeObserver->connect(this);
+    phoneModeObserver->subscribe(
+        [=]([[maybe_unused]] sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering) {
+            if (mode == sys::phone_modes::PhoneMode::Offline) {
+                this->handleLockRequest(antenna::lockState::locked);
+            }
+            else {
+                this->handleLockRequest(antenna::lockState::unlocked);
+            }
+        });
 }
 
 ServiceAntenna::~ServiceAntenna()
