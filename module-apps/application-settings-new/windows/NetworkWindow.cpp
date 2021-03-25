@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NetworkWindow.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
+#include "application-settings-new/data/PINSettingsSimData.hpp"
 
 #include "OptionSetting.hpp"
 
@@ -87,8 +88,21 @@ namespace gui
                 nullptr,
                 nullptr,
                 gui::option::SettingRightItem::ArrowWhite,
-                true));
+                false));
         }
+
+        optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
+            utils::translateI18("app_settings_network_pin_settings") + " (" + simStr + ")",
+            [=](gui::Item &item) {
+                auto pinSettingsData = std::make_unique<gui::PINSettingsSimData>(simStr);
+                this->application->switchWindow(gui::window::name::pin_settings, std::move(pinSettingsData));
+                return true;
+            },
+            nullptr,
+            nullptr,
+            gui::option::SettingRightItem::ArrowWhite,
+            false));
+
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translateI18("app_settings_network_import_contacts_from_sim_card"),
             [=](gui::Item &item) {

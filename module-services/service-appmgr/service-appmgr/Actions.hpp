@@ -45,6 +45,8 @@ namespace app::manager
             RequestPin,
             RequestPuk,
             RequestPinChange,
+            RequestPinDisable,
+            RequestPinEnable,
             UnlockSim,
             BlockSim,
             ShowMMIResult,

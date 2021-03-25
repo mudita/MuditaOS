@@ -144,8 +144,8 @@ bool CellularServiceAPI::SelectAntenna(sys::Service *serv, bsp::cellular::antenn
 
 bool CellularServiceAPI::SetScanMode(sys::Service *serv, std::string mode)
 {
-    auto msg  = std::make_shared<CellularSetScanModeMessage>(mode);
-    auto ret  = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
+    auto msg = std::make_shared<CellularSetScanModeMessage>(mode);
+    auto ret = serv->bus.sendUnicast(msg, ServiceCellular::serviceName, 5000);
 
     CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
 
@@ -271,6 +271,12 @@ bool CellularServiceAPI::ChangeSimPin(sys::Service *serv,
                                       const std::vector<unsigned int> &pin)
 {
     return serv->bus.sendUnicast(std::make_shared<CellularSimPukDataMessage>(sim, passcode, pin),
+                                 ServiceCellular::serviceName);
+}
+
+bool CellularServiceAPI::RequestSimCardPinLockState(sys::Service *serv)
+{
+    return serv->bus.sendUnicast(std::make_shared<CellularSimCardPinLockStateRequestDataMessage>(),
                                  ServiceCellular::serviceName);
 }
 

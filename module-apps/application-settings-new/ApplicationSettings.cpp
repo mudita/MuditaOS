@@ -38,6 +38,7 @@
 #include "windows/ChangeTimeZone.hpp"
 #include "windows/ChangeDateAndTimeWindow.hpp"
 #include "windows/PhoneModesWindow.hpp"
+#include "windows/PINSettingsWindow.hpp"
 #include "windows/DoNotDisturbWindow.hpp"
 #include "windows/OfflineWindow.hpp"
 #include "windows/ConnectionFrequencyWindow.hpp"
@@ -67,6 +68,7 @@
 #include <application-settings-new/data/DeviceData.hpp>
 #include <application-settings-new/data/LanguagesData.hpp>
 #include <application-settings-new/data/PhoneNameData.hpp>
+#include <application-settings-new/data/PINSettingsLockStateData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
 
@@ -297,6 +299,16 @@ namespace app
             return sys::MessageNone{};
         });
 
+        connect(typeid(CellularSimCardPinLockStateResponseDataMessage), [&](sys::Message *msg) {
+            auto simCardPinLockState = dynamic_cast<CellularSimCardPinLockStateResponseDataMessage *>(msg);
+            if (simCardPinLockState != nullptr) {
+                auto pinSettingsLockStateData =
+                    std::make_unique<gui::PINSettingsLockStateData>(simCardPinLockState->getSimCardPinLockState());
+                updateWindow(gui::window::name::pin_settings, std::move(pinSettingsLockStateData));
+            }
+            return sys::MessageNone{};
+        });
+
         connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
             if (gui::window::name::languages == getCurrentWindow()->getName()) {
                 auto response = dynamic_cast<manager::GetCurrentDisplayLanguageResponse *>(msg);
@@ -434,6 +446,9 @@ namespace app
         });
         windowsFactory.attach(gui::window::name::system, [](Application *app, const std::string &name) {
             return std::make_unique<gui::SystemMainWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::pin_settings, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::PINSettingsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::new_apn, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NewApnWindow>(app);
