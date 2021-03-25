@@ -300,8 +300,9 @@ std::unique_ptr<db::QueryResult> CalllogRecordInterface::setAllReadQuery(std::sh
 
 std::unique_ptr<db::QueryResult> CalllogRecordInterface::getCountQuery(std::shared_ptr<db::Query> query)
 {
-    auto count    = CalllogRecordInterface::GetCount();
-    auto response = std::make_unique<db::query::CalllogGetCountResult>(count);
+    auto localQuery = static_cast<db::query::CalllogGetCount *>(query.get());
+    auto count      = GetCount(localQuery->getState());
+    auto response   = std::make_unique<db::query::CalllogGetCountResult>(localQuery->getState(), count);
     response->setRequestQuery(query);
     return response;
 }
