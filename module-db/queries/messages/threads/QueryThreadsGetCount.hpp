@@ -3,35 +3,30 @@
 
 #pragma once
 
-#include <queries/RecordQuery.hpp>
-#include <queries/Filter.hpp>
-#include <Interface/CalllogRecord.hpp>
+#include <Common/Query.hpp>
 #include <Common/Common.hpp>
-
-#include <string>
 
 namespace db::query
 {
-    class CalllogGetCount : public Query
+    class ThreadGetCount : public Query
     {
         EntryState state;
 
       public:
-        explicit CalllogGetCount(EntryState state);
-        [[nodiscard]] auto getState() const noexcept -> EntryState;
+        explicit ThreadGetCount(EntryState state);
         [[nodiscard]] auto debugInfo() const -> std::string override;
+        [[nodiscard]] auto getState() const noexcept -> EntryState;
     };
 
-    class CalllogGetCountResult : public QueryResult
+    class ThreadGetCountResult : public QueryResult
     {
         EntryState state;
         unsigned count;
 
       public:
-        CalllogGetCountResult(EntryState state, unsigned count);
+        ThreadGetCountResult(EntryState state, unsigned count);
+        [[nodiscard]] auto debugInfo() const -> std::string override;
         [[nodiscard]] auto getState() const noexcept -> EntryState;
         [[nodiscard]] auto getCount() const noexcept -> unsigned;
-        [[nodiscard]] auto debugInfo() const -> std::string override;
     };
-
-}; // namespace db::query
+} // namespace db::query

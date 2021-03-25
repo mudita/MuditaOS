@@ -84,6 +84,7 @@ set(SOURCES
         queries/messages/threads/QueryThreadGetByContactID.cpp
         queries/messages/threads/QueryThreadRemove.cpp
         queries/messages/threads/QueryThreadMarkAsRead.cpp
+        queries/messages/threads/QueryThreadsGetCount.cpp
         queries/notes/QueryNotesGet.cpp
         queries/notes/QueryNotesGetByText.cpp
         queries/notes/QueryNoteStore.cpp
