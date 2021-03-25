@@ -72,6 +72,7 @@ target_sources( ${PROJECT_NAME}
         windows/DoNotDisturbWindow.cpp
         windows/OfflineWindow.cpp
         windows/PhoneModesWindow.cpp
+        windows/PINSettingsWindow.cpp
         windows/AboutYourPureWindow.cpp
         windows/CertificationWindow.cpp
         windows/TechnicalInformationWindow.cpp

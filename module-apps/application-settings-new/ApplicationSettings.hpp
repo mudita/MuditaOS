@@ -49,6 +49,7 @@ namespace gui::window::name
     inline constexpr auto display_and_keypad = "DisplayAndKeypad";
     inline constexpr auto change_settings    = "ChangeSettings";
     inline constexpr auto all_operators      = "AllOperators";
+    inline constexpr auto pin_settings       = "PINSettings";
     inline constexpr auto import_contacts    = "ImportContacts";
     inline constexpr auto dialog_settings    = "DialogSettings";
     inline constexpr auto change_passcode    = "ChangePasscode";

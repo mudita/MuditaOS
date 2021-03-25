@@ -100,6 +100,16 @@ namespace app
             return actionHandled();
         });
 
+        addActionReceiver(app::manager::actions::RequestPinDisable, [this](auto &&data) {
+            lockHandler.handlePinDisableRequest(std::forward<decltype(data)>(data));
+            return actionHandled();
+        });
+
+        addActionReceiver(app::manager::actions::RequestPinEnable, [this](auto &&data) {
+            lockHandler.handlePinEnableRequest(std::forward<decltype(data)>(data));
+            return actionHandled();
+        });
+
         addActionReceiver(app::manager::actions::BlockSim, [this](auto &&data) {
             lockHandler.handleSimBlocked(std::move(data));
             return actionHandled();

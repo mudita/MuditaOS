@@ -160,6 +160,11 @@ class ServiceCellular : public sys::Service
 
     /// sim functionality
 
+    /** Function checks if sim pin is locked (enabled)
+     * @return True if sim pin is locked, False if it's not
+     */
+    bool isPinLocked();
+
     /** Function ready for change pin action send to Service Cellular form eg. GUI
      * \param oldPin
      * \param newPin
