@@ -68,6 +68,7 @@ set(TARGET_COMPILE_FEATURES
         CACHE INTERNAL "" )
 
 
+set_property(SOURCE ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/crashdump/CrashCatcher_armv7m.S PROPERTY LANGUAGE C)
 set(TARGET_SOURCES
 
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/_exit.c
@@ -77,6 +78,11 @@ set(TARGET_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/xip/evkbimxrt1050_flexspi_nor_config.c
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/xip/evkbimxrt1050_sdram_ini_dcd.c
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/xip/fsl_flexspi_nor_boot.c
+        ${CMAKE_SOURCE_DIR}/module-utils/CrashDebug/CrashCatcher/Core/src/CrashCatcher.c
+        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/crashdump/CrashCatcher_armv7m.S
+        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/crashdump/crashcatcher_impl.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/crashdump/crashdumpwriter_vfs.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/crashdump/consoledump.cpp
         CACHE INTERNAL ""
         )
 
@@ -87,6 +93,8 @@ set(TARGET_DIR_INCLUDES
 
 set(BOARD_DIR_INCLUDES
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/newlib/include
+        ${CMAKE_SOURCE_DIR}/module-utils/CrashDebug/CrashCatcher/include
+        ${CMAKE_SOURCE_DIR}/module-utils/CrashDebug/CrashCatcher/Core/src
 )
 
 set(TARGET_LIBRARIES

@@ -81,3 +81,6 @@
 	path = test/harness
 	url = ../QAMuditaHarness.git
 	shallow = true
+[submodule "module-utils/CrashDebug"]
+	path = module-utils/CrashDebug
+	url = git@github.com:adamgreen/CrashDebug.git

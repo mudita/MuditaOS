@@ -173,6 +173,8 @@ namespace bsp
         /* Enable MPU */
         ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 
+        SCB->SHCSR &= ~(SCB_SHCSR_MEMFAULTENA_Msk | SCB_SHCSR_USGFAULTENA_Msk | SCB_SHCSR_BUSFAULTENA_Msk);
+
         /* Enable I cache and D cache */
         SCB_EnableDCache();
         SCB_EnableICache();
