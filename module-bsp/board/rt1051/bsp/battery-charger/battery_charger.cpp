@@ -32,8 +32,8 @@ namespace bsp::battery_charger
         constexpr std::uint8_t VSYS_MIN              = 0x80; // 3.6V
         constexpr std::uint8_t CHARGE_TARGET_VOLTAGE = 0x1D; // 4.35V
 
-        constexpr std::uint8_t MAX_CHARGE_CURRENT  = 0x30; // 1600mA -> 1C
-        constexpr std::uint8_t FAST_CHARGE_CURRENT = 0x0A; // 500mA
+        constexpr std::uint8_t MAX_USB_CURRENT     = 0x0F; // 500mA
+        constexpr std::uint8_t FAST_CHARGE_CURRENT = 0x09; // 450mA
 
         constexpr std::uint16_t nominalCapacitymAh = 1600;
 
@@ -215,9 +215,9 @@ namespace bsp::battery_charger
                 LOG_ERROR("Charge target voltage write fail");
             }
 
-            value = MAX_CHARGE_CURRENT;
+            value = MAX_USB_CURRENT;
             if (chargerWrite(Registers::CHG_CNFG_09, value) != kStatus_Success) {
-                LOG_ERROR("Maximum charge current write fail");
+                LOG_ERROR("Maximum usb current write fail");
             }
 
             value = FAST_CHARGE_CURRENT;
