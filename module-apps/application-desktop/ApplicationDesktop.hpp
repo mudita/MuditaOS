@@ -120,6 +120,8 @@ namespace app
                      manager::actions::RequestPin,
                      manager::actions::RequestPuk,
                      manager::actions::RequestPinChange,
+                     manager::actions::RequestPinDisable,
+                     manager::actions::RequestPinEnable,
                      manager::actions::RequestScreenPasscode,
                      manager::actions::UnlockSim,
                      manager::actions::BlockSim,

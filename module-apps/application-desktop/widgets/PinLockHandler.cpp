@@ -116,6 +116,16 @@ namespace gui
         switchToPinLockWindow(onActivatedCallback);
     }
 
+    void PinLockHandler::handlePinDisableRequest(app::manager::actions::ActionParamsPtr &&data)
+    {
+        LOG_INFO("Handling RequestPinDisable action");
+    }
+
+    void PinLockHandler::handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data)
+    {
+        LOG_INFO("Handling RequestPinEnable action");
+    }
+
     void PinLockHandler::handleSimBlocked(app::manager::actions::ActionParamsPtr &&data)
     {
         LOG_DEBUG("Handling BlockSim action");

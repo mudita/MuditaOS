@@ -49,6 +49,8 @@ namespace gui
 
         void handlePasscodeRequest(PinLock::LockType type, app::manager::actions::ActionParamsPtr &&data);
         void handlePinChangeRequest(app::manager::actions::ActionParamsPtr &&data);
+        void handlePinDisableRequest(app::manager::actions::ActionParamsPtr &&data);
+        void handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data);
         void handleSimBlocked(app::manager::actions::ActionParamsPtr &&data);
         void handleUnlockSim(app::manager::actions::ActionParamsPtr &&data);
         void handleCMEError(app::manager::actions::ActionParamsPtr &&data) const;
