@@ -37,11 +37,7 @@ namespace app
         : Application(name, parent, mode, startInBackground, app::call_stack_size)
     {
         using namespace gui::top_bar;
-        topBarManager->enableIndicators({Indicator::Signal,
-                                         Indicator::Time,
-                                         Indicator::Battery,
-                                         Indicator::SimCard,
-                                         Indicator::NetworkAccessTechnology});
+        topBarManager->enableIndicators({Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         addActionReceiver(manager::actions::Call, [this](auto &&data) {
             switchWindow(window::name_call, std::forward<decltype(data)>(data));
             return actionHandled();

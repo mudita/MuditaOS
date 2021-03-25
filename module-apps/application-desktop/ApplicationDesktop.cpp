@@ -48,11 +48,7 @@ namespace app
           lockHandler(this), dbNotificationHandler(this)
     {
         using namespace gui::top_bar;
-        topBarManager->enableIndicators({Indicator::Signal,
-                                         Indicator::Time,
-                                         Indicator::Battery,
-                                         Indicator::SimCard,
-                                         Indicator::NetworkAccessTechnology});
+        topBarManager->enableIndicators({Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         topBarManager->set(Indicator::SimCard,
                            std::make_shared<SIMConfiguration>(SIMConfiguration::DisplayMode::OnlyInactiveState));
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);

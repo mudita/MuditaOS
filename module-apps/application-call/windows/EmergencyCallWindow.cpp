@@ -29,7 +29,6 @@ namespace gui
 
     top_bar::Configuration EmergencyCallWindow::configureTopBar(top_bar::Configuration appConfiguration)
     {
-        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
         appConfiguration.enable(top_bar::Indicator::PhoneMode);
         return appConfiguration;
     }
