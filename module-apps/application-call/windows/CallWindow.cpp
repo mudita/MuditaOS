@@ -154,6 +154,12 @@ namespace gui
         erase();
     }
 
+    top_bar::Configuration CallWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    {
+        appConfiguration.enable(top_bar::Indicator::NetworkAccessTechnology);
+        return appConfiguration;
+    }
+
     void CallWindow::setState(State state)
     {
         auto prevState = getState();

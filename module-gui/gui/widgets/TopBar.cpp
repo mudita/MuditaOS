@@ -22,9 +22,9 @@ namespace gui::top_bar
 {
     using namespace style::header::status_bar;
 
-    constexpr auto batteryWidgetAsText = true;
+    constexpr auto batteryWidgetAsText = false;
     using BatteryType                  = std::conditional<batteryWidgetAsText, BatteryText, BatteryBar>::type;
-    constexpr auto signalWidgetAsText  = true;
+    constexpr auto signalWidgetAsText  = false;
     using SignalType = std::conditional<signalWidgetAsText, SignalStrengthText, SignalStrengthBar>::type;
     constexpr auto simWidgetInDevelopersMode = false;
     using SimType = std::conditional<simWidgetInDevelopersMode, SIMDevelopersMode, SIM>::type;

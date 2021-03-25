@@ -44,11 +44,7 @@ namespace gui
     top_bar::Configuration EventReminderWindow::configureTopBar(top_bar::Configuration appConfiguration)
     {
         using namespace top_bar;
-        appConfiguration.enable({Indicator::Signal,
-                                 Indicator::Time,
-                                 Indicator::Battery,
-                                 Indicator::SimCard,
-                                 Indicator::NetworkAccessTechnology});
+        appConfiguration.enable({Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});
         return appConfiguration;
     }
 
