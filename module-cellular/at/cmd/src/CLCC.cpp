@@ -46,6 +46,11 @@ namespace at
             return magic_enum::enum_cast<T>(ret);
         }
 
+        template auto CLCC::toEnum<ModemCall::CallDir>(const std::string &text) -> std::optional<ModemCall::CallDir>;
+        template auto CLCC::toEnum<ModemCall::CallState>(const std::string &text)
+            -> std::optional<ModemCall::CallState>;
+        template auto CLCC::toEnum<ModemCall::CallMode>(const std::string &text) -> std::optional<ModemCall::CallMode>;
+
         result::CLCC &CLCC::parse(Result &base_result)
         {
             using namespace std::literals;
