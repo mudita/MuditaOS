@@ -20,6 +20,12 @@ namespace cellular
     class StateChange;
 }
 
+namespace db::query
+{
+    class ThreadGetCountResult;
+    class CalllogGetCountResult;
+}; // namespace db::query
+
 namespace app
 {
     inline constexpr auto name_desktop = "ApplicationDesktop";
@@ -67,6 +73,8 @@ namespace app
         bool handle(db::NotificationMessage *msg);
         bool handle(cellular::StateChange *msg);
         auto handle(db::query::notifications::GetAllResult *msg) -> bool;
+        auto handle(db::query::ThreadGetCountResult *msg) -> bool;
+        auto handle(db::query::CalllogGetCountResult *msg) -> bool;
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
         auto handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool;
         /**
@@ -77,8 +85,6 @@ namespace app
         bool showCalls();
         bool clearCallsNotification();
         bool clearMessagesNotification();
-        bool requestNotSeenNotifications();
-        bool requestNotReadNotifications();
         unsigned int getLockPassHash() const noexcept
         {
             return lockPassHash;
@@ -94,6 +100,7 @@ namespace app
         void setOsUpdateVersion(const std::string &value);
 
       private:
+        bool refreshMainWindow();
         void activeSimChanged(std::string value);
         void lockPassHashChanged(std::string value);
         void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);

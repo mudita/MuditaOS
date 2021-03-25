@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalllogHelper.hpp"
@@ -69,7 +69,7 @@ auto CalllogHelper::requestDataFromDB(Context &context) -> sys::ReturnCodes
 
 auto CalllogHelper::getCalllogCount(Context &context) -> sys::ReturnCodes
 {
-    auto query = std::make_unique<db::query::CalllogGetCount>();
+    auto query = std::make_unique<db::query::CalllogGetCount>(EntryState::ALL);
 
     auto listener = std::make_unique<db::EndpointListener>(
         [](db::QueryResult *result, Context context) {
