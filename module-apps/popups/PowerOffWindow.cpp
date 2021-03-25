@@ -19,7 +19,6 @@ namespace gui
         appConfiguration.enable(top_bar::Indicator::Time);
         appConfiguration.disable(top_bar::Indicator::Lock);
         appConfiguration.disable(top_bar::Indicator::Battery);
-        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
         appConfiguration.disable(top_bar::Indicator::Signal);
         appConfiguration.disable(top_bar::Indicator::SimCard);
         return appConfiguration;
