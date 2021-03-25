@@ -1,6 +1,13 @@
 if (CMAKE_CROSSCOMPILING)
     # Littlefs fuse is needed in rt1051 and Linux for manipulate images
     # genlittlefs is needed only on the Linux image for generate emulator target image
+    set(CRASH_DEBUG_DIR "${CMAKE_SOURCE_DIR}/module-utils/CrashDebug")
+    add_custom_target(
+        crashdebug ALL
+        COMMAND make -C ${CRASH_DEBUG_DIR} CrashDebug
+        COMMAND ${CMAKE_COMMAND} -E make_directory crashdebug
+        COMMAND ${CMAKE_COMMAND} -E copy ${CRASH_DEBUG_DIR}/bins/lin64/CrashDebug crashdebug
+    )
     add_custom_target(
         lfsfuse ALL
         COMMAND ${CMAKE_COMMAND}
