@@ -517,11 +517,17 @@ void ServiceCellular::registerMessageHandlers()
     });
 
     connect(typeid(CellularIncominCallMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        if (doNotDisturbCondition()) {
+            return std::make_shared<CellularResponseMessage>(hangUpCall());
+        }
         auto msg = static_cast<CellularIncominCallMessage *>(request);
         return handleCellularIncominCallMessage(msg);
     });
 
     connect(typeid(CellularCallerIdMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        if (doNotDisturbCondition()) {
+            return std::make_shared<CellularResponseMessage>(true);
+        }
         auto msg = static_cast<CellularCallerIdMessage *>(request);
         return handleCellularCallerIdMessage(msg);
     });
@@ -630,6 +636,12 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(CellularSendSMSMessage),
             [&](sys::Message *request) -> sys::MessagePointer { return handleCellularSendSMSMessage(request); });
+
+    connect(typeid(CellularRingNotification),
+            [&](sys::Message *request) -> sys::MessagePointer { return handleCellularRingNotification(request); });
+
+    connect(typeid(CellularCallerIdNotification),
+            [&](sys::Message *request) -> sys::MessagePointer { return handleCellularCallerIdNotification(request); });
 
     handle_CellularGetChannelMessage();
 }
@@ -1145,6 +1157,7 @@ bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
 
 auto ServiceCellular::handleSimPinMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>
 {
+
     auto msgSimPin = dynamic_cast<CellularSimPinDataMessage *>(msgl);
     if (msgSimPin != nullptr) {
         LOG_DEBUG("Unlocking sim");
@@ -2241,7 +2254,6 @@ auto ServiceCellular::handleCellularAnswerIncomingCallMessage(CellularMessage *m
 auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessage *msg)
     -> std::shared_ptr<CellularResponseMessage>
 {
-
     auto channel = cmux->get(TS0710::Channel::Commands);
     if (channel == nullptr) {
         return std::make_shared<CellularResponseMessage>(false);
@@ -2639,6 +2651,31 @@ auto ServiceCellular::handleCellularSendSMSMessage(sys::Message *msg) -> std::sh
     return std::make_shared<CellularResponseMessage>(true);
 }
 
+auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
+{
+    auto message = static_cast<CellularRingNotification *>(msg);
+
+    if (doNotDisturbCondition()) {
+        return std::make_shared<CellularResponseMessage>(this->hangUpCall());
+    }
+    bus.sendMulticast(std::make_shared<CellularIncominCallMessage>(message->getNubmer()),
+                      sys::BusChannel::ServiceCellularNotifications);
+    return std::make_shared<CellularResponseMessage>(true);
+}
+
+auto ServiceCellular::handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
+{
+    auto message = static_cast<CellularCallerIdNotification *>(msg);
+
+    if (doNotDisturbCondition()) {
+        return std::make_shared<CellularResponseMessage>(this->hangUpCall());
+    }
+
+    bus.sendMulticast(std::make_shared<CellularCallerIdMessage>(message->getNubmer()),
+                      sys::BusChannel::ServiceCellularNotifications);
+    return std::make_shared<CellularResponseMessage>(true);
+}
+
 auto ServiceCellular::isModemRadioModuleOn() -> bool
 {
     using at::cfun::Functionality;
@@ -2711,4 +2748,21 @@ auto ServiceCellular::switchToOffline() -> bool
     bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
 
     return true;
+}
+
+auto ServiceCellular::doNotDisturbCondition() -> bool
+{
+    return phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::DoNotDisturb);
+}
+
+auto ServiceCellular::hangUpCall() -> bool
+{
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel) {
+        if (channel->cmd(at::factory(at::AT::ATH))) {
+            return true;
+        }
+    }
+    LOG_ERROR("Failed to hang up call");
+    return false;
 }
