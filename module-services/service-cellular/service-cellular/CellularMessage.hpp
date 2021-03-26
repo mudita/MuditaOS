@@ -96,6 +96,8 @@ class CellularNotificationMessage : public CellularMessage
         PowerDownDeregistered,    // modem informed it has disconnected from network
         SMSDone,                  // SMS initialization finished
         NewIncomingUrc,           // phone received new URC from network and we need to wake up modem and host
+        Ring,                     // phone received Ring notification
+        CallerID                  // phone received Caller Id notification
     };
 
     // TODO check and fix all CellularNotificationMessage constructors
@@ -1025,6 +1027,50 @@ class CellularSendSMSMessage : public CellularMessage
     explicit CellularSendSMSMessage(SMSRecord record) : CellularMessage(MessageType::CellularSendSMS), record(record)
     {}
     SMSRecord record;
+};
+
+class CellularRingNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularRingNotification(const utils::PhoneNumber::View &number)
+        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring), number(number)
+    {}
+    explicit CellularRingNotification(const utils::PhoneNumber &number)
+        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring), number(number.getView())
+    {}
+    explicit CellularRingNotification(const std::string &e164number)
+        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring),
+          number(utils::PhoneNumber::parse(e164number))
+    {}
+    auto getNubmer() const -> utils::PhoneNumber::View
+    {
+        return number;
+    }
+
+  private:
+    utils::PhoneNumber::View number;
+};
+
+class CellularCallerIdNotification : public CellularNotificationMessage
+{
+  public:
+    explicit CellularCallerIdNotification(const utils::PhoneNumber::View &number)
+        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring), number(number)
+    {}
+    explicit CellularCallerIdNotification(const utils::PhoneNumber &number)
+        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring), number(number.getView())
+    {}
+    explicit CellularCallerIdNotification(const std::string &e164number)
+        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring),
+          number(utils::PhoneNumber::parse(e164number))
+    {}
+    auto getNubmer() const -> utils::PhoneNumber::View
+    {
+        return number;
+    }
+
+  private:
+    utils::PhoneNumber::View number;
 };
 
 namespace cellular
