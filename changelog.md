@@ -1,5 +1,50 @@
 # MuditaOS changelog
 
+## [0.61.1 2020-03-26]
+
+### Added
+
+* Add "About Your Pure" main window.
+* Add `pureflash` rapid image flashing utility.
+* Add a phone mode status bar widget.
+* Add access to data backups over MTP.
+* Add auto disconnect of a Bluetooth device on timeout to save energy.
+* Add Bluetooth audio playback using the A2DP profile.
+* Add documentation of the logging subsystem.
+* Add documentation of the Pure simulator.
+* Add dumping logs to file.
+* Add linear backlight controller.
+* Add phone mode popups.
+* Add popup volume control.
+* Add Swedish localization.
+
+### Changed
+
+* Add improvements to the test harness.
+* Add several enhancements to the Quotes application.
+* Block CPU frequency dropping when a USB cable is connected to improve USB communication stability.
+* Improve memory usage.
+* Improve power management when Bluetooth is active.
+* Refactor of system timers.
+* Remove a workaround to support old battery packs.
+* Replace test data in Polish with the English version.
+* Update torch controlling.
+
+### Fixed
+
+* Fix broken update process.
+* Fix building simulator using Release configuration.
+* Fix communication stability with the cellular modem by tweaking command timeouts.
+* Fix flushing database contents to the non-volatile memory.
+* Fix image building by updating its build dependencies.
+* Fix image checksum validation.
+* Fix issues with incoming messages.
+* Fix newline handling in messages' thumbnails.
+* Fix occasional crashes when handling MTP transfers.
+* Fix persistent entry in the call log database.
+* Fix transmission errors on communication with the Bluetooth modem.
+* Fix wording for English localization.
+
 ## [0.60.1 2020-03-19]
 
 ### Added
