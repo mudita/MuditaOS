@@ -15,7 +15,7 @@ namespace battery_level_check
 {
     namespace
     {
-        unsigned int batteryLevelCritical = 0;
+        unsigned int batteryLevelCritical = 10;
 
         constexpr auto batteryShutdownLevel = 5;
 
