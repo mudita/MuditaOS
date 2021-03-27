@@ -83,15 +83,13 @@ namespace gui
 
     void PinLockHandler::handleScreenPasscodeRequest(app::manager::actions::ActionParamsPtr &&data) const
     {
-        LOG_DEBUG("Handling ScreenPasscode action");
-
         auto params = static_cast<app::manager::actions::ScreenPasscodeParams *>(data.get());
         auto lock   = std::make_unique<gui::PinLock>(
             Store::GSM::SIM::NONE, PinLock::LockState::PasscodeRequired, PinLock::LockType::Screen);
 
         if (params->isCancel()) {
             if (app->getCurrentWindow()->getName() == app::window::name::desktop_pin_lock) {
-                app->switchWindow(app::window::name::desktop_main_window);
+                app->returnToPreviousWindow();
             }
             return;
         }

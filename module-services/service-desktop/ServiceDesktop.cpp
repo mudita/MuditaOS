@@ -212,9 +212,12 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     });
 
     connect(sdesktop::usb::USBDisconnected(), [&](sys::Message *msg) {
-        LOG_INFO("USB disconnected. Enabling secured endpoints.");
-        bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(true),
-                        app::manager::ApplicationManager::ServiceName);
+        LOG_INFO("USB disconnected");
+        if (usbSecurityModel->isSecurityEnabled()) {
+            LOG_INFO("Enabling secured endpoints.");
+            bus.sendUnicast(std::make_shared<sdesktop::passcode::ScreenPasscodeRequest>(true),
+                            app::manager::ApplicationManager::ServiceName);
+        }
         bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::Off),
                         service::name::system_manager);
         return sys::MessageNone{};
@@ -264,7 +267,7 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     settings->registerValueChange(
         ::settings::SystemProperties::usbSecurity,
         [this](std::string value) {
-            bool securityEnabled = utils::getNumericValue<bool>(value);
+            bool securityEnabled = usbSecurityModel->isSecurityEnabled();
             usbSecurityModel->enableEndpointSecurity(securityEnabled);
             usbSecurityModel->setEndpointSecurity(securityEnabled ? EndpointSecurity::Block : EndpointSecurity::Allow);
         },
