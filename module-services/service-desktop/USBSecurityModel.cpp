@@ -56,12 +56,7 @@ namespace sdesktop
 
     auto USBSecurityModel::isSecurityEnabled() const -> bool
     {
-#ifdef DISABLE_USB_SECURITY
         return false;
-#else
-        return utils::getNumericValue<bool>(
-            settings->getValue(settings::SystemProperties::usbSecurity, settings::SettingsScope::Global));
-#endif
     }
 
     void USBSecurityModel::enableEndpointSecurity(bool securityEnabled)
