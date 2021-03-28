@@ -162,8 +162,7 @@ namespace gui
     {
         if (previousOperation.empty() ||
             ((lastCharIsSymbol || symbol == utils::localize.get("app_calculator_decimal_separator") ||
-              (!previousOperation.empty() && lastCharIsSymbol &&
-               symbol == style::calculator::symbols::strings::minus)) &&
+              (lastCharIsSymbol && symbol == style::calculator::symbols::strings::minus)) &&
              !isDecimalSeparator(lastChar))) {
             writeEquation(lastCharIsSymbol, symbol);
         }
