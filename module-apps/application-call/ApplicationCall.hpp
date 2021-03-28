@@ -27,7 +27,7 @@ namespace app
         inline constexpr auto name_number            = "NumberWindow";
     } // namespace window
 
-    inline constexpr auto ringtone_path = "assets/audio/Ringtone-drum2.mp3"; // Should bo moved to database
+    inline constexpr auto ringtone_path = "assets/audio/rington_drum_2.mp3"; // Should bo moved to database
 
     class CallWindowInterface
     {
