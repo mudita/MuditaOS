@@ -3,8 +3,7 @@
 
 #include <catch2/catch.hpp>
 #include <map>
-
-#include "service-db/SettingsMessages.hpp"
+#include <service-db/EntryPath.hpp>
 
 using namespace settings;
 
@@ -72,24 +71,54 @@ TEST_CASE("Entry Path - is less comparison - AppLocal scope")
 
 TEST_CASE("Entry Path - std::map::find - EGD-6486")
 {
+    EntryPath TestValGlobal1{"", "", "", "variableA", SettingsScope::Global};
+    EntryPath TestValGlobal1Full{"Mode", "Service", "Profile", "variableA", SettingsScope::Global};
+    EntryPath TestValLocal1{"", "", "", "variableA", SettingsScope::AppLocal};
+    EntryPath TestValLocalBFull{"modeA", "serviceA", "profileC", "variableB", SettingsScope::AppLocal};
+
     std::map<EntryPath, std::string> map = {
-        {{"", "", "", "variableA", SettingsScope::Global}, "1"},
-        {{"", "", "", "variableA", SettingsScope::Global}, "2"},
-        {{"modeA", "serviceA", "profileC", "variableB", SettingsScope::AppLocal}, "3"},
+        {TestValGlobal1, "1"},
+        {TestValGlobal1, "2"},
+        {TestValLocal1, "3"},
+        {TestValLocalBFull, "3"},
     };
+
+    REQUIRE(map.size() == 3);
 
     SECTION("Find global variable")
     {
-        auto it1 = map.find({"", "", "", "variableA", SettingsScope::Global});
+        auto it1 = map.find(TestValGlobal1);
         REQUIRE(it1 != map.end());
 
-        auto it2 = map.find({"Mode", "Service", "Profile", "variableA", SettingsScope::Global});
+        auto it2 = map.find(TestValGlobal1Full);
         REQUIRE(it2 != map.end());
+
+        REQUIRE(it1 == it2);
     }
 
     SECTION("Find app local variable")
     {
-        auto it = map.find({"modeA", "serviceA", "profileC", "variableB", SettingsScope::AppLocal});
+        auto it = map.find(TestValLocalBFull);
+        REQUIRE(it != map.end());
+    }
+
+    SECTION("Find app local variable - and erase")
+    {
+        auto it = map.find(TestValLocal1);
+        REQUIRE(it != map.end());
+        map.erase(it);
+
+        auto it1 = map.find(TestValGlobal1);
+        REQUIRE(it1 != map.end());
+    }
+
+    SECTION("Find app Global variable - and erase")
+    {
+        auto it1 = map.find(TestValGlobal1);
+        REQUIRE(it1 != map.end());
+        map.erase(it1);
+
+        auto it = map.find(TestValLocal1);
         REQUIRE(it != map.end());
     }
 }

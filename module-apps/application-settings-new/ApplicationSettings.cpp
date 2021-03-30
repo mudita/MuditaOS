@@ -451,7 +451,7 @@ namespace app
             return std::make_unique<gui::CertificationWindow>(app);
         });
         windowsFactory.attach(gui::window::name::technical_information, [&](Application *app, const std::string &name) {
-            auto factoryData = std::make_unique<FactoryData>(std::make_unique<::settings::Settings>(this));
+            auto factoryData = std::make_unique<FactoryData>(*settings);
             auto presenter   = std::make_unique<TechnicalWindowPresenter>(std::move(factoryData));
             return std::make_unique<gui::TechnicalInformationWindow>(app, std::move(presenter));
         });

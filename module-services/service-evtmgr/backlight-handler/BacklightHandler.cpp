@@ -5,6 +5,7 @@
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
+#include <Utils.hpp>
 
 namespace backlight
 {
@@ -34,6 +35,11 @@ namespace backlight
               })}
 
     {}
+
+    void Handler::init()
+    {
+        screenLightControl->initFromSettings();
+    }
 
     void Handler::processScreenRequest(screen_light_control::Action action)
     {

@@ -135,7 +135,7 @@ namespace app::manager
         : Service{serviceName, {}, ApplicationManagerStackDepth},
           ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, notificationProvider(this),
-          autoLockEnabled(false), settings(std::make_shared<settings::Settings>(this)),
+          autoLockEnabled(false), settings(std::make_unique<settings::Settings>()),
           phoneModeObserver(std::make_unique<sys::phone_modes::Observer>()),
           phoneLockHandler(locks::PhoneLockHandler(this, settings))
     {
@@ -149,6 +149,7 @@ namespace app::manager
 
     sys::ReturnCodes ApplicationManager::InitHandler()
     {
+        settings->init(service::ServiceProxy(shared_from_this()));
         utils::setDisplayLanguage(
             settings->getValue(settings::SystemProperties::displayLanguage, settings::SettingsScope::Global));
 
@@ -260,7 +261,7 @@ namespace app::manager
 
     sys::ReturnCodes ApplicationManager::DeinitHandler()
     {
-        settings->unregisterValueChange();
+        settings->deinit();
         closeApplications();
         return sys::ReturnCodes::Success;
     }

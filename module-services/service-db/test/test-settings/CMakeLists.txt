@@ -11,7 +11,5 @@ add_catch2_executable(
             module-audio
             service-cellular
             module-cellular
-            iosyscalls
         DEPS
-            disk_image
 )
