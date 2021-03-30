@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>           // for Section, SourceLineInfo, SECTION, SectionInfo, StringRef, TEST_CASE
@@ -83,24 +83,6 @@ namespace settings
             }
             return std::make_shared<sys::ResponseMessage>();
         };
-
-        sys::MessagePointer handleListProfiles(sys::Message *req)
-        {
-            if (dynamic_cast<settings::Messages::ListProfiles *>(req) != nullptr) {
-                std::list<std::string> profiles = {"silent", "loud"};
-                return std::make_shared<settings::Messages::ProfileListResponse>(profiles);
-            }
-            return std::make_shared<sys::ResponseMessage>();
-        };
-
-        sys::MessagePointer handleListModes(sys::Message *req)
-        {
-            if (dynamic_cast<settings::Messages::ListProfiles *>(req) != nullptr) {
-                std::list<std::string> modes = {"mode1", "mode2"};
-                return std::make_shared<settings::Messages::ModeListResponse>(modes);
-            }
-            return std::make_shared<sys::ResponseMessage>();
-        };
     };
 } // namespace settings
 
@@ -124,33 +106,5 @@ TEST_CASE("Settings Messages")
         settings.bus.sendUnicast(std::make_shared<settings::Messages::UnregisterOnVariableChange>(settings::EntryPath(
                                      {"mode", "service", "profile", "variable", settings::SettingsScope::AppLocal})),
                                  "db-worker");
-    }
-
-    SECTION("Send profile messages")
-    {
-        settings::Service settings("settings");
-        settings.InitHandler();
-
-        settings.bus.sendUnicast(std::make_shared<settings::Messages::ListProfiles>(), "settings");
-
-        settings.bus.sendUnicast(std::make_shared<settings::Messages::AddProfile>("new-profile"), "settings");
-
-        settings.bus.sendUnicast(std::make_shared<settings::Messages::GetCurrentProfile>(), "settings");
-
-        settings.bus.sendUnicast(std::make_shared<settings::Messages::CurrentProfileChanged>("profile"), "settings");
-    }
-
-    SECTION("Send mode messages")
-    {
-        settings::Service settings("settings");
-        settings.InitHandler();
-
-        settings.bus.sendUnicast(std::make_shared<settings::Messages::ListModes>(), "settings");
-
-        settings.bus.sendUnicast(std::make_shared<settings::Messages::GetCurrentMode>(), "settings");
-
-        settings.bus.sendUnicast(std::make_shared<settings::Messages::AddMode>("new-mode"), "settings");
-
-        settings.bus.sendUnicast(std::make_shared<settings::Messages::CurrentModeChanged>("mode"), "settings");
     }
 }

@@ -53,4 +53,9 @@ namespace bluetooth
             }
         });
     }
+
+    void SettingsHolder::deinit()
+    {
+        settingsProvider->deinit();
+    }
 } // namespace Bluetooth

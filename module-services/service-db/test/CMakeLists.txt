@@ -26,9 +26,12 @@ add_catch2_executable(
         SRCS
             main.cpp
             test-entry-path.cpp
+            ${CMAKE_SOURCE_DIR}/module-services/service-db/EntryPath.cpp
         LIBS
-            service-db
-            module-db
+        INCLUDE
+            ${CMAKE_SOURCE_DIR}/module-utils/
+            ${CMAKE_SOURCE_DIR}/module-services/service-db/
 )
 
 add_subdirectory(test-settings)
+add_subdirectory(test-settings-Settings)

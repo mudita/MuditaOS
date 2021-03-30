@@ -24,7 +24,6 @@ namespace screen_light_control
                                                               "LightSensorReadoutTimer",
                                                               std::chrono::milliseconds{READOUT_TIMER_MS},
                                                               [this](sys::Timer &) { readoutTimerCallback(); });
-        initFromSettings();
     }
 
     ScreenLightControl::~ScreenLightControl()
