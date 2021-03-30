@@ -180,15 +180,6 @@ ServiceCellular::ServiceCellular()
     bus.channels.push_back(sys::BusChannel::ServiceEvtmgrNotifications);
     bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
-    settings = std::make_unique<settings::Settings>(this);
-
-    connectionManager = std::make_unique<ConnectionManager>(
-        utils::getNumericValue<bool>(
-            settings->getValue(settings::Cellular::offlineMode, settings::SettingsScope::Global)),
-        static_cast<std::chrono::minutes>(utils::getNumericValue<int>(settings->getValue(
-            settings->getValue(settings::Offline::connectionFrequency, settings::SettingsScope::Global)))),
-        std::make_shared<ConnectionManagerCellularCommands>(*this));
-
     callStateTimer = sys::TimerFactory::createPeriodicTimer(
         this, "call_state", std::chrono::milliseconds{1000}, [this](sys::Timer &) { CallStateTimerHandler(); });
     stateTimer = sys::TimerFactory::createPeriodicTimer(
@@ -201,7 +192,10 @@ ServiceCellular::ServiceCellular()
         sys::TimerFactory::createPeriodicTimer(this, "connection", std::chrono::seconds{60}, [this](sys::Timer &) {
             utility::conditionally_invoke(
                 [this]() { return phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline); },
-                [this]() { connectionManager->onTimerTick(); });
+                [this]() {
+                    if (connectionManager != nullptr)
+                        connectionManager->onTimerTick();
+                });
         });
 
     ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
@@ -248,8 +242,6 @@ ServiceCellular::ServiceCellular()
 ServiceCellular::~ServiceCellular()
 {
     LOG_INFO("[ServiceCellular] Cleaning resources");
-    settings->unregisterValueChange(settings::Cellular::volte_on, ::settings::SettingsScope::Global);
-    settings->unregisterValueChange(settings::Cellular::apn_list, ::settings::SettingsScope::Global);
 }
 
 // this static function will be replaced by Settings API
@@ -284,6 +276,16 @@ sys::ReturnCodes ServiceCellular::InitHandler()
 {
     board = EventManagerServiceAPI::GetBoard(this);
 
+    settings = std::make_unique<settings::Settings>();
+    settings->init(service::ServiceProxy(shared_from_this()));
+
+    connectionManager = std::make_unique<ConnectionManager>(
+        utils::getNumericValue<bool>(
+            settings->getValue(settings::Cellular::offlineMode, settings::SettingsScope::Global)),
+        static_cast<std::chrono::minutes>(utils::getNumericValue<int>(settings->getValue(
+            settings->getValue(settings::Offline::connectionFrequency, settings::SettingsScope::Global)))),
+        std::make_shared<ConnectionManagerCellularCommands>(*this));
+
     state.set(this, State::ST::WaitForStartPermission);
     settings->registerValueChange(
         settings::Cellular::volte_on,
@@ -307,7 +309,7 @@ sys::ReturnCodes ServiceCellular::InitHandler()
 
 sys::ReturnCodes ServiceCellular::DeinitHandler()
 {
-
+    settings->deinit();
     return sys::ReturnCodes::Success;
 }
 

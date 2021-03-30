@@ -1,12 +1,11 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <module-sys/Service/Message.hpp>
-#include <service-db/DBServiceName.hpp>
+#include "EntryPath.hpp"
 #include "SettingsScope.hpp"
-#include "SettingsMessages.hpp"
+#include "SettingsProxy.hpp"
 
 #include <cstdint>
 #include <functional>
@@ -15,23 +14,23 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <exception>
 
 namespace settings
 {
     class SettingsCache;
+
     class Settings
     {
       public:
         using ValueChangedCallback           = std::function<void(const std::string &)>;
         using ValueChangedCallbackWithName   = std::function<void(const std::string &, const std::string &value)>;
-        using ProfileChangedCallback         = std::function<void(const std::string &)>;
-        using ModeChangedCallback            = ProfileChangedCallback;
-        using ListOfProfiles                 = std::list<std::string>;
-        using ListOfModes                    = ListOfProfiles;
-        using OnAllProfilesRetrievedCallback = std::function<void(const ListOfProfiles &)>;
-        using OnAllModesRetrievedCallback    = std::function<void(const ListOfModes &)>;
 
-        Settings(sys::Service *app, const std::string &dbAgentName = service::name::db, SettingsCache *cache = nullptr);
+        Settings() = default;
+        virtual ~Settings();
+
+        void init(const service::ServiceProxy &interface);
+        void deinit();
 
         void setValue(const std::string &variableName,
                       const std::string &variableValue,
@@ -44,43 +43,17 @@ namespace settings
                                  SettingsScope scope = SettingsScope::AppLocal);
         void unregisterValueChange(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal);
         /// unregisters all registered variables (both global and local)
-        void unregisterValueChange();
         std::string getValue(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal);
 
-        void getAllProfiles(OnAllProfilesRetrievedCallback cb);
-        void setCurrentProfile(const std::string &profile);
-        void addProfile(const std::string &profile);
-        void registerProfileChange(ProfileChangedCallback);
-        void unregisterProfileChange();
-
-        void getAllModes(OnAllModesRetrievedCallback cb);
-        void setCurrentMode(const std::string &mode);
-        void addMode(const std::string &mode);
-        void registerModeChange(ModeChangedCallback);
-        void unregisterModeChange();
+        SettingsCache *getCache();
 
       private:
-        std::string dbAgentName;
-
-        std::shared_ptr<sys::Service> app;
-        std::string serviceName;
-        std::string phoneMode;
-        std::string profile;
-
-        SettingsCache *cache;
+        SettingsProxy interface;
 
         using ValueCb = std::map<EntryPath, std::pair<ValueChangedCallback, ValueChangedCallbackWithName>>;
+
         ValueCb cbValues;
-        ModeChangedCallback cbMode;
-        OnAllModesRetrievedCallback cbAllModes;
-        ProfileChangedCallback cbProfile;
-        OnAllProfilesRetrievedCallback cbAllProfiles;
-        void sendMsg(std::shared_ptr<settings::Messages::SettingsMessage> &&msg);
-        void registerHandlers();
-        auto handleVariableChanged(sys::Message *req) -> sys::MessagePointer;
-        auto handleCurrentProfileChanged(sys::Message *req) -> sys::MessagePointer;
-        auto handleCurrentModeChanged(sys::Message *req) -> sys::MessagePointer;
-        auto handleProfileListResponse(sys::Message *req) -> sys::MessagePointer;
-        auto handleModeListResponse(sys::Message *req) -> sys::MessagePointer;
+
+        void handleVariableChanged(const EntryPath &path, const std::string &value);
     };
 } // namespace settings
