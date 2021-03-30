@@ -94,7 +94,6 @@ namespace parserFSM
         inline constexpr auto currentRTCTime   = "currentRTCTime";
         inline constexpr auto updateReady      = "updateReady";
         inline constexpr auto updateFileList   = "updateFileList";
-        inline constexpr auto restoreRequest   = "restoreRequest";
         inline constexpr auto factoryRequest   = "factoryRequest";
         inline constexpr auto networkStatus    = "networkStatus";
         inline constexpr auto accessTechnology = "accessTechnology";
