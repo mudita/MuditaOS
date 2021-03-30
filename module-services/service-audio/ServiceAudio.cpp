@@ -107,6 +107,7 @@ ServiceAudio::~ServiceAudio()
 
 sys::ReturnCodes ServiceAudio::InitHandler()
 {
+    settingsProvider = std::make_unique<settings::Settings>();
     settingsProvider->init(service::Interface(shared_from_this()));
     std::transform(std::begin(cacheInitializer),
                    std::end(cacheInitializer),
