@@ -1,5 +1,5 @@
 #!/bin/bash -e
-#Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+#Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 #For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 usage() {
@@ -12,7 +12,7 @@ Usage: $(basename $0) [image_size] [image_file] [files]...
 }
 
 
-if [ $# -lt 3 ]; then
+if [ $# -lt 2 ]; then
 	echo "Error! Invalid argument count"
 	usage
 	exit -1
@@ -41,5 +41,6 @@ unit: sectors
 
 /dev/sdz1 : start=$SECTOR_START, size=$SECTOR_END, type=9e
 ==sfdisk
-./genlittlefs --image $IMAGE_FILE --block_size=32768  --overwrite  --partition_num 1 -- assets/* module-vfs/test_dir/* .boot.json
+pwd
+./genlittlefs --image $IMAGE_FILE --block_size=32768  --overwrite  --partition_num 1 -- sys/.boot.json sys/current/assets/* module-vfs/test_dir/*
 
