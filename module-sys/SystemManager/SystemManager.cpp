@@ -46,6 +46,34 @@ namespace sys
         constexpr std::chrono::milliseconds lowBatteryShutdownDelayTime{5000};
     } // namespace
 
+    namespace state
+    {
+        namespace update
+        {
+            static const std::set<std::string> whitelist{service::name::service_desktop,
+                                                         service::name::evt_manager,
+                                                         service::name::gui,
+                                                         service::name::db,
+                                                         service::name::eink,
+                                                         app::manager::ApplicationManager::ServiceName};
+        }
+
+        namespace restore
+        {
+            static const std::set<std::string> whitelist{service::name::service_desktop,
+                                                         service::name::evt_manager,
+                                                         service::name::gui,
+                                                         service::name::eink,
+                                                         app::manager::ApplicationManager::ServiceName};
+        }
+
+        static bool isOnWhitelist(const std::set<std::string> &list, const std::string &serviceName)
+        {
+            return list.find(serviceName) != list.end();
+        }
+
+    } // namespace state
+
     using namespace cpp_freertos;
     using namespace std;
     using namespace sys;
@@ -164,9 +192,9 @@ namespace sys
 
     void SystemManager::StartSystem(InitFunction sysInit, InitFunction appSpaceInit)
     {
-        powerManager  = std::make_unique<PowerManager>();
-        cpuStatistics = std::make_unique<CpuStatistics>();
-        deviceManager = std::make_unique<DeviceManager>();
+        powerManager     = std::make_unique<PowerManager>();
+        cpuStatistics    = std::make_unique<CpuStatistics>();
+        deviceManager    = std::make_unique<DeviceManager>();
         phoneModeSubject = std::make_unique<phone_modes::Subject>(this);
 
         systemInit = std::move(sysInit);
@@ -180,7 +208,13 @@ namespace sys
         cpuStatisticsTimer.start();
     }
 
-    bool SystemManager::Update(Service *s, const std::string &updateOSVer, std::string &currentOSVer)
+    bool SystemManager::CloseSystem(Service *s)
+    {
+        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), service::name::system_manager);
+        return true;
+    }
+
+    bool SystemManager::Update(Service *s, const std::string &updateOSVer, const std::string &currentOSVer)
     {
         // set update OS version (and also current os version) in Settings
         storeOsVersion(s, updateOSVer, currentOSVer);
@@ -192,6 +226,25 @@ namespace sys
         auto msgCloseApplications = std::make_shared<app::manager::UpdateInProgress>(service::name::system_manager);
         s->bus.sendUnicast(std::move(msgCloseApplications), app::manager::ApplicationManager::ServiceName);
 
+        return true;
+    }
+
+    bool SystemManager::Restore(Service *s)
+    {
+        LOG_DEBUG("trying to enter restore state");
+        auto ret = s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Restore),
+                                      service::name::system_manager,
+                                      sys::constants::restoreTimeout);
+        if (ret.first != ReturnCodes::Success) {
+            LOG_WARN("Can't stop all services, %d ms wait time", sys::constants::restoreTimeout);
+        }
+        auto msgCloseApplications = std::make_shared<app::manager::UpdateInProgress>(service::name::system_manager);
+        ret                       = s->bus.sendUnicast(std::move(msgCloseApplications),
+                                 app::manager::ApplicationManager::ServiceName,
+                                 sys::constants::restoreTimeout);
+        if (ret.first != ReturnCodes::Success) {
+            LOG_WARN("Can't stop all applications, %d ms wait time", sys::constants::restoreTimeout);
+        }
         return true;
     }
 
@@ -411,6 +464,9 @@ namespace sys
                 case Code::Update:
                     UpdateSystemHandler();
                     break;
+                case Code::Restore:
+                    RestoreSystemHandler();
+                    break;
                 case Code::Reboot:
                     RebootHandler();
                     break;
@@ -418,6 +474,7 @@ namespace sys
                     break;
                 }
             }
+
             return MessageNone{};
         });
 
@@ -603,6 +660,44 @@ namespace sys
         set(State::Shutdown);
     }
 
+    void SystemManager::RestoreSystemHandler()
+    {
+        LOG_INFO("Entering restore system state");
+
+        // We are going to remove services in reversed order of creation
+        CriticalSection::Enter();
+        std::reverse(servicesList.begin(), servicesList.end());
+        CriticalSection::Exit();
+
+        for (bool retry{};; retry = false) {
+            for (auto &service : servicesList) {
+                if (sys::state::isOnWhitelist(sys::state::restore::whitelist, service->GetName())) {
+                    continue;
+                }
+
+                if (service->parent.empty()) {
+                    LOG_DEBUG("destroy service: %s", service->GetName().c_str());
+                    const auto ret = DestroySystemService(service->GetName(), this);
+                    if (!ret) {
+                        // no response to exit message,
+                        LOG_FATAL("%s failed to respond to exit message", service->GetName().c_str());
+                        kill(service);
+                    }
+                    else {
+                        LOG_DEBUG("%s destroyed", service->GetName().c_str());
+                    }
+                    retry = true;
+                    break;
+                }
+            }
+            if (!retry) {
+                break;
+            }
+        }
+
+        LOG_INFO("entered restore state");
+    }
+
     void SystemManager::UpdateSystemHandler()
     {
         LOG_DEBUG("Starting system update procedure...");
@@ -614,34 +709,11 @@ namespace sys
 
         for (bool retry{};; retry = false) {
             for (auto &service : servicesList) {
-                if (service->GetName() == service::name::evt_manager) {
-                    LOG_DEBUG("Delay closing %s", service::name::evt_manager);
-                    continue;
-                }
-                if (service->GetName() == service::name::service_desktop) {
-                    LOG_DEBUG("Delay closing %s", service::name::service_desktop);
+                if (sys::state::isOnWhitelist(sys::state::update::whitelist, service->GetName())) {
+                    LOG_DEBUG("Delay closing %s", service->GetName().c_str());
                     continue;
                 }
 
-                if (service->GetName() == service::name::db) {
-                    LOG_DEBUG("Delay closing %s", service::name::db);
-                    continue;
-                }
-
-                if (service->GetName() == service::name::gui) {
-                    LOG_DEBUG("Delay closing %s", service::name::gui);
-                    continue;
-                }
-
-                if (service->GetName() == service::name::eink) {
-                    LOG_DEBUG("Delay closing %s", service::name::eink);
-                    continue;
-                }
-
-                if (service->GetName() == app::manager::ApplicationManager::ServiceName) {
-                    LOG_DEBUG("Delay closing %s", app::manager::ApplicationManager::ServiceName);
-                    continue;
-                }
                 if (service->parent.empty()) {
                     const auto ret = DestroySystemService(service->GetName(), this);
                     if (!ret) {
