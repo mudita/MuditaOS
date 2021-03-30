@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AppsAndToolsWindow.hpp"
@@ -12,7 +12,7 @@ namespace gui
     AppsAndToolsWindow::AppsAndToolsWindow(app::Application *app) : OptionWindow(app, gui::window::name::apps_and_tools)
     {
         addOptions(appsAndToolsOptionsList());
-        setTitle(utils::localize.get("app_settings_apps_tools"));
+        setTitle(utils::localize.get("app_settings_apps"));
     }
 
     std::list<Option> AppsAndToolsWindow::appsAndToolsOptionsList()
@@ -33,8 +33,10 @@ namespace gui
                                                 gui::option::Arrow::Enabled});
         };
 
+        addMenu(i18("app_settings_apps_phone"), gui::window::name::phone);
         addMenu(i18("app_settings_apps_messages"), gui::window::name::messages);
-        addMenu(i18("app_settings_apps_torch"), gui::window::name::torch);
+        addMenu(i18("app_settings_apps_calendar"), gui::window::name::calendar);
+        addMenu(i18("app_settings_apps_alarm_clock"), gui::window::name::alarm_clock);
 
         return optionList;
     }

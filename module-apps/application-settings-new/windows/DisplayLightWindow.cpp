@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DisplayLightWindow.hpp"
-#include "application-settings-new/widgets/OptionSetting.hpp"
+#include "application-settings-new/widgets/SpinBoxOptionSettings.hpp"
 #include "OptionSetting.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "OptionSetting.hpp"
