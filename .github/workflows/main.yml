@@ -96,8 +96,9 @@ jobs:
       - name: start emulator
         run: |
           rm -f /tmp/purephone_pts_name
-          ./run_emulator_on_filesystem_image.sh > emulator.log 2>&1 &
+          ./run_release_emulator_on_image.sh &> emulator.log &
           echo $! > emulator.pid
+          echo "Emulator PID: $(cat emulator.pid)"
       - name: run tests
         run: pytest ./pytest -rP -s --port=simulator --timeout=120 -m 'not rt1051'
         working-directory: test
