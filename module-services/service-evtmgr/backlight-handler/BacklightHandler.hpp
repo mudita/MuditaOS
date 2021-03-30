@@ -6,6 +6,7 @@
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <Timers/TimerHandle.hpp>
+#include <Service/ServiceProxy.hpp>
 
 namespace settings
 {
@@ -30,6 +31,9 @@ namespace backlight
       public:
         Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent);
 
+        /// initiaise in InitHandler when Service is ready
+        void init();
+
         /// Process request of the screen light control
         /// @screen_light_control::Action an action to perform
         void processScreenRequest(screen_light_control::Action action);
@@ -43,7 +47,7 @@ namespace backlight
         void handleKeyPressed();
         /// Process request of the keypad light control
         /// @screen_light_control::ParameterizedAction an action to perform
-        /// @return True if request was processed succesfully, false otherwise
+        /// @return True if request was processed successfully, false otherwise
         auto processKeypadRequest(bsp::keypad_backlight::Action action) -> bool;
 
         [[nodiscard]] auto getScreenLightState() const noexcept -> bool;

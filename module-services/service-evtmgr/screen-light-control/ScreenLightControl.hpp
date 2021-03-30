@@ -75,6 +75,8 @@ namespace screen_light_control
         [[nodiscard]] auto getAutoModeState() const noexcept -> ScreenLightMode;
         [[nodiscard]] auto getBrightnessValue() const noexcept -> bsp::eink_frontlight::BrightnessPercentage;
 
+        void initFromSettings();
+
       private:
         void controlTimerCallback();
         void readoutTimerCallback();
@@ -90,8 +92,6 @@ namespace screen_light_control
 
         void enableAutomaticMode();
         void disableAutomaticMode();
-
-        void initFromSettings();
 
         static constexpr inline auto CONTROL_TIMER_MS = 25;
         static constexpr inline auto READOUT_TIMER_MS = 500;
