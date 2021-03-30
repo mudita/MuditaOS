@@ -36,6 +36,7 @@ namespace sys
         using namespace std::chrono_literals;
         inline constexpr std::chrono::milliseconds timerInitInterval{30s};
         inline constexpr std::chrono::milliseconds timerPeriodInterval{100ms};
+        inline constexpr auto restoreTimeout{5000};
     } // namespace constants
 
     class PhoneModeRequest; // Forward declaration
@@ -45,6 +46,7 @@ namespace sys
     {
         CloseSystem,
         Update,
+        Restore,
         Reboot,
         None,
     };
@@ -77,7 +79,7 @@ namespace sys
             Suspend,
             Shutdown,
             ShutdownReady,
-            Reboot,
+            Reboot
         } state = State::Running;
 
         explicit SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
@@ -89,7 +91,12 @@ namespace sys
 
         void StartSystem(InitFunction sysInit, InitFunction appSpaceInit);
 
-        static bool Update(Service *s, const std::string &updateOSVer, std::string &currentOSVer);
+        // Invoke system close procedure
+        static bool CloseSystem(Service *s);
+
+        static bool Update(Service *s, const std::string &updateOSVer, const std::string &currentOSVer);
+
+        static bool Restore(Service *s);
 
         static bool Reboot(Service *s);
 
@@ -166,6 +173,8 @@ namespace sys
         void readyToCloseHandler(Message *msg);
 
         void UpdateSystemHandler();
+
+        void RestoreSystemHandler();
 
         void RebootHandler();
 

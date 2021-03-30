@@ -199,3 +199,7 @@ def pytest_configure(config):
                             "usb_cdc_echo: mark test if it's intended for usb-cdc echo mode")
     config.addinivalue_line("markers",
                             "two_sim_cards: mark test in case when two sim cards are required")
+    config.addinivalue_line("markers",
+                            "backup: subset of backup user data tests")
+    config.addinivalue_line("markers",
+                            "restore: subset of restore user data tests")
