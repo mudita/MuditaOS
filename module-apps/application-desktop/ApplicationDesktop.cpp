@@ -383,8 +383,6 @@ namespace app
 
     sys::ReturnCodes ApplicationDesktop::DeinitHandler()
     {
-        LOG_INFO("DeinitHandler");
-        settings->unregisterValueChange();
         return sys::ReturnCodes::Success;
     }
 

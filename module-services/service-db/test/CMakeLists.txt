@@ -32,3 +32,4 @@ add_catch2_executable(
 )
 
 add_subdirectory(test-settings)
+add_subdirectory(test-settings-Settings)
