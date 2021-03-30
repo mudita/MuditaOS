@@ -7,7 +7,7 @@
 #include <module-services/service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <module-apps/application-settings-new/widgets/SpinBox.hpp>
 #include <module-apps/application-settings-new/ApplicationSettings.hpp>
-#include <module-apps/application-settings-new/widgets/OptionSetting.hpp>
+#include <module-apps/application-settings-new/widgets/SpinBoxOptionSettings.hpp>
 #include "BaseSettingsWindow.hpp"
 
 namespace gui

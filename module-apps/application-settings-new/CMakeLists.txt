@@ -46,7 +46,14 @@ target_sources( ${PROJECT_NAME}
         windows/AppsAndToolsWindow.cpp
         windows/NetworkWindow.cpp
         windows/NightshiftWindow.cpp
+        windows/OptionsWidgetMaker.cpp
+        windows/PhoneWindow.cpp
+        windows/CallRingtoneWindow.cpp
         windows/MessagesWindow.cpp
+        windows/MessageSoundWindow.cpp
+        windows/CalendarWindow.cpp
+        windows/NotificationSoundWindow.cpp
+        windows/AlarmClockWindow.cpp
         windows/PhoneNameWindow.cpp
         windows/AutolockWindow.cpp
         windows/TorchWindow.cpp
@@ -59,7 +66,7 @@ target_sources( ${PROJECT_NAME}
         windows/ChangePasscodeWindow.cpp
         windows/NewApnWindow.cpp
         widgets/SpinBox.cpp
-        widgets/SpinBoxOptionSetting.cpp
+        widgets/SpinBoxOptionSettings.cpp
         windows/SystemMainWindow.cpp
         windows/LanguagesWindow.cpp
         windows/DateAndTimeMainWindow.cpp
