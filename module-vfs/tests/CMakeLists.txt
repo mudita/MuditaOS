@@ -27,14 +27,12 @@ add_catch2_executable(
 )
 
 set(LITTLEFS_IMAGE "lfstest.img")
-add_custom_command( 
-    OUTPUT ${LITTLEFS_IMAGE}
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genlfstestimg.sh 1G ${LITTLEFS_IMAGE} assets/* .boot.json
+add_custom_target(
+    ${LITTLEFS_IMAGE}
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/genlfstestimg.sh 1G ${LITTLEFS_IMAGE}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    DEPENDS genlittlefs
+    DEPENDS genlittlefs assets
 )
-
-add_custom_target(test_lfs_image DEPENDS assets ${LITTLEFS_IMAGE})
 
 add_catch2_executable(
     NAME vfs-littlefs
@@ -43,7 +41,7 @@ add_catch2_executable(
     LIBS
         module-vfs
     DEPS
-        test_lfs_image
+        ${LITTLEFS_IMAGE}
 )
 
 add_catch2_executable(
@@ -53,7 +51,7 @@ add_catch2_executable(
     LIBS
         module-vfs
     DEPS
-        test_lfs_image
+        ${LITTLEFS_IMAGE}
 )
 
 # prepare test assets

@@ -31,7 +31,7 @@ namespace
                                         "/tmp",
                                         nullptr};
 
-    constexpr const char *IMAGE_PATHS[]{"/sys", nullptr};
+    constexpr const char *IMAGE_PATHS[]{"/sys", "assets", "country-codes.db", "Luts.bin", nullptr};
 
     pthread_mutex_t g_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
     phmap::flat_hash_set<vfsn::linux::internal::FILEX *> g_fdlist;
@@ -66,7 +66,13 @@ namespace vfsn::linux::internal
     {
         for (auto path = IMAGE_PATHS; *path; ++path)
             if (std::strstr(inpath, *path) == inpath) {
-                std::strncpy(buffer, inpath + 1, PATH_MAX);
+                if (*inpath == '/') {
+                    std::strncpy(buffer, inpath + 1, PATH_MAX);
+                }
+                else {
+                    std::strncpy(buffer, "sys/current/", PATH_MAX);
+                    std::strncpy(buffer + 12, inpath, PATH_MAX - 12);
+                }
                 return buffer;
             }
         return inpath;

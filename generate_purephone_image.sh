@@ -10,8 +10,6 @@ Usage: $(basename $0) [image_path] [build_dir]
 ==usage
 }
 
-ASSETS_DIR="assets country-codes.db Luts.bin boot.bin"
-
 if [ $# -ne 2 ]; then
 	echo "Error! Invalid argument count"
 	usage
@@ -19,10 +17,10 @@ if [ $# -ne 2 ]; then
 fi
 
 IMAGE_NAME=$(realpath $1)
-SRC_DATA=$(realpath $2)
+BUILDDIR=$(realpath $2)
 
-if [ ! -d "$SRC_DATA" ]; then
-	echo "Error! build_dir is not a directory"
+if [ ! -d "$BUILDDIR" ]; then
+	echo "Error! \${build_dir} (${BUILDDIR}) is not a directory"
 	usage
 	exit -1
 fi
@@ -85,23 +83,42 @@ PART2="$IMAGE_NAME@@$(($PART2_START * $DEVICE_BLK_SIZE))"
 mformat -i "$PART1" -F -T $PART1_SIZE -M $DEVICE_BLK_SIZE -v MUDITAOS
 mformat -i "$PART2" -F -T $PART2_SIZE -M $DEVICE_BLK_SIZE -v RECOVER
 
+if [ ! -d "$BUILDDIR/sys" ]; then
+	echo "Fatal! Image folder sys/ missing in build. Check build system."
+	exit -1
+fi
+cd "$BUILDDIR"/sys
+
 #Copy FAT data
+CURRENT_DATA="assets country-codes.db Luts.bin"
+
 mmd -i "$PART1" ::/current
-cd "$SRC_DATA"
-for i in $ASSETS_DIR; do
-    if [ -f "$i" -o -d "$i" ]; then
-	mcopy -s -i "$PART1" $i ::/current/
-    else 
-        echo "Warning! Unable to copy item: $i"
-    fi
-done
-mcopy -s -i "$PART1" .boot.json ::
-mcopy -s -i "$PART1" .boot.json.crc32 ::
 mmd -i "$PART1" ::/current/sys
 mmd -i "$PART1" ::/updates
 
+for i in $CURRENT_DATA; do
+	f="current/$i"
+    if [ -f "$f" -o -d "$f" ]; then
+		mcopy -s -i "$PART1" $f ::/current/
+	else
+		echo "Error! Unable to copy item: $f"
+		exit 1
+	fi
+done
+
+if [ -f "current/boot.bin" ]; then
+	mcopy -s -i "$PART1" "current/boot.bin" ::/current/
+else
+	echo "Warning! Missing boot.bin"
+	echo "(it's fine for a Linux build)"
+fi
+
+mcopy -s -i "$PART1" .boot.json ::
+mcopy -s -i "$PART1" .boot.json.crc32 ::
+
 #Littlefs generate image
 $GENLFS --image=$IMAGE_NAME --block_size=32768  --overwrite  --partition_num=3 -- user/*
+
 # back to previous dir
 cd -
 sync

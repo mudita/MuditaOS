@@ -39,8 +39,6 @@ if (${ENABLE_TESTS})
 	include(PureCoverage)
 endif ()
 
-add_custom_target(assets)
-
 # setting build flags
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -DDEBUG")
@@ -61,7 +59,7 @@ else()
 
 endif()
 
-set(TOOLCHAIN_PATH "" CACHE STRING "Path to coolchain directory")
+set(TOOLCHAIN_PATH "" CACHE STRING "Path to toolchain directory")
 
 target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_LIB_DIRECTORY})
 
@@ -216,11 +214,11 @@ add_subdirectory(host-tools)
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     set(HEX_FILE ${CMAKE_PROJECT_NAME}.hex)
-    set(BIN_FILE boot.bin)
+    set(BIN_FILE ${CMAKE_BINARY_DIR}/sys/current/boot.bin)
 
     add_custom_command(
         COMMENT "Generate boot.bin"
-        OUTPUT ${CMAKE_BINARY_DIR}/${BIN_FILE}
+        OUTPUT ${BIN_FILE}
         DEPENDS ${CMAKE_PROJECT_NAME}
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${BIN_FILE}
         )
@@ -233,22 +231,8 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         )
 
     add_custom_target(
-        ${BIN_FILE}-target ALL
-        DEPENDS ${CMAKE_BINARY_DIR}/${BIN_FILE}
-        )
-
-    add_custom_target(
         ${HEX_FILE}-target ALL
         DEPENDS ${CMAKE_BINARY_DIR}/${HEX_FILE}
-        )
-
-    multicomp_install(FILES ${CMAKE_BINARY_DIR}/${BIN_FILE}
-        DESTINATION "./"
-        PERMISSIONS
-            OWNER_READ OWNER_WRITE OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE
-        COMPONENTS Standalone Update
         )
 
     # download the bootloader
@@ -402,7 +386,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     add_custom_target(package-standalone
         COMMAND tar -ScJf ${PACKAGE_STANDALONE_FILE_NAME} ${DISK_IMAGE_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        DEPENDS ${BIN_FILE}-target ${ECOBOOT_FILE}-target ${VERSION_JSON_FILE}-target  disk_image 
+        DEPENDS ${BIN_FILE} ${ECOBOOT_FILE}-target ${VERSION_JSON_FILE}-target disk_image
         )
 
     set(PACKAGE_UPDATE_FILE_NAME ${PACKAGE_COMMON_NAME}-Update.tar)
@@ -412,7 +396,7 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         COMMAND ${CMAKE_CPACK_COMMAND}
         -C $<CONFIGURATION>
         --config ${CPACK_OUTPUT_CONFIG_FILE}
-        DEPENDS  ${BIN_FILE}-target ${ECOBOOT_FILE}-target ${VERSION_JSON_FILE}-target 
+        DEPENDS  ${BIN_FILE} ${ECOBOOT_FILE}-target ${VERSION_JSON_FILE}-target
         )
     add_custom_target(package-update-checksums
         COMMAND rhash
