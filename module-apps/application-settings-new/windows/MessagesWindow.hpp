@@ -1,22 +1,53 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <OptionWindow.hpp>
+#include "BaseSettingsWindow.hpp"
+#include "OptionsWidgetMaker.hpp"
 
 namespace gui
 {
-    class MessagesWindow : public OptionWindow
+    ///  @brief Messages vibration, sound, and other settings window
+    ///
+    class MessagesWindow : public BaseSettingsWindow
     {
       public:
-        MessagesWindow(app::Application *app);
-        ~MessagesWindow() override = default;
-        void onBeforeShow(ShowMode m, SwitchData *d) override;
-        void rebuildOptList();
+        ///  Constructor
+        ///  @app parent application pointer
+        explicit MessagesWindow(app::Application *app);
 
       private:
-        std::list<Option> messagesOptList();
-        bool showUnreadMessagesFirst = false;
+        ///  Switches messages vibration state
+        ///  @return new state
+        void switchVibrationState();
+
+        ///  Switches messages sound state
+        void switchSoundState();
+
+        ///  Opens message sound selection window
+        void openMessageSoundWindow();
+
+        ///  Switches option to show unread messages first
+        void switchShowUnreadFirst();
+
+        ///  Opens message templates window
+        void openMessageTemplates();
+
+        ///  Build the list of options to be drawn
+        ///  @return list of options
+        std::list<Option> buildOptionsList() override;
+
+        ///  Widget maker object
+        OptionsWidgetMaker mWidgetMaker;
+
+        ///  Flag describing if messages vibration is enabled
+        bool mVibrationsEnabled = false;
+
+        ///  Flag describing if messages sound is enabled
+        bool mSoundEnabled = true;
+
+        ///  Flag describing if unread messages are shown first
+        bool mShowUnreadMessagesFirst = true;
     };
 } // namespace gui

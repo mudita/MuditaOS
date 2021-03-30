@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "OptionSetting.hpp"
+#include "SpinBoxOptionSettings.hpp"
 
 #include <utility>
 #include "SpinBox.hpp"
@@ -23,7 +23,7 @@ namespace gui
 
         auto optionItem = new gui::ListItem();
         optionItem->setMinimumSize(style::window::default_body_width, style::window::label::big_h);
-        optionItem->inputCallback        = spinBox->inputCallback;
+        optionItem->inputCallback            = spinBox->inputCallback;
         optionItem->focusChangedCallback     = [spinBox](Item &item) { return spinBox->focusChangedCallback(item); };
         optionItem->dimensionChangedCallback = [spinBox](gui::Item &, const BoundingBox &newDim) -> bool {
             spinBox->setPosition(0, 0);

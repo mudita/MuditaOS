@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationSettings.hpp"
@@ -18,7 +18,13 @@
 #include "windows/AppsAndToolsWindow.hpp"
 #include "windows/NightshiftWindow.hpp"
 #include "windows/NetworkWindow.hpp"
+#include "windows/PhoneWindow.hpp"
+#include "windows/CallRingtoneWindow.hpp"
 #include "windows/MessagesWindow.hpp"
+#include "windows/MessageSoundWindow.hpp"
+#include "windows/CalendarWindow.hpp"
+#include "windows/NotificationSoundWindow.hpp"
+#include "windows/AlarmClockWindow.hpp"
 #include "windows/PhoneNameWindow.hpp"
 #include "windows/AutolockWindow.hpp"
 #include "windows/TorchWindow.hpp"
@@ -414,8 +420,26 @@ namespace app
         windowsFactory.attach(gui::window::name::apn_options, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ApnOptionsWindow>(app);
         });
+        windowsFactory.attach(gui::window::name::phone, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::PhoneWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::call_ringtone, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::CallRingtoneWindow>(app);
+        });
         windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MessagesWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::message_sound, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::MessageSoundWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::calendar, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::CalendarWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::notification_sound, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::NotificationSoundWindow>(app);
+        });
+        windowsFactory.attach(gui::window::name::alarm_clock, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::AlarmClockWindow>(app);
         });
         windowsFactory.attach(gui::window::name::phone_name, [](Application *app, const std::string &name) {
             return std::make_unique<gui::PhoneNameWindow>(app);
