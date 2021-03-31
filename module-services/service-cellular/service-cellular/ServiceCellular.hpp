@@ -299,7 +299,8 @@ class ServiceCellular : public sys::Service
     void handleUSSDTimer();
 
     bool handleSimState(at::SimState state, const std::string message);
-    auto handleSimResponse(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleSimPinMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleSimPukMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>;
 
     std::shared_ptr<cellular::RawCommandRespAsync> handleCellularStartOperatorsScan(
         CellularStartOperatorsScanMessage *msg);
