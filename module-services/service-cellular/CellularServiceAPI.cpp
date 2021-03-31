@@ -352,3 +352,9 @@ bool CellularServiceAPI::SetFlightMode(sys::Service *serv, bool flightModeOn)
     return serv->bus.sendUnicast(std::make_shared<CellularSetFlightModeMessage>(flightModeOn),
                                  ServiceCellular::serviceName);
 }
+
+bool CellularServiceAPI::SetConnectionFrequency(sys::Service *serv, uint8_t connectionFrequency)
+{
+    return serv->bus.sendUnicast(std::make_shared<CellularSetConnectionFrequencyMessage>(connectionFrequency),
+                                 ServiceCellular::serviceName);
+}

@@ -740,7 +740,6 @@ namespace app
     void ApplicationSettingsNew::setConnectionFrequency(uint8_t val) noexcept
     {
         connectionFrequency = val;
-        settings->setValue(
-            ::settings::Offline::connectionFrequency, std::to_string(val), ::settings::SettingsScope::Global);
+        CellularServiceAPI::SetConnectionFrequency(this, val);
     }
 } /* namespace app */
