@@ -558,8 +558,11 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularSimStateMessage),
             [&](sys::Message *request) -> sys::MessagePointer { return handleSimStateMessage(request); });
 
-    connect(typeid(CellularSimResponseMessage),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleSimResponse(request); });
+    connect(typeid(CellularSimPinDataMessage),
+            [&](sys::Message *request) -> sys::MessagePointer { return handleSimPinMessage(request); });
+
+    connect(typeid(CellularSimPukDataMessage),
+            [&](sys::Message *request) -> sys::MessagePointer { return handleSimPukMessage(request); });
 
     connect(typeid(cellular::StateChange),
             [&](sys::Message *request) -> sys::MessagePointer { return handleStateRequestMessage(request); });
@@ -1100,21 +1103,26 @@ bool ServiceCellular::unlockSimPuk(std::string puk, std::string pin)
     return false;
 }
 
-auto ServiceCellular::handleSimResponse(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>
+auto ServiceCellular::handleSimPinMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>
 {
-
     auto msgSimPin = dynamic_cast<CellularSimPinDataMessage *>(msgl);
     if (msgSimPin != nullptr) {
-        LOG_DEBUG("Unclocking sim");
+        LOG_DEBUG("Unlocking sim");
         return std::make_shared<CellularResponseMessage>(unlockSimPin(SimCard::pinToString(msgSimPin->getPin())));
     }
+    LOG_ERROR("Request message is not CellularSimPinDataMessage!");
+    return std::make_shared<CellularResponseMessage>(false);
+}
 
+auto ServiceCellular::handleSimPukMessage(sys::Message *msgl) -> std::shared_ptr<sys::ResponseMessage>
+{
     auto msgSimPuk = dynamic_cast<CellularSimPukDataMessage *>(msgl);
     if (msgSimPuk != nullptr) {
         LOG_DEBUG("Unlocking puk");
         return std::make_shared<CellularResponseMessage>(
             unlockSimPuk(SimCard::pinToString(msgSimPuk->getPuk()), SimCard::pinToString(msgSimPuk->getNewPin())));
     }
+    LOG_ERROR("Request message is not CellularSimPukDataMessage!");
     return std::make_shared<CellularResponseMessage>(false);
 }
 
