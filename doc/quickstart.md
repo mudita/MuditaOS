@@ -259,3 +259,20 @@ where:
 - `<version>`   - is read from the latest "release-x.y.z" tag
 - `<target>`    - RT1051 or Linux 
 - `<extension>` - `zip` for RT1051 and `tar.gz` for Linux
+
+## Generating code coverage reports
+
+To generate code coverage reports for unit tests, you have to configure the project
+with `COVERAGE_ENABLE=ON`. Please note, that code coverage report generation
+works for the Linux/Debug configuration only.
+Code coverage reports are generated with the `gcovr` application. You can
+install it with:
+```
+pip3 install gcovr
+```
+
+Following targets related to coverage report generation are available:
+* `coverage-all-html` - run `ctest` and generate a detailed HTML report.
+* `coverage-html` - generate detailed HTML report based on the data collected during last execution of a unit test. The report
+will be generated in the `coverage-html` subdirectory of a build directory.
+* `coverage` - same as above, but generate an XML Cobertura report instead of an HTML.
