@@ -74,7 +74,8 @@ class CellularMessage : public sys::DataMessage
         MMIData,
         NewIncomingSMS,
         RadioOnOff,
-        SendSMS
+        SendSMS,
+        CellularSetConnectionFrequency
     };
     explicit CellularMessage(Type type) : sys::DataMessage(), type(type)
     {}
@@ -974,6 +975,21 @@ class CellularSetFlightModeMessage : public CellularMessage
         : CellularMessage(Type::SetFlightMode), flightModeOn(flightModeOn)
     {}
     bool flightModeOn;
+};
+
+class CellularSetConnectionFrequencyMessage : public CellularMessage
+{
+  public:
+    explicit CellularSetConnectionFrequencyMessage(const uint8_t &connectionFrequency)
+        : CellularMessage(Type::CellularSetConnectionFrequency), connectionFrequency(connectionFrequency)
+    {}
+    auto getConnectionFrequency() const noexcept -> uint8_t
+    {
+        return connectionFrequency;
+    }
+
+  private:
+    uint8_t connectionFrequency;
 };
 
 class CellularCallActiveNotification : public CellularNotificationMessage

@@ -244,7 +244,6 @@ bool ServiceAntenna::HandleStateChange(antenna::State state)
     switch (state) {
     case antenna::State::none:
         ret = noneStateHandler();
-        ;
         break;
     case antenna::State::init:
         ret = initStateHandler();
@@ -282,6 +281,11 @@ bool ServiceAntenna::initStateHandler(void)
 {
     LOG_INFO("State Init");
     bsp::cellular::antenna antenna;
+    if (phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline)) {
+        AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+        return true;
+    }
+
     if (CellularServiceAPI::GetAntenna(this, antenna)) {
         currentAntenna = antenna;
         state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(),
