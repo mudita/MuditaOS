@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/Endpoint.hpp>
@@ -7,7 +7,6 @@
 #include <endpoints/contacts/ContactsEndpoint.hpp>
 #include <endpoints/factoryReset/FactoryReset.hpp>
 #include <endpoints/messages/MessageHelper.hpp>
-#include <endpoints/update/UpdateMuditaOS.hpp>
 #include <parser/ParserFSM.hpp>
 #include <parser/ParserUtils.hpp>
 
@@ -24,23 +23,6 @@
 #include <filesystem>
 #include <string>
 #include <vector>
-
-TEST_CASE("System Update Tests")
-{
-    UpdateMuditaOS updateOS(nullptr);
-
-    updateos::UpdateError err = updateOS.prepareTempDirForUpdate(std::filesystem::path{"user"} / "tmp",
-                                                                 std::filesystem::path{"sys"} / "updates");
-    REQUIRE(err == updateos::UpdateError::NoError);
-
-    updateOS.setUpdateFile(std::filesystem::path{"sys"} / "updates", "muditaos-unittest.tar");
-
-    err = updateOS.unpackUpdate();
-    REQUIRE(err == updateos::UpdateError::NoError);
-
-    err = updateOS.verifyChecksums();
-    REQUIRE(err == updateos::UpdateError::NoError);
-}
 
 using namespace parserFSM;
 
