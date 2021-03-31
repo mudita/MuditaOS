@@ -141,34 +141,3 @@ add_catch2_executable(
         module-utils
 )
 
-###########################################
-# UTF8 functional tests projeet
-project(test_module-utils_utf8 VERSION 1.0
-    DESCRIPTION "Module-utils utf8 functional tests")
-
-add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
-    test_utf8.cpp
-)
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..")
-target_link_libraries(${PROJECT_NAME} PRIVATE module-utils)
-add_test(NAME ${PROJECT_NAME}
-    COMMAND ${PROJECT_NAME}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    )
-add_dependencies(check ${PROJECT_NAME})
-
-###########################################
-# time conversion tests project
-project(test_module-utils_time VERSION 1.0
-    DESCRIPTION "Module-utils time tests")
-
-add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
-    test_time_conversion.cpp
-)
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..")
-target_link_libraries(${PROJECT_NAME} PRIVATE module-utils module-vfs)
-add_test(NAME ${PROJECT_NAME}
-     COMMAND ${PROJECT_NAME}
-     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    )
-add_dependencies(check ${PROJECT_NAME})
