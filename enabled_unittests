@@ -228,7 +228,6 @@ TESTS_LIST["catch2-service-db-settings"]="
 "
 #---------
 TESTS_LIST["catch2-service-desktop"]="
-    System Update Tests;
     Parser Test;
     DB Helpers test - json decoding;
     DB Helpers test - json encoding (contacts);
