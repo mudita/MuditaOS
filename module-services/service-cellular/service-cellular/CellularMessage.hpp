@@ -348,54 +348,6 @@ class CellularSimMessage : public CellularMessage
     static const Store::GSM::SIM defaultSimCard = Store::GSM::SIM::SIM1;
 };
 
-class CellularSimResponseMessage : public CellularSimMessage
-{
-  public:
-    enum class SimState
-    {
-        SIMUnlocked,
-        PINRequired,
-        PINInvalidRetryPossible,
-        PUKRequired,
-        PUKInvalidRetryPossible,
-        SIMBlocked
-    };
-    CellularSimResponseMessage(Store::GSM::SIM sim,
-                               SimState state,
-                               unsigned int pinSize,
-                               unsigned int attemptsLeft = defaultAttemptsLeft)
-        : CellularSimMessage(MessageType::CellularSimResponse, sim), state(state), attemptsLeft(attemptsLeft)
-    {}
-
-    SimState getSimState() const noexcept
-    {
-        return state;
-    }
-    utils::PhoneNumber::View getPhoneNumber() const noexcept
-    {
-        return number;
-    }
-    unsigned int getPinSize() const noexcept
-    {
-        return pinSize;
-    }
-    unsigned int getAttemptsLeft() const noexcept
-    {
-        return attemptsLeft;
-    }
-
-  private:
-    SimState state = defaultSimState;
-    utils::PhoneNumber::View number;
-    unsigned int pinSize = defaultPinSize;
-    /// ignored if state is not one of { PINInvalidRetryPossible, PUKInvalidRetryPossible }
-    unsigned int attemptsLeft = defaultAttemptsLeft;
-
-    static const unsigned int defaultPinSize      = 4;
-    static const unsigned int defaultAttemptsLeft = 4;
-    static const SimState defaultSimState         = SimState::SIMUnlocked;
-};
-
 /// Message use only for mockup GUI purposes
 class CellularSimVerifyPinRequestMessage : public CellularSimMessage
 {
