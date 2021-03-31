@@ -35,7 +35,8 @@ namespace gui
         const auto popupData = dynamic_cast<ModesPopupData *>(data);
         if (popupData != nullptr) {
             const auto currentMode = popupData->getPhoneMode();
-            modesBox->update(currentMode);
+            const auto currentFlightMode = popupData->getFlightMode();
+            modesBox->update(currentMode, currentFlightMode);
         }
     }
 

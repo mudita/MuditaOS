@@ -148,4 +148,6 @@ namespace CellularServiceAPI
 
     bool SetFlightMode(sys::Service *serv, bool flightModeOn);
 
+    bool SetConnectionFrequency(sys::Service *serv, uint8_t connectionFrequency);
+
 }; // namespace CellularServiceAPI

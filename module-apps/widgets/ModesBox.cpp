@@ -24,7 +24,7 @@ namespace gui
         addOffline();
     }
 
-    void ModesBox::update(const sys::phone_modes::PhoneMode &phoneMode)
+    void ModesBox::update(const sys::phone_modes::PhoneMode &phoneMode, const bool flightMode)
     {
         using PhoneMode      = sys::phone_modes::PhoneMode;
         auto getUpdateValues = [&phoneMode](const PhoneMode &compare) -> std::pair<std::string, const bool> {
@@ -34,7 +34,7 @@ namespace gui
         connected->update(getUpdateValues(PhoneMode::Connected));
         notDisturb->update(getUpdateValues(PhoneMode::DoNotDisturb));
         offline->update(getUpdateValues(PhoneMode::Offline));
-        if (phoneMode == PhoneMode::Offline) {
+        if (phoneMode == PhoneMode::Offline && !flightMode) {
             messageOnly->setVisible(true);
         }
         else {
