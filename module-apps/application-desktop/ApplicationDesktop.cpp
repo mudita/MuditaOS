@@ -20,6 +20,9 @@
 #include "windows/MmiPushWindow.hpp"
 #include "windows/MmiInternalMsgWindow.hpp"
 #include "presenter/PowerOffPresenter.hpp"
+#include <windows/Dialog.hpp>
+#include <windows/DialogMetadata.hpp>
+#include <messages/DialogMetadataMessage.hpp>
 
 #include "AppWindow.hpp"
 #include "data/LockPhoneData.hpp"
@@ -408,6 +411,40 @@ namespace app
             return sys::msgHandled();
         });
 
+        auto createPinChangedSuccessfullyDialog =
+            [](app::ApplicationDesktop *app) -> std::unique_ptr<gui::DialogMetadataMessage> {
+            return std::make_unique<gui::DialogMetadataMessage>(
+                gui::DialogMetadata{utils::localize.get("app_desktop_sim_change_pin"),
+                                    "big_circle_placeholder",
+                                    utils::localize.get("app_desktop_sim_pin_changed_successfully"),
+                                    "",
+                                    [app]() {
+                                        app->switchWindow(app::window::name::desktop_main_window);
+                                        return true;
+                                    }});
+        };
+
+        connect(typeid(CellularSimNewPinResponseMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto response = dynamic_cast<CellularSimNewPinResponseMessage *>(request);
+            if (response->retCode) {
+                auto metaData = createPinChangedSuccessfullyDialog(this);
+                switchWindow(gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
+            }
+            else {
+                lockHandler.handlePinChangeRequestFailed();
+            }
+            return sys::MessageNone{};
+        });
+
+        connect(typeid(CellularSimPukResponseMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto response = dynamic_cast<CellularSimPukResponseMessage *>(request);
+            if (response->retCode) {
+                auto metaData = createPinChangedSuccessfullyDialog(this);
+                switchWindow(gui::window::name::dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
+            }
+            return sys::MessageNone{};
+        });
+
         auto msgToSend =
             std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
         bus.sendUnicast(msgToSend, service::name::service_desktop);
@@ -491,6 +528,9 @@ namespace app
         });
         windowsFactory.attach(desktop_mmi_internal, [](Application *app, const std::string newname) {
             return std::make_unique<gui::MmiInternalMsgWindow>(app, desktop_mmi_internal);
+        });
+        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogConfirm>(app, name);
         });
 
         attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});

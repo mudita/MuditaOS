@@ -631,6 +631,20 @@ class CellularResponseMessage : public sys::ResponseMessage
     std::string data;
 };
 
+class CellularSimNewPinResponseMessage : public CellularResponseMessage
+{
+  public:
+    explicit CellularSimNewPinResponseMessage(bool retCode) : CellularResponseMessage(retCode)
+    {}
+};
+
+class CellularSimPukResponseMessage : public CellularResponseMessage
+{
+  public:
+    explicit CellularSimPukResponseMessage(bool retCode) : CellularResponseMessage(retCode)
+    {}
+};
+
 class CellularAntennaResponseMessage : public sys::ResponseMessage
 {
   public:
