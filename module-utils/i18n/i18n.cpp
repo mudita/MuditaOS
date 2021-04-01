@@ -68,9 +68,10 @@ namespace utils
 
     void i18n::setInputLanguage(const Language &lang)
     {
-        if (lang == inputLanguage) {
+        if (lang.empty() || lang == inputLanguage) {
             return;
         }
+
         inputLanguage = lang;
     }
 
@@ -105,31 +106,46 @@ namespace utils
         return returnNonEmptyString(displayLanguage[str].string_value(), str);
     }
 
-    void i18n::setDisplayLanguage(const Language &lang)
+    bool i18n::setDisplayLanguage(const Language &lang)
     {
-        if (!backupLanguageInitializer) {
-            fallbackLanguage          = loader.createJson(fallbackLanguageName);
-            displayLanguage           = fallbackLanguage;
-            backupLanguageInitializer = true;
+        if ((lang.empty() || lang == currentDisplayLanguage) && !currentDisplayLanguage.empty()) {
+
+            return false;
         }
-        if (lang == currentDisplayLanguage) {
-            return;
+        else if (json11::Json pack = loader.createJson(lang); pack != json11::Json()) {
+
+            currentDisplayLanguage = lang;
+            changeDisplayLanguage(pack);
+
+            return true;
         }
-        currentDisplayLanguage = lang;
-        if (lang == fallbackLanguageName) {
-            displayLanguage = fallbackLanguage;
+        else if (fallbackLanguage == json11::Json()) {
+
+            loadFallbackLanguage();
+            return true;
         }
-        else {
-            json11::Json pack = loader.createJson(lang);
-            // Suspend whole system during switching lang packs
-            vTaskSuspendAll();
-            displayLanguage = pack;
-            xTaskResumeAll();
-        }
+
+        return false;
     }
 
-    void i18n::setFallbackLanguage(const Language &lang)
+    void i18n::changeDisplayLanguage(const json11::Json &lang)
     {
-        fallbackLanguageName = std::move(lang);
+        cpp_freertos::LockGuard lock(mutex);
+        displayLanguage = lang;
     }
+
+    void i18n::resetDisplayLanguages()
+    {
+        currentDisplayLanguage.clear();
+        displayLanguage  = json11::Json();
+        fallbackLanguage = json11::Json();
+    }
+
+    void i18n::loadFallbackLanguage()
+    {
+        cpp_freertos::LockGuard lock(mutex);
+        currentDisplayLanguage = fallbackLanguageName;
+        fallbackLanguage       = loader.createJson(fallbackLanguageName);
+    }
+
 } // namespace utils
