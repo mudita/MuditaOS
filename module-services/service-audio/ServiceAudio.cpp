@@ -168,6 +168,9 @@ ServiceAudio::ServiceAudio()
     phoneModeObserver->subscribe([&](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
         HandlePhoneModeChange(phoneMode, tetheringMode);
     });
+
+    connect(typeid(BluetoothDeviceVolumeChanged),
+            [this](sys::Message *msg) -> sys::MessagePointer { return handleVolumeChangedOnBluetoothDevice(msg); });
 }
 
 ServiceAudio::~ServiceAudio()
@@ -685,7 +688,7 @@ std::string ServiceAudio::getSetting(const Setting &setting,
     std::string path = dbPath(setting, targetPlayback, targetProfile, phoneModeObserver->getCurrentPhoneMode());
 
     if (const auto set_it = settingsCache.find(path); settingsCache.end() != set_it) {
-        LOG_ERROR("Get audio setting %s = %s", path.c_str(), set_it->second.c_str());
+        LOG_INFO("Get audio setting %s = %s", path.c_str(), set_it->second.c_str());
         return set_it->second;
     }
 
@@ -771,4 +774,10 @@ void ServiceAudio::settingsChanged(const std::string &name, std::string value)
         return;
     }
     LOG_ERROR("ServiceAudio::settingsChanged received notification about not registered setting: %s", name.c_str());
+}
+auto ServiceAudio::handleVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer
+{
+    auto *msg = static_cast<BluetoothDeviceVolumeChanged *>(msgl);
+    LOG_WARN("Volume chnged on bt device to %u. Handler to be done", msg->getVolume());
+    return sys::msgHandled();
 }

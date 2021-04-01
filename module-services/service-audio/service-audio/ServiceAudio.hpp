@@ -109,8 +109,8 @@ class ServiceAudio : public sys::Service
                                          const audio::PlaybackType &playbackType);
 
     const std::pair<audio::Profile::Type, audio::PlaybackType> getCurrentContext();
-
     void settingsChanged(const std::string &name, std::string value);
+    auto handleVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
 };
 
 namespace sys

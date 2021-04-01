@@ -44,6 +44,7 @@ namespace message::bluetooth
     class ConnectResult;
     class Disconnect;
     class DisconnectResult;
+    class AudioVolume;
 
 } // namespace message::bluetooth
 
@@ -91,6 +92,7 @@ class ServiceBluetooth : public sys::Service
     [[nodiscard]] auto handle(BluetoothAddrMessage *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(sdesktop::developerMode::DeveloperModeRequest *msg) -> std::shared_ptr<sys::Message>;
     [[nodiscard]] auto handle(BluetoothAudioStartMessage *msg) -> std::shared_ptr<sys::Message>;
+    [[nodiscard]] auto handle(message::bluetooth::AudioVolume *msg) -> std::shared_ptr<sys::Message>;
 };
 
 namespace sys

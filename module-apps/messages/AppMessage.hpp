@@ -196,8 +196,8 @@ namespace app
         gui::InputEvent event;
 
       public:
-        AppInputEventMessage(gui::InputEvent evt) : AppMessage(MessageType::AppInputEvent), event{evt} {};
-        virtual ~AppInputEventMessage(){};
+        explicit AppInputEventMessage(gui::InputEvent evt) : AppMessage(MessageType::AppInputEvent), event{evt}
+        {}
 
         const gui::InputEvent &getEvent()
         {

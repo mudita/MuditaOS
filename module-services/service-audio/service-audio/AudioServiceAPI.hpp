@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -168,4 +168,6 @@ namespace AudioServiceAPI
      *  Response will come as message AudioKeyPressedResponse
      */
     bool KeyPressed(sys::Service *serv, const int step);
+
+    bool BluetoothVolumeChanged(sys::Service *serv, const uint8_t volume);
 }; // namespace AudioServiceAPI
