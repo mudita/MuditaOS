@@ -278,3 +278,18 @@ class AudioKeyPressedResponse : public sys::DataMessage
     const ShowPopup showPopup = ShowPopup::False;
     std::pair<audio::Profile::Type, audio::PlaybackType> context;
 };
+
+class BluetoothDeviceVolumeChanged : public AudioMessage
+{
+  public:
+    explicit BluetoothDeviceVolumeChanged(std::uint8_t volume) : volume{volume}
+    {}
+
+    [[nodiscard]] auto getVolume() const noexcept -> std::uint8_t
+    {
+        return volume;
+    }
+
+  private:
+    const std::uint8_t volume;
+};

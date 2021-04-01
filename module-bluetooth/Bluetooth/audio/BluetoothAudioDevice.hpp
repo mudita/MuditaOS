@@ -44,4 +44,4 @@ namespace bluetooth
         static constexpr Capabilities btCapabilities = {.usesDMA = false, .minBlockSize = 512U, .maxBlockSize = 512U};
     };
 
-}; // namespace bluetooth
+} // namespace bluetooth

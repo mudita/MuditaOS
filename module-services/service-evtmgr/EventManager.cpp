@@ -148,7 +148,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         handleMinuteUpdate(msg->timestamp);
         handled = true;
     }
-    else if (auto msg = dynamic_cast<AudioEventRequest *>(msgl); msg /*&& msgl->sender == this->GetName()*/) {
+    else if (auto msg = dynamic_cast<AudioEventRequest *>(msgl); msg) {
         AudioServiceAPI::SendEvent(this, msg->getEvent());
         handled = true;
     }
