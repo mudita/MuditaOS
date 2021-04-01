@@ -162,6 +162,10 @@ TESTS_LIST["catch2-gui"]="
     gui::Item on input flow test;
     gui::Window on input flow test;
     Set size tests;
+    Constructing with empty image name;
+    Setting an empty image name;
+    Setting an incorrect image name;
+    Setting an incorrect image id;
     Parsing English input language;
     Parsing numeric keyboard;
     Getting charKey after clicking button twice;
