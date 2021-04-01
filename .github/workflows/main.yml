@@ -20,6 +20,7 @@ jobs:
           fetch-depth: 0
       - name: check commit messages
         run: ./tools/check_commit_messages.py
+
   check_copyright_and_style:
     name: check copyright and style
     if: github.event.pull_request.draft == false
@@ -69,7 +70,25 @@ jobs:
         with:
           token: ${{ secrets.GitHub_PAT }}
           submodules: recursive
-      - name: build linux binary
+      - name: build Linux Debug
+        run: |
+          export JOBS=${JOBS:-$(nproc)} && \
+          echo "JOBS=${JOBS}" &&  \
+          ./configure.sh linux Debug -G Ninja && \
+          pushd build-linux-Debug && \
+          ninja -j ${JOBS} unittests && \
+          ninja -j ${JOBS} && \
+          popd
+      - name: run unit tests
+        run: |
+          ./tools/run_unittests.sh enabled_unittests
+      - name: Check for statics
+        run: |
+          ./tools/find_global_data.py build-linux-Debug/PurePhone.elf
+      - name: store debug build artefact
+        run: |
+          tar -S -cf /artefacts/build-${GITHUB_SHA}.tar build-linux-Debug
+      - name: build linux Release
         run: |
           export JOBS=${JOBS:-$(nproc)} && \
           echo "JOBS=${JOBS}" &&  \
@@ -77,22 +96,6 @@ jobs:
           pushd build-linux-Release && \
           ninja -j ${JOBS} && \
           popd
-      - name: Check for statics
-        run: ./tools/find_global_data.py build-linux-Release/PurePhone.elf
-      - name: build unit tests
-        run: |
-          export JOBS=${JOBS:-$(nproc)} && \
-          echo "JOBS=${JOBS}" &&  \
-          ./configure.sh linux Debug -G Ninja && \
-          pushd build-linux-Debug && \
-          ninja -j ${JOBS} unittests && \
-          popd
-      - name: run unit tests
-        run: |
-          ./tools/run_unittests.sh enabled_unittests
-      - name: store build artefact
-        run: |
-          tar -S -cf /artefacts/build-${GITHUB_SHA}.tar build-linux-Release
       - name: start emulator
         run: |
           rm -f /tmp/purephone_pts_name
