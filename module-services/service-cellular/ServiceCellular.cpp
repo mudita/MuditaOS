@@ -349,7 +349,7 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(CellularSimNewPinDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularSimNewPinDataMessage *>(request);
-        return std::make_shared<CellularResponseMessage>(
+        return std::make_shared<CellularSimNewPinResponseMessage>(
             changePin(SimCard::pinToString(msg->getOldPin()), SimCard::pinToString(msg->getNewPin())));
     });
 
@@ -1183,7 +1183,7 @@ auto ServiceCellular::handleSimPukMessage(sys::Message *msgl) -> std::shared_ptr
     auto msgSimPuk = dynamic_cast<CellularSimPukDataMessage *>(msgl);
     if (msgSimPuk != nullptr) {
         LOG_DEBUG("Unlocking puk");
-        return std::make_shared<CellularResponseMessage>(
+        return std::make_shared<CellularSimPukResponseMessage>(
             unlockSimPuk(SimCard::pinToString(msgSimPuk->getPuk()), SimCard::pinToString(msgSimPuk->getNewPin())));
     }
     LOG_ERROR("Request message is not CellularSimPukDataMessage!");

@@ -6,7 +6,6 @@
 #include "application-desktop/ApplicationDesktop.hpp"
 #include "application-desktop/data/LockPhoneData.hpp"
 #include "application-desktop/windows/Names.hpp"
-
 #include <module-utils/common_data/EventStore.hpp>
 #include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
 #include <service-cellular/CellularMessage.hpp>
@@ -124,6 +123,31 @@ namespace gui
     void PinLockHandler::handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data)
     {
         LOG_INFO("Handling RequestPinEnable action");
+    }
+
+    void PinLockHandler::handlePinChangeRequestFailed()
+    {
+        using namespace app::manager::actions;
+        if (simLock.value > 0) {
+            --simLock.value;
+        }
+        else {
+            LOG_ERROR("Number of attempts left is equal to zero before decrementation!");
+        }
+        if (simLock.value > 0) {
+            simLock.lockState        = PinLock::LockState::PasscodeInvalidRetryRequired;
+            auto onActivatedCallback = [this](PinLock::LockType type, const std::vector<unsigned int> &data) {
+                auto params = std::make_unique<PasscodeParams>(
+                    Store::GSM::get()->selected, simLock.value, PasscodeParams::pinName);
+                handlePinChangeRequest(std::move(params));
+            };
+            switchToPinLockWindow(PinLock::LockState::PasscodeInvalidRetryRequired, onActivatedCallback);
+        }
+        else {
+            auto params = std::make_unique<PasscodeParams>(
+                Store::GSM::get()->selected, PasscodeParams::numOfAttemptsForEnteringPUK, PasscodeParams::pukName);
+            handlePasscodeRequest(gui::PinLock::LockType::SimPuk, std::move(params));
+        }
     }
 
     void PinLockHandler::handleSimBlocked(app::manager::actions::ActionParamsPtr &&data)
@@ -245,7 +269,6 @@ namespace gui
                                                     const std::vector<unsigned int> &passcode,
                                                     const std::vector<unsigned int> &pin)
     {
-        setSimLockHandled();
         if (type == PinLock::LockType::SimPin) {
             app->bus.sendUnicast(std::make_shared<CellularSimNewPinDataMessage>(simLock.sim, passcode, pin),
                                  serviceCellular);
