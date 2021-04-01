@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -203,17 +203,22 @@ namespace gui
 
     ImageMap *ImageManager::getImageMap(uint32_t id)
     {
-        if (id >= imageMaps.size())
-            return nullptr;
+        if (id >= imageMaps.size()) {
+            LOG_FATAL("Unable to find an image by id: %" PRIu32, id);
+            throw ImageNotFound{"Image could not be found."};
+        }
         return imageMaps[id];
     }
     uint32_t ImageManager::getImageMapID(const std::string &name)
     {
-        for (uint32_t i = 0; i < imageMaps.size(); i++) {
-            if (name.compare(imageMaps[i]->getName()) == 0)
+        for (uint32_t i = 0; i < imageMaps.size(); ++i) {
+            if (imageMaps[i]->getName() == name) {
                 return i;
+            }
         }
-        return 0;
+
+        LOG_FATAL("Unable to find an image: %s", name.c_str());
+        throw ImageNotFound{"Image could not be found."};
     }
 
 } /* namespace gui */

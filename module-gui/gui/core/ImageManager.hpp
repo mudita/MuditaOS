@@ -1,15 +1,7 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-/*
- * ImageManager.hpp
- *
- *  Created on: 18 maj 2019
- *      Author: robert
- */
-
-#ifndef GUI_CORE_PIXMAPMANAGER_HPP_
-#define GUI_CORE_PIXMAPMANAGER_HPP_
+#pragma once
 
 #include <vector>
 #include <string>
@@ -20,6 +12,11 @@
 
 namespace gui
 {
+    class ImageNotFound : public std::runtime_error
+    {
+      public:
+        using std::runtime_error::runtime_error;
+    };
 
     class ImageManager
     {
@@ -50,5 +47,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* GUI_CORE_PIXMAPMANAGER_HPP_ */
