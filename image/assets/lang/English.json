@@ -403,6 +403,7 @@
   "app_settings_security": "Security",
   "app_settings_language": "Language",
   "app_settings_factory_reset": "Factory reset",
+  "app_settings_display_factory_reset_confirmation": "Your phone needs to turn off \nto perform factory reset.\n Restart now?",
   "app_settings_about_your_pure": "About your Pure",
   "app_settings_technical_information": "Technical Information",
   "app_settings_tech_info_model": "Model",
