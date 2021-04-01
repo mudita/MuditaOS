@@ -2,9 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include "json/json11.hpp"
 #include <string>
 #include <filesystem>
+#include <mutex.hpp>
 
 using Language = std::string;
 
@@ -31,11 +33,14 @@ namespace utils
         json11::Json displayLanguage;
         json11::Json fallbackLanguage; // backup language if item not found
         LangLoader loader;
-        Language fallbackLanguageName;
+        Language fallbackLanguageName = DefaultLanguage;
         Language inputLanguage = fallbackLanguageName;
         Language inputLanguageFilename;
-        Language currentDisplayLanguage = fallbackLanguageName;
-        bool backupLanguageInitializer  = false;
+        Language currentDisplayLanguage;
+        mutable cpp_freertos::MutexStandard mutex;
+
+        void changeDisplayLanguage(const json11::Json &lang);
+        void loadFallbackLanguage();
 
       public:
         static constexpr auto DefaultLanguage              = "English";
@@ -49,8 +54,8 @@ namespace utils
         const std::string &getInputLanguage();
         const std::string &getDisplayLanguage();
         const std::string &get(const std::string &str);
-        void setDisplayLanguage(const Language &lang);
-        void setFallbackLanguage(const Language &lang);
+        bool setDisplayLanguage(const Language &lang);
+        void resetDisplayLanguages();
     };
 
     // Global instance of i18 class
