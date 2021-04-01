@@ -28,6 +28,7 @@
 #include "DeviceManager.hpp"
 #include <chrono>
 #include <vector>
+#include <module-apps/Application.hpp>
 
 namespace sys
 {
@@ -110,13 +111,13 @@ namespace sys
         /// Runs a service
         static bool RunSystemService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
         /// Runs an application
-        static bool RunApplication(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
+        static bool RunApplication(std::shared_ptr<app::Application> app, Service *caller, TickType_t timeout = 5000);
 
         /// Destroy existing service
         /// @note there is no fallback
-        static bool DestroySystemService(const std::string &name, Service *caller, TickType_t timeout = 5000);
+        static bool DestroySystemService(const std::string &name, Service *caller);
         /// Destroy existing application
-        static bool DestroyApplication(const std::string &name, Service *caller, TickType_t timeout = 5000);
+        static bool DestroyApplication(const std::string &name, Service *caller);
 
         /// Translates a slider state into a phone mode.
         /// \param key  Slider button state
@@ -153,11 +154,9 @@ namespace sys
         void StartSystemServices();
 
         static bool RunService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
-        static bool DestroyService(std::vector<std::shared_ptr<Service>> &serviceContainer,
-                                   const std::string &name,
-                                   Service *caller,
-                                   TickType_t timeout = 5000);
+        static bool RequestServiceClose(const std::string &name, Service *caller, TickType_t timeout = 5000);
 
+        template <typename T> void DestroyServices(const T &whitelist);
         /// Sysmgr stores list of all active services but some of them are under control of parent services.
         /// Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to
         /// parents.
@@ -210,8 +209,9 @@ namespace sys
         std::vector<std::string> readyForCloseRegister;
 
         static std::vector<std::shared_ptr<Service>> servicesList;
-        static std::vector<std::shared_ptr<Service>> applicationsList;
-        static cpp_freertos::MutexStandard destroyMutex;
+        static std::vector<std::shared_ptr<app::Application>> applicationsList;
+        static cpp_freertos::MutexStandard serviceDestroyMutex;
+        static cpp_freertos::MutexStandard appDestroyMutex;
         static std::unique_ptr<PowerManager> powerManager;
         static std::unique_ptr<CpuStatistics> cpuStatistics;
         static std::unique_ptr<DeviceManager> deviceManager;
