@@ -3,7 +3,7 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 root_dir="$(realpath $(dirname $(realpath $0))/..)"
-build_dir="${root_dir}/build-linux-Release"
+build_dir="${root_dir}/build-linux-Debug"
 
 run_logs=${build_dir}/ut_run_logs
 
