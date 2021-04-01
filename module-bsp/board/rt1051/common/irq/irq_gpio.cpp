@@ -12,6 +12,7 @@
 #include "bsp/battery-charger/battery_charger.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/keyboard/keyboard.hpp"
+#include "bsp/headset/headset.hpp"
 #include "bsp/BoardDefinitions.hpp"
 #include "bsp/magnetometer/magnetometer.hpp"
 #include "bsp/light_sensor/light_sensor.hpp"
@@ -149,6 +150,7 @@ namespace bsp
             }
 
             if (irq_mask & (1 << BOARD_JACKDET_IRQ_GPIO_PIN)) {
+                xHigherPriorityTaskWoken |= bsp::headset::headset_IRQHandler();
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_RI_PIN)) {
