@@ -306,6 +306,17 @@ TESTS_LIST["catch2-utils-log"]="
     Log tests;
 "
 #---------
+TESTS_LIST["catch2-utils-i18n"]="
+    Test set display language - empty display language string;
+    Test set display language - invalid display language string;
+    Test set display language - double invalid display language string;
+    Test set display language - set display language with valid string;
+    Test set display language - set display language with valid string and try to invalidate;
+    Test get string method - no display language set;
+    Test get string method - invalid display language set;
+    Test get string method - valid display language set;
+"
+#---------
 TESTS_LIST["catch2-utils-loggerbuffer"]="
     LoggerBuffer tests;
 "

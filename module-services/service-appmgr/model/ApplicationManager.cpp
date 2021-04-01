@@ -39,7 +39,7 @@ namespace app::manager
     namespace
     {
         constexpr auto ApplicationManagerStackDepth = 3072;
-        constexpr auto timerBlock         = "BlockTimer";
+        constexpr auto timerBlock                   = "BlockTimer";
     } // namespace
 
     ApplicationManagerBase::ApplicationManagerBase(std::vector<std::unique_ptr<app::ApplicationLauncher>> &&launchers)
@@ -118,7 +118,8 @@ namespace app::manager
 
     sys::ReturnCodes ApplicationManager::InitHandler()
     {
-        utils::localize.setFallbackLanguage(utils::localize.DefaultLanguage);
+        utils::localize.setDisplayLanguage(settings->getValue(settings::SystemProperties::displayLanguage));
+
         settings->registerValueChange(
             settings::SystemProperties::displayLanguage,
             [this](std::string value) { displayLanguageChanged(value); },
@@ -535,7 +536,7 @@ namespace app::manager
     auto ApplicationManager::handleLaunchAction(ActionEntry &action) -> bool
     {
         auto launchParams = static_cast<ApplicationLaunchData *>(action.params.get());
-        auto targetApp = getApplication(launchParams->getTargetApplicationName());
+        auto targetApp    = getApplication(launchParams->getTargetApplicationName());
         if (targetApp == nullptr || !targetApp->handles(actions::Launch)) {
             return false;
         }
@@ -886,14 +887,14 @@ namespace app::manager
         handleActionRequest(actionRequest.get());
         autoLockTimer.start();
     }
+
     void ApplicationManager::displayLanguageChanged(std::string value)
     {
-        if (value.empty()) {
-            return;
+        if (utils::localize.setDisplayLanguage(value)) {
+            rebuildActiveApplications();
         }
-        utils::localize.setDisplayLanguage(value);
-        rebuildActiveApplications();
     }
+
     void ApplicationManager::lockTimeChanged(std::string value)
     {
         autoLockTimer.stop();
@@ -908,16 +909,14 @@ namespace app::manager
             autoLockTimer.start();
             return;
         }
-        autoLockEnabled = true;
+        autoLockEnabled     = true;
         const auto interval = std::chrono::milliseconds{utils::getNumericValue<unsigned int>(value)};
         autoLockTimer.restart(interval);
         //?any additional action needed here?
     }
+
     void ApplicationManager::inputLanguageChanged(std::string value)
     {
-        if (value.empty()) {
-            return;
-        }
         utils::localize.setInputLanguage(value);
     }
 

@@ -131,6 +131,16 @@ add_catch2_executable(
         module-db
 )
 
+#  i18n language change tests
+add_catch2_executable(
+    NAME
+        utils-i18n
+    SRCS
+        test_i18n.cpp
+    LIBS
+        module-utils
+)
+
 ###########################################
 # UTF8 functional tests projeet
 project(test_module-utils_utf8 VERSION 1.0
