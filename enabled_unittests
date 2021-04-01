@@ -428,8 +428,7 @@ TESTS_LIST["catch2-unittest_ATURCStream"]="
 #---------
 #---------
 TESTS_LIST["catch2-unittest_CellularResult"]="
-    CellularResult: serializing/deserializing;
-    CellularResult: objects creation;
+    CellularResult
 "
 #---------
 
