@@ -52,26 +52,31 @@ namespace sys
     {
         namespace update
         {
-            static const std::set<std::string> whitelist{service::name::service_desktop,
-                                                         service::name::evt_manager,
-                                                         service::name::gui,
-                                                         service::name::db,
-                                                         service::name::eink,
-                                                         app::manager::ApplicationManager::ServiceName};
+            static constexpr std::array whitelist = {service::name::service_desktop,
+                                                     service::name::evt_manager,
+                                                     service::name::gui,
+                                                     service::name::db,
+                                                     service::name::eink,
+                                                     app::manager::ApplicationManager::ServiceName};
         }
 
         namespace restore
         {
-            static const std::set<std::string> whitelist{service::name::service_desktop,
-                                                         service::name::evt_manager,
-                                                         service::name::gui,
-                                                         service::name::eink,
-                                                         app::manager::ApplicationManager::ServiceName};
+            static constexpr std::array whitelist = {service::name::service_desktop,
+                                                     service::name::evt_manager,
+                                                     service::name::gui,
+                                                     service::name::eink,
+                                                     app::manager::ApplicationManager::ServiceName};
         }
 
-        static bool isOnWhitelist(const std::set<std::string> &list, const std::string &serviceName)
+        namespace regularClose
         {
-            return list.find(serviceName) != list.end();
+            static constexpr std::array whitelist = {service::name::evt_manager};
+        }
+
+        template <typename T> static bool isOnWhitelist(const T &list, const std::string &serviceName)
+        {
+            return std::find(std::begin(list), std::end(list), serviceName) != std::end(list);
         }
 
     } // namespace state
@@ -313,7 +318,7 @@ namespace sys
         return RunService(std::move(service), caller, timeout);
     }
 
-    bool SystemManager::RunApplication(std::shared_ptr<Service> app, Service *caller, TickType_t timeout)
+    bool SystemManager::RunApplication(std::shared_ptr<app::Application> app, Service *caller, TickType_t timeout)
     {
         CriticalSection::Enter();
         applicationsList.push_back(app);
@@ -322,45 +327,74 @@ namespace sys
         return RunService(std::move(app), caller, timeout);
     }
 
-    bool SystemManager::DestroyService(std::vector<std::shared_ptr<Service>> &serviceContainer,
-                                       const std::string &name,
-                                       Service *caller,
-                                       TickType_t timeout)
+    bool SystemManager::RequestServiceClose(const std::string &name, Service *caller, TickType_t timeout)
     {
         auto msg  = std::make_shared<SystemMessage>(SystemMessageType::Exit);
         auto ret  = caller->bus.sendUnicast(msg, name, timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
-        if (ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)) {
-
-            cpp_freertos::LockGuard lck(destroyMutex);
-
-            auto serv = std::find_if(serviceContainer.begin(),
-                                     serviceContainer.end(),
-                                     [&name](std::shared_ptr<Service> const &s) { return s->GetName() == name; });
-            if (serv == serviceContainer.end()) {
-                LOG_ERROR("No such service to destroy in services list: %s", name.c_str());
-                return false;
-            }
-
-            serviceContainer.erase(serv);
-
-            return true;
-        }
-        else {
-            LOG_ERROR("Service to close: %s doesn't exist", name.c_str());
+        if (ret.first != ReturnCodes::Success) {
+            LOG_ERROR("Service to close: %s did not respond", name.c_str());
             return false;
         }
+        else if (resp->retCode != ReturnCodes::Success) {
+            LOG_ERROR("Service %s noticed failure at close", name.c_str());
+            return false;
+        }
+        return true;
     }
 
-    bool SystemManager::DestroySystemService(const std::string &name, Service *caller, TickType_t timeout)
+    template <typename T> void SystemManager::DestroyServices(const T &whitelist)
     {
-        return DestroyService(servicesList, name, caller, timeout);
+        cpp_freertos::LockGuard lck(serviceDestroyMutex);
+        for (auto service = servicesList.begin(); service != servicesList.end();) {
+            if (sys::state::isOnWhitelist<T>(whitelist, (*service)->GetName())) {
+                LOG_DEBUG("Delay closing %s", (*service)->GetName().c_str());
+                ++service;
+            }
+            else {
+                if (!RequestServiceClose((*service)->GetName(), this)) {
+                    LOG_ERROR("Service %s did not respond -> to kill", (*service)->GetName().c_str());
+                    kill(*service);
+                }
+                service = servicesList.erase(service);
+            }
+        }
     }
 
-    bool SystemManager::DestroyApplication(const std::string &name, Service *caller, TickType_t timeout)
+    bool SystemManager::DestroySystemService(const std::string &name, Service *caller)
     {
-        return DestroyService(applicationsList, name, caller, timeout);
+        cpp_freertos::LockGuard lck(serviceDestroyMutex);
+        if (RequestServiceClose(name, caller)) {
+            auto service = std::find_if(servicesList.begin(),
+                                        servicesList.end(),
+                                        [&name](std::shared_ptr<Service> const &s) { return s->GetName() == name; });
+            if (service == servicesList.end()) {
+                LOG_ERROR("No such service to destroy in the list: %s", name.c_str());
+                return false;
+            }
+            servicesList.erase(service);
+            return true;
+        }
+        return false;
+    }
+
+    bool SystemManager::DestroyApplication(const std::string &name, Service *caller)
+    {
+        cpp_freertos::LockGuard lck(appDestroyMutex);
+        if (RequestServiceClose(name, caller)) {
+            auto app =
+                std::find_if(applicationsList.begin(),
+                             applicationsList.end(),
+                             [&name](std::shared_ptr<app::Application> const &s) { return s->GetName() == name; });
+            if (app == applicationsList.end()) {
+                LOG_ERROR("No such application to destroy in the list: %s", name.c_str());
+                return false;
+            }
+            applicationsList.erase(app);
+            return true;
+        }
+        return false;
     }
 
     void SystemManager::preCloseRoutine(CloseReason closeReason)
@@ -444,11 +478,6 @@ namespace sys
             LOG_DEBUG("deinit handler: %s", c_str(ret));
         }
         toKill->CloseHandler();
-
-        servicesList.erase(
-            std::find_if(servicesList.begin(), servicesList.end(), [&toKill](std::shared_ptr<Service> const &s) {
-                return s->GetName() == toKill->GetName();
-            }));
     }
 
     ReturnCodes SystemManager::InitHandler()
@@ -643,27 +672,8 @@ namespace sys
         // All delayed messages will be ignored
         readyForCloseRegister.clear();
 
-        for (bool retry{};; retry = false) {
-            for (auto &service : servicesList) {
-                if (service->GetName() == service::name::evt_manager) {
-                    LOG_DEBUG("Delay closing %s", service::name::evt_manager);
-                    continue;
-                }
-                if (service->parent == "") {
-                    const auto ret = DestroySystemService(service->GetName(), this);
-                    if (!ret) {
-                        // no response to exit message,
-                        LOG_FATAL("%s", (service->GetName() + " failed to response to exit message").c_str());
-                        kill(service);
-                    }
-                    retry = true;
-                    break;
-                }
-            }
-            if (!retry) {
-                break;
-            }
-        }
+        DestroyServices(sys::state::regularClose::whitelist);
+
         set(State::Shutdown);
     }
 
@@ -676,31 +686,7 @@ namespace sys
         std::reverse(servicesList.begin(), servicesList.end());
         CriticalSection::Exit();
 
-        for (bool retry{};; retry = false) {
-            for (auto &service : servicesList) {
-                if (sys::state::isOnWhitelist(sys::state::restore::whitelist, service->GetName())) {
-                    continue;
-                }
-
-                if (service->parent.empty()) {
-                    LOG_DEBUG("destroy service: %s", service->GetName().c_str());
-                    const auto ret = DestroySystemService(service->GetName(), this);
-                    if (!ret) {
-                        // no response to exit message,
-                        LOG_FATAL("%s failed to respond to exit message", service->GetName().c_str());
-                        kill(service);
-                    }
-                    else {
-                        LOG_DEBUG("%s destroyed", service->GetName().c_str());
-                    }
-                    retry = true;
-                    break;
-                }
-            }
-            if (!retry) {
-                break;
-            }
-        }
+        DestroyServices(sys::state::restore::whitelist);
 
         LOG_INFO("entered restore state");
     }
@@ -714,28 +700,7 @@ namespace sys
         std::reverse(servicesList.begin(), servicesList.end());
         CriticalSection::Exit();
 
-        for (bool retry{};; retry = false) {
-            for (auto &service : servicesList) {
-                if (sys::state::isOnWhitelist(sys::state::update::whitelist, service->GetName())) {
-                    LOG_DEBUG("Delay closing %s", service->GetName().c_str());
-                    continue;
-                }
-
-                if (service->parent.empty()) {
-                    const auto ret = DestroySystemService(service->GetName(), this);
-                    if (!ret) {
-                        // no response to exit message,
-                        LOG_FATAL("%s failed to response to exit message", service->GetName().c_str());
-                        kill(service);
-                    }
-                    retry = true;
-                    break;
-                }
-            }
-            if (!retry) {
-                break;
-            }
-        }
+        DestroyServices(sys::state::update::whitelist);
     }
 
     void SystemManager::RebootHandler()
@@ -801,8 +766,9 @@ namespace sys
     }
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
-    std::vector<std::shared_ptr<Service>> SystemManager::applicationsList;
-    cpp_freertos::MutexStandard SystemManager::destroyMutex;
+    std::vector<std::shared_ptr<app::Application>> SystemManager::applicationsList;
+    cpp_freertos::MutexStandard SystemManager::serviceDestroyMutex;
+    cpp_freertos::MutexStandard SystemManager::appDestroyMutex;
     std::unique_ptr<PowerManager> SystemManager::powerManager;
     std::unique_ptr<CpuStatistics> SystemManager::cpuStatistics;
     std::unique_ptr<DeviceManager> SystemManager::deviceManager;

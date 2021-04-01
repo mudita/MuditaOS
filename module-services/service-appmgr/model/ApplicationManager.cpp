@@ -430,24 +430,18 @@ namespace app::manager
         return true;
     }
 
-    void ApplicationManager::closeService(const std::string &name)
-    {
-        bool ret = sys::SystemManager::DestroyApplication(name, this);
-        if (ret) {
-            LOG_INFO("Service/Application %s closed", name.c_str());
-        }
-        else {
-            LOG_FATAL("Service/Application %s is still running", name.c_str());
-        }
-    }
-
     void ApplicationManager::closeApplication(ApplicationHandle *application)
     {
         if (application == nullptr) {
             return;
         }
 
-        closeService(application->name());
+        if (sys::SystemManager::DestroyApplication(application->name(), this)) {
+            LOG_INFO("Application %s closed", application->name().c_str());
+        }
+        else {
+            LOG_FATAL("Application %s is still running", application->name().c_str());
+        }
         application->close();
     }
 
