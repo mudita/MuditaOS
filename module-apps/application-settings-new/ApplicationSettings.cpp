@@ -447,6 +447,9 @@ namespace app
         windowsFactory.attach(gui::window::name::about_your_pure, [](Application *app, const std::string &name) {
             return std::make_unique<gui::AboutYourPureWindow>(app);
         });
+        windowsFactory.attach(gui::window::name::factory_reset, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogYesNo>(app, name);
+        });
         windowsFactory.attach(gui::window::name::certification, [](Application *app, const std::string &name) {
             return std::make_unique<gui::CertificationWindow>(app);
         });
