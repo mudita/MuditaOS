@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -26,6 +26,12 @@ namespace app::manager::actions
         [[nodiscard]] Store::GSM::SIM getSim() const noexcept;
         [[nodiscard]] unsigned int getAttempts() const noexcept;
         [[nodiscard]] const std::string &getPasscodeName() const noexcept;
+
+        static constexpr auto numOfAttemptsForEnteringPIN = 3u;
+        static constexpr auto numOfAttemptsForEnteringPUK = 10u;
+
+        static constexpr auto pinName = "PIN";
+        static constexpr auto pukName = "PUK";
     };
 
     /** Action parameters for

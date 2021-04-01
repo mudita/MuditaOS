@@ -154,14 +154,19 @@ namespace gui
         }
         else if (lockType == PinLock::LockType::SimPin) {
             LockBox = std::make_unique<SimLockBox>(this);
+            setTitleBar(true, false);
+            setText("app_desktop_header_sim_setup",
+                    TextType::Title,
+                    true,
+                    {{getToken(Token::Sim), utils::enumToString(lock->getSim())}});
         }
         assert(LockBox != nullptr);
     }
 
     auto PinLockWindow::usesNumericKeys() const noexcept -> bool
     {
-        return lock->isState(PinLock::LockState::PasscodeRequired) ||
-               lock->isState(PinLock::LockState::NewPasscodeRequired) ||
-               lock->isState(PinLock::LockState::NewPasscodeConfirmRequired);
+        return lock && (lock->isState(PinLock::LockState::PasscodeRequired) ||
+                        lock->isState(PinLock::LockState::NewPasscodeRequired) ||
+                        lock->isState(PinLock::LockState::NewPasscodeConfirmRequired));
     }
 } /* namespace gui */

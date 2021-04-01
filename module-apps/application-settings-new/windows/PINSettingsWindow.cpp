@@ -57,7 +57,14 @@ namespace gui
         if (pinIsOn) {
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
                 utils::translateI18("app_settings_network_pin_change_code"),
-                [=](Item & /*item*/) { return true; },
+                [=](Item & /*item*/) {
+                    using namespace app::manager::actions;
+                    auto params = std::make_unique<PasscodeParams>(Store::GSM::get()->selected,
+                                                                   PasscodeParams::numOfAttemptsForEnteringPIN,
+                                                                   PasscodeParams::pinName);
+                    app::manager::Controller::sendAction(application, RequestPinChange, std::move(params));
+                    return true;
+                },
                 nullptr,
                 nullptr,
                 option::SettingRightItem::ArrowWhite));
