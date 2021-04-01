@@ -10,6 +10,7 @@
 #include <Service/Service.hpp>
 #include <Service/Message.hpp>
 #include <service-db/Settings.hpp>
+#include "service-bluetooth/messages/AudioVolume.hpp"
 #include "service-bluetooth/messages/Connect.hpp"
 #include "service-bluetooth/messages/Disconnect.hpp"
 #include "service-bluetooth/messages/Status.hpp"
@@ -26,6 +27,7 @@
 #include <service-desktop/service-desktop/DesktopMessages.hpp>
 #include <service-desktop/endpoints/bluetooth/BluetoothEventMessages.hpp>
 #include <service-desktop/endpoints/bluetooth/BluetoothHelper.hpp>
+#include <service-audio/AudioServiceAPI.hpp>
 #include <BtCommand.hpp>
 #include <BtKeysStorage.hpp>
 #include <Timers/TimerFactory.hpp>
@@ -73,6 +75,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<BluetoothAudioStartMessage>();
     connectHandler<BluetoothMessage>();
     connectHandler<BluetoothPairMessage>();
+    connectHandler<message::bluetooth::AudioVolume>();
     connectHandler<message::bluetooth::Connect>();
     connectHandler<message::bluetooth::ConnectResult>();
     connectHandler<message::bluetooth::Disconnect>();
@@ -309,6 +312,13 @@ auto ServiceBluetooth::handle(sdesktop::developerMode::DeveloperModeRequest *msg
     }
     return sys::MessageNone{};
 }
+
+auto ServiceBluetooth::handle(message::bluetooth::AudioVolume *msg) -> std::shared_ptr<sys::Message>
+{
+    AudioServiceAPI::BluetoothVolumeChanged(this, msg->getVolume());
+    return sys::MessageNone{};
+}
+
 void ServiceBluetooth::startTimeoutTimer()
 {
     if (connectionTimeoutTimer.isValid()) {

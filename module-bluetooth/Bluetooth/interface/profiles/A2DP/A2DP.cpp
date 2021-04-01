@@ -142,7 +142,7 @@ namespace bluetooth
         AVRCP::mediaTracker.local_seid = avdtp_local_seid(local_stream_endpoint);
         avdtp_source_register_delay_reporting_category(AVRCP::mediaTracker.local_seid);
 
-        AVRCP::init();
+        AVRCP::init(const_cast<sys::Service *>(ownerService));
         // Initialize SDP,
         sdp_init();
 
