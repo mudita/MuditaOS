@@ -49,3 +49,26 @@ GSM Module Enables Host to Exit from Power Saving Mode
 * CPU sentinel block frequency decreasing below 132 MHz
 * The wake-up described in the point above takes place
 
+## Phone modes in cellular
+
+Conditions for cellular to switch the phone mode
+* Phone mode changes on event provided by 'phoneModeObserver'
+
+Connected mode
+* no actions are needed to meet the Connected mode criteria, calls and messages are allowed
+
+Do not Disturb
+* incoming calls are rejected 
+* outgoing calls, incoming and outgoing messages are allowed
+
+Offline mode
+* modem is disconnected from the GSM network, both calls and messages are rejected
+
+| | Connected | Do not Disturb | Offline |
+| ----------- | --------- | -------------- | ------- |
+|Incoming calls| Allowed | Rejected | Not allowed |
+|Outgoing calls| Allowed | Allowed | Not allowed |
+|Incoming messages| Allowed | Allowed | Not allowed |
+|Outgoing messages| Allowed | Allowed | Not allowed |
+
+![](phone_modes.svg)
