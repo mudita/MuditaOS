@@ -76,13 +76,19 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
+        bool headsetState = false;
+        uint8_t headsetKeyEvent, headsetKeyCode;
 
-        if (bsp::headset::Handler(notification) == true) {
-            bool state   = bsp::headset::IsInserted();
+        if (bsp::headset::headset_get_data(headsetState, headsetKeyEvent, headsetKeyCode) ==
+            bsp::headset::HeadsetState::Changed) {
+
             auto message = std::make_shared<AudioEventRequest>(audio::EventType::JackState,
-                                                               state ? audio::Event::DeviceState::Connected
-                                                                     : audio::Event::DeviceState::Disconnected);
+                                                               headsetState ? audio::Event::DeviceState::Connected
+                                                                            : audio::Event::DeviceState::Disconnected);
             service->bus.sendUnicast(message, service::name::evt_manager);
+        }
+        else if (auto keyCode = headsetKeyToKeyboardKey(headsetKeyCode); keyCode != bsp::KeyCodes::Undefined) {
+            processKeyEvent(static_cast<bsp::KeyEvents>(headsetKeyEvent), keyCode);
         }
     }
 
@@ -299,4 +305,22 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
         }
     }
     service->bus.sendUnicast(message, service::name::evt_manager);
+}
+
+bsp::KeyCodes WorkerEvent::headsetKeyToKeyboardKey(uint8_t headsetKeyCode)
+{
+    switch (headsetKeyCode) {
+    case static_cast<uint8_t>(bsp::headset::KeyCode::Key1):
+        return bsp::KeyCodes::JoystickEnter;
+
+    case static_cast<uint8_t>(bsp::headset::KeyCode::Key2):
+        return bsp::KeyCodes::Undefined;
+
+    case static_cast<uint8_t>(bsp::headset::KeyCode::Key3):
+        return bsp::KeyCodes::VolUp;
+
+    case static_cast<uint8_t>(bsp::headset::KeyCode::Key4):
+        return bsp::KeyCodes::VolDown;
+    }
+    return bsp::KeyCodes::Undefined;
 }
