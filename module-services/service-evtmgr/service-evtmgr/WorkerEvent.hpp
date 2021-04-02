@@ -56,6 +56,12 @@ class WorkerEvent : public sys::Worker
      */
     void processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code);
 
+    /**
+     * @brief This method is responsible for translating a headset key to keyboard key code.
+     * @param code key code
+     */
+    bsp::KeyCodes headsetKeyToKeyboardKey(uint8_t code);
+
     void updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
     /**
      * @brief list of keys with long press enabled. First item is key code, second is long press time.

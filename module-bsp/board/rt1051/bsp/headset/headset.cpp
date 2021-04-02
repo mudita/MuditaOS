@@ -13,35 +13,74 @@ namespace bsp
 {
     namespace headset
     {
-        using namespace drivers;
+        namespace
+        {
+            using namespace drivers;
 
-        static constexpr uint8_t HEADSET_I2C_ADDR     = 0x3B;
-        static constexpr uint8_t HEADSET_INT_REG_ADDR = 0x01;
-        static constexpr uint8_t HEADSET_INT_DIS_ADDR = 0x03;
-        static constexpr uint8_t HEADSET_DEV_SET_ADDR = 0x04;
-        static constexpr uint8_t HEADSET_DET_RES_ADDR = 0x0B;
+            constexpr uint8_t HEADSET_I2C_ADDR = 0x3B;
 
-        static constexpr uint8_t HEADSET_DET_THRESH1_ADDR = 0x0D;
-        static constexpr uint8_t HEADSET_DET_THRESH2_ADDR = 0x0E;
-        static constexpr uint8_t HEADSET_DET_THRESH3_ADDR = 0x0F;
+            constexpr uint8_t HEADSET_INTERRUPT_REG      = 0x01;
+            constexpr uint8_t HEADSET_KEY_PRESS_INT_REG  = 0x02;
+            constexpr uint8_t HEADSET_INTERRUPT_DIS_REG  = 0x03;
+            constexpr uint8_t HEADSET_DEV_SETTINGS_REG   = 0x04;
+            constexpr uint8_t HEADSET_DEV_SETTING_1_REG  = 0x05;
+            constexpr uint8_t HEADSET_ACCESSORY_STAT_REG = 0x0B;
 
-        static constexpr uint8_t HEADSET_INT_DIS_INT_DIS = 1 << 3;
-        static constexpr uint8_t HEADSET_INT_DIS_INT_ENA = 0 << 3;
-        static constexpr uint8_t HEADSET_INT_DIS_ADC_DIS = 1 << 2;
-        static constexpr uint8_t HEADSET_INT_DIS_ADC_ENA = 0 << 2;
-        static constexpr uint8_t HEADSET_INT_DIS_DC_DIS  = 1 << 1;
-        static constexpr uint8_t HEADSET_INT_DIS_DC_ENA  = 0 << 1;
-        static constexpr uint8_t HEADSET_INT_DIS_INS_DIS = 1 << 0;
-        static constexpr uint8_t HEADSET_INT_DIS_INS_ENA = 0 << 0;
+            constexpr uint8_t HEADSET_DET_THRESH1_ADDR = 0x0D;
+            constexpr uint8_t HEADSET_DET_THRESH2_ADDR = 0x0E;
+            constexpr uint8_t HEADSET_DET_THRESH3_ADDR = 0x0F;
 
-        static constexpr uint8_t HEADSET_DET_THRESH1_VAL = 0x22;
-        static constexpr uint8_t HEADSET_DET_THRESH2_VAL = 0x23;
-        static constexpr uint8_t HEADSET_DET_THRESH3_VAL = 0x6C;
+            constexpr uint8_t HEADSET_INT_DIS_INT_DIS = 1 << 3;
+            constexpr uint8_t HEADSET_INT_DIS_INT_ENA = 0 << 3;
+            constexpr uint8_t HEADSET_INT_DIS_ADC_DIS = 1 << 2;
+            constexpr uint8_t HEADSET_INT_DIS_ADC_ENA = 0 << 2;
+            constexpr uint8_t HEADSET_INT_DIS_DC_DIS  = 1 << 1;
+            constexpr uint8_t HEADSET_INT_DIS_DC_ENA  = 0 << 1;
+            constexpr uint8_t HEADSET_INT_DIS_INS_DIS = 1 << 0;
+            constexpr uint8_t HEADSET_INT_DIS_INS_ENA = 0 << 0;
 
-        static constexpr uint8_t HEADSET_DEV_SET_DET_EN = 1 << 5;
-        static constexpr uint8_t HEADSET_DEV_SET_DEB_1S = 0x06;
+            constexpr uint8_t HEADSET_DET_THRESH1_VAL = 0x22;
+            constexpr uint8_t HEADSET_DET_THRESH2_VAL = 0x23;
+            constexpr uint8_t HEADSET_DET_THRESH3_VAL = 0x6C;
 
-        static constexpr uint16_t HEADSET_POLL_INTERVAL_MS = 500;
+            constexpr uint8_t HEADSET_DEV_SET_DET_TRIG = 1 << 4;
+            constexpr uint8_t HEADSET_DEV_SET_DET_EN   = 1 << 5;
+            constexpr uint8_t HEADSET_DEV_SET_RESET    = 1 << 7;
+            constexpr uint8_t HEADSET_DEV_SET_DEB_1S   = 0x06;
+
+            constexpr uint8_t HEADSET_DEV_SET1_KP_EN = 1 << 2;
+
+            constexpr uint16_t HEADSET_POLL_INTERVAL_MS = 500;
+
+            enum class HeadsetIQRDetectionResult : uint8_t
+            {
+                DETRES_3POLE            = 1 << 0,
+                DETRES_OMTP             = 1 << 1,
+                DETRES_CTIA             = 1 << 2,
+                DETRES_INSERTION_STATUS = 1 << 3
+            };
+
+            enum class HeadsetIQRKeyPressStatus : uint8_t
+            {
+                KEY4_RELEASE = 1 << 7,
+                KEY4_PRESS   = 1 << 6,
+                KEY3_RELEASE = 1 << 5,
+                KEY3_PRESS   = 1 << 4,
+                KEY2_RELEASE = 1 << 3,
+                KEY2_PRESS   = 1 << 2,
+                KEY1_RELEASE = 1 << 1,
+                KEY1_PRESS   = 1 << 0,
+            };
+
+            enum class HeadsetType : uint8_t
+            {
+                Type3Pole,
+                TypeOMTP,
+                TypeCTIA,
+                TypeDontCare
+            };
+
+        } // anonymous namespace
 
         static std::shared_ptr<drivers::DriverI2C> i2c;
         static std::shared_ptr<drivers::DriverGPIO> gpio;
@@ -53,53 +92,127 @@ namespace bsp
         static bool HeadsetInserted    = false;
         static bool MicrophoneInserted = false;
 
-        static bool ReadInsertionStatus()
+        static HeadsetType insertedHeadsetType = HeadsetType::TypeDontCare;
+
+        static void readKeyCodeAndEvent(uint8_t &keyEvent, uint8_t &keyCode)
+        {
+            uint8_t keypress_int = 0;
+
+            i2cAddr.subAddress = HEADSET_KEY_PRESS_INT_REG;
+            i2c->Read(i2cAddr, static_cast<uint8_t *>(&keypress_int), 1);
+
+            switch (static_cast<HeadsetIQRKeyPressStatus>(keypress_int)) {
+            case HeadsetIQRKeyPressStatus::KEY4_RELEASE:
+                keyCode  = static_cast<uint8_t>(KeyCode::Key4);
+                keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
+                break;
+            case HeadsetIQRKeyPressStatus::KEY4_PRESS:
+                keyCode  = static_cast<uint8_t>(KeyCode::Key4);
+                keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
+                break;
+            case HeadsetIQRKeyPressStatus::KEY3_RELEASE:
+                keyCode  = static_cast<uint8_t>(KeyCode::Key3);
+                keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
+                break;
+            case HeadsetIQRKeyPressStatus::KEY3_PRESS:
+                keyCode  = static_cast<uint8_t>(KeyCode::Key3);
+                keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
+                break;
+            case HeadsetIQRKeyPressStatus::KEY2_RELEASE:
+                keyCode  = static_cast<uint8_t>(KeyCode::Key2);
+                keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
+                break;
+            case HeadsetIQRKeyPressStatus::KEY2_PRESS:
+                keyCode  = static_cast<uint8_t>(KeyCode::Key2);
+                keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
+                break;
+            case HeadsetIQRKeyPressStatus::KEY1_RELEASE:
+                keyCode  = static_cast<uint8_t>(KeyCode::Key1);
+                keyEvent = static_cast<uint8_t>(KeyEvent::KeyReleased);
+                break;
+            case HeadsetIQRKeyPressStatus::KEY1_PRESS:
+                keyCode  = static_cast<uint8_t>(KeyCode::Key1);
+                keyEvent = static_cast<uint8_t>(KeyEvent::KeyPressed);
+                break;
+            default:
+                keyCode  = static_cast<uint8_t>(KeyCode::Error);
+                keyEvent = static_cast<uint8_t>(KeyEvent::Error);
+                break;
+            }
+        }
+
+        HeadsetState headset_get_data(bool &headsetState, uint8_t &keyEvent, uint8_t &keyCode)
         {
             uint8_t reg;
-            bool ret = false;
+            uint8_t acc_status              = 0;
+            HeadsetState headsetStateChange = HeadsetState::NoChange;
 
-            i2cAddr.subAddress = HEADSET_INT_REG_ADDR;
-            i2c->Read(i2cAddr, (uint8_t *)&reg, 1);
+            // Clear event flags
+            i2cAddr.subAddress = HEADSET_INTERRUPT_REG;
+            i2c->Read(i2cAddr, static_cast<uint8_t *>(&reg), 1);
 
-            i2cAddr.subAddress = HEADSET_DET_RES_ADDR;
-            i2c->Read(i2cAddr, (uint8_t *)&reg, 1);
+            i2cAddr.subAddress = HEADSET_ACCESSORY_STAT_REG;
+            i2c->Read(i2cAddr, static_cast<uint8_t *>(&acc_status), 1);
 
-            if (((reg & 0x08) == 0) && (HeadsetInserted == true)) {
+            // Check if jack removed event
+            if (((acc_status & static_cast<uint8_t>(HeadsetIQRDetectionResult::DETRES_INSERTION_STATUS)) == 0) &&
+                (HeadsetInserted == true)) {
                 HeadsetInserted = false;
                 MicrophoneInserted = false;
+
                 LOG_INFO("Headset removed");
-                gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
 
-                ret = true;
+                // Turn off key press/release detection
+                reg                = HEADSET_DEV_SET1_KP_EN;
+                i2cAddr.subAddress = HEADSET_DEV_SETTING_1_REG;
+                i2c->Modify(i2cAddr, reg, MicrophoneInserted, 1);
+
+                headsetState       = static_cast<uint8_t>(HeadsetInserted);
+                headsetStateChange = HeadsetState::Changed;
             }
-
-            if (((reg & 0x08) != 0) && (HeadsetInserted == false)) {
+            else if (((acc_status & static_cast<uint8_t>(HeadsetIQRDetectionResult::DETRES_INSERTION_STATUS)) != 0) &&
+                     (HeadsetInserted == false)) {
                 LOG_INFO("Headset inserted");
                 HeadsetInserted = true;
 
-                if ((reg & 0x01) != 0) {
+                acc_status &= ~static_cast<uint8_t>(HeadsetIQRDetectionResult::DETRES_INSERTION_STATUS);
+
+                switch (static_cast<HeadsetIQRDetectionResult>(acc_status)) {
+                case HeadsetIQRDetectionResult::DETRES_3POLE:
                     LOG_INFO("Headset 3-pole detected");
                     MicrophoneInserted = false;
-                }
-                if ((reg & 0x02) != 0) {
+                    insertedHeadsetType = HeadsetType::Type3Pole;
+                    break;
+                case HeadsetIQRDetectionResult::DETRES_OMTP:
                     LOG_INFO("Headset 4-pole OMTP detected");
                     MicrophoneInserted = true;
-                }
-                if ((reg & 0x04) != 0) {
+                    insertedHeadsetType = HeadsetType::TypeOMTP;
+                    break;
+                case HeadsetIQRDetectionResult::DETRES_CTIA:
                     LOG_INFO("Headset 4-pole Standard detected");
                     MicrophoneInserted = true;
+                    insertedHeadsetType = HeadsetType::TypeCTIA;
+                    break;
+                default:
+                    LOG_INFO("uknown Headset type detected");
+                    MicrophoneInserted  = false;
+                    insertedHeadsetType = HeadsetType::TypeDontCare;
                 }
-                ret = true;
-            }
 
-            if (MicrophoneInserted == true) {
-                gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 1);
+                // Turn on/off key press/release detection
+                reg                = HEADSET_DEV_SET1_KP_EN;
+                i2cAddr.subAddress = HEADSET_DEV_SETTING_1_REG;
+                i2c->Modify(i2cAddr, reg, MicrophoneInserted, 1);
+
+                headsetState       = static_cast<uint8_t>(HeadsetInserted);
+                headsetStateChange = HeadsetState::Changed;
             }
+            // Key pressed/released event
             else {
-                gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
+                readKeyCodeAndEvent(keyEvent, keyCode);
             }
 
-            return ret;
+            return headsetStateChange;
         }
 
         static void TimerHandler(TimerHandle_t xTimer)
@@ -123,7 +236,7 @@ namespace bsp
 
         status_t Init(xQueueHandle qHandle)
         {
-            // Microphone jack external GPIO pin configuration
+            // Headset jack external GPIO pin configuration
             gpio = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::MIC_BIAS_DRIVER_GPIO),
                                       DriverGPIOParams{});
 
@@ -132,7 +245,7 @@ namespace bsp
                                               .defLogic = 0,
                                               .pin      = static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN)});
 
-            gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
+            gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 1);
 
             // Jack detection I2C and GPIO configuration
 
@@ -152,21 +265,25 @@ namespace bsp
                 static_cast<I2CInstances>(BoardDefinitions::HEADSET_I2C),
                 DriverI2CParams{.baudrate = static_cast<uint32_t>(BoardDefinitions::HEADSET_I2C_BAUDRATE)});
 
+            // Reset headset controller
+            uint8_t reg        = HEADSET_DEV_SET_RESET;
+            i2cAddr.subAddress = HEADSET_DEV_SETTINGS_REG;
+            i2c->Write(i2cAddr, static_cast<uint8_t *>(&reg), 1);
+
             qHandleIrq = qHandle;
 
             HeadsetInserted = false;
             MicrophoneInserted = false;
 
-            // Turn off DC and ADC conversion interrupt
-            uint8_t reg =
-                HEADSET_INT_DIS_INT_ENA | HEADSET_INT_DIS_ADC_ENA | HEADSET_INT_DIS_DC_ENA | HEADSET_INT_DIS_INS_ENA;
-
-            i2cAddr.subAddress = HEADSET_INT_DIS_ADDR;
+            // Set Insertion de-bounce time to 1s, enable auto-detection and manually trigger detection
+            reg                = HEADSET_DEV_SET_DEB_1S | HEADSET_DEV_SET_DET_EN | HEADSET_DEV_SET_DET_TRIG;
+            i2cAddr.subAddress = HEADSET_DEV_SETTINGS_REG;
             i2c->Write(i2cAddr, static_cast<uint8_t *>(&reg), 1);
 
-            // Set Insertion de-bounce time to 1s, enable auto-detection
-            reg                = HEADSET_DEV_SET_DET_EN | HEADSET_DEV_SET_DEB_1S;
-            i2cAddr.subAddress = HEADSET_DEV_SET_ADDR;
+            // Turn off DC and ADC conversion interrupt
+            reg = HEADSET_INT_DIS_INT_ENA | HEADSET_INT_DIS_ADC_DIS | HEADSET_INT_DIS_DC_DIS | HEADSET_INT_DIS_INS_ENA;
+
+            i2cAddr.subAddress = HEADSET_INTERRUPT_DIS_REG;
             i2c->Write(i2cAddr, static_cast<uint8_t *>(&reg), 1);
 
             // Set detection thresholds
@@ -196,15 +313,6 @@ namespace bsp
             return kStatus_Success;
         }
 
-        bool Handler(uint8_t notification)
-        {
-            if (notification == 0x01) {
-                return ReadInsertionStatus();
-            }
-
-            return false;
-        }
-
         bool IsInserted()
         {
             return HeadsetInserted;
@@ -216,9 +324,13 @@ namespace bsp
             HeadsetInserted = false;
             MicrophoneInserted = false;
 
+            uint8_t reg        = HEADSET_DEV_SET_RESET;
+            i2cAddr.subAddress = HEADSET_DEV_SETTINGS_REG;
+            i2c->Write(i2cAddr, static_cast<uint8_t *>(&reg), 1);
             i2c.reset();
 
             gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::MIC_BIAS_DRIVER_EN), 0);
+            gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::HEADSET_IRQ_PIN));
 
             return kStatus_Success;
         }
