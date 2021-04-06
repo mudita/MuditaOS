@@ -276,6 +276,16 @@ bool WorkerEvent::deinit(void)
 
 void WorkerEvent::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
 {
+    auto eventManager                 = dynamic_cast<EventManager *>(service);
+    const auto currentDumpLogsTimeout = eventManager->getCurrentDumpLogsTimeout();
+    if (bsp::CpuFrequencyHz::Level_2 < newFrequency &&
+        currentDumpLogsTimeout != EventManager::dumpLogsTimeoutAbove24Mhz) {
+        eventManager->changeDumpLogsTimeout(EventManager::dumpLogsTimeoutAbove24Mhz);
+    }
+    else if (newFrequency <= bsp::CpuFrequencyHz::Level_2 &&
+             currentDumpLogsTimeout != EventManager::dumpLogsTimeoutBelowOrEqual24Mhz) {
+        eventManager->changeDumpLogsTimeout(EventManager::dumpLogsTimeoutBelowOrEqual24Mhz);
+    }
     bsp::eink_frontlight::updateClockFrequency(newFrequency);
 }
 

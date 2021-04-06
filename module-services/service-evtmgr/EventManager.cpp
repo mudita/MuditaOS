@@ -47,20 +47,12 @@
 #include <common_data/EventStore.hpp>
 #include <SystemManager/messages/PhoneModeRequest.hpp>
 #include <vibra/Vibra.hpp>
-
-namespace
-{
-    constexpr auto loggerDelayMs   = 1000 * 60 * 5;
-    constexpr auto loggerTimerName = "Logger";
-} // namespace
+#include <LockGuard.hpp>
 
 EventManager::EventManager(const std::string &name)
-    : sys::Service(name, "", stackDepth),
-      settings(std::make_shared<settings::Settings>(this)), loggerTimer{sys::TimerFactory::createPeriodicTimer(
-                                                                this,
-                                                                loggerTimerName,
-                                                                std::chrono::milliseconds{loggerDelayMs},
-                                                                [this](sys::Timer & /*timer*/) { dumpLogsToFile(); })},
+    : sys::Service(name, "", stackDepth), settings(std::make_shared<settings::Settings>(this)),
+      loggerTimer{sys::TimerFactory::createPeriodicTimer(
+          this, loggerTimerName, currentDumpLogsTimeout, [this](sys::Timer & /*timer*/) { dumpLogsToFile(); })},
       screenLightControl(std::make_unique<screen_light_control::ScreenLightControl>(settings, this)),
       Vibra(std::make_unique<vibra_handle::Vibra>(this))
 {
@@ -76,6 +68,8 @@ EventManager::~EventManager()
     if (EventWorker != nullptr) {
         EventWorker->close();
     }
+    LOG_INFO("Dumping logs to file on shutdown");
+    dumpLogsToFile();
 }
 
 // those static functions and variables will be replaced by Settings API
@@ -365,13 +359,24 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
 
 void EventManager::dumpLogsToFile()
 {
+    LockGuard lock(loggerMutex);
     const auto logPath = purefs::dir::getUserDiskPath() / LOG_FILE_NAME;
-    const bool dumpLog = !(std::filesystem::exists(logPath) && std::filesystem::file_size(logPath) > MAX_LOG_FILE_SIZE);
-    if (dumpLog) {
+    const bool shouldDumpLogs =
+        !(std::filesystem::exists(logPath) && std::filesystem::file_size(logPath) > MAX_LOG_FILE_SIZE);
+    if (shouldDumpLogs) {
         const auto &logs = Log::Logger::get().getLogs();
-        std::fstream logFile(logPath, std::fstream::out | std::fstream::app);
-        logFile.write(logs.data(), logs.size());
+        if (!logs.empty()) {
+            std::fstream logFile(logPath, std::fstream::out | std::fstream::app);
+            logFile.write(logs.data(), logs.size());
+        }
     }
+}
+
+void EventManager::changeDumpLogsTimeout(std::chrono::milliseconds timeout)
+{
+    LOG_DEBUG("Dump logs timeout changed to %lu ms", static_cast<long unsigned>(timeout.count()));
+    currentDumpLogsTimeout = timeout;
+    loggerTimer.restart(currentDumpLogsTimeout);
 }
 
 void EventManager::handleMinuteUpdate(time_t timestamp)
