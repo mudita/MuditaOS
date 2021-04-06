@@ -38,6 +38,7 @@ enum class WorkerEventQueues
     queueRTC,
     queueCellular,
     queueMagnetometerIRQ,
+    queueMagnetometerNotify,
     queueTorch,
     queueLightSensor,
     queueChargerDetect
@@ -83,11 +84,12 @@ class WorkerEvent : public sys::Worker
     virtual bool deinit() override;
 
     void init(std::list<sys::WorkerQueueInfo> queuesList, std::shared_ptr<settings::Settings> settings);
-
+    static constexpr auto MagnetometerNotifyQueue = "qMagnetometerNotify";
     /**
      * This method is called from thread when new message arrives in queue.
      * @param queueID Index of the queue in the queues vector.
      */
     bool handleMessage(uint32_t queueID) override final;
-
+    void requestSliderPositionRead();
+    void handleMagnetometerEvent();
 };

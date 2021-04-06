@@ -286,14 +286,19 @@ sys::ReturnCodes EventManager::InitHandler()
         return std::make_shared<sys::ResponseMessage>();
     });
 
-    connect(sevm::ToggleTorchOnOffMessage(), [&](sys::Message *) {
+    connect(sevm::ToggleTorchOnOffMessage(), [&]([[maybe_unused]] sys::Message *msg) {
         toggleTorchOnOff();
-        return std::make_shared<sys::ResponseMessage>();
+        return sys::MessageNone{};
     });
 
-    connect(sevm::ToggleTorchColorMessage(), [&](sys::Message *) {
+    connect(sevm::ToggleTorchColorMessage(), [&]([[maybe_unused]] sys::Message *msg) {
         toggleTorchColor();
-        return std::make_shared<sys::ResponseMessage>();
+        return sys::MessageNone{};
+    });
+
+    connect(sevm::RequestPhoneModeForceUpdate(), [&]([[maybe_unused]] sys::Message *msg) {
+        EventWorker->requestSliderPositionRead();
+        return sys::MessageNone{};
     });
 
     // initialize keyboard worker
@@ -307,6 +312,7 @@ sys::ReturnCodes EventManager::InitHandler()
     list.emplace_back("qRTC"s, sizeof(uint8_t), 20);
     list.emplace_back("qSIM"s, sizeof(uint8_t), 5);
     list.emplace_back("qMagnetometer"s, sizeof(uint8_t), 5);
+    list.emplace_back(WorkerEvent::MagnetometerNotifyQueue, sizeof(uint8_t), 1);
     list.emplace_back("qTorch"s, sizeof(uint8_t), 5);
     list.emplace_back("qLightSensor"s, sizeof(uint8_t), 5);
     list.emplace_back("qChargerDetect"s, sizeof(uint8_t), 5);

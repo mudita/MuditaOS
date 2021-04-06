@@ -39,6 +39,7 @@ namespace bsp
 
         bsp::KeyCodes parse(const Measurements &measurements);
         std::optional<bsp::KeyCodes> WorkerEventHandler();
+        void resetCurrentParsedValue();
 
         BaseType_t IRQHandler();
         void enableIRQ();
