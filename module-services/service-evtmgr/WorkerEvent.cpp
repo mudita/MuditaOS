@@ -163,7 +163,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         if (notification == bsp::cellular::trayPin) {
             Store::GSM::Tray pinstate = bsp::cellular::sim::getTray();
             LOG_DEBUG("SIM state change: %d", static_cast<int>(pinstate));
-            bsp::cellular::sim::hotSwapTrigger();
+            bsp::cellular::sim::hotswap_trigger();
         }
 
         if (notification == bsp::cellular::ringIndicatorPin) {

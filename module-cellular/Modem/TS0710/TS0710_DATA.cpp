@@ -61,7 +61,7 @@ void TS0710_DATA::request(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, 
         frame.data = User_data;
         TS0710_Frame frame_c(frame);
         // UartSend(frame_c.getSerData().data(), frame_c.getSerData().size());
-        pv_cellular->write(static_cast<void *>(frame_c.getSerData().data()), frame_c.getSerData().size());
+        pv_cellular->Write(static_cast<void *>(frame_c.getSerData().data()), frame_c.getSerData().size());
     }
     else { // if data size > max frame size
         int dataLeft                     = User_data.size();
@@ -76,7 +76,7 @@ void TS0710_DATA::request(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, 
             TS0710_Frame frame_c(frame);
             // UartSend(frame_c.getSerData().data(), frame_c.getSerData().size());
             // while(!pv_cellular->GetSendingAllowed());
-            pv_cellular->write(static_cast<void *>(frame_c.getSerData().data()), frame_c.getSerData().size());
+            pv_cellular->Write(static_cast<void *>(frame_c.getSerData().data()), frame_c.getSerData().size());
             // vTaskDelay(1);
             dataLeft -= (dataLeft <= maximumFrameLength ? dataLeft : maximumFrameLength);
         }

@@ -4,7 +4,6 @@
 #ifndef PUREPHONE_LINUX_CELLULAR_HPP
 #define PUREPHONE_LINUX_CELLULAR_HPP
 
-class milliseconds;
 #include "bsp/cellular/bsp_cellular.hpp"
 
 #include <cstring>
@@ -15,6 +14,7 @@ class milliseconds;
 
 namespace bsp
 {
+
     class LinuxCellular : public Cellular
     {
       private:
@@ -24,40 +24,40 @@ namespace bsp
         LinuxCellular(const char *term, uint32_t portSpeed);
         ~LinuxCellular();
 
-        void powerUp() override final;
+        void PowerUp() override final;
 
-        void powerDown() override final;
+        void PowerDown() override final;
 
-        void restart() override final;
+        void Restart() override final;
 
-        uint32_t wait(std::chrono::milliseconds timeoutMs) override final;
+        uint32_t Wait(uint32_t timeout) override final;
 
-        ssize_t read(void *buf, size_t nbytes, std::chrono::milliseconds timeoutMs) override final;
+        ssize_t Read(void *buf, size_t nbytes) override final;
 
-        ssize_t write(void *buf, size_t nbytes) override final;
+        ssize_t Write(void *buf, size_t nbytes) override final;
 
-        void informModemHostAsleep() override final;
+        void InformModemHostAsleep() override final;
 
-        void informModemHostWakeup() override final;
+        void InformModemHostWakeup() override final;
 
-        void enterSleep() override final;
+        void EnterSleep() override final;
 
-        void exitSleep() override final;
+        void ExitSleep() override final;
 
-        void setSpeed(uint32_t portSpeed) override final;
+        void SetSpeed(uint32_t portSpeed);
 
-        void setSendingAllowed(bool state) override final
+        void SetSendingAllowed(bool state) override final
         {
             pv_SendingAllowed = state;
         }
-        bool getSendingAllowed() override final
+        bool GetSendingAllowed() override final
         {
             return pv_SendingAllowed;
         }
 
-        void selectAntenna(bsp::cellular::antenna antenna) override final;
+        void SelectAntenna(bsp::cellular::antenna antenna) override final;
 
-        bsp::cellular::antenna getAntenna() override final;
+        bsp::cellular::antenna GetAntenna() override final;
 
       private:
         static constexpr speed_t baud_bits[] = {0,
@@ -73,6 +73,8 @@ namespace bsp
                                                 B2000000,
                                                 B3000000,
                                                 B4000000};
+
+        static const uint32_t portBaudRate = 115200;
 
         static const uint32_t MAX_EVENTS = 1;
 

@@ -10,14 +10,15 @@
 #include <utility>
 #include <vector>
 
-ATParser::ATParser(bsp::Cellular *cellular) : Channel{new uint8_t[at::defaultReceiveBufferSize]}, cellular(cellular)
+ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular)
 {
-    responseBuffer = xMessageBufferCreate(at::defaultMessageBufferSize);
+    isInitialized = true;
 }
 
 /// plz see 12.7 summary of urc in documentation
 std::vector<ATParser::Urc> ATParser::ParseURC()
 {
+
     std::vector<ATParser::Urc> resp;
     size_t maxPos = 0, pos = 0;
 
@@ -29,7 +30,7 @@ std::vector<ATParser::Urc> ATParser::ParseURC()
     };
 
     for (const auto &el : vals) {
-        pos = urcBuffer.find(el.first);
+        pos = responseBuffer.find(el.first);
         if (pos != std::string::npos) {
             resp.push_back(el.second);
             maxPos = std::max(pos + el.first.length(), maxPos);
@@ -37,50 +38,50 @@ std::vector<ATParser::Urc> ATParser::ParseURC()
         }
     }
 
-    if (urcBuffer.find("+QIND: \"FOTA\"") != std::string::npos) {
-        LOG_DEBUG("%s", urcBuffer.c_str());
+    if (responseBuffer.find("+QIND: \"FOTA\"") != std::string::npos) {
+        LOG_DEBUG("%s", responseBuffer.c_str());
         resp.push_back(ATParser::Urc::Fota);
         return resp;
     }
 
     // manage string buffer
     if (maxPos == 0) {}
-    else if (urcBuffer.size() >= maxPos) {
-        urcBuffer.erase();
+    else if (responseBuffer.size() >= maxPos) {
+        responseBuffer.erase();
     }
     else {
-        urcBuffer = urcBuffer.substr(maxPos);
+        responseBuffer = responseBuffer.substr(maxPos);
     }
 
     return resp;
 }
 
-at::Result ATParser::ProcessNewData(sys::Service *service, bsp::cellular::CellularResult *cellularResult)
+int ATParser::ProcessNewData(sys::Service *service)
 {
-    at::Result result;
+    char rawBuffer[256] = {0};
+
+    LOG_DEBUG("Receiving data from ProcessNewData");
+    auto length = cellular->Read(rawBuffer, sizeof(rawBuffer));
 
     {
         cpp_freertos::LockGuard lock(mutex);
-        urcBuffer.append(cellularResult->getDataAsString());
+        responseBuffer.append(reinterpret_cast<char *>(rawBuffer), length);
+        LOG_DEBUG("Appending %d bytes to responseBuffer[%u]: %s",
+                  static_cast<int>(length),
+                  static_cast<unsigned int>(responseBuffer.size()),
+                  utils::removeNewLines(responseBuffer).c_str());
     }
 
     auto ret = ParseURC();
-
-    if (awaitingResponseFlag.state()) {
-        if (!xMessageBufferSend(responseBuffer,
-                                (void *)cellularResult->getSerialized().get(),
-                                cellularResult->getSerializedSize(),
-                                pdMS_TO_TICKS(at::defaultBufferTimeoutMs.count()))) {
-            LOG_DEBUG("[AT] Message buffer full!");
-            result.code = at::Result::Code::FULL_MSG_BUFFER;
-        }
+    if (blockedTaskHandle) {
+        xTaskNotifyGive(blockedTaskHandle);
     }
-    else if (!ret.empty()) {
+    else if (ret.size()) {
         if (ret.size() == 1 && ret[0] == ATParser::Urc::Fota) {
-            std::string fotaData(urcBuffer);
+            std::string fotaData(responseBuffer);
             LOG_DEBUG("parsing FOTA:\"%s\"", fotaData.c_str());
             FotaService::API::sendRawProgress(service, fotaData);
-            urcBuffer.erase();
+            responseBuffer.erase();
         }
         else {
             urcs.insert(std::end(urcs), std::begin(ret), std::end(ret));
@@ -92,36 +93,33 @@ at::Result ATParser::ProcessNewData(sys::Service *service, bsp::cellular::Cellul
             cpp_freertos::LockGuard lock(mutex);
             auto msg = std::make_shared<CellularPowerUpProcedureCompleteNotification>();
             service->bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
-            urcBuffer.erase();
+            LOG_DEBUG("[!!!] Fucking away data");
+            responseBuffer.erase();
             urcs.clear();
         }
     }
-    else {
-        result.code = at::Result::Code::DATA_NOT_USED;
-    }
-
-    return result;
+    return 1;
 }
 
 void ATParser::cmd_init()
 {
     cpp_freertos::LockGuard lock(mutex);
-    urcBuffer.erase();
+    responseBuffer.erase();
 }
 
 void ATParser::cmd_send(std::string cmd)
 {
-    cellular->write(const_cast<char *>(cmd.c_str()), cmd.size());
+    cellular->Write(const_cast<char *>(cmd.c_str()), cmd.size());
 }
 
-size_t ATParser::cmd_receive(std::uint8_t *buffer, std::chrono::milliseconds timeout = std::chrono::milliseconds{0})
+std::string ATParser::cmd_receive()
 {
-    return xMessageBufferReceive(responseBuffer, buffer, 256, pdMS_TO_TICKS(timeout.count()));
+    cpp_freertos::LockGuard lock(mutex);
+    return responseBuffer;
 }
 
 void ATParser::cmd_post()
 {
     cpp_freertos::LockGuard lock(mutex);
-    urcBuffer.erase();
-    xMessageBufferReset(responseBuffer);
+    responseBuffer.erase(); // TODO:M.P is it okay to flush buffer here ?
 }
