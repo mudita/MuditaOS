@@ -178,16 +178,24 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         }
     }
 
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueMagnetometerNotify)) {
+        uint8_t notification;
+        if (!queue->Dequeue(&notification, 0)) {
+            return false;
+        }
+
+        bsp::magnetometer::resetCurrentParsedValue();
+        LOG_WARN("Received notify, current value reset!");
+        handleMagnetometerEvent();
+    }
+
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueMagnetometerIRQ)) {
         uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
 
-        if (std::optional<bsp::KeyCodes> key = bsp::magnetometer::WorkerEventHandler()) {
-            LOG_DEBUG("magneto IRQ handler: %s", c_str(*key));
-            processKeyEvent(bsp::KeyEvents::Pressed, *key);
-        }
+        handleMagnetometerEvent();
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueLightSensor)) {
@@ -305,6 +313,20 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
         }
     }
     service->bus.sendUnicast(message, service::name::evt_manager);
+}
+void WorkerEvent::requestSliderPositionRead()
+{
+    uint8_t request = 1;
+    if (auto queue = getQueueByName(WorkerEvent::MagnetometerNotifyQueue); !queue->Overwrite(&request)) {
+        LOG_ERROR("Unable to overwrite the request.");
+    }
+}
+void WorkerEvent::handleMagnetometerEvent()
+{
+    if (const auto &key = bsp::magnetometer::WorkerEventHandler(); key.has_value()) {
+        LOG_DEBUG("magneto IRQ handler: %s", c_str(*key));
+        processKeyEvent(bsp::KeyEvents::Pressed, *key);
+    }
 }
 
 bsp::KeyCodes WorkerEvent::headsetKeyToKeyboardKey(uint8_t headsetKeyCode)
