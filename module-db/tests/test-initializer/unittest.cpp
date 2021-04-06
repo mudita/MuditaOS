@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -95,7 +95,7 @@ TEST_CASE("Create and destroy simple database")
 class ScopedDir
 {
   public:
-    ScopedDir(std::string p) : path(p)
+    explicit ScopedDir(const std::string &p) : path(p)
     {
         if (!(std::filesystem::exists(path.c_str()))) {
             REQUIRE(std::filesystem::create_directory(path.c_str()));
@@ -109,7 +109,7 @@ class ScopedDir
         }
     }
 
-    auto operator()(std::string file = "") -> std::filesystem::path
+    auto operator()(const std::string &file = "") -> std::filesystem::path
     {
         return path / file;
     }
@@ -194,7 +194,7 @@ TEST_CASE("Database initialization scripts")
     SECTION("read empty script files")
     {
         ScopedDir dir("scripts");
-        std::string test_file("read_empyty_1.sql");
+        std::string test_file("read_empty_1.sql");
 
         auto file = std::fopen(dir(test_file).c_str(), "w");
         std::fclose(file);
@@ -203,13 +203,13 @@ TEST_CASE("Database initialization scripts")
         DatabaseInitializer initializer(&db);
         auto commands = initializer.readCommands(dir(test_file));
 
-        REQUIRE(commands.size() == 0);
+        REQUIRE(commands.empty());
     }
 
     SECTION("read script file with comment")
     {
         ScopedDir dir("read_script_file_with_comment");
-        std::string test_file("test_01.sql");
+        std::string test_file("test_001.sql");
 
         auto file = std::fopen(dir(test_file).c_str(), "w");
         std::fwrite(script_comment.data(), sizeof(char), script_comment.size(), file);
@@ -225,7 +225,7 @@ TEST_CASE("Database initialization scripts")
     SECTION("execute valid script")
     {
         ScopedDir dir("execute_valid_script");
-        std::string test_file("test_01.sql");
+        std::string test_file("test_001.sql");
 
         auto file = std::fopen(dir(test_file).c_str(), "w");
         std::fwrite(script_create.data(), sizeof(char), script_create.size(), file);
@@ -241,7 +241,7 @@ TEST_CASE("Database initialization scripts")
     SECTION("execute invalid script")
     {
         ScopedDir dir("execute_invalid_script");
-        std::string test_file("test_1.sql");
+        std::string test_file("test_001.sql");
 
         auto file = std::fopen(dir(test_file).c_str(), "w");
         std::fwrite(script_invalid.data(), sizeof(char), script_invalid.size(), file);
