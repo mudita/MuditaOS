@@ -64,4 +64,8 @@ namespace sys::phone_modes
         auto message = std::make_shared<PhoneModeChanged>(phoneMode, tetheringMode);
         owner->bus.sendMulticast(std::move(message), BusChannel::PhoneModeChanges);
     }
+    bool Subject::isTetheringEnabled() const noexcept
+    {
+        return tetheringMode == Tethering::On;
+    }
 } // namespace sys::phone_modes

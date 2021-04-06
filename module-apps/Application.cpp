@@ -38,6 +38,7 @@
 #include <module-utils/time/DateAndTimeSettings.hpp>
 
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
+#include <TetheringPhoneModePopup.hpp>
 #include "popups/data/PopupData.hpp"
 
 namespace gui
@@ -717,6 +718,13 @@ namespace app
                                       [](Application *app, const std::string &name) {
                                           return std::make_unique<gui::TetheringConfirmationPopup>(
                                               app, window::tethering_confirmation_window);
+                                      });
+                break;
+            case ID::TetheringPhoneModeChangeProhibited:
+                windowsFactory.attach(window::tethering_phonemode_change_window,
+                                      [](Application *app, const std::string &name) {
+                                          return std::make_unique<gui::TetheringPhoneModePopup>(
+                                              app, window::tethering_phonemode_change_window);
                                       });
                 break;
             case ID::PhoneModes:

@@ -16,6 +16,8 @@ namespace gui::popup
             return gui::popup::window::brightness_window;
         case ID::Tethering:
             return gui::popup::window::tethering_confirmation_window;
+        case ID::TetheringPhoneModeChangeProhibited:
+            return gui::popup::window::tethering_phonemode_change_window;
         }
         return {};
     }
