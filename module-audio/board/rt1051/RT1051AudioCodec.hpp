@@ -18,6 +18,9 @@
 
 #include <mutex.hpp>
 
+#include <initializer_list>
+#include <vector>
+
 namespace audio
 {
 
@@ -41,11 +44,16 @@ namespace audio
         AudioDevice::RetCode OutputPathCtrl(OutputPath outputPath) override final;
         AudioDevice::RetCode InputPathCtrl(InputPath inputPath) override final;
         bool IsFormatSupported(const Format &format) override final;
+        auto getSupportedFormats() -> const std::vector<AudioFormat> & override final;
 
         cpp_freertos::MutexStandard mutex;
 
       private:
-        constexpr static TickType_t codecSettleTime = 20 * portTICK_PERIOD_MS;
+        constexpr static TickType_t codecSettleTime                               = 20 * portTICK_PERIOD_MS;
+        constexpr static std::initializer_list<unsigned int> supportedSampleRates = {
+            8000, 16000, 32000, 44100, 48000, 96000};
+        constexpr static std::initializer_list<unsigned int> supportedBitWidths    = {16};
+        constexpr static std::initializer_list<unsigned int> supportedChannelModes = {1, 2};
 
         enum class State
         {
@@ -65,6 +73,7 @@ namespace audio
         SAIFormat saiOutFormat;
         CodecParamsMAX98090 codecParams;
         CodecMAX98090 codec;
+        std::vector<audio::AudioFormat> formats;
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t rxHandle);

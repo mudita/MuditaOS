@@ -4,6 +4,9 @@
 #pragma once
 
 #include "Stream.hpp"
+#include "AudioFormat.hpp"
+
+#include <vector>
 
 #include <cstdint>
 
@@ -28,6 +31,9 @@ namespace audio
 
         [[nodiscard]] const Capabilities &getCapabilities() const noexcept;
 
+        auto isFormatSupported(const AudioFormat &format) -> bool;
+        virtual auto getSupportedFormats() -> const std::vector<AudioFormat> & = 0;
+
       protected:
         Capabilities _caps;
         Stream *_stream = nullptr;
@@ -50,6 +56,7 @@ namespace audio
         Source() = default;
         explicit Source(const Capabilities &caps);
 
+        virtual auto getSourceFormat() -> AudioFormat;
         virtual void onDataReceive() = 0;
         virtual void enableInput()   = 0;
         virtual void disableInput()  = 0;
@@ -79,6 +86,16 @@ namespace audio
         inline void connectInputStream(Stream &stream)
         {
             Source::connectStream(stream);
+        }
+
+        inline auto isFormatSupportedBySink(const AudioFormat &format) -> bool
+        {
+            return Sink::isFormatSupported(format);
+        }
+
+        inline auto isFormatSupportedBySource(const AudioFormat &format) -> bool
+        {
+            return Source::isFormatSupported(format);
         }
     };
 

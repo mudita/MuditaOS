@@ -3,18 +3,21 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <string>
-#include <memory>
-#include <optional>
-#include <cstring>
+#include "Audio/AudioCommon.hpp"
+#include "Audio/Endpoint.hpp"
+#include "Audio/Stream.hpp"
+#include "DecoderWorker.hpp"
 
 #include <log/log.hpp>
 
-#include "Audio/Stream.hpp"
-#include "Audio/Endpoint.hpp"
-#include "Audio/AudioCommon.hpp"
-#include "DecoderWorker.hpp"
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+
+#include <cstring>
+#include <cstdint>
+
 namespace audio
 {
     namespace channel
@@ -104,6 +107,9 @@ namespace audio
         void enableInput() override;
         void disableInput() override;
 
+        auto getSourceFormat() -> AudioFormat override;
+        auto getSupportedFormats() -> const std::vector<AudioFormat> & override;
+
         void startDecodingWorker(DecoderWorker::EndOfFileCallback endOfFileCallback);
         void stopDecodingWorker();
 
@@ -111,6 +117,7 @@ namespace audio
         static std::unique_ptr<Decoder> Create(const char *file);
 
       protected:
+        virtual auto getBitWidth() -> unsigned int = 0;
         virtual void fetchTagsSpecific(){};
 
         void convertmono2stereo(int16_t *pcm, uint32_t samplecount);
@@ -133,6 +140,7 @@ namespace audio
         // decoding worker
         std::unique_ptr<DecoderWorker> audioWorker;
         DecoderWorker::EndOfFileCallback _endOfFileCallback;
+        std::vector<AudioFormat> formats;
     };
 
 } // namespace audio

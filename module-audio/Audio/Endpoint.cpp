@@ -3,6 +3,9 @@
 
 #include "Endpoint.hpp"
 
+#include <algorithm>
+#include <vector>
+
 #include <cassert> // assert
 
 using namespace audio;
@@ -30,6 +33,12 @@ void Endpoint::disconnectStream()
 bool Endpoint::isConnected() const noexcept
 {
     return _stream != nullptr;
+}
+
+auto Endpoint::isFormatSupported(const AudioFormat &format) -> bool
+{
+    const auto &formats = getSupportedFormats();
+    return std::find(std::begin(formats), std::end(formats), format) != std::end(formats);
 }
 
 Sink::Sink(const Capabilities &caps) : Endpoint(caps)
@@ -108,4 +117,9 @@ Sink *StreamConnection::getSink() const noexcept
 Stream *StreamConnection::getStream() const noexcept
 {
     return _stream;
+}
+
+auto Source::getSourceFormat() -> AudioFormat
+{
+    return audio::nullFormat;
 }
