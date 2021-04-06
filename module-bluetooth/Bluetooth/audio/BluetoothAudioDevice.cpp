@@ -4,10 +4,13 @@
 #include "BluetoothAudioDevice.hpp"
 
 #include <Audio/AudioCommon.hpp>
+#include <interface/profiles/A2DP/AVDTP.hpp>
+
 #include <Audio/Stream.hpp>
 
 #include <cassert>
 
+using audio::AudioFormat;
 using namespace bluetooth;
 
 BluetoothAudioDevice::BluetoothAudioDevice(MediaContext *mediaContext)
@@ -23,7 +26,11 @@ BluetoothAudioDevice::~BluetoothAudioDevice()
 
 void BluetoothAudioDevice::setMediaContext(MediaContext *mediaContext)
 {
-    ctx = mediaContext;
+    constexpr static auto supportedBitWidth = 16U;
+    ctx                                     = mediaContext;
+    formats = std::vector<AudioFormat>{AudioFormat{static_cast<unsigned>(AVDTP::sbcConfig.samplingFrequency),
+                                                   supportedBitWidth,
+                                                   static_cast<unsigned>(AVDTP::sbcConfig.numChannels)}};
 }
 
 auto BluetoothAudioDevice::Start(const Format &format) -> audio::AudioDevice::RetCode
@@ -123,4 +130,9 @@ auto BluetoothAudioDevice::fillSbcAudioBuffer(MediaContext *context) -> int
     }
 
     return totalNumBytesRead;
+}
+
+auto BluetoothAudioDevice::getSupportedFormats() -> const std::vector<AudioFormat> &
+{
+    return formats;
 }

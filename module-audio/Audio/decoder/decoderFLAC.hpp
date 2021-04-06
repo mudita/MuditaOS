@@ -22,6 +22,8 @@ namespace audio
         void setPosition(float pos) override;
 
       private:
+        auto getBitWidth() -> unsigned int override;
+
         drflac *flac = nullptr;
 
         uint32_t totalSamplesCount = 0;

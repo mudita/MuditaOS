@@ -18,7 +18,8 @@ namespace audio
 
     RT1051AudioCodec::RT1051AudioCodec()
         : SAIAudioDevice(BOARD_AUDIOCODEC_SAIx, &rxHandle, &txHandle), saiInFormat{}, saiOutFormat{},
-          codecParams{}, codec{}
+          codecParams{}, codec{},
+          formats(audio::AudioFormat::makeMatrix(supportedSampleRates, supportedBitWidths, supportedChannelModes))
     {
         isInitialized = true;
     }
@@ -264,6 +265,11 @@ namespace audio
             SAI_TransferAbortReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle);
         }
         memset(&rxHandle, 0, sizeof(rxHandle));
+    }
+
+    auto RT1051AudioCodec::getSupportedFormats() -> const std::vector<AudioFormat> &
+    {
+        return formats;
     }
 
     void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
