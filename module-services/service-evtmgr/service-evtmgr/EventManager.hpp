@@ -38,7 +38,13 @@ class EventManager : public sys::Service
     void toggleTorchColor();
 
     std::shared_ptr<settings::Settings> settings;
+
     sys::TimerHandle loggerTimer;
+    std::chrono::milliseconds currentDumpLogsTimeout = dumpLogsTimeoutAbove24Mhz;
+    cpp_freertos::MutexStandard loggerMutex;
+
+    static constexpr auto loggerTimerName = "LoggerTimer";
+
     sys::TimerHandle keypadLightTimer;
     bsp::keypad_backlight::State keypadLightState{bsp::keypad_backlight::State::off};
 
@@ -78,12 +84,20 @@ class EventManager : public sys::Service
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
     void dumpLogsToFile();
+    void changeDumpLogsTimeout(std::chrono::milliseconds timeout);
+    auto getCurrentDumpLogsTimeout() -> std::chrono::milliseconds
+    {
+        return currentDumpLogsTimeout;
+    }
 
     /**
      * @brief Sends request to application manager to switch from current application to specific window in application
      * with specified name .
      */
     static bool messageSetApplication(sys::Service *sender, const std::string &applicationName);
+
+    static constexpr auto dumpLogsTimeoutAbove24Mhz        = std::chrono::seconds{10};
+    static constexpr auto dumpLogsTimeoutBelowOrEqual24Mhz = std::chrono::minutes{5};
 };
 
 namespace sys
