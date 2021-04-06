@@ -537,7 +537,8 @@ namespace app
         windowsFactory.attach(gui::window::name::connection_frequency, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering});
+        attachPopups(
+            {gui::popup::ID::Volume, gui::popup::ID::TetheringPhoneModeChangeProhibited, gui::popup::ID::Tethering});
     }
 
     void ApplicationSettingsNew::destroyUserInterface()

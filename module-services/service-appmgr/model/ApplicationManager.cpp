@@ -11,6 +11,7 @@
 #include <SystemManager/SystemManager.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <SystemManager/messages/TetheringQuestionRequest.hpp>
+#include <SystemManager/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
 #include <application-call/ApplicationCall.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
@@ -367,6 +368,7 @@ namespace app::manager
         connect(typeid(CellularCallRejectedByOfflineNotification), convertibleToActionHandler);
         connect(typeid(sys::TetheringQuestionRequest), convertibleToActionHandler);
         connect(typeid(sys::TetheringQuestionAbort), convertibleToActionHandler);
+        connect(typeid(sys::TetheringPhoneModeChangeProhibitedMessage), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

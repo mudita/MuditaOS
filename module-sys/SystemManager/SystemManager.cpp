@@ -29,6 +29,7 @@
 #include "messages/PhoneModeRequest.hpp"
 #include "messages/TetheringStateRequest.hpp"
 #include "messages/TetheringQuestionRequest.hpp"
+#include "messages/TetheringPhoneModeChangeProhibitedMessage.hpp"
 #include <time/ScopedTime.hpp>
 #include "Timers/TimerFactory.hpp"
 #include <service-appmgr/StartupType.hpp>
@@ -733,6 +734,13 @@ namespace sys
     MessagePointer SystemManager::handlePhoneModeRequest(PhoneModeRequest *request)
     {
         LOG_INFO("Phone mode change requested.");
+        if (phoneModeSubject->isTetheringEnabled()) {
+            LOG_WARN("Changing phone mode when tethering is enabled!");
+            // display popup
+            bus.sendUnicast(std::make_shared<TetheringPhoneModeChangeProhibitedMessage>(),
+                            app::manager::ApplicationManager::ServiceName);
+            return MessageNone{};
+        }
         phoneModeSubject->setPhoneMode(request->getPhoneMode());
         return MessageNone{};
     }

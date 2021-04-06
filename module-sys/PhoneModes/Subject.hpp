@@ -39,6 +39,8 @@ namespace sys::phone_modes
          */
         bool setTetheringMode(Tethering mode);
 
+        bool isTetheringEnabled() const noexcept;
+
       private:
         void notifyChange();
         bool changePhoneMode(PhoneMode mode) noexcept;
