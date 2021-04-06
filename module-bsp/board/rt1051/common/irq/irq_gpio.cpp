@@ -122,7 +122,7 @@ namespace bsp
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_SIM_TRAY_INSERTED_PIN)) {
-                xHigherPriorityTaskWoken |= bsp::cellular::sim::trayIRQHandler();
+                xHigherPriorityTaskWoken |= bsp::cellular::sim::trayIRQ_handler();
             }
 
             if (irq_mask & (1 << static_cast<uint32_t>(BoardDefinitions::LIGHT_SENSOR_IRQ))) {
@@ -154,7 +154,7 @@ namespace bsp
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_RI_PIN)) {
-                bsp::cellular::ringIndicator::riIRQHandler();
+                bsp::cellular::ringIndicator::riIRQ_handler();
             }
 
             // Clear all IRQs

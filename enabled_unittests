@@ -443,11 +443,6 @@ TESTS_LIST["catch2-unittest_ATURCStream"]="
     URC AT Stream Parser;
 "
 #---------
-#---------
-TESTS_LIST["catch2-unittest_CellularResult"]="
-    CellularResult
-"
-#---------
 
 
 
