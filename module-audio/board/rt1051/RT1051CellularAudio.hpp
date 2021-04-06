@@ -17,6 +17,8 @@
 
 #include <mutex.hpp>
 
+#include <vector>
+
 namespace audio
 {
 
@@ -40,6 +42,7 @@ namespace audio
         AudioDevice::RetCode OutputPathCtrl(OutputPath outputPath) override final;
         AudioDevice::RetCode InputPathCtrl(InputPath inputPath) override final;
         bool IsFormatSupported(const Format &format) override final;
+        auto getSupportedFormats() -> const std::vector<AudioFormat> & override final;
 
         cpp_freertos::MutexStandard mutex;
 
@@ -62,6 +65,7 @@ namespace audio
         SAIFormat saiOutFormat;
         uint32_t mclkSourceClockHz = 0;
         sai_config_t config;
+        std::vector<AudioFormat> formats;
 
         // M.P: It is important to destroy these drivers in specific order
         std::shared_ptr<drivers::DriverPLL> pll;

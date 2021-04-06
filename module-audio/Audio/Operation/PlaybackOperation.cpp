@@ -36,7 +36,9 @@ namespace audio
         if (dec == nullptr) {
             throw AudioInitException("Error during initializing decoder", RetCode::FileDoesntExist);
         }
-        tags = dec->fetchTags();
+        tags        = dec->fetchTags();
+        auto format = dec->getSourceFormat();
+        LOG_DEBUG("Source format: %s", format.toString().c_str());
 
         auto retCode = SwitchToPriorityProfile();
         if (retCode != RetCode::Success) {
@@ -164,6 +166,12 @@ namespace audio
         audioDevice = CreateDevice(newProfile->GetAudioDeviceType());
         if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
+            return RetCode::Failed;
+        }
+
+        // check if audio device supports Decoder's profile
+        if (auto format = dec->getSourceFormat(); !audioDevice->isFormatSupportedBySink(format)) {
+            LOG_ERROR("Format unsupported by the audio device: %s", format.toString().c_str());
             return RetCode::Failed;
         }
 

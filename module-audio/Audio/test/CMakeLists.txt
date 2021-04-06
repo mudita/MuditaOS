@@ -19,4 +19,15 @@ add_gtest_executable(
         module-audio
 )
 
+add_gtest_executable(
+    NAME
+        audio-misc
+    SRCS
+        unittest.cpp
+        unittest_format.cpp
+        TestEndpoint.cpp
+    LIBS
+        module-audio
+)
+
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" DESTINATION "${CMAKE_BINARY_DIR}")

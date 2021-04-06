@@ -277,4 +277,10 @@ namespace audio
         return samplesToRead;
     }
 
+    auto decoderMP3::getBitWidth() -> unsigned int
+    {
+        static constexpr auto mp3bitWidth = 16U;
+        return mp3bitWidth;
+    }
+
 } // namespace audio

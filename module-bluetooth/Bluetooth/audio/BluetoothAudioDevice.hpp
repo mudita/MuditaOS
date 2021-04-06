@@ -26,6 +26,7 @@ namespace bluetooth
         auto OutputPathCtrl(OutputPath outputPath) -> audio::AudioDevice::RetCode override;
         auto InputPathCtrl(InputPath inputPath) -> audio::AudioDevice::RetCode override;
         auto IsFormatSupported(const Format &format) -> bool override;
+        auto getSupportedFormats() -> const std::vector<audio::AudioFormat> & override;
 
         // Endpoint control methods
         void onDataSend() override;
@@ -40,6 +41,7 @@ namespace bluetooth
 
         MediaContext *ctx  = nullptr;
         bool outputEnabled = false;
+        std::vector<audio::AudioFormat> formats;
 
         static constexpr Capabilities btCapabilities = {.usesDMA = false, .minBlockSize = 512U, .maxBlockSize = 512U};
     };

@@ -249,6 +249,11 @@ namespace audio
         memset(&rxHandle, 0, sizeof(rxHandle));
     }
 
+    auto RT1051CellularAudio::getSupportedFormats() -> const std::vector<AudioFormat> &
+    {
+        return formats;
+    }
+
     void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)
     {
         auto self = static_cast<RT1051CellularAudio *>(userData);

@@ -10,6 +10,7 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Audio.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioCommon.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioDeviceFactory.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioFormat.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioMux.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/Decoder.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp"
