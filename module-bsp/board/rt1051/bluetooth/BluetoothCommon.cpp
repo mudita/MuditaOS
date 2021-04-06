@@ -37,8 +37,7 @@ BluetoothCommon::BluetoothCommon()
     GPIO_PinInit(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, &gpio_init_structure);
 }
 
-BluetoothCommon::~BluetoothCommon()
-{}
+BluetoothCommon::~BluetoothCommon() = default;
 
 void BluetoothCommon::open()
 {
