@@ -15,6 +15,7 @@
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
+#include <service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
 #include <service-desktop/service-desktop/Constants.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
@@ -783,6 +784,11 @@ namespace sys
                 !tetheringChanged) {
                 bus.sendUnicast(std::make_shared<TetheringQuestionAbort>(),
                                 app::manager::ApplicationManager::ServiceName);
+            }
+            else {
+                // Turned on, disabling...
+                LOG_INFO("Disabling tethering");
+                bus.sendUnicast(std::make_shared<sevm::RequestPhoneModeForceUpdate>(), service::name::evt_manager);
             }
         }
         return MessageNone{};
