@@ -8,6 +8,7 @@
 #include <log/log.hpp>
 #include <string>
 #include <ticks.hpp>
+#include <vector>
 #include <inttypes.h> // for PRIu32
 #include <Utils.hpp>
 #include "ATStream.hpp"
@@ -26,22 +27,22 @@ const std::string Channel::CMS_ERROR  = "+CMS ERROR:";
 // const std::string Channel::RING = "RING";
 // const std::string Channel::NO_DIALTONE = "NO DIALTONE";
 
-void Channel::cmdLog(std::string cmd, const Result &result, std::chrono::milliseconds timeout)
+void Channel::cmd_log(std::string cmd, const Result &result, uint32_t timeout)
 {
     cmd.erase(std::remove(cmd.begin(), cmd.end(), '\r'), cmd.end());
     cmd.erase(std::remove(cmd.begin(), cmd.end(), '\n'), cmd.end());
     switch (result.code) {
     case Result::Code::TIMEOUT: {
-        LOG_ERROR(
-            "[AT]: >%s<, timeout %llu - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf",
-            cmd.c_str(),
-            static_cast<long long unsigned int>(timeout.count()));
+        LOG_INFO("[AT]: >%s<, timeout %" PRIu32
+                 " - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf",
+                 cmd.c_str(),
+                 timeout);
     } break;
     case Result::Code::ERROR: {
-        LOG_ERROR("[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
+        LOG_INFO("[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
     } break;
     default:
-        LOG_DEBUG("[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
+        LOG_INFO("[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
         break;
     }
 #if DEBUG_MODEM_OUTPUT_RESPONSE
@@ -63,31 +64,30 @@ std::string Channel::formatCommand(const std::string &cmd) const
 Result Channel::cmd(const std::string &cmd, std::chrono::milliseconds timeout, size_t rxCount)
 {
     Result result;
-    ATStream atStream(rxCount);
-
-    awaitingResponseFlag.set();
+    blockedTaskHandle = xTaskGetCurrentTaskHandle();
 
     cmd_init();
     std::string cmdFixed = formatCommand(cmd);
+
     cmd_send(cmdFixed);
 
-    auto startTime = std::chrono::steady_clock::now();
-    auto endTime   = startTime + timeout;
+    uint32_t currentTime   = cpp_freertos::Ticks::GetTicks();
+    uint32_t timeoutNeeded = ((timeout.count() == UINT32_MAX) ? UINT32_MAX : currentTime + timeout.count());
+    uint32_t timeElapsed   = currentTime;
+
+    ATStream atStream(rxCount);
 
     while (true) {
-        if (std::chrono::steady_clock::now() > endTime) {
+        if (timeoutNeeded != UINT32_MAX && timeElapsed >= timeoutNeeded) {
             result.code = Result::Code::TIMEOUT;
             break;
         }
 
-        if (size_t bytesRead = cmd_receive(receiveBuffer.get(), std::chrono::milliseconds{0}); bytesRead > 0) {
-            auto cellularResult = bsp::cellular::CellularResult{receiveBuffer.get(), bytesRead};
+        auto taskUnlocked = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
+        timeElapsed       = cpp_freertos::Ticks::GetTicks();
 
-            if (result = checkResult(cellularResult.getResultCode()); result.code != at::Result::Code::OK) {
-                break;
-            }
-
-            atStream.write(cellularResult.getDataAsString());
+        if (taskUnlocked) {
+            atStream.write(cmd_receive());
 
             if (atStream.isReady()) {
                 result = atStream.getResult();
@@ -96,10 +96,9 @@ Result Channel::cmd(const std::string &cmd, std::chrono::milliseconds timeout, s
         }
     }
 
-    awaitingResponseFlag.clear();
-
+    blockedTaskHandle = nullptr;
     cmd_post();
-    cmdLog(cmdFixed, result, timeout);
+    cmd_log(cmdFixed, result, timeout.count());
 
     return result;
 }
@@ -115,26 +114,4 @@ auto Channel::cmd(const at::AT &at) -> Result
     auto cmd  = at::factory(at);
     auto time = utils::time::Scoped("Time to run at command" + cmd.getCmd());
     return this->cmd(cmd);
-}
-
-Result Channel::checkResult(bsp::cellular::CellularResultCode cellularResult)
-{
-    Result result;
-
-    switch (cellularResult) {
-    case bsp::cellular::CellularResultCode::ReceivingNotStarted:
-        result.code = Result::Code::RECEIVING_NOT_STARTED;
-        break;
-    case bsp::cellular::CellularResultCode::TransmittingNotStarted:
-        result.code = Result::Code::TRANSMISSION_NOT_STARTED;
-        break;
-    case bsp::cellular::CellularResultCode::CMUXFrameError:
-        result.code = Result::Code::CMUX_FRAME_ERROR;
-        break;
-    default:
-        result.code = Result::Code::OK;
-        break;
-    }
-
-    return result;
 }

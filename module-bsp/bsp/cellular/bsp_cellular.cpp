@@ -8,10 +8,11 @@
 #error "Unsupported target"
 #endif
 
-namespace bsp
-{
-    std::optional<std::unique_ptr<Cellular>> Cellular::create([[maybe_unused]] const char *term, uint32_t portSpeed)
-    {
+
+namespace bsp{
+
+    std::optional<std::unique_ptr<Cellular>> Cellular::Create(
+            [[maybe_unused]] const char* term, uint32_t portSpeed) {
 
         std::unique_ptr<Cellular> inst;
 
@@ -23,26 +24,26 @@ namespace bsp
 #error "Unsupported target"
 #endif
 
-        if (inst->isInitialized) {
+        if(inst->isInitialized){
             return inst;
         }
 
         return {};
     }
 
-    [[nodiscard]] auto Cellular::getCellularDevice() const noexcept -> std::shared_ptr<devices::Device>
+    [[nodiscard]] auto Cellular::GetCellularDevice() const noexcept -> std::shared_ptr<devices::Device>
     {
         return driverLPUART;
     }
 
-    [[nodiscard]] auto Cellular::getLastCommunicationTimestamp() const noexcept -> TickType_t
+    [[nodiscard]] auto Cellular::GetLastCommunicationTimestamp() const noexcept -> TickType_t
     {
     	return lastCommunicationTimestamp;
     }
 
-    [[nodiscard]] auto Cellular::isCellularInSleepMode() const noexcept -> bool
+    [[nodiscard]] auto Cellular::IsCellularInSleepMode() const noexcept -> bool
     {
     	return isInSleepMode;
     }
 
-} // namespace bsp
+}

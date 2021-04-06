@@ -7,7 +7,7 @@
 #include <vector>
 #include <at/Commands.hpp>
 #include <at/Result.hpp>
-#include <bsp/cellular/CellularResult.hpp>
+#include <at/Constants.hpp>
 
 namespace at
 {
@@ -29,12 +29,12 @@ namespace at
 
         /// @defgroup Channel Platform independent methods
         /// {
-        virtual void cmdLog(std::string cmd, const Result &result, std::chrono::milliseconds timeout)
+        virtual void cmd_log(std::string cmd, const Result &result, uint32_t timeout)
         {}
-        virtual void cmd_init()                                                               = 0;
-        virtual void cmd_send(std::string cmd)                                                = 0;
-        virtual size_t cmd_receive(std::uint8_t *buffer, std::chrono::milliseconds timeoutMs) = 0;
-        virtual void cmd_post()                                                               = 0;
+        virtual void cmd_init()                = 0;
+        virtual void cmd_send(std::string cmd) = 0;
+        virtual std::string cmd_receive()      = 0;
+        virtual void cmd_post()                = 0;
         /// }
     };
 } // namespace at

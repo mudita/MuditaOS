@@ -5,7 +5,6 @@
 #include <at/ATFactory.hpp>
 #include <at/Cmd.hpp>
 #include "bsp/cellular/bsp_cellular.hpp"
-#include "bsp/cellular/CellularResult.hpp"
 #include "projdefs.h"
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/SignalStrength.hpp>
@@ -45,11 +44,39 @@ std::map<PortSpeed_e, int> ATPortSpeeds_text          = {{PortSpeed_e::PS9600, 9
 #define SERIAL_PORT "/dev/null"
 #endif
 
-static constexpr std::uint16_t threadSizeWords = 2048;
+#define USE_DAEFAULT_BAUDRATE 1
+
+static const std::uint16_t threadSizeWords = 2048;
 
 TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent)
 {
-    Init(portSpeed, parent);
+    LOG_INFO("Serial port: '%s'", SERIAL_PORT);
+    pv_portSpeed = portSpeed;
+    pv_cellular  = bsp::Cellular::Create(SERIAL_PORT, 115200).value_or(nullptr);
+    parser       = new ATParser(pv_cellular.get());
+    pv_parent    = parent;
+
+    // start connection
+    startParams.PortSpeed               = pv_portSpeed;
+    startParams.MaxFrameSize            = 127; // maximum for Basic mode
+    startParams.AckTimer                = 10;  // 100ms default
+    startParams.MaxNumOfRetransmissions = 3;   // default
+    startParams.MaxCtrlRespTime         = 30;  // 300ms default
+    startParams.WakeUpRespTime          = 10;  // 10s default
+    startParams.ErrRecovWindowSize      = 2;   // 2 default
+
+    if (auto flushed = FlushReceiveData(); flushed > 0) {
+        LOG_INFO("Discarded initial %" PRIu32 " bytes sent by modem",
+                 static_cast<uint32_t>(flushed)); // not baud-accurate. Might be 460800÷115200 times more
+    }
+
+    constexpr auto workerName = "TS0710SerialRxWorker";
+    BaseType_t task_error =
+        xTaskCreate(workerTaskFunction, workerName, threadSizeWords, this, taskPriority, &taskHandle);
+    if (task_error != pdPASS) {
+        LOG_ERROR("Failed to start %s task", workerName);
+        return;
+    }
 }
 
 TS0710::~TS0710()
@@ -63,45 +90,7 @@ TS0710::~TS0710()
     if (taskHandle) {
         vTaskDelete(taskHandle);
     }
-
     delete parser;
-}
-
-void TS0710::Init(PortSpeed_e portSpeed, sys::Service *parent)
-{
-    pv_cellular = bsp::Cellular::create(SERIAL_PORT, 115200).value_or(nullptr);
-    parser      = new ATParser(pv_cellular.get());
-    pv_parent   = parent;
-
-    SetStartParams(portSpeed);
-
-    if (auto flushed = flushReceiveData(); flushed > 0) {
-        LOG_INFO("Discarded initial %lu bytes sent by modem",
-                 static_cast<unsigned long>(flushed)); // not baud-accurate. Might be 460800÷115200 times more
-    }
-    else {
-        LOG_DEBUG("Nothing to discard");
-    }
-
-    constexpr auto workerName = "TS0710Worker";
-
-    BaseType_t task_error =
-        xTaskCreate(workerTaskFunction, workerName, threadSizeWords, this, taskPriority, &taskHandle);
-    if (task_error != pdPASS) {
-        LOG_ERROR("Failed to start %s task", workerName);
-        return;
-    }
-}
-
-void TS0710::SetStartParams(PortSpeed_e portSpeed)
-{
-    startParams.PortSpeed               = portSpeed;
-    startParams.MaxFrameSize            = 127; // maximum for Basic mode
-    startParams.AckTimer                = 10;  // 100ms default
-    startParams.MaxNumOfRetransmissions = 3;   // default
-    startParams.MaxCtrlRespTime         = 30;  // 300ms default
-    startParams.WakeUpRespTime          = 10;  // 10s default
-    startParams.ErrRecovWindowSize      = 2;   // 2 default
 }
 
 TS0710_Frame::frame_t createCMUXExitFrame()
@@ -156,7 +145,7 @@ void CloseCmux(std::unique_ptr<bsp::Cellular> &pv_cellular)
 {
     LOG_INFO("Closing mux mode");
     TS0710_Frame::frame_t frame = createCMUXExitFrame();
-    pv_cellular->write((void *)frame.serialize().data(), frame.serialize().size());
+    pv_cellular->Write((void *)frame.serialize().data(), frame.serialize().size());
     vTaskDelay(1000); // GSM module needs some time to close multiplexer
 }
 
@@ -174,7 +163,7 @@ TS0710::ConfState TS0710::BaudDetectOnce()
     while (!result) {
         switch (step) {
         case BaudTestStep::baud460800_NoCmux:
-            pv_cellular->setSpeed(ATPortSpeeds_text[PortSpeed_e::PS460800]);
+            pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS460800]);
             lastStep = step;
             result   = BaudDetectTestAT(parser, step, BaudTestStep::baud460800_Cmux);
             break;
@@ -184,7 +173,7 @@ TS0710::ConfState TS0710::BaudDetectOnce()
             result   = BaudDetectTestAT(parser, step, BaudTestStep::baud115200_NoCmux);
             break;
         case BaudTestStep::baud115200_NoCmux:
-            pv_cellular->setSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]);
+            pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]);
             lastStep = step;
             result   = BaudDetectTestAT(parser, step, BaudTestStep::baud115200_Cmux);
             break;
@@ -194,8 +183,8 @@ TS0710::ConfState TS0710::BaudDetectOnce()
             result   = BaudDetectTestAT(parser, step, BaudTestStep::baud_NotFound);
             break;
         case BaudTestStep::baud_NotFound:
-            pv_cellular->setSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
-            LOG_ERROR("No Baud found for modem.");
+            pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
+            LOG_DEBUG("No Baud found for modem.");
             return ConfState::Failure;
             break;
         }
@@ -217,11 +206,12 @@ TS0710::ConfState TS0710::BaudDetectProcedure(uint16_t timeout_s)
             return ConfState::Success;
         }
     }
-    pv_cellular->setSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
+    pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
     LOG_ERROR("No Baud found.");
     return ConfState::Failure;
 }
 
+// TODO:M.P Fetch configuration from JSON/XML file
 TS0710::ConfState TS0710::ConfProcedure()
 {
     LOG_DEBUG("Configuring modem...");
@@ -302,14 +292,14 @@ TS0710::ConfState TS0710::AudioConfProcedure()
         if (!parser->cmd(at::AT::QMIC)) {
             return ConfState::Failure;
         }
-        return setupEchoCanceller(EchoCancellerStrength::Tuned);
+        return SetupEchoCanceller(EchoCancellerStrength::Tuned);
     }
     else {
         if (!parser->cmd(at::AT::QDAI_INIT)) {
             return ConfState::Failure;
         }
         else {
-            pv_cellular->restart();
+            pv_cellular->Restart();
             LOG_DEBUG("GSM module first run, performing reset...");
             return ConfState::ModemNeedsReset;
         }
@@ -369,13 +359,13 @@ TS0710::ConfState TS0710::StartMultiplexer()
         return ConfState::Failure;
     }
 
-    mode = Mode::CMUX_SETUP;
-
-    TS0710_START TS0710_Start{TS0710_START::Mode_e::Basic, startParams, pv_cellular.get()};
+    mode                          = Mode::CMUX_SETUP;
+    TS0710_START *pv_TS0710_Start = new TS0710_START(TS0710_START::Mode_e::Basic, startParams, pv_cellular.get());
     // wait for confirmation
-    if (TS0710_Start.ConnectionStatus()) {
-        channels.push_back(TS0710_Start.getCtrlChannel()); // store control channel
+    if (pv_TS0710_Start->ConnectionStatus()) {
+        channels.push_back(pv_TS0710_Start->getCtrlChannel()); // store control channel
     }
+    delete pv_TS0710_Start;
 
     controlCallback = [this](std::string &data) {
         auto frameData = data;
@@ -395,10 +385,10 @@ TS0710::ConfState TS0710::StartMultiplexer()
                 LOG_PRINTF("RTR ");
             if (frameData[3] & 0x04) {
                 LOG_PRINTF("RTC ");
-                this->getCellular()->setSendingAllowed(true);
+                this->getCellular()->SetSendingAllowed(true);
             }
             else
-                this->getCellular()->setSendingAllowed(false);
+                this->getCellular()->SetSendingAllowed(false);
             if (frameData[3] & 0x02)
                 LOG_PRINTF("FC ");
 
@@ -407,23 +397,24 @@ TS0710::ConfState TS0710::StartMultiplexer()
         }
     };
 
+    // channels[0]->setCallback(controlCallback);
+
+    // TODO: Open remaining channels
     OpenChannel(Channel::Commands);
     OpenChannel(Channel::Notifications);
     OpenChannel(Channel::Data);
-    LOG_DEBUG("[TS0710] Channels open");
 
-    mode                 = Mode::CMUX;
-    DLC_channel *channel = get(Channel::Commands);
-    if (channel != nullptr) {
+    mode           = Mode::CMUX;
+    DLC_channel *c = get(Channel::Commands);
+    if (c != nullptr) {
         // Route URCs to second (Notifications) MUX channel
-        LOG_DEBUG("[TS0710] Setting URC Channel");
-        channel->cmd(at::AT::SET_URC_CHANNEL);
+        c->cmd(at::AT::SET_URC_CHANNEL);
         LOG_DEBUG("Sending test ATI");
-        auto res = channel->cmd(at::AT::SW_INFO);
+        auto res = c->cmd(at::AT::SW_INFO);
         if (!res) {
             LOG_ERROR("Sending test ATI command failed");
         }
-        res = channel->cmd(at::AT::CSQ);
+        res = c->cmd(at::AT::CSQ);
         if (res) {
             auto beg       = res.response[0].find(" ");
             auto end       = res.response[0].find(",", 1);
@@ -452,147 +443,123 @@ TS0710::ConfState TS0710::StartMultiplexer()
         return ConfState::Failure;
     }
 
-    LOG_DEBUG("[TS0710] Mux started");
     return ConfState::Success;
 }
 
-void TS0710::sendFrameToChannel(bsp::cellular::CellularResult &resultStruct)
+void workerTaskFunction(void *ptr)
 {
-    auto frame = TS0710_Frame{resultStruct.getData()};
+    TS0710 *inst = reinterpret_cast<TS0710 *>(ptr);
 
-    for (auto chan : getChannels()) {
-        if (frame.getFrameDLCI() == chan->getDLCI()) {
-            if (frame.getData().empty()) {
-                // Control frame contains no data
-                resultStruct.setData(frame.getSerData());
-            }
-            else {
-                resultStruct.setData(frame.getData());
-            }
-
-            if (frame.getFrameStatus() != TS0710_Frame::OK) {
-                resultStruct.setResultCode(bsp::cellular::CellularResultCode::CMUXFrameError);
-            }
-
-            chan->ParseInputData(&resultStruct);
-            return;
+    while (1) {
+        auto ret = inst->pv_cellular->Wait(UINT32_MAX);
+        if (ret == 0) {
+            continue;
         }
-    }
-}
 
-void TS0710::parseCellularResultCMUX(bsp::cellular::CellularDMAResultStruct &result)
-{
-    static std::vector<uint8_t> currentFrame;
-    static bool frameStartDetected = false;
+        // AT mode is used only during initialization phase
+        if (inst->mode == TS0710::Mode::AT) {
+            // inst->atParser->ProcessNewData();
+            // TODO: add AT command processing
+            LOG_DEBUG("[Worker] Processing AT response");
+            inst->parser->ProcessNewData(inst->pv_parent);
+        }
+        // CMUX mode is default operation mode
+        else if (inst->mode == TS0710::Mode::CMUX) {
+            // LOG_DEBUG("[Worker] Processing CMUX response");
+            std::vector<uint8_t> data;
+            inst->ReceiveData(data, static_cast<uint32_t>(inst->startParams.MaxCtrlRespTime));
+            // send data to fifo
+            for (uint8_t c : data) {
+                inst->RXFifo.push(c);
+            }
+            data.clear();
+            // divide message to different frames as Quectel may send them one after another
+            std::vector<std::vector<uint8_t>> multipleFrames;
+            std::vector<uint8_t> _d;
+            int fifoLen = inst->RXFifo.size();
+            // LOG_DEBUG("[RXFifo] %i elements", fifoLen);
 
-    for (auto i = 0U; i < result.dataSize; ++i) {
-        uint8_t character = result.data[i];
-        if (frameStartDetected || character == TS0710_FLAG) {
-
-            currentFrame.push_back(character);
-
-            // Check if frame is complete only in case of TS0710_FLAG
-            if (frameStartDetected && character == TS0710_FLAG) {
-                if (TS0710_Frame::isComplete(currentFrame)) {
-                    frameStartDetected = false;
-                    bsp::cellular::CellularResult cellularResult{{result.resultCode, currentFrame}};
-                    sendFrameToChannel(cellularResult);
-                    currentFrame.clear();
-                    continue;
+            for (int i = 0; i < fifoLen; i++) {
+                _d.push_back(inst->RXFifo.front());
+                inst->RXFifo.pop();
+                if (/*TS0710_Frame::isComplete(_d)*/ (_d.size() > 1) && (_d[0] == 0xF9) &&
+                    (_d[_d.size() - 1] == 0xF9)) {
+                    // LOG_DEBUG("Pushing back FRAME");
+                    multipleFrames.push_back(_d);
+                    _d.clear();
                 }
             }
+            // if some data stored @_d then push it back to queue as incomplete packet
+            if (!_d.empty() && (_d[0] == 0xF9)) {
+                // LOG_DEBUG("Pushing back [%i] incomplete frame", _d.size());
+                for (uint8_t c : _d)
+                    inst->RXFifo.push(c);
+            }
+            _d.clear();
 
-            frameStartDetected = true;
+            // LOG_DEBUG("Received %i frames", multipleFrames.size());
+            for (auto *chan : inst->channels) {
+                for (std::vector<uint8_t> v : multipleFrames) {
+                    if (TS0710_Frame::isMyChannel(v, chan->getDLCI()))
+                        chan->ParseInputData(v);
+                }
+            }
+            multipleFrames.clear();
         }
     }
 }
 
-size_t TS0710::flushReceiveData()
+size_t TS0710::FlushReceiveData()
 {
-    auto flushed                = 0U;
-    constexpr auto flushTimeout = std::chrono::milliseconds{20};
-    bsp::cellular::CellularDMAResultStruct dummyResult;
-    do {
-        flushed += pv_cellular->read(&dummyResult, dummyResult.getMaxSize(), flushTimeout);
-    } while (dummyResult.resultCode == bsp::cellular::CellularResultCode::ReceivedAndFull);
+    using namespace std::chrono_literals;
+
+    auto flushed                          = 0U;
+    constexpr auto flushInactivityTimeout = 20ms;
+    std::uint8_t dummyRead[50];
+    while (pv_cellular->Wait(flushInactivityTimeout.count())) {
+        flushed += pv_cellular->Read(dummyRead, sizeof(dummyRead));
+    }
     return flushed;
 }
 
-void TS0710::processError(bsp::cellular::CellularDMAResultStruct &result)
+ssize_t TS0710::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout)
 {
-    bsp::cellular::CellularResult cellularResult{{result.resultCode, {}}};
+    ssize_t ret = -1;
+    std::unique_ptr<uint8_t[]> buf(new uint8_t[startParams.MaxFrameSize]);
+    bool complete     = false;
+    uint32_t _timeout = timeout;
 
-    if (mode == TS0710::Mode::AT) {
-        parser->ProcessNewData(pv_parent, &cellularResult);
-    }
-    else if (mode == TS0710::Mode::CMUX || mode == TS0710::Mode::CMUX_SETUP) {
-        sendFrameToChannel(cellularResult);
-    }
-}
-
-void TS0710::processData(bsp::cellular::CellularDMAResultStruct &result)
-{
-    if (mode == TS0710::Mode::AT) {
-        bsp::cellular::CellularResult cellularResult{result};
-        parser->ProcessNewData(pv_parent, &cellularResult);
-    }
-    else if (mode == TS0710::Mode::CMUX || mode == TS0710::Mode::CMUX_SETUP) {
-        parseCellularResultCMUX(result);
-    }
-}
-
-[[noreturn]] void workerTaskFunction(void *ptr)
-{
-    LOG_DEBUG("Worker start");
-
-    constexpr auto readTimeout = std::chrono::milliseconds{10000};
-    TS0710 *inst               = static_cast<TS0710 *>(ptr);
-    bsp::cellular::CellularDMAResultStruct result{};
-
-    while (true) {
-        result.resultCode = bsp::cellular::CellularResultCode::ReceivedNoData;
-
-        inst->pv_cellular->read(&result, bsp::cellular::CellularDMAResultStruct::getMaxSize(), readTimeout);
-
-        switch (result.resultCode) {
-        case bsp::cellular::CellularResultCode::ReceivedAndFull:
-            LOG_DEBUG("DMA buffer full");
-            [[fallthrough]];
-        case bsp::cellular::CellularResultCode::ReceivedAfterFull:
-            [[fallthrough]];
-        case bsp::cellular::CellularResultCode::ReceivedAndIdle:
-            inst->processData(result);
-            break;
-        case bsp::cellular::CellularResultCode::Uninitialized:
-            LOG_DEBUG("DMA uninitialized");
-            [[fallthrough]];
-        case bsp::cellular::CellularResultCode::ReceivingNotStarted:
-            [[fallthrough]];
-        case bsp::cellular::CellularResultCode::TransmittingNotStarted:
-            [[fallthrough]];
-        case bsp::cellular::CellularResultCode::CMUXFrameError:
-            LOG_DEBUG("CellularResult Error: %s", c_str(result.resultCode));
-            inst->processError(result);
-            break;
-        case bsp::cellular::CellularResultCode::ReceivedNoData:
-            break;
+    while ((!complete) && (--_timeout)) {
+        ret = pv_cellular->Read(reinterpret_cast<void *>(buf.get()), startParams.MaxFrameSize);
+        if (ret > 0) {
+            // LOG_DEBUG("Received %i bytes", ret);
+            for (int i = 0; i < ret; i++) {
+                data.push_back(buf[i]);
+            }
+            complete = TS0710_Frame::isComplete(data);
         }
+        vTaskDelay(pdMS_TO_TICKS(1));
     }
+    if ((!complete) && (_timeout)) {
+        LOG_ERROR("Incomplete frame received");
+    }
+
+    return ret;
 }
 
 void TS0710::SelectAntenna(bsp::cellular::antenna antenna)
 {
-    pv_cellular->selectAntenna(antenna);
+    pv_cellular->SelectAntenna(antenna);
 }
 
 bsp::cellular::antenna TS0710::GetAntenna()
 {
-    return pv_cellular->getAntenna();
+    return pv_cellular->GetAntenna();
 }
 
 void TS0710::InformModemHostWakeup(void)
 {
-    return pv_cellular->informModemHostWakeup();
+    return pv_cellular->InformModemHostWakeup();
 }
 
 bool TS0710::IsModemActive(void)
@@ -602,46 +569,46 @@ bool TS0710::IsModemActive(void)
 
 void TS0710::TurnOnModem(void)
 {
-    return pv_cellular->powerUp();
+    return pv_cellular->PowerUp();
 }
 
 void TS0710::ResetModem(void)
 {
-    return pv_cellular->restart();
+    return pv_cellular->Restart();
 }
 
 void TS0710::TurnOffModem(void)
 {
-    return pv_cellular->powerDown();
+    return pv_cellular->PowerDown();
 }
 
 void TS0710::EnterSleepMode(void)
 {
-    return pv_cellular->enterSleep();
+    return pv_cellular->EnterSleep();
 }
 
 void TS0710::ExitSleepMode(void)
 {
-    return pv_cellular->exitSleep();
+    return pv_cellular->ExitSleep();
 }
 
 void TS0710::RegisterCellularDevice(void)
 {
-    auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(pv_cellular->getCellularDevice());
+    auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(pv_cellular->GetCellularDevice());
     pv_parent->bus.sendUnicast(std::move(deviceRegistrationMsg), service::name::system_manager);
 }
 
-[[nodiscard]] auto TS0710::getLastCommunicationTimestamp() const noexcept -> TickType_t
+[[nodiscard]] auto TS0710::GetLastCommunicationTimestamp() const noexcept -> TickType_t
 {
-    return pv_cellular->getLastCommunicationTimestamp();
+    return pv_cellular->GetLastCommunicationTimestamp();
 }
 
-[[nodiscard]] auto TS0710::isCellularInSleepMode() const noexcept -> bool
+[[nodiscard]] auto TS0710::IsCellularInSleepMode() const noexcept -> bool
 {
-    return pv_cellular->isCellularInSleepMode();
+    return pv_cellular->IsCellularInSleepMode();
 }
 
-TS0710::ConfState TS0710::setupEchoCanceller(EchoCancellerStrength strength)
+TS0710::ConfState TS0710::SetupEchoCanceller(EchoCancellerStrength strength)
 {
 
     switch (strength) {

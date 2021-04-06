@@ -248,7 +248,7 @@ static bool isSettingsAutomaticTimeSyncEnabled()
 void ServiceCellular::SleepTimerHandler()
 {
     auto currentTime                = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
-    auto lastCommunicationTimestamp = cmux->getLastCommunicationTimestamp();
+    auto lastCommunicationTimestamp = cmux->GetLastCommunicationTimestamp();
     auto timeOfInactivity           = currentTime >= lastCommunicationTimestamp
                                 ? currentTime - lastCommunicationTimestamp
                                 : std::numeric_limits<TickType_t>::max() - lastCommunicationTimestamp + currentTime;
@@ -358,8 +358,8 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularChangeSimDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg                    = static_cast<CellularChangeSimDataMessage *>(request);
         Store::GSM::get()->selected = msg->getSim();
-        bsp::cellular::sim::simSelect();
-        bsp::cellular::sim::hotSwapTrigger();
+        bsp::cellular::sim::sim_sel();
+        bsp::cellular::sim::hotswap_trigger();
         return std::make_shared<CellularResponseMessage>(true);
     });
 
@@ -456,7 +456,7 @@ void ServiceCellular::registerMessageHandlers()
         }
         if (typeid(*msg->event.get()) == typeid(sdesktop::developerMode::CellularSleepModeInfoRequestEvent)) {
             auto event = std::make_unique<sdesktop::developerMode::CellularSleepModeInfoRequestEvent>(
-                cmux->isCellularInSleepMode());
+                cmux->IsCellularInSleepMode());
             auto message = std::make_shared<sdesktop::developerMode::DeveloperModeRequest>(std::move(event));
             bus.sendUnicast(std::move(message), service::name::service_desktop);
         }
@@ -929,7 +929,7 @@ bool ServiceCellular::handle_audio_conf_procedure()
             state.set(this, State::ST::Failed);
             return false;
         }
-        cmux->getCellular()->setSpeed(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
+        cmux->getCellular()->SetSpeed(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
         vTaskDelay(1000);
 
         if (cmux->StartMultiplexer() == TS0710::ConfState::Success) {
@@ -1303,7 +1303,8 @@ auto ServiceCellular::sendSMS(SMSRecord record) -> bool
             std::string body         = UCS2(UTF8(receiver)).str();
             std::string suffix       = "\"";
             std::string command_data = command + body + suffix;
-            if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(command_data.c_str(), 1, commandTimeout))) {
+            if (cmux->CheckATCommandPrompt(
+                    channel->SendCommandPrompt(command_data.c_str(), 1, commandTimeout.count()))) {
 
                 if (channel->cmd((UCS2(record.body).str() + "\032").c_str(), commandTimeout)) {
                     result = true;
@@ -1341,7 +1342,8 @@ auto ServiceCellular::sendSMS(SMSRecord record) -> bool
                     std::string command(at::factory(at::AT::QCMGS) + UCS2(UTF8(receiver)).str() + "\",120," +
                                         std::to_string(i + 1) + "," + std::to_string(messagePartsCount));
 
-                    if (cmux->CheckATCommandPrompt(channel->SendCommandPrompt(command.c_str(), 1, commandTimeout))) {
+                    if (cmux->CheckATCommandPrompt(
+                            channel->SendCommandPrompt(command.c_str(), 1, commandTimeout.count()))) {
                         // prompt sign received, send data ended by "Ctrl+Z"
                         if (channel->cmd(UCS2(messagePart).str() + "\032", commandTimeout, 2)) {
                             result = true;
@@ -1691,7 +1693,7 @@ bool ServiceCellular::handle_sim_sanity_check()
     auto ret = sim_check_hot_swap(cmux->get(TS0710::Channel::Commands));
     if (ret) {
         state.set(this, State::ST::ModemOn);
-        bsp::cellular::sim::simSelect();
+        bsp::cellular::sim::sim_sel();
     }
     else {
         LOG_ERROR("Sanity check failure - user will be promped about full shutdown");
@@ -1703,8 +1705,8 @@ bool ServiceCellular::handle_sim_sanity_check()
 bool ServiceCellular::handle_select_sim()
 {
 
-    bsp::cellular::sim::simSelect();
-    bsp::cellular::sim::hotSwapTrigger();
+    bsp::cellular::sim::sim_sel();
+    bsp::cellular::sim::hotswap_trigger();
 #if defined(TARGET_Linux)
     DLC_channel *channel = cmux->get(TS0710::Channel::Commands);
     auto ret             = channel->cmd(at::AT::QSIMSTAT);

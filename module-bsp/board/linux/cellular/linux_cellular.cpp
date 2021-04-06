@@ -12,8 +12,10 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <map>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <ticks.hpp>
+#include <time.h>
 #include <unistd.h>
 
 #define _LINUX_UART_DEBUG 0
@@ -66,6 +68,8 @@ namespace bsp
             LOG_FATAL("Failed to create epoll file descriptor");
         }
 
+        struct epoll_event event;
+
         event.events = EPOLLIN;
 
         if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event)) {
@@ -87,23 +91,23 @@ namespace bsp
         }
     }
 
-    void LinuxCellular::powerUp()
+    void LinuxCellular::PowerUp()
     {}
 
-    void LinuxCellular::powerDown()
+    void LinuxCellular::PowerDown()
     {}
 
-    void LinuxCellular::restart()
+    void LinuxCellular::Restart()
     {}
 
-    ssize_t LinuxCellular::read(void *buf, size_t nbytes, std::chrono::milliseconds timeoutMs)
+    ssize_t LinuxCellular::Read(void *buf, size_t nbytes)
     {
 
         cpp_freertos::LockGuard lock(serOutMutex);
 
         int ret;
         for (;;) {
-            ret = ::read(fd, buf, nbytes);
+            ret = read(fd, buf, nbytes);
             if (ret != -1 || errno != EINTR)
                 break;
         }
@@ -120,7 +124,7 @@ namespace bsp
         return ret;
     }
 
-    ssize_t LinuxCellular::write(void *buf, size_t nbytes)
+    ssize_t LinuxCellular::Write(void *buf, size_t nbytes)
     {
         cpp_freertos::LockGuard lock(serOutMutex);
 #if _LINUX_UART_DEBUG
@@ -132,31 +136,30 @@ namespace bsp
 #endif
         int ret;
         for (;;) {
-            ret = ::write(fd, buf, nbytes);
+            ret = write(fd, buf, nbytes);
             if (ret != -1 || errno != EINTR)
                 break;
         }
         return ret;
     }
 
-    void LinuxCellular::informModemHostAsleep(void)
+    void LinuxCellular::InformModemHostAsleep(void)
     {}
 
-    void LinuxCellular::informModemHostWakeup(void)
+    void LinuxCellular::InformModemHostWakeup(void)
     {}
 
-    void LinuxCellular::enterSleep()
+    void LinuxCellular::EnterSleep()
     {}
 
-    void LinuxCellular::exitSleep()
+    void LinuxCellular::ExitSleep()
     {}
 
-    uint32_t LinuxCellular::wait(std::chrono::milliseconds timeoutMs)
+    uint32_t LinuxCellular::Wait(uint32_t timeout)
     {
-        auto timeoutTicks = pdMS_TO_TICKS(timeoutMs.count());
 
         uint32_t currentTime   = cpp_freertos::Ticks::GetTicks();
-        uint32_t timeoutNeeded = currentTime + timeoutTicks;
+        uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
         uint32_t timeElapsed   = currentTime;
 
         for (;;) {
@@ -179,7 +182,7 @@ namespace bsp
         }
     }
 
-    void LinuxCellular::setSpeed(uint32_t portSpeed)
+    void LinuxCellular::SetSpeed(uint32_t portSpeed)
     {
         struct termios t;
         memset(&t, 0, sizeof(t));
@@ -198,10 +201,10 @@ namespace bsp
         ioctl(fd, TIOCMBIS, &status);
     }
 
-    void LinuxCellular::selectAntenna(bsp::cellular::antenna antenna)
+    void LinuxCellular::SelectAntenna(bsp::cellular::antenna antenna)
     {}
 
-    bsp::cellular::antenna LinuxCellular::getAntenna()
+    bsp::cellular::antenna LinuxCellular::GetAntenna()
     {
         return bsp::cellular::antenna::lowBand;
     }
@@ -245,7 +248,7 @@ namespace bsp
         namespace sim
         {
 
-            auto trayIRQHandler() -> BaseType_t
+            auto trayIRQ_handler() -> BaseType_t
             {
                 return BaseType_t();
             }
@@ -255,15 +258,15 @@ namespace bsp
                 return Store::GSM::Tray::IN;
             }
 
-            void hotSwapTrigger()
+            void hotswap_trigger()
             {}
 
-            void simSelect()
+            void sim_sel()
             {}
         } // namespace sim
         namespace ringIndicator
         {
-            auto riIRQHandler() -> BaseType_t
+            auto riIRQ_handler() -> BaseType_t
             {
                 return BaseType_t();
             }
