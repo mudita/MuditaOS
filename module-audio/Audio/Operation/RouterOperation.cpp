@@ -82,7 +82,9 @@ namespace audio
 
         // enable audio connections
         inputConnection->enable();
-        outputConnection->enable();
+        if (!IsMuted()) {
+            outputConnection->enable();
+        }
 
         return audio::RetCode::Success;
     }
@@ -152,10 +154,10 @@ namespace audio
             SwitchToPriorityProfile();
             break;
         case EventType::CallMute:
-            Mute(true);
+            Mute();
             break;
         case EventType::CallUnmute:
-            Mute(false);
+            Unmute();
             break;
         default:
             return RetCode::UnsupportedEvent;
@@ -203,15 +205,21 @@ namespace audio
         return RetCode::Success;
     }
 
-    bool RouterOperation::Mute(bool enable)
+    void RouterOperation::Mute()
     {
-        if (enable == true) {
-            outputConnection->disable();
-        }
-        else {
-            outputConnection->enable();
-        }
-        return true;
+        outputConnection->disable();
+        mute = Mute::Enabled;
+    }
+
+    void RouterOperation::Unmute()
+    {
+        outputConnection->enable();
+        mute = Mute::Disabled;
+    }
+
+    auto RouterOperation::IsMuted() const noexcept -> bool
+    {
+        return mute == RouterOperation::Mute::Enabled;
     }
 
     Position RouterOperation::GetPosition()
