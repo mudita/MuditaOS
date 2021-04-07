@@ -145,6 +145,10 @@ If your rebase succeeds:
  - Rebase changes history - don't rebase branches that other people are working on (it's doable, but don't do this if you're not familiar with how to do it properly)
  - Always rebase your feature branches to `origin master`
 
+### Make smoke tests
+Before You actually press `Rebase and merge` on Github You must run smoke tests and link test run in Jira ticket on which Your PR is based. Good practice would be including link in
+Pull request info or comments section. 
+
 #### How to change some shameful commit somewhere in your PR branch history
 ```
 git log -S 'shameful log I added'   # search in history when some message was added
@@ -166,3 +170,7 @@ git rebase --continue
 ```
 
 PS: A good GUI git browser will do it all for you.
+
+### Reverting merged PR
+There might be a case, when Your PR passed all the tests and was merged to master, but eg. QA testing shows that it introduces some blocking bugs. If this happens, and after consulting with the team, 
+You have to revert Your previous changes. Do this the same way as You would do any other PR. Including smoke tests.
