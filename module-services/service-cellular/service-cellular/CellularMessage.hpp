@@ -645,6 +645,21 @@ class CellularSimPukResponseMessage : public CellularResponseMessage
     {}
 };
 
+class CellularSimCardLockResponseMessage : public CellularResponseMessage
+{
+    CellularSimCardLockDataMessage::SimCardLock cardLock;
+
+  public:
+    CellularSimCardLockResponseMessage(bool retCode, CellularSimCardLockDataMessage::SimCardLock cardLock)
+        : CellularResponseMessage(retCode), cardLock(cardLock)
+    {}
+
+    [[nodiscard]] auto getSimCardLock() const noexcept -> CellularSimCardLockDataMessage::SimCardLock
+    {
+        return cardLock;
+    }
+};
+
 class CellularAntennaResponseMessage : public sys::ResponseMessage
 {
   public:

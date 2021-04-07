@@ -8,7 +8,6 @@
 #include "application-desktop/windows/Names.hpp"
 #include <module-utils/common_data/EventStore.hpp>
 #include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
-#include <service-cellular/CellularMessage.hpp>
 
 namespace gui
 {
@@ -115,18 +114,52 @@ namespace gui
         switchToPinLockWindow(onActivatedCallback);
     }
 
-    void PinLockHandler::handlePinDisableRequest(app::manager::actions::ActionParamsPtr &&data)
+    void PinLockHandler::handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data,
+                                                CellularSimCardLockDataMessage::SimCardLock simCardLock)
     {
-        LOG_INFO("Handling RequestPinDisable action");
+        LOG_DEBUG("Handling PinEnableRequest action, simCardLock = %d", static_cast<int>(simCardLock));
+        handlePasscodeParams(PinLock::LockType::SimPin, PinLock::LockState::PasscodeRequired, std::move(data));
+        promptSimLockWindow      = true;
+        auto onActivatedCallback = [this, simCardLock](PinLock::LockType type, const std::vector<unsigned int> &data) {
+            app->bus.sendUnicast(
+                std::make_shared<CellularSimCardLockDataMessage>(Store::GSM::get()->selected, simCardLock, data),
+                serviceCellular);
+        };
+        switchToPinLockWindow(onActivatedCallback);
     }
 
-    void PinLockHandler::handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data)
+    void PinLockHandler::handlePinEnableRequestFailed(CellularSimCardLockDataMessage::SimCardLock simCardLock)
     {
-        LOG_INFO("Handling RequestPinEnable action");
+        LOG_DEBUG("Handling PinEnableRequestFailed action, simCardLock = %d, simLock.value = %u",
+                  static_cast<int>(simCardLock),
+                  simLock.value);
+        using namespace app::manager::actions;
+        if (simLock.value > 0) {
+            --simLock.value;
+        }
+        else {
+            LOG_ERROR("Number of attempts left is equal to zero before decrementation!");
+        }
+        if (simLock.value > 0) {
+            simLock.lockState        = PinLock::LockState::PasscodeInvalidRetryRequired;
+            auto onActivatedCallback = [this, simCardLock](PinLock::LockType type,
+                                                           const std::vector<unsigned int> &data) {
+                auto params = std::make_unique<PasscodeParams>(
+                    Store::GSM::get()->selected, simLock.value, PasscodeParams::pinName);
+                handlePinEnableRequest(std::move(params), simCardLock);
+            };
+            switchToPinLockWindow(PinLock::LockState::PasscodeInvalidRetryRequired, onActivatedCallback);
+        }
+        else {
+            auto params = std::make_unique<PasscodeParams>(
+                Store::GSM::get()->selected, PasscodeParams::numOfAttemptsForEnteringPUK, PasscodeParams::pukName);
+            handlePasscodeRequest(gui::PinLock::LockType::SimPuk, std::move(params));
+        }
     }
 
     void PinLockHandler::handlePinChangeRequestFailed()
     {
+        LOG_DEBUG("Handling PinChangeRequestFailed action, simLock.value = %u", simLock.value);
         using namespace app::manager::actions;
         if (simLock.value > 0) {
             --simLock.value;

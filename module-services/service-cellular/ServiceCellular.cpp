@@ -355,9 +355,10 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(CellularSimCardLockDataMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularSimCardLockDataMessage *>(request);
-        return std::make_shared<CellularResponseMessage>(
+        return std::make_shared<CellularSimCardLockResponseMessage>(
             setPinLock(msg->getLock() == CellularSimCardLockDataMessage::SimCardLock::Locked,
-                       SimCard::pinToString(msg->getPin())));
+                       SimCard::pinToString(msg->getPin())),
+            msg->getLock());
     });
 
     connect(typeid(CellularChangeSimDataMessage), [&](sys::Message *request) -> sys::MessagePointer {

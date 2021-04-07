@@ -7,6 +7,7 @@
 
 #include <module-services/service-appmgr/service-appmgr/messages/ActionRequest.hpp>
 #include <module-services/service-appmgr/service-appmgr/Actions.hpp>
+#include <service-cellular/CellularMessage.hpp>
 
 namespace app
 {
@@ -49,8 +50,9 @@ namespace gui
 
         void handlePasscodeRequest(PinLock::LockType type, app::manager::actions::ActionParamsPtr &&data);
         void handlePinChangeRequest(app::manager::actions::ActionParamsPtr &&data);
-        void handlePinDisableRequest(app::manager::actions::ActionParamsPtr &&data);
-        void handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data);
+        void handlePinEnableRequest(app::manager::actions::ActionParamsPtr &&data,
+                                    CellularSimCardLockDataMessage::SimCardLock simCardLock);
+        void handlePinEnableRequestFailed(CellularSimCardLockDataMessage::SimCardLock simCardLock);
         void handleSimBlocked(app::manager::actions::ActionParamsPtr &&data);
         void handleUnlockSim(app::manager::actions::ActionParamsPtr &&data);
         void handleCMEError(app::manager::actions::ActionParamsPtr &&data) const;
