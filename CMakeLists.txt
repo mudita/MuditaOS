@@ -80,8 +80,6 @@ add_compile_definitions(FSL_RTOS_FREE_RTOS
                 __STARTUP_INITIALIZE_NONCACHEDATA
                 SDK_OS_FREE_RTOS
                 XIP_EXTERNAL_FLASH=0
-                XIP_BOOT_HEADER_ENABLE=1
-                XIP_BOOT_HEADER_DCD_ENABLE=0
                 CPU_MIMXRT1051DVL6B_cm7
                 CPU_MIMXRT1051DVL6B
                 SDK_DEBUGCONSOLE=0
@@ -106,6 +104,17 @@ add_compile_options( ${TARGET_COMPILE_OPTIONS}
 option (GENERATE_STACK_USAGE "Generate stack usage report" OFF)
 if (GENERATE_STACK_USAGE)
     add_compile_options (-fstack-usage)
+endif ()
+
+include(SecureBoot)
+
+if (NOT ENABLE_SECURE_BOOT)
+    # Only enable the build-time boot header in a non-secure configuration,
+    # a header for Secure Boot is added post-build when signing the binary
+    add_compile_definitions(
+        XIP_BOOT_HEADER_ENABLE=1
+        XIP_BOOT_HEADER_DCD_ENABLE=0
+    )
 endif ()
 
 target_compile_features(${PROJECT_NAME} PUBLIC
@@ -217,12 +226,34 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     set(HEX_FILE ${CMAKE_PROJECT_NAME}.hex)
     set(BIN_FILE ${CMAKE_BINARY_DIR}/sys/current/boot.bin)
 
-    add_custom_command(
-        COMMENT "Generate boot.bin"
-        OUTPUT ${BIN_FILE}
-        DEPENDS ${CMAKE_PROJECT_NAME}
-        COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${BIN_FILE}
-        )
+    if (ENABLE_SECURE_BOOT)
+        set (SREC_FILE ${CMAKE_PROJECT_NAME}.srec)
+        # .srec file required by elftosb
+        add_custom_command(
+            COMMENT "Generate ${CMAKE_PROJECT_NAME}.srec"
+            OUTPUT ${CMAKE_BINARY_DIR}/${SREC_FILE}
+            DEPENDS ${CMAKE_PROJECT_NAME}
+            COMMAND ${CMAKE_OBJCOPY} -Osrec $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${SREC_FILE}
+            )
+
+        add_custom_command(
+            COMMENT "Generate signed boot.bin (Secure Boot)"
+            OUTPUT ${BIN_FILE}
+            DEPENDS ${CMAKE_BINARY_DIR}/${SREC_FILE}
+            COMMAND ${CMAKE_SOURCE_DIR}/config/elftosb_wrapper.sh "${ELFTOSB_PATH}" "${CST_PATH}" -f imx -V
+            -c ${CMAKE_BINARY_DIR}/imx_authenticated_hab.bd
+            -o ${BIN_FILE}
+            ${CMAKE_BINARY_DIR}/${SREC_FILE}
+            VERBATIM
+            )
+    else ()
+        add_custom_command(
+            COMMENT "Generate boot.bin"
+            OUTPUT ${BIN_FILE}
+            DEPENDS ${CMAKE_PROJECT_NAME}
+            COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${BIN_FILE}
+            )
+    endif()
 
     add_custom_command(
         COMMENT "Generate ${CMAKE_PROJECT_NAME}.hex"
