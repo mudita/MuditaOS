@@ -77,11 +77,14 @@ namespace gui
     {
         currentState = !currentState;
         refreshOptionsList();
+        using namespace app::manager::actions;
+        auto params = std::make_unique<PasscodeParams>(
+            Store::GSM::get()->selected, PasscodeParams::numOfAttemptsForEnteringPIN, PasscodeParams::pinName);
         if (!currentState) {
-            app::manager::Controller::sendAction(application, app::manager::actions::RequestPinDisable, nullptr);
+            app::manager::Controller::sendAction(application, RequestPinDisable, std::move(params));
         }
         else {
-            app::manager::Controller::sendAction(application, app::manager::actions::RequestPinEnable, nullptr);
+            app::manager::Controller::sendAction(application, RequestPinEnable, std::move(params));
         }
     }
 } // namespace gui
