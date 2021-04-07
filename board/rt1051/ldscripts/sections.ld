@@ -35,7 +35,7 @@ SECTIONS
         . = 0x430 ;
         KEEP(*(.boot_hdr.dcd_data))
         __boot_hdr_end__ = ABSOLUTE(.) ;
-        . = 0x2000 ;
+        . = 0x1000 ;
     } > BOARD_SDRAM_TEXT
 
     /* Data sections descriptors for startup initialization */
