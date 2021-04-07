@@ -5,7 +5,7 @@
 
 #include "BaseSettingsWindow.hpp"
 #include "OptionsWidgetMaker.hpp"
-
+#include <application-settings-new/models/AudioSettingsModel.hpp>
 namespace gui
 {
     ///  @brief Phone (call) vibration and sound settings window
@@ -14,7 +14,9 @@ namespace gui
       public:
         ///  Constructor
         ///  @app parent application pointer
-        explicit PhoneWindow(app::Application *app);
+        ///  @audioModel audio settings model
+        explicit PhoneWindow(app::Application *app,
+                             std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel);
 
       private:
         ///  Switches phone vibration state
@@ -38,5 +40,8 @@ namespace gui
 
         ///  Flag describing if phone sound is enabled
         bool mSoundEnabled = true;
+
+        /// Audio settings model
+        std::unique_ptr<audio_settings::AbstractAudioSettingsModel> mAudioModel;
     };
 } // namespace gui

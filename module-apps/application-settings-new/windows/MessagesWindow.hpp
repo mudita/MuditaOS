@@ -5,6 +5,7 @@
 
 #include "BaseSettingsWindow.hpp"
 #include "OptionsWidgetMaker.hpp"
+#include <application-settings-new/models/AudioSettingsModel.hpp>
 
 namespace gui
 {
@@ -15,11 +16,12 @@ namespace gui
       public:
         ///  Constructor
         ///  @app parent application pointer
-        explicit MessagesWindow(app::Application *app);
+        ///  @audioModel audio settings model
+        explicit MessagesWindow(app::Application *app,
+                                std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel);
 
       private:
         ///  Switches messages vibration state
-        ///  @return new state
         void switchVibrationState();
 
         ///  Switches messages sound state
@@ -49,5 +51,8 @@ namespace gui
 
         ///  Flag describing if unread messages are shown first
         bool mShowUnreadMessagesFirst = true;
+
+        /// Audio settings model
+        std::unique_ptr<audio_settings::AbstractAudioSettingsModel> mAudioModel;
     };
 } // namespace gui

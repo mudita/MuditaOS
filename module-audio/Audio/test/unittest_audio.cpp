@@ -41,40 +41,31 @@ TEST_CASE("Audio settings string creation")
 {
     SECTION("Create volume string for playback loudspeaker, multimedia")
     {
-        const auto str = audio::dbPath(audio::Setting::Volume,
-                                       audio::PlaybackType::Multimedia,
-                                       audio::Profile::Type::PlaybackLoudspeaker,
-                                       sys::phone_modes::PhoneMode::Connected);
+        const auto str = audio::dbPath(
+            audio::Setting::Volume, audio::PlaybackType::Multimedia, audio::Profile::Type::PlaybackLoudspeaker);
         REQUIRE_FALSE(str.empty());
         REQUIRE(str == "audio/PlaybackLoudspeaker/Multimedia/Volume");
     }
 
     SECTION("Create volume string for routing speakerphone")
     {
-        const auto str = audio::dbPath(audio::Setting::Volume,
-                                       audio::PlaybackType::None,
-                                       audio::Profile::Type::RoutingLoudspeaker,
-                                       sys::phone_modes::PhoneMode::Offline);
+        const auto str =
+            audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::RoutingLoudspeaker);
         REQUIRE_FALSE(str.empty());
         REQUIRE(str == "audio/RoutingLoudspeaker/Volume");
     }
 
     SECTION("Create gain string for recording built-in microphone")
     {
-        const auto str = audio::dbPath(audio::Setting::Gain,
-                                       audio::PlaybackType::None,
-                                       audio::Profile::Type::RecordingBuiltInMic,
-                                       sys::phone_modes::PhoneMode::DoNotDisturb);
+        const auto str =
+            audio::dbPath(audio::Setting::Gain, audio::PlaybackType::None, audio::Profile::Type::RecordingBuiltInMic);
         REQUIRE_FALSE(str.empty());
         REQUIRE(str == "audio/RecordingBuiltInMic/Gain");
     }
 
     SECTION("Create empty volume string when Idle")
     {
-        const auto str = audio::dbPath(audio::Setting::Volume,
-                                       audio::PlaybackType::None,
-                                       audio::Profile::Type::Idle,
-                                       sys::phone_modes::PhoneMode::Offline);
+        const auto str = audio::dbPath(audio::Setting::Volume, audio::PlaybackType::None, audio::Profile::Type::Idle);
         REQUIRE(str.empty());
     }
 
@@ -101,34 +92,22 @@ TEST_CASE("Audio settings string creation")
             {PlaybackType::None, Setting::Volume, "audio/RecordingBuiltInMic/Volume"},
 
             // EnableSound
-            {PlaybackType::System, Setting::EnableSound, "audio/Offline/RecordingBuiltInMic/Notifications/EnableSound"},
-            {PlaybackType::Meditation,
-             Setting::EnableSound,
-             "audio/Offline/RecordingBuiltInMic/Meditation/EnableSound"},
-            {PlaybackType::CallRingtone,
-             Setting::EnableSound,
-             "audio/Offline/RecordingBuiltInMic/CallRingtone/EnableSound"},
-            {PlaybackType::KeypadSound,
-             Setting::EnableSound,
-             "audio/Offline/RecordingBuiltInMic/KeypadSound/EnableSound"},
+            {PlaybackType::System, Setting::EnableSound, "audio/RecordingBuiltInMic/Notifications/EnableSound"},
+            {PlaybackType::Meditation, Setting::EnableSound, "audio/RecordingBuiltInMic/Meditation/EnableSound"},
+            {PlaybackType::CallRingtone, Setting::EnableSound, "audio/RecordingBuiltInMic/CallRingtone/EnableSound"},
+            {PlaybackType::KeypadSound, Setting::EnableSound, "audio/RecordingBuiltInMic/KeypadSound/EnableSound"},
             {PlaybackType::TextMessageRingtone,
              Setting::EnableSound,
-             "audio/Offline/RecordingBuiltInMic/TextMessageRingtone/EnableSound"},
-            {PlaybackType::Notifications,
-             Setting::EnableSound,
-             "audio/Offline/RecordingBuiltInMic/Notifications/EnableSound"},
-            {PlaybackType::Alarm, Setting::EnableSound, "audio/Offline/RecordingBuiltInMic/Alarm/EnableSound"},
-            {PlaybackType::Multimedia,
-             Setting::EnableSound,
-             "audio/Offline/RecordingBuiltInMic/Multimedia/EnableSound"},
-            {PlaybackType::None, Setting::EnableSound, "audio/Offline/RecordingBuiltInMic/EnableSound"},
+             "audio/RecordingBuiltInMic/TextMessageRingtone/EnableSound"},
+            {PlaybackType::Notifications, Setting::EnableSound, "audio/RecordingBuiltInMic/Notifications/EnableSound"},
+            {PlaybackType::Alarm, Setting::EnableSound, "audio/RecordingBuiltInMic/Alarm/EnableSound"},
+            {PlaybackType::Multimedia, Setting::EnableSound, "audio/RecordingBuiltInMic/Multimedia/EnableSound"},
+            {PlaybackType::None, Setting::EnableSound, "audio/RecordingBuiltInMic/EnableSound"},
         };
 
         for (auto &testCase : testCases) {
-            const auto str = audio::dbPath(testCase.setting,
-                                           testCase.playbackType,
-                                           audio::Profile::Type::RecordingBuiltInMic,
-                                           sys::phone_modes::PhoneMode::Offline);
+            const auto str =
+                audio::dbPath(testCase.setting, testCase.playbackType, audio::Profile::Type::RecordingBuiltInMic);
             REQUIRE_FALSE(str.empty());
             REQUIRE(str == testCase.path);
         }

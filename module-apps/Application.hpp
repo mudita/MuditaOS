@@ -284,14 +284,6 @@ namespace app
             systemCloseInProgress = true;
         }
 
-        bool setVolume(const audio::Volume &value,
-                       const audio::Profile::Type &profileType,
-                       const audio::PlaybackType &playbackType);
-
-        auto getVolume(audio::Volume &volume,
-                       const audio::Profile::Type &profileType,
-                       const audio::PlaybackType &playbackType);
-
         bool adjustCurrentVolume(const int step);
         bool increaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
         {
@@ -301,7 +293,6 @@ namespace app
         {
             return adjustCurrentVolume(-step);
         }
-        audio::RetCode getCurrentVolume(audio::Volume &volume);
 
         void toggleTorchOnOff();
 

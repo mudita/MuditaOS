@@ -10,18 +10,19 @@
 
 namespace gui
 {
-    MessagesWindow::MessagesWindow(app::Application *app)
-        : BaseSettingsWindow(app, gui::window::name::messages), mWidgetMaker(this)
+    MessagesWindow::MessagesWindow(app::Application *app,
+                                   std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel)
+        : BaseSettingsWindow(app, gui::window::name::messages), mWidgetMaker(this), mAudioModel(std::move(audioModel))
     {
-        mVibrationsEnabled       = false;
-        mSoundEnabled            = true;
-        mShowUnreadMessagesFirst = true;
+        mShowUnreadMessagesFirst = false;
         setTitle(utils::localize.get("app_settings_apps_messages"));
     }
 
     std::list<Option> MessagesWindow::buildOptionsList()
     {
         std::list<gui::Option> optionList;
+        mVibrationsEnabled = mAudioModel->isVibrationEnabled();
+        mSoundEnabled      = mAudioModel->isSoundEnabled();
 
         mWidgetMaker.addSwitchOption(optionList,
                                      utils::translateI18("app_settings_vibration"),
@@ -51,15 +52,13 @@ namespace gui
 
     void MessagesWindow::switchVibrationState()
     {
-        mVibrationsEnabled = !mVibrationsEnabled;
-        LOG_INFO("switchVibrationState %d", static_cast<int>(mVibrationsEnabled));
+        (mVibrationsEnabled) ? mAudioModel->setVibrationDisabled() : mAudioModel->setVibrationEnabled();
         refreshOptionsList();
     }
 
     void MessagesWindow::switchSoundState()
     {
-        mSoundEnabled = !mSoundEnabled;
-        LOG_INFO("switchSoundState %d", static_cast<int>(mSoundEnabled));
+        mSoundEnabled ? mAudioModel->setSoundDisabled() : mAudioModel->setSoundEnabled();
         refreshOptionsList();
     }
 

@@ -23,21 +23,20 @@ class AudioMessage : public sys::DataMessage
 class AudioResponseMessage : public sys::ResponseMessage
 {
   public:
-    AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
-                         const audio::Tags &tags = {},
-                         const float val         = 0.0)
+    explicit AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
+                                  const audio::Tags &tags = {},
+                                  const std::string &val  = {})
         : sys::ResponseMessage(), retCode(retCode), tags(tags), val(val)
     {}
 
-    AudioResponseMessage(audio::RetCode retCode, const float val) : AudioResponseMessage(retCode, {}, val)
+    AudioResponseMessage(audio::RetCode retCode, const std::string &val) : AudioResponseMessage(retCode, {}, val)
     {}
 
-    virtual ~AudioResponseMessage()
-    {}
+    virtual ~AudioResponseMessage() = default;
 
     const audio::RetCode retCode = audio::RetCode::Success;
     audio::Tags tags             = {};
-    float val                    = 0.0;
+    std::string val;
 };
 
 class AudioNotificationMessage : public AudioMessage
@@ -62,16 +61,14 @@ class AudioNotificationMessage : public AudioMessage
 class AudioSettingsMessage : public AudioMessage
 {
   public:
-    AudioSettingsMessage(const audio::Profile::Type &profileType,
-                         const audio::PlaybackType &playbackType,
+    AudioSettingsMessage(const audio::PlaybackType &playbackType,
                          const audio::Setting &setting,
                          const std::string &val = {})
-        : AudioMessage{}, profileType{profileType}, playbackType{playbackType}, setting{setting}, val{val}
+        : AudioMessage{}, playbackType{playbackType}, setting{setting}, val{val}
     {}
 
     ~AudioSettingsMessage() override = default;
 
-    audio::Profile::Type profileType = audio::Profile::Type::Idle;
     audio::PlaybackType playbackType = audio::PlaybackType::None;
     const audio::Setting setting;
     std::string val{};
@@ -80,10 +77,8 @@ class AudioSettingsMessage : public AudioMessage
 class AudioGetSetting : public AudioSettingsMessage
 {
   public:
-    AudioGetSetting(const audio::Profile::Type &profileType,
-                    const audio::PlaybackType &playbackType,
-                    const audio::Setting &setting)
-        : AudioSettingsMessage{profileType, playbackType, setting}
+    AudioGetSetting(const audio::PlaybackType &playbackType, const audio::Setting &setting)
+        : AudioSettingsMessage{playbackType, setting}
     {}
 
     ~AudioGetSetting() override = default;
@@ -92,11 +87,8 @@ class AudioGetSetting : public AudioSettingsMessage
 class AudioSetSetting : public AudioSettingsMessage
 {
   public:
-    AudioSetSetting(const audio::Profile::Type &profileType,
-                    const audio::PlaybackType &playbackType,
-                    const audio::Setting &setting,
-                    const std::string &val)
-        : AudioSettingsMessage{profileType, playbackType, setting, val}
+    AudioSetSetting(const audio::PlaybackType &playbackType, const audio::Setting &setting, const std::string &val)
+        : AudioSettingsMessage{playbackType, setting, val}
     {}
 
     ~AudioSetSetting() override = default;

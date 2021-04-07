@@ -10,17 +10,19 @@
 
 namespace gui
 {
-    PhoneWindow::PhoneWindow(app::Application *app)
-        : BaseSettingsWindow(app, gui::window::name::phone), mWidgetMaker(this)
+    PhoneWindow::PhoneWindow(app::Application *app,
+                             std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel)
+        : BaseSettingsWindow(app, gui::window::name::phone), mWidgetMaker(this), mAudioModel(std::move(audioModel))
     {
-        mVibrationsEnabled = true;
-        mSoundEnabled      = true;
         setTitle(utils::localize.get("app_settings_apps_phone"));
     }
 
     std::list<Option> PhoneWindow::buildOptionsList()
     {
         std::list<gui::Option> optionList;
+        mVibrationsEnabled = mAudioModel->isVibrationEnabled();
+        mSoundEnabled      = mAudioModel->isSoundEnabled();
+
         mWidgetMaker.addSwitchOption(optionList,
                                      utils::translateI18("app_settings_vibration"),
                                      mVibrationsEnabled,
@@ -39,16 +41,13 @@ namespace gui
 
     void PhoneWindow::switchVibrationState()
     {
-        LOG_INFO("switchVibrationState before %d", static_cast<int>(mVibrationsEnabled));
-        mVibrationsEnabled = !mVibrationsEnabled;
-        LOG_INFO("switchVibrationState after %d", static_cast<int>(mVibrationsEnabled));
+        (mVibrationsEnabled) ? mAudioModel->setVibrationDisabled() : mAudioModel->setVibrationEnabled();
         refreshOptionsList();
     }
 
     void PhoneWindow::switchSoundState()
     {
-        mSoundEnabled = !mSoundEnabled;
-        LOG_INFO("switchSoundState %d", static_cast<int>(mSoundEnabled));
+        mSoundEnabled ? mAudioModel->setSoundDisabled() : mAudioModel->setSoundEnabled();
         refreshOptionsList();
     }
 

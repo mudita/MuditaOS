@@ -10,17 +10,19 @@
 
 namespace gui
 {
-    CalendarWindow::CalendarWindow(app::Application *app)
-        : BaseSettingsWindow(app, gui::window::name::calendar), mWidgetMaker(this)
+    CalendarWindow::CalendarWindow(app::Application *app,
+                                   std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel)
+        : BaseSettingsWindow(app, gui::window::name::calendar), mWidgetMaker(this), mAudioModel(std::move(audioModel))
     {
-        mVibrationsEnabled = true;
-        mSoundEnabled      = true;
         setTitle(utils::localize.get("app_settings_apps_calendar"));
     }
 
     std::list<Option> CalendarWindow::buildOptionsList()
     {
         std::list<gui::Option> optionList;
+        mVibrationsEnabled = mAudioModel->isVibrationEnabled();
+        mSoundEnabled      = mAudioModel->isSoundEnabled();
+
         mWidgetMaker.addSwitchOption(optionList,
                                      utils::translateI18("app_settings_vibration"),
                                      mVibrationsEnabled,
@@ -42,15 +44,13 @@ namespace gui
 
     void CalendarWindow::switchVibrationState()
     {
-        mVibrationsEnabled = !mVibrationsEnabled;
-        LOG_INFO("switchVibrationState %d", static_cast<int>(mVibrationsEnabled));
+        (mVibrationsEnabled) ? mAudioModel->setVibrationDisabled() : mAudioModel->setVibrationEnabled();
         refreshOptionsList();
     }
 
     void CalendarWindow::switchSoundState()
     {
-        mSoundEnabled = !mSoundEnabled;
-        LOG_INFO("switchSoundState %d", static_cast<int>(mSoundEnabled));
+        mSoundEnabled ? mAudioModel->setSoundDisabled() : mAudioModel->setSoundEnabled();
         refreshOptionsList();
     }
 

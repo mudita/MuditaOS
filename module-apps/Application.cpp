@@ -644,29 +644,9 @@ namespace app
         pushWindow(windowName);
     }
 
-    bool Application::setVolume(const audio::Volume &value,
-                                const audio::Profile::Type &profileType,
-                                const audio::PlaybackType &playbackType)
-    {
-        const auto ret = AudioServiceAPI::SetSetting(this, audio::Setting::Volume, value, playbackType, profileType);
-        return ret == audio::RetCode::Success;
-    }
-
-    auto Application::getVolume(audio::Volume &volume,
-                                const audio::Profile::Type &profileType,
-                                const audio::PlaybackType &playbackType)
-    {
-        return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume, playbackType, profileType);
-    }
-
     bool Application::adjustCurrentVolume(const int step)
     {
         return AudioServiceAPI::KeyPressed(this, step);
-    }
-
-    audio::RetCode Application::getCurrentVolume(audio::Volume &volume)
-    {
-        return AudioServiceAPI::GetSetting(this, audio::Setting::Volume, volume);
     }
 
     void Application::toggleTorchOnOff()
