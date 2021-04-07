@@ -7,9 +7,7 @@
 #include "Profiles/Profile.hpp"
 
 #include <Service/Message.hpp>
-#include <PhoneModes/Common.hpp>
 #include <Utils.hpp>
-#include <PhoneModes/Common.hpp>
 
 #include <bitset>
 #include <map>
@@ -45,7 +43,14 @@ namespace audio
         Volume,
         Gain,
         EnableVibration,
-        EnableSound
+        EnableSound,
+        Sound
+    };
+
+    enum class SettingState : bool
+    {
+        Enabled,
+        Disabled
     };
 
     enum class PlaybackType
@@ -67,7 +72,6 @@ namespace audio
         Setting setting;
         PlaybackType playbackType;
         Profile::Type profileType;
-        std::optional<sys::phone_modes::PhoneMode> phoneMode = std::nullopt;
     };
 
     [[nodiscard]] const std::string str(const PlaybackType &playbackType) noexcept;
@@ -78,8 +82,7 @@ namespace audio
 
     [[nodiscard]] const std::string dbPath(const Setting &setting,
                                            const PlaybackType &playbackType,
-                                           const Profile::Type &profileType,
-                                           const std::optional<sys::phone_modes::PhoneMode> phoneMode = std::nullopt);
+                                           const Profile::Type &profileType);
 
     [[nodiscard]] bool isSystemSound(const PlaybackType &playbackType) noexcept;
 

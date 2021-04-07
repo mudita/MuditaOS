@@ -5,6 +5,7 @@
 
 #include "BaseSettingsWindow.hpp"
 #include "OptionsWidgetMaker.hpp"
+#include <application-settings-new/models/AudioSettingsModel.hpp>
 
 namespace gui
 {
@@ -15,7 +16,9 @@ namespace gui
       public:
         ///  Constructor
         ///  @app parent application pointer
-        explicit AlarmClockWindow(app::Application *app);
+        /// @audioModel audio settings model
+        explicit AlarmClockWindow(app::Application *app,
+                                  std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel);
 
       private:
         ///  Switches alarm vibration state
@@ -34,5 +37,8 @@ namespace gui
 
         ///  Flag describing if phone vibration is enabled
         bool mVibrationsEnabled = false;
+
+        /// Audio settings model
+        std::unique_ptr<audio_settings::AbstractAudioSettingsModel> mAudioModel;
     };
 } // namespace gui

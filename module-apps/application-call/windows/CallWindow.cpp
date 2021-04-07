@@ -194,7 +194,6 @@ namespace gui
             microphoneIcon->set(MicrophoneIconState::MUTE);
             setFocusItem(nullptr);
             connectTimerOnExit();
-            LOG_FATAL("CALL_ENDED");
         } break;
         case State::CALL_IN_PROGRESS: {
             if (prevState == State::INCOMING_CALL) { // otherwise it is already started

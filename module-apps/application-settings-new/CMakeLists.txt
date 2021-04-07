@@ -23,6 +23,7 @@ target_sources( ${PROJECT_NAME}
         models/QuotesModel.cpp
         models/CategoriesModel.cpp
         models/SARInfoRepository.cpp
+        models/AudioSettingsModel.cpp
         presenter/SARInfoWindowPresenter.cpp
         widgets/ChangePasscodeLockHandler.cpp
         widgets/QuoteWidget.cpp
