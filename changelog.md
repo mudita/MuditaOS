@@ -1,5 +1,45 @@
 # MuditaOS changelog
 
+## [0.62.1 2920-04-07]
+
+### Added
+
+* Add a window to display technical information about the device for certification purposes.
+* Add calls rejecting in the 'Do not Disturb mode.
+* Add crash dumping with CrashCatcher.
+* Add detection of headset buttons.
+* Add factory reset window.
+* Add offline mode handling by the cellular modem.
+* Add test harness for cellular in the sleep mode.
+* Add window to display SAR parameter value.
+
+### Changed
+
+* Change USB charging current to 500 mA.
+* Disable USB security temporarily to prevent connectivity issues with Mudita Center.
+* Improve boot time by optimizing the start time of the desktop application.
+* Move quotes from JSON file to the database.
+* Prevent starting the phone if the battery is below shutdown level.
+* Run unit tests on Release configuration instead of Debug during CI checks.
+* Split CI build types for unit tests and test harness.
+* Update documentation on the cellular modem's low power mode.
+
+### Fixed
+
+* Fix backup/restore API.
+* Fix crash in the calendar application when focusing on an all-day event.
+* Fix crashing unit tests of the desktop service.
+* Fix execution time of test harness during CI runs.
+* Fix inability to unlock SIM with PIN.
+* Fix invalid language fallback on assets load error.
+* Fix issues with date and time in the onboarding application.
+* Fix linking with GCC10.
+* Fix several minor issues in automated testing.
+* Fix silent boot fail when there is no valid image available.
+* Fix storing quotation marks in the notes.
+* Fix text addition and deletion for the text line widget.
+* Fix USB disconnect time.
+
 ## [0.61.1 2020-03-26]
 
 ### Added
