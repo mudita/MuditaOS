@@ -10,10 +10,10 @@
 #include "PinLockWindow.hpp"
 
 #include "application-desktop/ApplicationDesktop.hpp"
-#include "application-desktop/data/LockPhoneData.hpp"
-#include "ScreenLockBox.hpp"
-#include "SimLockBox.hpp"
-#include "PukLockBox.hpp"
+#include "popups/data/LockData.hpp"
+#include "popups/lock-widgets/ScreenLockBox.hpp"
+#include "popups/lock-widgets/SimLockBox.hpp"
+#include "popups/lock-widgets/PukLockBox.hpp"
 #include <application-phonebook/ApplicationPhonebook.hpp>
 
 namespace gui
@@ -74,7 +74,7 @@ namespace gui
 
     void PinLockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (auto lockData = dynamic_cast<LockPhoneData *>(data)) {
+        if (auto lockData = dynamic_cast<LockData *>(data)) {
             rebuild();
             lockTimeoutApplication = lockData->getPreviousApplication();
             lock                   = lockData->getLock();

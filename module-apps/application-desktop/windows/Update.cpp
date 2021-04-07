@@ -4,7 +4,7 @@
 #include "log/log.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
-#include "../data/LockPhoneData.hpp"
+#include "application-desktop/data/DesktopData.hpp"
 #include <source/version.hpp>
 
 // module-utils

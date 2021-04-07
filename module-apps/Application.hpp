@@ -31,7 +31,6 @@
 #include "popups/Popups.hpp"
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"
-#include "Popups.hpp"
 
 namespace app
 {

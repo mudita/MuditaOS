@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ChangePasscodeLockHandler.hpp"
-#include "application-desktop/widgets/PinHash.hpp"
+#include "module-apps/popups/lock-widgets/PinHash.hpp"
 
 namespace gui
 {

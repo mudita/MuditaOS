@@ -12,8 +12,9 @@
 #include <module-gui/gui/widgets/TopBar.hpp>
 #include <module-gui/gui/core/FontManager.hpp>
 
-#include <module-apps/application-desktop/data/AppDesktopStyle.hpp>
-#include <module-apps/application-desktop/data/LockPhoneData.hpp>
+#include <module-apps/popups/data/LockStyle.hpp>
+#include <module-apps/application-desktop/data/DesktopStyle.hpp>
+#include <module-apps/application-desktop/data/DesktopData.hpp>
 #include <module-apps/application-desktop/windows/Names.hpp>
 
 #include <application-phonebook/ApplicationPhonebook.hpp>

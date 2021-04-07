@@ -1,8 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-desktop/data/AppDesktopStyle.hpp"
 #include "application-settings-new/ApplicationSettings.hpp"
+#include "popups/data/LockStyle.hpp"
 #include "ChangePasscodeWindow.hpp"
 #include "DialogMetadata.hpp"
 #include "DialogMetadataMessage.hpp"

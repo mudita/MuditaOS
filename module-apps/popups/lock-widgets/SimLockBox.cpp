@@ -3,9 +3,9 @@
 
 #include "SimLockBox.hpp"
 
-#include "PinLockBaseWindow.hpp"
-#include "application-desktop/widgets/PinLock.hpp"
-#include "application-desktop/data/AppDesktopStyle.hpp"
+#include "popups/data/LockStyle.hpp"
+#include "popups/lock-windows/PinLockBaseWindow.hpp"
+#include "PinLock.hpp"
 #include <Style.hpp>
 #include <Image.hpp>
 

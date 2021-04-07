@@ -8,8 +8,8 @@
 #include "DesktopMainWindow.hpp"
 #include "GuiTimer.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
-#include "application-desktop/data/LockPhoneData.hpp"
-#include "application-desktop/data/Style.hpp"
+#include "application-desktop/data/DesktopData.hpp"
+#include "application-desktop/data/DesktopStyle.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include "gui/widgets/Image.hpp"
 #include <service-appmgr/Controller.hpp>

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "application-desktop/widgets/PinLock.hpp"
+#include "module-apps/popups/lock-widgets/PinLock.hpp"
 
 namespace gui
 {

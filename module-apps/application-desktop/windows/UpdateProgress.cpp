@@ -4,14 +4,14 @@
 #include <log/log.hpp>
 #include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/TopBar.hpp>
-#include <application-desktop/data/LockPhoneData.hpp>
+#include <application-desktop/data/DesktopData.hpp>
 #include <source/version.hpp>
 
 // module-utils
 #include <i18n/i18n.hpp>
 
 #include <application-desktop/ApplicationDesktop.hpp>
-#include <application-desktop/data/Style.hpp>
+#include <application-desktop/data/DesktopStyle.hpp>
 
 // services
 #include <service-appmgr/model/ApplicationManager.hpp>

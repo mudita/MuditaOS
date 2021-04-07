@@ -121,7 +121,7 @@ namespace gui
         unsigned int minPinSize = defaultPasscodeSize;
         bool autoActivate       = false;
 
-        static constexpr unsigned int defaultPasscodeSize = 4;
+        static constexpr unsigned int defaultPasscodeSize    = 4;
         static constexpr unsigned int unlimitedNumOfAttempts = std::numeric_limits<unsigned int>::max();
 
         void setAutoActivate(bool _autoActivate)

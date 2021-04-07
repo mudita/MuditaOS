@@ -6,12 +6,11 @@
 #include "MessageType.hpp"
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/MenuWindow.hpp"
-#include "windows/PinLockWindow.hpp"
+#include "module-apps/popups/lock-windows/PinLockWindow.hpp"
 #include "windows/PowerOffWindow.hpp"
 #include "windows/DeadBatteryWindow.hpp"
 #include "windows/LogoWindow.hpp"
 #include "windows/ChargingBatteryWindow.hpp"
-#include "windows/LockedInfoWindow.hpp"
 #include "windows/Reboot.hpp"
 #include "windows/Update.hpp"
 #include "windows/UpdateProgress.hpp"
@@ -25,7 +24,7 @@
 #include <messages/DialogMetadataMessage.hpp>
 
 #include "AppWindow.hpp"
-#include "data/LockPhoneData.hpp"
+#include "data/DesktopData.hpp"
 #include "models/ActiveNotificationsModel.hpp"
 
 #include <service-db/DBServiceAPI.hpp>

@@ -1,10 +1,10 @@
 //// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 //// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include "popups/data/LockData.hpp"
 #include "PinLockHandler.hpp"
 #include "PinHash.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
-#include "application-desktop/data/LockPhoneData.hpp"
 #include "application-desktop/windows/Names.hpp"
 #include <module-utils/common_data/EventStore.hpp>
 #include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
@@ -100,7 +100,7 @@ namespace gui
 
         app->switchWindow(app::window::name::desktop_pin_lock,
                           gui::ShowMode::GUI_SHOW_INIT,
-                          std::make_unique<gui::LockPhoneData>(std::move(lock)));
+                          std::make_unique<gui::LockData>(std::move(lock)));
     }
 
     void PinLockHandler::handlePinChangeRequest(app::manager::actions::ActionParamsPtr &&data)
@@ -216,7 +216,7 @@ namespace gui
         };
         app->switchWindow(app::window::name::desktop_pin_lock,
                           gui::ShowMode::GUI_SHOW_INIT,
-                          std::make_unique<gui::LockPhoneData>(std::move(lock)));
+                          std::make_unique<gui::LockData>(std::move(lock)));
     }
 
     void PinLockHandler::switchToPinLockWindow(
@@ -246,7 +246,7 @@ namespace gui
         }
         app->switchWindow(app::window::name::desktop_pin_lock,
                           gui::ShowMode::GUI_SHOW_INIT,
-                          std::make_unique<gui::LockPhoneData>(std::move(lock)));
+                          std::make_unique<gui::LockData>(std::move(lock)));
     }
 
     void PinLockHandler::switchToPinLockWindow(
@@ -258,7 +258,7 @@ namespace gui
         lock->onActivatedCallback = onLockActivatedCallback;
         app->switchWindow(app::window::name::desktop_pin_lock,
                           gui::ShowMode::GUI_SHOW_INIT,
-                          std::make_unique<gui::LockPhoneData>(std::move(lock)));
+                          std::make_unique<gui::LockData>(std::move(lock)));
     }
 
     void PinLockHandler::handlePasscode(PinLock::LockType type, const std::vector<unsigned int> passcode)

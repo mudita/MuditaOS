@@ -1,10 +1,11 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+#include <module-apps/popups/lock-widgets/PinLock.hpp>
+#include <module-apps/popups/data/LockData.hpp>
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/data/ChangePasscodeData.hpp"
 #include "module-apps/application-desktop/windows/Names.hpp"
-#include "module-apps/application-desktop/data/LockPhoneData.hpp"
 #include "OptionSetting.hpp"
 #include "SecurityMainWindow.hpp"
 
@@ -53,7 +54,7 @@ namespace gui
                 };
                 application->switchWindow(app::window::name::desktop_pin_lock,
                                           gui::ShowMode::GUI_SHOW_INIT,
-                                          std::make_unique<gui::LockPhoneData>(std::move(lock)));
+                                          std::make_unique<gui::LockData>(std::move(lock)));
                 return true;
             },
             [=](Item &item) {

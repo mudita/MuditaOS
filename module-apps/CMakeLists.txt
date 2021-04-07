@@ -30,13 +30,6 @@ set( SOURCES
     "windows/NoEvents.cpp"
     "widgets/ButtonOnOff.cpp"
     "widgets/InputBox.cpp"
-    "popups/Popups.cpp"
-    "popups/VolumeWindow.cpp"
-    "popups/WindowWithTimer.cpp"
-    "popups/HomeModesWindow.cpp"
-    "popups/TetheringNotificationPopup.cpp"
-    "popups/TetheringConfirmationPopup.cpp"
-    "popups/TetheringPhoneModePopup.cpp"
     "windows/BrightnessWindow.cpp"
     "widgets/BrightnessBox.cpp"
     "widgets/ModesBox.cpp"
@@ -120,6 +113,8 @@ include_directories( ../module-os )
 include_directories( ../module-bsp )
 include_directories( ../module-db )
 
+add_subdirectory(popups)
+
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         service-appmgr
@@ -156,7 +151,6 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/messages
         ${CMAKE_CURRENT_SOURCE_DIR}/windows
-        ${CMAKE_CURRENT_SOURCE_DIR}/popups
         ${CMAKE_CURRENT_SOURCE_DIR}/options
         ${CMAKE_CURRENT_SOURCE_DIR}/options/type
         ${CMAKE_BINARY_DIR}

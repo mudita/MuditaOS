@@ -9,8 +9,9 @@
 #include "RichTextParser.hpp"
 #include "FontManager.hpp"
 
-#include "application-desktop/data/AppDesktopStyle.hpp"
-#include "Names.hpp"
+#include "application-desktop/data/DesktopStyle.hpp"
+#include "module-apps/popups/data/LockStyle.hpp"
+#include "module-apps/application-desktop/windows/Names.hpp"
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <i18n/i18n.hpp>

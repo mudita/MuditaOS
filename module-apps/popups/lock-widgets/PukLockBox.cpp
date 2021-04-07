@@ -3,9 +3,9 @@
 
 #include "PukLockBox.hpp"
 
-#include "PinLockBaseWindow.hpp"
-#include "application-desktop/widgets/PinLock.hpp"
-#include "application-desktop/data/AppDesktopStyle.hpp"
+#include "popups/data/LockStyle.hpp"
+#include "popups/lock-windows/PinLockBaseWindow.hpp"
+#include "PinLock.hpp"
 #include "gui/widgets/Image.hpp"
 #include <i18n/i18n.hpp>
 #include <Style.hpp>
