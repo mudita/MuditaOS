@@ -83,4 +83,4 @@
 	shallow = true
 [submodule "module-utils/CrashDebug"]
 	path = module-utils/CrashDebug
-	url = git@github.com:adamgreen/CrashDebug.git
+	url = https://github.com/adamgreen/CrashDebug.git
