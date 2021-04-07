@@ -27,6 +27,11 @@ namespace audio
         using AudioCallback =
             std::function<std::int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>;
         static const std::size_t INPUT_BUFFER_START_SIZE = 1024;
+        enum class Mute : bool
+        {
+            Enabled,
+            Disabled
+        };
 
       public:
         RouterOperation(const char *file, AudioServiceMessage::Callback callback);
@@ -48,8 +53,11 @@ namespace audio
         static constexpr auto maximumBlockSize = 64U;
         static constexpr Endpoint::Capabilities routerCapabilities{.minBlockSize = minimumBlockSize,
                                                                    .maxBlockSize = maximumBlockSize};
+        Mute mute = Mute::Disabled;
 
-        bool Mute(bool enable);
+        void Mute();
+        void Unmute();
+        [[nodiscard]] auto IsMuted() const noexcept -> bool;
 
         std::unique_ptr<Stream> dataStreamOut;
         std::unique_ptr<Stream> dataStreamIn;
