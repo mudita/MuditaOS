@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FactoryReset.hpp"
 #include <SystemManager/SystemManager.hpp>
 #include <log/log.hpp>
-#include <purefs/filesystem_paths.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <Utils.hpp>
 
@@ -38,36 +37,52 @@ namespace FactoryReset
 
     bool Run(sys::Service *ownerService)
     {
-        LOG_INFO("FactoryReset: restoring factory state started...");
+        LOG_INFO("Restoring factory state started...");
 
         recurseDepth             = 0;
-        const auto factoryOSPath = purefs::dir::getFactoryOSPath();
+        const auto userOSPath    = purefs::dir::getUserDiskPath();
 
-        if (std::filesystem::is_directory(factoryOSPath.c_str()) && std::filesystem::is_empty(factoryOSPath.c_str())) {
-            LOG_ERROR("FactoryReset: restoring factory state aborted");
-            LOG_ERROR("FactoryReset: directory %s seems empty.", factoryOSPath.c_str());
+        if (std::filesystem::is_directory(userOSPath.c_str()) && std::filesystem::is_empty(userOSPath.c_str())) {
+            LOG_ERROR("Restoring factory state aborted");
+            LOG_ERROR("Directory %s seems empty.", userOSPath.c_str());
             return false;
         }
 
         if (ownerService != nullptr) {
-            LOG_INFO("FactoryReset: closing ServiceDB...");
+            LOG_INFO("Closing ServiceDB...");
             std::string dbServiceName = service::name::db;
             sys::SystemManager::DestroySystemService(dbServiceName, ownerService);
         }
 
-        if (DeleteDirContent(purefs::dir::getRootDiskPath()) != true) {
-            LOG_ERROR("FactoryReset: restoring factory state aborted");
-            return false;
-        }
+        DeleteSelectedUserFiles(userOSPath);
 
-        if (CopyDirContent(factoryOSPath, purefs::dir::getRootDiskPath()) != true) {
-            LOG_ERROR("FactoryReset: restoring factory state aborted");
-            return false;
-        }
-
-        LOG_INFO("FactoryReset: restoring factory state finished, rebooting...");
+        LOG_INFO("Rebooting...");
         sys::SystemManager::Reboot(ownerService);
         return true;
+    }
+
+    bool DeleteSelectedUserFiles(const std::filesystem::path &userOSPath)
+    {
+        bool returnStatus                        = true;
+        std::vector<std::string> selectedFileExt = {".db", ".db-journal", ".db-wal"};
+
+        LOG_INFO("Delete DB files which will be recreated with factory content after reboot:");
+        for (const auto &f : std::filesystem::directory_iterator(userOSPath.c_str())) {
+            for (const auto &ext : selectedFileExt) {
+                if (f.path().extension() == ext) {
+                    auto removeStatus = std::filesystem::remove(f.path());
+                    if (removeStatus == false) {
+                        LOG_ERROR("Error deleting file %s, aborting...", f.path().c_str());
+                        returnStatus = false;
+                    }
+                    else {
+                        LOG_INFO("%s deleted.", f.path().c_str());
+                    }
+                    break;
+                }
+            }
+        }
+        return returnStatus;
     }
 
     bool DeleteDirContent(std::string dir)
