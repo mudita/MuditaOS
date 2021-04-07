@@ -249,6 +249,8 @@
   "app_desktop_sim_setup_wrong_puk": "<text>Wrong PUK code.<br></br>You have <token>$ATTEMPTS</token> attempts left</text>",
   "app_desktop_sim_setup_wrong_puk_last_attempt": "<text>Wrong PUK code.<br></br>You have 1 attempt left</text>",
   "app_desktop_sim_setup_wrong_puk_last_attempt_warning": "<text>If the code is wrong this time, the<br></br>SIM card will be blocked and you'll<br></br>have to contact the operator.</text>",
+  "app_desktop_sim_card_unlocked": "SIM card unlocked",
+  "app_desktop_sim_card_locked": "SIM card locked",
   "app_desktop_screen_enter_passcode_to_unlock": "<text>Enter the passcode<br></br>to unlock:</text>",
   "app_desktop_screen_wrong_passcode_last_attempt": "<text>Wrong passcode.<br></br>You have 1 attempt left.</text>",
   "app_desktop_screen_wrong_passcode_last_attempt_warning": "<text>If the passcode is wrong this time,<br></br>you'll have to wait <token>$MINUTES</token> minutes<br></br>before trying again.</text>",

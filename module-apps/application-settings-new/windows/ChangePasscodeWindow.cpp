@@ -106,7 +106,7 @@ namespace gui
 
                 auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                     gui::DialogMetadata{utils::localize.get("app_settings_security_change_passcode"),
-                                        "big_circle_placeholder",
+                                        "success_icon_W_G",
                                         utils::localize.get("app_settings_security_passcode_disabled"),
                                         "",
                                         [this]() {
@@ -168,7 +168,7 @@ namespace gui
 
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                 gui::DialogMetadata{utils::localize.get("app_settings_security_change_passcode"),
-                                    "big_circle_placeholder",
+                                    "success_icon_W_G",
                                     utils::localize.get("app_settings_security_passcode_changed_successfully"),
                                     "",
                                     [this]() {
