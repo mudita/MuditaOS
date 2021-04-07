@@ -26,9 +26,6 @@ namespace app
         inline constexpr auto name_dialogConfirm     = "DialogConfirm";
         inline constexpr auto name_number            = "NumberWindow";
     } // namespace window
-
-    inline constexpr auto ringtone_path = "assets/audio/rington_drum_2.mp3"; // Should bo moved to database
-
     class CallWindowInterface
     {
       public:

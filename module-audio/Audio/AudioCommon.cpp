@@ -63,13 +63,10 @@ namespace audio
 
     const std::string dbPath(const DbPathElement &element)
     {
-        return dbPath(element.setting, element.playbackType, element.profileType, element.phoneMode);
+        return dbPath(element.setting, element.playbackType, element.profileType);
     }
 
-    const std::string dbPath(const Setting &setting,
-                             const PlaybackType &playbackType,
-                             const Profile::Type &profileType,
-                             const std::optional<sys::phone_modes::PhoneMode> phoneMode)
+    const std::string dbPath(const Setting &setting, const PlaybackType &playbackType, const Profile::Type &profileType)
     {
         if (profileType == Profile::Type::Idle && playbackType == PlaybackType::None) {
             return std::string();
@@ -79,9 +76,6 @@ namespace audio
         std::string path;
 
         pathElements.emplace_back(audioDbPrefix);
-        if ((setting == Setting::EnableSound || setting == Setting::EnableVibration) && phoneMode.has_value()) {
-            pathElements.emplace_back(utils::enumToString(phoneMode.value()));
-        }
 
         if (auto s = str(profileType); !s.empty()) {
             pathElements.emplace_back(s);

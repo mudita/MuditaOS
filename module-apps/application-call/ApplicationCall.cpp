@@ -301,7 +301,8 @@ namespace app
 
     void ApplicationCall::startAudioRinging()
     {
-        AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, ringtone_path);
+        const auto filePath = AudioServiceAPI::GetSound(this, audio::PlaybackType::CallRingtone);
+        AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::CallRingtone, filePath);
     }
 
     void ApplicationCall::startAudioRouting()

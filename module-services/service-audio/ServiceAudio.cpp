@@ -20,7 +20,6 @@
 #include <utility>
 
 using namespace audio;
-using namespace sys::phone_modes;
 
 inline constexpr auto audioServiceStackSize = 1024 * 4;
 
@@ -29,6 +28,10 @@ static constexpr auto defaultVolumeLow   = "2";
 static constexpr auto defaultVolumeMuted = "0";
 static constexpr auto defaultTrue        = "1";
 static constexpr auto defaultFalse       = "0";
+static constexpr auto defaultCallRingtonePath        = "assets/audio/Ringtone-drum2.mp3";
+static constexpr auto defaultTextMessageRingtonePath = "assets/audio/SMS-drum2.mp3";
+static constexpr auto defaultNotificationsPath       = "assets/audio/SMS-drum2.mp3";
+static constexpr auto defaultKeypadSoundPath         = "assets/audio/SMS-drum2.mp3";
 
 static constexpr std::initializer_list<std::pair<audio::DbPathElement, const char *>> cacheInitializer{
 
@@ -41,9 +44,7 @@ static constexpr std::initializer_list<std::pair<audio::DbPathElement, const cha
     {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackBluetoothA2DP}, defaultVolumeLow},
     {DbPathElement{Setting::Volume, PlaybackType::System, Profile::Type::PlaybackLoudspeaker}, defaultVolumeHigh},
 
-    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackHeadphones}, defaultVolumeLow},
-    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackBluetoothA2DP}, defaultVolumeLow},
-    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker}, defaultVolumeHigh},
+    {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::Idle}, defaultVolumeLow},
 
     // ROUTING
     {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RoutingBluetoothHSP}, "20"},
@@ -62,110 +63,36 @@ static constexpr std::initializer_list<std::pair<audio::DbPathElement, const cha
     {DbPathElement{Setting::Gain, PlaybackType::None, Profile::Type::RecordingBluetoothHSP}, "100"},
 
     // MISC
-    {DbPathElement{Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Connected},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Connected},
-     defaultTrue},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Connected},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Connected},
-     defaultTrue},
-    {DbPathElement{
-         Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Connected},
-     defaultTrue},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Connected},
-     defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle}, defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle}, defaultFalse},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle}, defaultFalse},
     {DbPathElement{Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle}, defaultTrue},
 
-    {DbPathElement{Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultFalse},
-    {DbPathElement{
-         Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle}, defaultTrue},
+    {DbPathElement{Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle}, defaultTrue},
 
-    {DbPathElement{Setting::EnableVibration, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Offline},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Offline},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Offline},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Offline},
-     defaultFalse},
-    {DbPathElement{
-         Setting::EnableVibration, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Offline},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Offline},
-     defaultFalse},
-    {DbPathElement{Setting::EnableVibration, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::Offline},
-     defaultTrue},
-
-    {DbPathElement{Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Connected},
-     defaultTrue},
-    {DbPathElement{Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Connected},
-     defaultTrue},
-    {DbPathElement{Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Connected},
-     defaultTrue},
-    {DbPathElement{Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Connected},
-     defaultTrue},
-    {DbPathElement{Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Connected},
-     defaultTrue},
-    {DbPathElement{Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Connected},
-     defaultTrue},
-    {DbPathElement{Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::Connected}, defaultTrue},
-
-    {DbPathElement{Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultTrue},
-    {DbPathElement{Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultFalse},
-    {DbPathElement{Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultFalse},
-    {DbPathElement{Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultFalse},
-    {DbPathElement{
-         Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultFalse},
-    {DbPathElement{Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultTrue},
-    {DbPathElement{Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::DoNotDisturb},
-     defaultTrue},
-
-    {DbPathElement{Setting::EnableSound, PlaybackType::Multimedia, Profile::Type::Idle, PhoneMode::Offline},
-     defaultTrue},
-    {DbPathElement{Setting::EnableSound, PlaybackType::Notifications, Profile::Type::Idle, PhoneMode::Offline},
-     defaultFalse},
-    {DbPathElement{Setting::EnableSound, PlaybackType::KeypadSound, Profile::Type::Idle, PhoneMode::Offline},
-     defaultFalse},
-    {DbPathElement{Setting::EnableSound, PlaybackType::CallRingtone, Profile::Type::Idle, PhoneMode::Offline},
-     defaultFalse},
-    {DbPathElement{Setting::EnableSound, PlaybackType::TextMessageRingtone, Profile::Type::Idle, PhoneMode::Offline},
-     defaultFalse},
-    {DbPathElement{Setting::EnableSound, PlaybackType::Meditation, Profile::Type::Idle, PhoneMode::Offline},
-     defaultTrue},
-    {DbPathElement{Setting::EnableSound, PlaybackType::Alarm, Profile::Type::Idle, PhoneMode::Offline}, defaultTrue},
+    {DbPathElement{Setting::Sound, PlaybackType::Notifications, Profile::Type::Idle}, defaultNotificationsPath},
+    {DbPathElement{Setting::Sound, PlaybackType::KeypadSound, Profile::Type::Idle}, defaultKeypadSoundPath},
+    {DbPathElement{Setting::Sound, PlaybackType::CallRingtone, Profile::Type::Idle}, defaultCallRingtonePath},
+    {DbPathElement{Setting::Sound, PlaybackType::TextMessageRingtone, Profile::Type::Idle},
+     defaultTextMessageRingtonePath},
 };
 
 ServiceAudio::ServiceAudio()
     : sys::Service(service::name::audio, "", audioServiceStackSize, sys::ServicePriority::Idle),
       audioMux([this](auto... params) { return this->AudioServicesCallback(params...); }),
-      settingsProvider(std::make_unique<settings::Settings>(this)),
-      phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
+      settingsProvider(std::make_unique<settings::Settings>(this))
 {
     LOG_INFO("[ServiceAudio] Initializing");
     bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
-    bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
-
-    phoneModeObserver->connect(this);
-    phoneModeObserver->subscribe([&](sys::phone_modes::PhoneMode phoneMode) { HandlePhoneModeChange(phoneMode); });
 
     connect(typeid(BluetoothDeviceVolumeChanged),
             [this](sys::Message *msg) -> sys::MessagePointer { return handleVolumeChangedOnBluetoothDevice(msg); });
@@ -209,8 +136,7 @@ std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Messag
         bus.sendMulticast(std::move(newMsg), sys::BusChannel::ServiceAudioNotifications);
     }
     else if (const auto *dbReq = dynamic_cast<const AudioServiceMessage::DbRequest *>(msg); dbReq) {
-        std::string path =
-            dbPath(dbReq->setting, dbReq->playback, dbReq->profile, phoneModeObserver->getCurrentPhoneMode());
+        std::string path = dbPath(dbReq->setting, dbReq->playback, dbReq->profile);
         LOG_DEBUG("ServiceAudio::DBbCallback(%s)", path.c_str());
         auto settings_it = settingsCache.find(path);
         if (settingsCache.end() == settings_it) {
@@ -246,7 +172,6 @@ constexpr bool ServiceAudio::IsResumable(const audio::PlaybackType &type) const
 
 constexpr bool ServiceAudio::ShouldLoop(const std::optional<audio::PlaybackType> &type) const
 {
-
     return type.value_or(audio::PlaybackType::None) == audio::PlaybackType::CallRingtone;
 }
 
@@ -256,6 +181,7 @@ bool ServiceAudio::IsVibrationEnabled(const audio::PlaybackType &type)
         utils::getNumericValue<audio::Vibrate>(getSetting(Setting::EnableVibration, Profile::Type::Idle, type));
     return isEnabled;
 }
+
 bool ServiceAudio::IsOperationEnabled(const audio::PlaybackType &plType, const Operation::Type &opType)
 {
     if (opType == Operation::Type::Router || opType == Operation::Type::Recorder) {
@@ -264,6 +190,11 @@ bool ServiceAudio::IsOperationEnabled(const audio::PlaybackType &plType, const O
     auto isEnabled =
         utils::getNumericValue<audio::EnableSound>(getSetting(Setting::EnableSound, Profile::Type::Idle, plType));
     return isEnabled;
+}
+
+std::string ServiceAudio::GetSound(const audio::PlaybackType &plType)
+{
+    return getSetting(Setting::Sound, Profile::Type::Idle, plType);
 }
 
 ServiceAudio::VibrationType ServiceAudio::GetVibrationType(const audio::PlaybackType &type)
@@ -299,7 +230,7 @@ void ServiceAudio::VibrationUpdate(const audio::PlaybackType &type, std::optiona
         EventManagerServiceAPI::vibraPulseRepeatUntilStop(this);
         vibrationMotorStatus = AudioMux::VibrationStatus::On;
     }
-    else if (!anyOfInputsOn && IsVibrationMotorOn()) {
+    else if ((!anyOfInputsOn && IsVibrationMotorOn()) || (anyOfInputsOn && IsVibrationMotorOn())) {
         EventManagerServiceAPI::vibraStop(this);
         vibrationMotorStatus = AudioMux::VibrationStatus::Off;
     }
@@ -544,25 +475,6 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyP
         audio::RetCode::Success, newVolume, AudioKeyPressedResponse::ShowPopup::True, context);
 }
 
-void ServiceAudio::HandlePhoneModeChange(sys::phone_modes::PhoneMode phoneMode)
-{
-    LOG_INFO("Phone mode changed to %s", utils::enumToString(phoneMode).c_str());
-    for (auto &input : audioMux.GetAllInputs()) {
-        if (input.audio->GetCurrentState() != Audio::State::Idle) {
-            std::string path = dbPath(Setting::Volume,
-                                      input.audio->GetCurrentOperationPlaybackType(),
-                                      input.audio->GetPriorityPlaybackProfile(),
-                                      phoneMode);
-            if (const auto it = settingsCache.find(path); settingsCache.end() != it) {
-                input.audio->SetOutputVolume(utils::getNumericValue<audio::Volume>(it->second));
-            }
-            else {
-                LOG_ERROR("Requested uninitialized DB value %s", path.c_str());
-            }
-        }
-    }
-}
-
 void ServiceAudio::MuteCurrentOperation()
 {
     for (auto &input : audioMux.GetAllInputs()) {
@@ -583,7 +495,7 @@ bool ServiceAudio::IsBusy()
 sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     sys::MessagePointer responseMsg;
-    bool isBusy = IsBusy();
+    const auto isBusy = IsBusy();
     auto &msgType = typeid(*msgl);
 
     if (msgType == typeid(AudioNotificationMessage)) {
@@ -592,12 +504,12 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     }
     else if (msgType == typeid(AudioGetSetting)) {
         auto *msg   = static_cast<AudioGetSetting *>(msgl);
-        auto value  = getSetting(msg->setting, msg->profileType, msg->playbackType);
-        responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, utils::getNumericValue<float>(value));
+        auto value  = getSetting(msg->setting, Profile::Type::Idle, msg->playbackType);
+        responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, value);
     }
     else if (msgType == typeid(AudioSetSetting)) {
         auto *msg = static_cast<AudioSetSetting *>(msgl);
-        setSetting(msg->setting, msg->val, msg->profileType, msg->playbackType);
+        setSetting(msg->setting, msg->val, Profile::Type::Idle, msg->playbackType);
         responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success);
     }
     else if (msgType == typeid(AudioStopRequest)) {
@@ -679,10 +591,22 @@ std::string ServiceAudio::getSetting(const Setting &setting,
         }
     }
 
-    if (setting == Setting::EnableVibration || setting == Setting::EnableSound) {
+    switch (setting) {
+    case Setting::EnableVibration:
+    case Setting::EnableSound:
+    case Setting::Sound:
         targetProfile = Profile::Type::Idle;
+        break;
+    case Setting::Volume:
+        if (targetPlayback == PlaybackType::Alarm) {
+            targetProfile = Profile::Type::Idle;
+        }
+        break;
+    case Setting::Gain:
+        break;
     }
-    std::string path = dbPath(setting, targetPlayback, targetProfile, phoneModeObserver->getCurrentPhoneMode());
+
+    const auto path = dbPath(setting, targetPlayback, targetProfile);
 
     if (const auto set_it = settingsCache.find(path); settingsCache.end() != set_it) {
         LOG_INFO("Get audio setting %s = %s", path.c_str(), set_it->second.c_str());
@@ -724,7 +648,12 @@ void ServiceAudio::setSetting(const Setting &setting,
         valueToSet              = std::to_string(clampedValue);
         if (activeInput) {
             retCode = activeInput.value()->audio->SetOutputVolume(clampedValue);
+            break;
         }
+        if (updatedPlayback == PlaybackType::Alarm) {
+            updatedProfile = Profile::Type::Idle;
+        }
+        break;
     } break;
     case Setting::Gain: {
         const auto clampedValue = std::clamp(utils::getNumericValue<audio::Gain>(value), minGain, maxGain);
@@ -734,17 +663,16 @@ void ServiceAudio::setSetting(const Setting &setting,
         }
     } break;
     case Setting::EnableVibration:
-    case Setting::EnableSound: {
+    case Setting::EnableSound:
+    case Setting::Sound: {
         updatedProfile = audio::Profile::Type::Idle;
         valueToSet     = value;
     } break;
     }
 
     if (retCode == RetCode::Success) {
-        settingsProvider->setValue(
-            dbPath(setting, updatedPlayback, updatedProfile, phoneModeObserver->getCurrentPhoneMode()), valueToSet);
-        settingsCache[dbPath(setting, updatedPlayback, updatedProfile, phoneModeObserver->getCurrentPhoneMode())] =
-            valueToSet;
+        settingsProvider->setValue(dbPath(setting, updatedPlayback, updatedProfile), valueToSet);
+        settingsCache[dbPath(setting, updatedPlayback, updatedProfile)] = valueToSet;
     }
 }
 

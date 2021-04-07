@@ -420,25 +420,33 @@ namespace app
             return std::make_unique<gui::ApnOptionsWindow>(app);
         });
         windowsFactory.attach(gui::window::name::phone, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::PhoneWindow>(app);
+            auto audioModel =
+                std::make_unique<audio_settings::AudioSettingsModel>(app, audio_settings::PlaybackType::CallRingtone);
+            return std::make_unique<gui::PhoneWindow>(app, std::move(audioModel));
         });
         windowsFactory.attach(gui::window::name::call_ringtone, [](Application *app, const std::string &name) {
             return std::make_unique<gui::CallRingtoneWindow>(app);
         });
         windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::MessagesWindow>(app);
+            auto audioModel = std::make_unique<audio_settings::AudioSettingsModel>(
+                app, audio_settings::PlaybackType::TextMessageRingtone);
+            return std::make_unique<gui::MessagesWindow>(app, std::move(audioModel));
         });
         windowsFactory.attach(gui::window::name::message_sound, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MessageSoundWindow>(app);
         });
         windowsFactory.attach(gui::window::name::calendar, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::CalendarWindow>(app);
+            auto audioModel =
+                std::make_unique<audio_settings::AudioSettingsModel>(app, audio_settings::PlaybackType::Notifications);
+            return std::make_unique<gui::CalendarWindow>(app, std::move(audioModel));
         });
         windowsFactory.attach(gui::window::name::notification_sound, [](Application *app, const std::string &name) {
             return std::make_unique<gui::NotificationSoundWindow>(app);
         });
         windowsFactory.attach(gui::window::name::alarm_clock, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::AlarmClockWindow>(app);
+            auto audioModel =
+                std::make_unique<audio_settings::AudioSettingsModel>(app, audio_settings::PlaybackType::Alarm);
+            return std::make_unique<gui::AlarmClockWindow>(app, std::move(audioModel));
         });
         windowsFactory.attach(gui::window::name::phone_name, [](Application *app, const std::string &name) {
             return std::make_unique<gui::PhoneNameWindow>(app);
@@ -731,5 +739,4 @@ namespace app
         settings->setValue(
             ::settings::Offline::connectionFrequency, std::to_string(val), ::settings::SettingsScope::Global);
     }
-
 } /* namespace app */

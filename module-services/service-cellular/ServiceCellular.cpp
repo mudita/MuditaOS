@@ -1850,8 +1850,11 @@ void ServiceCellular::onSMSReceived()
     DBServiceAPI::GetQuery(this,
                            db::Interface::Name::Notifications,
                            std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms));
-    const std::string ringtone_path = "assets/audio/sms_drum_2.mp3";
-    AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::TextMessageRingtone, ringtone_path);
+
+    const auto guard = [&]() { return !phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::DoNotDisturb); };
+    auto filePath    = AudioServiceAPI::GetSound(this, audio::PlaybackType::TextMessageRingtone);
+    utility::conditionally_invoke(
+        guard, &AudioServiceAPI::PlaybackStart, this, audio::PlaybackType::TextMessageRingtone, filePath);
 }
 
 bool ServiceCellular::receiveAllMessages()
