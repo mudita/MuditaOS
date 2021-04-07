@@ -253,7 +253,8 @@ void ServiceCellular::SleepTimerHandler()
                                 ? currentTime - lastCommunicationTimestamp
                                 : std::numeric_limits<TickType_t>::max() - lastCommunicationTimestamp + currentTime;
 
-    if (!ongoingCall.isValid() && timeOfInactivity >= constants::enterSleepModeTime.count()) {
+    if (!ongoingCall.isValid() && state.get() == cellular::State::ST::Ready &&
+        timeOfInactivity >= constants::enterSleepModeTime.count()) {
         cmux->EnterSleepMode();
         cpuSentinel->ReleaseMinimumFrequency();
     }
