@@ -52,6 +52,7 @@ INSTALL_PACKAGES="
         python3-pip \
         python3-requests \
         rhash \
+        rsync \
         tzdata \
         tar \
         vim \
