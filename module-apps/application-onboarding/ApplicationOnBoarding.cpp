@@ -30,8 +30,9 @@ namespace app
 
     ApplicationOnBoarding::ApplicationOnBoarding(std::string name,
                                                  std::string parent,
+                                                 sys::phone_modes::PhoneMode mode,
                                                  StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), startInBackground, OnBoardingStackSize)
+        : Application(std::move(name), std::move(parent), mode, startInBackground, OnBoardingStackSize)
     {
         using namespace gui::top_bar;
         topBarManager->enableIndicators({Indicator::Signal,

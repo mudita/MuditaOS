@@ -48,6 +48,7 @@ namespace gui
 namespace gui
 {
     class Item;
+    class PopupRequestParams;
 }
 namespace gui
 {
@@ -188,6 +189,7 @@ namespace app
 
         Application(std::string name,
                     std::string parent                  = "",
+                    sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                     StartInBackground startInBackground = {false},
                     uint32_t stackDepth                 = 4096,
                     sys::ServicePriority priority       = sys::ServicePriority::Idle);
@@ -326,7 +328,7 @@ namespace app
         /// Handle the change of phone mode and tethering mode
         /// @param mode new phone mode
         /// @param tethering new tethering mode
-        void handlePhoneModeChanged(sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering);
+        void handlePhoneModeChanged(sys::phone_modes::PhoneMode mode);
 
         /// @ingrup AppWindowStack
         WindowsStack windowsStack;
@@ -334,6 +336,7 @@ namespace app
 
         /// Method used to attach popups windows to application
         void attachPopups(const std::vector<gui::popup::ID> &popupsList);
+        void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params);
         void abortPopup(gui::popup::ID id);
 
       public:
@@ -391,7 +394,7 @@ namespace app
 
         /// application's settings
         std::unique_ptr<settings::Settings> settings;
-        std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
+        sys::phone_modes::PhoneMode phoneMode;
 
       public:
         void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;
@@ -414,21 +417,5 @@ namespace app
 
       private:
         ApplicationName targetAppName;
-    };
-
-    class PopupRequestParams : public manager::actions::ActionParams
-    {
-      public:
-        explicit PopupRequestParams(gui::popup::ID popupId)
-            : manager::actions::ActionParams{"Popup request parameters"}, popupId{popupId}
-        {}
-
-        [[nodiscard]] auto getPopupId() const noexcept
-        {
-            return popupId;
-        }
-
-      private:
-        gui::popup::ID popupId;
     };
 } /* namespace app */

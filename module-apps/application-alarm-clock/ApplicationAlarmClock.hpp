@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,8 +14,9 @@ namespace app
       public:
         ApplicationAlarmClock(std::string name,
                               std::string parent,
-                              uint32_t stackDepth           = 4096,
-                              sys::ServicePriority priority = sys::ServicePriority::Idle);
+                              sys::phone_modes::PhoneMode mode = sys::phone_modes::PhoneMode::Connected,
+                              uint32_t stackDepth              = 4096,
+                              sys::ServicePriority priority    = sys::ServicePriority::Idle);
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
@@ -36,7 +37,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
         }
     };
 } // namespace app

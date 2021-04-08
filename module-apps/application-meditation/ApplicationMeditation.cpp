@@ -12,8 +12,9 @@ namespace app
 {
     ApplicationMeditation::ApplicationMeditation(std::string name,
                                                  std::string parent,
+                                                 sys::phone_modes::PhoneMode mode,
                                                  StartInBackground startInBackground)
-        : Application{name, parent, startInBackground}, state{std::make_unique<gui::OptionsData>()}
+        : Application{name, parent, mode, startInBackground}, state{std::make_unique<gui::OptionsData>()}
     {}
 
     auto ApplicationMeditation::InitHandler() -> sys::ReturnCodes

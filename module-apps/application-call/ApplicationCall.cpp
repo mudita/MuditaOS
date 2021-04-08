@@ -30,8 +30,11 @@
 
 namespace app
 {
-    ApplicationCall::ApplicationCall(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, app::call_stack_size)
+    ApplicationCall::ApplicationCall(std::string name,
+                                     std::string parent,
+                                     sys::phone_modes::PhoneMode mode,
+                                     StartInBackground startInBackground)
+        : Application(name, parent, mode, startInBackground, app::call_stack_size)
     {
         using namespace gui::top_bar;
         topBarManager->enableIndicators({Indicator::Signal,

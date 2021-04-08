@@ -27,8 +27,11 @@ namespace app
         constexpr auto NotesStackSize = 4096U;
     } // namespace
 
-    ApplicationNotes::ApplicationNotes(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), startInBackground, NotesStackSize)
+    ApplicationNotes::ApplicationNotes(std::string name,
+                                       std::string parent,
+                                       sys::phone_modes::PhoneMode mode,
+                                       StartInBackground startInBackground)
+        : Application(std::move(name), std::move(parent), mode, startInBackground, NotesStackSize)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }

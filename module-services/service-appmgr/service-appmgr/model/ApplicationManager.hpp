@@ -68,6 +68,7 @@ namespace app::manager
         auto getLaunchingApplication() const noexcept -> ApplicationHandle *;
         auto getPreviousApplication() const noexcept -> ApplicationHandle *;
         auto getApplication(const ApplicationName &name) const noexcept -> ApplicationHandle *;
+        auto getRunningApplications() noexcept -> std::vector<ApplicationHandle *>;
         auto getApplications() const noexcept -> const ApplicationsContainer &
         {
             return applications.getAll();
@@ -84,6 +85,8 @@ namespace app::manager
 
       private:
         using ApplicationsStack = std::deque<ApplicationName>;
+
+        auto getStackOfUniqueApplications() const -> ApplicationsStack;
 
         State state = State::Running;
         ApplicationsStack stack;
@@ -120,6 +123,9 @@ namespace app::manager
         auto handleHomeAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleLaunchAction(ActionEntry &action) -> ActionProcessStatus;
         auto handlePopupAction(ActionEntry &action) -> ActionProcessStatus;
+        auto handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
+        void handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode);
+        void changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app);
         auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;
         auto handleCloseConfirmation(CloseConfirmation *msg) -> bool;

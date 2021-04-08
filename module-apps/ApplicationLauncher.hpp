@@ -65,12 +65,12 @@ namespace app
             return (preventAutoLocking == PreventAutoLocking::True);
         }
 
-        virtual bool run(sys::Service *caller = nullptr)
+        virtual bool run(sys::phone_modes::PhoneMode mode, sys::Service *caller = nullptr)
         {
             return false;
         }
 
-        virtual bool runBackground(sys::Service *caller = nullptr)
+        virtual bool runBackground(sys::phone_modes::PhoneMode mode, sys::Service *caller = nullptr)
         {
             return false;
         }
@@ -89,17 +89,17 @@ namespace app
             : ApplicationLauncher(name, std::move(manifest), isCloseable, preventBlocking)
         {}
 
-        bool run(sys::Service *caller) override
+        bool run(sys::phone_modes::PhoneMode mode, sys::Service *caller) override
         {
             parent = (caller == nullptr ? "" : caller->GetName());
-            handle = std::make_shared<T>(name, parent);
+            handle = std::make_shared<T>(name, parent, mode);
             return sys::SystemManager::RunApplication(handle, caller);
         }
 
-        bool runBackground(sys::Service *caller) override
+        bool runBackground(sys::phone_modes::PhoneMode mode, sys::Service *caller) override
         {
             parent = (caller == nullptr ? "" : caller->GetName());
-            handle = std::make_shared<T>(name, parent, true);
+            handle = std::make_shared<T>(name, parent, mode, true);
             return sys::SystemManager::RunApplication(handle, caller);
         }
     };

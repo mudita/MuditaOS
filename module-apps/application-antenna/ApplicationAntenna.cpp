@@ -36,8 +36,11 @@ namespace app
 
     inline constexpr auto antennaApplicationStackSize = 1024 * 3;
 
-    ApplicationAntenna::ApplicationAntenna(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, antennaApplicationStackSize)
+    ApplicationAntenna::ApplicationAntenna(std::string name,
+                                           std::string parent,
+                                           sys::phone_modes::PhoneMode mode,
+                                           StartInBackground startInBackground)
+        : Application(name, parent, mode, startInBackground, antennaApplicationStackSize)
     {
         bus.channels.push_back(sys::BusChannel::AntennaNotifications);
         appTimer = sys::TimerFactory::createPeriodicTimer(

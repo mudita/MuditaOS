@@ -5,6 +5,8 @@
 
 #include <module-sys/Service/Message.hpp>
 
+#include <module-apps/popups/data/PopupRequestParams.hpp>
+
 #include <service-appmgr/Actions.hpp>
 #include <service-appmgr/messages/ActionRequest.hpp>
 
@@ -18,7 +20,7 @@ namespace sys
 
         std::unique_ptr<app::manager::ActionRequest> toAction() const override
         {
-            auto params = std::make_unique<app::PopupRequestParams>(gui::popup::ID::Tethering);
+            auto params = std::make_unique<gui::PopupRequestParams>(gui::popup::ID::Tethering);
             return std::make_unique<app::manager::ActionRequest>(
                 sender, app::manager::actions::ShowPopup, std::move(params));
         }
@@ -32,7 +34,7 @@ namespace sys
 
         std::unique_ptr<app::manager::ActionRequest> toAction() const override
         {
-            auto params = std::make_unique<app::PopupRequestParams>(gui::popup::ID::Tethering);
+            auto params = std::make_unique<gui::PopupRequestParams>(gui::popup::ID::Tethering);
             return std::make_unique<app::manager::ActionRequest>(
                 sender, app::manager::actions::AbortPopup, std::move(params));
         }

@@ -56,6 +56,7 @@ namespace app
 
         ApplicationDesktop(std::string name                    = name_desktop,
                            std::string parent                  = {},
+                           sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                            StartInBackground startInBackground = {false});
         virtual ~ApplicationDesktop();
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -131,7 +132,8 @@ namespace app
                      manager::actions::DisplayCMEError,
                      manager::actions::DisplayLowBatteryScreen,
                      manager::actions::SystemBrownout,
-                     manager::actions::DisplayLogoAtExit}};
+                     manager::actions::DisplayLogoAtExit,
+                     manager::actions::PhoneModeChanged}};
         }
     };
 

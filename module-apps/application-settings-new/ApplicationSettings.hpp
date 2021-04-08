@@ -180,6 +180,7 @@ namespace app
       public:
         explicit ApplicationSettingsNew(std::string name                    = name_settings_new,
                                         std::string parent                  = {},
+                                        sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                                         StartInBackground startInBackground = {false});
         ~ApplicationSettingsNew() override;
         auto DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) -> sys::MessagePointer override;
@@ -256,7 +257,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
         }
     };
 } /* namespace app */
