@@ -75,6 +75,9 @@ gui::ListItem *CalllogModel::getItem(gui::Order order)
         return nullptr;
     }
 
+    auto contact = DBServiceAPI::ContactGetByIDWithTemporary(application, call->getContactId());
+    call->name   = contact->front().getFormattedName();
+
     auto item = new gui::CalllogItem(this, !(utils::dateAndTimeSettings.isTimeFormat12()));
 
     auto callCallback = [this, item](gui::Item & /*item*/, const gui::InputEvent &event) {
