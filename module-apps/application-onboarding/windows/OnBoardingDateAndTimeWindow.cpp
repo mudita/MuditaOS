@@ -1,12 +1,14 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-onboarding/ApplicationOnBoarding.hpp"
 #include "OnBoardingDateAndTimeWindow.hpp"
 #include "ConfigurationSuccessfulDialogWindow.hpp"
+
+#include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-apps/application-onboarding/data/OnBoardingSwitchData.hpp>
 #include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <module-apps/application-settings-new/data/ChangePasscodeData.hpp>
 
 namespace app::onBoarding
 {
@@ -30,7 +32,11 @@ namespace app::onBoarding
     bool OnBoardingDateAndTimeWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_RF)) {
-            return AppWindow::onInput(inputEvent);
+            application->switchWindow(
+                gui::window::name::onBoarding_configure_passcode,
+                gui::ShowMode::GUI_SHOW_INIT,
+                std::make_unique<ChangePasscodeData>(ChangePasscodeAction::OnlyProvideNewPasscode));
+            return true;
         }
         else if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_LF)) {
             return getFocusItem()->onActivated(nullptr);

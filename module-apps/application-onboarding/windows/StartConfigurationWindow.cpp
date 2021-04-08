@@ -51,7 +51,7 @@ namespace app::onBoarding
                                           std::make_unique<OnBoardingSwitchData>());
             }
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-                application->switchWindow(gui::window::name::onBoarding_date_and_time,
+                application->switchWindow(gui::window::name::onBoarding_configure_passcode,
                                           gui::ShowMode::GUI_SHOW_INIT,
                                           std::make_unique<OnBoardingSwitchData>());
             }
