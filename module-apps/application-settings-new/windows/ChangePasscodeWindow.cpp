@@ -67,8 +67,11 @@ namespace gui
 
         lockBox = std::make_unique<ScreenLockBaseBox>(this);
         lockBox->buildLockBox(lockHandler.getLock().getMaxPinSize());
-        primaryText->setPosition(screen_lock_style::primary_text::y, gui::Axis::Y);
-        pinLabelsBox->setPosition(screen_lock_style::pin_label::y, gui::Axis::Y);
+
+        lockImage = new gui::Image(this, lock_style::image::x, lock_style::image::y, 0, 0, "pin_lock");
+
+        primaryText->setPosition(lockImage->getHeight() + screen_lock_style::primary_text::y, gui::Axis::Y);
+        pinLabelsBox->setPosition(lockImage->getHeight() + screen_lock_style::pin_label::y, gui::Axis::Y);
     }
 
     void ChangePasscodeWindow::buildTitleBar()
