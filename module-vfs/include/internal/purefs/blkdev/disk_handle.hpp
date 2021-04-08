@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,8 +18,8 @@ namespace purefs::blkdev::internal
     class disk_handle
     {
       public:
-        static constexpr auto no_parition = -1;
-        explicit disk_handle(std::weak_ptr<blkdev::disk> disk, std::string_view name, short partition = no_parition)
+        static constexpr auto no_partition = -1;
+        explicit disk_handle(std::weak_ptr<blkdev::disk> disk, std::string_view name, short partition = no_partition)
             : m_disk(disk), m_partition(partition), m_name(name)
         {}
         auto disk() const noexcept
@@ -32,7 +32,7 @@ namespace purefs::blkdev::internal
         }
         auto has_partition() const noexcept -> bool
         {
-            return m_partition != no_parition;
+            return m_partition != no_partition;
         }
         auto sectors() const noexcept -> sector_t;
         auto name() const noexcept

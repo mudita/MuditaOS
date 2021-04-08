@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/blkdev/disk_manager.hpp>
@@ -80,7 +80,7 @@ namespace purefs::blkdev
             }
             else {
                 ret = std::make_shared<internal::disk_handle>(it->second, device_name, part);
-                if (part != internal::disk_handle::no_parition) {
+                if (part != internal::disk_handle::no_partition) {
                     if (part >= int(partitions(ret).size())) {
                         LOG_ERROR("Partition %i doesn't exists", part);
                         ret = nullptr;
