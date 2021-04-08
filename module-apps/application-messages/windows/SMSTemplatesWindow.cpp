@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSTemplatesWindow.hpp"
@@ -8,7 +8,6 @@
 #include "application-messages/data/MessagesStyle.hpp"
 
 #include <service-appmgr/Controller.hpp>
-#include <service-db/DBSMSTemplateMessage.hpp>
 #include <i18n/i18n.hpp>
 #include <Style.hpp>
 #include <log/log.hpp>
@@ -101,12 +100,6 @@ namespace gui
         if (auto switchData = dynamic_cast<SMSSendTemplateRequest *>(data); switchData != nullptr) {
             smsSendTemplateRequestHandler(switchData);
         }
-    }
-
-    bool SMSTemplatesWindow::onDatabaseMessage(sys::Message *msgl)
-    {
-        auto msg = dynamic_cast<DBSMSTemplateResponseMessage *>(msgl);
-        return msg && smsTemplateModel->updateRecords(*msg->records);
     }
 
 } /* namespace gui */

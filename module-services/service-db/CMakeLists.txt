@@ -7,15 +7,10 @@ set(SOURCES
     DBServiceAPI_GetByQuery.cpp
     DatabaseAgent.cpp
     ServiceDB.cpp
-        messages/DBCalllogMessage.cpp
+    messages/DBCalllogMessage.cpp
     messages/DBContactMessage.cpp
-    messages/DBCountryCodeMessage.cpp
-    messages/DBNotesMessage.cpp
     messages/DBNotificationMessage.cpp
     messages/DBServiceMessage.cpp
-    messages/DBSMSMessage.cpp
-    messages/DBSMSTemplateMessage.cpp
-    messages/DBThreadMessage.cpp
     messages/QueryMessage.cpp
     agents/settings/SettingsAgent.cpp
     agents/settings/Settings.cpp

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,7 +7,6 @@
 
 #include <Interface/CalllogRecord.hpp>
 #include <Common/Common.hpp>
-#include <MessageType.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -18,13 +17,6 @@ class DBCalllogMessage : public DBMessage
   public:
     DBCalllogMessage(MessageType messageType, const CalllogRecord &rec = CalllogRecord{});
     CalllogRecord record;
-};
-
-class DBCalllogGetCount : public DBCalllogMessage
-{
-  public:
-    EntryState state;
-    DBCalllogGetCount(EntryState state);
 };
 
 class DBCalllogResponseMessage : public DBResponseMessage

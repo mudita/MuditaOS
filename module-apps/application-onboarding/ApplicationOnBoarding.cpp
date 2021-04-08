@@ -16,7 +16,6 @@
 #include "windows/OnBoardingDateAndTimeWindow.hpp"
 #include "windows/OnBoardingChangeDateAndTimeWindow.hpp"
 
-#include <service-db/DBMessage.hpp>
 #include <module-services/service-appmgr/service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 #include <module-apps/application-settings-new/data/LanguagesData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
