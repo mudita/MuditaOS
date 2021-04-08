@@ -3,7 +3,7 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 CONTAINER_NAME="wearemudita/mudita_os_builder"
-CONTAINER_TAG="1.9"
+CONTAINER_TAG="1.10"
 CONTAINER=${CONTAINER_NAME}:${CONTAINER_TAG}
 PURE_HOME=`pwd`
 STANDARD_OPTIONS="-v `pwd`:${PURE_HOME} --user \"$(id -u):$(id -g)\" --env HOME=${PURE_HOME} -t"
