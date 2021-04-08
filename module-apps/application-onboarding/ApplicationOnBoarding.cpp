@@ -20,6 +20,7 @@
 #include <module-apps/application-settings-new/data/LanguagesData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-apps/application-settings-new/windows/ChangeTimeZone.hpp>
+#include <module-apps/application-onboarding/windows/ConfigurePasscodeWindow.hpp>
 
 namespace app
 {
@@ -83,6 +84,18 @@ namespace app
         settings->setValue(settings::SystemProperties::eulaAccepted, "1", settings::SettingsScope::Global);
     }
 
+    void ApplicationOnBoarding::setLockPassHash(unsigned int value)
+    {
+        lockPassHash = value;
+        settings->setValue(
+            ::settings::SystemProperties::lockPassHash, std::to_string(value), ::settings::SettingsScope::Global);
+    }
+
+    auto ApplicationOnBoarding::getLockPassHash() const noexcept -> unsigned int
+    {
+        return lockPassHash;
+    }
+
     sys::ReturnCodes ApplicationOnBoarding::DeinitHandler()
     {
         return sys::ReturnCodes::Success;
@@ -136,6 +149,13 @@ namespace app
                               });
         windowsFactory.attach(gui::window::name::change_time_zone, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ChangeTimeZone>(app);
+        });
+        windowsFactory.attach(gui::window::name::onBoarding_configure_passcode,
+                              [](Application *app, const std::string &name) {
+                                  return std::make_unique<gui::ConfigurePasscodeWindow>(app);
+                              });
+        windowsFactory.attach(gui::window::name::dialog_confirm, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::DialogConfirm>(app, gui::window::name::dialog_confirm);
         });
 
         attachPopups({gui::popup::ID::Volume,
