@@ -15,6 +15,7 @@ namespace app
       public:
         ApplicationCalculator(std::string name                    = name_calculator,
                               std::string parent                  = {},
+                              sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                               StartInBackground startInBackground = {false});
         ~ApplicationCalculator() override = default;
 
@@ -35,7 +36,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
         }
     };
 } /* namespace app */

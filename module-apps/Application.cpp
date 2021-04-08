@@ -6,6 +6,8 @@
 #include "GuiTimer.hpp"      // for GuiTimer
 #include "Item.hpp"          // for Item
 #include "MessageType.hpp"   // for MessageType
+#include "module-apps/popups/data/PopupRequestParams.hpp"
+#include "module-apps/popups/data/PhoneModeParams.hpp"
 #include "module-sys/Timers/TimerFactory.hpp" // for Timer
 #include "TopBar.hpp"
 #include "popups/TetheringConfirmationPopup.hpp"
@@ -82,6 +84,7 @@ namespace app
 
     Application::Application(std::string name,
                              std::string parent,
+                             sys::phone_modes::PhoneMode mode,
                              StartInBackground startInBackground,
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
@@ -89,14 +92,12 @@ namespace app
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
-          settings(std::make_unique<settings::Settings>(this)),
-          phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
+          settings(std::make_unique<settings::Settings>(this)), phoneMode{mode}
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
         topBarManager->set(utils::dateAndTimeSettings.isTimeFormat12() ? gui::top_bar::TimeMode::Time12h
                                                                        : gui::top_bar::TimeMode::Time24h);
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
-        bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
         longPressTimer = sys::TimerFactory::createPeriodicTimer(this,
                                                                 "LongPress",
@@ -111,22 +112,22 @@ namespace app
         connect(typeid(AppUpdateWindowMessage),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleUpdateWindow(msg); });
 
-        // handle phone mode changes
-        phoneModeObserver->connect(this);
-        phoneModeObserver->subscribe(
-            [&](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
-                handlePhoneModeChanged(phoneMode, tetheringMode);
-            });
-
+        addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
+            if (params != nullptr) {
+                auto modeParams = static_cast<gui::PhoneModeParams *>(params.get());
+                phoneMode       = modeParams->getPhoneMode();
+            }
+            return actionHandled();
+        });
         addActionReceiver(app::manager::actions::ShowPopup, [this](auto &&params) {
-            auto popupParams = static_cast<app::PopupRequestParams *>(params.get());
+            auto popupParams = static_cast<gui::PopupRequestParams *>(params.get());
             if (const auto popupId = popupParams->getPopupId(); isPopupPermitted(popupId)) {
-                switchWindow(gui::popup::resolveWindowName(popupId));
+                showPopup(popupId, popupParams);
             }
             return actionHandled();
         });
         addActionReceiver(app::manager::actions::AbortPopup, [this](auto &&params) {
-            auto popupParams   = static_cast<app::PopupRequestParams *>(params.get());
+            auto popupParams   = static_cast<gui::PopupRequestParams *>(params.get());
             const auto popupId = popupParams->getPopupId();
             abortPopup(popupId);
             return actionHandled();
@@ -186,7 +187,7 @@ namespace app
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
             window->updateTime();
-            window->updatePhoneMode(phoneModeObserver->getCurrentPhoneMode());
+            window->updatePhoneMode(phoneMode);
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
 
@@ -687,19 +688,15 @@ namespace app
         sender->bus.sendUnicast(msg, application);
     }
 
-    void Application::handlePhoneModeChanged(sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering)
+    void Application::handlePhoneModeChanged(sys::phone_modes::PhoneMode mode)
     {
-        // only foreground rendering application will react to mode changes
-        if (state != State::ACTIVE_FORGROUND) {
-            return;
-        }
-
         using namespace gui::popup;
-        if (getCurrentWindow()->getName() == window::phone_modes_window) {
-            updateWindow(window::phone_modes_window, std::make_unique<gui::ModesPopupData>(mode));
+        const auto &popupName = resolveWindowName(gui::popup::ID::PhoneModes);
+        if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
+            updateWindow(popupName, std::make_unique<gui::ModesPopupData>(mode));
         }
         else {
-            switchWindow(window::phone_modes_window, std::make_unique<gui::ModesPopupData>(mode));
+            switchWindow(popupName, std::make_unique<gui::ModesPopupData>(mode));
         }
     }
 
@@ -735,6 +732,18 @@ namespace app
             case ID::Brightness:
                 break;
             }
+        }
+    }
+
+    void Application::showPopup(gui::popup::ID id, const gui::PopupRequestParams *params)
+    {
+        using namespace gui::popup;
+        if (id == ID::PhoneModes) {
+            auto popupParams = static_cast<const gui::PhoneModePopupRequestParams *>(params);
+            handlePhoneModeChanged(popupParams->getPhoneMode());
+        }
+        else {
+            switchWindow(gui::popup::resolveWindowName(id));
         }
     }
 

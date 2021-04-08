@@ -27,6 +27,7 @@ namespace app
       public:
         explicit ApplicationOnBoarding(std::string name                    = name_onboarding,
                                        std::string parent                  = {},
+                                       sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                                        StartInBackground startInBackground = {false});
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -44,7 +45,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
         }
     };
 } // namespace app

@@ -21,6 +21,7 @@ namespace app
       public:
         ApplicationClock(std::string name                    = name_clock,
                          std::string parent                  = {},
+                         sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                          StartInBackground startInBackground = {false},
                          uint32_t stackDepth                 = 4096,
                          sys::ServicePriority priority       = sys::ServicePriority::Idle);
@@ -42,7 +43,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
         }
     };
 } /* namespace app */

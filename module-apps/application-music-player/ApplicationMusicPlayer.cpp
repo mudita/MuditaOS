@@ -18,8 +18,9 @@ namespace app
 
     ApplicationMusicPlayer::ApplicationMusicPlayer(std::string name,
                                                    std::string parent,
+                                                   sys::phone_modes::PhoneMode mode,
                                                    StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), startInBackground, applicationMusicPlayerStackSize)
+        : Application(std::move(name), std::move(parent), mode, startInBackground, applicationMusicPlayerStackSize)
     {
         LOG_INFO("ApplicationMusicPlayer::create");
         connect(typeid(AudioStartPlaybackResponse), [&](sys::Message *msg) {

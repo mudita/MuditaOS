@@ -78,15 +78,14 @@ ServiceAntenna::ServiceAntenna()
     bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
     phoneModeObserver->connect(this);
-    phoneModeObserver->subscribe(
-        [=]([[maybe_unused]] sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering) {
-            if (mode == sys::phone_modes::PhoneMode::Offline) {
-                this->handleLockRequest(antenna::lockState::locked);
-            }
-            else {
-                this->handleLockRequest(antenna::lockState::unlocked);
-            }
-        });
+    phoneModeObserver->subscribe([this](sys::phone_modes::PhoneMode mode) {
+        if (mode == sys::phone_modes::PhoneMode::Offline) {
+            handleLockRequest(antenna::lockState::locked);
+        }
+        else {
+            handleLockRequest(antenna::lockState::unlocked);
+        }
+    });
 }
 
 ServiceAntenna::~ServiceAntenna()

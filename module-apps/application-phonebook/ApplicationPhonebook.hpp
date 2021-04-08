@@ -32,6 +32,7 @@ namespace app
       public:
         ApplicationPhonebook(std::string name                    = name_phonebook,
                              std::string parent                  = {},
+                             sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                              StartInBackground startInBackground = {false});
         ~ApplicationPhonebook() override = default;
 
@@ -59,7 +60,8 @@ namespace app
                      manager::actions::AddContact,
                      manager::actions::EditContact,
                      manager::actions::ShowContactDetails,
-                     manager::actions::ShowEmergencyContacts}};
+                     manager::actions::ShowEmergencyContacts,
+                     manager::actions::PhoneModeChanged}};
         }
     };
 } // namespace app

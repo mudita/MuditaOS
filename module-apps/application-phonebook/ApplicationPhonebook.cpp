@@ -21,8 +21,9 @@ namespace app
 {
     ApplicationPhonebook::ApplicationPhonebook(std::string name,
                                                std::string parent,
+                                               sys::phone_modes::PhoneMode mode,
                                                StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, phonebook_stack_size)
+        : Application(name, parent, mode, startInBackground, phonebook_stack_size)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowContacts, [this](auto &&data) {

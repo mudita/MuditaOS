@@ -60,6 +60,7 @@ namespace app::manager
             DisplayLogoAtExit,
             SMSRejectedByOfflineNotification,
             CallRejectedByOfflineNotification,
+            PhoneModeChanged,
             ShowPopup,
             AbortPopup,
             UserAction // The last enumerator in the Action enum.

@@ -7,20 +7,51 @@
 
 namespace sys::phone_modes
 {
+    namespace
+    {
+        template <typename F> void onChanged(const F &onChanged, const Observer::OnFinishedCallbacks &onFinished)
+        {
+            try {
+                onChanged();
+                if (onFinished.onComplete) {
+                    onFinished.onComplete();
+                }
+            }
+            catch (const std::exception &error) {
+                if (onFinished.onError) {
+                    onFinished.onError(error);
+                }
+                throw;
+            }
+        }
+    } // namespace
+
     void Observer::connect(Service *owner)
     {
         owner->connect(typeid(PhoneModeChanged), [this](sys::Message *request) -> sys::MessagePointer {
             return handlePhoneModeChange(static_cast<PhoneModeChanged *>(request));
         });
+        owner->connect(typeid(TetheringChanged), [this](sys::Message *request) -> sys::MessagePointer {
+            return handleTetheringChange(static_cast<TetheringChanged *>(request));
+        });
     }
 
-    void Observer::subscribe(OnChangeCallback &&onChange,
+    void Observer::subscribe(OnPhoneModeChangedCallback &&onChange,
                              OnCompleteCallback &&onComplete,
                              OnErrorCallback &&onError) noexcept
     {
-        onChangeCallback   = std::move(onChange);
-        onCompleteCallback = std::move(onComplete);
-        onErrorCallback    = std::move(onError);
+        onPhoneModeChangedCallback           = std::move(onChange);
+        onPhoneModeChangeFinished.onComplete = std::move(onComplete);
+        onPhoneModeChangeFinished.onError    = std::move(onError);
+    }
+
+    void Observer::subscribe(OnTetheringChangedCallback &&onChange,
+                             OnCompleteCallback &&onComplete,
+                             OnErrorCallback &&onError) noexcept
+    {
+        onTetheringChangedCallback           = std::move(onChange);
+        onTetheringChangeFinished.onComplete = std::move(onComplete);
+        onTetheringChangeFinished.onError    = std::move(onError);
     }
 
     bool Observer::isInMode(PhoneMode mode) const noexcept
@@ -41,35 +72,34 @@ namespace sys::phone_modes
     sys::MessagePointer Observer::handlePhoneModeChange(PhoneModeChanged *message)
     {
         phoneMode     = message->getPhoneMode();
-        tetheringMode = message->getTetheringMode();
+        if (!onPhoneModeChangedCallback) {
+            LOG_WARN("No subscriber on phone mode change.");
+            return MessageNone{};
+        }
 
         try {
-            onPhoneModeChanged();
+            onChanged([this]() { onPhoneModeChangedCallback(phoneMode); }, onPhoneModeChangeFinished);
         }
         catch (const std::exception &) {
-            return std::make_shared<PhoneModeChangeFailed>();
+            return std::make_shared<ChangeFailed>();
         }
-        return std::make_shared<PhoneModeChangedSuccessfully>();
+        return std::make_shared<ChangedSuccessfully>();
     }
 
-    void Observer::onPhoneModeChanged()
+    sys::MessagePointer Observer::handleTetheringChange(TetheringChanged *message)
     {
-        if (!onChangeCallback) {
+        tetheringMode = message->getTetheringMode();
+        if (!onTetheringChangedCallback) {
             LOG_WARN("No subscriber on phone mode change.");
-            return;
+            return MessageNone{};
         }
 
         try {
-            onChangeCallback(phoneMode, tetheringMode);
-            if (onCompleteCallback) {
-                onCompleteCallback();
-            }
+            onChanged([this]() { onTetheringChangedCallback(tetheringMode); }, onTetheringChangeFinished);
         }
-        catch (const std::exception &error) {
-            if (onErrorCallback) {
-                onErrorCallback(error);
-            }
-            throw;
+        catch (const std::exception &) {
+            return std::make_shared<ChangeFailed>();
         }
+        return std::make_shared<ChangedSuccessfully>();
     }
 } // namespace sys::phone_modes
