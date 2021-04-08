@@ -10,7 +10,6 @@
 #include "windows/SearchEngineWindow.hpp"
 #include "windows/SearchResultsWindow.hpp"
 
-#include <service-db/DBMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 
 #include <module-apps/application-notes/presenter/NotesMainWindowPresenter.hpp>
