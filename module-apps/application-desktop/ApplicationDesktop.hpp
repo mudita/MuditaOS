@@ -14,6 +14,7 @@
 #include <endpoints/update/UpdateMuditaOS.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <widgets/NotificationListItem.hpp>
 
 namespace cellular
 {
@@ -73,7 +74,6 @@ namespace app
         // done
         bool handle(db::NotificationMessage *msg);
         bool handle(cellular::StateChange *msg);
-        auto handle(db::query::notifications::GetAllResult *msg) -> bool;
         auto handle(db::query::ThreadGetCountResult *msg) -> bool;
         auto handle(db::query::CalllogGetCountResult *msg) -> bool;
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
@@ -84,8 +84,6 @@ namespace app
         //	static bool messageLockPhone( sys::Service* sender, std::string application , const gui::InputEvent& event
         //);
         bool showCalls();
-        bool clearCallsNotification();
-        bool clearMessagesNotification();
         unsigned int getLockPassHash() const noexcept
         {
             return lockPassHash;
@@ -105,6 +103,7 @@ namespace app
         void activeSimChanged(std::string value);
         void lockPassHashChanged(std::string value);
         void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);
+        void handleNotificationsChanged(manager::actions::ActionParamsPtr &&data);
         unsigned int lockPassHash = 0;
         void osUpdateVersionChanged(const std::string &value);
         void osCurrentVersionChanged(const std::string &value);
@@ -133,7 +132,8 @@ namespace app
                      manager::actions::DisplayLowBatteryScreen,
                      manager::actions::SystemBrownout,
                      manager::actions::DisplayLogoAtExit,
-                     manager::actions::PhoneModeChanged}};
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::NotificationsChanged}};
         }
     };
 

@@ -165,6 +165,16 @@ namespace gui
             }
         };
 
+        focusChangedCallback = [this]([[maybe_unused]] Item &item) -> bool {
+            if (focus) {
+                setFocus();
+            }
+            else {
+                setFocusItem(nullptr);
+            }
+            return true;
+        };
+
         body->parentOnRequestedResizeCallback = [this]() {
             if (pageLoaded)
                 recalculateOnBoxRequestedResize();

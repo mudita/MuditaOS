@@ -31,6 +31,7 @@
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <application-settings/ApplicationSettings.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
 #include <service-cellular/ServiceCellular.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <application-calllog/ApplicationCallLog.hpp>
@@ -43,7 +44,7 @@
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <service-db/DBCalllogMessage.hpp>
-
+#include <models/NotificationProvider.hpp>
 #include <cassert>
 namespace app
 {
@@ -52,9 +53,8 @@ namespace app
     {
         bool requestNotSeenNotifications(app::Application *app)
         {
-            const auto [succeed, _] = DBServiceAPI::GetQuery(
-                app, db::Interface::Name::Notifications, std::make_unique<db::query::notifications::GetAll>());
-            return succeed;
+            return app->bus.sendUnicast(std::make_shared<app::manager::GetAllNotificationsRequest>(),
+                                        "ApplicationManager");
         }
 
         bool requestUnreadThreadsCount(app::Application *app)
@@ -165,6 +165,11 @@ namespace app
             return actionHandled();
         });
 
+        addActionReceiver(app::manager::actions::NotificationsChanged, [this](auto &&data) {
+            handleNotificationsChanged(std::forward<decltype(data)>(data));
+            return actionHandled();
+        });
+
         addActionReceiver(app::manager::actions::AutoLock, [this](auto &&data) {
             if (lockHandler.isScreenLocked()) {
                 return actionHandled();
@@ -220,9 +225,6 @@ namespace app
         if (resp != nullptr) {
             if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
                 auto result = msg->getResult();
-                if (auto response = dynamic_cast<db::query::notifications::GetAllResult *>(result.get())) {
-                    handled = handle(response);
-                }
                 if (auto response = dynamic_cast<db::query::ThreadGetCountResult *>(result.get())) {
                     handled = handle(response);
                 }
@@ -263,47 +265,13 @@ namespace app
         return true;
     }
 
-    auto ApplicationDesktop::handle(db::query::notifications::GetAllResult *msg) -> bool
-    {
-        assert(msg);
-        auto records = *msg->getResult();
-
-        bool rebuildMainWindow = false;
-
-        for (auto record : records) {
-            switch (record.key) {
-            case NotificationsRecord::Key::Calls:
-                rebuildMainWindow |= record.value != notifications.notSeen.Calls;
-                notifications.notSeen.Calls = record.value;
-                break;
-
-            case NotificationsRecord::Key::Sms:
-                rebuildMainWindow |= record.value != notifications.notSeen.SMS;
-                notifications.notSeen.SMS = record.value;
-                break;
-
-            case NotificationsRecord::Key::NotValidKey:
-            case NotificationsRecord::Key::NumberOfKeys:
-                LOG_ERROR("Not a valid key");
-                return false;
-            }
-        }
-
-        auto ptr = getCurrentWindow();
-        if (rebuildMainWindow && ptr->getName() == app::window::name::desktop_main_window) {
-            ptr->rebuild();
-        }
-
-        return true;
-    }
-
     auto ApplicationDesktop::handle(db::NotificationMessage *msg) -> bool
     {
         assert(msg);
-
-        if (msg->interface == db::Interface::Name::Notifications && msg->type == db::Query::Type::Update) {
-            return requestNotSeenNotifications(this);
-        }
+        //
+        //        if (msg->interface == db::Interface::Name::Notifications && msg->type == db::Query::Type::Update) {
+        //            return requestNotSeenNotifications(this);
+        //        }
 
         if (msg->interface == db::Interface::Name::Calllog && msg->type != db::Query::Type::Read) {
             return requestUnreadCallsCount(this);
@@ -355,26 +323,6 @@ namespace app
     {
         LOG_DEBUG("show calls!");
         return manager::Controller::sendAction(this, manager::actions::ShowCallLog);
-    }
-
-    bool ApplicationDesktop::clearCallsNotification()
-    {
-        LOG_DEBUG("Clear Call notifications");
-        DBServiceAPI::GetQuery(this,
-                               db::Interface::Name::Notifications,
-                               std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Calls));
-        notifications.notSeen.Calls = 0;
-        return true;
-    }
-
-    bool ApplicationDesktop::clearMessagesNotification()
-    {
-        LOG_DEBUG("Clear Sms notifications");
-        DBServiceAPI::GetQuery(this,
-                               db::Interface::Name::Notifications,
-                               std::make_unique<db::query::notifications::Clear>(NotificationsRecord::Key::Sms));
-        notifications.notSeen.SMS = 0;
-        return true;
     }
 
     // Invoked during initialization
@@ -620,6 +568,15 @@ namespace app
                 currentWindow->getName() == app::window::name::charging_battery) {
                 switchWindow(app::window::name::desktop_main_window);
             }
+        }
+    }
+
+    void ApplicationDesktop::handleNotificationsChanged(manager::actions::ActionParamsPtr &&data)
+    {
+        auto notificationsChanged = static_cast<app::manager::actions::NotificationsChangedParams *>(data.get());
+        if (auto mainWindow = dynamic_cast<gui::DesktopMainWindow *>(getWindow(app::window::name::desktop_main_window));
+            mainWindow != nullptr) {
+            mainWindow->notificationChanged(notificationsChanged, mainWindow == getCurrentWindow());
         }
     }
 

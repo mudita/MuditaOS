@@ -29,6 +29,8 @@
 #include <service-gui/Common.hpp>
 #include <service-eink/Common.hpp>
 
+#include <models/NotificationProvider.hpp>
+
 namespace app
 {
     class ApplicationLauncher;
@@ -139,6 +141,7 @@ namespace app::manager
         auto handleTimeFormatChange(TimeFormatChangeRequest *msg) -> bool;
         auto handleDateFormatChange(DateFormatChangeRequest *msg) -> bool;
         auto handleSetOsUpdateVersionChange(SetOsUpdateVersion *msg) -> bool;
+        auto handleDBResponse(db::QueryResponse *msg) -> bool;
         auto handlePowerSavingModeInit() -> bool;
         auto handleMessageAsAction(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>;
         /// handles dom request by passing this request to application which should provide the dom
@@ -164,6 +167,7 @@ namespace app::manager
 
         ApplicationName rootApplicationName;
         ActionsRegistry actionsRegistry;
+        notifications::NotificationProvider notificationProvider;
 
         bool autoLockEnabled; ///< a flag which indicates whether the autoLockTimer should be armed.
                               /// @note: The flag value depends on database settings "gs_lock_time". If the

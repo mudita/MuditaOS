@@ -44,6 +44,9 @@ set( SOURCES
     "widgets/DateWidget.cpp"
     "widgets/TimeWidget.cpp"
     "widgets/WidgetsUtils.cpp"
+    "widgets/NotificationListItem.cpp"
+    "models/NotificationsModel.cpp"
+    "models/NotificationProvider.cpp"
     "options/OptionsModel.cpp"
     "options/type/OptionSimple.cpp"
     "options/type/OptionCall.cpp"
@@ -51,7 +54,9 @@ set( SOURCES
     "options/type/OptionSetting.cpp"
     "options/type/OptionChangePin.cpp"
     "options/type/OptionWithActiveIcons.cpp"
-    "application-desktop/windows/UpdateProgress.cpp")
+    "application-desktop/windows/UpdateProgress.cpp"
+    "messages/NotificationData.cpp"
+    "application-desktop/models/ActiveNotificationsModel.cpp")
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 

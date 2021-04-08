@@ -291,4 +291,22 @@ namespace style
         inline constexpr auto rightMargin = 10U;
     } // namespace widgets
 
+    namespace notifications
+    {
+        inline constexpr auto spanSize     = 8;
+        inline constexpr auto digitSize    = 16;
+        inline constexpr auto iconWidth    = 35;
+        inline constexpr auto textMaxWidth = 250;
+        inline constexpr auto itemHeight   = 55;
+
+        namespace model
+        {
+            inline constexpr auto maxNotificationsPerPage = 4;
+            inline constexpr auto x                       = 20;
+            inline constexpr auto y                       = 284;
+            inline constexpr auto w                       = style::window::default_body_width;
+            inline constexpr auto h                       = itemHeight * maxNotificationsPerPage;
+        } // namespace model
+    }     // namespace notifications
+
 }; // namespace style
