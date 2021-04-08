@@ -146,7 +146,7 @@ If your rebase succeeds:
  - Always rebase your feature branches to `origin master`
 
 ### Make smoke tests
-Before You actually press `Rebase and merge` on Github You must run smoke tests and link test run in Jira ticket on which Your PR is based. Good practice would be including link in
+Before You actually press `Rebase and merge` on Github You must run [smoke tests](https://appnroll.atlassian.net/wiki/spaces/MFP/pages/1089569238/How+to+Test+my+branch+before+merging+it+to+master+Embedded+team) and link test run in Jira ticket on which Your PR is based. Good practice would be including link in
 Pull request info or comments section. 
 
 #### How to change some shameful commit somewhere in your PR branch history
