@@ -5,6 +5,7 @@ MAINTAINER radoslaw.wicik@mudiata.com
 
 RUN ln -fs /usr/share/zoneinfo/@DOCKER_TIMEZONE@ /etc/localtime
 RUN export DEBIAN_FRONTEND=noninteractive 
+RUN sed -i'' 's/archive.ubuntu.com/us.archive.ubuntu.com/' /etc/apt/sources.list
 RUN apt-get update 
 RUN apt-get full-upgrade -y 
 RUN apt-get install -y \
