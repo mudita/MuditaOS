@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-db/DBContactMessage.hpp>
-#include <service-db/DBMessage.hpp>
 
 #include <ContactRecord.hpp>
 #include <MessageType.hpp>
@@ -13,17 +12,6 @@
 
 DBContactMessage ::DBContactMessage(MessageType messageType, const ContactRecord &rec, bool favourite)
     : DBMessage(messageType), record(rec), favourite{favourite}
-{}
-
-DBContactBlock::DBContactBlock(MessageType messageType, const uint32_t _id, bool _shouldBeBlocked)
-    : DBMessage(messageType), id(_id), shouldBeBlocked(_shouldBeBlocked)
-{}
-
-DBContactSearchMessage ::DBContactSearchMessage(MessageType messageType,
-                                                const char *_primaryName,
-                                                const char *_alternativeName,
-                                                const char *_number)
-    : DBMessage(messageType), primaryName(_primaryName), alternativeName(_alternativeName), number(_number)
 {}
 
 DBContactResponseMessage ::DBContactResponseMessage(std::unique_ptr<std::vector<ContactRecord>> rec,

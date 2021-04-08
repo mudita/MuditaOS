@@ -41,10 +41,6 @@ auto DBServiceAPI::ThreadGetByNumber(sys::Service *serv,
 {
     return nullptr;
 }
-auto DBServiceAPI::ThreadGetCount(sys::Service *serv, EntryState state) -> uint32_t
-{
-    return 0;
-}
 
 auto DBServiceAPI::GetQueryWithReply(sys::Service *serv,
                                      db::Interface::Name database,
@@ -77,11 +73,6 @@ auto DBServiceAPI::ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial)
 {
     return nullptr;
 }
-auto DBServiceAPI::ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber)
-    -> std::unique_ptr<std::vector<ContactRecord>>
-{
-    return nullptr;
-}
 auto DBServiceAPI::MatchContactByPhoneNumber(sys::Service *serv, const utils::PhoneNumber::View &numberView)
     -> std::unique_ptr<ContactRecord>
 {
@@ -99,11 +90,6 @@ auto DBServiceAPI::ContactUpdate(sys::Service *serv, const ContactRecord &rec) -
 {
     return false;
 }
-auto DBServiceAPI::ContactSearch(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName, UTF8 number)
-    -> std::unique_ptr<std::vector<ContactRecord>>
-{
-    return nullptr;
-}
 auto DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec) -> CalllogRecord
 {
     return {};
@@ -115,18 +101,6 @@ auto DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id) -> bool
 auto DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -> bool
 {
     return false;
-}
-auto DBServiceAPI::CalllogGetCount(sys::Service *serv, EntryState state) -> uint32_t
-{
-    return 0;
-}
-auto DBServiceAPI::CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit) -> bool
-{
-    return false;
-}
-auto DBServiceAPI::GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc) -> uint32_t
-{
-    return 0;
 }
 auto DBServiceAPI::DBBackup(sys::Service *serv, std::string backupPath) -> bool
 {

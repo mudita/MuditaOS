@@ -10,7 +10,6 @@
 #include "windows/CallLogOptionsWindow.hpp"
 
 #include <service-db/DBServiceAPI.hpp>
-#include <service-db/DBMessage.hpp>
 #include <Dialog.hpp>
 #include <OptionWindow.hpp>
 #include <i18n/i18n.hpp>
