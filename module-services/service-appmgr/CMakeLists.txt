@@ -7,6 +7,7 @@ set(SOURCES
     data/UsbActionsParams.cpp
     data/SimActionsParams.cpp
     data/MmiActionsParams.cpp
+    data/NotificationsChangedActionsParams.cpp
     model/ApplicationManager.cpp
     model/ApplicationHandle.cpp
     model/ApplicationsRegistry.cpp

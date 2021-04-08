@@ -8,6 +8,8 @@
 #include "gui/widgets/Window.hpp"
 
 #include "Translator.hpp"
+#include <notifications/NotificationsModel.hpp>
+#include <ListView.hpp>
 
 namespace app
 {
@@ -16,14 +18,14 @@ namespace app
 
 namespace gui
 {
-    class NotificationsBox;
-
     class DesktopMainWindow : public AppWindow
     {
       protected:
         gui::Label *time          = nullptr;
         gui::Label *dayText       = nullptr;
-        gui::NotificationsBox *notifications = nullptr;
+
+        gui::ListView *notificationsList                            = nullptr;
+        std::shared_ptr<gui::NotificationsModel> notificationsModel = nullptr;
 
         /// Timed enter value cache, could be templated to any value really
         class EnterCache
@@ -64,15 +66,15 @@ namespace gui
 
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState();
-        auto buildNotifications(app::ApplicationDesktop *app) -> bool;
-        auto setActiveState(app::ApplicationDesktop *app) -> bool;
+        auto setActiveState() -> bool;
         bool processLongPressEvent(const InputEvent &inputEvent);
         bool processShortPressEventOnUnlocked(const InputEvent &inputEvent);
         bool processShortPressEventOnLocked(const InputEvent &inputEvent);
         app::ApplicationDesktop *getAppDesktop() const;
 
       public:
-        DesktopMainWindow(app::Application *app);
+        DesktopMainWindow(app::Application *app, std::shared_ptr<NotificationsModel> model);
+        ~DesktopMainWindow();
 
         // virtual methods gui::Window
         bool onInput(const InputEvent &inputEvent) override;

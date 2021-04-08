@@ -25,6 +25,7 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/service-appmgr/messages/DOMRequest.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
+#include <service-appmgr/data/NotificationsChangedActionsParams.hpp>
 #include "service-gui/messages/DrawMessage.hpp" // for DrawMessage
 #include "task.h"                               // for xTaskGetTic...
 #include "windows/AppWindow.hpp"                // for AppWindow
@@ -130,6 +131,11 @@ namespace app
             auto popupParams   = static_cast<gui::PopupRequestParams *>(params.get());
             const auto popupId = popupParams->getPopupId();
             abortPopup(popupId);
+            return actionHandled();
+        });
+        addActionReceiver(app::manager::actions::NotificationsChanged, [this](auto &&params) {
+            auto notificationParams = static_cast<manager::actions::NotificationsChangedParams *>(params.get());
+            handle(notificationParams);
             return actionHandled();
         });
     }
@@ -862,6 +868,11 @@ namespace app
     void Application::addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback)
     {
         receivers.insert_or_assign(actionId, std::move(callback));
+    }
+
+    void Application::handle(manager::actions::NotificationsChangedParams *params)
+    {
+        LOG_DEBUG("To be implemented by Pop-up based Locked-Screen [EGD-5884]");
     }
 
     void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
