@@ -173,4 +173,4 @@ PS: A good GUI git browser will do it all for you.
 
 ### Reverting merged PR
 There might be a case, when Your PR passed all the tests and was merged to master, but eg. QA testing shows that it introduces some blocking bugs. If this happens, and after consulting with the team, 
-You have to revert Your previous changes. Do this the same way as You would do any other PR. Including smoke tests.
+You have to revert Your previous changes. Do this the same way as You would do any other PR. Use same Jira ticket as origina PR. Including smoke tests.
