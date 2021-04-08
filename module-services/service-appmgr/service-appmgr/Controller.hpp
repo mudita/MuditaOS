@@ -53,5 +53,6 @@ namespace app::manager
         static auto changeDateFormat(sys::Service *sender, utils::time::Locale::DateFormat dateFormat) -> bool;
         static auto changePowerSaveMode(sys::Service *sender) -> bool;
         static auto preventBlockingDevice(sys::Service *sender) -> bool;
+        static auto requestNotifications(sys::Service *sender) -> bool;
     };
 } // namespace app::manager

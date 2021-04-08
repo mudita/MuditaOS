@@ -161,6 +161,16 @@ namespace gui
             }
         };
 
+        focusChangedCallback = [this]([[maybe_unused]] Item &item) -> bool {
+            if (focus) {
+                setFocus();
+            }
+            else {
+                setFocusItem(nullptr);
+            }
+            return true;
+        };
+
         body->parentOnRequestedResizeCallback = [this]() {
             if (pageLoaded)
                 recalculateOnBoxRequestedResize();
@@ -575,6 +585,10 @@ namespace gui
 
     void ListView::setFocus()
     {
+        if (!focus) {
+            return;
+        }
+
         setFocusItem(body);
 
         if (storedFocusIndex != listview::nPos) {

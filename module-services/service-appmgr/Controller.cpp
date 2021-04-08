@@ -4,6 +4,7 @@
 #include "service-appmgr/Controller.hpp"
 
 #include "service-appmgr/model/ApplicationManager.hpp"
+#include "service-appmgr/messages/GetAllNotificationsRequest.hpp"
 
 #include <Service/Service.hpp>
 
@@ -36,7 +37,7 @@ namespace app::manager
     {
         setOnSwitchBehaviour(data, onSwitchBehaviour);
         auto msg = std::make_shared<app::manager::ActionRequest>(sender->GetName(), actionId, std::move(data));
-        return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+        return sender->bus.sendUnicast(std::move(msg), ApplicationManager::ServiceName);
     }
 
     auto Controller::switchBack(sys::Service *sender, std::unique_ptr<SwitchBackRequest> msg) -> bool
@@ -110,5 +111,11 @@ namespace app::manager
     {
         auto msg = std::make_shared<app::manager::PowerSaveModeInitRequest>(sender->GetName());
         return sender->bus.sendUnicast(msg, ApplicationManager::ServiceName);
+    }
+
+    auto Controller::requestNotifications(sys::Service *sender) -> bool
+    {
+        auto msg = std::make_shared<app::manager::GetAllNotificationsRequest>();
+        return sender->bus.sendUnicast(std::move(msg), ApplicationManager::ServiceName);
     }
 } // namespace app::manager
