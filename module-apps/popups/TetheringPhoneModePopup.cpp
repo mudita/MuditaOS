@@ -4,7 +4,7 @@
 #include "TetheringPhoneModePopup.hpp"
 #include "DialogMetadataMessage.hpp"
 #include "Application.hpp"
-#include "SystemManager/messages/TetheringPhoneModeChangeProhibitedMessage.hpp"
+#include "data/PopupRequestParams.hpp"
 #include <service-appmgr/Controller.hpp>
 
 namespace gui
@@ -20,7 +20,7 @@ namespace gui
         metadata.text   = utils::translateI18("tethering_phone_mode_change_prohibited");
         metadata.icon   = "info_big_circle_W_G";
         metadata.action = [this]() {
-            auto params = std::make_unique<app::PopupRequestParams>(gui::popup::ID::TetheringPhoneModeChangeProhibited);
+            auto params = std::make_unique<gui::PopupRequestParams>(gui::popup::ID::TetheringPhoneModeChangeProhibited);
             app::manager::Controller::sendAction(application, app::manager::actions::AbortPopup, std::move(params));
             return true;
         };

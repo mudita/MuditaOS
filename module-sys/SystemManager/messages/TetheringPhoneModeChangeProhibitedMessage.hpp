@@ -19,7 +19,7 @@ namespace sys
 
         std::unique_ptr<app::manager::ActionRequest> toAction() const override
         {
-            auto params = std::make_unique<app::PopupRequestParams>(gui::popup::ID::TetheringPhoneModeChangeProhibited);
+            auto params = std::make_unique<gui::PopupRequestParams>(gui::popup::ID::TetheringPhoneModeChangeProhibited);
             return std::make_unique<app::manager::ActionRequest>(
                 sender, app::manager::actions::ShowPopup, std::move(params));
         }

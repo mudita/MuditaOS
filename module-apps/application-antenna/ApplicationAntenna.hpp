@@ -40,6 +40,7 @@ namespace app
       public:
         ApplicationAntenna(std::string name                    = name_antenna,
                            std::string parent                  = {},
+                           sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                            StartInBackground startInBackground = {false});
         virtual ~ApplicationAntenna();
 
@@ -73,7 +74,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
         }
     };
 } /* namespace app */

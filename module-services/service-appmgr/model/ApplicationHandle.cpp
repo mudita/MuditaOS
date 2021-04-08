@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/model/ApplicationHandle.hpp>
@@ -58,14 +58,14 @@ namespace app::manager
         return manifest.contains(action);
     }
 
-    void ApplicationHandle::run(sys::Service *caller)
+    void ApplicationHandle::run(sys::phone_modes::PhoneMode mode, sys::Service *caller)
     {
-        launcher->run(caller);
+        launcher->run(mode, caller);
     }
 
-    void ApplicationHandle::runInBackground(sys::Service *caller)
+    void ApplicationHandle::runInBackground(sys::phone_modes::PhoneMode mode, sys::Service *caller)
     {
-        launcher->runBackground(caller);
+        launcher->runBackground(mode, caller);
     }
 
     void ApplicationHandle::close() noexcept

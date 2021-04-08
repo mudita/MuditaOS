@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,6 +25,7 @@ namespace app
       public:
         explicit ApplicationNotes(std::string name                    = name_notes,
                                   std::string parent                  = {},
+                                  sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                                   StartInBackground startInBackground = {false});
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -40,7 +41,7 @@ namespace app
     {
         static auto GetManifest() -> manager::ApplicationManifest
         {
-            return {{manager::actions::Launch}};
+            return {{manager::actions::Launch, manager::actions::PhoneModeChanged}};
         }
     };
 } // namespace app

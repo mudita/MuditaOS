@@ -72,8 +72,11 @@ namespace app
         }
     } // namespace
 
-    ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground), lockHandler(this)
+    ApplicationDesktop::ApplicationDesktop(std::string name,
+                                           std::string parent,
+                                           sys::phone_modes::PhoneMode mode,
+                                           StartInBackground startInBackground)
+        : Application(name, parent, mode, startInBackground), lockHandler(this)
     {
         using namespace gui::top_bar;
         topBarManager->enableIndicators({Indicator::Signal,

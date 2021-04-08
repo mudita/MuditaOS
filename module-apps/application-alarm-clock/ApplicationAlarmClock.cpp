@@ -19,9 +19,10 @@ namespace app
 
     ApplicationAlarmClock::ApplicationAlarmClock(std::string name,
                                                  std::string parent,
+                                                 sys::phone_modes::PhoneMode mode,
                                                  uint32_t stackDepth,
                                                  sys::ServicePriority priority)
-        : Application(name, parent, false, stackDepth, priority)
+        : Application(name, parent, mode, false, stackDepth, priority)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }

@@ -326,22 +326,22 @@ void handleCellularSimNewPinDataMessage(CellularSimNewPinDataMessage *msg)
 void ServiceCellular::registerMessageHandlers()
 {
     phoneModeObserver->connect(this);
-    phoneModeObserver->subscribe(
-        [=]([[maybe_unused]] sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering) {
-            using bsp::cellular::USB::setPassthrough;
-            using bsp::cellular::USB::PassthroughState;
-            setPassthrough(tethering == sys::phone_modes::Tethering::On ? PassthroughState::ENABLED
-                                                                        : PassthroughState::DISABLED);
-
-            if (mode == sys::phone_modes::PhoneMode::Offline) {
-                this->switchToOffline();
+    phoneModeObserver->subscribe([this](sys::phone_modes::PhoneMode mode) {
+        if (mode == sys::phone_modes::PhoneMode::Offline) {
+            this->switchToOffline();
+        }
+        else {
+            if (!this->isModemRadioModuleOn()) {
+                this->turnOnRadioModule();
             }
-            else {
-                if (!this->isModemRadioModuleOn()) {
-                    this->turnOnRadioModule();
-                }
-            }
-        });
+        }
+    });
+    phoneModeObserver->subscribe([](sys::phone_modes::Tethering tethering) {
+        using bsp::cellular::USB::setPassthrough;
+        using bsp::cellular::USB::PassthroughState;
+        setPassthrough(tethering == sys::phone_modes::Tethering::On ? PassthroughState::ENABLED
+                                                                    : PassthroughState::DISABLED);
+    });
 
     connect(typeid(CellularSimCardPinLockStateRequestDataMessage),
             [&](sys::Message * /*request*/) -> sys::MessagePointer {

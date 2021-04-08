@@ -165,9 +165,7 @@ ServiceAudio::ServiceAudio()
     bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
     phoneModeObserver->connect(this);
-    phoneModeObserver->subscribe([&](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
-        HandlePhoneModeChange(phoneMode, tetheringMode);
-    });
+    phoneModeObserver->subscribe([&](sys::phone_modes::PhoneMode phoneMode) { HandlePhoneModeChange(phoneMode); });
 
     connect(typeid(BluetoothDeviceVolumeChanged),
             [this](sys::Message *msg) -> sys::MessagePointer { return handleVolumeChangedOnBluetoothDevice(msg); });
@@ -546,8 +544,7 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyP
         audio::RetCode::Success, newVolume, AudioKeyPressedResponse::ShowPopup::True, context);
 }
 
-void ServiceAudio::HandlePhoneModeChange(sys::phone_modes::PhoneMode phoneMode,
-                                         sys::phone_modes::Tethering tetheringMode)
+void ServiceAudio::HandlePhoneModeChange(sys::phone_modes::PhoneMode phoneMode)
 {
     LOG_INFO("Phone mode changed to %s", utils::enumToString(phoneMode).c_str());
     for (auto &input : audioMux.GetAllInputs()) {
