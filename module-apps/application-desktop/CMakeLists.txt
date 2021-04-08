@@ -17,7 +17,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLock.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLockHandler.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/NotificationsBox.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockBaseWindow.cpp"
@@ -40,7 +39,9 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiInternalMsgWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/ScreenLockBaseBox.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/LockWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/UpdateProgress.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/presenter/PowerOffPresenter.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/models/ActiveNotificationsModel.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockPhoneData.hpp"
@@ -50,7 +51,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLock.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PinLockHandler.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/NotificationsBox.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockBaseWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockBox.hpp"
@@ -71,6 +71,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiInternalMsgWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/ScreenLockBaseBox.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/LockWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/models/ActiveNotificationsModel.hpp"
 )
 
 target_link_libraries(${PROJECT_NAME}

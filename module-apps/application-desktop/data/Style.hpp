@@ -5,20 +5,6 @@
 
 namespace style::desktop
 {
-
-    namespace notifications
-    {
-        inline constexpr auto SpanSize     = 8;
-        inline constexpr auto DigitSize    = 16;
-        inline constexpr auto IconWidth    = 35;
-        inline constexpr auto TextMaxWidth = 250;
-
-        inline constexpr auto X     = 0;
-        inline constexpr auto Y     = 284;
-        inline constexpr auto Width = style::window_width;
-
-    }; // namespace notifications
-
     namespace timeLabel
     {
         inline constexpr auto X      = 0;

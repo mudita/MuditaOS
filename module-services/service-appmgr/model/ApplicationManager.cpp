@@ -36,6 +36,7 @@
 #include <module-utils/time/DateAndTimeSettings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-appmgr/messages/DOMRequest.hpp>
+#include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
 
 #include "module-services/service-appmgr/service-appmgr/messages/ApplicationStatus.hpp"
 
@@ -131,14 +132,15 @@ namespace app::manager
                                            const ApplicationName &_rootApplicationName)
         : Service{serviceName, {}, ApplicationManagerStackDepth},
           ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
-          actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, autoLockEnabled(false),
-          settings(std::make_unique<settings::Settings>(this)),
+          actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, notificationProvider(this),
+          autoLockEnabled(false), settings(std::make_unique<settings::Settings>(this)),
           phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
     {
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, timerBlock, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
         bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         registerMessageHandlers();
     }
 
@@ -382,6 +384,21 @@ namespace app::manager
             handleSetOsUpdateVersionChange(msg);
             return sys::msgHandled();
         });
+        connect(typeid(GetAllNotificationsRequest), [&](sys::Message *request) {
+            notificationProvider.requestNotSeenNotifications();
+            notificationProvider.send();
+            return sys::msgHandled();
+        });
+        connect(typeid(db::NotificationMessage), [&](sys::Message *msg) {
+            auto msgl = static_cast<db::NotificationMessage *>(msg);
+            notificationProvider.handle(msgl);
+            return sys::msgHandled();
+        });
+        connect(typeid(db::QueryResponse), [&](sys::Message *msg) {
+            auto response = static_cast<db::QueryResponse *>(msg);
+            handleDBResponse(response);
+            return sys::msgHandled();
+        });
 
         connect(typeid(app::manager::DOMRequest), [&](sys::Message *request) { return handleDOMRequest(request); });
 
@@ -578,7 +595,9 @@ namespace app::manager
         case actions::ShowPopup:
             [[fallthrough]];
         case actions::AbortPopup:
-            return handlePopupAction(action);
+            return handleActionOnFocusedApp(action);
+        case actions::NotificationsChanged:
+            return handleActionOnFocusedApp(action);
         default:
             return handleCustomAction(action);
         }
@@ -621,14 +640,13 @@ namespace app::manager
         return ActionProcessStatus::Skipped;
     }
 
-    auto ApplicationManager::handlePopupAction(ActionEntry &action) -> ActionProcessStatus
+    auto ApplicationManager::handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus
     {
         auto targetApp = getFocusedApplication();
         if (targetApp == nullptr) {
             return ActionProcessStatus::Skipped;
         }
         action.setTargetApplication(targetApp->name());
-
         auto &params = action.params;
         app::Application::requestAction(this, targetApp->name(), action.actionId, std::move(params));
         return ActionProcessStatus::Accepted;
@@ -844,6 +862,16 @@ namespace app::manager
         settings->setValue(
             settings::SystemProperties::osCurrentVersion, msg->osCurrentVer, settings::SettingsScope::Global);
         return true;
+    }
+
+    auto ApplicationManager::handleDBResponse(db::QueryResponse *msg) -> bool
+    {
+        auto result = msg->getResult();
+        if (auto response = dynamic_cast<db::query::notifications::GetAllResult *>(result.get())) {
+            notificationProvider.handle(response);
+            return true;
+        }
+        return false;
     }
 
     void ApplicationManager::rebuildActiveApplications()
