@@ -423,6 +423,7 @@ TESTS_LIST["catch2-vfs-disk"]="
     Null pointer passed to disk manager functions;
     Boundary checks for partitions;
     Disk sectors out of range for partition;
+    Alternative partitions in the disk manager;
 "
 #---------
 TESTS_LIST["catch2-vfs-littlefs"]="

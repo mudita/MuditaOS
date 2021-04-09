@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -102,6 +102,37 @@ TEST_CASE("RW boundary checking")
     std::vector<uint8_t> buf1(sect_size), buf2(sect_size);
     REQUIRE(dm.read("emmc0", buf1.data(), part1.start_sector, 1) == 0);
     REQUIRE(dm.read(part1.name, buf2.data(), 0, 1) == 0);
+    REQUIRE(buf1 == buf2);
+}
+
+TEST_CASE("Alternative partitions in the disk manager")
+{
+    using namespace purefs;
+    blkdev::disk_manager dm;
+    auto disk = std::make_shared<blkdev::disk_image>(disk_image);
+    REQUIRE(disk);
+    REQUIRE(dm.register_device(disk, "emmc0") == 0);
+    const auto sect_size  = dm.get_info("emmc0", blkdev::info_type::sector_size);
+    const auto sect_size1 = dm.get_info("emmc0sys1", blkdev::info_type::sector_size);
+    REQUIRE(sect_size > 0);
+    REQUIRE(sect_size == sect_size1);
+    const auto sect_count = dm.get_info("emmc0sys1", blkdev::info_type::sector_count);
+    REQUIRE(sect_count == (256L * 1024L * 1024L) / sect_size);
+    const auto sect_count1 = dm.get_info("emmc0", blkdev::info_type::sector_count);
+    REQUIRE(sect_count1 > sect_count);
+    std::vector<char> buf1(sect_size, 0);
+    REQUIRE(dm.read("emmc0", buf1.data(), 0, 1) == 0);
+    std::vector<char> buf2(sect_size, 0xAA);
+    REQUIRE(dm.write("emmc0sys1", buf2.data(), 0, 1) == 0);
+    std::fill(std::begin(buf2), std::end(buf2), 0xBB);
+    REQUIRE(dm.write("emmc0sys0", buf2.data(), 0, 1) == 0);
+    REQUIRE(dm.read("emmc0", buf2.data(), 0, 1) == 0);
+    REQUIRE(buf1 == buf2);
+    std::fill(std::begin(buf2), std::end(buf2), 0xAA);
+    REQUIRE(dm.read("emmc0sys1", buf1.data(), 0, 1) == 0);
+    REQUIRE(buf1 == buf2);
+    std::fill(std::begin(buf2), std::end(buf2), 0xBB);
+    REQUIRE(dm.read("emmc0sys0", buf1.data(), 0, 1) == 0);
     REQUIRE(buf1 == buf2);
 }
 
