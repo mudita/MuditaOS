@@ -64,7 +64,6 @@ namespace app
         }
 
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
 
         connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
             if (gui::window::name::onBoarding_languages == getCurrentWindow()->getName()) {

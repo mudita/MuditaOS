@@ -56,42 +56,36 @@ namespace app
         std::string targetWindow;
         // optional data for the target window.
         std::unique_ptr<gui::SwitchData> data;
-        // name of the application to which switch should be performed after finishing tasks in target application and
-        // window.
-        std::string returnApplication;
-        // name of the window to which switch should be performed after finishing tasks in target application and
-        // window.
-        std::string returnWindow;
+
+        StartupReason startupReason = StartupReason::Launch;
 
       public:
         AppSwitchMessage(const std::string &targetApplication,
                          const std::string &targetWindow,
                          std::unique_ptr<gui::SwitchData> data,
-                         const std::string &returnApplication = "",
-                         const std::string &returnWindow      = "")
-            : AppMessage(MessageType::AppSwitch), targetApplication{targetApplication}, targetWindow{targetWindow},
-              data{std::move(data)}, returnApplication{returnApplication}, returnWindow{returnWindow} {};
+                         StartupReason startupReason)
+            : AppMessage(MessageType::AppSwitch), targetApplication{targetApplication},
+              targetWindow{targetWindow}, data{std::move(data)}, startupReason{startupReason} {};
         virtual ~AppSwitchMessage(){};
 
-        [[nodiscard]] std::string getTargetWindowName() const
+        [[nodiscard]] std::string getTargetWindowName() const noexcept
         {
             return targetWindow;
         };
-        [[nodiscard]] std::string getReturnWindowName() const
-        {
-            return returnWindow;
-        };
+
         [[nodiscard]] std::unique_ptr<gui::SwitchData> &getData()
         {
             return data;
         };
-        [[nodiscard]] std::string getTargetApplicationName() const
+
+        [[nodiscard]] std::string getTargetApplicationName() const noexcept
         {
             return targetApplication;
         };
-        [[nodiscard]] std::string getReturnApplicationName() const
+
+        [[nodiscard]] StartupReason getApplicationStartupReason() const noexcept
         {
-            return returnApplication;
+            return startupReason;
         };
     };
 

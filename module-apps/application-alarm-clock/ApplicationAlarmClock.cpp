@@ -70,7 +70,6 @@ namespace app
         }
 
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
         return ret;
     }
 

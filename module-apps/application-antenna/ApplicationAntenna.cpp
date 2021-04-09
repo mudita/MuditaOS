@@ -156,8 +156,6 @@ namespace app
 
         createUserInterface();
 
-        setActiveWindow(gui::name::window::main_window);
-
         CellularServiceAPI::GetAntenna(this, antenna);
 
         return ret;

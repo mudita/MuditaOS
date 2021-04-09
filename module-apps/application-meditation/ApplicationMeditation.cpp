@@ -24,7 +24,7 @@ namespace app
             return ret;
 
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
+
         return ret;
     }
 

@@ -44,6 +44,8 @@ namespace app::manager
                                    // is closeable and there is incoming call. This flag is also used when closeable
                                    // application is on front and there is a timeout to block the application.
 
+        StartupReason startupReason = StartupReason::Launch; // Informs application about startup reason.
+
       private:
         auto getManifest() const -> const ApplicationManifest &;
     };
