@@ -47,32 +47,40 @@ namespace purefs::blkdev
         return statusBlkDevSuccess;
     }
 
-    auto disk_emmc::write(const void *buf, sector_t lba, std::size_t count) -> int
+    auto disk_emmc::write(const void *buf, sector_t lba, std::size_t count, hwpart_t hwpart) -> int
     {
         cpp_freertos::LockGuard lock(mutex);
         if (!mmcCard->isHostReady || buf == nullptr) {
             return statusBlkDevFail;
         }
-        auto err = MMC_WriteBlocks(mmcCard.get(), static_cast<const uint8_t *>(buf), lba, count);
+        auto err = switch_partition(hwpart);
+        if (err != kStatus_Success) {
+            return err;
+        }
+        err = MMC_WriteBlocks(mmcCard.get(), static_cast<const uint8_t *>(buf), lba, count);
         if (err != kStatus_Success) {
             return err;
         }
         return statusBlkDevSuccess;
     }
 
-    auto disk_emmc::erase(sector_t lba, std::size_t count) -> int
+    auto disk_emmc::erase(sector_t lba, std::size_t count, hwpart_t hwpart) -> int
     {
         // erase group size is 512kB so it has been deliberately disallowed
         // group of this size would make the solution inefficient in this case
         return statusBlkDevSuccess;
     }
-    auto disk_emmc::read(void *buf, sector_t lba, std::size_t count) -> int
+    auto disk_emmc::read(void *buf, sector_t lba, std::size_t count, hwpart_t hwpart) -> int
     {
         cpp_freertos::LockGuard lock(mutex);
         if (!mmcCard->isHostReady || buf == nullptr) {
             return statusBlkDevFail;
         }
-        auto err = MMC_ReadBlocks(mmcCard.get(), static_cast<uint8_t *>(buf), lba, count);
+        auto err = switch_partition(hwpart);
+        if (err != kStatus_Success) {
+            return err;
+        }
+        err = MMC_ReadBlocks(mmcCard.get(), static_cast<uint8_t *>(buf), lba, count);
         if (err != kStatus_Success) {
             return err;
         }
@@ -110,18 +118,45 @@ namespace purefs::blkdev
         return media_status::healthly;
     }
 
-    auto disk_emmc::get_info(info_type what) const -> scount_t
+    auto disk_emmc::get_info(info_type what, hwpart_t hwpart) const -> scount_t
     {
         cpp_freertos::LockGuard lock(mutex);
         switch (what) {
         case info_type::sector_size:
             return mmcCard->blockSize;
         case info_type::sector_count:
-            return mmcCard->userPartitionBlocks;
+            switch (hwpart) {
+            case kMMC_AccessPartitionUserArea:
+                return mmcCard->userPartitionBlocks;
+            case kMMC_AccessPartitionBoot1:
+            case kMMC_AccessPartitionBoot2:
+                return mmcCard->bootPartitionBlocks;
+            default:
+                return mmcCard->systemPartitionBlocks;
+            }
         case info_type::erase_block:
             // not supported
             return 0;
         }
-        return -1;
+        return -ENOTSUP;
     }
+
+    auto disk_emmc::switch_partition(hwpart_t newpart) -> int
+    {
+        if (newpart > kMMC_AccessGeneralPurposePartition4) {
+            return -ERANGE;
+        }
+        int ret{};
+        if (newpart != currHwPart) {
+            ret = MMC_SelectPartition(mmcCard.get(), static_cast<mmc_access_partition_t>(newpart));
+            if (ret == kStatus_Success) {
+                currHwPart = newpart;
+            }
+            else {
+                LOG_ERROR("Unable to switch partition err %i", ret);
+            }
+        }
+        return ret;
+    }
+
 } // namespace purefs::blkdev
