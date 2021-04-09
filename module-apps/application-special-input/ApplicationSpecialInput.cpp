@@ -47,7 +47,7 @@ sys::ReturnCodes ApplicationSpecialInput::InitHandler()
         LOG_ERROR("Can't initialize ApplicationSpecialInput");
     }
     createUserInterface();
-    setActiveWindow(gui::name::window::main_window);
+
     return ret;
 }
 

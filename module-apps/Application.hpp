@@ -8,9 +8,9 @@
 #include "Audio/Profiles/Profile.hpp" // for Profile, Pro...
 #include "CallbackStorage.hpp"
 
-#include "Service/Common.hpp"              // for ReturnCodes
-#include "Service/Message.hpp"             // for MessagePointer
-#include "Service/Service.hpp"             // for Service
+#include "Service/Common.hpp"  // for ReturnCodes
+#include "Service/Message.hpp" // for MessagePointer
+#include "Service/Service.hpp" // for Service
 #include "Timers/TimerHandle.hpp"
 #include "SwitchData.hpp"                  // for SwitchData
 #include "SystemManager/SystemManager.hpp" // for SystemManager
@@ -20,13 +20,13 @@
 #include <PhoneModes/Observer.hpp>
 
 #include <service-appmgr/ApplicationManifest.hpp>
-#include <list>                           // for list
-#include <map>                            // for allocator, map
-#include <memory>                         // for make_shared
-#include <stdint.h>                       // for uint32_t
-#include <string>                         // for string
-#include <utility>                        // for move, pair
-#include <vector>                         // for vector
+#include <list>     // for list
+#include <map>      // for allocator, map
+#include <memory>   // for make_shared
+#include <stdint.h> // for uint32_t
+#include <string>   // for string
+#include <utility>  // for move, pair
+#include <vector>   // for vector
 #include "TopBarManager.hpp"
 #include "popups/Popups.hpp"
 #include "WindowsFactory.hpp"
@@ -75,6 +75,13 @@ namespace app
     {
         Success,
         Failure
+    };
+
+    enum class StartupReason
+    {
+        Launch,   // Default startup causing application MainWindow to be added to stack.
+        OnAction, // Switch to application  was caused by action. Enum is used to prevent called applications to
+        // switch to main window on application switch and allow declared handler to switch to desired window.
     };
 
     struct StartInBackground
@@ -168,6 +175,8 @@ namespace app
         sys::MessagePointer handleMinuteUpdated(sys::Message *msgl);
         sys::MessagePointer handleAction(sys::Message *msgl);
         sys::MessagePointer handleApplicationSwitch(sys::Message *msgl);
+        sys::MessagePointer handleApplicationSwitchLaunch(sys::Message *msgl);
+        sys::MessagePointer handleApplicationSwitchOnAction(sys::Message *msgl);
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl);
         sys::MessagePointer handleUpdateWindow(sys::Message *msgl);
         sys::MessagePointer handleAppClose(sys::Message *msgl);
@@ -312,7 +321,8 @@ namespace app
         static void messageSwitchApplication(sys::Service *sender,
                                              std::string application,
                                              std::string window,
-                                             std::unique_ptr<gui::SwitchData> data);
+                                             std::unique_ptr<gui::SwitchData> data,
+                                             StartupReason startupReason);
         static void messageCloseApplication(sys::Service *sender, std::string application);
         static void messageRebuildApplication(sys::Service *sender, std::string application);
         static void messageApplicationLostFocus(sys::Service *sender, std::string application);

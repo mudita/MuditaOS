@@ -390,7 +390,6 @@ namespace app
         requestUnreadThreadsCount(this);
         requestUnreadCallsCount(this);
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
 
         connect(sdesktop::UpdateOsMessage(), [&](sys::Message *msg) {
             auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
