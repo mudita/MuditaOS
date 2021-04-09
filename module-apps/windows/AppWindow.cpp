@@ -154,6 +154,12 @@ namespace gui
             app::manager::Controller::sendAction(application, app::manager::actions::Home);
         }
 
+        if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_PND) {
+            LOG_INFO("Locking phone");
+
+            application->handlePhoneLock();
+        }
+
         if ((inputEvent.isShortPress())) {
             switch (inputEvent.keyCode) {
             case KeyCode::HEADSET_VOLUP:

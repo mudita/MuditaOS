@@ -478,9 +478,6 @@ namespace app
         windowsFactory.attach(charging_battery, [](Application *app, const std::string newname) {
             return std::make_unique<gui::ChargingBatteryWindow>(app);
         });
-        windowsFactory.attach(desktop_locked, [](Application *app, const std::string newname) {
-            return std::make_unique<gui::LockedInfoWindow>(app);
-        });
         windowsFactory.attach(desktop_reboot, [](Application *app, const std::string newname) {
             auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
             return std::make_unique<gui::RebootWindow>(app, std::move(presenter));

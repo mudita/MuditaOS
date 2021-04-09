@@ -18,19 +18,22 @@ namespace gui
             PhoneModes,
             Brightness,
             Tethering,
-            TetheringPhoneModeChangeProhibited
+            TetheringPhoneModeChangeProhibited,
+            PhoneLock
         };
 
         namespace window
         {
-            inline constexpr auto volume_window      = "VolumePopup";
-            inline constexpr auto phone_modes_window = "PhoneModesPopup";
-            inline constexpr auto brightness_window  = "BrightnessPopup";
-            inline constexpr auto tethering_confirmation_window     = "TetheringConfirmationPopup";
+            inline constexpr auto volume_window                 = "VolumePopup";
+            inline constexpr auto phone_modes_window            = "PhoneModesPopup";
+            inline constexpr auto brightness_window             = "BrightnessPopup";
+            inline constexpr auto tethering_confirmation_window = "TetheringConfirmationPopup";
             inline constexpr auto tethering_phonemode_change_window = "TetheringPhoneModeChangeProhibitedPopup";
+            inline constexpr auto phone_lock_window             = "PhoneLockPopup";
+            inline constexpr auto phone_lock_info_window        = "PhoneLockInfoPopup";
 
         } // namespace window
 
         std::string resolveWindowName(ID id);
-    }     // namespace popup
+    } // namespace popup
 } // namespace gui

@@ -1,9 +1,8 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceTime.hpp"
 #include "service-time/CalendarTimeEvents.hpp"
-#include "service-time/TimeMessage.hpp"
 
 #include <BaseInterface.hpp>
 #include <Common/Query.hpp>
@@ -59,7 +58,7 @@ namespace stm
         case MessageType::DBServiceNotification: {
             auto msg = dynamic_cast<db::NotificationMessage *>(msgl);
             if (msg == nullptr) {
-                responseMsg = std::make_shared<TimeResponseMessage>(false);
+                responseMsg = std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
                 break;
             }
             if (msg->interface == db::Interface::Name::Events && msg->dataModified()) {

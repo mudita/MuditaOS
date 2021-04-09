@@ -41,7 +41,9 @@
 #include <module-utils/time/DateAndTimeSettings.hpp>
 
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
-#include <TetheringPhoneModePopup.hpp>
+#include <module-apps/popups/TetheringPhoneModePopup.hpp>
+#include <module-apps/popups/lock-windows/PhoneLockedWindow.hpp>
+#include <module-apps/popups/lock-windows/PhoneLockedInfoWindow.hpp>
 #include "popups/data/PopupData.hpp"
 
 namespace gui
@@ -748,6 +750,14 @@ namespace app
                 break;
             case ID::Brightness:
                 break;
+            case ID::PhoneLock:
+                windowsFactory.attach(window::phone_lock_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::PhoneLockedWindow>(app, window::phone_lock_window);
+                });
+                windowsFactory.attach(window::phone_lock_info_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::PhoneLockedInfoWindow>(app, window::phone_lock_info_window);
+                });
+                break;
             }
         }
     }
@@ -878,6 +888,11 @@ namespace app
     void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)
     {
         callbackStorage->removeAll(receiver);
+    }
+
+    void Application::handlePhoneLock()
+    {
+        switchWindow(gui::popup::window::phone_lock_window);
     }
 
     void Application::setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept

@@ -398,6 +398,8 @@ namespace app
         sys::phone_modes::PhoneMode phoneMode;
 
       public:
+        void handlePhoneLock();
+
         void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;
         bool isLockScreenPasscodeOn() const noexcept;
         const gui::top_bar::Configuration &getTopBarConfiguration() const noexcept;

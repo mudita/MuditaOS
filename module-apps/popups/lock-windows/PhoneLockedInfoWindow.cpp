@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "LockedInfoWindow.hpp"
+#include "PhoneLockedInfoWindow.hpp"
 
 #include "service-appmgr/Controller.hpp"
 #include "gui/widgets/BottomBar.hpp"
@@ -18,17 +18,17 @@
 
 using namespace gui;
 
-LockedInfoWindow::LockedInfoWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_locked)
+PhoneLockedInfoWindow::PhoneLockedInfoWindow(app::Application *app, const std::string &name) : AppWindow(app, name)
 {
     buildInterface();
 }
 
-void LockedInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+void PhoneLockedInfoWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     setVisibleState();
 }
 
-void LockedInfoWindow::setVisibleState()
+void PhoneLockedInfoWindow::setVisibleState()
 {
     lockImage->setVisible(true);
 
@@ -37,35 +37,30 @@ void LockedInfoWindow::setVisibleState()
     bottomBar->setActive(BottomBar::Side::RIGHT, true);
 }
 
-bool LockedInfoWindow::onInput(const InputEvent &inputEvent)
+bool PhoneLockedInfoWindow::onInput(const InputEvent &inputEvent)
 {
     if (inputEvent.isShortPress()) {
         if (inputEvent.keyCode == KeyCode::KEY_LF && bottomBar->isActive(BottomBar::Side::LEFT)) {
             app::manager::Controller::sendAction(application, app::manager::actions::EmergencyDial);
             return true;
         }
-        else if (inputEvent.keyCode == KeyCode::KEY_RF && bottomBar->isActive(BottomBar::Side::RIGHT)) {
-            application->switchWindow(gui::name::window::main_window);
-            return true;
-        }
     }
     return AppWindow::onInput(inputEvent);
 }
 
-void LockedInfoWindow::rebuild()
+top_bar::Configuration PhoneLockedInfoWindow::configureTopBar(top_bar::Configuration appConfiguration)
 {
-    destroyInterface();
-    buildInterface();
-}
-
-top_bar::Configuration LockedInfoWindow::configureTopBar(top_bar::Configuration appConfiguration)
-{
-    appConfiguration.enable(top_bar::Indicator::Lock);
+    appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
     appConfiguration.disable(top_bar::Indicator::Time);
+    appConfiguration.enable(top_bar::Indicator::PhoneMode);
+    appConfiguration.enable(top_bar::Indicator::Lock);
+    appConfiguration.enable(top_bar::Indicator::Battery);
+    appConfiguration.enable(top_bar::Indicator::Signal);
+    appConfiguration.enable(top_bar::Indicator::SimCard);
     return appConfiguration;
 }
 
-void LockedInfoWindow::buildInterface()
+void PhoneLockedInfoWindow::buildInterface()
 {
     namespace lock_style = style::window::pin_lock;
     AppWindow::buildInterface();
@@ -80,22 +75,11 @@ void LockedInfoWindow::buildInterface()
                         lock_style::primary_text::w,
                         lock_style::primary_text::h);
 
+    // FIXME!
     TextFormat format(FontManager::getInstance().getFont(style::window::font::medium));
     text::RichTextParser rtParser;
     auto parsedText = rtParser.parse(utils::translate("app_desktop_press_to_unlock"), &format);
 
     infoText->setText(std::move(parsedText));
     infoText->setAlignment(Alignment::Horizontal::Center);
-}
-
-void LockedInfoWindow::destroyInterface()
-{
-    erase();
-    invalidate();
-}
-
-void LockedInfoWindow::invalidate() noexcept
-{
-    lockImage = nullptr;
-    infoText  = nullptr;
 }
