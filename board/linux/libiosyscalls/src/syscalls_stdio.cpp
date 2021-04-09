@@ -692,7 +692,6 @@ extern "C"
     void _iosys_setbuf(FILE *__restrict, char *__restrict) __THROW
     {
         TRACE_SYSCALL();
-        std::cerr << "Unimplemented syscall " << __PRETTY_FUNCTION__ << std::endl;
         errno = ENOTSUP;
     }
     __asm__(".symver _iosys_setbuf,setbuf@GLIBC_2.2.5");
@@ -700,7 +699,6 @@ extern "C"
     int _iosys_setvbuf(FILE *__restrict __stream, char *__restrict __buf, int __modes, size_t __n) __THROW
     {
         TRACE_SYSCALL();
-        std::cerr << "Unimplemented syscall " << __PRETTY_FUNCTION__ << std::endl;
         errno = ENOTSUP;
         return 0;
     }
@@ -709,7 +707,6 @@ extern "C"
     void _iosys_setbuffer(FILE *__restrict __stream, char *__restrict __buf, size_t __size) __THROW
     {
         TRACE_SYSCALL();
-        std::cerr << "Unimplemented syscall " << __PRETTY_FUNCTION__ << std::endl;
         errno = ENOTSUP;
     }
     __asm__(".symver _iosys_setbuffer,setbuffer@GLIBC_2.2.5");
@@ -719,7 +716,6 @@ extern "C"
     {
         TRACE_SYSCALL();
         errno = ENOTSUP;
-        std::cerr << "Unimplemented syscall " << __PRETTY_FUNCTION__ << std::endl;
     }
     __asm__(".symver _iosys_setlinebuf,setlinebuf@GLIBC_2.2.5");
 }
