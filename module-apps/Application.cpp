@@ -2,10 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
-#include "Common.hpp"        // for RefreshModes
-#include "GuiTimer.hpp"      // for GuiTimer
-#include "Item.hpp"          // for Item
-#include "MessageType.hpp"   // for MessageType
+#include "Common.hpp"      // for RefreshModes
+#include "GuiTimer.hpp"    // for GuiTimer
+#include "Item.hpp"        // for Item
+#include "MessageType.hpp" // for MessageType
 #include "module-apps/popups/data/PopupRequestParams.hpp"
 #include "module-apps/popups/data/PhoneModeParams.hpp"
 #include "module-sys/Timers/TimerFactory.hpp" // for Timer
@@ -373,7 +373,15 @@ namespace app
         try {
             const auto &actionHandler = receivers.at(action);
             auto &data                = msg->getData();
-            return actionHandler(std::move(data));
+
+            auto result = actionHandler(std::move(data));
+
+            if (windowsStack.isEmpty()) {
+                LOG_ERROR("OnAction application switch with no window provided. Fallback to default mainWindow.");
+                setActiveWindow(gui::name::window::main_window);
+            }
+
+            return result;
         }
         catch (const std::out_of_range &) {
             LOG_ERROR("Application %s is not able to handle action #%d", GetName().c_str(), action);
@@ -382,6 +390,20 @@ namespace app
     }
 
     sys::MessagePointer Application::handleApplicationSwitch(sys::Message *msgl)
+    {
+        auto *msg = static_cast<AppSwitchMessage *>(msgl);
+
+        switch (msg->getApplicationStartupReason()) {
+        case StartupReason::Launch:
+            return handleApplicationSwitchLaunch(msgl);
+        case StartupReason::OnAction:
+            return handleApplicationSwitchOnAction(msgl);
+        }
+
+        return sys::msgNotHandled();
+    }
+
+    sys::MessagePointer Application::handleApplicationSwitchLaunch(sys::Message *msgl)
     {
         auto *msg    = static_cast<AppSwitchMessage *>(msgl);
         bool handled = false;
@@ -426,6 +448,19 @@ namespace app
             return sys::msgHandled();
         }
         return sys::msgNotHandled();
+    }
+
+    sys::MessagePointer Application::handleApplicationSwitchOnAction(sys::Message *msgl)
+    {
+        if ((state == State::ACTIVATING) || (state == State::INITIALIZING) || (state == State::ACTIVE_BACKGROUND)) {
+            setState(State::ACTIVE_FORGROUND);
+            app::manager::Controller::confirmSwitch(this);
+            return sys::msgHandled();
+        }
+        else {
+            LOG_ERROR("Application already running - no startup on Action");
+            return sys::msgNotHandled();
+        }
     }
 
     sys::MessagePointer Application::handleSwitchWindow(sys::Message *msgl)
@@ -656,9 +691,10 @@ namespace app
     void Application::messageSwitchApplication(sys::Service *sender,
                                                std::string application,
                                                std::string window,
-                                               std::unique_ptr<gui::SwitchData> data)
+                                               std::unique_ptr<gui::SwitchData> data,
+                                               StartupReason startupReason)
     {
-        auto msg = std::make_shared<AppSwitchMessage>(application, window, std::move(data));
+        auto msg = std::make_shared<AppSwitchMessage>(application, window, std::move(data), startupReason);
         sender->bus.sendUnicast(msg, application);
     }
 

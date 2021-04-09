@@ -417,7 +417,8 @@ namespace app::manager
         if (app.state() == ApplicationHandle::State::ACTIVE_BACKGROUND) {
             LOG_INFO("Switching focus to application [%s] (window [%s])", app.name().c_str(), app.switchWindow.c_str());
             setState(State::AwaitingFocusConfirmation);
-            app::Application::messageSwitchApplication(this, app.name(), app.switchWindow, std::move(app.switchData));
+            app::Application::messageSwitchApplication(
+                this, app.name(), app.switchWindow, std::move(app.switchData), StartupReason::Launch);
         }
         else {
             LOG_INFO("Starting application %s", app.name().c_str());
@@ -496,7 +497,7 @@ namespace app::manager
         if (app->name() == currentlyFocusedApp->name()) {
             // Switch window only.
             app::Application::messageSwitchApplication(
-                this, app->name(), app->switchWindow, std::move(app->switchData));
+                this, app->name(), app->switchWindow, std::move(app->switchData), StartupReason::Launch);
             return false;
         }
 
@@ -585,6 +586,7 @@ namespace app::manager
             return ActionProcessStatus::Dropped;
         }
 
+        targetApp->startupReason = StartupReason::Launch;
         action.setTargetApplication(targetApp->name());
         SwitchRequest switchRequest(ServiceName, targetApp->name(), gui::name::window::main_window, nullptr);
         return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
@@ -632,6 +634,10 @@ namespace app::manager
         }
 
         const auto targetApp = actionHandlers.front();
+
+        // Inform that target app switch is caused by Action
+        targetApp->startupReason = StartupReason::OnAction;
+
         action.setTargetApplication(targetApp->name());
         auto &actionParams = action.params;
         if (targetApp->state() != ApplicationHandle::State::ACTIVE_FORGROUND) {
@@ -725,7 +731,9 @@ namespace app::manager
             LOG_INFO("Switch application to %s", app.name().c_str());
             app.setState(ApplicationHandle::State::ACTIVATING);
             setState(State::AwaitingFocusConfirmation);
-            app::Application::messageSwitchApplication(this, app.name(), app.switchWindow, std::move(app.switchData));
+
+            app::Application::messageSwitchApplication(
+                this, app.name(), app.switchWindow, std::move(app.switchData), launchingApp->startupReason);
         }
     }
 
@@ -877,6 +885,9 @@ namespace app::manager
 
     void ApplicationManager::onLaunchFinished(ApplicationHandle &app)
     {
+        // reset startupReason to default Launch
+        app.startupReason = StartupReason::Launch;
+
         if (!actionsRegistry.hasPendingAction()) {
             return;
         }
