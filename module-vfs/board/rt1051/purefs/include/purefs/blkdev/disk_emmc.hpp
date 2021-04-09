@@ -6,6 +6,7 @@
 #include <purefs/blkdev/disk.hpp>
 #include <mutex.hpp>
 #include <memory>
+#include <atomic>
 
 #if !defined(TARGET_RT1051)
 static_assert(false, "Unsupported target.");
@@ -26,16 +27,20 @@ namespace purefs::blkdev
 
         auto probe(unsigned flags) -> int override;
         auto cleanup() -> int override;
-        auto write(const void *buf, sector_t lba, std::size_t count) -> int override;
-        auto read(void *buf, sector_t lba, std::size_t count) -> int override;
+        auto write(const void *buf, sector_t lba, std::size_t count, hwpart_t hwpart) -> int override;
+        auto read(void *buf, sector_t lba, std::size_t count, hwpart_t hwpart) -> int override;
         auto sync() -> int override;
         auto status() const -> media_status override;
-        auto get_info(info_type what) const -> scount_t override;
-        auto erase(sector_t lba, std::size_t count) -> int override;
+        auto get_info(info_type what, hwpart_t hwpart) const -> scount_t override;
+        auto erase(sector_t lba, std::size_t count, hwpart_t hwpart) -> int override;
+
+      private:
+        auto switch_partition(hwpart_t newpart) -> int;
 
       private:
         int initStatus;
         std::unique_ptr<_mmc_card> mmcCard;
         mutable cpp_freertos::MutexRecursive mutex;
+        std::atomic<hwpart_t> currHwPart{0};
     };
 } // namespace purefs::blkdev

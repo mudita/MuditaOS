@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -139,7 +139,7 @@ namespace purefs::blkdev
         static auto disk_handle_from_partition_handle(disk_fd disk) -> disk_fd;
 
       private:
-        static auto parse_device_name(std::string_view device) -> std::tuple<std::string_view, short>;
+        static auto parse_device_name(std::string_view device) -> std::tuple<std::string_view, part_t>;
         static auto part_lba_to_disk_lba(disk_fd disk, sector_t part_lba, size_t count) -> scount_t;
 
       private:
