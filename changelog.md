@@ -1,6 +1,26 @@
 # MuditaOS changelog
 
-## [0.62.1 2920-04-07]
+## [0.62.2 2020-04-09]
+
+### Added
+
+* Add factory reset mode.
+* Add SIM PIN settings.
+* Add tethering confirmation popup.
+* Add volume control of Bluetooth headsets.
+* Add windows for audio volume and vibration settings.
+
+### Changed
+
+* Disable functional tests with test harness during CI builds.
+
+### Fixed
+
+* Fix CrashDump repository path causing build issues.
+* Fix database initialization's unit test.
+* Fix phone call muting.
+
+## [0.62.1 2020-04-07]
 
 ### Added
 
