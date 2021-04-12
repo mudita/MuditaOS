@@ -102,6 +102,19 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
     std::shared_ptr<sys::ResponseMessage> responseMsg;
     auto type = static_cast<MessageType>(msgl->messageType);
     switch (type) {
+
+        /**
+         * Contact records
+         */
+
+    case MessageType::DBContactAdd: {
+        auto time             = utils::time::Scoped("DBContactAdd");
+        DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
+        auto ret              = contactRecordInterface->Add(msg->record);
+        responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Create);
+    } break;
+
     case MessageType::DBContactGetByID: {
         auto time             = utils::time::Scoped("DBContactGetByID");
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
@@ -139,6 +152,22 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
             responseMsg = std::make_shared<DBContactNumberResponseMessage>(sys::ReturnCodes::Failure,
                                                                            std::unique_ptr<ContactRecord>());
         }
+    } break;
+
+    case MessageType::DBContactRemove: {
+        auto time             = utils::time::Scoped("DBContactRemove");
+        DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
+        auto ret              = contactRecordInterface->RemoveByID(msg->id);
+        responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Delete);
+    } break;
+
+    case MessageType::DBContactUpdate: {
+        auto time             = utils::time::Scoped("DBContactUpdate");
+        DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
+        auto ret              = contactRecordInterface->Update(msg->record);
+        responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+        sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Update);
     } break;
 
         /**
