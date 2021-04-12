@@ -31,6 +31,7 @@ namespace gui
         AppWindow::buildInterface();
 
         bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_music_player_music_library"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_music_player_play"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_music_player_quit"));
 
         img = new gui::Image(this, noteImg::x, noteImg::y, "note");
@@ -65,13 +66,24 @@ namespace gui
             return true;
         }
 
-        if (!inputEvent.isShortPress()) {
-            return false;
-        }
-
-        if (inputEvent.is(gui::KeyCode::KEY_LF)) {
+        if (inputEvent.is(gui::KeyCode::KEY_LF) && inputEvent.isShortPress()) {
             application->switchWindow(gui::name::window::all_songs_window);
             return true;
+        }
+
+        if (inputEvent.is(gui::KeyCode::KEY_ENTER) || inputEvent.is(gui::KeyCode::HEADSET_OK)) {
+            if (inputEvent.isLongPress()) {
+                auto app = dynamic_cast<app::ApplicationMusicPlayer *>(application);
+                assert(app);
+                app->stop();
+                return true;
+            }
+            else if (inputEvent.isShortPress()) {
+                auto app = dynamic_cast<app::ApplicationMusicPlayer *>(application);
+                assert(app);
+                app->togglePlaying();
+                return true;
+            }
         }
 
         return false;

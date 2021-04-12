@@ -5,6 +5,7 @@
 
 #include <Application.hpp>
 #include <Audio/decoder/Decoder.hpp>
+#include <atomic>
 
 namespace gui
 {
@@ -27,6 +28,8 @@ namespace app
     class ApplicationMusicPlayer : public Application
     {
         std::optional<audio::Token> currentFileToken;
+
+        std::atomic_bool isTrackPlaying = false;
 
       public:
         explicit ApplicationMusicPlayer(std::string name                    = name_music_player,
@@ -52,9 +55,13 @@ namespace app
         bool pause();
         bool resume();
         bool stop();
+        void startPlaying();
+        void togglePlaying();
+
         std::optional<audio::Tags> getFileTags(const std::string &filePath);
 
         void handlePlayResponse(sys::Message *msg);
+        void handleStopResponse(sys::Message *msg);
     };
 
     template <> struct ManifestTraits<ApplicationMusicPlayer>
