@@ -3,8 +3,9 @@ cmake_minimum_required(VERSION 3.12)
 project(module-vfs VERSION 1.0
         DESCRIPTION "VFS module library")
 
-add_subdirectory(thirdparty/lfsfs)
+module_is_test_entity()
 
+add_subdirectory(thirdparty/lfsfs)
 
 set(FF_FAT_SOURCES_THIRDPARTY
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fatfs/source/ff.c

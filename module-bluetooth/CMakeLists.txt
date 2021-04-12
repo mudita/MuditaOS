@@ -5,6 +5,8 @@ project(module-bluetooth VERSION 1.0 DESCRIPTION "Bluetooth module library")
 
 set(CMAKE_CXX_STANDARD 17)
 
+module_is_test_entity()
+
 set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/audio/BluetoothAudioDevice.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BluetoothWorker.cpp

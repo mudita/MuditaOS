@@ -3,6 +3,8 @@
 project(module-sys VERSION 1.0
         DESCRIPTION "Core module library")
 
+module_is_test_entity()
+
 set(BUS_IMPL_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/details/bus/Bus.cpp
 )
