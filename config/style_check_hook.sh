@@ -137,14 +137,14 @@ shouldnt_ignore() {
 function help() {
         echo "Runs clang-format on source files"
         cat <<- EOM
-		ussge:
+		usage:
 		   $0 [option]
 		        --about             does nothing
 		        --last              checks current branch against origin/master - doesn't fix
 		        --branch-fix        checks current branch against origin/master and fixes errors - you have to 'git add' and 'git commit' them
 		        --fix               fix style in currently staged files (ignores user.fixinstage variale), this is usefull for manual style applying
 		
-		If you would like to automatially fix style before commit
+		If you would like to automatically fix style before commit
 		add to your git config "user.fixinstage" variable with value "True"
 		by calling:
 		    git config user.fixinstage True
