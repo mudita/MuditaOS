@@ -7,7 +7,7 @@
 CHANGELOG_FILE="changelog.md"
 
 function printChangeLogForGH() {
-    CHANGELOG="$(cat ${CHANGELOG_FILE})"
+    CHANGELOG="$(awk -f tools/last_changelog.awk ${CHANGELOG_FILE})"
     CHANGELOG="${CHANGELOG//'%'/'%25'}"
     CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
     CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
