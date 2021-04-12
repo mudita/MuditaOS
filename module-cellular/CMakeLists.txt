@@ -5,6 +5,8 @@ project(module-cellular VERSION 1.0
 
 include(SerialPort)
 
+module_is_test_entity()
+
 set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATParser.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATStream.cpp

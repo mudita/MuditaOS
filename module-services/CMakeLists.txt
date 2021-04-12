@@ -3,6 +3,8 @@
 project(module-services VERSION 1.0
         DESCRIPTION "Library with all services.")
 
+module_is_test_entity()
+
 include(${CMAKE_SOURCE_DIR}/module-lwip/lwip-includes.cmake)
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")

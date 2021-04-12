@@ -3,6 +3,8 @@
 project(module-db VERSION 1.0
         DESCRIPTION "Database module library")
 
+module_is_test_entity()
+
 include(thirdparty)
 
 set (SQLITE3_SOURCE Database/sqlite3.c)
