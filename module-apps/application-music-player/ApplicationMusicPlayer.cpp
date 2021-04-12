@@ -27,12 +27,27 @@ namespace app
             handlePlayResponse(msg);
             return sys::MessageNone{};
         });
+
+        connect(typeid(AudioStopResponse), [&](sys::Message *msg) {
+            handleStopResponse(msg);
+            return sys::MessageNone{};
+        });
     }
 
     void ApplicationMusicPlayer::handlePlayResponse(sys::Message *msg)
     {
         auto startResponse = static_cast<AudioStartPlaybackResponse *>(msg);
         currentFileToken   = startResponse->token;
+    }
+
+    void ApplicationMusicPlayer::handleStopResponse(sys::Message *msg)
+    {
+        auto stopResponse = static_cast<AudioStopResponse *>(msg);
+
+        if (stopResponse->token == currentFileToken.value()) {
+            currentFileToken.reset();
+            isTrackPlaying = false;
+        }
     }
 
     sys::MessagePointer ApplicationMusicPlayer::DataReceivedHandler(sys::DataMessage *msgl,
@@ -105,12 +120,15 @@ namespace app
     bool ApplicationMusicPlayer::play(const std::string &fileName)
     {
         AudioServiceAPI::PlaybackStart(this, audio::PlaybackType::Multimedia, fileName);
+        isTrackPlaying = true;
+
         return true;
     }
 
     bool ApplicationMusicPlayer::pause()
     {
         if (currentFileToken) {
+            isTrackPlaying = false;
             return AudioServiceAPI::Pause(this, currentFileToken.value());
         }
         return false;
@@ -119,7 +137,7 @@ namespace app
     bool ApplicationMusicPlayer::resume()
     {
         if (currentFileToken) {
-
+            isTrackPlaying = true;
             return AudioServiceAPI::Resume(this, currentFileToken.value());
         }
         return false;
@@ -128,6 +146,25 @@ namespace app
     std::optional<audio::Tags> ApplicationMusicPlayer::getFileTags(const std::string &filePath)
     {
         return AudioServiceAPI::GetFileTags(this, filePath);
+    }
+
+    bool ApplicationMusicPlayer::stop()
+    {
+        if (currentFileToken) {
+            isTrackPlaying = false;
+            return AudioServiceAPI::Stop(this, currentFileToken.value());
+        }
+        return false;
+    }
+
+    void ApplicationMusicPlayer::togglePlaying()
+    {
+        if (isTrackPlaying) {
+            pause();
+        }
+        else {
+            resume();
+        }
     }
 
 } /* namespace app */
