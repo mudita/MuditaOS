@@ -1,17 +1,19 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookIceContacts.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
+#include "service-appmgr/Controller.hpp"
 
 #include <service-db/DBNotificationMessage.hpp>
 
 namespace gui
 {
     PhonebookIceContacts::PhonebookIceContacts(app::Application *app)
-        : AppWindow(app, gui::window::name::ice_contacts), phonebookModel{std::make_shared<PhonebookModel>(
-                                                               this->application, "", ContactsDB::iceGroupId())}
+        : AppWindow(app, gui::window::name::ice_contacts),
+          phonebookModel{std::make_shared<PhonebookModel>(
+              this->application, "", ContactsDB::iceGroupId(), 0, phonebook::model::Config::ICE)}
     {
         buildInterface();
     }
@@ -55,7 +57,12 @@ namespace gui
 
     bool PhonebookIceContacts::onInput(const InputEvent &inputEvent)
     {
-        // check if any of the lower inheritance onInput methods catch the event
+        if (inputEvent.isShortPress()) {
+            if (inputEvent.is(KeyCode::KEY_RF)) {
+                app::manager::Controller::switchBack(application);
+                return true;
+            }
+        }
         return AppWindow::onInput(inputEvent);
     }
 

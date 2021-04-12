@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
@@ -25,9 +25,11 @@ const static std::uint32_t phonebookModelTimeout = 1000;
 PhonebookModel::PhonebookModel(app::Application *app,
                                std::string filter,
                                std::uint32_t groupFilter,
-                               std::uint32_t displayMode)
+                               std::uint32_t displayMode,
+                               phonebook::model::Config config)
     : DatabaseModel(app), app::AsyncCallbackReceiver{app}, queryFilter(std::move(filter)),
-      queryGroupFilter(std::move(groupFilter)), queryDisplayMode(std::move(displayMode))
+      queryGroupFilter(std::move(groupFilter)), queryDisplayMode(std::move(displayMode)),
+      configuration(std::move(config))
 {}
 
 auto PhonebookModel::requestRecordsCount() -> unsigned int
@@ -150,8 +152,14 @@ auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
         if (event.keyCode == gui::KeyCode::KEY_LF) {
             if (item->contact && !item->contact->numbers.empty()) {
                 const auto phoneNumber = item->contact->numbers.front().number;
-                return app::manager::Controller::sendAction(
-                    application, app::manager::actions::Dial, std::make_unique<app::ExecuteCallData>(phoneNumber));
+                auto onSwitchBehaviour = app::manager::OnSwitchBehaviour::Close;
+                if (configuration == phonebook::model::Config::ICE) {
+                    onSwitchBehaviour = app::manager::OnSwitchBehaviour::RunInBackground;
+                }
+                return app::manager::Controller::sendAction(application,
+                                                            app::manager::actions::Dial,
+                                                            std::make_unique<app::ExecuteCallData>(phoneNumber),
+                                                            onSwitchBehaviour);
             }
         }
         return false;

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,6 +17,15 @@
 
 #include <string>
 
+namespace phonebook::model
+{
+    enum class Config
+    {
+        PHONEBOOK,
+        ICE
+    };
+}
+
 class PhonebookModel : public app::DatabaseModel<ContactRecord>,
                        public gui::ListItemProvider,
                        public app::AsyncCallbackReceiver
@@ -26,13 +35,15 @@ class PhonebookModel : public app::DatabaseModel<ContactRecord>,
     std::uint32_t queryGroupFilter;
     std::uint32_t queryDisplayMode;
     std::uint32_t lastRequestedOffset = 0;
+    phonebook::model::Config configuration;
 
   public:
     ContactsMapData letterMap;
     PhonebookModel(app::Application *app,
-                   std::string filter        = "",
-                   std::uint32_t groupFilter = 0,
-                   std::uint32_t displayMode = 0);
+                   std::string filter              = "",
+                   std::uint32_t groupFilter       = 0,
+                   std::uint32_t displayMode       = 0,
+                   phonebook::model::Config config = phonebook::model::Config::PHONEBOOK);
 
     // virtual methods from DatabaseModel
     auto updateRecords(std::vector<ContactRecord> records) -> bool override;
