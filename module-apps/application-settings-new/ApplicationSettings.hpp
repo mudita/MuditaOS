@@ -164,6 +164,16 @@ namespace app
             virtual auto isFlightMode() const noexcept -> bool     = 0;
             virtual void setFlightMode(bool flightModeOn) noexcept = 0;
         };
+
+        class ConnectedSettings
+        {
+          public:
+            virtual auto isMessageSoundEnabled() const noexcept -> bool               = 0;
+            virtual void setMessageSoundEnabled(bool messageSoundOn) noexcept         = 0;
+            virtual auto isMessageVibrationEnabled() const noexcept -> bool           = 0;
+            virtual void setMessageVibrationEnabled(bool messageVibrationOn) noexcept = 0;
+        };
+
     }; // namespace settingsInterface
 
     class ApplicationSettingsNew : public app::Application,
@@ -174,6 +184,7 @@ namespace app
                                    public settingsInterface::SecuritySettings,
                                    public settingsInterface::DndSettings,
                                    public settingsInterface::OfflineSettings,
+                                   public settingsInterface::ConnectedSettings,
                                    public settingsInterface::ConnectionSettings,
                                    public AsyncCallbackReceiver
     {
@@ -233,6 +244,11 @@ namespace app
         auto isFlightMode() const noexcept -> bool override;
         void setFlightMode(bool flightModeOn) noexcept override;
 
+        auto isMessageSoundEnabled() const noexcept -> bool override;
+        void setMessageSoundEnabled(bool messageSoundOn) noexcept override;
+        auto isMessageVibrationEnabled() const noexcept -> bool override;
+        void setMessageVibrationEnabled(bool messageVibrationOn) noexcept override;
+
         auto getConnectionFrequency() const noexcept -> uint8_t override;
         void setConnectionFrequency(uint8_t val) noexcept override;
 
@@ -251,6 +267,8 @@ namespace app
         bool callsFromFavorites       = false;
         int connectionFrequency       = 0;
         bool flightModeOn             = true;
+        bool connectedMessageSoundOn     = true;
+        bool connectedMessageVibrationOn = true;
     };
 
     template <> struct ManifestTraits<ApplicationSettingsNew>

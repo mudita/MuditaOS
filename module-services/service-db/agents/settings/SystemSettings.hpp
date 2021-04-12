@@ -59,4 +59,10 @@ namespace settings
         constexpr inline auto callsFromFavorites      = "off_calls_from_favorites";
     } // namespace Offline
 
+    namespace Connected
+    {
+        constexpr inline auto messageSoundOn     = "conn_message_sound_on";
+        constexpr inline auto messageVibrationOn = "conn_message_vibration_on";
+    } // namespace Connected
+
 }; // namespace settings

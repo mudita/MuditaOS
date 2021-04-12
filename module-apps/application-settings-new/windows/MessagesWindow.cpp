@@ -10,11 +10,9 @@
 
 namespace gui
 {
-    MessagesWindow::MessagesWindow(app::Application *app)
-        : BaseSettingsWindow(app, gui::window::name::messages), mWidgetMaker(this)
+    MessagesWindow::MessagesWindow(app::Application *app, app::settingsInterface::ConnectedSettings *connectedSettings)
+        : BaseSettingsWindow(app, gui::window::name::messages), mWidgetMaker(this), connectedSettings(connectedSettings)
     {
-        mVibrationsEnabled       = false;
-        mSoundEnabled            = true;
         mShowUnreadMessagesFirst = true;
         setTitle(utils::localize.get("app_settings_apps_messages"));
     }
@@ -25,11 +23,18 @@ namespace gui
 
         mWidgetMaker.addSwitchOption(optionList,
                                      utils::translateI18("app_settings_vibration"),
-                                     mVibrationsEnabled,
-                                     [&]() { switchVibrationState(); });
+                                     connectedSettings->isMessageVibrationEnabled(),
+                                     [&]() {
+                                         connectedSettings->setMessageVibrationEnabled(
+                                             !connectedSettings->isMessageVibrationEnabled());
+                                         refreshOptionsList();
+                                     });
 
         mWidgetMaker.addSwitchOption(
-            optionList, utils::translateI18("app_settings_sound"), mSoundEnabled, [&]() { switchSoundState(); });
+            optionList, utils::translateI18("app_settings_sound"), connectedSettings->isMessageSoundEnabled(), [&]() {
+                connectedSettings->setMessageSoundEnabled(!connectedSettings->isMessageSoundEnabled());
+                refreshOptionsList();
+            });
 
         if (mSoundEnabled) {
             mWidgetMaker.addSelectOption(
@@ -47,20 +52,6 @@ namespace gui
         mWidgetMaker.addSelectOption(
             optionList, utils::translateI18("app_settings_Templates"), [&]() { openMessageTemplates(); });
         return optionList;
-    }
-
-    void MessagesWindow::switchVibrationState()
-    {
-        mVibrationsEnabled = !mVibrationsEnabled;
-        LOG_INFO("switchVibrationState %d", static_cast<int>(mVibrationsEnabled));
-        refreshOptionsList();
-    }
-
-    void MessagesWindow::switchSoundState()
-    {
-        mSoundEnabled = !mSoundEnabled;
-        LOG_INFO("switchSoundState %d", static_cast<int>(mSoundEnabled));
-        refreshOptionsList();
     }
 
     void MessagesWindow::switchShowUnreadFirst()

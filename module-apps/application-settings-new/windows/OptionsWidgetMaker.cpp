@@ -10,7 +10,7 @@ namespace gui
     {}
 
     void OptionsWidgetMaker::addSwitchOption(
-        std::list<gui::Option> &list, const UTF8 &text, bool &option, std::function<void()> callback, bool indent)
+        std::list<gui::Option> &list, const UTF8 &text, const bool &option, std::function<void()> callback, bool indent)
     {
         list.emplace_back(std::make_unique<option::OptionSettings>(
             std::move(text),

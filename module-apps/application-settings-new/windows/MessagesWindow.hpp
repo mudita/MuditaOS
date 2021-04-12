@@ -6,6 +6,11 @@
 #include "BaseSettingsWindow.hpp"
 #include "OptionsWidgetMaker.hpp"
 
+namespace app::settingsInterface
+{
+    class ConnectedSettings;
+}; // namespace app::settingsInterface
+
 namespace gui
 {
     ///  @brief Messages vibration, sound, and other settings window
@@ -15,16 +20,9 @@ namespace gui
       public:
         ///  Constructor
         ///  @app parent application pointer
-        explicit MessagesWindow(app::Application *app);
+        explicit MessagesWindow(app::Application *app, app::settingsInterface::ConnectedSettings *connectedSettings);
 
       private:
-        ///  Switches messages vibration state
-        ///  @return new state
-        void switchVibrationState();
-
-        ///  Switches messages sound state
-        void switchSoundState();
-
         ///  Opens message sound selection window
         void openMessageSoundWindow();
 
@@ -40,6 +38,9 @@ namespace gui
 
         ///  Widget maker object
         OptionsWidgetMaker mWidgetMaker;
+
+        ///  Settings of connected mode
+        app::settingsInterface::ConnectedSettings *connectedSettings;
 
         ///  Flag describing if messages vibration is enabled
         bool mVibrationsEnabled = false;

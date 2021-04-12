@@ -365,6 +365,14 @@ namespace app
             ::settings::Offline::notificationsWhenLocked,
             [this](const std::string &value) { notificationsWhenLocked = utils::getNumericValue<bool>(value); },
             ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::Connected::messageSoundOn,
+            [this](const std::string &value) { connectedMessageSoundOn = utils::getNumericValue<bool>(value); },
+            ::settings::SettingsScope::Global);
+        settings->registerValueChange(
+            ::settings::Connected::messageVibrationOn,
+            [this](const std::string &value) { connectedMessageVibrationOn = utils::getNumericValue<bool>(value); },
+            ::settings::SettingsScope::Global);
 
         return ret;
     }
@@ -428,7 +436,7 @@ namespace app
             return std::make_unique<gui::CallRingtoneWindow>(app);
         });
         windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::MessagesWindow>(app);
+            return std::make_unique<gui::MessagesWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
         windowsFactory.attach(gui::window::name::message_sound, [](Application *app, const std::string &name) {
             return std::make_unique<gui::MessageSoundWindow>(app);
@@ -733,6 +741,31 @@ namespace app
     {
         this->flightModeOn = flightModeOn;
         CellularServiceAPI::SetFlightMode(this, flightModeOn);
+    }
+
+    auto ApplicationSettingsNew::isMessageSoundEnabled() const noexcept -> bool
+    {
+        return connectedMessageSoundOn;
+    }
+
+    void ApplicationSettingsNew::setMessageSoundEnabled(bool messageSoundOn) noexcept
+    {
+        connectedMessageSoundOn = messageSoundOn;
+        settings->setValue(
+            ::settings::Connected::messageSoundOn, std::to_string(messageSoundOn), ::settings::SettingsScope::Global);
+    }
+
+    auto ApplicationSettingsNew::isMessageVibrationEnabled() const noexcept -> bool
+    {
+        return connectedMessageVibrationOn;
+    }
+
+    void ApplicationSettingsNew::setMessageVibrationEnabled(bool messageVibrationOn) noexcept
+    {
+        connectedMessageVibrationOn = messageVibrationOn;
+        settings->setValue(::settings::Connected::messageVibrationOn,
+                           std::to_string(messageVibrationOn),
+                           ::settings::SettingsScope::Global);
     }
 
     auto ApplicationSettingsNew::getConnectionFrequency() const noexcept -> uint8_t

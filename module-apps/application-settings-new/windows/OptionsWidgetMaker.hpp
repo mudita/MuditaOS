@@ -24,7 +24,7 @@ namespace gui
         ///  @param indent should the option be indent
         void addSwitchOption(std::list<gui::Option> &list,
                              const UTF8 &text,
-                             bool &option,
+                             const bool &option,
                              std::function<void()> callback,
                              bool indent = false);
 
