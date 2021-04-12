@@ -11,6 +11,8 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
+module_is_test_entity()
+
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 	include(targets/Target_Linux.cmake)
 else()
