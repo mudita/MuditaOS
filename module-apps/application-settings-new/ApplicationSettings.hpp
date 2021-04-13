@@ -6,6 +6,7 @@
 #include "Application.hpp"
 
 #include <bsp/common.hpp>
+#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <module-services/service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <common_data/EventStore.hpp>
 
@@ -124,9 +125,9 @@ namespace app
         class KeypdBacklightSettings
         {
           public:
-            virtual ~KeypdBacklightSettings()                   = default;
-            virtual auto isKeypadBacklightOn() -> bool          = 0;
-            virtual void setKeypadBacklightState(bool newState) = 0;
+            virtual ~KeypdBacklightSettings()                                        = default;
+            virtual auto getKeypadBacklightState() -> bsp::keypad_backlight::State   = 0;
+            virtual void setKeypadBacklightState(bsp::keypad_backlight::State state) = 0;
         };
 
         class SecuritySettings
@@ -216,8 +217,8 @@ namespace app
         void setStatus(bool isDisplayLightSwitchOn) override;
         void setBrightnessFunction() override;
 
-        auto isKeypadBacklightOn() -> bool override;
-        void setKeypadBacklightState(bool newState) override;
+        auto getKeypadBacklightState() -> bsp::keypad_backlight::State override;
+        void setKeypadBacklightState(bsp::keypad_backlight::State keypadLightState) override;
 
         auto isUSBSecured() const -> bool override;
         void setUSBSecurity(bool security) override;

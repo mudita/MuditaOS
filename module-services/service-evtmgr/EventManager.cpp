@@ -125,6 +125,10 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
                 const auto mode = sys::SystemManager::translateSliderState(message->key);
                 bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
             }
+            if (keypadLightState == bsp::keypad_backlight::State::activeMode) {
+                bsp::keypad_backlight::turnOnAll();
+                startKeypadLightTimer();
+            }
         }
 
         // send key to focused application
@@ -379,21 +383,43 @@ void EventManager::handleMinuteUpdate(time_t timestamp)
     }
 }
 
-bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action act)
+bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action action)
 {
     bool response = false;
-    switch (act) {
+    switch (action) {
     case bsp::keypad_backlight::Action::turnOn:
+        if (keypadLightState == bsp::keypad_backlight::State::activeMode) {
+            keypadLightTimer.stop();
+        }
+        keypadLightState = bsp::keypad_backlight::State::on;
         response = bsp::keypad_backlight::turnOnAll();
         break;
     case bsp::keypad_backlight::Action::turnOff:
+        if (keypadLightState == bsp::keypad_backlight::State::activeMode) {
+            keypadLightTimer.stop();
+        }
+        keypadLightState = bsp::keypad_backlight::State::off;
         response = bsp::keypad_backlight::shutdown();
         break;
     case bsp::keypad_backlight::Action::checkState:
         response = bsp::keypad_backlight::checkState();
         break;
+    case bsp::keypad_backlight::Action::turnOnActiveMode:
+        keypadLightState = bsp::keypad_backlight::State::activeMode;
+        response         = bsp::keypad_backlight::turnOnAll();
+        startKeypadLightTimer();
+        break;
     }
     return response;
+}
+
+void EventManager::startKeypadLightTimer()
+{
+    keypadLightTimer = sys::TimerFactory::createSingleShotTimer(
+        this, keypadLightTimerName, keypadLightTimerTimeout, [this](sys::Timer &) {
+            bsp::keypad_backlight::shutdown();
+        });
+    keypadLightTimer.start();
 }
 
 bool EventManager::processVibraRequest(bsp::vibrator::Action act, std::chrono::milliseconds RepetitionTime)
