@@ -10,6 +10,7 @@
 #include <Audio/AudioCommon.hpp>
 #include <Audio/Profiles/Profile.hpp>
 #include <Audio/Endpoint.hpp>
+#include <Audio/Stream.hpp>
 
 #include <mutex.hpp>
 

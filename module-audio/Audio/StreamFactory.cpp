@@ -18,11 +18,13 @@ StreamFactory::StreamFactory(Endpoint::Capabilities factoryCaps, unsigned int bu
     : caps(std::move(factoryCaps)), bufferingSize(bufferingSize)
 {}
 
-auto StreamFactory::makeStream(const Source &source, const Sink &sink) -> std::unique_ptr<Stream>
+auto StreamFactory::makeStream(Source &source, Sink &sink) -> std::unique_ptr<Stream>
 {
     auto negotiatedCaps = negotiateCaps({source, sink});
+    auto format         = source.getSourceFormat();
 
-    return std::make_unique<Stream>(getAllocator(negotiatedCaps.usesDMA), negotiatedCaps.maxBlockSize, bufferingSize);
+    return std::make_unique<Stream>(
+        format, getAllocator(negotiatedCaps.usesDMA), negotiatedCaps.maxBlockSize, bufferingSize);
 }
 
 auto StreamFactory::negotiateCaps(std::vector<std::reference_wrapper<const Endpoint>> v) -> Endpoint::Capabilities
