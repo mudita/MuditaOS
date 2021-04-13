@@ -16,6 +16,7 @@
 #include <service-appmgr/Controller.hpp>
 #include <service-db/QueryMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <utility>
 
 namespace app
 {
@@ -23,7 +24,7 @@ namespace app
                                                std::string parent,
                                                sys::phone_modes::PhoneMode mode,
                                                StartInBackground startInBackground)
-        : Application(name, parent, mode, startInBackground, phonebook_stack_size)
+        : Application(std::move(name), std::move(parent), mode, startInBackground, phonebook_stack_size)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowContacts, [this](auto &&data) {
@@ -191,9 +192,9 @@ namespace app
     bool ApplicationPhonebook::searchEmpty(const std::string &query)
     {
         gui::DialogMetadata meta;
-        meta.icon  = "search_big";
-        meta.text  = utils::localize.get("app_phonebook_search_no_results");
-        meta.title = utils::localize.get("common_results_prefix") + "\"" + query + "\"";
+        meta.icon                        = "search_big";
+        meta.text                        = utils::localize.get("app_phonebook_search_no_results");
+        meta.title                       = utils::localize.get("common_results_prefix") + "\"" + query + "\"";
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         data->ignoreCurrentWindowOnStack = true;
         LOG_DEBUG("Switching to app_phonebook_search_no_results window.");
