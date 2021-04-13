@@ -29,6 +29,8 @@ namespace gui
 
 class UTF8;
 
+class StatusBarVisitor;
+
 namespace gui::top_bar
 {
 
@@ -45,12 +47,7 @@ namespace gui::top_bar
 
     using Indicators        = std::vector<Indicator>;
     using IndicatorStatuses = std::map<Indicator, bool>;
-
-    enum class TimeMode
-    {
-        Time12h, /// 12h time format
-        Time24h  /// 24h time format
-    };
+    using IndicatorsModifiers = std::map<Indicator, std::shared_ptr<StatusBarVisitor>>;
 
     /// Carries the top bar configuration.
     class Configuration
@@ -61,7 +58,7 @@ namespace gui::top_bar
         void enable(Indicator indicator);
 
         /// Enable number of specified indicators
-        /// @param indicators vectior of indicators to enable
+        /// @param indicators vector of indicators to enable
         void enable(const Indicators &indicators);
 
         /// Disable specified indicator
@@ -73,17 +70,14 @@ namespace gui::top_bar
         /// @param enabled desired status to be set (true=enabled, false=disabled)
         void setIndicator(Indicator indicator, bool enabled);
 
-        /// Set time mode (12h/24h)
-        /// @param timeMode desired time mode configuration
-        void setTimeMode(TimeMode timeMode);
-
         /// Set phone mode (connected/dnd/offline)
         /// @param phoneMode desired phone mode configuration
         void setPhoneMode(sys::phone_modes::PhoneMode phoneMode);
 
-        /// Return the time mode configuration
-        /// @return cuurent time mode configuration
-        [[nodiscard]] auto getTimeMode() const noexcept -> TimeMode;
+        /// Set a configuration modifier to the specified indicator
+        /// @param indicator indicator type
+        /// @param config desired indicator's configuration
+        void setIndicatorModifier(Indicator indicator, std::shared_ptr<StatusBarVisitor> config);
 
         /// Get the phone mode configuration
         /// @return phone mode
@@ -98,6 +92,10 @@ namespace gui::top_bar
         /// @return indicator statuses
         [[nodiscard]] auto getIndicatorsConfiguration() const noexcept -> const IndicatorStatuses &;
 
+        /// Return the indicator modifiers
+        /// @return indicator modifiers
+        [[nodiscard]] auto getIndicatorsModifiers() const noexcept -> const IndicatorsModifiers &;
+
       private:
         /// Current indicator statuses
         IndicatorStatuses indicatorStatuses = {{Indicator::Signal, false},
@@ -108,11 +106,11 @@ namespace gui::top_bar
                                                {Indicator::SimCard, false},
                                                {Indicator::NetworkAccessTechnology, false}};
 
-        /// Time mode
-        TimeMode mTimeMode = TimeMode::Time12h;
-
         /// Phone mode
         sys::phone_modes::PhoneMode mPhoneMode = sys::phone_modes::PhoneMode::Connected;
+
+        /// Indicator modifiers:
+        IndicatorsModifiers indicatorsModifiers;
     };
 
     /// Top bar widget class.
@@ -196,6 +194,11 @@ namespace gui::top_bar
         /// @param indicator indicator id
         /// @param enabled enable or disable the specified indicator
         void setIndicatorStatus(Indicator indicator, bool enabled);
+
+        /// Applies a modifier to specified indicator
+        /// @param indicator indicator id
+        /// @param modifier pointer to modifier
+        void setIndicatorModifier(Indicator indicator, StatusBarVisitor &modifier);
 
         /// Pointer to widget showing digital clock
         Time *time = nullptr;

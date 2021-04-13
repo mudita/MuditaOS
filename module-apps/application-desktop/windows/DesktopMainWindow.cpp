@@ -69,9 +69,6 @@ namespace gui
             }
         };
 
-        applyToTopBar(
-            [this](top_bar::Configuration configuration) { return configureTopBar(std::move(configuration)); });
-
         setVisibleState();
     }
 
@@ -117,6 +114,8 @@ namespace gui
 
     void DesktopMainWindow::setVisibleState()
     {
+        applyToTopBar(
+            [this](top_bar::Configuration configuration) { return configureTopBar(std::move(configuration)); });
         if (auto app = getAppDesktop(); app->lockHandler.isScreenLocked()) {
             bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
             bottomBar->setActive(BottomBar::Side::RIGHT, false);

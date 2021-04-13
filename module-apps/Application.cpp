@@ -10,6 +10,7 @@
 #include "module-apps/popups/data/PhoneModeParams.hpp"
 #include "module-sys/Timers/TimerFactory.hpp" // for Timer
 #include "TopBar.hpp"
+#include "TopBar/Time.hpp"
 #include "popups/TetheringConfirmationPopup.hpp"
 #include "Translator.hpp"                // for KeyInputSim...
 #include "common_data/EventStore.hpp"    // for Battery
@@ -96,8 +97,11 @@ namespace app
           settings(std::make_unique<settings::Settings>(this)), phoneMode{mode}
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
-        topBarManager->set(utils::dateAndTimeSettings.isTimeFormat12() ? gui::top_bar::TimeMode::Time12h
-                                                                       : gui::top_bar::TimeMode::Time24h);
+        using TimeMode = gui::top_bar::TimeConfiguration::TimeMode;
+        auto modifier  = std::make_shared<gui::top_bar::TimeConfiguration>(
+            utils::dateAndTimeSettings.isTimeFormat12() ? TimeMode::Time12h : TimeMode::Time24h);
+        topBarManager->set(gui::top_bar::Indicator::Time, std::move(modifier));
+
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 
         longPressTimer = sys::TimerFactory::createPeriodicTimer(this,

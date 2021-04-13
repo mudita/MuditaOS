@@ -3,6 +3,33 @@
 
 #pragma once
 
+#include <log/log.hpp>
+
+namespace gui::top_bar
+{
+    class SIM;
+    class Time;
+} // namespace gui::top_bar
+
+class StatusBarVisitor
+{
+    void logError() const
+    {
+        LOG_ERROR("Invalid widget visited");
+    }
+
+  public:
+    virtual void visit([[maybe_unused]] gui::top_bar::SIM &widget) const
+    {
+        logError();
+    }
+    virtual void visit([[maybe_unused]] gui::top_bar::Time &widget) const
+    {
+        logError();
+    }
+    virtual ~StatusBarVisitor() = default;
+};
+
 template <typename ItemPolicy> class StatusBarWidgetBase : public ItemPolicy
 {
   public:
@@ -22,5 +49,10 @@ template <typename ItemPolicy> class StatusBarWidgetBase : public ItemPolicy
     virtual bool isVisible()
     {
         return ItemPolicy::visible;
+    }
+
+    virtual void acceptStatusBarVisitor([[maybe_unused]] StatusBarVisitor &visitor)
+    {
+        LOG_ERROR("Invalid visitor");
     }
 };

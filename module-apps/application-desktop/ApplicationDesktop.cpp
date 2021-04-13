@@ -44,6 +44,7 @@
 #include <module-apps/messages/AppMessage.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <service-db/DBCalllogMessage.hpp>
+#include <module-gui/gui/widgets/TopBar/SIM.hpp>
 
 #include <cassert>
 namespace app
@@ -80,6 +81,8 @@ namespace app
                                          Indicator::Battery,
                                          Indicator::SimCard,
                                          Indicator::NetworkAccessTechnology});
+        topBarManager->set(Indicator::SimCard,
+                           std::make_shared<SIMConfiguration>(SIMConfiguration::DisplayMode::OnlyInactiveState));
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
         addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
