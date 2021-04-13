@@ -122,7 +122,7 @@ namespace bluetooth
         // request role change on reconnecting headset to always use them in slave mode
         hci_set_master_slave_policy(0);
 
-        l2cap_init();
+        Profile::initL2cap();
         // Initialize  A2DP Source.
         a2dp_source_init();
         a2dp_source_register_packet_handler(&sourcePacketHandler);
@@ -143,14 +143,18 @@ namespace bluetooth
         avdtp_source_register_delay_reporting_category(AVRCP::mediaTracker.local_seid);
 
         AVRCP::init(const_cast<sys::Service *>(ownerService));
-        // Initialize SDP,
-        sdp_init();
+
+        // Initialize SDP
+        Profile::initSdp();
 
         // Create  A2DP Source service record and register it with SDP.
         sdpSourceServiceBuffer.fill(0);
+        constexpr uint32_t a2dpSdpRecordHandle = 0x10001;
         a2dp_source_create_sdp_record(
-            sdpSourceServiceBuffer.data(), 0x10001, AVDTP_SOURCE_FEATURE_MASK_PLAYER, nullptr, nullptr);
-        sdp_register_service(sdpSourceServiceBuffer.data());
+            sdpSourceServiceBuffer.data(), a2dpSdpRecordHandle, AVDTP_SOURCE_FEATURE_MASK_PLAYER, nullptr, nullptr);
+        if (const auto status = sdp_register_service(sdpSourceServiceBuffer.data()); status != ERROR_CODE_SUCCESS) {
+            LOG_ERROR("Can't register service. Status %x", status);
+        }
 
         // Create AVRCP target service record and register it with SDP.
         AVRCP::sdpTargetServiceBuffer.fill(0);
@@ -158,16 +162,27 @@ namespace bluetooth
 #ifdef AVRCP_BROWSING_ENABLED
         supported_features |= AVRCP_FEATURE_MASK_BROWSING;
 #endif
+        constexpr uint32_t avrcpServiceSdpRecordHandle = 0x10002;
         avrcp_target_create_sdp_record(
-            AVRCP::sdpTargetServiceBuffer.data(), 0x10002, supportedFeatures, nullptr, nullptr);
-        sdp_register_service(AVRCP::sdpTargetServiceBuffer.data());
+            AVRCP::sdpTargetServiceBuffer.data(), avrcpServiceSdpRecordHandle, supportedFeatures, nullptr, nullptr);
+        if (const auto status = sdp_register_service(AVRCP::sdpTargetServiceBuffer.data());
+            status != ERROR_CODE_SUCCESS) {
+            LOG_ERROR("Can't register service. Status %x", status);
+        }
 
         // setup AVRCP Controller
         AVRCP::sdpControllerServiceBuffer.fill(0);
-        uint16_t controllerSupportedFeatures = AVRCP_FEATURE_MASK_CATEGORY_PLAYER_OR_RECORDER;
-        avrcp_controller_create_sdp_record(
-            AVRCP::sdpControllerServiceBuffer.data(), 0x10003, controllerSupportedFeatures, nullptr, nullptr);
-        sdp_register_service(AVRCP::sdpControllerServiceBuffer.data());
+        uint16_t controllerSupportedFeatures              = AVRCP_FEATURE_MASK_CATEGORY_PLAYER_OR_RECORDER;
+        constexpr uint32_t avrcpControllerSdpRecordHandle = 0x10003;
+        avrcp_controller_create_sdp_record(AVRCP::sdpControllerServiceBuffer.data(),
+                                           avrcpControllerSdpRecordHandle,
+                                           controllerSupportedFeatures,
+                                           nullptr,
+                                           nullptr);
+        if (const auto status = sdp_register_service(AVRCP::sdpControllerServiceBuffer.data());
+            status != ERROR_CODE_SUCCESS) {
+            LOG_ERROR("Can't register service. Status %x", status);
+        }
 
         // Set local name with a template Bluetooth address, that will be automatically
         // replaced with a actual address once it is available, i.e. when BTstack boots
@@ -487,9 +502,6 @@ namespace bluetooth
         case A2DP_SUBEVENT_STREAMING_CAN_SEND_MEDIA_PACKET_NOW:
             local_seid = a2dp_subevent_streaming_can_send_media_packet_now_get_local_seid(packet);
             cid        = a2dp_subevent_signaling_media_codec_sbc_configuration_get_a2dp_cid(packet);
-            // LOG_INFO("A2DP Source: can send media packet: a2dp_cid [expected 0x%02x, received 0x%02x], local_seid
-            // [expected %d, received %d]\n", AVRCP::mediaTracker.a2dp_cid, cid, AVRCP::mediaTracker.local_seid,
-            // local_seid);
             sendMediaPacket();
             break;
 

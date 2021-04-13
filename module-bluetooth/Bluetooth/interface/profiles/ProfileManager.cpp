@@ -15,7 +15,7 @@ namespace bluetooth
     {
         if (!initialized) {
             profilesList = {{AudioProfile::A2DP, std::make_shared<bluetooth::A2DP>()},
-                            {AudioProfile::HSP, nullptr},
+                            {AudioProfile::HSP, std::make_shared<bluetooth::HSP>()},
                             {AudioProfile::HFP, nullptr},
                             {AudioProfile::None, nullptr}};
 

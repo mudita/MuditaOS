@@ -191,12 +191,16 @@ namespace bluetooth
         sco->setOwnerService(ownerService);
         sco->init();
 
-        l2cap_init();
-        sdp_init();
+        Profile::initL2cap();
+        Profile::initSdp();
 
         serviceBuffer.fill(0);
-        hsp_ag_create_sdp_record(serviceBuffer.data(), 0x10001, rfcommChannelNr, agServiceName.c_str());
-        sdp_register_service(serviceBuffer.data());
+        constexpr uint32_t hspSdpRecordHandle = 0x10004;
+        hsp_ag_create_sdp_record(serviceBuffer.data(), hspSdpRecordHandle, rfcommChannelNr, agServiceName.c_str());
+
+        if (const auto status = sdp_register_service(serviceBuffer.data()); status != ERROR_CODE_SUCCESS) {
+            LOG_ERROR("Can't register service. Status %x", status);
+        }
 
         rfcomm_init();
 
