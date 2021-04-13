@@ -24,6 +24,14 @@ namespace bluetooth
         virtual void stop()                                                                       = 0;
         virtual void disconnect()                                                                 = 0;
         virtual void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) = 0;
+
+      protected:
+        static void initSdp();
+        static void initL2cap();
+
+      private:
+        static bool isL2CapInitialized;
+        static bool isSdpInitialized;
     };
 
 } // namespace bluetooth
