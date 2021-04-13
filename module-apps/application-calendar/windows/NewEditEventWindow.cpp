@@ -27,8 +27,8 @@ namespace gui
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
 
         list = new gui::ListView(this,
                                  style::window::calendar::listView_x,
@@ -44,11 +44,11 @@ namespace gui
     {
         switch (eventAction) {
         case EventAction::Add: {
-            setTitle(utils::localize.get("app_calendar_new_event_title"));
+            setTitle(utils::translate("app_calendar_new_event_title"));
             break;
         }
         case EventAction::Edit:
-            setTitle(utils::localize.get("app_calendar_edit_event_title"));
+            setTitle(utils::translate("app_calendar_edit_event_title"));
             break;
         }
 

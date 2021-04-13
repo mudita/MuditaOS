@@ -36,7 +36,7 @@ void PostUpdateWindow::onBeforeShow(ShowMode mode, SwitchData *data)
         auto *item = dynamic_cast<CurrentOsVersion *>(data);
         if (item != nullptr) {
             currentOsVersion = item->getCurrentOsVersion();
-            auto info        = utils::localize.get("app_desktop_update_success");
+            auto info        = utils::translate("app_desktop_update_success");
             utils::findAndReplaceAll(info, "$VERSION", currentOsVersion);
             infoText->setText(info);
         }
@@ -83,9 +83,9 @@ void PostUpdateWindow::buildInterface()
     namespace post_update_style = style::window::pin_lock;
     AppWindow::buildInterface();
 
-    setTitle(utils::localize.get("app_desktop_update_muditaos"));
+    setTitle(utils::translate("app_desktop_update_muditaos"));
 
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_ok"));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::translate("common_ok"));
 
     successImage =
         new gui::Image(this, post_update_style::image::x, post_update_style::image::y, 0, 0, "circle_success");

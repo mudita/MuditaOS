@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DoNotDisturbWindow.hpp"
@@ -19,7 +19,7 @@ namespace gui
 
     void DoNotDisturbWindow::buildInterface()
     {
-        setTitle(utils::translateI18("app_settings_title_do_not_disturb"));
+        setTitle(utils::translate("app_settings_title_do_not_disturb"));
         optionsList->setSize(optionsList->getWidth(),
                              optionsList->getHeight() - style::settings::window::offline::body_offset);
         bar = new Rect(this,
@@ -34,7 +34,7 @@ namespace gui
                                    style::window::default_body_width,
                                    style::settings::window::offline::description_h);
         descriptionText->setFont(style::window::font::medium);
-        descriptionText->setText(utils::translateI18("app_settings_info_dnd"));
+        descriptionText->setText(utils::translate("app_settings_info_dnd"));
         descriptionText->setVisible(true);
     }
 
@@ -42,7 +42,7 @@ namespace gui
     {
         std::list<gui::Option> optList;
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translateI18("app_settings_notifications_when_locked"),
+            utils::translate("app_settings_notifications_when_locked"),
             [=](gui::Item &item) {
                 dndSettings->setNotificationsWhenLocked(!dndSettings->getNotificationsWhenLocked());
                 refreshOptionsList();
@@ -54,7 +54,7 @@ namespace gui
                                                         : gui::option::SettingRightItem::Off));
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translateI18("app_settings_calls_from_favorites"),
+            utils::translate("app_settings_calls_from_favorites"),
             [=](gui::Item &item) {
                 dndSettings->setCallsFromFavourite(!dndSettings->getCallsFromFavourite());
                 refreshOptionsList();
@@ -65,8 +65,8 @@ namespace gui
             (dndSettings->getCallsFromFavourite()) ? gui::option::SettingRightItem::On
                                                    : gui::option::SettingRightItem::Off));
 
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch));
         return optList;
     }
 } // namespace gui

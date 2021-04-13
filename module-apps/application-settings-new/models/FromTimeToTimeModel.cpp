@@ -60,13 +60,13 @@ unsigned int FromTimeToTimeModel::requestRecordsCount()
 void FromTimeToTimeModel::createData()
 {
     fromTimeItem = new gui::SettingsTimeItem(
-        utils::localize.get("app_settings_nightshift_from"),
+        utils::translate("app_settings_nightshift_from"),
         gui::TimeWidget::Type::Start,
         [&](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [&]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
     toTimeItem = new gui::SettingsTimeItem(
-        utils::localize.get("app_settings_nightshift_to"),
+        utils::translate("app_settings_nightshift_to"),
         gui::TimeWidget::Type::End,
         [&](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [&]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });

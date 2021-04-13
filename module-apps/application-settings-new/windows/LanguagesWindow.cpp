@@ -14,12 +14,12 @@ namespace gui
     LanguagesWindow::LanguagesWindow(app::Application *app, std::string name)
         : BaseSettingsWindow(app, std::move(name)), langList(loader.getAvailableDisplayLanguages())
     {
-        setTitle(utils::localize.get("app_settings_title_languages"));
+        setTitle(utils::translate("app_settings_title_languages"));
     }
 
     void LanguagesWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        selectedLanguage = utils::localize.getDisplayLanguage();
+        selectedLanguage = utils::getDisplayLanguage();
         setLanguageIndex();
 
         refreshOptionsList(selectedLanguageIndex);

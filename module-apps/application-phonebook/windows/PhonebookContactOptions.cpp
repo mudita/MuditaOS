@@ -37,7 +37,7 @@ namespace gui
     auto PhonebookContactOptions::contactOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> options;
-        options.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_edit"), [=](gui::Item &item) {
+        options.emplace_back(gui::Option{utils::translate("app_phonebook_options_edit"), [=](gui::Item &item) {
                                              LOG_INFO("Editing contact!");
                                              std::unique_ptr<gui::SwitchData> data =
                                                  std::make_unique<PhonebookItemData>(contact);
@@ -46,7 +46,7 @@ namespace gui
                                                                              std::move(data));
                                              return true;
                                          }});
-        options.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_forward_namecard"),
+        options.emplace_back(gui::Option{utils::translate("app_phonebook_options_forward_namecard"),
                                          [=](gui::Item &item) {
                                              LOG_INFO("Forwarding namecard!");
                                              std::unique_ptr<gui::SwitchData> data =
@@ -58,19 +58,18 @@ namespace gui
                                          },
                                          gui::option::Arrow::Enabled});
         if (contact->isOnBlocked()) {
-            options.emplace_back(
-                gui::Option{utils::localize.get("app_phonebook_options_unblock"), [=](gui::Item &item) {
-                                LOG_INFO("Unblocking contact!");
-                                return contactBlock(false);
-                            }});
+            options.emplace_back(gui::Option{utils::translate("app_phonebook_options_unblock"), [=](gui::Item &item) {
+                                                 LOG_INFO("Unblocking contact!");
+                                                 return contactBlock(false);
+                                             }});
         }
         else {
-            options.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_block"), [=](gui::Item &item) {
+            options.emplace_back(gui::Option{utils::translate("app_phonebook_options_block"), [=](gui::Item &item) {
                                                  LOG_INFO("Blocking contact!");
                                                  return contactBlock(true);
                                              }});
         }
-        options.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_delete"), [=](gui::Item &item) {
+        options.emplace_back(gui::Option{utils::translate("app_phonebook_options_delete"), [=](gui::Item &item) {
                                              LOG_INFO("Deleting contact!");
                                              return contactRemove();
                                          }});
@@ -83,10 +82,10 @@ namespace gui
         std::string dialogText;
 
         if (shouldBeBlocked) {
-            dialogText = utils::localize.get("app_phonebook_options_block_confirm");
+            dialogText = utils::translate("app_phonebook_options_block_confirm");
         }
         else {
-            dialogText = utils::localize.get("app_phonebook_options_unblock_confirm");
+            dialogText = utils::translate("app_phonebook_options_unblock_confirm");
         }
 
         auto contactRec = DBServiceAPI::ContactGetByID(this->application, contact->ID);
@@ -120,7 +119,7 @@ namespace gui
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(
             gui::DialogMetadata{cont.getFormattedName(),
                                 "phonebook_contact_delete_trashcan",
-                                utils::localize.get("app_phonebook_options_delete_confirm"),
+                                utils::translate("app_phonebook_options_delete_confirm"),
                                 "",
                                 [=]() -> bool {
                                     if (!DBServiceAPI::ContactRemove(this->application, contact->ID)) {
@@ -141,13 +140,13 @@ namespace gui
 
         switch (notificationType) {
         case NotificationType::Block:
-            dialogText = utils::localize.get("app_phonebook_options_block_notification");
+            dialogText = utils::translate("app_phonebook_options_block_notification");
             break;
         case NotificationType::Delete:
-            dialogText = utils::localize.get("app_phonebook_options_delete_notification");
+            dialogText = utils::translate("app_phonebook_options_delete_notification");
             break;
         case NotificationType::Unblock:
-            dialogText = utils::localize.get("app_phonebook_options_unblock_notification");
+            dialogText = utils::translate("app_phonebook_options_unblock_notification");
             break;
         }
 

@@ -421,9 +421,9 @@ namespace app
         auto createPinChangedSuccessfullyDialog =
             [](app::ApplicationDesktop *app) -> std::unique_ptr<gui::DialogMetadataMessage> {
             return std::make_unique<gui::DialogMetadataMessage>(
-                gui::DialogMetadata{utils::localize.get("app_desktop_sim_change_pin"),
+                gui::DialogMetadata{utils::translate("app_desktop_sim_change_pin"),
                                     "success_icon_W_G",
-                                    utils::localize.get("app_desktop_sim_pin_changed_successfully"),
+                                    utils::translate("app_desktop_sim_pin_changed_successfully"),
                                     "",
                                     [app]() {
                                         app->switchWindow(app::window::name::desktop_main_window);
@@ -459,8 +459,8 @@ namespace app
                     "",
                     "success_icon_W_G",
                     response->getSimCardLock() == CellularSimCardLockDataMessage::SimCardLock::Unlocked
-                        ? utils::localize.get("app_desktop_sim_card_unlocked")
-                        : utils::localize.get("app_desktop_sim_card_locked"),
+                        ? utils::translate("app_desktop_sim_card_unlocked")
+                        : utils::translate("app_desktop_sim_card_locked"),
                     "",
                     [this]() {
                         switchWindow(app::window::name::desktop_main_window);

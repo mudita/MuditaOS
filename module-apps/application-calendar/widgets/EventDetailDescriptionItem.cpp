@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventDetailDescriptionItem.hpp"
@@ -74,7 +74,7 @@ namespace gui
 
     void EventDetailDescriptionItem::descriptionHandler()
     {
-        title->setText(utils::localize.get("app_calendar_event_detail"));
+        title->setText(utils::translate("app_calendar_event_detail"));
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
             description->setText(event->title);
             eventTime->setText(

@@ -35,11 +35,11 @@ namespace gui
         AppWindow::buildInterface();
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get("app_calendar_bar_month"));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate("app_calendar_bar_month"));
 
-        setTitle(utils::localize.get("app_calendar_title_main"));
+        setTitle(utils::translate("app_calendar_title_main"));
         leftArrowImage = new gui::Image(
             this, style::window::calendar::arrow_x, style::window::calendar::arrow_y, 0, 0, "arrow_left");
         newDayEventImage =

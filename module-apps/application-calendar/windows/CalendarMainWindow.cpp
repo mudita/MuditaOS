@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalendarMainWindow.hpp"
@@ -151,7 +151,7 @@ namespace gui
 
         LOG_DEBUG("Start build interface for calendar main window");
 
-        setTitle(utils::localize.get("app_calendar_title_main"));
+        setTitle(utils::translate("app_calendar_title_main"));
 
         monthModel = std::make_unique<MonthModel>(actualDate);
         filterRequest();
@@ -161,9 +161,9 @@ namespace gui
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get("app_calendar_bar_list"));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate("app_calendar_bar_list"));
     }
 
     void CalendarMainWindow::destroyInterface()
@@ -228,7 +228,7 @@ namespace gui
             else {
                 auto appCalendar = dynamic_cast<app::ApplicationCalendar *>(application);
                 assert(appCalendar != nullptr);
-                appCalendar->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"), filter);
+                appCalendar->switchToNoEventsWindow(utils::translate("app_calendar_title_main"), filter);
             }
             return true;
         }

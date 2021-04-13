@@ -88,7 +88,7 @@ struct ContactRecord : public Record
             return getNumberAsName();
         }
         if (type == NameFormatType::List || type == NameFormatType::Title) {
-            return utils::localize.get("app_phonebook_contact_no_name");
+            return utils::translate("app_phonebook_contact_no_name");
         }
         return "";
     }

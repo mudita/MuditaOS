@@ -80,11 +80,11 @@ namespace gui
         if (isReach) {
             TextFormat format(FontManager::getInstance().getFont(style::window::font::medium));
             text::RichTextParser rtParser;
-            auto parsedText = rtParser.parse(utils::localize.get(value), &format, std::move(tokens));
+            auto parsedText = rtParser.parse(utils::translate(value), &format, std::move(tokens));
             text->setText(std::move(parsedText));
         }
         else {
-            text->setText(utils::localize.get(value));
+            text->setText(utils::translate(value));
         }
     }
 
@@ -102,8 +102,8 @@ namespace gui
 
     void LockWindow::buildBottomBar()
     {
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::confirm));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
     }
 
     auto LockWindow::getText(TextType type) noexcept -> gui::Text *

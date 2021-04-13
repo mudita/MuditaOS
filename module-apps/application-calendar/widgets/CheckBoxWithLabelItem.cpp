@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CheckBoxWithLabelItem.hpp"
@@ -90,25 +90,25 @@ namespace gui
 
     void CheckBoxWithLabelItem::setCheckBoxes()
     {
-        if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Monday)) {
+        if (descriptionLabel->getText() == utils::translate(style::strings::common::Monday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Monday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Tuesday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Tuesday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Tuesday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Wednesday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Wednesday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Wednesday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Thursday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Thursday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Thursday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Friday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Friday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Friday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Saturday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Saturday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Saturday.iso_encoding() - 1));
         }
-        else if (descriptionLabel->getText() == utils::localize.get(style::strings::common::Sunday)) {
+        else if (descriptionLabel->getText() == utils::translate(style::strings::common::Sunday)) {
             checkBox->setImageVisible(checkBoxData->getData(date::Sunday.iso_encoding() - 1));
         }
     }

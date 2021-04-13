@@ -20,13 +20,13 @@ namespace gui
     void NightshiftWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        setTitle(utils::localize.get("app_settings_title_nightshift"));
+        setTitle(utils::translate("app_settings_title_nightshift"));
 
         bottomBar->setActive(BottomBar::Side::LEFT, false);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         list = new gui::ListView(this,
                                  style::window::date_and_time::listView_x,

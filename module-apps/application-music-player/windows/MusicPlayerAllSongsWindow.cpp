@@ -30,10 +30,10 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_music_player_all_songs"));
+        setTitle(utils::translate("app_music_player_all_songs"));
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_music_player_play"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_music_player_play"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         songsList = new gui::ListView(this,
                                       musicPlayerStyle::allSongsWindow::x,

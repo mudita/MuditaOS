@@ -22,7 +22,7 @@ namespace gui
     auto CalendarEventsOptions::eventsOptionsList() -> std::list<gui::Option>
     {
         std::list<gui::Option> options;
-        options.emplace_back(gui::Option{utils::localize.get("app_calendar_options_edit"), [=](gui::Item &item) {
+        options.emplace_back(gui::Option{utils::translate("app_calendar_options_edit"), [=](gui::Item &item) {
                                              LOG_INFO("Switch to edit window");
                                              auto rec  = std::make_unique<EventsRecord>(*eventRecord);
                                              auto data = std::make_unique<EventRecordData>(std::move(rec));
@@ -31,7 +31,7 @@ namespace gui
                                                                        std::move(data));
                                              return true;
                                          }});
-        options.emplace_back(gui::Option{utils::localize.get("app_calendar_options_delete"),
+        options.emplace_back(gui::Option{utils::translate("app_calendar_options_delete"),
                                          [=](gui::Item &item) { return eventDelete(); }});
         return options;
     }
@@ -60,7 +60,7 @@ namespace gui
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
             eventRecord->title,
             "phonebook_contact_delete_trashcan",
-            utils::localize.get("app_calendar_event_delete_confirmation"),
+            utils::translate("app_calendar_event_delete_confirmation"),
             "",
             [=]() -> bool {
                 LOG_INFO("Delete calendar event %d", static_cast<int>(eventRecord->ID));

@@ -23,11 +23,11 @@ namespace gui::top_bar
     {
         switch (mode) {
         case sys::phone_modes::PhoneMode::DoNotDisturb:
-            setText(utils::localize.get("home_modes_notdisturb"));
+            setText(utils::translate("home_modes_notdisturb"));
             break;
 
         case sys::phone_modes::PhoneMode::Offline:
-            setText(utils::localize.get("home_modes_offline"));
+            setText(utils::translate("home_modes_offline"));
             break;
 
         case sys::phone_modes::PhoneMode::Connected:

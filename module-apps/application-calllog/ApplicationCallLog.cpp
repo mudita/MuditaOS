@@ -94,7 +94,7 @@ namespace app
             return std::make_unique<gui::CallLogDetailsWindow>(app);
         });
         windowsFactory.attach(
-            utils::localize.get("app_phonebook_options_title"),
+            utils::translate("app_phonebook_options_title"),
             [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
         windowsFactory.attach(calllog::settings::DialogYesNoStr, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogYesNo>(app, name);
@@ -115,7 +115,7 @@ namespace app
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(
             gui::DialogMetadata{record.name,
                                 "phonebook_contact_delete_trashcan",
-                                utils::localize.get("app_calllog_delete_call_confirmation"),
+                                utils::translate("app_calllog_delete_call_confirmation"),
                                 "",
                                 [=]() -> bool {
                                     if (DBServiceAPI::CalllogRemove(this, record.ID) == false) {

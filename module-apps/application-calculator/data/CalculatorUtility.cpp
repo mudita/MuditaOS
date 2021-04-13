@@ -25,14 +25,14 @@ namespace calc
             if (output.length() > CalculatorConstants::maxStringLength) {
                 output = getValueThatFitsOnScreen(result);
             }
-            if (utils::localize.get("app_calculator_decimal_separator") == symbols::strings::comma) {
+            if (utils::translate("app_calculator_decimal_separator") == symbols::strings::comma) {
                 output.replace(output.find(symbols::strings::full_stop),
                                std::size(std::string_view(symbols::strings::full_stop)),
                                symbols::strings::comma);
             }
             return Result{source, output, false};
         }
-        return Result{source, utils::localize.get("app_calculator_error"), true};
+        return Result{source, utils::translate("app_calculator_error"), true};
     }
 
     std::string Calculator::prepareEquationForParser(std::string input)

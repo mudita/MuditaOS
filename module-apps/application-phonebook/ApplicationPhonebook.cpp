@@ -193,8 +193,8 @@ namespace app
     {
         gui::DialogMetadata meta;
         meta.icon                        = "search_big";
-        meta.text                        = utils::localize.get("app_phonebook_search_no_results");
-        meta.title                       = utils::localize.get("common_results_prefix") + "\"" + query + "\"";
+        meta.text                        = utils::translate("app_phonebook_search_no_results");
+        meta.title                       = utils::translate("common_results_prefix") + "\"" + query + "\"";
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         data->ignoreCurrentWindowOnStack = true;
         LOG_DEBUG("Switching to app_phonebook_search_no_results window.");

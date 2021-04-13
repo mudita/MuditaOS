@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <i18n/i18n.hpp>
@@ -11,7 +11,7 @@ namespace gui
     {
         setEdges(RectangleEdge::None);
         addArrow("arrow_left", Alignment::Horizontal::Left);
-        addBrightnessTitle(this, utils::localize.get(style::window::brightness::title_key));
+        addBrightnessTitle(this, utils::translate(style::window::brightness::title_key));
         addArrow("arrow_right", Alignment::Horizontal::Right);
 
         resizeItems();

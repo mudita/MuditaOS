@@ -15,7 +15,7 @@ namespace app::onBoarding
     UpdateDialogWindow::UpdateDialogWindow(app::Application *app)
         : gui::Dialog(app, gui::window::name::onBoarding_update)
     {
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
     }
 

@@ -19,7 +19,7 @@ SCENARIO("Input Processor tests")
 
     GIVEN("An empty input")
     {
-        utils::localize.setDisplayLanguage("English");
+        utils::setDisplayLanguage("English");
 
         auto inputField = gui::Text{};
         auto processor  = calc::InputProcessorText{gsl::make_strict_not_null(&inputField)};

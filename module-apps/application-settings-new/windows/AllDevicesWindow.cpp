@@ -24,7 +24,7 @@ namespace gui
 
     void AllDevicesWindow::buildInterface()
     {
-        setTitle(utils::localize.get("app_settings_bluetooth_all_devices"));
+        setTitle(utils::translate("app_settings_bluetooth_all_devices"));
         leftArrowImage = new gui::Image(this,
                                         style::settings::window::leftArrowImage::x,
                                         style::settings::window::leftArrowImage::y,
@@ -62,9 +62,9 @@ namespace gui
             application->switchWindow(gui::window::name::dialog_settings,
                                       gui::ShowMode::GUI_SHOW_INIT,
                                       std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
-                                          utils::localize.get("app_settings_bluetooth_add_device"),
+                                          utils::translate("app_settings_bluetooth_add_device"),
                                           "search_big",
-                                          utils::localize.get("app_settings_bluetooth_searching_devices")}));
+                                          utils::translate("app_settings_bluetooth_searching_devices")}));
             return true;
         }
         if (inputEvent.is(KeyCode::KEY_LF)) {
@@ -106,10 +106,10 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(isConnected ? utils::translateI18("common_disconnect")
-                                                           : utils::translateI18("common_connect"),
+                        this->setBottomBarText(isConnected ? utils::translate("common_disconnect")
+                                                           : utils::translate("common_connect"),
                                                BottomBar::Side::CENTER);
-                        this->setBottomBarText(utils::translateI18("common_forget"), BottomBar::Side::LEFT);
+                        this->setBottomBarText(utils::translate("common_forget"), BottomBar::Side::LEFT);
                         this->bottomBar->setActive(BottomBar::Side::LEFT, true);
                         addressOfSelectedDevice = addr;
                     }
@@ -118,7 +118,7 @@ namespace gui
                 nullptr,
                 isConnected ? gui::option::SettingRightItem::Text : gui::option::SettingRightItem::Bt,
                 false,
-                utils::localize.get("app_settings_option_connected")));
+                utils::translate("app_settings_option_connected")));
         }
         return optionsList;
     }

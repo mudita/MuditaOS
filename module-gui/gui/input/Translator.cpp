@@ -215,11 +215,9 @@ namespace gui
     std::vector<std::string> Profiles::getProfilesNames()
     {
         std::vector<std::string> profilesNames;
-        LOG_INFO("Scanning %s profiles folder: %s",
-                 utils::files::jsonExtension,
-                 utils::localize.InputLanguageDirPath.c_str());
+        LOG_INFO("Scanning %s profiles folder: %s", utils::files::jsonExtension, utils::getInputLanguagePath().c_str());
 
-        for (const auto &entry : std::filesystem::directory_iterator(utils::localize.InputLanguageDirPath)) {
+        for (const auto &entry : std::filesystem::directory_iterator(utils::getInputLanguagePath())) {
             profilesNames.push_back(std::filesystem::path(entry.path().stem()));
         }
 
@@ -251,7 +249,7 @@ namespace gui
         std::vector<std::string> profilesNames = getProfilesNames();
         for (const auto &profileName : profilesNames) {
             if (!profileName.empty()) {
-                auto filePath = utils::localize.InputLanguageDirPath / (profileName + utils::files::jsonExtension);
+                auto filePath = utils::getInputLanguagePath() / (profileName + utils::files::jsonExtension);
                 loadProfile(filePath);
             }
         }
@@ -272,7 +270,7 @@ namespace gui
 
     Profile &Profiles::get(const std::string &name)
     {
-        std::filesystem::path filepath = utils::localize.InputLanguageDirPath / (name + utils::files::jsonExtension);
+        std::filesystem::path filepath = utils::getInputLanguagePath() / (name + utils::files::jsonExtension);
         // if profile not in profile map -> load
         if (filepath.empty()) {
             LOG_ERROR("Request for nonexistent profile: %s", filepath.c_str());

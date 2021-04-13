@@ -21,15 +21,15 @@ namespace app::notes
                        std::function<bool(gui::Item &)> onClickCallback,
                        std::list<gui::Option> &options)
         {
-            options.emplace_back(utils::localize.get(translationId), onClickCallback);
+            options.emplace_back(utils::translate(translationId), onClickCallback);
         }
 
         void removeNote(const NotesRecord &record, Application *application, AbstractNotesRepository &notesRepository)
         {
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                gui::DialogMetadata{utils::localize.get("app_alarm_clock_title_main"),
+                gui::DialogMetadata{utils::translate("app_alarm_clock_title_main"),
                                     "phonebook_contact_delete_trashcan",
-                                    utils::localize.get("app_notes_note_delete_confirmation"),
+                                    utils::translate("app_notes_note_delete_confirmation"),
                                     "",
                                     [record, application, &notesRepository] {
                                         notesRepository.remove(record, [application](bool) {

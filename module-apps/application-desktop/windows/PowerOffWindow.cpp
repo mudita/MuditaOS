@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputEvent.hpp"
@@ -47,8 +47,8 @@ namespace gui
             presenter->powerOff();
             return true;
         };
-        metadata.title = utils::localize.get("app_desktop_poweroff_title");
-        metadata.text  = utils::localize.get("app_desktop_poweroff_question");
+        metadata.title = utils::translate("app_desktop_poweroff_title");
+        metadata.text  = utils::translate("app_desktop_poweroff_question");
         metadata.icon  = "turn_off_W_G";
         auto msg       = std::make_unique<DialogMetadataMessage>(std::move(metadata));
         DialogYesNo::onBeforeShow(mode, msg.get());

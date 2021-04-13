@@ -35,7 +35,7 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_settings_sar"));
+        setTitle(utils::translate("app_settings_sar"));
 
         namespace sarStyle = style::settings::window::sar;
         sarInfoText =
@@ -49,7 +49,7 @@ namespace gui
         sarInfoText->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
 
         setFocusItem(sarInfoText);
     }

@@ -9,7 +9,7 @@
 TEST_CASE("Calculator utilities")
 {
     auto calculator = calc::Calculator();
-    utils::localize.setDisplayLanguage("English");
+    utils::setDisplayLanguage("English");
 
     SECTION("Empty input")
     {
@@ -87,7 +87,7 @@ TEST_CASE("Calculator utilities")
 
     SECTION("Fraction with comma")
     {
-        utils::localize.setDisplayLanguage("Polski");
+        utils::setDisplayLanguage("Polski");
         auto result = calculator.calculate("15,5+12,056");
         REQUIRE(result.value == "27,556");
         REQUIRE(result.equation == "15.5+12.056");
@@ -97,7 +97,7 @@ TEST_CASE("Calculator utilities")
     SECTION("Division by 0")
     {
         auto result = calculator.calculate("15+5÷0");
-        REQUIRE(result.value == utils::localize.get("app_calculator_error"));
+        REQUIRE(result.value == utils::translate("app_calculator_error"));
         REQUIRE(result.equation == "15+5/0");
         REQUIRE(result.isError);
     }
@@ -105,7 +105,7 @@ TEST_CASE("Calculator utilities")
     SECTION("Division 0 by 0")
     {
         auto result = calculator.calculate("0÷0");
-        REQUIRE(result.value == utils::localize.get("app_calculator_error"));
+        REQUIRE(result.value == utils::translate("app_calculator_error"));
         REQUIRE(result.equation == "0/0");
         REQUIRE(result.isError);
     }
@@ -113,7 +113,7 @@ TEST_CASE("Calculator utilities")
     SECTION("Result exceeds maximum number")
     {
         auto result = calculator.calculate("1.79769e+308×2");
-        REQUIRE(result.value == utils::localize.get("app_calculator_error"));
+        REQUIRE(result.value == utils::translate("app_calculator_error"));
         REQUIRE(result.equation == "1.79769e+308*2");
         REQUIRE(result.isError);
     }

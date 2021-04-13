@@ -60,9 +60,9 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(strings::message));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(strings::message));
 
         // top circle image
         imageCircleTop = new gui::Image(this, imageCircleTop::x, imageCircleTop::y, 0, 0, imageCircleTop::name);
@@ -85,7 +85,7 @@ namespace gui
         speakerIcon                       = new SpeakerIcon(this, speakerIcon::x, speakerIcon::y);
         speakerIcon->focusChangedCallback = [=](gui::Item &item) {
             LOG_DEBUG("speakerIcon get/lost focus");
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch), false);
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch), false);
             return true;
         };
         speakerIcon->activatedCallback = [=](gui::Item &item) {
@@ -113,7 +113,7 @@ namespace gui
         microphoneIcon                       = new MicrophoneIcon(this, microphoneIcon::x, microphoneIcon::y);
         microphoneIcon->focusChangedCallback = [=](gui::Item &item) {
             LOG_DEBUG("microphoneIcon get/lost focus");
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch), false);
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch), false);
             return true;
         };
         microphoneIcon->activatedCallback = [=](gui::Item &item) {
@@ -130,7 +130,7 @@ namespace gui
         sendSmsIcon                       = new gui::SendSmsIcon(this, sendMessageIcon::x, sendMessageIcon::y);
         sendSmsIcon->focusChangedCallback = [=](gui::Item &item) {
             LOG_DEBUG("Send message get/lost focus");
-            bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(strings::message), false);
+            bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(strings::message), false);
             return true;
         };
         sendSmsIcon->activatedCallback = [=](gui::Item &item) {
@@ -162,9 +162,9 @@ namespace gui
         switch (state) {
         case State::INCOMING_CALL: {
             interface->startAudioRinging();
-            bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(strings::answer), true);
-            bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(strings::reject), true);
-            durationLabel->setText(utils::localize.get(strings::iscalling));
+            bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(strings::answer), true);
+            bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(strings::reject), true);
+            durationLabel->setText(utils::translate(strings::iscalling));
             durationLabel->setVisible(true);
             speakerIcon->setVisible(false);
             microphoneIcon->setVisible(false);
@@ -186,7 +186,7 @@ namespace gui
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
             bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
             durationLabel->setVisible(true);
-            durationLabel->setText(utils::localize.get(strings::callended));
+            durationLabel->setText(utils::translate(strings::callended));
             sendSmsIcon->setVisible(false);
             speakerIcon->setVisible(false);
             microphoneIcon->setVisible(false);
@@ -202,7 +202,7 @@ namespace gui
             runCallTimer();
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
-            bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(strings::endcall), true);
+            bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(strings::endcall), true);
             durationLabel->setVisible(true);
             sendSmsIcon->setVisible(false);
             speakerIcon->setVisible(true);
@@ -216,8 +216,8 @@ namespace gui
             interface->startAudioRouting();
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
             bottomBar->setActive(gui::BottomBar::Side::CENTER, false);
-            bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(strings::endcall), true);
-            durationLabel->setText(utils::localize.get(strings::calling));
+            bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(strings::endcall), true);
+            durationLabel->setText(utils::translate(strings::calling));
             durationLabel->setVisible(true);
             sendSmsIcon->setVisible(false);
             speakerIcon->setVisible(true);
@@ -274,7 +274,7 @@ namespace gui
                 numberLabel->setText(displayName);
             }
             else {
-                numberLabel->setText(utils::localize.get(strings::privateNumber));
+                numberLabel->setText(utils::translate(strings::privateNumber));
             }
 
             if (dynamic_cast<app::IncomingCallData *>(data) != nullptr) {

@@ -12,14 +12,14 @@ namespace gui
     AppsAndToolsWindow::AppsAndToolsWindow(app::Application *app) : OptionWindow(app, gui::window::name::apps_and_tools)
     {
         addOptions(appsAndToolsOptionsList());
-        setTitle(utils::localize.get("app_settings_apps"));
+        setTitle(utils::translate("app_settings_apps"));
     }
 
     std::list<Option> AppsAndToolsWindow::appsAndToolsOptionsList()
     {
         std::list<gui::Option> optionList;
 
-        auto i18     = [](std::string text) { return utils::localize.get(text); };
+        auto i18     = [](std::string text) { return utils::translate(text); };
         auto addMenu = [&](UTF8 name, std::string window) {
             optionList.emplace_back(gui::Option{name,
                                                 [=](gui::Item &item) {

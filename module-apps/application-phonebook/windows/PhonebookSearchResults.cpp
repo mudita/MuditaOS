@@ -38,9 +38,9 @@ namespace gui
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("common_results_prefix"));
+        setTitle(utils::translate("common_results_prefix"));
     }
 
     void PhonebookSearchResults::destroyInterface()
@@ -70,18 +70,18 @@ namespace gui
         assert(searchResultsData != nullptr);
 
         searchResultsModel = searchResultsData->consumeSearchResultsModel();
-        setTitle(utils::localize.get("common_results_prefix") + "\"" + searchResultsModel->getFilter() + "\"");
+        setTitle(utils::translate("common_results_prefix") + "\"" + searchResultsModel->getFilter() + "\"");
         searchResultList->setProvider(searchResultsModel);
 
         if (searchResultsModel->messagesSelectCallback) {
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setText(BottomBar::Side::LEFT, "");
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
         }
         else {
             bottomBar->setActive(BottomBar::Side::LEFT, true);
-            bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
+            bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
         }
 
         return true;

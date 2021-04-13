@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-utils/gsl/gsl_util>
@@ -16,12 +16,12 @@ namespace app::onBoarding
 
     std::string EULARepository::getEulaText()
     {
-        auto displayLanguageName = utils::localize.getDisplayLanguage();
+        const auto &displayLanguageName = utils::getDisplayLanguage();
         auto eulaFile            = std::ifstream(licensesPath / displayLanguageName / fileName);
         auto fileHandlerCleanup  = gsl::finally([&eulaFile]() { eulaFile.close(); });
 
         if (!eulaFile.is_open()) {
-            eulaFile.open(licensesPath / utils::i18n::DefaultLanguage / fileName);
+            eulaFile.open(licensesPath / utils::getDefaultLanguage() / fileName);
 
             if (!eulaFile.is_open()) {
                 throw std::runtime_error("EULA assets missing in system!");
