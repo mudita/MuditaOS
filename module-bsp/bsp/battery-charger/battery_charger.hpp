@@ -71,6 +71,10 @@ namespace bsp::battery_charger
 
 	std::uint8_t getTopControllerINTSource();
 
+	void setUSBCurrentLimit(batteryChargerType chargerType);
+
+	void actionIfChargerUnplugged();
+
 	BaseType_t INTB_IRQHandler();
 
 	extern "C"

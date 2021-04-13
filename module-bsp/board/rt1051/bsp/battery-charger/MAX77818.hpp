@@ -154,7 +154,7 @@ namespace bsp::battery_charger
     };
 
     /// CHG_DETAILS_01 register
-    enum CHG_DETAILS_01
+    enum class CHG_DETAILS_01
     {
         CHARGER_PREQUALIFICATION = 0x00,
         CHARGER_CC               = 0x01,
@@ -164,6 +164,20 @@ namespace bsp::battery_charger
         CHARGER_TIMER_FAULT      = 0x06,
         CHARGER_BATTERY_DETECT   = 0x07,
         CHARGER_OFF              = 0x08,
+    };
+
+    // CHG_CNFG_09 register
+    enum class USBCurrentLimit
+    {
+        lim500mA  = 0x0F,
+        lim1000mA = 0x1E,
+    };
+
+    // CHG_CNFG_02 register
+    enum class ChargeCurrentLimit
+    {
+        lim450mA  = 0x09, /// default
+        lim1600mA = 0x20, /// 1C of battery
     };
 
     // CONFIG register bits

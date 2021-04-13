@@ -158,4 +158,31 @@ namespace bsp::battery_charger
     void checkTemperatureRange()
     {}
 
+    void setUSBCurrentLimit(batteryChargerType chargerType)
+    {
+        switch (chargerType) {
+        case batteryChargerType::DcdTimeOut:
+            [[fallthrough]];
+        case batteryChargerType::DcdUnknownType:
+            [[fallthrough]];
+        case batteryChargerType::DcdError:
+            [[fallthrough]];
+        case batteryChargerType::DcdSDP:
+            LOG_INFO("USB current limit set to 500mA");
+            break;
+        case batteryChargerType::DcdCDP:
+            [[fallthrough]];
+        case batteryChargerType::DcdDCP:
+            LOG_INFO("USB current limit set to 1000mA");
+            break;
+        }
+    }
+
+    void actionIfChargerUnplugged()
+    {
+        if (Store::Battery::get().state == Store::Battery::State::Discharging) {
+            LOG_INFO("USB unplugged");
+        }
+    }
+
 } // namespace bsp::battery_charger
