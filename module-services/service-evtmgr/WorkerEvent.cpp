@@ -101,6 +101,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             auto topINT = bsp::battery_charger::getTopControllerINTSource();
             if (topINT & static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::CHGR_INT)) {
                 bsp::battery_charger::getChargeStatus();
+                bsp::battery_charger::actionIfChargerUnplugged();
                 auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
                 service->bus.sendUnicast(std::move(message), service::name::evt_manager);
                 battery_level_check::checkBatteryLevel();
@@ -207,11 +208,12 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueChargerDetect)) {
-        uint8_t notification;
+        std::uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
         LOG_DEBUG("USB charger type: %d", notification);
+        bsp::battery_charger::setUSBCurrentLimit(static_cast<bsp::battery_charger::batteryChargerType>(notification));
     }
 
     return true;
