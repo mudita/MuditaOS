@@ -1,11 +1,12 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "KeypadLightWindow.hpp"
 
-#include "application-settings-new/ApplicationSettings.hpp"
-#include "OptionSetting.hpp"
+#include <application-settings-new/ApplicationSettings.hpp>
+#include <OptionSetting.hpp>
 
+#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui
@@ -15,11 +16,17 @@ namespace gui
                                          app::settingsInterface::KeypdBacklightSettings *settings)
         : BaseSettingsWindow(app, window::name::keypad_light), keypadLightSettings(settings)
     {
-        if (keypadLightSettings->isKeypadBacklightOn()) {
+        const auto keypadBacklightState = keypadLightSettings->getKeypadBacklightState();
+        switch (keypadBacklightState) {
+        case bsp::keypad_backlight::State::on:
             isAlwaysOnSwitchOn = true;
-        }
-        else {
+            break;
+        case bsp::keypad_backlight::State::activeMode:
+            isActiveSwitchOn = true;
+            break;
+        case bsp::keypad_backlight::State::off:
             isOffSwitchOn = true;
+            break;
         }
 
         setTitle(utils::localize.get("app_settings_display_keypad_light"));
@@ -32,7 +39,15 @@ namespace gui
         isAlwaysOnSwitchOn = false;
         toggleSwitch = !toggleSwitch;
         rebuildOptionList();
-        keypadLightSettings->setKeypadBacklightState(isAlwaysOnSwitchOn);
+        if (isAlwaysOnSwitchOn) {
+            keypadLightSettings->setKeypadBacklightState(bsp::keypad_backlight::State::on);
+        }
+        else if (isActiveSwitchOn) {
+            keypadLightSettings->setKeypadBacklightState(bsp::keypad_backlight::State::activeMode);
+        }
+        else {
+            keypadLightSettings->setKeypadBacklightState(bsp::keypad_backlight::State::off);
+        }
     }
 
     auto KeypadLightWindow::buildOptionsList() -> std::list<gui::Option>

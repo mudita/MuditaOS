@@ -32,6 +32,5 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
     ('cl_offline_mode', '0'),
     ('off_connection_frequency', '0'),
     ('off_notifications_when_locked', '0'),
-    ('off_calls_from_favorites', '0');
-
-
+    ('off_calls_from_favorites', '0'),
+    ('keypad_light_state', '0');

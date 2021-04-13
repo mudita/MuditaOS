@@ -21,6 +21,7 @@
 #include <log/log.hpp>
 #include <service-appmgr/messages/Message.hpp>
 #include <service-evtmgr/EventManager.hpp>
+#include <service-evtmgr/EVMessages.hpp>
 #include <service-gui/ServiceGUI.hpp>
 #include <service-eink/ServiceEink.hpp>
 #include <service-gui/Common.hpp>
@@ -30,7 +31,6 @@
 #include <algorithm>
 #include <limits>
 #include <utility>
-
 #include <module-utils/Utils.hpp>
 #include <module-utils/time/DateAndTimeSettings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
@@ -181,6 +181,15 @@ namespace app::manager
             [this](std::string value) {
                 utils::dateAndTimeSettings.setDateFormat(
                     static_cast<utils::time::Locale::DateFormat>(utils::getNumericValue<unsigned int>(value)));
+            },
+            ::settings::SettingsScope::Global);
+
+        settings->registerValueChange(
+            ::settings::KeypadLight::state,
+            [this](const std::string &value) {
+                const auto keypadLightState =
+                    static_cast<bsp::keypad_backlight::State>(utils::getNumericValue<int>(value));
+                processKeypadBacklightState(keypadLightState);
             },
             ::settings::SettingsScope::Global);
 
@@ -1018,4 +1027,20 @@ namespace app::manager
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
     }
 
+    void ApplicationManager::processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState)
+    {
+        auto action = bsp::keypad_backlight::Action::turnOff;
+        switch (keypadLightState) {
+        case bsp::keypad_backlight::State::on:
+            action = bsp::keypad_backlight::Action::turnOn;
+            break;
+        case bsp::keypad_backlight::State::activeMode:
+            action = bsp::keypad_backlight::Action::turnOnActiveMode;
+            break;
+        case bsp::keypad_backlight::State::off:
+            action = bsp::keypad_backlight::Action::turnOff;
+            break;
+        }
+        bus.sendUnicast(std::make_shared<sevm::KeypadBacklightMessage>(action), service::name::evt_manager);
+    }
 } // namespace app::manager

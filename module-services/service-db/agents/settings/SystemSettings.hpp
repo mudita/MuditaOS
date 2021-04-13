@@ -59,4 +59,8 @@ namespace settings
         constexpr inline auto callsFromFavorites      = "off_calls_from_favorites";
     } // namespace Offline
 
+    namespace KeypadLight
+    {
+        constexpr inline auto state = "keypad_light_state";
+    } // namespace KeypadLight
 }; // namespace settings

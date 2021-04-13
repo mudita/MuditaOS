@@ -10,6 +10,7 @@
 #include <module-apps/Application.hpp>
 #include <module-apps/ApplicationLauncher.hpp>
 
+#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <service-appmgr/messages/Message.hpp>
 #include <Service/Common.hpp>
 #include <Service/Message.hpp>
@@ -177,6 +178,8 @@ namespace app::manager
         void displayLanguageChanged(std::string value);
         void lockTimeChanged(std::string value);
         void inputLanguageChanged(std::string value);
+
+        void processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState);
     };
 } // namespace app::manager
 
