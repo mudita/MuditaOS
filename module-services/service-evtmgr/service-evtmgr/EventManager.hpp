@@ -30,7 +30,8 @@ class EventManager : public sys::Service
   private:
     static constexpr auto stackDepth = 4096;
     void handleMinuteUpdate(time_t timestamp);
-    bool processKeypadBacklightRequest(bsp::keypad_backlight::Action act);
+    bool processKeypadBacklightRequest(bsp::keypad_backlight::Action action);
+    void startKeypadLightTimer();
     bool processVibraRequest(bsp::vibrator::Action act,
                              std::chrono::milliseconds RepetitionTime = std::chrono::milliseconds{1000});
     void toggleTorchOnOff();
@@ -38,6 +39,11 @@ class EventManager : public sys::Service
 
     std::shared_ptr<settings::Settings> settings;
     sys::TimerHandle loggerTimer;
+    sys::TimerHandle keypadLightTimer;
+    bsp::keypad_backlight::State keypadLightState{bsp::keypad_backlight::State::off};
+
+    static constexpr auto keypadLightTimerName    = "KeypadLightTimer";
+    static constexpr auto keypadLightTimerTimeout = std::chrono::seconds(5);
 
   protected:
     std::unique_ptr<WorkerEvent> EventWorker;

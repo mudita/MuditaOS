@@ -662,31 +662,17 @@ namespace app
                         service::name::evt_manager);
     }
 
-    auto ApplicationSettingsNew::isKeypadBacklightOn() -> bool
+    auto ApplicationSettingsNew::getKeypadBacklightState() -> bsp::keypad_backlight::State
     {
-        constexpr int timeout = pdMS_TO_TICKS(1500);
-
-        auto response =
-            bus.sendUnicast(std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::checkState),
-                            service::name::evt_manager,
-                            timeout);
-
-        if (response.first == sys::ReturnCodes::Success) {
-            auto msgState = dynamic_cast<sevm::KeypadBacklightResponseMessage *>(response.second.get());
-            if (msgState == nullptr) {
-                return false;
-            }
-
-            return msgState->success;
-        }
-        return false;
+        return static_cast<bsp::keypad_backlight::State>(utils::getNumericValue<int>(
+            settings->getValue(::settings::KeypadLight::state, ::settings::SettingsScope::Global)));
     }
 
-    void ApplicationSettingsNew::setKeypadBacklightState(bool newState)
+    void ApplicationSettingsNew::setKeypadBacklightState(bsp::keypad_backlight::State keypadLightState)
     {
-        bus.sendUnicast(std::make_shared<sevm::KeypadBacklightMessage>(
-                            newState ? bsp::keypad_backlight::Action::turnOn : bsp::keypad_backlight::Action::turnOff),
-                        service::name::evt_manager);
+        settings->setValue(::settings::KeypadLight::state,
+                           std::to_string(static_cast<int>(keypadLightState)),
+                           ::settings::SettingsScope::Global);
     }
 
     bool ApplicationSettingsNew::isUSBSecured() const
@@ -711,6 +697,7 @@ namespace app
         settings->setValue(
             ::settings::Offline::notificationsWhenLocked, std::to_string(on), ::settings::SettingsScope::Global);
     }
+
     auto ApplicationSettingsNew::getCallsFromFavourite() const noexcept -> bool
     {
         return callsFromFavorites;
