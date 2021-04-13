@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookSearchResults.hpp"
@@ -58,34 +58,6 @@ namespace gui
         if (mode == ShowMode::GUI_SHOW_INIT) {
             searchResultList->rebuildList();
         }
-    }
-
-    auto PhonebookSearchResults::onInput(const InputEvent &inputEvent) -> bool
-    {
-        if (AppWindow::onInput(inputEvent)) {
-            return true;
-        }
-
-        // process only if key is released
-        if (inputEvent.state != InputEvent::State::keyReleasedShort) {
-            return false;
-        }
-        if (inputEvent.state == InputEvent::State::keyReleasedShort) {
-            switch (inputEvent.keyCode) {
-            case KeyCode::KEY_LEFT:
-                LOG_INFO("Adding new contact");
-                application->switchWindow(gui::window::name::new_contact);
-                return true;
-            case KeyCode::KEY_RIGHT:
-                LOG_INFO("Searching contact");
-                application->switchWindow("Search");
-                return true;
-            default:
-                break;
-            }
-        }
-
-        return false;
     }
 
     auto PhonebookSearchResults::handleSwitchData(SwitchData *data) -> bool
