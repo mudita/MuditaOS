@@ -16,8 +16,8 @@ namespace app
         return topBarConfiguration;
     }
 
-    void TopBarManager::set(gui::top_bar::TimeMode timeMode)
+    void TopBarManager::set(gui::top_bar::Indicator indicator, std::shared_ptr<StatusBarVisitor> config)
     {
-        topBarConfiguration.setTimeMode(timeMode);
+        topBarConfiguration.setIndicatorModifier(indicator, std::move(config));
     }
 } // namespace app

@@ -3,7 +3,6 @@
 
 #include "Time.hpp"
 #include "time/time_conversion.hpp"
-#include <Utils.hpp>
 #include "Style.hpp"
 
 namespace gui::top_bar
@@ -29,5 +28,26 @@ namespace gui::top_bar
     void Time::setFormat(const std::string &format)
     {
         _time.set_format(format);
+    }
+
+    void Time::acceptStatusBarVisitor(StatusBarVisitor &visitor)
+    {
+        visitor.visit(*this);
+    }
+
+    TimeConfiguration::TimeConfiguration(TimeMode mode) : mode{mode}
+    {}
+
+    TimeConfiguration::TimeMode TimeConfiguration::getMode() const noexcept
+    {
+        return mode;
+    }
+
+    void TimeConfiguration::visit(gui::top_bar::Time &widget) const
+    {
+        using namespace utils::time;
+        getMode() == TimeConfiguration::TimeMode::Time12h
+            ? widget.setFormat(Locale::format(Locale::TimeFormat::FormatTime12H))
+            : widget.setFormat(Locale::format(Locale::TimeFormat::FormatTime24H));
     }
 } // namespace gui::top_bar

@@ -5,6 +5,7 @@
 #include "Application.hpp"
 #include "InputEvent.hpp"
 #include "TopBar.hpp"
+#include "TopBar/Time.hpp"
 #include <Style.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 #include <i18n/i18n.hpp>
@@ -116,8 +117,10 @@ namespace gui
     bool AppWindow::updateTime()
     {
         applyToTopBar([](top_bar::Configuration configuration) {
-            configuration.setTimeMode(utils::dateAndTimeSettings.isTimeFormat12() ? gui::top_bar::TimeMode::Time12h
-                                                                                  : (gui::top_bar::TimeMode::Time24h));
+            using TimeMode = gui::top_bar::TimeConfiguration::TimeMode;
+            auto modifier  = std::make_shared<gui::top_bar::TimeConfiguration>(
+                utils::dateAndTimeSettings.isTimeFormat12() ? TimeMode::Time12h : TimeMode::Time24h);
+            configuration.setIndicatorModifier(gui::top_bar::Indicator::Time, std::move(modifier));
             return configuration;
         });
         if (topBar == nullptr) {

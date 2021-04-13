@@ -9,13 +9,35 @@
 
 namespace gui::top_bar
 {
+
+    /// Sets time mode (12h/24h) for Time widget
+    class TimeConfiguration : public StatusBarVisitor
+    {
+      public:
+        enum class TimeMode
+        {
+            Time12h, /// 12h time format
+            Time24h  /// 24h time format
+        };
+
+        explicit TimeConfiguration(TimeMode mode);
+
+        [[nodiscard]] TimeMode getMode() const noexcept;
+        void visit(gui::top_bar::Time &widget) const override;
+
+      private:
+        TimeMode mode;
+    };
+
     class Time : public StatusBarWidgetBase<Label>
     {
         utils::time::Timestamp _time;
+        void setFormat(const std::string &format);
+        friend class TimeConfiguration;
 
       public:
         Time(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
         void update();
-        void setFormat(const std::string &format);
+        void acceptStatusBarVisitor(StatusBarVisitor &visitor) override;
     };
 } // namespace gui::top_bar
