@@ -32,9 +32,6 @@ namespace bsp::battery_charger
         constexpr std::uint8_t VSYS_MIN              = 0x80; // 3.6V
         constexpr std::uint8_t CHARGE_TARGET_VOLTAGE = 0x1D; // 4.35V
 
-        constexpr std::uint8_t MAX_USB_CURRENT     = 0x0F; // 500mA
-        constexpr std::uint8_t FAST_CHARGE_CURRENT = 0x09; // 450mA
-
         constexpr std::uint16_t nominalCapacitymAh = 1600;
 
         constexpr std::uint16_t fullyChargedSOC = 100;
@@ -206,6 +203,30 @@ namespace bsp::battery_charger
             }
         }
 
+        void setMaxBusCurrent(USBCurrentLimit limit)
+        {
+            const auto value = static_cast<std::uint8_t>(limit);
+            if (chargerWrite(Registers::CHG_CNFG_09, value) != kStatus_Success) {
+                LOG_ERROR("Maximum usb current write fail");
+            }
+        }
+
+        void setMaxChargeCurrent(ChargeCurrentLimit limit)
+        {
+            unlockProtectedChargerRegisters();
+            const auto value = static_cast<std::uint8_t>(limit);
+            if (chargerWrite(Registers::CHG_CNFG_02, value) != kStatus_Success) {
+                LOG_ERROR("Fast charge current write fail");
+            }
+            lockProtectedChargerRegisters();
+        }
+
+        void resetUSBCurrrentLimit()
+        {
+            LOG_INFO("USB current limit set to 500mA");
+            setMaxBusCurrent(USBCurrentLimit::lim500mA);
+        }
+
         void configureBatteryCharger()
         {
             unlockProtectedChargerRegisters();
@@ -215,17 +236,10 @@ namespace bsp::battery_charger
                 LOG_ERROR("Charge target voltage write fail");
             }
 
-            value = MAX_USB_CURRENT;
-            if (chargerWrite(Registers::CHG_CNFG_09, value) != kStatus_Success) {
-                LOG_ERROR("Maximum usb current write fail");
-            }
-
-            value = FAST_CHARGE_CURRENT;
-            if (chargerWrite(Registers::CHG_CNFG_02, value) != kStatus_Success) {
-                LOG_ERROR("Fast charge current write fail");
-            }
-
             lockProtectedChargerRegisters();
+
+            resetUSBCurrrentLimit();
+            setMaxChargeCurrent(ChargeCurrentLimit::lim1600mA);
         }
 
         std::uint8_t getChargerDetails()
@@ -595,7 +609,7 @@ namespace bsp::battery_charger
             Store::Battery::modify().state = Store::Battery::State::Discharging;
         }
 
-        switch (chargerDetails) {
+        switch (static_cast<CHG_DETAILS_01>(chargerDetails)) {
         case CHG_DETAILS_01::CHARGER_DONE:
             Store::Battery::modify().state = Store::Battery::State::ChargingDone;
             chargingFinishedAction();
@@ -613,6 +627,10 @@ namespace bsp::battery_charger
             [[fallthrough]];
         case CHG_DETAILS_01::CHARGER_TOPOFF:
             Store::Battery::modify().state = Store::Battery::State::Charging;
+            break;
+        case CHG_DETAILS_01::CHARGER_TIMER_FAULT:
+            [[fallthrough]];
+        case CHG_DETAILS_01::CHARGER_BATTERY_DETECT:
             break;
         }
 
@@ -665,6 +683,35 @@ namespace bsp::battery_charger
     {
         auto value = chargerTopControllerRead(Registers::TOP_CONTROLL_IRQ_SRC_REG);
         return value.second;
+    }
+
+    void setUSBCurrentLimit(batteryChargerType chargerType)
+    {
+        switch (chargerType) {
+        case batteryChargerType::DcdTimeOut:
+            [[fallthrough]];
+        case batteryChargerType::DcdUnknownType:
+            [[fallthrough]];
+        case batteryChargerType::DcdError:
+            [[fallthrough]];
+        case batteryChargerType::DcdSDP:
+            resetUSBCurrrentLimit();
+            break;
+        case batteryChargerType::DcdCDP:
+            [[fallthrough]];
+        case batteryChargerType::DcdDCP:
+            // TODO: Uncomment when temerature ranges protection implemented
+            // LOG_INFO("USB current limit set to 1000mA");
+            // setMaxBusCurrent(USBCurrentLimit::lim1000mA);
+            break;
+        }
+    }
+
+    void actionIfChargerUnplugged()
+    {
+        if (Store::Battery::get().state == Store::Battery::State::Discharging) {
+            resetUSBCurrrentLimit();
+        }
     }
 
     BaseType_t INTB_IRQHandler()
