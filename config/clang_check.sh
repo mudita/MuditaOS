@@ -42,7 +42,8 @@ get_compile_commands()
 {
     [[ -f build-linux-Debug/compile_commands.json ]] || ./configure.sh linux debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 > /dev/null 2>&1
     cp build-linux-Debug/compile_commands.json /tmp/compile_commands.json
-    sed -i 's|-static-libasan||g' /tmp/compile_commands.json
+    sed -i 's|-static-libasan||g'     /tmp/compile_commands.json
+    sed -i 's|-Wno-literal-suffix||g' /tmp/compile_commands.json
 }
 
 main()
@@ -66,7 +67,7 @@ main()
     verify_clang_format_version
     get_compile_commands
     # run tidy
-    git diff -U0 --no-color remotes/origin/master...HEAD "$files_to_check" | ${tool[*]} -p 1 -path=/tmp/
+    git diff -U0 --no-color remotes/origin/master...HEAD $files_to_check | ${tool[*]} -p 1 -path=/tmp/
 }
 
 main
