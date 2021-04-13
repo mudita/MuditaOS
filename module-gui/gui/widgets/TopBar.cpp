@@ -1,13 +1,11 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <ctime>
 #include <iomanip>
 #include "Label.hpp"
 #include "Image.hpp"
 #include "BoxLayout.hpp"
 #include "TopBar.hpp"
-#include <time/time_conversion.hpp>
 #include "TopBar/Style.hpp"
 #include "TopBar/BatteryBar.hpp"
 #include "TopBar/BatteryText.hpp"
@@ -19,7 +17,6 @@
 #include "TopBar/Time.hpp"
 #include "TopBar/Lock.hpp"
 #include "common_data/EventStore.hpp"
-#include "time/time_locale.hpp"
 
 namespace gui::top_bar
 {
@@ -29,6 +26,8 @@ namespace gui::top_bar
     using BatteryType                  = std::conditional<batteryWidgetAsText, BatteryText, BatteryBar>::type;
     constexpr auto signalWidgetAsText  = true;
     using SignalType = std::conditional<signalWidgetAsText, SignalStrengthText, SignalStrengthBar>::type;
+    constexpr auto simWidgetInDevelopersMode = false;
+    using SimType = std::conditional<simWidgetInDevelopersMode, SIMDevelopersMode, SIM>::type;
 
     void Configuration::enable(Indicator indicator)
     {
@@ -52,19 +51,9 @@ namespace gui::top_bar
         indicatorStatuses[indicator] = enabled;
     }
 
-    auto Configuration::getTimeMode() const noexcept -> TimeMode
-    {
-        return mTimeMode;
-    }
-
     auto Configuration::getPhoneMode() const noexcept -> sys::phone_modes::PhoneMode
     {
         return mPhoneMode;
-    }
-
-    void Configuration::setTimeMode(TimeMode timeMode)
-    {
-        mTimeMode = timeMode;
     }
 
     void Configuration::setPhoneMode(sys::phone_modes::PhoneMode phoneMode)
@@ -80,6 +69,16 @@ namespace gui::top_bar
     auto Configuration::getIndicatorsConfiguration() const noexcept -> const IndicatorStatuses &
     {
         return indicatorStatuses;
+    }
+
+    auto Configuration::getIndicatorsModifiers() const noexcept -> const IndicatorsModifiers &
+    {
+        return indicatorsModifiers;
+    }
+
+    void Configuration::setIndicatorModifier(Indicator indicator, std::shared_ptr<StatusBarVisitor> config)
+    {
+        indicatorsModifiers[indicator] = std::move(config);
     }
 
     TopBar::TopBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : HBox{parent, x, y, w, h}
@@ -129,7 +128,7 @@ namespace gui::top_bar
         rightBox->setReverseOrder(true);
         battery = new BatteryType(rightBox, 0, 0, 0, 0);
         battery->setMargins(gui::Margins(0, 0, margins::between, margins::iconBottom));
-        sim = new SIM(rightBox, 0, 0);
+        sim = new SimType(rightBox, 0, 0);
         sim->setMargins(gui::Margins(0, 0, margins::between, margins::iconBottom));
 
         updateSignalStrength();
@@ -159,9 +158,9 @@ namespace gui::top_bar
             phoneMode->setPhoneMode(config.getPhoneMode());
         }
 
-        using namespace utils::time;
-        config.getTimeMode() == TimeMode::Time12h ? time->setFormat(Locale::format(Locale::TimeFormat::FormatTime12H))
-                                                  : time->setFormat(Locale::format(Locale::TimeFormat::FormatTime24H));
+        for (auto &[indicator, modifier] : config.getIndicatorsModifiers()) {
+            setIndicatorModifier(indicator, *modifier);
+        }
 
         for (auto [indicator, enabled] : config.getIndicatorsConfiguration()) {
             setIndicatorStatus(indicator, enabled);
@@ -196,6 +195,16 @@ namespace gui::top_bar
         case Indicator::PhoneMode:
             showPhoneMode(enabled);
             break;
+        }
+    }
+
+    void TopBar::setIndicatorModifier(Indicator indicator, StatusBarVisitor &modifier)
+    {
+        if (indicator == Indicator::SimCard && sim != nullptr) {
+            sim->acceptStatusBarVisitor(modifier);
+        }
+        else if (indicator == Indicator::Time && time != nullptr) {
+            time->acceptStatusBarVisitor(modifier);
         }
     }
 
