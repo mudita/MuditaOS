@@ -3,6 +3,8 @@
 
 #include "SAIAudioDevice.hpp"
 
+#include <Audio/Stream.hpp>
+
 using namespace audio;
 
 SAIAudioDevice::SAIAudioDevice(I2S_Type *base, sai_edma_handle_t *rxHandle, sai_edma_handle_t *txHandle)
@@ -20,8 +22,10 @@ void SAIAudioDevice::initiateRxTransfer()
 
 void SAIAudioDevice::initiateTxTransfer()
 {
-    auto nullSpan = Sink::_stream->getNullSpan();
-    auto xfer     = sai_transfer_t{.data = nullSpan.data, .dataSize = nullSpan.dataSize};
+    audio::Stream::Span dataToSend;
+    Sink::_stream->peek(dataToSend);
+
+    auto xfer = sai_transfer_t{.data = dataToSend.data, .dataSize = dataToSend.dataSize};
     SAI_TransferSendEDMA(_base, tx, &xfer);
 }
 

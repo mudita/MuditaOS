@@ -25,7 +25,9 @@ add_gtest_executable(
     SRCS
         unittest.cpp
         unittest_format.cpp
+        unittest_transcode.cpp
         TestEndpoint.cpp
+        TestStream.cpp
     LIBS
         module-audio
 )
