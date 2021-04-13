@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LockedScreenWindow.hpp"
@@ -12,7 +12,7 @@ namespace gui
 
     LockedScreenWindow::LockedScreenWindow(app::Application *app) : BaseSettingsWindow(app, window::name::locked_screen)
     {
-        setTitle(utils::localize.get("app_settings_display_locked_screen"));
+        setTitle(utils::translate("app_settings_display_locked_screen"));
     }
 
     auto LockedScreenWindow::buildOptionsList() -> std::list<Option>
@@ -32,7 +32,7 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                        this->setBottomBarText(utils::translate(style::strings::common::select),
                                                BottomBar::Side::CENTER);
                     }
                     return true;
@@ -41,8 +41,8 @@ namespace gui
                 gui::option::SettingRightItem::ArrowWhite));
         };
 
-        addMenu(utils::translateI18("app_settings_display_locked_screen_autolock"), gui::window::name::autolock);
-        addMenu(utils::translateI18("app_settings_display_locked_screen_wallpaper"), gui::window::name::wallpaper);
+        addMenu(utils::translate("app_settings_display_locked_screen_autolock"), gui::window::name::autolock);
+        addMenu(utils::translate("app_settings_display_locked_screen_wallpaper"), gui::window::name::wallpaper);
 
         return optionList;
     }

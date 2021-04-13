@@ -84,7 +84,7 @@ namespace gui
                 descriptionLabel->setFont(style::window::font::mediumbold);
                 setFocusItem(inputBoxLabel);
                 auto bottorBarText =
-                    category.enabled ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
+                    category.enabled ? utils::translate("common_uncheck") : utils::translate("common_check");
                 this->bottomBarTemporaryMode(bottorBarText);
             }
             else {
@@ -100,7 +100,7 @@ namespace gui
             enableCategory(category.enabled);
             tickImage->setVisible(category.enabled);
             auto bottorBarText =
-                category.enabled ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
+                category.enabled ? utils::translate("common_uncheck") : utils::translate("common_check");
             this->bottomBarTemporaryMode(bottorBarText);
             hBox->resizeItems();
             return true;

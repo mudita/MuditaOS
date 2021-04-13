@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DateWidget.hpp"
@@ -33,17 +33,17 @@ namespace gui
 
         dayLabel = new Label(labelsHBox, 0, 0, 0, 0);
         applyLabelSpecificProperties(dayLabel);
-        dayLabel->setText(utils::localize.get("app_settings_title_day"));
+        dayLabel->setText(utils::translate("app_settings_title_day"));
 
         monthLabel = new Label(labelsHBox, 0, 0, 0, 0);
         applyLabelSpecificProperties(monthLabel);
         monthLabel->setMargins(Margins(date_and_time::separator, 0, 0, 0));
-        monthLabel->setText(utils::localize.get("app_settings_title_month"));
+        monthLabel->setText(utils::translate("app_settings_title_month"));
 
         yearLabel = new Label(labelsHBox, 0, 0, 0, 0);
         applyLabelSpecificProperties(yearLabel);
         yearLabel->setMargins(Margins(date_and_time::separator, 0, 0, 0));
-        yearLabel->setText(utils::localize.get("app_settings_title_year"));
+        yearLabel->setText(utils::translate("app_settings_title_year"));
 
         dateHBox = new HBox(this, 0, 0, 0, 0);
         dateHBox->setMinimumSize(style::window::default_body_width, date_and_time::hBox_h);

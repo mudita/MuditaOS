@@ -18,14 +18,14 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_calculator_title_main"));
+        setTitle(utils::translate("app_calculator_title_main"));
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::calculator::equals));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(style::calculator::decimal_separator));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::calculator::equals));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::calculator::decimal_separator));
         bottomBar->setFont(BottomBar::Side::LEFT, style::window::font::largelight);
 
         mathOperationInput = new gui::Text(this,

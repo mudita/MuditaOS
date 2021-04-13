@@ -20,7 +20,7 @@ namespace gui
         std::list<Option> optionList;
 
         optionList.emplace_back(std::make_unique<option::OptionSettings>(
-            utils::translateI18("app_settings_security_lock_screen_passcode"),
+            utils::translate("app_settings_security_lock_screen_passcode"),
             [=](Item &item) {
                 lockScreenPasscodeIsOn = !lockScreenPasscodeIsOn;
                 LOG_INFO("switching to %s page", window::name::change_passcode);
@@ -32,12 +32,10 @@ namespace gui
             },
             [=](Item &item) {
                 if (item.focus) {
-                    this->setBottomBarText(utils::localize.get(style::strings::common::Switch),
-                                           BottomBar::Side::CENTER);
+                    this->setBottomBarText(utils::translate(style::strings::common::Switch), BottomBar::Side::CENTER);
                 }
                 else {
-                    this->setBottomBarText(utils::localize.get(style::strings::common::select),
-                                           BottomBar::Side::CENTER);
+                    this->setBottomBarText(utils::translate(style::strings::common::select), BottomBar::Side::CENTER);
                 }
                 return true;
             },
@@ -45,7 +43,7 @@ namespace gui
             lockScreenPasscodeIsOn ? option::SettingRightItem::On : option::SettingRightItem::Off));
 
         optionList.emplace_back(std::make_unique<option::OptionSettings>(
-            utils::translateI18("app_settings_security_usb_passcode"),
+            utils::translate("app_settings_security_usb_passcode"),
             [=](Item &item) {
                 auto lock = std::make_unique<gui::PinLock>(
                     Store::GSM::SIM::NONE, PinLock::LockState::PasscodeRequired, PinLock::LockType::Screen);
@@ -60,12 +58,10 @@ namespace gui
             },
             [=](Item &item) {
                 if (item.focus) {
-                    this->setBottomBarText(utils::localize.get(style::strings::common::Switch),
-                                           BottomBar::Side::CENTER);
+                    this->setBottomBarText(utils::translate(style::strings::common::Switch), BottomBar::Side::CENTER);
                 }
                 else {
-                    this->setBottomBarText(utils::localize.get(style::strings::common::select),
-                                           BottomBar::Side::CENTER);
+                    this->setBottomBarText(utils::translate(style::strings::common::select), BottomBar::Side::CENTER);
                 }
                 return true;
             },
@@ -74,7 +70,7 @@ namespace gui
 
         if (lockScreenPasscodeIsOn) {
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
-                utils::translateI18("app_settings_security_change_passcode"),
+                utils::translate("app_settings_security_change_passcode"),
                 [=](Item &item) {
                     LOG_INFO("switching to %s page", window::name::change_passcode);
                     application->switchWindow(

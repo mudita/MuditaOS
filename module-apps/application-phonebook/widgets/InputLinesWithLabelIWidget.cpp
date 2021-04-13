@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputLinesWithLabelIWidget.hpp"
@@ -127,7 +127,7 @@ namespace gui
     }
     void InputLinesWithLabelIWidget::firstNameHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_first_name"));
+        titleLabel->setText(utils::translate("app_phonebook_new_contact_first_name"));
         inputText->setTextType(TextType::SingleLine);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->primaryName = inputText->getText(); };
@@ -136,7 +136,7 @@ namespace gui
     }
     void InputLinesWithLabelIWidget::secondNameHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_name"));
+        titleLabel->setText(utils::translate("app_phonebook_new_contact_second_name"));
         inputText->setTextType(TextType::SingleLine);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) {
@@ -147,7 +147,7 @@ namespace gui
     }
     void InputLinesWithLabelIWidget::numberHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_number"));
+        titleLabel->setText(utils::translate("app_phonebook_new_contact_number"));
         inputText->setTextType(TextType::SingleLine);
         inputText->setInputMode(new InputMode({InputMode::phone}));
 
@@ -166,7 +166,7 @@ namespace gui
     }
     void InputLinesWithLabelIWidget::secondNumberHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_second_number"));
+        titleLabel->setText(utils::translate("app_phonebook_new_contact_second_number"));
         inputText->setTextType(TextType::SingleLine);
         inputText->setInputMode(new InputMode({InputMode::phone}));
 
@@ -185,7 +185,7 @@ namespace gui
     }
     void InputLinesWithLabelIWidget::emailHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_email"));
+        titleLabel->setText(utils::translate("app_phonebook_new_contact_email"));
         inputText->setTextType(TextType::SingleLine);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
@@ -194,7 +194,7 @@ namespace gui
     }
     void InputLinesWithLabelIWidget::addressHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
+        titleLabel->setText(utils::translate("app_phonebook_new_contact_address"));
         inputText->setTextType(TextType::SingleLine);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
@@ -202,7 +202,7 @@ namespace gui
     }
     void InputLinesWithLabelIWidget::noteHandler()
     {
-        titleLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
+        titleLabel->setText(utils::translate("app_phonebook_new_contact_note"));
         inputText->setTextType(TextType::SingleLine);
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->note = inputText->getText(); };

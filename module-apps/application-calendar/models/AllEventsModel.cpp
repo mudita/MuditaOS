@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AllEventsModel.hpp"
@@ -77,7 +77,7 @@ auto AllEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
 
         if (app->getEquivalentToEmptyWindow() == EquivalentWindow::AllEventsWindow) {
             auto filter = TimePointNow();
-            app->switchToNoEventsWindow(utils::localize.get("app_calendar_title_main"), filter);
+            app->switchToNoEventsWindow(utils::translate("app_calendar_title_main"), filter);
         }
     }
     auto eventShift = app->getEventShift();

@@ -42,8 +42,8 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         auto vBox = new VBox(this,
                              style::window::default_left_margin,
@@ -64,7 +64,7 @@ namespace gui
         authorLabel->setMinimumSize(style::headerWidth, style::window::label::default_h);
         authorLabel->setEdges(RectangleEdge::None);
         authorLabel->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left});
-        authorLabel->setText(utils::localize.get("app_settings_display_wallpaper_quotes_author"));
+        authorLabel->setText(utils::translate("app_settings_display_wallpaper_quotes_author"));
         authorLabel->setPenFocusWidth(::style::window::default_border_focus_w);
         authorLabel->setFont(::style::window::font::verysmall);
         authorLabel->setPadding(gui::Padding(0, 0, 0, 0));
@@ -93,7 +93,7 @@ namespace gui
         quoteLabel->setMinimumSize(style::headerWidth, style::window::label::default_h);
         quoteLabel->setEdges(RectangleEdge::None);
         quoteLabel->setPenFocusWidth(::style::window::default_border_focus_w);
-        quoteLabel->setText(utils::localize.get("app_settings_display_wallpaper_quotes_note"));
+        quoteLabel->setText(utils::translate("app_settings_display_wallpaper_quotes_note"));
         quoteLabel->setFont(::style::window::font::verysmall);
         quoteLabel->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Left});
         quoteLabel->activeItem = false;
@@ -120,7 +120,7 @@ namespace gui
         quoteCharCounter->setFont(::style::window::font::verysmall);
         quoteCharCounter->setAlignment(gui::Alignment{gui::Alignment::Horizontal::Right});
 
-        setTitle(utils::localize.get("app_settings_display_wallpaper_quotes_new"));
+        setTitle(utils::translate("app_settings_display_wallpaper_quotes_new"));
         vBox->resizeItems();
         setFocusItem(quoteText);
     }
@@ -136,12 +136,12 @@ namespace gui
         quoteData   = quotedata->getQuote();
 
         if (quoteAction == QuoteAction::Edit) {
-            setTitle(utils::localize.get("app_settings_display_wallpaper_quotes_edit"));
+            setTitle(utils::translate("app_settings_display_wallpaper_quotes_edit"));
             quoteText->setText(quoteData.quote);
             authorText->setText(quoteData.author);
         }
         else {
-            setTitle(utils::localize.get("app_settings_display_wallpaper_quotes_new"));
+            setTitle(utils::translate("app_settings_display_wallpaper_quotes_new"));
         }
 
         setQuoteCharactersCount(quoteText->getText().length());

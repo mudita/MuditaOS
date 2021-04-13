@@ -142,7 +142,7 @@ namespace app::manager
 
     sys::ReturnCodes ApplicationManager::InitHandler()
     {
-        utils::localize.setDisplayLanguage(
+        utils::setDisplayLanguage(
             settings->getValue(settings::SystemProperties::displayLanguage, settings::SettingsScope::Global));
 
         settings->registerValueChange(
@@ -328,7 +328,7 @@ namespace app::manager
         connect(typeid(DisplayLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<DisplayLanguageChangeRequest *>(request);
             handleDisplayLanguageChange(msg);
-            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::localize.getDisplayLanguage());
+            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::getDisplayLanguage());
         });
         connect(typeid(InputLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<InputLanguageChangeRequest *>(request);
@@ -369,7 +369,7 @@ namespace app::manager
             return sys::MessageNone{};
         });
         connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
-            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::localize.getDisplayLanguage());
+            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::getDisplayLanguage());
         });
         connect(typeid(UpdateInProgress), [this](sys::Message *) {
             closeApplicationsOnUpdate();
@@ -757,13 +757,12 @@ namespace app::manager
     {
         const auto &requestedLanguage = msg->getLanguage();
 
-        if (requestedLanguage == utils::localize.getDisplayLanguage()) {
+        if (not utils::setDisplayLanguage(requestedLanguage)) {
             LOG_WARN("The selected language is already set. Ignore.");
             return false;
         }
         settings->setValue(
             settings::SystemProperties::displayLanguage, requestedLanguage, settings::SettingsScope::Global);
-        utils::localize.setDisplayLanguage(requestedLanguage);
         rebuildActiveApplications();
         return true;
     }
@@ -772,13 +771,12 @@ namespace app::manager
     {
         const auto &requestedLanguage = msg->getLanguage();
 
-        if (requestedLanguage == utils::localize.getInputLanguage()) {
+        if (not utils::setInputLanguage(requestedLanguage)) {
             LOG_WARN("The selected language is already set. Ignore.");
             return false;
         }
         settings->setValue(
             settings::SystemProperties::inputLanguage, requestedLanguage, settings::SettingsScope::Global);
-        utils::localize.setInputLanguage(requestedLanguage);
         return true;
     }
 
@@ -985,7 +983,7 @@ namespace app::manager
 
     void ApplicationManager::displayLanguageChanged(std::string value)
     {
-        if (utils::localize.setDisplayLanguage(value)) {
+        if (utils::setDisplayLanguage(value)) {
             rebuildActiveApplications();
         }
     }
@@ -1012,7 +1010,7 @@ namespace app::manager
 
     void ApplicationManager::inputLanguageChanged(std::string value)
     {
-        utils::localize.setInputLanguage(value);
+        utils::setInputLanguage(value);
     }
 
     auto ApplicationManager::handleDOMRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>

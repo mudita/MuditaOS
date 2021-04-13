@@ -28,9 +28,9 @@ namespace gui
           smsModel{std::make_shared<SMSThreadModel>(app)}
     {
         AppWindow::buildInterface();
-        setTitle(utils::localize.get("app_messages_title_main"));
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        setTitle(utils::translate("app_messages_title_main"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         smsList = new gui::ListView(this,
                                     style::messages::smsList::x,

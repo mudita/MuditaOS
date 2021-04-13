@@ -336,8 +336,8 @@ namespace utils::time
     UTF8 Duration::str(DisplayedFormat displayedFormat) const
     {
         // switch between format low and hig
-        std::string data = utils::localize.get(hours != 0 ? formatMap.at(displayedFormat).highFormat
-                                                          : formatMap.at(displayedFormat).lowFormat);
+        std::string data = utils::translate(hours != 0 ? formatMap.at(displayedFormat).highFormat
+                                                       : formatMap.at(displayedFormat).lowFormat);
         fillStr(data);
 
         return data;

@@ -27,12 +27,12 @@ namespace app::notes
     void SearchResultsWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        setTitle(utils::localize.get("app_notes_title_main"));
+        setTitle(utils::translate("app_notes_title_main"));
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(::style::strings::common::open));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::open));
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
 
         list = new gui::ListView(this,
                                  style::list::X,
@@ -71,9 +71,9 @@ namespace app::notes
 
     void SearchResultsWindow::onNothingFound(const std::string &searchText)
     {
-        gui::DialogMetadata meta{utils::localize.get("common_results_prefix") + searchText,
+        gui::DialogMetadata meta{utils::translate("common_results_prefix") + searchText,
                                  "search_big",
-                                 utils::localize.get("app_notes_search_no_results")};
+                                 utils::translate("app_notes_search_no_results")};
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         data->ignoreCurrentWindowOnStack = true;
         application->switchWindow(gui::name::window::note_dialog, std::move(data));

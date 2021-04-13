@@ -38,10 +38,10 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_messages_templates"));
+        setTitle(utils::translate("app_messages_templates"));
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::use));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::use));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         namespace style = style::messages::templates::list;
 

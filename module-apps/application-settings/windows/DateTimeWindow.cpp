@@ -50,10 +50,10 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_settings_date_and_time"));
+        setTitle(utils::translate("app_settings_date_and_time"));
 
         // create date widgets
         uint32_t w = this->getWidth();
@@ -68,17 +68,17 @@ namespace gui
                                  style::settings::date::date_time_box_h);
 
         auto item = addDateTimeItem(nullptr,
-                                    utils::localize.get("app_settings_title_day"),
+                                    utils::translate("app_settings_title_day"),
                                     time.get_date_time_substr(utils::time::GetParameters::Day));
         dateItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Day, item));
 
         item = addDateTimeItem(nullptr,
-                               utils::localize.get("app_settings_title_month"),
+                               utils::translate("app_settings_title_month"),
                                time.get_date_time_substr(utils::time::GetParameters::Month));
         dateItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Month, item));
 
         item = addDateTimeItem(nullptr,
-                               utils::localize.get("app_settings_title_year"),
+                               utils::translate("app_settings_title_year"),
                                time.get_date_time_substr(utils::time::GetParameters::Year));
         dateItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Year, item));
 
@@ -129,7 +129,7 @@ namespace gui
                                  style::settings::date::time_box_y_pos,
                                  w,
                                  style::settings::date::date_time_box_h);
-        item     = addDateTimeItem(nullptr, utils::localize.get("app_settings_title_time"), std::to_string(hourValue));
+        item     = addDateTimeItem(nullptr, utils::translate("app_settings_title_time"), std::to_string(hourValue));
         timeItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Hour, item));
         timeBody->addWidget(item);
         timeBody->addWidget(addSpacer(":"));

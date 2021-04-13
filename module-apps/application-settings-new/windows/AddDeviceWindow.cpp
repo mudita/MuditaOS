@@ -52,7 +52,7 @@ namespace gui
                 gui::option::SettingRightItem::Bt));
         }
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::add));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::add));
 
         return optionsList;
     }

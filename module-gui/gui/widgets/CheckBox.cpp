@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CheckBox.hpp"
@@ -37,10 +37,10 @@ namespace gui
             if (focus) {
                 setFocusItem(image);
                 if (image->visible) {
-                    bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
+                    bottomBarTemporaryMode(utils::translate("common_uncheck"));
                 }
                 else {
-                    bottomBarTemporaryMode(utils::localize.get("common_check"));
+                    bottomBarTemporaryMode(utils::translate("common_check"));
                 }
             }
             else {
@@ -58,10 +58,10 @@ namespace gui
                 if (event.keyCode == gui::KeyCode::KEY_LF) {
                     image->setVisible(!image->visible);
                     if (image->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
+                        bottomBarTemporaryMode(utils::translate("common_uncheck"));
                     }
                     else {
-                        bottomBarTemporaryMode(utils::localize.get("common_check"));
+                        bottomBarTemporaryMode(utils::translate("common_check"));
                     }
                     return true;
                 }
@@ -70,10 +70,10 @@ namespace gui
                 if (event.keyCode == gui::KeyCode::KEY_ENTER) {
                     image->setVisible(!image->visible);
                     if (image->visible) {
-                        bottomBarTemporaryMode(utils::localize.get("common_uncheck"));
+                        bottomBarTemporaryMode(utils::translate("common_uncheck"));
                     }
                     else {
-                        bottomBarTemporaryMode(utils::localize.get("common_check"));
+                        bottomBarTemporaryMode(utils::translate("common_check"));
                     }
                     return true;
                 }

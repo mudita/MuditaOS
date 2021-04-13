@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ConnectionFrequencyWindow.hpp"
@@ -23,10 +23,10 @@ namespace gui
 
         auto intervalText = [](uint8_t value) {
             if (value == 0) {
-                return utils::localize.get("app_alarm_clock_repeat_never");
+                return utils::translate("app_alarm_clock_repeat_never");
             }
             const std::string toReplace = "%0";
-            std::string temp            = utils::translateI18("app_meditation_interval_every_x_minutes");
+            std::string temp            = utils::translate("app_meditation_interval_every_x_minutes");
             temp.replace(temp.find(toReplace), toReplace.size(), std::to_string(value));
             return temp;
         };
@@ -44,8 +44,8 @@ namespace gui
                                                                        : option::SettingRightItem::Disabled));
         }
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         return optList;
     }

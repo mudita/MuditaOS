@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #define CATCH_CONFIG_MAIN
@@ -28,7 +28,7 @@ TEST_CASE("Time display parser")
         REQUIRE("24" == TimePointToMinutesString(event.date_from));
         REQUIRE("3" == TimePointToHourString12H(event.date_till));
         REQUIRE("36" == TimePointToMinutesString(event.date_till));
-        REQUIRE(returnString == "2:24 - 3:36 " + utils::localize.get(utils::time::Locale::getPM()));
+        REQUIRE(returnString == "2:24 - 3:36 " + utils::translate(utils::time::Locale::getPM()));
     }
 
     SECTION("Before noon time input (mode12h)")
@@ -45,7 +45,7 @@ TEST_CASE("Time display parser")
         REQUIRE("59" == TimePointToMinutesString(event.date_from));
         REQUIRE("7" == TimePointToHourString12H(event.date_till));
         REQUIRE("45" == TimePointToMinutesString(event.date_till));
-        REQUIRE(returnString == "5:59 - 7:45 " + utils::localize.get(utils::time::Locale::getAM()));
+        REQUIRE(returnString == "5:59 - 7:45 " + utils::translate(utils::time::Locale::getAM()));
     }
 
     SECTION("Mixed time input (mode12h)")
@@ -62,8 +62,8 @@ TEST_CASE("Time display parser")
         REQUIRE("05" == TimePointToMinutesString(event.date_from));
         REQUIRE("7" == TimePointToHourString12H(event.date_till));
         REQUIRE("55" == TimePointToMinutesString(event.date_till));
-        REQUIRE(returnString == "1:05 " + utils::localize.get(utils::time::Locale::getAM()) + " - 7:55 " +
-                                    utils::localize.get(utils::time::Locale::getPM()));
+        REQUIRE(returnString == "1:05 " + utils::translate(utils::time::Locale::getAM()) + " - 7:55 " +
+                                    utils::translate(utils::time::Locale::getPM()));
     }
 
     SECTION("Before noon time input - short version (mode12h)")
@@ -78,7 +78,7 @@ TEST_CASE("Time display parser")
         REQUIRE("2020-12-31 19:55:00" == TimePointToString(event.date_till));
         REQUIRE("12" == TimePointToHourString12H(event.date_from));
         REQUIRE("05" == TimePointToMinutesString(event.date_from));
-        REQUIRE(returnString == "12:05 " + utils::localize.get(utils::time::Locale::getAM()));
+        REQUIRE(returnString == "12:05 " + utils::translate(utils::time::Locale::getAM()));
     }
 
     SECTION("After noon time input - short version (mode12h)")
@@ -93,7 +93,7 @@ TEST_CASE("Time display parser")
         REQUIRE("2020-12-31 19:55:00" == TimePointToString(event.date_till));
         REQUIRE("12" == TimePointToHourString12H(event.date_from));
         REQUIRE("05" == TimePointToMinutesString(event.date_from));
-        REQUIRE(returnString == "12:05 " + utils::localize.get(utils::time::Locale::getPM()));
+        REQUIRE(returnString == "12:05 " + utils::translate(utils::time::Locale::getPM()));
     }
 
     SECTION("Time input (mode24h)")
@@ -138,6 +138,6 @@ TEST_CASE("Time display parser")
             event.date_from, event.date_till, Version::normal, false);
         REQUIRE("2020-10-20 00:00:00" == TimePointToString(event.date_from));
         REQUIRE("2020-10-20 23:59:00" == TimePointToString(event.date_till));
-        REQUIRE(returnString == utils::localize.get("app_calendar_all_day"));
+        REQUIRE(returnString == utils::translate("app_calendar_all_day"));
     }
 }

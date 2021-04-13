@@ -21,15 +21,15 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_settings_bluetooth_phone_name"));
+        setTitle(utils::translate("app_settings_bluetooth_phone_name"));
 
-        inputField = inputBox(this, utils::localize.get("app_settings_bluetooth_phone_name"));
+        inputField = inputBox(this, utils::translate("app_settings_bluetooth_phone_name"));
         bottomBar->setActive(BottomBar::Side::LEFT, false);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         setFocusItem(inputField);
     }

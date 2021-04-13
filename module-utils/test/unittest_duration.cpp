@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstring>
@@ -12,11 +12,9 @@
 
 #include <catch2/catch.hpp>
 
-utils::i18n localize;
-
 TEST_CASE("Duration - creation")
 {
-    utils::localize.setDisplayLanguage("English");
+    utils::setDisplayLanguage("English");
 
     SECTION("default constructor")
     {
@@ -59,7 +57,7 @@ TEST_CASE("Duration - creation")
 
 TEST_CASE("Duration - arithemtics")
 {
-    utils::localize.setDisplayLanguage("English");
+    utils::setDisplayLanguage("English");
 
     SECTION("Addition")
     {
@@ -97,7 +95,7 @@ TEST_CASE("Duration - arithemtics")
 
 TEST_CASE("Duration - comparision")
 {
-    utils::localize.setDisplayLanguage("English");
+    utils::setDisplayLanguage("English");
 
     SECTION("Duration")
     {
@@ -141,7 +139,7 @@ TEST_CASE("Duration - comparision")
 
 TEST_CASE("Duration - display")
 {
-    utils::localize.setDisplayLanguage("English");
+    utils::setDisplayLanguage("English");
 
     {
         using namespace utils::time;

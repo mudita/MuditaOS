@@ -30,7 +30,7 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_phonebook_title_main"));
+        setTitle(utils::translate("app_phonebook_title_main"));
         leftArrowImage  = new gui::Image(this,
                                         phonebookStyle::mainWindow::leftArrowImage::x,
                                         phonebookStyle::mainWindow::leftArrowImage::y,
@@ -71,9 +71,9 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         auto app  = application;
         inputMode = std::make_unique<InputMode>(

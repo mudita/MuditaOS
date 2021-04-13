@@ -12,7 +12,7 @@ namespace gui
 
     AutolockWindow::AutolockWindow(app::Application *app) : BaseSettingsWindow(app, window::name::autolock)
     {
-        setTitle(utils::localize.get("app_settings_display_locked_screen_autolock"));
+        setTitle(utils::translate("app_settings_display_locked_screen_autolock"));
     }
 
     auto AutolockWindow::buildOptionsList() -> std::list<gui::Option>
@@ -30,7 +30,7 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                        this->setBottomBarText(utils::translate(style::strings::common::select),
                                                BottomBar::Side::CENTER);
                     }
                     return true;

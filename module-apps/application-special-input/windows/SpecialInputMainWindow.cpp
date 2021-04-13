@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SpecialInputMainWindow.hpp"
@@ -32,9 +32,9 @@ void SpecialInputMainWindow::buildInterface()
 {
     AppWindow::buildInterface();
 
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-    bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::emoji));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+    bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::emoji));
 
     charList = new gui::ListView(this,
                                  specialInputStyle::specialInputListView::x,
@@ -74,13 +74,13 @@ void SpecialInputMainWindow::switchPage()
     if (actualWindow == specialInputStyle::CharactersType::Emoji) {
         model->createData(specialInputStyle::CharactersType::SpecialCharacters);
         actualWindow = specialInputStyle::CharactersType::SpecialCharacters;
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::emoji));
-        setTitle(utils::localize.get("app_special_input_window"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::emoji));
+        setTitle(utils::translate("app_special_input_window"));
     }
     else if (actualWindow == specialInputStyle::CharactersType::SpecialCharacters) {
         model->createData(specialInputStyle::CharactersType::Emoji);
         actualWindow = specialInputStyle::CharactersType::Emoji;
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::special_chars));
-        setTitle(utils::localize.get("app_emoji_input_window"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::special_chars));
+        setTitle(utils::translate("app_emoji_input_window"));
     }
 }

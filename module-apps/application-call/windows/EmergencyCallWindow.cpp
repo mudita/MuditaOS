@@ -21,10 +21,10 @@ namespace gui
         using namespace callAppStyle;
         NumberWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_ice_contacts_title"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_phonebook_ice_contacts_title"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        numberDescriptionLabel->setText(utils::localize.get("app_call_emergency_text"));
+        numberDescriptionLabel->setText(utils::translate("app_call_emergency_text"));
     }
 
     top_bar::Configuration EmergencyCallWindow::configureTopBar(top_bar::Configuration appConfiguration)

@@ -14,7 +14,7 @@ namespace gui
                              std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel)
         : BaseSettingsWindow(app, gui::window::name::phone), mWidgetMaker(this), mAudioModel(std::move(audioModel))
     {
-        setTitle(utils::localize.get("app_settings_apps_phone"));
+        setTitle(utils::translate("app_settings_apps_phone"));
     }
 
     std::list<Option> PhoneWindow::buildOptionsList()
@@ -23,17 +23,16 @@ namespace gui
         mVibrationsEnabled = mAudioModel->isVibrationEnabled();
         mSoundEnabled      = mAudioModel->isSoundEnabled();
 
-        mWidgetMaker.addSwitchOption(optionList,
-                                     utils::translateI18("app_settings_vibration"),
-                                     mVibrationsEnabled,
-                                     [&]() { switchVibrationState(); });
+        mWidgetMaker.addSwitchOption(optionList, utils::translate("app_settings_vibration"), mVibrationsEnabled, [&]() {
+            switchVibrationState();
+        });
 
         mWidgetMaker.addSwitchOption(
-            optionList, utils::translateI18("app_settings_sound"), mSoundEnabled, [&]() { switchSoundState(); });
+            optionList, utils::translate("app_settings_sound"), mSoundEnabled, [&]() { switchSoundState(); });
 
         if (mSoundEnabled) {
             mWidgetMaker.addSelectOption(
-                optionList, utils::translateI18("app_settings_call_ringtome"), [&]() { openRingtoneWindow(); }, true);
+                optionList, utils::translate("app_settings_call_ringtome"), [&]() { openRingtoneWindow(); }, true);
         }
 
         return optionList;

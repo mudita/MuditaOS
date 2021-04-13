@@ -61,7 +61,7 @@ namespace gui
     {
         this->call = call;
         if (call->presentation == PresentationType::PR_UNKNOWN) {
-            text->setText(utils::localize.get(callLogStyle::strings::privateNumber));
+            text->setText(utils::translate(callLogStyle::strings::privateNumber));
         }
         else {
             text->setText(call->name);

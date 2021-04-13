@@ -29,7 +29,7 @@ namespace gui
             break;
         }
 
-        setTitle(utils::localize.get("app_settings_display_keypad_light"));
+        setTitle(utils::translate("app_settings_display_keypad_light"));
     }
 
     void KeypadLightWindow::switchHandler(bool &toggleSwitch)
@@ -63,7 +63,7 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
+                        this->setBottomBarText(utils::translate(style::strings::common::Switch),
                                                BottomBar::Side::CENTER);
                     }
                     return true;
@@ -72,9 +72,9 @@ namespace gui
                 Switch ? gui::option::SettingRightItem::Checked : gui::option::SettingRightItem::Disabled));
         };
 
-        addCheckOption(utils::translateI18("app_settings_display_keypad_light_on"), isAlwaysOnSwitchOn);
-        addCheckOption(utils::translateI18("app_settings_display_keypad_light_off"), isOffSwitchOn);
-        addCheckOption(utils::translateI18("app_settings_display_keypad_light_active"), isActiveSwitchOn);
+        addCheckOption(utils::translate("app_settings_display_keypad_light_on"), isAlwaysOnSwitchOn);
+        addCheckOption(utils::translate("app_settings_display_keypad_light_off"), isOffSwitchOn);
+        addCheckOption(utils::translate("app_settings_display_keypad_light_active"), isActiveSwitchOn);
 
         return optionsList;
     } // namespace gui

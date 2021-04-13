@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadsModel.hpp"
@@ -55,7 +55,7 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
         }
         if (event.keyCode == gui::KeyCode::KEY_LF) {
             application->switchWindow(
-                utils::localize.get("app_phonebook_options_title"),
+                utils::translate("app_phonebook_options_title"),
                 std::make_unique<gui::OptionsWindowOptions>(threadWindowOptions(app, item->getThreadItem().get())));
         }
         return false;

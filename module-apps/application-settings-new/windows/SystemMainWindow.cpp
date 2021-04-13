@@ -18,7 +18,7 @@ namespace gui
         std::list<Option> optionList;
         auto addOption = [&](UTF8 name, const std::string &window) {
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
-                utils::translateI18(name),
+                utils::translate(name),
                 [=](Item &item) {
                     LOG_INFO("switching to %s page", window.c_str());
                     application->switchWindow(window, nullptr);
@@ -31,12 +31,12 @@ namespace gui
 
         auto addFactoryResetOption = [&](UTF8 name, const std::string &window) {
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
-                utils::translateI18(name),
+                utils::translate(name),
                 [=](Item &item) {
                     auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                        gui::DialogMetadata{utils::localize.get("app_settings_factory_reset"),
+                        gui::DialogMetadata{utils::translate("app_settings_factory_reset"),
                                             "info_big_circle_W_G",
-                                            utils::localize.get("app_settings_display_factory_reset_confirmation"),
+                                            utils::translate("app_settings_display_factory_reset_confirmation"),
                                             "",
                                             [this]() {
                                                 auto msg = std::make_shared<sdesktop::FactoryMessage>();
