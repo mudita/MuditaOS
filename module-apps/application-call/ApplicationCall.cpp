@@ -60,7 +60,7 @@ namespace app
                 return true;
             };
             constexpr auto iconNoEmergency = "emergency_W_G";
-            auto textNoEmergency           = utils::localize.get("app_call_wrong_emergency");
+            auto textNoEmergency           = utils::translate("app_call_wrong_emergency");
             utils::findAndReplaceAll(textNoEmergency, "$NUMBER", data->getDescription());
             showNotification(buttonAction, iconNoEmergency, textNoEmergency);
             return actionHandled();
@@ -71,7 +71,7 @@ namespace app
                 return true;
             };
             constexpr auto iconNoSim = "info_big_circle_W_G";
-            const auto textNoSim     = utils::localize.get("app_call_no_sim");
+            const auto textNoSim     = utils::translate("app_call_no_sim");
             showNotification(buttonAction, iconNoSim, textNoSim);
             return actionHandled();
         });
@@ -81,7 +81,7 @@ namespace app
                 return true;
             };
             constexpr auto icon    = "info_big_circle_W_G";
-            const auto textOffline = utils::localize.get("app_call_offline");
+            const auto textOffline = utils::translate("app_call_offline");
             showNotification(buttonAction, icon, textOffline);
             return actionHandled();
         });

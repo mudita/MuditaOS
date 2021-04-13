@@ -207,9 +207,9 @@ namespace app
             switchWindow(gui::window::name::dialog_retry,
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(
-                             gui::DialogMetadata{utils::localize.get("app_settings_bt"),
+                             gui::DialogMetadata{utils::translate("app_settings_bt"),
                                                  "info_big_circle_W_G",
-                                                 utils::localize.get("app_settings_bluetooth_pairing_error_message"),
+                                                 utils::translate("app_settings_bluetooth_pairing_error_message"),
                                                  "",
                                                  [=]() -> bool {
                                                      bus.sendUnicast(std::make_shared<BluetoothPairMessage>(addr),
@@ -237,9 +237,9 @@ namespace app
             switchWindow(gui::window::name::dialog_retry,
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(
-                             gui::DialogMetadata{utils::localize.get("app_settings_bt"),
+                             gui::DialogMetadata{utils::translate("app_settings_bt"),
                                                  "info_big_circle_W_G",
-                                                 utils::localize.get("app_settings_bluetooth_unpairing_error_message"),
+                                                 utils::translate("app_settings_bluetooth_unpairing_error_message"),
                                                  "",
                                                  [=]() -> bool {
                                                      bus.sendUnicast(std::make_shared<message::bluetooth::Unpair>(addr),
@@ -261,9 +261,9 @@ namespace app
             switchWindow(gui::window::name::dialog_retry,
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
-                             utils::localize.get("app_settings_bt"),
+                             utils::translate("app_settings_bt"),
                              "info_big_circle_W_G",
-                             utils::localize.get("app_settings_bluetooth_connecting_error_message"),
+                             utils::translate("app_settings_bluetooth_connecting_error_message"),
                              "",
                              [=]() -> bool {
                                  bus.sendUnicast(std::make_shared<message::bluetooth::Connect>(addr),
@@ -283,9 +283,9 @@ namespace app
             switchWindow(gui::window::name::dialog_confirm,
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(
-                             gui::DialogMetadata{utils::localize.get("app_settings_bt"),
+                             gui::DialogMetadata{utils::translate("app_settings_bt"),
                                                  "info_big_circle_W_G",
-                                                 utils::localize.get("app_settings_bluetooth_init_error_message"),
+                                                 utils::translate("app_settings_bluetooth_init_error_message"),
                                                  "",
                                                  [=]() -> bool {
                                                      switchWindow(gui::window::name::bluetooth);
@@ -371,7 +371,7 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(
-                app, utils::localize.get("app_settings_title_main_new"), mainWindowOptionsNew(app));
+                app, utils::translate("app_settings_title_main_new"), mainWindowOptionsNew(app));
         });
         windowsFactory.attach(gui::window::name::bluetooth, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BluetoothWindow>(app);

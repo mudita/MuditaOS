@@ -16,8 +16,8 @@ namespace gui::option
     {
         assert(app != nullptr);
 
-        text = "<text>" + utils::localize.get("sms_call_text") + "<b>" + contact.getFormattedName().c_str() +
-               "</b></text>";
+        text =
+            "<text>" + utils::translate("sms_call_text") + "<b>" + contact.getFormattedName().c_str() + "</b></text>";
 
         activatedCallback = [app, contact](gui::Item &item) {
             if (!contact.numbers.empty()) {

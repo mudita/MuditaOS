@@ -69,8 +69,8 @@ void LockedInfoWindow::buildInterface()
     namespace lock_style = style::window::pin_lock;
     AppWindow::buildInterface();
 
-    bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_emergency"));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+    bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_emergency"));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("common_back"));
 
     lockImage = new gui::Image(this, lock_style::image::x, lock_style::image::y, 0, 0, "pin_lock");
     infoText  = new Text(this,
@@ -81,7 +81,7 @@ void LockedInfoWindow::buildInterface()
 
     TextFormat format(FontManager::getInstance().getFont(style::window::font::medium));
     text::RichTextParser rtParser;
-    auto parsedText = rtParser.parse(utils::localize.get("app_desktop_press_to_unlock"), &format);
+    auto parsedText = rtParser.parse(utils::translate("app_desktop_press_to_unlock"), &format);
 
     infoText->setText(std::move(parsedText));
     infoText->setAlignment(Alignment::Horizontal::Center);

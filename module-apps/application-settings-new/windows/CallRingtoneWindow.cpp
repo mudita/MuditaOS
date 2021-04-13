@@ -9,6 +9,6 @@ namespace gui
 {
     CallRingtoneWindow::CallRingtoneWindow(app::Application *app) : BaseSettingsWindow(app, window::name::call_ringtone)
     {
-        setTitle(utils::localize.get("app_settings_call_ringtome"));
+        setTitle(utils::translate("app_settings_call_ringtome"));
     }
 } // namespace gui

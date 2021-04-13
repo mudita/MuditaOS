@@ -57,7 +57,7 @@ namespace gui
         AppWindow::buildInterface();
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
         bottomBar->setBorderColor(ColorNoColor);
 
         const uint32_t w = this->getWidth() - style::window::default_left_margin - style::window::default_right_margin;

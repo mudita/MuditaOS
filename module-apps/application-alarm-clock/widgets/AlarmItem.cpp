@@ -58,10 +58,10 @@ namespace gui
             onOffImage->switchState(ButtonState::Off);
         }
         if (alarm->repeat == static_cast<uint32_t>(AlarmRepeat::everyday)) {
-            periodLabel->setText(utils::localize.get("app_alarm_clock_repeat_everyday"));
+            periodLabel->setText(utils::translate("app_alarm_clock_repeat_everyday"));
         }
         else if (alarm->repeat == static_cast<uint32_t>(AlarmRepeat::weekDays)) {
-            periodLabel->setText(utils::localize.get("app_alarm_clock_repeat_week_days"));
+            periodLabel->setText(utils::translate("app_alarm_clock_repeat_week_days"));
         }
         else if (alarm->repeat != static_cast<uint32_t>(AlarmRepeat::never)) {
             periodLabel->setText(CustomRepeatValueParser(alarm->repeat).getWeekDaysText());

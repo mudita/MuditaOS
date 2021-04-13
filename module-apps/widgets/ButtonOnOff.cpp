@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ButtonOnOff.hpp"
@@ -27,12 +27,12 @@ namespace gui
         currentState = newButtonState;
         if (currentState == ButtonState::On) {
             setFillColor(ColorFullBlack);
-            setText(utils::translateI18("app_settings_toggle_on"));
+            setText(utils::translate("app_settings_toggle_on"));
             setTextColor(ColorFullWhite);
         }
         else if (currentState == ButtonState::Off) {
             setFillColor(ColorFullWhite);
-            setText(utils::translateI18("app_settings_toggle_off"));
+            setText(utils::translate("app_settings_toggle_off"));
             setTextColor(ColorFullBlack);
         }
     }

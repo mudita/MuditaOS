@@ -33,11 +33,11 @@ namespace app::alarmClock
         AppWindow::buildInterface();
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
 
-        setTitle(utils::localize.get("app_alarm_clock_title_main"));
+        setTitle(utils::translate("app_alarm_clock_title_main"));
         leftArrowImage = new gui::Image(
             this, style::alarmClock::window::arrow_x, style::alarmClock::window::arrow_y, 0, 0, "arrow_left");
         plusSignImage =
@@ -62,7 +62,7 @@ namespace app::alarmClock
                                       style::window_width,
                                       style::window_height - ::style::header::height - ::style::footer::height,
                                       "phonebook_empty_grey_circle_W_G",
-                                      utils::localize.get("app_alarm_clock_no_alarms_information"));
+                                      utils::translate("app_alarm_clock_no_alarms_information"));
         emptyListIcon->focusChangedCallback = [this](gui::Item &) {
             onEmptyList();
             return true;

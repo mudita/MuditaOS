@@ -21,7 +21,7 @@ namespace gui
                                title->offset_h(),
                                style::window::default_body_width,
                                style::window::volume::title_height,
-                               utils::localize.get(style::window::volume::base_title_key));
+                               utils::translate(style::window::volume::base_title_key));
 
         volumeText->setPenWidth(style::window::default_border_no_focus_w);
         volumeText->setFont(style::window::font::mediumbold);
@@ -69,7 +69,7 @@ namespace gui
 
     void VolumeWindow::showProperText(const AudioContext &audioContext, const audio::Volume volume) noexcept
     {
-        volumeText->setText(utils::localize.get(style::window::volume::base_title_key));
+        volumeText->setText(utils::translate(style::window::volume::base_title_key));
         const auto [profileType, playbackType] = audioContext;
         if (playbackType == audio::PlaybackType::Multimedia) {
             showMultimediaPlayback();
@@ -88,17 +88,17 @@ namespace gui
 
     void VolumeWindow::showMultimediaPlayback() noexcept
     {
-        volumeText->setText(utils::localize.get(style::window::volume::music_title_key));
+        volumeText->setText(utils::translate(style::window::volume::music_title_key));
     }
 
     void VolumeWindow::showCalling() noexcept
     {
-        volumeText->setText(utils::localize.get(style::window::volume::call_title_key));
+        volumeText->setText(utils::translate(style::window::volume::call_title_key));
     }
 
     void VolumeWindow::showMuted() noexcept
     {
-        volumeText->setText(utils::localize.get(style::window::volume::mute_title_key));
+        volumeText->setText(utils::translate(style::window::volume::mute_title_key));
     }
 
     bool VolumeWindow::onInput(const gui::InputEvent &inputEvent)

@@ -20,11 +20,11 @@ namespace gui
             },
             [=](Item &item) {
                 if (item.focus) {
-                    mWindow->setBottomBarText(utils::localize.get(style::strings::common::Switch),
+                    mWindow->setBottomBarText(utils::translate(style::strings::common::Switch),
                                               BottomBar::Side::CENTER);
                 }
                 else {
-                    mWindow->setBottomBarText(utils::localize.get(style::strings::common::select),
+                    mWindow->setBottomBarText(utils::translate(style::strings::common::select),
                                               BottomBar::Side::CENTER);
                 }
                 return true;

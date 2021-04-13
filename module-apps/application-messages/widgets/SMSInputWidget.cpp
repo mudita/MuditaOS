@@ -75,9 +75,9 @@ namespace gui
             if (inputText->focus) {
 
                 application->getWindow(gui::name::window::thread_view)
-                    ->setBottomBarText(utils::localize.get("sms_reply"), BottomBar::Side::CENTER);
+                    ->setBottomBarText(utils::translate("sms_reply"), BottomBar::Side::CENTER);
 
-                if (inputText->getText() == utils::localize.get("sms_temp_reply")) {
+                if (inputText->getText() == utils::translate("sms_temp_reply")) {
                     inputText->clear();
                 }
             }
@@ -87,7 +87,7 @@ namespace gui
 
                     // Temporary solution to be fixed when proper Text Color handling will be added.
                     auto format = TextFormat(Font(27).raw(), Color(7, 0));
-                    for (auto &el : textToTextBlocks(utils::localize.get("sms_temp_reply"), format)) {
+                    for (auto &el : textToTextBlocks(utils::translate("sms_temp_reply"), format)) {
                         inputText->addText(el);
                     }
                 }
@@ -116,7 +116,7 @@ namespace gui
 
     void SMSInputWidget::handleDraftMessage()
     {
-        if (const auto &text = inputText->getText(); text.empty() || (text == utils::localize.get("sms_temp_reply"))) {
+        if (const auto &text = inputText->getText(); text.empty() || (text == utils::translate("sms_temp_reply"))) {
             clearDraftMessage();
         }
         else {

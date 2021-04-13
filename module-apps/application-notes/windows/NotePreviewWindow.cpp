@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotePreviewWindow.hpp"
@@ -49,7 +49,7 @@ namespace app::notes
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_notes_title_main"));
+        setTitle(utils::translate("app_notes_title_main"));
 
         namespace previewStyle = app::notes::style::preview;
         date                   = new gui::Label(
@@ -71,13 +71,13 @@ namespace app::notes
         note->setCursorStartPosition(gui::CursorStartPosition::DocumentBegin);
 
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(::style::strings::common::options));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::options));
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get("app_notes_edit"));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate("app_notes_edit"));
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
 
         setFocusItem(note);
     }
@@ -98,12 +98,12 @@ namespace app::notes
     {
         utils::time::DateTime dt{timestamp};
         std::ostringstream dateText;
-        dateText << utils::localize.get("app_notes_edited") << ": ";
+        dateText << utils::translate("app_notes_edited") << ": ";
         if (dt.isToday()) {
-            dateText << utils::localize.get("common_today") << ", ";
+            dateText << utils::translate("common_today") << ", ";
         }
         else if (dt.isYesterday()) {
-            dateText << utils::localize.get("common_yesterday") << ", ";
+            dateText << utils::translate("common_yesterday") << ", ";
         }
         dateText << dt;
         date->setText(dateText.str());
@@ -116,7 +116,7 @@ namespace app::notes
                 application->switchWindow(gui::name::window::note_edit, std::make_unique<NoteSwitchData>(*notesRecord));
             }
             else if (inputEvent.is(gui::KeyCode::KEY_LF)) {
-                application->switchWindow(utils::localize.get("app_phonebook_options_title"),
+                application->switchWindow(utils::translate("app_phonebook_options_title"),
                                           std::make_unique<gui::OptionsWindowOptions>(notePreviewOptions(
                                               application, *notesRecord, presenter->getRepository(), note)));
             }

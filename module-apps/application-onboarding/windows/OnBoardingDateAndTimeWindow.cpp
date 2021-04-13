@@ -24,9 +24,9 @@ namespace app::onBoarding
     {
         DateAndTimeMainWindow::onBeforeShow(mode, data);
 
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(style::strings::common::Switch));
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::strings::common::Switch));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
     }
 
     bool OnBoardingDateAndTimeWindow::onInput(const gui::InputEvent &inputEvent)
@@ -43,9 +43,9 @@ namespace app::onBoarding
         }
         else if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_ENTER)) {
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                gui::DialogMetadata{utils::localize.get("app_onboarding_title_configuration"),
+                gui::DialogMetadata{utils::translate("app_onboarding_title_configuration"),
                                     "success_icon_W_G",
-                                    utils::localize.get("app_onboarding_configuration_successful"),
+                                    utils::translate("app_onboarding_configuration_successful"),
                                     "",
                                     [=]() -> bool { return true; }});
             application->switchWindow(gui::window::name::onBoarding_configuration_successful,
@@ -60,13 +60,13 @@ namespace app::onBoarding
 
     bool OnBoardingDateAndTimeWindow::bottomBarCallback(gui::Item &item)
     {
-        setBottomBarText(utils::localize.get(style::strings::common::save), gui::BottomBar::Side::CENTER);
+        setBottomBarText(utils::translate(style::strings::common::save), gui::BottomBar::Side::CENTER);
 
         if (item.focus) {
-            setBottomBarText(utils::localize.get(style::strings::common::Switch), gui::BottomBar::Side::LEFT);
+            setBottomBarText(utils::translate(style::strings::common::Switch), gui::BottomBar::Side::LEFT);
         }
         else {
-            setBottomBarText(utils::localize.get(style::strings::common::select), gui::BottomBar::Side::LEFT);
+            setBottomBarText(utils::translate(style::strings::common::select), gui::BottomBar::Side::LEFT);
         }
         return true;
     }

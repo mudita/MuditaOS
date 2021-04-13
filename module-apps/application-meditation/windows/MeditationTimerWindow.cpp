@@ -33,7 +33,7 @@ void MeditationTimerWindow::buildInterface()
     assert(app != nullptr); // Pre-condition check.
 
     AppWindow::buildInterface();
-    setTitle(utils::localize.get("app_meditation_title_main"));
+    setTitle(utils::translate("app_meditation_title_main"));
 
     timer = new MeditationTimer(style::meditation::timer::X,
                                 style::meditation::timer::Y,
@@ -125,27 +125,27 @@ void MeditationTimerWindow::setWidgetVisible(bool tBar, bool bBar, bool counter)
 void MeditationTimerWindow::setVisibleRunning()
 {
     setWidgetVisible(false, true, true);
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::pause));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::stop));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::pause));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::stop));
     meditationInfo->setVisible(false);
 }
 void MeditationTimerWindow::setVisiblePaused()
 {
     setWidgetVisible(true, true, true);
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::resume));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::stop));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::resume));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::stop));
 }
 void MeditationTimerWindow::setVisiblePreparation()
 {
     setWidgetVisible(false, false, false);
     TextFormat format(FontManager::getInstance().getFont(style::window::font::biglight));
     gui::text::RichTextParser parser;
-    auto textParsed = parser.parse(utils::localize.get("app_meditation_put_down_phone_and_wait"), &format);
+    auto textParsed = parser.parse(utils::translate("app_meditation_put_down_phone_and_wait"), &format);
     meditationInfo->setText(std::move(textParsed));
     meditationInfo->setVisible(true);
 
     finished = false;
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 }
 
 void MeditationTimerWindow::setVisibleMeditationEnd()
@@ -153,7 +153,7 @@ void MeditationTimerWindow::setVisibleMeditationEnd()
     setWidgetVisible(false, false, false);
     TextFormat format(FontManager::getInstance().getFont(style::window::font::biglight));
     gui::text::RichTextParser parser;
-    auto textParsed = parser.parse(utils::localize.get("app_meditation_thank_you_for_session"), &format);
+    auto textParsed = parser.parse(utils::translate("app_meditation_thank_you_for_session"), &format);
     finished        = true;
     meditationInfo->setText(std::move(textParsed));
     meditationInfo->setVisible(true);

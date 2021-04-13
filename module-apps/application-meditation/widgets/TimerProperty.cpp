@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimerProperty.hpp"
@@ -48,7 +48,7 @@ void TimerProperty::build()
     timeUnitLabel->setFont(style::window::font::verysmall);
     timeUnitLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
     timeUnitLabel->setEdges(RectangleEdge::None);
-    timeUnitLabel->setText(utils::localize.get("app_meditation_minutes"));
+    timeUnitLabel->setText(utils::translate("app_meditation_minutes"));
 }
 
 bool TimerProperty::onFocus(bool isFocused)
@@ -93,10 +93,10 @@ void TimerProperty::setMeditationTime()
     const auto meditationTime = static_cast<int>(state.getTime().count());
     timeLabel->setText(utils::to_string(meditationTime));
     if (meditationTime == 1) {
-        timeUnitLabel->setText(utils::localize.get("app_meditation_minute"));
+        timeUnitLabel->setText(utils::translate("app_meditation_minute"));
     }
     else {
-        timeUnitLabel->setText(utils::localize.get("app_meditation_minutes"));
+        timeUnitLabel->setText(utils::translate("app_meditation_minutes"));
     }
 }
 

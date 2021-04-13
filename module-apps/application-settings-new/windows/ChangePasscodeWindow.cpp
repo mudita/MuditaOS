@@ -76,7 +76,7 @@ namespace gui
 
     void ChangePasscodeWindow::buildTitleBar()
     {
-        setTitle(utils::localize.get("app_settings_security_change_passcode"));
+        setTitle(utils::translate("app_settings_security_change_passcode"));
     }
 
     void ChangePasscodeWindow::destroyInterface()
@@ -108,9 +108,9 @@ namespace gui
                 application->setLockScreenPasscodeOn(false);
 
                 auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                    gui::DialogMetadata{utils::localize.get("app_settings_security_change_passcode"),
+                    gui::DialogMetadata{utils::translate("app_settings_security_change_passcode"),
                                         "success_icon_W_G",
-                                        utils::localize.get("app_settings_security_passcode_disabled"),
+                                        utils::translate("app_settings_security_passcode_disabled"),
                                         "",
                                         [this]() {
                                             application->switchWindow(gui::window::name::security);
@@ -170,9 +170,9 @@ namespace gui
             application->setLockScreenPasscodeOn(true);
 
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                gui::DialogMetadata{utils::localize.get("app_settings_security_change_passcode"),
+                gui::DialogMetadata{utils::translate("app_settings_security_change_passcode"),
                                     "success_icon_W_G",
-                                    utils::localize.get("app_settings_security_passcode_changed_successfully"),
+                                    utils::translate("app_settings_security_passcode_changed_successfully"),
                                     "",
                                     [this]() {
                                         application->switchWindow(gui::window::name::security);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FotaWindow.hpp"
@@ -39,8 +39,8 @@ namespace gui
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("Go"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("Go"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("common_back"));
 
         mainBox = new gui::VBox(this, 0, title->offset_h(), style::window_width, style::window_height);
         mainBox->setPenWidth(style::window::default_border_no_focus_w);

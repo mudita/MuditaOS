@@ -12,7 +12,7 @@ namespace gui
 {
     EditQuotesWindow::EditQuotesWindow(app::Application *app) : BaseSettingsWindow(app, window::name::edit_quotes)
     {
-        setTitle(utils::localize.get("app_settings_display_wallpaper_edit_quotes"));
+        setTitle(utils::translate("app_settings_display_wallpaper_edit_quotes"));
     }
 
     auto EditQuotesWindow::buildOptionsList() -> std::list<gui::Option>
@@ -28,7 +28,7 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
+                        this->setBottomBarText(utils::translate(style::strings::common::Switch),
                                                BottomBar::Side::CENTER);
                     }
                     return true;
@@ -37,19 +37,19 @@ namespace gui
                 switcher ? gui::option::SettingRightItem::Checked : gui::option::SettingRightItem::Disabled));
         };
 
-        addCheckOption(utils::translateI18("app_settings_display_wallpaper_quotes_our_favourites"),
+        addCheckOption(utils::translate("app_settings_display_wallpaper_quotes_our_favourites"),
                        isOurFavouritesSwitchOn);
 
         if (isOurFavouritesSwitchOn) {
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                utils::translateI18("app_settings_display_wallpaper_quotes_categories"),
+                utils::translate("app_settings_display_wallpaper_quotes_categories"),
                 [=](gui::Item &item) {
                     application->switchWindow(gui::window::name::quote_categories, nullptr);
                     return true;
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                        this->setBottomBarText(utils::translate(style::strings::common::select),
                                                BottomBar::Side::CENTER);
                     }
                     return true;
@@ -58,18 +58,18 @@ namespace gui
                 gui::option::SettingRightItem::ArrowWhite));
         }
 
-        addCheckOption(utils::translateI18("app_settings_display_wallpaper_quotes_custom"), isCustomSwitchOn);
+        addCheckOption(utils::translate("app_settings_display_wallpaper_quotes_custom"), isCustomSwitchOn);
 
         if (isCustomSwitchOn) {
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                utils::translateI18("app_settings_display_wallpaper_edit_quotes"),
+                utils::translate("app_settings_display_wallpaper_edit_quotes"),
                 [=](gui::Item &item) {
                     application->switchWindow(gui::window::name::quotes, nullptr);
                     return true;
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                        this->setBottomBarText(utils::translate(style::strings::common::select),
                                                BottomBar::Side::CENTER);
                     }
                     return true;

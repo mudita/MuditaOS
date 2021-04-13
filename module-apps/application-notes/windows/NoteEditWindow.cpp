@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NoteEditWindow.hpp"
@@ -49,7 +49,7 @@ namespace app::notes
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_notes_edit_new_note"));
+        setTitle(utils::translate("app_notes_edit_new_note"));
 
         namespace editStyle = app::notes::style::edit;
         charactersCounter   = new gui::Label(
@@ -77,13 +77,13 @@ namespace app::notes
         edit->setTextLimitType(gui::TextLimitType::MaxSignsCount, MaxCharactersCount);
 
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(::style::strings::common::options));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::options));
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(::style::strings::common::save));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::save));
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
 
         setFocusItem(edit);
     }
@@ -129,7 +129,7 @@ namespace app::notes
             }
             if (inputEvent.is(gui::KeyCode::KEY_LF)) {
                 application->switchWindow(
-                    utils::localize.get("app_phonebook_options_title"),
+                    utils::translate("app_phonebook_options_title"),
                     std::make_unique<gui::OptionsWindowOptions>(noteEditOptions(application, *notesRecord, edit)));
             }
         }

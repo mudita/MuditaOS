@@ -1,9 +1,9 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "log/log.hpp"
-#include "i18n.hpp"
-#include "Utils.hpp"
+#include "i18nImpl.hpp"
+#include <log/log.hpp>
+#include <Utils.hpp>
 #include <cstdio>
 #include <purefs/filesystem_paths.hpp>
 
@@ -17,10 +17,38 @@ namespace utils
         }
     } // namespace
 
-    i18n localize;
-    json11::Json LangLoader::createJson(const std::string &filename)
+    namespace
     {
-        const auto path = utils::localize.DisplayLanguageDirPath / (filename + utils::files::jsonExtension);
+        class i18nPrivateInterface : public i18n
+        {
+          public:
+            const std::string &get(const std::string &str);
+            using i18n::getDisplayLanguage;
+            using i18n::getDisplayLanguagePath;
+            using i18n::getInputLanguageFilename;
+            using i18n::getInputLanguagePath;
+            using i18n::resetAssetsPath;
+            using i18n::resetDisplayLanguages;
+            using i18n::setDisplayLanguage;
+            using i18n::setInputLanguage;
+        };
+
+        const std::string &i18nPrivateInterface::get(const std::string &str)
+        {
+            // if language pack returned nothing then try default language
+            if (getDisplayLanguageJSON()[str].string_value().empty()) {
+                return returnNonEmptyString(getFallbackLanguageJSON()[str].string_value(), str);
+            }
+            return returnNonEmptyString(getDisplayLanguageJSON()[str].string_value(), str);
+        }
+
+    } // namespace
+
+    i18nPrivateInterface localize;
+
+    json11::Json LangLoaderImpl::createJson(const std::string &filename)
+    {
+        const auto path = localize.getDisplayLanguagePath() / (filename + utils::files::jsonExtension);
         auto fd         = std::fopen(path.c_str(), "r");
         if (fd == nullptr) {
             LOG_FATAL("Error during opening file %s", path.c_str());
@@ -51,7 +79,7 @@ namespace utils
     std::vector<Language> LangLoader::getAvailableDisplayLanguages() const
     {
         std::vector<std::string> languageNames;
-        for (const auto &entry : std::filesystem::directory_iterator(utils::localize.DisplayLanguageDirPath)) {
+        for (const auto &entry : std::filesystem::directory_iterator(getDisplayLanguagePath())) {
             languageNames.push_back(std::filesystem::path(entry.path()).stem());
         }
         return languageNames;
@@ -60,7 +88,7 @@ namespace utils
     std::vector<Language> LangLoader::getAvailableInputLanguages() const
     {
         std::vector<std::string> languageNames;
-        for (const auto &entry : std::filesystem::directory_iterator(utils::localize.InputLanguageDirPath)) {
+        for (const auto &entry : std::filesystem::directory_iterator(getInputLanguagePath())) {
             languageNames.push_back(std::filesystem::path(entry.path()).stem());
         }
         return languageNames;
@@ -72,13 +100,14 @@ namespace utils
         InputLanguageDirPath   = assets / "profiles";
     }
 
-    void i18n::setInputLanguage(const Language &lang)
+    bool i18n::setInputLanguage(const Language &lang)
     {
         if (lang.empty() || lang == inputLanguage) {
-            return;
+            return false;
         }
 
         inputLanguage = lang;
+        return true;
     }
 
     const std::string &i18n::getInputLanguageFilename(const std::string &inputMode)
@@ -91,25 +120,6 @@ namespace utils
             inputLanguageFilename = inputLanguage + utils::files::breakSign + inputMode;
         }
         return inputLanguageFilename;
-    }
-
-    const std::string &i18n::getInputLanguage()
-    {
-        return inputLanguage;
-    }
-
-    const std::string &i18n::getDisplayLanguage()
-    {
-        return currentDisplayLanguage;
-    }
-
-    const std::string &i18n::get(const std::string &str)
-    {
-        // if language pack returned nothing then try default language
-        if (displayLanguage[str].string_value().empty()) {
-            return returnNonEmptyString(fallbackLanguage[str].string_value(), str);
-        }
-        return returnNonEmptyString(displayLanguage[str].string_value(), str);
     }
 
     bool i18n::setDisplayLanguage(const Language &lang)
@@ -140,6 +150,48 @@ namespace utils
         displayLanguage = lang;
     }
 
+    void i18n::loadFallbackLanguage()
+    {
+        cpp_freertos::LockGuard lock(mutex);
+        currentDisplayLanguage = fallbackLanguageName;
+        fallbackLanguage       = loader.createJson(fallbackLanguageName);
+    }
+
+    const std::string &translate(const std::string &text)
+    {
+        return utils::localize.get(text);
+    }
+
+    const std::string &getDisplayLanguage()
+    {
+        return utils::localize.getDisplayLanguage();
+    }
+
+    const std::string &getInputLanguageFilename(const std::string &inputMode)
+    {
+        return localize.getInputLanguageFilename(inputMode);
+    }
+
+    bool setInputLanguage(const Language &lang)
+    {
+        return localize.setInputLanguage(lang);
+    }
+
+    bool setDisplayLanguage(const Language &lang)
+    {
+        return localize.setDisplayLanguage(lang);
+    }
+
+    const std::filesystem::path getInputLanguagePath()
+    {
+        return localize.getInputLanguagePath();
+    }
+
+    const std::filesystem::path getDisplayLanguagePath()
+    {
+        return localize.getDisplayLanguagePath();
+    }
+
     void i18n::resetDisplayLanguages()
     {
         currentDisplayLanguage.clear();
@@ -147,11 +199,14 @@ namespace utils
         fallbackLanguage = json11::Json();
     }
 
-    void i18n::loadFallbackLanguage()
+    void resetDisplayLanguages()
     {
-        cpp_freertos::LockGuard lock(mutex);
-        currentDisplayLanguage = fallbackLanguageName;
-        fallbackLanguage       = loader.createJson(fallbackLanguageName);
+        return localize.resetDisplayLanguages();
+    }
+
+    void resetAssetsPath(const std::filesystem::path &p)
+    {
+        return localize.resetAssetsPath(p);
     }
 
 } // namespace utils

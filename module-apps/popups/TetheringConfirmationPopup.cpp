@@ -17,8 +17,8 @@ namespace gui
     void TetheringConfirmationPopup::onBeforeShow(ShowMode mode, [[maybe_unused]] SwitchData *data)
     {
         DialogMetadata metadata;
-        metadata.title  = utils::translateI18("tethering");
-        metadata.text   = utils::translateI18("tethering_enable_question");
+        metadata.title  = utils::translate("tethering");
+        metadata.text   = utils::translate("tethering_enable_question");
         metadata.icon   = "tethering_icon";
         metadata.action = [this]() {
             application->bus.sendUnicast(std::make_shared<sys::TetheringEnabledResponse>(),

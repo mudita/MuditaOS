@@ -15,17 +15,16 @@ namespace gui
         : BaseSettingsWindow(app, gui::window::name::alarm_clock), mWidgetMaker(this),
           mAudioModel(std::move(audioModel))
     {
-        setTitle(utils::localize.get("app_settings_apps_alarm_clock"));
+        setTitle(utils::translate("app_settings_apps_alarm_clock"));
     }
 
     std::list<Option> AlarmClockWindow::buildOptionsList()
     {
         std::list<gui::Option> optionList;
         mVibrationsEnabled = mAudioModel->isVibrationEnabled();
-        mWidgetMaker.addSwitchOption(optionList,
-                                     utils::translateI18("app_settings_vibration"),
-                                     mVibrationsEnabled,
-                                     [&]() { switchVibrationState(); });
+        mWidgetMaker.addSwitchOption(optionList, utils::translate("app_settings_vibration"), mVibrationsEnabled, [&]() {
+            switchVibrationState();
+        });
 
         auto focusCallback = [&](gui::Item &item) {
             if (item.focus) {
@@ -35,7 +34,7 @@ namespace gui
         };
 
         optionList.emplace_back(std::make_unique<gui::SpinBoxOptionSettings>(
-            utils::translateI18("app_settings_volume"),
+            utils::translate("app_settings_volume"),
             mAudioModel->getVolume(),
             std::ceil(10.0),
             [&](uint8_t value) {

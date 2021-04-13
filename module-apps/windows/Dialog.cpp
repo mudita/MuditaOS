@@ -12,7 +12,7 @@ using namespace gui;
 Dialog::Dialog(app::Application *app, const std::string &name) : gui::AppWindow(app, name)
 {
     AppWindow::buildInterface();
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
     setTitle("");
 
     icon = new Icon(this,
@@ -40,7 +40,7 @@ void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
 DialogConfirm::DialogConfirm(app::Application *app, const std::string &name) : Dialog(app, name)
 {
     bottomBar->setActive(BottomBar::Side::RIGHT, false);
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::ok));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::ok));
     setFocusItem(icon);
     icon->inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
         if (inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == gui::KeyCode::KEY_RF) {
@@ -75,18 +75,18 @@ DialogYesNo::DialogYesNo(app::Application *app, const std::string &name) : Dialo
     no  = createYesNoOption(hBox, gui::dialog::Option::NO);
     yes = createYesNoOption(hBox, gui::dialog::Option::YES);
 
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_confirm"));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::translate("common_confirm"));
 }
 
 Label *DialogYesNo::createYesNoOption(Item *parent, const gui::dialog::Option &optionName)
 {
     Label *option = new Label(parent, 0, 0, 0, 0, "");
     if (optionName == gui::dialog::Option::YES) {
-        option->setText(utils::localize.get(style::strings::common::yes));
+        option->setText(utils::translate(style::strings::common::yes));
         option->activatedCallback = [=](Item &) -> bool { return false; };
     }
     else if (optionName == gui::dialog::Option::NO) {
-        option->setText(utils::localize.get(style::strings::common::no));
+        option->setText(utils::translate(style::strings::common::no));
         option->setMargins(Margins(0, 0, dialog::style::option::margin, 0));
         option->activatedCallback = [=](Item &) -> bool {
             application->returnToPreviousWindow();
@@ -145,7 +145,7 @@ void DialogYesNoIconTxt::onBeforeShow(ShowMode mode, SwitchData *data)
 
 DialogRetry::DialogRetry(app::Application *app, const std::string &name) : Dialog(app, name)
 {
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::retry));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::retry));
     setFocusItem(bottomBar);
 }
 

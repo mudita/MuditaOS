@@ -3,6 +3,7 @@
 #include <cstring>
 #include "ATStream.hpp"
 #include "ATCommon.hpp"
+#include <map>
 
 namespace at
 {

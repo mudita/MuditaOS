@@ -13,7 +13,7 @@ namespace gui
     DateAndTimeMainWindow::DateAndTimeMainWindow(app::Application *app)
         : BaseSettingsWindow(app, window::name::date_and_time)
     {
-        setTitle(utils::localize.get("app_settings_date_and_time"));
+        setTitle(utils::translate("app_settings_date_and_time"));
         automaticDateAndTimeIsOn = utils::dateAndTimeSettings.isAutomaticDateAndTimeOn();
         automaticTimeZoneIsOn    = utils::dateAndTimeSettings.isAutomaticTimeZoneOn();
         timeFormat               = utils::dateAndTimeSettings.getTimeFormat();
@@ -43,7 +43,7 @@ namespace gui
         };
 
         addSwitchOption(
-            utils::translateI18("app_settings_date_and_time_automatic_date_and_time"),
+            utils::translate("app_settings_date_and_time_automatic_date_and_time"),
             [=](Item &item) {
                 automaticDateAndTimeIsOn = !automaticDateAndTimeIsOn;
                 app::manager::Controller::changeAutomaticDateAndTimeIsOn(application, automaticDateAndTimeIsOn);
@@ -53,7 +53,7 @@ namespace gui
             automaticDateAndTimeIsOn ? option::SettingRightItem::On : option::SettingRightItem::Off);
 
         if (!automaticDateAndTimeIsOn) {
-            addOption(utils::translateI18("app_settings_date_and_time_change_date_and_time"), [=](Item &item) {
+            addOption(utils::translate("app_settings_date_and_time_change_date_and_time"), [=](Item &item) {
                 LOG_INFO("switching to %s page", window::name::change_date_and_time);
                 application->switchWindow(window::name::change_date_and_time, nullptr);
                 return true;
@@ -61,7 +61,7 @@ namespace gui
         }
 
         addSwitchOption(
-            utils::translateI18("app_settings_date_and_time_automatic_time_zone"),
+            utils::translate("app_settings_date_and_time_automatic_time_zone"),
             [=](Item &item) {
                 automaticTimeZoneIsOn = !automaticTimeZoneIsOn;
                 app::manager::Controller::changeAutomaticTimeZoneIsOn(application, automaticTimeZoneIsOn);
@@ -71,7 +71,7 @@ namespace gui
             automaticTimeZoneIsOn ? option::SettingRightItem::On : option::SettingRightItem::Off);
 
         if (!automaticTimeZoneIsOn) {
-            addOption(utils::translateI18("app_settings_date_and_time_change_time_zone"), [=](Item &item) {
+            addOption(utils::translate("app_settings_date_and_time_change_time_zone"), [=](Item &item) {
                 LOG_INFO("switching to %s page", window::name::change_time_zone);
                 application->switchWindow(window::name::change_time_zone, nullptr);
                 return true;
@@ -79,7 +79,7 @@ namespace gui
         }
 
         addSwitchOption(
-            utils::translateI18("app_settings_date_and_time_time_format"),
+            utils::translate("app_settings_date_and_time_time_format"),
             [=](Item &item) {
                 timeFormat = (timeFormat == utils::time::Locale::TimeFormat::FormatTime12H)
                                  ? utils::time::Locale::TimeFormat::FormatTime24H
@@ -92,7 +92,7 @@ namespace gui
             utils::time::Locale::get_time_format(timeFormat).data());
 
         addSwitchOption(
-            utils::translateI18("app_settings_date_and_time_date_format"),
+            utils::translate("app_settings_date_and_time_date_format"),
             [=](Item &item) {
                 dateFormat = (dateFormat == utils::time::Locale::DateFormat::DD_MM_YYYY)
                                  ? utils::time::Locale::DateFormat::MM_DD_YYYY
@@ -110,10 +110,10 @@ namespace gui
     bool DateAndTimeMainWindow::bottomBarCallback(Item &item)
     {
         if (item.focus) {
-            setBottomBarText(utils::localize.get(style::strings::common::Switch), BottomBar::Side::CENTER);
+            setBottomBarText(utils::translate(style::strings::common::Switch), BottomBar::Side::CENTER);
         }
         else {
-            setBottomBarText(utils::localize.get(style::strings::common::select), BottomBar::Side::CENTER);
+            setBottomBarText(utils::translate(style::strings::common::select), BottomBar::Side::CENTER);
         }
         return true;
     }

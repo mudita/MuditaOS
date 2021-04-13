@@ -45,11 +45,11 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_calllog_title_main"));
+        setTitle(utils::translate("app_calllog_title_main"));
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::call));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         list = new gui::ListView(this,
                                  mainWindow::x,

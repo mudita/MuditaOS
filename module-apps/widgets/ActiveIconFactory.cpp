@@ -28,7 +28,7 @@ auto ActiveIconFactory::makeCustomIcon(const UTF8 &image,
         if (icon->focus) {
             icon->setEdges(RectangleEdge::Bottom | RectangleEdge::Top);
             application->getCurrentWindow()->bottomBarTemporaryMode(
-                utils::localize.get(name), BottomBar::Side::CENTER, false);
+                utils::translate(name), BottomBar::Side::CENTER, false);
         }
         else {
             icon->setEdges(RectangleEdge::None);

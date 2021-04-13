@@ -27,11 +27,11 @@ namespace app::onBoarding
         AppWindow::buildInterface();
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(::style::strings::common::start));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::start));
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(::style::strings::common::skip));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::skip));
 
         new gui::Icon(this,
                       0,
@@ -39,7 +39,7 @@ namespace app::onBoarding
                       style::window_width,
                       style::window::default_body_height,
                       "logo_no_text",
-                      utils::localize.get("app_onboarding_start_configuration"));
+                      utils::translate("app_onboarding_start_configuration"));
     }
 
     bool StartConfigurationWindow::onInput(const gui::InputEvent &inputEvent)
@@ -58,15 +58,15 @@ namespace app::onBoarding
             if (inputEvent.is(gui::KeyCode::KEY_LF)) {
 
                 auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
-                    utils::localize.get("app_onboarding_title"),
+                    utils::translate("app_onboarding_title"),
                     "info_icon_W_G",
-                    utils::localize.get("app_onboarding_skip_confirm"),
+                    utils::translate("app_onboarding_skip_confirm"),
                     "",
                     [=]() -> bool {
                         auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                            gui::DialogMetadata{utils::localize.get("app_onboarding_title_configuration"),
+                            gui::DialogMetadata{utils::translate("app_onboarding_title_configuration"),
                                                 "info_icon_W_G",
-                                                utils::localize.get("app_onboarding_no_configuration"),
+                                                utils::translate("app_onboarding_no_configuration"),
                                                 "",
                                                 [=]() -> bool { return true; }});
 

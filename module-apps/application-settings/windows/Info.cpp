@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Info.hpp"
@@ -35,7 +35,7 @@ namespace gui
     {
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         setTitle("Info");
 
@@ -47,12 +47,12 @@ namespace gui
         addAlignedLabelWithValue(box, "GIT branch:", std::string(GIT_BRANCH));
         addAlignedLabelWithValue(box, "Version:", std::string(VERSION));
         {
-            addAlignedLabelWithValue(box, "Bootloader:", utils::localize.get("not available"));
+            addAlignedLabelWithValue(box, "Bootloader:", utils::translate("not available"));
         }
         std::string firmwareVersion;
         CellularServiceAPI::GetFirmwareVersion(getApplication(), firmwareVersion);
         addAlignedLabelWithValue(
-            box, "Modem Frimware:", (firmwareVersion.empty() ? utils::localize.get("not available") : firmwareVersion));
+            box, "Modem Frimware:", (firmwareVersion.empty() ? utils::translate("not available") : firmwareVersion));
     }
 
     void Info::destroyInterface()

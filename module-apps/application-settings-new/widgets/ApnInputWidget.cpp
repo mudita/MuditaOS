@@ -128,7 +128,7 @@ namespace gui
 
     void ApnInputWidget::nameHandler()
     {
-        titleLabel->setText(utils::localize.get("app_settings_apn_name"));
+        titleLabel->setText(utils::translate("app_settings_apn_name"));
         inputText->setTextType(TextType::SingleLine);
         onSaveCallback = [&](std::shared_ptr<packet_data::APN::Config> apnRecord) {
             apnRecord->apn = inputText->getText();
@@ -141,7 +141,7 @@ namespace gui
 
     void ApnInputWidget::apnHandler()
     {
-        titleLabel->setText(utils::localize.get("app_settings_apn_APN"));
+        titleLabel->setText(utils::translate("app_settings_apn_APN"));
         inputText->setTextType(TextType::SingleLine);
         onSaveCallback = [&](std::shared_ptr<packet_data::APN::Config> apnRecord) {
             apnRecord->ip = inputText->getText();
@@ -154,7 +154,7 @@ namespace gui
 
     void ApnInputWidget::usernameHandler()
     {
-        titleLabel->setText(utils::localize.get("app_settings_apn_username"));
+        titleLabel->setText(utils::translate("app_settings_apn_username"));
         inputText->setTextType(TextType::SingleLine);
         onSaveCallback = [&](std::shared_ptr<packet_data::APN::Config> apnRecord) {
             apnRecord->username = inputText->getText();
@@ -167,7 +167,7 @@ namespace gui
 
     void ApnInputWidget::passwordNumberHandler()
     {
-        titleLabel->setText(utils::localize.get("app_settings_apn_password"));
+        titleLabel->setText(utils::translate("app_settings_apn_password"));
         inputText->setTextType(TextType::SingleLine);
         onSaveCallback = [&](std::shared_ptr<packet_data::APN::Config> apnRecord) {
             apnRecord->password = inputText->getText();
@@ -180,7 +180,7 @@ namespace gui
 
     void ApnInputWidget::authtypeHandler()
     {
-        titleLabel->setText(utils::localize.get("app_settings_apn_authtype"));
+        titleLabel->setText(utils::translate("app_settings_apn_authtype"));
         inputText->setTextType(TextType::SingleLine);
         onSaveCallback = [&](std::shared_ptr<packet_data::APN::Config> apnRecord) {
             apnRecord->setAuthMethod(inputText->getText());
@@ -193,7 +193,7 @@ namespace gui
 
     void ApnInputWidget::apntypeHandler()
     {
-        titleLabel->setText(utils::localize.get("app_settings_apn_apntype"));
+        titleLabel->setText(utils::translate("app_settings_apn_apntype"));
         inputText->setTextType(TextType::SingleLine);
         onSaveCallback = [&](std::shared_ptr<packet_data::APN::Config> apnRecord) {
             apnRecord->setApnType(inputText->getText());
@@ -205,7 +205,7 @@ namespace gui
     }
     void ApnInputWidget::protocolHandler()
     {
-        titleLabel->setText(utils::localize.get("app_settings_apn_apnprotocol"));
+        titleLabel->setText(utils::translate("app_settings_apn_apnprotocol"));
         inputText->setTextType(TextType::SingleLine);
         onSaveCallback = [&](std::shared_ptr<packet_data::APN::Config> apnRecord) {
             apnRecord->setApnProtocol(inputText->getText());

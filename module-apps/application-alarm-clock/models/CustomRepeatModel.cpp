@@ -38,7 +38,7 @@ namespace app::alarmClock
     void CustomRepeatModel::createData(const WeekDaysRepeatData &data)
     {
         for (auto const &[key, dayName] : gui::CustomCheckBoxWithLabel::weekDays) {
-            internalData.push_back(new gui::CustomCheckBoxWithLabel(application, utils::localize.get(dayName), data));
+            internalData.push_back(new gui::CustomCheckBoxWithLabel(application, utils::translate(dayName), data));
         }
 
         for (auto &item : internalData) {

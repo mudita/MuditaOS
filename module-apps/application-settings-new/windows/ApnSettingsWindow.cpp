@@ -20,7 +20,7 @@ namespace gui
 
     void ApnSettingsWindow::buildInterface()
     {
-        setTitle(utils::localize.get("app_settings_network_apn_settings"));
+        setTitle(utils::translate("app_settings_network_apn_settings"));
 
         leftArrowImage = new gui::Image(this,
                                         style::settings::window::leftArrowImage::x,
@@ -40,9 +40,9 @@ namespace gui
                                  style::window_width,
                                  style::window_height - style::header::height - style::footer::height,
                                  "phonebook_empty_grey_circle_W_G",
-                                 utils::localize.get("app_settings_apn_settings_no_apns"));
+                                 utils::translate("app_settings_apn_settings_no_apns"));
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
 
         activeApn        = std::make_shared<packet_data::APN::Config>();
         apnSettingsModel = std::make_shared<ApnSettingsModel>(application);
