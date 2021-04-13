@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Endpoint.hpp"
+#include "Stream.hpp"
 
 #include <memory>
 #include <vector>
@@ -16,7 +17,7 @@ namespace audio
       public:
         explicit StreamFactory(Endpoint::Capabilities factoryCaps,
                                unsigned int bufferingSize = Stream::defaultBufferingSize);
-        auto makeStream(const Source &source, const Sink &sink) -> std::unique_ptr<Stream>;
+        auto makeStream(Source &source, Sink &sink) -> std::unique_ptr<Stream>;
 
       private:
         auto negotiateCaps(std::vector<std::reference_wrapper<const Endpoint>> v) -> Endpoint::Capabilities;
