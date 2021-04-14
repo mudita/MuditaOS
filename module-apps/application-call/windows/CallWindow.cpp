@@ -338,6 +338,25 @@ namespace gui
         return false;
     }
 
+    bool CallWindow::handleHeadsetOkButton()
+    {
+        switch (getState()) {
+        case State::INCOMING_CALL:
+            interface->answerIncomingCall();
+            return true;
+        case State::OUTGOING_CALL:
+            [[fallthrough]];
+        case State::CALL_IN_PROGRESS:
+            interface->hangupCall();
+            return true;
+        case State::IDLE:
+        case State::CALL_ENDED:
+            break;
+        }
+
+        return false;
+    }
+
     bool CallWindow::handleDigit(const uint32_t digit)
     {
         interface->transmitDtmfTone(digit);
@@ -363,6 +382,9 @@ namespace gui
                 break;
             case KeyCode::KEY_RF:
                 handled = handleRightButton();
+                break;
+            case KeyCode::HEADSET_OK:
+                handled = handleHeadsetOkButton();
                 break;
             default:
                 break;

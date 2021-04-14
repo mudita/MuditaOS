@@ -335,16 +335,13 @@ bsp::KeyCodes WorkerEvent::headsetKeyToKeyboardKey(uint8_t headsetKeyCode)
 {
     switch (headsetKeyCode) {
     case static_cast<uint8_t>(bsp::headset::KeyCode::Key1):
-        return bsp::KeyCodes::JoystickEnter;
-
-    case static_cast<uint8_t>(bsp::headset::KeyCode::Key2):
-        return bsp::KeyCodes::Undefined;
+        return bsp::KeyCodes::HeadsetOk;
 
     case static_cast<uint8_t>(bsp::headset::KeyCode::Key3):
-        return bsp::KeyCodes::VolUp;
+        return bsp::KeyCodes::HeadsetVolUp;
 
     case static_cast<uint8_t>(bsp::headset::KeyCode::Key4):
-        return bsp::KeyCodes::VolDown;
+        return bsp::KeyCodes::HeadsetVolDown;
     }
     return bsp::KeyCodes::Undefined;
 }

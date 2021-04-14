@@ -58,6 +58,10 @@ void RWindow::keyMapInit(void)
     keyMap.insert(std::pair<int8_t, uint32_t>('b', static_cast<uint32_t>(bsp::KeyCodes::SSwitchMid)));
     keyMap.insert(std::pair<int8_t, uint32_t>('n', static_cast<uint32_t>(bsp::KeyCodes::SSwitchUp)));
 
+    keyMap.insert(std::pair<int8_t, uint32_t>('u', static_cast<uint32_t>(bsp::KeyCodes::HeadsetOk)));
+    keyMap.insert(std::pair<int8_t, uint32_t>('j', static_cast<uint32_t>(bsp::KeyCodes::HeadsetVolUp)));
+    keyMap.insert(std::pair<int8_t, uint32_t>('m', static_cast<uint32_t>(bsp::KeyCodes::HeadsetVolDown)));
+
     batteryKeyMap.insert(std::pair<int8_t, uint32_t>('[', 1));
     batteryKeyMap.insert(std::pair<int8_t, uint32_t>(']', 2));
     batteryKeyMap.insert(std::pair<int8_t, uint32_t>('p', 3));
