@@ -617,6 +617,8 @@ namespace app
             setState(State::ACTIVE_BACKGROUND);
         }
 
+        lockScreenPasscodeIsOn = utils::getNumericValue<bool>(
+            settings->getValue(settings::SystemProperties::lockScreenPasscodeIsOn, settings::SettingsScope::Global));
         settings->registerValueChange(
             settings::SystemProperties::lockScreenPasscodeIsOn,
             [this](const std::string &value) { lockScreenPasscodeIsOn = utils::getNumericValue<bool>(value); },

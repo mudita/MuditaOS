@@ -386,6 +386,9 @@ namespace app
             return ret;
         }
 
+        lockPassHashChanged(
+            settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global));
+
         requestNotSeenNotifications(this);
         requestUnreadThreadsCount(this);
         requestUnreadCallsCount(this);

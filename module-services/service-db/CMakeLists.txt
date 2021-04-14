@@ -7,6 +7,7 @@ set(SOURCES
     DBServiceAPI_GetByQuery.cpp
     DatabaseAgent.cpp
     ServiceDB.cpp
+    EntryPath.cpp
     messages/DBCalllogMessage.cpp
     messages/DBContactMessage.cpp
     messages/DBNotificationMessage.cpp
