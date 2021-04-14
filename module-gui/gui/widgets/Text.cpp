@@ -206,8 +206,12 @@ namespace gui
     void Text::setFont(const UTF8 &fontName)
     {
         RawFont *newFont = FontManager::getInstance().getFont(fontName);
-        format.setFont(newFont);
-        buildCursor();
+
+        if (format.getFont() != newFont) {
+            format.setFont(newFont);
+            buildCursor();
+            drawLines();
+        }
     }
 
     void Text::setFont(RawFont *font)

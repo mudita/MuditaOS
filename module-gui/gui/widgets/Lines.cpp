@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Lines.hpp"
@@ -80,20 +80,37 @@ namespace gui
             auto textLine =
                 gui::TextLine(drawCursor, w, initHeight, underLine, UnderlineDrawMode::WholeLine, underLinePadding);
 
-            if (textLine.height() > 0 && initHeight != textLine.height()) {
+            if ((textLine.height() > 0) && initHeight != textLine.height()) {
                 initHeight = textLine.height();
             }
 
-            if (lineYPosition + initHeight > h) {
-                stopCondition = LinesDrawStop::OutOfSpace;
-                addToInvisibleLines(std::move(textLine));
+            if (!previousLinesStart.empty() && (textLine.length() == 0) && textLine.getLineEnd()) {
+                stopCondition = LinesDrawStop::OutOfText;
                 break;
             }
 
+            if (lineYPosition + initHeight > h) {
+                if ((textLine.length() == 0) && textLine.getLineEnd()) {
+                    stopCondition = LinesDrawStop::OutOfText;
+                    break;
+                }
+                else {
+                    stopCondition = LinesDrawStop::OutOfSpace;
+                    addToInvisibleLines(std::move(textLine));
+                    break;
+                }
+            }
+
             if (lines.size() >= linesCount) {
-                stopCondition = LinesDrawStop::OutOfSpace;
-                addToInvisibleLines(std::move(textLine));
-                break;
+                if ((textLine.length() == 0) && textLine.getLineEnd()) {
+                    stopCondition = LinesDrawStop::OutOfText;
+                    break;
+                }
+                else {
+                    stopCondition = LinesDrawStop::OutOfSpace;
+                    addToInvisibleLines(std::move(textLine));
+                    break;
+                }
             }
 
             emplace(std::move(textLine));
