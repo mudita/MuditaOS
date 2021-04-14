@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -47,32 +47,9 @@ namespace settings
                 scope    = SettingsScope::AppLocal;
             }
         }
-
-        bool operator<(const EntryPath &other) const
-        {
-            if (mode < other.mode)
-                return true;
-            if (mode > other.mode)
-                return false;
-            if (service < other.service)
-                return true;
-            if (service > other.service)
-                return false;
-            if (profile < other.profile)
-                return true;
-            if (profile > other.profile)
-                return false;
-            if (variable < other.variable)
-                return true;
-            if (variable > other.variable)
-                return false;
-            if (scope < other.scope)
-                return true;
-            if (scope > other.scope)
-                return false;
-            return false;
-        }
     };
+
+    bool operator<(const EntryPath &lhs, const EntryPath &rhs) noexcept;
 
     namespace Messages
     {
