@@ -21,18 +21,22 @@ namespace sys::phone_modes
 
     bool Subject::setMode(PhoneMode _phoneMode, Tethering _tetheringMode)
     {
-        const bool changed = changePhoneMode(_phoneMode) || changeTetheringMode(_tetheringMode);
-        if (changed) {
-            notifyChange();
+        const bool phoneModeChanged = changePhoneMode(_phoneMode);
+        if (phoneModeChanged) {
+            notifyPhoneModeChange();
         }
-        return changed;
+        const bool tetheringChanged = changeTetheringMode(_tetheringMode);
+        if (tetheringChanged) {
+            notifyTetheringChange();
+        }
+        return phoneModeChanged || tetheringChanged;
     }
 
     bool Subject::setPhoneMode(PhoneMode mode)
     {
         const auto changed = changePhoneMode(mode);
         if (changed) {
-            notifyChange();
+            notifyPhoneModeChange();
         }
         return changed;
     }
@@ -46,7 +50,7 @@ namespace sys::phone_modes
     {
         const auto changed = changeTetheringMode(mode);
         if (changed) {
-            notifyChange();
+            notifyTetheringChange();
         }
         return changed;
     }
@@ -56,12 +60,21 @@ namespace sys::phone_modes
         return std::exchange(tetheringMode, mode) != mode;
     }
 
-    void Subject::notifyChange()
+    void Subject::notifyPhoneModeChange()
     {
-        LOG_INFO("Phone modes changed: Phone mode: [%s]; Tethering: [%s]. Notifying phone modes observers.",
-                 magic_enum::enum_name(phoneMode).data(),
+        LOG_INFO("Phone mode changed to: [%s]. Notifying phone modes observers.",
+                 magic_enum::enum_name(phoneMode).data());
+        owner->bus.sendMulticast(std::make_shared<PhoneModeChanged>(phoneMode), BusChannel::PhoneModeChanges);
+    }
+
+    void Subject::notifyTetheringChange()
+    {
+        LOG_INFO("Tethering mode changed to: [%s]. Notifying phone modes observers.",
                  magic_enum::enum_name(tetheringMode).data());
-        auto message = std::make_shared<PhoneModeChanged>(phoneMode, tetheringMode);
-        owner->bus.sendMulticast(std::move(message), BusChannel::PhoneModeChanges);
+        owner->bus.sendMulticast(std::make_shared<TetheringChanged>(tetheringMode), BusChannel::PhoneModeChanges);
+    }
+    bool Subject::isTetheringEnabled() const noexcept
+    {
+        return tetheringMode == Tethering::On;
     }
 } // namespace sys::phone_modes

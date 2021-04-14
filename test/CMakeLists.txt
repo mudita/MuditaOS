@@ -6,6 +6,12 @@ list(APPEND CMAKE_MODULE_PATH "${CATCH2_PATH}/contrib/")
 add_subdirectory(googletest)
 add_subdirectory(${CATCH2_PATH})
 
+define_property(
+    DIRECTORY PROPERTY TEST_ENTITY INHERITED
+    BRIEF_DOCS "Test entity of the directory"
+    FULL_DOCS "Add directory to a test entity to group tests defined in the directory and its subdirectories"
+)
+
 include(CMakeParseArguments)
 include(GoogleTest)
 include(Catch)
@@ -31,6 +37,8 @@ function(add_gtest_executable)
     if(NOT _TEST_ARGS_SRCS)
 	message(FATAL_ERROR "You must provide test sources for ${_TESTNAME}")
     endif(NOT _TEST_ARGS_SRCS)
+
+    get_directory_property(_TEST_ENTITY TEST_ENTITY)
 
     add_executable(${_TESTNAME} EXCLUDE_FROM_ALL ${_TEST_ARGS_SRCS})
 
@@ -65,7 +73,11 @@ function(add_gtest_executable)
 
     add_dependencies(unittests ${_TESTNAME})
     add_dependencies(check ${_TESTNAME})
-    
+
+    if(_TEST_ENTITY)
+        add_dependencies(unittests-${_TEST_ENTITY} ${_TESTNAME})
+    endif()
+
     gtest_add_tests(${_TESTNAME} "" AUTO)
 endfunction()
 
@@ -84,8 +96,10 @@ function(add_catch2_executable)
     set(_TESTNAME "catch2-${_TEST_ARGS_NAME}")
 
     if(NOT _TEST_ARGS_SRCS)
-	    message(FATAL_ERROR "You must provide test sources for ${_TESTNAME}")
+        message(FATAL_ERROR "You must provide test sources for ${_TESTNAME}")
     endif(NOT _TEST_ARGS_SRCS)
+
+    get_directory_property(_TEST_ENTITY TEST_ENTITY)
 
     add_executable(${_TESTNAME} EXCLUDE_FROM_ALL ${_TEST_ARGS_SRCS})
 
@@ -117,7 +131,40 @@ function(add_catch2_executable)
 
     add_dependencies(unittests ${_TESTNAME})
     add_dependencies(check ${_TESTNAME})
-    catch_discover_tests(${_TESTNAME} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+    if(_TEST_ENTITY)
+        add_dependencies(unittests-${_TEST_ENTITY} ${_TESTNAME})
+    endif()
+
+    catch_discover_tests(${_TESTNAME}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        PROPERTIES LABELS ${_TEST_ENTITY}
+    )
+endfunction()
+
+function(add_test_entity)
+    cmake_parse_arguments(
+        _ARGS
+        ""
+        "NAME"
+        ""
+        ${ARGN}
+    )
+
+    if(NOT _ARGS_NAME)
+        message(FATAL_ERROR "You must provide a test entity name")
+    endif(NOT _ARGS_NAME)
+
+    message("Adding test entity: ${_ARGS_NAME}")
+
+    set_directory_properties(PROPERTIES
+        TEST_ENTITY ${_ARGS_NAME}
+        LABELS ${_ARGS_NAME}
+    )
+
+    add_custom_target(unittests-${_ARGS_NAME})
+    add_custom_target(check-${_ARGS_NAME} ${CMAKE_CTEST_COMMAND} -L ${_ARGS_NAME})
+    add_dependencies(check-${_ARGS_NAME} unittests-${_ARGS_NAME})
 endfunction()
 
 set(_CATCH_DISCOVER_TESTS_SCRIPT ${_CATCH_DISCOVER_TESTS_SCRIPT} PARENT_SCOPE)

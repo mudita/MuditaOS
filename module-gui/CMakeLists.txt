@@ -1,8 +1,9 @@
 ﻿cmake_minimum_required(VERSION 3.12)
 
-
 project(module-gui VERSION 1.0
         DESCRIPTION "GUI library dedicated for pure phone.")
+
+module_is_test_entity()
 
 if( NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)
@@ -10,7 +11,6 @@ else()
 	set(CMAKE_CXX_STANDARD 17)
     include(targets/Target_Linux.cmake)
 endif()
-
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 include(gui/CMakeLists.txt)

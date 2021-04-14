@@ -41,8 +41,11 @@ namespace gui::window::name
 
 namespace app
 {
-    ApplicationSettings::ApplicationSettings(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground)
+    ApplicationSettings::ApplicationSettings(std::string name,
+                                             std::string parent,
+                                             sys::phone_modes::PhoneMode mode,
+                                             StartInBackground startInBackground)
+        : Application(name, parent, mode, startInBackground)
     {
         bus.channels.push_back(sys::BusChannel::AntennaNotifications);
         addActionReceiver(manager::actions::SelectSimCard, [this](auto &&data) {
@@ -105,8 +108,6 @@ namespace app
 
         createUserInterface();
 
-        setActiveWindow(gui::name::window::main_window);
-
         return ret;
     }
 
@@ -163,7 +164,10 @@ namespace app
                                   });
         }
 
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::PhoneModes});
     }
 
     void ApplicationSettings::destroyUserInterface()

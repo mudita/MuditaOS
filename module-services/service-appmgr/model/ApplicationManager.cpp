@@ -5,12 +5,15 @@
 #include <service-appmgr/Controller.hpp>
 
 #include <module-apps/messages/AppMessage.hpp>
+#include <module-apps/popups/data/PhoneModeParams.hpp>
+#include <module-apps/popups/data/PopupRequestParams.hpp>
 #include <Common.hpp>
 #include <Service/Message.hpp>
 #include <module-sys/Timers/TimerFactory.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <SystemManager/messages/SystemManagerMessage.hpp>
 #include <SystemManager/messages/TetheringQuestionRequest.hpp>
+#include <SystemManager/messages/TetheringPhoneModeChangeProhibitedMessage.hpp>
 #include <application-call/ApplicationCall.hpp>
 #include <application-special-input/ApplicationSpecialInput.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
@@ -100,6 +103,26 @@ namespace app::manager
     auto ApplicationManagerBase::getApplication(const ApplicationName &name) const noexcept -> ApplicationHandle *
     {
         return applications.findByName(name);
+    }
+
+    auto ApplicationManagerBase::getRunningApplications() noexcept -> std::vector<ApplicationHandle *>
+    {
+        const auto &stackOfUniqueApps = getStackOfUniqueApplications();
+        std::vector<ApplicationHandle *> runningApps;
+        std::transform(stackOfUniqueApps.begin(),
+                       stackOfUniqueApps.end(),
+                       std::back_inserter(runningApps),
+                       [this](const auto &appName) { return getApplication(appName); });
+        return runningApps;
+    }
+
+    auto ApplicationManagerBase::getStackOfUniqueApplications() const -> ApplicationsStack
+    {
+        auto stackOfUniqueApps = stack;
+        std::sort(stackOfUniqueApps.begin(), stackOfUniqueApps.end());
+        const auto last = std::unique(stackOfUniqueApps.begin(), stackOfUniqueApps.end());
+        stackOfUniqueApps.erase(last, stackOfUniqueApps.end());
+        return stackOfUniqueApps;
     }
 
     ApplicationManager::ApplicationManager(const ApplicationName &serviceName,
@@ -197,7 +220,7 @@ namespace app::manager
     {
         for (const auto &name : std::vector<ApplicationName>{app::name_call, app::special_input}) {
             if (auto app = getApplication(name); app != nullptr) {
-                app->runInBackground(this);
+                app->runInBackground(phoneModeObserver->getCurrentPhoneMode(), this);
             }
         }
     }
@@ -236,10 +259,11 @@ namespace app::manager
     void ApplicationManager::registerMessageHandlers()
     {
         phoneModeObserver->connect(this);
-        phoneModeObserver->subscribe(
-            [](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
-                LOG_INFO("Phone mode changed.");
-            });
+        phoneModeObserver->subscribe([this](sys::phone_modes::PhoneMode phoneMode) {
+            handlePhoneModeChanged(phoneMode);
+            actionsRegistry.enqueue(
+                ActionEntry{actions::ShowPopup, std::make_unique<gui::PhoneModePopupRequestParams>(phoneMode)});
+        });
 
         connect(typeid(StartAllowedMessage), [this](sys::Message *request) {
             auto msg = static_cast<StartAllowedMessage *>(request);
@@ -367,6 +391,7 @@ namespace app::manager
         connect(typeid(CellularCallRejectedByOfflineNotification), convertibleToActionHandler);
         connect(typeid(sys::TetheringQuestionRequest), convertibleToActionHandler);
         connect(typeid(sys::TetheringQuestionAbort), convertibleToActionHandler);
+        connect(typeid(sys::TetheringPhoneModeChangeProhibitedMessage), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -392,11 +417,12 @@ namespace app::manager
         if (app.state() == ApplicationHandle::State::ACTIVE_BACKGROUND) {
             LOG_INFO("Switching focus to application [%s] (window [%s])", app.name().c_str(), app.switchWindow.c_str());
             setState(State::AwaitingFocusConfirmation);
-            app::Application::messageSwitchApplication(this, app.name(), app.switchWindow, std::move(app.switchData));
+            app::Application::messageSwitchApplication(
+                this, app.name(), app.switchWindow, std::move(app.switchData), StartupReason::Launch);
         }
         else {
             LOG_INFO("Starting application %s", app.name().c_str());
-            app.run(this);
+            app.run(phoneModeObserver->getCurrentPhoneMode(), this);
         }
         return true;
     }
@@ -471,7 +497,7 @@ namespace app::manager
         if (app->name() == currentlyFocusedApp->name()) {
             // Switch window only.
             app::Application::messageSwitchApplication(
-                this, app->name(), app->switchWindow, std::move(app->switchData));
+                this, app->name(), app->switchWindow, std::move(app->switchData), StartupReason::Launch);
             return false;
         }
 
@@ -513,6 +539,20 @@ namespace app::manager
         actionsRegistry.enqueue(std::move(entry));
     }
 
+    void ApplicationManager::handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode)
+    {
+        for (const auto app : getRunningApplications()) {
+            changePhoneMode(phoneMode, app);
+        }
+    }
+
+    void ApplicationManager::changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app)
+    {
+        ActionEntry action{actions::PhoneModeChanged, std::make_unique<gui::PhoneModeParams>(phoneMode)};
+        action.setTargetApplication(app->name());
+        actionsRegistry.enqueue(std::move(action));
+    }
+
     ActionProcessStatus ApplicationManager::handleAction(ActionEntry &action)
     {
         switch (action.actionId) {
@@ -520,6 +560,8 @@ namespace app::manager
             return handleHomeAction(action);
         case actions::Launch:
             return handleLaunchAction(action);
+        case actions::PhoneModeChanged:
+            return handlePhoneModeChangedAction(action);
         case actions::ShowPopup:
             [[fallthrough]];
         case actions::AbortPopup:
@@ -544,9 +586,26 @@ namespace app::manager
             return ActionProcessStatus::Dropped;
         }
 
+        targetApp->startupReason = StartupReason::Launch;
         action.setTargetApplication(targetApp->name());
         SwitchRequest switchRequest(ServiceName, targetApp->name(), gui::name::window::main_window, nullptr);
         return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
+    }
+
+    auto ApplicationManager::handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus
+    {
+        const auto &targetName = action.target;
+        auto targetApp         = getApplication(targetName);
+        if (targetApp == nullptr || !targetApp->handles(action.actionId)) {
+            return ActionProcessStatus::Dropped;
+        }
+
+        if (targetApp->state() == ApplicationHandle::State::ACTIVE_FORGROUND ||
+            targetApp->state() == ApplicationHandle::State::ACTIVE_BACKGROUND) {
+            app::Application::requestAction(this, targetName, action.actionId, std::move(action.params));
+            return ActionProcessStatus::Accepted;
+        }
+        return ActionProcessStatus::Skipped;
     }
 
     auto ApplicationManager::handlePopupAction(ActionEntry &action) -> ActionProcessStatus
@@ -575,6 +634,10 @@ namespace app::manager
         }
 
         const auto targetApp = actionHandlers.front();
+
+        // Inform that target app switch is caused by Action
+        targetApp->startupReason = StartupReason::OnAction;
+
         action.setTargetApplication(targetApp->name());
         auto &actionParams = action.params;
         if (targetApp->state() != ApplicationHandle::State::ACTIVE_FORGROUND) {
@@ -668,7 +731,9 @@ namespace app::manager
             LOG_INFO("Switch application to %s", app.name().c_str());
             app.setState(ApplicationHandle::State::ACTIVATING);
             setState(State::AwaitingFocusConfirmation);
-            app::Application::messageSwitchApplication(this, app.name(), app.switchWindow, std::move(app.switchData));
+
+            app::Application::messageSwitchApplication(
+                this, app.name(), app.switchWindow, std::move(app.switchData), launchingApp->startupReason);
         }
     }
 
@@ -820,6 +885,9 @@ namespace app::manager
 
     void ApplicationManager::onLaunchFinished(ApplicationHandle &app)
     {
+        // reset startupReason to default Launch
+        app.startupReason = StartupReason::Launch;
+
         if (!actionsRegistry.hasPendingAction()) {
             return;
         }

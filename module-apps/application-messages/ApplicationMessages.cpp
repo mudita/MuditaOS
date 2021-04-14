@@ -41,8 +41,11 @@ namespace app
 {
     static constexpr auto messagesStackDepth = 1024 * 6; // 6Kb stack size
 
-    ApplicationMessages::ApplicationMessages(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, messagesStackDepth), AsyncCallbackReceiver{this}
+    ApplicationMessages::ApplicationMessages(std::string name,
+                                             std::string parent,
+                                             sys::phone_modes::PhoneMode mode,
+                                             StartInBackground startInBackground)
+        : Application(name, parent, mode, startInBackground, messagesStackDepth), AsyncCallbackReceiver{this}
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::CreateSms, [this](auto &&data) {
@@ -123,7 +126,7 @@ namespace app
         }
 
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
+
         return ret;
     }
 
@@ -160,7 +163,10 @@ namespace app
             return std::make_unique<gui::SearchResults>(app);
         });
 
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::PhoneModes});
     }
 
     void ApplicationMessages::destroyUserInterface()

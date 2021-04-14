@@ -163,4 +163,24 @@ namespace audio
         audioWorker->disablePlayback();
     }
 
+    auto Decoder::getSourceFormat() -> AudioFormat
+    {
+        auto tags     = fetchTags();
+        auto bitWidth = getBitWidth();
+        // this is a decoder mono to stereo hack, will be removed when proper
+        // transcoding implementation is added
+        auto channels = tags->num_channel == 1 ? 2U : tags->num_channel;
+
+        return AudioFormat{tags->sample_rate, bitWidth, channels};
+    }
+
+    auto Decoder::getSupportedFormats() -> const std::vector<AudioFormat> &
+    {
+        if (formats.empty()) {
+            formats.push_back(getSourceFormat());
+        }
+
+        return formats;
+    }
+
 } // namespace audio

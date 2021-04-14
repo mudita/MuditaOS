@@ -18,8 +18,9 @@ namespace app
 
     ApplicationMusicPlayer::ApplicationMusicPlayer(std::string name,
                                                    std::string parent,
+                                                   sys::phone_modes::PhoneMode mode,
                                                    StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), startInBackground, applicationMusicPlayerStackSize)
+        : Application(std::move(name), std::move(parent), mode, startInBackground, applicationMusicPlayerStackSize)
     {
         LOG_INFO("ApplicationMusicPlayer::create");
         connect(typeid(AudioStartPlaybackResponse), [&](sys::Message *msg) {
@@ -50,8 +51,6 @@ namespace app
 
         createUserInterface();
 
-        setActiveWindow(gui::name::window::main_window);
-
         return ret;
     }
 
@@ -69,7 +68,10 @@ namespace app
             return std::make_unique<gui::MusicPlayerEmptyWindow>(app);
         });
 
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::PhoneModes});
     }
 
     void ApplicationMusicPlayer::destroyUserInterface()

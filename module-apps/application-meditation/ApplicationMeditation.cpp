@@ -12,8 +12,9 @@ namespace app
 {
     ApplicationMeditation::ApplicationMeditation(std::string name,
                                                  std::string parent,
+                                                 sys::phone_modes::PhoneMode mode,
                                                  StartInBackground startInBackground)
-        : Application{name, parent, startInBackground}, state{std::make_unique<gui::OptionsData>()}
+        : Application{name, parent, mode, startInBackground}, state{std::make_unique<gui::OptionsData>()}
     {}
 
     auto ApplicationMeditation::InitHandler() -> sys::ReturnCodes
@@ -23,7 +24,7 @@ namespace app
             return ret;
 
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
+
         return ret;
     }
 
@@ -53,7 +54,10 @@ namespace app
             return std::make_unique<gui::PreparationTimeWindow>(app);
         });
 
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::PhoneModes});
     }
 
     void ApplicationMeditation::destroyUserInterface()

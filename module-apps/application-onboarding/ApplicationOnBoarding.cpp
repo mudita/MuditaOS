@@ -16,7 +16,6 @@
 #include "windows/OnBoardingDateAndTimeWindow.hpp"
 #include "windows/OnBoardingChangeDateAndTimeWindow.hpp"
 
-#include <service-db/DBMessage.hpp>
 #include <module-services/service-appmgr/service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 #include <module-apps/application-settings-new/data/LanguagesData.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
@@ -31,8 +30,9 @@ namespace app
 
     ApplicationOnBoarding::ApplicationOnBoarding(std::string name,
                                                  std::string parent,
+                                                 sys::phone_modes::PhoneMode mode,
                                                  StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), startInBackground, OnBoardingStackSize)
+        : Application(std::move(name), std::move(parent), mode, startInBackground, OnBoardingStackSize)
     {
         using namespace gui::top_bar;
         topBarManager->enableIndicators({Indicator::Signal,
@@ -64,7 +64,6 @@ namespace app
         }
 
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
 
         connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
             if (gui::window::name::onBoarding_languages == getCurrentWindow()->getName()) {
@@ -139,7 +138,10 @@ namespace app
             return std::make_unique<gui::ChangeTimeZone>(app);
         });
 
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::PhoneModes});
     }
 
     void ApplicationOnBoarding::destroyUserInterface()

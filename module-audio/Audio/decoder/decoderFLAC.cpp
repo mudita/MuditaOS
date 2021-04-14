@@ -3,6 +3,7 @@
 
 #include <Utils.hpp>
 #include "decoderFLAC.hpp"
+#include "flac/flacfile.h"
 
 #define DR_FLAC_IMPLEMENTATION
 #define DR_FLAC_NO_STDIO
@@ -105,6 +106,13 @@ namespace audio
 
             userdata->totalSamplesCount = pMetadata->data.streaminfo.totalSampleCount;
         }
+    }
+
+    auto decoderFLAC::getBitWidth() -> unsigned int
+    {
+        TagLib::FLAC::File flacFile(filePath.c_str());
+        auto properties = flacFile.audioProperties();
+        return properties->bitsPerSample();
     }
 
 } // namespace audio

@@ -21,10 +21,11 @@ namespace app
 {
     ApplicationClock::ApplicationClock(std::string name,
                                        std::string parent,
+                                       sys::phone_modes::PhoneMode mode,
                                        StartInBackground startInBackground,
                                        uint32_t stackDepth,
                                        sys::ServicePriority priority)
-        : Application(name, parent, startInBackground, stackDepth, priority)
+        : Application(name, parent, mode, startInBackground, stackDepth, priority)
     {
         timerClock = sys::TimerFactory::createPeriodicTimer(
             this, "Clock", std::chrono::milliseconds{1000}, [&](sys::Timer &) { timerClockCallback(); });
@@ -86,7 +87,10 @@ namespace app
             return std::make_unique<gui::ClockMainWindow>(app, name);
         });
 
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::PhoneModes});
     }
 
     void ApplicationClock::destroyUserInterface()

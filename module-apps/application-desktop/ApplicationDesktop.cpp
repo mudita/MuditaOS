@@ -72,8 +72,11 @@ namespace app
         }
     } // namespace
 
-    ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground), lockHandler(this)
+    ApplicationDesktop::ApplicationDesktop(std::string name,
+                                           std::string parent,
+                                           sys::phone_modes::PhoneMode mode,
+                                           StartInBackground startInBackground)
+        : Application(name, parent, mode, startInBackground), lockHandler(this)
     {
         using namespace gui::top_bar;
         topBarManager->enableIndicators({Indicator::Signal,
@@ -387,7 +390,6 @@ namespace app
         requestUnreadThreadsCount(this);
         requestUnreadCallsCount(this);
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
 
         connect(sdesktop::UpdateOsMessage(), [&](sys::Message *msg) {
             auto *updateMsg = dynamic_cast<sdesktop::UpdateOsMessage *>(msg);
@@ -557,7 +559,10 @@ namespace app
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
 
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::PhoneModes});
     }
 
     void ApplicationDesktop::destroyUserInterface()

@@ -8,7 +8,6 @@
 #include <Common/Query.hpp>
 #include <Interface/CalllogRecord.hpp>
 #include <Interface/ContactRecord.hpp>
-#include <Interface/NotesRecord.hpp>
 #include <Interface/SMSTemplateRecord.hpp>
 #include <Interface/ThreadRecord.hpp>
 #include <PhoneNumber.hpp>
@@ -32,8 +31,6 @@ namespace sys
 {
     class Service;
 } // namespace sys
-struct ContactRecord;
-struct NotesRecord;
 
 class DBServiceAPI
 {
@@ -50,10 +47,10 @@ class DBServiceAPI
         success
     };
 
-    static auto ThreadGetByNumber(sys::Service *serv,
-                                  const utils::PhoneNumber::View &phoneNumber,
-                                  std::uint32_t timeout = DefaultTimeoutInMs) -> std::unique_ptr<ThreadRecord>;
-    static auto ThreadGetCount(sys::Service *serv, EntryState state = EntryState::ALL) -> uint32_t;
+    [[deprecated]] static auto ThreadGetByNumber(sys::Service *serv,
+                                                 const utils::PhoneNumber::View &phoneNumber,
+                                                 std::uint32_t timeout = DefaultTimeoutInMs)
+        -> std::unique_ptr<ThreadRecord>;
 
     /**
      * Queries the database.
@@ -83,19 +80,18 @@ class DBServiceAPI
      *
      * @note This function is blocking. It's checking until first error.
      */
-    static auto verifyContact(sys::Service *serv, const ContactRecord &rec) -> ContactVerificationResult;
-    static auto ContactGetByID(sys::Service *serv, uint32_t contactID) -> std::unique_ptr<std::vector<ContactRecord>>;
-    static auto ContactGetByIDWithTemporary(sys::Service *serv, uint32_t contactID)
+    [[deprecated]] static auto verifyContact(sys::Service *serv, const ContactRecord &rec) -> ContactVerificationResult;
+    [[deprecated]] static auto ContactGetByID(sys::Service *serv, uint32_t contactID)
+        -> std::unique_ptr<std::vector<ContactRecord>>;
+    [[deprecated]] static auto ContactGetByIDWithTemporary(sys::Service *serv, uint32_t contactID)
         -> std::unique_ptr<std::vector<ContactRecord>>;
 
   private:
-    static auto ContactGetByIDCommon(sys::Service *serv, std::shared_ptr<DBContactMessage> contactMsg)
+    [[deprecated]] static auto ContactGetByIDCommon(sys::Service *serv, std::shared_ptr<DBContactMessage> contactMsg)
         -> std::unique_ptr<std::vector<ContactRecord>>;
 
   public:
-    static auto ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial)
-        -> std::unique_ptr<std::vector<ContactRecord>>;
-    static auto ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber)
+    [[deprecated]] static auto ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial)
         -> std::unique_ptr<std::vector<ContactRecord>>;
 
     /**
@@ -105,22 +101,16 @@ class DBServiceAPI
      * @param numberView - number to match contact with
      * @return std::unique_ptr<ContactRecord>
      */
-    static auto MatchContactByPhoneNumber(sys::Service *serv, const utils::PhoneNumber::View &numberView)
+    [[deprecated]] static auto MatchContactByPhoneNumber(sys::Service *serv, const utils::PhoneNumber::View &numberView)
         -> std::unique_ptr<ContactRecord>;
-    static auto ContactAdd(sys::Service *serv, const ContactRecord &rec) -> bool;
-    static auto ContactRemove(sys::Service *serv, uint32_t id) -> bool;
-    static auto ContactUpdate(sys::Service *serv, const ContactRecord &rec) -> bool;
-    static auto ContactSearch(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName, UTF8 number)
-        -> std::unique_ptr<std::vector<ContactRecord>>;
 
-    static auto CalllogAdd(sys::Service *serv, const CalllogRecord &rec) -> CalllogRecord;
-    static auto CalllogRemove(sys::Service *serv, uint32_t id) -> bool;
-    static auto CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -> bool;
-    static auto CalllogGetCount(sys::Service *serv, EntryState state = EntryState::ALL) -> uint32_t;
-    static auto CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit) -> bool;
+    [[deprecated]] static auto ContactAdd(sys::Service *serv, const ContactRecord &rec) -> bool;
+    [[deprecated]] static auto ContactRemove(sys::Service *serv, uint32_t id) -> bool;
+    [[deprecated]] static auto ContactUpdate(sys::Service *serv, const ContactRecord &rec) -> bool;
 
-    /* country codes */
-    static auto GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc) -> uint32_t;
+    [[deprecated]] static auto CalllogAdd(sys::Service *serv, const CalllogRecord &rec) -> CalllogRecord;
+    [[deprecated]] static auto CalllogRemove(sys::Service *serv, uint32_t id) -> bool;
+    [[deprecated]] static auto CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) -> bool;
 
     static auto DBBackup(sys::Service *serv, std::string backupPath) -> bool;
 

@@ -81,7 +81,7 @@ class ServiceAudio : public sys::Service
     auto HandleGetFileTags(const std::string &fileName) -> std::unique_ptr<AudioResponseMessage>;
     void HandleNotification(const AudioNotificationMessage::Type &type, const audio::Token &token);
     auto HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyPressedResponse>;
-    void HandlePhoneModeChange(sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode);
+    void HandlePhoneModeChange(sys::phone_modes::PhoneMode phoneMode);
     void MuteCurrentOperation();
     void VibrationUpdate(const audio::PlaybackType &type               = audio::PlaybackType::None,
                          std::optional<audio::AudioMux::Input *> input = std::nullopt);

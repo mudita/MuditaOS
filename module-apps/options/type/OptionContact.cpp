@@ -53,6 +53,7 @@ namespace gui::option
                                                         app::manager::OnSwitchBehaviour::RunInBackground);
         }
         case ContactOperation::Details: {
+            data->ignoreCurrentWindowOnStack = true;
             return app::manager::Controller::sendAction(app,
                                                         app::manager::actions::ShowContactDetails,
                                                         std::move(data),

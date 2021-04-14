@@ -10,7 +10,6 @@
 #include "windows/SearchEngineWindow.hpp"
 #include "windows/SearchResultsWindow.hpp"
 
-#include <service-db/DBMessage.hpp>
 #include <service-db/QueryMessage.hpp>
 
 #include <module-apps/application-notes/presenter/NotesMainWindowPresenter.hpp>
@@ -28,8 +27,11 @@ namespace app
         constexpr auto NotesStackSize = 4096U;
     } // namespace
 
-    ApplicationNotes::ApplicationNotes(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), startInBackground, NotesStackSize)
+    ApplicationNotes::ApplicationNotes(std::string name,
+                                       std::string parent,
+                                       sys::phone_modes::PhoneMode mode,
+                                       StartInBackground startInBackground)
+        : Application(std::move(name), std::move(parent), mode, startInBackground, NotesStackSize)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
@@ -72,7 +74,7 @@ namespace app
         }
 
         createUserInterface();
-        setActiveWindow(gui::name::window::main_window);
+
         return ret;
     }
 
@@ -122,7 +124,10 @@ namespace app
             utils::localize.get("app_phonebook_options_title"),
             [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
 
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::PhoneModes});
     }
 
     void ApplicationNotes::destroyUserInterface()

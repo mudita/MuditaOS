@@ -30,8 +30,11 @@
 
 namespace app
 {
-    ApplicationCall::ApplicationCall(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, app::call_stack_size)
+    ApplicationCall::ApplicationCall(std::string name,
+                                     std::string parent,
+                                     sys::phone_modes::PhoneMode mode,
+                                     StartInBackground startInBackground)
+        : Application(name, parent, mode, startInBackground, app::call_stack_size)
     {
         using namespace gui::top_bar;
         topBarManager->enableIndicators({Indicator::Signal,
@@ -213,8 +216,6 @@ namespace app
 
         createUserInterface();
 
-        setActiveWindow(gui::name::window::main_window);
-
         return ret;
     }
 
@@ -237,7 +238,10 @@ namespace app
         windowsFactory.attach(app::window::name_dialogConfirm, [](Application *app, const std::string &name) {
             return std::make_unique<gui::DialogConfirm>(app, name);
         });
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::PhoneModes});
     }
 
     bool ApplicationCall::showNotification(std::function<bool()> action,

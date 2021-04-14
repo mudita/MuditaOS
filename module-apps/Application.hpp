@@ -8,9 +8,9 @@
 #include "Audio/Profiles/Profile.hpp" // for Profile, Pro...
 #include "CallbackStorage.hpp"
 
-#include "Service/Common.hpp"              // for ReturnCodes
-#include "Service/Message.hpp"             // for MessagePointer
-#include "Service/Service.hpp"             // for Service
+#include "Service/Common.hpp"  // for ReturnCodes
+#include "Service/Message.hpp" // for MessagePointer
+#include "Service/Service.hpp" // for Service
 #include "Timers/TimerHandle.hpp"
 #include "SwitchData.hpp"                  // for SwitchData
 #include "SystemManager/SystemManager.hpp" // for SystemManager
@@ -20,13 +20,13 @@
 #include <PhoneModes/Observer.hpp>
 
 #include <service-appmgr/ApplicationManifest.hpp>
-#include <list>                           // for list
-#include <map>                            // for allocator, map
-#include <memory>                         // for make_shared
-#include <stdint.h>                       // for uint32_t
-#include <string>                         // for string
-#include <utility>                        // for move, pair
-#include <vector>                         // for vector
+#include <list>     // for list
+#include <map>      // for allocator, map
+#include <memory>   // for make_shared
+#include <stdint.h> // for uint32_t
+#include <string>   // for string
+#include <utility>  // for move, pair
+#include <vector>   // for vector
 #include "TopBarManager.hpp"
 #include "popups/Popups.hpp"
 #include "WindowsFactory.hpp"
@@ -48,6 +48,7 @@ namespace gui
 namespace gui
 {
     class Item;
+    class PopupRequestParams;
 }
 namespace gui
 {
@@ -74,6 +75,13 @@ namespace app
     {
         Success,
         Failure
+    };
+
+    enum class StartupReason
+    {
+        Launch,   // Default startup causing application MainWindow to be added to stack.
+        OnAction, // Switch to application  was caused by action. Enum is used to prevent called applications to
+        // switch to main window on application switch and allow declared handler to switch to desired window.
     };
 
     struct StartInBackground
@@ -167,6 +175,8 @@ namespace app
         sys::MessagePointer handleMinuteUpdated(sys::Message *msgl);
         sys::MessagePointer handleAction(sys::Message *msgl);
         sys::MessagePointer handleApplicationSwitch(sys::Message *msgl);
+        sys::MessagePointer handleApplicationSwitchLaunch(sys::Message *msgl);
+        sys::MessagePointer handleApplicationSwitchOnAction(sys::Message *msgl);
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl);
         sys::MessagePointer handleUpdateWindow(sys::Message *msgl);
         sys::MessagePointer handleAppClose(sys::Message *msgl);
@@ -188,6 +198,7 @@ namespace app
 
         Application(std::string name,
                     std::string parent                  = "",
+                    sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                     StartInBackground startInBackground = {false},
                     uint32_t stackDepth                 = 4096,
                     sys::ServicePriority priority       = sys::ServicePriority::Idle);
@@ -310,7 +321,8 @@ namespace app
         static void messageSwitchApplication(sys::Service *sender,
                                              std::string application,
                                              std::string window,
-                                             std::unique_ptr<gui::SwitchData> data);
+                                             std::unique_ptr<gui::SwitchData> data,
+                                             StartupReason startupReason);
         static void messageCloseApplication(sys::Service *sender, std::string application);
         static void messageRebuildApplication(sys::Service *sender, std::string application);
         static void messageApplicationLostFocus(sys::Service *sender, std::string application);
@@ -326,7 +338,7 @@ namespace app
         /// Handle the change of phone mode and tethering mode
         /// @param mode new phone mode
         /// @param tethering new tethering mode
-        void handlePhoneModeChanged(sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering);
+        void handlePhoneModeChanged(sys::phone_modes::PhoneMode mode);
 
         /// @ingrup AppWindowStack
         WindowsStack windowsStack;
@@ -334,6 +346,7 @@ namespace app
 
         /// Method used to attach popups windows to application
         void attachPopups(const std::vector<gui::popup::ID> &popupsList);
+        void showPopup(gui::popup::ID id, const gui::PopupRequestParams *params);
         void abortPopup(gui::popup::ID id);
 
       public:
@@ -391,7 +404,7 @@ namespace app
 
         /// application's settings
         std::unique_ptr<settings::Settings> settings;
-        std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
+        sys::phone_modes::PhoneMode phoneMode;
 
       public:
         void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;
@@ -414,21 +427,5 @@ namespace app
 
       private:
         ApplicationName targetAppName;
-    };
-
-    class PopupRequestParams : public manager::actions::ActionParams
-    {
-      public:
-        explicit PopupRequestParams(gui::popup::ID popupId)
-            : manager::actions::ActionParams{"Popup request parameters"}, popupId{popupId}
-        {}
-
-        [[nodiscard]] auto getPopupId() const noexcept
-        {
-            return popupId;
-        }
-
-      private:
-        gui::popup::ID popupId;
     };
 } /* namespace app */

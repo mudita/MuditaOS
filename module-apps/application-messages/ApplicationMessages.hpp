@@ -40,6 +40,7 @@ namespace app
       public:
         ApplicationMessages(std::string name                    = name_messages,
                             std::string parent                  = {},
+                            sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                             StartInBackground startInBackground = {false});
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
@@ -87,7 +88,8 @@ namespace app
                      manager::actions::CreateSms,
                      manager::actions::ShowSmsTemplates,
                      manager::actions::SmsRejectNoSim,
-                     manager::actions::SMSRejectedByOfflineNotification}};
+                     manager::actions::SMSRejectedByOfflineNotification,
+                     manager::actions::PhoneModeChanged}};
         }
     };
 } /* namespace app */

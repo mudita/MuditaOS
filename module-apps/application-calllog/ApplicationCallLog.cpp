@@ -10,7 +10,6 @@
 #include "windows/CallLogOptionsWindow.hpp"
 
 #include <service-db/DBServiceAPI.hpp>
-#include <service-db/DBMessage.hpp>
 #include <Dialog.hpp>
 #include <OptionWindow.hpp>
 #include <i18n/i18n.hpp>
@@ -23,8 +22,11 @@ using namespace calllog;
 
 namespace app
 {
-    ApplicationCallLog::ApplicationCallLog(std::string name, std::string parent, StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, 4096)
+    ApplicationCallLog::ApplicationCallLog(std::string name,
+                                           std::string parent,
+                                           sys::phone_modes::PhoneMode mode,
+                                           StartInBackground startInBackground)
+        : Application(name, parent, mode, startInBackground, 4096)
     {
         addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {
             switchWindow(gui::name::window::main_window, std::move(data));
@@ -98,7 +100,10 @@ namespace app
             return std::make_unique<gui::DialogYesNo>(app, name);
         });
 
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::PhoneModes});
     }
 
     void ApplicationCallLog::destroyUserInterface()

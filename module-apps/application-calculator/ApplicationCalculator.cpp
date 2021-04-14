@@ -9,8 +9,9 @@ namespace app
 {
     ApplicationCalculator::ApplicationCalculator(std::string name,
                                                  std::string parent,
+                                                 sys::phone_modes::PhoneMode mode,
                                                  StartInBackground startInBackground)
-        : Application(name, parent, startInBackground, stack_size)
+        : Application(name, parent, mode, startInBackground, stack_size)
     {}
 
     sys::MessagePointer ApplicationCalculator::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -27,8 +28,6 @@ namespace app
 
         createUserInterface();
 
-        setActiveWindow(gui::name::window::main_window);
-
         return ret;
     }
 
@@ -43,7 +42,10 @@ namespace app
             return std::make_unique<gui::CalculatorMainWindow>(app, name);
         });
 
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering, gui::popup::ID::PhoneModes});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::PhoneModes});
     }
 
     void ApplicationCalculator::destroyUserInterface()

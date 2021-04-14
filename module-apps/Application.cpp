@@ -2,10 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Application.hpp"
-#include "Common.hpp"        // for RefreshModes
-#include "GuiTimer.hpp"      // for GuiTimer
-#include "Item.hpp"          // for Item
-#include "MessageType.hpp"   // for MessageType
+#include "Common.hpp"      // for RefreshModes
+#include "GuiTimer.hpp"    // for GuiTimer
+#include "Item.hpp"        // for Item
+#include "MessageType.hpp" // for MessageType
+#include "module-apps/popups/data/PopupRequestParams.hpp"
+#include "module-apps/popups/data/PhoneModeParams.hpp"
 #include "module-sys/Timers/TimerFactory.hpp" // for Timer
 #include "TopBar.hpp"
 #include "popups/TetheringConfirmationPopup.hpp"
@@ -38,6 +40,7 @@
 #include <module-utils/time/DateAndTimeSettings.hpp>
 
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
+#include <TetheringPhoneModePopup.hpp>
 #include "popups/data/PopupData.hpp"
 
 namespace gui
@@ -81,6 +84,7 @@ namespace app
 
     Application::Application(std::string name,
                              std::string parent,
+                             sys::phone_modes::PhoneMode mode,
                              StartInBackground startInBackground,
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
@@ -88,14 +92,12 @@ namespace app
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
-          settings(std::make_unique<settings::Settings>(this)),
-          phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
+          settings(std::make_unique<settings::Settings>(this)), phoneMode{mode}
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
         topBarManager->set(utils::dateAndTimeSettings.isTimeFormat12() ? gui::top_bar::TimeMode::Time12h
                                                                        : gui::top_bar::TimeMode::Time24h);
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
-        bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
         longPressTimer = sys::TimerFactory::createPeriodicTimer(this,
                                                                 "LongPress",
@@ -110,22 +112,22 @@ namespace app
         connect(typeid(AppUpdateWindowMessage),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleUpdateWindow(msg); });
 
-        // handle phone mode changes
-        phoneModeObserver->connect(this);
-        phoneModeObserver->subscribe(
-            [&](sys::phone_modes::PhoneMode phoneMode, sys::phone_modes::Tethering tetheringMode) {
-                handlePhoneModeChanged(phoneMode, tetheringMode);
-            });
-
+        addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
+            if (params != nullptr) {
+                auto modeParams = static_cast<gui::PhoneModeParams *>(params.get());
+                phoneMode       = modeParams->getPhoneMode();
+            }
+            return actionHandled();
+        });
         addActionReceiver(app::manager::actions::ShowPopup, [this](auto &&params) {
-            auto popupParams = static_cast<app::PopupRequestParams *>(params.get());
+            auto popupParams = static_cast<gui::PopupRequestParams *>(params.get());
             if (const auto popupId = popupParams->getPopupId(); isPopupPermitted(popupId)) {
-                switchWindow(gui::popup::resolveWindowName(popupId));
+                showPopup(popupId, popupParams);
             }
             return actionHandled();
         });
         addActionReceiver(app::manager::actions::AbortPopup, [this](auto &&params) {
-            auto popupParams   = static_cast<app::PopupRequestParams *>(params.get());
+            auto popupParams   = static_cast<gui::PopupRequestParams *>(params.get());
             const auto popupId = popupParams->getPopupId();
             abortPopup(popupId);
             return actionHandled();
@@ -185,7 +187,7 @@ namespace app
             window->updateSignalStrength();
             window->updateNetworkAccessTechnology();
             window->updateTime();
-            window->updatePhoneMode(phoneModeObserver->getCurrentPhoneMode());
+            window->updatePhoneMode(phoneMode);
 
             auto message = std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), mode);
 
@@ -371,7 +373,15 @@ namespace app
         try {
             const auto &actionHandler = receivers.at(action);
             auto &data                = msg->getData();
-            return actionHandler(std::move(data));
+
+            auto result = actionHandler(std::move(data));
+
+            if (windowsStack.isEmpty()) {
+                LOG_ERROR("OnAction application switch with no window provided. Fallback to default mainWindow.");
+                setActiveWindow(gui::name::window::main_window);
+            }
+
+            return result;
         }
         catch (const std::out_of_range &) {
             LOG_ERROR("Application %s is not able to handle action #%d", GetName().c_str(), action);
@@ -380,6 +390,20 @@ namespace app
     }
 
     sys::MessagePointer Application::handleApplicationSwitch(sys::Message *msgl)
+    {
+        auto *msg = static_cast<AppSwitchMessage *>(msgl);
+
+        switch (msg->getApplicationStartupReason()) {
+        case StartupReason::Launch:
+            return handleApplicationSwitchLaunch(msgl);
+        case StartupReason::OnAction:
+            return handleApplicationSwitchOnAction(msgl);
+        }
+
+        return sys::msgNotHandled();
+    }
+
+    sys::MessagePointer Application::handleApplicationSwitchLaunch(sys::Message *msgl)
     {
         auto *msg    = static_cast<AppSwitchMessage *>(msgl);
         bool handled = false;
@@ -424,6 +448,19 @@ namespace app
             return sys::msgHandled();
         }
         return sys::msgNotHandled();
+    }
+
+    sys::MessagePointer Application::handleApplicationSwitchOnAction(sys::Message *msgl)
+    {
+        if ((state == State::ACTIVATING) || (state == State::INITIALIZING) || (state == State::ACTIVE_BACKGROUND)) {
+            setState(State::ACTIVE_FORGROUND);
+            app::manager::Controller::confirmSwitch(this);
+            return sys::msgHandled();
+        }
+        else {
+            LOG_ERROR("Application already running - no startup on Action");
+            return sys::msgNotHandled();
+        }
     }
 
     sys::MessagePointer Application::handleSwitchWindow(sys::Message *msgl)
@@ -654,9 +691,10 @@ namespace app
     void Application::messageSwitchApplication(sys::Service *sender,
                                                std::string application,
                                                std::string window,
-                                               std::unique_ptr<gui::SwitchData> data)
+                                               std::unique_ptr<gui::SwitchData> data,
+                                               StartupReason startupReason)
     {
-        auto msg = std::make_shared<AppSwitchMessage>(application, window, std::move(data));
+        auto msg = std::make_shared<AppSwitchMessage>(application, window, std::move(data), startupReason);
         sender->bus.sendUnicast(msg, application);
     }
 
@@ -686,19 +724,15 @@ namespace app
         sender->bus.sendUnicast(msg, application);
     }
 
-    void Application::handlePhoneModeChanged(sys::phone_modes::PhoneMode mode, sys::phone_modes::Tethering tethering)
+    void Application::handlePhoneModeChanged(sys::phone_modes::PhoneMode mode)
     {
-        // only foreground rendering application will react to mode changes
-        if (state != State::ACTIVE_FORGROUND) {
-            return;
-        }
-
         using namespace gui::popup;
-        if (getCurrentWindow()->getName() == window::phone_modes_window) {
-            updateWindow(window::phone_modes_window, std::make_unique<gui::ModesPopupData>(mode));
+        const auto &popupName = resolveWindowName(gui::popup::ID::PhoneModes);
+        if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
+            updateWindow(popupName, std::make_unique<gui::ModesPopupData>(mode));
         }
         else {
-            switchWindow(window::phone_modes_window, std::make_unique<gui::ModesPopupData>(mode));
+            switchWindow(popupName, std::make_unique<gui::ModesPopupData>(mode));
         }
     }
 
@@ -719,6 +753,13 @@ namespace app
                                               app, window::tethering_confirmation_window);
                                       });
                 break;
+            case ID::TetheringPhoneModeChangeProhibited:
+                windowsFactory.attach(window::tethering_phonemode_change_window,
+                                      [](Application *app, const std::string &name) {
+                                          return std::make_unique<gui::TetheringPhoneModePopup>(
+                                              app, window::tethering_phonemode_change_window);
+                                      });
+                break;
             case ID::PhoneModes:
                 windowsFactory.attach(window::phone_modes_window, [](Application *app, const std::string &name) {
                     return std::make_unique<gui::HomeModesWindow>(app, window::phone_modes_window);
@@ -727,6 +768,18 @@ namespace app
             case ID::Brightness:
                 break;
             }
+        }
+    }
+
+    void Application::showPopup(gui::popup::ID id, const gui::PopupRequestParams *params)
+    {
+        using namespace gui::popup;
+        if (id == ID::PhoneModes) {
+            auto popupParams = static_cast<const gui::PhoneModePopupRequestParams *>(params);
+            handlePhoneModeChanged(popupParams->getPhoneMode());
+        }
+        else {
+            switchWindow(gui::popup::resolveWindowName(id));
         }
     }
 

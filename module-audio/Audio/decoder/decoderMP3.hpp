@@ -28,6 +28,7 @@ namespace audio
 
       private:
         void fetchTagsSpecific() override;
+        auto getBitWidth() -> unsigned int override;
 
         bool find_first_valid_frame();
 

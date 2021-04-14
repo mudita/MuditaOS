@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,8 +24,8 @@ namespace app::manager
         explicit ApplicationHandle(std::unique_ptr<app::ApplicationLauncher> &&_launcher);
 
         void setState(State state) noexcept;
-        void run(sys::Service *caller);
-        void runInBackground(sys::Service *caller);
+        void run(sys::phone_modes::PhoneMode mode, sys::Service *caller);
+        void runInBackground(sys::phone_modes::PhoneMode mode, sys::Service *caller);
         void close() noexcept;
 
         auto valid() const noexcept -> bool;
@@ -43,6 +43,8 @@ namespace app::manager
                                    // temporarily. This flag is used to prevent application closing when application
                                    // is closeable and there is incoming call. This flag is also used when closeable
                                    // application is on front and there is a timeout to block the application.
+
+        StartupReason startupReason = StartupReason::Launch; // Informs application about startup reason.
 
       private:
         auto getManifest() const -> const ApplicationManifest &;

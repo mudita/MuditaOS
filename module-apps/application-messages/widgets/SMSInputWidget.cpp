@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSInputWidget.hpp"
@@ -53,6 +53,12 @@ namespace gui
             return true;
         };
 
+        inputText->setInputMode(new InputMode(
+            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            [=](const UTF8 &Text) { application->getCurrentWindow()->bottomBarTemporaryMode(Text); },
+            [=]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
+            [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
+
         inputText->inputCallback = [this, application]([[maybe_unused]] Item &, const InputEvent &event) {
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
@@ -70,12 +76,6 @@ namespace gui
 
                 application->getWindow(gui::name::window::thread_view)
                     ->setBottomBarText(utils::localize.get("sms_reply"), BottomBar::Side::CENTER);
-
-                inputText->setInputMode(new InputMode(
-                    {InputMode::ABC, InputMode::abc, InputMode::digit},
-                    [=](const UTF8 &Text) { application->getCurrentWindow()->bottomBarTemporaryMode(Text); },
-                    [=]() { application->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
-                    [=]() { application->getCurrentWindow()->selectSpecialCharacter(); }));
 
                 if (inputText->getText() == utils::localize.get("sms_temp_reply")) {
                     inputText->clear();

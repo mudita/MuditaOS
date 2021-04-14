@@ -82,6 +82,7 @@ namespace app
       public:
         ApplicationCall(std::string name                    = name_call,
                         std::string parent                  = {},
+                        sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
                         StartInBackground startInBackground = {false});
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -131,7 +132,8 @@ namespace app
                      manager::actions::EmergencyDial,
                      manager::actions::NotAnEmergencyNotification,
                      manager::actions::NoSimNotification,
-                     manager::actions::CallRejectedByOfflineNotification}};
+                     manager::actions::CallRejectedByOfflineNotification,
+                     manager::actions::PhoneModeChanged}};
         }
     };
 } /* namespace app */

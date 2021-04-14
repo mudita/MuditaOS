@@ -96,8 +96,9 @@ namespace app
 
     ApplicationSettingsNew::ApplicationSettingsNew(std::string name,
                                                    std::string parent,
+                                                   sys::phone_modes::PhoneMode mode,
                                                    StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), startInBackground), AsyncCallbackReceiver{this}
+        : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver{this}
     {
         if ((Store::GSM::SIM::SIM1 == selectedSim || Store::GSM::SIM::SIM2 == selectedSim) &&
             Store::GSM::get()->sim == selectedSim) {
@@ -328,8 +329,6 @@ namespace app
 
         createUserInterface();
 
-        setActiveWindow(gui::name::window::main_window);
-
         settings->registerValueChange(settings::operators_on,
                                       [this](const std::string &value) { operatorOnChanged(value); });
         settings->registerValueChange(
@@ -537,7 +536,10 @@ namespace app
         windowsFactory.attach(gui::window::name::connection_frequency, [](Application *app, const std::string &name) {
             return std::make_unique<gui::ConnectionFrequencyWindow>(app, static_cast<ApplicationSettingsNew *>(app));
         });
-        attachPopups({gui::popup::ID::Volume, gui::popup::ID::Tethering});
+        attachPopups({gui::popup::ID::Volume,
+                      gui::popup::ID::TetheringPhoneModeChangeProhibited,
+                      gui::popup::ID::Tethering,
+                      gui::popup::ID::PhoneModes});
     }
 
     void ApplicationSettingsNew::destroyUserInterface()

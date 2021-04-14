@@ -80,3 +80,37 @@ if(COVERAGE_ENABLE)
         DEPENDENCIES ""
     )
 endif()
+
+function(enable_entity_coverage)
+    if(COVERAGE_ENABLE)
+        cmake_parse_arguments(
+            _ARGS
+            ""
+            "NAME;COVERAGE_PATH"
+            ""
+            ${ARGN}
+        )
+
+        message("Enabling coverage reporting for test entity: ${_ARGS_NAME} (${PROJECT_NAME})")
+
+        if(_ARGS_COVERAGE_PATH)
+            set(GCOVR_ADDITIONAL_ARGS ${GCOVR_ADDITIONAL_ARGS} -f ${_ARGS_COVERAGE_PATH})
+        endif()
+
+        setup_target_for_coverage_gcovr_html(
+            NAME coverage-${_ARGS_NAME}-html
+            EXECUTABLE ;
+            DEPENDENCIES ""
+        )
+
+        setup_target_for_coverage_gcovr_xml(
+            NAME coverage-${_ARGS_NAME}
+            EXECUTABLE ;
+            DEPENDENCIES ""
+        )
+
+        add_dependencies(coverage-${_ARGS_NAME}-html check-${_ARGS_NAME})
+        add_dependencies(coverage-${_ARGS_NAME} check-${_ARGS_NAME})
+        add_dependencies(check-${_ARGS_NAME} coverage-cleanup)
+    endif()
+endfunction(enable_entity_coverage)

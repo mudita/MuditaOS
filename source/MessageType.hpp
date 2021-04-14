@@ -22,49 +22,14 @@ enum class MessageType
     DBSettingsGet,    ///< get current settings from database
     DBSettingsUpdate, ///< update settings
 
-    DBSMSAdd,                         ///< Add new sms record
-    DBSMSRemove,                      ///< Remove specified SMS record
-    DBSMSUpdate,                      ///< Update specified SMS record
-    DBSMSGetSMSLimitOffset,           ///< Get SMS records by limit,offset
-    DBSMSGetSMSLimitOffsetByThreadID, ///< Get SMS records by limit,offset with specified ThreadID field
-    DBSMSGetLastRecord,               ///< Get last edited record
-    DBSMSGetCount,                    ///< Get all sms count
+    DBContactGetByID [[deprecated]],        ///< used to ask for a contact with specified id
+    DBContactGetBySpeedDial [[deprecated]], ///< used to ask for a contact with specified speed dial key assigned
+    DBContactMatchByNumber
+    [[deprecated]], ///< used to best match with a single contact using a phone number (primary or secondary)
+    DBContactAdd [[deprecated]],    ///< Add contact record
+    DBContactRemove [[deprecated]], ///< Remove contact remove
+    DBContactUpdate [[deprecated]], ///< Update contact remove
 
-    DBThreadGet,            ///< Get thread by ID
-    DBThreadGetForContact,  ///< Get thread between 2 contacts
-    DBThreadRemove,         ///< Remove thread by ID
-    DBThreadGetLimitOffset, ///< Get Thread record by limit,offset
-    DBThreadGetCount,       ///< get Thread count
-    DBThreadUpdate,         ///< Thread update
-
-    DBSMSTemplateAdd,            ///< Add new sms template record
-    DBSMSTemplateRemove,         ///< Remove selected sms template record
-    DBSMSTemplateUpdate,         ///< Update selected sms template record
-    DBSMSTemplateGetLimitOffset, ///< Get sms templates records by limit,offset
-    DBSMSTemplateGetCount,       ///< Get sms templates reocrds count
-
-    DBContactVerify, ///< checks database for a contact that has the same name (primary+" "+alternative) or phone number
-                     ///< 1 or phone number 2 or speed dial key
-    DBContactGetByName, ///< used to ask for a contact with specified primary and alternative name.
-    DBContactSearch,
-    DBContactGetByID,        ///< used to ask for a contact with specified id
-    DBContactGetBySpeedDial, ///< used to ask for a contact with specified speed dial key assigned
-    DBContactGetByNumber,    ///< used to ask for a contact with specified primary or secondary phone number
-    DBContactMatchByNumber,  ///< used to best match with a single contact using a phone number (primary or secondary)
-    DBContactAdd,            ///< Add contact record
-    DBContactRemove,         ///< Remove contact remove
-    DBContactUpdate,         ///< Update contact remove
-    DBContactGetLimitOffset, ///< Get contact records by limit,offset
-    DBContactGetCount,       ///< Get contacts count
-    DBContactBlock,
-    DBAlarmAdd,            ///< Add alarm record
-    DBAlarmRemove,         ///< Remove alarm remove
-    DBAlarmUpdate,         ///< Update alarm remove
-    DBAlarmGetLimitOffset, ///< Get alarm records by limit,offset
-    DBAlarmGetCount,       ///< Get alarm count
-    DBAlarmGetNext,        ///< Get alarm, closest or equal to current timestamp.
-
-    DBCountryCode,
     DBQuery,
 
     // Cellular messages
@@ -114,17 +79,9 @@ enum class MessageType
     CellularRadioOnOff,
     CellularSendSMS,
 
-    DBNotesAdd,            ///< Add new note's record
-    DBNotesRemove,         ///< Remove selected note's record
-    DBNotesUpdate,         ///< Update selected note's record
-    DBNotesGetLimitOffset, ///< Get notes records by limit,offset
-    DBNotesGetCount,       ///< Get notes reocrds count
-
-    DBCalllogAdd,            ///< Add new note's record
-    DBCalllogRemove,         ///< Remove selected note's record
-    DBCalllogUpdate,         ///< Update selected note's record
-    DBCalllogGetLimitOffset, ///< Get Calllog records by limit,offset
-    DBCalllogGetCount,       ///< Get Calllog reocrds count
+    DBCalllogAdd [[deprecated]],    ///< Add new note's record
+    DBCalllogRemove [[deprecated]], ///< Remove selected note's record
+    DBCalllogUpdate [[deprecated]], ///< Update selected note's record
 
     // Audio service messages
     AudioMessage,
