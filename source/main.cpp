@@ -1,6 +1,12 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
+
+
+
+
+
+
 #include "config.h"
 
 // applications
@@ -60,6 +66,8 @@
 
 int main()
 {
+
+
 
 #if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();

@@ -1,29 +1,29 @@
 [submodule "module-lwip/lib/lwip"]
 	path = module-lwip/lib/lwip
-	url = ../lwip.git
+	url = git@mudita.github.com:mudita/lwip.git
 	shallow = true
 [submodule "module-utils/microtar"]
 	path = module-utils/microtar
-	url = ../microtar.git
+	url = git@mudita.github.com:mudita/microtar.git
 [submodule "module-utils/segger"]
 	path = module-utils/segger
-	url = ../segger-utils.git
+	url = git@mudita.github.com:mudita/segger-utils.git
 [submodule "module-utils/crc32"]
 	path = module-utils/crc32
-	url = ../crc32
+	url = git@mudita.github.com:mudita/crc32
 [submodule "module-utils/re2"]
 	path = module-utils/re2
-	url = ../re2.git
+	url = git@mudita.github.com:mudita/re2.git
 	branch = rt1051
 	shallow = true
 [submodule "module-utils/protobuf"]
 	path = module-utils/protobuf
-	url = ../protobuf.git
+	url = git@mudita.github.com:mudita/protobuf.git
 	branch = rt1051
 	shallow = true
 [submodule "module-utils/libphonenumber"]
 	path = module-utils/libphonenumber
-	url = ../libphonenumber.git
+	url = git@mudita.github.com:mudita/libphonenumber.git
 	branch = rt1051
 	shallow = true
 [submodule "test/googletest"]
@@ -35,21 +35,21 @@
 	url = https://github.com/catchorg/Catch2
 [submodule "module-utils/date"]
 	path = module-utils/date
-	url = ../date.git
+	url = git@mudita.github.com:mudita/date.git
 [submodule "module-audio/Audio/decoder/minimp3"]
 	path = module-audio/Audio/decoder/minimp3
-	url = ../minimp3.git
+	url = git@mudita.github.com:mudita/minimp3.git
     branch = RT1051
 [submodule "module-utils/taglib"]
 	path = module-utils/taglib
-	url = ../taglib.git
+	url = git@mudita.github.com:mudita/taglib.git
 	branch = rt1051
 [submodule "module-bluetooth/lib/btstack"]
 	path = module-bluetooth/lib/btstack
-	url = ../btstack.git
+	url = git@mudita.github.com:mudita/btstack.git
 [submodule "module-utils/pugixml"]
 	path = module-utils/pugixml
-	url = ../pugixml.git
+	url = git@mudita.github.com:mudita/pugixml.git
 [submodule "module-utils/magic_enum"]
 	path = module-utils/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
@@ -58,10 +58,10 @@
 	url = https://github.com/codeplea/tinyexpr.git
 [submodule "module-bsp/board/rt1051/bsp/usb"]
 	path = module-bsp/board/rt1051/bsp/usb
-	url = ../usb_stack.git
+	url = git@mudita.github.com:mudita/usb_stack.git
 [submodule "module-vfs/thirdparty/fatfs"]
 	path = module-vfs/thirdparty/fatfs
-	url = ../fatfs.git
+	url = git@mudita.github.com:mudita/fatfs.git
 [submodule "host-tools/littlefs-fuse/lfsfuse"]
 	path = host-tools/littlefs-fuse/lfsfuse
 	url = https://github.com/littlefs-project/littlefs-fuse.git
@@ -76,10 +76,10 @@
 	url = https://github.com/boost-ext/sml
 [submodule "tools/misc"]
 	path = tools/misc
-	url = ../misc-tools.git
+	url = git@mudita.github.com:mudita/misc-tools.git
 [submodule "test/harness"]
 	path = test/harness
-	url = ../QAMuditaHarness.git
+	url = git@mudita.github.com:mudita/QAMuditaHarness.git
 	shallow = true
 [submodule "module-utils/CrashDebug"]
 	path = module-utils/CrashDebug
