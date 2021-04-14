@@ -33,7 +33,11 @@ namespace bsp {
 
         SSwitchUp = 34,
         SSwitchDown = 54,
-        SSwitchMid = 44
+        SSwitchMid = 44,
+
+        HeadsetOk      = 71,
+        HeadsetVolUp   = 72,
+        HeadsetVolDown = 73
     };
 }
 
@@ -92,6 +96,12 @@ inline const char *c_str(bsp::KeyCodes code)
         return "SSwitchDown";
     case bsp::KeyCodes::SSwitchMid:
         return "SSwitchMid";
+    case bsp::KeyCodes::HeadsetOk:
+        return "HeadsetOk";
+    case bsp::KeyCodes::HeadsetVolUp:
+        return "HeadsetVolUp";
+    case bsp::KeyCodes::HeadsetVolDown:
+        return "HeadsetVolDown";
     }
     return "";
 }

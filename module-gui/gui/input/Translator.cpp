@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Translator.hpp"
@@ -137,6 +137,15 @@ namespace gui
         case bsp::KeyCodes::SSwitchMid:
             return gui::KeyCode::SWITCH_MID;
             break;
+        case bsp::KeyCodes::HeadsetOk:
+            return gui::KeyCode::HEADSET_OK;
+
+        case bsp::KeyCodes::HeadsetVolUp:
+            return gui::KeyCode::HEADSET_VOLUP;
+
+        case bsp::KeyCodes::HeadsetVolDown:
+            return gui::KeyCode::HEADSET_VOLDN;
+
         default:
             LOG_ERROR("Unhandled bsp key!");
             return gui::KeyCode::KEY_UNDEFINED;
