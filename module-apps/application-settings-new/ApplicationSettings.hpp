@@ -32,13 +32,11 @@ namespace gui::window::name
     inline constexpr auto locked_screen  = "LockedScreen";
 
     inline constexpr auto phone              = "Phone";
-    inline constexpr auto call_ringtone      = "CallRingtone";
     inline constexpr auto messages           = "Messages";
-    inline constexpr auto message_sound      = "MessageSound";
     inline constexpr auto message_templates  = "MessageTemplates";
     inline constexpr auto calendar           = "Calendar";
-    inline constexpr auto notification_sound = "NotificationSound";
     inline constexpr auto alarm_clock        = "AlarmClock";
+    inline constexpr auto sound_select       = "SoundSelect";
     inline constexpr auto torch              = "Torch";
     inline constexpr auto nightshift         = "Nightshift";
 
