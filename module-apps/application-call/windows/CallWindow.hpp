@@ -45,6 +45,7 @@ namespace gui
 
         bool handleLeftButton();
         bool handleRightButton();
+        bool handleHeadsetOkButton();
         void setState(app::call::State state);
         [[nodiscard]] auto getState() const noexcept -> app::call::State;
 

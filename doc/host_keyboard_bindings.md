@@ -7,7 +7,7 @@
 - [Battery "buttons"](#battery-buttons)
 
 ### Functional buttons
-- Volume up         - key [ `R` ] 
+- Volume up         - key [ `R` ]
 - Volume down 		- key [ `F` ]
 - Functional left 	- key [ `Q` ]
 - Functional right 	- key [ `E` ]
@@ -20,6 +20,9 @@
 - Slider mid		- key [ `B` ]
 - Slider down 		- key [ `N` ]
 - Torch button 		- key [ `T` ]
+- Headset OK        - key [ `U` ]
+- Headset Vol +     - key [ `J` ]
+- Headset Vol -     - key [ `M` ]
 
 ### Numeric buttons
 - Numeric 0		- key [ `0` ]
@@ -39,3 +42,8 @@
  - Connect/disconnect wall adapter		- key [ `P` ]
  - Decrease battery level		- key [ `[` ]
  - Increase battery level		- key [ `]` ]
+
+### Charger type selection
+ - Standard Downstream Port (SDP) - key [ `L` ]
+ - Charging Downstream Port (CDP) - key [ `;` ]
+ - Dedicated Charging Port  (DCP) - key [ `'` ]

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -41,6 +41,10 @@ namespace gui
         SWITCH_UP  = static_cast<int>(bsp::KeyCodes::SSwitchUp),
         SWITCH_MID = static_cast<int>(bsp::KeyCodes::SSwitchMid),
         SWITCH_DN  = static_cast<int>(bsp::KeyCodes::SSwitchDown),
+
+        HEADSET_OK    = static_cast<int>(bsp::KeyCodes::HeadsetOk),
+        HEADSET_VOLUP = static_cast<int>(bsp::KeyCodes::HeadsetVolUp),
+        HEADSET_VOLDN = static_cast<int>(bsp::KeyCodes::HeadsetVolDown),
     };
 
     static const int InvalidNumericKeyCode = -1;
@@ -181,6 +185,12 @@ namespace gui
         return "SWITCH_MID";
     case gui::KeyCode::SWITCH_DN:
         return "SWITCH_DN";
+    case gui::KeyCode::HEADSET_OK:
+        return "HEADSET_OK";
+    case gui::KeyCode::HEADSET_VOLUP:
+        return "HEADSET_VOLUP";
+    case gui::KeyCode::HEADSET_VOLDN:
+        return "HEADSET_VOLDN";
     }
     return "";
 }
