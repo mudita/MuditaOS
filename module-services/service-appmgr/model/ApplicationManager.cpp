@@ -142,7 +142,8 @@ namespace app::manager
 
     sys::ReturnCodes ApplicationManager::InitHandler()
     {
-        utils::localize.setDisplayLanguage(settings->getValue(settings::SystemProperties::displayLanguage));
+        utils::localize.setDisplayLanguage(
+            settings->getValue(settings::SystemProperties::displayLanguage, settings::SettingsScope::Global));
 
         settings->registerValueChange(
             settings::SystemProperties::displayLanguage,

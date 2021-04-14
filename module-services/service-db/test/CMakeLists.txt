@@ -19,4 +19,15 @@ add_catch2_executable(
             disk_image
 )
 
+add_catch2_executable(
+        NAME
+            entry-path
+        SRCS
+            main.cpp
+            test-entry-path.cpp
+        LIBS
+            service-db
+            module-db
+)
+
 add_subdirectory(test-settings)

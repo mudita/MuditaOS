@@ -155,6 +155,13 @@ TESTS_LIST["catch2-dependency-graph-tests"]="
     Given Dependency Graph When topological sort on directed cyclic graph then verify order;
 "
 #---------
+TESTS_LIST["catch2-entry-path"]="
+    Entry Path - is less comparison - different settings scope;
+    Entry Path - is less comparison - Global scope;
+    Entry Path - is less comparison - AppLocal scope;
+    Entry Path - std::map::find - EGD-6486;
+"
+#---------
 TESTS_LIST["catch2-gui"]="
     Test BoundingBox intersect;
     Are fonts loaded;
