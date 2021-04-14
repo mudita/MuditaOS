@@ -6,6 +6,7 @@
 #include "BaseSettingsWindow.hpp"
 #include "OptionsWidgetMaker.hpp"
 #include <application-settings-new/models/AudioSettingsModel.hpp>
+
 namespace gui
 {
     ///  @brief Phone (call) vibration and sound settings window

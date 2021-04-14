@@ -3,7 +3,9 @@
 
 #include "MessagesWindow.hpp"
 
+#include <application-settings-new/data/SoundSelectData.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
+
 #include <i18n/i18n.hpp>
 #include <OptionWindow.hpp>
 #include <OptionSetting.hpp>
@@ -67,7 +69,11 @@ namespace gui
 
     void MessagesWindow::openMessageSoundWindow()
     {
-        this->application->switchWindow(gui::window::name::message_sound);
+        SoundSelectData::Info info;
+        info.windowTitle = utils::translate("app_settings_message_sound");
+        info.audioModel  = mAudioModel.get();
+
+        application->switchWindow(gui::window::name::sound_select, std::make_unique<SoundSelectData>(info));
     }
 
     void MessagesWindow::openMessageTemplates()
