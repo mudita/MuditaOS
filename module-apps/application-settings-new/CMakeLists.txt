@@ -24,6 +24,7 @@ target_sources( ${PROJECT_NAME}
         models/CategoriesModel.cpp
         models/SARInfoRepository.cpp
         models/AudioSettingsModel.cpp
+        models/SoundsModel.cpp
         presenter/SARInfoWindowPresenter.cpp
         widgets/ChangePasscodeLockHandler.cpp
         widgets/QuoteWidget.cpp
@@ -31,6 +32,7 @@ target_sources( ${PROJECT_NAME}
         widgets/ApnInputWidget.cpp
         widgets/SettingsDateItem.cpp
         widgets/SettingsTimeItem.cpp
+        widgets/SettingsSoundItem.cpp
         windows/SettingsMainWindow.cpp
         windows/AddDeviceWindow.cpp
         windows/AllDevicesWindow.cpp
@@ -49,12 +51,10 @@ target_sources( ${PROJECT_NAME}
         windows/NightshiftWindow.cpp
         windows/OptionsWidgetMaker.cpp
         windows/PhoneWindow.cpp
-        windows/CallRingtoneWindow.cpp
         windows/MessagesWindow.cpp
-        windows/MessageSoundWindow.cpp
         windows/CalendarWindow.cpp
-        windows/NotificationSoundWindow.cpp
         windows/AlarmClockWindow.cpp
+        windows/SoundSelectWindow.cpp
         windows/PhoneNameWindow.cpp
         windows/AutolockWindow.cpp
         windows/TorchWindow.cpp

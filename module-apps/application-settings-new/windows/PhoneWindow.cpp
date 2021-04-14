@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneWindow.hpp"
-
+#include <application-settings-new/data/SoundSelectData.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
+
 #include <i18n/i18n.hpp>
 #include <OptionWindow.hpp>
 #include <OptionSetting.hpp>
@@ -52,7 +53,10 @@ namespace gui
 
     void PhoneWindow::openRingtoneWindow()
     {
-        application->switchWindow(gui::window::name::call_ringtone);
+        SoundSelectData::Info info;
+        info.windowTitle = utils::translate("app_settings_call_ringtome");
+        info.audioModel  = mAudioModel.get();
+        application->switchWindow(gui::window::name::sound_select, std::make_unique<SoundSelectData>(info));
     }
 
 } // namespace gui

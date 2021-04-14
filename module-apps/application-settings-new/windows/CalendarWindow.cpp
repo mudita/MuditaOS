@@ -3,6 +3,7 @@
 
 #include "CalendarWindow.hpp"
 
+#include <application-settings-new/data/SoundSelectData.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <i18n/i18n.hpp>
 #include "BaseSettingsWindow.hpp"
@@ -55,7 +56,11 @@ namespace gui
 
     void CalendarWindow::openNoticicationSoundWindow()
     {
-        application->switchWindow(gui::window::name::notification_sound);
+        SoundSelectData::Info info;
+        info.windowTitle = utils::translate("app_settings_notification_sound");
+        info.audioModel  = mAudioModel.get();
+
+        application->switchWindow(gui::window::name::sound_select, std::make_unique<SoundSelectData>(info));
     }
 
 } // namespace gui

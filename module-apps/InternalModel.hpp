@@ -40,7 +40,7 @@ namespace app
             internalLimit  = limit;
         }
 
-        gui::ListItem *getRecord(gui::Order order)
+        T getRecord(gui::Order order)
         {
             auto index = 0;
             if (order == gui::Order::Previous) {
@@ -70,7 +70,7 @@ namespace app
             Item->clearNavigationItem(gui::NavigationDirection::DOWN);
         }
 
-        [[nodiscard]] gui::ListItem *getInternalDataElement(unsigned int index, gui::Order order)
+        [[nodiscard]] T getInternalDataElement(unsigned int index, gui::Order order)
         {
             if (isIndexValid(index, order)) {
                 clearItemProperties(internalData[index]);

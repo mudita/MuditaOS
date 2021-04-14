@@ -3,57 +3,59 @@
 
 #include "ApplicationSettings.hpp"
 
-#include "windows/AddDeviceWindow.hpp"
-#include "windows/AllDevicesWindow.hpp"
-#include "windows/ApnSettingsWindow.hpp"
-#include "windows/ApnOptionsWindow.hpp"
-#include "windows/BluetoothWindow.hpp"
-#include "windows/SettingsMainWindow.hpp"
-#include "windows/DisplayAndKeypadWindow.hpp"
-#include "windows/InputLanguageWindow.hpp"
-#include "windows/LockedScreenWindow.hpp"
-#include "windows/FontSizeWindow.hpp"
-#include "windows/DisplayLightWindow.hpp"
-#include "windows/KeypadLightWindow.hpp"
-#include "windows/AppsAndToolsWindow.hpp"
-#include "windows/NightshiftWindow.hpp"
-#include "windows/NetworkWindow.hpp"
-#include "windows/PhoneWindow.hpp"
-#include "windows/CallRingtoneWindow.hpp"
-#include "windows/MessagesWindow.hpp"
-#include "windows/MessageSoundWindow.hpp"
-#include "windows/CalendarWindow.hpp"
-#include "windows/NotificationSoundWindow.hpp"
-#include "windows/AlarmClockWindow.hpp"
-#include "windows/PhoneNameWindow.hpp"
-#include "windows/AutolockWindow.hpp"
-#include "windows/TorchWindow.hpp"
-#include "windows/WallpaperWindow.hpp"
-#include "windows/QuotesMainWindow.hpp"
-#include "windows/QuotesAddWindow.hpp"
-#include "windows/EditQuotesWindow.hpp"
-#include "windows/QuoteCategoriesWindow.hpp"
-#include "windows/SecurityMainWindow.hpp"
-#include "windows/QuotesOptionsWindow.hpp"
-#include "windows/SARInfoWindow.hpp"
-#include "windows/ChangePasscodeWindow.hpp"
-#include "windows/SystemMainWindow.hpp"
-#include "windows/NewApnWindow.hpp"
-#include "windows/LanguagesWindow.hpp"
-#include "windows/DateAndTimeMainWindow.hpp"
-#include "windows/ChangeTimeZone.hpp"
-#include "windows/ChangeDateAndTimeWindow.hpp"
-#include "windows/PhoneModesWindow.hpp"
-#include "windows/PINSettingsWindow.hpp"
-#include "windows/DoNotDisturbWindow.hpp"
-#include "windows/OfflineWindow.hpp"
-#include "windows/ConnectionFrequencyWindow.hpp"
-#include "windows/AboutYourPureWindow.hpp"
-#include "windows/CertificationWindow.hpp"
-#include "windows/TechnicalInformationWindow.hpp"
-
-#include "Dialog.hpp"
-#include "DialogMetadataMessage.hpp"
+#include <application-settings-new/windows/AddDeviceWindow.hpp>
+#include <application-settings-new/windows/AllDevicesWindow.hpp>
+#include <application-settings-new/windows/ApnSettingsWindow.hpp>
+#include <application-settings-new/windows/ApnOptionsWindow.hpp>
+#include <application-settings-new/windows/BluetoothWindow.hpp>
+#include <application-settings-new/windows/SettingsMainWindow.hpp>
+#include <application-settings-new/windows/DisplayAndKeypadWindow.hpp>
+#include <application-settings-new/windows/InputLanguageWindow.hpp>
+#include <application-settings-new/windows/LockedScreenWindow.hpp>
+#include <application-settings-new/windows/FontSizeWindow.hpp>
+#include <application-settings-new/windows/DisplayLightWindow.hpp>
+#include <application-settings-new/windows/KeypadLightWindow.hpp>
+#include <application-settings-new/windows/AppsAndToolsWindow.hpp>
+#include <application-settings-new/windows/NightshiftWindow.hpp>
+#include <application-settings-new/windows/NetworkWindow.hpp>
+#include <application-settings-new/windows/PhoneWindow.hpp>
+#include <application-settings-new/windows/MessagesWindow.hpp>
+#include <application-settings-new/windows/CalendarWindow.hpp>
+#include <application-settings-new/windows/AlarmClockWindow.hpp>
+#include <application-settings-new/windows/SoundSelectWindow.hpp>
+#include <application-settings-new/windows/PhoneNameWindow.hpp>
+#include <application-settings-new/windows/AutolockWindow.hpp>
+#include <application-settings-new/windows/TorchWindow.hpp>
+#include <application-settings-new/windows/WallpaperWindow.hpp>
+#include <application-settings-new/windows/QuotesMainWindow.hpp>
+#include <application-settings-new/windows/QuotesAddWindow.hpp>
+#include <application-settings-new/windows/EditQuotesWindow.hpp>
+#include <application-settings-new/windows/QuoteCategoriesWindow.hpp>
+#include <application-settings-new/windows/SecurityMainWindow.hpp>
+#include <application-settings-new/windows/QuotesOptionsWindow.hpp>
+#include <application-settings-new/windows/SARInfoWindow.hpp>
+#include <application-settings-new/windows/ChangePasscodeWindow.hpp>
+#include <application-settings-new/windows/SystemMainWindow.hpp>
+#include <application-settings-new/windows/NewApnWindow.hpp>
+#include <application-settings-new/windows/LanguagesWindow.hpp>
+#include <application-settings-new/windows/DateAndTimeMainWindow.hpp>
+#include <application-settings-new/windows/ChangeTimeZone.hpp>
+#include <application-settings-new/windows/ChangeDateAndTimeWindow.hpp>
+#include <application-settings-new/windows/PhoneModesWindow.hpp>
+#include <application-settings-new/windows/PINSettingsWindow.hpp>
+#include <application-settings-new/windows/DoNotDisturbWindow.hpp>
+#include <application-settings-new/windows/OfflineWindow.hpp>
+#include <application-settings-new/windows/ConnectionFrequencyWindow.hpp>
+#include <application-settings-new/windows/AboutYourPureWindow.hpp>
+#include <application-settings-new/windows/CertificationWindow.hpp>
+#include <application-settings-new/windows/TechnicalInformationWindow.hpp>
+#include <application-settings-new/data/ApnListData.hpp>
+#include <application-settings-new/data/BondedDevicesData.hpp>
+#include <application-settings-new/data/BluetoothStatusData.hpp>
+#include <application-settings-new/data/DeviceData.hpp>
+#include <application-settings-new/data/LanguagesData.hpp>
+#include <application-settings-new/data/PhoneNameData.hpp>
+#include <application-settings-new/data/PINSettingsLockStateData.hpp>
 
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-cellular/CellularServiceAPI.hpp>
@@ -68,17 +70,8 @@
 #include <service-bluetooth/messages/ResponseVisibleDevices.hpp>
 #include <service-bluetooth/messages/Unpair.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
-#include <application-settings-new/data/ApnListData.hpp>
-#include <application-settings-new/data/BondedDevicesData.hpp>
-#include <application-settings-new/data/BluetoothStatusData.hpp>
-#include <application-settings-new/data/DeviceData.hpp>
-#include <application-settings-new/data/LanguagesData.hpp>
-#include <application-settings-new/data/PhoneNameData.hpp>
-#include <application-settings-new/data/PINSettingsLockStateData.hpp>
-#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
-
-#include <i18n/i18n.hpp>
+#include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/ScreenLightControlMessage.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/Constants.hpp>
 #include <module-services/service-evtmgr/service-evtmgr/EVMessages.hpp>
@@ -86,6 +79,10 @@
 #include <module-services/service-appmgr/service-appmgr/model/ApplicationManager.hpp>
 #include <module-apps/application-desktop/windows/PinLockWindow.hpp>
 #include <module-apps/application-desktop/windows/Names.hpp>
+#include <module-apps/messages/DialogMetadataMessage.hpp>
+#include <module-apps/windows/Dialog.hpp>
+
+#include <i18n/i18n.hpp>
 
 namespace app
 {
@@ -428,29 +425,23 @@ namespace app
                 std::make_unique<audio_settings::AudioSettingsModel>(app, audio_settings::PlaybackType::CallRingtone);
             return std::make_unique<gui::PhoneWindow>(app, std::move(audioModel));
         });
-        windowsFactory.attach(gui::window::name::call_ringtone, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::CallRingtoneWindow>(app);
-        });
         windowsFactory.attach(gui::window::name::messages, [](Application *app, const std::string &name) {
             auto audioModel = std::make_unique<audio_settings::AudioSettingsModel>(
                 app, audio_settings::PlaybackType::TextMessageRingtone);
             return std::make_unique<gui::MessagesWindow>(app, std::move(audioModel));
-        });
-        windowsFactory.attach(gui::window::name::message_sound, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::MessageSoundWindow>(app);
         });
         windowsFactory.attach(gui::window::name::calendar, [](Application *app, const std::string &name) {
             auto audioModel =
                 std::make_unique<audio_settings::AudioSettingsModel>(app, audio_settings::PlaybackType::Notifications);
             return std::make_unique<gui::CalendarWindow>(app, std::move(audioModel));
         });
-        windowsFactory.attach(gui::window::name::notification_sound, [](Application *app, const std::string &name) {
-            return std::make_unique<gui::NotificationSoundWindow>(app);
-        });
         windowsFactory.attach(gui::window::name::alarm_clock, [](Application *app, const std::string &name) {
             auto audioModel =
                 std::make_unique<audio_settings::AudioSettingsModel>(app, audio_settings::PlaybackType::Alarm);
             return std::make_unique<gui::AlarmClockWindow>(app, std::move(audioModel));
+        });
+        windowsFactory.attach(gui::window::name::sound_select, [](Application *app, const std::string &name) {
+            return std::make_unique<gui::SoundSelectWindow>(app, name);
         });
         windowsFactory.attach(gui::window::name::phone_name, [](Application *app, const std::string &name) {
             return std::make_unique<gui::PhoneNameWindow>(app);
