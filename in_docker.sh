@@ -18,11 +18,11 @@ fi
 
 function help() {
     cat <<- MSGEND
-		This scripts runs configuration and build in docker container.
+		This script runs configuration and builds in docker container.
 		You don't have to setup entire build environment, just use container.
 		 
-		Ussage:
-		${0} login|config|make [addiotional options]
+		Usage:
+		${0} login|config|make [additional options]
 		 
 		    login                                   - login to build container - usually not needed
 		    config <target> <build_type> [OPTIONS]  - run ./configure.sh in container
@@ -30,7 +30,7 @@ function help() {
 		                                              OPTIONS are passed to cmake as is
 		                                              run '${0} config' without params to see details
 		    make|ninja <build_directory> [OPTIONS]        - run 'make' in container. You have to pass directory
-		                                              creted by '${0} config' command.
+		                                              created by '${0} config' command.
 		                                              you can pass additional arguments for make linke '-j' or 'VERBOSE=1'
 		MSGEND
     exit 0
