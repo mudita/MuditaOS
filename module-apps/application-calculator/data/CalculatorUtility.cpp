@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalculatorUtility.hpp"
@@ -11,6 +11,11 @@
 Result Calculator::calculate(std::string source)
 {
     source = prepareEquationForParser(source);
+
+    if (source.empty()) {
+        return Result{source, {}, false};
+    }
+
     int error;
     double result = te_interp(source.c_str(), &error);
     if (error == 0 && !std::isinf(result) && !std::isnan(result)) {
