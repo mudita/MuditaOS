@@ -225,6 +225,8 @@ TESTS_LIST["catch2-gui-text"]="
     TextLineCursor - navigation without scroll;
     TextLineCursor - navigation with scroll;
     TextLineCursor - addition and deletion with scroll;
+    TextFixedSize drawLines;
+    TextFixedSize remove Char;
 "
 #---------
 TESTS_LIST["catch2-PowerManager"]="
