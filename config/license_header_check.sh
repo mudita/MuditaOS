@@ -184,7 +184,7 @@ function shouldnt_ignore() {
 function help() {
     cat <<END
     check and update header files with copyright notice
-    ussage:
+    usage:
         $0 [--help | --check-only]
         $0 --hook [ --check-only]
                 Run as git "pre-commith.hook", checks against files in stash

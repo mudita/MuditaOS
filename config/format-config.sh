@@ -3,7 +3,7 @@
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 # config file for pre-commit.hook clang-format
-# ignore file for clang-format autoformating
+# ignore file for clang-format autoformatting
 
 # set this variable in your shell if you wish to disable autoformatting on commit for time being
 export DISABLE_AUTO_FORMATTING=0
@@ -11,7 +11,7 @@ export DISABLE_AUTO_FORMATTING=0
 # set this variable to get more verbose output
 export VERBOSE=1
 
-# ignore_paths for formatter - these are regex matched with filenames to be formated
+# ignore_paths for formatter - these are regex matched with filenames to be formatted
 # if you don't wish to format i.e one file - just pass whole path to this file from git root directory
 export declare ignore_paths=(
     '.*/catch.hpp'
