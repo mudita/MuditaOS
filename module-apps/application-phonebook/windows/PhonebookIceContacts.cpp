@@ -4,7 +4,6 @@
 #include "PhonebookIceContacts.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookStyle.hpp"
-#include "service-appmgr/Controller.hpp"
 
 #include <service-db/DBNotificationMessage.hpp>
 
@@ -57,11 +56,7 @@ namespace gui
     bool PhonebookIceContacts::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortPress()) {
-            if (inputEvent.is(KeyCode::KEY_RF)) {
-                app::manager::Controller::switchBack(application);
-                return true;
-            }
-            else if (inputEvent.is(KeyCode::KEY_ENTER)) {
+            if (inputEvent.is(KeyCode::KEY_ENTER)) {
                 return true;
             }
         }
