@@ -33,6 +33,14 @@ namespace service::gui
         constexpr std::chrono::milliseconds BSPEinkBusyTimeout{3000}; ///< sync with \ref BSP_EinkBusyTimeout
         constexpr std::chrono::milliseconds RTOSMessageRoundtripTimeout{1000};
         constexpr std::chrono::milliseconds ContextReleaseTimeout{BSPEinkBusyTimeout + RTOSMessageRoundtripTimeout};
+
+        ::gui::RefreshModes getMaxRefreshMode(::gui::RefreshModes lhs, ::gui::RefreshModes rhs) noexcept
+        {
+            if (lhs == ::gui::RefreshModes::GUI_REFRESH_DEEP) {
+                return lhs;
+            }
+            return rhs;
+        }
     } // namespace
 
     ServiceGUI::ServiceGUI(const std::string &name, std::string parent)
@@ -184,14 +192,17 @@ namespace service::gui
     {
         auto finishedMsg       = static_cast<service::gui::RenderingFinished *>(message);
         const auto contextId   = finishedMsg->getContextId();
-        const auto refreshMode = finishedMsg->getRefreshMode();
+        auto refreshMode       = finishedMsg->getRefreshMode();
         if (isInState(State::Idle)) {
+            if (cache.isRenderCached()) {
+                refreshMode = getMaxRefreshMode(cache.getCachedRender()->refreshMode, refreshMode);
+                cache.invalidate();
+            }
             const auto context = contextPool->peekContext(contextId);
             sendOnDisplay(context, contextId, refreshMode);
-            invalidateCache();
         }
         else {
-            cacheRender(contextId, refreshMode);
+            cache.cache({contextId, refreshMode});
             contextPool->returnContext(contextId);
         }
         return sys::MessageNone{};
@@ -216,16 +227,6 @@ namespace service::gui
                 LOG_WARN("Context #%d released after timeout. Does ServiceEink respond properly?", contextId);
             });
         contextReleaseTimer.start();
-    }
-
-    void ServiceGUI::cacheRender(int contextId, ::gui::RefreshModes refreshMode)
-    {
-        cachedRender = CachedRender{contextId, refreshMode};
-    }
-
-    void ServiceGUI::invalidateCache()
-    {
-        cachedRender = std::nullopt;
     }
 
     sys::MessagePointer ServiceGUI::handleEinkInitialized(sys::Message *message)
@@ -258,7 +259,7 @@ namespace service::gui
 
     bool ServiceGUI::isNextFrameReady() const noexcept
     {
-        return cachedRender.has_value();
+        return cache.isRenderCached();
     }
 
     bool ServiceGUI::isAnyFrameBeingRenderedOrDisplayed() const noexcept
@@ -268,11 +269,11 @@ namespace service::gui
 
     void ServiceGUI::trySendNextFrame()
     {
-        const auto contextId = cachedRender->contextId;
+        const auto contextId = cache.getCachedRender()->contextId;
         if (const auto context = contextPool->borrowContext(contextId); context != nullptr) {
-            sendOnDisplay(context, contextId, cachedRender->refreshMode);
+            sendOnDisplay(context, contextId, cache.getCachedRender()->refreshMode);
         }
-        invalidateCache();
+        cache.invalidate();
     }
 
     void ServiceGUI::setState(State state) noexcept

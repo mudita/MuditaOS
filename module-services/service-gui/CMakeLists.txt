@@ -5,6 +5,7 @@ set(SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/ServiceGUI.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/WorkerGUI.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/ContextPool.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/RenderCache.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/DrawCommandsQueue.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/SynchronizationMechanism.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/messages/DrawMessage.cpp"
