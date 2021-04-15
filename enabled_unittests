@@ -233,6 +233,13 @@ TESTS_LIST["catch2-PowerManager"]="
     Power Manager CPU sentinels governor test;
 "
 #---------
+TESTS_LIST["catch2-render-cache-tests"]="
+    Render cache - default initialized;
+    Render cache - cache;
+    Render cache - cache and invalidate;
+    Render cache - exchange cached item;
+"
+#---------
 TESTS_LIST["catch2-service-db"]="
     DB_API;
     Settings Messages;

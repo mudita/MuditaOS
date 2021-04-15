@@ -16,6 +16,7 @@
 #include "ContextPool.hpp"
 #include "DrawCommandsQueue.hpp"
 #include "Common.hpp"
+#include "RenderCache.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -46,11 +47,6 @@ namespace service::gui
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
       private:
-        struct CachedRender
-        {
-            int contextId;
-            ::gui::RefreshModes refreshMode;
-        };
         enum class State
         {
             NotInitialised,
@@ -61,9 +57,6 @@ namespace service::gui
 
         static void initAssetManagers();
         void registerMessageHandlers();
-
-        void cacheRender(int contextId, ::gui::RefreshModes refreshMode);
-        void invalidateCache();
 
         void prepareDisplayEarly(::gui::RefreshModes refreshMode);
         void notifyRenderer(std::list<std::unique_ptr<::gui::DrawCommand>> &&commands, ::gui::RefreshModes refreshMode);
@@ -88,7 +81,7 @@ namespace service::gui
         std::unique_ptr<WorkerGUI> worker;
         std::unique_ptr<DrawCommandsQueue> commandsQueue;
         std::unique_ptr<::gui::ColorScheme> colorSchemeUpdate;
-        std::optional<CachedRender> cachedRender;
+        RenderCache cache;
         sys::TimerHandle contextReleaseTimer;
         State currentState;
         bool lastRenderScheduled;
