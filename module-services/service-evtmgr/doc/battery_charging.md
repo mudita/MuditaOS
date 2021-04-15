@@ -29,16 +29,23 @@ Default current limit of a charger to draw from USB port is 500mA. Due to severa
 - Charging downstream port (CDP)
 - Dedicated charging port (DCP)
 
-PureOS limits the bus current to 500mA, in case of SDP, and to 1500mA in case of CDP and DCP. USB type recognition is part of the USB stack.
+PureOS limits the bus current to 500mA, in case of SDP, and to 1000mA in case of CDP and DCP. USB type recognition is part of the USB stack.
 
 ![](USB_current_selection.svg "Current selection algorithm")
 
 ## Charger cutoff due to temperature
 
-In order to prevent fast battery cell degradation, charging action needs to be prohibited in specific temperature range. For given cell valid charging range is 0-45 Cdeg. 
+In order to prevent fast battery cell degradation, charging action needs to be controlled in specific temperature ranges. Given requirements from battery specification:
+- 1 to 15 Cdeg : 0.2C current limit
+- 15 to 35 Cdeg : 1C current limit
+- 35 to 45 Cdeg : 4.1V charging voltage
 
-Current implementation cuts off charging when cell temperature is outside this range. Mechanism is interrupt-driven. In interrupt handler temperature measurement is sampled and appropriate interrupt range is set. The same action is done at the time of initialization. This way no cyclic sampling of the temperature has to be done. Algorithm could be described by following graph:
+For battery in the system value of 1C equals 1600mA. 
 
-![](charger_temperature_cutoff.svg "Charging cutoff")
+**NOTE: Charging current limit has lower priority than USB current limit. Therefore, final charging current will be lower than USB current.**
 
-Additional 1 Cdeg hysteresis was introduced to prevent rapid changes in charging state.
+Implementation is interrupt-driven. In interrupt handler temperature measurement is sampled and appropriate interrupt range is set. The same action is done at the time of initialization. This way no cyclic sampling of the temperature has to be done. Algorithm could be described by following graph:
+
+![](charger_temperature_algorithm.svg "Charging control due to temperature")
+
+Additional 2 Cdeg hysteresis was introduced to prevent rapid changes in charging states.
