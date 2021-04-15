@@ -4,6 +4,7 @@
 #include <catch2/catch.hpp>
 #include <purefs/blkdev/disk_manager.hpp>
 #include <purefs/blkdev/disk_image.hpp>
+#include <filesystem>
 
 namespace
 {
@@ -11,7 +12,9 @@ namespace
     constexpr auto part_disk_image     = "test_disk.img";
     constexpr auto part_disk_image_ext = "test_disk_ext.img";
     constexpr auto part_disk_image_bad = "test_disk_bad.img";
+    constexpr auto eeprom_image        = "test_eeprom.bin";
 } // namespace
+
 TEST_CASE("Registering and unregistering device")
 {
     using namespace purefs;
@@ -117,7 +120,7 @@ TEST_CASE("Alternative partitions in the disk manager")
     REQUIRE(sect_size > 0);
     REQUIRE(sect_size == sect_size1);
     const auto sect_count = dm.get_info("emmc0sys1", blkdev::info_type::sector_count);
-    REQUIRE(sect_count == (256L * 1024L * 1024L) / sect_size);
+    REQUIRE(sect_count == (32 * 1024L * 1024L) / sect_size);
     const auto sect_count1 = dm.get_info("emmc0", blkdev::info_type::sector_count);
     REQUIRE(sect_count1 > sect_count);
     std::vector<char> buf1(sect_size, 0);
@@ -134,6 +137,35 @@ TEST_CASE("Alternative partitions in the disk manager")
     std::fill(std::begin(buf2), std::end(buf2), 0xBB);
     REQUIRE(dm.read("emmc0sys0", buf1.data(), 0, 1) == 0);
     REQUIRE(buf1 == buf2);
+}
+
+TEST_CASE("Disk manager EEPROM emulation")
+{
+    static constexpr auto eeprom_size        = 32768;
+    static constexpr auto eeprom_sector_size = 64;
+
+    using namespace purefs;
+    std::ofstream ofc(eeprom_image);
+    ofc.close();
+    std::filesystem::resize_file(eeprom_image, eeprom_size);
+    blkdev::disk_manager dm;
+    auto disk = std::make_shared<blkdev::disk_image>(eeprom_image, eeprom_sector_size, 1);
+    REQUIRE(disk);
+    REQUIRE(dm.register_device(disk, "nvrom0", blkdev::flags::no_parts_scan) == 0);
+    const auto sect_size  = dm.get_info("nvrom0", blkdev::info_type::sector_size);
+    const auto sect_count = dm.get_info("nvrom0", blkdev::info_type::sector_count);
+    REQUIRE(sect_size == eeprom_sector_size);
+    REQUIRE(sect_count == eeprom_size / sect_size);
+    std::vector<char> buf_in1(sect_size, 0xAA);
+    std::vector<char> buf_in2(sect_size, 0xBB);
+    REQUIRE(dm.write("nvrom0", buf_in1.data(), 0, 1) == 0);
+    REQUIRE(dm.write("nvrom0", buf_in2.data(), sect_count - 1, 1) == 0);
+    std::vector<char> buf_out1(sect_size);
+    std::vector<char> buf_out2(sect_size);
+    REQUIRE(dm.read("nvrom0", buf_out1.data(), 0, 1) == 0);
+    REQUIRE(dm.read("nvrom0", buf_out2.data(), sect_count - 1, 1) == 0);
+    REQUIRE(buf_in1 == buf_out1);
+    REQUIRE(buf_in2 == buf_out2);
 }
 
 TEST_CASE("Null pointer passed to disk manager functions")

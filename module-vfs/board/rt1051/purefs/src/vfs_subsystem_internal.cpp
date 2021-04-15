@@ -11,4 +11,9 @@ namespace purefs::subsystem::internal
     {
         return std::make_shared<purefs::blkdev::disk_emmc>();
     }
+
+    auto create_default_nvm_device() -> std::shared_ptr<blkdev::disk>
+    {
+        return {};
+    }
 } // namespace purefs::subsystem::internal

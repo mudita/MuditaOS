@@ -433,6 +433,7 @@ TESTS_LIST["catch2-vfs-disk"]="
     Boundary checks for partitions;
     Disk sectors out of range for partition;
     Alternative partitions in the disk manager;
+    Disk manager EEPROM emulation;
 "
 #---------
 TESTS_LIST["catch2-vfs-littlefs"]="

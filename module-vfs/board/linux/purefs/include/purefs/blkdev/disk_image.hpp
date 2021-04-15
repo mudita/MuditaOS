@@ -5,20 +5,17 @@
 
 #include <purefs/blkdev/disk.hpp>
 #include <mutex>
-#include <array>
+#include <vector>
 
 namespace purefs::blkdev
 {
     class disk_image final : public disk
     {
-        static constexpr auto sector_size = 512UL;
         static constexpr auto invalid_fd      = -1;
-        static constexpr auto syspart_count   = 8U;
-        static constexpr auto syspart_size    = 256UL * 1024UL * 1024UL;
-        static constexpr auto syspart_sectors = syspart_size / sector_size;
+        static constexpr auto syspart_size    = 32 * 1024UL * 1024UL;
 
       public:
-        disk_image(std::string_view image_filename);
+        explicit disk_image(std::string_view image_filename, std::size_t sector_size = 512, hwpart_t num_parts = 8);
         virtual ~disk_image()
         {}
 
@@ -35,9 +32,12 @@ namespace purefs::blkdev
         auto open_and_truncate(hwpart_t hwpart) -> int;
 
       private:
-        std::array<int, syspart_count> m_filedes;
-        std::array<unsigned long, syspart_count> m_sectors;
+        std::vector<int> m_filedes;
+        std::vector<std::size_t> m_sectors;
         const std::string m_image_name;
+        const std::size_t m_sector_size;
+        const std::size_t m_syspart_sectors;
+        const hwpart_t m_sysparts;
         mutable std::recursive_mutex m_mtx;
     };
 } // namespace purefs::blkdev
