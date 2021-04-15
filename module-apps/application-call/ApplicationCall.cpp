@@ -150,60 +150,53 @@ namespace app
             return retMsg;
         }
 
-        if (msgl->messageType == MessageType::CellularNotification) {
-            auto *msg = dynamic_cast<CellularNotificationMessage *>(msgl);
-            assert(msg != nullptr);
+        if (auto msg = dynamic_cast<CellularMessage *>(msgl)) {
+            if (msg->type == CellularMessage::Type::Notification) {
+                auto *msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+                assert(msg != nullptr);
 
-            switch (msg->type) {
-            case CellularNotificationMessage::Type::CallAborted: {
-                callerIdTimer.reset();
-                CallAbortHandler();
-            } break;
-            case CellularNotificationMessage::Type::CallActive: {
-                CallActiveHandler();
-            } break;
-            default:
-                break;
+                switch (msg->content) {
+                case CellularNotificationMessage::Content::CallAborted: {
+                    callerIdTimer.reset();
+                    CallAbortHandler();
+                } break;
+                case CellularNotificationMessage::Content::CallActive: {
+                    CallActiveHandler();
+                } break;
+                default:
+                    break;
+                }
+
+                return std::make_shared<sys::ResponseMessage>();
             }
-
-            return std::make_shared<sys::ResponseMessage>();
+            else if (msg->type == CellularMessage::Type::Ringing) {
+                auto msg = dynamic_cast<CellularRingingMessage *>(msgl);
+                assert(msg != nullptr);
+                RingingHandler(msg);
+            }
+            else if (msg->type == CellularMessage::Type::IncomingCall) {
+                auto msg = dynamic_cast<CellularIncominCallMessage *>(msgl);
+                assert(msg != nullptr);
+                IncomingCallHandler(msg);
+            }
+            else if (msg->type == CellularMessage::Type::CallerId) {
+                auto msg = dynamic_cast<CellularCallerIdMessage *>(msgl);
+                assert(msg != nullptr);
+                CallerIdHandler(msg);
+            }
         }
 
-        else if (msgl->messageType == MessageType::CellularRinging) {
-            auto msg = dynamic_cast<CellularRingingMessage *>(msgl);
-            assert(msg != nullptr);
-            RingingHandler(msg);
-        }
-
-        else if (msgl->messageType == MessageType::CellularIncomingCall) {
-            auto msg = dynamic_cast<CellularIncominCallMessage *>(msgl);
-            assert(msg != nullptr);
-            IncomingCallHandler(msg);
-        }
-
-        else if (msgl->messageType == MessageType::CellularCallerId) {
-            auto msg = dynamic_cast<CellularCallerIdMessage *>(msgl);
-            assert(msg != nullptr);
-            CallerIdHandler(msg);
-        }
-
-        if (resp != nullptr) {
-            switch (resp->responseTo) {
-            case MessageType::CellularHangupCall: {
+        if (auto msg = dynamic_cast<CellularResponseMessage *>(resp)) {
+            if (msg->cellResponse == CellularMessage::Type::HangupCall) {
                 if (resp->retCode == sys::ReturnCodes::Success) {
                     CallAbortHandler();
                 }
-                break;
             }
-            default:
-                break;
-            }
-
             return std::make_shared<sys::ResponseMessage>();
         }
 
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-    }
+    } // namespace app
 
     // Invoked during initialization
     sys::ReturnCodes ApplicationCall::InitHandler()

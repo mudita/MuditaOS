@@ -2125,7 +2125,7 @@ std::shared_ptr<cellular::RawCommandRespAsync> ServiceCellular::handleCellularSt
     CellularStartOperatorsScanMessage *msg)
 {
     LOG_INFO("CellularStartOperatorsScan handled");
-    auto ret = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularOperatorsScanResult);
+    auto ret = std::make_shared<cellular::RawCommandRespAsync>(CellularMessage::Type::OperatorsScanResult);
     NetworkSettings networkSettings(*this);
     ret->data = networkSettings.scanOperators(msg->getFullInfo());
     bus.sendUnicast(ret, msg->sender);
@@ -2303,16 +2303,16 @@ void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage 
             if (!ongoingCall.endCall(CellularCall::Forced::True)) {
                 LOG_ERROR("Failed to end ongoing call");
             }
-            bus.sendMulticast(std::make_shared<CellularResponseMessage>(true, msg->messageType),
+            bus.sendMulticast(std::make_shared<CellularResponseMessage>(true, msg->type),
                               sys::BusChannel::ServiceCellularNotifications);
         }
         else {
             LOG_ERROR("Call not aborted");
-            bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->messageType),
+            bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->type),
                               sys::BusChannel::ServiceCellularNotifications);
         }
     }
-    bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->messageType),
+    bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->type),
                       sys::BusChannel::ServiceCellularNotifications);
 }
 
@@ -2419,7 +2419,7 @@ auto ServiceCellular::handleCellularGetOwnNumberMessage(sys::Message *msg) -> st
 
 auto ServiceCellular::handleCellularGetNetworkInfoMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    auto message  = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularNetworkInfoResult);
+    auto message  = std::make_shared<cellular::RawCommandRespAsync>(CellularMessage::Type::NetworkInfoResult);
     message->data = getNetworkInfo();
     bus.sendUnicast(message, msg->sender);
 
@@ -2451,7 +2451,7 @@ auto ServiceCellular::handleCellularGetScanModeMessage(sys::Message *msg) -> std
 {
     auto mode = GetScanMode();
     if (mode != "") {
-        auto response = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularGetScanModeResult);
+        auto response = std::make_shared<cellular::RawCommandRespAsync>(CellularMessage::Type::GetScanModeResult);
         response->data.push_back(mode);
         bus.sendUnicast(response, msg->sender);
         return std::make_shared<CellularResponseMessage>(true);
@@ -2536,7 +2536,7 @@ auto ServiceCellular::handleCellularGetNwinfoMessage(sys::Message *msg) -> std::
 auto ServiceCellular::handleCellularGetAntennaMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     auto antenna = cmux->GetAntenna();
-    return std::make_shared<CellularAntennaResponseMessage>(true, antenna, MessageType::CellularGetAntenna);
+    return std::make_shared<CellularAntennaResponseMessage>(true, antenna, CellularMessage::Type::GetAntenna);
 }
 auto ServiceCellular::handleCellularDtmfRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {

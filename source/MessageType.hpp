@@ -32,53 +32,6 @@ enum class MessageType
 
     DBQuery,
 
-    // Cellular messages
-    CellularStateRequest,       ///< cellular change state request, only for use by cellular
-    CellularNotification,       ///< Async notification message
-    CellularAnswerIncomingCall, ///< Answer incoming call
-    CellularHangupCall,         ///< Hang up call
-    CellularRinging,
-    CellularIncomingCall,
-    CellularCallerId,
-    CellularCallRequest,      ///< Call request
-    CellularPowerStateChange, ///< Change power state of the module
-
-    CellularListCurrentCalls,
-    CellularSimProcedure,        // Broadcast on sim state changed
-    CellularSimResponse,         // Send to PIN window (show, error state, hide)
-    CellularSimVerifyPinRequest, // Send from PIN window with PIN, PUK, ... number
-    CellularSetVoLTE,
-    CellularSetFlightMode,
-
-    CellularPacketData, ///< for all PacketData messages
-
-    CellularGetOwnNumber,
-    CellularGetIMSI,
-    CellularGetNetworkInfo,
-    CellularStartOperatorsScan,
-    CellularOperatorsScanResult,
-    CellularNetworkInfoResult,
-    CellularSelectAntenna,
-    CellularSetScanMode,
-    CellularGetScanMode,
-    CellularGetScanModeResult,
-    CellularGetFirmwareVersion,       ///< Asks for current firmware version
-    CellularGetFirmwareVersionResult, ///< Returns current firmware version
-    CellularGetChannel,               ///< Asks for channel, requres chnnel name
-    CellularGetChannelResponse,       ///< Returns channel (and it's name)
-    CellularGetCSQ,
-    CellularGetCREG,
-    CellularGetNWINFO,
-    CellularGetAntenna,
-    CellularTransmitDtmfTones,
-    CellularUSSDRequest,
-    CellularTimeUpdated,
-    CellularSimState,
-    CellularMMIData,
-    CellularNewIncomingSMS,
-    CellularRadioOnOff,
-    CellularSendSMS,
-
     DBCalllogAdd [[deprecated]],    ///< Add new note's record
     DBCalllogRemove [[deprecated]], ///< Remove selected note's record
     DBCalllogUpdate [[deprecated]], ///< Update selected note's record
