@@ -122,10 +122,10 @@ namespace app
 
         if (auto phoneMsg = dynamic_cast<CellularNotificationMessage *>(msgl); nullptr != phoneMsg) {
             selectedSim = Store::GSM::get()->selected;
-            if (CellularNotificationMessage::Type::SIM_READY == phoneMsg->type) {
+            if (CellularNotificationMessage::Content::SIM_READY == phoneMsg->content) {
                 selectedSimNumber = CellularServiceAPI::GetOwnNumber(this);
             }
-            else if (CellularNotificationMessage::Type::SIM_NOT_READY == phoneMsg->type) {
+            else if (CellularNotificationMessage::Content::SIM_NOT_READY == phoneMsg->content) {
                 selectedSimNumber = {};
             }
             auto currentWindow = getCurrentWindow();

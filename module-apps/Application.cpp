@@ -263,10 +263,10 @@ namespace app
     {
         auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
         if (msg != nullptr) {
-            if (msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate) {
+            if (msg->content == CellularNotificationMessage::Content::SignalStrengthUpdate) {
                 return handleSignalStrengthUpdate(msgl);
             }
-            if (msg->type == CellularNotificationMessage::Type::NetworkStatusUpdate) {
+            if (msg->content == CellularNotificationMessage::Content::NetworkStatusUpdate) {
                 return handleNetworkAccessTechnologyUpdate(msgl);
             }
         }

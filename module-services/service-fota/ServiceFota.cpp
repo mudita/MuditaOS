@@ -50,7 +50,7 @@ namespace FotaService
         connectionTimer = sys::TimerFactory::createPeriodicTimer(
             this, "Fota", std::chrono::milliseconds{defaultTimer}, [this](sys::Timer &) {
                 std::shared_ptr<InternetRequestMessage> msg =
-                    std::make_shared<InternetRequestMessage>(MessageType::CellularListCurrentCalls);
+                    std::make_shared<InternetRequestMessage>(MessageType::MessageTypeUninitialized);
                 bus.sendUnicast(msg, service::name::fota);
             });
         registerMessageHandlers();

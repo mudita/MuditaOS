@@ -98,74 +98,80 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
 {
     bool handled = false;
 
-    switch (msgl->messageType) {
-    case MessageType::StateChange:
-        HandleStateChange(state->get());
-        break;
-    case MessageType::AntennaChanged: {
-        bsp::cellular::antenna antenna;
-        if (CellularServiceAPI::GetAntenna(this, antenna)) {
-            currentAntenna = antenna;
-            if (state->get() == antenna::State::switchAntenna) {
-                LOG_INFO("Antena switched.");
+    if (auto msg = dynamic_cast<CellularMessage *>(msgl)) {
+        switch (msg->type) {
+        case CellularMessage::Type::Notification: {
 
-                state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(),
-                                          pdMS_TO_TICKS(antenna::connectionStatusTimeout),
-                                          antenna::State::switchAntenna);
-                state->set(antenna::State::connectionStatus);
+            if (auto notif = dynamic_cast<CellularNotificationMessage *>(msg)) {
+                if (notif->content == CellularNotificationMessage::Content::CallAborted) {
+                    AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
+                }
             }
-        }
-        handled = true;
-        break;
-    }
-    case MessageType::CellularNotification: {
-
-        auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
-        if (msg != nullptr) {
-            if (msg->type == CellularNotificationMessage::Type::CallAborted) {
-                AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
-            }
-        }
-        handled = true;
-        break;
-    }
-    case MessageType::CellularIncomingCall: {
-        AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
-    } break;
-    case MessageType::CellularRinging: {
-        AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
-    } break;
-    case MessageType::CellularHangupCall: {
-        AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
-    } break;
-    case MessageType::CellularStateRequest: {
-        auto msg = dynamic_cast<cellular::StateChange *>(msgl);
-        if (msg != nullptr) {
-            if (msg->request == cellular::State::ST::Ready) {
-                state->set(antenna::State::init);
-            }
-        }
-    } break;
-    case MessageType::AntennaCSQChange:
-        LOG_DEBUG("CSQChange message");
-        if (state->get() == antenna::State::idle) {
-            state->set(antenna::State::csqChange);
-        }
-        break;
-    case MessageType::AntennaLockService: {
-        auto msg = dynamic_cast<AntennaLockRequestMessage *>(msgl);
-        if (msg != nullptr) {
-            handleLockRequest(msg->request);
             handled = true;
+            break;
         }
-    } break;
-    case MessageType::AntennaGetLockState: {
-        auto responseMessage = std::make_shared<AntennaLockRequestResponse>(true, serviceLocked);
-        return responseMessage;
-    } break;
-    default:
-        break;
+        case CellularMessage::Type::IncomingCall: {
+            AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+        } break;
+        case CellularMessage::Type::Ringing: {
+            AntennaServiceAPI::LockRequest(this, antenna::lockState::locked);
+        } break;
+        case CellularMessage::Type::HangupCall: {
+            AntennaServiceAPI::LockRequest(this, antenna::lockState::unlocked);
+        } break;
+        case CellularMessage::Type::StateRequest: {
+            auto msg = dynamic_cast<cellular::StateChange *>(msgl);
+            if (msg != nullptr) {
+                if (msg->request == cellular::State::ST::Ready) {
+                    state->set(antenna::State::init);
+                }
+            }
+        } break;
+        default:
+            break;
+        }
     }
+    else
+        switch (msgl->messageType) {
+        case MessageType::StateChange:
+            HandleStateChange(state->get());
+            break;
+        case MessageType::AntennaChanged: {
+            bsp::cellular::antenna antenna;
+            if (CellularServiceAPI::GetAntenna(this, antenna)) {
+                currentAntenna = antenna;
+                if (state->get() == antenna::State::switchAntenna) {
+                    LOG_INFO("Antena switched.");
+
+                    state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(),
+                                              pdMS_TO_TICKS(antenna::connectionStatusTimeout),
+                                              antenna::State::switchAntenna);
+                    state->set(antenna::State::connectionStatus);
+                }
+            }
+            handled = true;
+            break;
+        }
+        case MessageType::AntennaCSQChange:
+            LOG_DEBUG("CSQChange message");
+            if (state->get() == antenna::State::idle) {
+                state->set(antenna::State::csqChange);
+            }
+            break;
+        case MessageType::AntennaLockService: {
+            auto msg = dynamic_cast<AntennaLockRequestMessage *>(msgl);
+            if (msg != nullptr) {
+                handleLockRequest(msg->request);
+                handled = true;
+            }
+        } break;
+        case MessageType::AntennaGetLockState: {
+            auto responseMessage = std::make_shared<AntennaLockRequestResponse>(true, serviceLocked);
+            return responseMessage;
+        } break;
+        default:
+            break;
+        }
 
     if (handled)
         return std::make_shared<sys::ResponseMessage>();
