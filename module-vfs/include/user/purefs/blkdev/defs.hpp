@@ -48,4 +48,13 @@ namespace purefs::blkdev
         force_suspend, //! Device is in force suspend state
         power_off      //! Device is in poweroff state
     };
+
+    //! Disk manager flags
+    struct flags
+    {
+        enum _flags
+        {
+            no_parts_scan = 0x1 //! Don't scan partitions on disc
+        };
+    };
 } // namespace purefs::blkdev

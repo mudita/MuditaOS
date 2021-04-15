@@ -47,7 +47,14 @@ namespace purefs::blkdev
                 return ret;
             }
             const auto it = m_dev_map.emplace(std::make_pair(device_name, disk));
-            return reread_partitions(std::make_shared<internal::disk_handle>(disk, it.first->first));
+            if (flags & flags::no_parts_scan) {
+                disk->clear_partitions();
+                return 0;
+            }
+            else {
+                ret = reread_partitions(std::make_shared<internal::disk_handle>(disk, it.first->first));
+                return ret;
+            }
         }
     }
     auto disk_manager::unregister_device(std::string_view device_name) -> int

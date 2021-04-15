@@ -28,6 +28,7 @@ namespace purefs::blkdev::internal
             constexpr auto reserved_sect      = 0x00e;
             constexpr auto number_of_fats     = 0x010;
             constexpr auto num_parts          = 4;
+            constexpr auto min_sector_size    = 512;
         } // namespace
     }     // namespace defs
     namespace
@@ -57,6 +58,10 @@ namespace purefs::blkdev::internal
         auto ret = m_disk->read(mbr_sect.data(), 0, 1, 0);
         if (ret < 0) {
             return ret;
+        }
+        if (sect_size < defs::min_sector_size) {
+            LOG_ERROR("Unable to scan partition when sector size < 512");
+            return -ENXIO;
         }
         // Check initial signature
         if ((mbr_sect[defs::mbr_signature_offs] != 0x55) && (mbr_sect[defs::mbr_signature_offs + 1] != 0xAA)) {
