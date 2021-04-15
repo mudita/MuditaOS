@@ -221,7 +221,7 @@ void NewEditEventModel::eraseTimeItems()
 
 void NewEditEventModel::clearData()
 {
-    list->clear();
+    list->reset();
     eraseInternalData();
     startTime       = nullptr;
     endTime         = nullptr;

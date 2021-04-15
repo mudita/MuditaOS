@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AutolockWindow.hpp"
@@ -25,7 +25,7 @@ namespace gui
                 time,
                 [=](gui::Item &item) {
                     selectedTime = time;
-                    rebuildOptionList();
+                    refreshOptionsList();
                     return true;
                 },
                 [=](gui::Item &item) {

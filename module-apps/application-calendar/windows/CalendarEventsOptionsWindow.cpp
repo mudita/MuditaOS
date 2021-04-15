@@ -49,8 +49,7 @@ namespace gui
 
         eventRecord = item->getData();
         clearOptions();
-        options = eventsOptionsList();
-        addOptions(options);
+        addOptions(eventsOptionsList());
         return true;
     }
 

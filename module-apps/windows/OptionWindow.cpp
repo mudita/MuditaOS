@@ -27,8 +27,12 @@ namespace gui
 
     void OptionWindow::rebuild()
     {
-        clearOptions();
-        addOptions(options);
+        recreateOptions();
+    }
+
+    void OptionWindow::createOptions()
+    {
+        optionsModel->createData(options);
     }
 
     void OptionWindow::refreshOptions(std::list<Option> &&optionList)
@@ -43,22 +47,24 @@ namespace gui
         optionsList->rebuildList(style::listview::RebuildType::OnPageElement, pageIndex);
     }
 
-    void OptionWindow::addOptions(std::list<Option> &optionList)
-    {
-        optionsModel->createData(optionList);
-        optionsList->rebuildList();
-    }
-
     void OptionWindow::addOptions(std::list<Option> &&optionList)
     {
         options = std::move(optionList);
-        addOptions(options);
+        createOptions();
+
+        optionsList->rebuildList();
     }
 
-    void OptionWindow::resetOptions(std::list<Option> &&optionList)
+    void OptionWindow::changeOptions(std::list<Option> &&optionList)
     {
         clearOptions();
         addOptions(std::move(optionList));
+    }
+
+    void OptionWindow::recreateOptions()
+    {
+        clearOptions();
+        createOptions();
     }
 
     void OptionWindow::clearOptions()
@@ -85,27 +91,26 @@ namespace gui
                                         optionsModel,
                                         style::listview::ScrollBarType::None);
 
-        rebuild();
+        optionsList->prepareRebuildCallback = [this]() { recreateOptions(); };
+
+        optionsModel->createData(options);
+
         setFocusItem(optionsList);
     }
 
-    void OptionWindow::destroyInterface()
+    void OptionWindow::onClose()
     {
-        erase();
-        optionsList = nullptr;
-    }
-
-    OptionWindow::~OptionWindow()
-    {
-        destroyInterface();
+        optionsList->onClose();
     }
 
     void OptionWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (auto message = dynamic_cast<gui::OptionsWindowOptions *>(data)) {
             LOG_DEBUG("Options load!");
-            resetOptions(message->takeOptions());
+            options = message->takeOptions();
         }
+
+        optionsList->rebuildList(style::listview::RebuildType::InPlace);
     }
 
 } /* namespace gui */

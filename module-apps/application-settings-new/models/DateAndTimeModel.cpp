@@ -13,7 +13,7 @@ DateAndTimeModel::DateAndTimeModel(app::Application *application) : app(applicat
 
 void DateAndTimeModel::loadData(std::shared_ptr<utils::time::FromTillDate> fromTillDate)
 {
-    list->clear();
+    list->reset();
     eraseInternalData();
 
     createData();

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DisplayAndKeypadWindow.hpp"
@@ -14,8 +14,7 @@ namespace gui
     DisplayAndKeypadWindow::DisplayAndKeypadWindow(app::Application *app)
         : OptionWindow(app, gui::window::name::display_and_keypad)
     {
-        options = displayAndKeypadOptionsList();
-        addOptions(options);
+        addOptions(displayAndKeypadOptionsList());
         setTitle(utils::localize.get("app_settings_disp_key"));
     }
 
