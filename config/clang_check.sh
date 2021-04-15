@@ -26,10 +26,11 @@ get_files_to_check()
 {
     local files
     local endlist=()
+    local file_with_ignores="$1"
 
     files=$(git diff -U0 --name-only remotes/origin/master...HEAD)
     for file in ${files}; do
-        if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore "${file}"; then
+        if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore "${file}" > "$file_with_ignores"; then
             endlist+=("$file")
         fi
     done
@@ -56,7 +57,11 @@ main()
     tool=$(get_clang_tidy)
 
     local files_to_check
-    files_to_check=$(get_files_to_check)
+    local ignore_files
+    ignore_files=$(mktemp /tmp/clang_check.XXXXXX)
+
+    files_to_check=$(get_files_to_check "$ignore_files")
+    cat "$ignore_files" && rm "$ignore_files"
 
     if [[ -z $files_to_check ]]; then
         echo "no files to check"
