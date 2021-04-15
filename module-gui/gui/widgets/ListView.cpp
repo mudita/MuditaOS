@@ -186,7 +186,7 @@ namespace gui
 
     ListView::~ListView()
     {
-        clearItems();
+        clear();
     }
 
     void ListView::setElementsCount(unsigned int count)
@@ -319,6 +319,14 @@ namespace gui
         direction = style::listview::Direction::Bottom;
     }
 
+    void ListView::onClose()
+    {
+        if (!body->empty()) {
+            storedFocusIndex = getFocusItemIndex();
+        }
+        clear();
+    }
+
     unsigned int ListView::getFocusItemIndex()
     {
         auto index = body->getFocusItemIndex();
@@ -343,15 +351,15 @@ namespace gui
         }
     }
 
-    void ListView::clear()
+    void ListView::reset()
     {
-        clearItems();
+        clear();
         setStartIndex();
         body->setReverseOrder(false);
         direction = style::listview::Direction::Bottom;
     }
 
-    void ListView::clearItems()
+    void ListView::clear()
     {
         body->setFocusItem(nullptr);
 
@@ -378,7 +386,7 @@ namespace gui
             return;
         }
 
-        clearItems();
+        clear();
 
         addItemsOnPage();
 
@@ -529,7 +537,7 @@ namespace gui
             auto page           = 0;
             auto pageStartIndex = 0;
 
-            clearItems();
+            clear();
 
             while (true) {
 
@@ -546,10 +554,10 @@ namespace gui
                 page += 1;
                 pageStartIndex += currentPageSize;
 
-                clearItems();
+                clear();
             }
 
-            clearItems();
+            clear();
             requestCompleteData   = false;
             requestFullListRender = false;
 

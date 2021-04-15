@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhoneModesWindow.hpp"
@@ -14,11 +14,10 @@ namespace gui
                                        app::settingsInterface::SimParams *simParams,
                                        app::settingsInterface::OperatorsSettings *operatorsSettings)
         : OptionWindow(app, gui::window::name::phone_modes), simParams(simParams), operatorsSettings(operatorsSettings)
-    {}
-    void PhoneModesWindow::onBeforeShow(ShowMode m, SwitchData *d)
     {
-        rebuild();
+        addOptions(modesOptList());
     }
+
     auto PhoneModesWindow::modesOptList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optList;
@@ -70,10 +69,4 @@ namespace gui
 
         return optList;
     }
-    void PhoneModesWindow::rebuild()
-    {
-        clearOptions();
-        addOptions(modesOptList());
-    }
-
 } // namespace gui

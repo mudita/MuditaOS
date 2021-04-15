@@ -76,7 +76,6 @@ namespace gui
         style::listview::Direction direction     = style::listview::Direction::Bottom;
         style::listview::Orientation orientation = style::listview::Orientation::TopBottom;
 
-        void clearItems();
         virtual void addItemsOnPage();
 
         bool requestCompleteData   = false;
@@ -131,7 +130,10 @@ namespace gui
         /// Callback to be called on rebuild preparation - in example to on demand clear provider data.
         std::function<void()> prepareRebuildCallback;
 
+        void reset();
         void clear();
+        void onClose();
+
         std::shared_ptr<ListItemProvider> getProvider();
         void setOrientation(style::listview::Orientation value);
         void setBoundaries(style::listview::Boundaries value);

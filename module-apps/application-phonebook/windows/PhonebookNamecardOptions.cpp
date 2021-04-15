@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-services/service-appmgr/service-appmgr/Controller.hpp>
@@ -15,8 +15,7 @@ namespace gui
         : OptionWindow(app, gui::window::name::namecard_options)
     {
         buildInterface();
-        options = namecardOptionsList();
-        addOptions(options);
+        addOptions(namecardOptionsList());
     }
 
     auto PhonebookNamecardOptions::handleSwitchData(SwitchData *data) -> bool

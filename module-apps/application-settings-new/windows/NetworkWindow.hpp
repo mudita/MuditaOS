@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,13 +25,11 @@ namespace gui
       private:
         auto netOptList() -> std::list<gui::Option>;
         app::settingsInterface::SimParams *simParams;
-        void rebuild() override;
         app::settingsInterface::OperatorsSettings *operatorsSettings;
 
       public:
         NetworkWindow(app::Application *app,
                       app::settingsInterface::SimParams *simParams,
                       app::settingsInterface::OperatorsSettings *operatorsSettings);
-        void onBeforeShow(ShowMode m, SwitchData *d) override;
     };
 } // namespace gui
