@@ -137,7 +137,8 @@ case "${1}" in
         fi
         FILES=$(git diff-index --cached --name-only HEAD)
         LAST="Stage" 
-        FIX=$([[ $(git config user.fixinstage) == "true" ]] && echo "true" || echo "false")
+        FIX=$([[ $(git config user.fixinstage) ]] && git config user.fixinstage || echo "false")
+        FIX=${FIX:-false}
         ;;
 esac
 
