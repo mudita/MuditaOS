@@ -14,6 +14,11 @@
 #include "bsp/usb/usb.hpp"
 #include "USBSecurityModel.hpp"
 
+namespace constants
+{
+    constexpr auto usbSuspendTimeout = std::chrono::seconds{1};
+} // namespace constants
+
 class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
 {
   public:
@@ -56,6 +61,7 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     void startTransferTimer();
     void stopTransferTimer();
     void reloadTransferTimer();
+    void suspendUsb();
 
     bool stateChangeWait();
 
@@ -69,6 +75,7 @@ class WorkerDesktop : public sys::Worker, public bsp::USBDeviceListener
     const sdesktop::USBSecurityModel &securityModel;
     sys::Service *ownerService = nullptr;
     parserFSM::StateMachine parser;
+    sys::TimerHandle usbSuspendTimer;
 
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 };

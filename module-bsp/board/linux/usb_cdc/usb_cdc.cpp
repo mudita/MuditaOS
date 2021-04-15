@@ -155,6 +155,11 @@ namespace bsp
         LOG_INFO("usbReinit");
     }
 
+    void usbSuspend()
+    {
+        LOG_INFO("usbSuspend");
+    }
+
     int usbInit(xQueueHandle receiveQueue, xQueueHandle irqQueue, USBDeviceListener *)
     {
 
