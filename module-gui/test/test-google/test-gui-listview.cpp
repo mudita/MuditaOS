@@ -134,7 +134,7 @@ TEST_F(ListViewTesting, List_Clear_Test)
     moveNTimes(1, style::listview::Direction::Top);
 
     // Clear list and request same data as before -> page should refresh with same data.
-    testListView->clear();
+    testListView->reset();
     testProvider->refreshList();
 
     ASSERT_EQ(6, testListView->currentPageSize) << "6 elements should fit into list.";
@@ -291,7 +291,7 @@ TEST_F(ListViewTesting, Data_Deletion_Test)
     auto pointerToLast  = dynamic_cast<gui::TestListItem *>(testListView->body->children.back());
 
     // Clear list
-    testListView->clear();
+    testListView->reset();
     ASSERT_EQ(0, testListView->body->children.size()) << "List should be empty";
     testProvider->refreshList();
 
@@ -312,7 +312,7 @@ TEST_F(ListViewTesting, Data_Deletion_Test)
     pointerToLast  = dynamic_cast<gui::TestListItem *>(testListView->body->children.back());
 
     // Clear list
-    testListView->clear();
+    testListView->reset();
     ASSERT_EQ(0, testListView->body->children.size()) << "List should be empty";
     testProvider->refreshList();
 

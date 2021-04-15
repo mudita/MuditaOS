@@ -38,7 +38,7 @@ namespace gui
         isOffSwitchOn      = false;
         isAlwaysOnSwitchOn = false;
         toggleSwitch = !toggleSwitch;
-        rebuildOptionList();
+        refreshOptionsList();
         if (isAlwaysOnSwitchOn) {
             keypadLightSettings->setKeypadBacklightState(bsp::keypad_backlight::State::on);
         }

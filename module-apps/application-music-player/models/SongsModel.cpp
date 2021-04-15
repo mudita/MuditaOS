@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SongsModel.hpp"
@@ -55,7 +55,7 @@ void SongsModel::createData(const std::vector<audio::Tags> &songsList,
 
 void SongsModel::clearData()
 {
-    list->clear();
+    list->reset();
 
     list->rebuildList();
 }

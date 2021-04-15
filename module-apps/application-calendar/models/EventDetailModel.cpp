@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventDetailModel.hpp"
@@ -45,7 +45,7 @@ void EventDetailModel::createData()
 
 void EventDetailModel::loadData(std::shared_ptr<EventsRecord> record)
 {
-    list->clear();
+    list->reset();
     eraseInternalData();
 
     createData();

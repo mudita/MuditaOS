@@ -23,22 +23,22 @@ namespace gui
         std::shared_ptr<OptionsModel> optionsModel = nullptr;
         ListView *optionsList                      = nullptr;
         std::list<Option> options;
-        virtual void addOptions(std::list<Option> &optionList);
+
+        void createOptions();
+        void recreateOptions();
+        void clearOptions();
         void addOptions(std::list<Option> &&optionList);
-        void resetOptions(std::list<Option> &&optionList);
+        void changeOptions(std::list<Option> &&optionList);
         void refreshOptions(std::list<Option> &&optionList);
         void refreshOptions(std::list<Option> &&optionList, unsigned int pageIndex);
 
       public:
         OptionWindow(app::Application *app, const std::string &name);
         OptionWindow(app::Application *app, const std::string &name, std::list<Option> options);
-        ~OptionWindow() override;
-
-        void clearOptions();
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void onClose() override;
         void rebuild() override;
         void buildInterface() override;
-        void destroyInterface() override;
     };
 }; // namespace gui

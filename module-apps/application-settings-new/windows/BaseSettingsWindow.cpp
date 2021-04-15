@@ -7,12 +7,7 @@
 namespace gui
 {
     BaseSettingsWindow::BaseSettingsWindow(app::Application *app, std::string name) : OptionWindow(app, name)
-    {
-        optionsList->prepareRebuildCallback = [this]() {
-            clearOptions();
-            optionsModel->createData(options);
-        };
-    }
+    {}
 
     void BaseSettingsWindow::rebuild()
     {
@@ -22,13 +17,12 @@ namespace gui
 
     void BaseSettingsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        rebuildOptionList();
+        refreshOptionsList();
     }
 
     void BaseSettingsWindow::rebuildOptionList()
     {
-        clearOptions();
-        addOptions(buildOptionsList());
+        changeOptions(buildOptionsList());
     }
 
     void BaseSettingsWindow::refreshOptionsList()

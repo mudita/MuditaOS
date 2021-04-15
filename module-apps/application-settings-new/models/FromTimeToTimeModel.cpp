@@ -13,7 +13,7 @@ FromTimeToTimeModel::FromTimeToTimeModel(app::Application *application) : app(ap
 
 void FromTimeToTimeModel::loadData(std::shared_ptr<utils::time::FromTillDate> fromTillDate)
 {
-    list->clear();
+    list->reset();
     eraseInternalData();
 
     createData();

@@ -93,7 +93,7 @@ void NewApnModel::createData()
 
 void NewApnModel::clearData()
 {
-    list->clear();
+    list->reset();
 
     eraseInternalData();
 

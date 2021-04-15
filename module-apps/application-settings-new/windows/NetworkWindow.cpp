@@ -15,11 +15,10 @@ namespace gui
                                  app::settingsInterface::SimParams *simParams,
                                  app::settingsInterface::OperatorsSettings *operatorsSettings)
         : OptionWindow(app, gui::window::name::network), simParams(simParams), operatorsSettings(operatorsSettings)
-    {}
-    void NetworkWindow::onBeforeShow(ShowMode m, SwitchData *d)
     {
-        rebuild();
+        addOptions(netOptList());
     }
+
     auto NetworkWindow::netOptList() -> std::list<gui::Option>
     {
         std::list<gui::Option> optList;
@@ -72,7 +71,7 @@ namespace gui
             utils::translateI18("app_settings_network_operator_auto_select"),
             [=](gui::Item &item) {
                 operatorsSettings->setOperatorsOn(!operatorsOn);
-                rebuild();
+                refreshOptions(netOptList());
                 return true;
             },
             nullptr,
@@ -116,7 +115,7 @@ namespace gui
             utils::translateI18("app_settings_network_voice_over_lte"),
             [=](gui::Item &item) {
                 operatorsSettings->setVoLTEOn(!voLteOn);
-                rebuild();
+                refreshOptions(netOptList());
                 return true;
             },
             nullptr,
@@ -138,10 +137,4 @@ namespace gui
 
         return optList;
     }
-    void NetworkWindow::rebuild()
-    {
-        clearOptions();
-        addOptions(netOptList());
-    }
-
 } // namespace gui

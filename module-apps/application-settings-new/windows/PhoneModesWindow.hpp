@@ -25,13 +25,11 @@ namespace gui
       private:
         auto modesOptList() -> std::list<gui::Option>;
         app::settingsInterface::SimParams *simParams;
-        void rebuild() override;
         app::settingsInterface::OperatorsSettings *operatorsSettings;
 
       public:
         PhoneModesWindow(app::Application *app,
                          app::settingsInterface::SimParams *simParams,
                          app::settingsInterface::OperatorsSettings *operatorsSettings);
-        void onBeforeShow(ShowMode m, SwitchData *d) override;
     };
 } // namespace gui
