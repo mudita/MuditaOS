@@ -11,8 +11,9 @@
 #include "drivers/i2c/DriverI2C.hpp"
 #include <purefs/filesystem_paths.hpp>
 #include <utility>
-#include <bitset>
 #include <fstream>
+#include <map>
+#include "battery_charger_utils.hpp"
 
 namespace bsp::battery_charger
 {
@@ -23,24 +24,17 @@ namespace bsp::battery_charger
         const auto cfgFile              = purefs::dir::getUserDiskPath() / "batteryFuelGaugeConfig.cfg";
         constexpr auto registersToStore = 0xFF + 1;
 
-        constexpr std::uint16_t ENABLE_ALL_IRQ_MASK = 0xF8;
+        constexpr std::uint16_t ENABLE_CHG_FG_IRQ_MASK = 0xFC;
         constexpr std::uint8_t UNLOCK_CHARGER       = 0x3 << 2;
 
         constexpr std::uint8_t CHG_ON_OTG_OFF_BUCK_ON  = 0b00000101;
         constexpr std::uint8_t CHG_OFF_OTG_OFF_BUCK_ON = 0b00000100;
 
         constexpr std::uint8_t VSYS_MIN              = 0x80; // 3.6V
-        constexpr std::uint8_t CHARGE_TARGET_VOLTAGE = 0x1D; // 4.35V
 
         constexpr std::uint16_t nominalCapacitymAh = 1600;
 
         constexpr std::uint16_t fullyChargedSOC = 100;
-
-        constexpr std::uint8_t maxTemperatureDegrees = 46;
-        constexpr std::uint8_t minTemperatureDegrees = 0;
-        constexpr std::uint8_t maxDisabled           = 0x7F;
-        constexpr std::uint8_t minDisabled           = 0x80;
-        constexpr auto temperatureHysteresis         = 1;
 
         constexpr std::uint16_t maxVoltagemV = 4400;
         constexpr std::uint16_t minVoltagemV = 3600;
@@ -84,10 +78,35 @@ namespace bsp::battery_charger
 
         enum class TemperatureRanges
         {
-            normal,
-            cold,
-            hot
+            Cold,
+            Cdeg1to15,
+            Cdeg15to35,
+            Cdeg35to45,
+            Hot
         };
+
+        struct TemparatureThresholds
+        {
+            int lowTemperatureThreshold;
+            int highTemperatureThreshold;
+            std::uint8_t alertLow;
+            std::uint8_t alertHigh;
+        };
+
+        constexpr std::uint8_t maxAlertDisabled{0x7F};
+        constexpr std::uint8_t minAlertDisabled{0x80};
+
+        // INT is triggered if T>=maxThreshold || T<minThreshold
+        constexpr std::uint8_t lowHysteresis{1};
+        constexpr std::uint8_t highHysteresis{2};
+
+        const std::map<TemperatureRanges, TemparatureThresholds> temperatureRanges{
+            {TemperatureRanges::Cold, {std::numeric_limits<std::int8_t>::min(), 1, minAlertDisabled, 1}},
+            {TemperatureRanges::Cdeg1to15, {1, 15, 0, 15 + highHysteresis}},
+            {TemperatureRanges::Cdeg15to35, {15, 35, 15 - lowHysteresis, 35 + highHysteresis}},
+            {TemperatureRanges::Cdeg35to45, {35, 45, 35 - lowHysteresis, 45 + highHysteresis}},
+            {TemperatureRanges::Hot,
+             {45, std::numeric_limits<std::int8_t>::max(), 45 - lowHysteresis, maxAlertDisabled}}};
 
         std::shared_ptr<drivers::DriverI2C> i2c;
         std::shared_ptr<drivers::DriverGPIO> gpio;
@@ -221,6 +240,16 @@ namespace bsp::battery_charger
             lockProtectedChargerRegisters();
         }
 
+        void setChargeTargetVoltage(ChargeTerminationVoltage voltage)
+        {
+            unlockProtectedChargerRegisters();
+            std::uint8_t value = static_cast<std::uint8_t>(voltage) | VSYS_MIN;
+            if (chargerWrite(Registers::CHG_CNFG_04, value) != kStatus_Success) {
+                LOG_ERROR("Charge target voltage write fail");
+            }
+            lockProtectedChargerRegisters();
+        }
+
         void resetUSBCurrrentLimit()
         {
             LOG_INFO("USB current limit set to 500mA");
@@ -229,15 +258,7 @@ namespace bsp::battery_charger
 
         void configureBatteryCharger()
         {
-            unlockProtectedChargerRegisters();
-
-            std::uint8_t value = CHARGE_TARGET_VOLTAGE | VSYS_MIN;
-            if (chargerWrite(Registers::CHG_CNFG_04, value) != kStatus_Success) {
-                LOG_ERROR("Charge target voltage write fail");
-            }
-
-            lockProtectedChargerRegisters();
-
+            setChargeTargetVoltage(ChargeTerminationVoltage::mV4350);
             resetUSBCurrrentLimit();
             setMaxChargeCurrent(ChargeCurrentLimit::lim1600mA);
         }
@@ -355,10 +376,9 @@ namespace bsp::battery_charger
                     return batteryRetval::OK;
                 }
         */
-        batteryRetval setTemperatureThresholds(std::uint8_t maxTemperatureDegrees, std::uint8_t minTemperatureDegrees)
+        batteryRetval setTemperatureThresholds(std::uint8_t minTemperatureDegrees, std::uint8_t maxTemperatureDegrees)
         {
-            std::uint16_t regVal = (maxTemperatureDegrees << 8) | minTemperatureDegrees;
-
+            std::uint16_t regVal = (static_cast<uint16_t>(maxTemperatureDegrees) << 8) | minTemperatureDegrees;
             if (fuelGaugeWrite(Registers::TALRT_Th_REG, regVal) != kStatus_Success) {
                 LOG_ERROR("setTemperatureThresholds failed.");
                 return batteryRetval::ChargerError;
@@ -419,7 +439,7 @@ namespace bsp::battery_charger
 
         batteryRetval enableTopIRQs()
         {
-            std::uint8_t val = ENABLE_ALL_IRQ_MASK;
+            std::uint8_t val = ENABLE_CHG_FG_IRQ_MASK;
 
             if (chargerTopControllerWrite(Registers::TOP_CONTROLL_IRQ_MASK_REG, val) != kStatus_Success) {
                 LOG_ERROR("enableIRQs failed.");
@@ -461,11 +481,9 @@ namespace bsp::battery_charger
         int getCellTemperature()
         {
             auto value      = fuelGaugeRead(Registers::TEMP_REG);
-            int temperature = value.second >> 8;
-            if (value.second & 0x8000) {
-                temperature *= -1;
-            }
-            return temperature;
+            // Round to integer by stripping fractions
+            std::uint8_t temperatureInt = value.second >> 8;
+            return utils::twosComplimentToInt(temperatureInt);
         }
         /*
         int getCurrentMeasurement()
@@ -503,22 +521,36 @@ namespace bsp::battery_charger
         void processTemperatureRange(TemperatureRanges temperatureRange)
         {
             switch (temperatureRange) {
-            case TemperatureRanges::normal:
-                LOG_DEBUG("Normal temperature range, charging enabled.");
+            case TemperatureRanges::Cdeg1to15:
+                LOG_DEBUG("1 to 15 cell temperature range");
                 enableCharging();
-                setTemperatureThresholds(maxTemperatureDegrees, minTemperatureDegrees);
+                setChargeTargetVoltage(ChargeTerminationVoltage::mV4350);
+                setMaxChargeCurrent(ChargeCurrentLimit::lim300mA);
                 break;
-            case TemperatureRanges::cold:
-                LOG_DEBUG("Temperature too low, charging disabled.");
-                disableCharging();
-                setTemperatureThresholds(minTemperatureDegrees + temperatureHysteresis, minDisabled);
+            case TemperatureRanges::Cdeg15to35:
+                LOG_DEBUG("15 to 35 cell temperature range");
+                enableCharging();
+                setChargeTargetVoltage(ChargeTerminationVoltage::mV4350);
+                setMaxChargeCurrent(ChargeCurrentLimit::lim1600mA);
                 break;
-            case TemperatureRanges::hot:
-                LOG_DEBUG("Temperature too high, charging disabled.");
+            case TemperatureRanges::Cdeg35to45:
+                LOG_DEBUG("35 to 45 cell temperature range");
+                enableCharging();
+                setChargeTargetVoltage(ChargeTerminationVoltage::mV4100);
+                setMaxChargeCurrent(ChargeCurrentLimit::lim1600mA);
+                break;
+            case TemperatureRanges::Cold:
+                LOG_DEBUG("Cell temperature too low, charging disabled.");
                 disableCharging();
-                setTemperatureThresholds(maxDisabled, maxTemperatureDegrees - temperatureHysteresis);
+                break;
+            case TemperatureRanges::Hot:
+                LOG_DEBUG("Cell temperature too high, charging disabled.");
+                disableCharging();
                 break;
             }
+
+            setTemperatureThresholds(temperatureRanges.at(temperatureRange).alertLow,
+                                     temperatureRanges.at(temperatureRange).alertHigh);
         }
 
     } // namespace
@@ -543,7 +575,6 @@ namespace bsp::battery_charger
             loadConfiguration();
         }
 
-        setTemperatureThresholds(maxTemperatureDegrees, minTemperatureDegrees);
         setServiceVoltageThresholds(maxVoltagemV, minVoltagemV);
 
         fillConfigRegisterValue();
@@ -566,6 +597,7 @@ namespace bsp::battery_charger
 
     void deinit()
     {
+        resetUSBCurrrentLimit();
         storeConfiguration();
 
         gpio->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
@@ -662,21 +694,16 @@ namespace bsp::battery_charger
 
     void checkTemperatureRange()
     {
-        TemperatureRanges temperatureRange;
-
         int temperature = getCellTemperature();
         LOG_DEBUG("Cell temperature: %d", temperature);
-        if (temperature >= maxTemperatureDegrees) {
-            temperatureRange = TemperatureRanges::hot;
-        }
-        else if (temperature > minTemperatureDegrees) {
-            temperatureRange = TemperatureRanges::normal;
-        }
-        else {
-            temperatureRange = TemperatureRanges::cold;
-        }
 
-        processTemperatureRange(temperatureRange);
+        for (const auto &[range, thresholds] : temperatureRanges) {
+            if ((temperature > thresholds.lowTemperatureThreshold) &&
+                (temperature <= thresholds.highTemperatureThreshold)) {
+                processTemperatureRange(range);
+                break;
+            }
+        }
     }
 
     std::uint8_t getTopControllerINTSource()
@@ -700,9 +727,8 @@ namespace bsp::battery_charger
         case batteryChargerType::DcdCDP:
             [[fallthrough]];
         case batteryChargerType::DcdDCP:
-            // TODO: Uncomment when temerature ranges protection implemented
-            // LOG_INFO("USB current limit set to 1000mA");
-            // setMaxBusCurrent(USBCurrentLimit::lim1000mA);
+            LOG_INFO("USB current limit set to 1000mA");
+            setMaxBusCurrent(USBCurrentLimit::lim1000mA);
             break;
         }
     }

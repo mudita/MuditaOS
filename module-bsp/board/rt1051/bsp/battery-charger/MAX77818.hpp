@@ -176,8 +176,15 @@ namespace bsp::battery_charger
     // CHG_CNFG_02 register
     enum class ChargeCurrentLimit
     {
+        lim300mA  = 0x06, /// est. 0.2C of battery
         lim450mA  = 0x09, /// default
         lim1600mA = 0x20, /// 1C of battery
+    };
+
+    enum class ChargeTerminationVoltage
+    {
+        mV4100 = 0x12, /// 4.1V
+        mV4350 = 0x1D, /// 4.35V nominal battery voltage
     };
 
     // CONFIG register bits
