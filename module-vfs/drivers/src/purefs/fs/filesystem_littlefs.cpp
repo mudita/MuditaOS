@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <cstring>
+#include <algorithm>
 #include <sys/stat.h>
 
 namespace
@@ -127,13 +128,13 @@ namespace
         }
         cfg->block_cycles    = 512;
         cfg->block_count     = 0; // Read later from super block
-        cfg->lookahead_size  = 131072;
         const auto total_siz = uint64_t(sector_size) * uint64_t(part_sectors_count);
         if (total_siz % cfg->block_size) {
             LOG_ERROR("Block size doesn't match partition size");
             return -ERANGE;
         }
         cfg->block_count = total_siz / cfg->block_size - 1;
+        cfg->lookahead_size = std::min<lfs_size_t>(131072, cfg->block_count);
         cfg->read_size  = cfg->block_size;
         cfg->prog_size  = cfg->block_size;
         cfg->cache_size = cfg->block_size;
