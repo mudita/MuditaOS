@@ -23,7 +23,7 @@ namespace app
 
     void ApplicationAntenna::timerHandler(void)
     {
-        auto win = getCurrentWindow();
+        auto win        = getCurrentWindow();
         auto windowName = win->getName();
         if ((windowName == gui::name::window::main_window) || (windowName == gui::name::window::algo_window)) {
             if (!cellularRequestInProgress) {
@@ -62,56 +62,43 @@ namespace app
 
         // this variable defines whether message was processed.
         bool handled = false;
-        if (msgl->messageType == MessageType::CellularOperatorsScanResult) {
-            auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl);
-            if (msg != nullptr) {
+        if (auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl)) {
+            switch (msg->type) {
+            case CellularMessage::Type::OperatorsScanResult: {
                 auto win = getCurrentWindow();
-
                 if (win->getName() == gui::name::window::main_window) {
-                    auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
-                    if (window != nullptr) {
-
+                    if (auto window = dynamic_cast<gui::AntennaMainWindow *>(win)) {
                         window->updateOperatorsScan(msg->data);
                     }
                 }
                 cellularRequestInProgress = false;
-            }
-            handled = true;
-        }
-        if (msgl->messageType == MessageType::CellularNetworkInfoResult) {
-            auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl);
-            if (msg != nullptr) {
+                handled                   = true;
+            } break;
+            case CellularMessage::Type::NetworkInfoResult: {
                 handleNetworkParams(msg->data);
                 auto win = getCurrentWindow();
-
                 if (win->getName() == gui::name::window::main_window) {
-                    auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
-                    if (window != nullptr) {
-
+                    if (auto window = dynamic_cast<gui::AntennaMainWindow *>(win)) {
                         window->updateDebugInfo(msg->data);
                     }
                 }
-
                 cellularRequestInProgress = false;
-            }
-            handled = true;
-        }
-        if (msgl->messageType == MessageType::CellularGetScanModeResult) {
-            auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl);
-            if (msg != nullptr) {
-                auto win = windowsStack.get(gui::name::window::scan_window);
-
-                if (win->getName() == gui::name::window::scan_window) {
-                    auto window = dynamic_cast<gui::ScanModesWindow *>(win);
-                    if (window != nullptr) {
-
+                handled                   = true;
+            } break;
+            case CellularMessage::Type::GetScanModeResult: {
+                if (auto win = windowsStack.get(gui::name::window::scan_window)) {
+                    if (auto window = dynamic_cast<gui::ScanModesWindow *>(win)) {
                         window->updateCurrentMode(msg->data[0]);
                     }
                 }
                 cellularRequestInProgress = false;
+                handled                   = true;
+            } break;
+            default:
+                break;
             }
-            handled = true;
         }
+
         if (msgl->messageType == MessageType::AntennaChanged) {
 
             CellularServiceAPI::GetAntenna(this, antenna);

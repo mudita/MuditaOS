@@ -6,7 +6,6 @@
 #include <string>
 #include <optional>
 #include "CellularMessage.hpp"
-#include "MessageType.hpp"
 
 #include "PacketDataTypes.hpp"
 #include "Result.hpp"
@@ -17,13 +16,11 @@ class CellularGetAPNMessage : public CellularMessage
     std::optional<packet_data::APN::APNType> apnType = std::nullopt;
 
   public:
-    CellularGetAPNMessage() : CellularMessage(MessageType::CellularPacketData)
+    CellularGetAPNMessage() : CellularMessage(Type::PacketData)
     {}
-    CellularGetAPNMessage(std::uint8_t contextId)
-        : CellularMessage(MessageType::CellularPacketData), contextId(contextId)
+    CellularGetAPNMessage(std::uint8_t contextId) : CellularMessage(Type::PacketData), contextId(contextId)
     {}
-    CellularGetAPNMessage(packet_data::APN::APNType apnType)
-        : CellularMessage(MessageType::CellularPacketData), apnType(apnType)
+    CellularGetAPNMessage(packet_data::APN::APNType apnType) : CellularMessage(Type::PacketData), apnType(apnType)
     {}
     [[nodiscard]] const std::optional<packet_data::APN::APNType> getAPNType() const noexcept
     {
@@ -41,7 +38,7 @@ class CellularSetAPNMessage : public CellularMessage // also as DeleteAPN
 
   public:
     CellularSetAPNMessage(std::shared_ptr<packet_data::APN::Config> apnConfig)
-        : CellularMessage(MessageType::CellularPacketData), apnConfig(std::move(apnConfig))
+        : CellularMessage(Type::PacketData), apnConfig(std::move(apnConfig))
     {}
 
     [[nodiscard]] std::shared_ptr<packet_data::APN::Config> getAPNConfig() const noexcept
@@ -56,7 +53,7 @@ class CellularNewAPNMessage : public CellularMessage
 
   public:
     CellularNewAPNMessage(std::shared_ptr<packet_data::APN::Config> apnConfig)
-        : CellularMessage(MessageType::CellularPacketData), apnConfig(std::move(apnConfig))
+        : CellularMessage(Type::PacketData), apnConfig(std::move(apnConfig))
     {}
 
     [[nodiscard]] std::shared_ptr<packet_data::APN::Config> getAPNConfig() const noexcept
@@ -71,7 +68,7 @@ class CellularSetDataTransferMessage : public CellularMessage
 
   public:
     CellularSetDataTransferMessage(packet_data::DataTransfer dataTransfer)
-        : CellularMessage(MessageType::CellularPacketData), dataTransfer(dataTransfer)
+        : CellularMessage(Type::PacketData), dataTransfer(dataTransfer)
     {}
     [[nodiscard]] packet_data::DataTransfer getDataTransfer() const noexcept
     {
@@ -82,14 +79,14 @@ class CellularSetDataTransferMessage : public CellularMessage
 class CellularGetDataTransferMessage : public CellularMessage
 {
   public:
-    CellularGetDataTransferMessage() : CellularMessage(MessageType::CellularPacketData)
+    CellularGetDataTransferMessage() : CellularMessage(Type::PacketData)
     {}
 };
 
 class CellularGetActiveContextsMessage : public CellularMessage
 {
   public:
-    CellularGetActiveContextsMessage() : CellularMessage(MessageType::CellularPacketData)
+    CellularGetActiveContextsMessage() : CellularMessage(Type::PacketData)
     {}
 };
 
@@ -98,8 +95,7 @@ class CellularActivateContextMessage : public CellularMessage
     std::uint8_t contextId;
 
   public:
-    CellularActivateContextMessage(std::uint8_t contextId)
-        : CellularMessage(MessageType::CellularPacketData), contextId(contextId)
+    CellularActivateContextMessage(std::uint8_t contextId) : CellularMessage(Type::PacketData), contextId(contextId)
     {}
     [[nodiscard]] std::uint8_t getContextId() const noexcept
     {
@@ -111,8 +107,7 @@ class CellularDeactivateContextMessage : public CellularMessage
     std::uint8_t contextId;
 
   public:
-    CellularDeactivateContextMessage(std::uint8_t contextId)
-        : CellularMessage(MessageType::CellularPacketData), contextId(contextId)
+    CellularDeactivateContextMessage(std::uint8_t contextId) : CellularMessage(Type::PacketData), contextId(contextId)
     {}
     [[nodiscard]] std::uint8_t getContextId() const noexcept
     {
@@ -127,7 +122,7 @@ class CellularGetAPNResponse : public CellularMessage
 
   public:
     CellularGetAPNResponse(std::vector<std::shared_ptr<packet_data::APN::Config>> apns)
-        : CellularMessage(MessageType::CellularPacketData), apns(std::move(apns))
+        : CellularMessage(Type::PacketData), apns(std::move(apns))
     {}
 
     [[nodiscard]] const std::vector<std::shared_ptr<packet_data::APN::Config>> &getAPNs() const noexcept
@@ -141,7 +136,7 @@ class CellularATResponse : public CellularMessage
     at::Result::Code result;
 
   public:
-    CellularATResponse(at::Result::Code result) : CellularMessage(MessageType::CellularPacketData), result(result)
+    CellularATResponse(at::Result::Code result) : CellularMessage(Type::PacketData), result(result)
     {}
 
     [[nodiscard]] at::Result::Code getResult() const noexcept
@@ -184,7 +179,7 @@ class CellularGetDataTransferResponse : public CellularMessage
 
   public:
     CellularGetDataTransferResponse(packet_data::DataTransfer dataTransfer)
-        : CellularMessage(MessageType::CellularPacketData), dataTransfer(dataTransfer)
+        : CellularMessage(Type::PacketData), dataTransfer(dataTransfer)
     {}
 
     [[nodiscard]] packet_data::DataTransfer getDataTransfer() const noexcept
@@ -199,7 +194,7 @@ class CellularGetActiveContextsResponse : public CellularMessage
 
   public:
     CellularGetActiveContextsResponse(std::optional<std::vector<std::shared_ptr<packet_data::APN::Config>>> result)
-        : CellularMessage(MessageType::CellularPacketData)
+        : CellularMessage(Type::PacketData)
     {
         if (result) {
             result = std::move(*result);
