@@ -9,12 +9,8 @@
 namespace gui
 {
 
-    ListViewScroll::ListViewScroll(Item *parent,
-                                   unsigned int x,
-                                   unsigned int y,
-                                   unsigned int w,
-                                   unsigned int h,
-                                   style::listview::ScrollBarType type)
+    ListViewScroll::ListViewScroll(
+        Item *parent, unsigned int x, unsigned int y, unsigned int w, unsigned int h, listview::ScrollBarType type)
         : Rect{parent, x, y, w, h}, type(type)
     {
 
@@ -55,8 +51,8 @@ namespace gui
     void ListViewScroll::updatePreRendered(const ListViewScrollUpdateData &data)
     {
         if (data.startIndex != storedStartIndex) {
-            if (data.direction == style::listview::Direction::Bottom) {
-                if (data.boundaries == style::listview::Boundaries::Continuous && (data.startIndex == 0)) {
+            if (data.direction == listview::Direction::Bottom) {
+                if (data.boundaries == listview::Boundaries::Continuous && (data.startIndex == 0)) {
                     currentPage = 0;
                 }
                 else if (currentPage + 1 < pagesCount) {
@@ -64,7 +60,7 @@ namespace gui
                 }
             }
             else {
-                if (data.boundaries == style::listview::Boundaries::Continuous && storedStartIndex == 0) {
+                if (data.boundaries == listview::Boundaries::Continuous && storedStartIndex == 0) {
                     currentPage = pagesCount - 1;
                 }
                 else if (currentPage > 0 && storedStartIndex != 0) {
@@ -102,16 +98,16 @@ namespace gui
         if (shouldShowScroll(data.listPageSize, data.elementsCount)) {
 
             switch (type) {
-            case style::listview::ScrollBarType::Proportional:
+            case listview::ScrollBarType::Proportional:
                 updateProportional(data);
                 break;
-            case style::listview::ScrollBarType::Fixed:
+            case listview::ScrollBarType::Fixed:
                 updateFixed(data);
                 break;
-            case style::listview::ScrollBarType::PreRendered:
+            case listview::ScrollBarType::PreRendered:
                 updatePreRendered(data);
                 break;
-            case style::listview::ScrollBarType::None:
+            case listview::ScrollBarType::None:
                 break;
             }
 
@@ -130,7 +126,7 @@ namespace gui
                                     style::listview::scroll::y,
                                     style::listview::scroll::w,
                                     style::listview::scroll::h,
-                                    style::listview::ScrollBarType::None);
+                                    listview::ScrollBarType::None);
         type   = gui::ItemType::LIST;
     }
 
@@ -140,7 +136,7 @@ namespace gui
                        unsigned int w,
                        unsigned int h,
                        std::shared_ptr<ListItemProvider> prov,
-                       style::listview::ScrollBarType scrollBarType)
+                       listview::ScrollBarType scrollBarType)
         : Rect{parent, x, y, w, h}
     {
 
@@ -170,7 +166,7 @@ namespace gui
                 recalculateOnBoxRequestedResize();
         };
 
-        if (scrollBarType != style::listview::ScrollBarType::None) {
+        if (scrollBarType != listview::ScrollBarType::None) {
             scroll = new ListViewScroll(this,
                                         style::listview::scroll::x,
                                         style::listview::scroll::y,
@@ -197,7 +193,7 @@ namespace gui
         }
     }
 
-    void ListView::setBoundaries(style::listview::Boundaries value)
+    void ListView::setBoundaries(listview::Boundaries value)
     {
         boundaries = value;
     }
@@ -207,11 +203,11 @@ namespace gui
         scrollTopMargin = value;
     }
 
-    void ListView::setOrientation(style::listview::Orientation value)
+    void ListView::setOrientation(listview::Orientation value)
     {
         orientation = value;
 
-        if (orientation == style::listview::Orientation::TopBottom) {
+        if (orientation == listview::Orientation::TopBottom) {
             body->setAlignment(Alignment::Vertical::Top);
         }
         else {
@@ -237,7 +233,7 @@ namespace gui
         return elementsCount == 0;
     }
 
-    void ListView::rebuildList(style::listview::RebuildType rebuildType, unsigned int dataOffset, bool forceRebuild)
+    void ListView::rebuildList(listview::RebuildType rebuildType, unsigned int dataOffset, bool forceRebuild)
     {
         if (pageLoaded || forceRebuild) {
 
@@ -266,14 +262,14 @@ namespace gui
     void ListView::prepareFullRebuild()
     {
         setStartIndex();
-        storedFocusIndex = style::listview::nPos;
+        storedFocusIndex = listview::nPos;
     }
 
     void ListView::prepareOnOffsetRebuild(unsigned int dataOffset)
     {
         if (dataOffset < elementsCount) {
             startIndex       = dataOffset;
-            storedFocusIndex = style::listview::nPos;
+            storedFocusIndex = listview::nPos;
         }
         else {
             LOG_ERROR("Requested rebuild on index greater than elements count");
@@ -292,19 +288,19 @@ namespace gui
         storedFocusIndex = dataOffset;
     }
 
-    void ListView::setup(style::listview::RebuildType rebuildType, unsigned int dataOffset)
+    void ListView::setup(listview::RebuildType rebuildType, unsigned int dataOffset)
     {
         switch (rebuildType) {
-        case style::listview::RebuildType::Full:
+        case listview::RebuildType::Full:
             prepareFullRebuild();
             break;
-        case style::listview::RebuildType::OnOffset:
+        case listview::RebuildType::OnOffset:
             prepareOnOffsetRebuild(dataOffset);
             break;
-        case style::listview::RebuildType::InPlace:
+        case listview::RebuildType::InPlace:
             prepareInPlaceRebuild();
             break;
-        case style::listview::RebuildType::OnPageElement:
+        case listview::RebuildType::OnPageElement:
             prepareOnPageElementRebuild(dataOffset);
             break;
         }
@@ -316,7 +312,7 @@ namespace gui
         lastRebuildRequest = {rebuildType, dataOffset};
 
         body->setReverseOrder(false);
-        direction = style::listview::Direction::Bottom;
+        direction = listview::Direction::Bottom;
     }
 
     void ListView::onClose()
@@ -331,7 +327,7 @@ namespace gui
     {
         auto index = body->getFocusItemIndex();
 
-        if (direction == style::listview::Direction::Top) {
+        if (direction == listview::Direction::Top) {
             int position = currentPageSize - 1 - index;
             index        = std::abs(position);
         }
@@ -356,7 +352,7 @@ namespace gui
         clear();
         setStartIndex();
         body->setReverseOrder(false);
-        direction = style::listview::Direction::Bottom;
+        direction = listview::Direction::Bottom;
     }
 
     void ListView::clear()
@@ -423,7 +419,7 @@ namespace gui
 
     Order ListView::getOrderFromDirection() const noexcept
     {
-        if (direction == style::listview::Direction::Bottom)
+        if (direction == listview::Direction::Bottom)
             return Order::Next;
 
         return Order::Previous;
@@ -431,7 +427,7 @@ namespace gui
 
     Order ListView::getOppositeOrderFromDirection() const noexcept
     {
-        if (direction == style::listview::Direction::Bottom)
+        if (direction == listview::Direction::Bottom)
             return Order::Previous;
 
         return Order::Next;
@@ -439,7 +435,7 @@ namespace gui
 
     void ListView::setStartIndex()
     {
-        if (orientation == style::listview::Orientation::TopBottom) {
+        if (orientation == listview::Orientation::TopBottom) {
             startIndex = 0;
         }
         else {
@@ -449,7 +445,7 @@ namespace gui
 
     void ListView::recalculateStartIndex()
     {
-        if (direction == style::listview::Direction::Top) {
+        if (direction == listview::Direction::Top) {
             startIndex = startIndex < currentPageSize ? 0 : startIndex - currentPageSize;
         }
     }
@@ -458,7 +454,7 @@ namespace gui
     {
         // Check if first page is filled with items. If not reload page to be filed with items. Check for both
         // Orientations.
-        if (orientation == style::listview::Orientation::TopBottom && direction == style::listview::Direction::Top &&
+        if (orientation == listview::Orientation::TopBottom && direction == listview::Direction::Top &&
             startIndex == 0) {
             if (body->getSizeLeft() > provider->getMinimalItemHeight()) {
                 focusOnLastItem = true;
@@ -468,7 +464,7 @@ namespace gui
             }
         }
 
-        if (orientation == style::listview::Orientation::BottomTop && direction == style::listview::Direction::Bottom &&
+        if (orientation == listview::Orientation::BottomTop && direction == listview::Direction::Bottom &&
             startIndex + currentPageSize == elementsCount) {
             if (body->getSizeLeft() > provider->getMinimalItemHeight()) {
                 focusOnLastItem = true;
@@ -515,7 +511,7 @@ namespace gui
 
     void ListView::checkFullRenderRequirement()
     {
-        if (scroll && scroll->type == style::listview::ScrollBarType::PreRendered) {
+        if (scroll && scroll->type == listview::ScrollBarType::PreRendered) {
             requestFullListRender = true;
         }
     }
@@ -561,8 +557,8 @@ namespace gui
             requestCompleteData   = false;
             requestFullListRender = false;
 
-            if (lastRebuildRequest.first == style::listview::RebuildType::Full) {
-                if (orientation == style::listview::Orientation::TopBottom) {
+            if (lastRebuildRequest.first == listview::RebuildType::Full) {
+                if (orientation == listview::Orientation::TopBottom) {
                     scroll->updateStartConditions(startIndex, 0, page + 1);
                 }
                 else {
@@ -581,7 +577,7 @@ namespace gui
     {
         setFocusItem(body);
 
-        if (storedFocusIndex != style::listview::nPos) {
+        if (storedFocusIndex != listview::nPos) {
             if (!body->setFocusOnElement(storedFocusIndex)) {
                 body->setFocusOnLastElement();
             }
@@ -641,7 +637,7 @@ namespace gui
                                     : currentPageSize - body->getVisibleChildrenCount();
             currentPageSize = body->getVisibleChildrenCount();
 
-            if (direction == style::listview::Direction::Top) {
+            if (direction == listview::Direction::Top) {
                 startIndex += diff;
             }
             else {
@@ -666,11 +662,11 @@ namespace gui
         return count;
     }
 
-    unsigned int ListView::calculateLimit(style::listview::Direction value)
+    unsigned int ListView::calculateLimit(listview::Direction value)
     {
         auto minLimit =
             (2 * currentPageSize > calculateMaxItemsOnPage() ? 2 * currentPageSize : calculateMaxItemsOnPage());
-        if (value == style::listview::Direction::Bottom)
+        if (value == listview::Direction::Bottom)
             return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
         else
             return minLimit < startIndex ? minLimit : startIndex;
@@ -678,11 +674,11 @@ namespace gui
 
     bool ListView::requestNextPage()
     {
-        if (startIndex + currentPageSize >= elementsCount && boundaries == style::listview::Boundaries::Continuous) {
+        if (startIndex + currentPageSize >= elementsCount && boundaries == listview::Boundaries::Continuous) {
 
             startIndex = 0;
         }
-        else if (startIndex + currentPageSize >= elementsCount && boundaries == style::listview::Boundaries::Fixed) {
+        else if (startIndex + currentPageSize >= elementsCount && boundaries == listview::Boundaries::Fixed) {
 
             return false;
         }
@@ -692,10 +688,10 @@ namespace gui
                                                                        : elementsCount - (elementsCount - startIndex);
         }
 
-        direction = style::listview::Direction::Bottom;
+        direction = listview::Direction::Bottom;
         body->setReverseOrder(false);
         pageLoaded       = false;
-        storedFocusIndex = style::listview::nPos;
+        storedFocusIndex = listview::nPos;
         provider->requestRecords(startIndex, calculateLimit());
 
         return true;
@@ -706,28 +702,28 @@ namespace gui
         auto topFetchIndex = 0;
         auto limit         = 0;
 
-        if (startIndex == 0 && boundaries == style::listview::Boundaries::Continuous) {
+        if (startIndex == 0 && boundaries == listview::Boundaries::Continuous) {
 
             startIndex    = elementsCount;
-            topFetchIndex = elementsCount - calculateLimit(style::listview::Direction::Top);
-            limit         = calculateLimit(style::listview::Direction::Top);
+            topFetchIndex = elementsCount - calculateLimit(listview::Direction::Top);
+            limit         = calculateLimit(listview::Direction::Top);
         }
-        else if (startIndex == 0 && boundaries == style::listview::Boundaries::Fixed) {
+        else if (startIndex == 0 && boundaries == listview::Boundaries::Fixed) {
 
             return false;
         }
         else {
 
-            limit         = calculateLimit(style::listview::Direction::Top);
-            topFetchIndex = startIndex < calculateLimit(style::listview::Direction::Top)
+            limit         = calculateLimit(listview::Direction::Top);
+            topFetchIndex = startIndex < calculateLimit(listview::Direction::Top)
                                 ? 0
-                                : startIndex - calculateLimit(style::listview::Direction::Top);
+                                : startIndex - calculateLimit(listview::Direction::Top);
         }
 
-        direction = style::listview::Direction::Top;
+        direction = listview::Direction::Top;
         body->setReverseOrder(true);
         pageLoaded       = false;
-        storedFocusIndex = style::listview::nPos;
+        storedFocusIndex = listview::nPos;
         provider->requestRecords(topFetchIndex, limit);
 
         return true;

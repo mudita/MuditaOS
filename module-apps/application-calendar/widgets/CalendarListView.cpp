@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CalendarListView.hpp"
@@ -16,7 +16,7 @@ namespace gui
     void CalendarListView::addLabelMarker(gui::AllEventsItem *item)
     {
         assert(item != nullptr);
-        if (direction == style::listview::Direction::Bottom) {
+        if (direction == listview::Direction::Bottom) {
             if (!(labelMark == item->getLabelMarker())) {
 
                 labelMark = item->getLabelMarker();
@@ -27,7 +27,7 @@ namespace gui
                 body->addWidget(calendarAllEventsItem);
             }
         }
-        if (direction == style::listview::Direction::Top) {
+        if (direction == listview::Direction::Top) {
 
             if (currentPageSize == 0) {
                 labelMark = item->getLabelMarker();
@@ -61,7 +61,7 @@ namespace gui
         while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
 
             // if direction bot add label mark before adding item
-            if (direction == style::listview::Direction::Bottom) {
+            if (direction == listview::Direction::Bottom) {
                 auto eventItem = dynamic_cast<gui::AllEventsItem *>(item);
                 if (eventItem != nullptr) {
                     addLabelMarker(eventItem);
@@ -75,7 +75,7 @@ namespace gui
 
                 // if page full and direction top remove last element and add floating label mark on top if there was no
                 // one previously
-                if (direction == style::listview::Direction::Top) {
+                if (direction == listview::Direction::Top) {
 
                     if (previousItemIsLabel) {
                         break;
@@ -97,7 +97,7 @@ namespace gui
             }
 
             // if direction top add label mark after adding item
-            if (direction == style::listview::Direction::Top) {
+            if (direction == listview::Direction::Top) {
                 previousItemIsLabel = false;
                 auto eventItem      = dynamic_cast<gui::AllEventsItem *>(item);
                 if (eventItem != nullptr) {
@@ -113,7 +113,7 @@ namespace gui
         recalculateStartIndex();
 
         // Add element on top for first page purpose
-        if (startIndex == 0 && direction == style::listview::Direction::Top) {
+        if (startIndex == 0 && direction == listview::Direction::Top) {
             auto *calendarAllEventsItem = new gui::AllEventsItem();
             calendarAllEventsItem->setMarkerItem(labelMark);
             body->addWidget(calendarAllEventsItem);

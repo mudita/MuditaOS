@@ -30,7 +30,7 @@ namespace gui
                                  style::quotes::categories::list::Width,
                                  style::quotes::categories::list::Height,
                                  categoriesModel,
-                                 style::listview::ScrollBarType::Fixed);
+                                 gui::listview::ScrollBarType::Fixed);
 
         setFocusItem(list);
     }

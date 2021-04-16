@@ -38,7 +38,7 @@ namespace gui
         if (list == nullptr) {
             return;
         }
-        list->rebuildList(style::listview::RebuildType::InPlace);
+        list->rebuildList(gui::listview::RebuildType::InPlace);
     }
 
     void CallLogMainWindow::buildInterface()
@@ -57,7 +57,7 @@ namespace gui
                                  mainWindow::w,
                                  mainWindow::h,
                                  calllogModel,
-                                 style::listview::ScrollBarType::Fixed);
+                                 gui::listview::ScrollBarType::Fixed);
 
         setFocusItem(list);
     }

@@ -56,7 +56,7 @@ namespace gui
                                  style::quotes::list::Width,
                                  style::quotes::list::Height,
                                  quotesModel,
-                                 style::listview::ScrollBarType::Fixed);
+                                 gui::listview::ScrollBarType::Fixed);
 
         setFocusItem(list);
     }

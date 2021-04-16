@@ -37,7 +37,7 @@ namespace gui
         if (list == nullptr) {
             return;
         }
-        list->rebuildList(style::listview::RebuildType::InPlace);
+        list->rebuildList(gui::listview::RebuildType::InPlace);
     }
 
     void MessagesMainWindow::buildInterface()
@@ -54,7 +54,7 @@ namespace gui
                                  msgThreadStyle::listWidth,
                                  msgThreadStyle::listHeight,
                                  threadsModel,
-                                 style::listview::ScrollBarType::Fixed);
+                                 listview::ScrollBarType::Fixed);
         list->setScrollTopMargin(style::margins::small);
         list->rebuildList();
 
