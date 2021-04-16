@@ -28,7 +28,7 @@ get_files_to_check()
     local endlist=()
     local file_with_ignores="$1"
 
-    files=$(git diff -U0 --name-only remotes/origin/master...HEAD)
+    files=$(git diff -U0 --name-only remotes/origin/master...HEAD --diff-filter='d')
     for file in ${files}; do
         if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore "${file}" > "$file_with_ignores"; then
             endlist+=("$file")
