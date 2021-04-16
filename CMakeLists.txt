@@ -379,6 +379,14 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
         -C ${PACKAGE_STAGING_DIRECTORY}/Standalone "."
         DEPENDS package-standalone-staged
         )
+    add_custom_target(
+        eeprom_image ALL
+        DEPENDS genlittlefs
+        DEPENDS assets
+        COMMAND ${CMAKE_BINARY_DIR}/genlittlefs -b 128 -s 32768 --overwrite --image ${CMAKE_BINARY_DIR}/eeprom.img ${CMAKE_BINARY_DIR}/sys/personalization.json
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Generate eeprom image"
+    )
 endif()
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")

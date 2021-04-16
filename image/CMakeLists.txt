@@ -7,6 +7,7 @@ add_custom_target(
     assets
     COMMAND rsync -ravu --delete
         ${ASSETS_SOURCE_DIR}/.boot.json*
+        ${ASSETS_SOURCE_DIR}/personalization.json
         ${ASSETS_DEST_DIR}
     COMMAND rsync -ravu --delete
         ${ASSETS_SOURCE_DIR}/assets

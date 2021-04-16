@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/filesystem.hpp>
@@ -19,6 +19,7 @@ namespace purefs::subsystem
     namespace
     {
         constexpr auto default_blkdev_name = "emmc0";
+        constexpr auto default_nvrom_name       = "nvrom0";
         constexpr auto fat_part_code         = 0x0b;
         constexpr auto lfs_part_code         = 0x9e;
         constexpr auto old_layout_part_count = 2;
@@ -26,6 +27,7 @@ namespace purefs::subsystem
         constexpr auto boot_size_limit       = 16384L;
         constexpr auto block_size_max_shift  = 21;
         constexpr auto block_size_min_shift  = 8;
+        constexpr uint32_t nvrom_lfs_block_size = 128U;
         namespace json
         {
             constexpr auto os_type = "ostype";
@@ -123,6 +125,16 @@ namespace purefs::subsystem
             LOG_FATAL("Unable to register block device with error %i", err);
             return {};
         }
+        const auto nvrom_bdev = internal::create_default_nvm_device();
+        if (nvrom_bdev) {
+            err = disk_mgr->register_device(nvrom_bdev, default_nvrom_name, blkdev::flags::no_parts_scan);
+            if (err) {
+                LOG_WARN("Unable to register NVROM device err %i. Maybe running on rev>T7", err);
+            }
+        }
+        else {
+            LOG_WARN("No NVROM driver available for this platform");
+        }
         auto fs_core = std::make_shared<fs::filesystem>(disk_mgr);
         err          = fs_core->register_filesystem("vfat", std::make_shared<fs::drivers::filesystem_vfat>());
         if (err) {
@@ -207,6 +219,17 @@ namespace purefs::subsystem
         const auto boot_dir_name    = parse_boot_json_directory(json_file);
         const auto user_dir         = (dir::getRootDiskPath() / boot_dir_name).string();
         fs::internal::set_default_thread_cwd(user_dir);
+
+        // Mount NVRAM memory
+        err = vfs->mount(default_nvrom_name,
+                         purefs::dir::getMfgConfPath().c_str(),
+                         "littlefs",
+                         fs::mount_flags::read_only,
+                         &nvrom_lfs_block_size);
+        if (err) {
+            LOG_WARN("Unable to mount NVROM partition err %i. Maybe running on rev>T7", err);
+            err = 0;
+        }
         return err;
     }
 
