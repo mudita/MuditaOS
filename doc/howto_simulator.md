@@ -8,7 +8,7 @@ Some of the differences between the simulator and the actual phone are:
 
 You can start the simulator locally by executig the `PurePhone.elf` file located inside your build directory. 
 
-You can also run the simulator on disk image with the same layout as we got on the phone by using `run_emulator_on_filesystem_image.sh`.
+You can also run the simulator on disk image with the same layout as we got on the phone by using `run_simulator_on_filesystem_image.sh`.
 
 To move around the simulator please use the ["Keyboard binding on Linux Pure simulator" document](host_keyboard_bindings.md).
 
