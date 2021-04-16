@@ -30,6 +30,12 @@ namespace bluetooth
         void disconnect() override;
         void start() override;
         void stop() override;
+        /// @return SystemError - it's not posible to start ringing while there's A2DP active
+        [[nodiscard]] auto startRinging() const noexcept -> Error::Code override;
+        /// @return SystemError - it's not posible to stop ringing while there's A2DP active
+        [[nodiscard]] auto stopRinging() const noexcept -> Error::Code override;
+        /// @return SystemError - it's not posible to start routing while there's A2DP active
+        [[nodiscard]] auto initializeCall() const noexcept -> Error::Code override;
 
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override;
 

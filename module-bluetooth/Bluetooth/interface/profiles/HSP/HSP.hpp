@@ -9,7 +9,19 @@
 
 namespace bluetooth
 {
-
+    class CellularInterface
+    {
+      public:
+        virtual ~CellularInterface()                           = default;
+        virtual bool answerIncomingCall(sys::Service *service) = 0;
+        virtual bool hangupCall(sys::Service *service)         = 0;
+    };
+    class CellularInterfaceImpl : public CellularInterface
+    {
+      public:
+        bool answerIncomingCall(sys::Service *service) override;
+        bool hangupCall(sys::Service *service) override;
+    };
     class HSP : public Profile
     {
         static constexpr auto CLASS_OF_DEVICE = 0x400204;
@@ -31,6 +43,17 @@ namespace bluetooth
         void disconnect() override;
         void start() override;
         void stop() override;
+        /// @brief Starts ring
+        /// @return Success
+        [[nodiscard]] auto startRinging() const noexcept -> Error::Code override;
+        /// @brief Stops ring
+        /// @return Success
+        [[nodiscard]] auto stopRinging() const noexcept -> Error::Code override;
+        /// @brief Initializes bluetooth audio call which is divided into two parts:
+        /// - Ring stop
+        /// - SCO link establishment
+        /// @return Success
+        [[nodiscard]] auto initializeCall() const noexcept -> Error::Code override;
 
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) override
         {}

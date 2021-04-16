@@ -24,6 +24,15 @@ namespace bluetooth
         virtual void stop()                                                                       = 0;
         virtual void disconnect()                                                                 = 0;
         virtual void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice) = 0;
+        /// Starts ringing
+        /// @return Error code that determines, whether operation was successful or not
+        [[nodiscard]] virtual auto startRinging() const noexcept -> Error::Code = 0;
+        /// Stops ringing
+        /// @return Error code that determines, whether operation was successful or not
+        [[nodiscard]] virtual auto stopRinging() const noexcept -> Error::Code = 0;
+        /// Initializes call
+        /// @return Error code that determines, whether operation was successful or not
+        [[nodiscard]] virtual auto initializeCall() const noexcept -> Error::Code = 0;
 
       protected:
         static void initSdp();
