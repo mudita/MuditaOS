@@ -38,8 +38,8 @@ namespace gui
                                     style::messages::smsList::w,
                                     style::messages::smsList::h,
                                     smsModel,
-                                    style::listview::ScrollBarType::Proportional);
-        smsList->setOrientation(style::listview::Orientation::BottomTop);
+                                    listview::ScrollBarType::Proportional);
+        smsList->setOrientation(listview::Orientation::BottomTop);
 
         setFocusItem(smsList);
     }

@@ -41,7 +41,7 @@ namespace gui
                                  phonebookStyle::newContactWindow::newContactsList::w,
                                  phonebookStyle::newContactWindow::newContactsList::h,
                                  newContactModel,
-                                 style::listview::ScrollBarType::PreRendered);
+                                 listview::ScrollBarType::PreRendered);
         setFocusItem(list);
     }
 

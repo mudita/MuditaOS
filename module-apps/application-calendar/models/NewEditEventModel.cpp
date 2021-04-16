@@ -56,7 +56,7 @@ void NewEditEventModel::createData(bool allDayEvent)
         application, utils::localize.get("app_calendar_new_edit_event_allday"), [this](bool isChecked) {
             isChecked ? createTimeItems() : eraseTimeItems();
             const auto it = std::find(std::begin(internalData), std::end(internalData), allDayEventCheckBox);
-            list->rebuildList(style::listview::RebuildType::OnPageElement, std::distance(std::begin(internalData), it));
+            list->rebuildList(gui::listview::RebuildType::OnPageElement, std::distance(std::begin(internalData), it));
         });
 
     dateItem = new gui::CalendarDateItem();

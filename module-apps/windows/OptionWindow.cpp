@@ -38,13 +38,13 @@ namespace gui
     void OptionWindow::refreshOptions(std::list<Option> &&optionList)
     {
         options = std::move(optionList);
-        optionsList->rebuildList(style::listview::RebuildType::InPlace);
+        optionsList->rebuildList(listview::RebuildType::InPlace);
     }
 
     void OptionWindow::refreshOptions(std::list<Option> &&optionList, unsigned int pageIndex)
     {
         options = std::move(optionList);
-        optionsList->rebuildList(style::listview::RebuildType::OnPageElement, pageIndex);
+        optionsList->rebuildList(listview::RebuildType::OnPageElement, pageIndex);
     }
 
     void OptionWindow::addOptions(std::list<Option> &&optionList)
@@ -89,7 +89,7 @@ namespace gui
                                         option::window::optionsListW,
                                         option::window::optionsListH,
                                         optionsModel,
-                                        style::listview::ScrollBarType::None);
+                                        listview::ScrollBarType::None);
 
         optionsList->prepareRebuildCallback = [this]() { recreateOptions(); };
 
@@ -110,7 +110,7 @@ namespace gui
             options = message->takeOptions();
         }
 
-        optionsList->rebuildList(style::listview::RebuildType::InPlace);
+        optionsList->rebuildList(listview::RebuildType::InPlace);
     }
 
 } /* namespace gui */
