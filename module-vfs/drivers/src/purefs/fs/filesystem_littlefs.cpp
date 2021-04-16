@@ -134,7 +134,7 @@ namespace
             return -ERANGE;
         }
         cfg->block_count = total_siz / cfg->block_size - 1;
-        cfg->lookahead_size = std::min<lfs_size_t>(131072, cfg->block_count);
+        cfg->lookahead_size = std::min<lfs_size_t>(131072U, ((cfg->block_count >> 3U) + 1U) << 3U);
         cfg->read_size  = cfg->block_size;
         cfg->prog_size  = cfg->block_size;
         cfg->cache_size = cfg->block_size;
