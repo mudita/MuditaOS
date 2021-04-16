@@ -27,7 +27,7 @@ namespace service::gui
 {
     namespace
     {
-        constexpr auto ServiceGuiStackDepth  = 1024U;
+        constexpr auto ServiceGuiStackDepth  = 1536U;
         constexpr auto ContextsCount         = 2;
         constexpr auto CommandsQueueCapacity = 3;
         constexpr std::chrono::milliseconds BSPEinkBusyTimeout{3000}; ///< sync with \ref BSP_EinkBusyTimeout
