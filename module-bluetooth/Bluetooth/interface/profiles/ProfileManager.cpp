@@ -95,6 +95,21 @@ namespace bluetooth
         return Error::Success;
     }
 
+    auto ProfileManager::startRinging() -> Error::Code
+    {
+        return currentProfilePtr->startRinging();
+    }
+
+    auto ProfileManager::stopRinging() -> Error::Code
+    {
+        return currentProfilePtr->stopRinging();
+    }
+
+    auto ProfileManager::initializeCall() -> Error::Code
+    {
+        return currentProfilePtr->initializeCall();
+    }
+
     auto ProfileManager::setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code
     {
         if (currentProfilePtr == nullptr) {

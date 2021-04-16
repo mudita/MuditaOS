@@ -500,7 +500,8 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(CellularHangupCallMessage), [&](sys::Message *request) -> sys::MessagePointer {
         auto msg = static_cast<CellularHangupCallMessage *>(request);
-        return handleCellularHangupCallMessage(msg);
+        handleCellularHangupCallMessage(msg);
+        return sys::MessageNone{};
     });
 
     connect(typeid(db::QueryResponse), [&](sys::Message *request) -> sys::MessagePointer {
@@ -2291,8 +2292,7 @@ auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessag
     return std::make_shared<CellularResponseMessage>(request->isHandled());
 }
 
-auto ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage *msg)
-    -> std::shared_ptr<CellularResponseMessage>
+void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage *msg)
 {
     auto channel = cmux->get(TS0710::Channel::Commands);
     LOG_INFO("CellularHangupCall");
@@ -2303,14 +2303,17 @@ auto ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage 
             if (!ongoingCall.endCall(CellularCall::Forced::True)) {
                 LOG_ERROR("Failed to end ongoing call");
             }
-            return std::make_shared<CellularResponseMessage>(true, msg->messageType);
+            bus.sendMulticast(std::make_shared<CellularResponseMessage>(true, msg->messageType),
+                              sys::BusChannel::ServiceCellularNotifications);
         }
         else {
             LOG_ERROR("Call not aborted");
-            return std::make_shared<CellularResponseMessage>(false, msg->messageType);
+            bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->messageType),
+                              sys::BusChannel::ServiceCellularNotifications);
         }
     }
-    return std::make_shared<CellularResponseMessage>(false, msg->messageType);
+    bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->messageType),
+                      sys::BusChannel::ServiceCellularNotifications);
 }
 
 auto ServiceCellular::handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>
