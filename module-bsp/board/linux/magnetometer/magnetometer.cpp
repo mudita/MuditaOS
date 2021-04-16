@@ -35,7 +35,11 @@ namespace bsp
 
         void enableIRQ()
         {}
-        void resetCurrentParsedValue()
+        void initFirstReadout()
         {}
+        bsp::KeyCodes getCurrentSliderPosition()
+        {
+            return bsp::KeyCodes::Undefined;
+        }
     } // namespace magnetometer
 } // namespace bsp

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverI2C.hpp"
@@ -50,6 +50,7 @@ namespace drivers
         auto ret = BOARD_LPI2C_Send(
             base, addr.deviceAddress, addr.subAddress, addr.subAddressSize, const_cast<uint8_t *>(txBuff), size);
         if (ret != kStatus_Success) {
+            LOG_ERROR("I2C Write: Error %ld", ret);
             return -1; // TODO:M.P: fix me
         }
         else {
@@ -62,6 +63,7 @@ namespace drivers
         cpp_freertos::LockGuard lock(mutex);
         auto ret = BOARD_LPI2C_Receive(base, addr.deviceAddress, addr.subAddress, addr.subAddressSize, rxBuff, size);
         if (ret != kStatus_Success) {
+            LOG_ERROR("I2C Read: Error %ld", ret);
             return -1; // TODO:M.P: fix me
         }
         else {
