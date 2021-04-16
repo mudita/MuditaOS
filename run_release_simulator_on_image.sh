@@ -13,7 +13,7 @@ if [ ! -x "$APP_BINARY" ]; then
 elif [ ! -x "$PRELOAD_LIB" ]; then
     echo "Error: $PRELOAD_LIB doesn't exists"
 else
-    echo "Running emulator in directory: $(pwd)"
+    echo "Running simulator in directory: $(pwd)"
     $RENDERER &
     export IOSYSCALLS_REDIRECT_TO_IMAGE=1
     export LD_PRELOAD=$PRELOAD_LIB

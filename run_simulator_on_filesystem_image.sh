@@ -13,7 +13,7 @@ arraymenu ()
       break;
     elif [ 1 -le "$REPLY" ] && [ "$REPLY" -le $(($#-1)) ];
     then
-      echo "You selected $option emulator image."
+      echo "You selected $option simulator image."
       break;
     else
       echo "Incorrect Input: Select a number 1-$#"
@@ -29,7 +29,7 @@ elif [ ${#dirs[@]} -gt 1 ]; then
     arraymenu "${dirs[@]}"
     cd "${dirs[$REPLY-1]}"
 else
-    echo "Error: Emulator directory doesn't exists"
+    echo "Error: Simulator directory doesn't exists"
     exit -1
 fi
 
@@ -41,7 +41,7 @@ if [ ! -x "$APP_BINARY" ]; then
 elif [ ! -x "$PRELOAD_LIB" ]; then
     echo "Error: $PRELOAD_LIB doesn't exists"
 else
-    echo "Running emulator in directory: $(pwd)"
+    echo "Running simulator in directory: $(pwd)"
     $RENDERER &
     export IOSYSCALLS_REDIRECT_TO_IMAGE=1
     export LD_PRELOAD=$PRELOAD_LIB

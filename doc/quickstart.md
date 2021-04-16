@@ -54,13 +54,13 @@ cd ./config/ && ./bootstrap.sh 0- && cd ../                    # bootstrap requi
 ./configure.sh rt1051|linux Debug|Release|RelWithDebInfo       # configure build
 cd <build-dir>                                                 # build dir depends on configuration
 make -j                                                        # build
-./PurePhone                                                    # run PurePhone - emulator screen will pop up (on the Linux filesystem)
+./PurePhone                                                    # run PurePhone - simulator screen will pop up (on the Linux filesystem)
 ```
 
-If you want to run the emulator with image and our VFS implementation
+If you want to run the simulator with image and our VFS implementation
 you need to run the image through the script:
 ```bash
-./run_emulator_on_filesystem_image.sh
+./run_simulator_on_filesystem_image.sh
 ```
 
 ### Quickstart with unit tests
