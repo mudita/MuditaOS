@@ -81,7 +81,7 @@ namespace gui
                                           style::window::calendar::listView_w,
                                           style::window::calendar::listView_h,
                                           dayEventsModel,
-                                          style::listview::ScrollBarType::Fixed);
+                                          gui::listview::ScrollBarType::Fixed);
         setFocusItem(dayEventsList);
     }
 
@@ -116,7 +116,7 @@ namespace gui
         if (msgNotification != nullptr) {
             if (msgNotification->interface == db::Interface::Name::Events) {
                 if (msgNotification->dataModified()) {
-                    dayEventsList->rebuildList(style::listview::RebuildType::InPlace);
+                    dayEventsList->rebuildList(gui::listview::RebuildType::InPlace);
                     return true;
                 }
             }

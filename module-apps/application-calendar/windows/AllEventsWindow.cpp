@@ -103,7 +103,7 @@ namespace gui
         if (msgNotification != nullptr) {
             if (msgNotification->interface == db::Interface::Name::Events) {
                 if (msgNotification->dataModified()) {
-                    allEventsList->rebuildList(style::listview::RebuildType::InPlace);
+                    allEventsList->rebuildList(gui::listview::RebuildType::InPlace);
                     return true;
                 }
             }

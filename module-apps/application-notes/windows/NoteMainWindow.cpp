@@ -87,7 +87,7 @@ namespace app::notes
                                  listStyle::Width,
                                  listStyle::Height,
                                  presenter->getNotesItemProvider(),
-                                 ::style::listview::ScrollBarType::Fixed);
+                                 gui::listview::ScrollBarType::Fixed);
         list->setPenWidth(listStyle::PenWidth);
         list->setPenFocusWidth(listStyle::FocusedPenWidth);
         list->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {
@@ -165,7 +165,7 @@ namespace app::notes
             if (msgNotification->interface == db::Interface::Name::Notes) {
                 if (msgNotification->dataModified()) {
 
-                    list->rebuildList(::style::listview::RebuildType::InPlace);
+                    list->rebuildList(::gui::listview::RebuildType::InPlace);
 
                     return true;
                 }

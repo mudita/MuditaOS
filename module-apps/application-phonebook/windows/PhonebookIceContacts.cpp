@@ -33,7 +33,7 @@ namespace gui
                                             phonebookStyle::iceContactsWindow::contactsListIce::w,
                                             phonebookStyle::iceContactsWindow::contactsListIce::h,
                                             phonebookModel,
-                                            style::listview::ScrollBarType::Fixed);
+                                            gui::listview::ScrollBarType::Fixed);
 
         setFocusItem(contactsListIce);
 

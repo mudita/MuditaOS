@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmClockMainWindow.hpp"
@@ -49,7 +49,7 @@ namespace app::alarmClock
                                        style::alarmClock::window::listView_w,
                                        style::alarmClock::window::listView_h,
                                        presenter->getAlarmsItemProvider(),
-                                       style::listview::ScrollBarType::Fixed);
+                                       gui::listview::ScrollBarType::Fixed);
         alarmsList->focusChangedCallback = [this](gui::Item &) {
             onListFilled();
             return true;
@@ -115,7 +115,7 @@ namespace app::alarmClock
         auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
         if (msgNotification != nullptr && msgNotification->interface == db::Interface::Name::Alarms) {
             if (msgNotification->dataModified()) {
-                alarmsList->rebuildList(style::listview::RebuildType::InPlace);
+                alarmsList->rebuildList(gui::listview::RebuildType::InPlace);
             }
             if (presenter->isAlarmsListEmpty()) {
                 showEmptyIcon();

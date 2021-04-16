@@ -66,7 +66,7 @@ auto DayEventsModel::handleQueryResponse(db::QueryResult *queryResult) -> bool
     if (auto response = dynamic_cast<db::query::events::GetFilteredByDayResult *>(queryResult); response != nullptr) {
         if (recordsCount != (response->getCountResult())) {
             recordsCount = response->getCountResult();
-            list->rebuildList(style::listview::RebuildType::Full, 0, true);
+            list->rebuildList(gui::listview::RebuildType::Full, 0, true);
             return false;
         }
 

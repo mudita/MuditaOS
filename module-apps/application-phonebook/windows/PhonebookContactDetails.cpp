@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookContactDetails.hpp"
@@ -37,7 +37,7 @@ namespace gui
                                      phonebookStyle::contactDetailsWindow::contactDetailsList::w,
                                      phonebookStyle::contactDetailsWindow::contactDetailsList::h,
                                      contactDetailsModel,
-                                     style::listview::ScrollBarType::PreRendered);
+                                     gui::listview::ScrollBarType::PreRendered);
         setFocusItem(bodyList);
     }
 

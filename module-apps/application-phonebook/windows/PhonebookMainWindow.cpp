@@ -23,7 +23,7 @@ namespace gui
 
     void PhonebookMainWindow::rebuild()
     {
-        contactsList->rebuildList(style::listview::RebuildType::InPlace);
+        contactsList->rebuildList(gui::listview::RebuildType::InPlace);
     }
 
     void PhonebookMainWindow::buildInterface()
@@ -66,7 +66,7 @@ namespace gui
 
         phonebookModel->letterMap = phonebookModel->requestLetterMap();
         phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
-        contactsList->rebuildList(style::listview::RebuildType::Full);
+        contactsList->rebuildList(gui::listview::RebuildType::Full);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -129,7 +129,7 @@ namespace gui
             if (dataOffset != phonebookContactsMap::NO_MATCH_FOUND) {
                 LOG_DEBUG("PhoneBook Data Offset : %" PRIu32, dataOffset);
                 phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
-                contactsList->rebuildList(style::listview::RebuildType::OnOffset, dataOffset);
+                contactsList->rebuildList(gui::listview::RebuildType::OnOffset, dataOffset);
             }
         }
     }
