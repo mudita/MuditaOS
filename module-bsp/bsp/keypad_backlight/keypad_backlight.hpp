@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-
 #include <cstdint>
 
 namespace bsp::keypad_backlight
@@ -12,6 +11,8 @@ namespace bsp::keypad_backlight
         turnOff,
         turnOnActiveMode,
         turnOn,
+        turnOnCallMode,
+        turnOffCallMode,
         checkState,
     };
 
@@ -30,7 +31,11 @@ namespace bsp::keypad_backlight
 
     bool turnOnAll();
 
-    bool configureModule();
+    bool turnOnFunctionKeysBacklight();
+
+    bool turnOnNumericKeysBacklight();
+
+    bool configureModule(std::uint8_t enablesRegisterValue);
 
     bool shutdown();
 

@@ -32,6 +32,7 @@ class EventManager : public sys::Service
     void handleMinuteUpdate(time_t timestamp);
     bool processKeypadBacklightRequest(bsp::keypad_backlight::Action action);
     void startKeypadLightTimer();
+    void restoreKeypadLightState();
     bool processVibraRequest(bsp::vibrator::Action act,
                              std::chrono::milliseconds RepetitionTime = std::chrono::milliseconds{1000});
     void toggleTorchOnOff();
@@ -41,6 +42,7 @@ class EventManager : public sys::Service
     sys::TimerHandle loggerTimer;
     sys::TimerHandle keypadLightTimer;
     bsp::keypad_backlight::State keypadLightState{bsp::keypad_backlight::State::off};
+    bool isKeypadLightInCallMode = false;
 
     static constexpr auto keypadLightTimerName    = "KeypadLightTimer";
     static constexpr auto keypadLightTimerTimeout = std::chrono::seconds(5);
@@ -63,7 +65,7 @@ class EventManager : public sys::Service
     std::unique_ptr<vibra_handle::Vibra> Vibra;
 
   public:
-    EventManager(const std::string &name = service::name::evt_manager);
+    explicit EventManager(const std::string &name = service::name::evt_manager);
     ~EventManager();
 
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;

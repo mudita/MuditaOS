@@ -10,6 +10,8 @@
 #include <module-sys/Timers/TimerHandle.hpp>
 #include <SystemManager/SystemManager.hpp>
 #include <service-cellular/CellularMessage.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <service-evtmgr/EVMessages.hpp>
 #include <time/time_conversion.hpp>
 
 namespace app
@@ -106,6 +108,16 @@ namespace app
         }
         void setState(call::State state) noexcept override
         {
+            if (state == call::State::CALL_IN_PROGRESS) {
+                bus.sendUnicast(
+                    std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::turnOnCallMode),
+                    service::name::evt_manager);
+            }
+            else {
+                bus.sendUnicast(
+                    std::make_shared<sevm::KeypadBacklightMessage>(bsp::keypad_backlight::Action::turnOffCallMode),
+                    service::name::evt_manager);
+            }
             this->state = state;
         }
 
