@@ -28,8 +28,9 @@ namespace
         __REAL_DECL(symlink);
 
         __REAL_DECL(fcntl);
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 28))
         __REAL_DECL(fcntl64);
-
+#endif
         __REAL_DECL(chdir);
         __REAL_DECL(fchdir);
 
@@ -75,8 +76,9 @@ namespace
         __REAL_DLSYM(symlink);
 
         __REAL_DLSYM(fcntl);
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 28))
         __REAL_DLSYM(fcntl64);
-
+#endif
         __REAL_DLSYM(chdir);
         __REAL_DLSYM(fchdir);
 
@@ -110,11 +112,15 @@ namespace
         __REAL_DLSYM(poll);
         __REAL_DLSYM(statvfs);
 
-        if (!(real::link && real::unlink && real::symlink && real::fcntl && real::fcntl64 && real::chdir &&
-              real::fchdir && real::getcwd && real::getwd && real::get_current_dir_name && real::mkdir && real::chmod &&
-              real::fchmod && real::fsync && real::fdatasync && real::__xstat && real::__lxstat && real::__fxstat &&
-              real::__xstat64 && real::__lxstat64 && real::__fxstat64 && real::read && real::write && real::lseek &&
-              real::lseek64 && real::mount && real::umount && real::ioctl && real::poll && real::statvfs)) {
+        if (!(real::link && real::unlink && real::symlink && real::fcntl && real::chdir && real::fchdir &&
+              real::getcwd && real::getwd && real::get_current_dir_name && real::mkdir && real::chmod && real::fchmod &&
+              real::fsync && real::fdatasync && real::__xstat && real::__lxstat && real::__fxstat && real::__xstat64 &&
+              real::__lxstat64 && real::__fxstat64 && real::read && real::write && real::lseek && real::lseek64 &&
+              real::mount && real::umount && real::ioctl && real::poll && real::statvfs
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 28))
+              && real::fcntl64
+#endif
+              )) {
             abort();
         }
     }
@@ -321,6 +327,7 @@ extern "C"
     }
     __asm__(".symver _iosys_fcntl,fcntl@GLIBC_2.2.5");
 
+#if __GLIBC__ > 2 || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 28))
     int _iosys_fcntl64(int fd, int cmd, ... /* arg */)
     {
         if (vfs::is_image_fd(fd)) {
@@ -341,6 +348,7 @@ extern "C"
         }
     }
     __asm__(".symver _iosys_fcntl64,fcntl64@GLIBC_2.2.5");
+#endif
 
     int _iosys_chdir(const char *path)
     {
