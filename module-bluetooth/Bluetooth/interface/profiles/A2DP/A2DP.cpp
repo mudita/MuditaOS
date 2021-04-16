@@ -95,6 +95,21 @@ namespace bluetooth
         pimpl->stop();
     }
 
+    auto A2DP::startRinging() const noexcept -> Error::Code
+    {
+        return Error::SystemError;
+    }
+
+    auto A2DP::stopRinging() const noexcept -> Error::Code
+    {
+        return Error::SystemError;
+    }
+
+    auto A2DP::initializeCall() const noexcept -> Error::Code
+    {
+        return Error::SystemError;
+    }
+
     void A2DP::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice)
     {
         pimpl->setAudioDevice(std::move(audioDevice));

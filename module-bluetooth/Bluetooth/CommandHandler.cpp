@@ -69,6 +69,12 @@ namespace bluetooth
             return switchAudioProfile();
         case bluetooth::Command::None:
             return Error::Success;
+        case Command::StartRinging:
+            return profileManager->startRinging();
+        case Command::StopRinging:
+            return profileManager->stopRinging();
+        case Command::StartRouting:
+            return profileManager->initializeCall();
         case Command::StartStream:
             profileManager->start();
             return Error::Success;
