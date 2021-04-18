@@ -78,6 +78,8 @@ namespace audio
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t rxHandle);
 
+        void InitBsp();
+        void DeinitBsp();
         void OutStart();
         void InStart();
         void OutStop();

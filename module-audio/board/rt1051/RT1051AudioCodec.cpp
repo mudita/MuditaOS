@@ -27,6 +27,7 @@ namespace audio
     RT1051AudioCodec::~RT1051AudioCodec()
     {
         Stop();
+        DeinitBsp();
     }
 
     CodecParamsMAX98090::InputPath RT1051AudioCodec::getCodecInputPath(const AudioDevice::Format &format)
@@ -70,6 +71,8 @@ namespace audio
         if (state == State::Running) {
             return AudioDevice::RetCode::Failure;
         }
+
+        InitBsp();
 
         saiInFormat.bitWidth      = format.bitWidth;
         saiInFormat.sampleRate_Hz = format.sampleRate_Hz;
@@ -184,6 +187,16 @@ namespace audio
             return false;
         }
         return true;
+    }
+
+    void RT1051AudioCodec::InitBsp()
+    {
+        bsp::audioInit();
+    }
+
+    void RT1051AudioCodec::DeinitBsp()
+    {
+        bsp::audioDeinit();
     }
 
     void RT1051AudioCodec::InStart()
