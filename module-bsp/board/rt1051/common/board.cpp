@@ -194,9 +194,6 @@ namespace bsp
         // Set internal DCDC to DCM mode. Switching between DCM and CCM mode will be done automatically.
         DCDC_BootIntoDCM(DCDC);
 
-        // init audio
-        audioInit();
-
         PrintSystemClocks();
         clearAndPrintBootReason();
     }
