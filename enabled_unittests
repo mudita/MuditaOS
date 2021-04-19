@@ -36,6 +36,7 @@ TESTS_LIST["catch2-audio-test"]="
 #---------
 TESTS_LIST["catch2-calculator"]="
     Calculator utilities;
+    Scenario: Input Processor tests;
 "
 #---------
 TESTS_LIST["catch2-callback-storage-test"]="
