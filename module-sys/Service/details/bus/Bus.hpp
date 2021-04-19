@@ -38,10 +38,10 @@ namespace sys
          * @param timeout       Timeout
          * @return Return code and a response.
          */
-        SendResult SendUnicast(std::shared_ptr<Message> message,
-                               const std::string &targetName,
-                               Service *sender,
-                               std::uint32_t timeout);
+        SendResult SendUnicastSync(std::shared_ptr<Message> message,
+                                   const std::string &targetName,
+                                   Service *sender,
+                                   std::uint32_t timeout);
 
         /**
          * Sends a message to the specified channel.

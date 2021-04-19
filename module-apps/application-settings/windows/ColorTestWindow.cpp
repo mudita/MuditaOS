@@ -78,7 +78,7 @@ namespace gui
     {
         if (scheme != currentColorScheme) {
             currentColorScheme = scheme;
-            application->bus.sendUnicast(
+            application->bus.sendUnicastSync(
                 std::make_shared<service::gui::ChangeColorScheme>(std::move(scheme)), service::name::gui, 100);
             LOG_INFO("Updated color scheme");
 

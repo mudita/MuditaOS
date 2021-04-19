@@ -101,10 +101,10 @@ namespace sys
         return false;
     }
 
-    SendResult Bus::SendUnicast(std::shared_ptr<Message> message,
-                                const std::string &targetName,
-                                Service *sender,
-                                std::uint32_t timeout)
+    SendResult Bus::SendUnicastSync(std::shared_ptr<Message> message,
+                                    const std::string &targetName,
+                                    Service *sender,
+                                    std::uint32_t timeout)
     {
         std::vector<std::shared_ptr<Message>> tempMsg;
         tempMsg.reserve(4); // reserve space for 4 elements to avoid costly memory allocations
