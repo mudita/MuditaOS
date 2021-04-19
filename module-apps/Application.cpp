@@ -44,6 +44,7 @@
 #include <module-apps/popups/TetheringPhoneModePopup.hpp>
 #include <module-apps/popups/lock-windows/PhoneLockedWindow.hpp>
 #include <module-apps/popups/lock-windows/PhoneLockedInfoWindow.hpp>
+#include <module-apps/popups/lock-windows/PhoneUnLockWindow.hpp>
 #include "popups/data/PopupData.hpp"
 
 namespace gui
@@ -140,6 +141,8 @@ namespace app
             handle(notificationParams);
             return actionHandled();
         });
+
+        phoneLockSubject = std::make_shared<lock::PhoneLockSubject>(this);
     }
 
     Application::~Application() noexcept
@@ -751,11 +754,15 @@ namespace app
             case ID::Brightness:
                 break;
             case ID::PhoneLock:
-                windowsFactory.attach(window::phone_lock_window, [](Application *app, const std::string &name) {
-                    return std::make_unique<gui::PhoneLockedWindow>(app, window::phone_lock_window);
+            case ID::InputLock:
+                windowsFactory.attach(window::phone_lock_window, [this](Application *app, const std::string &name) {
+                    return std::make_unique<gui::PhoneLockedWindow>(app, window::phone_lock_window, phoneLockSubject);
                 });
                 windowsFactory.attach(window::phone_lock_info_window, [](Application *app, const std::string &name) {
                     return std::make_unique<gui::PhoneLockedInfoWindow>(app, window::phone_lock_info_window);
+                });
+                windowsFactory.attach(window::input_lock_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::PhoneUnlockWindow>(app, window::input_lock_window);
                 });
                 break;
             }
@@ -776,6 +783,15 @@ namespace app
                      std::to_string(volumeParams->getVolume()).c_str());
             handleVolumeChanged(volumeParams->getVolume(), volumeParams->getAudioContext());
         }
+        else if (id == ID::InputLock) {
+            auto popupParams = static_cast<const gui::PhoneUnlockInputRequestParams *>(params);
+
+            assert(popupParams->getLock());
+
+            switchWindow(gui::popup::resolveWindowName(id),
+                         std::make_unique<gui::PhoneUnlockInputRequestParams>(popupParams->getPopupId(),
+                                                                              popupParams->getLock()));
+        }
         else {
             switchWindow(gui::popup::resolveWindowName(id));
         }
@@ -784,6 +800,8 @@ namespace app
     void Application::abortPopup(gui::popup::ID id)
     {
         const auto popupName = gui::popup::resolveWindowName(id);
+
+        // Spróbowac wyciagac ze stacka okienek - albo dodac jire na to na pozniej
         if (getCurrentWindow()->getName() == popupName) {
             returnToPreviousWindow();
         }
@@ -892,7 +910,7 @@ namespace app
 
     void Application::handlePhoneLock()
     {
-        switchWindow(gui::popup::window::phone_lock_window);
+        phoneLockSubject->lock();
     }
 
     void Application::setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept

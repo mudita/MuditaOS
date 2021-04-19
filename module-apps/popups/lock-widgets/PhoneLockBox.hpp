@@ -4,14 +4,14 @@
 #pragma once
 
 #include "popups/lock-windows/PinLockBaseWindow.hpp"
-#include "ScreenLockBaseBox.hpp"
+#include "PhoneLockBaseBox.hpp"
 
 namespace gui
 {
-    class ScreenLockBox : public ScreenLockBaseBox
+    class PhoneLockBox : public PhoneLockBaseBox
     {
       public:
-        ScreenLockBox(PinLockBaseWindow *LockBaseWindow) : ScreenLockBaseBox(LockBaseWindow), LockWindow(LockBaseWindow)
+        PhoneLockBox(PinLockBaseWindow *LockBaseWindow) : PhoneLockBaseBox(LockBaseWindow), LockWindow(LockBaseWindow)
         {}
 
       private:

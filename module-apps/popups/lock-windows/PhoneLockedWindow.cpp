@@ -5,6 +5,7 @@
 #include <module-apps/application-desktop/data/DesktopStyle.hpp>
 #include <module-utils/time/DateAndTimeSettings.hpp>
 #include <module-services/service-appmgr/service-appmgr/Controller.hpp>
+#include <utility>
 
 #include "Application.hpp"
 
@@ -12,7 +13,10 @@
 
 namespace gui
 {
-    PhoneLockedWindow::PhoneLockedWindow(app::Application *app, const std::string &name) : AppWindow(app, name)
+    PhoneLockedWindow::PhoneLockedWindow(app::Application *app,
+                                         const std::string &name,
+                                         std::shared_ptr<lock::PhoneLockSubject> phoneLockSubject)
+        : AppWindow(app, name), phoneLockSubject(phoneLockSubject)
     {
         buildInterface();
 
@@ -62,7 +66,6 @@ namespace gui
 
         // To be added
         // buildNotifications(app);
-
     }
 
     bool PhoneLockedWindow::processLongPressEvent(const InputEvent &inputEvent)
@@ -86,12 +89,19 @@ namespace gui
 
             LOG_ERROR("Chce dac unlocka");
 
-            //            getAppDesktop()->lockHandler.unlockScreen();
+            phoneLockSubject->unlock();
+            //          getAppDesktop()->lockHandler.unlockScreen();
+
             return true;
         }
         else if (enter_cache.storeEnter(inputEvent)) {
             return true;
         }
+        // back not allowed on blocked screen // TODO może lepiej sprawdzić czy zablokowane ogólnie?
+        //        else if (inputEvent.is(KeyCode::KEY_RF)) {
+        //            application->switchWindow(gui::popup::window::phone_lock_info_window);
+        //            return true;
+        //        }
         // check if any of the lower inheritance onInput methods catch the event
         else if (AppWindow::onInput(inputEvent)) {
             return true;

@@ -8,6 +8,7 @@
 #include <service-appmgr/Actions.hpp>
 #include <module-sys/PhoneModes/Common.hpp>
 #include <module-audio/Audio/AudioCommon.hpp>
+#include <module-apps/popups/lock-widgets/Lock.hpp>
 
 namespace gui
 {
@@ -25,6 +26,22 @@ namespace gui
 
       private:
         gui::popup::ID popupId;
+    };
+
+    class PhoneUnlockInputRequestParams : public PopupRequestParams
+    {
+      public:
+        explicit PhoneUnlockInputRequestParams(gui::popup::ID popupId, gui::Lock *lock)
+            : PopupRequestParams{popupId}, lock{lock}
+        {}
+
+        [[nodiscard]] auto getLock() const noexcept
+        {
+            return lock;
+        }
+
+      private:
+        gui::Lock *lock;
     };
 
     class PhoneModePopupRequestParams : public PopupRequestParams

@@ -4,39 +4,39 @@
 #include "popups/data/LockStyle.hpp"
 #include "popups/lock-windows/PinLockBaseWindow.hpp"
 #include "PinLock.hpp"
-#include "ScreenLockBaseBox.hpp"
+#include "PhoneLockBaseBox.hpp"
 
 namespace label_style = style::window::pin_lock::pin_label;
 
 namespace gui
 {
-    void ScreenLockBaseBox::buildLockBox(unsigned int pinSize)
+    void PhoneLockBaseBox::buildLockBox(unsigned int pinSize)
     {
         buildPinLabels(pinSize);
     }
 
-    void ScreenLockBaseBox::clear()
+    void PhoneLockBaseBox::clear()
     {
         for (unsigned i = 0; i < pinLabels.size(); i++) {
             popChar(i);
         }
     }
 
-    void ScreenLockBaseBox::popChar(unsigned int charNum)
+    void PhoneLockBaseBox::popChar(unsigned int charNum)
     {
         if (charNum < pinLabels.size()) {
             pinLabels[charNum]->setVisibleState(false);
         }
     }
 
-    void ScreenLockBaseBox::putChar(unsigned int charNum)
+    void PhoneLockBaseBox::putChar(unsigned int charNum)
     {
         if (charNum < pinLabels.size()) {
             pinLabels[charNum]->setVisibleState(true);
         }
     }
 
-    void ScreenLockBaseBox::buildPinLabels(unsigned int pinSize)
+    void PhoneLockBaseBox::buildPinLabels(unsigned int pinSize)
     {
         constexpr auto pinLabelWidth = style::window::default_body_width;
         pinLabels.clear();
@@ -65,10 +65,10 @@ namespace gui
         lockWindow->pinLabelsBox->setEdges(RectangleEdge::None);
     }
 
-    ScreenLockBaseBox::PinLabel::PinLabel(Item *parent, uint32_t w, uint32_t h) : HBox(parent, 0, 0, w, h)
+    PhoneLockBaseBox::PinLabel::PinLabel(Item *parent, uint32_t w, uint32_t h) : HBox(parent, 0, 0, w, h)
     {}
 
-    void ScreenLockBaseBox::PinLabel::setVisibleState(bool isImageVisible)
+    void PhoneLockBaseBox::PinLabel::setVisibleState(bool isImageVisible)
     {
         if (isImageVisible && image == nullptr) {
             image = new gui::Image("dot_12px_hard_alpha_W_G");

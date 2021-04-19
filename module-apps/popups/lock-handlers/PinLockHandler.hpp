@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "PinLock.hpp"
+#include "module-apps/popups/lock-widgets/PinLock.hpp"
 
 #include <module-services/service-appmgr/service-appmgr/messages/ActionRequest.hpp>
 #include <module-services/service-appmgr/service-appmgr/Actions.hpp>

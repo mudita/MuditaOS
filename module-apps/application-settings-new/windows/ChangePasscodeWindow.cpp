@@ -65,7 +65,7 @@ namespace gui
         AppWindow::buildInterface();
         LockWindow::build();
 
-        lockBox = std::make_unique<ScreenLockBaseBox>(this);
+        lockBox = std::make_unique<PhoneLockBaseBox>(this);
         lockBox->buildLockBox(lockHandler.getLock().getMaxPinSize());
 
         lockImage = new gui::Image(this, lock_style::image::x, lock_style::image::y, 0, 0, "pin_lock");

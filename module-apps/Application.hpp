@@ -29,6 +29,7 @@
 #include <vector>   // for vector
 #include "TopBarManager.hpp"
 #include "popups/Popups.hpp"
+#include "popups/lock-handlers/PhoneLockSubject.hpp"
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"
 
@@ -396,6 +397,8 @@ namespace app
         /// application's settings
         std::unique_ptr<settings::Settings> settings;
         sys::phone_modes::PhoneMode phoneMode;
+
+        std::shared_ptr<lock::PhoneLockSubject> phoneLockSubject;
 
       public:
         void handlePhoneLock();

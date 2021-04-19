@@ -2,26 +2,26 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PinLock.hpp"
-#include "ScreenLockBox.hpp"
+#include "PhoneLockBox.hpp"
 
 namespace gui
 {
     constexpr auto timeToUnlock = 10;
 
-    void ScreenLockBox::buildLockBox(unsigned int pinSize)
+    void PhoneLockBox::buildLockBox(unsigned int pinSize)
     {
         LockWindow->buildImages("pin_lock", "pin_lock_info");
-        ScreenLockBaseBox::buildLockBox(pinSize);
+        PhoneLockBaseBox::buildLockBox(pinSize);
     }
 
-    void ScreenLockBox::setVisibleStateBlocked()
+    void PhoneLockBox::setVisibleStateBlocked()
     {
         LockWindow->setText("app_desktop_screen_blocked_info", LockWindow::TextType::Primary);
         LockWindow->setImagesVisible(false, true);
         LockWindow->setBottomBarWidgetsActive(false, true, false);
     }
 
-    void ScreenLockBox::setVisibleStateEnterPin(EnterPasscodeType type)
+    void PhoneLockBox::setVisibleStateEnterPin(EnterPasscodeType type)
     {
         LockWindow->pinLabelsBox->setVisible(true);
         LockWindow->setText("app_desktop_screen_enter_passcode_to_unlock", LockWindow::TextType::Primary, true);
@@ -29,7 +29,7 @@ namespace gui
         LockWindow->setBottomBarWidgetsActive(false, false, true);
     }
 
-    void ScreenLockBox::setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value)
+    void PhoneLockBox::setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value)
     {
         switch (type) {
         case PinLockBox::PasscodeErrorType::InvalidPasscode:

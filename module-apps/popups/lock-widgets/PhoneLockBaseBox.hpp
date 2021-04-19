@@ -9,10 +9,10 @@
 
 namespace gui
 {
-    class ScreenLockBaseBox : public PinLockBox
+    class PhoneLockBaseBox : public PinLockBox
     {
       public:
-        ScreenLockBaseBox(LockWindow *lockBaseWindow) : lockWindow(lockBaseWindow)
+        PhoneLockBaseBox(LockWindow *lockBaseWindow) : lockWindow(lockBaseWindow)
         {}
 
         void buildLockBox(unsigned int pinSize) override;

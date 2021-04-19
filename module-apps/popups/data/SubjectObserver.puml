@@ -1,0 +1,21 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+
+"Application" -> "Application\nWindow": GiveSubject
+"ApplicationManager\nObserver" -> "ApplicationManager\nObserver": connect()
+"ApplicationManager\nObserver" -> "ApplicationManager\nObserver": subscribe(Callbacks)
+
+"Application\nWindow" -> "Bus": LockMessage(unlock/lock)
+"Bus" -> "ApplicationManager\nObserver": LockMessage(unlock/lock)
+
+"ApplicationManager\nObserver" -> "ApplicationManager\nObserver": HandleCallbacks
+"ApplicationManager\nObserver" -> "Bus": SendPopupAction
+"Bus" -> "Application": SendPopupAction
+"Application" -> "Application\nWindow": TakePopupData(LockObject)
+"Application\nWindow" -> "Application\nWindow": HandleLockObject
+"Application\nWindow" -> "ApplicationManager\nObserver": ActivationRequest
+"ApplicationManager\nObserver" -> "ApplicationManager\nObserver": HandleLockActivation
+"ApplicationManager\nObserver" -> "Bus": SendPopupAction
+"Bus" -> "Application": SendPopupAction
+@enduml

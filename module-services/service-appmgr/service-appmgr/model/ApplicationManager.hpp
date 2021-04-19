@@ -31,6 +31,7 @@
 #include <service-eink/Common.hpp>
 
 #include <notifications/NotificationProvider.hpp>
+#include <module-apps/popups/lock-handlers/PhoneLockObserver.hpp>
 
 namespace app
 {
@@ -179,6 +180,9 @@ namespace app::manager
                                         // lock screen.
         std::unique_ptr<settings::Settings> settings;
         std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
+
+        std::unique_ptr<lock::PhoneLockObserver> phoneLockObserver;
+
         void displayLanguageChanged(std::string value);
         void lockTimeChanged(std::string value);
         void inputLanguageChanged(std::string value);

@@ -3,7 +3,7 @@
 
 #include "popups/data/LockData.hpp"
 #include "PinLockHandler.hpp"
-#include "PinHash.hpp"
+#include "module-apps/popups/lock-widgets/PinHash.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 #include "application-desktop/windows/Names.hpp"
 #include <module-utils/common_data/EventStore.hpp>
