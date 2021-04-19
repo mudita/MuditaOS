@@ -21,6 +21,24 @@ TEST_CASE("Calculator utilities")
         REQUIRE(!result.isError);
     }
 
+    SECTION("No operation")
+    {
+        auto result = calculator.calculate("0");
+        REQUIRE(result.value == "0");
+        REQUIRE(result.equation == "0");
+        REQUIRE(!result.isError);
+
+        result = calculator.calculate("1234");
+        REQUIRE(result.value == "1234");
+        REQUIRE(result.equation == "1234");
+        REQUIRE(!result.isError);
+
+        result = calculator.calculate("43211e6");
+        REQUIRE(result.value == "4.321e10");
+        REQUIRE(result.equation == "43211e6");
+        REQUIRE(!result.isError);
+    }
+
     SECTION("Addition")
     {
         auto result = calculator.calculate("5+4+8+6");
