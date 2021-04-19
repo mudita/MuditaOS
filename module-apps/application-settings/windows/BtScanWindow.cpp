@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <functional>
@@ -73,7 +73,7 @@ namespace gui
 
                 std::shared_ptr<BluetoothAddrMessage> msg =
                     std::make_shared<BluetoothAddrMessage>(bd_addr_to_str(device.address));
-                application->bus.sendUnicast(msg, "ServiceBluetooth", 5000);
+                application->bus.sendUnicastSync(msg, "ServiceBluetooth", 5000);
 
                 message_bt2(application, BluetoothMessage::Request::StopScan);
                 // message_bt2(application, BluetoothMessage::Request::Start);

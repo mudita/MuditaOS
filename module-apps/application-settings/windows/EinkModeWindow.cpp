@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <memory>
@@ -39,7 +39,7 @@ namespace gui
                 last_mode = service::eink::EinkModeMessage::Mode::Normal;
             }
 
-            application->bus.sendUnicast(
+            application->bus.sendUnicastSync(
                 std::make_shared<service::eink::EinkModeMessage>(last_mode), service::name::eink, 5000);
             return true;
         };

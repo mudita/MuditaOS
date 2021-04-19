@@ -25,7 +25,7 @@ namespace AudioServiceAPI
         {
             auto msgType = static_cast<int>(msg->type);
             LOG_DEBUG("Msg type %d", msgType);
-            auto ret = serv->bus.sendUnicast(msg, service::name::audio, sys::BusProxy::defaultTimeout);
+            auto ret = serv->bus.sendUnicastSync(msg, service::name::audio, sys::BusProxy::defaultTimeout);
             if (ret.first == sys::ReturnCodes::Success) {
                 if (auto resp = std::dynamic_pointer_cast<AudioResponseMessage>(ret.second)) {
                     LOG_DEBUG("Msg type %d done", msgType);
