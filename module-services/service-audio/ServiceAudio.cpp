@@ -28,10 +28,10 @@ static constexpr auto defaultVolumeLow   = "2";
 static constexpr auto defaultVolumeMuted = "0";
 static constexpr auto defaultTrue        = "1";
 static constexpr auto defaultFalse       = "0";
-static constexpr auto defaultCallRingtonePath        = "assets/audio/Ringtone-drum2.mp3";
-static constexpr auto defaultTextMessageRingtonePath = "assets/audio/SMS-drum2.mp3";
-static constexpr auto defaultNotificationsPath       = "assets/audio/SMS-drum2.mp3";
-static constexpr auto defaultKeypadSoundPath         = "assets/audio/SMS-drum2.mp3";
+static constexpr auto defaultCallRingtonePath        = "assets/audio/rington_drum_2.mp3";
+static constexpr auto defaultTextMessageRingtonePath = "assets/audio/sms_drum_2.mp3";
+static constexpr auto defaultNotificationsPath       = "assets/audio/sms_drum_2.mp3";
+static constexpr auto defaultKeypadSoundPath         = "assets/audio/sms_drum_2.mp3";
 
 static constexpr std::initializer_list<std::pair<audio::DbPathElement, const char *>> cacheInitializer{
 
