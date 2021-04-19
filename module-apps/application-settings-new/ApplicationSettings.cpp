@@ -622,7 +622,7 @@ namespace app
     {
         constexpr int timeout = pdMS_TO_TICKS(1500);
 
-        auto response = bus.sendUnicast(
+        auto response = bus.sendUnicastSync(
             std::make_shared<sevm::ScreenLightControlRequestParameters>(), service::name::evt_manager, timeout);
 
         if (response.first == sys::ReturnCodes::Success) {

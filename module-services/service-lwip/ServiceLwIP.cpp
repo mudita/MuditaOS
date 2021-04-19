@@ -44,7 +44,7 @@ extern "C"
 sys::ReturnCodes message_lwip(sys::Service *app, LwIP_message::Request req)
 {
     std::shared_ptr<LwIP_message> msg = std::make_shared<LwIP_message>(req);
-    auto ret                          = app->bus.sendUnicast(msg, "ServiceLwIP", 5000);
+    auto ret                          = app->bus.sendUnicastSync(msg, "ServiceLwIP", 5000);
     if (ret.first != sys::ReturnCodes::Success) {
         LOG_ERROR("err: %s", c_str(ret.first));
     }

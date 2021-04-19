@@ -240,16 +240,16 @@ namespace sys
     bool SystemManager::Restore(Service *s)
     {
         LOG_DEBUG("trying to enter restore state");
-        auto ret = s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Restore),
-                                      service::name::system_manager,
-                                      sys::constants::restoreTimeout);
+        auto ret = s->bus.sendUnicastSync(std::make_shared<SystemManagerCmd>(Code::Restore),
+                                          service::name::system_manager,
+                                          sys::constants::restoreTimeout);
         if (ret.first != ReturnCodes::Success) {
             LOG_WARN("Can't stop all services, %d ms wait time", sys::constants::restoreTimeout);
         }
         auto msgCloseApplications = std::make_shared<app::manager::UpdateInProgress>(service::name::system_manager);
-        ret                       = s->bus.sendUnicast(std::move(msgCloseApplications),
-                                 app::manager::ApplicationManager::ServiceName,
-                                 sys::constants::restoreTimeout);
+        ret                       = s->bus.sendUnicastSync(std::move(msgCloseApplications),
+                                     app::manager::ApplicationManager::ServiceName,
+                                     sys::constants::restoreTimeout);
         if (ret.first != ReturnCodes::Success) {
             LOG_WARN("Can't stop all applications, %d ms wait time", sys::constants::restoreTimeout);
         }
@@ -272,7 +272,7 @@ namespace sys
 
     bool SystemManager::SuspendService(const std::string &name, sys::Service *caller)
     {
-        auto ret = caller->bus.sendUnicast(
+        auto ret = caller->bus.sendUnicastSync(
             std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::SuspendToRAM),
             name,
             1000);
@@ -286,7 +286,7 @@ namespace sys
 
     bool SystemManager::ResumeService(const std::string &name, sys::Service *caller)
     {
-        auto ret = caller->bus.sendUnicast(
+        auto ret = caller->bus.sendUnicastSync(
             std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode, ServicePowerMode::Active), name, 1000);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
@@ -301,7 +301,7 @@ namespace sys
         service->StartService();
 
         auto msg  = std::make_shared<SystemMessage>(SystemMessageType::Start);
-        auto ret  = caller->bus.sendUnicast(msg, service->GetName(), timeout);
+        auto ret  = caller->bus.sendUnicastSync(msg, service->GetName(), timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if (ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)) {
@@ -331,7 +331,7 @@ namespace sys
     bool SystemManager::RequestServiceClose(const std::string &name, Service *caller, TickType_t timeout)
     {
         auto msg  = std::make_shared<SystemMessage>(SystemMessageType::Exit);
-        auto ret  = caller->bus.sendUnicast(msg, name, timeout);
+        auto ret  = caller->bus.sendUnicastSync(msg, name, timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if (ret.first != ReturnCodes::Success) {
