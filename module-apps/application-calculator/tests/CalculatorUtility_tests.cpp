@@ -1,16 +1,14 @@
 ﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 #include "application-calculator/data/CalculatorUtility.hpp"
 #include <i18n/i18n.hpp>
 #include <cstring>
 
-
 TEST_CASE("Calculator utilities")
 {
-    auto calculator = Calculator();
+    auto calculator = calc::Calculator();
     utils::localize.setDisplayLanguage("English");
 
     SECTION("Empty input")
