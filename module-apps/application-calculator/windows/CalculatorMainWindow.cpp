@@ -106,7 +106,8 @@ namespace gui
                 mathOperationInput->removeChar();
                 return false;
             }
-            if (!event.is(gui::KeyCode::KEY_0) && mathOperationInput->getText() == "0") {
+            if (!event.is(gui::KeyCode::KEY_0) && !event.is(gui::KeyCode::KEY_ENTER) &&
+                mathOperationInput->getText() == "0") {
                 mathOperationInput->clear();
             }
             return false;
