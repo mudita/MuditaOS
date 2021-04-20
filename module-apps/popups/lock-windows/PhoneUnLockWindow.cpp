@@ -44,13 +44,13 @@ namespace gui
     void PhoneUnlockWindow::setVisibleState()
     {
         restore();
-        if (phoneLock->isState(Lock::LockState::InputRequired)) {
+        if (phoneLock->isState(lock::Lock::LockState::InputRequired)) {
             LockBox->setVisibleStateEnterPin(PinLockBox::EnterPasscodeType::ProvidePasscode);
         }
-        else if (phoneLock->isState(Lock::LockState::InvalidInputRetryRequired)) {
+        else if (phoneLock->isState(lock::Lock::LockState::InvalidInputRetryRequired)) {
             LockBox->setVisibleStateInvalidPin(PinLockBox::PasscodeErrorType::InvalidPasscode, phoneLock->getValue());
         }
-        else if (phoneLock->isState(Lock::LockState::Blocked)) {
+        else if (phoneLock->isState(lock::Lock::LockState::Blocked)) {
             LockBox->setVisibleStateBlocked();
         }
         //        else if (lock->isState(PinLock::LockState::NewPasscodeRequired)) {
@@ -88,7 +88,7 @@ namespace gui
 
             LockBox->buildLockBox(phoneLock->getMaxPinSize());
 
-            if (phoneLock->isState(Lock::LockState::InputRequired)) {
+            if (phoneLock->isState(lock::Lock::LockState::InputRequired)) {
                 currentPasscodeType = PinLockBox::EnterPasscodeType::ProvidePasscode;
             }
             //            else if (lock->isState(Lock::LockState::NewPasscodeRequired)) {
@@ -107,7 +107,7 @@ namespace gui
             if (usesNumericKeys()) {
                 phoneLock->clearAttempt();
             }
-            else if (phoneLock->isState(Lock::LockState::InvalidInputRetryRequired)) {
+            else if (phoneLock->isState(lock::Lock::LockState::InvalidInputRetryRequired)) {
                 phoneLock->consumeState();
             }
             application->returnToPreviousWindow();
@@ -148,7 +148,7 @@ namespace gui
     // Co to do kurwy za funkcja jest ....
     auto PhoneUnlockWindow::usesNumericKeys() const noexcept -> bool
     {
-        return phoneLock && (phoneLock->isState(Lock::LockState::InputRequired));
+        return phoneLock && (phoneLock->isState(lock::Lock::LockState::InputRequired));
 
         //        return lock && (lock->isState(PinLock::LockState::PasscodeRequired) ||
         //                        lock->isState(PinLock::LockState::NewPasscodeRequired) ||

@@ -13,8 +13,6 @@ namespace lock
     class LockHandler
     {
       protected:
-        virtual ~LockHandler() = default;
-
-        gui::Lock *lock = nullptr;
+        Lock *lock = nullptr;
     };
 } // namespace lock

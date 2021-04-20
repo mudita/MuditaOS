@@ -4,7 +4,7 @@
 #include "Lock.hpp"
 #include <module-utils/log/log.hpp>
 
-namespace gui
+namespace lock
 {
     void Lock::consumeState() noexcept
     {
@@ -59,4 +59,4 @@ namespace gui
         }
         onActivatedCallback(pinCopy);
     }
-} // namespace gui
+} // namespace lock

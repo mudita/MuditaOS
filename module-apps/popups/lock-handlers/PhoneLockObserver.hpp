@@ -15,7 +15,7 @@ namespace lock
       private:
         using OnPhoneLockCallback             = std::function<void()>;
         using OnPhoneUnlockCallback           = std::function<void()>;
-        using OnPhonePasscodeRequiredCallback = std::function<void(gui::Lock *)>;
+        using OnPhonePasscodeRequiredCallback = std::function<void(Lock *)>;
 
         OnPhoneLockCallback onPhoneLockCallback;
         OnPhoneUnlockCallback onPhoneUnlockCallback;
@@ -28,7 +28,8 @@ namespace lock
         sys::MessagePointer handleUnlockRequest();
 
       public:
-        explicit PhoneLockObserver();
+        PhoneLockObserver();
+        ~PhoneLockObserver();
 
         void subscribe(OnPhoneLockCallback &&onLock,
                        OnPhoneUnlockCallback &&onUnlock,

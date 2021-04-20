@@ -7,8 +7,10 @@
 #include <functional>
 #include <limits>
 
-namespace gui
+namespace lock
 {
+    class PhoneLockObserver;
+
     class Lock
     {
       public:
@@ -79,11 +81,11 @@ namespace gui
         std::function<void(const std::vector<unsigned int> &)> onActivatedCallback = nullptr;
 
         // Clean that up
-        LockState lockState = LockState::Unlocked;
-        unsigned int value  = 0;
 
       private:
         std::string passcodeName;
+        LockState lockState = LockState::Unlocked;
+        unsigned int value  = 0;
 
         std::vector<unsigned int> pinValue;
         unsigned int maxPinSize = defaultPasscodeSize;
@@ -102,6 +104,8 @@ namespace gui
             minPinSize = _minPinSize;
             maxPinSize = _maxPinSize;
         }
+
+        friend class PhoneLockObserver;
     };
 
 } // namespace gui

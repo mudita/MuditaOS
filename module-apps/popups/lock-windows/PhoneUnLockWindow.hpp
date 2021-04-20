@@ -17,7 +17,7 @@ namespace gui
 {
     class PhoneUnlockWindow : public PinLockBaseWindow
     {
-        Lock *phoneLock = nullptr;
+        lock::Lock *phoneLock = nullptr;
 
         const std::string this_window_name;
         std::string lockTimeoutApplication                = "";

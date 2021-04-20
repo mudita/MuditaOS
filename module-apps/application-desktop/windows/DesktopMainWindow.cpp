@@ -14,6 +14,7 @@
 #include "gui/widgets/Image.hpp"
 #include <service-appmgr/Controller.hpp>
 #include <service-time/ServiceTime.hpp>
+#include <service-time/TimeMessage.hpp>
 
 #include <i18n/i18n.hpp>
 #include "log/log.hpp"
@@ -125,6 +126,7 @@ namespace gui
             inputCallback = nullptr;
             setFocusItem(nullptr);
 
+            application->bus.sendUnicast(std::make_shared<TimersProcessingStopMessage>(), service::name::service_time);
         }
         else {
             setActiveState();
@@ -141,6 +143,7 @@ namespace gui
                 app::manager::Controller::sendAction(application, app::manager::actions::SelectSimCard);
             }
 
+            application->bus.sendUnicast(std::make_shared<TimersProcessingStartMessage>(), service::name::service_time);
         }
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }

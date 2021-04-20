@@ -312,7 +312,7 @@ namespace app::manager
                 auto params1 = std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock);
                 actionsRegistry.enqueue(ActionEntry{actions::AbortPopup, std::move(params1)});
             },
-            [this](gui::Lock *lock) {
+            [this](lock::Lock *lock) {
                 LOG_ERROR("Potrzebuje passcode");
 
                 auto params = std::make_unique<gui::PhoneUnlockInputRequestParams>(gui::popup::ID::InputLock, lock);

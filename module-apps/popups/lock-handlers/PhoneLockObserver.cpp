@@ -11,7 +11,7 @@ namespace lock
 
     PhoneLockObserver::PhoneLockObserver()
     {
-        lock = new gui::Lock(gui::Lock::LockState::Blocked);
+        lock = new Lock(Lock::LockState::Blocked);
 
         lock->onActivatedCallback = [this](const std::vector<unsigned int> &data) {
             LOG_ERROR("Wolam active sprawdzam czy ok");
@@ -19,20 +19,25 @@ namespace lock
             const uint32_t hash = GetPinHash(data);
 
             if (phoneLockHash == hash) {
-                lock->lockState = gui::Lock::LockState::Unlocked;
+                lock->lockState = Lock::LockState::Unlocked;
                 lock->value     = 4;
                 onPhoneUnlockCallback();
                 return;
             }
             else if (lock->value > 0) {
-                lock->lockState = gui::Lock::LockState::InvalidInputRetryRequired;
+                lock->lockState = Lock::LockState::InvalidInputRetryRequired;
             }
             else {
-                lock->lockState = gui::Lock::LockState::Blocked;
+                lock->lockState = Lock::LockState::Blocked;
             }
 
             onPhonePasscodeRequiredCallback(lock);
         };
+    }
+
+    PhoneLockObserver::~PhoneLockObserver()
+    {
+        delete lock;
     }
 
     void PhoneLockObserver::enablePhoneLock(bool _phoneLockEnabled)
@@ -76,13 +81,13 @@ namespace lock
             onPhoneUnlockCallback();
         }
         else {
-            if (lock->isState(gui::Lock::LockState::Unlocked)) {
+            if (lock->isState(Lock::LockState::Unlocked)) {
                 onPhoneUnlockCallback();
             }
-            else if (!lock->isState(gui::Lock::LockState::Unlocked)) {
+            else if (!lock->isState(Lock::LockState::Unlocked)) {
 
                 LOG_ERROR("Potrzebuje passcode - jest coś w hashu ? %d", phoneLockHash);
-                lock->lockState = gui::Lock::LockState::InputRequired;
+                lock->lockState = Lock::LockState::InputRequired;
 
                 onPhonePasscodeRequiredCallback(lock);
             }
@@ -94,10 +99,9 @@ namespace lock
     sys::MessagePointer PhoneLockObserver::handleLockRequest()
     {
         // Pewnie dodać Locked?
-        lock->lockState = gui::Lock::LockState::Blocked;
+        lock->lockState = Lock::LockState::Blocked;
         onPhoneLockCallback();
 
         return sys::msgHandled();
     }
-
 } // namespace lock
