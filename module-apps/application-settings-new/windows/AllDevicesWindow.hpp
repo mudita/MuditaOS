@@ -11,6 +11,24 @@ namespace gui
 {
     class Image;
 
+    class ActiveDevice
+    {
+      public:
+        explicit ActiveDevice(std::string address) : address(std::move(address))
+        {}
+        ActiveDevice() = default;
+        enum class DeviceState
+        {
+            Connected,
+            Connecting,
+            Pairing,
+            Paired,
+            Unknown
+        };
+        DeviceState state = DeviceState::Unknown;
+        std::string address;
+    };
+
     class AllDevicesWindow : public BaseSettingsWindow
     {
       public:
@@ -21,12 +39,16 @@ namespace gui
         auto buildOptionsList() -> std::list<Option> override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         auto onInput(const InputEvent &inputEvent) -> bool override;
+        UTF8 getTextOnCenter(const ActiveDevice::DeviceState &) const;
+        UTF8 getTextOnRight(const ActiveDevice::DeviceState &) const;
+        option::SettingRightItem getRightItem(const ActiveDevice::DeviceState &) const;
+        auto handleDeviceAction(const ActiveDevice &) -> bool;
 
+        ActiveDevice activeDevice;
         Image *leftArrowImage = nullptr;
         Image *crossImage     = nullptr;
         std::vector<Devicei> devices{};
-        std::string addressOfConnectedDevice;
-        std::string addressOfSelectedDevice;
+        std::string addressOfDeviceSelected;
         std::unique_ptr<BluetoothSettingsModel> bluetoothSettingsModel{};
     };
 

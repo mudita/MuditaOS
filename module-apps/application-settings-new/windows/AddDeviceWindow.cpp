@@ -2,8 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AddDeviceWindow.hpp"
-#include "application-settings-new/ApplicationSettings.hpp"
-#include "application-settings-new/data/DeviceData.hpp"
+#include <application-settings-new/ApplicationSettings.hpp>
+#include <application-settings-new/data/DeviceData.hpp>
+#include <application-settings-new/data/PairingDeviceData.hpp>
 
 #include "OptionSetting.hpp"
 
@@ -43,6 +44,8 @@ namespace gui
                 device.name,
                 [=](gui::Item & /*unused*/) {
                     LOG_DEBUG("Device: %s", device.name.c_str());
+                    auto pairingDeviceData = std::make_unique<PairingDeviceData>(device);
+                    application->switchWindow(gui::window::name::all_devices, std::move(pairingDeviceData));
                     bluetoothSettingsModel->requestDevicePair(bd_addr_to_str(device.address));
                     application->switchWindow(gui::window::name::all_devices);
                     return true;
