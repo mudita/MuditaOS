@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationSettings.hpp"
@@ -204,21 +204,9 @@ namespace app
                                 service::name::bluetooth);
                 return sys::MessageNone{};
             }
-            auto addr = bluetoothPairResultMsg->getAddr();
-            switchWindow(gui::window::name::dialog_retry,
-                         gui::ShowMode::GUI_SHOW_INIT,
-                         std::make_unique<gui::DialogMetadataMessage>(
-                             gui::DialogMetadata{utils::translate("app_settings_bt"),
-                                                 "info_big_circle_W_G",
-                                                 utils::translate("app_settings_bluetooth_pairing_error_message"),
-                                                 "",
-                                                 [=]() -> bool {
-                                                     bus.sendUnicast(std::make_shared<BluetoothPairMessage>(addr),
-                                                                     service::name::bluetooth);
-
-                                                     returnToPreviousWindow();
-                                                     return true;
-                                                 }}));
+            auto addr    = bluetoothPairResultMsg->getAddr();
+            auto message = std::make_shared<BluetoothPairMessage>(std::move(addr));
+            switchToAllDevicesViaBtErrorPrompt(std::move(message), "app_settings_bluetooth_pairing_error_message");
 
             return sys::MessageNone{};
         });
@@ -235,19 +223,8 @@ namespace app
             }
             auto addr = unpairResultMsg->getAddr();
             bus.sendUnicast(std::make_shared<::message::bluetooth::RequestBondedDevices>(), service::name::bluetooth);
-            switchWindow(gui::window::name::dialog_retry,
-                         gui::ShowMode::GUI_SHOW_INIT,
-                         std::make_unique<gui::DialogMetadataMessage>(
-                             gui::DialogMetadata{utils::translate("app_settings_bt"),
-                                                 "info_big_circle_W_G",
-                                                 utils::translate("app_settings_bluetooth_unpairing_error_message"),
-                                                 "",
-                                                 [=]() -> bool {
-                                                     bus.sendUnicast(std::make_shared<message::bluetooth::Unpair>(addr),
-                                                                     service::name::bluetooth);
-                                                     returnToPreviousWindow();
-                                                     return true;
-                                                 }}));
+            auto message = std::make_shared<message::bluetooth::Unpair>(std::move(addr));
+            switchToAllDevicesViaBtErrorPrompt(std::move(message), "app_settings_bluetooth_unpairing_error_message");
             return sys::MessageNone{};
         });
 
@@ -258,21 +235,9 @@ namespace app
                                 service::name::bluetooth);
                 return sys::MessageNone{};
             }
-            auto addr = connectResultMsg->getAddr();
-            switchWindow(gui::window::name::dialog_retry,
-                         gui::ShowMode::GUI_SHOW_INIT,
-                         std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
-                             utils::translate("app_settings_bt"),
-                             "info_big_circle_W_G",
-                             utils::translate("app_settings_bluetooth_connecting_error_message"),
-                             "",
-                             [=]() -> bool {
-                                 bus.sendUnicast(std::make_shared<message::bluetooth::Connect>(addr),
-                                                 service::name::bluetooth);
-                                 returnToPreviousWindow();
-                                 return true;
-                             }}));
-
+            auto addr    = connectResultMsg->getAddr();
+            auto message = std::make_shared<message::bluetooth::Connect>(std::move(addr));
+            switchToAllDevicesViaBtErrorPrompt(std::move(message), "app_settings_bluetooth_connecting_error_message");
             return sys::MessageNone{};
         });
 
@@ -285,7 +250,7 @@ namespace app
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(
                              gui::DialogMetadata{utils::translate("app_settings_bt"),
-                                                 "info_big_circle_W_G",
+                                                 "emergency_W_G",
                                                  utils::translate("app_settings_bluetooth_init_error_message"),
                                                  "",
                                                  [=]() -> bool {
@@ -732,5 +697,22 @@ namespace app
     {
         connectionFrequency = val;
         CellularServiceAPI::SetConnectionFrequency(this, val);
+    }
+
+    void ApplicationSettingsNew::switchToAllDevicesViaBtErrorPrompt(std::shared_ptr<sys::DataMessage> msg,
+                                                                    const std::string &errorMsg)
+    {
+        switchWindow(gui::window::name::dialog_retry,
+                     gui::ShowMode::GUI_SHOW_INIT,
+                     std::make_unique<gui::DialogMetadataMessage>(
+                         gui::DialogMetadata{utils::translate("app_settings_bt"),
+                                             "emergency_W_G",
+                                             utils::translate(errorMsg),
+                                             "",
+                                             [this, message{std::move(msg)}]() -> bool {
+                                                 bus.sendUnicast(message, service::name::bluetooth);
+                                                 switchWindow(gui::window::name::all_devices);
+                                                 return true;
+                                             }}));
     }
 } /* namespace app */

@@ -457,6 +457,8 @@
   "app_settings_title_color_test": "Display available colors",
   "app_settings_toolbar_reset": "RESET",
   "app_settings_option_connected": "<text font='gt_pressura' weight='regular' size='27'>CONNECTED</text>",
+  "app_settings_option_connecting": "<text font='gt_pressura' weight='regular' size='27'>CONNECTING</text>",
+  "app_settings_option_pairing": "<text font='gt_pressura' weight='regular' size='27'>PAIRING</text>",
   "app_settings_title_do_not_disturb": "Do not disturb",
   "app_settings_title_offline": "Offline",
   "app_settings_title_connection_frequency": "Connection frequency",
