@@ -351,5 +351,26 @@ SCENARIO("Input Processor tests")
                 }
             }
         }
+
+        WHEN("We do BIG math")
+        {
+            inputField.setText("99999×99999");
+            passShortKeyPress(KeyCodes::JoystickEnter);
+
+            THEN("Output contains exponent")
+            {
+                REQUIRE(inputField.getText() == "9.9998e9");
+            }
+
+            AND_WHEN("We start typing")
+            {
+                passShortKeyPresses({KeyCodes::NumericKey4, MinusKey, KeyCodes::NumericKey5, KeyCodes::NumericKey6});
+
+                THEN("Input is cleared before typing")
+                {
+                    REQUIRE(inputField.getText() == "4-56");
+                }
+            }
+        }
     }
 }
