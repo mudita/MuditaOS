@@ -28,7 +28,9 @@ namespace calc
         bool isPreviousNumberDecimal() const;
         bool decimalLimitReached() const;
 
-        std::uint32_t getPenultimate();
+        bool inputContainsExponent() const;
+
+        std::uint32_t getPenultimate() const;
 
         gui::Text *inputField{nullptr};
         bool clearInput{false};
