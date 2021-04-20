@@ -80,7 +80,7 @@ namespace screen_light_control
 
         template <class T> void setScreenLightSettings(const std::string &varName, T value)
         {
-            settings->setValue(varName, utils::to_string(value));
+            settings->setValue(varName, utils::to_string(value), settings::SettingsScope::Global);
         }
         void initFromSettings();
 
