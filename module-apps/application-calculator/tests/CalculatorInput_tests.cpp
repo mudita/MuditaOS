@@ -159,6 +159,21 @@ SCENARIO("Input Processor tests")
                     REQUIRE(inputField.getText() == "0.12345");
                 }
             }
+
+            AND_WHEN("We try to enter more than 6 decimals")
+            {
+                passShortKeyPresses({KeyCodes::NumericKey4,
+                                     KeyCodes::NumericKey5,
+                                     KeyCodes::NumericKey6,
+                                     KeyCodes::NumericKey7,
+                                     KeyCodes::NumericKey8,
+                                     KeyCodes::NumericKey9});
+
+                THEN("The input is truncated to 6 decimals")
+                {
+                    REQUIRE(inputField.getText() == "0.123456");
+                }
+            }
         }
 
         WHEN("We enter zero")
@@ -286,6 +301,21 @@ SCENARIO("Input Processor tests")
                         THEN("It is ignored")
                         {
                             REQUIRE(inputField.getText() == "123+4.56456");
+                        }
+                    }
+
+                    AND_WHEN("We try to enter more than 6 decimals")
+                    {
+                        passShortKeyPresses({KeyCodes::NumericKey4,
+                                             KeyCodes::NumericKey5,
+                                             KeyCodes::NumericKey6,
+                                             KeyCodes::NumericKey7,
+                                             KeyCodes::NumericKey8,
+                                             KeyCodes::NumericKey9});
+
+                        THEN("The input is truncated to 6 decimals")
+                        {
+                            REQUIRE(inputField.getText() == "123+4.564567");
                         }
                     }
                 }

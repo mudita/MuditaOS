@@ -24,7 +24,10 @@ namespace calc
 
       private:
         void writeEquation(bool lastCharIsSymbol, const UTF8 &symbol);
-        bool isPreviousNumberDecimal();
+
+        bool isPreviousNumberDecimal() const;
+        bool decimalLimitReached() const;
+
         std::uint32_t getPenultimate();
 
         gui::Text *inputField{nullptr};

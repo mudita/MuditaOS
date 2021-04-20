@@ -83,6 +83,11 @@ bool calc::InputProcessorText::handle(const gui::InputEvent &event)
         return true;
     }
 
+    if (decimalLimitReached()) {
+        // Consume event to don't allow more decimals
+        return true;
+    }
+
     return false;
 }
 
@@ -111,7 +116,7 @@ void calc::InputProcessorText::writeEquation(bool lastCharIsSymbol, const UTF8 &
     }
 }
 
-bool calc::InputProcessorText::isPreviousNumberDecimal()
+bool calc::InputProcessorText::isPreviousNumberDecimal() const
 {
     if (!inputField->getText().empty()) {
         std::vector<int> symbolsIndexes;
@@ -135,6 +140,20 @@ bool calc::InputProcessorText::isPreviousNumberDecimal()
         }
         return lastNumber.find(utils::localize.get("app_calculator_decimal_separator")) != std::string::npos;
     }
+    return false;
+}
+
+bool calc::InputProcessorText::decimalLimitReached() const
+{
+    if (!isPreviousNumberDecimal())
+        return false;
+
+    const auto &txt          = std::string{inputField->getText()};
+    const auto separator_pos = txt.find_last_of(utils::localize.get("app_calculator_decimal_separator"));
+
+    if ((txt.size() - separator_pos) > DecimalDigitsLimit)
+        return true;
+
     return false;
 }
 
