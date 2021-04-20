@@ -705,6 +705,14 @@ class CellularSimCardLockResponseMessage : public CellularResponseMessage
     }
 };
 
+class CellularGetOwnNumberResponseMessage : public CellularResponseMessage
+{
+  public:
+    CellularGetOwnNumberResponseMessage(bool retCode, std::string number = std::string())
+        : CellularResponseMessage(retCode, std::move(number))
+    {}
+};
+
 class CellularAntennaResponseMessage : public CellularResponseMessage
 {
   public:

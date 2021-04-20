@@ -100,9 +100,13 @@ namespace app
                                                    StartInBackground startInBackground)
         : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver{this}
     {
+        CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
+            selectedSimNumber = number;
+            LOG_DEBUG("Sim number changed: %s", selectedSimNumber.c_str());
+        });
         if ((Store::GSM::SIM::SIM1 == selectedSim || Store::GSM::SIM::SIM2 == selectedSim) &&
             Store::GSM::get()->sim == selectedSim) {
-            selectedSimNumber = CellularServiceAPI::GetOwnNumber(this);
+            CellularServiceAPI::RequestForOwnNumber(this);
         }
     }
 
@@ -123,7 +127,7 @@ namespace app
         if (auto phoneMsg = dynamic_cast<CellularNotificationMessage *>(msgl); nullptr != phoneMsg) {
             selectedSim = Store::GSM::get()->selected;
             if (CellularNotificationMessage::Content::SIM_READY == phoneMsg->content) {
-                selectedSimNumber = CellularServiceAPI::GetOwnNumber(this);
+                CellularServiceAPI::RequestForOwnNumber(this);
             }
             else if (CellularNotificationMessage::Content::SIM_NOT_READY == phoneMsg->content) {
                 selectedSimNumber = {};

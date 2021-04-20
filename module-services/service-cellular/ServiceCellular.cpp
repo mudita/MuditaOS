@@ -2412,9 +2412,9 @@ auto ServiceCellular::handleCellularGetOwnNumberMessage(sys::Message *msg) -> st
 {
     std::string temp;
     if (getOwnNumber(temp)) {
-        return std::make_shared<CellularResponseMessage>(true, temp);
+        return std::make_shared<CellularGetOwnNumberResponseMessage>(true, temp);
     }
-    return std::make_shared<CellularResponseMessage>(false);
+    return std::make_shared<CellularGetOwnNumberResponseMessage>(false);
 }
 
 auto ServiceCellular::handleCellularGetNetworkInfoMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
