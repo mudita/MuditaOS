@@ -13,7 +13,7 @@ calc::InputProcessorText::InputProcessorText(gsl::strict_not_null<gui::Text *> i
 
 bool calc::InputProcessorText::handle(const gui::InputEvent &event)
 {
-    if (clearInput) {
+    if (clearInput || inputContainsExponent()) {
         clear();
     }
 
@@ -157,7 +157,12 @@ bool calc::InputProcessorText::decimalLimitReached() const
     return false;
 }
 
-std::uint32_t calc::InputProcessorText::getPenultimate()
+bool calc::InputProcessorText::inputContainsExponent() const
+{
+    return std::string{inputField->getText()}.find('e') != std::string::npos;
+}
+
+std::uint32_t calc::InputProcessorText::getPenultimate() const
 {
     const auto &text = inputField->getText();
     const auto len   = text.length();
