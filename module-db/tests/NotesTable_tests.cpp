@@ -12,7 +12,7 @@ TEST_CASE("Notes Table tests")
 {
     Database::initialize();
 
-    const auto notesDbPath = std::filesystem::path{"user"} / "notes.db";
+    const auto notesDbPath = std::filesystem::path{"sys/user"} / "notes.db";
     NotesDB notesDb{notesDbPath.c_str()};
     REQUIRE(notesDb.isInitialized());
 

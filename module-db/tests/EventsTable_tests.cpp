@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -32,7 +32,7 @@ TEST_CASE("Events Table tests")
 {
     Database::initialize();
 
-    const auto eventsPath = (std::filesystem::path{"user"} / "events.db");
+    const auto eventsPath = (std::filesystem::path{"sys/user"} / "events.db");
     if (std::filesystem::exists(eventsPath)) {
         REQUIRE(std::filesystem::remove(eventsPath));
     }
