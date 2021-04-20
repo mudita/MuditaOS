@@ -43,6 +43,8 @@ namespace calc
     class InputProcessor
     {
       public:
+        static inline constexpr auto DecimalDigitsLimit = 6;
+
         virtual ~InputProcessor() = default;
 
         virtual bool handle(const gui::InputEvent &event) = 0;
