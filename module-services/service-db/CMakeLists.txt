@@ -16,6 +16,7 @@ set(SOURCES
     agents/settings/SettingsAgent.cpp
     agents/settings/Settings.cpp
     agents/settings/SettingsCache.cpp
+    agents/settings/FactorySettings.cpp
     agents/file_indexer/FileIndexerAgent.cpp
     agents/quotes/QuotesAgent.cpp
 )

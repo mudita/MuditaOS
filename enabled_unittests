@@ -245,6 +245,8 @@ TESTS_LIST["catch2-service-db"]="
     DB_API;
     Settings Messages;
     Quotes;
+    Factory Settings;
+    Factory Settings Init;
 "
 #---------
 TESTS_LIST["catch2-service-db-settings"]="
