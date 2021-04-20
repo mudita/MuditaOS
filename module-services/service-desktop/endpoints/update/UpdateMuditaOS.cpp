@@ -535,10 +535,9 @@ bool UpdateMuditaOS::unpackFileToTemp(mtar_header_t &h, unsigned long *crc32)
 updateos::UpdateError UpdateMuditaOS::cleanupAfterUpdate()
 {
     try {
-        if (std::filesystem::is_directory(updateTempDirectory.c_str()) &&
-            std::filesystem::remove_all(updateTempDirectory.c_str())) {
-            return informError(
-                updateos::UpdateError::CantRemoveUniqueTmpDir, "remove_all failed on %s", updateTempDirectory.c_str());
+        if (std::filesystem::is_directory(updateTempDirectory.c_str())) {
+            const auto numOfFilesRemoved = std::filesystem::remove_all(updateTempDirectory.c_str());
+            LOG_DEBUG("Number of files and directories removed: %lu", static_cast<unsigned long>(numOfFilesRemoved));
         }
     }
     catch (const std::filesystem::filesystem_error &e) {
