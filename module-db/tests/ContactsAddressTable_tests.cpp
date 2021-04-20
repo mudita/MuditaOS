@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -10,7 +10,7 @@ TEST_CASE("Contacts address Table tests")
 {
     Database::initialize();
 
-    const auto callogPath = (std::filesystem::path{"user"} / "contacts.db");
+    const auto callogPath = (std::filesystem::path{"sys/user"} / "contacts.db");
     if (std::filesystem::exists(callogPath)) {
         REQUIRE(std::filesystem::remove(callogPath));
     }

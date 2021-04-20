@@ -26,7 +26,7 @@ TEST_CASE("Contact Groups tests")
 {
     INFO("sqlite Init");
     Database::initialize();
-    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
     if (std::filesystem::exists(contactsPath)) {
         REQUIRE(std::filesystem::remove(contactsPath));
     }
