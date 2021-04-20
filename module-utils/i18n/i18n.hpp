@@ -44,8 +44,9 @@ namespace utils
 
       public:
         static constexpr auto DefaultLanguage              = "English";
-        const std::filesystem::path DisplayLanguageDirPath = "assets/lang";
-        const std::filesystem::path InputLanguageDirPath   = "assets/profiles";
+        std::filesystem::path DisplayLanguageDirPath       = "assets/lang";
+        std::filesystem::path InputLanguageDirPath         = "assets/profiles";
+        void resetAssetsPath(const std::filesystem::path &);
 
         virtual ~i18n() = default;
         void setInputLanguage(const Language &lang);

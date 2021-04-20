@@ -984,7 +984,7 @@ TEST_CASE("Text addition bounds - multiple limits tests")
     std::string testStringTwoLines = "Test String 1\nTest String 2";
 
     std::string richTextTwoLines =
-        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='25'>String </text><text size='20' "
+        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
         "weight='bold'>1</text><br></br><text>Test String 2</text>";
 
     SECTION("Adding text to lower limit set to signs count and size and lines on higher limit")

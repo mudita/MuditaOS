@@ -28,8 +28,8 @@ TEST_CASE("Thread Record tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
-    const auto smsPath      = (std::filesystem::path{"user"} / "sms.db");
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
+    const auto smsPath      = (std::filesystem::path{"sys/user"} / "sms.db");
     if (std::filesystem::exists(contactsPath)) {
         REQUIRE(std::filesystem::remove(contactsPath));
     }

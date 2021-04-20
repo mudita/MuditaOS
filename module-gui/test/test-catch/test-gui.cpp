@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /// These are random tests what could be salvaged from old tests
@@ -55,7 +55,7 @@ TEST_CASE("Are fonts loaded")
     // this is because no fonts are loaded
     REQUIRE(fontmanager.getFont(0) == nullptr);
     // now initialize, from where is it taken? nobody knows from this foo
-    fontmanager.init("assets");
+    fontmanager.init("sys/current/assets");
     // check if there is at least default font
     REQUIRE(fontmanager.getFont(0) != nullptr);
 }

@@ -66,6 +66,12 @@ namespace utils
         return languageNames;
     }
 
+    void i18n::resetAssetsPath(const std::filesystem::path &assets)
+    {
+        DisplayLanguageDirPath = assets / "lang";
+        InputLanguageDirPath   = assets / "profiles";
+    }
+
     void i18n::setInputLanguage(const Language &lang)
     {
         if (lang.empty() || lang == inputLanguage) {
