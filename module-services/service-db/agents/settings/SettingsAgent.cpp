@@ -9,23 +9,36 @@
 #include <purefs/filesystem_paths.hpp>
 #include <service-db/SettingsCache.hpp>
 
-namespace settings::DbPaths
+namespace settings
 {
-    constexpr auto phone_mode    = "system/phone_mode";
-    constexpr auto phone_profile = "system/phone_profile";
-} // namespace settings::DbPaths
+    namespace DbPaths
+    {
+        constexpr auto phone_mode    = "system/phone_mode";
+        constexpr auto phone_profile = "system/phone_profile";
+    } // namespace DbPaths
+
+    namespace factory
+    {
+        constexpr auto data_file         = "personalization.json";
+        const std::filesystem::path path = purefs::dir::getMfgConfPath() / data_file;
+    } // namespace factory
+
+} // namespace settings
 
 SettingsAgent::SettingsAgent(sys::Service *parentService, settings::SettingsCache *cache)
-    : DatabaseAgent(parentService), cache(cache)
+    : DatabaseAgent(parentService), cache(cache), factorySettings(settings::factory::path)
 {
     if (nullptr == cache) {
         this->cache = settings::SettingsCache::getInstance();
     }
+
     database = std::make_unique<Database>(getDbFilePath().c_str());
 }
 
 void SettingsAgent::initDb()
 {
+    factorySettings.initDb(database.get());
+
     // first approach -> take care about big amount of variables
     auto allVars = database->query(settings::Statements::getAllValues);
     if (nullptr == allVars || 0 == allVars->getRowCount()) {
