@@ -1,7 +1,9 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
+#include "FactorySettings.hpp"
 
 #include <service-db/DatabaseAgent.hpp>
 #include <service-db/SettingsMessages.hpp>
@@ -35,11 +37,14 @@ class SettingsAgent : public DatabaseAgent
 
   private:
     settings::SettingsCache *cache;
+    settings::FactorySettings factorySettings;
+
     using MapOfRecipentsToBeNotified = std::map<std::string, std::set<settings::EntryPath>>;
     MapOfRecipentsToBeNotified variableChangeRecipients;
     using SetOfRecipents = std::set<std::string>;
     SetOfRecipents profileChangedRecipients;
     SetOfRecipents modeChangeRecipients;
+
     // db operations
     auto dbGetValue(const settings::EntryPath &path) -> std::optional<std::string>;
     auto dbSetValue(const settings::EntryPath &path, const std::string &value) -> bool;
