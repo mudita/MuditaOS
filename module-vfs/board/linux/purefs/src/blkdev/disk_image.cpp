@@ -186,4 +186,16 @@ namespace purefs::blkdev
         }
         return 0;
     }
+
+    auto disk_image::pm_control(pm_state target_state) -> int
+    {
+        pmState = target_state;
+        return 0;
+    }
+    auto disk_image::pm_read(pm_state &current_state) -> int
+    {
+        current_state = pmState;
+        return 0;
+    }
+
 } // namespace purefs::blkdev

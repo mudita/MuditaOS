@@ -189,6 +189,9 @@ namespace sys
         /// periodic update of cpu statistics
         void CpuStatisticsTimerHandler();
 
+        /// used for power management control for the filesystem
+        void UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency);
+
         MessagePointer handlePhoneModeRequest(PhoneModeRequest *request);
         MessagePointer handleTetheringStateRequest(TetheringStateRequest *request);
         MessagePointer enableTethering(TetheringEnabledResponse *response);
@@ -207,6 +210,8 @@ namespace sys
         InitFunction userInit;
         InitFunction systemInit;
         std::vector<std::string> readyForCloseRegister;
+
+        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
         static std::vector<std::shared_ptr<Service>> servicesList;
         static std::vector<std::shared_ptr<app::Application>> applicationsList;
