@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 /*
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
@@ -72,9 +75,8 @@ void
 __attribute__((weak))
 abort(void)
 {
-  
+
 }
 #endif
-
 
 // ----------------------------------------------------------------------------
