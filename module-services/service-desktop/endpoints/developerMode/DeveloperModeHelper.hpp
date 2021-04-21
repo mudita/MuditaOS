@@ -46,7 +46,6 @@ namespace parserFSM
     {
         inline constexpr auto keyPressed             = "keyPressed";
         inline constexpr auto state                  = "state";
-        inline constexpr auto systemStarted          = "systemStarted";
         inline constexpr auto ATResponse             = "ATResponse";
         inline constexpr auto AT                     = "AT";
         inline constexpr auto timeout                = "timeout";
