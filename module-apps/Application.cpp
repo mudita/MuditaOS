@@ -300,9 +300,6 @@ namespace app
         else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
             return handleSIMMessage(msgl);
         }
-        else if (dynamic_cast<AudioKeyPressedResponse *>(msgl) != nullptr) {
-            return handleAudioKeyMessage(msgl);
-        }
         return sys::msgNotHandled();
     }
 
@@ -588,25 +585,6 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleAudioKeyMessage(sys::Message *msgl)
-    {
-        using namespace gui::popup;
-        const auto msg = static_cast<AudioKeyPressedResponse *>(msgl);
-        if (msg->showPopup == AudioKeyPressedResponse::ShowPopup::True) {
-            LOG_INFO("Playback: %s, volume: %s",
-                     audio::str(msg->context.second).c_str(),
-                     std::to_string(msg->volume).c_str());
-            auto data = std::make_unique<gui::VolumePopupData>(msg->volume, msg->context);
-            if (getCurrentWindow()->getName() == window::volume_window) {
-                updateWindow(window::volume_window, std::move(data));
-            }
-            else {
-                switchWindow(window::volume_window, std::move(data));
-            }
-        }
-        return sys::msgHandled();
-    }
-
     sys::ReturnCodes Application::InitHandler()
     {
         setState(State::INITIALIZING);
@@ -721,6 +699,18 @@ namespace app
         }
     }
 
+    void Application::handleVolumeChanged(audio::Volume volume, audio::Context context)
+    {
+        using namespace gui::popup;
+        const auto popupName = resolveWindowName(gui::popup::ID::Volume);
+        if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
+            updateWindow(popupName, std::make_unique<gui::VolumePopupData>(volume, context));
+        }
+        else {
+            switchWindow(popupName, std::make_unique<gui::VolumePopupData>(volume, context));
+        }
+    }
+
     void Application::attachPopups(const std::vector<gui::popup::ID> &popupsList)
     {
         using namespace gui::popup;
@@ -762,6 +752,13 @@ namespace app
         if (id == ID::PhoneModes) {
             auto popupParams = static_cast<const gui::PhoneModePopupRequestParams *>(params);
             handlePhoneModeChanged(popupParams->getPhoneMode());
+        }
+        else if (id == ID::Volume) {
+            auto volumeParams = static_cast<const gui::VolumePopupRequestParams *>(params);
+            LOG_INFO("Playback: %s, volume: %s",
+                     audio::str(volumeParams->getAudioContext().second).c_str(),
+                     std::to_string(volumeParams->getVolume()).c_str());
+            handleVolumeChanged(volumeParams->getVolume(), volumeParams->getAudioContext());
         }
         else {
             switchWindow(gui::popup::resolveWindowName(id));

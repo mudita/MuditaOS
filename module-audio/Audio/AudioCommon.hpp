@@ -67,6 +67,9 @@ namespace audio
         Last = Alarm,
     };
 
+    /// Used to describe audio operations
+    using Context = std::pair<Profile::Type, PlaybackType>;
+
     struct DbPathElement
     {
         Setting setting;

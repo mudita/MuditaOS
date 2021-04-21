@@ -185,7 +185,6 @@ namespace app
         sys::MessagePointer handleGetDOM(sys::Message *msgl);
         sys::MessagePointer handleAppFocusLost(sys::Message *msgl);
         sys::MessagePointer handleSIMMessage(sys::Message *msgl);
-        sys::MessagePointer handleAudioKeyMessage(sys::Message *msgl);
 
         virtual bool isPopupPermitted(gui::popup::ID popupId) const;
 
@@ -330,6 +329,11 @@ namespace app
         /// @param mode new phone mode
         /// @param tethering new tethering mode
         void handlePhoneModeChanged(sys::phone_modes::PhoneMode mode);
+
+        /// Handles volume changed event
+        /// @param volume current volume level
+        /// @param context audio context which contains current profile and playback
+        void handleVolumeChanged(audio::Volume volume, audio::Context context);
 
         /// @ingrup AppWindowStack
         WindowsStack windowsStack;

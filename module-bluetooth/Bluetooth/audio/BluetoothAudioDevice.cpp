@@ -5,6 +5,7 @@
 
 #include <Audio/AudioCommon.hpp>
 #include <interface/profiles/A2DP/AVDTP.hpp>
+#include <module-audio/Audio/VolumeScaler.hpp>
 
 #include <Audio/Stream.hpp>
 
@@ -45,9 +46,8 @@ auto BluetoothAudioDevice::Stop() -> audio::AudioDevice::RetCode
 
 auto BluetoothAudioDevice::OutputVolumeCtrl(float vol) -> audio::AudioDevice::RetCode
 {
-    constexpr auto avrcpMaxVolume = std::uint8_t{0x7F}; // from AVRCP documentation
-    const auto volumeToSet        = static_cast<std::uint8_t>((vol / audio::maxVolume) * avrcpMaxVolume);
-    const auto status             = avrcp_controller_set_absolute_volume(ctx->avrcp_cid, volumeToSet);
+    const auto volumeToSet = audio::volume::scaler::toAvrcpVolume(vol);
+    const auto status      = avrcp_controller_set_absolute_volume(ctx->avrcp_cid, volumeToSet);
     if (status != ERROR_CODE_SUCCESS) {
         LOG_ERROR("Can't set volume level. Status %x", status);
         return audio::AudioDevice::RetCode::Failure;

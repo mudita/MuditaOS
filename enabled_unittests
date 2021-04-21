@@ -467,4 +467,8 @@ TESTS_LIST["catch2-module-bsp"]="
     BatteryChargerUtilsTest;
 "
 #---------
+TESTS_LIST["catch2-audio-volume-scaler"]="
+    Scenario: Scale volume levels between system and bluetooth;
+"
+#---------
 
