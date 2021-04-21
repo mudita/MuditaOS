@@ -23,17 +23,36 @@ namespace calc
         void clear() override;
 
       private:
-        void writeEquation(bool lastCharIsSymbol, const UTF8 &symbol);
+        std::optional<std::uint32_t> lastCharacter() const;
+        bool lastCharacterIsSymbol() const;
+        bool lastCharacterIsOperation() const;
 
-        bool isPreviousNumberDecimal() const;
-        bool decimalLimitReached() const;
+        std::optional<std::uint32_t> penultimateCharacter() const;
+        bool penultimateCharacterIsSymbol() const;
+        bool penultimateCharacterIsDecimalSeparator() const;
 
+        bool shouldComputeBeforeNextOperation() const;
+        void handleOperation(const UTF8 &operation);
+        void addSymbol(const UTF8 &symbol);
+
+        bool shouldHideInput(const gui::InputEvent &event) const;
+        bool shouldRestoreInput(const gui::InputEvent &event) const;
+        void hideCurrentInput();
+        void restoreHiddenInput();
+        bool hasHiddenPart() const;
+
+        bool isCurrentNumberDecimal() const;
         bool inputContainsExponent() const;
 
-        std::uint32_t getPenultimate() const;
+        bool prohibidInput(const gui::InputEvent &event) const;
+        bool charactedLimitReached() const;
+        bool decimalLimitReached() const;
+
+        void compute();
 
         gui::Text *inputField{nullptr};
         bool clearInput{false};
+        UTF8 hiddenPartOfEquation{};
     };
 
 } // namespace calc

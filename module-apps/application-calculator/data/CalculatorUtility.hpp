@@ -6,17 +6,6 @@
 
 namespace calc
 {
-    namespace CalculatorConstants
-    {
-        inline constexpr auto veryLowPrecision = 4;
-        inline constexpr auto lowPrecision     = 5;
-        inline constexpr auto precision        = 6;
-        inline constexpr auto highPrecision    = 8;
-        inline constexpr auto expLength        = 1;
-        inline constexpr auto minusExpLength   = 2;
-        inline constexpr auto maxStringLength  = 7;
-    } // namespace CalculatorConstants
-
     struct Result
     {
         std::string equation;

@@ -20,7 +20,6 @@ SCENARIO("Input Processor tests")
     GIVEN("An empty input")
     {
         utils::setDisplayLanguage("English");
-
         auto inputField = gui::Text{};
         auto processor  = calc::InputProcessorText{gsl::make_strict_not_null(&inputField)};
 
@@ -111,6 +110,41 @@ SCENARIO("Input Processor tests")
                     REQUIRE(inputField.isEmpty());
                 }
             }
+
+            AND_WHEN("We continue to type")
+            {
+                passShortKeyPresses(
+                    {KeyCodes::NumericKey1, KeyCodes::NumericKey2, KeyCodes::NumericKey3, KeyCodes::NumericKey4});
+
+                THEN("The input is limited to predefined limit")
+                {
+                    REQUIRE(inputField.getText().length() == calc::limits::MaxInputLength);
+                }
+
+                AND_WHEN("We try do delete input")
+                {
+                    passShortKeyPresses({4, KeyCodes::NumericKeyPnd});
+
+                    THEN("Input is deleted")
+                    {
+                        REQUIRE(inputField.getText() == "123");
+                    }
+                }
+
+                AND_WHEN("We try to compute")
+                {
+                    passShortKeyPresses({MinusKey,
+                                         KeyCodes::NumericKey1,
+                                         KeyCodes::NumericKey2,
+                                         KeyCodes::NumericKey3,
+                                         KeyCodes::JoystickEnter});
+
+                    THEN("We are able to")
+                    {
+                        REQUIRE(inputField.getText() == "1234000");
+                    }
+                }
+            }
         }
 
         WHEN("We enter leading zeros")
@@ -160,7 +194,7 @@ SCENARIO("Input Processor tests")
                 }
             }
 
-            AND_WHEN("We try to enter more than 6 decimals")
+            AND_WHEN("We try to enter more than 5 decimals")
             {
                 passShortKeyPresses({KeyCodes::NumericKey4,
                                      KeyCodes::NumericKey5,
@@ -169,9 +203,29 @@ SCENARIO("Input Processor tests")
                                      KeyCodes::NumericKey8,
                                      KeyCodes::NumericKey9});
 
-                THEN("The input is truncated to 6 decimals")
+                THEN("The input is truncated")
                 {
-                    REQUIRE(inputField.getText() == "0.123456");
+                    REQUIRE(inputField.getText() == "0.12345");
+                }
+
+                AND_WHEN("We try do delete input")
+                {
+                    passShortKeyPresses({3, KeyCodes::NumericKeyPnd});
+
+                    THEN("Input is deleted")
+                    {
+                        REQUIRE(inputField.getText() == "0.12");
+                    }
+                }
+
+                AND_WHEN("We try to do operations")
+                {
+                    passShortKeyPresses({PlusKey, KeyCodes::NumericKey2, KeyCodes::JoystickEnter});
+
+                    THEN("It is posible")
+                    {
+                        REQUIRE(inputField.getText() == "2.12345");
+                    }
                 }
             }
         }
@@ -214,6 +268,17 @@ SCENARIO("Input Processor tests")
             {
                 REQUIRE(inputField.getText() == "-23");
             }
+
+            AND_WHEN("We try to subtract a negitive number")
+            {
+                passShortKeyPresses(
+                    {MinusKey, MinusKey, KeyCodes::NumericKey1, KeyCodes::NumericKey3, KeyCodes::JoystickEnter});
+
+                THEN("The result is computed properly")
+                {
+                    REQUIRE(inputField.getText() == "-10");
+                }
+            }
         }
 
         WHEN("We enter a number")
@@ -247,9 +312,19 @@ SCENARIO("Input Processor tests")
                 {
                     passShortKeyPresses({KeyCodes::NumericKey4, KeyCodes::NumericKey5, KeyCodes::NumericKey6});
 
-                    THEN("It is shown")
+                    THEN("Previos input is hidden")
                     {
-                        REQUIRE(inputField.getText() == "123+456");
+                        REQUIRE(inputField.getText() == "456");
+                    }
+
+                    AND_WHEN("We press enter")
+                    {
+                        passShortKeyPress(KeyCodes::JoystickEnter);
+
+                        THEN("The result is computed")
+                        {
+                            REQUIRE(inputField.getText() == "579");
+                        }
                     }
                 }
 
@@ -257,9 +332,39 @@ SCENARIO("Input Processor tests")
                 {
                     passShortKeyPresses({MinusKey, KeyCodes::NumericKey5, KeyCodes::NumericKey6});
 
-                    THEN("It is shown")
+                    THEN("Previous input is hidden and negative number is shown")
                     {
-                        REQUIRE(inputField.getText() == "123+-56");
+                        REQUIRE(inputField.getText() == "-56");
+                    }
+
+                    AND_WHEN("We press enter")
+                    {
+                        passShortKeyPress(KeyCodes::JoystickEnter);
+
+                        THEN("The result is computed")
+                        {
+                            REQUIRE(inputField.getText() == "67");
+                        }
+                    }
+
+                    AND_WHEN("We delete the input")
+                    {
+                        passShortKeyPresses({3, KeyCodes::NumericKeyPnd});
+
+                        THEN("Input is deleted")
+                        {
+                            REQUIRE(inputField.getText().empty());
+                        }
+
+                        AND_WHEN("We press # again")
+                        {
+                            passShortKeyPress(KeyCodes::NumericKeyPnd);
+
+                            THEN("Previous input is restored")
+                            {
+                                REQUIRE(inputField.getText() == "123+");
+                            }
+                        }
                     }
                 }
 
@@ -290,7 +395,7 @@ SCENARIO("Input Processor tests")
 
                     THEN("It is shown")
                     {
-                        REQUIRE(inputField.getText() == "123+4.56");
+                        REQUIRE(inputField.getText() == "4.56");
                     }
 
                     AND_WHEN("We press the fraction key again")
@@ -300,11 +405,11 @@ SCENARIO("Input Processor tests")
 
                         THEN("It is ignored")
                         {
-                            REQUIRE(inputField.getText() == "123+4.56456");
+                            REQUIRE(inputField.getText() == "4.56456");
                         }
                     }
 
-                    AND_WHEN("We try to enter more than 6 decimals")
+                    AND_WHEN("We try to enter more than 5 decimals")
                     {
                         passShortKeyPresses({KeyCodes::NumericKey4,
                                              KeyCodes::NumericKey5,
@@ -313,9 +418,9 @@ SCENARIO("Input Processor tests")
                                              KeyCodes::NumericKey8,
                                              KeyCodes::NumericKey9});
 
-                        THEN("The input is truncated to 6 decimals")
+                        THEN("The input is truncated")
                         {
-                            REQUIRE(inputField.getText() == "123+4.564567");
+                            REQUIRE(inputField.getText() == "4.56456");
                         }
                     }
                 }
@@ -354,7 +459,9 @@ SCENARIO("Input Processor tests")
 
         WHEN("We do BIG math")
         {
-            inputField.setText("99999×99999");
+            passShortKeyPresses({5, KeyCodes::NumericKey9});
+            passShortKeyPress(MultiplicationKey);
+            passShortKeyPresses({5, KeyCodes::NumericKey9});
             passShortKeyPress(KeyCodes::JoystickEnter);
 
             THEN("Output contains exponent")
@@ -368,7 +475,36 @@ SCENARIO("Input Processor tests")
 
                 THEN("Input is cleared before typing")
                 {
-                    REQUIRE(inputField.getText() == "4-56");
+                    REQUIRE(inputField.getText() == "56");
+                }
+            }
+        }
+
+        WHEN("We enter an equation")
+        {
+            passShortKeyPresses({3, KeyCodes::NumericKey1});
+            passShortKeyPress(MultiplicationKey);
+            passShortKeyPress(KeyCodes::NumericKey4);
+
+            AND_WHEN("We press another operation")
+            {
+                passShortKeyPress(PlusKey);
+
+                THEN("The previous operation is computed first")
+                {
+                    REQUIRE(inputField.getText() == "444+");
+                }
+
+                AND_WHEN("We continue input")
+                {
+                    passShortKeyPress(MinusKey);
+                    passShortKeyPresses({3, KeyCodes::NumericKey1});
+                    passShortKeyPress(KeyCodes::JoystickEnter);
+
+                    THEN("The following equation is computed properly")
+                    {
+                        REQUIRE(inputField.getText() == "333");
+                    }
                 }
             }
         }
