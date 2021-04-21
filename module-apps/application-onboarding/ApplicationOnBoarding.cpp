@@ -161,7 +161,8 @@ namespace app
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,
                       gui::popup::ID::TetheringPhoneModeChangeProhibited,
-                      gui::popup::ID::PhoneModes});
+                      gui::popup::ID::PhoneModes,
+                      gui::popup::ID::PhoneLock});
     }
 
     void ApplicationOnBoarding::destroyUserInterface()
