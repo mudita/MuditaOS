@@ -65,6 +65,25 @@ void NotificationProvider::handle(db::NotificationMessage *msg)
     }
 }
 
+void NotificationProvider::handle(sys::phone_modes::Tethering tethering)
+{
+    using Tethering           = sys::phone_modes::Tethering;
+    bool notificationsChanged = false;
+
+    if (tethering == Tethering::On && notifications.count(NotificationType::Tethering) == 0) {
+        notifications[NotificationType::Tethering] = std::make_shared<notifications::TetheringNotification>();
+        notificationsChanged                       = true;
+    }
+    else if (tethering == Tethering::Off && notifications.count(NotificationType::Tethering) != 0) {
+        notifications.erase(NotificationType::Tethering);
+        notificationsChanged = true;
+    }
+
+    if (notificationsChanged) {
+        send();
+    }
+}
+
 void NotificationProvider::requestNotSeenNotifications()
 {
     DBServiceAPI::GetQuery(

@@ -15,6 +15,7 @@ namespace notifications
         Unknown,
         NotSeenSms,
         NotSeenCall,
+        Tethering
     };
 
     enum class NotificationPriority
@@ -63,6 +64,12 @@ namespace notifications
         [[nodiscard]] bool hasRecord() const noexcept;
         [[nodiscard]] auto getRecord() const noexcept -> const std::unique_ptr<ContactRecord> &;
         [[nodiscard]] auto getValue() const noexcept -> unsigned;
+    };
+
+    class TetheringNotification : public Notification
+    {
+      public:
+        TetheringNotification();
     };
 
 } // namespace notifications

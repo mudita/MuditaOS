@@ -74,6 +74,14 @@ auto NotificationsModel::create(const notifications::NotSeenCallNotification *no
     return item;
 }
 
+auto NotificationsModel::create(const notifications::TetheringNotification *notification) -> NotificationListItem *
+{
+    auto item = new NotificationWithOnOffButton(notifications::NotificationType::Tethering, gui::ButtonState::On);
+    item->setName(utils::translate("Tethering"), false);
+    item->deleteByList = false;
+    return item;
+}
+
 void NotificationsModel::updateData(app::manager::actions::NotificationsChangedParams *params)
 {
     if (list == nullptr) {
@@ -86,7 +94,6 @@ void NotificationsModel::updateData(app::manager::actions::NotificationsChangedP
             delete item;
         }
     };
-
     for (const auto &notification : params->getNotifications()) {
         if (typeid(*notification) == typeid(notifications::NotSeenSMSNotification)) {
             auto sms = static_cast<const notifications::NotSeenSMSNotification *>(notification.get());
@@ -95,6 +102,10 @@ void NotificationsModel::updateData(app::manager::actions::NotificationsChangedP
         else if (typeid(*notification) == typeid(notifications::NotSeenCallNotification)) {
             auto call = static_cast<const notifications::NotSeenCallNotification *>(notification.get());
             internalData.push_back(create(call));
+        }
+        else if (typeid(*notification) == typeid(notifications::TetheringNotification)) {
+            auto tethering = static_cast<const notifications::TetheringNotification *>(notification.get());
+            internalData.push_back(create(tethering));
         }
     }
 

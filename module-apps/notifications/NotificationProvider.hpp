@@ -4,6 +4,7 @@
 #pragma once
 
 #include "NotificationData.hpp"
+#include <PhoneModes/Common.hpp>
 
 namespace sys
 {
@@ -31,6 +32,7 @@ namespace notifications
 
         void handle(db::query::notifications::GetAllResult *msg);
         void handle(db::NotificationMessage *msg);
+        void handle(sys::phone_modes::Tethering tethering);
         void requestNotSeenNotifications();
         void send();
 

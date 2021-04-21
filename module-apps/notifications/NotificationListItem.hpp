@@ -7,6 +7,7 @@
 #include <BoxLayout.hpp>
 #include <Text.hpp>
 #include <RichTextParser.hpp>
+#include <widgets/ButtonOnOff.hpp>
 
 #include "NotificationData.hpp"
 
@@ -38,6 +39,13 @@ namespace gui
     {
       public:
         NotificationWithEventCounter(notifications::NotificationType type, const UTF8 &indicator);
+    };
+
+    class NotificationWithOnOffButton : public NotificationListItem
+    {
+
+      public:
+        NotificationWithOnOffButton(notifications::NotificationType type, gui::ButtonState state);
     };
 
 } // namespace gui
