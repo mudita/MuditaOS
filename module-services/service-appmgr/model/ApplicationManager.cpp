@@ -279,6 +279,9 @@ namespace app::manager
                 ActionEntry{actions::ShowPopup, std::make_unique<gui::PhoneModePopupRequestParams>(phoneMode)});
         });
 
+        phoneModeObserver->subscribe(
+            [this](sys::phone_modes::Tethering tethering) { handleTetheringChanged(tethering); });
+
         connect(typeid(StartAllowedMessage), [this](sys::Message *request) {
             auto msg = static_cast<StartAllowedMessage *>(request);
             handleStart(msg);
@@ -581,6 +584,11 @@ namespace app::manager
         ActionEntry action{actions::PhoneModeChanged, std::make_unique<gui::PhoneModeParams>(phoneMode)};
         action.setTargetApplication(app->name());
         actionsRegistry.enqueue(std::move(action));
+    }
+
+    void ApplicationManager::handleTetheringChanged(sys::phone_modes::Tethering tethering)
+    {
+        notificationProvider.handle(tethering);
     }
 
     ActionProcessStatus ApplicationManager::handleAction(ActionEntry &action)

@@ -86,7 +86,7 @@ namespace
         {notifications::NotificationType::Unknown, "phone"},
         {notifications::NotificationType::NotSeenSms, "mail"},
         {notifications::NotificationType::NotSeenCall, "phone"},
-    };
+        {notifications::NotificationType::Tethering, "tethering_notification_icon"}};
 } // namespace
 
 NotificationListItem::NotificationListItem(NotificationType type) : type{type}
@@ -135,4 +135,12 @@ NotificationWithEventCounter::NotificationWithEventCounter(notifications::Notifi
 {
     box->addWidget(buildImageInactive("dot_12px_hard_alpha_W_G"));
     box->addWidget(buildNotificationCountText(indicator));
+}
+
+NotificationWithOnOffButton::NotificationWithOnOffButton(notifications::NotificationType type, gui::ButtonState state)
+    : NotificationListItem(type)
+{
+    auto button = new ButtonOnOff(nullptr, state);
+    button->setMargins(Margins(0, 0, 20, 0));
+    box->addWidget(button);
 }

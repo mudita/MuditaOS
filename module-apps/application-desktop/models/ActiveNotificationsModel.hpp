@@ -12,5 +12,6 @@ namespace gui
         void setParentBottomBar(const UTF8 &left, const UTF8 &center, const UTF8 &right);
         auto create(const notifications::NotSeenSMSNotification *notification) -> NotificationListItem * override;
         auto create(const notifications::NotSeenCallNotification *notification) -> NotificationListItem * override;
+        auto create(const notifications::TetheringNotification *notification) -> NotificationListItem * override;
     };
 } // namespace gui

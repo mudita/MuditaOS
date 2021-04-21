@@ -62,3 +62,6 @@ auto NotSeenCallNotification::getValue() const noexcept -> unsigned
 {
     return value;
 }
+
+TetheringNotification::TetheringNotification() : Notification(NotificationType::Tethering)
+{}

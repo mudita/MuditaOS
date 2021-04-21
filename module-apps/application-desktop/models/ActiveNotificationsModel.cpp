@@ -6,6 +6,7 @@
 #include <service-appmgr/Controller.hpp>
 #include <application-messages/ApplicationMessages.hpp>
 #include <application-call/data/CallSwitchData.hpp>
+#include <SystemManager/messages/TetheringStateRequest.hpp>
 
 using namespace gui;
 
@@ -96,5 +97,24 @@ auto ActiveNotificationsModel::create(const notifications::NotSeenCallNotificati
     };
 
     item->setDismissible(true);
+    return item;
+}
+
+auto ActiveNotificationsModel::create(const notifications::TetheringNotification *notification)
+    -> NotificationListItem *
+{
+    auto item               = NotificationsModel::create(notification);
+    item->activatedCallback = [this]([[maybe_unused]] gui::Item &_item) {
+        return parent->getApplication()->bus.sendUnicast(
+            std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::Off),
+            service::name::system_manager);
+    };
+    item->focusChangedCallback = [this](gui::Item &_item) {
+        if (_item.focus) {
+            setParentBottomBar({}, utils::translate("common_disconnect"), {});
+            return true;
+        }
+        return false;
+    };
     return item;
 }

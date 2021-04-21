@@ -128,6 +128,7 @@ namespace app::manager
         auto handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus;
         auto handlePhoneModeChangedAction(ActionEntry &action) -> ActionProcessStatus;
         void handlePhoneModeChanged(sys::phone_modes::PhoneMode phoneMode);
+        void handleTetheringChanged(sys::phone_modes::Tethering tethering);
         void changePhoneMode(sys::phone_modes::PhoneMode phoneMode, const ApplicationHandle *app);
         auto handleCustomAction(ActionEntry &action) -> ActionProcessStatus;
         auto handleSwitchApplication(SwitchRequest *msg, bool closeCurrentlyFocusedApp = true) -> bool;

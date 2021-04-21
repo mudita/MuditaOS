@@ -27,6 +27,8 @@ namespace gui
             -> NotificationListItem *;
         [[nodiscard]] virtual auto create(const notifications::NotSeenCallNotification *notification)
             -> NotificationListItem *;
+        [[nodiscard]] virtual auto create(const notifications::TetheringNotification *notification)
+            -> NotificationListItem *;
 
       public:
         [[nodiscard]] bool isEmpty() const noexcept;
