@@ -92,7 +92,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_IDLE_HOOK                     0
 #define configUSE_TICK_HOOK                     0
 #define configCHECK_FOR_STACK_OVERFLOW          2
-#define configUSE_MALLOC_FAILED_HOOK            0
+#define configUSE_MALLOC_FAILED_HOOK            1
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 
 /* Run time and task stats gathering related definitions. */
@@ -179,6 +179,7 @@ standard names. */
 #define configSYSTEM_HEAP_STATS           (1)
 #define configUSER_HEAP_STATS             (1)
 #define configSYSTEM_HEAP_INTEGRITY_CHECK (1)
+#define PROJECT_CONFIG_HEAP_INTEGRITY_CHECKS (1)
 #endif
 
 extern void vConfigureTimerForRunTimeStats(void);
