@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <i18n/i18n.hpp>
 #include <utf8/UTF8.hpp>
 
 namespace gui
@@ -37,20 +38,49 @@ namespace calc
             inline constexpr auto comma          = "\u002C";
             inline constexpr auto asterisk       = "\u002A";
             inline constexpr auto solidus        = "\u002F";
+
+            inline const std::string &equals_str()
+            {
+                return utils::translate("app_calculator_equals");
+            }
+
+            inline const std::string &decimal_separator_str()
+            {
+                return utils::translate("app_calculator_decimal_separator");
+            }
+
+            inline const std::string &error_str()
+            {
+                return utils::translate("app_calculator_error");
+            }
         } // namespace strings
-    }     // namespace symbols
+
+    } // namespace symbols
+
+    namespace limits
+    {
+        inline constexpr auto MaxInputLength   = 7u;
+        inline constexpr auto MaxDecimalDigits = 6u;
+
+        inline constexpr auto VeryLowPrecision = 4;
+        inline constexpr auto LowPrecision     = 5;
+        inline constexpr auto Precision        = 6;
+        inline constexpr auto HighPrecision    = 8;
+        inline constexpr auto ExpLength        = 1;
+        inline constexpr auto MinusExpLength   = 2;
+        inline constexpr auto MaxStringLength  = 7;
+    } // namespace limits
 
     class InputProcessor
     {
       public:
-        static inline constexpr auto DecimalDigitsLimit = 6;
-
         virtual ~InputProcessor() = default;
 
         virtual bool handle(const gui::InputEvent &event) = 0;
         virtual void clear()                              = 0;
 
-        static bool isSymbol(std::uint32_t code);
-        static bool isDecimalSeparator(std::uint32_t c);
+        static bool isSymbol(std::uint32_t code) noexcept;
+        static bool isOperation(std::uint32_t code) noexcept;
+        static bool isDecimalSeparator(std::uint32_t c) noexcept;
     };
 } // namespace calc

@@ -3,7 +3,7 @@
 
 #include "CalculatorInputProcessor.hpp"
 
-bool calc::InputProcessor::isSymbol(uint32_t code)
+bool calc::InputProcessor::isSymbol(uint32_t code) noexcept
 {
     using namespace symbols::codes;
 
@@ -25,7 +25,25 @@ bool calc::InputProcessor::isSymbol(uint32_t code)
     }
 }
 
-bool calc::InputProcessor::isDecimalSeparator(uint32_t code)
+bool calc::InputProcessor::isOperation(uint32_t code) noexcept
+{
+    using namespace symbols::codes;
+
+    switch (code) {
+    case plus:
+        [[fallthrough]];
+    case minus:
+        [[fallthrough]];
+    case division:
+        [[fallthrough]];
+    case multiplication:
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool calc::InputProcessor::isDecimalSeparator(uint32_t code) noexcept
 {
     using namespace symbols::codes;
 
