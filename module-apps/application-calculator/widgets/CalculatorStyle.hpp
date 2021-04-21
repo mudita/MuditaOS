@@ -8,8 +8,6 @@
 namespace style::calculator
 {
     inline constexpr auto grid_cells        = 9;
-    inline constexpr auto equals            = "app_calculator_equals";
-    inline constexpr auto decimal_separator = "app_calculator_decimal_separator";
 
     namespace window
     {
@@ -19,7 +17,8 @@ namespace style::calculator
         inline constexpr auto math_box_cell_width  = style::window::default_body_width / 3;
         inline constexpr auto input_offset_top     = style::header::height + 20;
         inline constexpr auto input_height         = 100;
-        inline constexpr auto input_width          = 380;
-        inline constexpr auto input_margin         = 50;
+        inline constexpr auto input_width          = 400;
+        inline constexpr auto input_margin         = 40;
     } // namespace window
+
 } // namespace style::calculator

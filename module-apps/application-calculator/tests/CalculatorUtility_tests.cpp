@@ -3,6 +3,7 @@
 
 #include <catch2/catch.hpp>
 #include "application-calculator/data/CalculatorUtility.hpp"
+#include "application-calculator/data/CalculatorInputProcessor.hpp"
 #include <i18n/i18n.hpp>
 #include <cstring>
 
@@ -97,7 +98,7 @@ TEST_CASE("Calculator utilities")
     SECTION("Division by 0")
     {
         auto result = calculator.calculate("15+5÷0");
-        REQUIRE(result.value == utils::translate("app_calculator_error"));
+        REQUIRE(result.value == calc::symbols::strings::error_str());
         REQUIRE(result.equation == "15+5/0");
         REQUIRE(result.isError);
     }
@@ -105,7 +106,7 @@ TEST_CASE("Calculator utilities")
     SECTION("Division 0 by 0")
     {
         auto result = calculator.calculate("0÷0");
-        REQUIRE(result.value == utils::translate("app_calculator_error"));
+        REQUIRE(result.value == calc::symbols::strings::error_str());
         REQUIRE(result.equation == "0/0");
         REQUIRE(result.isError);
     }
@@ -113,7 +114,7 @@ TEST_CASE("Calculator utilities")
     SECTION("Result exceeds maximum number")
     {
         auto result = calculator.calculate("1.79769e+308×2");
-        REQUIRE(result.value == utils::translate("app_calculator_error"));
+        REQUIRE(result.value == calc::symbols::strings::error_str());
         REQUIRE(result.equation == "1.79769e+308*2");
         REQUIRE(result.isError);
     }

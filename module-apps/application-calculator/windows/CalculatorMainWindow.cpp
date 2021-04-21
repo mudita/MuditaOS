@@ -4,7 +4,6 @@
 #include "CalculatorMainWindow.hpp"
 #include "application-calculator/widgets/CalculatorStyle.hpp"
 #include "application-calculator/data/CalculatorInputProcessorText.hpp"
-#include <i18n/i18n.hpp>
 
 namespace gui
 {
@@ -24,8 +23,8 @@ namespace gui
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
         bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::calculator::equals));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::calculator::decimal_separator));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, calc::symbols::strings::equals_str());
+        bottomBar->setText(gui::BottomBar::Side::LEFT, calc::symbols::strings::decimal_separator_str());
         bottomBar->setFont(BottomBar::Side::LEFT, style::window::font::largelight);
 
         mathOperationInput = new gui::Text(this,
