@@ -78,7 +78,7 @@ class ServiceAudio : public sys::Service
     auto HandleResume(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     auto HandleGetFileTags(const std::string &fileName) -> std::unique_ptr<AudioResponseMessage>;
     void HandleNotification(const AudioNotificationMessage::Type &type, const audio::Token &token);
-    auto HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyPressedResponse>;
+    auto HandleKeyPressed(const int step) -> sys::MessagePointer;
     void MuteCurrentOperation();
     void VibrationUpdate(const audio::PlaybackType &type               = audio::PlaybackType::None,
                          std::optional<audio::AudioMux::Input *> input = std::nullopt);
@@ -106,7 +106,7 @@ class ServiceAudio : public sys::Service
                                          const audio::Profile::Type &profileType,
                                          const audio::PlaybackType &playbackType);
 
-    const std::pair<audio::Profile::Type, audio::PlaybackType> getCurrentContext();
+    const audio::Context getCurrentContext();
     void settingsChanged(const std::string &name, std::string value);
     auto handleVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer;
 };

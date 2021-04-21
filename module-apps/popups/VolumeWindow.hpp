@@ -36,13 +36,11 @@ namespace gui
 {
     class VolumeWindow : public WindowWithTimer
     {
-        using AudioContext = std::pair<audio::Profile::Type, audio::PlaybackType>;
-
       private:
         audio::Volume volume = 0;
-        AudioContext audioContext;
+        audio::Context audioContext;
 
-        void showProperText(const AudioContext &audioContext, const audio::Volume volume) noexcept;
+        void showProperText(const audio::Context &audioContext, const audio::Volume volume) noexcept;
         void showMultimediaPlayback() noexcept;
         void showCalling() noexcept;
         void showMuted() noexcept;

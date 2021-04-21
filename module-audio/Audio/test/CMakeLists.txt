@@ -30,4 +30,13 @@ add_gtest_executable(
         module-audio
 )
 
+add_catch2_executable(
+    NAME
+        audio-volume-scaler
+    SRCS
+        unittest_scaler.cpp
+    LIBS
+        module-audio
+)
+
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/testfiles" DESTINATION "${CMAKE_BINARY_DIR}")
