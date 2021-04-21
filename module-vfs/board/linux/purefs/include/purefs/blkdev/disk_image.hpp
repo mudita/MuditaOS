@@ -28,10 +28,13 @@ namespace purefs::blkdev
         auto status() const -> media_status override;
         auto get_info(info_type what, hwpart_t hwpart) const -> scount_t override;
         auto erase(sector_t lba, std::size_t count, hwpart_t hwpart) -> int override;
+        auto pm_control(pm_state target_state) -> int override;
+        auto pm_read(pm_state &current_state) -> int override;
         auto range_valid(sector_t lba, std::size_t count, hwpart_t hwpart) const -> bool;
         auto open_and_truncate(hwpart_t hwpart) -> int;
 
       private:
+        pm_state pmState{pm_state::active};
         std::vector<int> m_filedes;
         std::vector<std::size_t> m_sectors;
         const std::string m_image_name;
