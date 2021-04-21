@@ -12,7 +12,7 @@ std::list<gui::Option> mainWindowOptionsNew(app::Application *app)
 {
     std::list<gui::Option> l;
 
-    auto i18     = [](const std::string &text) { return utils::localize.get(text); };
+    auto i18     = [](const std::string &text) { return utils::translate(text); };
     auto addMenu = [&l, &app](UTF8 name, const std::string &window = "") {
         l.emplace_back(gui::Option{name,
                                    [=](gui::Item &item) {

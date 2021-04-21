@@ -23,7 +23,7 @@ namespace gui
         std::list<gui::Option> optList;
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translateI18("app_settings_connected"),
+            utils::translate("app_settings_connected"),
             [=](gui::Item &item) { return true; },
             [=](gui::Item &item) {
                 if (item.focus) {
@@ -34,15 +34,14 @@ namespace gui
             this));
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translateI18("app_settings_title_do_not_disturb"),
+            utils::translate("app_settings_title_do_not_disturb"),
             [=](gui::Item &item) {
                 this->application->switchWindow(gui::window::name::do_not_disturb, nullptr);
                 return true;
             },
             [=](gui::Item &item) {
                 if (item.focus) {
-                    this->setBottomBarText(utils::localize.get(style::strings::common::adjust),
-                                           BottomBar::Side::CENTER);
+                    this->setBottomBarText(utils::translate(style::strings::common::adjust), BottomBar::Side::CENTER);
                 }
                 return true;
             },
@@ -50,22 +49,21 @@ namespace gui
             gui::option::SettingRightItem::ArrowWhite));
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translateI18("app_settings_title_offline"),
+            utils::translate("app_settings_title_offline"),
             [=](gui::Item &item) {
                 this->application->switchWindow(gui::window::name::offline, nullptr);
                 return true;
             },
             [=](gui::Item &item) {
                 if (item.focus) {
-                    this->setBottomBarText(utils::localize.get(style::strings::common::adjust),
-                                           BottomBar::Side::CENTER);
+                    this->setBottomBarText(utils::translate(style::strings::common::adjust), BottomBar::Side::CENTER);
                 }
                 return true;
             },
             this,
             gui::option::SettingRightItem::ArrowWhite));
 
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         return optList;
     }

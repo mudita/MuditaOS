@@ -15,7 +15,7 @@ namespace app::onBoarding
     NoConfigurationDialogWindow::NoConfigurationDialogWindow(app::Application *app)
         : gui::Dialog(app, gui::window::name::onBoarding_no_configuration)
     {
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::start));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::start));
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, false);
     }
 
@@ -24,9 +24,9 @@ namespace app::onBoarding
         if (inputEvent.isShortPress()) {
             if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
                 auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                    gui::DialogMetadata{utils::localize.get("app_onboarding_title_update_info"),
+                    gui::DialogMetadata{utils::translate("app_onboarding_title_update_info"),
                                         "update_icon_W_G",
-                                        utils::localize.get("app_onboarding_update_info"),
+                                        utils::translate("app_onboarding_update_info"),
                                         "",
                                         [=]() -> bool { return true; }});
                 application->switchWindow(

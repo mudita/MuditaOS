@@ -97,11 +97,10 @@ namespace gui
             [this](top_bar::Configuration configuration) { return configureTopBar(std::move(configuration)); });
 
         if (app->lockHandler.isScreenLocked()) {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
             bottomBar->setActive(BottomBar::Side::RIGHT, false);
-            bottomBar->setText(BottomBar::Side::LEFT,
-                               utils::localize.get("app_desktop_emergency"),
-                               app->lockHandler.isScreenBlocked());
+            bottomBar->setText(
+                BottomBar::Side::LEFT, utils::translate("app_desktop_emergency"), app->lockHandler.isScreenBlocked());
 
             inputCallback = nullptr;
             setFocusItem(nullptr);
@@ -250,15 +249,15 @@ namespace gui
         }
 
         auto onNotificationFocus = [this](bool isFocused) -> void {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_show"), isFocused);
-            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_desktop_clear"), isFocused);
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_show"), isFocused);
+            bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_desktop_clear"), isFocused);
             bottomBar->setActive(BottomBar::Side::LEFT, !isFocused);
         };
 
         if (app->notifications.notSeen.Calls > 0) {
             notifications->addNotification(
                 "phone",
-                utils::localize.get("app_desktop_missed_calls"),
+                utils::translate("app_desktop_missed_calls"),
                 std::to_string(app->notifications.notSeen.Calls),
                 [app]() -> bool { return app->showCalls(); },
                 [app]() -> bool { return app->clearCallsNotification(); },
@@ -267,7 +266,7 @@ namespace gui
         if (app->notifications.notSeen.SMS > 0) {
             notifications->addNotification(
                 "mail",
-                utils::localize.get("app_desktop_unread_messages"),
+                utils::translate("app_desktop_unread_messages"),
                 std::to_string(app->notifications.notSeen.SMS),
                 [this]() -> bool {
                     return app::manager::Controller::sendAction(
@@ -293,10 +292,10 @@ namespace gui
     }
     auto DesktopMainWindow::setActiveState(app::ApplicationDesktop *app) -> bool
     {
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_desktop_calls"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_menu"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_desktop_calls"));
         auto hasNotifications = !app->notifications.notSeen.areEmpty();
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_desktop_clear_all"), hasNotifications);
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_desktop_clear_all"), hasNotifications);
 
         inputCallback = [this, app, hasNotifications](Item &, const InputEvent &inputEvent) -> bool {
             if (!inputEvent.isShortPress()) {

@@ -12,7 +12,7 @@
 #include "service-cellular/State.hpp"
 #include "service-cellular/USSD.hpp"
 #include "service-cellular/MessageConstants.hpp"
-
+#include <service-cellular/connection-manager/ConnectionManagerCellularCommands.hpp>
 #include "SimCard.hpp"
 #include "NetworkSettings.hpp"
 #include "service-cellular/RequestFactory.hpp"
@@ -182,6 +182,15 @@ ServiceCellular::ServiceCellular()
     bus.channels.push_back(sys::BusChannel::ServiceEvtmgrNotifications);
     bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
 
+    settings = std::make_unique<settings::Settings>(this);
+
+    connectionManager = std::make_unique<ConnectionManager>(
+        utils::getNumericValue<bool>(
+            settings->getValue(settings::Cellular::offlineMode, settings::SettingsScope::Global)),
+        static_cast<std::chrono::minutes>(utils::getNumericValue<int>(settings->getValue(
+            settings->getValue(settings::Offline::connectionFrequency, settings::SettingsScope::Global)))),
+        std::make_shared<ConnectionManagerCellularCommands>(*this));
+
     callStateTimer = sys::TimerFactory::createPeriodicTimer(
         this, "call_state", std::chrono::milliseconds{1000}, [this](sys::Timer &) { CallStateTimerHandler(); });
     stateTimer = sys::TimerFactory::createPeriodicTimer(
@@ -190,6 +199,12 @@ ServiceCellular::ServiceCellular()
         this, "ussd", std::chrono::milliseconds{1000}, [this](sys::Timer &) { handleUSSDTimer(); });
     sleepTimer = sys::TimerFactory::createPeriodicTimer(
         this, "sleep", constants::sleepTimerInterval, [this](sys::Timer &) { SleepTimerHandler(); });
+    connectionTimer =
+        sys::TimerFactory::createPeriodicTimer(this, "connection", std::chrono::seconds{60}, [this](sys::Timer &) {
+            utility::conditionally_invoke(
+                [this]() { return phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Offline); },
+                [this]() { connectionManager->onTimerTick(); });
+        });
 
     ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
         auto call = DBServiceAPI::CalllogAdd(this, rec);
@@ -326,16 +341,8 @@ void handleCellularSimNewPinDataMessage(CellularSimNewPinDataMessage *msg)
 void ServiceCellular::registerMessageHandlers()
 {
     phoneModeObserver->connect(this);
-    phoneModeObserver->subscribe([this](sys::phone_modes::PhoneMode mode) {
-        if (mode == sys::phone_modes::PhoneMode::Offline) {
-            this->switchToOffline();
-        }
-        else {
-            if (!this->isModemRadioModuleOn()) {
-                this->turnOnRadioModule();
-            }
-        }
-    });
+    phoneModeObserver->subscribe(
+        [this](sys::phone_modes::PhoneMode mode) { connectionManager->onPhoneModeChange(mode); });
     phoneModeObserver->subscribe([](sys::phone_modes::Tethering tethering) {
         using bsp::cellular::USB::setPassthrough;
         using bsp::cellular::USB::PassthroughState;
@@ -524,18 +531,10 @@ void ServiceCellular::registerMessageHandlers()
         return handleCellularRingingMessage(msg);
     });
 
-    connect(typeid(CellularIncominCallMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        if (doNotDisturbCondition()) {
-            return std::make_shared<CellularResponseMessage>(hangUpCall());
-        }
-        auto msg = static_cast<CellularIncominCallMessage *>(request);
-        return handleCellularIncominCallMessage(msg);
-    });
+    connect(typeid(CellularIncominCallMessage),
+            [&](sys::Message *request) -> sys::MessagePointer { return handleCellularIncominCallMessage(request); });
 
     connect(typeid(CellularCallerIdMessage), [&](sys::Message *request) -> sys::MessagePointer {
-        if (doNotDisturbCondition()) {
-            return std::make_shared<CellularResponseMessage>(true);
-        }
         auto msg = static_cast<CellularCallerIdMessage *>(request);
         return handleCellularCallerIdMessage(msg);
     });
@@ -639,9 +638,6 @@ void ServiceCellular::registerMessageHandlers()
     connect(typeid(CellularUrcIncomingNotification),
             [&](sys::Message *request) -> sys::MessagePointer { return handleUrcIncomingNotification(request); });
 
-    connect(typeid(CellularSetRadioOnOffMessage),
-            [&](sys::Message *request) -> sys::MessagePointer { return handleCellularSetRadioOnOffMessage(request); });
-
     connect(typeid(CellularSendSMSMessage),
             [&](sys::Message *request) -> sys::MessagePointer { return handleCellularSendSMSMessage(request); });
 
@@ -650,6 +646,10 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(CellularCallerIdNotification),
             [&](sys::Message *request) -> sys::MessagePointer { return handleCellularCallerIdNotification(request); });
+
+    connect(typeid(CellularSetConnectionFrequencyMessage), [&](sys::Message *request) -> sys::MessagePointer {
+        return handleCellularSetConnectionFrequencyMessage(request);
+    });
 
     handle_CellularGetChannelMessage();
 }
@@ -950,23 +950,22 @@ bool ServiceCellular::handle_audio_conf_procedure()
                 LOG_DEBUG("Setting up notifications callback");
                 notificationsChannel->setCallback(notificationCallback);
             }
-            auto mode = phoneModeObserver->getCurrentPhoneMode();
-            if (mode == sys::phone_modes::PhoneMode::Offline) {
-                if (!turnOffRadioModule()) {
-                    LOG_ERROR("Disabling RF modeule failed");
-                    state.set(this, State::ST::Failed);
-                    return false;
-                }
+            auto flightMode =
+                settings->getValue(settings::Cellular::offlineMode, settings::SettingsScope::Global) == "1" ? true
+                                                                                                            : false;
+            connectionManager->setFlightMode(flightMode);
+            auto interval = 0;
+            if (utils::toNumeric(
+                    settings->getValue(settings::Offline::connectionFrequency, settings::SettingsScope::Global),
+                    interval)) {
+                connectionManager->setInterval(std::chrono::minutes{interval});
             }
-            else {
-                if (!isModemRadioModuleOn()) {
-                    if (turnOnRadioModule()) {
-                        LOG_ERROR("Enabling RF modeule failed");
-                        state.set(this, State::ST::Failed);
-                        return false;
-                    }
-                }
+            if (!connectionManager->onPhoneModeChange(phoneModeObserver->getCurrentPhoneMode())) {
+                state.set(this, State::ST::Failed);
+                LOG_ERROR("Failed to handle phone mode");
+                return false;
             }
+
             state.set(this, State::ST::APNConfProcedure);
             return true;
         }
@@ -2125,7 +2124,7 @@ std::shared_ptr<cellular::RawCommandRespAsync> ServiceCellular::handleCellularSt
     CellularStartOperatorsScanMessage *msg)
 {
     LOG_INFO("CellularStartOperatorsScan handled");
-    auto ret = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularOperatorsScanResult);
+    auto ret = std::make_shared<cellular::RawCommandRespAsync>(CellularMessage::Type::OperatorsScanResult);
     NetworkSettings networkSettings(*this);
     ret->data = networkSettings.scanOperators(msg->getFullInfo());
     bus.sendUnicast(ret, msg->sender);
@@ -2303,16 +2302,16 @@ void ServiceCellular::handleCellularHangupCallMessage(CellularHangupCallMessage 
             if (!ongoingCall.endCall(CellularCall::Forced::True)) {
                 LOG_ERROR("Failed to end ongoing call");
             }
-            bus.sendMulticast(std::make_shared<CellularResponseMessage>(true, msg->messageType),
+            bus.sendMulticast(std::make_shared<CellularResponseMessage>(true, msg->type),
                               sys::BusChannel::ServiceCellularNotifications);
         }
         else {
             LOG_ERROR("Call not aborted");
-            bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->messageType),
+            bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->type),
                               sys::BusChannel::ServiceCellularNotifications);
         }
     }
-    bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->messageType),
+    bus.sendMulticast(std::make_shared<CellularResponseMessage>(false, msg->type),
                       sys::BusChannel::ServiceCellularNotifications);
 }
 
@@ -2376,20 +2375,20 @@ auto ServiceCellular::handleCellularRingingMessage(CellularRingingMessage *msg) 
     return std::make_shared<CellularResponseMessage>(ongoingCall.startCall(msg->number, CallType::CT_OUTGOING));
 }
 
-auto ServiceCellular::handleCellularIncominCallMessage(CellularIncominCallMessage *msg)
-    -> std::shared_ptr<sys::ResponseMessage>
+auto ServiceCellular::handleCellularIncominCallMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    auto ret = true;
+    auto ret     = true;
+    auto message = static_cast<CellularIncominCallMessage *>(msg);
     if (!ongoingCall.isValid()) {
-        ret = ongoingCall.startCall(msg->number, CallType::CT_INCOMING);
+        ret = ongoingCall.startCall(message->number, CallType::CT_INCOMING);
     }
     return std::make_shared<CellularResponseMessage>(ret);
 }
 
-auto ServiceCellular::handleCellularCallerIdMessage(CellularCallerIdMessage *msg)
-    -> std::shared_ptr<sys::ResponseMessage>
+auto ServiceCellular::handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    ongoingCall.setNumber(msg->number);
+    auto message = static_cast<CellularCallerIdMessage *>(msg);
+    ongoingCall.setNumber(message->number);
     return sys::MessageNone{};
 }
 
@@ -2412,14 +2411,14 @@ auto ServiceCellular::handleCellularGetOwnNumberMessage(sys::Message *msg) -> st
 {
     std::string temp;
     if (getOwnNumber(temp)) {
-        return std::make_shared<CellularResponseMessage>(true, temp);
+        return std::make_shared<CellularGetOwnNumberResponseMessage>(true, temp);
     }
-    return std::make_shared<CellularResponseMessage>(false);
+    return std::make_shared<CellularGetOwnNumberResponseMessage>(false);
 }
 
 auto ServiceCellular::handleCellularGetNetworkInfoMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    auto message  = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularNetworkInfoResult);
+    auto message  = std::make_shared<cellular::RawCommandRespAsync>(CellularMessage::Type::NetworkInfoResult);
     message->data = getNetworkInfo();
     bus.sendUnicast(message, msg->sender);
 
@@ -2451,7 +2450,7 @@ auto ServiceCellular::handleCellularGetScanModeMessage(sys::Message *msg) -> std
 {
     auto mode = GetScanMode();
     if (mode != "") {
-        auto response = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularGetScanModeResult);
+        auto response = std::make_shared<cellular::RawCommandRespAsync>(CellularMessage::Type::GetScanModeResult);
         response->data.push_back(mode);
         bus.sendUnicast(response, msg->sender);
         return std::make_shared<CellularResponseMessage>(true);
@@ -2536,7 +2535,7 @@ auto ServiceCellular::handleCellularGetNwinfoMessage(sys::Message *msg) -> std::
 auto ServiceCellular::handleCellularGetAntennaMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     auto antenna = cmux->GetAntenna();
-    return std::make_shared<CellularAntennaResponseMessage>(true, antenna, MessageType::CellularGetAntenna);
+    return std::make_shared<CellularAntennaResponseMessage>(true, antenna, CellularMessage::Type::GetAntenna);
 }
 auto ServiceCellular::handleCellularDtmfRequestMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
@@ -2643,16 +2642,9 @@ auto ServiceCellular::handleCellularSetFlightModeMessage(sys::Message *msg) -> s
     auto setMsg = static_cast<CellularSetFlightModeMessage *>(msg);
     settings->setValue(
         settings::Cellular::offlineMode, std::to_string(setMsg->flightModeOn), settings::SettingsScope::Global);
+    connectionManager->setFlightMode(setMsg->flightModeOn);
+    connectionManager->onPhoneModeChange(phoneModeObserver->getCurrentPhoneMode());
     return std::make_shared<CellularResponseMessage>(true);
-}
-
-auto ServiceCellular::handleCellularSetRadioOnOffMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
-{
-    auto message = static_cast<CellularSetRadioOnOffMessage *>(msg);
-    if (message->getRadioOnOf()) {
-        return std::make_shared<CellularResponseMessage>(turnOnRadioModule());
-    }
-    return std::make_shared<CellularResponseMessage>(turnOffRadioModule());
 }
 
 auto ServiceCellular::handleCellularSendSMSMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
@@ -2674,106 +2666,42 @@ auto ServiceCellular::handleCellularSendSMSMessage(sys::Message *msg) -> std::sh
 
 auto ServiceCellular::handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    auto message = static_cast<CellularRingNotification *>(msg);
-
-    if (doNotDisturbCondition()) {
-        return std::make_shared<CellularResponseMessage>(this->hangUpCall());
+    if (isIncommingCallAllowed()) {
+        auto message = static_cast<CellularRingNotification *>(msg);
+        bus.sendMulticast(std::make_shared<CellularIncominCallMessage>(message->getNubmer()),
+                          sys::BusChannel::ServiceCellularNotifications);
+        return std::make_shared<CellularResponseMessage>(true);
     }
-    bus.sendMulticast(std::make_shared<CellularIncominCallMessage>(message->getNubmer()),
-                      sys::BusChannel::ServiceCellularNotifications);
-    return std::make_shared<CellularResponseMessage>(true);
+    return std::make_shared<CellularResponseMessage>(this->hangUpCall());
 }
 
 auto ServiceCellular::handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    auto message = static_cast<CellularCallerIdNotification *>(msg);
-
-    if (doNotDisturbCondition()) {
-        return std::make_shared<CellularResponseMessage>(this->hangUpCall());
+    if (isIncommingCallAllowed()) {
+        auto message = static_cast<CellularCallerIdNotification *>(msg);
+        bus.sendMulticast(std::make_shared<CellularCallerIdMessage>(message->getNubmer()),
+                          sys::BusChannel::ServiceCellularNotifications);
+        return std::make_shared<CellularResponseMessage>(true);
     }
+    return std::make_shared<CellularResponseMessage>(this->hangUpCall());
+}
 
-    bus.sendMulticast(std::make_shared<CellularCallerIdMessage>(message->getNubmer()),
-                      sys::BusChannel::ServiceCellularNotifications);
+auto ServiceCellular::handleCellularSetConnectionFrequencyMessage(sys::Message *msg)
+    -> std::shared_ptr<sys::ResponseMessage>
+{
+    auto setMsg = static_cast<CellularSetConnectionFrequencyMessage *>(msg);
+    settings->setValue(settings::Offline::connectionFrequency,
+                       std::to_string(setMsg->getConnectionFrequency()),
+                       settings::SettingsScope::Global);
+
+    connectionManager->setInterval(std::chrono::minutes{setMsg->getConnectionFrequency()});
+    connectionManager->onPhoneModeChange(phoneModeObserver->getCurrentPhoneMode());
     return std::make_shared<CellularResponseMessage>(true);
 }
 
-auto ServiceCellular::isModemRadioModuleOn() -> bool
+auto ServiceCellular::isIncommingCallAllowed() -> bool
 {
-    using at::cfun::Functionality;
-    auto channel = cmux->get(TS0710::Channel::Commands);
-    if (channel) {
-        auto cmd      = at::cmd::CFUN(at::cmd::Modifier::Get);
-        auto response = channel->cmd(cmd);
-        if (response.code == at::Result::Code::OK) {
-            auto result = cmd.parse(response);
-            if (result.code == at::Result::Code::OK) {
-                return result.functionality == Functionality::Full;
-            }
-        }
-    }
-    return false;
-}
-auto ServiceCellular::turnOnRadioModule() -> bool
-{
-    using at::cfun::Functionality;
-    auto channel = cmux->get(TS0710::Channel::Commands);
-    if (channel) {
-        auto cmd = at::cmd::CFUN(at::cmd::Modifier::Set);
-        cmd.set(Functionality::Full);
-        auto resp = channel->cmd(cmd);
-        return resp.code == at::Result::Code::OK;
-    }
-    return false;
-}
-
-auto ServiceCellular::turnOffRadioModule() -> bool
-{
-    using at::cfun::Functionality;
-    auto channel = cmux->get(TS0710::Channel::Commands);
-    if (channel) {
-        auto cmd = at::cmd::CFUN(at::cmd::Modifier::Set);
-        cmd.set(Functionality::DisableRF);
-        auto resp = channel->cmd(cmd);
-        return resp.code == at::Result::Code::OK;
-    }
-    return false;
-}
-
-auto ServiceCellular::switchToOffline() -> bool
-{
-    if (ongoingCall.isActive()) {
-        auto channel = cmux->get(TS0710::Channel::Commands);
-        if (channel) {
-            if (channel->cmd(at::factory(at::AT::ATH))) {
-                callStateTimer.stop();
-                if (!ongoingCall.endCall(CellularCall::Forced::True)) {
-                    LOG_ERROR("Failed to end ongoing call");
-                    return false;
-                }
-                auto msg = std::make_shared<CellularCallAbortedNotification>();
-                bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
-            }
-        }
-    }
-
-    if (!turnOffRadioModule()) {
-        LOG_ERROR("Failed to disable RF module");
-        return false;
-    }
-
-    // force clear signal indicator
-    auto rssi = 0;
-    SignalStrength signalStrength(rssi);
-    Store::GSM::get()->setSignalStrength(signalStrength.data);
-    auto msg = std::make_shared<CellularSignalStrengthUpdateNotification>();
-    bus.sendMulticast(msg, sys::BusChannel::ServiceCellularNotifications);
-
-    return true;
-}
-
-auto ServiceCellular::doNotDisturbCondition() -> bool
-{
-    return phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::DoNotDisturb);
+    return phoneModeObserver->isInMode(sys::phone_modes::PhoneMode::Connected);
 }
 
 auto ServiceCellular::hangUpCall() -> bool

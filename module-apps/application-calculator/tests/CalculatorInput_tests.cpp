@@ -19,7 +19,7 @@ SCENARIO("Input Processor tests")
 
     GIVEN("An empty input")
     {
-        utils::localize.setDisplayLanguage("English");
+        utils::setDisplayLanguage("English");
 
         auto inputField = gui::Text{};
         auto processor  = calc::InputProcessorText{gsl::make_strict_not_null(&inputField)};
@@ -348,6 +348,27 @@ SCENARIO("Input Processor tests")
                 THEN("Input ends with division sign")
                 {
                     REQUIRE(inputField.getText() == "123÷");
+                }
+            }
+        }
+
+        WHEN("We do BIG math")
+        {
+            inputField.setText("99999×99999");
+            passShortKeyPress(KeyCodes::JoystickEnter);
+
+            THEN("Output contains exponent")
+            {
+                REQUIRE(inputField.getText() == "9.9998e9");
+            }
+
+            AND_WHEN("We start typing")
+            {
+                passShortKeyPresses({KeyCodes::NumericKey4, MinusKey, KeyCodes::NumericKey5, KeyCodes::NumericKey6});
+
+                THEN("Input is cleared before typing")
+                {
+                    REQUIRE(inputField.getText() == "4-56");
                 }
             }
         }

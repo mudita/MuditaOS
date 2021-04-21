@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -45,10 +45,10 @@ namespace gui
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_desktop_tools_antenna"));
+        setTitle(utils::translate("app_desktop_tools_antenna"));
 
         for (auto title : titlesText) {
             titles.push_back(addLabel(title, [=](gui::Item &item) { return true; }));

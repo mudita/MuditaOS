@@ -30,10 +30,10 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_phonebook_contact_title"));
+        setTitle(utils::translate("app_phonebook_contact_title"));
 
         list = new gui::ListView(this,
                                  phonebookStyle::newContactWindow::newContactsList::x,
@@ -65,10 +65,10 @@ namespace gui
             break;
         case ContactAction::Add:
         case ContactAction::EditTemporary:
-            setTitle(utils::localize.get("app_phonebook_contact_title"));
+            setTitle(utils::translate("app_phonebook_contact_title"));
             break;
         case ContactAction::Edit:
-            setTitle(utils::localize.get("app_phonebook_options_edit"));
+            setTitle(utils::translate("app_phonebook_options_edit"));
             break;
         }
 
@@ -211,7 +211,7 @@ namespace gui
             contact->ID = oldContactRecord.ID;
         }
 
-        std::string duplicatedNumberPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
+        std::string duplicatedNumberPhrase = utils::translate("app_phonebook_duplicate_numbers");
         phonebookUtils::fillContactData(duplicatedNumberPhrase, oldContactRecord);
 
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
@@ -235,9 +235,9 @@ namespace gui
             contact->ID = oldContactRecord.ID;
         }
 
-        std::string duplicatedSpeedDialPhrase = utils::localize.get("app_phonebook_duplicate_numbers");
+        std::string duplicatedSpeedDialPhrase = utils::translate("app_phonebook_duplicate_numbers");
         phonebookUtils::fillContactData(duplicatedSpeedDialPhrase, oldContactRecord);
-        std::string duplicatedSpeedDialTitle = utils::localize.get("app_phonebook_duplicate_speed_dial_title");
+        std::string duplicatedSpeedDialTitle = utils::translate("app_phonebook_duplicate_speed_dial_title");
         phonebookUtils::fillContactData(duplicatedSpeedDialTitle, oldContactRecord);
 
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(

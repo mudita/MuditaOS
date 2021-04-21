@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MusicPlayerEmptyWindow.hpp"
@@ -30,13 +30,13 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_music_player_music_library"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_music_player_quit"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_music_player_music_library"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_music_player_quit"));
 
         img = new gui::Image(this, noteImg::x, noteImg::y, "note");
 
         text = new Text(this, infoText::x, infoText::y, infoText::w, infoText::h);
-        text->setText(utils::localize.get("app_music_player_music_empty_window_notification"));
+        text->setText(utils::translate("app_music_player_music_empty_window_notification"));
         text->setTextType(TextType::MultiLine);
         text->setEditMode(EditMode::Browse);
         text->setEdges(RectangleEdge::None);

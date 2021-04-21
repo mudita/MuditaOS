@@ -62,7 +62,7 @@ void DateAndTimeModel::createData()
     dateItem = new gui::SettingsDateItem();
 
     timeItem = new gui::SettingsTimeItem(
-        utils::localize.get("app_settings_title_time"),
+        utils::translate("app_settings_title_time"),
         gui::TimeWidget::Type::Start,
         [&](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [&]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });

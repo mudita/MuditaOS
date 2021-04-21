@@ -21,7 +21,7 @@ namespace gui
 
     void OfflineWindow::buildInterface()
     {
-        setTitle(utils::translateI18("app_settings_title_offline"));
+        setTitle(utils::translate("app_settings_title_offline"));
         optionsList->setSize(optionsList->getWidth(),
                              optionsList->getHeight() - style::settings::window::offline::body_offset);
 
@@ -37,8 +37,8 @@ namespace gui
                                    style::window::default_body_width,
                                    style::settings::window::offline::description_h);
         descriptionText->setFont(style::window::font::medium);
-        descriptionText->setText(utils::translateI18(isFlightMode ? "app_settings_info_offline_flight_mode"
-                                                                  : "app_settings_info_offline_messages_only"));
+        descriptionText->setText(utils::translate(isFlightMode ? "app_settings_info_offline_flight_mode"
+                                                               : "app_settings_info_offline_messages_only"));
         descriptionText->setVisible(true);
     }
 
@@ -46,19 +46,19 @@ namespace gui
     {
         std::list<gui::Option> optList;
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translateI18("app_settings_allow"),
+            utils::translate("app_settings_allow"),
             [=](gui::Item &item) { return changeFlightMode(!isFlightMode); },
             nullptr,
             nullptr,
             gui::option::SettingRightItem::Text,
             false,
-            utils::translateI18(isFlightMode ? "app_settings_no_network_connection_flight_mode"
-                                             : "app_settings_messages_only"),
+            utils::translate(isFlightMode ? "app_settings_no_network_connection_flight_mode"
+                                          : "app_settings_messages_only"),
             false));
 
         if (!isFlightMode) {
             optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                utils::translateI18("app_settings_title_connection_frequency"),
+                utils::translate("app_settings_title_connection_frequency"),
                 [=](gui::Item &item) {
                     this->application->switchWindow(gui::window::name::connection_frequency, nullptr);
                     return true;
@@ -68,8 +68,8 @@ namespace gui
                 gui::option::SettingRightItem::ArrowWhite));
         }
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::Switch));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::Switch));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         return optList;
     }
@@ -78,8 +78,8 @@ namespace gui
     {
         this->isFlightMode = isFlightMode;
         offlineSettings->setFlightMode(isFlightMode);
-        descriptionText->setText(utils::translateI18(isFlightMode ? "app_settings_info_offline_flight_mode"
-                                                                  : "app_settings_info_offline_messages_only"));
+        descriptionText->setText(utils::translate(isFlightMode ? "app_settings_info_offline_flight_mode"
+                                                               : "app_settings_info_offline_messages_only"));
         rebuildOptionList();
         return true;
     }

@@ -10,7 +10,7 @@ namespace gui
     AboutYourPureWindow::AboutYourPureWindow(app::Application *app)
         : BaseSettingsWindow(app, window::name::about_your_pure)
     {
-        setTitle(utils::localize.get("app_settings_about_your_pure"));
+        setTitle(utils::translate("app_settings_about_your_pure"));
     }
 
     auto AboutYourPureWindow::buildOptionsList() -> std::list<Option>
@@ -18,7 +18,7 @@ namespace gui
         std::list<Option> optionList;
         auto addOption = [&](UTF8 name, const std::string &window) {
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
-                utils::translateI18(name),
+                utils::translate(name),
                 [=](Item &item) {
                     LOG_INFO("switching to %s page", window.c_str());
                     application->switchWindow(window, nullptr);

@@ -70,25 +70,24 @@ std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumb
     }
 }
 
-std::string CellularServiceAPI::GetOwnNumber(sys::Service *serv)
+void CellularServiceAPI::SubscribeForOwnNumber(sys::Service *serv, std::function<void(const std::string &)> callback)
 {
-    auto msg = std::make_shared<CellularGetOwnNumberMessage>();
+    serv->connect(typeid(CellularGetOwnNumberResponseMessage), [callback](sys::Message *msg) {
+        auto response = dynamic_cast<CellularGetOwnNumberResponseMessage *>(msg);
+        if (response != nullptr && response->retCode) {
+            callback(response->data);
+        }
+        else {
+            LOG_ERROR("Getting own number failed");
+            callback(std::string());
+        }
+        return sys::MessageNone{};
+    });
+}
 
-    auto ret                          = serv->bus.sendUnicastSync(msg, ServiceCellular::serviceName, 5000);
-    CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
-
-    if (response == nullptr) {
-        LOG_ERROR("CellularServiceAPI::GetOwnNumber failed");
-        return std::string();
-    }
-
-    if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {
-        return response->data;
-    }
-    else {
-        LOG_ERROR("CellularServiceAPI::GetOwnNumber failed");
-        return std::string();
-    }
+void CellularServiceAPI::RequestForOwnNumber(sys::Service *serv)
+{
+    serv->bus.sendUnicast(std::make_shared<CellularGetOwnNumberMessage>(), ServiceCellular::serviceName);
 }
 
 void CellularServiceAPI::GetNetworkInfo(sys::Service *serv)
@@ -351,5 +350,11 @@ bool CellularServiceAPI::ChangeModulePowerState(sys::Service *serv, cellular::St
 bool CellularServiceAPI::SetFlightMode(sys::Service *serv, bool flightModeOn)
 {
     return serv->bus.sendUnicast(std::make_shared<CellularSetFlightModeMessage>(flightModeOn),
+                                 ServiceCellular::serviceName);
+}
+
+bool CellularServiceAPI::SetConnectionFrequency(sys::Service *serv, uint8_t connectionFrequency)
+{
+    return serv->bus.sendUnicast(std::make_shared<CellularSetConnectionFrequencyMessage>(connectionFrequency),
                                  ServiceCellular::serviceName);
 }

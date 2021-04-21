@@ -23,7 +23,7 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_settings_technical_information"));
+        setTitle(utils::translate("app_settings_technical_information"));
 
         modelText  = new gui::Text(this,
                                   style::techinfo::textmodel::x,
@@ -69,19 +69,19 @@ namespace gui
                                   style::techinfo::valueimea::width,
                                   style::techinfo::valueimea::height);
 
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
     }
 
     void TechnicalInformationWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         // dummy data for now
-        modelText->setText(utils::localize.get("app_settings_tech_info_model"));
+        modelText->setText(utils::translate("app_settings_tech_info_model"));
         modelValue->setText(model);
-        serialNumberText->setText(utils::localize.get("app_settings_tech_info_serial_number"));
+        serialNumberText->setText(utils::translate("app_settings_tech_info_serial_number"));
         serialNumberValue->setText(serialNumber);
-        osVersionText->setText(utils::localize.get("app_settings_tech_info_os_version"));
+        osVersionText->setText(utils::translate("app_settings_tech_info_os_version"));
         osVersionValue->setText(std::string(VERSION));
-        imeiText->setText(utils::localize.get("app_settings_tech_info_imei"));
+        imeiText->setText(utils::translate("app_settings_tech_info_imei"));
         imeiValue->setText(imei);
     }
 

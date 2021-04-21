@@ -38,10 +38,10 @@ namespace gui
         numberLabel->setText(num);
 
         if (num.empty()) {
-            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+            bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
             return;
         }
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_call_clear"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate("app_call_clear"));
     }
 
     void NumberWindow::buildInterface()
@@ -54,7 +54,7 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(callAppStyle::strings::call));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(callAppStyle::strings::call));
 
         numberLabel = new gui::Label(this, numberLabel::x, numberLabel::y, numberLabel::w, numberLabel::h);
         numberLabel->setPenWidth(numberLabel::borderW);

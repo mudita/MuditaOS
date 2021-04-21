@@ -27,20 +27,70 @@
 class CellularMessage : public sys::DataMessage
 {
   public:
-    explicit CellularMessage(MessageType messageType) : sys::DataMessage(messageType){};
+    enum class Type
+    {
+        Uninitialized,
+        StateRequest,       ///< cellular change state request, only for use by cellular
+        Notification,       ///< Async notification message
+        AnswerIncomingCall, ///< Answer incoming call
+        HangupCall,         ///< Hang up call
+        Ringing,
+        IncomingCall,
+        CallerId,
+        CallRequest,      ///< Call request
+        PowerStateChange, ///< Change power state of the module
+
+        ListCurrentCalls,
+        SimProcedure,        // Broadcast on sim state changed
+        SimResponse,         // Send to PIN window (show, error state, hide)
+        SimVerifyPinRequest, // Send from PIN window with PIN, PUK, ... number
+        SetVoLTE,
+        SetFlightMode,
+
+        PacketData, ///< for all PacketData messages
+
+        GetOwnNumber,
+        GetIMSI,
+        GetNetworkInfo,
+        StartOperatorsScan,
+        OperatorsScanResult,
+        NetworkInfoResult,
+        SelectAntenna,
+        SetScanMode,
+        GetScanMode,
+        GetScanModeResult,
+        GetFirmwareVersion,       ///< Asks for current firmware version
+        GetFirmwareVersionResult, ///< Returns current firmware version
+        GetChannel,               ///< Asks for channel, requres chnnel name
+        GetChannelResponse,       ///< Returns channel (and it's name)
+        GetCSQ,
+        GetCREG,
+        GetNWINFO,
+        GetAntenna,
+        TransmitDtmfTones,
+        USSDRequest,
+        TimeUpdated,
+        SimState,
+        MMIData,
+        NewIncomingSMS,
+        RadioOnOff,
+        SendSMS,
+        CellularSetConnectionFrequency
+    };
+    explicit CellularMessage(Type type) : sys::DataMessage(), type(type)
+    {}
+    const Type type;
 };
 
 class CellularRingingMessage : public CellularMessage
 {
   public:
-    CellularRingingMessage(const utils::PhoneNumber::View &number)
-        : CellularMessage(MessageType::CellularRinging), number(number)
+    CellularRingingMessage(const utils::PhoneNumber::View &number) : CellularMessage(Type::Ringing), number(number)
     {}
-    CellularRingingMessage(const utils::PhoneNumber &number)
-        : CellularMessage(MessageType::CellularRinging), number(number.getView())
+    CellularRingingMessage(const utils::PhoneNumber &number) : CellularMessage(Type::Ringing), number(number.getView())
     {}
     CellularRingingMessage(const std::string &e164number)
-        : CellularMessage(MessageType::CellularRinging), number(utils::PhoneNumber::parse(e164number))
+        : CellularMessage(Type::Ringing), number(utils::PhoneNumber::parse(e164number))
     {}
 
     utils::PhoneNumber::View number;
@@ -50,13 +100,13 @@ class CellularIncominCallMessage : public CellularMessage
 {
   public:
     CellularIncominCallMessage(const utils::PhoneNumber::View &number)
-        : CellularMessage(MessageType::CellularIncomingCall), number(number)
+        : CellularMessage(Type::IncomingCall), number(number)
     {}
     CellularIncominCallMessage(const utils::PhoneNumber &number)
-        : CellularMessage(MessageType::CellularIncomingCall), number(number.getView())
+        : CellularMessage(Type::IncomingCall), number(number.getView())
     {}
     CellularIncominCallMessage(const std::string &e164number)
-        : CellularMessage(MessageType::CellularIncomingCall), number(utils::PhoneNumber::parse(e164number))
+        : CellularMessage(Type::IncomingCall), number(utils::PhoneNumber::parse(e164number))
     {}
 
     utils::PhoneNumber::View number;
@@ -65,14 +115,13 @@ class CellularIncominCallMessage : public CellularMessage
 class CellularCallerIdMessage : public CellularMessage
 {
   public:
-    CellularCallerIdMessage(const utils::PhoneNumber::View &number)
-        : CellularMessage(MessageType::CellularCallerId), number(number)
+    CellularCallerIdMessage(const utils::PhoneNumber::View &number) : CellularMessage(Type::CallerId), number(number)
     {}
     CellularCallerIdMessage(const utils::PhoneNumber &number)
-        : CellularMessage(MessageType::CellularCallerId), number(number.getView())
+        : CellularMessage(Type::CallerId), number(number.getView())
     {}
     CellularCallerIdMessage(const std::string &e164number)
-        : CellularMessage(MessageType::CellularCallerId), number(utils::PhoneNumber::parse(e164number))
+        : CellularMessage(Type::CallerId), number(utils::PhoneNumber::parse(e164number))
     {}
 
     utils::PhoneNumber::View number;
@@ -81,7 +130,7 @@ class CellularCallerIdMessage : public CellularMessage
 class CellularNotificationMessage : public CellularMessage
 {
   public:
-    enum class Type
+    enum class Content
     {
         CallAborted, // user tried to call other device but receiving side dropped call or call unsuccessful
         CallActive,  // call is in progress both if call was initialized by user and when user received incoming call.
@@ -103,20 +152,20 @@ class CellularNotificationMessage : public CellularMessage
     // TODO check and fix all CellularNotificationMessage constructors
 
     CellularNotificationMessage() = delete;
-    CellularNotificationMessage(Type type, const std::string &data = "")
-        : CellularMessage(MessageType::CellularNotification), type(type), data(data)
+    CellularNotificationMessage(Content content, const std::string &data = "")
+        : CellularMessage(Type::Notification), content(content), data(data)
     {}
 
     virtual ~CellularNotificationMessage() = default;
 
-    Type type;
+    Content content;
     std::string data;
 };
 
 class CellularGetCurrentOperatorMessage : public CellularMessage
 {
   public:
-    explicit CellularGetCurrentOperatorMessage() : CellularMessage(MessageType::CellularNotification)
+    explicit CellularGetCurrentOperatorMessage() : CellularMessage(Type::Notification)
     {}
 };
 
@@ -129,7 +178,7 @@ class CellularGetCurrentOperatorResponse : public CellularMessage
 
   public:
     explicit CellularGetCurrentOperatorResponse(std::string currentOperatorName)
-        : CellularMessage(MessageType::CellularNotification), currentOperatorName(currentOperatorName)
+        : CellularMessage(Type::Notification), currentOperatorName(currentOperatorName)
     {}
 
     std::string getCurrentOperatorName() const
@@ -169,7 +218,7 @@ class CellularPowerStateChange : public CellularMessage
 {
   public:
     explicit CellularPowerStateChange(cellular::State::PowerState new_state)
-        : CellularMessage(MessageType::CellularPowerStateChange), newState(new_state)
+        : CellularMessage(Type::PowerStateChange), newState(new_state)
     {}
 
     cellular::State::PowerState getNewState() const noexcept
@@ -187,7 +236,7 @@ class CellularStartOperatorsScanMessage : public CellularMessage
 
   public:
     explicit CellularStartOperatorsScanMessage(bool fullInfoList = false)
-        : CellularMessage(MessageType::CellularStartOperatorsScan), fullInfo(fullInfoList)
+        : CellularMessage(Type::StartOperatorsScan), fullInfo(fullInfoList)
     {}
 
     bool getFullInfo() const noexcept
@@ -204,7 +253,7 @@ class CellularSimStateMessage : public CellularMessage
 
   public:
     explicit CellularSimStateMessage(at::SimState state, std::string message)
-        : CellularMessage(MessageType::CellularSimState), state(state), message(std::move(message))
+        : CellularMessage(Type::SimState), state(state), message(std::move(message))
     {}
 
     at::SimState getState() const noexcept
@@ -228,17 +277,14 @@ class CellularTimeNotificationMessage : public CellularMessage
   public:
     CellularTimeNotificationMessage() = delete;
     explicit CellularTimeNotificationMessage(struct tm time, long int timeZoneGmtOff, std::string timeZoneString)
-        : CellularMessage(MessageType::CellularTimeUpdated), time(time), timeZoneGmtOff(timeZoneGmtOff),
-          timeZoneString(timeZoneString)
+        : CellularMessage(Type::TimeUpdated), time(time), timeZoneGmtOff(timeZoneGmtOff), timeZoneString(timeZoneString)
     {}
 
     explicit CellularTimeNotificationMessage(long int timeZoneGmtOff, std::string timeZoneString)
-        : CellularMessage(MessageType::CellularTimeUpdated), timeZoneGmtOff(timeZoneGmtOff),
-          timeZoneString(timeZoneString)
+        : CellularMessage(Type::TimeUpdated), timeZoneGmtOff(timeZoneGmtOff), timeZoneString(timeZoneString)
     {}
 
-    explicit CellularTimeNotificationMessage(struct tm time)
-        : CellularMessage(MessageType::CellularTimeUpdated), time(time)
+    explicit CellularTimeNotificationMessage(struct tm time) : CellularMessage(Type::TimeUpdated), time(time)
     {}
 
     std::optional<struct tm> getTime(void)
@@ -267,7 +313,7 @@ class CellularUSSDMessage : public CellularMessage
     };
     CellularUSSDMessage() = delete;
     CellularUSSDMessage(RequestType requestType, const std::string &data = "")
-        : CellularMessage(MessageType::CellularUSSDRequest), type(requestType), data(data)
+        : CellularMessage(Type::USSDRequest), type(requestType), data(data)
     {}
 
     RequestType type;
@@ -276,7 +322,7 @@ class CellularUSSDMessage : public CellularMessage
 class CellularRequestMessage : public CellularMessage
 {
   public:
-    CellularRequestMessage(MessageType messageType, std::string data = "") : CellularMessage(messageType), data(data)
+    CellularRequestMessage(Type type, std::string data = "") : CellularMessage(type), data(data)
     {}
 
     std::string data;
@@ -287,7 +333,7 @@ class CellularDtmfRequestMessage : public CellularMessage
     uint32_t digit = 0;
 
   public:
-    CellularDtmfRequestMessage(uint32_t digit) : CellularMessage(MessageType::CellularTransmitDtmfTones), digit(digit)
+    CellularDtmfRequestMessage(uint32_t digit) : CellularMessage(Type::TransmitDtmfTones), digit(digit)
     {}
 
     uint32_t getDigit() const
@@ -299,7 +345,7 @@ class CellularDtmfRequestMessage : public CellularMessage
 class CellularAntennaRequestMessage : public CellularMessage
 {
   public:
-    CellularAntennaRequestMessage() : CellularMessage(MessageType::CellularSelectAntenna)
+    CellularAntennaRequestMessage() : CellularMessage(Type::SelectAntenna)
     {}
 
     bsp::cellular::antenna antenna;
@@ -315,7 +361,7 @@ class CellularCallRequestMessage : public CellularMessage
     };
 
     CellularCallRequestMessage(const utils::PhoneNumber::View &number, RequestMode requestMode = RequestMode::Normal)
-        : CellularMessage(MessageType::CellularCallRequest), number(number), requestMode(requestMode)
+        : CellularMessage(Type::CallRequest), number(number), requestMode(requestMode)
     {}
     utils::PhoneNumber::View number;
     RequestMode requestMode = RequestMode::Normal;
@@ -324,7 +370,7 @@ class CellularCallRequestMessage : public CellularMessage
 class CellularSmsNoSimRequestMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction
 {
   public:
-    CellularSmsNoSimRequestMessage() : CellularMessage{MessageType::MessageTypeUninitialized}
+    CellularSmsNoSimRequestMessage() : CellularMessage{Type::Uninitialized}
     {}
 
     [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
@@ -337,7 +383,7 @@ class CellularSmsNoSimRequestMessage : public CellularMessage, public app::manag
 class CellularSimMessage : public CellularMessage
 {
   public:
-    CellularSimMessage(MessageType messageType, Store::GSM::SIM sim) : CellularMessage(messageType), sim(sim)
+    CellularSimMessage(Type type, Store::GSM::SIM sim) : CellularMessage(type), sim(sim)
     {}
     virtual ~CellularSimMessage() = default;
     Store::GSM::SIM getSimCard() const noexcept
@@ -355,12 +401,12 @@ class CellularSimVerifyPinRequestMessage : public CellularSimMessage
 {
   public:
     CellularSimVerifyPinRequestMessage(Store::GSM::SIM sim, std::vector<unsigned int> pinValue)
-        : CellularSimMessage(MessageType::CellularSimVerifyPinRequest, sim), pinValue(std::move(pinValue))
+        : CellularSimMessage(Type::SimVerifyPinRequest, sim), pinValue(std::move(pinValue))
     {}
     CellularSimVerifyPinRequestMessage(Store::GSM::SIM sim,
                                        std::vector<unsigned int> pinValue,
                                        std::vector<unsigned int> pukValue)
-        : CellularSimMessage(MessageType::CellularSimVerifyPinRequest, sim), pinValue(std::move(pinValue)),
+        : CellularSimMessage(Type::SimVerifyPinRequest, sim), pinValue(std::move(pinValue)),
           pukValue(std::move(pukValue))
     {}
 
@@ -384,7 +430,7 @@ class CellularSimPasscodeRequest : public CellularMessage
     app::manager::actions::PasscodeParams params;
 
     CellularSimPasscodeRequest(Store::GSM::SIM _sim, unsigned int _attempts, std::string _passcodeName)
-        : CellularMessage(MessageType::CellularSimResponse), params(_sim, _attempts, std::move(_passcodeName))
+        : CellularMessage(Type::SimResponse), params(_sim, _attempts, std::move(_passcodeName))
     {}
 };
 
@@ -423,7 +469,7 @@ class CellularUnlockSimMessage : public CellularMessage, public app::manager::ac
     app::manager::actions::SimStateParams params;
 
   public:
-    CellularUnlockSimMessage(Store::GSM::SIM _sim) : CellularMessage(MessageType::CellularSimResponse), params(_sim)
+    CellularUnlockSimMessage(Store::GSM::SIM _sim) : CellularMessage(Type::SimResponse), params(_sim)
     {}
 
     [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
@@ -438,8 +484,7 @@ class CellularBlockSimMessage : public CellularMessage, public app::manager::act
     app::manager::actions::SimStateParams params;
 
   public:
-    explicit CellularBlockSimMessage(Store::GSM::SIM _sim)
-        : CellularMessage(MessageType::CellularSimResponse), params(_sim)
+    explicit CellularBlockSimMessage(Store::GSM::SIM _sim) : CellularMessage(Type::SimResponse), params(_sim)
     {}
 
     [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
@@ -455,7 +500,7 @@ class CellularDisplayCMEMessage : public CellularMessage, public app::manager::a
 
   public:
     CellularDisplayCMEMessage(Store::GSM::SIM _sim, unsigned int _cmeCode)
-        : CellularMessage(MessageType::CellularSimResponse), params(_sim, _cmeCode)
+        : CellularMessage(Type::SimResponse), params(_sim, _cmeCode)
     {}
 
     [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest>
@@ -472,7 +517,7 @@ class CellularSimDataMessage : public CellularMessage
     Store::GSM::SIM sim = Store::GSM::SIM::NONE;
 
   public:
-    explicit CellularSimDataMessage(Store::GSM::SIM _sim) : CellularMessage{MessageType::CellularSimResponse}, sim{_sim}
+    explicit CellularSimDataMessage(Store::GSM::SIM _sim) : CellularMessage{Type::SimResponse}, sim{_sim}
     {}
     [[nodiscard]] Store::GSM::SIM getSim() const noexcept
     {
@@ -596,20 +641,20 @@ class CellularSimAbortMessage : public CellularSimDataMessage
     {}
 };
 
-class CellularGetChannelMessage : public sys::DataMessage
+class CellularGetChannelMessage : public CellularMessage
 {
   public:
     CellularGetChannelMessage(TS0710::Channel dataChannel = TS0710::Channel::None)
-        : sys::DataMessage(MessageType::CellularGetChannel), dataChannel(dataChannel)
+        : CellularMessage{Type::GetChannel}, dataChannel(dataChannel)
     {}
     TS0710::Channel dataChannel;
 };
 
-class CellularGetChannelResponseMessage : public sys::DataMessage
+class CellularGetChannelResponseMessage : public CellularMessage
 {
   public:
     CellularGetChannelResponseMessage(DLC_channel *dataChannelPtr = nullptr)
-        : sys::DataMessage(MessageType::CellularGetChannelResponse), dataChannelPtr(dataChannelPtr)
+        : CellularMessage{Type::GetChannelResponse}, dataChannelPtr(dataChannelPtr)
     {}
     DLC_channel *dataChannelPtr;
 };
@@ -618,17 +663,18 @@ class CellularResponseMessage : public sys::ResponseMessage
 {
   public:
     CellularResponseMessage(bool retCode,
-                            std::string retdata    = std::string(),
-                            MessageType responseTo = MessageType::MessageTypeUninitialized)
-        : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode), data(retdata){};
+                            std::string retdata              = std::string(),
+                            CellularMessage::Type responseTo = CellularMessage::Type::Uninitialized)
+        : sys::ResponseMessage(sys::ReturnCodes::Success), retCode(retCode), data(retdata), cellResponse(responseTo){};
 
-    CellularResponseMessage(bool retCode, MessageType responseTo)
-        : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
+    CellularResponseMessage(bool retCode, CellularMessage::Type responseTo)
+        : sys::ResponseMessage(sys::ReturnCodes::Success), retCode(retCode), cellResponse(responseTo){};
 
     virtual ~CellularResponseMessage(){};
 
     bool retCode;
     std::string data;
+    CellularMessage::Type cellResponse;
 };
 
 class CellularSimNewPinResponseMessage : public CellularResponseMessage
@@ -660,16 +706,21 @@ class CellularSimCardLockResponseMessage : public CellularResponseMessage
     }
 };
 
-class CellularAntennaResponseMessage : public sys::ResponseMessage
+class CellularGetOwnNumberResponseMessage : public CellularResponseMessage
 {
   public:
-    CellularAntennaResponseMessage(bool retCode, bsp::cellular::antenna retAntenna, MessageType responseTo)
-        : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode)
-    {
-        antenna = retAntenna;
-    };
+    CellularGetOwnNumberResponseMessage(bool retCode, std::string number = std::string())
+        : CellularResponseMessage(retCode, std::move(number))
+    {}
+};
 
-    bool retCode;
+class CellularAntennaResponseMessage : public CellularResponseMessage
+{
+  public:
+    CellularAntennaResponseMessage(bool retCode, bsp::cellular::antenna retAntenna, CellularMessage::Type responseTo)
+        : CellularResponseMessage(retCode, responseTo), antenna(retAntenna)
+    {}
+
     bsp::cellular::antenna antenna;
 };
 
@@ -680,7 +731,7 @@ class CellularMMIResult : public CellularMessage
 
     explicit CellularMMIResult(app::manager::actions::MMIResultParams::MMIResult result,
                                std::shared_ptr<app::manager::actions::MMICustomResultParams> customResult = nullptr)
-        : CellularMessage(MessageType::CellularMMIData), params(result, std::move(customResult))
+        : CellularMessage(Type::MMIData), params(result, std::move(customResult))
     {}
 };
 
@@ -707,8 +758,7 @@ class CellularMMIDataMessage : public CellularMessage
     app::manager::actions::MMIParams params;
 
   public:
-    explicit CellularMMIDataMessage(std::string mmiData)
-        : CellularMessage(MessageType::CellularMMIData), params(mmiData)
+    explicit CellularMMIDataMessage(std::string mmiData) : CellularMessage(Type::MMIData), params(mmiData)
     {}
 };
 class CellularMMIResponseMessage : public CellularMMIDataMessage, public app::manager::actions::ConvertibleToAction
@@ -755,7 +805,7 @@ class CellularVoLTEDataMessage : public CellularMessage
     bool VoLTEon = false;
 
   public:
-    explicit CellularVoLTEDataMessage(bool VoLTEon) : CellularMessage{MessageType::CellularSetVoLTE}, VoLTEon{VoLTEon}
+    explicit CellularVoLTEDataMessage(bool VoLTEon) : CellularMessage{Type::SetVoLTE}, VoLTEon{VoLTEon}
     {}
     [[nodiscard]] bool getVoLTEon() const noexcept
     {
@@ -808,7 +858,7 @@ class CellularNewIncomingSMSMessage : public CellularMessage
 {
   public:
     explicit CellularNewIncomingSMSMessage(const std::string &data)
-        : CellularMessage(MessageType::CellularNewIncomingSMS), notificationData(data)
+        : CellularMessage(Type::NewIncomingSMS), notificationData(data)
     {}
     auto getData() const -> std::string
     {
@@ -822,56 +872,56 @@ class CellularNewIncomingSMSMessage : public CellularMessage
 class CellularAnswerIncomingCallMessage : public CellularMessage
 {
   public:
-    CellularAnswerIncomingCallMessage() : CellularMessage(MessageType::CellularAnswerIncomingCall)
+    CellularAnswerIncomingCallMessage() : CellularMessage(Type::AnswerIncomingCall)
     {}
 };
 
 class CellularHangupCallMessage : public CellularMessage
 {
   public:
-    CellularHangupCallMessage() : CellularMessage(MessageType::CellularHangupCall)
+    CellularHangupCallMessage() : CellularMessage(Type::HangupCall)
     {}
 };
 
 class CellularListCallsMessage : public CellularMessage
 {
   public:
-    CellularListCallsMessage() : CellularMessage(MessageType::CellularListCurrentCalls)
+    CellularListCallsMessage() : CellularMessage(Type::ListCurrentCalls)
     {}
 };
 
 class CellularSimProcedureMessage : public CellularMessage
 {
   public:
-    CellularSimProcedureMessage() : CellularMessage(MessageType::CellularSimProcedure)
+    CellularSimProcedureMessage() : CellularMessage(Type::SimProcedure)
     {}
 };
 
 class CellularGetIMSIMessage : public CellularMessage
 {
   public:
-    CellularGetIMSIMessage() : CellularMessage(MessageType::CellularGetIMSI)
+    CellularGetIMSIMessage() : CellularMessage(Type::GetIMSI)
     {}
 };
 
 class CellularGetOwnNumberMessage : public CellularMessage
 {
   public:
-    CellularGetOwnNumberMessage() : CellularMessage(MessageType::CellularGetOwnNumber)
+    CellularGetOwnNumberMessage() : CellularMessage(Type::GetOwnNumber)
     {}
 };
 
 class CellularGetNetworkInfoMessage : public CellularMessage
 {
   public:
-    CellularGetNetworkInfoMessage() : CellularMessage(MessageType::CellularGetNetworkInfo)
+    CellularGetNetworkInfoMessage() : CellularMessage(Type::GetNetworkInfo)
     {}
 };
 
 class CellularSetScanModeMessage : public CellularMessage
 {
   public:
-    CellularSetScanModeMessage(const std::string &mode) : CellularMessage(MessageType::CellularSetScanMode), data(mode)
+    CellularSetScanModeMessage(const std::string &mode) : CellularMessage(Type::SetScanMode), data(mode)
     {}
     std::string data;
 };
@@ -879,42 +929,42 @@ class CellularSetScanModeMessage : public CellularMessage
 class CellularGetScanModeMessage : public CellularMessage
 {
   public:
-    CellularGetScanModeMessage() : CellularMessage(MessageType::CellularGetScanMode)
+    CellularGetScanModeMessage() : CellularMessage(Type::GetScanMode)
     {}
 };
 
 class CellularGetFirmwareVersionMessage : public CellularMessage
 {
   public:
-    CellularGetFirmwareVersionMessage() : CellularMessage(MessageType::CellularGetFirmwareVersion)
+    CellularGetFirmwareVersionMessage() : CellularMessage(Type::GetFirmwareVersion)
     {}
 };
 
 class CellularGetCsqMessage : public CellularMessage
 {
   public:
-    CellularGetCsqMessage() : CellularMessage(MessageType::CellularGetCSQ)
+    CellularGetCsqMessage() : CellularMessage(Type::GetCSQ)
     {}
 };
 
 class CellularGetCregMessage : public CellularMessage
 {
   public:
-    CellularGetCregMessage() : CellularMessage(MessageType::CellularGetCREG)
+    CellularGetCregMessage() : CellularMessage(Type::GetCREG)
     {}
 };
 
 class CellularGetNwinfoMessage : public CellularMessage
 {
   public:
-    CellularGetNwinfoMessage() : CellularMessage(MessageType::CellularGetNWINFO)
+    CellularGetNwinfoMessage() : CellularMessage(Type::GetNWINFO)
     {}
 };
 
 class CellularGetAntennaMessage : public CellularMessage
 {
   public:
-    CellularGetAntennaMessage() : CellularMessage(MessageType::CellularGetAntenna)
+    CellularGetAntennaMessage() : CellularMessage(Type::GetAntenna)
     {}
 };
 
@@ -922,16 +972,31 @@ class CellularSetFlightModeMessage : public CellularMessage
 {
   public:
     explicit CellularSetFlightModeMessage(bool flightModeOn)
-        : CellularMessage(MessageType::CellularSetFlightMode), flightModeOn(flightModeOn)
+        : CellularMessage(Type::SetFlightMode), flightModeOn(flightModeOn)
     {}
     bool flightModeOn;
+};
+
+class CellularSetConnectionFrequencyMessage : public CellularMessage
+{
+  public:
+    explicit CellularSetConnectionFrequencyMessage(const uint8_t &connectionFrequency)
+        : CellularMessage(Type::CellularSetConnectionFrequency), connectionFrequency(connectionFrequency)
+    {}
+    auto getConnectionFrequency() const noexcept -> uint8_t
+    {
+        return connectionFrequency;
+    }
+
+  private:
+    uint8_t connectionFrequency;
 };
 
 class CellularCallActiveNotification : public CellularNotificationMessage
 {
   public:
     explicit CellularCallActiveNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::CallActive, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::CallActive, data)
     {}
 };
 
@@ -939,7 +1004,7 @@ class CellularCallAbortedNotification : public CellularNotificationMessage
 {
   public:
     explicit CellularCallAbortedNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::CallAborted, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::CallAborted, data)
     {}
 };
 
@@ -947,7 +1012,7 @@ class CellularPowerUpProcedureCompleteNotification : public CellularNotification
 {
   public:
     explicit CellularPowerUpProcedureCompleteNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::PowerUpProcedureComplete, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::PowerUpProcedureComplete, data)
     {}
 };
 
@@ -955,7 +1020,7 @@ class CellularPowerDownDeregisteringNotification : public CellularNotificationMe
 {
   public:
     explicit CellularPowerDownDeregisteringNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::PowerDownDeregistering, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::PowerDownDeregistering, data)
     {}
 };
 
@@ -963,7 +1028,7 @@ class CellularPowerDownDeregisteredNotification : public CellularNotificationMes
 {
   public:
     explicit CellularPowerDownDeregisteredNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::PowerDownDeregistered, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::PowerDownDeregistered, data)
     {}
 };
 
@@ -971,7 +1036,7 @@ class CellularNewIncomingSMSNotification : public CellularNotificationMessage
 {
   public:
     explicit CellularNewIncomingSMSNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::NewIncomingSMS, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::NewIncomingSMS, data)
     {}
 };
 
@@ -979,7 +1044,7 @@ class CellularSimReadyNotification : public CellularNotificationMessage
 {
   public:
     explicit CellularSimReadyNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::SIM_READY, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::SIM_READY, data)
     {}
 };
 
@@ -987,7 +1052,7 @@ class CellularSmsDoneNotification : public CellularNotificationMessage
 {
   public:
     explicit CellularSmsDoneNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::SMSDone, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::SMSDone, data)
     {}
 };
 
@@ -995,7 +1060,7 @@ class CellularSignalStrengthUpdateNotification : public CellularNotificationMess
 {
   public:
     explicit CellularSignalStrengthUpdateNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::SignalStrengthUpdate, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::SignalStrengthUpdate, data)
     {}
 };
 
@@ -1003,7 +1068,7 @@ class CellularNetworkStatusUpdateNotification : public CellularNotificationMessa
 {
   public:
     explicit CellularNetworkStatusUpdateNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::NetworkStatusUpdate, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::NetworkStatusUpdate, data)
     {}
 };
 
@@ -1011,7 +1076,7 @@ class CellularSimNotReadyNotification : public CellularNotificationMessage
 {
   public:
     explicit CellularSimNotReadyNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::SIM_NOT_READY, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::SIM_NOT_READY, data)
     {}
 };
 
@@ -1019,15 +1084,14 @@ class CellularUrcIncomingNotification : public CellularNotificationMessage
 {
   public:
     explicit CellularUrcIncomingNotification(const std::string &data = "")
-        : CellularNotificationMessage(CellularNotificationMessage::Type::NewIncomingUrc, data)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::NewIncomingUrc, data)
     {}
 };
 
 class CellularSetRadioOnOffMessage : public CellularMessage
 {
   public:
-    explicit CellularSetRadioOnOffMessage(bool radioOnOff)
-        : CellularMessage(MessageType::CellularRadioOnOff), radioOnOff(radioOnOff)
+    explicit CellularSetRadioOnOffMessage(bool radioOnOff) : CellularMessage(Type::RadioOnOff), radioOnOff(radioOnOff)
     {}
     auto getRadioOnOf() -> bool
     {
@@ -1071,7 +1135,7 @@ class CellularCallRejectedByOfflineNotification : public CellularResponseMessage
 class CellularSendSMSMessage : public CellularMessage
 {
   public:
-    explicit CellularSendSMSMessage(SMSRecord record) : CellularMessage(MessageType::CellularSendSMS), record(record)
+    explicit CellularSendSMSMessage(SMSRecord record) : CellularMessage(Type::SendSMS), record(record)
     {}
     SMSRecord record;
 };
@@ -1080,13 +1144,13 @@ class CellularRingNotification : public CellularNotificationMessage
 {
   public:
     explicit CellularRingNotification(const utils::PhoneNumber::View &number)
-        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring), number(number)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::Ring), number(number)
     {}
     explicit CellularRingNotification(const utils::PhoneNumber &number)
-        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring), number(number.getView())
+        : CellularNotificationMessage(CellularNotificationMessage::Content::Ring), number(number.getView())
     {}
     explicit CellularRingNotification(const std::string &e164number)
-        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring),
+        : CellularNotificationMessage(CellularNotificationMessage::Content::Ring),
           number(utils::PhoneNumber::parse(e164number))
     {}
     auto getNubmer() const -> utils::PhoneNumber::View
@@ -1102,13 +1166,13 @@ class CellularCallerIdNotification : public CellularNotificationMessage
 {
   public:
     explicit CellularCallerIdNotification(const utils::PhoneNumber::View &number)
-        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring), number(number)
+        : CellularNotificationMessage(CellularNotificationMessage::Content::Ring), number(number)
     {}
     explicit CellularCallerIdNotification(const utils::PhoneNumber &number)
-        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring), number(number.getView())
+        : CellularNotificationMessage(CellularNotificationMessage::Content::Ring), number(number.getView())
     {}
     explicit CellularCallerIdNotification(const std::string &e164number)
-        : CellularNotificationMessage(CellularNotificationMessage::Type::Ring),
+        : CellularNotificationMessage(CellularNotificationMessage::Content::Ring),
           number(utils::PhoneNumber::parse(e164number))
     {}
     auto getNubmer() const -> utils::PhoneNumber::View
@@ -1127,15 +1191,14 @@ namespace cellular
     {
       public:
         const State::ST request;
-        StateChange(const State::ST request = State::ST::Failed)
-            : CellularMessage(MessageType::CellularStateRequest), request(request)
+        StateChange(const State::ST request = State::ST::Failed) : CellularMessage(Type::StateRequest), request(request)
         {}
     };
 
     class RawCommandRespAsync : public CellularMessage
     {
       public:
-        RawCommandRespAsync(MessageType messageType) : CellularMessage(messageType){};
+        RawCommandRespAsync(Type type) : CellularMessage(type){};
         virtual ~RawCommandRespAsync() = default;
         std::vector<std::string> data;
     };

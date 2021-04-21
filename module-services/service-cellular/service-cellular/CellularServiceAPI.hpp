@@ -35,11 +35,16 @@ namespace CellularServiceAPI
      */
     std::string GetIMSI(sys::Service *serv, bool getFullIMSINumber = false);
     /*
-     * @brief Its calls sercive-cellular for selected SIM own phone number.
+     * @brief Its subscribes service-cellular for selected SIM own phone number response messages.
      * @param serv pointer to caller service.
-     * #return SIM own number when succeeds, empty string when fails
+     * @param callback called on response message receive event.
      */
-    std::string GetOwnNumber(sys::Service *serv);
+    void SubscribeForOwnNumber(sys::Service *serv, std::function<void(const std::string &)> callback);
+    /*
+     * @brief Its calls service-cellular for selected SIM own phone number.
+     * @param serv pointer to caller service.
+     */
+    void RequestForOwnNumber(sys::Service *serv);
     /*
      * @brief It calls service-cellulat fo newtwork info
      * @param serv pointer to caller service.
@@ -142,5 +147,7 @@ namespace CellularServiceAPI
     bool ChangeModulePowerState(sys::Service *serv, cellular::State::PowerState newState);
 
     bool SetFlightMode(sys::Service *serv, bool flightModeOn);
+
+    bool SetConnectionFrequency(sys::Service *serv, uint8_t connectionFrequency);
 
 }; // namespace CellularServiceAPI

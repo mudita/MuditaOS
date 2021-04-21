@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmOptionsItem.hpp"
@@ -83,13 +83,13 @@ namespace gui
         optionsNames.clear();
         switch (itemName) {
         case AlarmOptionItemName::Sound:
-            descriptionLabel->setText(utils::localize.get("app_alarm_clock_sound"));
+            descriptionLabel->setText(utils::translate("app_alarm_clock_sound"));
             break;
         case AlarmOptionItemName::Snooze:
-            descriptionLabel->setText(utils::localize.get("app_alarm_clock_snooze"));
+            descriptionLabel->setText(utils::translate("app_alarm_clock_snooze"));
             break;
         case AlarmOptionItemName::Repeat:
-            descriptionLabel->setText(utils::localize.get("app_alarm_clock_repeat"));
+            descriptionLabel->setText(utils::translate("app_alarm_clock_repeat"));
             break;
         }
         if (itemName == AlarmOptionItemName::Sound) {
@@ -98,16 +98,16 @@ namespace gui
             }
         }
         else if (itemName == AlarmOptionItemName::Snooze) {
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_snooze_5_min"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_snooze_10_min"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_snooze_15_min"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_snooze_30_min"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_snooze_5_min"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_snooze_10_min"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_snooze_15_min"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_snooze_30_min"));
         }
         else if (itemName == AlarmOptionItemName::Repeat) {
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_repeat_never"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_repeat_everyday"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_repeat_week_days"));
-            optionsNames.push_back(utils::localize.get("app_alarm_clock_repeat_custom"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_repeat_never"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_repeat_everyday"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_repeat_week_days"));
+            optionsNames.push_back(utils::translate("app_alarm_clock_repeat_custom"));
         }
     }
 
@@ -121,10 +121,10 @@ namespace gui
                 rightArrow->setVisible(true);
                 hBox->resizeItems();
                 if (itemName == AlarmOptionItemName::Sound) {
-                    bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_play_pause"));
+                    bottomBarTemporaryMode(utils::translate("app_alarm_clock_play_pause"));
                 }
                 if (itemName == AlarmOptionItemName::Repeat && actualVectorIndex == optionsNames.size() - 1) {
-                    bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_edit"));
+                    bottomBarTemporaryMode(utils::translate("app_alarm_clock_edit"));
                 }
             }
             else {
@@ -151,7 +151,7 @@ namespace gui
                 if (actualVectorIndex >= optionsNames.size()) {
                     actualVectorIndex = optionsNames.size() - 1;
                     if (itemName == AlarmOptionItemName::Repeat) {
-                        bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_edit"));
+                        bottomBarTemporaryMode(utils::translate("app_alarm_clock_edit"));
                     }
                 }
                 else if (itemName == AlarmOptionItemName::Repeat) {
@@ -167,7 +167,7 @@ namespace gui
                     actualVectorIndex = 0;
                 }
                 if (actualVectorIndex == optionsNames.size() - 1 && itemName == AlarmOptionItemName::Repeat) {
-                    bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_edit"));
+                    bottomBarTemporaryMode(utils::translate("app_alarm_clock_edit"));
                 }
                 else if (itemName == AlarmOptionItemName::Repeat) {
                     bottomBarRestoreFromTemporaryMode();
@@ -213,8 +213,7 @@ namespace gui
                     alarm->repeat = actualVectorIndex;
                 }
                 else if (alarm->repeat == optionsNames.size() - 1 ||
-                         optionsNames[optionsNames.size() - 1] ==
-                             utils::localize.get("app_alarm_clock_repeat_custom")) {
+                         optionsNames[optionsNames.size() - 1] == utils::translate("app_alarm_clock_repeat_custom")) {
                     alarm->repeat = static_cast<uint32_t>(AlarmRepeat::never);
                 }
                 break;
@@ -252,7 +251,7 @@ namespace gui
                 if (alarm->repeat < optionsNames.size() - 1) {
                     actualVectorIndex = alarm->repeat;
                     if (alarm->repeat == static_cast<uint32_t>(AlarmRepeat::never)) {
-                        optionsNames[optionsNames.size() - 1] = utils::localize.get("app_alarm_clock_repeat_custom");
+                        optionsNames[optionsNames.size() - 1] = utils::translate("app_alarm_clock_repeat_custom");
                     }
                     bottomBarRestoreFromTemporaryMode();
                 }
@@ -262,19 +261,19 @@ namespace gui
                         actualVectorIndex = static_cast<uint32_t>(AlarmRepeat::everyday);
                         alarm->repeat     = actualVectorIndex;
                         bottomBarRestoreFromTemporaryMode();
-                        optionsNames[optionsNames.size() - 1] = utils::localize.get("app_alarm_clock_repeat_custom");
+                        optionsNames[optionsNames.size() - 1] = utils::translate("app_alarm_clock_repeat_custom");
                     }
                     else if (parser.isCustomValueWeekDays()) {
                         actualVectorIndex = static_cast<uint32_t>(AlarmRepeat::weekDays);
                         alarm->repeat     = actualVectorIndex;
                         bottomBarRestoreFromTemporaryMode();
-                        optionsNames[optionsNames.size() - 1] = utils::localize.get("app_alarm_clock_repeat_custom");
+                        optionsNames[optionsNames.size() - 1] = utils::translate("app_alarm_clock_repeat_custom");
                     }
                     else {
                         actualVectorIndex                     = optionsNames.size() - 1;
                         optionsNames[optionsNames.size() - 1] = parser.getWeekDaysText();
                         if (this->focus) {
-                            bottomBarTemporaryMode(utils::localize.get("app_alarm_clock_edit"));
+                            bottomBarTemporaryMode(utils::translate("app_alarm_clock_edit"));
                         }
                     }
                 }

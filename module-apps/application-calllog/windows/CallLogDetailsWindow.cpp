@@ -77,9 +77,9 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::call));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::call));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         // NOTE: height of all labels is set using decorators
 
@@ -89,7 +89,7 @@ namespace gui
                                                         information::label::y,
                                                         information::label::w,
                                                         0,
-                                                        utils::localize.get(style::strings::common::information)));
+                                                        utils::translate(style::strings::common::information)));
         number           = decorateData(
             new gui::Label(this, information::number::x, information::number::y, information::number::w, 0));
         number->setFont(style::window::font::mediumbold);
@@ -128,12 +128,12 @@ namespace gui
 
         // focus callbacks
         rects[static_cast<uint32_t>(FocusRects::Call)]->focusChangedCallback = [=](gui::Item &item) {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::call));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::call));
             return true;
         };
 
         rects[static_cast<uint32_t>(FocusRects::Sms)]->focusChangedCallback = [=](gui::Item &item) {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::send));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::send));
             return true;
         };
 
@@ -158,7 +158,7 @@ namespace gui
 
         // Type
         typeLabel = decorateLabel(new gui::Label(
-            this, type::label::x, type::label::y, type::label::w, 0, utils::localize.get("app_calllog_type")));
+            this, type::label::x, type::label::y, type::label::w, 0, utils::translate("app_calllog_type")));
         typeData  = decorateData(new gui::Label(this, type::data::x, type::data::y, type::data::w, 0));
 
         // TODO: alek: it is used in the code at least twice, possibly create one common function for this
@@ -177,12 +177,12 @@ namespace gui
                                                      duration::label::y,
                                                      duration::label::w,
                                                      0,
-                                                     utils::localize.get("app_calllog_duration")));
+                                                     utils::translate("app_calllog_duration")));
         durationData  = decorateData(new gui::Label(this, duration::data::x, duration::data::y, duration::data::w, 0));
 
         // Date
         dateLabel = decorateLabel(new gui::Label(
-            this, date::label::x, date::label::y, date::label::w, 0, utils::localize.get("app_calllog_date")));
+            this, date::label::x, date::label::y, date::label::w, 0, utils::translate("app_calllog_date")));
         dateDay   = decorateData(new gui::Label(this, date::dataDay::x, date::dataDay::y, date::dataDay::w, 0));
         dateDate  = decorateData(new gui::Label(this, date::dataDate::x, date::dataDate::y, date::dataDate::w, 0));
     }
@@ -214,16 +214,16 @@ namespace gui
             UTF8 callTypeStr;
             switch (record.type) {
             case CallType::CT_INCOMING:
-                callTypeStr = utils::localize.get("app_calllog_incoming_call");
+                callTypeStr = utils::translate("app_calllog_incoming_call");
                 break;
             case CallType::CT_OUTGOING:
-                callTypeStr = utils::localize.get("app_calllog_outgoing_call");
+                callTypeStr = utils::translate("app_calllog_outgoing_call");
                 break;
             case CallType::CT_MISSED:
-                callTypeStr = utils::localize.get("app_calllog_missed_call");
+                callTypeStr = utils::translate("app_calllog_missed_call");
                 break;
             case CallType::CT_REJECTED:
-                callTypeStr = utils::localize.get("app_calllog_rejected_call");
+                callTypeStr = utils::translate("app_calllog_rejected_call");
                 break;
             default:
                 break;
@@ -234,8 +234,8 @@ namespace gui
 
             utils::time::Timestamp t(record.date);
             dateDay->setText(t.day() + ",");
-            dateDate->setText(t.str(utils::localize.get("locale_date_full") + ", " +
-                                    utils::localize.get("locale_12hour_min"))); // TODO: alek 12/24 h
+            dateDate->setText(t.str(utils::translate("locale_date_full") + ", " +
+                                    utils::translate("locale_12hour_min"))); // TODO: alek 12/24 h
         }
 
         if (mode == ShowMode::GUI_SHOW_INIT)
@@ -248,7 +248,7 @@ namespace gui
             rects[FocusRects::Sms]->setVisible(false);
             rects[FocusRects::Sms]->activatedCallback    = nullptr;
             rects[FocusRects::Sms]->focusChangedCallback = nullptr;
-            number->setText(utils::localize.get(callLogStyle::strings::privateNumber));
+            number->setText(utils::translate(callLogStyle::strings::privateNumber));
             bottomBar->setActive(BottomBar::Side::CENTER, false);
         }
         else {
@@ -274,7 +274,7 @@ namespace gui
             (inputEvent.keyCode == KeyCode::KEY_LF)) {
             auto app = dynamic_cast<app::ApplicationCallLog *>(application);
             assert(app != nullptr);
-            app->switchWindow(utils::localize.get("app_phonebook_options_title"),
+            app->switchWindow(utils::translate("app_phonebook_options_title"),
                               std::make_unique<gui::OptionsWindowOptions>(calllogWindowOptions(app, record)));
 
             return true;

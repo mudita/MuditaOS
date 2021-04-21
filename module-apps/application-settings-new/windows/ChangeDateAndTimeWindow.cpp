@@ -20,12 +20,12 @@ namespace gui
     void ChangeDateAndTimeWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        setTitle(utils::localize.get("app_settings_date_and_time"));
+        setTitle(utils::translate("app_settings_date_and_time"));
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
 
         list = new gui::ListView(this,
                                  style::window::date_and_time::listView_x,

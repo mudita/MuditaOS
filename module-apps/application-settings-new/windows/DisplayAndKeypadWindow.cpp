@@ -15,7 +15,7 @@ namespace gui
         : OptionWindow(app, gui::window::name::display_and_keypad)
     {
         addOptions(displayAndKeypadOptionsList());
-        setTitle(utils::localize.get("app_settings_disp_key"));
+        setTitle(utils::translate("app_settings_disp_key"));
     }
 
     std::list<Option> DisplayAndKeypadWindow::displayAndKeypadOptionsList()
@@ -35,7 +35,7 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                        this->setBottomBarText(utils::translate(style::strings::common::select),
                                                BottomBar::Side::CENTER);
                     }
                     return true;
@@ -44,11 +44,11 @@ namespace gui
                 gui::option::SettingRightItem::ArrowWhite));
         };
 
-        addMenu(utils::translateI18("app_settings_display_display_light"), gui::window::name::display_light);
-        addMenu(utils::translateI18("app_settings_display_font_size"), gui::window::name::font_size);
-        addMenu(utils::translateI18("app_settings_display_locked_screen"), gui::window::name::locked_screen);
-        addMenu(utils::translateI18("app_settings_display_keypad_light"), gui::window::name::keypad_light);
-        addMenu(utils::translateI18("app_settings_display_input_language"), gui::window::name::input_language);
+        addMenu(utils::translate("app_settings_display_display_light"), gui::window::name::display_light);
+        addMenu(utils::translate("app_settings_display_font_size"), gui::window::name::font_size);
+        addMenu(utils::translate("app_settings_display_locked_screen"), gui::window::name::locked_screen);
+        addMenu(utils::translate("app_settings_display_keypad_light"), gui::window::name::keypad_light);
+        addMenu(utils::translate("app_settings_display_input_language"), gui::window::name::input_language);
 
         return optionList;
     }

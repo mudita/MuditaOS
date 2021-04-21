@@ -45,14 +45,14 @@ namespace app::notes
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_notes_title_main"));
+        setTitle(utils::translate("app_notes_title_main"));
 
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(::style::strings::common::options));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(::style::strings::common::options));
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(::style::strings::common::open));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::open));
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
 
         namespace windowStyle = app::notes::style::main_window;
         leftArrowImage        = new gui::Image(this,
@@ -103,7 +103,7 @@ namespace app::notes
                                       ::style::window_width,
                                       ::style::window_height - ::style::header::height - ::style::footer::height,
                                       "phonebook_empty_grey_circle_W_G",
-                                      utils::localize.get("app_notes_no_notes"));
+                                      utils::translate("app_notes_no_notes"));
         emptyListIcon->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {
             onEmptyList();
             return true;

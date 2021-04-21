@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
+#include <map>
 
 #include "service-db/SettingsMessages.hpp"
 

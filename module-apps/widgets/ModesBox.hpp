@@ -82,6 +82,6 @@ namespace gui
 
       public:
         ModesBox(Item *parent = nullptr, uint32_t x = 0, uint32_t y = 0);
-        void update(const sys::phone_modes::PhoneMode &phoneMode);
+        void update(const sys::phone_modes::PhoneMode &phoneMode, const bool flightMode);
     };
 } // namespace gui

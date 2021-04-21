@@ -14,11 +14,11 @@ SARInfoRepository::SARInfoRepository(std::filesystem::path certificationInfoPath
 
 std::string SARInfoRepository::getSarInfoText()
 {
-    auto displayLanguageName = utils::localize.getDisplayLanguage();
+    const auto &displayLanguageName = utils::getDisplayLanguage();
     auto sarInfoFile         = std::ifstream(certificationInfoPath / displayLanguageName / fileName);
 
     if (!sarInfoFile.is_open()) {
-        sarInfoFile.open(certificationInfoPath / utils::i18n::DefaultLanguage / fileName);
+        sarInfoFile.open(certificationInfoPath / utils::getDefaultLanguage() / fileName);
 
         if (!sarInfoFile.is_open()) {
             throw std::runtime_error("SAR info assets are missing in the system!");

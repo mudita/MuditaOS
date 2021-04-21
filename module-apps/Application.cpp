@@ -263,10 +263,10 @@ namespace app
     {
         auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
         if (msg != nullptr) {
-            if (msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate) {
+            if (msg->content == CellularNotificationMessage::Content::SignalStrengthUpdate) {
                 return handleSignalStrengthUpdate(msgl);
             }
-            if (msg->type == CellularNotificationMessage::Type::NetworkStatusUpdate) {
+            if (msg->content == CellularNotificationMessage::Content::NetworkStatusUpdate) {
                 return handleNetworkAccessTechnologyUpdate(msgl);
             }
         }
@@ -708,13 +708,16 @@ namespace app
 
     void Application::handlePhoneModeChanged(sys::phone_modes::PhoneMode mode)
     {
+        auto flightModeSetting = settings->getValue(settings::Cellular::offlineMode, settings::SettingsScope::Global);
+        bool flightMode        = flightModeSetting == "1" ? true : false;
+
         using namespace gui::popup;
         const auto &popupName = resolveWindowName(gui::popup::ID::PhoneModes);
         if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
-            updateWindow(popupName, std::make_unique<gui::ModesPopupData>(mode));
+            updateWindow(popupName, std::make_unique<gui::ModesPopupData>(mode, flightMode));
         }
         else {
-            switchWindow(popupName, std::make_unique<gui::ModesPopupData>(mode));
+            switchWindow(popupName, std::make_unique<gui::ModesPopupData>(mode, flightMode));
         }
     }
 

@@ -13,7 +13,7 @@ calc::InputProcessorText::InputProcessorText(gsl::strict_not_null<gui::Text *> i
 
 bool calc::InputProcessorText::handle(const gui::InputEvent &event)
 {
-    if (clearInput) {
+    if (clearInput || inputContainsExponent()) {
         clear();
     }
 
@@ -61,7 +61,7 @@ bool calc::InputProcessorText::handle(const gui::InputEvent &event)
 
     if (event.keyCode == gui::KeyCode::KEY_LF) {
         if (!isPreviousNumberDecimal()) {
-            writeEquation(lastCharIsSymbol, utils::localize.get("app_calculator_decimal_separator"));
+            writeEquation(lastCharIsSymbol, utils::translate("app_calculator_decimal_separator"));
         }
         return true;
     }
@@ -138,7 +138,7 @@ bool calc::InputProcessorText::isPreviousNumberDecimal() const
         else {
             lastNumber = input.substr(*it, std::string::npos);
         }
-        return lastNumber.find(utils::localize.get("app_calculator_decimal_separator")) != std::string::npos;
+        return lastNumber.find(utils::translate("app_calculator_decimal_separator")) != std::string::npos;
     }
     return false;
 }
@@ -149,7 +149,7 @@ bool calc::InputProcessorText::decimalLimitReached() const
         return false;
 
     const auto &txt          = std::string{inputField->getText()};
-    const auto separator_pos = txt.find_last_of(utils::localize.get("app_calculator_decimal_separator"));
+    const auto separator_pos = txt.find_last_of(utils::translate("app_calculator_decimal_separator"));
 
     if ((txt.size() - separator_pos) > DecimalDigitsLimit)
         return true;
@@ -157,7 +157,12 @@ bool calc::InputProcessorText::decimalLimitReached() const
     return false;
 }
 
-std::uint32_t calc::InputProcessorText::getPenultimate()
+bool calc::InputProcessorText::inputContainsExponent() const
+{
+    return std::string{inputField->getText()}.find('e') != std::string::npos;
+}
+
+std::uint32_t calc::InputProcessorText::getPenultimate() const
 {
     const auto &text = inputField->getText();
     const auto len   = text.length();

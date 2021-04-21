@@ -28,12 +28,12 @@ namespace gui::top_bar
 
     void BatteryText::showBatteryCharging()
     {
-        label->setText(utils::localize.get("topbar_battery_charging"));
+        label->setText(utils::translate("topbar_battery_charging"));
     }
 
     void BatteryText::showBatteryChargingDone()
     {
-        label->setText(utils::localize.get("topbar_battery_plugged"));
+        label->setText(utils::translate("topbar_battery_plugged"));
     }
 
 } // namespace gui::top_bar

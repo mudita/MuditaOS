@@ -9,6 +9,6 @@ namespace gui
 {
     MessageSoundWindow::MessageSoundWindow(app::Application *app) : BaseSettingsWindow(app, window::name::message_sound)
     {
-        setTitle(utils::localize.get("app_settings_message_sound"));
+        setTitle(utils::translate("app_settings_message_sound"));
     }
 } // namespace gui

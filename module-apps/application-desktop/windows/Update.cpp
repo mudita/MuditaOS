@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "log/log.hpp"
@@ -46,8 +46,8 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::confirm));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         // title label
         titleLabel = new gui::Label(this, 0, 60, 480, 40);
@@ -56,7 +56,7 @@ namespace gui
         titleLabel->setFont(style::header::font::title);
         titleLabel->setEdges(RectangleEdge::None);
         titleLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        titleLabel->setText(utils::localize.get("app_desktop_update"));
+        titleLabel->setText(utils::translate("app_desktop_update"));
 
         // Update version information
         updateVersionInfo = new gui::Label(this, 10, 132, 480, 40);
@@ -66,7 +66,7 @@ namespace gui
         updateVersionInfo->setEdges(RectangleEdge::None);
         updateVersionInfo->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-        updateVersionInfo->setText(utils::localize.get("app_desktop_update"));
+        updateVersionInfo->setText(utils::translate("app_desktop_update"));
 
         // Update details
         updateDetails = new gui::Label(this, 40, 172, 440, 40);
@@ -75,7 +75,7 @@ namespace gui
         updateDetails->setFont(style::window::font::verysmall);
         updateDetails->setEdges(RectangleEdge::None);
         updateDetails->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-        updateDetails->setText(utils::localize.get("app_desktop_update"));
+        updateDetails->setText(utils::translate("app_desktop_update"));
 
         // Current version information
         currentVersionInfo = new gui::Label(this, 10, 222, 480, 40);
@@ -85,7 +85,7 @@ namespace gui
         currentVersionInfo->setEdges(RectangleEdge::None);
         currentVersionInfo->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Top));
-        currentVersionInfo->setText(utils::localize.get("app_desktop_update_current"));
+        currentVersionInfo->setText(utils::translate("app_desktop_update_current"));
 
         // Label Info
         infoLabel = new gui::Label(this, 20, 304, 440, 40);
@@ -93,7 +93,7 @@ namespace gui
         infoLabel->setBorderColor(gui::ColorNoColor);
         infoLabel->setFont(style::window::font::medium);
         infoLabel->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
-        infoLabel->setText(utils::localize.get("app_desktop_update_apply"));
+        infoLabel->setText(utils::translate("app_desktop_update_apply"));
 
         // Details during update
         detailLabel = new gui::Label(this, 20, 354, 440, 20);
@@ -126,8 +126,8 @@ namespace gui
             selectionLabels.push_back(label);
             pinLabelX += 193;
         }
-        selectionLabels[0]->setText(utils::localize.get(style::strings::common::no));
-        selectionLabels[1]->setText(utils::localize.get(style::strings::common::yes));
+        selectionLabels[0]->setText(utils::translate(style::strings::common::no));
+        selectionLabels[1]->setText(utils::translate(style::strings::common::yes));
 
         // define navigation between labels
         selectionLabels[0]->setNavigationItem(NavigationDirection::LEFT, selectionLabels[1]);
@@ -174,7 +174,7 @@ namespace gui
                 currentVersion << GIT_REV;
                 currentVersion << ")";
 
-                updateVersion << utils::localize.get("app_desktop_update_to");
+                updateVersion << utils::translate("app_desktop_update_to");
                 updateVersion << ": ";
                 updateVersion << msg.updateStats.versionInformation[boot::json::os_version][boot::json::version_string]
                                      .string_value();
@@ -183,7 +183,7 @@ namespace gui
                                      .string_value();
                 updateVersion << ")";
 
-                updateFileDetails << utils::localize.get("app_desktop_update_size");
+                updateFileDetails << utils::translate("app_desktop_update_size");
                 updateFileDetails << ": ";
                 updateFileDetails << std::to_string(msg.updateStats.totalBytes / 1024);
                 updateFileDetails << "Kb (";
@@ -225,7 +225,7 @@ namespace gui
                 selectionLabels[1]->setVisible(false);
 
                 percentLabel->setVisible(true);
-                percentLabel->setText(utils::localize.get("app_desktop_update_start"));
+                percentLabel->setText(utils::translate("app_desktop_update_start"));
                 auto msgToSend = std::make_shared<sdesktop::UpdateOsMessage>(updateFile.c_str(), 0);
                 application->bus.sendUnicast(msgToSend, service::name::service_desktop);
 
@@ -251,7 +251,7 @@ namespace gui
                     static_cast<int>((static_cast<float>(item->getUpdateOsMessage().updateStats.currentExtractedBytes) /
                                       static_cast<float>(item->getUpdateOsMessage().updateStats.totalBytes)) *
                                      100.0);
-                ssi << utils::localize.get("app_desktop_update_unpacking");
+                ssi << utils::translate("app_desktop_update_unpacking");
                 ssi << ": ";
                 ssi << std::to_string(progressPercent);
                 ssi << " %";
@@ -262,11 +262,11 @@ namespace gui
                 percentLabel->setText(item->getUpdateOsMessage().updateStats.messageText);
             }
 
-            sizeStream << utils::localize.get("app_desktop_update_size");
+            sizeStream << utils::translate("app_desktop_update_size");
             sizeStream << ": ";
             sizeStream << std::to_string(item->getUpdateOsMessage().updateStats.fileExtractedSize);
             sizeStream << " ";
-            sizeStream << utils::localize.get("app_desktop_update_bytes");
+            sizeStream << utils::translate("app_desktop_update_bytes");
             detailLabel->setText(sizeStream.str());
             this->application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }

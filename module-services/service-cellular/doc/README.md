@@ -64,11 +64,17 @@ Do not Disturb
 Offline mode
 * modem is disconnected from the GSM network, both calls and messages are rejected
 
-| | Connected | Do not Disturb | Offline |
-| ----------- | --------- | -------------- | ------- |
-|Incoming calls| Allowed | Rejected | Not allowed |
-|Outgoing calls| Allowed | Allowed | Not allowed |
-|Incoming messages| Allowed | Allowed | Not allowed |
-|Outgoing messages| Allowed | Allowed | Not allowed |
+Messages only mode
+* modem is disconnected from the GSM network, calls are rejected, sending messages is rejected
+* phone is connecting to the GSM network in selected by settings period to fetch incoming messages
+
+| | Connected | Do not Disturb | Offline | Message only |
+| ----------- | --------- | -------------- | ------- | ------- |
+|Incoming calls| Allowed | Rejected | Not allowed | Rejected |
+|Outgoing calls| Allowed | Allowed | Not allowed | Rejected |
+|Incoming messages| Allowed | Allowed | Not allowed | Rejected |
+|Outgoing messages| Allowed | Allowed | Not allowed | Partially allowed |
 
 ![](phone_modes.svg)
+
+![](connection_manager.svg)

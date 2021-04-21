@@ -21,7 +21,7 @@ namespace gui
         isAutoLightSwitchOn    = values.mode == screen_light_control::ScreenLightMode::Automatic;
         brightnessValue        = values.parameters.manualModeBrightness;
 
-        setTitle(utils::localize.get("app_settings_display_display_light"));
+        setTitle(utils::translate("app_settings_display_display_light"));
 
         screenLightSettings->setBrightnessFunction();
 
@@ -72,7 +72,7 @@ namespace gui
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
+                        this->setBottomBarText(utils::translate(style::strings::common::Switch),
                                                BottomBar::Side::CENTER);
                     }
                     return true;
@@ -91,9 +91,9 @@ namespace gui
                 text, nullptr, nullptr, this, gui::option::SettingRightItem::Disabled));
         };
 
-        addOnOffOoption(utils::translateI18("app_settings_display_light_main"), isDisplayLightSwitchOn);
+        addOnOffOoption(utils::translate("app_settings_display_light_main"), isDisplayLightSwitchOn);
         if (isDisplayLightSwitchOn) {
-            addOnOffOoption(utils::translateI18("app_settings_display_light_auto"), isAutoLightSwitchOn);
+            addOnOffOoption(utils::translate("app_settings_display_light_auto"), isAutoLightSwitchOn);
         }
 
         if (isDisplayLightSwitchOn && !isAutoLightSwitchOn) {
@@ -115,13 +115,13 @@ namespace gui
 
         auto setBottomBarOnSpinnerFocus = [&](gui::Item &item) {
             if (item.focus) {
-                setBottomBarText(utils::translateI18(style::strings::common::set), BottomBar::Side::CENTER);
+                setBottomBarText(utils::translate(style::strings::common::set), BottomBar::Side::CENTER);
             }
             return true;
         };
 
         auto spinner = std::make_unique<gui::SpinBoxOptionSettings>(
-            utils::translateI18("app_settings_display_light_brightness"),
+            utils::translate("app_settings_display_light_brightness"),
             std::ceil(brightnessValue / brightnessStep),
             std::ceil(screen_light_control::Parameters::MAX_BRIGHTNESS / brightnessStep),
             setBrightness,

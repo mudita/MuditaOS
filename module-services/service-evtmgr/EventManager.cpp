@@ -170,27 +170,27 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         return msg;
     }
     else if (msgl->messageType == MessageType::EVMModemStatus) {
-        auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl);
-        if (msg != nullptr) {
+        if (auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl)) {
             auto message   = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMModemStatus);
             message->state = msg->state;
             bus.sendUnicast(message, "ServiceCellular");
         }
         handled = true;
     }
-    else if (msgl->messageType == MessageType::CellularTimeUpdated) {
-        auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl);
-        if (msg != nullptr) {
-            if (auto time = msg->getTime(); time) {
-                LOG_INFO("RTC set by network time.");
-                bsp::rtc_SetDateTime(&time.value());
+    else if (auto msg = dynamic_cast<CellularMessage *>(msgl)) {
+        if (msg->type == CellularMessage::Type::TimeUpdated) {
+            if (auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl)) {
+                if (auto time = msg->getTime(); time) {
+                    LOG_INFO("RTC set by network time.");
+                    bsp::rtc_SetDateTime(&time.value());
+                }
+                if (auto timeZoneOffset = msg->getTimeZoneOffset(); timeZoneOffset) {
+                    setSettingsTimeZone(msg->getTimeZoneString().value());
+                    utils::time::Time::setTimeZoneOffset(msg->getTimeZoneOffset().value());
+                }
+                auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
+                bus.sendMulticast(notification, sys::BusChannel::ServiceEvtmgrNotifications);
             }
-            if (auto timeZoneOffset = msg->getTimeZoneOffset(); timeZoneOffset) {
-                setSettingsTimeZone(msg->getTimeZoneString().value());
-                utils::time::Time::setTimeZoneOffset(msg->getTimeZoneOffset().value());
-            }
-            auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
-            bus.sendMulticast(notification, sys::BusChannel::ServiceEvtmgrNotifications);
         }
     }
     else if (msgl->messageType == MessageType::EVMRingIndicator) {

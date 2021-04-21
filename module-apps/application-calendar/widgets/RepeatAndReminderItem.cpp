@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RepeatAndReminderItem.hpp"
@@ -100,18 +100,18 @@ namespace gui
 
     void RepeatAndReminderItem::descriptionHandler()
     {
-        repeatTitle->setText(utils::localize.get("app_calendar_event_detail_repeat"));
-        reminderTitle->setText(utils::localize.get("app_calendar_event_detail_reminder"));
+        repeatTitle->setText(utils::translate("app_calendar_event_detail_repeat"));
+        reminderTitle->setText(utils::translate("app_calendar_event_detail_reminder"));
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
             if (event->repeat > app::ApplicationCalendar::repeatOptions.size()) {
                 repeat->setText(CustomRepeatValueParser(event->repeat).getWeekDaysText());
             }
             else {
-                repeat->setText(utils::localize.get(
-                    app::ApplicationCalendar::repeatOptions.at(static_cast<Repeat>(event->repeat))));
+                repeat->setText(
+                    utils::translate(app::ApplicationCalendar::repeatOptions.at(static_cast<Repeat>(event->repeat))));
             }
-            reminder->setText(utils::localize.get(
-                app::ApplicationCalendar::reminderOptions.at(static_cast<Reminder>(event->reminder))));
+            reminder->setText(
+                utils::translate(app::ApplicationCalendar::reminderOptions.at(static_cast<Reminder>(event->reminder))));
         };
     }
 

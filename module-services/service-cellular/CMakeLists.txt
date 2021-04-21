@@ -14,6 +14,8 @@ set(SOURCES
     QMBNManager.cpp
     RequestFactory.cpp
     CellularRequestHandler.cpp
+    connection-manager/ConnectionManager.cpp
+    connection-manager/ConnectionManagerCellularCommands.cpp
     requests/Request.cpp
     requests/CallRequest.cpp
     requests/SupplementaryServicesRequest.cpp

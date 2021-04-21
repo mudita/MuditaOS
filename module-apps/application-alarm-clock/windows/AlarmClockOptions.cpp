@@ -16,7 +16,7 @@ namespace app::alarmClock
                        std::function<bool(gui::Item &)> onClickCallback,
                        std::list<gui::Option> &options)
         {
-            options.emplace_back(utils::localize.get(translationId), onClickCallback);
+            options.emplace_back(utils::translate(translationId), onClickCallback);
         }
 
         void removeAlarm(const AlarmsRecord &record,
@@ -24,9 +24,9 @@ namespace app::alarmClock
                          AbstractAlarmsRepository &alarmsRepository)
         {
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                gui::DialogMetadata{utils::localize.get("app_alarm_clock_title_main"),
+                gui::DialogMetadata{utils::translate("app_alarm_clock_title_main"),
                                     "phonebook_contact_delete_trashcan",
-                                    utils::localize.get("app_alarm_clock_delete_confirmation"),
+                                    utils::translate("app_alarm_clock_delete_confirmation"),
                                     "",
                                     [record, application, &alarmsRepository] {
                                         alarmsRepository.remove(record, [application](bool) {

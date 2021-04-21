@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -11,7 +11,7 @@ TEST_CASE("Contact Record db tests")
 {
     Database::initialize();
 
-    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
     if (std::filesystem::exists(contactsPath)) {
         REQUIRE(std::filesystem::remove(contactsPath));
     }
@@ -192,7 +192,7 @@ TEST_CASE("Test contact name formatting")
     REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberFormattedTest);
     REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::NotUseNumber) == "");
     REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
-            utils::localize.get("app_phonebook_contact_no_name"));
+            utils::translate("app_phonebook_contact_no_name"));
 
     testRecord.numbers.clear();
     testRecord.numbers = std::vector<ContactRecord::Number>({
@@ -204,16 +204,16 @@ TEST_CASE("Test contact name formatting")
     REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) == numberFormattedTest);
     REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::NotUseNumber) == "");
     REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
-            utils::localize.get("app_phonebook_contact_no_name"));
+            utils::translate("app_phonebook_contact_no_name"));
 
     testRecord.numbers.clear();
 
     REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Default) == "");
     REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::List) ==
-            utils::localize.get("app_phonebook_contact_no_name"));
+            utils::translate("app_phonebook_contact_no_name"));
     REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::NotUseNumber) == "");
     REQUIRE(testRecord.getFormattedName(ContactRecord::NameFormatType::Title) ==
-            utils::localize.get("app_phonebook_contact_no_name"));
+            utils::translate("app_phonebook_contact_no_name"));
 }
 
 TEST_CASE("Test converting contact data to string")
@@ -262,7 +262,7 @@ TEST_CASE("Test converting contact data to string")
 TEST_CASE("Contact record numbers update")
 {
     Database::initialize();
-    const auto contactsPath = (std::filesystem::path{"user"} / "contacts.db");
+    const auto contactsPath = (std::filesystem::path{"sys/user"} / "contacts.db");
     if (std::filesystem::exists(contactsPath)) {
         REQUIRE(std::filesystem::remove(contactsPath));
     }

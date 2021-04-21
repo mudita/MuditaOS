@@ -100,9 +100,13 @@ namespace app
                                                    StartInBackground startInBackground)
         : Application(std::move(name), std::move(parent), mode, startInBackground), AsyncCallbackReceiver{this}
     {
+        CellularServiceAPI::SubscribeForOwnNumber(this, [&](const std::string &number) {
+            selectedSimNumber = number;
+            LOG_DEBUG("Sim number changed: %s", selectedSimNumber.c_str());
+        });
         if ((Store::GSM::SIM::SIM1 == selectedSim || Store::GSM::SIM::SIM2 == selectedSim) &&
             Store::GSM::get()->sim == selectedSim) {
-            selectedSimNumber = CellularServiceAPI::GetOwnNumber(this);
+            CellularServiceAPI::RequestForOwnNumber(this);
         }
     }
 
@@ -122,10 +126,10 @@ namespace app
 
         if (auto phoneMsg = dynamic_cast<CellularNotificationMessage *>(msgl); nullptr != phoneMsg) {
             selectedSim = Store::GSM::get()->selected;
-            if (CellularNotificationMessage::Type::SIM_READY == phoneMsg->type) {
-                selectedSimNumber = CellularServiceAPI::GetOwnNumber(this);
+            if (CellularNotificationMessage::Content::SIM_READY == phoneMsg->content) {
+                CellularServiceAPI::RequestForOwnNumber(this);
             }
-            else if (CellularNotificationMessage::Type::SIM_NOT_READY == phoneMsg->type) {
+            else if (CellularNotificationMessage::Content::SIM_NOT_READY == phoneMsg->content) {
                 selectedSimNumber = {};
             }
             auto currentWindow = getCurrentWindow();
@@ -207,9 +211,9 @@ namespace app
             switchWindow(gui::window::name::dialog_retry,
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(
-                             gui::DialogMetadata{utils::localize.get("app_settings_bt"),
+                             gui::DialogMetadata{utils::translate("app_settings_bt"),
                                                  "info_big_circle_W_G",
-                                                 utils::localize.get("app_settings_bluetooth_pairing_error_message"),
+                                                 utils::translate("app_settings_bluetooth_pairing_error_message"),
                                                  "",
                                                  [=]() -> bool {
                                                      bus.sendUnicast(std::make_shared<BluetoothPairMessage>(addr),
@@ -237,9 +241,9 @@ namespace app
             switchWindow(gui::window::name::dialog_retry,
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(
-                             gui::DialogMetadata{utils::localize.get("app_settings_bt"),
+                             gui::DialogMetadata{utils::translate("app_settings_bt"),
                                                  "info_big_circle_W_G",
-                                                 utils::localize.get("app_settings_bluetooth_unpairing_error_message"),
+                                                 utils::translate("app_settings_bluetooth_unpairing_error_message"),
                                                  "",
                                                  [=]() -> bool {
                                                      bus.sendUnicast(std::make_shared<message::bluetooth::Unpair>(addr),
@@ -261,9 +265,9 @@ namespace app
             switchWindow(gui::window::name::dialog_retry,
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
-                             utils::localize.get("app_settings_bt"),
+                             utils::translate("app_settings_bt"),
                              "info_big_circle_W_G",
-                             utils::localize.get("app_settings_bluetooth_connecting_error_message"),
+                             utils::translate("app_settings_bluetooth_connecting_error_message"),
                              "",
                              [=]() -> bool {
                                  bus.sendUnicast(std::make_shared<message::bluetooth::Connect>(addr),
@@ -283,9 +287,9 @@ namespace app
             switchWindow(gui::window::name::dialog_confirm,
                          gui::ShowMode::GUI_SHOW_INIT,
                          std::make_unique<gui::DialogMetadataMessage>(
-                             gui::DialogMetadata{utils::localize.get("app_settings_bt"),
+                             gui::DialogMetadata{utils::translate("app_settings_bt"),
                                                  "info_big_circle_W_G",
-                                                 utils::localize.get("app_settings_bluetooth_init_error_message"),
+                                                 utils::translate("app_settings_bluetooth_init_error_message"),
                                                  "",
                                                  [=]() -> bool {
                                                      switchWindow(gui::window::name::bluetooth);
@@ -371,7 +375,7 @@ namespace app
     {
         windowsFactory.attach(gui::name::window::main_window, [](Application *app, const std::string &name) {
             return std::make_unique<gui::OptionWindow>(
-                app, utils::localize.get("app_settings_title_main_new"), mainWindowOptionsNew(app));
+                app, utils::translate("app_settings_title_main_new"), mainWindowOptionsNew(app));
         });
         windowsFactory.attach(gui::window::name::bluetooth, [](Application *app, const std::string &name) {
             return std::make_unique<gui::BluetoothWindow>(app);
@@ -736,7 +740,6 @@ namespace app
     void ApplicationSettingsNew::setConnectionFrequency(uint8_t val) noexcept
     {
         connectionFrequency = val;
-        settings->setValue(
-            ::settings::Offline::connectionFrequency, std::to_string(val), ::settings::SettingsScope::Global);
+        CellularServiceAPI::SetConnectionFrequency(this, val);
     }
 } /* namespace app */

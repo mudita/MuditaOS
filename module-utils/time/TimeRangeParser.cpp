@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeRangeParser.hpp"
@@ -14,9 +14,9 @@ namespace utils::time
     std::string TimeRangeParser::AMPMtoString(bool isAm)
     {
         if (isAm) {
-            return utils::localize.get(utils::time::Locale::getAM());
+            return utils::translate(utils::time::Locale::getAM());
         }
-        return utils::localize.get(utils::time::Locale::getPM());
+        return utils::translate(utils::time::Locale::getPM());
     }
 
     std::string TimeRangeParser::getCalendarTimeString(TimePoint startDate,
@@ -29,7 +29,7 @@ namespace utils::time
 
         if (startTime.hours().count() == 0 && startTime.minutes().count() == 0 && endTime.hours().count() == max_hour &&
             endTime.minutes().count() == max_minutes) {
-            return utils::localize.get("app_calendar_all_day");
+            return utils::translate("app_calendar_all_day");
         }
         else {
             bool startIsAm = true;

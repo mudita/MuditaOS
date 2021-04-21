@@ -47,13 +47,13 @@ void NewEditEventModel::createData(bool allDayEvent)
     assert(app != nullptr);
 
     eventNameInput = new gui::TextWithLabelItem(
-        utils::localize.get("app_calendar_new_edit_event_name"),
+        utils::translate("app_calendar_new_edit_event_name"),
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); },
         [app]() { app->getCurrentWindow()->selectSpecialCharacter(); });
 
     allDayEventCheckBox = new gui::NewEventCheckBoxWithLabel(
-        application, utils::localize.get("app_calendar_new_edit_event_allday"), [this](bool isChecked) {
+        application, utils::translate("app_calendar_new_edit_event_allday"), [this](bool isChecked) {
             isChecked ? createTimeItems() : eraseTimeItems();
             const auto it = std::find(std::begin(internalData), std::end(internalData), allDayEventCheckBox);
             list->rebuildList(gui::listview::RebuildType::OnPageElement, std::distance(std::begin(internalData), it));
@@ -63,13 +63,13 @@ void NewEditEventModel::createData(bool allDayEvent)
 
     reminder = new gui::SeveralOptionsItem(
         application,
-        utils::localize.get("app_calendar_event_detail_reminder"),
+        utils::translate("app_calendar_event_detail_reminder"),
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
     repeat = new gui::SeveralOptionsItem(
         application,
-        utils::localize.get("app_calendar_event_detail_repeat"),
+        utils::translate("app_calendar_event_detail_repeat"),
         [app](const UTF8 &text) { app->getCurrentWindow()->bottomBarTemporaryMode(text, false); },
         [app]() { app->getCurrentWindow()->bottomBarRestoreFromTemporaryMode(); });
 
@@ -196,8 +196,8 @@ void NewEditEventModel::createTimeItems()
         }
     };
 
-    create(startTime, utils::localize.get("app_calendar_new_edit_event_start"), gui::TimeWidget::Type::Start);
-    create(endTime, utils::localize.get("app_calendar_new_edit_event_end"), gui::TimeWidget::Type::End);
+    create(startTime, utils::translate("app_calendar_new_edit_event_start"), gui::TimeWidget::Type::Start);
+    create(endTime, utils::translate("app_calendar_new_edit_event_end"), gui::TimeWidget::Type::End);
 
     startTime->setConnectionToSecondItem(endTime);
     endTime->setConnectionToSecondItem(startTime);

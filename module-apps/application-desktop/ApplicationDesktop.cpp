@@ -187,7 +187,6 @@ namespace app
     }
     ApplicationDesktop::~ApplicationDesktop()
     {
-        LOG_INFO("Desktop destruktor");
     }
 
     // Invoked upon receiving data message
@@ -421,9 +420,9 @@ namespace app
         auto createPinChangedSuccessfullyDialog =
             [](app::ApplicationDesktop *app) -> std::unique_ptr<gui::DialogMetadataMessage> {
             return std::make_unique<gui::DialogMetadataMessage>(
-                gui::DialogMetadata{utils::localize.get("app_desktop_sim_change_pin"),
+                gui::DialogMetadata{utils::translate("app_desktop_sim_change_pin"),
                                     "success_icon_W_G",
-                                    utils::localize.get("app_desktop_sim_pin_changed_successfully"),
+                                    utils::translate("app_desktop_sim_pin_changed_successfully"),
                                     "",
                                     [app]() {
                                         app->switchWindow(app::window::name::desktop_main_window);
@@ -459,8 +458,8 @@ namespace app
                     "",
                     "success_icon_W_G",
                     response->getSimCardLock() == CellularSimCardLockDataMessage::SimCardLock::Unlocked
-                        ? utils::localize.get("app_desktop_sim_card_unlocked")
-                        : utils::localize.get("app_desktop_sim_card_locked"),
+                        ? utils::translate("app_desktop_sim_card_unlocked")
+                        : utils::translate("app_desktop_sim_card_locked"),
                     "",
                     [this]() {
                         switchWindow(app::window::name::desktop_main_window);
@@ -478,11 +477,20 @@ namespace app
             std::make_shared<sdesktop::UpdateOsMessage>(updateos::UpdateMessageType::UpdateCheckForUpdateOnce);
         bus.sendUnicast(msgToSend, service::name::service_desktop);
 
+        auto selectedSim = magic_enum::enum_cast<Store::GSM::SIM>(
+            settings->getValue(settings::SystemProperties::activeSim, settings::SettingsScope::Global));
+        if (selectedSim.has_value()) {
+            Store::GSM::get()->selected = selectedSim.value();
+        }
+        else {
+            Store::GSM::get()->selected = Store::GSM::SIM::NONE;
+        }
+
         settings->registerValueChange(
             settings::SystemProperties::activeSim,
             [this](const std::string &value) { activeSimChanged(value); },
             settings::SettingsScope::Global);
-        Store::GSM::get()->selected = Store::GSM::SIM::NONE;
+
         settings->registerValueChange(
             settings::SystemProperties::lockPassHash,
             [this](const std::string &value) { lockPassHashChanged(value); },

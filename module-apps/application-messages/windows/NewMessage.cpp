@@ -166,7 +166,7 @@ namespace gui
         if (getFocusItem() == recipient) {
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             if (recipient->getText().empty()) {
-                bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
+                bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
                 return;
             }
             bottomBar->setActive(BottomBar::Side::CENTER, false);
@@ -177,17 +177,17 @@ namespace gui
     {
         namespace msgStyle = style::messages::newMessage;
         AppWindow::buildInterface();
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("sms_title_message"));
+        setTitle(utils::translate("sms_title_message"));
 
         const uint32_t w = this->getWidth() - style::window::default_left_margin - style::window::default_right_margin;
         const uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
         body             = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
 
         auto recipientLabel = new Label(body, 0, 0, body->getWidth(), msgStyle::recipientLabel::h);
-        recipientLabel->setText(utils::localize.get("sms_add_rec_num"));
+        recipientLabel->setText(utils::translate("sms_add_rec_num"));
         recipientLabel->activeItem = false;
         recipientLabel->setEdges(gui::RectangleEdge::None);
         recipientLabel->setFont(style::window::font::small);
@@ -234,7 +234,7 @@ namespace gui
         img->activeItem = false;
 
         auto labelMessage = new Label(body, 0, 0, body->getWidth(), msgStyle::messageLabel::h);
-        labelMessage->setText(utils::localize.get("app_messages_message"));
+        labelMessage->setText(utils::translate("app_messages_message"));
         labelMessage->activeItem = false;
         labelMessage->setEdges(gui::RectangleEdge::None);
         labelMessage->setFont(style::window::font::small);
@@ -260,7 +260,7 @@ namespace gui
             return true;
         };
         message->focusChangedCallback = [=](Item &) -> bool {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::send));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::send));
             bottomBar->setActive(BottomBar::Side::LEFT, true);
             return true;
         };

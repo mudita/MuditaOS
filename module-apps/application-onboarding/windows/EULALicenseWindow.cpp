@@ -40,7 +40,7 @@ namespace app::onBoarding
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_onboarding_eula_license"));
+        setTitle(utils::translate("app_onboarding_eula_license"));
 
         namespace previewStyle = app::notes::style::preview;
         eulaText               = new gui::Text(
@@ -56,10 +56,10 @@ namespace app::onBoarding
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(::style::strings::common::accept));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::accept));
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(::style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(::style::strings::common::back));
 
         setFocusItem(eulaText);
     }

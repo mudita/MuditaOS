@@ -19,10 +19,10 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_settings_display_wallpaper_quotes_categories"));
+        setTitle(utils::translate("app_settings_display_wallpaper_quotes_categories"));
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::check));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::check));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         list = new gui::ListView(this,
                                  style::quotes::categories::list::X,

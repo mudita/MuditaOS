@@ -71,7 +71,7 @@ namespace gui
             if (item.focus) {
                 descriptionLabel->setFont(style::window::font::mediumbold);
                 auto bottorBarText =
-                    quote.enabled ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
+                    quote.enabled ? utils::translate("common_uncheck") : utils::translate("common_check");
                 this->bottomBarTemporaryMode(bottorBarText);
             }
             else {
@@ -86,8 +86,7 @@ namespace gui
             quote.enabled = !quote.enabled;
             enableQuote(quote.enabled);
             tickImage->showImage(quote.enabled);
-            auto bottorBarText =
-                quote.enabled ? utils::localize.get("common_uncheck") : utils::localize.get("common_check");
+            auto bottorBarText = quote.enabled ? utils::translate("common_uncheck") : utils::translate("common_check");
             this->bottomBarTemporaryMode(bottorBarText);
             hBox->resizeItems();
             return true;

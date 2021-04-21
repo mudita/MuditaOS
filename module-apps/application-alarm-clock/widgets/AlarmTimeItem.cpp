@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmTimeItem.hpp"
@@ -155,17 +155,17 @@ namespace gui
             mode12hInput->setFont(style::window::font::largelight);
             mode12hInput->setPenFocusWidth(style::window::default_border_focus_w);
             mode12hInput->setPenWidth(style::window::default_border_rect_no_focus);
-            mode12hInput->setText(utils::localize.get(utils::time::Locale::getAM()));
+            mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
             mode12hInput->inputCallback = [&](Item &item, const InputEvent &event) {
                 if (event.state != gui::InputEvent::State::keyReleasedShort) {
                     return false;
                 }
                 if (event.keyCode == gui::KeyCode::KEY_LF) {
-                    if (mode12hInput->getText() == utils::localize.get(utils::time::Locale::getAM())) {
-                        mode12hInput->setText(utils::localize.get(utils::time::Locale::getPM()));
+                    if (mode12hInput->getText() == utils::translate(utils::time::Locale::getAM())) {
+                        mode12hInput->setText(utils::translate(utils::time::Locale::getPM()));
                     }
                     else {
-                        mode12hInput->setText(utils::localize.get(utils::time::Locale::getAM()));
+                        mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
                     }
                     return true;
                 }
@@ -173,7 +173,7 @@ namespace gui
             };
             mode12hInput->focusChangedCallback = [&](Item &item) {
                 if (item.focus) {
-                    bottomBarTemporaryMode(utils::localize.get("common_switch"));
+                    bottomBarTemporaryMode(utils::translate("common_switch"));
                 }
                 else {
                     bottomBarRestoreFromTemporaryMode();
@@ -190,10 +190,10 @@ namespace gui
                 hourInput->setText(TimePointToHourString12H(alarm->time));
                 minuteInput->setText(TimePointToMinutesString(alarm->time));
                 if (date::is_am(TimePointToHourMinSec(alarm->time).hours())) {
-                    mode12hInput->setText(utils::localize.get(utils::time::Locale::getAM()));
+                    mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
                 }
                 else {
-                    mode12hInput->setText(utils::localize.get(utils::time::Locale::getPM()));
+                    mode12hInput->setText(utils::translate(utils::time::Locale::getPM()));
                 }
             };
         }
@@ -210,7 +210,7 @@ namespace gui
 
     bool AlarmTimeItem::isPm(const std::string &text) const
     {
-        return !(text == utils::localize.get(utils::time::Locale::getAM()));
+        return !(text == utils::translate(utils::time::Locale::getAM()));
     }
 
     void AlarmTimeItem::validateHour()
