@@ -67,7 +67,7 @@ namespace gui
         }
     }
 
-    void VolumeWindow::showProperText(const AudioContext &audioContext, const audio::Volume volume) noexcept
+    void VolumeWindow::showProperText(const audio::Context &audioContext, const audio::Volume volume) noexcept
     {
         volumeText->setText(utils::translate(style::window::volume::base_title_key));
         const auto [profileType, playbackType] = audioContext;

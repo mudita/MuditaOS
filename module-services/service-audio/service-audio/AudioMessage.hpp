@@ -6,6 +6,10 @@
 #include <Audio/AudioCommon.hpp>
 #include <Audio/decoder/Decoder.hpp>
 #include <MessageType.hpp>
+#include <service-appmgr/service-appmgr/messages/ActionRequest.hpp>
+#include <module-services/service-appmgr/service-appmgr/Actions.hpp>
+#include <module-apps/popups/data/PopupRequestParams.hpp>
+
 #include <Service/Message.hpp>
 
 #include <memory>
@@ -251,24 +255,22 @@ class AudioKeyPressedRequest : public AudioMessage
     const int step{};
 };
 
-class AudioKeyPressedResponse : public sys::DataMessage
+class VolumeChanged : public sys::DataMessage, public app::manager::actions::ConvertibleToAction
 {
   public:
-    enum class ShowPopup : bool
-    {
-        True,
-        False
-    };
-    AudioKeyPressedResponse(audio::RetCode retCode,
-                            const audio::Volume &volume,
-                            const ShowPopup showPopup,
-                            const std::pair<audio::Profile::Type, audio::PlaybackType> &context)
-        : sys::DataMessage(MessageType::AudioMessage), volume(volume), showPopup(showPopup), context(context)
+    VolumeChanged(audio::Volume volume, audio::Context context)
+        : sys::DataMessage{MessageType::MessageTypeUninitialized}, volume{volume}, context{context}
     {}
 
-    const audio::Volume volume{};
-    const ShowPopup showPopup = ShowPopup::False;
-    std::pair<audio::Profile::Type, audio::PlaybackType> context;
+    [[nodiscard]] auto toAction() const -> std::unique_ptr<app::manager::ActionRequest> override
+    {
+        return std::make_unique<app::manager::ActionRequest>(
+            sender, app::manager::actions::ShowPopup, std::make_unique<gui::VolumePopupRequestParams>(volume, context));
+    }
+
+  private:
+    const audio::Volume volume;
+    audio::Context context;
 };
 
 class BluetoothDeviceVolumeChanged : public AudioMessage

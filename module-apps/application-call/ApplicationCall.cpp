@@ -89,6 +89,9 @@ namespace app
 
     bool ApplicationCall::isPopupPermitted(gui::popup::ID popupId) const
     {
+        if (popupId == gui::popup::ID::Volume) {
+            return true;
+        }
         return getState() == call::State::IDLE;
     }
 

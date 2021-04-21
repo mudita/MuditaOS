@@ -7,6 +7,7 @@
 #include <Audio/Operation/IdleOperation.hpp>
 #include <Audio/Operation/PlaybackOperation.hpp>
 #include <Bluetooth/audio/BluetoothAudioDevice.hpp>
+#include <module-audio/Audio/VolumeScaler.hpp>
 #include <service-bluetooth/Constants.hpp>
 #include <service-bluetooth/ServiceBluetoothCommon.hpp>
 #include <service-bluetooth/BluetoothMessage.hpp>
@@ -453,7 +454,7 @@ void ServiceAudio::HandleNotification(const AudioNotificationMessage::Type &type
     }
 }
 
-auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyPressedResponse>
+auto ServiceAudio::HandleKeyPressed(const int step) -> sys::MessagePointer
 {
     auto context = getCurrentContext();
 
@@ -464,12 +465,10 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyP
         // active system sounds can be only muted, no volume control is possible
         if (step < 0) {
             MuteCurrentOperation();
-            return std::make_unique<AudioKeyPressedResponse>(
-                audio::RetCode::Success, 0, AudioKeyPressedResponse::ShowPopup::False, context);
+            return sys::msgHandled();
         }
         else {
-            return std::make_unique<AudioKeyPressedResponse>(
-                audio::RetCode::Success, currentVolume, AudioKeyPressedResponse::ShowPopup::False, context);
+            return sys::msgHandled();
         }
     }
 
@@ -484,8 +483,8 @@ auto ServiceAudio::HandleKeyPressed(const int step) -> std::unique_ptr<AudioKeyP
         // update volume of currently active sound
         setSetting(Setting::Volume, std::to_string(newVolume));
     }
-    return std::make_unique<AudioKeyPressedResponse>(
-        audio::RetCode::Success, newVolume, AudioKeyPressedResponse::ShowPopup::True, context);
+    bus.sendMulticast(std::make_unique<VolumeChanged>(newVolume, context), sys::BusChannel::ServiceAudioNotifications);
+    return sys::msgHandled();
 }
 
 void ServiceAudio::MuteCurrentOperation()
@@ -509,7 +508,7 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
 {
     sys::MessagePointer responseMsg;
     const auto isBusy = IsBusy();
-    auto &msgType = typeid(*msgl);
+    auto &msgType     = typeid(*msgl);
 
     if (msgType == typeid(AudioNotificationMessage)) {
         auto *msg = static_cast<AudioNotificationMessage *>(msgl);
@@ -689,7 +688,7 @@ void ServiceAudio::setSetting(const Setting &setting,
     }
 }
 
-const std::pair<audio::Profile::Type, audio::PlaybackType> ServiceAudio::getCurrentContext()
+const audio::Context ServiceAudio::getCurrentContext()
 {
     const auto activeInput = audioMux.GetActiveInput();
     if (!activeInput.has_value()) {
@@ -715,7 +714,12 @@ void ServiceAudio::settingsChanged(const std::string &name, std::string value)
 }
 auto ServiceAudio::handleVolumeChangedOnBluetoothDevice(sys::Message *msgl) -> sys::MessagePointer
 {
-    auto *msg = static_cast<BluetoothDeviceVolumeChanged *>(msgl);
-    LOG_WARN("Volume chnged on bt device to %u. Handler to be done", msg->getVolume());
+    auto *msg                              = static_cast<BluetoothDeviceVolumeChanged *>(msgl);
+    const auto volume                      = volume::scaler::toSystemVolume(msg->getVolume());
+    const auto [profileType, playbackType] = getCurrentContext();
+    settingsProvider->setValue(dbPath(Setting::Volume, playbackType, profileType), std::to_string(volume));
+    settingsCache[dbPath(Setting::Volume, playbackType, profileType)] = std::to_string(volume);
+    bus.sendMulticast(std::make_unique<VolumeChanged>(volume, std::make_pair(profileType, playbackType)),
+                      sys::BusChannel::ServiceAudioNotifications);
     return sys::msgHandled();
 }

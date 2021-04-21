@@ -208,7 +208,7 @@ namespace AudioServiceAPI
      * @param serv - requesting service.
      * @param step - step that will be added to current volume.
      * @return True if request has been sent successfully, false otherwise
-     * @note Response will come as message AudioKeyPressedResponse
+     * @note If volume popup should be shown then Application Manager is informed.
      */
     bool KeyPressed(sys::Service *serv, const int step);
 

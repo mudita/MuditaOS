@@ -27,6 +27,7 @@
 #include <service-gui/Common.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-appmgr/StartupType.hpp>
+#include <module-services/service-audio/service-audio/AudioMessage.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -137,6 +138,7 @@ namespace app::manager
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, timerBlock, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
         bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
         registerMessageHandlers();
     }
 
@@ -402,6 +404,7 @@ namespace app::manager
         connect(typeid(sys::TetheringQuestionRequest), convertibleToActionHandler);
         connect(typeid(sys::TetheringQuestionAbort), convertibleToActionHandler);
         connect(typeid(sys::TetheringPhoneModeChangeProhibitedMessage), convertibleToActionHandler);
+        connect(typeid(VolumeChanged), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
