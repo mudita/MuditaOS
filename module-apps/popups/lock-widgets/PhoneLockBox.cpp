@@ -21,7 +21,7 @@ namespace gui
         LockWindow->setBottomBarWidgetsActive(false, true, false);
     }
 
-    void PhoneLockBox::setVisibleStateEnterPin(EnterPasscodeType type)
+    void PhoneLockBox::setVisibleStateInputRequired(InputActionType type)
     {
         LockWindow->pinLabelsBox->setVisible(true);
         LockWindow->setText("app_desktop_screen_enter_passcode_to_unlock", LockWindow::TextType::Primary, true);
@@ -29,10 +29,10 @@ namespace gui
         LockWindow->setBottomBarWidgetsActive(false, false, true);
     }
 
-    void PhoneLockBox::setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value)
+    void PhoneLockBox::setVisibleStateInputInvalid(InputErrorType type, unsigned int value)
     {
         switch (type) {
-        case PinLockBox::PasscodeErrorType::InvalidPasscode:
+        case LockBox::InputErrorType::InvalidInput:
             LockWindow->setTitleBar(false, false);
             if (value == 1) {
                 LockWindow->setText(
@@ -50,10 +50,10 @@ namespace gui
             }
             break;
 
-        case PinLockBox::PasscodeErrorType::NewPasscodeConfirmFailed:
+        case LockBox::InputErrorType::NewInputConfirmFailed:
             LOG_ERROR("No use case for NewPasscodeConfirmFailed");
             break;
-        case PinLockBox::PasscodeErrorType::UnhandledError:
+        case LockBox::InputErrorType::UnhandledError:
             LOG_ERROR("No use case for UnhandledError");
             break;
         }

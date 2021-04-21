@@ -98,10 +98,10 @@ namespace gui
             return true;
         }
         // back not allowed on blocked screen // TODO może lepiej sprawdzić czy zablokowane ogólnie?
-        //        else if (inputEvent.is(KeyCode::KEY_RF)) {
-        //            application->switchWindow(gui::popup::window::phone_lock_info_window);
-        //            return true;
-        //        }
+        else if (inputEvent.is(KeyCode::KEY_RF)) {
+            application->switchWindow(gui::popup::window::phone_lock_info_window);
+            return true;
+        }
         // check if any of the lower inheritance onInput methods catch the event
         else if (AppWindow::onInput(inputEvent)) {
             return true;

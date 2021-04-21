@@ -3,7 +3,7 @@
 
 #include "popups/data/LockData.hpp"
 #include "PinLockHandler.hpp"
-#include "module-apps/popups/lock-widgets/PinHash.hpp"
+#include "module-apps/popups/lock-widgets/LockHash.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 #include "application-desktop/windows/Names.hpp"
 #include <module-utils/common_data/EventStore.hpp>
@@ -35,7 +35,7 @@ namespace gui
 
     void PinLockHandler::handleScreenPin(const std::vector<unsigned int> &pin)
     {
-        const uint32_t hash = GetPinHash(pin);
+        const uint32_t hash = GetHash(pin);
         screenLock.attemptsLeft--;
         if (hash == app->getLockPassHash()) {
             screenLock.lockState    = gui::Lock::LockState::Unlocked;

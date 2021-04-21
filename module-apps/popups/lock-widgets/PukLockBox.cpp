@@ -15,47 +15,47 @@ namespace gui
 {
     void PukLockBox::popChar(unsigned int charNum)
     {
-        rebuildPinLabels(charNum);
+        rebuildInputLabels(charNum);
     }
     void PukLockBox::putChar(unsigned int charNum)
     {
-        rebuildPinLabels(++charNum);
+        rebuildInputLabels(++charNum);
     }
-    void PukLockBox::buildLockBox(unsigned int pinSize)
+    void PukLockBox::buildLockBox(unsigned int inputSize)
     {
         LockWindow->buildImages("pin_lock", "pin_lock_info");
-        buildPinLabels(0);
+        buildInputLabels(0);
     }
-    void PukLockBox::buildPinLabels(unsigned int pinSize)
+    void PukLockBox::buildInputLabels(unsigned int inputSize)
     {
         auto itemBuilder = []() {
             auto label = new gui::Image("dot_12px_hard_alpha_W_G");
             return label;
         };
 
-        LockWindow->buildPinLabels(itemBuilder, pinSize, label_style::x, label_style::y, label_style::w);
+        LockWindow->buildPinLabels(itemBuilder, inputSize, label_style::x, label_style::y, label_style::w);
         LockWindow->pinLabelsBox->setEdges(RectangleEdge::Bottom);
     }
 
-    void PukLockBox::rebuildPinLabels(unsigned int pinSize)
+    void PukLockBox::rebuildInputLabels(unsigned int inputSize)
     {
         LockWindow->pinLabelsBox->erase();
-        buildPinLabels(pinSize);
+        buildInputLabels(inputSize);
     }
 
-    void PukLockBox::setVisibleStateEnterPin(EnterPasscodeType type)
+    void PukLockBox::setVisibleStateInputRequired(InputActionType type)
     {
         LockWindow->pinLabelsBox->setVisible(true);
         switch (type) {
-        case PinLockBox::EnterPasscodeType::ProvidePasscode: {
+        case LockBox::InputActionType::ProvideInput: {
             LockWindow->setText("app_desktop_sim_setup_enter_puk", PinLockBaseWindow::TextType::Primary, true);
             break;
         }
-        case PinLockBox::EnterPasscodeType::ProvideNewPasscode: {
+        case LockBox::InputActionType::ProvideNewInput: {
             LockWindow->setText("app_desktop_sim_enter_new_pin", PinLockBaseWindow::TextType::Primary);
             break;
         }
-        case PinLockBox::EnterPasscodeType::ConfirmNewPasscode:
+        case LockBox::InputActionType::ConfirmNewInput:
             LockWindow->setText("app_desktop_sim_confirm_new_pin", PinLockBaseWindow::TextType::Primary);
             break;
         }
@@ -63,10 +63,10 @@ namespace gui
         LockWindow->setImagesVisible(true, false);
         LockWindow->setBottomBarWidgetsActive(false, false, true);
     }
-    void PukLockBox::setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value)
+    void PukLockBox::setVisibleStateInputInvalid(InputErrorType type, unsigned int value)
     {
         switch (type) {
-        case PinLockBox::PasscodeErrorType::InvalidPasscode:
+        case LockBox::InputErrorType::InvalidInput:
             if (value > 1) {
                 LockWindow->setText(
                     "app_desktop_sim_setup_wrong_puk",
@@ -82,11 +82,11 @@ namespace gui
                                     true);
             }
             break;
-        case PinLockBox::PasscodeErrorType::NewPasscodeConfirmFailed: {
+        case LockBox::InputErrorType::NewInputConfirmFailed: {
             LockWindow->setText("app_desktop_sim_wrong_pin_confirmation", PinLockBaseWindow::TextType::Primary);
             break;
         }
-        case PinLockBox::PasscodeErrorType::UnhandledError:
+        case LockBox::InputErrorType::UnhandledError:
             LOG_ERROR("No use case for UnhandledError in PukLockBox");
             break;
         }
@@ -102,6 +102,6 @@ namespace gui
 
     void PukLockBox::clear()
     {
-        rebuildPinLabels(0);
+        rebuildInputLabels(0);
     }
 } // namespace gui

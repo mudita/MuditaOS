@@ -4,7 +4,7 @@
 #include <module-apps/popups/lock-widgets/Lock.hpp>
 #include "popups/data/LockData.hpp"
 #include "PhoneLockObserver.hpp"
-#include "popups/lock-widgets/PinHash.hpp"
+#include "popups/lock-widgets/LockHash.hpp"
 
 namespace lock
 {
@@ -12,12 +12,12 @@ namespace lock
 
     PhoneLockObserver::PhoneLockObserver()
     {
-        lock = new Lock(Lock::LockState::Blocked, default_attempts);
+        lock = new Lock(Lock::LockState::InputRequired, default_attempts);
 
         lock->onActivatedCallback = [this](Lock::LockType type, const std::vector<unsigned int> &data) {
             LOG_ERROR("Wolam active sprawdzam czy ok");
 
-            const uint32_t hash = GetPinHash(data);
+            const uint32_t hash = GetHash(data);
             lock->attemptsLeft--;
 
             if (phoneLockHash == hash) {
@@ -101,7 +101,7 @@ namespace lock
     sys::MessagePointer PhoneLockObserver::handleLockRequest()
     {
         // Pewnie dodać Locked?
-        lock->lockState = Lock::LockState::Blocked;
+        lock->lockState = Lock::LockState::InputRequired;
         onPhoneLockCallback();
 
         return sys::msgHandled();

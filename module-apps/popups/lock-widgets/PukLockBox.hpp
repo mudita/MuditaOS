@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "PinLockBox.hpp"
+#include "LockBox.hpp"
 
 namespace gui
 {
@@ -12,7 +12,7 @@ namespace gui
 
 namespace gui
 {
-    class PukLockBox : public PinLockBox
+    class PukLockBox : public LockBox
     {
       public:
         explicit PukLockBox(PinLockBaseWindow *LockBaseWindow) : LockWindow(LockBaseWindow)
@@ -24,12 +24,12 @@ namespace gui
         void putChar(unsigned int charNum) final;
         void clear() final;
 
-        void setVisibleStateEnterPin(EnterPasscodeType type) final;
-        void setVisibleStateInvalidPin(PasscodeErrorType type, unsigned int value) final;
+        void setVisibleStateInputRequired(InputActionType type) final;
+        void setVisibleStateInputInvalid(InputErrorType type, unsigned int value) final;
         void setVisibleStateBlocked() final;
 
-        void buildLockBox(unsigned int pinSize) final;
-        void buildPinLabels(unsigned int pinSize);
-        void rebuildPinLabels(unsigned int pinSize);
+        void buildLockBox(unsigned int inputSize) final;
+        void buildInputLabels(unsigned int inputSize);
+        void rebuildInputLabels(unsigned int inputSize);
     };
 } // namespace gui

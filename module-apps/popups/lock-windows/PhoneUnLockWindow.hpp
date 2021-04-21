@@ -10,7 +10,7 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "popups/lock-widgets/Lock.hpp"
 #include "popups/lock-widgets/Lock.hpp"
-#include "popups/lock-widgets/PinLockBox.hpp"
+#include "popups/lock-widgets/LockBox.hpp"
 #include "PinLockBaseWindow.hpp"
 
 namespace gui
@@ -19,8 +19,7 @@ namespace gui
     {
         const std::string this_window_name;
         std::string lockTimeoutApplication                = "";
-        std::unique_ptr<PinLockBox> LockBox               = nullptr;
-        PinLockBox::EnterPasscodeType currentPasscodeType = PinLockBox::EnterPasscodeType::ProvidePasscode;
+        std::unique_ptr<LockBox> lockBox                  = nullptr;
 
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState();

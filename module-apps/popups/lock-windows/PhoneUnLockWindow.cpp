@@ -46,13 +46,13 @@ namespace gui
     {
         restore();
         if (lock->isState(lock::Lock::LockState::InputRequired)) {
-            LockBox->setVisibleStateEnterPin(PinLockBox::EnterPasscodeType::ProvidePasscode);
+            lockBox->setVisibleStateInputRequired(LockBox::InputActionType::ProvideInput);
         }
         else if (lock->isState(lock::Lock::LockState::InputInvalidRetryRequired)) {
-            LockBox->setVisibleStateInvalidPin(PinLockBox::PasscodeErrorType::InvalidPasscode, lock->getAttemptsLeft());
+            lockBox->setVisibleStateInputInvalid(LockBox::InputErrorType::InvalidInput, lock->getAttemptsLeft());
         }
         else if (lock->isState(lock::Lock::LockState::Blocked)) {
-            LockBox->setVisibleStateBlocked();
+            lockBox->setVisibleStateBlocked();
         }
         //        else if (lock->isState(PinLock::LockState::NewPasscodeRequired)) {
         //            LockBox->setVisibleStateEnterPin(PinLockBox::EnterPasscodeType::ProvideNewPasscode);
@@ -84,13 +84,9 @@ namespace gui
             lock = lockData->getLock();
             assert(lock);
 
-            LockBox = std::make_unique<PhoneLockBox>(this);
+            lockBox = std::make_unique<PhoneLockBox>(this);
 
-            LockBox->buildLockBox(lock->getMaxInputSize());
-
-            if (lock->isState(lock::Lock::LockState::InputRequired)) {
-                currentPasscodeType = PinLockBox::EnterPasscodeType::ProvidePasscode;
-            }
+            lockBox->buildLockBox(lock->getMaxInputSize());
 
             setVisibleState();
         }
@@ -106,42 +102,40 @@ namespace gui
                 lock->clearAttempt();
             }
             else if (lock->isState(lock::Lock::LockState::InputInvalidRetryRequired)) {
-
-                LOG_ERROR("Tutaj powinienes byc prawda?");
-
                 lock->consumeState();
             }
-            //            application->returnToPreviousWindow();
+            application->returnToPreviousWindow();
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_PND)) {
             if (usesNumericKeys()) {
                 lock->popChar();
-                LockBox->popChar(lock->getCharCount());
+                lockBox->popChar(lock->getCharCount());
                 bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
                 return true;
             }
         }
         else if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
 
-            LOG_ERROR("Tutaj powinienem wchodzić");
-
             if (usesNumericKeys() && lock->canPut()) {
 
-                LOG_ERROR("I o tutaj");
-
-                LockBox->putChar(lock->getCharCount());
+                lockBox->putChar(lock->getCharCount());
                 lock->putNextChar(gui::toNumeric(inputEvent.keyCode));
                 bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
+
+                if (lock->canVerify()) {
+                    lock->activate();
+                }
 
                 return true;
             }
         }
+
         else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
-            lock->activate();
-            bottomBar->setActive(BottomBar::Side::CENTER, false);
+            application->returnToPreviousWindow();
             return true;
         }
+
         // check if any of the lower inheritance onInput methods catch the event
         return AppWindow::onInput(inputEvent);
     }

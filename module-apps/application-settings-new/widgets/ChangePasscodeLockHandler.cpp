@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ChangePasscodeLockHandler.hpp"
-#include "module-apps/popups/lock-widgets/PinHash.hpp"
+#include "module-apps/popups/lock-widgets/LockHash.hpp"
 
 namespace gui
 {
@@ -13,7 +13,7 @@ namespace gui
     Lock::LockState ChangePasscodeLockHandler::checkPasscode(unsigned int currentLockPassHash)
     {
         return activateLock([this, currentLockPassHash](Lock::LockType, const std::vector<unsigned int> &pin) {
-            const auto hash = GetPinHash(pin);
+            const auto hash = GetHash(pin);
             if (hash == currentLockPassHash) {
                 lock.lockState = Lock::LockState::NewInputRequired;
             }
@@ -26,7 +26,7 @@ namespace gui
     Lock::LockState ChangePasscodeLockHandler::newPasscodeConfirmed()
     {
         return activateLock([this](Lock::LockType, const std::vector<unsigned int> &pin) {
-            const auto newPasscodeConfirmedHash = GetPinHash(pin);
+            const auto newPasscodeConfirmedHash = GetHash(pin);
             if (newPasscodeHash == newPasscodeConfirmedHash) {
                 lock.lockState = Lock::LockState::Unlocked;
             }
@@ -43,7 +43,7 @@ namespace gui
                 lock.lockState = Lock::LockState::NewInputInvalidRetryRequired;
                 return;
             }
-            newPasscodeHash = GetPinHash(pin);
+            newPasscodeHash = GetHash(pin);
             lock.lockState  = Lock::LockState::NewInputConfirmRequired;
         });
     }

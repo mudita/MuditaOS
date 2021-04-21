@@ -17,29 +17,29 @@ namespace gui
 
     void PhoneLockBaseBox::clear()
     {
-        for (unsigned i = 0; i < pinLabels.size(); i++) {
+        for (unsigned i = 0; i < inputLabels.size(); i++) {
             popChar(i);
         }
     }
 
     void PhoneLockBaseBox::popChar(unsigned int charNum)
     {
-        if (charNum < pinLabels.size()) {
-            pinLabels[charNum]->setVisibleState(false);
+        if (charNum < inputLabels.size()) {
+            inputLabels[charNum]->setVisibleState(false);
         }
     }
 
     void PhoneLockBaseBox::putChar(unsigned int charNum)
     {
-        if (charNum < pinLabels.size()) {
-            pinLabels[charNum]->setVisibleState(true);
+        if (charNum < inputLabels.size()) {
+            inputLabels[charNum]->setVisibleState(true);
         }
     }
 
     void PhoneLockBaseBox::buildPinLabels(unsigned int pinSize)
     {
         constexpr auto pinLabelWidth = style::window::default_body_width;
-        pinLabels.clear();
+        inputLabels.clear();
 
         if (pinSize == 0) {
             return;
@@ -53,10 +53,10 @@ namespace gui
         }
 
         auto itemBuilder = [this, singleLabelWidth]() {
-            auto label = new PinLabel(nullptr, singleLabelWidth, label_style::size);
+            auto label = new InputLabel(nullptr, singleLabelWidth, label_style::size);
             label->setEdges(RectangleEdge::Bottom);
             label->setMargins(Margins(label_style::margin, 0, label_style::margin, 0));
-            pinLabels.push_back(label);
+            inputLabels.push_back(label);
             return label;
         };
 
@@ -65,10 +65,10 @@ namespace gui
         lockWindow->pinLabelsBox->setEdges(RectangleEdge::None);
     }
 
-    PhoneLockBaseBox::PinLabel::PinLabel(Item *parent, uint32_t w, uint32_t h) : HBox(parent, 0, 0, w, h)
+    PhoneLockBaseBox::InputLabel::InputLabel(Item *parent, uint32_t w, uint32_t h) : HBox(parent, 0, 0, w, h)
     {}
 
-    void PhoneLockBaseBox::PinLabel::setVisibleState(bool isImageVisible)
+    void PhoneLockBaseBox::InputLabel::setVisibleState(bool isImageVisible)
     {
         if (isImageVisible && image == nullptr) {
             image = new gui::Image("dot_12px_hard_alpha_W_G");
