@@ -1,8 +1,7 @@
 //// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 //// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-apps/popups/lock-widgets/Lock.hpp>
-#include "popups/data/LockData.hpp"
+#include <module-utils/Utils.hpp>
 #include "PhoneLockObserver.hpp"
 #include "popups/lock-widgets/LockHash.hpp"
 
@@ -15,13 +14,11 @@ namespace lock
         lock = new Lock(Lock::LockState::InputRequired, default_attempts);
 
         lock->onActivatedCallback = [this](Lock::LockType type, const std::vector<unsigned int> &data) {
-            LOG_ERROR("Wolam active sprawdzam czy ok");
-
             const uint32_t hash = GetHash(data);
             lock->attemptsLeft--;
 
             if (phoneLockHash == hash) {
-                lock->lockState = Lock::LockState::Unlocked;
+                lock->lockState    = Lock::LockState::Unlocked;
                 lock->attemptsLeft = default_attempts;
                 onPhoneUnlockCallback();
                 return;
@@ -76,8 +73,6 @@ namespace lock
 
     sys::MessagePointer PhoneLockObserver::handleUnlockRequest()
     {
-        LOG_ERROR("Chce odblokowac ten zasrany telefon");
-
         // Check if phoneLock has not been disabled by setting
         if (!phoneLockEnabled) {
             onPhoneUnlockCallback();
@@ -86,11 +81,12 @@ namespace lock
             if (lock->isState(Lock::LockState::Unlocked)) {
                 onPhoneUnlockCallback();
             }
+            else if (lock->isState(Lock::LockState::Blocked)) {
+                onPhonePasscodeRequiredCallback(lock);
+            }
             else if (!lock->isState(Lock::LockState::Unlocked)) {
 
-                LOG_ERROR("Potrzebuje passcode - jest coś w hashu ? %d", phoneLockHash);
                 lock->lockState = Lock::LockState::InputRequired;
-
                 onPhonePasscodeRequiredCallback(lock);
             }
         }
@@ -100,7 +96,6 @@ namespace lock
 
     sys::MessagePointer PhoneLockObserver::handleLockRequest()
     {
-        // Pewnie dodać Locked?
         lock->lockState = Lock::LockState::InputRequired;
         onPhoneLockCallback();
 

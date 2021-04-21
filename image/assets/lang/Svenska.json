@@ -234,7 +234,7 @@
   "app_desktop_screen_wrong_passcode_last_attempt_warning": "<text>Om lösenordet är fel den här gången,<br></br>måste du vänta <token>$MINUTES</token> minuter<br></br>innan nästa försök.</text>",
   "app_desktop_screen_wrong_passcode": "<text>Fel lösenord.<br></br>Du har <token>$ATTEMPTS</token> försök kvar.</text>",
   "app_desktop_screen_blocked_info": "Tyvärr, telefonen blockerad.",
-  "app_desktop_press_to_unlock": "<text>Tryck <b>Lås upp</b> följt av <b>#</b></text>",
+  "app_desktop_press_to_unlock": "<text font='gt_pressura' size='27'>Tryck <b>Lås upp</b> följt av <b>#</b></text>",
   "app_desktop_unread_messages": "<text>Olästa <b>meddelanden</b></text>",
   "app_desktop_missed_calls": "<text>Missade <b>samtal</b></text>",
   "app_desktop_menu_phone": "SAMTAL",

@@ -41,7 +41,10 @@ bool PhoneLockedInfoWindow::onInput(const InputEvent &inputEvent)
 {
     if (inputEvent.isShortPress()) {
         if (inputEvent.keyCode == KeyCode::KEY_LF && bottomBar->isActive(BottomBar::Side::LEFT)) {
-            app::manager::Controller::sendAction(application, app::manager::actions::EmergencyDial);
+            app::manager::Controller::sendAction(application,
+                                                 app::manager::actions::EmergencyDial,
+                                                 std::make_unique<SwitchData>(),
+                                                 app::manager::OnSwitchBehaviour::RunInBackground);
             return true;
         }
     }
@@ -75,11 +78,6 @@ void PhoneLockedInfoWindow::buildInterface()
                         lock_style::primary_text::w,
                         lock_style::primary_text::h);
 
-    // FIXME!
-    TextFormat format(FontManager::getInstance().getFont(style::window::font::medium));
-    text::RichTextParser rtParser;
-    auto parsedText = rtParser.parse(utils::translate("app_desktop_press_to_unlock"), &format);
-
-    infoText->setText(std::move(parsedText));
+    infoText->setRichText(utils::translate("app_desktop_press_to_unlock"));
     infoText->setAlignment(Alignment::Horizontal::Center);
 }

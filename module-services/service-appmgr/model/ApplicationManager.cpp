@@ -298,25 +298,19 @@ namespace app::manager
         phoneLockObserver->connect(this);
         phoneLockObserver->subscribe(
             [this]() {
-                LOG_ERROR("Blokuje sobie telefon?");
-
-                auto params = std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock);
-                actionsRegistry.enqueue(ActionEntry{actions::ShowPopup, std::move(params)});
+                actionsRegistry.enqueue(ActionEntry{
+                    actions::ShowPopup, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock)});
             },
             [this]() {
-                LOG_ERROR("Odblokowuje sobie telefon przez popup akcje?");
-
-                auto params2 = std::make_unique<gui::PopupRequestParams>(gui::popup::ID::InputLock);
-                actionsRegistry.enqueue(ActionEntry{actions::AbortPopup, std::move(params2)});
-
-                auto params1 = std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock);
-                actionsRegistry.enqueue(ActionEntry{actions::AbortPopup, std::move(params1)});
+                actionsRegistry.enqueue(ActionEntry{
+                    actions::AbortPopup, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::InputLock)});
+                actionsRegistry.enqueue(ActionEntry{
+                    actions::AbortPopup, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock)});
             },
             [this](lock::Lock *lock) {
-                LOG_ERROR("Potrzebuje passcode");
-
-                auto params = std::make_unique<gui::PhoneUnlockInputRequestParams>(gui::popup::ID::InputLock, lock);
-                actionsRegistry.enqueue(ActionEntry{actions::ShowPopup, std::move(params)});
+                actionsRegistry.enqueue(
+                    ActionEntry{actions::ShowPopup,
+                                std::make_unique<gui::PhoneUnlockInputRequestParams>(gui::popup::ID::InputLock, lock)});
             });
 
         connect(typeid(StartAllowedMessage), [this](sys::Message *request) {

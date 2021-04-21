@@ -17,8 +17,6 @@ namespace gui
 {
     class PhoneUnlockWindow : public PinLockBaseWindow
     {
-        const std::string this_window_name;
-        std::string lockTimeoutApplication                = "";
         std::unique_ptr<LockBox> lockBox                  = nullptr;
 
         // method hides or show widgets and sets bars according to provided state

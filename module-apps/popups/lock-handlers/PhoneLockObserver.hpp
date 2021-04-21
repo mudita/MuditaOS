@@ -3,16 +3,18 @@
 
 #pragma once
 
+#include "popups/lock-widgets/Lock.hpp"
 #include "popups/data/LockMessages.hpp"
-#include "popups/lock-handlers/LockHandler.hpp"
 
 #include "module-sys/Service/Service.hpp"
 
 namespace lock
 {
-    class PhoneLockObserver : private LockHandler
+    class PhoneLockObserver
     {
       private:
+        Lock *lock = nullptr;
+
         using OnPhoneLockCallback             = std::function<void()>;
         using OnPhoneUnlockCallback           = std::function<void()>;
         using OnPhonePasscodeRequiredCallback = std::function<void(Lock *)>;
