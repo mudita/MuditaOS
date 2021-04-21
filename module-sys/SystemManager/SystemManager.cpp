@@ -33,6 +33,7 @@
 #include <time/ScopedTime.hpp>
 #include "Timers/TimerFactory.hpp"
 #include <service-appmgr/StartupType.hpp>
+#include <purefs/vfs_subsystem.hpp>
 
 const inline size_t systemManagerStack = 4096 * 2;
 
@@ -642,6 +643,12 @@ namespace sys
 
         deviceManager->RegisterNewDevice(powerManager->getExternalRamDevice());
 
+        cpuSentinel = std::make_shared<sys::CpuSentinel>(
+            service::name::system_manager, this, [this](bsp::CpuFrequencyHz newFrequency) {
+                UpdateResourcesAfterCpuFrequencyChange(newFrequency);
+            });
+        powerManager->RegisterNewSentinel(cpuSentinel);
+
         return ReturnCodes::Success;
     }
 
@@ -771,6 +778,16 @@ namespace sys
     {
         phoneModeSubject->setTetheringMode(phone_modes::Tethering::On);
         return MessageNone{};
+    }
+
+    void SystemManager::UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyHz newFrequency)
+    {
+        if (newFrequency == bsp::CpuFrequencyHz::Level_1) {
+            purefs::subsystem::disk_mgr()->pm_control(purefs::blkdev::pm_state::suspend);
+        }
+        else {
+            purefs::subsystem::disk_mgr()->pm_control(purefs::blkdev::pm_state::active);
+        }
     }
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;

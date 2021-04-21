@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "drivers/usdhc/DriverUSDHC.hpp"
 #include <purefs/blkdev/disk.hpp>
 #include <mutex.hpp>
 #include <memory>
@@ -33,14 +34,19 @@ namespace purefs::blkdev
         auto status() const -> media_status override;
         auto get_info(info_type what, hwpart_t hwpart) const -> scount_t override;
         auto erase(sector_t lba, std::size_t count, hwpart_t hwpart) -> int override;
+        auto pm_control(pm_state target_state) -> int override;
+        auto pm_read(pm_state &current_state) -> int override;
 
       private:
         auto switch_partition(hwpart_t newpart) -> int;
 
       private:
         int initStatus;
-        std::unique_ptr<_mmc_card> mmcCard;
+        pm_state pmState{pm_state::active};
         mutable cpp_freertos::MutexRecursive mutex;
         std::atomic<hwpart_t> currHwPart{0};
+
+        std::unique_ptr<_mmc_card> mmcCard;
+        std::shared_ptr<drivers::DriverUSDHC> driverUSDHC;
     };
 } // namespace purefs::blkdev
