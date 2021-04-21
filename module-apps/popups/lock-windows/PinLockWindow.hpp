@@ -7,7 +7,7 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/BottomBar.hpp"
-#include "popups/lock-widgets/PinLock.hpp"
+#include "popups/lock-widgets/Lock.hpp"
 #include "popups/lock-widgets/PinLockBox.hpp"
 #include "PinLockBaseWindow.hpp"
 

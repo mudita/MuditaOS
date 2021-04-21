@@ -3,7 +3,7 @@
 
 #include "popups/data/LockStyle.hpp"
 #include "popups/lock-windows/PinLockBaseWindow.hpp"
-#include "PinLock.hpp"
+#include "Lock.hpp"
 #include "PhoneLockBaseBox.hpp"
 
 namespace label_style = style::window::pin_lock::pin_label;

@@ -13,6 +13,7 @@
 #include "popups/lock-widgets/PhoneLockBox.hpp"
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <module-apps/popups/data/PopupRequestParams.hpp>
+#include <module-apps/popups/data/LockData.hpp>
 
 namespace gui
 {
@@ -44,13 +45,13 @@ namespace gui
     void PhoneUnlockWindow::setVisibleState()
     {
         restore();
-        if (phoneLock->isState(lock::Lock::LockState::InputRequired)) {
+        if (lock->isState(lock::Lock::LockState::InputRequired)) {
             LockBox->setVisibleStateEnterPin(PinLockBox::EnterPasscodeType::ProvidePasscode);
         }
-        else if (phoneLock->isState(lock::Lock::LockState::InvalidInputRetryRequired)) {
-            LockBox->setVisibleStateInvalidPin(PinLockBox::PasscodeErrorType::InvalidPasscode, phoneLock->getValue());
+        else if (lock->isState(lock::Lock::LockState::InputInvalidRetryRequired)) {
+            LockBox->setVisibleStateInvalidPin(PinLockBox::PasscodeErrorType::InvalidPasscode, lock->getAttemptsLeft());
         }
-        else if (phoneLock->isState(lock::Lock::LockState::Blocked)) {
+        else if (lock->isState(lock::Lock::LockState::Blocked)) {
             LockBox->setVisibleStateBlocked();
         }
         //        else if (lock->isState(PinLock::LockState::NewPasscodeRequired)) {
@@ -75,25 +76,22 @@ namespace gui
 
         LOG_ERROR("Wchodze sobie do tego okna ?");
 
-        if (auto lockData = dynamic_cast<PhoneUnlockInputRequestParams *>(data)) {
+        if (auto lockData = dynamic_cast<lock::LockData *>(data)) {
 
             LOG_ERROR("Cast sie udal?");
 
             rebuild();
-            //            lockTimeoutApplication = lockData->getPreviousApplication();
-            phoneLock = lockData->getLock();
-            assert(phoneLock);
+            lock = lockData->getLock();
+            assert(lock);
 
             LockBox = std::make_unique<PhoneLockBox>(this);
 
-            LockBox->buildLockBox(phoneLock->getMaxPinSize());
+            LockBox->buildLockBox(lock->getMaxInputSize());
 
-            if (phoneLock->isState(lock::Lock::LockState::InputRequired)) {
+            if (lock->isState(lock::Lock::LockState::InputRequired)) {
                 currentPasscodeType = PinLockBox::EnterPasscodeType::ProvidePasscode;
             }
-            //            else if (lock->isState(Lock::LockState::NewPasscodeRequired)) {
-            //                currentPasscodeType = PinLockBox::EnterPasscodeType::ProvideNewPasscode;
-            //            }
+
             setVisibleState();
         }
     }
@@ -105,19 +103,22 @@ namespace gui
         }
         else if (inputEvent.is(KeyCode::KEY_RF) && bottomBar->isActive(BottomBar::Side::RIGHT)) {
             if (usesNumericKeys()) {
-                phoneLock->clearAttempt();
+                lock->clearAttempt();
             }
-            else if (phoneLock->isState(lock::Lock::LockState::InvalidInputRetryRequired)) {
-                phoneLock->consumeState();
+            else if (lock->isState(lock::Lock::LockState::InputInvalidRetryRequired)) {
+
+                LOG_ERROR("Tutaj powinienes byc prawda?");
+
+                lock->consumeState();
             }
-            application->returnToPreviousWindow();
+            //            application->returnToPreviousWindow();
             return true;
         }
         else if (inputEvent.is(KeyCode::KEY_PND)) {
             if (usesNumericKeys()) {
-                phoneLock->popChar();
-                LockBox->popChar(phoneLock->getCharCount());
-                bottomBar->setActive(BottomBar::Side::CENTER, phoneLock->canVerify());
+                lock->popChar();
+                LockBox->popChar(lock->getCharCount());
+                bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
                 return true;
             }
         }
@@ -125,19 +126,19 @@ namespace gui
 
             LOG_ERROR("Tutaj powinienem wchodzić");
 
-            if (usesNumericKeys() && phoneLock->canPut()) {
+            if (usesNumericKeys() && lock->canPut()) {
 
                 LOG_ERROR("I o tutaj");
 
-                LockBox->putChar(phoneLock->getCharCount());
-                phoneLock->putNextChar(gui::toNumeric(inputEvent.keyCode));
-                bottomBar->setActive(BottomBar::Side::CENTER, phoneLock->canVerify());
+                LockBox->putChar(lock->getCharCount());
+                lock->putNextChar(gui::toNumeric(inputEvent.keyCode));
+                bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
 
                 return true;
             }
         }
         else if (inputEvent.is(KeyCode::KEY_ENTER) && bottomBar->isActive(BottomBar::Side::CENTER)) {
-            phoneLock->activate();
+            lock->activate();
             bottomBar->setActive(BottomBar::Side::CENTER, false);
             return true;
         }
@@ -148,7 +149,7 @@ namespace gui
     // Co to do kurwy za funkcja jest ....
     auto PhoneUnlockWindow::usesNumericKeys() const noexcept -> bool
     {
-        return phoneLock && (phoneLock->isState(lock::Lock::LockState::InputRequired));
+        return lock && (lock->isState(lock::Lock::LockState::InputRequired));
 
         //        return lock && (lock->isState(PinLock::LockState::PasscodeRequired) ||
         //                        lock->isState(PinLock::LockState::NewPasscodeRequired) ||

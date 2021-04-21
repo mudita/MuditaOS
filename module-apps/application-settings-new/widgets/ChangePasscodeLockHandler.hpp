@@ -3,17 +3,19 @@
 
 #pragma once
 
-#include "module-apps/popups/lock-widgets/PinLock.hpp"
+#include "module-apps/popups/lock-widgets/Lock.hpp"
 
 namespace gui
 {
+    using namespace lock;
+
     class ChangePasscodeLockHandler
     {
       public:
         ChangePasscodeLockHandler();
 
-        auto checkPasscode(unsigned int currentLockPassHash) -> PinLock::LockState;
-        [[nodiscard]] auto getLock() -> PinLock &
+        auto checkPasscode(unsigned int currentLockPassHash) -> Lock::LockState;
+        [[nodiscard]] auto getLock() -> Lock &
         {
             return lock;
         }
@@ -21,14 +23,14 @@ namespace gui
         {
             return newPasscodeHash;
         }
-        auto newPasscodeConfirmed() -> PinLock::LockState;
-        auto newPasscodeProvided() -> PinLock::LockState;
+        auto newPasscodeConfirmed() -> Lock::LockState;
+        auto newPasscodeProvided() -> Lock::LockState;
 
       private:
-        using OnActivatedCallback = std::function<void(PinLock::LockType type, const std::vector<unsigned int> &)>;
-        auto activateLock(OnActivatedCallback onActivatedCallback) -> PinLock::LockState;
+        using OnActivatedCallback = std::function<void(Lock::LockType type, const std::vector<unsigned int> &)>;
+        auto activateLock(OnActivatedCallback onActivatedCallback) -> Lock::LockState;
 
-        PinLock lock;
+        Lock lock;
         unsigned int newPasscodeHash;
     };
 } // namespace gui

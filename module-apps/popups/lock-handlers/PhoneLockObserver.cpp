@@ -8,24 +8,26 @@
 
 namespace lock
 {
+    constexpr unsigned int default_attempts = 4;
 
     PhoneLockObserver::PhoneLockObserver()
     {
-        lock = new Lock(Lock::LockState::Blocked);
+        lock = new Lock(Lock::LockState::Blocked, default_attempts);
 
-        lock->onActivatedCallback = [this](const std::vector<unsigned int> &data) {
+        lock->onActivatedCallback = [this](Lock::LockType type, const std::vector<unsigned int> &data) {
             LOG_ERROR("Wolam active sprawdzam czy ok");
 
             const uint32_t hash = GetPinHash(data);
+            lock->attemptsLeft--;
 
             if (phoneLockHash == hash) {
                 lock->lockState = Lock::LockState::Unlocked;
-                lock->value     = 4;
+                lock->attemptsLeft = default_attempts;
                 onPhoneUnlockCallback();
                 return;
             }
-            else if (lock->value > 0) {
-                lock->lockState = Lock::LockState::InvalidInputRetryRequired;
+            else if (lock->attemptsLeft > 0) {
+                lock->lockState = Lock::LockState::InputInvalidRetryRequired;
             }
             else {
                 lock->lockState = Lock::LockState::Blocked;

@@ -45,6 +45,7 @@
 #include <module-apps/popups/lock-windows/PhoneLockedWindow.hpp>
 #include <module-apps/popups/lock-windows/PhoneLockedInfoWindow.hpp>
 #include <module-apps/popups/lock-windows/PhoneUnLockWindow.hpp>
+#include <module-apps/popups/data/LockData.hpp>
 #include "popups/data/PopupData.hpp"
 
 namespace gui
@@ -785,12 +786,11 @@ namespace app
         }
         else if (id == ID::InputLock) {
             auto popupParams = static_cast<const gui::PhoneUnlockInputRequestParams *>(params);
+            auto lock        = std::make_unique<lock::Lock>(*popupParams->getLock());
 
             assert(popupParams->getLock());
 
-            switchWindow(gui::popup::resolveWindowName(id),
-                         std::make_unique<gui::PhoneUnlockInputRequestParams>(popupParams->getPopupId(),
-                                                                              popupParams->getLock()));
+            switchWindow(gui::popup::resolveWindowName(id), std::make_unique<lock::LockData>(std::move(lock)));
         }
         else {
             switchWindow(gui::popup::resolveWindowName(id));

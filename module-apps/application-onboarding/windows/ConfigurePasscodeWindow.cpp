@@ -20,7 +20,7 @@ namespace gui
 {
     ConfigurePasscodeWindow::ConfigurePasscodeWindow(app::Application *app) : ChangePasscodeWindow(app)
     {
-        lockState = PinLock::LockState::NewPasscodeRequired;
+        lockState = Lock::LockState::NewInputRequired;
 
         textForEnterNewPassword = "app_onboarding_set_password";
         testForConfirmPassword  = "app_onboarding_confirm_password";
@@ -54,10 +54,10 @@ namespace gui
     void ConfigurePasscodeWindow::processPasscode()
     {
         switch (lockState) {
-        case PinLock::LockState::NewPasscodeConfirmRequired:
-        case PinLock::LockState::NewPasscodeInvalid: {
+        case Lock::LockState::NewInputConfirmRequired:
+        case Lock::LockState::NewInputInvalid: {
             lockState = lockHandler.newPasscodeConfirmed();
-            if (lockState == PinLock::LockState::Unlocked) {
+            if (lockState == Lock::LockState::Unlocked) {
                 auto app = static_cast<app::ApplicationOnBoarding *>(application);
                 app->setLockPassHash(lockHandler.getNewPasscodeHash());
             }
@@ -71,7 +71,7 @@ namespace gui
     void ConfigurePasscodeWindow::setVisibleState()
     {
         switch (lockState) {
-        case PinLock::LockState::NewPasscodeInvalid: {
+        case Lock::LockState::NewInputInvalid: {
 
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
                 gui::DialogMetadata{utils::translate("app_onboarding_passcode_configuration"),
@@ -91,7 +91,7 @@ namespace gui
 
             break;
         }
-        case PinLock::LockState::Unlocked: {
+        case Lock::LockState::Unlocked: {
             application->setLockScreenPasscodeOn(true);
             application->switchWindow(gui::window::name::onBoarding_date_and_time,
                                       gui::ShowMode::GUI_SHOW_INIT,

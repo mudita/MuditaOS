@@ -74,6 +74,7 @@ namespace app
           lockHandler(this), notificationsModel{std::make_shared<gui::ActiveNotificationsModel>()}
     {
         using namespace gui::top_bar;
+
         topBarManager->enableIndicators({Indicator::Signal,
                                          Indicator::Time,
                                          Indicator::Battery,
@@ -82,7 +83,7 @@ namespace app
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
         addActionReceiver(app::manager::actions::RequestPin, [this](auto &&data) {
-            lockHandler.handlePasscodeRequest(gui::PinLock::LockType::SimPin, std::move(data));
+            lockHandler.handlePasscodeRequest(lock::Lock::LockType::SimPin, std::move(data));
             return actionHandled();
         });
 
@@ -92,7 +93,7 @@ namespace app
         });
 
         addActionReceiver(app::manager::actions::RequestPuk, [this](auto &&data) {
-            lockHandler.handlePasscodeRequest(gui::PinLock::LockType::SimPuk, std::move(data));
+            lockHandler.handlePasscodeRequest(lock::Lock::LockType::SimPuk, std::move(data));
             return actionHandled();
         });
 

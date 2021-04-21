@@ -30,7 +30,7 @@ namespace gui
         ChangePasscodeAction changePasscodeAction;
         std::unique_ptr<PhoneLockBaseBox> lockBox  = nullptr;
         gui::Image *lockImage                      = nullptr;
-        PinLock::LockState lockState{PinLock::LockState::PasscodeRequired};
+        Lock::LockState lockState{Lock::LockState::InputRequired};
         ChangePasscodeLockHandler lockHandler;
 
         std::string textForEnterCurrentPassword = "app_settings_security_type_current_passcode";

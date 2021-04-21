@@ -5,7 +5,7 @@
 
 #include "popups/data/LockStyle.hpp"
 #include "popups/lock-windows/PinLockBaseWindow.hpp"
-#include "PinLock.hpp"
+#include "Lock.hpp"
 #include <Style.hpp>
 #include <Image.hpp>
 
@@ -54,7 +54,7 @@ namespace gui
                 "app_desktop_sim_enter_pin_unlock",
                 PinLockBaseWindow::TextType::Primary,
                 true,
-                {{LockWindow->getToken(PinLockBaseWindow::Token::PinType), LockWindow->lock->getPasscodeName()}});
+                {{LockWindow->getToken(PinLockBaseWindow::Token::PinType), LockWindow->lock->getLockName()}});
             break;
         }
         case PinLockBox::EnterPasscodeType::ProvideNewPasscode:

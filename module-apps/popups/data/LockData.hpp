@@ -5,37 +5,27 @@
 
 #include <memory>
 #include "gui/SwitchData.hpp"
-#include "popups/lock-widgets/PinLock.hpp"
+#include "popups/lock-widgets/Lock.hpp"
 
-namespace gui
+namespace lock
 {
 
     // class template that stores information that was sent along with switch message
     class LockData : public gui::SwitchData
     {
-        std::string previousApplication;
-        std::unique_ptr<PinLock> lock;
+        std::unique_ptr<Lock> lock;
 
       public:
-        LockData(std::unique_ptr<PinLock> &&lock) : SwitchData(), lock(std::move(lock))
+        LockData(std::unique_ptr<Lock> &&lock) : SwitchData(), lock(std::move(lock))
         {
             description = "LockPhoneData";
         }
 
         virtual ~LockData(){};
 
-        void setPrevApplication(const std::string &prevApp)
+        [[nodiscard]] std::unique_ptr<Lock> getLock()
         {
-            previousApplication = prevApp;
-        };
-        [[nodiscard]] const std::string &getPreviousApplication()
-        {
-            return previousApplication;
-        };
-
-        [[nodiscard]] std::unique_ptr<PinLock> getLock()
-        {
-            return std::make_unique<PinLock>(*lock.get());
+            return std::make_unique<Lock>(*lock.get());
         }
     };
 

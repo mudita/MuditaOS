@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "popups/data/LockStyle.hpp"
-#include "popups/lock-widgets/PinLock.hpp"
+#include "popups/lock-widgets/Lock.hpp"
 #include "FontManager.hpp"
 #include <i18n/i18n.hpp>
 #include "LockWindow.hpp"

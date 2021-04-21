@@ -9,7 +9,7 @@
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "popups/lock-widgets/Lock.hpp"
-#include "popups/lock-widgets/PinLock.hpp"
+#include "popups/lock-widgets/Lock.hpp"
 #include "popups/lock-widgets/PinLockBox.hpp"
 #include "PinLockBaseWindow.hpp"
 
@@ -17,8 +17,6 @@ namespace gui
 {
     class PhoneUnlockWindow : public PinLockBaseWindow
     {
-        lock::Lock *phoneLock = nullptr;
-
         const std::string this_window_name;
         std::string lockTimeoutApplication                = "";
         std::unique_ptr<PinLockBox> LockBox               = nullptr;

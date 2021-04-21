@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-apps/popups/lock-widgets/PinLock.hpp>
+#include <module-apps/popups/lock-widgets/Lock.hpp>
 #include <module-apps/popups/data/LockData.hpp>
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/data/ChangePasscodeData.hpp"
@@ -46,15 +46,15 @@ namespace gui
         optionList.emplace_back(std::make_unique<option::OptionSettings>(
             utils::translate("app_settings_security_usb_passcode"),
             [=](Item &item) {
-                auto lock = std::make_unique<gui::PinLock>(
-                    Store::GSM::SIM::NONE, PinLock::LockState::PasscodeRequired, PinLock::LockType::Screen);
-                lock->onActivatedCallback = [this](PinLock::LockType type, const std::vector<unsigned int> &data) {
+                auto lock = std::make_unique<lock::Lock>(
+                    Store::GSM::SIM::NONE, lock::Lock::LockState::InputRequired, lock::Lock::LockType::Screen);
+                lock->onActivatedCallback = [this](lock::Lock::LockType type, const std::vector<unsigned int> &data) {
                     securitySettings->setUSBSecurity(!securitySettings->isUSBSecured());
                     application->returnToPreviousWindow();
                 };
                 application->switchWindow(app::window::name::desktop_pin_lock,
                                           gui::ShowMode::GUI_SHOW_INIT,
-                                          std::make_unique<gui::LockData>(std::move(lock)));
+                                          std::make_unique<lock::LockData>(std::move(lock)));
                 return true;
             },
             [=](Item &item) {
