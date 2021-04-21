@@ -31,7 +31,7 @@
 #include <service-eink/Common.hpp>
 
 #include <notifications/NotificationProvider.hpp>
-#include <module-apps/popups/lock-handlers/PhoneLockObserver.hpp>
+#include <module-apps/locks/handlers/PhoneLockObserver.hpp>
 
 namespace app
 {

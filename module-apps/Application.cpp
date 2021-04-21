@@ -42,10 +42,10 @@
 
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
 #include <module-apps/popups/TetheringPhoneModePopup.hpp>
-#include <module-apps/popups/lock-windows/PhoneLockedWindow.hpp>
-#include <module-apps/popups/lock-windows/PhoneLockedInfoWindow.hpp>
-#include <module-apps/popups/lock-windows/PhoneUnLockWindow.hpp>
-#include <module-apps/popups/data/LockData.hpp>
+#include <module-apps/popups/lock-popups/PhoneLockedWindow.hpp>
+#include <module-apps/popups/lock-popups/PhoneLockedInfoWindow.hpp>
+#include <module-apps/popups/lock-popups/PhoneUnLockWindow.hpp>
+#include <module-apps/locks/data/LockData.hpp>
 #include "popups/data/PopupData.hpp"
 
 namespace gui

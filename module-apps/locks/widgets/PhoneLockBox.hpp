@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "popups/lock-windows/PinLockBaseWindow.hpp"
+#include "locks/windows/PinLockBaseWindow.hpp"
 #include "PhoneLockBaseBox.hpp"
 
 namespace gui

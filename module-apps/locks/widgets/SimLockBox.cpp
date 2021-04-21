@@ -3,8 +3,8 @@
 
 #include "SimLockBox.hpp"
 
-#include "popups/data/LockStyle.hpp"
-#include "popups/lock-windows/PinLockBaseWindow.hpp"
+#include "locks/data/LockStyle.hpp"
+#include "locks/windows/PinLockBaseWindow.hpp"
 #include "Lock.hpp"
 #include <Style.hpp>
 #include <Image.hpp>

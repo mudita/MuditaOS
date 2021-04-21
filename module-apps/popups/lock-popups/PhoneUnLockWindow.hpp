@@ -4,20 +4,19 @@
 #pragma once
 
 #include "AppWindow.hpp"
-#include "LockWindow.hpp"
+#include "module-apps/locks/windows/LockWindow.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/BottomBar.hpp"
-#include "popups/lock-widgets/Lock.hpp"
-#include "popups/lock-widgets/Lock.hpp"
-#include "popups/lock-widgets/LockBox.hpp"
-#include "PinLockBaseWindow.hpp"
+#include "module-apps/locks/widgets/Lock.hpp"
+#include "module-apps/locks/widgets/LockBox.hpp"
+#include "module-apps/locks/windows/PinLockBaseWindow.hpp"
 
 namespace gui
 {
     class PhoneUnlockWindow : public PinLockBaseWindow
     {
-        std::unique_ptr<LockBox> lockBox                  = nullptr;
+        std::unique_ptr<LockBox> lockBox = nullptr;
 
         // method hides or show widgets and sets bars according to provided state
         void setVisibleState();

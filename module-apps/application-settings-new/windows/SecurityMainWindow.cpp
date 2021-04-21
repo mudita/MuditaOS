@@ -1,8 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <module-apps/popups/lock-widgets/Lock.hpp>
-#include <module-apps/popups/data/LockData.hpp>
+#include <module-apps/locks/widgets/Lock.hpp>
+#include <module-apps/locks/data/LockData.hpp>
 #include "application-settings-new/ApplicationSettings.hpp"
 #include "application-settings-new/data/ChangePasscodeData.hpp"
 #include "module-apps/application-desktop/windows/Names.hpp"

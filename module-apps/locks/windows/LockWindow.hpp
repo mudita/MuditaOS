@@ -51,10 +51,10 @@ namespace gui
         void setTitleBar(bool isVisible);
 
         std::unique_ptr<lock::Lock> lock = nullptr;
-        gui::HBox *pinLabelsBox       = nullptr;
-        gui::Text *primaryText        = nullptr;
-        gui::Text *secondaryText      = nullptr;
-        gui::Text *title              = nullptr;
+        gui::HBox *pinLabelsBox          = nullptr;
+        gui::Text *primaryText           = nullptr;
+        gui::Text *secondaryText         = nullptr;
+        gui::Text *title                 = nullptr;
 
       protected:
         virtual void buildBottomBar();

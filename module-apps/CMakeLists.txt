@@ -114,6 +114,7 @@ include_directories( ../module-bsp )
 include_directories( ../module-db )
 
 add_subdirectory(popups)
+add_subdirectory(locks)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "module-apps/popups/lock-widgets/Lock.hpp"
+#include "module-apps/locks/widgets/Lock.hpp"
 
 namespace gui
 {

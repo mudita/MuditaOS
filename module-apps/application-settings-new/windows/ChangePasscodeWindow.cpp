@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-settings-new/ApplicationSettings.hpp"
-#include "popups/data/LockStyle.hpp"
+#include "locks/data/LockStyle.hpp"
 #include "ChangePasscodeWindow.hpp"
 #include "DialogMetadata.hpp"
 #include "DialogMetadataMessage.hpp"

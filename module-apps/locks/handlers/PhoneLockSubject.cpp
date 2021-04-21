@@ -2,7 +2,7 @@
 //// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-appmgr/service-appmgr/model/ApplicationManager.hpp"
-#include "popups/data/LockMessages.hpp"
+#include "locks/data/LockMessages.hpp"
 #include "PhoneLockSubject.hpp"
 
 namespace lock

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "module-apps/popups/lock-widgets/Lock.hpp"
+#include "module-apps/locks/widgets/Lock.hpp"
 
 #include <module-services/service-appmgr/service-appmgr/messages/ActionRequest.hpp>
 #include <module-services/service-appmgr/service-appmgr/Actions.hpp>

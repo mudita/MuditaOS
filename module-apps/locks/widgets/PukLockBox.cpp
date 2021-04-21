@@ -3,8 +3,8 @@
 
 #include "PukLockBox.hpp"
 
-#include "popups/data/LockStyle.hpp"
-#include "popups/lock-windows/PinLockBaseWindow.hpp"
+#include "locks/data/LockStyle.hpp"
+#include "locks/windows/PinLockBaseWindow.hpp"
 #include "Lock.hpp"
 #include "gui/widgets/Image.hpp"
 #include <i18n/i18n.hpp>

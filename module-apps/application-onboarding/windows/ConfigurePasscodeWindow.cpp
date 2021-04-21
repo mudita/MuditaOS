@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ConfigurePasscodeWindow.hpp"
-#include <popups/data/LockStyle.hpp>
+#include <locks/data/LockStyle.hpp>
 
 #include <application-onboarding/ApplicationOnBoarding.hpp>
 #include <application-onboarding/data/OnBoardingSwitchData.hpp>

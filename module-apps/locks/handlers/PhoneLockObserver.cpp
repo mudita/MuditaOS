@@ -3,7 +3,7 @@
 
 #include <module-utils/Utils.hpp>
 #include "PhoneLockObserver.hpp"
-#include "popups/lock-widgets/LockHash.hpp"
+#include "locks/widgets/LockHash.hpp"
 
 namespace lock
 {

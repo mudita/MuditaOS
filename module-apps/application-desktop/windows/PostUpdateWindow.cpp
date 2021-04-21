@@ -12,7 +12,7 @@
 #include <module-gui/gui/widgets/TopBar.hpp>
 #include <module-gui/gui/core/FontManager.hpp>
 
-#include <module-apps/popups/data/LockStyle.hpp>
+#include <module-apps/locks/data/LockStyle.hpp>
 #include <module-apps/application-desktop/data/DesktopStyle.hpp>
 #include <module-apps/application-desktop/data/DesktopData.hpp>
 #include <module-apps/application-desktop/windows/Names.hpp>

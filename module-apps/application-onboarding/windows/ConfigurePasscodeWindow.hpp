@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <popups/lock-widgets/PhoneLockBaseBox.hpp>
-#include <popups/lock-windows/LockWindow.hpp>
+#include <locks/widgets/PhoneLockBaseBox.hpp>
+#include <locks/windows/LockWindow.hpp>
 #include <application-settings-new/windows/ChangePasscodeWindow.hpp>
 #include <application-settings-new/data/ChangePasscodeData.hpp>
 #include <application-settings-new/widgets/ChangePasscodeLockHandler.hpp>

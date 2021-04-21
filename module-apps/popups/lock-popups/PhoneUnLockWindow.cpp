@@ -9,11 +9,11 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "PhoneUnLockWindow.hpp"
 
-#include "popups/data/LockData.hpp"
-#include "popups/lock-widgets/PhoneLockBox.hpp"
+#include "module-apps/locks/data/LockData.hpp"
+#include "module-apps/locks/widgets/PhoneLockBox.hpp"
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <module-apps/popups/data/PopupRequestParams.hpp>
-#include <module-apps/popups/data/LockData.hpp>
+#include <module-apps/locks/data/LockData.hpp>
 
 namespace gui
 {

@@ -5,7 +5,7 @@
 
 #include <memory>
 #include "gui/SwitchData.hpp"
-#include "popups/lock-widgets/Lock.hpp"
+#include "locks/widgets/Lock.hpp"
 
 namespace lock
 {
@@ -29,4 +29,4 @@ namespace lock
         }
     };
 
-} // namespace gui
+} // namespace lock

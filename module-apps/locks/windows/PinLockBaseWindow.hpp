@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "popups/lock-windows/LockWindow.hpp"
+#include "LockWindow.hpp"
 
 namespace gui
 {

@@ -1,9 +1,9 @@
 //// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 //// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "popups/data/LockData.hpp"
+#include "locks/data/LockData.hpp"
 #include "PinLockHandler.hpp"
-#include "module-apps/popups/lock-widgets/LockHash.hpp"
+#include "locks/widgets/LockHash.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 #include "application-desktop/windows/Names.hpp"
 #include <module-utils/common_data/EventStore.hpp>

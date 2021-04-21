@@ -10,10 +10,10 @@
 #include "PinLockWindow.hpp"
 
 #include "application-desktop/ApplicationDesktop.hpp"
-#include "popups/data/LockData.hpp"
-#include "popups/lock-widgets/PhoneLockBox.hpp"
-#include "popups/lock-widgets/SimLockBox.hpp"
-#include "popups/lock-widgets/PukLockBox.hpp"
+#include "locks/data/LockData.hpp"
+#include "locks/widgets/PhoneLockBox.hpp"
+#include "locks/widgets/SimLockBox.hpp"
+#include "locks/widgets/PukLockBox.hpp"
 #include <application-phonebook/ApplicationPhonebook.hpp>
 
 namespace gui
@@ -76,7 +76,7 @@ namespace gui
     {
         if (auto lockData = dynamic_cast<LockData *>(data)) {
             rebuild();
-            lock                   = lockData->getLock();
+            lock = lockData->getLock();
             assert(lock);
 
             buildPinLockBox();

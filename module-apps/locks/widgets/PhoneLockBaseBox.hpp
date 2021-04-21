@@ -5,7 +5,7 @@
 
 #include "Image.hpp"
 #include "LockBox.hpp"
-#include "popups/lock-windows/LockWindow.hpp"
+#include "locks/windows/LockWindow.hpp"
 
 namespace gui
 {

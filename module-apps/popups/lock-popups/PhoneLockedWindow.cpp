@@ -3,8 +3,12 @@
 
 #include <memory>
 #include <module-apps/application-desktop/data/DesktopStyle.hpp>
+#include <module-apps/application-desktop/windows/Names.hpp>
+
 #include <module-utils/time/DateAndTimeSettings.hpp>
 #include <module-services/service-appmgr/service-appmgr/Controller.hpp>
+#include <service-time/ServiceTime.hpp>
+#include <service-time/TimeMessage.hpp>
 #include <utility>
 
 #include "Application.hpp"
@@ -64,9 +68,8 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
         bottomBar->setActive(BottomBar::Side::LEFT, false);
 
-        // Nie wiem na chuj to
-        //        application->bus.sendUnicast(std::make_shared<TimersProcessingStopMessage>(),
-        //        service::name::service_time);
+        // No idea what is that
+        application->bus.sendUnicast(std::make_shared<TimersProcessingStopMessage>(), service::name::service_time);
 
         // To be added
         // buildNotifications(app);
@@ -76,8 +79,8 @@ namespace gui
     {
         if (inputEvent.is(KeyCode::KEY_RF)) {
 
-            // tutaj ma być chyba jeśli zakładamy żę tylko desktop to może -> do wyjasnienia
-            //  application->switchWindow(app::window::name::desktop_poweroff);
+            // maybe convert to action hmm
+            application->switchWindow(app::window::name::desktop_poweroff);
             return true;
         }
         // check if any of the lower inheritance onInput methods catch the event
@@ -97,7 +100,7 @@ namespace gui
         else if (enter_cache.storeEnter(inputEvent)) {
             return true;
         }
-        // back not allowed on blocked screen // TODO może lepiej sprawdzić czy zablokowane ogólnie?
+        // back not allowed on blocked screen
         else if (inputEvent.is(KeyCode::KEY_RF)) {
             application->switchWindow(gui::popup::window::phone_lock_info_window);
             return true;

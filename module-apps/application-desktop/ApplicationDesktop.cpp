@@ -6,7 +6,7 @@
 #include "MessageType.hpp"
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/MenuWindow.hpp"
-#include "module-apps/popups/lock-windows/PinLockWindow.hpp"
+#include "module-apps/locks/windows/PinLockWindow.hpp"
 #include "windows/PowerOffWindow.hpp"
 #include "windows/DeadBatteryWindow.hpp"
 #include "windows/LogoWindow.hpp"

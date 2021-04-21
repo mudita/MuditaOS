@@ -4,7 +4,7 @@
 #pragma once
 
 #include "windows/Names.hpp"
-#include "module-apps/popups/lock-handlers/PinLockHandler.hpp"
+#include "module-apps/locks/handlers/PinLockHandler.hpp"
 
 #include <Application.hpp>
 #include <Service/Message.hpp>

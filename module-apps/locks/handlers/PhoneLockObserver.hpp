@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "popups/lock-widgets/Lock.hpp"
-#include "popups/data/LockMessages.hpp"
+#include "locks/widgets/Lock.hpp"
+#include "locks/data/LockMessages.hpp"
 
 #include "module-sys/Service/Service.hpp"
 

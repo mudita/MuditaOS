@@ -1,8 +1,8 @@
 // Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "popups/data/LockStyle.hpp"
-#include "popups/lock-windows/PinLockBaseWindow.hpp"
+#include "locks/data/LockStyle.hpp"
+#include "locks/windows/PinLockBaseWindow.hpp"
 #include "Lock.hpp"
 #include "PhoneLockBaseBox.hpp"
 

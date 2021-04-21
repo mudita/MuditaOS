@@ -29,7 +29,7 @@
 #include <vector>   // for vector
 #include "TopBarManager.hpp"
 #include "popups/Popups.hpp"
-#include "popups/lock-handlers/PhoneLockSubject.hpp"
+#include "locks/handlers/PhoneLockSubject.hpp"
 #include "WindowsFactory.hpp"
 #include "WindowsStack.hpp"
 

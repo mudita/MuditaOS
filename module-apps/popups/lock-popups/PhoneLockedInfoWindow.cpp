@@ -10,7 +10,7 @@
 #include "FontManager.hpp"
 
 #include "application-desktop/data/DesktopStyle.hpp"
-#include "module-apps/popups/data/LockStyle.hpp"
+#include "module-apps/locks/data/LockStyle.hpp"
 #include "module-apps/application-desktop/windows/Names.hpp"
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
