@@ -101,4 +101,10 @@ namespace lock
 
         return sys::msgHandled();
     }
+
+    bool PhoneLockObserver::isPhoneLocked()
+    {
+        return !lock->isState(Lock::LockState::Unlocked);
+    }
+
 } // namespace lock

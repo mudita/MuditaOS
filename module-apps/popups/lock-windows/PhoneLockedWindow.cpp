@@ -64,6 +64,10 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
         bottomBar->setActive(BottomBar::Side::LEFT, false);
 
+        // Nie wiem na chuj to
+        //        application->bus.sendUnicast(std::make_shared<TimersProcessingStopMessage>(),
+        //        service::name::service_time);
+
         // To be added
         // buildNotifications(app);
     }
@@ -80,18 +84,14 @@ namespace gui
         return AppWindow::onInput(inputEvent);
     }
 
-    bool PhoneLockedWindow::processShortPressEventOnLocked(const InputEvent &inputEvent)
+    bool PhoneLockedWindow::processShortPressEvent(const InputEvent &inputEvent)
     {
         // if enter was pressed
         if (enter_cache.cached() && inputEvent.is(KeyCode::KEY_PND)) {
             // if interval between enter and pnd keys is less than time defined for unlocking
             // display pin lock screen or simply refresh current window to update labels
 
-            LOG_ERROR("Chce dac unlocka");
-
             phoneLockSubject->unlock();
-            //          getAppDesktop()->lockHandler.unlockScreen();
-
             return true;
         }
         else if (enter_cache.storeEnter(inputEvent)) {
@@ -118,7 +118,7 @@ namespace gui
             return processLongPressEvent(inputEvent);
         }
         else if (inputEvent.isShortPress()) {
-            return processShortPressEventOnLocked(inputEvent);
+            return processShortPressEvent(inputEvent);
         }
         return AppWindow::onInput(inputEvent);
     }

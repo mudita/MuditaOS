@@ -640,7 +640,13 @@ namespace app::manager
     auto ApplicationManager::handleHomeAction(ActionEntry &action) -> ActionProcessStatus
     {
         action.setTargetApplication(rootApplicationName);
-        SwitchRequest switchRequest(ServiceName, rootApplicationName, gui::name::window::main_window, nullptr);
+
+        auto targetWindow = gui::name::window::main_window;
+        if (phoneLockObserver->isPhoneLocked()) {
+            targetWindow = gui::popup::window::phone_lock_window;
+        }
+
+        SwitchRequest switchRequest(ServiceName, rootApplicationName, targetWindow, nullptr);
         return handleSwitchApplication(&switchRequest) ? ActionProcessStatus::Accepted : ActionProcessStatus::Dropped;
     }
 

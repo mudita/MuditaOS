@@ -40,6 +40,7 @@ namespace lock
         void enablePhoneLock(bool _phoneLockEnabled);
         void setPhoneLockHash(const std::string &value);
         void connect(sys::Service *owner);
+        [[nodiscard]] bool isPhoneLocked();
     };
 
 } // namespace lock

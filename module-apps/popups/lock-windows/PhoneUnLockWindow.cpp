@@ -53,6 +53,18 @@ namespace gui
         }
     }
 
+    top_bar::Configuration PhoneUnlockWindow::configureTopBar(top_bar::Configuration appConfiguration)
+    {
+        appConfiguration.disable(top_bar::Indicator::NetworkAccessTechnology);
+        appConfiguration.disable(top_bar::Indicator::Time);
+        appConfiguration.enable(top_bar::Indicator::PhoneMode);
+        appConfiguration.enable(top_bar::Indicator::Lock);
+        appConfiguration.enable(top_bar::Indicator::Battery);
+        appConfiguration.enable(top_bar::Indicator::Signal);
+        appConfiguration.enable(top_bar::Indicator::SimCard);
+        return appConfiguration;
+    }
+
     void PhoneUnlockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (auto lockData = dynamic_cast<lock::LockData *>(data)) {

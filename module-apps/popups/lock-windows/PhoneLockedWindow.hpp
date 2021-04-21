@@ -61,7 +61,7 @@ namespace gui
         } enter_cache;
 
         bool processLongPressEvent(const InputEvent &inputEvent);
-        bool processShortPressEventOnLocked(const InputEvent &inputEvent);
+        bool processShortPressEvent(const InputEvent &inputEvent);
 
         std::shared_ptr<lock::PhoneLockSubject> phoneLockSubject;
 
