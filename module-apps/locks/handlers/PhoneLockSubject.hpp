@@ -17,6 +17,7 @@ namespace lock
 
         void unlock();
         void lock();
+        void verifyInput(const std::vector<unsigned int> &inputData);
     };
 
 } // namespace lock

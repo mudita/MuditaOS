@@ -134,8 +134,7 @@ namespace app::manager
           ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, notificationProvider(this),
           autoLockEnabled(false), settings(std::make_unique<settings::Settings>(this)),
-          phoneModeObserver(std::make_unique<sys::phone_modes::Observer>()),
-          phoneLockObserver(std::make_unique<lock::PhoneLockObserver>())
+          phoneModeObserver(std::make_unique<sys::phone_modes::Observer>()), phoneLockHandler(lock::PhoneLocHandler())
     {
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, timerBlock, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
@@ -150,19 +149,32 @@ namespace app::manager
         utils::setDisplayLanguage(
             settings->getValue(settings::SystemProperties::displayLanguage, settings::SettingsScope::Global));
 
-        phoneLockObserver->setPhoneLockHash(
+        phoneLockHandler.setPhoneLockHash(
             settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global));
+        phoneLockHandler.addOnPhoneLockCallback([this]() {
+            actionsRegistry.enqueue(
+                ActionEntry{actions::ShowPopup, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock)});
+        });
+        phoneLockHandler.addOnPhoneUnlockCallback([this]() {
+            actionsRegistry.enqueue(
+                ActionEntry{actions::AbortPopup, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::InputLock)});
+            actionsRegistry.enqueue(
+                ActionEntry{actions::AbortPopup, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock)});
+        });
+        phoneLockHandler.addOnPhoneInputRequiredCallback([this](lock::Lock lock) {
+            actionsRegistry.enqueue(
+                ActionEntry{actions::ShowPopup,
+                            std::make_unique<gui::PhoneUnlockInputRequestParams>(gui::popup::ID::InputLock, lock)});
+        });
 
         settings->registerValueChange(
             settings::SystemProperties::lockScreenPasscodeIsOn,
-            [this](const std::string &value) {
-                phoneLockObserver->enablePhoneLock(utils::getNumericValue<bool>(value));
-            },
+            [this](const std::string &value) { phoneLockHandler.enablePhoneLock(utils::getNumericValue<bool>(value)); },
             settings::SettingsScope::Global);
 
         settings->registerValueChange(
             settings::SystemProperties::lockPassHash,
-            [this](const std::string &value) { phoneLockObserver->setPhoneLockHash(value); },
+            [this](const std::string &value) { phoneLockHandler.setPhoneLockHash(value); },
             settings::SettingsScope::Global);
 
         settings->registerValueChange(
@@ -295,24 +307,6 @@ namespace app::manager
                 ActionEntry{actions::ShowPopup, std::make_unique<gui::PhoneModePopupRequestParams>(phoneMode)});
         });
 
-        phoneLockObserver->connect(this);
-        phoneLockObserver->subscribe(
-            [this]() {
-                actionsRegistry.enqueue(ActionEntry{
-                    actions::ShowPopup, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock)});
-            },
-            [this]() {
-                actionsRegistry.enqueue(ActionEntry{
-                    actions::AbortPopup, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::InputLock)});
-                actionsRegistry.enqueue(ActionEntry{
-                    actions::AbortPopup, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock)});
-            },
-            [this](lock::Lock lock) {
-                actionsRegistry.enqueue(
-                    ActionEntry{actions::ShowPopup,
-                                std::make_unique<gui::PhoneUnlockInputRequestParams>(gui::popup::ID::InputLock, lock)});
-            });
-
         connect(typeid(StartAllowedMessage), [this](sys::Message *request) {
             auto msg = static_cast<StartAllowedMessage *>(request);
             handleStart(msg);
@@ -432,6 +426,14 @@ namespace app::manager
             auto response = static_cast<db::QueryResponse *>(msg);
             handleDBResponse(response);
             return sys::msgHandled();
+        });
+        connect(typeid(lock::LockPhone),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleLockRequest(); });
+        connect(typeid(lock::UnlockPhone),
+                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleUnlockRequest(); });
+        connect(typeid(lock::LockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
+            auto msg = static_cast<lock::LockPhoneInput *>(request);
+            return phoneLockHandler.verifyPhoneLockInput(msg->getInputData());
         });
 
         connect(typeid(app::manager::DOMRequest), [&](sys::Message *request) { return handleDOMRequest(request); });
@@ -642,7 +644,7 @@ namespace app::manager
         action.setTargetApplication(rootApplicationName);
 
         auto targetWindow = gui::name::window::main_window;
-        if (phoneLockObserver->isPhoneLocked()) {
+        if (phoneLockHandler.isPhoneLocked()) {
             targetWindow = gui::popup::window::phone_lock_window;
         }
 

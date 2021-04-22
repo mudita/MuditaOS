@@ -113,7 +113,7 @@ namespace gui
                 bottomBar->setActive(BottomBar::Side::CENTER, lock->canVerify());
 
                 if (lock->canVerify()) {
-                    lock->activate();
+                    application->verifyPhoneLockInput(lock->getInput());
                 }
 
                 return true;

@@ -31,7 +31,7 @@
 #include <service-eink/Common.hpp>
 
 #include <notifications/NotificationProvider.hpp>
-#include <module-apps/locks/handlers/PhoneLockObserver.hpp>
+#include <module-apps/locks/handlers/PhoneLocHandler.hpp>
 
 namespace app
 {
@@ -181,7 +181,7 @@ namespace app::manager
         std::unique_ptr<settings::Settings> settings;
         std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
 
-        std::unique_ptr<lock::PhoneLockObserver> phoneLockObserver;
+        lock::PhoneLocHandler phoneLockHandler;
 
         void displayLanguageChanged(std::string value);
         void lockTimeChanged(std::string value);

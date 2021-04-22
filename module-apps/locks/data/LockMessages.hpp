@@ -21,6 +21,22 @@ namespace lock
         {}
     };
 
+    class LockPhoneInput : public sys::DataMessage
+    {
+      private:
+        std::vector<unsigned int> inputData;
+
+      public:
+        explicit LockPhoneInput(std::vector<unsigned int> inputData)
+            : DataMessage{MessageType::MessageTypeUninitialized}, inputData(std::move(inputData))
+        {}
+
+        [[nodiscard]] auto getInputData() const noexcept
+        {
+            return inputData;
+        }
+    };
+
     class ChangedSuccessfully : public sys::ResponseMessage
     {};
 

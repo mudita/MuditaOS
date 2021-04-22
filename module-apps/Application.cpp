@@ -910,7 +910,11 @@ namespace app
     void Application::handlePhoneUnLock()
     {
         phoneLockSubject.unlock();
-        ;
+    }
+
+    void Application::verifyPhoneLockInput(const std::vector<unsigned int> &inputData)
+    {
+        phoneLockSubject.verifyInput(inputData);
     }
 
     void Application::setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept

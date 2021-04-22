@@ -23,4 +23,10 @@ namespace lock
     {
         owner->bus.sendUnicast(std::make_shared<LockPhone>(), app::manager::ApplicationManager::ServiceName);
     }
+
+    void PhoneLockSubject::verifyInput(const std::vector<unsigned int> &inputData)
+    {
+        owner->bus.sendUnicast(std::make_shared<LockPhoneInput>(inputData),
+                               app::manager::ApplicationManager::ServiceName);
+    }
 } // namespace lock

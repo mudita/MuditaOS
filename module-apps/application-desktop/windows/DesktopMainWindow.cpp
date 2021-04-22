@@ -115,8 +115,6 @@ namespace gui
     void DesktopMainWindow::setVisibleState()
     {
         auto app = getAppDesktop();
-        applyToTopBar(
-            [this](top_bar::Configuration configuration) { return configureTopBar(std::move(configuration)); });
 
         setActiveState();
 

@@ -57,10 +57,6 @@ namespace gui
 
     void PhoneLockedWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        // To be deleted?
-        applyToTopBar(
-            [this](top_bar::Configuration configuration) { return configureTopBar(std::move(configuration)); });
-
         bottomBar->setActive(BottomBar::Side::RIGHT, false);
         bottomBar->setText(BottomBar::Side::CENTER, utils::translate("app_desktop_unlock"));
         bottomBar->setActive(BottomBar::Side::LEFT, false);

@@ -17,7 +17,7 @@ namespace gui
 
 namespace lock
 {
-    class PhoneLockObserver;
+    class PhoneLocHandler;
 
     class Lock
     {
@@ -66,6 +66,10 @@ namespace lock
         [[nodiscard]] bool canVerify() const noexcept
         {
             return getCharCount() >= minInputSize;
+        }
+        [[nodiscard]] std::vector<unsigned int> getInput() const
+        {
+            return inputValue;
         }
         [[nodiscard]] unsigned int getAttemptsLeft() const noexcept
         {
@@ -137,7 +141,7 @@ namespace lock
             maxInputSize = _maxInputSize;
         }
 
-        friend class PhoneLockObserver;
+        friend class PhoneLocHandler;
         friend class gui::PinLockHandler;
         friend class gui::ChangePasscodeLockHandler;
     };

@@ -403,6 +403,7 @@ namespace app
       public:
         void handlePhoneLock();
         void handlePhoneUnLock();
+        void verifyPhoneLockInput(const std::vector<unsigned int> &inputData);
 
         void setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept;
         bool isLockScreenPasscodeOn() const noexcept;
