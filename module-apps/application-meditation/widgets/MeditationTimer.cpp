@@ -2,14 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
-
-#include <cassert>
+#include "GuiTimer.hpp"
 
 #include <service-audio/AudioServiceAPI.hpp>
 #include <application-meditation/data/Style.hpp>
+#include <purefs/filesystem_paths.hpp>
 #include <time/time_conversion.hpp>
-
-#include "GuiTimer.hpp"
 
 namespace gui
 {
@@ -157,14 +155,11 @@ namespace gui
         timer->setVisible(isVisible);
     }
 
-    namespace
-    {
-        constexpr auto intervalSoundPath = "assets/audio/sms_drum_2.mp3";
-    }
-
     void MeditationTimer::onInterval() const
     {
-        AudioServiceAPI::PlaybackStart(application, audio::PlaybackType::Meditation, intervalSoundPath);
+        AudioServiceAPI::PlaybackStart(application,
+                                       audio::PlaybackType::Meditation,
+                                       purefs::dir::getCurrentOSPath() / "assets/audio/meditation/gong.mp3");
     }
 
     void MeditationTimer::registerTimeoutCallback(const std::function<void()> &cb)
