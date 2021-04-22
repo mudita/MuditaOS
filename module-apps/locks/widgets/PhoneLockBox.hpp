@@ -11,7 +11,8 @@ namespace gui
     class PhoneLockBox : public PhoneLockBaseBox
     {
       public:
-        PhoneLockBox(PinLockBaseWindow *LockBaseWindow) : PhoneLockBaseBox(LockBaseWindow), LockWindow(LockBaseWindow)
+        explicit PhoneLockBox(PinLockBaseWindow *LockBaseWindow)
+            : PhoneLockBaseBox(LockBaseWindow), LockWindow(LockBaseWindow)
         {}
 
       private:

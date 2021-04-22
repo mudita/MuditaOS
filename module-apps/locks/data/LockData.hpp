@@ -16,12 +16,10 @@ namespace lock
         std::unique_ptr<Lock> lock;
 
       public:
-        LockData(std::unique_ptr<Lock> &&lock) : SwitchData(), lock(std::move(lock))
+        explicit LockData(std::unique_ptr<Lock> &&lock) : SwitchData(), lock(std::move(lock))
         {
             description = "LockPhoneData";
         }
-
-        virtual ~LockData(){};
 
         [[nodiscard]] std::unique_ptr<Lock> getLock()
         {

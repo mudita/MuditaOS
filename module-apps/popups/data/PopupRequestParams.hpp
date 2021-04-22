@@ -31,7 +31,7 @@ namespace gui
     class PhoneUnlockInputRequestParams : public PopupRequestParams
     {
       public:
-        explicit PhoneUnlockInputRequestParams(gui::popup::ID popupId, lock::Lock *lock)
+        PhoneUnlockInputRequestParams(gui::popup::ID popupId, lock::Lock *lock)
             : PopupRequestParams{popupId}, lock{lock}
         {}
 

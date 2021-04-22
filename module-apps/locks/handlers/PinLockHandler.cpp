@@ -35,7 +35,7 @@ namespace gui
 
     void PinLockHandler::handleScreenPin(const std::vector<unsigned int> &pin)
     {
-        const uint32_t hash = GetHash(pin);
+        const uint32_t hash = getHash(pin);
         screenLock.attemptsLeft--;
         if (hash == app->getLockPassHash()) {
             screenLock.lockState    = gui::Lock::LockState::Unlocked;

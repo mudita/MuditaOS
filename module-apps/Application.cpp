@@ -786,10 +786,10 @@ namespace app
         }
         else if (id == ID::InputLock) {
             auto popupParams = static_cast<const gui::PhoneUnlockInputRequestParams *>(params);
-            auto lock        = std::make_unique<lock::Lock>(*popupParams->getLock());
 
             assert(popupParams->getLock());
 
+            auto lock = std::make_unique<lock::Lock>(*popupParams->getLock());
             switchWindow(gui::popup::resolveWindowName(id), std::make_unique<lock::LockData>(std::move(lock)));
         }
         else {
@@ -801,7 +801,6 @@ namespace app
     {
         const auto popupName = gui::popup::resolveWindowName(id);
 
-        // Spróbowac wyciagac ze stacka okienek - albo dodac jire na to na pozniej
         if (getCurrentWindow()->getName() == popupName) {
             returnToPreviousWindow();
         }

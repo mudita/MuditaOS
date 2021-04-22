@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,7 +20,7 @@ template <> struct std::hash<std::vector<unsigned int>>
     }
 };
 
-static inline uint32_t GetHash(const std::vector<unsigned int> &input)
+static inline uint32_t getHash(const std::vector<unsigned int> &input)
 {
     static std::hash<std::vector<unsigned int>> hashEngine;
     return hashEngine(input);

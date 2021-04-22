@@ -40,12 +40,11 @@ namespace lock
 
     void Lock::activate()
     {
-        auto inputCopy = std::move(inputValue);
-        clearAttempt();
         if (!onActivatedCallback) {
             LOG_ERROR("Passcode verification callback null");
             return;
         }
-        onActivatedCallback(lockType, inputCopy);
+        onActivatedCallback(lockType, inputValue);
+        clearAttempt();
     }
 } // namespace lock

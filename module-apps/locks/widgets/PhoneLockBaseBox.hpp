@@ -12,7 +12,7 @@ namespace gui
     class PhoneLockBaseBox : public LockBox
     {
       public:
-        PhoneLockBaseBox(LockWindow *lockBaseWindow) : lockWindow(lockBaseWindow)
+        explicit PhoneLockBaseBox(LockWindow *lockBaseWindow) : lockWindow(lockBaseWindow)
         {}
 
         void buildLockBox(unsigned int pinSize) override;

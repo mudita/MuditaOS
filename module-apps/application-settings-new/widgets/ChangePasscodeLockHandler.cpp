@@ -13,7 +13,7 @@ namespace gui
     Lock::LockState ChangePasscodeLockHandler::checkPasscode(unsigned int currentLockPassHash)
     {
         return activateLock([this, currentLockPassHash](Lock::LockType, const std::vector<unsigned int> &pin) {
-            const auto hash = GetHash(pin);
+            const auto hash = getHash(pin);
             if (hash == currentLockPassHash) {
                 lock.lockState = Lock::LockState::NewInputRequired;
             }
@@ -26,7 +26,7 @@ namespace gui
     Lock::LockState ChangePasscodeLockHandler::newPasscodeConfirmed()
     {
         return activateLock([this](Lock::LockType, const std::vector<unsigned int> &pin) {
-            const auto newPasscodeConfirmedHash = GetHash(pin);
+            const auto newPasscodeConfirmedHash = getHash(pin);
             if (newPasscodeHash == newPasscodeConfirmedHash) {
                 lock.lockState = Lock::LockState::Unlocked;
             }
@@ -43,7 +43,7 @@ namespace gui
                 lock.lockState = Lock::LockState::NewInputInvalidRetryRequired;
                 return;
             }
-            newPasscodeHash = GetHash(pin);
+            newPasscodeHash = getHash(pin);
             lock.lockState  = Lock::LockState::NewInputConfirmRequired;
         });
     }

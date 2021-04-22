@@ -14,7 +14,7 @@ namespace lock
         lock = new Lock(Lock::LockState::InputRequired, default_attempts);
 
         lock->onActivatedCallback = [this](Lock::LockType type, const std::vector<unsigned int> &data) {
-            const uint32_t hash = GetHash(data);
+            const uint32_t hash = getHash(data);
             lock->attemptsLeft--;
 
             if (phoneLockHash == hash) {
@@ -76,19 +76,19 @@ namespace lock
         // Check if phoneLock has not been disabled by setting
         if (!phoneLockEnabled) {
             onPhoneUnlockCallback();
+            return sys::msgHandled();
         }
-        else {
-            if (lock->isState(Lock::LockState::Unlocked)) {
-                onPhoneUnlockCallback();
-            }
-            else if (lock->isState(Lock::LockState::Blocked)) {
-                onPhonePasscodeRequiredCallback(lock);
-            }
-            else if (!lock->isState(Lock::LockState::Unlocked)) {
 
-                lock->lockState = Lock::LockState::InputRequired;
-                onPhonePasscodeRequiredCallback(lock);
-            }
+        if (lock->isState(Lock::LockState::Unlocked)) {
+            onPhoneUnlockCallback();
+        }
+        else if (lock->isState(Lock::LockState::Blocked)) {
+            onPhonePasscodeRequiredCallback(lock);
+        }
+        else if (!lock->isState(Lock::LockState::Unlocked)) {
+
+            lock->lockState = Lock::LockState::InputRequired;
+            onPhonePasscodeRequiredCallback(lock);
         }
 
         return sys::msgHandled();
@@ -102,7 +102,7 @@ namespace lock
         return sys::msgHandled();
     }
 
-    bool PhoneLockObserver::isPhoneLocked()
+    bool PhoneLockObserver::isPhoneLocked() const noexcept
     {
         return !lock->isState(Lock::LockState::Unlocked);
     }

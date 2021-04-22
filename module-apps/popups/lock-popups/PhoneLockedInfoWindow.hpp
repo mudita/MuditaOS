@@ -17,7 +17,7 @@ namespace gui
         void setVisibleState();
 
       public:
-        explicit PhoneLockedInfoWindow(app::Application *app, const std::string &name);
+        PhoneLockedInfoWindow(app::Application *app, const std::string &name);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 

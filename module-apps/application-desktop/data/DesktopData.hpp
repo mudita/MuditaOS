@@ -7,6 +7,7 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <filesystem>
+#include <utility>
 
 namespace gui
 {
@@ -14,10 +15,10 @@ namespace gui
     class UpdateSwitchData : public gui::SwitchData
     {
       public:
-        UpdateSwitchData(sdesktop::UpdateOsMessage *messageToCopyFrom) : updateOsMessage(*messageToCopyFrom)
+        explicit UpdateSwitchData(sdesktop::UpdateOsMessage *messageToCopyFrom) : updateOsMessage(*messageToCopyFrom)
         {}
 
-        const sdesktop::UpdateOsMessage &getUpdateOsMessage()
+        [[nodiscard]] const sdesktop::UpdateOsMessage &getUpdateOsMessage() const noexcept
         {
             return updateOsMessage;
         }
@@ -38,7 +39,7 @@ namespace gui
 
         void setData(std::string version)
         {
-            osVersion = version;
+            osVersion = std::move(version);
         }
     };
 
