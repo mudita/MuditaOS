@@ -79,15 +79,21 @@ namespace purefs::blkdev
          * @param[in] device_name Device or partition name
          * @param[in] target_state Set the target power state
          * @return zero or success otherwise error
-         * @note If the partition is changed whole device state will be suspended
+         * @note If the partition is changed the device state will be suspended
          */
         auto pm_control(disk_fd dfd, pm_state target_state) -> int;
         auto pm_control(std::string_view device_name, pm_state target_state) -> int;
+        /* Set all block devices registered in the disk manager to target pm state
+         * @param[in] target_state Set the target power state
+         * @return Error code from the last failed device
+         * @note If the partition is changed the device state will be suspended
+         */
+        auto pm_control(pm_state target_state) -> int;
         /** Get block device power state
          * @param[in] dfd Disk device handle
          * @param[out] currrent_state Device current state
          * @return zero or success otherwise error
-         * @note If the partition is changed whole device state will be suspended
+         * @note If the partition is changed the device state will be suspended
          */
         auto pm_read(disk_fd dfd, pm_state &current_state) -> int;
         auto pm_read(std::string_view device_name, pm_state &current_state) -> int;
