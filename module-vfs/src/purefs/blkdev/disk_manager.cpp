@@ -238,6 +238,19 @@ namespace purefs::blkdev
         }
         return disk->pm_control(target_state);
     }
+    auto disk_manager::pm_control(pm_state target_state) -> int
+    {
+        cpp_freertos::LockGuard _lck(*m_lock);
+        int last_err{};
+        for (const auto &disk : m_dev_map) {
+            auto err = disk.second->pm_control(target_state);
+            if (err) {
+                LOG_ERROR("Unable to change PM state for device %s errno: %i", disk.first.c_str(), err);
+                last_err = err;
+            }
+        }
+        return last_err;
+    }
     auto disk_manager::pm_read(disk_fd dfd, pm_state &current_state) -> int
     {
         if (!dfd) {
