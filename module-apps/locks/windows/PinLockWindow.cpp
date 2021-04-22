@@ -76,8 +76,7 @@ namespace gui
     {
         if (auto lockData = dynamic_cast<LockData *>(data)) {
             rebuild();
-            lock = lockData->getLock();
-            assert(lock);
+            lock = std::make_unique<lock::Lock>(lockData->getLock());
 
             buildPinLockBox();
             lockBox->buildLockBox(lock->getMaxInputSize());

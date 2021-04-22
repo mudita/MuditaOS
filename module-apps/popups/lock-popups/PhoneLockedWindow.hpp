@@ -16,8 +16,6 @@ namespace app
 
 namespace gui
 {
-    class PhoneLockObserver;
-
     class NotificationsBox;
 
     class PhoneLockedWindow : public AppWindow
@@ -63,12 +61,8 @@ namespace gui
         bool processLongPressEvent(const InputEvent &inputEvent);
         bool processShortPressEvent(const InputEvent &inputEvent);
 
-        std::shared_ptr<lock::PhoneLockSubject> phoneLockSubject;
-
       public:
-        PhoneLockedWindow(app::Application *app,
-                          const std::string &name,
-                          std::shared_ptr<lock::PhoneLockSubject> phoneLockSubject);
+        PhoneLockedWindow(app::Application *app, const std::string &name);
 
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

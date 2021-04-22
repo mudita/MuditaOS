@@ -13,11 +13,11 @@ namespace lock
     class PhoneLockObserver
     {
       private:
-        Lock *lock = nullptr;
+        Lock lock;
 
         using OnPhoneLockCallback             = std::function<void()>;
         using OnPhoneUnlockCallback           = std::function<void()>;
-        using OnPhonePasscodeRequiredCallback = std::function<void(Lock *)>;
+        using OnPhonePasscodeRequiredCallback = std::function<void(Lock)>;
 
         OnPhoneLockCallback onPhoneLockCallback;
         OnPhoneUnlockCallback onPhoneUnlockCallback;
@@ -31,7 +31,6 @@ namespace lock
 
       public:
         PhoneLockObserver();
-        ~PhoneLockObserver();
 
         void subscribe(OnPhoneLockCallback &&onLock,
                        OnPhoneUnlockCallback &&onUnlock,

@@ -71,8 +71,7 @@ namespace gui
 
             rebuild();
 
-            lock = lockData->getLock();
-            assert(lock);
+            lock = std::make_unique<lock::Lock>(lockData->getLock());
 
             lockBox = std::make_unique<PhoneLockBox>(this);
 

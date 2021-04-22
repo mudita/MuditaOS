@@ -13,17 +13,17 @@ namespace lock
     // class template that stores information that was sent along with switch message
     class LockData : public gui::SwitchData
     {
-        std::unique_ptr<Lock> lock;
+        Lock lock;
 
       public:
-        explicit LockData(std::unique_ptr<Lock> &&lock) : SwitchData(), lock(std::move(lock))
+        explicit LockData(Lock lock) : SwitchData(), lock(std::move(lock))
         {
             description = "LockPhoneData";
         }
 
-        [[nodiscard]] std::unique_ptr<Lock> getLock()
+        [[nodiscard]] Lock getLock()
         {
-            return std::make_unique<Lock>(*lock.get());
+            return lock;
         }
     };
 

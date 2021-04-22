@@ -307,7 +307,7 @@ namespace app::manager
                 actionsRegistry.enqueue(ActionEntry{
                     actions::AbortPopup, std::make_unique<gui::PopupRequestParams>(gui::popup::ID::PhoneLock)});
             },
-            [this](lock::Lock *lock) {
+            [this](lock::Lock lock) {
                 actionsRegistry.enqueue(
                     ActionEntry{actions::ShowPopup,
                                 std::make_unique<gui::PhoneUnlockInputRequestParams>(gui::popup::ID::InputLock, lock)});

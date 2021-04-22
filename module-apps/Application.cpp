@@ -97,7 +97,7 @@ namespace app
           default_window(gui::name::window::main_window), windowsStack(this),
           keyTranslator{std::make_unique<gui::KeyInputSimpleTranslation>()}, startInBackground{startInBackground},
           callbackStorage{std::make_unique<CallbackStorage>()}, topBarManager{std::make_unique<TopBarManager>()},
-          settings(std::make_unique<settings::Settings>(this)), phoneMode{mode}
+          settings(std::make_unique<settings::Settings>(this)), phoneMode{mode}, phoneLockSubject(this)
     {
         topBarManager->enableIndicators({gui::top_bar::Indicator::Time});
         topBarManager->set(utils::dateAndTimeSettings.isTimeFormat12() ? gui::top_bar::TimeMode::Time12h
@@ -142,8 +142,6 @@ namespace app
             handle(notificationParams);
             return actionHandled();
         });
-
-        phoneLockSubject = std::make_shared<lock::PhoneLockSubject>(this);
     }
 
     Application::~Application() noexcept
@@ -756,8 +754,8 @@ namespace app
                 break;
             case ID::PhoneLock:
             case ID::InputLock:
-                windowsFactory.attach(window::phone_lock_window, [this](Application *app, const std::string &name) {
-                    return std::make_unique<gui::PhoneLockedWindow>(app, window::phone_lock_window, phoneLockSubject);
+                windowsFactory.attach(window::phone_lock_window, [](Application *app, const std::string &name) {
+                    return std::make_unique<gui::PhoneLockedWindow>(app, window::phone_lock_window);
                 });
                 windowsFactory.attach(window::phone_lock_info_window, [](Application *app, const std::string &name) {
                     return std::make_unique<gui::PhoneLockedInfoWindow>(app, window::phone_lock_info_window);
@@ -787,10 +785,7 @@ namespace app
         else if (id == ID::InputLock) {
             auto popupParams = static_cast<const gui::PhoneUnlockInputRequestParams *>(params);
 
-            assert(popupParams->getLock());
-
-            auto lock = std::make_unique<lock::Lock>(*popupParams->getLock());
-            switchWindow(gui::popup::resolveWindowName(id), std::make_unique<lock::LockData>(std::move(lock)));
+            switchWindow(gui::popup::resolveWindowName(id), std::make_unique<lock::LockData>(popupParams->getLock()));
         }
         else {
             switchWindow(gui::popup::resolveWindowName(id));
@@ -909,7 +904,13 @@ namespace app
 
     void Application::handlePhoneLock()
     {
-        phoneLockSubject->lock();
+        phoneLockSubject.lock();
+    }
+
+    void Application::handlePhoneUnLock()
+    {
+        phoneLockSubject.unlock();
+        ;
     }
 
     void Application::setLockScreenPasscodeOn(bool screenPasscodeOn) noexcept

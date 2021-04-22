@@ -54,7 +54,7 @@ namespace gui
                 };
                 application->switchWindow(app::window::name::desktop_pin_lock,
                                           gui::ShowMode::GUI_SHOW_INIT,
-                                          std::make_unique<lock::LockData>(std::move(lock)));
+                                          std::make_unique<lock::LockData>(*lock));
                 return true;
             },
             [=](Item &item) {

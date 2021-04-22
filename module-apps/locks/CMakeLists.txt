@@ -1,13 +1,13 @@
 ﻿
 include_directories( ${CMAKE_PROJECT_NAME}
 
-	PUBLIC
+	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}"
 )
 
 include_directories( ${PROJECT_NAME}
 
-	PUBLIC
+	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}"
 )
 
@@ -26,7 +26,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhoneLockBox.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/SimLockBox.cpp"
 
-	PUBLIC
+	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockData.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockStyle.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/LockMessages.hpp"

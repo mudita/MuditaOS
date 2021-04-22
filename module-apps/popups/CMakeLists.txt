@@ -1,13 +1,13 @@
 ﻿
 include_directories( ${CMAKE_PROJECT_NAME}
 
-	PUBLIC
+	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}"
 )
 
 include_directories( ${PROJECT_NAME}
 
-	PUBLIC
+	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}"
 )
 
@@ -25,7 +25,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneLockedWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/lock-popups/PhoneUnLockWindow.cpp"
 
-	PUBLIC
+	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/Popups.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/VolumeWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/WindowWithTimer.hpp"

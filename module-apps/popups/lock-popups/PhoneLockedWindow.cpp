@@ -17,10 +17,7 @@
 
 namespace gui
 {
-    PhoneLockedWindow::PhoneLockedWindow(app::Application *app,
-                                         const std::string &name,
-                                         std::shared_ptr<lock::PhoneLockSubject> phoneLockSubject)
-        : AppWindow(app, name), phoneLockSubject(phoneLockSubject)
+    PhoneLockedWindow::PhoneLockedWindow(app::Application *app, const std::string &name) : AppWindow(app, name)
     {
         buildInterface();
 
@@ -94,7 +91,7 @@ namespace gui
             // if interval between enter and pnd keys is less than time defined for unlocking
             // display pin lock screen or simply refresh current window to update labels
 
-            phoneLockSubject->unlock();
+            application->handlePhoneUnLock();
             return true;
         }
         else if (enter_cache.storeEnter(inputEvent)) {

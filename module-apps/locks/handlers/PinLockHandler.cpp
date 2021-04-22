@@ -97,9 +97,8 @@ namespace gui
             app->switchWindow(app::window::name::desktop_main_window);
         };
 
-        app->switchWindow(app::window::name::desktop_pin_lock,
-                          gui::ShowMode::GUI_SHOW_INIT,
-                          std::make_unique<gui::LockData>(std::move(lock)));
+        app->switchWindow(
+            app::window::name::desktop_pin_lock, gui::ShowMode::GUI_SHOW_INIT, std::make_unique<gui::LockData>(*lock));
     }
 
     void PinLockHandler::handlePinChangeRequest(app::manager::actions::ActionParamsPtr &&data)
@@ -212,9 +211,8 @@ namespace gui
         lock->onActivatedCallback = [this](Lock::LockType type, const std::vector<unsigned int> &data) {
             app->switchWindow(app::window::name::desktop_main_window);
         };
-        app->switchWindow(app::window::name::desktop_pin_lock,
-                          gui::ShowMode::GUI_SHOW_INIT,
-                          std::make_unique<gui::LockData>(std::move(lock)));
+        app->switchWindow(
+            app::window::name::desktop_pin_lock, gui::ShowMode::GUI_SHOW_INIT, std::make_unique<gui::LockData>(*lock));
     }
 
     void PinLockHandler::switchToPinLockWindow(
@@ -242,9 +240,8 @@ namespace gui
         else {
             lock->onActivatedCallback = onLockActivatedCallback;
         }
-        app->switchWindow(app::window::name::desktop_pin_lock,
-                          gui::ShowMode::GUI_SHOW_INIT,
-                          std::make_unique<gui::LockData>(std::move(lock)));
+        app->switchWindow(
+            app::window::name::desktop_pin_lock, gui::ShowMode::GUI_SHOW_INIT, std::make_unique<gui::LockData>(*lock));
     }
 
     void PinLockHandler::switchToPinLockWindow(
@@ -254,9 +251,8 @@ namespace gui
         auto lock                 = std::make_unique<gui::Lock>(getStrongestLock());
         lock->lockState           = state;
         lock->onActivatedCallback = onLockActivatedCallback;
-        app->switchWindow(app::window::name::desktop_pin_lock,
-                          gui::ShowMode::GUI_SHOW_INIT,
-                          std::make_unique<gui::LockData>(std::move(lock)));
+        app->switchWindow(
+            app::window::name::desktop_pin_lock, gui::ShowMode::GUI_SHOW_INIT, std::make_unique<gui::LockData>(*lock));
     }
 
     void PinLockHandler::handlePasscode(Lock::LockType type, const std::vector<unsigned int> passcode)
