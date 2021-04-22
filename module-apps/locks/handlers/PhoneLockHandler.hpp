@@ -10,7 +10,7 @@
 
 namespace lock
 {
-    class PhoneLocHandler
+    class PhoneLockHandler
     {
       private:
         Lock lock;
@@ -29,7 +29,7 @@ namespace lock
         void verifyCallbacks();
 
       public:
-        PhoneLocHandler();
+        PhoneLockHandler();
 
         void addOnPhoneLockCallback(OnPhoneLockCallback &&onLock) noexcept;
         void addOnPhoneUnlockCallback(OnPhoneUnlockCallback &&onUnlock) noexcept;

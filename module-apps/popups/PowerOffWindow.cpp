@@ -52,6 +52,9 @@ namespace gui
         metadata.icon  = "turn_off_W_G";
         auto msg       = std::make_unique<DialogMetadataMessage>(std::move(metadata));
         DialogYesNo::onBeforeShow(mode, msg.get());
+
+        bottomBar->setActive(BottomBar::Side::CENTER, false);
+        bottomBar->setActive(BottomBar::Side::RIGHT, false);
     }
 
 } /* namespace gui */

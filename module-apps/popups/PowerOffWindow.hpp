@@ -8,14 +8,14 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/BottomBar.hpp"
-#include "../presenter/PowerOffPresenter.hpp"
+#include "module-apps/popups/presenter/PowerOffPresenter.hpp"
 
 namespace gui
 {
     class PowerOffWindow : public DialogYesNo
     {
-
         std::unique_ptr<PowerOffPresenter> presenter;
+
       public:
         PowerOffWindow(app::Application *app, std::unique_ptr<PowerOffPresenter> &&presenter);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;

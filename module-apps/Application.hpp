@@ -161,7 +161,7 @@ namespace app
       private:
         std::string default_window;
         State state = State::DEACTIVATED;
-        bool lockScreenPasscodeIsOn{};
+        bool lockScreenPasscodeIsOn;
 
         sys::MessagePointer handleSignalStrengthUpdate(sys::Message *msgl);
         sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);

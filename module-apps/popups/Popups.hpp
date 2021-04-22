@@ -33,6 +33,7 @@ namespace gui
             inline constexpr auto phone_lock_window                 = "PhoneLockPopup";
             inline constexpr auto phone_lock_info_window            = "PhoneLockInfoPopup";
             inline constexpr auto input_lock_window                 = "InputLockPopup";
+            inline constexpr auto power_off_window                  = "PowerOffPopup";
 
         } // namespace window
 

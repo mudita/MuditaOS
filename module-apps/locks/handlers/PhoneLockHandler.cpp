@@ -2,22 +2,22 @@
 //// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <module-utils/Utils.hpp>
-#include "PhoneLocHandler.hpp"
+#include "PhoneLockHandler.hpp"
 #include "locks/widgets/LockHash.hpp"
 
 namespace lock
 {
     constexpr unsigned int default_attempts = 4;
 
-    PhoneLocHandler::PhoneLocHandler() : lock(Lock::LockState::InputRequired, default_attempts)
+    PhoneLockHandler::PhoneLockHandler() : lock(Lock::LockState::InputRequired, default_attempts)
     {}
 
-    void PhoneLocHandler::enablePhoneLock(bool _phoneLockEnabled)
+    void PhoneLockHandler::enablePhoneLock(bool _phoneLockEnabled)
     {
         phoneLockEnabled = _phoneLockEnabled;
     }
 
-    void PhoneLocHandler::setPhoneLockHash(const std::string &value)
+    void PhoneLockHandler::setPhoneLockHash(const std::string &value)
     {
         if (!value.empty()) {
             phoneLockHash = utils::getNumericValue<unsigned int>(value);
@@ -27,30 +27,30 @@ namespace lock
         }
     }
 
-    void PhoneLocHandler::verifyCallbacks()
+    void PhoneLockHandler::verifyCallbacks()
     {
         if (!onPhoneLockCallback || !onPhoneUnlockCallback || !onPhoneInputRequiredCallback) {
             throw std::runtime_error("Missing PhoneLockHandlers!");
         }
     }
 
-    void PhoneLocHandler::addOnPhoneLockCallback(PhoneLocHandler::OnPhoneLockCallback &&onLock) noexcept
+    void PhoneLockHandler::addOnPhoneLockCallback(PhoneLockHandler::OnPhoneLockCallback &&onLock) noexcept
     {
         onPhoneLockCallback = std::move(onLock);
     }
 
-    void PhoneLocHandler::addOnPhoneUnlockCallback(PhoneLocHandler::OnPhoneUnlockCallback &&onUnlock) noexcept
+    void PhoneLockHandler::addOnPhoneUnlockCallback(PhoneLockHandler::OnPhoneUnlockCallback &&onUnlock) noexcept
     {
         onPhoneUnlockCallback = std::move(onUnlock);
     }
 
-    void PhoneLocHandler::addOnPhoneInputRequiredCallback(
-        PhoneLocHandler::OnPhoneInputRequiredCallback &&onInputRequired) noexcept
+    void PhoneLockHandler::addOnPhoneInputRequiredCallback(
+        PhoneLockHandler::OnPhoneInputRequiredCallback &&onInputRequired) noexcept
     {
         onPhoneInputRequiredCallback = std::move(onInputRequired);
     }
 
-    sys::MessagePointer PhoneLocHandler::handleUnlockRequest()
+    sys::MessagePointer PhoneLockHandler::handleUnlockRequest()
     {
         verifyCallbacks();
 
@@ -75,7 +75,7 @@ namespace lock
         return sys::msgHandled();
     }
 
-    sys::MessagePointer PhoneLocHandler::handleLockRequest()
+    sys::MessagePointer PhoneLockHandler::handleLockRequest()
     {
         verifyCallbacks();
 
@@ -85,7 +85,7 @@ namespace lock
         return sys::msgHandled();
     }
 
-    sys::MessagePointer PhoneLocHandler::verifyPhoneLockInput(const std::vector<unsigned int> &inputData)
+    sys::MessagePointer PhoneLockHandler::verifyPhoneLockInput(const std::vector<unsigned int> &inputData)
     {
         verifyCallbacks();
 
@@ -110,7 +110,7 @@ namespace lock
         return sys::msgHandled();
     }
 
-    bool PhoneLocHandler::isPhoneLocked() const noexcept
+    bool PhoneLockHandler::isPhoneLocked() const noexcept
     {
         return !lock.isState(Lock::LockState::Unlocked);
     }

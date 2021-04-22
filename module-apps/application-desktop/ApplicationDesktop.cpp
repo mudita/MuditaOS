@@ -6,8 +6,8 @@
 #include "MessageType.hpp"
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/MenuWindow.hpp"
+#include "module-apps/popups/presenter/PowerOffPresenter.hpp"
 #include "module-apps/locks/windows/PinLockWindow.hpp"
-#include "windows/PowerOffWindow.hpp"
 #include "windows/DeadBatteryWindow.hpp"
 #include "windows/LogoWindow.hpp"
 #include "windows/ChargingBatteryWindow.hpp"
@@ -18,7 +18,6 @@
 #include "windows/MmiPullWindow.hpp"
 #include "windows/MmiPushWindow.hpp"
 #include "windows/MmiInternalMsgWindow.hpp"
-#include "presenter/PowerOffPresenter.hpp"
 #include <windows/Dialog.hpp>
 #include <windows/DialogMetadata.hpp>
 #include <messages/DialogMetadataMessage.hpp>
@@ -465,10 +464,6 @@ namespace app
         });
         windowsFactory.attach(desktop_menu, [](Application *app, const std::string newname) {
             return std::make_unique<gui::MenuWindow>(app);
-        });
-        windowsFactory.attach(desktop_poweroff, [](Application *app, const std::string newname) {
-            auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
-            return std::make_unique<gui::PowerOffWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(dead_battery, [](Application *app, const std::string newname) {
             return std::make_unique<gui::DeadBatteryWindow>(app);

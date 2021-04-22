@@ -3,13 +3,11 @@
 
 #include <memory>
 #include <module-apps/application-desktop/data/DesktopStyle.hpp>
-#include <module-apps/application-desktop/windows/Names.hpp>
 
 #include <module-utils/time/DateAndTimeSettings.hpp>
 #include <module-services/service-appmgr/service-appmgr/Controller.hpp>
 #include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
-#include <utility>
 
 #include "Application.hpp"
 
@@ -73,7 +71,7 @@ namespace gui
         if (inputEvent.is(KeyCode::KEY_RF)) {
 
             // maybe convert to action hmm
-            application->switchWindow(app::window::name::desktop_poweroff);
+            application->switchWindow(gui::popup::window::power_off_window);
             return true;
         }
         // check if any of the lower inheritance onInput methods catch the event

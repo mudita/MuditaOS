@@ -18,7 +18,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/PowerOffWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DeadBatteryWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/LogoWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/ChargingBatteryWindow.cpp"
@@ -29,9 +28,8 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPullWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiPushWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MmiInternalMsgWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/presenter/PowerOffPresenter.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/models/ActiveNotificationsModel.cpp"
-		PUBLIC
+	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationDesktop.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/DesktopData.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/DesktopStyle.hpp"
@@ -39,7 +37,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/DesktopInputWidget.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DesktopMainWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/PowerOffWindow.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Reboot.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/Update.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/UpdateProgress.hpp"

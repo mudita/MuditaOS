@@ -134,7 +134,7 @@ namespace app::manager
           ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
           actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, notificationProvider(this),
           autoLockEnabled(false), settings(std::make_unique<settings::Settings>(this)),
-          phoneModeObserver(std::make_unique<sys::phone_modes::Observer>()), phoneLockHandler(lock::PhoneLocHandler())
+          phoneModeObserver(std::make_unique<sys::phone_modes::Observer>()), phoneLockHandler(lock::PhoneLockHandler())
     {
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, timerBlock, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });

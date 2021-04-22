@@ -41,6 +41,8 @@
 #include <module-utils/time/DateAndTimeSettings.hpp>
 
 #include <service-audio/AudioServiceAPI.hpp> // for GetOutputVolume
+#include <module-apps/popups/PowerOffWindow.hpp>
+#include <module-apps/popups/presenter/PowerOffPresenter.hpp>
 #include <module-apps/popups/TetheringPhoneModePopup.hpp>
 #include <module-apps/popups/lock-popups/PhoneLockedWindow.hpp>
 #include <module-apps/popups/lock-popups/PhoneLockedInfoWindow.hpp>
@@ -762,6 +764,10 @@ namespace app
                 });
                 windowsFactory.attach(window::input_lock_window, [](Application *app, const std::string &name) {
                     return std::make_unique<gui::PhoneUnlockWindow>(app, window::input_lock_window);
+                });
+                windowsFactory.attach(window::power_off_window, [](Application *app, const std::string &name) {
+                    auto presenter = std::make_unique<gui::PowerOffPresenter>(app);
+                    return std::make_unique<gui::PowerOffWindow>(app, std::move(presenter));
                 });
                 break;
             }
