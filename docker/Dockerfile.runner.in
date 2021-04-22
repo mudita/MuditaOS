@@ -9,7 +9,9 @@ RUN sed -i'' 's/archive.ubuntu.com/us.archive.ubuntu.com/' /etc/apt/sources.list
 RUN apt-get update 
 RUN apt-get full-upgrade -y 
 RUN apt-get install -y \
-        @INSTALL_PACKAGES@ 
+        @INSTALL_PACKAGES@
+RUN apt-get -qy autoremove
+RUN apt-get -qy clean
 RUN ln -fs /usr/bin/python3 /usr/bin/python
 RUN locale-gen pl_PL.UTF-8 \
                en_US.UTF-8 \
