@@ -13,7 +13,7 @@ namespace gui
                                    std::function<void(const UTF8 &)> bottomBarTemporaryMode,
                                    std::function<void()> bottomBarRestoreFromTemporaryMode,
                                    std::function<void()> selectSpecialCharacter,
-                                   std::function<void()> contentChanged,
+                                   std::function<void(const std::string &text)> contentChanged,
                                    unsigned int lines)
         : listItemName(listItemName), checkTextContent(std::move(contentChanged))
     {
@@ -75,7 +75,7 @@ namespace gui
         inputCallback = [&](Item &item, const InputEvent &event) {
             auto result = inputText->onInput(event);
             if (checkTextContent != nullptr) {
-                checkTextContent();
+                checkTextContent(inputText->getText());
             }
             return result;
         };

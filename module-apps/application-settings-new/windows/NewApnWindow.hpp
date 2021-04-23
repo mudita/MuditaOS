@@ -24,7 +24,6 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
-        auto verifyAndSave() -> bool;
         void setSaveButtonVisible(bool visible);
         std::shared_ptr<packet_data::APN::Config> apn;
         std::shared_ptr<NewApnModel> newApnModel;

@@ -31,5 +31,5 @@ class NewApnModel : public app::InternalModel<gui::ApnListItem *>, public gui::L
     auto getItem(gui::Order order) -> gui::ListItem * override;
 
     void requestRecords(uint32_t offset, uint32_t limit) override;
-    void apnDataChanged();
+    void apnNameChanged(const std::string &newName);
 };

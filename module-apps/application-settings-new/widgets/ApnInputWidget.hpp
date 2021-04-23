@@ -21,14 +21,14 @@ namespace gui
                        std::function<void(const UTF8 &text)> bottomBarTemporaryMode = nullptr,
                        std::function<void()> bottomBarRestoreFromTemporaryMode      = nullptr,
                        std::function<void()> selectSpecialCharacter                 = nullptr,
-                       std::function<void()> contentChanged                         = nullptr,
+                       std::function<void(const std::string &text)> contentChanged  = nullptr,
                        unsigned int lines                                           = 1);
 
       private:
-        VBox *vBox                             = nullptr;
-        Label *titleLabel                      = nullptr;
-        TextFixedSize *inputText               = nullptr;
-        std::function<void()> checkTextContent = nullptr;
+        VBox *vBox                                                    = nullptr;
+        Label *titleLabel                                             = nullptr;
+        TextFixedSize *inputText                                      = nullptr;
+        std::function<void(const std::string &text)> checkTextContent = nullptr;
 
         void applyItemNameSpecificSettings();
         void nameHandler();
