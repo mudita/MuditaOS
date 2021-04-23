@@ -27,12 +27,6 @@ TEST_CASE("SettingsApi")
         std::shared_ptr<settings::MyService> varWritter;
         std::shared_ptr<settings::MyService> varReader;
         std::shared_ptr<settings::AppTest> testVar;
-        std::shared_ptr<settings::ServiceProfile> profWritter;
-        std::shared_ptr<settings::ServiceProfile> profReader;
-        std::shared_ptr<settings::AppTestProfileMode> testProf;
-        std::shared_ptr<settings::ServiceMode> modeWritter;
-        std::shared_ptr<settings::ServiceMode> modeReader;
-        std::shared_ptr<settings::AppTestProfileMode> testMode;
         std::shared_ptr<std::mutex> testStart;
 
         std::shared_ptr<settings::Settings> postMortemSetting;
@@ -43,12 +37,6 @@ TEST_CASE("SettingsApi")
              &varWritter,
              &varReader,
              &testVar,
-             &profWritter,
-             &profReader,
-             &testProf,
-             &modeWritter,
-             &modeReader,
-             &testMode,
              &testStart,
              &postMortemSetting]() {
                 // preliminary
@@ -69,26 +57,6 @@ TEST_CASE("SettingsApi")
 
                 testVar = std::make_shared<settings::AppTest>("appTest", varWritter, varReader, testStart);
                 ret &= sys::SystemManager::RunSystemService(testVar, manager.get());
-
-                profWritter = std::make_shared<settings::ServiceProfile>("writterProf");
-                profReader  = std::make_shared<settings::ServiceProfile>("readerProf");
-
-                ret &= sys::SystemManager::RunSystemService(profWritter, manager.get());
-                ret &= sys::SystemManager::RunSystemService(profReader, manager.get());
-
-                testProf = std::make_shared<settings::AppTestProfileMode>(
-                    "appTestProfile", profWritter, profReader, testStart);
-                ret &= sys::SystemManager::RunSystemService(testProf, manager.get());
-
-                modeWritter = std::make_shared<settings::ServiceMode>("writterMode");
-                modeReader  = std::make_shared<settings::ServiceMode>("readerMode");
-
-                ret &= sys::SystemManager::RunSystemService(modeWritter, manager.get());
-                ret &= sys::SystemManager::RunSystemService(modeReader, manager.get());
-
-                testMode =
-                    std::make_shared<settings::AppTestProfileMode>("appTestMode", modeWritter, modeReader, testStart);
-                ret &= sys::SystemManager::RunSystemService(testMode, manager.get());
 
                 std::cout << "koniec start thr_id: " << std::this_thread::get_id() << std::endl << std::flush;
                 testStart->unlock();
@@ -116,25 +84,6 @@ TEST_CASE("SettingsApi")
             REQUIRE(testVar->v.size() == 3);
             REQUIRE(testVar->v[1] == testVar->v[0] + "1");
             REQUIRE(testVar->v[2] == testVar->v[1] + "2");
-
-            // check the result
-            std::cout << "testProf values:" << std::endl << std::flush;
-            for (const auto &s : testProf->v) {
-                std::cout << s << std::endl << std::flush;
-            }
-            REQUIRE(testProf->v[1] == testProf->v[0] + "1");
-            REQUIRE(testProf->v[2] == testProf->v[0] + "12");
-            REQUIRE(testProf->v[3] == "other");
-
-            std::cout << "testMode values:" << std::endl << std::flush;
-            for (const auto &s : testMode->v) {
-                std::cout << s << std::endl << std::flush;
-            }
-            REQUIRE(testMode->v[1] == testMode->v[0] + "1");
-            REQUIRE(testMode->v[2] == testMode->v[0] + "12");
-            REQUIRE(testMode->v[3] == "other");
-
-            postMortemSetting->addMode("lol");
         }
         catch (std::exception &error) {
             std::cout << error.what() << std::endl;

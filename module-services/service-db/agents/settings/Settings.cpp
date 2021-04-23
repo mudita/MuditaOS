@@ -52,18 +52,6 @@ namespace settings
         using std::placeholders::_2;
         interface.changeHandler(
             typeid(settings::Messages::VariableChanged), change, std::bind(&Settings::handleVariableChanged, this, _1));
-        interface.changeHandler(typeid(settings::Messages::CurrentProfileChanged),
-                                change,
-                                std::bind(&Settings::handleCurrentProfileChanged, this, _1));
-        interface.changeHandler(typeid(settings::Messages::CurrentModeChanged),
-                                change,
-                                std::bind(&Settings::handleCurrentModeChanged, this, _1));
-        interface.changeHandler(typeid(settings::Messages::ProfileListResponse),
-                                change,
-                                std::bind(&Settings::handleProfileListResponse, this, _1));
-        interface.changeHandler(typeid(settings::Messages::ModeListResponse),
-                                change,
-                                std::bind(&Settings::handleModeListResponse, this, _1));
     }
 
     auto Settings::handleVariableChanged(sys::Message *req) -> sys::MessagePointer
@@ -89,46 +77,6 @@ namespace settings
                     cbWithName(key.variable, val.value_or(""));
                 }
             }
-        }
-        return std::make_shared<sys::ResponseMessage>();
-    }
-    auto Settings::handleCurrentProfileChanged(sys::Message *req) -> sys::MessagePointer
-    {
-        log_debug("handleCurrentProfileChanged");
-        if (auto msg = dynamic_cast<settings::Messages::CurrentProfileChanged *>(req)) {
-            auto profile = msg->getProfileName();
-            log_debug("handleCurrentProfileChanged: %s", profile.c_str());
-            cbProfile(profile);
-        }
-        return std::make_shared<sys::ResponseMessage>();
-    }
-    auto Settings::handleCurrentModeChanged(sys::Message *req) -> sys::MessagePointer
-    {
-        log_debug("handleCurrentModeChanged");
-        if (auto msg = dynamic_cast<settings::Messages::CurrentModeChanged *>(req)) {
-            auto mode = msg->getProfileName();
-            log_debug("handleCurrentModeChanged: %s", mode.c_str());
-            cbMode(mode);
-        }
-        return std::make_shared<sys::ResponseMessage>();
-    }
-    auto Settings::handleProfileListResponse(sys::Message *req) -> sys::MessagePointer
-    {
-        log_debug("handleProfileListResponse");
-        if (auto msg = dynamic_cast<settings::Messages::ProfileListResponse *>(req)) {
-            auto profiles = msg->getValue();
-            log_debug("handleProfileListResponse: %zu elements", profiles.size());
-            cbAllProfiles(profiles);
-        }
-        return std::make_shared<sys::ResponseMessage>();
-    }
-    auto Settings::handleModeListResponse(sys::Message *req) -> sys::MessagePointer
-    {
-        log_debug("handleModeListResponse");
-        if (auto msg = dynamic_cast<settings::Messages::ModeListResponse *>(req)) {
-            auto modes = msg->getValue();
-            log_debug("handleModeListResponse: %zu elements", modes.size());
-            cbAllModes(modes);
         }
         return std::make_shared<sys::ResponseMessage>();
     }
@@ -202,76 +150,5 @@ namespace settings
     {
         return interface.getCache()->getValue(
             {.service = interface.ownerName(), .variable = variableName, .scope = scope});
-    }
-
-    void Settings::getAllProfiles(OnAllProfilesRetrievedCallback cb)
-    {
-        if (nullptr == cbAllProfiles) {
-            interface.sendMsg(std::make_shared<settings::Messages::ListProfiles>());
-        }
-        cbAllProfiles = std::move(cb);
-    }
-
-    void Settings::setCurrentProfile(const std::string &profile)
-    {
-        interface.sendMsg(std::make_shared<settings::Messages::SetCurrentProfile>(profile));
-    }
-
-    void Settings::addProfile(const std::string &profile)
-    {
-        interface.sendMsg(std::make_shared<settings::Messages::AddProfile>(profile));
-    }
-
-    void Settings::registerProfileChange(ProfileChangedCallback cb)
-    {
-        if (nullptr != cbProfile) {
-            log_debug("Profile change callback already exists, overwritting");
-        }
-        else {
-            interface.sendMsg(std::make_shared<settings::Messages::RegisterOnProfileChange>());
-        }
-
-        cbProfile = std::move(cb);
-    }
-
-    void Settings::unregisterProfileChange()
-    {
-        cbProfile = nullptr;
-        interface.sendMsg(std::make_shared<settings::Messages::UnregisterOnProfileChange>());
-    }
-
-    void Settings::getAllModes(OnAllModesRetrievedCallback cb)
-    {
-        if (nullptr == cbAllModes) {
-            interface.sendMsg(std::make_shared<settings::Messages::ListModes>());
-        }
-        cbAllModes = std::move(cb);
-    }
-
-    void Settings::setCurrentMode(const std::string &mode)
-    {
-        interface.sendMsg(std::make_shared<settings::Messages::SetCurrentMode>(mode));
-    }
-
-    void Settings::addMode(const std::string &mode)
-    {
-        interface.sendMsg(std::make_shared<settings::Messages::AddMode>(mode));
-    }
-
-    void Settings::registerModeChange(ModeChangedCallback cb)
-    {
-        if (nullptr != cbMode) {
-            log_debug("ModeChange callback allready set overwriting");
-        }
-        else {
-            interface.sendMsg(std::make_shared<settings::Messages::RegisterOnModeChange>());
-        }
-        cbMode = std::move(cb);
-    }
-
-    void Settings::unregisterModeChange()
-    {
-        cbMode = nullptr;
-        interface.sendMsg(std::make_shared<settings::Messages::UnregisterOnModeChange>());
     }
 } // namespace settings

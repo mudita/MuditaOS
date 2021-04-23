@@ -23,12 +23,6 @@ namespace settings
       public:
         using ValueChangedCallback           = std::function<void(const std::string &)>;
         using ValueChangedCallbackWithName   = std::function<void(const std::string &, const std::string &value)>;
-        using ProfileChangedCallback         = std::function<void(const std::string &)>;
-        using ModeChangedCallback            = ProfileChangedCallback;
-        using ListOfProfiles                 = std::list<std::string>;
-        using ListOfModes                    = ListOfProfiles;
-        using OnAllProfilesRetrievedCallback = std::function<void(const ListOfProfiles &)>;
-        using OnAllModesRetrievedCallback    = std::function<void(const ListOfModes &)>;
 
         Settings() = default;
         virtual ~Settings();
@@ -50,18 +44,6 @@ namespace settings
         void unregisterValueChange();
         std::string getValue(const std::string &variableName, SettingsScope scope = SettingsScope::AppLocal);
 
-        void getAllProfiles(OnAllProfilesRetrievedCallback cb);
-        void setCurrentProfile(const std::string &profile);
-        void addProfile(const std::string &profile);
-        void registerProfileChange(ProfileChangedCallback);
-        void unregisterProfileChange();
-
-        void getAllModes(OnAllModesRetrievedCallback cb);
-        void setCurrentMode(const std::string &mode);
-        void addMode(const std::string &mode);
-        void registerModeChange(ModeChangedCallback);
-        void unregisterModeChange();
-
       private:
         Interface interface;
         std::string serviceName;
@@ -71,10 +53,6 @@ namespace settings
 
         using ValueCb = std::map<EntryPath, std::pair<ValueChangedCallback, ValueChangedCallbackWithName>>;
         ValueCb cbValues;
-        ModeChangedCallback cbMode;
-        OnAllModesRetrievedCallback cbAllModes;
-        ProfileChangedCallback cbProfile;
-        OnAllProfilesRetrievedCallback cbAllProfiles;
 
         /// using owner service either
         /// - to register handlers
@@ -83,9 +61,5 @@ namespace settings
         /// existing - handlers shouldn't be called
         void changeHandlers(enum Interface::Change change);
         auto handleVariableChanged(sys::Message *req) -> sys::MessagePointer;
-        auto handleCurrentProfileChanged(sys::Message *req) -> sys::MessagePointer;
-        auto handleCurrentModeChanged(sys::Message *req) -> sys::MessagePointer;
-        auto handleProfileListResponse(sys::Message *req) -> sys::MessagePointer;
-        auto handleModeListResponse(sys::Message *req) -> sys::MessagePointer;
     };
 } // namespace settings
