@@ -11,6 +11,7 @@
 #include "USSD.hpp"
 #include "PacketData.hpp"
 #include "PacketDataCellularMessage.hpp"
+#include <service-cellular/connection-manager/ConnectionManager.hpp>
 
 #include <module-cellular/Modem/ATURCStream.hpp>
 #include <Modem/TS0710/DLC_channel.h>
@@ -62,6 +63,8 @@ namespace constants
     inline constexpr std::chrono::milliseconds sleepTimerInterval{500ms};
     inline constexpr std::chrono::milliseconds enterSleepModeTime{5s};
 } // namespace constants
+
+class ConnectionManager;
 
 class ServiceCellular : public sys::Service
 {
@@ -188,13 +191,18 @@ class ServiceCellular : public sys::Service
     // used to enter modem sleep mode
     sys::TimerHandle sleepTimer;
 
+    // used to manage network connection in Messages only mode
+    sys::TimerHandle connectionTimer;
+
+    std::unique_ptr<settings::Settings> settings;
+
     void SleepTimerHandler();
     void CallStateTimerHandler();
     DLC_channel::Callback_t notificationCallback = nullptr;
 
     std::unique_ptr<packet_data::PacketData> packetData;
     std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
-
+    std::unique_ptr<ConnectionManager> connectionManager;
     cellular::State state;
     bsp::Board board = bsp::Board::none;
 
@@ -268,7 +276,6 @@ class ServiceCellular : public sys::Service
     /// Process change of power state
     void handle_power_state_change();
 
-    std::unique_ptr<settings::Settings> settings = std::make_unique<settings::Settings>(this);
     bool handle_apn_conf_procedure();
 
     bool handleTextMessagesInit();
@@ -334,6 +341,7 @@ class ServiceCellular : public sys::Service
     friend class NetworkSettings;
     friend class packet_data::PDPContext;
     friend class packet_data::PacketData;
+    friend class ConnectionManagerCellularCommands;
 
     void volteChanged(const std::string &value);
     void apnListChanged(const std::string &value);
@@ -341,13 +349,13 @@ class ServiceCellular : public sys::Service
 
     auto handleCellularAnswerIncomingCallMessage(CellularMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
     auto handleCellularCallRequestMessage(CellularCallRequestMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
-    auto handleCellularHangupCallMessage(CellularHangupCallMessage *msg) -> std::shared_ptr<CellularResponseMessage>;
+    void handleCellularHangupCallMessage(CellularHangupCallMessage *msg);
     auto handleDBQueryResponseMessage(db::QueryResponse *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularListCallsMessage(CellularMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleDBNotificatioMessage(db::NotificationMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularRingingMessage(CellularRingingMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleCellularIncominCallMessage(CellularIncominCallMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
-    auto handleCellularCallerIdMessage(CellularCallerIdMessage *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularIncominCallMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularCallerIdMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularSimProcedureMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetIMSIMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularGetOwnNumberMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
@@ -384,13 +392,9 @@ class ServiceCellular : public sys::Service
     auto handleCellularSendSMSMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularRingNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
     auto handleCellularCallerIdNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
+    auto handleCellularSetConnectionFrequencyMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>;
 
-    auto isModemRadioModuleOn() -> bool;
-    auto turnOnRadioModule() -> bool;
-    auto turnOffRadioModule() -> bool;
-
-    auto switchToOffline() -> bool;
-    auto doNotDisturbCondition() -> bool;
+    auto isIncommingCallAllowed() -> bool;
 
     auto hangUpCall() -> bool;
 };

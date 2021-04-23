@@ -167,7 +167,7 @@ namespace app
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
             title,
             "phonebook_empty_grey_circle_W_G",
-            utils::localize.get("app_calendar_no_events_information"),
+            utils::translate("app_calendar_no_events_information"),
             "",
             [=]() -> bool {
                 LOG_DEBUG("Switch to new event window");

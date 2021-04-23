@@ -25,6 +25,7 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/service-appmgr/messages/DOMRequest.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
+#include <service-appmgr/data/NotificationsChangedActionsParams.hpp>
 #include "service-gui/messages/DrawMessage.hpp" // for DrawMessage
 #include "task.h"                               // for xTaskGetTic...
 #include "windows/AppWindow.hpp"                // for AppWindow
@@ -130,6 +131,11 @@ namespace app
             auto popupParams   = static_cast<gui::PopupRequestParams *>(params.get());
             const auto popupId = popupParams->getPopupId();
             abortPopup(popupId);
+            return actionHandled();
+        });
+        addActionReceiver(app::manager::actions::NotificationsChanged, [this](auto &&params) {
+            auto notificationParams = static_cast<manager::actions::NotificationsChangedParams *>(params.get());
+            handle(notificationParams);
             return actionHandled();
         });
     }
@@ -263,10 +269,10 @@ namespace app
     {
         auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
         if (msg != nullptr) {
-            if (msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate) {
+            if (msg->content == CellularNotificationMessage::Content::SignalStrengthUpdate) {
                 return handleSignalStrengthUpdate(msgl);
             }
-            if (msg->type == CellularNotificationMessage::Type::NetworkStatusUpdate) {
+            if (msg->content == CellularNotificationMessage::Content::NetworkStatusUpdate) {
                 return handleNetworkAccessTechnologyUpdate(msgl);
             }
         }
@@ -299,9 +305,6 @@ namespace app
         }
         else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
             return handleSIMMessage(msgl);
-        }
-        else if (dynamic_cast<AudioKeyPressedResponse *>(msgl) != nullptr) {
-            return handleAudioKeyMessage(msgl);
         }
         return sys::msgNotHandled();
     }
@@ -588,25 +591,6 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer Application::handleAudioKeyMessage(sys::Message *msgl)
-    {
-        using namespace gui::popup;
-        const auto msg = static_cast<AudioKeyPressedResponse *>(msgl);
-        if (msg->showPopup == AudioKeyPressedResponse::ShowPopup::True) {
-            LOG_INFO("Playback: %s, volume: %s",
-                     audio::str(msg->context.second).c_str(),
-                     std::to_string(msg->volume).c_str());
-            auto data = std::make_unique<gui::VolumePopupData>(msg->volume, msg->context);
-            if (getCurrentWindow()->getName() == window::volume_window) {
-                updateWindow(window::volume_window, std::move(data));
-            }
-            else {
-                switchWindow(window::volume_window, std::move(data));
-            }
-        }
-        return sys::msgHandled();
-    }
-
     sys::ReturnCodes Application::InitHandler()
     {
         setState(State::INITIALIZING);
@@ -708,13 +692,28 @@ namespace app
 
     void Application::handlePhoneModeChanged(sys::phone_modes::PhoneMode mode)
     {
+        auto flightModeSetting = settings->getValue(settings::Cellular::offlineMode, settings::SettingsScope::Global);
+        bool flightMode        = flightModeSetting == "1" ? true : false;
+
         using namespace gui::popup;
         const auto &popupName = resolveWindowName(gui::popup::ID::PhoneModes);
         if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
-            updateWindow(popupName, std::make_unique<gui::ModesPopupData>(mode));
+            updateWindow(popupName, std::make_unique<gui::ModesPopupData>(mode, flightMode));
         }
         else {
-            switchWindow(popupName, std::make_unique<gui::ModesPopupData>(mode));
+            switchWindow(popupName, std::make_unique<gui::ModesPopupData>(mode, flightMode));
+        }
+    }
+
+    void Application::handleVolumeChanged(audio::Volume volume, audio::Context context)
+    {
+        using namespace gui::popup;
+        const auto popupName = resolveWindowName(gui::popup::ID::Volume);
+        if (const auto currentWindowName = getCurrentWindow()->getName(); currentWindowName == popupName) {
+            updateWindow(popupName, std::make_unique<gui::VolumePopupData>(volume, context));
+        }
+        else {
+            switchWindow(popupName, std::make_unique<gui::VolumePopupData>(volume, context));
         }
     }
 
@@ -759,6 +758,13 @@ namespace app
         if (id == ID::PhoneModes) {
             auto popupParams = static_cast<const gui::PhoneModePopupRequestParams *>(params);
             handlePhoneModeChanged(popupParams->getPhoneMode());
+        }
+        else if (id == ID::Volume) {
+            auto volumeParams = static_cast<const gui::VolumePopupRequestParams *>(params);
+            LOG_INFO("Playback: %s, volume: %s",
+                     audio::str(volumeParams->getAudioContext().second).c_str(),
+                     std::to_string(volumeParams->getVolume()).c_str());
+            handleVolumeChanged(volumeParams->getVolume(), volumeParams->getAudioContext());
         }
         else {
             switchWindow(gui::popup::resolveWindowName(id));
@@ -862,6 +868,11 @@ namespace app
     void Application::addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback)
     {
         receivers.insert_or_assign(actionId, std::move(callback));
+    }
+
+    void Application::handle(manager::actions::NotificationsChangedParams *params)
+    {
+        LOG_DEBUG("To be implemented by Pop-up based Locked-Screen [EGD-5884]");
     }
 
     void Application::cancelCallbacks(AsyncCallbackReceiver::Ptr receiver)

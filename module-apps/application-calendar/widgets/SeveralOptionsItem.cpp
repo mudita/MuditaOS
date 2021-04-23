@@ -79,26 +79,26 @@ namespace gui
     void SeveralOptionsItem::prepareOptionsNames()
     {
         optionsNames.clear();
-        if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_reminder")) {
-            optionsNames.push_back(utils::localize.get("app_calendar_reminder_never"));
-            optionsNames.push_back(utils::localize.get("app_calendar_reminder_event_time"));
-            optionsNames.push_back(utils::localize.get("app_calendar_reminder_5_min_before"));
-            optionsNames.push_back(utils::localize.get("app_calendar_reminder_15_min_before"));
-            optionsNames.push_back(utils::localize.get("app_calendar_reminder_30_min_before"));
-            optionsNames.push_back(utils::localize.get("app_calendar_reminder_1_hour_before"));
-            optionsNames.push_back(utils::localize.get("app_calendar_reminder_2_hour_before"));
-            optionsNames.push_back(utils::localize.get("app_calendar_reminder_1_day_before"));
-            optionsNames.push_back(utils::localize.get("app_calendar_reminder_2_days_before"));
-            optionsNames.push_back(utils::localize.get("app_calendar_reminder_1_week_before"));
+        if (descriptionLabel->getText() == utils::translate("app_calendar_event_detail_reminder")) {
+            optionsNames.push_back(utils::translate("app_calendar_reminder_never"));
+            optionsNames.push_back(utils::translate("app_calendar_reminder_event_time"));
+            optionsNames.push_back(utils::translate("app_calendar_reminder_5_min_before"));
+            optionsNames.push_back(utils::translate("app_calendar_reminder_15_min_before"));
+            optionsNames.push_back(utils::translate("app_calendar_reminder_30_min_before"));
+            optionsNames.push_back(utils::translate("app_calendar_reminder_1_hour_before"));
+            optionsNames.push_back(utils::translate("app_calendar_reminder_2_hour_before"));
+            optionsNames.push_back(utils::translate("app_calendar_reminder_1_day_before"));
+            optionsNames.push_back(utils::translate("app_calendar_reminder_2_days_before"));
+            optionsNames.push_back(utils::translate("app_calendar_reminder_1_week_before"));
         }
-        else if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
-            optionsNames.push_back(utils::localize.get("app_calendar_repeat_never"));
-            optionsNames.push_back(utils::localize.get("app_calendar_repeat_daily"));
-            optionsNames.push_back(utils::localize.get("app_calendar_repeat_weekly"));
-            optionsNames.push_back(utils::localize.get("app_calendar_repeat_two_weeks"));
-            optionsNames.push_back(utils::localize.get("app_calendar_repeat_month"));
-            optionsNames.push_back(utils::localize.get("app_calendar_repeat_year"));
-            optionsNames.push_back(utils::localize.get("app_calendar_repeat_custom"));
+        else if (descriptionLabel->getText() == utils::translate("app_calendar_event_detail_repeat")) {
+            optionsNames.push_back(utils::translate("app_calendar_repeat_never"));
+            optionsNames.push_back(utils::translate("app_calendar_repeat_daily"));
+            optionsNames.push_back(utils::translate("app_calendar_repeat_weekly"));
+            optionsNames.push_back(utils::translate("app_calendar_repeat_two_weeks"));
+            optionsNames.push_back(utils::translate("app_calendar_repeat_month"));
+            optionsNames.push_back(utils::translate("app_calendar_repeat_year"));
+            optionsNames.push_back(utils::translate("app_calendar_repeat_custom"));
         }
     }
 
@@ -107,8 +107,8 @@ namespace gui
         focusChangedCallback = [&](Item &item) {
             if (item.focus) {
                 if (actualVectorIndex == optionsNames.size() - 1 &&
-                    descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
-                    bottomBarTemporaryMode(utils::localize.get("app_calendar_edit"));
+                    descriptionLabel->getText() == utils::translate("app_calendar_event_detail_repeat")) {
+                    bottomBarTemporaryMode(utils::translate("app_calendar_edit"));
                 }
                 optionLabel->setMargins(gui::Margins(0, 0, 0, 0));
             }
@@ -130,8 +130,8 @@ namespace gui
                 actualVectorIndex--;
                 if (actualVectorIndex >= optionsNames.size()) {
                     actualVectorIndex = optionsNames.size() - 1;
-                    if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
-                        bottomBarTemporaryMode(utils::localize.get("app_calendar_edit"));
+                    if (descriptionLabel->getText() == utils::translate("app_calendar_event_detail_repeat")) {
+                        bottomBarTemporaryMode(utils::translate("app_calendar_edit"));
                     }
                 }
                 else {
@@ -147,8 +147,8 @@ namespace gui
                 }
                 optionLabel->setText(optionsNames[actualVectorIndex]);
                 if (actualVectorIndex == optionsNames.size() - 1 &&
-                    descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
-                    bottomBarTemporaryMode(utils::localize.get("app_calendar_edit"));
+                    descriptionLabel->getText() == utils::translate("app_calendar_event_detail_repeat")) {
+                    bottomBarTemporaryMode(utils::translate("app_calendar_edit"));
                 }
                 else {
                     bottomBarRestoreFromTemporaryMode();
@@ -156,7 +156,7 @@ namespace gui
                 return true;
             }
             if (event.keyCode == gui::KeyCode::KEY_LF && actualVectorIndex == optionsNames.size() - 1 &&
-                descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
+                descriptionLabel->getText() == utils::translate("app_calendar_event_detail_repeat")) {
                 OptionParser parser;
                 auto weekDayRepeatData = std::make_unique<WeekDaysRepeatData>();
                 assert(weekDayRepeatData != nullptr);
@@ -168,26 +168,26 @@ namespace gui
         };
 
         onSaveCallback = [&](std::shared_ptr<EventsRecord> record) {
-            if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
+            if (descriptionLabel->getText() == utils::translate("app_calendar_event_detail_repeat")) {
                 if (record->repeat < optionsNames.size() - 1 && actualVectorIndex != optionsNames.size() - 1) {
                     record->repeat = actualVectorIndex;
                 }
                 else if (record->repeat == optionsNames.size() - 1 ||
-                         optionsNames[optionsNames.size() - 1] == utils::localize.get("app_calendar_repeat_custom")) {
+                         optionsNames[optionsNames.size() - 1] == utils::translate("app_calendar_repeat_custom")) {
                     record->repeat = static_cast<uint32_t>(AlarmRepeat::never);
                 }
             }
-            else if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_reminder")) {
+            else if (descriptionLabel->getText() == utils::translate("app_calendar_event_detail_reminder")) {
                 record->reminder = static_cast<uint32_t>(reminderTimeOptions[actualVectorIndex]);
             }
         };
 
         onLoadCallback = [&](std::shared_ptr<EventsRecord> event) {
-            if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_repeat")) {
+            if (descriptionLabel->getText() == utils::translate("app_calendar_event_detail_repeat")) {
                 if (event->repeat < optionsNames.size() - 1) {
                     actualVectorIndex = event->repeat;
                     if (event->repeat == static_cast<uint32_t>(Repeat::never)) {
-                        optionsNames[optionsNames.size() - 1] = utils::localize.get("app_calendar_repeat_custom");
+                        optionsNames[optionsNames.size() - 1] = utils::translate("app_calendar_repeat_custom");
                     }
                     bottomBarRestoreFromTemporaryMode();
                 }
@@ -197,20 +197,20 @@ namespace gui
                         actualVectorIndex = static_cast<uint32_t>(Repeat::daily);
                         event->repeat     = actualVectorIndex;
                         bottomBarRestoreFromTemporaryMode();
-                        optionsNames[optionsNames.size() - 1] = utils::localize.get("app_calendar_repeat_custom");
+                        optionsNames[optionsNames.size() - 1] = utils::translate("app_calendar_repeat_custom");
                     }
                     else {
                         actualVectorIndex                     = optionsNames.size() - 1;
                         optionsNames[optionsNames.size() - 1] = parser.getWeekDaysText();
                         if (this->focus) {
-                            bottomBarTemporaryMode(utils::localize.get("app_calendar_edit"));
+                            bottomBarTemporaryMode(utils::translate("app_calendar_edit"));
                         }
                     }
                 }
                 repeatOptionValue = event->repeat;
                 optionLabel->setText(optionsNames[actualVectorIndex]);
             }
-            else if (descriptionLabel->getText() == utils::localize.get("app_calendar_event_detail_reminder")) {
+            else if (descriptionLabel->getText() == utils::translate("app_calendar_event_detail_reminder")) {
                 actualVectorIndex = std::find(reminderTimeOptions.begin(),
                                               reminderTimeOptions.end(),
                                               static_cast<Reminder>(event->reminder)) -

@@ -90,4 +90,9 @@ namespace audio_settings
     {
         AudioServiceAPI::SetVolume(application, volume, playbackType);
     }
+
+    audio::PlaybackType AudioSettingsModel::getPlaybackType()
+    {
+        return playbackType;
+    }
 } // namespace audio_settings

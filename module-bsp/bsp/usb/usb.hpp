@@ -45,5 +45,6 @@ namespace bsp
     int usbCDCSendRaw(const char *dataPtr, size_t dataLen);
     void usbDeinit();
     void usbReinit(const char *mtpRoot);
+    void usbSuspend();
 
 } // namespace bsp

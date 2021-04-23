@@ -8,6 +8,7 @@
 
 #include <bsp/common.hpp>
 #include "board/rt1051/bsp/eMMC/fsl_mmc.h"
+#include "bsp/BoardDefinitions.hpp"
 
 namespace purefs::blkdev
 {
@@ -21,6 +22,9 @@ namespace purefs::blkdev
         mmcCard->enablePreDefinedBlockCount = true;
         mmcCard->host.base                  = USDHC2;
         mmcCard->host.sourceClock_Hz        = GetPerphSourceClock(PerphClock_USDHC2);
+
+        driverUSDHC = drivers::DriverUSDHC::Create(
+            "EMMC", static_cast<drivers::USDHCInstances>(BoardDefinitions::EMMC_USDHC_INSTANCE));
     }
 
     disk_emmc::~disk_emmc()
@@ -57,7 +61,13 @@ namespace purefs::blkdev
         if (err != kStatus_Success) {
             return err;
         }
+        if (pmState == pm_state::suspend) {
+            driverUSDHC->Enable();
+        }
         err = MMC_WriteBlocks(mmcCard.get(), static_cast<const uint8_t *>(buf), lba, count);
+        if (pmState == pm_state::suspend) {
+            driverUSDHC->Disable();
+        }
         if (err != kStatus_Success) {
             return err;
         }
@@ -80,7 +90,13 @@ namespace purefs::blkdev
         if (err != kStatus_Success) {
             return err;
         }
+        if (pmState == pm_state::suspend) {
+            driverUSDHC->Enable();
+        }
         err = MMC_ReadBlocks(mmcCard.get(), static_cast<uint8_t *>(buf), lba, count);
+        if (pmState == pm_state::suspend) {
+            driverUSDHC->Disable();
+        }
         if (err != kStatus_Success) {
             return err;
         }
@@ -96,8 +112,14 @@ namespace purefs::blkdev
         while ((GET_SDMMCHOST_STATUS(mmcCard->host.base) & CARD_DATA0_STATUS_MASK) != CARD_DATA0_NOT_BUSY) {
             taskYIELD();
         }
-
-        if (kStatus_Success != MMC_WaitWriteComplete(mmcCard.get())) {
+        if (pmState == pm_state::suspend) {
+            driverUSDHC->Enable();
+        }
+        auto err = MMC_WaitWriteComplete(mmcCard.get());
+        if (pmState == pm_state::suspend) {
+            driverUSDHC->Disable();
+        }
+        if (err != kStatus_Success) {
             return kStatus_SDMMC_WaitWriteCompleteFailed;
         }
         return statusBlkDevSuccess;
@@ -148,7 +170,13 @@ namespace purefs::blkdev
         }
         int ret{};
         if (newpart != currHwPart) {
+            if (pmState == pm_state::suspend) {
+                driverUSDHC->Enable();
+            }
             ret = MMC_SelectPartition(mmcCard.get(), static_cast<mmc_access_partition_t>(newpart));
+            if (pmState == pm_state::suspend) {
+                driverUSDHC->Disable();
+            }
             if (ret == kStatus_Success) {
                 currHwPart = newpart;
             }
@@ -157,6 +185,29 @@ namespace purefs::blkdev
             }
         }
         return ret;
+    }
+
+    auto disk_emmc::pm_control(pm_state target_state) -> int
+    {
+        if (pmState != target_state) {
+            cpp_freertos::LockGuard lock(mutex);
+            if (target_state == pm_state::suspend) {
+                driverUSDHC->Disable();
+            }
+            else {
+                driverUSDHC->Enable();
+            }
+
+            pmState = target_state;
+        }
+
+        return kStatus_Success;
+    }
+
+    auto disk_emmc::pm_read(pm_state &current_state) -> int
+    {
+        current_state = pmState;
+        return kStatus_Success;
     }
 
 } // namespace purefs::blkdev

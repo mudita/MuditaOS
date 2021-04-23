@@ -46,6 +46,9 @@ namespace bluetooth
 
         auto start() -> Error::Code;
         auto stop() -> Error::Code;
+        auto startRinging() -> Error::Code;
+        auto stopRinging() -> Error::Code;
+        auto initializeCall() -> Error::Code;
 
         auto setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code;
 

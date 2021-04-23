@@ -26,12 +26,12 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_settings_bt"));
+        setTitle(utils::translate("app_settings_bt"));
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::confirm));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         image = new Image(this, passkey_style::image::x, passkey_style::image::y, 0, 0, "bluetooth_W_G");
 
@@ -42,7 +42,7 @@ namespace gui
                           style::window::label::default_h);
         label->setFont(style::window::font::big);
         label->setEdges(RectangleEdge::None);
-        label->setText(utils::localize.get("app_settings_bluetooth_enter_passkey"));
+        label->setText(utils::translate("app_settings_bluetooth_enter_passkey"));
 
         text = new Text(
             this, passkey_style::text::x, passkey_style::text::y, passkey_style::text::w, passkey_style::text::h);

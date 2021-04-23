@@ -10,10 +10,8 @@ namespace gui
 {
     class VolumePopupData : public SwitchData
     {
-        using AudioContext = std::pair<audio::Profile::Type, audio::PlaybackType>;
-
       public:
-        explicit VolumePopupData(const audio::Volume volume, const AudioContext audioContext)
+        explicit VolumePopupData(const audio::Volume volume, const audio::Context audioContext)
             : SwitchData(), volume{volume}, audioContext{audioContext}
         {}
 
@@ -22,20 +20,21 @@ namespace gui
             return volume;
         }
 
-        [[nodiscard]] auto getAudioContext() const noexcept -> AudioContext
+        [[nodiscard]] auto getAudioContext() const noexcept -> audio::Context
         {
             return audioContext;
         }
 
       private:
         const audio::Volume volume;
-        const AudioContext audioContext;
+        const audio::Context audioContext;
     };
 
     class ModesPopupData : public SwitchData
     {
       public:
-        explicit ModesPopupData(const sys::phone_modes::PhoneMode phoneMode) : SwitchData(), phoneMode{phoneMode}
+        explicit ModesPopupData(sys::phone_modes::PhoneMode phoneMode, bool flightMode)
+            : SwitchData(), phoneMode{phoneMode}, isFlightModeEnabled(flightMode)
         {}
 
         [[nodiscard]] auto getPhoneMode() const noexcept -> sys::phone_modes::PhoneMode
@@ -43,7 +42,13 @@ namespace gui
             return phoneMode;
         }
 
+        [[nodiscard]] auto getFlightMode() const noexcept -> bool
+        {
+            return isFlightModeEnabled;
+        }
+
       private:
         const sys::phone_modes::PhoneMode phoneMode;
+        const bool isFlightModeEnabled;
     };
 } // namespace gui

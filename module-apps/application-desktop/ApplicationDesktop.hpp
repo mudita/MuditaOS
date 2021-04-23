@@ -14,6 +14,7 @@
 #include <endpoints/update/UpdateMuditaOS.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-desktop/DesktopMessages.hpp>
+#include <notifications/NotificationListItem.hpp>
 
 namespace cellular
 {
@@ -24,7 +25,12 @@ namespace db::query
 {
     class ThreadGetCountResult;
     class CalllogGetCountResult;
-}; // namespace db::query
+} // namespace db::query
+
+namespace gui
+{
+    class NotificationsModel;
+}
 
 namespace app
 {
@@ -47,18 +53,17 @@ namespace app
                 }
             };
 
-            Counters notSeen;
             Counters notRead;
 
         } notifications;
 
         gui::PinLockHandler lockHandler;
 
-        ApplicationDesktop(std::string name                    = name_desktop,
-                           std::string parent                  = {},
-                           sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
-                           StartInBackground startInBackground = {false});
-        virtual ~ApplicationDesktop();
+        explicit ApplicationDesktop(std::string name                    = name_desktop,
+                                    std::string parent                  = {},
+                                    sys::phone_modes::PhoneMode mode    = sys::phone_modes::PhoneMode::Connected,
+                                    StartInBackground startInBackground = {false});
+
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
         sys::ReturnCodes DeinitHandler() override;
@@ -73,19 +78,17 @@ namespace app
         // done
         bool handle(db::NotificationMessage *msg);
         bool handle(cellular::StateChange *msg);
-        auto handle(db::query::notifications::GetAllResult *msg) -> bool;
         auto handle(db::query::ThreadGetCountResult *msg) -> bool;
         auto handle(db::query::CalllogGetCountResult *msg) -> bool;
         auto handle(sdesktop::UpdateOsMessage *msg) -> bool;
         auto handle(sdesktop::developerMode::ScreenlockCheckEvent *event) -> bool;
+        void handle(manager::actions::NotificationsChangedParams *params) override;
         /**
          * This static method will be used to lock the phone
          */
         //	static bool messageLockPhone( sys::Service* sender, std::string application , const gui::InputEvent& event
         //);
         bool showCalls();
-        bool clearCallsNotification();
-        bool clearMessagesNotification();
         unsigned int getLockPassHash() const noexcept
         {
             return lockPassHash;
@@ -101,7 +104,7 @@ namespace app
         void setOsUpdateVersion(const std::string &value);
 
       private:
-        bool refreshMainWindow();
+        bool refreshMenuWindow();
         void activeSimChanged(std::string value);
         void lockPassHashChanged(std::string value);
         void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);
@@ -110,6 +113,7 @@ namespace app
         void osCurrentVersionChanged(const std::string &value);
         std::string osUpdateVersion{updateos::initSysVer};
         std::string osCurrentVersion{updateos::initSysVer};
+        std::shared_ptr<gui::NotificationsModel> notificationsModel;
     };
 
     template <> struct ManifestTraits<ApplicationDesktop>
@@ -133,7 +137,8 @@ namespace app
                      manager::actions::DisplayLowBatteryScreen,
                      manager::actions::SystemBrownout,
                      manager::actions::DisplayLogoAtExit,
-                     manager::actions::PhoneModeChanged}};
+                     manager::actions::PhoneModeChanged,
+                     manager::actions::NotificationsChanged}};
         }
     };
 

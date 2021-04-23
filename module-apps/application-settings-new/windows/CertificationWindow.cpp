@@ -20,7 +20,7 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_settings_certification"));
+        setTitle(utils::translate("app_settings_certification"));
 
         usFccIdText = new gui::Text(this,
                                     style::certification::textfc::x,
@@ -76,17 +76,17 @@ namespace gui
                                        style::certification::imagece::height,
                                        "settings_certification_ce");
 
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
     }
 
     void CertificationWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         // dummy data for now (to be changed later)
-        usFccIdText->setText(utils::localize.get("app_settings_us_fcc_id"));
+        usFccIdText->setText(utils::translate("app_settings_us_fcc_id"));
         usFccIdValue->setText(certno);
-        canadaIcText->setText(utils::localize.get("app_settings_canada_ic"));
+        canadaIcText->setText(utils::translate("app_settings_canada_ic"));
         canadaIcValue->setText(certno);
-        europeCeText->setText(utils::localize.get("app_settings_europe"));
+        europeCeText->setText(utils::translate("app_settings_europe"));
         europeCeValue->setText(certno);
     }
 

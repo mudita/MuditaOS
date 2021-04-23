@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationWindow.hpp"
@@ -31,14 +31,14 @@ namespace gui
     void MeditationWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        setTitle(utils::localize.get("app_meditation_title_main"));
+        setTitle(utils::translate("app_meditation_title_main"));
 
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
         bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
         bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::start));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::start));
 
         timeSetter = new TimerProperty(this,
                                        style::meditation::timer::X,

@@ -26,7 +26,7 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_settings_title_color_test"));
+        setTitle(utils::translate("app_settings_title_color_test"));
 
         colorListView = new ColorTestListView(application,
                                               this,
@@ -39,11 +39,11 @@ namespace gui
         colorListView->rebuildList();
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_settings_toolbar_reset"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate("app_settings_toolbar_reset"));
         bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         applyInputCallback();
 
@@ -78,7 +78,7 @@ namespace gui
     {
         if (scheme != currentColorScheme) {
             currentColorScheme = scheme;
-            application->bus.sendUnicast(
+            application->bus.sendUnicastSync(
                 std::make_shared<service::gui::ChangeColorScheme>(std::move(scheme)), service::name::gui, 100);
             LOG_INFO("Updated color scheme");
 

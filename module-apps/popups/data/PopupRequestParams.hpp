@@ -7,6 +7,7 @@
 
 #include <service-appmgr/Actions.hpp>
 #include <module-sys/PhoneModes/Common.hpp>
+#include <module-audio/Audio/AudioCommon.hpp>
 
 namespace gui
 {
@@ -40,5 +41,27 @@ namespace gui
 
       private:
         sys::phone_modes::PhoneMode phoneMode;
+    };
+
+    class VolumePopupRequestParams : public PopupRequestParams
+    {
+      public:
+        VolumePopupRequestParams(audio::Volume volume, const audio::Context audioContext)
+            : PopupRequestParams{gui::popup::ID::Volume}, volume{volume}, audioContext{audioContext}
+        {}
+
+        [[nodiscard]] auto getVolume() const noexcept
+        {
+            return volume;
+        }
+
+        [[nodiscard]] auto getAudioContext() const noexcept
+        {
+            return audioContext;
+        }
+
+      private:
+        const audio::Volume volume;
+        const audio::Context audioContext;
     };
 } // namespace gui

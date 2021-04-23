@@ -20,16 +20,16 @@ namespace gui::option
 
         switch (contactOperation) {
         case ContactOperation::Details:
-            text = utils::localize.get("app_options_contact_details");
+            text = utils::translate("app_options_contact_details");
             break;
         case ContactOperation::Add:
-            text = utils::localize.get("app_options_contact_add");
+            text = utils::translate("app_options_contact_add");
             break;
         case ContactOperation::Edit:
-            text = utils::localize.get("app_options_contact_edit");
+            text = utils::translate("app_options_contact_edit");
             break;
         default:
-            text = utils::localize.get("app_options_invalid_option");
+            text = utils::translate("app_options_invalid_option");
             LOG_WARN("ContactOperation %d not supported", static_cast<int>(contactOperation));
             break;
         }

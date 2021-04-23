@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-messages/ApplicationMessages.hpp>
@@ -87,7 +87,7 @@ namespace gui
                 LOG_INFO("Message activated!");
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
-                app->switchWindow(utils::localize.get("app_phonebook_options_title"),
+                app->switchWindow(utils::translate("app_phonebook_options_title"),
                                   std::make_unique<gui::OptionsWindowOptions>(smsWindowOptions(app, *record)));
                 return true;
             }

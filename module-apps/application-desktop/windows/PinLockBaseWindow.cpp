@@ -86,7 +86,7 @@ namespace gui
         iceText->activeItem = false;
         iceText->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         iceText->setFont(style::window::font::verysmall);
-        iceText->setText(utils::localize.get("app_desktop_emergency"));
+        iceText->setText(utils::translate("app_desktop_emergency"));
         iceBox->addWidget(iceText);
 
         title = new gui::Text(this, title::x, title::y, title::w, title::h);

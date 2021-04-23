@@ -36,24 +36,20 @@
 namespace app
 {
     class WindowsStack;
+
+    namespace manager::actions
+    {
+        class NotificationsChangedParams;
+    }
 } // namespace app
 namespace gui
 {
     class AppWindow;
-} // namespace gui
-namespace gui
-{
     class InputEvent;
-}
-namespace gui
-{
     class Item;
     class PopupRequestParams;
-}
-namespace gui
-{
     class KeyInputSimpleTranslation;
-}
+} // namespace gui
 namespace settings
 {
     class Settings;
@@ -185,7 +181,6 @@ namespace app
         sys::MessagePointer handleGetDOM(sys::Message *msgl);
         sys::MessagePointer handleAppFocusLost(sys::Message *msgl);
         sys::MessagePointer handleSIMMessage(sys::Message *msgl);
-        sys::MessagePointer handleAudioKeyMessage(sys::Message *msgl);
 
         virtual bool isPopupPermitted(gui::popup::ID popupId) const;
 
@@ -331,6 +326,11 @@ namespace app
         /// @param tethering new tethering mode
         void handlePhoneModeChanged(sys::phone_modes::PhoneMode mode);
 
+        /// Handles volume changed event
+        /// @param volume current volume level
+        /// @param context audio context which contains current profile and playback
+        void handleVolumeChanged(audio::Volume volume, audio::Context context);
+
         /// @ingrup AppWindowStack
         WindowsStack windowsStack;
         WindowsFactory windowsFactory;
@@ -390,6 +390,7 @@ namespace app
                                                  const gui::InputEvent &event);
 
         void addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback);
+        virtual void handle(manager::actions::NotificationsChangedParams *params);
 
         std::unique_ptr<TopBarManager> topBarManager;
 

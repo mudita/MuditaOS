@@ -61,7 +61,7 @@ namespace app
                 returnToPreviousWindow();
                 return true;
             };
-            const auto notification = utils::localize.get("app_messages_no_sim");
+            const auto notification = utils::translate("app_messages_no_sim");
             showNotification(action, notification);
             return actionHandled();
         });
@@ -70,7 +70,7 @@ namespace app
                 returnToPreviousWindow();
                 return true;
             };
-            const auto notification = utils::localize.get("app_sms_offline");
+            const auto notification = utils::translate("app_sms_offline");
             showNotification(action, notification);
 
             return actionHandled();
@@ -142,7 +142,7 @@ namespace app
             return std::make_unique<gui::NewMessageWindow>(app);
         });
         windowsFactory.attach(
-            utils::localize.get("app_phonebook_options_title"),
+            utils::translate("app_phonebook_options_title"),
             [](Application *app, const std::string &name) { return std::make_unique<gui::OptionWindow>(app, name); });
         windowsFactory.attach(gui::name::window::dialog, [](Application *app, const std::string &name) {
             return std::make_unique<gui::Dialog>(app, name);
@@ -210,7 +210,7 @@ namespace app
                 auto metaData       = std::make_unique<gui::DialogMetadataMessage>(
                     gui::DialogMetadata{contact.getFormattedName(),
                                         "phonebook_contact_delete_trashcan",
-                                        utils::localize.get("app_messages_thread_delete_confirmation"),
+                                        utils::translate("app_messages_thread_delete_confirmation"),
                                         "",
                                         [this, record]() { return onRemoveSmsThreadConfirmed(*record); }});
                 switchWindow(gui::name::window::dialog_yes_no, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
@@ -248,7 +248,7 @@ namespace app
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(
             gui::DialogMetadata{record.body,
                                 "phonebook_contact_delete_trashcan",
-                                utils::localize.get("app_messages_message_delete_confirmation"),
+                                utils::translate("app_messages_message_delete_confirmation"),
                                 "",
                                 [this, record] { return onRemoveSmsConfirmed(record); }});
         switchWindow(gui::name::window::dialog_yes_no, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
@@ -297,8 +297,8 @@ namespace app
     {
         gui::DialogMetadata meta;
         meta.icon                        = "search_big";
-        meta.text                        = utils::localize.get("app_messages_thread_no_result");
-        meta.title                       = utils::localize.get("common_results_prefix") + query;
+        meta.text                        = utils::translate("app_messages_thread_no_result");
+        meta.title                       = utils::translate("common_results_prefix") + query;
         auto data                        = std::make_unique<gui::DialogMetadataMessage>(meta);
         data->ignoreCurrentWindowOnStack = true;
         switchWindow(gui::name::window::dialog, std::make_unique<gui::DialogMetadataMessage>(meta));
@@ -409,7 +409,7 @@ namespace app
     {
         LOG_INFO("New message options for %s", requestingWindow.c_str());
         auto opts = std::make_unique<gui::OptionsWindowOptions>(newMessageWindowOptions(this, requestingWindow, text));
-        switchWindow(utils::localize.get("app_phonebook_options_title"), std::move(opts));
+        switchWindow(utils::translate("app_phonebook_options_title"), std::move(opts));
         return true;
     }
 

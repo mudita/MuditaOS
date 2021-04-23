@@ -36,6 +36,7 @@ TESTS_LIST["catch2-audio-test"]="
 #---------
 TESTS_LIST["catch2-calculator"]="
     Calculator utilities;
+    Scenario: Input Processor tests;
 "
 #---------
 TESTS_LIST["catch2-callback-storage-test"]="
@@ -244,6 +245,8 @@ TESTS_LIST["catch2-service-db"]="
     DB_API;
     Settings Messages;
     Quotes;
+    Factory Settings;
+    Factory Settings Init;
 "
 #---------
 TESTS_LIST["catch2-service-db-settings"]="
@@ -462,6 +465,12 @@ TESTS_LIST["catch2-unittest_ATURCStream"]="
     URC AT Stream Parser;
 "
 #---------
-
-
+TESTS_LIST["catch2-module-bsp"]="
+    BatteryChargerUtilsTest;
+"
+#---------
+TESTS_LIST["catch2-audio-volume-scaler"]="
+    Scenario: Scale volume levels between system and bluetooth;
+"
+#---------
 

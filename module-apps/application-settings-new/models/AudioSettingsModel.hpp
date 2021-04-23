@@ -39,6 +39,7 @@ namespace audio_settings
         virtual void setSound(std::string filePath)     = 0;
         [[nodiscard]] virtual audio::Volume getVolume() = 0;
         virtual void setVolume(audio::Volume vol)       = 0;
+        [[nodiscard]] virtual audio::PlaybackType getPlaybackType() = 0;
     };
 
     class AudioSettingsModel : public AbstractAudioSettingsModel
@@ -58,6 +59,7 @@ namespace audio_settings
         void setSound(std::string) override;
         audio::Volume getVolume() override;
         void setVolume(audio::Volume vol) override;
+        audio::PlaybackType getPlaybackType() override;
 
       private:
         app::Application *application = nullptr;

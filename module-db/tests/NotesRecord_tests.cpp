@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -17,7 +17,7 @@ TEST_CASE("Notes Record tests")
 {
     Database::initialize();
 
-    const auto notesDbPath = std::filesystem::path{"user"} / "notes.db";
+    const auto notesDbPath = std::filesystem::path{"sys/user"} / "notes.db";
     NotesDB notesDb{notesDbPath.c_str()};
     REQUIRE(notesDb.isInitialized());
 

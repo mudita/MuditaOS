@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NoEvents.hpp"
@@ -58,16 +58,16 @@ void NoEvents::onBeforeShow(ShowMode mode, SwitchData *data)
         };
     }
 
-    if (title->getText() == utils::localize.get("app_calendar_title_main")) {
+    if (title->getText() == utils::translate("app_calendar_title_main")) {
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get("app_calendar_bar_month"));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate("app_calendar_bar_month"));
     }
 }
 
 bool NoEvents::onInput(const gui::InputEvent &inputEvent)
 {
     if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_RF) &&
-        title->getText() == utils::localize.get("app_calendar_title_main")) {
+        title->getText() == utils::translate("app_calendar_title_main")) {
         app::manager::Controller::switchBack(application);
         return true;
     }
@@ -77,7 +77,7 @@ bool NoEvents::onInput(const gui::InputEvent &inputEvent)
     }
 
     if (inputEvent.isShortPress() && inputEvent.is(gui::KeyCode::KEY_LF) &&
-        title->getText() == utils::localize.get("app_calendar_title_main")) {
+        title->getText() == utils::translate("app_calendar_title_main")) {
         application->switchWindow(gui::name::window::main_window);
         return true;
     }

@@ -41,14 +41,14 @@ namespace gui
 
     void ConfigurePasscodeWindow::buildBottomBar()
     {
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::skip));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::confirm));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::skip));
     }
 
     void ConfigurePasscodeWindow::buildTitleBar()
     {
-        setTitle(utils::localize.get("app_onboarding_passcode_configuration"));
+        setTitle(utils::translate("app_onboarding_passcode_configuration"));
     }
 
     void ConfigurePasscodeWindow::processPasscode()
@@ -74,9 +74,9 @@ namespace gui
         case PinLock::LockState::NewPasscodeInvalid: {
 
             auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                gui::DialogMetadata{utils::localize.get("app_onboarding_passcode_configuration"),
+                gui::DialogMetadata{utils::translate("app_onboarding_passcode_configuration"),
                                     "info_big_circle_W_G",
-                                    utils::localize.get("app_onboarding_wrong_password"),
+                                    utils::translate("app_onboarding_wrong_password"),
                                     "",
                                     [this]() {
                                         application->switchWindow(gui::window::name::onBoarding_configure_passcode,

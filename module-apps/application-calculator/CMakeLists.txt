@@ -4,6 +4,8 @@
         "${CMAKE_CURRENT_LIST_DIR}/windows/CalculatorMainWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/MathOperationsBox.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/data/CalculatorUtility.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/data/CalculatorInputProcessor.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/data/CalculatorInputProcessorText.cpp"
 
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/ApplicationCalculator.hpp"

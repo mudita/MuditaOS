@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -47,8 +47,9 @@ namespace bsp::keypad_backlight
 
     constexpr inline auto NSTDBY       = 0b10000000;
     constexpr inline auto BOOST_EN     = 0b01000000;
-    constexpr inline auto LED_PORTS_EN = 0b00001110; // Only ports 2-4 active on board
-    constexpr inline auto WAKEUP       = NSTDBY | BOOST_EN | LED_PORTS_EN;
+    constexpr inline auto FUNCTION_KEYS_PORTS_EN = NSTDBY | BOOST_EN | 0b00000110; // Only ports 2-3 active
+    constexpr inline auto NUMERIC_KEYS_PORT_EN   = NSTDBY | BOOST_EN | 0b00001000; // Only port 4 active
+    constexpr inline auto ALL_PORTS_EN           = FUNCTION_KEYS_PORTS_EN | NUMERIC_KEYS_PORT_EN; // ports 2-4 active
 
     constexpr inline auto LED_TEST_THRESHOLD = 3; // 0.18mA = (15mA/255) * 3
     constexpr inline auto EN_LED_TEST        = 0b00010000;

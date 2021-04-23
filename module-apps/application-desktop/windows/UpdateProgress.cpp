@@ -42,7 +42,7 @@ namespace gui
                     msg.updateStats.versionInformation[boot::json::os_version][boot::json::version_string]
                         .string_value();
                 if (text->getText().empty()) {
-                    text->setText(utils::localize.get("app_desktop_update_preparing") + " " + updateVersion);
+                    text->setText(utils::translate("app_desktop_update_preparing") + " " + updateVersion);
                 }
                 else {
                     text->setText(textInfo);
@@ -83,7 +83,7 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        setTitle(utils::localize.get("app_desktop_update_muditaos"));
+        setTitle(utils::translate("app_desktop_update_muditaos"));
 
         icon = new Image(this, style::desktop::image::x, style::desktop::image::y, "circle_update");
 
@@ -151,7 +151,7 @@ namespace gui
                 progressPercent = 30;
                 break;
             case updateos::UpdateState::ExtractingFiles:
-                textInfo        = utils::localize.get("app_desktop_update_in_progress");
+                textInfo        = utils::translate("app_desktop_update_in_progress");
                 progressPercent = 40;
                 break;
             case updateos::UpdateState::ChecksumVerification:
@@ -163,7 +163,7 @@ namespace gui
                 progressPercent = 80;
                 break;
             case updateos::UpdateState::UpdatingBootloader:
-                textInfo        = utils::localize.get("app_desktop_update_ready_for_reset");
+                textInfo        = utils::translate("app_desktop_update_ready_for_reset");
                 progressPercent = 99;
                 break;
             case updateos::UpdateState::ReadyForReset:

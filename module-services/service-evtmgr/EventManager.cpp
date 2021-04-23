@@ -125,7 +125,7 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
                 const auto mode = sys::SystemManager::translateSliderState(message->key);
                 bus.sendUnicast(std::make_shared<sys::PhoneModeRequest>(mode), service::name::system_manager);
             }
-            if (keypadLightState == bsp::keypad_backlight::State::activeMode) {
+            if (keypadLightState == bsp::keypad_backlight::State::activeMode && !isKeypadLightInCallMode) {
                 bsp::keypad_backlight::turnOnAll();
                 startKeypadLightTimer();
             }
@@ -170,27 +170,27 @@ sys::MessagePointer EventManager::DataReceivedHandler(sys::DataMessage *msgl, sy
         return msg;
     }
     else if (msgl->messageType == MessageType::EVMModemStatus) {
-        auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl);
-        if (msg != nullptr) {
+        if (auto msg = dynamic_cast<sevm::StatusStateMessage *>(msgl)) {
             auto message   = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMModemStatus);
             message->state = msg->state;
             bus.sendUnicast(message, "ServiceCellular");
         }
         handled = true;
     }
-    else if (msgl->messageType == MessageType::CellularTimeUpdated) {
-        auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl);
-        if (msg != nullptr) {
-            if (auto time = msg->getTime(); time) {
-                LOG_INFO("RTC set by network time.");
-                bsp::rtc_SetDateTime(&time.value());
+    else if (auto msg = dynamic_cast<CellularMessage *>(msgl)) {
+        if (msg->type == CellularMessage::Type::TimeUpdated) {
+            if (auto msg = dynamic_cast<CellularTimeNotificationMessage *>(msgl)) {
+                if (auto time = msg->getTime(); time) {
+                    LOG_INFO("RTC set by network time.");
+                    bsp::rtc_SetDateTime(&time.value());
+                }
+                if (auto timeZoneOffset = msg->getTimeZoneOffset(); timeZoneOffset) {
+                    setSettingsTimeZone(msg->getTimeZoneString().value());
+                    utils::time::Time::setTimeZoneOffset(msg->getTimeZoneOffset().value());
+                }
+                auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
+                bus.sendMulticast(notification, sys::BusChannel::ServiceEvtmgrNotifications);
             }
-            if (auto timeZoneOffset = msg->getTimeZoneOffset(); timeZoneOffset) {
-                setSettingsTimeZone(msg->getTimeZoneString().value());
-                utils::time::Time::setTimeZoneOffset(msg->getTimeZoneOffset().value());
-            }
-            auto notification = std::make_shared<sys::DataMessage>(MessageType::EVMTimeUpdated);
-            bus.sendMulticast(notification, sys::BusChannel::ServiceEvtmgrNotifications);
         }
     }
     else if (msgl->messageType == MessageType::EVMRingIndicator) {
@@ -392,14 +392,14 @@ bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action a
             keypadLightTimer.stop();
         }
         keypadLightState = bsp::keypad_backlight::State::on;
-        response = bsp::keypad_backlight::turnOnAll();
+        response         = bsp::keypad_backlight::turnOnAll();
         break;
     case bsp::keypad_backlight::Action::turnOff:
         if (keypadLightState == bsp::keypad_backlight::State::activeMode) {
             keypadLightTimer.stop();
         }
         keypadLightState = bsp::keypad_backlight::State::off;
-        response = bsp::keypad_backlight::shutdown();
+        response         = bsp::keypad_backlight::shutdown();
         break;
     case bsp::keypad_backlight::Action::checkState:
         response = bsp::keypad_backlight::checkState();
@@ -409,8 +409,34 @@ bool EventManager::processKeypadBacklightRequest(bsp::keypad_backlight::Action a
         response         = bsp::keypad_backlight::turnOnAll();
         startKeypadLightTimer();
         break;
+    case bsp::keypad_backlight::Action::turnOnCallMode:
+        if (keypadLightTimer.isActive()) {
+            keypadLightTimer.stop();
+        }
+        isKeypadLightInCallMode = true;
+        response                = bsp::keypad_backlight::turnOnFunctionKeysBacklight();
+        break;
+    case bsp::keypad_backlight::Action::turnOffCallMode:
+        isKeypadLightInCallMode = false;
+        restoreKeypadLightState();
+        break;
     }
     return response;
+}
+
+void EventManager::restoreKeypadLightState()
+{
+    switch (keypadLightState) {
+    case bsp::keypad_backlight::State::off:
+        processKeypadBacklightRequest(bsp::keypad_backlight::Action::turnOff);
+        break;
+    case bsp::keypad_backlight::State::on:
+        processKeypadBacklightRequest(bsp::keypad_backlight::Action::turnOn);
+        break;
+    case bsp::keypad_backlight::State::activeMode:
+        processKeypadBacklightRequest(bsp::keypad_backlight::Action::turnOnActiveMode);
+        break;
+    }
 }
 
 void EventManager::startKeypadLightTimer()

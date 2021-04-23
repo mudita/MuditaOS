@@ -35,15 +35,14 @@ namespace gui
         std::list<gui::Option> optionsList;
 
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            utils::translateI18("app_settings_bluetooth_main"),
+            utils::translate("app_settings_bluetooth_main"),
             [=](gui::Item & /*unused*/) {
                 changeBluetoothState(isBluetoothSwitchOn);
                 return true;
             },
             [=](gui::Item &item) {
                 if (item.focus) {
-                    this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
-                                           BottomBar::Side::CENTER);
+                    this->setBottomBarText(utils::translate(style::strings::common::Switch), BottomBar::Side::CENTER);
                 }
                 return true;
             },
@@ -52,14 +51,14 @@ namespace gui
 
         if (isBluetoothSwitchOn) {
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                utils::translateI18("app_settings_bluetooth_all_devices"),
+                utils::translate("app_settings_bluetooth_all_devices"),
                 [=](gui::Item & /*unused*/) {
                     this->application->switchWindow(gui::window::name::all_devices, gui::ShowMode::GUI_SHOW_INIT);
                     return true;
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                        this->setBottomBarText(utils::translate(style::strings::common::select),
                                                BottomBar::Side::CENTER);
                     }
                     return true;
@@ -68,14 +67,14 @@ namespace gui
                 gui::option::SettingRightItem::ArrowWhite,
                 true));
             optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                utils::translateI18("app_settings_bluetooth_phone_visibility"),
+                utils::translate("app_settings_bluetooth_phone_visibility"),
                 [=](gui::Item & /*unused*/) {
                     changeVisibility(isPhoneVisibilitySwitchOn);
                     return true;
                 },
                 [=](gui::Item &item) {
                     if (item.focus) {
-                        this->setBottomBarText(utils::translateI18(style::strings::common::Switch),
+                        this->setBottomBarText(utils::translate(style::strings::common::Switch),
                                                BottomBar::Side::CENTER);
                     }
                     return true;
@@ -84,14 +83,14 @@ namespace gui
                 isPhoneVisibilitySwitchOn ? gui::option::SettingRightItem::On : gui::option::SettingRightItem::Off));
             if (isPhoneVisibilitySwitchOn) {
                 optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-                    utils::translateI18("app_settings_bluetooth_phone_name"),
+                    utils::translate("app_settings_bluetooth_phone_name"),
                     [=](gui::Item & /*unused*/) {
                         this->application->switchWindow(gui::window::name::phone_name, gui::ShowMode::GUI_SHOW_INIT);
                         return true;
                     },
                     [=](gui::Item &item) {
                         if (item.focus) {
-                            this->setBottomBarText(utils::translateI18(style::strings::common::select),
+                            this->setBottomBarText(utils::translate(style::strings::common::select),
                                                    BottomBar::Side::CENTER);
                         }
                         return true;

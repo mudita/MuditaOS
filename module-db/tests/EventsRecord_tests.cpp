@@ -39,7 +39,7 @@ TEST_CASE("Events Record tests")
 {
     Database::initialize();
 
-    const auto eventsPath = (std::filesystem::path{"user"} / "events.db");
+    const auto eventsPath = (std::filesystem::path{"sys/user"} / "events.db");
     if (std::filesystem::exists(eventsPath)) {
         REQUIRE(std::filesystem::remove(eventsPath));
     }

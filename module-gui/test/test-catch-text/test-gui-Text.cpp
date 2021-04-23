@@ -168,7 +168,7 @@ TEST_CASE("Text buildDrawList")
 
 TEST_CASE("handle input mode ABC/abc/1234")
 {
-    utils::localize.setInputLanguage("English"); /// needed to load input mode
+    utils::setInputLanguage("English"); /// needed to load input mode
     auto &fontmanager = mockup::fontManager();
     auto font         = fontmanager.getFont(0);
     auto text         = gui::TestText();
@@ -984,7 +984,7 @@ TEST_CASE("Text addition bounds - multiple limits tests")
     std::string testStringTwoLines = "Test String 1\nTest String 2";
 
     std::string richTextTwoLines =
-        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='25'>String </text><text size='20' "
+        "<text font='gt_pressura' color='12' size='30'>Test </text><text size='20'>String </text><text size='27' "
         "weight='bold'>1</text><br></br><text>Test String 2</text>";
 
     SECTION("Adding text to lower limit set to signs count and size and lines on higher limit")

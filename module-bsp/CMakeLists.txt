@@ -94,3 +94,6 @@ target_link_libraries(${PROJECT_NAME}
     ${TARGET_LIBRARIES}
 )
 
+if (${ENABLE_TESTS})
+    add_subdirectory(tests)
+endif ()

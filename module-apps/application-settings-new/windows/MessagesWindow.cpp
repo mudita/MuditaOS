@@ -3,7 +3,9 @@
 
 #include "MessagesWindow.hpp"
 
+#include <application-settings-new/data/SoundSelectData.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
+
 #include <i18n/i18n.hpp>
 #include <OptionWindow.hpp>
 #include <OptionSetting.hpp>
@@ -15,7 +17,7 @@ namespace gui
         : BaseSettingsWindow(app, gui::window::name::messages), mWidgetMaker(this), mAudioModel(std::move(audioModel))
     {
         mShowUnreadMessagesFirst = false;
-        setTitle(utils::localize.get("app_settings_apps_messages"));
+        setTitle(utils::translate("app_settings_apps_messages"));
     }
 
     std::list<Option> MessagesWindow::buildOptionsList()
@@ -24,29 +26,25 @@ namespace gui
         mVibrationsEnabled = mAudioModel->isVibrationEnabled();
         mSoundEnabled      = mAudioModel->isSoundEnabled();
 
-        mWidgetMaker.addSwitchOption(optionList,
-                                     utils::translateI18("app_settings_vibration"),
-                                     mVibrationsEnabled,
-                                     [&]() { switchVibrationState(); });
+        mWidgetMaker.addSwitchOption(optionList, utils::translate("app_settings_vibration"), mVibrationsEnabled, [&]() {
+            switchVibrationState();
+        });
 
         mWidgetMaker.addSwitchOption(
-            optionList, utils::translateI18("app_settings_sound"), mSoundEnabled, [&]() { switchSoundState(); });
+            optionList, utils::translate("app_settings_sound"), mSoundEnabled, [&]() { switchSoundState(); });
 
         if (mSoundEnabled) {
             mWidgetMaker.addSelectOption(
-                optionList,
-                utils::translateI18("app_settings_message_sound"),
-                [&]() { openMessageSoundWindow(); },
-                true);
+                optionList, utils::translate("app_settings_message_sound"), [&]() { openMessageSoundWindow(); }, true);
         }
 
         mWidgetMaker.addSwitchOption(optionList,
-                                     utils::translateI18("app_settings_show_unread_first"),
+                                     utils::translate("app_settings_show_unread_first"),
                                      mShowUnreadMessagesFirst,
                                      [&]() { switchShowUnreadFirst(); });
 
         mWidgetMaker.addSelectOption(
-            optionList, utils::translateI18("app_settings_Templates"), [&]() { openMessageTemplates(); });
+            optionList, utils::translate("app_settings_Templates"), [&]() { openMessageTemplates(); });
         return optionList;
     }
 
@@ -71,7 +69,11 @@ namespace gui
 
     void MessagesWindow::openMessageSoundWindow()
     {
-        this->application->switchWindow(gui::window::name::message_sound);
+        SoundSelectData::Info info;
+        info.windowTitle = utils::translate("app_settings_message_sound");
+        info.audioModel  = mAudioModel.get();
+
+        application->switchWindow(gui::window::name::sound_select, std::make_unique<SoundSelectData>(info));
     }
 
     void MessagesWindow::openMessageTemplates()

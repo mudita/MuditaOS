@@ -26,10 +26,10 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::save));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::save));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_settings_new_edit_apn"));
+        setTitle(utils::translate("app_settings_new_edit_apn"));
 
         list = new gui::ListView(this,
                                  style::settings::window::newApn::x,

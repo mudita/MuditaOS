@@ -27,6 +27,7 @@
 #include <service-gui/Common.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <service-appmgr/StartupType.hpp>
+#include <module-services/service-audio/service-audio/AudioMessage.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -35,6 +36,7 @@
 #include <module-utils/time/DateAndTimeSettings.hpp>
 #include <module-services/service-db/agents/settings/SystemSettings.hpp>
 #include <service-appmgr/messages/DOMRequest.hpp>
+#include <service-appmgr/messages/GetAllNotificationsRequest.hpp>
 
 #include "module-services/service-appmgr/service-appmgr/messages/ApplicationStatus.hpp"
 
@@ -130,19 +132,21 @@ namespace app::manager
                                            const ApplicationName &_rootApplicationName)
         : Service{serviceName, {}, ApplicationManagerStackDepth},
           ApplicationManagerBase(std::move(launchers)), rootApplicationName{_rootApplicationName},
-          actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, autoLockEnabled(false),
-          settings(std::make_unique<settings::Settings>(this)),
+          actionsRegistry{[this](ActionEntry &action) { return handleAction(action); }}, notificationProvider(this),
+          autoLockEnabled(false), settings(std::make_unique<settings::Settings>(this)),
           phoneModeObserver(std::make_unique<sys::phone_modes::Observer>())
     {
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, timerBlock, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
         bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
+        bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         registerMessageHandlers();
     }
 
     sys::ReturnCodes ApplicationManager::InitHandler()
     {
-        utils::localize.setDisplayLanguage(
+        utils::setDisplayLanguage(
             settings->getValue(settings::SystemProperties::displayLanguage, settings::SettingsScope::Global));
 
         settings->registerValueChange(
@@ -328,7 +332,7 @@ namespace app::manager
         connect(typeid(DisplayLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<DisplayLanguageChangeRequest *>(request);
             handleDisplayLanguageChange(msg);
-            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::localize.getDisplayLanguage());
+            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::getDisplayLanguage());
         });
         connect(typeid(InputLanguageChangeRequest), [this](sys::Message *request) {
             auto msg = static_cast<InputLanguageChangeRequest *>(request);
@@ -369,7 +373,7 @@ namespace app::manager
             return sys::MessageNone{};
         });
         connect(typeid(GetCurrentDisplayLanguageRequest), [&](sys::Message *request) {
-            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::localize.getDisplayLanguage());
+            return std::make_shared<GetCurrentDisplayLanguageResponse>(utils::getDisplayLanguage());
         });
         connect(typeid(UpdateInProgress), [this](sys::Message *) {
             closeApplicationsOnUpdate();
@@ -378,6 +382,21 @@ namespace app::manager
         connect(typeid(SetOsUpdateVersion), [this](sys::Message *request) {
             auto msg = static_cast<SetOsUpdateVersion *>(request);
             handleSetOsUpdateVersionChange(msg);
+            return sys::msgHandled();
+        });
+        connect(typeid(GetAllNotificationsRequest), [&](sys::Message *request) {
+            notificationProvider.requestNotSeenNotifications();
+            notificationProvider.send();
+            return sys::msgHandled();
+        });
+        connect(typeid(db::NotificationMessage), [&](sys::Message *msg) {
+            auto msgl = static_cast<db::NotificationMessage *>(msg);
+            notificationProvider.handle(msgl);
+            return sys::msgHandled();
+        });
+        connect(typeid(db::QueryResponse), [&](sys::Message *msg) {
+            auto response = static_cast<db::QueryResponse *>(msg);
+            handleDBResponse(response);
             return sys::msgHandled();
         });
 
@@ -402,6 +421,7 @@ namespace app::manager
         connect(typeid(sys::TetheringQuestionRequest), convertibleToActionHandler);
         connect(typeid(sys::TetheringQuestionAbort), convertibleToActionHandler);
         connect(typeid(sys::TetheringPhoneModeChangeProhibitedMessage), convertibleToActionHandler);
+        connect(typeid(VolumeChanged), convertibleToActionHandler);
     }
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
@@ -575,7 +595,9 @@ namespace app::manager
         case actions::ShowPopup:
             [[fallthrough]];
         case actions::AbortPopup:
-            return handlePopupAction(action);
+            return handleActionOnFocusedApp(action);
+        case actions::NotificationsChanged:
+            return handleActionOnFocusedApp(action);
         default:
             return handleCustomAction(action);
         }
@@ -618,14 +640,13 @@ namespace app::manager
         return ActionProcessStatus::Skipped;
     }
 
-    auto ApplicationManager::handlePopupAction(ActionEntry &action) -> ActionProcessStatus
+    auto ApplicationManager::handleActionOnFocusedApp(ActionEntry &action) -> ActionProcessStatus
     {
         auto targetApp = getFocusedApplication();
         if (targetApp == nullptr) {
             return ActionProcessStatus::Skipped;
         }
         action.setTargetApplication(targetApp->name());
-
         auto &params = action.params;
         app::Application::requestAction(this, targetApp->name(), action.actionId, std::move(params));
         return ActionProcessStatus::Accepted;
@@ -757,13 +778,12 @@ namespace app::manager
     {
         const auto &requestedLanguage = msg->getLanguage();
 
-        if (requestedLanguage == utils::localize.getDisplayLanguage()) {
+        if (not utils::setDisplayLanguage(requestedLanguage)) {
             LOG_WARN("The selected language is already set. Ignore.");
             return false;
         }
         settings->setValue(
             settings::SystemProperties::displayLanguage, requestedLanguage, settings::SettingsScope::Global);
-        utils::localize.setDisplayLanguage(requestedLanguage);
         rebuildActiveApplications();
         return true;
     }
@@ -772,13 +792,12 @@ namespace app::manager
     {
         const auto &requestedLanguage = msg->getLanguage();
 
-        if (requestedLanguage == utils::localize.getInputLanguage()) {
+        if (not utils::setInputLanguage(requestedLanguage)) {
             LOG_WARN("The selected language is already set. Ignore.");
             return false;
         }
         settings->setValue(
             settings::SystemProperties::inputLanguage, requestedLanguage, settings::SettingsScope::Global);
-        utils::localize.setInputLanguage(requestedLanguage);
         return true;
     }
 
@@ -843,6 +862,16 @@ namespace app::manager
         settings->setValue(
             settings::SystemProperties::osCurrentVersion, msg->osCurrentVer, settings::SettingsScope::Global);
         return true;
+    }
+
+    auto ApplicationManager::handleDBResponse(db::QueryResponse *msg) -> bool
+    {
+        auto result = msg->getResult();
+        if (auto response = dynamic_cast<db::query::notifications::GetAllResult *>(result.get())) {
+            notificationProvider.handle(response);
+            return true;
+        }
+        return false;
     }
 
     void ApplicationManager::rebuildActiveApplications()
@@ -985,7 +1014,7 @@ namespace app::manager
 
     void ApplicationManager::displayLanguageChanged(std::string value)
     {
-        if (utils::localize.setDisplayLanguage(value)) {
+        if (utils::setDisplayLanguage(value)) {
             rebuildActiveApplications();
         }
     }
@@ -1012,7 +1041,7 @@ namespace app::manager
 
     void ApplicationManager::inputLanguageChanged(std::string value)
     {
-        utils::localize.setInputLanguage(value);
+        utils::setInputLanguage(value);
     }
 
     auto ApplicationManager::handleDOMRequest(sys::Message *request) -> std::shared_ptr<sys::ResponseMessage>

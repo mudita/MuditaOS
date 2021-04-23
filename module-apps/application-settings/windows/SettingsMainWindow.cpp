@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsMainWindow.hpp"
@@ -15,7 +15,7 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
 {
     std::list<gui::Option> l;
 
-    auto i18     = [](std::string text) { return utils::localize.get(text); };
+    auto i18     = [](std::string text) { return utils::translate(text); };
     auto addMenu = [&](UTF8 name, std::string window = "") {
         l.emplace_back(gui::Option{name,
                                    [=](gui::Item &item) {

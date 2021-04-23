@@ -10,28 +10,6 @@
 
 namespace screen_light_control
 {
-    namespace
-    {
-        auto from_string(const std::string &str, bool def) -> bool
-        {
-            try {
-                return std::stoi(str) == 0;
-            }
-            catch (std::exception &) {
-                return def;
-            }
-        }
-
-        auto from_string(const std::string &str, float def) -> float
-        {
-            try {
-                return std::stof(str);
-            }
-            catch (std::exception &) {
-                return def;
-            }
-        }
-    } // namespace
 
     ScreenLightControl::ScreenLightControl(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
         : settings(settings)
@@ -54,26 +32,34 @@ namespace screen_light_control
 
     void ScreenLightControl::initFromSettings()
     {
-        settings->registerValueChange(settings::Brightness::brightnessLevel,
-                                      [&](const std::string &value) { setBrightnessLevel(from_string(value, 0.0f)); });
+        settings->registerValueChange(
+            settings::Brightness::brightnessLevel,
+            [&](const std::string &value) { setBrightnessLevel(utils::getNumericValue<float>(value)); },
+            settings::SettingsScope::Global);
 
-        settings->registerValueChange(settings::Brightness::autoMode, [&](const std::string &value) {
-            if (from_string(value, false)) {
-                enableAutomaticMode();
-            }
-            else {
-                disableAutomaticMode();
-            }
-        });
+        settings->registerValueChange(
+            settings::Brightness::autoMode,
+            [&](const std::string &value) {
+                if (utils::getNumericValue<bool>(value)) {
+                    enableAutomaticMode();
+                }
+                else {
+                    disableAutomaticMode();
+                }
+            },
+            settings::SettingsScope::Global);
 
-        settings->registerValueChange(settings::Brightness::autoMode, [&](const std::string &value) {
-            if (from_string(value, false)) {
-                turnOn();
-            }
-            else {
-                turnOff();
-            }
-        });
+        settings->registerValueChange(
+            settings::Brightness::state,
+            [&](const std::string &value) {
+                if (utils::getNumericValue<bool>(value)) {
+                    turnOn();
+                }
+                else {
+                    turnOff();
+                }
+            },
+            settings::SettingsScope::Global);
     }
 
     void ScreenLightControl::processRequest(Action action, const Parameters &params)
@@ -89,11 +75,11 @@ namespace screen_light_control
             break;
         case Action::enableAutomaticMode:
             enableAutomaticMode();
-            setScreenLightSettings(settings::Brightness::autoMode, automaticMode);
+            setScreenLightSettings(settings::Brightness::autoMode, automaticMode == ScreenLightMode::Automatic);
             break;
         case Action::disableAutomaticMode:
             disableAutomaticMode();
-            setScreenLightSettings(settings::Brightness::autoMode, automaticMode);
+            setScreenLightSettings(settings::Brightness::autoMode, automaticMode == ScreenLightMode::Automatic);
             break;
         case Action::setManualModeBrightness:
             setBrightnessLevel(params.manualModeBrightness);

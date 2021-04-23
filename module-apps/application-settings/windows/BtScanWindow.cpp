@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <functional>
@@ -60,10 +60,10 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::select));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("BT_scan_results"));
+        setTitle(utils::translate("BT_scan_results"));
 
         box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 7 * style::window::label::default_h);
 
@@ -73,7 +73,7 @@ namespace gui
 
                 std::shared_ptr<BluetoothAddrMessage> msg =
                     std::make_shared<BluetoothAddrMessage>(bd_addr_to_str(device.address));
-                application->bus.sendUnicast(msg, "ServiceBluetooth", 5000);
+                application->bus.sendUnicastSync(msg, "ServiceBluetooth", 5000);
 
                 message_bt2(application, BluetoothMessage::Request::StopScan);
                 // message_bt2(application, BluetoothMessage::Request::Start);

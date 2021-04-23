@@ -10,6 +10,6 @@ namespace gui
     NotificationSoundWindow::NotificationSoundWindow(app::Application *app)
         : BaseSettingsWindow(app, window::name::notification_sound)
     {
-        setTitle(utils::localize.get("app_settings_notification_sound"));
+        setTitle(utils::translate("app_settings_notification_sound"));
     }
 } // namespace gui

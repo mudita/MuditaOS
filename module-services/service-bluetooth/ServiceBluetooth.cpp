@@ -11,6 +11,7 @@
 #include <Service/Message.hpp>
 #include <service-db/Settings.hpp>
 #include "service-bluetooth/messages/AudioVolume.hpp"
+#include "service-bluetooth/messages/AudioRouting.hpp"
 #include "service-bluetooth/messages/Connect.hpp"
 #include "service-bluetooth/messages/Disconnect.hpp"
 #include "service-bluetooth/messages/Status.hpp"
@@ -18,6 +19,7 @@
 #include "service-bluetooth/messages/BondedDevices.hpp"
 #include "service-bluetooth/messages/Unpair.hpp"
 #include "service-bluetooth/messages/SetDeviceName.hpp"
+#include "service-bluetooth/messages/Ring.hpp"
 
 #include "SystemManager/messages/SentinelRegistrationMessage.hpp"
 
@@ -76,6 +78,8 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<BluetoothMessage>();
     connectHandler<BluetoothPairMessage>();
     connectHandler<message::bluetooth::AudioVolume>();
+    connectHandler<message::bluetooth::Ring>();
+    connectHandler<message::bluetooth::StartAudioRouting>();
     connectHandler<message::bluetooth::Connect>();
     connectHandler<message::bluetooth::ConnectResult>();
     connectHandler<message::bluetooth::Disconnect>();
@@ -317,6 +321,20 @@ auto ServiceBluetooth::handle(message::bluetooth::AudioVolume *msg) -> std::shar
 {
     AudioServiceAPI::BluetoothVolumeChanged(this, msg->getVolume());
     return sys::MessageNone{};
+}
+
+auto ServiceBluetooth::handle(message::bluetooth::Ring *msg) -> std::shared_ptr<sys::Message>
+{
+    const auto enableRing = msg->enabled();
+    sendWorkerCommand(bluetooth::Command(enableRing ? bluetooth::Command::Type::StartRinging
+                                                    : bluetooth::Command::Type::StopRinging));
+    return std::make_shared<sys::ResponseMessage>();
+}
+
+auto ServiceBluetooth::handle(message::bluetooth::StartAudioRouting *msg) -> std::shared_ptr<sys::Message>
+{
+    sendWorkerCommand(bluetooth::Command(bluetooth::Command::Type::StartRouting));
+    return std::make_shared<sys::ResponseMessage>();
 }
 
 void ServiceBluetooth::startTimeoutTimer()

@@ -8,6 +8,7 @@
 #include <log/log.hpp>
 #include <service-evtmgr/Constants.hpp>
 #include <service-audio/AudioMessage.hpp>
+#include <service-cellular/service-cellular/CellularServiceAPI.hpp>
 #include <BluetoothWorker.hpp>
 
 extern "C"
@@ -20,6 +21,16 @@ extern "C"
 
 namespace bluetooth
 {
+    bool CellularInterfaceImpl::answerIncomingCall(sys::Service *service)
+    {
+        return CellularServiceAPI::AnswerIncomingCall(service);
+    }
+
+    bool CellularInterfaceImpl::hangupCall(sys::Service *service)
+    {
+        return CellularServiceAPI::HangupCall(service);
+    }
+
     HSP::HSP() : pimpl(std::make_unique<HSPImpl>(HSPImpl()))
     {}
 
@@ -71,6 +82,24 @@ namespace bluetooth
         pimpl->stop();
     }
 
+    auto HSP::startRinging() const noexcept -> Error::Code
+    {
+        pimpl->startRinging();
+        return Error::Success;
+    }
+
+    auto HSP::stopRinging() const noexcept -> Error::Code
+    {
+        pimpl->stopRinging();
+        return Error::Success;
+    }
+
+    auto HSP::initializeCall() const noexcept -> Error::Code
+    {
+        pimpl->initializeCall();
+        return Error::Success;
+    }
+
     HSP::~HSP() = default;
 
     uint16_t HSP::HSPImpl::scoHandle = HCI_CON_HANDLE_INVALID;
@@ -78,6 +107,7 @@ namespace bluetooth
     std::array<char, commandBufferLength> HSP::HSPImpl::ATcommandBuffer;
     std::array<uint8_t, serviceBufferLength> HSP::HSPImpl::serviceBuffer;
     std::unique_ptr<SCO> HSP::HSPImpl::sco;
+    std::unique_ptr<CellularInterface> HSP::HSPImpl::cellularInterface = nullptr;
     const sys::Service *HSP::HSPImpl::ownerService;
     std::string HSP::HSPImpl::agServiceName = "PurePhone HSP";
     bool HSP::HSPImpl::isConnected          = false;
@@ -153,6 +183,7 @@ namespace bluetooth
             else {
                 scoHandle = hsp_subevent_audio_connection_complete_get_handle(event);
                 LOG_DEBUG("Audio connection established with SCO handle 0x%04x.\n", scoHandle);
+                cellularInterface->answerIncomingCall(const_cast<sys::Service *>(ownerService));
                 hci_request_sco_can_send_now_event();
                 RunLoop::trigger();
             }
@@ -160,6 +191,7 @@ namespace bluetooth
         case HSP_SUBEVENT_AUDIO_DISCONNECTION_COMPLETE:
             LOG_DEBUG("Audio connection released.\n\n");
             sendAudioEvent(audio::EventType::BlutoothHSPDeviceState, audio::Event::DeviceState::Disconnected);
+            cellularInterface->hangupCall(const_cast<sys::Service *>(ownerService));
             scoHandle   = HCI_CON_HANDLE_INVALID;
             isConnected = false;
             break;
@@ -185,11 +217,19 @@ namespace bluetooth
         }
     }
 
+    void HSP::HSPImpl::establishAudioConnection()
+    {
+        LOG_DEBUG("Establish Audio connection to %s...\n", bd_addr_to_str(deviceAddr));
+        hsp_ag_establish_audio_connection();
+    }
+
     auto HSP::HSPImpl::init() -> Error::Code
     {
         sco = std::make_unique<SCO>();
         sco->setOwnerService(ownerService);
         sco->init();
+
+        cellularInterface = std::make_unique<CellularInterfaceImpl>();
 
         Profile::initL2cap();
         Profile::initSdp();
@@ -233,7 +273,7 @@ namespace bluetooth
     void HSP::HSPImpl::setDeviceAddress(bd_addr_t addr)
     {
         bd_addr_copy(deviceAddr, addr);
-        LOG_INFO("Address set!");
+        LOG_DEBUG("Address set!");
     }
 
     void HSP::HSPImpl::setOwnerService(const sys::Service *service)
@@ -250,12 +290,28 @@ namespace bluetooth
         if (!isConnected) {
             connect();
         }
-        LOG_DEBUG("Establish Audio connection to %s...\n", bd_addr_to_str(deviceAddr));
-        hsp_ag_establish_audio_connection();
     }
     void HSP::HSPImpl::stop()
     {
+        stopRinging();
         hsp_ag_release_audio_connection();
     }
 
+    void HSP::HSPImpl::startRinging() const noexcept
+    {
+        LOG_DEBUG("Bluetooth ring started");
+        hsp_ag_start_ringing();
+    }
+
+    void HSP::HSPImpl::stopRinging() const noexcept
+    {
+        LOG_DEBUG("Bluetooth ring stopped");
+        hsp_ag_stop_ringing();
+    }
+
+    void HSP::HSPImpl::initializeCall() const noexcept
+    {
+        stopRinging();
+        establishAudioConnection();
+    }
 } // namespace bluetooth

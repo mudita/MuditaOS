@@ -61,12 +61,12 @@ namespace gui
     {
         std::list<gui::Option> l;
 
-        l.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_send_bt"), [=](gui::Item &item) {
+        l.emplace_back(gui::Option{utils::translate("app_phonebook_options_send_bt"), [=](gui::Item &item) {
                                        LOG_INFO("Sending namecard via bluetooth!");
                                        sendViaBluetooth();
                                        return true;
                                    }});
-        l.emplace_back(gui::Option{utils::localize.get("app_phonebook_options_send_sms"), [=](gui::Item &item) {
+        l.emplace_back(gui::Option{utils::translate("app_phonebook_options_send_sms"), [=](gui::Item &item) {
                                        LOG_INFO("Sending namecard via SMS!");
                                        sendViaSms();
                                        return true;

@@ -23,7 +23,7 @@ namespace app::onBoarding
         AppWindow::buildInterface();
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(::style::strings::common::start));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(::style::strings::common::start));
 
         new gui::Image(this, 0, 0, 0, 0, "logo");
     }

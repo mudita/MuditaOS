@@ -1,20 +1,24 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StreamQueuedEventsListener.hpp"
 
-using namespace audio;
+#include <macros.h>
+
+#include <utility>
+
+using audio::StreamQueuedEventsListener;
 
 StreamQueuedEventsListener::StreamQueuedEventsListener(std::shared_ptr<cpp_freertos::Queue> eventsQueue)
     : queue(eventsQueue)
 {}
 
-void StreamQueuedEventsListener::onEvent(Stream *stream, Stream::Event event, Stream::EventSourceMode source)
+void StreamQueuedEventsListener::onEvent(AbstractStream *stream, Stream::Event event)
 {
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
     EventStorage newStorage                = {stream, event};
 
-    if (source == Stream::EventSourceMode::ISR) {
+    if (isIRQ()) {
         queue->EnqueueFromISR(&newStorage, &xHigherPriorityTaskWoken);
         if (xHigherPriorityTaskWoken) {
             taskYIELD();

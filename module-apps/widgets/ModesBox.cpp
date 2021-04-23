@@ -24,7 +24,7 @@ namespace gui
         addOffline();
     }
 
-    void ModesBox::update(const sys::phone_modes::PhoneMode &phoneMode)
+    void ModesBox::update(const sys::phone_modes::PhoneMode &phoneMode, const bool flightMode)
     {
         using PhoneMode      = sys::phone_modes::PhoneMode;
         auto getUpdateValues = [&phoneMode](const PhoneMode &compare) -> std::pair<std::string, const bool> {
@@ -34,7 +34,7 @@ namespace gui
         connected->update(getUpdateValues(PhoneMode::Connected));
         notDisturb->update(getUpdateValues(PhoneMode::DoNotDisturb));
         offline->update(getUpdateValues(PhoneMode::Offline));
-        if (phoneMode == PhoneMode::Offline) {
+        if (phoneMode == PhoneMode::Offline && !flightMode) {
             messageOnly->setVisible(true);
         }
         else {
@@ -49,7 +49,7 @@ namespace gui
                                 0,
                                 style::window::modes::width,
                                 style::window::modes::height / style::window::modes::number_of_entries);
-        connected->addText(utils::localize.get(style::window::modes::connected::title_key),
+        connected->addText(utils::translate(style::window::modes::connected::title_key),
                            style::window::font::medium,
                            style::window::modes::text::width,
                            style::window::modes::height / style::window::modes::number_of_entries);
@@ -65,7 +65,7 @@ namespace gui
                                  style::window::modes::width,
                                  style::window::modes::height / style::window::modes::number_of_entries);
 
-        notDisturb->addText(utils::localize.get(style::window::modes::notdisturb::title_key),
+        notDisturb->addText(utils::translate(style::window::modes::notdisturb::title_key),
                             style::window::font::medium,
                             style::window::modes::text::width,
                             style::window::modes::height / style::window::modes::number_of_entries);
@@ -79,7 +79,7 @@ namespace gui
                               0,
                               style::window::modes::width,
                               style::window::modes::height / style::window::modes::number_of_entries);
-        offline->addText(utils::localize.get(style::window::modes::offline::title_key),
+        offline->addText(utils::translate(style::window::modes::offline::title_key),
                          style::window::font::medium,
                          style::window::modes::text::width,
                          style::window::modes::height / style::window::modes::number_of_entries);
@@ -91,7 +91,7 @@ namespace gui
                                   style::window::modes::width,
                                   style::window::modes::height / style::window::modes::number_of_entries);
 
-        messageOnly->addText(utils::localize.get(style::window::modes::offline::description_key),
+        messageOnly->addText(utils::translate(style::window::modes::offline::description_key),
                              style::window::font::verysmall,
                              style::window::modes::text::width,
                              style::window::modes::height / style::window::modes::number_of_entries);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesItem.hpp"
@@ -57,7 +57,7 @@ namespace gui
     void NotesItem::setDateText(std::uint32_t timestamp)
     {
         if (auto dt = utils::time::DateTime(timestamp); dt.isYesterday()) {
-            date->setText(utils::localize.get("common_yesterday"));
+            date->setText(utils::translate("common_yesterday"));
         }
         else {
             date->setText(dt);

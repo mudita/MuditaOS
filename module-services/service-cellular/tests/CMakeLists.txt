@@ -37,3 +37,11 @@ add_catch2_executable(
         module-cellular
 )
 
+add_gtest_executable(
+        NAME
+        connection-manager
+        SRCS
+        unittest_connection-manager.cpp
+        LIBS
+        module-cellular
+)

@@ -25,7 +25,18 @@ add_gtest_executable(
     SRCS
         unittest.cpp
         unittest_format.cpp
+        unittest_transcode.cpp
         TestEndpoint.cpp
+        TestStream.cpp
+    LIBS
+        module-audio
+)
+
+add_catch2_executable(
+    NAME
+        audio-volume-scaler
+    SRCS
+        unittest_scaler.cpp
     LIBS
         module-audio
 )

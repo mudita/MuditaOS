@@ -147,7 +147,7 @@ namespace utils
                     return "";
                 }
                 else {
-                    return localize.get(tlocale.days[day]);
+                    return translate(tlocale.days[day]);
                 }
             }
 
@@ -158,7 +158,7 @@ namespace utils
                     return "";
                 }
                 else {
-                    return localize.get(tlocale.daysShort[day]);
+                    return translate(tlocale.daysShort[day]);
                 }
             }
 
@@ -169,33 +169,33 @@ namespace utils
                     return "";
                 }
                 else {
-                    return localize.get(tlocale.months[mon]);
+                    return translate(tlocale.months[mon]);
                 }
             }
 
             static const UTF8 yesterday()
             {
-                return localize.get(tlocale.lyesterday);
+                return translate(tlocale.lyesterday);
             }
 
             static const UTF8 today()
             {
-                return localize.get(tlocale.ltoday);
+                return translate(tlocale.ltoday);
             }
 
             static const std::string format(TimeFormat what)
             {
-                return localize.get(tlocale.time_formats[static_cast<unsigned>(what)]);
+                return translate(tlocale.time_formats[static_cast<unsigned>(what)]);
             }
 
             static const UTF8 getAM()
             {
-                return localize.get("common_AM");
+                return translate("common_AM");
             }
 
             static const UTF8 getPM()
             {
-                return localize.get("common_PM");
+                return translate("common_PM");
             }
         };
 

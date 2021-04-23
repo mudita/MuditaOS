@@ -61,11 +61,11 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        setTitle(utils::localize.get("app_messages_title_main"));
+        setTitle(utils::translate("app_messages_title_main"));
 
         leftArrowImage  = new gui::Image(this, 30, 62, 0, 0, "arrow_left");
         rightArrowImage = new gui::Image(this, 480 - 30 - 13, 62, 0, 0, "arrow_right");
@@ -78,7 +78,7 @@ namespace gui
                                  style::window_width,
                                  style::window_height - style::header::height - style::footer::height,
                                  "phonebook_empty_grey_circle_W_G",
-                                 utils::localize.get("app_messages_no_messages"));
+                                 utils::translate("app_messages_no_messages"));
 
         list->setVisible(true);
         list->focusChangedCallback = [this]([[maybe_unused]] gui::Item &item) {

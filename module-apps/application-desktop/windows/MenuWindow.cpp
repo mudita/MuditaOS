@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MenuWindow.hpp"
@@ -64,7 +64,7 @@ namespace gui
         desc->setPenWidth(style::window::default_border_no_focus_w);
         desc->setFont(style::window::font::verysmall);
         desc->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
-        desc->setText(utils::localize.get(title));
+        desc->setText(utils::translate(title));
 
         if (hasNotificationsCallback != nullptr) {
             onNotificationsChangeCallback =
@@ -147,15 +147,15 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::translate(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
         auto app = dynamic_cast<app::ApplicationDesktop *>(application);
         assert(app);
 
         mainMenu = new MenuPage(
             this,
-            utils::localize.get("app_desktop_menu_title"),
+            utils::translate("app_desktop_menu_title"),
             {
 
                 new gui::Tile{
@@ -239,7 +239,7 @@ namespace gui
 
         toolsMenu = new MenuPage(
             this,
-            utils::localize.get("app_desktop_tools_title"),
+            utils::translate("app_desktop_tools_title"),
             {
                 new gui::Tile{"menu_tools_notes_W_G",
                               "app_desktop_tools_notes",

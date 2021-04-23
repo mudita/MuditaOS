@@ -23,7 +23,7 @@ namespace gui
         vBox = new VBox(this, 0, 0, 0, 0);
         vBox->setEdges(RectangleEdge::None);
 
-        titleLabel = new Label(vBox, 0, 0, 0, 0, utils::localize.get("app_phonebook_contact_information"));
+        titleLabel = new Label(vBox, 0, 0, 0, 0, utils::translate("app_phonebook_contact_information"));
         titleLabel->setMinimumSize(phonebookStyle::informationWidget::w,
                                    phonebookStyle::informationWidget::title_label_h);
         titleLabel->setEdges(RectangleEdge::None);

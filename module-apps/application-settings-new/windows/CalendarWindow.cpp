@@ -3,6 +3,7 @@
 
 #include "CalendarWindow.hpp"
 
+#include <application-settings-new/data/SoundSelectData.hpp>
 #include <application-settings-new/ApplicationSettings.hpp>
 #include <i18n/i18n.hpp>
 #include "BaseSettingsWindow.hpp"
@@ -14,7 +15,7 @@ namespace gui
                                    std::unique_ptr<audio_settings::AbstractAudioSettingsModel> &&audioModel)
         : BaseSettingsWindow(app, gui::window::name::calendar), mWidgetMaker(this), mAudioModel(std::move(audioModel))
     {
-        setTitle(utils::localize.get("app_settings_apps_calendar"));
+        setTitle(utils::translate("app_settings_apps_calendar"));
     }
 
     std::list<Option> CalendarWindow::buildOptionsList()
@@ -23,18 +24,17 @@ namespace gui
         mVibrationsEnabled = mAudioModel->isVibrationEnabled();
         mSoundEnabled      = mAudioModel->isSoundEnabled();
 
-        mWidgetMaker.addSwitchOption(optionList,
-                                     utils::translateI18("app_settings_vibration"),
-                                     mVibrationsEnabled,
-                                     [&]() { switchVibrationState(); });
+        mWidgetMaker.addSwitchOption(optionList, utils::translate("app_settings_vibration"), mVibrationsEnabled, [&]() {
+            switchVibrationState();
+        });
 
         mWidgetMaker.addSwitchOption(
-            optionList, utils::translateI18("app_settings_sound"), mSoundEnabled, [&]() { switchSoundState(); });
+            optionList, utils::translate("app_settings_sound"), mSoundEnabled, [&]() { switchSoundState(); });
 
         if (mSoundEnabled) {
             mWidgetMaker.addSelectOption(
                 optionList,
-                utils::translateI18("app_settings_notification_sound"),
+                utils::translate("app_settings_notification_sound"),
                 [&]() { openNoticicationSoundWindow(); },
                 true);
         }
@@ -56,7 +56,11 @@ namespace gui
 
     void CalendarWindow::openNoticicationSoundWindow()
     {
-        application->switchWindow(gui::window::name::notification_sound);
+        SoundSelectData::Info info;
+        info.windowTitle = utils::translate("app_settings_notification_sound");
+        info.audioModel  = mAudioModel.get();
+
+        application->switchWindow(gui::window::name::sound_select, std::make_unique<SoundSelectData>(info));
     }
 
 } // namespace gui

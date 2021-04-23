@@ -8,6 +8,7 @@
 #include "parser/MessageHandler.hpp"
 #include "parser/ParserFSM.hpp"
 #include "endpoints/Context.hpp"
+#include "Timers/TimerFactory.hpp"
 
 #include <bsp/usb/usb.hpp>
 #include <log/log.hpp>
@@ -35,6 +36,9 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     cpuSentinel                  = std::make_shared<sys::CpuSentinel>("WorkerDesktop", ownerService);
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     ownerService->bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
+
+    usbSuspendTimer = sys::TimerFactory::createSingleShotTimer(
+        ownerService, "usbSuspend", constants::usbSuspendTimeout, [this](sys::Timer &) { suspendUsb(); });
 
     return (bsp::usbInit(receiveQueue, irqQueue, this) < 0) ? false : true;
 }
@@ -124,6 +128,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         LOG_DEBUG("USB status: %d", static_cast<int>(notification));
 
         if (notification == bsp::USBDeviceStatus::Connected) {
+            usbSuspendTimer.stop();
             ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBConnected>(),
                                           service::name::service_desktop);
         }
@@ -133,6 +138,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
                                           service::name::service_desktop);
         }
         else if (notification == bsp::USBDeviceStatus::Disconnected) {
+            usbSuspendTimer.start();
             cpuSentinel->ReleaseMinimumFrequency();
             ownerService->bus.sendUnicast(std::make_shared<sdesktop::usb::USBDisconnected>(),
                                           service::name::service_desktop);
@@ -283,4 +289,9 @@ void WorkerDesktop::uploadFileFailedResponse()
     };
     responseContext.setResponseBody(responseJson);
     parserFSM::MessageHandler::putToSendQueue(responseContext.createSimpleResponse());
+}
+
+void WorkerDesktop::suspendUsb()
+{
+    bsp::usbSuspend();
 }

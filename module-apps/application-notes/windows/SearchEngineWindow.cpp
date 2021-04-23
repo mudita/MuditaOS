@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SearchEngineWindow.hpp"
@@ -27,14 +27,14 @@ namespace app::notes
     void SearchEngineWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        setTitle(utils::localize.get("app_notes_title_main"));
+        setTitle(utils::translate("app_notes_title_main"));
 
         bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
-        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get(style::strings::common::search));
+        bottomBar->setText(gui::BottomBar::Side::CENTER, utils::translate(style::strings::common::search));
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
 
-        input = gui::inputBox(this, utils::localize.get("common_search_uc"), "search");
+        input = gui::inputBox(this, utils::translate("common_search_uc"), "search");
         setFocusItem(input);
     }
 

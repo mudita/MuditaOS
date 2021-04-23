@@ -1,17 +1,15 @@
-// Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Stream.hpp"
-
-#include <macros.h>
 
 #include <algorithm>
 #include <iterator>
 
 using namespace audio;
 
-Stream::Stream(Allocator &allocator, std::size_t blockSize, unsigned int bufferingSize)
-    : _allocator(allocator), _blockSize(blockSize), _blockCount(bufferingSize),
+Stream::Stream(AudioFormat format, Allocator &allocator, std::size_t blockSize, unsigned int bufferingSize)
+    : _allocator(allocator), _blockSize(blockSize), _blockCount(bufferingSize), _format(format),
       _buffer(_allocator.allocate(_blockSize * _blockCount)), _emptyBuffer(_allocator.allocate(_blockSize)),
       _dataStart(_buffer.get(), _blockSize * _blockCount, _buffer.get(), _blockSize), _dataEnd(_dataStart),
       _peekPosition(_dataStart), _writeReservationPosition(_dataStart)
@@ -169,21 +167,31 @@ void Stream::release()
     _writeReservationPosition = _dataEnd;
 }
 
-std::size_t Stream::getBlockSize() const noexcept
+auto Stream::getInputTraits() const noexcept -> Traits
 {
     LockGuard lock;
-
-    return _blockSize;
+    return getIOTraits();
 }
 
-void Stream::registerListener(EventListener *listener)
+auto Stream::getOutputTraits() const noexcept -> Traits
+{
+    LockGuard lock;
+    return getIOTraits();
+}
+
+auto Stream::getIOTraits() const noexcept -> Traits
+{
+    return Traits{.blockSize = _blockSize, .format = _format};
+}
+
+void Stream::registerListener(AbstractStream::EventListener *listener)
 {
     LockGuard lock;
 
     listeners.push_back(std::ref(listener));
 }
 
-void Stream::unregisterListeners(Stream::EventListener *listener)
+void Stream::unregisterListeners(AbstractStream::EventListener *listener)
 {
     LockGuard lock;
 
@@ -195,10 +203,8 @@ void Stream::unregisterListeners(Stream::EventListener *listener)
 
 void Stream::broadcastEvent(Event event)
 {
-    auto eventMode = isIRQ() ? EventSourceMode::ISR : EventSourceMode::Thread;
-
     for (auto listener : listeners) {
-        listener->onEvent(this, event, eventMode);
+        listener->onEvent(this, event);
     }
 }
 
@@ -251,7 +257,7 @@ bool Stream::isFull() const noexcept
 
 bool Stream::blocksAvailable() const noexcept
 {
-    return !isEmpty();
+    return !isFull();
 }
 
 void Stream::reset()
@@ -336,11 +342,6 @@ Stream::RawBlockIterator Stream::RawBlockIterator::operator--(int)
 Stream::Span Stream::RawBlockIterator::operator*()
 {
     return Stream::Span{.data = _curPos, .dataSize = _stepSize};
-}
-
-std::uint8_t *Stream::Span::dataEnd() const noexcept
-{
-    return data + dataSize;
 }
 
 Stream::Span Stream::getNullSpan() const noexcept

@@ -30,8 +30,8 @@ namespace gui
 
         bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
         bottomBar->setActive(gui::BottomBar::Side::LEFT, true);
-        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
-        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::translate(style::strings::common::back));
+        bottomBar->setText(gui::BottomBar::Side::LEFT, utils::translate(style::strings::common::options));
 
         bodyList = new gui::ListView(this,
                                      style::window::calendar::listView_x,

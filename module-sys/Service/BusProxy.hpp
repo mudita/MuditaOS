@@ -24,7 +24,9 @@ namespace sys
         ~BusProxy() noexcept;
 
         bool sendUnicast(std::shared_ptr<Message> message, const std::string &targetName);
-        SendResult sendUnicast(std::shared_ptr<Message> message, const std::string &targetName, std::uint32_t timeout);
+        SendResult sendUnicastSync(std::shared_ptr<Message> message,
+                                   const std::string &targetName,
+                                   std::uint32_t timeout);
         void sendMulticast(std::shared_ptr<Message> message, BusChannel channel);
         void sendBroadcast(std::shared_ptr<Message> message);
 

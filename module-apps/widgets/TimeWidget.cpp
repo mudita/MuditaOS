@@ -187,7 +187,7 @@ namespace gui
         };
         mode12hInput->focusChangedCallback = [&](Item &item) {
             if (item.focus) {
-                bottomBarTemporaryMode(utils::localize.get("common_switch"));
+                bottomBarTemporaryMode(utils::translate("common_switch"));
             }
             else {
                 bottomBarRestoreFromTemporaryMode();
