@@ -11,7 +11,8 @@ namespace gui
 {
 
     NewApnWindow::NewApnWindow(app::Application *app)
-        : AppWindow(app, gui::window::name::new_apn), newApnModel{std::make_shared<NewApnModel>(app)}
+        : AppWindow(app, gui::window::name::new_apn),
+          apn(std::make_shared<packet_data::APN::Config>()), newApnModel{std::make_shared<NewApnModel>(app)}
     {
         buildInterface();
     }
@@ -74,10 +75,13 @@ namespace gui
             return false;
         }
 
-        apn = item->getApn();
-        if (apn == nullptr) {
-            apn = std::make_shared<packet_data::APN::Config>();
-            return true;
+        auto apnItem = item->getApn();
+        if (apnItem != nullptr) {
+            apn = apnItem;
+        }
+
+        if (!apn->apn.empty()) {
+            setSaveButtonVisible(true);
         }
 
         return true;
@@ -94,26 +98,19 @@ namespace gui
             return false;
         }
         if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
-            if (apn != nullptr) {
-                newApnModel->saveData(apn);
+            newApnModel->saveData(apn);
+            LOG_DEBUG("APN: \"%s\" ", apn->apn.c_str());
+            if (apn != nullptr && !apn->apn.empty()) {
+                apnSettingsModel->saveAPN(apn);
+                LOG_INFO("APN record saved: \"%s\" ", apn->apn.c_str());
+                application->returnToPreviousWindow();
             }
-            verifyAndSave();
+            else {
+                LOG_WARN("APN not saved, name is empty!");
+            }
             return true;
         }
 
         return AppWindow::onInput(inputEvent);
     }
-
-    auto NewApnWindow::verifyAndSave() -> bool
-    {
-        if (apn == nullptr) {
-            LOG_DEBUG("APN record not found");
-            return false;
-        }
-        apnSettingsModel->saveAPN(apn);
-        LOG_DEBUG("APN record  saved : \"%s\" ", apn->apn.c_str());
-
-        return true;
-    }
-
 } // namespace gui
