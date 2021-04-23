@@ -29,8 +29,7 @@ bool CellularServiceAPI::DialNumber(sys::Service *serv, const utils::PhoneNumber
 
 bool CellularServiceAPI::DialEmergencyNumber(sys::Service *serv, const utils::PhoneNumber &number)
 {
-    auto msg = std::make_shared<CellularCallRequestMessage>(number.getView(),
-                                                            CellularCallRequestMessage::RequestMode::Emergency);
+    auto msg = std::make_shared<CellularCallRequestMessage>(number.getView(), cellular::api::CallMode::Emergency);
     return serv->bus.sendUnicast(msg, ServiceCellular::serviceName);
 }
 

@@ -2287,8 +2287,8 @@ auto ServiceCellular::handleCellularCallRequestMessage(CellularCallRequestMessag
 
     cellular::RequestFactory factory(msg->number.getEntered(),
                                      *channel,
-                                     msg->requestMode,
-                                     Store::GSM::get()->simCardInserted() ? RequestFactory::SimStatus::SimInsterted
+                                     msg->callMode,
+                                     Store::GSM::get()->simCardInserted() ? RequestFactory::SimStatus::SimInserted
                                                                           : RequestFactory::SimStatus::SimSlotEmpty);
 
     auto request = factory.create();

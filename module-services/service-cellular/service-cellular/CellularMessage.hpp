@@ -24,6 +24,26 @@
 #include <service-appmgr/service-appmgr/data/SimActionsParams.hpp>
 #include <service-appmgr/service-appmgr/data/MmiActionsParams.hpp>
 
+namespace cellular
+{
+    namespace api
+    {
+        enum class CallMode
+        {
+            Regular,
+            Emergency
+        };
+    }
+    namespace msg::request
+    {}
+} // namespace cellular
+
+// ugly temporary tweak
+namespace api
+{
+    using CallMode = cellular::api::CallMode;
+}
+
 class CellularMessage : public sys::DataMessage
 {
   public:
@@ -354,17 +374,11 @@ class CellularAntennaRequestMessage : public CellularMessage
 class CellularCallRequestMessage : public CellularMessage
 {
   public:
-    enum class RequestMode
-    {
-        Normal,
-        Emergency
-    };
-
-    CellularCallRequestMessage(const utils::PhoneNumber::View &number, RequestMode requestMode = RequestMode::Normal)
-        : CellularMessage(Type::CallRequest), number(number), requestMode(requestMode)
+    CellularCallRequestMessage(const utils::PhoneNumber::View &number, api::CallMode callMode = api::CallMode::Regular)
+        : CellularMessage(Type::CallRequest), number(number), callMode(callMode)
     {}
     utils::PhoneNumber::View number;
-    RequestMode requestMode = RequestMode::Normal;
+    api::CallMode callMode = api::CallMode::Regular;
 };
 
 class CellularSmsNoSimRequestMessage : public CellularMessage, public app::manager::actions::ConvertibleToAction

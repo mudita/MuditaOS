@@ -23,9 +23,9 @@ namespace cellular
 {
     RequestFactory::RequestFactory(const std::string &data,
                                    at::BaseChannel &channel,
-                                   CellularCallRequestMessage::RequestMode requestMode,
+                                   cellular::api::CallMode callMode,
                                    SimStatus simCardStatus)
-        : request(data), channel(channel), requestMode(requestMode), simStatus(simCardStatus)
+        : request(data), channel(channel), callMode(callMode), simStatus(simCardStatus)
     {
         registerRequest(ImeiRegex, ImeiRequest::create);
         registerRequest(PasswordRegistrationRegex, PasswordRegistrationRequest::create);
@@ -54,14 +54,14 @@ namespace cellular
             qeccnumResponse.eccNumbersNoSim.end();
 
         if (isSimEmergency || isNoSimEmergency) {
-            if (simStatus == SimStatus::SimInsterted || isNoSimEmergency) {
+            if (simStatus == SimStatus::SimInserted || isNoSimEmergency) {
                 return std::make_unique<CallRequest>(request);
             }
             else {
                 return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NoSim, request);
             }
         }
-        else if (requestMode == CellularCallRequestMessage::RequestMode::Emergency) {
+        else if (callMode == cellular::api::CallMode::Emergency) {
             return std::make_unique<RejectRequest>(RejectRequest::RejectReason::NotAnEmergencyNumber, request);
         }
         return nullptr;

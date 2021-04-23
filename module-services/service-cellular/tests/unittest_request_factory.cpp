@@ -109,12 +109,11 @@ TEST_CASE("Emergency handling")
 
         auto dummyChannel = at::GenericChannel(at::Result::Code::OK, channelMockResponse);
 
-        RequestFactory requestFactory(test.number,
-                                      dummyChannel,
-                                      test.isEmergencyRequest ? CellularCallRequestMessage::RequestMode::Emergency
-                                                              : CellularCallRequestMessage::RequestMode::Normal,
-                                      test.insertSim ? RequestFactory::SimStatus::SimInsterted
-                                                     : RequestFactory::SimStatus::SimSlotEmpty);
+        RequestFactory requestFactory(
+            test.number,
+            dummyChannel,
+            test.isEmergencyRequest ? cellular::api::CallMode::Emergency : cellular::api::CallMode::Regular,
+            test.insertSim ? RequestFactory::SimStatus::SimInserted : RequestFactory::SimStatus::SimSlotEmpty);
         std::shared_ptr<IRequest> request = requestFactory.create();
 
         INFO("Failed test case idx: " + std::to_string(idx));
@@ -447,8 +446,8 @@ TEST_CASE("MMI requests")
         auto mockChannel = at::GenericChannel(at::Result::Code::OK, {});
         RequestFactory requestFactory(testCase.requestString,
                                       mockChannel,
-                                      CellularCallRequestMessage::RequestMode::Normal,
-                                      RequestFactory::SimStatus::SimInsterted);
+                                      cellular::api::CallMode::Regular,
+                                      RequestFactory::SimStatus::SimInserted);
         auto request        = requestFactory.create();
         auto requestCommand = request->command();
 

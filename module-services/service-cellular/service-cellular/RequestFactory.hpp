@@ -23,13 +23,13 @@ namespace cellular
       public:
         enum class SimStatus
         {
-            SimInsterted,
+            SimInserted,
             SimSlotEmpty
         };
 
         RequestFactory(const std::string &data,
                        at::BaseChannel &channel,
-                       CellularCallRequestMessage::RequestMode requestMode,
+                       cellular::api::CallMode callMode,
                        SimStatus simCardStatus);
         std::unique_ptr<IRequest> create();
 
@@ -41,7 +41,7 @@ namespace cellular
         std::vector<std::pair<std::string, CreateCallback>> requestMap;
 
         at::BaseChannel &channel;
-        const CellularCallRequestMessage::RequestMode requestMode;
+        const cellular::api::CallMode callMode;
         const SimStatus simStatus;
     };
 } // namespace cellular
