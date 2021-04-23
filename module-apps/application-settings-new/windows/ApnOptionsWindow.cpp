@@ -24,6 +24,7 @@ namespace gui
             utils::translate("app_settings_apn_options_edit"),
             [=](gui::Item &item) {
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<ApnItemData>(apn);
+                data->ignoreCurrentWindowOnStack      = true;
                 application->switchWindow(gui::window::name::new_apn, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                 return true;
             },
@@ -34,6 +35,7 @@ namespace gui
             utils::translate("app_settings_apn_options_delete"),
             [=](gui::Item &item) {
                 apnSettingsModel->removeAPN(apn);
+                application->returnToPreviousWindow();
                 return true;
             },
             nullptr,
@@ -43,6 +45,7 @@ namespace gui
             utils::translate("app_settings_apn_options_set_as_default"),
             [=](gui::Item &item) {
                 apnSettingsModel->setAsDefaultAPN(apn);
+                application->returnToPreviousWindow();
                 return true;
             },
             nullptr,
