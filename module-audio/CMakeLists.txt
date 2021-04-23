@@ -56,8 +56,6 @@ target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_compile_options(${PROJECT_NAME} PRIVATE -O0 -g)
-
 # supress warning for flac decoder
 set_source_files_properties(
         ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp
